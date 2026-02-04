@@ -4,19 +4,30 @@ The Rust Language Toolkit: a localization DSL embedded in Rust via macros.
 
 ## Overview
 
-RLT files are valid Rust source files with a `.rlt.rs` extension. They
-contain an `rlt!` macro invocation that defines phrases for a single
-language.
+RLT files are valid Rust source files with a `.rlt.rs` extension. They contain
+macro invocations that define phrases for a single language.
+
+The **source language** (typically English) uses `rlt_source!`:
 
 ```rust
 // en.rlt.rs
-rlt! {
+rlt_source! {
     hello = "Hello, world!";
 }
 ```
 
-The macro generates Rust functions with compile-time validation of phrase and
-parameter names. Parameter values are dynamically typed at runtime.
+**Translation languages** use `rlt_lang!`:
+
+```rust
+// ru.rlt.rs
+rlt_lang!(Ru) {
+    hello = "Привет, мир!";
+}
+```
+
+The source macro generates a trait (`RltLang`) with default implementations.
+Translation macros implement the trait, overriding only the phrases they define.
+Missing translations automatically fall back to the source language.
 
 ---
 
@@ -30,7 +41,7 @@ RLT has four primitives: **phrase**, **parameter**, **variant**, and
 A phrase has a name and produces text.
 
 ```rust
-rlt! {
+rlt_source! {
     hello = "Hello, world!";
     goodbye = "Goodbye!";
 }
@@ -42,7 +53,7 @@ Phrases can accept values. Parameters are declared in parentheses and
 interpolated with `{}`.
 
 ```rust
-rlt! {
+rlt_source! {
     greet(name) = "Hello, {name}!";
     damage(amount, target) = "Deal {amount} damage to {target}.";
 }
@@ -53,7 +64,7 @@ rlt! {
 A phrase can have multiple forms. Variants are declared in braces after `=`.
 
 ```rust
-rlt! {
+rlt_source! {
     card = {
         one: "card",
         other: "cards",
@@ -64,7 +75,7 @@ rlt! {
 Variants can be multi-dimensional using dot notation:
 
 ```rust
-rlt! {
+rlt_lang!(Ru) {
     card = {
         nom.one: "карта",
         nom.few: "карты",
@@ -76,6 +87,59 @@ rlt! {
 }
 ```
 
+**Multi-key shorthand:** Assign the same value to multiple keys with commas:
+
+```rust
+rlt_source! {
+    card = {
+        nom.one, acc.one: "card",
+        nom.other, acc.other: "cards",
+    };
+}
+```
+
+**Wildcard fallbacks:** Omit the final dimension to create a fallback for any
+unspecified sub-key:
+
+```rust
+rlt_lang!(Ru) {
+    card = {
+        nom: "карта",        // Fallback for nom.one, nom.few, etc.
+        nom.many: "карт",    // Override for nom.many specifically
+        acc: "карту",
+        acc.many: "карт",
+    };
+}
+```
+
+Resolution order: exact match (`nom.many`) → progressively shorter fallbacks (`nom`).
+If no match is found after trying all fallbacks, RLT produces a **runtime error**.
+This catches bugs where a required variant is missing from a phrase definition.
+
+**Irregular forms (suppletion):** Use variants for words with unpredictable forms:
+
+```rust
+rlt_source! {
+    go = { present: "go", past: "went", participle: "gone" };
+    good = { base: "good", comparative: "better", superlative: "best" };
+}
+```
+
+These features combine for concise definitions:
+
+```rust
+rlt_lang!(Ru) {
+    event = :neut :inan {
+        nom, acc: "событие",
+        nom.many, acc.many: "событий",
+        gen: "события",
+        gen.many: "событий",
+        ins.one: "событием",
+        ins: "событиями",
+    };
+}
+```
+
 ### Selection
 
 The `:` operator selects a variant.
@@ -83,8 +147,11 @@ The `:` operator selects a variant.
 Literal selection uses a variant name directly:
 
 ```rust
-rlt! {
+rlt_source! {
     all_cards = "All {card:other}.";
+}
+
+rlt_lang!(Ru) {
     take_one = "Возьмите {card:acc.one}.";
 }
 ```
@@ -93,17 +160,29 @@ Derived selection uses a parameter. For numbers, RLT maps to CLDR plural
 categories (`one`, `two`, `few`, `many`, `other`):
 
 ```rust
-rlt! {
+rlt_source! {
     draw(n) = "Draw {n} {card:n}.";
 }
 // n=1 → "Draw 1 card."
 // n=5 → "Draw 5 cards."
 ```
 
+**Escape sequences:** Use doubled characters to include literal `{`, `}`, `@`, or `:`
+in phrase text:
+
+```rust
+rlt_source! {
+    syntax_help = "Use {{name}} for interpolation and @@ for transforms.";
+    ratio = "The ratio is 1::2.";
+}
+// → "Use {name} for interpolation and @ for transforms."
+// → "The ratio is 1:2."
+```
+
 Multi-dimensional selection chains with multiple `:` operators:
 
 ```rust
-rlt! {
+rlt_lang!(Ru) {
     draw(n) = "Возьмите {n} {card:acc:n}.";
 }
 // n=1 → "Возьмите 1 карту."
@@ -116,7 +195,7 @@ When a phrase takes another phrase as a parameter, you can select variants from
 it:
 
 ```rust
-rlt! {
+rlt_source! {
     character = {
         one: "character",
         other: "characters",
@@ -136,7 +215,7 @@ phrase `counting` refers to."
 Selection also works when both the phrase and selector are parameters:
 
 ```rust
-rlt! {
+rlt_source! {
     character = { one: "character", other: "characters" };
     card = { one: "card", other: "cards" };
 
@@ -153,16 +232,16 @@ number at runtime.
 
 ## Metadata Tags
 
-A phrase can declare metadata tags using `:` after its definition. Tags serve
+A phrase can declare metadata tags using `:` before its content. Tags serve
 two purposes:
 
 1. **Selection**: Other phrases can select variants based on the tag
 2. **Transforms**: Transforms can read tags to determine behavior
 
 ```rust
-rlt! {
-    card = "carta" :fem;
-    character = "personaje" :masc;
+rlt_lang!(Es) {
+    card = :fem "carta";
+    character = :masc "personaje";
 }
 ```
 
@@ -171,31 +250,35 @@ rlt! {
 Phrases can have multiple tags for different purposes:
 
 ```rust
-rlt! {
+rlt_source! {
     // English: article hint for @a transform
-    card = "card" :a;
-    event = "event" :an;
-    ally = "ally" :an;
-    uniform = "uniform" :a;   // phonetic exception (not "an uniform")
-    hour = "hour" :an;        // silent h exception
+    card = :a "card";
+    event = :an "event";
+    ally = :an "ally";
+    uniform = :a "uniform";   // phonetic exception (not "an uniform")
+    hour = :an "hour";        // silent h exception
+}
 
+rlt_lang!(De) {
     // German: grammatical gender for article transforms
-    karte = "Karte" :fem;
-    charakter = "Charakter" :masc;
-    ereignis = "Ereignis" :neut;
+    karte = :fem "Karte";
+    charakter = :masc "Charakter";
+    ereignis = :neut "Ereignis";
+}
 
+rlt_lang!(ZhCn) {
     // Chinese: measure word category for @count transform
-    pai = "牌" :zhang;
-    jue_se = "角色" :ge;
+    pai = :zhang "牌";
+    jue_se = :ge "角色";
 }
 ```
 
 **Selection based on tags:**
 
 ```rust
-rlt! {
-    card = "carta" :fem;
-    character = "personaje" :masc;
+rlt_lang!(Es) {
+    card = :fem "carta";
+    character = :masc "personaje";
 
     destroyed = {
         masc: "destruido",
@@ -213,22 +296,23 @@ rlt! {
 ## Transforms
 
 The `@` operator applies a transform. Transforms are prefix operations that
-modify text.
+modify text. When chaining multiple transforms, they apply right-to-left
+(innermost first):
 
 ```rust
-rlt! {
+rlt_source! {
     card = "card";
 
     draw_one = "Draw {@a card}.";        // → "Draw a card."
     title = "{@cap card}";               // → "Card"
-    heading = "{@cap @a card}";          // → "A card"
+    heading = "{@cap @a card}";          // @a first → "a card", then @cap → "A card"
 }
 ```
 
 Transforms combine with selection:
 
 ```rust
-rlt! {
+rlt_source! {
     card = {
         one: "card",
         other: "cards",
@@ -239,6 +323,32 @@ rlt! {
 // n=1 → "Draw 1 Card."
 // n=3 → "Draw 3 Cards."
 ```
+
+**Transform context:** Some transforms need additional information beyond the
+phrase they operate on. Context is passed via `@transform:context`, where context
+can be a literal value or a parameter reference:
+
+```rust
+destroy_card = "Zerstöre {@der:acc karte}.";      // :acc is literal context
+return_all(t) = "devuelve {@el:other t} a mano";  // :other is literal context
+draw(n) = "抽{@count:n card}";                    // :n is parameter context
+```
+
+Here `:acc` tells `@der` to produce the accusative article, `:other` tells `@el`
+to produce the plural article, and `:n` tells `@count` how many items. The context
+modifies the transform's behavior—it's not selecting from the phrase's variants.
+
+**Disambiguation:** When both transform context and phrase selection appear, the
+first `:` after the transform name is context, subsequent `:` operators apply to
+the phrase:
+
+```rust
+draw(n) = "Draw {@cap card:n}.";           // No context; :n selects from card
+get_card = "Nimm {@der:acc karte:one}.";   // :acc is context; :one selects variant
+```
+
+The general pattern is `{@transform:context phrase:selector}`. Transforms that
+don't use context (like `@cap`) ignore any context provided.
 
 ### Universal Transforms
 
@@ -256,11 +366,11 @@ Language-specific transforms read metadata tags to determine behavior:
 
 ```rust
 // en.rlt.rs
-rlt! {
-    card = "card" :a;
-    event = "event" :an;
-    hour = "hour" :an;      // silent h
-    uniform = "uniform" :a;  // phonetic exception
+rlt_source! {
+    card = :a "card";
+    event = :an "event";
+    hour = :an "hour";      // silent h
+    uniform = :a "uniform";  // phonetic exception
 
     draw_one = "Draw {@a card}.";   // → "Draw a card."
     play_one = "Play {@a event}.";  // → "Play an event."
@@ -277,22 +387,22 @@ This pattern applies to other language-specific transforms:
 
 ```rust
 // de.rlt.rs - German definite articles
-rlt! {
-    karte = "Karte" :fem;
-    charakter = "Charakter" :masc;
-    ereignis = "Ereignis" :neut;
+rlt_lang!(De) {
+    karte = :fem "Karte";
+    charakter = :masc "Charakter";
+    ereignis = :neut "Ereignis";
 
-    // @the reads :masc/:fem/:neut → der/die/das
-    destroy_card = "Zerstöre {@the karte}.";  // → "Zerstöre die Karte."
+    // @der reads :masc/:fem/:neut → der/die/das
+    destroy_card = "Zerstöre {@der:acc karte}.";  // → "Zerstöre die Karte."
 }
 
 // zh_cn.rlt.rs - Chinese measure words
-rlt! {
-    pai = "牌" :zhang;
-    jue_se = "角色" :ge;
+rlt_lang!(ZhCn) {
+    pai = :zhang "牌";
+    jue_se = :ge "角色";
 
-    // @count reads measure word tags
-    draw(n) = "抽{@count n pai}";  // → "抽3张牌"
+    // @count uses context for the number, reads measure word tag from phrase
+    draw(n) = "抽{@count:n pai}";  // → "抽3张牌"
 }
 ```
 
@@ -305,11 +415,44 @@ in `fr.rlt.rs` uses French rules. The language is inferred from the filename.
 | Transform   | Languages                      | Reads Tags                   | Effect                       |
 | ----------- | ------------------------------ | ---------------------------- | ---------------------------- |
 | `@a`        | English                        | `:a`, `:an`                  | Indefinite article (a/an)    |
-| `@the`      | Germanic, Romance              | `:masc`, `:fem`, `:neut`     | Definite article             |
+| `@der`      | German                         | `:masc`, `:fem`, `:neut`     | Definite article + case      |
+| `@el`       | Spanish                        | `:masc`, `:fem`              | Definite article             |
+| `@le`       | French                         | `:masc`, `:fem`, `:vowel`    | Definite article (with elision) |
 | `@un`       | Romance                        | `:masc`, `:fem`              | Indefinite article           |
-| `@contract` | French, Italian, Portuguese    | article + preposition        | Contraction (de+le→du)       |
-| `@elide`    | French, Italian                | `:vowel`                     | Vowel elision (le→l')        |
 | `@count`    | Chinese, Japanese, Korean      | `:zhang`, `:ge`, etc.        | Measure word insertion       |
+
+### Transform Aliases
+
+Transforms can have aliases for readability. Aliases are interchangeable—they
+produce identical behavior:
+
+```rust
+// en.rlt.rs - @a and @an are aliases
+rlt_source! {
+    card = :a "card";
+    event = :an "event";
+
+    // Both forms work identically:
+    draw_card = "Draw {@a card}.";    // → "Draw a card."
+    play_event = "Play {@an event}."; // → "Play an event."
+
+    // The transform reads the tag, not the alias used:
+    also_works = "Draw {@an card}.";  // → "Draw a card." (reads :a tag)
+}
+```
+
+Common aliases by language:
+
+| Language | Primary | Aliases |
+| -------- | ------- | ------- |
+| English  | `@a`    | `@an`   |
+| German   | `@der`  | `@die`, `@das` |
+| Spanish  | `@el`   | `@la`   |
+| French   | `@le`   | `@la`   |
+| Italian  | `@il`   | `@lo`, `@la` |
+
+Aliases let translators write what feels natural for the phrase being modified,
+even though the transform behavior is determined by the phrase's metadata tags.
 
 See **APPENDIX_STDLIB.md** for complete documentation of transforms per
 language.
@@ -319,10 +462,10 @@ language.
 Transforms read metadata from phrase parameters, enabling abstraction:
 
 ```rust
-rlt! {
-    card = "card" :a;
-    event = "event" :an;
-    ally = "ally" :an;
+rlt_source! {
+    card = :a "card";
+    event = :an "event";
+    ally = :an "ally";
 
     // thing is a phrase parameter - @a reads its :a/:an tag
     play(thing) = "Play {@a thing}.";
@@ -351,7 +494,7 @@ draw(n) = "Draw {card:n}.";  // Picks "card" or "cards"
 articles, capitalization, contractions, measure words.
 
 ```rust
-card = "card" :a;
+card = :a "card";
 draw_one = "Draw {@a card}.";  // Produces "a card"
 ```
 
@@ -368,7 +511,7 @@ apply dynamic rules.
 
 ```rust
 // en.rlt.rs
-rlt! {
+rlt_source! {
     card = {
         one: "card",
         other: "cards",
@@ -384,35 +527,32 @@ Russian has three plural categories:
 
 ```rust
 // ru.rlt.rs
-rlt! {
+rlt_lang!(Ru) {
     card = {
-        one: "карта",
+        one: "карту",
         few: "карты",
         many: "карт",
     };
 
     draw(n) = "Возьмите {n} {card:n}.";
 }
-// n=1  → "Возьмите 1 карта."
+// n=1  → "Возьмите 1 карту."
 // n=3  → "Возьмите 3 карты."
 // n=5  → "Возьмите 5 карт."
-// n=21 → "Возьмите 21 карта."
+// n=21 → "Возьмите 21 карту."
 ```
 
 ### Case + Number (Russian)
 
 ```rust
 // ru.rlt.rs
-rlt! {
+rlt_lang!(Ru) {
     card = {
-        nom.one: "карта",
-        nom.few: "карты",
+        nom: "карта",
         nom.many: "карт",
-        acc.one: "карту",
-        acc.few: "карты",
+        acc: "карту",
         acc.many: "карт",
-        gen.one: "карты",
-        gen.few: "карт",
+        gen: "карты",
         gen.many: "карт",
     };
 
@@ -425,9 +565,9 @@ rlt! {
 
 ```rust
 // es.rlt.rs
-rlt! {
-    card = "carta" :fem;
-    enemy = "enemigo" :masc;
+rlt_lang!(Es) {
+    card = :fem "carta";
+    enemy = :masc "enemigo";
 
     destroyed = {
         masc: "destruido",
@@ -440,38 +580,49 @@ rlt! {
 // target=enemy → "Enemigo fue destruido."
 ```
 
+### Verb Agreement (Russian)
+
+Verbs that agree with their subject use the same tag-based selection pattern:
+
+```rust
+// ru.rlt.rs
+rlt_lang!(Ru) {
+    card = :fem "карта";
+    character = :masc "персонаж";
+
+    // Past tense agrees in gender
+    was_destroyed = {
+        masc: "был уничтожен",
+        fem: "была уничтожена",
+        neut: "было уничтожено",
+    };
+
+    thing_destroyed(thing) = "{thing:nom.one} {was_destroyed:thing}.";
+}
+// thing=card      → "карта была уничтожена."
+// thing=character → "персонаж был уничтожен."
+```
+
 ### Measure Words (Chinese)
 
-```rust
-// zh-CN.rlt.rs
-rlt! {
-    card = "牌";
-    character = "角色";
-
-    zhang(n, thing) = "{n}张{thing}";
-    ge(n, thing) = "{n}个{thing}";
-
-    draw(n) = "抽{zhang(n, card)}。";
-    summon(n) = "召唤{ge(n, character)}。";
-}
-// draw(3)   → "抽3张牌。"
-// summon(2) → "召唤2个角色。"
-```
-
-### Articles (English)
+Chinese requires measure words (classifiers) between numbers and nouns. The
+`@count` transform uses context for the number and reads the measure word tag
+from the phrase:
 
 ```rust
-// en.rlt.rs
-rlt! {
-    card = "card";
-    event = "event";
-    ally = "ally";
+// zh_cn.rlt.rs
+rlt_lang!(ZhCn) {
+    card = :zhang "牌";       // :zhang = 张 (flat objects)
+    character = :ge "角色";   // :ge = 个 (general classifier)
 
-    draw_one = "Draw {@a card}.";      // → "Draw a card."
-    play_one = "Play {@a event}.";     // → "Play an event."
-    target_one = "Target {@a ally}.";  // → "Target an ally."
+    draw(n) = "抽{@count:n card}。";      // → "抽3张牌。"
+    summon(n) = "召唤{@count:n character}。"; // → "召唤2个角色。"
 }
 ```
+
+The `@count:n phrase` pattern uses `n` as context (the count) and reads the
+measure word tag from the phrase. This applies to Japanese, Korean, Vietnamese,
+Thai, and Bengali, each with their own classifier tags.
 
 ---
 
@@ -483,15 +634,15 @@ Each language has its own `.rlt.rs` file:
 src/
   localization/
     mod.rs
-    en.rlt.rs      # English (source)
-    zh_cn.rlt.rs   # Simplified Chinese
-    ru.rlt.rs      # Russian
-    es.rlt.rs      # Spanish
-    pt_br.rlt.rs   # Portuguese (Brazil)
+    en.rlt.rs      # English (source) - uses rlt_source!
+    zh_cn.rlt.rs   # Simplified Chinese - uses rlt_lang!
+    ru.rlt.rs      # Russian - uses rlt_lang!
+    es.rlt.rs      # Spanish - uses rlt_lang!
+    pt_br.rlt.rs   # Portuguese (Brazil) - uses rlt_lang!
 ```
 
-The source language defines the contract. Other languages must define the same
-phrase names with the same parameters.
+The source language defines the API contract via the generated trait. Translation
+languages implement the trait, with missing phrases falling back to the source.
 
 ---
 
@@ -502,10 +653,10 @@ phrase references. Type checking happens at runtime.
 
 ```rust
 // All of these work:
-en::draw(3);                    // number
-en::draw("3");                  // string (converted to display)
-en::greet("World");             // string
-en::destroy(es::card());        // phrase reference
+En.draw(3);                    // number
+En.draw("3");                  // string (converted to display)
+En.greet("World");             // string
+Es.destroy(Es.card());         // phrase reference
 ```
 
 **Runtime behavior:**
@@ -513,19 +664,24 @@ en::destroy(es::card());        // phrase reference
 | Operation              | Value Type      | Behavior                                    |
 | ---------------------- | --------------- | ------------------------------------------- |
 | `{x}`                  | Any             | Display the value                           |
-| `{card:x}` (plural)    | Number          | Select plural category (one/few/many/other) |
-| `{card:x}` (plural)    | String          | Parse as number, or use "other" as fallback |
-| `{card:x}` (plural)    | Phrase          | Use "other" as fallback                     |
-| `{destroyed:x}` (tags) | Phrase          | Look up tag, select matching variant        |
-| `{destroyed:x}` (tags) | String/Number   | Use first variant as fallback               |
+| `{card:x}` (selection) | Number          | Select plural category (one/few/many/other) |
+| `{card:x}` (selection) | String          | Parse as number, or error if invalid        |
+| `{card:x}` (selection) | Phrase          | Look up matching tag from phrase            |
+| `{card:x}` (selection) | (no match)      | **Runtime error** (missing variant)         |
 | `{@a x}`               | Phrase with tag | Use the tag                                 |
 | `{@a x}`               | Other           | **Runtime error** (missing required tag)    |
 
-This design prioritizes simplicity and flexibility over strict type safety.
-Selection operations use fallback behavior—the system always produces *some*
-output, even if the value type doesn't match the expected usage. However,
-metadata-driven transforms (like `@a`) produce runtime errors when required
-tags are missing, ensuring predictable results.
+**Design rationale:** All selection operations produce runtime errors when they
+cannot find a matching variant. This catches bugs early: a missing `few` variant
+in Russian, a missing gender tag for Spanish agreement, or passing a string where
+a phrase was expected. Silent fallbacks would produce subtly incorrect output that
+might not be noticed until a native speaker reviews the text.
+
+**Error handling:** All phrase functions return `Result<String, RltError>`.
+Callers should handle errors appropriately for their context—log and use a
+fallback string, propagate the error, or panic during development. The error
+message includes the operation, expected variants/tags, and actual value to
+aid debugging.
 
 ---
 
@@ -535,7 +691,7 @@ Given:
 
 ```rust
 // en.rlt.rs
-rlt! {
+rlt_source! {
     card = {
         one: "card",
         other: "cards",
@@ -548,104 +704,157 @@ rlt! {
 RLT generates:
 
 ```rust
-pub mod en {
-    pub fn draw(n: impl Into<Value>) -> String {
-        // Runtime plural selection based on n's value
-    }
+// A unit struct for trait dispatch
+pub struct En;
+
+// The trait with default implementations (fallback to English)
+pub trait RltLang {
+    fn card(&self) -> Phrase { ... }
+    fn draw(&self, n: impl Into<Value>) -> Result<String, RltError> { ... }
+}
+
+impl RltLang for En { ... }
+```
+
+For a translation:
+
+```rust
+// ru.rlt.rs
+rlt_lang!(Ru) {
+    card = { ... };
+    draw(n) = "...";
 }
 ```
 
-Usage:
+RLT generates:
 
 ```rust
-use localization::en;
+pub struct Ru;
 
-let msg = en::draw(3);  // "Draw 3 cards."
+impl RltLang for Ru { ... }
 ```
 
-**Variant accessors:**
-
-For phrases with variants, RLT generates accessor functions for each variant:
+**Usage:**
 
 ```rust
-// RLT definition:
-card = {
-    one: "card",
-    other: "cards",
-};
+use localization::{En, Ru, RltLang};
 
-// Generated Rust:
-pub fn card() -> PhraseRef { ... }          // Default (first variant)
-pub fn card_one() -> PhraseRef { ... }
-pub fn card_other() -> PhraseRef { ... }
+fn localized_draw(lang: &impl RltLang, n: i32) -> Result<String, RltError> {
+    lang.draw(n)
+}
+
+localized_draw(&En, 3)?;  // "Draw 3 cards."
+localized_draw(&Ru, 3)?;  // "Возьмите 3 карты."
 ```
 
-The `PhraseRef` type carries the phrase's text, variants, and tags:
+**Phrase type:**
+
+Phrases without parameters return a `Phrase` that carries text, variants, and
+tags. This type is used when passing phrases as parameters to other phrases.
 
 ```rust
-pub struct PhraseRef {
-    text: &'static str,
-    variants: &'static [(&'static str, &'static str)],
+pub struct Phrase {
+    /// Default text (used when displaying without variant selection).
+    text: Cow<'static, str>,
+    /// Variant key → variant text. Keys use dot notation: "nom.one".
+    variants: HashMap<&'static str, Cow<'static, str>>,
+    /// Metadata tags attached to this phrase.
     tags: &'static [&'static str],
 }
+```
 
-impl std::fmt::Display for PhraseRef {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.text)
-    }
+The `Cow<'static, str>` type allows phrases to use static strings when no
+interpolation occurs, while supporting owned strings for dynamic content.
+
+From Rust code, use the `variant()` method to access specific variants:
+
+```rust
+let singular = En.card();                    // displays as "card"
+let plural = En.card().variant("other")?;    // "cards"
+```
+
+---
+
+## Incomplete Translations
+
+During development, you may want to add phrases to the source language without
+immediately translating them. RLT supports this via **fallback behavior**.
+
+### Default: Fallback to Source
+
+The trait's default implementations use the source language text. If Russian
+doesn't define a phrase, it inherits the English version:
+
+```rust
+// ru.rlt.rs
+rlt_lang!(Ru) {
+    card = { ... };
+    // 'draw' not defined - falls back to English
+}
+
+// Usage:
+Ru.draw(3)  // Returns English: "Draw 3 cards."
+```
+
+### Strict Mode for CI
+
+For release builds, enable the `strict-i18n` feature to require complete
+translations:
+
+```toml
+# Cargo.toml
+[features]
+default = []
+strict-i18n = []
+```
+
+With `strict-i18n` enabled, the trait has no default implementations:
+
+```rust
+// When strict-i18n is enabled
+pub trait RltLang {
+    fn card(&self) -> Phrase;  // no default - must implement
+    fn draw(&self, n: impl Into<Value>) -> String;  // no default
 }
 ```
 
-This allows Rust code to access specific variants when needed:
+Missing translations become compile errors:
 
-```rust
-// Use default (singular)
-let singular = en::card();  // displays as "card"
-
-// Use explicit plural
-let plural = en::card_other();  // displays as "cards"
+```
+error[E0046]: not all trait items implemented, missing: `draw`
+  --> ru.rlt.rs
+   |
+   = note: `draw` from trait `RltLang` is not implemented
 ```
 
-**Passing phrase references:**
+**Workflow:**
+
+- **Development:** `cargo build` — missing translations fall back to English
+- **CI/Release:** `cargo build --features strict-i18n` — missing translations fail
+
+### Runtime Detection
+
+For debugging, each language struct provides a `is_fallback(phrase_name: &str)`
+method that returns `true` if calling that phrase would use the source language
+fallback. This enables debug UIs to highlight untranslated content:
 
 ```rust
-// es.rlt.rs
-rlt! {
-    carta = "carta" :fem;
-    enemigo = "enemigo" :masc;
-    destruido = { masc: "destruido", fem: "destruida" };
-
-    destroy(target) = "{target} fue {destruido:target}.";
+if Ru.is_fallback("draw") {
+    log::warn!("'draw' is not yet translated to Russian");
 }
-```
-
-```rust
-use localization::es;
-
-let msg = es::destroy(es::carta());    // "carta fue destruida."
-let msg = es::destroy(es::enemigo());  // "enemigo fue destruido."
-```
-
-**Multi-language support:**
-
-```rust
-use localization::messages;
-use localization::Language;
-
-let msg = messages::draw(Language::Ru, 3);  // "Возьмите 3 карты."
 ```
 
 ---
 
 ## Compile-Time Errors
 
-RLT validates phrase and parameter *names* at compile time. Type mismatches are
-handled at runtime with fallback behavior.
+RLT validates phrase and parameter *names* at compile time within each file.
+Cross-file validation (missing translations) is enforced via the trait system.
 
 **Unknown phrase:**
 
 ```rust
-rlt! {
+rlt_source! {
     draw(n) = "Draw {n} {cards:n}.";  // typo
 }
 ```
@@ -663,7 +872,7 @@ error: unknown phrase 'cards'
 **Unknown parameter:**
 
 ```rust
-rlt! {
+rlt_source! {
     draw(n) = "Draw {count} {card:n}.";  // 'count' not declared
 }
 ```
@@ -682,7 +891,7 @@ error: unknown parameter 'count'
 
 ```rust
 // ru.rlt.rs
-rlt! {
+rlt_lang!(Ru) {
     card = {
         one: "карта",
         other: "карт",  // missing 'few'
@@ -699,87 +908,33 @@ error: missing variant 'few' for phrase 'card'
 
 **Invalid selector:**
 
-```rust
-rlt! {
-    take = "{card:accusative}";  // 'accusative' not a variant of card
-}
-```
+Using a selector that doesn't match any variant produces an error listing
+available variants.
 
-```
-error: phrase 'card' has no variant 'accusative'
-  --> en.rlt.rs:2:17
-   |
-2  |     take = "{card:accusative}";
-   |                   ^^^^^^^^^^ variant not defined
-   |
-   = note: available variants: one, other
-```
+**Missing phrase in translation (strict mode):**
 
-**Missing phrase in translation:**
-
-A build script validates all `.rlt.rs` files together:
-
-```
-error: phrase 'draw' not defined in ru.rlt.rs
-  --> en.rlt.rs:5:5
-   |
-5  |     draw(n) = "Draw {n} {card:n}.";
-   |     ^^^^ defined in source language
-   |
-   = help: add to ru.rlt.rs:
-   |     draw(n) = "...";
-```
+With `--features strict-i18n`, missing translations produce standard Rust trait
+implementation errors.
 
 ---
 
 ## Design Philosophy
 
-**Logic in Rust, text in RLT.**
+**Logic in Rust, text in RLT.** Complex branching stays in Rust; RLT provides
+atomic text pieces. This keeps RLT files simple and translator-friendly.
 
-RLT provides atomic text pieces. Complex branching logic stays in Rust code:
+**Keywords and formatting are just phrases.** No special syntax—define phrases
+with markup (`dissolve = "<k>dissolve</k>";`) and interpolate normally.
 
-```rust
-// Rust code handles the logic
-match predicate {
-    Predicate::Your(card_predicate) => {
-        if is_character(card_predicate) {
-            en::ally()  // RLT provides the text
-        } else {
-            en::your_card()
-        }
-    }
-    Predicate::Enemy(card_predicate) => {
-        en::enemy()
-    }
-}
-```
+**Dynamic typing for simplicity.** Parameters accept any `Value` type. Runtime
+errors catch type mismatches. Translators don't need to understand Rust types.
 
-This separation keeps RLT files simple and translator-friendly, while allowing
-arbitrarily complex composition logic in Rust.
+**Immediate IDE support.** Proc-macros enable rust-analyzer autocomplete without
+external build tools.
 
-**Keywords and formatting are just phrases.**
-
-There's no special keyword syntax. Define phrases that return formatted text:
-
-```rust
-rlt! {
-    dissolve = "<k>dissolve</k>";
-    materialized = "<k>materialized</k>";
-    energy_symbol = "<e>●</e>";
-
-    could_dissolve(target) = "which could {dissolve} {target}";
-}
-// → "which could <k>dissolve</k> that character"
-```
-
-The formatting markup is part of the phrase text and gets interpolated normally.
-
-**Dynamic typing for simplicity.**
-
-Parameters are dynamically typed to keep the RLT syntax simple and
-translator-friendly. The runtime handles type mismatches gracefully with
-fallback behavior rather than errors. This trades strict type safety for ease
-of use—translators don't need to understand Rust's type system.
+**Edge cases require more variants.** Some language features require extensive
+variant tables. This is by design—explicit variants are predictable. When
+unwieldy, use language-specific transforms to encapsulate complexity.
 
 ---
 
@@ -791,8 +946,14 @@ of use—translators don't need to understand Rust's type system.
 | Parameter    | `name(p) = "{p}";`             | Accept values                           |
 | Variant      | `name = { a: "x", b: "y" };`   | Multiple forms                          |
 | Selection    | `{phrase:selector}`            | Choose a variant                        |
-| Metadata tag | `name = "text" :tag;`          | Attach metadata for selection/transforms|
-| Transform    | `{@transform phrase}`          | Modify text                             |
+| Metadata tag | `name = :tag "text";`          | Attach metadata for selection/transforms|
+| Transform    | `{@transform:ctx phrase}`      | Modify text                             |
 
-Four primitives, Rust-compatible syntax, compile-time name checking, runtime
-value handling.
+| Macro          | Purpose                                              |
+| -------------- | ---------------------------------------------------- |
+| `rlt_source!`  | Define source language; generates trait              |
+| `rlt_lang!(X)` | Define translation; generates trait impl             |
+
+Four primitives, two macros, Rust-compatible syntax, compile-time name checking,
+runtime error handling via `Result<String, RltError>`, automatic fallback for
+incomplete translations during development.

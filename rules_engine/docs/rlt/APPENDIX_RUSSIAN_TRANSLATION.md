@@ -2,17 +2,17 @@
 
 This appendix provides a comprehensive example of translating `predicate_serializer.rs`
 to Russian using RLT. It demonstrates how to keep language-specific text in RLT files
-while maintaining language-agnostic Rust logic.
+while giving translators control over grammatical forms and word order.
 
 ## Overview
 
 The original `predicate_serializer.rs` contains ~800 lines of Rust code that produces
 English text for card predicates. The goal is to:
 
-1. Extract all English text into `en.rlt.rs`
-2. Create a Russian translation in `ru.rlt.rs`
-3. Refactor `predicate_serializer.rs` to call RLT functions instead of returning
-   hardcoded strings
+1. Extract all English text into `en.rlt.rs` using `rlt_source!`
+2. Create a Russian translation in `ru.rlt.rs` using `rlt_lang!`
+3. Refactor `predicate_serializer.rs` to pass `PhraseRef` values instead of
+   pre-rendered strings, allowing RLT to control grammatical selection
 
 ---
 
@@ -76,31 +76,65 @@ For this serializer, we primarily need:
 
 ---
 
-## Part 2: The English RLT File
+## Part 2: Key Design Principle
 
-First, we extract all English text into RLT phrases:
+### Pass PhraseRef, Not String
+
+The critical insight: **Rust should pass `PhraseRef` values to RLT phrases, not
+pre-rendered strings.** This allows RLT to select the appropriate grammatical form.
+
+**Wrong approach** (strips variant information):
+```rust
+// Rust pre-renders to String, losing all variants
+let counting = serialize_card_predicate_plural(count_matching, lang);
+// counting = "characters" (String) — no variant table!
+
+lang.with_cost_less_than_allied(base, counting)
+// RLT receives a String, cannot select {counting:gen.many}
+```
+
+**Correct approach** (preserves variants):
+```rust
+// Rust passes the PhraseRef with all variants intact
+let counting = lang.character();
+// counting = PhraseRef { variants: [("nom.one", "персонаж"), ("gen.many", "персонажей"), ...] }
+
+lang.with_cost_less_than_allied(base, counting)
+// RLT can now select {counting:gen.many} → "персонажей"
+```
+
+### Selection Handles Everything
+
+RLT's existing selection mechanism (`:`) handles case and number selection on phrase
+parameters. No new transforms are needed:
+
+```rust
+// ru.rlt.rs
+rlt_lang!(Ru) {
+    with_cost_less_than_allied(base, counting) =
+        "{base:nom.one} со стоимостью меньше количества союзных {counting:gen.many}";
+}
+```
+
+The `:gen.many` selector extracts that variant from the `counting` PhraseRef.
+
+---
+
+## Part 3: The English RLT File
+
+English is simpler—no case, simple plurals. Each language's templates use
+selectors appropriate for that language, so English just needs `one`/`other`:
 
 ```rust
 // en.rlt.rs
-rlt! {
+rlt_source! {
     // =========================================================================
     // Basic Card Types
     // =========================================================================
 
-    card = {
-        one: "card",
-        other: "cards",
-    } :a;
-
-    character = {
-        one: "character",
-        other: "characters",
-    } :a;
-
-    event = {
-        one: "event",
-        other: "events",
-    } :an;
+    card = :a { one: "card", other: "cards" };
+    character = :a { one: "character", other: "characters" };
+    event = :an { one: "event", other: "events" };
 
     // =========================================================================
     // Pronouns and References
@@ -114,195 +148,103 @@ rlt! {
     it = "it";
 
     // =========================================================================
-    // Ownership: Your/Allied
+    // Ownership
     // =========================================================================
 
-    ally = {
-        one: "ally",
-        other: "allies",
-    } :an;
-
-    your_card = {
-        one: "your card",
-        other: "your cards",
-    };
-
-    your_event = {
-        one: "your event",
-        other: "your events",
-    };
-
-    allied(thing) = "allied {thing}";
+    ally = :an { one: "ally", other: "allies" };
+    your_card = { one: "your card", other: "your cards" };
+    your_event = { one: "your event", other: "your events" };
+    enemy = :an { one: "enemy", other: "enemies" };
+    enemy_card = :an { one: "enemy card", other: "enemy cards" };
+    enemy_event = :an { one: "enemy event", other: "enemy events" };
 
     // =========================================================================
-    // Ownership: Enemy
+    // Standalone Reference Phrases
+    //
+    // These produce complete noun phrases for simple predicate references.
+    // English includes articles where appropriate; each language decides
+    // its own presentation.
     // =========================================================================
 
-    enemy = {
-        one: "enemy",
-        other: "enemies",
-    } :an;
-
-    enemy_card = {
-        one: "enemy card",
-        other: "enemy cards",
-    } :an;
-
-    enemy_event = {
-        one: "enemy event",
-        other: "enemy events",
-    } :an;
+    an_ally = "an ally";
+    an_enemy = "an enemy";
+    a_character = "a character";
+    a_card = "a card";
+    an_event = "an event";
 
     // =========================================================================
-    // Articles
+    // Compositional Phrases
+    //
+    // English templates use simple one/other selectors.
     // =========================================================================
 
-    // The @a transform handles "a" vs "an" based on the :a/:an tags
-    with_article(thing) = "{@a thing}";
+    allied(entity) = "allied {entity:one}";
+    allied_plural(entity) = "allied {entity:other}";
+    enemy_modified(entity) = "enemy {entity:one}";
+    enemy_modified_plural(entity) = "enemy {entity:other}";
+
+    not_a(entity) = "a character that is not {@a entity}";
+    ally_not(entity) = "ally that is not {@a entity}";
+    non_entity_enemy(entity) = "non-{entity:one} enemy";
+    characters_not_plural(entity) = "characters that are not {entity:other}";
+    allies_not_plural(entity) = "allies that are not {entity:other}";
 
     // =========================================================================
-    // Subtype Predicates
+    // Constraint Patterns
     // =========================================================================
 
-    // Singular with article: "a {subtype}"
-    a_subtype(subtype) = "{@a subtype}";
+    with_spark(base, spark, op) = "{base:one} with spark {spark}{op}";
+    with_spark_plural(base, spark, op) = "{base:other} with spark {spark}{op}";
+    with_cost(base, cost, op) = "{base:one} with cost {cost}{op}";
+    with_cost_plural(base, cost, op) = "{base:other} with cost {cost}{op}";
 
-    // Plural: "{plural-subtype}"
-    plural_subtype(subtype) = "{subtype:other}";
-
-    // Allied subtype (singular/plural)
-    allied_subtype(subtype) = "allied {subtype}";
-    allied_subtype_plural(subtype) = "allied {subtype:other}";
-
-    // Enemy subtype
-    enemy_subtype(subtype) = "enemy {subtype}";
-    enemy_subtype_plural(subtype) = "enemy {subtype:other}";
-
-    // =========================================================================
-    // Negation
-    // =========================================================================
-
-    not_a_subtype(subtype) = "a character that is not {@a subtype}";
-    ally_not_subtype(subtype) = "ally that is not {@a subtype}";
-    non_subtype_enemy(subtype) = "non-{subtype} enemy";
-
-    characters_not_subtype_plural(subtype) = "characters that are not {subtype:other}";
-    allies_not_subtype_plural(subtype) = "allies that are not {subtype:other}";
-
-    // =========================================================================
-    // Spark Constraints
-    // =========================================================================
-
-    character_with_spark(spark, op) = "a character with spark {spark}{op}";
-    characters_with_spark(spark, op) = "characters with spark {spark}{op}";
-    ally_with_spark(spark, op) = "ally with spark {spark}{op}";
-    allies_with_spark(spark, op) = "allies with spark {spark}{op}";
-    enemy_with_spark(spark, op) = "enemy with spark {spark}{op}";
-
-    // =========================================================================
-    // Cost Constraints
-    // =========================================================================
-
-    with_cost(base, cost, op) = "{base} with cost {cost}{op}";
-    enemy_with_cost(cost, op) = "enemy with cost {cost}{op}";
-
-    // =========================================================================
-    // Ability Constraints
-    // =========================================================================
-
-    character_with_materialized = "a character with a {materialized} ability";
-    characters_with_materialized = "characters with {materialized} abilities";
-    ally_with_materialized = "ally with a {materialized} ability";
-    allies_with_materialized = "allies with {materialized} abilities";
-    enemy_with_materialized = "enemy with a {materialized} ability";
-
-    character_with_activated = "a character with an activated ability";
-    characters_with_activated = "characters with activated abilities";
-    ally_with_activated = "ally with an activated ability";
-    allies_with_activated = "allies with activated abilities";
-    enemy_with_activated = "enemy with an activated ability";
+    with_materialized(base) = "{base:one} with a {materialized} ability";
+    with_materialized_plural(base) = "{base:other} with {materialized} abilities";
+    with_activated(base) = "{base:one} with an activated ability";
+    with_activated_plural(base) = "{base:other} with activated abilities";
 
     // =========================================================================
     // Complex Comparisons
     // =========================================================================
 
     with_spark_less_than_energy(base) =
-        "{base} with spark less than the amount of {energy_symbol} paid";
-
+        "{base:one} with spark less than the amount of {energy_symbol} paid";
     with_cost_less_than_allied(base, counting) =
-        "{base} with cost less than the number of allied {counting:other}";
-
+        "{base:one} with cost less than the number of allied {counting:other}";
     with_cost_less_than_abandoned(base) =
-        "{base} with cost less than the abandoned ally's cost";
-
+        "{base:one} with cost less than the abandoned ally's cost";
     with_spark_less_than_abandoned(base) =
-        "{base} with spark less than the abandoned ally's spark";
-
+        "{base:one} with spark less than the abandoned ally's spark";
     with_spark_less_than_abandoned_enemy(base) =
-        "{base} with spark less than that ally's spark";
-
+        "{base:one} with spark less than that ally's spark";
     with_spark_less_than_abandoned_count(base) =
-        "{base} with spark less than the number of allies abandoned this turn";
-
+        "{base:one} with spark less than the number of allies abandoned this turn";
     with_cost_less_than_void(base) =
-        "{base} with cost less than the number of cards in your void";
+        "{base:one} with cost less than the number of cards in your void";
 
     // =========================================================================
-    // Could Dissolve
+    // Other Patterns
     // =========================================================================
 
     event_could_dissolve(target) = "an event which could {dissolve} {target}";
     your_event_could_dissolve(target) = "your event which could {dissolve} {target}";
     events_could_dissolve(target) = "events which could {dissolve} {target}";
     your_events_could_dissolve(target) = "your events which could {dissolve} {target}";
-    event_could_dissolve_base(target) = "event which could {dissolve} {target}";
 
-    // =========================================================================
-    // Fast Modifier
-    // =========================================================================
-
-    fast(base) = "a {fast} {base}";
-    fast_plural(base) = "fast {base}";
-
-    // =========================================================================
-    // Void Location
-    // =========================================================================
+    fast_modified(base) = "a {fast} {base:one}";
+    fast_modified_plural(base) = "{fast} {base:other}";
 
     in_your_void(things) = "{things} in your void";
     in_opponent_void(things) = "{things} in the opponent's void";
 
-    // =========================================================================
-    // Other Modifiers
-    // =========================================================================
+    another(entity) = "another {entity:one}";
+    other_plural(entities) = "other {entities:other}";
+    for_each(entity) = "each {entity:one}";
 
-    another(thing) = "another {thing}";
-    other(things) = "other {things}";
+    or_less = " or less";
+    or_more = " or more";
 
-    // =========================================================================
-    // For Each Patterns
-    // =========================================================================
-
-    for_each_prefix(thing) = "each {thing}";
-
-    // Special cases for "for each"
-    allied_character_each = "allied character";
-    ally_each = "ally";
-    enemy_each = "enemy";
-    character_each = "character";
-    card_each = "card";
-    event_each = "event";
-    other_character_each = "other character";
-    card_in_void_each = "card in your void";
-    character_in_void_each = "character in your void";
-    event_in_void_each = "event in your void";
-    card_in_opponent_void_each = "card in the opponent's void";
-    character_in_opponent_void_each = "character in the opponent's void";
-    event_in_opponent_void_each = "event in the opponent's void";
-
-    // =========================================================================
-    // Keywords (with formatting markup)
-    // =========================================================================
-
+    // Keywords
     dissolve = "<k>dissolve</k>";
     materialized = "<k>materialized</k>";
     fast = "<k>fast</k>";
@@ -312,62 +254,57 @@ rlt! {
 
 ---
 
-## Part 3: The Russian RLT File
+## Part 4: The Russian RLT File
 
-Now we translate to Russian, handling case, number, and gender:
+Russian uses the same phrase names but different variant selections. The translator
+has full control over:
+- Which case to use for each slot
+- Word order within phrases
+- How modifiers agree with their nouns
 
 ```rust
 // ru.rlt.rs
-rlt! {
+rlt_lang!(Ru) {
     // =========================================================================
     // Basic Card Types
     //
-    // Russian nouns decline for case and number. We need:
-    // - nom (nominative): subject - "карта есть"
-    // - acc (accusative): direct object - "возьмите карту"
-    // - gen (genitive): possession, counting, "of" - "нет карт"
-    //
+    // Russian nouns decline for case and number. Using multi-key shorthand
+    // and wildcard fallbacks keeps definitions concise.
     // Number categories: one (1, 21), few (2-4, 22-24), many (5-20, 0)
     // =========================================================================
 
-    card = {
-        // Nominative: "the card is..."
+    card = :fem :inan {
         nom.one: "карта",
-        nom.few: "карты",
+        nom: "карты",
         nom.many: "карт",
-        // Accusative: "take a card..."
         acc.one: "карту",
-        acc.few: "карты",
+        acc: "карты",
         acc.many: "карт",
-        // Genitive: "5 cards", "no cards"
         gen.one: "карты",
-        gen.few: "карт",
+        gen: "карт",
         gen.many: "карт",
-    } :fem :inan;
+        ins.one: "картой",
+        ins: "картами",
+    };
 
-    character = {
+    character = :masc :anim {
         nom.one: "персонаж",
-        nom.few: "персонажа",
+        nom: "персонажи",
         nom.many: "персонажей",
-        acc.one: "персонажа",      // Animate masculine: acc = gen
-        acc.few: "персонажей",
-        acc.many: "персонажей",
-        gen.one: "персонажа",
-        gen.few: "персонажей",
-        gen.many: "персонажей",
-    } :masc :anim;
+        acc, gen: "персонажа",        // Animate masc: acc = gen
+        acc.many, gen.many: "персонажей",
+        ins.one: "персонажем",
+        ins: "персонажами",
+    };
 
-    event = {
-        nom.one: "событие",
-        nom.few: "события",
-        nom.many: "событий",
-        acc.one: "событие",        // Neuter: acc = nom
-        acc.few: "события",
-        acc.many: "событий",
-        gen.one: "события",
-        gen.few: "событий",
+    event = :neut :inan {
+        nom, acc: "событие",          // Neuter inan: acc = nom
+        nom.many, acc.many: "событий",
+        gen: "события",
         gen.many: "событий",
-    } :neut :inan;
+        ins.one: "событием",
+        ins: "событиями",
+    };
 
     // =========================================================================
     // Pronouns and References
@@ -386,44 +323,35 @@ rlt! {
     // "союзник" (ally) is masculine animate
     // =========================================================================
 
-    ally = {
+    ally = :masc :anim {
         nom.one: "союзник",
-        nom.few: "союзника",
+        nom: "союзники",
         nom.many: "союзников",
-        acc.one: "союзника",
-        acc.few: "союзников",
-        acc.many: "союзников",
-        gen.one: "союзника",
-        gen.few: "союзников",
-        gen.many: "союзников",
-    } :masc :anim;
+        acc, gen: "союзника",
+        acc.many, gen.many: "союзников",
+        ins.one: "союзником",
+        ins: "союзниками",
+    };
 
     your_card = {
-        nom.one: "ваша карта",
-        nom.few: "ваши карты",
+        nom: "ваша карта",
         nom.many: "ваших карт",
-        acc.one: "вашу карту",
-        acc.few: "ваши карты",
+        acc: "вашу карту",
         acc.many: "ваших карт",
-        gen.one: "вашей карты",
-        gen.few: "ваших карт",
+        gen: "вашей карты",
         gen.many: "ваших карт",
+        ins.one: "вашей картой",
+        ins: "вашими картами",
     };
 
     your_event = {
-        nom.one: "ваше событие",
-        nom.few: "ваши события",
-        nom.many: "ваших событий",
-        acc.one: "ваше событие",
-        acc.few: "ваши события",
-        acc.many: "ваших событий",
-        gen.one: "вашего события",
-        gen.few: "ваших событий",
+        nom, acc: "ваше событие",
+        nom.many, acc.many: "ваших событий",
+        gen: "вашего события",
         gen.many: "ваших событий",
+        ins.one: "вашим событием",
+        ins: "вашими событиями",
     };
-
-    // "союзный" (allied) must agree with the noun it modifies
-    allied(thing) = "союзный {thing}";  // Simplified; see gender agreement below
 
     // =========================================================================
     // Ownership: Enemy
@@ -431,137 +359,133 @@ rlt! {
     // "враг" (enemy) is masculine animate
     // =========================================================================
 
-    enemy = {
+    enemy = :masc :anim {
         nom.one: "враг",
-        nom.few: "врага",
+        nom: "враги",
         nom.many: "врагов",
-        acc.one: "врага",
-        acc.few: "врагов",
-        acc.many: "врагов",
-        gen.one: "врага",
-        gen.few: "врагов",
-        gen.many: "врагов",
-    } :masc :anim;
+        acc, gen: "врага",
+        acc.many, gen.many: "врагов",
+        ins.one: "врагом",
+        ins: "врагами",
+    };
 
     enemy_card = {
-        nom.one: "вражеская карта",
-        nom.few: "вражеские карты",
+        nom: "вражеская карта",
         nom.many: "вражеских карт",
-        acc.one: "вражескую карту",
-        acc.few: "вражеские карты",
+        acc: "вражескую карту",
         acc.many: "вражеских карт",
-        gen.one: "вражеской карты",
-        gen.few: "вражеских карт",
+        gen: "вражеской карты",
         gen.many: "вражеских карт",
+        ins.one: "вражеской картой",
+        ins: "вражескими картами",
     };
 
     enemy_event = {
-        nom.one: "вражеское событие",
-        nom.few: "вражеские события",
-        nom.many: "вражеских событий",
-        acc.one: "вражеское событие",
-        acc.few: "вражеские события",
-        acc.many: "вражеских событий",
-        gen.one: "вражеского события",
-        gen.few: "вражеских событий",
+        nom, acc: "вражеское событие",
+        nom.many, acc.many: "вражеских событий",
+        gen: "вражеского события",
         gen.many: "вражеских событий",
+        ins.one: "вражеским событием",
+        ins: "вражескими событиями",
     };
 
     // =========================================================================
-    // Articles
+    // Standalone Reference Phrases
     //
-    // Russian has no articles! These phrases become identity functions.
+    // These produce complete noun phrases for simple predicate references.
+    // Russian has no articles, so these are just the nominative singular forms.
     // =========================================================================
 
-    with_article(thing) = "{thing}";
+    an_ally = "союзник";
+    an_enemy = "враг";
+    a_character = "персонаж";
+    a_card = "карта";
+    an_event = "событие";
 
     // =========================================================================
-    // Subtype Predicates
+    // Compositional Phrases
     //
-    // Subtypes are passed as parameters with their own case variants.
+    // Allied/enemy modifiers must agree with the noun's gender—we use
+    // tag-based selection to pick the right adjective form.
     // =========================================================================
 
-    a_subtype(subtype) = "{subtype:acc.one}";
-    plural_subtype(subtype) = "{subtype:gen.many}";
+    // Allied modifier: "союзный" agrees with noun gender
+    // Uses tag-based selection: entity's :masc/:fem/:neut tag selects adjective form
+    allied_adj = {
+        masc: "союзный",
+        fem: "союзная",
+        neut: "союзное",
+    };
+    allied(entity) = "{allied_adj:entity} {entity:nom.one}";
+    allied_plural(entity) = "союзных {entity:gen.many}";
 
-    allied_subtype(subtype) = "союзный {subtype:nom.one}";
-    allied_subtype_plural(subtype) = "союзных {subtype:gen.many}";
+    // Enemy modifier: "вражеский" agrees with noun gender
+    enemy_adj = {
+        masc: "вражеский",
+        fem: "вражеская",
+        neut: "вражеское",
+    };
+    enemy_modified(entity) = "{enemy_adj:entity} {entity:nom.one}";
+    enemy_modified_plural(entity) = "вражеских {entity:gen.many}";
 
-    enemy_subtype(subtype) = "вражеский {subtype:nom.one}";
-    enemy_subtype_plural(subtype) = "вражеских {subtype:gen.many}";
+    // Negation: Russian uses instrumental case after "являться"
+    not_a(entity) = "персонаж, который не является {entity:ins.one}";
+    ally_not(entity) = "союзник, который не является {entity:ins.one}";
+    non_entity_enemy(entity) = "враг, не являющийся {entity:ins.one}";
 
-    // =========================================================================
-    // Negation
-    // =========================================================================
-
-    not_a_subtype(subtype) = "персонаж, который не является {subtype:ins.one}";
-    ally_not_subtype(subtype) = "союзник, который не является {subtype:ins.one}";
-    non_subtype_enemy(subtype) = "враг, не являющийся {subtype:ins.one}";
-
-    characters_not_subtype_plural(subtype) =
-        "персонажи, которые не являются {subtype:ins.many}";
-    allies_not_subtype_plural(subtype) =
-        "союзники, которые не являются {subtype:ins.many}";
-
-    // =========================================================================
-    // Spark Constraints
-    // =========================================================================
-
-    character_with_spark(spark, op) = "персонаж с искрой {spark}{op}";
-    characters_with_spark(spark, op) = "персонажи с искрой {spark}{op}";
-    ally_with_spark(spark, op) = "союзник с искрой {spark}{op}";
-    allies_with_spark(spark, op) = "союзники с искрой {spark}{op}";
-    enemy_with_spark(spark, op) = "враг с искрой {spark}{op}";
+    characters_not_plural(entity) = "персонажи, которые не являются {entity:ins.other}";
+    allies_not_plural(entity) = "союзники, которые не являются {entity:ins.other}";
 
     // =========================================================================
-    // Cost Constraints
+    // Constraint Patterns
+    //
+    // Russian uses instrumental case for "с" (with) constructions.
+    // Word order is flexible; these patterns sound natural in Russian.
     // =========================================================================
 
-    with_cost(base, cost, op) = "{base} со стоимостью {cost}{op}";
-    enemy_with_cost(cost, op) = "враг со стоимостью {cost}{op}";
+    // Spark constraints: "{base} с искрой {value}{operator}"
+    with_spark(base, spark, op) = "{base:nom.one} с искрой {spark}{op}";
+    with_spark_plural(base, spark, op) = "{base:nom.other} с искрой {spark}{op}";
 
-    // =========================================================================
-    // Ability Constraints
-    // =========================================================================
+    // Cost constraints: "{base} со стоимостью {value}{operator}"
+    with_cost(base, cost, op) = "{base:nom.one} со стоимостью {cost}{op}";
+    with_cost_plural(base, cost, op) = "{base:nom.other} со стоимостью {cost}{op}";
 
-    character_with_materialized = "персонаж со способностью {materialized}";
-    characters_with_materialized = "персонажи со способностями {materialized}";
-    ally_with_materialized = "союзник со способностью {materialized}";
-    allies_with_materialized = "союзники со способностями {materialized}";
-    enemy_with_materialized = "враг со способностью {materialized}";
+    // Ability constraints
+    with_materialized(base) = "{base:nom.one} со способностью {materialized}";
+    with_materialized_plural(base) = "{base:nom.other} со способностями {materialized}";
 
-    character_with_activated = "персонаж с активируемой способностью";
-    characters_with_activated = "персонажи с активируемыми способностями";
-    ally_with_activated = "союзник с активируемой способностью";
-    allies_with_activated = "союзники с активируемыми способностями";
-    enemy_with_activated = "враг с активируемой способностью";
+    with_activated(base) = "{base:nom.one} с активируемой способностью";
+    with_activated_plural(base) = "{base:nom.other} с активируемыми способностями";
 
     // =========================================================================
     // Complex Comparisons
     //
-    // Russian word order is more flexible. We use structures that sound natural.
+    // These demonstrate the power of selection on phrase parameters.
+    // The translator chooses gen.many for counting contexts.
     // =========================================================================
 
     with_spark_less_than_energy(base) =
-        "{base} с искрой меньше количества уплаченной {energy_symbol}";
+        "{base:nom.one} с искрой меньше количества уплаченной {energy_symbol}";
 
+    // KEY EXAMPLE: {counting:gen.many} extracts genitive plural from the PhraseRef
     with_cost_less_than_allied(base, counting) =
-        "{base} со стоимостью меньше количества союзных {counting:gen.many}";
+        "{base:nom.one} со стоимостью меньше количества союзных {counting:gen.many}";
 
     with_cost_less_than_abandoned(base) =
-        "{base} со стоимостью меньше стоимости покинутого союзника";
+        "{base:nom.one} со стоимостью меньше стоимости покинутого союзника";
 
     with_spark_less_than_abandoned(base) =
-        "{base} с искрой меньше искры покинутого союзника";
+        "{base:nom.one} с искрой меньше искры покинутого союзника";
 
     with_spark_less_than_abandoned_enemy(base) =
-        "{base} с искрой меньше искры того союзника";
+        "{base:nom.one} с искрой меньше искры того союзника";
 
     with_spark_less_than_abandoned_count(base) =
-        "{base} с искрой меньше количества союзников, покинутых в этом ходу";
+        "{base:nom.one} с искрой меньше количества союзников, покинутых в этом ходу";
 
     with_cost_less_than_void(base) =
-        "{base} со стоимостью меньше количества карт в вашей бездне";
+        "{base:nom.one} со стоимостью меньше количества карт в вашей бездне";
 
     // =========================================================================
     // Could Dissolve
@@ -571,20 +495,18 @@ rlt! {
     your_event_could_dissolve(target) = "ваше событие, способное {dissolve} {target}";
     events_could_dissolve(target) = "события, способные {dissolve} {target}";
     your_events_could_dissolve(target) = "ваши события, способные {dissolve} {target}";
-    event_could_dissolve_base(target) = "событие, способное {dissolve} {target}";
 
     // =========================================================================
     // Fast Modifier
     // =========================================================================
 
-    fast(base) = "{fast} {base}";
-    fast_plural(base) = "{fast} {base}";
+    fast_modified(base) = "{fast} {base:nom.one}";
+    fast_modified_plural(base) = "{fast} {base:nom.other}";
 
     // =========================================================================
     // Void Location
     //
-    // "бездна" (void) is feminine
-    // "в вашей бездне" = in your void (prepositional case)
+    // "бездна" (void) is feminine, prepositional case for location
     // =========================================================================
 
     in_your_void(things) = "{things} в вашей бездне";
@@ -592,30 +514,37 @@ rlt! {
 
     // =========================================================================
     // Other Modifiers
+    //
+    // "другой" must agree with noun gender
     // =========================================================================
 
-    another(thing) = "другой {thing}";
-    other(things) = "другие {things}";
+    another_adj = {
+        masc: "другой",
+        fem: "другая",
+        neut: "другое",
+    };
+    another(entity) = "{another_adj:entity} {entity:nom.one}";
+    other_plural(entities) = "другие {entities:nom.other}";
 
     // =========================================================================
     // For Each Patterns
+    //
+    // "каждый" must agree with noun gender
     // =========================================================================
 
-    for_each_prefix(thing) = "каждый {thing}";
+    each_adj = {
+        masc: "каждый",
+        fem: "каждая",
+        neut: "каждое",
+    };
+    for_each(entity) = "{each_adj:entity} {entity:nom.one}";
 
-    allied_character_each = "союзный персонаж";
-    ally_each = "союзник";
-    enemy_each = "враг";
-    character_each = "персонаж";
-    card_each = "карта";
-    event_each = "событие";
-    other_character_each = "другой персонаж";
-    card_in_void_each = "карта в вашей бездне";
-    character_in_void_each = "персонаж в вашей бездне";
-    event_in_void_each = "событие в вашей бездне";
-    card_in_opponent_void_each = "карта в бездне противника";
-    character_in_opponent_void_each = "персонаж в бездне противника";
-    event_in_opponent_void_each = "событие в бездне противника";
+    // =========================================================================
+    // Operators
+    // =========================================================================
+
+    or_less = " или меньше";
+    or_more = " или больше";
 
     // =========================================================================
     // Keywords
@@ -630,769 +559,332 @@ rlt! {
 
 ---
 
-## Part 4: The Refactored predicate_serializer.rs
+## Part 5: The Refactored predicate_serializer.rs
 
-The refactored serializer uses RLT phrases instead of hardcoded strings. The key
-principle is: **Rust handles logic, RLT handles text**.
+The refactored serializer passes `PhraseRef` values instead of pre-rendered strings.
+This allows RLT to select the appropriate grammatical form.
+
+### Key Changes from Original
+
+1. **Return `PhraseRef` instead of `String` for base types**
+2. **Let RLT phrases do selection, not Rust functions**
+3. **Remove separate `_singular` and `_plural` serialization functions**
+4. **Call semantic phrases directly for simple references** — Rust calls `lang.an_ally()`,
+   not `lang.with_article(lang.ally())`. Each language decides its own presentation.
+5. **Pass `PhraseRef` to compositional phrases for constraint patterns** — allows RLT
+   to select appropriate grammatical forms
 
 ```rust
 // predicate_serializer.rs
 
 use ability_data::predicate::{CardPredicate, Predicate};
-use ability_data::variable_value::VariableValue;
+use crate::localization::{RltLang, PhraseRef};
 
-use crate::localization::{Language, rlt};
-use crate::variables::parser_bindings::VariableBindings;
-use crate::variables::parser_substitutions;
+/// Get the base phrase for a card type.
+/// Returns PhraseRef so RLT can select the appropriate case/number.
+fn card_type_phrase(lang: &impl RltLang, card_predicate: &CardPredicate) -> PhraseRef {
+    match card_predicate {
+        CardPredicate::Card => lang.card(),
+        CardPredicate::Character => lang.character(),
+        CardPredicate::Event => lang.event(),
+        CardPredicate::CharacterType(subtype) => lang.subtype_phrase(*subtype),
+        _ => lang.character(), // Fallback
+    }
+}
+
+enum Ownership { Your, Enemy }
+
+/// Get the ownership-qualified phrase for compositional use.
+/// Returns PhraseRef for use in constraint phrases that need to select variants.
+fn ownership_phrase(lang: &impl RltLang, ownership: Ownership, card_predicate: &CardPredicate) -> PhraseRef {
+    match (ownership, card_predicate) {
+        (Ownership::Your, CardPredicate::Character) => lang.ally(),
+        (Ownership::Your, CardPredicate::Card) => lang.your_card(),
+        (Ownership::Your, CardPredicate::Event) => lang.your_event(),
+        (Ownership::Enemy, CardPredicate::Character) => lang.enemy(),
+        (Ownership::Enemy, CardPredicate::Card) => lang.enemy_card(),
+        (Ownership::Enemy, CardPredicate::Event) => lang.enemy_event(),
+        _ => card_type_phrase(lang, card_predicate),
+    }
+}
 
 /// Serialize a predicate to localized text.
-pub fn serialize_predicate(
-    predicate: &Predicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
+pub fn serialize_predicate(lang: &impl RltLang, predicate: &Predicate) -> String {
     match predicate {
-        Predicate::This => rlt::this_character(lang),
-        Predicate::That => rlt::that_character(lang),
-        Predicate::Them => rlt::them(lang),
-        Predicate::It => rlt::it(lang),
+        // Simple references
+        Predicate::This => lang.this_character().to_string(),
+        Predicate::That => lang.that_character().to_string(),
+        Predicate::Them => lang.them().to_string(),
+        Predicate::It => lang.it().to_string(),
+
+        // Ownership predicates: Rust identifies semantic context, RLT handles presentation
         Predicate::Your(card_predicate) => {
-            serialize_your_predicate_with_article(card_predicate, bindings, lang)
+            serialize_owned_predicate(lang, card_predicate, Ownership::Your)
         }
+        Predicate::Enemy(card_predicate) => {
+            serialize_owned_predicate(lang, card_predicate, Ownership::Enemy)
+        }
+        Predicate::Any(card_predicate) => {
+            serialize_any_predicate(lang, card_predicate)
+        }
+
+        // Location predicates
+        Predicate::YourVoid(card_predicate) => {
+            let base = card_type_phrase(lang, card_predicate);
+            lang.in_your_void(base).to_string()
+        }
+        Predicate::EnemyVoid(card_predicate) => {
+            let base = card_type_phrase(lang, card_predicate);
+            lang.in_opponent_void(base).to_string()
+        }
+
+        // Other predicates
         Predicate::Another(card_predicate) => {
-            let base = serialize_your_predicate_base(card_predicate, bindings, lang);
-            rlt::with_article(lang, base)
-        }
-        Predicate::Any(card_predicate) => {
-            serialize_card_predicate(card_predicate, bindings, lang)
-        }
-        Predicate::Enemy(card_predicate) => {
-            let base = serialize_enemy_predicate_base(card_predicate, bindings, lang);
-            rlt::with_article(lang, base)
-        }
-        Predicate::YourVoid(card_predicate) => {
-            let things = serialize_card_predicate_plural(card_predicate, bindings, lang);
-            rlt::in_your_void(lang, things)
-        }
-        Predicate::EnemyVoid(card_predicate) => {
-            let things = serialize_card_predicate_plural(card_predicate, bindings, lang);
-            rlt::in_opponent_void(lang, things)
+            let base = card_type_phrase(lang, card_predicate);
+            lang.another(base).to_string()
         }
         Predicate::AnyOther(card_predicate) => {
-            let base = serialize_card_predicate_base(card_predicate, bindings, lang);
-            rlt::another(lang, base)
+            let base = card_type_phrase(lang, card_predicate);
+            lang.other_plural(base).to_string()
         }
     }
 }
 
-/// Serialize a predicate in plural form.
-pub fn serialize_predicate_plural(
-    predicate: &Predicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
-    match predicate {
-        Predicate::Another(card_predicate) | Predicate::Your(card_predicate) => {
-            serialize_your_predicate_plural(card_predicate, bindings, lang)
-        }
-        Predicate::Any(card_predicate) => {
-            serialize_card_predicate_plural(card_predicate, bindings, lang)
-        }
-        Predicate::Enemy(card_predicate) => {
-            serialize_enemy_predicate_plural(card_predicate, bindings, lang)
-        }
-        Predicate::YourVoid(card_predicate) => {
-            let things = serialize_card_predicate_plural(card_predicate, bindings, lang);
-            rlt::in_your_void(lang, things)
-        }
-        Predicate::EnemyVoid(card_predicate) => {
-            let things = serialize_card_predicate_plural(card_predicate, bindings, lang);
-            rlt::in_opponent_void(lang, things)
-        }
-        Predicate::This => rlt::these_characters(lang),
-        Predicate::That => rlt::those_characters(lang),
-        Predicate::Them | Predicate::It => rlt::them(lang),
-        Predicate::AnyOther(card_predicate) => {
-            let base = serialize_card_predicate_plural(card_predicate, bindings, lang);
-            rlt::other(lang, base)
-        }
-    }
-}
-
-/// Serialize the base text of a card predicate (no article).
-fn serialize_card_predicate_base(
+/// Serialize an owned predicate (your/enemy) with its constraints.
+fn serialize_owned_predicate(
+    lang: &impl RltLang,
     card_predicate: &CardPredicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
+    ownership: Ownership,
 ) -> String {
     match card_predicate {
-        CardPredicate::Card => rlt::card(lang),
-        CardPredicate::Character => rlt::character(lang),
-        CardPredicate::Event => rlt::event(lang),
-        CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::subtype_placeholder(lang)  // "{subtype}" - resolved at render time
-        }
-        _ => serialize_card_predicate(card_predicate, bindings, lang),
-    }
-}
+        // Simple types: call semantic phrase directly
+        // RLT decides presentation (articles, case, etc.)
+        CardPredicate::Character => match ownership {
+            Ownership::Your => lang.an_ally().to_string(),
+            Ownership::Enemy => lang.an_enemy().to_string(),
+        },
+        CardPredicate::Card => match ownership {
+            Ownership::Your => lang.your_card().to_string(),
+            Ownership::Enemy => lang.enemy_card().to_string(),
+        },
+        CardPredicate::Event => match ownership {
+            Ownership::Your => lang.your_event().to_string(),
+            Ownership::Enemy => lang.enemy_event().to_string(),
+        },
 
-/// Serialize a card predicate with article.
-fn serialize_card_predicate(
-    card_predicate: &CardPredicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
-    match card_predicate {
-        CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
-            let base = serialize_card_predicate_base(card_predicate, bindings, lang);
-            rlt::with_article(lang, base)
+        // Spark constraint: compose base with constraint
+        CardPredicate::CharacterWithSpark(spark, operator) => {
+            let base = ownership_phrase(lang, ownership, &CardPredicate::Character);
+            let op = serialize_operator(lang, operator);
+            lang.with_spark(base, spark.0, op).to_string()
         }
-        CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::a_subtype(lang, "{subtype}")
-        }
-        CardPredicate::Fast { target } => {
-            let base = serialize_fast_target(target, bindings, lang);
-            rlt::fast(lang, base)
-        }
+
+        // Cost constraint
         CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            bind_cost(bindings, cost.0);
-            let base = serialize_card_predicate(target, bindings, lang);
-            let op = serialize_operator(cost_operator, lang);
-            rlt::with_cost(lang, base, "{e}", op)
+            let base = ownership_phrase(lang, ownership, target);
+            let op = serialize_operator(lang, cost_operator);
+            lang.with_cost(base, cost.0, op).to_string()
         }
+
+        // Materialized ability
         CardPredicate::CharacterWithMaterializedAbility => {
-            rlt::character_with_materialized(lang)
+            let base = ownership_phrase(lang, ownership, &CardPredicate::Character);
+            lang.with_materialized(base).to_string()
         }
+
+        // Activated ability
         CardPredicate::CharacterWithMultiActivatedAbility => {
-            rlt::character_with_activated(lang)
+            let base = ownership_phrase(lang, ownership, &CardPredicate::Character);
+            lang.with_activated(base).to_string()
         }
-        CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
-            let base = serialize_card_predicate(target, bindings, lang);
-            rlt::with_spark_less_than_energy(lang, base)
-        }
-        CardPredicate::CouldDissolve { target } => {
-            let target_text = serialize_predicate(target, bindings, lang);
-            rlt::event_could_dissolve(lang, target_text)
-        }
-        CardPredicate::NotCharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::not_a_subtype(lang, "{subtype}")
-        }
-        CardPredicate::CharacterWithSpark(spark, operator) => {
-            bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
-            let op = serialize_operator(operator, lang);
-            rlt::character_with_spark(lang, "{s}", op)
-        }
-        CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
-            let base = serialize_card_predicate(target, bindings, lang);
-            let counting = serialize_card_predicate_plural(count_matching, bindings, lang);
-            rlt::with_cost_less_than_allied(lang, base, counting)
-        }
-        CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
-            let base = serialize_card_predicate(target, bindings, lang);
-            rlt::with_cost_less_than_abandoned(lang, base)
-        }
-        CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
-            let base = serialize_card_predicate(target, bindings, lang);
-            rlt::with_spark_less_than_abandoned(lang, base)
-        }
-        CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
-            let base = serialize_card_predicate(target, bindings, lang);
-            rlt::with_spark_less_than_abandoned_count(lang, base)
-        }
-        CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
-            let base = serialize_card_predicate(target, bindings, lang);
-            rlt::with_cost_less_than_void(lang, base)
-        }
-    }
-}
 
-/// Serialize a card predicate in plural form.
-fn serialize_card_predicate_plural(
-    card_predicate: &CardPredicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
-    match card_predicate {
-        CardPredicate::Card => rlt::card_plural(lang),
-        CardPredicate::Character => rlt::character_plural(lang),
-        CardPredicate::Event => rlt::event_plural(lang),
-        CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::plural_subtype(lang, "{subtype}")
+        // Cost compared to allied count
+        // KEY: We pass PhraseRef for 'counting', RLT selects gen.many
+        CardPredicate::CharacterWithCostComparedToControlled {
+            target,
+            count_matching,
+            ..
+        } => {
+            let base = ownership_phrase(lang, ownership, target);
+            let counting = card_type_phrase(lang, count_matching);
+            lang.with_cost_less_than_allied(base, counting).to_string()
         }
-        CardPredicate::NotCharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::characters_not_subtype_plural(lang, "{subtype}")
-        }
-        CardPredicate::CharacterWithSpark(spark, operator) => {
-            bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
-            let op = serialize_operator(operator, lang);
-            rlt::characters_with_spark(lang, "{s}", op)
-        }
-        CardPredicate::CharacterWithMaterializedAbility => {
-            rlt::characters_with_materialized(lang)
-        }
-        CardPredicate::CharacterWithMultiActivatedAbility => {
-            rlt::characters_with_activated(lang)
-        }
+
+        // Fast modifier
         CardPredicate::Fast { target } => {
-            let base = serialize_card_predicate_plural(target, bindings, lang);
-            rlt::fast_plural(lang, base)
+            let base = ownership_phrase(lang, ownership, target);
+            lang.fast_modified(base).to_string()
         }
-        CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            bind_cost(bindings, cost.0);
-            let base = serialize_card_predicate_plural(target, bindings, lang);
-            let op = serialize_operator(cost_operator, lang);
-            rlt::with_cost(lang, base, "{e}", op)
-        }
-        CardPredicate::CouldDissolve { target } => {
-            let target_text = predicate_base_text(target, bindings, lang);
-            rlt::events_could_dissolve(lang, target_text)
-        }
-        // ... remaining cases follow the same pattern
-        _ => serialize_card_predicate(card_predicate, bindings, lang),
-    }
-}
 
-/// Serialize "your" predicate (ally/your card/your event).
-fn serialize_your_predicate_base(
-    card_predicate: &CardPredicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
-    match card_predicate {
-        CardPredicate::Character => rlt::ally(lang),
-        CardPredicate::Card => rlt::your_card(lang),
-        CardPredicate::Event => rlt::your_event(lang),
-        CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::allied_subtype(lang, "{subtype}")
+        // Could dissolve
+        CardPredicate::CouldDissolve { target } => {
+            let target_text = serialize_predicate(lang, target);
+            lang.event_could_dissolve(target_text).to_string()
         }
+
+        // Negation
         CardPredicate::NotCharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::ally_not_subtype(lang, "{subtype}")
+            let entity = lang.subtype_phrase(*subtype);
+            lang.not_a(entity).to_string()
         }
+
+        // Other complex predicates...
+        _ => lang.a_character().to_string(),
+    }
+}
+
+/// Serialize "any" predicates (no ownership qualifier).
+fn serialize_any_predicate(lang: &impl RltLang, card_predicate: &CardPredicate) -> String {
+    match card_predicate {
+        // Simple types: call semantic phrase directly
+        CardPredicate::Card => lang.a_card().to_string(),
+        CardPredicate::Character => lang.a_character().to_string(),
+        CardPredicate::Event => lang.an_event().to_string(),
+
         CardPredicate::CharacterWithSpark(spark, operator) => {
-            bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
-            let op = serialize_operator(operator, lang);
-            rlt::ally_with_spark(lang, "{s}", op)
+            let base = lang.character();
+            let op = serialize_operator(lang, operator);
+            lang.with_spark(base, spark.0, op).to_string()
         }
-        CardPredicate::CharacterWithMaterializedAbility => {
-            rlt::ally_with_materialized(lang)
-        }
-        CardPredicate::CharacterWithMultiActivatedAbility => {
-            rlt::ally_with_activated(lang)
-        }
-        CardPredicate::Fast { target } => {
-            let base = serialize_fast_target(target, bindings, lang);
-            rlt::fast(lang, base)
-        }
-        CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            bind_cost(bindings, cost.0);
-            let base = serialize_your_predicate_base(target, bindings, lang);
-            let op = serialize_operator(cost_operator, lang);
-            rlt::with_cost(lang, base, "{e}", op)
-        }
-        CardPredicate::CouldDissolve { target } => {
-            let target_text = predicate_base_text(target, bindings, lang);
-            rlt::your_event_could_dissolve(lang, target_text)
-        }
-        _ => {
-            // Fallback: use generic card predicate
-            serialize_card_predicate(card_predicate, bindings, lang)
-        }
+
+        // ... similar patterns for other constraints
+        _ => lang.a_character().to_string(),
     }
 }
 
-fn serialize_your_predicate_with_article(
-    card_predicate: &CardPredicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
-    if is_generic_card_type(card_predicate) {
-        serialize_card_predicate(card_predicate, bindings, lang)
-    } else if let CardPredicate::CharacterType(subtype) = card_predicate {
-        bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-        rlt::a_subtype(lang, "{subtype}")
-    } else {
-        serialize_your_predicate_base(card_predicate, bindings, lang)
-    }
+/// Serialize for "for each" contexts.
+pub fn serialize_for_each_predicate(lang: &impl RltLang, predicate: &Predicate) -> String {
+    let base = match predicate {
+        Predicate::Your(CardPredicate::Character) => lang.ally(),
+        Predicate::Enemy(CardPredicate::Character) => lang.enemy(),
+        Predicate::Any(cp) => card_type_phrase(lang, cp),
+        _ => lang.character(),
+    };
+    lang.for_each(base).to_string()
 }
 
-/// Serialize "your" predicate in plural form.
-fn serialize_your_predicate_plural(
-    card_predicate: &CardPredicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
-    match card_predicate {
-        CardPredicate::Character => rlt::ally_plural(lang),
-        CardPredicate::Card => rlt::your_card_plural(lang),
-        CardPredicate::Event => rlt::your_event_plural(lang),
-        CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::allied_subtype_plural(lang, "{subtype}")
-        }
-        CardPredicate::NotCharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::allies_not_subtype_plural(lang, "{subtype}")
-        }
-        CardPredicate::CharacterWithSpark(spark, operator) => {
-            bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
-            let op = serialize_operator(operator, lang);
-            rlt::allies_with_spark(lang, "{s}", op)
-        }
-        CardPredicate::CharacterWithMaterializedAbility => {
-            rlt::allies_with_materialized(lang)
-        }
-        CardPredicate::CharacterWithMultiActivatedAbility => {
-            rlt::allies_with_activated(lang)
-        }
-        CardPredicate::Fast { target } => {
-            let base = serialize_card_predicate_plural(target, bindings, lang);
-            rlt::fast_plural(lang, base)
-        }
-        CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            bind_cost(bindings, cost.0);
-            let base = serialize_your_predicate_plural(target, bindings, lang);
-            let op = serialize_operator(cost_operator, lang);
-            rlt::with_cost(lang, base, "{e}", op)
-        }
-        CardPredicate::CouldDissolve { target } => {
-            let target_text = predicate_base_text(target, bindings, lang);
-            rlt::your_events_could_dissolve(lang, target_text)
-        }
-        _ => serialize_card_predicate_plural(card_predicate, bindings, lang),
-    }
-}
-
-/// Serialize "enemy" predicate base.
-fn serialize_enemy_predicate_base(
-    card_predicate: &CardPredicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
-    match card_predicate {
-        CardPredicate::Character => rlt::enemy(lang),
-        CardPredicate::Card => rlt::enemy_card(lang),
-        CardPredicate::Event => rlt::enemy_event(lang),
-        CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::enemy_subtype(lang, "{subtype}")
-        }
-        CardPredicate::NotCharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::non_subtype_enemy(lang, "{subtype}")
-        }
-        CardPredicate::CharacterWithSpark(spark, operator) => {
-            bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
-            let op = serialize_operator(operator, lang);
-            rlt::enemy_with_spark(lang, "{s}", op)
-        }
-        CardPredicate::CharacterWithMaterializedAbility => {
-            rlt::enemy_with_materialized(lang)
-        }
-        CardPredicate::CharacterWithMultiActivatedAbility => {
-            rlt::enemy_with_activated(lang)
-        }
-        CardPredicate::CardWithCost { cost_operator, cost, .. } => {
-            bind_cost(bindings, cost.0);
-            let op = serialize_operator(cost_operator, lang);
-            rlt::enemy_with_cost(lang, "{e}", op)
-        }
-        CardPredicate::Fast { target } => {
-            let base = serialize_fast_target(target, bindings, lang);
-            rlt::fast(lang, base)
-        }
-        CardPredicate::CouldDissolve { target } => {
-            let target_text = serialize_predicate(target, bindings, lang);
-            rlt::event_could_dissolve_base(lang, target_text)
-        }
-        _ => {
-            // Complex predicates: delegate to generic handling
-            let base = serialize_enemy_predicate_base_inner(card_predicate, bindings, lang);
-            base
-        }
-    }
-}
-
-/// Serialize "enemy" predicate in plural form.
-fn serialize_enemy_predicate_plural(
-    card_predicate: &CardPredicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
-    match card_predicate {
-        CardPredicate::Character => rlt::enemy_plural(lang),
-        CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::enemy_subtype_plural(lang, "{subtype}")
-        }
-        _ => {
-            // Fallback: "enemy" + generic plural
-            let base = serialize_card_predicate_plural(card_predicate, bindings, lang);
-            rlt::enemy_prefix(lang, base)
-        }
-    }
-}
-
-/// Serialize fast target (no article).
-fn serialize_fast_target(
-    card_predicate: &CardPredicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
-    match card_predicate {
-        CardPredicate::Card => rlt::card(lang),
-        CardPredicate::Character => rlt::character(lang),
-        CardPredicate::Event => rlt::event(lang),
-        CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::subtype_placeholder(lang)
-        }
-        CardPredicate::Fast { target } => {
-            let base = serialize_fast_target(target, bindings, lang);
-            rlt::fast_modifier(lang, base)
-        }
-        _ => serialize_card_predicate_base(card_predicate, bindings, lang),
-    }
-}
-
-/// Serialize predicate for "for each" contexts.
-pub fn serialize_for_each_predicate(
-    predicate: &Predicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
-    // Many "for each" cases have special phrasings
-    match predicate {
-        Predicate::Another(CardPredicate::Character) => rlt::allied_character_each(lang),
-        Predicate::Your(CardPredicate::Character) => rlt::ally_each(lang),
-        Predicate::Enemy(CardPredicate::Character) => rlt::enemy_each(lang),
-        Predicate::Any(CardPredicate::Character) => rlt::character_each(lang),
-        Predicate::Any(CardPredicate::Card) => rlt::card_each(lang),
-        Predicate::Any(CardPredicate::Event) => rlt::event_each(lang),
-        Predicate::AnyOther(CardPredicate::Character) => rlt::other_character_each(lang),
-        Predicate::YourVoid(CardPredicate::Card) => rlt::card_in_void_each(lang),
-        Predicate::YourVoid(CardPredicate::Character) => rlt::character_in_void_each(lang),
-        Predicate::YourVoid(CardPredicate::Event) => rlt::event_in_void_each(lang),
-        Predicate::EnemyVoid(CardPredicate::Card) => rlt::card_in_opponent_void_each(lang),
-        Predicate::EnemyVoid(CardPredicate::Character) => {
-            rlt::character_in_opponent_void_each(lang)
-        }
-        Predicate::EnemyVoid(CardPredicate::Event) => rlt::event_in_opponent_void_each(lang),
-        Predicate::This => rlt::this_character(lang),
-        Predicate::That | Predicate::It => rlt::that_character(lang),
-        Predicate::Them => rlt::character_each(lang),
-
-        // Subtype handling
-        Predicate::Another(CardPredicate::CharacterType(subtype))
-        | Predicate::Your(CardPredicate::CharacterType(subtype)) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::allied_subtype(lang, "{subtype}")
-        }
-        Predicate::Enemy(CardPredicate::CharacterType(subtype)) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::enemy_subtype(lang, "{subtype}")
-        }
-        Predicate::Any(CardPredicate::CharacterType(subtype)) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::subtype_placeholder(lang)
-        }
-        Predicate::AnyOther(CardPredicate::CharacterType(subtype)) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::other_subtype(lang, "{subtype}")
-        }
-
-        // Spark constraints
-        Predicate::Another(CardPredicate::CharacterWithSpark(spark, operator))
-        | Predicate::Your(CardPredicate::CharacterWithSpark(spark, operator)) => {
-            bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
-            let op = serialize_operator(operator, lang);
-            rlt::ally_with_spark(lang, "{s}", op)
-        }
-
-        // Void subtypes
-        Predicate::YourVoid(CardPredicate::CharacterType(subtype)) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::subtype_in_void(lang, "{subtype}")
-        }
-
-        // Generic fallback
-        _ => {
-            let base = predicate_base_text(predicate, bindings, lang);
-            rlt::for_each_prefix(lang, base)
-        }
-    }
-}
-
-/// Get the base text of a predicate (used in various contexts).
-pub fn predicate_base_text(
-    predicate: &Predicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
-    match predicate {
-        Predicate::This => rlt::this_character(lang),
-        Predicate::That => rlt::that_character(lang),
-        Predicate::Them => rlt::them(lang),
-        Predicate::It => rlt::it(lang),
-        Predicate::Your(card_predicate) => {
-            if is_generic_card_type(card_predicate) {
-                serialize_card_predicate_base(card_predicate, bindings, lang)
-            } else {
-                serialize_your_predicate_base(card_predicate, bindings, lang)
-            }
-        }
-        Predicate::Another(card_predicate) => {
-            serialize_your_predicate_base(card_predicate, bindings, lang)
-        }
-        Predicate::Any(card_predicate) => {
-            serialize_card_predicate_base(card_predicate, bindings, lang)
-        }
-        Predicate::Enemy(card_predicate) => {
-            // Complex: depends on context
-            serialize_enemy_base_for_context(card_predicate, bindings, lang)
-        }
-        Predicate::YourVoid(card_predicate) => {
-            let base = serialize_card_predicate_base(card_predicate, bindings, lang);
-            rlt::in_your_void(lang, base)
-        }
-        Predicate::EnemyVoid(card_predicate) => {
-            let base = serialize_card_predicate_base(card_predicate, bindings, lang);
-            rlt::in_opponent_void(lang, base)
-        }
-        Predicate::AnyOther(card_predicate) => {
-            let base = serialize_card_predicate_base(card_predicate, bindings, lang);
-            rlt::another(lang, base)
-        }
-    }
-}
-
-// =========================================================================
-// Helper Functions
-// =========================================================================
-
-fn is_generic_card_type(card_predicate: &CardPredicate) -> bool {
-    matches!(
-        card_predicate,
-        CardPredicate::Card | CardPredicate::Character | CardPredicate::Event
-    )
-}
-
-fn bind_cost(bindings: &mut VariableBindings, cost: i32) {
-    if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-        bindings.insert(var_name.to_string(), VariableValue::Integer(cost));
-    }
-}
-
-fn serialize_operator(operator: &CostOperator, lang: Language) -> String {
+fn serialize_operator(lang: &impl RltLang, operator: &CostOperator) -> String {
     match operator {
-        CostOperator::LessOrEqual => rlt::or_less(lang),
-        CostOperator::GreaterOrEqual => rlt::or_more(lang),
+        CostOperator::LessOrEqual => lang.or_less().to_string(),
+        CostOperator::GreaterOrEqual => lang.or_more().to_string(),
         CostOperator::Equal => String::new(),
     }
 }
-
-fn serialize_enemy_base_for_context(
-    card_predicate: &CardPredicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
-    match card_predicate {
-        _ if is_generic_card_type(card_predicate) => {
-            serialize_card_predicate_base(card_predicate, bindings, lang)
-        }
-        CardPredicate::CouldDissolve { target } => {
-            let target_text = serialize_predicate(target, bindings, lang);
-            rlt::event_could_dissolve_base(lang, target_text)
-        }
-        CardPredicate::CardWithCost { .. } => {
-            serialize_card_predicate_without_article(card_predicate, bindings, lang)
-        }
-        _ => serialize_enemy_predicate_base(card_predicate, bindings, lang),
-    }
-}
-
-fn serialize_card_predicate_without_article(
-    card_predicate: &CardPredicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
-    match card_predicate {
-        CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
-            serialize_card_predicate_base(card_predicate, bindings, lang)
-        }
-        CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            rlt::subtype_placeholder(lang)
-        }
-        CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            bind_cost(bindings, cost.0);
-            let base = serialize_card_predicate_without_article(target, bindings, lang);
-            let op = serialize_operator(cost_operator, lang);
-            rlt::with_cost(lang, base, "{e}", op)
-        }
-        _ => serialize_card_predicate(card_predicate, bindings, lang),
-    }
-}
-
-/// Serialize only the cost constraint (for contexts where base type is implied).
-pub fn serialize_cost_constraint_only(
-    card_predicate: &CardPredicate,
-    bindings: &mut VariableBindings,
-    lang: Language,
-) -> String {
-    match card_predicate {
-        CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            bind_cost(bindings, cost.0);
-            let op = serialize_operator(cost_operator, lang);
-            if is_generic_card_type(target) {
-                rlt::cost_constraint_only(lang, "{e}", op)
-            } else {
-                let base = serialize_card_predicate_without_article(target, bindings, lang);
-                rlt::with_cost(lang, base, "{e}", op)
-            }
-        }
-        _ => serialize_card_predicate_without_article(card_predicate, bindings, lang),
-    }
-}
 ```
 
 ---
 
-## Part 5: Key Design Decisions
+## Part 6: How Selection Solves the Problem
 
-### 1. Language Parameter Threading
+### The Flow for "characters with cost less than the number of allied characters"
 
-Every serialization function takes a `Language` parameter. This allows the same Rust
-logic to produce text in any supported language:
+**English:**
+```
+lang.with_cost_less_than_allied(base, counting)
 
-```rust
-let en_text = serialize_predicate(&pred, &mut bindings, Language::En);
-let ru_text = serialize_predicate(&pred, &mut bindings, Language::Ru);
+base = lang.character()     // PhraseRef with one="character", other="characters"
+counting = lang.character() // Same PhraseRef
+
+Template: "{base:one} with cost less than the number of allied {counting:other}"
+Result:   "character with cost less than the number of allied characters"
 ```
 
-### 2. RLT Phrases for All Text
+**Russian:**
+```
+lang.with_cost_less_than_allied(base, counting)
 
-No hardcoded English strings remain in the Rust code. Every piece of text comes from
-an RLT phrase:
+base = lang.character()     // PhraseRef with nom.one="персонаж", gen.many="персонажей"
+counting = lang.character() // Same PhraseRef
 
-```rust
-// Before (hardcoded)
-"this character".to_string()
-
-// After (RLT)
-rlt::this_character(lang)
+Template: "{base:nom.one} со стоимостью меньше количества союзных {counting:gen.many}"
+Result:   "персонаж со стоимостью меньше количества союзных персонажей"
 ```
 
-### 3. Variable Bindings Pass Through
+The same Rust code produces grammatically correct output in both languages because:
+1. Rust passes `PhraseRef` values with language-appropriate variants
+2. Each language's template uses selectors appropriate for that language
+3. English uses simple `:one`/`:other`, Russian uses `:nom.one`/`:gen.many`
 
-Subtype and numeric variables are still bound in Rust code, but their text
-representation is determined by RLT:
+### Gender Agreement with Tag-Based Selection
 
-```rust
-bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-rlt::allied_subtype(lang, "{subtype}")  // RLT handles the text
-```
-
-### 4. Complex Phrases in RLT
-
-Complex phrases with multiple parameters are defined in RLT:
+For modifiers like "another" that must agree with noun gender:
 
 ```rust
-// en.rlt.rs
-with_cost_less_than_allied(base, counting) =
-    "{base} with cost less than the number of allied {counting:other}";
-
 // ru.rlt.rs
-with_cost_less_than_allied(base, counting) =
-    "{base} со стоимостью меньше количества союзных {counting:gen.many}";
+rlt_lang!(Ru) {
+    another_adj = {
+        masc: "другой",
+        fem: "другая",
+        neut: "другое",
+    };
+    another(entity) = "{another_adj:entity} {entity:nom.one}";
+}
 ```
 
-The Rust code just calls these phrases with the appropriate parameters.
+When `entity` is `card` (tagged `:fem`), selection produces:
+- `{another_adj:entity}` → looks up `entity`'s tag (`:fem`) → selects "другая"
+- `{entity:nom.one}` → selects "карта"
+- Result: "другая карта"
 
-### 5. Case Selection in Russian
-
-Russian case selection happens through RLT's variant selection:
-
-```rust
-// When we need genitive plural (for counting)
-rlt::allied_subtype_plural(lang, "{subtype}")
-// → "союзных {subtype:gen.many}" in Russian
-// → "allied {subtype:other}" in English
-```
-
-### 6. Article Handling
-
-English needs articles; Russian doesn't. The `with_article` phrase handles this:
-
-```rust
-// en.rlt.rs
-with_article(thing) = "{@a thing}";  // Adds "a" or "an"
-
-// ru.rlt.rs
-with_article(thing) = "{thing}";     // No article needed
-```
+When `entity` is `character` (tagged `:masc`):
+- `{another_adj:entity}` → looks up `:masc` → selects "другой"
+- `{entity:nom.one}` → selects "персонаж"
+- Result: "другой персонаж"
 
 ---
 
-## Part 6: Testing the Translation
+## Part 7: Benefits of This Approach
 
-### Example: "Draw 3 cards"
+### For Translators
 
-```rust
-// English
-rlt::draw(Language::En, 3)  // → "Draw 3 cards."
+1. **Full control over grammatical forms**: Select any case/number variant
+2. **Flexible word order**: Rearrange phrase templates as needed
+3. **Gender agreement**: Tag-based selection handles adjective agreement
+4. **No Rust knowledge required**: All linguistic decisions in RLT files
 
-// Russian
-rlt::draw(Language::Ru, 3)  // → "Возьмите 3 карты."
-```
+### For Developers
 
-### Example: "an ally with spark 2 or less"
+1. **Simpler Rust code**: No separate singular/plural functions
+2. **Less phrase explosion**: Compositional phrases replace combinatorial variants
+3. **Type safety**: `PhraseRef` carries variants; selection is validated
+4. **Single code path**: Same Rust logic for all languages
+5. **Semantic API**: Rust calls `lang.an_ally()` not `lang.with_article(lang.ally())` — no
+   linguistic decisions in Rust code
 
-```rust
-let pred = Predicate::Your(CardPredicate::CharacterWithSpark(Spark(2), CostOperator::LessOrEqual));
+### Comparison
 
-serialize_predicate(&pred, &mut bindings, Language::En)
-// → "an ally with spark 2 or less"
-
-serialize_predicate(&pred, &mut bindings, Language::Ru)
-// → "союзник с искрой 2 или меньше"
-```
-
-### Example: "characters with cost less than the number of allied characters"
-
-```rust
-let pred = Predicate::Any(CardPredicate::CharacterWithCostComparedToControlled {
-    target: Box::new(CardPredicate::Character),
-    count_matching: Box::new(CardPredicate::Character),
-    operator: CostOperator::LessThan,
-});
-
-serialize_predicate(&pred, &mut bindings, Language::En)
-// → "a character with cost less than the number of allied characters"
-
-serialize_predicate(&pred, &mut bindings, Language::Ru)
-// → "персонаж со стоимостью меньше количества союзных персонажей"
-```
+| Aspect | Old Approach | New Approach |
+|--------|--------------|--------------|
+| Rust returns | `String` (pre-rendered) | `PhraseRef` (with variants) |
+| Simple references | `with_article(ally)` | `an_ally()` |
+| Case selection | Rust function choice | RLT `:case.number` selector |
+| Phrase count | O(base × ownership × number) | O(base + ownership) |
+| Translator control | Limited to text | Full grammatical control |
+| Gender agreement | Separate phrases | Tag-based selection |
+| Article decisions | Rust code | RLT phrases |
 
 ---
 
 ## Summary
 
-| Aspect | Before | After |
-|--------|--------|-------|
-| Text location | Hardcoded in Rust | RLT files |
-| Language support | English only | Any language |
-| Article handling | In Rust logic | RLT transforms |
-| Plural forms | English rules | CLDR rules per language |
-| Case declension | N/A | RLT variant selection |
-| Rust code role | Text + logic | Logic only |
+Two key insights drive this design:
 
-The refactored approach keeps all language-specific text in RLT files, making
-translation straightforward: translators work with `.rlt.rs` files and never need
-to touch Rust code.
+**1. Pass `PhraseRef`, not `String`.** Pre-rendering to `String` strips variant
+information. By passing `PhraseRef` values through the system, variants are
+preserved until the final RLT phrase renders them.
+
+**2. Call semantic phrases, not presentation helpers.** Rust should call
+`lang.an_ally()` (semantic: "I need an ally reference"), not
+`lang.with_article(lang.ally())` (presentational: "add an article to this").
+Linguistic decisions—articles, case, word order—belong in RLT, not Rust.
+
+The result:
+
+1. **Translators choose** which grammatical forms to use via `:` selectors
+2. **Gender agreement** works via tag-based selection on phrase parameters
+3. **Word order** is fully controlled by the translator's phrase templates
+4. **Rust remains language-agnostic** — it identifies semantic contexts, RLT
+   handles all presentation
+
+This approach keeps semantic logic in Rust (which predicate type? what constraints?)
+while putting grammatical logic in RLT (which case? which number? what word order?).

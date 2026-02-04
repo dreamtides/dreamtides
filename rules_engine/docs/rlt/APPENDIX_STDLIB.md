@@ -37,23 +37,21 @@ These transforms work identically in all languages:
 | `:an` | Use "an" as indefinite article (required for `@a`) |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@a` | `:a`, `:an` (required) | Prepend indefinite article; errors if tag missing |
-| `@the` | - | Prepend "the" |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@a` | `@an` | `:a`, `:an` (required) | Prepend indefinite article; errors if tag missing |
+| `@the` | - | - | Prepend "the" |
 
 **Plural categories**: `one`, `other`
 
 ```rust
 // en.rlt.rs
-rlt! {
-    card = "card" :a;
-    event = "event" :an;
-    ally = "ally" :an;
-    hour = "hour" :an;       // silent h
-    uniform = "uniform" :a;   // /juː/ sound
-
-    card = { one: "card", other: "cards" };
+rlt_source! {
+    card = :a { one: "card", other: "cards" };
+    event = :an { one: "event", other: "events" };
+    ally = :an { one: "ally", other: "allies" };
+    hour = :an "hour";       // silent h
+    uniform = :a "uniform";  // /juː/ sound
 
     draw_one = "Draw {@a card}.";      // → "Draw a card."
     play_one = "Play {@a event}.";     // → "Play an event."
@@ -79,22 +77,22 @@ rlt! {
 | `:zhi` | Animals, hands | 只 |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@count` | measure word tags | Insert number + measure word |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@count` | - | measure word tags | Insert number + measure word |
 
 **Plural categories**: `other` (no plural distinction)
 
 ```rust
 // zh_cn.rlt.rs
-rlt! {
-    pai = "牌" :zhang;
-    jue_se = "角色" :ge;
-    wan_jia = "玩家" :ming;
+rlt_lang!(ZhCn) {
+    pai = :zhang "牌";
+    jue_se = :ge "角色";
+    wan_jia = :ming "玩家";
 
-    // @count inserts number + measure word
-    draw(n) = "抽{@count n pai}";       // n=3 → "抽3张牌"
-    summon(n) = "召唤{@count n jue_se}"; // n=2 → "召唤2个角色"
+    // @count:n uses n as context (the count), reads measure word tag from phrase
+    draw(n) = "抽{@count:n pai}";       // n=3 → "抽3张牌"
+    summon(n) = "召唤{@count:n jue_se}"; // n=2 → "召唤2个角色"
 }
 ```
 
@@ -114,15 +112,17 @@ rlt! {
 
 ```rust
 // hi.rlt.rs
-rlt! {
-    card = "कार्ड" :masc;
-    event = "घटना" :fem;
-
-    card = {
-        dir.one: "कार्ड",
-        dir.other: "कार्ड",
-        obl.one: "कार्ड",
+rlt_lang!(Hi) {
+    card = :masc {
+        dir: "कार्ड",
+        obl: "कार्ड",
         obl.other: "कार्डों",
+    };
+
+    event = :fem {
+        dir: "घटना",
+        obl: "घटना",
+        obl.other: "घटनाओं",
     };
 }
 ```
@@ -140,27 +140,27 @@ rlt! {
 | `:fem` | Feminine gender |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@el` | `:masc`, `:fem` | Definite article (el/la/los/las) |
-| `@un` | `:masc`, `:fem` | Indefinite article (un/una/unos/unas) |
+| Transform | Aliases | Reads | Context | Effect |
+|-----------|---------|-------|---------|--------|
+| `@el` | `@la` | `:masc`, `:fem` | `:one`/`:other` | Definite article (el/la/los/las) |
+| `@un` | `@una` | `:masc`, `:fem` | `:one`/`:other` | Indefinite article (un/una/unos/unas) |
+
+Use context selector for plural forms: `@el:other` → los/las, `@un:other` → unos/unas.
 
 **Plural categories**: `one`, `other`
 
 ```rust
 // es.rlt.rs
-rlt! {
-    card = "carta" :fem;
-    enemy = "enemigo" :masc;
-
-    card = { one: "carta", other: "cartas" };
-    enemy = { one: "enemigo", other: "enemigos" };
+rlt_lang!(Es) {
+    card = :fem { one: "carta", other: "cartas" };
+    enemy = :masc { one: "enemigo", other: "enemigos" };
 
     destroyed = { masc: "destruido", fem: "destruida" };
 
-    draw_one = "Roba {@un card}.";           // → "Roba una carta."
-    the_enemy = "{@el enemy}";               // → "el enemigo"
-    destroy(x) = "{x} fue {destroyed:x}.";   // → "carta fue destruida."
+    draw_one = "Roba {@un card}.";                // → "Roba una carta."
+    the_enemy = "{@el enemy}";                    // → "el enemigo"
+    return_all(t) = "devuelve {@el:other t}";     // → "devuelve las cartas"
+    destroy(x) = "{x} fue {destroyed:x}.";        // → "carta fue destruida."
 }
 ```
 
@@ -178,28 +178,28 @@ rlt! {
 | `:vowel` | Starts with vowel sound (for elision) |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@le` | `:masc`, `:fem`, `:vowel` | Definite article (le/la/l'/les) |
-| `@un` | `:masc`, `:fem` | Indefinite article (un/une) |
-| `@de` | `:masc`, `:fem`, `:vowel` | "de" + article (du/de la/de l'/des) |
-| `@a` | `:masc`, `:fem`, `:vowel` | "à" + article (au/à la/à l'/aux) |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@le` | `@la` | `:masc`, `:fem`, `:vowel` | Definite article (le/la/l'/les) |
+| `@un` | `@une` | `:masc`, `:fem` | Indefinite article (un/une) |
+| `@de` | - | `:masc`, `:fem`, `:vowel` | "de" + article (du/de la/de l'/des) |
+| `@au` | - | `:masc`, `:fem`, `:vowel` | "à" + article (au/à la/à l'/aux) |
 
 **Plural categories**: `one`, `other`
 
 ```rust
 // fr.rlt.rs
-rlt! {
-    card = "carte" :fem;
-    enemy = "ennemi" :masc :vowel;
-    friend = "ami" :masc :vowel;
-    void = "vide" :masc;
-    hand = "main" :fem;
+rlt_lang!(Fr) {
+    card = :fem "carte";
+    enemy = :masc :vowel "ennemi";
+    friend = :masc :vowel "ami";
+    void = :masc "vide";
+    hand = :fem "main";
 
     the_card = "{@le card}";      // → "la carte"
     the_enemy = "{@le enemy}";    // → "l'ennemi" (elision)
     from_void = "{@de void}";     // → "du vide"
-    to_hand = "{@a hand}";        // → "à la main"
+    to_hand = "{@au hand}";       // → "à la main"
 }
 ```
 
@@ -218,18 +218,16 @@ rlt! {
 | `:moon` | Moon letter (no assimilation) |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@al` | `:sun`, `:moon` | Definite article with assimilation |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@al` | - | `:sun`, `:moon` | Definite article with assimilation |
 
 **Plural categories**: `zero`, `one`, `two`, `few`, `many`, `other`
 
 ```rust
 // ar.rlt.rs
-rlt! {
-    card = "بطاقة" :fem :moon;
-
-    card = {
+rlt_lang!(Ar) {
+    card = :fem :moon {
         one: "بطاقة",
         two: "بطاقتان",
         few: "بطاقات",
@@ -254,9 +252,9 @@ rlt! {
 | `:jon` | For people (জন) |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@count` | classifier tags | Number + classifier |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@count` | - | classifier tags | Number + classifier |
 
 **Plural categories**: `one`, `other`
 
@@ -273,22 +271,22 @@ rlt! {
 | `:fem` | Feminine gender |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@o` | `:masc`, `:fem` | Definite article (o/a/os/as) |
-| `@um` | `:masc`, `:fem` | Indefinite article (um/uma) |
-| `@de` | `:masc`, `:fem` | "de" + article (do/da/dos/das) |
-| `@em` | `:masc`, `:fem` | "em" + article (no/na/nos/nas) |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@o` | `@a` | `:masc`, `:fem` | Definite article (o/a/os/as) |
+| `@um` | `@uma` | `:masc`, `:fem` | Indefinite article (um/uma) |
+| `@de` | - | `:masc`, `:fem` | "de" + article (do/da/dos/das) |
+| `@em` | - | `:masc`, `:fem` | "em" + article (no/na/nos/nas) |
 
 **Plural categories**: `one`, `other`
 
 ```rust
 // pt_br.rlt.rs
-rlt! {
-    card = "carta" :fem;
-    enemy = "inimigo" :masc;
-    void = "vazio" :masc;
-    hand = "mão" :fem;
+rlt_lang!(PtBr) {
+    card = :fem "carta";
+    enemy = :masc "inimigo";
+    void = :masc "vazio";
+    hand = :fem "mão";
 
     the_card = "{@o card}";      // → "a carta"
     from_void = "{@de void}";    // → "do vazio"
@@ -317,21 +315,26 @@ rlt! {
 
 ```rust
 // ru.rlt.rs
-rlt! {
-    card = "карта" :fem :inan;
-    ally = "союзник" :masc :anim;
-
-    card = {
-        nom.one: "карта",
-        nom.few: "карты",
+rlt_lang!(Ru) {
+    card = :fem :inan {
+        nom: "карта",
         nom.many: "карт",
-        acc.one: "карту",
-        acc.few: "карты",
+        acc: "карту",
         acc.many: "карт",
-        gen.one: "карты",
-        gen.few: "карт",
+        gen: "карты",
         gen.many: "карт",
-        // ... dat, ins, prep
+        ins.one: "картой",
+        ins: "картами",
+    };
+
+    ally = :masc :anim {
+        nom.one: "союзник",
+        nom: "союзники",
+        nom.many: "союзников",
+        acc, gen: "союзника",
+        acc.many, gen.many: "союзников",
+        ins.one: "союзником",
+        ins: "союзниками",
     };
 }
 ```
@@ -353,19 +356,19 @@ rlt! {
 | `:satsu` | Books | 冊 |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@count` | counter tags | Number + counter |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@count` | - | counter tags | Number + counter |
 
 **Plural categories**: `other` (no plural distinction)
 
 ```rust
 // ja.rlt.rs
-rlt! {
-    card = "カード" :mai;
-    character = "キャラクター" :nin;
+rlt_lang!(Ja) {
+    card = :mai "カード";
+    character = :nin "キャラクター";
 
-    draw(n) = "{@count n card}を引く";  // n=3 → "3枚のカードを引く"
+    draw(n) = "{@count:n card}を引く";  // n=3 → "3枚カードを引く"
 }
 ```
 
@@ -383,10 +386,10 @@ rlt! {
 | `:neut` | Neuter (das) |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@der` | `:masc`, `:fem`, `:neut` + case | Definite article (der/die/das/den/dem/des) |
-| `@ein` | `:masc`, `:fem`, `:neut` + case | Indefinite article (ein/eine/einen/einem/einer/eines) |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@der` | `@die`, `@das` | `:masc`, `:fem`, `:neut` + case | Definite article (der/die/das/den/dem/des) |
+| `@ein` | `@eine` | `:masc`, `:fem`, `:neut` + case | Indefinite article (ein/eine/einen/einem/einer/eines) |
 
 **Plural categories**: `one`, `other`
 
@@ -394,23 +397,23 @@ rlt! {
 
 ```rust
 // de.rlt.rs
-rlt! {
-    karte = "Karte" :fem;
-    charakter = "Charakter" :masc;
-    ereignis = "Ereignis" :neut;
-
-    karte = {
-        nom.one: "Karte",
-        nom.other: "Karten",
-        acc.one: "Karte",
-        acc.other: "Karten",
-        dat.one: "Karte",
-        dat.other: "Karten",
-        gen.one: "Karte",
-        gen.other: "Karten",
+rlt_lang!(De) {
+    karte = :fem {
+        nom, acc, dat, gen: "Karte",
+        nom.other, acc.other, dat.other, gen.other: "Karten",
     };
 
-    the_card = "{@der:nom karte}";  // → "die Karte"
+    charakter = :masc {
+        nom, acc, dat, gen: "Charakter",
+        nom.other, acc.other, dat.other, gen.other: "Charaktere",
+    };
+
+    ereignis = :neut {
+        nom, acc, dat, gen: "Ereignis",
+        nom.other, acc.other, dat.other, gen.other: "Ereignisse",
+    };
+
+    the_card = "{@der:nom karte}";   // → "die Karte"
     a_char = "{@ein:acc charakter}"; // → "einen Charakter"
 }
 ```
@@ -431,19 +434,24 @@ rlt! {
 | `:gwon` | Books | 권 |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@count` | counter tags | Number + counter (Korean or Sino-Korean) |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@count` | - | counter tags | Number + counter (Korean or Sino-Korean) |
+| `@particle` | - | final sound | Context-sensitive particle (가/이, 를/을, etc.) |
+
+The `@particle` transform inspects the final sound of the preceding word. See
+**Advanced Transforms** section for details.
 
 **Plural categories**: `other` (no plural distinction)
 
 ```rust
 // ko.rlt.rs
-rlt! {
-    card = "카드" :jang;
-    character = "캐릭터" :myeong;
+rlt_lang!(Ko) {
+    card = :jang "카드";
+    character = :myeong "캐릭터";
 
-    draw(n) = "{@count n card}를 뽑는다";  // n=3 → "카드 3장을 뽑는다"
+    draw(n) = "{@count:n card}를 뽑는다";  // n=3 → "카드 3장을 뽑는다"
+    thing_exists(thing) = "{thing}{@particle:subj thing} 있다";
 }
 ```
 
@@ -463,9 +471,9 @@ rlt! {
 | `:to` | Flat paper items | tờ |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@count` | classifier tags | Number + classifier |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@count` | - | classifier tags | Number + classifier |
 
 **Plural categories**: `other` (no plural distinction)
 
@@ -482,24 +490,23 @@ rlt! {
 | `:back` | Back vowels (a, ı, o, u) |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@acc` | `:front`, `:back` | Accusative suffix (-i/-ı/-u/-ü) |
-| `@dat` | `:front`, `:back` | Dative suffix (-e/-a) |
-| `@loc` | `:front`, `:back` | Locative suffix (-de/-da/-te/-ta) |
-| `@abl` | `:front`, `:back` | Ablative suffix (-den/-dan/-ten/-tan) |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@inflect` | - | `:front`, `:back` | Suffix chain with vowel harmony |
+
+The `@inflect` transform handles agglutinative suffix chains. See **Advanced
+Transforms** section for details.
 
 **Plural categories**: `one`, `other`
 
 ```rust
 // tr.rlt.rs
-rlt! {
-    card = "kart" :back;
-    hand = "el" :front;
-    void = "boşluk" :back;
+rlt_lang!(Tr) {
+    ev = :back "ev";
+    göz = :front "göz";
 
-    to_hand = "{@dat hand}";     // → "ele"
-    from_void = "{@abl void}";   // → "boşluktan"
+    to_house = "{@inflect:dat ev}";              // → "eve"
+    from_my_houses = "{@inflect:abl.poss1sg.pl ev}"; // → "evlerimden"
 }
 ```
 
@@ -518,21 +525,21 @@ rlt! {
 | `:s_imp` | Starts with s+consonant, z, gn, ps, x |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@il` | gender + sound tags | Definite article (il/lo/la/l'/i/gli/le) |
-| `@un` | gender + sound tags | Indefinite article (un/uno/una/un') |
-| `@di` | gender + sound tags | "di" + article (del/dello/della/dell'/dei/degli/delle) |
-| `@a` | gender + sound tags | "a" + article (al/allo/alla/all'/ai/agli/alle) |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@il` | `@lo`, `@la` | gender + sound tags | Definite article (il/lo/la/l'/i/gli/le) |
+| `@un` | `@uno`, `@una` | gender + sound tags | Indefinite article (un/uno/una/un') |
+| `@di` | - | gender + sound tags | "di" + article (del/dello/della/dell'/dei/degli/delle) |
+| `@a` | - | gender + sound tags | "a" + article (al/allo/alla/all'/ai/agli/alle) |
 
 **Plural categories**: `one`, `other`
 
 ```rust
 // it.rlt.rs
-rlt! {
-    card = "carta" :fem;
-    student = "studente" :masc :s_imp;
-    friend = "amico" :masc :vowel;
+rlt_lang!(It) {
+    card = :fem "carta";
+    student = :masc :s_imp "studente";
+    friend = :masc :vowel "amico";
 
     the_card = "{@il card}";       // → "la carta"
     the_student = "{@il student}"; // → "lo studente"
@@ -560,18 +567,22 @@ rlt! {
 
 ```rust
 // pl.rlt.rs
-rlt! {
-    card = "karta" :fem;
-    enemy = "wróg" :masc_anim;
-
-    card = {
-        nom.one: "karta",
-        nom.few: "karty",
+rlt_lang!(Pl) {
+    card = :fem {
+        nom: "karta",
         nom.many: "kart",
-        acc.one: "kartę",
-        acc.few: "karty",
+        acc: "kartę",
         acc.many: "kart",
-        // ... etc
+        gen: "karty",
+        gen.many: "kart",
+    };
+
+    enemy = :masc_anim {
+        nom.one: "wróg",
+        nom: "wrogowie",
+        nom.many: "wrogów",
+        acc, gen: "wroga",
+        acc.many, gen.many: "wrogów",
     };
 }
 ```
@@ -601,18 +612,18 @@ rlt! {
 | `:het` | Neuter gender (het-words) |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@de` | `:de`, `:het` | Definite article (de/het) |
-| `@een` | - | Indefinite article (een) |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@de` | `@het` | `:de`, `:het` | Definite article (de/het) |
+| `@een` | - | - | Indefinite article (een) |
 
 **Plural categories**: `one`, `other`
 
 ```rust
 // nl.rlt.rs
-rlt! {
-    card = "kaart" :de;
-    character = "karakter" :het;
+rlt_lang!(Nl) {
+    card = :de "kaart";
+    character = :het "karakter";
 
     the_card = "{@de card}";        // → "de kaart"
     the_char = "{@de character}";   // → "het karakter"
@@ -634,9 +645,9 @@ rlt! {
 | `:an` | General small objects | อัน |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@count` | classifier tags | Number + classifier |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@count` | - | classifier tags | Number + classifier |
 
 **Plural categories**: `other` (no plural distinction)
 
@@ -649,15 +660,15 @@ rlt! {
 **Metadata tags**: None required
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@plural` | - | Reduplication (kartu → kartu-kartu) |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@plural` | - | - | Reduplication (kartu → kartu-kartu) |
 
 **Plural categories**: `other` (context-dependent)
 
 ```rust
 // id.rlt.rs
-rlt! {
+rlt_lang!(Id) {
     card = "kartu";
 
     all_cards = "semua {@plural card}";  // → "semua kartu-kartu"
@@ -676,17 +687,17 @@ rlt! {
 | `:vowel` | Ends in vowel (affects ezafe) |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@ezafe` | `:vowel` | Ezafe connector (-e/-ye) |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@ezafe` | - | `:vowel` | Ezafe connector (-e/-ye) |
 
 **Plural categories**: `one`, `other`
 
 ```rust
 // fa.rlt.rs
-rlt! {
+rlt_lang!(Fa) {
     card = "کارت";
-    hand = "دست" :vowel;
+    hand = :vowel "دست";
 
     card_of_player = "{@ezafe card} بازیکن";  // → "کارت‌ِ بازیکن"
 }
@@ -706,16 +717,16 @@ rlt! {
 | `:neut` | Neuter (masc singular, fem plural) |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@def` | gender | Postposed definite article |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@def` | - | gender | Postposed definite article |
 
 **Plural categories**: `one`, `few`, `other`
 
 ```rust
 // ro.rlt.rs
-rlt! {
-    card = "carte" :fem;
+rlt_lang!(Ro) {
+    card = :fem "carte";
 
     the_card = "{@def card}";  // → "cartea"
 }
@@ -735,10 +746,10 @@ rlt! {
 | `:neut` | Neuter |
 
 **Transforms**:
-| Transform | Reads | Effect |
-|-----------|-------|--------|
-| `@o` | gender + case | Definite article (ο/η/το/τον/την/του/της/οι/τα...) |
-| `@enas` | gender + case | Indefinite article |
+| Transform | Aliases | Reads | Effect |
+|-----------|---------|-------|--------|
+| `@o` | `@i`, `@to` | gender + case | Definite article (ο/η/το/τον/την/του/της/οι/τα...) |
+| `@enas` | `@mia`, `@ena` | gender + case | Indefinite article |
 
 **Plural categories**: `one`, `other`
 
@@ -771,9 +782,9 @@ rlt! {
 | Russian | 3 | 6 | 4 | - |
 | Japanese | - | - | 1 | `@count` |
 | German | 3 | 4 | 2 | `@der`, `@ein` |
-| Korean | - | - | 1 | `@count` |
+| Korean | - | - | 1 | `@count`, `@particle` |
 | Vietnamese | - | - | 1 | `@count` |
-| Turkish | - | 6 | 2 | `@acc`, `@dat`, `@loc`, `@abl` |
+| Turkish | - | 6 | 2 | `@inflect` |
 | Italian | 2 | - | 2 | `@il`, `@un`, `@di`, `@a` |
 | Polish | 3 | 7 | 4 | - |
 | Ukrainian | 3 | 7 | 4 | - |
@@ -784,6 +795,118 @@ rlt! {
 | Romanian | 3 | 2 | 3 | `@def` |
 | Greek | 3 | 4 | 2 | `@o`, `@enas` |
 | Czech | 3 | 7 | 4 | - |
+
+---
+
+## Advanced Transforms
+
+These transforms handle morphological operations that selection alone cannot express—
+they inspect phonology, apply harmony rules, or copy agreement features dynamically.
+
+### `@particle` — Phonology-Based Particle Selection
+
+**Languages:** Korean, Japanese
+
+Korean particles change form based on the preceding sound. The transform inspects
+the final Unicode grapheme cluster (not byte or code point) to determine vowel
+vs. consonant ending. This handles composed Hangul syllables correctly.
+
+```rust
+// ko.rlt.rs
+rlt_lang!(Ko) {
+    apple = "사과";   // ends in vowel (과 = gwa)
+    book = "책";      // ends in consonant (책 = chaek)
+
+    thing_is(thing) = "{thing}{@particle:subj thing} 있다";
+}
+// apple → "사과가 있다" (vowel-final: 가)
+// book → "책이 있다" (consonant-final: 이)
+```
+
+| Context | Vowel-final | Consonant-final |
+|---------|-------------|-----------------|
+| `:subj` | 가 (ga) | 이 (i) |
+| `:obj` | 를 (reul) | 을 (eul) |
+| `:topic` | 는 (neun) | 은 (eun) |
+
+The transform cannot use tags because any phrase might end in any sound depending
+on its variant form. It must inspect rendered text at runtime.
+
+---
+
+### `@inflect` — Agglutinative Suffix Chains
+
+**Languages:** Turkish, Finnish, Hungarian, other Uralic/Turkic languages
+
+Agglutinative languages build words by chaining suffixes, where each suffix's
+form depends on vowel harmony with what precedes it. A single transform handles
+the full chain.
+
+```rust
+// tr.rlt.rs
+rlt_lang!(Tr) {
+    ev = :back "ev";           // house (back vowel)
+    göz = :front "göz";        // eye (front vowel)
+
+    from_my_houses = "{@inflect:abl.poss1sg.pl ev}";   // → "evlerimden"
+    from_my_eyes = "{@inflect:abl.poss1sg.pl göz}";   // → "gözlerimden"
+}
+```
+
+**Suffix chain for "evlerimden" (from my houses):**
+
+| Suffix | Function | Back form | Front form |
+|--------|----------|-----------|------------|
+| plural | -ler/-lar | -lar | -ler |
+| poss1sg | -im/-ım/-um/-üm | -ım | -im |
+| ablative | -den/-dan/-ten/-tan | -dan | -den |
+
+Result: ev + ler + im + den → "evlerimden"
+
+The transform applies vowel harmony at each step. The `:back`/`:front` tag on
+the root determines the initial harmony class, and subsequent suffixes follow
+the "last vowel" rule.
+
+**Available suffixes:**
+
+| Context | Meaning |
+|---------|---------|
+| `pl` | Plural |
+| `poss1sg`, `poss2sg`, `poss3sg` | Possessive (my/your/their) |
+| `poss1pl`, `poss2pl`, `poss3pl` | Possessive plural |
+| `nom`, `acc`, `dat`, `gen`, `loc`, `abl` | Cases |
+
+Suffixes are applied left-to-right as specified in the context.
+
+---
+
+### `@liaison` — Prevocalic Form Selection
+
+**Languages:** French
+
+French has a small set of adjectives with special prevocalic forms. The `@liaison`
+transform selects between standard and prevocalic forms based on the following
+word's `:vowel` tag.
+
+```rust
+// fr.rlt.rs
+rlt_lang!(Fr) {
+    ami = :masc :vowel "ami";
+    livre = :masc "livre";
+
+    // Use variants for liaison forms
+    ce = { standard: "ce", vowel: "cet" };
+    beau = { standard: "beau", vowel: "bel" };
+
+    this_thing(thing) = "{@liaison ce thing} {thing}";
+}
+// ami (has :vowel) → "cet ami"
+// livre (no :vowel) → "ce livre"
+```
+
+The transform reads the `:vowel` tag from its second argument and selects the
+matching variant from the first argument. This handles the four common cases
+(ce/cet, beau/bel, nouveau/nouvel, vieux/vieil) without phonological analysis.
 
 ---
 
