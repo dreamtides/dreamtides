@@ -380,7 +380,9 @@ impl PhraseId {
 
     /// Call a phrase with positional arguments.
     pub fn call(&self, locale: &Locale, args: &[Value]) -> Result<String, EvalError> {
-        locale.interpreter().call_phrase_by_id(self.0, locale.language(), args)
+        locale.interpreter()
+            .call_phrase_by_id(self.0, locale.language(), args)
+            .map(|p| p.to_string())
     }
 
     /// Get the phrase name for debugging.

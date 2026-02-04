@@ -349,21 +349,33 @@ rlf! {
 // n=3 → "Draw 3 Cards."
 ```
 
-**Transform context:** Some transforms need additional information:
+**Transform context:** Some transforms need additional information. Transforms
+can take an optional `:context` immediately after their name. This is separate
+from phrase selection—transforms never have selectors, only context:
+
+```
+{@transform:context phrase:selector}
+     │         │      │       │
+     │         │      │       └─ selects variant from phrase
+     │         │      └───────── phrase or parameter reference
+     │         └──────────────── context for the transform
+     └────────────────────────── transform name
+```
+
+Examples:
 
 ```rust
 // In de.rlf
-destroy_card = "Zerstöre {@der:acc karte}.";      // :acc is literal context
+destroy_card = "Zerstöre {@der:acc karte}.";      // :acc is transform context
 
 // In es.rlf
-return_all(t) = "devuelve {@el:other t} a mano";  // :other is literal context
+return_all(t) = "devuelve {@el:other t} a mano";  // :other is transform context
 
 // In zh_cn.rlf
-draw(n) = "抽{@count:n card}";                    // :n is parameter context
+draw(n) = "抽{@count:n card}";                    // :n is transform context (parameter)
 ```
 
-The first `:` after the transform name is context; subsequent `:` apply to the
-phrase:
+When both are present, context comes first:
 
 ```rust
 get_card = "Nimm {@der:acc karte:one}.";   // :acc is context; :one selects variant
@@ -604,10 +616,30 @@ include the file path and line number.
 
 ## Runtime Errors
 
-Generated functions use `.expect()` and **panic** on evaluation errors. This is
-intentional—these are programming errors (missing phrase, wrong argument count,
-missing tag) that should be caught during development. The underlying interpreter
-returns `Result` for testing and tooling; see **APPENDIX_RUST_INTEGRATION.md**.
+RLF uses a two-layer error model:
+
+**Generated functions** (from `rlf!`) use `.expect()` and **panic** on errors.
+These are for static phrases where errors indicate programming mistakes:
+
+```rust
+strings::draw(&locale, 3);  // Panics if "draw" phrase is missing or malformed
+```
+
+**Interpreter methods** return `Result` for data-driven content where errors
+may come from external data:
+
+```rust
+locale.interpreter().eval_str(template, lang, params)?;  // Returns Result
+```
+
+Use the interpreter API directly when evaluating templates from TOML, JSON, or
+other data files. This lets you handle errors gracefully rather than panicking.
+
+**No language fallback:** If a phrase exists in English but not in Russian,
+requesting the Russian version returns `PhraseNotFound`—it does not fall back
+to English. Translations must be complete; missing phrases are errors.
+
+See **APPENDIX_RUST_INTEGRATION.md** for the full error type definitions.
 
 ---
 
