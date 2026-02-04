@@ -1,34 +1,27 @@
 # Appendix: Rust Integration
 
-This appendix describes how the `rlf_source!` and `rlf_lang!` macros are
-implemented, what Rust code they generate, and how errors are reported.
+This appendix describes how the `rlf!` macro is implemented, what Rust code it
+generates, and how errors are reported.
 
 ## Macro Architecture
 
-RLF uses Rust procedural macros to parse `.rlf.rs` files and generate Rust
-code. There are two macros:
+RLF uses a single Rust procedural macro to parse `.rlf.rs` files and generate
+Rust code:
 
-- **`rlf_source!`**: For the source language (typically English). Generates
-  a trait with default implementations and a unit struct.
-- **`rlf_lang!(Name)`**: For translation languages. Generates a unit struct
-  and a trait implementation.
+- **`rlf!`**: Parses phrase definitions and generates locale-aware functions
 
 The process has three phases:
 
 1. **Parsing**: Extract phrase definitions from the macro input
 2. **Validation**: Check names, detect undefined references
-3. **Code Generation**: Emit Rust functions, trait, and implementations
-
-Cross-language validation (ensuring translations define the same phrases) is
-handled by Rust's trait system—missing methods cause compile errors when
-`strict-i18n` is enabled.
+3. **Code Generation**: Emit Rust functions that check locale and dispatch
 
 ---
 
 ## Phase 1: Parsing
 
-The macro receives tokens from inside the `rlf_source! { ... }` or
-`rlf_lang!(Name) { ... }` block. It parses these into an internal representation:
+The macro receives tokens from inside the `rlf! { ... }` block. It parses these
+into an internal representation:
 
 ```rust
 // Internal AST (conceptual)
@@ -106,7 +99,6 @@ Wildcard fallbacks use partial keys:
 ```rust
 // Wildcard syntax
 card = { nom: "card", nom.other: "cards" };
-// Stored as: [("nom", "card"), ("nom.other", "cards")]
 // At runtime: nom.one → try "nom.one" (miss) → try "nom" (hit) → "card"
 ```
 
@@ -114,21 +106,21 @@ card = { nom: "card", nom.other: "cards" };
 
 ## Phase 2: Validation
 
-After parsing, the macro validates names and references. This is purely
-compile-time checking—no type inference or type checking occurs.
+After parsing, the macro performs comprehensive compile-time validation. This
+catches errors early, before code generation.
 
 ### Name Resolution
 
-Within phrase text, names in `{}` are resolved using these rules:
+Within phrase text, names in `{}` are resolved:
 
 1. **Parameters first**: If a name matches a declared parameter, it refers to that parameter
 2. **Phrases second**: Otherwise, it refers to a phrase defined in the file
 
 **No shadowing allowed:** It is a compile error for a parameter to have the same
-name as a phrase. This eliminates ambiguity without requiring special syntax.
+name as a phrase:
 
 ```rust
-rlf_source! {
+rlf! {
     card = "card";
 
     // ERROR: parameter 'card' shadows phrase 'card'
@@ -143,7 +135,7 @@ rlf_source! {
 if `n` is in the parameter list, otherwise it's a literal variant name.
 
 ```rust
-rlf_source! {
+rlf! {
     card = { one: "card", other: "cards" };
 
     // 'other' is literal (no parameter named 'other')
@@ -154,31 +146,153 @@ rlf_source! {
 }
 ```
 
-The validator checks that all referenced names exist:
+### Validation Checks
 
-1. **Phrase references**: Every `{phrase_name}` must refer to a defined phrase
-2. **Parameter references**: Every `{param}` in a phrase body must be in that
-   phrase's parameter list
-3. **Selector references**: Every `{phrase:selector}` must use a valid variant
-   name (for literal selectors)
+The validator performs these compile-time checks:
 
-### Undefined Reference Detection
+#### 1. Phrase Reference Validation
 
-The validator builds a set of all phrase names and checks each reference. Errors
-include source spans for precise IDE highlighting. For literal selectors like
-`{card:accusative}`, the validator also checks that the variant exists in the
-phrase's definition. Parameter selectors (`{card:n}`) are validated at runtime.
+Every `{phrase_name}` must refer to a defined phrase:
+
+```rust
+rlf! {
+    draw(n) = "Draw {n} {cards:n}.";  // ERROR: 'cards' not defined
+}
+```
+
+#### 2. Parameter Reference Validation
+
+Every `{param}` must be in the phrase's parameter list:
+
+```rust
+rlf! {
+    draw(n) = "Draw {count} cards.";  // ERROR: 'count' not a parameter
+}
+```
+
+#### 3. Literal Selector Validation
+
+Literal selectors must match defined variants:
+
+```rust
+rlf! {
+    card = { one: "card", other: "cards" };
+    take = "{card:accusative}";  // ERROR: no 'accusative' variant
+}
+```
+
+#### 4. Transform Existence Validation
+
+Every `@transform` must be a known transform:
+
+```rust
+rlf! {
+    card = "card";
+    bad = "{@foo card}";  // ERROR: unknown transform '@foo'
+}
+```
+
+The macro knows about:
+- Universal transforms: `@cap`, `@upper`, `@lower`
+- Source language transforms: `@a`, `@an` (English), etc.
+
+#### 5. Transform Tag Validation (Literal Arguments)
+
+When a transform is applied to a literal phrase reference, the macro verifies
+the phrase has the required tags:
+
+```rust
+rlf! {
+    card = "card";  // Missing :a or :an tag
+    draw = "Draw {@a card}.";  // ERROR: '@a' requires tag ':a' or ':an'
+}
+```
+
+This check only applies when the transform argument is a literal phrase. When
+the argument is a parameter, the check must be deferred to runtime:
+
+```rust
+rlf! {
+    card = :a "card";
+    event = :an "event";
+
+    // Compile-time check: 'card' has :a tag ✓
+    draw_card = "Draw {@a card}.";
+
+    // Runtime check: can't know what 'thing' will be
+    draw(thing) = "Draw {@a thing}.";
+}
+```
+
+#### 6. Tag-Based Selection Validation (Literal Arguments)
+
+When selecting variants based on a phrase's tag, and the selector phrase is
+a literal reference, the macro verifies compatibility:
+
+```rust
+rlf! {
+    destroyed = { masc: "destroyed", fem: "destroyed" };
+    card = :neut "card";  // Has :neut, not :masc or :fem
+
+    // ERROR: 'card' has tag ':neut' but 'destroyed' has no 'neut' variant
+    bad = "{destroyed:card}";
+}
+```
+
+When the selector is a parameter, this must be a runtime check:
+
+```rust
+rlf! {
+    destroyed = { masc: "destroyed", fem: "destroyed" };
+    card = :fem "card";
+    enemy = :masc "enemy";
+
+    // Compile-time check: 'card' has :fem, 'destroyed' has 'fem' ✓
+    card_destroyed = "{destroyed:card}";
+
+    // Runtime check: can't know what 'target' will be
+    destroy(target) = "{destroyed:target}";
+}
+```
+
+#### 7. Cyclic Reference Detection
+
+The macro detects cycles in phrase references:
+
+```rust
+rlf! {
+    a = "see {b}";
+    b = "see {c}";
+    c = "see {a}";  // ERROR: cyclic reference: a -> b -> c -> a
+}
+```
+
+The validator builds a dependency graph and performs cycle detection before
+code generation.
+
+### Validation Summary
+
+| Check | Literal Phrase | Parameter | Status |
+|-------|----------------|-----------|--------|
+| Phrase exists | ✓ Compile | ✓ Compile | Error |
+| Parameter exists | ✓ Compile | ✓ Compile | Error |
+| Literal selector valid | ✓ Compile | N/A | Error |
+| Transform exists | ✓ Compile | ✓ Compile | Error |
+| Transform has required tag | ✓ Compile | Runtime | Error |
+| Tag-based selection compatible | ✓ Compile | Runtime | Error |
+| No cyclic references | ✓ Compile | ✓ Compile | Error |
 
 ---
 
 ## Phase 3: Code Generation
 
-Based on the validated AST, the macro generates Rust code. The output differs
-between `rlf_source!` and `rlf_lang!`.
+Based on the validated AST, the macro generates Rust functions and embeds the
+source phrases as data. Each phrase becomes a function that delegates to the
+interpreter.
 
 ### The Value Type
 
-All parameters use a single `Value` type that handles runtime dispatch:
+All parameters use a single `Value` type:
 
 ```rust
 pub enum Value {
@@ -190,338 +304,511 @@ pub enum Value {
 ```
 
 `Value` provides methods for runtime operations: `as_number()` for plural
-selection (returns `None` for phrases), `has_tag(&str)` and `get_variant(&str)`
-for tag-based selection (only work on `Phrase` values). The `Display` impl
-renders the value's text representation.
+selection, `has_tag(&str)` and `get_variant(&str)` for tag-based selection.
 
 ### The Phrase Type
 
-Phrases without parameters return a `Phrase` that carries metadata for runtime
-operations:
+Phrases without parameters return a `Phrase`:
 
 ```rust
 pub struct Phrase {
-    /// Default text (used when displaying without variant selection).
-    pub text: Cow<'static, str>,
-    /// Variant key → variant text. Keys use dot notation: "nom.one".
-    pub variants: HashMap<&'static str, Cow<'static, str>>,
-    /// Metadata tags attached to this phrase.
-    pub tags: &'static [&'static str],
+    /// Default text.
+    pub text: String,
+    /// Variant key → variant text.
+    pub variants: HashMap<String, String>,
+    /// Metadata tags.
+    pub tags: Vec<String>,
 }
 
 impl Phrase {
-    /// Get a specific variant by key, with fallback resolution.
-    pub fn variant(&self, key: &str) -> Result<&str, RlfError> {
+    /// Get a specific variant by key, with fallback resolution. Panics if not found.
+    pub fn variant(&self, key: &str) -> &str {
         resolve_variant(&self.variants, key)
     }
 }
 
-impl std::fmt::Display for Phrase {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Display for Phrase {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.text)
     }
 }
 ```
 
-The `Cow<'static, str>` type allows phrases to use static strings when no
-interpolation occurs, while supporting owned strings when phrases contain
-dynamic content.
-
 ### Into<Value> Implementations
 
-Common types implement `Into<Value>` for convenient calling: integers (`i32`,
-`i64`, `u32`, etc.) become `Value::Number`, strings (`&str`, `String`) become
-`Value::String`, and `Phrase` becomes `Value::Phrase`.
+Common types implement `Into<Value>`: integers become `Value::Number`, strings
+become `Value::String`, and `Phrase` becomes `Value::Phrase`.
 
 ---
 
-## Code Generation: rlf_source!
+## The PhraseId Type
 
-The source language macro generates two things:
+`PhraseId` provides a compact, serializable reference to any phrase that can be
+resolved at runtime. This is useful for storing phrase references in data
+structures like game state, card definitions, or network messages—then supplying
+parameters when the text is actually needed.
 
-1. A trait with default implementations
-2. A unit struct that implements the trait
-
-### Example
+### Design
 
 ```rust
-// en.rlf.rs
-rlf_source! {
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
+pub struct PhraseId(u64);
+```
+
+`PhraseId` wraps a 64-bit FNV-1a hash of the phrase name. This design provides:
+
+| Property | Benefit |
+|----------|---------|
+| **Stability** | Same name → same hash, forever. Adding/removing phrases doesn't affect other IDs. |
+| **Compactness** | 8 bytes, implements `Copy`, stack-allocated. |
+| **Serializability** | Just a `u64`—works with JSON, bincode, protobuf, etc. |
+| **Const construction** | `PhraseId::from_name()` is `const fn`, enabling compile-time constants. |
+
+### API
+
+```rust
+impl PhraseId {
+    /// Create a PhraseId from a phrase name at compile time.
+    pub const fn from_name(name: &str) -> Self {
+        Self(const_fnv1a_64(name))
+    }
+
+    /// Resolve a parameterless phrase to its Phrase value.
+    pub fn resolve(&self, locale: &Locale) -> Result<Phrase, EvalError> {
+        locale.interpreter().get_phrase_by_id(self.0, locale.language())
+    }
+
+    /// Call a phrase with positional arguments.
+    pub fn call(&self, locale: &Locale, args: &[Value]) -> Result<String, EvalError> {
+        locale.interpreter().call_phrase_by_id(self.0, locale.language(), args)
+    }
+
+    /// Get the phrase name for debugging.
+    /// Returns None if the phrase isn't registered.
+    pub fn name(&self) -> Option<&'static str> {
+        PHRASE_ID_REGISTRY.get(&self.0).copied()
+    }
+
+    /// Get the raw hash value.
+    pub fn as_u64(&self) -> u64 {
+        self.0
+    }
+}
+
+impl PhraseId {
+    /// Check if this phrase has parameters.
+    pub fn has_parameters(&self, locale: &Locale) -> bool {
+        locale.interpreter().phrase_parameter_count(self.0) > 0
+    }
+
+    /// Get the number of parameters this phrase expects.
+    pub fn parameter_count(&self, locale: &Locale) -> usize {
+        locale.interpreter().phrase_parameter_count(self.0)
+    }
+}
+```
+
+### Hash Function
+
+RLF uses FNV-1a for phrase name hashing because it's simple, fast, and
+implementable as a `const fn`:
+
+```rust
+const fn const_fnv1a_64(s: &str) -> u64 {
+    const FNV_OFFSET: u64 = 0xcbf29ce484222325;
+    const FNV_PRIME: u64 = 0x100000001b3;
+
+    let bytes = s.as_bytes();
+    let mut hash = FNV_OFFSET;
+    let mut i = 0;
+    while i < bytes.len() {
+        hash ^= bytes[i] as u64;
+        hash = hash.wrapping_mul(FNV_PRIME);
+        i += 1;
+    }
+    hash
+}
+```
+
+### Collision Detection
+
+Hash collisions are theoretically possible but practically negligible with
+64-bit hashes. The interpreter detects collisions when phrases are registered:
+
+```rust
+impl RlfInterpreter {
+    pub fn load_phrases(&mut self, language: &str, content: &str) -> Result<usize, LoadError> {
+        for phrase in parse_phrases(content)? {
+            let id = PhraseId::from_name(&phrase.name);
+            if let Some(existing) = self.phrase_ids.get(&id.0) {
+                if existing != &phrase.name {
+                    panic!(
+                        "PhraseId collision: '{}' and '{}' have the same hash",
+                        existing, phrase.name
+                    );
+                }
+            }
+            self.phrase_ids.insert(id.0, phrase.name.clone());
+            // ... register phrase
+        }
+        Ok(count)
+    }
+}
+```
+
+### Name Registry
+
+The interpreter maintains a reverse mapping from hash to name for debugging:
+
+```rust
+struct RlfInterpreter {
+    // ... other fields
+    phrase_id_names: HashMap<u64, &'static str>,
+}
+```
+
+This registry is populated when source phrases are registered at startup. The
+`PhraseId::name()` method queries this registry.
+
+---
+
+## Code Generation: PhraseId Constants
+
+### Generated Module
+
+For every phrase (with or without parameters), the `rlf!` macro generates a
+constant in the `phrase_ids` submodule:
+
+```rust
+// strings.rlf.rs
+rlf! {
     card = { one: "card", other: "cards" };
+    event = :an "event";
+    hello = "Hello, world!";
     draw(n) = "Draw {n} {card:n}.";
 }
 ```
 
-### Generated Trait
-
-The trait has default implementations for the source language:
-
 ```rust
-#[cfg(not(feature = "strict-i18n"))]
-pub trait RlfLang {
-    fn card(&self) -> Phrase {
-        static VARIANTS: phf::Map<&'static str, &'static str> = phf_map! {
-            "one" => "card",
-            "other" => "cards",
-        };
-        Phrase {
-            text: Cow::Borrowed("card"),
-            variants: &VARIANTS,
-            tags: &[],
-        }
-    }
+// Generated in strings.rs
+pub mod phrase_ids {
+    use super::PhraseId;
 
-    fn draw(&self, n: impl Into<Value>) -> Result<String, RlfError> {
-        let n = n.into();
-        let category = plural_category("en", n.as_number().ok_or_else(|| {
-            RlfError::InvalidSelector { phrase: "card", selector: n.to_string() }
-        })?);
-        let card_text = self.card().variant(category)?;
-        Ok(format!("Draw {} {}.", n, card_text))
-    }
-}
+    /// ID for the "card" phrase.
+    pub const CARD: PhraseId = PhraseId::from_name("card");
 
-#[cfg(feature = "strict-i18n")]
-pub trait RlfLang {
-    fn card(&self) -> Phrase;
-    fn draw(&self, n: impl Into<Value>) -> Result<String, RlfError>;
+    /// ID for the "event" phrase.
+    pub const EVENT: PhraseId = PhraseId::from_name("event");
+
+    /// ID for the "hello" phrase.
+    pub const HELLO: PhraseId = PhraseId::from_name("hello");
+
+    /// ID for the "draw" phrase. Call with 1 argument (n).
+    pub const DRAW: PhraseId = PhraseId::from_name("draw");
 }
 ```
 
-With `strict-i18n` disabled (default), missing translations fall back to English.
-With `strict-i18n` enabled, missing translations are compile errors.
+### Resolving vs Calling
 
-### Generated Unit Struct
+Use `resolve()` for parameterless phrases (returns a `Phrase` with variants and
+tags). Use `call()` for phrases with parameters (returns the evaluated `String`):
 
 ```rust
-pub struct En;
+// Parameterless: use resolve()
+let card = strings::phrase_ids::CARD.resolve(&locale)?;
+println!("{}", card);                    // "card"
+println!("{}", card.variant("other"));   // "cards"
 
-impl RlfLang for En {
-    // Uses trait defaults (source language implementations)
-}
+// With parameters: use call()
+let text = strings::phrase_ids::DRAW.call(&locale, &[3.into()])?;
+println!("{}", text);  // "Draw 3 cards."
+```
+
+You can also use `call()` on parameterless phrases—it just takes an empty slice:
+
+```rust
+let text = strings::phrase_ids::HELLO.call(&locale, &[])?;  // "Hello, world!"
 ```
 
 ---
 
-## Code Generation: rlf_lang!
+## PhraseId Usage Patterns
 
-Translation macros generate a unit struct and trait implementation.
+### Storing in Data Structures
+
+```rust
+#[derive(Serialize, Deserialize)]
+struct CardDefinition {
+    name: PhraseId,
+    flavor_text: PhraseId,
+    cost: u32,
+    power: u32,
+}
+
+let card = CardDefinition {
+    name: strings::phrase_ids::FIRE_ELEMENTAL,
+    flavor_text: strings::phrase_ids::FIRE_ELEMENTAL_FLAVOR,
+    cost: 5,
+    power: 4,
+};
+
+// Serialize to JSON, save to file, send over network, etc.
+let json = serde_json::to_string(&card)?;
+
+// Later, resolve to localized text
+fn render_card(card: &CardDefinition, locale: &Locale) -> String {
+    let name = card.name.resolve(locale)
+        .map(|p| p.to_string())
+        .unwrap_or_else(|_| "[missing]".to_string());
+    format!("{} (Cost: {})", name, card.cost)
+}
+```
+
+### Storing Phrases with Runtime Parameters
+
+A common pattern is storing a `PhraseId` alongside the values needed to resolve
+it. This separates "which phrase" from "what values":
+
+```rust
+#[derive(Serialize, Deserialize)]
+enum PromptLabel {
+    /// A simple parameterless phrase
+    Simple(PhraseId),
+    /// A phrase that needs an energy value
+    WithEnergy { phrase: PhraseId, energy: i32 },
+    /// A phrase that needs a card reference
+    WithCard { phrase: PhraseId, card: PhraseId },
+}
+
+impl PromptLabel {
+    fn resolve(&self, locale: &Locale) -> Result<String, EvalError> {
+        match self {
+            PromptLabel::Simple(id) => {
+                id.call(locale, &[])
+            }
+            PromptLabel::WithEnergy { phrase, energy } => {
+                phrase.call(locale, &[(*energy).into()])
+            }
+            PromptLabel::WithCard { phrase, card } => {
+                let card_phrase = card.resolve(locale)?;
+                phrase.call(locale, &[card_phrase.into()])
+            }
+        }
+    }
+}
+
+// Usage
+let label = PromptLabel::WithEnergy {
+    phrase: strings::phrase_ids::COSTS_ENERGY,  // "Costs {e} energy."
+    energy: 3,
+};
+let text = label.resolve(&locale)?;  // → "Costs 3 energy."
+```
+
+### Generic Phrase Calls
+
+For maximum flexibility, store arguments as `Vec<Value>`:
+
+```rust
+#[derive(Serialize, Deserialize)]
+struct DynamicPhrase {
+    id: PhraseId,
+    args: Vec<Value>,
+}
+
+impl DynamicPhrase {
+    fn resolve(&self, locale: &Locale) -> Option<String> {
+        self.id.call(locale, &self.args)
+    }
+}
+```
+
+### Comparing Phrases
+
+Because `PhraseId` is `Copy`, `Eq`, and `Hash`, it works efficiently in
+collections and comparisons:
+
+```rust
+use std::collections::HashSet;
+
+let mut seen: HashSet<PhraseId> = HashSet::new();
+seen.insert(strings::phrase_ids::CARD);
+seen.insert(strings::phrase_ids::EVENT);
+
+if seen.contains(&strings::phrase_ids::CARD) {
+    // ...
+}
+```
+
+### Debugging
+
+Use `name()` to get the phrase name for logging:
+
+```rust
+fn debug_phrase(id: PhraseId) {
+    if let Some(name) = id.name() {
+        println!("Phrase: {} (hash: {:016x})", name, id.as_u64());
+    } else {
+        println!("Unknown phrase (hash: {:016x})", id.as_u64());
+    }
+}
+```
+
+### Dynamic PhraseId Creation
+
+While constants are preferred, you can create `PhraseId` dynamically from
+strings when needed (e.g., loading from external data):
+
+```rust
+// From a string at runtime
+let id = PhraseId::from_name("card");
+assert_eq!(id, strings::phrase_ids::CARD);
+
+// This works because the hash is deterministic
+```
+
+---
+
+## Code Generation: Phrase Functions
 
 ### Example
 
 ```rust
-// ru.rlf.rs
-rlf_lang!(Ru) {
-    card = {
-        one: "карта",
-        few: "карты",
-        many: "карт",
-    };
-    draw(n) = "Возьмите {n} {card:n}.";
+// strings.rlf.rs
+rlf! {
+    card = { one: "card", other: "cards" };
+    draw(n) = "Draw {n} {card:n}.";
 }
 ```
 
 ### Generated Code
 
 ```rust
-pub struct Ru;
+// strings.rs (generated)
 
-impl RlfLang for Ru {
-    fn card(&self) -> Phrase {
-        static VARIANTS: phf::Map<&'static str, &'static str> = phf_map! {
-            "one" => "карта",
-            "few" => "карты",
-            "many" => "карт",
-        };
-        Phrase {
-            text: Cow::Borrowed("карта"),
-            variants: &VARIANTS,
-            tags: &[],
-        }
-    }
+/// Returns the "card" phrase.
+pub fn card(locale: &Locale) -> Phrase {
+    locale.interpreter()
+        .get_phrase(locale.language(), "card")
+        .expect("phrase 'card' should exist")
+}
 
-    fn draw(&self, n: impl Into<Value>) -> Result<String, RlfError> {
-        let n = n.into();
-        let category = plural_category("ru", n.as_number().ok_or_else(|| {
-            RlfError::InvalidSelector { phrase: "card", selector: n.to_string() }
-        })?);
-        let card_text = self.card().variant(category)?;
-        Ok(format!("Возьмите {} {}.", n, card_text))
-    }
+/// Evaluates the "draw" phrase.
+pub fn draw(locale: &Locale, n: impl Into<Value>) -> String {
+    locale.interpreter()
+        .call_phrase(locale.language(), "draw", &[n.into()])
+        .expect("phrase 'draw' should exist")
+}
+
+/// Source language phrases embedded as data.
+const SOURCE_PHRASES: &str = r#"
+    card = { one: "card", other: "cards" };
+    draw(n) = "Draw {n} {card:n}.";
+"#;
+
+/// Registers source language phrases with the interpreter. Call once at startup.
+pub fn register_source_phrases(interpreter: &mut RlfInterpreter) {
+    interpreter.load_phrases("en", SOURCE_PHRASES)
+        .expect("source phrases should parse successfully");
 }
 ```
 
-### Incomplete Translations
+### Key Design Points
 
-If Russian only defines some phrases:
-
-```rust
-// ru.rlf.rs
-rlf_lang!(Ru) {
-    card = { ... };
-    // 'draw' not defined
-}
-```
-
-Generated code only overrides what's defined:
-
-```rust
-impl RlfLang for Ru {
-    fn card(&self) -> Phrase { ... }
-    // draw() not overridden - uses trait default (English)
-}
-```
-
-With `strict-i18n` enabled, this becomes a compile error because the trait
-has no default for `draw()`.
+1. **Unified evaluation**: All languages use the interpreter, including the source
+2. **Embedded source data**: The macro extracts source phrases and embeds them as a string constant
+3. **Startup registration**: Source phrases are loaded into the interpreter once at startup
+4. **Simple generated code**: Functions are thin wrappers that delegate to the interpreter
 
 ---
 
-## Selection Code Generation
+## Selection Evaluation
 
-Selection is resolved at runtime by examining the selector value. The runtime
-tries exact matches first, then progressively shorter fallback keys. If no match
-is found, it returns an error:
+Selection is resolved at runtime by the interpreter. The interpreter tries exact
+matches first, then progressively shorter fallback keys:
 
 ```rust
 // RLF:
 card = { nom: "card", nom.other: "cards" };
 draw(n) = "Draw {n} {card:nom:n}.";
 
-// Generated:
-pub fn draw(n: impl Into<Value>) -> Result<String, RlfError> {
-    let n = n.into();
-
-    let category = match n.as_number() {
-        Some(num) => plural_category("en", num),  // "one" or "other"
-        None => return Err(RlfError::InvalidSelector {
-            phrase: "card",
-            selector: n.to_string(),
-        }),
-    };
-    let full_key = format!("nom.{}", category);
-    let card_text = resolve_variant(CARD_VARIANTS, &full_key)?;
-
-    Ok(format!("Draw {} {}.", n, card_text))
-}
-
-fn resolve_variant(variants: &[(&str, &str)], key: &str) -> Result<&str, RlfError> {
+// Interpreter logic:
+fn resolve_variant(
+    variants: &HashMap<String, String>,
+    key: &str,
+    phrase_name: &str,
+) -> Result<&str, EvalError> {
     // Try exact match: "nom.one"
-    if let Some((_, v)) = variants.iter().find(|(k, _)| *k == key) {
+    if let Some(v) = variants.get(key) {
         return Ok(v);
     }
     // Try fallback: "nom"
     if let Some(dot) = key.rfind('.') {
         let fallback = &key[..dot];
-        if let Some((_, v)) = variants.iter().find(|(k, _)| *k == fallback) {
+        if let Some(v) = variants.get(fallback) {
             return Ok(v);
         }
     }
-    // No match found
-    Err(RlfError::MissingVariant {
-        phrase: "card",
-        requested: key.to_string(),
-        available: variants.iter().map(|(k, _)| *k).collect(),
+    Err(EvalError::MissingVariant {
+        phrase: phrase_name.to_string(),
+        key: key.to_string(),
+        available: variants.keys().cloned().collect(),
     })
 }
 ```
 
 ### Tag-Based Selection
 
-When selecting based on a phrase's tag, the generated code checks for matching
-tags and returns an error if none match:
+When selecting based on a phrase's tag, the interpreter reads the tag and uses
+it as the variant key:
 
 ```rust
 // RLF:
 destroyed = { masc: "destruido", fem: "destruida" };
 destroy(target) = "{target} fue {destroyed:target}.";
 
-// Generated:
-pub fn destroy(target: impl Into<Value>) -> Result<String, RlfError> {
-    let target = target.into();
-
-    let destroyed_text = if target.has_tag("fem") {
-        "destruida"
-    } else if target.has_tag("masc") {
-        "destruido"
-    } else {
-        return Err(RlfError::MissingRequiredTag {
-            operation: "destroyed",
-            expected_tags: &["masc", "fem"],
-            value: target.to_string(),
-        });
-    };
-
-    Ok(format!("{} fue {}.", target, destroyed_text))
-}
+// Interpreter logic:
+// 1. Evaluate 'target' parameter → gets a Phrase value
+// 2. Read first tag from target phrase (e.g., "fem")
+// 3. Select 'destroyed' variant using that tag
+// 4. If no matching variant, panic with descriptive error
 ```
 
 ---
 
-## Transform Code Generation
+## Transform Evaluation
 
-Transforms are compiled to runtime function calls:
+Transforms are evaluated by the interpreter at runtime:
 
 ```rust
 // RLF:
 card = :a "card";
 draw_one = "Draw {@a card}.";
 
-// Generated:
-pub fn draw_one() -> Result<String, RlfError> {
-    let card = card();
-    let card_with_article = transform_a_en(card.into())?;
-    Ok(format!("Draw {}.", card_with_article))
-}
-
-fn transform_a_en(value: Value) -> Result<String, RlfError> {
+// Interpreter has built-in transform functions:
+fn transform_a(value: Value) -> String {
     let text = value.to_string();
 
-    // Check for explicit tag - required for @a transform
     if value.has_tag("a") {
-        return Ok(format!("a {}", text));
+        return format!("a {}", text);
     }
     if value.has_tag("an") {
-        return Ok(format!("an {}", text));
+        return format!("an {}", text);
     }
 
-    // No heuristics - missing tag is an error
-    Err(RlfError::MissingRequiredTag {
-        operation: "@a",
-        expected_tags: &["a", "an"],
-        value: text,
-    })
+    panic!("@a transform requires tag ':a' or ':an' on '{}'", text)
 }
 ```
 
 ### Transform Aliases
 
-Aliases are resolved at compile time to their primary transform:
+Aliases are resolved by the interpreter:
 
 ```rust
-// Transform alias registry (per language)
-static EN_TRANSFORM_ALIASES: &[(&str, &str)] = &[
-    ("an", "a"),  // @an → @a
-];
-
-static DE_TRANSFORM_ALIASES: &[(&str, &str)] = &[
-    ("die", "der"),  // @die → @der
-    ("das", "der"),  // @das → @der
-];
-```
-
-During code generation, aliases are replaced with their primary transform:
-
-```rust
-// RLF:
+// @an → @a
 play_event = "Play {@an event}.";
 
-// After alias resolution (generated code):
-pub fn play_event() -> Result<String, RlfError> {
-    let event = event();
-    let event_with_article = transform_a_en(event.into())?;  // @an → @a
-    Ok(format!("Play {}.", event_with_article))
-}
+// Interpreter maps @an to the same transform function as @a
 ```
 
 ---
@@ -530,13 +817,13 @@ pub fn play_event() -> Result<String, RlfError> {
 
 RLF reports errors as Rust compile-time errors with precise source locations.
 
-### Error Categories
+### Compile-Time Error Categories
 
 **Syntax Errors:**
 
 ```
 error: expected '=' after phrase name
-  --> en.rlf.rs:3:10
+  --> strings.rlf.rs:3:10
    |
 3  |     hello "world";
    |          ^ expected '='
@@ -546,7 +833,7 @@ error: expected '=' after phrase name
 
 ```
 error: unknown phrase 'cards'
-  --> en.rlf.rs:5:28
+  --> strings.rlf.rs:5:28
    |
 5  |     draw(n) = "Draw {n} {cards:n}.";
    |                          ^^^^^ not defined
@@ -558,7 +845,7 @@ error: unknown phrase 'cards'
 
 ```
 error: unknown parameter 'count'
-  --> en.rlf.rs:2:18
+  --> strings.rlf.rs:2:18
    |
 2  |     draw(n) = "Draw {count} cards.";
    |                      ^^^^^ not in parameter list
@@ -570,7 +857,7 @@ error: unknown parameter 'count'
 
 ```
 error: phrase 'card' has no variant 'accusative'
-  --> en.rlf.rs:5:22
+  --> strings.rlf.rs:5:22
    |
 5  |     take = "{card:accusative}";
    |                  ^^^^^^^^^^^ variant not defined
@@ -580,134 +867,32 @@ error: phrase 'card' has no variant 'accusative'
 
 ### Span Preservation
 
-The macro preserves source spans through parsing so errors point to the exact
-location in the `.rlf.rs` file:
+The macro preserves source spans for precise error locations:
 
 ```rust
 struct Identifier {
     name: String,
-    span: Span,  // proc_macro2::Span
+    span: Span,
 }
 ```
 
 ### Helpful Suggestions
 
-For typos, the macro suggests similar names:
-
-```rust
-fn suggest_similar(name: &str, candidates: &[&str]) -> Option<&str> {
-    candidates.iter()
-        .filter(|c| levenshtein_distance(name, c) <= 2)
-        .min_by_key(|c| levenshtein_distance(name, c))
-        .copied()
-}
-```
+For typos, the macro suggests similar names using Levenshtein distance.
 
 ---
 
-## Macro File Discovery
+## Translation File Validation
 
-The `rlf_lang!` macro needs to know which trait to implement. This is handled
-through Rust's module system, not cross-file macro communication:
+Translation files (`.rlf`) are validated at load time, not compile time.
 
-1. **Source file generates trait**: `rlf_source!` in `en.rlf.rs` generates a
-   `pub trait RlfLang`.
+### Load-Time Checks
 
-2. **Translation files import trait**: Each translation file must import the
-   trait via `use crate::localization::RlfLang;` (or similar path).
+When loading a translation file, the interpreter validates and returns `Result`:
 
-3. **Macro uses imported trait**: `rlf_lang!(Ru)` generates `impl RlfLang for Ru`,
-   where `RlfLang` refers to whatever trait is in scope.
-
-This design requires no special cross-file communication. The trait name
-`RlfLang` is conventional; if you rename it, translation macros still work
-because they implement whatever trait is imported.
-
-```rust
-// mod.rs
-mod en;  // Contains rlf_source! → generates RlfLang trait + En struct
-mod ru;  // Contains rlf_lang!(Ru) → implements RlfLang for Ru
-
-pub use en::{En, RlfLang};
-pub use ru::Ru;
-```
-
----
-
-## Cross-Language Validation
-
-RLF validates cross-language consistency via Rust's trait system, not via
-macro introspection.
-
-### How It Works
-
-1. `rlf_source!` generates a trait with all phrase methods
-2. `rlf_lang!` generates an `impl` block for that trait
-3. If a translation is missing a phrase, the impl is incomplete
-
-### With strict-i18n Disabled (Development)
-
-The trait has default implementations, so missing phrases compile fine:
-
-```rust
-// Generated trait (strict-i18n disabled)
-pub trait RlfLang {
-    fn card(&self) -> Phrase { ... }  // default (English)
-    fn draw(&self, n: impl Into<Value>) -> Result<String, RlfError> { ... }  // default
-}
-
-// Russian impl - only overrides card()
-impl RlfLang for Ru {
-    fn card(&self) -> Phrase { ... }
-    // draw() uses trait default (English)
-}
-```
-
-### With strict-i18n Enabled (CI/Release)
-
-The trait has no defaults, so missing phrases are compile errors:
-
-```rust
-// Generated trait (strict-i18n enabled)
-pub trait RlfLang {
-    fn card(&self) -> Phrase;  // no default
-    fn draw(&self, n: impl Into<Value>) -> Result<String, RlfError>;  // no default
-}
-
-// Russian impl - missing draw() is an error
-impl RlfLang for Ru {
-    fn card(&self) -> Phrase { ... }
-    // ERROR: method `draw` not implemented
-}
-```
-
-Error message:
-
-```
-error[E0046]: not all trait items implemented, missing: `draw`
-  --> src/localization/ru.rlf.rs:1:1
-   |
-   = note: `draw` from trait `RlfLang` is not implemented
-```
-
-### Parameter Count Validation
-
-If a translation has wrong parameters, it won't match the trait signature:
-
-```rust
-// en.rlf.rs
-rlf_source! {
-    greet(name) = "Hello, {name}!";
-}
-
-// ru.rlf.rs
-rlf_lang!(Ru) {
-    greet(name, title) = "Привет, {title} {name}!";  // ERROR: wrong signature
-}
-```
-
-The generated impl tries to define `fn greet(&self, name: impl Into<Value>, title: impl Into<Value>)`
-but the trait expects `fn greet(&self, name: impl Into<Value>)`, causing a type error.
+1. **Syntax**: Parse errors return `Err(LoadError)` with line/column information
+2. **Phrase references**: Unknown phrases produce warnings (not errors)
+3. **Parameter counts**: Mismatch with source language produces warnings
 
 ---
 
@@ -715,8 +900,7 @@ but the trait expects `fn greet(&self, name: impl Into<Value>)`, causing a type 
 
 ### ICU4X Dependencies
 
-RLF uses crates from the [ICU4X](https://github.com/unicode-org/icu4x) project for
-Unicode-compliant internationalization:
+RLF uses ICU4X for Unicode-compliant internationalization:
 
 ```toml
 [dependencies]
@@ -724,28 +908,17 @@ icu_plurals = "2"
 icu_locale_core = "2"
 ```
 
-| Crate | Purpose |
-|-------|---------|
-| `icu_plurals` | CLDR plural rules for all languages |
-| `icu_locale_core` | Locale identifiers and parsing |
-
 ### CLDR Plural Rules
-
-RLF uses `icu_plurals` for plural category selection:
 
 ```rust
 use icu_plurals::{PluralCategory, PluralRuleType, PluralRules};
 use icu_locale_core::locale;
 
-/// Returns the CLDR plural category as a string for variant selection.
 fn plural_category(lang: &str, n: i64) -> &'static str {
     let locale = match lang {
         "en" => locale!("en"),
         "ru" => locale!("ru"),
         "ar" => locale!("ar"),
-        "pl" => locale!("pl"),
-        "zh" => locale!("zh"),
-        // ... other languages
         _ => locale!("en"),
     };
 
@@ -761,26 +934,6 @@ fn plural_category(lang: &str, n: i64) -> &'static str {
         PluralCategory::Other => "other",
     }
 }
-```
-
-This handles all CLDR plural rules correctly:
-
-```rust
-// English: one/other
-plural_category("en", 1)  // → "one"
-plural_category("en", 5)  // → "other"
-
-// Russian: one/few/many
-plural_category("ru", 1)  // → "one"
-plural_category("ru", 2)  // → "few"
-plural_category("ru", 5)  // → "many"
-plural_category("ru", 21) // → "one"
-
-// Arabic: zero/one/two/few/many/other
-plural_category("ar", 0)  // → "zero"
-plural_category("ar", 1)  // → "one"
-plural_category("ar", 2)  // → "two"
-plural_category("ar", 5)  // → "few"
 ```
 
 ### Universal Transforms
@@ -805,49 +958,20 @@ pub fn transform_lower(s: &str) -> String {
 
 ### Language-Specific Transforms
 
-Each language has its transform implementations:
+Each language has transform implementations:
 
 ```rust
 // English @a transform
-fn transform_a_en(value: Value) -> Result<String, RlfError> {
+fn transform_a_en(value: Value) -> String {
     let text = value.to_string();
 
     if value.has_tag("an") {
-        Ok(format!("an {}", text))
+        format!("an {}", text)
     } else if value.has_tag("a") {
-        Ok(format!("a {}", text))
+        format!("a {}", text)
     } else {
-        Err(RlfError::MissingRequiredTag {
-            operation: "@a",
-            expected_tags: &["a", "an"],
-            value: text,
-        })
+        panic!("@a transform requires tag ':a' or ':an' on '{}'", text)
     }
-}
-
-// Chinese @count transform - context is the number, phrase has measure word tag
-fn transform_count_zh_cn(context: Value, phrase: Value) -> Result<String, RlfError> {
-    let num = context.as_number().ok_or_else(|| RlfError::InvalidSelector {
-        phrase: "@count context",
-        selector: context.to_string(),
-    })?;
-    let text = phrase.to_string();
-
-    let measure_word = if phrase.has_tag("zhang") {
-        "张"
-    } else if phrase.has_tag("ge") {
-        "个"
-    } else if phrase.has_tag("ming") {
-        "名"
-    } else {
-        return Err(RlfError::MissingRequiredTag {
-            operation: "@count",
-            expected_tags: &["zhang", "ge", "ming"],
-            value: text,
-        });
-    };
-
-    Ok(format!("{}{}{}", num, measure_word, text))
 }
 ```
 
@@ -855,121 +979,85 @@ fn transform_count_zh_cn(context: Value, phrase: Value) -> Result<String, RlfErr
 
 ## Runtime Errors
 
-Selection and transforms produce errors when required variants or tags are missing:
+The interpreter returns `Result<_, EvalError>` for all evaluation methods. Common
+error conditions:
 
-```rust
-pub enum RlfError {
-    /// Variant selection failed - no matching variant found
-    MissingVariant {
-        phrase: &'static str,
-        requested: String,
-        available: Vec<&'static str>,
-    },
+- **Phrase not found**: Phrase doesn't exist in the current language
+- **Missing variant**: Selector key doesn't match any variant in the phrase
+- **Missing required tag**: Transform requires a tag the phrase doesn't have
+- **Argument count mismatch**: Wrong number of arguments passed to a phrase
+- **Cyclic reference**: Phrase references itself directly or indirectly
 
-    /// Tag-based selection or transform requires a tag that wasn't present
-    MissingRequiredTag {
-        operation: &'static str,
-        expected_tags: &'static [&'static str],
-        value: String,
-    },
-
-    /// Selector value couldn't be interpreted (e.g., non-numeric string for plural)
-    InvalidSelector {
-        phrase: &'static str,
-        selector: String,
-    },
-}
-```
-
-**Example error messages:**
-
-Missing variant error:
-```
-RLF error: phrase 'card' has no variant matching 'nom.few'
-  Available variants: nom.one, nom.other
-
-Hint: Add the missing variant to the phrase definition, or check that
-the selector value is correct.
-```
-
-Transform error:
-```
-RLF error: transform '@a' requires tag [:a, :an] but "uniform" has none
-
-Hint: Add a tag to the phrase definition:
-    uniform = :a "uniform";
-```
-
-Tag-based selection error:
-```
-RLF error: selection for 'destroyed' requires tag [:masc, :fem] but "sword" has none
-
-Hint: Pass a phrase with the required tag:
-    sword = :fem "sword";
-```
-
-Invalid selector error:
-```
-RLF error: cannot use "hello" as plural selector for 'card' (expected number)
-```
+Generated functions (from the `rlf!` macro) call `.expect()` on results, so these
+errors cause panics in application code. This is intentional—these are programming
+errors indicating the RLF definition is inconsistent with how it's being used,
+and should be caught during development.
 
 ---
 
 ## Performance Considerations
 
-### Static Data
+### Unified Interpreter
 
-Phrase text and variant tables are static:
+All languages (including the source) use the interpreter:
 
-```rust
-static CARD_VARIANTS: &[(&str, &str)] = &[
-    ("one", "card"),
-    ("other", "cards"),
-];
-```
+- Interpreter lookup per phrase call
+- Runtime variant resolution
+- String allocation for results
 
-### Minimal Allocations
+This is acceptable because:
 
-- Phrases without parameters use `Cow::Borrowed` (no allocation)
-- Phrases with interpolated parameters use `Cow::Owned` (one allocation)
-- Phrases with parameters that produce strings allocate once for the result
-- The `Value` type uses `String` for string values (allocation on conversion)
+1. Localized text is typically not performance-critical
+2. Hot paths can cache results
+3. The interpreter is optimized for common patterns
+4. Simplicity outweighs micro-optimization
 
-### Minimal External Dependencies
+### Caching Opportunities
 
-RLF depends on ICU4X for CLDR plural rules. ICU4X compiles locale data into the
-binary by default—no runtime data file loading required. The `icu_plurals` crate
-adds approximately 100KB to the binary with all locales included, or less with
-locale subsetting via the `icu4x-datagen` tool.
+- **Parsed ASTs**: Source phrases are parsed once at startup
+- **Plural rules**: CLDR rules are cached per language
+- **Phrase lookup**: HashMap-based O(1) lookup by name
+
+### Memory
+
+- Phrases with interpolation allocate once for the result
+- The `Value` type uses `String` for string values
+- Typical translation files use a few hundred KB
 
 ---
 
 ## IDE Support
 
-Because RLF uses proc-macros, rust-analyzer provides immediate feedback:
-autocomplete for phrase functions, go-to-definition on phrase calls (navigates
-to the macro invocation), and inline error highlighting for syntax errors and
-undefined references.
+Because RLF uses proc-macros, rust-analyzer provides:
+
+- **Autocomplete**: Phrase functions appear immediately
+- **Go-to-definition**: Navigate to the macro invocation
+- **Error highlighting**: Syntax errors and undefined references
 
 ---
 
 ## Summary
 
-| Component | rlf_source! | rlf_lang!(Name) |
-|-----------|-------------|-----------------|
-| Struct | `pub struct En;` | `pub struct Name;` |
-| Trait | `pub trait RlfLang { ... }` | (uses existing trait) |
-| Impl | `impl RlfLang for En { ... }` | `impl RlfLang for Name { ... }` |
+| Component | Behavior |
+|-----------|----------|
+| Source language | Embedded as data, evaluated via interpreter |
+| Translated languages | Loaded from files, evaluated via interpreter |
+| Validation | Compile-time for source, load-time for translations |
+| IDE support | Full autocomplete via proc-macro |
+| PhraseId | Hash-based identifier for serializable phrase references |
 
-| Feature | Development | CI (strict-i18n) |
-|---------|-------------|------------------|
-| Missing translations | Fall back to English | Compile error |
-| Trait defaults | Yes | No |
-| Cross-language validation | Runtime (fallback used) | Compile-time |
+### Generated Types
+
+| Type | Purpose | Size |
+|------|---------|------|
+| `Phrase` | Returned by parameterless phrase functions; carries text, variants, tags | Heap-allocated |
+| `Value` | Runtime parameter type; accepts numbers, strings, phrases | Enum (24 bytes typical) |
+| `PhraseId` | Serializable reference to any phrase; resolve with `call()` | 8 bytes, `Copy` |
 
 The design prioritizes:
 
-- **Immediate feedback**: Proc-macros enable IDE autocomplete without build steps
-- **Incremental translation**: Missing phrases fall back gracefully during development
-- **Release safety**: `strict-i18n` ensures complete translations before release
-- **Simplicity**: No build scripts, no external tools, just Rust macros
+- **Simplicity**: One code path for all languages
+- **Immediate feedback**: Add phrase, use immediately with autocomplete
+- **Flexible translations**: Load/reload without recompilation
+- **Simple API**: Functions take locale, return strings
+- **Serializable references**: `PhraseId` enables storing phrase references in data

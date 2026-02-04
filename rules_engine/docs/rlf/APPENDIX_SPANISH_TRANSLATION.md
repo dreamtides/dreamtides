@@ -9,8 +9,8 @@ into RLF files while keeping the serializer code language-agnostic.
 The original `cost_serializer.rs` contains ~150 lines of Rust code that produces
 English text for card costs. The goal is to:
 
-1. Extract all English text into `en.rlf.rs` using `rlf_source!`
-2. Create a Spanish translation in `es.rlf.rs` using `rlf_lang!`
+1. Extract all English text into `strings.rlf.rs` using `rlf!`
+2. Create a Spanish translation in `es.rlf` (loaded at runtime)
 3. Refactor `cost_serializer.rs` to be language-agnostic, delegating all
    grammatical decisions to RLF
 
@@ -54,12 +54,6 @@ CollectionExpression::AnyNumberOf => {
         predicate_serializer::serialize_predicate_plural(target, bindings)
     )
 }
-
-// Problem 3: Variable binding for numbers (loses context)
-if let Some(var_name) = parser_substitutions::directive_to_integer_variable("discards") {
-    bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
-}
-"{discards}".to_string()
 ```
 
 ### Spanish Grammatical Requirements
@@ -81,52 +75,46 @@ For this serializer:
 
 ## Part 2: Key Design Principle
 
-### Pass PhraseRef, Not String
+### Pass Phrase, Not String
 
-The critical insight: **Rust should pass `PhraseRef` values to RLF phrases, not
-pre-rendered strings.** This allows RLF to select the appropriate grammatical form.
+The critical insight: **Rust should pass `Phrase` values to RLF phrases, not
+pre-rendered strings.**
 
-**Wrong approach** (current code):
+**Wrong approach:**
 ```rust
 // Rust pre-renders predicate, losing grammatical information
-let target_text = serialize_predicate_plural(target, bindings);
-// target_text = "allies" (String) — no gender, no case variants!
+let target_text = serialize_predicate_plural(target, locale);
+// target_text = "allies" (String) — no gender!
 
 format!("abandon any number of {}", target_text)
-// Cannot produce correct Spanish: "abandona cualquier cantidad de aliados"
-// because we don't know "aliados" is masculine for agreement
 ```
 
-**Correct approach**:
+**Correct approach:**
 ```rust
-// Rust passes PhraseRef with full grammatical information
-let target = lang.ally();  // PhraseRef with :masc tag and all forms
+// Rust passes Phrase with full grammatical information
+let target = strings::ally(locale);  // Phrase with :masc tag
 
-lang.abandon_any_number(target)
-// Spanish template can now use gender tag for agreement
+strings::abandon_any_number(locale, target)
+// Spanish template can use gender tag for agreement
 ```
 
 ### Let RLF Handle All Grammatical Decisions
 
-The serializer should identify *what* to say (semantic meaning), not *how* to
-say it (grammatical form). Examples:
+The serializer identifies *what* to say, not *how* to say it:
 
 | Semantic Intent | Rust Calls | RLF Decides |
 |-----------------|------------|-------------|
-| "one ally" | `lang.abandon_one(target)` | Article, gender agreement |
-| "3 cards" | `lang.abandon_n(3, target)` | Number agreement, word order |
-| "any number of allies" | `lang.abandon_any_number(target)` | Quantifier, agreement |
-| "your hand" | `lang.your_hand()` | Possessive form |
+| "one ally" | `strings::abandon_one(locale, target)` | Article, gender |
+| "3 cards" | `strings::abandon_n(locale, 3, target)` | Number agreement |
+| "your hand" | `strings::your_hand(locale)` | Possessive form |
 
 ---
 
 ## Part 3: The English RLF File
 
-English is simpler—no gender, simple plurals:
-
 ```rust
-// en.rlf.rs
-rlf_source! {
+// strings.rlf.rs
+rlf! {
     // =========================================================================
     // Basic Types
     // =========================================================================
@@ -209,121 +197,115 @@ rlf_source! {
 
 ---
 
-## Part 4: The Spanish RLF File
+## Part 4: The Spanish Translation File
 
 Spanish uses the same phrase names but different templates with gender agreement:
 
 ```rust
-// es.rlf.rs
-rlf_lang!(Es) {
-    // =========================================================================
-    // Basic Types
-    //
-    // Spanish nouns have gender. Tags enable article transforms and agreement.
-    // Plural forms: one (1), other (2+)
-    // =========================================================================
+// es.rlf
+// Spanish translation for cost serializer
 
-    card = :fem {
-        one: "carta",
-        other: "cartas",
-    };
+// =========================================================================
+// Basic Types
+//
+// Spanish nouns have gender. Tags enable article transforms and agreement.
+// =========================================================================
 
-    character = :masc {
-        one: "personaje",
-        other: "personajes",
-    };
+card = :fem {
+    one: "carta",
+    other: "cartas",
+};
 
-    ally = :masc {
-        one: "aliado",
-        other: "aliados",
-    };
+character = :masc {
+    one: "personaje",
+    other: "personajes",
+};
 
-    // =========================================================================
-    // Keyword Formatting
-    // =========================================================================
+ally = :masc {
+    one: "aliado",
+    other: "aliados",
+};
 
-    banish = "<k>Destierra</k>";
-    energy_symbol = "<e>●</e>";
+// =========================================================================
+// Keyword Formatting
+// =========================================================================
 
-    // =========================================================================
-    // Locations
-    //
-    // "vacío" is masculine, "mano" is feminine
-    // =========================================================================
+banish = "<k>Destierra</k>";
+energy_symbol = "<e>●</e>";
 
-    your_void = "tu vacío";
-    opponent_void = "el vacío del oponente";
-    your_hand = "tu mano";
-    hand = "mano";
+// =========================================================================
+// Locations
+//
+// "vacío" is masculine, "mano" is feminine
+// =========================================================================
 
-    // =========================================================================
-    // Abandon Costs
-    //
-    // Spanish uses gender-agreeing quantifiers
-    // "cualquier cantidad de" works for both genders
-    // =========================================================================
+your_void = "tu vacío";
+opponent_void = "el vacío del oponente";
+your_hand = "tu mano";
+hand = "mano";
 
-    abandon_any_number(target) = "abandona cualquier cantidad de {target:other}";
-    abandon_one(target) = "abandona {@un target}";
-    abandon_n(n, target) = "abandona {n} {target:n}";
+// =========================================================================
+// Abandon Costs
+//
+// Spanish uses gender-agreeing quantifiers
+// =========================================================================
 
-    // =========================================================================
-    // Discard Costs
-    // =========================================================================
+abandon_any_number(target) = "abandona cualquier cantidad de {target:other}";
+abandon_one(target) = "abandona {@un target}";
+abandon_n(n, target) = "abandona {n} {target:n}";
 
-    discard_n(n) = "descarta {n}";
-    discard_your_hand = "descarta tu mano";
+// =========================================================================
+// Discard Costs
+// =========================================================================
 
-    // =========================================================================
-    // Energy Costs
-    // =========================================================================
+discard_n(n) = "descarta {n}";
+discard_your_hand = "descarta tu mano";
 
-    energy_cost(n) = "{n}";
-    lose_maximum_energy(n) = "pierde {n}";
-    pay_one_or_more_energy = "paga 1 o más {energy_symbol}";
+// =========================================================================
+// Energy Costs
+// =========================================================================
 
-    // =========================================================================
-    // Banish Costs
-    //
-    // Gender agreement with "carta" (fem) and "vacío" (masc)
-    // =========================================================================
+energy_cost(n) = "{n}";
+lose_maximum_energy(n) = "pierde {n}";
+pay_one_or_more_energy = "paga 1 o más {energy_symbol}";
 
-    banish_one_from_void = "{banish} otra carta de tu vacío";
-    banish_n_from_your_void(n) = "{banish} {n} de tu vacío";
-    banish_n_from_opponent_void(n) = "{banish} {n} del vacío del oponente";
-    banish_your_void = "{banish} tu vacío";
-    banish_void_with_min(n) = "{banish} tu vacío con {n} o más cartas";
-    banish_from_hand(target) = "{banish} {target} de la mano";
+// =========================================================================
+// Banish Costs
+// =========================================================================
 
-    // =========================================================================
-    // Return to Hand Costs
-    //
-    // "devolver" (return) conjugates; agreement with target gender
-    // =========================================================================
+banish_one_from_void = "{banish} otra carta de tu vacío";
+banish_n_from_your_void(n) = "{banish} {n} de tu vacío";
+banish_n_from_opponent_void(n) = "{banish} {n} del vacío del oponente";
+banish_your_void = "{banish} tu vacío";
+banish_void_with_min(n) = "{banish} tu vacío con {n} o más cartas";
+banish_from_hand(target) = "{banish} {target} de la mano";
 
-    return_one(target) = "devuelve {@un target} a la mano";
-    return_n(n, target) = "devuelve {n} {target:n} a la mano";
-    return_all_but_one(target) = "devuelve todos menos {@un target} a la mano";
-    return_all(target) = "devuelve {@el:other target} a la mano";
-    return_any_number(target) = "devuelve cualquier cantidad de {target:other} a la mano";
-    return_up_to(n, target) = "devuelve hasta {n} {target:n} a la mano";
-    return_each_other(target) = "devuelve cada otro {target:one} a la mano";
-    return_n_or_more(n, target) = "devuelve {n} o más {target:other} a la mano";
+// =========================================================================
+// Return to Hand Costs
+// =========================================================================
 
-    // =========================================================================
-    // Connectors
-    // =========================================================================
+return_one(target) = "devuelve {@un target} a la mano";
+return_n(n, target) = "devuelve {n} {target:n} a la mano";
+return_all_but_one(target) = "devuelve todos menos {@un target} a la mano";
+return_all(target) = "devuelve {@el:other target} a la mano";
+return_any_number(target) = "devuelve cualquier cantidad de {target:other} a la mano";
+return_up_to(n, target) = "devuelve hasta {n} {target:n} a la mano";
+return_each_other(target) = "devuelve cada otro {target:one} a la mano";
+return_n_or_more(n, target) = "devuelve {n} o más {target:other} a la mano";
 
-    cost_or = " o ";
-    cost_and = " y ";
-}
+// =========================================================================
+// Connectors
+// =========================================================================
+
+cost_or = " o ";
+cost_and = " y ";
 ```
 
 ---
 
 ## Part 5: Refactored cost_serializer.rs
 
-The refactored serializer passes `PhraseRef` values and delegates all grammatical
+The refactored serializer passes `Phrase` values and delegates all grammatical
 decisions to RLF:
 
 ```rust
@@ -331,158 +313,148 @@ decisions to RLF:
 
 use ability_data::collection_expression::CollectionExpression;
 use ability_data::cost::Cost;
-use crate::localization::{RlfLang, PhraseRef};
+use crate::localization::{strings, Locale, Phrase};
 
 /// Serialize a cost to localized text.
-pub fn serialize_cost(cost: &Cost, lang: &impl RlfLang) -> String {
+pub fn serialize_cost(locale: &Locale, cost: &Cost) -> String {
     match cost {
         Cost::AbandonCharactersCount { target, count } => {
-            serialize_abandon(target, count, lang)
+            serialize_abandon(locale, target, count)
         }
 
         Cost::DiscardCards { count, .. } => {
-            lang.discard_n(*count).to_string()
+            strings::discard_n(locale, *count)
         }
 
         Cost::DiscardHand => {
-            lang.discard_your_hand().to_string()
+            strings::discard_your_hand(locale).to_string()
         }
 
         Cost::Energy(energy) => {
-            lang.energy_cost(energy.0).to_string()
+            strings::energy_cost(locale, energy.0)
         }
 
         Cost::LoseMaximumEnergy(amount) => {
-            lang.lose_maximum_energy(*amount).to_string()
+            strings::lose_maximum_energy(locale, *amount)
         }
 
         Cost::BanishCardsFromYourVoid(count) => {
             if *count == 1 {
-                lang.banish_one_from_void().to_string()
+                strings::banish_one_from_void(locale).to_string()
             } else {
-                lang.banish_n_from_your_void(*count).to_string()
+                strings::banish_n_from_your_void(locale, *count)
             }
         }
 
         Cost::BanishCardsFromEnemyVoid(count) => {
-            lang.banish_n_from_opponent_void(*count).to_string()
+            strings::banish_n_from_opponent_void(locale, *count)
         }
 
         Cost::BanishAllCardsFromYourVoidWithMinCount(min_count) => {
-            lang.banish_void_with_min(*min_count).to_string()
+            strings::banish_void_with_min(locale, *min_count)
         }
 
         Cost::BanishFromHand(predicate) => {
-            let target = predicate_to_phrase(predicate, lang);
-            lang.banish_from_hand(target).to_string()
+            let target = predicate_to_phrase(locale, predicate);
+            strings::banish_from_hand(locale, target)
         }
 
         Cost::Choice(costs) => {
             costs
                 .iter()
-                .map(|c| serialize_cost(c, lang))
+                .map(|c| serialize_cost(locale, c))
                 .collect::<Vec<_>>()
-                .join(&lang.cost_or().to_string())
+                .join(&strings::cost_or(locale).to_string())
         }
 
         Cost::ReturnToHand { target, count } => {
-            serialize_return_to_hand(target, count, lang)
+            serialize_return_to_hand(locale, target, count)
         }
 
         Cost::SpendOneOrMoreEnergy => {
-            lang.pay_one_or_more_energy().to_string()
+            strings::pay_one_or_more_energy(locale).to_string()
         }
 
         Cost::BanishAllCardsFromYourVoid => {
-            lang.banish_your_void().to_string()
+            strings::banish_your_void(locale).to_string()
         }
 
         Cost::CostList(costs) => {
             costs
                 .iter()
-                .map(|c| serialize_cost(c, lang))
+                .map(|c| serialize_cost(locale, c))
                 .collect::<Vec<_>>()
-                .join(&lang.cost_and().to_string())
+                .join(&strings::cost_and(locale).to_string())
         }
     }
 }
 
-/// Convert a predicate to a PhraseRef for use in cost phrases.
-/// This preserves variant information for RLF selection.
-fn predicate_to_phrase(predicate: &Predicate, lang: &impl RlfLang) -> PhraseRef {
+/// Convert a predicate to a Phrase.
+fn predicate_to_phrase(locale: &Locale, predicate: &Predicate) -> Phrase {
     match predicate {
-        Predicate::Your(CardPredicate::Character) => lang.ally(),
-        Predicate::Enemy(CardPredicate::Character) => lang.character(),
-        Predicate::Any(CardPredicate::Card) => lang.card(),
-        Predicate::Any(CardPredicate::Character) => lang.character(),
-        // ... other predicate types
-        _ => lang.card(),
+        Predicate::Your(CardPredicate::Character) => strings::ally(locale),
+        Predicate::Enemy(CardPredicate::Character) => strings::character(locale),
+        Predicate::Any(CardPredicate::Card) => strings::card(locale),
+        Predicate::Any(CardPredicate::Character) => strings::character(locale),
+        _ => strings::card(locale),
     }
 }
 
-/// Serialize an abandon cost with collection expression.
+/// Serialize an abandon cost.
 fn serialize_abandon(
+    locale: &Locale,
     target: &Predicate,
     count: &CollectionExpression,
-    lang: &impl RlfLang,
 ) -> String {
-    let target_phrase = predicate_to_phrase(target, lang);
+    let target_phrase = predicate_to_phrase(locale, target);
 
     match count {
         CollectionExpression::AnyNumberOf => {
-            lang.abandon_any_number(target_phrase).to_string()
+            strings::abandon_any_number(locale, target_phrase)
         }
         CollectionExpression::Exactly(1) => {
-            lang.abandon_one(target_phrase).to_string()
+            strings::abandon_one(locale, target_phrase)
         }
         CollectionExpression::Exactly(n) => {
-            lang.abandon_n(*n, target_phrase).to_string()
+            strings::abandon_n(locale, *n, target_phrase)
         }
-        _ => lang.abandon_n(1, target_phrase).to_string(),
+        _ => strings::abandon_n(locale, 1, target_phrase),
     }
 }
 
-/// Serialize a return-to-hand cost with collection expression.
+/// Serialize a return-to-hand cost.
 fn serialize_return_to_hand(
+    locale: &Locale,
     target: &Predicate,
     count: &CollectionExpression,
-    lang: &impl RlfLang,
 ) -> String {
-    let target_phrase = predicate_to_phrase(target, lang);
+    let target_phrase = predicate_to_phrase(locale, target);
 
     match count {
         CollectionExpression::Exactly(1) => {
-            lang.return_one(target_phrase).to_string()
+            strings::return_one(locale, target_phrase)
         }
         CollectionExpression::Exactly(n) => {
-            lang.return_n(*n, target_phrase).to_string()
+            strings::return_n(locale, *n, target_phrase)
         }
         CollectionExpression::AllButOne => {
-            lang.return_all_but_one(target_phrase).to_string()
+            strings::return_all_but_one(locale, target_phrase)
         }
         CollectionExpression::All => {
-            lang.return_all(target_phrase).to_string()
+            strings::return_all(locale, target_phrase)
         }
         CollectionExpression::AnyNumberOf => {
-            lang.return_any_number(target_phrase).to_string()
+            strings::return_any_number(locale, target_phrase)
         }
         CollectionExpression::UpTo(n) => {
-            lang.return_up_to(*n, target_phrase).to_string()
+            strings::return_up_to(locale, *n, target_phrase)
         }
         CollectionExpression::EachOther => {
-            lang.return_each_other(target_phrase).to_string()
+            strings::return_each_other(locale, target_phrase)
         }
         CollectionExpression::OrMore(n) => {
-            lang.return_n_or_more(*n, target_phrase).to_string()
+            strings::return_n_or_more(locale, *n, target_phrase)
         }
-    }
-}
-
-/// Serialize a cost used as a trigger cost (may need different phrasing).
-pub fn serialize_trigger_cost(cost: &Cost, lang: &impl RlfLang) -> String {
-    match cost {
-        Cost::Energy(_) => format!("pay {}", serialize_cost(cost, lang)),
-        _ => serialize_cost(cost, lang),
     }
 }
 ```
@@ -495,14 +467,12 @@ pub fn serialize_trigger_cost(cost: &Cost, lang: &impl RlfLang) -> String {
 
 Spanish uses the `@un` transform to add indefinite articles with gender agreement:
 
-```rust
-// es.rlf.rs
-rlf_lang!(Es) {
-    card = :fem { one: "carta", other: "cartas" };
-    ally = :masc { one: "aliado", other: "aliados" };
+```
+# es.rlf
+card = :fem { one: "carta", other: "cartas" };
+ally = :masc { one: "aliado", other: "aliados" };
 
-    abandon_one(target) = "abandona {@un target}";
-}
+abandon_one(target) = "abandona {@un target}";
 ```
 
 The `@un` transform reads the `:fem` or `:masc` tag from the target phrase:
@@ -512,11 +482,11 @@ The `@un` transform reads the `:fem` or `:masc` tag from the target phrase:
 | `card` | `:fem` | "una carta" |
 | `ally` | `:masc` | "un aliado" |
 
-### The @el Transform with Number
+### The @el Transform with Context
 
 For definite articles with plural agreement:
 
-```rust
+```
 return_all(target) = "devuelve {@el:other target} a la mano";
 ```
 
@@ -529,9 +499,9 @@ The `@el:other` syntax selects the plural definite article:
 
 ### Direct Number Selection
 
-For phrases with explicit counts, selection handles agreement:
+For phrases with explicit counts:
 
-```rust
+```
 abandon_n(n, target) = "abandona {n} {target:n}";
 ```
 
@@ -552,15 +522,15 @@ abandon_n(n, target) = "abandona {n} {target:n}";
 ```rust
 let target = Predicate::Your(CardPredicate::Character);
 let count = CollectionExpression::AnyNumberOf;
-serialize_cost(&Cost::AbandonCharactersCount { target, count }, &lang)
+serialize_cost(locale, &Cost::AbandonCharactersCount { target, count })
 ```
 
 **English flow:**
 ```
-predicate_to_phrase(target) → lang.ally()
-    → PhraseRef { text: "ally", variants: [("one", "ally"), ("other", "allies")], tags: ["an"] }
+predicate_to_phrase(target) → strings::ally(locale)
+    → Phrase { text: "ally", variants: [...], tags: ["an"] }
 
-lang.abandon_any_number(target_phrase)
+strings::abandon_any_number(locale, target_phrase)
     Template: "abandon any number of {target:other}"
     Selection: target:other → "allies"
     Result: "abandon any number of allies"
@@ -568,10 +538,10 @@ lang.abandon_any_number(target_phrase)
 
 **Spanish flow:**
 ```
-predicate_to_phrase(target) → lang.ally()
-    → PhraseRef { text: "aliado", variants: [("one", "aliado"), ("other", "aliados")], tags: ["masc"] }
+predicate_to_phrase(target) → strings::ally(locale)
+    → Phrase { text: "aliado", variants: [...], tags: ["masc"] }
 
-lang.abandon_any_number(target_phrase)
+strings::abandon_any_number(locale, target_phrase)
     Template: "abandona cualquier cantidad de {target:other}"
     Selection: target:other → "aliados"
     Result: "abandona cualquier cantidad de aliados"
@@ -579,19 +549,12 @@ lang.abandon_any_number(target_phrase)
 
 ### Example 2: "return a card to hand"
 
-**Rust code:**
-```rust
-let target = Predicate::Any(CardPredicate::Card);
-let count = CollectionExpression::Exactly(1);
-serialize_cost(&Cost::ReturnToHand { target, count }, &lang)
-```
-
 **English flow:**
 ```
-predicate_to_phrase(target) → lang.card()
-    → PhraseRef { tags: ["a"], ... }
+predicate_to_phrase(target) → strings::card(locale)
+    → Phrase { tags: ["a"], ... }
 
-lang.return_one(target_phrase)
+strings::return_one(locale, target_phrase)
     Template: "return {@a target} to hand"
     Transform: @a reads :a tag → "a card"
     Result: "return a card to hand"
@@ -599,10 +562,10 @@ lang.return_one(target_phrase)
 
 **Spanish flow:**
 ```
-predicate_to_phrase(target) → lang.card()
-    → PhraseRef { tags: ["fem"], ... }
+predicate_to_phrase(target) → strings::card(locale)
+    → Phrase { tags: ["fem"], ... }
 
-lang.return_one(target_phrase)
+strings::return_one(locale, target_phrase)
     Template: "devuelve {@un target} a la mano"
     Transform: @un reads :fem tag → "una carta"
     Result: "devuelve una carta a la mano"
@@ -616,21 +579,21 @@ let cost = Cost::Choice(vec![
     Cost::DiscardCards { count: 3, .. },
     Cost::BanishCardsFromYourVoid(2),
 ]);
-serialize_cost(&cost, &lang)
+serialize_cost(locale, &cost)
 ```
 
 **English flow:**
 ```
-serialize_cost(DiscardCards) → lang.discard_n(3) → "discard 3"
-serialize_cost(Banish) → lang.banish_n_from_your_void(2) → "{banish} 2 from your void"
+serialize_cost(DiscardCards) → strings::discard_n(locale, 3) → "discard 3"
+serialize_cost(Banish) → strings::banish_n_from_your_void(locale, 2) → "{banish} 2 from your void"
 Join with cost_or → " or "
 Result: "discard 3 or <k>Banish</k> 2 from your void"
 ```
 
 **Spanish flow:**
 ```
-serialize_cost(DiscardCards) → lang.discard_n(3) → "descarta 3"
-serialize_cost(Banish) → lang.banish_n_from_your_void(2) → "{banish} 2 de tu vacío"
+serialize_cost(DiscardCards) → strings::discard_n(locale, 3) → "descarta 3"
+serialize_cost(Banish) → strings::banish_n_from_your_void(locale, 2) → "{banish} 2 de tu vacío"
 Join with cost_or → " o "
 Result: "descarta 3 o <k>Destierra</k> 2 de tu vacío"
 ```
@@ -650,48 +613,45 @@ The refactored serializer is completely language-agnostic. It does NOT:
 - Know how to pluralize words
 - Handle any grammatical agreement
 
-All of these concerns are handled in RLF files.
-
 ### Comparison: Old vs New
 
 **Old approach (hardcoded English):**
 ```rust
 CollectionExpression::Exactly(1) => {
-    format!("abandon {}", predicate_serializer::serialize_predicate(target, bindings))
+    format!("abandon {}", serialize_predicate(target, bindings))
 }
 ```
 
 Problems:
 - English text hardcoded in Rust
 - Predicate pre-rendered as String, losing gender information
-- Would need entirely different code paths for Spanish
+- Would need different code paths for Spanish
 
 **New approach (RLF):**
 ```rust
 CollectionExpression::Exactly(1) => {
-    lang.abandon_one(predicate_to_phrase(target, lang)).to_string()
+    strings::abandon_one(locale, predicate_to_phrase(locale, target))
 }
 ```
 
 Benefits:
 - No English text in Rust
-- PhraseRef preserves gender tag
+- Phrase preserves gender tag
 - Same Rust code works for all languages
-- Spanish translator controls all grammatical decisions
 
 ### For Translators
 
 1. **Full control over articles**: Use `@un`/`@el` transforms
-2. **Full control over gender**: Tags on phrases enable automatic agreement
-3. **Full control over word order**: Rearrange phrase templates freely
-4. **No Rust knowledge required**: All work happens in RLF files
+2. **Full control over gender**: Tags enable automatic agreement
+3. **Full control over word order**: Rearrange templates freely
+4. **No Rust knowledge required**: All work in `.rlf` files
 
 ### For Developers
 
-1. **Simpler serializer**: No linguistic logic, just semantic decisions
+1. **Simpler serializer**: No linguistic logic
 2. **Single code path**: Same Rust for all languages
-3. **Type-safe**: PhraseRef carries metadata; selection validates at compile time
-4. **Testable**: Can test serializer output for any language
+3. **Type-safe**: Phrase carries metadata
+4. **Testable**: Test output for any language
 
 ---
 
@@ -709,9 +669,9 @@ The key insight: **keep grammatical decisions in RLF, semantic decisions in Rust
 | "What word order sounds natural?" | RLF |
 
 The cost serializer becomes a simple mapping from cost types to RLF phrase calls.
-All the linguistic complexity—gender, articles, pluralization, word order—lives
-in the RLF files where translators can control it directly.
+All linguistic complexity—gender, articles, pluralization, word order—lives in
+the RLF files where translators can control it directly.
 
-This approach scales to any language: add a new `.rlf.rs` file with appropriate
+This approach scales to any language: add a new `.rlf` file with appropriate
 tags and phrase templates, and the same Rust serializer produces grammatically
 correct output automatically.
