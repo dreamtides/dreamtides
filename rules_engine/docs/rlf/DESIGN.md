@@ -1,31 +1,31 @@
-# RLT
+# RLF
 
-The Rust Language Toolkit: a localization DSL embedded in Rust via macros.
+The Rust Localization Framework: a localization DSL embedded in Rust via macros.
 
 ## Overview
 
-RLT files are valid Rust source files with a `.rlt.rs` extension. They contain
+RLF files are valid Rust source files with a `.rlf.rs` extension. They contain
 macro invocations that define phrases for a single language.
 
-The **source language** (typically English) uses `rlt_source!`:
+The **source language** (typically English) uses `rlf_source!`:
 
 ```rust
-// en.rlt.rs
-rlt_source! {
+// en.rlf.rs
+rlf_source! {
     hello = "Hello, world!";
 }
 ```
 
-**Translation languages** use `rlt_lang!`:
+**Translation languages** use `rlf_lang!`:
 
 ```rust
-// ru.rlt.rs
-rlt_lang!(Ru) {
+// ru.rlf.rs
+rlf_lang!(Ru) {
     hello = "Привет, мир!";
 }
 ```
 
-The source macro generates a trait (`RltLang`) with default implementations.
+The source macro generates a trait (`RlfLang`) with default implementations.
 Translation macros implement the trait, overriding only the phrases they define.
 Missing translations automatically fall back to the source language.
 
@@ -33,7 +33,7 @@ Missing translations automatically fall back to the source language.
 
 ## Primitives
 
-RLT has four primitives: **phrase**, **parameter**, **variant**, and
+RLF has four primitives: **phrase**, **parameter**, **variant**, and
 **selection**.
 
 ### Phrase
@@ -41,7 +41,7 @@ RLT has four primitives: **phrase**, **parameter**, **variant**, and
 A phrase has a name and produces text.
 
 ```rust
-rlt_source! {
+rlf_source! {
     hello = "Hello, world!";
     goodbye = "Goodbye!";
 }
@@ -53,7 +53,7 @@ Phrases can accept values. Parameters are declared in parentheses and
 interpolated with `{}`.
 
 ```rust
-rlt_source! {
+rlf_source! {
     greet(name) = "Hello, {name}!";
     damage(amount, target) = "Deal {amount} damage to {target}.";
 }
@@ -64,7 +64,7 @@ rlt_source! {
 A phrase can have multiple forms. Variants are declared in braces after `=`.
 
 ```rust
-rlt_source! {
+rlf_source! {
     card = {
         one: "card",
         other: "cards",
@@ -75,7 +75,7 @@ rlt_source! {
 Variants can be multi-dimensional using dot notation:
 
 ```rust
-rlt_lang!(Ru) {
+rlf_lang!(Ru) {
     card = {
         nom.one: "карта",
         nom.few: "карты",
@@ -90,7 +90,7 @@ rlt_lang!(Ru) {
 **Multi-key shorthand:** Assign the same value to multiple keys with commas:
 
 ```rust
-rlt_source! {
+rlf_source! {
     card = {
         nom.one, acc.one: "card",
         nom.other, acc.other: "cards",
@@ -102,7 +102,7 @@ rlt_source! {
 unspecified sub-key:
 
 ```rust
-rlt_lang!(Ru) {
+rlf_lang!(Ru) {
     card = {
         nom: "карта",        // Fallback for nom.one, nom.few, etc.
         nom.many: "карт",    // Override for nom.many specifically
@@ -113,13 +113,13 @@ rlt_lang!(Ru) {
 ```
 
 Resolution order: exact match (`nom.many`) → progressively shorter fallbacks (`nom`).
-If no match is found after trying all fallbacks, RLT produces a **runtime error**.
+If no match is found after trying all fallbacks, RLF produces a **runtime error**.
 This catches bugs where a required variant is missing from a phrase definition.
 
 **Irregular forms (suppletion):** Use variants for words with unpredictable forms:
 
 ```rust
-rlt_source! {
+rlf_source! {
     go = { present: "go", past: "went", participle: "gone" };
     good = { base: "good", comparative: "better", superlative: "best" };
 }
@@ -128,7 +128,7 @@ rlt_source! {
 These features combine for concise definitions:
 
 ```rust
-rlt_lang!(Ru) {
+rlf_lang!(Ru) {
     event = :neut :inan {
         nom, acc: "событие",
         nom.many, acc.many: "событий",
@@ -147,20 +147,20 @@ The `:` operator selects a variant.
 Literal selection uses a variant name directly:
 
 ```rust
-rlt_source! {
+rlf_source! {
     all_cards = "All {card:other}.";
 }
 
-rlt_lang!(Ru) {
+rlf_lang!(Ru) {
     take_one = "Возьмите {card:acc.one}.";
 }
 ```
 
-Derived selection uses a parameter. For numbers, RLT maps to CLDR plural
+Derived selection uses a parameter. For numbers, RLF maps to CLDR plural
 categories (`one`, `two`, `few`, `many`, `other`):
 
 ```rust
-rlt_source! {
+rlf_source! {
     draw(n) = "Draw {n} {card:n}.";
 }
 // n=1 → "Draw 1 card."
@@ -171,7 +171,7 @@ rlt_source! {
 in phrase text:
 
 ```rust
-rlt_source! {
+rlf_source! {
     syntax_help = "Use {{name}} for interpolation and @@ for transforms.";
     ratio = "The ratio is 1::2.";
 }
@@ -182,7 +182,7 @@ rlt_source! {
 Multi-dimensional selection chains with multiple `:` operators:
 
 ```rust
-rlt_lang!(Ru) {
+rlf_lang!(Ru) {
     draw(n) = "Возьмите {n} {card:acc:n}.";
 }
 // n=1 → "Возьмите 1 карту."
@@ -195,7 +195,7 @@ When a phrase takes another phrase as a parameter, you can select variants from
 it:
 
 ```rust
-rlt_source! {
+rlf_source! {
     character = {
         one: "character",
         other: "characters",
@@ -215,7 +215,7 @@ phrase `counting` refers to."
 Selection also works when both the phrase and selector are parameters:
 
 ```rust
-rlt_source! {
+rlf_source! {
     character = { one: "character", other: "characters" };
     card = { one: "card", other: "cards" };
 
@@ -239,7 +239,7 @@ two purposes:
 2. **Transforms**: Transforms can read tags to determine behavior
 
 ```rust
-rlt_lang!(Es) {
+rlf_lang!(Es) {
     card = :fem "carta";
     character = :masc "personaje";
 }
@@ -250,7 +250,7 @@ rlt_lang!(Es) {
 Phrases can have multiple tags for different purposes:
 
 ```rust
-rlt_source! {
+rlf_source! {
     // English: article hint for @a transform
     card = :a "card";
     event = :an "event";
@@ -259,14 +259,14 @@ rlt_source! {
     hour = :an "hour";        // silent h exception
 }
 
-rlt_lang!(De) {
+rlf_lang!(De) {
     // German: grammatical gender for article transforms
     karte = :fem "Karte";
     charakter = :masc "Charakter";
     ereignis = :neut "Ereignis";
 }
 
-rlt_lang!(ZhCn) {
+rlf_lang!(ZhCn) {
     // Chinese: measure word category for @count transform
     pai = :zhang "牌";
     jue_se = :ge "角色";
@@ -276,7 +276,7 @@ rlt_lang!(ZhCn) {
 **Selection based on tags:**
 
 ```rust
-rlt_lang!(Es) {
+rlf_lang!(Es) {
     card = :fem "carta";
     character = :masc "personaje";
 
@@ -300,7 +300,7 @@ modify text. When chaining multiple transforms, they apply right-to-left
 (innermost first):
 
 ```rust
-rlt_source! {
+rlf_source! {
     card = "card";
 
     draw_one = "Draw {@a card}.";        // → "Draw a card."
@@ -312,7 +312,7 @@ rlt_source! {
 Transforms combine with selection:
 
 ```rust
-rlt_source! {
+rlf_source! {
     card = {
         one: "card",
         other: "cards",
@@ -365,8 +365,8 @@ These transforms work on any text in any language:
 Language-specific transforms read metadata tags to determine behavior:
 
 ```rust
-// en.rlt.rs
-rlt_source! {
+// en.rlf.rs
+rlf_source! {
     card = :a "card";
     event = :an "event";
     hour = :an "hour";      // silent h
@@ -386,8 +386,8 @@ with a consonant).
 This pattern applies to other language-specific transforms:
 
 ```rust
-// de.rlt.rs - German definite articles
-rlt_lang!(De) {
+// de.rlf.rs - German definite articles
+rlf_lang!(De) {
     karte = :fem "Karte";
     charakter = :masc "Charakter";
     ereignis = :neut "Ereignis";
@@ -396,8 +396,8 @@ rlt_lang!(De) {
     destroy_card = "Zerstöre {@der:acc karte}.";  // → "Zerstöre die Karte."
 }
 
-// zh_cn.rlt.rs - Chinese measure words
-rlt_lang!(ZhCn) {
+// zh_cn.rlf.rs - Chinese measure words
+rlf_lang!(ZhCn) {
     pai = :zhang "牌";
     jue_se = :ge "角色";
 
@@ -408,9 +408,9 @@ rlt_lang!(ZhCn) {
 
 ### Standard Transform Library
 
-RLT provides language-specific transforms for common patterns. Transforms are
-scoped to the language file—`@un` in `es.rlt.rs` uses Spanish rules, while `@un`
-in `fr.rlt.rs` uses French rules. The language is inferred from the filename.
+RLF provides language-specific transforms for common patterns. Transforms are
+scoped to the language file—`@un` in `es.rlf.rs` uses Spanish rules, while `@un`
+in `fr.rlf.rs` uses French rules. The language is inferred from the filename.
 
 | Transform   | Languages                      | Reads Tags                   | Effect                       |
 | ----------- | ------------------------------ | ---------------------------- | ---------------------------- |
@@ -427,8 +427,8 @@ Transforms can have aliases for readability. Aliases are interchangeable—they
 produce identical behavior:
 
 ```rust
-// en.rlt.rs - @a and @an are aliases
-rlt_source! {
+// en.rlf.rs - @a and @an are aliases
+rlf_source! {
     card = :a "card";
     event = :an "event";
 
@@ -462,7 +462,7 @@ language.
 Transforms read metadata from phrase parameters, enabling abstraction:
 
 ```rust
-rlt_source! {
+rlf_source! {
     card = :a "card";
     event = :an "event";
     ally = :an "ally";
@@ -510,8 +510,8 @@ apply dynamic rules.
 ### Pluralization (English)
 
 ```rust
-// en.rlt.rs
-rlt_source! {
+// en.rlf.rs
+rlf_source! {
     card = {
         one: "card",
         other: "cards",
@@ -526,8 +526,8 @@ rlt_source! {
 Russian has three plural categories:
 
 ```rust
-// ru.rlt.rs
-rlt_lang!(Ru) {
+// ru.rlf.rs
+rlf_lang!(Ru) {
     card = {
         one: "карту",
         few: "карты",
@@ -545,8 +545,8 @@ rlt_lang!(Ru) {
 ### Case + Number (Russian)
 
 ```rust
-// ru.rlt.rs
-rlt_lang!(Ru) {
+// ru.rlf.rs
+rlf_lang!(Ru) {
     card = {
         nom: "карта",
         nom.many: "карт",
@@ -564,8 +564,8 @@ rlt_lang!(Ru) {
 ### Gender Agreement (Spanish)
 
 ```rust
-// es.rlt.rs
-rlt_lang!(Es) {
+// es.rlf.rs
+rlf_lang!(Es) {
     card = :fem "carta";
     enemy = :masc "enemigo";
 
@@ -585,8 +585,8 @@ rlt_lang!(Es) {
 Verbs that agree with their subject use the same tag-based selection pattern:
 
 ```rust
-// ru.rlt.rs
-rlt_lang!(Ru) {
+// ru.rlf.rs
+rlf_lang!(Ru) {
     card = :fem "карта";
     character = :masc "персонаж";
 
@@ -610,8 +610,8 @@ Chinese requires measure words (classifiers) between numbers and nouns. The
 from the phrase:
 
 ```rust
-// zh_cn.rlt.rs
-rlt_lang!(ZhCn) {
+// zh_cn.rlf.rs
+rlf_lang!(ZhCn) {
     card = :zhang "牌";       // :zhang = 张 (flat objects)
     character = :ge "角色";   // :ge = 个 (general classifier)
 
@@ -628,17 +628,17 @@ Thai, and Bengali, each with their own classifier tags.
 
 ## File Structure
 
-Each language has its own `.rlt.rs` file:
+Each language has its own `.rlf.rs` file:
 
 ```
 src/
   localization/
     mod.rs
-    en.rlt.rs      # English (source) - uses rlt_source!
-    zh_cn.rlt.rs   # Simplified Chinese - uses rlt_lang!
-    ru.rlt.rs      # Russian - uses rlt_lang!
-    es.rlt.rs      # Spanish - uses rlt_lang!
-    pt_br.rlt.rs   # Portuguese (Brazil) - uses rlt_lang!
+    en.rlf.rs      # English (source) - uses rlf_source!
+    zh_cn.rlf.rs   # Simplified Chinese - uses rlf_lang!
+    ru.rlf.rs      # Russian - uses rlf_lang!
+    es.rlf.rs      # Spanish - uses rlf_lang!
+    pt_br.rlf.rs   # Portuguese (Brazil) - uses rlf_lang!
 ```
 
 The source language defines the API contract via the generated trait. Translation
@@ -677,7 +677,7 @@ in Russian, a missing gender tag for Spanish agreement, or passing a string wher
 a phrase was expected. Silent fallbacks would produce subtly incorrect output that
 might not be noticed until a native speaker reviews the text.
 
-**Error handling:** All phrase functions return `Result<String, RltError>`.
+**Error handling:** All phrase functions return `Result<String, RlfError>`.
 Callers should handle errors appropriately for their context—log and use a
 fallback string, propagate the error, or panic during development. The error
 message includes the operation, expected variants/tags, and actual value to
@@ -690,8 +690,8 @@ aid debugging.
 Given:
 
 ```rust
-// en.rlt.rs
-rlt_source! {
+// en.rlf.rs
+rlf_source! {
     card = {
         one: "card",
         other: "cards",
@@ -701,45 +701,45 @@ rlt_source! {
 }
 ```
 
-RLT generates:
+RLF generates:
 
 ```rust
 // A unit struct for trait dispatch
 pub struct En;
 
 // The trait with default implementations (fallback to English)
-pub trait RltLang {
+pub trait RlfLang {
     fn card(&self) -> Phrase { ... }
-    fn draw(&self, n: impl Into<Value>) -> Result<String, RltError> { ... }
+    fn draw(&self, n: impl Into<Value>) -> Result<String, RlfError> { ... }
 }
 
-impl RltLang for En { ... }
+impl RlfLang for En { ... }
 ```
 
 For a translation:
 
 ```rust
-// ru.rlt.rs
-rlt_lang!(Ru) {
+// ru.rlf.rs
+rlf_lang!(Ru) {
     card = { ... };
     draw(n) = "...";
 }
 ```
 
-RLT generates:
+RLF generates:
 
 ```rust
 pub struct Ru;
 
-impl RltLang for Ru { ... }
+impl RlfLang for Ru { ... }
 ```
 
 **Usage:**
 
 ```rust
-use localization::{En, Ru, RltLang};
+use localization::{En, Ru, RlfLang};
 
-fn localized_draw(lang: &impl RltLang, n: i32) -> Result<String, RltError> {
+fn localized_draw(lang: &impl RlfLang, n: i32) -> Result<String, RlfError> {
     lang.draw(n)
 }
 
@@ -778,7 +778,7 @@ let plural = En.card().variant("other")?;    // "cards"
 ## Incomplete Translations
 
 During development, you may want to add phrases to the source language without
-immediately translating them. RLT supports this via **fallback behavior**.
+immediately translating them. RLF supports this via **fallback behavior**.
 
 ### Default: Fallback to Source
 
@@ -786,8 +786,8 @@ The trait's default implementations use the source language text. If Russian
 doesn't define a phrase, it inherits the English version:
 
 ```rust
-// ru.rlt.rs
-rlt_lang!(Ru) {
+// ru.rlf.rs
+rlf_lang!(Ru) {
     card = { ... };
     // 'draw' not defined - falls back to English
 }
@@ -812,7 +812,7 @@ With `strict-i18n` enabled, the trait has no default implementations:
 
 ```rust
 // When strict-i18n is enabled
-pub trait RltLang {
+pub trait RlfLang {
     fn card(&self) -> Phrase;  // no default - must implement
     fn draw(&self, n: impl Into<Value>) -> String;  // no default
 }
@@ -822,9 +822,9 @@ Missing translations become compile errors:
 
 ```
 error[E0046]: not all trait items implemented, missing: `draw`
-  --> ru.rlt.rs
+  --> ru.rlf.rs
    |
-   = note: `draw` from trait `RltLang` is not implemented
+   = note: `draw` from trait `RlfLang` is not implemented
 ```
 
 **Workflow:**
@@ -848,20 +848,20 @@ if Ru.is_fallback("draw") {
 
 ## Compile-Time Errors
 
-RLT validates phrase and parameter *names* at compile time within each file.
+RLF validates phrase and parameter *names* at compile time within each file.
 Cross-file validation (missing translations) is enforced via the trait system.
 
 **Unknown phrase:**
 
 ```rust
-rlt_source! {
+rlf_source! {
     draw(n) = "Draw {n} {cards:n}.";  // typo
 }
 ```
 
 ```
 error: unknown phrase 'cards'
-  --> en.rlt.rs:2:28
+  --> en.rlf.rs:2:28
    |
 2  |     draw(n) = "Draw {n} {cards:n}.";
    |                          ^^^^^ not defined
@@ -872,14 +872,14 @@ error: unknown phrase 'cards'
 **Unknown parameter:**
 
 ```rust
-rlt_source! {
+rlf_source! {
     draw(n) = "Draw {count} {card:n}.";  // 'count' not declared
 }
 ```
 
 ```
 error: unknown parameter 'count'
-  --> en.rlt.rs:2:18
+  --> en.rlf.rs:2:18
    |
 2  |     draw(n) = "Draw {count} {card:n}.";
    |                      ^^^^^ not in parameter list
@@ -890,8 +890,8 @@ error: unknown parameter 'count'
 **Missing variant:**
 
 ```rust
-// ru.rlt.rs
-rlt_lang!(Ru) {
+// ru.rlf.rs
+rlf_lang!(Ru) {
     card = {
         one: "карта",
         other: "карт",  // missing 'few'
@@ -901,7 +901,7 @@ rlt_lang!(Ru) {
 
 ```
 error: missing variant 'few' for phrase 'card'
-  --> ru.rlt.rs:2:5
+  --> ru.rlf.rs:2:5
    |
    = note: Russian requires: one, few, many
 ```
@@ -920,8 +920,8 @@ implementation errors.
 
 ## Design Philosophy
 
-**Logic in Rust, text in RLT.** Complex branching stays in Rust; RLT provides
-atomic text pieces. This keeps RLT files simple and translator-friendly.
+**Logic in Rust, text in RLF.** Complex branching stays in Rust; RLF provides
+atomic text pieces. This keeps RLF files simple and translator-friendly.
 
 **Keywords and formatting are just phrases.** No special syntax—define phrases
 with markup (`dissolve = "<k>dissolve</k>";`) and interpolate normally.
@@ -951,9 +951,9 @@ unwieldy, use language-specific transforms to encapsulate complexity.
 
 | Macro          | Purpose                                              |
 | -------------- | ---------------------------------------------------- |
-| `rlt_source!`  | Define source language; generates trait              |
-| `rlt_lang!(X)` | Define translation; generates trait impl             |
+| `rlf_source!`  | Define source language; generates trait              |
+| `rlf_lang!(X)` | Define translation; generates trait impl             |
 
 Four primitives, two macros, Rust-compatible syntax, compile-time name checking,
-runtime error handling via `Result<String, RltError>`, automatic fallback for
+runtime error handling via `Result<String, RlfError>`, automatic fallback for
 incomplete translations during development.

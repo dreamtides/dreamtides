@@ -1,18 +1,18 @@
 # Appendix: Spanish Translation Walkthrough
 
 This appendix provides a comprehensive example of translating `cost_serializer.rs`
-to Spanish using RLT. It demonstrates how to extract all localization concerns
-into RLT files while keeping the serializer code language-agnostic.
+to Spanish using RLF. It demonstrates how to extract all localization concerns
+into RLF files while keeping the serializer code language-agnostic.
 
 ## Overview
 
 The original `cost_serializer.rs` contains ~150 lines of Rust code that produces
 English text for card costs. The goal is to:
 
-1. Extract all English text into `en.rlt.rs` using `rlt_source!`
-2. Create a Spanish translation in `es.rlt.rs` using `rlt_lang!`
+1. Extract all English text into `en.rlf.rs` using `rlf_source!`
+2. Create a Spanish translation in `es.rlf.rs` using `rlf_lang!`
 3. Refactor `cost_serializer.rs` to be language-agnostic, delegating all
-   grammatical decisions to RLT
+   grammatical decisions to RLF
 
 ---
 
@@ -83,8 +83,8 @@ For this serializer:
 
 ### Pass PhraseRef, Not String
 
-The critical insight: **Rust should pass `PhraseRef` values to RLT phrases, not
-pre-rendered strings.** This allows RLT to select the appropriate grammatical form.
+The critical insight: **Rust should pass `PhraseRef` values to RLF phrases, not
+pre-rendered strings.** This allows RLF to select the appropriate grammatical form.
 
 **Wrong approach** (current code):
 ```rust
@@ -106,12 +106,12 @@ lang.abandon_any_number(target)
 // Spanish template can now use gender tag for agreement
 ```
 
-### Let RLT Handle All Grammatical Decisions
+### Let RLF Handle All Grammatical Decisions
 
 The serializer should identify *what* to say (semantic meaning), not *how* to
 say it (grammatical form). Examples:
 
-| Semantic Intent | Rust Calls | RLT Decides |
+| Semantic Intent | Rust Calls | RLF Decides |
 |-----------------|------------|-------------|
 | "one ally" | `lang.abandon_one(target)` | Article, gender agreement |
 | "3 cards" | `lang.abandon_n(3, target)` | Number agreement, word order |
@@ -120,13 +120,13 @@ say it (grammatical form). Examples:
 
 ---
 
-## Part 3: The English RLT File
+## Part 3: The English RLF File
 
 English is simpler—no gender, simple plurals:
 
 ```rust
-// en.rlt.rs
-rlt_source! {
+// en.rlf.rs
+rlf_source! {
     // =========================================================================
     // Basic Types
     // =========================================================================
@@ -209,13 +209,13 @@ rlt_source! {
 
 ---
 
-## Part 4: The Spanish RLT File
+## Part 4: The Spanish RLF File
 
 Spanish uses the same phrase names but different templates with gender agreement:
 
 ```rust
-// es.rlt.rs
-rlt_lang!(Es) {
+// es.rlf.rs
+rlf_lang!(Es) {
     // =========================================================================
     // Basic Types
     //
@@ -324,17 +324,17 @@ rlt_lang!(Es) {
 ## Part 5: Refactored cost_serializer.rs
 
 The refactored serializer passes `PhraseRef` values and delegates all grammatical
-decisions to RLT:
+decisions to RLF:
 
 ```rust
 // cost_serializer.rs
 
 use ability_data::collection_expression::CollectionExpression;
 use ability_data::cost::Cost;
-use crate::localization::{RltLang, PhraseRef};
+use crate::localization::{RlfLang, PhraseRef};
 
 /// Serialize a cost to localized text.
-pub fn serialize_cost(cost: &Cost, lang: &impl RltLang) -> String {
+pub fn serialize_cost(cost: &Cost, lang: &impl RlfLang) -> String {
     match cost {
         Cost::AbandonCharactersCount { target, count } => {
             serialize_abandon(target, count, lang)
@@ -408,8 +408,8 @@ pub fn serialize_cost(cost: &Cost, lang: &impl RltLang) -> String {
 }
 
 /// Convert a predicate to a PhraseRef for use in cost phrases.
-/// This preserves variant information for RLT selection.
-fn predicate_to_phrase(predicate: &Predicate, lang: &impl RltLang) -> PhraseRef {
+/// This preserves variant information for RLF selection.
+fn predicate_to_phrase(predicate: &Predicate, lang: &impl RlfLang) -> PhraseRef {
     match predicate {
         Predicate::Your(CardPredicate::Character) => lang.ally(),
         Predicate::Enemy(CardPredicate::Character) => lang.character(),
@@ -424,7 +424,7 @@ fn predicate_to_phrase(predicate: &Predicate, lang: &impl RltLang) -> PhraseRef 
 fn serialize_abandon(
     target: &Predicate,
     count: &CollectionExpression,
-    lang: &impl RltLang,
+    lang: &impl RlfLang,
 ) -> String {
     let target_phrase = predicate_to_phrase(target, lang);
 
@@ -446,7 +446,7 @@ fn serialize_abandon(
 fn serialize_return_to_hand(
     target: &Predicate,
     count: &CollectionExpression,
-    lang: &impl RltLang,
+    lang: &impl RlfLang,
 ) -> String {
     let target_phrase = predicate_to_phrase(target, lang);
 
@@ -479,7 +479,7 @@ fn serialize_return_to_hand(
 }
 
 /// Serialize a cost used as a trigger cost (may need different phrasing).
-pub fn serialize_trigger_cost(cost: &Cost, lang: &impl RltLang) -> String {
+pub fn serialize_trigger_cost(cost: &Cost, lang: &impl RlfLang) -> String {
     match cost {
         Cost::Energy(_) => format!("pay {}", serialize_cost(cost, lang)),
         _ => serialize_cost(cost, lang),
@@ -496,8 +496,8 @@ pub fn serialize_trigger_cost(cost: &Cost, lang: &impl RltLang) -> String {
 Spanish uses the `@un` transform to add indefinite articles with gender agreement:
 
 ```rust
-// es.rlt.rs
-rlt_lang!(Es) {
+// es.rlf.rs
+rlf_lang!(Es) {
     card = :fem { one: "carta", other: "cartas" };
     ally = :masc { one: "aliado", other: "aliados" };
 
@@ -650,7 +650,7 @@ The refactored serializer is completely language-agnostic. It does NOT:
 - Know how to pluralize words
 - Handle any grammatical agreement
 
-All of these concerns are handled in RLT files.
+All of these concerns are handled in RLF files.
 
 ### Comparison: Old vs New
 
@@ -666,7 +666,7 @@ Problems:
 - Predicate pre-rendered as String, losing gender information
 - Would need entirely different code paths for Spanish
 
-**New approach (RLT):**
+**New approach (RLF):**
 ```rust
 CollectionExpression::Exactly(1) => {
     lang.abandon_one(predicate_to_phrase(target, lang)).to_string()
@@ -684,7 +684,7 @@ Benefits:
 1. **Full control over articles**: Use `@un`/`@el` transforms
 2. **Full control over gender**: Tags on phrases enable automatic agreement
 3. **Full control over word order**: Rearrange phrase templates freely
-4. **No Rust knowledge required**: All work happens in RLT files
+4. **No Rust knowledge required**: All work happens in RLF files
 
 ### For Developers
 
@@ -697,21 +697,21 @@ Benefits:
 
 ## Summary
 
-The key insight: **keep grammatical decisions in RLT, semantic decisions in Rust.**
+The key insight: **keep grammatical decisions in RLF, semantic decisions in Rust.**
 
 | Responsibility | Where |
 |----------------|-------|
 | "What cost type is this?" | Rust |
 | "What predicate should I reference?" | Rust |
-| "What article does this noun need?" | RLT |
-| "What is the plural form?" | RLT |
-| "How does gender agreement work?" | RLT |
-| "What word order sounds natural?" | RLT |
+| "What article does this noun need?" | RLF |
+| "What is the plural form?" | RLF |
+| "How does gender agreement work?" | RLF |
+| "What word order sounds natural?" | RLF |
 
-The cost serializer becomes a simple mapping from cost types to RLT phrase calls.
+The cost serializer becomes a simple mapping from cost types to RLF phrase calls.
 All the linguistic complexity—gender, articles, pluralization, word order—lives
-in the RLT files where translators can control it directly.
+in the RLF files where translators can control it directly.
 
-This approach scales to any language: add a new `.rlt.rs` file with appropriate
+This approach scales to any language: add a new `.rlf.rs` file with appropriate
 tags and phrase templates, and the same Rust serializer produces grammatically
 correct output automatically.

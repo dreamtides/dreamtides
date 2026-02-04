@@ -1,16 +1,16 @@
 # Appendix: Rust Integration
 
-This appendix describes how the `rlt_source!` and `rlt_lang!` macros are
+This appendix describes how the `rlf_source!` and `rlf_lang!` macros are
 implemented, what Rust code they generate, and how errors are reported.
 
 ## Macro Architecture
 
-RLT uses Rust procedural macros to parse `.rlt.rs` files and generate Rust
+RLF uses Rust procedural macros to parse `.rlf.rs` files and generate Rust
 code. There are two macros:
 
-- **`rlt_source!`**: For the source language (typically English). Generates
+- **`rlf_source!`**: For the source language (typically English). Generates
   a trait with default implementations and a unit struct.
-- **`rlt_lang!(Name)`**: For translation languages. Generates a unit struct
+- **`rlf_lang!(Name)`**: For translation languages. Generates a unit struct
   and a trait implementation.
 
 The process has three phases:
@@ -27,8 +27,8 @@ handled by Rust's trait system—missing methods cause compile errors when
 
 ## Phase 1: Parsing
 
-The macro receives tokens from inside the `rlt_source! { ... }` or
-`rlt_lang!(Name) { ... }` block. It parses these into an internal representation:
+The macro receives tokens from inside the `rlf_source! { ... }` or
+`rlf_lang!(Name) { ... }` block. It parses these into an internal representation:
 
 ```rust
 // Internal AST (conceptual)
@@ -128,7 +128,7 @@ Within phrase text, names in `{}` are resolved using these rules:
 name as a phrase. This eliminates ambiguity without requiring special syntax.
 
 ```rust
-rlt_source! {
+rlf_source! {
     card = "card";
 
     // ERROR: parameter 'card' shadows phrase 'card'
@@ -143,7 +143,7 @@ rlt_source! {
 if `n` is in the parameter list, otherwise it's a literal variant name.
 
 ```rust
-rlt_source! {
+rlf_source! {
     card = { one: "card", other: "cards" };
 
     // 'other' is literal (no parameter named 'other')
@@ -174,7 +174,7 @@ phrase's definition. Parameter selectors (`{card:n}`) are validated at runtime.
 ## Phase 3: Code Generation
 
 Based on the validated AST, the macro generates Rust code. The output differs
-between `rlt_source!` and `rlt_lang!`.
+between `rlf_source!` and `rlf_lang!`.
 
 ### The Value Type
 
@@ -211,7 +211,7 @@ pub struct Phrase {
 
 impl Phrase {
     /// Get a specific variant by key, with fallback resolution.
-    pub fn variant(&self, key: &str) -> Result<&str, RltError> {
+    pub fn variant(&self, key: &str) -> Result<&str, RlfError> {
         resolve_variant(&self.variants, key)
     }
 }
@@ -235,7 +235,7 @@ Common types implement `Into<Value>` for convenient calling: integers (`i32`,
 
 ---
 
-## Code Generation: rlt_source!
+## Code Generation: rlf_source!
 
 The source language macro generates two things:
 
@@ -245,8 +245,8 @@ The source language macro generates two things:
 ### Example
 
 ```rust
-// en.rlt.rs
-rlt_source! {
+// en.rlf.rs
+rlf_source! {
     card = { one: "card", other: "cards" };
     draw(n) = "Draw {n} {card:n}.";
 }
@@ -258,7 +258,7 @@ The trait has default implementations for the source language:
 
 ```rust
 #[cfg(not(feature = "strict-i18n"))]
-pub trait RltLang {
+pub trait RlfLang {
     fn card(&self) -> Phrase {
         static VARIANTS: phf::Map<&'static str, &'static str> = phf_map! {
             "one" => "card",
@@ -271,10 +271,10 @@ pub trait RltLang {
         }
     }
 
-    fn draw(&self, n: impl Into<Value>) -> Result<String, RltError> {
+    fn draw(&self, n: impl Into<Value>) -> Result<String, RlfError> {
         let n = n.into();
         let category = plural_category("en", n.as_number().ok_or_else(|| {
-            RltError::InvalidSelector { phrase: "card", selector: n.to_string() }
+            RlfError::InvalidSelector { phrase: "card", selector: n.to_string() }
         })?);
         let card_text = self.card().variant(category)?;
         Ok(format!("Draw {} {}.", n, card_text))
@@ -282,9 +282,9 @@ pub trait RltLang {
 }
 
 #[cfg(feature = "strict-i18n")]
-pub trait RltLang {
+pub trait RlfLang {
     fn card(&self) -> Phrase;
-    fn draw(&self, n: impl Into<Value>) -> Result<String, RltError>;
+    fn draw(&self, n: impl Into<Value>) -> Result<String, RlfError>;
 }
 ```
 
@@ -296,22 +296,22 @@ With `strict-i18n` enabled, missing translations are compile errors.
 ```rust
 pub struct En;
 
-impl RltLang for En {
+impl RlfLang for En {
     // Uses trait defaults (source language implementations)
 }
 ```
 
 ---
 
-## Code Generation: rlt_lang!
+## Code Generation: rlf_lang!
 
 Translation macros generate a unit struct and trait implementation.
 
 ### Example
 
 ```rust
-// ru.rlt.rs
-rlt_lang!(Ru) {
+// ru.rlf.rs
+rlf_lang!(Ru) {
     card = {
         one: "карта",
         few: "карты",
@@ -326,7 +326,7 @@ rlt_lang!(Ru) {
 ```rust
 pub struct Ru;
 
-impl RltLang for Ru {
+impl RlfLang for Ru {
     fn card(&self) -> Phrase {
         static VARIANTS: phf::Map<&'static str, &'static str> = phf_map! {
             "one" => "карта",
@@ -340,10 +340,10 @@ impl RltLang for Ru {
         }
     }
 
-    fn draw(&self, n: impl Into<Value>) -> Result<String, RltError> {
+    fn draw(&self, n: impl Into<Value>) -> Result<String, RlfError> {
         let n = n.into();
         let category = plural_category("ru", n.as_number().ok_or_else(|| {
-            RltError::InvalidSelector { phrase: "card", selector: n.to_string() }
+            RlfError::InvalidSelector { phrase: "card", selector: n.to_string() }
         })?);
         let card_text = self.card().variant(category)?;
         Ok(format!("Возьмите {} {}.", n, card_text))
@@ -356,8 +356,8 @@ impl RltLang for Ru {
 If Russian only defines some phrases:
 
 ```rust
-// ru.rlt.rs
-rlt_lang!(Ru) {
+// ru.rlf.rs
+rlf_lang!(Ru) {
     card = { ... };
     // 'draw' not defined
 }
@@ -366,7 +366,7 @@ rlt_lang!(Ru) {
 Generated code only overrides what's defined:
 
 ```rust
-impl RltLang for Ru {
+impl RlfLang for Ru {
     fn card(&self) -> Phrase { ... }
     // draw() not overridden - uses trait default (English)
 }
@@ -384,17 +384,17 @@ tries exact matches first, then progressively shorter fallback keys. If no match
 is found, it returns an error:
 
 ```rust
-// RLT:
+// RLF:
 card = { nom: "card", nom.other: "cards" };
 draw(n) = "Draw {n} {card:nom:n}.";
 
 // Generated:
-pub fn draw(n: impl Into<Value>) -> Result<String, RltError> {
+pub fn draw(n: impl Into<Value>) -> Result<String, RlfError> {
     let n = n.into();
 
     let category = match n.as_number() {
         Some(num) => plural_category("en", num),  // "one" or "other"
-        None => return Err(RltError::InvalidSelector {
+        None => return Err(RlfError::InvalidSelector {
             phrase: "card",
             selector: n.to_string(),
         }),
@@ -405,7 +405,7 @@ pub fn draw(n: impl Into<Value>) -> Result<String, RltError> {
     Ok(format!("Draw {} {}.", n, card_text))
 }
 
-fn resolve_variant(variants: &[(&str, &str)], key: &str) -> Result<&str, RltError> {
+fn resolve_variant(variants: &[(&str, &str)], key: &str) -> Result<&str, RlfError> {
     // Try exact match: "nom.one"
     if let Some((_, v)) = variants.iter().find(|(k, _)| *k == key) {
         return Ok(v);
@@ -418,7 +418,7 @@ fn resolve_variant(variants: &[(&str, &str)], key: &str) -> Result<&str, RltErro
         }
     }
     // No match found
-    Err(RltError::MissingVariant {
+    Err(RlfError::MissingVariant {
         phrase: "card",
         requested: key.to_string(),
         available: variants.iter().map(|(k, _)| *k).collect(),
@@ -432,12 +432,12 @@ When selecting based on a phrase's tag, the generated code checks for matching
 tags and returns an error if none match:
 
 ```rust
-// RLT:
+// RLF:
 destroyed = { masc: "destruido", fem: "destruida" };
 destroy(target) = "{target} fue {destroyed:target}.";
 
 // Generated:
-pub fn destroy(target: impl Into<Value>) -> Result<String, RltError> {
+pub fn destroy(target: impl Into<Value>) -> Result<String, RlfError> {
     let target = target.into();
 
     let destroyed_text = if target.has_tag("fem") {
@@ -445,7 +445,7 @@ pub fn destroy(target: impl Into<Value>) -> Result<String, RltError> {
     } else if target.has_tag("masc") {
         "destruido"
     } else {
-        return Err(RltError::MissingRequiredTag {
+        return Err(RlfError::MissingRequiredTag {
             operation: "destroyed",
             expected_tags: &["masc", "fem"],
             value: target.to_string(),
@@ -463,18 +463,18 @@ pub fn destroy(target: impl Into<Value>) -> Result<String, RltError> {
 Transforms are compiled to runtime function calls:
 
 ```rust
-// RLT:
+// RLF:
 card = :a "card";
 draw_one = "Draw {@a card}.";
 
 // Generated:
-pub fn draw_one() -> Result<String, RltError> {
+pub fn draw_one() -> Result<String, RlfError> {
     let card = card();
     let card_with_article = transform_a_en(card.into())?;
     Ok(format!("Draw {}.", card_with_article))
 }
 
-fn transform_a_en(value: Value) -> Result<String, RltError> {
+fn transform_a_en(value: Value) -> Result<String, RlfError> {
     let text = value.to_string();
 
     // Check for explicit tag - required for @a transform
@@ -486,7 +486,7 @@ fn transform_a_en(value: Value) -> Result<String, RltError> {
     }
 
     // No heuristics - missing tag is an error
-    Err(RltError::MissingRequiredTag {
+    Err(RlfError::MissingRequiredTag {
         operation: "@a",
         expected_tags: &["a", "an"],
         value: text,
@@ -513,11 +513,11 @@ static DE_TRANSFORM_ALIASES: &[(&str, &str)] = &[
 During code generation, aliases are replaced with their primary transform:
 
 ```rust
-// RLT:
+// RLF:
 play_event = "Play {@an event}.";
 
 // After alias resolution (generated code):
-pub fn play_event() -> Result<String, RltError> {
+pub fn play_event() -> Result<String, RlfError> {
     let event = event();
     let event_with_article = transform_a_en(event.into())?;  // @an → @a
     Ok(format!("Play {}.", event_with_article))
@@ -528,7 +528,7 @@ pub fn play_event() -> Result<String, RltError> {
 
 ## Error Handling
 
-RLT reports errors as Rust compile-time errors with precise source locations.
+RLF reports errors as Rust compile-time errors with precise source locations.
 
 ### Error Categories
 
@@ -536,7 +536,7 @@ RLT reports errors as Rust compile-time errors with precise source locations.
 
 ```
 error: expected '=' after phrase name
-  --> en.rlt.rs:3:10
+  --> en.rlf.rs:3:10
    |
 3  |     hello "world";
    |          ^ expected '='
@@ -546,7 +546,7 @@ error: expected '=' after phrase name
 
 ```
 error: unknown phrase 'cards'
-  --> en.rlt.rs:5:28
+  --> en.rlf.rs:5:28
    |
 5  |     draw(n) = "Draw {n} {cards:n}.";
    |                          ^^^^^ not defined
@@ -558,7 +558,7 @@ error: unknown phrase 'cards'
 
 ```
 error: unknown parameter 'count'
-  --> en.rlt.rs:2:18
+  --> en.rlf.rs:2:18
    |
 2  |     draw(n) = "Draw {count} cards.";
    |                      ^^^^^ not in parameter list
@@ -570,7 +570,7 @@ error: unknown parameter 'count'
 
 ```
 error: phrase 'card' has no variant 'accusative'
-  --> en.rlt.rs:5:22
+  --> en.rlf.rs:5:22
    |
 5  |     take = "{card:accusative}";
    |                  ^^^^^^^^^^^ variant not defined
@@ -581,7 +581,7 @@ error: phrase 'card' has no variant 'accusative'
 ### Span Preservation
 
 The macro preserves source spans through parsing so errors point to the exact
-location in the `.rlt.rs` file:
+location in the `.rlf.rs` file:
 
 ```rust
 struct Identifier {
@@ -607,28 +607,28 @@ fn suggest_similar(name: &str, candidates: &[&str]) -> Option<&str> {
 
 ## Macro File Discovery
 
-The `rlt_lang!` macro needs to know which trait to implement. This is handled
+The `rlf_lang!` macro needs to know which trait to implement. This is handled
 through Rust's module system, not cross-file macro communication:
 
-1. **Source file generates trait**: `rlt_source!` in `en.rlt.rs` generates a
-   `pub trait RltLang`.
+1. **Source file generates trait**: `rlf_source!` in `en.rlf.rs` generates a
+   `pub trait RlfLang`.
 
 2. **Translation files import trait**: Each translation file must import the
-   trait via `use crate::localization::RltLang;` (or similar path).
+   trait via `use crate::localization::RlfLang;` (or similar path).
 
-3. **Macro uses imported trait**: `rlt_lang!(Ru)` generates `impl RltLang for Ru`,
-   where `RltLang` refers to whatever trait is in scope.
+3. **Macro uses imported trait**: `rlf_lang!(Ru)` generates `impl RlfLang for Ru`,
+   where `RlfLang` refers to whatever trait is in scope.
 
 This design requires no special cross-file communication. The trait name
-`RltLang` is conventional; if you rename it, translation macros still work
+`RlfLang` is conventional; if you rename it, translation macros still work
 because they implement whatever trait is imported.
 
 ```rust
 // mod.rs
-mod en;  // Contains rlt_source! → generates RltLang trait + En struct
-mod ru;  // Contains rlt_lang!(Ru) → implements RltLang for Ru
+mod en;  // Contains rlf_source! → generates RlfLang trait + En struct
+mod ru;  // Contains rlf_lang!(Ru) → implements RlfLang for Ru
 
-pub use en::{En, RltLang};
+pub use en::{En, RlfLang};
 pub use ru::Ru;
 ```
 
@@ -636,13 +636,13 @@ pub use ru::Ru;
 
 ## Cross-Language Validation
 
-RLT validates cross-language consistency via Rust's trait system, not via
+RLF validates cross-language consistency via Rust's trait system, not via
 macro introspection.
 
 ### How It Works
 
-1. `rlt_source!` generates a trait with all phrase methods
-2. `rlt_lang!` generates an `impl` block for that trait
+1. `rlf_source!` generates a trait with all phrase methods
+2. `rlf_lang!` generates an `impl` block for that trait
 3. If a translation is missing a phrase, the impl is incomplete
 
 ### With strict-i18n Disabled (Development)
@@ -651,13 +651,13 @@ The trait has default implementations, so missing phrases compile fine:
 
 ```rust
 // Generated trait (strict-i18n disabled)
-pub trait RltLang {
+pub trait RlfLang {
     fn card(&self) -> Phrase { ... }  // default (English)
-    fn draw(&self, n: impl Into<Value>) -> Result<String, RltError> { ... }  // default
+    fn draw(&self, n: impl Into<Value>) -> Result<String, RlfError> { ... }  // default
 }
 
 // Russian impl - only overrides card()
-impl RltLang for Ru {
+impl RlfLang for Ru {
     fn card(&self) -> Phrase { ... }
     // draw() uses trait default (English)
 }
@@ -669,13 +669,13 @@ The trait has no defaults, so missing phrases are compile errors:
 
 ```rust
 // Generated trait (strict-i18n enabled)
-pub trait RltLang {
+pub trait RlfLang {
     fn card(&self) -> Phrase;  // no default
-    fn draw(&self, n: impl Into<Value>) -> Result<String, RltError>;  // no default
+    fn draw(&self, n: impl Into<Value>) -> Result<String, RlfError>;  // no default
 }
 
 // Russian impl - missing draw() is an error
-impl RltLang for Ru {
+impl RlfLang for Ru {
     fn card(&self) -> Phrase { ... }
     // ERROR: method `draw` not implemented
 }
@@ -685,9 +685,9 @@ Error message:
 
 ```
 error[E0046]: not all trait items implemented, missing: `draw`
-  --> src/localization/ru.rlt.rs:1:1
+  --> src/localization/ru.rlf.rs:1:1
    |
-   = note: `draw` from trait `RltLang` is not implemented
+   = note: `draw` from trait `RlfLang` is not implemented
 ```
 
 ### Parameter Count Validation
@@ -695,13 +695,13 @@ error[E0046]: not all trait items implemented, missing: `draw`
 If a translation has wrong parameters, it won't match the trait signature:
 
 ```rust
-// en.rlt.rs
-rlt_source! {
+// en.rlf.rs
+rlf_source! {
     greet(name) = "Hello, {name}!";
 }
 
-// ru.rlt.rs
-rlt_lang!(Ru) {
+// ru.rlf.rs
+rlf_lang!(Ru) {
     greet(name, title) = "Привет, {title} {name}!";  // ERROR: wrong signature
 }
 ```
@@ -715,7 +715,7 @@ but the trait expects `fn greet(&self, name: impl Into<Value>)`, causing a type 
 
 ### ICU4X Dependencies
 
-RLT uses crates from the [ICU4X](https://github.com/unicode-org/icu4x) project for
+RLF uses crates from the [ICU4X](https://github.com/unicode-org/icu4x) project for
 Unicode-compliant internationalization:
 
 ```toml
@@ -731,7 +731,7 @@ icu_locale_core = "2"
 
 ### CLDR Plural Rules
 
-RLT uses `icu_plurals` for plural category selection:
+RLF uses `icu_plurals` for plural category selection:
 
 ```rust
 use icu_plurals::{PluralCategory, PluralRuleType, PluralRules};
@@ -809,7 +809,7 @@ Each language has its transform implementations:
 
 ```rust
 // English @a transform
-fn transform_a_en(value: Value) -> Result<String, RltError> {
+fn transform_a_en(value: Value) -> Result<String, RlfError> {
     let text = value.to_string();
 
     if value.has_tag("an") {
@@ -817,7 +817,7 @@ fn transform_a_en(value: Value) -> Result<String, RltError> {
     } else if value.has_tag("a") {
         Ok(format!("a {}", text))
     } else {
-        Err(RltError::MissingRequiredTag {
+        Err(RlfError::MissingRequiredTag {
             operation: "@a",
             expected_tags: &["a", "an"],
             value: text,
@@ -826,8 +826,8 @@ fn transform_a_en(value: Value) -> Result<String, RltError> {
 }
 
 // Chinese @count transform - context is the number, phrase has measure word tag
-fn transform_count_zh_cn(context: Value, phrase: Value) -> Result<String, RltError> {
-    let num = context.as_number().ok_or_else(|| RltError::InvalidSelector {
+fn transform_count_zh_cn(context: Value, phrase: Value) -> Result<String, RlfError> {
+    let num = context.as_number().ok_or_else(|| RlfError::InvalidSelector {
         phrase: "@count context",
         selector: context.to_string(),
     })?;
@@ -840,7 +840,7 @@ fn transform_count_zh_cn(context: Value, phrase: Value) -> Result<String, RltErr
     } else if phrase.has_tag("ming") {
         "名"
     } else {
-        return Err(RltError::MissingRequiredTag {
+        return Err(RlfError::MissingRequiredTag {
             operation: "@count",
             expected_tags: &["zhang", "ge", "ming"],
             value: text,
@@ -858,7 +858,7 @@ fn transform_count_zh_cn(context: Value, phrase: Value) -> Result<String, RltErr
 Selection and transforms produce errors when required variants or tags are missing:
 
 ```rust
-pub enum RltError {
+pub enum RlfError {
     /// Variant selection failed - no matching variant found
     MissingVariant {
         phrase: &'static str,
@@ -885,7 +885,7 @@ pub enum RltError {
 
 Missing variant error:
 ```
-RLT error: phrase 'card' has no variant matching 'nom.few'
+RLF error: phrase 'card' has no variant matching 'nom.few'
   Available variants: nom.one, nom.other
 
 Hint: Add the missing variant to the phrase definition, or check that
@@ -894,7 +894,7 @@ the selector value is correct.
 
 Transform error:
 ```
-RLT error: transform '@a' requires tag [:a, :an] but "uniform" has none
+RLF error: transform '@a' requires tag [:a, :an] but "uniform" has none
 
 Hint: Add a tag to the phrase definition:
     uniform = :a "uniform";
@@ -902,7 +902,7 @@ Hint: Add a tag to the phrase definition:
 
 Tag-based selection error:
 ```
-RLT error: selection for 'destroyed' requires tag [:masc, :fem] but "sword" has none
+RLF error: selection for 'destroyed' requires tag [:masc, :fem] but "sword" has none
 
 Hint: Pass a phrase with the required tag:
     sword = :fem "sword";
@@ -910,7 +910,7 @@ Hint: Pass a phrase with the required tag:
 
 Invalid selector error:
 ```
-RLT error: cannot use "hello" as plural selector for 'card' (expected number)
+RLF error: cannot use "hello" as plural selector for 'card' (expected number)
 ```
 
 ---
@@ -937,7 +937,7 @@ static CARD_VARIANTS: &[(&str, &str)] = &[
 
 ### Minimal External Dependencies
 
-RLT depends on ICU4X for CLDR plural rules. ICU4X compiles locale data into the
+RLF depends on ICU4X for CLDR plural rules. ICU4X compiles locale data into the
 binary by default—no runtime data file loading required. The `icu_plurals` crate
 adds approximately 100KB to the binary with all locales included, or less with
 locale subsetting via the `icu4x-datagen` tool.
@@ -946,7 +946,7 @@ locale subsetting via the `icu4x-datagen` tool.
 
 ## IDE Support
 
-Because RLT uses proc-macros, rust-analyzer provides immediate feedback:
+Because RLF uses proc-macros, rust-analyzer provides immediate feedback:
 autocomplete for phrase functions, go-to-definition on phrase calls (navigates
 to the macro invocation), and inline error highlighting for syntax errors and
 undefined references.
@@ -955,11 +955,11 @@ undefined references.
 
 ## Summary
 
-| Component | rlt_source! | rlt_lang!(Name) |
+| Component | rlf_source! | rlf_lang!(Name) |
 |-----------|-------------|-----------------|
 | Struct | `pub struct En;` | `pub struct Name;` |
-| Trait | `pub trait RltLang { ... }` | (uses existing trait) |
-| Impl | `impl RltLang for En { ... }` | `impl RltLang for Name { ... }` |
+| Trait | `pub trait RlfLang { ... }` | (uses existing trait) |
+| Impl | `impl RlfLang for En { ... }` | `impl RlfLang for Name { ... }` |
 
 | Feature | Development | CI (strict-i18n) |
 |---------|-------------|------------------|

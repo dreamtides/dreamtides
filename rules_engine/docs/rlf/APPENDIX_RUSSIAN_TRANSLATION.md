@@ -1,7 +1,7 @@
 # Appendix: Russian Translation Walkthrough
 
 This appendix provides a comprehensive example of translating `predicate_serializer.rs`
-to Russian using RLT. It demonstrates how to keep language-specific text in RLT files
+to Russian using RLF. It demonstrates how to keep language-specific text in RLF files
 while giving translators control over grammatical forms and word order.
 
 ## Overview
@@ -9,10 +9,10 @@ while giving translators control over grammatical forms and word order.
 The original `predicate_serializer.rs` contains ~800 lines of Rust code that produces
 English text for card predicates. The goal is to:
 
-1. Extract all English text into `en.rlt.rs` using `rlt_source!`
-2. Create a Russian translation in `ru.rlt.rs` using `rlt_lang!`
+1. Extract all English text into `en.rlf.rs` using `rlf_source!`
+2. Create a Russian translation in `ru.rlf.rs` using `rlf_lang!`
 3. Refactor `predicate_serializer.rs` to pass `PhraseRef` values instead of
-   pre-rendered strings, allowing RLT to control grammatical selection
+   pre-rendered strings, allowing RLF to control grammatical selection
 
 ---
 
@@ -80,8 +80,8 @@ For this serializer, we primarily need:
 
 ### Pass PhraseRef, Not String
 
-The critical insight: **Rust should pass `PhraseRef` values to RLT phrases, not
-pre-rendered strings.** This allows RLT to select the appropriate grammatical form.
+The critical insight: **Rust should pass `PhraseRef` values to RLF phrases, not
+pre-rendered strings.** This allows RLF to select the appropriate grammatical form.
 
 **Wrong approach** (strips variant information):
 ```rust
@@ -90,7 +90,7 @@ let counting = serialize_card_predicate_plural(count_matching, lang);
 // counting = "characters" (String) — no variant table!
 
 lang.with_cost_less_than_allied(base, counting)
-// RLT receives a String, cannot select {counting:gen.many}
+// RLF receives a String, cannot select {counting:gen.many}
 ```
 
 **Correct approach** (preserves variants):
@@ -100,17 +100,17 @@ let counting = lang.character();
 // counting = PhraseRef { variants: [("nom.one", "персонаж"), ("gen.many", "персонажей"), ...] }
 
 lang.with_cost_less_than_allied(base, counting)
-// RLT can now select {counting:gen.many} → "персонажей"
+// RLF can now select {counting:gen.many} → "персонажей"
 ```
 
 ### Selection Handles Everything
 
-RLT's existing selection mechanism (`:`) handles case and number selection on phrase
+RLF's existing selection mechanism (`:`) handles case and number selection on phrase
 parameters. No new transforms are needed:
 
 ```rust
-// ru.rlt.rs
-rlt_lang!(Ru) {
+// ru.rlf.rs
+rlf_lang!(Ru) {
     with_cost_less_than_allied(base, counting) =
         "{base:nom.one} со стоимостью меньше количества союзных {counting:gen.many}";
 }
@@ -120,14 +120,14 @@ The `:gen.many` selector extracts that variant from the `counting` PhraseRef.
 
 ---
 
-## Part 3: The English RLT File
+## Part 3: The English RLF File
 
 English is simpler—no case, simple plurals. Each language's templates use
 selectors appropriate for that language, so English just needs `one`/`other`:
 
 ```rust
-// en.rlt.rs
-rlt_source! {
+// en.rlf.rs
+rlf_source! {
     // =========================================================================
     // Basic Card Types
     // =========================================================================
@@ -254,7 +254,7 @@ rlt_source! {
 
 ---
 
-## Part 4: The Russian RLT File
+## Part 4: The Russian RLF File
 
 Russian uses the same phrase names but different variant selections. The translator
 has full control over:
@@ -263,8 +263,8 @@ has full control over:
 - How modifiers agree with their nouns
 
 ```rust
-// ru.rlt.rs
-rlt_lang!(Ru) {
+// ru.rlf.rs
+rlf_lang!(Ru) {
     // =========================================================================
     // Basic Card Types
     //
@@ -562,27 +562,27 @@ rlt_lang!(Ru) {
 ## Part 5: The Refactored predicate_serializer.rs
 
 The refactored serializer passes `PhraseRef` values instead of pre-rendered strings.
-This allows RLT to select the appropriate grammatical form.
+This allows RLF to select the appropriate grammatical form.
 
 ### Key Changes from Original
 
 1. **Return `PhraseRef` instead of `String` for base types**
-2. **Let RLT phrases do selection, not Rust functions**
+2. **Let RLF phrases do selection, not Rust functions**
 3. **Remove separate `_singular` and `_plural` serialization functions**
 4. **Call semantic phrases directly for simple references** — Rust calls `lang.an_ally()`,
    not `lang.with_article(lang.ally())`. Each language decides its own presentation.
-5. **Pass `PhraseRef` to compositional phrases for constraint patterns** — allows RLT
+5. **Pass `PhraseRef` to compositional phrases for constraint patterns** — allows RLF
    to select appropriate grammatical forms
 
 ```rust
 // predicate_serializer.rs
 
 use ability_data::predicate::{CardPredicate, Predicate};
-use crate::localization::{RltLang, PhraseRef};
+use crate::localization::{RlfLang, PhraseRef};
 
 /// Get the base phrase for a card type.
-/// Returns PhraseRef so RLT can select the appropriate case/number.
-fn card_type_phrase(lang: &impl RltLang, card_predicate: &CardPredicate) -> PhraseRef {
+/// Returns PhraseRef so RLF can select the appropriate case/number.
+fn card_type_phrase(lang: &impl RlfLang, card_predicate: &CardPredicate) -> PhraseRef {
     match card_predicate {
         CardPredicate::Card => lang.card(),
         CardPredicate::Character => lang.character(),
@@ -596,7 +596,7 @@ enum Ownership { Your, Enemy }
 
 /// Get the ownership-qualified phrase for compositional use.
 /// Returns PhraseRef for use in constraint phrases that need to select variants.
-fn ownership_phrase(lang: &impl RltLang, ownership: Ownership, card_predicate: &CardPredicate) -> PhraseRef {
+fn ownership_phrase(lang: &impl RlfLang, ownership: Ownership, card_predicate: &CardPredicate) -> PhraseRef {
     match (ownership, card_predicate) {
         (Ownership::Your, CardPredicate::Character) => lang.ally(),
         (Ownership::Your, CardPredicate::Card) => lang.your_card(),
@@ -609,7 +609,7 @@ fn ownership_phrase(lang: &impl RltLang, ownership: Ownership, card_predicate: &
 }
 
 /// Serialize a predicate to localized text.
-pub fn serialize_predicate(lang: &impl RltLang, predicate: &Predicate) -> String {
+pub fn serialize_predicate(lang: &impl RlfLang, predicate: &Predicate) -> String {
     match predicate {
         // Simple references
         Predicate::This => lang.this_character().to_string(),
@@ -617,7 +617,7 @@ pub fn serialize_predicate(lang: &impl RltLang, predicate: &Predicate) -> String
         Predicate::Them => lang.them().to_string(),
         Predicate::It => lang.it().to_string(),
 
-        // Ownership predicates: Rust identifies semantic context, RLT handles presentation
+        // Ownership predicates: Rust identifies semantic context, RLF handles presentation
         Predicate::Your(card_predicate) => {
             serialize_owned_predicate(lang, card_predicate, Ownership::Your)
         }
@@ -652,13 +652,13 @@ pub fn serialize_predicate(lang: &impl RltLang, predicate: &Predicate) -> String
 
 /// Serialize an owned predicate (your/enemy) with its constraints.
 fn serialize_owned_predicate(
-    lang: &impl RltLang,
+    lang: &impl RlfLang,
     card_predicate: &CardPredicate,
     ownership: Ownership,
 ) -> String {
     match card_predicate {
         // Simple types: call semantic phrase directly
-        // RLT decides presentation (articles, case, etc.)
+        // RLF decides presentation (articles, case, etc.)
         CardPredicate::Character => match ownership {
             Ownership::Your => lang.an_ally().to_string(),
             Ownership::Enemy => lang.an_enemy().to_string(),
@@ -699,7 +699,7 @@ fn serialize_owned_predicate(
         }
 
         // Cost compared to allied count
-        // KEY: We pass PhraseRef for 'counting', RLT selects gen.many
+        // KEY: We pass PhraseRef for 'counting', RLF selects gen.many
         CardPredicate::CharacterWithCostComparedToControlled {
             target,
             count_matching,
@@ -734,7 +734,7 @@ fn serialize_owned_predicate(
 }
 
 /// Serialize "any" predicates (no ownership qualifier).
-fn serialize_any_predicate(lang: &impl RltLang, card_predicate: &CardPredicate) -> String {
+fn serialize_any_predicate(lang: &impl RlfLang, card_predicate: &CardPredicate) -> String {
     match card_predicate {
         // Simple types: call semantic phrase directly
         CardPredicate::Card => lang.a_card().to_string(),
@@ -753,7 +753,7 @@ fn serialize_any_predicate(lang: &impl RltLang, card_predicate: &CardPredicate) 
 }
 
 /// Serialize for "for each" contexts.
-pub fn serialize_for_each_predicate(lang: &impl RltLang, predicate: &Predicate) -> String {
+pub fn serialize_for_each_predicate(lang: &impl RlfLang, predicate: &Predicate) -> String {
     let base = match predicate {
         Predicate::Your(CardPredicate::Character) => lang.ally(),
         Predicate::Enemy(CardPredicate::Character) => lang.enemy(),
@@ -763,7 +763,7 @@ pub fn serialize_for_each_predicate(lang: &impl RltLang, predicate: &Predicate) 
     lang.for_each(base).to_string()
 }
 
-fn serialize_operator(lang: &impl RltLang, operator: &CostOperator) -> String {
+fn serialize_operator(lang: &impl RlfLang, operator: &CostOperator) -> String {
     match operator {
         CostOperator::LessOrEqual => lang.or_less().to_string(),
         CostOperator::GreaterOrEqual => lang.or_more().to_string(),
@@ -810,8 +810,8 @@ The same Rust code produces grammatically correct output in both languages becau
 For modifiers like "another" that must agree with noun gender:
 
 ```rust
-// ru.rlt.rs
-rlt_lang!(Ru) {
+// ru.rlf.rs
+rlf_lang!(Ru) {
     another_adj = {
         masc: "другой",
         fem: "другая",
@@ -840,7 +840,7 @@ When `entity` is `character` (tagged `:masc`):
 1. **Full control over grammatical forms**: Select any case/number variant
 2. **Flexible word order**: Rearrange phrase templates as needed
 3. **Gender agreement**: Tag-based selection handles adjective agreement
-4. **No Rust knowledge required**: All linguistic decisions in RLT files
+4. **No Rust knowledge required**: All linguistic decisions in RLF files
 
 ### For Developers
 
@@ -857,11 +857,11 @@ When `entity` is `character` (tagged `:masc`):
 |--------|--------------|--------------|
 | Rust returns | `String` (pre-rendered) | `PhraseRef` (with variants) |
 | Simple references | `with_article(ally)` | `an_ally()` |
-| Case selection | Rust function choice | RLT `:case.number` selector |
+| Case selection | Rust function choice | RLF `:case.number` selector |
 | Phrase count | O(base × ownership × number) | O(base + ownership) |
 | Translator control | Limited to text | Full grammatical control |
 | Gender agreement | Separate phrases | Tag-based selection |
-| Article decisions | Rust code | RLT phrases |
+| Article decisions | Rust code | RLF phrases |
 
 ---
 
@@ -871,20 +871,20 @@ Two key insights drive this design:
 
 **1. Pass `PhraseRef`, not `String`.** Pre-rendering to `String` strips variant
 information. By passing `PhraseRef` values through the system, variants are
-preserved until the final RLT phrase renders them.
+preserved until the final RLF phrase renders them.
 
 **2. Call semantic phrases, not presentation helpers.** Rust should call
 `lang.an_ally()` (semantic: "I need an ally reference"), not
 `lang.with_article(lang.ally())` (presentational: "add an article to this").
-Linguistic decisions—articles, case, word order—belong in RLT, not Rust.
+Linguistic decisions—articles, case, word order—belong in RLF, not Rust.
 
 The result:
 
 1. **Translators choose** which grammatical forms to use via `:` selectors
 2. **Gender agreement** works via tag-based selection on phrase parameters
 3. **Word order** is fully controlled by the translator's phrase templates
-4. **Rust remains language-agnostic** — it identifies semantic contexts, RLT
+4. **Rust remains language-agnostic** — it identifies semantic contexts, RLF
    handles all presentation
 
 This approach keeps semantic logic in Rust (which predicate type? what constraints?)
-while putting grammatical logic in RLT (which case? which number? what word order?).
+while putting grammatical logic in RLF (which case? which number? what word order?).

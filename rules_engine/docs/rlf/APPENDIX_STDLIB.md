@@ -1,10 +1,10 @@
-# Appendix: RLT Standard Library
+# Appendix: RLF Standard Library
 
-This appendix documents the standard transforms and metadata tags provided by RLT for the world's most widely-spoken languages.
+This appendix documents the standard transforms and metadata tags provided by RLF for the world's most widely-spoken languages.
 
 ## Overview
 
-RLT provides three categories of transforms:
+RLF provides three categories of transforms:
 
 1. **Universal transforms**: Work on any text in any language
 2. **Language-family transforms**: Shared across related languages
@@ -45,8 +45,8 @@ These transforms work identically in all languages:
 **Plural categories**: `one`, `other`
 
 ```rust
-// en.rlt.rs
-rlt_source! {
+// en.rlf.rs
+rlf_source! {
     card = :a { one: "card", other: "cards" };
     event = :an { one: "event", other: "events" };
     ally = :an { one: "ally", other: "allies" };
@@ -84,8 +84,8 @@ rlt_source! {
 **Plural categories**: `other` (no plural distinction)
 
 ```rust
-// zh_cn.rlt.rs
-rlt_lang!(ZhCn) {
+// zh_cn.rlf.rs
+rlf_lang!(ZhCn) {
     pai = :zhang "牌";
     jue_se = :ge "角色";
     wan_jia = :ming "玩家";
@@ -111,8 +111,8 @@ rlt_lang!(ZhCn) {
 **Plural categories**: `one`, `other`
 
 ```rust
-// hi.rlt.rs
-rlt_lang!(Hi) {
+// hi.rlf.rs
+rlf_lang!(Hi) {
     card = :masc {
         dir: "कार्ड",
         obl: "कार्ड",
@@ -150,8 +150,8 @@ Use context selector for plural forms: `@el:other` → los/las, `@un:other` → 
 **Plural categories**: `one`, `other`
 
 ```rust
-// es.rlt.rs
-rlt_lang!(Es) {
+// es.rlf.rs
+rlf_lang!(Es) {
     card = :fem { one: "carta", other: "cartas" };
     enemy = :masc { one: "enemigo", other: "enemigos" };
 
@@ -188,8 +188,8 @@ rlt_lang!(Es) {
 **Plural categories**: `one`, `other`
 
 ```rust
-// fr.rlt.rs
-rlt_lang!(Fr) {
+// fr.rlf.rs
+rlf_lang!(Fr) {
     card = :fem "carte";
     enemy = :masc :vowel "ennemi";
     friend = :masc :vowel "ami";
@@ -225,8 +225,8 @@ rlt_lang!(Fr) {
 **Plural categories**: `zero`, `one`, `two`, `few`, `many`, `other`
 
 ```rust
-// ar.rlt.rs
-rlt_lang!(Ar) {
+// ar.rlf.rs
+rlf_lang!(Ar) {
     card = :fem :moon {
         one: "بطاقة",
         two: "بطاقتان",
@@ -281,8 +281,8 @@ rlt_lang!(Ar) {
 **Plural categories**: `one`, `other`
 
 ```rust
-// pt_br.rlt.rs
-rlt_lang!(PtBr) {
+// pt_br.rlf.rs
+rlf_lang!(PtBr) {
     card = :fem "carta";
     enemy = :masc "inimigo";
     void = :masc "vazio";
@@ -314,8 +314,8 @@ rlt_lang!(PtBr) {
 **Case variants**: `nom`, `acc`, `gen`, `dat`, `ins`, `prep`
 
 ```rust
-// ru.rlt.rs
-rlt_lang!(Ru) {
+// ru.rlf.rs
+rlf_lang!(Ru) {
     card = :fem :inan {
         nom: "карта",
         nom.many: "карт",
@@ -363,8 +363,8 @@ rlt_lang!(Ru) {
 **Plural categories**: `other` (no plural distinction)
 
 ```rust
-// ja.rlt.rs
-rlt_lang!(Ja) {
+// ja.rlf.rs
+rlf_lang!(Ja) {
     card = :mai "カード";
     character = :nin "キャラクター";
 
@@ -396,8 +396,8 @@ rlt_lang!(Ja) {
 **Case variants**: `nom`, `acc`, `dat`, `gen`
 
 ```rust
-// de.rlt.rs
-rlt_lang!(De) {
+// de.rlf.rs
+rlf_lang!(De) {
     karte = :fem {
         nom, acc, dat, gen: "Karte",
         nom.other, acc.other, dat.other, gen.other: "Karten",
@@ -445,8 +445,8 @@ The `@particle` transform inspects the final sound of the preceding word. See
 **Plural categories**: `other` (no plural distinction)
 
 ```rust
-// ko.rlt.rs
-rlt_lang!(Ko) {
+// ko.rlf.rs
+rlf_lang!(Ko) {
     card = :jang "카드";
     character = :myeong "캐릭터";
 
@@ -500,8 +500,8 @@ Transforms** section for details.
 **Plural categories**: `one`, `other`
 
 ```rust
-// tr.rlt.rs
-rlt_lang!(Tr) {
+// tr.rlf.rs
+rlf_lang!(Tr) {
     ev = :back "ev";
     göz = :front "göz";
 
@@ -535,8 +535,8 @@ rlt_lang!(Tr) {
 **Plural categories**: `one`, `other`
 
 ```rust
-// it.rlt.rs
-rlt_lang!(It) {
+// it.rlf.rs
+rlf_lang!(It) {
     card = :fem "carta";
     student = :masc :s_imp "studente";
     friend = :masc :vowel "amico";
@@ -566,8 +566,8 @@ rlt_lang!(It) {
 **Case variants**: `nom`, `acc`, `gen`, `dat`, `ins`, `loc`, `voc`
 
 ```rust
-// pl.rlt.rs
-rlt_lang!(Pl) {
+// pl.rlf.rs
+rlf_lang!(Pl) {
     card = :fem {
         nom: "karta",
         nom.many: "kart",
@@ -620,8 +620,8 @@ rlt_lang!(Pl) {
 **Plural categories**: `one`, `other`
 
 ```rust
-// nl.rlt.rs
-rlt_lang!(Nl) {
+// nl.rlf.rs
+rlf_lang!(Nl) {
     card = :de "kaart";
     character = :het "karakter";
 
@@ -667,8 +667,8 @@ rlt_lang!(Nl) {
 **Plural categories**: `other` (context-dependent)
 
 ```rust
-// id.rlt.rs
-rlt_lang!(Id) {
+// id.rlf.rs
+rlf_lang!(Id) {
     card = "kartu";
 
     all_cards = "semua {@plural card}";  // → "semua kartu-kartu"
@@ -694,8 +694,8 @@ rlt_lang!(Id) {
 **Plural categories**: `one`, `other`
 
 ```rust
-// fa.rlt.rs
-rlt_lang!(Fa) {
+// fa.rlf.rs
+rlf_lang!(Fa) {
     card = "کارت";
     hand = :vowel "دست";
 
@@ -724,8 +724,8 @@ rlt_lang!(Fa) {
 **Plural categories**: `one`, `few`, `other`
 
 ```rust
-// ro.rlt.rs
-rlt_lang!(Ro) {
+// ro.rlf.rs
+rlf_lang!(Ro) {
     card = :fem "carte";
 
     the_card = "{@def card}";  // → "cartea"
@@ -812,8 +812,8 @@ the final Unicode grapheme cluster (not byte or code point) to determine vowel
 vs. consonant ending. This handles composed Hangul syllables correctly.
 
 ```rust
-// ko.rlt.rs
-rlt_lang!(Ko) {
+// ko.rlf.rs
+rlf_lang!(Ko) {
     apple = "사과";   // ends in vowel (과 = gwa)
     book = "책";      // ends in consonant (책 = chaek)
 
@@ -843,8 +843,8 @@ form depends on vowel harmony with what precedes it. A single transform handles
 the full chain.
 
 ```rust
-// tr.rlt.rs
-rlt_lang!(Tr) {
+// tr.rlf.rs
+rlf_lang!(Tr) {
     ev = :back "ev";           // house (back vowel)
     göz = :front "göz";        // eye (front vowel)
 
@@ -889,8 +889,8 @@ transform selects between standard and prevocalic forms based on the following
 word's `:vowel` tag.
 
 ```rust
-// fr.rlt.rs
-rlt_lang!(Fr) {
+// fr.rlf.rs
+rlf_lang!(Fr) {
     ami = :masc :vowel "ami";
     livre = :masc "livre";
 
