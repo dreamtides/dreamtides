@@ -18,6 +18,7 @@ use fluent::{FluentArgs, fluent_args};
 use masonry::dimension::{FlexInsets, SafeAreaInsets};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
 use masonry::flex_style::FlexStyle;
+use strings::phrases;
 use tabula_data::fluent_loader::StringContext;
 use tabula_generated::string_id::StringId;
 use ui_components::box_component::{BoxComponent, BoxComponentBuilder, Named};
@@ -189,7 +190,7 @@ fn primary_action_button(
 
     if legal_actions.contains(BattleAction::SubmitVoidCardTargets, ForPlayer::Human) {
         Some(ButtonView {
-            label: builder.string(StringId::PrimaryButtonSubmitVoidCardTargets),
+            label: phrases::primary_button_submit_void_card_targets(phrases::locale()).to_string(),
             action: Some(BattleAction::SubmitVoidCardTargets.into()),
         })
     } else if legal_actions.contains(BattleAction::SubmitHandCardTargets, ForPlayer::Human) {

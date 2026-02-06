@@ -26,12 +26,14 @@ masonry = { path = "../masonry" }
 parser_v2 = { path = "../parser_v2" }
 quest_state = { path = "../quest_state" }
 state_provider = { path = "../state_provider" }
+strings = { path = "../strings" }
 tabula_data = { path = "../tabula_data" }
 tabula_generated = { path = "../tabula_generated" }
 ui_components = { path = "../ui_components" }
 
 bon = { workspace = true }
 fluent = { workspace = true }
+rlf = { workspace = true }
 schemars = { workspace = true }
 serde = { workspace = true }
 strum = { workspace = true }

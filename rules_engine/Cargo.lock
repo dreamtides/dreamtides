@@ -1540,9 +1540,11 @@ dependencies = [
  "masonry",
  "parser_v2",
  "quest_state",
+ "rlf",
  "schemars 1.0.2",
  "serde",
  "state_provider",
+ "strings",
  "strum",
  "tabula_data",
  "tabula_generated",
@@ -4859,7 +4861,6 @@ dependencies = [
 [[package]]
 name = "rlf"
 version = "0.1.0"
-source = "git+https://github.com/thurn/rlf#22957a87af2685466a0b84e8ef843733b60a1c1f"
 dependencies = [
  "bon",
  "const-fnv1a-hash",
@@ -4878,7 +4879,6 @@ dependencies = [
 [[package]]
 name = "rlf-macros"
 version = "0.1.0"
-source = "git+https://github.com/thurn/rlf#22957a87af2685466a0b84e8ef843733b60a1c1f"
 dependencies = [
  "proc-macro2",
  "quote",
