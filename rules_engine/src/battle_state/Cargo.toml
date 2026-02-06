@@ -17,12 +17,12 @@ core_data = { path = "../core_data" }
 quest_state = { path = "../quest_state" }
 tabula_data = { path = "../tabula_data" }
 tabula_generated = { path = "../tabula_generated" }
-
 bit-vec = { workspace = true }
 enum-iterator = { workspace = true }
 enumset = { workspace = true }
 rand = { workspace = true }
 rand_xoshiro = { workspace = true }
+rlf = { workspace = true }
 schemars = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

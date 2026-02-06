@@ -125,7 +125,7 @@ pub fn render(
                     pause_duration: Milliseconds::new(0),
                 }));
                 builder.push(Command::DisplayEnemyMessage(DisplayEnemyMessageCommand {
-                    message: labels::choice_label(builder, *choice),
+                    message: labels::choice_label(*choice),
                     show_duration: Milliseconds::new(2000),
                 }));
                 builder.push(Command::Wait(Milliseconds::new(1000)));

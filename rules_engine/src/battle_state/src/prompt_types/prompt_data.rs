@@ -2,10 +2,10 @@ use ability_data::effect::{Effect, ModalEffectChoice};
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
+use rlf::PhraseId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::EnumDiscriminants;
-use tabula_generated::string_id::StringId;
 
 use crate::battle::battle_state::PendingEffectIndex;
 use crate::battle::card_id::{BattleDeckCardId, CharacterId, HandCardId, StackCardId, VoidCardId};
@@ -119,8 +119,8 @@ pub struct PromptChoice {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum PromptChoiceLabel {
-    String(StringId),
-    StringWithEnergy(StringId, Energy),
+    String(PhraseId),
+    StringWithEnergy(PhraseId, Energy),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
