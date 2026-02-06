@@ -1,1 +1,1 @@
-pub mod phrases;
+pub mod strings;

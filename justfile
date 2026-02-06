@@ -525,6 +525,8 @@ rsync-for-review:
     rsync --delete --stats --copy-links -avqr --exclude='client/Library' --exclude='client/test_output' --exclude='client/Assets/ThirdParty' ./client ~/dreamtides_tests/
     echo $'\a'
     cp justfile ~/dreamtides_tests/
+    mkdir -p ~/dreamtides_tests/.cargo
+    cp -f .cargo/config.toml ~/dreamtides_tests/.cargo/config.toml 2>/dev/null || true
     echo $'\a'
 
 rsync-third-party:

@@ -19,6 +19,9 @@ client/Assets/StreamingAssets/Tabula.xlsm
 .worktrees
 state.json
 
+# Local Cargo config (contains [patch] overrides for local dev)
+.cargo/
+
 # Serena (per-worktree config, created by llmc)
 .serena/
 .lattice/
