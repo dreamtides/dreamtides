@@ -88,7 +88,6 @@ fn stop_compute_executor(app_handle: &tauri::AppHandle) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run(paths: cli::AppPaths) {
     logging::json_logger::initialize();
-    derived::fluent_integration::initialize_fluent_resource();
     derived::function_registry::initialize_global_registry();
     cleanup_temp_files_on_startup(&paths);
 

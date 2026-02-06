@@ -21,8 +21,7 @@ tauri-build = { version = "2", features = [] }
 # Internal dependencies
 ability_data = { path = "../../ability_data" }
 core_data = { path = "../../core_data" }
-
-# External dependencies
+strings = { path = "../../strings" }
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = "0.10"
 chumsky = "0.12"
@@ -30,8 +29,6 @@ clap = { version = "4", features = ["derive"] }
 derive_more = { version = "1", features = ["full"] }
 dirs = "6"
 enumset = { version = "1", features = ["serde"] }
-fluent = "0.17"
-fluent-bundle = "0.16"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp"] }
 notify = "6"
 notify-debouncer-mini = "0.4"
@@ -39,6 +36,7 @@ num_cpus = "1"
 parking_lot = "0.12"
 regex = "1"
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls"] }
+rlf = { git = "https://github.com/thurn/rlf", features = ["global-locale"] }
 schemars = { version = "1", features = ["uuid1"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

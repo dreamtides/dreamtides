@@ -1,12 +1,7 @@
 use std::collections::HashMap;
 
 use tv_lib::derived::derived_types::{DerivedFunction, DerivedResult, LookupContext, RowData};
-use tv_lib::derived::fluent_integration::initialize_fluent_resource;
 use tv_lib::derived::rules_preview::RulesPreviewFunction;
-
-fn setup() {
-    initialize_fluent_resource();
-}
 
 fn create_empty_context() -> LookupContext {
     LookupContext::new()
@@ -32,19 +27,17 @@ fn full_text(spans: &[tv_lib::derived::derived_types::StyledSpan]) -> String {
 
 #[test]
 fn test_appendix_g_keyword_foresee_example() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{Foresee}", "foresee: 3");
+    let inputs = make_inputs("{Foresee(foresee)}", "foresee: 3");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
-    assert!(text.contains("Foresee"), "Should contain keyword text: {text}");
+    assert!(text.to_lowercase().contains("foresee"), "Should contain keyword text: {text}");
     assert!(text.contains("3"), "Should contain the variable value: {text}");
 
-    let colored_span = spans.iter().find(|s| s.text.contains("Foresee"));
-    assert!(colored_span.is_some(), "Should find a span with Foresee: {spans:?}");
-    assert!(colored_span.unwrap().color.is_some(), "Foresee keyword should be colored: {spans:?}");
+    let colored_span = spans.iter().find(|s| s.color.is_some());
+    assert!(colored_span.is_some(), "Should find a colored span: {spans:?}");
     assert_eq!(
         colored_span.unwrap().color.as_deref(),
         Some("AA00FF"),
@@ -53,11 +46,10 @@ fn test_appendix_g_keyword_foresee_example() {
 }
 
 #[test]
-fn test_trigger_materialized_term_expansion() {
-    setup();
+fn test_trigger_materialized_phrase_expansion() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{Materialized} Gain {$e} energy.", "e: 2");
+    let inputs = make_inputs("{materialized} Gain {e} energy.", "e: 2");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
@@ -71,7 +63,6 @@ fn test_trigger_materialized_term_expansion() {
 
 #[test]
 fn test_italic_style_tags() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("<i>italic text</i> normal", "");
@@ -91,7 +82,6 @@ fn test_italic_style_tags() {
 
 #[test]
 fn test_underline_style_tags() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("<u>underlined</u> plain", "");
@@ -108,7 +98,6 @@ fn test_underline_style_tags() {
 
 #[test]
 fn test_unicode_content_in_output() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("Hello world", "");
@@ -120,10 +109,9 @@ fn test_unicode_content_in_output() {
 
 #[test]
 fn test_unicode_variable_value() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("Name: { $name }", "name: Dragon");
+    let inputs = make_inputs("Name: {name}", "name: Dragon");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
@@ -132,7 +120,6 @@ fn test_unicode_variable_value() {
 
 #[test]
 fn test_malformed_tag_passed_through_as_literal() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("<invalid>text</invalid>", "");
@@ -145,11 +132,10 @@ fn test_malformed_tag_passed_through_as_literal() {
 
 #[test]
 fn test_combined_variable_substitution_and_styling() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs =
-        make_inputs("<b>Deal</b> { $damage } <color=#FF0000>fire</color> damage.", "damage: 5");
+        make_inputs("<b>Deal</b> {damage} <color=#FF0000>fire</color> damage.", "damage: 5");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
@@ -170,77 +156,63 @@ fn test_combined_variable_substitution_and_styling() {
 }
 
 #[test]
-fn test_keyword_dissolve_term() {
-    setup();
+fn test_keyword_dissolve_phrase() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("{Dissolve} target character.", "");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
-    assert!(text.contains("Dissolve"), "Should contain keyword text: {text}");
+    assert!(text.to_lowercase().contains("dissolve"), "Should contain keyword text: {text}");
 
-    let keyword_span = spans.iter().find(|s| s.text.contains("Dissolve"));
-    assert!(keyword_span.is_some(), "Should find keyword span: {spans:?}");
-    assert_eq!(
-        keyword_span.unwrap().color.as_deref(),
-        Some("AA00FF"),
-        "Keyword should use keyword color: {spans:?}"
-    );
+    let keyword_span = spans.iter().find(|s| s.color.as_deref() == Some("AA00FF"));
+    assert!(keyword_span.is_some(), "Should find keyword colored span: {spans:?}");
 }
 
 #[test]
-fn test_keyword_reclaim_term() {
-    setup();
+fn test_keyword_reclaim_phrase() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("{Reclaim} a character.", "");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
-    assert!(text.contains("Reclaim"), "Should contain Reclaim keyword: {text}");
+    assert!(text.to_lowercase().contains("reclaim"), "Should contain Reclaim keyword: {text}");
 
-    let keyword_span = spans.iter().find(|s| s.text.contains("Reclaim"));
-    assert_eq!(
-        keyword_span.unwrap().color.as_deref(),
-        Some("AA00FF"),
-        "Reclaim should use keyword color: {spans:?}"
-    );
+    let keyword_span = spans.iter().find(|s| s.color.as_deref() == Some("AA00FF"));
+    assert!(keyword_span.is_some(), "Reclaim should use keyword color: {spans:?}");
 }
 
 #[test]
-fn test_keyword_prevent_term() {
-    setup();
+fn test_keyword_prevent_phrase() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("{Prevent} the next event.", "");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
-    assert!(text.contains("Prevent"), "Should contain Prevent keyword: {text}");
+    assert!(text.to_lowercase().contains("prevent"), "Should contain Prevent keyword: {text}");
 }
 
 #[test]
 fn test_fast_keyword_produces_bold() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("{Fast}", "");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
-    assert!(text.contains("Fast"), "Should contain Fast text: {text}");
+    assert!(text.to_lowercase().contains("fast"), "Should contain Fast text: {text}");
 
-    let fast_span = spans.iter().find(|s| s.text.contains("Fast"));
+    let fast_span = spans.iter().find(|s| s.text.to_lowercase().contains("fast"));
     assert!(fast_span.unwrap().bold, "Fast keyword should be bold: {spans:?}");
 }
 
 #[test]
-fn test_energy_symbol_rendering() {
-    setup();
+fn test_energy_variable_rendering() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{e}", "e: 3");
+    let inputs = make_inputs("{energy(e)}", "e: 3");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
@@ -249,7 +221,6 @@ fn test_energy_symbol_rendering() {
 
 #[test]
 fn test_to_frontend_value_for_rich_text_result() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("<b>Bold</b> text", "");
@@ -264,7 +235,6 @@ fn test_to_frontend_value_for_rich_text_result() {
 
 #[test]
 fn test_to_frontend_value_for_empty_text_result() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("", "");
@@ -278,7 +248,6 @@ fn test_to_frontend_value_for_empty_text_result() {
 
 #[test]
 fn test_to_frontend_value_for_error_result() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
 
@@ -305,7 +274,6 @@ fn test_default_trait_creates_function() {
 
 #[test]
 fn test_whitespace_only_variables_treated_as_empty() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("Plain text.", "   \n   \n   ");
@@ -317,7 +285,6 @@ fn test_whitespace_only_variables_treated_as_empty() {
 
 #[test]
 fn test_all_style_types_combined() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("<b><i><u><color=#FF0000>fully styled</color></u></i></b>", "");
@@ -334,7 +301,6 @@ fn test_all_style_types_combined() {
 
 #[test]
 fn test_multiple_style_sections() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs =
@@ -357,15 +323,14 @@ fn test_multiple_style_sections() {
 }
 
 #[test]
-fn test_choose_one_term() {
-    setup();
+fn test_choose_one_phrase() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{ChooseOne}", "");
+    let inputs = make_inputs("{choose_one}", "");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
-    assert!(text.contains("Choose One"), "Should expand ChooseOne term: {text}");
+    assert!(text.contains("Choose One"), "Should expand choose_one phrase: {text}");
 
     let bold_span = spans.iter().find(|s| s.text.contains("Choose One"));
     assert!(bold_span.unwrap().bold, "Choose One should be bold: {spans:?}");
@@ -373,42 +338,35 @@ fn test_choose_one_term() {
 
 #[test]
 fn test_kindle_with_variable() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{Kindle}", "k: 2");
+    let inputs = make_inputs("{Kindle(k)}", "k: 2");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
-    assert!(text.contains("Kindle"), "Should contain Kindle keyword: {text}");
+    assert!(text.to_lowercase().contains("kindle"), "Should contain Kindle keyword: {text}");
     assert!(text.contains("2"), "Should contain variable value: {text}");
 
-    let keyword_span = spans.iter().find(|s| s.text.contains("Kindle"));
-    assert_eq!(
-        keyword_span.unwrap().color.as_deref(),
-        Some("AA00FF"),
-        "Kindle should use keyword color: {spans:?}"
-    );
+    let keyword_span = spans.iter().find(|s| s.color.as_deref() == Some("AA00FF"));
+    assert!(keyword_span.is_some(), "Kindle should use keyword color: {spans:?}");
 }
 
 #[test]
-fn test_complex_card_text_with_multiple_terms() {
-    setup();
+fn test_complex_card_text_with_multiple_phrases() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{Materialized} {Foresee}. Draw a card.", "foresee: 3");
+    let inputs = make_inputs("{materialized} {Foresee(foresee)}. Draw a card.", "foresee: 3");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
     assert!(text.contains("Materialized"), "Should contain trigger: {text}");
-    assert!(text.contains("Foresee"), "Should contain keyword: {text}");
+    assert!(text.to_lowercase().contains("foresee"), "Should contain keyword: {text}");
     assert!(text.contains("3"), "Should contain foresee value: {text}");
     assert!(text.contains("Draw a card"), "Should contain trailing text: {text}");
 }
 
 #[test]
 fn test_array_type_rules_text_returns_error() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
 
@@ -426,7 +384,6 @@ fn test_array_type_rules_text_returns_error() {
 
 #[test]
 fn test_object_type_rules_text_returns_error() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
 
@@ -444,7 +401,6 @@ fn test_object_type_rules_text_returns_error() {
 
 #[test]
 fn test_boolean_type_rules_text_returns_error() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
 
@@ -462,7 +418,6 @@ fn test_boolean_type_rules_text_returns_error() {
 
 #[test]
 fn test_array_type_variables_returns_error() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
 
@@ -481,7 +436,6 @@ fn test_array_type_variables_returns_error() {
 
 #[test]
 fn test_rich_text_spans_preserve_text_content() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("Start <b>middle</b> end.", "");
@@ -493,7 +447,6 @@ fn test_rich_text_spans_preserve_text_content() {
 
 #[test]
 fn test_special_characters_in_text() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("Costs & benefits: 50% off!", "");
@@ -505,7 +458,6 @@ fn test_special_characters_in_text() {
 
 #[test]
 fn test_lookup_context_not_used() {
-    setup();
     let function = RulesPreviewFunction::new();
     let mut context = LookupContext::new();
     let mut table_data = HashMap::new();

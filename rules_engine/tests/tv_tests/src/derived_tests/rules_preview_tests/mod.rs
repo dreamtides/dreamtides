@@ -4,12 +4,7 @@ mod fluent_tests;
 use std::collections::HashMap;
 
 use tv_lib::derived::derived_types::{DerivedFunction, DerivedResult, LookupContext, RowData};
-use tv_lib::derived::fluent_integration::initialize_fluent_resource;
 use tv_lib::derived::rules_preview::RulesPreviewFunction;
-
-fn setup() {
-    initialize_fluent_resource();
-}
 
 fn create_empty_context() -> LookupContext {
     LookupContext::new()
@@ -42,10 +37,9 @@ fn test_is_not_async() {
 
 #[test]
 fn test_simple_variable_substitution() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("Gain { $e } energy.", "e: 3");
+    let inputs = make_inputs("Gain {e} energy.", "e: 3");
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -59,7 +53,6 @@ fn test_simple_variable_substitution() {
 
 #[test]
 fn test_empty_rules_text() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("", "");
@@ -70,7 +63,6 @@ fn test_empty_rules_text() {
 
 #[test]
 fn test_null_rules_text() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
 
@@ -83,7 +75,6 @@ fn test_null_rules_text() {
 
 #[test]
 fn test_missing_rules_text_field() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs: RowData = HashMap::new();
@@ -94,7 +85,6 @@ fn test_missing_rules_text_field() {
 
 #[test]
 fn test_invalid_rules_text_type() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
 
@@ -112,7 +102,6 @@ fn test_invalid_rules_text_type() {
 
 #[test]
 fn test_invalid_variables_type() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
 
@@ -131,7 +120,6 @@ fn test_invalid_variables_type() {
 
 #[test]
 fn test_null_variables_treated_as_empty() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
 
@@ -151,7 +139,6 @@ fn test_null_variables_treated_as_empty() {
 
 #[test]
 fn test_missing_variables_field() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
 
@@ -170,7 +157,6 @@ fn test_missing_variables_field() {
 
 #[test]
 fn test_malformed_variables_returns_error() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("Hello", "invalid no colon");
@@ -188,16 +174,15 @@ fn test_malformed_variables_returns_error() {
 }
 
 #[test]
-fn test_missing_fluent_variable_returns_error() {
-    setup();
+fn test_missing_rlf_phrase_returns_error() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{ $missing_var }", "");
+    let inputs = make_inputs("{nonexistent_phrase_xyz}", "");
 
     let result = function.compute(&inputs, &context);
     match result {
         DerivedResult::Error(msg) => {
-            assert!(msg.contains("Fluent error"), "Error should mention Fluent: {msg}");
+            assert!(msg.contains("RLF error"), "Error should mention RLF: {msg}");
         }
         other => panic!("Expected Error, got: {other:?}"),
     }
@@ -205,11 +190,9 @@ fn test_missing_fluent_variable_returns_error() {
 
 #[test]
 fn test_bold_style_tags() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
 
-    // Directly provide text with bold tags (no Fluent processing needed)
     let inputs = make_inputs("<b>bold text</b> normal", "");
 
     let result = function.compute(&inputs, &context);
@@ -230,7 +213,6 @@ fn test_bold_style_tags() {
 
 #[test]
 fn test_color_style_tags() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("<color=#FF0000>red text</color> plain", "");
@@ -259,7 +241,6 @@ fn test_color_style_tags() {
 
 #[test]
 fn test_nested_style_tags() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("<color=#F57F17><b><u>Figment</u></b></color>", "");
@@ -280,10 +261,9 @@ fn test_nested_style_tags() {
 
 #[test]
 fn test_multiple_variables() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{ $a } and { $b }", "a: hello\nb: world");
+    let inputs = make_inputs("{a} and {b}", "a: hello\nb: world");
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -297,10 +277,9 @@ fn test_multiple_variables() {
 
 #[test]
 fn test_numeric_variable_substitution() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("Draw { $n } cards.", "n: 5");
+    let inputs = make_inputs("Draw {n} cards.", "n: 5");
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -314,7 +293,6 @@ fn test_numeric_variable_substitution() {
 
 #[test]
 fn test_plain_text_no_styling() {
-    setup();
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs("No styling here.", "");

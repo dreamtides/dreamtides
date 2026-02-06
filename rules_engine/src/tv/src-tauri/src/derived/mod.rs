@@ -1,7 +1,7 @@
 pub mod card_lookup;
 pub mod compute_executor;
 pub mod derived_types;
-pub mod fluent_integration;
+pub mod rlf_integration;
 pub mod function_registry;
 pub mod generation_tracker;
 pub mod image_derived;
