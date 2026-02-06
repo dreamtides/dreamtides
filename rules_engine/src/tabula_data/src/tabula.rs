@@ -9,7 +9,6 @@ use crate::card_definition::CardDefinition;
 use crate::card_effect_row::{self, CardEffectRow};
 use crate::card_list_row::{self, CardListRow};
 use crate::dreamwell_definition::DreamwellCardDefinition;
-use crate::fluent_loader::{self, FluentStrings};
 use crate::tabula_error::TabulaError;
 use crate::toml_loader::{
     self, CardEffectsFile, CardListsFile, CardsFile, DreamwellFile, TestCardsFile,
@@ -28,12 +27,10 @@ pub enum TabulaSource {
 
 /// The central database of all game data.
 ///
-/// Contains all card definitions, localized strings, card lists, and visual
-/// effect definitions loaded from TOML and FTL files.
+/// Contains all card definitions, card lists, and visual effect definitions
+/// loaded from TOML files.
 #[derive(Debug, Default)]
 pub struct Tabula {
-    /// Localized strings from Fluent FTL files.
-    pub strings: FluentStrings,
     /// Card definitions indexed by base card ID.
     pub cards: BTreeMap<BaseCardId, CardDefinition>,
     /// Dreamwell card definitions indexed by dreamwell card ID.
@@ -51,7 +48,6 @@ impl Tabula {
     pub fn load(source: TabulaSource, path: &Path) -> Result<Self, Vec<TabulaError>> {
         let mut errors = Vec::new();
 
-        let strings = load_strings(path, &mut errors)?;
         let abilities = load_abilities(path, &mut errors)?;
         let cards = load_cards_strict(source, path, &abilities, &mut errors);
         let dreamwell_cards = load_dreamwell_cards_strict(source, path, &abilities, &mut errors);
@@ -59,7 +55,7 @@ impl Tabula {
         let card_effects = load_card_effects_strict(path, &mut errors);
 
         if errors.is_empty() {
-            Ok(Self { strings, cards, dreamwell_cards, card_lists, card_effects })
+            Ok(Self { cards, dreamwell_cards, card_lists, card_effects })
         } else {
             Err(errors)
         }
@@ -79,7 +75,6 @@ impl Tabula {
         let mut errors = Vec::new();
         let mut warnings = Vec::new();
 
-        let strings = load_strings(path, &mut errors)?;
         let abilities = load_abilities(path, &mut errors)?;
         let cards = load_cards_lenient(source, path, &abilities, &mut errors, &mut warnings);
         let dreamwell_cards =
@@ -88,23 +83,11 @@ impl Tabula {
         let card_effects = load_card_effects_lenient(path, &mut errors, &mut warnings);
 
         if errors.is_empty() {
-            Ok((Self { strings, cards, dreamwell_cards, card_lists, card_effects }, warnings))
+            Ok((Self { cards, dreamwell_cards, card_lists, card_effects }, warnings))
         } else {
             Err(errors)
         }
     }
-}
-
-/// Loads Fluent strings from the strings.ftl file.
-fn load_strings(
-    path: &Path,
-    errors: &mut Vec<TabulaError>,
-) -> Result<FluentStrings, Vec<TabulaError>> {
-    let strings_path = path.join("strings.ftl");
-    fluent_loader::load(&strings_path).map_err(|e| {
-        errors.push(e);
-        errors.clone()
-    })
 }
 
 /// Loads pre-parsed abilities from the parsed_abilities.json file.

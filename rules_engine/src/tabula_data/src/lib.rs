@@ -5,7 +5,6 @@ pub mod card_definition_raw;
 pub mod card_effect_row;
 pub mod card_list_row;
 pub mod dreamwell_definition;
-pub mod fluent_loader;
 pub mod tabula;
 pub mod tabula_error;
 pub mod toml_loader;

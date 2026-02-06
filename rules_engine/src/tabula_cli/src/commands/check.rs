@@ -22,17 +22,6 @@ pub fn check() -> Result<ExitCode> {
         has_mismatch = true;
     }
 
-    // Check string_id.rs
-    let expected = generate::generate_string_ids_string(&tabula_dir)?;
-    let actual_path = output_dir.join("string_id.rs");
-    let actual = fs::read_to_string(&actual_path)
-        .with_context(|| format!("Failed to read {}", actual_path.display()))?;
-    if expected != actual {
-        eprintln!("Mismatch: string_id.rs");
-        print_diff(&actual, &expected);
-        has_mismatch = true;
-    }
-
     // Check card_lists.rs
     let expected = generate::generate_card_lists_string(&tabula_dir)?;
     let actual_path = output_dir.join("card_lists.rs");

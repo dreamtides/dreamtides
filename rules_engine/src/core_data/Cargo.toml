@@ -14,7 +14,6 @@ bench = false
 [dependencies]
 derive_more = { workspace = true }
 enumset = { workspace = true }
-fluent = { workspace = true }
 schemars = { workspace = true }
 serde = { workspace = true }
 strum = { workspace = true }

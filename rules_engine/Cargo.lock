@@ -1181,7 +1181,6 @@ version = "0.0.0"
 dependencies = [
  "derive_more 1.0.0",
  "enumset",
- "fluent",
  "schemars 1.0.2",
  "serde",
  "strum",
@@ -5719,12 +5718,9 @@ version = "0.0.0"
 dependencies = [
  "ability_data",
  "core_data",
- "fluent",
- "fluent-bundle",
  "serde",
  "serde_json",
  "strum",
- "tabula_generated",
  "thiserror 2.0.12",
  "toml",
  "uuid",

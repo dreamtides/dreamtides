@@ -8,9 +8,6 @@ use uuid::Uuid;
 
 /// Creates a minimal test fixture directory with all required files.
 fn create_test_fixture(dir: &Path, source: TabulaSource) {
-    // Create strings.ftl
-    fs::write(dir.join("strings.ftl"), "test-string = Test String\n").unwrap();
-
     // Create parsed_abilities.json (empty map)
     let abilities: BTreeMap<Uuid, Vec<Ability>> = BTreeMap::new();
     fs::write(dir.join("parsed_abilities.json"), serde_json::to_string(&abilities).unwrap())
@@ -135,19 +132,8 @@ fn load_test_source_succeeds() {
 }
 
 #[test]
-fn load_fails_on_missing_strings_file() {
-    let temp_dir = tempfile::tempdir().unwrap();
-    // Don't create strings.ftl
-
-    let result = Tabula::load(TabulaSource::Test, temp_dir.path());
-
-    assert!(result.is_err());
-}
-
-#[test]
 fn load_fails_on_missing_abilities_file() {
     let temp_dir = tempfile::tempdir().unwrap();
-    fs::write(temp_dir.path().join("strings.ftl"), "test = Test\n").unwrap();
     // Don't create parsed_abilities.json
 
     let result = Tabula::load(TabulaSource::Test, temp_dir.path());
@@ -158,7 +144,6 @@ fn load_fails_on_missing_abilities_file() {
 #[test]
 fn load_fails_on_invalid_card() {
     let temp_dir = tempfile::tempdir().unwrap();
-    fs::write(temp_dir.path().join("strings.ftl"), "test = Test\n").unwrap();
     let abilities: BTreeMap<Uuid, Vec<Ability>> = BTreeMap::new();
     fs::write(
         temp_dir.path().join("parsed_abilities.json"),
@@ -187,7 +172,6 @@ name = "Invalid Card"
 #[test]
 fn load_lenient_succeeds_with_invalid_card() {
     let temp_dir = tempfile::tempdir().unwrap();
-    fs::write(temp_dir.path().join("strings.ftl"), "test = Test\n").unwrap();
     let abilities: BTreeMap<Uuid, Vec<Ability>> = BTreeMap::new();
     fs::write(
         temp_dir.path().join("parsed_abilities.json"),
