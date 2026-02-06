@@ -4,7 +4,8 @@ code-review: check-format build workspace-lints clippy style-validator test unit
 
 # Run this before pushing
 code-review-rsync: rsync-for-review
-    cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
+    cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; just clean-test-dir; exit 1)
+    just clean-test-dir
 
 review: check-snapshots check-format build clippy style-validator test tv-check tv-clippy
 
