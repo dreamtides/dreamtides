@@ -71,7 +71,7 @@ energy-cost = 2
 rules-text = """
 Draw {cards(cards)}. Discard {cards(discards)}.
 
-{ReclaimForCost(reclaim)}"""
+{Reclaim_for_cost(reclaim)}"""
 variables = """
 cards: 2
 discards: 2
@@ -435,7 +435,7 @@ card-number = 26
 name = "The Devourer"
 id = "99720e39-6bad-4c6c-867c-7bc5c326195e"
 energy-cost = 8
-rules-text = "{Banish} your void with {count} or more cards: {Reclaim} this character."
+rules-text = "{Banish} your void with {count(count)} or more cards: {Reclaim} this character."
 variables = "count: 8"
 card-type = "Character"
 subtype = "Ancient"
@@ -453,7 +453,7 @@ energy-cost = 3
 rules-text = """
 {Materialized} Draw {cards(cards)}, then discard {cards(discards)}.
 
-{ReclaimForCost(reclaim)}"""
+{Reclaim_for_cost(reclaim)}"""
 variables = """
 cards: 1
 discards: 1
@@ -1108,7 +1108,7 @@ energy-cost = 1
 rules-text = """
 {Foresee(foresee)}. Draw {cards(cards)}.
 
-{ReclaimForCost(reclaim)}"""
+{Reclaim_for_cost(reclaim)}"""
 variables = """
 foresee: 1
 cards: 1
@@ -1341,7 +1341,7 @@ card-number = 81
 name = "Secrets of the Deep"
 id = "958b9c00-bdbf-4bad-974e-baf57357c3a5"
 energy-cost = 0
-rules-text = "Pay 1 or more {energy-symbol}: Draw {cards(cards)} for each {energy-symbol} spent, then discard {cards(discards)}."
+rules-text = "Pay 1 or more {energy_symbol}: Draw {cards(cards)} for each {energy_symbol} spent, then discard {cards(discards)}."
 variables = """
 cards: 1
 discards: 2"""
@@ -1535,7 +1535,7 @@ energy-cost = 5
 rules-text = """
 Copy the next event you play {this_turn_times(number)}.
 
-{ReclaimForCost(reclaim)}"""
+{Reclaim_for_cost(reclaim)}"""
 variables = """
 number: 3
 reclaim: 2"""
@@ -1584,7 +1584,7 @@ spark = ""
 name = "The Power Within"
 id = "be92ff6f-a468-4545-8ea2-cd8c3c53cb9a"
 energy-cost = 1
-rules-text = "{MultiplyBy(number)} the number of cards you draw from card effects this turn."
+rules-text = "{multiply_by(number)} the number of cards you draw from card effects this turn."
 variables = "number: 2"
 card-type = "Event"
 is-fast = false
@@ -1614,7 +1614,7 @@ spark = ""
 name = "Surge of Fury"
 id = "ab07f1aa-ca7a-4716-988e-281ab871baf4"
 energy-cost = 1
-rules-text = "At the end of this turn, trigger an additional {JudgmentPhaseName} phase."
+rules-text = "At the end of this turn, trigger an additional {judgment_phase_name} phase."
 card-type = "Event"
 is-fast = false
 image-number = 1968259702
@@ -1693,7 +1693,7 @@ spark = ""
 name = "Genesis Burst"
 id = "1a6babbe-c0fe-47ed-8ad3-4cdbf0585b10"
 energy-cost = 2
-rules-text = "{MultiplyBy(number)} the amount of {energy-symbol} you have."
+rules-text = "{multiply_by(number)} the amount of {energy_symbol} you have."
 variables = "number: 2"
 card-type = "Event"
 is-fast = false
@@ -1708,7 +1708,7 @@ spark = ""
 name = "Catalyst Ignition"
 id = "90a624db-d288-4856-afc9-f9222e67d3bd"
 energy-cost = 2
-rules-text = "{MultiplyBy(number)} the amount of {energy-symbol} you gain from card effects this turn."
+rules-text = "{multiply_by(number)} the amount of {energy_symbol} you gain from card effects this turn."
 variables = "number: 2"
 card-type = "Event"
 is-fast = false
@@ -1809,7 +1809,7 @@ spark = ""
 name = "Spirit Reaping"
 id = "36c59908-aae7-42fb-9419-4a6aa1255211"
 energy-cost = 1
-rules-text = "Abandon an ally: Gain {energy-symbol} equal to that character's cost."
+rules-text = "Abandon an ally: Gain {energy_symbol} equal to that character's cost."
 card-type = "Event"
 is-fast = false
 image-number = 2155438703
@@ -2503,7 +2503,7 @@ energy-cost = 1
 rules-text = """
 {Banish} an ally. {Materialize} it at end of turn.
 
-{ReclaimForCost(reclaim)}"""
+{Reclaim_for_cost(reclaim)}"""
 variables = "reclaim: 1"
 card-type = "Event"
 is-fast = false
@@ -2647,7 +2647,7 @@ energy-cost = 3
 rules-text = """
 {Dissolve} an enemy with cost {energy(e)} or more.
 
-{ReclaimForCost(reclaim)}"""
+{Reclaim_for_cost(reclaim)}"""
 variables = """
 e: 3
 reclaim: 2"""
@@ -2664,7 +2664,7 @@ spark = ""
 name = "Burst of Obliteration"
 id = "f841dd11-102c-42b2-b85a-492930189fbd"
 energy-cost = 3
-rules-text = "Pay 1 or more {energy-symbol}: {Dissolve} all characters with spark less than the amount of {energy-symbol} paid."
+rules-text = "Pay 1 or more {energy_symbol}: {Dissolve} all characters with spark less than the amount of {energy_symbol} paid."
 card-type = "Event"
 is-fast = false
 image-number = 2299755789
@@ -3410,7 +3410,7 @@ spark = ""
 name = "Architect of Memory"
 id = "2530adcc-5ae2-486a-94b2-f40dd62f3755"
 energy-cost = 2
-rules-text = "While you have {count} or more cards in your void, they have {reclaim} equal to their cost."
+rules-text = "While you have {count(count)} or more cards in your void, they have {reclaim} equal to their cost."
 variables = "count: 7"
 card-type = "Character"
 subtype = "Synth"
@@ -3475,7 +3475,7 @@ variables = ""
 name = "Dreamscatter"
 id = "a6e8e100-9aa6-4a53-82ec-4ab161829533"
 energy-cost = 2
-rules-text = "Pay 1 or more {energy-symbol}: Draw {cards(cards)} for each {energy-symbol} spent."
+rules-text = "Pay 1 or more {energy_symbol}: Draw {cards(cards)} for each {energy_symbol} spent."
 variables = "cards: 1"
 card-type = "Event"
 is-fast = true
@@ -3540,7 +3540,7 @@ name = "Break the Sequence"
 id = "6e94b4a6-4164-4572-91c1-e74de3e75188"
 energy-cost = "*"
 rules-text = """
-{ChooseOne}
+{choose_one}
 {bullet} {energy(mode1-cost)}: Return an enemy to hand.
 {bullet} {energy(mode2-cost)}: Draw {cards(cards)}."""
 variables = """

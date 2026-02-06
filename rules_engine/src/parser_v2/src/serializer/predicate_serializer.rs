@@ -192,7 +192,7 @@ pub fn serialize_card_predicate(
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
             format!(
-                "{} with spark less than the amount of {{energy-symbol}} paid",
+                "{} with spark less than the amount of {{energy_symbol}} paid",
                 serialize_card_predicate(target, bindings)
             )
         }
@@ -201,7 +201,7 @@ pub fn serialize_card_predicate(
         }
         CardPredicate::NotCharacterType(subtype) => {
             bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "a character that is not {a-subtype}".to_string()
+            "a character that is not {@a subtype(subtype)}".to_string()
         }
         CardPredicate::CharacterWithSpark(spark, operator) => {
             bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
@@ -271,7 +271,7 @@ pub fn serialize_card_predicate_without_article(
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
             format!(
-                "{} with spark less than the amount of {{energy-symbol}} paid",
+                "{} with spark less than the amount of {{energy_symbol}} paid",
                 serialize_card_predicate_without_article(target, bindings)
             )
         }
@@ -383,7 +383,7 @@ pub fn serialize_card_predicate_plural(
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
             format!(
-                "{} with spark less than the amount of {{energy-symbol}} paid",
+                "{} with spark less than the amount of {{energy_symbol}} paid",
                 serialize_card_predicate_plural(target, bindings)
             )
         }
@@ -407,7 +407,7 @@ pub fn serialize_fast_target(
         }
         CardPredicate::NotCharacterType(subtype) => {
             bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "character that is not {a-subtype}".to_string()
+            "character that is not {@a subtype(subtype)}".to_string()
         }
         CardPredicate::CharacterWithSpark(spark, operator) => {
             bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
@@ -462,7 +462,7 @@ pub fn serialize_fast_target(
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
             format!(
-                "{} with spark less than the amount of {{energy-symbol}} paid",
+                "{} with spark less than the amount of {{energy_symbol}} paid",
                 serialize_fast_target(target, bindings)
             )
         }
@@ -550,7 +550,7 @@ fn your_predicate_formatted(
         }
         CardPredicate::NotCharacterType(subtype) => {
             bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            FormattedText::new("ally that is not {a-subtype}")
+            FormattedText::new("ally that is not {@a subtype(subtype)}")
         }
         CardPredicate::CharacterWithSpark(spark, operator) => {
             bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
@@ -611,7 +611,7 @@ fn your_predicate_formatted(
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
             FormattedText::new(&format!(
-                "{} with spark less than the amount of {{energy-symbol}} paid",
+                "{} with spark less than the amount of {{energy_symbol}} paid",
                 serialize_your_predicate(target, bindings)
             ))
         }
@@ -692,7 +692,7 @@ fn enemy_predicate_formatted(
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
             FormattedText::new(&format!(
-                "{} with spark less than the amount of {{energy-symbol}} paid",
+                "{} with spark less than the amount of {{energy_symbol}} paid",
                 serialize_enemy_predicate(target, bindings)
             ))
         }
@@ -779,7 +779,7 @@ fn serialize_your_predicate_plural(
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
             format!(
-                "{} with spark less than the amount of {{energy-symbol}} paid",
+                "{} with spark less than the amount of {{energy_symbol}} paid",
                 serialize_your_predicate_plural(target, bindings)
             )
         }

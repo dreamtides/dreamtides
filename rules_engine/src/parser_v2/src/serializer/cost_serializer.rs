@@ -71,7 +71,7 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("count") {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*min_count));
             }
-            "{Banish} your void with {count} or more cards".to_string()
+            "{Banish} your void with {count(count)} or more cards".to_string()
         }
         Cost::BanishFromHand(predicate) => {
             format!(
@@ -135,7 +135,7 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
                 )
             }
         },
-        Cost::SpendOneOrMoreEnergy => "pay 1 or more {energy-symbol}".to_string(),
+        Cost::SpendOneOrMoreEnergy => "pay 1 or more {energy_symbol}".to_string(),
         Cost::BanishAllCardsFromYourVoid => "{Banish} your void".to_string(),
         Cost::CostList(costs) => {
             costs.iter().map(|c| serialize_cost(c, bindings)).collect::<Vec<_>>().join(" and ")

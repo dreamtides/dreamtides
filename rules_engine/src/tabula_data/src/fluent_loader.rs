@@ -29,6 +29,8 @@ const RLF_MULTI_WORD_PHRASES: &[(&str, &str)] = &[
     ("text_number", "text-number"),
     ("maximum_energy", "maximum-energy"),
     ("reclaim_for_cost", "reclaim-for-cost"),
+    ("Reclaim_for_cost", "ReclaimForCost"),
+    ("multiply_by", "MultiplyBy"),
 ];
 
 /// Phrases where the Fluent message ID is the phrase name itself, not the
@@ -36,6 +38,14 @@ const RLF_MULTI_WORD_PHRASES: &[(&str, &str)] = &[
 /// Fluent message definition.
 const PHRASE_NAME_IS_MESSAGE: &[&str] =
     &["foresee", "Foresee", "kindle", "Kindle", "MultiplyBy", "ReclaimForCost", "subtype"];
+
+/// Mapping from RLF bare phrase names (without parentheses) to Fluent message
+/// IDs for non-parameterized phrases where the naming convention differs.
+const RLF_BARE_PHRASES: &[(&str, &str)] = &[
+    ("energy_symbol", "energy-symbol"),
+    ("choose_one", "ChooseOne"),
+    ("judgment_phase_name", "JudgmentPhaseName"),
+];
 
 /// Describes the context in which a string is used.
 ///
@@ -296,6 +306,10 @@ fn convert_rlf_to_fluent(s: &str) -> String {
                 result.push('{');
                 result.push_str(&convert_rlf_reference(&content));
                 result.push('}');
+            } else if let Some(fluent_name) = convert_rlf_bare_reference(&content) {
+                result.push('{');
+                result.push_str(&fluent_name);
+                result.push('}');
             } else {
                 result.push('{');
                 result.push_str(&content);
@@ -372,6 +386,15 @@ fn convert_rlf_reference(content: &str) -> String {
     }
 
     content.to_string()
+}
+
+/// Converts a bare RLF phrase reference (without parentheses) to the
+/// equivalent Fluent message ID, if a mapping exists.
+fn convert_rlf_bare_reference(content: &str) -> Option<String> {
+    RLF_BARE_PHRASES
+        .iter()
+        .find(|(rlf_name, _)| *rlf_name == content)
+        .map(|(_, fluent_name)| fluent_name.to_string())
 }
 
 fn format_error_details(errors: &[FluentError]) -> String {

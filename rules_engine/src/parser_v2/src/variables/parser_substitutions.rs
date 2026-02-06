@@ -64,6 +64,17 @@ static RLF_PHRASE_TO_DIRECTIVE: &[(&str, &str)] = &[
     ("text_number", "text-number"),
     ("maximum_energy", "maximum-energy"),
     ("reclaim_for_cost", "reclaim-for-cost"),
+    ("Reclaim_for_cost", "reclaim-for-cost"),
+    ("multiply_by", "multiplyby"),
+    ("count", "count"),
+];
+
+/// Maps bare RLF reference names (without parentheses) to the directive names
+/// expected by the parser.
+static RLF_BARE_TO_DIRECTIVE: &[(&str, &str)] = &[
+    ("energy_symbol", "energy-symbol"),
+    ("choose_one", "chooseone"),
+    ("judgment_phase_name", "judgmentphasename"),
 ];
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -215,6 +226,13 @@ fn resolve_directive(
     // Try RLF function call syntax: phrase(args) or phrase(args):selector
     if let Some(resolved) = resolve_rlf_directive(name, bindings, span)? {
         return Ok(resolved);
+    }
+
+    // Try bare RLF reference mapping (e.g., energy_symbol -> energy-symbol)
+    if let Some((_, directive_name)) =
+        RLF_BARE_TO_DIRECTIVE.iter().find(|(rlf_name, _)| *rlf_name == name)
+    {
+        return Ok(ResolvedToken::Token(Token::Directive(directive_name.to_string())));
     }
 
     Ok(ResolvedToken::Token(Token::Directive(name.to_string())))

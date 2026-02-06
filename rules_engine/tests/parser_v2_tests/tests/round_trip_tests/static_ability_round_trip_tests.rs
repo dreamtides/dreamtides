@@ -77,7 +77,7 @@ fn test_win_if_empty_deck() {
 
 #[test]
 fn test_void_cards_have_reclaim_equal_cost() {
-    assert_round_trip("While you have {count} or more cards in your void, they have {reclaim} equal to their cost.", "count: 7");
+    assert_round_trip("While you have {count(count)} or more cards in your void, they have {reclaim} equal to their cost.", "count: 7");
 }
 
 #[test]
@@ -110,7 +110,7 @@ fn test_conditional_cost_if_dissolved() {
 #[test]
 fn test_banish_void_with_count_reclaim_self() {
     assert_round_trip(
-        "{Banish} your void with {count} or more cards: {Reclaim} this character.",
+        "{Banish} your void with {count(count)} or more cards: {Reclaim} this character.",
         "count: 8",
     );
 }

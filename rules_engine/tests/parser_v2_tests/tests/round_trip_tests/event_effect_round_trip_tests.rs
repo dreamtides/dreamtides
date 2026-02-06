@@ -81,7 +81,7 @@ fn test_dissolve_enemy_by_cost_or_less() {
 #[test]
 fn test_dissolve_enemy_by_cost_or_more_with_reclaim() {
     assert_round_trip("{Dissolve} an enemy with cost {energy(e)} or more.", "e: 3");
-    assert_round_trip("{ReclaimForCost(reclaim)}", "reclaim: 2");
+    assert_round_trip("{Reclaim_for_cost(reclaim)}", "reclaim: 2");
 }
 
 #[test]
@@ -107,7 +107,7 @@ fn test_dissolve_enemy_draw() {
 
 #[test]
 fn test_dissolve_by_energy_paid() {
-    assert_round_trip("Pay 1 or more {energy-symbol}: {Dissolve} all characters with spark less than the amount of {energy-symbol} paid.", "");
+    assert_round_trip("Pay 1 or more {energy_symbol}: {Dissolve} all characters with spark less than the amount of {energy_symbol} paid.", "");
 }
 
 #[test]
@@ -141,7 +141,7 @@ fn test_banish_allies_then_materialize() {
 #[test]
 fn test_banish_ally_materialize_at_end_of_turn() {
     assert_round_trip("{Banish} an ally. {Materialize} it at end of turn.", "");
-    assert_round_trip("{ReclaimForCost(reclaim)}", "reclaim: 1");
+    assert_round_trip("{Reclaim_for_cost(reclaim)}", "reclaim: 1");
 }
 
 // ============================================================================
@@ -195,7 +195,7 @@ fn test_draw_one() {
 #[test]
 fn test_draw_discard_with_reclaim() {
     assert_round_trip("Draw {cards(cards)}. Discard {cards(discards)}.", "cards: 2\ndiscards: 2");
-    assert_round_trip("{ReclaimForCost(reclaim)}", "reclaim: 2");
+    assert_round_trip("{Reclaim_for_cost(reclaim)}", "reclaim: 2");
 }
 
 #[test]
@@ -281,13 +281,13 @@ fn test_gain_points_per_cards_played() {
 
 #[test]
 fn test_multiply_energy() {
-    assert_round_trip("{MultiplyBy(number)} the amount of {energy-symbol} you have.", "number: 2");
+    assert_round_trip("{multiply_by(number)} the amount of {energy_symbol} you have.", "number: 2");
 }
 
 #[test]
 fn test_multiply_energy_gain() {
     assert_round_trip(
-        "{MultiplyBy(number)} the amount of {energy-symbol} you gain from card effects this turn.",
+        "{multiply_by(number)} the amount of {energy_symbol} you gain from card effects this turn.",
         "number: 2",
     );
 }
@@ -295,7 +295,7 @@ fn test_multiply_energy_gain() {
 #[test]
 fn test_multiply_draw() {
     assert_round_trip(
-        "{MultiplyBy(number)} the number of cards you draw from card effects this turn.",
+        "{multiply_by(number)} the number of cards you draw from card effects this turn.",
         "number: 2",
     );
 }
@@ -333,7 +333,7 @@ fn test_event_gains_reclaim_for_cost() {
 #[test]
 fn test_foresee_draw_with_reclaim() {
     assert_round_trip("{Foresee(foresee)}. Draw {cards(cards)}.", "foresee: 1\ncards: 1");
-    assert_round_trip("{ReclaimForCost(reclaim)}", "reclaim: 3");
+    assert_round_trip("{Reclaim_for_cost(reclaim)}", "reclaim: 3");
 }
 
 // ============================================================================
@@ -343,7 +343,7 @@ fn test_foresee_draw_with_reclaim() {
 #[test]
 fn test_extra_judgment_phase() {
     assert_round_trip(
-        "At the end of this turn, trigger an additional {JudgmentPhaseName} phase.",
+        "At the end of this turn, trigger an additional {judgment_phase_name} phase.",
         "",
     );
 }
@@ -360,7 +360,7 @@ fn test_extra_turn() {
 #[test]
 fn test_copy_next_event_times() {
     assert_round_trip("Copy the next event you play {this_turn_times(number)}.", "number: 3");
-    assert_round_trip("{ReclaimForCost(reclaim)}", "reclaim: 2");
+    assert_round_trip("{Reclaim_for_cost(reclaim)}", "reclaim: 2");
 }
 
 // ============================================================================
@@ -421,5 +421,5 @@ fn test_materialize_random_characters_from_deck() {
 
 #[test]
 fn test_choose_one_return_or_draw() {
-    assert_round_trip("{ChooseOne}\n{bullet} {energy(mode1-cost)}: Return an enemy to hand.\n{bullet} {energy(mode2-cost)}: Draw {cards(cards)}.", "mode1-cost: 2\nmode2-cost: 3\ncards: 2");
+    assert_round_trip("{choose_one}\n{bullet} {energy(mode1-cost)}: Return an enemy to hand.\n{bullet} {energy(mode2-cost)}: Draw {cards(cards)}.", "mode1-cost: 2\nmode2-cost: 3\ncards: 2");
 }

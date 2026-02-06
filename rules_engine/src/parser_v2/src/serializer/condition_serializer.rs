@@ -28,13 +28,13 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("count") {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            format!("if you have drawn {count} or more cards this turn")
+            "if you have drawn {count(count)} or more cards this turn".to_string()
         }
         Condition::CardsInVoidCount { count } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("count") {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "while you have {count} or more cards in your void,".to_string()
+            "while you have {count(count)} or more cards in your void,".to_string()
         }
         Condition::DissolvedThisTurn { .. } => "if a character dissolved this turn".to_string(),
         Condition::PredicateCount { count: 1, predicate } => {

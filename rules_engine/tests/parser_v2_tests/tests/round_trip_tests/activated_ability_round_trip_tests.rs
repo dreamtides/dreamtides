@@ -127,13 +127,13 @@ fn test_pay_energy_subtype_spark_becomes() {
 
 #[test]
 fn test_abandon_ally_gain_energy_equal_cost() {
-    assert_round_trip("Abandon an ally: Gain {energy-symbol} equal to that character's cost.", "");
+    assert_round_trip("Abandon an ally: Gain {energy_symbol} equal to that character's cost.", "");
 }
 
 #[test]
 fn test_pay_energy_draw_per_energy_spent() {
     assert_round_trip(
-        "Pay 1 or more {energy-symbol}: Draw {cards(cards)} for each {energy-symbol} spent.",
+        "Pay 1 or more {energy_symbol}: Draw {cards(cards)} for each {energy_symbol} spent.",
         "cards: 1",
     );
 }
@@ -190,5 +190,5 @@ fn test_return_all_but_one_ally_draw_per_returned() {
 
 #[test]
 fn test_pay_variable_energy_draw_per_energy() {
-    assert_round_trip("Pay 1 or more {energy-symbol}: Draw {cards(cards)} for each {energy-symbol} spent, then discard {cards(discards)}.", "cards: 1\ndiscards: 2");
+    assert_round_trip("Pay 1 or more {energy_symbol}: Draw {cards(cards)} for each {energy_symbol} spent, then discard {cards(discards)}.", "cards: 1\ndiscards: 2");
 }

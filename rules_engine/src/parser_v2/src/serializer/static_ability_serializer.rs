@@ -143,7 +143,7 @@ pub fn serialize_standard_static_ability(
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*multiplier));
             }
-            "{MultiplyBy(number)} the amount of {energy-symbol} you gain from card effects this turn."
+            "{multiply_by(number)} the amount of {energy_symbol} you gain from card effects this turn."
                 .to_string()
         }
         StandardStaticAbility::MultiplyCardDrawFromCardEffects { multiplier } => {
@@ -152,7 +152,7 @@ pub fn serialize_standard_static_ability(
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*multiplier));
             }
-            "{MultiplyBy(number)} the number of cards you draw from card effects this turn."
+            "{multiply_by(number)} the number of cards you draw from card effects this turn."
                 .to_string()
         }
         StandardStaticAbility::OncePerTurnPlayFromVoid { matching } => {

@@ -106,14 +106,14 @@ pub fn serialize_standard_effect(
         StandardEffect::GainEnergyEqualToCost { target } => {
             match target {
                 Predicate::It | Predicate::That => {
-                    "gain {energy-symbol} equal to that character's cost.".to_string()
+                    "gain {energy_symbol} equal to that character's cost.".to_string()
                 }
                 Predicate::This => {
-                    "gain {energy-symbol} equal to this character's cost.".to_string()
+                    "gain {energy_symbol} equal to this character's cost.".to_string()
                 }
                 _ => {
                     format!(
-                        "gain {{energy-symbol}} equal to {}'s cost.",
+                        "gain {{energy_symbol}} equal to {}'s cost.",
                         predicate_serializer::serialize_predicate(target, bindings)
                     )
                 }
@@ -269,8 +269,13 @@ pub fn serialize_standard_effect(
                     predicate_serializer::serialize_card_predicate(matching, bindings)
                 )
             } else {
+                if let Some(var_name) = parser_substitutions::directive_to_integer_variable(
+                    "cards",
+                ) {
+                    bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
+                }
                 format!(
-                    "put {{up-to-n-cards}} {} from your void on top of your deck.",
+                    "put up to {{cards(cards)}} {} from your void on top of your deck.",
                     predicate_serializer::serialize_card_predicate_plural(matching,
                     bindings)
                 )
@@ -493,7 +498,7 @@ pub fn serialize_standard_effect(
                 }
                 (_, QuantityExpression::ForEachEnergySpentOnThisCard) => {
                     format!(
-                        "{{materialize}} a number of copies of {} equal to the amount of {{energy-symbol}} spent.",
+                        "{{materialize}} a number of copies of {} equal to the amount of {{energy_symbol}} spent.",
                         predicate_serializer::serialize_predicate(target, bindings)
                     )
                 }
@@ -681,7 +686,7 @@ pub fn serialize_standard_effect(
                 bindings
                     .insert(var_name.to_string(), VariableValue::Integer(*multiplier));
             }
-            "{MultiplyBy(number)} the amount of {energy-symbol} you have.".to_string()
+            "{multiply_by(number)} the amount of {energy_symbol} you have.".to_string()
         }
         StandardEffect::CopyNextPlayed { matching, times } => {
             if let Some(count) = times {
@@ -744,14 +749,14 @@ pub fn serialize_standard_effect(
             }
         }
         StandardEffect::TriggerAdditionalJudgmentPhaseAtEndOfTurn => {
-            "at the end of this turn, trigger an additional {JudgmentPhaseName} phase."
+            "at the end of this turn, trigger an additional {judgment_phase_name} phase."
                 .to_string()
         }
         StandardEffect::TakeExtraTurn => "take an extra turn after this one.".to_string(),
         StandardEffect::YouWinTheGame => "you win the game.".to_string(),
         StandardEffect::AbandonAndGainEnergyForSpark { target, .. } => {
             format!(
-                "abandon {} and gain {{energy-symbol}} for each point of spark that character had.",
+                "abandon {} and gain {{energy_symbol}} for each point of spark that character had.",
                 predicate_serializer::serialize_predicate(target, bindings)
             )
         }
@@ -803,7 +808,7 @@ pub fn serialize_standard_effect(
             )
         }
         StandardEffect::GainTwiceThatMuchEnergyInstead => {
-            "gain twice that much {energy-symbol} instead.".to_string()
+            "gain twice that much {energy_symbol} instead.".to_string()
         }
         StandardEffect::MaterializeCharacterFromVoid { target } => {
             format!(
@@ -822,11 +827,11 @@ pub fn serialize_standard_effect(
             format!("pay {}.", cost_serializer::serialize_cost(cost, bindings))
         }
         StandardEffect::SpendAllEnergyDissolveEnemy => {
-            "spend all your {energy-symbol}. {dissolve} an enemy with cost less than or equal to the amount spent."
+            "spend all your {energy_symbol}. {dissolve} an enemy with cost less than or equal to the amount spent."
                 .to_string()
         }
         StandardEffect::SpendAllEnergyDrawAndDiscard => {
-            "spend all your {energy-symbol}. Draw cards equal to the amount spent, then discard that many cards."
+            "spend all your {energy_symbol}. Draw cards equal to the amount spent, then discard that many cards."
                 .to_string()
         }
     }
@@ -1072,7 +1077,7 @@ pub fn serialize_effect_with_context(
             result
         }
         Effect::Modal(choices) => {
-            let mut result = "{ChooseOne}".to_string();
+            let mut result = "{choose_one}".to_string();
             for (index, choice) in choices.iter().enumerate() {
                 result.push('\n');
                 result.push_str("{bullet} ");
@@ -1152,7 +1157,7 @@ pub fn serialize_for_count_expression(
                 text_formatting::card_predicate_base_text(predicate).without_article()
             )
         }
-        QuantityExpression::ForEachEnergySpentOnThisCard => "{energy-symbol} spent".to_string(),
+        QuantityExpression::ForEachEnergySpentOnThisCard => "{energy_symbol} spent".to_string(),
         QuantityExpression::CardsDrawnThisTurn(predicate) => {
             format!(
                 "{} you have drawn this turn",

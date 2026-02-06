@@ -84,7 +84,7 @@ fn test_materialized_draw_discard_with_reclaim() {
         "{Materialized} Draw {cards(cards)}, then discard {cards(discards)}.",
         "cards: 1\ndiscards: 1",
     );
-    assert_round_trip("{ReclaimForCost(reclaim)}", "reclaim: 3");
+    assert_round_trip("{Reclaim_for_cost(reclaim)}", "reclaim: 3");
 }
 
 #[test]
