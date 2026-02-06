@@ -127,19 +127,6 @@ rlf::rlf! {
     };
 
     // =========================================================================
-    // Figment types
-    // =========================================================================
-
-    // Celestial figment type.
-    celestial = "Celestial";
-    // Halcyon figment type.
-    halcyon = "Halcyon";
-    // Radiant figment type.
-    radiant = "Radiant";
-    // Shadow figment type.
-    shadow = "Shadow";
-
-    // =========================================================================
     // Figment tokens
     // =========================================================================
 
@@ -159,12 +146,8 @@ rlf::rlf! {
     // Character subtypes
     // =========================================================================
 
-    // Agent subtype.
-    agent = :an { one: "Agent", other: "Agents" };
     // Ancient subtype.
     ancient = :an { one: "Ancient", other: "Ancients" };
-    // Avatar subtype.
-    avatar = :an { one: "Avatar", other: "Avatars" };
     // Child subtype.
     child = :a { one: "Child", other: "Children" };
     // Detective subtype.
@@ -173,8 +156,6 @@ rlf::rlf! {
     enigma = :an { one: "Enigma", other: "Enigmas" };
     // Explorer subtype.
     explorer = :an { one: "Explorer", other: "Explorers" };
-    // Guide subtype.
-    guide = :a { one: "Guide", other: "Guides" };
     // Hacker subtype.
     hacker = :a { one: "Hacker", other: "Hackers" };
     // Mage subtype.
@@ -187,8 +168,6 @@ rlf::rlf! {
     outsider = :an { one: "Outsider", other: "Outsiders" };
     // Renegade subtype.
     renegade = :a { one: "Renegade", other: "Renegades" };
-    // Robot subtype.
-    robot = :a { one: "Robot", other: "Robots" };
     // Spirit Animal subtype.
     spirit_animal = :a { one: "Spirit Animal", other: "Spirit Animals" };
     // Super subtype.
