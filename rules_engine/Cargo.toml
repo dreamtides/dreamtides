@@ -29,8 +29,6 @@ either = "1"
 enum-iterator = "2"
 enumset = { version = "1", features = ["serde"] }
 fastrand = "2"
-fluent = "0.17"
-fluent-bundle = "0.16"
 rlf = { git = "https://github.com/thurn/rlf", features = ["global-locale"] }
 rlf-macros = { git = "https://github.com/thurn/rlf" }
 google-sheets4 = "6"
