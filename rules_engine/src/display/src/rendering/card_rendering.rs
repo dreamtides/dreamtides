@@ -19,23 +19,21 @@ use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::card_types::{CardSubtype, CardType};
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::SpriteAddress;
+use core_data::figment_type::FigmentType;
 use core_data::identifiers::AbilityNumber;
 use core_data::types::{CardFacing, PlayerName};
 use display_data::card_view::{
     CardActions, CardPrefab, CardView, DisplayImage, InfoZoomData, InfoZoomIcon, RevealedCardView,
 };
-use fluent::types::FluentNumber;
-use fluent::{FluentArgs, FluentValue, fluent_args};
 use masonry::flex_enums::FlexDirection;
 use masonry::flex_style::FlexStyle;
 use parser_v2::serializer::ability_serializer;
 use parser_v2::variables::parser_bindings::VariableBindings;
-use rlf::Value;
+use parser_v2::variables::parser_substitutions;
+use rlf::interpreter::plural_category;
+use rlf::{EvalError, Phrase, Value, VariantKey};
 use strings::strings;
 use tabula_data::card_definition::CardDefinition;
-use tabula_data::fluent_loader::StringContext;
-use tabula_data::tabula_error::TabulaError;
-use tabula_generated::string_id::StringId;
 use ui_components::box_component::BoxComponent;
 use ui_components::component::Component;
 use ui_components::icon;
@@ -89,49 +87,100 @@ pub fn card_name(battle: &BattleState, card_id: CardId) -> String {
     card::get_definition(battle, card_id).displayed_name.clone()
 }
 
-/// Converts [VariableBindings] to Fluent [FluentArgs] for string formatting.
-pub fn to_fluent_args(bindings: &VariableBindings) -> FluentArgs<'static> {
-    let mut args = FluentArgs::new();
-    for (name, value) in bindings.iter() {
-        let fluent_value: FluentValue<'static> = match value {
-            VariableValue::Integer(n) => FluentValue::Number(FluentNumber::from(*n as f64)),
-            VariableValue::Subtype(subtype) => FluentValue::String(subtype.to_string().into()),
-            VariableValue::Figment(figment) => FluentValue::String(figment.to_string().into()),
-        };
-        args.set(name.clone(), fluent_value);
-    }
-    args
-}
-
-/// Converts [VariableBindings] to RLF parameters for eval_str formatting.
+/// Converts [VariableBindings] to RLF parameters for string evaluation.
+///
+/// Inserts two categories of entries into the params map:
+/// 1. **Variable-level entries**: Each variable binding is inserted with its
+///    name (hyphens converted to underscores). Integer variables are also
+///    pre-evaluated against any matching single-parameter RLF phrase.
+/// 2. **Directive-level entries**: For each known serializer directive that
+///    maps to a bound integer variable, the corresponding RLF phrase is
+///    pre-evaluated and the result is stored under the directive name
+///    (converted to underscores). This allows templates like
+///    `{reclaim_for_cost}` to resolve even though the variable is "reclaim".
 pub fn to_rlf_params(bindings: &VariableBindings) -> HashMap<String, Value> {
+    strings::register_source_phrases();
     let mut params = HashMap::new();
+
     for (name, value) in bindings.iter() {
+        let key = name.replace('-', "_");
         let rlf_value = match value {
-            VariableValue::Integer(n) => Value::Number(*n as i64),
+            VariableValue::Integer(n) => resolve_integer_variable(&key, *n),
             VariableValue::Subtype(subtype) => rlf::with_locale(|locale| {
                 Value::Phrase(
-                    locale.get_phrase(&subtype.to_string()).expect("subtype phrase should exist"),
+                    locale
+                        .get_phrase(subtype_phrase_name(*subtype))
+                        .expect("subtype phrase should exist"),
                 )
             }),
             VariableValue::Figment(figment) => rlf::with_locale(|locale| {
                 Value::Phrase(
-                    locale.get_phrase(&figment.to_string()).expect("figment phrase should exist"),
+                    locale
+                        .get_phrase(figment_phrase_name(*figment))
+                        .expect("figment phrase should exist"),
                 )
             }),
         };
-        params.insert(name.clone(), rlf_value);
+        params.insert(key, rlf_value);
     }
+
+    resolve_directive_phrases(bindings, &mut params);
     params
+}
+
+/// Converts serializer template directive names to RLF-compatible identifiers.
+///
+/// Applies two transformations within `{...}` blocks:
+/// - Converts hyphens to underscores (e.g., `{energy-symbol}` ->
+///   `{energy_symbol}`)
+/// - Converts CamelCase to snake_case (e.g., `{ChooseOne}` -> `{Choose_one}`)
+///
+/// Escaped braces `{{` are preserved as-is.
+pub fn to_rlf_template(text: &str) -> String {
+    let mut result = String::with_capacity(text.len());
+    let mut chars = text.chars().peekable();
+    while let Some(c) = chars.next() {
+        if c == '{' {
+            if chars.peek() == Some(&'{') {
+                result.push('{');
+                result.push(chars.next().unwrap());
+                continue;
+            }
+            result.push('{');
+            let mut prev_was_lower = false;
+            while let Some(&inner) = chars.peek() {
+                if inner == '}' {
+                    break;
+                }
+                let ch = chars.next().unwrap();
+                if ch == '-' {
+                    result.push('_');
+                    prev_was_lower = false;
+                } else if ch.is_ascii_uppercase() && prev_was_lower {
+                    result.push('_');
+                    result.push(ch.to_ascii_lowercase());
+                    prev_was_lower = true;
+                } else {
+                    result.push(ch);
+                    prev_was_lower = ch.is_ascii_lowercase();
+                }
+            }
+        } else {
+            result.push(c);
+        }
+    }
+    result
 }
 
 /// Evaluates a template string with RLF variable bindings.
 ///
 /// Rewrites `{phrase(arg)}` to `{phrase:_p_arg}` selector syntax so that
 /// variant phrases correctly select based on the argument's plural category.
+/// Uses simple (non-pre-resolved) params since
+/// [rewrite_phrase_calls_to_selectors] handles plural variant selection.
 pub fn eval_str(template: &str, bindings: &VariableBindings) -> String {
     strings::register_source_phrases();
-    let mut params = to_rlf_params(bindings);
+    let mut params = to_simple_rlf_params(bindings);
     let rewritten = rewrite_phrase_calls_to_selectors(template, &mut params);
     rlf::with_locale(|locale| {
         locale
@@ -143,24 +192,22 @@ pub fn eval_str(template: &str, bindings: &VariableBindings) -> String {
 
 /// Returns the rules text for the given ability, without including any costs.
 pub fn ability_token_text(
-    builder: &ResponseBuilder,
+    _builder: &ResponseBuilder,
     definition: &CardDefinition,
     ability_number: AbilityNumber,
 ) -> String {
     let ability = &definition.abilities[ability_number.0];
     let serialized = ability_serializer::serialize_ability_effect(ability);
-    let args = to_fluent_args(&serialized.variables);
-    builder
-        .tabula()
-        .strings
-        .format_display_string(&serialized.text, StringContext::CardText, args)
+    let params = to_rlf_params(&serialized.variables);
+    let template = to_rlf_template(&serialized.text);
+    rlf::with_locale(|locale| locale.eval_str(&template, params))
+        .map(|p| p.to_string())
         .unwrap_or_default()
 }
 
-pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
+pub fn rules_text(_builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
     let definition = card::get_definition(battle, card_id);
-    let mut formatted =
-        serialize_abilities_text(builder, &definition.abilities).unwrap_or_default();
+    let mut formatted = serialize_abilities_text(&definition.abilities).unwrap_or_default();
 
     if let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
         && let Some(ModelEffectChoiceIndex(index)) = stack_item.modal_choice
@@ -176,22 +223,21 @@ pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: Card
         return format!(
             "{} <b><color=\"blue\">{}</color></b>",
             formatted,
-            builder
-                .string_with_args(StringId::CardRulesTextEnergyPaid, fluent_args!("e" => energy.0))
+            strings::card_rules_text_energy_paid(energy.0)
         );
     }
 
     if is_on_stack_from_void(battle, card_id) {
         return format!(
             "{formatted} <b><color=\"blue\">{}</color></b>",
-            builder.string(StringId::CardRulesTextReclaimed)
+            strings::card_rules_text_reclaimed()
         );
     }
 
     if apply_card_fx::is_anchored(battle, card_id) {
         return format!(
             "{formatted} <b><color=\"blue\">{}</color></b>",
-            builder.string(StringId::CardRulesTextAnchored)
+            strings::card_rules_text_anchored()
         );
     }
 
@@ -330,25 +376,85 @@ fn extract_transforms(content: &str) -> (String, &str) {
     (prefix, rest)
 }
 
-/// Serializes abilities using the ability serializer and formats with Fluent.
-fn serialize_abilities_text(
-    builder: &ResponseBuilder,
-    abilities: &[Ability],
-) -> Result<String, TabulaError> {
-    // Tags must use Fluent "quoted string" syntax to avoid breaking parsing.
-    let line_height_25 = "{\"<line-height=25%>\"}";
-    let end_line_height = "{\"</line-height>\"}";
+/// Converts [VariableBindings] to simple RLF parameters without
+/// pre-resolving integer variables. Used by [eval_str] where
+/// [rewrite_phrase_calls_to_selectors] handles plural variant selection.
+fn to_simple_rlf_params(bindings: &VariableBindings) -> HashMap<String, Value> {
+    let mut params = HashMap::new();
+    for (name, value) in bindings.iter() {
+        let rlf_value = match value {
+            VariableValue::Integer(n) => Value::Number(*n as i64),
+            VariableValue::Subtype(subtype) => rlf::with_locale(|locale| {
+                Value::Phrase(
+                    locale
+                        .get_phrase(subtype_phrase_name(*subtype))
+                        .expect("subtype phrase should exist"),
+                )
+            }),
+            VariableValue::Figment(figment) => rlf::with_locale(|locale| {
+                Value::Phrase(
+                    locale
+                        .get_phrase(figment_phrase_name(*figment))
+                        .expect("figment phrase should exist"),
+                )
+            }),
+        };
+        params.insert(name.clone(), rlf_value);
+    }
+    params
+}
+
+/// Pre-evaluates RLF phrases for serializer directives and inserts results
+/// into the params map. For each directive that maps to a bound integer
+/// variable, looks up the corresponding RLF phrase and pre-renders it.
+fn resolve_directive_phrases(bindings: &VariableBindings, params: &mut HashMap<String, Value>) {
+    for directive_name in parser_substitutions::directive_names() {
+        let phrase_name = directive_name.replace('-', "_");
+        if params.contains_key(&phrase_name) {
+            continue;
+        }
+        if let Some(var_name) = parser_substitutions::directive_to_integer_variable(directive_name)
+            && let Some(VariableValue::Integer(n)) = bindings.get(var_name)
+            && let Some(v) = resolve_directive_phrase(&phrase_name, *n)
+        {
+            params.insert(phrase_name, v);
+        }
+    }
+}
+
+/// Attempts to pre-evaluate a directive's RLF phrase with the given integer
+/// value. Returns the pre-rendered string if the phrase exists and takes one
+/// parameter, with the correct plural variant selected.
+fn resolve_directive_phrase(phrase_name: &str, n: u32) -> Option<Value> {
+    rlf::with_locale(|locale| {
+        let def = locale.registry()?.get(phrase_name)?;
+        if def.parameters.len() != 1 {
+            return None;
+        }
+        let phrase = locale.call_phrase(phrase_name, &[Value::Number(n as i64)]).ok()?;
+        if phrase.variants.is_empty() {
+            Some(Value::String(phrase.text))
+        } else {
+            let category = plural_category("en", n as i64);
+            let text =
+                phrase.variants.get(&VariantKey::new(category)).cloned().unwrap_or(phrase.text);
+            Some(Value::String(text))
+        }
+    })
+}
+
+/// Serializes abilities using the ability serializer and formats with RLF.
+fn serialize_abilities_text(abilities: &[Ability]) -> Result<String, EvalError> {
+    let line_height_25 = "<line-height=25%>";
+    let end_line_height = "</line-height>";
 
     let formatted: Result<Vec<_>, _> = abilities
         .iter()
         .map(|ability| {
             let serialized = ability_serializer::serialize_ability(ability);
-            let args = to_fluent_args(&serialized.variables);
-            builder.tabula().strings.format_display_string(
-                &serialized.text,
-                StringContext::CardText,
-                args,
-            )
+            let params = to_rlf_params(&serialized.variables);
+            let template = to_rlf_template(&serialized.text);
+            rlf::with_locale(|locale| locale.eval_str(&template, params)).map(|p| p.to_string())
         })
         .collect();
 
@@ -377,7 +483,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
     } else if card_properties::base_energy_cost(battle, card_id).is_some() {
         Some(card_properties::converted_energy_cost(battle, card_id).to_string())
     } else {
-        Some(builder.string(StringId::AsteriskIcon))
+        Some(strings::asterisk_icon().to_string())
     };
 
     RevealedCardView {
@@ -388,7 +494,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
         spark: card_properties::spark(battle, controller, CharacterId(card_id))
             .or_else(|| card_properties::base_spark(battle, card_id))
             .map(|spark| spark.to_string()),
-        card_type: card_type(builder, battle, card_id),
+        card_type: card_type(battle, card_id),
         rules_text: rules_text(builder, battle, card_id),
         outline_color: match selection_color {
             Some(color) => Some(color),
@@ -481,45 +587,19 @@ fn can_select_order_action(legal_actions: &LegalActions, card_id: CardId) -> Opt
     if let LegalActions::SelectDeckCardOrder { .. } = legal_actions { Some(card_id) } else { None }
 }
 
-fn card_type(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
+fn card_type(battle: &BattleState, card_id: CardId) -> String {
     let definition = card::get_definition(battle, card_id);
     let result = if let Some(subtype) = definition.card_subtype {
-        let subtype_key = match subtype {
-            CardSubtype::Agent => "agent",
-            CardSubtype::Ancient => "ancient",
-            CardSubtype::Avatar => "avatar",
-            CardSubtype::Child => "child",
-            CardSubtype::Detective => "detective",
-            CardSubtype::Enigma => "enigma",
-            CardSubtype::Explorer => "explorer",
-            CardSubtype::Guide => "guide",
-            CardSubtype::Hacker => "hacker",
-            CardSubtype::Mage => "mage",
-            CardSubtype::Monster => "monster",
-            CardSubtype::Musician => "musician",
-            CardSubtype::Outsider => "outsider",
-            CardSubtype::Renegade => "renegade",
-            CardSubtype::Robot => "robot",
-            CardSubtype::SpiritAnimal => "spirit-animal",
-            CardSubtype::Super => "super",
-            CardSubtype::Survivor => "survivor",
-            CardSubtype::Synth => "synth",
-            CardSubtype::Tinkerer => "tinkerer",
-            CardSubtype::Trooper => "trooper",
-            CardSubtype::Visionary => "visionary",
-            CardSubtype::Visitor => "visitor",
-            CardSubtype::Warrior => "warrior",
-        };
-        builder.string_with_args(StringId::Subtype, fluent_args!["subtype" => subtype_key])
+        strings::subtype(subtype_to_phrase(subtype)).to_string()
     } else {
-        let type_string = match definition.card_type {
-            CardType::Character => StringId::CardTypeCharacter,
-            CardType::Event => StringId::CardTypeEvent,
-            CardType::Dreamsign => StringId::CardTypeDreamsign,
-            CardType::Dreamcaller => StringId::CardTypeDreamcaller,
-            CardType::Dreamwell => StringId::CardTypeDreamwell,
-        };
-        builder.string(type_string)
+        match definition.card_type {
+            CardType::Character => strings::card_type_character(),
+            CardType::Event => strings::card_type_event(),
+            CardType::Dreamsign => strings::card_type_dreamsign(),
+            CardType::Dreamcaller => strings::card_type_dreamcaller(),
+            CardType::Dreamwell => strings::card_type_dreamwell(),
+        }
+        .to_string()
     };
 
     if card_properties::is_fast(battle, card_id) { format!("\u{f0e7} {result}") } else { result }
@@ -669,6 +749,106 @@ fn targeting_color(
         display_color::GREEN_500
     } else {
         display_color::RED_500
+    }
+}
+
+/// Resolves an integer variable to either a pre-evaluated phrase string or a
+/// raw number. If a phrase with the given name exists and takes exactly one
+/// parameter, the phrase is evaluated with the integer value and the correct
+/// plural variant is selected so that template references like `{cards}`
+/// produce formatted output (e.g. "a card" for 1, "2 cards" for 2).
+fn resolve_integer_variable(name: &str, n: u32) -> Value {
+    rlf::with_locale(|locale| {
+        let phrase_name = name.replace('-', "_");
+        let has_single_param = locale
+            .registry()
+            .and_then(|r| r.get(&phrase_name))
+            .is_some_and(|def| def.parameters.len() == 1);
+        if has_single_param {
+            let phrase = locale
+                .call_phrase(&phrase_name, &[Value::Number(n as i64)])
+                .expect("phrase should evaluate");
+            if phrase.variants.is_empty() {
+                Value::String(phrase.text)
+            } else {
+                let category = plural_category("en", n as i64);
+                let text =
+                    phrase.variants.get(&VariantKey::new(category)).cloned().unwrap_or(phrase.text);
+                Value::String(text)
+            }
+        } else {
+            Value::Number(n as i64)
+        }
+    })
+}
+
+/// Returns the RLF [Phrase] for a [CardSubtype].
+fn subtype_to_phrase(subtype: CardSubtype) -> Phrase {
+    match subtype {
+        CardSubtype::Agent => strings::agent(),
+        CardSubtype::Ancient => strings::ancient(),
+        CardSubtype::Avatar => strings::avatar(),
+        CardSubtype::Child => strings::child(),
+        CardSubtype::Detective => strings::detective(),
+        CardSubtype::Enigma => strings::enigma(),
+        CardSubtype::Explorer => strings::explorer(),
+        CardSubtype::Guide => strings::guide(),
+        CardSubtype::Hacker => strings::hacker(),
+        CardSubtype::Mage => strings::mage(),
+        CardSubtype::Monster => strings::monster(),
+        CardSubtype::Musician => strings::musician(),
+        CardSubtype::Outsider => strings::outsider(),
+        CardSubtype::Renegade => strings::renegade(),
+        CardSubtype::Robot => strings::robot(),
+        CardSubtype::SpiritAnimal => strings::spirit_animal(),
+        CardSubtype::Super => strings::super_(),
+        CardSubtype::Survivor => strings::survivor(),
+        CardSubtype::Synth => strings::synth(),
+        CardSubtype::Tinkerer => strings::tinkerer(),
+        CardSubtype::Trooper => strings::trooper(),
+        CardSubtype::Visionary => strings::visionary(),
+        CardSubtype::Visitor => strings::visitor(),
+        CardSubtype::Warrior => strings::warrior(),
+    }
+}
+
+/// Returns the RLF phrase name for a [CardSubtype].
+fn subtype_phrase_name(subtype: CardSubtype) -> &'static str {
+    match subtype {
+        CardSubtype::Agent => "agent",
+        CardSubtype::Ancient => "ancient",
+        CardSubtype::Avatar => "avatar",
+        CardSubtype::Child => "child",
+        CardSubtype::Detective => "detective",
+        CardSubtype::Enigma => "enigma",
+        CardSubtype::Explorer => "explorer",
+        CardSubtype::Guide => "guide",
+        CardSubtype::Hacker => "hacker",
+        CardSubtype::Mage => "mage",
+        CardSubtype::Monster => "monster",
+        CardSubtype::Musician => "musician",
+        CardSubtype::Outsider => "outsider",
+        CardSubtype::Renegade => "renegade",
+        CardSubtype::Robot => "robot",
+        CardSubtype::SpiritAnimal => "spirit_animal",
+        CardSubtype::Super => "super_",
+        CardSubtype::Survivor => "survivor",
+        CardSubtype::Synth => "synth",
+        CardSubtype::Tinkerer => "tinkerer",
+        CardSubtype::Trooper => "trooper",
+        CardSubtype::Visionary => "visionary",
+        CardSubtype::Visitor => "visitor",
+        CardSubtype::Warrior => "warrior",
+    }
+}
+
+/// Returns the RLF phrase name for a [FigmentType].
+fn figment_phrase_name(figment: FigmentType) -> &'static str {
+    match figment {
+        FigmentType::Celestial => "celestial",
+        FigmentType::Halcyon => "halcyon",
+        FigmentType::Radiant => "radiant",
+        FigmentType::Shadow => "shadow",
     }
 }
 
