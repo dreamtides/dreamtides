@@ -1,0 +1,16 @@
+[package]
+name = "strings"
+version = "0.0.0"
+edition = "2024"
+
+[lints]
+workspace = true
+
+[lib]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+rlf = { workspace = true }
+rlf-macros = { workspace = true }
