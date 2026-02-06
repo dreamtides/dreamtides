@@ -12,10 +12,8 @@ use core_data::display_color;
 use core_data::numerics::Energy;
 use display_data::card_view::{CardActions, CardView};
 use display_data::object_position::{ObjectPosition, Position};
-use fluent::fluent_args;
 use parser_v2::serializer::ability_serializer;
-use tabula_data::fluent_loader::StringContext;
-use tabula_generated::string_id::StringId;
+use strings::strings;
 
 use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
@@ -39,7 +37,7 @@ pub fn cards(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
     }
 
     let definition = card::get_definition(battle, card_id);
-    let descriptions = modal_effect_descriptions(builder, &definition.abilities);
+    let descriptions = modal_effect_descriptions(&definition.abilities);
     modal
         .choices
         .iter()
@@ -59,17 +57,10 @@ pub fn cards(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
 
 /// [String]s for the descriptions of the choices in an active modal effect
 /// prompt, if any.
-pub fn modal_effect_descriptions(builder: &ResponseBuilder, abilities: &[Ability]) -> Vec<String> {
+pub fn modal_effect_descriptions(abilities: &[Ability]) -> Vec<String> {
     ability_serializer::serialize_modal_choices(abilities)
         .values()
-        .map(|serialized| {
-            let args = card_rendering::to_fluent_args(&serialized.variables);
-            builder
-                .tabula()
-                .strings
-                .format_display_string(&serialized.text, StringContext::CardText, args)
-                .unwrap_or_default()
-        })
+        .map(|serialized| card_rendering::eval_str(&serialized.text, &serialized.variables))
         .collect()
 }
 
@@ -88,10 +79,7 @@ fn modal_effect_card_view(
     let view = TokenCardView::builder()
         .id(adapter::modal_effect_choice_client_id(card_id, index))
         .image(card_rendering::card_image(battle, card_id))
-        .name(builder.string_with_args(
-            StringId::ModalEffectChoiceCardName,
-            fluent_args!("number" => index.value() + 1),
-        ))
+        .name(strings::modal_effect_choice_card_name(index.value() + 1).to_string())
         .position(ObjectPosition { position: Position::Browser, sorting_key: index.value() as u32 })
         .create_position(ObjectPosition {
             position: Position::HiddenWithinCard(adapter::client_card_id(card_id)),

@@ -369,8 +369,8 @@ rlf::rlf! {
     character_limit_exceeded_warning_message =
         "Character limit exceeded:: A character will be abandoned, with its spark permanently added to your total.";
     // Warning about exceeding both limits.
-    combined_limit_warning_message(e) =
-        "Character limit exceeded:: A character will be abandoned. Cards drawn in excess of 10 become {energy(e)} instead.";
+    combined_limit_warning_message =
+        "Character limit exceeded:: A character will be abandoned. Cards drawn in excess of 10 become {energy_symbol} instead.";
 
     // =========================================================================
     // Error panel

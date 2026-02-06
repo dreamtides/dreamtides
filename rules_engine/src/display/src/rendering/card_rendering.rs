@@ -30,6 +30,8 @@ use masonry::flex_enums::FlexDirection;
 use masonry::flex_style::FlexStyle;
 use parser_v2::serializer::ability_serializer;
 use parser_v2::variables::parser_bindings::VariableBindings;
+use rlf::Value;
+use strings::strings;
 use tabula_data::card_definition::CardDefinition;
 use tabula_data::fluent_loader::StringContext;
 use tabula_data::tabula_error::TabulaError;
@@ -101,6 +103,44 @@ pub fn to_fluent_args(bindings: &VariableBindings) -> FluentArgs<'static> {
     args
 }
 
+/// Converts [VariableBindings] to RLF parameters for eval_str formatting.
+pub fn to_rlf_params(bindings: &VariableBindings) -> HashMap<String, Value> {
+    let mut params = HashMap::new();
+    for (name, value) in bindings.iter() {
+        let rlf_value = match value {
+            VariableValue::Integer(n) => Value::Number(*n as i64),
+            VariableValue::Subtype(subtype) => rlf::with_locale(|locale| {
+                Value::Phrase(
+                    locale.get_phrase(&subtype.to_string()).expect("subtype phrase should exist"),
+                )
+            }),
+            VariableValue::Figment(figment) => rlf::with_locale(|locale| {
+                Value::Phrase(
+                    locale.get_phrase(&figment.to_string()).expect("figment phrase should exist"),
+                )
+            }),
+        };
+        params.insert(name.clone(), rlf_value);
+    }
+    params
+}
+
+/// Evaluates a template string with RLF variable bindings.
+///
+/// Rewrites `{phrase(arg)}` to `{phrase:_p_arg}` selector syntax so that
+/// variant phrases correctly select based on the argument's plural category.
+pub fn eval_str(template: &str, bindings: &VariableBindings) -> String {
+    strings::register_source_phrases();
+    let mut params = to_rlf_params(bindings);
+    let rewritten = rewrite_phrase_calls_to_selectors(template, &mut params);
+    rlf::with_locale(|locale| {
+        locale
+            .eval_str(&rewritten, params)
+            .unwrap_or_else(|e| panic!("Error evaluating template {template:?}: {e}"))
+            .to_string()
+    })
+}
+
 /// Returns the rules text for the given ability, without including any costs.
 pub fn ability_token_text(
     builder: &ResponseBuilder,
@@ -125,10 +165,8 @@ pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: Card
     if let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
         && let Some(ModelEffectChoiceIndex(index)) = stack_item.modal_choice
     {
-        formatted = modal_effect_prompt_rendering::modal_effect_descriptions(
-            builder,
-            &definition.abilities,
-        )[index]
+        formatted = modal_effect_prompt_rendering::modal_effect_descriptions(&definition.abilities)
+            [index]
             .clone();
     }
 
@@ -160,13 +198,11 @@ pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: Card
     formatted
 }
 
-pub fn build_info_zoom_data(
-    builder: &ResponseBuilder,
-    battle: &BattleState,
-    card_id: CardId,
-) -> Option<InfoZoomData> {
+/// Builds info zoom data for a card including targeting icons and
+/// supplemental help text.
+pub fn build_info_zoom_data(battle: &BattleState, card_id: CardId) -> Option<InfoZoomData> {
     let targeting_icons = get_targeting_icons(battle, card_id);
-    let supplemental_texts = ability_help_text::help_texts(builder, battle, card_id);
+    let supplemental_texts = ability_help_text::help_texts(battle, card_id);
 
     let supplemental_info = if supplemental_texts.is_empty() {
         None
@@ -195,6 +231,103 @@ pub fn build_info_zoom_data(
     } else {
         Some(InfoZoomData { supplemental_card_info: supplemental_info, icons: targeting_icons })
     }
+}
+
+/// Rewrites RLF function call syntax `{phrase(arg)}` to selector syntax
+/// `{phrase:_p_arg}` to enable proper variant selection. Also handles
+/// transforms like `{@cap @a phrase(arg)}`.
+///
+/// Adds prefixed parameter copies (`_p_arg`) to the params map so that
+/// the prefixed selector references resolve correctly without shadowing
+/// phrase names.
+fn rewrite_phrase_calls_to_selectors(
+    template: &str,
+    params: &mut HashMap<String, Value>,
+) -> String {
+    let original = std::mem::take(params);
+    let mut sorted_keys: Vec<_> = original.keys().collect();
+    sorted_keys.sort();
+    for k in sorted_keys {
+        params.insert(sanitize_param_name(k), original[k].clone());
+    }
+
+    let mut result = String::with_capacity(template.len());
+    let mut chars = template.char_indices().peekable();
+
+    while let Some((i, ch)) = chars.next() {
+        if ch == '{'
+            && let Some(close_pos) = template[i..].find('}')
+        {
+            let close_idx = i + close_pos;
+            let content = &template[i + 1..close_idx];
+
+            if let Some(rewritten) = rewrite_interpolation(content) {
+                result.push('{');
+                result.push_str(&rewritten);
+                result.push('}');
+                while chars.peek().is_some_and(|&(j, _)| j < close_idx) {
+                    chars.next();
+                }
+                chars.next();
+                continue;
+            }
+        }
+        result.push(ch);
+    }
+
+    result
+}
+
+/// Rewrites a single interpolation content if it contains a function call.
+///
+/// Converts `phrase(arg)` to `phrase:_p_arg` and handles optional
+/// leading transforms like `@cap @a`.
+fn rewrite_interpolation(content: &str) -> Option<String> {
+    let trimmed = content.trim();
+    let (transforms_prefix, rest) = extract_transforms(trimmed);
+
+    if let Some(paren_start) = rest.find('(')
+        && let Some(paren_end) = rest.find(')')
+    {
+        let phrase_name = rest[..paren_start].trim();
+        let args_str = &rest[paren_start + 1..paren_end];
+        let suffix = &rest[paren_end + 1..];
+        let args: Vec<&str> = args_str.split(',').map(str::trim).collect();
+
+        let prefixed_args: Vec<String> = args.iter().map(|arg| sanitize_param_name(arg)).collect();
+        let selector_suffix: String = prefixed_args.iter().map(|a| format!(":{a}")).collect();
+
+        return Some(format!("{transforms_prefix}{phrase_name}{selector_suffix}{suffix}"));
+    }
+
+    None
+}
+
+/// Converts a parameter name to a prefixed, sanitized RLF identifier.
+///
+/// Adds `_p_` prefix and replaces hyphens with underscores since RLF
+/// identifiers do not support hyphens.
+fn sanitize_param_name(name: &str) -> String {
+    format!("_p_{}", name.replace('-', "_"))
+}
+
+/// Extracts leading `@transform` prefixes from an interpolation, returning
+/// the prefix string and the remaining content.
+fn extract_transforms(content: &str) -> (String, &str) {
+    let mut prefix = String::new();
+    let mut rest = content;
+
+    while let Some(stripped) = rest.strip_prefix('@') {
+        if let Some(space_pos) = stripped.find(' ') {
+            prefix.push('@');
+            prefix.push_str(&stripped[..space_pos + 1]);
+            rest = &stripped[space_pos + 1..];
+        } else {
+            break;
+        }
+    }
+
+    (prefix, rest)
 }
 
 /// Serializes abilities using the ability serializer and formats with Fluent.
@@ -262,7 +395,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
             None if can_play => Some(display_color::GREEN),
             _ => None,
         },
-        info_zoom_data: build_info_zoom_data(builder, battle, card_id),
+        info_zoom_data: build_info_zoom_data(battle, card_id),
         is_fast: false,
         actions: CardActions {
             can_play: play_action.map(GameAction::BattleAction),
@@ -270,7 +403,6 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
             on_click: selection_action,
             play_effect_preview: play_action.map(|play_action| {
                 outcome_simulation::action_effect_preview(
-                    builder,
                     battle,
                     builder.act_for_player(),
                     play_action,

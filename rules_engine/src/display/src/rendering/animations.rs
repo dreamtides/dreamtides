@@ -210,10 +210,8 @@ pub fn render(
             if *player != builder.display_for_player() {
                 push_snapshot(builder, snapshot);
                 let definition = card::get_definition(snapshot, item_id.underlying_card_id());
-                let descriptions = modal_effect_prompt_rendering::modal_effect_descriptions(
-                    builder,
-                    &definition.abilities,
-                );
+                let descriptions =
+                    modal_effect_prompt_rendering::modal_effect_descriptions(&definition.abilities);
                 builder.push(Command::DisplayEnemyMessage(DisplayEnemyMessageCommand {
                     message: descriptions[choice_index.value()].clone(),
                     show_duration: Milliseconds::new(2000),

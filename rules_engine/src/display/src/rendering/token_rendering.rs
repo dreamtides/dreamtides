@@ -20,8 +20,7 @@ use display_data::card_view::{
     RevealedCardView,
 };
 use display_data::object_position::{ObjectPosition, Position};
-use fluent::fluent_args;
-use tabula_generated::string_id::StringId;
+use strings::strings;
 use ui_components::icon;
 
 use crate::core::adapter;
@@ -74,7 +73,7 @@ pub fn trigger_card_view(
             })
             .image(card_rendering::card_image(battle, character_card_id))
             .name(card_rendering::card_name(battle, character_card_id))
-            .card_type(builder.string(StringId::TokenTypeTriggeredAbility))
+            .card_type(strings::token_type_triggered_ability().to_string())
             .rules_text(card_rendering::ability_token_text(
                 builder,
                 &definition,
@@ -89,7 +88,7 @@ pub fn trigger_card_view(
                 sorting_key: 0,
             })
             .create_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/UI, Pads, Enchantments and Misc/RPG3_Enchantment_Subtle01v2.wav"))
-            .maybe_info_zoom_data(build_token_info_zoom_data(builder, battle, character_card_id))
+            .maybe_info_zoom_data(build_token_info_zoom_data(battle, character_card_id))
             .build(),
     )
 }
@@ -267,11 +266,9 @@ fn activated_ability_card_view(
         _ => None,
     });
 
-    let character_name = card_rendering::card_name(battle, character_card_id);
-    let ability_name = builder.string_with_args(
-        StringId::CharacterAbilityCardName,
-        fluent_args!("character-name" => character_name),
-    );
+    let ability_name =
+        strings::character_ability_card_name(card_rendering::card_name(battle, character_card_id))
+            .to_string();
 
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
     let is_legal_action = legal_actions.contains(action, ForPlayer::Human);
@@ -304,7 +301,7 @@ fn activated_ability_card_view(
             .card_type(format!(
                 "{} {}",
                 if is_fast { format!("{} ", icon::FAST) } else { "".to_string() },
-                builder.string(StringId::TokenTypeActivatedAbility)
+                strings::token_type_activated_ability()
             ))
             .rules_text(card_rendering::ability_token_text(
                 builder,
@@ -323,7 +320,6 @@ fn activated_ability_card_view(
                 can_play: if is_legal_action { activate_action } else { None },
                 play_effect_preview: if is_legal_action {
                     Some(outcome_simulation::action_effect_preview(
-                        builder,
                         battle,
                         builder.act_for_player(),
                         action,
@@ -341,7 +337,7 @@ fn activated_ability_card_view(
             .is_fast(
                 ability_data.ability.options.as_ref().map(|opts| opts.is_fast).unwrap_or(false),
             )
-            .maybe_info_zoom_data(build_token_info_zoom_data(builder, battle, character_card_id))
+            .maybe_info_zoom_data(build_token_info_zoom_data(battle, character_card_id))
             .build(),
     )
 }
@@ -369,11 +365,7 @@ fn void_card_token_view(
             .position(ObjectPosition { position, sorting_key: hand_sorting_key })
             .image(card_rendering::card_image(battle, card_id))
             .name(card_rendering::card_name(battle, card_id))
-            .card_type(format!(
-                "{} {}",
-                icon::FAST,
-                builder.string(StringId::TokenTypeReclaimAbility)
-            ))
+            .card_type(format!("{} {}", icon::FAST, strings::token_type_reclaim_ability()))
             .cost(
                 from_void_with_cost
                     .map(|cost| cost.cost.to_string())
@@ -395,7 +387,6 @@ fn void_card_token_view(
                 can_play: play_action.map(GameAction::BattleAction),
                 play_effect_preview: play_action.map(|action| {
                     outcome_simulation::action_effect_preview(
-                        builder,
                         battle,
                         builder.act_for_player(),
                         action,
@@ -405,15 +396,14 @@ fn void_card_token_view(
             })
             .maybe_outline_color(play_action.map(|_| display_color::PURPLE_300))
             .is_fast(card_properties::is_fast(battle, card_id))
-            .maybe_info_zoom_data(build_token_info_zoom_data(builder, battle, card_id))
+            .maybe_info_zoom_data(build_token_info_zoom_data(battle, card_id))
             .build(),
     )
 }
 
 fn build_token_info_zoom_data(
-    builder: &ResponseBuilder,
     battle: &BattleState,
     parent_card_id: CardId,
 ) -> Option<InfoZoomData> {
-    card_rendering::build_info_zoom_data(builder, battle, parent_card_id)
+    card_rendering::build_info_zoom_data(battle, parent_card_id)
 }
