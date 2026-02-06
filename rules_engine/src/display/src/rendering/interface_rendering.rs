@@ -190,7 +190,7 @@ fn primary_action_button(
 
     if legal_actions.contains(BattleAction::SubmitVoidCardTargets, ForPlayer::Human) {
         Some(ButtonView {
-            label: strings::primary_button_submit_void_card_targets(strings::locale()).to_string(),
+            label: strings::primary_button_submit_void_card_targets().to_string(),
             action: Some(BattleAction::SubmitVoidCardTargets.into()),
         })
     } else if legal_actions.contains(BattleAction::SubmitHandCardTargets, ForPlayer::Human) {
