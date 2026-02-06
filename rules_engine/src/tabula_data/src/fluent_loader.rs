@@ -12,6 +12,31 @@ use zip::ZipArchive;
 
 use crate::tabula_error::TabulaError;
 
+/// Mapping from RLF phrase names (with underscores) to Fluent message IDs
+/// (with hyphens) for multi-word phrases.
+const RLF_MULTI_WORD_PHRASES: &[(&str, &str)] = &[
+    ("cards_numeral", "cards-numeral"),
+    ("top_n_cards", "top-n-cards"),
+    ("count_allies", "count-allies"),
+    ("count_allied_subtype", "count-allied-subtype"),
+    ("a_figment", "a-figment"),
+    ("n_figments", "n-figments"),
+    ("this_turn_times", "this-turn-times"),
+    ("n_random_characters", "n-random-characters"),
+    ("up_to_n_events", "up-to-n-events"),
+    ("up_to_n_allies", "up-to-n-allies"),
+    ("it_or_them", "it-or-them"),
+    ("text_number", "text-number"),
+    ("maximum_energy", "maximum-energy"),
+    ("reclaim_for_cost", "reclaim-for-cost"),
+];
+
+/// Phrases where the Fluent message ID is the phrase name itself, not the
+/// argument. These phrases have parameters in RLF that are consumed by the
+/// Fluent message definition.
+const PHRASE_NAME_IS_MESSAGE: &[&str] =
+    &["foresee", "Foresee", "kindle", "Kindle", "MultiplyBy", "ReclaimForCost", "subtype"];
+
 /// Describes the context in which a string is used.
 ///
 /// Used to correctly determine formatting for colored elements and other
@@ -213,7 +238,9 @@ impl FluentStrings {
     /// Formats a string for display using Fluent placeable resolution.
     ///
     /// This method takes an arbitrary string containing Fluent references and
-    /// resolves all placeables against the loaded resource bundle.
+    /// resolves all placeables against the loaded resource bundle. Handles
+    /// both legacy Fluent syntax and RLF function call syntax by converting
+    /// RLF references to Fluent message references before formatting.
     pub fn format_display_string(
         &self,
         s: &str,
@@ -223,7 +250,8 @@ impl FluentStrings {
         if s.trim().is_empty() {
             return Ok(s.to_string());
         }
-        let ftl = format!("tmp-for-display = {s}");
+        let converted = convert_rlf_to_fluent(s);
+        let ftl = format!("tmp-for-display = {converted}");
         let temp_res = FluentResource::try_new(ftl).map_err(|(_, errors)| {
             let message = errors.iter().map(ToString::to_string).collect::<Vec<_>>().join("; ");
             TabulaError::FluentError {
@@ -241,6 +269,109 @@ impl FluentStrings {
     pub fn format_pattern(&self, id: StringId, context: StringContext, args: FluentArgs) -> String {
         self.format(id.identifier(), context, args).unwrap_or_default()
     }
+}
+
+/// Converts RLF function call syntax in serialized text to Fluent message
+/// references so the string can be processed by the Fluent formatter.
+fn convert_rlf_to_fluent(s: &str) -> String {
+    let mut result = String::with_capacity(s.len());
+    let mut chars = s.chars().peekable();
+
+    while let Some(ch) = chars.next() {
+        if ch == '{' {
+            let mut content = String::new();
+            let mut depth = 1;
+            for inner in chars.by_ref() {
+                if inner == '{' {
+                    depth += 1;
+                } else if inner == '}' {
+                    depth -= 1;
+                    if depth == 0 {
+                        break;
+                    }
+                }
+                content.push(inner);
+            }
+            if content.contains('(') {
+                result.push('{');
+                result.push_str(&convert_rlf_reference(&content));
+                result.push('}');
+            } else {
+                result.push('{');
+                result.push_str(&content);
+                result.push('}');
+            }
+        } else {
+            result.push(ch);
+        }
+    }
+
+    result
+}
+
+/// Converts a single RLF reference (the content between `{` and `}`) to the
+/// equivalent Fluent message reference.
+fn convert_rlf_reference(content: &str) -> String {
+    let has_cap = content.starts_with("@cap ");
+    let has_a = content.contains("@a ");
+    let stripped = content.trim_start_matches("@cap ").trim_start_matches("@a ");
+
+    let (core, selector) = if let Some(pos) = stripped.find(':') {
+        (&stripped[..pos], Some(&stripped[pos + 1..]))
+    } else {
+        (stripped, None)
+    };
+
+    let Some(paren_start) = core.find('(') else {
+        return content.to_string();
+    };
+    let Some(paren_end) = core.find(')') else {
+        return content.to_string();
+    };
+
+    let phrase_name = core[..paren_start].trim();
+
+    // Handle subtype special cases
+    if phrase_name == "subtype" {
+        if has_a && has_cap {
+            return "ASubtype".to_string();
+        }
+        if has_a {
+            return "a-subtype".to_string();
+        }
+        if selector == Some("other") {
+            return "plural-subtype".to_string();
+        }
+        return "subtype".to_string();
+    }
+
+    // Check multi-word phrase table for underscore->hyphen conversion
+    for (rlf_name, fluent_name) in RLF_MULTI_WORD_PHRASES {
+        if phrase_name == *rlf_name {
+            return fluent_name.to_string();
+        }
+    }
+
+    // For phrases where the Fluent message ID is the phrase name itself
+    if PHRASE_NAME_IS_MESSAGE.contains(&phrase_name) {
+        return phrase_name.to_string();
+    }
+
+    // For capitalized multi-word phrases with underscores that aren't in the
+    // table (shouldn't happen, but handle gracefully)
+    if phrase_name.contains('_') {
+        return phrase_name.replace('_', "-");
+    }
+
+    // Default: use the first argument as the Fluent message ID
+    // (e.g., energy(e) -> e, cards(discards) -> discards, points(points) -> points)
+    let args_str = &core[paren_start + 1..paren_end];
+    let first_arg = args_str.split(',').next().unwrap_or(args_str).trim();
+    if !first_arg.is_empty() {
+        return first_arg.to_string();
+    }
+
+    content.to_string()
 }
 
 fn format_error_details(errors: &[FluentError]) -> String {

@@ -69,7 +69,7 @@ pub fn serialize_standard_static_ability(
                 bindings.insert(var_name.to_string(), VariableValue::Integer(increase.0));
             }
             format!(
-                "{} cost you {{e}} more.",
+                "{} cost you {{energy(e)}} more.",
                 predicate_serializer::serialize_card_predicate_plural(matching, bindings)
             )
         }
@@ -78,7 +78,7 @@ pub fn serialize_standard_static_ability(
                 bindings.insert(var_name.to_string(), VariableValue::Integer(reduction.0));
             }
             format!(
-                "{} cost you {{e}} less.",
+                "{} cost you {{energy(e)}} less.",
                 predicate_serializer::serialize_card_predicate_plural(matching, bindings)
             )
         }
@@ -87,7 +87,7 @@ pub fn serialize_standard_static_ability(
                 bindings.insert(var_name.to_string(), VariableValue::Integer(increase.0));
             }
             format!(
-                "the opponent's {} cost {{e}} more.",
+                "the opponent's {} cost {{energy(e)}} more.",
                 predicate_serializer::serialize_card_predicate_plural(matching, bindings)
             )
         }
@@ -115,7 +115,7 @@ pub fn serialize_standard_static_ability(
             };
             if let Some(cost) = &alt_cost.additional_cost {
                 let base = format!(
-                    "{}: Play this {} for {{e}}",
+                    "{}: Play this {} for {{energy(e)}}",
                     serializer_utils::capitalize_first_letter(&cost_serializer::serialize_cost(
                         cost, bindings,
                     )),
@@ -127,7 +127,7 @@ pub fn serialize_standard_static_ability(
                     format!("{}.", base)
                 }
             } else {
-                format!("this {} costs {{e}}", card_type)
+                format!("this {} costs {{energy(e)}}", card_type)
             }
         }
         StandardStaticAbility::CharactersInHandHaveFast => {
@@ -143,7 +143,7 @@ pub fn serialize_standard_static_ability(
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*multiplier));
             }
-            "{MultiplyBy} the amount of {energy-symbol} you gain from card effects this turn."
+            "{MultiplyBy(number)} the amount of {energy-symbol} you gain from card effects this turn."
                 .to_string()
         }
         StandardStaticAbility::MultiplyCardDrawFromCardEffects { multiplier } => {
@@ -152,7 +152,8 @@ pub fn serialize_standard_static_ability(
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*multiplier));
             }
-            "{MultiplyBy} the number of cards you draw from card effects this turn.".to_string()
+            "{MultiplyBy(number)} the number of cards you draw from card effects this turn."
+                .to_string()
         }
         StandardStaticAbility::OncePerTurnPlayFromVoid { matching } => {
             format!(
@@ -194,7 +195,7 @@ pub fn serialize_standard_static_ability(
                     VariableValue::Integer(play_from_hand_or_void.energy_cost.0),
                 );
             }
-            "you may play this card from your hand or void for {e}".to_string()
+            "you may play this card from your hand or void for {energy(e)}".to_string()
         }
         StandardStaticAbility::CardsInYourVoidHaveReclaim { .. } => {
             "they have {reclaim} equal to their cost.".to_string()
@@ -204,7 +205,7 @@ pub fn serialize_standard_static_ability(
                 bindings.insert(var_name.to_string(), VariableValue::Integer(reduction.0));
             }
             format!(
-                "this card costs {{e}} less for each {}.",
+                "this card costs {{energy(e)}} less for each {}.",
                 effect_serializer::serialize_for_count_expression(quantity, bindings)
             )
         }
@@ -215,7 +216,7 @@ pub fn serialize_standard_static_ability(
             let predicate_text = match matching {
                 ability_data::predicate::CardPredicate::Character => "allies".to_string(),
                 ability_data::predicate::CardPredicate::CharacterType(_) => {
-                    "allied {plural-subtype}".to_string()
+                    "allied {subtype(subtype):other}".to_string()
                 }
                 _ => predicate_serializer::serialize_card_predicate_plural(matching, bindings),
             };
@@ -236,7 +237,7 @@ pub fn serialize_standard_static_ability(
                     ))
                 ));
             }
-            result.push_str("play this card from your void for {e}");
+            result.push_str("play this card from your void for {energy(e)}");
             if let Some(effect) = &play_from_void.if_you_do {
                 let effect_text = effect_serializer::serialize_effect(effect, bindings);
                 result.push_str(&format!(", then {}", effect_text.trim_end_matches('.')));

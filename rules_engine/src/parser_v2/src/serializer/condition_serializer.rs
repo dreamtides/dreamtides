@@ -14,7 +14,7 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "with {count-allies} that share a character type,".to_string()
+            "with {count_allies(allies)} that share a character type,".to_string()
         }
         Condition::CardsDiscardedThisTurn { count: 1, predicate } => format!(
             "if you have discarded {} this turn",
@@ -41,7 +41,7 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
             if let Predicate::Another(CardPredicate::CharacterType(subtype)) = predicate {
                 bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
             }
-            "with an allied {subtype},".to_string()
+            "with an allied {subtype(subtype)},".to_string()
         }
         Condition::PredicateCount { count, predicate } => {
             format!(
@@ -62,7 +62,7 @@ fn serialize_predicate_count(
         Predicate::Another(CardPredicate::CharacterType(subtype)) => {
             bindings.insert("allies".to_string(), VariableValue::Integer(count));
             bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "{count-allied-subtype}".to_string()
+            "{count_allied_subtype(subtype, allies)}".to_string()
         }
         Predicate::Another(CardPredicate::Character) => {
             if let Some(var_name) =
@@ -70,7 +70,7 @@ fn serialize_predicate_count(
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(count));
             }
-            "{count-allies}".to_string()
+            "{count_allies(allies)}".to_string()
         }
         Predicate::Another(card_predicate) => predicate_serializer::serialize_predicate_plural(
             &Predicate::Another(card_predicate.clone()),

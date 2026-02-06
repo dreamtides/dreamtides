@@ -16,7 +16,7 @@ pub fn lowercase_leading_keyword(s: &str) -> String {
 ///
 /// Only capitalizes known action keywords (kindle, foresee, prevent,
 /// dissolve, banish, materialize, reclaim, discover), not other directives
-/// like {e} (energy).
+/// like {energy(e)}.
 pub fn capitalize_first_letter(s: &str) -> String {
     if s.starts_with('{') {
         if let Some(end) = s.find('}') {
@@ -33,8 +33,9 @@ pub fn capitalize_first_letter(s: &str) -> String {
 /// Serializes an operator to its string representation.
 ///
 /// Returns a string with a leading space for non-empty operators. This allows
-/// format strings like `"cost {e}{}"` to work correctly for all operators,
-/// producing `"cost {e}"` for Exactly and `"cost {e} or less"` for OrLess.
+/// format strings like `"cost {energy(e)}{}"` to work correctly for all
+/// operators, producing `"cost {energy(e)}"` for Exactly and
+/// `"cost {energy(e)} or less"` for OrLess.
 pub fn serialize_operator<T>(operator: &Operator<T>) -> String {
     match operator {
         Operator::OrLess => " or less".to_string(),
@@ -54,8 +55,11 @@ fn capitalize_string(s: &str) -> String {
 }
 
 fn is_capitalizable_keyword(keyword: &str) -> bool {
+    // Extract just the phrase name before any parenthesis for RLF function call
+    // syntax (e.g., "kindle(k)" -> "kindle")
+    let name = keyword.split('(').next().unwrap_or(keyword);
     matches!(
-        keyword.to_lowercase().as_str(),
+        name.to_lowercase().as_str(),
         "kindle"
             | "foresee"
             | "prevent"
@@ -63,6 +67,8 @@ fn is_capitalizable_keyword(keyword: &str) -> bool {
             | "banish"
             | "materialize"
             | "reclaim"
+            | "reclaim_for_cost"
+            | "reclaimforcost"
             | "discover"
     )
 }

@@ -8,7 +8,7 @@ use parser_v2_tests::test_helpers::*;
 #[test]
 fn test_play_count_trigger_reclaim_self() {
     assert_round_trip(
-        "When you play {cards-numeral} in a turn, {reclaim} this character.",
+        "When you play {cards_numeral(cards)} in a turn, {reclaim} this character.",
         "cards: 2",
     );
 }
@@ -28,18 +28,18 @@ fn test_discard_trigger_gain_reclaim_equal_cost() {
 
 #[test]
 fn test_discard_trigger_gain_points() {
-    assert_round_trip("When you discard a card, gain {points}.", "points: 1");
+    assert_round_trip("When you discard a card, gain {points(points)}.", "points: 1");
 }
 
 #[test]
 fn test_discard_trigger_kindle() {
-    assert_round_trip("When you discard a card, {kindle}.", "k: 1");
+    assert_round_trip("When you discard a card, {kindle(k)}.", "k: 1");
 }
 
 #[test]
 fn test_materialize_subtype_trigger_self_gains_spark() {
     assert_round_trip(
-        "When you {materialize} an allied {subtype}, this character gains +{s} spark.",
+        "When you {materialize} an allied {subtype(subtype)}, this character gains +{s} spark.",
         "subtype: warrior\ns: 1",
     );
 }
@@ -47,20 +47,23 @@ fn test_materialize_subtype_trigger_self_gains_spark() {
 #[test]
 fn test_materialize_character_by_cost_trigger_draw() {
     assert_round_trip(
-        "Once per turn, when you {materialize} a character with cost {e} or less, draw {cards}.",
+        "Once per turn, when you {materialize} a character with cost {energy(e)} or less, draw {cards(cards)}.",
         "e: 2\ncards: 1",
     );
 }
 
 #[test]
 fn test_materialize_character_trigger_gain_energy() {
-    assert_round_trip("Once per turn, when you {materialize} a character, gain {e}.", "e: 1");
+    assert_round_trip(
+        "Once per turn, when you {materialize} a character, gain {energy(e)}.",
+        "e: 1",
+    );
 }
 
 #[test]
 fn test_materialize_subtype_trigger_draw() {
     assert_round_trip(
-        "Once per turn, when you {materialize} {a-subtype}, draw {cards}.",
+        "Once per turn, when you {materialize} {@a subtype(subtype)}, draw {cards(cards)}.",
         "subtype: warrior\ncards: 1",
     );
 }
@@ -68,14 +71,17 @@ fn test_materialize_subtype_trigger_draw() {
 #[test]
 fn test_play_subtype_trigger_reclaim_by_cost() {
     assert_round_trip(
-        "When you play {a-subtype}, {reclaim} a random character with cost {e} or less.",
+        "When you play {@a subtype(subtype)}, {reclaim} a random character with cost {energy(e)} or less.",
         "subtype: warrior\ne: 3",
     );
 }
 
 #[test]
 fn test_play_fast_card_trigger_draw() {
-    assert_round_trip("Once per turn, when you play a {fast} card, draw {cards}.", "cards: 1");
+    assert_round_trip(
+        "Once per turn, when you play a {fast} card, draw {cards(cards)}.",
+        "cards: 1",
+    );
 }
 
 #[test]
@@ -85,24 +91,24 @@ fn test_play_fast_card_trigger_gain_spark() {
 
 #[test]
 fn test_play_fast_card_trigger_gain_points() {
-    assert_round_trip("When you play a {fast} card, gain {points}.", "points: 1");
+    assert_round_trip("When you play a {fast} card, gain {points(points)}.", "points: 1");
 }
 
 #[test]
 fn test_end_of_turn_gain_energy() {
-    assert_round_trip("At the end of your turn, gain {e}.", "e: 2");
+    assert_round_trip("At the end of your turn, gain {energy(e)}.", "e: 2");
 }
 
 #[test]
 fn test_play_fast_character_trigger_gain_energy() {
     assert_round_trip("Characters in your hand have {fast}.", "");
-    assert_round_trip("Once per turn, when you play a {fast} character, gain {e}.", "e: 1");
+    assert_round_trip("Once per turn, when you play a {fast} character, gain {energy(e)}.", "e: 1");
 }
 
 #[test]
 fn test_discard_trigger_gain_energy_and_kindle() {
     assert_round_trip(
-        "Once per turn, when you discard a card, Gain {e}, then {kindle}.",
+        "Once per turn, when you discard a card, Gain {energy(e)}, then {kindle(k)}.",
         "e: 1\nk: 2",
     );
 }
@@ -110,7 +116,7 @@ fn test_discard_trigger_gain_energy_and_kindle() {
 #[test]
 fn test_materialize_subtype_trigger_gain_energy() {
     assert_round_trip(
-        "When you {materialize} an allied {subtype}, gain {e}.",
+        "When you {materialize} an allied {subtype(subtype)}, gain {energy(e)}.",
         "subtype:spirit-animal\ne: 1",
     );
 }
@@ -118,7 +124,7 @@ fn test_materialize_subtype_trigger_gain_energy() {
 #[test]
 fn test_materialize_subtype_trigger_that_character_gains_spark() {
     assert_round_trip(
-        "When you {materialize} an allied {subtype}, that character gains +{s} spark.",
+        "When you {materialize} an allied {subtype(subtype)}, that character gains +{s} spark.",
         "subtype:spirit-animal\ns:1",
     );
 }
@@ -134,7 +140,7 @@ fn test_materialize_character_trigger_gain_spark() {
 #[test]
 fn test_play_subtype_trigger_draw() {
     assert_round_trip(
-        "When you play {a-subtype}, draw {cards}.",
+        "When you play {@a subtype(subtype)}, draw {cards(cards)}.",
         "subtype: spirit-animal\ncards: 1",
     );
 }
@@ -146,28 +152,28 @@ fn test_ally_banished_trigger_gain_spark() {
 
 #[test]
 fn test_ally_banished_trigger_kindle() {
-    assert_round_trip("When an ally is {banished}, {kindle}.", "k: 1");
+    assert_round_trip("When an ally is {banished}, {kindle(k)}.", "k: 1");
 }
 
 #[test]
 fn test_ally_dissolved_trigger_draw() {
-    assert_round_trip("When an ally is {dissolved}, draw {cards}.", "cards: 1");
+    assert_round_trip("When an ally is {dissolved}, draw {cards(cards)}.", "cards: 1");
 }
 
 #[test]
 fn test_ally_dissolved_trigger_gain_energy() {
-    assert_round_trip("When an ally is {dissolved}, gain {e}.", "e: 1");
+    assert_round_trip("When an ally is {dissolved}, gain {energy(e)}.", "e: 1");
 }
 
 #[test]
 fn test_ally_dissolved_trigger_gain_points() {
-    assert_round_trip("When an ally is {dissolved}, gain {points}.", "points: 1");
+    assert_round_trip("When an ally is {dissolved}, gain {points(points)}.", "points: 1");
 }
 
 #[test]
 fn test_ally_dissolved_trigger_gain_reclaim_for_cost() {
     assert_round_trip(
-        "When an ally is {dissolved}, this card gains {reclaim-for-cost} this turn.",
+        "When an ally is {dissolved}, this card gains {reclaim_for_cost(reclaim)} this turn.",
         "reclaim: 1",
     );
 }
@@ -180,24 +186,24 @@ fn test_abandon_ally_trigger_gain_spark() {
 #[test]
 fn test_abandon_allies_count_trigger_dissolve() {
     assert_round_trip(
-        "When you abandon {count-allies} in a turn, {dissolve} an enemy.",
+        "When you abandon {count_allies(allies)} in a turn, {dissolve} an enemy.",
         "allies: 2",
     );
 }
 
 #[test]
 fn test_abandon_character_trigger_gain_points() {
-    assert_round_trip("When you abandon a character, gain {points}.", "points: 1");
+    assert_round_trip("When you abandon a character, gain {points(points)}.", "points: 1");
 }
 
 #[test]
 fn test_abandon_ally_trigger_kindle() {
-    assert_round_trip("When you abandon an ally, {kindle}.", "k: 2");
+    assert_round_trip("When you abandon an ally, {kindle(k)}.", "k: 2");
 }
 
 #[test]
 fn test_abandon_character_trigger_draw() {
-    assert_round_trip("When you abandon a character, draw {cards}.", "cards: 1");
+    assert_round_trip("When you abandon a character, draw {cards(cards)}.", "cards: 1");
 }
 
 #[test]
@@ -210,17 +216,17 @@ fn test_event_to_void_trigger_gain_spark() {
 
 #[test]
 fn test_play_event_trigger_gain_energy() {
-    assert_round_trip("When you play an event, gain {e}.", "e: 1");
+    assert_round_trip("When you play an event, gain {energy(e)}.", "e: 1");
 }
 
 #[test]
 fn test_play_event_trigger_foresee() {
-    assert_round_trip("When you play an event, {foresee}.", "foresee: 1");
+    assert_round_trip("When you play an event, {foresee(foresee)}.", "foresee: 1");
 }
 
 #[test]
 fn test_play_event_trigger_copy() {
-    assert_round_trip("Events cost you {e} more.", "e: 2");
+    assert_round_trip("Events cost you {energy(e)} more.", "e: 2");
     assert_round_trip("When you play an event from your hand, copy it.", "");
 }
 
@@ -239,7 +245,10 @@ fn test_materialize_character_trigger_judgment() {
 
 #[test]
 fn test_until_end_of_turn_play_character_trigger_draw() {
-    assert_round_trip("Until end of turn, when you play a character, draw {cards}.", "cards: 1");
+    assert_round_trip(
+        "Until end of turn, when you play a character, draw {cards(cards)}.",
+        "cards: 1",
+    );
 }
 
 #[test]
@@ -252,17 +261,20 @@ fn test_judgment_triggers_on_materialize() {
 
 #[test]
 fn test_draw_count_in_void_trigger_reclaim() {
-    assert_round_trip("When you draw {cards-numeral} in a turn, while this card is in your void, it gains {reclaim-for-cost} this turn.", "cards: 2\nreclaim: 1");
+    assert_round_trip("When you draw {cards_numeral(cards)} in a turn, while this card is in your void, it gains {reclaim_for_cost(reclaim)} this turn.", "cards: 2\nreclaim: 1");
 }
 
 #[test]
 fn test_play_character_trigger_materialize_figment() {
-    assert_round_trip("When you play a character, {materialize} {a-figment}.", "figment: halcyon");
+    assert_round_trip(
+        "When you play a character, {materialize} {a_figment(figment)}.",
+        "figment: halcyon",
+    );
 }
 
 #[test]
 fn test_materialize_ally_trigger_gain_energy() {
-    assert_round_trip("When you {materialize} an ally, gain {e}.", "e: 1");
+    assert_round_trip("When you {materialize} an ally, gain {energy(e)}.", "e: 1");
 }
 
 #[test]
@@ -276,7 +288,7 @@ fn test_play_card_opponent_turn_trigger_gain_spark() {
 #[test]
 fn test_materialize_subtype_trigger_reclaim_self() {
     assert_round_trip(
-        "When you {materialize} {a-subtype}, {reclaim} this character.",
+        "When you {materialize} {@a subtype(subtype)}, {reclaim} this character.",
         "subtype: survivor",
     );
 }
@@ -284,12 +296,12 @@ fn test_materialize_subtype_trigger_reclaim_self() {
 #[test]
 fn test_play_subtype_trigger_put_to_void() {
     assert_round_trip(
-        "When you play {a-subtype}, put the {top-n-cards} of your deck into your void.",
+        "When you play {@a subtype(subtype)}, put the {top_n_cards(to-void)} of your deck into your void.",
         "subtype: survivor\nto-void: 2",
     );
 }
 
 #[test]
 fn test_until_end_of_turn_ally_leaves_trigger_gain_energy() {
-    assert_round_trip("Until end of turn, when an ally leaves play, gain {e}.", "e: 2");
+    assert_round_trip("Until end of turn, when an ally leaves play, gain {energy(e)}.", "e: 2");
 }
