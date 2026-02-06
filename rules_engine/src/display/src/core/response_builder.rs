@@ -6,11 +6,8 @@ use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattleView, DisplayPlayer};
 use display_data::command::{Command, CommandSequence, ParallelCommandGroup, UpdateBattleCommand};
-use fluent::FluentArgs;
 use state_provider::display_state_provider::{DisplayState, DisplayStateProvider};
-use tabula_data::fluent_loader::StringContext;
 use tabula_data::tabula::Tabula;
-use tabula_generated::string_id::StringId;
 
 /// Primary builder used to render game state.
 pub struct ResponseBuilder {
@@ -103,22 +100,6 @@ impl ResponseBuilder {
     /// Returns the [Tabula] instance
     pub fn tabula(&self) -> Arc<Tabula> {
         self.provider.tabula().clone()
-    }
-
-    /// Formats a string for display in the currently language without any
-    /// arguments.
-    pub fn string(&self, string_id: StringId) -> String {
-        self.provider.tabula().strings.format_pattern(
-            string_id,
-            StringContext::Interface,
-            FluentArgs::new(),
-        )
-    }
-
-    /// Formats a string for display in the currently selected language with the
-    /// given arguments.
-    pub fn string_with_args(&self, string_id: StringId, args: FluentArgs) -> String {
-        self.provider.tabula().strings.format_pattern(string_id, StringContext::Interface, args)
     }
 
     pub fn should_animate(&self) -> bool {

@@ -1538,7 +1538,6 @@ dependencies = [
  "bon",
  "core_data",
  "display_data",
- "fluent",
  "logging",
  "masonry",
  "parser_v2",

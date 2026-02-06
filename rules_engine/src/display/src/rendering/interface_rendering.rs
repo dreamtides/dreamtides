@@ -14,12 +14,10 @@ use core_data::numerics::Energy;
 use display_data::battle_view::{
     ButtonView, CardBrowserView, CardOrderSelectorView, InterfaceView,
 };
-use fluent::FluentArgs;
 use masonry::dimension::{FlexInsets, SafeAreaInsets};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
 use masonry::flex_style::FlexStyle;
 use strings::strings;
-use tabula_data::fluent_loader::StringContext;
 use ui_components::box_component::{BoxComponent, BoxComponentBuilder, Named};
 use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;
@@ -113,26 +111,18 @@ fn get_prompt_message_from_source(battle: &BattleState, prompt: &PromptData) -> 
         return None;
     }
 
-    let prompt = match prompt.source.card_source() {
+    match prompt.source.card_source() {
         CardSource::CardId(card_id) => {
             // TODO: Handle multiple prompts per card.
             let definition = card::get_definition(battle, card_id);
-            definition.displayed_prompts.first()?.clone()
+            definition.displayed_prompts.first().cloned()
         }
         CardSource::DreamwellCard(dreamwell_card_id) => {
             let definition = battle.dreamwell.definition(dreamwell_card_id);
-            definition.displayed_prompts.first()?.clone()
+            definition.displayed_prompts.first().cloned()
         }
-        CardSource::None => {
-            return None;
-        }
-    };
-
-    battle
-        .tabula
-        .strings
-        .format_display_string(&prompt, StringContext::Interface, FluentArgs::default())
-        .ok()
+        CardSource::None => None,
+    }
 }
 
 fn get_generic_prompt_message(_builder: &ResponseBuilder, prompt_type: &PromptType) -> String {

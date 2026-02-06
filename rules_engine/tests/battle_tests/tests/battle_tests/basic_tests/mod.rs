@@ -11,6 +11,7 @@ mod outcome_simulation_tests;
 mod prompt_message_tests;
 mod stack_interaction_tests;
 mod test_helpers;
+mod text_utils_tests;
 mod triggered_ability_tests;
 mod turn_sequence_tests;
 mod undo_tests;

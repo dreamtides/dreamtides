@@ -47,18 +47,6 @@ const RLF_BARE_PHRASES: &[(&str, &str)] = &[
     ("judgment_phase_name", "JudgmentPhaseName"),
 ];
 
-/// Describes the context in which a string is used.
-///
-/// Used to correctly determine formatting for colored elements and other
-/// context-dependent rendering.
-#[derive(Debug, Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
-pub enum StringContext {
-    /// String is used in the game interface (menus, buttons, etc.).
-    Interface,
-    /// String is used in card text (rules text, abilities, etc.).
-    CardText,
-}
-
 /// A collection of localized strings loaded from Fluent FTL files.
 ///
 /// Wraps a `FluentBundle` and provides methods for formatting localized
@@ -164,28 +152,13 @@ fn read_android_asset(jar_url: &str, path: &Path) -> Result<String, TabulaError>
     })
 }
 
-impl StringContext {
-    /// Returns the Fluent variable key for this context.
-    pub fn key(&self) -> &'static str {
-        match self {
-            StringContext::Interface => "interface",
-            StringContext::CardText => "card-text",
-        }
-    }
-}
-
 impl FluentStrings {
     /// Formats a localized string with the given message ID and arguments.
     ///
     /// Returns a formatted string or an error if the message ID is not found
     /// or formatting fails.
-    pub fn format(
-        &self,
-        id: &str,
-        context: StringContext,
-        args: FluentArgs,
-    ) -> Result<String, TabulaError> {
-        self.format_with_resource(id, context, args, None)
+    pub fn format(&self, id: &str, args: FluentArgs) -> Result<String, TabulaError> {
+        self.format_with_resource(id, args, None)
     }
 
     /// Formats a localized string, using an optional additional resource.
@@ -195,11 +168,9 @@ impl FluentStrings {
     fn format_with_resource(
         &self,
         id: &str,
-        context: StringContext,
-        mut args: FluentArgs,
+        args: FluentArgs,
         additional_resource: Option<Arc<FluentResource>>,
     ) -> Result<String, TabulaError> {
-        args.set("context", context.key());
         let mut bundle = FluentBundle::default();
         bundle.set_use_isolating(false);
         if bundle.add_resource(self.resource.clone()).is_err() {
@@ -251,12 +222,7 @@ impl FluentStrings {
     /// resolves all placeables against the loaded resource bundle. Handles
     /// both legacy Fluent syntax and RLF function call syntax by converting
     /// RLF references to Fluent message references before formatting.
-    pub fn format_display_string(
-        &self,
-        s: &str,
-        context: StringContext,
-        args: FluentArgs,
-    ) -> Result<String, TabulaError> {
+    pub fn format_display_string(&self, s: &str, args: FluentArgs) -> Result<String, TabulaError> {
         if s.trim().is_empty() {
             return Ok(s.to_string());
         }
@@ -270,14 +236,14 @@ impl FluentStrings {
                 message: format!("Failed to parse display string: {message}"),
             }
         })?;
-        self.format_with_resource("tmp-for-display", context, args, Some(Arc::new(temp_res)))
+        self.format_with_resource("tmp-for-display", args, Some(Arc::new(temp_res)))
     }
 
     /// Formats a localized string using a [StringId].
     ///
     /// Returns the formatted string or an empty string if formatting fails.
-    pub fn format_pattern(&self, id: StringId, context: StringContext, args: FluentArgs) -> String {
-        self.format(id.identifier(), context, args).unwrap_or_default()
+    pub fn format_pattern(&self, id: StringId, args: FluentArgs) -> String {
+        self.format(id.identifier(), args).unwrap_or_default()
     }
 }
 

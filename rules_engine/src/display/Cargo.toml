@@ -32,7 +32,6 @@ tabula_generated = { path = "../tabula_generated" }
 ui_components = { path = "../ui_components" }
 
 bon = { workspace = true }
-fluent = { workspace = true }
 rlf = { workspace = true }
 schemars = { workspace = true }
 serde = { workspace = true }
