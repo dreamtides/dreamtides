@@ -4861,6 +4861,7 @@ dependencies = [
 [[package]]
 name = "rlf"
 version = "0.1.0"
+source = "git+https://github.com/thurn/rlf#d871c6bb61b5a278a2de2ec2838a5ebd0a4c1483"
 dependencies = [
  "bon",
  "const-fnv1a-hash",
@@ -4879,6 +4880,7 @@ dependencies = [
 [[package]]
 name = "rlf-macros"
 version = "0.1.0"
+source = "git+https://github.com/thurn/rlf#d871c6bb61b5a278a2de2ec2838a5ebd0a4c1483"
 dependencies = [
  "proc-macro2",
  "quote",
