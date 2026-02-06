@@ -13,5 +13,6 @@ pub mod modal_effect_prompt_rendering;
 pub mod position_overrides;
 pub mod positions;
 pub mod renderer;
+pub mod rlf_eval;
 pub mod supplemental_card_info;
 pub mod token_rendering;
