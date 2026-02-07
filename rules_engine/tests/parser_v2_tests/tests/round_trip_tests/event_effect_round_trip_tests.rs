@@ -87,7 +87,7 @@ fn test_dissolve_enemy_by_cost_or_more_with_reclaim() {
 #[test]
 fn test_dissolve_enemy_by_subtype_count() {
     assert_round_trip(
-        "{Dissolve} an enemy with cost less than the number of allied {subtype(t):other}.",
+        "{Dissolve} an enemy with cost less than the number of allied {@plural subtype(t)}.",
         "t: warrior",
     );
 }

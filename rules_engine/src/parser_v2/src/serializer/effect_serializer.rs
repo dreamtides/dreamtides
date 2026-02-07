@@ -1065,7 +1065,7 @@ fn serialize_allied_card_predicate_plural(
     match card_predicate {
         CardPredicate::CharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            "allied {subtype(t):other}".to_string()
+            "allied {@plural subtype(t)}".to_string()
         }
         _ => {
             format!("allied {}", text_formatting::card_predicate_base_text(card_predicate).plural())

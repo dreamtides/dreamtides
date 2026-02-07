@@ -36,7 +36,7 @@ fn test_prevent_dissolve_event() {
 
 #[test]
 fn test_subtypes_have_spark_bonus() {
-    assert_round_trip("Allied {subtype(t):other} have +{s} spark.", "t: warrior\ns: 1");
+    assert_round_trip("Allied {@plural subtype(t)} have +{s} spark.", "t: warrior\ns: 1");
 }
 
 #[test]
@@ -47,7 +47,7 @@ fn test_opponent_events_cost_more() {
 #[test]
 fn test_spark_equals_subtype_count() {
     assert_round_trip(
-        "This character's spark is equal to the number of allied {subtype(t):other}.",
+        "This character's spark is equal to the number of allied {@plural subtype(t)}.",
         "t: warrior",
     );
 }
@@ -83,7 +83,7 @@ fn test_void_cards_have_reclaim_equal_cost() {
 #[test]
 fn test_subtype_in_void_allies_have_spark() {
     assert_round_trip(
-        "While this card is in your void, allied {subtype(t):other} have +{s} spark.",
+        "While this card is in your void, allied {@plural subtype(t)} have +{s} spark.",
         "t: survivor\ns: 2",
     );
 }
@@ -134,7 +134,7 @@ fn test_events_cost_more_with_copy() {
 #[test]
 fn test_subtype_gains_spark_equal_count() {
     assert_round_trip(
-        "Each allied {subtype(t)} gains spark equal to the number of allied {subtype(t):other}.",
+        "Each allied {subtype(t)} gains spark equal to the number of allied {@plural subtype(t)}.",
         "t: spirit-animal",
     );
 }

@@ -314,11 +314,11 @@ pub fn serialize_card_predicate_plural(
         }
         CardPredicate::CharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            "{subtype(t):other}".to_string()
+            "{@plural subtype(t)}".to_string()
         }
         CardPredicate::NotCharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            "characters that are not {subtype(t):other}".to_string()
+            "characters that are not {@plural subtype(t)}".to_string()
         }
         CardPredicate::CharacterWithSpark(spark, operator) => {
             bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
@@ -702,14 +702,14 @@ fn serialize_your_predicate_plural(
         CardPredicate::Event => "your events".to_string(),
         CardPredicate::CharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            "allied {subtype(t):other}".to_string()
+            "allied {@plural subtype(t)}".to_string()
         }
         CardPredicate::Fast { target } => {
             format!("{{fast}} {}", serialize_card_predicate_plural(target, bindings))
         }
         CardPredicate::NotCharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            "allies that are not {subtype(t):other}".to_string()
+            "allies that are not {@plural subtype(t)}".to_string()
         }
         CardPredicate::CharacterWithSpark(spark, operator) => {
             bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
@@ -783,7 +783,7 @@ fn serialize_enemy_predicate_plural(
         CardPredicate::Character => "enemies".to_string(),
         CardPredicate::CharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            "enemy {subtype(t):other}".to_string()
+            "enemy {@plural subtype(t)}".to_string()
         }
         _ => {
             format!("enemy {}", serialize_card_predicate_plural(card_predicate, bindings))

@@ -189,7 +189,7 @@ pub fn serialize_standard_static_ability(
             let predicate_text = match matching {
                 ability_data::predicate::CardPredicate::Character => "allies".to_string(),
                 ability_data::predicate::CardPredicate::CharacterType(_) => {
-                    "allied {subtype(t):other}".to_string()
+                    "allied {@plural subtype(t)}".to_string()
                 }
                 _ => predicate_serializer::serialize_card_predicate_plural(matching, bindings),
             };

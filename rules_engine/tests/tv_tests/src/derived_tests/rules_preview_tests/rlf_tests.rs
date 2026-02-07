@@ -194,7 +194,7 @@ fn test_subtype_variable_with_article() {
 fn test_subtype_variable_plural() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{subtype(subtype):other}", "subtype: warrior");
+    let inputs = make_inputs("{@plural subtype(subtype)}", "subtype: warrior");
 
     let result = function.compute(&inputs, &context);
     match result {

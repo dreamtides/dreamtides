@@ -666,7 +666,7 @@ spark = ""
 name = "Fury of the Clan"
 id = "cd3d7b81-de72-4668-b505-e09848a477be"
 energy-cost = 1
-rules-text = "{Dissolve} an enemy with cost less than the number of allied {subtype(t):other}."
+rules-text = "{Dissolve} an enemy with cost less than the number of allied {@plural subtype(t)}."
 variables = "t: warrior"
 card-type = "Event"
 is-fast = false
@@ -828,7 +828,7 @@ variables = ""
 name = "Skyflame Commander"
 id = "07dea7d2-6d3b-40f6-9740-cfefd44aaaaf"
 energy-cost = 2
-rules-text = "Allied {subtype(t):other} have +{s} spark."
+rules-text = "Allied {@plural subtype(t)} have +{s} spark."
 variables = """
 t: warrior
 s: 1"""
@@ -923,7 +923,7 @@ card-number = 56
 name = "Blade of Unity"
 id = "6d7c5ef9-14ed-4301-8aa5-a07944d1918f"
 energy-cost = 2
-rules-text = "This character's spark is equal to the number of allied {subtype(t):other}."
+rules-text = "This character's spark is equal to the number of allied {@plural subtype(t)}."
 variables = "t: warrior"
 card-type = "Character"
 subtype = "Warrior"
@@ -2126,7 +2126,7 @@ card-number = 130
 name = "Spirit Bond"
 id = "1396e9c8-5719-42bc-8ef6-98d2777cc069"
 energy-cost = 12
-rules-text = "Each allied {subtype(t)} gains spark equal to the number of allied {subtype(t):other}. "
+rules-text = "Each allied {subtype(t)} gains spark equal to the number of allied {@plural subtype(t)}. "
 variables = "t: spirit-animal"
 card-type = "Event"
 is-fast = false
@@ -3016,7 +3016,7 @@ variables = ""
 name = "Soulkindler"
 id = "7d20f2bb-50b5-418a-a435-da13a13ad257"
 energy-cost = 2
-rules-text = "While this card is in your void, allied {subtype(t):other} have +{s} spark."
+rules-text = "While this card is in your void, allied {@plural subtype(t)} have +{s} spark."
 variables = """
 t: survivor
 s: 2"""

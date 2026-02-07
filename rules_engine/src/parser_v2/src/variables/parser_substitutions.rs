@@ -223,8 +223,9 @@ fn resolve_rlf_syntax(
     bindings: &VariableBindings,
     span: SimpleSpan,
 ) -> Result<Option<ResolvedToken>, UnresolvedVariable> {
-    // Strip @cap and @a prefixes
-    let stripped = name.trim_start_matches("@cap ").trim_start_matches("@a ");
+    // Strip @cap, @a, and @plural prefixes
+    let stripped =
+        name.trim_start_matches("@cap ").trim_start_matches("@a ").trim_start_matches("@plural ");
 
     // Strip :selector suffix
     let (core, _selector) = if let Some(pos) = stripped.find(':') {
