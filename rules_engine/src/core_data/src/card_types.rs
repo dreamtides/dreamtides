@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use enumset::EnumSetType;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -41,7 +43,7 @@ pub enum CardSubtype {
     Outsider,
     Renegade,
     Robot,
-    #[strum(serialize = "Spirit Animal")]
+    #[strum(to_string = "Spirit Animal", serialize = "SpiritAnimal")]
     SpiritAnimal,
     Super,
     Survivor,
@@ -57,33 +59,8 @@ pub enum CardSubtype {
 }
 
 impl CardSubtype {
+    /// Parses a PascalCase variable string into a CardSubtype.
     pub fn from_variable(variable: &str) -> Option<CardSubtype> {
-        match variable {
-            "agent" => Some(CardSubtype::Agent),
-            "ancient" => Some(CardSubtype::Ancient),
-            "avatar" => Some(CardSubtype::Avatar),
-            "child" => Some(CardSubtype::Child),
-            "detective" => Some(CardSubtype::Detective),
-            "explorer" => Some(CardSubtype::Explorer),
-            "guide" => Some(CardSubtype::Guide),
-            "hacker" => Some(CardSubtype::Hacker),
-            "mage" => Some(CardSubtype::Mage),
-            "monster" => Some(CardSubtype::Monster),
-            "musician" => Some(CardSubtype::Musician),
-            "outsider" => Some(CardSubtype::Outsider),
-            "renegade" => Some(CardSubtype::Renegade),
-            "robot" => Some(CardSubtype::Robot),
-            "spirit-animal" => Some(CardSubtype::SpiritAnimal),
-            "super" => Some(CardSubtype::Super),
-            "survivor" => Some(CardSubtype::Survivor),
-            "synth" => Some(CardSubtype::Synth),
-            "tinkerer" => Some(CardSubtype::Tinkerer),
-            "trooper" => Some(CardSubtype::Trooper),
-            "visionary" => Some(CardSubtype::Visionary),
-            "visitor" => Some(CardSubtype::Visitor),
-            "warrior" => Some(CardSubtype::Warrior),
-            "enigma" => Some(CardSubtype::Enigma),
-            _ => None,
-        }
+        Self::from_str(variable).ok()
     }
 }

@@ -34,7 +34,7 @@ fn test_materialized_draw_cards() {
 #[test]
 fn test_materialized_draw_cards_for_each_allied_subtype() {
     let result =
-        parse_ability("{Materialized} Draw {cards} for each allied {subtype}.", "c: 2, t: warrior");
+        parse_ability("{Materialized} Draw {cards} for each allied {subtype}.", "c: 2, t: Warrior");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -790,7 +790,7 @@ fn test_discover_character_with_activated_ability() {
 
 #[test]
 fn test_materialized_draw_subtype_from_deck() {
-    let result = parse_ability("{Materialized} Draw {a_subtype} from your deck.", "t: warrior");
+    let result = parse_ability("{Materialized} Draw {a_subtype} from your deck.", "t: Warrior");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -849,7 +849,7 @@ fn test_return_all_ally_to_hand_draw_cards() {
 fn test_reclaim_random_character_with_cost_or_less() {
     let result = parse_ability(
         "When you play {a_subtype}, {reclaim} a random character with cost {e} or less.",
-        "t: warrior, e: 3",
+        "t: Warrior, e: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(

@@ -14,7 +14,7 @@ fn test_abandon_allies_count_reclaim_self() {
 fn test_pay_energy_gain_spark_per_subtype() {
     assert_round_trip(
         "{energy(e)}: This character gains +{s} spark for each allied {subtype(t)}.",
-        "e: 4\ns: 1\nt: warrior",
+        "e: 4\ns: 1\nt: Warrior",
     );
 }
 
@@ -93,7 +93,7 @@ fn test_abandon_ally_dissolve_enemy_by_spark() {
 
 #[test]
 fn test_abandon_ally_once_per_turn_reclaim_subtype() {
-    assert_round_trip("Abandon an ally, once per turn: {Reclaim} {@a subtype(t)}.", "t: warrior");
+    assert_round_trip("Abandon an ally, once per turn: {Reclaim} {@a subtype(t)}.", "t: Warrior");
 }
 
 #[test]
@@ -115,7 +115,7 @@ fn test_pay_energy_materialize_copy() {
 fn test_pay_energy_subtype_spark_becomes() {
     assert_round_trip(
         "{energy(e)}: The spark of each allied {subtype(t)} becomes {s}.",
-        "e: 3\nt: spirit-animal\ns: 5",
+        "e: 3\nt: SpiritAnimal\ns: 5",
     );
 }
 

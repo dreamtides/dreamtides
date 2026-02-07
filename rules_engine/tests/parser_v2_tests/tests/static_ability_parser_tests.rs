@@ -36,7 +36,7 @@ fn test_opponent_events_cost_more() {
 
 #[test]
 fn test_allied_plural_subtype_have_spark() {
-    let result = parse_ability("Allied {plural_subtype} have +{s} spark.", "t: warrior, s: 1");
+    let result = parse_ability("Allied {plural_subtype} have +{s} spark.", "t: Warrior, s: 1");
     assert_ron_snapshot!(result, @r###"
     Static(StaticAbility(SparkBonusOtherCharacters(
       matching: CharacterType(Warrior),
@@ -219,7 +219,7 @@ fn test_character_costs_if_discarded_character_this_turn() {
 fn test_character_costs_if_discarded_subtype_this_turn() {
     let result = parse_ability(
         "This character costs {e} if you have discarded {a_subtype} this turn.",
-        "e: 1, t: warrior",
+        "e: 1, t: Warrior",
     );
     assert_ron_snapshot!(result, @r###"
     Static(WithOptions(StaticAbilityWithOptions(
@@ -315,7 +315,7 @@ fn test_judgment_ability_of_allies_triggers_when_materialize() {
 fn test_spark_equal_to_allied_subtype() {
     let result = parse_ability(
         "This character's spark is equal to the number of allied {plural_subtype}.",
-        "t: warrior",
+        "t: Warrior",
     );
     assert_ron_snapshot!(result, @r###"
     Static(StaticAbility(SparkEqualToPredicateCount(
@@ -339,7 +339,7 @@ fn test_spark_equal_to_cards_in_void() {
 fn test_while_in_void_allied_subtype_have_spark() {
     let result = parse_ability(
         "If this card is in your void, allied {plural_subtype} have +{s} spark.",
-        "t: warrior, s: 1",
+        "t: Warrior, s: 1",
     );
     assert_ron_snapshot!(result, @r###"
     Static(WithOptions(StaticAbilityWithOptions(
@@ -382,7 +382,7 @@ fn test_play_only_from_void() {
 fn test_with_allied_subtype_play_from_hand_or_void_for_cost() {
     let result = parse_ability(
         "With an allied {subtype}, you may play this card from your hand or void for {e}.",
-        "t: warrior, e: 2",
+        "t: Warrior, e: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Static(WithOptions(StaticAbilityWithOptions(

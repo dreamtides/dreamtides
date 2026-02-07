@@ -133,7 +133,7 @@ fn test_double_newline_expression() {
 fn test_subtype_variable_produces_phrase() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{subtype(subtype)}", "subtype: warrior");
+    let inputs = make_inputs("{subtype(subtype)}", "subtype: Warrior");
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -152,7 +152,7 @@ fn test_subtype_variable_produces_phrase() {
 fn test_subtype_variable_spirit_animal() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{subtype(subtype)}", "subtype: spirit-animal");
+    let inputs = make_inputs("{subtype(subtype)}", "subtype: SpiritAnimal");
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -174,7 +174,7 @@ fn test_subtype_variable_spirit_animal() {
 fn test_subtype_variable_with_article() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{@a subtype(subtype)}", "subtype: warrior");
+    let inputs = make_inputs("{@a subtype(subtype)}", "subtype: Warrior");
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -194,7 +194,7 @@ fn test_subtype_variable_with_article() {
 fn test_subtype_variable_plural() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{@plural subtype(subtype)}", "subtype: warrior");
+    let inputs = make_inputs("{@plural subtype(subtype)}", "subtype: Warrior");
 
     let result = function.compute(&inputs, &context);
     match result {

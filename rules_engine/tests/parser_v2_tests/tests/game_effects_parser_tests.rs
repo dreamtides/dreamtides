@@ -65,7 +65,7 @@ fn test_materialize_random_characters_with_cost() {
 fn test_judgment_materialize_random_subtype_from_deck() {
     let result = parse_ability(
         "{Judgment} {Materialize} {n_random_characters} {subtype} from your deck.",
-        "n: 2, t: warrior",
+        "n: 2, t: Warrior",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -149,7 +149,7 @@ fn test_dissolve_an_enemy() {
 
 #[test]
 fn test_discover_a_subtype() {
-    let result = parse_ability("{Discover} {a_subtype}.", "t: warrior");
+    let result = parse_ability("{Discover} {a_subtype}.", "t: Warrior");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Discover(
@@ -411,7 +411,7 @@ fn test_discover_fast_card() {
 
 #[test]
 fn test_discover_fast_subtype() {
-    let result = parse_ability("{Discover} a {fast} {a_subtype}.", "t: warrior");
+    let result = parse_ability("{Discover} a {fast} {a_subtype}.", "t: Warrior");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Discover(
@@ -473,7 +473,7 @@ fn test_discover_card_with_cost() {
 
 #[test]
 fn test_banish_non_subtype_enemy() {
-    let result = parse_ability("{Banish} a non-{subtype} enemy.", "t: warrior");
+    let result = parse_ability("{Banish} a non-{subtype} enemy.", "t: Warrior");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(BanishCharacter(
@@ -517,7 +517,7 @@ fn test_discover_character_with_cost() {
 
 #[test]
 fn test_discover_subtype_with_cost() {
-    let result = parse_ability("{Discover} {a_subtype} with cost {e} or more.", "t: warrior, e: 4");
+    let result = parse_ability("{Discover} {a_subtype} with cost {e} or more.", "t: Warrior, e: 4");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Discover(
@@ -552,7 +552,7 @@ fn test_discover_fast_event_with_cost() {
 #[test]
 fn test_discover_fast_subtype_with_cost() {
     let result =
-        parse_ability("{Discover} a {fast} {subtype} with cost {e} or less.", "t: mage, e: 2");
+        parse_ability("{Discover} a {fast} {subtype} with cost {e} or less.", "t: Mage, e: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Discover(
@@ -571,7 +571,7 @@ fn test_discover_fast_subtype_with_cost() {
 #[test]
 fn test_discover_subtype_with_spark() {
     let result =
-        parse_ability("{Discover} {a_subtype} with spark {s} or less.", "t: warrior, s: 2");
+        parse_ability("{Discover} {a_subtype} with spark {s} or less.", "t: Warrior, s: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Discover(
@@ -598,7 +598,7 @@ fn test_discover_fast_character_with_spark_general() {
 #[test]
 fn test_discover_fast_subtype_with_spark_general() {
     let result =
-        parse_ability("{Discover} a {fast} {subtype} with spark {s} or less.", "t: warrior, s: 1");
+        parse_ability("{Discover} a {fast} {subtype} with spark {s} or less.", "t: Warrior, s: 1");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Discover(
@@ -644,7 +644,7 @@ fn test_banish_ally_materialize_at_end_of_turn_reclaim() {
 fn test_dissolve_enemy_with_cost_less_than_allied_subtype() {
     let result = parse_ability(
         "{Dissolve} an enemy with cost less than the number of allied {plural_subtype}.",
-        "t: warrior",
+        "t: Warrior",
     );
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
@@ -793,7 +793,7 @@ fn test_judgment_you_may_banish_cards_from_opponent_void_to_gain_energy() {
 fn test_judgment_you_may_abandon_subtype_to_discover_subtype_with_cost_higher_and_materialize_it() {
     let result = parse_ability(
         "{Judgment} You may abandon {a_subtype} to {discover} {a_subtype} with cost {e} higher and {materialize} it.",
-        "t: warrior, e: 2",
+        "t: Warrior, e: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(

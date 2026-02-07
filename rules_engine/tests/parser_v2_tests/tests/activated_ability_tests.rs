@@ -44,7 +44,7 @@ fn test_abandon_an_ally_once_per_turn_gain_points() {
 #[test]
 fn test_abandon_an_ally_once_per_turn_reclaim_subtype() {
     let result =
-        parse_ability("Abandon an ally, once per turn: {Reclaim} a {subtype}.", "t: warrior");
+        parse_ability("Abandon an ally, once per turn: {Reclaim} a {subtype}.", "t: Warrior");
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
@@ -183,7 +183,7 @@ fn test_energy_draw_cards() {
 #[test]
 fn test_energy_gain_spark_for_each_allied_subtype() {
     let result =
-        parse_ability("{e}: Gain +{s} spark for each allied {subtype}.", "e: 1, s: 2, t: warrior");
+        parse_ability("{e}: Gain +{s} spark for each allied {subtype}.", "e: 1, s: 2, t: Warrior");
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [

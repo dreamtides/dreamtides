@@ -98,7 +98,7 @@ fn test_judgment_each_player_abandons() {
 fn test_judgment_gain_energy_per_subtype() {
     assert_round_trip(
         "{Judgment} Gain {energy(e)} for each allied {subtype(t)}.",
-        "e: 1\nt: spirit-animal",
+        "e: 1\nt: SpiritAnimal",
     );
 }
 
@@ -124,7 +124,7 @@ fn test_judgment_may_pay_to_banish_and_materialize_multiple() {
 fn test_judgment_may_pay_subtype_gains_spark() {
     assert_round_trip(
         "{Judgment} You may pay {energy(e)} to have each allied {subtype(t)} gain +{s} spark.",
-        "e: 4\nt:spirit-animal\ns: 2",
+        "e: 4\nt: SpiritAnimal\ns: 2",
     );
 }
 
@@ -157,7 +157,7 @@ fn test_judgment_with_allies_that_share_type_draw() {
 fn test_judgment_with_allied_subtype_count_gain_energy() {
     assert_round_trip(
         "{Materialized_Judgment} With {count_allied_subtype(a, t)}, gain {energy(e)}.",
-        "t: warrior\na: 2\ne: 1",
+        "t: Warrior\na: 2\ne: 1",
     );
 }
 
@@ -165,7 +165,7 @@ fn test_judgment_with_allied_subtype_count_gain_energy() {
 fn test_judgment_with_allied_subtype_count_draw() {
     assert_round_trip(
         "{Materialized_Judgment} With {count_allied_subtype(a, t)}, draw {cards(c)}.",
-        "a: 2\nt: survivor\nc: 1",
+        "a: 2\nt: Survivor\nc: 1",
     );
 }
 
@@ -176,14 +176,14 @@ fn test_judgment_draw_one() {
 
 #[test]
 fn test_judgment_may_abandon_subtype_to_discover_and_materialize() {
-    assert_round_trip("{Judgment} You may abandon {@a subtype(t)} to {discover} {@a subtype(t)} with cost {energy(e)} higher and {materialize} it.", "t: warrior\ne: 1");
+    assert_round_trip("{Judgment} You may abandon {@a subtype(t)} to {discover} {@a subtype(t)} with cost {energy(e)} higher and {materialize} it.", "t: Warrior\ne: 1");
 }
 
 #[test]
 fn test_judgment_with_allied_subtype_gain_energy() {
     assert_round_trip(
         "{Judgment} With {count_allied_subtype(a, t)}, gain {energy(e)}.",
-        "t:spirit-animal\na: 2\ne: 2",
+        "t: SpiritAnimal\na: 2\ne: 2",
     );
 }
 

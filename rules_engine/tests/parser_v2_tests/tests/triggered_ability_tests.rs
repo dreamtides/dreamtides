@@ -130,7 +130,7 @@ fn test_once_per_turn_when_you_materialize_a_character_with_cost_or_less_draw_ca
 fn test_once_per_turn_when_you_materialize_a_subtype_draw_cards() {
     let result = parse_ability(
         "Once per turn, when you {materialize} {a_subtype}, draw {cards}.",
-        "t: warrior, c: 2",
+        "t: Warrior, c: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -190,7 +190,7 @@ fn test_when_you_materialize_an_ally_gain_energy() {
 fn test_when_you_materialize_a_subtype_reclaim_this_character() {
     let result = parse_ability(
         "When you {materialize} {a_subtype}, {reclaim} this character.",
-        "t: warrior",
+        "t: Warrior",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -221,7 +221,7 @@ fn test_when_you_materialize_a_character_this_character_gains_spark() {
 
 #[test]
 fn test_when_you_play_a_subtype_draw_cards() {
-    let result = parse_ability("When you play {a_subtype}, draw {cards}.", "t: warrior, c: 2");
+    let result = parse_ability("When you play {a_subtype}, draw {cards}.", "t: Warrior, c: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Play(Your(CharacterType(Warrior))),
@@ -236,7 +236,7 @@ fn test_when_you_play_a_subtype_draw_cards() {
 fn test_when_you_play_a_subtype_put_cards_from_deck_into_void() {
     let result = parse_ability(
         "When you play {a_subtype}, put the {top_n_cards} of your deck into your void.",
-        "t: warrior, v: 3",
+        "t: Warrior, v: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -359,7 +359,7 @@ fn test_when_an_ally_is_dissolved_gain_energy() {
 fn test_dissolved_a_subtype_in_void_gains_reclaim() {
     let result = parse_ability(
         "{Dissolved} {ASubtype} in your void gains {reclaim} equal to its cost.",
-        "t: warrior",
+        "t: Warrior",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -380,7 +380,7 @@ fn test_dissolved_a_subtype_in_void_gains_reclaim() {
 fn test_dissolved_capitalized_subtype_directive_in_void_gains_reclaim() {
     let result = parse_ability(
         "{Dissolved} {ASubtype} in your void gains {reclaim} equal to its cost.",
-        "t: survivor",
+        "t: Survivor",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -401,7 +401,7 @@ fn test_dissolved_capitalized_subtype_directive_in_void_gains_reclaim() {
 fn test_dissolved_draw_cards_with_allied_subtype_dissolved_trigger() {
     let result = parse_abilities(
         "{Dissolved} Draw {cards}.\n\nWhen an allied {subtype} is {dissolved}, draw {cards}.",
-        "c: 1, t: warrior",
+        "c: 1, t: Warrior",
     );
     assert_eq!(result.len(), 2);
     assert_ron_snapshot!(result[0], @r###"
@@ -468,7 +468,7 @@ fn test_when_you_play_an_event_foresee() {
 #[test]
 fn test_when_you_materialize_an_allied_subtype_gain_energy() {
     let result =
-        parse_ability("When you {materialize} an allied {subtype}, gain {e}.", "t: warrior, e: 1");
+        parse_ability("When you {materialize} an allied {subtype}, gain {e}.", "t: Warrior, e: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Materialize(Another(CharacterType(Warrior))),
@@ -483,7 +483,7 @@ fn test_when_you_materialize_an_allied_subtype_gain_energy() {
 fn test_when_you_materialize_an_allied_subtype_this_character_gains_spark() {
     let result = parse_ability(
         "When you {materialize} an allied {subtype}, this character gains +{s} spark.",
-        "t: warrior, s: 2",
+        "t: Warrior, s: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -500,7 +500,7 @@ fn test_when_you_materialize_an_allied_subtype_this_character_gains_spark() {
 fn test_when_you_materialize_an_allied_subtype_that_character_gains_spark() {
     let result = parse_ability(
         "When you {materialize} an allied {subtype}, that character gains +{s} spark.",
-        "t: warrior, s: 2",
+        "t: Warrior, s: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -627,7 +627,7 @@ fn test_when_you_play_a_fast_card_this_character_gains_spark() {
 #[test]
 fn test_judgment_gain_energy_for_each_allied_subtype() {
     let result =
-        parse_ability("{Judgment} Gain {e} for each allied {subtype}.", "t: warrior, e: 1");
+        parse_ability("{Judgment} Gain {e} for each allied {subtype}.", "t: Warrior, e: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -721,7 +721,7 @@ fn test_judgment_you_may_discard_to_dissolve_enemy_with_spark_or_less() {
 fn test_judgment_with_count_allied_subtype_gain_energy() {
     let result = parse_ability(
         "{Judgment} With {count_allied_subtype}, gain {e}.",
-        "t: warrior, a: 2, e: 3",
+        "t: Warrior, a: 2, e: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -746,7 +746,7 @@ fn test_judgment_with_count_allied_subtype_gain_energy() {
 fn test_materialized_judgment_with_count_allied_subtype_gain_energy() {
     let result = parse_ability(
         "{Materialized_Judgment} With {count_allied_subtype}, gain {e}.",
-        "t: warrior, a: 2, e: 3",
+        "t: Warrior, a: 2, e: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -772,7 +772,7 @@ fn test_materialized_judgment_with_count_allied_subtype_gain_energy() {
 fn test_materialized_judgment_with_count_allied_subtype_draw_cards() {
     let result = parse_ability(
         "{Materialized_Judgment} With {count_allied_subtype}, draw {cards}.",
-        "t: warrior, a: 2, c: 1",
+        "t: Warrior, a: 2, c: 1",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -849,7 +849,7 @@ fn test_dissolved_kindle() {
 #[test]
 fn test_when_allied_subtype_dissolved_kindle() {
     let result =
-        parse_ability("When an allied {subtype} is {dissolved}, {kindle}.", "t: warrior, k: 1");
+        parse_ability("When an allied {subtype} is {dissolved}, {kindle}.", "t: Warrior, k: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Dissolved(Another(CharacterType(Warrior))),

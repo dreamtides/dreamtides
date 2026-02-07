@@ -16,7 +16,7 @@ fn test_materialized_dissolved_draw() {
 
 #[test]
 fn test_materialized_draw_subtype_from_deck() {
-    assert_round_trip("{Materialized} Draw {@a subtype(t)} from your deck.", "t: warrior");
+    assert_round_trip("{Materialized} Draw {@a subtype(t)} from your deck.", "t: Warrior");
 }
 
 #[test]
@@ -122,7 +122,7 @@ fn test_materialized_banish_opponent_void() {
 fn test_materialized_draw_per_subtype() {
     assert_round_trip(
         "{Materialized} Draw {cards(c)} for each allied {subtype(t)}.",
-        "c: 1\nt:spirit-animal",
+        "c: 1\nt: SpiritAnimal",
     );
 }
 
@@ -202,7 +202,7 @@ fn test_dissolved_kindle_on_subtype() {
     assert_round_trip("{Dissolved} {Kindle(k)}.", "k: 2");
     assert_round_trip(
         "When an allied {subtype(t)} is {dissolved}, {kindle(k)}.",
-        "k: 2\nt: survivor",
+        "k: 2\nt: Survivor",
     );
 }
 
@@ -211,7 +211,7 @@ fn test_dissolved_draw_on_subtype() {
     assert_round_trip("{Dissolved} Draw {cards(c)}.", "c: 1");
     assert_round_trip(
         "When an allied {subtype(t)} is {dissolved}, draw {cards(c)}.",
-        "c: 1\nt: survivor",
+        "c: 1\nt: Survivor",
     );
 }
 
@@ -227,7 +227,7 @@ fn test_dissolved_may_pay_return_to_hand() {
 fn test_dissolved_subtype_gains_reclaim() {
     assert_round_trip(
         "{Dissolved} {@cap @a subtype(t)} in your void gains {reclaim} equal to its cost.",
-        "t: survivor",
+        "t: Survivor",
     );
 }
 

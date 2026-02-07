@@ -20,7 +20,7 @@ fn test_materialized_judgment_kindle() {
 #[test]
 fn test_ally_gains_spark_for_each_allied_subtype() {
     let result =
-        parse_ability("An ally gains +{s} spark for each allied {subtype}.", "s: 2, t: warrior");
+        parse_ability("An ally gains +{s} spark for each allied {subtype}.", "s: 2, t: Warrior");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(GainsSparkForQuantity(
@@ -36,7 +36,7 @@ fn test_ally_gains_spark_for_each_allied_subtype() {
 fn test_judgment_you_may_pay_to_have_each_allied_gain_spark() {
     let result = parse_ability(
         "{Judgment} You may pay {e} to have each allied {subtype} gain +{s} spark.",
-        "e: 1, t: warrior, s: 2",
+        "e: 1, t: Warrior, s: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -59,7 +59,7 @@ fn test_judgment_you_may_pay_to_have_each_allied_gain_spark() {
 fn test_energy_cost_spark_of_each_allied_subtype_becomes() {
     let result = parse_ability(
         "{e}: The spark of each allied {subtype} becomes {s}.",
-        "e: 1, t: warrior, s: 3",
+        "e: 1, t: Warrior, s: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
@@ -79,7 +79,7 @@ fn test_energy_cost_spark_of_each_allied_subtype_becomes() {
 fn test_each_allied_subtype_gains_spark_for_each_allied_subtype() {
     let result = parse_ability(
         "Each allied {subtype} gains spark equal to the number of allied {plural_subtype}.",
-        "t: warrior",
+        "t: Warrior",
     );
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
@@ -96,7 +96,7 @@ fn test_each_allied_subtype_gains_spark_for_each_allied_subtype() {
 fn test_judgment_each_allied_subtype_gains_spark_for_each_allied_subtype() {
     let result = parse_ability(
         "{Judgment} Each allied {subtype} gains spark equal to the number of allied {plural_subtype}.",
-        "t: warrior",
+        "t: Warrior",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(

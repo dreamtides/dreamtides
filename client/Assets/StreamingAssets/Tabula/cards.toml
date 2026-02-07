@@ -503,7 +503,7 @@ id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
 energy-cost = 3
 rules-text = "{Judgment} You may abandon {@a subtype(t)} to {discover} {@a subtype(t)} with cost {energy(e)} higher and {materialize} it."
 variables = """
-t: warrior
+t: Warrior
 e: 1"""
 card-type = "Character"
 subtype = "Ancient"
@@ -552,7 +552,7 @@ rules-text = "{energy(e)}: This character gains +{s} spark for each allied {subt
 variables = """
 e: 4
 s: 1
-t: warrior"""
+t: Warrior"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -569,7 +569,7 @@ energy-cost = 2
 rules-text = "An ally gains +{s} spark for each allied {subtype(t)}."
 variables = """
 s: 1
-t: warrior"""
+t: Warrior"""
 card-type = "Event"
 is-fast = true
 image-number = 1788833078
@@ -587,7 +587,7 @@ rules-text = """
 When you {materialize} an allied {subtype(t)}, this character gains +{s} spark.
 """
 variables = """
-t: warrior
+t: Warrior
 s: 1"""
 card-type = "Character"
 subtype = "Warrior"
@@ -637,7 +637,7 @@ name = "Judgment of the Blade"
 id = "e0c88a46-b85f-4497-ab19-850acc868863"
 energy-cost = 1
 rules-text = "{Banish} a non-{subtype(t)} enemy."
-variables = "t: warrior"
+variables = "t: Warrior"
 card-type = "Event"
 is-fast = false
 image-number = 1708315387
@@ -667,7 +667,7 @@ name = "Fury of the Clan"
 id = "cd3d7b81-de72-4668-b505-e09848a477be"
 energy-cost = 1
 rules-text = "{Dissolve} an enemy with cost less than the number of allied {@plural subtype(t)}."
-variables = "t: warrior"
+variables = "t: Warrior"
 card-type = "Event"
 is-fast = false
 image-number = 2303852059
@@ -682,7 +682,7 @@ name = "Summons of the Bonded"
 id = "ff0fc84e-5d40-4317-820d-76d2a660c453"
 energy-cost = 1
 rules-text = "{Discover} {@a subtype(t)}."
-variables = "t: warrior"
+variables = "t: Warrior"
 card-type = "Event"
 is-fast = false
 image-number = 1570031575
@@ -731,7 +731,7 @@ id = "a5275ef5-2896-4a0a-89de-96b241e05472"
 energy-cost = 0
 rules-text = "{Materialized_Judgment} With {count_allied_subtype(a, t)}, gain {energy(e)}. "
 variables = """
-t: warrior
+t: Warrior
 a: 2
 e: 1"""
 card-type = "Character"
@@ -780,7 +780,7 @@ name = "Seeker for the Way"
 id = "a42e3d7a-35a0-4dbc-a85d-c71b191d44a8"
 energy-cost = 3
 rules-text = "{Materialized} Draw {@a subtype(t)} from your deck."
-variables = "t: warrior"
+variables = "t: Warrior"
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -830,7 +830,7 @@ id = "07dea7d2-6d3b-40f6-9740-cfefd44aaaaf"
 energy-cost = 2
 rules-text = "Allied {@plural subtype(t)} have +{s} spark."
 variables = """
-t: warrior
+t: Warrior
 s: 1"""
 card-type = "Character"
 subtype = "Warrior"
@@ -924,7 +924,7 @@ name = "Blade of Unity"
 id = "6d7c5ef9-14ed-4301-8aa5-a07944d1918f"
 energy-cost = 2
 rules-text = "This character's spark is equal to the number of allied {@plural subtype(t)}."
-variables = "t: warrior"
+variables = "t: Warrior"
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -940,7 +940,7 @@ id = "e3b7d716-2776-4469-af9c-4dc082e0083c"
 energy-cost = 4
 rules-text = "Once per turn, when you {materialize} {@a subtype(t)}, draw {cards(c)}."
 variables = """
-t: warrior
+t: Warrior
 c: 1"""
 card-type = "Character"
 subtype = "Mage"
@@ -957,7 +957,7 @@ id = "59f14f33-3aff-45d2-9492-fb06c0ef7fea"
 energy-cost = 5
 rules-text = "When you play {@a subtype(t)}, {reclaim} a random character with cost {energy(e)} or less."
 variables = """
-t: warrior
+t: Warrior
 e: 3"""
 card-type = "Character"
 subtype = "Mage"
@@ -2017,7 +2017,7 @@ rules-text = """
 """
 variables = """
 e: 1
-t: spirit-animal"""
+t: SpiritAnimal"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -2078,7 +2078,7 @@ id = "f44fabc0-b239-423d-b602-a70a9da38479"
 energy-cost = 1
 rules-text = "When you {materialize} an allied {subtype(t)}, gain {energy(e)}."
 variables = """
-t:spirit-animal
+t: SpiritAnimal
 e: 1"""
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -2095,7 +2095,7 @@ id = "2621f88d-3207-40ec-840a-3d45fb5ed10f"
 energy-cost = 1
 rules-text = "{Judgment} With {count_allied_subtype(a, t)}, gain {energy(e)}."
 variables = """
-t:spirit-animal
+t: SpiritAnimal
 a: 2
 e: 2"""
 card-type = "Character"
@@ -2127,7 +2127,7 @@ name = "Spirit Bond"
 id = "1396e9c8-5719-42bc-8ef6-98d2777cc069"
 energy-cost = 12
 rules-text = "Each allied {subtype(t)} gains spark equal to the number of allied {@plural subtype(t)}. "
-variables = "t: spirit-animal"
+variables = "t: SpiritAnimal"
 card-type = "Event"
 is-fast = false
 image-number = 1913887486
@@ -2190,7 +2190,7 @@ rules-text = """
 When you play {@a subtype(t)}, draw {cards(c)}.
 """
 variables = """
-t: spirit-animal
+t: SpiritAnimal
 c: 1"""
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -2208,7 +2208,7 @@ energy-cost = 2
 rules-text = "{Judgment} You may pay {energy(e)} to have each allied {subtype(t)} gain +{s} spark."
 variables = """
 e: 4
-t:spirit-animal
+t: SpiritAnimal
 s: 2"""
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -2227,7 +2227,7 @@ rules-text = """
 When you {materialize} an allied {subtype(t)}, that character gains +{s} spark.
 """
 variables = """
-t:spirit-animal
+t: SpiritAnimal
 s:1"""
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -2359,7 +2359,7 @@ energy-cost = 2
 rules-text = "{Materialized} Draw {cards(c)} for each allied {subtype(t)}."
 variables = """
 c: 1
-t:spirit-animal"""
+t: SpiritAnimal"""
 card-type = "Character"
 subtype = "Visitor"
 is-fast = false
@@ -2376,7 +2376,7 @@ energy-cost = 1
 rules-text = "{energy(e)}: The spark of each allied {subtype(t)} becomes {s}."
 variables = """
 e: 3
-t: spirit-animal
+t: SpiritAnimal
 s: 5"""
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -2775,7 +2775,7 @@ id = "d41a0c56-ca67-4626-90b6-c7fadeadfc4a"
 energy-cost = 5
 rules-text = "With an allied {subtype(t)}, you may play this card from your hand or void for {energy(e)}."
 variables = """
-t: survivor
+t: Survivor
 e: 1"""
 card-type = "Character"
 subtype = "Survivor"
@@ -2811,7 +2811,7 @@ energy-cost = 2
 rules-text = "{Materialized_Judgment} With {count_allied_subtype(a, t)}, draw {cards(c)}. "
   variables = """
 a: 2
-t: survivor
+t: Survivor
 c: 1"""
 card-type = "Character"
 subtype = "Survivor"
@@ -2832,7 +2832,7 @@ rules-text = """
 When an allied {subtype(t)} is {dissolved}, {kindle(k)}."""
 variables = """
 k: 2
-t: survivor"""
+t: Survivor"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2867,7 +2867,7 @@ rules-text = """
 When an allied {subtype(t)} is {dissolved}, draw {cards(c)}. """
 variables = """
 c: 1
-t: survivor"""
+t: Survivor"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2972,7 +2972,7 @@ name = "Twilight Reclaimer"
 id = "fb3029e1-7f43-4284-bcdd-11dfe6711f96"
 energy-cost = 1
 rules-text = "{Dissolved} {@cap @a subtype(t)} in your void gains {reclaim} equal to its cost."
-variables = "t: survivor"
+variables = "t: Survivor"
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -3018,7 +3018,7 @@ id = "7d20f2bb-50b5-418a-a435-da13a13ad257"
 energy-cost = 2
 rules-text = "If this card is in your void, allied {@plural subtype(t)} have +{s} spark."
 variables = """
-t: survivor
+t: Survivor
 s: 2"""
 card-type = "Character"
 subtype = "Survivor"
@@ -3101,7 +3101,7 @@ name = "Veil of the Wastes"
 id = "10ad7a9e-401d-494e-b4f3-5580b8d850d0"
 energy-cost = 3
 rules-text = "When you {materialize} {@a subtype(t)}, {reclaim} this character."
-variables = "t: survivor"
+variables = "t: Survivor"
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -3116,7 +3116,7 @@ name = "Through the Rift"
 id = "437fc66b-c0eb-46fd-82fa-ebbb16939e66"
 energy-cost = 1
 rules-text = "{Discover} {@a subtype(t)}."
-variables = "t: survivor"
+variables = "t: Survivor"
 card-type = "Event"
 is-fast = false
 image-number = 1790126243
@@ -3132,7 +3132,7 @@ id = "9979e005-3a9e-4c98-ae7b-d8a25307c959"
 energy-cost = 2
 rules-text = "When you play {@a subtype(t)}, put the {top_n_cards(v)} of your deck into your void."
 variables = """
-t: survivor
+t: Survivor
 v: 2"""
 card-type = "Character"
 subtype = "Survivor"
@@ -3272,7 +3272,7 @@ name = "Grim Reclaimer"
 id = "61c9fa98-dda1-4f45-976e-b3fc89987b11"
 energy-cost = 2
 rules-text = "Abandon an ally, once per turn: {Reclaim} {@a subtype(t)}."
-variables = "t: warrior"
+variables = "t: Warrior"
 card-type = "Character"
 subtype = "Outsider"
 is-fast = false

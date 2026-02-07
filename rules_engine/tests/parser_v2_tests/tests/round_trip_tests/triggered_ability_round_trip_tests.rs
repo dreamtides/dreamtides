@@ -40,7 +40,7 @@ fn test_discard_trigger_kindle() {
 fn test_materialize_subtype_trigger_self_gains_spark() {
     assert_round_trip(
         "When you {materialize} an allied {subtype(t)}, this character gains +{s} spark.",
-        "t: warrior\ns: 1",
+        "t: Warrior\ns: 1",
     );
 }
 
@@ -64,7 +64,7 @@ fn test_materialize_character_trigger_gain_energy() {
 fn test_materialize_subtype_trigger_draw() {
     assert_round_trip(
         "Once per turn, when you {materialize} {@a subtype(t)}, draw {cards(c)}.",
-        "t: warrior\nc: 1",
+        "t: Warrior\nc: 1",
     );
 }
 
@@ -72,7 +72,7 @@ fn test_materialize_subtype_trigger_draw() {
 fn test_play_subtype_trigger_reclaim_by_cost() {
     assert_round_trip(
         "When you play {@a subtype(t)}, {reclaim} a random character with cost {energy(e)} or less.",
-        "t: warrior\ne: 3",
+        "t: Warrior\ne: 3",
     );
 }
 
@@ -114,7 +114,7 @@ fn test_discard_trigger_gain_energy_and_kindle() {
 fn test_materialize_subtype_trigger_gain_energy() {
     assert_round_trip(
         "When you {materialize} an allied {subtype(t)}, gain {energy(e)}.",
-        "t:spirit-animal\ne: 1",
+        "t: SpiritAnimal\ne: 1",
     );
 }
 
@@ -122,7 +122,7 @@ fn test_materialize_subtype_trigger_gain_energy() {
 fn test_materialize_subtype_trigger_that_character_gains_spark() {
     assert_round_trip(
         "When you {materialize} an allied {subtype(t)}, that character gains +{s} spark.",
-        "t:spirit-animal\ns:1",
+        "t: SpiritAnimal\ns:1",
     );
 }
 
@@ -136,7 +136,7 @@ fn test_materialize_character_trigger_gain_spark() {
 
 #[test]
 fn test_play_subtype_trigger_draw() {
-    assert_round_trip("When you play {@a subtype(t)}, draw {cards(c)}.", "t: spirit-animal\nc: 1");
+    assert_round_trip("When you play {@a subtype(t)}, draw {cards(c)}.", "t: SpiritAnimal\nc: 1");
 }
 
 #[test]
@@ -274,7 +274,7 @@ fn test_play_card_opponent_turn_trigger_gain_spark() {
 fn test_materialize_subtype_trigger_reclaim_self() {
     assert_round_trip(
         "When you {materialize} {@a subtype(t)}, {reclaim} this character.",
-        "t: survivor",
+        "t: Survivor",
     );
 }
 
@@ -282,7 +282,7 @@ fn test_materialize_subtype_trigger_reclaim_self() {
 fn test_play_subtype_trigger_put_to_void() {
     assert_round_trip(
         "When you play {@a subtype(t)}, put the {top_n_cards(v)} of your deck into your void.",
-        "t: survivor\nv: 2",
+        "t: Survivor\nv: 2",
     );
 }
 

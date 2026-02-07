@@ -16,12 +16,12 @@ fn test_discover_card_by_cost() {
 
 #[test]
 fn test_discover_subtype() {
-    assert_round_trip("{Discover} {@a subtype(t)}.", "t: warrior");
+    assert_round_trip("{Discover} {@a subtype(t)}.", "t: Warrior");
 }
 
 #[test]
 fn test_discover_subtype_survivor() {
-    assert_round_trip("{Discover} {@a subtype(t)}.", "t: survivor");
+    assert_round_trip("{Discover} {@a subtype(t)}.", "t: Survivor");
 }
 
 #[test]
@@ -88,7 +88,7 @@ fn test_dissolve_enemy_by_cost_or_more_with_reclaim() {
 fn test_dissolve_enemy_by_subtype_count() {
     assert_round_trip(
         "{Dissolve} an enemy with cost less than the number of allied {@plural subtype(t)}.",
-        "t: warrior",
+        "t: Warrior",
     );
 }
 
@@ -127,7 +127,7 @@ fn test_banish_enemy_by_cost() {
 
 #[test]
 fn test_banish_non_subtype_enemy() {
-    assert_round_trip("{Banish} a non-{subtype(t)} enemy.", "t: warrior");
+    assert_round_trip("{Banish} a non-{subtype(t)} enemy.", "t: Warrior");
 }
 
 #[test]
@@ -372,7 +372,7 @@ fn test_shuffle_and_draw() {
 
 #[test]
 fn test_ally_gains_spark_per_subtype() {
-    assert_round_trip("An ally gains +{s} spark for each allied {subtype(t)}.", "s: 1\nt: warrior");
+    assert_round_trip("An ally gains +{s} spark for each allied {subtype(t)}.", "s: 1\nt: Warrior");
 }
 
 // ============================================================================
