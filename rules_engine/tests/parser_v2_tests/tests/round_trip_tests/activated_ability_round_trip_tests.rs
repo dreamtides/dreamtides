@@ -13,7 +13,7 @@ fn test_abandon_allies_count_reclaim_self() {
 #[test]
 fn test_pay_energy_gain_spark_per_subtype() {
     assert_round_trip(
-        "{energy(e)}: Gain +{s} spark for each allied {subtype(t)}.",
+        "{energy(e)}: This character gains +{s} spark for each allied {subtype(t)}.",
         "e: 4\ns: 1\nt: warrior",
     );
 }

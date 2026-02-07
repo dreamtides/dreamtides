@@ -548,7 +548,7 @@ variables = ""
 name = "Assault Leader"
 id = "7163d032-c2db-44c0-b9d4-624994a0e648"
 energy-cost = 3
-rules-text = "{energy(e)}: Gain +{s} spark for each allied {subtype(t)}."
+rules-text = "{energy(e)}: This character gains +{s} spark for each allied {subtype(t)}."
 variables = """
 e: 4
 s: 1

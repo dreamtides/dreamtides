@@ -165,18 +165,11 @@ pub fn serialize_standard_effect(
         }
         StandardEffect::GainsSparkForQuantity { target, gains, for_quantity } => {
             bindings.insert("s".to_string(), VariableValue::Integer(gains.0));
-            if matches!(target, Predicate::This) {
-                format!(
-                    "gain +{{s}} spark for each {}.",
-                    serialize_for_count_expression(for_quantity, bindings)
-                )
-            } else {
-                format!(
-                    "{} gains +{{s}} spark for each {}.",
-                    predicate_serializer::serialize_predicate(target, bindings),
-                    serialize_for_count_expression(for_quantity, bindings)
-                )
-            }
+            format!(
+                "{} gains +{{s}} spark for each {}.",
+                predicate_serializer::serialize_predicate(target, bindings),
+                serialize_for_count_expression(for_quantity, bindings)
+            )
         }
         StandardEffect::SparkBecomes { matching, spark, .. } => {
             bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
