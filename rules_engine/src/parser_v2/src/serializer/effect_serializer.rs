@@ -872,16 +872,10 @@ pub fn serialize_effect_with_context(
                 if context == AbilityContext::Triggered {
                     let effect_strings: Vec<String> = effects
                         .iter()
-                        .enumerate()
-                        .map(|(i, e)| {
-                            let s = serialize_standard_effect(&e.effect, bindings)
+                        .map(|e| {
+                            serialize_standard_effect(&e.effect, bindings)
                                 .trim_end_matches('.')
-                                .to_string();
-                            if i == 0 {
-                                serializer_utils::capitalize_first_letter(&s)
-                            } else {
-                                s
-                            }
+                                .to_string()
                         })
                         .collect();
                     result.push_str(&format!("{}.", effect_strings.join(", then ")));

@@ -418,7 +418,7 @@ card-number = 25
 name = "Torchbearer of the Abyss"
 id = "dfcf69cb-c569-484a-8a98-b673a5c47899"
 energy-cost = 4
-rules-text = "Once per turn, when you discard a card, Gain {energy(e)}, then {kindle(k)}."
+rules-text = "Once per turn, when you discard a card, gain {energy(e)}, then {kindle(k)}."
 variables = """
 e: 1
 k: 2"""
