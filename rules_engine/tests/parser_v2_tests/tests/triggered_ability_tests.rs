@@ -308,7 +308,7 @@ fn test_when_you_abandon_an_ally_this_character_gains_spark() {
 #[test]
 fn test_when_you_abandon_count_allies_in_a_turn_dissolve_an_enemy() {
     let result = parse_ability(
-        "When you abandon {count-allies} in a turn, {dissolve} an enemy.",
+        "When you abandon {count_allies} in a turn, {dissolve} an enemy.",
         "allies: 2",
     );
     assert_ron_snapshot!(result, @r###"
@@ -728,7 +728,7 @@ fn test_judgment_you_may_discard_to_dissolve_enemy_with_spark_or_less() {
 #[test]
 fn test_judgment_with_count_allied_subtype_gain_energy() {
     let result = parse_ability(
-        "{Judgment} With {count-allied-subtype}, gain {e}.",
+        "{Judgment} With {count_allied_subtype}, gain {e}.",
         "subtype: warrior, allies: 2, e: 3",
     );
     assert_ron_snapshot!(result, @r###"
@@ -753,7 +753,7 @@ fn test_judgment_with_count_allied_subtype_gain_energy() {
 #[test]
 fn test_materialized_judgment_with_count_allied_subtype_gain_energy() {
     let result = parse_ability(
-        "{MaterializedJudgment} With {count-allied-subtype}, gain {e}.",
+        "{Materialized_Judgment} With {count_allied_subtype}, gain {e}.",
         "subtype: warrior, allies: 2, e: 3",
     );
     assert_ron_snapshot!(result, @r###"
@@ -779,7 +779,7 @@ fn test_materialized_judgment_with_count_allied_subtype_gain_energy() {
 #[test]
 fn test_materialized_judgment_with_count_allied_subtype_draw_cards() {
     let result = parse_ability(
-        "{MaterializedJudgment} With {count-allied-subtype}, draw {cards}.",
+        "{Materialized_Judgment} With {count_allied_subtype}, draw {cards}.",
         "subtype: warrior, allies: 2, cards: 1",
     );
     assert_ron_snapshot!(result, @r###"
@@ -906,7 +906,7 @@ fn test_when_you_play_this_character_gain_energy() {
 #[test]
 fn test_judgment_with_count_allies_that_share_character_type_draw_cards() {
     let result = parse_ability(
-        "{Judgment} With {count-allies} that share a character type, draw {cards}.",
+        "{Judgment} With {count_allies} that share a character type, draw {cards}.",
         "allies: 3, cards: 2",
     );
     assert_ron_snapshot!(result, @r###"
@@ -952,7 +952,7 @@ fn test_events_cost_more_and_play_event_from_hand_copy() {
 #[test]
 fn test_has_all_character_types_and_judgment_with_allies() {
     let result = parse_abilities(
-        "Has all character types.\n\n{Judgment} With {count-allies} that share a character type, draw {cards}.",
+        "Has all character types.\n\n{Judgment} With {count_allies} that share a character type, draw {cards}.",
         "allies: 2, cards: 1",
     );
     assert_ron_snapshot!(result, @r###"
@@ -1030,7 +1030,7 @@ fn test_when_you_play_card_during_opponent_turn_this_character_gains_spark() {
 #[test]
 fn test_when_you_play_a_character_materialize_figment() {
     let result =
-        parse_ability("When you play a character, {materialize} {a-figment}.", "figment: shadow");
+        parse_ability("When you play a character, {materialize} {a_figment}.", "figment: shadow");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Play(Your(Character)),

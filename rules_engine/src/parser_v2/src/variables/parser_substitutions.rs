@@ -192,17 +192,6 @@ fn resolve_directive(
         return constructor(name, variable_name, bindings, span);
     }
 
-    // Try with hyphens normalized to underscores (e.g. {Choose-One} →
-    // choose-one → choose_one)
-    if name.contains('-') {
-        let normalized = name.replace('-', "_");
-        if let Some((_, variable_name, constructor)) =
-            DIRECTIVES.iter().find(|(directive_name, _, _)| **directive_name == normalized)
-        {
-            return constructor(&normalized, variable_name, bindings, span);
-        }
-    }
-
     // Try numbered variant lookup (e.g., cards1, e2)
     if let Some((base_name, _suffix)) = split_numbered_directive(name) {
         if let Some((_, _, constructor)) =

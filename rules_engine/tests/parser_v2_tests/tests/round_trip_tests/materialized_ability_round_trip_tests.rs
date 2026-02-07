@@ -14,7 +14,7 @@ fn test_materialized_discard_then_draw() {
 
 #[test]
 fn test_materialized_dissolved_draw() {
-    assert_round_trip("{MaterializedDissolved} Draw {cards(cards)}.", "cards: 1");
+    assert_round_trip("{Materialized_Dissolved} Draw {cards(cards)}.", "cards: 1");
 }
 
 #[test]
@@ -84,7 +84,7 @@ fn test_materialized_draw_discard_with_reclaim() {
         "{Materialized} Draw {cards(cards)}, then discard {cards(discards)}.",
         "cards: 1\ndiscards: 1",
     );
-    assert_round_trip("{Reclaim_for_cost(reclaim)}", "reclaim: 3");
+    assert_round_trip("{Reclaim_For_Cost(reclaim)}", "reclaim: 3");
 }
 
 #[test]
@@ -107,12 +107,12 @@ fn test_materialized_copy_event_multiple_times() {
 
 #[test]
 fn test_materialized_judgment_gain_energy() {
-    assert_round_trip("{MaterializedJudgment} Gain {energy(e)}.", "e: 2");
+    assert_round_trip("{Materialized_Judgment} Gain {energy(e)}.", "e: 2");
 }
 
 #[test]
 fn test_materialized_judgment_kindle() {
-    assert_round_trip("{MaterializedJudgment} {Kindle(k)}.", "k: 1");
+    assert_round_trip("{Materialized_Judgment} {Kindle(k)}.", "k: 1");
 }
 
 #[test]
@@ -122,7 +122,7 @@ fn test_materialized_return_character_from_void() {
 
 #[test]
 fn test_materialized_judgment_gain_one_energy() {
-    assert_round_trip("{MaterializedJudgment} Gain {energy(e)}.", "e: 1");
+    assert_round_trip("{Materialized_Judgment} Gain {energy(e)}.", "e: 1");
 }
 
 #[test]
@@ -207,7 +207,7 @@ fn test_materialized_draw_per_ally_abandoned() {
 #[test]
 fn test_materialized_dissolved_put_top_cards_to_void() {
     assert_round_trip(
-        "{MaterializedDissolved} Put the {top_n_cards(to_void)} of your deck into your void.",
+        "{Materialized_Dissolved} Put the {top_n_cards(to_void)} of your deck into your void.",
         "to_void: 4",
     );
 }

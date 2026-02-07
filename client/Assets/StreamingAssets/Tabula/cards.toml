@@ -71,7 +71,7 @@ energy-cost = 2
 rules-text = """
 Draw {cards(cards)}. Discard {cards(discards)}.
 
-{Reclaim_for_cost(reclaim)}"""
+{Reclaim_For_Cost(reclaim)}"""
 variables = """
 cards: 2
 discards: 2
@@ -453,7 +453,7 @@ energy-cost = 3
 rules-text = """
 {Materialized} Draw {cards(cards)}, then discard {cards(discards)}.
 
-{Reclaim_for_cost(reclaim)}"""
+{Reclaim_For_Cost(reclaim)}"""
 variables = """
 cards: 1
 discards: 1
@@ -518,7 +518,7 @@ card-number = 31
 name = "Tranquil Duelist"
 id = "84eedef8-9dc9-42ef-afe8-07bc1882f7ee"
 energy-cost = 2
-rules-text = "{MaterializedDissolved} Draw {cards(cards)}."
+rules-text = "{Materialized_Dissolved} Draw {cards(cards)}."
 variables = "cards: 1"
 card-type = "Character"
 subtype = "Warrior"
@@ -729,7 +729,7 @@ card-number = 44
 name = "Wolfbond Chieftain"
 id = "a5275ef5-2896-4a0a-89de-96b241e05472"
 energy-cost = 0
-rules-text = "{MaterializedJudgment} With {count_allied_subtype(subtype, allies)}, gain {energy(e)}. "
+rules-text = "{Materialized_Judgment} With {count_allied_subtype(subtype, allies)}, gain {energy(e)}. "
 variables = """
 subtype: warrior
 allies: 2
@@ -747,7 +747,7 @@ card-number = 45
 name = "Dawnblade Wanderer"
 id = "d8f9abc2-a864-47b9-96e6-2ced9f9ba208"
 energy-cost = 1
-rules-text = "{MaterializedJudgment} Gain {energy(e)}."
+rules-text = "{Materialized_Judgment} Gain {energy(e)}."
 variables = "e: 2"
 card-type = "Character"
 subtype = "Warrior"
@@ -1108,7 +1108,7 @@ energy-cost = 1
 rules-text = """
 {Foresee(foresee)}. Draw {cards(cards)}.
 
-{Reclaim_for_cost(reclaim)}"""
+{Reclaim_For_Cost(reclaim)}"""
 variables = """
 foresee: 1
 cards: 1
@@ -1535,7 +1535,7 @@ energy-cost = 5
 rules-text = """
 Copy the next event you play {this_turn_times(number)}.
 
-{Reclaim_for_cost(reclaim)}"""
+{Reclaim_For_Cost(reclaim)}"""
 variables = """
 number: 3
 reclaim: 2"""
@@ -2243,7 +2243,7 @@ name = "Ebonwing"
 id = "2ff0d711-4202-4dca-983d-96622849b76a"
 energy-cost = 1
 rules-text = """
-{MaterializedJudgment} {Kindle(k)}.
+{Materialized_Judgment} {Kindle(k)}.
 """
 variables = "k: 1"
 card-type = "Character"
@@ -2291,7 +2291,7 @@ card-number = 140
 name = "Driftcaller Sovereign"
 id = "919f4169-7a9d-4004-871f-9f36e3761e72"
 energy-cost = 1
-rules-text = "{MaterializedJudgment} Gain {energy(e)}."
+rules-text = "{Materialized_Judgment} Gain {energy(e)}."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -2406,7 +2406,7 @@ variables = ""
 name = "Flickerveil Adept"
 id = "d8017d8f-7855-47e5-bfe5-89ca2e7c5203"
 energy-cost = 4
-rules-text = "{MaterializedJudgment} {Banish} an ally with spark {s} or less, then {materialize} it."
+rules-text = "{Materialized_Judgment} {Banish} an ally with spark {s} or less, then {materialize} it."
 variables = "s: 2"
 card-type = "Character"
 subtype = "Mage"
@@ -2503,7 +2503,7 @@ energy-cost = 1
 rules-text = """
 {Banish} an ally. {Materialize} it at end of turn.
 
-{Reclaim_for_cost(reclaim)}"""
+{Reclaim_For_Cost(reclaim)}"""
 variables = "reclaim: 1"
 card-type = "Event"
 is-fast = false
@@ -2647,7 +2647,7 @@ energy-cost = 3
 rules-text = """
 {Dissolve} an enemy with cost {energy(e)} or more.
 
-{Reclaim_for_cost(reclaim)}"""
+{Reclaim_For_Cost(reclaim)}"""
 variables = """
 e: 3
 reclaim: 2"""
@@ -2808,7 +2808,7 @@ card-number = 172
 name = "Hope's Vanguard"
 id = "c08ffd90-ef79-48f7-9aa2-22875acbeba4"
 energy-cost = 2
-rules-text = "{MaterializedJudgment} With {count_allied_subtype(subtype, allies)}, draw {cards(cards)}. "
+rules-text = "{Materialized_Judgment} With {count_allied_subtype(subtype, allies)}, draw {cards(cards)}. "
 variables = """
 allies: 2
 subtype: survivor
@@ -3084,7 +3084,7 @@ name = "Searcher in the Mists"
 id = "560ad530-9ad9-452c-b80e-902d9a76af0c"
 energy-cost = 2
 rules-text = """
-{MaterializedDissolved} Put the {top_n_cards(to_void)} of your deck into your void.
+{Materialized_Dissolved} Put the {top_n_cards(to_void)} of your deck into your void.
 """
 variables = "to_void: 4"
 card-type = "Character"

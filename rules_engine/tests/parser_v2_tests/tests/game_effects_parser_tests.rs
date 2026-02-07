@@ -44,7 +44,7 @@ fn test_when_ally_dissolved_gains_reclaim_for_cost() {
 #[test]
 fn test_materialize_random_characters_with_cost() {
     let result = parse_ability(
-        "{Materialize} {n-random-characters} with cost {e} or less from your deck.",
+        "{Materialize} {n_random_characters} with cost {e} or less from your deck.",
         "number: 3, e: 5",
     );
     assert_ron_snapshot!(result, @r###"
@@ -64,7 +64,7 @@ fn test_materialize_random_characters_with_cost() {
 #[test]
 fn test_judgment_materialize_random_subtype_from_deck() {
     let result = parse_ability(
-        "{Judgment} {Materialize} {n-random-characters} {subtype} from your deck.",
+        "{Judgment} {Materialize} {n_random_characters} {subtype} from your deck.",
         "number: 2, subtype: warrior",
     );
     assert_ron_snapshot!(result, @r###"
@@ -618,7 +618,7 @@ fn test_discover_fast_subtype_with_spark_general() {
 #[test]
 fn test_banish_ally_materialize_at_end_of_turn_reclaim() {
     let result = parse_abilities(
-        "{Banish} an ally. {Materialize} it at end of turn.\n\n{ReclaimForCost}",
+        "{Banish} an ally. {Materialize} it at end of turn.\n\n{Reclaim_For_Cost}",
         "reclaim: 2",
     );
     assert_eq!(result.len(), 2);
@@ -648,7 +648,7 @@ fn test_banish_ally_materialize_at_end_of_turn_reclaim() {
 #[test]
 fn test_dissolve_enemy_with_cost_less_than_allied_subtype() {
     let result = parse_ability(
-        "{Dissolve} an enemy with cost less than the number of allied {plural-subtype}.",
+        "{Dissolve} an enemy with cost less than the number of allied {plural_subtype}.",
         "subtype: warrior",
     );
     assert_ron_snapshot!(result, @r###"
@@ -794,7 +794,7 @@ fn test_judgment_you_may_abandon_subtype_to_discover_subtype_with_cost_higher_an
 #[test]
 fn test_judgment_you_may_pay_energy_to_banish_up_to_n_allies_then_materialize_them() {
     let result = parse_ability(
-        "{Judgment} You may pay {e} to {banish} {up-to-n-allies}, then {materialize} {it-or-them}.",
+        "{Judgment} You may pay {e} to {banish} {up_to_n_allies}, then {materialize} {it_or_them}.",
         "e: 1, number: 2",
     );
     assert_ron_snapshot!(result, @r###"
@@ -853,7 +853,7 @@ fn test_materialized_banish_any_number_of_allies_then_materialize_them() {
 #[test]
 fn test_banish_up_to_n_allies_then_materialize_them() {
     let result =
-        parse_ability("{Banish} {up-to-n-allies}, then {materialize} {it-or-them}.", "number: 3");
+        parse_ability("{Banish} {up_to_n_allies}, then {materialize} {it_or_them}.", "number: 3");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(BanishThenMaterialize(
@@ -882,7 +882,7 @@ fn test_you_may_banish_ally_then_materialize_it() {
 
 #[test]
 fn test_materialize_n_figments() {
-    let result = parse_ability("{Materialize} {n-figments}.", "figment: celestial, number: 2");
+    let result = parse_ability("{Materialize} {n_figments}.", "figment: celestial, number: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(MaterializeFigments(
@@ -896,7 +896,7 @@ fn test_materialize_n_figments() {
 #[test]
 fn test_materialize_a_figment_for_each_card_played_this_turn() {
     let result = parse_ability(
-        "{Materialize} {a-figment} for each card you have played this turn.",
+        "{Materialize} {a_figment} for each card you have played this turn.",
         "figment: shadow",
     );
     assert_ron_snapshot!(result, @r###"
@@ -966,7 +966,7 @@ fn test_materialized_event_in_void_gains_reclaim() {
 #[test]
 fn test_materialized_copy_next_event() {
     let result = parse_ability(
-        "{Materialized} Copy the next event you play {this-turn-times}.",
+        "{Materialized} Copy the next event you play {this_turn_times}.",
         "number: 1",
     );
     assert_ron_snapshot!(result, @r###"
@@ -984,7 +984,7 @@ fn test_materialized_copy_next_event() {
 
 #[test]
 fn test_event_copy_next_event() {
-    let result = parse_ability("Copy the next event you play {this-turn-times}.", "number: 2");
+    let result = parse_ability("Copy the next event you play {this_turn_times}.", "number: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(CopyNextPlayed(
@@ -1011,7 +1011,7 @@ fn test_event_trigger_additional_judgment_phase() {
 #[test]
 fn test_event_copy_next_fast_character() {
     let result =
-        parse_ability("Copy the next {fast} character you play {this-turn-times}.", "number: 1");
+        parse_ability("Copy the next {fast} character you play {this_turn_times}.", "number: 1");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(CopyNextPlayed(
@@ -1027,7 +1027,7 @@ fn test_event_copy_next_fast_character() {
 #[test]
 fn test_event_copy_next_event_with_reclaim_for_cost() {
     let result = parse_abilities(
-        "Copy the next event you play {this-turn-times}.\n\n{ReclaimForCost}",
+        "Copy the next event you play {this_turn_times}.\n\n{Reclaim_For_Cost}",
         "number: 1, reclaim: 2",
     );
     assert_ron_snapshot!(result, @r###"

@@ -11,7 +11,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
             format!("{{{}}}", serialize_keyword(&keywords[0]))
         }
         TriggerEvent::Keywords(keywords) if keywords.len() == 2 => {
-            format!("{{{}{}}}", serialize_keyword(&keywords[0]), serialize_keyword(&keywords[1]))
+            format!("{{{}_{}}}", serialize_keyword(&keywords[0]), serialize_keyword(&keywords[1]))
         }
         TriggerEvent::Play(predicate) => {
             format!(
@@ -128,7 +128,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         }
         TriggerEvent::GainEnergy => "when you gain energy, ".to_string(),
         TriggerEvent::Keywords(keywords) => {
-            let keyword_text = keywords.iter().map(serialize_keyword).collect::<String>();
+            let keyword_text = keywords.iter().map(serialize_keyword).collect::<Vec<_>>().join("_");
             format!("{{{}}}", keyword_text)
         }
     }

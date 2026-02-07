@@ -154,7 +154,7 @@ fn test_judgment_with_allies_that_share_type_draw() {
 #[test]
 fn test_judgment_with_allied_subtype_count_gain_energy() {
     assert_round_trip(
-        "{MaterializedJudgment} With {count_allied_subtype(subtype, allies)}, gain {energy(e)}.",
+        "{Materialized_Judgment} With {count_allied_subtype(subtype, allies)}, gain {energy(e)}.",
         "subtype: warrior\nallies: 2\ne: 1",
     );
 }
@@ -162,7 +162,7 @@ fn test_judgment_with_allied_subtype_count_gain_energy() {
 #[test]
 fn test_judgment_with_allied_subtype_count_draw() {
     assert_round_trip(
-        "{MaterializedJudgment} With {count_allied_subtype(subtype, allies)}, draw {cards(cards)}.",
+        "{Materialized_Judgment} With {count_allied_subtype(subtype, allies)}, draw {cards(cards)}.",
         "allies: 2\nsubtype: survivor\ncards: 1",
     );
 }
@@ -188,7 +188,7 @@ fn test_judgment_with_allied_subtype_gain_energy() {
 #[test]
 fn test_judgment_banish_ally_by_spark_then_materialize() {
     assert_round_trip(
-        "{MaterializedJudgment} {Banish} an ally with spark {s} or less, then {materialize} it.",
+        "{Materialized_Judgment} {Banish} an ally with spark {s} or less, then {materialize} it.",
         "s: 2",
     );
 }

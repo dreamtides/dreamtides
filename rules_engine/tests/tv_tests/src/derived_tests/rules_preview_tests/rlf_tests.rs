@@ -109,7 +109,7 @@ fn test_double_newline_expression() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs(
-        "Draw {cards(cards_count)}.\n\n{Reclaim_for_cost(reclaim_cost)}",
+        "Draw {cards(cards_count)}.\n\n{Reclaim_For_Cost(reclaim_cost)}",
         "cards_count: 2\nreclaim_cost: 2",
     );
 

@@ -3,7 +3,7 @@ use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_materialized_judgment_kindle() {
-    let result = parse_ability("{MaterializedJudgment} {Kindle}.", "k: 1");
+    let result = parse_ability("{Materialized_Judgment} {Kindle}.", "k: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -80,7 +80,7 @@ fn test_energy_cost_spark_of_each_allied_subtype_becomes() {
 #[test]
 fn test_each_allied_subtype_gains_spark_for_each_allied_subtype() {
     let result = parse_ability(
-        "Each allied {subtype} gains spark equal to the number of allied {plural-subtype}.",
+        "Each allied {subtype} gains spark equal to the number of allied {plural_subtype}.",
         "subtype: warrior",
     );
     assert_ron_snapshot!(result, @r###"
@@ -97,7 +97,7 @@ fn test_each_allied_subtype_gains_spark_for_each_allied_subtype() {
 #[test]
 fn test_judgment_each_allied_subtype_gains_spark_for_each_allied_subtype() {
     let result = parse_ability(
-        "{Judgment} Each allied {subtype} gains spark equal to the number of allied {plural-subtype}.",
+        "{Judgment} Each allied {subtype} gains spark equal to the number of allied {plural_subtype}.",
         "subtype: warrior",
     );
     assert_ron_snapshot!(result, @r###"

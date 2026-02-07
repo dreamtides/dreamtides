@@ -22,7 +22,7 @@ pub const TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND: BaseCardId = BaseCard
 pub const TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO: BaseCardId = BaseCardId(uuid!("e8f937da-cca7-447d-a559-530d7c339325"));
 /// {Prevent} a played event which could {dissolve} an ally.
 pub const TEST_PREVENT_EVENT_WHICH_COULD_DISSOLVE_ALLY: BaseCardId = BaseCardId(uuid!("a9f3e4c7-2b1d-4e8a-9c3f-5d7b8e2a1c4d"));
-/// {Foresee(foresee)}. Draw {cards(cards)}.  {ReclaimForCost(reclaim)}
+/// {Foresee(foresee)}. Draw {cards(cards)}.  {Reclaim_For_Cost(reclaim)}
 pub const TEST_FORESEE_ONE_DRAW_RECLAIM: BaseCardId = BaseCardId(uuid!("de21db6c-54b4-4bff-b1d6-5a4711ef5ed8"));
 /// {Prevent} a played character.
 pub const TEST_COUNTERSPELL_CHARACTER: BaseCardId = BaseCardId(uuid!("86ed0d3f-320b-49d0-b022-cd94aa07edbd"));
@@ -50,9 +50,9 @@ pub const TEST_FORESEE_ONE: BaseCardId = BaseCardId(uuid!("8217b59b-6573-484b-9f
 pub const TEST_FORESEE_TWO: BaseCardId = BaseCardId(uuid!("89e34264-a69c-48a4-867e-add7b811394b"));
 /// {Foresee(foresee)}. Draw {cards(cards)}.
 pub const TEST_FORESEE_ONE_DRAW_A_CARD: BaseCardId = BaseCardId(uuid!("820faab3-37c1-46fa-a314-5f023ec739a1"));
-/// Draw {cards(cards)}.  {ReclaimForCost(reclaim)}
+/// Draw {cards(cards)}.  {Reclaim_For_Cost(reclaim)}
 pub const TEST_DRAW_ONE_RECLAIM: BaseCardId = BaseCardId(uuid!("0cba1386-d1b6-4f57-8ccc-d92f8be01d7c"));
-/// {Foresee(foresee)}.  {ReclaimForCost(reclaim)}
+/// {Foresee(foresee)}.  {Reclaim_For_Cost(reclaim)}
 pub const TEST_FORESEE_ONE_RECLAIM: BaseCardId = BaseCardId(uuid!("86ffc58b-96db-4106-a892-8ae2a70719e6"));
 /// Return a card from your void to your hand.
 pub const TEST_RETURN_VOID_CARD_TO_HAND: BaseCardId = BaseCardId(uuid!("46e20fe4-36ca-438d-91a6-fac880ee9495"));

@@ -99,7 +99,7 @@ fn test_multiple_errors_first_is_reported() {
 
 #[test]
 fn test_unresolved_figment_variable() {
-    let input = "{Materialize} {n-figments}.";
+    let input = "{Materialize} {n_figments}.";
     let lex_result = lexer_tokenize::lex(input).unwrap();
     let bindings = VariableBindings::new();
 
@@ -114,7 +114,7 @@ fn test_unresolved_figment_variable() {
 
 #[test]
 fn test_unresolved_subtype_variable() {
-    let input = "Allied {plural-subtype} have +2 spark.";
+    let input = "Allied {plural_subtype} have +2 spark.";
     let lex_result = lexer_tokenize::lex(input).unwrap();
     let bindings = VariableBindings::new();
 

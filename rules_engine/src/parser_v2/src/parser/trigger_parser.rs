@@ -30,9 +30,9 @@ fn keyword_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, Parse
 fn combined_keyword_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     choice((
-        directive("materializedjudgment")
+        directive("materialized_judgment")
             .to(vec![TriggerKeyword::Materialized, TriggerKeyword::Judgment]),
-        directive("materializeddissolved")
+        directive("materialized_dissolved")
             .to(vec![TriggerKeyword::Materialized, TriggerKeyword::Dissolved]),
     ))
     .map(TriggerEvent::Keywords)

@@ -91,7 +91,7 @@ fn test_card_4_judgment_may_discard() {
 
 #[test]
 fn test_card_5_draw_discard_reclaim() {
-    let input = "Draw {cards}. Discard {discards}.\n\n{ReclaimForCost}";
+    let input = "Draw {cards}. Discard {discards}.\n\n{Reclaim_For_Cost}";
     let result = lexer_tokenize::lex(input).expect("lexing should succeed");
 
     assert_eq!(tokens(&result), vec![
@@ -103,7 +103,7 @@ fn test_card_5_draw_discard_reclaim() {
         &Token::Period,
         &Token::Newline,
         &Token::Newline,
-        &Token::Directive("reclaimforcost".to_string()),
+        &Token::Directive("reclaim_for_cost".to_string()),
     ]);
 }
 
@@ -333,11 +333,11 @@ fn test_apostrophe_in_word() {
 
 #[test]
 fn test_combined_trigger_directive() {
-    let input = "{MaterializedJudgment} Gain {e}.";
+    let input = "{Materialized_Judgment} Gain {e}.";
     let result = lexer_tokenize::lex(input).expect("lexing should succeed");
 
     assert_eq!(tokens(&result), vec![
-        &Token::Directive("materializedjudgment".to_string()),
+        &Token::Directive("materialized_judgment".to_string()),
         &Token::Word("gain".to_string()),
         &Token::Directive("e".to_string()),
         &Token::Period,

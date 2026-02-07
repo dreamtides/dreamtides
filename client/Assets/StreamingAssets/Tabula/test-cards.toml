@@ -143,7 +143,7 @@ energy-cost = 1
 rules-text = """
 {Foresee(foresee)}. Draw {cards(cards)}.
 
-{ReclaimForCost(reclaim)}"""
+{Reclaim_For_Cost(reclaim)}"""
 variables = """
 foresee: 1
 cards: 1
@@ -346,7 +346,7 @@ energy-cost = 2
 rules-text = """
 Draw {cards(cards)}.
 
-{ReclaimForCost(reclaim)}"""
+{Reclaim_For_Cost(reclaim)}"""
 variables = """
 cards: 1
 reclaim: 1"""
@@ -364,7 +364,7 @@ energy-cost = 1
 rules-text = """
 {Foresee(foresee)}.
 
-{ReclaimForCost(reclaim)}"""
+{Reclaim_For_Cost(reclaim)}"""
 variables = """
 foresee: 1
 reclaim: 3"""

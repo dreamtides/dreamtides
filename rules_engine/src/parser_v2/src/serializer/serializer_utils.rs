@@ -22,8 +22,8 @@ pub fn capitalize_first_letter(s: &str) -> String {
         if let Some(end) = s.find('}') {
             let keyword = &s[1..end];
             if is_capitalizable_keyword(keyword) {
-                let capitalized = capitalize_string(keyword);
-                return format!("{{{}}}{}", capitalized, &s[end + 1..]);
+                let capitalized = title_case_keyword(keyword);
+                return format!("{{{capitalized}}}{}", &s[end + 1..]);
             }
         }
     }
@@ -52,6 +52,17 @@ fn capitalize_string(s: &str) -> String {
         None => String::new(),
         Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
     }
+}
+
+/// Title-cases each underscore-separated word in a keyword, preserving
+/// arguments after `(`.
+fn title_case_keyword(s: &str) -> String {
+    let (name, args) = match s.find('(') {
+        Some(pos) => (&s[..pos], &s[pos..]),
+        None => (s, ""),
+    };
+    let title_cased = name.split('_').map(capitalize_string).collect::<Vec<_>>().join("_");
+    format!("{title_cased}{args}")
 }
 
 fn is_capitalizable_keyword(keyword: &str) -> bool {

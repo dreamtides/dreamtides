@@ -3,7 +3,7 @@ use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_reclaim_for_cost() {
-    let result = parse_ability("{ReclaimForCost}", "reclaim: 2");
+    let result = parse_ability("{Reclaim_For_Cost}", "reclaim: 2");
     assert_ron_snapshot!(result, @r###"
     Named(Reclaim(Some(Energy(2))))
     "###);
@@ -49,7 +49,7 @@ fn test_dissolve_enemy_with_cost_or_less_reclaim_abandon_ally() {
 #[test]
 fn test_foresee_draw_cards_reclaim() {
     let result = parse_abilities(
-        "{Foresee}. Draw {cards}.\n\n{ReclaimForCost}",
+        "{Foresee}. Draw {cards}.\n\n{Reclaim_For_Cost}",
         "foresee: 3, cards: 2, reclaim: 2",
     );
     assert_eq!(result.len(), 2);
@@ -79,7 +79,7 @@ fn test_foresee_draw_cards_reclaim() {
 #[test]
 fn test_draw_discard_reclaim() {
     let result = parse_abilities(
-        "Draw {cards}. Discard {discards}.\n\n{ReclaimForCost}",
+        "Draw {cards}. Discard {discards}.\n\n{Reclaim_For_Cost}",
         "cards: 2, discards: 1, reclaim: 3",
     );
     assert_eq!(result.len(), 2);
@@ -109,7 +109,7 @@ fn test_draw_discard_reclaim() {
 #[test]
 fn test_materialized_draw_discard_reclaim() {
     let result = parse_abilities(
-        "{Materialized} Draw {cards}. Discard {discards}.\n\n{ReclaimForCost}",
+        "{Materialized} Draw {cards}. Discard {discards}.\n\n{Reclaim_For_Cost}",
         "cards: 2, discards: 1, reclaim: 3",
     );
     assert_eq!(result.len(), 2);
@@ -142,7 +142,7 @@ fn test_materialized_draw_discard_reclaim() {
 #[test]
 fn test_dissolve_enemy_with_cost_reclaim() {
     let result = parse_abilities(
-        "{Dissolve} an enemy with cost {e} or more.\n\n{ReclaimForCost}",
+        "{Dissolve} an enemy with cost {e} or more.\n\n{Reclaim_For_Cost}",
         "e: 4, reclaim: 2",
     );
     assert_eq!(result.len(), 2);
@@ -246,7 +246,7 @@ fn test_banish_from_hand_alternate_cost_prevent_card() {
 #[test]
 fn test_lose_maximum_energy_alternate_cost_prevent_card() {
     let result = parse_abilities(
-        "Lose {maximum-energy}: Play this event for {e}.\n\n{Prevent} a played card.",
+        "Lose {maximum_energy}: Play this event for {e}.\n\n{Prevent} a played card.",
         "max: 1, e: 0",
     );
     assert_eq!(result.len(), 2);

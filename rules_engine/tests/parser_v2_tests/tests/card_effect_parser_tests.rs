@@ -52,7 +52,7 @@ fn test_materialized_draw_cards_for_each_allied_subtype() {
 
 #[test]
 fn test_materialized_judgment_gain_energy() {
-    let result = parse_ability("{MaterializedJudgment} Gain {e}.", "e: 1");
+    let result = parse_ability("{Materialized_Judgment} Gain {e}.", "e: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -326,7 +326,7 @@ fn test_materialized_discard_then_draw() {
 
 #[test]
 fn test_materialized_dissolved_draw_cards() {
-    let result = parse_ability("{MaterializedDissolved} Draw {cards}.", "cards: 1");
+    let result = parse_ability("{Materialized_Dissolved} Draw {cards}.", "cards: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -343,7 +343,7 @@ fn test_materialized_dissolved_draw_cards() {
 #[test]
 fn test_materialized_dissolved_put_cards_from_deck_into_void() {
     let result = parse_ability(
-        "{MaterializedDissolved} Put the {top_n_cards} of your deck into your void.",
+        "{Materialized_Dissolved} Put the {top_n_cards} of your deck into your void.",
         "to_void: 2",
     );
     assert_ron_snapshot!(result, @r###"
@@ -636,7 +636,7 @@ fn test_abandon_any_number_of_allies_draw_for_each_abandoned() {
 #[test]
 fn test_banish_up_to_n_then_materialize_them() {
     let result =
-        parse_ability("{Banish} {up-to-n-allies}, then {materialize} {it-or-them}.", "number: 2");
+        parse_ability("{Banish} {up_to_n_allies}, then {materialize} {it_or_them}.", "number: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(BanishThenMaterialize(
@@ -650,7 +650,7 @@ fn test_banish_up_to_n_then_materialize_them() {
 #[test]
 fn test_materialized_judgment_banish_ally_with_spark_then_materialize_it() {
     let result = parse_ability(
-        "{MaterializedJudgment} {Banish} an ally with spark {s} or less, then {materialize} it.",
+        "{Materialized_Judgment} {Banish} an ally with spark {s} or less, then {materialize} it.",
         "s: 2",
     );
     assert_ron_snapshot!(result, @r###"
@@ -687,7 +687,7 @@ fn test_materialized_discard_chosen_card_from_opponent_hand_they_draw() {
 
 #[test]
 fn test_return_up_to_n_events_from_void_to_hand() {
-    let result = parse_ability("Return {up-to-n-events} from your void to your hand.", "number: 3");
+    let result = parse_ability("Return {up_to_n_events} from your void to your hand.", "number: 3");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(ReturnUpToCountFromYourVoidToHand(

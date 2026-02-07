@@ -37,7 +37,7 @@ fn test_opponent_events_cost_more() {
 #[test]
 fn test_allied_plural_subtype_have_spark() {
     let result =
-        parse_ability("Allied {plural-subtype} have +{s} spark.", "subtype: warrior, s: 1");
+        parse_ability("Allied {plural_subtype} have +{s} spark.", "subtype: warrior, s: 1");
     assert_ron_snapshot!(result, @r###"
     Static(StaticAbility(SparkBonusOtherCharacters(
       matching: CharacterType(Warrior),
@@ -219,7 +219,7 @@ fn test_character_costs_if_discarded_character_this_turn() {
 #[test]
 fn test_character_costs_if_discarded_subtype_this_turn() {
     let result = parse_ability(
-        "This character costs {e} if you have discarded {a-subtype} this turn.",
+        "This character costs {e} if you have discarded {a_subtype} this turn.",
         "e: 1, subtype: warrior",
     );
     assert_ron_snapshot!(result, @r###"
@@ -238,7 +238,7 @@ fn test_character_costs_if_discarded_subtype_this_turn() {
 
 #[test]
 fn test_lose_maximum_energy_play_for_alternate_cost() {
-    let result = parse_ability("Lose {maximum-energy}: Play this event for {e}.", "max: 1, e: 0");
+    let result = parse_ability("Lose {maximum_energy}: Play this event for {e}.", "max: 1, e: 0");
     assert_ron_snapshot!(result, @r###"
     Static(StaticAbility(PlayForAlternateCost(AlternateCost(
       energy_cost: Energy(0),
@@ -315,7 +315,7 @@ fn test_judgment_ability_of_allies_triggers_when_materialize() {
 #[test]
 fn test_spark_equal_to_allied_subtype() {
     let result = parse_ability(
-        "This character's spark is equal to the number of allied {plural-subtype}.",
+        "This character's spark is equal to the number of allied {plural_subtype}.",
         "subtype: warrior",
     );
     assert_ron_snapshot!(result, @r###"
@@ -339,7 +339,7 @@ fn test_spark_equal_to_cards_in_void() {
 #[test]
 fn test_while_in_void_allied_subtype_have_spark() {
     let result = parse_ability(
-        "While this card is in your void, allied {plural-subtype} have +{s} spark.",
+        "While this card is in your void, allied {plural_subtype} have +{s} spark.",
         "subtype: warrior, s: 1",
     );
     assert_ron_snapshot!(result, @r###"

@@ -149,7 +149,7 @@ fn test_abandon_an_ally_this_character_gains_spark() {
 
 #[test]
 fn test_abandon_count_allies_reclaim_this_character() {
-    let result = parse_ability("Abandon {count-allies}: {Reclaim} this character.", "allies: 3");
+    let result = parse_ability("Abandon {count_allies}: {Reclaim} this character.", "allies: 3");
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
