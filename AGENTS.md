@@ -47,7 +47,9 @@ Please follow this checklist after completing any task:
   - CORRECT ENUM VALUE: Zone::Battlefield
   - CORRECT FUNCTION CALL: move_card::to_destination_zone()
   - CORRECT STRUCT NAME: BattleState
-- Public functions and types go at the TOP of the file, then private ones.
+- Items in a file must follow this order: private constants, private statics,
+  thread_local declarations, public type aliases, public constants, public traits,
+  public structs/enums, public functions, then all other private items.
 - Don't add "pub use" for anything.
 - Keep Cargo.toml dependencies alphabetized in two lists, internal then external dependencies.
 - Use modern Rust features such as let-else statements and "{inline:?}" variable formatting
