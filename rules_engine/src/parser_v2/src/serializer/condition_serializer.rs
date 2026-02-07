@@ -62,7 +62,7 @@ fn serialize_predicate_count(
         Predicate::Another(CardPredicate::CharacterType(subtype)) => {
             bindings.insert("allies".to_string(), VariableValue::Integer(count));
             bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "{count_allied_subtype(subtype, allies)}".to_string()
+            "{count_allied_subtype(allies, subtype)}".to_string()
         }
         Predicate::Another(CardPredicate::Character) => {
             if let Some(var_name) =

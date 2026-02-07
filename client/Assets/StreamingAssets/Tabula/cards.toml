@@ -729,7 +729,7 @@ card-number = 44
 name = "Wolfbond Chieftain"
 id = "a5275ef5-2896-4a0a-89de-96b241e05472"
 energy-cost = 0
-rules-text = "{Materialized_Judgment} With {count_allied_subtype(subtype, allies)}, gain {energy(e)}. "
+rules-text = "{Materialized_Judgment} With {count_allied_subtype(allies, subtype)}, gain {energy(e)}. "
 variables = """
 subtype: warrior
 allies: 2
@@ -2093,7 +2093,7 @@ card-number = 128
 name = "Luminwings"
 id = "2621f88d-3207-40ec-840a-3d45fb5ed10f"
 energy-cost = 1
-rules-text = "{Judgment} With {count_allied_subtype(subtype, allies)}, gain {energy(e)}."
+rules-text = "{Judgment} With {count_allied_subtype(allies, subtype)}, gain {energy(e)}."
 variables = """
 subtype:spirit-animal
 allies: 2
@@ -2808,7 +2808,7 @@ card-number = 172
 name = "Hope's Vanguard"
 id = "c08ffd90-ef79-48f7-9aa2-22875acbeba4"
 energy-cost = 2
-rules-text = "{Materialized_Judgment} With {count_allied_subtype(subtype, allies)}, draw {cards(cards)}. "
+rules-text = "{Materialized_Judgment} With {count_allied_subtype(allies, subtype)}, draw {cards(cards)}. "
 variables = """
 allies: 2
 subtype: survivor

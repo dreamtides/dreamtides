@@ -1,4 +1,5 @@
 mod card_lookup_tests;
+mod cards_rlf_eval_tests;
 mod executor_tests;
 mod generation_tracker_tests;
 mod image_derived_tests;

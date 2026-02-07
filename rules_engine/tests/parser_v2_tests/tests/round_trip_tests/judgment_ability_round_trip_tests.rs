@@ -154,7 +154,7 @@ fn test_judgment_with_allies_that_share_type_draw() {
 #[test]
 fn test_judgment_with_allied_subtype_count_gain_energy() {
     assert_round_trip(
-        "{Materialized_Judgment} With {count_allied_subtype(subtype, allies)}, gain {energy(e)}.",
+        "{Materialized_Judgment} With {count_allied_subtype(allies, subtype)}, gain {energy(e)}.",
         "subtype: warrior\nallies: 2\ne: 1",
     );
 }
@@ -162,7 +162,7 @@ fn test_judgment_with_allied_subtype_count_gain_energy() {
 #[test]
 fn test_judgment_with_allied_subtype_count_draw() {
     assert_round_trip(
-        "{Materialized_Judgment} With {count_allied_subtype(subtype, allies)}, draw {cards(cards)}.",
+        "{Materialized_Judgment} With {count_allied_subtype(allies, subtype)}, draw {cards(cards)}.",
         "allies: 2\nsubtype: survivor\ncards: 1",
     );
 }
@@ -180,7 +180,7 @@ fn test_judgment_may_abandon_subtype_to_discover_and_materialize() {
 #[test]
 fn test_judgment_with_allied_subtype_gain_energy() {
     assert_round_trip(
-        "{Judgment} With {count_allied_subtype(subtype, allies)}, gain {energy(e)}.",
+        "{Judgment} With {count_allied_subtype(allies, subtype)}, gain {energy(e)}.",
         "subtype:spirit-animal\nallies: 2\ne: 2",
     );
 }

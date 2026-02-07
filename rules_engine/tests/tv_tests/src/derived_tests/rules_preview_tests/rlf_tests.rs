@@ -130,6 +130,111 @@ fn test_double_newline_expression() {
 }
 
 #[test]
+fn test_subtype_variable_produces_phrase() {
+    let function = RulesPreviewFunction::new();
+    let context = create_empty_context();
+    let inputs = make_inputs("{subtype(subtype)}", "subtype: warrior");
+
+    let result = function.compute(&inputs, &context);
+    match result {
+        DerivedResult::RichText(spans) => {
+            let full_text: String = spans.iter().map(|s| s.text.as_str()).collect();
+            assert!(full_text.contains("Warrior"), "Should contain subtype name: {full_text}");
+        }
+        DerivedResult::Error(msg) => {
+            panic!("Subtype variable should produce Phrase, not error: {msg}")
+        }
+        other => panic!("Expected RichText, got: {other:?}"),
+    }
+}
+
+#[test]
+fn test_subtype_variable_spirit_animal() {
+    let function = RulesPreviewFunction::new();
+    let context = create_empty_context();
+    let inputs = make_inputs("{subtype(subtype)}", "subtype: spirit-animal");
+
+    let result = function.compute(&inputs, &context);
+    match result {
+        DerivedResult::RichText(spans) => {
+            let full_text: String = spans.iter().map(|s| s.text.as_str()).collect();
+            assert!(
+                full_text.contains("Spirit Animal"),
+                "Should contain subtype name: {full_text}"
+            );
+        }
+        DerivedResult::Error(msg) => {
+            panic!("Spirit animal subtype should produce Phrase, not error: {msg}")
+        }
+        other => panic!("Expected RichText, got: {other:?}"),
+    }
+}
+
+#[test]
+fn test_subtype_variable_with_article() {
+    let function = RulesPreviewFunction::new();
+    let context = create_empty_context();
+    let inputs = make_inputs("{@a subtype(subtype)}", "subtype: warrior");
+
+    let result = function.compute(&inputs, &context);
+    match result {
+        DerivedResult::RichText(spans) => {
+            let full_text: String = spans.iter().map(|s| s.text.as_str()).collect();
+            assert!(full_text.to_lowercase().contains("a "), "Should contain article: {full_text}");
+            assert!(full_text.contains("Warrior"), "Should contain subtype name: {full_text}");
+        }
+        DerivedResult::Error(msg) => {
+            panic!("Subtype with article should produce Phrase, not error: {msg}")
+        }
+        other => panic!("Expected RichText, got: {other:?}"),
+    }
+}
+
+#[test]
+fn test_subtype_variable_plural() {
+    let function = RulesPreviewFunction::new();
+    let context = create_empty_context();
+    let inputs = make_inputs("{subtype(subtype):other}", "subtype: warrior");
+
+    let result = function.compute(&inputs, &context);
+    match result {
+        DerivedResult::RichText(spans) => {
+            let full_text: String = spans.iter().map(|s| s.text.as_str()).collect();
+            assert!(
+                full_text.contains("Warriors"),
+                "Should contain plural subtype name: {full_text}"
+            );
+        }
+        DerivedResult::Error(msg) => {
+            panic!("Subtype plural should produce Phrase, not error: {msg}")
+        }
+        other => panic!("Expected RichText, got: {other:?}"),
+    }
+}
+
+#[test]
+fn test_figment_variable_produces_phrase() {
+    let function = RulesPreviewFunction::new();
+    let context = create_empty_context();
+    let inputs = make_inputs("{figment(figment)}", "figment: celestial");
+
+    let result = function.compute(&inputs, &context);
+    match result {
+        DerivedResult::RichText(spans) => {
+            let full_text: String = spans.iter().map(|s| s.text.as_str()).collect();
+            assert!(
+                full_text.contains("Celestial"),
+                "Should contain figment type name: {full_text}"
+            );
+        }
+        DerivedResult::Error(msg) => {
+            panic!("Figment variable should produce Phrase, not error: {msg}")
+        }
+        other => panic!("Expected RichText, got: {other:?}"),
+    }
+}
+
+#[test]
 fn test_single_newline_expression() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
