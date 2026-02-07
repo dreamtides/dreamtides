@@ -207,7 +207,7 @@ fn test_materialized_draw_per_ally_abandoned() {
 #[test]
 fn test_materialized_dissolved_put_top_cards_to_void() {
     assert_round_trip(
-        "{MaterializedDissolved} Put the {top_n_cards(to-void)} of your deck into your void.",
+        "{MaterializedDissolved} Put the {top_n_cards(to_void)} of your deck into your void.",
         "to-void: 4",
     );
 }

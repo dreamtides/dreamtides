@@ -260,7 +260,7 @@ pub fn serialize_standard_effect(
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "put the {top_n_cards(to-void)} of your deck into your void.".to_string()
+            "put the {top_n_cards(to_void)} of your deck into your void.".to_string()
         }
         StandardEffect::PutCardsFromVoidOnTopOfDeck { matching, count } => {
             if *count == 1 {
@@ -1082,9 +1082,9 @@ pub fn serialize_effect_with_context(
                 result.push('\n');
                 result.push_str("{bullet} ");
                 let (cost_var, cost_directive) = if index == 0 {
-                    ("{energy(mode1-cost)}", "mode1-cost")
+                    ("{energy(mode1_cost)}", "mode1-cost")
                 } else {
-                    ("{energy(mode2-cost)}", "mode2-cost")
+                    ("{energy(mode2_cost)}", "mode2-cost")
                 };
                 if let Some(var_name) =
                     parser_substitutions::directive_to_integer_variable(cost_directive)

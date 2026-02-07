@@ -12,7 +12,7 @@ use strings::strings;
 use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::display_state;
-use crate::rendering::rlf_eval;
+use crate::rendering::rlf_helper;
 
 /// Returns [CardView]s for all cards present in the dreamwell.
 pub fn all_cards(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
@@ -84,7 +84,7 @@ fn rules_text(card: &DreamwellCard) -> String {
         .iter()
         .map(|ability| {
             let serialized = ability_serializer::serialize_ability(ability);
-            rlf_eval::eval_str(&serialized.text, &serialized.variables)
+            rlf_helper::eval_str(&serialized.text, &serialized.variables)
         })
         .collect::<Vec<_>>()
         .join(&format!("\n{line_height_25}\n{end_line_height}"))

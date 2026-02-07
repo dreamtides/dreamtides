@@ -110,8 +110,8 @@ id = "e8f937da-cca7-447d-a559-530d7c339325"
 energy-cost = "*"
 rules-text = """
 {ChooseOne}
-{bullet} {energy(mode1-cost)}: Return an enemy character to hand.
-{bullet} {energy(mode2-cost)}: Draw {cards(cards)}."""
+{bullet} {energy(mode1_cost)}: Return an enemy character to hand.
+{bullet} {energy(mode2_cost)}: Draw {cards(cards)}."""
 variables = """
 mode1-cost: 2
 mode2-cost: 3
@@ -394,8 +394,8 @@ id = "029889e9-25bc-438f-a492-8813febd65d8"
 energy-cost = "*"
 rules-text = """
 {ChooseOne}
-{bullet} {energy(mode1-cost)}: Draw {cards(cards1)}.
-{bullet} {energy(mode2-cost)}: Draw {cards(cards2)}."""
+{bullet} {energy(mode1_cost)}: Draw {cards(cards1)}.
+{bullet} {energy(mode2_cost)}: Draw {cards(cards2)}."""
 variables = """
 mode1-cost: 1
 cards1: 1
@@ -414,8 +414,8 @@ id = "9847b3fc-1e7f-44e5-90af-1240ae12aaee"
 energy-cost = "*"
 rules-text = """
 {ChooseOne}
-{bullet} {energy(mode1-cost)}: Draw {cards(cards)}.
-{bullet} {energy(mode2-cost)}: {Dissolve} an enemy character."""
+{bullet} {energy(mode1_cost)}: Draw {cards(cards)}.
+{bullet} {energy(mode2_cost)}: {Dissolve} an enemy character."""
 variables = """
 mode1-cost: 1
 cards: 1
@@ -470,7 +470,7 @@ prompts = ""
 name = "Test Deck To Void"
 id = "a7340f26-b759-458c-b8cb-b6fcc36fe412"
 energy-cost = 2
-rules-text = "Put the {top_n_cards(to-void)} of your deck into your void."
+rules-text = "Put the {top_n_cards(to_void)} of your deck into your void."
 variables = "to-void: 3"
 card-type = "Event"
 is-fast = false

@@ -41,7 +41,7 @@ use crate::rendering::positions::ControllerAndZone;
 use crate::rendering::supplemental_card_info::SupplementalCardInfo;
 use crate::rendering::{
     ability_help_text, apply_card_fx, card_display_state, modal_effect_prompt_rendering, positions,
-    rlf_eval,
+    rlf_helper,
 };
 
 pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardView {
@@ -93,7 +93,7 @@ pub fn ability_token_text(
 ) -> String {
     let ability = &definition.abilities[ability_number.0];
     let serialized = ability_serializer::serialize_ability_effect(ability);
-    rlf_eval::eval_str(&serialized.text, &serialized.variables)
+    rlf_helper::eval_str(&serialized.text, &serialized.variables)
 }
 
 /// Returns formatted rules text for a card on the battlefield or stack.
@@ -180,7 +180,7 @@ fn serialize_abilities_text(abilities: &[Ability]) -> String {
         .iter()
         .map(|ability| {
             let serialized = ability_serializer::serialize_ability(ability);
-            rlf_eval::eval_str(&serialized.text, &serialized.variables)
+            rlf_helper::eval_str(&serialized.text, &serialized.variables)
         })
         .collect::<Vec<_>>()
         .join(&format!("\n{line_height_25}\n{end_line_height}"))

@@ -269,18 +269,25 @@ fn resolve_rlf_directive(
     let args_str = &core[paren_start + 1..paren_end];
     let args: Vec<&str> = args_str.split(',').map(str::trim).collect();
 
-    // Determine the Fluent directive name from the RLF phrase syntax
-    let directive_name = determine_fluent_directive(name, phrase_name, &args, has_cap, selector);
+    // Determine the Fluent directive name from the RLF phrase syntax.
+    // Convert underscores to hyphens to match DIRECTIVES table naming.
+    let directive_name =
+        determine_fluent_directive(name, phrase_name, &args, has_cap, selector).replace('_', "-");
 
     // Look up the directive in the DIRECTIVES table
     if let Some((_, default_var, constructor)) =
         DIRECTIVES.iter().find(|(dir_name, _, _)| *dir_name == directive_name)
     {
         // Use the RLF argument as the variable name for lookups when present,
-        // otherwise fall back to the default variable name from DIRECTIVES
-        let variable_name =
-            if args.len() == 1 && !args[0].is_empty() { args[0] } else { default_var };
-        return Ok(Some(constructor(&directive_name, variable_name, bindings, span)?));
+        // otherwise fall back to the default variable name from DIRECTIVES.
+        // Convert underscores to hyphens since binding keys use hyphenated
+        // names from the TOML card definitions.
+        let variable_name = if args.len() == 1 && !args[0].is_empty() {
+            args[0].replace('_', "-")
+        } else {
+            default_var.to_string()
+        };
+        return Ok(Some(constructor(&directive_name, &variable_name, bindings, span)?));
     }
 
     // Try numbered variant for the first argument (e.g., cards(cards1))

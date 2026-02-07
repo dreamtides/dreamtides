@@ -1855,7 +1855,7 @@ name = "Harvest the Forgotten"
 id = "540cd70f-4fc8-417b-ac0d-3b337bfe8f01"
 energy-cost = 1
 rules-text = """
-Put the {top_n_cards(to-void)} of your deck into your void. Draw {cards(cards)}.
+Put the {top_n_cards(to_void)} of your deck into your void. Draw {cards(cards)}.
 """
 variables = """
 to-void: 3
@@ -2881,7 +2881,7 @@ card-number = 176
 name = "Ashborn Necromancer"
 id = "5511b4b5-a7e3-48df-978d-c09673b39f42"
 energy-cost = 4
-rules-text = "Abandon an ally: Put the {top_n_cards(to-void)} of your deck into your void."
+rules-text = "Abandon an ally: Put the {top_n_cards(to_void)} of your deck into your void."
 variables = "to-void: 2"
 card-type = "Character"
 subtype = "Outsider"
@@ -3084,7 +3084,7 @@ name = "Searcher in the Mists"
 id = "560ad530-9ad9-452c-b80e-902d9a76af0c"
 energy-cost = 2
 rules-text = """
-{MaterializedDissolved} Put the {top_n_cards(to-void)} of your deck into your void.
+{MaterializedDissolved} Put the {top_n_cards(to_void)} of your deck into your void.
 """
 variables = "to-void: 4"
 card-type = "Character"
@@ -3130,7 +3130,7 @@ spark = ""
 name = "Flagbearer of Decay"
 id = "9979e005-3a9e-4c98-ae7b-d8a25307c959"
 energy-cost = 2
-rules-text = "When you play {@a subtype(subtype)}, put the {top_n_cards(to-void)} of your deck into your void."
+rules-text = "When you play {@a subtype(subtype)}, put the {top_n_cards(to_void)} of your deck into your void."
 variables = """
 subtype: survivor
 to-void: 2"""
@@ -3541,8 +3541,8 @@ id = "6e94b4a6-4164-4572-91c1-e74de3e75188"
 energy-cost = "*"
 rules-text = """
 {choose_one}
-{bullet} {energy(mode1-cost)}: Return an enemy to hand.
-{bullet} {energy(mode2-cost)}: Draw {cards(cards)}."""
+{bullet} {energy(mode1_cost)}: Return an enemy to hand.
+{bullet} {energy(mode2_cost)}: Draw {cards(cards)}."""
 variables = """
 mode1-cost: 2
 mode2-cost: 3

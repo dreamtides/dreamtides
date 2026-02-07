@@ -18,7 +18,7 @@ pub const TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN: BaseCardId = BaseCard
 pub const TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: BaseCardId = BaseCardId(uuid!("d8a8541f-5b00-4d91-9518-aa8ae70ea450"));
 /// Return {up_to_n_events(number)} from your void to your hand.
 pub const TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND: BaseCardId = BaseCardId(uuid!("559e62a0-7ead-4136-8bd4-6cc58db4bef7"));
-/// {ChooseOne} {bullet} {energy(mode1-cost)}: Return an enemy character to hand. {bullet} {energy(mode2-cost)}: Draw {cards(cards)}.
+/// {ChooseOne} {bullet} {energy(mode1_cost)}: Return an enemy character to hand. {bullet} {energy(mode2_cost)}: Draw {cards(cards)}.
 pub const TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO: BaseCardId = BaseCardId(uuid!("e8f937da-cca7-447d-a559-530d7c339325"));
 /// {Prevent} a played event which could {dissolve} an ally.
 pub const TEST_PREVENT_EVENT_WHICH_COULD_DISSOLVE_ALLY: BaseCardId = BaseCardId(uuid!("a9f3e4c7-2b1d-4e8a-9c3f-5d7b8e2a1c4d"));
@@ -56,9 +56,9 @@ pub const TEST_DRAW_ONE_RECLAIM: BaseCardId = BaseCardId(uuid!("0cba1386-d1b6-4f
 pub const TEST_FORESEE_ONE_RECLAIM: BaseCardId = BaseCardId(uuid!("86ffc58b-96db-4106-a892-8ae2a70719e6"));
 /// Return a card from your void to your hand.
 pub const TEST_RETURN_VOID_CARD_TO_HAND: BaseCardId = BaseCardId(uuid!("46e20fe4-36ca-438d-91a6-fac880ee9495"));
-/// {ChooseOne} {bullet} {energy(mode1-cost)}: Draw {cards(cards1)}. {bullet} {energy(mode2-cost)}: Draw {cards(cards2)}.
+/// {ChooseOne} {bullet} {energy(mode1_cost)}: Draw {cards(cards1)}. {bullet} {energy(mode2_cost)}: Draw {cards(cards2)}.
 pub const TEST_MODAL_DRAW_ONE_OR_DRAW_TWO: BaseCardId = BaseCardId(uuid!("029889e9-25bc-438f-a492-8813febd65d8"));
-/// {ChooseOne} {bullet} {energy(mode1-cost)}: Draw {cards(cards)}. {bullet} {energy(mode2-cost)}: {Dissolve} an enemy character.
+/// {ChooseOne} {bullet} {energy(mode1_cost)}: Draw {cards(cards)}. {bullet} {energy(mode2_cost)}: {Dissolve} an enemy character.
 pub const TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY: BaseCardId = BaseCardId(uuid!("9847b3fc-1e7f-44e5-90af-1240ae12aaee"));
 /// Return an enemy character to hand.
 pub const TEST_RETURN_TO_HAND: BaseCardId = BaseCardId(uuid!("cf2f292b-f02c-4130-aff7-3f48fd147633"));
@@ -66,7 +66,7 @@ pub const TEST_RETURN_TO_HAND: BaseCardId = BaseCardId(uuid!("cf2f292b-f02c-4130
 pub const TEST_GAIN_POINTS: BaseCardId = BaseCardId(uuid!("995b52a1-b368-4c83-ae05-8ab3800ca618"));
 /// Gain {energy(e)}.
 pub const TEST_GAIN_ENERGY: BaseCardId = BaseCardId(uuid!("db191470-7a5b-4133-b731-8a81767d46e1"));
-/// Put the {top_n_cards(to-void)} of your deck into your void.
+/// Put the {top_n_cards(to_void)} of your deck into your void.
 pub const TEST_DECK_TO_VOID: BaseCardId = BaseCardId(uuid!("a7340f26-b759-458c-b8cb-b6fcc36fe412"));
 /// Discard {cards(discards)}.
 pub const TEST_DISCARD: BaseCardId = BaseCardId(uuid!("6e76f193-dcf0-4faf-b1f7-50af2e0dc8a2"));

@@ -63,7 +63,7 @@ fn test_abandon_ally_gain_energy() {
 #[test]
 fn test_abandon_ally_put_to_void() {
     assert_round_trip(
-        "Abandon an ally: Put the {top_n_cards(to-void)} of your deck into your void.",
+        "Abandon an ally: Put the {top_n_cards(to_void)} of your deck into your void.",
         "to-void: 2",
     );
 }
