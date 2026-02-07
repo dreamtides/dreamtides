@@ -2809,7 +2809,7 @@ name = "Hope's Vanguard"
 id = "c08ffd90-ef79-48f7-9aa2-22875acbeba4"
 energy-cost = 2
 rules-text = "{Materialized_Judgment} With {count_allied_subtype(allies, subtype)}, draw {cards(cards)}. "
-variables = """
+  variables = """
 allies: 2
 subtype: survivor
 cards: 1"""
