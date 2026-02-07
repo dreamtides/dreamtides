@@ -13,61 +13,61 @@ use regex::Regex;
 
 #[test]
 fn test_parse_integer_variable() {
-    let bindings = VariableBindings::parse("cards: 2").unwrap();
-    assert_eq!(bindings.get("cards"), Some(&VariableValue::Integer(2)));
+    let bindings = VariableBindings::parse("c: 2").unwrap();
+    assert_eq!(bindings.get("c"), Some(&VariableValue::Integer(2)));
 }
 
 #[test]
 fn test_parse_multiple_integer_variables() {
-    let bindings = VariableBindings::parse("cards: 2, e: 3, points: 1").unwrap();
-    assert_eq!(bindings.get("cards"), Some(&VariableValue::Integer(2)));
+    let bindings = VariableBindings::parse("c: 2, e: 3, p: 1").unwrap();
+    assert_eq!(bindings.get("c"), Some(&VariableValue::Integer(2)));
     assert_eq!(bindings.get("e"), Some(&VariableValue::Integer(3)));
-    assert_eq!(bindings.get("points"), Some(&VariableValue::Integer(1)));
+    assert_eq!(bindings.get("p"), Some(&VariableValue::Integer(1)));
 }
 
 #[test]
 fn test_parse_subtype_variable() {
-    let bindings = VariableBindings::parse("subtype: warrior").unwrap();
-    assert_eq!(bindings.get("subtype"), Some(&VariableValue::Subtype(CardSubtype::Warrior)));
+    let bindings = VariableBindings::parse("t: warrior").unwrap();
+    assert_eq!(bindings.get("t"), Some(&VariableValue::Subtype(CardSubtype::Warrior)));
 }
 
 #[test]
 fn test_parse_figment_variable() {
-    let bindings = VariableBindings::parse("figment: radiant").unwrap();
-    assert_eq!(bindings.get("figment"), Some(&VariableValue::Figment(FigmentType::Radiant)));
+    let bindings = VariableBindings::parse("g: radiant").unwrap();
+    assert_eq!(bindings.get("g"), Some(&VariableValue::Figment(FigmentType::Radiant)));
 }
 
 #[test]
 fn test_parse_mixed_variables() {
-    let bindings = VariableBindings::parse("cards: 2, subtype: explorer, figment: shadow").unwrap();
-    assert_eq!(bindings.get("cards"), Some(&VariableValue::Integer(2)));
-    assert_eq!(bindings.get("subtype"), Some(&VariableValue::Subtype(CardSubtype::Explorer)));
-    assert_eq!(bindings.get("figment"), Some(&VariableValue::Figment(FigmentType::Shadow)));
+    let bindings = VariableBindings::parse("c: 2, t: explorer, g: shadow").unwrap();
+    assert_eq!(bindings.get("c"), Some(&VariableValue::Integer(2)));
+    assert_eq!(bindings.get("t"), Some(&VariableValue::Subtype(CardSubtype::Explorer)));
+    assert_eq!(bindings.get("g"), Some(&VariableValue::Figment(FigmentType::Shadow)));
 }
 
 #[test]
 fn test_parse_newline_separated() {
-    let bindings = VariableBindings::parse("cards: 2\ne: 3").unwrap();
-    assert_eq!(bindings.get("cards"), Some(&VariableValue::Integer(2)));
+    let bindings = VariableBindings::parse("c: 2\ne: 3").unwrap();
+    assert_eq!(bindings.get("c"), Some(&VariableValue::Integer(2)));
     assert_eq!(bindings.get("e"), Some(&VariableValue::Integer(3)));
 }
 
 #[test]
 fn test_parse_with_whitespace() {
-    let bindings = VariableBindings::parse("  cards : 2  ,  e : 3  ").unwrap();
-    assert_eq!(bindings.get("cards"), Some(&VariableValue::Integer(2)));
+    let bindings = VariableBindings::parse("  c : 2  ,  e : 3  ").unwrap();
+    assert_eq!(bindings.get("c"), Some(&VariableValue::Integer(2)));
     assert_eq!(bindings.get("e"), Some(&VariableValue::Integer(3)));
 }
 
 #[test]
 fn test_parse_empty_string() {
     let bindings = VariableBindings::parse("").unwrap();
-    assert_eq!(bindings.get("cards"), None);
+    assert_eq!(bindings.get("c"), None);
 }
 
 #[test]
 fn test_parse_invalid_format() {
-    let result = VariableBindings::parse("cards 2");
+    let result = VariableBindings::parse("c 2");
     assert!(result.is_err());
 }
 
@@ -79,29 +79,29 @@ fn test_parse_invalid_value() {
 
 #[test]
 fn test_get_integer_helper() {
-    let bindings = VariableBindings::parse("cards: 2").unwrap();
-    assert_eq!(bindings.get_integer("cards"), Some(2));
+    let bindings = VariableBindings::parse("c: 2").unwrap();
+    assert_eq!(bindings.get_integer("c"), Some(2));
     assert_eq!(bindings.get_integer("missing"), None);
 }
 
 #[test]
 fn test_get_subtype_helper() {
-    let bindings = VariableBindings::parse("subtype: warrior").unwrap();
-    assert_eq!(bindings.get_subtype("subtype"), Some(CardSubtype::Warrior));
+    let bindings = VariableBindings::parse("t: warrior").unwrap();
+    assert_eq!(bindings.get_subtype("t"), Some(CardSubtype::Warrior));
     assert_eq!(bindings.get_subtype("missing"), None);
 }
 
 #[test]
 fn test_get_figment_helper() {
-    let bindings = VariableBindings::parse("figment: radiant").unwrap();
-    assert_eq!(bindings.get_figment("figment"), Some(FigmentType::Radiant));
+    let bindings = VariableBindings::parse("g: radiant").unwrap();
+    assert_eq!(bindings.get_figment("g"), Some(FigmentType::Radiant));
     assert_eq!(bindings.get_figment("missing"), None);
 }
 
 #[test]
 fn test_resolve_simple_integer() {
     let tokens = vec![(Token::Directive("cards".to_string()), SimpleSpan::new((), 0..7))];
-    let bindings = VariableBindings::parse("cards: 2").unwrap();
+    let bindings = VariableBindings::parse("c: 2").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
@@ -111,7 +111,7 @@ fn test_resolve_simple_integer() {
 #[test]
 fn test_resolve_simple_subtype() {
     let tokens = vec![(Token::Directive("subtype".to_string()), SimpleSpan::new((), 0..9))];
-    let bindings = VariableBindings::parse("subtype: warrior").unwrap();
+    let bindings = VariableBindings::parse("t: warrior").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
@@ -144,7 +144,7 @@ fn test_resolve_word_token() {
 #[test]
 fn test_resolve_compound_n_figments() {
     let tokens = vec![(Token::Directive("n_figments".to_string()), SimpleSpan::new((), 0..12))];
-    let bindings = VariableBindings::parse("number: 3, figment: radiant").unwrap();
+    let bindings = VariableBindings::parse("n: 3, g: radiant").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
@@ -158,7 +158,7 @@ fn test_resolve_compound_n_figments() {
 #[test]
 fn test_resolve_compound_a_figment() {
     let tokens = vec![(Token::Directive("a_figment".to_string()), SimpleSpan::new((), 0..11))];
-    let bindings = VariableBindings::parse("figment: shadow").unwrap();
+    let bindings = VariableBindings::parse("g: shadow").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
@@ -171,12 +171,12 @@ fn test_resolve_compound_a_figment() {
 #[test]
 fn test_resolve_compound_missing_number() {
     let tokens = vec![(Token::Directive("n_figments".to_string()), SimpleSpan::new((), 0..12))];
-    let bindings = VariableBindings::parse("figment: radiant").unwrap();
+    let bindings = VariableBindings::parse("g: radiant").unwrap();
 
     let result = resolve_variables(&tokens, &bindings);
     assert!(result.is_err());
     let err = result.unwrap_err();
-    assert_eq!(err.name, "number");
+    assert_eq!(err.name, "n");
 }
 
 #[test]
@@ -187,7 +187,7 @@ fn test_resolve_compound_missing_figment() {
     let result = resolve_variables(&tokens, &bindings);
     assert!(result.is_err());
     let err = result.unwrap_err();
-    assert_eq!(err.name, "figment");
+    assert_eq!(err.name, "g");
 }
 
 #[test]
@@ -198,7 +198,7 @@ fn test_resolve_missing_variable() {
     let result = resolve_variables(&tokens, &bindings);
     assert!(result.is_err());
     let err = result.unwrap_err();
-    assert_eq!(err.name, "cards");
+    assert_eq!(err.name, "c");
 }
 
 #[test]
@@ -208,7 +208,7 @@ fn test_resolve_mixed_tokens() {
         (Token::Directive("cards".to_string()), SimpleSpan::new((), 5..12)),
         (Token::Period, SimpleSpan::new((), 12..13)),
     ];
-    let bindings = VariableBindings::parse("cards: 2").unwrap();
+    let bindings = VariableBindings::parse("c: 2").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 3);
@@ -225,7 +225,7 @@ fn test_representative_card_1() {
         (Token::Word("play".to_string()), SimpleSpan::new((), 9..13)),
         (Token::Directive("cards_numeral".to_string()), SimpleSpan::new((), 14..29)),
     ];
-    let bindings = VariableBindings::parse("cards: 2").unwrap();
+    let bindings = VariableBindings::parse("c: 2").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 4);
@@ -246,7 +246,7 @@ fn test_representative_card_4() {
         (Token::Word("gain".to_string()), SimpleSpan::new((), 31..35)),
         (Token::Directive("points".to_string()), SimpleSpan::new((), 36..44)),
     ];
-    let bindings = VariableBindings::parse("discards: 1, cards: 1, points: 1").unwrap();
+    let bindings = VariableBindings::parse("d: 1, c: 1, p: 1").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 7);
@@ -280,7 +280,7 @@ fn test_representative_card_9() {
         (Token::Directive("n_figments".to_string()), SimpleSpan::new((), 14..26)),
         (Token::Period, SimpleSpan::new((), 26..27)),
     ];
-    let bindings = VariableBindings::parse("number: 3, figment: radiant").unwrap();
+    let bindings = VariableBindings::parse("n: 3, g: radiant").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 3);
@@ -294,7 +294,7 @@ fn test_representative_card_9() {
 
 #[test]
 fn test_round_trip_bindings() {
-    let original = "cards: 2, e: 3, subtype: warrior, figment: radiant";
+    let original = "c: 2, e: 3, t: warrior, g: radiant";
     let bindings1 = VariableBindings::parse(original).unwrap();
 
     let bindings2 = VariableBindings::parse(original).unwrap();
@@ -304,8 +304,8 @@ fn test_round_trip_bindings() {
 #[test]
 fn test_insert_variable() {
     let mut bindings = VariableBindings::new();
-    bindings.insert("cards".to_string(), VariableValue::Integer(2));
-    assert_eq!(bindings.get_integer("cards"), Some(2));
+    bindings.insert("c".to_string(), VariableValue::Integer(2));
+    assert_eq!(bindings.get_integer("c"), Some(2));
 }
 
 #[test]
@@ -318,9 +318,7 @@ fn test_variable_directive_recognition() {
         (Token::Directive("s".to_string()), SimpleSpan::new((), 32..35)),
         (Token::Directive("subtype".to_string()), SimpleSpan::new((), 40..49)),
     ];
-    let bindings =
-        VariableBindings::parse("e: 1, cards: 2, discards: 3, points: 4, s: 5, subtype: warrior")
-            .unwrap();
+    let bindings = VariableBindings::parse("e: 1, c: 2, d: 3, p: 4, s: 5, t: warrior").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 6);

@@ -9,7 +9,7 @@ fn test_full_ability_at_end_of_turn_gain_energy() {
 
 #[test]
 fn test_full_ability_draw_cards() {
-    let ability = parse_ability("Draw {cards}.", "cards: 2");
+    let ability = parse_ability("Draw {cards}.", "c: 2");
     assert!(matches!(ability, Ability::Event(_)));
 }
 

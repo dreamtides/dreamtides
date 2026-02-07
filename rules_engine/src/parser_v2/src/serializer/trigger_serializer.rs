@@ -37,7 +37,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "when you play {cards_numeral(cards)} in a turn, ".to_string()
+            "when you play {cards_numeral(c)} in a turn, ".to_string()
         }
         TriggerEvent::PlayDuringTurn(predicate, turn) => match turn {
             PlayerTurn::YourTurn => {
@@ -95,7 +95,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "when you abandon {count_allies(allies)} in a turn, ".to_string()
+            "when you abandon {count_allies(a)} in a turn, ".to_string()
         }
         TriggerEvent::PutIntoVoid(predicate) => {
             format!(
@@ -109,7 +109,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "when you draw {cards_numeral(cards)} in a turn, ".to_string()
+            "when you draw {cards_numeral(c)} in a turn, ".to_string()
         }
         TriggerEvent::EndOfYourTurn => "at the end of your turn, ".to_string(),
         TriggerEvent::DrawAllCardsInCopyOfDeck => {
@@ -122,7 +122,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
             format!(
-                "when you {{materialize}} {{text_number(number)}} {} in a turn, ",
+                "when you {{materialize}} {{text_number(n)}} {} in a turn, ",
                 predicate_serializer::serialize_predicate_plural(predicate, bindings)
             )
         }

@@ -7,14 +7,14 @@ use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_abandon_allies_count_reclaim_self() {
-    assert_round_trip("Abandon {count_allies(allies)}: {Reclaim} this character.", "allies: 2");
+    assert_round_trip("Abandon {count_allies(a)}: {Reclaim} this character.", "a: 2");
 }
 
 #[test]
 fn test_pay_energy_gain_spark_per_subtype() {
     assert_round_trip(
-        "{energy(e)}: Gain +{s} spark for each allied {subtype(subtype)}.",
-        "e: 4\ns: 1\nsubtype: warrior",
+        "{energy(e)}: Gain +{s} spark for each allied {subtype(t)}.",
+        "e: 4\ns: 1\nt: warrior",
     );
 }
 
@@ -29,16 +29,16 @@ fn test_pay_energy_banish_card_reclaim_self() {
 #[test]
 fn test_pay_energy_abandon_ally_by_spark_draw() {
     assert_round_trip(
-        "{energy(e)}, Abandon an ally with spark {s} or less: Draw {cards(cards)}.",
-        "e: 2\ns: 1\ncards: 2",
+        "{energy(e)}, Abandon an ally with spark {s} or less: Draw {cards(c)}.",
+        "e: 2\ns: 1\nc: 2",
     );
 }
 
 #[test]
 fn test_pay_energy_abandon_discard_hand_draw() {
     assert_round_trip(
-        "{energy(e)}, Abandon a character, Discard your hand: Draw {cards(cards)}.",
-        "e: 2\ncards: 3",
+        "{energy(e)}, Abandon a character, Discard your hand: Draw {cards(c)}.",
+        "e: 2\nc: 3",
     );
 }
 
@@ -49,10 +49,7 @@ fn test_abandon_ally_gain_spark() {
 
 #[test]
 fn test_pay_energy_discard_kindle() {
-    assert_round_trip(
-        "{energy(e)}, Discard {cards(discards)}: {Kindle(k)}.",
-        "e: 1\ndiscards: 1\nk: 2",
-    );
+    assert_round_trip("{energy(e)}, Discard {cards(d)}: {Kindle(k)}.", "e: 1\nd: 1\nk: 2");
 }
 
 #[test]
@@ -63,8 +60,8 @@ fn test_abandon_ally_gain_energy() {
 #[test]
 fn test_abandon_ally_put_to_void() {
     assert_round_trip(
-        "Abandon an ally: Put the {top_n_cards(to_void)} of your deck into your void.",
-        "to_void: 2",
+        "Abandon an ally: Put the {top_n_cards(v)} of your deck into your void.",
+        "v: 2",
     );
 }
 
@@ -75,7 +72,7 @@ fn test_abandon_ally_kindle() {
 
 #[test]
 fn test_abandon_ally_once_per_turn_gain_points() {
-    assert_round_trip("Abandon an ally, once per turn: Gain {points(points)}.", "points: 1");
+    assert_round_trip("Abandon an ally, once per turn: Gain {points(p)}.", "p: 1");
 }
 
 #[test]
@@ -96,10 +93,7 @@ fn test_abandon_ally_dissolve_enemy_by_spark() {
 
 #[test]
 fn test_abandon_ally_once_per_turn_reclaim_subtype() {
-    assert_round_trip(
-        "Abandon an ally, once per turn: {Reclaim} {@a subtype(subtype)}.",
-        "subtype: warrior",
-    );
+    assert_round_trip("Abandon an ally, once per turn: {Reclaim} {@a subtype(t)}.", "t: warrior");
 }
 
 #[test]
@@ -109,7 +103,7 @@ fn test_abandon_discard_hand_gain_energy() {
 
 #[test]
 fn test_pay_energy_draw() {
-    assert_round_trip("{energy(e)}: Draw {cards(cards)}.", "e: 3\ncards: 1");
+    assert_round_trip("{energy(e)}: Draw {cards(c)}.", "e: 3\nc: 1");
 }
 
 #[test]
@@ -120,8 +114,8 @@ fn test_pay_energy_materialize_copy() {
 #[test]
 fn test_pay_energy_subtype_spark_becomes() {
     assert_round_trip(
-        "{energy(e)}: The spark of each allied {subtype(subtype)} becomes {s}.",
-        "e: 3\nsubtype: spirit-animal\ns: 5",
+        "{energy(e)}: The spark of each allied {subtype(t)} becomes {s}.",
+        "e: 3\nt: spirit-animal\ns: 5",
     );
 }
 
@@ -133,17 +127,14 @@ fn test_abandon_ally_gain_energy_equal_cost() {
 #[test]
 fn test_pay_energy_draw_per_energy_spent() {
     assert_round_trip(
-        "Pay 1 or more {energy_symbol}: Draw {cards(cards)} for each {energy_symbol} spent.",
-        "cards: 1",
+        "Pay 1 or more {energy_symbol}: Draw {cards(c)} for each {energy_symbol} spent.",
+        "c: 1",
     );
 }
 
 #[test]
 fn test_abandon_or_discard_dissolve_enemy() {
-    assert_round_trip(
-        "Abandon an ally or discard {cards(discards)}: {Dissolve} an enemy.",
-        "discards: 1",
-    );
+    assert_round_trip("Abandon an ally or discard {cards(d)}: {Dissolve} an enemy.", "d: 1");
 }
 
 #[test]
@@ -154,10 +145,7 @@ fn test_banish_from_hand_play_for_zero_prevent() {
 
 #[test]
 fn test_lose_max_energy_play_for_zero_prevent() {
-    assert_round_trip(
-        "Lose {maximum_energy(max)}: Play this event for {energy(e)}.",
-        "max: 1\ne: 0",
-    );
+    assert_round_trip("Lose {maximum_energy(m)}: Play this event for {energy(e)}.", "m: 1\ne: 0");
     assert_round_trip("{Prevent} a played card.", "");
 }
 
@@ -175,20 +163,20 @@ fn test_fast_abandon_self_prevent_event() {
 #[test]
 fn test_abandon_any_allies_draw_per_abandoned() {
     assert_round_trip(
-        "Abandon any number of allies: Draw {cards(cards)} for each ally abandoned.",
-        "cards: 1",
+        "Abandon any number of allies: Draw {cards(c)} for each ally abandoned.",
+        "c: 1",
     );
 }
 
 #[test]
 fn test_return_all_but_one_ally_draw_per_returned() {
     assert_round_trip(
-        "Return all but one ally to hand: Draw {cards(cards)} for each ally returned.",
-        "cards: 1",
+        "Return all but one ally to hand: Draw {cards(c)} for each ally returned.",
+        "c: 1",
     );
 }
 
 #[test]
 fn test_pay_variable_energy_draw_per_energy() {
-    assert_round_trip("Pay 1 or more {energy_symbol}: Draw {cards(cards)} for each {energy_symbol} spent, then discard {cards(discards)}.", "cards: 1\ndiscards: 2");
+    assert_round_trip("Pay 1 or more {energy_symbol}: Draw {cards(c)} for each {energy_symbol} spent, then discard {cards(d)}.", "c: 1\nd: 2");
 }

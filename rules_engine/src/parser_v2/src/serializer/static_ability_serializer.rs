@@ -143,7 +143,7 @@ pub fn serialize_standard_static_ability(
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*multiplier));
             }
-            "{multiply_by(number)} the amount of {energy_symbol} you gain from card effects this turn."
+            "{multiply_by(n)} the amount of {energy_symbol} you gain from card effects this turn."
                 .to_string()
         }
         StandardStaticAbility::MultiplyCardDrawFromCardEffects { multiplier } => {
@@ -152,8 +152,7 @@ pub fn serialize_standard_static_ability(
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*multiplier));
             }
-            "{multiply_by(number)} the number of cards you draw from card effects this turn."
-                .to_string()
+            "{multiply_by(n)} the number of cards you draw from card effects this turn.".to_string()
         }
         StandardStaticAbility::OncePerTurnPlayFromVoid { matching } => {
             format!(
@@ -216,7 +215,7 @@ pub fn serialize_standard_static_ability(
             let predicate_text = match matching {
                 ability_data::predicate::CardPredicate::Character => "allies".to_string(),
                 ability_data::predicate::CardPredicate::CharacterType(_) => {
-                    "allied {subtype(subtype):other}".to_string()
+                    "allied {subtype(t):other}".to_string()
                 }
                 _ => predicate_serializer::serialize_card_predicate_plural(matching, bindings),
             };

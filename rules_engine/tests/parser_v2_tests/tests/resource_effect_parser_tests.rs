@@ -3,8 +3,7 @@ use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_multiply_your_energy() {
-    let result =
-        parse_ability("{multiply_by} the amount of {energy_symbol} you have.", "number: 2");
+    let result = parse_ability("{multiply_by} the amount of {energy_symbol} you have.", "n: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(MultiplyYourEnergy(
@@ -16,10 +15,8 @@ fn test_multiply_your_energy() {
 
 #[test]
 fn test_judgment_multiply_your_energy() {
-    let result = parse_ability(
-        "{Judgment} {multiply_by} the amount of {energy_symbol} you have.",
-        "number: 3",
-    );
+    let result =
+        parse_ability("{Judgment} {multiply_by} the amount of {energy_symbol} you have.", "n: 3");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -34,7 +31,7 @@ fn test_judgment_multiply_your_energy() {
 
 #[test]
 fn test_dissolve_enemy_you_lose_points() {
-    let result = parse_ability("{Dissolve} an enemy. You lose {points}.", "points: 1");
+    let result = parse_ability("{Dissolve} an enemy. You lose {points}.", "p: 1");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: List([
@@ -57,7 +54,7 @@ fn test_dissolve_enemy_you_lose_points() {
 
 #[test]
 fn test_dissolve_enemy_opponent_gains_points() {
-    let result = parse_ability("{Dissolve} an enemy. The opponent gains {points}.", "points: 1");
+    let result = parse_ability("{Dissolve} an enemy. The opponent gains {points}.", "p: 1");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: List([
@@ -80,10 +77,8 @@ fn test_dissolve_enemy_opponent_gains_points() {
 
 #[test]
 fn test_judgment_draw_cards_opponent_gains_points() {
-    let result = parse_ability(
-        "{Judgment} Draw {cards}. The opponent gains {points}.",
-        "cards: 2, points: 1",
-    );
+    let result =
+        parse_ability("{Judgment} Draw {cards}. The opponent gains {points}.", "c: 2, p: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -111,7 +106,7 @@ fn test_judgment_draw_cards_opponent_gains_points() {
 fn test_dissolve_enemy_draw_cards_with_cost_reduction() {
     let result = parse_abilities(
         "{Dissolve} an enemy. Draw {cards}.\n\nThis event costs {e} if a character dissolved this turn.",
-        "cards: 1, e: 1",
+        "c: 1, e: 1",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -148,7 +143,7 @@ fn test_dissolve_enemy_draw_cards_with_cost_reduction() {
 fn test_multiply_energy_gain_from_card_effects() {
     let result = parse_ability(
         "{multiply_by} the amount of {energy_symbol} you gain from card effects this turn.",
-        "number: 2",
+        "n: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
@@ -165,7 +160,7 @@ fn test_multiply_energy_gain_from_card_effects() {
 fn test_multiply_card_draw_from_card_effects() {
     let result = parse_ability(
         "{multiply_by} the number of cards you draw from card effects this turn.",
-        "number: 3",
+        "n: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(

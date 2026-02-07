@@ -16,7 +16,7 @@ fn test_at_end_of_turn_gain_energy() {
 
 #[test]
 fn test_when_you_discard_a_card_gain_points() {
-    let result = parse_ability("When you discard a card, gain {points}.", "points: 1");
+    let result = parse_ability("When you discard a card, gain {points}.", "p: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Discard(Your(Card)),
@@ -106,7 +106,7 @@ fn test_once_per_turn_when_you_materialize_a_character_gain_energy() {
 fn test_once_per_turn_when_you_materialize_a_character_with_cost_or_less_draw_cards() {
     let result = parse_ability(
         "Once per turn, when you {materialize} a character with cost {e} or less, draw {cards}.",
-        "e: 2, cards: 1",
+        "e: 2, c: 1",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -130,7 +130,7 @@ fn test_once_per_turn_when_you_materialize_a_character_with_cost_or_less_draw_ca
 fn test_once_per_turn_when_you_materialize_a_subtype_draw_cards() {
     let result = parse_ability(
         "Once per turn, when you {materialize} {a_subtype}, draw {cards}.",
-        "subtype: warrior, cards: 2",
+        "t: warrior, c: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -161,10 +161,8 @@ fn test_when_you_play_an_event_gain_energy() {
 
 #[test]
 fn test_when_you_play_cards_in_turn_reclaim_this_character() {
-    let result = parse_ability(
-        "When you play {cards_numeral} in a turn, {reclaim} this character.",
-        "cards: 2",
-    );
+    let result =
+        parse_ability("When you play {cards_numeral} in a turn, {reclaim} this character.", "c: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: PlayCardsInTurn(2),
@@ -192,7 +190,7 @@ fn test_when_you_materialize_an_ally_gain_energy() {
 fn test_when_you_materialize_a_subtype_reclaim_this_character() {
     let result = parse_ability(
         "When you {materialize} {a_subtype}, {reclaim} this character.",
-        "subtype: warrior",
+        "t: warrior",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -223,8 +221,7 @@ fn test_when_you_materialize_a_character_this_character_gains_spark() {
 
 #[test]
 fn test_when_you_play_a_subtype_draw_cards() {
-    let result =
-        parse_ability("When you play {a_subtype}, draw {cards}.", "subtype: warrior, cards: 2");
+    let result = parse_ability("When you play {a_subtype}, draw {cards}.", "t: warrior, c: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Play(Your(CharacterType(Warrior))),
@@ -239,7 +236,7 @@ fn test_when_you_play_a_subtype_draw_cards() {
 fn test_when_you_play_a_subtype_put_cards_from_deck_into_void() {
     let result = parse_ability(
         "When you play {a_subtype}, put the {top_n_cards} of your deck into your void.",
-        "subtype: warrior, to_void: 3",
+        "t: warrior, v: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -253,7 +250,7 @@ fn test_when_you_play_a_subtype_put_cards_from_deck_into_void() {
 
 #[test]
 fn test_when_you_abandon_a_character_draw_cards() {
-    let result = parse_ability("When you abandon a character, draw {cards}.", "cards: 2");
+    let result = parse_ability("When you abandon a character, draw {cards}.", "c: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Abandon(Your(Character)),
@@ -266,7 +263,7 @@ fn test_when_you_abandon_a_character_draw_cards() {
 
 #[test]
 fn test_when_you_abandon_a_character_gain_points() {
-    let result = parse_ability("When you abandon a character, gain {points}.", "points: 1");
+    let result = parse_ability("When you abandon a character, gain {points}.", "p: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Abandon(Your(Character)),
@@ -307,10 +304,8 @@ fn test_when_you_abandon_an_ally_this_character_gains_spark() {
 
 #[test]
 fn test_when_you_abandon_count_allies_in_a_turn_dissolve_an_enemy() {
-    let result = parse_ability(
-        "When you abandon {count_allies} in a turn, {dissolve} an enemy.",
-        "allies: 2",
-    );
+    let result =
+        parse_ability("When you abandon {count_allies} in a turn, {dissolve} an enemy.", "a: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: AbandonCardsInTurn(2),
@@ -323,7 +318,7 @@ fn test_when_you_abandon_count_allies_in_a_turn_dissolve_an_enemy() {
 
 #[test]
 fn test_when_an_ally_is_dissolved_gain_points() {
-    let result = parse_ability("When an ally is {dissolved}, gain {points}.", "points: 2");
+    let result = parse_ability("When an ally is {dissolved}, gain {points}.", "p: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Dissolved(Another(Character)),
@@ -336,7 +331,7 @@ fn test_when_an_ally_is_dissolved_gain_points() {
 
 #[test]
 fn test_when_an_ally_is_dissolved_draw_cards() {
-    let result = parse_ability("When an ally is {dissolved}, draw {cards}.", "cards: 2");
+    let result = parse_ability("When an ally is {dissolved}, draw {cards}.", "c: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Dissolved(Another(Character)),
@@ -364,7 +359,7 @@ fn test_when_an_ally_is_dissolved_gain_energy() {
 fn test_dissolved_a_subtype_in_void_gains_reclaim() {
     let result = parse_ability(
         "{Dissolved} {ASubtype} in your void gains {reclaim} equal to its cost.",
-        "subtype: warrior",
+        "t: warrior",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -385,7 +380,7 @@ fn test_dissolved_a_subtype_in_void_gains_reclaim() {
 fn test_dissolved_capitalized_subtype_directive_in_void_gains_reclaim() {
     let result = parse_ability(
         "{Dissolved} {ASubtype} in your void gains {reclaim} equal to its cost.",
-        "subtype: survivor",
+        "t: survivor",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -406,7 +401,7 @@ fn test_dissolved_capitalized_subtype_directive_in_void_gains_reclaim() {
 fn test_dissolved_draw_cards_with_allied_subtype_dissolved_trigger() {
     let result = parse_abilities(
         "{Dissolved} Draw {cards}.\n\nWhen an allied {subtype} is {dissolved}, draw {cards}.",
-        "cards: 1, subtype: warrior",
+        "c: 1, t: warrior",
     );
     assert_eq!(result.len(), 2);
     assert_ron_snapshot!(result[0], @r###"
@@ -459,7 +454,7 @@ fn test_when_an_ally_is_banished_this_character_gains_spark() {
 
 #[test]
 fn test_when_you_play_an_event_foresee() {
-    let result = parse_ability("When you play an event, {foresee}.", "foresee: 1");
+    let result = parse_ability("When you play an event, {foresee}.", "f: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Play(Your(Event)),
@@ -472,10 +467,8 @@ fn test_when_you_play_an_event_foresee() {
 
 #[test]
 fn test_when_you_materialize_an_allied_subtype_gain_energy() {
-    let result = parse_ability(
-        "When you {materialize} an allied {subtype}, gain {e}.",
-        "subtype: warrior, e: 1",
-    );
+    let result =
+        parse_ability("When you {materialize} an allied {subtype}, gain {e}.", "t: warrior, e: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Materialize(Another(CharacterType(Warrior))),
@@ -490,7 +483,7 @@ fn test_when_you_materialize_an_allied_subtype_gain_energy() {
 fn test_when_you_materialize_an_allied_subtype_this_character_gains_spark() {
     let result = parse_ability(
         "When you {materialize} an allied {subtype}, this character gains +{s} spark.",
-        "subtype: warrior, s: 2",
+        "t: warrior, s: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -507,7 +500,7 @@ fn test_when_you_materialize_an_allied_subtype_this_character_gains_spark() {
 fn test_when_you_materialize_an_allied_subtype_that_character_gains_spark() {
     let result = parse_ability(
         "When you {materialize} an allied {subtype}, that character gains +{s} spark.",
-        "subtype: warrior, s: 2",
+        "t: warrior, s: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -522,7 +515,7 @@ fn test_when_you_materialize_an_allied_subtype_that_character_gains_spark() {
 
 #[test]
 fn test_when_you_play_a_fast_card_gain_points() {
-    let result = parse_ability("When you play a {fast} card, gain {points}.", "points: 1");
+    let result = parse_ability("When you play a {fast} card, gain {points}.", "p: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Play(Your(Fast(
@@ -554,8 +547,7 @@ fn test_when_an_event_is_put_into_your_void_this_character_gains_spark() {
 
 #[test]
 fn test_once_per_turn_when_you_play_a_fast_card_draw_cards() {
-    let result =
-        parse_ability("Once per turn, when you play a {fast} card, draw {cards}.", "cards: 2");
+    let result = parse_ability("Once per turn, when you play a {fast} card, draw {cards}.", "c: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Play(Your(Fast(
@@ -575,7 +567,7 @@ fn test_once_per_turn_when_you_play_a_fast_card_draw_cards() {
 #[test]
 fn test_until_end_of_turn_when_you_play_a_character_draw_cards() {
     let result =
-        parse_ability("Until end of turn, when you play a character, draw {cards}.", "cards: 2");
+        parse_ability("Until end of turn, when you play a character, draw {cards}.", "c: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(CreateTriggerUntilEndOfTurn(
@@ -635,7 +627,7 @@ fn test_when_you_play_a_fast_card_this_character_gains_spark() {
 #[test]
 fn test_judgment_gain_energy_for_each_allied_subtype() {
     let result =
-        parse_ability("{Judgment} Gain {e} for each allied {subtype}.", "subtype: warrior, e: 1");
+        parse_ability("{Judgment} Gain {e} for each allied {subtype}.", "t: warrior, e: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -669,7 +661,7 @@ fn test_judgment_gain_energy_for_each_allied_character() {
 fn test_judgment_you_may_discard_draw_gain_points() {
     let result = parse_ability(
         "{Judgment} You may discard {discards} to draw {cards} and gain {points}.",
-        "discards: 2, cards: 1, points: 3",
+        "d: 2, c: 1, p: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -729,7 +721,7 @@ fn test_judgment_you_may_discard_to_dissolve_enemy_with_spark_or_less() {
 fn test_judgment_with_count_allied_subtype_gain_energy() {
     let result = parse_ability(
         "{Judgment} With {count_allied_subtype}, gain {e}.",
-        "subtype: warrior, allies: 2, e: 3",
+        "t: warrior, a: 2, e: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -754,7 +746,7 @@ fn test_judgment_with_count_allied_subtype_gain_energy() {
 fn test_materialized_judgment_with_count_allied_subtype_gain_energy() {
     let result = parse_ability(
         "{Materialized_Judgment} With {count_allied_subtype}, gain {e}.",
-        "subtype: warrior, allies: 2, e: 3",
+        "t: warrior, a: 2, e: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -780,7 +772,7 @@ fn test_materialized_judgment_with_count_allied_subtype_gain_energy() {
 fn test_materialized_judgment_with_count_allied_subtype_draw_cards() {
     let result = parse_ability(
         "{Materialized_Judgment} With {count_allied_subtype}, draw {cards}.",
-        "subtype: warrior, allies: 2, cards: 1",
+        "t: warrior, a: 2, c: 1",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -856,10 +848,8 @@ fn test_dissolved_kindle() {
 
 #[test]
 fn test_when_allied_subtype_dissolved_kindle() {
-    let result = parse_ability(
-        "When an allied {subtype} is {dissolved}, {kindle}.",
-        "subtype: warrior, k: 1",
-    );
+    let result =
+        parse_ability("When an allied {subtype} is {dissolved}, {kindle}.", "t: warrior, k: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Dissolved(Another(CharacterType(Warrior))),
@@ -907,7 +897,7 @@ fn test_when_you_play_this_character_gain_energy() {
 fn test_judgment_with_count_allies_that_share_character_type_draw_cards() {
     let result = parse_ability(
         "{Judgment} With {count_allies} that share a character type, draw {cards}.",
-        "allies: 3, cards: 2",
+        "a: 3, c: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -953,7 +943,7 @@ fn test_events_cost_more_and_play_event_from_hand_copy() {
 fn test_has_all_character_types_and_judgment_with_allies() {
     let result = parse_abilities(
         "Has all character types.\n\n{Judgment} With {count_allies} that share a character type, draw {cards}.",
-        "allies: 2, cards: 1",
+        "a: 2, c: 1",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -980,7 +970,7 @@ fn test_has_all_character_types_and_judgment_with_allies() {
 fn test_when_you_draw_cards_in_turn_while_in_void_gains_reclaim() {
     let result = parse_ability(
         "When you draw {cards_numeral} in a turn, while this card is in your void, it gains {reclaim_for_cost} this turn.",
-        "cards: 3, reclaim: 2",
+        "c: 3, r: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -1030,7 +1020,7 @@ fn test_when_you_play_card_during_opponent_turn_this_character_gains_spark() {
 #[test]
 fn test_when_you_play_a_character_materialize_figment() {
     let result =
-        parse_ability("When you play a character, {materialize} {a_figment}.", "figment: shadow");
+        parse_ability("When you play a character, {materialize} {a_figment}.", "g: shadow");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Play(Your(Character)),

@@ -57,7 +57,7 @@ pub fn serialize_standard_effect(
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "draw {cards(cards)}.".to_string()
+            "draw {cards(c)}.".to_string()
         }
         StandardEffect::DrawCardsForEach { count, for_each } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable(
@@ -66,7 +66,7 @@ pub fn serialize_standard_effect(
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
             format!(
-                "draw {{cards(cards)}} for each {}.", serialize_for_count_expression(for_each,
+                "draw {{cards(c)}} for each {}.", serialize_for_count_expression(for_each,
                 bindings)
             )
         }
@@ -76,7 +76,7 @@ pub fn serialize_standard_effect(
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "discard {cards(discards)}.".to_string()
+            "discard {cards(d)}.".to_string()
         }
         StandardEffect::DiscardCardFromEnemyHand { predicate } => {
             format!(
@@ -91,7 +91,7 @@ pub fn serialize_standard_effect(
                 bindings.insert(var_name.to_string(), VariableValue::Integer(1));
             }
             format!(
-                "discard a chosen {} from the opponent's hand. They draw {{cards(cards)}}.",
+                "discard a chosen {} from the opponent's hand. They draw {{cards(c)}}.",
                 text_formatting::card_predicate_base_text(predicate).without_article()
             )
         }
@@ -136,7 +136,7 @@ pub fn serialize_standard_effect(
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(gains.0));
             }
-            "gain {points(points)}.".to_string()
+            "gain {points(p)}.".to_string()
         }
         StandardEffect::GainPointsForEach { gain, for_count } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable(
@@ -145,7 +145,7 @@ pub fn serialize_standard_effect(
                 bindings.insert(var_name.to_string(), VariableValue::Integer(gain.0));
             }
             format!(
-                "gain {{points(points)}} for each {}.", serialize_for_count_expression(for_count,
+                "gain {{points(p)}} for each {}.", serialize_for_count_expression(for_count,
                 bindings)
             )
         }
@@ -155,7 +155,7 @@ pub fn serialize_standard_effect(
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(loses.0));
             }
-            "you lose {points(points)}.".to_string()
+            "you lose {points(p)}.".to_string()
         }
         StandardEffect::EnemyGainsPoints { count } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable(
@@ -163,7 +163,7 @@ pub fn serialize_standard_effect(
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "the opponent gains {points(points)}.".to_string()
+            "the opponent gains {points(p)}.".to_string()
         }
         StandardEffect::EnemyGainsPointsEqualToItsSpark => {
             "the opponent gains points equal to its spark.".to_string()
@@ -174,7 +174,7 @@ pub fn serialize_standard_effect(
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "the opponent loses {points(points)}.".to_string()
+            "the opponent loses {points(p)}.".to_string()
         }
         StandardEffect::Foresee { count } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable(
@@ -182,7 +182,7 @@ pub fn serialize_standard_effect(
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "{foresee(foresee)}.".to_string()
+            "{foresee(f)}.".to_string()
         }
         StandardEffect::Kindle { amount } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable(
@@ -260,7 +260,7 @@ pub fn serialize_standard_effect(
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "put the {top_n_cards(to_void)} of your deck into your void.".to_string()
+            "put the {top_n_cards(v)} of your deck into your void.".to_string()
         }
         StandardEffect::PutCardsFromVoidOnTopOfDeck { matching, count } => {
             if *count == 1 {
@@ -275,7 +275,7 @@ pub fn serialize_standard_effect(
                     bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
                 }
                 format!(
-                    "put up to {{cards(cards)}} {} from your void on top of your deck.",
+                    "put up to {{cards(c)}} {} from your void on top of your deck.",
                     predicate_serializer::serialize_card_predicate_plural(matching,
                     bindings)
                 )
@@ -399,7 +399,7 @@ pub fn serialize_standard_effect(
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "{banish} {cards(cards)} from the opponent's void.".to_string()
+            "{banish} {cards(c)} from the opponent's void.".to_string()
         }
         StandardEffect::BanishEnemyVoid => "{banish} the opponent's void.".to_string(),
         StandardEffect::BanishThenMaterialize { target, count } => {
@@ -427,7 +427,7 @@ pub fn serialize_standard_effect(
                     {
                         bindings.insert(var_name.to_string(), VariableValue::Integer(*n));
                     }
-                    "{banish} {up_to_n_allies(number)}, then {materialize} {it_or_them(number)}.".to_string()
+                    "{banish} {up_to_n_allies(n)}, then {materialize} {it_or_them(n)}.".to_string()
                 }
                 _ => {
                     format!(
@@ -512,21 +512,21 @@ pub fn serialize_standard_effect(
             }
         }
         StandardEffect::MaterializeFigments { count, figment } => {
-            bindings.insert("figment".to_string(), VariableValue::Figment(*figment));
+            bindings.insert("g".to_string(), VariableValue::Figment(*figment));
             if *count == 1 {
-                "{materialize} {a_figment(figment)}.".to_string()
+                "{materialize} {a_figment(g)}.".to_string()
             } else {
-                bindings.insert("number".to_string(), VariableValue::Integer(*count));
-                "{materialize} {n_figments(number, figment)}.".to_string()
+                bindings.insert("n".to_string(), VariableValue::Integer(*count));
+                "{materialize} {n_figments(n, g)}.".to_string()
             }
         }
         StandardEffect::MaterializeFigmentsQuantity { count, quantity, figment } => {
-            bindings.insert("figment".to_string(), VariableValue::Figment(*figment));
+            bindings.insert("g".to_string(), VariableValue::Figment(*figment));
             let figment_text = if *count == 1 {
-                "{a_figment(figment)}"
+                "{a_figment(g)}"
             } else {
-                bindings.insert("number".to_string(), VariableValue::Integer(*count));
-                "{n_figments(number, figment)}"
+                bindings.insert("n".to_string(), VariableValue::Integer(*count));
+                "{n_figments(n, g)}"
             };
             match quantity {
                 QuantityExpression::PlayedThisTurn(_) => {
@@ -591,7 +591,7 @@ pub fn serialize_standard_effect(
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "return {up_to_n_events(number)} from your void to your hand.".to_string()
+            "return {up_to_n_events(n)} from your void to your hand.".to_string()
         }
         StandardEffect::ReturnFromYourVoidToPlay { target } => {
             format!(
@@ -617,7 +617,7 @@ pub fn serialize_standard_effect(
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "each player discards {cards(discards)}.".to_string()
+            "each player discards {cards(d)}.".to_string()
         }
         StandardEffect::EachPlayerAbandonsCharacters { matching, .. } => {
             format!(
@@ -631,7 +631,7 @@ pub fn serialize_standard_effect(
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "each player shuffles their hand and void into their deck and then draws {cards(cards)}."
+            "each player shuffles their hand and void into their deck and then draws {cards(c)}."
                 .to_string()
         }
         StandardEffect::MaterializeCollection { target, count } => {
@@ -675,7 +675,7 @@ pub fn serialize_standard_effect(
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
             format!(
-                "{{materialize}} {{n_random_characters(number)}} {} from your deck.",
+                "{{materialize}} {{n_random_characters(n)}} {} from your deck.",
                 predicate_serializer::serialize_cost_constraint_only(predicate, bindings)
             )
         }
@@ -686,7 +686,7 @@ pub fn serialize_standard_effect(
                 bindings
                     .insert(var_name.to_string(), VariableValue::Integer(*multiplier));
             }
-            "{multiply_by(number)} the amount of {energy_symbol} you have.".to_string()
+            "{multiply_by(n)} the amount of {energy_symbol} you have.".to_string()
         }
         StandardEffect::CopyNextPlayed { matching, times } => {
             if let Some(count) = times {
@@ -698,7 +698,7 @@ pub fn serialize_standard_effect(
                 }
             }
             format!(
-                "copy the next {} you play {{this_turn_times(number)}}.",
+                "copy the next {} you play {{this_turn_times(n)}}.",
                 predicate_serializer::predicate_base_text(matching, bindings)
             )
         }
@@ -845,9 +845,9 @@ pub fn serialize_effect(effect: &Effect, bindings: &mut VariableBindings) -> Str
 /// Serializes an effect with explicit ability context.
 ///
 /// The context determines joining behavior for mandatory effect lists:
-/// - Triggered: use `, then` (e.g., "{Judgment} Draw {cards(cards)}, then
-///   discard {cards(discards)}.")
-/// - Event: use `. ` (e.g., "Draw {cards(cards)}. Discard {cards(discards)}.")
+/// - Triggered: use `, then` (e.g., "{Judgment} Draw {cards(c)}, then discard
+///   {cards(d)}.")
+/// - Event: use `. ` (e.g., "Draw {cards(c)}. Discard {cards(d)}.")
 pub fn serialize_effect_with_context(
     effect: &Effect,
     bindings: &mut VariableBindings,
@@ -1081,17 +1081,9 @@ pub fn serialize_effect_with_context(
             for (index, choice) in choices.iter().enumerate() {
                 result.push('\n');
                 result.push_str("{bullet} ");
-                let (cost_var, cost_directive) = if index == 0 {
-                    ("{energy(mode1_cost)}", "mode1_cost")
-                } else {
-                    ("{energy(mode2_cost)}", "mode2_cost")
-                };
-                if let Some(var_name) =
-                    parser_substitutions::directive_to_integer_variable(cost_directive)
-                {
-                    bindings
-                        .insert(var_name.to_string(), VariableValue::Integer(choice.energy_cost.0));
-                }
+                let (cost_var, var_name) =
+                    if index == 0 { ("{energy(e1)}", "e1") } else { ("{energy(e2)}", "e2") };
+                bindings.insert(var_name.to_string(), VariableValue::Integer(choice.energy_cost.0));
                 result.push_str(&format!(
                     "{}: {}",
                     cost_var,
@@ -1125,19 +1117,19 @@ pub fn serialize_for_count_expression(
             "ally abandoned this turn".to_string()
         }
         QuantityExpression::AbandonedThisTurn(CardPredicate::CharacterType(_)) => {
-            "allied {subtype(subtype)} abandoned this turn".to_string()
+            "allied {subtype(t)} abandoned this turn".to_string()
         }
         QuantityExpression::AbandonedThisWay(CardPredicate::Character) => {
             "ally abandoned".to_string()
         }
         QuantityExpression::AbandonedThisWay(CardPredicate::CharacterType(_)) => {
-            "allied {subtype(subtype)} abandoned".to_string()
+            "allied {subtype(t)} abandoned".to_string()
         }
         QuantityExpression::ReturnedToHandThisWay(CardPredicate::Character) => {
             "ally returned".to_string()
         }
         QuantityExpression::ReturnedToHandThisWay(CardPredicate::CharacterType(_)) => {
-            "allied {subtype(subtype)} returned".to_string()
+            "allied {subtype(t)} returned".to_string()
         }
         QuantityExpression::ReturnedToHandThisWay(predicate) => {
             format!(
@@ -1185,8 +1177,8 @@ fn serialize_allied_card_predicate(
 ) -> String {
     match card_predicate {
         CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "allied {subtype(subtype)}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "allied {subtype(t)}".to_string()
         }
         _ => {
             format!(
@@ -1204,8 +1196,8 @@ fn serialize_allied_card_predicate_plural(
 ) -> String {
     match card_predicate {
         CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "allied {subtype(subtype):other}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "allied {subtype(t):other}".to_string()
         }
         _ => {
             format!("allied {}", text_formatting::card_predicate_base_text(card_predicate).plural())
@@ -1227,7 +1219,7 @@ fn serialize_gains_reclaim(
         {
             bindings.insert(var_name.to_string(), VariableValue::Integer(energy_cost.0));
         }
-        ("{reclaim_for_cost(reclaim)}", "")
+        ("{reclaim_for_cost(r)}", "")
     } else {
         ("{reclaim}", " equal to its cost")
     };
@@ -1265,12 +1257,12 @@ fn serialize_void_gains_reclaim(
         {
             bindings.insert(var_name.to_string(), VariableValue::Integer(energy_cost.0));
         }
-        ("{reclaim_for_cost(reclaim)}", "")
+        ("{reclaim_for_cost(r)}", "")
     } else {
         ("{reclaim}", " equal to its cost")
     };
     let (reclaim_directive_plural, reclaim_suffix_plural) = if cost.is_some() {
-        ("{reclaim_for_cost(reclaim)}", "")
+        ("{reclaim_for_cost(r)}", "")
     } else {
         ("{reclaim}", " equal to their cost")
     };
@@ -1278,8 +1270,8 @@ fn serialize_void_gains_reclaim(
     match count {
         CollectionExpression::Exactly(1) => {
             let predicate_text = if let CardPredicate::CharacterType(subtype) = predicate {
-                bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-                "{@cap @a subtype(subtype)}".to_string()
+                bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+                "{@cap @a subtype(t)}".to_string()
             } else {
                 serializer_utils::capitalize_first_letter(
                     &predicate_serializer::serialize_card_predicate(predicate, bindings),

@@ -32,8 +32,8 @@ prompts = ""
 name = "Dreamwell Foresee"
 id = "40c77ea8-a021-4bc6-8970-0853c03f3fe0"
 energy-produced = 1
-rules-text = "{Foresee}."
-variables = "foresee: 1"
+rules-text = "{Foresee(f)}."
+variables = "f: 1"
 phase = 1
 image-number = 1897537165
 prompts = ""
@@ -42,8 +42,8 @@ prompts = ""
 name = "Dreamwell Gain Points"
 id = "d386663c-9e9f-4b8e-b410-f3467e39801b"
 energy-produced = 1
-rules-text = "Gain {points}."
-variables = "points: 2"
+rules-text = "Gain {points(p)}."
+variables = "p: 2"
 phase = 1
 image-number = 1789989917
 prompts = ""
@@ -62,10 +62,10 @@ prompts = ""
 name = "Dreamwell Draw Discard"
 id = "40e4381f-12f7-46b9-ae50-67b3195781b1"
 energy-produced = 1
-rules-text = "Draw {cards}. Discard {discards}."
+rules-text = "Draw {cards(c)}. Discard {cards(d)}."
 variables = """
-cards: 1
-discards: 1"""
+c: 1
+d: 1"""
 prompts = "Select a card to discard."
 phase = 1
 image-number = 1011222385
@@ -74,8 +74,8 @@ image-number = 1011222385
 name = "Dreamwell Mill 3"
 id = "a2cdf115-8e1a-455e-a118-123f6f36c7ba"
 energy-produced = 1
-rules-text = "Put the {top_n_cards(to_void)} of your deck into your void."
-variables = "to_void: 3"
+rules-text = "Put the {top_n_cards(v)} of your deck into your void."
+variables = "v: 3"
 phase = 1
 image-number = 2421338077
 prompts = ""

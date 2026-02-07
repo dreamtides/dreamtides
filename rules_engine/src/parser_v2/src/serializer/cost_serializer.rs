@@ -24,16 +24,16 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
                 {
                     bindings.insert(var_name.to_string(), VariableValue::Integer(*n));
                 }
-                "abandon {count_allies(allies)}".to_string()
+                "abandon {count_allies(a)}".to_string()
             }
-            _ => "abandon {count_allies(allies)}".to_string(),
+            _ => "abandon {count_allies(a)}".to_string(),
         },
         Cost::DiscardCards { count, .. } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("discards")
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "discard {cards(discards)}".to_string()
+            "discard {cards(d)}".to_string()
         }
         Cost::DiscardHand => "discard your hand".to_string(),
         Cost::Energy(energy) => {
@@ -48,7 +48,7 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*amount));
             }
-            "lose {maximum_energy(max)}".to_string()
+            "lose {maximum_energy(m)}".to_string()
         }
         Cost::BanishCardsFromYourVoid(count) => {
             if *count == 1 {
@@ -58,20 +58,20 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
                 {
                     bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
                 }
-                "{Banish} {cards(cards)} from your void".to_string()
+                "{Banish} {cards(c)} from your void".to_string()
             }
         }
         Cost::BanishCardsFromEnemyVoid(count) => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("cards") {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
-            "{Banish} {cards(cards)} from the opponent's void".to_string()
+            "{Banish} {cards(c)} from the opponent's void".to_string()
         }
         Cost::BanishAllCardsFromYourVoidWithMinCount(min_count) => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("count") {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*min_count));
             }
-            "{Banish} your void with {count(count)} or more cards".to_string()
+            "{Banish} your void with {count(n)} or more cards".to_string()
         }
         Cost::BanishFromHand(predicate) => {
             format!(

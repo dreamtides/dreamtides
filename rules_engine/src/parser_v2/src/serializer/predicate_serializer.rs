@@ -16,8 +16,8 @@ pub fn serialize_predicate(predicate: &Predicate, bindings: &mut VariableBinding
             if is_generic_card_type(card_predicate) {
                 serialize_card_predicate(card_predicate, bindings)
             } else if let CardPredicate::CharacterType(subtype) = card_predicate {
-                bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-                "{@a subtype(subtype)}".to_string()
+                bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+                "{@a subtype(t)}".to_string()
             } else {
                 // For Your predicates, use canonical form (character, not ally)
                 serialize_card_predicate(card_predicate, bindings)
@@ -168,8 +168,8 @@ pub fn serialize_card_predicate(
             text_formatting::card_predicate_base_text(card_predicate).with_article()
         }
         CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "{@a subtype(subtype)}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "{@a subtype(t)}".to_string()
         }
         CardPredicate::Fast { target } => {
             format!("a {{fast}} {}", serialize_fast_target(target, bindings))
@@ -200,8 +200,8 @@ pub fn serialize_card_predicate(
             format!("an event which could {{dissolve}} {}", serialize_predicate(target, bindings))
         }
         CardPredicate::NotCharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "a character that is not {@a subtype(subtype)}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "a character that is not {@a subtype(t)}".to_string()
         }
         CardPredicate::CharacterWithSpark(spark, operator) => {
             bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
@@ -256,8 +256,8 @@ pub fn serialize_card_predicate_without_article(
             text_formatting::card_predicate_base_text(card_predicate).without_article()
         }
         CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "{subtype(subtype)}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "{subtype(t)}".to_string()
         }
         CardPredicate::CardWithCost { target, cost_operator, cost } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
@@ -320,12 +320,12 @@ pub fn serialize_card_predicate_plural(
             text_formatting::card_predicate_base_text(card_predicate).plural()
         }
         CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "{subtype(subtype):other}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "{subtype(t):other}".to_string()
         }
         CardPredicate::NotCharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "characters that are not {subtype(subtype):other}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "characters that are not {subtype(t):other}".to_string()
         }
         CardPredicate::CharacterWithSpark(spark, operator) => {
             bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
@@ -402,12 +402,12 @@ pub fn serialize_fast_target(
         CardPredicate::Character => "character".to_string(),
         CardPredicate::Event => "event".to_string(),
         CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "{subtype(subtype)}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "{subtype(t)}".to_string()
         }
         CardPredicate::NotCharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "character that is not {@a subtype(subtype)}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "character that is not {@a subtype(t)}".to_string()
         }
         CardPredicate::CharacterWithSpark(spark, operator) => {
             bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
@@ -482,13 +482,13 @@ pub fn serialize_for_each_predicate(
     match predicate {
         Predicate::Another(CardPredicate::Character) => "allied character".to_string(),
         Predicate::Another(CardPredicate::CharacterType(subtype)) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "allied {subtype(subtype)}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "allied {subtype(t)}".to_string()
         }
         Predicate::Your(CardPredicate::Character) => "ally".to_string(),
         Predicate::Your(CardPredicate::CharacterType(subtype)) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "allied {subtype(subtype)}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "allied {subtype(t)}".to_string()
         }
         Predicate::Enemy(CardPredicate::Character) => "enemy".to_string(),
         Predicate::Any(CardPredicate::Character) => "character".to_string(),
@@ -499,23 +499,23 @@ pub fn serialize_for_each_predicate(
         Predicate::That => "that character".to_string(),
         Predicate::Them => "character".to_string(),
         Predicate::Enemy(CardPredicate::CharacterType(subtype)) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "enemy {subtype(subtype)}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "enemy {subtype(t)}".to_string()
         }
         Predicate::Any(CardPredicate::CharacterType(subtype)) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "{subtype(subtype)}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "{subtype(t)}".to_string()
         }
         Predicate::Any(CardPredicate::Event) => "event".to_string(),
         Predicate::AnyOther(CardPredicate::Character) => "other character".to_string(),
         Predicate::AnyOther(CardPredicate::CharacterType(subtype)) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "other {subtype(subtype)}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "other {subtype(t)}".to_string()
         }
         Predicate::YourVoid(CardPredicate::Character) => "character in your void".to_string(),
         Predicate::YourVoid(CardPredicate::CharacterType(subtype)) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "{subtype(subtype)} in your void".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "{subtype(t)} in your void".to_string()
         }
         Predicate::YourVoid(CardPredicate::Event) => "event in your void".to_string(),
         Predicate::EnemyVoid(CardPredicate::Card) => "card in the opponent's void".to_string(),
@@ -545,12 +545,12 @@ fn your_predicate_formatted(
         CardPredicate::Card => FormattedText::new("your card"),
         CardPredicate::Event => FormattedText::new("your event"),
         CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            FormattedText::new("allied {subtype(subtype)}")
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            FormattedText::new("allied {subtype(t)}")
         }
         CardPredicate::NotCharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            FormattedText::new("ally that is not {@a subtype(subtype)}")
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            FormattedText::new("ally that is not {@a subtype(t)}")
         }
         CardPredicate::CharacterWithSpark(spark, operator) => {
             bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
@@ -630,12 +630,12 @@ fn enemy_predicate_formatted(
         CardPredicate::Character => FormattedText::new("enemy"),
         CardPredicate::Card => FormattedText::new("enemy card"),
         CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            FormattedText::new("enemy {subtype(subtype)}")
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            FormattedText::new("enemy {subtype(t)}")
         }
         CardPredicate::NotCharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            FormattedText::new_non_vowel("non-{subtype(subtype)} enemy")
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            FormattedText::new_non_vowel("non-{subtype(t)} enemy")
         }
         CardPredicate::CharacterWithSpark(spark, operator) => {
             bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
@@ -716,15 +716,15 @@ fn serialize_your_predicate_plural(
         CardPredicate::Card => "your cards".to_string(),
         CardPredicate::Event => "your events".to_string(),
         CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "allied {subtype(subtype):other}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "allied {subtype(t):other}".to_string()
         }
         CardPredicate::Fast { target } => {
             format!("{{fast}} {}", serialize_card_predicate_plural(target, bindings))
         }
         CardPredicate::NotCharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "allies that are not {subtype(subtype):other}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "allies that are not {subtype(t):other}".to_string()
         }
         CardPredicate::CharacterWithSpark(spark, operator) => {
             bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
@@ -799,8 +799,8 @@ fn serialize_enemy_predicate_plural(
     match card_predicate {
         CardPredicate::Character => "enemies".to_string(),
         CardPredicate::CharacterType(subtype) => {
-            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
-            "enemy {subtype(subtype):other}".to_string()
+            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+            "enemy {subtype(t):other}".to_string()
         }
         _ => {
             format!("enemy {}", serialize_card_predicate_plural(card_predicate, bindings))

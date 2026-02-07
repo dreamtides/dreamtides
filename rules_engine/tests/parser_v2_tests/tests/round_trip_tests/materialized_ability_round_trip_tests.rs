@@ -6,23 +6,17 @@ use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_materialized_discard_then_draw() {
-    assert_round_trip(
-        "{Materialized} Discard {cards(discards)}, then draw {cards(cards)}.",
-        "discards: 2\ncards: 2",
-    );
+    assert_round_trip("{Materialized} Discard {cards(d)}, then draw {cards(c)}.", "d: 2\nc: 2");
 }
 
 #[test]
 fn test_materialized_dissolved_draw() {
-    assert_round_trip("{Materialized_Dissolved} Draw {cards(cards)}.", "cards: 1");
+    assert_round_trip("{Materialized_Dissolved} Draw {cards(c)}.", "c: 1");
 }
 
 #[test]
 fn test_materialized_draw_subtype_from_deck() {
-    assert_round_trip(
-        "{Materialized} Draw {@a subtype(subtype)} from your deck.",
-        "subtype: warrior",
-    );
+    assert_round_trip("{Materialized} Draw {@a subtype(t)} from your deck.", "t: warrior");
 }
 
 #[test]
@@ -37,12 +31,12 @@ fn test_materialized_disable_activated_abilities() {
 
 #[test]
 fn test_materialized_draw_one() {
-    assert_round_trip("{Materialized} Draw {cards(cards)}.", "cards: 1");
+    assert_round_trip("{Materialized} Draw {cards(c)}.", "c: 1");
 }
 
 #[test]
 fn test_materialized_foresee() {
-    assert_round_trip("{Materialized} {Foresee(foresee)}.", "foresee: 2");
+    assert_round_trip("{Materialized} {Foresee(f)}.", "f: 2");
 }
 
 #[test]
@@ -80,11 +74,8 @@ fn test_materialized_give_event_reclaim_equal_cost() {
 
 #[test]
 fn test_materialized_draw_discard_with_reclaim() {
-    assert_round_trip(
-        "{Materialized} Draw {cards(cards)}, then discard {cards(discards)}.",
-        "cards: 1\ndiscards: 1",
-    );
-    assert_round_trip("{Reclaim_For_Cost(reclaim)}", "reclaim: 3");
+    assert_round_trip("{Materialized} Draw {cards(c)}, then discard {cards(d)}.", "c: 1\nd: 1");
+    assert_round_trip("{Reclaim_For_Cost(r)}", "r: 3");
 }
 
 #[test]
@@ -99,10 +90,7 @@ fn test_materialized_discover_fast_event() {
 
 #[test]
 fn test_materialized_copy_event_multiple_times() {
-    assert_round_trip(
-        "{Materialized} Copy the next event you play {this_turn_times(number)}.",
-        "number: 3",
-    );
+    assert_round_trip("{Materialized} Copy the next event you play {this_turn_times(n)}.", "n: 3");
 }
 
 #[test]
@@ -133,8 +121,8 @@ fn test_materialized_banish_opponent_void() {
 #[test]
 fn test_materialized_draw_per_subtype() {
     assert_round_trip(
-        "{Materialized} Draw {cards(cards)} for each allied {subtype(subtype)}.",
-        "cards: 1\nsubtype:spirit-animal",
+        "{Materialized} Draw {cards(c)} for each allied {subtype(t)}.",
+        "c: 1\nt:spirit-animal",
     );
 }
 
@@ -156,14 +144,14 @@ fn test_materialized_banish_any_allies_then_materialize() {
 #[test]
 fn test_materialized_discard_chosen_from_opponent_hand() {
     assert_round_trip(
-        "{Materialized} Discard a chosen card from the opponent's hand. They draw {cards(cards)}.",
-        "cards: 1",
+        "{Materialized} Discard a chosen card from the opponent's hand. They draw {cards(c)}.",
+        "c: 1",
     );
 }
 
 #[test]
 fn test_materialized_draw_two() {
-    assert_round_trip("{Materialized} Draw {cards(cards)}.", "cards: 2");
+    assert_round_trip("{Materialized} Draw {cards(c)}.", "c: 2");
 }
 
 #[test]
@@ -193,22 +181,19 @@ fn test_materialized_return_ally_to_hand() {
 
 #[test]
 fn test_materialized_each_player_discards() {
-    assert_round_trip("{Materialized} Each player discards {cards(discards)}.", "discards: 1");
+    assert_round_trip("{Materialized} Each player discards {cards(d)}.", "d: 1");
 }
 
 #[test]
 fn test_materialized_draw_per_ally_abandoned() {
-    assert_round_trip(
-        "{Materialized} Draw {cards(cards)} for each ally abandoned this turn.",
-        "cards: 1",
-    );
+    assert_round_trip("{Materialized} Draw {cards(c)} for each ally abandoned this turn.", "c: 1");
 }
 
 #[test]
 fn test_materialized_dissolved_put_top_cards_to_void() {
     assert_round_trip(
-        "{Materialized_Dissolved} Put the {top_n_cards(to_void)} of your deck into your void.",
-        "to_void: 4",
+        "{Materialized_Dissolved} Put the {top_n_cards(v)} of your deck into your void.",
+        "v: 4",
     );
 }
 
@@ -216,17 +201,17 @@ fn test_materialized_dissolved_put_top_cards_to_void() {
 fn test_dissolved_kindle_on_subtype() {
     assert_round_trip("{Dissolved} {Kindle(k)}.", "k: 2");
     assert_round_trip(
-        "When an allied {subtype(subtype)} is {dissolved}, {kindle(k)}.",
-        "k: 2\nsubtype: survivor",
+        "When an allied {subtype(t)} is {dissolved}, {kindle(k)}.",
+        "k: 2\nt: survivor",
     );
 }
 
 #[test]
 fn test_dissolved_draw_on_subtype() {
-    assert_round_trip("{Dissolved} Draw {cards(cards)}.", "cards: 1");
+    assert_round_trip("{Dissolved} Draw {cards(c)}.", "c: 1");
     assert_round_trip(
-        "When an allied {subtype(subtype)} is {dissolved}, draw {cards(cards)}.",
-        "cards: 1\nsubtype: survivor",
+        "When an allied {subtype(t)} is {dissolved}, draw {cards(c)}.",
+        "c: 1\nt: survivor",
     );
 }
 
@@ -241,8 +226,8 @@ fn test_dissolved_may_pay_return_to_hand() {
 #[test]
 fn test_dissolved_subtype_gains_reclaim() {
     assert_round_trip(
-        "{Dissolved} {@cap @a subtype(subtype)} in your void gains {reclaim} equal to its cost.",
-        "subtype: survivor",
+        "{Dissolved} {@cap @a subtype(t)} in your void gains {reclaim} equal to its cost.",
+        "t: survivor",
     );
 }
 

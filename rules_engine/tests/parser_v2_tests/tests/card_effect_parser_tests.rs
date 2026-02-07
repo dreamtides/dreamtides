@@ -3,7 +3,7 @@ use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_judgment_gain_points() {
-    let result = parse_ability("{Judgment} Gain {points}.", "points: 2");
+    let result = parse_ability("{Judgment} Gain {points}.", "p: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -18,7 +18,7 @@ fn test_judgment_gain_points() {
 
 #[test]
 fn test_materialized_draw_cards() {
-    let result = parse_ability("{Materialized} Draw {cards}.", "cards: 1");
+    let result = parse_ability("{Materialized} Draw {cards}.", "c: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -33,10 +33,8 @@ fn test_materialized_draw_cards() {
 
 #[test]
 fn test_materialized_draw_cards_for_each_allied_subtype() {
-    let result = parse_ability(
-        "{Materialized} Draw {cards} for each allied {subtype}.",
-        "cards: 2, subtype: warrior",
-    );
+    let result =
+        parse_ability("{Materialized} Draw {cards} for each allied {subtype}.", "c: 2, t: warrior");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -68,7 +66,7 @@ fn test_materialized_judgment_gain_energy() {
 
 #[test]
 fn test_draw_cards_event() {
-    let result = parse_ability("Draw {cards}.", "cards: 3");
+    let result = parse_ability("Draw {cards}.", "c: 3");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(DrawCards(
@@ -80,8 +78,7 @@ fn test_draw_cards_event() {
 
 #[test]
 fn test_gain_points_for_each_card_played_this_turn() {
-    let result =
-        parse_ability("Gain {points} for each card you have played this turn.", "points: 2");
+    let result = parse_ability("Gain {points} for each card you have played this turn.", "p: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(GainPointsForEach(
@@ -94,7 +91,7 @@ fn test_gain_points_for_each_card_played_this_turn() {
 
 #[test]
 fn test_draw_cards_for_each_card_played_this_turn() {
-    let result = parse_ability("Draw {cards} for each card you have played this turn.", "cards: 2");
+    let result = parse_ability("Draw {cards} for each card you have played this turn.", "c: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(DrawCardsForEach(
@@ -107,7 +104,7 @@ fn test_draw_cards_for_each_card_played_this_turn() {
 
 #[test]
 fn test_gain_energy_draw_cards() {
-    let result = parse_ability("Gain {e}. Draw {cards}.", "e: 2, cards: 3");
+    let result = parse_ability("Gain {e}. Draw {cards}.", "e: 2, c: 3");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: List([
@@ -130,7 +127,7 @@ fn test_gain_energy_draw_cards() {
 
 #[test]
 fn test_judgment_gain_energy_draw_cards() {
-    let result = parse_ability("{Judgment} Gain {e}. Draw {cards}.", "e: 1, cards: 2");
+    let result = parse_ability("{Judgment} Gain {e}. Draw {cards}.", "e: 1, c: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -156,7 +153,7 @@ fn test_judgment_gain_energy_draw_cards() {
 
 #[test]
 fn test_draw_cards_discard_cards() {
-    let result = parse_ability("Draw {cards}. Discard {discards}.", "cards: 2, discards: 1");
+    let result = parse_ability("Draw {cards}. Discard {discards}.", "c: 2, d: 1");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: List([
@@ -179,8 +176,7 @@ fn test_draw_cards_discard_cards() {
 
 #[test]
 fn test_draw_cards_discard_cards_gain_energy() {
-    let result =
-        parse_ability("Draw {cards}. Discard {discards}. Gain {e}.", "cards: 1, discards: 1, e: 1");
+    let result = parse_ability("Draw {cards}. Discard {discards}. Gain {e}.", "c: 1, d: 1, e: 1");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: List([
@@ -209,7 +205,7 @@ fn test_draw_cards_discard_cards_gain_energy() {
 
 #[test]
 fn test_discard_cards_draw_cards() {
-    let result = parse_ability("Discard {discards}. Draw {cards}.", "discards: 1, cards: 2");
+    let result = parse_ability("Discard {discards}. Draw {cards}.", "d: 1, c: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: List([
@@ -232,7 +228,7 @@ fn test_discard_cards_draw_cards() {
 
 #[test]
 fn test_return_enemy_or_ally_to_hand_draw_cards() {
-    let result = parse_ability("Return an enemy or ally to hand. Draw {cards}.", "cards: 1");
+    let result = parse_ability("Return an enemy or ally to hand. Draw {cards}.", "c: 1");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: List([
@@ -270,8 +266,7 @@ fn test_materialized_gain_energy() {
 
 #[test]
 fn test_judgment_draw_then_discard() {
-    let result =
-        parse_ability("{Judgment} Draw {cards}, then discard {discards}.", "cards: 2, discards: 1");
+    let result = parse_ability("{Judgment} Draw {cards}, then discard {discards}.", "c: 2, d: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -297,10 +292,8 @@ fn test_judgment_draw_then_discard() {
 
 #[test]
 fn test_materialized_discard_then_draw() {
-    let result = parse_ability(
-        "{Materialized} Discard {discards}, then draw {cards}.",
-        "discards: 1, cards: 2",
-    );
+    let result =
+        parse_ability("{Materialized} Discard {discards}, then draw {cards}.", "d: 1, c: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -326,7 +319,7 @@ fn test_materialized_discard_then_draw() {
 
 #[test]
 fn test_materialized_dissolved_draw_cards() {
-    let result = parse_ability("{Materialized_Dissolved} Draw {cards}.", "cards: 1");
+    let result = parse_ability("{Materialized_Dissolved} Draw {cards}.", "c: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -344,7 +337,7 @@ fn test_materialized_dissolved_draw_cards() {
 fn test_materialized_dissolved_put_cards_from_deck_into_void() {
     let result = parse_ability(
         "{Materialized_Dissolved} Put the {top_n_cards} of your deck into your void.",
-        "to_void: 2",
+        "v: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -429,7 +422,7 @@ fn test_you_may_return_character_from_void_draw_cards() {
     assert_ron_snapshot!(
         parse_ability(
             "You may return a character from your void to your hand. Draw {cards}.",
-            "cards: 2",
+            "c: 2",
         ),
         @r###"
     Event(EventAbility(
@@ -527,10 +520,8 @@ fn test_discard_chosen_card_with_cost_from_opponent_hand() {
 
 #[test]
 fn test_judgment_you_may_draw_then_discard() {
-    let result = parse_ability(
-        "{Judgment} You may draw {cards}, then discard {discards}.",
-        "cards: 2, discards: 1",
-    );
+    let result =
+        parse_ability("{Judgment} You may draw {cards}, then discard {discards}.", "c: 2, d: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -556,7 +547,7 @@ fn test_judgment_you_may_draw_then_discard() {
 
 #[test]
 fn test_materialized_each_player_discards() {
-    let result = parse_ability("{Materialized} Each player discards {discards}.", "discards: 1");
+    let result = parse_ability("{Materialized} Each player discards {discards}.", "d: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -589,7 +580,7 @@ fn test_judgment_each_player_abandons_character() {
 fn test_put_cards_from_deck_into_void_draw_cards() {
     let result = parse_ability(
         "Put the {top_n_cards} of your deck into your void. Draw {cards}.",
-        "to_void: 3, cards: 2",
+        "v: 3, c: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
@@ -615,7 +606,7 @@ fn test_put_cards_from_deck_into_void_draw_cards() {
 fn test_abandon_any_number_of_allies_draw_for_each_abandoned() {
     let result = parse_ability(
         "Abandon any number of allies: Draw {cards} for each ally abandoned.",
-        "cards: 1",
+        "c: 1",
     );
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
@@ -636,7 +627,7 @@ fn test_abandon_any_number_of_allies_draw_for_each_abandoned() {
 #[test]
 fn test_banish_up_to_n_then_materialize_them() {
     let result =
-        parse_ability("{Banish} {up_to_n_allies}, then {materialize} {it_or_them}.", "number: 2");
+        parse_ability("{Banish} {up_to_n_allies}, then {materialize} {it_or_them}.", "n: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(BanishThenMaterialize(
@@ -671,7 +662,7 @@ fn test_materialized_judgment_banish_ally_with_spark_then_materialize_it() {
 fn test_materialized_discard_chosen_card_from_opponent_hand_they_draw() {
     let result = parse_ability(
         "{Materialized} Discard a chosen card from the opponent's hand. They draw {cards}.",
-        "cards: 1",
+        "c: 1",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -687,7 +678,7 @@ fn test_materialized_discard_chosen_card_from_opponent_hand_they_draw() {
 
 #[test]
 fn test_return_up_to_n_events_from_void_to_hand() {
-    let result = parse_ability("Return {up_to_n_events} from your void to your hand.", "number: 3");
+    let result = parse_ability("Return {up_to_n_events} from your void to your hand.", "n: 3");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(ReturnUpToCountFromYourVoidToHand(
@@ -701,7 +692,7 @@ fn test_return_up_to_n_events_from_void_to_hand() {
 #[test]
 fn test_materialized_draw_cards_for_each_ally_abandoned_this_turn() {
     let result =
-        parse_ability("{Materialized} Draw {cards} for each ally abandoned this turn.", "cards: 2");
+        parse_ability("{Materialized} Draw {cards} for each ally abandoned this turn.", "c: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -719,7 +710,7 @@ fn test_materialized_draw_cards_for_each_ally_abandoned_this_turn() {
 fn test_materialized_card_with_cost_in_void_gains_reclaim() {
     let result = parse_ability(
         "{Materialized} A card with cost {e} or less in your void gains {reclaim_for_cost}.",
-        "e: 3, reclaim: 0",
+        "e: 3, r: 0",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -742,8 +733,7 @@ fn test_materialized_card_with_cost_in_void_gains_reclaim() {
 
 #[test]
 fn test_event_in_void_gains_reclaim_this_turn() {
-    let result =
-        parse_ability("An event in your void gains {reclaim_for_cost} this turn.", "reclaim: 0");
+    let result = parse_ability("An event in your void gains {reclaim_for_cost} this turn.", "r: 0");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(GainsReclaim(
@@ -800,8 +790,7 @@ fn test_discover_character_with_activated_ability() {
 
 #[test]
 fn test_materialized_draw_subtype_from_deck() {
-    let result =
-        parse_ability("{Materialized} Draw {a_subtype} from your deck.", "subtype: warrior");
+    let result = parse_ability("{Materialized} Draw {a_subtype} from your deck.", "t: warrior");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -818,7 +807,7 @@ fn test_materialized_draw_subtype_from_deck() {
 fn test_return_all_but_one_ally_to_hand_draw_cards() {
     let result = parse_ability(
         "Return all but one ally to hand: Draw {cards} for each ally returned.",
-        "cards: 2",
+        "c: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
@@ -838,10 +827,8 @@ fn test_return_all_but_one_ally_to_hand_draw_cards() {
 
 #[test]
 fn test_return_all_ally_to_hand_draw_cards() {
-    let result = parse_ability(
-        "Return all allies to hand: Draw {cards} for each ally returned.",
-        "cards: 1",
-    );
+    let result =
+        parse_ability("Return all allies to hand: Draw {cards} for each ally returned.", "c: 1");
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
@@ -862,7 +849,7 @@ fn test_return_all_ally_to_hand_draw_cards() {
 fn test_reclaim_random_character_with_cost_or_less() {
     let result = parse_ability(
         "When you play {a_subtype}, {reclaim} a random character with cost {e} or less.",
-        "subtype: warrior, e: 3",
+        "t: warrior, e: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(

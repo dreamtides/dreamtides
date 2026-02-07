@@ -76,7 +76,7 @@ pub fn top_n_cards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a
 
 pub fn discards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "discards" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive_matches_with_suffix(&directive, "cards") || directive == "discards" => value
     }
 }
 
@@ -196,13 +196,13 @@ pub fn this_turn_times<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtr
 
 pub fn mode1_cost<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "mode1_cost" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive == "e1" => value
     }
 }
 
 pub fn mode2_cost<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "mode2_cost" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive == "e2" => value
     }
 }
 

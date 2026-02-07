@@ -2,7 +2,7 @@ use parser_v2_benchmarks::benchmark_utils;
 
 #[test]
 fn test_parser_bench_draw_cards() {
-    benchmark_utils::parse_single_card("Draw {cards}.", "cards: 2");
+    benchmark_utils::parse_single_card("Draw {cards}.", "c: 2");
 }
 
 #[test]

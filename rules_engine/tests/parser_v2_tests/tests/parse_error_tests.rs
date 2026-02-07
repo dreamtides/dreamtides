@@ -43,7 +43,7 @@ fn test_unresolved_variable_with_suggestion() {
     let error = ParserError::from(result.unwrap_err());
     let formatted = parser_diagnostics::format_error(&error, input, "test");
 
-    assert!(formatted.contains("Unresolved variable: cards"));
+    assert!(formatted.contains("Unresolved variable: c"));
 }
 
 #[test]
@@ -73,7 +73,7 @@ fn test_missing_variable_binding() {
     let error = ParserError::from(result.unwrap_err());
     let formatted = parser_diagnostics::format_error(&error, input, "test");
 
-    assert!(formatted.contains("cards"));
+    assert!(formatted.contains("c"));
     assert!(formatted.contains("not found"));
 }
 
@@ -109,7 +109,7 @@ fn test_unresolved_figment_variable() {
     let error = ParserError::from(result.unwrap_err());
     let formatted = parser_diagnostics::format_error(&error, input, "test");
 
-    assert!(formatted.contains("figment") || formatted.contains("number"));
+    assert!(formatted.contains("g") || formatted.contains("n"));
 }
 
 #[test]
@@ -124,7 +124,7 @@ fn test_unresolved_subtype_variable() {
     let error = ParserError::from(result.unwrap_err());
     let formatted = parser_diagnostics::format_error(&error, input, "test");
 
-    assert!(formatted.contains("subtype"));
+    assert!(formatted.contains("t"));
 }
 
 #[test]
@@ -147,7 +147,7 @@ fn test_suggestions_for_close_variable_names() {
     let error = ParserError::from(result.unwrap_err());
     let formatted = parser_diagnostics::format_error(&error, input, "test");
 
-    assert!(formatted.contains("discards"));
+    assert!(formatted.contains("d"));
 }
 
 #[test]
@@ -201,7 +201,7 @@ fn test_draw_discard_missing_variables_suggests_fix() {
     let error = ParserError::from(result.unwrap_err());
     let formatted = parser_diagnostics::format_error(&error, input, "test");
 
-    assert!(formatted.contains("cards"));
+    assert!(formatted.contains("c"));
     assert!(formatted.contains("not found"));
 }
 
@@ -217,7 +217,7 @@ fn test_opponent_gains_points_missing_variable_suggests_fix() {
     let error = ParserError::from(result.unwrap_err());
     let formatted = parser_diagnostics::format_error(&error, input, "test");
 
-    assert!(formatted.contains("points"));
+    assert!(formatted.contains("p"));
     assert!(formatted.contains("not found"));
 }
 
@@ -233,7 +233,7 @@ fn test_return_enemy_or_ally_to_hand_draw_cards_missing_variable_suggests_fix() 
     let error = ParserError::from(result.unwrap_err());
     let formatted = parser_diagnostics::format_error(&error, input, "test");
 
-    assert!(formatted.contains("cards"));
+    assert!(formatted.contains("c"));
     assert!(formatted.contains("not found"));
 }
 
@@ -249,6 +249,6 @@ fn test_draw_then_discard_missing_variable_suggests_fix() {
     let error = ParserError::from(result.unwrap_err());
     let formatted = parser_diagnostics::format_error(&error, input, "test");
 
-    assert!(formatted.contains("cards"));
+    assert!(formatted.contains("c"));
     assert!(formatted.contains("not found"));
 }

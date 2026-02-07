@@ -21,7 +21,7 @@ fn test_abandon_an_ally_gain_energy() {
 
 #[test]
 fn test_abandon_an_ally_once_per_turn_gain_points() {
-    let result = parse_ability("Abandon an ally, once per turn: Gain {points}.", "points: 1");
+    let result = parse_ability("Abandon an ally, once per turn: Gain {points}.", "p: 1");
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
@@ -44,7 +44,7 @@ fn test_abandon_an_ally_once_per_turn_gain_points() {
 #[test]
 fn test_abandon_an_ally_once_per_turn_reclaim_subtype() {
     let result =
-        parse_ability("Abandon an ally, once per turn: {Reclaim} a {subtype}.", "subtype: warrior");
+        parse_ability("Abandon an ally, once per turn: {Reclaim} a {subtype}.", "t: warrior");
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
@@ -68,7 +68,7 @@ fn test_abandon_an_ally_once_per_turn_reclaim_subtype() {
 fn test_abandon_an_ally_put_cards_from_deck_into_void() {
     let result = parse_ability(
         "Abandon an ally: Put the {top_n_cards} of your deck into your void.",
-        "to_void: 2",
+        "v: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
@@ -149,7 +149,7 @@ fn test_abandon_an_ally_this_character_gains_spark() {
 
 #[test]
 fn test_abandon_count_allies_reclaim_this_character() {
-    let result = parse_ability("Abandon {count_allies}: {Reclaim} this character.", "allies: 3");
+    let result = parse_ability("Abandon {count_allies}: {Reclaim} this character.", "a: 3");
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
@@ -167,7 +167,7 @@ fn test_abandon_count_allies_reclaim_this_character() {
 
 #[test]
 fn test_energy_draw_cards() {
-    let result = parse_ability("{e}: Draw {cards}.", "e: 1, cards: 2");
+    let result = parse_ability("{e}: Draw {cards}.", "e: 1, c: 2");
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
@@ -182,10 +182,8 @@ fn test_energy_draw_cards() {
 
 #[test]
 fn test_energy_gain_spark_for_each_allied_subtype() {
-    let result = parse_ability(
-        "{e}: Gain +{s} spark for each allied {subtype}.",
-        "e: 1, s: 2, subtype: warrior",
-    );
+    let result =
+        parse_ability("{e}: Gain +{s} spark for each allied {subtype}.", "e: 1, s: 2, t: warrior");
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
@@ -202,7 +200,7 @@ fn test_energy_gain_spark_for_each_allied_subtype() {
 
 #[test]
 fn test_energy_discard_kindle() {
-    let result = parse_ability("{e}, Discard {discards}: {Kindle}.", "e: 1, discards: 2, k: 2");
+    let result = parse_ability("{e}, Discard {discards}: {Kindle}.", "e: 1, d: 2, k: 2");
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
@@ -240,7 +238,7 @@ fn test_energy_banish_from_void_reclaim_this_character() {
 fn test_energy_abandon_ally_with_spark_draw_cards() {
     let result = parse_ability(
         "{e}, Abandon an ally with spark {s} or less: Draw {cards}.",
-        "e: 1, s: 2, cards: 3",
+        "e: 1, s: 2, c: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
@@ -260,10 +258,8 @@ fn test_energy_abandon_ally_with_spark_draw_cards() {
 
 #[test]
 fn test_energy_abandon_character_discard_hand_draw_cards() {
-    let result = parse_ability(
-        "{e}, Abandon a character, Discard your hand: Draw {cards}.",
-        "e: 2, cards: 3",
-    );
+    let result =
+        parse_ability("{e}, Abandon a character, Discard your hand: Draw {cards}.", "e: 2, c: 3");
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
@@ -391,7 +387,7 @@ fn test_abandon_ally_dissolve_enemy_with_spark_less_than_abandoned() {
 fn test_banish_void_with_min_count_reclaim_this_character() {
     let result = parse_ability(
         "{Banish} your void with {count} or more cards: {Reclaim} this character.",
-        "count: 3",
+        "n: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
@@ -431,7 +427,7 @@ fn test_fast_abandon_this_character_prevent_played_event() {
 fn test_pay_one_or_more_energy_draw_for_each_energy_spent() {
     let result = parse_ability(
         "Pay 1 or more {energy_symbol}: Draw {cards} for each {energy_symbol} spent, then discard {discards}.",
-        "cards: 1, discards: 1"
+        "c: 1, d: 1"
     );
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
@@ -483,7 +479,7 @@ fn test_pay_one_or_more_dissolve_all_characters() {
 fn test_pay_one_or_more_energy_draw() {
     let result = parse_ability(
         "Pay 1 or more {energy_symbol}: Draw {cards} for each {energy_symbol} spent.",
-        "cards: 2",
+        "c: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(

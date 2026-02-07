@@ -54,8 +54,8 @@ spark = ""
 name = "Test Variable Energy Draw"
 id = "e06a8cfe-483f-42c0-aac8-9c12b21b3f99"
 energy-cost = 2
-rules-text = "Pay 1 or more {energy_symbol}: Draw {cards(cards)} for each {energy_symbol} spent."
-variables = "cards: 1"
+rules-text = "Pay 1 or more {energy_symbol}: Draw {cards(c)} for each {energy_symbol} spent."
+variables = "c: 1"
 prompts = "Pay one or more energy: Draw cards for each energy spent."
 card-type = "Event"
 is-fast = true
@@ -80,10 +80,10 @@ prompts = ""
 name = "Test Fast Multi Activated Ability Draw Card Character"
 id = "d8a8541f-5b00-4d91-9518-aa8ae70ea450"
 energy-cost = 2
-rules-text = "{fast} {energy(e)}: Draw {cards(cards)}."
+rules-text = "{fast} {energy(e)}: Draw {cards(c)}."
 variables = """
 e: 3
-cards: 1"""
+c: 1"""
 card-type = "Character"
 is-fast = false
 spark = 2
@@ -95,8 +95,8 @@ prompts = ""
 name = "Test Return One Or Two Void Event Cards To Hand"
 id = "559e62a0-7ead-4136-8bd4-6cc58db4bef7"
 energy-cost = 4
-rules-text = "Return {up_to_n_events(number)} from your void to your hand."
-variables = "number: 2"
+rules-text = "Return {up_to_n_events(n)} from your void to your hand."
+variables = "n: 2"
 prompts = "Choose up to 2 events in your void to return."
 card-type = "Event"
 is-fast = false
@@ -110,12 +110,12 @@ id = "e8f937da-cca7-447d-a559-530d7c339325"
 energy-cost = "*"
 rules-text = """
 {choose_one}
-{bullet} {energy(mode1_cost)}: Return an enemy character to hand.
-{bullet} {energy(mode2_cost)}: Draw {cards(cards)}."""
+{bullet} {energy(e1)}: Return an enemy character to hand.
+{bullet} {energy(e2)}: Draw {cards(c)}."""
 variables = """
-mode1_cost: 2
-mode2_cost: 3
-cards: 2"""
+e1: 2
+e2: 3
+c: 2"""
 prompts = "Choose an enemy character to return to hand."
 card-type = "Event"
 is-fast = true
@@ -141,13 +141,13 @@ name = "Test Foresee One Draw Reclaim"
 id = "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8"
 energy-cost = 1
 rules-text = """
-{Foresee(foresee)}. Draw {cards(cards)}.
+{Foresee(f)}. Draw {cards(c)}.
 
-{Reclaim_For_Cost(reclaim)}"""
+{Reclaim_For_Cost(r)}"""
 variables = """
-foresee: 1
-cards: 1
-reclaim: 3"""
+f: 1
+c: 1
+r: 3"""
 card-type = "Event"
 is-fast = true
 image-number = 1328168243
@@ -185,8 +185,8 @@ variables = ""
 name = "Test Draw One"
 id = "68f90d08-9b51-424e-90d1-d15ddd1ece93"
 energy-cost = 0
-rules-text = "Draw {cards(cards)}."
-variables = "cards: 1"
+rules-text = "Draw {cards(c)}."
+variables = "c: 1"
 card-type = "Event"
 is-fast = true
 image-number = 489056605
@@ -224,10 +224,10 @@ prompts = ""
 name = "Test Activated Ability Draw Card"
 id = "8dfeb2c1-2d72-411c-a8cc-7f84ca532c63"
 energy-cost = 2
-rules-text = "{energy(e)}, once per turn: Draw {cards(cards)}."
+rules-text = "{energy(e)}, once per turn: Draw {cards(c)}."
 variables = """
 e: 1
-cards: 1"""
+c: 1"""
 card-type = "Character"
 is-fast = false
 spark = 3
@@ -239,10 +239,10 @@ prompts = ""
 name = "Test Multi Activated Ability Draw Card Character"
 id = "56f944bb-333b-4e2c-9c8c-2068f41998c2"
 energy-cost = 0
-rules-text = "{energy(e)}: Draw {cards(cards)}."
+rules-text = "{energy(e)}: Draw {cards(c)}."
 variables = """
 e: 1
-cards: 1"""
+c: 1"""
 card-type = "Character"
 is-fast = false
 spark = 3
@@ -254,10 +254,10 @@ prompts = ""
 name = "Test Fast Activated Ability Draw Card Character"
 id = "44aa4a1a-e8c6-4969-94bc-5fdbe010395e"
 energy-cost = 0
-rules-text = "{fast} {energy(e)}, once per turn: Draw {cards(cards)}."
+rules-text = "{fast} {energy(e)}, once per turn: Draw {cards(c)}."
 variables = """
 e: 1
-cards: 1"""
+c: 1"""
 card-type = "Character"
 is-fast = false
 spark = 3
@@ -283,14 +283,14 @@ name = "Test Dual Activated Ability Character"
 id = "3af84464-874a-4fd2-89cb-1986dee59ae1"
 energy-cost = 4
 rules-text = """
-{energy(e1)}: Draw {cards(cards1)}.
+{energy(e1)}: Draw {cards(c1)}.
 
-{energy(e2)}: Draw {cards(cards2)}."""
+{energy(e2)}: Draw {cards(c2)}."""
 variables = """
 e1: 1
-cards1: 1
+c1: 1
 e2: 2
-cards2: 2"""
+c2: 2"""
 card-type = "Character"
 is-fast = false
 spark = 3
@@ -302,8 +302,8 @@ prompts = ""
 name = "Test Foresee One"
 id = "8217b59b-6573-484b-9f3b-203e86e1d841"
 energy-cost = 1
-rules-text = "{Foresee(foresee)}."
-variables = "foresee: 1"
+rules-text = "{Foresee(f)}."
+variables = "f: 1"
 card-type = "Event"
 is-fast = true
 image-number = 489056605
@@ -315,8 +315,8 @@ prompts = ""
 name = "Test Foresee Two"
 id = "89e34264-a69c-48a4-867e-add7b811394b"
 energy-cost = 1
-rules-text = "{Foresee(foresee)}."
-variables = "foresee: 2"
+rules-text = "{Foresee(f)}."
+variables = "f: 2"
 card-type = "Event"
 is-fast = true
 image-number = 489056605
@@ -328,10 +328,10 @@ prompts = ""
 name = "Test Foresee One Draw A Card"
 id = "820faab3-37c1-46fa-a314-5f023ec739a1"
 energy-cost = 1
-rules-text = "{Foresee(foresee)}. Draw {cards(cards)}."
+rules-text = "{Foresee(f)}. Draw {cards(c)}."
 variables = """
-foresee: 1
-cards: 1"""
+f: 1
+c: 1"""
 card-type = "Event"
 is-fast = true
 image-number = 1328168243
@@ -344,12 +344,12 @@ name = "Test Draw One Reclaim"
 id = "0cba1386-d1b6-4f57-8ccc-d92f8be01d7c"
 energy-cost = 2
 rules-text = """
-Draw {cards(cards)}.
+Draw {cards(c)}.
 
-{Reclaim_For_Cost(reclaim)}"""
+{Reclaim_For_Cost(r)}"""
 variables = """
-cards: 1
-reclaim: 1"""
+c: 1
+r: 1"""
 card-type = "Event"
 is-fast = true
 image-number = 1328168243
@@ -362,12 +362,12 @@ name = "Test Foresee One Reclaim"
 id = "86ffc58b-96db-4106-a892-8ae2a70719e6"
 energy-cost = 1
 rules-text = """
-{Foresee(foresee)}.
+{Foresee(f)}.
 
-{Reclaim_For_Cost(reclaim)}"""
+{Reclaim_For_Cost(r)}"""
 variables = """
-foresee: 1
-reclaim: 3"""
+f: 1
+r: 3"""
 card-type = "Event"
 is-fast = true
 image-number = 1328168243
@@ -394,13 +394,13 @@ id = "029889e9-25bc-438f-a492-8813febd65d8"
 energy-cost = "*"
 rules-text = """
 {choose_one}
-{bullet} {energy(mode1_cost)}: Draw {cards(cards1)}.
-{bullet} {energy(mode2_cost)}: Draw {cards(cards2)}."""
+{bullet} {energy(e1)}: Draw {cards(c1)}.
+{bullet} {energy(e2)}: Draw {cards(c2)}."""
 variables = """
-mode1_cost: 1
-cards1: 1
-mode2_cost: 3
-cards2: 2"""
+e1: 1
+c1: 1
+e2: 3
+c2: 2"""
 card-type = "Event"
 is-fast = false
 image-number = 1200949264
@@ -414,12 +414,12 @@ id = "9847b3fc-1e7f-44e5-90af-1240ae12aaee"
 energy-cost = "*"
 rules-text = """
 {choose_one}
-{bullet} {energy(mode1_cost)}: Draw {cards(cards)}.
-{bullet} {energy(mode2_cost)}: {Dissolve} an enemy character."""
+{bullet} {energy(e1)}: Draw {cards(c)}.
+{bullet} {energy(e2)}: {Dissolve} an enemy character."""
 variables = """
-mode1_cost: 1
-cards: 1
-mode2_cost: 2"""
+e1: 1
+c: 1
+e2: 2"""
 prompts = "Choose an enemy character to {dissolve}."
 card-type = "Event"
 is-fast = true
@@ -444,8 +444,8 @@ variables = ""
 name = "Test Gain Points"
 id = "995b52a1-b368-4c83-ae05-8ab3800ca618"
 energy-cost = 0
-rules-text = "Gain {points(points)}."
-variables = "points: 2"
+rules-text = "Gain {points(p)}."
+variables = "p: 2"
 card-type = "Event"
 is-fast = false
 image-number = 1200949264
@@ -470,8 +470,8 @@ prompts = ""
 name = "Test Deck To Void"
 id = "a7340f26-b759-458c-b8cb-b6fcc36fe412"
 energy-cost = 2
-rules-text = "Put the {top_n_cards(to_void)} of your deck into your void."
-variables = "to_void: 3"
+rules-text = "Put the {top_n_cards(v)} of your deck into your void."
+variables = "v: 3"
 card-type = "Event"
 is-fast = false
 image-number = 1200949264
@@ -483,8 +483,8 @@ prompts = ""
 name = "Test Discard"
 id = "6e76f193-dcf0-4faf-b1f7-50af2e0dc8a2"
 energy-cost = 1
-rules-text = "Discard {cards(discards)}."
-variables = "discards: 1"
+rules-text = "Discard {cards(d)}."
+variables = "d: 1"
 card-type = "Event"
 is-fast = false
 image-number = 1200949264
@@ -496,8 +496,8 @@ prompts = ""
 name = "Test Discard Two"
 id = "ef6d55f9-49ba-4637-af50-91068cb3a2b2"
 energy-cost = 2
-rules-text = "Discard {cards(discards)}."
-variables = "discards: 2"
+rules-text = "Discard {cards(d)}."
+variables = "d: 2"
 card-type = "Event"
 is-fast = false
 image-number = 1200949264
@@ -509,8 +509,8 @@ prompts = ""
 name = "Test Materialized Draw Card"
 id = "f62670ae-73ad-4645-8de4-4cd8fb58b920"
 energy-cost = 0
-rules-text = "{Materialized} Draw {cards(cards)}."
-variables = "cards: 1"
+rules-text = "{Materialized} Draw {cards(c)}."
+variables = "c: 1"
 card-type = "Character"
 is-fast = false
 spark = 1

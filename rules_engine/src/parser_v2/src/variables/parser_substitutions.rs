@@ -7,43 +7,41 @@ use crate::lexer::lexer_token::{Spanned, Token};
 use crate::variables::parser_bindings::VariableBindings;
 
 static DIRECTIVES: &[(&str, &str, VariableConstructor)] = &[
-    ("a_figment", "figment", figment),
-    ("a_subtype", "subtype", subtype),
-    ("asubtype", "subtype", subtype),
-    ("cards", "cards", integer),
-    ("cards_numeral", "cards", integer),
+    ("a_figment", "g", figment),
+    ("a_subtype", "t", subtype),
+    ("asubtype", "t", subtype),
+    ("cards", "c", integer),
+    ("cards_numeral", "c", integer),
     ("choose_one", "", bare),
-    ("copies", "number", integer),
-    ("count", "count", integer),
+    ("copies", "n", integer),
+    ("count", "n", integer),
     ("count_allied_subtype", "", subtype_count),
-    ("count_allies", "allies", integer),
-    ("discards", "discards", integer),
+    ("count_allies", "a", integer),
+    ("discards", "d", integer),
     ("e", "e", integer),
     ("energy_symbol", "", bare),
-    ("figments", "figment", figment),
-    ("foresee", "foresee", integer),
-    ("Foresee", "foresee", integer),
-    ("it_or_them", "number", integer),
+    ("figments", "g", figment),
+    ("foresee", "f", integer),
+    ("Foresee", "f", integer),
+    ("it_or_them", "n", integer),
     ("judgment_phase_name", "", bare),
     ("kindle", "k", integer),
     ("Kindle", "k", integer),
-    ("maximum_energy", "max", integer),
-    ("mode1_cost", "mode1_cost", integer),
-    ("mode2_cost", "mode2_cost", integer),
-    ("multiply_by", "number", integer),
+    ("maximum_energy", "m", integer),
+    ("multiply_by", "n", integer),
     ("n_figments", "", figment_count),
-    ("n_random_characters", "number", integer),
-    ("plural_subtype", "subtype", subtype),
-    ("points", "points", integer),
-    ("reclaim_for_cost", "reclaim", integer),
-    ("reclaimforcost", "reclaim", integer),
+    ("n_random_characters", "n", integer),
+    ("plural_subtype", "t", subtype),
+    ("points", "p", integer),
+    ("reclaim_for_cost", "r", integer),
+    ("reclaimforcost", "r", integer),
     ("s", "s", integer),
-    ("subtype", "subtype", subtype),
-    ("text_number", "number", integer),
-    ("this_turn_times", "number", integer),
-    ("top_n_cards", "to_void", integer),
-    ("up_to_n_allies", "number", integer),
-    ("up_to_n_events", "number", integer),
+    ("subtype", "t", subtype),
+    ("text_number", "n", integer),
+    ("this_turn_times", "n", integer),
+    ("top_n_cards", "v", integer),
+    ("up_to_n_allies", "n", integer),
+    ("up_to_n_events", "n", integer),
 ];
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -87,7 +85,7 @@ pub fn variable_names() -> impl Iterator<Item = &'static str> {
         .iter()
         .map(|(_, var_name, _)| *var_name)
         .filter(|name| !name.is_empty())
-        .chain(["figment", "number", "subtype", "allies"])
+        .chain(["g", "n", "t", "a", "e1", "e2"])
 }
 
 /// Returns the integer variable name for a given directive, if it exists and is
@@ -112,11 +110,11 @@ fn figment_count(
     span: SimpleSpan,
 ) -> Result<ResolvedToken, UnresolvedVariable> {
     let figment_type = bindings
-        .get_figment("figment")
-        .ok_or_else(|| UnresolvedVariable { name: "figment".to_string(), span })?;
+        .get_figment("g")
+        .ok_or_else(|| UnresolvedVariable { name: "g".to_string(), span })?;
     let count = bindings
-        .get_integer("number")
-        .ok_or_else(|| UnresolvedVariable { name: "number".to_string(), span })?;
+        .get_integer("n")
+        .ok_or_else(|| UnresolvedVariable { name: "n".to_string(), span })?;
     Ok(ResolvedToken::FigmentCount { directive: directive.to_string(), count, figment_type })
 }
 
@@ -127,35 +125,35 @@ fn subtype_count(
     span: SimpleSpan,
 ) -> Result<ResolvedToken, UnresolvedVariable> {
     let subtype = bindings
-        .get_subtype("subtype")
-        .ok_or_else(|| UnresolvedVariable { name: "subtype".to_string(), span })?;
+        .get_subtype("t")
+        .ok_or_else(|| UnresolvedVariable { name: "t".to_string(), span })?;
     let count = bindings
-        .get_integer("allies")
-        .ok_or_else(|| UnresolvedVariable { name: "allies".to_string(), span })?;
+        .get_integer("a")
+        .ok_or_else(|| UnresolvedVariable { name: "a".to_string(), span })?;
     Ok(ResolvedToken::SubtypeCount { directive: directive.to_string(), count, subtype })
 }
 
 fn figment(
     directive: &str,
-    _variable_name: &str,
+    variable_name: &str,
     bindings: &VariableBindings,
     span: SimpleSpan,
 ) -> Result<ResolvedToken, UnresolvedVariable> {
     let figment_type = bindings
-        .get_figment("figment")
-        .ok_or_else(|| UnresolvedVariable { name: "figment".to_string(), span })?;
+        .get_figment(variable_name)
+        .ok_or_else(|| UnresolvedVariable { name: variable_name.to_string(), span })?;
     Ok(ResolvedToken::Figment { directive: directive.to_string(), figment_type })
 }
 
 fn subtype(
     directive: &str,
-    _variable_name: &str,
+    variable_name: &str,
     bindings: &VariableBindings,
     span: SimpleSpan,
 ) -> Result<ResolvedToken, UnresolvedVariable> {
     let subtype = bindings
-        .get_subtype("subtype")
-        .ok_or_else(|| UnresolvedVariable { name: "subtype".to_string(), span })?;
+        .get_subtype(variable_name)
+        .ok_or_else(|| UnresolvedVariable { name: variable_name.to_string(), span })?;
     Ok(ResolvedToken::Subtype { directive: directive.to_string(), subtype })
 }
 

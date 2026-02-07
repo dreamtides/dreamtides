@@ -11,15 +11,12 @@ fn test_judgment_return_self_from_void() {
 
 #[test]
 fn test_judgment_may_draw_then_discard() {
-    assert_round_trip(
-        "{Judgment} You may draw {cards(cards)}, then discard {cards(discards)}.",
-        "cards: 2\ndiscards: 3",
-    );
+    assert_round_trip("{Judgment} You may draw {cards(c)}, then discard {cards(d)}.", "c: 2\nd: 3");
 }
 
 #[test]
 fn test_judgment_foresee() {
-    assert_round_trip("{Judgment} {Foresee(foresee)}.", "foresee: 1");
+    assert_round_trip("{Judgment} {Foresee(f)}.", "f: 1");
 }
 
 #[test]
@@ -29,57 +26,54 @@ fn test_judgment_gain_energy() {
 
 #[test]
 fn test_judgment_banish_from_void_to_dissolve() {
-    assert_round_trip("{Judgment} You may {banish} {cards(cards)} from your void to {dissolve} an enemy with cost {energy(e)} or less.", "cards: 3\ne: 2");
+    assert_round_trip("{Judgment} You may {banish} {cards(c)} from your void to {dissolve} an enemy with cost {energy(e)} or less.", "c: 3\ne: 2");
 }
 
 #[test]
 fn test_judgment_draw_then_discard() {
-    assert_round_trip(
-        "{Judgment} Draw {cards(cards)}, then discard {cards(discards)}.",
-        "cards: 1\ndiscards: 1",
-    );
+    assert_round_trip("{Judgment} Draw {cards(c)}, then discard {cards(d)}.", "c: 1\nd: 1");
 }
 
 #[test]
 fn test_judgment_draw_opponent_gains_points() {
     assert_round_trip(
-        "{Judgment} Draw {cards(cards)}, then the opponent gains {points(points)}.",
-        "cards: 1\npoints: 2",
+        "{Judgment} Draw {cards(c)}, then the opponent gains {points(p)}.",
+        "c: 1\np: 2",
     );
 }
 
 #[test]
 fn test_judgment_may_discard_to_draw_and_gain_points() {
     assert_round_trip(
-        "{Judgment} You may discard {cards(discards)} to draw {cards(cards)} and gain {points(points)}.",
-        "discards: 1\ncards: 1\npoints: 1",
+        "{Judgment} You may discard {cards(d)} to draw {cards(c)} and gain {points(p)}.",
+        "d: 1\nc: 1\np: 1",
     );
 }
 
 #[test]
 fn test_judgment_may_discard_to_dissolve_by_spark() {
     assert_round_trip(
-        "{Judgment} You may discard {cards(discards)} to {dissolve} an enemy with spark {s} or less.",
-        "s: 1\ndiscards: 1",
+        "{Judgment} You may discard {cards(d)} to {dissolve} an enemy with spark {s} or less.",
+        "s: 1\nd: 1",
     );
 }
 
 #[test]
 fn test_judgment_pay_to_kindle_and_banish_opponent_void() {
     assert_round_trip(
-        "{Judgment} Pay {energy(e)} to {kindle(k)} and {banish} {cards(cards)} from the opponent's void.",
-        "e: 1\nk: 1\ncards: 1",
+        "{Judgment} Pay {energy(e)} to {kindle(k)} and {banish} {cards(c)} from the opponent's void.",
+        "e: 1\nk: 1\nc: 1",
     );
 }
 
 #[test]
 fn test_judgment_gain_points() {
-    assert_round_trip("{Judgment} Gain {points(points)}.", "points: 1");
+    assert_round_trip("{Judgment} Gain {points(p)}.", "p: 1");
 }
 
 #[test]
 fn test_judgment_gain_two_points() {
-    assert_round_trip("{Judgment} Gain {points(points)}.", "points: 2");
+    assert_round_trip("{Judgment} Gain {points(p)}.", "p: 2");
 }
 
 #[test]
@@ -95,8 +89,8 @@ fn test_judgment_each_player_abandons() {
 #[test]
 fn test_judgment_gain_energy_per_subtype() {
     assert_round_trip(
-        "{Judgment} Gain {energy(e)} for each allied {subtype(subtype)}.",
-        "e: 1\nsubtype: spirit-animal",
+        "{Judgment} Gain {energy(e)} for each allied {subtype(t)}.",
+        "e: 1\nt: spirit-animal",
     );
 }
 
@@ -113,24 +107,24 @@ fn test_judgment_may_banish_ally_then_materialize() {
 #[test]
 fn test_judgment_may_pay_to_banish_and_materialize_multiple() {
     assert_round_trip(
-        "{Judgment} You may pay {energy(e)} to {banish} {up_to_n_allies(number)}, then {materialize} {it_or_them(number)}.",
-        "e: 3\nnumber: 2",
+        "{Judgment} You may pay {energy(e)} to {banish} {up_to_n_allies(n)}, then {materialize} {it_or_them(n)}.",
+        "e: 3\nn: 2",
     );
 }
 
 #[test]
 fn test_judgment_may_pay_subtype_gains_spark() {
     assert_round_trip(
-        "{Judgment} You may pay {energy(e)} to have each allied {subtype(subtype)} gain +{s} spark.",
-        "e: 4\nsubtype:spirit-animal\ns: 2",
+        "{Judgment} You may pay {energy(e)} to have each allied {subtype(t)} gain +{s} spark.",
+        "e: 4\nt:spirit-animal\ns: 2",
     );
 }
 
 #[test]
 fn test_judgment_may_banish_from_opponent_void_gain_energy() {
     assert_round_trip(
-        "{Judgment} You may {banish} {cards(cards)} from the opponent's void to gain {energy(e)}.",
-        "cards: 1\ne: 1",
+        "{Judgment} You may {banish} {cards(c)} from the opponent's void to gain {energy(e)}.",
+        "c: 1\ne: 1",
     );
 }
 
@@ -146,42 +140,42 @@ fn test_judgment_may_pay_return_from_void_to_hand() {
 fn test_judgment_with_allies_that_share_type_draw() {
     assert_round_trip("Has all character types.", "");
     assert_round_trip(
-        "{Judgment} With {count_allies(allies)} that share a character type, draw {cards(cards)}.",
-        "allies: 3\ncards: 1",
+        "{Judgment} With {count_allies(a)} that share a character type, draw {cards(c)}.",
+        "a: 3\nc: 1",
     );
 }
 
 #[test]
 fn test_judgment_with_allied_subtype_count_gain_energy() {
     assert_round_trip(
-        "{Materialized_Judgment} With {count_allied_subtype(allies, subtype)}, gain {energy(e)}.",
-        "subtype: warrior\nallies: 2\ne: 1",
+        "{Materialized_Judgment} With {count_allied_subtype(a, t)}, gain {energy(e)}.",
+        "t: warrior\na: 2\ne: 1",
     );
 }
 
 #[test]
 fn test_judgment_with_allied_subtype_count_draw() {
     assert_round_trip(
-        "{Materialized_Judgment} With {count_allied_subtype(allies, subtype)}, draw {cards(cards)}.",
-        "allies: 2\nsubtype: survivor\ncards: 1",
+        "{Materialized_Judgment} With {count_allied_subtype(a, t)}, draw {cards(c)}.",
+        "a: 2\nt: survivor\nc: 1",
     );
 }
 
 #[test]
 fn test_judgment_draw_one() {
-    assert_round_trip("{Judgment} Draw {cards(cards)}.", "cards: 1");
+    assert_round_trip("{Judgment} Draw {cards(c)}.", "c: 1");
 }
 
 #[test]
 fn test_judgment_may_abandon_subtype_to_discover_and_materialize() {
-    assert_round_trip("{Judgment} You may abandon {@a subtype(subtype)} to {discover} {@a subtype(subtype)} with cost {energy(e)} higher and {materialize} it.", "subtype: warrior\ne: 1");
+    assert_round_trip("{Judgment} You may abandon {@a subtype(t)} to {discover} {@a subtype(t)} with cost {energy(e)} higher and {materialize} it.", "t: warrior\ne: 1");
 }
 
 #[test]
 fn test_judgment_with_allied_subtype_gain_energy() {
     assert_round_trip(
-        "{Judgment} With {count_allied_subtype(allies, subtype)}, gain {energy(e)}.",
-        "subtype:spirit-animal\nallies: 2\ne: 2",
+        "{Judgment} With {count_allied_subtype(a, t)}, gain {energy(e)}.",
+        "t:spirit-animal\na: 2\ne: 2",
     );
 }
 

@@ -36,7 +36,7 @@ fn test_prevent_dissolve_event() {
 
 #[test]
 fn test_subtypes_have_spark_bonus() {
-    assert_round_trip("Allied {subtype(subtype):other} have +{s} spark.", "subtype: warrior\ns: 1");
+    assert_round_trip("Allied {subtype(t):other} have +{s} spark.", "t: warrior\ns: 1");
 }
 
 #[test]
@@ -47,8 +47,8 @@ fn test_opponent_events_cost_more() {
 #[test]
 fn test_spark_equals_subtype_count() {
     assert_round_trip(
-        "This character's spark is equal to the number of allied {subtype(subtype):other}.",
-        "subtype: warrior",
+        "This character's spark is equal to the number of allied {subtype(t):other}.",
+        "t: warrior",
     );
 }
 
@@ -77,14 +77,14 @@ fn test_win_if_empty_deck() {
 
 #[test]
 fn test_void_cards_have_reclaim_equal_cost() {
-    assert_round_trip("While you have {count(count)} or more cards in your void, they have {reclaim} equal to their cost.", "count: 7");
+    assert_round_trip("While you have {count(n)} or more cards in your void, they have {reclaim} equal to their cost.", "n: 7");
 }
 
 #[test]
 fn test_subtype_in_void_allies_have_spark() {
     assert_round_trip(
-        "While this card is in your void, allied {subtype(subtype):other} have +{s} spark.",
-        "subtype: survivor\ns: 2",
+        "While this card is in your void, allied {subtype(t):other} have +{s} spark.",
+        "t: survivor\ns: 2",
     );
 }
 
@@ -96,22 +96,22 @@ fn test_only_play_from_void() {
 #[test]
 fn test_with_allied_subtype_play_from_hand_or_void() {
     assert_round_trip(
-        "With an allied {subtype(subtype)}, you may play this card from your hand or void for {energy(e)}.",
-        "subtype: survivor\ne: 1",
+        "With an allied {subtype(t)}, you may play this card from your hand or void for {energy(e)}.",
+        "t: survivor\ne: 1",
     );
 }
 
 #[test]
 fn test_conditional_cost_if_dissolved() {
-    assert_round_trip("{Dissolve} an enemy. Draw {cards(cards)}.", "cards: 1");
+    assert_round_trip("{Dissolve} an enemy. Draw {cards(c)}.", "c: 1");
     assert_round_trip("This event costs {energy(e)} if a character dissolved this turn.", "e: 1");
 }
 
 #[test]
 fn test_banish_void_with_count_reclaim_self() {
     assert_round_trip(
-        "{Banish} your void with {count(count)} or more cards: {Reclaim} this character.",
-        "count: 8",
+        "{Banish} your void with {count(n)} or more cards: {Reclaim} this character.",
+        "n: 8",
     );
 }
 
@@ -134,7 +134,7 @@ fn test_events_cost_more_with_copy() {
 #[test]
 fn test_subtype_gains_spark_equal_count() {
     assert_round_trip(
-        "Each allied {subtype(subtype)} gains spark equal to the number of allied {subtype(subtype):other}.",
-        "subtype: spirit-animal",
+        "Each allied {subtype(t)} gains spark equal to the number of allied {subtype(t):other}.",
+        "t: spirit-animal",
     );
 }
