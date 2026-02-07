@@ -129,7 +129,7 @@ fn test_once_per_turn_when_you_materialize_a_character_with_cost_or_less_draw_ca
 #[test]
 fn test_once_per_turn_when_you_materialize_a_subtype_draw_cards() {
     let result = parse_ability(
-        "Once per turn, when you {materialize} {a-subtype}, draw {cards}.",
+        "Once per turn, when you {materialize} {a_subtype}, draw {cards}.",
         "subtype: warrior, cards: 2",
     );
     assert_ron_snapshot!(result, @r###"
@@ -162,7 +162,7 @@ fn test_when_you_play_an_event_gain_energy() {
 #[test]
 fn test_when_you_play_cards_in_turn_reclaim_this_character() {
     let result = parse_ability(
-        "When you play {cards-numeral} in a turn, {reclaim} this character.",
+        "When you play {cards_numeral} in a turn, {reclaim} this character.",
         "cards: 2",
     );
     assert_ron_snapshot!(result, @r###"
@@ -191,7 +191,7 @@ fn test_when_you_materialize_an_ally_gain_energy() {
 #[test]
 fn test_when_you_materialize_a_subtype_reclaim_this_character() {
     let result = parse_ability(
-        "When you {materialize} {a-subtype}, {reclaim} this character.",
+        "When you {materialize} {a_subtype}, {reclaim} this character.",
         "subtype: warrior",
     );
     assert_ron_snapshot!(result, @r###"
@@ -224,7 +224,7 @@ fn test_when_you_materialize_a_character_this_character_gains_spark() {
 #[test]
 fn test_when_you_play_a_subtype_draw_cards() {
     let result =
-        parse_ability("When you play {a-subtype}, draw {cards}.", "subtype: warrior, cards: 2");
+        parse_ability("When you play {a_subtype}, draw {cards}.", "subtype: warrior, cards: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Play(Your(CharacterType(Warrior))),
@@ -238,8 +238,8 @@ fn test_when_you_play_a_subtype_draw_cards() {
 #[test]
 fn test_when_you_play_a_subtype_put_cards_from_deck_into_void() {
     let result = parse_ability(
-        "When you play {a-subtype}, put the {top-n-cards} of your deck into your void.",
-        "subtype: warrior, to-void: 3",
+        "When you play {a_subtype}, put the {top_n_cards} of your deck into your void.",
+        "subtype: warrior, to_void: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -979,7 +979,7 @@ fn test_has_all_character_types_and_judgment_with_allies() {
 #[test]
 fn test_when_you_draw_cards_in_turn_while_in_void_gains_reclaim() {
     let result = parse_ability(
-        "When you draw {cards-numeral} in a turn, while this card is in your void, it gains {reclaim-for-cost} this turn.",
+        "When you draw {cards_numeral} in a turn, while this card is in your void, it gains {reclaim_for_cost} this turn.",
         "cards: 3, reclaim: 2",
     );
     assert_ron_snapshot!(result, @r###"

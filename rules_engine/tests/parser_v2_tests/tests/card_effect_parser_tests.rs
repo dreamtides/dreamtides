@@ -343,8 +343,8 @@ fn test_materialized_dissolved_draw_cards() {
 #[test]
 fn test_materialized_dissolved_put_cards_from_deck_into_void() {
     let result = parse_ability(
-        "{MaterializedDissolved} Put the {top-n-cards} of your deck into your void.",
-        "to-void: 2",
+        "{MaterializedDissolved} Put the {top_n_cards} of your deck into your void.",
+        "to_void: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
@@ -588,8 +588,8 @@ fn test_judgment_each_player_abandons_character() {
 #[test]
 fn test_put_cards_from_deck_into_void_draw_cards() {
     let result = parse_ability(
-        "Put the {top-n-cards} of your deck into your void. Draw {cards}.",
-        "to-void: 3, cards: 2",
+        "Put the {top_n_cards} of your deck into your void. Draw {cards}.",
+        "to_void: 3, cards: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
@@ -718,7 +718,7 @@ fn test_materialized_draw_cards_for_each_ally_abandoned_this_turn() {
 #[test]
 fn test_materialized_card_with_cost_in_void_gains_reclaim() {
     let result = parse_ability(
-        "{Materialized} A card with cost {e} or less in your void gains {reclaim-for-cost}.",
+        "{Materialized} A card with cost {e} or less in your void gains {reclaim_for_cost}.",
         "e: 3, reclaim: 0",
     );
     assert_ron_snapshot!(result, @r###"
@@ -743,7 +743,7 @@ fn test_materialized_card_with_cost_in_void_gains_reclaim() {
 #[test]
 fn test_event_in_void_gains_reclaim_this_turn() {
     let result =
-        parse_ability("An event in your void gains {reclaim-for-cost} this turn.", "reclaim: 0");
+        parse_ability("An event in your void gains {reclaim_for_cost} this turn.", "reclaim: 0");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(GainsReclaim(
@@ -801,7 +801,7 @@ fn test_discover_character_with_activated_ability() {
 #[test]
 fn test_materialized_draw_subtype_from_deck() {
     let result =
-        parse_ability("{Materialized} Draw {a-subtype} from your deck.", "subtype: warrior");
+        parse_ability("{Materialized} Draw {a_subtype} from your deck.", "subtype: warrior");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
@@ -861,7 +861,7 @@ fn test_return_all_ally_to_hand_draw_cards() {
 #[test]
 fn test_reclaim_random_character_with_cost_or_less() {
     let result = parse_ability(
-        "When you play {a-subtype}, {reclaim} a random character with cost {e} or less.",
+        "When you play {a_subtype}, {reclaim} a random character with cost {e} or less.",
         "subtype: warrior, e: 3",
     );
     assert_ron_snapshot!(result, @r###"

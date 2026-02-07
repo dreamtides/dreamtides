@@ -25,7 +25,7 @@ fn test_until_end_of_turn_when_you_play_event_copy_it() {
 #[test]
 fn test_when_ally_dissolved_gains_reclaim_for_cost() {
     let result = parse_ability(
-        "When an ally is {dissolved}, this card gains {reclaim-for-cost} this turn.",
+        "When an ally is {dissolved}, this card gains {reclaim_for_cost} this turn.",
         "reclaim: 3",
     );
     assert_ron_snapshot!(result, @r###"
@@ -149,7 +149,7 @@ fn test_dissolve_an_enemy() {
 
 #[test]
 fn test_discover_a_subtype() {
-    let result = parse_ability("{Discover} {a-subtype}.", "subtype: warrior");
+    let result = parse_ability("{Discover} {a_subtype}.", "subtype: warrior");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Discover(
@@ -411,7 +411,7 @@ fn test_discover_fast_card() {
 
 #[test]
 fn test_discover_fast_subtype() {
-    let result = parse_ability("{Discover} a {fast} {a-subtype}.", "subtype: warrior");
+    let result = parse_ability("{Discover} a {fast} {a_subtype}.", "subtype: warrior");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Discover(
@@ -518,7 +518,7 @@ fn test_discover_character_with_cost() {
 #[test]
 fn test_discover_subtype_with_cost() {
     let result =
-        parse_ability("{Discover} {a-subtype} with cost {e} or more.", "subtype: warrior, e: 4");
+        parse_ability("{Discover} {a_subtype} with cost {e} or more.", "subtype: warrior, e: 4");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Discover(
@@ -574,7 +574,7 @@ fn test_discover_fast_subtype_with_cost() {
 #[test]
 fn test_discover_subtype_with_spark() {
     let result =
-        parse_ability("{Discover} {a-subtype} with spark {s} or less.", "subtype: warrior, s: 2");
+        parse_ability("{Discover} {a_subtype} with spark {s} or less.", "subtype: warrior, s: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Discover(
@@ -765,7 +765,7 @@ fn test_judgment_you_may_banish_cards_from_opponent_void_to_gain_energy() {
 #[test]
 fn test_judgment_you_may_abandon_subtype_to_discover_subtype_with_cost_higher_and_materialize_it() {
     let result = parse_ability(
-        "{Judgment} You may abandon {a-subtype} to {discover} {a-subtype} with cost {e} higher and {materialize} it.",
+        "{Judgment} You may abandon {a_subtype} to {discover} {a_subtype} with cost {e} higher and {materialize} it.",
         "subtype: warrior, e: 2",
     );
     assert_ron_snapshot!(result, @r###"
@@ -998,7 +998,7 @@ fn test_event_copy_next_event() {
 #[test]
 fn test_event_trigger_additional_judgment_phase() {
     let result = parse_ability(
-        "At the end of this turn, trigger an additional {JudgmentPhaseName} phase.",
+        "At the end of this turn, trigger an additional {judgment_phase_name} phase.",
         "",
     );
     assert_ron_snapshot!(result, @r###"
@@ -1167,8 +1167,8 @@ fn test_when_you_discard_card_it_gains_reclaim_equal_to_cost() {
 #[test]
 fn test_modal_return_enemy_or_draw_cards() {
     let result = parse_ability(
-        "{ChooseOne}\n{bullet} {mode1-cost}: Return an enemy to hand.\n{bullet} {mode2-cost}: Draw {cards}.",
-        "mode1-cost: 1, mode2-cost: 2, cards: 3",
+        "{choose_one}\n{bullet} {mode1_cost}: Return an enemy to hand.\n{bullet} {mode2_cost}: Draw {cards}.",
+        "mode1_cost: 1, mode2_cost: 2, cards: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(

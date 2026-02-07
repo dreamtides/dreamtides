@@ -297,7 +297,7 @@ fn test_materialize_subtype_trigger_reclaim_self() {
 fn test_play_subtype_trigger_put_to_void() {
     assert_round_trip(
         "When you play {@a subtype(subtype)}, put the {top_n_cards(to_void)} of your deck into your void.",
-        "subtype: survivor\nto-void: 2",
+        "subtype: survivor\nto_void: 2",
     );
 }
 

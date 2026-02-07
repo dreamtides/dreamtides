@@ -248,7 +248,7 @@ fn test_return_events_from_void() {
 fn test_put_top_cards_to_void_draw() {
     assert_round_trip(
         "Put the {top_n_cards(to_void)} of your deck into your void. Draw {cards(cards)}.",
-        "to-void: 3\ncards: 1",
+        "to_void: 3\ncards: 1",
     );
 }
 
@@ -421,5 +421,5 @@ fn test_materialize_random_characters_from_deck() {
 
 #[test]
 fn test_choose_one_return_or_draw() {
-    assert_round_trip("{choose_one}\n{bullet} {energy(mode1_cost)}: Return an enemy to hand.\n{bullet} {energy(mode2_cost)}: Draw {cards(cards)}.", "mode1-cost: 2\nmode2-cost: 3\ncards: 2");
+    assert_round_trip("{choose_one}\n{bullet} {energy(mode1_cost)}: Return an enemy to hand.\n{bullet} {energy(mode2_cost)}: Draw {cards(cards)}.", "mode1_cost: 2\nmode2_cost: 3\ncards: 2");
 }

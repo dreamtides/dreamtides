@@ -67,8 +67,8 @@ fn test_abandon_an_ally_once_per_turn_reclaim_subtype() {
 #[test]
 fn test_abandon_an_ally_put_cards_from_deck_into_void() {
     let result = parse_ability(
-        "Abandon an ally: Put the {top-n-cards} of your deck into your void.",
-        "to-void: 2",
+        "Abandon an ally: Put the {top_n_cards} of your deck into your void.",
+        "to_void: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
@@ -344,7 +344,7 @@ fn test_abandon_or_discard_dissolve_enemy() {
 #[test]
 fn test_abandon_ally_gain_energy_equal_to_cost() {
     let result =
-        parse_ability("Abandon an ally: Gain {energy-symbol} equal to that character's cost.", "");
+        parse_ability("Abandon an ally: Gain {energy_symbol} equal to that character's cost.", "");
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
@@ -430,7 +430,7 @@ fn test_fast_abandon_this_character_prevent_played_event() {
 #[test]
 fn test_pay_one_or_more_energy_draw_for_each_energy_spent() {
     let result = parse_ability(
-        "Pay 1 or more {energy-symbol}: Draw {cards} for each {energy-symbol} spent, then discard {discards}.",
+        "Pay 1 or more {energy_symbol}: Draw {cards} for each {energy_symbol} spent, then discard {discards}.",
         "cards: 1, discards: 1"
     );
     assert_ron_snapshot!(result, @r###"
@@ -460,7 +460,7 @@ fn test_pay_one_or_more_energy_draw_for_each_energy_spent() {
 #[test]
 fn test_pay_one_or_more_dissolve_all_characters() {
     let result = parse_ability(
-        "Pay 1 or more {energy-symbol}: {Dissolve} all characters with spark less than the amount of {energy-symbol} paid.",
+        "Pay 1 or more {energy_symbol}: {Dissolve} all characters with spark less than the amount of {energy_symbol} paid.",
         ""
     );
     assert_ron_snapshot!(result, @r###"
@@ -482,7 +482,7 @@ fn test_pay_one_or_more_dissolve_all_characters() {
 #[test]
 fn test_pay_one_or_more_energy_draw() {
     let result = parse_ability(
-        "Pay 1 or more {energy-symbol}: Draw {cards} for each {energy-symbol} spent.",
+        "Pay 1 or more {energy_symbol}: Draw {cards} for each {energy_symbol} spent.",
         "cards: 2",
     );
     assert_ron_snapshot!(result, @r###"
