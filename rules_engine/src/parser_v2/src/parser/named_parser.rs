@@ -32,7 +32,6 @@ fn reclaim_directive<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'
 
 fn reclaim_cost<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _)
-            if directive == "reclaimforcost" || directive == "reclaim_for_cost" => value
+        (ResolvedToken::ReclaimCost(v), _) => v
     }
 }

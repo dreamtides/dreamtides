@@ -58,7 +58,7 @@ impl ViolationKind {
                 "use statement placed inline within function body or other nested context (use statements must be at top of file)"
             }
             ViolationKind::CodeOrder => {
-                "items not in correct order (should be: public type aliases, public constants, public traits, public structs/enums, public functions, then private items)"
+                "items not in correct order (should be: private constants, private statics, thread_local, public type aliases, public constants, public traits, public structs/enums, public functions, then private items)"
             }
             ViolationKind::MissingDocCommentImport => {
                 "doc comment references type not imported in use statements"

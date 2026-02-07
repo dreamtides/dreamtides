@@ -77,7 +77,7 @@ static PARSER_WORDS: &[&str] = &[
 ];
 
 pub fn suggest_directive(name: &str) -> Option<Vec<String>> {
-    find_suggestions(name, parser_substitutions::directive_names().collect())
+    find_suggestions(name, parser_substitutions::phrase_names().collect())
 }
 
 pub fn suggest_variable(name: &str) -> Option<Vec<String>> {

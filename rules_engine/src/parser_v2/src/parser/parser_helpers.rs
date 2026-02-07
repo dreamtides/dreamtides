@@ -48,59 +48,63 @@ pub fn effect_separator<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtr
     choice((period(), comma().then_ignore(word("then")), word("and")))
 }
 
+#[expect(clippy::unnested_or_patterns)]
 pub fn energy<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive_matches_with_suffix(&directive, "e") => value
+        (ResolvedToken::Energy(v), _)
+        | (ResolvedToken::Mode1Energy(v), _)
+        | (ResolvedToken::Mode2Energy(v), _) => v,
     }
 }
 
 pub fn cards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive_matches_with_suffix(&directive, "cards") => value
+        (ResolvedToken::CardCount(v), _) => v,
     }
 }
 
 /// Parses the {cards_numeral} directive value.
 pub fn cards_numeral<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "cards_numeral" => value
+        (ResolvedToken::CardCountNumeral(v), _) => v,
     }
 }
 
 /// Parses the {top_n_cards} directive value.
 pub fn top_n_cards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "top_n_cards" => value
+        (ResolvedToken::TopNCards(v), _) => v,
     }
 }
 
+#[expect(clippy::unnested_or_patterns)]
 pub fn discards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive_matches_with_suffix(&directive, "cards") || directive == "discards" => value
+        (ResolvedToken::CardCount(v), _) | (ResolvedToken::DiscardCount(v), _) => v,
     }
 }
 
 pub fn points<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "points" => value
+        (ResolvedToken::PointCount(v), _) => v,
     }
 }
 
 pub fn spark<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "s" => value
+        (ResolvedToken::SparkAmount(v), _) => v,
     }
 }
 
 pub fn subtype<'a>() -> impl Parser<'a, ParserInput<'a>, CardSubtype, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Subtype { subtype, .. }, _) => subtype
+        (ResolvedToken::Subtype(subtype), _) => subtype
     }
 }
 
 pub fn figment<'a>() -> impl Parser<'a, ParserInput<'a>, FigmentType, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Figment { figment_type, .. }, _) => figment_type
+        (ResolvedToken::Figment(figment_type), _) => figment_type
     }
 }
 
@@ -119,19 +123,19 @@ pub fn words<'a>(
 
 pub fn foresee_count<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "foresee" || directive == "Foresee" => value
+        (ResolvedToken::ForeseeCount(v), _) => v,
     }
 }
 
 pub fn kindle_amount<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "kindle" || directive == "Kindle" => value
+        (ResolvedToken::KindleAmount(v), _) => v,
     }
 }
 
 pub fn maximum_energy<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "maximum_energy" => value
+        (ResolvedToken::MaximumEnergy(v), _) => v,
     }
 }
 
@@ -141,25 +145,25 @@ pub fn article<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + 
 
 pub fn count<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "count" => value
+        (ResolvedToken::Count(v), _) => v,
     }
 }
 
 pub fn count_allies<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "count_allies" => value
+        (ResolvedToken::CountAllies(v), _) => v,
     }
 }
 
 pub fn up_to_n_allies<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "up_to_n_allies" => value
+        (ResolvedToken::UpToNAllies(v), _) => v,
     }
 }
 
 pub fn it_or_them_count<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "it_or_them" => value
+        (ResolvedToken::ItOrThemCount(v), _) => v,
     }
 }
 
@@ -172,37 +176,37 @@ pub fn count_allied_subtype<'a>(
 
 pub fn up_to_n_events<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "up_to_n_events" => value
+        (ResolvedToken::UpToNEvents(v), _) => v,
     }
 }
 
 pub fn number<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "number" || directive == "n_random_characters" || directive == "multiply_by" => value
+        (ResolvedToken::Number(v), _) => v,
     }
 }
 
 pub fn reclaim_cost<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "reclaim_for_cost" || directive == "reclaimforcost" => value
+        (ResolvedToken::ReclaimCost(v), _) => v,
     }
 }
 
 pub fn this_turn_times<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "this_turn_times" => value
+        (ResolvedToken::ThisTurnTimes(v), _) => v,
     }
 }
 
 pub fn mode1_cost<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "e1" => value
+        (ResolvedToken::Mode1Energy(v), _) => v,
     }
 }
 
 pub fn mode2_cost<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "e2" => value
+        (ResolvedToken::Mode2Energy(v), _) => v,
     }
 }
 
@@ -210,10 +214,4 @@ pub fn newline<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + 
     select! {
         (ResolvedToken::Token(Token::Newline), _) => ()
     }
-}
-
-fn directive_matches_with_suffix(directive: &str, base: &str) -> bool {
-    directive == base
-        || (directive.starts_with(base)
-            && directive[base.len()..].chars().all(|c| c.is_ascii_digit()))
 }

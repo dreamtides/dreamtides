@@ -4,16 +4,11 @@ use ability_data::variable_value::VariableValue;
 
 use crate::serializer::predicate_serializer;
 use crate::variables::parser_bindings::VariableBindings;
-use crate::variables::parser_substitutions;
 
 pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBindings) -> String {
     match condition {
         Condition::AlliesThatShareACharacterType { count } => {
-            if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("count_allies")
-            {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
-            }
+            bindings.insert("a".to_string(), VariableValue::Integer(*count));
             "with {count_allies(a)} that share a character type,".to_string()
         }
         Condition::CardsDiscardedThisTurn { count: 1, predicate } => format!(
@@ -25,15 +20,11 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
             predicate = predicate_serializer::serialize_card_predicate(predicate, bindings)
         ),
         Condition::CardsDrawnThisTurn { count } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("count") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
-            }
+            bindings.insert("n".to_string(), VariableValue::Integer(*count));
             "if you have drawn {count(n)} or more cards this turn".to_string()
         }
         Condition::CardsInVoidCount { count } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("count") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
-            }
+            bindings.insert("n".to_string(), VariableValue::Integer(*count));
             "while you have {count(n)} or more cards in your void,".to_string()
         }
         Condition::DissolvedThisTurn { .. } => "if a character dissolved this turn".to_string(),
@@ -65,11 +56,7 @@ fn serialize_predicate_count(
             "{count_allied_subtype(a, t)}".to_string()
         }
         Predicate::Another(CardPredicate::Character) => {
-            if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("count_allies")
-            {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(count));
-            }
+            bindings.insert("a".to_string(), VariableValue::Integer(count));
             "{count_allies(a)}".to_string()
         }
         Predicate::Another(card_predicate) => predicate_serializer::serialize_predicate_plural(

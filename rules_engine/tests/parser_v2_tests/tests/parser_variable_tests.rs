@@ -105,7 +105,7 @@ fn test_resolve_simple_integer() {
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
-    assert_eq!(resolved[0].0, ResolvedToken::Integer { directive: "cards".to_string(), value: 2 });
+    assert_eq!(resolved[0].0, ResolvedToken::CardCount(2));
 }
 
 #[test]
@@ -115,10 +115,7 @@ fn test_resolve_simple_subtype() {
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
-    assert_eq!(resolved[0].0, ResolvedToken::Subtype {
-        directive: "subtype".to_string(),
-        subtype: CardSubtype::Warrior
-    });
+    assert_eq!(resolved[0].0, ResolvedToken::Subtype(CardSubtype::Warrior));
 }
 
 #[test]
@@ -149,7 +146,6 @@ fn test_resolve_compound_n_figments() {
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
     assert_eq!(resolved[0].0, ResolvedToken::FigmentCount {
-        directive: "n_figments".to_string(),
         count: 3,
         figment_type: FigmentType::Radiant
     });
@@ -162,10 +158,7 @@ fn test_resolve_compound_a_figment() {
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
-    assert_eq!(resolved[0].0, ResolvedToken::Figment {
-        directive: "a_figment".to_string(),
-        figment_type: FigmentType::Shadow
-    });
+    assert_eq!(resolved[0].0, ResolvedToken::Figment(FigmentType::Shadow));
 }
 
 #[test]
@@ -213,7 +206,7 @@ fn test_resolve_mixed_tokens() {
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 3);
     assert_eq!(resolved[0].0, ResolvedToken::Token(Token::Word("draw".to_string())));
-    assert_eq!(resolved[1].0, ResolvedToken::Integer { directive: "cards".to_string(), value: 2 });
+    assert_eq!(resolved[1].0, ResolvedToken::CardCount(2));
     assert_eq!(resolved[2].0, ResolvedToken::Token(Token::Period));
 }
 
@@ -229,10 +222,7 @@ fn test_representative_card_1() {
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 4);
-    assert_eq!(resolved[3].0, ResolvedToken::Integer {
-        directive: "cards_numeral".to_string(),
-        value: 2
-    });
+    assert_eq!(resolved[3].0, ResolvedToken::CardCountNumeral(2));
 }
 
 #[test]
@@ -250,12 +240,9 @@ fn test_representative_card_4() {
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 7);
-    assert_eq!(resolved[0].0, ResolvedToken::Integer {
-        directive: "discards".to_string(),
-        value: 1
-    });
-    assert_eq!(resolved[3].0, ResolvedToken::Integer { directive: "cards".to_string(), value: 1 });
-    assert_eq!(resolved[6].0, ResolvedToken::Integer { directive: "points".to_string(), value: 1 });
+    assert_eq!(resolved[0].0, ResolvedToken::DiscardCount(1));
+    assert_eq!(resolved[3].0, ResolvedToken::CardCount(1));
+    assert_eq!(resolved[6].0, ResolvedToken::PointCount(1));
 }
 
 #[test]
@@ -270,7 +257,7 @@ fn test_representative_card_7() {
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 4);
-    assert_eq!(resolved[3].0, ResolvedToken::Integer { directive: "e".to_string(), value: 2 });
+    assert_eq!(resolved[3].0, ResolvedToken::Energy(2));
 }
 
 #[test]
@@ -286,7 +273,6 @@ fn test_representative_card_9() {
     assert_eq!(resolved.len(), 3);
     assert_eq!(resolved[0].0, ResolvedToken::Token(Token::Directive("Materialize".to_string())));
     assert_eq!(resolved[1].0, ResolvedToken::FigmentCount {
-        directive: "n_figments".to_string(),
         count: 3,
         figment_type: FigmentType::Radiant
     });
@@ -322,18 +308,12 @@ fn test_variable_directive_recognition() {
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 6);
-    assert_eq!(resolved[0].0, ResolvedToken::Integer { directive: "e".to_string(), value: 1 });
-    assert_eq!(resolved[1].0, ResolvedToken::Integer { directive: "cards".to_string(), value: 2 });
-    assert_eq!(resolved[2].0, ResolvedToken::Integer {
-        directive: "discards".to_string(),
-        value: 3
-    });
-    assert_eq!(resolved[3].0, ResolvedToken::Integer { directive: "points".to_string(), value: 4 });
-    assert_eq!(resolved[4].0, ResolvedToken::Integer { directive: "s".to_string(), value: 5 });
-    assert_eq!(resolved[5].0, ResolvedToken::Subtype {
-        directive: "subtype".to_string(),
-        subtype: CardSubtype::Warrior
-    });
+    assert_eq!(resolved[0].0, ResolvedToken::Energy(1));
+    assert_eq!(resolved[1].0, ResolvedToken::CardCount(2));
+    assert_eq!(resolved[2].0, ResolvedToken::DiscardCount(3));
+    assert_eq!(resolved[3].0, ResolvedToken::PointCount(4));
+    assert_eq!(resolved[4].0, ResolvedToken::SparkAmount(5));
+    assert_eq!(resolved[5].0, ResolvedToken::Subtype(CardSubtype::Warrior));
 }
 
 #[test]
@@ -371,9 +351,6 @@ fn test_variables_in_cards_toml_match_directives() {
     if !missing_from_code.is_empty() {
         let mut sorted: Vec<_> = missing_from_code.iter().map(|s| s.as_str()).collect();
         sorted.sort();
-        panic!(
-            "Variable names in cards.toml not handled by DIRECTIVES:\n  {}",
-            sorted.join("\n  ")
-        );
+        panic!("Variable names in cards.toml not handled by PHRASES:\n  {}", sorted.join("\n  "));
     }
 }

@@ -7,7 +7,6 @@ use crate::serializer::{
     serializer_utils, text_formatting,
 };
 use crate::variables::parser_bindings::VariableBindings;
-use crate::variables::parser_substitutions;
 
 pub fn serialize_static_ability(
     static_ability: &StaticAbility,
@@ -65,36 +64,28 @@ pub fn serialize_standard_static_ability(
 ) -> String {
     match ability {
         StandardStaticAbility::YourCardsCostIncrease { matching, increase } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(increase.0));
-            }
+            bindings.insert("e".to_string(), VariableValue::Integer(increase.0));
             format!(
                 "{} cost you {{energy(e)}} more.",
                 predicate_serializer::serialize_card_predicate_plural(matching, bindings)
             )
         }
         StandardStaticAbility::YourCardsCostReduction { matching, reduction } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(reduction.0));
-            }
+            bindings.insert("e".to_string(), VariableValue::Integer(reduction.0));
             format!(
                 "{} cost you {{energy(e)}} less.",
                 predicate_serializer::serialize_card_predicate_plural(matching, bindings)
             )
         }
         StandardStaticAbility::EnemyCardsCostIncrease { matching, increase } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(increase.0));
-            }
+            bindings.insert("e".to_string(), VariableValue::Integer(increase.0));
             format!(
                 "the opponent's {} cost {{energy(e)}} more.",
                 predicate_serializer::serialize_card_predicate_plural(matching, bindings)
             )
         }
         StandardStaticAbility::SparkBonusOtherCharacters { matching, added_spark } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("s") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(added_spark.0));
-            }
+            bindings.insert("s".to_string(), VariableValue::Integer(added_spark.0));
             format!(
                 "allied {} have +{{s}} spark.",
                 predicate_serializer::serialize_card_predicate_plural(matching, bindings)
@@ -104,10 +95,7 @@ pub fn serialize_standard_static_ability(
             format!("To play this card, {}.", cost_serializer::serialize_cost(cost, bindings))
         }
         StandardStaticAbility::PlayForAlternateCost(alt_cost) => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings
-                    .insert(var_name.to_string(), VariableValue::Integer(alt_cost.energy_cost.0));
-            }
+            bindings.insert("e".to_string(), VariableValue::Integer(alt_cost.energy_cost.0));
             let card_type = match alt_cost.card_type {
                 Some(CardTypeContext::Character) => "character",
                 Some(CardTypeContext::Event) => "event",
@@ -138,20 +126,12 @@ pub fn serialize_standard_static_ability(
         }
         StandardStaticAbility::HasAllCharacterTypes => "has all character types.".to_string(),
         StandardStaticAbility::MultiplyEnergyGainFromCardEffects { multiplier } => {
-            if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("multiply_by")
-            {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(*multiplier));
-            }
+            bindings.insert("n".to_string(), VariableValue::Integer(*multiplier));
             "{multiply_by(n)} the amount of {energy_symbol} you gain from card effects this turn."
                 .to_string()
         }
         StandardStaticAbility::MultiplyCardDrawFromCardEffects { multiplier } => {
-            if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("multiply_by")
-            {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(*multiplier));
-            }
+            bindings.insert("n".to_string(), VariableValue::Integer(*multiplier));
             "{multiply_by(n)} the number of cards you draw from card effects this turn.".to_string()
         }
         StandardStaticAbility::OncePerTurnPlayFromVoid { matching } => {
@@ -188,30 +168,24 @@ pub fn serialize_standard_static_ability(
             "you may only play this character from your void.".to_string()
         }
         StandardStaticAbility::PlayFromHandOrVoidForCost(play_from_hand_or_void) => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings.insert(
-                    var_name.to_string(),
-                    VariableValue::Integer(play_from_hand_or_void.energy_cost.0),
-                );
-            }
+            bindings.insert(
+                "e".to_string(),
+                VariableValue::Integer(play_from_hand_or_void.energy_cost.0),
+            );
             "you may play this card from your hand or void for {energy(e)}".to_string()
         }
         StandardStaticAbility::CardsInYourVoidHaveReclaim { .. } => {
             "they have {reclaim} equal to their cost.".to_string()
         }
         StandardStaticAbility::CostReductionForEach { reduction, quantity } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(reduction.0));
-            }
+            bindings.insert("e".to_string(), VariableValue::Integer(reduction.0));
             format!(
                 "this card costs {{energy(e)}} less for each {}.",
                 effect_serializer::serialize_for_count_expression(quantity, bindings)
             )
         }
         StandardStaticAbility::SparkBonusYourCharacters { matching, added_spark } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("s") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(added_spark.0));
-            }
+            bindings.insert("s".to_string(), VariableValue::Integer(added_spark.0));
             let predicate_text = match matching {
                 ability_data::predicate::CardPredicate::Character => "allies".to_string(),
                 ability_data::predicate::CardPredicate::CharacterType(_) => {
@@ -223,9 +197,7 @@ pub fn serialize_standard_static_ability(
         }
         StandardStaticAbility::PlayFromVoid(play_from_void) => {
             if let Some(energy_cost) = play_from_void.energy_cost {
-                if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                    bindings.insert(var_name.to_string(), VariableValue::Integer(energy_cost.0));
-                }
+                bindings.insert("e".to_string(), VariableValue::Integer(energy_cost.0));
             }
             let mut result = String::new();
             if let Some(cost) = &play_from_void.additional_cost {

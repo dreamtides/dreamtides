@@ -4,7 +4,6 @@ use ability_data::variable_value::VariableValue;
 
 use crate::serializer::predicate_serializer;
 use crate::variables::parser_bindings::VariableBindings;
-use crate::variables::parser_substitutions;
 
 pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
     match cost {
@@ -19,58 +18,38 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
                 format!("abandon {}", predicate_serializer::serialize_predicate(target, bindings))
             }
             CollectionExpression::Exactly(n) => {
-                if let Some(var_name) =
-                    parser_substitutions::directive_to_integer_variable("count_allies")
-                {
-                    bindings.insert(var_name.to_string(), VariableValue::Integer(*n));
-                }
+                bindings.insert("a".to_string(), VariableValue::Integer(*n));
                 "abandon {count_allies(a)}".to_string()
             }
             _ => "abandon {count_allies(a)}".to_string(),
         },
         Cost::DiscardCards { count, .. } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("discards")
-            {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
-            }
+            bindings.insert("d".to_string(), VariableValue::Integer(*count));
             "discard {cards(d)}".to_string()
         }
         Cost::DiscardHand => "discard your hand".to_string(),
         Cost::Energy(energy) => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(energy.0));
-            }
+            bindings.insert("e".to_string(), VariableValue::Integer(energy.0));
             "{energy(e)}".to_string()
         }
         Cost::LoseMaximumEnergy(amount) => {
-            if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("maximum_energy")
-            {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(*amount));
-            }
+            bindings.insert("m".to_string(), VariableValue::Integer(*amount));
             "lose {maximum_energy(m)}".to_string()
         }
         Cost::BanishCardsFromYourVoid(count) => {
             if *count == 1 {
                 "{Banish} another card in your void".to_string()
             } else {
-                if let Some(var_name) = parser_substitutions::directive_to_integer_variable("cards")
-                {
-                    bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
-                }
+                bindings.insert("c".to_string(), VariableValue::Integer(*count));
                 "{Banish} {cards(c)} from your void".to_string()
             }
         }
         Cost::BanishCardsFromEnemyVoid(count) => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("cards") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
-            }
+            bindings.insert("c".to_string(), VariableValue::Integer(*count));
             "{Banish} {cards(c)} from the opponent's void".to_string()
         }
         Cost::BanishAllCardsFromYourVoidWithMinCount(min_count) => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("count") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(*min_count));
-            }
+            bindings.insert("n".to_string(), VariableValue::Integer(*min_count));
             "{Banish} your void with {count(n)} or more cards".to_string()
         }
         Cost::BanishFromHand(predicate) => {

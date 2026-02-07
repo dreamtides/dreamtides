@@ -4,7 +4,6 @@ use text_formatting::FormattedText;
 
 use crate::serializer::{serializer_utils, text_formatting};
 use crate::variables::parser_bindings::VariableBindings;
-use crate::variables::parser_substitutions;
 
 pub fn serialize_predicate(predicate: &Predicate, bindings: &mut VariableBindings) -> String {
     match predicate {
@@ -175,9 +174,7 @@ pub fn serialize_card_predicate(
             format!("a {{fast}} {}", serialize_fast_target(target, bindings))
         }
         CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(cost.0));
-            }
+            bindings.insert("e".to_string(), VariableValue::Integer(cost.0));
             format!(
                 "{} with cost {{energy(e)}}{}",
                 serialize_card_predicate(target, bindings),
@@ -260,9 +257,7 @@ pub fn serialize_card_predicate_without_article(
             "{subtype(t)}".to_string()
         }
         CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(cost.0));
-            }
+            bindings.insert("e".to_string(), VariableValue::Integer(cost.0));
             format!(
                 "{} with cost {{energy(e)}}{}",
                 serialize_card_predicate_without_article(target, bindings),
@@ -290,9 +285,7 @@ pub fn serialize_cost_constraint_only(
 ) -> String {
     match card_predicate {
         CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(cost.0));
-            }
+            bindings.insert("e".to_string(), VariableValue::Integer(cost.0));
             // If target is a generic type, skip it
             if is_generic_card_type(target) {
                 format!(
@@ -366,9 +359,7 @@ pub fn serialize_card_predicate_plural(
             format!("fast {}", serialize_card_predicate_plural(target, bindings))
         }
         CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(cost.0));
-            }
+            bindings.insert("e".to_string(), VariableValue::Integer(cost.0));
             format!(
                 "{} with cost {{energy(e)}}{}",
                 serialize_card_predicate_plural(target, bindings),
@@ -445,9 +436,7 @@ pub fn serialize_fast_target(
             )
         }
         CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(cost.0));
-            }
+            bindings.insert("e".to_string(), VariableValue::Integer(cost.0));
             format!(
                 "{} with cost {{energy(e)}}{}",
                 serialize_fast_target(target, bindings),
@@ -569,9 +558,7 @@ fn your_predicate_formatted(
             FormattedText::new(&format!("{{fast}} {}", serialize_fast_target(target, bindings)))
         }
         CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(cost.0));
-            }
+            bindings.insert("e".to_string(), VariableValue::Integer(cost.0));
             FormattedText::new(&format!(
                 "{} with cost {{energy(e)}}{}",
                 serialize_your_predicate(target, bindings),
@@ -651,9 +638,7 @@ fn enemy_predicate_formatted(
             FormattedText::new("enemy with an activated ability")
         }
         CardPredicate::CardWithCost { cost_operator, cost, .. } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(cost.0));
-            }
+            bindings.insert("e".to_string(), VariableValue::Integer(cost.0));
             FormattedText::new(&format!(
                 "enemy with cost {{energy(e)}}{}",
                 serializer_utils::serialize_operator(cost_operator)
@@ -737,9 +722,7 @@ fn serialize_your_predicate_plural(
             "allies with activated abilities".to_string()
         }
         CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(cost.0));
-            }
+            bindings.insert("e".to_string(), VariableValue::Integer(cost.0));
             format!(
                 "{} with cost {{energy(e)}}{}",
                 serialize_your_predicate_plural(target, bindings),
