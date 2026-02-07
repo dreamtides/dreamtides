@@ -1403,7 +1403,7 @@ variables = ""
 name = "Eternal Sentry"
 id = "511e8751-95d0-4d09-9f60-48fa53f14a13"
 energy-cost = 4
-rules-text = "When you draw {cards_numeral(c)} in a turn, while this card is in your void, it gains {reclaim_for_cost(r)} this turn."
+rules-text = "When you draw {cards_numeral(c)} in a turn, if this card is in your void, it gains {reclaim_for_cost(r)} this turn."
 variables = """
 c: 2
 r: 1"""
@@ -3016,7 +3016,7 @@ variables = ""
 name = "Soulkindler"
 id = "7d20f2bb-50b5-418a-a435-da13a13ad257"
 energy-cost = 2
-rules-text = "While this card is in your void, allied {@plural subtype(t)} have +{s} spark."
+rules-text = "If this card is in your void, allied {@plural subtype(t)} have +{s} spark."
 variables = """
 t: survivor
 s: 2"""

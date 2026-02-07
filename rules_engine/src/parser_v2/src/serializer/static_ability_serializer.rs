@@ -26,9 +26,9 @@ pub fn serialize_static_ability(
             if let Some(condition) = &ability.condition {
                 if matches!(condition, Condition::ThisCardIsInYourVoid) {
                     if base.ends_with('.') {
-                        format!("while this card is in your void, {}", base)
+                        format!("if this card is in your void, {}", base)
                     } else {
-                        format!("while this card is in your void, {}.", base)
+                        format!("if this card is in your void, {}.", base)
                     }
                 } else if matches!(condition, Condition::CardsInVoidCount { .. })
                     || matches!(condition, Condition::PredicateCount { count: 1, .. })

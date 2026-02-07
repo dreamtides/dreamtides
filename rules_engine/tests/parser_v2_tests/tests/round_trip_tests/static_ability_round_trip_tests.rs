@@ -83,7 +83,7 @@ fn test_void_cards_have_reclaim_equal_cost() {
 #[test]
 fn test_subtype_in_void_allies_have_spark() {
     assert_round_trip(
-        "While this card is in your void, allied {@plural subtype(t)} have +{s} spark.",
+        "If this card is in your void, allied {@plural subtype(t)} have +{s} spark.",
         "t: survivor\ns: 2",
     );
 }

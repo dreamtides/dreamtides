@@ -969,7 +969,7 @@ fn test_has_all_character_types_and_judgment_with_allies() {
 #[test]
 fn test_when_you_draw_cards_in_turn_while_in_void_gains_reclaim() {
     let result = parse_ability(
-        "When you draw {cards_numeral} in a turn, while this card is in your void, it gains {reclaim_for_cost} this turn.",
+        "When you draw {cards_numeral} in a turn, if this card is in your void, it gains {reclaim_for_cost} this turn.",
         "c: 3, r: 2",
     );
     assert_ron_snapshot!(result, @r###"
