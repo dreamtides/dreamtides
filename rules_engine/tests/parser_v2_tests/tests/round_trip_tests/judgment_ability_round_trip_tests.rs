@@ -67,6 +67,14 @@ fn test_judgment_pay_to_kindle_and_banish_opponent_void() {
 }
 
 #[test]
+fn test_judgment_may_pay_to_kindle_and_banish_opponent_void() {
+    assert_round_trip(
+        "{Judgment} You may pay {energy(e)} to {kindle(k)} and {banish} {cards(c)} from the opponent's void.",
+        "e: 1\nk: 1\nc: 1",
+    );
+}
+
+#[test]
 fn test_judgment_gain_points() {
     assert_round_trip("{Judgment} Gain {points(p)}.", "p: 1");
 }

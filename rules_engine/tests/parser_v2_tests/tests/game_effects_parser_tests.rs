@@ -710,6 +710,38 @@ fn test_judgment_pay_energy_to_kindle_and_banish_cards_from_opponent_void() {
 }
 
 #[test]
+fn test_judgment_you_may_pay_energy_to_kindle_and_banish_cards_from_opponent_void() {
+    let result = parse_ability(
+        "{Judgment} You may pay {e} to {kindle} and {banish} {cards} from the opponent's void.",
+        "e: 1, k: 1, c: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: ListWithOptions(ListWithOptions(
+        effects: [
+          EffectWithOptions(
+            effect: Kindle(
+              amount: Spark(1),
+            ),
+            optional: true,
+          ),
+          EffectWithOptions(
+            effect: BanishCardsFromEnemyVoid(
+              count: 2,
+            ),
+            optional: true,
+          ),
+        ],
+        trigger_cost: Some(Energy(Energy(1))),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_judgment_you_may_banish_cards_from_your_void_to_dissolve_enemy_with_cost() {
     let result = parse_ability(
         "{Judgment} You may {banish} {cards} from your void to {dissolve} an enemy with cost {e} or less.",

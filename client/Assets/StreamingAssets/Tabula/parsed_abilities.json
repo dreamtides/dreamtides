@@ -2633,7 +2633,7 @@
                     "amount": 1
                   }
                 },
-                "optional": false
+                "optional": true
               },
               {
                 "effect": {
@@ -2641,7 +2641,7 @@
                     "count": 1
                   }
                 },
-                "optional": false
+                "optional": true
               }
             ],
             "trigger_cost": {

@@ -845,7 +845,7 @@ card-number = 51
 name = "Spirit Field Reclaimer"
 id = "7d1820ef-80c4-415e-bc36-7d361259225c"
 energy-cost = 2
-rules-text = "{Judgment} Pay {energy(e)} to {kindle(k)} and {banish} {cards(c)} from the opponent's void."
+rules-text = "{Judgment} You may pay {energy(e)} to {kindle(k)} and {banish} {cards(c)} from the opponent's void."
 variables = """
 e: 1
 k: 1
