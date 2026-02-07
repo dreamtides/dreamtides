@@ -13,14 +13,14 @@ fn spans(result: &LexResult) -> Vec<SimpleSpan> {
 
 #[test]
 fn test_card_1_play_cards_numeral() {
-    let input = "When you play {cards-numeral} in a turn, {reclaim} this character.";
+    let input = "When you play {cards_numeral} in a turn, {reclaim} this character.";
     let result = lexer_tokenize::lex(input).expect("lexing should succeed");
 
     assert_eq!(tokens(&result), vec![
         &Token::Word("when".to_string()),
         &Token::Word("you".to_string()),
         &Token::Word("play".to_string()),
-        &Token::Directive("cards-numeral".to_string()),
+        &Token::Directive("cards_numeral".to_string()),
         &Token::Word("in".to_string()),
         &Token::Word("a".to_string()),
         &Token::Word("turn".to_string()),
@@ -181,12 +181,12 @@ fn test_card_8_when_discard_kindle() {
 
 #[test]
 fn test_card_9_materialize_figments() {
-    let input = "{Materialize} {n-figments}.";
+    let input = "{Materialize} {n_figments}.";
     let result = lexer_tokenize::lex(input).expect("lexing should succeed");
 
     assert_eq!(tokens(&result), vec![
         &Token::Directive("materialize".to_string()),
-        &Token::Directive("n-figments".to_string()),
+        &Token::Directive("n_figments".to_string()),
         &Token::Period,
     ]);
 }

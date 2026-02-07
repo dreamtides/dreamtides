@@ -76,7 +76,7 @@ pub fn gain_energy<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, Par
 pub fn gain_energy_equal_to_abandoned_cost<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     word("gain")
-        .ignore_then(directive("energy-symbol"))
+        .ignore_then(directive("energy_symbol"))
         .then_ignore(words(&["equal", "to", "that", "character's", "cost"]))
         .to(StandardEffect::GainEnergyEqualToCost { target: Predicate::It })
 }

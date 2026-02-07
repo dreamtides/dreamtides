@@ -10,7 +10,7 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
     match condition {
         Condition::AlliesThatShareACharacterType { count } => {
             if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("count-allies")
+                parser_substitutions::directive_to_integer_variable("count_allies")
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
@@ -66,7 +66,7 @@ fn serialize_predicate_count(
         }
         Predicate::Another(CardPredicate::Character) => {
             if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("count-allies")
+                parser_substitutions::directive_to_integer_variable("count_allies")
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(count));
             }

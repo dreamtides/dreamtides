@@ -256,7 +256,7 @@ pub fn serialize_standard_effect(
         }
         StandardEffect::PutCardsFromYourDeckIntoVoid { count } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable(
-                "top-n-cards",
+                "top_n_cards",
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
@@ -418,12 +418,12 @@ pub fn serialize_standard_effect(
                 }
                 CollectionExpression::UpTo(n) => {
                     if let Some(var_name) =
-                        parser_substitutions::directive_to_integer_variable("up-to-n-allies")
+                        parser_substitutions::directive_to_integer_variable("up_to_n_allies")
                     {
                         bindings.insert(var_name.to_string(), VariableValue::Integer(*n));
                     }
                     if let Some(var_name) =
-                        parser_substitutions::directive_to_integer_variable("it-or-them")
+                        parser_substitutions::directive_to_integer_variable("it_or_them")
                     {
                         bindings.insert(var_name.to_string(), VariableValue::Integer(*n));
                     }
@@ -587,7 +587,7 @@ pub fn serialize_standard_effect(
         }
         StandardEffect::ReturnUpToCountFromYourVoidToHand { count, .. } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable(
-                "up-to-n-events",
+                "up_to_n_events",
             ) {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
@@ -670,7 +670,7 @@ pub fn serialize_standard_effect(
         }
         StandardEffect::MaterializeRandomFromDeck { count, predicate } => {
             if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("n-random-characters")
+                parser_substitutions::directive_to_integer_variable("n_random_characters")
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
@@ -681,7 +681,7 @@ pub fn serialize_standard_effect(
         }
         StandardEffect::MultiplyYourEnergy { multiplier } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable(
-                "multiplyby",
+                "multiply_by",
             ) {
                 bindings
                     .insert(var_name.to_string(), VariableValue::Integer(*multiplier));
@@ -691,7 +691,7 @@ pub fn serialize_standard_effect(
         StandardEffect::CopyNextPlayed { matching, times } => {
             if let Some(count) = times {
                 if let Some(var_name) = parser_substitutions::directive_to_integer_variable(
-                    "this-turn-times",
+                    "this_turn_times",
                 ) {
                     bindings
                         .insert(var_name.to_string(), VariableValue::Integer(*count));
@@ -1082,9 +1082,9 @@ pub fn serialize_effect_with_context(
                 result.push('\n');
                 result.push_str("{bullet} ");
                 let (cost_var, cost_directive) = if index == 0 {
-                    ("{energy(mode1_cost)}", "mode1-cost")
+                    ("{energy(mode1_cost)}", "mode1_cost")
                 } else {
-                    ("{energy(mode2_cost)}", "mode2-cost")
+                    ("{energy(mode2_cost)}", "mode2_cost")
                 };
                 if let Some(var_name) =
                     parser_substitutions::directive_to_integer_variable(cost_directive)
@@ -1223,7 +1223,7 @@ fn serialize_gains_reclaim(
     let this_turn_suffix = if this_turn { " this turn" } else { "" };
     let (reclaim_directive, reclaim_suffix) = if let Some(energy_cost) = cost {
         if let Some(var_name) =
-            parser_substitutions::directive_to_integer_variable("reclaim-for-cost")
+            parser_substitutions::directive_to_integer_variable("reclaim_for_cost")
         {
             bindings.insert(var_name.to_string(), VariableValue::Integer(energy_cost.0));
         }
@@ -1261,7 +1261,7 @@ fn serialize_void_gains_reclaim(
 ) -> String {
     let (reclaim_directive, reclaim_suffix) = if let Some(energy_cost) = cost {
         if let Some(var_name) =
-            parser_substitutions::directive_to_integer_variable("reclaim-for-cost")
+            parser_substitutions::directive_to_integer_variable("reclaim_for_cost")
         {
             bindings.insert(var_name.to_string(), VariableValue::Integer(energy_cost.0));
         }

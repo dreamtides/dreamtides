@@ -1858,7 +1858,7 @@ rules-text = """
 Put the {top_n_cards(to_void)} of your deck into your void. Draw {cards(cards)}.
 """
 variables = """
-to-void: 3
+to_void: 3
 cards: 1"""
 card-type = "Event"
 is-fast = false
@@ -2882,7 +2882,7 @@ name = "Ashborn Necromancer"
 id = "5511b4b5-a7e3-48df-978d-c09673b39f42"
 energy-cost = 4
 rules-text = "Abandon an ally: Put the {top_n_cards(to_void)} of your deck into your void."
-variables = "to-void: 2"
+variables = "to_void: 2"
 card-type = "Character"
 subtype = "Outsider"
 is-fast = false
@@ -3086,7 +3086,7 @@ energy-cost = 2
 rules-text = """
 {MaterializedDissolved} Put the {top_n_cards(to_void)} of your deck into your void.
 """
-variables = "to-void: 4"
+variables = "to_void: 4"
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -3133,7 +3133,7 @@ energy-cost = 2
 rules-text = "When you play {@a subtype(subtype)}, put the {top_n_cards(to_void)} of your deck into your void."
 variables = """
 subtype: survivor
-to-void: 2"""
+to_void: 2"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -3544,8 +3544,8 @@ rules-text = """
 {bullet} {energy(mode1_cost)}: Return an enemy to hand.
 {bullet} {energy(mode2_cost)}: Draw {cards(cards)}."""
 variables = """
-mode1-cost: 2
-mode2-cost: 3
+mode1_cost: 2
+mode2_cost: 3
 cards: 2"""
 card-type = "Event"
 is-fast = true

@@ -314,13 +314,7 @@ fn can_select_order_action(legal_actions: &LegalActions, card_id: CardId) -> Opt
 fn card_type(battle: &BattleState, card_id: CardId) -> String {
     let definition = card::get_definition(battle, card_id);
     let result = if let Some(subtype) = definition.card_subtype {
-        strings::register_source_phrases();
-        let phrase = rlf::with_locale(|locale| {
-            locale
-                .get_phrase(rlf_helper::subtype_phrase_name(subtype))
-                .expect("subtype phrase should exist")
-        });
-        strings::subtype(phrase).to_string()
+        strings::subtype(rlf_helper::subtype_phrase(subtype)).to_string()
     } else {
         match definition.card_type {
             CardType::Character => strings::card_type_character(),

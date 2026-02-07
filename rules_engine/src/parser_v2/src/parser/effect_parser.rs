@@ -34,7 +34,7 @@ pub fn effect_or_compound_parser<'a>(
 }
 
 fn modal_effect_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone {
-    directive("chooseone")
+    directive("choose_one")
         .ignore_then(newline())
         .ignore_then(
             directive("bullet")

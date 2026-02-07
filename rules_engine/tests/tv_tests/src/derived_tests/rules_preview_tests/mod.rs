@@ -1,5 +1,5 @@
 mod end_to_end_tests;
-mod fluent_tests;
+mod rlf_tests;
 
 use std::collections::HashMap;
 

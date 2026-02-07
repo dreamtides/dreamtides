@@ -19,7 +19,7 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, QuantityExpression, Pars
         .or(card_predicate_parser::parser()
             .then_ignore(words(&["which", "dissolved", "this", "turn"]))
             .map(QuantityExpression::DissolvedThisTurn))
-        .or(directive("energy-symbol")
+        .or(directive("energy_symbol")
             .then_ignore(word("spent"))
             .to(QuantityExpression::ForEachEnergySpentOnThisCard))
         .or(words(&["ally", "abandoned", "this", "turn"])

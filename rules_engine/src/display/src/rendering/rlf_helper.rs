@@ -4,7 +4,7 @@ use ability_data::variable_value::VariableValue;
 use core_data::card_types::CardSubtype;
 use core_data::figment_type::FigmentType;
 use parser_v2::variables::parser_bindings::VariableBindings;
-use rlf::Value;
+use rlf::{Phrase, Value};
 use strings::strings;
 
 /// Evaluates a template string with RLF variable bindings.
@@ -19,33 +19,33 @@ pub fn eval_str(template: &str, bindings: &VariableBindings) -> String {
     })
 }
 
-/// Returns the RLF phrase name for a [CardSubtype].
-pub fn subtype_phrase_name(subtype: CardSubtype) -> &'static str {
+/// Returns the RLF phrase for a [CardSubtype].
+pub fn subtype_phrase(subtype: CardSubtype) -> Phrase {
     match subtype {
-        CardSubtype::Agent => "agent",
-        CardSubtype::Ancient => "ancient",
-        CardSubtype::Avatar => "avatar",
-        CardSubtype::Child => "child",
-        CardSubtype::Detective => "detective",
-        CardSubtype::Enigma => "enigma",
-        CardSubtype::Explorer => "explorer",
-        CardSubtype::Guide => "guide",
-        CardSubtype::Hacker => "hacker",
-        CardSubtype::Mage => "mage",
-        CardSubtype::Monster => "monster",
-        CardSubtype::Musician => "musician",
-        CardSubtype::Outsider => "outsider",
-        CardSubtype::Renegade => "renegade",
-        CardSubtype::Robot => "robot",
-        CardSubtype::SpiritAnimal => "spirit_animal",
-        CardSubtype::Super => "super_",
-        CardSubtype::Survivor => "survivor",
-        CardSubtype::Synth => "synth",
-        CardSubtype::Tinkerer => "tinkerer",
-        CardSubtype::Trooper => "trooper",
-        CardSubtype::Visionary => "visionary",
-        CardSubtype::Visitor => "visitor",
-        CardSubtype::Warrior => "warrior",
+        CardSubtype::Agent => strings::agent(),
+        CardSubtype::Ancient => strings::ancient(),
+        CardSubtype::Avatar => strings::avatar(),
+        CardSubtype::Child => strings::child(),
+        CardSubtype::Detective => strings::detective(),
+        CardSubtype::Enigma => strings::enigma(),
+        CardSubtype::Explorer => strings::explorer(),
+        CardSubtype::Guide => strings::guide(),
+        CardSubtype::Hacker => strings::hacker(),
+        CardSubtype::Mage => strings::mage(),
+        CardSubtype::Monster => strings::monster(),
+        CardSubtype::Musician => strings::musician(),
+        CardSubtype::Outsider => strings::outsider(),
+        CardSubtype::Renegade => strings::renegade(),
+        CardSubtype::Robot => strings::robot(),
+        CardSubtype::SpiritAnimal => strings::spirit_animal(),
+        CardSubtype::Super => strings::super_(),
+        CardSubtype::Survivor => strings::survivor(),
+        CardSubtype::Synth => strings::synth(),
+        CardSubtype::Tinkerer => strings::tinkerer(),
+        CardSubtype::Trooper => strings::trooper(),
+        CardSubtype::Visionary => strings::visionary(),
+        CardSubtype::Visitor => strings::visitor(),
+        CardSubtype::Warrior => strings::warrior(),
     }
 }
 
@@ -55,32 +55,20 @@ fn build_params(bindings: &VariableBindings) -> HashMap<String, Value> {
     for (name, value) in bindings.iter() {
         let rlf_value = match value {
             VariableValue::Integer(n) => Value::Number(*n as i64),
-            VariableValue::Subtype(subtype) => rlf::with_locale(|locale| {
-                Value::Phrase(
-                    locale
-                        .get_phrase(subtype_phrase_name(*subtype))
-                        .expect("subtype phrase should exist"),
-                )
-            }),
-            VariableValue::Figment(figment) => rlf::with_locale(|locale| {
-                Value::Phrase(
-                    locale
-                        .get_phrase(figment_phrase_name(*figment))
-                        .expect("figment phrase should exist"),
-                )
-            }),
+            VariableValue::Subtype(subtype) => Value::Phrase(subtype_phrase(*subtype)),
+            VariableValue::Figment(figment) => Value::Phrase(figment_phrase(*figment)),
         };
-        params.insert(name.replace('-', "_"), rlf_value);
+        params.insert(name.clone(), rlf_value);
     }
     params
 }
 
-/// Returns the RLF phrase name for a [FigmentType].
-fn figment_phrase_name(figment: FigmentType) -> &'static str {
+/// Returns the RLF phrase for a [FigmentType].
+fn figment_phrase(figment: FigmentType) -> Phrase {
     match figment {
-        FigmentType::Celestial => "celestial",
-        FigmentType::Halcyon => "halcyon",
-        FigmentType::Radiant => "radiant",
-        FigmentType::Shadow => "shadow",
+        FigmentType::Celestial => strings::celestial(),
+        FigmentType::Halcyon => strings::halcyon(),
+        FigmentType::Radiant => strings::radiant(),
+        FigmentType::Shadow => strings::shadow(),
     }
 }

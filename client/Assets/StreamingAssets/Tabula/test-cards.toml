@@ -54,7 +54,7 @@ spark = ""
 name = "Test Variable Energy Draw"
 id = "e06a8cfe-483f-42c0-aac8-9c12b21b3f99"
 energy-cost = 2
-rules-text = "Pay 1 or more {energy-symbol}: Draw {cards(cards)} for each {energy-symbol} spent."
+rules-text = "Pay 1 or more {energy_symbol}: Draw {cards(cards)} for each {energy_symbol} spent."
 variables = "cards: 1"
 prompts = "Pay one or more energy: Draw cards for each energy spent."
 card-type = "Event"
@@ -109,12 +109,12 @@ name = "Test Modal Return To Hand Or Draw Two"
 id = "e8f937da-cca7-447d-a559-530d7c339325"
 energy-cost = "*"
 rules-text = """
-{ChooseOne}
+{choose_one}
 {bullet} {energy(mode1_cost)}: Return an enemy character to hand.
 {bullet} {energy(mode2_cost)}: Draw {cards(cards)}."""
 variables = """
-mode1-cost: 2
-mode2-cost: 3
+mode1_cost: 2
+mode2_cost: 3
 cards: 2"""
 prompts = "Choose an enemy character to return to hand."
 card-type = "Event"
@@ -393,13 +393,13 @@ name = "Test Modal Draw One Or Draw Two"
 id = "029889e9-25bc-438f-a492-8813febd65d8"
 energy-cost = "*"
 rules-text = """
-{ChooseOne}
+{choose_one}
 {bullet} {energy(mode1_cost)}: Draw {cards(cards1)}.
 {bullet} {energy(mode2_cost)}: Draw {cards(cards2)}."""
 variables = """
-mode1-cost: 1
+mode1_cost: 1
 cards1: 1
-mode2-cost: 3
+mode2_cost: 3
 cards2: 2"""
 card-type = "Event"
 is-fast = false
@@ -413,13 +413,13 @@ name = "Test Modal Draw One Or Dissolve Enemy"
 id = "9847b3fc-1e7f-44e5-90af-1240ae12aaee"
 energy-cost = "*"
 rules-text = """
-{ChooseOne}
+{choose_one}
 {bullet} {energy(mode1_cost)}: Draw {cards(cards)}.
 {bullet} {energy(mode2_cost)}: {Dissolve} an enemy character."""
 variables = """
-mode1-cost: 1
+mode1_cost: 1
 cards: 1
-mode2-cost: 2"""
+mode2_cost: 2"""
 prompts = "Choose an enemy character to {dissolve}."
 card-type = "Event"
 is-fast = true
@@ -471,7 +471,7 @@ name = "Test Deck To Void"
 id = "a7340f26-b759-458c-b8cb-b6fcc36fe412"
 energy-cost = 2
 rules-text = "Put the {top_n_cards(to_void)} of your deck into your void."
-variables = "to-void: 3"
+variables = "to_void: 3"
 card-type = "Event"
 is-fast = false
 image-number = 1200949264

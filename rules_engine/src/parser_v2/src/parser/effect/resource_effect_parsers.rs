@@ -34,7 +34,7 @@ pub fn multiply_energy_gain_from_card_effects<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     number()
         .then_ignore(words(&["the", "amount", "of"]))
-        .then_ignore(directive("energy-symbol"))
+        .then_ignore(directive("energy_symbol"))
         .then_ignore(words(&["you", "gain", "from", "card", "effects", "this", "turn"]))
         .map(|multiplier| StandardEffect::CreateStaticAbilityUntilEndOfTurn {
             ability: Box::new(StandardStaticAbility::MultiplyEnergyGainFromCardEffects {
@@ -61,7 +61,7 @@ pub fn multiply_your_energy<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     number()
         .then_ignore(words(&["the", "amount", "of"]))
-        .then_ignore(directive("energy-symbol"))
+        .then_ignore(directive("energy_symbol"))
         .then_ignore(words(&["you", "have"]))
         .map(|multiplier| StandardEffect::MultiplyYourEnergy { multiplier })
 }

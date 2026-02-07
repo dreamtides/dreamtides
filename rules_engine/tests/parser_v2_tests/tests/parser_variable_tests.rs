@@ -143,13 +143,13 @@ fn test_resolve_word_token() {
 
 #[test]
 fn test_resolve_compound_n_figments() {
-    let tokens = vec![(Token::Directive("n-figments".to_string()), SimpleSpan::new((), 0..12))];
+    let tokens = vec![(Token::Directive("n_figments".to_string()), SimpleSpan::new((), 0..12))];
     let bindings = VariableBindings::parse("number: 3, figment: radiant").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
     assert_eq!(resolved[0].0, ResolvedToken::FigmentCount {
-        directive: "n-figments".to_string(),
+        directive: "n_figments".to_string(),
         count: 3,
         figment_type: FigmentType::Radiant
     });
@@ -157,20 +157,20 @@ fn test_resolve_compound_n_figments() {
 
 #[test]
 fn test_resolve_compound_a_figment() {
-    let tokens = vec![(Token::Directive("a-figment".to_string()), SimpleSpan::new((), 0..11))];
+    let tokens = vec![(Token::Directive("a_figment".to_string()), SimpleSpan::new((), 0..11))];
     let bindings = VariableBindings::parse("figment: shadow").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
     assert_eq!(resolved[0].0, ResolvedToken::Figment {
-        directive: "a-figment".to_string(),
+        directive: "a_figment".to_string(),
         figment_type: FigmentType::Shadow
     });
 }
 
 #[test]
 fn test_resolve_compound_missing_number() {
-    let tokens = vec![(Token::Directive("n-figments".to_string()), SimpleSpan::new((), 0..12))];
+    let tokens = vec![(Token::Directive("n_figments".to_string()), SimpleSpan::new((), 0..12))];
     let bindings = VariableBindings::parse("figment: radiant").unwrap();
 
     let result = resolve_variables(&tokens, &bindings);
@@ -181,7 +181,7 @@ fn test_resolve_compound_missing_number() {
 
 #[test]
 fn test_resolve_compound_missing_figment() {
-    let tokens = vec![(Token::Directive("a-figment".to_string()), SimpleSpan::new((), 0..11))];
+    let tokens = vec![(Token::Directive("a_figment".to_string()), SimpleSpan::new((), 0..11))];
     let bindings = VariableBindings::new();
 
     let result = resolve_variables(&tokens, &bindings);
@@ -223,14 +223,14 @@ fn test_representative_card_1() {
         (Token::Word("when".to_string()), SimpleSpan::new((), 0..4)),
         (Token::Word("you".to_string()), SimpleSpan::new((), 5..8)),
         (Token::Word("play".to_string()), SimpleSpan::new((), 9..13)),
-        (Token::Directive("cards-numeral".to_string()), SimpleSpan::new((), 14..29)),
+        (Token::Directive("cards_numeral".to_string()), SimpleSpan::new((), 14..29)),
     ];
     let bindings = VariableBindings::parse("cards: 2").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 4);
     assert_eq!(resolved[3].0, ResolvedToken::Integer {
-        directive: "cards-numeral".to_string(),
+        directive: "cards_numeral".to_string(),
         value: 2
     });
 }
@@ -277,7 +277,7 @@ fn test_representative_card_7() {
 fn test_representative_card_9() {
     let tokens = vec![
         (Token::Directive("Materialize".to_string()), SimpleSpan::new((), 0..13)),
-        (Token::Directive("n-figments".to_string()), SimpleSpan::new((), 14..26)),
+        (Token::Directive("n_figments".to_string()), SimpleSpan::new((), 14..26)),
         (Token::Period, SimpleSpan::new((), 26..27)),
     ];
     let bindings = VariableBindings::parse("number: 3, figment: radiant").unwrap();
@@ -286,7 +286,7 @@ fn test_representative_card_9() {
     assert_eq!(resolved.len(), 3);
     assert_eq!(resolved[0].0, ResolvedToken::Token(Token::Directive("Materialize".to_string())));
     assert_eq!(resolved[1].0, ResolvedToken::FigmentCount {
-        directive: "n-figments".to_string(),
+        directive: "n_figments".to_string(),
         count: 3,
         figment_type: FigmentType::Radiant
     });
@@ -343,7 +343,7 @@ fn test_variables_in_cards_toml_match_directives() {
     let cards_toml =
         std::fs::read_to_string("../../tabula/cards.toml").expect("Failed to read cards.toml");
 
-    let variable_regex = Regex::new(r"([a-zA-Z][a-zA-Z0-9-]*)\s*:\s*").unwrap();
+    let variable_regex = Regex::new(r"([a-zA-Z][a-zA-Z0-9_]*)\s*:\s*").unwrap();
     let mut toml_variables: HashSet<String> = HashSet::new();
     let mut in_variables_block = false;
 

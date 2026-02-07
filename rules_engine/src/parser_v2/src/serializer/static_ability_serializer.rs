@@ -139,7 +139,7 @@ pub fn serialize_standard_static_ability(
         StandardStaticAbility::HasAllCharacterTypes => "has all character types.".to_string(),
         StandardStaticAbility::MultiplyEnergyGainFromCardEffects { multiplier } => {
             if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("multiplyby")
+                parser_substitutions::directive_to_integer_variable("multiply_by")
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*multiplier));
             }
@@ -148,7 +148,7 @@ pub fn serialize_standard_static_ability(
         }
         StandardStaticAbility::MultiplyCardDrawFromCardEffects { multiplier } => {
             if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("multiplyby")
+                parser_substitutions::directive_to_integer_variable("multiply_by")
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*multiplier));
             }

@@ -299,7 +299,7 @@ pub fn trigger_additional_judgment_phase<'a>(
     words(&["at", "the", "end", "of", "this", "turn"])
         .ignore_then(comma())
         .ignore_then(words(&["trigger", "an", "additional"]))
-        .ignore_then(directive("judgmentphasename"))
+        .ignore_then(directive("judgment_phase_name"))
         .ignore_then(word("phase"))
         .to(StandardEffect::TriggerAdditionalJudgmentPhaseAtEndOfTurn)
 }

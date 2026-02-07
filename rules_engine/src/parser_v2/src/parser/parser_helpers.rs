@@ -60,17 +60,17 @@ pub fn cards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + C
     }
 }
 
-/// Parses the {cards-numeral} directive value.
+/// Parses the {cards_numeral} directive value.
 pub fn cards_numeral<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "cards-numeral" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive == "cards_numeral" => value
     }
 }
 
-/// Parses the {top-n-cards} directive value.
+/// Parses the {top_n_cards} directive value.
 pub fn top_n_cards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "top-n-cards" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive == "top_n_cards" => value
     }
 }
 
@@ -131,7 +131,7 @@ pub fn kindle_amount<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<
 
 pub fn maximum_energy<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "maximum-energy" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive == "maximum_energy" => value
     }
 }
 
@@ -147,19 +147,19 @@ pub fn count<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + C
 
 pub fn count_allies<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "count-allies" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive == "count_allies" => value
     }
 }
 
 pub fn up_to_n_allies<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "up-to-n-allies" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive == "up_to_n_allies" => value
     }
 }
 
 pub fn it_or_them_count<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "it-or-them" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive == "it_or_them" => value
     }
 }
 
@@ -172,37 +172,37 @@ pub fn count_allied_subtype<'a>(
 
 pub fn up_to_n_events<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "up-to-n-events" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive == "up_to_n_events" => value
     }
 }
 
 pub fn number<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "number" || directive == "n-random-characters" || directive == "multiplyby" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive == "number" || directive == "n_random_characters" || directive == "multiply_by" => value
     }
 }
 
 pub fn reclaim_cost<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "reclaim-for-cost" || directive == "reclaimforcost" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive == "reclaim_for_cost" || directive == "reclaimforcost" => value
     }
 }
 
 pub fn this_turn_times<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "this-turn-times" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive == "this_turn_times" => value
     }
 }
 
 pub fn mode1_cost<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "mode1-cost" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive == "mode1_cost" => value
     }
 }
 
 pub fn mode2_cost<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "mode2-cost" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive == "mode2_cost" => value
     }
 }
 

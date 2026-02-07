@@ -33,7 +33,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         }
         TriggerEvent::PlayCardsInTurn(count) => {
             if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("cards-numeral")
+                parser_substitutions::directive_to_integer_variable("cards_numeral")
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
@@ -91,7 +91,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         }
         TriggerEvent::AbandonCardsInTurn(count) => {
             if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("count-allies")
+                parser_substitutions::directive_to_integer_variable("count_allies")
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
@@ -105,7 +105,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         }
         TriggerEvent::DrawCardsInTurn(count) => {
             if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("cards-numeral")
+                parser_substitutions::directive_to_integer_variable("cards_numeral")
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
@@ -117,7 +117,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         }
         TriggerEvent::MaterializeNthThisTurn(predicate, count) => {
             if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("text-number")
+                parser_substitutions::directive_to_integer_variable("text_number")
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }

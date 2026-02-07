@@ -79,7 +79,7 @@ pub fn with_spark_compared_to_energy_spent_suffix<'a>(
     words(&["with", "spark"])
         .ignore_then(spark_comparison_operator())
         .then_ignore(words(&["the", "amount", "of"]))
-        .then_ignore(directive("energy-symbol"))
+        .then_ignore(directive("energy_symbol"))
         .then_ignore(word("paid"))
 }
 

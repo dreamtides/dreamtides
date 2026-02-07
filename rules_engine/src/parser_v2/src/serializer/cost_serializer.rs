@@ -20,7 +20,7 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
             }
             CollectionExpression::Exactly(n) => {
                 if let Some(var_name) =
-                    parser_substitutions::directive_to_integer_variable("count-allies")
+                    parser_substitutions::directive_to_integer_variable("count_allies")
                 {
                     bindings.insert(var_name.to_string(), VariableValue::Integer(*n));
                 }
@@ -44,7 +44,7 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
         }
         Cost::LoseMaximumEnergy(amount) => {
             if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("maximum-energy")
+                parser_substitutions::directive_to_integer_variable("maximum_energy")
             {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*amount));
             }
