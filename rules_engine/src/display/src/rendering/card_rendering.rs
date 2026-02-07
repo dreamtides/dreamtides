@@ -15,7 +15,7 @@ use battle_state::battle_cards::stack_card_state::{
     EffectTargets, StackCardAdditionalCostsPaid, StandardEffectTarget,
 };
 use battle_state::prompt_types::prompt_data::PromptType;
-use core_data::card_types::{CardSubtype, CardType};
+use core_data::card_types::CardType;
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::SpriteAddress;
 use core_data::identifiers::AbilityNumber;
@@ -26,7 +26,6 @@ use display_data::card_view::{
 use masonry::flex_enums::FlexDirection;
 use masonry::flex_style::FlexStyle;
 use parser_v2::serializer::ability_serializer;
-use rlf::Phrase;
 use strings::strings;
 use tabula_data::card_definition::CardDefinition;
 use ui_components::box_component::BoxComponent;
@@ -315,7 +314,13 @@ fn can_select_order_action(legal_actions: &LegalActions, card_id: CardId) -> Opt
 fn card_type(battle: &BattleState, card_id: CardId) -> String {
     let definition = card::get_definition(battle, card_id);
     let result = if let Some(subtype) = definition.card_subtype {
-        strings::subtype(subtype_to_phrase(subtype)).to_string()
+        strings::register_source_phrases();
+        let phrase = rlf::with_locale(|locale| {
+            locale
+                .get_phrase(rlf_helper::subtype_phrase_name(subtype))
+                .expect("subtype phrase should exist")
+        });
+        strings::subtype(phrase).to_string()
     } else {
         match definition.card_type {
             CardType::Character => strings::card_type_character(),
@@ -474,36 +479,6 @@ fn targeting_color(
         display_color::GREEN_500
     } else {
         display_color::RED_500
-    }
-}
-
-/// Returns the RLF [Phrase] for a [CardSubtype].
-fn subtype_to_phrase(subtype: CardSubtype) -> Phrase {
-    match subtype {
-        CardSubtype::Agent => strings::agent(),
-        CardSubtype::Ancient => strings::ancient(),
-        CardSubtype::Avatar => strings::avatar(),
-        CardSubtype::Child => strings::child(),
-        CardSubtype::Detective => strings::detective(),
-        CardSubtype::Enigma => strings::enigma(),
-        CardSubtype::Explorer => strings::explorer(),
-        CardSubtype::Guide => strings::guide(),
-        CardSubtype::Hacker => strings::hacker(),
-        CardSubtype::Mage => strings::mage(),
-        CardSubtype::Monster => strings::monster(),
-        CardSubtype::Musician => strings::musician(),
-        CardSubtype::Outsider => strings::outsider(),
-        CardSubtype::Renegade => strings::renegade(),
-        CardSubtype::Robot => strings::robot(),
-        CardSubtype::SpiritAnimal => strings::spirit_animal(),
-        CardSubtype::Super => strings::super_(),
-        CardSubtype::Survivor => strings::survivor(),
-        CardSubtype::Synth => strings::synth(),
-        CardSubtype::Tinkerer => strings::tinkerer(),
-        CardSubtype::Trooper => strings::trooper(),
-        CardSubtype::Visionary => strings::visionary(),
-        CardSubtype::Visitor => strings::visitor(),
-        CardSubtype::Warrior => strings::warrior(),
     }
 }
 

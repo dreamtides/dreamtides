@@ -19,34 +19,8 @@ pub fn eval_str(template: &str, bindings: &VariableBindings) -> String {
     })
 }
 
-/// Converts [VariableBindings] to RLF parameters.
-fn build_params(bindings: &VariableBindings) -> HashMap<String, Value> {
-    let mut params = HashMap::new();
-    for (name, value) in bindings.iter() {
-        let rlf_value = match value {
-            VariableValue::Integer(n) => Value::Number(*n as i64),
-            VariableValue::Subtype(subtype) => rlf::with_locale(|locale| {
-                Value::Phrase(
-                    locale
-                        .get_phrase(subtype_phrase_name(*subtype))
-                        .expect("subtype phrase should exist"),
-                )
-            }),
-            VariableValue::Figment(figment) => rlf::with_locale(|locale| {
-                Value::Phrase(
-                    locale
-                        .get_phrase(figment_phrase_name(*figment))
-                        .expect("figment phrase should exist"),
-                )
-            }),
-        };
-        params.insert(name.replace('-', "_"), rlf_value);
-    }
-    params
-}
-
 /// Returns the RLF phrase name for a [CardSubtype].
-fn subtype_phrase_name(subtype: CardSubtype) -> &'static str {
+pub fn subtype_phrase_name(subtype: CardSubtype) -> &'static str {
     match subtype {
         CardSubtype::Agent => "agent",
         CardSubtype::Ancient => "ancient",
@@ -73,6 +47,32 @@ fn subtype_phrase_name(subtype: CardSubtype) -> &'static str {
         CardSubtype::Visitor => "visitor",
         CardSubtype::Warrior => "warrior",
     }
+}
+
+/// Converts [VariableBindings] to RLF parameters.
+fn build_params(bindings: &VariableBindings) -> HashMap<String, Value> {
+    let mut params = HashMap::new();
+    for (name, value) in bindings.iter() {
+        let rlf_value = match value {
+            VariableValue::Integer(n) => Value::Number(*n as i64),
+            VariableValue::Subtype(subtype) => rlf::with_locale(|locale| {
+                Value::Phrase(
+                    locale
+                        .get_phrase(subtype_phrase_name(*subtype))
+                        .expect("subtype phrase should exist"),
+                )
+            }),
+            VariableValue::Figment(figment) => rlf::with_locale(|locale| {
+                Value::Phrase(
+                    locale
+                        .get_phrase(figment_phrase_name(*figment))
+                        .expect("figment phrase should exist"),
+                )
+            }),
+        };
+        params.insert(name.replace('-', "_"), rlf_value);
+    }
+    params
 }
 
 /// Returns the RLF phrase name for a [FigmentType].
