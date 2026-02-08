@@ -102,11 +102,16 @@ pub fn assert_valid_span(span: &SimpleSpan) {
     );
 }
 
-/// Asserts that an ability round-trips correctly, including both text and
-/// variable bindings.
+/// Asserts that an ability round-trips correctly, verifying text equality,
+/// variable bindings, and AST structural equality.
 pub fn assert_round_trip(expected_text: &str, vars: &str) {
     let parsed = parse_ability(expected_text, vars);
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(expected_text, serialized.text);
     assert_eq!(VariableBindings::parse(vars).unwrap(), serialized.variables);
+    let reparsed = parse_ability(&serialized.text, vars);
+    assert_eq!(
+        parsed, reparsed,
+        "AST mismatch: parse(input) != parse(serialize(parse(input)))\n  input: {expected_text:?}"
+    );
 }

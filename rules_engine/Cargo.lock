@@ -3875,8 +3875,10 @@ dependencies = [
  "parser_v2",
  "parser_v2_benchmarks",
  "regex",
+ "rlf",
  "serde",
  "stacker",
+ "strings",
  "toml",
 ]
 
@@ -4798,6 +4800,7 @@ dependencies = [
 [[package]]
 name = "rlf"
 version = "0.1.0"
+source = "git+https://github.com/thurn/rlf#3df09cedab1b92616590315c1e936f1b914f93b8"
 dependencies = [
  "bon",
  "const-fnv1a-hash",
@@ -4816,6 +4819,7 @@ dependencies = [
 [[package]]
 name = "rlf-macros"
 version = "0.1.0"
+source = "git+https://github.com/thurn/rlf#3df09cedab1b92616590315c1e936f1b914f93b8"
 dependencies = [
  "proc-macro2",
  "quote",

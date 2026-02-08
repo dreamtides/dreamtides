@@ -44,6 +44,7 @@ struct RoundTripError {
 enum RoundTripErrorType {
     TextMismatch,
     VariableMismatch,
+    AstMismatch,
     ParseError(String),
 }
 
@@ -96,9 +97,6 @@ fn test_all_cards_toml_round_trip() {
                         error_type: RoundTripErrorType::TextMismatch,
                     });
                 } else if !variables_match(&serialized.variables, &resolved.bindings) {
-                    // Check that each serialized variable matches the original binding.
-                    // We don't require exact equality since the card may have variables
-                    // shared across multiple abilities.
                     round_trip_errors.push(RoundTripError {
                         card_name: resolved.card_name.clone(),
                         ability_text: resolved.ability_text.clone(),
@@ -106,6 +104,17 @@ fn test_all_cards_toml_round_trip() {
                         serialized_text: serialized.text,
                         serialized_variables: format!("{:?}", serialized.variables),
                         error_type: RoundTripErrorType::VariableMismatch,
+                    });
+                } else if let Some(reparse_error) =
+                    check_ast_round_trip(&serialized.text, &resolved.resolved_tokens)
+                {
+                    round_trip_errors.push(RoundTripError {
+                        card_name: resolved.card_name.clone(),
+                        ability_text: resolved.ability_text.clone(),
+                        variables: resolved.variables.clone(),
+                        serialized_text: reparse_error,
+                        serialized_variables: format!("{:?}", serialized.variables),
+                        error_type: RoundTripErrorType::AstMismatch,
                     });
                 } else {
                     success_count += 1;
@@ -182,6 +191,51 @@ fn resolve_ability(
     })
 }
 
+/// Checks that reparsing the serialized text produces the same AST.
+///
+/// Returns `None` on success, or `Some(error_description)` on failure.
+fn check_ast_round_trip(
+    serialized_text: &str,
+    original_tokens: &[(parser_substitutions::ResolvedToken, chumsky::span::SimpleSpan)],
+) -> Option<String> {
+    let original_ability = {
+        let parser = ability_parser::ability_parser();
+        match parser.parse(original_tokens).into_result() {
+            Ok(a) => a,
+            Err(_) => return Some("Failed to parse original tokens".to_string()),
+        }
+    };
+
+    let lex_result = match lexer_tokenize::lex(serialized_text) {
+        Ok(r) => r,
+        Err(e) => return Some(format!("Failed to lex serialized text: {e:?}")),
+    };
+
+    let serialized_ability = ability_serializer::serialize_ability(&original_ability);
+    let bindings = serialized_ability.variables;
+
+    let resolved = match parser_substitutions::resolve_variables(&lex_result.tokens, &bindings) {
+        Ok(r) => r,
+        Err(e) => return Some(format!("Failed to resolve variables: {e}")),
+    };
+
+    let reparsed_ability = {
+        let parser = ability_parser::ability_parser();
+        match parser.parse(&resolved).into_result() {
+            Ok(a) => a,
+            Err(e) => return Some(format!("Failed to reparse serialized text: {e:?}")),
+        }
+    };
+
+    if original_ability != reparsed_ability {
+        Some(format!(
+            "AST mismatch:\n  original: {original_ability:?}\n  reparsed: {reparsed_ability:?}"
+        ))
+    } else {
+        None
+    }
+}
+
 /// Checks that all serialized variables match the original bindings.
 ///
 /// Returns true if every variable in `serialized` has the same value in
@@ -237,6 +291,12 @@ fn print_results(
                     println!("\nError: Variable mismatch");
                     println!("\nSerialized Variables:");
                     println!("  {}", error.serialized_variables);
+                }
+                RoundTripErrorType::AstMismatch => {
+                    println!(
+                        "\nError: AST mismatch (parse(input) != parse(serialize(parse(input))))"
+                    );
+                    println!("\n{}", error.serialized_text);
                 }
                 RoundTripErrorType::ParseError(msg) => {
                     println!("\nParse Error: {}", msg);

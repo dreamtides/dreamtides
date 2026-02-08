@@ -1,0 +1,246 @@
+A New Advenure|0|Draw 2 cards. Discard 2 cards. Gain <color=#00838F>2●</color>.
+Abolish|0|<color=#AA00FF>Prevent</color> a played card.
+Abomination of Memory|0|This character's spark is equal to the number of cards in your void.
+Abyssal Enforcer|0|▸ <b>Materialized:</b> Return an enemy to hand.
+Abyssal Plunge|0|<color=#AA00FF>Dissolve</color> an enemy with cost <color=#00838F>3●</color> or more.
+Abyssal Plunge|1|<color=#AA00FF>Reclaim</color> <color=#00838F>2●</color>
+Angel of the Eclipse|0|When you <color=#AA00FF>materialize</color> an ally, gain <color=#00838F>1●</color>.
+Apocalypse Vigilante|0|When you discard a card, gain <color=#F57F17>1⍏</color>.
+Apocalypse|0|<color=#AA00FF>Dissolve</color> all characters.
+Arc Gate Opening|0|Gain <color=#00838F>4●</color>.
+Architect of Memory|0|While you have 7 or more cards in your void, they have <color=#AA00FF>reclaim</color> equal to their cost.
+Archive of the Forgotten |0|Return up to 2 events from your void to your hand.
+Ashborn Necromancer|0|Abandon an ally: Put the top 2 cards of your deck into your void.
+Ashen Avenger|0|<color=#00838F>2●</color>, <color=#AA00FF>Banish</color> another card in your void: <color=#AA00FF>Reclaim</color> this character.
+Ashen Remnant|0|Abandon an ally: You may put a character from your void on top of your deck.
+Ashlight Caller|0|▸ <b>Materialized:</b> An event in your void gains <color=#AA00FF>reclaim</color> equal to its cost this turn.
+Ashmaze Guide|0|When you discard a card, it gains <color=#AA00FF>reclaim</color> equal to its cost this turn.
+Assault Leader|0|<color=#00838F>4●</color>: This character gains +1 spark for each allied <color=#2E7D32><b>Warrior</b></color>.
+Astral Interface|0|Draw a card. Discard a card.
+Astral Navigators|0|▸ <b>Materialized:</b> <color=#AA00FF>Foresee</color> 2.
+Aurora Channeler|0|▸ <b>Materialized:</b> Gain <color=#00838F>3●</color>.
+Aurora Rider|0|▸ <b>Materialized:</b> <color=#AA00FF>Banish</color> any number of allies, then <color=#AA00FF>materialize</color> them.
+Auroral Passage|0|Put the top 3 cards of your deck into your void.
+Autumn Glade|0|Gain <color=#F57F17>1⍏</color>.
+Avatar of Cosmic Reckoning|0|When an ally is ▸ <b>Dissolved:</b>, gain <color=#F57F17>1⍏</color>.
+Beacon of Tomorrow|0|<color=#AA00FF>Discover</color> a card with cost <color=#00838F>2●</color>.
+Blade of Oblivion|0|When you abandon 2 allies in a turn, <color=#AA00FF>dissolve</color> an enemy.
+Blade of Unity|0|This character's spark is equal to the number of allied <color=#2E7D32><b>Warriors</b></color>.
+Blazing Emberwing|0|The '▸ <b>Judgment:</b>' ability of allies triggers when you <color=#AA00FF>materialize</color> them.
+Blooming Path Wanderer|0|▸ <b>Judgment:</b> You may <color=#AA00FF>banish</color> an ally, then <color=#AA00FF>materialize</color> it.
+Bloomweaver|0|Once per turn, when you <color=#AA00FF>materialize</color> a character, gain <color=#00838F>1●</color>.
+Boundless Wanderer|0|Has all character types.
+Boundless Wanderer|1|▸ <b>Judgment:</b> With 3 allies that share a character type, draw a card.
+Break the Sequence|0|<b>Choose One:</b>
+• <color=#00838F>2●</color>: Return an enemy to hand.
+• <color=#00838F>3●</color>: Draw 2 cards.
+Break the Veil|0|Discard a chosen card with cost <color=#00838F>3●</color> or less from the opponent's hand.
+Burst of Obliteration|0|Pay 1 or more <color=#00838F>●</color>: <color=#AA00FF>Dissolve</color> all characters with spark less than the amount of <color=#00838F>●</color> paid.
+Call to the Unknown|0|<color=#AA00FF>Discover</color> a character with a ▸ <b>Materialized:</b> ability.
+Cascade of Reflections|0|Until end of turn, when you play an event, copy it.
+Catalyst Ignition|0|Double the amount of <color=#00838F>●</color> you gain from card effects this turn.
+Celestial Reverie|0|Until end of turn, when you play a character, draw a card.
+Chronicle Reclaimer|0|▸ <b>Judgment:</b> Draw a card, then discard a card.
+Cloaked Sentinel|0|The opponent's events cost <color=#00838F>1●</color> more.
+Company Commander|0|When you <color=#AA00FF>materialize</color> an allied <color=#2E7D32><b>Warrior</b></color>, this character gains +1 spark.
+Conduit of Resonance|0|When you <color=#AA00FF>materialize</color> a character, trigger the ▸ <b>Judgment:</b> ability of each ally.
+Cosmic Puppeteer|0|▸ <b>Materialized:</b> Gain control of an enemy with cost <color=#00838F>2●</color> or less.
+Cragfall|0|<color=#AA00FF>Prevent</color> a played character.
+Data Pulse|0|Gain <color=#00838F>2●</color>. Draw a card.
+Dawnblade Wanderer|0|▸ <b>Materialized, Judgment:</b> Gain <color=#00838F>2●</color>.
+Dawnprowler Panther|0|When you <color=#AA00FF>materialize</color> an allied <color=#2E7D32><b>Spirit Animal</b></color>, gain <color=#00838F>1●</color>.
+Desperation|0|Abandon any number of allies: Draw a card for each ally abandoned.
+Dimensional Pathfinder|0|▸ <b>Judgment:</b> You may pay <color=#00838F>3●</color> to <color=#AA00FF>banish</color> up to 2 allies, then <color=#AA00FF>materialize</color> them.
+Door to Possibility|0|<color=#AA00FF>Discover</color> an event.
+Dreadcall Warden|0|<color=#00838F>2●</color>, Abandon an ally with spark 1 or less: Draw 2 cards.
+Dreamborne Leviathan|0|Reveal the top card of your deck.
+Dreamborne Leviathan|1|You may play characters from the top of your deck.
+Dreamscatter|0|Pay 1 or more <color=#00838F>●</color>: Draw a card for each <color=#00838F>●</color> spent.
+Driftcaller Sovereign|0|▸ <b>Materialized, Judgment:</b> Gain <color=#00838F>1●</color>.
+Duneveil Vanguard|0|▸ <b>Judgment:</b> You may discard a card to <color=#AA00FF>dissolve</color> an enemy with spark 1 or less.
+Dustborn Veteran|0|When an ally is ▸ <b>Dissolved:</b>, this card gains <color=#AA00FF>reclaim</color> <color=#00838F>1●</color> this turn.
+Ebonwing|0|▸ <b>Materialized, Judgment:</b> <color=#AA00FF>Kindle</color> 1.
+Echo Architect|0|Events cost you <color=#00838F>2●</color> more.
+Echo Architect|1|When you play an event from your hand, copy it.
+Echoes of Eternity|0|Copy the next event you play this turn three times.
+Echoes of Eternity|1|<color=#AA00FF>Reclaim</color> <color=#00838F>2●</color>
+Echoes of the Journey|0|Draw a card for each card you have played this turn.
+Echoing Denial|0|<color=#AA00FF>Banish</color> a card from hand: Play this event for <color=#00838F>0●</color>.
+Echoing Denial|1|<color=#AA00FF>Prevent</color> a played card.
+Eclipse Herald|0|▸ <b>Judgment:</b> You may <color=#AA00FF>banish</color> 3 cards from your void to <color=#AA00FF>dissolve</color> an enemy with cost <color=#00838F>2●</color> or less.
+Emberwatch Veteran|0|<color=#00838F>1●</color>, Discard a card: <color=#AA00FF>Kindle</color> 2.
+Emerald Guardian|0|▸ <b>Judgment:</b> Gain <color=#00838F>2●</color>.
+Endless Projection|0|When you play a character, <color=#AA00FF>materialize</color> a <color=#F57F17><b><u>Halcyon Figment</u></color></b>.
+Epiphany Unfolded|0|Draw 3 cards.
+Eternal Sentry|0|When you draw 2 cards in a turn, if this card is in your void, it gains <color=#AA00FF>reclaim</color> <color=#00838F>1●</color> this turn.
+Eternal Stag|0|When you play a <color=#2E7D32><b>Spirit Animal</b></color>, draw a card.
+Ethereal Courser|0|▸ <b>Materialized:</b> You may return an ally to hand.
+Ethereal Trailblazer|0|▸ <b>Judgment:</b> Gain <color=#00838F>1●</color>.
+Evacuation Enforcer|0|▸ <b>Judgment:</b> You may draw 2 cards, then discard 3 cards.
+Exiles of the Last Light|0|Abandon an ally: <color=#AA00FF>Kindle</color> 1.
+Fathomless Maw|0|When you abandon a character, gain <color=#F57F17>1⍏</color>.
+Fell the Mighty|0|<color=#AA00FF>Banish</color> a card from hand: Play this event for <color=#00838F>0●</color>.
+Fell the Mighty|1|<color=#AA00FF>Dissolve</color> an enemy.
+Flagbearer of Decay|0|When you play a <color=#2E7D32><b>Survivor</b></color>, put the top 2 cards of your deck into your void.
+Flash of Power|0|Gain <color=#00838F>6●</color>.
+Flickerveil Adept|0|▸ <b>Materialized, Judgment:</b> <color=#AA00FF>Banish</color> an ally with spark 2 or less, then <color=#AA00FF>materialize</color> it.
+Forgotten Titan|0|This character costs <color=#00838F>1●</color> if you have discarded a card this turn.
+Forsworn Champion|0|Abandon an ally: This character gains +1 spark.
+Fragments of Vision|0|Draw 3 cards. Discard 2 cards.
+Frost Visionary|0|▸ <b>Materialized:</b> Draw a card.
+Fury of the Clan|0|<color=#AA00FF>Dissolve</color> an enemy with cost less than the number of allied <color=#2E7D32><b>Warriors</b></color>.
+Genesis Burst|0|Double the amount of <color=#00838F>●</color> you have.
+Ghostlight Wolves|0|▸ <b>Judgment:</b> Gain <color=#00838F>1●</color> for each allied <color=#2E7D32><b>Spirit Animal</b></color>.
+Glimpse of Infinity|0|Gain <color=#00838F>3●</color>.
+Grim Reclaimer|0|Abandon an ally, once per turn: <color=#AA00FF>Reclaim</color> a <color=#2E7D32><b>Warrior</b></color>.
+Guiding Light|0|<color=#AA00FF>Foresee</color> 1. Draw a card.
+Guiding Light|1|<color=#AA00FF>Reclaim</color> <color=#00838F>3●</color>
+Harvest the Forgotten|0|Put the top 3 cards of your deck into your void. Draw a card.
+Harvester of Despair|0|When you abandon an ally, this character gains +1 spark.
+Herald of the Last Light|0|<b>↯fast</b> -- Abandon this character: <color=#AA00FF>Prevent</color> a played event.
+Hope's Vanguard|0|▸ <b>Materialized, Judgment:</b> With 2 allied <color=#2E7D32><b>Survivors</b></color>, draw a card.
+Horizon Follower|0|▸ <b>Judgment:</b> Gain <color=#F57F17>1⍏</color>.
+Illumination of Glory|0|Gain <color=#F57F17>1⍏</color> for each card you have played this turn.
+Immolate|0|<color=#AA00FF>Dissolve</color> an enemy.
+Infernal Ascendant|0|When you abandon an ally, <color=#AA00FF>kindle</color> 2.
+Infernal Rest|0|Lose 1 maximum <color=#00838F>●</color>: Play this event for <color=#00838F>0●</color>.
+Infernal Rest|1|<color=#AA00FF>Prevent</color> a played card.
+Intermezzo Balladeer|0|When you play a <b>↯fast</b> card, this character gains +2 spark.
+Invoker of Myths|0|Once per turn, when you <color=#AA00FF>materialize</color> a <color=#2E7D32><b>Warrior</b></color>, draw a card.
+Judgment of the Blade|0|<color=#AA00FF>Banish</color> a non-<color=#2E7D32><b>Warrior</b></color> enemy.
+Keeper of Forgotten Light|0|▸ <b>Materialized:</b> Draw 2 cards.
+Keeper of the Lightpath|0|Events cost you <color=#00838F>1●</color> less.
+Keeper of the Tides|0|▸ <b>Materialized:</b> <color=#AA00FF>Discover</color> a <b>↯fast</b> event.
+Key to the Moment|0|Return all but one ally to hand: Draw a card for each ally returned.
+Kindred Sparks|0|With an allied <color=#2E7D32><b>Survivor</b></color>, you may play this card from your hand or void for <color=#00838F>1●</color>.
+Knowledge Restored|0|Draw 3 cards.
+Lantern Keeper|0|▸ <b>Judgment:</b> Gain <color=#F57F17>2⍏</color>.
+Light of Emergence|0|<color=#AA00FF>Materialize</color> two random characters with cost <color=#00838F>3●</color> or less from your deck.
+Looming Oracle|0|▸ <b>Materialized:</b> Draw a card.
+Lumin-Gate Seer|0|Once per turn, when you <color=#AA00FF>materialize</color> a character with cost <color=#00838F>2●</color> or less, draw a card.
+Lumineth|0|When you have no cards in your deck, you win the game.
+Luminwings|0|▸ <b>Judgment:</b> With 2 allied <color=#2E7D32><b>Spirit Animals</b></color>, gain <color=#00838F>2●</color>.
+Lurking Dread|0|Discard a chosen character from the opponent's hand.
+Maelstrom Denial|0|<color=#AA00FF>Prevent</color> a played <b>↯fast</b> card.
+Melodist of the Finale|0|When you play a <b>↯fast</b> card, gain <color=#F57F17>1⍏</color>.
+Minstrel of Falling Light|0|<color=#00838F>3●</color>: Draw a card.
+Mirrorlight Architect|0|<color=#00838F>4●</color>: <color=#AA00FF>Materialize</color> a copy of an ally.
+Moment Rewound|0|Take an extra turn after this one.
+Momentum of the Fallen|0|<color=#AA00FF>Dissolve</color> an enemy. Draw a card.
+Momentum of the Fallen|1|This event costs <color=#00838F>1●</color> if a character dissolved this turn.
+Moonlit Dancer|0|Characters in your hand have <b>↯fast</b>.
+Moonlit Dancer|1|Once per turn, when you play a <b>↯fast</b> character, gain <color=#00838F>1●</color>.
+Moonlit Voyage|0|Draw 2 cards. Discard 2 cards.
+Moonlit Voyage|1|<color=#AA00FF>Reclaim</color> <color=#00838F>2●</color>
+Mother of Flames|0|When you discard a card, <color=#AA00FF>kindle</color> 1.
+Mystic Runefish|0|<color=#00838F>3●</color>: The spark of each allied <color=#2E7D32><b>Spirit Animal</b></color> becomes 5.
+Nexus Wayfinder|0|Characters cost you <color=#00838F>2●</color> less.
+Nightmare Manifest|0|▸ <b>Judgment:</b> Each player abandons a character.
+Nightmare|0|Draw a card.
+Nocturne|0|▸ <b>Materialized:</b> Draw a card, then discard a card.
+Nocturne|1|<color=#AA00FF>Reclaim</color> <color=#00838F>3●</color>
+Nomad of Endless Paths|0|▸ <b>Materialized:</b> Return an ally to hand.
+Obliterator of Worlds|0|Abandon an ally: Play this character for <color=#00838F>0●</color>, then abandon it.
+Obliterator of Worlds|1|▸ <b>Materialized:</b> <color=#AA00FF>Dissolve</color> an enemy.
+Oracle of Shifting Skies|0|When you play an event, <color=#AA00FF>foresee</color> 1.
+Packcaller of Shadows|0|<color=#AA00FF>Materialize</color> a <color=#F57F17><b><u>Celestial Figment</u></color></b> for each card you have played this turn.
+Pallid Arbiter|0|Disable the ▸ <b>Materialized:</b> abilities of enemies.
+Paradox Enforcer|0|▸ <b>Materialized:</b> <color=#AA00FF>Banish</color> an enemy until this character leaves play.
+Passage Through Oblivion|0|<color=#AA00FF>Banish</color> an ally. <color=#AA00FF>Materialize</color> it at end of turn.
+Passage Through Oblivion|1|<color=#AA00FF>Reclaim</color> <color=#00838F>1●</color>
+Path to Redemption|0|All cards currently in your void gain <color=#AA00FF>reclaim</color> equal to their cost this turn.
+Pattern Seeker|0|▸ <b>Judgment:</b> You may discard a card to draw a card and gain <color=#F57F17>1⍏</color>.
+Portal of Twin Paths|0|<color=#AA00FF>Banish</color> up to 2 allies, then <color=#AA00FF>materialize</color> them.
+Prophet of the Consumed|0|▸ <b>Materialized:</b> Draw a card for each ally abandoned this turn.
+Pulse of Sacrifice|0|Abandon a character, Discard your hand: Gain <color=#00838F>5●</color>.
+Pyrestone Avatar|0|When an ally is <color=#AA00FF>banished</color>, <color=#AA00FF>kindle</color> 1.
+Pyrokinetic Surge|0|Abandon an ally or discard a card: <color=#AA00FF>Dissolve</color> an enemy.
+Radiant Trio|0|<color=#AA00FF>Materialize</color> three <color=#F57F17><b><u>Radiant Figments</u></color></b>.
+Rebirth Ritualist|0|<color=#00838F>2●</color>, Abandon a character, Discard your hand: Draw 3 cards.
+Reclaimer of Lost Paths|0|▸ <b>Materialized:</b> A card with cost <color=#00838F>3●</color> or less in your void gains <color=#AA00FF>reclaim</color> <color=#00838F>0●</color>.
+Resilient Wanderer|0|▸ <b>Dissolved:</b> You may pay <color=#00838F>1●</color> to return this character to your hand.
+Return to Nowhere|0|Return an enemy or ally to hand. Draw a card.
+Reunion|0|You may return a character from your void to your hand, then draw a card.
+Revenant of the Lost|0|You may only play this character from your void.
+Ride of the Vanguard|0|An ally gains +1 spark for each allied <color=#2E7D32><b>Warrior</b></color>.
+Ridge Vortex Explorer|0|When you discard this character, <color=#AA00FF>materialize</color> it.
+Riftwalker|0|▸ <b>Materialized:</b> <color=#AA00FF>Banish</color> an enemy until your next main phase.
+Ripple Through Reality|0|<color=#AA00FF>Prevent</color> a played card. Put it on top of the opponent's deck.
+Ripple of Defiance|0|<color=#AA00FF>Prevent</color> a played event unless the opponent pays <color=#00838F>2●</color>.
+Rite of Summoning|0|<color=#AA00FF>Discover</color> a character with an activated ability.
+Ruin Scavenger|0|▸ <b>Judgment:</b> You may <color=#AA00FF>banish</color> a card from the opponent's void to gain <color=#00838F>1●</color>.
+Sage of the Prelude|0|Once per turn, when you play a <b>↯fast</b> card, draw a card.
+Scorched Reckoning|0|<color=#AA00FF>Dissolve</color> an enemy with spark 3 or more.
+Scrap Reclaimer|0|▸ <b>Judgment:</b> Return this character from your void to your hand.
+Searcher in the Mists|0|▸ <b>Materialized, Dissolved:</b> Put the top 4 cards of your deck into your void.
+Secrets of the Deep|0|Pay 1 or more <color=#00838F>●</color>: Draw a card for each <color=#00838F>●</color> spent, then discard 2 cards.
+Seeker for the Way|0|▸ <b>Materialized:</b> Draw a <color=#2E7D32><b>Warrior</b></color> from your deck.
+Seeker of the Radiant Wilds|0|▸ <b>Materialized:</b> Draw a card for each allied <color=#2E7D32><b>Spirit Animal</b></color>.
+Seer of the Fallen|0|▸ <b>Dissolved:</b> Draw a card.
+Seer of the Fallen|1|When an allied <color=#2E7D32><b>Survivor</b></color> is ▸ <b>Dissolved:</b>, draw a card.
+Shadowpaw|0|▸ <b>Materialized:</b> Return a character from your void to your hand.
+Shardwoven Tyrant|0|Abandon an ally: You may <color=#AA00FF>dissolve</color> an enemy with spark less than that ally's spark.
+Shatter the Frail|0|<color=#AA00FF>Dissolve</color> an enemy with spark 1 or less.
+Shattering Gambit|0|<color=#AA00FF>Dissolve</color> an enemy. The opponent gains <color=#F57F17>3⍏</color>.
+Silent Avenger|0|▸ <b>Dissolved:</b> <color=#AA00FF>Kindle</color> 2.
+Silent Avenger|1|When an allied <color=#2E7D32><b>Survivor</b></color> is ▸ <b>Dissolved:</b>, <color=#AA00FF>kindle</color> 2.
+Skies of Change|0|Discard a card. Draw 2 cards.
+Skyflame Commander|0|Allied <color=#2E7D32><b>Warriors</b></color> have +1 spark.
+Skypath|0|<color=#AA00FF>Foresee</color> 1.
+Soulbinder|0|Abandon an ally: Gain <color=#00838F>1●</color>.
+Soulflame Predator|0|▸ <b>Materialized:</b> <color=#AA00FF>Banish</color> the opponent's void.
+Soulkindler|0|If this card is in your void, allied <color=#2E7D32><b>Survivors</b></color> have +2 spark.
+Speaker for the Forgotten|0|When you play a <color=#2E7D32><b>Warrior</b></color>, <color=#AA00FF>reclaim</color> a random character with cost <color=#00838F>3●</color> or less.
+Specter of Silent Snow|0|When you abandon a character, draw a card.
+Spirit Bond|0|Each allied <color=#2E7D32><b>Spirit Animal</b></color> gains spark equal to the number of allied <color=#2E7D32><b>Spirit Animals</b></color>.
+Spirit Field Reclaimer|0|▸ <b>Judgment:</b> You may pay <color=#00838F>1●</color> to <color=#AA00FF>kindle</color> 1 and <color=#AA00FF>banish</color> a card from the opponent's void.
+Spirit Reaping|0|Abandon an ally: Gain <color=#00838F>●</color> equal to that character's cost.
+Spirit of Smoldering Echoes|0|When an event is put into your void, this character gains +1 spark.
+Spirit of the Greenwood|0|▸ <b>Judgment:</b> Gain <color=#00838F>1●</color> for each allied character.
+Spiritbound Alpha|0|▸ <b>Judgment:</b> You may pay <color=#00838F>4●</color> to have each allied <color=#2E7D32><b>Spirit Animal</b></color> gain +2 spark.
+Starcatcher|0|When you play an event, gain <color=#00838F>1●</color>.
+Starlight Guide|0|▸ <b>Materialized:</b> You may <color=#AA00FF>banish</color> an ally, then <color=#AA00FF>materialize</color> it.
+Starlit Cascade|0|Until end of turn, when an ally leaves play, gain <color=#00838F>2●</color>.
+Starsea Traveler|0|Once per turn, you may play a character with cost <color=#00838F>2●</color> or less from your void.
+Summons of the Bonded|0|<color=#AA00FF>Discover</color> a <color=#2E7D32><b>Warrior</b></color>.
+Sundown Surfer|0|When you play a card during the opponent's turn, this character gains +1 spark.
+Sunset Chronicler|0|When an ally is ▸ <b>Dissolved:</b>, draw a card.
+Sunshadow Eagle|0|When you <color=#AA00FF>materialize</color> an allied <color=#2E7D32><b>Spirit Animal</b></color>, that character gains +1 spark.
+Surge of Fury|0|At the end of this turn, trigger an additional <b>Judgment</b> phase.
+Synaptic Sentinel|0|▸ <b>Judgment:</b> <color=#AA00FF>Foresee</color> 1.
+The Bondweaver|0|When you <color=#AA00FF>materialize</color> a character, this character gains +1 spark.
+The Calling Night|0|▸ <b>Judgment:</b> Draw a card, then the opponent gains <color=#F57F17>2⍏</color>.
+The Devourer|0|<color=#AA00FF>Banish</color> your void with 8 or more cards: <color=#AA00FF>Reclaim</color> this character.
+The Dread Sovereign|0|▸ <b>Judgment:</b> You may abandon a <color=#2E7D32><b>Warrior</b></color> to <color=#AA00FF>discover</color> a <color=#2E7D32><b>Warrior</b></color> with cost <color=#00838F>1●</color> higher and <color=#AA00FF>materialize</color> it.
+The Forsaker|0|Abandon an ally, once per turn: Gain <color=#F57F17>1⍏</color>.
+The Power Within|0|Double the number of cards you draw from card effects this turn.
+The Ringleader|0|▸ <b>Materialized:</b> Copy the next event you play this turn three times.
+The Rising God|0|Abandon 2 allies: <color=#AA00FF>Reclaim</color> this character.
+The Waking Titan|0|To play this card, return an ally with cost <color=#00838F>3●</color> or more to hand.
+The Waking Titan|1|▸ <b>Judgment:</b> Draw a card.
+Threadbreaker|0|▸ <b>Materialized:</b> <color=#AA00FF>Prevent</color> a played card with cost <color=#00838F>2●</color> or less.
+Through the Rift|0|<color=#AA00FF>Discover</color> a <color=#2E7D32><b>Survivor</b></color>.
+Tideborne Voyager|0|When an ally is <color=#AA00FF>banished</color>, this character gains +1 spark.
+Titan of Forgotten Echoes|0|When you play 2 cards in a turn, <color=#AA00FF>reclaim</color> this character.
+Together Against the Tide|0|<color=#AA00FF>Prevent</color> a played event which could <color=#AA00FF>dissolve</color> an ally.
+Torchbearer of the Abyss|0|Once per turn, when you discard a card, gain <color=#00838F>1●</color>, then <color=#AA00FF>kindle</color> 2.
+Tranquil Duelist|0|▸ <b>Materialized, Dissolved:</b> Draw a card.
+Twilight Radiance|0|Gain <color=#00838F>1●</color>.
+Twilight Reclaimer|0|▸ <b>Dissolved:</b> A <color=#2E7D32><b>Survivor</b></color> in your void gains <color=#AA00FF>reclaim</color> equal to its cost.
+Twilight Suppressor|0|▸ <b>Materialized:</b> Disable the activated abilities of an enemy while this character is in play.
+Unleash Ruin|0|<color=#AA00FF>Dissolve</color> an enemy. You lose <color=#F57F17>4⍏</color>.
+Unleashed Destruction|0|<color=#AA00FF>Dissolve</color> an enemy with cost <color=#00838F>2●</color> or less.
+Unleashed Destruction|1|<color=#AA00FF>Reclaim</color> -- Abandon an ally
+Urban Cipher|0|▸ <b>Materialized:</b> Discard 2 cards, then draw 2 cards.
+Veil Shatter|0|<color=#AA00FF>Banish</color> an enemy with cost <color=#00838F>2●</color> or less.
+Veil of the Wastes|0|When you <color=#AA00FF>materialize</color> a <color=#2E7D32><b>Survivor</b></color>, <color=#AA00FF>reclaim</color> this character.
+Virtuoso of Harmony|0|At the end of your turn, gain <color=#00838F>2●</color>.
+Voidshield Guardian|0|When the opponent plays an event which could <color=#AA00FF>dissolve</color> an ally, <color=#AA00FF>prevent</color> that card.
+Volcanic Channeler|0|When an ally is ▸ <b>Dissolved:</b>, gain <color=#00838F>1●</color>.
+Wasteland Arbitrator|0|▸ <b>Materialized:</b> Each player discards a card.
+Weight of Memory|0|<color=#AA00FF>Dissolve</color> an enemy with cost less than the number of cards in your void.
+Wheel of the Heavens|0|Each player shuffles their hand and void into their deck and then draws 5 cards.
+Whisper of the Past|0|An event in your void gains <color=#AA00FF>reclaim</color> <color=#00838F>0●</color> this turn.
+Wolfbond Chieftain|0|▸ <b>Materialized, Judgment:</b> With 2 allied <color=#2E7D32><b>Warriors</b></color>, gain <color=#00838F>1●</color>.
+Wraith of Twisting Shadows|0|▸ <b>Materialized:</b> Discard a chosen card from the opponent's hand. They draw a card.
+Wreckheap Survivor|0|▸ <b>Judgment:</b> You may pay <color=#00838F>1●</color> to return this character from your void to your hand.
