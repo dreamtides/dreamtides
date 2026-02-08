@@ -30,7 +30,13 @@ pub fn serialize_standard_effect(
 ) -> String {
     match effect {
         StandardEffect::CreateStaticAbilityUntilEndOfTurn { ability } => {
-            static_ability_serializer::serialize_standard_static_ability(ability, bindings)
+            let base =
+                static_ability_serializer::serialize_standard_static_ability(ability, bindings);
+            if base.ends_with('.') {
+                base
+            } else {
+                format!("{}{}", base, strings::period_suffix())
+            }
         }
         StandardEffect::CreateTriggerUntilEndOfTurn { trigger } => {
             if matches!(trigger.trigger, TriggerEvent::Keywords(_)) {

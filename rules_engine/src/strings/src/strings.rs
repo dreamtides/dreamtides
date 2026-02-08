@@ -1134,4 +1134,76 @@ rlf::rlf! {
     void_each_other_gains_reclaim_for_cost_this_turn($r) = "Each other card in your void gains {reclaim_for_cost($r)} this turn";
     // Each other card in your void gains reclaim equal to its cost this turn.
     void_each_other_gains_reclaim_equal_cost_this_turn = "Each other card in your void gains {reclaim} equal to its cost this turn";
+
+    // =========================================================================
+    // Static ability serializer phrases
+    // =========================================================================
+
+    // Your matching cards cost more energy.
+    your_cards_cost_increase($matching, $e) = "{$matching} cost you {energy($e)} more";
+    // Your matching cards cost less energy.
+    your_cards_cost_reduction($matching, $e) = "{$matching} cost you {energy($e)} less";
+    // The opponent's matching cards cost more energy.
+    enemy_cards_cost_increase($matching, $e) = "the opponent's {$matching} cost {energy($e)} more";
+    // Allied matching characters have bonus spark.
+    spark_bonus_other_characters($matching, $s) = "allied {$matching} have +{$s} spark";
+    // To play this card, pay an additional cost.
+    additional_cost_to_play($cost) = "To play {this_card}, {$cost}";
+    // This card type costs alternate energy.
+    play_for_alternate_cost_simple($card_type, $e) = "{$card_type} costs {energy($e)}";
+    // Additional cost prefix: Play this card type for alternate energy.
+    play_for_alternate_cost_with_additional($cost, $card_type, $e) = "{$cost}: Play {$card_type} for {energy($e)}";
+    // Additional cost with if-you-do abandon effect.
+    play_for_alternate_cost_abandon($cost, $card_type, $e) = "{$cost}: Play {$card_type} for {energy($e)}, then abandon it";
+    // Characters in your hand have fast.
+    characters_in_hand_have_fast = "characters in your hand have {fast}";
+    // Disable the materialized abilities of enemies.
+    disable_enemy_materialized_abilities = "disable the {Materialized} abilities of enemies";
+    // Has all character types.
+    has_all_character_types = "has all character types";
+    // Multiply the amount of energy gained from card effects.
+    multiply_energy_gain($n) = "{multiply_by($n)} the amount of {energy_symbol} you gain from card effects this turn";
+    // Multiply the number of cards drawn from card effects.
+    multiply_card_draw($n) = "{multiply_by($n)} the number of cards you draw from card effects this turn";
+    // Once per turn, play a matching card from your void.
+    once_per_turn_play_from_void($matching) = "once per turn, you may play {$matching} from your void";
+    // Reveal the top card of your deck.
+    reveal_top_card = "reveal the top card of your deck";
+    // You may look at the top card of your deck.
+    you_may_look_at_top_card = "you may look at the top card of your deck";
+    // You may play matching cards from the top of your deck.
+    you_may_play_from_top_of_deck($matching) = "you may play {$matching} from the top of your deck";
+    // Judgment ability of matching characters triggers when materialized.
+    judgment_triggers_when_materialized($matching) = "the '{{Judgment}}' ability of {$matching} triggers when you {{materialize}} them";
+    // This character's spark equals predicate count.
+    spark_equal_to_predicate_count($matching) = "{this_character}'s spark is equal to the number of {$matching}";
+    // You may only play this character from your void.
+    play_only_from_void = "you may only play {this_character} from your void";
+    // You may play this card from your hand or void for a cost.
+    play_from_hand_or_void_for_cost($e) = "you may play {this_card} from your hand or void for {energy($e)}";
+    // Cards in your void have reclaim equal to their cost.
+    cards_in_void_have_reclaim = "they have {reclaim} equal to their cost";
+    // This card costs less for each matching quantity.
+    cost_reduction_for_each($e, $quantity) = "{this_card} costs {energy($e)} less for each {$quantity}";
+    // Your matching characters have bonus spark (allies variant).
+    spark_bonus_your_characters($matching, $s) = "{$matching} have +{$s} spark";
+    // Play this card from your void for a cost.
+    play_from_void_for_cost($e) = "play {this_card} from your void for {energy($e)}";
+    // Play this card from your void with additional cost prefix.
+    play_from_void_with_additional_cost($cost, $e) = "{$cost}: play {this_card} from your void for {energy($e)}";
+    // Play this card from your void with additional cost and if-you-do effect.
+    play_from_void_with_effect($cost, $e, $effect) = "{$cost}: play {this_card} from your void for {energy($e)}, then {$effect}";
+    // Play this card from your void for cost with if-you-do effect.
+    play_from_void_for_cost_with_effect($e, $effect) = "play {this_card} from your void for {energy($e)}, then {$effect}";
+
+    // =========================================================================
+    // Static ability condition phrases
+    // =========================================================================
+
+    // Condition prefix: if this card is in your void.
+    if_this_card_in_void_prefix($base) = "if {this_card} is in your void, {$base}";
+    // Condition prepended to base ability text.
+    condition_prepended($condition, $base) = "{$condition} {$base}";
+    // Condition appended to base ability text.
+    condition_appended($base, $condition) = "{$base} {$condition}";
 }
