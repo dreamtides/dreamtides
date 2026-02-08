@@ -5,6 +5,7 @@ use ability_data::effect::{Effect, ModelEffectChoiceIndex};
 use ability_data::named_ability::NamedAbility;
 use ability_data::trigger_event::TriggerEvent;
 use ability_data::variable_value::VariableValue;
+use strings::strings;
 
 use crate::serializer::effect_serializer::AbilityContext;
 use crate::serializer::{
@@ -71,7 +72,7 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
                 .as_ref()
                 .is_some_and(|options| !options.is_fast && !options.is_multi);
             if is_fast {
-                result.push_str("{Fast} -- ");
+                result.push_str(&strings::fast_prefix().to_string());
             }
             let costs = activated
                 .costs
