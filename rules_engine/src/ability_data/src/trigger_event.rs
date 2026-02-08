@@ -4,7 +4,7 @@ use crate::predicate::Predicate;
 
 /// Describes possible game events which may cause a triggered ability to
 /// trigger.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum TriggerEvent {
     Abandon(Predicate),
     AbandonCardsInTurn(u32),
@@ -27,14 +27,14 @@ pub enum TriggerEvent {
     OpponentPlays(Predicate),
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum TriggerKeyword {
     Materialized,
     Judgment,
     Dissolved,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PlayerTurn {
     YourTurn,
     EnemyTurn,

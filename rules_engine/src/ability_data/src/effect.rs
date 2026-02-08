@@ -7,7 +7,7 @@ use crate::cost::Cost;
 use crate::standard_effect::StandardEffect;
 
 /// Represents a mutation to the game state.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Effect {
     Effect(StandardEffect),
     WithOptions(EffectWithOptions),
@@ -24,14 +24,14 @@ pub struct ModelEffectChoiceIndex(pub usize);
 
 /// Represents a choice of effect to apply. These are written as a bulleted list
 /// of options with associated costs and the text "Choose One".
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ModalEffectChoice {
     pub energy_cost: Energy,
     pub effect: Effect,
 }
 
 /// Provides an effect along with configuration options.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EffectWithOptions {
     /// Effect to apply
     pub effect: StandardEffect,
@@ -56,7 +56,7 @@ pub struct EffectWithOptions {
 }
 
 /// Provides a list of effects with shared configuration options.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ListWithOptions {
     /// Effects to apply
     pub effects: Vec<EffectWithOptions>,

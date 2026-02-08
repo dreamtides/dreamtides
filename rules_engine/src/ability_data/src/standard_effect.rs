@@ -13,7 +13,7 @@ use crate::triggered_ability::TriggeredAbility;
 /// Effects are the primary way in which cards modify the game state. This can
 /// be as part of the resolution of an event card, or via the effect text of a
 /// triggered or activated ability on a character card.
-#[derive(Debug, Clone, Serialize, Deserialize, EnumDiscriminants)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, EnumDiscriminants)]
 #[strum_discriminants(derive(Display))]
 pub enum StandardEffect {
     AbandonAndGainEnergyForSpark {

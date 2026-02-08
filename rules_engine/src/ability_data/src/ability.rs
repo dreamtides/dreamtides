@@ -10,7 +10,7 @@ use crate::triggered_ability::TriggeredAbility;
 /// An 'ability' represents a paragraph of text present on a card or a specific
 /// keyword which maps to text defined by the game rules. Abilities on cards are
 /// evaluated from top to bottom in order to apply their game effects.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Ability {
     /// An event ability happens immediately when an event card is played, and
     /// then the event card is discarded. Character cards cannot have
@@ -71,7 +71,7 @@ pub struct DisplayedModalEffectChoice {
     pub effect: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EventAbility {
     /// If a [Cost] is specified this cost must be paid immediately upon playing
     /// the event card, *not* when it resolves. This is typically written as

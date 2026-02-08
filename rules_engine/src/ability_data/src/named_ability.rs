@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::cost::Cost;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum NamedAbility {
     /// You may play this card from your void for the given energy cost, or for
     /// its normal energy cost if none is given. If you do, banish it when it

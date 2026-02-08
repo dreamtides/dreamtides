@@ -9,7 +9,7 @@ use crate::effect::Effect;
 ///
 /// An activated ability on an *event* card describes an additional cost to play
 /// that event and must be paid immediately.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ActivatedAbility {
     /// Costs to activate this ability, paid before it is put on the stack.
     pub costs: Vec<Cost>,
@@ -22,7 +22,7 @@ pub struct ActivatedAbility {
     pub options: Option<ActivatedAbilityOptions>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ActivatedAbilityOptions {
     /// True if this ability can be activated in response to enemy game actions.
     ///

@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::effect::Effect;
 use crate::trigger_event::TriggerEvent;
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TriggeredAbilityOptions {
     /// True if this ability can only trigger once per turn.
     pub once_per_turn: bool,
@@ -15,7 +15,7 @@ pub struct TriggeredAbilityOptions {
 /// A triggered ability is an effect which happens when some triggering
 /// event occurs, typically while its card is in play. Indicated in card
 /// text by "When", "Whenever", "At", or by a trigger keyword.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TriggeredAbility {
     pub trigger: TriggerEvent,
     pub effect: Effect,

@@ -10,13 +10,13 @@ use crate::quantity_expression_data::QuantityExpression;
 /// A static ability represents something which modifies the rules of the game,
 /// either for this specific card or globally. Static abilities do not 'happen',
 /// they're just something that is always true.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum StaticAbility {
     StaticAbility(StandardStaticAbility),
     WithOptions(StaticAbilityWithOptions),
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct StaticAbilityWithOptions {
     pub ability: StandardStaticAbility,
 
@@ -26,7 +26,7 @@ pub struct StaticAbilityWithOptions {
 }
 
 /// Basic static abilities
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum StandardStaticAbility {
     AdditionalCostToPlay(Cost),
     CardsInYourVoidHaveReclaim { matching: CardPredicate },
@@ -53,7 +53,7 @@ pub enum StandardStaticAbility {
     YourCardsCostReduction { matching: CardPredicate, reduction: Energy },
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PlayFromVoid {
     /// The energy cost of playing this card from the void.
     ///
@@ -72,7 +72,7 @@ pub struct PlayFromVoid {
     pub if_you_do: Option<Effect>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PlayFromHandOrVoidForCost {
     pub energy_cost: Energy,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -82,14 +82,14 @@ pub struct PlayFromHandOrVoidForCost {
 }
 
 /// Indicates whether an ability applies to characters or events.
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum CardTypeContext {
     #[default]
     Event,
     Character,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct AlternateCost {
     pub energy_cost: Energy,
     #[serde(skip_serializing_if = "Option::is_none")]
