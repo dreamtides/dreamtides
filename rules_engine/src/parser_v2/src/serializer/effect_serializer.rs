@@ -218,26 +218,20 @@ pub fn serialize_standard_effect(
         StandardEffect::BanishEnemyVoid => strings::banish_enemy_void_effect().to_string(),
         StandardEffect::BanishThenMaterialize { target, count } => match count {
             CollectionExpression::Exactly(1) => {
-                format!(
-                    "{{banish}} {}, then {{materialize}} it.",
-                    predicate_serializer::serialize_predicate(target, bindings)
-                )
+                let target = predicate_serializer::serialize_predicate(target, bindings);
+                format!("{}.", strings::banish_then_materialize_it(target))
             }
             CollectionExpression::AnyNumberOf => {
-                format!(
-                    "{{banish}} any number of {}, then {{materialize}} them.",
-                    predicate_serializer::serialize_predicate_plural(target, bindings)
-                )
+                let target = predicate_serializer::serialize_predicate_plural(target, bindings);
+                format!("{}.", strings::banish_then_materialize_any_number(target))
             }
             CollectionExpression::UpTo(n) => {
-                bindings.insert("n".to_string(), VariableValue::Integer(*n));
-                "{banish} {up_to_n_allies($n)}, then {materialize} {pronoun:$n}.".to_string()
+                let target = predicate_serializer::serialize_predicate_plural(target, bindings);
+                format!("{}.", strings::banish_then_materialize_up_to(*n, target))
             }
             _ => {
-                format!(
-                    "{{banish}} {}, then {{materialize}} them.",
-                    predicate_serializer::serialize_predicate(target, bindings)
-                )
+                let target = predicate_serializer::serialize_predicate(target, bindings);
+                format!("{}.", strings::banish_then_materialize_them(target))
             }
         },
         StandardEffect::BanishCharacterUntilLeavesPlay { target, until_leaves } => {
@@ -835,11 +829,13 @@ fn serialize_allied_card_predicate(
     match card_predicate {
         CardPredicate::CharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            "allied {subtype($t)}".to_string()
+            strings::allied_card_with_subtype(serializer_utils::subtype_to_phrase(*subtype))
+                .to_string()
         }
-        _ => {
-            format!("allied {}", predicate_serializer::card_predicate_base_text(card_predicate))
-        }
+        _ => strings::allied_card_with_base(predicate_serializer::card_predicate_base_text(
+            card_predicate,
+        ))
+        .to_string(),
     }
 }
 
@@ -851,14 +847,13 @@ fn serialize_allied_card_predicate_plural(
     match card_predicate {
         CardPredicate::CharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            "allied {@plural subtype($t)}".to_string()
+            strings::allied_card_with_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
+                .to_string()
         }
-        _ => {
-            format!(
-                "allied {}",
-                predicate_serializer::card_predicate_base_text_plural(card_predicate)
-            )
-        }
+        _ => strings::allied_card_with_base_plural(
+            predicate_serializer::card_predicate_base_text_plural(card_predicate),
+        )
+        .to_string(),
     }
 }
 
@@ -869,53 +864,66 @@ fn serialize_gains_reclaim(
     cost: &Option<Energy>,
     bindings: &mut VariableBindings,
 ) -> String {
-    let this_turn_suffix = if this_turn { " this turn" } else { "" };
-    let (reclaim_directive, reclaim_suffix) = if let Some(energy_cost) = cost {
-        bindings.insert("r".to_string(), VariableValue::Integer(energy_cost.0));
-        ("{reclaim_for_cost($r)}", "")
-    } else {
-        ("{reclaim}", " equal to its cost")
-    };
-
     match target {
         Predicate::It => {
-            format!("it gains {}{}{}.", reclaim_directive, reclaim_suffix, this_turn_suffix)
+            if let Some(energy_cost) = cost {
+                if this_turn {
+                    format!("{}.", strings::it_gains_reclaim_for_cost_this_turn(energy_cost.0))
+                } else {
+                    format!("{}.", strings::it_gains_reclaim_for_cost(energy_cost.0))
+                }
+            } else if this_turn {
+                format!("{}.", strings::it_gains_reclaim_equal_cost_this_turn())
+            } else {
+                format!("{}.", strings::it_gains_reclaim_equal_cost())
+            }
         }
         Predicate::This => {
-            format!("this card gains {}{}{}.", reclaim_directive, reclaim_suffix, this_turn_suffix)
+            if let Some(energy_cost) = cost {
+                if this_turn {
+                    format!(
+                        "{}.",
+                        strings::this_card_gains_reclaim_for_cost_this_turn(energy_cost.0)
+                    )
+                } else {
+                    format!("{}.", strings::this_card_gains_reclaim_for_cost(energy_cost.0))
+                }
+            } else if this_turn {
+                format!("{}.", strings::this_card_gains_reclaim_equal_cost_this_turn())
+            } else {
+                format!("{}.", strings::this_card_gains_reclaim_equal_cost())
+            }
         }
         Predicate::YourVoid(predicate) => {
-            serialize_void_gains_reclaim(count, predicate, this_turn_suffix, cost, bindings)
+            serialize_void_gains_reclaim(count, predicate, this_turn, cost, bindings)
         }
-        _ => format!(
-            "{} gains {}{}{}.",
-            predicate_serializer::serialize_predicate(target, bindings),
-            reclaim_directive,
-            reclaim_suffix,
-            this_turn_suffix
-        ),
+        _ => {
+            let target = predicate_serializer::serialize_predicate(target, bindings);
+            if let Some(energy_cost) = cost {
+                if this_turn {
+                    format!(
+                        "{}.",
+                        strings::target_gains_reclaim_for_cost_this_turn(target, energy_cost.0)
+                    )
+                } else {
+                    format!("{}.", strings::target_gains_reclaim_for_cost(target, energy_cost.0))
+                }
+            } else if this_turn {
+                format!("{}.", strings::target_gains_reclaim_equal_cost_this_turn(target))
+            } else {
+                format!("{}.", strings::target_gains_reclaim_equal_cost(target))
+            }
+        }
     }
 }
 
 fn serialize_void_gains_reclaim(
     count: &CollectionExpression,
     predicate: &CardPredicate,
-    this_turn_suffix: &str,
+    this_turn: bool,
     cost: &Option<Energy>,
     bindings: &mut VariableBindings,
 ) -> String {
-    let (reclaim_directive, reclaim_suffix) = if let Some(energy_cost) = cost {
-        bindings.insert("r".to_string(), VariableValue::Integer(energy_cost.0));
-        ("{reclaim_for_cost($r)}", "")
-    } else {
-        ("{reclaim}", " equal to its cost")
-    };
-    let (reclaim_directive_plural, reclaim_suffix_plural) = if cost.is_some() {
-        ("{reclaim_for_cost($r)}", "")
-    } else {
-        ("{reclaim}", " equal to their cost")
-    };
-
     match count {
         CollectionExpression::Exactly(1) => {
             let predicate_text = if let CardPredicate::CharacterType(subtype) = predicate {
@@ -927,56 +935,174 @@ fn serialize_void_gains_reclaim(
                         .to_string(),
                 )
             };
-            format!(
-                "{} in your void gains {}{}{}.",
-                predicate_text, reclaim_directive, reclaim_suffix, this_turn_suffix
-            )
+            if let Some(energy_cost) = cost {
+                if this_turn {
+                    format!(
+                        "{}.",
+                        strings::void_single_gains_reclaim_for_cost_this_turn(
+                            predicate_text,
+                            energy_cost.0
+                        )
+                    )
+                } else {
+                    format!(
+                        "{}.",
+                        strings::void_single_gains_reclaim_for_cost(predicate_text, energy_cost.0)
+                    )
+                }
+            } else if this_turn {
+                format!(
+                    "{}.",
+                    strings::void_single_gains_reclaim_equal_cost_this_turn(predicate_text)
+                )
+            } else {
+                format!("{}.", strings::void_single_gains_reclaim_equal_cost(predicate_text))
+            }
         }
-        CollectionExpression::Exactly(n) => format!(
-            "{} {} in your void gain {}{}{}.",
-            n,
-            predicate_serializer::serialize_card_predicate_plural(predicate, bindings),
-            reclaim_directive_plural,
-            reclaim_suffix_plural,
-            this_turn_suffix
-        ),
-        CollectionExpression::All => format!(
-            "all cards currently in your void gain {}{}{}.",
-            reclaim_directive_plural, reclaim_suffix_plural, this_turn_suffix
-        ),
-        CollectionExpression::AllButOne => format!(
-            "all but one {} in your void gain {}{}{}.",
-            predicate_serializer::serialize_card_predicate_plural(predicate, bindings),
-            reclaim_directive_plural,
-            reclaim_suffix_plural,
-            this_turn_suffix
-        ),
-        CollectionExpression::UpTo(n) => format!(
-            "up to {} {} in your void gain {}{}{}.",
-            n,
-            predicate_serializer::serialize_card_predicate_plural(predicate, bindings),
-            reclaim_directive_plural,
-            reclaim_suffix_plural,
-            this_turn_suffix
-        ),
-        CollectionExpression::AnyNumberOf => format!(
-            "any number of {} in your void gain {}{}{}.",
-            predicate_serializer::serialize_card_predicate_plural(predicate, bindings),
-            reclaim_directive_plural,
-            reclaim_suffix_plural,
-            this_turn_suffix
-        ),
-        CollectionExpression::OrMore(n) => format!(
-            "{} or more {} in your void gain {}{}{}.",
-            n,
-            predicate_serializer::serialize_card_predicate_plural(predicate, bindings),
-            reclaim_directive_plural,
-            reclaim_suffix_plural,
-            this_turn_suffix
-        ),
-        CollectionExpression::EachOther => format!(
-            "Each other card in your void gains {}{}{}",
-            reclaim_directive, reclaim_suffix, this_turn_suffix
-        ),
+        CollectionExpression::Exactly(n) => {
+            let pred = predicate_serializer::serialize_card_predicate_plural(predicate, bindings);
+            if let Some(energy_cost) = cost {
+                if this_turn {
+                    format!(
+                        "{}.",
+                        strings::void_exactly_n_gain_reclaim_for_cost_this_turn(
+                            *n,
+                            pred,
+                            energy_cost.0
+                        )
+                    )
+                } else {
+                    format!(
+                        "{}.",
+                        strings::void_exactly_n_gain_reclaim_for_cost(*n, pred, energy_cost.0)
+                    )
+                }
+            } else if this_turn {
+                format!("{}.", strings::void_exactly_n_gain_reclaim_equal_cost_this_turn(*n, pred))
+            } else {
+                format!("{}.", strings::void_exactly_n_gain_reclaim_equal_cost(*n, pred))
+            }
+        }
+        CollectionExpression::All => {
+            if let Some(energy_cost) = cost {
+                if this_turn {
+                    format!("{}.", strings::void_all_gain_reclaim_for_cost_this_turn(energy_cost.0))
+                } else {
+                    format!("{}.", strings::void_all_gain_reclaim_for_cost(energy_cost.0))
+                }
+            } else if this_turn {
+                format!("{}.", strings::void_all_gain_reclaim_equal_cost_this_turn())
+            } else {
+                format!("{}.", strings::void_all_gain_reclaim_equal_cost())
+            }
+        }
+        CollectionExpression::AllButOne => {
+            let pred = predicate_serializer::serialize_card_predicate_plural(predicate, bindings);
+            if let Some(energy_cost) = cost {
+                if this_turn {
+                    format!(
+                        "{}.",
+                        strings::void_all_but_one_gain_reclaim_for_cost_this_turn(
+                            pred,
+                            energy_cost.0
+                        )
+                    )
+                } else {
+                    format!(
+                        "{}.",
+                        strings::void_all_but_one_gain_reclaim_for_cost(pred, energy_cost.0)
+                    )
+                }
+            } else if this_turn {
+                format!("{}.", strings::void_all_but_one_gain_reclaim_equal_cost_this_turn(pred))
+            } else {
+                format!("{}.", strings::void_all_but_one_gain_reclaim_equal_cost(pred))
+            }
+        }
+        CollectionExpression::UpTo(n) => {
+            let pred = predicate_serializer::serialize_card_predicate_plural(predicate, bindings);
+            if let Some(energy_cost) = cost {
+                if this_turn {
+                    format!(
+                        "{}.",
+                        strings::void_up_to_gain_reclaim_for_cost_this_turn(
+                            *n,
+                            pred,
+                            energy_cost.0
+                        )
+                    )
+                } else {
+                    format!(
+                        "{}.",
+                        strings::void_up_to_gain_reclaim_for_cost(*n, pred, energy_cost.0)
+                    )
+                }
+            } else if this_turn {
+                format!("{}.", strings::void_up_to_gain_reclaim_equal_cost_this_turn(*n, pred))
+            } else {
+                format!("{}.", strings::void_up_to_gain_reclaim_equal_cost(*n, pred))
+            }
+        }
+        CollectionExpression::AnyNumberOf => {
+            let pred = predicate_serializer::serialize_card_predicate_plural(predicate, bindings);
+            if let Some(energy_cost) = cost {
+                if this_turn {
+                    format!(
+                        "{}.",
+                        strings::void_any_number_gain_reclaim_for_cost_this_turn(
+                            pred,
+                            energy_cost.0
+                        )
+                    )
+                } else {
+                    format!(
+                        "{}.",
+                        strings::void_any_number_gain_reclaim_for_cost(pred, energy_cost.0)
+                    )
+                }
+            } else if this_turn {
+                format!("{}.", strings::void_any_number_gain_reclaim_equal_cost_this_turn(pred))
+            } else {
+                format!("{}.", strings::void_any_number_gain_reclaim_equal_cost(pred))
+            }
+        }
+        CollectionExpression::OrMore(n) => {
+            let pred = predicate_serializer::serialize_card_predicate_plural(predicate, bindings);
+            if let Some(energy_cost) = cost {
+                if this_turn {
+                    format!(
+                        "{}.",
+                        strings::void_or_more_gain_reclaim_for_cost_this_turn(
+                            *n,
+                            pred,
+                            energy_cost.0
+                        )
+                    )
+                } else {
+                    format!(
+                        "{}.",
+                        strings::void_or_more_gain_reclaim_for_cost(*n, pred, energy_cost.0)
+                    )
+                }
+            } else if this_turn {
+                format!("{}.", strings::void_or_more_gain_reclaim_equal_cost_this_turn(*n, pred))
+            } else {
+                format!("{}.", strings::void_or_more_gain_reclaim_equal_cost(*n, pred))
+            }
+        }
+        CollectionExpression::EachOther => {
+            if let Some(energy_cost) = cost {
+                if this_turn {
+                    strings::void_each_other_gains_reclaim_for_cost_this_turn(energy_cost.0)
+                        .to_string()
+                } else {
+                    strings::void_each_other_gains_reclaim_for_cost(energy_cost.0).to_string()
+                }
+            } else if this_turn {
+                strings::void_each_other_gains_reclaim_equal_cost_this_turn().to_string()
+            } else {
+                strings::void_each_other_gains_reclaim_equal_cost().to_string()
+            }
+        }
     }
 }

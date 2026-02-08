@@ -996,4 +996,140 @@ rlf::rlf! {
     materialize_figments_for_each($fig, $for_each) = "{{materialize}} {$fig} for each {$for_each}";
     // Materialize figments for each quantity.
     materialize_figments_for_each_quantity($fig, $quantity) = "{{materialize}} {$fig} for each {$quantity}";
+
+    // =========================================================================
+    // Banish then materialize phrases
+    // =========================================================================
+
+    // Banish a single target then materialize it.
+    banish_then_materialize_it($target) = "{{banish}} {$target}, then {{materialize}} it";
+    // Banish any number of targets then materialize them.
+    banish_then_materialize_any_number($target) = "{{banish}} any number of {$target}, then {{materialize}} them";
+    // Banish up to N allies then materialize them (uses pronoun agreement).
+    banish_then_materialize_up_to($n, $target) = "{{banish}} up to {$n} {$target}, then {{materialize}} {pronoun:$n}";
+    // Banish targets then materialize them (default plural).
+    banish_then_materialize_them($target) = "{{banish}} {$target}, then {{materialize}} them";
+
+    // =========================================================================
+    // Allied card predicate phrases
+    // =========================================================================
+
+    // Allied card predicate with subtype.
+    allied_card_with_subtype($t) = "allied {subtype($t)}";
+    // Allied card predicate with base text.
+    allied_card_with_base($base) = "allied {$base}";
+    // Allied card predicate plural with subtype.
+    allied_card_with_subtype_plural($t) = "allied {subtype($t):other}";
+    // Allied card predicate plural with base text.
+    allied_card_with_base_plural($base) = "allied {$base}";
+
+    // =========================================================================
+    // Gains reclaim effect phrases
+    // =========================================================================
+
+    // It gains reclaim with cost.
+    it_gains_reclaim_for_cost($r) = "it gains {reclaim_for_cost($r)}";
+    // It gains reclaim equal to its cost.
+    it_gains_reclaim_equal_cost = "it gains {reclaim} equal to its cost";
+    // This card gains reclaim with cost.
+    this_card_gains_reclaim_for_cost($r) = "this card gains {reclaim_for_cost($r)}";
+    // This card gains reclaim equal to its cost.
+    this_card_gains_reclaim_equal_cost = "this card gains {reclaim} equal to its cost";
+    // Target gains reclaim with cost.
+    target_gains_reclaim_for_cost($target, $r) = "{$target} gains {reclaim_for_cost($r)}";
+    // Target gains reclaim equal to its cost.
+    target_gains_reclaim_equal_cost($target) = "{$target} gains {reclaim} equal to its cost";
+
+    // It gains reclaim with cost this turn.
+    it_gains_reclaim_for_cost_this_turn($r) = "it gains {reclaim_for_cost($r)} this turn";
+    // It gains reclaim equal to its cost this turn.
+    it_gains_reclaim_equal_cost_this_turn = "it gains {reclaim} equal to its cost this turn";
+    // This card gains reclaim with cost this turn.
+    this_card_gains_reclaim_for_cost_this_turn($r) = "this card gains {reclaim_for_cost($r)} this turn";
+    // This card gains reclaim equal to its cost this turn.
+    this_card_gains_reclaim_equal_cost_this_turn = "this card gains {reclaim} equal to its cost this turn";
+    // Target gains reclaim with cost this turn.
+    target_gains_reclaim_for_cost_this_turn($target, $r) = "{$target} gains {reclaim_for_cost($r)} this turn";
+    // Target gains reclaim equal to its cost this turn.
+    target_gains_reclaim_equal_cost_this_turn($target) = "{$target} gains {reclaim} equal to its cost this turn";
+
+    // =========================================================================
+    // Void gains reclaim effect phrases (singular)
+    // =========================================================================
+
+    // A single card in your void gains reclaim with cost.
+    void_single_gains_reclaim_for_cost($pred, $r) = "{$pred} in your void gains {reclaim_for_cost($r)}";
+    // A single card in your void gains reclaim equal to its cost.
+    void_single_gains_reclaim_equal_cost($pred) = "{$pred} in your void gains {reclaim} equal to its cost";
+    // A single card in your void gains reclaim with cost this turn.
+    void_single_gains_reclaim_for_cost_this_turn($pred, $r) = "{$pred} in your void gains {reclaim_for_cost($r)} this turn";
+    // A single card in your void gains reclaim equal to its cost this turn.
+    void_single_gains_reclaim_equal_cost_this_turn($pred) = "{$pred} in your void gains {reclaim} equal to its cost this turn";
+
+    // =========================================================================
+    // Void gains reclaim effect phrases (plural - collection)
+    // =========================================================================
+
+    // N cards in your void gain reclaim with cost.
+    void_exactly_n_gain_reclaim_for_cost($n, $pred, $r) = "{$n} {$pred} in your void gain {reclaim_for_cost($r)}";
+    // N cards in your void gain reclaim equal to their cost.
+    void_exactly_n_gain_reclaim_equal_cost($n, $pred) = "{$n} {$pred} in your void gain {reclaim} equal to their cost";
+    // N cards in your void gain reclaim with cost this turn.
+    void_exactly_n_gain_reclaim_for_cost_this_turn($n, $pred, $r) = "{$n} {$pred} in your void gain {reclaim_for_cost($r)} this turn";
+    // N cards in your void gain reclaim equal to their cost this turn.
+    void_exactly_n_gain_reclaim_equal_cost_this_turn($n, $pred) = "{$n} {$pred} in your void gain {reclaim} equal to their cost this turn";
+
+    // All cards in your void gain reclaim with cost.
+    void_all_gain_reclaim_for_cost($r) = "all cards currently in your void gain {reclaim_for_cost($r)}";
+    // All cards in your void gain reclaim equal to their cost.
+    void_all_gain_reclaim_equal_cost = "all cards currently in your void gain {reclaim} equal to their cost";
+    // All cards in your void gain reclaim with cost this turn.
+    void_all_gain_reclaim_for_cost_this_turn($r) = "all cards currently in your void gain {reclaim_for_cost($r)} this turn";
+    // All cards in your void gain reclaim equal to their cost this turn.
+    void_all_gain_reclaim_equal_cost_this_turn = "all cards currently in your void gain {reclaim} equal to their cost this turn";
+
+    // All but one cards in your void gain reclaim with cost.
+    void_all_but_one_gain_reclaim_for_cost($pred, $r) = "all but one {$pred} in your void gain {reclaim_for_cost($r)}";
+    // All but one cards in your void gain reclaim equal to their cost.
+    void_all_but_one_gain_reclaim_equal_cost($pred) = "all but one {$pred} in your void gain {reclaim} equal to their cost";
+    // All but one cards in your void gain reclaim with cost this turn.
+    void_all_but_one_gain_reclaim_for_cost_this_turn($pred, $r) = "all but one {$pred} in your void gain {reclaim_for_cost($r)} this turn";
+    // All but one cards in your void gain reclaim equal to their cost this turn.
+    void_all_but_one_gain_reclaim_equal_cost_this_turn($pred) = "all but one {$pred} in your void gain {reclaim} equal to their cost this turn";
+
+    // Up to N cards in your void gain reclaim with cost.
+    void_up_to_gain_reclaim_for_cost($n, $pred, $r) = "up to {$n} {$pred} in your void gain {reclaim_for_cost($r)}";
+    // Up to N cards in your void gain reclaim equal to their cost.
+    void_up_to_gain_reclaim_equal_cost($n, $pred) = "up to {$n} {$pred} in your void gain {reclaim} equal to their cost";
+    // Up to N cards in your void gain reclaim with cost this turn.
+    void_up_to_gain_reclaim_for_cost_this_turn($n, $pred, $r) = "up to {$n} {$pred} in your void gain {reclaim_for_cost($r)} this turn";
+    // Up to N cards in your void gain reclaim equal to their cost this turn.
+    void_up_to_gain_reclaim_equal_cost_this_turn($n, $pred) = "up to {$n} {$pred} in your void gain {reclaim} equal to their cost this turn";
+
+    // Any number of cards in your void gain reclaim with cost.
+    void_any_number_gain_reclaim_for_cost($pred, $r) = "any number of {$pred} in your void gain {reclaim_for_cost($r)}";
+    // Any number of cards in your void gain reclaim equal to their cost.
+    void_any_number_gain_reclaim_equal_cost($pred) = "any number of {$pred} in your void gain {reclaim} equal to their cost";
+    // Any number of cards in your void gain reclaim with cost this turn.
+    void_any_number_gain_reclaim_for_cost_this_turn($pred, $r) = "any number of {$pred} in your void gain {reclaim_for_cost($r)} this turn";
+    // Any number of cards in your void gain reclaim equal to their cost this turn.
+    void_any_number_gain_reclaim_equal_cost_this_turn($pred) = "any number of {$pred} in your void gain {reclaim} equal to their cost this turn";
+
+    // N or more cards in your void gain reclaim with cost.
+    void_or_more_gain_reclaim_for_cost($n, $pred, $r) = "{$n} or more {$pred} in your void gain {reclaim_for_cost($r)}";
+    // N or more cards in your void gain reclaim equal to their cost.
+    void_or_more_gain_reclaim_equal_cost($n, $pred) = "{$n} or more {$pred} in your void gain {reclaim} equal to their cost";
+    // N or more cards in your void gain reclaim with cost this turn.
+    void_or_more_gain_reclaim_for_cost_this_turn($n, $pred, $r) = "{$n} or more {$pred} in your void gain {reclaim_for_cost($r)} this turn";
+    // N or more cards in your void gain reclaim equal to their cost this turn.
+    void_or_more_gain_reclaim_equal_cost_this_turn($n, $pred) = "{$n} or more {$pred} in your void gain {reclaim} equal to their cost this turn";
+
+    // Each other card in your void gains reclaim with cost.
+    void_each_other_gains_reclaim_for_cost($r) = "Each other card in your void gains {reclaim_for_cost($r)}";
+    // Each other card in your void gains reclaim equal to its cost.
+    void_each_other_gains_reclaim_equal_cost = "Each other card in your void gains {reclaim} equal to its cost";
+    // Each other card in your void gains reclaim with cost this turn.
+    void_each_other_gains_reclaim_for_cost_this_turn($r) = "Each other card in your void gains {reclaim_for_cost($r)} this turn";
+    // Each other card in your void gains reclaim equal to its cost this turn.
+    void_each_other_gains_reclaim_equal_cost_this_turn = "Each other card in your void gains {reclaim} equal to its cost this turn";
 }
