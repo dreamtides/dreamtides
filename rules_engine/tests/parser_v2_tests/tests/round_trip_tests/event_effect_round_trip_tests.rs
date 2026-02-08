@@ -11,17 +11,17 @@ use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_discover_card_by_cost() {
-    assert_round_trip("{Discover} a card with cost {energy(e)}.", "e: 2");
+    assert_round_trip("{Discover} a card with cost {energy($e)}.", "e: 2");
 }
 
 #[test]
 fn test_discover_subtype() {
-    assert_round_trip("{Discover} {@a subtype(t)}.", "t: Warrior");
+    assert_round_trip("{Discover} {@a subtype($t)}.", "t: Warrior");
 }
 
 #[test]
 fn test_discover_subtype_survivor() {
-    assert_round_trip("{Discover} {@a subtype(t)}.", "t: Survivor");
+    assert_round_trip("{Discover} {@a subtype($t)}.", "t: Survivor");
 }
 
 #[test]
@@ -55,39 +55,39 @@ fn test_dissolve_all_characters() {
 
 #[test]
 fn test_dissolve_enemy_lose_points() {
-    assert_round_trip("{Dissolve} an enemy. You lose {points(p)}.", "p: 4");
+    assert_round_trip("{Dissolve} an enemy. You lose {points($p)}.", "p: 4");
 }
 
 #[test]
 fn test_dissolve_enemy_opponent_gains_points() {
-    assert_round_trip("{Dissolve} an enemy. The opponent gains {points(p)}.", "p: 3");
+    assert_round_trip("{Dissolve} an enemy. The opponent gains {points($p)}.", "p: 3");
 }
 
 #[test]
 fn test_dissolve_enemy_by_spark_or_less() {
-    assert_round_trip("{Dissolve} an enemy with spark {s} or less.", "s: 1");
+    assert_round_trip("{Dissolve} an enemy with spark {$s} or less.", "s: 1");
 }
 
 #[test]
 fn test_dissolve_enemy_by_spark_or_more() {
-    assert_round_trip("{Dissolve} an enemy with spark {s} or more.", "s: 3");
+    assert_round_trip("{Dissolve} an enemy with spark {$s} or more.", "s: 3");
 }
 
 #[test]
 fn test_dissolve_enemy_by_cost_or_less() {
-    assert_round_trip("{Dissolve} an enemy with cost {energy(e)} or less.", "e: 2");
+    assert_round_trip("{Dissolve} an enemy with cost {energy($e)} or less.", "e: 2");
 }
 
 #[test]
 fn test_dissolve_enemy_by_cost_or_more_with_reclaim() {
-    assert_round_trip("{Dissolve} an enemy with cost {energy(e)} or more.", "e: 3");
-    assert_round_trip("{Reclaim_For_Cost(r)}", "r: 2");
+    assert_round_trip("{Dissolve} an enemy with cost {energy($e)} or more.", "e: 3");
+    assert_round_trip("{Reclaim_For_Cost($r)}", "r: 2");
 }
 
 #[test]
 fn test_dissolve_enemy_by_subtype_count() {
     assert_round_trip(
-        "{Dissolve} an enemy with cost less than the number of allied {@plural subtype(t)}.",
+        "{Dissolve} an enemy with cost less than the number of allied {@plural subtype($t)}.",
         "t: Warrior",
     );
 }
@@ -102,7 +102,7 @@ fn test_dissolve_enemy_by_void_count() {
 
 #[test]
 fn test_dissolve_enemy_draw() {
-    assert_round_trip("{Dissolve} an enemy. Draw {cards(c)}.", "c: 1");
+    assert_round_trip("{Dissolve} an enemy. Draw {cards($c)}.", "c: 1");
 }
 
 #[test]
@@ -112,7 +112,7 @@ fn test_dissolve_by_energy_paid() {
 
 #[test]
 fn test_dissolve_enemy_with_reclaim_cost() {
-    assert_round_trip("{Dissolve} an enemy with cost {energy(e)} or less.", "e: 2");
+    assert_round_trip("{Dissolve} an enemy with cost {energy($e)} or less.", "e: 2");
     assert_round_trip("{Reclaim} -- Abandon an ally", "");
 }
 
@@ -122,23 +122,26 @@ fn test_dissolve_enemy_with_reclaim_cost() {
 
 #[test]
 fn test_banish_enemy_by_cost() {
-    assert_round_trip("{Banish} an enemy with cost {energy(e)} or less.", "e: 2");
+    assert_round_trip("{Banish} an enemy with cost {energy($e)} or less.", "e: 2");
 }
 
 #[test]
 fn test_banish_non_subtype_enemy() {
-    assert_round_trip("{Banish} a non-{subtype(t)} enemy.", "t: Warrior");
+    assert_round_trip("{Banish} a non-{subtype($t)} enemy.", "t: Warrior");
 }
 
 #[test]
 fn test_banish_allies_then_materialize() {
-    assert_round_trip("{Banish} {up_to_n_allies(n)}, then {materialize} {it_or_them(n)}.", "n: 2");
+    assert_round_trip(
+        "{Banish} {up_to_n_allies($n)}, then {materialize} {it_or_them($n)}.",
+        "n: 2",
+    );
 }
 
 #[test]
 fn test_banish_ally_materialize_at_end_of_turn() {
     assert_round_trip("{Banish} an ally. {Materialize} it at end of turn.", "");
-    assert_round_trip("{Reclaim_For_Cost(r)}", "r: 1");
+    assert_round_trip("{Reclaim_For_Cost($r)}", "r: 1");
 }
 
 // ============================================================================
@@ -152,7 +155,7 @@ fn test_prevent_played_card() {
 
 #[test]
 fn test_prevent_played_event_unless_pay() {
-    assert_round_trip("{Prevent} a played event unless the opponent pays {energy(e)}.", "e: 2");
+    assert_round_trip("{Prevent} a played event unless the opponent pays {energy($e)}.", "e: 2");
 }
 
 #[test]
@@ -181,34 +184,34 @@ fn test_prevent_played_card_put_on_deck() {
 
 #[test]
 fn test_draw_cards() {
-    assert_round_trip("Draw {cards(c)}.", "c: 3");
+    assert_round_trip("Draw {cards($c)}.", "c: 3");
 }
 
 #[test]
 fn test_draw_one() {
-    assert_round_trip("Draw {cards(c)}.", "c: 1");
+    assert_round_trip("Draw {cards($c)}.", "c: 1");
 }
 
 #[test]
 fn test_draw_discard_with_reclaim() {
-    assert_round_trip("Draw {cards(c)}. Discard {cards(d)}.", "c: 2\nd: 2");
-    assert_round_trip("{Reclaim_For_Cost(r)}", "r: 2");
+    assert_round_trip("Draw {cards($c)}. Discard {cards($d)}.", "c: 2\nd: 2");
+    assert_round_trip("{Reclaim_For_Cost($r)}", "r: 2");
 }
 
 #[test]
 fn test_draw_discard() {
-    assert_round_trip("Draw {cards(c)}. Discard {cards(d)}.", "c: 3\nd: 2");
+    assert_round_trip("Draw {cards($c)}. Discard {cards($d)}.", "c: 3\nd: 2");
 }
 
 #[test]
 fn test_discard_draw() {
-    assert_round_trip("Discard {cards(d)}. Draw {cards(c)}.", "d: 1\nc: 2");
+    assert_round_trip("Discard {cards($d)}. Draw {cards($c)}.", "d: 1\nc: 2");
 }
 
 #[test]
 fn test_discard_chosen_from_opponent_hand_by_cost() {
     assert_round_trip(
-        "Discard a chosen card with cost {energy(e)} or less from the opponent's hand.",
+        "Discard a chosen card with cost {energy($e)} or less from the opponent's hand.",
         "e: 3",
     );
 }
@@ -220,31 +223,31 @@ fn test_discard_chosen_character_from_opponent_hand() {
 
 #[test]
 fn test_return_character_to_hand_draw() {
-    assert_round_trip("Return an enemy or ally to hand. Draw {cards(c)}.", "c: 1");
+    assert_round_trip("Return an enemy or ally to hand. Draw {cards($c)}.", "c: 1");
 }
 
 #[test]
 fn test_may_return_character_from_void_draw() {
     assert_round_trip(
-        "You may return a character from your void to your hand, then draw {cards(c)}.",
+        "You may return a character from your void to your hand, then draw {cards($c)}.",
         "c: 1",
     );
 }
 
 #[test]
 fn test_draw_per_cards_played() {
-    assert_round_trip("Draw {cards(c)} for each card you have played this turn.", "c: 1");
+    assert_round_trip("Draw {cards($c)} for each card you have played this turn.", "c: 1");
 }
 
 #[test]
 fn test_return_events_from_void() {
-    assert_round_trip("Return {up_to_n_events(n)} from your void to your hand.", "n: 2");
+    assert_round_trip("Return {up_to_n_events($n)} from your void to your hand.", "n: 2");
 }
 
 #[test]
 fn test_put_top_cards_to_void_draw() {
     assert_round_trip(
-        "Put the {top_n_cards(v)} of your deck into your void. Draw {cards(c)}.",
+        "Put the {top_n_cards($v)} of your deck into your void. Draw {cards($c)}.",
         "v: 3\nc: 1",
     );
 }
@@ -255,33 +258,33 @@ fn test_put_top_cards_to_void_draw() {
 
 #[test]
 fn test_gain_energy() {
-    assert_round_trip("Gain {energy(e)}.", "e: 3");
+    assert_round_trip("Gain {energy($e)}.", "e: 3");
 }
 
 #[test]
 fn test_gain_four_energy() {
-    assert_round_trip("Gain {energy(e)}.", "e: 4");
+    assert_round_trip("Gain {energy($e)}.", "e: 4");
 }
 
 #[test]
 fn test_gain_six_energy() {
-    assert_round_trip("Gain {energy(e)}.", "e: 6");
+    assert_round_trip("Gain {energy($e)}.", "e: 6");
 }
 
 #[test]
 fn test_gain_points_per_cards_played() {
-    assert_round_trip("Gain {points(p)} for each card you have played this turn.", "p: 1");
+    assert_round_trip("Gain {points($p)} for each card you have played this turn.", "p: 1");
 }
 
 #[test]
 fn test_multiply_energy() {
-    assert_round_trip("{multiply_by(n)} the amount of {energy_symbol} you have.", "n: 2");
+    assert_round_trip("{multiply_by($n)} the amount of {energy_symbol} you have.", "n: 2");
 }
 
 #[test]
 fn test_multiply_energy_gain() {
     assert_round_trip(
-        "{multiply_by(n)} the amount of {energy_symbol} you gain from card effects this turn.",
+        "{multiply_by($n)} the amount of {energy_symbol} you gain from card effects this turn.",
         "n: 2",
     );
 }
@@ -289,19 +292,22 @@ fn test_multiply_energy_gain() {
 #[test]
 fn test_multiply_draw() {
     assert_round_trip(
-        "{multiply_by(n)} the number of cards you draw from card effects this turn.",
+        "{multiply_by($n)} the number of cards you draw from card effects this turn.",
         "n: 2",
     );
 }
 
 #[test]
 fn test_gain_energy_draw() {
-    assert_round_trip("Gain {energy(e)}. Draw {cards(c)}.", "e: 2\nc: 1");
+    assert_round_trip("Gain {energy($e)}. Draw {cards($c)}.", "e: 2\nc: 1");
 }
 
 #[test]
 fn test_draw_discard_gain_energy() {
-    assert_round_trip("Draw {cards(c)}. Discard {cards(d)}. Gain {energy(e)}.", "c: 2\nd: 2\ne: 2");
+    assert_round_trip(
+        "Draw {cards($c)}. Discard {cards($d)}. Gain {energy($e)}.",
+        "c: 2\nd: 2\ne: 2",
+    );
 }
 
 // ============================================================================
@@ -323,8 +329,8 @@ fn test_event_gains_reclaim_for_cost() {
 
 #[test]
 fn test_foresee_draw_with_reclaim() {
-    assert_round_trip("{Foresee(f)}. Draw {cards(c)}.", "f: 1\nc: 1");
-    assert_round_trip("{Reclaim_For_Cost(r)}", "r: 3");
+    assert_round_trip("{Foresee($f)}. Draw {cards($c)}.", "f: 1\nc: 1");
+    assert_round_trip("{Reclaim_For_Cost($r)}", "r: 3");
 }
 
 // ============================================================================
@@ -350,8 +356,8 @@ fn test_extra_turn() {
 
 #[test]
 fn test_copy_next_event_times() {
-    assert_round_trip("Copy the next event you play {this_turn_times(n)}.", "n: 3");
-    assert_round_trip("{Reclaim_For_Cost(r)}", "r: 2");
+    assert_round_trip("Copy the next event you play {this_turn_times($n)}.", "n: 3");
+    assert_round_trip("{Reclaim_For_Cost($r)}", "r: 2");
 }
 
 // ============================================================================
@@ -361,7 +367,7 @@ fn test_copy_next_event_times() {
 #[test]
 fn test_shuffle_and_draw() {
     assert_round_trip(
-        "Each player shuffles their hand and void into their deck and then draws {cards(c)}.",
+        "Each player shuffles their hand and void into their deck and then draws {cards($c)}.",
         "c: 5",
     );
 }
@@ -372,7 +378,10 @@ fn test_shuffle_and_draw() {
 
 #[test]
 fn test_ally_gains_spark_per_subtype() {
-    assert_round_trip("An ally gains +{s} spark for each allied {subtype(t)}.", "s: 1\nt: Warrior");
+    assert_round_trip(
+        "An ally gains +{$s} spark for each allied {subtype($t)}.",
+        "s: 1\nt: Warrior",
+    );
 }
 
 // ============================================================================
@@ -382,20 +391,20 @@ fn test_ally_gains_spark_per_subtype() {
 #[test]
 fn test_materialize_figments_per_cards_played() {
     assert_round_trip(
-        "{Materialize} {a_figment(g)} for each card you have played this turn.",
+        "{Materialize} {a_figment($g)} for each card you have played this turn.",
         "g: celestial",
     );
 }
 
 #[test]
 fn test_materialize_multiple_figments() {
-    assert_round_trip("{Materialize} {n_figments(n, g)}.", "n: 3\ng: radiant");
+    assert_round_trip("{Materialize} {n_figments($n, $g)}.", "n: 3\ng: radiant");
 }
 
 #[test]
 fn test_materialize_random_characters_from_deck() {
     assert_round_trip(
-        "{Materialize} {n_random_characters(n)} with cost {energy(e)} or less from your deck.",
+        "{Materialize} {n_random_characters($n)} with cost {energy($e)} or less from your deck.",
         "e: 3\nn: 2",
     );
 }
@@ -406,5 +415,5 @@ fn test_materialize_random_characters_from_deck() {
 
 #[test]
 fn test_choose_one_return_or_draw() {
-    assert_round_trip("{choose_one}\n{bullet} {energy(e1)}: Return an enemy to hand.\n{bullet} {energy(e2)}: Draw {cards(c)}.", "e1: 2\ne2: 3\nc: 2");
+    assert_round_trip("{choose_one}\n{bullet} {energy($e1)}: Return an enemy to hand.\n{bullet} {energy($e2)}: Draw {cards($c)}.", "e1: 2\ne2: 3\nc: 2");
 }
