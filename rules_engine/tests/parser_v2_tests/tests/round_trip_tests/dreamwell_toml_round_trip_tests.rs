@@ -1,14 +1,9 @@
 //! Round-trip tests for all dreamwells in dreamwell.toml.
 //!
 //! Verifies that parsing and serializing each dreamwell's rules text produces
-//! the original text and variable bindings.
+//! rendered output matching the directly-rendered input text.
 
-use chumsky::Parser;
-use parser_v2::lexer::lexer_tokenize;
-use parser_v2::parser::ability_parser;
-use parser_v2::serializer::ability_serializer;
-use parser_v2::variables::parser_bindings::VariableBindings;
-use parser_v2::variables::parser_substitutions;
+use parser_v2_tests::test_helpers;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -24,30 +19,6 @@ struct Dreamwell {
     variables: Option<String>,
 }
 
-struct ResolvedAbility {
-    dreamwell_name: String,
-    ability_text: String,
-    variables: String,
-    bindings: VariableBindings,
-    resolved_tokens: Vec<(parser_substitutions::ResolvedToken, chumsky::span::SimpleSpan)>,
-}
-
-struct RoundTripError {
-    dreamwell_name: String,
-    ability_text: String,
-    variables: String,
-    serialized_text: String,
-    serialized_variables: String,
-    error_type: RoundTripErrorType,
-}
-
-enum RoundTripErrorType {
-    TextMismatch,
-    VariableMismatch,
-    AstMismatch,
-    ParseError(String),
-}
-
 #[test]
 fn test_all_dreamwell_toml_round_trip() {
     let dreamwell_toml = std::fs::read_to_string("../../tabula/dreamwell.toml")
@@ -55,8 +26,9 @@ fn test_all_dreamwell_toml_round_trip() {
     let dreamwell_file: DreamwellFile =
         toml::from_str(&dreamwell_toml).expect("Failed to parse dreamwell.toml");
 
-    let mut resolved_abilities = Vec::new();
-    let mut resolution_errors = Vec::new();
+    let mut errors = Vec::new();
+    let mut success_count = 0;
+    let mut total_abilities = 0;
 
     for dreamwell in &dreamwell_file.dreamwell {
         let Some(rules_text) = &dreamwell.rules_text else {
@@ -71,240 +43,22 @@ fn test_all_dreamwell_toml_round_trip() {
                 continue;
             }
 
-            match resolve_ability(&dreamwell.name, ability_block, variables) {
-                Ok(resolved) => resolved_abilities.push(resolved),
-                Err(error) => resolution_errors.push(error),
+            total_abilities += 1;
+
+            match test_helpers::assert_rendered_match_for_toml(
+                &dreamwell.name,
+                ability_block,
+                variables,
+            ) {
+                Ok(()) => success_count += 1,
+                Err(error) => errors.push(error),
             }
         }
     }
 
-    let parser = ability_parser::ability_parser();
+    test_helpers::print_bulk_results("dreamwell.toml", success_count, total_abilities, &errors);
 
-    let mut round_trip_errors = Vec::new();
-    let mut success_count = 0;
-
-    for resolved in &resolved_abilities {
-        match parser.parse(&resolved.resolved_tokens).into_result() {
-            Ok(ability) => {
-                let serialized = ability_serializer::serialize_ability(&ability);
-
-                if serialized.text != resolved.ability_text {
-                    round_trip_errors.push(RoundTripError {
-                        dreamwell_name: resolved.dreamwell_name.clone(),
-                        ability_text: resolved.ability_text.clone(),
-                        variables: resolved.variables.clone(),
-                        serialized_text: serialized.text,
-                        serialized_variables: format!("{:?}", serialized.variables),
-                        error_type: RoundTripErrorType::TextMismatch,
-                    });
-                } else if !variables_match(&serialized.variables, &resolved.bindings) {
-                    round_trip_errors.push(RoundTripError {
-                        dreamwell_name: resolved.dreamwell_name.clone(),
-                        ability_text: resolved.ability_text.clone(),
-                        variables: resolved.variables.clone(),
-                        serialized_text: serialized.text,
-                        serialized_variables: format!("{:?}", serialized.variables),
-                        error_type: RoundTripErrorType::VariableMismatch,
-                    });
-                } else if let Some(reparse_error) =
-                    check_ast_round_trip(&serialized.text, &resolved.resolved_tokens)
-                {
-                    round_trip_errors.push(RoundTripError {
-                        dreamwell_name: resolved.dreamwell_name.clone(),
-                        ability_text: resolved.ability_text.clone(),
-                        variables: resolved.variables.clone(),
-                        serialized_text: reparse_error,
-                        serialized_variables: format!("{:?}", serialized.variables),
-                        error_type: RoundTripErrorType::AstMismatch,
-                    });
-                } else {
-                    success_count += 1;
-                }
-            }
-            Err(errors) => {
-                let error_msg = if errors.is_empty() {
-                    "Unknown parse error".to_string()
-                } else {
-                    format!("{:?}", errors[0])
-                };
-                round_trip_errors.push(RoundTripError {
-                    dreamwell_name: resolved.dreamwell_name.clone(),
-                    ability_text: resolved.ability_text.clone(),
-                    variables: resolved.variables.clone(),
-                    serialized_text: String::new(),
-                    serialized_variables: String::new(),
-                    error_type: RoundTripErrorType::ParseError(error_msg),
-                });
-            }
-        }
+    if !errors.is_empty() {
+        panic!("\n{} abilities failed rendered comparison (see details above)", errors.len());
     }
-
-    let all_errors: Vec<RoundTripError> =
-        resolution_errors.into_iter().chain(round_trip_errors).collect();
-
-    let total_abilities = resolved_abilities.len() + all_errors.len();
-    print_results("dreamwell.toml", success_count, total_abilities, &all_errors);
-
-    if !all_errors.is_empty() {
-        panic!("\n{} abilities failed round-trip (see details above)", all_errors.len());
-    }
-}
-
-fn resolve_ability(
-    dreamwell_name: &str,
-    ability_text: &str,
-    variables: &str,
-) -> Result<ResolvedAbility, RoundTripError> {
-    let bindings = VariableBindings::parse(variables).map_err(|e| RoundTripError {
-        dreamwell_name: dreamwell_name.to_string(),
-        ability_text: ability_text.to_string(),
-        variables: variables.to_string(),
-        serialized_text: String::new(),
-        serialized_variables: String::new(),
-        error_type: RoundTripErrorType::ParseError(format!("Variable binding error: {:?}", e)),
-    })?;
-
-    let lex_result = lexer_tokenize::lex(ability_text).map_err(|e| RoundTripError {
-        dreamwell_name: dreamwell_name.to_string(),
-        ability_text: ability_text.to_string(),
-        variables: variables.to_string(),
-        serialized_text: String::new(),
-        serialized_variables: String::new(),
-        error_type: RoundTripErrorType::ParseError(format!("Lexer error: {:?}", e)),
-    })?;
-
-    let resolved_tokens = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings)
-        .map_err(|e| RoundTripError {
-            dreamwell_name: dreamwell_name.to_string(),
-            ability_text: ability_text.to_string(),
-            variables: variables.to_string(),
-            serialized_text: String::new(),
-            serialized_variables: String::new(),
-            error_type: RoundTripErrorType::ParseError(format!("Variable resolution error: {}", e)),
-        })?;
-
-    Ok(ResolvedAbility {
-        dreamwell_name: dreamwell_name.to_string(),
-        ability_text: ability_text.to_string(),
-        variables: variables.to_string(),
-        bindings,
-        resolved_tokens,
-    })
-}
-
-/// Checks that reparsing the serialized text produces the same AST.
-///
-/// Returns `None` on success, or `Some(error_description)` on failure.
-fn check_ast_round_trip(
-    serialized_text: &str,
-    original_tokens: &[(parser_substitutions::ResolvedToken, chumsky::span::SimpleSpan)],
-) -> Option<String> {
-    let original_ability = {
-        let parser = ability_parser::ability_parser();
-        match parser.parse(original_tokens).into_result() {
-            Ok(a) => a,
-            Err(_) => return Some("Failed to parse original tokens".to_string()),
-        }
-    };
-
-    let lex_result = match lexer_tokenize::lex(serialized_text) {
-        Ok(r) => r,
-        Err(e) => return Some(format!("Failed to lex serialized text: {e:?}")),
-    };
-
-    let serialized_ability = ability_serializer::serialize_ability(&original_ability);
-    let bindings = serialized_ability.variables;
-
-    let resolved = match parser_substitutions::resolve_variables(&lex_result.tokens, &bindings) {
-        Ok(r) => r,
-        Err(e) => return Some(format!("Failed to resolve variables: {e}")),
-    };
-
-    let reparsed_ability = {
-        let parser = ability_parser::ability_parser();
-        match parser.parse(&resolved).into_result() {
-            Ok(a) => a,
-            Err(e) => return Some(format!("Failed to reparse serialized text: {e:?}")),
-        }
-    };
-
-    if original_ability != reparsed_ability {
-        Some(format!(
-            "AST mismatch:\n  original: {original_ability:?}\n  reparsed: {reparsed_ability:?}"
-        ))
-    } else {
-        None
-    }
-}
-
-/// Checks that all serialized variables match the original bindings.
-///
-/// Returns true if every variable in `serialized` has the same value in
-/// `original`. This allows the original to contain extra variables (for cards
-/// with multiple abilities sharing the same variables).
-fn variables_match(serialized: &VariableBindings, original: &VariableBindings) -> bool {
-    for (key, value) in serialized.iter() {
-        if original.get(key) != Some(value) {
-            return false;
-        }
-    }
-    true
-}
-
-fn print_results(
-    file_name: &str,
-    success_count: usize,
-    total_abilities: usize,
-    errors: &[RoundTripError],
-) {
-    println!("\n========================================");
-    println!("{} Round-Trip Validation Results", file_name);
-    println!("========================================\n");
-    println!("Total abilities: {}", total_abilities);
-    println!("Successfully round-tripped: {}", success_count);
-    println!("Failed round-trip: {}\n", errors.len());
-
-    if errors.is_empty() {
-        println!("All abilities round-tripped successfully!");
-    } else {
-        println!("Round-Trip Failures:\n");
-        println!("{}", "=".repeat(80));
-
-        for (i, error) in errors.iter().enumerate() {
-            println!("\nFailure #{}", i + 1);
-            println!("{}", "-".repeat(80));
-            println!("Dreamwell: {}", error.dreamwell_name);
-            println!("\nOriginal Text:");
-            println!("  {}", error.ability_text.replace('\n', "\n  "));
-
-            if !error.variables.is_empty() {
-                println!("\nOriginal Variables:");
-                println!("  {}", error.variables.replace('\n', "\n  "));
-            }
-
-            match &error.error_type {
-                RoundTripErrorType::TextMismatch => {
-                    println!("\nError: Text mismatch");
-                    println!("\nSerialized Text:");
-                    println!("  {}", error.serialized_text.replace('\n', "\n  "));
-                }
-                RoundTripErrorType::VariableMismatch => {
-                    println!("\nError: Variable mismatch");
-                    println!("\nSerialized Variables:");
-                    println!("  {}", error.serialized_variables);
-                }
-                RoundTripErrorType::AstMismatch => {
-                    println!(
-                        "\nError: AST mismatch (parse(input) != parse(serialize(parse(input))))"
-                    );
-                    println!("\n{}", error.serialized_text);
-                }
-                RoundTripErrorType::ParseError(msg) => {
-                    println!("\nParse Error: {}", msg);
-                }
-            }
-            println!("{}", "-".repeat(80));
-        }
-    }
-    println!("\n========================================\n");
 }
