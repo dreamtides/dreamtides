@@ -418,7 +418,7 @@ pub fn serialize_standard_effect(
         StandardEffect::MaterializeFigments { count, figment } => {
             bindings.insert("g".to_string(), VariableValue::Figment(*figment));
             if *count == 1 {
-                "{materialize} {a_figment($g)}.".to_string()
+                "{materialize} {@a figment($g)}.".to_string()
             } else {
                 bindings.insert("n".to_string(), VariableValue::Integer(*count));
                 "{materialize} {n_figments($n, $g)}.".to_string()
@@ -427,7 +427,7 @@ pub fn serialize_standard_effect(
         StandardEffect::MaterializeFigmentsQuantity { count, quantity, figment } => {
             bindings.insert("g".to_string(), VariableValue::Figment(*figment));
             let figment_text = if *count == 1 {
-                "{a_figment($g)}"
+                "{@a figment($g)}"
             } else {
                 bindings.insert("n".to_string(), VariableValue::Integer(*count));
                 "{n_figments($n, $g)}"

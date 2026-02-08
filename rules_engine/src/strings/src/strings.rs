@@ -131,24 +131,22 @@ rlf::rlf! {
     // =========================================================================
 
     // Celestial figment type.
-    celestial = "Celestial";
+    celestial = :a "Celestial";
     // Halcyon figment type.
-    halcyon = "Halcyon";
+    halcyon = :a "Halcyon";
     // Radiant figment type.
-    radiant = "Radiant";
+    radiant = :a "Radiant";
     // Shadow figment type.
-    shadow = "Shadow";
+    shadow = :a "Shadow";
 
     // =========================================================================
     // Figment tokens
     // =========================================================================
 
-    // Figment token (singular) with gold formatting.
-    figment($f) = "<color=#F57F17><b><u>{$f} Figment</u></color></b>";
+    // Figment token (singular) with gold formatting, inheriting article metadata.
+    figment($f) = :from($f) "<color=#F57F17><b><u>{$f} Figment</u></color></b>";
     // Figment tokens (plural) with gold formatting.
     figments_plural($f) = "<color=#F57F17><b><u>{$f} Figments</u></color></b>";
-    // A figment with article.
-    a_figment($f) = "a {figment($f)}";
     // N figments with article for singular.
     n_figments($n, $f) = :match($n) {
         1: "a {figment($f)}",

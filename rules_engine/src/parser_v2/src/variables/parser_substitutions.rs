@@ -8,7 +8,7 @@ use crate::variables::parser_bindings::VariableBindings;
 
 static BARE_PHRASES: &[&str] = &["choose_one", "energy_symbol", "judgment_phase_name"];
 
-static FIGMENT_PHRASES: &[(&str, &str)] = &[("a_figment", "g"), ("figments", "g")];
+static FIGMENT_PHRASES: &[(&str, &str)] = &[("figment", "g"), ("figments", "g")];
 
 static PHRASES: &[PhraseEntry] = &[
     ("cards", "c", ResolvedToken::CardCount),
@@ -131,6 +131,13 @@ fn resolve_directive(
     // Strip $ prefix from bare variable references (e.g., "$s" -> "s")
     if let Some(bare_name) = name.strip_prefix('$') {
         return resolve_directive(bare_name, bindings, span);
+    }
+
+    // Strip RLF transform prefixes (@a, @cap, @plural) from bare references
+    for prefix in ["@cap @a ", "@cap ", "@a ", "@plural "] {
+        if let Some(stripped) = name.strip_prefix(prefix) {
+            return resolve_directive(stripped, bindings, span);
+        }
     }
 
     // Try direct lookup in integer phrases
@@ -265,7 +272,7 @@ fn resolve_rlf_syntax(
     }
 
     // Handle figment phrases
-    if phrase_name == "a_figment" || phrase_name == "figments" {
+    if phrase_name == "figment" || phrase_name == "figments" {
         let variable_name = if args.len() == 1 && !args[0].is_empty() { args[0] } else { "g" };
         let figment_type = bindings
             .get_figment(variable_name)

@@ -391,7 +391,7 @@ fn test_ally_gains_spark_per_subtype() {
 #[test]
 fn test_materialize_figments_per_cards_played() {
     assert_round_trip(
-        "{Materialize} {a_figment($g)} for each card you have played this turn.",
+        "{Materialize} {@a figment($g)} for each card you have played this turn.",
         "g: celestial",
     );
 }

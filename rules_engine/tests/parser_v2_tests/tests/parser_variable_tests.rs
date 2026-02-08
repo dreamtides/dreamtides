@@ -152,8 +152,8 @@ fn test_resolve_compound_n_figments() {
 }
 
 #[test]
-fn test_resolve_compound_a_figment() {
-    let tokens = vec![(Token::Directive("a_figment".to_string()), SimpleSpan::new((), 0..11))];
+fn test_resolve_compound_figment() {
+    let tokens = vec![(Token::Directive("figment".to_string()), SimpleSpan::new((), 0..7))];
     let bindings = VariableBindings::parse("g: shadow").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
@@ -174,7 +174,7 @@ fn test_resolve_compound_missing_number() {
 
 #[test]
 fn test_resolve_compound_missing_figment() {
-    let tokens = vec![(Token::Directive("a_figment".to_string()), SimpleSpan::new((), 0..11))];
+    let tokens = vec![(Token::Directive("figment".to_string()), SimpleSpan::new((), 0..7))];
     let bindings = VariableBindings::new();
 
     let result = resolve_variables(&tokens, &bindings);

@@ -1020,7 +1020,7 @@ fn test_when_you_play_card_during_opponent_turn_this_character_gains_spark() {
 #[test]
 fn test_when_you_play_a_character_materialize_figment() {
     let result =
-        parse_ability("When you play a character, {materialize} {a_figment}.", "g: shadow");
+        parse_ability("When you play a character, {materialize} {@a figment}.", "g: shadow");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Play(Your(Character)),

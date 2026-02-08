@@ -260,7 +260,7 @@ fn test_draw_count_in_void_trigger_reclaim() {
 
 #[test]
 fn test_play_character_trigger_materialize_figment() {
-    assert_round_trip("When you play a character, {materialize} {a_figment($g)}.", "g: halcyon");
+    assert_round_trip("When you play a character, {materialize} {@a figment($g)}.", "g: halcyon");
 }
 
 #[test]

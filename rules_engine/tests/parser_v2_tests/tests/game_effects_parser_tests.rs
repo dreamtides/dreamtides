@@ -923,7 +923,7 @@ fn test_materialize_n_figments() {
 #[test]
 fn test_materialize_a_figment_for_each_card_played_this_turn() {
     let result = parse_ability(
-        "{Materialize} {a_figment} for each card you have played this turn.",
+        "{Materialize} {@a figment} for each card you have played this turn.",
         "g: shadow",
     );
     assert_ron_snapshot!(result, @r###"
