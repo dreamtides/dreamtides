@@ -669,4 +669,27 @@ rlf::rlf! {
     you_win_the_game_effect = "you win the game.";
     // No effect.
     no_effect = "";
+
+    // =========================================================================
+    // Structural Phrases — Category A (Final)
+    // =========================================================================
+
+    // Optional action prefix for abilities the player may choose to activate.
+    you_may_prefix = "you may ";
+    // Connects a cost to its effect in activated abilities (e.g., "{cost} to {effect}").
+    cost_to_connector($cost) = "{$cost} to ";
+    // Prefix for effects that last until the end of the current turn.
+    until_end_of_turn_prefix = "Until end of turn, ";
+    // Prefix for abilities that can only be used once per turn.
+    once_per_turn_prefix = "Once per turn, ";
+    // Suffix for abilities that can only be used once per turn.
+    once_per_turn_suffix = ", once per turn";
+    // Joins cost and effect in activated abilities (e.g., "cost: effect").
+    cost_effect_separator = ": ";
+    // Joins sequential effects in ability text (e.g., "draw a card, then dissolve").
+    then_joiner = ", then ";
+    // Joins parallel effects in ability text (e.g., "draw a card and gain 1 energy").
+    and_joiner = " and ";
+    // Terminal punctuation for ability text.
+    period_suffix = ".";
 }
