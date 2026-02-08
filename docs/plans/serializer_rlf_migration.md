@@ -587,12 +587,20 @@ If `VariableBindings` and `VariableValue` are no longer used anywhere, delete th
 
 #### Step 6: Update test infrastructure
 
-`assert_round_trip` no longer parses or compares `VariableBindings`. The test now:
-1. Parses input text with vars to get an AST
-2. Serializes the AST (produces rendered text)
-3. **Cannot re-parse rendered text** (it has HTML tags)
+Switch to the dual-path rendered output comparison strategy (Section 7.1):
 
-This means the AST round-trip test strategy needs adjustment. See Design Decision 6.1.
+```rust
+pub fn assert_rendered_match(input_text: &str, vars: &str) {
+    // Path A: parse → serialize → rendered string
+    let parsed = parse_ability(input_text, vars);
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    // Path B: evaluate template text directly through RLF
+    let rendered = rlf_eval(input_text, vars);
+    assert_eq!(serialized.text, rendered);
+}
+```
+
+Keep `rlf_eval` as a test-only helper even after removing it from production code. It serves as an independent oracle for verifying serializer output.
 
 #### Step 7: Validate and commit
 
@@ -618,25 +626,26 @@ Remove `capitalize_first_letter`, `capitalize_string`, `title_case_keyword`, `is
 
 ## 7. Design Decisions
 
-### 7.1 Round-Trip Testing After Rendered Output (Task 8 Impact)
+### 7.1 Testing Strategy: Dual-Path Rendered Output Comparison
 
-Once the serializer produces rendered text (with HTML color tags, Unicode symbols), the current round-trip strategy breaks:
-- Parser expects `"draw {cards($c)}."` but serializer now produces `"draw 3 cards."`
-- Parser expects `"{Banish}"` but serializer now produces `"<color=#AA00FF><b>Banish</b></color>"`
+The serializer does not need to support round-trip testing (parse → serialize → re-parse). Instead, we compare the **final rendered English output** of two independent paths:
 
-**Options:**
+```
+Path A: input_string → parse() → AST → serialize() → rendered string
+Path B: input_string → rlf_eval()                   → rendered string
+Assert: Path A == Path B
+```
 
-**Option A — Strip-and-reparse:** Add a function that strips HTML/formatting from rendered text, producing plain text that the parser can consume. E.g., `"<color=#AA00FF><b>Banish</b></color>"` → `"{Banish}"`. This is fragile and defeats the purpose of testing the full pipeline.
+Both paths start from the same input string (template text with variables) and should produce identical final rendered text (with HTML color tags, Unicode symbols, etc.). This validates that the serializer produces correct rendered output without needing to re-parse rendered text.
 
-**Option B — Separate parseable output:** The serializer produces both rendered text (for display) and parseable text (for round-trip testing). Keep the template-text output alongside the new rendered output. This doubles the work but preserves existing tests.
+**How this works at each phase:**
 
-**Option C — Drop text round-trip, keep AST-only:** After Task 3, we rely on AST round-trip tests that compare `parse(input) == serialize_then_reparse(input)`. But `serialize_then_reparse` can't work with rendered text (Option A problem). Instead, test at the AST level only: `serialize(parse(text))` produces an AST, and we verify the AST is correct via insta snapshots or manual assertions.
+- **Before Task 8** (eval_str still exists): Path B is `rlf_helper::eval_str(input_string, vars)`. Path A is `serialize(parse(input_string, vars)).text`. Both should produce the same rendered string.
+- **After Task 8** (eval_str removed): Path B can be preserved as a test-only helper that evaluates template text through RLF directly. It doesn't need to exist in production code.
 
-**Option D — Parser consumes rendered text:** Teach the parser to accept rendered text as input. This is expensive and couples the parser to display formatting.
+**What this replaces:** The current text-equality round-trip test (`input == serialize(parse(input)).text`) compares template text. The new strategy compares rendered text from two independent paths, which is strictly more powerful — it validates both parse/serialize correctness AND rendered output correctness simultaneously.
 
-**Recommended: Option B** during the transition, then gradually move to Option C. Keep a `serialize_template()` function that produces the old template-text format alongside the new `serialize_rendered()`. This lets existing round-trip tests continue working while new tests validate rendered output. Once we're confident in AST-level testing, remove `serialize_template()`.
-
-**Alternative Recommended: Option C with AST snapshots.** After Task 1 proves AST comparison works, and Task 3 removes text equality tests, we no longer need to re-parse serializer output. Instead, tests verify: (1) `parse(text)` produces a correct AST (via insta snapshots), and (2) `serialize(parse(text))` produces a correct rendered string (via insta snapshots of rendered output). The two are tested independently. This is simpler than Option B but requires trusting the snapshot tests.
+**Task 3 impact:** When text-equality tests are removed, they're replaced by this dual-path comparison. The AST-level tests from Task 1 provide a second safety net: `parse(input) == parse(serialize(parse(input)))` at the AST level (once serializer output is parseable template text; before Task 8). After Task 8, the dual-path rendered comparison is the primary test strategy.
 
 ### 7.2 Phrase Parameter Types
 
