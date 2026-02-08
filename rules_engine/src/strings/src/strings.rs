@@ -666,6 +666,77 @@ rlf::rlf! {
     fast_prefix = "{Fast} -- ";
 
     // =========================================================================
+    // Effect serializer — predicate-consuming phrases
+    // =========================================================================
+
+    // Discard a chosen card from the opponent's hand.
+    discard_chosen_from_enemy_hand($target) = "discard a chosen {$target} from the opponent's hand";
+    // Dissolve a target.
+    dissolve_target($target) = "{{dissolve}} {$target}";
+    // Banish a target.
+    banish_target($target) = "{{banish}} {$target}";
+    // Banish a target until another leaves play.
+    banish_until_leaves($target, $until) = "{{banish}} {$target} until {$until} leaves play";
+    // Banish a target until your next main phase.
+    banish_until_next_main($target) = "{{banish}} {$target} until your next main phase";
+    // Banish a target when it leaves play.
+    banish_when_leaves_play($target) = "{{banish}} {$target} when it leaves play";
+    // Gain control of a target.
+    gain_control_of($target) = "gain control of {$target}";
+    // Discover a card predicate.
+    discover_target($target) = "{{Discover}} {$target}";
+    // Discover a card and materialize it.
+    discover_and_materialize($target) = "{{Discover}} {$target} and {{materialize}} it";
+    // Materialize a target.
+    materialize_target($target) = "{{materialize}} {$target}";
+    // Materialize a target at end of turn.
+    materialize_at_end_of_turn($target) = "{{materialize}} {$target} at end of turn";
+    // Materialize a target from your void.
+    materialize_from_void($target) = "{{materialize}} {$target} from your void";
+    // Return a target to hand.
+    return_to_hand($target) = "return {$target} to hand";
+    // Return this character to your hand.
+    return_this_to_hand = "return this character to your hand";
+    // Return an enemy or ally to hand.
+    return_any_character_to_hand = "return an enemy or ally to hand";
+    // Return an ally to hand.
+    return_ally_to_hand = "return an ally to hand";
+    // Return a target from your void to your hand.
+    return_from_void_to_hand($target) = "return {$target} from your void to your hand";
+    // Reclaim a target from your void.
+    reclaim_target($target) = "{{reclaim}} {$target}";
+    // Reclaim a random card type.
+    reclaim_random($target) = "{{reclaim}} a random {$target}";
+    // Put a target on top of the opponent's deck.
+    put_on_top_of_enemy_deck($target) = "put {$target} on top of the opponent's deck";
+    // Copy a target.
+    copy_target($target) = "copy {$target}";
+    // Disable activated abilities of a target while this is in play.
+    disable_activated_abilities($target) = "disable the activated abilities of {$target} while this character is in play";
+    // Draw a matching card from your deck.
+    draw_matching_from_deck($target) = "draw {$target} from your deck";
+    // Abandon a target and gain energy for its spark.
+    abandon_and_gain_energy_for_spark($target) = "abandon {$target} and gain {{energy_symbol}} for each point of spark that character had";
+    // Abandon a target at end of turn.
+    abandon_at_end_of_turn($target) = "abandon {$target} at end of turn";
+    // Each player abandons a matching card.
+    each_player_abandons($target) = "each player abandons {$target}";
+    // Target cannot be dissolved this turn.
+    prevent_dissolve_this_turn($target) = "{$target} cannot be {{dissolved}} this turn";
+    // Prevent a played target.
+    prevent_played_target($target) = "{{prevent}} a played {$target}";
+    // Prevent a played target unless opponent pays cost.
+    prevent_unless_pays($target, $cost) = "{{prevent}} a played {$target} unless the opponent pays {$cost}";
+    // Gain energy equal to a target's cost.
+    gain_energy_equal_to_cost($target) = "gain {{energy_symbol}} equal to {$target}'s cost";
+    // Target gains spark.
+    gains_spark($target, $s) = "{$target} gains +{$s} spark";
+    // Opponent pays a cost.
+    opponent_pays_cost($cost) = "the opponent pays {$cost}";
+    // Pay a cost.
+    pay_cost_effect($cost) = "pay {$cost}";
+
+    // =========================================================================
     // Effect serializer phrases (Category A)
     // =========================================================================
 
