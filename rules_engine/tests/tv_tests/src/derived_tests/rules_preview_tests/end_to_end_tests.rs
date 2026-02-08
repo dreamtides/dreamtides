@@ -29,7 +29,7 @@ fn full_text(spans: &[tv_lib::derived::derived_types::StyledSpan]) -> String {
 fn test_appendix_g_keyword_foresee_example() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{Foresee(foresee)}", "foresee: 3");
+    let inputs = make_inputs("{Foresee($foresee)}", "foresee: 3");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
@@ -49,7 +49,7 @@ fn test_appendix_g_keyword_foresee_example() {
 fn test_trigger_materialized_phrase_expansion() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{materialized} Gain {e} energy.", "e: 2");
+    let inputs = make_inputs("{materialized} Gain {$e} energy.", "e: 2");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
@@ -111,7 +111,7 @@ fn test_unicode_content_in_output() {
 fn test_unicode_variable_value() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("Name: {name}", "name: Dragon");
+    let inputs = make_inputs("Name: {$name}", "name: Dragon");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
@@ -135,7 +135,7 @@ fn test_combined_variable_substitution_and_styling() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs =
-        make_inputs("<b>Deal</b> {damage} <color=#FF0000>fire</color> damage.", "damage: 5");
+        make_inputs("<b>Deal</b> {$damage} <color=#FF0000>fire</color> damage.", "damage: 5");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
@@ -212,7 +212,7 @@ fn test_fast_keyword_produces_bold() {
 fn test_energy_variable_rendering() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{energy(e)}", "e: 3");
+    let inputs = make_inputs("{energy($e)}", "e: 3");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
@@ -340,7 +340,7 @@ fn test_choose_one_phrase() {
 fn test_kindle_with_variable() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{Kindle(k)}", "k: 2");
+    let inputs = make_inputs("{Kindle($k)}", "k: 2");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);
@@ -355,7 +355,7 @@ fn test_kindle_with_variable() {
 fn test_complex_card_text_with_multiple_phrases() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{materialized} {Foresee(foresee)}. Draw a card.", "foresee: 3");
+    let inputs = make_inputs("{materialized} {Foresee($foresee)}. Draw a card.", "foresee: 3");
 
     let spans = extract_rich_text(function.compute(&inputs, &context));
     let text = full_text(&spans);

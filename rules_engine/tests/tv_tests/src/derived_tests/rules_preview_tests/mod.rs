@@ -39,7 +39,7 @@ fn test_is_not_async() {
 fn test_simple_variable_substitution() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("Gain {e} energy.", "e: 3");
+    let inputs = make_inputs("Gain {$e} energy.", "e: 3");
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -263,7 +263,7 @@ fn test_nested_style_tags() {
 fn test_multiple_variables() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{a} and {b}", "a: hello\nb: world");
+    let inputs = make_inputs("{$a} and {$b}", "a: hello\nb: world");
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -279,7 +279,7 @@ fn test_multiple_variables() {
 fn test_numeric_variable_substitution() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("Draw {n} cards.", "n: 5");
+    let inputs = make_inputs("Draw {$n} cards.", "n: 5");
 
     let result = function.compute(&inputs, &context);
     match result {
