@@ -1,4 +1,5 @@
 use ability_data::predicate::Operator;
+use strings::strings;
 
 /// Lowercases a leading keyword like "{Banish}" -> "{banish}" in a string.
 pub fn lowercase_leading_keyword(s: &str) -> String {
@@ -38,11 +39,11 @@ pub fn capitalize_first_letter(s: &str) -> String {
 /// `"cost {energy(e)} or less"` for OrLess.
 pub fn serialize_operator<T>(operator: &Operator<T>) -> String {
     match operator {
-        Operator::OrLess => " or less".to_string(),
-        Operator::OrMore => " or more".to_string(),
+        Operator::OrLess => strings::operator_or_less().to_string(),
+        Operator::OrMore => strings::operator_or_more().to_string(),
         Operator::Exactly => String::new(),
-        Operator::LowerBy(_) => " lower".to_string(),
-        Operator::HigherBy(_) => " higher".to_string(),
+        Operator::LowerBy(_) => strings::operator_lower().to_string(),
+        Operator::HigherBy(_) => strings::operator_higher().to_string(),
     }
 }
 

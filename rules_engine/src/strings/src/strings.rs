@@ -588,4 +588,17 @@ rlf::rlf! {
     with_count_allied_subtype($a, $t) = "{{count_allied_subtype($a, $t)}}";
     // Condition for a count of allies.
     with_count_allies($a) = "{{count_allies($a)}}";
+
+    // =========================================================================
+    // Operator phrases
+    // =========================================================================
+
+    // Operator suffix for "or less" comparisons.
+    operator_or_less = " or less";
+    // Operator suffix for "or more" comparisons.
+    operator_or_more = " or more";
+    // Operator suffix for "lower" comparisons.
+    operator_lower = " lower";
+    // Operator suffix for "higher" comparisons.
+    operator_higher = " higher";
 }
