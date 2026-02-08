@@ -128,6 +128,11 @@ fn resolve_directive(
     bindings: &VariableBindings,
     span: SimpleSpan,
 ) -> Result<ResolvedToken, UnresolvedVariable> {
+    // Strip $ prefix from bare variable references (e.g., "$s" -> "s")
+    if let Some(bare_name) = name.strip_prefix('$') {
+        return resolve_directive(bare_name, bindings, span);
+    }
+
     // Try direct lookup in integer phrases
     if let Some((_, default_var, constructor)) =
         PHRASES.iter().find(|(phrase_name, _, _)| *phrase_name == name)
@@ -244,7 +249,11 @@ fn resolve_rlf_syntax(
 
     let phrase_name = core[..paren_start].trim();
     let args_str = &core[paren_start + 1..paren_end];
-    let args: Vec<&str> = args_str.split(',').map(str::trim).collect();
+    let args: Vec<&str> = args_str
+        .split(',')
+        .map(str::trim)
+        .map(|arg| arg.strip_prefix('$').unwrap_or(arg))
+        .collect();
 
     // Handle subtype phrases
     if phrase_name == "subtype" {
