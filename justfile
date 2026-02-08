@@ -7,7 +7,9 @@ code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; just clean-test-dir; exit 1)
     just clean-test-dir
 
-review: check-snapshots check-format build clippy style-validator test tv-check tv-clippy
+review: check-snapshots check-format build clippy style-validator test tv-check tv-clippy tv-test
+
+review-verbose: check-snapshots check-format-verbose build-verbose clippy-verbose style-validator-verbose test-verbose tv-check-verbose tv-clippy-verbose tv-test
 
 check:
     #!/usr/bin/env bash
@@ -79,7 +81,7 @@ test: tabula-check
         TEST_THREADS=""
     fi
 
-    output=$(RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml -- $TEST_THREADS 2>&1)
+    output=$(RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --exclude tv_tests -- $TEST_THREADS 2>&1)
     if [ $? -eq 0 ]; then
         echo "Tests passed"
     else
@@ -95,7 +97,7 @@ test-verbose:
     else
         TEST_THREADS=""
     fi
-    RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml -- $TEST_THREADS
+    RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --exclude tv_tests -- $TEST_THREADS
 
 battle-test *args='':
     ./rules_engine/scripts/run_cargo_test.sh battle_tests "$@"
@@ -270,6 +272,9 @@ style-validator:
   else
     echo "Style validation passed"
   fi
+
+style-validator-verbose:
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "style_validator" -- --code-order
 
 style-validator-fix:
   #!/usr/bin/env bash
@@ -605,6 +610,11 @@ tv-check:
         exit 1
     fi
 
+tv-check-verbose:
+    cargo check --manifest-path rules_engine/src/tv/src-tauri/Cargo.toml
+    cd rules_engine/src/tv && npx tsc --noEmit
+    cd rules_engine/src/tv && npx eslint src/
+
 tv-clippy:
     #!/usr/bin/env bash
     output=$(cargo clippy --manifest-path rules_engine/src/tv/src-tauri/Cargo.toml -- -D warnings -D clippy::all 2>&1)
@@ -614,6 +624,9 @@ tv-clippy:
         echo "$output"
         exit 1
     fi
+
+tv-clippy-verbose:
+    cargo clippy --manifest-path rules_engine/src/tv/src-tauri/Cargo.toml -- -D warnings -D clippy::all
 
 tv-test *args='':
     ./rules_engine/scripts/run_cargo_test.sh tv_tests "$@"
