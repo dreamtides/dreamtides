@@ -32,7 +32,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         }
         TriggerEvent::PlayCardsInTurn(count) => {
             bindings.insert("c".to_string(), VariableValue::Integer(*count));
-            "when you play {cards_numeral($c)} in a turn, ".to_string()
+            "when you play {$c} {card:$c} in a turn, ".to_string()
         }
         TriggerEvent::PlayDuringTurn(predicate, turn) => match turn {
             PlayerTurn::YourTurn => {
@@ -96,7 +96,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         }
         TriggerEvent::DrawCardsInTurn(count) => {
             bindings.insert("c".to_string(), VariableValue::Integer(*count));
-            "when you draw {cards_numeral($c)} in a turn, ".to_string()
+            "when you draw {$c} {card:$c} in a turn, ".to_string()
         }
         TriggerEvent::EndOfYourTurn => "at the end of your turn, ".to_string(),
         TriggerEvent::DrawAllCardsInCopyOfDeck => {

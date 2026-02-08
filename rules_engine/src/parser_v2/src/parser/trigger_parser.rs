@@ -3,7 +3,7 @@ use ability_data::trigger_event::{PlayerTurn, TriggerEvent, TriggerKeyword};
 use chumsky::prelude::*;
 
 use crate::parser::parser_helpers::{
-    article, cards_numeral, comma, count_allies, directive, word, words, ParserExtra, ParserInput,
+    article, cards, comma, count_allies, directive, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, predicate_parser};
 
@@ -97,7 +97,7 @@ fn draw_all_cards_trigger<'a>(
 fn draw_cards_in_turn_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you", "draw"])
-        .ignore_then(cards_numeral())
+        .ignore_then(cards())
         .then_ignore(words(&["in", "a", "turn"]))
         .map(TriggerEvent::DrawCardsInTurn)
 }
@@ -159,7 +159,7 @@ fn play_during_opponent_turn_trigger<'a>(
 fn play_cards_in_turn_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you", "play"])
-        .ignore_then(cards_numeral())
+        .ignore_then(cards())
         .then_ignore(words(&["in", "a", "turn"]))
         .map(TriggerEvent::PlayCardsInTurn)
 }

@@ -2,7 +2,7 @@
 name = "Titan of Forgotten Echoes"
 id = "d31723e7-8faa-41e3-89b6-c30d8fdf9cca"
 energy-cost = 6
-rules-text = "When you play {cards_numeral($c)} in a turn, {reclaim} this character."
+rules-text = "When you play {$c} {card:$c} in a turn, {reclaim} this character."
 variables = "c: 2"
 card-type = "Character"
 subtype = "Ancient"
@@ -1403,7 +1403,7 @@ variables = ""
 name = "Eternal Sentry"
 id = "511e8751-95d0-4d09-9f60-48fa53f14a13"
 energy-cost = 4
-rules-text = "When you draw {cards_numeral($c)} in a turn, if this card is in your void, it gains {reclaim_for_cost($r)} this turn."
+rules-text = "When you draw {$c} {card:$c} in a turn, if this card is in your void, it gains {reclaim_for_cost($r)} this turn."
 variables = """
 c: 2
 r: 1"""

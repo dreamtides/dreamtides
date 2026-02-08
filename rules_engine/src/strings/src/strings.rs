@@ -89,9 +89,6 @@ rlf::rlf! {
         1: "a card",
         *other: "{$n} cards",
     };
-    // Card count with numeral (e.g., "1 card" or "2 cards").
-    cards_numeral($n) = "{$n} {card:$n}";
-
     // Top N cards of deck (e.g., "top card" or "top 3 cards").
     top_n_cards($n) = :match($n) {
         1: "top card",

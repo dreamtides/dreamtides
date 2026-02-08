@@ -162,7 +162,7 @@ fn test_when_you_play_an_event_gain_energy() {
 #[test]
 fn test_when_you_play_cards_in_turn_reclaim_this_character() {
     let result =
-        parse_ability("When you play {cards_numeral} in a turn, {reclaim} this character.", "c: 2");
+        parse_ability("When you play {$c} {card:$c} in a turn, {reclaim} this character.", "c: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: PlayCardsInTurn(2),
@@ -969,7 +969,7 @@ fn test_has_all_character_types_and_judgment_with_allies() {
 #[test]
 fn test_when_you_draw_cards_in_turn_while_in_void_gains_reclaim() {
     let result = parse_ability(
-        "When you draw {cards_numeral} in a turn, if this card is in your void, it gains {reclaim_for_cost} this turn.",
+        "When you draw {$c} {card:$c} in a turn, if this card is in your void, it gains {reclaim_for_cost} this turn.",
         "c: 3, r: 2",
     );
     assert_ron_snapshot!(result, @r###"

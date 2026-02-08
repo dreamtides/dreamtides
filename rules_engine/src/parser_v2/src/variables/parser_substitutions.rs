@@ -12,7 +12,6 @@ static FIGMENT_PHRASES: &[(&str, &str)] = &[("figment", "g"), ("figments", "g")]
 
 static PHRASES: &[PhraseEntry] = &[
     ("cards", "c", ResolvedToken::CardCount),
-    ("cards_numeral", "c", ResolvedToken::CardCountNumeral),
     ("copies", "n", ResolvedToken::Copies),
     ("count", "n", ResolvedToken::Count),
     ("count_allies", "a", ResolvedToken::CountAllies),
@@ -33,6 +32,7 @@ static PHRASES: &[PhraseEntry] = &[
     ("up_to_n_allies", "n", ResolvedToken::UpToNAllies),
     ("up_to_n_events", "n", ResolvedToken::UpToNEvents),
     // Short-form entries used in TOML data
+    ("c", "c", ResolvedToken::CardCount),
     ("e", "e", ResolvedToken::Energy),
     ("s", "s", ResolvedToken::SparkAmount),
 ];
@@ -49,7 +49,6 @@ pub enum ResolvedToken {
     Mode1Energy(u32),
     Mode2Energy(u32),
     CardCount(u32),
-    CardCountNumeral(u32),
     TopNCards(u32),
     DiscardCount(u32),
     PointCount(u32),
@@ -83,12 +82,17 @@ pub struct UnresolvedVariable {
 }
 
 /// Resolves directive tokens using variable bindings.
+///
+/// Display-only directives (like `{card:$c}` for RLF parameterized
+/// selection) are filtered out since they carry no semantic information
+/// for the parser.
 pub fn resolve_variables(
     tokens: &[Spanned<Token>],
     bindings: &VariableBindings,
 ) -> Result<Vec<Spanned<ResolvedToken>>, UnresolvedVariable> {
     tokens
         .iter()
+        .filter(|(token, _)| !is_display_only_directive(token))
         .map(|(token, span)| match token {
             Token::Directive(name) => {
                 resolve_directive(name, bindings, *span).map(|resolved| (resolved, *span))
@@ -404,6 +408,21 @@ fn resolve_rlf_syntax(
     }
 
     Ok(None)
+}
+
+/// Returns true if a token is a display-only RLF directive that should
+/// be filtered out during variable resolution.
+///
+/// For example, `{card:$c}` is an RLF parameterized selection used for
+/// plural-aware rendering but carries no semantic data for the parser.
+fn is_display_only_directive(token: &Token) -> bool {
+    if let Token::Directive(name) = token {
+        // Match patterns like "card:$c" (term:$variable parameterized selection)
+        if let Some(after_colon) = name.strip_prefix("card:") {
+            return after_colon.starts_with('$');
+        }
+    }
+    false
 }
 
 fn split_numbered_suffix(name: &str) -> Option<(&str, &str)> {

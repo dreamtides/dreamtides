@@ -7,10 +7,7 @@ use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_play_count_trigger_reclaim_self() {
-    assert_round_trip(
-        "When you play {cards_numeral($c)} in a turn, {reclaim} this character.",
-        "c: 2",
-    );
+    assert_round_trip("When you play {$c} {card:$c} in a turn, {reclaim} this character.", "c: 2");
 }
 
 #[test]
@@ -255,7 +252,7 @@ fn test_judgment_triggers_on_materialize() {
 
 #[test]
 fn test_draw_count_in_void_trigger_reclaim() {
-    assert_round_trip("When you draw {cards_numeral($c)} in a turn, if this card is in your void, it gains {reclaim_for_cost($r)} this turn.", "c: 2\nr: 1");
+    assert_round_trip("When you draw {$c} {card:$c} in a turn, if this card is in your void, it gains {reclaim_for_cost($r)} this turn.", "c: 2\nr: 1");
 }
 
 #[test]

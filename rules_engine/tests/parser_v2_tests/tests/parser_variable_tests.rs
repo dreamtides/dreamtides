@@ -216,13 +216,14 @@ fn test_representative_card_1() {
         (Token::Word("when".to_string()), SimpleSpan::new((), 0..4)),
         (Token::Word("you".to_string()), SimpleSpan::new((), 5..8)),
         (Token::Word("play".to_string()), SimpleSpan::new((), 9..13)),
-        (Token::Directive("cards_numeral".to_string()), SimpleSpan::new((), 14..29)),
+        (Token::Directive("$c".to_string()), SimpleSpan::new((), 14..18)),
+        (Token::Directive("card:$c".to_string()), SimpleSpan::new((), 19..29)),
     ];
     let bindings = VariableBindings::parse("c: 2").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 4);
-    assert_eq!(resolved[3].0, ResolvedToken::CardCountNumeral(2));
+    assert_eq!(resolved[3].0, ResolvedToken::CardCount(2));
 }
 
 #[test]
