@@ -9,7 +9,7 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
     match condition {
         Condition::AlliesThatShareACharacterType { count } => {
             bindings.insert("a".to_string(), VariableValue::Integer(*count));
-            "with {count_allies(a)} that share a character type,".to_string()
+            "with {count_allies($a)} that share a character type,".to_string()
         }
         Condition::CardsDiscardedThisTurn { count: 1, predicate } => format!(
             "if you have discarded {} this turn",
@@ -21,18 +21,18 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
         ),
         Condition::CardsDrawnThisTurn { count } => {
             bindings.insert("n".to_string(), VariableValue::Integer(*count));
-            "if you have drawn {count(n)} or more cards this turn".to_string()
+            "if you have drawn {count($n)} or more cards this turn".to_string()
         }
         Condition::CardsInVoidCount { count } => {
             bindings.insert("n".to_string(), VariableValue::Integer(*count));
-            "while you have {count(n)} or more cards in your void,".to_string()
+            "while you have {count($n)} or more cards in your void,".to_string()
         }
         Condition::DissolvedThisTurn { .. } => "if a character dissolved this turn".to_string(),
         Condition::PredicateCount { count: 1, predicate } => {
             if let Predicate::Another(CardPredicate::CharacterType(subtype)) = predicate {
                 bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
             }
-            "with an allied {subtype(t)},".to_string()
+            "with an allied {subtype($t)},".to_string()
         }
         Condition::PredicateCount { count, predicate } => {
             format!(
@@ -53,11 +53,11 @@ fn serialize_predicate_count(
         Predicate::Another(CardPredicate::CharacterType(subtype)) => {
             bindings.insert("a".to_string(), VariableValue::Integer(count));
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            "{count_allied_subtype(a, t)}".to_string()
+            "{count_allied_subtype($a, $t)}".to_string()
         }
         Predicate::Another(CardPredicate::Character) => {
             bindings.insert("a".to_string(), VariableValue::Integer(count));
-            "{count_allies(a)}".to_string()
+            "{count_allies($a)}".to_string()
         }
         Predicate::Another(card_predicate) => predicate_serializer::serialize_predicate_plural(
             &Predicate::Another(card_predicate.clone()),

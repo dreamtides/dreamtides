@@ -19,38 +19,38 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
             }
             CollectionExpression::Exactly(n) => {
                 bindings.insert("a".to_string(), VariableValue::Integer(*n));
-                "abandon {count_allies(a)}".to_string()
+                "abandon {count_allies($a)}".to_string()
             }
-            _ => "abandon {count_allies(a)}".to_string(),
+            _ => "abandon {count_allies($a)}".to_string(),
         },
         Cost::DiscardCards { count, .. } => {
             bindings.insert("d".to_string(), VariableValue::Integer(*count));
-            "discard {cards(d)}".to_string()
+            "discard {cards($d)}".to_string()
         }
         Cost::DiscardHand => "discard your hand".to_string(),
         Cost::Energy(energy) => {
             bindings.insert("e".to_string(), VariableValue::Integer(energy.0));
-            "{energy(e)}".to_string()
+            "{energy($e)}".to_string()
         }
         Cost::LoseMaximumEnergy(amount) => {
             bindings.insert("m".to_string(), VariableValue::Integer(*amount));
-            "lose {maximum_energy(m)}".to_string()
+            "lose {maximum_energy($m)}".to_string()
         }
         Cost::BanishCardsFromYourVoid(count) => {
             if *count == 1 {
                 "{Banish} another card in your void".to_string()
             } else {
                 bindings.insert("c".to_string(), VariableValue::Integer(*count));
-                "{Banish} {cards(c)} from your void".to_string()
+                "{Banish} {cards($c)} from your void".to_string()
             }
         }
         Cost::BanishCardsFromEnemyVoid(count) => {
             bindings.insert("c".to_string(), VariableValue::Integer(*count));
-            "{Banish} {cards(c)} from the opponent's void".to_string()
+            "{Banish} {cards($c)} from the opponent's void".to_string()
         }
         Cost::BanishAllCardsFromYourVoidWithMinCount(min_count) => {
             bindings.insert("n".to_string(), VariableValue::Integer(*min_count));
-            "{Banish} your void with {count(n)} or more cards".to_string()
+            "{Banish} your void with {count($n)} or more cards".to_string()
         }
         Cost::BanishFromHand(predicate) => {
             format!(

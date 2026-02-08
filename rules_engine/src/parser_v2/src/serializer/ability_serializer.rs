@@ -161,7 +161,7 @@ fn serialize_named_ability(named: &NamedAbility, variables: &mut VariableBinding
             if let Some(energy_cost) = cost {
                 variables.insert("r".to_string(), VariableValue::Integer(energy_cost.0));
             }
-            "{Reclaim_For_Cost(r)}".to_string()
+            "{Reclaim_For_Cost($r)}".to_string()
         }
         NamedAbility::ReclaimForCost(cost) => {
             format!(

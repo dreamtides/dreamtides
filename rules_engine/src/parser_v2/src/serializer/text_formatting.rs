@@ -14,10 +14,10 @@ pub fn card_predicate_base_text(predicate: &CardPredicate) -> FormattedText {
         CardPredicate::Character => FormattedText::new("character"),
         CardPredicate::Event => FormattedText::new("event"),
         CardPredicate::CharacterType(_) => {
-            FormattedText::with_plural("{subtype(t)}", "{@plural subtype(t)}")
+            FormattedText::with_plural("{subtype($t)}", "{@plural subtype($t)}")
         }
         CardPredicate::NotCharacterType(_) => {
-            FormattedText::new("character that is not {@a subtype(t)}")
+            FormattedText::new("character that is not {@a subtype($t)}")
         }
         CardPredicate::Fast { target } => card_predicate_base_text(target),
         CardPredicate::CardWithCost { target, .. } => card_predicate_base_text(target),
