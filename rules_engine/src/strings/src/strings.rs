@@ -458,7 +458,7 @@ rlf::rlf! {
     // Cost for discarding your entire hand.
     discard_your_hand_cost = "discard your hand";
     // Cost for paying one or more energy.
-    pay_one_or_more_energy_cost = "pay 1 or more {{energy_symbol}}";
+    pay_one_or_more_energy_cost = "pay 1 or more {energy_symbol}";
     // Connector for alternative costs.
     cost_or_connector = " or ";
     // Connector for combined costs.
@@ -491,25 +491,25 @@ rlf::rlf! {
     // =========================================================================
 
     // Abandon a count of allies.
-    abandon_count_allies($a) = "abandon {{count_allies($a)}}";
+    abandon_count_allies($a) = "abandon {count_allies($a)}";
     // Discard a count of cards.
-    discard_cards_cost($d) = "discard {{cards($d)}}";
+    discard_cards_cost($d) = "discard {cards($d)}";
     // Energy cost value.
-    energy_cost_value($e) = "{{energy($e)}}";
+    energy_cost_value($e) = "{energy($e)}";
     // Lose maximum energy cost.
-    lose_max_energy_cost($m) = "lose {{maximum_energy($m)}}";
+    lose_max_energy_cost($m) = "lose {maximum_energy($m)}";
     // Banish your entire void.
-    banish_your_void_cost = "{{Banish}} your void";
+    banish_your_void_cost = "{Banish} your void";
     // Banish another card in your void.
-    banish_another_in_void = "{{Banish}} another card in your void";
+    banish_another_in_void = "{Banish} another card in your void";
     // Banish a count of cards from your void.
-    banish_cards_from_void($c) = "{{Banish}} {{cards($c)}} from your void";
+    banish_cards_from_void($c) = "{Banish} {cards($c)} from your void";
     // Banish a count of cards from the opponent's void.
-    banish_cards_from_enemy_void($c) = "{{Banish}} {{cards($c)}} from the opponent's void";
+    banish_cards_from_enemy_void($c) = "{Banish} {cards($c)} from the opponent's void";
     // Banish your void with a minimum card count.
-    banish_void_min_count($n) = "{{Banish}} your void with {{count($n)}} or more cards";
+    banish_void_min_count($n) = "{Banish} your void with {count($n)} or more cards";
     // Banish a target from hand.
-    banish_from_hand_cost($target) = "{{Banish}} {$target} from hand";
+    banish_from_hand_cost($target) = "{Banish} {$target} from hand";
 
     // =========================================================================
     // Trigger serializer phrases (Category A)
@@ -545,19 +545,19 @@ rlf::rlf! {
     // =========================================================================
 
     // Materialize a target trigger.
-    when_you_materialize_trigger($target) = "when you {{materialize}} {$target}, ";
+    when_you_materialize_trigger($target) = "when you {materialize} {$target}, ";
     // Target dissolved trigger.
-    when_dissolved_trigger($target) = "when {$target} is {{dissolved}}, ";
+    when_dissolved_trigger($target) = "when {$target} is {dissolved}, ";
     // Target banished trigger.
-    when_banished_trigger($target) = "when {$target} is {{banished}}, ";
+    when_banished_trigger($target) = "when {$target} is {banished}, ";
     // Play N cards in a turn trigger.
-    when_you_play_cards_in_turn_trigger($c) = "when you play {{$c}} {{card:$c}} in a turn, ";
+    when_you_play_cards_in_turn_trigger($c) = "when you play {$c} {card:$c} in a turn, ";
     // Abandon N allies in a turn trigger.
-    when_you_abandon_count_in_turn_trigger($a) = "when you abandon {{count_allies($a)}} in a turn, ";
+    when_you_abandon_count_in_turn_trigger($a) = "when you abandon {count_allies($a)} in a turn, ";
     // Draw N cards in a turn trigger.
-    when_you_draw_in_turn_trigger($c) = "when you draw {{$c}} {{card:$c}} in a turn, ";
+    when_you_draw_in_turn_trigger($c) = "when you draw {$c} {card:$c} in a turn, ";
     // Materialize Nth target in a turn trigger.
-    when_you_materialize_nth_in_turn_trigger($n, $target) = "when you {{materialize}} {{text_number($n)}} {$target} in a turn, ";
+    when_you_materialize_nth_in_turn_trigger($n, $target) = "when you {materialize} {text_number($n)} {$target} in a turn, ";
 
     // =========================================================================
     // Condition serializer phrases (Category A)
@@ -577,17 +577,17 @@ rlf::rlf! {
     // =========================================================================
 
     // Condition for allies sharing a character type.
-    with_allies_sharing_type($a) = "with {{count_allies($a)}} that share a character type,";
+    with_allies_sharing_type($a) = "with {count_allies($a)} that share a character type,";
     // Condition for drawing a count of cards this turn.
-    if_drawn_count_this_turn($n) = "if you have drawn {{count($n)}} or more cards this turn";
+    if_drawn_count_this_turn($n) = "if you have drawn {count($n)} or more cards this turn";
     // Condition for having a count of cards in your void.
-    while_void_count($n) = "while you have {{count($n)}} or more cards in your void,";
+    while_void_count($n) = "while you have {count($n)} or more cards in your void,";
     // Condition for having an allied subtype.
-    with_allied_subtype($t) = "with an allied {{subtype($t)}},";
+    with_allied_subtype($t) = "with an allied {subtype($t)},";
     // Condition for a count of allied characters with a subtype.
-    with_count_allied_subtype($a, $t) = "{{count_allied_subtype($a, $t)}}";
+    with_count_allied_subtype($a, $t) = "{count_allied_subtype($a, $t)}";
     // Condition for a count of allies.
-    with_count_allies($a) = "{{count_allies($a)}}";
+    with_count_allies($a) = "{count_allies($a)}";
 
     // =========================================================================
     // Operator phrases
@@ -607,55 +607,55 @@ rlf::rlf! {
     // =========================================================================
 
     // Draw cards effect.
-    draw_cards_effect($c) = "draw {{cards($c)}}.";
+    draw_cards_effect($c) = "draw {cards($c)}.";
     // Discard cards effect.
-    discard_cards_effect($d) = "discard {{cards($d)}}.";
+    discard_cards_effect($d) = "discard {cards($d)}.";
     // Gain energy effect.
-    gain_energy_effect($e) = "gain {{energy($e)}}.";
+    gain_energy_effect($e) = "gain {energy($e)}.";
     // Gain points effect.
-    gain_points_effect($p) = "gain {{points($p)}}.";
+    gain_points_effect($p) = "gain {points($p)}.";
     // Lose points effect.
-    lose_points_effect($p) = "you lose {{points($p)}}.";
+    lose_points_effect($p) = "you lose {points($p)}.";
     // Opponent gains points effect.
-    opponent_gains_points_effect($p) = "the opponent gains {{points($p)}}.";
+    opponent_gains_points_effect($p) = "the opponent gains {points($p)}.";
     // Opponent loses points effect.
-    opponent_loses_points_effect($p) = "the opponent loses {{points($p)}}.";
+    opponent_loses_points_effect($p) = "the opponent loses {points($p)}.";
     // Foresee effect.
-    foresee_effect($f) = "{{foresee($f)}}.";
+    foresee_effect($f) = "{foresee($f)}.";
     // Kindle effect.
-    kindle_effect($k) = "{{kindle($k)}}.";
+    kindle_effect($k) = "{kindle($k)}.";
     // Each player discards effect.
-    each_player_discards_effect($d) = "each player discards {{cards($d)}}.";
+    each_player_discards_effect($d) = "each player discards {cards($d)}.";
     // Prevent that card effect.
-    prevent_that_card_effect = "{{prevent}} that card.";
+    prevent_that_card_effect = "{prevent} that card.";
     // Then materialize it effect.
-    then_materialize_it_effect = "then {{materialize}} it.";
+    then_materialize_it_effect = "then {materialize} it.";
     // Gain twice energy instead effect.
-    gain_twice_energy_instead_effect = "gain twice that much {{energy_symbol}} instead.";
+    gain_twice_energy_instead_effect = "gain twice that much {energy_symbol} instead.";
     // Gain energy equal to that character's cost effect.
-    gain_energy_equal_to_that_cost_effect = "gain {{energy_symbol}} equal to that character's cost.";
+    gain_energy_equal_to_that_cost_effect = "gain {energy_symbol} equal to that character's cost.";
     // Gain energy equal to this character's cost effect.
-    gain_energy_equal_to_this_cost_effect = "gain {{energy_symbol}} equal to this character's cost.";
+    gain_energy_equal_to_this_cost_effect = "gain {energy_symbol} equal to this character's cost.";
     // Put top cards of deck into void effect.
-    put_deck_into_void_effect($v) = "put the {{top_n_cards($v)}} of your deck into your void.";
+    put_deck_into_void_effect($v) = "put the {top_n_cards($v)} of your deck into your void.";
     // Banish cards from enemy void effect.
-    banish_cards_from_enemy_void_effect($c) = "{{banish}} {{cards($c)}} from the opponent's void.";
+    banish_cards_from_enemy_void_effect($c) = "{banish} {cards($c)} from the opponent's void.";
     // Banish enemy void effect.
-    banish_enemy_void_effect = "{{banish}} the opponent's void.";
+    banish_enemy_void_effect = "{banish} the opponent's void.";
     // Judgment phase at end of turn effect.
-    judgment_phase_at_end_of_turn_effect = "at the end of this turn, trigger an additional {{judgment_phase_name}} phase.";
+    judgment_phase_at_end_of_turn_effect = "at the end of this turn, trigger an additional {judgment_phase_name} phase.";
     // Multiply energy effect.
-    multiply_energy_effect($n) = "{{multiply_by($n)}} the amount of {{energy_symbol}} you have.";
+    multiply_energy_effect($n) = "{multiply_by($n)} the amount of {energy_symbol} you have.";
     // Spend all energy dissolve effect.
-    spend_all_energy_dissolve_effect = "spend all your {{energy_symbol}}. {{dissolve}} an enemy with cost less than or equal to the amount spent.";
+    spend_all_energy_dissolve_effect = "spend all your {energy_symbol}. {dissolve} an enemy with cost less than or equal to the amount spent.";
     // Spend all energy draw discard effect.
-    spend_all_energy_draw_discard_effect = "spend all your {{energy_symbol}}. Draw cards equal to the amount spent, then discard that many cards.";
+    spend_all_energy_draw_discard_effect = "spend all your {energy_symbol}. Draw cards equal to the amount spent, then discard that many cards.";
     // Each player shuffles and draws effect.
-    each_player_shuffles_and_draws_effect($c) = "each player shuffles their hand and void into their deck and then draws {{cards($c)}}.";
+    each_player_shuffles_and_draws_effect($c) = "each player shuffles their hand and void into their deck and then draws {cards($c)}.";
     // Return up to events from void effect.
-    return_up_to_events_from_void_effect($n) = "return {{up_to_n_events($n)}} from your void to your hand.";
+    return_up_to_events_from_void_effect($n) = "return {up_to_n_events($n)} from your void to your hand.";
     // Fast prefix for activated abilities.
-    fast_prefix = "{{Fast}} -- ";
+    fast_prefix = "{Fast} -- ";
 
     // =========================================================================
     // Effect serializer phrases (Category A)
