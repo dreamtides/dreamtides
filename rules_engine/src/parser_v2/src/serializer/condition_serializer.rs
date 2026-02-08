@@ -10,8 +10,7 @@ use crate::variables::parser_bindings::VariableBindings;
 pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBindings) -> String {
     match condition {
         Condition::AlliesThatShareACharacterType { count } => {
-            bindings.insert("a".to_string(), VariableValue::Integer(*count));
-            strings::with_allies_sharing_type(0).to_string()
+            strings::with_allies_sharing_type(*count).to_string()
         }
         Condition::CardsDiscardedThisTurn { count: 1, predicate } => {
             strings::if_discarded_this_turn(predicate_serializer::serialize_card_predicate(
@@ -24,13 +23,9 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
         )
         .to_string(),
         Condition::CardsDrawnThisTurn { count } => {
-            bindings.insert("n".to_string(), VariableValue::Integer(*count));
-            strings::if_drawn_count_this_turn(0).to_string()
+            strings::if_drawn_count_this_turn(*count).to_string()
         }
-        Condition::CardsInVoidCount { count } => {
-            bindings.insert("n".to_string(), VariableValue::Integer(*count));
-            strings::while_void_count(0).to_string()
-        }
+        Condition::CardsInVoidCount { count } => strings::while_void_count(*count).to_string(),
         Condition::DissolvedThisTurn { .. } => {
             strings::if_character_dissolved_this_turn().to_string()
         }
@@ -55,13 +50,11 @@ fn serialize_predicate_count(
 ) -> String {
     match predicate {
         Predicate::Another(CardPredicate::CharacterType(subtype)) => {
-            bindings.insert("a".to_string(), VariableValue::Integer(count));
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            strings::with_count_allied_subtype(0, 0).to_string()
+            strings::with_count_allied_subtype(count, 0).to_string()
         }
         Predicate::Another(CardPredicate::Character) => {
-            bindings.insert("a".to_string(), VariableValue::Integer(count));
-            strings::with_count_allies(0).to_string()
+            strings::with_count_allies(count).to_string()
         }
         Predicate::Another(card_predicate) => predicate_serializer::serialize_predicate_plural(
             &Predicate::Another(card_predicate.clone()),

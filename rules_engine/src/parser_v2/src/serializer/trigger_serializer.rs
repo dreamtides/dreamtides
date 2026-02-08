@@ -1,5 +1,4 @@
 use ability_data::trigger_event::{PlayerTurn, TriggerEvent, TriggerKeyword};
-use ability_data::variable_value::VariableValue;
 use strings::strings;
 
 use crate::serializer::predicate_serializer;
@@ -29,8 +28,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         )
         .to_string(),
         TriggerEvent::PlayCardsInTurn(count) => {
-            bindings.insert("c".to_string(), VariableValue::Integer(*count));
-            strings::when_you_play_cards_in_turn_trigger(0).to_string()
+            strings::when_you_play_cards_in_turn_trigger(*count).to_string()
         }
         TriggerEvent::PlayDuringTurn(predicate, turn) => match turn {
             PlayerTurn::YourTurn => strings::when_you_play_in_turn_trigger(
@@ -67,23 +65,20 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         )
         .to_string(),
         TriggerEvent::AbandonCardsInTurn(count) => {
-            bindings.insert("a".to_string(), VariableValue::Integer(*count));
-            strings::when_you_abandon_count_in_turn_trigger(0).to_string()
+            strings::when_you_abandon_count_in_turn_trigger(*count).to_string()
         }
         TriggerEvent::PutIntoVoid(predicate) => strings::when_put_into_void_trigger(
             predicate_serializer::serialize_predicate(predicate, bindings),
         )
         .to_string(),
         TriggerEvent::DrawCardsInTurn(count) => {
-            bindings.insert("c".to_string(), VariableValue::Integer(*count));
-            strings::when_you_draw_in_turn_trigger(0).to_string()
+            strings::when_you_draw_in_turn_trigger(*count).to_string()
         }
         TriggerEvent::EndOfYourTurn => strings::at_end_of_your_turn_trigger().to_string(),
         TriggerEvent::DrawAllCardsInCopyOfDeck => strings::when_deck_empty_trigger().to_string(),
         TriggerEvent::MaterializeNthThisTurn(predicate, count) => {
-            bindings.insert("n".to_string(), VariableValue::Integer(*count));
             strings::when_you_materialize_nth_in_turn_trigger(
-                0,
+                *count,
                 predicate_serializer::serialize_predicate_plural(predicate, bindings),
             )
             .to_string()

@@ -1,6 +1,5 @@
 use ability_data::collection_expression::CollectionExpression;
 use ability_data::cost::Cost;
-use ability_data::variable_value::VariableValue;
 use strings::strings;
 
 use crate::serializer::predicate_serializer;
@@ -18,40 +17,25 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
                 strings::abandon_target(predicate_serializer::serialize_predicate(target, bindings))
                     .to_string()
             }
-            CollectionExpression::Exactly(n) => {
-                bindings.insert("a".to_string(), VariableValue::Integer(*n));
-                strings::abandon_count_allies(0).to_string()
-            }
+            CollectionExpression::Exactly(n) => strings::abandon_count_allies(*n).to_string(),
             _ => strings::abandon_count_allies(0).to_string(),
         },
-        Cost::DiscardCards { count, .. } => {
-            bindings.insert("d".to_string(), VariableValue::Integer(*count));
-            strings::discard_cards_cost(0).to_string()
-        }
+        Cost::DiscardCards { count, .. } => strings::discard_cards_cost(*count).to_string(),
         Cost::DiscardHand => strings::discard_your_hand_cost().to_string(),
-        Cost::Energy(energy) => {
-            bindings.insert("e".to_string(), VariableValue::Integer(energy.0));
-            strings::energy_cost_value(0).to_string()
-        }
-        Cost::LoseMaximumEnergy(amount) => {
-            bindings.insert("m".to_string(), VariableValue::Integer(*amount));
-            strings::lose_max_energy_cost(0).to_string()
-        }
+        Cost::Energy(energy) => strings::energy_cost_value(energy.0).to_string(),
+        Cost::LoseMaximumEnergy(amount) => strings::lose_max_energy_cost(*amount).to_string(),
         Cost::BanishCardsFromYourVoid(count) => {
             if *count == 1 {
                 strings::banish_another_in_void().to_string()
             } else {
-                bindings.insert("c".to_string(), VariableValue::Integer(*count));
-                strings::banish_cards_from_void(0).to_string()
+                strings::banish_cards_from_void(*count).to_string()
             }
         }
         Cost::BanishCardsFromEnemyVoid(count) => {
-            bindings.insert("c".to_string(), VariableValue::Integer(*count));
-            strings::banish_cards_from_enemy_void(0).to_string()
+            strings::banish_cards_from_enemy_void(*count).to_string()
         }
         Cost::BanishAllCardsFromYourVoidWithMinCount(min_count) => {
-            bindings.insert("n".to_string(), VariableValue::Integer(*min_count));
-            strings::banish_void_min_count(0).to_string()
+            strings::banish_void_min_count(*min_count).to_string()
         }
         Cost::BanishFromHand(predicate) => strings::banish_from_hand_cost(
             predicate_serializer::serialize_predicate(predicate, bindings),
