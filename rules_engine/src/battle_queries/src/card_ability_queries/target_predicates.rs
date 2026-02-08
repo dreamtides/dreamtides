@@ -30,7 +30,6 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::DissolveCharactersQuantity { target, .. } => Some(target),
         StandardEffect::GainControl { target } => Some(target),
         StandardEffect::GainEnergyEqualToCost { target } => Some(target),
-        StandardEffect::GainsAegisThisTurn { target } => Some(target),
         StandardEffect::GainsReclaim { target, .. } => Some(target),
         StandardEffect::GainsSpark { target, .. } => Some(target),
         StandardEffect::GainsSparkForQuantity { target, .. } => Some(target),

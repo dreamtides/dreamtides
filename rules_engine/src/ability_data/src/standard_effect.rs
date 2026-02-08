@@ -165,9 +165,6 @@ pub enum StandardEffect {
         gain: Points,
         for_count: QuantityExpression,
     },
-    GainsAegisThisTurn {
-        target: Predicate,
-    },
     GainsSpark {
         target: Predicate,
         gains: Spark,

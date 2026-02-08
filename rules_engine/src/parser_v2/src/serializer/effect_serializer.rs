@@ -623,12 +623,6 @@ pub fn serialize_standard_effect(
                 predicate_serializer::serialize_predicate(target, bindings)
             )
         }
-        StandardEffect::GainsAegisThisTurn { target } => {
-            format!(
-                "{} gains {{Aegis}} this turn.",
-                predicate_serializer::serialize_predicate(target, bindings)
-            )
-        }
         StandardEffect::GainsSparkUntilYourNextMainForEach { target, gains, for_each } => {
             bindings.insert("s".to_string(), VariableValue::Integer(gains.0));
             format!(

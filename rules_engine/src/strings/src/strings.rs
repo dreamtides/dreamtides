@@ -83,7 +83,7 @@ rlf::rlf! {
     // =========================================================================
 
     // Card noun with article metadata.
-    card = :a { one: "card", other: "cards" };
+    card = :a :inan { one: "card", other: "cards" };
     // Card count with article (e.g., "a card" or "2 cards").
     cards($n) = :match($n) {
         1: "a card",
@@ -111,7 +111,7 @@ rlf::rlf! {
     // =========================================================================
 
     // Ally noun with article metadata.
-    ally = :an { one: "ally", other: "allies" };
+    ally = :an :anim { one: "ally", other: "allies" };
     // Ally count with article (e.g., "an ally" or "2 allies").
     count_allies($n) = :match($n) {
         1: "an ally",
@@ -128,13 +128,13 @@ rlf::rlf! {
     // =========================================================================
 
     // Celestial figment type.
-    celestial = :a "Celestial";
+    celestial = :a :anim "Celestial";
     // Halcyon figment type.
-    halcyon = :a "Halcyon";
+    halcyon = :a :anim "Halcyon";
     // Radiant figment type.
-    radiant = :a "Radiant";
+    radiant = :a :anim "Radiant";
     // Shadow figment type.
-    shadow = :a "Shadow";
+    shadow = :a :anim "Shadow";
 
     // =========================================================================
     // Figment tokens
@@ -155,53 +155,53 @@ rlf::rlf! {
     // =========================================================================
 
     // Agent subtype.
-    agent = :an { one: "Agent", other: "Agents" };
+    agent = :an :anim { one: "Agent", other: "Agents" };
     // Ancient subtype.
-    ancient = :an { one: "Ancient", other: "Ancients" };
+    ancient = :an :anim { one: "Ancient", other: "Ancients" };
     // Avatar subtype.
-    avatar = :an { one: "Avatar", other: "Avatars" };
+    avatar = :an :anim { one: "Avatar", other: "Avatars" };
     // Child subtype.
-    child = :a { one: "Child", other: "Children" };
+    child = :a :anim { one: "Child", other: "Children" };
     // Detective subtype.
-    detective = :a { one: "Detective", other: "Detectives" };
+    detective = :a :anim { one: "Detective", other: "Detectives" };
     // Enigma subtype.
-    enigma = :an { one: "Enigma", other: "Enigmas" };
+    enigma = :an :anim { one: "Enigma", other: "Enigmas" };
     // Explorer subtype.
-    explorer = :an { one: "Explorer", other: "Explorers" };
+    explorer = :an :anim { one: "Explorer", other: "Explorers" };
     // Guide subtype.
-    guide = :a { one: "Guide", other: "Guides" };
+    guide = :a :anim { one: "Guide", other: "Guides" };
     // Hacker subtype.
-    hacker = :a { one: "Hacker", other: "Hackers" };
+    hacker = :a :anim { one: "Hacker", other: "Hackers" };
     // Mage subtype.
-    mage = :a { one: "Mage", other: "Mages" };
+    mage = :a :anim { one: "Mage", other: "Mages" };
     // Monster subtype.
-    monster = :a { one: "Monster", other: "Monsters" };
+    monster = :a :anim { one: "Monster", other: "Monsters" };
     // Musician subtype.
-    musician = :a { one: "Musician", other: "Musicians" };
+    musician = :a :anim { one: "Musician", other: "Musicians" };
     // Outsider subtype.
-    outsider = :an { one: "Outsider", other: "Outsiders" };
+    outsider = :an :anim { one: "Outsider", other: "Outsiders" };
     // Renegade subtype.
-    renegade = :a { one: "Renegade", other: "Renegades" };
+    renegade = :a :anim { one: "Renegade", other: "Renegades" };
     // Robot subtype.
-    robot = :a { one: "Robot", other: "Robots" };
+    robot = :a :anim { one: "Robot", other: "Robots" };
     // Spirit Animal subtype.
-    spirit_animal = :a { one: "Spirit Animal", other: "Spirit Animals" };
+    spirit_animal = :a :anim { one: "Spirit Animal", other: "Spirit Animals" };
     // Super subtype.
-    super_ = :a { one: "Super", other: "Supers" };
+    super_ = :a :anim { one: "Super", other: "Supers" };
     // Survivor subtype.
-    survivor = :a { one: "Survivor", other: "Survivors" };
+    survivor = :a :anim { one: "Survivor", other: "Survivors" };
     // Synth subtype.
-    synth = :a { one: "Synth", other: "Synths" };
+    synth = :a :anim { one: "Synth", other: "Synths" };
     // Tinkerer subtype.
-    tinkerer = :a { one: "Tinkerer", other: "Tinkerers" };
+    tinkerer = :a :anim { one: "Tinkerer", other: "Tinkerers" };
     // Trooper subtype.
-    trooper = :a { one: "Trooper", other: "Troopers" };
+    trooper = :a :anim { one: "Trooper", other: "Troopers" };
     // Visionary subtype.
-    visionary = :a { one: "Visionary", other: "Visionaries" };
+    visionary = :a :anim { one: "Visionary", other: "Visionaries" };
     // Visitor subtype.
-    visitor = :a { one: "Visitor", other: "Visitors" };
+    visitor = :a :anim { one: "Visitor", other: "Visitors" };
     // Warrior subtype.
-    warrior = :a { one: "Warrior", other: "Warriors" };
+    warrior = :a :anim { one: "Warrior", other: "Warriors" };
 
     // Subtype display with green bold formatting, inheriting article metadata.
     subtype($s) = :from($s) "<color=#2E7D32><b>{$s}</b></color>";
@@ -404,9 +404,9 @@ rlf::rlf! {
     // =========================================================================
 
     // Character card type.
-    card_type_character = "Character";
+    card_type_character = :anim "Character";
     // Event card type.
-    card_type_event = "Event";
+    card_type_event = :inan "Event";
     // Dreamsign card type.
     card_type_dreamsign = "Dreamsign";
     // Dreamcaller card type.

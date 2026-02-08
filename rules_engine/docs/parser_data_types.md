@@ -154,7 +154,6 @@ AbandonAtEndOfTurn { target: Predicate }
 AbandonAndGainEnergyForSpark { target: Predicate, energy_per_spark: Energy }
 EachPlayerAbandonsCharacters { matching: CardPredicate, count: u32 }
 EachPlayerDiscardCards { count: u32 }
-GainsAegisThisTurn { target: Predicate }
 PreventDissolveThisTurn { target: Predicate }
 PayCost { cost: Cost }
 OpponentPaysCost { cost: Cost }
