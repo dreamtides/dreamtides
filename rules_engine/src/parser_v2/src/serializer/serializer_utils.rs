@@ -1,4 +1,6 @@
 use ability_data::predicate::Operator;
+use core_data::card_types::CardSubtype;
+use rlf::Phrase;
 use strings::strings;
 
 /// Lowercases a leading keyword like "{Banish}" -> "{banish}" in a string.
@@ -44,6 +46,36 @@ pub fn serialize_operator<T>(operator: &Operator<T>) -> String {
         Operator::Exactly => String::new(),
         Operator::LowerBy(_) => strings::operator_lower().to_string(),
         Operator::HigherBy(_) => strings::operator_higher().to_string(),
+    }
+}
+
+/// Converts a [CardSubtype] to its corresponding RLF phrase.
+pub fn subtype_to_phrase(subtype: CardSubtype) -> Phrase {
+    match subtype {
+        CardSubtype::Agent => strings::agent(),
+        CardSubtype::Ancient => strings::ancient(),
+        CardSubtype::Avatar => strings::avatar(),
+        CardSubtype::Child => strings::child(),
+        CardSubtype::Detective => strings::detective(),
+        CardSubtype::Enigma => strings::enigma(),
+        CardSubtype::Explorer => strings::explorer(),
+        CardSubtype::Guide => strings::guide(),
+        CardSubtype::Hacker => strings::hacker(),
+        CardSubtype::Mage => strings::mage(),
+        CardSubtype::Monster => strings::monster(),
+        CardSubtype::Musician => strings::musician(),
+        CardSubtype::Outsider => strings::outsider(),
+        CardSubtype::Renegade => strings::renegade(),
+        CardSubtype::Robot => strings::robot(),
+        CardSubtype::SpiritAnimal => strings::spirit_animal(),
+        CardSubtype::Super => strings::super_(),
+        CardSubtype::Survivor => strings::survivor(),
+        CardSubtype::Synth => strings::synth(),
+        CardSubtype::Tinkerer => strings::tinkerer(),
+        CardSubtype::Trooper => strings::trooper(),
+        CardSubtype::Visionary => strings::visionary(),
+        CardSubtype::Visitor => strings::visitor(),
+        CardSubtype::Warrior => strings::warrior(),
     }
 }
 

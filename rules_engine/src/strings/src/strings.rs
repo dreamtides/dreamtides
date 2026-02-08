@@ -907,4 +907,93 @@ rlf::rlf! {
     card_predicate_abandoned_this_turn($base) = :from($base) "{$base} abandoned this turn";
     // Generic card predicate abandoned for count expressions.
     card_predicate_abandoned($base) = :from($base) "{$base} abandoned";
+
+    // =========================================================================
+    // For-each effect phrases
+    // =========================================================================
+
+    // Draw cards for each matching predicate.
+    draw_cards_for_each($c, $target) = "draw {cards($c)} for each {$target}";
+    // Gain energy for each matching predicate.
+    gain_energy_for_each($e, $target) = "gain {energy($e)} for each {$target}";
+    // Gain points for each matching quantity.
+    gain_points_for_each($p, $target) = "gain {points($p)} for each {$target}";
+    // Target gains spark for each matching quantity.
+    gains_spark_for_each($target, $s, $quantity) = "{$target} gains +{$s} spark for each {$quantity}";
+    // Target gains spark until next main phase for each matching predicate.
+    gains_spark_until_next_main_for_each($target, $s, $for_each) = "{$target} gains +{$s} spark until your next main phase for each {$for_each}";
+    // Each matching gains spark equal to count of another group.
+    each_gains_spark_equal_to($each, $count_of) = "each {$each} gains spark equal to the number of {$count_of}";
+    // Have each matching gain spark.
+    have_each_gain_spark($each, $s) = "have each {$each} gain +{$s} spark";
+    // Spark of each matching becomes a value.
+    spark_of_each_becomes($each, $s) = "the spark of each {$each} becomes {$s}";
+    // Dissolve all with cost less than or equal to quantity count.
+    dissolve_all_with_cost_lte_quantity($target, $quantity) = "{{dissolve}} all {$target} with cost less than or equal to the number of {$quantity}";
+
+    // =========================================================================
+    // Collection effect phrases
+    // =========================================================================
+
+    // Dissolve all matching targets.
+    dissolve_all($target) = "{{dissolve}} all {$target}";
+    // Dissolve exactly N matching targets.
+    dissolve_exactly($n, $target) = "{{dissolve}} {$n} {$target}";
+    // Dissolve up to N matching targets.
+    dissolve_up_to($n, $target) = "{{dissolve}} up to {$n} {$target}";
+    // Dissolve any number of matching targets.
+    dissolve_any_number_of($target) = "{{dissolve}} any number of {$target}";
+    // Dissolve a single matching target.
+    dissolve_single($target) = "{{dissolve}} {$target}";
+
+    // Banish all matching targets.
+    banish_all($target) = "{{banish}} all {$target}";
+    // Banish exactly N matching targets.
+    banish_exactly($n, $target) = "{{banish}} {$n} {$target}";
+    // Banish up to N matching targets.
+    banish_up_to($n, $target) = "{{banish}} up to {$n} {$target}";
+    // Banish any number of matching targets.
+    banish_any_number_of($target) = "{{banish}} any number of {$target}";
+    // Banish a single matching target.
+    banish_single($target) = "{{banish}} {$target}";
+
+    // Materialize them.
+    materialize_them = "{{materialize}} them";
+    // Materialize all matching targets.
+    materialize_all($target) = "{{materialize}} all {$target}";
+    // Materialize any number of matching targets.
+    materialize_any_number_of($target) = "{{materialize}} any number of {$target}";
+    // Materialize up to N matching targets.
+    materialize_up_to($n, $target) = "{{materialize}} up to {$n} {$target}";
+    // Materialize a single matching target.
+    materialize_single($target) = "{{materialize}} {$target}";
+
+    // Materialize a copy of a target.
+    materialize_copy_of($target) = "{{materialize}} a copy of {$target}";
+    // Materialize N copies of a target.
+    materialize_n_copies_of($n, $target) = "{{materialize}} {$n} copies of {$target}";
+    // Materialize copies of target equal to count of matching.
+    materialize_copies_equal_to_matching($target, $matching) = "{{materialize}} a number of copies of {$target} equal to the number of {$matching}";
+    // Materialize copies of target equal to energy spent.
+    materialize_copies_equal_to_energy($target) = "{{materialize}} a number of copies of {$target} equal to the amount of {{energy_symbol}} spent";
+    // Materialize copies of target equal to quantity.
+    materialize_copies_equal_to_quantity($target, $quantity) = "{{materialize}} a number of copies of {$target} equal to the number of {$quantity}";
+
+    // Trigger judgment ability of each matching target.
+    trigger_judgment_of_each($target) = "trigger the {{Judgment}} ability of each {$target}";
+    // Trigger judgment ability of a single matching target.
+    trigger_judgment_of($target) = "trigger the {{Judgment}} ability of {$target}";
+    // Trigger judgment ability of exactly N matching targets.
+    trigger_judgment_of_n($n, $target) = "trigger the {{Judgment}} ability of {$n} {$target}";
+
+    // =========================================================================
+    // Materialize figment quantity phrases
+    // =========================================================================
+
+    // Materialize figments for each card played this turn.
+    materialize_figments_for_each_played($fig) = "{{materialize}} {$fig} for each card you have played this turn";
+    // Materialize figments for each matching predicate.
+    materialize_figments_for_each($fig, $for_each) = "{{materialize}} {$fig} for each {$for_each}";
+    // Materialize figments for each quantity.
+    materialize_figments_for_each_quantity($fig, $quantity) = "{{materialize}} {$fig} for each {$quantity}";
 }

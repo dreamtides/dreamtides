@@ -1,9 +1,8 @@
 use ability_data::condition::Condition;
 use ability_data::predicate::{CardPredicate, Predicate};
-use ability_data::variable_value::VariableValue;
 use strings::strings;
 
-use crate::serializer::predicate_serializer;
+use crate::serializer::{predicate_serializer, serializer_utils};
 use crate::variables::parser_bindings::VariableBindings;
 
 /// Serializes a condition to its template text representation.
@@ -31,9 +30,12 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
         }
         Condition::PredicateCount { count: 1, predicate } => {
             if let Predicate::Another(CardPredicate::CharacterType(subtype)) = predicate {
-                bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
+                strings::with_allied_subtype(serializer_utils::subtype_to_phrase(*subtype))
+                    .to_string()
+            } else {
+                strings::with_predicate_condition(serialize_predicate_count(1, predicate, bindings))
+                    .to_string()
             }
-            strings::with_allied_subtype(0).to_string()
         }
         Condition::PredicateCount { count, predicate } => strings::with_predicate_condition(
             serialize_predicate_count(*count, predicate, bindings),
@@ -50,8 +52,8 @@ fn serialize_predicate_count(
 ) -> String {
     match predicate {
         Predicate::Another(CardPredicate::CharacterType(subtype)) => {
-            bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            strings::with_count_allied_subtype(count, 0).to_string()
+            strings::with_count_allied_subtype(count, serializer_utils::subtype_to_phrase(*subtype))
+                .to_string()
         }
         Predicate::Another(CardPredicate::Character) => {
             strings::with_count_allies(count).to_string()

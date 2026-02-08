@@ -532,7 +532,7 @@ pub fn card_predicate_base_text_plural(predicate: &CardPredicate) -> String {
 }
 
 /// Returns the base noun phrase for a card predicate using RLF phrases.
-fn card_predicate_base_phrase(predicate: &CardPredicate) -> Phrase {
+pub fn card_predicate_base_phrase(predicate: &CardPredicate) -> Phrase {
     match predicate {
         CardPredicate::Card => strings::card(),
         CardPredicate::Character => strings::character(),
