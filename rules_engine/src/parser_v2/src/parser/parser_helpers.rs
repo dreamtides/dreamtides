@@ -63,13 +63,6 @@ pub fn cards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + C
     }
 }
 
-/// Parses the {top_n_cards} directive value.
-pub fn top_n_cards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
-    select! {
-        (ResolvedToken::TopNCards(v), _) => v,
-    }
-}
-
 #[expect(clippy::unnested_or_patterns)]
 pub fn discards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {

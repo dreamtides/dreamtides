@@ -28,7 +28,7 @@ static PHRASES: &[PhraseEntry] = &[
     ("spark", "s", ResolvedToken::SparkAmount),
     ("text_number", "n", ResolvedToken::TextNumber),
     ("this_turn_times", "n", ResolvedToken::ThisTurnTimes),
-    ("top_n_cards", "v", ResolvedToken::TopNCards),
+    ("top_n_cards", "v", ResolvedToken::CardCount),
     ("up_to_n_allies", "n", ResolvedToken::UpToNAllies),
     ("up_to_n_events", "n", ResolvedToken::UpToNEvents),
     // Short-form entries used in TOML data
@@ -49,7 +49,6 @@ pub enum ResolvedToken {
     Mode1Energy(u32),
     Mode2Energy(u32),
     CardCount(u32),
-    TopNCards(u32),
     DiscardCount(u32),
     PointCount(u32),
     SparkAmount(u32),

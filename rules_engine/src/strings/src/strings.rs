@@ -92,7 +92,7 @@ rlf::rlf! {
     // Top N cards of deck (e.g., "top card" or "top 3 cards").
     top_n_cards($n) = :match($n) {
         1: "top card",
-        *other: "top {$n} cards",
+        *other: "top {$n} {card:$n}",
     };
 
     // =========================================================================

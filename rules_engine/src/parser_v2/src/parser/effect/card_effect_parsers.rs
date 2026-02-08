@@ -6,7 +6,7 @@ use core_data::numerics::{Energy, Points};
 
 use crate::parser::parser_helpers::{
     article, cards, directive, discards, energy, period, points, reclaim_cost, subtype,
-    top_n_cards, up_to_n_events, word, words, ParserExtra, ParserInput,
+    up_to_n_events, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, predicate_parser, quantity_expression_parser};
 
@@ -164,7 +164,7 @@ pub fn reclaim_random_from_void<'a>(
 pub fn put_cards_from_deck_into_void<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     words(&["put", "the"])
-        .ignore_then(top_n_cards())
+        .ignore_then(cards())
         .then_ignore(words(&["of", "your", "deck", "into", "your", "void"]))
         .map(|count| StandardEffect::PutCardsFromYourDeckIntoVoid { count })
 }
