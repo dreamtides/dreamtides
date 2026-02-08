@@ -507,17 +507,17 @@ rlf::rlf! {
     // Lose maximum energy cost.
     lose_max_energy_cost($m) = "lose {maximum_energy($m)}";
     // Banish your entire void.
-    banish_your_void_cost = "{Banish} your void";
+    banish_your_void_cost = "{banish} your void";
     // Banish another card in your void.
-    banish_another_in_void = "{Banish} another card in your void";
+    banish_another_in_void = "{banish} another card in your void";
     // Banish a count of cards from your void.
-    banish_cards_from_void($c) = "{Banish} {cards($c)} from your void";
+    banish_cards_from_void($c) = "{banish} {cards($c)} from your void";
     // Banish a count of cards from the opponent's void.
-    banish_cards_from_enemy_void($c) = "{Banish} {cards($c)} from the opponent's void";
+    banish_cards_from_enemy_void($c) = "{banish} {cards($c)} from the opponent's void";
     // Banish your void with a minimum card count.
-    banish_void_min_count($n) = "{Banish} your void with {count($n)} or more cards";
+    banish_void_min_count($n) = "{banish} your void with {count($n)} or more cards";
     // Banish a target from hand.
-    banish_from_hand_cost($target) = :from($target) "{Banish} {$target} from hand";
+    banish_from_hand_cost($target) = :from($target) "{banish} {$target} from hand";
 
     // =========================================================================
     // Trigger serializer phrases (Category A)
@@ -672,27 +672,27 @@ rlf::rlf! {
     // Discard a chosen card from the opponent's hand.
     discard_chosen_from_enemy_hand($target) = "discard a chosen {$target} from the opponent's hand";
     // Dissolve a target.
-    dissolve_target($target) = "{{dissolve}} {$target}";
+    dissolve_target($target) = "{dissolve} {$target}";
     // Banish a target.
-    banish_target($target) = "{{banish}} {$target}";
+    banish_target($target) = "{banish} {$target}";
     // Banish a target until another leaves play.
-    banish_until_leaves($target, $until) = "{{banish}} {$target} until {$until} leaves play";
+    banish_until_leaves($target, $until) = "{banish} {$target} until {$until} leaves play";
     // Banish a target until your next main phase.
-    banish_until_next_main($target) = "{{banish}} {$target} until your next main phase";
+    banish_until_next_main($target) = "{banish} {$target} until your next main phase";
     // Banish a target when it leaves play.
-    banish_when_leaves_play($target) = "{{banish}} {$target} when it leaves play";
+    banish_when_leaves_play($target) = "{banish} {$target} when it leaves play";
     // Gain control of a target.
     gain_control_of($target) = "gain control of {$target}";
     // Discover a card predicate.
-    discover_target($target) = "{{discover}} {$target}";
+    discover_target($target) = "{discover} {$target}";
     // Discover a card and materialize it.
-    discover_and_materialize($target) = "{{discover}} {$target} and {{materialize}} it";
+    discover_and_materialize($target) = "{discover} {$target} and {materialize} it";
     // Materialize a target.
-    materialize_target($target) = "{{materialize}} {$target}";
+    materialize_target($target) = "{materialize} {$target}";
     // Materialize a target at end of turn.
-    materialize_at_end_of_turn($target) = "{{materialize}} {$target} at end of turn";
+    materialize_at_end_of_turn($target) = "{materialize} {$target} at end of turn";
     // Materialize a target from your void.
-    materialize_from_void($target) = "{{materialize}} {$target} from your void";
+    materialize_from_void($target) = "{materialize} {$target} from your void";
     // Return a target to hand.
     return_to_hand($target) = "return {$target} to hand";
     // Return this character to your hand.
@@ -704,9 +704,9 @@ rlf::rlf! {
     // Return a target from your void to your hand.
     return_from_void_to_hand($target) = "return {$target} from your void to your hand";
     // Reclaim a target from your void.
-    reclaim_target($target) = "{{reclaim}} {$target}";
+    reclaim_target($target) = "{reclaim} {$target}";
     // Reclaim a random card type.
-    reclaim_random($target) = "{{reclaim}} a random {$target}";
+    reclaim_random($target) = "{reclaim} a random {$target}";
     // Put a target on top of the opponent's deck.
     put_on_top_of_enemy_deck($target) = "put {$target} on top of the opponent's deck";
     // Copy a target.
@@ -716,19 +716,19 @@ rlf::rlf! {
     // Draw a matching card from your deck.
     draw_matching_from_deck($target) = "draw {$target} from your deck";
     // Abandon a target and gain energy for its spark.
-    abandon_and_gain_energy_for_spark($target) = "abandon {$target} and gain {{energy_symbol}} for each point of spark that character had";
+    abandon_and_gain_energy_for_spark($target) = "abandon {$target} and gain {energy_symbol} for each point of spark that character had";
     // Abandon a target at end of turn.
     abandon_at_end_of_turn($target) = "abandon {$target} at end of turn";
     // Each player abandons a matching card.
     each_player_abandons($target) = "each player abandons {$target}";
     // Target cannot be dissolved this turn.
-    prevent_dissolve_this_turn($target) = "{$target} cannot be {{dissolved}} this turn";
+    prevent_dissolve_this_turn($target) = "{$target} cannot be {dissolved} this turn";
     // Prevent a played target.
-    prevent_played_target($target) = "{{prevent}} a played {$target}";
+    prevent_played_target($target) = "{prevent} a played {$target}";
     // Prevent a played target unless opponent pays cost.
-    prevent_unless_pays($target, $cost) = "{{prevent}} a played {$target} unless the opponent pays {$cost}";
+    prevent_unless_pays($target, $cost) = "{prevent} a played {$target} unless the opponent pays {$cost}";
     // Gain energy equal to a target's cost.
-    gain_energy_equal_to_cost($target) = "gain {{energy_symbol}} equal to {$target}'s cost";
+    gain_energy_equal_to_cost($target) = "gain {energy_symbol} equal to {$target}'s cost";
     // Target gains spark.
     gains_spark($target, $s) = "{$target} gains +{$s} spark";
     // Opponent pays a cost.
@@ -931,86 +931,86 @@ rlf::rlf! {
     // Spark of each matching becomes a value.
     spark_of_each_becomes($each, $s) = "the spark of each {$each} becomes {$s}";
     // Dissolve all with cost less than or equal to quantity count.
-    dissolve_all_with_cost_lte_quantity($target, $quantity) = "{{dissolve}} all {$target} with cost less than or equal to the number of {$quantity}";
+    dissolve_all_with_cost_lte_quantity($target, $quantity) = "{dissolve} all {$target} with cost less than or equal to the number of {$quantity}";
 
     // =========================================================================
     // Collection effect phrases
     // =========================================================================
 
     // Dissolve all matching targets.
-    dissolve_all($target) = "{{dissolve}} all {$target}";
+    dissolve_all($target) = "{dissolve} all {$target}";
     // Dissolve exactly N matching targets.
-    dissolve_exactly($n, $target) = "{{dissolve}} {$n} {$target}";
+    dissolve_exactly($n, $target) = "{dissolve} {$n} {$target}";
     // Dissolve up to N matching targets.
-    dissolve_up_to($n, $target) = "{{dissolve}} up to {$n} {$target}";
+    dissolve_up_to($n, $target) = "{dissolve} up to {$n} {$target}";
     // Dissolve any number of matching targets.
-    dissolve_any_number_of($target) = "{{dissolve}} any number of {$target}";
+    dissolve_any_number_of($target) = "{dissolve} any number of {$target}";
     // Dissolve a single matching target.
-    dissolve_single($target) = "{{dissolve}} {$target}";
+    dissolve_single($target) = "{dissolve} {$target}";
 
     // Banish all matching targets.
-    banish_all($target) = "{{banish}} all {$target}";
+    banish_all($target) = "{banish} all {$target}";
     // Banish exactly N matching targets.
-    banish_exactly($n, $target) = "{{banish}} {$n} {$target}";
+    banish_exactly($n, $target) = "{banish} {$n} {$target}";
     // Banish up to N matching targets.
-    banish_up_to($n, $target) = "{{banish}} up to {$n} {$target}";
+    banish_up_to($n, $target) = "{banish} up to {$n} {$target}";
     // Banish any number of matching targets.
-    banish_any_number_of($target) = "{{banish}} any number of {$target}";
+    banish_any_number_of($target) = "{banish} any number of {$target}";
     // Banish a single matching target.
-    banish_single($target) = "{{banish}} {$target}";
+    banish_single($target) = "{banish} {$target}";
 
     // Materialize them.
-    materialize_them = "{{materialize}} them";
+    materialize_them = "{materialize} them";
     // Materialize all matching targets.
-    materialize_all($target) = "{{materialize}} all {$target}";
+    materialize_all($target) = "{materialize} all {$target}";
     // Materialize any number of matching targets.
-    materialize_any_number_of($target) = "{{materialize}} any number of {$target}";
+    materialize_any_number_of($target) = "{materialize} any number of {$target}";
     // Materialize up to N matching targets.
-    materialize_up_to($n, $target) = "{{materialize}} up to {$n} {$target}";
+    materialize_up_to($n, $target) = "{materialize} up to {$n} {$target}";
     // Materialize a single matching target.
-    materialize_single($target) = "{{materialize}} {$target}";
+    materialize_single($target) = "{materialize} {$target}";
 
     // Materialize a copy of a target.
-    materialize_copy_of($target) = "{{materialize}} a copy of {$target}";
+    materialize_copy_of($target) = "{materialize} a copy of {$target}";
     // Materialize N copies of a target.
-    materialize_n_copies_of($n, $target) = "{{materialize}} {$n} copies of {$target}";
+    materialize_n_copies_of($n, $target) = "{materialize} {$n} copies of {$target}";
     // Materialize copies of target equal to count of matching.
-    materialize_copies_equal_to_matching($target, $matching) = "{{materialize}} a number of copies of {$target} equal to the number of {$matching}";
+    materialize_copies_equal_to_matching($target, $matching) = "{materialize} a number of copies of {$target} equal to the number of {$matching}";
     // Materialize copies of target equal to energy spent.
-    materialize_copies_equal_to_energy($target) = "{{materialize}} a number of copies of {$target} equal to the amount of {{energy_symbol}} spent";
+    materialize_copies_equal_to_energy($target) = "{materialize} a number of copies of {$target} equal to the amount of {energy_symbol} spent";
     // Materialize copies of target equal to quantity.
-    materialize_copies_equal_to_quantity($target, $quantity) = "{{materialize}} a number of copies of {$target} equal to the number of {$quantity}";
+    materialize_copies_equal_to_quantity($target, $quantity) = "{materialize} a number of copies of {$target} equal to the number of {$quantity}";
 
     // Trigger judgment ability of each matching target.
-    trigger_judgment_of_each($target) = "trigger the {{Judgment}} ability of each {$target}";
+    trigger_judgment_of_each($target) = "trigger the {Judgment} ability of each {$target}";
     // Trigger judgment ability of a single matching target.
-    trigger_judgment_of($target) = "trigger the {{Judgment}} ability of {$target}";
+    trigger_judgment_of($target) = "trigger the {Judgment} ability of {$target}";
     // Trigger judgment ability of exactly N matching targets.
-    trigger_judgment_of_n($n, $target) = "trigger the {{Judgment}} ability of {$n} {$target}";
+    trigger_judgment_of_n($n, $target) = "trigger the {Judgment} ability of {$n} {$target}";
 
     // =========================================================================
     // Materialize figment quantity phrases
     // =========================================================================
 
     // Materialize figments for each card played this turn.
-    materialize_figments_for_each_played($fig) = "{{materialize}} {$fig} for each card you have played this turn";
+    materialize_figments_for_each_played($fig) = "{materialize} {$fig} for each card you have played this turn";
     // Materialize figments for each matching predicate.
-    materialize_figments_for_each($fig, $for_each) = "{{materialize}} {$fig} for each {$for_each}";
+    materialize_figments_for_each($fig, $for_each) = "{materialize} {$fig} for each {$for_each}";
     // Materialize figments for each quantity.
-    materialize_figments_for_each_quantity($fig, $quantity) = "{{materialize}} {$fig} for each {$quantity}";
+    materialize_figments_for_each_quantity($fig, $quantity) = "{materialize} {$fig} for each {$quantity}";
 
     // =========================================================================
     // Banish then materialize phrases
     // =========================================================================
 
     // Banish a single target then materialize it.
-    banish_then_materialize_it($target) = "{{banish}} {$target}, then {{materialize}} it";
+    banish_then_materialize_it($target) = "{banish} {$target}, then {materialize} it";
     // Banish any number of targets then materialize them.
-    banish_then_materialize_any_number($target) = "{{banish}} any number of {$target}, then {{materialize}} them";
+    banish_then_materialize_any_number($target) = "{banish} any number of {$target}, then {materialize} them";
     // Banish up to N allies then materialize them (uses pronoun agreement).
-    banish_then_materialize_up_to($n, $target) = "{{banish}} up to {$n} {$target}, then {{materialize}} {pronoun:$n}";
+    banish_then_materialize_up_to($n, $target) = "{banish} up to {$n} {$target}, then {materialize} {pronoun:$n}";
     // Banish targets then materialize them (default plural).
-    banish_then_materialize_them($target) = "{{banish}} {$target}, then {{materialize}} them";
+    banish_then_materialize_them($target) = "{banish} {$target}, then {materialize} them";
 
     // =========================================================================
     // Allied card predicate phrases
@@ -1174,7 +1174,7 @@ rlf::rlf! {
     // You may play matching cards from the top of your deck.
     you_may_play_from_top_of_deck($matching) = "you may play {$matching} from the top of your deck";
     // Judgment ability of matching characters triggers when materialized.
-    judgment_triggers_when_materialized($matching) = "the '{{Judgment}}' ability of {$matching} triggers when you {{materialize}} them";
+    judgment_triggers_when_materialized($matching) = "the '{Judgment}' ability of {$matching} triggers when you {materialize} them";
     // This character's spark equals predicate count.
     spark_equal_to_predicate_count($matching) = "{this_character}'s spark is equal to the number of {$matching}";
     // You may only play this character from your void.
@@ -1206,4 +1206,13 @@ rlf::rlf! {
     condition_prepended($condition, $base) = "{$condition} {$base}";
     // Condition appended to base ability text.
     condition_appended($base, $condition) = "{$base} {$condition}";
+
+    // =========================================================================
+    // Ability serializer structural phrases
+    // =========================================================================
+
+    // Capitalizes the first visible character of a string.
+    capitalized_sentence($s) = "{@cap $s}";
+    // Reclaim with dash-separated cost text.
+    reclaim_with_cost($cost) = "{Reclaim} -- {$cost}";
 }

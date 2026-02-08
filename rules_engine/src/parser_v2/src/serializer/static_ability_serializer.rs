@@ -5,7 +5,6 @@ use strings::strings;
 
 use crate::serializer::{
     condition_serializer, cost_serializer, effect_serializer, predicate_serializer,
-    serializer_utils,
 };
 use crate::variables::parser_bindings::VariableBindings;
 
@@ -114,9 +113,9 @@ pub fn serialize_standard_static_ability(
                 None => strings::this_card().to_string(),
             };
             if let Some(cost) = &alt_cost.additional_cost {
-                let capitalized_cost = serializer_utils::capitalize_first_letter(
-                    &cost_serializer::serialize_cost(cost, bindings),
-                );
+                let capitalized_cost =
+                    strings::capitalized_sentence(cost_serializer::serialize_cost(cost, bindings))
+                        .to_string();
                 if alt_cost.if_you_do.is_some() {
                     strings::play_for_alternate_cost_abandon(
                         capitalized_cost,
@@ -219,9 +218,9 @@ pub fn serialize_standard_static_ability(
                 bindings.insert("e".to_string(), VariableValue::Integer(energy_cost.0));
             }
             if let Some(cost) = &play_from_void.additional_cost {
-                let capitalized_cost = serializer_utils::capitalize_first_letter(
-                    &cost_serializer::serialize_cost(cost, bindings),
-                );
+                let capitalized_cost =
+                    strings::capitalized_sentence(cost_serializer::serialize_cost(cost, bindings))
+                        .to_string();
                 if let Some(effect) = &play_from_void.if_you_do {
                     let effect_text = effect_serializer::serialize_effect(effect, bindings);
                     strings::play_from_void_with_effect(

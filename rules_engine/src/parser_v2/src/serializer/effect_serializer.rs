@@ -43,10 +43,7 @@ pub fn serialize_standard_effect(
                 format!(
                     "until end of turn, {} {}",
                     trigger_serializer::serialize_trigger_event(&trigger.trigger, bindings),
-                    serializer_utils::capitalize_first_letter(&serialize_effect(
-                        &trigger.effect,
-                        bindings
-                    ))
+                    strings::capitalized_sentence(serialize_effect(&trigger.effect, bindings))
                 )
             } else {
                 format!(
@@ -295,10 +292,10 @@ pub fn serialize_standard_effect(
         StandardEffect::MaterializeFigments { count, figment } => {
             bindings.insert("g".to_string(), VariableValue::Figment(*figment));
             if *count == 1 {
-                "{materialize} {@a figment($g)}.".to_string()
+                format!("{} {{@a figment($g)}}.", strings::materialize())
             } else {
                 bindings.insert("n".to_string(), VariableValue::Integer(*count));
-                "{materialize} {n_figments($n, $g)}.".to_string()
+                format!("{} {{n_figments($n, $g)}}.", strings::materialize())
             }
         }
         StandardEffect::MaterializeFigmentsQuantity { count, quantity, figment } => {
@@ -402,7 +399,8 @@ pub fn serialize_standard_effect(
         StandardEffect::MaterializeRandomFromDeck { count, predicate } => {
             bindings.insert("n".to_string(), VariableValue::Integer(*count));
             format!(
-                "{{materialize}} {{n_random_characters($n)}} {} from your deck.",
+                "{} {{n_random_characters($n)}} {} from your deck.",
+                strings::materialize(),
                 predicate_serializer::serialize_cost_constraint_only(predicate, bindings)
             )
         }
@@ -651,7 +649,7 @@ pub fn serialize_effect_with_context(
                         .map(|e| {
                             let s = serialize_standard_effect(&e.effect, bindings);
                             let s = s.trim_end_matches('.');
-                            serializer_utils::capitalize_first_letter(s)
+                            strings::capitalized_sentence(s).to_string()
                         })
                         .collect();
                     let sentence_join = strings::sentence_joiner().to_string();
@@ -722,7 +720,7 @@ pub fn serialize_effect_with_context(
                     if index == 0 { ("{energy($e1)}", "e1") } else { ("{energy($e2)}", "e2") };
                 bindings.insert(var_name.to_string(), VariableValue::Integer(choice.energy_cost.0));
                 let effect_text = serialize_effect_with_context(&choice.effect, bindings, context);
-                let capitalized = serializer_utils::capitalize_first_letter(&effect_text);
+                let capitalized = strings::capitalized_sentence(effect_text).to_string();
                 result.push_str(&format!("{cost_var}{cost_effect_sep}{capitalized}"));
             }
             result
@@ -901,10 +899,10 @@ fn serialize_void_gains_reclaim(
                 bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
                 "{@cap @a subtype($t)}".to_string()
             } else {
-                serializer_utils::capitalize_first_letter(
-                    &predicate_serializer::serialize_card_predicate(predicate, bindings)
-                        .to_string(),
-                )
+                strings::capitalized_sentence(predicate_serializer::serialize_card_predicate(
+                    predicate, bindings,
+                ))
+                .to_string()
             };
             if let Some(energy_cost) = cost {
                 if this_turn {
