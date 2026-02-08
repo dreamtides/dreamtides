@@ -15,28 +15,28 @@ rlf::rlf! {
     // =========================================================================
 
     // Energy amount with colored symbol (e.g., "2[energy]").
-    energy(e) = "<color=#00838F>{e}\u{25CF}</color>";
+    energy($e) = "<color=#00838F>{$e}\u{25CF}</color>";
     // Points amount with colored symbol (e.g., "3[points]").
-    points(p) = "<color=#F57F17>{p}\u{234F}</color>";
+    points($p) = "<color=#F57F17>{$p}\u{234F}</color>";
     // Maximum energy display (e.g., "5 maximum [energy]").
-    maximum_energy(max) = "{max} maximum {energy_symbol}";
+    maximum_energy($max) = "{$max} maximum {energy_symbol}";
 
     // =========================================================================
     // Trigger ability prefixes
     // =========================================================================
 
     // Trigger prefix formatting (for runtime eval_str use).
-    trigger(t) = "\u{25B8} <b>{t}::</b>";
+    trigger($t) = "\u{25B8} <b>{$t}:</b>";
     // Materialized trigger prefix.
-    materialized = "\u{25B8} <b>Materialized::</b>";
+    materialized = "\u{25B8} <b>Materialized:</b>";
     // Judgment trigger prefix.
-    judgment = "\u{25B8} <b>Judgment::</b>";
+    judgment = "\u{25B8} <b>Judgment:</b>";
     // Dissolved trigger prefix.
-    dissolved = "\u{25B8} <b>Dissolved::</b>";
+    dissolved = "\u{25B8} <b>Dissolved:</b>";
     // Combined materialized and judgment trigger prefix.
-    materialized_judgment = "\u{25B8} <b>Materialized, Judgment::</b>";
+    materialized_judgment = "\u{25B8} <b>Materialized, Judgment:</b>";
     // Combined materialized and dissolved trigger prefix.
-    materialized_dissolved = "\u{25B8} <b>Materialized, Dissolved::</b>";
+    materialized_dissolved = "\u{25B8} <b>Materialized, Dissolved:</b>";
     // Bold judgment phase name for card text references.
     judgment_phase_name = "<b>Judgment</b>";
 
@@ -45,7 +45,7 @@ rlf::rlf! {
     // =========================================================================
 
     // Keyword formatting in purple (for runtime eval_str use).
-    keyword(k) = "<color=#AA00FF>{k}</color>";
+    keyword($k) = "<color=#AA00FF>{$k}</color>";
     // Dissolve keyword.
     dissolve = "<color=#AA00FF>dissolve</color>";
     // Banish keyword.
@@ -61,20 +61,20 @@ rlf::rlf! {
     // Prevent keyword.
     prevent = "<color=#AA00FF>prevent</color>";
     // Kindle keyword with spark amount.
-    kindle(k) = "<color=#AA00FF>kindle</color> {k}";
+    kindle($k) = "<color=#AA00FF>kindle</color> {$k}";
     // Foresee keyword with card count.
-    foresee(n) = "<color=#AA00FF>foresee</color> {n}";
+    foresee($n) = "<color=#AA00FF>foresee</color> {$n}";
     // Fast keyword with lightning bolt.
     fast = "<b>\u{21AF}fast</b>";
     // Reclaim with energy cost.
-    reclaim_for_cost(r) = "<color=#AA00FF>reclaim</color> <color=#00838F>{r}\u{25CF}</color>";
+    reclaim_for_cost($r) = "<color=#AA00FF>reclaim</color> <color=#00838F>{$r}\u{25CF}</color>";
 
     // =========================================================================
     // Modal card formatting
     // =========================================================================
 
     // Bold "Choose One:" header for modal cards.
-    choose_one = "<b>Choose One::</b>";
+    choose_one = "<b>Choose One:</b>";
     // Bullet point for modal options.
     bullet = "\u{2022}";
 
@@ -85,17 +85,17 @@ rlf::rlf! {
     // Card noun with article metadata.
     card = :a { one: "card", other: "cards" };
     // Card count with article (e.g., "a card" or "2 cards").
-    cards(n) = {
-        one: "a card",
-        other: "{n} cards"
+    cards($n) = :match($n) {
+        1: "a card",
+        *other: "{$n} cards",
     };
     // Card count with numeral (e.g., "1 card" or "2 cards").
-    cards_numeral(n) = "{n} {card:n}";
+    cards_numeral($n) = "{$n} {card:$n}";
 
     // Top N cards of deck (e.g., "top card" or "top 3 cards").
-    top_n_cards(n) = {
-        one: "top card",
-        other: "top {n} cards"
+    top_n_cards($n) = :match($n) {
+        1: "top card",
+        *other: "top {$n} cards",
     };
 
     // =========================================================================
@@ -103,11 +103,11 @@ rlf::rlf! {
     // =========================================================================
 
     // Spark value passthrough.
-    spark_value(s) = "{s}";
+    spark_value($s) = "{$s}";
     // Spark keyword for ability text.
     spark = "spark";
     // Generic count passthrough for numeric conditions.
-    count(n) = "{n}";
+    count($n) = "{$n}";
 
     // =========================================================================
     // Ally counts
@@ -116,14 +116,14 @@ rlf::rlf! {
     // Ally noun with article metadata.
     ally = :an { one: "ally", other: "allies" };
     // Ally count with article (e.g., "an ally" or "2 allies").
-    count_allies(n) = {
-        one: "an ally",
-        other: "{n} allies"
+    count_allies($n) = :match($n) {
+        1: "an ally",
+        *other: "{$n} allies",
     };
     // Allied character count with subtype (e.g., "an allied warrior").
-    count_allied_subtype(n, s) = {
-        one: "an allied {subtype(s)}",
-        other: "{n} allied {subtype(s):other}"
+    count_allied_subtype($n, $s) = :match($n) {
+        1: "an allied {subtype($s)}",
+        *other: "{$n} allied {subtype($s):other}",
     };
 
     // =========================================================================
@@ -144,15 +144,15 @@ rlf::rlf! {
     // =========================================================================
 
     // Figment token (singular) with gold formatting.
-    figment(f) = "<color=#F57F17><b><u>{f} Figment</u></color></b>";
+    figment($f) = "<color=#F57F17><b><u>{$f} Figment</u></color></b>";
     // Figment tokens (plural) with gold formatting.
-    figments_plural(f) = "<color=#F57F17><b><u>{f} Figments</u></color></b>";
+    figments_plural($f) = "<color=#F57F17><b><u>{$f} Figments</u></color></b>";
     // A figment with article.
-    a_figment(f) = "a {figment(f)}";
+    a_figment($f) = "a {figment($f)}";
     // N figments with article for singular.
-    n_figments(n, f) = {
-        one: "a {figment(f)}",
-        other: "{text_number(n)} {figments_plural(f)}"
+    n_figments($n, $f) = :match($n) {
+        1: "a {figment($f)}",
+        *other: "{text_number($n)} {figments_plural($f)}",
     };
 
     // =========================================================================
@@ -209,16 +209,20 @@ rlf::rlf! {
     warrior = :a { one: "Warrior", other: "Warriors" };
 
     // Subtype display with green bold formatting, inheriting article metadata.
-    subtype(s) = :from(s) "<color=#2E7D32><b>{s}</b></color>";
+    subtype($s) = :from($s) "<color=#2E7D32><b>{$s}</b></color>";
 
     // =========================================================================
     // Text number conversion
     // =========================================================================
 
-    // Convert number to word (1) or fall back to numeral.
-    text_number(n) = {
-        one: "one",
-        other: "{n}"
+    // Convert number to word (1-5) or fall back to numeral.
+    text_number($n) = :match($n) {
+        1: "one",
+        2: "two",
+        3: "three",
+        4: "four",
+        5: "five",
+        *other: "{$n}",
     };
 
     // =========================================================================
@@ -226,14 +230,16 @@ rlf::rlf! {
     // =========================================================================
 
     // Turn duration with repetition count.
-    this_turn_times(n) = {
-        one: "this turn",
-        other: "this turn {text_number(n)} times"
+    this_turn_times($n) = :match($n) {
+        1: "this turn",
+        *other: "this turn {text_number($n)} times",
     };
 
     // Multiplier effect (Double, Triple, etc.).
-    multiply_by(n) = {
-        other: "Multiply by {n}"
+    multiply_by($n) = :match($n) {
+        2: "Double",
+        3: "Triple",
+        *other: "Multiply by {$n}",
     };
 
     // =========================================================================
@@ -241,9 +247,9 @@ rlf::rlf! {
     // =========================================================================
 
     // Copy count with article (e.g., "a copy" or "two copies").
-    copies(n) = {
-        one: "a copy",
-        other: "{text_number(n)} copies"
+    copies($n) = :match($n) {
+        1: "a copy",
+        *other: "{text_number($n)} copies",
     };
 
     // =========================================================================
@@ -251,9 +257,9 @@ rlf::rlf! {
     // =========================================================================
 
     // Random character count (e.g., "a random character" or "two random characters").
-    n_random_characters(n) = {
-        one: "a random character",
-        other: "{text_number(n)} random characters"
+    n_random_characters($n) = :match($n) {
+        1: "a random character",
+        *other: "{text_number($n)} random characters",
     };
 
     // =========================================================================
@@ -261,9 +267,9 @@ rlf::rlf! {
     // =========================================================================
 
     // Up to N events (e.g., "an event" or "up to 3 events").
-    up_to_n_events(n) = {
-        one: "an event",
-        other: "up to {n} events"
+    up_to_n_events($n) = :match($n) {
+        1: "an event",
+        *other: "up to {$n} events",
     };
 
     // =========================================================================
@@ -271,9 +277,9 @@ rlf::rlf! {
     // =========================================================================
 
     // Up to N allies (e.g., "an ally" or "up to 3 allies").
-    up_to_n_allies(n) = {
-        one: "an ally",
-        other: "up to {n} allies"
+    up_to_n_allies($n) = :match($n) {
+        1: "an ally",
+        *other: "up to {$n} allies",
     };
 
     // =========================================================================
@@ -281,9 +287,9 @@ rlf::rlf! {
     // =========================================================================
 
     // Pronoun for singular or plural (it/them).
-    it_or_them(n) = {
-        one: "it",
-        other: "them"
+    it_or_them($n) = :match($n) {
+        1: "it",
+        *other: "them",
     };
 
     // =========================================================================
@@ -331,9 +337,9 @@ rlf::rlf! {
     // Decline to take the action associated with a prompt.
     decline_prompt_button = "Decline";
     // Choose to pay energy to take a prompt action.
-    pay_energy_prompt_button(e) = "Spend {energy(e)}";
+    pay_energy_prompt_button($e) = "Spend {energy($e)}";
     // Confirm the amount of energy to pay as an additional cost.
-    pay_energy_additional_cost_button(e) = "Spend {energy(e)}";
+    pay_energy_additional_cost_button($e) = "Spend {energy($e)}";
     // Confirm selection of target cards in the void.
     primary_button_submit_void_card_targets = "Submit";
     // Confirm selection of target cards in the hand.
@@ -364,7 +370,7 @@ rlf::rlf! {
     // =========================================================================
 
     // Energy paid annotation for variable-cost cards.
-    card_rules_text_energy_paid(e) = "({energy(e)} paid)";
+    card_rules_text_energy_paid($e) = "({energy($e)} paid)";
     // Reclaimed annotation.
     card_rules_text_reclaimed = "(Reclaimed)";
     // Anchored annotation.
@@ -375,9 +381,9 @@ rlf::rlf! {
     // =========================================================================
 
     // Card name for a numbered modal effect choice.
-    modal_effect_choice_card_name(number) = "Choice {number}";
+    modal_effect_choice_card_name($number) = "Choice {$number}";
     // Card name for a character ability.
-    character_ability_card_name(character_name) = "{character_name} Ability";
+    character_ability_card_name($character_name) = "{$character_name} Ability";
 
     // =========================================================================
     // Limit warning messages
@@ -385,13 +391,13 @@ rlf::rlf! {
 
     // Warning about exceeding the hand size limit.
     hand_size_limit_exceeded_warning_message =
-        "Note:: Cards drawn in excess of 10 become {energy_symbol} instead.";
+        "Note: Cards drawn in excess of 10 become {energy_symbol} instead.";
     // Warning about exceeding the character limit.
     character_limit_exceeded_warning_message =
-        "Character limit exceeded:: A character will be abandoned, with its spark permanently added to your total.";
+        "Character limit exceeded: A character will be abandoned, with its spark permanently added to your total.";
     // Warning about exceeding both limits.
     combined_limit_warning_message =
-        "Character limit exceeded:: A character will be abandoned. Cards drawn in excess of 10 become {energy_symbol} instead.";
+        "Character limit exceeded: A character will be abandoned. Cards drawn in excess of 10 become {energy_symbol} instead.";
 
     // =========================================================================
     // Error panel
@@ -421,25 +427,25 @@ rlf::rlf! {
 
     // Help text for dissolve ability.
     help_text_dissolve =
-        "{@cap dissolve}:: Send a character to the void";
+        "{@cap dissolve}: Send a character to the void";
     // Help text for prevent ability.
     help_text_prevent =
-        "{@cap prevent}:: Send a card to the void in response to it being played";
+        "{@cap prevent}: Send a card to the void in response to it being played";
     // Help text for foresee 1 ability.
     help_text_foresee_1 =
-        "<color=#AA00FF>Foresee</color> 1:: Look at the top card of your deck. You may put it into your void.";
+        "<color=#AA00FF>Foresee</color> 1: Look at the top card of your deck. You may put it into your void.";
     // Help text for foresee N ability.
-    help_text_foresee_n(n) =
-        "<color=#AA00FF>Foresee</color> {n}:: Look at the top {n} cards of your deck. You may put them into your void or put them back in any order.";
+    help_text_foresee_n($n) =
+        "<color=#AA00FF>Foresee</color> {$n}: Look at the top {$n} cards of your deck. You may put them into your void or put them back in any order.";
     // Help text for anchored status.
     help_text_anchored =
-        "<color=#AA00FF><b>Anchored</b></color>:: Cannot be dissolved.";
+        "<color=#AA00FF><b>Anchored</b></color>: Cannot be dissolved.";
     // Help text for reclaim without cost.
     help_text_reclaim_without_cost =
-        "{@cap reclaim}:: You may play a card from your void, then banish it when it leaves play.";
+        "{@cap reclaim}: You may play a card from your void, then banish it when it leaves play.";
     // Help text for reclaim with energy cost.
-    help_text_reclaim_with_cost(e) =
-        "{@cap reclaim} {energy(e)}:: You may play this card from your void for {energy(e)}, then banish it.";
+    help_text_reclaim_with_cost($e) =
+        "{@cap reclaim} {energy($e)}: You may play this card from your void for {energy($e)}, then banish it.";
 
     // =========================================================================
     // Token types
