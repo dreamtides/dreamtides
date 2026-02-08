@@ -450,4 +450,64 @@ rlf::rlf! {
     token_type_triggered_ability = "Triggered Ability";
     // Reclaim ability token type.
     token_type_reclaim_ability = "Reclaim Ability";
+
+    // =========================================================================
+    // Cost serializer phrases (Category A)
+    // =========================================================================
+
+    // Cost for discarding your entire hand.
+    discard_your_hand_cost = "discard your hand";
+    // Cost for paying one or more energy.
+    pay_one_or_more_energy_cost = "pay 1 or more {{energy_symbol}}";
+    // Connector for alternative costs.
+    cost_or_connector = " or ";
+    // Connector for combined costs.
+    cost_and_connector = " and ";
+    // Pay prefix for trigger costs.
+    pay_prefix($cost) = "pay {$cost}";
+    // Abandon any number of a target type.
+    abandon_any_number_of($target) = "abandon any number of {$target}";
+    // Abandon a specific target.
+    abandon_target($target) = "abandon {$target}";
+    // Return a target to hand.
+    return_target_to_hand($target) = "return {$target} to hand";
+    // Return a count of targets to hand.
+    return_count_to_hand($n, $target) = "return {$n} {$target} to hand";
+    // Return all but one target to hand.
+    return_all_but_one_to_hand($target) = "return all but one {$target} to hand";
+    // Return all targets to hand.
+    return_all_to_hand($target) = "return all {$target} to hand";
+    // Return any number of targets to hand.
+    return_any_number_to_hand($target) = "return any number of {$target} to hand";
+    // Return up to N targets to hand.
+    return_up_to_to_hand($n, $target) = "return up to {$n} {$target} to hand";
+    // Return each other target to hand.
+    return_each_other_to_hand($target) = "return each other {$target} to hand";
+    // Return N or more targets to hand.
+    return_or_more_to_hand($n, $target) = "return {$n} or more {$target} to hand";
+
+    // =========================================================================
+    // Cost serializer phrases (Category B) - Phase 2: requires Phrase composition
+    // =========================================================================
+
+    // Abandon a count of allies.
+    abandon_count_allies($a) = "abandon {{count_allies($a)}}";
+    // Discard a count of cards.
+    discard_cards_cost($d) = "discard {{cards($d)}}";
+    // Energy cost value.
+    energy_cost_value($e) = "{{energy($e)}}";
+    // Lose maximum energy cost.
+    lose_max_energy_cost($m) = "lose {{maximum_energy($m)}}";
+    // Banish your entire void.
+    banish_your_void_cost = "{{Banish}} your void";
+    // Banish another card in your void.
+    banish_another_in_void = "{{Banish}} another card in your void";
+    // Banish a count of cards from your void.
+    banish_cards_from_void($c) = "{{Banish}} {{cards($c)}} from your void";
+    // Banish a count of cards from the opponent's void.
+    banish_cards_from_enemy_void($c) = "{{Banish}} {{cards($c)}} from the opponent's void";
+    // Banish your void with a minimum card count.
+    banish_void_min_count($n) = "{{Banish}} your void with {{count($n)}} or more cards";
+    // Banish a target from hand.
+    banish_from_hand_cost($target) = "{{Banish}} {$target} from hand";
 }

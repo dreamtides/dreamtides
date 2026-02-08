@@ -3845,6 +3845,7 @@ dependencies = [
  "ron 0.8.1",
  "serde",
  "serde_json",
+ "strings",
  "strum",
  "thiserror 2.0.12",
  "toml",
