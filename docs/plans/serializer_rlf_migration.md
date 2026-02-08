@@ -666,6 +666,8 @@ Currently, `rlf_helper::eval_str()` calls `strings::register_source_phrases()` o
 | 7. Ability serializer | LOW | Straightforward top-level orchestration |
 | 8. Remove eval_str | MEDIUM | Atomic switchover, round-trip test strategy change |
 | 9. Remove capitalization | LOW | Simple deletion |
+| 10. Animacy tags + `:from` | LOW | Additive changes only, no English behavioral impact |
+| 11. RLF framework changes | LOW | Independent of Dreamtides code, follows established patterns |
 
 ---
 
@@ -714,7 +716,7 @@ dissolve_target($target) = :match($target) {
 };
 ```
 
-**Rust code implication:** English terms need `:anim`/`:inan` tags (already added in Phase 1.5 prep).
+**Rust code implication:** English terms need `:anim`/`:inan` tags (to be added in Task 10; not yet present in `strings.rs`).
 
 ### 9.4 Chinese Classifiers and Word Order
 
@@ -744,17 +746,210 @@ dissolve_target($target) = "Löse {@ein:acc $target} auf.";
 | `:a` / `:an` | English source | English indefinite article selection |
 | `:anim` / `:inan` | English source | Cross-language animacy (Spanish personal "a", Russian acc=gen) |
 | `:masc` / `:fem` / `:neut` | Translation files | Language-specific gender agreement |
+| `:zhang` / `:ge` / `:ming` etc. | Chinese translation | Chinese classifier tags for `@count` |
+
+**Animacy tag requirements (Task 2):** All entity noun terms in `strings.rs` MUST carry `:anim` or `:inan` tags. This is critical for Spanish (personal "a" before animate direct objects) and Russian (masculine animate accusative = genitive). Specifically:
+- `:anim` on: `ally`, all character subtypes (agent, ancient, avatar, child, detective, dreamer, explorer, mystic, ruler, scholar, spy, trickster, warrior), `character`
+- `:inan` on: `card`, `event`, figment types, location-like terms
+
+**Compound phrase `:from` requirement (Task 2):** Compound phrases that wrap entity references MUST use `:from($entity)` to preserve tag propagation through the composition chain. Without this, downstream `:match` for gender/animacy breaks. Specifically:
+```rust
+allied($entity) = :from($entity) "allied {$entity:one}";
+enemy_modified($entity) = :from($entity) "enemy {$entity:one}";
+```
+
+**`:from` tag propagation guarantee:** `:from($param)` MUST propagate ALL tags unconditionally from the parameter. This includes `:a`/`:an`, `:anim`/`:inan`, and any language-specific tags (`:masc`/`:fem`/`:neut`, classifier tags). This is a hard requirement — verify and document as a guarantee.
 
 ### 9.7 RLF Feature Verification Checklist
 
 Before writing translation files, verify these RLF features are fully implemented:
 - [ ] `@count` transform for CJK classifiers
+- [ ] `@count:word` modifier for CJK number words (一/两/三 instead of 1/2/3) — see Section 9.8
 - [ ] `@der`/`@ein` for German articles + case
+- [ ] `@ein` returns empty string for plural context (German has no plural indefinite article)
 - [ ] `@el`/`@un` for Spanish articles
-- [ ] `@o` for Portuguese articles
+- [ ] `@del`/`@al` for Spanish preposition+article contractions (de+el=del, a+el=al)
+- [ ] `@o`/`@um` for Portuguese articles
+- [ ] `@um:other` produces plural indefinite articles (uns/umas) for Portuguese
+- [ ] `@para` (a+article contraction ao/à/aos/às) for Portuguese
+- [ ] `@por` (por+article contraction pelo/pela/pelos/pelas) for Portuguese
 - [ ] Multi-parameter `:match` (e.g., `:match($n, $entity)`)
-- [ ] `:from` with multi-dimensional variant propagation
+- [ ] `:from` with multi-dimensional variant propagation (4 cases × 2 numbers for German)
+- [ ] `:from` propagates ALL tags unconditionally (`:a`/`:an`, `:anim`/`:inan`, gender, classifiers)
 - [ ] Phrase parameter types in `rlf!` macro-generated functions
+- [ ] `@cap` is a no-op on CJK characters (Chinese/Japanese/Korean)
+- [ ] `@cap` skips leading HTML markup tags to find first visible character
+
+### 9.8 RLF Framework Changes Required
+
+These changes to the RLF framework (`rlf` crate) were identified by the 5-language i18n review. See `docs/plans/i18n-review-*.md` for full analysis. Changes are ordered by priority.
+
+#### 9.8.1 Portuguese `@para` Transform — HIGH
+
+Add preposition "a" + article contraction (ao/à/aos/às). Needed for dynamic "to X" phrases like "devolva à mão" (return to the hand). ~30 lines following the exact pattern of existing `@de` and `@em` transforms. See `i18n-review-pt-br.md` Section 14.1.
+
+#### 9.8.2 Portuguese `@por` Transform — MEDIUM
+
+Add preposition "por" + article contraction (pelo/pela/pelos/pelas). Needed for "by/for each" patterns. ~30 lines. See `i18n-review-pt-br.md` Section 14.2.
+
+#### 9.8.3 Portuguese `@um` Plural Context — MEDIUM
+
+Enhance `@um` to accept `:other` context for plural indefinite articles (uns/umas). Currently only produces singular (um/uma). ~10 lines. See `i18n-review-pt-br.md` Section 14.3.
+
+#### 9.8.4 Chinese `@count:word` Modifier — MEDIUM
+
+Add a `:word` context modifier to `@count` that substitutes CJK number words (一/两/三) instead of digits (1/2/3) for small numbers (1-10). Falls back to digits for larger numbers. Without this, Chinese translators must use verbose `:match` wrappers for every count phrase. ~30 lines per CJK language. See `i18n-review-zh.md` Recommendation 1.
+
+#### 9.8.5 German `@ein` Empty Plural — LOW
+
+Define `@ein` behavior for plural context: return empty string. German has no plural indefinite article. Currently undefined behavior. ~5 lines. See `i18n-review-de.md` Recommendation 2.
+
+#### 9.8.6 Spanish `@del`/`@al` Contractions — LOW
+
+Add preposition+article contraction transforms: "de"+"el"="del", "a"+"el"="al". Only applies to masculine singular definite article. Low priority because most card text uses possessives ("tu") not articles for locations. ~20 lines each. See `i18n-review-es.md` RFC-ES-3/RFC-ES-7.
+
+#### 9.8.7 Changes NOT Recommended
+
+The following were evaluated and rejected by the i18n review:
+- **Classifiers as first-class concept** (Chinese) — tags + `@count` already handle this
+- **`@sep` for separable verbs** (German) — phrase templates handle this perfectly
+- **`@part` for participle agreement** (all gendered languages) — `:match` is simpler and more flexible
+- **`@kein` negative article** (German) — too few use cases, inline works
+- **Verb conjugation transforms** (Portuguese, Spanish) — only ~15 fixed verbs in the game
+- **Implicit `:from` on compound phrases** — explicit is better, avoid ambiguity with multi-parameter phrases
+- **Language-specific `:from` behavior** — `:from` is correctly language-neutral by design
+- **Declension context on `@der`/`@ein`** (German) — pragmatic alternative (hardcoded adjective forms per known context) works for Dreamtides domain
+
+### 9.9 Cross-Language Design Conventions
+
+These conventions were identified by the i18n review and MUST be followed during Phase 2:
+
+1. **Effect phrases MUST NOT include trailing periods.** The period is added by `period_suffix` at the assembly level. This prevents double punctuation when effects are joined by `then_joiner`. (German agent: separable verb prefix must come before the period/connector.)
+
+2. **Each phrase MUST control its own capitalization via `@cap`.** The Rust code MUST NOT apply `capitalize_first_letter()` to already-rendered strings. The ability serializer concatenates pre-capitalized pieces. (German agent: V2 word order requires verb-initial effects; Chinese agent: `@cap` is a no-op on CJK.)
+
+3. **Keyword terms MUST have separate imperative and participial forms.** `dissolve` (imperative, for effects) and `dissolved` (participle, for triggers) are distinct terms. Spanish/Portuguese need different verb forms; Russian/German need different gender-agreeing participles. (Spanish agent: BLOCK-ES-2.)
+
+4. **Structural connectors MUST be named RLF phrases.** All punctuation, separators, and joiners used by `ability_serializer.rs` go through named phrases: `then_joiner`, `and_joiner`, `period_suffix`, `cost_effect_separator`, `once_per_turn_prefix`, `until_end_of_turn_prefix`, etc. (Chinese agent: full-width punctuation; Russian agent: em-dash separator convention.)
+
+5. **`text_number` is English-specific.** Translators for gendered languages (Spanish, Portuguese, German) should inline number words in their phrase templates using `:match`, not call `text_number`. Only "1" varies by gender in most languages.
+
+---
+
+### Task 10: Add Animacy Tags and `:from` to Compound Phrases
+
+**Files:** `strings.rs`
+**Risk:** LOW — additive changes only, no behavioral impact on English.
+**Prerequisite:** Task 2 (predicate phrases must exist before tagging them)
+
+This task implements the animacy tagging and compound phrase `:from` propagation identified by the 5-language i18n review.
+
+#### Step 1: Add `:anim`/`:inan` tags to all entity terms
+
+Every noun term in `strings.rs` that represents a game entity needs an animacy tag:
+
+```rust
+// Character types — animate
+ally = :an :anim { one: "ally", other: "allies" };
+agent = :an :anim { one: "Agent", other: "Agents" };
+ancient = :an :anim { one: "Ancient", other: "Ancients" };
+avatar = :an :anim { one: "Avatar", other: "Avatars" };
+child = :a :anim { one: "Child", other: "Children" };
+detective = :a :anim { one: "Detective", other: "Detectives" };
+dreamer = :a :anim { one: "Dreamer", other: "Dreamers" };
+explorer = :an :anim { one: "Explorer", other: "Explorers" };
+mystic = :a :anim { one: "Mystic", other: "Mystics" };
+ruler = :a :anim { one: "Ruler", other: "Rulers" };
+scholar = :a :anim { one: "Scholar", other: "Scholars" };
+spy = :a :anim { one: "Spy", other: "Spies" };
+trickster = :a :anim { one: "Trickster", other: "Tricksters" };
+warrior = :a :anim { one: "Warrior", other: "Warriors" };
+character = :a :anim { one: "character", other: "characters" };
+
+// Non-character types — inanimate
+card = :a :inan { one: "card", other: "cards" };
+event = :an :inan { one: "event", other: "events" };
+// figment types also :inan
+```
+
+English doesn't read these tags, so this is purely additive. The tags enable Spanish `:match($target) { anim: "... a ...", *inan: "..." }` and Russian masculine animate accusative=genitive.
+
+#### Step 2: Add `:from($entity)` to compound predicate phrases
+
+Ensure tag propagation through the composition chain:
+
+```rust
+allied($entity) = :from($entity) "allied {$entity:one}";
+enemy_modified($entity) = :from($entity) "enemy {$entity:one}";
+allied_subtype($t) = :from($t) { one: "allied {$t}", other: "allied {$t:other}" };
+enemy_subtype($t) = :from($t) { one: "enemy {$t}", other: "enemy {$t:other}" };
+```
+
+Without `:from`, downstream phrases that do `:match(allied_result)` for gender/animacy would fail because tags are lost in the composition.
+
+#### Step 3: Verify keyword terms have separate imperative/participial forms
+
+Audit all keyword terms to ensure imperative (effect text) and participial (trigger text) uses are separate terms:
+- `dissolve` (imperative) + `dissolved` (participle) ✓
+- `banish` (imperative) + `banished` (participle) ✓
+- `materialize`, `reclaim`, `prevent`, `discover` — verify participial forms exist if used in triggers
+
+#### Step 4: Validate and commit
+
+---
+
+### Task 11: RLF Framework Changes for Localization
+
+**Files:** RLF crate (`~/rlf/`) — `transforms.rs`, stdlib definitions
+**Risk:** LOW — additive changes following established patterns.
+**Prerequisite:** None (can be done in parallel with Phase 2 tasks)
+
+This task implements the RLF framework changes identified by the 5-language i18n review (Section 9.8).
+
+#### Step 1: Add Portuguese `@para` transform (HIGH)
+
+Add "a" + article contraction (ao/à/aos/às) following the exact pattern of existing `@de` and `@em` transforms. Register under `("pt", "para")` with alias `@ao`. ~30 lines.
+
+#### Step 2: Add Portuguese `@por` transform (MEDIUM)
+
+Add "por" + article contraction (pelo/pela/pelos/pelas). Same pattern. Register under `("pt", "por")`. ~30 lines.
+
+#### Step 3: Enhance Portuguese `@um` for plural context (MEDIUM)
+
+Modify `portuguese_um_transform` to accept context parameter, producing "uns"/"umas" for `:other` context. ~10 lines.
+
+#### Step 4: Add `@count:word` modifier for CJK (MEDIUM)
+
+Add a `:word` context to the Chinese `@count` transform that substitutes CJK number words (一/两/三/四/五/六/七/八/九/十) for small numbers (1-10), falling back to digits for larger numbers. Uses 两 (not 二) for counting form of "two". ~30 lines.
+
+#### Step 5: Define German `@ein` plural behavior (LOW)
+
+Specify that `@ein` with `.other` (plural) context returns empty string. Prevents undefined behavior. ~5 lines.
+
+#### Step 6: Add Spanish `@del`/`@al` contractions (LOW)
+
+Add "de"+"el"="del" and "a"+"el"="al" contraction transforms. Only contract with masculine singular definite article. ~20 lines each.
+
+#### Step 7: Update APPENDIX_STDLIB.md documentation
+
+- Document `@count:word` modifier and the canonical `:match` fallback pattern for CJK
+- Document `@para`, `@por` in Portuguese transform table
+- Document `@um:other` plural behavior
+- Document `@ein` empty-string plural behavior
+- Document `@del`/`@al` in Spanish transform table
+- Add note that `text_number` is English-specific; gendered languages inline number words
+
+#### Step 8: Add verification tests
+
+Add test cases for:
+- `:from` propagates all tags unconditionally (including `:anim`/`:inan`)
+- `:from` preserves multi-dimensional variants (4 cases × 2 numbers for German)
+- `@count:word` produces correct CJK number words
+- `@ein:acc.other` returns empty string
+- `@um:other` produces plural forms
+- All new preposition+article transforms produce correct contractions
+
+#### Step 9: Validate and commit
 
 ---
 
@@ -785,9 +980,17 @@ Task 8: Remove eval_str + VariableBindings
     │
     ▼
 Task 9: Remove Capitalization Helpers
+    │
+    ▼
+Task 10: Add Animacy Tags + :from to Compound Phrases  ◄── i18n prep
 ```
 
-All tasks are sequential — each depends on the previous. No parallelism is possible because every task modifies `strings.rs` and/or changes function signatures that downstream tasks depend on.
+**Parallel track (can run alongside any task):**
+```
+Task 11: RLF Framework Changes  ◄── independent of Dreamtides code
+```
+
+Tasks 1-9 are sequential — each depends on the previous. Task 10 depends on Task 2 (predicate phrases must exist). Task 11 is independent and can be done at any time since it modifies the RLF crate, not the Dreamtides codebase.
 
 ---
 
@@ -795,6 +998,11 @@ All tasks are sequential — each depends on the previous. No parallelism is pos
 
 | File | Path | Lines |
 |------|------|-------|
+| i18n review (Chinese) | `docs/plans/i18n-review-zh.md` | — |
+| i18n review (Russian) | `docs/plans/i18n-review-ru.md` | — |
+| i18n review (Spanish) | `docs/plans/i18n-review-es.md` | — |
+| i18n review (PT-BR) | `docs/plans/i18n-review-pt-br.md` | — |
+| i18n review (German) | `docs/plans/i18n-review-de.md` | — |
 | Serializer directory | `rules_engine/src/parser_v2/src/serializer/` | — |
 | RLF strings | `rules_engine/src/strings/src/strings.rs` | ~695 |
 | Round-trip test helpers | `rules_engine/tests/parser_v2_tests/src/test_helpers.rs` | 113 |
