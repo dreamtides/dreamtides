@@ -510,4 +510,52 @@ rlf::rlf! {
     banish_void_min_count($n) = "{{Banish}} your void with {{count($n)}} or more cards";
     // Banish a target from hand.
     banish_from_hand_cost($target) = "{{Banish}} {$target} from hand";
+
+    // =========================================================================
+    // Trigger serializer phrases (Category A)
+    // =========================================================================
+
+    // End of your turn trigger.
+    at_end_of_your_turn_trigger = "at the end of your turn, ";
+    // Empty deck trigger.
+    when_deck_empty_trigger = "when you have no cards in your deck, ";
+    // Gain energy trigger.
+    when_you_gain_energy_trigger = "when you gain energy, ";
+    // Play a target trigger.
+    when_you_play_trigger($target) = "when you play {$target}, ";
+    // Opponent plays a target trigger.
+    when_opponent_plays_trigger($target) = "when the opponent plays {$target}, ";
+    // Play a target from hand trigger.
+    when_you_play_from_hand_trigger($target) = "when you play {$target} from your hand, ";
+    // Play a target in a turn trigger.
+    when_you_play_in_turn_trigger($target) = "when you play {$target} in a turn, ";
+    // Play a target during enemy turn trigger.
+    when_you_play_during_enemy_turn_trigger($target) = "when you play {$target} during the opponent's turn, ";
+    // Discard a target trigger.
+    when_you_discard_trigger($target) = "when you discard {$target}, ";
+    // Target leaves play trigger.
+    when_leaves_play_trigger($target) = "when {$target} leaves play, ";
+    // Abandon a target trigger.
+    when_you_abandon_trigger($target) = "when you abandon {$target}, ";
+    // Target put into void trigger.
+    when_put_into_void_trigger($target) = "when {$target} is put into your void, ";
+
+    // =========================================================================
+    // Trigger serializer phrases (Category B)
+    // =========================================================================
+
+    // Materialize a target trigger.
+    when_you_materialize_trigger($target) = "when you {{materialize}} {$target}, ";
+    // Target dissolved trigger.
+    when_dissolved_trigger($target) = "when {$target} is {{dissolved}}, ";
+    // Target banished trigger.
+    when_banished_trigger($target) = "when {$target} is {{banished}}, ";
+    // Play N cards in a turn trigger.
+    when_you_play_cards_in_turn_trigger($c) = "when you play {{$c}} {{card:$c}} in a turn, ";
+    // Abandon N allies in a turn trigger.
+    when_you_abandon_count_in_turn_trigger($a) = "when you abandon {{count_allies($a)}} in a turn, ";
+    // Draw N cards in a turn trigger.
+    when_you_draw_in_turn_trigger($c) = "when you draw {{$c}} {{card:$c}} in a turn, ";
+    // Materialize Nth target in a turn trigger.
+    when_you_materialize_nth_in_turn_trigger($n, $target) = "when you {{materialize}} {{text_number($n)}} {$target} in a turn, ";
 }
