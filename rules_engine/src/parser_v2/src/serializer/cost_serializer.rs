@@ -11,13 +11,13 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
     match cost {
         Cost::AbandonCharactersCount { target, count } => match count {
             CollectionExpression::AnyNumberOf => strings::abandon_any_number_of(
-                &*predicate_serializer::serialize_predicate_plural(target, bindings),
+                predicate_serializer::serialize_predicate_plural(target, bindings),
             )
             .to_string(),
-            CollectionExpression::Exactly(1) => strings::abandon_target(
-                &*predicate_serializer::serialize_predicate(target, bindings),
-            )
-            .to_string(),
+            CollectionExpression::Exactly(1) => {
+                strings::abandon_target(predicate_serializer::serialize_predicate(target, bindings))
+                    .to_string()
+            }
             CollectionExpression::Exactly(n) => {
                 bindings.insert("a".to_string(), VariableValue::Integer(*n));
                 strings::abandon_count_allies(0).to_string()
@@ -54,7 +54,7 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
             strings::banish_void_min_count(0).to_string()
         }
         Cost::BanishFromHand(predicate) => strings::banish_from_hand_cost(
-            &*predicate_serializer::serialize_predicate(predicate, bindings),
+            predicate_serializer::serialize_predicate(predicate, bindings),
         )
         .to_string(),
         Cost::Choice(costs) => costs
@@ -64,38 +64,38 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
             .join(&strings::cost_or_connector().to_string()),
         Cost::ReturnToHand { target, count } => match count {
             CollectionExpression::Exactly(1) => strings::return_target_to_hand(
-                &*predicate_serializer::serialize_predicate(target, bindings),
+                predicate_serializer::serialize_predicate(target, bindings),
             )
             .to_string(),
             CollectionExpression::Exactly(n) => strings::return_count_to_hand(
                 *n,
-                &*predicate_serializer::serialize_predicate_plural(target, bindings),
+                predicate_serializer::serialize_predicate_plural(target, bindings),
             )
             .to_string(),
             CollectionExpression::AllButOne => strings::return_all_but_one_to_hand(
-                &*predicate_serializer::predicate_base_text(target, bindings),
+                predicate_serializer::predicate_base_text(target, bindings),
             )
             .to_string(),
             CollectionExpression::All => strings::return_all_to_hand(
-                &*predicate_serializer::serialize_predicate(target, bindings),
+                predicate_serializer::serialize_predicate(target, bindings),
             )
             .to_string(),
             CollectionExpression::AnyNumberOf => strings::return_any_number_to_hand(
-                &*predicate_serializer::serialize_predicate(target, bindings),
+                predicate_serializer::serialize_predicate(target, bindings),
             )
             .to_string(),
             CollectionExpression::UpTo(n) => strings::return_up_to_to_hand(
                 *n,
-                &*predicate_serializer::serialize_predicate_plural(target, bindings),
+                predicate_serializer::serialize_predicate_plural(target, bindings),
             )
             .to_string(),
             CollectionExpression::EachOther => strings::return_each_other_to_hand(
-                &*predicate_serializer::serialize_predicate(target, bindings),
+                predicate_serializer::serialize_predicate(target, bindings),
             )
             .to_string(),
             CollectionExpression::OrMore(n) => strings::return_or_more_to_hand(
                 *n,
-                &*predicate_serializer::serialize_predicate_plural(target, bindings),
+                predicate_serializer::serialize_predicate_plural(target, bindings),
             )
             .to_string(),
         },

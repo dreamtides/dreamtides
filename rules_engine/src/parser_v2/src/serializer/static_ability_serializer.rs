@@ -192,7 +192,8 @@ pub fn serialize_standard_static_ability(
                 ability_data::predicate::CardPredicate::CharacterType(_) => {
                     "allied {@plural subtype($t)}".to_string()
                 }
-                _ => predicate_serializer::serialize_card_predicate_plural(matching, bindings),
+                _ => predicate_serializer::serialize_card_predicate_plural(matching, bindings)
+                    .to_string(),
             };
             format!("{} have +{{$s}} spark.", predicate_text)
         }

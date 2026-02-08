@@ -14,13 +14,13 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
             strings::with_allies_sharing_type(0).to_string()
         }
         Condition::CardsDiscardedThisTurn { count: 1, predicate } => {
-            strings::if_discarded_this_turn(&*predicate_serializer::serialize_card_predicate(
+            strings::if_discarded_this_turn(predicate_serializer::serialize_card_predicate(
                 predicate, bindings,
             ))
             .to_string()
         }
         Condition::CardsDiscardedThisTurn { predicate, .. } => strings::if_discarded_this_turn(
-            &*predicate_serializer::serialize_card_predicate(predicate, bindings),
+            predicate_serializer::serialize_card_predicate(predicate, bindings),
         )
         .to_string(),
         Condition::CardsDrawnThisTurn { count } => {
@@ -41,7 +41,7 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
             strings::with_allied_subtype(0).to_string()
         }
         Condition::PredicateCount { count, predicate } => strings::with_predicate_condition(
-            &*serialize_predicate_count(*count, predicate, bindings),
+            serialize_predicate_count(*count, predicate, bindings),
         )
         .to_string(),
         Condition::ThisCardIsInYourVoid => strings::if_card_in_your_void().to_string(),
@@ -66,34 +66,49 @@ fn serialize_predicate_count(
         Predicate::Another(card_predicate) => predicate_serializer::serialize_predicate_plural(
             &Predicate::Another(card_predicate.clone()),
             bindings,
-        ),
-        Predicate::This => predicate_serializer::serialize_predicate_plural(predicate, bindings),
-        Predicate::It => predicate_serializer::serialize_predicate_plural(predicate, bindings),
-        Predicate::Them => predicate_serializer::serialize_predicate_plural(predicate, bindings),
-        Predicate::That => predicate_serializer::serialize_predicate_plural(predicate, bindings),
+        )
+        .to_string(),
+        Predicate::This => {
+            predicate_serializer::serialize_predicate_plural(predicate, bindings).to_string()
+        }
+        Predicate::It => {
+            predicate_serializer::serialize_predicate_plural(predicate, bindings).to_string()
+        }
+        Predicate::Them => {
+            predicate_serializer::serialize_predicate_plural(predicate, bindings).to_string()
+        }
+        Predicate::That => {
+            predicate_serializer::serialize_predicate_plural(predicate, bindings).to_string()
+        }
         Predicate::Enemy(card_predicate) => predicate_serializer::serialize_predicate_plural(
             &Predicate::Enemy(card_predicate.clone()),
             bindings,
-        ),
+        )
+        .to_string(),
         Predicate::Your(card_predicate) => predicate_serializer::serialize_predicate_plural(
             &Predicate::Your(card_predicate.clone()),
             bindings,
-        ),
+        )
+        .to_string(),
         Predicate::Any(card_predicate) => predicate_serializer::serialize_predicate_plural(
             &Predicate::Any(card_predicate.clone()),
             bindings,
-        ),
+        )
+        .to_string(),
         Predicate::AnyOther(card_predicate) => predicate_serializer::serialize_predicate_plural(
             &Predicate::AnyOther(card_predicate.clone()),
             bindings,
-        ),
+        )
+        .to_string(),
         Predicate::YourVoid(card_predicate) => predicate_serializer::serialize_predicate_plural(
             &Predicate::YourVoid(card_predicate.clone()),
             bindings,
-        ),
+        )
+        .to_string(),
         Predicate::EnemyVoid(card_predicate) => predicate_serializer::serialize_predicate_plural(
             &Predicate::EnemyVoid(card_predicate.clone()),
             bindings,
-        ),
+        )
+        .to_string(),
     }
 }

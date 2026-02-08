@@ -919,7 +919,7 @@ pub fn serialize_for_count_expression(
 ) -> String {
     match quantity_expression {
         QuantityExpression::Matching(predicate) => {
-            predicate_serializer::serialize_for_each_predicate(predicate, bindings)
+            predicate_serializer::serialize_for_each_predicate(predicate, bindings).to_string()
         }
         QuantityExpression::PlayedThisTurn(predicate) => {
             format!(
@@ -1074,7 +1074,8 @@ fn serialize_void_gains_reclaim(
                 "{@cap @a subtype($t)}".to_string()
             } else {
                 serializer_utils::capitalize_first_letter(
-                    &predicate_serializer::serialize_card_predicate(predicate, bindings),
+                    &predicate_serializer::serialize_card_predicate(predicate, bindings)
+                        .to_string(),
                 )
             };
             format!(
