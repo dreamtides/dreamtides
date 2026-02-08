@@ -675,7 +675,7 @@ Currently, `rlf_helper::eval_str()` calls `strings::register_source_phrases()` o
 | 7. Ability serializer | LOW | Straightforward top-level orchestration |
 | 8. Remove eval_str | MEDIUM | Atomic switchover, round-trip test strategy change |
 | 9. Remove capitalization | LOW | Simple deletion |
-| 10. Animacy tags + `:from` | LOW | Additive changes only, no English behavioral impact |
+| 10. `:from` + keyword audit | LOW | Additive changes only, no English behavioral impact |
 | 11. RLF framework changes | LOW | Independent of Dreamtides code, follows established patterns |
 
 ---
@@ -711,7 +711,7 @@ when_dissolved_trigger($target) = :match($target) {
 };
 ```
 
-**Rust code implication:** Predicate `Phrase` values must carry gender tags (`:masc`/`:fem`/`:neut`). English source terms carry animacy (`:anim`/`:inan`); translation files add gender.
+**Rust code implication:** Predicate `Phrase` values must carry gender tags (`:masc`/`:fem`/`:neut`). These come from the translation file's definition of each term, not the English source. When the locale is Russian, `strings::ally()` returns the Russian `Phrase` which carries `:masc`.
 
 ### 9.3 Personal "a" (Spanish)
 
@@ -725,7 +725,7 @@ dissolve_target($target) = :match($target) {
 };
 ```
 
-**Rust code implication:** English terms need `:anim`/`:inan` tags (to be added in Task 10; not yet present in `strings.rs`).
+**Rust code implication:** The Spanish translation file defines entity terms with `:anim`/`:inan` tags. When the locale is Spanish, `strings::ally()` returns the Spanish `Phrase` which carries `:anim`, enabling the `:match` branch. No tags needed on the English source.
 
 ### 9.4 Chinese Classifiers and Word Order
 
@@ -750,16 +750,19 @@ dissolve_target($target) = "Löse {@ein:acc $target} auf.";
 
 ### 9.6 Tag System Design
 
-| Tag | Source | Purpose |
-|-----|--------|---------|
-| `:a` / `:an` | English source | English indefinite article selection |
-| `:anim` / `:inan` | English source | Cross-language animacy (Spanish personal "a", Russian acc=gen) |
-| `:masc` / `:fem` / `:neut` | Translation files | Language-specific gender agreement |
-| `:zhang` / `:ge` / `:ming` etc. | Chinese translation | Chinese classifier tags for `@count` |
+All grammatical tags are **language-specific** and live in **translation files**, not in the English source. Each language defines whatever tags its grammar requires. When the serializer calls `strings::ally()`, it gets the `Phrase` from the active locale's definition, carrying that locale's tags.
 
-**Animacy tag requirements (Task 2):** All entity noun terms in `strings.rs` MUST carry `:anim` or `:inan` tags. This is critical for Spanish (personal "a" before animate direct objects) and Russian (masculine animate accusative = genitive). Specifically:
-- `:anim` on: `ally`, all character subtypes (agent, ancient, avatar, child, detective, dreamer, explorer, mystic, ruler, scholar, spy, trickster, warrior), `character`
-- `:inan` on: `card`, `event`, figment types, location-like terms
+| Tag | Defined in | Purpose |
+|-----|-----------|---------|
+| `:a` / `:an` | English source (`strings.rs`) | English indefinite article selection |
+| `:anim` / `:inan` | Translation files (es, ru, etc.) | Animacy (Spanish personal "a", Russian acc=gen) |
+| `:masc` / `:fem` / `:neut` | Translation files (es, ru, de, pt) | Gender agreement |
+| `:zhang` / `:ge` / `:ming` etc. | Chinese translation | Chinese classifier tags for `@count` |
+| `:nom` / `:acc` / `:dat` etc. | Translation files (ru, de) | Case variant keys |
+
+**Key principle:** The English source only carries `:a`/`:an` tags (English grammar). All other grammatical metadata (gender, animacy, classifiers, case) is defined by each translation file on its own terms. This keeps the English source clean and gives each language full control over its grammatical annotations.
+
+**Example:** The English source defines `ally = :an { one: "ally", other: "allies" }`. The Russian translation independently defines `ally = :masc :anim { nom: "союзник", ... }`. When the locale is Russian, `strings::ally()` returns the Russian Phrase with `:masc :anim` tags. The English `:an` tag is irrelevant in Russian context.
 
 **Compound phrase `:from` requirement (Task 2):** Compound phrases that wrap entity references MUST use `:from($entity)` to preserve tag propagation through the composition chain. Without this, downstream `:match` for gender/animacy breaks. Specifically:
 ```rust
@@ -767,7 +770,9 @@ allied($entity) = :from($entity) "allied {$entity:one}";
 enemy_modified($entity) = :from($entity) "enemy {$entity:one}";
 ```
 
-**`:from` tag propagation guarantee:** `:from($param)` MUST propagate ALL tags unconditionally from the parameter. This includes `:a`/`:an`, `:anim`/`:inan`, and any language-specific tags (`:masc`/`:fem`/`:neut`, classifier tags). This is a hard requirement — verify and document as a guarantee.
+When running in Russian, `allied(ally)` inherits `:masc :anim` from the Russian `ally` definition via `:from`. A downstream phrase can then `:match` on those tags.
+
+**`:from` tag propagation guarantee:** `:from($param)` MUST propagate ALL tags unconditionally from the parameter — whatever tags the active locale's definition carries. This is a hard requirement — verify and document as a guarantee.
 
 ### 9.7 RLF Feature Verification Checklist
 
@@ -784,7 +789,7 @@ Before writing translation files, verify these RLF features are fully implemente
 - [ ] `@por` (por+article contraction pelo/pela/pelos/pelas) for Portuguese
 - [ ] Multi-parameter `:match` (e.g., `:match($n, $entity)`)
 - [ ] `:from` with multi-dimensional variant propagation (4 cases × 2 numbers for German)
-- [ ] `:from` propagates ALL tags unconditionally (`:a`/`:an`, `:anim`/`:inan`, gender, classifiers)
+- [ ] `:from` propagates ALL tags unconditionally from the active locale's definition
 - [ ] Phrase parameter types in `rlf!` macro-generated functions
 - [ ] `@cap` is a no-op on CJK characters (Chinese/Japanese/Korean)
 - [ ] `@cap` skips leading HTML markup tags to find first visible character
@@ -845,45 +850,15 @@ These conventions were identified by the i18n review and MUST be followed during
 
 ---
 
-### Task 10: Add Animacy Tags and `:from` to Compound Phrases
+### Task 10: Add `:from` to Compound Phrases and Audit Keywords
 
 **Files:** `strings.rs`
 **Risk:** LOW — additive changes only, no behavioral impact on English.
-**Prerequisite:** Task 2 (predicate phrases must exist before tagging them)
+**Prerequisite:** Task 2 (predicate phrases must exist)
 
-This task implements the animacy tagging and compound phrase `:from` propagation identified by the 5-language i18n review.
+This task ensures the English source phrases support proper tag propagation for localization. Note: grammatical tags like `:anim`/`:inan`, `:masc`/`:fem`, and classifiers are defined by each translation file on its own terms — the English source only needs `:a`/`:an`. The key English-side requirement is that compound phrases use `:from` so that whatever tags the active locale defines will propagate through composition.
 
-#### Step 1: Add `:anim`/`:inan` tags to all entity terms
-
-Every noun term in `strings.rs` that represents a game entity needs an animacy tag:
-
-```rust
-// Character types — animate
-ally = :an :anim { one: "ally", other: "allies" };
-agent = :an :anim { one: "Agent", other: "Agents" };
-ancient = :an :anim { one: "Ancient", other: "Ancients" };
-avatar = :an :anim { one: "Avatar", other: "Avatars" };
-child = :a :anim { one: "Child", other: "Children" };
-detective = :a :anim { one: "Detective", other: "Detectives" };
-dreamer = :a :anim { one: "Dreamer", other: "Dreamers" };
-explorer = :an :anim { one: "Explorer", other: "Explorers" };
-mystic = :a :anim { one: "Mystic", other: "Mystics" };
-ruler = :a :anim { one: "Ruler", other: "Rulers" };
-scholar = :a :anim { one: "Scholar", other: "Scholars" };
-spy = :a :anim { one: "Spy", other: "Spies" };
-trickster = :a :anim { one: "Trickster", other: "Tricksters" };
-warrior = :a :anim { one: "Warrior", other: "Warriors" };
-character = :a :anim { one: "character", other: "characters" };
-
-// Non-character types — inanimate
-card = :a :inan { one: "card", other: "cards" };
-event = :an :inan { one: "event", other: "events" };
-// figment types also :inan
-```
-
-English doesn't read these tags, so this is purely additive. The tags enable Spanish `:match($target) { anim: "... a ...", *inan: "..." }` and Russian masculine animate accusative=genitive.
-
-#### Step 2: Add `:from($entity)` to compound predicate phrases
+#### Step 1: Add `:from($entity)` to compound predicate phrases
 
 Ensure tag propagation through the composition chain:
 
@@ -894,9 +869,9 @@ allied_subtype($t) = :from($t) { one: "allied {$t}", other: "allied {$t:other}" 
 enemy_subtype($t) = :from($t) { one: "enemy {$t}", other: "enemy {$t:other}" };
 ```
 
-Without `:from`, downstream phrases that do `:match(allied_result)` for gender/animacy would fail because tags are lost in the composition.
+Without `:from`, downstream phrases that do `:match(allied_result)` for gender/animacy would fail because tags are lost in the composition. When running in Russian, `allied(ally)` inherits `:masc :anim` from the Russian `ally` definition. When running in English, it inherits `:an` from the English definition.
 
-#### Step 3: Verify keyword terms have separate imperative/participial forms
+#### Step 2: Verify keyword terms have separate imperative/participial forms
 
 Audit all keyword terms to ensure imperative (effect text) and participial (trigger text) uses are separate terms:
 - `dissolve` (imperative) + `dissolved` (participle) ✓
@@ -951,7 +926,7 @@ Add "de"+"el"="del" and "a"+"el"="al" contraction transforms. Only contract with
 #### Step 8: Add verification tests
 
 Add test cases for:
-- `:from` propagates all tags unconditionally (including `:anim`/`:inan`)
+- `:from` propagates all tags unconditionally from the active locale's definition
 - `:from` preserves multi-dimensional variants (4 cases × 2 numbers for German)
 - `@count:word` produces correct CJK number words
 - `@ein:acc.other` returns empty string
@@ -991,7 +966,7 @@ Task 8: Remove eval_str + VariableBindings
 Task 9: Remove Capitalization Helpers
     │
     ▼
-Task 10: Add Animacy Tags + :from to Compound Phrases  ◄── i18n prep
+Task 10: Add :from to Compound Phrases + Audit Keywords  ◄── i18n prep
 ```
 
 **Parallel track (can run alongside any task):**
