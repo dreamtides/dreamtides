@@ -18,7 +18,7 @@ fn make_inputs(rules_text: &str, variables: &str) -> RowData {
 fn test_variable_substitution() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("Deal {damage} damage.", "damage: 4");
+    let inputs = make_inputs("Deal {$damage} damage.", "damage: 4");
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -34,7 +34,7 @@ fn test_variable_substitution() {
 fn test_rlf_phrase_expansion() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{Foresee(foresee)}", "foresee: 3");
+    let inputs = make_inputs("{Foresee($foresee)}", "foresee: 3");
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -72,8 +72,10 @@ fn test_missing_variable_error() {
 fn test_numeric_variable_parsing() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs =
-        make_inputs("Costs {energy(cost)} energy, gives {points(pts)} points.", "cost: 7\npts: 2");
+    let inputs = make_inputs(
+        "Costs {energy($cost)} energy, gives {points($pts)} points.",
+        "cost: 7\npts: 2",
+    );
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -109,7 +111,7 @@ fn test_double_newline_expression() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
     let inputs = make_inputs(
-        "Draw {cards(cards_count)}.\n\n{Reclaim_For_Cost(reclaim_cost)}",
+        "Draw {cards($cards_count)}.\n\n{Reclaim_For_Cost($reclaim_cost)}",
         "cards_count: 2\nreclaim_cost: 2",
     );
 
@@ -133,7 +135,7 @@ fn test_double_newline_expression() {
 fn test_subtype_variable_produces_phrase() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{subtype(subtype)}", "subtype: Warrior");
+    let inputs = make_inputs("{subtype($subtype)}", "subtype: Warrior");
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -152,7 +154,7 @@ fn test_subtype_variable_produces_phrase() {
 fn test_subtype_variable_spirit_animal() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{subtype(subtype)}", "subtype: SpiritAnimal");
+    let inputs = make_inputs("{subtype($subtype)}", "subtype: SpiritAnimal");
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -174,7 +176,7 @@ fn test_subtype_variable_spirit_animal() {
 fn test_subtype_variable_with_article() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{@a subtype(subtype)}", "subtype: Warrior");
+    let inputs = make_inputs("{@a subtype($subtype)}", "subtype: Warrior");
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -194,7 +196,7 @@ fn test_subtype_variable_with_article() {
 fn test_subtype_variable_plural() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{@plural subtype(subtype)}", "subtype: Warrior");
+    let inputs = make_inputs("{@plural subtype($subtype)}", "subtype: Warrior");
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -216,7 +218,7 @@ fn test_subtype_variable_plural() {
 fn test_figment_variable_produces_phrase() {
     let function = RulesPreviewFunction::new();
     let context = create_empty_context();
-    let inputs = make_inputs("{figment(figment)}", "figment: celestial");
+    let inputs = make_inputs("{figment($figment)}", "figment: celestial");
 
     let result = function.compute(&inputs, &context);
     match result {

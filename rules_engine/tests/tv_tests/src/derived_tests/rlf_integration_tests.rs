@@ -43,7 +43,7 @@ fn test_parse_variables_invalid_empty_value() {
 fn test_format_expression_simple_variable() {
     let vars = parse_variables("e: 3").unwrap();
     let params = vars.to_rlf_params();
-    let result = format_expression("{e}", params);
+    let result = format_expression("{$e}", params);
     assert!(result.is_ok());
     assert_eq!(result.unwrap(), "3");
 }
@@ -52,7 +52,7 @@ fn test_format_expression_simple_variable() {
 fn test_format_expression_with_phrase() {
     let vars = parse_variables("k: 3").unwrap();
     let params = vars.to_rlf_params();
-    let result = format_expression("{kindle(k)}", params);
+    let result = format_expression("{kindle($k)}", params);
     assert!(result.is_ok());
     let output = result.unwrap();
     assert!(output.contains("kindle"), "Output should contain 'kindle': {output}");
