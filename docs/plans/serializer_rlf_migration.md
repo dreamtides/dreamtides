@@ -1,33 +1,32 @@
-# Serializer RLF Migration — Technical Design Document
+# Serializer RLF Migration — Phase 2 Technical Design Document
 
 ---
 
 ## 1. Goal
 
-Migrate all hardcoded English strings in `rules_engine/src/parser_v2/src/serializer/` to named RLF phrase calls in `strings.rs`. The serializer code becomes language-agnostic in *intent* (every output is a named semantic phrase) while continuing to produce English template text for round-trip test compatibility.
+Make the serializer Rust code 100% language-neutral. After Phase 2, every piece of text the serializer produces flows through a named RLF phrase. The serializer outputs **final rendered display strings** — no more template text, no more `VariableBindings`, no more `eval_str()` two-pass rendering. Adding a new language requires only writing a `.rlf` translation file, with zero Rust code changes.
 
-**This is Phase 1.5 — semantic cataloging and code organization.** It is explicitly NOT full localization. Real multilingual support requires Phase 2 (Phrase-based composition), which is sketched at the end of this document. Phase 1.5 produces durable value: phrase names, parameter signatures, and call-site refactoring survive into Phase 2. The escaped-brace phrase *bodies* (~65% of phrases) are temporary and will be rewritten. The primary value of Phase 1.5 is the **semantic inventory** — enumerating every string the serializer produces and assigning it a name. This cataloging work is the hardest intellectual part of the migration and survives fully into Phase 2.
+**What Phase 1.5 accomplished:** Every hardcoded string in the leaf serializers (cost, trigger, condition, utils, simple effect arms) was replaced with a named `strings::` phrase call. However, the serializer still produces template text with `{directives}` and `VariableBindings`, using `{{...}}` escaped braces as a compatibility bridge. The predicate serializer, FormattedText, static ability serializer, ability serializer orchestration, and complex effect arms remain unmigrated.
 
-**Durability caveats:** Call sites will need minor changes in Phase 2 (removing `bindings.insert()` calls when RLF evaluates parameters directly). Serializer return types will change from `String` to `Phrase`. Phrase bodies for ~65% of phrases will be rewritten. But phrase names and parameter counts are stable.
+**What Phase 2 does:**
+1. Replace `FormattedText` with proper RLF `Phrase` returns carrying metadata (tags, variants)
+2. Migrate the predicate serializer to return `Phrase` instead of `String`
+3. Migrate all remaining serializers to return `Phrase`
+4. Remove `{{...}}` escaped braces — phrases produce final rendered text directly
+5. Remove `VariableBindings` — values are passed directly to phrase functions
+6. Remove `eval_str()` — the display layer receives final text from the serializer
+7. Remove `capitalize_first_letter` / `lowercase_leading_keyword` — use RLF `@cap`
 
-**Target languages for Dreamtides (informing design decisions):**
+**What is NOT in scope:** Writing translation files for non-English languages. We are building the language-neutral Rust infrastructure; actual translations come later.
+
+**Target languages (informing design decisions):**
 English, Simplified Chinese, Russian, Spanish, Portuguese-Brazil, German
 
 ---
 
 ## 2. Architecture
 
-### 2.1 Current Pipeline
-
-```
-Card TOML → Parser → Ability AST → Serializer → (template String, VariableBindings)
-                                                          ↓
-                                          rlf_helper::eval_str() → rendered String
-```
-
-The serializer produces template text containing `{directives}` like `{Banish}`, `{cards($c)}`, `{energy($e)}`. The display layer's `eval_str()` resolves these against RLF definitions in `strings.rs` and `VariableBindings` to produce final rendered text with colors and symbols.
-
-### 2.2 Phase 1.5 Pipeline (after this migration)
+### 2.1 Current Pipeline (Post Phase 1.5)
 
 ```
 Card TOML → Parser → Ability AST → Serializer → (template String, VariableBindings)
@@ -35,620 +34,648 @@ Card TOML → Parser → Ability AST → Serializer → (template String, Variab
                                strings::phrase()     rlf_helper::eval_str() → rendered String
 ```
 
-The serializer calls named RLF phrases instead of using inline format strings. Phrases use escaped braces `{{...}}` to output literal `{directives}` that `eval_str()` resolves in a second pass. **The serializer output is identical to today** — same template text, same `VariableBindings`. No changes to the parser, display layer, or test infrastructure.
+The serializer calls named RLF phrases but uses `{{...}}` escapes to produce literal template text (e.g., `"draw {cards($c)}."` with `{c: 3}` in bindings). The display layer's `eval_str()` resolves these against RLF definitions to produce final rendered text with colors and symbols.
 
-### 2.3 Why Escaped Braces
+### 2.2 Phase 2 Pipeline (Target)
 
-The parser expects `{Banish}` as input, not `<color=#AA00FF>Banish</color>`. Round-trip tests compare serializer output against original parsed text. If RLF phrases evaluated `{Banish}` directly, the serializer would produce rendered text, breaking all round-trip tests.
+```
+Card TOML → Parser → Ability AST → Serializer → rendered String
+                                     ↓ calls
+                               strings::phrase(real_values) → Phrase → .to_string()
+```
 
-The escaped-brace approach (`{{Banish}}` → literal `{Banish}`) lets RLF phrases define sentence structure while preserving the template text format. This is confirmed working — `$param` inside `{{...}}` is NOT evaluated; it becomes literal text. (Verified against RLF test suite: `test_escape_braces()`, `test_escaped_braces_with_dollar_param()`, and end-to-end in `escape_sequences.rs`.)
+The serializer calls RLF phrase functions with **real values** (not phantom 0s) and receives fully-rendered `Phrase` objects. Intermediate serializers return `Phrase` to preserve metadata (tags, variants) for composition. The ability serializer calls `.to_string()` at the top level to produce the final display string.
 
-**Important: Two escape mechanisms.** The current serializer code uses two different mechanisms that produce `{`:
-1. **Rust format strings**: `format!("{{materialize}}")` uses Rust's `{{` escaping to produce literal `{materialize}` in the format output.
-2. **Plain strings**: `"draw {cards($c)}.".to_string()` — `{` is literal because `.to_string()` is not a format string.
+**Key changes from Phase 1.5:**
+- `SerializedAbility` loses its `variables` field — it just holds a `String`
+- `eval_str()` is deleted — the serializer output IS the final display text
+- `VariableBindings` is no longer threaded through serializer functions
+- Category B phrases have `{{ }}` replaced with `{ }` — they now evaluate directly
+- `FormattedText` is deleted — replaced by `Phrase` with `:a`/`:an` tags and `one`/`other` variants
 
-Phase 1.5 introduces a third mechanism: **RLF escape syntax** in phrase bodies where `{{cards($c)}}` evaluates to literal `{cards($c)}`. These are three different systems (Rust formatting, string literals, RLF escaping) that all produce the same output. After migration, only the RLF mechanism remains.
+### 2.3 Phrase Composition Strategy
 
-### 2.4 Phrase Categories
+The fundamental challenge: serializers currently compose text via `format!()` and string concatenation. In Phase 2, intermediate results are `Phrase` objects with metadata. Composition works at two levels:
 
-**Any phrase containing `{{...}}` is Category B**, regardless of how simple it appears. This is the sole criterion.
+**Level 1 — Phrase parameters (metadata-preserving):**
+Predicate serializers return `Phrase` values that carry `:a`/`:an` tags and `one`/`other` variants. These are passed as `Value::Phrase(p)` arguments to consuming phrases. The consuming phrase can use `{@a $target}` to add the correct article, `{$target:other}` to select the plural form, or `:match($target)` for gender agreement. This is the critical path for localization.
 
-**Category A — Final phrases (survive unchanged into Phase 2):**
-- Self-contained text with NO escaped braces
-- Parameters are only `$target` (pre-rendered predicate strings) or simple text
-- Examples: `discard_your_hand_cost`, `take_extra_turn_effect`, `cost_or_connector`
+```rust
+// Predicate returns Phrase with :an tag and one/other variants
+let target = predicate_serializer::serialize_predicate(pred);
 
-**Category B — Temporary phrases (escaped braces, rewritten in Phase 2):**
-- Contain `{{directive}}` patterns that produce literal template text
-- Parameters with `$` inside `{{...}}` are not evaluated — they pass through as literal text for `eval_str()`
-- Marked with `// Phase 2: requires Phrase composition` comments
-- Examples: `draw_cards_effect`, `banish_your_void_cost`, `prevent_that_card_effect`
+// RLF phrase receives it as a Phrase value and can use @a, :other, :match
+// when_you_play_trigger($target) = "when you play {@a $target}, ";
+strings::when_you_play_trigger(Value::Phrase(target)).to_string()
+```
 
-### 2.5 Key Constraint: Phantom Parameters in Category B
+**Level 2 — String concatenation (top-level assembly):**
+The ability serializer assembles final text from already-rendered pieces using string concatenation. This is acceptable because: (a) the ability serializer is the top-level compositor where metadata propagation is complete, and (b) each assembled piece is itself an RLF phrase that translation files can reorder internally. For structural connectors (": ", ", then ", etc.) the ability serializer uses named phrases.
 
-In Category B phrases like `draw_cards_effect($c) = "draw {{cards($c)}}.";`, the `$c` parameter is **never evaluated** by RLF. The output is always `draw {cards($c)}.` regardless of what integer is passed. The parameter exists for API stability — when Phase 2 replaces `{{cards($c)}}` with `{cards($c)}`, the parameter will be evaluated. For Phase 1.5, the actual value comes from `VariableBindings` via `eval_str()`.
+```rust
+// Ability serializer concatenates rendered pieces
+let trigger_text = strings::when_you_play_trigger(target_phrase).to_string();
+let effect_text = strings::draw_cards_effect(count).to_string();
+format!("{trigger_text}{effect_text}")
+```
 
-### 2.6 Variable Name Coupling Risk
+**Why not a single top-level phrase for each ability structure?**
+Ability structures are highly variable (optional costs, optional once-per-turn, keyword vs non-keyword triggers, multiple cost slots, etc.). Expressing every combination as a single RLF phrase would require dozens of conditional phrases. String concatenation at the top level is simpler, and for languages that need to reorder trigger vs effect, the translation can restructure at the phrase level below.
 
-Literal `$c`, `$e`, etc. inside escaped braces must match `VariableBindings` keys. There is no compile-time validation of this coupling. A typo produces a runtime error when `eval_str()` can't resolve the variable.
+### 2.4 FormattedText → Phrase Mapping
 
-**Mitigation:** Round-trip tests serve as the primary consistency check — the `cards_toml_round_trip_tests` test uses byte-for-byte comparison of template text AND exact `VariableBindings` equality. A typo in a phrase body produces different template text, which the test catches immediately with an error message showing the card name, expected text, and actual text side-by-side.
+`FormattedText` currently provides five operations. Each maps directly to an RLF feature:
 
-**Additional mitigation:** When writing each phrase, verify each `$var` inside `{{...}}` matches the corresponding `bindings.insert("var", ...)` call. A mechanical check: grep for all `bindings.insert` calls in each serializer and verify they appear in the corresponding phrases.
+| FormattedText method | RLF equivalent | Example |
+|---------------------|----------------|---------|
+| `.with_article()` → `"a card"`, `"an ally"` | `{@a $phrase}` reads `:a`/`:an` tag | `ally = :an { one: "ally", other: "allies" };` |
+| `.without_article()` → `"card"`, `"ally"` | Direct `{$phrase}` reference | `{$target}` |
+| `.plural()` → `"cards"`, `"allies"` | Variant selection `{$phrase:other}` | `{$target:other}` |
+| `.capitalized()` → `"Card"`, `"Ally"` | `{@cap $phrase}` transform | `{@cap $target}` |
+| `.capitalized_with_article()` → `"A card"`, `"An ally"` | `{@cap @a $phrase}` | `{@cap @a $target}` |
 
-**Complete variable name inventory:**
+The `FormattedText::new()` constructor auto-detects vowel sounds. In Phase 2, this is handled by `:a`/`:an` tags on the phrase definitions themselves. The `FormattedText::with_plural()` constructor for custom plurals maps to `one`/`other` variants on the phrase.
 
-| Variable | Meaning | Used By |
-|----------|---------|---------|
-| `$e` | Energy amount | cost, effect, trigger costs |
-| `$c` | Card count | cost, effect, trigger |
-| `$d` | Discard count | cost, effect |
-| `$a` | Ally count | cost, condition |
-| `$m` | Max energy | cost |
-| `$n` | Generic count | cost, condition, effect, trigger |
-| `$t` | Subtype | condition, effect |
-| `$f` | Foresee count | effect |
-| `$k` | Kindle amount | effect |
-| `$p` | Points amount | effect |
-| `$s` | Spark amount | effect |
-| `$v` | Void card count | effect |
+### 2.5 Predicate System Redesign
+
+Currently, `serialize_predicate()` returns strings like `"a character"`, `"an enemy"`, `"{@a subtype($t)}"` — baking in the article and ownership context. In Phase 2, predicates return `Phrase` objects and the consuming phrase decides presentation:
+
+**Current (Phase 1.5):**
+```rust
+// predicate_serializer returns pre-baked String
+fn serialize_predicate(pred: &Predicate, bindings: &mut VariableBindings) -> String {
+    match pred {
+        Another(Character) => "an ally".to_string(),       // article baked in
+        Enemy(Character) => "an enemy".to_string(),        // article baked in
+        Your(CharacterType(t)) => {
+            bindings.insert("t", Subtype(*t));
+            "{@a subtype($t)}".to_string()                 // deferred to eval_str
+        }
+    }
+}
+```
+
+**Phase 2:**
+```rust
+// predicate_serializer returns Phrase with metadata
+fn serialize_predicate(pred: &Predicate) -> Phrase {
+    match pred {
+        Another(Character) => strings::ally(),             // Phrase with :an tag
+        Enemy(Character) => strings::enemy(),              // Phrase with :an tag
+        Your(CharacterType(t)) => {
+            strings::subtype(subtype_phrase(*t))            // Phrase inherits tags via :from
+        }
+    }
+}
+
+// Consuming phrase applies article/plural as needed:
+// dissolve_target($target) = "{@cap dissolve} {@a $target}.";
+// → "Dissolve an ally." or "Dissolve an enemy Ancient."
+```
+
+The key insight: predicates no longer decide whether to include an article — they return a bare `Phrase` with metadata, and the consuming phrase template uses `{@a $target}` or `{$target}` or `{$target:other}` to control presentation. This is essential for localization because different languages need different article/case forms at different call sites.
+
+### 2.6 Keyword Capitalization Strategy
+
+Currently, `capitalize_first_letter()` handles two patterns:
+1. Regular text: uppercase first character
+2. Keywords in braces: `"{kindle($k)} ..."` → `"{Kindle($k)} ..."` with title-case logic for underscore-separated keywords
+
+In Phase 2, keywords are always rendered (no more template `{keyword}` syntax). All keyword phrases in `strings.rs` are defined with their display formatting. Capitalization is handled by:
+- RLF `@cap` transform for sentence-initial capitalization
+- Keyword phrases are defined lowercase by convention; `@cap` is applied at the call site when needed
+
+`capitalize_first_letter()` and `lowercase_leading_keyword()` are deleted. Any serializer function that capitalizes its output uses `@cap` in its phrase template instead.
 
 ---
 
-## 3. Scope
+## 3. Current State Inventory
 
-### 3.1 In Scope (Phase 1.5)
+### 3.1 Serializer Files
 
-| File | Lines | Arms | Coverage |
-|------|-------|------|----------|
-| `cost_serializer.rs` | 131 | ~28 (14 top-level + nested) | Full |
-| `trigger_serializer.rs` | 127 | 22 in `serialize_trigger_event` | Full (keyword arms kept as Rust format strings) |
-| `condition_serializer.rs` | 96 | 22 (9 in `serialize_condition` + 13 in `serialize_predicate_count`) | Full |
-| `serializer_utils.rs` | 86 | 5 (`serialize_operator` only) | Partial |
-| `effect_serializer.rs` simple arms | ~200 | ~26 StandardEffect variants | Partial |
-| `strings.rs` additions | — | — | New phrases |
+| File | Lines | Migration Status (Post Phase 1.5) |
+|------|-------|----|
+| `ability_serializer.rs` | 176 | Not migrated. Uses `strings::fast_prefix()` only. Hardcoded structural text. |
+| `cost_serializer.rs` | 119 | Fully migrated to `strings::` phrases (Category B with `{{ }}`). |
+| `trigger_serializer.rs` | 108 | Fully migrated (keyword arms stay as `format!` by design). |
+| `condition_serializer.rs` | 99 | Fully migrated to `strings::` phrases. |
+| `effect_serializer.rs` | 1138 | ~20 arms migrated; ~50 arms still use `format!()`. |
+| `predicate_serializer.rs` | 802 | Not migrated. All 16 functions return hardcoded `String`. |
+| `static_ability_serializer.rs` | 221 | Not migrated. Zero `strings::` usage. |
+| `text_formatting.rs` | 78 | Not migrated. `FormattedText` to be replaced by `Phrase`. |
+| `serializer_utils.rs` | 86 | `serialize_operator` migrated. `capitalize_first_letter`/`lowercase_leading_keyword` to be deleted. |
 
-### 3.2 Out of Scope (deferred to Phase 2)
+### 3.2 Display Layer Call Sites
 
-| File | Reason |
-|------|--------|
-| `predicate_serializer.rs` (803 lines, 16 functions) | Returns `String` with English articles; must return `Phrase` in Phase 2. |
-| `text_formatting.rs` (79 lines, `FormattedText` struct) | Poor man's `Phrase` — replaced by real RLF terms in Phase 2. |
-| `static_ability_serializer.rs` (222 lines) | Circular dependency with effect_serializer; complex conditional string building. |
-| `ability_serializer.rs` (176 lines) | Orchestrator with conditional capitalization; depends on all other serializers. |
-| `effect_serializer.rs` complex arms | Arms calling predicate_serializer, FormattedText, or serialize_gains_reclaim. |
-| `effect_serializer.rs` structural logic | `serialize_effect_with_context` (4 Effect::List branches, ListWithOptions, Modal). |
-| `effect_serializer.rs` helpers | `serialize_gains_reclaim`, `serialize_void_gains_reclaim`, `serialize_for_count_expression` (public, 15 arms), `serialize_allied_card_predicate`. |
-| `capitalize_first_letter` / `lowercase_leading_keyword` | Template-text operations; kept as-is until Phase 2. |
+All call sites follow the same pattern — serialize then eval:
+- `card_rendering.rs`: `serialize_abilities_text()` and `ability_token_text()`
+- `dreamwell_card_rendering.rs`: ability rendering
+- `modal_effect_prompt_rendering.rs`: modal choice text
 
-### 3.3 Decision: Why Skip Predicate Serializer
+### 3.3 strings.rs Phrase Inventory
 
-The predicate serializer is 803 lines with 16 functions, ~100 match arms, deep `FormattedText` coupling, and is called by every other serializer (~80 call sites). In Phase 1.5, predicate phrases would receive pre-rendered English strings as `$target` parameters — fundamentally blocking i18n for Russian (case declension on both nouns AND adjectives), German (article declension across 4 cases), Spanish (personal "a" before animate direct objects, subjunctive mood in temporal clauses), Chinese (classifiers, prenominal modifiers), and Portuguese (contractions, future subjunctive). All predicate phrases would be rewritten in Phase 2 when predicates return `Phrase` objects. Migrating it now doubles the work for no lasting benefit.
+**225 total phrases** defined in `rlf!` macro:
+- **175 Category A** (no `{{ }}`): Final phrases that survive into Phase 2 unchanged
+- **50 Category B** (contain `{{ }}`): Temporary phrases whose `{{ }}` escapes will be removed
+
+### 3.4 Types That Need PartialEq
+
+`Ability` derives `Debug, Clone, Serialize, Deserialize` but **not** `PartialEq`. The inner types (`EventAbility`, `TriggeredAbility`, `ActivatedAbility`, `StaticAbility`) do derive `PartialEq, Eq`, but `NamedAbility` and `Effect` do not. Adding `PartialEq` to the full AST tree is a prerequisite for AST-level round-trip tests.
 
 ---
 
-## 4. Phase 2 Prep Work (zero-risk, do during Phase 1.5)
+## 4. Cross-Serializer Dependency Graph
 
-### 4.1 Add Animacy Tags to English Predicate Terms
-
-Enrich existing terms in `strings.rs` with animacy tags. These don't affect English output but signal metadata for future translations. Gender tags (`:masc`/`:fem`/`:neut`) are language-specific and will appear only in translation files (e.g., `ru.rlf`), not in the English source.
-
-```rust
-// Current:
-ally = :an { one: "ally", other: "allies" };
-card = :a { one: "card", other: "cards" };
-
-// Enriched with animacy:
-ally = :an :anim { one: "ally", other: "allies" };
-enemy = :an :anim { one: "enemy", other: "enemies" };
-character = :a :anim { one: "character", other: "characters" };
-event = :an :inan { one: "event", other: "events" };
-card = :a :inan { one: "card", other: "cards" };
+```
+ability_serializer
+  ├── trigger_serializer
+  │     └── predicate_serializer
+  ├── cost_serializer
+  │     └── predicate_serializer
+  ├── effect_serializer
+  │     ├── predicate_serializer
+  │     ├── cost_serializer
+  │     ├── condition_serializer
+  │     │     └── predicate_serializer
+  │     ├── trigger_serializer
+  │     ├── static_ability_serializer  ←──┐
+  │     │     ├── predicate_serializer    │
+  │     │     ├── cost_serializer         │  CIRCULAR
+  │     │     ├── condition_serializer    │
+  │     │     ├── effect_serializer  ─────┘
+  │     │     └── text_formatting
+  │     ├── text_formatting
+  │     └── serializer_utils
+  ├── serializer_utils
+  └── static_ability_serializer
 ```
 
-Translation files will add language-specific gender:
-```
-// ru.rlf — gender + animacy + case declension
-card = :fem :inan {
-    nom: "карта", nom.few: "карты", nom.many: "карт",
-    acc: "карту", acc.few: "карты", acc.many: "карт",
-};
-character = :masc :anim {
-    nom: "персонаж", nom.few: "персонажа", nom.many: "персонажей",
-    acc: "персонажа", acc.few: "персонажей", acc.many: "персонажей",
-};
+**Circular dependency:** `effect_serializer` calls `static_ability_serializer::serialize_standard_static_ability()`. In return, `static_ability_serializer` calls `effect_serializer::serialize_for_count_expression()` and `effect_serializer::serialize_effect()`. These must be migrated together.
 
-// de.rlf — gender + case (no animacy distinction)
-card = :fem { nom: "Karte", acc: "Karte", dat: "Karte", nom.other: "Karten" };
-```
-
-### 4.2 Add Missing Keywords
-
-`{Aegis}` is used in effect_serializer output (line 668) but not defined in `strings.rs`. Add it:
-
-```rust
-aegis = <color={keyword_color}><b>Aegis</b></color>;
-```
+**Migration order constraint:** `predicate_serializer` + `text_formatting` must be migrated first (they're leaves). Then the mid-level serializers (cost, trigger, condition, effect + static_ability together). Finally `ability_serializer` at the top.
 
 ---
 
 ## 5. Validation Protocol
 
-After **every single task** (not just at the end):
+After **every single task**:
 
 ```bash
-just review    # clippy + style validator + ALL tests including cards_toml_round_trip_tests
+just review    # clippy + style validator + ALL tests
 ```
 
-If `just review` fails, stop and fix before proceeding. The `cards_toml_round_trip_tests` test serializes every card in the game — it is the ultimate validation that no serializer output changed. It uses byte-for-byte comparison and shows the card name, expected text, and actual text in the error message, making diagnosis straightforward.
+### 5.1 Round-Trip Test Evolution
 
-**Optional phrase unit tests:** Consider adding a small test file exercising Category B phrases to verify escaped-brace output in isolation (e.g., `assert_eq!(strings::draw_cards_effect(1).to_string(), "draw {cards($c)}.")`). This is defense-in-depth — the cards_toml test already catches mismatches — but catches typos earlier in the feedback loop.
+**Phase 2 begins** with text-equality round-trip tests (current). After Task 1 adds AST-level tests, **both strategies run in parallel**. After Task 3 proves AST tests are reliable, text-equality tests are removed, unblocking serializer output format changes.
+
+### 5.2 Test Coverage
+
+- `cards_toml_round_trip_tests` — serializes every card in the game (byte-for-byte or AST-level)
+- `dreamwell_toml_round_trip_tests` — same for dreamwell cards
+- Unit round-trip tests in 6 files — individual ability patterns
+- `card_effect_parser_tests.rs` — insta snapshot tests for parser AST
 
 ---
 
 ## 6. Task Breakdown
 
-### Task 1: Cost Serializer Migration
+### Task 1: AST-Level Round-Trip Tests
 
-**Files:** `strings.rs`, `cost_serializer.rs`
-**Risk:** Low — leaf serializer, no callers depend on internal structure.
+**Files:** `ability_data` types, `test_helpers.rs`, new test file
+**Risk:** HIGH — this is the single point of failure for all subsequent work.
 
-#### Step 1: Add cost phrases to strings.rs
+#### Step 1: Add PartialEq to the Ability AST
+
+Add `PartialEq, Eq` to all types in the ability AST tree that don't already have it. The types that need it:
+- `Ability` (ability.rs) — currently `Debug, Clone, Serialize, Deserialize`
+- `NamedAbility` (named_ability.rs) — currently `Debug, Clone, Serialize, Deserialize`
+- `Effect` (effect.rs) — currently `Debug, Clone, Serialize, Deserialize`
+- Check and add to any nested types that are missing it
+
+These are simple `derive` additions. If any type contains `f32`/`f64` (unlikely for a card game AST), use `PartialEq` with appropriate handling.
+
+#### Step 2: Add `assert_ast_round_trip` helper
+
+Add to `test_helpers.rs`:
 
 ```rust
-    // =========================================================================
-    // Cost Phrases — Category B (Phase 2: requires Phrase composition)
-    // =========================================================================
-
-    // Phase 2: $param is literal inside {{...}}, resolved by eval_str
-    abandon_count_allies($a) = "abandon {{count_allies($a)}}";
-    discard_cards_cost($d) = "discard {{cards($d)}}";
-    energy_cost_value($e) = "{{energy($e)}}";
-    lose_max_energy_cost($m) = "lose {{maximum_energy($m)}}";
-    banish_your_void_cost = "{{Banish}} your void";
-    banish_another_in_void = "{{Banish}} another card in your void";
-    banish_cards_from_void($c) = "{{Banish}} {{cards($c)}} from your void";
-    banish_cards_from_enemy_void($c) = "{{Banish}} {{cards($c)}} from the opponent's void";
-    banish_void_min_count($n) = "{{Banish}} your void with {{count($n)}} or more cards";
-    banish_from_hand_cost($target) = "{{Banish}} {$target} from hand";
-
-    // =========================================================================
-    // Cost Phrases — Category A (Final)
-    // =========================================================================
-
-    discard_your_hand_cost = "discard your hand";
-    pay_one_or_more_energy_cost = "pay 1 or more {energy_symbol}";
-    cost_or_connector = " or ";
-    cost_and_connector = " and ";
-    pay_prefix($cost) = "pay {$cost}";
-
-    // Cost target phrases (Category A — $target is pre-rendered, no escaped braces)
-    abandon_any_number_of($target) = "abandon any number of {$target}";
-    abandon_target($target) = "abandon {$target}";
-    return_target_to_hand($target) = "return {$target} to hand";
-    return_count_to_hand($n, $target) = "return {$n} {$target} to hand";
-    return_all_but_one_to_hand($target) = "return all but one {$target} to hand";
-    return_all_to_hand($target) = "return all {$target} to hand";
-    return_any_number_to_hand($target) = "return any number of {$target} to hand";
-    return_up_to_to_hand($n, $target) = "return up to {$n} {$target} to hand";
-    return_each_other_to_hand($target) = "return each other {$target} to hand";
-    return_or_more_to_hand($n, $target) = "return {$n} or more {$target} to hand";
+pub fn assert_ast_round_trip(input_text: &str, vars: &str) {
+    let parsed = parse_ability(input_text, vars);
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    let reparsed = parse_ability(&serialized.text, &serialized.variables.to_string());
+    assert_eq!(parsed, reparsed,
+        "AST mismatch for input: {input_text}\n  serialized: {}\n  vars: {}",
+        serialized.text, serialized.variables
+    );
+}
 ```
 
-#### Step 2: Refactor cost_serializer.rs
+#### Step 3: Add parallel AST round-trip test suite
 
-Replace every hardcoded string with the corresponding `strings::` call. Keep all `bindings.insert(...)` calls unchanged. The function signature and return type do not change.
+For every existing `assert_round_trip(text, vars)` call, add a corresponding `assert_ast_round_trip(text, vars)`. Run both in the same test function. The existing text-equality test catches output format changes (catches regressions now); the AST test catches semantic equivalence (needed for Phase 2 when output format changes).
 
-All ~28 match arms (including nested `CollectionExpression` arms in `AbandonCharactersCount` with 4 sub-arms, `ReturnToHand` with 8 sub-arms, and the `BanishCardsFromYourVoid` if-else branch) must be migrated. `serialize_trigger_cost` wraps `serialize_cost` with the `pay_prefix` phrase for energy costs.
+#### Step 4: Add AST-level comparison to TOML bulk tests
 
-Cross-serializer calls to `predicate_serializer::serialize_predicate()`, `serialize_predicate_plural()`, and `predicate_base_text()` remain as-is — their return values are passed as `$target` string parameters to the new phrases.
+In `cards_toml_round_trip_tests.rs` and `dreamwell_toml_round_trip_tests.rs`, add AST comparison alongside the existing text comparison. Both must pass.
 
-Note: `cost_or_connector` and `cost_and_connector` are used in `.join()` calls. Use `strings::cost_or_connector().to_string()` as the join separator.
-
-#### Step 3: Validate
-
-```bash
-just review
-```
-
-#### Step 4: Commit
+#### Step 5: Validate and commit
 
 ---
 
-### Task 2: Trigger Serializer Migration
+### Task 2: Predicate Serializer + FormattedText → Phrase
 
-**Files:** `strings.rs`, `trigger_serializer.rs`
-**Risk:** Low — leaf serializer, only calls predicate_serializer for target text.
+**Files:** `predicate_serializer.rs`, `text_formatting.rs`, `strings.rs`
+**Risk:** HIGH — 802 lines, 16 functions, ~80 call sites across all other serializers.
+**Prerequisite:** Task 1
 
-#### Step 1: Add trigger phrases to strings.rs
+This is the hardest single step. It changes the predicate serializer from returning `String` to returning `Phrase`, replacing `FormattedText` with RLF metadata.
+
+#### Step 1: Add predicate noun phrases to strings.rs
+
+Define RLF terms for all composite predicate noun phrases that `FormattedText` currently constructs. These carry `:a`/`:an` tags and `one`/`other` variants for article and plural selection:
 
 ```rust
-    // =========================================================================
-    // Trigger Phrases — Category A (Final)
-    // =========================================================================
+// =========================================================================
+// Predicate Noun Terms
+// =========================================================================
 
-    at_end_of_your_turn_trigger = "at the end of your turn, ";
-    when_deck_empty_trigger = "when you have no cards in your deck, ";
-    when_you_gain_energy_trigger = "when you gain energy, ";
+// Ownership-qualified character terms
+your_card = :a :inan { one: "your card", other: "your cards" };
+your_event = :an :inan { one: "your event", other: "your events" };
+enemy_card = :an :inan { one: "enemy card", other: "enemy cards" };
+enemy_event = :an :inan { one: "enemy event", other: "enemy events" };
 
-    // Trigger target phrases (Category A)
-    when_you_play_trigger($target) = "when you play {$target}, ";
-    when_opponent_plays_trigger($target) = "when the opponent plays {$target}, ";
-    when_you_play_from_hand_trigger($target) = "when you play {$target} from your hand, ";
-    when_you_play_in_turn_trigger($target) = "when you play {$target} in a turn, ";
-    when_you_play_during_enemy_turn_trigger($target) = "when you play {$target} during the opponent's turn, ";
-    when_you_discard_trigger($target) = "when you discard {$target}, ";
-    when_leaves_play_trigger($target) = "when {$target} leaves play, ";
-    when_you_abandon_trigger($target) = "when you abandon {$target}, ";
-    when_put_into_void_trigger($target) = "when {$target} is put into your void, ";
+// The "ally" and "enemy" terms already exist with proper tags.
+// SubType terms use :from to inherit tags from the subtype Phrase.
 
-    // =========================================================================
-    // Trigger Phrases — Category B (Phase 2: requires Phrase composition)
-    // =========================================================================
-
-    when_you_materialize_trigger($target) = "when you {{materialize}} {$target}, ";
-    when_dissolved_trigger($target) = "when {$target} is {{dissolved}}, ";
-    when_banished_trigger($target) = "when {$target} is {{banished}}, ";
-    when_you_play_cards_in_turn_trigger($c) = "when you play {{$c}} {{card:$c}} in a turn, ";
-    when_you_abandon_count_in_turn_trigger($a) = "when you abandon {{count_allies($a)}} in a turn, ";
-    when_you_draw_in_turn_trigger($c) = "when you draw {{$c}} {{card:$c}} in a turn, ";
-    when_you_materialize_nth_in_turn_trigger($n, $target) = "when you {{materialize}} {{text_number($n)}} {$target} in a turn, ";
+allied_subtype($t) = :from($t) { one: "allied {$t}", other: "allied {$t:other}" };
+enemy_subtype($t) = :from($t) { one: "enemy {$t}", other: "enemy {$t:other}" };
 ```
 
-**Note on `PlayCardsInTurn` and `DrawCardsInTurn`:** The serializer outputs `{$c} {card:$c}` (inline RLF parameterized selection), NOT `{cards_numeral($c)}` (which was removed in commit 5c41d958). The phrase bodies must match current serializer output exactly: `"when you play {{$c}} {{card:$c}} in a turn, "`. The `{{$c}}` and `{{card:$c}}` produce literal `{$c}` and `{card:$c}` which eval_str resolves.
+The exact set of phrases depends on which `CardPredicate` arms exist. Each arm in `your_predicate_formatted` and `enemy_predicate_formatted` maps to a phrase.
 
-#### Step 2: Refactor trigger_serializer.rs
+#### Step 2: Refactor predicate_serializer return types
 
-Migrate all 22 match arms in `serialize_trigger_event`. For the keyword arms (`Keywords` with len==1, len==2, fallback), these produce `{Judgment}`, `{Materialized_Judgment}`, etc. via `format!("{{{}}}", keyword)` — Rust triple-brace escaping to produce template directives. Since the keyword text is dynamic (from `serialize_keyword`), keep these arms as Rust format strings. Document why in a comment.
+Change all public functions to return `Phrase` instead of `String`:
+- `serialize_predicate()` → `Phrase`
+- `serialize_predicate_plural()` → `Phrase` (or `String` since it's always the plural text)
+- `predicate_base_text()` → `Phrase`
+- `serialize_card_predicate()` → `Phrase`
+- All other public functions
 
-`serialize_keyword` returns plain strings ("Judgment", "Materialized", "Dissolved") — no migration needed.
+The private `your_predicate_formatted()` and `enemy_predicate_formatted()` currently return `FormattedText`. Change them to return `Phrase` directly (the RLF term already carries article tags and plural variants).
 
-#### Step 3: Validate and commit
+#### Step 3: Update all call sites
+
+This is the bulk of the work (~80 call sites). Each call site currently does one of:
+1. Passes predicate `String` to a `strings::` phrase as `&str` → change to pass `Value::Phrase(p)`
+2. Uses predicate `String` in `format!()` → change to use `p.to_string()` for now, or create a new phrase
+3. Calls `.with_article()` / `.without_article()` / `.plural()` on the result → use `@a`, direct ref, or `:other` in the phrase template
+
+**Key pattern change for consuming phrases:**
+
+Category A phrases like `when_you_play_trigger($target)` currently take `&str`. They need to accept `Value` (Phrase) instead so they can use `{@a $target}` etc. This means changing the `rlf!` parameter types.
+
+Category B phrases with `$target` inside `{{ }}` must also be updated — the `$target` is now a real `Phrase` value, not a pre-rendered string.
+
+#### Step 4: Delete text_formatting.rs
+
+Remove the `FormattedText` struct and `card_predicate_base_text()` function. All their functionality is now provided by RLF phrases with proper tags and variants.
+
+Update `mod.rs` to remove the module declaration.
+
+#### Step 5: Validate and commit
+
+**Critical:** Both text-equality AND AST round-trip tests must pass. The serializer output text may change (e.g., article selection may differ slightly if tag-based `@a` produces different results than vowel-detection). The AST test ensures semantic equivalence is preserved.
 
 ---
 
-### Task 3: Condition Serializer Migration
+### Task 3: Remove Text-Equality Round-Trip Tests
 
-**Files:** `strings.rs`, `condition_serializer.rs`
-**Risk:** Low — small file, well-defined.
+**Files:** `test_helpers.rs`, all round-trip test files, TOML round-trip tests
+**Risk:** MEDIUM — must be confident AST tests are sufficient.
+**Prerequisite:** Task 2 (proves AST tests catch real issues)
 
-#### Step 1: Add condition phrases to strings.rs
+#### Step 1: Verify AST test coverage
+
+Review all existing text-equality tests. For each one, confirm the AST test would catch the same failure. Check edge cases: empty abilities, abilities with multiple effects, modal choices, named abilities.
+
+#### Step 2: Remove text-equality assertions
+
+In `assert_round_trip`, remove the `assert_eq!(expected_text, serialized.text)` and `VariableBindings` comparison. Replace with just the AST comparison.
+
+In TOML bulk tests, remove the byte-for-byte text comparison. Keep only AST-level comparison.
+
+#### Step 3: Simplify SerializedAbility usage in tests
+
+Test helpers no longer need to compare `VariableBindings`. Simplify `assert_round_trip` to:
 
 ```rust
-    // =========================================================================
-    // Condition Phrases — Category A (Final)
-    // =========================================================================
-
-    if_character_dissolved_this_turn = "if a character dissolved this turn";
-    if_card_in_your_void = "if this card is in your void,";
-
-    // Condition target phrases (Category A)
-    if_discarded_this_turn($target) = "if you have discarded {$target} this turn";
-    with_predicate_condition($pred) = "with {$pred},";
-
-    // =========================================================================
-    // Condition Phrases — Category B (Phase 2: requires Phrase composition)
-    // =========================================================================
-
-    with_allies_sharing_type($a) = "with {{count_allies($a)}} that share a character type,";
-    if_drawn_count_this_turn($n) = "if you have drawn {{count($n)}} or more cards this turn";
-    while_void_count($n) = "while you have {{count($n)}} or more cards in your void,";
-    with_allied_subtype($t) = "with an allied {{subtype($t)}},";
-    with_count_allied_subtype($a, $t) = "{{count_allied_subtype($a, $t)}}";
-    with_count_allies($a) = "{{count_allies($a)}}";
+pub fn assert_round_trip(input_text: &str, vars: &str) {
+    let parsed = parse_ability(input_text, vars);
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    // Re-parse the serialized output and compare ASTs
+    let reparsed = parse_from_rendered(&serialized.text);
+    assert_eq!(parsed, reparsed);
+}
 ```
 
-#### Step 2: Refactor condition_serializer.rs
+Note: `parse_from_rendered` must handle the fact that serializer output is now **rendered** text (with HTML color tags etc.) rather than template text. The parser needs to handle this, OR the serializer provides both a rendered string and a parseable string. See Design Decision 3.1 below.
 
-Migrate all 9 match arms in `serialize_condition` AND all 13 match arms in `serialize_predicate_count`. For the delegation arms in `serialize_predicate_count` (that call `predicate_serializer::serialize_predicate_plural`), no phrase is needed — the call stays as-is. Only the `Another(CharacterType(_))` and `Another(Character)` arms that produce `{count_allied_subtype($a, $t)}` and `{count_allies($a)}` need phrases.
-
-#### Step 3: Validate and commit
+#### Step 4: Validate and commit
 
 ---
 
-### Task 4: Serializer Utils — Operator Phrases
+### Task 4: Remove `{{ }}` Escapes and VariableBindings from Leaf Serializers
 
-**Files:** `strings.rs`, `serializer_utils.rs`
-**Risk:** Low — purely additive.
+**Files:** `strings.rs`, `cost_serializer.rs`, `trigger_serializer.rs`, `condition_serializer.rs`, `serializer_utils.rs`, simple `effect_serializer.rs` arms
+**Risk:** LOW — straightforward mechanical changes.
+**Prerequisite:** Task 3
 
-#### Step 1: Add operator phrases
+#### Step 1: Rewrite Category B phrases in strings.rs
+
+For every phrase containing `{{ }}`, remove the escape braces so RLF evaluates directly:
 
 ```rust
-    // =========================================================================
-    // Operator Phrases — Category A (Final)
-    // =========================================================================
+// Before (Phase 1.5):
+draw_cards_effect($c) = "draw {{cards($c)}}.";
 
-    operator_or_less = " or less";
-    operator_or_more = " or more";
-    operator_lower = " lower";
-    operator_higher = " higher";
+// After (Phase 2):
+draw_cards_effect($c) = "draw {cards($c)}.";
 ```
 
-#### Step 2: Refactor `serialize_operator`
+All ~50 Category B phrases are rewritten. The phantom parameter problem is eliminated — `$c` is now actually evaluated by RLF.
 
-Replace the 5 match arms. `Operator::Exactly` returns empty string — use `String::new()` or a phrase that evaluates to empty.
+#### Step 2: Pass real values to phrase functions
 
-**Do NOT migrate** `capitalize_first_letter` or `lowercase_leading_keyword`. These operate on template syntax (`{keyword}` patterns) and are essential for the current pipeline. Note: `capitalize_first_letter` has special title-case logic for underscore-separated keywords (e.g., `reclaim_for_cost` → `Reclaim_For_Cost`). RLF's `@cap` only capitalizes the first letter, so this logic has no direct RLF equivalent. Phase 2 should ensure all keyword terms are defined with correct capitalization in their RLF definitions, eliminating the need for runtime capitalization.
+In each serializer, replace the pattern:
+```rust
+bindings.insert("c".to_string(), VariableValue::Integer(count));
+strings::draw_cards_effect(0).to_string()   // 0 is phantom
+```
+with:
+```rust
+strings::draw_cards_effect(count).to_string()   // real value
+```
 
-#### Step 3: Validate and commit
+Remove all `bindings.insert()` calls for leaf serializers (cost, trigger, condition, simple effects). The `bindings: &mut VariableBindings` parameter is still passed through but no longer written to by these functions.
+
+#### Step 3: Update phrases that take $target
+
+Phrases like `when_you_play_trigger($target)` currently receive pre-rendered `String` targets. After Task 2, they receive `Phrase` values. Update the phrase function calls to pass `Value::Phrase(target_phrase)` where the predicate serializer now returns a `Phrase`.
+
+#### Step 4: Validate and commit
 
 ---
 
-### Task 5: Effect Serializer — Simple Count-Only Effects
+### Task 5: Migrate Remaining Effect Serializer Arms
 
 **Files:** `strings.rs`, `effect_serializer.rs`
-**Risk:** Low-Medium — modifying a large file (1193 lines) but only touching self-contained arms.
+**Risk:** MEDIUM — large file, many arms.
+**Prerequisite:** Task 4
 
-#### Step 1: Add simple effect phrases
+#### Step 1: Add phrases for all remaining StandardEffect arms
 
-These are `StandardEffect` variants that take only counts (no predicates, no FormattedText, no cross-serializer composition):
-
-```rust
-    // =========================================================================
-    // Simple Effect Phrases — Category B (Phase 2: requires Phrase composition)
-    // =========================================================================
-
-    draw_cards_effect($c) = "draw {{cards($c)}}.";
-    discard_cards_effect($d) = "discard {{cards($d)}}.";
-    gain_energy_effect($e) = "gain {{energy($e)}}.";
-    gain_points_effect($p) = "gain {{points($p)}}.";
-    lose_points_effect($p) = "you lose {{points($p)}}.";
-    opponent_gains_points_effect($p) = "the opponent gains {{points($p)}}.";
-    opponent_loses_points_effect($p) = "the opponent loses {{points($p)}}.";
-    foresee_effect($f) = "{{foresee($f)}}.";
-    kindle_effect($k) = "{{kindle($k)}}.";
-    each_player_discards_effect($d) = "each player discards {{cards($d)}}.";
-    prevent_that_card_effect = "{{prevent}} that card.";
-    then_materialize_it_effect = "then {{materialize}} it.";
-    gain_twice_energy_instead_effect = "gain twice that much {{energy_symbol}} instead.";
-    gain_energy_equal_to_that_cost_effect = "gain {{energy_symbol}} equal to that character's cost.";
-    gain_energy_equal_to_this_cost_effect = "gain {{energy_symbol}} equal to this character's cost.";
-    put_deck_into_void_effect($v) = "put the {{top_n_cards($v)}} of your deck into your void.";
-    banish_cards_from_enemy_void_effect($c) = "{{banish}} {{cards($c)}} from the opponent's void.";
-    banish_enemy_void_effect = "{{banish}} the opponent's void.";
-    judgment_phase_at_end_of_turn_effect = "at the end of this turn, trigger an additional {{judgment_phase_name}} phase.";
-    multiply_energy_effect($n) = "{{multiply_by($n)}} the amount of {{energy_symbol}} you have.";
-    spend_all_energy_dissolve_effect = "spend all your {{energy_symbol}}. {{dissolve}} an enemy with cost less than or equal to the amount spent.";
-    spend_all_energy_draw_discard_effect = "spend all your {{energy_symbol}}. Draw cards equal to the amount spent, then discard that many cards.";
-    each_player_shuffles_and_draws_effect($c) = "each player shuffles their hand and void into their deck and then draws {{cards($c)}}.";
-    return_up_to_events_from_void_effect($n) = "return {{up_to_n_events($n)}} from your void to your hand.";
-    fast_prefix = "{{Fast}} -- ";
-
-    // =========================================================================
-    // Simple Effect Phrases — Category A (Final)
-    // =========================================================================
-
-    opponent_gains_points_equal_spark = "the opponent gains points equal to its spark.";
-    take_extra_turn_effect = "take an extra turn after this one.";
-    you_win_the_game_effect = "you win the game.";
-    no_effect = "";
-```
-
-#### Step 2: Refactor simple effect arms
-
-Migrate only the following `StandardEffect` variants (those that don't call `predicate_serializer` or use `FormattedText`):
-
-- `DrawCards`, `DiscardCards`, `GainEnergy`, `GainPoints`, `LosePoints`
-- `EnemyGainsPoints`, `EnemyGainsPointsEqualToItsSpark`, `EnemyLosesPoints`
-- `Foresee`, `Kindle`
-- `EachPlayerDiscardCards`, `EachPlayerShufflesHandAndVoidIntoDeckAndDraws`
-- `PutCardsFromYourDeckIntoVoid`
-- `BanishCardsFromEnemyVoid`, `BanishEnemyVoid`
-- `MultiplyYourEnergy`
-- `TakeExtraTurn`, `YouWinTheGame`
-- `GainTwiceThatMuchEnergyInstead`, `ThenMaterializeIt`, `NoEffect`
-- `SpendAllEnergyDissolveEnemy`, `SpendAllEnergyDrawAndDiscard`
-- `TriggerAdditionalJudgmentPhaseAtEndOfTurn`
-- `ReturnUpToCountFromYourVoidToHand`
-- `GainEnergyEqualToCost` (the `It`/`That` and `This` sub-cases only — the fallback `_` calls `predicate_serializer` and is deferred)
-- `Counterspell` — the `Predicate::That | Predicate::It` branch only (produces `{prevent} that card.`; the other branch calls `predicate_serializer` and is deferred)
-
-**Do NOT migrate** any arm that calls `predicate_serializer::*`, `text_formatting::*`, `serialize_for_count_expression`, `serialize_gains_reclaim`, or any other complex helper. Those arms stay as hardcoded strings until Phase 2.
-
-#### Step 3: Validate and commit
-
----
-
-### Task 6: Effect Serializer — Structural Connectors
-
-**Files:** `strings.rs`
-**Risk:** Very low — adding phrases only, no code changes.
-
-Add structural connector phrases that will be used by `ability_serializer` and `serialize_effect_with_context`. These are defined now but not wired into code — those files are deferred to Phase 2. Having the phrases pre-defined means Phase 2 can use them directly.
+Define RLF phrases for all ~50 unmigrated `StandardEffect` arms. These arms now call the predicate serializer which returns `Phrase`, so `$target` parameters are `Phrase` values:
 
 ```rust
-    // =========================================================================
-    // Structural Phrases — Category A (Final)
-    // =========================================================================
-
-    you_may_prefix = "you may ";
-    cost_to_connector($cost) = "{$cost} to ";
-    until_end_of_turn_prefix = "Until end of turn, ";
-    once_per_turn_prefix = "Once per turn, ";
-    once_per_turn_suffix = ", once per turn";
-    cost_effect_separator = ": ";
-    then_joiner = ", then ";
-    and_joiner = " and ";
-    period_suffix = ".";
+// Examples of new phrases taking Phrase targets:
+dissolve_target_effect($target) = "{@cap dissolve} {@a $target}.";
+banish_target_effect($target) = "{@cap banish} {@a $target}.";
+gain_control_effect($target) = "gain control of {@a $target}.";
+draw_for_each_effect($c, $for_each) = "draw {cards($c)} for each {$for_each}.";
+materialize_target_effect($target) = "{@cap materialize} {@a $target}.";
 ```
 
-**Validate and commit.**
+#### Step 2: Migrate effect_serializer.rs arms
 
----
+Replace all remaining `format!()` arms with `strings::` phrase calls. Key groups:
 
-### Task 7: Phase 2 Prep — Enrich Predicate Terms with Tags
+**Predicate-consuming arms** (~30): `DissolveCharacter`, `BanishCharacter`, `GainControl`, `MaterializeCharacter`, `Discover`, `ReturnToHand`, `Counterspell` (all variants), etc. These now pass `Phrase` values from the predicate serializer to new RLF phrases.
 
-**Files:** `strings.rs`
-**Risk:** Zero — tags don't affect English output.
+**For-each pattern arms** (~8): `DrawCardsForEach`, `GainEnergyForEach`, `GainPointsForEach`, etc. These combine a count phrase with a for-each predicate phrase.
 
-Add `:anim`/`:inan` tags to all card-type and character terms. Add missing terms if not present. Add `aegis` keyword.
+**Spark-related arms** (~6): `GainsSpark`, `EachMatchingGainsSpark`, `SparkBecomes`, etc.
 
-**Validate and commit.**
+**Collection arms** (~10): `DissolveCharactersCount`, `BanishCollection`, `MaterializeCollection`, `MaterializeSilentCopy`, etc. These have nested `CollectionExpression` matches.
 
----
+#### Step 3: Migrate `serialize_for_count_expression`
 
-## 7. Escaped-Brace Phrase Tracking List
+This public function (15 arms) returns quantity descriptions used by multiple serializers. Migrate all arms to use RLF phrases. Since it's called by `static_ability_serializer`, coordinate with Task 6.
 
-Every Category B phrase must be tracked for Phase 2 rewrite. When Phase 2 begins, search `strings.rs` for `{{` to find all temporary phrases.
+#### Step 4: Migrate helper functions
 
-### Cost Phrases (Category B)
-- `abandon_count_allies($a)`
-- `discard_cards_cost($d)`
-- `energy_cost_value($e)`
-- `lose_max_energy_cost($m)`
-- `banish_your_void_cost`
-- `banish_another_in_void`
-- `banish_cards_from_void($c)`
-- `banish_cards_from_enemy_void($c)`
-- `banish_void_min_count($n)`
-- `banish_from_hand_cost($target)`
-
-### Trigger Phrases (Category B)
-- `when_you_materialize_trigger($target)`
-- `when_dissolved_trigger($target)`
-- `when_banished_trigger($target)`
-- `when_you_play_cards_in_turn_trigger($c)`
-- `when_you_abandon_count_in_turn_trigger($a)`
-- `when_you_draw_in_turn_trigger($c)`
-- `when_you_materialize_nth_in_turn_trigger($n, $target)`
-
-### Condition Phrases (Category B)
-- `with_allies_sharing_type($a)`
-- `if_drawn_count_this_turn($n)`
-- `while_void_count($n)`
-- `with_allied_subtype($t)`
-- `with_count_allied_subtype($a, $t)`
-- `with_count_allies($a)`
-
-### Simple Effect Phrases (Category B)
-- All `{{directive}}` phrases listed in Task 5 Step 1 (including `prevent_that_card_effect`, `then_materialize_it_effect`, `gain_twice_energy_instead_effect`, `gain_energy_equal_to_*_cost_effect`, `fast_prefix`, and all phrases with `{{energy_symbol}}`, `{{banish}}`, `{{dissolve}}`, etc.)
-
----
-
-## 8. Cross-Serializer Dependency Graph
-
-```
-ability_serializer                    [Phase 2]
-  ├── trigger_serializer              [Phase 1.5 — Task 2]
-  │     └── predicate_serializer      [Phase 2]
-  ├── cost_serializer                 [Phase 1.5 — Task 1]
-  │     └── predicate_serializer      [Phase 2]
-  ├── effect_serializer               [Phase 1.5 partial — Task 5]
-  │     ├── predicate_serializer      [Phase 2]
-  │     ├── cost_serializer           [Phase 1.5 — Task 1]
-  │     ├── condition_serializer      [Phase 1.5 — Task 3]
-  │     │     └── predicate_serializer [Phase 2]
-  │     ├── trigger_serializer        [Phase 1.5 — Task 2]
-  │     ├── static_ability_serializer [Phase 2]
-  │     │     ├── predicate_serializer
-  │     │     ├── cost_serializer
-  │     │     ├── condition_serializer
-  │     │     ├── effect_serializer   [CIRCULAR]
-  │     │     └── text_formatting
-  │     ├── text_formatting           [Phase 2]
-  │     └── serializer_utils          [Phase 1.5 — Task 4]
-  ├── serializer_utils                [Phase 1.5 — Task 4]
-  └── static_ability_serializer       [Phase 2]
-```
-
-**Key insight:** The `static_ability_serializer ↔ effect_serializer` circular dependency means they must be migrated together in Phase 2. The specific coupling points: `effect_serializer` calls `static_ability_serializer::serialize_standard_static_ability()` (line 32); `static_ability_serializer` calls `effect_serializer::serialize_for_count_expression()` (line 185, note: this is a `pub fn`, not private) and `effect_serializer::serialize_effect()` (line 214).
-
-**Note:** `ability_serializer` also depends on `serializer_utils` (for `capitalize_first_letter` and `lowercase_leading_keyword`), not shown in plan's original graph.
-
----
-
-## 9. What's NOT Covered (Phase 2 Scope)
-
-The following code paths are explicitly deferred. This section serves as the starting inventory for Phase 2 planning.
-
-### 9.1 Predicate Serializer (803 lines, 16 functions)
-
-All 11 public and 5 private functions. This is the **critical path** for Phase 2 — every non-trivial localization pattern depends on predicates returning `Phrase` with gender/case metadata.
-
-### 9.2 Effect Serializer Complex Arms (~40 StandardEffect variants)
-
-All arms calling predicate_serializer or other complex helpers (full list in prior version of this document, preserved in git history).
-
-### 9.3 Effect Serializer Structural Logic
-
-`serialize_effect_with_context`: `Effect::WithOptions`, `Effect::List` (4 code paths), `Effect::ListWithOptions`, `Effect::Modal`.
-
-### 9.4 Effect Serializer Helpers
-
-- `serialize_for_count_expression` (**public**, 15 arms, called by static_ability_serializer)
-- `serialize_gains_reclaim` (~116 lines)
+- `serialize_gains_reclaim` (~116 lines) — complex but self-contained
 - `serialize_void_gains_reclaim` (8 CollectionExpression arms)
 - `serialize_allied_card_predicate` / `serialize_allied_card_predicate_plural` (2 arms each)
 
-### 9.5 Static Ability Serializer (222 lines)
+#### Step 5: Migrate `serialize_effect_with_context` structural logic
 
-Must migrate together with effect_serializer due to circular dependency.
+The `Effect::WithOptions`, `Effect::List` (4 branches), `Effect::ListWithOptions`, and `Effect::Modal` arms. These use structural connector phrases already defined in strings.rs (`then_joiner`, `and_joiner`, `period_suffix`, `you_may_prefix`, etc.).
 
-### 9.6 Ability Serializer (176 lines)
-
-Conditional capitalization logic must be restructured for RLF `@cap` transforms.
-
-### 9.7 Text Formatting (79 lines)
-
-`FormattedText` maps directly to RLF concepts: `.with_article()` → `:a`/`:an` tags + `@a` transform, `.plural()` → `one`/`other` variants, `.capitalized()` → `@cap`. Must be replaced simultaneously with predicate_serializer (they are deeply entangled).
+#### Step 6: Validate and commit
 
 ---
 
-## 10. Phase 2 Plan Sketch
+### Task 6: Migrate Static Ability Serializer (Atomic with Effect Serializer)
 
-Phase 2 is a separate planning effort. The recommended order based on team analysis:
+**Files:** `strings.rs`, `static_ability_serializer.rs`
+**Risk:** MEDIUM — circular dependency with effect_serializer.
+**Prerequisite:** Task 5 (or done concurrently as a single atomic step)
 
-### Phase 2.0: Parallel Round-Trip Test Strategy
+**This task MUST be coordinated with Task 5** due to the circular dependency:
+- `effect_serializer` calls `static_ability_serializer::serialize_standard_static_ability()`
+- `static_ability_serializer` calls `effect_serializer::serialize_for_count_expression()` and `effect_serializer::serialize_effect()`
 
-**Do this FIRST, before any other Phase 2 work.** Create a second round-trip test that compares at the AST level (`parse(text) == parse(serialize(parse(text)))`) alongside the existing byte-for-byte text comparison. Run both strategies in parallel. This de-risks Phase 2.1 — once the AST-level test is proven reliable, you can change serializer output format without breaking the text-equality test being a hard blocker.
+#### Step 1: Add static ability phrases to strings.rs
 
-**Risk level: HIGH** — this is the single point of failure. If the new test strategy is wrong or incomplete, you lose confidence that serializer changes are correct.
+Define phrases for all ~20 `StandardStaticAbility` variants. These include conditional text placement logic (condition prepended vs appended).
 
-### Phase 2.1: Predicate Serializer + FormattedText → Phrase
+#### Step 2: Migrate `serialize_standard_static_ability`
 
-Replace `FormattedText` with real RLF terms simultaneously with changing `serialize_predicate()` to return `Phrase`. These are deeply entangled — `FormattedText` is consumed exclusively by predicate functions, and predicate functions produce `FormattedText`.
+Replace all `format!()` arms with `strings::` phrase calls. Handle the condition placement logic: for `StaticAbility::WithOptions`, conditions can be prepended (`"if this card is in your void, ..."`) or appended (`"... with allied subtype"`) depending on the condition type. This logic stays in Rust code, calling different phrases for each layout variant.
 
-All predicate terms carry `:a`/`:an` tags and `one`/`other` variants. `:from` is the key enabling mechanism — `subtype($s) = :from($s) "<b>{$s}</b>";` already propagates tags and variants through the composition chain.
+#### Step 3: Migrate `serialize_static_ability`
 
-This is the hardest single step: 803 lines, 16 functions, ~80 call sites across all serializers. But it unlocks everything else.
+Handle `StaticAbility::StaticAbility` (simple delegation) and `StaticAbility::WithOptions` (condition+ability composition).
 
-### Phase 2.2: Remove Text-Equality Round-Trip Tests
-
-Once Phase 2.0's AST-level tests have run in parallel long enough to build confidence, switch to AST-level comparison as the primary strategy. This removes the constraint that serializer output must exactly match parser input text.
-
-### Phase 2.3: Migrate Remaining Serializers
-
-Cost, trigger, condition: change `$target: String` → `$target: Phrase`. Rewrite Category B phrase bodies to use real RLF references (`{Banish}` instead of `{{Banish}}`). Effect serializer complex arms: now possible with Phrase composition.
-
-### Phase 2.4: Structural Composition (static_ability + effect together)
-
-`Effect::List`, `Effect::ListWithOptions`, `Effect::Modal`. `ability_serializer` orchestration. `serialize_gains_reclaim` and complex helpers. **Plan static_ability ↔ effect migration as a single atomic step** — document which functions in each file depend on the other (see Section 8).
-
-### Phase 2.5: Remove eval_str
-
-Serializer returns fully rendered text via `Phrase.to_string()`. `SerializedAbility` struct changes: drop `variables` field or change `text` to `Phrase`. Display layer calls `.to_string()` directly.
-
-**This must be an atomic switchover** — you can't have some abilities producing template text and others producing rendered text, because `serialize_abilities_text()` iterates over ALL abilities with a single code path. Once all serializers produce Phrase, flip the switch in `card_rendering.rs` all at once.
-
-**Mechanism:** Consider using `PhraseId` (compact, Copy-able, 16-byte identifier from RLF) to store references to definitions in serializable data, enabling `id.call(&locale, &args)` instead of string template evaluation.
-
-### Phase 2.6: Remove VariableBindings
-
-Variables become internal to serialization. `SerializedAbility` no longer exposes `VariableBindings`. Incremental, well-contained.
-
-### Phase 2.7: Remove Capitalization Helpers
-
-`capitalize_first_letter`, `lowercase_leading_keyword` — replaced by RLF `@cap` transforms and correctly-capitalized keyword term definitions.
+#### Step 4: Validate and commit
 
 ---
 
-## 11. Multilingual Design Considerations
+### Task 7: Migrate Ability Serializer
 
-The following issues were identified by i18n stress testing across all 6 target languages. They MUST be addressed during Phase 2 planning.
+**Files:** `ability_serializer.rs`, `strings.rs`
+**Risk:** LOW — top-level orchestrator, straightforward once everything below returns Phrase.
+**Prerequisite:** Tasks 5 and 6
 
-### 11.1 Case Declension (Russian, German)
+#### Step 1: Add ability structure phrases
 
-Russian has 6 cases × 3 CLDR plural categories = 18 forms per noun. German has 4 cases × 2 numbers = 8 forms. RLF's multi-dimensional variants with wildcard fallbacks handle this:
+```rust
+// Ability-level structural phrases
+triggered_ability_keyword_effect($trigger, $effect) = "{$trigger} {@cap $effect}";
+activated_cost_separator = ": ";
+activated_once_per_turn_suffix = ", once per turn";
+```
+
+Most structural phrases already exist from Phase 1.5 (`until_end_of_turn_prefix`, `once_per_turn_prefix`, `fast_prefix`, `cost_effect_separator`).
+
+#### Step 2: Refactor ability_serializer.rs
+
+Replace string concatenation with phrase calls. The key change: instead of calling `serializer_utils::capitalize_first_letter()`, use `@cap` in phrase templates.
+
+For `Ability::Triggered`: compose trigger + effect, with proper capitalization handled by phrases.
+For `Ability::Activated`: compose costs + separator + effect, with structural phrases.
+For `Ability::Event`: capitalize and return effect.
+For `Ability::Named`: handle Reclaim variants with proper phrases.
+For `Ability::Static`: capitalize and return static ability.
+
+#### Step 3: Update `serialize_named_ability`
+
+Currently produces template text like `"{Reclaim_For_Cost($r)}"`. Change to call the phrase directly with the real cost value.
+
+#### Step 4: Validate and commit
+
+---
+
+### Task 8: Remove eval_str and VariableBindings
+
+**Files:** `ability_serializer.rs`, `rlf_helper.rs`, `card_rendering.rs`, `dreamwell_card_rendering.rs`, `modal_effect_prompt_rendering.rs`, `parser_bindings.rs`
+**Risk:** LOW — straightforward cleanup once all serializers produce final text.
+**Prerequisite:** Task 7
+
+**This is an atomic switchover.** All display layer call sites iterate over abilities with a single code path. Once the serializer produces final rendered text, all call sites must stop calling `eval_str()` simultaneously.
+
+#### Step 1: Change SerializedAbility
+
+```rust
+// Before:
+pub struct SerializedAbility {
+    pub text: String,
+    pub variables: VariableBindings,
+}
+
+// After:
+pub struct SerializedAbility {
+    pub text: String,  // Now contains final rendered text, not template text
+}
+```
+
+#### Step 2: Remove VariableBindings from serializer functions
+
+Remove the `bindings: &mut VariableBindings` parameter from all serializer function signatures. This is a large mechanical change touching every function. Remove `VariableBindings::new()` creation in `serialize_ability()`.
+
+#### Step 3: Update display layer call sites
+
+In `card_rendering.rs`, `dreamwell_card_rendering.rs`, and `modal_effect_prompt_rendering.rs`, change:
+```rust
+// Before:
+let serialized = ability_serializer::serialize_ability(ability);
+rlf_helper::eval_str(&serialized.text, &serialized.variables)
+
+// After:
+ability_serializer::serialize_ability(ability).text
+```
+
+#### Step 4: Delete eval_str and build_params
+
+Delete `rlf_helper::eval_str()` and `rlf_helper::build_params()`. The `subtype_phrase()` and `figment_phrase()` functions in `rlf_helper.rs` are still needed (they're used by the predicate serializer now), so keep them.
+
+#### Step 5: Remove VariableBindings type
+
+If `VariableBindings` and `VariableValue` are no longer used anywhere, delete them. Check for any remaining references outside the serializer (e.g., `parser_substitutions` may use `VariableBindings` for parsing — keep that if so, but remove the serializer's dependency on it).
+
+#### Step 6: Update test infrastructure
+
+`assert_round_trip` no longer parses or compares `VariableBindings`. The test now:
+1. Parses input text with vars to get an AST
+2. Serializes the AST (produces rendered text)
+3. **Cannot re-parse rendered text** (it has HTML tags)
+
+This means the AST round-trip test strategy needs adjustment. See Design Decision 6.1.
+
+#### Step 7: Validate and commit
+
+---
+
+### Task 9: Remove Capitalization Helpers
+
+**Files:** `serializer_utils.rs`
+**Risk:** LOW — straightforward deletion.
+**Prerequisite:** Task 8
+
+#### Step 1: Verify no remaining callers
+
+Grep for `capitalize_first_letter` and `lowercase_leading_keyword` across the codebase. After Tasks 7-8, there should be zero callers.
+
+#### Step 2: Delete the functions
+
+Remove `capitalize_first_letter`, `capitalize_string`, `title_case_keyword`, `is_capitalizable_keyword`, and `lowercase_leading_keyword` from `serializer_utils.rs`.
+
+#### Step 3: Validate and commit
+
+---
+
+## 7. Design Decisions
+
+### 7.1 Round-Trip Testing After Rendered Output (Task 8 Impact)
+
+Once the serializer produces rendered text (with HTML color tags, Unicode symbols), the current round-trip strategy breaks:
+- Parser expects `"draw {cards($c)}."` but serializer now produces `"draw 3 cards."`
+- Parser expects `"{Banish}"` but serializer now produces `"<color=#AA00FF><b>Banish</b></color>"`
+
+**Options:**
+
+**Option A — Strip-and-reparse:** Add a function that strips HTML/formatting from rendered text, producing plain text that the parser can consume. E.g., `"<color=#AA00FF><b>Banish</b></color>"` → `"{Banish}"`. This is fragile and defeats the purpose of testing the full pipeline.
+
+**Option B — Separate parseable output:** The serializer produces both rendered text (for display) and parseable text (for round-trip testing). Keep the template-text output alongside the new rendered output. This doubles the work but preserves existing tests.
+
+**Option C — Drop text round-trip, keep AST-only:** After Task 3, we rely on AST round-trip tests that compare `parse(input) == serialize_then_reparse(input)`. But `serialize_then_reparse` can't work with rendered text (Option A problem). Instead, test at the AST level only: `serialize(parse(text))` produces an AST, and we verify the AST is correct via insta snapshots or manual assertions.
+
+**Option D — Parser consumes rendered text:** Teach the parser to accept rendered text as input. This is expensive and couples the parser to display formatting.
+
+**Recommended: Option B** during the transition, then gradually move to Option C. Keep a `serialize_template()` function that produces the old template-text format alongside the new `serialize_rendered()`. This lets existing round-trip tests continue working while new tests validate rendered output. Once we're confident in AST-level testing, remove `serialize_template()`.
+
+**Alternative Recommended: Option C with AST snapshots.** After Task 1 proves AST comparison works, and Task 3 removes text equality tests, we no longer need to re-parse serializer output. Instead, tests verify: (1) `parse(text)` produces a correct AST (via insta snapshots), and (2) `serialize(parse(text))` produces a correct rendered string (via insta snapshots of rendered output). The two are tested independently. This is simpler than Option B but requires trusting the snapshot tests.
+
+### 7.2 Phrase Parameter Types
+
+Currently, `rlf!` macro-generated functions accept specific Rust types (integers → `i64`, strings → `&str`). For Phase 2, predicate parameters need to accept `Phrase` values (via `Value::Phrase(p)`). Verify that the `rlf!` macro supports this, or determine how to pass `Value` enum variants to phrase functions.
+
+If the macro-generated functions only accept primitives, an alternative is to call `locale.eval_str()` with `Value::Phrase` in the params map, or to extend the `rlf!` macro to support Phrase parameters.
+
+### 7.3 register_source_phrases() Call Site
+
+Currently, `rlf_helper::eval_str()` calls `strings::register_source_phrases()` on every invocation. In Phase 2, the serializer calls `strings::` functions directly. Ensure phrase registration happens before serialization. Options:
+- Call `register_source_phrases()` once at serializer initialization
+- The `rlf!` macro handles registration lazily on first phrase access
+- Move registration to a global init that runs before any serialization
+
+---
+
+## 8. Risk Assessment
+
+| Task | Risk | Reason |
+|------|------|--------|
+| 1. AST round-trip tests | HIGH | Single point of failure for all subsequent work |
+| 2. Predicate → Phrase | HIGH | 802 lines, 16 functions, ~80 call sites, entangled with FormattedText |
+| 3. Remove text tests | MEDIUM | Must prove AST tests are sufficient first |
+| 4. Remove `{{ }}` escapes | LOW | Mechanical changes to leaf serializers |
+| 5. Remaining effect arms | MEDIUM | Large file (~50 arms), but each arm is self-contained |
+| 6. Static ability serializer | MEDIUM | Circular dependency with effect_serializer |
+| 7. Ability serializer | LOW | Straightforward top-level orchestration |
+| 8. Remove eval_str | MEDIUM | Atomic switchover, round-trip test strategy change |
+| 9. Remove capitalization | LOW | Simple deletion |
+
+---
+
+## 9. Multilingual Design Considerations
+
+These were identified by i18n stress testing across all 6 target languages. They inform the Rust code structure even though we're not writing translations yet.
+
+### 9.1 Case Declension (Russian, German)
+
+Russian: 6 cases × 3 CLDR plural categories = 18 forms per noun. German: 4 cases × 2 numbers. RLF handles this via multi-dimensional variants with wildcard fallbacks:
 
 ```
 // ru.rlf
@@ -656,13 +683,11 @@ card = :fem :inan {
     nom: "карта", nom.few: "карты", nom.many: "карт",
     acc: "карту", acc.few: "карты", acc.many: "карт",
 };
-
-// Usage: "Возьмите {card:acc:$n}."
-// n=1 → "Возьмите карту."  (acc + CLDR "one" → wildcard acc)
-// n=3 → "Возьмите карты."  (acc + CLDR "few" → acc.few)
 ```
 
-### 11.2 Gender Agreement on Participles (Russian, Spanish, Portuguese, German)
+**Rust code implication:** Predicate phrases must accept `Phrase` values (not strings) so translation files can apply case selectors like `{$target:acc:$n}`.
+
+### 9.2 Gender Agreement (Russian, Spanish, Portuguese, German)
 
 "when X is dissolved" requires participle agreement with X's gender. Handled by `:match` on gender tags:
 
@@ -673,17 +698,13 @@ when_dissolved_trigger($target) = :match($target) {
     fem: "когда {$target:nom} растворена, ",
     *neut: "когда {$target:nom} растворено, ",
 };
-
-// es.rlf
-when_dissolved_trigger($target) = :match($target) {
-    masc: "cuando {$target} sea disuelto, ",
-    *fem: "cuando {$target} sea disuelta, ",
-};
 ```
 
-### 11.3 Personal "a" (Spanish)
+**Rust code implication:** Predicate `Phrase` values must carry gender tags (`:masc`/`:fem`/`:neut`). English source terms carry animacy (`:anim`/`:inan`); translation files add gender.
 
-"dissolve an enemy" → "disolver **a** un enemigo" (animate direct object marker). No new RLF features needed — handle with `:match` on `:anim` tag:
+### 9.3 Personal "a" (Spanish)
+
+"dissolve an enemy" → "disolver **a** un enemigo". Handled by `:match` on `:anim` tag:
 
 ```
 // es.rlf
@@ -693,78 +714,80 @@ dissolve_target($target) = :match($target) {
 };
 ```
 
-### 11.4 Chinese Classifiers and Word Order
+**Rust code implication:** English terms need `:anim`/`:inan` tags (already added in Phase 1.5 prep).
 
-Every noun requires a measure word: 一**张**牌 (zhāng for cards), 一**个**角色 (gè for characters). Chinese also uses prenominal modifiers and different word order ("from your void banish cards" instead of "banish cards from your void"). Each Chinese phrase defines its own word order:
+### 9.4 Chinese Classifiers and Word Order
+
+Different classifiers per noun (张 for cards, 个 for characters). Different word order ("from void banish" not "banish from void"):
 
 ```
 // zh.rlf
-banish_cards_from_void($c) = "从你的虚空中{@cap banish}{@count($c) card}";
 draw_cards_effect($c) = "抽{cards($c)}。";
 cards($n) = :match($n) { 1: "一张牌", *other: "{$n}张牌" };
 ```
 
-### 11.5 German Separable Verbs
+**Rust code implication:** Each phrase defines its own word order in the translation file. The Rust code passes the same parameters regardless of language.
 
-"auflösen" (dissolve) → "löse...auf" (verb stem + particle split around object). Handled by German phrase structure:
+### 9.5 German Separable Verbs
+
+"auflösen" (dissolve) splits: "Löse ... auf". Handled entirely in translation file:
 
 ```
 // de.rlf
 dissolve_target($target) = "Löse {@ein:acc $target} auf.";
 ```
 
-### 11.6 Contraction Transforms (Portuguese)
+### 9.6 Tag System Design
 
-"de o" → "do", "em a" → "na". RLF's `@de` and `@em` transforms handle this.
+| Tag | Source | Purpose |
+|-----|--------|---------|
+| `:a` / `:an` | English source | English indefinite article selection |
+| `:anim` / `:inan` | English source | Cross-language animacy (Spanish personal "a", Russian acc=gen) |
+| `:masc` / `:fem` / `:neut` | Translation files | Language-specific gender agreement |
 
-### 11.7 Subjunctive Mood (Spanish, Portuguese)
+### 9.7 RLF Feature Verification Checklist
 
-Spanish uses subjunctive in temporal clauses ("cuando materialices" not "cuando materializas"). Portuguese uses future subjunctive ("quando materializar"). These are purely translation concerns — the translator writes the correct verb form. No RLF feature needed.
-
-### 11.8 Tag System Design
-
-English source terms carry `:a`/`:an` (for English articles) and `:anim`/`:inan` (for cross-language use). Gender tags (`:masc`/`:fem`/`:neut`) are language-specific and appear only in translation files. Animacy and gender are orthogonal dimensions — a Russian word can be `:masc :anim` (персонаж/character) or `:fem :inan` (карта/card).
-
-### 11.9 RLF Feature Verification Checklist
-
-Before Phase 2 begins, verify these RLF features are fully implemented:
+Before writing translation files, verify these RLF features are fully implemented:
 - [ ] `@count` transform for CJK classifiers
 - [ ] `@der`/`@ein` for German articles + case
 - [ ] `@el`/`@un` for Spanish articles
 - [ ] `@o` for Portuguese articles
 - [ ] Multi-parameter `:match` (e.g., `:match($n, $entity)`)
 - [ ] `:from` with multi-dimensional variant propagation
+- [ ] Phrase parameter types in `rlf!` macro-generated functions
 
 ---
 
-## 12. Migration Ordering and Risk Assessment
+## 10. Migration Ordering Summary
 
-### 12.1 Task Independence
+```
+Task 1: AST Round-Trip Tests
+    │
+    ▼
+Task 2: Predicate Serializer → Phrase  ◄── HARDEST STEP
+    │
+    ▼
+Task 3: Remove Text-Equality Tests
+    │
+    ▼
+Task 4: Remove {{ }} Escapes + VariableBindings (leaf serializers)
+    │
+    ▼
+Task 5: Remaining Effect Arms  ◄──┐
+    │                              │  ATOMIC (circular dep)
+Task 6: Static Ability Serializer ◄┘
+    │
+    ▼
+Task 7: Ability Serializer
+    │
+    ▼
+Task 8: Remove eval_str + VariableBindings
+    │
+    ▼
+Task 9: Remove Capitalization Helpers
+```
 
-Tasks 1-4 (cost, trigger, condition, utils) are truly independent leaf serializers with no cross-dependencies. Task 5 (simple effect arms) is also independent — the simple arms being migrated don't call other serializers. Tasks 6-7 are additive-only (new phrases, no code changes).
-
-**However:** All tasks add phrases to `strings.rs`. If done in parallel branches, merge conflicts are guaranteed. Do tasks sequentially (1→2→3→4→5→6→7) to avoid merge conflicts, or designate non-overlapping sections of `strings.rs` for each task.
-
-### 12.2 Performance
-
-Negligible concern. Card serialization is not a hot path (runs once per card display, not per frame). Category B phrases don't even evaluate parameters — they produce static strings. The eval_str two-pass adds no overhead vs. today.
-
-### 12.3 Error Handling
-
-`eval_str()` panics on failure (existing behavior, unchanged by migration). Round-trip tests catch all mismatches before they reach production. No changes to error handling needed for Phase 1.5.
-
-### 12.4 Phase 2 Risk Matrix
-
-| Step | Risk | Reason |
-|------|------|--------|
-| 2.0 Parallel tests | HIGH | Single point of failure for all subsequent work |
-| 2.1 Predicate→Phrase | HIGH | 803 lines, 16 functions, ~80 call sites, entangled with FormattedText |
-| 2.2 Remove text tests | MEDIUM | Must prove AST-level tests are sufficient first |
-| 2.3 Remaining serializers | LOW | Straightforward once predicates return Phrase |
-| 2.4 Structural composition | MEDIUM | Circular dependency requires atomic migration |
-| 2.5 Remove eval_str | LOW | Atomic switchover, straightforward once upstream done |
-| 2.6 Remove VariableBindings | LOW | Incremental, well-contained |
-| 2.7 Remove capitalization | LOW | Straightforward once `@cap` transforms are in place |
+All tasks are sequential — each depends on the previous. No parallelism is possible because every task modifies `strings.rs` and/or changes function signatures that downstream tasks depend on.
 
 ---
 
@@ -773,12 +796,15 @@ Negligible concern. Card serialization is not a hot path (runs once per card dis
 | File | Path | Lines |
 |------|------|-------|
 | Serializer directory | `rules_engine/src/parser_v2/src/serializer/` | — |
-| RLF strings | `rules_engine/src/strings/src/strings.rs` | ~456 |
+| RLF strings | `rules_engine/src/strings/src/strings.rs` | ~695 |
 | Round-trip test helpers | `rules_engine/tests/parser_v2_tests/src/test_helpers.rs` | 113 |
-| Round-trip tests | `rules_engine/tests/parser_v2_tests/tests/round_trip_tests/` | ~multiple files |
+| Round-trip tests | `rules_engine/tests/parser_v2_tests/tests/round_trip_tests/` | multiple |
 | Display eval_str | `rules_engine/src/display/src/rendering/rlf_helper.rs` | 75 |
 | Display card rendering | `rules_engine/src/display/src/rendering/card_rendering.rs` | 515 |
-| RLF design doc | `~/rlf/docs/DESIGN.md` | 766 |
+| Dreamwell rendering | `rules_engine/src/display/src/rendering/dreamwell_card_rendering.rs` | — |
+| Modal rendering | `rules_engine/src/display/src/rendering/modal_effect_prompt_rendering.rs` | — |
+| Ability AST types | `rules_engine/src/ability_data/src/` | multiple |
+| VariableBindings | `rules_engine/src/parser_v2/src/variables/parser_bindings.rs` | — |
 
 ## Appendix B: Commands
 
@@ -815,4 +841,23 @@ just battle-test <NAME>  # Specific battle test
 | PT-BR | "Dissolva um Ancião inimigo." | Reversed adjective order |
 | DE | "Löse einen feindlichen Uralten auf." | Separable verb, accusative article, adjective declension |
 
-These case studies confirm the architecture handles all 6 languages. The critical enabler is Phase 2.1 (predicates returning `Phrase` with gender/case metadata).
+These case studies confirm the architecture handles all 6 languages. The critical enabler is Task 2 (predicates returning `Phrase` with gender/case metadata).
+
+## Appendix D: Complete Category B Phrase List (to remove {{ }})
+
+All phrases in strings.rs containing `{{ }}` escapes. Task 4 removes the escapes from all of these:
+
+### Cost Phrases (10)
+`abandon_count_allies`, `discard_cards_cost`, `energy_cost_value`, `lose_max_energy_cost`, `banish_your_void_cost`, `banish_another_in_void`, `banish_cards_from_void`, `banish_cards_from_enemy_void`, `banish_void_min_count`, `banish_from_hand_cost`
+
+### Trigger Phrases (7)
+`when_you_materialize_trigger`, `when_dissolved_trigger`, `when_banished_trigger`, `when_you_play_cards_in_turn_trigger`, `when_you_abandon_count_in_turn_trigger`, `when_you_draw_in_turn_trigger`, `when_you_materialize_nth_in_turn_trigger`
+
+### Condition Phrases (6)
+`with_allies_sharing_type`, `if_drawn_count_this_turn`, `while_void_count`, `with_allied_subtype`, `with_count_allied_subtype`, `with_count_allies`
+
+### Effect Phrases (25)
+`draw_cards_effect`, `discard_cards_effect`, `gain_energy_effect`, `gain_points_effect`, `lose_points_effect`, `opponent_gains_points_effect`, `opponent_loses_points_effect`, `foresee_effect`, `kindle_effect`, `each_player_discards_effect`, `prevent_that_card_effect`, `then_materialize_it_effect`, `gain_twice_energy_instead_effect`, `gain_energy_equal_to_that_cost_effect`, `gain_energy_equal_to_this_cost_effect`, `put_deck_into_void_effect`, `banish_cards_from_enemy_void_effect`, `banish_enemy_void_effect`, `judgment_phase_at_end_of_turn_effect`, `multiply_energy_effect`, `spend_all_energy_dissolve_effect`, `spend_all_energy_draw_discard_effect`, `each_player_shuffles_and_draws_effect`, `return_up_to_events_from_void_effect`, `fast_prefix`
+
+### Structural (1)
+`pay_one_or_more_energy_cost`
