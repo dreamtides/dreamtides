@@ -20,7 +20,7 @@ Make the serializer Rust code 100% language-neutral. After Phase 2, every piece 
 **What is NOT in scope:** Writing translation files for non-English languages. We are building the language-neutral Rust infrastructure; actual translations come later.
 
 **Target languages (informing design decisions):**
-English, Simplified Chinese, Russian, Spanish, Portuguese-Brazil, German
+English, Simplified Chinese, Russian, Spanish, Portuguese-Brazil, German, Japanese, Arabic, Turkish, Korean, French
 
 ---
 
@@ -682,7 +682,7 @@ Currently, `rlf_helper::eval_str()` calls `strings::register_source_phrases()` o
 
 ## 9. Multilingual Design Considerations
 
-These were identified by i18n stress testing across all 6 target languages. They inform the Rust code structure even though we're not writing translations yet.
+These were identified by i18n stress testing across all 11 target languages (two rounds of 5-language review). They inform the Rust code structure even though we're not writing translations yet.
 
 ### 9.1 Case Declension (Russian, German)
 
@@ -698,7 +698,7 @@ card = :fem :inan {
 
 **Rust code implication:** Predicate phrases must accept `Phrase` values (not strings) so translation files can apply case selectors like `{$target:acc:$n}`.
 
-### 9.2 Gender Agreement (Russian, Spanish, Portuguese, German)
+### 9.2 Gender Agreement (Russian, Spanish, Portuguese, German, French, Arabic)
 
 "when X is dissolved" requires participle agreement with X's gender. Handled by `:match` on gender tags:
 
@@ -756,9 +756,14 @@ All grammatical tags are **language-specific** and live in **translation files**
 |-----|-----------|---------|
 | `:a` / `:an` | English source (`strings.rs`) | English indefinite article selection |
 | `:anim` / `:inan` | Translation files (es, ru, etc.) | Animacy (Spanish personal "a", Russian acc=gen) |
-| `:masc` / `:fem` / `:neut` | Translation files (es, ru, de, pt) | Gender agreement |
+| `:masc` / `:fem` / `:neut` | Translation files (es, ru, de, pt, fr, ar) | Gender agreement |
 | `:zhang` / `:ge` / `:ming` etc. | Chinese translation | Chinese classifier tags for `@count` |
-| `:nom` / `:acc` / `:dat` etc. | Translation files (ru, de) | Case variant keys |
+| `:mai` / `:tai` / `:ko` etc. | Japanese translation | Japanese counter tags for `@count` |
+| `:jang` / `:myeong` / `:gae` etc. | Korean translation | Korean counter tags for `@count` |
+| `:sun` / `:moon` | Arabic translation | `@al` definite article assimilation |
+| `:front` / `:back` | Turkish translation | Vowel harmony for `@inflect` suffixes |
+| `:vowel` | French translation | Elision trigger for `@le`/`@de`/`@au` |
+| `:nom` / `:acc` / `:dat` etc. | Translation files (ru, de, ar, tr) | Case variant keys |
 
 **Key principle:** The English source only carries `:a`/`:an` tags (English grammar). All other grammatical metadata (gender, animacy, classifiers, case) is defined by each translation file on its own terms. This keeps the English source clean and gives each language full control over its grammatical annotations.
 
@@ -791,12 +796,22 @@ Before writing translation files, verify these RLF features are fully implemente
 - [ ] `:from` with multi-dimensional variant propagation (4 cases × 2 numbers for German)
 - [ ] `:from` propagates ALL tags unconditionally from the active locale's definition
 - [ ] Phrase parameter types in `rlf!` macro-generated functions
-- [ ] `@cap` is a no-op on CJK characters (Chinese/Japanese/Korean)
+- [ ] `@cap` is a no-op on CJK characters (Chinese/Japanese/Korean) and Arabic script
 - [ ] `@cap` skips leading HTML markup tags to find first visible character
+- [ ] `@cap` uses locale-sensitive Unicode case mapping (Turkish dotted/dotless I)
+- [ ] `@inflect` handles Turkish buffer consonant insertion (y/n/s) for vowel-ending stems
+- [ ] `@inflect` accepts Phrase parameters, not only term references (Turkish `{@inflect:acc $target}`)
+- [ ] `@particle` strips trailing HTML markup to find last visible character (Korean/Japanese)
+- [ ] `@particle:and` (와/과), `:copula` (이다/다), `:dir` (으로/로) contexts for Korean
+- [ ] `@particle` handles ASCII digit endings via Korean pronunciation lookup table
+- [ ] `@al` correctly reads `:sun`/`:moon` tags inherited via `:from` (Arabic)
+- [ ] `@le`/`@de`/`@au` read `:vowel` tag for French elision (l', d', à l')
+- [ ] `@le:other`/`@de:other`/`@au:other` produce French plural forms (les/des/aux)
+- [ ] `:from` propagates `:vowel` tag through compound phrases (French elision chain)
 
 ### 9.8 RLF Framework Changes Required
 
-These changes to the RLF framework (`rlf` crate) were identified by the 5-language i18n review. See `docs/plans/i18n-review-*.md` for full analysis. Changes are ordered by priority.
+These changes to the RLF framework (`rlf` crate) were identified across two rounds of i18n review (11 languages total). See `docs/plans/i18n-review-*.md` for full analysis. Changes are ordered by priority.
 
 #### 9.8.1 Portuguese `@para` Transform — HIGH
 
@@ -810,9 +825,9 @@ Add preposition "por" + article contraction (pelo/pela/pelos/pelas). Needed for 
 
 Enhance `@um` to accept `:other` context for plural indefinite articles (uns/umas). Currently only produces singular (um/uma). ~10 lines. See `i18n-review-pt-br.md` Section 14.3.
 
-#### 9.8.4 Chinese `@count:word` Modifier — MEDIUM
+#### 9.8.4 CJK `@count:word` Modifier — MEDIUM
 
-Add a `:word` context modifier to `@count` that substitutes CJK number words (一/两/三) instead of digits (1/2/3) for small numbers (1-10). Falls back to digits for larger numbers. Without this, Chinese translators must use verbose `:match` wrappers for every count phrase. ~30 lines per CJK language. See `i18n-review-zh.md` Recommendation 1.
+Add a `:word` context modifier to `@count` that substitutes number words instead of digits for small numbers (1-10). Falls back to digits for larger numbers. Each CJK language has its own mapping: Chinese (一/两/三, note 两 not 二 for counting), Japanese (一/二/三, always 二), Korean (한/두/세 for native-system counters like `:jang`/`:myeong`, digits for Sino-Korean counters like 점/턴). ~30-40 lines per language. See `i18n-review-zh.md` Rec 1, `i18n-review-ja.md` Rec 1, `i18n-review-ko.md` KO-2.
 
 #### 9.8.5 German `@ein` Empty Plural — LOW
 
@@ -822,9 +837,29 @@ Define `@ein` behavior for plural context: return empty string. German has no pl
 
 Add preposition+article contraction transforms: "de"+"el"="del", "a"+"el"="al". Only applies to masculine singular definite article. Low priority because most card text uses possessives ("tu") not articles for locations. ~20 lines each. See `i18n-review-es.md` RFC-ES-3/RFC-ES-7.
 
-#### 9.8.7 Changes NOT Recommended
+#### 9.8.8 Turkish Buffer Consonant Insertion in `@inflect` — HIGH
 
-The following were evaluated and rejected by the i18n review:
+Turkish `@inflect` must insert buffer consonants (y/n/s) when suffixes are appended to vowel-ending stems: "y" before case suffixes (elma+acc→elmayı), "s" before 3sg possessive (araba+poss3sg→arabası), "n" before case suffixes after possessive endings (arabası+acc→arabasını). Without this, ~50% of Turkish noun inflections produce incorrect output. ~40 lines. See `i18n-review-tr.md` BLOCK-TR-1.
+
+#### 9.8.9 Korean `@particle` HTML Markup Stripping — HIGH
+
+Korean `@particle` must strip trailing HTML markup tags (`</color>`, `</b>`) to find the last visible character before determining consonant/vowel ending for particle selection (을/를, 이/가, 은/는). Analogous to `@cap` skipping leading markup. Without this, every particle attached to a colored keyword is incorrect. ~10 lines. See `i18n-review-ko.md` KO-CRIT-1.
+
+#### 9.8.10 Korean Additional Particle Contexts — MEDIUM
+
+Add `:and` (와/과), `:copula` (이다/다), `:dir` (으로/로) contexts to Korean `@particle`. Needed for conjunctive, copular, and directional patterns in card text. ~15 lines following the existing `:subj`/`:obj`/`:topic` pattern. See `i18n-review-ko.md` KO-1.
+
+#### 9.8.11 Japanese `:tai` Counter Tag — LOW
+
+Add `:tai` (体) to the Japanese counter tag set. Standard counter for game characters/creatures in Japanese TCGs. Without it, translators must hardcode 体 in every character-counting phrase. ~2 lines. See `i18n-review-ja.md` J1.
+
+#### 9.8.12 French `@un:other` Plural — LOW
+
+Define `@un:other` → "des" for French (gender-neutral plural indefinite). Same pattern as Portuguese `@um:other` (9.8.3). ~5 lines. See `i18n-review-fr.md` RFC-FR-4.
+
+#### 9.8.13 Changes NOT Recommended
+
+The following were evaluated and rejected across both i18n review rounds:
 - **Classifiers as first-class concept** (Chinese) — tags + `@count` already handle this
 - **`@sep` for separable verbs** (German) — phrase templates handle this perfectly
 - **`@part` for participle agreement** (all gendered languages) — `:match` is simpler and more flexible
@@ -832,7 +867,13 @@ The following were evaluated and rejected by the i18n review:
 - **Verb conjugation transforms** (Portuguese, Spanish) — only ~15 fixed verbs in the game
 - **Implicit `:from` on compound phrases** — explicit is better, avoid ambiguity with multi-parameter phrases
 - **Language-specific `:from` behavior** — `:from` is correctly language-neutral by design
-- **Declension context on `@der`/`@ein`** (German) — pragmatic alternative (hardcoded adjective forms per known context) works for Dreamtides domain
+- **Declension context on `@der`/`@ein`** (German) — pragmatic alternative works for Dreamtides domain
+- **Turkish-specific article transform** — Turkish has no articles; "bir" is a numeral, not an article
+- **Automatic plural suppression after numerals** (Turkish) — translators handle via `:match`
+- **`@ne` negation transform** (French) — ne...pas wraps verb, handled by phrase templates
+- **Honorific-level transforms** (Japanese, Korean) — card text uses single speech level chosen at translation time
+- **Full-width punctuation transforms** (Chinese, Japanese) — RLF phrase redefinition handles this
+- **`@particle` for Japanese** — Japanese particles are phonology-independent, can be written directly in templates
 
 ### 9.9 Cross-Language Design Conventions
 
@@ -888,7 +929,7 @@ Audit all keyword terms to ensure imperative (effect text) and participial (trig
 **Risk:** LOW — additive changes following established patterns.
 **Prerequisite:** None (can be done in parallel with Phase 2 tasks)
 
-This task implements the RLF framework changes identified by the 5-language i18n review (Section 9.8).
+This task implements the RLF framework changes identified by both rounds of i18n review (Section 9.8).
 
 #### Step 1: Add Portuguese `@para` transform (HIGH)
 
@@ -914,24 +955,51 @@ Specify that `@ein` with `.other` (plural) context returns empty string. Prevent
 
 Add "de"+"el"="del" and "a"+"el"="al" contraction transforms. Only contract with masculine singular definite article. ~20 lines each.
 
-#### Step 7: Update APPENDIX_STDLIB.md documentation
+#### Step 7: Add Turkish buffer consonant insertion to `@inflect` (HIGH)
 
-- Document `@count:word` modifier and the canonical `:match` fallback pattern for CJK
+Implement y/n/s buffer consonant insertion for Turkish vowel-ending stems. ~40 lines. See 9.8.8.
+
+#### Step 8: Add Korean `@particle` HTML markup stripping (HIGH)
+
+Strip trailing HTML tags in `@particle` to find last visible character. ~10 lines. See 9.8.9.
+
+#### Step 9: Add Korean particle contexts `:and`/`:copula`/`:dir` (MEDIUM)
+
+Add 3 new contexts to Korean `@particle` following existing pattern. ~15 lines. See 9.8.10.
+
+#### Step 10: Add Japanese `:tai` counter tag (LOW)
+
+Add `:tai` (体) to Japanese counter tag set. ~2 lines. See 9.8.11.
+
+#### Step 11: Add French `@un:other` plural (LOW)
+
+`@un:other` → "des". Same pattern as Portuguese `@um:other`. ~5 lines. See 9.8.12.
+
+#### Step 12: Update APPENDIX_STDLIB.md documentation
+
+- Document `@count:word` modifier for CJK (Chinese/Japanese/Korean number mappings)
 - Document `@para`, `@por` in Portuguese transform table
-- Document `@um:other` plural behavior
+- Document `@um:other` and `@un:other` plural behavior
 - Document `@ein` empty-string plural behavior
 - Document `@del`/`@al` in Spanish transform table
+- Document Turkish suffix ordering: plural → possessive → case
+- Document Turkish buffer consonant rules
+- Document Korean `@particle` digit-based lookup table and HTML stripping behavior
 - Add note that `text_number` is English-specific; gendered languages inline number words
 
-#### Step 8: Add verification tests
+#### Step 13: Add verification tests
 
 Add test cases for:
 - `:from` propagates all tags unconditionally from the active locale's definition
 - `:from` preserves multi-dimensional variants (4 cases × 2 numbers for German)
-- `@count:word` produces correct CJK number words
+- `@count:word` produces correct number words per CJK language (Chinese 两, Japanese 二, Korean 한/두/세)
 - `@ein:acc.other` returns empty string
-- `@um:other` produces plural forms
+- `@um:other` and `@un:other` produce plural forms
 - All new preposition+article transforms produce correct contractions
+- Turkish `@inflect` buffer consonant insertion (elma+acc→elmayı, araba+poss3sg→arabası)
+- Korean `@particle` strips HTML and selects correct particle form
+- Korean `@particle` handles digit endings (2→vowel, 3→consonant)
+- `@cap` is no-op on Arabic script and locale-sensitive for Turkish I/ı
 
 #### Step 9: Validate and commit
 
@@ -987,6 +1055,11 @@ Tasks 1-9 are sequential — each depends on the previous. Task 10 depends on Ta
 | i18n review (Spanish) | `docs/plans/i18n-review-es.md` | — |
 | i18n review (PT-BR) | `docs/plans/i18n-review-pt-br.md` | — |
 | i18n review (German) | `docs/plans/i18n-review-de.md` | — |
+| i18n review (Japanese) | `docs/plans/i18n-review-ja.md` | — |
+| i18n review (Arabic) | `docs/plans/i18n-review-ar.md` | — |
+| i18n review (Turkish) | `docs/plans/i18n-review-tr.md` | — |
+| i18n review (Korean) | `docs/plans/i18n-review-ko.md` | — |
+| i18n review (French) | `docs/plans/i18n-review-fr.md` | — |
 | Serializer directory | `rules_engine/src/parser_v2/src/serializer/` | — |
 | RLF strings | `rules_engine/src/strings/src/strings.rs` | ~695 |
 | Round-trip test helpers | `rules_engine/tests/parser_v2_tests/src/test_helpers.rs` | 113 |
@@ -1021,6 +1094,11 @@ just battle-test <NAME>  # Specific battle test
 | ES | "Roba una carta." | "Roba 3 cartas." | Gender agreement on article |
 | PT-BR | "Compre uma carta." | "Compre 3 cartas." | Gender agreement on article |
 | DE | "Ziehe eine Karte." | "Ziehe 3 Karten." | Accusative feminine article |
+| JA | "カードを一枚引く。" | "カードを3枚引く。" | Counter 枚, SOV, no articles |
+| AR | "اسحب بطاقة." | "اسحب 3 بطاقات." | All 6 CLDR categories, broken plurals |
+| TR | "bir kart çek." | "3 kart çek." | SOV, no plural after numerals |
+| KO | "카드 한 장을 뽑는다." | "카드 3장을 뽑는다." | Native numbers, particles, SOV |
+| FR | "Piochez une carte." | "Piochez 3 cartes." | Gender on article, elision |
 
 ### "Dissolve an enemy Ancient." across all languages
 
@@ -1032,8 +1110,13 @@ just battle-test <NAME>  # Specific battle test
 | ES | "Disuelve a un Antiguo enemigo." | Personal "a", reversed adjective order |
 | PT-BR | "Dissolva um Ancião inimigo." | Reversed adjective order |
 | DE | "Löse einen feindlichen Uralten auf." | Separable verb, accusative article, adjective declension |
+| JA | "敵のエンシェントを消滅させる。" | SOV, particle を marks object |
+| AR | "حَلّ عتيقاً معادياً." | Masc. imperative, accusative ending |
+| TR | "Bir düşman Kadimi erit." | `@inflect:acc` on target, SOV |
+| KO | "적 고대인을 해체한다." | `@particle:obj` selects 을, SOV |
+| FR | "Dissolvez l'Ancien ennemi." | `@le` reads `:vowel`, elision l' |
 
-These case studies confirm the architecture handles all 6 languages. The critical enabler is Task 2 (predicates returning `Phrase` with gender/case metadata).
+These case studies confirm the architecture handles all 11 languages. The critical enabler is Task 2 (predicates returning `Phrase` with gender/case metadata).
 
 ## Appendix D: Complete Category B Phrase List (to remove {{ }})
 
