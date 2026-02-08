@@ -227,6 +227,7 @@ rlf::rlf! {
     // Turn duration with repetition count.
     this_turn_times($n) = :match($n) {
         1: "this turn",
+        2: "twice this turn",
         *other: "this turn {text_number($n)} times",
     };
 
