@@ -558,4 +558,34 @@ rlf::rlf! {
     when_you_draw_in_turn_trigger($c) = "when you draw {{$c}} {{card:$c}} in a turn, ";
     // Materialize Nth target in a turn trigger.
     when_you_materialize_nth_in_turn_trigger($n, $target) = "when you {{materialize}} {{text_number($n)}} {$target} in a turn, ";
+
+    // =========================================================================
+    // Condition serializer phrases (Category A)
+    // =========================================================================
+
+    // Condition for a character dissolving this turn.
+    if_character_dissolved_this_turn = "if a character dissolved this turn";
+    // Condition for this card being in your void.
+    if_card_in_your_void = "if this card is in your void,";
+    // Condition for having discarded a target this turn.
+    if_discarded_this_turn($target) = "if you have discarded {$target} this turn";
+    // Condition wrapper for a predicate count.
+    with_predicate_condition($pred) = "with {$pred},";
+
+    // =========================================================================
+    // Condition serializer phrases (Category B)
+    // =========================================================================
+
+    // Condition for allies sharing a character type.
+    with_allies_sharing_type($a) = "with {{count_allies($a)}} that share a character type,";
+    // Condition for drawing a count of cards this turn.
+    if_drawn_count_this_turn($n) = "if you have drawn {{count($n)}} or more cards this turn";
+    // Condition for having a count of cards in your void.
+    while_void_count($n) = "while you have {{count($n)}} or more cards in your void,";
+    // Condition for having an allied subtype.
+    with_allied_subtype($t) = "with an allied {{subtype($t)}},";
+    // Condition for a count of allied characters with a subtype.
+    with_count_allied_subtype($a, $t) = "{{count_allied_subtype($a, $t)}}";
+    // Condition for a count of allies.
+    with_count_allies($a) = "{{count_allies($a)}}";
 }
