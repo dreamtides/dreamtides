@@ -54,14 +54,22 @@ rlf::rlf! {
     banished = "<color=#AA00FF>banished</color>";
     // Discover keyword.
     discover = "<color=#AA00FF>discover</color>";
+    // Discovered keyword (participial form).
+    discovered = "<color=#AA00FF>discovered</color>";
     // Reclaim keyword.
     reclaim = "<color=#AA00FF>reclaim</color>";
+    // Reclaimed keyword (participial form).
+    reclaimed = "<color=#AA00FF>reclaimed</color>";
     // Materialize keyword.
     materialize = "<color=#AA00FF>materialize</color>";
     // Prevent keyword.
     prevent = "<color=#AA00FF>prevent</color>";
+    // Prevented keyword (participial form).
+    prevented = "<color=#AA00FF>prevented</color>";
     // Kindle keyword with spark amount.
     kindle($k) = "<color=#AA00FF>kindle</color> {$k}";
+    // Kindled keyword (participial form).
+    kindled = "<color=#AA00FF>kindled</color>";
     // Foresee keyword with card count.
     foresee($n) = "<color=#AA00FF>foresee</color> {$n}";
     // Fast keyword with lightning bolt.
@@ -118,7 +126,7 @@ rlf::rlf! {
         *other: "{$n} allies",
     };
     // Allied character count with subtype (e.g., "an allied warrior").
-    count_allied_subtype($n, $s) = :match($n) {
+    count_allied_subtype($n, $s) = :from($s) :match($n) {
         1: "an allied {subtype($s)}",
         *other: "{$n} allied {subtype($s):other}",
     };
@@ -142,8 +150,8 @@ rlf::rlf! {
 
     // Figment token (singular) with gold formatting, inheriting article metadata.
     figment($f) = :from($f) "<color=#F57F17><b><u>{$f} Figment</u></color></b>";
-    // Figment tokens (plural) with gold formatting.
-    figments_plural($f) = "<color=#F57F17><b><u>{$f} Figments</u></color></b>";
+    // Figment tokens (plural) with gold formatting, inheriting article metadata.
+    figments_plural($f) = :from($f) "<color=#F57F17><b><u>{$f} Figments</u></color></b>";
     // N figments with article for singular.
     n_figments($n, $f) = :match($n) {
         1: "a {figment($f)}",
@@ -466,25 +474,25 @@ rlf::rlf! {
     // Pay prefix for trigger costs.
     pay_prefix($cost) = "pay {$cost}";
     // Abandon any number of a target type.
-    abandon_any_number_of($target) = "abandon any number of {$target}";
+    abandon_any_number_of($target) = :from($target) "abandon any number of {$target}";
     // Abandon a specific target.
-    abandon_target($target) = "abandon {$target}";
+    abandon_target($target) = :from($target) "abandon {$target}";
     // Return a target to hand.
-    return_target_to_hand($target) = "return {$target} to hand";
+    return_target_to_hand($target) = :from($target) "return {$target} to hand";
     // Return a count of targets to hand.
-    return_count_to_hand($n, $target) = "return {$n} {$target} to hand";
+    return_count_to_hand($n, $target) = :from($target) "return {$n} {$target} to hand";
     // Return all but one target to hand.
-    return_all_but_one_to_hand($target) = "return all but one {$target} to hand";
+    return_all_but_one_to_hand($target) = :from($target) "return all but one {$target} to hand";
     // Return all targets to hand.
-    return_all_to_hand($target) = "return all {$target} to hand";
+    return_all_to_hand($target) = :from($target) "return all {$target} to hand";
     // Return any number of targets to hand.
-    return_any_number_to_hand($target) = "return any number of {$target} to hand";
+    return_any_number_to_hand($target) = :from($target) "return any number of {$target} to hand";
     // Return up to N targets to hand.
-    return_up_to_to_hand($n, $target) = "return up to {$n} {$target} to hand";
+    return_up_to_to_hand($n, $target) = :from($target) "return up to {$n} {$target} to hand";
     // Return each other target to hand.
-    return_each_other_to_hand($target) = "return each other {$target} to hand";
+    return_each_other_to_hand($target) = :from($target) "return each other {$target} to hand";
     // Return N or more targets to hand.
-    return_or_more_to_hand($n, $target) = "return {$n} or more {$target} to hand";
+    return_or_more_to_hand($n, $target) = :from($target) "return {$n} or more {$target} to hand";
 
     // =========================================================================
     // Cost serializer phrases (Category B) - Phase 2: requires Phrase composition
@@ -509,7 +517,7 @@ rlf::rlf! {
     // Banish your void with a minimum card count.
     banish_void_min_count($n) = "{Banish} your void with {count($n)} or more cards";
     // Banish a target from hand.
-    banish_from_hand_cost($target) = "{Banish} {$target} from hand";
+    banish_from_hand_cost($target) = :from($target) "{Banish} {$target} from hand";
 
     // =========================================================================
     // Trigger serializer phrases (Category A)
@@ -522,34 +530,34 @@ rlf::rlf! {
     // Gain energy trigger.
     when_you_gain_energy_trigger = "when you gain energy, ";
     // Play a target trigger.
-    when_you_play_trigger($target) = "when you play {$target}, ";
+    when_you_play_trigger($target) = :from($target) "when you play {$target}, ";
     // Opponent plays a target trigger.
-    when_opponent_plays_trigger($target) = "when the opponent plays {$target}, ";
+    when_opponent_plays_trigger($target) = :from($target) "when the opponent plays {$target}, ";
     // Play a target from hand trigger.
-    when_you_play_from_hand_trigger($target) = "when you play {$target} from your hand, ";
+    when_you_play_from_hand_trigger($target) = :from($target) "when you play {$target} from your hand, ";
     // Play a target in a turn trigger.
-    when_you_play_in_turn_trigger($target) = "when you play {$target} in a turn, ";
+    when_you_play_in_turn_trigger($target) = :from($target) "when you play {$target} in a turn, ";
     // Play a target during enemy turn trigger.
-    when_you_play_during_enemy_turn_trigger($target) = "when you play {$target} during the opponent's turn, ";
+    when_you_play_during_enemy_turn_trigger($target) = :from($target) "when you play {$target} during the opponent's turn, ";
     // Discard a target trigger.
-    when_you_discard_trigger($target) = "when you discard {$target}, ";
+    when_you_discard_trigger($target) = :from($target) "when you discard {$target}, ";
     // Target leaves play trigger.
-    when_leaves_play_trigger($target) = "when {$target} leaves play, ";
+    when_leaves_play_trigger($target) = :from($target) "when {$target} leaves play, ";
     // Abandon a target trigger.
-    when_you_abandon_trigger($target) = "when you abandon {$target}, ";
+    when_you_abandon_trigger($target) = :from($target) "when you abandon {$target}, ";
     // Target put into void trigger.
-    when_put_into_void_trigger($target) = "when {$target} is put into your void, ";
+    when_put_into_void_trigger($target) = :from($target) "when {$target} is put into your void, ";
 
     // =========================================================================
     // Trigger serializer phrases (Category B)
     // =========================================================================
 
     // Materialize a target trigger.
-    when_you_materialize_trigger($target) = "when you {materialize} {$target}, ";
+    when_you_materialize_trigger($target) = :from($target) "when you {materialize} {$target}, ";
     // Target dissolved trigger.
-    when_dissolved_trigger($target) = "when {$target} is {dissolved}, ";
+    when_dissolved_trigger($target) = :from($target) "when {$target} is {dissolved}, ";
     // Target banished trigger.
-    when_banished_trigger($target) = "when {$target} is {banished}, ";
+    when_banished_trigger($target) = :from($target) "when {$target} is {banished}, ";
     // Play N cards in a turn trigger.
     when_you_play_cards_in_turn_trigger($c) = "when you play {$c} {card:$c} in a turn, ";
     // Abandon N allies in a turn trigger.
@@ -557,7 +565,7 @@ rlf::rlf! {
     // Draw N cards in a turn trigger.
     when_you_draw_in_turn_trigger($c) = "when you draw {$c} {card:$c} in a turn, ";
     // Materialize Nth target in a turn trigger.
-    when_you_materialize_nth_in_turn_trigger($n, $target) = "when you {materialize} {text_number($n)} {$target} in a turn, ";
+    when_you_materialize_nth_in_turn_trigger($n, $target) = :from($target) "when you {materialize} {text_number($n)} {$target} in a turn, ";
 
     // =========================================================================
     // Condition serializer phrases (Category A)
@@ -568,7 +576,7 @@ rlf::rlf! {
     // Condition for this card being in your void.
     if_card_in_your_void = "if this card is in your void,";
     // Condition for having discarded a target this turn.
-    if_discarded_this_turn($target) = "if you have discarded {$target} this turn";
+    if_discarded_this_turn($target) = :from($target) "if you have discarded {$target} this turn";
     // Condition wrapper for a predicate count.
     with_predicate_condition($pred) = "with {$pred},";
 
@@ -704,6 +712,11 @@ rlf::rlf! {
     // Enemy noun with article metadata.
     enemy = :an{ one: "enemy", other: "enemies" };
 
+    // This card noun with article metadata.
+    this_card = :a{ one: "this card", other: "these cards" };
+    // This character noun with article metadata.
+    this_character = :a{ one: "this character", other: "these characters" };
+
     // =========================================================================
     // Ownership-qualified predicate nouns
     // =========================================================================
@@ -778,16 +791,16 @@ rlf::rlf! {
     for_each_character_in_enemy_void = "character in the opponent's void";
     // For-each event in the opponent's void phrase.
     for_each_event_in_enemy_void = "event in the opponent's void";
-    // For-each allied subtype phrase.
-    for_each_allied_subtype($t) = "allied {subtype($t)}";
-    // For-each enemy subtype phrase.
-    for_each_enemy_subtype($t) = "enemy {subtype($t)}";
-    // For-each subtype phrase.
-    for_each_subtype($t) = "{subtype($t)}";
-    // For-each other subtype phrase.
-    for_each_other_subtype($t) = "other {subtype($t)}";
-    // For-each subtype in your void phrase.
-    for_each_subtype_in_your_void($t) = "{subtype($t)} in your void";
+    // For-each allied subtype phrase inheriting article metadata.
+    for_each_allied_subtype($t) = :from($t) "allied {subtype($t)}";
+    // For-each enemy subtype phrase inheriting article metadata.
+    for_each_enemy_subtype($t) = :from($t) "enemy {subtype($t)}";
+    // For-each subtype phrase inheriting article metadata.
+    for_each_subtype($t) = :from($t) "{subtype($t)}";
+    // For-each other subtype phrase inheriting article metadata.
+    for_each_other_subtype($t) = :from($t) "other {subtype($t)}";
+    // For-each subtype in your void phrase inheriting article metadata.
+    for_each_subtype_in_your_void($t) = :from($t) "{subtype($t)} in your void";
     // For-each ally with spark condition phrase.
     for_each_ally_with_spark($s, $op) = "ally with spark {$s}{$op}";
 
@@ -798,29 +811,29 @@ rlf::rlf! {
     // Ally abandoned this turn for count expressions.
     ally_abandoned_this_turn = "ally abandoned this turn";
     // Allied subtype abandoned this turn for count expressions.
-    allied_subtype_abandoned_this_turn($t) = "allied {subtype($t)} abandoned this turn";
+    allied_subtype_abandoned_this_turn($t) = :from($t) "allied {subtype($t)} abandoned this turn";
     // Ally abandoned (this way) for count expressions.
     ally_abandoned = "ally abandoned";
     // Allied subtype abandoned (this way) for count expressions.
-    allied_subtype_abandoned($t) = "allied {subtype($t)} abandoned";
+    allied_subtype_abandoned($t) = :from($t) "allied {subtype($t)} abandoned";
     // Ally returned to hand for count expressions.
     ally_returned = "ally returned";
     // Allied subtype returned to hand for count expressions.
-    allied_subtype_returned($t) = "allied {subtype($t)} returned";
+    allied_subtype_returned($t) = :from($t) "allied {subtype($t)} returned";
     // Generic card predicate returned for count expressions.
-    card_predicate_returned($base) = "{$base} returned";
+    card_predicate_returned($base) = :from($base) "{$base} returned";
     // Energy spent for count expressions.
     energy_spent = "{energy_symbol} spent";
     // Card predicate played this turn for count expressions.
-    card_predicate_played_this_turn($base) = "{$base} you have played this turn";
+    card_predicate_played_this_turn($base) = :from($base) "{$base} you have played this turn";
     // Card predicate drawn this turn for count expressions.
-    card_predicate_drawn_this_turn($base) = "{$base} you have drawn this turn";
+    card_predicate_drawn_this_turn($base) = :from($base) "{$base} you have drawn this turn";
     // Card predicate discarded this turn for count expressions.
-    card_predicate_discarded_this_turn($base) = "{$base} you have discarded this turn";
+    card_predicate_discarded_this_turn($base) = :from($base) "{$base} you have discarded this turn";
     // Card predicate dissolved this turn for count expressions.
-    card_predicate_dissolved_this_turn($base) = "{$base} which dissolved this turn";
+    card_predicate_dissolved_this_turn($base) = :from($base) "{$base} which dissolved this turn";
     // Generic card predicate abandoned this turn for count expressions.
-    card_predicate_abandoned_this_turn($base) = "{$base} abandoned this turn";
+    card_predicate_abandoned_this_turn($base) = :from($base) "{$base} abandoned this turn";
     // Generic card predicate abandoned for count expressions.
-    card_predicate_abandoned($base) = "{$base} abandoned";
+    card_predicate_abandoned($base) = :from($base) "{$base} abandoned";
 }
