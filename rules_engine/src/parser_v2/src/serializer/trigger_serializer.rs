@@ -2,10 +2,9 @@ use ability_data::trigger_event::{PlayerTurn, TriggerEvent, TriggerKeyword};
 use strings::strings;
 
 use crate::serializer::predicate_serializer;
-use crate::variables::parser_bindings::VariableBindings;
 
 /// Serializes a trigger event to its template text representation.
-pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBindings) -> String {
+pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
     match trigger {
         // Keyword arms use Rust format strings because the keyword text is
         // dynamic (produced by serialize_keyword), not a static phrase.
@@ -15,16 +14,16 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         TriggerEvent::Keywords(keywords) if keywords.len() == 2 => {
             format!("{{{}_{}}}", serialize_keyword(&keywords[0]), serialize_keyword(&keywords[1]))
         }
-        TriggerEvent::Play(predicate) => strings::when_you_play_trigger(
-            predicate_serializer::serialize_predicate(predicate, bindings),
-        )
-        .to_string(),
+        TriggerEvent::Play(predicate) => {
+            strings::when_you_play_trigger(predicate_serializer::serialize_predicate(predicate))
+                .to_string()
+        }
         TriggerEvent::OpponentPlays(predicate) => strings::when_opponent_plays_trigger(
-            predicate_serializer::serialize_predicate(predicate, bindings),
+            predicate_serializer::serialize_predicate(predicate),
         )
         .to_string(),
         TriggerEvent::PlayFromHand(predicate) => strings::when_you_play_from_hand_trigger(
-            predicate_serializer::serialize_predicate(predicate, bindings),
+            predicate_serializer::serialize_predicate(predicate),
         )
         .to_string(),
         TriggerEvent::PlayCardsInTurn(count) => {
@@ -32,43 +31,43 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         }
         TriggerEvent::PlayDuringTurn(predicate, turn) => match turn {
             PlayerTurn::YourTurn => strings::when_you_play_in_turn_trigger(
-                predicate_serializer::serialize_predicate(predicate, bindings),
+                predicate_serializer::serialize_predicate(predicate),
             )
             .to_string(),
             PlayerTurn::EnemyTurn => strings::when_you_play_during_enemy_turn_trigger(
-                predicate_serializer::serialize_predicate(predicate, bindings),
+                predicate_serializer::serialize_predicate(predicate),
             )
             .to_string(),
         },
-        TriggerEvent::Discard(predicate) => strings::when_you_discard_trigger(
-            predicate_serializer::serialize_predicate(predicate, bindings),
-        )
-        .to_string(),
+        TriggerEvent::Discard(predicate) => {
+            strings::when_you_discard_trigger(predicate_serializer::serialize_predicate(predicate))
+                .to_string()
+        }
         TriggerEvent::Materialize(predicate) => strings::when_you_materialize_trigger(
-            predicate_serializer::serialize_predicate(predicate, bindings),
+            predicate_serializer::serialize_predicate(predicate),
         )
         .to_string(),
-        TriggerEvent::Dissolved(predicate) => strings::when_dissolved_trigger(
-            predicate_serializer::serialize_predicate(predicate, bindings),
-        )
-        .to_string(),
-        TriggerEvent::Banished(predicate) => strings::when_banished_trigger(
-            predicate_serializer::serialize_predicate(predicate, bindings),
-        )
-        .to_string(),
-        TriggerEvent::LeavesPlay(predicate) => strings::when_leaves_play_trigger(
-            predicate_serializer::serialize_predicate(predicate, bindings),
-        )
-        .to_string(),
-        TriggerEvent::Abandon(predicate) => strings::when_you_abandon_trigger(
-            predicate_serializer::serialize_predicate(predicate, bindings),
-        )
-        .to_string(),
+        TriggerEvent::Dissolved(predicate) => {
+            strings::when_dissolved_trigger(predicate_serializer::serialize_predicate(predicate))
+                .to_string()
+        }
+        TriggerEvent::Banished(predicate) => {
+            strings::when_banished_trigger(predicate_serializer::serialize_predicate(predicate))
+                .to_string()
+        }
+        TriggerEvent::LeavesPlay(predicate) => {
+            strings::when_leaves_play_trigger(predicate_serializer::serialize_predicate(predicate))
+                .to_string()
+        }
+        TriggerEvent::Abandon(predicate) => {
+            strings::when_you_abandon_trigger(predicate_serializer::serialize_predicate(predicate))
+                .to_string()
+        }
         TriggerEvent::AbandonCardsInTurn(count) => {
             strings::when_you_abandon_count_in_turn_trigger(*count).to_string()
         }
         TriggerEvent::PutIntoVoid(predicate) => strings::when_put_into_void_trigger(
-            predicate_serializer::serialize_predicate(predicate, bindings),
+            predicate_serializer::serialize_predicate(predicate),
         )
         .to_string(),
         TriggerEvent::DrawCardsInTurn(count) => {
@@ -79,7 +78,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         TriggerEvent::MaterializeNthThisTurn(predicate, count) => {
             strings::when_you_materialize_nth_in_turn_trigger(
                 *count,
-                predicate_serializer::serialize_predicate_plural(predicate, bindings),
+                predicate_serializer::serialize_predicate_plural(predicate),
             )
             .to_string()
         }

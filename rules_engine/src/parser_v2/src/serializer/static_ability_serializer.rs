@@ -1,21 +1,17 @@
 use ability_data::condition::Condition;
 use ability_data::static_ability::{CardTypeContext, StandardStaticAbility, StaticAbility};
-use ability_data::variable_value::VariableValue;
 use strings::strings;
 
 use crate::serializer::{
     condition_serializer, cost_serializer, effect_serializer, predicate_serializer,
+    serializer_utils,
 };
-use crate::variables::parser_bindings::VariableBindings;
 
 /// Serializes a [StaticAbility] to its text representation.
-pub fn serialize_static_ability(
-    static_ability: &StaticAbility,
-    bindings: &mut VariableBindings,
-) -> String {
+pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
     match static_ability {
         StaticAbility::StaticAbility(ability) => {
-            let base = serialize_standard_static_ability(ability, bindings);
+            let base = serialize_standard_static_ability(ability);
             if base.ends_with('.') {
                 base
             } else {
@@ -23,7 +19,7 @@ pub fn serialize_static_ability(
             }
         }
         StaticAbility::WithOptions(ability) => {
-            let base = serialize_standard_static_ability(&ability.ability, bindings);
+            let base = serialize_standard_static_ability(&ability.ability);
             if let Some(condition) = &ability.condition {
                 if matches!(condition, Condition::ThisCardIsInYourVoid) {
                     let base_no_period = base.trim_end_matches('.');
@@ -35,8 +31,7 @@ pub fn serialize_static_ability(
                 } else if matches!(condition, Condition::CardsInVoidCount { .. })
                     || matches!(condition, Condition::PredicateCount { count: 1, .. })
                 {
-                    let condition_str =
-                        condition_serializer::serialize_condition(condition, bindings);
+                    let condition_str = condition_serializer::serialize_condition(condition);
                     let base_no_period = base.trim_end_matches('.');
                     format!(
                         "{}{}",
@@ -44,8 +39,7 @@ pub fn serialize_static_ability(
                         strings::period_suffix()
                     )
                 } else {
-                    let condition_str =
-                        condition_serializer::serialize_condition(condition, bindings);
+                    let condition_str = condition_serializer::serialize_condition(condition);
                     let base_no_period = base.trim_end_matches('.');
                     format!(
                         "{}{}",
@@ -64,49 +58,40 @@ pub fn serialize_static_ability(
 
 /// Serializes a [StandardStaticAbility] to its text representation without
 /// trailing punctuation.
-pub fn serialize_standard_static_ability(
-    ability: &StandardStaticAbility,
-    bindings: &mut VariableBindings,
-) -> String {
+pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> String {
     match ability {
         StandardStaticAbility::YourCardsCostIncrease { matching, increase } => {
-            bindings.insert("e".to_string(), VariableValue::Integer(increase.0));
             strings::your_cards_cost_increase(
-                predicate_serializer::serialize_card_predicate_plural(matching, bindings),
+                predicate_serializer::serialize_card_predicate_plural(matching),
                 increase.0,
             )
             .to_string()
         }
         StandardStaticAbility::YourCardsCostReduction { matching, reduction } => {
-            bindings.insert("e".to_string(), VariableValue::Integer(reduction.0));
             strings::your_cards_cost_reduction(
-                predicate_serializer::serialize_card_predicate_plural(matching, bindings),
+                predicate_serializer::serialize_card_predicate_plural(matching),
                 reduction.0,
             )
             .to_string()
         }
         StandardStaticAbility::EnemyCardsCostIncrease { matching, increase } => {
-            bindings.insert("e".to_string(), VariableValue::Integer(increase.0));
             strings::enemy_cards_cost_increase(
-                predicate_serializer::serialize_card_predicate_plural(matching, bindings),
+                predicate_serializer::serialize_card_predicate_plural(matching),
                 increase.0,
             )
             .to_string()
         }
         StandardStaticAbility::SparkBonusOtherCharacters { matching, added_spark } => {
-            bindings.insert("s".to_string(), VariableValue::Integer(added_spark.0));
             strings::spark_bonus_other_characters(
-                predicate_serializer::serialize_card_predicate_plural(matching, bindings),
+                predicate_serializer::serialize_card_predicate_plural(matching),
                 added_spark.0,
             )
             .to_string()
         }
         StandardStaticAbility::AdditionalCostToPlay(cost) => {
-            strings::additional_cost_to_play(cost_serializer::serialize_cost(cost, bindings))
-                .to_string()
+            strings::additional_cost_to_play(cost_serializer::serialize_cost(cost)).to_string()
         }
         StandardStaticAbility::PlayForAlternateCost(alt_cost) => {
-            bindings.insert("e".to_string(), VariableValue::Integer(alt_cost.energy_cost.0));
             let card_type = match alt_cost.card_type {
                 Some(CardTypeContext::Character) => strings::this_character().to_string(),
                 Some(CardTypeContext::Event) => "this event".to_string(),
@@ -114,7 +99,7 @@ pub fn serialize_standard_static_ability(
             };
             if let Some(cost) = &alt_cost.additional_cost {
                 let capitalized_cost =
-                    strings::capitalized_sentence(cost_serializer::serialize_cost(cost, bindings))
+                    strings::capitalized_sentence(cost_serializer::serialize_cost(cost))
                         .to_string();
                 if alt_cost.if_you_do.is_some() {
                     strings::play_for_alternate_cost_abandon(
@@ -146,16 +131,14 @@ pub fn serialize_standard_static_ability(
             strings::has_all_character_types().to_string()
         }
         StandardStaticAbility::MultiplyEnergyGainFromCardEffects { multiplier } => {
-            bindings.insert("n".to_string(), VariableValue::Integer(*multiplier));
             strings::multiply_energy_gain(*multiplier).to_string()
         }
         StandardStaticAbility::MultiplyCardDrawFromCardEffects { multiplier } => {
-            bindings.insert("n".to_string(), VariableValue::Integer(*multiplier));
             strings::multiply_card_draw(*multiplier).to_string()
         }
         StandardStaticAbility::OncePerTurnPlayFromVoid { matching } => {
             strings::once_per_turn_play_from_void(predicate_serializer::serialize_card_predicate(
-                matching, bindings,
+                matching,
             ))
             .to_string()
         }
@@ -171,22 +154,18 @@ pub fn serialize_standard_static_ability(
         }
         StandardStaticAbility::JudgmentTriggersWhenMaterialized { predicate } => {
             strings::judgment_triggers_when_materialized(
-                predicate_serializer::serialize_predicate_plural(predicate, bindings),
+                predicate_serializer::serialize_predicate_plural(predicate),
             )
             .to_string()
         }
         StandardStaticAbility::SparkEqualToPredicateCount { predicate } => {
             strings::spark_equal_to_predicate_count(
-                predicate_serializer::serialize_predicate_plural(predicate, bindings),
+                predicate_serializer::serialize_predicate_plural(predicate),
             )
             .to_string()
         }
         StandardStaticAbility::PlayOnlyFromVoid => strings::play_only_from_void().to_string(),
         StandardStaticAbility::PlayFromHandOrVoidForCost(play_from_hand_or_void) => {
-            bindings.insert(
-                "e".to_string(),
-                VariableValue::Integer(play_from_hand_or_void.energy_cost.0),
-            );
             strings::play_from_hand_or_void_for_cost(play_from_hand_or_void.energy_cost.0)
                 .to_string()
         }
@@ -194,35 +173,32 @@ pub fn serialize_standard_static_ability(
             strings::cards_in_void_have_reclaim().to_string()
         }
         StandardStaticAbility::CostReductionForEach { reduction, quantity } => {
-            bindings.insert("e".to_string(), VariableValue::Integer(reduction.0));
             strings::cost_reduction_for_each(
                 reduction.0,
-                effect_serializer::serialize_for_count_expression(quantity, bindings),
+                effect_serializer::serialize_for_count_expression(quantity),
             )
             .to_string()
         }
         StandardStaticAbility::SparkBonusYourCharacters { matching, added_spark } => {
-            bindings.insert("s".to_string(), VariableValue::Integer(added_spark.0));
             let predicate_text = match matching {
                 ability_data::predicate::CardPredicate::Character => "allies".to_string(),
-                ability_data::predicate::CardPredicate::CharacterType(_) => {
-                    "allied {@plural subtype($t)}".to_string()
+                ability_data::predicate::CardPredicate::CharacterType(subtype) => {
+                    format!(
+                        "allied {{@plural subtype({})}}",
+                        serializer_utils::subtype_phrase_name(*subtype)
+                    )
                 }
-                _ => predicate_serializer::serialize_card_predicate_plural(matching, bindings)
-                    .to_string(),
+                _ => predicate_serializer::serialize_card_predicate_plural(matching).to_string(),
             };
             strings::spark_bonus_your_characters(predicate_text, added_spark.0).to_string()
         }
         StandardStaticAbility::PlayFromVoid(play_from_void) => {
-            if let Some(energy_cost) = play_from_void.energy_cost {
-                bindings.insert("e".to_string(), VariableValue::Integer(energy_cost.0));
-            }
             if let Some(cost) = &play_from_void.additional_cost {
                 let capitalized_cost =
-                    strings::capitalized_sentence(cost_serializer::serialize_cost(cost, bindings))
+                    strings::capitalized_sentence(cost_serializer::serialize_cost(cost))
                         .to_string();
                 if let Some(effect) = &play_from_void.if_you_do {
-                    let effect_text = effect_serializer::serialize_effect(effect, bindings);
+                    let effect_text = effect_serializer::serialize_effect(effect);
                     strings::play_from_void_with_effect(
                         capitalized_cost,
                         play_from_void.energy_cost.map_or(0, |e| e.0),
@@ -237,7 +213,7 @@ pub fn serialize_standard_static_ability(
                     .to_string()
                 }
             } else if let Some(effect) = &play_from_void.if_you_do {
-                let effect_text = effect_serializer::serialize_effect(effect, bindings);
+                let effect_text = effect_serializer::serialize_effect(effect);
                 strings::play_from_void_for_cost_with_effect(
                     play_from_void.energy_cost.map_or(0, |e| e.0),
                     effect_text.trim_end_matches('.'),

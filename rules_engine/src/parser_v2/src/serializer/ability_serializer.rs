@@ -21,7 +21,6 @@ pub struct SerializedAbility {
 
 /// Serializes an ability into its rules text and variable bindings.
 pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
-    let mut variables = VariableBindings::new();
     let text = match ability {
         Ability::Triggered(triggered) => {
             let mut result = String::new();
@@ -36,8 +35,7 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
             if has_once_per_turn {
                 result.push_str(&strings::once_per_turn_prefix().to_string());
             }
-            let trigger =
-                trigger_serializer::serialize_trigger_event(&triggered.trigger, &mut variables);
+            let trigger = trigger_serializer::serialize_trigger_event(&triggered.trigger);
             if has_prefix {
                 result.push_str(&trigger);
             } else {
@@ -50,7 +48,6 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
                     &strings::capitalized_sentence(
                         effect_serializer::serialize_effect_with_context(
                             &triggered.effect,
-                            &mut variables,
                             AbilityContext::Triggered,
                         ),
                     )
@@ -59,16 +56,15 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
             } else {
                 result.push_str(&effect_serializer::serialize_effect_with_context(
                     &triggered.effect,
-                    &mut variables,
                     AbilityContext::Triggered,
                 ));
             }
             result
         }
-        Ability::Event(event) => strings::capitalized_sentence(
-            effect_serializer::serialize_effect(&event.effect, &mut variables),
-        )
-        .to_string(),
+        Ability::Event(event) => {
+            strings::capitalized_sentence(effect_serializer::serialize_effect(&event.effect))
+                .to_string()
+        }
         Ability::Activated(activated) => {
             let mut result = String::new();
             let is_fast = activated.options.as_ref().is_some_and(|options| options.is_fast);
@@ -83,11 +79,7 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
                 .costs
                 .iter()
                 .map(|cost| {
-                    strings::capitalized_sentence(cost_serializer::serialize_cost(
-                        cost,
-                        &mut variables,
-                    ))
-                    .to_string()
+                    strings::capitalized_sentence(cost_serializer::serialize_cost(cost)).to_string()
                 })
                 .collect::<Vec<_>>()
                 .join(", ");
@@ -99,20 +91,19 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
             result.push_str(
                 &strings::capitalized_sentence(effect_serializer::serialize_effect_with_context(
                     &activated.effect,
-                    &mut variables,
                     AbilityContext::Triggered,
                 ))
                 .to_string(),
             );
             result
         }
-        Ability::Named(named) => serialize_named_ability(named, &mut variables),
+        Ability::Named(named) => serialize_named_ability(named),
         Ability::Static(static_ability) => strings::capitalized_sentence(
-            static_ability_serializer::serialize_static_ability(static_ability, &mut variables),
+            static_ability_serializer::serialize_static_ability(static_ability),
         )
         .to_string(),
     };
-    SerializedAbility { text, variables }
+    SerializedAbility { text, variables: VariableBindings::new() }
 }
 
 /// Serializes just the effect portion of an ability, without any costs.
@@ -120,19 +111,18 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
 /// For event/activated abilities, returns only the effect text.
 /// For triggered/static/named abilities, returns the full ability text.
 pub fn serialize_ability_effect(ability: &Ability) -> SerializedAbility {
-    let mut variables = VariableBindings::new();
     let text = match ability {
-        Ability::Event(event) => strings::capitalized_sentence(
-            effect_serializer::serialize_effect(&event.effect, &mut variables),
-        )
-        .to_string(),
-        Ability::Activated(activated) => strings::capitalized_sentence(
-            effect_serializer::serialize_effect(&activated.effect, &mut variables),
-        )
-        .to_string(),
+        Ability::Event(event) => {
+            strings::capitalized_sentence(effect_serializer::serialize_effect(&event.effect))
+                .to_string()
+        }
+        Ability::Activated(activated) => {
+            strings::capitalized_sentence(effect_serializer::serialize_effect(&activated.effect))
+                .to_string()
+        }
         _ => return serialize_ability(ability),
     };
-    SerializedAbility { text, variables }
+    SerializedAbility { text, variables: VariableBindings::new() }
 }
 
 /// Extracts and serializes each modal effect choice from a list of abilities.
@@ -151,15 +141,13 @@ pub fn serialize_modal_choices(
         };
         if let Some(Effect::Modal(choices)) = effect {
             for choice in choices {
-                let mut variables = VariableBindings::new();
                 let text = strings::capitalized_sentence(effect_serializer::serialize_effect(
                     &choice.effect,
-                    &mut variables,
                 ))
                 .to_string();
                 result.insert(ModelEffectChoiceIndex(current_index), SerializedAbility {
                     text,
-                    variables,
+                    variables: VariableBindings::new(),
                 });
                 current_index += 1;
             }
@@ -168,7 +156,7 @@ pub fn serialize_modal_choices(
     result
 }
 
-fn serialize_named_ability(named: &NamedAbility, variables: &mut VariableBindings) -> String {
+fn serialize_named_ability(named: &NamedAbility) -> String {
     match named {
         NamedAbility::Reclaim(cost) => {
             if let Some(energy_cost) = cost {
@@ -178,7 +166,7 @@ fn serialize_named_ability(named: &NamedAbility, variables: &mut VariableBinding
             }
         }
         NamedAbility::ReclaimForCost(cost) => strings::reclaim_with_cost(
-            strings::capitalized_sentence(cost_serializer::serialize_cost(cost, variables)),
+            strings::capitalized_sentence(cost_serializer::serialize_cost(cost)),
         )
         .to_string(),
     }

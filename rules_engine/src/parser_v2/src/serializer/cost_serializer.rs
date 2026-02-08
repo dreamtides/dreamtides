@@ -3,18 +3,17 @@ use ability_data::cost::Cost;
 use strings::strings;
 
 use crate::serializer::predicate_serializer;
-use crate::variables::parser_bindings::VariableBindings;
 
 /// Serializes a cost to its template text representation.
-pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
+pub fn serialize_cost(cost: &Cost) -> String {
     match cost {
         Cost::AbandonCharactersCount { target, count } => match count {
             CollectionExpression::AnyNumberOf => strings::abandon_any_number_of(
-                predicate_serializer::serialize_predicate_plural(target, bindings),
+                predicate_serializer::serialize_predicate_plural(target),
             )
             .to_string(),
             CollectionExpression::Exactly(1) => {
-                strings::abandon_target(predicate_serializer::serialize_predicate(target, bindings))
+                strings::abandon_target(predicate_serializer::serialize_predicate(target))
                     .to_string()
             }
             CollectionExpression::Exactly(n) => strings::abandon_count_allies(*n).to_string(),
@@ -37,49 +36,49 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
         Cost::BanishAllCardsFromYourVoidWithMinCount(min_count) => {
             strings::banish_void_min_count(*min_count).to_string()
         }
-        Cost::BanishFromHand(predicate) => strings::banish_from_hand_cost(
-            predicate_serializer::serialize_predicate(predicate, bindings),
-        )
-        .to_string(),
+        Cost::BanishFromHand(predicate) => {
+            strings::banish_from_hand_cost(predicate_serializer::serialize_predicate(predicate))
+                .to_string()
+        }
         Cost::Choice(costs) => costs
             .iter()
-            .map(|c| serialize_cost(c, bindings))
+            .map(serialize_cost)
             .collect::<Vec<_>>()
             .join(&strings::cost_or_connector().to_string()),
         Cost::ReturnToHand { target, count } => match count {
-            CollectionExpression::Exactly(1) => strings::return_target_to_hand(
-                predicate_serializer::serialize_predicate(target, bindings),
-            )
-            .to_string(),
+            CollectionExpression::Exactly(1) => {
+                strings::return_target_to_hand(predicate_serializer::serialize_predicate(target))
+                    .to_string()
+            }
             CollectionExpression::Exactly(n) => strings::return_count_to_hand(
                 *n,
-                predicate_serializer::serialize_predicate_plural(target, bindings),
+                predicate_serializer::serialize_predicate_plural(target),
             )
             .to_string(),
             CollectionExpression::AllButOne => strings::return_all_but_one_to_hand(
-                predicate_serializer::predicate_base_text(target, bindings),
+                predicate_serializer::predicate_base_text(target),
             )
             .to_string(),
-            CollectionExpression::All => strings::return_all_to_hand(
-                predicate_serializer::serialize_predicate(target, bindings),
-            )
-            .to_string(),
+            CollectionExpression::All => {
+                strings::return_all_to_hand(predicate_serializer::serialize_predicate(target))
+                    .to_string()
+            }
             CollectionExpression::AnyNumberOf => strings::return_any_number_to_hand(
-                predicate_serializer::serialize_predicate(target, bindings),
+                predicate_serializer::serialize_predicate(target),
             )
             .to_string(),
             CollectionExpression::UpTo(n) => strings::return_up_to_to_hand(
                 *n,
-                predicate_serializer::serialize_predicate_plural(target, bindings),
+                predicate_serializer::serialize_predicate_plural(target),
             )
             .to_string(),
             CollectionExpression::EachOther => strings::return_each_other_to_hand(
-                predicate_serializer::serialize_predicate(target, bindings),
+                predicate_serializer::serialize_predicate(target),
             )
             .to_string(),
             CollectionExpression::OrMore(n) => strings::return_or_more_to_hand(
                 *n,
-                predicate_serializer::serialize_predicate_plural(target, bindings),
+                predicate_serializer::serialize_predicate_plural(target),
             )
             .to_string(),
         },
@@ -87,7 +86,7 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
         Cost::BanishAllCardsFromYourVoid => strings::banish_your_void_cost().to_string(),
         Cost::CostList(costs) => costs
             .iter()
-            .map(|c| serialize_cost(c, bindings))
+            .map(serialize_cost)
             .collect::<Vec<_>>()
             .join(&strings::cost_and_connector().to_string()),
     }
@@ -95,9 +94,9 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
 
 /// Serializes a cost used as a trigger cost, wrapping energy costs with a
 /// "pay" prefix.
-pub fn serialize_trigger_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
+pub fn serialize_trigger_cost(cost: &Cost) -> String {
     match cost {
-        Cost::Energy(_) => strings::pay_prefix(&*serialize_cost(cost, bindings)).to_string(),
-        _ => serialize_cost(cost, bindings),
+        Cost::Energy(_) => strings::pay_prefix(&*serialize_cost(cost)).to_string(),
+        _ => serialize_cost(cost),
     }
 }
