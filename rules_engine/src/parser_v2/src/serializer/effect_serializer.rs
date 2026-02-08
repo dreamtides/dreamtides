@@ -10,7 +10,7 @@ use strings::strings;
 
 use crate::serializer::{
     condition_serializer, cost_serializer, predicate_serializer, serializer_utils,
-    static_ability_serializer, text_formatting, trigger_serializer,
+    static_ability_serializer, trigger_serializer,
 };
 use crate::variables::parser_bindings::VariableBindings;
 
@@ -75,7 +75,7 @@ pub fn serialize_standard_effect(
             bindings.insert("c".to_string(), VariableValue::Integer(1));
             format!(
                 "discard a chosen {} from the opponent's hand. They draw {{cards($c)}}.",
-                text_formatting::card_predicate_base_text(predicate).without_article()
+                predicate_serializer::card_predicate_base_text(predicate)
             )
         }
         StandardEffect::GainEnergy { gains } => {
@@ -924,7 +924,7 @@ pub fn serialize_for_count_expression(
         QuantityExpression::PlayedThisTurn(predicate) => {
             format!(
                 "{} you have played this turn",
-                text_formatting::card_predicate_base_text(predicate).without_article()
+                predicate_serializer::card_predicate_base_text(predicate)
             )
         }
         QuantityExpression::AbandonedThisTurn(CardPredicate::Character) => {
@@ -946,40 +946,34 @@ pub fn serialize_for_count_expression(
             "allied {subtype($t)} returned".to_string()
         }
         QuantityExpression::ReturnedToHandThisWay(predicate) => {
-            format!(
-                "{} returned",
-                text_formatting::card_predicate_base_text(predicate).without_article()
-            )
+            format!("{} returned", predicate_serializer::card_predicate_base_text(predicate))
         }
         QuantityExpression::AbandonedThisTurn(predicate) => {
             format!(
                 "{} abandoned this turn",
-                text_formatting::card_predicate_base_text(predicate).without_article()
+                predicate_serializer::card_predicate_base_text(predicate)
             )
         }
         QuantityExpression::AbandonedThisWay(predicate) => {
-            format!(
-                "{} abandoned",
-                text_formatting::card_predicate_base_text(predicate).without_article()
-            )
+            format!("{} abandoned", predicate_serializer::card_predicate_base_text(predicate))
         }
         QuantityExpression::ForEachEnergySpentOnThisCard => "{energy_symbol} spent".to_string(),
         QuantityExpression::CardsDrawnThisTurn(predicate) => {
             format!(
                 "{} you have drawn this turn",
-                text_formatting::card_predicate_base_text(predicate).without_article()
+                predicate_serializer::card_predicate_base_text(predicate)
             )
         }
         QuantityExpression::DiscardedThisTurn(predicate) => {
             format!(
                 "{} you have discarded this turn",
-                text_formatting::card_predicate_base_text(predicate).without_article()
+                predicate_serializer::card_predicate_base_text(predicate)
             )
         }
         QuantityExpression::DissolvedThisTurn(predicate) => {
             format!(
                 "{} which dissolved this turn",
-                text_formatting::card_predicate_base_text(predicate).without_article()
+                predicate_serializer::card_predicate_base_text(predicate)
             )
         }
     }
@@ -995,10 +989,7 @@ fn serialize_allied_card_predicate(
             "allied {subtype($t)}".to_string()
         }
         _ => {
-            format!(
-                "allied {}",
-                text_formatting::card_predicate_base_text(card_predicate).without_article()
-            )
+            format!("allied {}", predicate_serializer::card_predicate_base_text(card_predicate))
         }
     }
 }
@@ -1014,7 +1005,10 @@ fn serialize_allied_card_predicate_plural(
             "allied {@plural subtype($t)}".to_string()
         }
         _ => {
-            format!("allied {}", text_formatting::card_predicate_base_text(card_predicate).plural())
+            format!(
+                "allied {}",
+                predicate_serializer::card_predicate_base_text_plural(card_predicate)
+            )
         }
     }
 }

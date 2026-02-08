@@ -1,8 +1,9 @@
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::variable_value::VariableValue;
-use text_formatting::FormattedText;
+use rlf::{Phrase, Tag, VariantKey};
+use strings::strings;
 
-use crate::serializer::{serializer_utils, text_formatting};
+use crate::serializer::serializer_utils;
 use crate::variables::parser_bindings::VariableBindings;
 
 pub fn serialize_predicate(predicate: &Predicate, bindings: &mut VariableBindings) -> String {
@@ -24,11 +25,11 @@ pub fn serialize_predicate(predicate: &Predicate, bindings: &mut VariableBinding
         }
         Predicate::Another(card_predicate) => {
             // For Another predicates, use ally form
-            your_predicate_formatted(card_predicate, bindings).with_article()
+            with_article(&your_predicate_formatted(card_predicate, bindings))
         }
         Predicate::Any(card_predicate) => serialize_card_predicate(card_predicate, bindings),
         Predicate::Enemy(card_predicate) => {
-            enemy_predicate_formatted(card_predicate, bindings).with_article()
+            with_article(&enemy_predicate_formatted(card_predicate, bindings))
         }
         Predicate::YourVoid(card_predicate) => {
             format!("{} in your void", serialize_card_predicate_plural(card_predicate, bindings))
@@ -40,10 +41,7 @@ pub fn serialize_predicate(predicate: &Predicate, bindings: &mut VariableBinding
             )
         }
         Predicate::AnyOther(card_predicate) => {
-            format!(
-                "another {}",
-                text_formatting::card_predicate_base_text(card_predicate).without_article()
-            )
+            format!("another {}", card_predicate_base_phrase(card_predicate))
         }
     }
 }
@@ -90,22 +88,20 @@ pub fn predicate_base_text(predicate: &Predicate, bindings: &mut VariableBinding
         Predicate::It => "it".to_string(),
         Predicate::Your(card_predicate) => {
             if is_generic_card_type(card_predicate) {
-                text_formatting::card_predicate_base_text(card_predicate).without_article()
+                card_predicate_base_phrase(card_predicate).to_string()
             } else {
                 serialize_your_predicate(card_predicate, bindings)
             }
         }
         Predicate::Another(card_predicate) => serialize_your_predicate(card_predicate, bindings),
-        Predicate::Any(card_predicate) => {
-            text_formatting::card_predicate_base_text(card_predicate).without_article()
-        }
+        Predicate::Any(card_predicate) => card_predicate_base_phrase(card_predicate).to_string(),
         Predicate::Enemy(card_predicate) => {
             // For Prevent/Counterspell contexts, serialize without "enemy" prefix
             // since "enemy" is implicit for played cards being countered.
             match card_predicate {
                 // Generic card types return base text without article
                 _ if is_generic_card_type(card_predicate) => {
-                    text_formatting::card_predicate_base_text(card_predicate).without_article()
+                    card_predicate_base_phrase(card_predicate).to_string()
                 }
                 // CouldDissolve: serialize without "enemy" prefix but include
                 // the full inner target (with article)
@@ -124,22 +120,16 @@ pub fn predicate_base_text(predicate: &Predicate, bindings: &mut VariableBinding
             }
         }
         Predicate::YourVoid(card_predicate) => {
-            format!(
-                "{} in your void",
-                text_formatting::card_predicate_base_text(card_predicate).plural()
-            )
+            format!("{} in your void", phrase_plural(&card_predicate_base_phrase(card_predicate)))
         }
         Predicate::EnemyVoid(card_predicate) => {
             format!(
                 "{} in the opponent's void",
-                text_formatting::card_predicate_base_text(card_predicate).plural()
+                phrase_plural(&card_predicate_base_phrase(card_predicate))
             )
         }
         Predicate::AnyOther(card_predicate) => {
-            format!(
-                "another {}",
-                text_formatting::card_predicate_base_text(card_predicate).without_article()
-            )
+            format!("another {}", card_predicate_base_phrase(card_predicate))
         }
     }
 }
@@ -148,14 +138,14 @@ pub fn serialize_your_predicate(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
 ) -> String {
-    your_predicate_formatted(card_predicate, bindings).without_article()
+    your_predicate_formatted(card_predicate, bindings).to_string()
 }
 
 pub fn serialize_enemy_predicate(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
 ) -> String {
-    enemy_predicate_formatted(card_predicate, bindings).without_article()
+    enemy_predicate_formatted(card_predicate, bindings).to_string()
 }
 
 pub fn serialize_card_predicate(
@@ -164,7 +154,7 @@ pub fn serialize_card_predicate(
 ) -> String {
     match card_predicate {
         CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
-            text_formatting::card_predicate_base_text(card_predicate).with_article()
+            with_article(&card_predicate_base_phrase(card_predicate))
         }
         CardPredicate::CharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
@@ -250,7 +240,7 @@ pub fn serialize_card_predicate_without_article(
 ) -> String {
     match card_predicate {
         CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
-            text_formatting::card_predicate_base_text(card_predicate).without_article()
+            card_predicate_base_phrase(card_predicate).to_string()
         }
         CardPredicate::CharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
@@ -310,7 +300,7 @@ pub fn serialize_card_predicate_plural(
 ) -> String {
     match card_predicate {
         CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
-            text_formatting::card_predicate_base_text(card_predicate).plural()
+            phrase_plural(&card_predicate_base_phrase(card_predicate))
         }
         CardPredicate::CharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
@@ -528,84 +518,119 @@ pub fn serialize_for_each_predicate(
     }
 }
 
+/// Returns the base noun text for a card predicate without an article.
+pub fn card_predicate_base_text(predicate: &CardPredicate) -> String {
+    card_predicate_base_phrase(predicate).to_string()
+}
+
+/// Returns the plural base noun text for a card predicate.
+pub fn card_predicate_base_text_plural(predicate: &CardPredicate) -> String {
+    phrase_plural(&card_predicate_base_phrase(predicate))
+}
+
+/// Returns the base noun phrase for a card predicate using RLF phrases.
+fn card_predicate_base_phrase(predicate: &CardPredicate) -> Phrase {
+    match predicate {
+        CardPredicate::Card => strings::card(),
+        CardPredicate::Character => strings::character(),
+        CardPredicate::Event => strings::event(),
+        CardPredicate::CharacterType(_) => Phrase::builder()
+            .text("{subtype($t)}".to_string())
+            .variants(
+                [(VariantKey::new("other"), "{@plural subtype($t)}".to_string())]
+                    .into_iter()
+                    .collect(),
+            )
+            .build(),
+        CardPredicate::NotCharacterType(_) => make_phrase("character that is not {@a subtype($t)}"),
+        CardPredicate::Fast { target } => card_predicate_base_phrase(target),
+        CardPredicate::CardWithCost { target, .. } => card_predicate_base_phrase(target),
+        CardPredicate::CharacterWithSpark(..) => strings::character(),
+        CardPredicate::CharacterWithMaterializedAbility => strings::character(),
+        CardPredicate::CharacterWithMultiActivatedAbility => strings::character(),
+        CardPredicate::CouldDissolve { .. } => strings::event(),
+        _ => strings::character(),
+    }
+}
+
 fn your_predicate_formatted(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
-) -> FormattedText {
+) -> Phrase {
     match card_predicate {
-        CardPredicate::Character => FormattedText::new("ally"),
-        CardPredicate::Card => FormattedText::new("your card"),
-        CardPredicate::Event => FormattedText::new("your event"),
+        CardPredicate::Character => strings::ally(),
+        CardPredicate::Card => make_phrase("your card"),
+        CardPredicate::Event => make_phrase("your event"),
         CardPredicate::CharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            FormattedText::new("allied {subtype($t)}")
+            make_phrase("allied {subtype($t)}")
         }
         CardPredicate::NotCharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            FormattedText::new("ally that is not {@a subtype($t)}")
+            make_phrase("ally that is not {@a subtype($t)}")
         }
         CardPredicate::CharacterWithSpark(spark, operator) => {
             bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "ally with spark {{$s}}{}",
                 serializer_utils::serialize_operator(operator)
             ))
         }
         CardPredicate::CharacterWithMaterializedAbility => {
-            FormattedText::new("ally with a {materialized} ability")
+            make_phrase("ally with a {materialized} ability")
         }
         CardPredicate::CharacterWithMultiActivatedAbility => {
-            FormattedText::new("ally with an activated ability")
+            make_phrase("ally with an activated ability")
         }
         CardPredicate::Fast { target } => {
-            FormattedText::new(&format!("{{fast}} {}", serialize_fast_target(target, bindings)))
+            make_phrase(&format!("{{fast}} {}", serialize_fast_target(target, bindings)))
         }
         CardPredicate::CardWithCost { target, cost_operator, cost } => {
             bindings.insert("e".to_string(), VariableValue::Integer(cost.0));
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "{} with cost {{energy($e)}}{}",
                 serialize_your_predicate(target, bindings),
                 serializer_utils::serialize_operator(cost_operator)
             ))
         }
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "{} with cost less than the number of allied {}",
                 serialize_your_predicate(target, bindings),
                 serialize_card_predicate_plural(count_matching, bindings)
             ))
         }
         CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "{} with cost less than the abandoned ally's cost",
                 serialize_your_predicate(target, bindings)
             ))
         }
         CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "{} with spark less than the abandoned ally's spark",
                 serialize_your_predicate(target, bindings)
             ))
         }
         CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "{} with spark less than the number of allies abandoned this turn",
                 serialize_your_predicate(target, bindings)
             ))
         }
         CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "{} with cost less than the number of cards in your void",
                 serialize_your_predicate(target, bindings)
             ))
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "{} with spark less than the amount of {{energy_symbol}} paid",
                 serialize_your_predicate(target, bindings)
             ))
         }
-        CardPredicate::CouldDissolve { target } => FormattedText::new(&format!(
+        CardPredicate::CouldDissolve { target } => make_phrase(&format!(
             "your event which could {{dissolve}} {}",
             predicate_base_text(target, bindings)
         )),
@@ -615,80 +640,80 @@ fn your_predicate_formatted(
 fn enemy_predicate_formatted(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
-) -> FormattedText {
+) -> Phrase {
     match card_predicate {
-        CardPredicate::Character => FormattedText::new("enemy"),
-        CardPredicate::Card => FormattedText::new("enemy card"),
+        CardPredicate::Character => strings::enemy(),
+        CardPredicate::Card => make_phrase("enemy card"),
         CardPredicate::CharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            FormattedText::new("enemy {subtype($t)}")
+            make_phrase("enemy {subtype($t)}")
         }
         CardPredicate::NotCharacterType(subtype) => {
             bindings.insert("t".to_string(), VariableValue::Subtype(*subtype));
-            FormattedText::new_non_vowel("non-{subtype($t)} enemy")
+            make_phrase_non_vowel("non-{subtype($t)} enemy")
         }
         CardPredicate::CharacterWithSpark(spark, operator) => {
             bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "enemy with spark {{$s}}{}",
                 serializer_utils::serialize_operator(operator)
             ))
         }
         CardPredicate::CharacterWithMaterializedAbility => {
-            FormattedText::new("enemy with a {materialized} ability")
+            make_phrase("enemy with a {materialized} ability")
         }
         CardPredicate::CharacterWithMultiActivatedAbility => {
-            FormattedText::new("enemy with an activated ability")
+            make_phrase("enemy with an activated ability")
         }
         CardPredicate::CardWithCost { cost_operator, cost, .. } => {
             bindings.insert("e".to_string(), VariableValue::Integer(cost.0));
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "enemy with cost {{energy($e)}}{}",
                 serializer_utils::serialize_operator(cost_operator)
             ))
         }
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "{} with cost less than the number of allied {}",
                 serialize_enemy_predicate(target, bindings),
                 serialize_card_predicate_plural(count_matching, bindings)
             ))
         }
         CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "{} with cost less than the abandoned ally's cost",
                 serialize_enemy_predicate(target, bindings)
             ))
         }
         CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "{} with cost less than the number of cards in your void",
                 serialize_enemy_predicate(target, bindings)
             ))
         }
         CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "{} with spark less than that ally's spark",
                 serialize_enemy_predicate(target, bindings)
             ))
         }
         CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "{} with spark less than the number of allies abandoned this turn",
                 serialize_enemy_predicate(target, bindings)
             ))
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
-            FormattedText::new(&format!(
+            make_phrase(&format!(
                 "{} with spark less than the amount of {{energy_symbol}} paid",
                 serialize_enemy_predicate(target, bindings)
             ))
         }
         CardPredicate::Fast { target } => {
-            FormattedText::new(&format!("{{fast}} {}", serialize_fast_target(target, bindings)))
+            make_phrase(&format!("{{fast}} {}", serialize_fast_target(target, bindings)))
         }
-        CardPredicate::Event => FormattedText::new("enemy event"),
-        CardPredicate::CouldDissolve { target } => FormattedText::new(&format!(
+        CardPredicate::Event => make_phrase("enemy event"),
+        CardPredicate::CouldDissolve { target } => make_phrase(&format!(
             "event which could {{dissolve}} {}",
             serialize_predicate(target, bindings)
         )),
@@ -799,4 +824,37 @@ fn serialize_enemy_predicate_plural(
 /// qualifiers for round-trip compatibility.
 fn is_generic_card_type(card_predicate: &CardPredicate) -> bool {
     matches!(card_predicate, CardPredicate::Card | CardPredicate::Character | CardPredicate::Event)
+}
+
+/// Creates a `Phrase` from a text string, auto-detecting the article tag
+/// based on whether the text starts with a vowel sound.
+fn make_phrase(text: &str) -> Phrase {
+    let tag = if text.starts_with(['a', 'e', 'i', 'o', 'u']) { "an" } else { "a" };
+    Phrase::builder().text(text.to_string()).tags(vec![Tag::new(tag)]).build()
+}
+
+/// Creates a `Phrase` with explicit non-vowel article treatment.
+fn make_phrase_non_vowel(text: &str) -> Phrase {
+    Phrase::builder().text(text.to_string()).tags(vec![Tag::new("a")]).build()
+}
+
+/// Returns the text of a phrase with its appropriate article prepended.
+fn with_article(phrase: &Phrase) -> String {
+    if phrase.has_tag("an") {
+        format!("an {}", phrase.text)
+    } else {
+        format!("a {}", phrase.text)
+    }
+}
+
+/// Returns the plural form of a phrase by selecting the "other" variant.
+///
+/// Falls back to appending "s" to the default text if no "other" variant
+/// is defined.
+fn phrase_plural(phrase: &Phrase) -> String {
+    if phrase.variants.contains_key(&VariantKey::new("other")) {
+        phrase.variant("other").to_string()
+    } else {
+        format!("{}s", phrase.text)
+    }
 }

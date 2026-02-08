@@ -4,7 +4,7 @@ use ability_data::variable_value::VariableValue;
 
 use crate::serializer::{
     condition_serializer, cost_serializer, effect_serializer, predicate_serializer,
-    serializer_utils, text_formatting,
+    serializer_utils,
 };
 use crate::variables::parser_bindings::VariableBindings;
 
@@ -150,7 +150,7 @@ pub fn serialize_standard_static_ability(
         StandardStaticAbility::YouMayPlayFromTopOfDeck { matching } => {
             format!(
                 "you may play {} from the top of your deck.",
-                text_formatting::card_predicate_base_text(matching).plural()
+                predicate_serializer::card_predicate_base_text_plural(matching)
             )
         }
         StandardStaticAbility::JudgmentTriggersWhenMaterialized { predicate } => {
