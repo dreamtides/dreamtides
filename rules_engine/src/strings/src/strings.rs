@@ -692,4 +692,135 @@ rlf::rlf! {
     and_joiner = " and ";
     // Terminal punctuation for ability text.
     period_suffix = ".";
+
+    // =========================================================================
+    // Predicate base entity nouns
+    // =========================================================================
+
+    // Character noun with article metadata.
+    character = :a{ one: "character", other: "characters" };
+    // Event noun with article metadata.
+    event = :an{ one: "event", other: "events" };
+    // Enemy noun with article metadata.
+    enemy = :an{ one: "enemy", other: "enemies" };
+
+    // =========================================================================
+    // Ownership-qualified predicate nouns
+    // =========================================================================
+
+    // Your card noun with article metadata.
+    your_card = :a{ one: "your card", other: "your cards" };
+    // Your character noun with article metadata.
+    your_character = :a{ one: "your character", other: "your characters" };
+    // Your event noun with article metadata.
+    your_event = :a{ one: "your event", other: "your events" };
+    // Enemy card noun with article metadata.
+    enemy_card = :an{ one: "enemy card", other: "enemy cards" };
+    // Enemy character noun with article metadata.
+    enemy_character = :an{ one: "enemy character", other: "enemy characters" };
+    // Enemy event noun with article metadata.
+    enemy_event = :an{ one: "enemy event", other: "enemy events" };
+    // Allied character noun with article metadata.
+    allied_character = :an{ one: "allied character", other: "allied characters" };
+    // Allied event noun with article metadata.
+    allied_event = :an{ one: "allied event", other: "allied events" };
+    // Other character noun with article metadata.
+    other_character = :an{ one: "other character", other: "other characters" };
+
+    // =========================================================================
+    // Compound predicate nouns with subtype propagation
+    // =========================================================================
+
+    // Allied subtype noun inheriting article metadata from subtype.
+    allied_subtype($t) = :from($t) "allied {$t}";
+    // Enemy subtype noun inheriting article metadata from subtype.
+    enemy_subtype($t) = :from($t) "enemy {$t}";
+    // Your subtype noun inheriting article metadata from subtype.
+    your_subtype($t) = :from($t) "your {$t}";
+    // Other subtype noun inheriting article metadata from subtype.
+    other_subtype($t) = :from($t) "other {$t}";
+    // Subtype in your void inheriting article metadata from subtype.
+    subtype_in_your_void($t) = :from($t) "{$t} in your void";
+
+    // =========================================================================
+    // For-each predicate phrases
+    // =========================================================================
+
+    // For-each ally phrase (without article).
+    for_each_ally = "ally";
+    // For-each allied character phrase.
+    for_each_allied_character = "allied character";
+    // For-each enemy phrase.
+    for_each_enemy = "enemy";
+    // For-each character phrase.
+    for_each_character = "character";
+    // For-each card phrase.
+    for_each_card = "card";
+    // For-each card in your void phrase.
+    for_each_card_in_your_void = "card in your void";
+    // For-each this character phrase.
+    for_each_this_character = "this character";
+    // For-each that character phrase.
+    for_each_that_character = "that character";
+    // For-each other character phrase.
+    for_each_other_character = "other character";
+    // For-each allied event phrase.
+    for_each_allied_event = "allied event";
+    // For-each event phrase.
+    for_each_event = "event";
+    // For-each character in your void phrase.
+    for_each_character_in_your_void = "character in your void";
+    // For-each event in your void phrase.
+    for_each_event_in_your_void = "event in your void";
+    // For-each card in the opponent's void phrase.
+    for_each_card_in_enemy_void = "card in the opponent's void";
+    // For-each character in the opponent's void phrase.
+    for_each_character_in_enemy_void = "character in the opponent's void";
+    // For-each event in the opponent's void phrase.
+    for_each_event_in_enemy_void = "event in the opponent's void";
+    // For-each allied subtype phrase.
+    for_each_allied_subtype($t) = "allied {subtype($t)}";
+    // For-each enemy subtype phrase.
+    for_each_enemy_subtype($t) = "enemy {subtype($t)}";
+    // For-each subtype phrase.
+    for_each_subtype($t) = "{subtype($t)}";
+    // For-each other subtype phrase.
+    for_each_other_subtype($t) = "other {subtype($t)}";
+    // For-each subtype in your void phrase.
+    for_each_subtype_in_your_void($t) = "{subtype($t)} in your void";
+    // For-each ally with spark condition phrase.
+    for_each_ally_with_spark($s, $op) = "ally with spark {$s}{$op}";
+
+    // =========================================================================
+    // Count expression phrases
+    // =========================================================================
+
+    // Ally abandoned this turn for count expressions.
+    ally_abandoned_this_turn = "ally abandoned this turn";
+    // Allied subtype abandoned this turn for count expressions.
+    allied_subtype_abandoned_this_turn($t) = "allied {subtype($t)} abandoned this turn";
+    // Ally abandoned (this way) for count expressions.
+    ally_abandoned = "ally abandoned";
+    // Allied subtype abandoned (this way) for count expressions.
+    allied_subtype_abandoned($t) = "allied {subtype($t)} abandoned";
+    // Ally returned to hand for count expressions.
+    ally_returned = "ally returned";
+    // Allied subtype returned to hand for count expressions.
+    allied_subtype_returned($t) = "allied {subtype($t)} returned";
+    // Generic card predicate returned for count expressions.
+    card_predicate_returned($base) = "{$base} returned";
+    // Energy spent for count expressions.
+    energy_spent = "{energy_symbol} spent";
+    // Card predicate played this turn for count expressions.
+    card_predicate_played_this_turn($base) = "{$base} you have played this turn";
+    // Card predicate drawn this turn for count expressions.
+    card_predicate_drawn_this_turn($base) = "{$base} you have drawn this turn";
+    // Card predicate discarded this turn for count expressions.
+    card_predicate_discarded_this_turn($base) = "{$base} you have discarded this turn";
+    // Card predicate dissolved this turn for count expressions.
+    card_predicate_dissolved_this_turn($base) = "{$base} which dissolved this turn";
+    // Generic card predicate abandoned this turn for count expressions.
+    card_predicate_abandoned_this_turn($base) = "{$base} abandoned this turn";
+    // Generic card predicate abandoned for count expressions.
+    card_predicate_abandoned($base) = "{$base} abandoned";
 }
