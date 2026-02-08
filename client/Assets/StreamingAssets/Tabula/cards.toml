@@ -2,7 +2,7 @@
 name = "Titan of Forgotten Echoes"
 id = "d31723e7-8faa-41e3-89b6-c30d8fdf9cca"
 energy-cost = 6
-rules-text = "When you play {cards_numeral(c)} in a turn, {reclaim} this character."
+rules-text = "When you play {cards_numeral($c)} in a turn, {reclaim} this character."
 variables = "c: 2"
 card-type = "Character"
 subtype = "Ancient"
@@ -17,7 +17,7 @@ card-number = 1
 name = "Beacon of Tomorrow"
 id = "6d7969d2-9d18-4a38-8c26-c900aca5f1d4"
 energy-cost = 2
-rules-text = "{Discover} a card with cost {energy(e)}."
+rules-text = "{Discover} a card with cost {energy($e)}."
 variables = "e: 2"
 card-type = "Event"
 is-fast = false
@@ -50,7 +50,7 @@ name = "Evacuation Enforcer"
 id = "5aee5a0d-c22a-4c09-9612-248d28c3df2f"
 energy-cost = 2
 rules-text = """
-{Judgment} You may draw {cards(c)}, then discard {cards(d)}.
+{Judgment} You may draw {cards($c)}, then discard {cards($d)}.
 """
 variables = """
 c: 2
@@ -69,9 +69,9 @@ name = "Moonlit Voyage"
 id = "8cc1a7da-42f8-4ab8-a41a-b9c8867f2dc4"
 energy-cost = 2
 rules-text = """
-Draw {cards(c)}. Discard {cards(d)}.
+Draw {cards($c)}. Discard {cards($d)}.
 
-{Reclaim_For_Cost(r)}"""
+{Reclaim_For_Cost($r)}"""
 variables = """
 c: 2
 d: 2
@@ -106,7 +106,7 @@ variables = ""
 name = "Pattern Seeker"
 id = "bd9ec464-fac5-4f42-85f5-2c61e2f04636"
 energy-cost = 2
-rules-text = "{Judgment} You may discard {cards(d)} to draw {cards(c)} and gain {points(p)}."
+rules-text = "{Judgment} You may discard {cards($d)} to draw {cards($c)} and gain {points($p)}."
 variables = """
 d: 1
 c: 1
@@ -139,7 +139,7 @@ variables = ""
 name = "Synaptic Sentinel"
 id = "c9531521-b8ae-4ce0-8857-474e60aa814a"
 energy-cost = 3
-rules-text = "{Judgment} {Foresee(f)}."
+rules-text = "{Judgment} {Foresee($f)}."
 variables = "f: 1"
 card-type = "Character"
 subtype = "Agent"
@@ -154,7 +154,7 @@ card-number = 9
 name = "The Rising God"
 id = "fb2661ee-387c-4a8f-965e-dd89be65cfe0"
 energy-cost = 9
-rules-text = "Abandon {count_allies(a)}: {Reclaim} this character."
+rules-text = "Abandon {count_allies($a)}: {Reclaim} this character."
 variables = "a: 2"
 card-type = "Character"
 subtype = "Ancient"
@@ -170,7 +170,7 @@ name = "Apocalypse Vigilante"
 id = "b6c8065c-ddc0-4eb1-9243-a3dcdcc870a4"
 energy-cost = 3
 rules-text = """
-When you discard a card, gain {points(p)}.
+When you discard a card, gain {points($p)}.
 """
 variables = "p: 1"
 card-type = "Character"
@@ -186,7 +186,7 @@ subtype = ""
 name = "Ethereal Trailblazer"
 id = "2c037f79-f049-4f19-b73a-50231ad7e751"
 energy-cost = 0
-rules-text = "{Judgment} Gain {energy(e)}."
+rules-text = "{Judgment} Gain {energy($e)}."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Warrior"
@@ -202,7 +202,7 @@ name = "Glimpse of Infinity"
 id = "a23df796-03d2-4082-9c30-fe6958e65ffe"
 energy-cost = 0
 rules-text = """
-Gain {energy(e)}.
+Gain {energy($e)}.
 """
 variables = "e: 3"
 card-type = "Event"
@@ -218,7 +218,7 @@ spark = ""
 name = "Unleash Ruin"
 id = "187870b3-165c-41ea-8126-abb096f5d6ab"
 energy-cost = 2
-rules-text = "{Dissolve} an enemy. You lose {points(p)}."
+rules-text = "{Dissolve} an enemy. You lose {points($p)}."
 variables = "p: 4"
 card-type = "Event"
 is-fast = false
@@ -233,7 +233,7 @@ spark = ""
 name = "Forgotten Titan"
 id = "8fb2e9d0-28e5-4253-a61c-59f7d4044d59"
 energy-cost = 5
-rules-text = "This character costs {energy(e)} if you have discarded a card this turn."
+rules-text = "This character costs {energy($e)} if you have discarded a card this turn."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Ancient"
@@ -248,7 +248,7 @@ card-number = 15
 name = "Eclipse Herald"
 id = "e5ac026b-a397-47ee-929d-46de1177784c"
 energy-cost = 2
-rules-text = "{Judgment} You may {banish} {cards(c)} from your void to {dissolve} an enemy with cost {energy(e)} or less. "
+rules-text = "{Judgment} You may {banish} {cards($c)} from your void to {dissolve} an enemy with cost {energy($e)} or less. "
 variables = """
 c: 3
 e: 2"""
@@ -266,7 +266,7 @@ name = "Chronicle Reclaimer"
 id = "177f4f38-2265-459d-a0a5-db196f32c6e1"
 energy-cost = 2
 rules-text = """
-{Judgment} Draw {cards(c)}, then discard {cards(d)}.
+{Judgment} Draw {cards($c)}, then discard {cards($d)}.
 """
 variables = """
 c: 1
@@ -301,7 +301,7 @@ spark = ""
 name = "Mother of Flames"
 id = "04f44172-4877-476e-aa91-36a6eb50b53c"
 energy-cost = 2
-rules-text = "When you discard a card, {kindle(k)}."
+rules-text = "When you discard a card, {kindle($k)}."
 variables = "k: 1"
 card-type = "Character"
 subtype = "Renegade"
@@ -316,7 +316,7 @@ card-number = 19
 name = "The Calling Night"
 id = "be97e5e0-eebb-4b90-a676-fcf909b35600"
 energy-cost = 2
-rules-text = "{Judgment} Draw {cards(c)}, then the opponent gains {points(p)}."
+rules-text = "{Judgment} Draw {cards($c)}, then the opponent gains {points($p)}."
 variables = """
 c: 1
 p: 2"""
@@ -334,7 +334,7 @@ name = "Starsea Traveler"
 id = "f06932ac-6d8a-493f-b47e-9134676ea396"
 energy-cost = 4
 rules-text = """
-Once per turn, you may play a character with cost {energy(e)} or less from your void.
+Once per turn, you may play a character with cost {energy($e)} or less from your void.
 """
 variables = "e:2"
 card-type = "Character"
@@ -351,7 +351,7 @@ name = "Urban Cipher"
 id = "aa0cd61a-13ce-4d61-b063-578686d1445a"
 energy-cost = 4
 rules-text = """
-{Materialized} Discard {cards(d)}, then draw {cards(c)}.
+{Materialized} Discard {cards($d)}, then draw {cards($c)}.
 """
 variables = """
 d: 2
@@ -369,7 +369,7 @@ card-number = 22
 name = "Reunion"
 id = "ddde23e7-939c-4b0f-be6a-ecc1e38c92f0"
 energy-cost = 2
-rules-text = "You may return a character from your void to your hand, then draw {cards(c)}."
+rules-text = "You may return a character from your void to your hand, then draw {cards($c)}."
 variables = "c: 1"
 card-type = "Event"
 is-fast = false
@@ -401,7 +401,7 @@ spark = ""
 name = "Duneveil Vanguard"
 id = "adfd1cfe-459b-4a9b-bc90-203847082a03"
 energy-cost = 2
-rules-text = "{Judgment} You may discard {cards(d)} to {dissolve} an enemy with spark {s} or less."
+rules-text = "{Judgment} You may discard {cards($d)} to {dissolve} an enemy with spark {$s} or less."
 variables = """
 d: 1
 s: 1"""
@@ -418,7 +418,7 @@ card-number = 25
 name = "Torchbearer of the Abyss"
 id = "dfcf69cb-c569-484a-8a98-b673a5c47899"
 energy-cost = 4
-rules-text = "Once per turn, when you discard a card, gain {energy(e)}, then {kindle(k)}."
+rules-text = "Once per turn, when you discard a card, gain {energy($e)}, then {kindle($k)}."
 variables = """
 e: 1
 k: 2"""
@@ -435,7 +435,7 @@ card-number = 26
 name = "The Devourer"
 id = "99720e39-6bad-4c6c-867c-7bc5c326195e"
 energy-cost = 8
-rules-text = "{Banish} your void with {count(n)} or more cards: {Reclaim} this character."
+rules-text = "{Banish} your void with {count($n)} or more cards: {Reclaim} this character."
 variables = "n: 8"
 card-type = "Character"
 subtype = "Ancient"
@@ -451,9 +451,9 @@ name = "Nocturne"
 id = "cb445b05-ea7b-4a1b-9484-110021e266f3"
 energy-cost = 3
 rules-text = """
-{Materialized} Draw {cards(c)}, then discard {cards(d)}.
+{Materialized} Draw {cards($c)}, then discard {cards($d)}.
 
-{Reclaim_For_Cost(r)}"""
+{Reclaim_For_Cost($r)}"""
 variables = """
 c: 1
 d: 1
@@ -501,7 +501,7 @@ variables = ""
 name = "The Dread Sovereign"
 id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
 energy-cost = 3
-rules-text = "{Judgment} You may abandon {@a subtype(t)} to {discover} {@a subtype(t)} with cost {energy(e)} higher and {materialize} it."
+rules-text = "{Judgment} You may abandon {@a subtype($t)} to {discover} {@a subtype($t)} with cost {energy($e)} higher and {materialize} it."
 variables = """
 t: Warrior
 e: 1"""
@@ -518,7 +518,7 @@ card-number = 31
 name = "Tranquil Duelist"
 id = "84eedef8-9dc9-42ef-afe8-07bc1882f7ee"
 energy-cost = 2
-rules-text = "{Materialized_Dissolved} Draw {cards(c)}."
+rules-text = "{Materialized_Dissolved} Draw {cards($c)}."
 variables = "c: 1"
 card-type = "Character"
 subtype = "Warrior"
@@ -548,7 +548,7 @@ variables = ""
 name = "Assault Leader"
 id = "7163d032-c2db-44c0-b9d4-624994a0e648"
 energy-cost = 3
-rules-text = "{energy(e)}: This character gains +{s} spark for each allied {subtype(t)}."
+rules-text = "{energy($e)}: This character gains +{$s} spark for each allied {subtype($t)}."
 variables = """
 e: 4
 s: 1
@@ -566,7 +566,7 @@ card-number = 34
 name = "Ride of the Vanguard"
 id = "e79d484f-d564-4429-9eca-0f90d2af5ef5"
 energy-cost = 2
-rules-text = "An ally gains +{s} spark for each allied {subtype(t)}."
+rules-text = "An ally gains +{$s} spark for each allied {subtype($t)}."
 variables = """
 s: 1
 t: Warrior"""
@@ -584,7 +584,7 @@ name = "Company Commander"
 id = "5dd8c16c-e8ed-4591-83c1-bdd610bed5a2"
 energy-cost = 2
 rules-text = """
-When you {materialize} an allied {subtype(t)}, this character gains +{s} spark.
+When you {materialize} an allied {subtype($t)}, this character gains +{$s} spark.
 """
 variables = """
 t: Warrior
@@ -603,7 +603,7 @@ name = "Lumin-Gate Seer"
 id = "d4123a89-fa76-46f9-a8b7-6a1d4ecc4c4f"
 energy-cost = 4
 rules-text = """
-Once per turn, when you {materialize} a character with cost {energy(e)} or less, draw {cards(c)}.
+Once per turn, when you {materialize} a character with cost {energy($e)} or less, draw {cards($c)}.
 """
 variables = """
 e: 2
@@ -621,7 +621,7 @@ card-number = 37
 name = "Veil Shatter"
 id = "4a4db2a7-0d00-4762-8dad-18648ddbc4fc"
 energy-cost = 2
-rules-text = "{Banish} an enemy with cost {energy(e)} or less."
+rules-text = "{Banish} an enemy with cost {energy($e)} or less."
 variables = "e: 2"
 card-type = "Event"
 is-fast = false
@@ -636,7 +636,7 @@ spark = ""
 name = "Judgment of the Blade"
 id = "e0c88a46-b85f-4497-ab19-850acc868863"
 energy-cost = 1
-rules-text = "{Banish} a non-{subtype(t)} enemy."
+rules-text = "{Banish} a non-{subtype($t)} enemy."
 variables = "t: Warrior"
 card-type = "Event"
 is-fast = false
@@ -651,7 +651,7 @@ spark = ""
 name = "Shatter the Frail"
 id = "56020364-cbe8-4500-900f-33510a95ff10"
 energy-cost = 2
-rules-text = "{Dissolve} an enemy with spark {s} or less."
+rules-text = "{Dissolve} an enemy with spark {$s} or less."
 variables = "s: 1"
 card-type = "Event"
 is-fast = true
@@ -666,7 +666,7 @@ spark = ""
 name = "Fury of the Clan"
 id = "cd3d7b81-de72-4668-b505-e09848a477be"
 energy-cost = 1
-rules-text = "{Dissolve} an enemy with cost less than the number of allied {@plural subtype(t)}."
+rules-text = "{Dissolve} an enemy with cost less than the number of allied {@plural subtype($t)}."
 variables = "t: Warrior"
 card-type = "Event"
 is-fast = false
@@ -681,7 +681,7 @@ spark = ""
 name = "Summons of the Bonded"
 id = "ff0fc84e-5d40-4317-820d-76d2a660c453"
 energy-cost = 1
-rules-text = "{Discover} {@a subtype(t)}."
+rules-text = "{Discover} {@a subtype($t)}."
 variables = "t: Warrior"
 card-type = "Event"
 is-fast = false
@@ -696,7 +696,7 @@ spark = ""
 name = "Ashen Avenger"
 id = "b9b26dbb-0384-4839-bff2-3b25c4c26518"
 energy-cost = 3
-rules-text = "{energy(e)}, {Banish} another card in your void: {Reclaim} this character."
+rules-text = "{energy($e)}, {Banish} another card in your void: {Reclaim} this character."
 variables = "e: 2"
 card-type = "Character"
 subtype = "Warrior"
@@ -711,7 +711,7 @@ card-number = 43
 name = "Dreadcall Warden"
 id = "eb84ba88-8352-45e8-8cf9-d160227db3ad"
 energy-cost = 2
-rules-text = "{energy(e)}, Abandon an ally with spark {s} or less: Draw {cards(c)}."
+rules-text = "{energy($e)}, Abandon an ally with spark {$s} or less: Draw {cards($c)}."
 variables = """
 e: 2
 s: 1
@@ -729,7 +729,7 @@ card-number = 44
 name = "Wolfbond Chieftain"
 id = "a5275ef5-2896-4a0a-89de-96b241e05472"
 energy-cost = 0
-rules-text = "{Materialized_Judgment} With {count_allied_subtype(a, t)}, gain {energy(e)}. "
+rules-text = "{Materialized_Judgment} With {count_allied_subtype($a, $t)}, gain {energy($e)}. "
 variables = """
 t: Warrior
 a: 2
@@ -747,7 +747,7 @@ card-number = 45
 name = "Dawnblade Wanderer"
 id = "d8f9abc2-a864-47b9-96e6-2ced9f9ba208"
 energy-cost = 1
-rules-text = "{Materialized_Judgment} Gain {energy(e)}."
+rules-text = "{Materialized_Judgment} Gain {energy($e)}."
 variables = "e: 2"
 card-type = "Character"
 subtype = "Warrior"
@@ -763,7 +763,7 @@ name = "Bloomweaver"
 id = "725cf0ad-b5d1-400e-9a55-31e0bb62f612"
 energy-cost = 1
 rules-text = """
-Once per turn, when you {materialize} a character, gain {energy(e)}.
+Once per turn, when you {materialize} a character, gain {energy($e)}.
 """
 variables = "e: 1"
 card-type = "Character"
@@ -779,7 +779,7 @@ card-number = 47
 name = "Seeker for the Way"
 id = "a42e3d7a-35a0-4dbc-a85d-c71b191d44a8"
 energy-cost = 3
-rules-text = "{Materialized} Draw {@a subtype(t)} from your deck."
+rules-text = "{Materialized} Draw {@a subtype($t)} from your deck."
 variables = "t: Warrior"
 card-type = "Character"
 subtype = "Warrior"
@@ -794,7 +794,7 @@ card-number = 48
 name = "Rebirth Ritualist"
 id = "1b69b697-4829-4e25-8d53-7462572cbb55"
 energy-cost = 2
-rules-text = "{energy(e)}, Abandon a character, Discard your hand: Draw {cards(c)}."
+rules-text = "{energy($e)}, Abandon a character, Discard your hand: Draw {cards($c)}."
 variables = """
 e: 2
 c: 3"""
@@ -828,7 +828,7 @@ variables = ""
 name = "Skyflame Commander"
 id = "07dea7d2-6d3b-40f6-9740-cfefd44aaaaf"
 energy-cost = 2
-rules-text = "Allied {@plural subtype(t)} have +{s} spark."
+rules-text = "Allied {@plural subtype($t)} have +{$s} spark."
 variables = """
 t: Warrior
 s: 1"""
@@ -845,7 +845,7 @@ card-number = 51
 name = "Spirit Field Reclaimer"
 id = "7d1820ef-80c4-415e-bc36-7d361259225c"
 energy-cost = 2
-rules-text = "{Judgment} You may pay {energy(e)} to {kindle(k)} and {banish} {cards(c)} from the opponent's void."
+rules-text = "{Judgment} You may pay {energy($e)} to {kindle($k)} and {banish} {cards($c)} from the opponent's void."
 variables = """
 e: 1
 k: 1
@@ -863,7 +863,7 @@ card-number = 52
 name = "Cloaked Sentinel"
 id = "f453990c-934d-42c6-a12c-2a7d50689909"
 energy-cost = 3
-rules-text = "The opponent's events cost {energy(e)} more."
+rules-text = "The opponent's events cost {energy($e)} more."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Mage"
@@ -893,7 +893,7 @@ variables = ""
 name = "Frost Visionary"
 id = "80076dbf-efdb-4130-80b9-45ebc8b3a235"
 energy-cost = 2
-rules-text = "{Materialized} Draw {cards(c)}."
+rules-text = "{Materialized} Draw {cards($c)}."
 variables = "c: 1"
 card-type = "Character"
 subtype = "Warrior"
@@ -908,7 +908,7 @@ card-number = 55
 name = "Forsworn Champion"
 id = "3baa112c-951f-4552-bc9e-0a3ee61543fa"
 energy-cost = 4
-rules-text = "Abandon an ally: This character gains +{s} spark."
+rules-text = "Abandon an ally: This character gains +{$s} spark."
 variables = "s: 1"
 card-type = "Character"
 subtype = "Warrior"
@@ -923,7 +923,7 @@ card-number = 56
 name = "Blade of Unity"
 id = "6d7c5ef9-14ed-4301-8aa5-a07944d1918f"
 energy-cost = 2
-rules-text = "This character's spark is equal to the number of allied {@plural subtype(t)}."
+rules-text = "This character's spark is equal to the number of allied {@plural subtype($t)}."
 variables = "t: Warrior"
 card-type = "Character"
 subtype = "Warrior"
@@ -938,7 +938,7 @@ card-number = 57
 name = "Invoker of Myths"
 id = "e3b7d716-2776-4469-af9c-4dc082e0083c"
 energy-cost = 4
-rules-text = "Once per turn, when you {materialize} {@a subtype(t)}, draw {cards(c)}."
+rules-text = "Once per turn, when you {materialize} {@a subtype($t)}, draw {cards($c)}."
 variables = """
 t: Warrior
 c: 1"""
@@ -955,7 +955,7 @@ card-number = 58
 name = "Speaker for the Forgotten"
 id = "59f14f33-3aff-45d2-9492-fb06c0ef7fea"
 energy-cost = 5
-rules-text = "When you play {@a subtype(t)}, {reclaim} a random character with cost {energy(e)} or less."
+rules-text = "When you play {@a subtype($t)}, {reclaim} a random character with cost {energy($e)} or less."
 variables = """
 t: Warrior
 e: 3"""
@@ -973,7 +973,7 @@ name = "Infernal Rest"
 id = "d02cc851-4c89-463a-b988-a94dfefef797"
 energy-cost = 2
 rules-text = """
-Lose {maximum_energy(m)}: Play this event for {energy(e)}.
+Lose {maximum_energy($m)}: Play this event for {energy($e)}.
 
 {Prevent} a played card."""
 variables = """
@@ -993,7 +993,7 @@ name = "Echoing Denial"
 id = "4666416e-5f12-47a3-9e7e-56943c0d6e44"
 energy-cost = 5
 rules-text = """
-{Banish} a card from hand: Play this event for {energy(e)}.
+{Banish} a card from hand: Play this event for {energy($e)}.
 
 {Prevent} a played card."""
 variables = "e: 0"
@@ -1011,7 +1011,7 @@ name = "Ripple of Defiance"
 id = "9c605a08-dac4-4c3e-8aff-437b79809937"
 energy-cost = 1
 rules-text = """
-{Prevent} a played event unless the opponent pays {energy(e)}.
+{Prevent} a played event unless the opponent pays {energy($e)}.
 """
 variables = "e: 2"
 card-type = "Event"
@@ -1027,7 +1027,7 @@ spark = ""
 name = "Break the Veil"
 id = "129bd326-ec4d-4da6-aff6-f1c2b78f10e4"
 energy-cost = 1
-rules-text = "Discard a chosen card with cost {energy(e)} or less from the opponent's hand."
+rules-text = "Discard a chosen card with cost {energy($e)} or less from the opponent's hand."
 variables = "e: 3"
 card-type = "Event"
 is-fast = false
@@ -1058,7 +1058,7 @@ name = "Fell the Mighty"
 id = "ff10c460-125f-4f77-b9e2-4c4f33adff3e"
 energy-cost = 4
 rules-text = """
-{Banish} a card from hand: Play this event for {energy(e)}.
+{Banish} a card from hand: Play this event for {energy($e)}.
 
 {Dissolve} an enemy."""
 variables = "e: 0"
@@ -1075,7 +1075,7 @@ spark = ""
 name = "Shattering Gambit"
 id = "754a3d7d-24e8-40e0-9ed8-f99672bc76eb"
 energy-cost = 0
-rules-text = "{Dissolve} an enemy. The opponent gains {points(p)}."
+rules-text = "{Dissolve} an enemy. The opponent gains {points($p)}."
 variables = "p: 3"
 card-type = "Event"
 is-fast = true
@@ -1106,9 +1106,9 @@ name = "Guiding Light"
 id = "62bf2eb8-4afb-42b1-a8c5-5423eed96545"
 energy-cost = 1
 rules-text = """
-{Foresee(f)}. Draw {cards(c)}.
+{Foresee($f)}. Draw {cards($c)}.
 
-{Reclaim_For_Cost(r)}"""
+{Reclaim_For_Cost($r)}"""
 variables = """
 f: 1
 c: 1
@@ -1126,7 +1126,7 @@ spark = ""
 name = "Pyrokinetic Surge"
 id = "f83a0657-f55a-4ee6-8630-c2ca2d8429ac"
 energy-cost = 1
-rules-text = "Abandon an ally or discard {cards(d)}: {Dissolve} an enemy."
+rules-text = "Abandon an ally or discard {cards($d)}: {Dissolve} an enemy."
 variables = "d: 1"
 card-type = "Event"
 is-fast = true
@@ -1142,7 +1142,7 @@ name = "Threadbreaker"
 id = "6e757f74-08e4-4f4e-ab27-70106b93a159"
 energy-cost = 3
 rules-text = """
-{Materialized} {Prevent} a played card with cost {energy(e)} or less.
+{Materialized} {Prevent} a played card with cost {energy($e)} or less.
 """
 variables = "e: 2"
 card-type = "Character"
@@ -1158,7 +1158,7 @@ card-number = 70
 name = "Cosmic Puppeteer"
 id = "e4aff892-1a6d-40b7-901d-1d57a9a21807"
 energy-cost = 5
-rules-text = "{Materialized} Gain control of an enemy with cost {energy(e)} or less."
+rules-text = "{Materialized} Gain control of an enemy with cost {energy($e)} or less."
 variables = "e: 2"
 card-type = "Character"
 subtype = "Ancient"
@@ -1174,7 +1174,7 @@ name = "Obliterator of Worlds"
 id = "5aea70af-2df6-411f-b513-cb9ee8b18fb4"
 energy-cost = 6
 rules-text = """
-Abandon an ally: Play this character for {energy(e)}, then abandon it.
+Abandon an ally: Play this character for {energy($e)}, then abandon it.
 
 {Materialized} {Dissolve} an enemy."""
 variables = "e: 0"
@@ -1192,7 +1192,7 @@ name = "Horizon Follower"
 id = "d124e9cc-407f-4288-9a09-78e426c00761"
 energy-cost = 2
 rules-text = """
-{Judgment} Gain {points(p)}.
+{Judgment} Gain {points($p)}.
 """
 variables = "p: 1"
 card-type = "Character"
@@ -1208,7 +1208,7 @@ card-number = 73
 name = "Astral Navigators"
 id = "03f73699-bf4d-4f36-a811-0e1f847b55f7"
 energy-cost = 3
-rules-text = "{Materialized} {Foresee(f)}."
+rules-text = "{Materialized} {Foresee($f)}."
 variables = "f: 2"
 card-type = "Character"
 subtype = "Robot"
@@ -1226,7 +1226,7 @@ energy-cost = 2
 rules-text = """
 Has all character types.
 
-{Judgment} With {count_allies(a)} that share a character type, draw {cards(c)}."""
+{Judgment} With {count_allies($a)} that share a character type, draw {cards($c)}."""
 variables = """
 a: 3
 c: 1"""
@@ -1243,7 +1243,7 @@ card-number = 75
 name = "Sage of the Prelude"
 id = "ef6c27d3-e55f-4107-b2fd-69ad00994351"
 energy-cost = 2
-rules-text = "Once per turn, when you play a {fast} card, draw {cards(c)}."
+rules-text = "Once per turn, when you play a {fast} card, draw {cards($c)}."
 variables = "c: 1"
 card-type = "Character"
 subtype = "Musician"
@@ -1258,7 +1258,7 @@ card-number = 76
 name = "Intermezzo Balladeer"
 id = "8ace6dbe-f2cd-4a5c-b56d-6ea01d60985b"
 energy-cost = 3
-rules-text = "When you play a {fast} card, this character gains +{s} spark."
+rules-text = "When you play a {fast} card, this character gains +{$s} spark."
 variables = "s: 2"
 card-type = "Character"
 subtype = "Musician"
@@ -1273,7 +1273,7 @@ card-number = 77
 name = "Melodist of the Finale"
 id = "bca1b98b-729b-480b-8375-04db7b1be6f1"
 energy-cost = 4
-rules-text = "When you play a {fast} card, gain {points(p)}."
+rules-text = "When you play a {fast} card, gain {points($p)}."
 variables = "p: 1"
 card-type = "Character"
 subtype = "Musician"
@@ -1289,9 +1289,9 @@ name = "The Waking Titan"
 id = "76435ef9-18df-4c2d-bf5a-c92d997e86b5"
 energy-cost = 5
 rules-text = """
-To play this card, return an ally with cost {energy(e)} or more to hand.
+To play this card, return an ally with cost {energy($e)} or more to hand.
 
-{Judgment} Draw {cards(c)}."""
+{Judgment} Draw {cards($c)}."""
 variables = """
 e: 3
 c: 1"""
@@ -1308,7 +1308,7 @@ card-number = 79
 name = "Virtuoso of Harmony"
 id = "a916abc5-97ad-49dc-8d61-5f68f739d44b"
 energy-cost = 2
-rules-text = "At the end of your turn, gain {energy(e)}."
+rules-text = "At the end of your turn, gain {energy($e)}."
 variables = "e: 2"
 card-type = "Character"
 subtype = "Musician"
@@ -1326,7 +1326,7 @@ energy-cost = 3
 rules-text = """
 Characters in your hand have {fast}.
 
-Once per turn, when you play a {fast} character, gain {energy(e)}. """
+Once per turn, when you play a {fast} character, gain {energy($e)}. """
 variables = "e: 1"
 card-type = "Character"
 subtype = "Visitor"
@@ -1341,7 +1341,7 @@ card-number = 81
 name = "Secrets of the Deep"
 id = "958b9c00-bdbf-4bad-974e-baf57357c3a5"
 energy-cost = 0
-rules-text = "Pay 1 or more {energy_symbol}: Draw {cards(c)} for each {energy_symbol} spent, then discard {cards(d)}."
+rules-text = "Pay 1 or more {energy_symbol}: Draw {cards($c)} for each {energy_symbol} spent, then discard {cards($d)}."
 variables = """
 c: 1
 d: 2"""
@@ -1373,7 +1373,7 @@ variables = ""
 name = "Lantern Keeper"
 id = "81008e3a-e2d1-4d7e-a13a-1583ef75b2ff"
 energy-cost = 4
-rules-text = "{Judgment} Gain {points(p)}."
+rules-text = "{Judgment} Gain {points($p)}."
 variables = "p: 2"
 card-type = "Character"
 subtype = "Visitor"
@@ -1403,7 +1403,7 @@ variables = ""
 name = "Eternal Sentry"
 id = "511e8751-95d0-4d09-9f60-48fa53f14a13"
 energy-cost = 4
-rules-text = "When you draw {cards_numeral(c)} in a turn, if this card is in your void, it gains {reclaim_for_cost(r)} this turn."
+rules-text = "When you draw {cards_numeral($c)} in a turn, if this card is in your void, it gains {reclaim_for_cost($r)} this turn."
 variables = """
 c: 2
 r: 1"""
@@ -1420,7 +1420,7 @@ card-number = 86
 name = "Epiphany Unfolded"
 id = "84f1d31e-149f-4ab8-ac67-de35b0ad97a9"
 energy-cost = 1
-rules-text = "Draw {cards(c)}."
+rules-text = "Draw {cards($c)}."
 variables = "c: 3"
 card-type = "Event"
 is-fast = true
@@ -1436,7 +1436,7 @@ name = "Return to Nowhere"
 id = "3e93788c-bae3-4fda-a94c-a387cf0f386d"
 energy-cost = 3
 rules-text = """
-Return an enemy or ally to hand. Draw {cards(c)}.
+Return an enemy or ally to hand. Draw {cards($c)}.
 """
 variables = "c: 1"
 card-type = "Event"
@@ -1467,7 +1467,7 @@ variables = ""
 name = "Illumination of Glory"
 id = "a2381225-b97f-4a38-845b-cefd8b86d499"
 energy-cost = 5
-rules-text = "Gain {points(p)} for each card you have played this turn."
+rules-text = "Gain {points($p)} for each card you have played this turn."
 variables = "p: 1"
 card-type = "Event"
 is-fast = false
@@ -1482,7 +1482,7 @@ spark = ""
 name = "Echoes of the Journey"
 id = "5ddbb693-5fc3-4e5a-8040-944fa9e9755d"
 energy-cost = 3
-rules-text = "Draw {cards(c)} for each card you have played this turn."
+rules-text = "Draw {cards($c)} for each card you have played this turn."
 variables = "c: 1"
 card-type = "Event"
 is-fast = false
@@ -1498,7 +1498,7 @@ name = "Echo Architect"
 id = "8fad0360-df91-4c08-8e48-298a07a4c3f3"
 energy-cost = 4
 rules-text = """
-Events cost you {energy(e)} more.
+Events cost you {energy($e)} more.
 
 When you play an event from your hand, copy it."""
 variables = "e: 2"
@@ -1533,9 +1533,9 @@ name = "Echoes of Eternity"
 id = "5ce29518-6ccd-420c-9fbf-c4b882266593"
 energy-cost = 5
 rules-text = """
-Copy the next event you play {this_turn_times(n)}.
+Copy the next event you play {this_turn_times($n)}.
 
-{Reclaim_For_Cost(r)}"""
+{Reclaim_For_Cost($r)}"""
 variables = """
 n: 3
 r: 2"""
@@ -1567,7 +1567,7 @@ spark = ""
 name = "Skies of Change"
 id = "48578752-91df-44dd-a9ac-1f46fe4454ed"
 energy-cost = 2
-rules-text = "Discard {cards(d)}. Draw {cards(c)}."
+rules-text = "Discard {cards($d)}. Draw {cards($c)}."
 variables = """
 d: 1
 c: 2"""
@@ -1584,7 +1584,7 @@ spark = ""
 name = "The Power Within"
 id = "be92ff6f-a468-4545-8ea2-cd8c3c53cb9a"
 energy-cost = 1
-rules-text = "{multiply_by(n)} the number of cards you draw from card effects this turn."
+rules-text = "{multiply_by($n)} the number of cards you draw from card effects this turn."
 variables = "n: 2"
 card-type = "Event"
 is-fast = false
@@ -1599,7 +1599,7 @@ spark = ""
 name = "Whisper of the Past"
 id = "35cc788c-b7f1-46ae-b398-7ad37a624247"
 energy-cost = 3
-rules-text = "An event in your void gains {reclaim_for_cost(r)} this turn."
+rules-text = "An event in your void gains {reclaim_for_cost($r)} this turn."
 variables = "r: 0"
 card-type = "Event"
 is-fast = false
@@ -1646,7 +1646,7 @@ spark = ""
 name = "Keeper of the Lightpath"
 id = "b7bc4166-8763-44b4-9bf0-4307362bf509"
 energy-cost = 3
-rules-text = "Events cost you {energy(e)} less."
+rules-text = "Events cost you {energy($e)} less."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Visitor"
@@ -1661,7 +1661,7 @@ card-number = 101
 name = "Starcatcher"
 id = "2df6ba84-9aec-451d-80e6-f14d743a6db6"
 energy-cost = 4
-rules-text = "When you play an event, gain {energy(e)}."
+rules-text = "When you play an event, gain {energy($e)}."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Visitor"
@@ -1677,7 +1677,7 @@ name = "Flash of Power"
 id = "a43133a1-ad75-4685-a5dd-9e94b249e463"
 energy-cost = 4
 rules-text = """
-Gain {energy(e)}.
+Gain {energy($e)}.
 """
 variables = "e: 6"
 card-type = "Event"
@@ -1693,7 +1693,7 @@ spark = ""
 name = "Genesis Burst"
 id = "1a6babbe-c0fe-47ed-8ad3-4cdbf0585b10"
 energy-cost = 2
-rules-text = "{multiply_by(n)} the amount of {energy_symbol} you have."
+rules-text = "{multiply_by($n)} the amount of {energy_symbol} you have."
 variables = "n: 2"
 card-type = "Event"
 is-fast = false
@@ -1708,7 +1708,7 @@ spark = ""
 name = "Catalyst Ignition"
 id = "90a624db-d288-4856-afc9-f9222e67d3bd"
 energy-cost = 2
-rules-text = "{multiply_by(n)} the amount of {energy_symbol} you gain from card effects this turn."
+rules-text = "{multiply_by($n)} the amount of {energy_symbol} you gain from card effects this turn."
 variables = "n: 2"
 card-type = "Event"
 is-fast = false
@@ -1724,7 +1724,7 @@ name = "Data Pulse"
 id = "c27871a8-5256-4505-bdd1-8f5c8c222153"
 energy-cost = 2
 rules-text = """
-Gain {energy(e)}. Draw {cards(c)}.
+Gain {energy($e)}. Draw {cards($c)}.
 """
 variables = """
 e: 2
@@ -1743,7 +1743,7 @@ name = "A New Advenure"
 id = "7d1b1516-f89a-4a27-b9b6-54afaa85c217"
 energy-cost = 3
 rules-text = """
-Draw {cards(c)}. Discard {cards(d)}. Gain {energy(e)}.
+Draw {cards($c)}. Discard {cards($d)}. Gain {energy($e)}.
 """
 variables = """
 c: 2
@@ -1762,7 +1762,7 @@ spark = ""
 name = "The Ringleader"
 id = "afee62e2-7768-47d5-87bd-eaea08400fad"
 energy-cost = 6
-rules-text = "{Materialized} Copy the next event you play {this_turn_times(n)}."
+rules-text = "{Materialized} Copy the next event you play {this_turn_times($n)}."
 variables = "n: 3"
 card-type = "Character"
 subtype = "Outsider"
@@ -1777,7 +1777,7 @@ card-number = 108
 name = "Wheel of the Heavens"
 id = "4950a8cd-85d5-402a-8a2d-efdd250764b7"
 energy-cost = 4
-rules-text = "Each player shuffles their hand and void into their deck and then draws {cards(c)}."
+rules-text = "Each player shuffles their hand and void into their deck and then draws {cards($c)}."
 variables = "c: 5"
 card-type = "Event"
 is-fast = false
@@ -1793,7 +1793,7 @@ name = "Arc Gate Opening"
 id = "7b22f49a-04a3-4ed9-9834-841883c2b14d"
 energy-cost = 2
 rules-text = """
-Gain {energy(e)}.
+Gain {energy($e)}.
 """
 variables = "e: 4"
 card-type = "Event"
@@ -1839,7 +1839,7 @@ spark = ""
 name = "Knowledge Restored"
 id = "ded25ef2-3c3f-4012-8717-8dec3def1854"
 energy-cost = 5
-rules-text = "Draw {cards(c)}."
+rules-text = "Draw {cards($c)}."
 variables = "c: 3"
 card-type = "Event"
 is-fast = false
@@ -1855,7 +1855,7 @@ name = "Harvest the Forgotten"
 id = "540cd70f-4fc8-417b-ac0d-3b337bfe8f01"
 energy-cost = 1
 rules-text = """
-Put the {top_n_cards(v)} of your deck into your void. Draw {cards(c)}.
+Put the {top_n_cards($v)} of your deck into your void. Draw {cards($c)}.
 """
 variables = """
 v: 3
@@ -1903,7 +1903,7 @@ spark = ""
 name = "Fragments of Vision"
 id = "57fb24df-bedf-414d-b190-03e831570fda"
 energy-cost = 3
-rules-text = "Draw {cards(c)}. Discard {cards(d)}."
+rules-text = "Draw {cards($c)}. Discard {cards($d)}."
 variables = """
 c: 3
 d: 2"""
@@ -1921,7 +1921,7 @@ name = "Oracle of Shifting Skies"
 id = "129ec84c-6423-466f-ad75-c83b50bab09f"
 energy-cost = 2
 rules-text = """
-When you play an event, {foresee(f)}.
+When you play an event, {foresee($f)}.
 """
 variables = "f: 1"
 card-type = "Character"
@@ -1952,7 +1952,7 @@ spark = ""
 name = "Spirit of Smoldering Echoes"
 id = "fe13ba87-8935-4740-b762-23c8ccd89ff9"
 energy-cost = 4
-rules-text = "When an event is put into your void, this character gains +{s} spark."
+rules-text = "When an event is put into your void, this character gains +{$s} spark."
 variables = "s: 1"
 card-type = "Character"
 subtype = "Ancient"
@@ -1967,7 +1967,7 @@ card-number = 120
 name = "Nexus Wayfinder"
 id = "30e50754-0903-45ef-8569-b9032a93ed8f"
 energy-cost = 5
-rules-text = "Characters cost you {energy(e)} less."
+rules-text = "Characters cost you {energy($e)} less."
 variables = "e: 2"
 card-type = "Character"
 subtype = "Explorer"
@@ -1997,7 +1997,7 @@ variables = ""
 name = "Celestial Reverie"
 id = "85eaf1ac-bcb4-4266-84be-844965bce25d"
 energy-cost = 1
-rules-text = "Until end of turn, when you play a character, draw {cards(c)}."
+rules-text = "Until end of turn, when you play a character, draw {cards($c)}."
 variables = "c: 1"
 card-type = "Event"
 is-fast = false
@@ -2013,7 +2013,7 @@ name = "Ghostlight Wolves"
 id = "b7bc3d79-3c83-4015-92c5-1984c37830f3"
 energy-cost = 3
 rules-text = """
-{Judgment} Gain {energy(e)} for each allied {subtype(t)}.
+{Judgment} Gain {energy($e)} for each allied {subtype($t)}.
 """
 variables = """
 e: 1
@@ -2076,7 +2076,7 @@ variables = ""
 name = "Dawnprowler Panther"
 id = "f44fabc0-b239-423d-b602-a70a9da38479"
 energy-cost = 1
-rules-text = "When you {materialize} an allied {subtype(t)}, gain {energy(e)}."
+rules-text = "When you {materialize} an allied {subtype($t)}, gain {energy($e)}."
 variables = """
 t: SpiritAnimal
 e: 1"""
@@ -2093,7 +2093,7 @@ card-number = 128
 name = "Luminwings"
 id = "2621f88d-3207-40ec-840a-3d45fb5ed10f"
 energy-cost = 1
-rules-text = "{Judgment} With {count_allied_subtype(a, t)}, gain {energy(e)}."
+rules-text = "{Judgment} With {count_allied_subtype($a, $t)}, gain {energy($e)}."
 variables = """
 t: SpiritAnimal
 a: 2
@@ -2111,7 +2111,7 @@ card-number = 129
 name = "Spirit of the Greenwood"
 id = "e1c49dfb-d84b-440e-80ef-029719c172d3"
 energy-cost = 3
-rules-text = "{Judgment} Gain {energy(e)} for each allied character."
+rules-text = "{Judgment} Gain {energy($e)} for each allied character."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -2126,7 +2126,7 @@ card-number = 130
 name = "Spirit Bond"
 id = "1396e9c8-5719-42bc-8ef6-98d2777cc069"
 energy-cost = 12
-rules-text = "Each allied {subtype(t)} gains spark equal to the number of allied {@plural subtype(t)}. "
+rules-text = "Each allied {subtype($t)} gains spark equal to the number of allied {@plural subtype($t)}. "
 variables = "t: SpiritAnimal"
 card-type = "Event"
 is-fast = false
@@ -2156,7 +2156,7 @@ variables = ""
 name = "Key to the Moment"
 id = "ff0bdb02-7d2b-448d-98e3-f360f39aafc3"
 energy-cost = 3
-rules-text = "Return all but one ally to hand: Draw {cards(c)} for each ally returned."
+rules-text = "Return all but one ally to hand: Draw {cards($c)} for each ally returned."
 variables = "c: 1"
 card-type = "Event"
 is-fast = false
@@ -2171,7 +2171,7 @@ spark = ""
 name = "The Bondweaver"
 id = "baae7f70-226f-48af-94c8-b8b211fd5087"
 energy-cost = 3
-rules-text = "When you {materialize} a character, this character gains +{s} spark."
+rules-text = "When you {materialize} a character, this character gains +{$s} spark."
 variables = "s: 1"
 card-type = "Character"
 subtype = "Visitor"
@@ -2187,7 +2187,7 @@ name = "Eternal Stag"
 id = "ec80cc3c-a23d-465e-a2cf-4eed6fb89e1d"
 energy-cost = 3
 rules-text = """
-When you play {@a subtype(t)}, draw {cards(c)}.
+When you play {@a subtype($t)}, draw {cards($c)}.
 """
 variables = """
 t: SpiritAnimal
@@ -2205,7 +2205,7 @@ card-number = 135
 name = "Spiritbound Alpha"
 id = "86e31227-afab-4eb3-a53f-53e08c7ff227"
 energy-cost = 2
-rules-text = "{Judgment} You may pay {energy(e)} to have each allied {subtype(t)} gain +{s} spark."
+rules-text = "{Judgment} You may pay {energy($e)} to have each allied {subtype($t)} gain +{$s} spark."
 variables = """
 e: 4
 t: SpiritAnimal
@@ -2224,7 +2224,7 @@ name = "Sunshadow Eagle"
 id = "b8b55ef4-2f79-4c62-b347-e91bea3a40bd"
 energy-cost = 3
 rules-text = """
-When you {materialize} an allied {subtype(t)}, that character gains +{s} spark.
+When you {materialize} an allied {subtype($t)}, that character gains +{$s} spark.
 """
 variables = """
 t: SpiritAnimal
@@ -2243,7 +2243,7 @@ name = "Ebonwing"
 id = "2ff0d711-4202-4dca-983d-96622849b76a"
 energy-cost = 1
 rules-text = """
-{Materialized_Judgment} {Kindle(k)}.
+{Materialized_Judgment} {Kindle($k)}.
 """
 variables = "k: 1"
 card-type = "Character"
@@ -2276,7 +2276,7 @@ variables = ""
 name = "Looming Oracle"
 id = "1b65c84c-6714-4f9b-a229-f1efa467a6c5"
 energy-cost = 2
-rules-text = "{Materialized} Draw {cards(c)}."
+rules-text = "{Materialized} Draw {cards($c)}."
 variables = "c: 1"
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -2291,7 +2291,7 @@ card-number = 140
 name = "Driftcaller Sovereign"
 id = "919f4169-7a9d-4004-871f-9f36e3761e72"
 energy-cost = 1
-rules-text = "{Materialized_Judgment} Gain {energy(e)}."
+rules-text = "{Materialized_Judgment} Gain {energy($e)}."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -2306,7 +2306,7 @@ card-number = 141
 name = "Emerald Guardian"
 id = "08daba86-8d26-416c-ac16-4c7c2185951f"
 energy-cost = 3
-rules-text = "{Judgment} Gain {energy(e)}."
+rules-text = "{Judgment} Gain {energy($e)}."
 variables = "e: 2"
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -2356,7 +2356,7 @@ variables = ""
 name = "Seeker of the Radiant Wilds"
 id = "0dc21b19-b21b-4905-9a9a-113db544e587"
 energy-cost = 2
-rules-text = "{Materialized} Draw {cards(c)} for each allied {subtype(t)}."
+rules-text = "{Materialized} Draw {cards($c)} for each allied {subtype($t)}."
 variables = """
 c: 1
 t: SpiritAnimal"""
@@ -2373,7 +2373,7 @@ card-number = 145
 name = "Mystic Runefish"
 id = "83fc9336-c5a4-4a6e-bf90-be84f3535d34"
 energy-cost = 1
-rules-text = "{energy(e)}: The spark of each allied {subtype(t)} becomes {s}."
+rules-text = "{energy($e)}: The spark of each allied {subtype($t)} becomes {$s}."
 variables = """
 e: 3
 t: SpiritAnimal
@@ -2406,7 +2406,7 @@ variables = ""
 name = "Flickerveil Adept"
 id = "d8017d8f-7855-47e5-bfe5-89ca2e7c5203"
 energy-cost = 4
-rules-text = "{Materialized_Judgment} {Banish} an ally with spark {s} or less, then {materialize} it."
+rules-text = "{Materialized_Judgment} {Banish} an ally with spark {$s} or less, then {materialize} it."
 variables = "s: 2"
 card-type = "Character"
 subtype = "Mage"
@@ -2421,7 +2421,7 @@ card-number = 148
 name = "Reclaimer of Lost Paths"
 id = "0ad4ca5c-f723-4494-8dec-1e058c37a099"
 energy-cost = 4
-rules-text = "{Materialized} A card with cost {energy(e)} or less in your void gains {reclaim_for_cost(r)}."
+rules-text = "{Materialized} A card with cost {energy($e)} or less in your void gains {reclaim_for_cost($r)}."
 variables = """
 e: 3
 r: 0"""
@@ -2453,7 +2453,7 @@ variables = ""
 name = "Wraith of Twisting Shadows"
 id = "f649bc96-1d35-4665-97d9-799208558ff3"
 energy-cost = 3
-rules-text = "{Materialized} Discard a chosen card from the opponent's hand. They draw {cards(c)}."
+rules-text = "{Materialized} Discard a chosen card from the opponent's hand. They draw {cards($c)}."
 variables = "c: 1"
 card-type = "Character"
 subtype = "Outsider"
@@ -2468,7 +2468,7 @@ card-number = 151
 name = "Keeper of Forgotten Light"
 id = "b1eb6004-c379-4b87-93be-3fe527b830b7"
 energy-cost = 6
-rules-text = "{Materialized} Draw {cards(c)}."
+rules-text = "{Materialized} Draw {cards($c)}."
 variables = "c: 2"
 card-type = "Character"
 subtype = "Ancient"
@@ -2503,7 +2503,7 @@ energy-cost = 1
 rules-text = """
 {Banish} an ally. {Materialize} it at end of turn.
 
-{Reclaim_For_Cost(r)}"""
+{Reclaim_For_Cost($r)}"""
 variables = "r: 1"
 card-type = "Event"
 is-fast = false
@@ -2565,7 +2565,7 @@ variables = ""
 name = "Tideborne Voyager"
 id = "522368e5-38cc-480c-930a-f8e1bc5a1f68"
 energy-cost = 4
-rules-text = "When an ally is {banished}, this character gains +{s} spark."
+rules-text = "When an ally is {banished}, this character gains +{$s} spark."
 variables = "s: 1"
 card-type = "Character"
 subtype = "Explorer"
@@ -2581,7 +2581,7 @@ name = "Pyrestone Avatar"
 id = "c85de002-4b55-4975-b800-a627fb699615"
 energy-cost = 4
 rules-text = """
-When an ally is {banished}, {kindle(k)}.
+When an ally is {banished}, {kindle($k)}.
 """
 variables = "k: 1"
 card-type = "Character"
@@ -2597,7 +2597,7 @@ card-number = 159
 name = "Light of Emergence"
 id = "3f98591f-5ede-4add-9df6-536e39780ec3"
 energy-cost = 5
-rules-text = "{Materialize} {n_random_characters(n)} with cost {energy(e)} or less from your deck."
+rules-text = "{Materialize} {n_random_characters($n)} with cost {energy($e)} or less from your deck."
 variables = """
 e: 3
 n: 2"""
@@ -2629,7 +2629,7 @@ spark = ""
 name = "Scorched Reckoning"
 id = "2b0d4a5a-83f0-4cae-a7e3-aefbb595fd1d"
 energy-cost = 2
-rules-text = "{Dissolve} an enemy with spark {s} or more."
+rules-text = "{Dissolve} an enemy with spark {$s} or more."
 variables = "s: 3"
 card-type = "Event"
 is-fast = false
@@ -2645,9 +2645,9 @@ name = "Abyssal Plunge"
 id = "810764f4-fda3-414a-9364-9ce3f2092710"
 energy-cost = 3
 rules-text = """
-{Dissolve} an enemy with cost {energy(e)} or more.
+{Dissolve} an enemy with cost {energy($e)} or more.
 
-{Reclaim_For_Cost(r)}"""
+{Reclaim_For_Cost($r)}"""
 variables = """
 e: 3
 r: 2"""
@@ -2679,7 +2679,7 @@ spark = ""
 name = "Dimensional Pathfinder"
 id = "6e7c552f-23b5-431a-9d50-f7706e27166a"
 energy-cost = 3
-rules-text = "{Judgment} You may pay {energy(e)} to {banish} {up_to_n_allies(n)}, then {materialize} {it_or_them(n)}."
+rules-text = "{Judgment} You may pay {energy($e)} to {banish} {up_to_n_allies($n)}, then {materialize} {it_or_them($n)}."
 variables = """
 e: 3
 n: 2"""
@@ -2711,7 +2711,7 @@ variables = ""
 name = "Portal of Twin Paths"
 id = "5af14769-48c7-45eb-a73d-52fdea4405c4"
 energy-cost = 3
-rules-text = "{Banish} {up_to_n_allies(n)}, then {materialize} {it_or_them(n)}."
+rules-text = "{Banish} {up_to_n_allies($n)}, then {materialize} {it_or_them($n)}."
 variables = "n: 2"
 card-type = "Event"
 is-fast = false
@@ -2726,7 +2726,7 @@ spark = ""
 name = "Aurora Channeler"
 id = "d12cbf86-5b50-4654-8c33-ff4428537c71"
 energy-cost = 4
-rules-text = "{Materialized} Gain {energy(e)}."
+rules-text = "{Materialized} Gain {energy($e)}."
 variables = "e: 3"
 card-type = "Character"
 subtype = "Explorer"
@@ -2742,7 +2742,7 @@ name = "Mirrorlight Architect"
 id = "476638a3-6ed9-47bc-b129-ad8b6662f41e"
 energy-cost = 1
 rules-text = """
-{energy(e)}: {Materialize} a copy of an ally.
+{energy($e)}: {Materialize} a copy of an ally.
 """
 variables = "e: 4"
 card-type = "Character"
@@ -2758,7 +2758,7 @@ card-number = 169
 name = "Starlit Cascade"
 id = "5de09339-b7de-45bd-abc0-1ab3a09e859d"
 energy-cost = 1
-rules-text = "Until end of turn, when an ally leaves play, gain {energy(e)}."
+rules-text = "Until end of turn, when an ally leaves play, gain {energy($e)}."
 variables = "e: 2"
 card-type = "Event"
 is-fast = false
@@ -2773,7 +2773,7 @@ spark = ""
 name = "Kindred Sparks"
 id = "d41a0c56-ca67-4626-90b6-c7fadeadfc4a"
 energy-cost = 5
-rules-text = "With an allied {subtype(t)}, you may play this card from your hand or void for {energy(e)}."
+rules-text = "With an allied {subtype($t)}, you may play this card from your hand or void for {energy($e)}."
 variables = """
 t: Survivor
 e: 1"""
@@ -2790,7 +2790,7 @@ card-number = 171
 name = "Emberwatch Veteran"
 id = "4a558573-ddf0-478e-b5ac-75401cbc74f7"
 energy-cost = 1
-rules-text = "{energy(e)}, Discard {cards(d)}: {Kindle(k)}."
+rules-text = "{energy($e)}, Discard {cards($d)}: {Kindle($k)}."
 variables = """
 e: 1
 d: 1
@@ -2808,7 +2808,7 @@ card-number = 172
 name = "Hope's Vanguard"
 id = "c08ffd90-ef79-48f7-9aa2-22875acbeba4"
 energy-cost = 2
-rules-text = "{Materialized_Judgment} With {count_allied_subtype(a, t)}, draw {cards(c)}. "
+rules-text = "{Materialized_Judgment} With {count_allied_subtype($a, $t)}, draw {cards($c)}. "
   variables = """
 a: 2
 t: Survivor
@@ -2827,9 +2827,9 @@ name = "Silent Avenger"
 id = "36ca76ae-0202-495f-bf99-d0ce98da6352"
 energy-cost = 3
 rules-text = """
-{Dissolved} {Kindle(k)}.
+{Dissolved} {Kindle($k)}.
 
-When an allied {subtype(t)} is {dissolved}, {kindle(k)}."""
+When an allied {subtype($t)} is {dissolved}, {kindle($k)}."""
 variables = """
 k: 2
 t: Survivor"""
@@ -2846,7 +2846,7 @@ card-number = 174
 name = "Soulbinder"
 id = "ad04efcb-158b-4ac7-a48f-7d15d7e9daff"
 energy-cost = 3
-rules-text = "Abandon an ally: Gain {energy(e)}."
+rules-text = "Abandon an ally: Gain {energy($e)}."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Synth"
@@ -2862,9 +2862,9 @@ name = "Seer of the Fallen"
 id = "233f67e8-2715-4b30-8985-2b5b15f851ac"
 energy-cost = 2
 rules-text = """
-{Dissolved} Draw {cards(c)}.
+{Dissolved} Draw {cards($c)}.
 
-When an allied {subtype(t)} is {dissolved}, draw {cards(c)}. """
+When an allied {subtype($t)} is {dissolved}, draw {cards($c)}. """
 variables = """
 c: 1
 t: Survivor"""
@@ -2881,7 +2881,7 @@ card-number = 176
 name = "Ashborn Necromancer"
 id = "5511b4b5-a7e3-48df-978d-c09673b39f42"
 energy-cost = 4
-rules-text = "Abandon an ally: Put the {top_n_cards(v)} of your deck into your void."
+rules-text = "Abandon an ally: Put the {top_n_cards($v)} of your deck into your void."
 variables = "v: 2"
 card-type = "Character"
 subtype = "Outsider"
@@ -2896,7 +2896,7 @@ card-number = 177
 name = "Sunset Chronicler"
 id = "ef74faa0-b550-4134-9afc-c6898f7af44c"
 energy-cost = 4
-rules-text = "When an ally is {dissolved}, draw {cards(c)}."
+rules-text = "When an ally is {dissolved}, draw {cards($c)}."
 variables = "c: 1"
 card-type = "Character"
 subtype = "Survivor"
@@ -2911,7 +2911,7 @@ card-number = 178
 name = "Wasteland Arbitrator"
 id = "2246466d-341e-4fe2-a804-5bc4ed3541e2"
 energy-cost = 1
-rules-text = "{Materialized} Each player discards {cards(d)}."
+rules-text = "{Materialized} Each player discards {cards($d)}."
 variables = "d: 1"
 card-type = "Character"
 subtype = "Survivor"
@@ -2926,7 +2926,7 @@ card-number = 179
 name = "Dustborn Veteran"
 id = "dce9ebda-da62-4304-a4e9-21170c98e2a6"
 energy-cost = 3
-rules-text = "When an ally is {dissolved}, this card gains {reclaim_for_cost(r)} this turn."
+rules-text = "When an ally is {dissolved}, this card gains {reclaim_for_cost($r)} this turn."
 variables = "r: 1"
 card-type = "Character"
 subtype = "Survivor"
@@ -2941,7 +2941,7 @@ card-number = 180
 name = "Avatar of Cosmic Reckoning"
 id = "0ebb38a7-5a30-40b3-b2f0-b6516a53303c"
 energy-cost = 6
-rules-text = "When an ally is {dissolved}, gain {points(p)}."
+rules-text = "When an ally is {dissolved}, gain {points($p)}."
 variables = "p: 1"
 card-type = "Character"
 subtype = "Ancient"
@@ -2956,7 +2956,7 @@ card-number = 181
 name = "Resilient Wanderer"
 id = "c85edc15-ff74-45d5-aed5-7ca488b6d100"
 energy-cost = 2
-rules-text = "{Dissolved} You may pay {energy(e)} to return this character to your hand."
+rules-text = "{Dissolved} You may pay {energy($e)} to return this character to your hand."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Survivor"
@@ -2971,7 +2971,7 @@ card-number = 182
 name = "Twilight Reclaimer"
 id = "fb3029e1-7f43-4284-bcdd-11dfe6711f96"
 energy-cost = 1
-rules-text = "{Dissolved} {@cap @a subtype(t)} in your void gains {reclaim} equal to its cost."
+rules-text = "{Dissolved} {@cap @a subtype($t)} in your void gains {reclaim} equal to its cost."
 variables = "t: Survivor"
 card-type = "Character"
 subtype = "Survivor"
@@ -2986,7 +2986,7 @@ card-number = 183
 name = "Wreckheap Survivor"
 id = "b5d3ce4f-2587-47a6-b8c2-d73204d4c05a"
 energy-cost = 3
-rules-text = "{Judgment} You may pay {energy(e)} to return this character from your void to your hand."
+rules-text = "{Judgment} You may pay {energy($e)} to return this character from your void to your hand."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Survivor"
@@ -3016,7 +3016,7 @@ variables = ""
 name = "Soulkindler"
 id = "7d20f2bb-50b5-418a-a435-da13a13ad257"
 energy-cost = 2
-rules-text = "If this card is in your void, allied {@plural subtype(t)} have +{s} spark."
+rules-text = "If this card is in your void, allied {@plural subtype($t)} have +{$s} spark."
 variables = """
 t: Survivor
 s: 2"""
@@ -3033,7 +3033,7 @@ card-number = 186
 name = "Exiles of the Last Light"
 id = "37c39729-f5f9-45ac-a01a-9f65c09c731c"
 energy-cost = 3
-rules-text = "Abandon an ally: {Kindle(k)}."
+rules-text = "Abandon an ally: {Kindle($k)}."
 variables = "k: 1"
 card-type = "Character"
 subtype = "Survivor"
@@ -3048,7 +3048,7 @@ card-number = 187
 name = "Ruin Scavenger"
 id = "6a95e4f6-75c7-435b-ae21-35a01e58c0b1"
 energy-cost = 1
-rules-text = "{Judgment} You may {banish} {cards(c)} from the opponent's void to gain {energy(e)}."
+rules-text = "{Judgment} You may {banish} {cards($c)} from the opponent's void to gain {energy($e)}."
 variables = """
 c: 1
 e: 1"""
@@ -3066,7 +3066,7 @@ name = "Unleashed Destruction"
 id = "24388863-1b0b-477d-aa06-faf33cba6176"
 energy-cost = 2
 rules-text = """
-{Dissolve} an enemy with cost {energy(e)} or less.
+{Dissolve} an enemy with cost {energy($e)} or less.
 
 {Reclaim} -- Abandon an ally"""
 variables = "e: 2"
@@ -3084,7 +3084,7 @@ name = "Searcher in the Mists"
 id = "560ad530-9ad9-452c-b80e-902d9a76af0c"
 energy-cost = 2
 rules-text = """
-{Materialized_Dissolved} Put the {top_n_cards(v)} of your deck into your void.
+{Materialized_Dissolved} Put the {top_n_cards($v)} of your deck into your void.
 """
 variables = "v: 4"
 card-type = "Character"
@@ -3100,7 +3100,7 @@ card-number = 190
 name = "Veil of the Wastes"
 id = "10ad7a9e-401d-494e-b4f3-5580b8d850d0"
 energy-cost = 3
-rules-text = "When you {materialize} {@a subtype(t)}, {reclaim} this character."
+rules-text = "When you {materialize} {@a subtype($t)}, {reclaim} this character."
 variables = "t: Survivor"
 card-type = "Character"
 subtype = "Survivor"
@@ -3115,7 +3115,7 @@ card-number = 191
 name = "Through the Rift"
 id = "437fc66b-c0eb-46fd-82fa-ebbb16939e66"
 energy-cost = 1
-rules-text = "{Discover} {@a subtype(t)}."
+rules-text = "{Discover} {@a subtype($t)}."
 variables = "t: Survivor"
 card-type = "Event"
 is-fast = false
@@ -3130,7 +3130,7 @@ spark = ""
 name = "Flagbearer of Decay"
 id = "9979e005-3a9e-4c98-ae7b-d8a25307c959"
 energy-cost = 2
-rules-text = "When you play {@a subtype(t)}, put the {top_n_cards(v)} of your deck into your void."
+rules-text = "When you play {@a subtype($t)}, put the {top_n_cards($v)} of your deck into your void."
 variables = """
 t: Survivor
 v: 2"""
@@ -3147,7 +3147,7 @@ card-number = 193
 name = "Harvester of Despair"
 id = "0fb45922-4d27-4d01-9372-86e991164006"
 energy-cost = 3
-rules-text = "When you abandon an ally, this character gains +{s} spark."
+rules-text = "When you abandon an ally, this character gains +{$s} spark."
 variables = "s: 1"
 card-type = "Character"
 subtype = "Ancient"
@@ -3162,7 +3162,7 @@ card-number = 194
 name = "Blade of Oblivion"
 id = "86eed140-60b0-4e69-b868-332fcf25b8b3"
 energy-cost = 2
-rules-text = "When you abandon {count_allies(a)} in a turn, {dissolve} an enemy."
+rules-text = "When you abandon {count_allies($a)} in a turn, {dissolve} an enemy."
 variables = "a: 2"
 card-type = "Character"
 subtype = "Warrior"
@@ -3177,7 +3177,7 @@ card-number = 195
 name = "Fathomless Maw"
 id = "fc294a5d-7239-4fd2-9d5e-e1760d342f60"
 energy-cost = 4
-rules-text = "When you abandon a character, gain {points(p)}."
+rules-text = "When you abandon a character, gain {points($p)}."
 variables = "p: 1"
 card-type = "Character"
 subtype = "Ancient"
@@ -3192,7 +3192,7 @@ card-number = 196
 name = "The Forsaker"
 id = "7263c37a-85c2-403a-8254-8ebd4b42a60d"
 energy-cost = 2
-rules-text = "Abandon an ally, once per turn: Gain {points(p)}."
+rules-text = "Abandon an ally, once per turn: Gain {points($p)}."
 variables = "p: 1"
 card-type = "Character"
 subtype = "Renegade"
@@ -3208,7 +3208,7 @@ name = "Infernal Ascendant"
 id = "e89e3b97-984b-40a2-a74b-3c0489511eba"
 energy-cost = 3
 rules-text = """
-When you abandon an ally, {kindle(k)}.
+When you abandon an ally, {kindle($k)}.
 """
 variables = "k: 2"
 card-type = "Character"
@@ -3255,7 +3255,7 @@ name = "Volcanic Channeler"
 id = "eb8f817b-ca18-4edd-b278-05b54b890364"
 energy-cost = 4
 rules-text = """
-When an ally is {dissolved}, gain {energy(e)}.
+When an ally is {dissolved}, gain {energy($e)}.
 """
 variables = "e: 1"
 card-type = "Character"
@@ -3271,7 +3271,7 @@ card-number = 201
 name = "Grim Reclaimer"
 id = "61c9fa98-dda1-4f45-976e-b3fc89987b11"
 energy-cost = 2
-rules-text = "Abandon an ally, once per turn: {Reclaim} {@a subtype(t)}."
+rules-text = "Abandon an ally, once per turn: {Reclaim} {@a subtype($t)}."
 variables = "t: Warrior"
 card-type = "Character"
 subtype = "Outsider"
@@ -3286,7 +3286,7 @@ card-number = 202
 name = "Angel of the Eclipse"
 id = "d70473b6-ef2b-4fae-bc64-6043c7a7f2be"
 energy-cost = 4
-rules-text = "When you {materialize} an ally, gain {energy(e)}."
+rules-text = "When you {materialize} an ally, gain {energy($e)}."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Musician"
@@ -3301,7 +3301,7 @@ card-number = 203
 name = "Packcaller of Shadows"
 id = "4d3eebd3-02b4-4016-a15a-0e8a05b6696b"
 energy-cost = 1
-rules-text = "{Materialize} {a_figment(g)} for each card you have played this turn."
+rules-text = "{Materialize} {a_figment($g)} for each card you have played this turn."
 variables = "g: celestial"
 card-type = "Character"
 subtype = "Mage"
@@ -3316,7 +3316,7 @@ card-number = 204
 name = "Radiant Trio"
 id = "c37964f0-153d-417e-8651-bbd043c5e118"
 energy-cost = 3
-rules-text = "{Materialize} {n_figments(n, g)}."
+rules-text = "{Materialize} {n_figments($n, $g)}."
 variables = """
 n: 3
 g: radiant"""
@@ -3333,7 +3333,7 @@ spark = ""
 name = "Endless Projection"
 id = "3ab4dd0d-28c6-42e7-ab47-691781d458c5"
 energy-cost = 4
-rules-text = "When you play a character, {materialize} {a_figment(g)}."
+rules-text = "When you play a character, {materialize} {a_figment($g)}."
 variables = "g: halcyon"
 card-type = "Character"
 subtype = "Visitor"
@@ -3348,7 +3348,7 @@ card-number = 206
 name = "Prophet of the Consumed"
 id = "b0ee552a-3a4f-434f-903d-165ebfe3d072"
 energy-cost = 3
-rules-text = "{Materialized} Draw {cards(c)} for each ally abandoned this turn."
+rules-text = "{Materialized} Draw {cards($c)} for each ally abandoned this turn."
 variables = "c: 1"
 card-type = "Character"
 subtype = "Synth"
@@ -3363,7 +3363,7 @@ card-number = 207
 name = "Specter of Silent Snow"
 id = "06e86fc5-b501-49eb-bdbe-0445fc56fa65"
 energy-cost = 4
-rules-text = "When you abandon a character, draw {cards(c)}."
+rules-text = "When you abandon a character, draw {cards($c)}."
 variables = "c: 1"
 card-type = "Character"
 subtype = "Outsider"
@@ -3378,7 +3378,7 @@ card-number = 208
 name = "Desperation"
 id = "39bbbc92-34d0-4699-8ac6-99805a1248fb"
 energy-cost = 2
-rules-text = "Abandon any number of allies: Draw {cards(c)} for each ally abandoned."
+rules-text = "Abandon any number of allies: Draw {cards($c)} for each ally abandoned."
 variables = "c: 1"
 card-type = "Event"
 is-fast = false
@@ -3410,7 +3410,7 @@ spark = ""
 name = "Architect of Memory"
 id = "2530adcc-5ae2-486a-94b2-f40dd62f3755"
 energy-cost = 2
-rules-text = "While you have {count(n)} or more cards in your void, they have {reclaim} equal to their cost."
+rules-text = "While you have {count($n)} or more cards in your void, they have {reclaim} equal to their cost."
 variables = "n: 7"
 card-type = "Character"
 subtype = "Synth"
@@ -3426,9 +3426,9 @@ name = "Momentum of the Fallen"
 id = "dfd2523a-ff26-4c8c-9197-ba60f492d819"
 energy-cost = 4
 rules-text = """
-{Dissolve} an enemy. Draw {cards(c)}.
+{Dissolve} an enemy. Draw {cards($c)}.
 
-This event costs {energy(e)} if a character dissolved this turn."""
+This event costs {energy($e)} if a character dissolved this turn."""
 variables = """
 c: 1
 e: 1"""
@@ -3445,7 +3445,7 @@ spark = ""
 name = "Pulse of Sacrifice"
 id = "12a59f07-7ff4-4a3b-9e9f-4f9b524d26af"
 energy-cost = 0
-rules-text = "Abandon a character, Discard your hand: Gain {energy(e)}."
+rules-text = "Abandon a character, Discard your hand: Gain {energy($e)}."
 variables = "e: 5"
 card-type = "Event"
 is-fast = false
@@ -3475,7 +3475,7 @@ variables = ""
 name = "Dreamscatter"
 id = "a6e8e100-9aa6-4a53-82ec-4ab161829533"
 energy-cost = 2
-rules-text = "Pay 1 or more {energy_symbol}: Draw {cards(c)} for each {energy_symbol} spent."
+rules-text = "Pay 1 or more {energy_symbol}: Draw {cards($c)} for each {energy_symbol} spent."
 variables = "c: 1"
 card-type = "Event"
 is-fast = true
@@ -3490,7 +3490,7 @@ spark = ""
 name = "Minstrel of Falling Light"
 id = "7285732f-7460-4544-8c74-9300a078a337"
 energy-cost = 2
-rules-text = "{energy(e)}: Draw {cards(c)}."
+rules-text = "{energy($e)}: Draw {cards($c)}."
 variables = """
 e: 3
 c: 1"""
@@ -3507,7 +3507,7 @@ card-number = 216
 name = "Sundown Surfer"
 id = "04be5c1e-20ab-475e-b02f-e78b82ca2e8d"
 energy-cost = 2
-rules-text = "When you play a card during the opponent's turn, this character gains +{s} spark."
+rules-text = "When you play a card during the opponent's turn, this character gains +{$s} spark."
 variables = "s: 1"
 card-type = "Character"
 subtype = "Visitor"
@@ -3523,7 +3523,7 @@ name = "Archive of the Forgotten "
 id = "1ce137cb-4234-45f7-abd2-d0ce97549885"
 energy-cost = 4
 rules-text = """
-Return {up_to_n_events(n)} from your void to your hand.
+Return {up_to_n_events($n)} from your void to your hand.
 """
 variables = "n: 2"
 card-type = "Event"
@@ -3541,8 +3541,8 @@ id = "6e94b4a6-4164-4572-91c1-e74de3e75188"
 energy-cost = "*"
 rules-text = """
 {choose_one}
-{bullet} {energy(e1)}: Return an enemy to hand.
-{bullet} {energy(e2)}: Draw {cards(c)}."""
+{bullet} {energy($e1)}: Return an enemy to hand.
+{bullet} {energy($e2)}: Draw {cards($c)}."""
 variables = """
 e1: 2
 e2: 3
@@ -3592,7 +3592,7 @@ spark = ""
 name = "Nightmare"
 id = "b4fd32f8-fbb0-42c9-a794-f0949d4062c5"
 energy-cost = 2
-rules-text = "Draw {cards(c)}."
+rules-text = "Draw {cards($c)}."
 variables = "c: 1"
 card-type = "Event"
 is-fast = false
