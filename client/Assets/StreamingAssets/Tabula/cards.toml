@@ -2679,7 +2679,7 @@ spark = ""
 name = "Dimensional Pathfinder"
 id = "6e7c552f-23b5-431a-9d50-f7706e27166a"
 energy-cost = 3
-rules-text = "{Judgment} You may pay {energy($e)} to {banish} {up_to_n_allies($n)}, then {materialize} {it_or_them($n)}."
+rules-text = "{Judgment} You may pay {energy($e)} to {banish} {up_to_n_allies($n)}, then {materialize} {pronoun:$n}."
 variables = """
 e: 3
 n: 2"""
@@ -2711,7 +2711,7 @@ variables = ""
 name = "Portal of Twin Paths"
 id = "5af14769-48c7-45eb-a73d-52fdea4405c4"
 energy-cost = 3
-rules-text = "{Banish} {up_to_n_allies($n)}, then {materialize} {it_or_them($n)}."
+rules-text = "{Banish} {up_to_n_allies($n)}, then {materialize} {pronoun:$n}."
 variables = "n: 2"
 card-type = "Event"
 is-fast = false

@@ -273,19 +273,16 @@ rlf::rlf! {
 
     // Up to N allies (e.g., "an ally" or "up to 3 allies").
     up_to_n_allies($n) = :match($n) {
-        1: "an ally",
-        *other: "up to {$n} allies",
+        1: "an {ally}",
+        *other: "up to {$n} {ally:other}",
     };
 
     // =========================================================================
     // Pronoun agreement
     // =========================================================================
 
-    // Pronoun for singular or plural (it/them).
-    it_or_them($n) = :match($n) {
-        1: "it",
-        *other: "them",
-    };
+    // Object pronoun with singular/plural agreement.
+    pronoun = { one: "it", other: "them" };
 
     // =========================================================================
     // Icons

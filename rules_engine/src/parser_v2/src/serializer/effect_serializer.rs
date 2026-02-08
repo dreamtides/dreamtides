@@ -330,8 +330,7 @@ pub fn serialize_standard_effect(
                 }
                 CollectionExpression::UpTo(n) => {
                     bindings.insert("n".to_string(), VariableValue::Integer(*n));
-                    // it_or_them also uses "n"
-                    "{banish} {up_to_n_allies($n)}, then {materialize} {it_or_them($n)}.".to_string()
+                    "{banish} {up_to_n_allies($n)}, then {materialize} {pronoun:$n}.".to_string()
                 }
                 _ => {
                     format!(

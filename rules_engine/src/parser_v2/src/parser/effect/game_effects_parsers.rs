@@ -5,8 +5,8 @@ use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 
 use crate::parser::parser_helpers::{
-    article, cards, comma, directive, figment, figment_count, foresee_count, it_or_them_count,
-    number, this_turn_times, up_to_n_allies, word, words, ParserExtra, ParserInput,
+    article, cards, comma, directive, figment, figment_count, foresee_count, number, pronoun,
+    this_turn_times, up_to_n_allies, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{
     card_predicate_parser, cost_parser, predicate_parser, quantity_expression_parser,
@@ -225,7 +225,7 @@ pub fn materialize_character_at_end_of_turn<'a>(
 
 pub fn materialize_collection<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    directive("materialize").ignore_then(it_or_them_count()).map(|_count| {
+    directive("materialize").ignore_then(word("them")).map(|_| {
         StandardEffect::MaterializeCollection {
             target: Predicate::Them,
             count: CollectionExpression::All,
@@ -376,7 +376,7 @@ pub fn banish_up_to_n_then_materialize<'a>(
         .then_ignore(comma())
         .then_ignore(word("then"))
         .then_ignore(directive("materialize"))
-        .then_ignore(it_or_them_count())
+        .then_ignore(pronoun())
         .map(|count| StandardEffect::BanishThenMaterialize {
             target: Predicate::Another(CardPredicate::Character),
             count: CollectionExpression::UpTo(count),

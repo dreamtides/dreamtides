@@ -147,10 +147,9 @@ pub fn up_to_n_allies<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra
     }
 }
 
-pub fn it_or_them_count<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
-    select! {
-        (ResolvedToken::ItOrThemCount(v), _) => v,
-    }
+/// Parses a pronoun word ("it" or "them").
+pub fn pronoun<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Clone {
+    choice((word("it"), word("them")))
 }
 
 pub fn count_allied_subtype<'a>(

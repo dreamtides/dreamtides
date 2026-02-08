@@ -18,7 +18,6 @@ static PHRASES: &[PhraseEntry] = &[
     ("discards", "d", ResolvedToken::DiscardCount),
     ("energy", "e", ResolvedToken::Energy),
     ("foresee", "f", ResolvedToken::ForeseeCount),
-    ("it_or_them", "n", ResolvedToken::ItOrThemCount),
     ("kindle", "k", ResolvedToken::KindleAmount),
     ("maximum_energy", "m", ResolvedToken::MaximumEnergy),
     ("multiply_by", "n", ResolvedToken::Number),
@@ -59,7 +58,6 @@ pub enum ResolvedToken {
     CountAllies(u32),
     UpToNAllies(u32),
     UpToNEvents(u32),
-    ItOrThemCount(u32),
     Number(u32),
     ReclaimCost(u32),
     ThisTurnTimes(u32),
@@ -141,6 +139,17 @@ fn resolve_directive(
         if let Some(stripped) = name.strip_prefix(prefix) {
             return resolve_directive(stripped, bindings, span);
         }
+    }
+
+    // Handle pronoun term selection (e.g., "pronoun:$n" -> Word("it") or
+    // Word("them"))
+    if let Some(var_ref) = name.strip_prefix("pronoun:") {
+        let var_name = var_ref.strip_prefix('$').unwrap_or(var_ref);
+        let value = bindings
+            .get_integer(var_name)
+            .ok_or_else(|| UnresolvedVariable { name: var_name.to_string(), span })?;
+        let word = if value == 1 { "it" } else { "them" };
+        return Ok(ResolvedToken::Token(Token::Word(word.to_string())));
     }
 
     // Try direct lookup in integer phrases

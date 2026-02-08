@@ -81,7 +81,7 @@ test: tabula-check
         TEST_THREADS=""
     fi
 
-    output=$(RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --exclude tv_tests -- $TEST_THREADS 2>&1)
+    output=$(RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --workspace --exclude tv_tests -- $TEST_THREADS 2>&1)
     if [ $? -eq 0 ]; then
         echo "Tests passed"
     else

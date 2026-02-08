@@ -821,7 +821,7 @@ fn test_judgment_you_may_abandon_subtype_to_discover_subtype_with_cost_higher_an
 #[test]
 fn test_judgment_you_may_pay_energy_to_banish_up_to_n_allies_then_materialize_them() {
     let result = parse_ability(
-        "{Judgment} You may pay {e} to {banish} {up_to_n_allies}, then {materialize} {it_or_them}.",
+        "{Judgment} You may pay {e} to {banish} {up_to_n_allies}, then {materialize} {pronoun:$n}.",
         "e: 1, n: 2",
     );
     assert_ron_snapshot!(result, @r###"
@@ -880,7 +880,7 @@ fn test_materialized_banish_any_number_of_allies_then_materialize_them() {
 #[test]
 fn test_banish_up_to_n_allies_then_materialize_them() {
     let result =
-        parse_ability("{Banish} {up_to_n_allies}, then {materialize} {it_or_them}.", "n: 3");
+        parse_ability("{Banish} {up_to_n_allies}, then {materialize} {pronoun:$n}.", "n: 3");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(BanishThenMaterialize(

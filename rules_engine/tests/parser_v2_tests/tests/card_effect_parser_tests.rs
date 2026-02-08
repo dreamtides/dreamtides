@@ -627,7 +627,7 @@ fn test_abandon_any_number_of_allies_draw_for_each_abandoned() {
 #[test]
 fn test_banish_up_to_n_then_materialize_them() {
     let result =
-        parse_ability("{Banish} {up_to_n_allies}, then {materialize} {it_or_them}.", "n: 2");
+        parse_ability("{Banish} {up_to_n_allies}, then {materialize} {pronoun:$n}.", "n: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(BanishThenMaterialize(

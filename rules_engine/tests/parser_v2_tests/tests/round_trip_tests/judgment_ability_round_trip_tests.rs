@@ -118,7 +118,7 @@ fn test_judgment_may_banish_ally_then_materialize() {
 #[test]
 fn test_judgment_may_pay_to_banish_and_materialize_multiple() {
     assert_round_trip(
-        "{Judgment} You may pay {energy($e)} to {banish} {up_to_n_allies($n)}, then {materialize} {it_or_them($n)}.",
+        "{Judgment} You may pay {energy($e)} to {banish} {up_to_n_allies($n)}, then {materialize} {pronoun:$n}.",
         "e: 3\nn: 2",
     );
 }

@@ -132,10 +132,7 @@ fn test_banish_non_subtype_enemy() {
 
 #[test]
 fn test_banish_allies_then_materialize() {
-    assert_round_trip(
-        "{Banish} {up_to_n_allies($n)}, then {materialize} {it_or_them($n)}.",
-        "n: 2",
-    );
+    assert_round_trip("{Banish} {up_to_n_allies($n)}, then {materialize} {pronoun:$n}.", "n: 2");
 }
 
 #[test]
