@@ -3,17 +3,6 @@ use core_data::card_types::CardSubtype;
 use rlf::Phrase;
 use strings::strings;
 
-/// Lowercases a leading keyword like "{Banish}" -> "{banish}" in a string.
-pub fn lowercase_leading_keyword(s: &str) -> String {
-    if s.starts_with('{') {
-        if let Some(end) = s.find('}') {
-            let keyword = &s[1..end];
-            return format!("{{{}}}{}", keyword.to_lowercase(), &s[end + 1..]);
-        }
-    }
-    s.to_string()
-}
-
 /// Capitalizes the first letter of a string, or the first letter of a
 /// leading action keyword in braces (e.g., "{kindle}" -> "{Kindle}").
 ///

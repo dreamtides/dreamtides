@@ -684,9 +684,9 @@ rlf::rlf! {
     // Gain control of a target.
     gain_control_of($target) = "gain control of {$target}";
     // Discover a card predicate.
-    discover_target($target) = "{{Discover}} {$target}";
+    discover_target($target) = "{{discover}} {$target}";
     // Discover a card and materialize it.
-    discover_and_materialize($target) = "{{Discover}} {$target} and {{materialize}} it";
+    discover_and_materialize($target) = "{{discover}} {$target} and {{materialize}} it";
     // Materialize a target.
     materialize_target($target) = "{{materialize}} {$target}";
     // Materialize a target at end of turn.
@@ -769,6 +769,8 @@ rlf::rlf! {
     then_joiner = ", then ";
     // Joins parallel effects in ability text (e.g., "draw a card and gain 1 energy").
     and_joiner = " and ";
+    // Joins separate effect sentences in event context (e.g., "Draw a card. Gain 1 energy.").
+    sentence_joiner = ". ";
     // Terminal punctuation for ability text.
     period_suffix = ".";
 

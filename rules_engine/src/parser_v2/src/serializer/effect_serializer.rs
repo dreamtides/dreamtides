@@ -527,25 +527,14 @@ pub fn serialize_effect_with_context(
                 result.push_str(&condition_serializer::serialize_condition(condition, bindings));
                 result.push(' ');
             }
-            let needs_lowercase = options.optional || options.trigger_cost.is_some();
             if options.optional {
-                result.push_str("you may ");
+                result.push_str(&strings::you_may_prefix().to_string());
             }
             if let Some(trigger_cost) = &options.trigger_cost {
                 let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost, bindings);
-                let cost_str = if options.optional {
-                    serializer_utils::lowercase_leading_keyword(&cost_str)
-                } else {
-                    cost_str
-                };
-                result.push_str(&format!("{} to ", cost_str));
+                result.push_str(&strings::cost_to_connector(cost_str).to_string());
             }
             let effect_str = serialize_standard_effect(&options.effect, bindings);
-            let effect_str = if needs_lowercase {
-                serializer_utils::lowercase_leading_keyword(&effect_str)
-            } else {
-                effect_str
-            };
             result.push_str(&effect_str);
             result
         }
@@ -553,19 +542,16 @@ pub fn serialize_effect_with_context(
             let all_optional = effects.iter().all(|e| e.optional);
             let has_condition = effects.first().and_then(|e| e.condition.as_ref()).is_some();
             let all_have_trigger_cost = effects.iter().all(|e| e.trigger_cost.is_some());
+            let and_join = strings::and_joiner().to_string();
+            let then_join = strings::then_joiner().to_string();
+            let period = strings::period_suffix().to_string();
             if all_optional && all_have_trigger_cost && !effects.is_empty() {
                 let effect_strings: Vec<String> = effects
                     .iter()
-                    .enumerate()
-                    .map(|(i, e)| {
-                        let s = serialize_standard_effect(&e.effect, bindings)
+                    .map(|e| {
+                        serialize_standard_effect(&e.effect, bindings)
                             .trim_end_matches('.')
-                            .to_string();
-                        if i == 0 {
-                            serializer_utils::lowercase_leading_keyword(&s)
-                        } else {
-                            s
-                        }
+                            .to_string()
                     })
                     .collect();
                 let mut result = String::new();
@@ -577,27 +563,21 @@ pub fn serialize_effect_with_context(
                         result.push(' ');
                     }
                 }
-                result.push_str("you may ");
+                result.push_str(&strings::you_may_prefix().to_string());
                 if let Some(trigger_cost) = &effects[0].trigger_cost {
                     let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost, bindings);
-                    let cost_str = serializer_utils::lowercase_leading_keyword(&cost_str);
-                    result.push_str(&format!("{} to ", cost_str));
+                    result.push_str(&strings::cost_to_connector(cost_str).to_string());
                 }
-                result.push_str(&format!("{}.", effect_strings.join(" and ")));
+                result.push_str(&effect_strings.join(&and_join));
+                result.push_str(&period);
                 result
             } else if !all_optional && all_have_trigger_cost && !effects.is_empty() {
                 let effect_strings: Vec<String> = effects
                     .iter()
-                    .enumerate()
-                    .map(|(i, e)| {
-                        let s = serialize_standard_effect(&e.effect, bindings)
+                    .map(|e| {
+                        serialize_standard_effect(&e.effect, bindings)
                             .trim_end_matches('.')
-                            .to_string();
-                        if i == 0 {
-                            serializer_utils::lowercase_leading_keyword(&s)
-                        } else {
-                            s
-                        }
+                            .to_string()
                     })
                     .collect();
                 let mut result = String::new();
@@ -610,26 +590,19 @@ pub fn serialize_effect_with_context(
                     }
                 }
                 if let Some(trigger_cost) = &effects[0].trigger_cost {
-                    result.push_str(&format!(
-                        "{} to ",
-                        cost_serializer::serialize_trigger_cost(trigger_cost, bindings)
-                    ));
+                    let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost, bindings);
+                    result.push_str(&strings::cost_to_connector(cost_str).to_string());
                 }
-                result.push_str(&format!("{}.", effect_strings.join(" and ")));
+                result.push_str(&effect_strings.join(&and_join));
+                result.push_str(&period);
                 result
             } else if all_optional && !effects.is_empty() {
                 let effect_strings: Vec<String> = effects
                     .iter()
-                    .enumerate()
-                    .map(|(i, e)| {
-                        let s = serialize_standard_effect(&e.effect, bindings)
+                    .map(|e| {
+                        serialize_standard_effect(&e.effect, bindings)
                             .trim_end_matches('.')
-                            .to_string();
-                        if i == 0 {
-                            serializer_utils::lowercase_leading_keyword(&s)
-                        } else {
-                            s
-                        }
+                            .to_string()
                     })
                     .collect();
                 let mut result = String::new();
@@ -641,7 +614,9 @@ pub fn serialize_effect_with_context(
                         result.push(' ');
                     }
                 }
-                result.push_str(&format!("you may {}.", effect_strings.join(", then ")));
+                result.push_str(&strings::you_may_prefix().to_string());
+                result.push_str(&effect_strings.join(&then_join));
+                result.push_str(&period);
                 result
             } else {
                 let mut result = String::new();
@@ -653,7 +628,6 @@ pub fn serialize_effect_with_context(
                         result.push(' ');
                     }
                 }
-                // For mandatory effect lists, use different joining based on context
                 if context == AbilityContext::Triggered {
                     let effect_strings: Vec<String> = effects
                         .iter()
@@ -663,17 +637,20 @@ pub fn serialize_effect_with_context(
                                 .to_string()
                         })
                         .collect();
-                    result.push_str(&format!("{}.", effect_strings.join(", then ")));
+                    result.push_str(&effect_strings.join(&then_join));
+                    result.push_str(&period);
                 } else {
                     let effect_strings: Vec<String> = effects
                         .iter()
                         .map(|e| {
                             let s = serialize_standard_effect(&e.effect, bindings);
                             let s = s.trim_end_matches('.');
-                            format!("{}.", serializer_utils::capitalize_first_letter(s))
+                            serializer_utils::capitalize_first_letter(s)
                         })
                         .collect();
-                    result.push_str(&effect_strings.join(" "));
+                    let sentence_join = strings::sentence_joiner().to_string();
+                    result.push_str(&effect_strings.join(&sentence_join));
+                    result.push_str(&period);
                 }
                 result
             }
@@ -685,39 +662,28 @@ pub fn serialize_effect_with_context(
                 result.push(' ');
             }
             let has_shared_trigger_cost = list_with_options.trigger_cost.is_some();
-            // Check if this is an optional action (parsed from "you may X to Y and Z")
-            // by checking if ALL effects are optional AND there's a shared trigger_cost.
-            // When all effects are optional with a shared cost, output "you may" once
-            // at the start instead of for each effect.
             let all_effects_optional =
                 list_with_options.effects.iter().all(|e| e.optional && e.trigger_cost.is_none());
             let is_optional_with_shared_cost = has_shared_trigger_cost && all_effects_optional;
             if is_optional_with_shared_cost {
-                result.push_str("you may ");
+                result.push_str(&strings::you_may_prefix().to_string());
             }
             if let Some(trigger_cost) = &list_with_options.trigger_cost {
                 let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost, bindings);
-                let cost_str = if is_optional_with_shared_cost {
-                    serializer_utils::lowercase_leading_keyword(&cost_str)
-                } else {
-                    cost_str
-                };
-                result.push_str(&format!("{} to ", cost_str));
+                result.push_str(&strings::cost_to_connector(cost_str).to_string());
             }
             let effect_strings: Vec<String> = list_with_options
                 .effects
                 .iter()
                 .map(|e| {
                     let mut effect_str = String::new();
-                    // When using shared optional cost, don't add "you may" to individual effects
                     if e.optional && !is_optional_with_shared_cost {
-                        effect_str.push_str("you may ");
+                        effect_str.push_str(&strings::you_may_prefix().to_string());
                     }
                     if let Some(trigger_cost) = &e.trigger_cost {
-                        effect_str.push_str(&format!(
-                            "{} to ",
-                            cost_serializer::serialize_trigger_cost(trigger_cost, bindings)
-                        ));
+                        let cost_str =
+                            cost_serializer::serialize_trigger_cost(trigger_cost, bindings);
+                        effect_str.push_str(&strings::cost_to_connector(cost_str).to_string());
                     }
                     if let Some(condition) = &e.condition {
                         effect_str.push_str(&condition_serializer::serialize_condition(
@@ -731,12 +697,17 @@ pub fn serialize_effect_with_context(
                     effect_str
                 })
                 .collect();
-            // Use " and " when effects share a common trigger cost
-            let joiner = if has_shared_trigger_cost { " and " } else { ", then " };
-            result.push_str(&format!("{}.", effect_strings.join(joiner)));
+            let joiner = if has_shared_trigger_cost {
+                strings::and_joiner().to_string()
+            } else {
+                strings::then_joiner().to_string()
+            };
+            result.push_str(&effect_strings.join(&joiner));
+            result.push_str(&strings::period_suffix().to_string());
             result
         }
         Effect::Modal(choices) => {
+            let cost_effect_sep = strings::cost_effect_separator().to_string();
             let mut result = "{choose_one}".to_string();
             for (index, choice) in choices.iter().enumerate() {
                 result.push('\n');
@@ -744,15 +715,9 @@ pub fn serialize_effect_with_context(
                 let (cost_var, var_name) =
                     if index == 0 { ("{energy($e1)}", "e1") } else { ("{energy($e2)}", "e2") };
                 bindings.insert(var_name.to_string(), VariableValue::Integer(choice.energy_cost.0));
-                result.push_str(&format!(
-                    "{}: {}",
-                    cost_var,
-                    serializer_utils::capitalize_first_letter(&serialize_effect_with_context(
-                        &choice.effect,
-                        bindings,
-                        context
-                    ))
-                ));
+                let effect_text = serialize_effect_with_context(&choice.effect, bindings, context);
+                let capitalized = serializer_utils::capitalize_first_letter(&effect_text);
+                result.push_str(&format!("{cost_var}{cost_effect_sep}{capitalized}"));
             }
             result
         }
