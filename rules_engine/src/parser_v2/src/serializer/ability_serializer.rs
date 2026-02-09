@@ -66,10 +66,8 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
         Ability::Activated(activated) => {
             let mut result = String::new();
             let is_fast = activated.options.as_ref().is_some_and(|options| options.is_fast);
-            let has_once_per_turn = activated
-                .options
-                .as_ref()
-                .is_some_and(|options| !options.is_fast && !options.is_multi);
+            let has_once_per_turn =
+                activated.options.as_ref().is_some_and(|options| !options.is_multi);
             if is_fast {
                 result.push_str(&strings::fast_prefix().to_string());
             }

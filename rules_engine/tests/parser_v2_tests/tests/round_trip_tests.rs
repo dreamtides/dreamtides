@@ -7,5 +7,7 @@ mod round_trip_tests {
     mod judgment_ability_round_trip_tests;
     mod materialized_ability_round_trip_tests;
     mod static_ability_round_trip_tests;
+    mod test_cards_toml_round_trip_tests;
+    mod test_dreamwell_toml_round_trip_tests;
     mod triggered_ability_round_trip_tests;
 }

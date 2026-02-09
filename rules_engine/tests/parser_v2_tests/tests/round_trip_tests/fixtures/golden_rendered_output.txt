@@ -56,6 +56,11 @@ Dreadcall Warden|0|<color=#00838F>2●</color>, Abandon an ally with spark 1 or 
 Dreamborne Leviathan|0|Reveal the top card of your deck.
 Dreamborne Leviathan|1|You may play characters from the top of your deck.
 Dreamscatter|0|Pay 1 or more <color=#00838F>●</color>: Draw a card for each <color=#00838F>●</color> spent.
+Dreamwell Draw Discard|0|Draw a card. Discard a card.
+Dreamwell Foresee|0|<color=#AA00FF>Foresee</color> 1.
+Dreamwell Gain Energy|0|Gain <color=#00838F>1●</color>.
+Dreamwell Gain Points|0|Gain <color=#F57F17>2⍏</color>.
+Dreamwell Mill 3|0|Put the top 3 cards of your deck into your void.
 Driftcaller Sovereign|0|▸ <b>Materialized, Judgment:</b> Gain <color=#00838F>1●</color>.
 Duneveil Vanguard|0|▸ <b>Judgment:</b> You may discard a card to <color=#AA00FF>dissolve</color> an enemy with spark 1 or less.
 Dustborn Veteran|0|When an ally is ▸ <b>Dissolved:</b>, this card gains <color=#AA00FF>reclaim</color> <color=#00838F>1●</color> this turn.
@@ -208,6 +213,51 @@ Sunset Chronicler|0|When an ally is ▸ <b>Dissolved:</b>, draw a card.
 Sunshadow Eagle|0|When you <color=#AA00FF>materialize</color> an allied <color=#2E7D32><b>Spirit Animal</b></color>, that character gains +1 spark.
 Surge of Fury|0|At the end of this turn, trigger an additional <b>Judgment</b> phase.
 Synaptic Sentinel|0|▸ <b>Judgment:</b> <color=#AA00FF>Foresee</color> 1.
+Test Activated Ability Dissolve Character|0|<color=#00838F>2●</color>: <color=#AA00FF>Dissolve</color> an enemy.
+Test Activated Ability Draw Card|0|<color=#00838F>1●</color>, once per turn: Draw a card.
+Test Counterspell Character|0|<color=#AA00FF>Prevent</color> a played character.
+Test Counterspell Unless Pays|0|<color=#AA00FF>Prevent</color> a played event unless the opponent pays <color=#00838F>2●</color>.
+Test Counterspell|0|<color=#AA00FF>Prevent</color> a played card.
+Test Deck To Void|0|Put the top 3 cards of your deck into your void.
+Test Discard Two|0|Discard 2 cards.
+Test Discard|0|Discard a card.
+Test Dissolve|0|<color=#AA00FF>Dissolve</color> an enemy.
+Test Draw One Reclaim|0|Draw a card.
+Test Draw One Reclaim|1|<color=#AA00FF>Reclaim</color> <color=#00838F>1●</color>
+Test Draw One|0|Draw a card.
+Test Dual Activated Ability Character|0|<color=#00838F>1●</color>: Draw a card.
+Test Dual Activated Ability Character|1|<color=#00838F>2●</color>: Draw 2 cards.
+Test Fast Activated Ability Draw Card Character|0|<b>↯fast</b> -- <color=#00838F>1●</color>, once per turn: Draw a card.
+Test Fast Multi Activated Ability Draw Card Character|0|<b>↯fast</b> -- <color=#00838F>3●</color>: Draw a card.
+Test Foresee One Draw A Card|0|<color=#AA00FF>Foresee</color> 1. Draw a card.
+Test Foresee One Draw Reclaim|0|<color=#AA00FF>Foresee</color> 1. Draw a card.
+Test Foresee One Draw Reclaim|1|<color=#AA00FF>Reclaim</color> <color=#00838F>3●</color>
+Test Foresee One Reclaim|0|<color=#AA00FF>Foresee</color> 1.
+Test Foresee One Reclaim|1|<color=#AA00FF>Reclaim</color> <color=#00838F>3●</color>
+Test Foresee One|0|<color=#AA00FF>Foresee</color> 1.
+Test Foresee Two|0|<color=#AA00FF>Foresee</color> 2.
+Test Gain Energy|0|Gain <color=#00838F>1●</color>.
+Test Gain Points|0|Gain <color=#F57F17>2⍏</color>.
+Test Materialized Draw Card|0|▸ <b>Materialized:</b> Draw a card.
+Test Modal Draw One Or Dissolve Enemy|0|<b>Choose One:</b>
+• <color=#00838F>1●</color>: Draw a card.
+• <color=#00838F>2●</color>: <color=#AA00FF>Dissolve</color> an enemy.
+Test Modal Draw One Or Draw Two|0|<b>Choose One:</b>
+• <color=#00838F>1●</color>: Draw a card.
+• <color=#00838F>3●</color>: Draw 2 cards.
+Test Modal Return To Hand Or Draw Two|0|<b>Choose One:</b>
+• <color=#00838F>2●</color>: Return an enemy to hand.
+• <color=#00838F>3●</color>: Draw 2 cards.
+Test Multi Activated Ability Draw Card Character|0|<color=#00838F>1●</color>: Draw a card.
+Test Named Dissolve|0|<color=#AA00FF>Dissolve</color> an enemy.
+Test Prevent Event Which Could Dissolve Ally|0|<color=#AA00FF>Prevent</color> a played event which could <color=#AA00FF>dissolve</color> an ally.
+Test Return One Or Two Void Event Cards To Hand|0|Return up to 2 events from your void to your hand.
+Test Return To Hand|0|Return an enemy to hand.
+Test Return Void Card To Hand|0|Return a card from your void to your hand.
+Test Trigger Gain Spark On Play Card Enemy Turn|0|When you play a card during the opponent's turn, this character gains +1 spark.
+Test Trigger Gain Spark When Materialize Another Character|0|When you <color=#AA00FF>materialize</color> an ally, this character gains +1 spark.
+Test Trigger Gain Two Spark On Play Card Enemy Turn|0|When you play a card during the opponent's turn, this character gains +2 spark.
+Test Variable Energy Draw|0|Pay 1 or more <color=#00838F>●</color>: Draw a card for each <color=#00838F>●</color> spent.
 The Bondweaver|0|When you <color=#AA00FF>materialize</color> a character, this character gains +1 spark.
 The Calling Night|0|▸ <b>Judgment:</b> Draw a card, then the opponent gains <color=#F57F17>2⍏</color>.
 The Devourer|0|<color=#AA00FF>Banish</color> your void with 8 or more cards: <color=#AA00FF>Reclaim</color> this character.

@@ -1,7 +1,8 @@
 //! Golden file test for rendered card text output.
 //!
-//! Generates rendered text for every card ability in cards.toml and
-//! dreamwell.toml and compares it against a stored baseline file.
+//! Generates rendered text for every card ability in cards.toml,
+//! dreamwell.toml, test-cards.toml, and test-dreamwell.toml and compares
+//! it against a stored baseline file.
 
 use chumsky::Parser;
 use parser_v2::lexer::lexer_tokenize;
@@ -25,6 +26,12 @@ struct Card {
 }
 
 #[derive(Debug, Deserialize)]
+struct TestCardsFile {
+    #[serde(rename = "test-cards")]
+    test_cards: Vec<Card>,
+}
+
+#[derive(Debug, Deserialize)]
 struct DreamwellFile {
     dreamwell: Vec<Dreamwell>,
 }
@@ -35,6 +42,12 @@ struct Dreamwell {
     #[serde(rename = "rules-text")]
     rules_text: Option<String>,
     variables: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct TestDreamwellFile {
+    #[serde(rename = "test-dreamwell")]
+    test_dreamwell: Vec<Dreamwell>,
 }
 
 /// Generates a single golden file entry for one ability.
@@ -92,6 +105,64 @@ fn generate_card_entries(cards_toml: &str, entries: &mut Vec<String>, errors: &m
     }
 }
 
+/// Generates rendered output lines for all abilities in a test-cards TOML file.
+fn generate_test_card_entries(
+    test_cards_toml: &str,
+    entries: &mut Vec<String>,
+    errors: &mut Vec<String>,
+) {
+    let test_cards_file: TestCardsFile =
+        toml::from_str(test_cards_toml).expect("Failed to parse test-cards TOML");
+
+    for card in &test_cards_file.test_cards {
+        let Some(rules_text) = &card.rules_text else {
+            continue;
+        };
+
+        let variables = card.variables.as_deref().unwrap_or("");
+
+        for (ability_index, ability_block) in rules_text.split("\n\n").enumerate() {
+            let ability_block = ability_block.trim();
+            if ability_block.is_empty() {
+                continue;
+            }
+
+            match generate_entry(&card.name, ability_index, ability_block, variables) {
+                Ok(entry) => entries.push(entry),
+                Err(e) => errors.push(e),
+            }
+        }
+    }
+}
+
+/// Generates rendered output lines for all abilities in a test-dreamwell TOML
+/// file, skipping entries that fail to parse.
+fn generate_test_dreamwell_entries(test_dreamwell_toml: &str, entries: &mut Vec<String>) {
+    let test_dreamwell_file: TestDreamwellFile =
+        toml::from_str(test_dreamwell_toml).expect("Failed to parse test-dreamwell TOML");
+
+    for dreamwell in &test_dreamwell_file.test_dreamwell {
+        let Some(rules_text) = &dreamwell.rules_text else {
+            continue;
+        };
+
+        let variables = dreamwell.variables.as_deref().unwrap_or("");
+
+        for (ability_index, ability_block) in rules_text.split("\n\n").enumerate() {
+            let ability_block = ability_block.trim();
+            if ability_block.is_empty() {
+                continue;
+            }
+
+            if let Ok(entry) =
+                generate_entry(&dreamwell.name, ability_index, ability_block, variables)
+            {
+                entries.push(entry);
+            }
+        }
+    }
+}
+
 /// Generates rendered output lines for all abilities in a dreamwell TOML file.
 fn generate_dreamwell_entries(
     dreamwell_toml: &str,
@@ -128,12 +199,18 @@ fn generate_golden_content() -> String {
         std::fs::read_to_string("../../tabula/cards.toml").expect("Failed to read cards.toml");
     let dreamwell_toml = std::fs::read_to_string("../../tabula/dreamwell.toml")
         .expect("Failed to read dreamwell.toml");
+    let test_cards_toml = std::fs::read_to_string("../../tabula/test-cards.toml")
+        .expect("Failed to read test-cards.toml");
+    let test_dreamwell_toml = std::fs::read_to_string("../../tabula/test-dreamwell.toml")
+        .expect("Failed to read test-dreamwell.toml");
 
     let mut entries = Vec::new();
     let mut errors = Vec::new();
 
     generate_card_entries(&cards_toml, &mut entries, &mut errors);
     generate_dreamwell_entries(&dreamwell_toml, &mut entries, &mut errors);
+    generate_test_card_entries(&test_cards_toml, &mut entries, &mut errors);
+    generate_test_dreamwell_entries(&test_dreamwell_toml, &mut entries);
 
     if !errors.is_empty() {
         panic!("Failed to generate {} golden file entries:\n{}", errors.len(), errors.join("\n"));

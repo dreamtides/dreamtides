@@ -4,7 +4,7 @@ use core_data::identifiers::{BaseCardId, DreamwellCardId};
 use uuid::uuid;
 
 pub const TEST_VANILLA_CHARACTER: BaseCardId = BaseCardId(uuid!("253ee0ca-f973-4d9f-ad37-abe548bc674f"));
-/// {Dissolve} an enemy character.
+/// {Dissolve} an enemy.
 pub const TEST_DISSOLVE: BaseCardId = BaseCardId(uuid!("d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6"));
 /// {Prevent} a played card.
 pub const TEST_COUNTERSPELL: BaseCardId = BaseCardId(uuid!("aad836b0-3ece-477c-b923-b099360f0115"));
@@ -14,11 +14,11 @@ pub const TEST_COUNTERSPELL_UNLESS_PAYS: BaseCardId = BaseCardId(uuid!("76b6d00c
 pub const TEST_VARIABLE_ENERGY_DRAW: BaseCardId = BaseCardId(uuid!("e06a8cfe-483f-42c0-aac8-9c12b21b3f99"));
 /// When you play a card during the opponent's turn, this character gains +{$s} spark.
 pub const TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN: BaseCardId = BaseCardId(uuid!("86ee5ad7-b60b-4596-af8c-7a495022ac61"));
-/// {fast} {energy($e)}: Draw {cards($c)}.
+/// {Fast} -- {energy($e)}: Draw {cards($c)}.
 pub const TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: BaseCardId = BaseCardId(uuid!("d8a8541f-5b00-4d91-9518-aa8ae70ea450"));
 /// Return {up_to_n_events($n)} from your void to your hand.
 pub const TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND: BaseCardId = BaseCardId(uuid!("559e62a0-7ead-4136-8bd4-6cc58db4bef7"));
-/// {choose_one} {bullet} {energy($e1)}: Return an enemy character to hand. {bullet} {energy($e2)}: Draw {cards($c)}.
+/// {choose_one} {bullet} {energy($e1)}: Return an enemy to hand. {bullet} {energy($e2)}: Draw {cards($c)}.
 pub const TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO: BaseCardId = BaseCardId(uuid!("e8f937da-cca7-447d-a559-530d7c339325"));
 /// {Prevent} a played event which could {dissolve} an ally.
 pub const TEST_PREVENT_EVENT_WHICH_COULD_DISSOLVE_ALLY: BaseCardId = BaseCardId(uuid!("a9f3e4c7-2b1d-4e8a-9c3f-5d7b8e2a1c4d"));
@@ -26,7 +26,7 @@ pub const TEST_PREVENT_EVENT_WHICH_COULD_DISSOLVE_ALLY: BaseCardId = BaseCardId(
 pub const TEST_FORESEE_ONE_DRAW_RECLAIM: BaseCardId = BaseCardId(uuid!("de21db6c-54b4-4bff-b1d6-5a4711ef5ed8"));
 /// {Prevent} a played character.
 pub const TEST_COUNTERSPELL_CHARACTER: BaseCardId = BaseCardId(uuid!("86ed0d3f-320b-49d0-b022-cd94aa07edbd"));
-/// {Dissolve} an enemy character.
+/// {Dissolve} an enemy.
 pub const TEST_NAMED_DISSOLVE: BaseCardId = BaseCardId(uuid!("3c1dbdc7-702e-4748-af3c-4fd837bcb404"));
 /// Draw {cards($c)}.
 pub const TEST_DRAW_ONE: BaseCardId = BaseCardId(uuid!("68f90d08-9b51-424e-90d1-d15ddd1ece93"));
@@ -38,9 +38,9 @@ pub const TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN: BaseCardId = Base
 pub const TEST_ACTIVATED_ABILITY_DRAW_CARD: BaseCardId = BaseCardId(uuid!("8dfeb2c1-2d72-411c-a8cc-7f84ca532c63"));
 /// {energy($e)}: Draw {cards($c)}.
 pub const TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: BaseCardId = BaseCardId(uuid!("56f944bb-333b-4e2c-9c8c-2068f41998c2"));
-/// {fast} {energy($e)}, once per turn: Draw {cards($c)}.
+/// {Fast} -- {energy($e)}, once per turn: Draw {cards($c)}.
 pub const TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: BaseCardId = BaseCardId(uuid!("44aa4a1a-e8c6-4969-94bc-5fdbe010395e"));
-/// {energy($e)}: {Dissolve} an enemy character.
+/// {energy($e)}: {Dissolve} an enemy.
 pub const TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER: BaseCardId = BaseCardId(uuid!("785e0341-fdd8-4e05-acb4-cbceed70ea6c"));
 /// {energy($e1)}: Draw {cards($c1)}.  {energy($e2)}: Draw {cards($c2)}.
 pub const TEST_DUAL_ACTIVATED_ABILITY_CHARACTER: BaseCardId = BaseCardId(uuid!("3af84464-874a-4fd2-89cb-1986dee59ae1"));
@@ -58,9 +58,9 @@ pub const TEST_FORESEE_ONE_RECLAIM: BaseCardId = BaseCardId(uuid!("86ffc58b-96db
 pub const TEST_RETURN_VOID_CARD_TO_HAND: BaseCardId = BaseCardId(uuid!("46e20fe4-36ca-438d-91a6-fac880ee9495"));
 /// {choose_one} {bullet} {energy($e1)}: Draw {cards($c1)}. {bullet} {energy($e2)}: Draw {cards($c2)}.
 pub const TEST_MODAL_DRAW_ONE_OR_DRAW_TWO: BaseCardId = BaseCardId(uuid!("029889e9-25bc-438f-a492-8813febd65d8"));
-/// {choose_one} {bullet} {energy($e1)}: Draw {cards($c)}. {bullet} {energy($e2)}: {Dissolve} an enemy character.
+/// {choose_one} {bullet} {energy($e1)}: Draw {cards($c)}. {bullet} {energy($e2)}: {Dissolve} an enemy.
 pub const TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY: BaseCardId = BaseCardId(uuid!("9847b3fc-1e7f-44e5-90af-1240ae12aaee"));
-/// Return an enemy character to hand.
+/// Return an enemy to hand.
 pub const TEST_RETURN_TO_HAND: BaseCardId = BaseCardId(uuid!("cf2f292b-f02c-4130-aff7-3f48fd147633"));
 /// Gain {points($p)}.
 pub const TEST_GAIN_POINTS: BaseCardId = BaseCardId(uuid!("995b52a1-b368-4c83-ae05-8ab3800ca618"));
@@ -81,7 +81,7 @@ pub const DREAMWELL_PRODUCE_2_STARTER: DreamwellCardId = DreamwellCardId(uuid!("
 pub const DREAMWELL_FORESEE: DreamwellCardId = DreamwellCardId(uuid!("40c77ea8-a021-4bc6-8970-0853c03f3fe0"));
 /// Gain {points($p)}.
 pub const DREAMWELL_GAIN_POINTS: DreamwellCardId = DreamwellCardId(uuid!("d386663c-9e9f-4b8e-b410-f3467e39801b"));
-/// Gain {$e}.
+/// Gain {energy($e)}.
 pub const DREAMWELL_GAIN_ENERGY: DreamwellCardId = DreamwellCardId(uuid!("107c3b3f-6131-4ff8-afcb-f0ce4188848f"));
 /// Draw {cards($c)}. Discard {cards($d)}.
 pub const DREAMWELL_DRAW_DISCARD: DreamwellCardId = DreamwellCardId(uuid!("40e4381f-12f7-46b9-ae50-67b3195781b1"));

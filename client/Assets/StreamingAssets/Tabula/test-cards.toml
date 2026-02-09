@@ -15,7 +15,7 @@ variables = ""
 name = "Test Dissolve"
 id = "d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6"
 energy-cost = 2
-rules-text = "{Dissolve} an enemy character."
+rules-text = "{Dissolve} an enemy."
 prompts = "Choose an enemy character to {dissolve}."
 card-type = "Event"
 is-fast = true
@@ -80,7 +80,7 @@ prompts = ""
 name = "Test Fast Multi Activated Ability Draw Card Character"
 id = "d8a8541f-5b00-4d91-9518-aa8ae70ea450"
 energy-cost = 2
-rules-text = "{fast} {energy($e)}: Draw {cards($c)}."
+rules-text = "{Fast} -- {energy($e)}: Draw {cards($c)}."
 variables = """
 e: 3
 c: 1"""
@@ -110,7 +110,7 @@ id = "e8f937da-cca7-447d-a559-530d7c339325"
 energy-cost = "*"
 rules-text = """
 {choose_one}
-{bullet} {energy($e1)}: Return an enemy character to hand.
+{bullet} {energy($e1)}: Return an enemy to hand.
 {bullet} {energy($e2)}: Draw {cards($c)}."""
 variables = """
 e1: 2
@@ -172,7 +172,7 @@ variables = ""
 name = "Test Named Dissolve"
 id = "3c1dbdc7-702e-4748-af3c-4fd837bcb404"
 energy-cost = 2
-rules-text = "{Dissolve} an enemy character."
+rules-text = "{Dissolve} an enemy."
 prompts = "Choose an enemy character to {dissolve}."
 card-type = "Event"
 is-fast = true
@@ -254,7 +254,7 @@ prompts = ""
 name = "Test Fast Activated Ability Draw Card Character"
 id = "44aa4a1a-e8c6-4969-94bc-5fdbe010395e"
 energy-cost = 0
-rules-text = "{fast} {energy($e)}, once per turn: Draw {cards($c)}."
+rules-text = "{Fast} -- {energy($e)}, once per turn: Draw {cards($c)}."
 variables = """
 e: 1
 c: 1"""
@@ -269,7 +269,7 @@ prompts = ""
 name = "Test Activated Ability Dissolve Character"
 id = "785e0341-fdd8-4e05-acb4-cbceed70ea6c"
 energy-cost = 3
-rules-text = "{energy($e)}: {Dissolve} an enemy character."
+rules-text = "{energy($e)}: {Dissolve} an enemy."
 variables = "e: 2"
 prompts = "Choose an enemy character to {dissolve}."
 card-type = "Character"
@@ -415,7 +415,7 @@ energy-cost = "*"
 rules-text = """
 {choose_one}
 {bullet} {energy($e1)}: Draw {cards($c)}.
-{bullet} {energy($e2)}: {Dissolve} an enemy character."""
+{bullet} {energy($e2)}: {Dissolve} an enemy."""
 variables = """
 e1: 1
 c: 1
@@ -431,7 +431,7 @@ spark = ""
 name = "Test Return To Hand"
 id = "cf2f292b-f02c-4130-aff7-3f48fd147633"
 energy-cost = 1
-rules-text = "Return an enemy character to hand."
+rules-text = "Return an enemy to hand."
 prompts = "Choose an enemy character to return to hand."
 card-type = "Event"
 is-fast = true
