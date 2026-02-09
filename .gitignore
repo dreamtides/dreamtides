@@ -7,6 +7,7 @@ log.json
 search_graph.dot
 !rules_engine/src/tv/src-tauri/CLAUDE.md
 .claude
+.codex/
 release_builds
 client_secret.json
 service_account_key.json
