@@ -7,7 +7,8 @@ use parser_v2::variables::parser_bindings::VariableBindings;
 use rlf::{Phrase, Value};
 use strings::strings;
 
-/// Evaluates a template string with RLF variable bindings.
+/// Evaluates a template string with RLF variable bindings. Used by the test
+/// oracle for dual-path rendered comparison.
 pub fn eval_str(template: &str, bindings: &VariableBindings) -> String {
     strings::register_source_phrases();
     let params = build_params(bindings);

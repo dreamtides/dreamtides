@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 
 use ability_data::ability::Ability;
 use ability_data::effect::{Effect, ModelEffectChoiceIndex};
@@ -10,13 +10,10 @@ use crate::serializer::effect_serializer::AbilityContext;
 use crate::serializer::{
     cost_serializer, effect_serializer, static_ability_serializer, trigger_serializer,
 };
-use crate::variables::parser_bindings::VariableBindings;
 
-/// Result of serializing an ability, containing both the text and variable
-/// bindings.
+/// Result of serializing an ability into displayable text.
 pub struct SerializedAbility {
     pub text: String,
-    pub variables: VariableBindings,
 }
 
 /// Serializes an ability into its rules text and variable bindings.
@@ -103,7 +100,7 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
         )
         .to_string(),
     };
-    SerializedAbility { text, variables: VariableBindings::new() }
+    SerializedAbility { text: resolve_rlf(&text) }
 }
 
 /// Serializes just the effect portion of an ability, without any costs.
@@ -122,7 +119,7 @@ pub fn serialize_ability_effect(ability: &Ability) -> SerializedAbility {
         }
         _ => return serialize_ability(ability),
     };
-    SerializedAbility { text, variables: VariableBindings::new() }
+    SerializedAbility { text: resolve_rlf(&text) }
 }
 
 /// Extracts and serializes each modal effect choice from a list of abilities.
@@ -146,14 +143,24 @@ pub fn serialize_modal_choices(
                 ))
                 .to_string();
                 result.insert(ModelEffectChoiceIndex(current_index), SerializedAbility {
-                    text,
-                    variables: VariableBindings::new(),
+                    text: resolve_rlf(&text),
                 });
                 current_index += 1;
             }
         }
     }
     result
+}
+
+/// Resolves any remaining RLF phrase references in a template string.
+fn resolve_rlf(template: &str) -> String {
+    strings::register_source_phrases();
+    rlf::with_locale(|locale| {
+        locale
+            .eval_str(template, HashMap::new())
+            .unwrap_or_else(|e| panic!("Error resolving RLF template {template:?}: {e}"))
+            .to_string()
+    })
 }
 
 fn serialize_named_ability(named: &NamedAbility) -> String {

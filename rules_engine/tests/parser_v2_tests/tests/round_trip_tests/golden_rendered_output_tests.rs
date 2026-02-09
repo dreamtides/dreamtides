@@ -9,7 +9,6 @@ use parser_v2::parser::ability_parser;
 use parser_v2::serializer::ability_serializer;
 use parser_v2::variables::parser_bindings::VariableBindings;
 use parser_v2::variables::parser_substitutions;
-use parser_v2_tests::test_helpers;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -63,7 +62,7 @@ fn generate_entry(
     };
 
     let serialized = ability_serializer::serialize_ability(&ability);
-    let rendered = test_helpers::eval_str(&serialized.text, &serialized.variables);
+    let rendered = serialized.text;
 
     Ok(format!("{name}|{ability_index}|{rendered}"))
 }

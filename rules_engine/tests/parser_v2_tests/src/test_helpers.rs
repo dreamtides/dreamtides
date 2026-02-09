@@ -178,15 +178,12 @@ pub fn figment_phrase(figment: FigmentType) -> Phrase {
 
 /// Asserts dual-path rendered output comparison for an ability.
 ///
-/// Path A: parse(input) -> serialize() -> eval_str(serialized.text,
-/// serialized.variables) -> rendered
+/// Path A: parse(input) -> serialize() -> serialized.text
 /// Path B: eval_str(input_text, parse_bindings(vars)) -> rendered
-/// Both paths go through eval_str so the test works during the transition
-/// period.
 pub fn assert_rendered_match(input_text: &str, vars: &str) {
     let parsed = parse_ability(input_text, vars);
     let serialized = ability_serializer::serialize_ability(&parsed);
-    let path_a = eval_str(&serialized.text, &serialized.variables);
+    let path_a = serialized.text;
     let input_bindings = VariableBindings::parse(vars).unwrap();
     let path_b = eval_str(input_text, &input_bindings);
     assert_eq!(
@@ -254,7 +251,7 @@ pub fn assert_rendered_match_for_toml(
     })?;
 
     let serialized = ability_serializer::serialize_ability(&ability);
-    let path_a = eval_str(&serialized.text, &serialized.variables);
+    let path_a = serialized.text;
     let path_b = eval_str(ability_text, &bindings);
 
     if path_a != path_b {

@@ -91,8 +91,7 @@ pub fn ability_token_text(
     ability_number: AbilityNumber,
 ) -> String {
     let ability = &definition.abilities[ability_number.0];
-    let serialized = ability_serializer::serialize_ability_effect(ability);
-    rlf_helper::eval_str(&serialized.text, &serialized.variables)
+    ability_serializer::serialize_ability_effect(ability).text
 }
 
 /// Returns formatted rules text for a card on the battlefield or stack.
@@ -177,10 +176,7 @@ fn serialize_abilities_text(abilities: &[Ability]) -> String {
 
     abilities
         .iter()
-        .map(|ability| {
-            let serialized = ability_serializer::serialize_ability(ability);
-            rlf_helper::eval_str(&serialized.text, &serialized.variables)
-        })
+        .map(|ability| ability_serializer::serialize_ability(ability).text)
         .collect::<Vec<_>>()
         .join(&format!("\n{line_height_25}\n{end_line_height}"))
 }

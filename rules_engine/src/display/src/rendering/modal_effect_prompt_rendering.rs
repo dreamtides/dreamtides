@@ -18,7 +18,7 @@ use strings::strings;
 use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
 use crate::rendering::token_rendering::TokenCardView;
-use crate::rendering::{card_rendering, rlf_helper, token_rendering};
+use crate::rendering::{card_rendering, token_rendering};
 
 /// [CardView]s for cards representing the choices in an active modal effect
 /// prompt, if any.
@@ -59,8 +59,8 @@ pub fn cards(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
 /// prompt, if any.
 pub fn modal_effect_descriptions(abilities: &[Ability]) -> Vec<String> {
     ability_serializer::serialize_modal_choices(abilities)
-        .values()
-        .map(|serialized| rlf_helper::eval_str(&serialized.text, &serialized.variables))
+        .into_values()
+        .map(|serialized| serialized.text)
         .collect()
 }
 
