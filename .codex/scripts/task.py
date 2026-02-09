@@ -4,10 +4,14 @@
 from __future__ import annotations
 
 import argparse
+import fcntl
 import json
+import os
+import socket
 import sys
-from collections.abc import Iterable
-from datetime import datetime, timezone
+from collections.abc import Iterable, Iterator
+from contextlib import contextmanager
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 
@@ -15,6 +19,9 @@ VALID_STATUSES = ("todo", "in_progress", "blocked", "done", "canceled")
 DONE_STATUS = "done"
 INDEX_VERSION = 1
 MIN_ID_WIDTH = 4
+CLAIM_LEASE_SECONDS_DEFAULT = 4 * 60 * 60
+TASK_INDEX_LOCK_FILE = "index.lock"
+UTC_TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
 class TaskError(Exception):
@@ -23,7 +30,21 @@ class TaskError(Exception):
 
 def utc_timestamp() -> str:
     """Return a stable UTC timestamp format used by task metadata."""
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return format_utc_timestamp(datetime.now(timezone.utc))
+
+
+def format_utc_timestamp(value: datetime) -> str:
+    """Format a timezone-aware timestamp as UTC metadata text."""
+    return value.astimezone(timezone.utc).strftime(UTC_TIMESTAMP_FORMAT)
+
+
+def parse_utc_timestamp(value: str) -> datetime | None:
+    """Parse a UTC timestamp string or return None when invalid."""
+    try:
+        parsed = datetime.strptime(value, UTC_TIMESTAMP_FORMAT)
+    except ValueError:
+        return None
+    return parsed.replace(tzinfo=timezone.utc)
 
 
 def parse_task_id(task_id: str) -> int:
@@ -91,6 +112,91 @@ def store_paths(root: Path) -> dict[str, Path]:
         "items": items_dir,
         "index": index_path,
     }
+
+
+@contextmanager
+def index_write_lock(paths: dict[str, Path]) -> Iterator[None]:
+    """Hold an exclusive cross-process lock for index mutations."""
+    lock_path = paths["tasks"] / TASK_INDEX_LOCK_FILE
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        lock_handle = lock_path.open("a+", encoding="utf-8")
+    except OSError as error:
+        raise TaskError(f"Failed to open lock file '{lock_path}': {error}") from error
+    try:
+        try:
+            fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+        except OSError as error:
+            raise TaskError(f"Failed to lock '{lock_path}': {error}") from error
+        yield
+    finally:
+        try:
+            fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
+        except OSError:
+            pass
+        lock_handle.close()
+
+
+def default_claimant() -> str:
+    """Build default claimant identifier for task leases."""
+    user_name = os.environ.get("USER") or "unknown"
+    host_name = socket.gethostname().split(".", maxsplit=1)[0]
+    return f"{user_name}@{host_name}:{os.getpid()}"
+
+
+def clear_claim(task: dict[str, object]) -> None:
+    """Clear lease metadata on a task."""
+    task["claimed_by"] = None
+    task["claimed_at"] = None
+    task["lease_expires_at"] = None
+
+
+def claim_task(
+    task: dict[str, object],
+    claimant: str,
+    now: datetime,
+    lease_seconds: int,
+) -> None:
+    """Mark a task as in-progress and assign lease metadata."""
+    if lease_seconds < 1:
+        raise TaskError("Lease duration must be at least 1 second.")
+    task["status"] = "in_progress"
+    task["claimed_by"] = claimant
+    task["claimed_at"] = format_utc_timestamp(now)
+    task["lease_expires_at"] = format_utc_timestamp(now + timedelta(seconds=lease_seconds))
+    task["updated_at"] = format_utc_timestamp(now)
+
+
+def normalize_claim_shape(task: dict[str, object]) -> None:
+    """Ensure claim metadata keys exist on task dictionaries."""
+    if "claimed_by" not in task:
+        task["claimed_by"] = None
+    if "claimed_at" not in task:
+        task["claimed_at"] = None
+    if "lease_expires_at" not in task:
+        task["lease_expires_at"] = None
+
+
+def reclaim_stale_in_progress_tasks(
+    tasks: list[dict[str, object]], now: datetime
+) -> list[dict[str, object]]:
+    """Move expired in-progress tasks back to todo."""
+    reclaimed: list[dict[str, object]] = []
+    now_text = format_utc_timestamp(now)
+    for task in tasks:
+        if task.get("status") != "in_progress":
+            continue
+        lease_expires_at = task.get("lease_expires_at")
+        if not isinstance(lease_expires_at, str):
+            continue
+        lease_expires_at_dt = parse_utc_timestamp(lease_expires_at)
+        if lease_expires_at_dt is None or lease_expires_at_dt > now:
+            continue
+        task["status"] = "todo"
+        task["updated_at"] = now_text
+        clear_claim(task)
+        reclaimed.append(task)
+    return reclaimed
 
 
 def default_index() -> dict[str, object]:
@@ -317,6 +423,9 @@ def validate_index(
         task_file = task.get("task_file")
         created_at = task.get("created_at")
         updated_at = task.get("updated_at")
+        claimed_by = task.get("claimed_by")
+        claimed_at = task.get("claimed_at")
+        lease_expires_at = task.get("lease_expires_at")
 
         if not isinstance(task_id, str):
             errors.append(f"{task_label}.id must be a string.")
@@ -347,6 +456,23 @@ def validate_index(
             errors.append(f"{task_label}.created_at must be a non-empty string.")
         if not isinstance(updated_at, str) or updated_at.strip() == "":
             errors.append(f"{task_label}.updated_at must be a non-empty string.")
+        if claimed_by is not None and (
+            not isinstance(claimed_by, str) or claimed_by.strip() == ""
+        ):
+            errors.append(f"{task_label}.claimed_by must be null or a non-empty string.")
+        if claimed_at is not None and (
+            not isinstance(claimed_at, str) or parse_utc_timestamp(claimed_at) is None
+        ):
+            errors.append(
+                f"{task_label}.claimed_at must be null or UTC timestamp {UTC_TIMESTAMP_FORMAT}."
+            )
+        if lease_expires_at is not None and (
+            not isinstance(lease_expires_at, str)
+            or parse_utc_timestamp(lease_expires_at) is None
+        ):
+            errors.append(
+                f"{task_label}.lease_expires_at must be null or UTC timestamp {UTC_TIMESTAMP_FORMAT}."
+            )
         if check_files and isinstance(task_file, str):
             file_path = root / task_file
             if not file_path.exists():
@@ -428,16 +554,19 @@ def cmd_init(args: argparse.Namespace) -> int:
     """Initialize the task store."""
     root = Path(args.root).resolve()
     paths = store_paths(root)
-    paths["items"].mkdir(parents=True, exist_ok=True)
-    if paths["index"].exists():
-        print(f"Task store already initialized at {paths['index']}.")
-        return 0
-    atomic_write_json(paths["index"], default_index())
+    with index_write_lock(paths):
+        paths["items"].mkdir(parents=True, exist_ok=True)
+        if paths["index"].exists():
+            print(f"Task store already initialized at {paths['index']}.")
+            return 0
+        atomic_write_json(paths["index"], default_index())
     print(f"Initialized task store at {paths['index']}.")
     return 0
 
 
-def load_store_or_raise(root: Path) -> tuple[dict[str, Path], dict[str, object], list[dict[str, object]]]:
+def load_store_or_raise(
+    root: Path,
+) -> tuple[dict[str, Path], dict[str, object], list[dict[str, object]]]:
     """Load store and tasks with structural validation."""
     paths = store_paths(root)
     index_payload = load_index(paths)
@@ -449,47 +578,71 @@ def load_store_or_raise(root: Path) -> tuple[dict[str, Path], dict[str, object],
     return (paths, index_payload, tasks)
 
 
+@contextmanager
+def mutable_store_or_raise(
+    root: Path,
+) -> Iterator[tuple[dict[str, Path], dict[str, object], list[dict[str, object]]]]:
+    """Load a task store under an exclusive mutation lock."""
+    paths = store_paths(root)
+    with index_write_lock(paths):
+        index_payload = load_index(paths)
+        tasks = index_tasks(index_payload)
+        for task in tasks:
+            normalize_claim_shape(task)
+        errors = validate_index(index_payload, root, check_files=False)
+        if errors:
+            rendered = "\n".join(f"- {error}" for error in errors)
+            raise TaskError(f"Task index validation failed:\n{rendered}")
+        yield (paths, index_payload, tasks)
+
+
 def cmd_add(args: argparse.Namespace) -> int:
     """Create a new task."""
     root = Path(args.root).resolve()
-    (paths, index_payload, tasks) = load_store_or_raise(root)
-    status = args.status
-    if status not in VALID_STATUSES:
-        raise TaskError(f"Invalid status '{status}'.")
-    blocked_by = parse_csv_ids(args.blocked_by)
-    existing_ids = {str(task["id"]) for task in tasks}
-    for blocker in blocked_by:
-        if blocker not in existing_ids:
-            raise TaskError(f"Cannot add task with unknown blocker '{blocker}'.")
-
     if args.markdown_file is not None:
         markdown_text = read_markdown_from_path(Path(args.markdown_file))
     else:
         markdown_text = read_markdown_from_stdin()
 
-    next_id = index_payload.get("next_id")
-    if not isinstance(next_id, int) or next_id < 1:
-        raise TaskError("Task index is invalid: 'next_id' must be >= 1.")
-    task_id = format_task_id(next_id)
-    task_file = str(Path(".codex") / "tasks" / "items" / f"{task_id}.md")
-    now = utc_timestamp()
-    task = {
-        "id": task_id,
-        "title": args.title,
-        "status": status,
-        "blocked_by": blocked_by,
-        "task_file": task_file,
-        "created_at": now,
-        "updated_at": now,
-    }
+    with mutable_store_or_raise(root) as (paths, index_payload, tasks):
+        status = args.status
+        if status not in VALID_STATUSES:
+            raise TaskError(f"Invalid status '{status}'.")
+        blocked_by = parse_csv_ids(args.blocked_by)
+        existing_ids = {str(task["id"]) for task in tasks}
+        for blocker in blocked_by:
+            if blocker not in existing_ids:
+                raise TaskError(f"Cannot add task with unknown blocker '{blocker}'.")
 
-    tasks.append(task)
-    index_payload["next_id"] = next_id + 1
-    write_task_markdown(root, task, body_override=markdown_text)
-    errors = validate_index(index_payload, root, check_files=True)
-    if errors:
-        raise TaskError("Cannot add task:\n" + "\n".join(f"- {error}" for error in errors))
-    atomic_write_json(paths["index"], index_payload)
+        next_id = index_payload.get("next_id")
+        if not isinstance(next_id, int) or next_id < 1:
+            raise TaskError("Task index is invalid: 'next_id' must be >= 1.")
+        task_id = format_task_id(next_id)
+        task_file = str(Path(".codex") / "tasks" / "items" / f"{task_id}.md")
+        now_dt = datetime.now(timezone.utc)
+        now = format_utc_timestamp(now_dt)
+        task = {
+            "id": task_id,
+            "title": args.title,
+            "status": status,
+            "blocked_by": blocked_by,
+            "task_file": task_file,
+            "created_at": now,
+            "updated_at": now,
+        }
+        clear_claim(task)
+        if status == "in_progress":
+            claim_task(task, default_claimant(), now_dt, CLAIM_LEASE_SECONDS_DEFAULT)
+
+        tasks.append(task)
+        index_payload["next_id"] = next_id + 1
+        write_task_markdown(root, task, body_override=markdown_text)
+        errors = validate_index(index_payload, root, check_files=True)
+        if errors:
+            raise TaskError(
+                "Cannot add task:\n" + "\n".join(f"- {error}" for error in errors)
+            )
+        atomic_write_json(paths["index"], index_payload)
     print(f"Created {task_id} -> {task_file}")
     return 0
 
@@ -554,32 +707,6 @@ def cmd_get(args: argparse.Namespace) -> int:
 def cmd_update(args: argparse.Namespace) -> int:
     """Update task metadata and markdown content."""
     root = Path(args.root).resolve()
-    (paths, index_payload, tasks) = load_store_or_raise(root)
-    task = get_task_by_id(tasks, args.task_id)
-
-    blockers = list(task["blocked_by"])
-    if args.set_blocked_by is not None:
-        blockers = parse_csv_ids(args.set_blocked_by)
-    blockers.extend(parse_id_inputs(args.add_blocker))
-    blockers = dedupe_preserve_order(blockers)
-    blockers = [blocker for blocker in blockers if blocker not in parse_id_inputs(args.remove_blocker)]
-
-    existing_ids = {str(item["id"]) for item in tasks}
-    for blocker in blockers:
-        if blocker not in existing_ids:
-            raise TaskError(f"Unknown blocker '{blocker}'.")
-    if task["id"] in blockers:
-        raise TaskError("A task cannot block itself.")
-
-    if args.title is not None:
-        task["title"] = args.title
-    if args.status is not None:
-        if args.status not in VALID_STATUSES:
-            raise TaskError(f"Invalid status '{args.status}'.")
-        task["status"] = args.status
-    task["blocked_by"] = blockers
-    task["updated_at"] = utc_timestamp()
-
     markdown_override: str | None = None
     append_text: str | None = None
     if args.replace_markdown_file is not None:
@@ -587,19 +714,73 @@ def cmd_update(args: argparse.Namespace) -> int:
     if args.append_markdown_file is not None:
         append_text = read_markdown_from_path(Path(args.append_markdown_file))
 
-    errors = validate_index(index_payload, root, check_files=True)
-    if errors:
-        raise TaskError(
-            "Cannot update task because validation failed:\n"
-            + "\n".join(f"- {error}" for error in errors)
+    with mutable_store_or_raise(root) as (paths, index_payload, tasks):
+        task = get_task_by_id(tasks, args.task_id)
+
+        blockers = list(task["blocked_by"])
+        if args.set_blocked_by is not None:
+            blockers = parse_csv_ids(args.set_blocked_by)
+        blockers.extend(parse_id_inputs(args.add_blocker))
+        blockers = dedupe_preserve_order(blockers)
+        blockers = [
+            blocker
+            for blocker in blockers
+            if blocker not in parse_id_inputs(args.remove_blocker)
+        ]
+
+        existing_ids = {str(item["id"]) for item in tasks}
+        for blocker in blockers:
+            if blocker not in existing_ids:
+                raise TaskError(f"Unknown blocker '{blocker}'.")
+        if task["id"] in blockers:
+            raise TaskError("A task cannot block itself.")
+
+        if args.title is not None:
+            task["title"] = args.title
+        if args.status is not None:
+            if args.status not in VALID_STATUSES:
+                raise TaskError(f"Invalid status '{args.status}'.")
+            task["status"] = args.status
+        task["blocked_by"] = blockers
+
+        if task["status"] == "in_progress":
+            now_dt = datetime.now(timezone.utc)
+            claimed_by = task.get("claimed_by")
+            claimed_at = task.get("claimed_at")
+            lease_expires_at = task.get("lease_expires_at")
+            if (
+                not isinstance(claimed_by, str)
+                or claimed_by.strip() == ""
+                or not isinstance(claimed_at, str)
+                or parse_utc_timestamp(claimed_at) is None
+                or not isinstance(lease_expires_at, str)
+                or parse_utc_timestamp(lease_expires_at) is None
+            ):
+                claim_task(
+                    task,
+                    default_claimant(),
+                    now_dt,
+                    CLAIM_LEASE_SECONDS_DEFAULT,
+                )
+            else:
+                task["updated_at"] = format_utc_timestamp(now_dt)
+        else:
+            clear_claim(task)
+            task["updated_at"] = utc_timestamp()
+
+        errors = validate_index(index_payload, root, check_files=True)
+        if errors:
+            raise TaskError(
+                "Cannot update task because validation failed:\n"
+                + "\n".join(f"- {error}" for error in errors)
+            )
+        write_task_markdown(
+            root,
+            task,
+            body_override=markdown_override,
+            append_text=append_text,
         )
-    write_task_markdown(
-        root,
-        task,
-        body_override=markdown_override,
-        append_text=append_text,
-    )
-    atomic_write_json(paths["index"], index_payload)
+        atomic_write_json(paths["index"], index_payload)
     print(f"Updated {task['id']}.")
     return 0
 
@@ -607,32 +788,119 @@ def cmd_update(args: argparse.Namespace) -> int:
 def cmd_done(args: argparse.Namespace) -> int:
     """Mark a task as done."""
     root = Path(args.root).resolve()
-    (paths, index_payload, tasks) = load_store_or_raise(root)
-    task = get_task_by_id(tasks, args.task_id)
-    by_id = {str(item["id"]): item for item in tasks}
-    unresolved = [
-        blocker
-        for blocker in task["blocked_by"]
-        if by_id[blocker]["status"] != DONE_STATUS
-    ]
-    if unresolved and not args.force:
-        raise TaskError(
-            "Cannot mark task done while blockers are unresolved: "
-            + ", ".join(unresolved)
-            + ". Use --force to override."
-        )
-    task["status"] = DONE_STATUS
-    task["updated_at"] = utc_timestamp()
-    write_task_markdown(root, task)
-    errors = validate_index(index_payload, root, check_files=True)
-    if errors:
-        raise TaskError(
-            "Cannot mark task done because validation failed:\n"
-            + "\n".join(f"- {error}" for error in errors)
-        )
-    atomic_write_json(paths["index"], index_payload)
+    with mutable_store_or_raise(root) as (paths, index_payload, tasks):
+        task = get_task_by_id(tasks, args.task_id)
+        by_id = {str(item["id"]): item for item in tasks}
+        unresolved = [
+            blocker
+            for blocker in task["blocked_by"]
+            if by_id[blocker]["status"] != DONE_STATUS
+        ]
+        if unresolved and not args.force:
+            raise TaskError(
+                "Cannot mark task done while blockers are unresolved: "
+                + ", ".join(unresolved)
+                + ". Use --force to override."
+            )
+        task["status"] = DONE_STATUS
+        task["updated_at"] = utc_timestamp()
+        clear_claim(task)
+        write_task_markdown(root, task)
+        errors = validate_index(index_payload, root, check_files=True)
+        if errors:
+            raise TaskError(
+                "Cannot mark task done because validation failed:\n"
+                + "\n".join(f"- {error}" for error in errors)
+            )
+        atomic_write_json(paths["index"], index_payload)
     print(f"Marked {task['id']} as done.")
     return 0
+
+
+def cmd_start(args: argparse.Namespace) -> int:
+    """Claim the oldest ready task and mark it in progress."""
+    root = Path(args.root).resolve()
+    if args.lease_seconds < 1:
+        raise TaskError("Lease duration must be at least 1 second.")
+    with mutable_store_or_raise(root) as (paths, index_payload, tasks):
+        now_dt = datetime.now(timezone.utc)
+        reclaimed = reclaim_stale_in_progress_tasks(tasks, now_dt)
+        for reclaimed_task in reclaimed:
+            write_task_markdown(root, reclaimed_task)
+
+        values = ready_tasks(tasks)
+        if not values:
+            if reclaimed:
+                errors = validate_index(index_payload, root, check_files=True)
+                if errors:
+                    raise TaskError(
+                        "Cannot reclaim stale tasks because validation failed:\n"
+                        + "\n".join(f"- {error}" for error in errors)
+                    )
+                atomic_write_json(paths["index"], index_payload)
+            if args.id_only:
+                return 0
+            if args.json:
+                print("null")
+                return 0
+            print("No ready tasks.")
+            return 0
+
+        task = values[0]
+        claim_task(task, args.claimant or default_claimant(), now_dt, args.lease_seconds)
+        write_task_markdown(root, task)
+        errors = validate_index(index_payload, root, check_files=True)
+        if errors:
+            raise TaskError(
+                "Cannot start task because validation failed:\n"
+                + "\n".join(f"- {error}" for error in errors)
+            )
+        atomic_write_json(paths["index"], index_payload)
+
+    if args.id_only:
+        print(task["id"])
+        return 0
+    if args.json:
+        payload = dict(task)
+        if args.body:
+            payload["markdown"] = read_markdown_from_path(task_file_path(root, task))
+        print(json.dumps(payload, indent=2))
+        return 0
+    if args.body:
+        print(read_markdown_from_path(task_file_path(root, task)))
+        return 0
+    print(f"Started {task['id']}.")
+    return 0
+
+
+def cmd_release(args: argparse.Namespace) -> int:
+    """Return an active task to todo status."""
+    root = Path(args.root).resolve()
+    with mutable_store_or_raise(root) as (paths, index_payload, tasks):
+        task = get_task_by_id(tasks, args.task_id)
+        if task["status"] in ("done", "canceled") and not args.force:
+            raise TaskError(
+                f"Cannot release task '{task['id']}' from status '{task['status']}' without --force."
+            )
+
+        task["status"] = "todo"
+        task["updated_at"] = utc_timestamp()
+        clear_claim(task)
+        write_task_markdown(root, task)
+        errors = validate_index(index_payload, root, check_files=True)
+        if errors:
+            raise TaskError(
+                "Cannot release task because validation failed:\n"
+                + "\n".join(f"- {error}" for error in errors)
+            )
+        atomic_write_json(paths["index"], index_payload)
+    print(f"Released {task['id']} to todo.")
+    return 0
+
+
+def cmd_finish(args: argparse.Namespace) -> int:
+    """Alias for done to support start/finish workflow."""
+    return cmd_done(args)
 
 
 def cmd_ready(args: argparse.Namespace) -> int:
@@ -659,6 +927,127 @@ def cmd_validate(args: argparse.Namespace) -> int:
             print(f"- {error}", file=sys.stderr)
         return 1
     print("Task store is valid.")
+    return 0
+
+
+def topological_tasks(tasks: list[dict[str, object]]) -> list[dict[str, object]]:
+    """Return tasks in topological order, tie-breaking by numeric task ID."""
+    by_id = {str(task["id"]): task for task in tasks}
+    dependents: dict[str, list[str]] = {task_id: [] for task_id in by_id}
+    indegree: dict[str, int] = {task_id: 0 for task_id in by_id}
+
+    for task in tasks:
+        task_id = str(task["id"])
+        blockers = [str(blocker) for blocker in task["blocked_by"]]
+        indegree[task_id] = len(blockers)
+        for blocker in blockers:
+            dependents[blocker].append(task_id)
+
+    ready = sorted(
+        [task_id for task_id, degree in indegree.items() if degree == 0],
+        key=parse_task_id,
+    )
+    ordered_ids: list[str] = []
+    while ready:
+        task_id = ready.pop(0)
+        ordered_ids.append(task_id)
+        for dependent_id in sorted(dependents[task_id], key=parse_task_id):
+            indegree[dependent_id] -= 1
+            if indegree[dependent_id] == 0:
+                ready.append(dependent_id)
+                ready.sort(key=parse_task_id)
+
+    if len(ordered_ids) != len(tasks):
+        raise TaskError("Cannot renumber tasks: dependency cycle detected.")
+    return [by_id[task_id] for task_id in ordered_ids]
+
+
+def ordered_tasks_for_renumber(
+    tasks: list[dict[str, object]], ordering: str
+) -> list[dict[str, object]]:
+    """Return task ordering used by renumber command."""
+    if ordering == "id":
+        return sorted(tasks, key=task_sort_key)
+    if ordering == "created":
+        return sorted(tasks, key=lambda task: (str(task["created_at"]), task_sort_key(task)))
+    return topological_tasks(tasks)
+
+
+def cmd_renumber(args: argparse.Namespace) -> int:
+    """Renumber task IDs sequentially and rewrite blockers/file paths."""
+    root = Path(args.root).resolve()
+    with mutable_store_or_raise(root) as (paths, index_payload, tasks):
+        ordered_tasks = ordered_tasks_for_renumber(tasks, args.by)
+        old_ids = [str(task["id"]) for task in ordered_tasks]
+        new_ids = [format_task_id(index + 1) for index in range(len(ordered_tasks))]
+        id_map = {old_id: new_id for old_id, new_id in zip(old_ids, new_ids, strict=True)}
+
+        if args.json:
+            print(json.dumps(id_map, indent=2))
+            if args.dry_run:
+                return 0
+        elif args.dry_run:
+            for old_id in old_ids:
+                print(f"{old_id} -> {id_map[old_id]}")
+            return 0
+
+        bodies_by_old_id: dict[str, str] = {}
+        for task in tasks:
+            task_id = str(task["id"])
+            path = task_file_path(root, task)
+            markdown_text = read_markdown_from_path(path)
+            (_, body) = split_task_markdown(markdown_text)
+            bodies_by_old_id[task_id] = body
+
+        now = utc_timestamp()
+        remapped_tasks: list[dict[str, object]] = []
+        for task in ordered_tasks:
+            old_id = str(task["id"])
+            new_id = id_map[old_id]
+            remapped_task = dict(task)
+            remapped_task["id"] = new_id
+            remapped_task["blocked_by"] = [
+                id_map[str(blocker)] for blocker in task["blocked_by"]
+            ]
+            remapped_task["task_file"] = str(
+                Path(".codex") / "tasks" / "items" / f"{new_id}.md"
+            )
+            remapped_task["updated_at"] = now
+            remapped_tasks.append(remapped_task)
+
+        index_payload["tasks"] = remapped_tasks
+        index_payload["next_id"] = len(remapped_tasks) + 1
+        errors = validate_index(index_payload, root, check_files=False)
+        if errors:
+            raise TaskError(
+                "Cannot renumber tasks because validation failed:\n"
+                + "\n".join(f"- {error}" for error in errors)
+            )
+
+        for task in remapped_tasks:
+            old_id = next(old for old, new in id_map.items() if new == task["id"])
+            write_task_markdown(root, task, body_override=bodies_by_old_id[old_id])
+
+        new_task_files = {str(task["task_file"]) for task in remapped_tasks}
+        old_task_files = {
+            str(task["task_file"])
+            for task in tasks
+            if isinstance(task.get("task_file"), str)
+        }
+        stale_files = sorted(old_task_files - new_task_files)
+        for stale_file in stale_files:
+            stale_path = root / stale_file
+            if stale_path.exists():
+                stale_path.unlink()
+
+        errors = validate_index(index_payload, root, check_files=True)
+        if errors:
+            raise TaskError(
+                "Cannot renumber tasks because file validation failed:\n"
+                + "\n".join(f"- {error}" for error in errors)
+            )
+        atomic_write_json(paths["index"], index_payload)
+    print(f"Renumbered {len(remapped_tasks)} tasks.")
     return 0
 
 
@@ -801,6 +1190,59 @@ def build_parser() -> argparse.ArgumentParser:
     )
     done_parser.set_defaults(handler=cmd_done)
 
+    start_parser = subparsers.add_parser(
+        "start",
+        help="Claim oldest ready task and mark it in_progress.",
+    )
+    start_output_group = start_parser.add_mutually_exclusive_group()
+    start_output_group.add_argument(
+        "--json",
+        action="store_true",
+        help="Output task object as JSON (or null when no ready tasks).",
+    )
+    start_output_group.add_argument(
+        "--id-only",
+        action="store_true",
+        help="Print only task ID (prints nothing when no ready tasks).",
+    )
+    start_parser.add_argument(
+        "--body",
+        action="store_true",
+        help="Include markdown body in output (JSON mode adds 'markdown').",
+    )
+    start_parser.add_argument(
+        "--claimant",
+        help="Claim owner label for lease metadata (default: current user/host/pid).",
+    )
+    start_parser.add_argument(
+        "--lease-seconds",
+        type=int,
+        default=CLAIM_LEASE_SECONDS_DEFAULT,
+        help=f"Lease duration in seconds (default: {CLAIM_LEASE_SECONDS_DEFAULT}).",
+    )
+    start_parser.set_defaults(handler=cmd_start)
+
+    release_parser = subparsers.add_parser(
+        "release",
+        help="Move a task back to todo status.",
+    )
+    release_parser.add_argument("task_id", help="Task ID (for example T0001).")
+    release_parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Allow releasing done/canceled tasks.",
+    )
+    release_parser.set_defaults(handler=cmd_release)
+
+    finish_parser = subparsers.add_parser("finish", help="Alias for done.")
+    finish_parser.add_argument("task_id", help="Task ID (for example T0001).")
+    finish_parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Allow marking done even when blockers are unresolved.",
+    )
+    finish_parser.set_defaults(handler=cmd_finish)
+
     ready_parser = subparsers.add_parser(
         "ready", help="Show unblocked todo tasks sorted oldest-first."
     )
@@ -815,6 +1257,28 @@ def build_parser() -> argparse.ArgumentParser:
         "validate", help="Validate index/task consistency."
     )
     validate_parser.set_defaults(handler=cmd_validate)
+
+    renumber_parser = subparsers.add_parser(
+        "renumber",
+        help="Renumber tasks sequentially and rewrite blockers/file paths.",
+    )
+    renumber_parser.add_argument(
+        "--by",
+        choices=("topo", "id", "created"),
+        default="topo",
+        help="Ordering used for reassigned IDs (default: topo).",
+    )
+    renumber_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show proposed renumber mapping without writing changes.",
+    )
+    renumber_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output renumber mapping as JSON.",
+    )
+    renumber_parser.set_defaults(handler=cmd_renumber)
 
     help_parser = subparsers.add_parser("help", help="Show command help.")
     help_parser.add_argument("command_name", nargs="?", help="Specific command name.")

@@ -22,6 +22,14 @@ Find unblocked work:
 .codex/scripts/task.py ready --json
 ```
 
+Claim oldest ready task (single-step start):
+
+```bash
+.codex/scripts/task.py start
+.codex/scripts/task.py start --id-only
+.codex/scripts/task.py start --json --body
+```
+
 List tasks:
 
 ```bash
@@ -75,6 +83,13 @@ Mark done:
 
 ```bash
 .codex/scripts/task.py done T0007
+.codex/scripts/task.py finish T0007
+```
+
+Return a task to `todo`:
+
+```bash
+.codex/scripts/task.py release T0007
 ```
 
 Validate store:
@@ -88,9 +103,9 @@ Validate store:
 ### Daily loop
 
 1. `ready --json` to select next task.
-2. `get <id> --body` only for chosen task.
-3. `update <id> --status in_progress` when starting.
-4. `done <id>` when finished.
+2. `start --json --body` to atomically claim oldest ready task and load details.
+3. `done <id>` or `finish <id>` when finished.
+4. `release <id>` if you need to put an in-progress task back to `todo`.
 5. `validate` after dependency edits.
 
 ### Adding a dependency
