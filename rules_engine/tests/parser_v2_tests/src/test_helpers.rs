@@ -24,6 +24,9 @@ const STACK_RED_ZONE: usize = 1024 * 1024; // 1 MB
 
 /// Stack size to grow by when needed.
 const STACK_SIZE: usize = 4 * 1024 * 1024; // 4 MB
+const BRACKET_LANGUAGE: &str = "bracket";
+const BRACKET_LOCALE_PATH: &str =
+    concat!(env!("CARGO_MANIFEST_DIR"), "/../../src/strings/locales/bracket.rlf");
 
 /// Wrapper that ensures sufficient stack space for parser operations.
 /// The deep Chumsky parser hierarchy requires significant stack during
@@ -120,6 +123,12 @@ pub fn eval_str(template: &str, bindings: &VariableBindings) -> String {
             .unwrap_or_else(|e| panic!("Error evaluating template {template:?}: {e}"))
             .to_string()
     })
+}
+
+/// Registers the bracket locale used by serializer leakage tests.
+pub fn register_bracket_test_locale() -> Result<usize, rlf::LoadError> {
+    strings::register_source_phrases();
+    rlf::with_locale_mut(|locale| locale.load_translations(BRACKET_LANGUAGE, BRACKET_LOCALE_PATH))
 }
 
 /// Returns the RLF phrase for a [CardSubtype].
