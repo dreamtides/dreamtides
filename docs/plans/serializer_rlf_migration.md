@@ -44,9 +44,9 @@ text output still bypasses RLF.
 7. Add antecedent parameters to pronoun-containing phrases for gendered
    language support (see Section 2.8)
 
-**What is NOT in scope:** Writing translation files for non-English languages.
-We are building language-neutral Rust infrastructure; actual translations come
-later.
+**What is NOT in scope:** Full translator deliverables for every target
+language. This plan does include translation *validation* requirements so we do
+not ship runtime `MissingVariant`/`MissingTag` failures.
 
 **Target languages (informing design decisions):** English, Simplified Chinese,
 Russian, Spanish, Portuguese-Brazil, German, Japanese, Arabic, Turkish, Korean,
@@ -89,9 +89,9 @@ Card TOML → Parser → Ability AST → Serializer → String
 **Key architectural changes:**
 
 1. **Phrase everywhere, String nowhere (until the boundary):** Every serializer
-   function below `ability_serializer` returns `Phrase` or `String` obtained
-   from `Phrase::to_string()`. No function constructs English text via
-   `format!()`.
+   function below `ability_serializer` returns `Phrase`. `ability_serializer` is
+   the only boundary allowed to call `.to_string()`. No function constructs
+   user-visible text via `format!()`.
 
 2. **Assembly phrases replace string concatenation:** Instead of
    `format!("{}: {}", trigger, effect)`, the serializer calls
@@ -155,6 +155,12 @@ named RLF phrases:
 periods. Punctuation is language-specific (`.` for Western, `。` for CJK).
 Assembly phrases add punctuation. This prevents double-period bugs and enables
 per-language punctuation.
+
+**Structural-pattern inventory rule:** All ability/effect assembly patterns used
+by Rust must be explicitly listed as named phrases in `strings.rs`
+(`triggered_ability`, `activated_ability`, modal forms, joiners, sentence
+wrappers). If localization uncovers a missing structural pattern, add a new
+assembly phrase instead of adding language logic to Rust.
 
 ### 2.5 Predicate System Redesign
 
@@ -227,10 +233,10 @@ pub fn serialize_predicate_plural(predicate: &Predicate) -> Phrase
 
 ### 2.6 `:from` + Variant Blocks for Cross-Language Agreement
 
-The `:from` + variant blocks feature (from
-`PROPOSAL_VARIANT_AWARE_COMPOSITION.md`, confirmed implemented in
-`evaluator.rs:333-456`) is critical for languages where adjectives must agree
-with nouns in case, gender, and number:
+`PROPOSAL_VARIANT_AWARE_COMPOSITION.md` describes the `:from` + owned variant
+block capability used by this migration. This capability is already landed in
+RLF and is mandatory for languages where adjectives/determiners must agree with
+nouns in case, gender, and number.
 
 ```
 // English — no agreement needed, simple template:
@@ -253,8 +259,12 @@ enemy_subtype($s) = :from($s) {
 
 The Rust serializer code is identical for all languages — it calls
 `strings::enemy_subtype(subtype_phrase)`. The translation file handles
-agreement. This is the fundamental mechanism that makes language neutrality
-possible for compound predicates.
+agreement. Without this RLF feature, compound predicate localization would force
+language-specific Rust fallbacks.
+
+**Implementation gate:** Do not start Task 2b until RLF parser/interpreter
+support for `:from` + owned variant blocks is verified in the pinned RLF
+revision and integration tests are green.
 
 ### 2.7 Tag System Design
 
@@ -351,6 +361,19 @@ banish_then_materialize_it($target) = :match($target) {
     *neut: "{banish} {$target:acc}, dann {materialize} es",
 };
 ```
+
+### 2.9 Non-Negotiable Migration Invariants
+
+1. Serializer internals return `Phrase`; only `ability_serializer` calls
+   `.to_string()`.
+2. No user-visible English text is assembled in Rust. Every semantic fragment
+   must map to a named phrase in `strings::`.
+3. Bracket-locale leak count must never increase after baseline is captured.
+4. Before migration completion, bracket-locale leaks must be exactly zero.
+5. Translation validation (`Locale::validate_translations` + Appendix E checks)
+   is required before enabling or updating a locale.
+6. `resolve_rlf()` is deleted only after parity and rollback criteria in Task 6
+   are satisfied.
 
 ---
 
@@ -671,6 +694,9 @@ migration.
 **Detection regex:** After joining all bracket-locale output, scan for any
 alphabetic character not inside `[...]`. This catches English leakage.
 
+**Gating rule:** Task 1 captures baseline leak count. Every subsequent task
+must keep the count <= baseline; any increase is stop-the-line until fixed.
+
 ### 7.2 Dual-Path Rendered Comparison (Existing Oracle)
 
 The existing test infrastructure compares two rendering paths:
@@ -691,24 +717,29 @@ Before starting migration, generate a golden file of
 regenerate and diff. Expected changes are annotated in the diff; unexpected
 changes are flagged.
 
-### 7.4 Preventing Future Regressions
+### 7.4 CI Gates and Regression Prevention
 
-After migration is complete:
-1. **Bracket-locale CI test** runs on every PR
-2. **Clippy/style lint** could flag `text_phrase()` or `make_phrase()` if
-   anyone re-adds them
-3. **Code review convention:** No `format!()` in serializer files that
-   produces user-visible text
+Required CI gates:
+1. **`serializer-bracket-locale`**: full-card render + leak detector, must be 0.
+2. **`serializer-static-analyzer`**: forbid serializer leakage patterns
+   (`text_phrase`, `make_phrase`, `with_article`, `phrase_plural`, and
+   user-visible string literals in `format!()`).
+3. **`serializer-golden-diff`**: block unannotated output diffs.
+4. **`just review`**: full style, lint, and test pass.
+
+Runtime safety and observability:
+1. Add assertion/logging to flag unresolved RLF markers (`{@`, `{$`) in
+   serializer outputs during tests.
+2. Record leak-count trend per migration phase in CI artifacts.
 
 ---
 
 ## 8. Task Breakdown
 
-**Ordering principle:** The bracket-locale test (Task 1) comes first so every
-subsequent task has a safety net. The predicate serializer (Tasks 2a-2c) comes
-next because it's the hardest part and the leaf dependency. Effect migration
-(Tasks 3-4) builds on the predicate foundation. Assembly migration (Tasks 5-6)
-comes last as the top of the call graph.
+**Ordering principle:** Task 1 establishes the safety net. Predicate migration
+(2a-2c) is the first serializer rewrite.
+Effect/static/trigger migration (3-5) follows. Ability assembly and
+`resolve_rlf()` removal (6) happen last, then cleanup/verification (7).
 
 **Convention for all tasks:** Do NOT add task-specific comments to the code.
 
@@ -726,14 +757,13 @@ test locale
    `test-cards.toml` with the bracket locale
 3. Assert: all output text is inside brackets (except HTML tags, whitespace,
    operators like `≤`, `≥`, and numbers)
-4. This test WILL FAIL initially — it reveals every English string that
-   bypasses RLF. Keep the test but mark expected failures. As subsequent
-   tasks eliminate English text, the failure count decreases toward zero.
+4. Capture baseline leak count (expected non-zero at start) and publish it as a
+   CI artifact
 5. Generate golden-file baseline of `(card, ability_index, rendered_text)`
    for regression detection
 
-**Success criteria:** Test exists, runs, produces a count of "English leaks".
-This count is the migration progress metric.
+**Go/No-Go:** leak count may start non-zero, but must never increase in later
+tasks.
 
 ---
 
@@ -754,6 +784,10 @@ Each phrase must have `:a`/`:an` tags and `one`/`other` variants as
 appropriate. Subtype-composition phrases must use `:from` for tag propagation.
 
 Also update `bracket.rlf` with bracketed versions of all new phrases.
+
+**Go/No-Go:** `strings.rs` compiles and bracket-locale harness still runs.
+Also verify the pinned RLF revision still passes integration tests that cover
+`:from` + owned variant blocks before beginning Task 2b.
 
 ---
 
@@ -776,11 +810,10 @@ Also update `bracket.rlf` with bracketed versions of all new phrases.
    `serialize_predicate()` with `{$pred}` (no article)
 
 **Critical:** Every `text_phrase()` call must become a named phrase. No
-`format!()` may produce English text. The ONLY `format!()` allowed is for
-composing RLF syntax that will be resolved (which should itself be replaced
-with phrase calls).
+`format!()` may produce user-visible text.
 
-**Success criteria:** `grep -c 'text_phrase\|make_phrase\|with_article\|phrase_plural' predicate_serializer.rs` returns 0.
+**Go/No-Go:** `grep -c 'text_phrase\|make_phrase\|with_article\|phrase_plural'`
+returns 0, `just review` passes, and leak count does not increase.
 
 ---
 
@@ -799,8 +832,26 @@ Update all consumer call sites to use the new predicate API:
    calls with `serialize_card_predicate()` / `serialize_card_predicate_plural()`
 4. Remove any `.to_string()` calls where Phrase can be passed directly to
    `strings::` phrase functions
+5. Enforce boundary invariant: non-ability serializers must return `Phrase`
+   values, not rendered text.
 
-**Success criteria:** `just review` passes. Bracket-locale leak count decreases.
+**Go/No-Go:** `just review` passes and leak count decreases or stays flat.
+
+---
+
+### Task 2d: Translation Validation Gate
+
+**Files:** test tooling + locale validation wiring  
+**Risk:** MEDIUM — prevents runtime locale crashes.  
+**Prerequisite:** Task 2c
+
+1. Add translation validation run using `Locale::validate_translations`.
+2. Implement Appendix E checks for missing variant/tag coverage on reachable
+   serializer phrase graph.
+3. Fail CI on missing variant/tag definitions for enabled locales.
+
+**Go/No-Go:** Tasks 3+ require validation checks to be wired and failing
+correctly on seeded bad data.
 
 ---
 
@@ -808,7 +859,7 @@ Update all consumer call sites to use the new predicate API:
 
 **Files:** `strings.rs`, `effect_serializer.rs`
 **Risk:** HIGH — 126 `format!()` calls, many with subtle English text.
-**Prerequisite:** Task 2c
+**Prerequisite:** Task 2d
 
 Split into sub-steps:
 
@@ -834,9 +885,8 @@ is mechanical — the serializer already knows the target at each call site.
 **3e. Count expression arms:** Migrate `serialize_for_count_expression()` —
 15 arms with nested `CollectionExpression` matches.
 
-**Success criteria:** `grep -c "format!" effect_serializer.rs` shows only
-structural format calls (no English text in any format!). Bracket-locale
-leak count near zero.
+**Go/No-Go:** zero user-visible English `format!()` calls in
+`effect_serializer.rs`; leak count strictly decreases from Task 2d.
 
 ---
 
@@ -855,8 +905,8 @@ leak count near zero.
 4. Migrate `Effect::WithOptions`, `Effect::ListWithOptions`, `Effect::Modal`
    branches
 
-**Success criteria:** `serialize_effect_with_context` contains zero English
-text. All joining/punctuation via named phrases.
+**Go/No-Go:** all joining/punctuation is phrase-driven and bracket-locale leak
+count is **zero** before moving to Task 5.
 
 ---
 
@@ -873,7 +923,8 @@ text. All joining/punctuation via named phrases.
 4. Add "this card" / "this character" as RLF terms for gender-aware
    translations
 
-**Success criteria:** Zero `format!()` with English text in either file.
+**Go/No-Go:** zero user-visible English `format!()` in both files and
+`just review` passes.
 
 ---
 
@@ -888,11 +939,13 @@ text. All joining/punctuation via named phrases.
 2. Replace string concatenation assembly with assembly phrase calls
 3. Eliminate all `strings::capitalized_sentence()` calls — capitalization
    moves into assembly phrase templates
-4. Delete `resolve_rlf()` function (4 call sites become direct assignment)
-5. Simplify `SerializedAbility` if possible (it's already just `{ text: String }`)
+4. Keep temporary rollback switch for one phase (`resolve_rlf` compatibility
+   path behind feature flag or equivalent guard)
+5. Run parity check against legacy output subset, then delete `resolve_rlf()`
+   and rollback switch once parity + CI gates are green
 
-**Success criteria:** `resolve_rlf` is deleted. No `eval_str` in production
-code path. Bracket-locale test shows zero English leaks.
+**Go/No-Go:** parity check passes, leak count remains zero, then `resolve_rlf`
+is removed.
 
 ---
 
@@ -913,18 +966,20 @@ code path. Bracket-locale test shows zero English leaks.
 5. Delete any dead code left behind by the migration
 6. Add `:from` tags to compound predicate phrases for tag propagation
    (ensures translations can inherit gender/animacy)
+7. Add runtime/test assertions for unresolved RLF markers (`{@`, `{$`) and log
+   leak-count trend in CI artifacts
 
-**Success criteria:** `just review` passes. Bracket-locale test green. Golden
-file matches expected output. Code review finds zero English-specific logic.
+**Go/No-Go:** `just review`, bracket-locale (0 leaks), golden diff annotations,
+translation validation, and unresolved-marker assertions all green.
 
 ---
 
 ## 9. Migration Ordering Summary
 
-**Main chain:** 1 → 2a → 2b → 2c → 3 → 4 → 5 → 6 → 7
+**Main chain:** 1 → 2a → 2b → 2c → 2d → 3 → 4 → 5 → 6 → 7
 
-**Parallel:** Task 1 (bracket-locale test) and Task 2a (predicate phrases)
-can run in parallel — both are additive. Tasks 2b onward are sequential.
+**Parallel:** Tasks 1 and 2a can run in parallel. Tasks 2b onward are
+sequential with explicit go/no-go gates.
 
 ---
 
@@ -932,104 +987,41 @@ can run in parallel — both are additive. Tasks 2b onward are sequential.
 
 | Task | Risk | Key Concerns |
 |------|------|-------------|
-| 1. Bracket-locale test | MEDIUM | Must generate bracket versions of 559 phrases; detection regex must handle HTML tags |
-| 2a. Predicate noun phrases | LOW | Additive strings.rs; ~50 new phrases |
-| 2b. Predicate internals rewrite | HIGH | 816 lines, complete rewrite; constraint composer is a new pattern |
-| 2c. Predicate consumer updates | MEDIUM | ~120 call sites, mostly mechanical |
-| 3. Effect arms migration | HIGH | 126 format!() calls; period convention change is sweeping |
-| 4. Effect assembly migration | MEDIUM | 4 branches, but connectors are already phrases |
-| 5. Static ability + trigger | MEDIUM | 23+ variants; circular dep requires care |
-| 6. Ability serializer + resolve_rlf | MEDIUM | 4 resolve_rlf sites; assembly phrase design |
-| 7. Final cleanup | LOW | Verification and dead code removal |
+| 1. Bracket-locale test | MEDIUM | Detector accuracy and full phrase coverage |
+| 2a. Predicate noun phrases | LOW | Additive `strings.rs` work |
+| 2b. Predicate internals rewrite | HIGH | Largest serializer rewrite and helper removal |
+| 2c. Predicate consumer updates | MEDIUM | Broad call-site churn |
+| 2d. Translation validation gate | MEDIUM | Reachability analysis and CI integration |
+| 3. Effect arms migration | HIGH | 126 `format!()` call removals + pronoun parameter wiring |
+| 4. Effect assembly migration | MEDIUM | Structural branch coverage and punctuation flow |
+| 5. Static ability + trigger | MEDIUM | Circular dependency sequencing |
+| 6. Ability serializer + `resolve_rlf` | MEDIUM | Rollback safety while deleting compatibility path |
+| 7. Final cleanup | LOW | Final regression and dead-code sweep |
 
-**Highest risk:** Task 2b (predicate rewrite) and Task 3 (effect arms). These
-are the two largest files with the most English-specific logic.
+**Highest risk tasks:** 2b and 3.
 
 ---
 
 ## 11. Multilingual Case Studies
 
-These case studies validate that the proposed architecture supports diverse
-languages. The Rust serializer code is IDENTICAL for all languages — only the
-`.rlf` translation file changes.
+These examples validate the core claim: Rust builds semantic phrase graphs; the
+`.rlf` file controls grammar and word order.
 
-### 11.1 "Draw 3 cards." (Parameterized count effect)
+1. Counted effects (`draw_cards_effect($n)`): CLDR plural/classifier behavior
+   differs by locale with no Rust changes.
+2. Compound predicates (`enemy_subtype($s)` + `dissolve_target($t)`): case and
+   adjective agreement move entirely into translation files.
+3. Pronoun-sensitive chains (`banish_then_materialize_it($target)`): gendered
+   locales use `:match($target)` while English/Chinese keep simple forms.
+4. For-each and optional-cost assembly: structure is expressed through assembly
+   phrases (`for_each_effect`, `optional_cost_effect`) rather than string concat.
 
-| Language | n=1 | n=3 | Key Features |
-|----------|-----|-----|--------------|
-| EN | "Draw a card." | "Draw 3 cards." | `:match` for 1 vs other |
-| ZH | "抽一张牌。" | "抽三张牌。" | Classifier 张, CJK period 。 |
-| RU | "Возьмите 1 карту." | "Возьмите 3 карты." | Accusative, CLDR one/few/many |
-| ES | "Roba una carta." | "Roba 3 cartas." | Gendered article |
-| DE | "Ziehe eine Karte." | "Ziehe 3 Karten." | Accusative feminine article |
-| JA | "カードを一枚引く。" | "カードを3枚引く。" | Counter 枚, SOV |
-
-**Rust code (identical for all languages):** `strings::draw_cards_effect(count).to_string()`
-
-### 11.2 "Dissolve an enemy Ancient." (Predicate with subtype)
-
-| Language | Output | Key Features |
-|----------|--------|--------------|
-| EN | "Dissolve an enemy Ancient." | `@a` reads `:an` tag |
-| RU | "Растворите вражеского Древнего." | Case+gender on adjective and noun |
-| ES | "Disuelve a un Antiguo enemigo." | Personal "a", post-nominal adj |
-| DE | "Löse einen feindlichen Uralten auf." | Separable verb, accusative |
-| PT-BR | "Dissolva um Antigo inimigo." | No personal "a" (unlike Spanish) |
-
-**Rust code:** `strings::dissolve_target(strings::enemy_subtype(subtype_phrase)).to_string()`
-
-### 11.3 "Banish an enemy, then materialize it." (Compound + pronoun)
-
-| Language | Output | Key Features |
-|----------|--------|--------------|
-| EN | "Banish an enemy, then materialize it." | Fixed pronoun "it" |
-| RU | "Изгоните врага, затем материализуйте его." | Gendered pronoun "его" (masc) |
-| ES | "Destierra a un enemigo, luego materialízalo." | Clitic "-lo" (masc) attached |
-| DE | "Verbanne einen Feind, dann materialisiere ihn." | "ihn" (masc accusative) |
-| FR | "Bannissez un ennemi, puis matérialisez-le." | "le" (masc) |
-
-This demonstrates why compound effects with pronouns need the antecedent's
-gender tags. The pronoun phrase uses `:match($target)` to select the correct
-form in gendered languages. See Section 2.8 for the full design principle,
-the list of affected phrases, and translation examples for Russian, German,
-Spanish (clitic), and Portuguese (proclitic).
-
-### 11.4 "For each allied Warrior, gain 1 energy." (For-each + subtype)
-
-| Language | Output | Key Features |
-|----------|--------|--------------|
-| EN | "For each allied Warrior, gain 1 energy." | "for each" wrapper |
-| RU | "За каждого союзного Воина получите 1 энергию." | Accusative case cascade |
-| DE | "Für jeden verbündeten Krieger erhalte 1 Energie." | Accusative declension |
-| JA | "味方のウォリアーそれぞれにつき、エネルギーを1得る。" | Postposition, SOV |
-
-**Rust code:** `strings::for_each_effect(pred, effect).to_string()`
-
-Note: For-each uses `{$pred}` (no article), not `{@a $pred}` — the consuming
-phrase controls article usage, eliminating `serialize_for_each_predicate`.
-
-### 11.5 Complex: Optional cost + count-expression constraint
-
-"You may abandon 2 allies: Dissolve an enemy with cost less than the number
-of cards in your void."
-
-| Language | Key Features |
-|----------|--------------|
-| RU | Case agreement cascades through constraint chain |
-| JA | SOV throughout, postpositions |
-
-**Rust code (identical for all languages):**
+Representative Rust usage remains language-agnostic:
 ```rust
-let void_count = strings::cards_in_your_void_count();
-let constraint = strings::with_cost_less_than(void_count);
-let target = strings::enemy_with_constraint(strings::character(), constraint);
+let target = strings::enemy_subtype(subtype_phrase);
 let effect = strings::dissolve_target(target);
-let cost = strings::abandon_count_allies(2);
-strings::optional_cost_effect(cost, effect).to_string()
+strings::effect_sentence(effect).to_string()
 ```
-
-The Rust code expresses **semantic structure**; each translation file handles
-the grammar.
 
 ---
 
@@ -1051,76 +1043,22 @@ the grammar.
 
 ## 13. Translator Guidelines
 
-Per-language guidance identified during multilingual review. Full translator
-guides should be separate documents; this section establishes key requirements.
+This migration depends on translation correctness. Minimum requirements:
 
-### 13.1 Cross-Language Requirements
+1. All locales: provide required noun number variants and stable keyword
+   glossary terms (`dissolve`, `banish`, `materialize`, `reclaim`, etc.).
+2. Gendered locales: provide noun gender tags and `:match($target)` branches
+   for pronoun-sensitive phrases.
+3. Case-heavy locales (notably Russian/German): provide required case variants
+   for reachable selections (`acc`, `gen`, etc.), with wildcard fallbacks where
+   appropriate.
+4. Locale-specific morphology (e.g., Spanish personal `a`, German articles,
+   CJK punctuation/counters) must stay in translation files, never in Rust.
+5. Every locale update must pass translation validation gates in Task 2d and
+   Appendix E checks before enablement.
 
-**All languages:** Define `one`/`other` variants on every noun. Lock the
-keyword glossary (dissolve, banish, materialize, reclaim, kindle, foresee,
-prevent) early. When a phrase has a variable-number subject, use
-`:match($target)` for verb agreement.
-
-**Gendered languages (es, pt, ru, de, fr, ar):** Every noun carries
-`:masc`/`:fem` (plus `:neut` for ru, de). Use `:from` for tag propagation,
-`:match` for agreement.
-
-**Case languages (ru, de):** Every noun must provide variant keys for all
-selected cases. Missing variants cause **runtime errors**. Use wildcard `*`
-for shared forms. A validation tool checking reachable variant selections
-against noun definitions would prevent crashes.
-
-### 13.2 Simplified Chinese (zh-CN)
-
-- **Classifier tags:** `:zhang` (flat objects/cards), `:ge` (default), `:mei`
-  (small items), `:dian` (points). Default to `:ge` if unsure.
-- **Numbers:** Chinese numerals for counts 1-5, Arabic for 6+. Use 两
-  (liǎng) not 二 (èr) when counting nouns. Arabic numerals for costs/stats.
-- **Punctuation:** Full-width CJK only: `。，：；（）`. No inter-word spaces.
-- **Pronouns:** Prefer dropping pronouns or using 其/repeating nouns.
-- **Word order:** BA-construction (将...verb) for complex objects; SVO for
-  simple ones.
-
-### 13.3 Russian (ru)
-
-- **Cases:** `nom`, `acc`, `gen`, `dat`, `inst`, `prep` on every noun. With
-  CLDR `one`/`few`/`many`, up to 18 forms per noun; wildcard fallbacks
-  reduce this.
-- **Tags:** ALL character subtypes: `:masc :anim`. Card/event types: `:inan`.
-  Wrong animacy cascades errors through all accusative selections.
-- **Verb aspect:** Perfective imperative for effects ("Растворите"),
-  imperfective present for triggers ("когда вы растворяете"), imperfective
-  for ongoing abilities.
-- **Register:** Formal "вы" imperative consistently.
-
-### 13.4 Spanish (es)
-
-- **Personal "a":** `:anim` on character terms. Use `:match($t) { anim:
-  "...a {@un $t}", *inan: "...{@un $t}" }`.
-- **Clitics:** Enclisis (no hyphen) in imperative: "materialízalo" (masc).
-  Use `:match($target)` for gender.
-- **Register:** Informal "tu" imperative. Post-nominal adjectives.
-
-### 13.5 Brazilian Portuguese (pt-BR)
-
-**Does NOT need:** `:anim` tags (no personal "a" — most common mistake from
-Spanish), case variants, `:from` + variant blocks, `@o` transform.
-
-**Does need:** `:masc`/`:fem` tags, `:match($target)` for clitic pronouns
-(o/a), `one`/`other` variants, mandatory contractions (do, da, no, na, ao,
-à, pelo, pela). Brazilian proclisis: "o materialize" not "materialize-o".
-
-### 13.6 German (de)
-
-- **Nouns:** Capitalize ALL nouns in `.rlf` definitions. RLF preserves
-  casing through composition.
-- **Cases:** `nom`/`acc`/`dat`/`gen` with `:from` + variant blocks. Use `*`
-  for the most common case.
-- **Articles:** `@der` (definite), `@ein` (indefinite) with case context.
-- **Separable verbs:** `"löse {$t} auf"` (prefix at start, particle at end).
-- **Adjective declension:** `:match` on gender within each case variant.
-- **Pronouns:** `:match($target)` per phrase, case fixed statically per
-  phrase template.
+Detailed language playbooks should live in dedicated localization docs rather
+than this migration plan.
 
 ---
 
