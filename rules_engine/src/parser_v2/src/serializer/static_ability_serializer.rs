@@ -95,7 +95,7 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         StandardStaticAbility::PlayForAlternateCost(alt_cost) => {
             let card_type = match alt_cost.card_type {
                 Some(CardTypeContext::Character) => strings::this_character().to_string(),
-                Some(CardTypeContext::Event) => "this event".to_string(),
+                Some(CardTypeContext::Event) => strings::this_event().to_string(),
                 None => strings::this_card().to_string(),
             };
             if let Some(cost) = &alt_cost.additional_cost {

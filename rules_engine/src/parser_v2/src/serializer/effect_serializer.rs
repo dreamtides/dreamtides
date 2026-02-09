@@ -35,17 +35,17 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         }
         StandardEffect::CreateTriggerUntilEndOfTurn { trigger } => {
             if matches!(trigger.trigger, TriggerEvent::Keywords(_)) {
-                format!(
-                    "until end of turn, {} {}",
+                strings::create_trigger_until_end_of_turn_keyword(
                     trigger_serializer::serialize_trigger_event(&trigger.trigger),
-                    strings::capitalized_sentence(serialize_effect(&trigger.effect))
+                    strings::capitalized_sentence(serialize_effect(&trigger.effect)),
                 )
+                .to_string()
             } else {
-                format!(
-                    "until end of turn, {}{}",
+                strings::create_trigger_until_end_of_turn(
                     trigger_serializer::serialize_trigger_event(&trigger.trigger),
-                    serialize_effect(&trigger.effect)
+                    serialize_effect(&trigger.effect),
                 )
+                .to_string()
             }
         }
         StandardEffect::DrawCards { count } => strings::draw_cards_effect(*count).to_string(),
@@ -59,10 +59,8 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             format!("{}.", strings::discard_chosen_from_enemy_hand(target))
         }
         StandardEffect::DiscardCardFromEnemyHandThenTheyDraw { predicate } => {
-            format!(
-                "discard a chosen {} from the opponent's hand. They draw {{cards(1)}}.",
-                predicate_serializer::card_predicate_base_text(predicate)
-            )
+            let target = predicate_serializer::serialize_card_predicate_without_article(predicate);
+            format!("{}.", strings::discard_chosen_from_enemy_hand_then_draw(target))
         }
         StandardEffect::GainEnergy { gains } => strings::gain_energy_effect(gains.0).to_string(),
         StandardEffect::GainEnergyEqualToCost { target } => match target {
@@ -126,16 +124,11 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         }
         StandardEffect::PutCardsFromVoidOnTopOfDeck { matching, count } => {
             if *count == 1 {
-                format!(
-                    "put {} from your void on top of your deck.",
-                    predicate_serializer::serialize_card_predicate(matching)
-                )
+                let target = predicate_serializer::serialize_card_predicate(matching);
+                format!("{}.", strings::put_from_void_on_top_of_deck(target))
             } else {
-                format!(
-                    "put up to {{cards({})}} {} from your void on top of your deck.",
-                    count,
-                    predicate_serializer::serialize_card_predicate_plural(matching)
-                )
+                let target = predicate_serializer::serialize_card_predicate_plural(matching);
+                format!("{}.", strings::put_up_to_from_void_on_top_of_deck(*count, target))
             }
         }
         StandardEffect::Counterspell { target } => {
@@ -384,22 +377,15 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             }
         },
         StandardEffect::MaterializeRandomFromDeck { count, predicate } => {
-            format!(
-                "{} {{n_random_characters({})}} {} from your deck.",
-                strings::materialize(),
-                count,
-                predicate_serializer::serialize_cost_constraint_only(predicate)
-            )
+            let constraint = predicate_serializer::serialize_cost_constraint_only(predicate);
+            format!("{}.", strings::materialize_random_from_deck(*count, constraint))
         }
         StandardEffect::MultiplyYourEnergy { multiplier } => {
             strings::multiply_energy_effect(*multiplier).to_string()
         }
         StandardEffect::CopyNextPlayed { matching, times } => {
-            let times_val = times.unwrap_or(1);
-            format!(
-                "copy the next {} you play {{this_turn_times({times_val})}}.",
-                predicate_serializer::predicate_base_text(matching)
-            )
+            let target = predicate_serializer::predicate_base_text(matching);
+            format!("{}.", strings::copy_next_played(target, times.unwrap_or(1)))
         }
         StandardEffect::Copy { target } => {
             let target = predicate_serializer::serialize_predicate(target);

@@ -671,6 +671,20 @@ rlf::rlf! {
 
     // Discard a chosen card from the opponent's hand.
     discard_chosen_from_enemy_hand($target) = "discard a chosen {$target} from the opponent's hand";
+    // Discard a chosen card from the opponent's hand, then they draw.
+    discard_chosen_from_enemy_hand_then_draw($target) = "discard a chosen {$target} from the opponent's hand. They draw {cards(1)}";
+    // Put a card from your void on top of your deck.
+    put_from_void_on_top_of_deck($target) = "put {$target} from your void on top of your deck";
+    // Put up to N cards from your void on top of your deck.
+    put_up_to_from_void_on_top_of_deck($n, $target) = "put up to {cards($n)} {$target} from your void on top of your deck";
+    // Materialize random characters from your deck.
+    materialize_random_from_deck($n, $constraint) = "{materialize} {n_random_characters($n)} {$constraint} from your deck";
+    // Copy the next card you play this turn.
+    copy_next_played($target, $times) = "copy the next {$target} you play {this_turn_times($times)}";
+    // Create a trigger until end of turn with keyword trigger.
+    create_trigger_until_end_of_turn_keyword($trig, $eff) = "until end of turn, {$trig} {$eff}";
+    // Create a trigger until end of turn.
+    create_trigger_until_end_of_turn($trig, $eff) = "until end of turn, {$trig}{$eff}";
     // Dissolve a target.
     dissolve_target($target) = "{dissolve} {$target}";
     // Banish a target.
@@ -789,6 +803,8 @@ rlf::rlf! {
     this_card = :a{ one: "this card", other: "these cards" };
     // This character noun with article metadata.
     this_character = :a{ one: "this character", other: "these characters" };
+    // This event noun with article metadata.
+    this_event = :an{ one: "this event", other: "these events" };
 
     // =========================================================================
     // Ownership-qualified predicate nouns
