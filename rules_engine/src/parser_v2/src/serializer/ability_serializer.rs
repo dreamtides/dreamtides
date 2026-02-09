@@ -13,6 +13,7 @@ use crate::serializer::{
 
 /// Result of serializing an ability into displayable text.
 pub struct SerializedAbility {
+    /// The rendered rules text for this ability.
     pub text: String,
 }
 

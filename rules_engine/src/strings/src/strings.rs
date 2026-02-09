@@ -25,7 +25,7 @@ rlf::rlf! {
     // Trigger ability prefixes
     // =========================================================================
 
-    // Trigger prefix formatting (for runtime eval_str use).
+    // Parameterized trigger prefix with dynamic text.
     trigger($t) = "\u{25B8} <b>{$t}:</b>";
     // Materialized trigger prefix.
     materialized = "\u{25B8} <b>Materialized:</b>";
@@ -44,7 +44,7 @@ rlf::rlf! {
     // Keywords
     // =========================================================================
 
-    // Keyword formatting in purple (for runtime eval_str use).
+    // Parameterized keyword formatting in purple.
     keyword($k) = "<color=#AA00FF>{$k}</color>";
     // Dissolve keyword.
     dissolve = "<color=#AA00FF>dissolve</color>";
@@ -460,7 +460,7 @@ rlf::rlf! {
     token_type_reclaim_ability = "Reclaim Ability";
 
     // =========================================================================
-    // Cost serializer phrases (Category A)
+    // Cost serializer phrases
     // =========================================================================
 
     // Cost for discarding your entire hand.
@@ -495,7 +495,7 @@ rlf::rlf! {
     return_or_more_to_hand($n, $target) = :from($target) "return {$n} or more {$target} to hand";
 
     // =========================================================================
-    // Cost serializer phrases (Category B) - Phase 2: requires Phrase composition
+    // Cost serializer phrases — parameterized
     // =========================================================================
 
     // Abandon a count of allies.
@@ -520,7 +520,7 @@ rlf::rlf! {
     banish_from_hand_cost($target) = :from($target) "{banish} {$target} from hand";
 
     // =========================================================================
-    // Trigger serializer phrases (Category A)
+    // Trigger serializer phrases
     // =========================================================================
 
     // End of your turn trigger.
@@ -549,7 +549,7 @@ rlf::rlf! {
     when_put_into_void_trigger($target) = :from($target) "when {$target} is put into your void, ";
 
     // =========================================================================
-    // Trigger serializer phrases (Category B)
+    // Trigger serializer phrases — parameterized
     // =========================================================================
 
     // Materialize a target trigger.
@@ -568,7 +568,7 @@ rlf::rlf! {
     when_you_materialize_nth_in_turn_trigger($n, $target) = :from($target) "when you {materialize} {text_number($n)} {$target} in a turn, ";
 
     // =========================================================================
-    // Condition serializer phrases (Category A)
+    // Condition serializer phrases
     // =========================================================================
 
     // Condition for a character dissolving this turn.
@@ -581,7 +581,7 @@ rlf::rlf! {
     with_predicate_condition($pred) = "with {$pred},";
 
     // =========================================================================
-    // Condition serializer phrases (Category B)
+    // Condition serializer phrases — parameterized
     // =========================================================================
 
     // Condition for allies sharing a character type.
@@ -611,7 +611,7 @@ rlf::rlf! {
     operator_higher = " higher";
 
     // =========================================================================
-    // Effect serializer phrases (Category B)
+    // Effect serializer phrases — parameterized
     // =========================================================================
 
     // Draw cards effect.
@@ -737,7 +737,7 @@ rlf::rlf! {
     pay_cost_effect($cost) = "pay {$cost}";
 
     // =========================================================================
-    // Effect serializer phrases (Category A)
+    // Effect serializer phrases — standalone
     // =========================================================================
 
     // Opponent gains points equal to spark effect.
@@ -750,7 +750,7 @@ rlf::rlf! {
     no_effect = "";
 
     // =========================================================================
-    // Structural Phrases — Category A (Final)
+    // Structural phrases
     // =========================================================================
 
     // Optional action prefix for abilities the player may choose to activate.

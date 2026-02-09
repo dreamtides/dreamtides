@@ -1,4 +1,5 @@
 use ability_data::condition::Condition;
+use ability_data::predicate::CardPredicate;
 use ability_data::static_ability::{CardTypeContext, StandardStaticAbility, StaticAbility};
 use strings::strings;
 
@@ -181,8 +182,8 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         }
         StandardStaticAbility::SparkBonusYourCharacters { matching, added_spark } => {
             let predicate_text = match matching {
-                ability_data::predicate::CardPredicate::Character => "allies".to_string(),
-                ability_data::predicate::CardPredicate::CharacterType(subtype) => {
+                CardPredicate::Character => "allies".to_string(),
+                CardPredicate::CharacterType(subtype) => {
                     format!(
                         "allied {{@plural subtype({})}}",
                         serializer_utils::subtype_phrase_name(*subtype)

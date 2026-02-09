@@ -22,6 +22,7 @@ pub enum AbilityContext {
     Event,
 }
 
+/// Serializes a standard effect to its text representation.
 pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
     match effect {
         StandardEffect::CreateStaticAbilityUntilEndOfTurn { ability } => {
@@ -678,6 +679,7 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
     }
 }
 
+/// Serializes a quantity expression to a "for each" clause string.
 pub fn serialize_for_count_expression(quantity_expression: &QuantityExpression) -> String {
     match quantity_expression {
         QuantityExpression::Matching(predicate) => {
