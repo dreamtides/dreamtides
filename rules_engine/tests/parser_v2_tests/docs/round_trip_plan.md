@@ -13,6 +13,19 @@ This document outlines a comprehensive plan to fix all 31 remaining round-trip t
 
 **COMPLETED:** All round-trip tests now pass. The `#[ignore = "Round-trip mismatch"]` annotations have been removed.
 
+## Serializer Baseline Artifacts
+
+- Bracket-locale leak baseline fixture: `tests/round_trip_tests/fixtures/bracket_locale_leak_baseline.toml`
+- Golden rendered output baseline fixture: `tests/round_trip_tests/fixtures/golden_rendered_output.txt`
+- Baseline leak counts captured from `test_full_card_bracket_locale_leak_detector`:
+  - `total_abilities = 278`
+  - `max_allowed_render_errors = 17`
+  - `max_allowed_unbracketed_text_leaks = 0`
+- Leak trend artifact file written by the leak harness test:
+  - `target/parser_v2_artifacts/bracket_locale_leak_trend.toml`
+- CI publishes all baseline artifacts via:
+  - `.github/workflows/parser-v2-serializer-baselines.yml`
+
 ---
 
 ## Canonical Patterns (Validated from cards.toml)

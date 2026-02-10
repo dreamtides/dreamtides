@@ -1,0 +1,40 @@
+name: parser-v2-serializer-baselines
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  serializer-baselines:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Run bracket locale leak baseline
+        env:
+          RUST_MIN_STACK: "8388608"
+          RUST_BACKTRACE: "0"
+          PARSER_V2_ARTIFACT_DIR: ${{ github.workspace }}/rules_engine/target/parser_v2_artifacts
+        run: |
+          cargo test --manifest-path rules_engine/Cargo.toml -p parser_v2_tests test_full_card_bracket_locale_leak_detector -- --nocapture
+
+      - name: Run golden rendered output baseline
+        env:
+          RUST_MIN_STACK: "8388608"
+        run: |
+          cargo test --manifest-path rules_engine/Cargo.toml -p parser_v2_tests test_golden_rendered_output
+
+      - name: Upload serializer baseline artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: serializer-baseline-artifacts
+          path: |
+            rules_engine/target/parser_v2_artifacts/bracket_locale_leak_trend.toml
+            rules_engine/tests/parser_v2_tests/tests/round_trip_tests/fixtures/bracket_locale_leak_baseline.toml
+            rules_engine/tests/parser_v2_tests/tests/round_trip_tests/fixtures/golden_rendered_output.txt
+          if-no-files-found: error

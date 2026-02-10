@@ -1,5 +1,6 @@
 use std::any::Any;
 use std::panic::{catch_unwind, AssertUnwindSafe};
+use std::path::PathBuf;
 
 use chumsky::Parser;
 use parser_v2::lexer::lexer_tokenize;
@@ -8,13 +9,16 @@ use parser_v2::serializer::ability_serializer;
 use parser_v2::variables::parser_bindings::VariableBindings;
 use parser_v2::variables::parser_substitutions;
 use parser_v2_tests::test_helpers;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 const CARDS_TOML_PATH: &str = "../../tabula/cards.toml";
 const TEST_CARDS_TOML_PATH: &str = "../../tabula/test-cards.toml";
 const BRACKET_LANGUAGE: &str = "bracket";
-const MAX_ALLOWED_BRACKET_RENDER_ERRORS: usize = 17;
-const MAX_ALLOWED_BRACKET_LEAKS: usize = 0;
+const BRACKET_LEAK_BASELINE_PATH: &str =
+    "tests/round_trip_tests/fixtures/bracket_locale_leak_baseline.toml";
+const BRACKET_LEAK_ARTIFACT_DIR_ENV: &str = "PARSER_V2_ARTIFACT_DIR";
+const BRACKET_LEAK_ARTIFACT_DIR_DEFAULT: &str = "../../target/parser_v2_artifacts";
+const BRACKET_LEAK_ARTIFACT_FILE_NAME: &str = "bracket_locale_leak_trend.toml";
 const MAX_REPORTED_ISSUES: usize = 40;
 
 #[derive(Debug, Deserialize)]
@@ -58,6 +62,23 @@ struct BracketLeak {
 struct TokenLeak {
     token: String,
     position: usize,
+}
+
+#[derive(Debug, Deserialize)]
+struct BracketLeakBaseline {
+    total_abilities: usize,
+    max_allowed_render_errors: usize,
+    max_allowed_unbracketed_text_leaks: usize,
+}
+
+#[derive(Debug, Serialize)]
+struct BracketLeakTrendArtifact {
+    baseline_total_abilities: usize,
+    baseline_max_allowed_render_errors: usize,
+    baseline_max_allowed_unbracketed_text_leaks: usize,
+    measured_total_abilities: usize,
+    measured_render_errors: usize,
+    measured_unbracketed_text_leaks: usize,
 }
 
 struct LanguageGuard {
@@ -289,8 +310,52 @@ fn format_leak_output(leaks: &[BracketLeak]) -> String {
     output.join("\n")
 }
 
+fn load_baseline() -> BracketLeakBaseline {
+    let baseline_toml = std::fs::read_to_string(BRACKET_LEAK_BASELINE_PATH).unwrap_or_else(|e| {
+        panic!("Failed to read bracket leak baseline at {}: {e}", BRACKET_LEAK_BASELINE_PATH)
+    });
+    toml::from_str(&baseline_toml).unwrap_or_else(|e| {
+        panic!("Failed to parse bracket leak baseline at {}: {e}", BRACKET_LEAK_BASELINE_PATH)
+    })
+}
+
+fn write_leak_trend_artifact(
+    baseline: &BracketLeakBaseline,
+    total_abilities: usize,
+    render_errors: usize,
+    leaks: usize,
+) -> PathBuf {
+    let artifact_dir = std::env::var(BRACKET_LEAK_ARTIFACT_DIR_ENV)
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| PathBuf::from(BRACKET_LEAK_ARTIFACT_DIR_DEFAULT));
+    let artifact_dir = if artifact_dir.is_relative() {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(artifact_dir)
+    } else {
+        artifact_dir
+    };
+    std::fs::create_dir_all(&artifact_dir).unwrap_or_else(|e| {
+        panic!("Failed to create bracket leak artifact directory {}: {e}", artifact_dir.display())
+    });
+    let artifact = BracketLeakTrendArtifact {
+        baseline_total_abilities: baseline.total_abilities,
+        baseline_max_allowed_render_errors: baseline.max_allowed_render_errors,
+        baseline_max_allowed_unbracketed_text_leaks: baseline.max_allowed_unbracketed_text_leaks,
+        measured_total_abilities: total_abilities,
+        measured_render_errors: render_errors,
+        measured_unbracketed_text_leaks: leaks,
+    };
+    let artifact_toml = toml::to_string_pretty(&artifact)
+        .unwrap_or_else(|e| panic!("Failed to serialize bracket leak trend artifact: {e}"));
+    let artifact_path = artifact_dir.join(BRACKET_LEAK_ARTIFACT_FILE_NAME);
+    std::fs::write(&artifact_path, artifact_toml).unwrap_or_else(|e| {
+        panic!("Failed to write bracket leak trend artifact at {}: {e}", artifact_path.display())
+    });
+    artifact_path
+}
+
 #[test]
 fn test_full_card_bracket_locale_leak_detector() {
+    let baseline = load_baseline();
     test_helpers::register_bracket_test_locale().expect("bracket locale should load");
     let _language_guard = activate_bracket_locale();
 
@@ -328,18 +393,23 @@ fn test_full_card_bracket_locale_leak_detector() {
         render_errors.len(),
         leaks.len()
     );
+    let artifact_path =
+        write_leak_trend_artifact(&baseline, total_abilities, render_errors.len(), leaks.len());
+    println!("Bracket locale leak trend artifact: {}", artifact_path.display());
 
     assert!(
-        render_errors.len() <= MAX_ALLOWED_BRACKET_RENDER_ERRORS,
-        "Bracket locale harness hit {} render errors (max allowed baseline: {MAX_ALLOWED_BRACKET_RENDER_ERRORS})\n{}",
+        render_errors.len() <= baseline.max_allowed_render_errors,
+        "Bracket locale harness hit {} render errors (max allowed baseline: {})\n{}",
         render_errors.len(),
+        baseline.max_allowed_render_errors,
         format_render_error_output(&render_errors)
     );
 
     assert!(
-        leaks.len() <= MAX_ALLOWED_BRACKET_LEAKS,
-        "Found {} unbracketed text leaks (max allowed baseline: {MAX_ALLOWED_BRACKET_LEAKS})\n{}",
+        leaks.len() <= baseline.max_allowed_unbracketed_text_leaks,
+        "Found {} unbracketed text leaks (max allowed baseline: {})\n{}",
         leaks.len(),
+        baseline.max_allowed_unbracketed_text_leaks,
         format_leak_output(&leaks)
     );
 }
