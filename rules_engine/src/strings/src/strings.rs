@@ -805,6 +805,20 @@ rlf::rlf! {
     this_character = :a{ one: "this character", other: "these characters" };
     // This event noun with article metadata.
     this_event = :an{ one: "this event", other: "these events" };
+    // That character noun with article metadata.
+    that_character = :a{ one: "that character", other: "those characters" };
+    // Demonstrative plural for these characters.
+    these_characters = "these characters";
+    // Demonstrative plural for those characters.
+    those_characters = "those characters";
+    // Singular predicate pronoun.
+    pronoun_it = "it";
+    // Plural predicate pronoun.
+    pronoun_them = "them";
+    // Another qualifying prefix for a predicate noun.
+    another_pred($p) = :from($p) "another {$p}";
+    // Other qualifying prefix for a plural predicate noun.
+    other_pred_plural($p) = :from($p) "other {$p:other}";
 
     // =========================================================================
     // Ownership-qualified predicate nouns
@@ -828,6 +842,27 @@ rlf::rlf! {
     allied_event = :an{ one: "allied event", other: "allied events" };
     // Other character noun with article metadata.
     other_character = :an{ one: "other character", other: "other characters" };
+    // Allied predicate noun inheriting article metadata from base.
+    allied_pred($base) = :from($base) "allied {$base}";
+    // Enemy predicate noun inheriting article metadata from base.
+    enemy_pred($base) = :from($base) "enemy {$base}";
+    // Predicate noun in your void location.
+    in_your_void($target) = :from($target) "{$target} in your void";
+    // Predicate noun in the opponent's void location.
+    in_opponent_void($target) = :from($target) "{$target} in the opponent's void";
+    // Predicate noun in your hand location.
+    in_your_hand($target) = :from($target) "{$target} in your hand";
+
+    // Cost constraint phrase.
+    with_cost_constraint($op, $val) = "with cost {$op} {$val}";
+    // Spark constraint phrase.
+    with_spark_constraint($op, $val) = "with spark {$op} {$val}";
+    // Predicate with composed constraint inheriting agreement metadata.
+    pred_with_constraint($base, $constraint) = :from($base) "{$base} {$constraint}";
+    // Non-subtype qualifier inheriting subtype metadata.
+    non_subtype($s) = :from($s) "non-{$s}";
+    // Relative clause for events that could dissolve a target.
+    could_dissolve_target($target) = "event which could {dissolve} {$target}";
 
     // =========================================================================
     // Compound predicate nouns with subtype propagation

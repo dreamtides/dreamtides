@@ -410,6 +410,13 @@ enemy = :an{ one: "[enemy]", other: "[enemies]" };
 this_card = :a{ one: "[this card]", other: "[these cards]" };
 this_character = :a{ one: "[this character]", other: "[these characters]" };
 this_event = :an{ one: "[this event]", other: "[these events]" };
+that_character = :a{ one: "[that character]", other: "[those characters]" };
+these_characters = "[these characters]";
+those_characters = "[those characters]";
+pronoun_it = "[it]";
+pronoun_them = "[them]";
+another_pred($p) = :from($p) "[another {$p}]";
+other_pred_plural($p) = :from($p) "[other {$p:other}]";
 
 
 your_card = :a{ one: "[your card]", other: "[your cards]" };
@@ -421,6 +428,17 @@ enemy_event = :an{ one: "[enemy event]", other: "[enemy events]" };
 allied_character = :an{ one: "[allied character]", other: "[allied characters]" };
 allied_event = :an{ one: "[allied event]", other: "[allied events]" };
 other_character = :an{ one: "[other character]", other: "[other characters]" };
+allied_pred($base) = :from($base) "[allied {$base}]";
+enemy_pred($base) = :from($base) "[enemy {$base}]";
+in_your_void($target) = :from($target) "[{$target} in your void]";
+in_opponent_void($target) = :from($target) "[{$target} in the opponent's void]";
+in_your_hand($target) = :from($target) "[{$target} in your hand]";
+
+with_cost_constraint($op, $val) = "[with cost {$op} {$val}]";
+with_spark_constraint($op, $val) = "[with spark {$op} {$val}]";
+pred_with_constraint($base, $constraint) = :from($base) "[{$base} {$constraint}]";
+non_subtype($s) = :from($s) "[non-{$s}]";
+could_dissolve_target($target) = "[event which could {dissolve} {$target}]";
 
 
 allied_subtype($t) = :from($t) "[allied {$t}]";
