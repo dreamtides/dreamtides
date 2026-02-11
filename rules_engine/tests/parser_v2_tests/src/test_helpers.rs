@@ -4,15 +4,18 @@ use ability_data::ability::Ability;
 use ability_data::variable_value::VariableValue;
 use chumsky::prelude::*;
 use chumsky::span::{SimpleSpan, Span};
+use chumsky::Boxed;
 use core_data::card_types::CardSubtype;
 use core_data::figment_type::FigmentType;
 use parser_v2::builder::parser_builder;
 use parser_v2::builder::parser_spans::SpannedAbility;
 use parser_v2::lexer::lexer_tokenize;
 use parser_v2::parser::ability_parser;
+use parser_v2::parser::parser_helpers::{ParserExtra, ParserInput};
 use parser_v2::serializer::ability_serializer;
 use parser_v2::variables::parser_bindings::VariableBindings;
 use parser_v2::variables::parser_substitutions;
+use parser_v2::variables::parser_substitutions::ResolvedToken;
 use rlf::{Phrase, Value};
 use strings::strings;
 
@@ -28,6 +31,10 @@ const BRACKET_LANGUAGE: &str = "bracket";
 const BRACKET_LOCALE_PATH: &str =
     concat!(env!("CARGO_MANIFEST_DIR"), "/../../src/strings/locales/bracket.rlf");
 
+thread_local! {
+    static ABILITY_PARSER_CACHE: AbilityParser<'static> = ability_parser::ability_parser().boxed();
+}
+
 /// Wrapper that ensures sufficient stack space for parser operations.
 /// The deep Chumsky parser hierarchy requires significant stack during
 /// construction, which can cause stack overflow in low-memory environments
@@ -37,14 +44,16 @@ fn with_stack<T>(f: impl FnOnce() -> T) -> T {
 }
 
 pub fn parse_ability(input: &str, vars: &str) -> Ability {
-    with_stack(|| {
-        let lex_result = lexer_tokenize::lex(input).unwrap();
-        let bindings = VariableBindings::parse(vars).unwrap();
-        let resolved =
-            parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
-        let parser = ability_parser::ability_parser();
-        parser.parse(&resolved).into_result().unwrap()
-    })
+    let lex_result = lexer_tokenize::lex(input).unwrap();
+    let bindings = VariableBindings::parse(vars).unwrap();
+    let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
+    parse_resolved_ability(&resolved)
+        .unwrap_or_else(|error| panic!("Failed to parse ability {input:?}: {error}"))
+}
+
+/// Parses an already-resolved token stream into an [Ability].
+pub fn parse_resolved_ability(resolved: &[(ResolvedToken, SimpleSpan)]) -> Result<Ability, String> {
+    with_stack(|| parse_resolved_ability_with_cached_parser(resolved))
 }
 
 pub fn parse_abilities(input: &str, vars: &str) -> Vec<Ability> {
@@ -59,23 +68,21 @@ pub fn parse_abilities(input: &str, vars: &str) -> Vec<Ability> {
             let lex_result = lexer_tokenize::lex(block).unwrap();
             let resolved =
                 parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
-            let parser = ability_parser::ability_parser();
-            abilities.push(parser.parse(&resolved).into_result().unwrap());
+            abilities.push(parse_resolved_ability_with_cached_parser(&resolved).unwrap_or_else(
+                |error| panic!("Failed to parse ability block {block:?}: {error}"),
+            ));
         }
         abilities
     })
 }
 
 pub fn parse_spanned_ability(input: &str, vars: &str) -> SpannedAbility {
-    with_stack(|| {
-        let lex_result = lexer_tokenize::lex(input).unwrap();
-        let bindings = VariableBindings::parse(vars).unwrap();
-        let resolved =
-            parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
-        let parser = ability_parser::ability_parser();
-        let ability = parser.parse(&resolved).into_result().unwrap();
-        parser_builder::build_spanned_ability(&ability, &lex_result).unwrap()
-    })
+    let lex_result = lexer_tokenize::lex(input).unwrap();
+    let bindings = VariableBindings::parse(vars).unwrap();
+    let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
+    let ability = parse_resolved_ability(&resolved)
+        .unwrap_or_else(|error| panic!("Failed to parse ability {input:?}: {error}"));
+    parser_builder::build_spanned_ability(&ability, &lex_result).unwrap()
 }
 
 pub fn parse_spanned_abilities(input: &str, vars: &str) -> Vec<SpannedAbility> {
@@ -90,8 +97,8 @@ pub fn parse_spanned_abilities(input: &str, vars: &str) -> Vec<SpannedAbility> {
             let lex_result = lexer_tokenize::lex(block).unwrap();
             let resolved =
                 parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
-            let parser = ability_parser::ability_parser();
-            let ability = parser.parse(&resolved).into_result().unwrap();
+            let ability = parse_resolved_ability_with_cached_parser(&resolved)
+                .unwrap_or_else(|error| panic!("Failed to parse ability block {block:?}: {error}"));
             abilities.push(parser_builder::build_spanned_ability(&ability, &lex_result).unwrap());
         }
         abilities
@@ -241,22 +248,11 @@ pub fn assert_rendered_match_for_toml(
             }
         })?;
 
-    let ability = with_stack(|| {
-        let parser = ability_parser::ability_parser();
-        parser.parse(&resolved).into_result()
-    })
-    .map_err(|errors| {
-        let error_msg = if errors.is_empty() {
-            "Unknown parse error".to_string()
-        } else {
-            format!("{:?}", errors[0])
-        };
-        RenderedComparisonError {
-            card_name: card_name.to_string(),
-            ability_text: ability_text.to_string(),
-            variables: variables.to_string(),
-            error_detail: format!("Parse error: {error_msg}"),
-        }
+    let ability = parse_resolved_ability(&resolved).map_err(|error| RenderedComparisonError {
+        card_name: card_name.to_string(),
+        ability_text: ability_text.to_string(),
+        variables: variables.to_string(),
+        error_detail: format!("Parse error: {error}"),
     })?;
 
     let serialized = ability_serializer::serialize_ability(&ability);
@@ -314,4 +310,22 @@ pub fn print_bulk_results(
         }
     }
     println!("\n========================================\n");
+}
+
+type AbilityParser<'a> = Boxed<'a, 'a, ParserInput<'a>, Ability, ParserExtra<'a>>;
+
+fn parse_resolved_ability_with_cached_parser(
+    resolved: &[(ResolvedToken, SimpleSpan)],
+) -> Result<Ability, String> {
+    ABILITY_PARSER_CACHE.with(|parser| {
+        let parser =
+            unsafe { &*(parser as *const AbilityParser<'static>).cast::<AbilityParser<'_>>() };
+        parser.parse(resolved).into_result().map_err(|errors| {
+            if errors.is_empty() {
+                "Unknown parse error".to_string()
+            } else {
+                format!("{:?}", errors[0])
+            }
+        })
+    })
 }

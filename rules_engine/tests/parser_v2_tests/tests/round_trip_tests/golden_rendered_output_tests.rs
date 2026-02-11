@@ -4,12 +4,11 @@
 //! dreamwell.toml, test-cards.toml, and test-dreamwell.toml and compares
 //! it against a stored baseline file.
 
-use chumsky::Parser;
 use parser_v2::lexer::lexer_tokenize;
-use parser_v2::parser::ability_parser;
 use parser_v2::serializer::ability_serializer;
 use parser_v2::variables::parser_bindings::VariableBindings;
 use parser_v2::variables::parser_substitutions;
+use parser_v2_tests::test_helpers;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -66,13 +65,8 @@ fn generate_entry(
     let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings)
         .map_err(|e| format!("{name}|{ability_index}|ERROR: resolve: {e}"))?;
 
-    let ability = {
-        let parser = ability_parser::ability_parser();
-        parser
-            .parse(&resolved)
-            .into_result()
-            .map_err(|e| format!("{name}|{ability_index}|ERROR: parse: {e:?}"))?
-    };
+    let ability = test_helpers::parse_resolved_ability(&resolved)
+        .map_err(|e| format!("{name}|{ability_index}|ERROR: parse: {e}"))?;
 
     let serialized = ability_serializer::serialize_ability(&ability);
     let rendered = serialized.text;
