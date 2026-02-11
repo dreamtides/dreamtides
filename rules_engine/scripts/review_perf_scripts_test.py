@@ -176,6 +176,15 @@ class ReviewScopePlannerTests(unittest.TestCase):
                 "style-validator",
                 "test-core",
             ),
+            markdown_only_skip_steps=(
+                "build",
+                "clippy",
+                "test-core",
+                "parser-test",
+                "tv-check",
+                "tv-clippy",
+                "tv-test",
+            ),
             parser_steps=("parser-test",),
             tv_steps=("tv-check", "tv-clippy", "tv-test"),
         )
@@ -448,6 +457,54 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.assertNotIn("tv-check", decision.selected_steps)
         self.assertIn("parser-test", decision.skipped_steps)
         self.assertIn("tv-check", decision.skipped_steps)
+
+    def test_markdown_only_change_skips_build_lints_and_all_tests(self) -> None:
+        env = {
+            "REVIEW_SCOPE_MODE": "enforce",
+            "REVIEW_SCOPE_CHANGED_FILES": "docs/notes/plan.MD",
+        }
+        decision = review_scope.plan_review_scope(
+            self.step_names,
+            env=env,
+            repo_root=Path.cwd(),
+            config=self.config,
+            metadata=self.metadata,
+        )
+
+        self.assertFalse(decision.forced_full)
+        self.assertTrue(decision.markdown_only)
+        self.assertEqual(decision.domains, ["docs"])
+        self.assertEqual(decision.unmapped_paths, [])
+        self.assertIn("check-snapshots", decision.selected_steps)
+        self.assertIn("check-format", decision.selected_steps)
+        self.assertIn("review-scope-validate", decision.selected_steps)
+        self.assertIn("style-validator", decision.selected_steps)
+        self.assertNotIn("build", decision.selected_steps)
+        self.assertNotIn("clippy", decision.selected_steps)
+        self.assertNotIn("test-core", decision.selected_steps)
+        self.assertNotIn("parser-test", decision.selected_steps)
+        self.assertNotIn("tv-check", decision.selected_steps)
+        self.assertNotIn("tv-clippy", decision.selected_steps)
+        self.assertNotIn("tv-test", decision.selected_steps)
+        self.assertEqual(decision.skipped_steps["build"], "markdown-only changes")
+        self.assertEqual(decision.skipped_steps["test-core"], "markdown-only changes")
+        self.assertEqual(decision.skipped_steps["tv-test"], "markdown-only changes")
+
+    def test_mixed_markdown_and_code_change_is_not_markdown_only(self) -> None:
+        env = {
+            "REVIEW_SCOPE_MODE": "enforce",
+            "REVIEW_SCOPE_CHANGED_FILES": "docs/notes/plan.md\nrules_engine/src/core_data/src/lib.rs",
+        }
+        decision = review_scope.plan_review_scope(
+            self.step_names,
+            env=env,
+            repo_root=Path.cwd(),
+            config=self.config,
+            metadata=self.metadata,
+        )
+        self.assertFalse(decision.markdown_only)
+        self.assertTrue(decision.forced_full)
+        self.assertIn("unmapped changed path", decision.forced_full_reason)
 
     def test_scope_validator_passes_repo_config(self) -> None:
         repo_root = Path(__file__).resolve().parents[2]

@@ -49,6 +49,15 @@
     "style-validator",
     "test-core"
   ],
+  "markdown_only_skip_steps": [
+    "build",
+    "clippy",
+    "test-core",
+    "parser-test",
+    "tv-check",
+    "tv-clippy",
+    "tv-test"
+  ],
   "parser_steps": [
     "parser-test"
   ],

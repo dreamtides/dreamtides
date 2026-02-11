@@ -18,6 +18,7 @@ DEFAULT_SCOPE_CONFIG_PATH = Path(__file__).with_name("review_scope_config.json")
 DEFAULT_WORKSPACE_MANIFEST = "rules_engine/Cargo.toml"
 DEFAULT_BASE_BRANCH = "origin/master"
 DEFAULT_LOCAL_SCOPE_STRATEGY = "head-if-dirty"
+MARKDOWN_EXTENSIONS = (".md", ".mdx", ".markdown")
 
 CommandRunner = Callable[[list[str], Path], tuple[int, str, str]]
 
@@ -37,6 +38,7 @@ class ScopeConfig:
     tv_crate_seeds: tuple[str, ...]
     tv_path_prefixes: tuple[str, ...]
     always_run_steps: tuple[str, ...]
+    markdown_only_skip_steps: tuple[str, ...]
     parser_steps: tuple[str, ...]
     tv_steps: tuple[str, ...]
 
@@ -68,6 +70,7 @@ class ScopeDecision:
     forced_full_reason: str
     changed_files_source: str
     changed_files: list[str]
+    markdown_only: bool
     impacted_crates: list[str]
     domains: list[str]
     selected_steps: list[str]
@@ -83,6 +86,7 @@ class ScopeDecision:
             "forced_full_reason": self.forced_full_reason,
             "changed_file_count": len(self.changed_files),
             "changed_files_source": self.changed_files_source,
+            "markdown_only": self.markdown_only,
             "impacted_crates": self.impacted_crates,
             "domains": self.domains,
             "selected_steps": self.selected_steps,
@@ -284,6 +288,7 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
         tv_crate_seeds=read_names(tv_section.get("crate_seeds", []), "tv.crate_seeds"),
         tv_path_prefixes=read_rules(tv_section.get("path_prefixes", []), "tv.path_prefixes"),
         always_run_steps=read_names(payload.get("always_run_steps", []), "always_run_steps"),
+        markdown_only_skip_steps=read_names(payload.get("markdown_only_skip_steps", []), "markdown_only_skip_steps"),
         parser_steps=read_names(payload.get("parser_steps", []), "parser_steps"),
         tv_steps=read_names(payload.get("tv_steps", []), "tv_steps"),
     )
@@ -387,6 +392,14 @@ def first_matching_rule(path: str, rules: tuple[str, ...]) -> str:
     return ""
 
 
+def is_markdown_path(path: str) -> bool:
+    """Returns whether a changed path is a markdown file."""
+    if not path or path.endswith("/"):
+        return False
+    suffix = PurePosixPath(path).suffix.lower()
+    return suffix in MARKDOWN_EXTENSIONS
+
+
 def crates_for_path(path: str, crate_roots: dict[str, str]) -> list[str]:
     """Returns workspace crates whose roots contain the path."""
     matched = [
@@ -418,6 +431,7 @@ def select_steps(
     step_names: list[str],
     config: ScopeConfig,
     forced_full: bool,
+    markdown_only: bool,
     parser_impacted: bool,
     tv_impacted: bool,
 ) -> tuple[list[str], dict[str, str]]:
@@ -426,6 +440,7 @@ def select_steps(
         return (list(step_names), {})
 
     always_steps = set(config.always_run_steps)
+    markdown_only_skip_steps = set(config.markdown_only_skip_steps)
     parser_steps = set(config.parser_steps)
     tv_steps = set(config.tv_steps)
 
@@ -433,6 +448,10 @@ def select_steps(
     skipped: dict[str, str] = {}
 
     for step_name in step_names:
+        if markdown_only and step_name in markdown_only_skip_steps:
+            skipped[step_name] = "markdown-only changes"
+            continue
+
         if step_name in parser_steps:
             if parser_impacted:
                 selected.append(step_name)
@@ -477,6 +496,7 @@ def plan_review_scope(
             forced_full_reason="",
             changed_files_source="scope-mode-off",
             changed_files=[],
+            markdown_only=False,
             impacted_crates=[],
             domains=["core"],
             selected_steps=list(step_names),
@@ -497,12 +517,13 @@ def plan_review_scope(
     if not changed_files and not forced_full_reason:
         forced_full_reason = "no changed files detected"
 
+    markdown_only = bool(changed_files) and all(is_markdown_path(changed_path) for changed_path in changed_files)
     impacted_crates: list[str] = []
     parser_impacted = False
     tv_impacted = False
     unmapped_paths: list[str] = []
 
-    if not forced_full_reason and changed_files:
+    if not forced_full_reason and changed_files and not markdown_only:
         workspace_metadata = metadata or load_workspace_metadata(effective_repo_root, command_runner)
 
         direct_crates: set[str] = set()
@@ -543,11 +564,12 @@ def plan_review_scope(
         step_names,
         scope_config,
         forced_full=forced_full,
+        markdown_only=markdown_only,
         parser_impacted=parser_impacted,
         tv_impacted=tv_impacted,
     )
 
-    domains = ["core"]
+    domains = ["docs"] if markdown_only else ["core"]
     if parser_impacted:
         domains.append("parser")
     if tv_impacted:
@@ -562,6 +584,7 @@ def plan_review_scope(
         forced_full_reason=forced_full_reason,
         changed_files_source=changed_files_result.source,
         changed_files=changed_files,
+        markdown_only=markdown_only,
         impacted_crates=impacted_crates,
         domains=domains,
         selected_steps=selected_steps,
@@ -579,6 +602,7 @@ def fallback_full_scope_decision(step_names: list[str], mode: str, reason: str) 
         forced_full_reason=reason,
         changed_files_source="planner-error",
         changed_files=[],
+        markdown_only=False,
         impacted_crates=[],
         domains=["core", "full"],
         selected_steps=list(step_names),
@@ -614,6 +638,7 @@ def validate_scope_configuration(config: ScopeConfig, metadata: WorkspaceMetadat
         ("parser.path_prefixes", config.parser_path_prefixes),
         ("tv.path_prefixes", config.tv_path_prefixes),
         ("always_run_steps", config.always_run_steps),
+        ("markdown_only_skip_steps", config.markdown_only_skip_steps),
         ("parser_steps", config.parser_steps),
         ("tv_steps", config.tv_steps),
     ):
@@ -647,6 +672,12 @@ def validate_scope_configuration(config: ScopeConfig, metadata: WorkspaceMetadat
     parser_step_set = set(config.parser_steps)
     tv_step_set = set(config.tv_steps)
     always_step_set = set(config.always_run_steps)
+    markdown_step_set = set(config.markdown_only_skip_steps)
+    known_steps = always_step_set | parser_step_set | tv_step_set
+
+    unknown_markdown_steps = sorted(markdown_step_set - known_steps)
+    if unknown_markdown_steps:
+        errors.append(f"markdown-only skip steps are unknown: {', '.join(unknown_markdown_steps)}")
 
     if parser_step_set & tv_step_set:
         overlap = sorted(parser_step_set & tv_step_set)
@@ -692,6 +723,7 @@ def render_scope_plan(decision: ScopeDecision) -> str:
 
     lines.append(f"changed files source: {decision.changed_files_source}")
     lines.append(f"changed files: {len(decision.changed_files)}")
+    lines.append(f"markdown only: {'yes' if decision.markdown_only else 'no'}")
     lines.append(f"domains: {', '.join(decision.domains)}")
 
     if decision.impacted_crates:
