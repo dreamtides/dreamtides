@@ -28,7 +28,7 @@ Please follow this checklist after completing any task:
    always test crate public APIs. Test error cases.
 3) Add logging where appropriate. Follow existing logging conventions.
 4) Run `just fmt` to apply formatting rules.
-5) Run `just review` to run clippy, validate style, and run unit tests
+5) Run `just review` via `exec_command` using `yield_time_ms=60000` to run clippy, validate style, and run unit tests
 6) Create a git commit with a detailed description of your work. 
 
 
@@ -71,6 +71,7 @@ Please follow this checklist after completing any task:
 - Run `just clippy` to check for lint warnings
 - After writing a test, use `just battle-test <TEST NAME>` to run it
 - After completing work, please ALWAYS run `just review` to validate changes
+- Some commands (especially `just review`) may run silently for ~5 minutes; run them with `exec_command` using `yield_time_ms=60000`, then keep waiting and polling instead of assuming a hang or restarting them.
 - Do not print a summary of changes after completing work.
 - Prefer the `just` commands over `cargo` commands since they have project-specific rules
 
