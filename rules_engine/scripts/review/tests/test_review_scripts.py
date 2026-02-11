@@ -527,6 +527,27 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.assertEqual(decision.skipped_steps["test-core"], "python/docs-only changes")
         self.assertNotIn("python-test", decision.skipped_steps)
 
+    def test_shell_script_change_is_core_not_unmapped(self) -> None:
+        env = {
+            "REVIEW_SCOPE_MODE": "enforce",
+            "REVIEW_SCOPE_CHANGED_FILES": "rules_engine/scripts/cleanup_integrated_task.sh",
+        }
+        decision = review_scope.plan_review_scope(
+            self.step_names,
+            env=env,
+            repo_root=Path.cwd(),
+            config=self.config,
+            metadata=self.metadata,
+        )
+        self.assertFalse(decision.forced_full)
+        self.assertEqual(decision.domains, ["core"])
+        self.assertEqual(decision.unmapped_paths, [])
+        self.assertIn("build", decision.selected_steps)
+        self.assertIn("clippy", decision.selected_steps)
+        self.assertIn("test-core", decision.selected_steps)
+        self.assertNotIn("python-test", decision.selected_steps)
+        self.assertIn("python-test", decision.skipped_steps)
+
     def test_mixed_markdown_and_code_change_is_not_markdown_only(self) -> None:
         env = {
             "REVIEW_SCOPE_MODE": "enforce",

@@ -20,6 +20,7 @@ DEFAULT_BASE_BRANCH = "origin/master"
 DEFAULT_LOCAL_SCOPE_STRATEGY = "head-if-dirty"
 MARKDOWN_EXTENSIONS = (".md", ".mdx", ".markdown")
 PYTHON_EXTENSIONS = (".py",)
+SHELL_EXTENSIONS = (".sh",)
 
 CommandRunner = Callable[[list[str], Path], tuple[int, str, str]]
 
@@ -584,6 +585,7 @@ def plan_review_scope(
         for changed_path in changed_files:
             full_trigger_match = first_matching_rule(changed_path, scope_config.global_full_triggers)
             changed_path_is_markdown = is_markdown_path(changed_path)
+            changed_path_is_shell = path_has_extension(changed_path, SHELL_EXTENSIONS)
             domain_matches = {
                 domain.name: bool(
                     first_matching_rule(changed_path, domain.path_prefixes)
@@ -605,7 +607,7 @@ def plan_review_scope(
             if mapped_crates:
                 direct_crates.update(mapped_crates)
 
-            has_domain_match = changed_path_is_markdown or any(domain_matches.values())
+            has_domain_match = changed_path_is_markdown or changed_path_is_shell or any(domain_matches.values())
             if not full_trigger_match and not has_domain_match and not mapped_crates:
                 unmapped_paths.append(changed_path)
 
