@@ -7,9 +7,23 @@ code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; just clean-test-dir; exit 1)
     just clean-test-dir
 
-review: check-snapshots check-format build clippy style-validator test parser-baselines tv-check tv-clippy tv-test
+review:
+    #!/usr/bin/env bash
+    if [ "${REVIEW_PERF:-1}" = "0" ]; then
+        just review-legacy
+    else
+        python3 rules_engine/scripts/review_perf_runner.py
+    fi
+
+review-legacy: check-snapshots check-format build clippy style-validator test parser-baselines tv-check tv-clippy tv-test
 
 review-verbose: check-snapshots check-format-verbose build-verbose clippy-verbose style-validator-verbose test-verbose parser-baselines tv-check-verbose tv-clippy-verbose tv-test
+
+review-analyze:
+    python3 rules_engine/scripts/analyze_review_perf.py
+
+review-analyze-history commits='100' sample='10':
+    python3 rules_engine/scripts/analyze_review_perf.py --backfill-commits "{{commits}}" --sample-every "{{sample}}"
 
 check:
     #!/usr/bin/env bash
@@ -81,12 +95,24 @@ test: tabula-check
         TEST_THREADS=""
     fi
 
-    output=$(RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --workspace --exclude tv_tests -- $TEST_THREADS 2>&1)
-    if [ $? -eq 0 ]; then
-        echo "Tests passed"
+    if [ "${REVIEW_PERF:-0}" = "1" ]; then
+        PROFILE_ARGS=()
+        if [ -n "$TEST_THREADS" ]; then
+            PROFILE_ARGS+=(--test-threads "${TEST_THREADS#--test-threads=}")
+        fi
+        RUST_MIN_STACK=8388608 python3 rules_engine/scripts/profile_cargo_test.py \
+            --manifest-path rules_engine/Cargo.toml \
+            --workspace \
+            --exclude tv_tests \
+            "${PROFILE_ARGS[@]}"
     else
-        echo "$output"
-        exit 1
+        output=$(RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --workspace --exclude tv_tests -- $TEST_THREADS 2>&1)
+        if [ $? -eq 0 ]; then
+            echo "Tests passed"
+        else
+            echo "$output"
+            exit 1
+        fi
     fi
 
 test-verbose:
