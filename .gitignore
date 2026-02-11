@@ -6,8 +6,12 @@ dreamtides.json
 log.json
 search_graph.dot
 !rules_engine/src/tv/src-tauri/CLAUDE.md
-.claude
-.codex/
+.claude/*
+!.claude/skills/
+!.claude/skills/**
+.codex/*
+!.codex/skills/
+!.codex/skills/**
 release_builds
 client_secret.json
 service_account_key.json

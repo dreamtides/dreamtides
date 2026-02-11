@@ -1,0 +1,11 @@
+# Keep only review-scope tracked for now; ignore current existing skills.
+README.md
+breaking-down-tasks-codex/
+codex-feature/
+creating-skills
+dreamtides-parser
+rlf-localization
+task-ops-codex/
+tauri-v2
+tv/
+univer
