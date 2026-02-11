@@ -32,7 +32,16 @@ Please follow this checklist after completing any task:
 6) Create a git commit with a detailed description of your work. 
 
 
-# CODE STYLE
+# DOCUMENTATION
+
+
+- When writing techncial designs or plans, do not write large code or pseudocode blocks.
+- Describe behavior in dense prose. Use bullet points, avoid filler words. Avoid diagrams.
+- Keep it short. Describe *what we want* but allow implementers autonomy.
+- Provide context. Link to specific files and document sections to read.
+
+
+# STYLE
 
 
 - Prefer writing code inline (when possible) to creating new variables via "let" statements
