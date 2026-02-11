@@ -219,6 +219,95 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.assertEqual(decision.changed_files_source, "env:REVIEW_SCOPE_CHANGED_FILES")
         self.assertEqual(decision.changed_files, ["rules_engine/src/core_data/src/lib.rs"])
 
+    def test_default_local_strategy_uses_only_head_changes(self) -> None:
+        env = {"REVIEW_SCOPE_MODE": "enforce"}
+        calls: list[list[str]] = []
+
+        def command_runner(args: list[str], _: Path) -> tuple[int, str, str]:
+            calls.append(args)
+            if args == ["git", "diff", "--name-only", "--cached", "HEAD"]:
+                return (0, "rules_engine/src/core_data/src/lib.rs\n", "")
+            if args == ["git", "diff", "--name-only"]:
+                return (0, "rules_engine/src/rules_engine/src/lib.rs\n", "")
+            if args == ["git", "ls-files", "--others", "--exclude-standard"]:
+                return (0, "scratch/new_file.txt\n", "")
+            raise AssertionError(f"unexpected command: {args}")
+
+        changed = review_scope.resolve_changed_files(env, Path.cwd(), command_runner=command_runner)
+        self.assertEqual(changed.source, "local-head-dirty")
+        self.assertEqual(
+            changed.changed_files,
+            [
+                "rules_engine/src/core_data/src/lib.rs",
+                "rules_engine/src/rules_engine/src/lib.rs",
+                "scratch/new_file.txt",
+            ],
+        )
+        self.assertEqual(
+            calls,
+            [
+                ["git", "diff", "--name-only", "--cached", "HEAD"],
+                ["git", "diff", "--name-only"],
+                ["git", "ls-files", "--others", "--exclude-standard"],
+            ],
+        )
+
+    def test_default_local_strategy_clean_forces_full(self) -> None:
+        env = {"REVIEW_SCOPE_MODE": "enforce"}
+
+        def command_runner(args: list[str], _: Path) -> tuple[int, str, str]:
+            if tuple(args) in {
+                ("git", "diff", "--name-only", "--cached", "HEAD"),
+                ("git", "diff", "--name-only"),
+                ("git", "ls-files", "--others", "--exclude-standard"),
+            }:
+                return (0, "", "")
+            raise AssertionError(f"unexpected command: {args}")
+
+        decision = review_scope.plan_review_scope(
+            self.step_names,
+            env=env,
+            repo_root=Path.cwd(),
+            config=self.config,
+            metadata=self.metadata,
+            command_runner=command_runner,
+        )
+        self.assertEqual(decision.changed_files_source, "local-clean")
+        self.assertTrue(decision.forced_full)
+        self.assertEqual(decision.forced_full_reason, "no changed files detected")
+
+    def test_merge_base_union_strategy_includes_branch_diff(self) -> None:
+        env = {
+            "REVIEW_SCOPE_MODE": "enforce",
+            "REVIEW_SCOPE_LOCAL_STRATEGY": "merge-base-union",
+        }
+        calls: list[list[str]] = []
+
+        def command_runner(args: list[str], _: Path) -> tuple[int, str, str]:
+            calls.append(args)
+            if args == ["git", "diff", "--name-only", "--cached", "HEAD"]:
+                return (0, "rules_engine/src/core_data/src/lib.rs\n", "")
+            if args == ["git", "diff", "--name-only"]:
+                return (0, "", "")
+            if args == ["git", "ls-files", "--others", "--exclude-standard"]:
+                return (0, "", "")
+            if args == ["git", "merge-base", "origin/master", "HEAD"]:
+                return (0, "123abc\n", "")
+            if args == ["git", "diff", "--name-only", "123abc...HEAD"]:
+                return (0, "rules_engine/src/parser_v2/src/lib.rs\n", "")
+            raise AssertionError(f"unexpected command: {args}")
+
+        changed = review_scope.resolve_changed_files(env, Path.cwd(), command_runner=command_runner)
+        self.assertEqual(changed.source, "local-merge-base-union")
+        self.assertEqual(
+            changed.changed_files,
+            [
+                "rules_engine/src/parser_v2/src/lib.rs",
+                "rules_engine/src/core_data/src/lib.rs",
+            ],
+        )
+        self.assertIn(["git", "merge-base", "origin/master", "HEAD"], calls)
+
     def test_base_head_override_precedence(self) -> None:
         env = {
             "REVIEW_SCOPE_MODE": "enforce",

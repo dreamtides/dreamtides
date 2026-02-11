@@ -13,7 +13,7 @@
     "rules_engine/Cargo.lock",
     "rules_engine/Cargo.toml",
     "rules_engine/scripts/review_perf_log.py",
-    "rules_engine/scripts/review_perf_runner.py",
+    "rules_engine/scripts/review_runner.py",
     "rules_engine/scripts/review_scope.py",
     "rules_engine/scripts/review_scope_config.json",
     "rules_engine/tabula/"

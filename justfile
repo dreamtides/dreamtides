@@ -10,12 +10,12 @@ code-review-rsync: rsync-for-review
 review:
     #!/usr/bin/env bash
     if [ "${REVIEW_PERF:-1}" = "0" ]; then
-        just review-legacy
+        just review-direct
     else
-        python3 rules_engine/scripts/review_perf_runner.py
+        python3 rules_engine/scripts/review_runner.py
     fi
 
-review-legacy: check-snapshots check-format build clippy style-validator review-core-test parser-test tv-check tv-clippy tv-test
+review-direct: check-snapshots check-format build clippy style-validator review-core-test parser-test tv-check tv-clippy tv-test
 
 review-verbose: check-snapshots check-format-verbose build-verbose clippy-verbose style-validator-verbose review-core-test-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
 

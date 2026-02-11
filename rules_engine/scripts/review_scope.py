@@ -13,10 +13,11 @@ from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Any, Callable, Mapping
 
-DEFAULT_SCOPE_MODE = "dry-run"
+DEFAULT_SCOPE_MODE = "enforce"
 DEFAULT_SCOPE_CONFIG_PATH = Path(__file__).with_name("review_scope_config.json")
 DEFAULT_WORKSPACE_MANIFEST = "rules_engine/Cargo.toml"
 DEFAULT_BASE_BRANCH = "origin/master"
+DEFAULT_LOCAL_SCOPE_STRATEGY = "head-if-dirty"
 
 CommandRunner = Callable[[list[str], Path], tuple[int, str, str]]
 
@@ -104,6 +105,14 @@ def normalize_scope_mode(raw_mode: str | None) -> str:
     if mode in {"dry-run", "enforce", "off"}:
         return mode
     return DEFAULT_SCOPE_MODE
+
+
+def normalize_local_scope_strategy(raw_strategy: str | None) -> str:
+    """Normalizes local changed-file strategy with a safe default."""
+    strategy = (raw_strategy or DEFAULT_LOCAL_SCOPE_STRATEGY).strip().lower()
+    if strategy in {"head-if-dirty", "merge-base-union"}:
+        return strategy
+    return DEFAULT_LOCAL_SCOPE_STRATEGY
 
 
 def is_truthy(value: str | None) -> bool:
@@ -218,14 +227,19 @@ def resolve_changed_files(env: Mapping[str, str], repo_root: Path, command_runne
         changed_files = run_git_lines(command_runner, repo_root, ["git", "diff", "--name-only", f"{merge_base}...HEAD"])
         return ChangedFilesResult(changed_files=changed_files, source=f"ci-merge-base:{DEFAULT_BASE_BRANCH}")
 
-    merge_base = run_git_single(command_runner, repo_root, ["git", "merge-base", DEFAULT_BASE_BRANCH, "HEAD"])
-    branch_diff = run_git_lines(command_runner, repo_root, ["git", "diff", "--name-only", f"{merge_base}...HEAD"])
+    local_strategy = normalize_local_scope_strategy(env.get("REVIEW_SCOPE_LOCAL_STRATEGY"))
     staged_diff = run_git_lines(command_runner, repo_root, ["git", "diff", "--name-only", "--cached", "HEAD"])
     unstaged_diff = run_git_lines(command_runner, repo_root, ["git", "diff", "--name-only"])
     untracked = run_git_lines(command_runner, repo_root, ["git", "ls-files", "--others", "--exclude-standard"])
+    local_changes = dedupe_keep_order([*staged_diff, *unstaged_diff, *untracked])
+    if local_strategy == "head-if-dirty":
+        source = "local-head-dirty" if local_changes else "local-clean"
+        return ChangedFilesResult(changed_files=local_changes, source=source)
 
-    union = dedupe_keep_order([*branch_diff, *staged_diff, *unstaged_diff, *untracked])
-    return ChangedFilesResult(changed_files=union, source="local-union")
+    merge_base = run_git_single(command_runner, repo_root, ["git", "merge-base", DEFAULT_BASE_BRANCH, "HEAD"])
+    branch_diff = run_git_lines(command_runner, repo_root, ["git", "diff", "--name-only", f"{merge_base}...HEAD"])
+    union = dedupe_keep_order([*branch_diff, *local_changes])
+    return ChangedFilesResult(changed_files=union, source="local-merge-base-union")
 
 
 def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
