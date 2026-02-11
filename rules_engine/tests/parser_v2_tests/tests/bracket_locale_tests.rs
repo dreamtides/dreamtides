@@ -1,5 +1,7 @@
 use parser_v2_tests::test_helpers;
 
+const BRACKET_LANGUAGE: &str = "en-x-bracket";
+
 #[test]
 fn bracket_locale_loads_all_source_phrases() {
     let loaded = test_helpers::register_bracket_test_locale()
@@ -42,7 +44,7 @@ fn bracket_locale_can_be_selected_and_restored() {
             .get_phrase("card")
             .expect("card phrase should resolve before locale switch")
             .to_string();
-        locale.set_language("bracket");
+        locale.set_language(BRACKET_LANGUAGE);
         let bracket_card = locale
             .get_phrase("card")
             .expect("card phrase should resolve in bracket locale")

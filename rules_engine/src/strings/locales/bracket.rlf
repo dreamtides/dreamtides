@@ -415,6 +415,7 @@ these_characters = "[these characters]";
 those_characters = "[those characters]";
 pronoun_it = "[it]";
 pronoun_them = "[them]";
+predicate_with_indefinite_article($p) = "[{@a $p}]";
 another_pred($p) = :from($p) "[another {$p}]";
 other_pred_plural($p) = :from($p) "[other {$p:other}]";
 

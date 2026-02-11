@@ -27,7 +27,7 @@ const STACK_RED_ZONE: usize = 1024 * 1024; // 1 MB
 
 /// Stack size to grow by when needed.
 const STACK_SIZE: usize = 4 * 1024 * 1024; // 4 MB
-const BRACKET_LANGUAGE: &str = "bracket";
+const BRACKET_LANGUAGE: &str = "en-x-bracket";
 const BRACKET_LOCALE_PATH: &str =
     concat!(env!("CARGO_MANIFEST_DIR"), "/../../src/strings/locales/bracket.rlf");
 

@@ -815,6 +815,8 @@ rlf::rlf! {
     pronoun_it = "it";
     // Plural predicate pronoun.
     pronoun_them = "them";
+    // Applies an English indefinite article to a predicate noun.
+    predicate_with_indefinite_article($p) = "{@a $p}";
     // Another qualifying prefix for a predicate noun.
     another_pred($p) = :from($p) "another {$p}";
     // Other qualifying prefix for a plural predicate noun.

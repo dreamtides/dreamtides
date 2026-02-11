@@ -1,7 +1,5 @@
-use std::collections::HashMap;
-
 use ability_data::predicate::{CardPredicate, Predicate};
-use rlf::{Phrase, Tag, Value, VariantKey};
+use rlf::{Phrase, Tag, VariantKey};
 use strings::strings;
 
 use crate::serializer::serializer_utils;
@@ -15,7 +13,7 @@ pub fn serialize_predicate(predicate: &Predicate) -> Phrase {
         Predicate::It => strings::pronoun_it(),
         Predicate::Your(card_predicate) => {
             if let CardPredicate::CharacterType(subtype) = card_predicate {
-                phrase_with_indefinite_article(&strings::subtype(
+                strings::predicate_with_indefinite_article(strings::subtype(
                     serializer_utils::subtype_to_phrase(*subtype),
                 ))
             } else {
@@ -23,11 +21,11 @@ pub fn serialize_predicate(predicate: &Predicate) -> Phrase {
             }
         }
         Predicate::Another(card_predicate) => {
-            phrase_with_indefinite_article(&your_predicate_formatted(card_predicate))
+            strings::predicate_with_indefinite_article(your_predicate_formatted(card_predicate))
         }
         Predicate::Any(card_predicate) => serialize_card_predicate(card_predicate),
         Predicate::Enemy(card_predicate) => {
-            phrase_with_indefinite_article(&enemy_predicate_formatted(card_predicate))
+            strings::predicate_with_indefinite_article(enemy_predicate_formatted(card_predicate))
         }
         Predicate::YourVoid(card_predicate) => {
             strings::in_your_void(serialize_card_predicate_plural(card_predicate))
@@ -506,15 +504,6 @@ pub fn card_predicate_base_phrase(predicate: &CardPredicate) -> Phrase {
         CardPredicate::CharacterWithMultiActivatedAbility => strings::character(),
         CardPredicate::CouldDissolve { .. } => strings::event(),
         _ => strings::character(),
-    }
-}
-
-fn phrase_with_indefinite_article(phrase: &Phrase) -> Phrase {
-    let mut params = HashMap::new();
-    params.insert("target".to_string(), Value::Phrase(phrase.clone()));
-    match rlf::with_locale(|locale| locale.eval_str("{@a $target}", params)) {
-        Ok(value) => Phrase::builder().text(value.to_string()).build(),
-        Err(_) => phrase.clone(),
     }
 }
 

@@ -53,13 +53,13 @@ pub fn subtype_phrase_name(subtype: CardSubtype) -> &'static str {
     }
 }
 
-/// Returns the RLF phrase name for a [FigmentType].
-pub fn figment_phrase_name(figment: FigmentType) -> &'static str {
+/// Converts a [FigmentType] to its corresponding RLF phrase.
+pub fn figment_to_phrase(figment: FigmentType) -> Phrase {
     match figment {
-        FigmentType::Celestial => "celestial",
-        FigmentType::Halcyon => "halcyon",
-        FigmentType::Radiant => "radiant",
-        FigmentType::Shadow => "shadow",
+        FigmentType::Celestial => strings::celestial(),
+        FigmentType::Halcyon => strings::halcyon(),
+        FigmentType::Radiant => strings::radiant(),
+        FigmentType::Shadow => strings::shadow(),
     }
 }
 

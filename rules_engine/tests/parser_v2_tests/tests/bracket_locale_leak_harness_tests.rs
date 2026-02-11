@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 
 const CARDS_TOML_PATH: &str = "../../tabula/cards.toml";
 const TEST_CARDS_TOML_PATH: &str = "../../tabula/test-cards.toml";
-const BRACKET_LANGUAGE: &str = "bracket";
+const BRACKET_LANGUAGE: &str = "en-x-bracket";
 const BRACKET_LEAK_BASELINE_PATH: &str =
     "tests/round_trip_tests/fixtures/bracket_locale_leak_baseline.toml";
 const BRACKET_LEAK_ARTIFACT_DIR_ENV: &str = "PARSER_V2_ARTIFACT_DIR";

@@ -274,20 +274,13 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             }
         }
         StandardEffect::MaterializeFigments { count, figment } => {
-            let fname = serializer_utils::figment_phrase_name(*figment);
-            if *count == 1 {
-                format!("{} {{@a figment({fname})}}.", strings::materialize())
-            } else {
-                format!("{} {{n_figments({}, {fname})}}.", strings::materialize(), count)
-            }
+            let figment_phrase = serializer_utils::figment_to_phrase(*figment);
+            format!("{}.", strings::materialize_target(strings::n_figments(*count, figment_phrase)))
         }
         StandardEffect::MaterializeFigmentsQuantity { count, quantity, figment } => {
-            let fname = serializer_utils::figment_phrase_name(*figment);
-            let figment_text = if *count == 1 {
-                format!("{{@a figment({fname})}}")
-            } else {
-                format!("{{n_figments({}, {fname})}}", count)
-            };
+            let figment_text =
+                strings::n_figments(*count, serializer_utils::figment_to_phrase(*figment))
+                    .to_string();
             match quantity {
                 QuantityExpression::PlayedThisTurn(_) => {
                     format!("{}.", strings::materialize_figments_for_each_played(figment_text))
@@ -821,7 +814,10 @@ fn serialize_void_gains_reclaim(
     match count {
         CollectionExpression::Exactly(1) => {
             let predicate_text = if let CardPredicate::CharacterType(subtype) = predicate {
-                format!("{{@cap @a subtype({})}}", serializer_utils::subtype_phrase_name(*subtype))
+                strings::capitalized_sentence(strings::predicate_with_indefinite_article(
+                    strings::subtype(serializer_utils::subtype_to_phrase(*subtype)),
+                ))
+                .to_string()
             } else {
                 strings::capitalized_sentence(predicate_serializer::serialize_card_predicate(
                     predicate,
