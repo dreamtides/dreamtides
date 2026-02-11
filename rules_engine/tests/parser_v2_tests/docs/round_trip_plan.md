@@ -23,8 +23,7 @@ This document outlines a comprehensive plan to fix all 31 remaining round-trip t
   - `max_allowed_unbracketed_text_leaks = 0`
 - Leak trend artifact file written by the leak harness test:
   - `target/parser_v2_artifacts/bracket_locale_leak_trend.toml`
-- CI publishes all baseline artifacts via:
-  - `.github/workflows/parser-v2-serializer-baselines.yml`
+- `just review` runs the serializer baseline checks via the `parser-baselines` target.
 
 ---
 

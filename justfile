@@ -7,9 +7,9 @@ code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; just clean-test-dir; exit 1)
     just clean-test-dir
 
-review: check-snapshots check-format build clippy style-validator test tv-check tv-clippy tv-test
+review: check-snapshots check-format build clippy style-validator test parser-baselines tv-check tv-clippy tv-test
 
-review-verbose: check-snapshots check-format-verbose build-verbose clippy-verbose style-validator-verbose test-verbose tv-check-verbose tv-clippy-verbose tv-test
+review-verbose: check-snapshots check-format-verbose build-verbose clippy-verbose style-validator-verbose test-verbose parser-baselines tv-check-verbose tv-clippy-verbose tv-test
 
 check:
     #!/usr/bin/env bash
@@ -111,6 +111,10 @@ parser-test *args='':
     export RUST_MIN_STACK=8388608
     export CARGO_TEST_QUIET=1
     ./rules_engine/scripts/run_cargo_test.sh parser_v2_tests "$@"
+
+parser-baselines:
+    just parser-test test_full_card_bracket_locale_leak_detector
+    just parser-test test_golden_rendered_output
 
 parser-test-insta *args='':
     #!/usr/bin/env bash
