@@ -1,5 +1,7 @@
+use std::collections::HashMap;
+
 use ability_data::predicate::{CardPredicate, Predicate};
-use rlf::{Phrase, Tag, VariantKey};
+use rlf::{Phrase, Tag, Value, VariantKey};
 use strings::strings;
 
 use crate::serializer::serializer_utils;
@@ -7,39 +9,34 @@ use crate::serializer::serializer_utils;
 /// Serializes a predicate to a Phrase.
 pub fn serialize_predicate(predicate: &Predicate) -> Phrase {
     match predicate {
-        Predicate::This => text_phrase("this character"),
-        Predicate::That => text_phrase("that character"),
-        Predicate::Them => text_phrase("them"),
-        Predicate::It => text_phrase("it"),
+        Predicate::This => strings::this_character(),
+        Predicate::That => strings::that_character(),
+        Predicate::Them => strings::pronoun_them(),
+        Predicate::It => strings::pronoun_it(),
         Predicate::Your(card_predicate) => {
-            if is_generic_card_type(card_predicate) {
-                serialize_card_predicate(card_predicate)
-            } else if let CardPredicate::CharacterType(subtype) = card_predicate {
-                text_phrase(&format!(
-                    "{{@a subtype({})}}",
-                    serializer_utils::subtype_phrase_name(*subtype)
+            if let CardPredicate::CharacterType(subtype) = card_predicate {
+                phrase_with_indefinite_article(&strings::subtype(
+                    serializer_utils::subtype_to_phrase(*subtype),
                 ))
             } else {
                 serialize_card_predicate(card_predicate)
             }
         }
         Predicate::Another(card_predicate) => {
-            text_phrase(&with_article(&your_predicate_formatted(card_predicate)))
+            phrase_with_indefinite_article(&your_predicate_formatted(card_predicate))
         }
         Predicate::Any(card_predicate) => serialize_card_predicate(card_predicate),
         Predicate::Enemy(card_predicate) => {
-            text_phrase(&with_article(&enemy_predicate_formatted(card_predicate)))
+            phrase_with_indefinite_article(&enemy_predicate_formatted(card_predicate))
         }
-        Predicate::YourVoid(card_predicate) => text_phrase(&format!(
-            "{} in your void",
-            serialize_card_predicate_plural(card_predicate)
-        )),
-        Predicate::EnemyVoid(card_predicate) => text_phrase(&format!(
-            "{} in the opponent's void",
-            serialize_card_predicate_plural(card_predicate)
-        )),
+        Predicate::YourVoid(card_predicate) => {
+            strings::in_your_void(serialize_card_predicate_plural(card_predicate))
+        }
+        Predicate::EnemyVoid(card_predicate) => {
+            strings::in_opponent_void(serialize_card_predicate_plural(card_predicate))
+        }
         Predicate::AnyOther(card_predicate) => {
-            text_phrase(&format!("another {}", card_predicate_base_phrase(card_predicate)))
+            strings::another_pred(card_predicate_base_phrase(card_predicate))
         }
     }
 }
@@ -48,29 +45,22 @@ pub fn serialize_predicate(predicate: &Predicate) -> Phrase {
 pub fn serialize_predicate_plural(predicate: &Predicate) -> Phrase {
     match predicate {
         Predicate::Another(card_predicate) => {
-            text_phrase(&serialize_your_predicate_plural(card_predicate))
+            serialize_your_predicate_plural_phrase(card_predicate)
         }
         Predicate::Any(card_predicate) => serialize_card_predicate_plural(card_predicate),
-        Predicate::Your(card_predicate) => {
-            text_phrase(&serialize_your_predicate_plural(card_predicate))
+        Predicate::Your(card_predicate) => serialize_your_predicate_plural_phrase(card_predicate),
+        Predicate::Enemy(card_predicate) => serialize_enemy_predicate_plural_phrase(card_predicate),
+        Predicate::YourVoid(card_predicate) => {
+            strings::in_your_void(serialize_card_predicate_plural(card_predicate))
         }
-        Predicate::Enemy(card_predicate) => {
-            text_phrase(&serialize_enemy_predicate_plural(card_predicate))
+        Predicate::EnemyVoid(card_predicate) => {
+            strings::in_opponent_void(serialize_card_predicate_plural(card_predicate))
         }
-        Predicate::YourVoid(card_predicate) => text_phrase(&format!(
-            "{} in your void",
-            serialize_card_predicate_plural(card_predicate)
-        )),
-        Predicate::EnemyVoid(card_predicate) => text_phrase(&format!(
-            "{} in the opponent's void",
-            serialize_card_predicate_plural(card_predicate)
-        )),
-        Predicate::This => text_phrase("these characters"),
-        Predicate::That => text_phrase("those characters"),
-        Predicate::Them => text_phrase("them"),
-        Predicate::It => text_phrase("them"),
+        Predicate::This => strings::these_characters(),
+        Predicate::That => strings::those_characters(),
+        Predicate::Them | Predicate::It => strings::pronoun_them(),
         Predicate::AnyOther(card_predicate) => {
-            text_phrase(&format!("other {}", serialize_card_predicate_plural(card_predicate)))
+            strings::other_pred_plural(card_predicate_base_phrase(card_predicate))
         }
     }
 }
@@ -519,11 +509,68 @@ pub fn card_predicate_base_phrase(predicate: &CardPredicate) -> Phrase {
     }
 }
 
+fn phrase_with_indefinite_article(phrase: &Phrase) -> Phrase {
+    let mut params = HashMap::new();
+    params.insert("target".to_string(), Value::Phrase(phrase.clone()));
+    match rlf::with_locale(|locale| locale.eval_str("{@a $target}", params)) {
+        Ok(value) => Phrase::builder().text(value.to_string()).build(),
+        Err(_) => phrase.clone(),
+    }
+}
+
+fn serialize_your_predicate_plural_phrase(card_predicate: &CardPredicate) -> Phrase {
+    match card_predicate {
+        CardPredicate::Character => {
+            Phrase::builder().text(strings::ally().variant("other").to_string()).build()
+        }
+        CardPredicate::Card => {
+            Phrase::builder().text(strings::your_card().variant("other").to_string()).build()
+        }
+        CardPredicate::Event => {
+            Phrase::builder().text(strings::your_event().variant("other").to_string()).build()
+        }
+        CardPredicate::CharacterType(subtype) => Phrase::builder()
+            .text(
+                strings::allied_subtype(strings::subtype(serializer_utils::subtype_to_phrase(
+                    *subtype,
+                )))
+                .variant("other")
+                .to_string(),
+            )
+            .build(),
+        _ => Phrase::builder().text(serialize_your_predicate_plural(card_predicate)).build(),
+    }
+}
+
+fn serialize_enemy_predicate_plural_phrase(card_predicate: &CardPredicate) -> Phrase {
+    match card_predicate {
+        CardPredicate::Character => {
+            Phrase::builder().text(strings::enemy().variant("other").to_string()).build()
+        }
+        CardPredicate::Card => {
+            Phrase::builder().text(strings::enemy_card().variant("other").to_string()).build()
+        }
+        CardPredicate::Event => {
+            Phrase::builder().text(strings::enemy_event().variant("other").to_string()).build()
+        }
+        CardPredicate::CharacterType(subtype) => Phrase::builder()
+            .text(
+                strings::enemy_subtype(strings::subtype(serializer_utils::subtype_to_phrase(
+                    *subtype,
+                )))
+                .variant("other")
+                .to_string(),
+            )
+            .build(),
+        _ => Phrase::builder().text(serialize_enemy_predicate_plural(card_predicate)).build(),
+    }
+}
+
 fn your_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
         CardPredicate::Character => strings::ally(),
-        CardPredicate::Card => make_phrase("your card"),
-        CardPredicate::Event => make_phrase("your event"),
+        CardPredicate::Card => strings::your_card(),
+        CardPredicate::Event => strings::your_event(),
         CardPredicate::CharacterType(subtype) => make_phrase(&format!(
             "allied {{subtype({})}}",
             serializer_utils::subtype_phrase_name(*subtype)
@@ -599,7 +646,7 @@ fn your_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
 fn enemy_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
         CardPredicate::Character => strings::enemy(),
-        CardPredicate::Card => make_phrase("enemy card"),
+        CardPredicate::Card => strings::enemy_card(),
         CardPredicate::CharacterType(subtype) => make_phrase(&format!(
             "enemy {{subtype({})}}",
             serializer_utils::subtype_phrase_name(*subtype)
@@ -664,7 +711,7 @@ fn enemy_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
         CardPredicate::Fast { target } => {
             make_phrase(&format!("{{fast}} {}", serialize_fast_target(target)))
         }
-        CardPredicate::Event => make_phrase("enemy event"),
+        CardPredicate::Event => strings::enemy_event(),
         CardPredicate::CouldDissolve { target } => {
             make_phrase(&format!("event which could {{dissolve}} {}", serialize_predicate(target)))
         }
