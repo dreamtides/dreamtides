@@ -15,9 +15,15 @@ review:
         python3 rules_engine/scripts/review_perf_runner.py
     fi
 
-review-legacy: check-snapshots check-format build clippy style-validator test tv-check tv-clippy tv-test
+review-legacy: check-snapshots check-format build clippy style-validator review-core-test parser-test tv-check tv-clippy tv-test
 
-review-verbose: check-snapshots check-format-verbose build-verbose clippy-verbose style-validator-verbose test-verbose tv-check-verbose tv-clippy-verbose tv-test
+review-verbose: check-snapshots check-format-verbose build-verbose clippy-verbose style-validator-verbose review-core-test-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
+
+review-scope-plan:
+    python3 rules_engine/scripts/review_scope.py plan
+
+review-scope-validate:
+    python3 rules_engine/scripts/review_scope.py validate
 
 review-analyze:
     python3 rules_engine/scripts/analyze_review_perf.py
@@ -124,6 +130,46 @@ test-verbose:
         TEST_THREADS=""
     fi
     RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --exclude tv_tests -- $TEST_THREADS
+
+review-core-test: tabula-check
+    #!/usr/bin/env bash
+    # Detect low-memory environment
+    if [ -n "${LOW_MEMORY:-}" ] || [ -f /.dockerenv ] || [ "$(uname -s)" = "Linux" ]; then
+        TEST_THREADS="--test-threads=1"
+    else
+        TEST_THREADS=""
+    fi
+
+    if [ "${REVIEW_PERF:-0}" = "1" ]; then
+        PROFILE_ARGS=()
+        if [ -n "$TEST_THREADS" ]; then
+            PROFILE_ARGS+=(--test-threads "${TEST_THREADS#--test-threads=}")
+        fi
+        RUST_MIN_STACK=8388608 python3 rules_engine/scripts/profile_cargo_test.py \
+            --manifest-path rules_engine/Cargo.toml \
+            --workspace \
+            --exclude tv_tests \
+            --exclude parser_v2_tests \
+            "${PROFILE_ARGS[@]}"
+    else
+        output=$(RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --workspace --exclude tv_tests --exclude parser_v2_tests -- $TEST_THREADS 2>&1)
+        if [ $? -eq 0 ]; then
+            echo "Tests passed"
+        else
+            echo "$output"
+            exit 1
+        fi
+    fi
+
+review-core-test-verbose:
+    #!/usr/bin/env bash
+    # Detect low-memory environment
+    if [ -n "${LOW_MEMORY:-}" ] || [ -f /.dockerenv ] || [ "$(uname -s)" = "Linux" ]; then
+        TEST_THREADS="--test-threads=1"
+    else
+        TEST_THREADS=""
+    fi
+    RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --workspace --exclude tv_tests --exclude parser_v2_tests -- $TEST_THREADS
 
 battle-test *args='':
     ./rules_engine/scripts/run_cargo_test.sh battle_tests "$@"

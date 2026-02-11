@@ -17,6 +17,7 @@ import fcntl
 KNOWN_EVENTS = {
     "run_start",
     "run_end",
+    "scope_plan",
     "step_start",
     "step_end",
     "command_start",

@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 import review_perf_log
+import review_scope
 
 
 @dataclass(frozen=True)
@@ -81,6 +82,22 @@ def print_milestone(message: str) -> None:
     print(message, flush=True)
 
 
+def print_scope_summary(scope_decision: review_scope.ScopeDecision) -> None:
+    """Prints a concise summary of scope planning decisions."""
+    print_milestone(
+        f"[scope] mode={scope_decision.mode} source={scope_decision.changed_files_source} changed={len(scope_decision.changed_files)} domains={','.join(scope_decision.domains)}"
+    )
+    if scope_decision.forced_full and scope_decision.forced_full_reason:
+        print_milestone(f"[scope] full review forced: {scope_decision.forced_full_reason}")
+        return
+
+    if scope_decision.skipped_steps:
+        skipped = ", ".join(f"{step} ({reason})" for step, reason in sorted(scope_decision.skipped_steps.items()))
+        print_milestone(f"[scope] planned skips: {skipped}")
+    else:
+        print_milestone("[scope] no steps eligible for skip")
+
+
 def run_command(
     run_id: str,
     step_name: str,
@@ -140,10 +157,12 @@ def step_specs() -> list[StepSpec]:
     return [
         StepSpec("check-snapshots", [CommandSpec("check-snapshots", ["just", "check-snapshots"])]),
         StepSpec("check-format", [CommandSpec("check-format", ["just", "check-format"])]),
+        StepSpec("review-scope-validate", [CommandSpec("review-scope-validate", ["just", "review-scope-validate"])]),
         StepSpec("build", [CommandSpec("build", ["just", "build"])]),
         StepSpec("clippy", [CommandSpec("clippy", ["just", "clippy"])]),
         StepSpec("style-validator", [CommandSpec("style-validator", ["just", "style-validator"])]),
-        StepSpec("test", [CommandSpec("test", ["just", "test"])]),
+        StepSpec("test-core", [CommandSpec("test-core", ["just", "review-core-test"])]),
+        StepSpec("parser-test", [CommandSpec("parser-test", ["just", "parser-test"])]),
         StepSpec(
             "tv-check",
             [
@@ -184,13 +203,14 @@ def run_review() -> int:
     run_seq = review_perf_log.estimate_next_run_sequence()
     started = time.monotonic()
     mode = console_mode()
-    steps = step_specs()
-    step_count = len(steps)
+    all_steps = step_specs()
+    step_names = [step.name for step in all_steps]
 
     base_env = dict(os.environ)
     base_env["REVIEW_PERF"] = "1"
     base_env["REVIEW_PERF_RUN_ID"] = run_id
     base_env.setdefault("REVIEW_PERF_SOURCE", "default")
+    scope_mode = review_scope.normalize_scope_mode(base_env.get("REVIEW_SCOPE_MODE"))
 
     emit(
         "run_start",
@@ -210,6 +230,44 @@ def run_review() -> int:
         },
     )
 
+    scope_event_status = "ok"
+    try:
+        scope_decision = review_scope.plan_review_scope(
+            step_names=step_names,
+            env=base_env,
+            repo_root=Path.cwd(),
+        )
+    except Exception as exc:
+        scope_event_status = "degraded"
+        warning_message = f"scope planner failed: {exc}"
+        emit(
+            "warning",
+            run_id,
+            {
+                "status": "degraded",
+                "message": warning_message,
+            },
+        )
+        scope_decision = review_scope.fallback_full_scope_decision(step_names, scope_mode, warning_message)
+
+    emit(
+        "scope_plan",
+        run_id,
+        {
+            "status": scope_event_status,
+            **scope_decision.event_payload(),
+        },
+    )
+
+    print_scope_summary(scope_decision)
+
+    if scope_decision.enforce and not scope_decision.forced_full:
+        selected_steps = set(scope_decision.selected_steps)
+        steps = [step for step in all_steps if step.name in selected_steps]
+    else:
+        steps = all_steps
+
+    step_count = len(steps)
     print_milestone(f"[review] run {run_seq} started ({step_count} steps)")
 
     failed_step = ""

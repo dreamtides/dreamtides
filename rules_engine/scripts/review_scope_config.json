@@ -1,0 +1,60 @@
+{
+  "required_global_full_triggers": [
+    ".github/",
+    "justfile",
+    "rules_engine/Cargo.lock",
+    "rules_engine/Cargo.toml",
+    "rules_engine/scripts/review_scope.py",
+    "rules_engine/scripts/review_scope_config.json"
+  ],
+  "global_full_triggers": [
+    ".github/",
+    "justfile",
+    "rules_engine/Cargo.lock",
+    "rules_engine/Cargo.toml",
+    "rules_engine/scripts/review_perf_log.py",
+    "rules_engine/scripts/review_perf_runner.py",
+    "rules_engine/scripts/review_scope.py",
+    "rules_engine/scripts/review_scope_config.json",
+    "rules_engine/tabula/"
+  ],
+  "parser": {
+    "crate_seeds": [
+      "parser_v2",
+      "parser_v2_benchmarks",
+      "parser_v2_tests"
+    ],
+    "path_prefixes": [
+      "rules_engine/benchmarks/parser_v2/",
+      "rules_engine/src/parser_v2/",
+      "rules_engine/tests/parser_v2_tests/"
+    ]
+  },
+  "tv": {
+    "crate_seeds": [
+      "tv",
+      "tv_tests"
+    ],
+    "path_prefixes": [
+      "rules_engine/src/tv/",
+      "rules_engine/tests/tv_tests/"
+    ]
+  },
+  "always_run_steps": [
+    "check-snapshots",
+    "check-format",
+    "review-scope-validate",
+    "build",
+    "clippy",
+    "style-validator",
+    "test-core"
+  ],
+  "parser_steps": [
+    "parser-test"
+  ],
+  "tv_steps": [
+    "tv-check",
+    "tv-clippy",
+    "tv-test"
+  ]
+}
