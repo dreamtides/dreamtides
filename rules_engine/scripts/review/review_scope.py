@@ -40,6 +40,7 @@ class ScopeConfig:
     tv_path_prefixes: tuple[str, ...]
     always_run_steps: tuple[str, ...]
     markdown_only_skip_steps: tuple[str, ...]
+    python_docs_only_skip_steps: tuple[str, ...]
     parser_steps: tuple[str, ...]
     tv_steps: tuple[str, ...]
     python_steps: tuple[str, ...]
@@ -302,6 +303,9 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
         tv_path_prefixes=read_rules(tv_section.get("path_prefixes", []), "tv.path_prefixes"),
         always_run_steps=read_names(payload.get("always_run_steps", []), "always_run_steps"),
         markdown_only_skip_steps=read_names(payload.get("markdown_only_skip_steps", []), "markdown_only_skip_steps"),
+        python_docs_only_skip_steps=read_names(
+            payload.get("python_docs_only_skip_steps", []), "python_docs_only_skip_steps"
+        ),
         parser_steps=read_names(payload.get("parser_steps", []), "parser_steps"),
         tv_steps=read_names(payload.get("tv_steps", []), "tv_steps"),
         python_steps=read_names(payload.get("python_steps", []), "python_steps"),
@@ -484,8 +488,10 @@ def select_steps(
         return (list(step_names), {})
 
     docs_only = impacted_domains == {"docs"}
+    python_docs_only = bool(impacted_domains) and impacted_domains.issubset({"docs", "python"})
     always_steps = set(config.always_run_steps)
     docs_skip_steps = set(config.markdown_only_skip_steps)
+    python_docs_skip_steps = set(config.python_docs_only_skip_steps)
     domain_by_step: dict[str, str] = {}
     for domain in scoped_domains(config):
         for step_name in domain.gated_steps:
@@ -497,6 +503,10 @@ def select_steps(
     for step_name in step_names:
         if docs_only and step_name in docs_skip_steps:
             skipped[step_name] = "markdown-only changes"
+            continue
+
+        if python_docs_only and step_name in python_docs_skip_steps:
+            skipped[step_name] = "python/docs-only changes"
             continue
 
         required_domain = domain_by_step.get(step_name)
@@ -568,10 +578,12 @@ def plan_review_scope(
         workspace_metadata = metadata or load_workspace_metadata(effective_repo_root, command_runner)
 
         direct_crates: set[str] = set()
+        docs_path_impact = False
         path_impacts: dict[str, bool] = {domain.name: False for domain in domain_rules}
 
         for changed_path in changed_files:
             full_trigger_match = first_matching_rule(changed_path, scope_config.global_full_triggers)
+            changed_path_is_markdown = is_markdown_path(changed_path)
             domain_matches = {
                 domain.name: bool(
                     first_matching_rule(changed_path, domain.path_prefixes)
@@ -587,11 +599,13 @@ def plan_review_scope(
             for domain_name, matched in domain_matches.items():
                 if matched:
                     path_impacts[domain_name] = True
+            if changed_path_is_markdown:
+                docs_path_impact = True
 
             if mapped_crates:
                 direct_crates.update(mapped_crates)
 
-            has_domain_match = any(domain_matches.values())
+            has_domain_match = changed_path_is_markdown or any(domain_matches.values())
             if not full_trigger_match and not has_domain_match and not mapped_crates:
                 unmapped_paths.append(changed_path)
 
@@ -600,6 +614,8 @@ def plan_review_scope(
 
         impacted_crates = expand_impacted_crates(direct_crates, workspace_metadata.reverse_dependencies)
         impacted_crates_set = set(impacted_crates)
+        if docs_path_impact:
+            impacted_domains.add("docs")
         for domain in domain_rules:
             seed_impact = bool(impacted_crates_set & set(domain.crate_seeds))
             if path_impacts[domain.name] or seed_impact:
@@ -615,6 +631,8 @@ def plan_review_scope(
     )
 
     domains = ["docs"] if markdown_only else ["core"]
+    if not markdown_only and "docs" in impacted_domains:
+        domains.append("docs")
     for domain in domain_rules:
         if domain.name in impacted_domains:
             domains.append(domain.name)
@@ -682,6 +700,7 @@ def validate_scope_configuration(config: ScopeConfig, metadata: WorkspaceMetadat
         ("global_full_triggers", config.global_full_triggers),
         ("always_run_steps", config.always_run_steps),
         ("markdown_only_skip_steps", config.markdown_only_skip_steps),
+        ("python_docs_only_skip_steps", config.python_docs_only_skip_steps),
     ]
     for domain in domain_rules:
         duplicate_checks.append((f"{domain.name}.path_prefixes", domain.path_prefixes))
@@ -695,6 +714,7 @@ def validate_scope_configuration(config: ScopeConfig, metadata: WorkspaceMetadat
     full_rules = set(config.global_full_triggers)
     always_step_set = set(config.always_run_steps)
     markdown_step_set = set(config.markdown_only_skip_steps)
+    python_docs_step_set = set(config.python_docs_only_skip_steps)
     domain_step_sets = {domain.name: set(domain.gated_steps) for domain in domain_rules}
     domain_seed_sets = {domain.name: set(domain.crate_seeds) for domain in domain_rules}
     known_steps = set(always_step_set)
@@ -704,6 +724,9 @@ def validate_scope_configuration(config: ScopeConfig, metadata: WorkspaceMetadat
     unknown_markdown_steps = sorted(markdown_step_set - known_steps)
     if unknown_markdown_steps:
         errors.append(f"markdown-only skip steps are unknown: {', '.join(unknown_markdown_steps)}")
+    unknown_python_docs_steps = sorted(python_docs_step_set - known_steps)
+    if unknown_python_docs_steps:
+        errors.append(f"python/docs-only skip steps are unknown: {', '.join(unknown_python_docs_steps)}")
 
     for domain in domain_rules:
         rule_set = set(domain.path_prefixes)

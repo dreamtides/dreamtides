@@ -188,6 +188,11 @@ class ReviewScopePlannerTests(unittest.TestCase):
                 "tv-clippy",
                 "tv-test",
             ),
+            python_docs_only_skip_steps=(
+                "build",
+                "clippy",
+                "test-core",
+            ),
             parser_steps=("parser-test",),
             tv_steps=("tv-check", "tv-clippy", "tv-test"),
             python_steps=("python-test",),
@@ -512,7 +517,14 @@ class ReviewScopePlannerTests(unittest.TestCase):
         )
         self.assertFalse(decision.forced_full)
         self.assertIn("python", decision.domains)
+        self.assertNotIn("docs", decision.domains)
+        self.assertNotIn("build", decision.selected_steps)
+        self.assertNotIn("clippy", decision.selected_steps)
+        self.assertNotIn("test-core", decision.selected_steps)
         self.assertIn("python-test", decision.selected_steps)
+        self.assertEqual(decision.skipped_steps["build"], "python/docs-only changes")
+        self.assertEqual(decision.skipped_steps["clippy"], "python/docs-only changes")
+        self.assertEqual(decision.skipped_steps["test-core"], "python/docs-only changes")
         self.assertNotIn("python-test", decision.skipped_steps)
 
     def test_mixed_markdown_and_code_change_is_not_markdown_only(self) -> None:
@@ -528,8 +540,34 @@ class ReviewScopePlannerTests(unittest.TestCase):
             metadata=self.metadata,
         )
         self.assertFalse(decision.markdown_only)
-        self.assertTrue(decision.forced_full)
-        self.assertIn("unmapped changed path", decision.forced_full_reason)
+        self.assertFalse(decision.forced_full)
+        self.assertIn("docs", decision.domains)
+        self.assertIn("parser", decision.domains)
+        self.assertIn("build", decision.selected_steps)
+        self.assertIn("test-core", decision.selected_steps)
+
+    def test_python_and_markdown_only_skips_rust_steps(self) -> None:
+        env = {
+            "REVIEW_SCOPE_MODE": "enforce",
+            "REVIEW_SCOPE_CHANGED_FILES": "docs/notes/plan.md\nrules_engine/scripts/grid_generator.py",
+        }
+        decision = review_scope.plan_review_scope(
+            self.step_names,
+            env=env,
+            repo_root=Path.cwd(),
+            config=self.config,
+            metadata=self.metadata,
+        )
+        self.assertFalse(decision.forced_full)
+        self.assertIn("docs", decision.domains)
+        self.assertIn("python", decision.domains)
+        self.assertNotIn("build", decision.selected_steps)
+        self.assertNotIn("clippy", decision.selected_steps)
+        self.assertNotIn("test-core", decision.selected_steps)
+        self.assertIn("python-test", decision.selected_steps)
+        self.assertEqual(decision.skipped_steps["build"], "python/docs-only changes")
+        self.assertEqual(decision.skipped_steps["clippy"], "python/docs-only changes")
+        self.assertEqual(decision.skipped_steps["test-core"], "python/docs-only changes")
 
     def test_scope_validator_passes_repo_config(self) -> None:
         repo_root = Path(__file__).resolve().parents[4]

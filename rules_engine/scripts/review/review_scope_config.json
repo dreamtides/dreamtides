@@ -59,6 +59,11 @@
     "tv-clippy",
     "tv-test"
   ],
+  "python_docs_only_skip_steps": [
+    "build",
+    "clippy",
+    "test-core"
+  ],
   "parser_steps": [
     "parser-test"
   ],

@@ -48,7 +48,7 @@ Scope fails closed and runs full review when:
 
 ## Domain Mapping
 
-- Docs domain: markdown-only changes (`.md`, `.mdx`, `.markdown`) anywhere in the repo.
+- Docs domain: markdown changes (`.md`, `.mdx`, `.markdown`) anywhere in the repo.
 - Parser domain: parser crates and parser path prefixes.
 - TV domain: tv crates and tv path prefixes.
 - Python domain: changed `.py` files.
@@ -63,6 +63,7 @@ Configured sets in `review_scope_config.json`:
 
 - `always_run_steps`
 - `markdown_only_skip_steps`
+- `python_docs_only_skip_steps`
 - `parser_steps`
 - `tv_steps`
 - `python_steps`
@@ -71,6 +72,7 @@ In `enforce` mode with no force-full:
 
 - always-run steps execute
 - markdown-only changes skip steps listed in `markdown_only_skip_steps` (for example Rust build, clippy, and all unit-test steps)
+- python-only and python+markdown-only changes skip steps listed in `python_docs_only_skip_steps` (for example Rust build, clippy, and core Rust tests)
 - parser steps execute only if parser domain impacted
 - tv steps execute only if tv domain impacted
 - python steps execute only if python domain impacted
