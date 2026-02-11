@@ -2,7 +2,7 @@
 """Locate the compiled Criterion benchmark binary for a given benchmark filter.
 
 Usage example:
-  python scripts/profile_benchmark_binary.py \
+  python scripts/review/profile_benchmark_binary.py \
 	  --benchmark ai_core_11/ai_core_11 \
 	  --package battle_benchmarks \
 	  --manifest-path benchmarks/battle/Cargo.toml \
@@ -109,7 +109,7 @@ def main(argv: List[str]) -> int:
 
 	# Determine project root relative to this script so invocation CWD doesn't matter.
 	script_dir = Path(__file__).resolve().parent
-	project_root = script_dir.parent  # rules_engine root
+	project_root = script_dir.parent.parent  # rules_engine root
 
 	manifest_path = Path(args.manifest_path)
 	if not manifest_path.is_absolute():

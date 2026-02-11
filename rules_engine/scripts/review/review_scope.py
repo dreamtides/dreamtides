@@ -19,6 +19,7 @@ DEFAULT_WORKSPACE_MANIFEST = "rules_engine/Cargo.toml"
 DEFAULT_BASE_BRANCH = "origin/master"
 DEFAULT_LOCAL_SCOPE_STRATEGY = "head-if-dirty"
 MARKDOWN_EXTENSIONS = (".md", ".mdx", ".markdown")
+PYTHON_EXTENSIONS = (".py",)
 
 CommandRunner = Callable[[list[str], Path], tuple[int, str, str]]
 
@@ -41,6 +42,7 @@ class ScopeConfig:
     markdown_only_skip_steps: tuple[str, ...]
     parser_steps: tuple[str, ...]
     tv_steps: tuple[str, ...]
+    python_steps: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -93,6 +95,17 @@ class ScopeDecision:
             "skipped_steps": self.skipped_steps,
             "unmapped_paths": self.unmapped_paths,
         }
+
+
+@dataclass(frozen=True)
+class ScopedDomain:
+    """Domain-specific classification rules and gated review steps."""
+
+    name: str
+    crate_seeds: tuple[str, ...]
+    path_prefixes: tuple[str, ...]
+    file_extensions: tuple[str, ...]
+    gated_steps: tuple[str, ...]
 
 
 def parse_args() -> argparse.Namespace:
@@ -291,6 +304,7 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
         markdown_only_skip_steps=read_names(payload.get("markdown_only_skip_steps", []), "markdown_only_skip_steps"),
         parser_steps=read_names(payload.get("parser_steps", []), "parser_steps"),
         tv_steps=read_names(payload.get("tv_steps", []), "tv_steps"),
+        python_steps=read_names(payload.get("python_steps", []), "python_steps"),
     )
 
 
@@ -374,6 +388,33 @@ def load_workspace_metadata(repo_root: Path, command_runner: CommandRunner = run
     return WorkspaceMetadata(crate_roots=crate_roots, reverse_dependencies=reverse_dependencies)
 
 
+def scoped_domains(config: ScopeConfig) -> tuple[ScopedDomain, ...]:
+    """Returns configured non-core/non-full domains used for scope planning."""
+    return (
+        ScopedDomain(
+            name="parser",
+            crate_seeds=config.parser_crate_seeds,
+            path_prefixes=config.parser_path_prefixes,
+            file_extensions=(),
+            gated_steps=config.parser_steps,
+        ),
+        ScopedDomain(
+            name="tv",
+            crate_seeds=config.tv_crate_seeds,
+            path_prefixes=config.tv_path_prefixes,
+            file_extensions=(),
+            gated_steps=config.tv_steps,
+        ),
+        ScopedDomain(
+            name="python",
+            crate_seeds=(),
+            path_prefixes=(),
+            file_extensions=PYTHON_EXTENSIONS,
+            gated_steps=config.python_steps,
+        ),
+    )
+
+
 def path_matches_rule(path: str, rule: str) -> bool:
     """Returns whether a changed path matches a configured exact rule or prefix rule."""
     if not rule:
@@ -394,10 +435,15 @@ def first_matching_rule(path: str, rules: tuple[str, ...]) -> str:
 
 def is_markdown_path(path: str) -> bool:
     """Returns whether a changed path is a markdown file."""
+    return path_has_extension(path, MARKDOWN_EXTENSIONS)
+
+
+def path_has_extension(path: str, extensions: tuple[str, ...]) -> bool:
+    """Returns whether a path has one of the provided extensions."""
     if not path or path.endswith("/"):
         return False
     suffix = PurePosixPath(path).suffix.lower()
-    return suffix in MARKDOWN_EXTENSIONS
+    return suffix in extensions
 
 
 def crates_for_path(path: str, crate_roots: dict[str, str]) -> list[str]:
@@ -431,39 +477,34 @@ def select_steps(
     step_names: list[str],
     config: ScopeConfig,
     forced_full: bool,
-    markdown_only: bool,
-    parser_impacted: bool,
-    tv_impacted: bool,
+    impacted_domains: set[str],
 ) -> tuple[list[str], dict[str, str]]:
     """Selects planned steps and per-step skip reasons."""
     if forced_full:
         return (list(step_names), {})
 
+    docs_only = impacted_domains == {"docs"}
     always_steps = set(config.always_run_steps)
-    markdown_only_skip_steps = set(config.markdown_only_skip_steps)
-    parser_steps = set(config.parser_steps)
-    tv_steps = set(config.tv_steps)
+    docs_skip_steps = set(config.markdown_only_skip_steps)
+    domain_by_step: dict[str, str] = {}
+    for domain in scoped_domains(config):
+        for step_name in domain.gated_steps:
+            domain_by_step[step_name] = domain.name
 
     selected: list[str] = []
     skipped: dict[str, str] = {}
 
     for step_name in step_names:
-        if markdown_only and step_name in markdown_only_skip_steps:
+        if docs_only and step_name in docs_skip_steps:
             skipped[step_name] = "markdown-only changes"
             continue
 
-        if step_name in parser_steps:
-            if parser_impacted:
+        required_domain = domain_by_step.get(step_name)
+        if required_domain:
+            if required_domain in impacted_domains:
                 selected.append(step_name)
             else:
-                skipped[step_name] = "parser domain not impacted"
-            continue
-
-        if step_name in tv_steps:
-            if tv_impacted:
-                selected.append(step_name)
-            else:
-                skipped[step_name] = "tv domain not impacted"
+                skipped[step_name] = f"{required_domain} domain not impacted"
             continue
 
         if step_name in always_steps:
@@ -518,45 +559,51 @@ def plan_review_scope(
         forced_full_reason = "no changed files detected"
 
     markdown_only = bool(changed_files) and all(is_markdown_path(changed_path) for changed_path in changed_files)
+    domain_rules = scoped_domains(scope_config)
+    impacted_domains: set[str] = {"docs"} if markdown_only else set()
     impacted_crates: list[str] = []
-    parser_impacted = False
-    tv_impacted = False
     unmapped_paths: list[str] = []
 
     if not forced_full_reason and changed_files and not markdown_only:
         workspace_metadata = metadata or load_workspace_metadata(effective_repo_root, command_runner)
 
         direct_crates: set[str] = set()
-        parser_path_impact = False
-        tv_path_impact = False
+        path_impacts: dict[str, bool] = {domain.name: False for domain in domain_rules}
 
         for changed_path in changed_files:
             full_trigger_match = first_matching_rule(changed_path, scope_config.global_full_triggers)
-            parser_rule_match = first_matching_rule(changed_path, scope_config.parser_path_prefixes)
-            tv_rule_match = first_matching_rule(changed_path, scope_config.tv_path_prefixes)
+            domain_matches = {
+                domain.name: bool(
+                    first_matching_rule(changed_path, domain.path_prefixes)
+                    or path_has_extension(changed_path, domain.file_extensions)
+                )
+                for domain in domain_rules
+            }
             mapped_crates = crates_for_path(changed_path, workspace_metadata.crate_roots)
 
             if full_trigger_match and not forced_full_reason:
                 forced_full_reason = f"matched global full trigger '{full_trigger_match}'"
 
-            if parser_rule_match:
-                parser_path_impact = True
-
-            if tv_rule_match:
-                tv_path_impact = True
+            for domain_name, matched in domain_matches.items():
+                if matched:
+                    path_impacts[domain_name] = True
 
             if mapped_crates:
                 direct_crates.update(mapped_crates)
 
-            if not full_trigger_match and not parser_rule_match and not tv_rule_match and not mapped_crates:
+            has_domain_match = any(domain_matches.values())
+            if not full_trigger_match and not has_domain_match and not mapped_crates:
                 unmapped_paths.append(changed_path)
 
         if unmapped_paths and not forced_full_reason:
             forced_full_reason = f"unmapped changed path '{unmapped_paths[0]}'"
 
         impacted_crates = expand_impacted_crates(direct_crates, workspace_metadata.reverse_dependencies)
-        parser_impacted = parser_path_impact or bool(set(impacted_crates) & set(scope_config.parser_crate_seeds))
-        tv_impacted = tv_path_impact or bool(set(impacted_crates) & set(scope_config.tv_crate_seeds))
+        impacted_crates_set = set(impacted_crates)
+        for domain in domain_rules:
+            seed_impact = bool(impacted_crates_set & set(domain.crate_seeds))
+            if path_impacts[domain.name] or seed_impact:
+                impacted_domains.add(domain.name)
 
     forced_full = bool(forced_full_reason)
 
@@ -564,16 +611,13 @@ def plan_review_scope(
         step_names,
         scope_config,
         forced_full=forced_full,
-        markdown_only=markdown_only,
-        parser_impacted=parser_impacted,
-        tv_impacted=tv_impacted,
+        impacted_domains=impacted_domains,
     )
 
     domains = ["docs"] if markdown_only else ["core"]
-    if parser_impacted:
-        domains.append("parser")
-    if tv_impacted:
-        domains.append("tv")
+    for domain in domain_rules:
+        if domain.name in impacted_domains:
+            domains.append(domain.name)
     if forced_full:
         domains.append("full")
 
@@ -626,6 +670,7 @@ def find_duplicates(values: tuple[str, ...]) -> list[str]:
 def validate_scope_configuration(config: ScopeConfig, metadata: WorkspaceMetadata) -> list[str]:
     """Validates scope config coverage and rule consistency."""
     errors: list[str] = []
+    domain_rules = scoped_domains(config)
 
     required = set(config.required_global_full_triggers)
     configured = set(config.global_full_triggers)
@@ -633,81 +678,75 @@ def validate_scope_configuration(config: ScopeConfig, metadata: WorkspaceMetadat
     if missing_required:
         errors.append(f"missing required global full triggers: {', '.join(missing_required)}")
 
-    for field_name, values in (
+    duplicate_checks: list[tuple[str, tuple[str, ...]]] = [
         ("global_full_triggers", config.global_full_triggers),
-        ("parser.path_prefixes", config.parser_path_prefixes),
-        ("tv.path_prefixes", config.tv_path_prefixes),
         ("always_run_steps", config.always_run_steps),
         ("markdown_only_skip_steps", config.markdown_only_skip_steps),
-        ("parser_steps", config.parser_steps),
-        ("tv_steps", config.tv_steps),
-    ):
+    ]
+    for domain in domain_rules:
+        duplicate_checks.append((f"{domain.name}.path_prefixes", domain.path_prefixes))
+        duplicate_checks.append((f"{domain.name}_steps", domain.gated_steps))
+
+    for field_name, values in duplicate_checks:
         duplicates = find_duplicates(values)
         if duplicates:
             errors.append(f"{field_name} contains duplicate entries: {', '.join(duplicates)}")
 
-    parser_rules = set(config.parser_path_prefixes)
-    tv_rules = set(config.tv_path_prefixes)
     full_rules = set(config.global_full_triggers)
-
-    parser_tv_overlap = sorted(parser_rules & tv_rules)
-    if parser_tv_overlap:
-        errors.append(f"parser and tv path rules overlap exactly: {', '.join(parser_tv_overlap)}")
-
-    parser_full_overlap = sorted(parser_rules & full_rules)
-    if parser_full_overlap:
-        errors.append(f"parser path rules conflict with full-run rules: {', '.join(parser_full_overlap)}")
-
-    tv_full_overlap = sorted(tv_rules & full_rules)
-    if tv_full_overlap:
-        errors.append(f"tv path rules conflict with full-run rules: {', '.join(tv_full_overlap)}")
-
-    parser_seed_set = set(config.parser_crate_seeds)
-    tv_seed_set = set(config.tv_crate_seeds)
-
-    overlapping_seeds = sorted(parser_seed_set & tv_seed_set)
-    if overlapping_seeds:
-        errors.append(f"crate seeds appear in multiple domains: {', '.join(overlapping_seeds)}")
-
-    parser_step_set = set(config.parser_steps)
-    tv_step_set = set(config.tv_steps)
     always_step_set = set(config.always_run_steps)
     markdown_step_set = set(config.markdown_only_skip_steps)
-    known_steps = always_step_set | parser_step_set | tv_step_set
+    domain_step_sets = {domain.name: set(domain.gated_steps) for domain in domain_rules}
+    domain_seed_sets = {domain.name: set(domain.crate_seeds) for domain in domain_rules}
+    known_steps = set(always_step_set)
+    for step_set in domain_step_sets.values():
+        known_steps.update(step_set)
 
     unknown_markdown_steps = sorted(markdown_step_set - known_steps)
     if unknown_markdown_steps:
         errors.append(f"markdown-only skip steps are unknown: {', '.join(unknown_markdown_steps)}")
 
-    if parser_step_set & tv_step_set:
-        overlap = sorted(parser_step_set & tv_step_set)
-        errors.append(f"parser and tv step sets overlap: {', '.join(overlap)}")
+    for domain in domain_rules:
+        rule_set = set(domain.path_prefixes)
+        full_overlap = sorted(rule_set & full_rules)
+        if full_overlap:
+            errors.append(f"{domain.name} path rules conflict with full-run rules: {', '.join(full_overlap)}")
 
-    if always_step_set & parser_step_set:
-        overlap = sorted(always_step_set & parser_step_set)
-        errors.append(f"always-run and parser step sets overlap: {', '.join(overlap)}")
+        always_overlap = sorted(always_step_set & domain_step_sets[domain.name])
+        if always_overlap:
+            errors.append(f"always-run and {domain.name} step sets overlap: {', '.join(always_overlap)}")
 
-    if always_step_set & tv_step_set:
-        overlap = sorted(always_step_set & tv_step_set)
-        errors.append(f"always-run and tv step sets overlap: {', '.join(overlap)}")
+    for index, left_domain in enumerate(domain_rules):
+        for right_domain in domain_rules[index + 1 :]:
+            path_overlap = sorted(set(left_domain.path_prefixes) & set(right_domain.path_prefixes))
+            if path_overlap:
+                errors.append(
+                    f"{left_domain.name} and {right_domain.name} path rules overlap exactly: {', '.join(path_overlap)}"
+                )
+
+            step_overlap = sorted(domain_step_sets[left_domain.name] & domain_step_sets[right_domain.name])
+            if step_overlap:
+                errors.append(
+                    f"{left_domain.name} and {right_domain.name} step sets overlap: {', '.join(step_overlap)}"
+                )
+
+            seed_overlap = sorted(domain_seed_sets[left_domain.name] & domain_seed_sets[right_domain.name])
+            if seed_overlap:
+                errors.append(f"crate seeds appear in multiple domains: {', '.join(seed_overlap)}")
 
     for crate_name in sorted(metadata.crate_roots):
-        domains = []
-        if crate_name in parser_seed_set:
-            domains.append("parser")
-        if crate_name in tv_seed_set:
-            domains.append("tv")
-        if not domains:
-            domains.append("core")
-        if len(domains) != 1:
-            errors.append(f"crate '{crate_name}' is classifiable into multiple domains: {', '.join(domains)}")
+        matching_domains = [domain.name for domain in domain_rules if crate_name in domain_seed_sets[domain.name]]
+        if len(matching_domains) > 1:
+            errors.append(f"crate '{crate_name}' is classifiable into multiple domains: {', '.join(matching_domains)}")
 
     return errors
 
 
 def default_step_names(config: ScopeConfig) -> list[str]:
     """Builds default step order for CLI planning output."""
-    return dedupe_keep_order([*config.always_run_steps, *config.parser_steps, *config.tv_steps])
+    ordered_steps = list(config.always_run_steps)
+    for domain in scoped_domains(config):
+        ordered_steps.extend(domain.gated_steps)
+    return dedupe_keep_order(ordered_steps)
 
 
 def render_scope_plan(decision: ScopeDecision) -> str:

@@ -5,14 +5,14 @@ description: Explain how Dreamtides scoped review chooses changed files, maps im
 
 # Review Scope
 
-Use this skill to explain the review scope system implemented in `rules_engine/scripts/review_scope.py` and consumed by `rules_engine/scripts/review_runner.py`.
+Use this skill to explain the review scope system implemented in `rules_engine/scripts/review/review_scope.py` and consumed by `rules_engine/scripts/review/review_runner.py`.
 
 ## What It Does
 
 `just review` (perf-runner path) builds a scope decision before running steps:
 
 1. Resolve changed files.
-2. Classify impact into `docs`, `core`, `parser`, `tv`, or `full`.
+2. Classify impact into `docs`, `core`, `parser`, `tv`, `python`, or `full`.
 3. Select steps to run/skip.
 4. Emit a `scope_plan` telemetry event and console summary.
 
@@ -51,6 +51,7 @@ Scope fails closed and runs full review when:
 - Docs domain: markdown-only changes (`.md`, `.mdx`, `.markdown`) anywhere in the repo.
 - Parser domain: parser crates and parser path prefixes.
 - TV domain: tv crates and tv path prefixes.
+- Python domain: changed `.py` files.
 - Core domain: everything else that is mapped and not forced full.
 - Full domain: any force-full condition.
 
@@ -64,6 +65,7 @@ Configured sets in `review_scope_config.json`:
 - `markdown_only_skip_steps`
 - `parser_steps`
 - `tv_steps`
+- `python_steps`
 
 In `enforce` mode with no force-full:
 
@@ -71,6 +73,7 @@ In `enforce` mode with no force-full:
 - markdown-only changes skip steps listed in `markdown_only_skip_steps` (for example Rust build, clippy, and all unit-test steps)
 - parser steps execute only if parser domain impacted
 - tv steps execute only if tv domain impacted
+- python steps execute only if python domain impacted
 
 ## Useful Commands
 

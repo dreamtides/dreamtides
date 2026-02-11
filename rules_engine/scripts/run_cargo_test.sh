@@ -6,7 +6,7 @@
 # Example: run_cargo_test.sh parser_v2_tests my_test_name
 #
 # Environment variables:
-#   REVIEW_PERF - If set to 1, route through profile_cargo_test.py
+#   REVIEW_PERF - If set to 1, route through review/profile_cargo_test.py
 #   RUST_MIN_STACK - Set minimum stack size (e.g., for deep parser hierarchies)
 #   CARGO_TEST_QUIET - If set, pass -q to cargo test
 #   CARGO_TEST_THREADS - If set, pass --test-threads=N to cargo test
@@ -47,7 +47,7 @@ if [ "${REVIEW_PERF:-0}" = "1" ]; then
         profiler_args+=("${FILTER_ARGS[@]}")
     fi
 
-    if ! python3 rules_engine/scripts/profile_cargo_test.py "${profiler_args[@]}"; then
+    if ! python3 rules_engine/scripts/review/profile_cargo_test.py "${profiler_args[@]}"; then
         exit 1
     fi
 

@@ -162,6 +162,15 @@ def step_specs() -> list[StepSpec]:
         StepSpec("clippy", [CommandSpec("clippy", ["just", "clippy"])]),
         StepSpec("style-validator", [CommandSpec("style-validator", ["just", "style-validator"])]),
         StepSpec("test-core", [CommandSpec("test-core", ["just", "review-core-test"])]),
+        StepSpec(
+            "python-test",
+            [
+                CommandSpec(
+                    "python-test",
+                    ["python3", "-m", "unittest", "discover", "-s", "rules_engine/scripts/review/tests", "-p", "test_*.py"],
+                )
+            ],
+        ),
         StepSpec("parser-test", [CommandSpec("parser-test", ["just", "parser-test"])]),
         StepSpec(
             "tv-check",

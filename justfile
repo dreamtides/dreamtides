@@ -12,7 +12,7 @@ review:
     if [ "${REVIEW_PERF:-1}" = "0" ]; then
         just review-direct
     else
-        python3 rules_engine/scripts/review_runner.py
+        python3 rules_engine/scripts/review/review_runner.py
     fi
 
 review-direct: check-snapshots check-format build clippy style-validator review-core-test parser-test tv-check tv-clippy tv-test
@@ -20,16 +20,16 @@ review-direct: check-snapshots check-format build clippy style-validator review-
 review-verbose: check-snapshots check-format-verbose build-verbose clippy-verbose style-validator-verbose review-core-test-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
 
 review-scope-plan:
-    python3 rules_engine/scripts/review_scope.py plan
+    python3 rules_engine/scripts/review/review_scope.py plan
 
 review-scope-validate:
-    python3 rules_engine/scripts/review_scope.py validate
+    python3 rules_engine/scripts/review/review_scope.py validate
 
 review-analyze:
-    python3 rules_engine/scripts/analyze_review_perf.py
+    python3 rules_engine/scripts/review/analyze_review_perf.py
 
 review-analyze-history commits='100' sample='10':
-    python3 rules_engine/scripts/analyze_review_perf.py --backfill-commits "{{commits}}" --sample-every "{{sample}}"
+    python3 rules_engine/scripts/review/analyze_review_perf.py --backfill-commits "{{commits}}" --sample-every "{{sample}}"
 
 check:
     #!/usr/bin/env bash
@@ -106,7 +106,7 @@ test: tabula-check
         if [ -n "$TEST_THREADS" ]; then
             PROFILE_ARGS+=(--test-threads "${TEST_THREADS#--test-threads=}")
         fi
-        RUST_MIN_STACK=8388608 python3 rules_engine/scripts/profile_cargo_test.py \
+        RUST_MIN_STACK=8388608 python3 rules_engine/scripts/review/profile_cargo_test.py \
             --manifest-path rules_engine/Cargo.toml \
             --workspace \
             --exclude tv_tests \
@@ -145,7 +145,7 @@ review-core-test: tabula-check
         if [ -n "$TEST_THREADS" ]; then
             PROFILE_ARGS+=(--test-threads "${TEST_THREADS#--test-threads=}")
         fi
-        RUST_MIN_STACK=8388608 python3 rules_engine/scripts/profile_cargo_test.py \
+        RUST_MIN_STACK=8388608 python3 rules_engine/scripts/review/profile_cargo_test.py \
             --manifest-path rules_engine/Cargo.toml \
             --workspace \
             --exclude tv_tests \
@@ -548,7 +548,7 @@ samply-matchup *args='':
 
 # Example: just samply-battle-benchmark ai_core_11
 samply-battle-benchmark *args='':
-    ./rules_engine/scripts/profile_benchmark_binary.py --manifest-path benchmarks/battle/Cargo.toml --samply --package battle_benchmarks --benchmark $@
+    ./rules_engine/scripts/review/profile_benchmark_binary.py --manifest-path benchmarks/battle/Cargo.toml --samply --package battle_benchmarks --benchmark $@
 
 @nim *args='':
     cargo run --manifest-path rules_engine/Cargo.toml --bin run_nim -- $@

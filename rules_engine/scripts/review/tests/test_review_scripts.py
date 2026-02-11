@@ -13,8 +13,9 @@ from dataclasses import replace
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-if str(SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(SCRIPT_DIR))
+REVIEW_DIR = SCRIPT_DIR.parent
+if str(REVIEW_DIR) not in sys.path:
+    sys.path.insert(0, str(REVIEW_DIR))
 
 import analyze_review_perf
 import profile_cargo_test
@@ -137,6 +138,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
             "clippy",
             "style-validator",
             "test-core",
+            "python-test",
             "parser-test",
             "tv-check",
             "tv-clippy",
@@ -148,16 +150,16 @@ class ReviewScopePlannerTests(unittest.TestCase):
                 "justfile",
                 "rules_engine/Cargo.toml",
                 "rules_engine/Cargo.lock",
-                "rules_engine/scripts/review_scope.py",
-                "rules_engine/scripts/review_scope_config.json",
+                "rules_engine/scripts/review/review_scope.py",
+                "rules_engine/scripts/review/review_scope_config.json",
             ),
             global_full_triggers=(
                 ".github/",
                 "justfile",
                 "rules_engine/Cargo.toml",
                 "rules_engine/Cargo.lock",
-                "rules_engine/scripts/review_scope.py",
-                "rules_engine/scripts/review_scope_config.json",
+                "rules_engine/scripts/review/review_scope.py",
+                "rules_engine/scripts/review/review_scope_config.json",
                 "rules_engine/tabula/",
             ),
             parser_crate_seeds=("parser_v2", "parser_v2_tests", "parser_v2_benchmarks"),
@@ -180,6 +182,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
                 "build",
                 "clippy",
                 "test-core",
+                "python-test",
                 "parser-test",
                 "tv-check",
                 "tv-clippy",
@@ -187,6 +190,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
             ),
             parser_steps=("parser-test",),
             tv_steps=("tv-check", "tv-clippy", "tv-test"),
+            python_steps=("python-test",),
         )
         self.metadata = review_scope.WorkspaceMetadata(
             crate_roots={
@@ -347,7 +351,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
     def test_unknown_path_forces_full(self) -> None:
         env = {
             "REVIEW_SCOPE_MODE": "enforce",
-            "REVIEW_SCOPE_CHANGED_FILES": "notes/unmapped.md",
+            "REVIEW_SCOPE_CHANGED_FILES": "notes/unmapped.txt",
         }
         decision = review_scope.plan_review_scope(
             self.step_names,
@@ -358,7 +362,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
         )
         self.assertTrue(decision.forced_full)
         self.assertIn("unmapped changed path", decision.forced_full_reason)
-        self.assertIn("notes/unmapped.md", decision.unmapped_paths)
+        self.assertIn("notes/unmapped.txt", decision.unmapped_paths)
 
     def test_tabula_path_forces_full(self) -> None:
         env = {
@@ -453,8 +457,10 @@ class ReviewScopePlannerTests(unittest.TestCase):
             metadata=self.metadata,
         )
         self.assertTrue(decision.enforce)
+        self.assertNotIn("python-test", decision.selected_steps)
         self.assertNotIn("parser-test", decision.selected_steps)
         self.assertNotIn("tv-check", decision.selected_steps)
+        self.assertIn("python-test", decision.skipped_steps)
         self.assertIn("parser-test", decision.skipped_steps)
         self.assertIn("tv-check", decision.skipped_steps)
 
@@ -482,13 +488,32 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.assertNotIn("build", decision.selected_steps)
         self.assertNotIn("clippy", decision.selected_steps)
         self.assertNotIn("test-core", decision.selected_steps)
+        self.assertNotIn("python-test", decision.selected_steps)
         self.assertNotIn("parser-test", decision.selected_steps)
         self.assertNotIn("tv-check", decision.selected_steps)
         self.assertNotIn("tv-clippy", decision.selected_steps)
         self.assertNotIn("tv-test", decision.selected_steps)
         self.assertEqual(decision.skipped_steps["build"], "markdown-only changes")
         self.assertEqual(decision.skipped_steps["test-core"], "markdown-only changes")
+        self.assertEqual(decision.skipped_steps["python-test"], "markdown-only changes")
         self.assertEqual(decision.skipped_steps["tv-test"], "markdown-only changes")
+
+    def test_python_change_selects_python_test_step(self) -> None:
+        env = {
+            "REVIEW_SCOPE_MODE": "enforce",
+            "REVIEW_SCOPE_CHANGED_FILES": "rules_engine/scripts/grid_generator.py",
+        }
+        decision = review_scope.plan_review_scope(
+            self.step_names,
+            env=env,
+            repo_root=Path.cwd(),
+            config=self.config,
+            metadata=self.metadata,
+        )
+        self.assertFalse(decision.forced_full)
+        self.assertIn("python", decision.domains)
+        self.assertIn("python-test", decision.selected_steps)
+        self.assertNotIn("python-test", decision.skipped_steps)
 
     def test_mixed_markdown_and_code_change_is_not_markdown_only(self) -> None:
         env = {
@@ -507,7 +532,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.assertIn("unmapped changed path", decision.forced_full_reason)
 
     def test_scope_validator_passes_repo_config(self) -> None:
-        repo_root = Path(__file__).resolve().parents[2]
+        repo_root = Path(__file__).resolve().parents[4]
         config = review_scope.load_scope_config()
         metadata = review_scope.load_workspace_metadata(repo_root)
         errors = review_scope.validate_scope_configuration(config, metadata)
