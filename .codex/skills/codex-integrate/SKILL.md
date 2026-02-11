@@ -7,8 +7,8 @@ Merge exactly one completed `codex/task-*` branch into `master`.
 Use this only when an external integration lock is already held.
 
 Default behavior: auto-discover the newest mergeable done task from the task queue,
-find or recreate its worktree, rebase onto `master`, run validation, fast-forward
-merge, then clean up branch/worktree.
+find or recreate its worktree, rebase onto `master`, fast-forward merge, then
+clean up branch/worktree.
 
 ## Runbook
 
@@ -67,17 +67,29 @@ echo "BRANCH=$BRANCH"
 echo "WORKTREE=$WORKTREE"
 ```
 
-2. Rebase and validate in the task worktree.
+2. Rebase in the task worktree.
 
 ```bash
-git fetch "$REPO_ROOT" master
 cd "$WORKTREE"
+git fetch "$REPO_ROOT" master
 git rebase FETCH_HEAD
 just fmt
-just review
 ```
 
-3. Fast-forward merge into `master`, then clean up.
+3. Optional validation (disabled by default).
+
+- Do not run `just review` by default; worker mode already validated before task completion.
+- If you explicitly need a second validation pass, run:
+
+```bash
+REVIEW_SCOPE_LOCAL_STRATEGY=merge-base-union just review
+```
+
+Use `merge-base-union` to scope against branch diff instead of clean-tree state.
+This avoids forcing unrelated full-scope steps (for example `tv-check`) when the
+worktree is otherwise clean.
+
+4. Fast-forward merge into `master`, then clean up.
 
 ```bash
 cd "$REPO_ROOT"
@@ -92,3 +104,5 @@ git branch -d "$BRANCH"
 - If rebase or validation fails, stop and keep branch/worktree for fixes.
 - Do not force-merge and do not delete the branch/worktree when unresolved.
 - If worktree removal fails because it is dirty, fix or stash inside that worktree first.
+- `FETCH_HEAD` is worktree-local: run `git fetch` from inside `"$WORKTREE"` immediately
+  before `git rebase FETCH_HEAD`.
