@@ -20,6 +20,7 @@ client/Assets/StreamingAssets/Tabula.xlsm
 .worktrees
 state.json
 .logs
+plans/
 
 # Local Cargo config (contains [patch] overrides for local dev)
 .cargo/
