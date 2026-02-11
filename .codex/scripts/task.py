@@ -25,7 +25,6 @@ UTC_TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 DEFAULT_TASK_STORE_ROOT = Path("/tmp/codex")
 TASKS_DIR_NAME = "tasks"
 TASK_ITEMS_DIR_NAME = "items"
-LEGACY_TASK_FILE_PREFIX = ".codex/tasks/"
 
 
 class TaskError(Exception):
@@ -278,8 +277,8 @@ def task_file_path(root: Path, task: dict[str, object]) -> Path:
     raw_path = Path(task_file)
     if raw_path.is_absolute():
         return raw_path
-    if task_file.startswith(LEGACY_TASK_FILE_PREFIX):
-        raw_path = Path(task_file.removeprefix(LEGACY_TASK_FILE_PREFIX))
+    if len(raw_path.parts) >= 2 and raw_path.parts[0] == ".codex" and raw_path.parts[1] == TASKS_DIR_NAME:
+        raw_path = Path(*raw_path.parts[2:])
     if raw_path.parts and raw_path.parts[0] == TASKS_DIR_NAME:
         raw_path = Path(*raw_path.parts[1:])
     return store_paths(root)["tasks"] / raw_path
