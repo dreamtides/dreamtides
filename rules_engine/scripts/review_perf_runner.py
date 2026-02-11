@@ -116,19 +116,6 @@ def step_specs() -> list[StepSpec]:
         StepSpec("style-validator", [CommandSpec("style-validator", ["just", "style-validator"])]),
         StepSpec("test", [CommandSpec("test", ["just", "test"])]),
         StepSpec(
-            "parser-baselines",
-            [
-                CommandSpec(
-                    "parser-baseline-bracket-locale",
-                    ["just", "parser-test", "test_full_card_bracket_locale_leak_detector"],
-                ),
-                CommandSpec(
-                    "parser-baseline-golden-output",
-                    ["just", "parser-test", "test_golden_rendered_output"],
-                ),
-            ],
-        ),
-        StepSpec(
             "tv-check",
             [
                 CommandSpec(

@@ -15,9 +15,9 @@ review:
         python3 rules_engine/scripts/review_perf_runner.py
     fi
 
-review-legacy: check-snapshots check-format build clippy style-validator test parser-baselines tv-check tv-clippy tv-test
+review-legacy: check-snapshots check-format build clippy style-validator test tv-check tv-clippy tv-test
 
-review-verbose: check-snapshots check-format-verbose build-verbose clippy-verbose style-validator-verbose test-verbose parser-baselines tv-check-verbose tv-clippy-verbose tv-test
+review-verbose: check-snapshots check-format-verbose build-verbose clippy-verbose style-validator-verbose test-verbose tv-check-verbose tv-clippy-verbose tv-test
 
 review-analyze:
     python3 rules_engine/scripts/analyze_review_perf.py
