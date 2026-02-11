@@ -1,11 +1,12 @@
 ---
 name: task-ops-codex
-description: Operate the persistent Codex filesystem task list under .codex/tasks using .codex/scripts/task.py. Use for task queue operations including finding ready work, adding tasks, updating dependencies, marking done, validating integrity, and inspecting task details.
+description: Operate the persistent Codex filesystem task list under /tmp/codex/tasks by default using .codex/scripts/task.py. Use for task queue operations including finding ready work, adding tasks, updating dependencies, marking done, validating integrity, and inspecting task details.
 ---
 
 # Codex Task Operations
 
 Use `.codex/scripts/task.py` as the single interface for task operations.
+By default the task store is `/tmp/codex/tasks`; pass `--root` to use a different root.
 
 ## Core Commands
 

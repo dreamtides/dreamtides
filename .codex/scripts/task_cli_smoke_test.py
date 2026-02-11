@@ -46,7 +46,7 @@ class TaskCliSmokeTest(unittest.TestCase):
             root = Path(tmp_dir)
 
             self.run_cmd(root, "init")
-            index_path = root / ".codex" / "tasks" / "index.json"
+            index_path = root / "tasks" / "index.json"
             self.assertTrue(index_path.exists())
 
             markdown_one = root / "task_1.md"
@@ -294,7 +294,7 @@ class TaskCliSmokeTest(unittest.TestCase):
                 "600",
             )
 
-            index_path = root / ".codex" / "tasks" / "index.json"
+            index_path = root / "tasks" / "index.json"
             index_payload = json.loads(index_path.read_text(encoding="utf-8"))
             index_payload["tasks"][0]["lease_expires_at"] = "2000-01-01T00:00:00Z"
             index_path.write_text(json.dumps(index_payload, indent=2) + "\n", encoding="utf-8")

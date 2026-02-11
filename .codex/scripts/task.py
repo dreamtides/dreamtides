@@ -22,6 +22,10 @@ MIN_ID_WIDTH = 4
 CLAIM_LEASE_SECONDS_DEFAULT = 4 * 60 * 60
 TASK_INDEX_LOCK_FILE = "index.lock"
 UTC_TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+DEFAULT_TASK_STORE_ROOT = Path("/tmp/codex")
+TASKS_DIR_NAME = "tasks"
+TASK_ITEMS_DIR_NAME = "items"
+LEGACY_TASK_FILE_PREFIX = ".codex/tasks/"
 
 
 class TaskError(Exception):
@@ -101,13 +105,11 @@ def dedupe_preserve_order(items: Iterable[str]) -> list[str]:
 
 def store_paths(root: Path) -> dict[str, Path]:
     """Resolve all task store paths relative to the provided root directory."""
-    codex_dir = root / ".codex"
-    tasks_dir = codex_dir / "tasks"
-    items_dir = tasks_dir / "items"
+    tasks_dir = root / TASKS_DIR_NAME
+    items_dir = tasks_dir / TASK_ITEMS_DIR_NAME
     index_path = tasks_dir / "index.json"
     return {
         "root": root,
-        "codex": codex_dir,
         "tasks": tasks_dir,
         "items": items_dir,
         "index": index_path,
@@ -207,9 +209,7 @@ def default_index() -> dict[str, object]:
 def ensure_store_exists(paths: dict[str, Path]) -> None:
     """Ensure task store directories and index exist."""
     if not paths["index"].exists():
-        raise TaskError(
-            "Task store is not initialized. Run '.codex/scripts/task.py init' first."
-        )
+        raise TaskError("Task store is not initialized. Run '.codex/scripts/task.py init' first.")
 
 
 def load_index(paths: dict[str, Path]) -> dict[str, object]:
@@ -275,7 +275,14 @@ def task_file_path(root: Path, task: dict[str, object]) -> Path:
     task_file = task.get("task_file")
     if not isinstance(task_file, str) or task_file == "":
         raise TaskError("Task metadata is missing a valid task_file value.")
-    return root / task_file
+    raw_path = Path(task_file)
+    if raw_path.is_absolute():
+        return raw_path
+    if task_file.startswith(LEGACY_TASK_FILE_PREFIX):
+        raw_path = Path(task_file.removeprefix(LEGACY_TASK_FILE_PREFIX))
+    if raw_path.parts and raw_path.parts[0] == TASKS_DIR_NAME:
+        raw_path = Path(*raw_path.parts[1:])
+    return store_paths(root)["tasks"] / raw_path
 
 
 def render_task_markdown(task: dict[str, object], body: str) -> str:
@@ -474,7 +481,11 @@ def validate_index(
                 f"{task_label}.lease_expires_at must be null or UTC timestamp {UTC_TIMESTAMP_FORMAT}."
             )
         if check_files and isinstance(task_file, str):
-            file_path = root / task_file
+            try:
+                file_path = task_file_path(root, task)
+            except TaskError as error:
+                errors.append(f"{task_label}.task_file {error}")
+                continue
             if not file_path.exists():
                 errors.append(f"{task_id} references missing task file '{task_file}'.")
 
@@ -618,7 +629,7 @@ def cmd_add(args: argparse.Namespace) -> int:
         if not isinstance(next_id, int) or next_id < 1:
             raise TaskError("Task index is invalid: 'next_id' must be >= 1.")
         task_id = format_task_id(next_id)
-        task_file = str(Path(".codex") / "tasks" / "items" / f"{task_id}.md")
+        task_file = str(Path(TASK_ITEMS_DIR_NAME) / f"{task_id}.md")
         now_dt = datetime.now(timezone.utc)
         now = format_utc_timestamp(now_dt)
         task = {
@@ -1009,9 +1020,7 @@ def cmd_renumber(args: argparse.Namespace) -> int:
             remapped_task["blocked_by"] = [
                 id_map[str(blocker)] for blocker in task["blocked_by"]
             ]
-            remapped_task["task_file"] = str(
-                Path(".codex") / "tasks" / "items" / f"{new_id}.md"
-            )
+            remapped_task["task_file"] = str(Path(TASK_ITEMS_DIR_NAME) / f"{new_id}.md")
             remapped_task["updated_at"] = now
             remapped_tasks.append(remapped_task)
 
@@ -1076,13 +1085,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--root",
-        default=".",
-        help="Workspace root containing .codex/tasks (default: current directory).",
+        default=str(DEFAULT_TASK_STORE_ROOT),
+        help=(
+            f"Task store root containing {TASKS_DIR_NAME}/ "
+            f"(default: {DEFAULT_TASK_STORE_ROOT})."
+        ),
     )
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    init_parser = subparsers.add_parser("init", help="Initialize .codex/tasks store.")
+    init_parser = subparsers.add_parser("init", help=f"Initialize {TASKS_DIR_NAME}/ store.")
     init_parser.set_defaults(handler=cmd_init)
 
     add_parser = subparsers.add_parser("add", help="Add a new task.")
