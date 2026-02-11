@@ -68,7 +68,27 @@ def command_string(argv: list[str]) -> str:
     return shlex.join(argv)
 
 
-def run_command(run_id: str, step_name: str, command_index: int, command: CommandSpec, base_env: dict[str, str]) -> tuple[int, float]:
+def console_mode() -> str:
+    """Returns the configured console output mode."""
+    mode = os.environ.get("REVIEW_PERF_CONSOLE", "milestones")
+    if mode == "verbose":
+        return "verbose"
+    return "milestones"
+
+
+def print_milestone(message: str) -> None:
+    """Prints a high-level progress message immediately."""
+    print(message, flush=True)
+
+
+def run_command(
+    run_id: str,
+    step_name: str,
+    command_index: int,
+    command: CommandSpec,
+    base_env: dict[str, str],
+    mode: str,
+) -> tuple[int, float]:
     """Runs one command and emits start/end events."""
     command_id = f"{step_name}:{command_index}"
     emit(
@@ -86,7 +106,16 @@ def run_command(run_id: str, step_name: str, command_index: int, command: Comman
     started = time.monotonic()
     env = dict(base_env)
     env["REVIEW_PERF_STEP"] = step_name
-    return_code = subprocess.call(command.argv, env=env)
+    if mode == "verbose":
+        return_code = subprocess.call(command.argv, env=env)
+    else:
+        completed = subprocess.run(command.argv, env=env, capture_output=True, text=True)
+        return_code = completed.returncode
+        if return_code != 0:
+            if completed.stdout:
+                print(completed.stdout, end="")
+            if completed.stderr:
+                print(completed.stderr, end="", file=sys.stderr)
     elapsed_ms = round((time.monotonic() - started) * 1000, 3)
 
     emit(
@@ -154,6 +183,9 @@ def run_review() -> int:
     run_id = run_id_now()
     run_seq = review_perf_log.estimate_next_run_sequence()
     started = time.monotonic()
+    mode = console_mode()
+    steps = step_specs()
+    step_count = len(steps)
 
     base_env = dict(os.environ)
     base_env["REVIEW_PERF"] = "1"
@@ -174,15 +206,19 @@ def run_review() -> int:
             "git_branch": git_output(["rev-parse", "--abbrev-ref", "HEAD"]),
             "git_dirty": git_is_dirty(),
             "detail_mode": os.environ.get("REVIEW_PERF_DETAIL", "stable"),
+            "console_mode": mode,
         },
     )
+
+    print_milestone(f"[review] run {run_seq} started ({step_count} steps)")
 
     failed_step = ""
     failed_command = ""
     failed_code = 0
     step_totals_ms: dict[str, float] = {}
 
-    for step in step_specs():
+    for step_index, step in enumerate(steps, start=1):
+        print_milestone(f"[review {step_index}/{step_count}] {step.name} started")
         emit(
             "step_start",
             run_id,
@@ -198,7 +234,7 @@ def run_review() -> int:
         step_failed = False
 
         for command_index, command in enumerate(step.commands, start=1):
-            return_code, elapsed_ms = run_command(run_id, step.name, command_index, command, base_env)
+            return_code, elapsed_ms = run_command(run_id, step.name, command_index, command, base_env, mode)
             command_elapsed_ms += elapsed_ms
             if return_code != 0:
                 failed_step = step.name
@@ -222,6 +258,11 @@ def run_review() -> int:
                 "exit_code": failed_code if step_failed else 0,
             },
         )
+
+        if step_failed:
+            print_milestone(f"[review {step_index}/{step_count}] {step.name} failed ({step_elapsed_ms / 1000:.1f}s)")
+        else:
+            print_milestone(f"[review {step_index}/{step_count}] {step.name} ok ({step_elapsed_ms / 1000:.1f}s)")
 
         if step_failed:
             break
@@ -255,6 +296,11 @@ def run_review() -> int:
                 "retained_runs": retain_runs,
             },
         )
+
+    if failed_code:
+        print_milestone(f"[review] failed at {failed_step}/{failed_command} ({total_ms / 1000:.1f}s)")
+    else:
+        print_milestone(f"[review] completed successfully ({total_ms / 1000:.1f}s)")
 
     return failed_code
 
