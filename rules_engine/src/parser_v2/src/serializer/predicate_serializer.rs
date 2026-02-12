@@ -262,16 +262,16 @@ fn serialize_card_predicate_without_article(card_predicate: &CardPredicate) -> P
 fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
         CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
-            plural_phrase(&card_predicate_base_phrase(card_predicate))
+            card_predicate_base_phrase_plural(card_predicate)
         }
         CardPredicate::CharacterType(subtype) => {
-            plural_phrase(&strings::subtype(serializer_utils::subtype_to_phrase(*subtype)))
+            strings::subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
         }
         CardPredicate::NotCharacterType(subtype) => {
             strings::characters_not_subtype(serializer_utils::subtype_to_phrase(*subtype))
         }
         CardPredicate::CharacterWithSpark(spark, operator) => compose_with_constraint(
-            plural_phrase(&strings::character()),
+            strings::characters_plural(),
             strings::with_spark_constraint(serializer_utils::serialize_operator(operator), spark.0),
         ),
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
@@ -314,11 +314,11 @@ fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
             serialize_cost_constraint(cost_operator, *cost),
         ),
         CardPredicate::CharacterWithMaterializedAbility => compose_with_constraint(
-            plural_phrase(&strings::character()),
+            strings::characters_plural(),
             strings::with_materialized_abilities_constraint(),
         ),
         CardPredicate::CharacterWithMultiActivatedAbility => compose_with_constraint(
-            plural_phrase(&strings::character()),
+            strings::characters_plural(),
             strings::with_activated_abilities_constraint(),
         ),
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
@@ -396,7 +396,7 @@ fn card_predicate_base_text(predicate: &CardPredicate) -> String {
 }
 
 fn card_predicate_base_text_plural(predicate: &CardPredicate) -> String {
-    plural_phrase(&card_predicate_base_phrase(predicate)).to_string()
+    card_predicate_base_phrase_plural(predicate).to_string()
 }
 
 fn card_predicate_base_phrase(predicate: &CardPredicate) -> Phrase {
@@ -420,40 +420,34 @@ fn card_predicate_base_phrase(predicate: &CardPredicate) -> Phrase {
     }
 }
 
-fn serialize_your_predicate_plural_phrase(card_predicate: &CardPredicate) -> Phrase {
-    match card_predicate {
-        CardPredicate::Character => {
-            Phrase::builder().text(strings::ally().variant("other").to_string()).build()
-        }
-        CardPredicate::Card => {
-            Phrase::builder().text(strings::your_card().variant("other").to_string()).build()
-        }
-        CardPredicate::Event => {
-            Phrase::builder().text(strings::your_event().variant("other").to_string()).build()
-        }
+/// Returns the plural base noun phrase for a card predicate.
+fn card_predicate_base_phrase_plural(predicate: &CardPredicate) -> Phrase {
+    match predicate {
+        CardPredicate::Card => strings::cards_plural(),
+        CardPredicate::Character => strings::characters_plural(),
+        CardPredicate::Event => strings::events_plural(),
         CardPredicate::CharacterType(subtype) => {
-            strings::allied_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
+            strings::subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
         }
-        _ => Phrase::builder().text(serialize_your_predicate_plural(card_predicate)).build(),
+        CardPredicate::NotCharacterType(subtype) => {
+            strings::characters_not_subtype(serializer_utils::subtype_to_phrase(*subtype))
+        }
+        CardPredicate::Fast { target } => card_predicate_base_phrase_plural(target),
+        CardPredicate::CardWithCost { target, .. } => card_predicate_base_phrase_plural(target),
+        CardPredicate::CharacterWithSpark(..) => strings::characters_plural(),
+        CardPredicate::CharacterWithMaterializedAbility => strings::characters_plural(),
+        CardPredicate::CharacterWithMultiActivatedAbility => strings::characters_plural(),
+        CardPredicate::CouldDissolve { .. } => strings::events_plural(),
+        _ => strings::characters_plural(),
     }
 }
 
+fn serialize_your_predicate_plural_phrase(card_predicate: &CardPredicate) -> Phrase {
+    serialize_your_predicate_plural(card_predicate)
+}
+
 fn serialize_enemy_predicate_plural_phrase(card_predicate: &CardPredicate) -> Phrase {
-    match card_predicate {
-        CardPredicate::Character => {
-            Phrase::builder().text(strings::enemy().variant("other").to_string()).build()
-        }
-        CardPredicate::Card => {
-            Phrase::builder().text(strings::enemy_card().variant("other").to_string()).build()
-        }
-        CardPredicate::Event => {
-            Phrase::builder().text(strings::enemy_event().variant("other").to_string()).build()
-        }
-        CardPredicate::CharacterType(subtype) => {
-            strings::enemy_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
-        }
-        _ => Phrase::builder().text(serialize_enemy_predicate_plural(card_predicate)).build(),
-    }
+    serialize_enemy_predicate_plural(card_predicate)
 }
 
 fn your_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
@@ -598,98 +592,91 @@ fn enemy_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
     }
 }
 
-fn serialize_your_predicate_plural(card_predicate: &CardPredicate) -> String {
+/// Serializes a "your" card predicate in plural form.
+fn serialize_your_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
-        CardPredicate::Character => strings::ally().variant("other").to_string(),
-        CardPredicate::Card => strings::your_card().variant("other").to_string(),
-        CardPredicate::Event => strings::your_event().variant("other").to_string(),
+        CardPredicate::Character => strings::allies_plural(),
+        CardPredicate::Card => strings::your_cards_plural(),
+        CardPredicate::Event => strings::your_events_plural(),
         CardPredicate::CharacterType(subtype) => {
             strings::allied_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
-                .to_string()
         }
         CardPredicate::Fast { target } => {
-            strings::fast_predicate(serialize_card_predicate_plural(target)).to_string()
+            strings::fast_predicate(serialize_card_predicate_plural(target))
         }
         CardPredicate::NotCharacterType(subtype) => {
-            strings::allies_not_subtype(serializer_utils::subtype_to_phrase(*subtype)).to_string()
+            strings::allies_not_subtype(serializer_utils::subtype_to_phrase(*subtype))
         }
         CardPredicate::CharacterWithSpark(spark, operator) => compose_with_constraint(
-            plural_phrase(&strings::ally()),
+            strings::allies_plural(),
             strings::with_spark_constraint(serializer_utils::serialize_operator(operator), spark.0),
-        )
-        .to_string(),
+        ),
         CardPredicate::CharacterWithMaterializedAbility => compose_with_constraint(
-            plural_phrase(&strings::ally()),
+            strings::allies_plural(),
             strings::with_materialized_abilities_constraint(),
-        )
-        .to_string(),
+        ),
         CardPredicate::CharacterWithMultiActivatedAbility => compose_with_constraint(
-            plural_phrase(&strings::ally()),
+            strings::allies_plural(),
             strings::with_activated_abilities_constraint(),
-        )
-        .to_string(),
+        ),
         CardPredicate::CardWithCost { target, cost_operator, cost } => compose_with_constraint(
-            Phrase::builder().text(serialize_your_predicate_plural(target)).build(),
+            serialize_your_predicate_plural(target),
             serialize_cost_constraint(cost_operator, *cost),
-        )
-        .to_string(),
+        ),
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
             compose_with_constraint(
-                Phrase::builder().text(serialize_your_predicate_plural(target)).build(),
+                serialize_your_predicate_plural(target),
                 strings::with_cost_less_than_allied_count(serialize_card_predicate_plural(
                     count_matching,
                 )),
             )
-            .to_string()
         }
         CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
             compose_with_constraint(
-                Phrase::builder().text(serialize_your_predicate_plural(target)).build(),
+                serialize_your_predicate_plural(target),
                 strings::with_cost_less_than_abandoned_ally_constraint(),
             )
-            .to_string()
         }
         CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
             compose_with_constraint(
-                Phrase::builder().text(serialize_your_predicate_plural(target)).build(),
+                serialize_your_predicate_plural(target),
                 strings::with_spark_less_than_abandoned_ally_constraint(),
             )
-            .to_string()
         }
         CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
             compose_with_constraint(
-                Phrase::builder().text(serialize_your_predicate_plural(target)).build(),
+                serialize_your_predicate_plural(target),
                 strings::with_spark_less_than_abandoned_count_this_turn_constraint(),
             )
-            .to_string()
         }
         CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
             compose_with_constraint(
-                Phrase::builder().text(serialize_your_predicate_plural(target)).build(),
+                serialize_your_predicate_plural(target),
                 strings::with_cost_less_than_void_count_constraint(),
             )
-            .to_string()
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
             compose_with_constraint(
-                Phrase::builder().text(serialize_your_predicate_plural(target)).build(),
+                serialize_your_predicate_plural(target),
                 strings::with_spark_less_than_energy_paid_constraint(),
             )
-            .to_string()
         }
         CardPredicate::CouldDissolve { target } => {
-            strings::your_events_could_dissolve(serialize_predicate(target)).to_string()
+            strings::your_events_could_dissolve(serialize_predicate(target))
         }
     }
 }
 
-fn serialize_enemy_predicate_plural(card_predicate: &CardPredicate) -> String {
+/// Serializes an "enemy" card predicate in plural form.
+fn serialize_enemy_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
-        CardPredicate::Character => strings::enemy().variant("other").to_string(),
+        CardPredicate::Character => strings::enemies_plural(),
+        CardPredicate::Card => strings::enemy_cards_plural(),
+        CardPredicate::Event => strings::enemy_events_plural(),
         CardPredicate::CharacterType(subtype) => {
-            strings::enemy_subtype_plural(serializer_utils::subtype_to_phrase(*subtype)).to_string()
+            strings::enemy_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
         }
-        _ => strings::enemy_pred(serialize_card_predicate_plural(card_predicate)).to_string(),
+        _ => strings::enemy_pred(serialize_card_predicate_plural(card_predicate)),
     }
 }
 
@@ -702,10 +689,6 @@ fn is_generic_card_type(card_predicate: &CardPredicate) -> bool {
 
 fn compose_with_constraint(base: Phrase, constraint: Phrase) -> Phrase {
     strings::pred_with_constraint(base, constraint)
-}
-
-fn plural_phrase(phrase: &Phrase) -> Phrase {
-    Phrase::builder().text(phrase.variant("other").to_string()).build()
 }
 
 fn serialize_cost_constraint(cost_operator: &Operator<Energy>, cost: Energy) -> Phrase {

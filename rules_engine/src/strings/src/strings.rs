@@ -213,6 +213,8 @@ rlf::rlf! {
 
     // Subtype display with green bold formatting, inheriting article metadata.
     subtype($s) = :from($s) "<color=#2E7D32><b>{$s}</b></color>";
+    // Subtype display in plural form with green bold formatting.
+    subtype_plural($s) = "<color=#2E7D32><b>{$s:other}</b></color>";
 
     // =========================================================================
     // Text number conversion
@@ -798,6 +800,14 @@ rlf::rlf! {
     event = :an{ one: "event", other: "events" };
     // Enemy noun with article metadata.
     enemy = :an{ one: "enemy", other: "enemies" };
+    // Plural card noun.
+    cards_plural = "cards";
+    // Plural character noun.
+    characters_plural = "characters";
+    // Plural event noun.
+    events_plural = "events";
+    // Plural enemy noun.
+    enemies_plural = "enemies";
 
     // This card noun with article metadata.
     this_card = :a{ one: "this card", other: "these cards" };
@@ -832,12 +842,22 @@ rlf::rlf! {
     your_character = :a{ one: "your character", other: "your characters" };
     // Your event noun with article metadata.
     your_event = :a{ one: "your event", other: "your events" };
+    // Plural your cards noun.
+    your_cards_plural = "your cards";
+    // Plural your events noun.
+    your_events_plural = "your events";
+    // Plural allies noun.
+    allies_plural = "allies";
     // Enemy card noun with article metadata.
     enemy_card = :an{ one: "enemy card", other: "enemy cards" };
     // Enemy character noun with article metadata.
     enemy_character = :an{ one: "enemy character", other: "enemy characters" };
     // Enemy event noun with article metadata.
     enemy_event = :an{ one: "enemy event", other: "enemy events" };
+    // Plural enemy cards noun.
+    enemy_cards_plural = "enemy cards";
+    // Plural enemy events noun.
+    enemy_events_plural = "enemy events";
     // Allied character noun with article metadata.
     allied_character = :an{ one: "allied character", other: "allied characters" };
     // Allied event noun with article metadata.
