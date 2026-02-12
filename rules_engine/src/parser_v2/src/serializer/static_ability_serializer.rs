@@ -168,7 +168,7 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         }
         StandardStaticAbility::SparkBonusYourCharacters { matching, added_spark } => {
             let predicate_text = match matching {
-                CardPredicate::Character => strings::allies_plural().to_string(),
+                CardPredicate::Character => strings::plural_of(strings::ally()).to_string(),
                 CardPredicate::CharacterType(subtype) => {
                     strings::allied_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
                         .to_string()

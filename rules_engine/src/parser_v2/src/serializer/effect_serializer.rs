@@ -684,7 +684,7 @@ fn serialize_allied_card_predicate_plural(card_predicate: &CardPredicate) -> Phr
         CardPredicate::CharacterType(subtype) => {
             strings::allied_card_with_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
         }
-        _ => strings::allied_card_with_base_plural(predicate_serializer::base_card_text_plural(
+        _ => strings::allied_card_with_base(predicate_serializer::base_card_text_plural(
             card_predicate,
         )),
     }

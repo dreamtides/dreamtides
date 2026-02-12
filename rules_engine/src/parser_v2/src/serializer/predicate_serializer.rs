@@ -278,13 +278,13 @@ fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
             card_predicate_base_phrase_plural(card_predicate)
         }
         CardPredicate::CharacterType(subtype) => {
-            strings::subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
+            strings::plural_of(strings::subtype(serializer_utils::subtype_to_phrase(*subtype)))
         }
         CardPredicate::NotCharacterType(subtype) => {
             strings::characters_not_subtype(serializer_utils::subtype_to_phrase(*subtype))
         }
         CardPredicate::CharacterWithSpark(spark, operator) => strings::pred_with_constraint(
-            strings::characters_plural(),
+            strings::plural_of(strings::character()),
             strings::with_spark_constraint(serializer_utils::serialize_operator(operator), spark.0),
         ),
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
@@ -332,11 +332,11 @@ fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
             )
         }
         CardPredicate::CharacterWithMaterializedAbility => strings::pred_with_constraint(
-            strings::characters_plural(),
+            strings::plural_of(strings::character()),
             strings::with_materialized_abilities_constraint(),
         ),
         CardPredicate::CharacterWithMultiActivatedAbility => strings::pred_with_constraint(
-            strings::characters_plural(),
+            strings::plural_of(strings::character()),
             strings::with_activated_abilities_constraint(),
         ),
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
@@ -433,22 +433,24 @@ fn card_predicate_base_phrase(predicate: &CardPredicate) -> Phrase {
 /// Returns the plural base noun phrase for a card predicate.
 fn card_predicate_base_phrase_plural(predicate: &CardPredicate) -> Phrase {
     match predicate {
-        CardPredicate::Card => strings::cards_plural(),
-        CardPredicate::Character => strings::characters_plural(),
-        CardPredicate::Event => strings::events_plural(),
+        CardPredicate::Card => strings::plural_of(strings::card()),
+        CardPredicate::Character => strings::plural_of(strings::character()),
+        CardPredicate::Event => strings::plural_of(strings::event()),
         CardPredicate::CharacterType(subtype) => {
-            strings::subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
+            strings::plural_of(strings::subtype(serializer_utils::subtype_to_phrase(*subtype)))
         }
         CardPredicate::NotCharacterType(subtype) => {
             strings::characters_not_subtype(serializer_utils::subtype_to_phrase(*subtype))
         }
         CardPredicate::Fast { target } => card_predicate_base_phrase_plural(target),
         CardPredicate::CardWithCost { target, .. } => card_predicate_base_phrase_plural(target),
-        CardPredicate::CharacterWithSpark(..) => strings::characters_plural(),
-        CardPredicate::CharacterWithMaterializedAbility => strings::characters_plural(),
-        CardPredicate::CharacterWithMultiActivatedAbility => strings::characters_plural(),
-        CardPredicate::CouldDissolve { .. } => strings::events_plural(),
-        _ => strings::characters_plural(),
+        CardPredicate::CharacterWithSpark(..) => strings::plural_of(strings::character()),
+        CardPredicate::CharacterWithMaterializedAbility => strings::plural_of(strings::character()),
+        CardPredicate::CharacterWithMultiActivatedAbility => {
+            strings::plural_of(strings::character())
+        }
+        CardPredicate::CouldDissolve { .. } => strings::plural_of(strings::event()),
+        _ => strings::plural_of(strings::character()),
     }
 }
 
@@ -607,9 +609,9 @@ fn enemy_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
 /// Serializes a "your" card predicate in plural form.
 fn serialize_your_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
-        CardPredicate::Character => strings::allies_plural(),
-        CardPredicate::Card => strings::your_cards_plural(),
-        CardPredicate::Event => strings::your_events_plural(),
+        CardPredicate::Character => strings::plural_of(strings::ally()),
+        CardPredicate::Card => strings::plural_of(strings::your_card()),
+        CardPredicate::Event => strings::plural_of(strings::your_event()),
         CardPredicate::CharacterType(subtype) => {
             strings::allied_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
         }
@@ -620,15 +622,15 @@ fn serialize_your_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
             strings::allies_not_subtype(serializer_utils::subtype_to_phrase(*subtype))
         }
         CardPredicate::CharacterWithSpark(spark, operator) => strings::pred_with_constraint(
-            strings::allies_plural(),
+            strings::plural_of(strings::ally()),
             strings::with_spark_constraint(serializer_utils::serialize_operator(operator), spark.0),
         ),
         CardPredicate::CharacterWithMaterializedAbility => strings::pred_with_constraint(
-            strings::allies_plural(),
+            strings::plural_of(strings::ally()),
             strings::with_materialized_abilities_constraint(),
         ),
         CardPredicate::CharacterWithMultiActivatedAbility => strings::pred_with_constraint(
-            strings::allies_plural(),
+            strings::plural_of(strings::ally()),
             strings::with_activated_abilities_constraint(),
         ),
         CardPredicate::CardWithCost { target, cost_operator, cost } => {
@@ -687,9 +689,9 @@ fn serialize_your_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
 /// Serializes an "enemy" card predicate in plural form.
 fn serialize_enemy_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
-        CardPredicate::Character => strings::enemies_plural(),
-        CardPredicate::Card => strings::enemy_cards_plural(),
-        CardPredicate::Event => strings::enemy_events_plural(),
+        CardPredicate::Character => strings::plural_of(strings::enemy()),
+        CardPredicate::Card => strings::plural_of(strings::enemy_card()),
+        CardPredicate::Event => strings::plural_of(strings::enemy_event()),
         CardPredicate::CharacterType(subtype) => {
             strings::enemy_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
         }
