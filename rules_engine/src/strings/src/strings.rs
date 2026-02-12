@@ -1300,6 +1300,29 @@ rlf::rlf! {
     reclaim_with_cost($cost) = "{Reclaim} -- {$cost}";
 
     // =========================================================================
+    // Ability assembly phrases
+    // =========================================================================
+
+    // Standard triggered ability: trigger text followed by effect text.
+    triggered_ability($trig, $eff) = "{@cap $trig}{$eff}";
+    // Triggered ability with prefix modifiers (once per turn, until end of turn).
+    prefixed_triggered_ability($pfx, $trig, $eff) = "{$pfx}{$trig}{$eff}";
+    // Keyword-triggered ability: trigger followed by capitalized effect.
+    keyword_triggered_ability($trig, $eff) = "{$trig} {@cap $eff}";
+    // Keyword-triggered ability with prefix modifiers.
+    prefixed_keyword_triggered_ability($pfx, $trig, $eff) = "{$pfx}{$trig} {@cap $eff}";
+    // Activated ability: capitalized costs, separator, capitalized effect.
+    activated_ability($c, $eff) = "{$c}{cost_effect_separator}{@cap $eff}";
+    // Activated ability with once-per-turn suffix on costs.
+    activated_ability_once_per_turn($c, $eff) = "{$c}{once_per_turn_suffix}{cost_effect_separator}{@cap $eff}";
+    // Fast activated ability: fast prefix, costs, separator, effect.
+    fast_activated_ability($c, $eff) = "{fast_prefix}{$c}{cost_effect_separator}{@cap $eff}";
+    // Fast activated ability with once-per-turn suffix.
+    fast_activated_ability_once_per_turn($c, $eff) = "{fast_prefix}{$c}{once_per_turn_suffix}{cost_effect_separator}{@cap $eff}";
+    // Activated ability cost separator for joining multiple costs.
+    activated_cost_separator = ", ";
+
+    // =========================================================================
     // Compound effect assembly phrases
     // =========================================================================
 
