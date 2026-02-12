@@ -714,3 +714,6 @@ tv-test *args='':
 
 tv-build:
     cd rules_engine/src/tv && pnpm tauri build
+
+update-rlf:
+    cargo update --manifest-path rules_engine/Cargo.toml -p rlf

@@ -4801,7 +4801,7 @@ dependencies = [
 [[package]]
 name = "rlf"
 version = "0.1.0"
-source = "git+https://github.com/thurn/rlf#8b08fabd4e80b6b52a4a6fc478be9dfb280d4342"
+source = "git+https://github.com/thurn/rlf#b394aef3cf1666f3488904d1ece0dc2f4dea2024"
 dependencies = [
  "bon",
  "const-fnv1a-hash",
@@ -4810,6 +4810,7 @@ dependencies = [
  "icu_locale_core",
  "icu_plurals",
  "rlf-macros",
+ "rlf-semantics",
  "serde",
  "strsim",
  "thiserror 2.0.12",
@@ -4820,13 +4821,19 @@ dependencies = [
 [[package]]
 name = "rlf-macros"
 version = "0.1.0"
-source = "git+https://github.com/thurn/rlf#8b08fabd4e80b6b52a4a6fc478be9dfb280d4342"
+source = "git+https://github.com/thurn/rlf#b394aef3cf1666f3488904d1ece0dc2f4dea2024"
 dependencies = [
  "proc-macro2",
  "quote",
+ "rlf-semantics",
  "strsim",
  "syn 2.0.95",
 ]
+
+[[package]]
+name = "rlf-semantics"
+version = "0.1.0"
+source = "git+https://github.com/thurn/rlf#b394aef3cf1666f3488904d1ece0dc2f4dea2024"
 
 [[package]]
 name = "ron"
