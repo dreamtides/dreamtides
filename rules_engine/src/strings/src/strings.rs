@@ -92,6 +92,8 @@ rlf::rlf! {
 
     // Card noun with article metadata.
     card = :a{ one: "card", other: "cards" };
+    // Plural card noun without article metadata.
+    cards_plural = "cards";
     // Card count with article (e.g., "a card" or "2 cards").
     cards($n) = :match($n) {
         1: "a card",
@@ -120,6 +122,8 @@ rlf::rlf! {
 
     // Ally noun with article metadata.
     ally = :an{ one: "ally", other: "allies" };
+    // Plural allies noun without article metadata.
+    allies_plural = "allies";
     // Ally count with article (e.g., "an ally" or "2 allies").
     count_allies($n) = :match($n) {
         1: "an ally",
@@ -213,7 +217,7 @@ rlf::rlf! {
 
     // Subtype display with green bold formatting, inheriting article metadata.
     subtype($s) = :from($s) "<color=#2E7D32><b>{$s}</b></color>";
-    // Subtype display in plural form with green bold formatting.
+    // Plural subtype display with green bold formatting.
     subtype_plural($s) = "<color=#2E7D32><b>{$s:other}</b></color>";
 
     // =========================================================================
@@ -796,17 +800,15 @@ rlf::rlf! {
 
     // Character noun with article metadata.
     character = :a{ one: "character", other: "characters" };
+    // Plural characters noun without article metadata.
+    characters_plural = "characters";
     // Event noun with article metadata.
     event = :an{ one: "event", other: "events" };
+    // Plural events noun without article metadata.
+    events_plural = "events";
     // Enemy noun with article metadata.
     enemy = :an{ one: "enemy", other: "enemies" };
-    // Plural card noun.
-    cards_plural = "cards";
-    // Plural character noun.
-    characters_plural = "characters";
-    // Plural event noun.
-    events_plural = "events";
-    // Plural enemy noun.
+    // Plural enemies noun without article metadata.
     enemies_plural = "enemies";
 
     // This card noun with article metadata.
@@ -838,25 +840,23 @@ rlf::rlf! {
 
     // Your card noun with article metadata.
     your_card = :a{ one: "your card", other: "your cards" };
+    // Plural your cards noun without article metadata.
+    your_cards_plural = "your cards";
     // Your character noun with article metadata.
     your_character = :a{ one: "your character", other: "your characters" };
     // Your event noun with article metadata.
     your_event = :a{ one: "your event", other: "your events" };
-    // Plural your cards noun.
-    your_cards_plural = "your cards";
-    // Plural your events noun.
+    // Plural your events noun without article metadata.
     your_events_plural = "your events";
-    // Plural allies noun.
-    allies_plural = "allies";
     // Enemy card noun with article metadata.
     enemy_card = :an{ one: "enemy card", other: "enemy cards" };
+    // Plural enemy cards noun without article metadata.
+    enemy_cards_plural = "enemy cards";
     // Enemy character noun with article metadata.
     enemy_character = :an{ one: "enemy character", other: "enemy characters" };
     // Enemy event noun with article metadata.
     enemy_event = :an{ one: "enemy event", other: "enemy events" };
-    // Plural enemy cards noun.
-    enemy_cards_plural = "enemy cards";
-    // Plural enemy events noun.
+    // Plural enemy events noun without article metadata.
     enemy_events_plural = "enemy events";
     // Allied character noun with article metadata.
     allied_character = :an{ one: "allied character", other: "allied characters" };
