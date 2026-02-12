@@ -1064,42 +1064,32 @@ rlf::rlf! {
     dissolve_all_with_cost_lte_quantity($target, $quantity) = "{dissolve} all {$target} with cost less than or equal to the number of {$quantity}";
 
     // =========================================================================
+    // Collection expression target phrases
+    // =========================================================================
+
+    // All of a target (plural).
+    collection_all($target) = "all {$target}";
+    // Exactly N of a target (plural).
+    collection_exactly($n, $target) = "{$n} {$target}";
+    // Up to N of a target (plural).
+    collection_up_to($n, $target) = "up to {$n} {$target}";
+    // Any number of a target (plural).
+    collection_any_number_of($target) = "any number of {$target}";
+
+    // =========================================================================
     // Collection effect phrases
     // =========================================================================
 
-    // Dissolve all matching targets.
-    dissolve_all($target) = "{dissolve} all {$target}";
-    // Dissolve exactly N matching targets.
-    dissolve_exactly($n, $target) = "{dissolve} {$n} {$target}";
-    // Dissolve up to N matching targets.
-    dissolve_up_to($n, $target) = "{dissolve} up to {$n} {$target}";
-    // Dissolve any number of matching targets.
-    dissolve_any_number_of($target) = "{dissolve} any number of {$target}";
-    // Dissolve a single matching target.
-    dissolve_single($target) = "{dissolve} {$target}";
-
-    // Banish all matching targets.
-    banish_all($target) = "{banish} all {$target}";
-    // Banish exactly N matching targets.
-    banish_exactly($n, $target) = "{banish} {$n} {$target}";
-    // Banish up to N matching targets.
-    banish_up_to($n, $target) = "{banish} up to {$n} {$target}";
-    // Banish any number of matching targets.
-    banish_any_number_of($target) = "{banish} any number of {$target}";
-    // Banish a single matching target.
-    banish_single($target) = "{banish} {$target}";
+    // Dissolve a collection target.
+    dissolve_collection($target) = "{dissolve} {$target}";
+    // Banish a collection target.
+    banish_collection_target($target) = "{banish} {$target}";
 
     // Materialize them.
     // Accepts antecedent $target for gendered pronoun agreement in translations.
     materialize_them($target) = "{materialize} them";
-    // Materialize all matching targets.
-    materialize_all($target) = "{materialize} all {$target}";
-    // Materialize any number of matching targets.
-    materialize_any_number_of($target) = "{materialize} any number of {$target}";
-    // Materialize up to N matching targets.
-    materialize_up_to($n, $target) = "{materialize} up to {$n} {$target}";
-    // Materialize a single matching target.
-    materialize_single($target) = "{materialize} {$target}";
+    // Materialize a collection target.
+    materialize_collection_target($target) = "{materialize} {$target}";
 
     // Materialize a copy of a target.
     materialize_copy_of($target) = "{materialize} a copy of {$target}";
@@ -1112,12 +1102,10 @@ rlf::rlf! {
     // Materialize copies of target equal to quantity.
     materialize_copies_equal_to_quantity($target, $quantity) = "{materialize} a number of copies of {$target} equal to the number of {$quantity}";
 
+    // Trigger judgment ability of a collection target.
+    trigger_judgment_of_collection($target) = "trigger the {Judgment} ability of {$target}";
     // Trigger judgment ability of each matching target.
     trigger_judgment_of_each($target) = "trigger the {Judgment} ability of each {$target}";
-    // Trigger judgment ability of a single matching target.
-    trigger_judgment_of($target) = "trigger the {Judgment} ability of {$target}";
-    // Trigger judgment ability of exactly N matching targets.
-    trigger_judgment_of_n($n, $target) = "trigger the {Judgment} ability of {$n} {$target}";
 
     // =========================================================================
     // Materialize figment quantity phrases
@@ -1191,84 +1179,46 @@ rlf::rlf! {
     target_gains_reclaim_equal_cost_this_turn($target) = "{$target} gains {reclaim} equal to its cost this turn";
 
     // =========================================================================
-    // Void gains reclaim effect phrases (singular)
+    // Void collection subject phrases
     // =========================================================================
 
-    // A single card in your void gains reclaim with cost.
-    void_single_gains_reclaim_for_cost($pred, $r) = "{$pred} in your void gains {reclaim_for_cost($r)}";
-    // A single card in your void gains reclaim equal to its cost.
-    void_single_gains_reclaim_equal_cost($pred) = "{$pred} in your void gains {reclaim} equal to its cost";
-    // A single card in your void gains reclaim with cost this turn.
-    void_single_gains_reclaim_for_cost_this_turn($pred, $r) = "{$pred} in your void gains {reclaim_for_cost($r)} this turn";
-    // A single card in your void gains reclaim equal to its cost this turn.
-    void_single_gains_reclaim_equal_cost_this_turn($pred) = "{$pred} in your void gains {reclaim} equal to its cost this turn";
+    // A single card in your void (subject).
+    void_subject_single($pred) = "{$pred} in your void";
+    // Exactly N cards in your void (subject).
+    void_subject_exactly($n, $pred) = "{$n} {$pred} in your void";
+    // All cards currently in your void (subject).
+    void_subject_all = "all cards currently in your void";
+    // All but one cards in your void (subject).
+    void_subject_all_but_one($pred) = "all but one {$pred} in your void";
+    // Up to N cards in your void (subject).
+    void_subject_up_to($n, $pred) = "up to {$n} {$pred} in your void";
+    // Any number of cards in your void (subject).
+    void_subject_any_number($pred) = "any number of {$pred} in your void";
+    // N or more cards in your void (subject).
+    void_subject_or_more($n, $pred) = "{$n} or more {$pred} in your void";
+    // Each other card in your void (subject).
+    void_subject_each_other = "Each other card in your void";
 
     // =========================================================================
-    // Void gains reclaim effect phrases (plural - collection)
+    // Void gains reclaim assembly phrases
     // =========================================================================
 
-    // N cards in your void gain reclaim with cost.
-    void_exactly_n_gain_reclaim_for_cost($n, $pred, $r) = "{$n} {$pred} in your void gain {reclaim_for_cost($r)}";
-    // N cards in your void gain reclaim equal to their cost.
-    void_exactly_n_gain_reclaim_equal_cost($n, $pred) = "{$n} {$pred} in your void gain {reclaim} equal to their cost";
-    // N cards in your void gain reclaim with cost this turn.
-    void_exactly_n_gain_reclaim_for_cost_this_turn($n, $pred, $r) = "{$n} {$pred} in your void gain {reclaim_for_cost($r)} this turn";
-    // N cards in your void gain reclaim equal to their cost this turn.
-    void_exactly_n_gain_reclaim_equal_cost_this_turn($n, $pred) = "{$n} {$pred} in your void gain {reclaim} equal to their cost this turn";
-
-    // All cards in your void gain reclaim with cost.
-    void_all_gain_reclaim_for_cost($r) = "all cards currently in your void gain {reclaim_for_cost($r)}";
-    // All cards in your void gain reclaim equal to their cost.
-    void_all_gain_reclaim_equal_cost = "all cards currently in your void gain {reclaim} equal to their cost";
-    // All cards in your void gain reclaim with cost this turn.
-    void_all_gain_reclaim_for_cost_this_turn($r) = "all cards currently in your void gain {reclaim_for_cost($r)} this turn";
-    // All cards in your void gain reclaim equal to their cost this turn.
-    void_all_gain_reclaim_equal_cost_this_turn = "all cards currently in your void gain {reclaim} equal to their cost this turn";
-
-    // All but one cards in your void gain reclaim with cost.
-    void_all_but_one_gain_reclaim_for_cost($pred, $r) = "all but one {$pred} in your void gain {reclaim_for_cost($r)}";
-    // All but one cards in your void gain reclaim equal to their cost.
-    void_all_but_one_gain_reclaim_equal_cost($pred) = "all but one {$pred} in your void gain {reclaim} equal to their cost";
-    // All but one cards in your void gain reclaim with cost this turn.
-    void_all_but_one_gain_reclaim_for_cost_this_turn($pred, $r) = "all but one {$pred} in your void gain {reclaim_for_cost($r)} this turn";
-    // All but one cards in your void gain reclaim equal to their cost this turn.
-    void_all_but_one_gain_reclaim_equal_cost_this_turn($pred) = "all but one {$pred} in your void gain {reclaim} equal to their cost this turn";
-
-    // Up to N cards in your void gain reclaim with cost.
-    void_up_to_gain_reclaim_for_cost($n, $pred, $r) = "up to {$n} {$pred} in your void gain {reclaim_for_cost($r)}";
-    // Up to N cards in your void gain reclaim equal to their cost.
-    void_up_to_gain_reclaim_equal_cost($n, $pred) = "up to {$n} {$pred} in your void gain {reclaim} equal to their cost";
-    // Up to N cards in your void gain reclaim with cost this turn.
-    void_up_to_gain_reclaim_for_cost_this_turn($n, $pred, $r) = "up to {$n} {$pred} in your void gain {reclaim_for_cost($r)} this turn";
-    // Up to N cards in your void gain reclaim equal to their cost this turn.
-    void_up_to_gain_reclaim_equal_cost_this_turn($n, $pred) = "up to {$n} {$pred} in your void gain {reclaim} equal to their cost this turn";
-
-    // Any number of cards in your void gain reclaim with cost.
-    void_any_number_gain_reclaim_for_cost($pred, $r) = "any number of {$pred} in your void gain {reclaim_for_cost($r)}";
-    // Any number of cards in your void gain reclaim equal to their cost.
-    void_any_number_gain_reclaim_equal_cost($pred) = "any number of {$pred} in your void gain {reclaim} equal to their cost";
-    // Any number of cards in your void gain reclaim with cost this turn.
-    void_any_number_gain_reclaim_for_cost_this_turn($pred, $r) = "any number of {$pred} in your void gain {reclaim_for_cost($r)} this turn";
-    // Any number of cards in your void gain reclaim equal to their cost this turn.
-    void_any_number_gain_reclaim_equal_cost_this_turn($pred) = "any number of {$pred} in your void gain {reclaim} equal to their cost this turn";
-
-    // N or more cards in your void gain reclaim with cost.
-    void_or_more_gain_reclaim_for_cost($n, $pred, $r) = "{$n} or more {$pred} in your void gain {reclaim_for_cost($r)}";
-    // N or more cards in your void gain reclaim equal to their cost.
-    void_or_more_gain_reclaim_equal_cost($n, $pred) = "{$n} or more {$pred} in your void gain {reclaim} equal to their cost";
-    // N or more cards in your void gain reclaim with cost this turn.
-    void_or_more_gain_reclaim_for_cost_this_turn($n, $pred, $r) = "{$n} or more {$pred} in your void gain {reclaim_for_cost($r)} this turn";
-    // N or more cards in your void gain reclaim equal to their cost this turn.
-    void_or_more_gain_reclaim_equal_cost_this_turn($n, $pred) = "{$n} or more {$pred} in your void gain {reclaim} equal to their cost this turn";
-
-    // Each other card in your void gains reclaim with cost.
-    void_each_other_gains_reclaim_for_cost($r) = "Each other card in your void gains {reclaim_for_cost($r)}";
-    // Each other card in your void gains reclaim equal to its cost.
-    void_each_other_gains_reclaim_equal_cost = "Each other card in your void gains {reclaim} equal to its cost";
-    // Each other card in your void gains reclaim with cost this turn.
-    void_each_other_gains_reclaim_for_cost_this_turn($r) = "Each other card in your void gains {reclaim_for_cost($r)} this turn";
-    // Each other card in your void gains reclaim equal to its cost this turn.
-    void_each_other_gains_reclaim_equal_cost_this_turn = "Each other card in your void gains {reclaim} equal to its cost this turn";
+    // Singular subject gains reclaim for a specific cost.
+    void_gains_reclaim_for_cost_singular($subject, $r) = "{$subject} gains {reclaim_for_cost($r)}";
+    // Singular subject gains reclaim equal to its cost.
+    void_gains_reclaim_equal_cost_singular($subject) = "{$subject} gains {reclaim} equal to its cost";
+    // Plural subject gains reclaim for a specific cost.
+    void_gains_reclaim_for_cost_plural($subject, $r) = "{$subject} gain {reclaim_for_cost($r)}";
+    // Plural subject gains reclaim equal to their cost.
+    void_gains_reclaim_equal_cost_plural($subject) = "{$subject} gain {reclaim} equal to their cost";
+    // Singular subject gains reclaim for a specific cost this turn.
+    void_gains_reclaim_for_cost_singular_this_turn($subject, $r) = "{$subject} gains {reclaim_for_cost($r)} this turn";
+    // Singular subject gains reclaim equal to its cost this turn.
+    void_gains_reclaim_equal_cost_singular_this_turn($subject) = "{$subject} gains {reclaim} equal to its cost this turn";
+    // Plural subject gains reclaim for a specific cost this turn.
+    void_gains_reclaim_for_cost_plural_this_turn($subject, $r) = "{$subject} gain {reclaim_for_cost($r)} this turn";
+    // Plural subject gains reclaim equal to their cost this turn.
+    void_gains_reclaim_equal_cost_plural_this_turn($subject) = "{$subject} gain {reclaim} equal to their cost this turn";
 
     // =========================================================================
     // Static ability serializer phrases

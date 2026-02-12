@@ -541,23 +541,16 @@ spark_of_each_becomes($each, $s) = "[the spark of each {$each} becomes {$s}]";
 dissolve_all_with_cost_lte_quantity($target, $quantity) = "[{dissolve} all {$target} with cost less than or equal to the number of {$quantity}]";
 
 
-dissolve_all($target) = "[{dissolve} all {$target}]";
-dissolve_exactly($n, $target) = "[{dissolve} {$n} {$target}]";
-dissolve_up_to($n, $target) = "[{dissolve} up to {$n} {$target}]";
-dissolve_any_number_of($target) = "[{dissolve} any number of {$target}]";
-dissolve_single($target) = "[{dissolve} {$target}]";
+collection_all($target) = "[all {$target}]";
+collection_exactly($n, $target) = "[{$n} {$target}]";
+collection_up_to($n, $target) = "[up to {$n} {$target}]";
+collection_any_number_of($target) = "[any number of {$target}]";
 
-banish_all($target) = "[{banish} all {$target}]";
-banish_exactly($n, $target) = "[{banish} {$n} {$target}]";
-banish_up_to($n, $target) = "[{banish} up to {$n} {$target}]";
-banish_any_number_of($target) = "[{banish} any number of {$target}]";
-banish_single($target) = "[{banish} {$target}]";
+dissolve_collection($target) = "[{dissolve} {$target}]";
+banish_collection_target($target) = "[{banish} {$target}]";
 
 materialize_them($target) = "[{materialize} them]";
-materialize_all($target) = "[{materialize} all {$target}]";
-materialize_any_number_of($target) = "[{materialize} any number of {$target}]";
-materialize_up_to($n, $target) = "[{materialize} up to {$n} {$target}]";
-materialize_single($target) = "[{materialize} {$target}]";
+materialize_collection_target($target) = "[{materialize} {$target}]";
 
 materialize_copy_of($target) = "[{materialize} a copy of {$target}]";
 materialize_n_copies_of($n, $target) = "[{materialize} {$n} copies of {$target}]";
@@ -565,9 +558,8 @@ materialize_copies_equal_to_matching($target, $matching) = "[{materialize} a num
 materialize_copies_equal_to_energy($target) = "[{materialize} a number of copies of {$target} equal to the amount of {energy_symbol} spent]";
 materialize_copies_equal_to_quantity($target, $quantity) = "[{materialize} a number of copies of {$target} equal to the number of {$quantity}]";
 
+trigger_judgment_of_collection($target) = "[trigger the {Judgment} ability of {$target}]";
 trigger_judgment_of_each($target) = "[trigger the {Judgment} ability of each {$target}]";
-trigger_judgment_of($target) = "[trigger the {Judgment} ability of {$target}]";
-trigger_judgment_of_n($n, $target) = "[trigger the {Judgment} ability of {$n} {$target}]";
 
 
 materialize_figments_for_each_played($fig) = "[{materialize} {$fig} for each card you have played this turn]";
@@ -602,46 +594,23 @@ target_gains_reclaim_for_cost_this_turn($target, $r) = "[{$target} gains {reclai
 target_gains_reclaim_equal_cost_this_turn($target) = "[{$target} gains {reclaim} equal to its cost this turn]";
 
 
-void_single_gains_reclaim_for_cost($pred, $r) = "[{$pred} in your void gains {reclaim_for_cost($r)}]";
-void_single_gains_reclaim_equal_cost($pred) = "[{$pred} in your void gains {reclaim} equal to its cost]";
-void_single_gains_reclaim_for_cost_this_turn($pred, $r) = "[{$pred} in your void gains {reclaim_for_cost($r)} this turn]";
-void_single_gains_reclaim_equal_cost_this_turn($pred) = "[{$pred} in your void gains {reclaim} equal to its cost this turn]";
+void_subject_single($pred) = "[{$pred} in your void]";
+void_subject_exactly($n, $pred) = "[{$n} {$pred} in your void]";
+void_subject_all = "[all cards currently in your void]";
+void_subject_all_but_one($pred) = "[all but one {$pred} in your void]";
+void_subject_up_to($n, $pred) = "[up to {$n} {$pred} in your void]";
+void_subject_any_number($pred) = "[any number of {$pred} in your void]";
+void_subject_or_more($n, $pred) = "[{$n} or more {$pred} in your void]";
+void_subject_each_other = "[Each other card in your void]";
 
-
-void_exactly_n_gain_reclaim_for_cost($n, $pred, $r) = "[{$n} {$pred} in your void gain {reclaim_for_cost($r)}]";
-void_exactly_n_gain_reclaim_equal_cost($n, $pred) = "[{$n} {$pred} in your void gain {reclaim} equal to their cost]";
-void_exactly_n_gain_reclaim_for_cost_this_turn($n, $pred, $r) = "[{$n} {$pred} in your void gain {reclaim_for_cost($r)} this turn]";
-void_exactly_n_gain_reclaim_equal_cost_this_turn($n, $pred) = "[{$n} {$pred} in your void gain {reclaim} equal to their cost this turn]";
-
-void_all_gain_reclaim_for_cost($r) = "[all cards currently in your void gain {reclaim_for_cost($r)}]";
-void_all_gain_reclaim_equal_cost = "[all cards currently in your void gain {reclaim} equal to their cost]";
-void_all_gain_reclaim_for_cost_this_turn($r) = "[all cards currently in your void gain {reclaim_for_cost($r)} this turn]";
-void_all_gain_reclaim_equal_cost_this_turn = "[all cards currently in your void gain {reclaim} equal to their cost this turn]";
-
-void_all_but_one_gain_reclaim_for_cost($pred, $r) = "[all but one {$pred} in your void gain {reclaim_for_cost($r)}]";
-void_all_but_one_gain_reclaim_equal_cost($pred) = "[all but one {$pred} in your void gain {reclaim} equal to their cost]";
-void_all_but_one_gain_reclaim_for_cost_this_turn($pred, $r) = "[all but one {$pred} in your void gain {reclaim_for_cost($r)} this turn]";
-void_all_but_one_gain_reclaim_equal_cost_this_turn($pred) = "[all but one {$pred} in your void gain {reclaim} equal to their cost this turn]";
-
-void_up_to_gain_reclaim_for_cost($n, $pred, $r) = "[up to {$n} {$pred} in your void gain {reclaim_for_cost($r)}]";
-void_up_to_gain_reclaim_equal_cost($n, $pred) = "[up to {$n} {$pred} in your void gain {reclaim} equal to their cost]";
-void_up_to_gain_reclaim_for_cost_this_turn($n, $pred, $r) = "[up to {$n} {$pred} in your void gain {reclaim_for_cost($r)} this turn]";
-void_up_to_gain_reclaim_equal_cost_this_turn($n, $pred) = "[up to {$n} {$pred} in your void gain {reclaim} equal to their cost this turn]";
-
-void_any_number_gain_reclaim_for_cost($pred, $r) = "[any number of {$pred} in your void gain {reclaim_for_cost($r)}]";
-void_any_number_gain_reclaim_equal_cost($pred) = "[any number of {$pred} in your void gain {reclaim} equal to their cost]";
-void_any_number_gain_reclaim_for_cost_this_turn($pred, $r) = "[any number of {$pred} in your void gain {reclaim_for_cost($r)} this turn]";
-void_any_number_gain_reclaim_equal_cost_this_turn($pred) = "[any number of {$pred} in your void gain {reclaim} equal to their cost this turn]";
-
-void_or_more_gain_reclaim_for_cost($n, $pred, $r) = "[{$n} or more {$pred} in your void gain {reclaim_for_cost($r)}]";
-void_or_more_gain_reclaim_equal_cost($n, $pred) = "[{$n} or more {$pred} in your void gain {reclaim} equal to their cost]";
-void_or_more_gain_reclaim_for_cost_this_turn($n, $pred, $r) = "[{$n} or more {$pred} in your void gain {reclaim_for_cost($r)} this turn]";
-void_or_more_gain_reclaim_equal_cost_this_turn($n, $pred) = "[{$n} or more {$pred} in your void gain {reclaim} equal to their cost this turn]";
-
-void_each_other_gains_reclaim_for_cost($r) = "[Each other card in your void gains {reclaim_for_cost($r)}]";
-void_each_other_gains_reclaim_equal_cost = "[Each other card in your void gains {reclaim} equal to its cost]";
-void_each_other_gains_reclaim_for_cost_this_turn($r) = "[Each other card in your void gains {reclaim_for_cost($r)} this turn]";
-void_each_other_gains_reclaim_equal_cost_this_turn = "[Each other card in your void gains {reclaim} equal to its cost this turn]";
+void_gains_reclaim_for_cost_singular($subject, $r) = "[{$subject} gains {reclaim_for_cost($r)}]";
+void_gains_reclaim_equal_cost_singular($subject) = "[{$subject} gains {reclaim} equal to its cost]";
+void_gains_reclaim_for_cost_plural($subject, $r) = "[{$subject} gain {reclaim_for_cost($r)}]";
+void_gains_reclaim_equal_cost_plural($subject) = "[{$subject} gain {reclaim} equal to their cost]";
+void_gains_reclaim_for_cost_singular_this_turn($subject, $r) = "[{$subject} gains {reclaim_for_cost($r)} this turn]";
+void_gains_reclaim_equal_cost_singular_this_turn($subject) = "[{$subject} gains {reclaim} equal to its cost this turn]";
+void_gains_reclaim_for_cost_plural_this_turn($subject, $r) = "[{$subject} gain {reclaim_for_cost($r)} this turn]";
+void_gains_reclaim_equal_cost_plural_this_turn($subject) = "[{$subject} gain {reclaim} equal to their cost this turn]";
 
 
 your_cards_cost_increase($matching, $e) = "[{$matching} cost you {energy($e)} more]";

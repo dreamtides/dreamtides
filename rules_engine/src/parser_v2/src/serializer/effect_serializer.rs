@@ -165,52 +165,16 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::DissolveCharacter { target } => {
             strings::dissolve_target(predicate_serializer::serialize_predicate(target)).to_string()
         }
-        StandardEffect::DissolveCharactersCount { target, count } => match count {
-            CollectionExpression::All => {
-                strings::dissolve_all(predicate_serializer::serialize_predicate_plural(target))
-                    .to_string()
-            }
-            CollectionExpression::Exactly(n) => strings::dissolve_exactly(
-                *n,
-                predicate_serializer::serialize_predicate_plural(target),
-            )
-            .to_string(),
-            CollectionExpression::UpTo(n) => strings::dissolve_up_to(
-                *n,
-                predicate_serializer::serialize_predicate_plural(target),
-            )
-            .to_string(),
-            CollectionExpression::AnyNumberOf => strings::dissolve_any_number_of(
-                predicate_serializer::serialize_predicate_plural(target),
-            )
-            .to_string(),
-            _ => strings::dissolve_single(predicate_serializer::serialize_predicate(target))
-                .to_string(),
-        },
+        StandardEffect::DissolveCharactersCount { target, count } => {
+            strings::dissolve_collection(serialize_collection_target(count, target)).to_string()
+        }
         StandardEffect::BanishCharacter { target } => {
             strings::banish_target(predicate_serializer::serialize_predicate(target)).to_string()
         }
-        StandardEffect::BanishCollection { target, count } => match count {
-            CollectionExpression::AnyNumberOf => strings::banish_any_number_of(
-                predicate_serializer::serialize_predicate_plural(target),
-            )
-            .to_string(),
-            CollectionExpression::All => {
-                strings::banish_all(predicate_serializer::serialize_predicate_plural(target))
-                    .to_string()
-            }
-            CollectionExpression::Exactly(n) => strings::banish_exactly(
-                *n,
-                predicate_serializer::serialize_predicate_plural(target),
-            )
-            .to_string(),
-            CollectionExpression::UpTo(n) => {
-                strings::banish_up_to(*n, predicate_serializer::serialize_predicate_plural(target))
-                    .to_string()
-            }
-            _ => strings::banish_single(predicate_serializer::serialize_predicate(target))
-                .to_string(),
-        },
+        StandardEffect::BanishCollection { target, count } => {
+            strings::banish_collection_target(serialize_collection_target(count, target))
+                .to_string()
+        }
         StandardEffect::BanishCardsFromEnemyVoid { count } => {
             strings::banish_cards_from_enemy_void_effect(*count).to_string()
         }
@@ -363,26 +327,14 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::EachPlayerShufflesHandAndVoidIntoDeckAndDraws { count } => {
             strings::each_player_shuffles_and_draws_effect(*count).to_string()
         }
-        StandardEffect::MaterializeCollection { target, count } => match (target, count) {
-            (Predicate::Them, CollectionExpression::All) => {
+        StandardEffect::MaterializeCollection { target, count } => {
+            if matches!((target, count), (Predicate::Them, CollectionExpression::All)) {
                 strings::materialize_them(strings::pronoun_them()).to_string()
-            }
-            (_, CollectionExpression::All) => {
-                strings::materialize_all(predicate_serializer::serialize_predicate_plural(target))
+            } else {
+                strings::materialize_collection_target(serialize_collection_target(count, target))
                     .to_string()
             }
-            (_, CollectionExpression::AnyNumberOf) => strings::materialize_any_number_of(
-                predicate_serializer::serialize_predicate_plural(target),
-            )
-            .to_string(),
-            (_, CollectionExpression::UpTo(n)) => strings::materialize_up_to(
-                *n,
-                predicate_serializer::serialize_predicate_plural(target),
-            )
-            .to_string(),
-            _ => strings::materialize_single(predicate_serializer::serialize_predicate(target))
-                .to_string(),
-        },
+        }
         StandardEffect::MaterializeRandomFromDeck { count, predicate } => {
             strings::materialize_random_from_deck(
                 *count,
@@ -414,17 +366,10 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                 predicate_serializer::predicate_base_phrase(matching),
             )
             .to_string(),
-            CollectionExpression::Exactly(1) => {
-                strings::trigger_judgment_of(predicate_serializer::serialize_predicate(matching))
-                    .to_string()
-            }
-            CollectionExpression::Exactly(n) => strings::trigger_judgment_of_n(
-                *n,
-                predicate_serializer::serialize_predicate_plural(matching),
-            )
+            _ => strings::trigger_judgment_of_collection(serialize_collection_target(
+                collection, matching,
+            ))
             .to_string(),
-            _ => strings::trigger_judgment_of(predicate_serializer::serialize_predicate(matching))
-                .to_string(),
         },
         StandardEffect::TriggerAdditionalJudgmentPhaseAtEndOfTurn => {
             strings::judgment_phase_at_end_of_turn_effect().to_string()
@@ -703,6 +648,28 @@ pub fn serialize_for_count_expression(quantity_expression: &QuantityExpression) 
     }
 }
 
+/// Serializes a collection expression with a predicate target to produce the
+/// appropriate quantified target phrase for use with verb phrases.
+fn serialize_collection_target(collection: &CollectionExpression, target: &Predicate) -> Phrase {
+    match collection {
+        CollectionExpression::All => {
+            strings::collection_all(predicate_serializer::serialize_predicate_plural(target))
+        }
+        CollectionExpression::Exactly(1) => predicate_serializer::serialize_predicate(target),
+        CollectionExpression::Exactly(n) => strings::collection_exactly(
+            *n,
+            predicate_serializer::serialize_predicate_plural(target),
+        ),
+        CollectionExpression::UpTo(n) => {
+            strings::collection_up_to(*n, predicate_serializer::serialize_predicate_plural(target))
+        }
+        CollectionExpression::AnyNumberOf => strings::collection_any_number_of(
+            predicate_serializer::serialize_predicate_plural(target),
+        ),
+        _ => predicate_serializer::serialize_predicate(target),
+    }
+}
+
 /// Serializes an effect as a periodless fragment for embedding in compound
 /// phrases. Strips the trailing period from the full effect rendering.
 fn serialize_effect_fragment(effect: &Effect) -> String {
@@ -812,138 +779,84 @@ fn serialize_void_gains_reclaim(
     this_turn: bool,
     cost: &Option<Energy>,
 ) -> String {
+    let (subject, is_singular) = serialize_void_collection_subject(count, predicate);
+    assemble_void_reclaim_effect(subject, is_singular, this_turn, cost)
+}
+
+/// Produces the subject phrase and singularity flag for a void collection
+/// expression.
+fn serialize_void_collection_subject(
+    count: &CollectionExpression,
+    predicate: &CardPredicate,
+) -> (Phrase, bool) {
     match count {
         CollectionExpression::Exactly(1) => {
             let predicate_text = if let CardPredicate::CharacterType(subtype) = predicate {
                 strings::capitalized_sentence(strings::predicate_with_indefinite_article(
                     strings::subtype(serializer_utils::subtype_to_phrase(*subtype)),
                 ))
-                .to_string()
             } else {
                 strings::capitalized_sentence(
                     predicate_serializer::serialize_card_predicate_phrase(predicate),
                 )
-                .to_string()
             };
-            if let Some(energy_cost) = cost {
-                if this_turn {
-                    strings::void_single_gains_reclaim_for_cost_this_turn(
-                        predicate_text,
-                        energy_cost.0,
-                    )
-                    .to_string()
-                } else {
-                    strings::void_single_gains_reclaim_for_cost(predicate_text, energy_cost.0)
-                        .to_string()
-                }
-            } else if this_turn {
-                strings::void_single_gains_reclaim_equal_cost_this_turn(predicate_text).to_string()
-            } else {
-                strings::void_single_gains_reclaim_equal_cost(predicate_text).to_string()
-            }
+            (strings::void_subject_single(predicate_text), true)
         }
         CollectionExpression::Exactly(n) => {
             let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
-            if let Some(energy_cost) = cost {
-                if this_turn {
-                    strings::void_exactly_n_gain_reclaim_for_cost_this_turn(*n, pred, energy_cost.0)
-                        .to_string()
-                } else {
-                    strings::void_exactly_n_gain_reclaim_for_cost(*n, pred, energy_cost.0)
-                        .to_string()
-                }
-            } else if this_turn {
-                strings::void_exactly_n_gain_reclaim_equal_cost_this_turn(*n, pred).to_string()
-            } else {
-                strings::void_exactly_n_gain_reclaim_equal_cost(*n, pred).to_string()
-            }
+            (strings::void_subject_exactly(*n, pred), false)
         }
-        CollectionExpression::All => {
-            if let Some(energy_cost) = cost {
-                if this_turn {
-                    strings::void_all_gain_reclaim_for_cost_this_turn(energy_cost.0).to_string()
-                } else {
-                    strings::void_all_gain_reclaim_for_cost(energy_cost.0).to_string()
-                }
-            } else if this_turn {
-                strings::void_all_gain_reclaim_equal_cost_this_turn().to_string()
-            } else {
-                strings::void_all_gain_reclaim_equal_cost().to_string()
-            }
-        }
+        CollectionExpression::All => (strings::void_subject_all(), false),
         CollectionExpression::AllButOne => {
             let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
-            if let Some(energy_cost) = cost {
-                if this_turn {
-                    strings::void_all_but_one_gain_reclaim_for_cost_this_turn(pred, energy_cost.0)
-                        .to_string()
-                } else {
-                    strings::void_all_but_one_gain_reclaim_for_cost(pred, energy_cost.0).to_string()
-                }
-            } else if this_turn {
-                strings::void_all_but_one_gain_reclaim_equal_cost_this_turn(pred).to_string()
-            } else {
-                strings::void_all_but_one_gain_reclaim_equal_cost(pred).to_string()
-            }
+            (strings::void_subject_all_but_one(pred), false)
         }
         CollectionExpression::UpTo(n) => {
             let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
-            if let Some(energy_cost) = cost {
-                if this_turn {
-                    strings::void_up_to_gain_reclaim_for_cost_this_turn(*n, pred, energy_cost.0)
-                        .to_string()
-                } else {
-                    strings::void_up_to_gain_reclaim_for_cost(*n, pred, energy_cost.0).to_string()
-                }
-            } else if this_turn {
-                strings::void_up_to_gain_reclaim_equal_cost_this_turn(*n, pred).to_string()
-            } else {
-                strings::void_up_to_gain_reclaim_equal_cost(*n, pred).to_string()
-            }
+            (strings::void_subject_up_to(*n, pred), false)
         }
         CollectionExpression::AnyNumberOf => {
             let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
-            if let Some(energy_cost) = cost {
-                if this_turn {
-                    strings::void_any_number_gain_reclaim_for_cost_this_turn(pred, energy_cost.0)
-                        .to_string()
-                } else {
-                    strings::void_any_number_gain_reclaim_for_cost(pred, energy_cost.0).to_string()
-                }
-            } else if this_turn {
-                strings::void_any_number_gain_reclaim_equal_cost_this_turn(pred).to_string()
-            } else {
-                strings::void_any_number_gain_reclaim_equal_cost(pred).to_string()
-            }
+            (strings::void_subject_any_number(pred), false)
         }
         CollectionExpression::OrMore(n) => {
             let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
-            if let Some(energy_cost) = cost {
-                if this_turn {
-                    strings::void_or_more_gain_reclaim_for_cost_this_turn(*n, pred, energy_cost.0)
-                        .to_string()
-                } else {
-                    strings::void_or_more_gain_reclaim_for_cost(*n, pred, energy_cost.0).to_string()
-                }
-            } else if this_turn {
-                strings::void_or_more_gain_reclaim_equal_cost_this_turn(*n, pred).to_string()
-            } else {
-                strings::void_or_more_gain_reclaim_equal_cost(*n, pred).to_string()
-            }
+            (strings::void_subject_or_more(*n, pred), false)
         }
-        CollectionExpression::EachOther => {
-            if let Some(energy_cost) = cost {
-                if this_turn {
-                    strings::void_each_other_gains_reclaim_for_cost_this_turn(energy_cost.0)
-                        .to_string()
-                } else {
-                    strings::void_each_other_gains_reclaim_for_cost(energy_cost.0).to_string()
-                }
-            } else if this_turn {
-                strings::void_each_other_gains_reclaim_equal_cost_this_turn().to_string()
-            } else {
-                strings::void_each_other_gains_reclaim_equal_cost().to_string()
-            }
+        CollectionExpression::EachOther => (strings::void_subject_each_other(), true),
+    }
+}
+
+/// Assembles a void-reclaim effect from subject, singularity, duration, and
+/// cost parameters by dispatching to the appropriate assembly phrase.
+fn assemble_void_reclaim_effect(
+    subject: Phrase,
+    is_singular: bool,
+    this_turn: bool,
+    cost: &Option<Energy>,
+) -> String {
+    match (is_singular, this_turn, cost) {
+        (true, false, Some(energy_cost)) => {
+            strings::void_gains_reclaim_for_cost_singular(subject, energy_cost.0).to_string()
+        }
+        (true, false, None) => strings::void_gains_reclaim_equal_cost_singular(subject).to_string(),
+        (true, true, Some(energy_cost)) => {
+            strings::void_gains_reclaim_for_cost_singular_this_turn(subject, energy_cost.0)
+                .to_string()
+        }
+        (true, true, None) => {
+            strings::void_gains_reclaim_equal_cost_singular_this_turn(subject).to_string()
+        }
+        (false, false, Some(energy_cost)) => {
+            strings::void_gains_reclaim_for_cost_plural(subject, energy_cost.0).to_string()
+        }
+        (false, false, None) => strings::void_gains_reclaim_equal_cost_plural(subject).to_string(),
+        (false, true, Some(energy_cost)) => {
+            strings::void_gains_reclaim_for_cost_plural_this_turn(subject, energy_cost.0)
+                .to_string()
+        }
+        (false, true, None) => {
+            strings::void_gains_reclaim_equal_cost_plural_this_turn(subject).to_string()
         }
     }
 }
