@@ -45,8 +45,6 @@ choose_one = "[<b>Choose One:</b>]";
 bullet = "[•]";
 
 
-plural_of($p) = "{$p:other}";
-
 card = :a{ one: "[card]", other: "[cards]" };
 cards($n) = :match($n) {
     1: "[a card]",
@@ -114,6 +112,7 @@ visitor = :a{ one: "[Visitor]", other: "[Visitors]" };
 warrior = :a{ one: "[Warrior]", other: "[Warriors]" };
 
 subtype($s) = :from($s) "[<color=#2E7D32><b>{$s}</b></color>]";
+subtype_plural($s) = "[<color=#2E7D32><b>{$s:other}</b></color>]";
 
 
 text_number($n) = :match($n) {
@@ -412,6 +411,10 @@ period_suffix = "[.]";
 character = :a{ one: "[character]", other: "[characters]" };
 event = :an{ one: "[event]", other: "[events]" };
 enemy = :an{ one: "[enemy]", other: "[enemies]" };
+cards_plural = "[cards]";
+characters_plural = "[characters]";
+events_plural = "[events]";
+enemies_plural = "[enemies]";
 
 this_card = :a{ one: "[this card]", other: "[these cards]" };
 this_character = :a{ one: "[this character]", other: "[these characters]" };
@@ -429,9 +432,14 @@ other_pred_plural($p) = :from($p) "[other {$p:other}]";
 your_card = :a{ one: "[your card]", other: "[your cards]" };
 your_character = :a{ one: "[your character]", other: "[your characters]" };
 your_event = :a{ one: "[your event]", other: "[your events]" };
+your_cards_plural = "[your cards]";
+your_events_plural = "[your events]";
+allies_plural = "[allies]";
 enemy_card = :an{ one: "[enemy card]", other: "[enemy cards]" };
 enemy_character = :an{ one: "[enemy character]", other: "[enemy characters]" };
 enemy_event = :an{ one: "[enemy event]", other: "[enemy events]" };
+enemy_cards_plural = "[enemy cards]";
+enemy_events_plural = "[enemy events]";
 allied_character = :an{ one: "[allied character]", other: "[allied characters]" };
 allied_event = :an{ one: "[allied event]", other: "[allied events]" };
 other_character = :an{ one: "[other character]", other: "[other characters]" };
@@ -568,8 +576,9 @@ banish_then_materialize_them($target) = "[{banish} {$target}, then {materialize}
 
 
 allied_card_with_subtype($t) = "[allied {subtype($t)}]";
-allied_card_with_subtype_plural($t) = "[allied {subtype($t):other}]";
 allied_card_with_base($base) = "[allied {$base}]";
+allied_card_with_subtype_plural($t) = "[allied {subtype($t):other}]";
+allied_card_with_base_plural($base) = "[allied {$base}]";
 
 
 it_gains_reclaim_for_cost($target, $r) = "[it gains {reclaim_for_cost($r)}]";
