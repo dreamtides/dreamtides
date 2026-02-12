@@ -173,7 +173,7 @@ def generate_test(card_name: str, rules_text: str, variables: str) -> str:
 
 
 def main():
-    project_root = Path(__file__).parent.parent
+    project_root = Path(__file__).parent.parent.parent
     cards_toml_path = project_root / "rules_engine" / "tabula" / "cards.toml"
     output_dir = project_root / "rules_engine" / "tests" / "parser_v2_tests" / "tests" / "round_trip_tests"
 
@@ -205,7 +205,7 @@ def main():
 //! correctly through parse -> serialize.
 //!
 //! GENERATED FILE - Do not edit manually.
-//! Regenerate with: python scripts/generate_round_trip_tests.py
+//! Regenerate with: python scripts/testing/generate_round_trip_tests.py
 
 use parser_v2_tests::test_helpers::*;
 

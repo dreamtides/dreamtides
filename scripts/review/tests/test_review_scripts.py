@@ -150,16 +150,16 @@ class ReviewScopePlannerTests(unittest.TestCase):
                 "justfile",
                 "rules_engine/Cargo.toml",
                 "rules_engine/Cargo.lock",
-                "rules_engine/scripts/review/review_scope.py",
-                "rules_engine/scripts/review/review_scope_config.json",
+                "scripts/review/review_scope.py",
+                "scripts/review/review_scope_config.json",
             ),
             global_full_triggers=(
                 ".github/",
                 "justfile",
                 "rules_engine/Cargo.toml",
                 "rules_engine/Cargo.lock",
-                "rules_engine/scripts/review/review_scope.py",
-                "rules_engine/scripts/review/review_scope_config.json",
+                "scripts/review/review_scope.py",
+                "scripts/review/review_scope_config.json",
                 "rules_engine/tabula/",
             ),
             parser_crate_seeds=("parser_v2", "parser_v2_tests", "parser_v2_benchmarks"),
@@ -506,7 +506,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
     def test_python_change_selects_python_test_step(self) -> None:
         env = {
             "REVIEW_SCOPE_MODE": "enforce",
-            "REVIEW_SCOPE_CHANGED_FILES": "rules_engine/scripts/grid_generator.py",
+            "REVIEW_SCOPE_CHANGED_FILES": "scripts/utility/grid_generator.py",
         }
         decision = review_scope.plan_review_scope(
             self.step_names,
@@ -530,7 +530,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
     def test_shell_script_change_is_core_not_unmapped(self) -> None:
         env = {
             "REVIEW_SCOPE_MODE": "enforce",
-            "REVIEW_SCOPE_CHANGED_FILES": "rules_engine/scripts/cleanup_integrated_task.sh",
+            "REVIEW_SCOPE_CHANGED_FILES": "scripts/worktrees/cleanup_integrated_task.sh",
         }
         decision = review_scope.plan_review_scope(
             self.step_names,
@@ -570,7 +570,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
     def test_python_and_markdown_only_skips_rust_steps(self) -> None:
         env = {
             "REVIEW_SCOPE_MODE": "enforce",
-            "REVIEW_SCOPE_CHANGED_FILES": "docs/notes/plan.md\nrules_engine/scripts/grid_generator.py",
+            "REVIEW_SCOPE_CHANGED_FILES": "docs/notes/plan.md\nscripts/utility/grid_generator.py",
         }
         decision = review_scope.plan_review_scope(
             self.step_names,
@@ -591,7 +591,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.assertEqual(decision.skipped_steps["test-core"], "python/docs-only changes")
 
     def test_scope_validator_passes_repo_config(self) -> None:
-        repo_root = Path(__file__).resolve().parents[4]
+        repo_root = Path(__file__).resolve().parents[3]
         config = review_scope.load_scope_config()
         metadata = review_scope.load_workspace_metadata(repo_root)
         errors = review_scope.validate_scope_configuration(config, metadata)

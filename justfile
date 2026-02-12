@@ -12,7 +12,7 @@ review:
     if [ "${REVIEW_PERF:-1}" = "0" ]; then
         just review-direct
     else
-        python3 rules_engine/scripts/review/review_runner.py
+        python3 scripts/review/review_runner.py
     fi
 
 review-direct: check-snapshots check-format build clippy style-validator review-core-test parser-test tv-check tv-clippy tv-test
@@ -20,16 +20,16 @@ review-direct: check-snapshots check-format build clippy style-validator review-
 review-verbose: check-snapshots check-format-verbose build-verbose clippy-verbose style-validator-verbose review-core-test-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
 
 review-scope-plan:
-    python3 rules_engine/scripts/review/review_scope.py plan
+    python3 scripts/review/review_scope.py plan
 
 review-scope-validate:
-    python3 rules_engine/scripts/review/review_scope.py validate
+    python3 scripts/review/review_scope.py validate
 
 review-analyze:
-    python3 rules_engine/scripts/review/analyze_review_perf.py
+    python3 scripts/review/analyze_review_perf.py
 
 review-analyze-history commits='100' sample='10':
-    python3 rules_engine/scripts/review/analyze_review_perf.py --backfill-commits "{{commits}}" --sample-every "{{sample}}"
+    python3 scripts/review/analyze_review_perf.py --backfill-commits "{{commits}}" --sample-every "{{sample}}"
 
 check:
     #!/usr/bin/env bash
@@ -106,7 +106,7 @@ test: tabula-check
         if [ -n "$TEST_THREADS" ]; then
             PROFILE_ARGS+=(--test-threads "${TEST_THREADS#--test-threads=}")
         fi
-        RUST_MIN_STACK=8388608 python3 rules_engine/scripts/review/profile_cargo_test.py \
+        RUST_MIN_STACK=8388608 python3 scripts/review/profile_cargo_test.py \
             --manifest-path rules_engine/Cargo.toml \
             --workspace \
             --exclude tv_tests \
@@ -145,7 +145,7 @@ review-core-test: tabula-check
         if [ -n "$TEST_THREADS" ]; then
             PROFILE_ARGS+=(--test-threads "${TEST_THREADS#--test-threads=}")
         fi
-        RUST_MIN_STACK=8388608 python3 rules_engine/scripts/review/profile_cargo_test.py \
+        RUST_MIN_STACK=8388608 python3 scripts/review/profile_cargo_test.py \
             --manifest-path rules_engine/Cargo.toml \
             --workspace \
             --exclude tv_tests \
@@ -172,7 +172,7 @@ review-core-test-verbose:
     RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --workspace --exclude tv_tests --exclude parser_v2_tests -- $TEST_THREADS
 
 battle-test *args='':
-    ./rules_engine/scripts/run_cargo_test.sh battle_tests "$@"
+    ./scripts/testing/run_cargo_test.sh battle_tests "$@"
 
 parser-test *args='':
     #!/usr/bin/env bash
@@ -182,7 +182,7 @@ parser-test *args='':
     fi
     export RUST_MIN_STACK=8388608
     export CARGO_TEST_QUIET=1
-    ./rules_engine/scripts/run_cargo_test.sh parser_v2_tests "$@"
+    ./scripts/testing/run_cargo_test.sh parser_v2_tests "$@"
 
 parser-baselines:
     just parser-test test_full_card_bracket_locale_leak_detector
@@ -202,7 +202,7 @@ lat *args='':
     cargo run --manifest-path rules_engine/Cargo.toml --bin lat -- "$@"
 
 lattice-test *args='':
-    ./rules_engine/scripts/run_cargo_test.sh lattice_tests "$@"
+    ./scripts/testing/run_cargo_test.sh lattice_tests "$@"
 
 lattice-bench *args='':
     cargo criterion --manifest-path rules_engine/Cargo.toml -p lattice_benchmarks -- "$@"
@@ -233,7 +233,7 @@ schema:
     rm schema.json
 
 fods:
-    python3 client/scripts/xlsm_fods_converter.py --input client/Assets/StreamingAssets/Tabula.xlsm --output client/Assets/StreamingAssets/Tabula.fods
+    python3 scripts/tabula/xlsm_fods_converter.py --input client/Assets/StreamingAssets/Tabula.xlsm --output client/Assets/StreamingAssets/Tabula.fods
 
 plugin_out := "client/Assets/Plugins"
 target_ios := "aarch64-apple-ios"
@@ -446,10 +446,10 @@ tabula-roundtrip-revert:
   cp /tmp/Tabula.backup.xlsm client/Assets/StreamingAssets/Tabula.xlsm
 
 tabula-verify-vba:
-   ./rules_engine/scripts/verify_vba.py
+   ./scripts/tabula/verify_vba.py
 
 check-snapshots:
-   ./rules_engine/scripts/check_pending_snapshots.py
+   ./scripts/testing/check_pending_snapshots.py
 
 watch-tabula:
     cargo watch -C rules_engine -x "run --bin tabula_cli server"
@@ -510,7 +510,7 @@ check-docs:
     RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links -D rustdoc::private-intra-doc-links -D rustdoc::bare-urls" cargo doc --manifest-path rules_engine/Cargo.toml --all
 
 unity-tests:
-    ./client/scripts/test.py
+    ./scripts/testing/test_unity.py
 
 outdated:
     # Check for outdated dependencies, consider installing cargo-edit and running 'cargo upgrade' if this fails
@@ -548,7 +548,7 @@ samply-matchup *args='':
 
 # Example: just samply-battle-benchmark ai_core_11
 samply-battle-benchmark *args='':
-    ./rules_engine/scripts/review/profile_benchmark_binary.py --manifest-path benchmarks/battle/Cargo.toml --samply --package battle_benchmarks --benchmark $@
+    ./scripts/review/profile_benchmark_binary.py --manifest-path benchmarks/battle/Cargo.toml --samply --package battle_benchmarks --benchmark $@
 
 @nim *args='':
     cargo run --manifest-path rules_engine/Cargo.toml --bin run_nim -- $@
@@ -557,10 +557,10 @@ matchup *args='':
     cargo run --manifest-path rules_engine/Cargo.toml --release --bin run_matchup -- "$@"
 
 card-images:
-    ./client/scripts/card_images.py --input client/Assets/ThirdParty/GameAssets/SourceImages --output client/Assets/ThirdParty/GameAssets/CardImages -r 50
+    ./scripts/images/card_images.py --input client/Assets/ThirdParty/GameAssets/SourceImages --output client/Assets/ThirdParty/GameAssets/CardImages -r 50
 
 resize-images:
-    ./client/scripts/resize.py --input client/Assets/ThirdParty/GameAssets/SourceImages
+    ./scripts/images/resize.py --input client/Assets/ThirdParty/GameAssets/SourceImages
 
 graphviz:
     dot -Tpng rules_engine/search_graph.dot -o rules_engine/search_graph.png && open rules_engine/search_graph.png
@@ -581,13 +581,13 @@ bench-parser:
     cargo criterion --manifest-path rules_engine/Cargo.toml -p parser_v2_benchmarks
 
 iai:
-    ./rules_engine/scripts/benchmark_on_linux.py 'iai_benchmarks'
+    ./scripts/benchmarking/benchmark_on_linux.py 'iai_benchmarks'
 
 bench-iai:
     cargo bench --manifest-path rules_engine/Cargo.toml iai_benchmarks
 
 symlinks:
-     ./rules_engine/scripts/symlinks.py -d ~/Documents/dttmp rules_engine/target client/Library
+     ./scripts/utility/symlinks.py -d ~/Documents/dttmp rules_engine/target client/Library
 
 test-determinism *args='':
     cargo run --manifest-path rules_engine/Cargo.toml --release --bin test_determinism -- $@
@@ -606,6 +606,8 @@ rsync-for-review:
     echo $'\a'
     rsync --delete --stats --copy-links -avqr --exclude='client/Library' --exclude='client/test_output' --exclude='client/Assets/ThirdParty' ./client ~/dreamtides_tests/
     echo $'\a'
+    rsync --delete --stats --copy-links -avqr ./scripts ~/dreamtides_tests/
+    echo $'\a'
     cp justfile ~/dreamtides_tests/
     mkdir -p ~/dreamtides_tests/.cargo
     cp -f .cargo/config.toml ~/dreamtides_tests/.cargo/config.toml 2>/dev/null || true
@@ -615,6 +617,8 @@ rsync-third-party:
     rsync --delete --stats --copy-links -avqr --exclude='rules_engine/target' ./rules_engine ~/dreamtides_tests/
     echo $'\a'
     rsync --delete --stats --copy-links -avqr --exclude='client/Library' --exclude='client/test_output' ./client ~/dreamtides_tests/
+    echo $'\a'
+    rsync --delete --stats --copy-links -avqr ./scripts ~/dreamtides_tests/
     echo $'\a'
     cp justfile ~/dreamtides_tests/
     echo $'\a'
@@ -629,7 +633,7 @@ logcat:
     adb logcat -s dreamtides -s Unity -s CRASH
 
 most-called-functions:
-    ./rules_engine/scripts/most_called_functions.py --auto-build --benchmark ai_core_11/ai_core_11 -p battle_benchmarks --manifest-path benchmarks/battle/Cargo.toml --limit 25 --demangle  --collapse-generics
+    ./scripts/benchmarking/most_called_functions.py --auto-build --benchmark ai_core_11/ai_core_11 -p battle_benchmarks --manifest-path benchmarks/battle/Cargo.toml --limit 25 --demangle  --collapse-generics
 
 prune-remote-branches:
     #!/usr/bin/env bash
@@ -705,7 +709,7 @@ tv-clippy-verbose:
     cargo clippy --manifest-path rules_engine/src/tv/src-tauri/Cargo.toml -- -D warnings -D clippy::all
 
 tv-test *args='':
-    ./rules_engine/scripts/run_cargo_test.sh tv_tests "$@"
+    ./scripts/testing/run_cargo_test.sh tv_tests "$@"
 
 tv-build:
     cd rules_engine/src/tv && pnpm tauri build

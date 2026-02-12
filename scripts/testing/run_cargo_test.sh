@@ -47,7 +47,7 @@ if [ "${REVIEW_PERF:-0}" = "1" ]; then
         profiler_args+=("${FILTER_ARGS[@]}")
     fi
 
-    if ! python3 rules_engine/scripts/review/profile_cargo_test.py "${profiler_args[@]}"; then
+    if ! python3 scripts/review/profile_cargo_test.py "${profiler_args[@]}"; then
         exit 1
     fi
 

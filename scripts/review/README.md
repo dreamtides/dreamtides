@@ -17,13 +17,13 @@ This directory contains the scripts that power scoped `just review` runs and rev
 
 The root `justfile` invokes these scripts directly:
 
-- `just review` -> `python3 rules_engine/scripts/review/review_runner.py`
-- `just review-scope-plan` -> `python3 rules_engine/scripts/review/review_scope.py plan`
-- `just review-scope-validate` -> `python3 rules_engine/scripts/review/review_scope.py validate`
-- `just review-analyze` -> `python3 rules_engine/scripts/review/analyze_review_perf.py`
+- `just review` -> `python3 scripts/review/review_runner.py`
+- `just review-scope-plan` -> `python3 scripts/review/review_scope.py plan`
+- `just review-scope-validate` -> `python3 scripts/review/review_scope.py validate`
+- `just review-analyze` -> `python3 scripts/review/analyze_review_perf.py`
 
-`rules_engine/scripts/review/profile_cargo_test.py` emits test-level performance events via `review_perf_log.py`.
-`just review` runs `python-test`, which executes `python3 -m unittest discover -s rules_engine/scripts/review/tests -p "test_*.py"` when Python domain scope is impacted (or in forced full mode).
+`scripts/review/profile_cargo_test.py` emits test-level performance events via `review_perf_log.py`.
+`just review` runs `python-test`, which executes `python3 -m unittest discover -s scripts/review/tests -p "test_*.py"` when Python domain scope is impacted (or in forced full mode).
 
 ## Conventions
 

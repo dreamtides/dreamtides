@@ -4,18 +4,18 @@
     "justfile",
     "rules_engine/Cargo.lock",
     "rules_engine/Cargo.toml",
-    "rules_engine/scripts/review/review_scope.py",
-    "rules_engine/scripts/review/review_scope_config.json"
+    "scripts/review/review_scope.py",
+    "scripts/review/review_scope_config.json"
   ],
   "global_full_triggers": [
     ".github/",
     "justfile",
     "rules_engine/Cargo.lock",
     "rules_engine/Cargo.toml",
-    "rules_engine/scripts/review/review_perf_log.py",
-    "rules_engine/scripts/review/review_runner.py",
-    "rules_engine/scripts/review/review_scope.py",
-    "rules_engine/scripts/review/review_scope_config.json",
+    "scripts/review/review_perf_log.py",
+    "scripts/review/review_runner.py",
+    "scripts/review/review_scope.py",
+    "scripts/review/review_scope_config.json",
     "rules_engine/tabula/"
   ],
   "parser": {

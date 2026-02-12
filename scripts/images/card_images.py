@@ -8,22 +8,22 @@ Input images should be 1000px tall.
 
 Example Usage:
 
-    ./client/scripts/resize.py \
+    ./scripts/images/resize.py \
         --input client/Assets/ThirdParty/GameAssets/SourceImages/Standard
-    ./client/scripts/card_images.py \
+    ./scripts/images/card_images.py \
         --input client/Assets/ThirdParty/GameAssets/SourceImages/Standard \
         --output client/Assets/ThirdParty/GameAssets/CardImages/Standard \
         -r 45
 
-    ./client/scripts/resize.py \
+    ./scripts/images/resize.py \
         --input client/Assets/ThirdParty/GameAssets/SourceImages/Dreamwell
-    ./client/scripts/card_images.py \
+    ./scripts/images/card_images.py \
         --input client/Assets/ThirdParty/GameAssets/SourceImages/Dreamwell \
         --output client/Assets/ThirdParty/GameAssets/CardImages/Dreamwell \
         --landscape \
         -r 45
 
-    ./client/scripts/card_images.py \
+    ./scripts/images/card_images.py \
         --input client/Assets/ThirdParty/GameAssets/SourceImages/Circular \
         --output client/Assets/ThirdParty/GameAssets/CardImages/Circular \
         --circle       

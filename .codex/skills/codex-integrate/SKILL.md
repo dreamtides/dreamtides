@@ -95,7 +95,7 @@ worktree is otherwise clean.
 cd "$REPO_ROOT"
 git checkout master
 git merge --ff-only "$BRANCH"
-rules_engine/scripts/cleanup_integrated_task.sh --task-id "$TASK_ID" --branch "$BRANCH" --worktree "$WORKTREE"
+scripts/worktrees/cleanup_integrated_task.sh --task-id "$TASK_ID" --branch "$BRANCH" --worktree "$WORKTREE"
 ```
 
 ## Failure Handling
@@ -105,6 +105,6 @@ rules_engine/scripts/cleanup_integrated_task.sh --task-id "$TASK_ID" --branch "$
 - If worktree removal fails because it is dirty, fix or stash inside that worktree first.
 - `FETCH_HEAD` is worktree-local: run `git fetch` from inside `"$WORKTREE"` immediately
   before `git rebase FETCH_HEAD`.
-- Cleanup helper script: `rules_engine/scripts/cleanup_integrated_task.sh`
+- Cleanup helper script: `scripts/worktrees/cleanup_integrated_task.sh`
   - Use `--dry-run` to preview cleanup decisions.
   - Refuses to delete branches not merged into `master`.

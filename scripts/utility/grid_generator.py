@@ -1,5 +1,5 @@
 # Example:
-# python3 ./rules_engine/scripts/grid_generator.py --print-legend --min-paths 2
+# python3 ./scripts/utility/grid_generator.py --print-legend --min-paths 2
 # --emoji --max-cost 2 --max-reward 3 --allow-backtracking 
 
 import argparse

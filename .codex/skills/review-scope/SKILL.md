@@ -5,7 +5,7 @@ description: Explain how Dreamtides scoped review chooses changed files, maps im
 
 # Review Scope
 
-Use this skill to explain the review scope system implemented in `rules_engine/scripts/review/review_scope.py` and consumed by `rules_engine/scripts/review/review_runner.py`.
+Use this skill to explain the review scope system implemented in `scripts/review/review_scope.py` and consumed by `scripts/review/review_runner.py`.
 
 ## What It Does
 
