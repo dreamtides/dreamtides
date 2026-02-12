@@ -328,7 +328,7 @@ foresee_effect($f) = "[{foresee($f)}]";
 kindle_effect($k) = "[{kindle($k)}]";
 each_player_discards_effect($d) = "[each player discards {cards($d)}]";
 prevent_that_card_effect = "[{prevent} that card]";
-then_materialize_it_effect = "[then {materialize} it]";
+then_materialize_it_effect($target) = "[then {materialize} it]";
 gain_twice_energy_instead_effect = "[gain twice that much {energy_symbol} instead]";
 gain_energy_equal_to_that_cost_effect = "[gain {energy_symbol} equal to that character's cost]";
 gain_energy_equal_to_this_cost_effect = "[gain {energy_symbol} equal to this character's cost]";
@@ -386,7 +386,7 @@ opponent_pays_cost($cost) = "[the opponent pays {$cost}]";
 pay_cost_effect($cost) = "[pay {$cost}]";
 
 
-opponent_gains_points_equal_spark = "[the opponent gains points equal to its spark]";
+opponent_gains_points_equal_spark($target) = "[the opponent gains points equal to its spark]";
 take_extra_turn_effect = "[take an extra turn after this one]";
 you_win_the_game_effect = "[you win the game]";
 no_effect = "[]";
@@ -553,7 +553,7 @@ banish_up_to($n, $target) = "[{banish} up to {$n} {$target}]";
 banish_any_number_of($target) = "[{banish} any number of {$target}]";
 banish_single($target) = "[{banish} {$target}]";
 
-materialize_them = "[{materialize} them]";
+materialize_them($target) = "[{materialize} them]";
 materialize_all($target) = "[{materialize} all {$target}]";
 materialize_any_number_of($target) = "[{materialize} any number of {$target}]";
 materialize_up_to($n, $target) = "[{materialize} up to {$n} {$target}]";
@@ -587,15 +587,15 @@ allied_card_with_subtype_plural($t) = "[allied {subtype($t):other}]";
 allied_card_with_base_plural($base) = "[allied {$base}]";
 
 
-it_gains_reclaim_for_cost($r) = "[it gains {reclaim_for_cost($r)}]";
-it_gains_reclaim_equal_cost = "[it gains {reclaim} equal to its cost]";
+it_gains_reclaim_for_cost($target, $r) = "[it gains {reclaim_for_cost($r)}]";
+it_gains_reclaim_equal_cost($target) = "[it gains {reclaim} equal to its cost]";
 this_card_gains_reclaim_for_cost($r) = "[this card gains {reclaim_for_cost($r)}]";
 this_card_gains_reclaim_equal_cost = "[this card gains {reclaim} equal to its cost]";
 target_gains_reclaim_for_cost($target, $r) = "[{$target} gains {reclaim_for_cost($r)}]";
 target_gains_reclaim_equal_cost($target) = "[{$target} gains {reclaim} equal to its cost]";
 
-it_gains_reclaim_for_cost_this_turn($r) = "[it gains {reclaim_for_cost($r)} this turn]";
-it_gains_reclaim_equal_cost_this_turn = "[it gains {reclaim} equal to its cost this turn]";
+it_gains_reclaim_for_cost_this_turn($target, $r) = "[it gains {reclaim_for_cost($r)} this turn]";
+it_gains_reclaim_equal_cost_this_turn($target) = "[it gains {reclaim} equal to its cost this turn]";
 this_card_gains_reclaim_for_cost_this_turn($r) = "[this card gains {reclaim_for_cost($r)} this turn]";
 this_card_gains_reclaim_equal_cost_this_turn = "[this card gains {reclaim} equal to its cost this turn]";
 target_gains_reclaim_for_cost_this_turn($target, $r) = "[{$target} gains {reclaim_for_cost($r)} this turn]";
@@ -681,3 +681,5 @@ condition_appended($base, $condition) = "[{$base} {$condition}]";
 
 capitalized_sentence($s) = "[{@cap $s}]";
 reclaim_with_cost($cost) = "[{Reclaim} -- {$cost}]";
+
+modal_choice_line($energy_cost, $effect) = "[{bullet} {$energy_cost}{cost_effect_separator}{@cap $effect}]";

@@ -90,7 +90,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             strings::opponent_gains_points_effect(*count).to_string()
         }
         StandardEffect::EnemyGainsPointsEqualToItsSpark => {
-            strings::opponent_gains_points_equal_spark().to_string()
+            strings::opponent_gains_points_equal_spark(strings::this_character()).to_string()
         }
         StandardEffect::EnemyLosesPoints { count } => {
             strings::opponent_loses_points_effect(*count).to_string()
@@ -364,7 +364,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             strings::each_player_shuffles_and_draws_effect(*count).to_string()
         }
         StandardEffect::MaterializeCollection { target, count } => match (target, count) {
-            (Predicate::Them, CollectionExpression::All) => strings::materialize_them().to_string(),
+            (Predicate::Them, CollectionExpression::All) => {
+                strings::materialize_them(strings::pronoun_them()).to_string()
+            }
             (_, CollectionExpression::All) => {
                 strings::materialize_all(predicate_serializer::serialize_predicate_plural(target))
                     .to_string()
@@ -469,7 +471,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             predicate_serializer::serialize_card_predicate_phrase(target),
         )
         .to_string(),
-        StandardEffect::ThenMaterializeIt => strings::then_materialize_it_effect().to_string(),
+        StandardEffect::ThenMaterializeIt => {
+            strings::then_materialize_it_effect(strings::pronoun_it()).to_string()
+        }
         StandardEffect::NoEffect => strings::no_effect().to_string(),
         StandardEffect::OpponentPaysCost { cost } => {
             strings::opponent_pays_cost(cost_serializer::serialize_cost(cost)).to_string()
@@ -651,15 +655,12 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
             result
         }
         Effect::Modal(choices) => {
-            let cost_effect_sep = strings::cost_effect_separator().to_string();
-            let mut result = "{choose_one}".to_string();
+            let mut result = strings::choose_one().to_string();
             for choice in choices {
                 result.push('\n');
-                result.push_str("{bullet} ");
-                let cost_text = format!("{{energy({})}}", choice.energy_cost.0);
+                let energy_cost = strings::energy(choice.energy_cost.0);
                 let effect_text = serialize_effect_with_context(&choice.effect, context);
-                let capitalized = strings::capitalized_sentence(effect_text).to_string();
-                result.push_str(&format!("{cost_text}{cost_effect_sep}{capitalized}"));
+                result.push_str(&strings::modal_choice_line(energy_cost, effect_text).to_string());
             }
             result
         }
@@ -758,16 +759,18 @@ fn serialize_gains_reclaim(
 ) -> String {
     match target {
         Predicate::It => {
+            let antecedent = strings::pronoun_it();
             if let Some(energy_cost) = cost {
                 if this_turn {
-                    strings::it_gains_reclaim_for_cost_this_turn(energy_cost.0).to_string()
+                    strings::it_gains_reclaim_for_cost_this_turn(antecedent, energy_cost.0)
+                        .to_string()
                 } else {
-                    strings::it_gains_reclaim_for_cost(energy_cost.0).to_string()
+                    strings::it_gains_reclaim_for_cost(antecedent, energy_cost.0).to_string()
                 }
             } else if this_turn {
-                strings::it_gains_reclaim_equal_cost_this_turn().to_string()
+                strings::it_gains_reclaim_equal_cost_this_turn(antecedent).to_string()
             } else {
-                strings::it_gains_reclaim_equal_cost().to_string()
+                strings::it_gains_reclaim_equal_cost(antecedent).to_string()
             }
         }
         Predicate::This => {

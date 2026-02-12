@@ -643,7 +643,8 @@ rlf::rlf! {
     // Prevent that card effect fragment (no trailing period).
     prevent_that_card_effect = "{prevent} that card";
     // Then materialize it effect fragment (no trailing period).
-    then_materialize_it_effect = "then {materialize} it";
+    // Accepts antecedent $target for gendered pronoun agreement in translations.
+    then_materialize_it_effect($target) = "then {materialize} it";
     // Gain twice energy instead effect fragment (no trailing period).
     gain_twice_energy_instead_effect = "gain twice that much {energy_symbol} instead";
     // Gain energy equal to that character's cost effect fragment (no trailing period).
@@ -761,7 +762,8 @@ rlf::rlf! {
     // =========================================================================
 
     // Opponent gains points equal to spark effect fragment (no trailing period).
-    opponent_gains_points_equal_spark = "the opponent gains points equal to its spark";
+    // Accepts antecedent $target for gendered pronoun agreement in translations.
+    opponent_gains_points_equal_spark($target) = "the opponent gains points equal to its spark";
     // Take extra turn effect fragment (no trailing period).
     take_extra_turn_effect = "take an extra turn after this one";
     // You win the game effect fragment (no trailing period).
@@ -1088,7 +1090,8 @@ rlf::rlf! {
     banish_single($target) = "{banish} {$target}";
 
     // Materialize them.
-    materialize_them = "{materialize} them";
+    // Accepts antecedent $target for gendered pronoun agreement in translations.
+    materialize_them($target) = "{materialize} them";
     // Materialize all matching targets.
     materialize_all($target) = "{materialize} all {$target}";
     // Materialize any number of matching targets.
@@ -1158,9 +1161,11 @@ rlf::rlf! {
     // =========================================================================
 
     // It gains reclaim with cost.
-    it_gains_reclaim_for_cost($r) = "it gains {reclaim_for_cost($r)}";
+    // Accepts antecedent $target for gendered pronoun agreement in translations.
+    it_gains_reclaim_for_cost($target, $r) = "it gains {reclaim_for_cost($r)}";
     // It gains reclaim equal to its cost.
-    it_gains_reclaim_equal_cost = "it gains {reclaim} equal to its cost";
+    // Accepts antecedent $target for gendered pronoun agreement in translations.
+    it_gains_reclaim_equal_cost($target) = "it gains {reclaim} equal to its cost";
     // This card gains reclaim with cost.
     this_card_gains_reclaim_for_cost($r) = "this card gains {reclaim_for_cost($r)}";
     // This card gains reclaim equal to its cost.
@@ -1171,9 +1176,11 @@ rlf::rlf! {
     target_gains_reclaim_equal_cost($target) = "{$target} gains {reclaim} equal to its cost";
 
     // It gains reclaim with cost this turn.
-    it_gains_reclaim_for_cost_this_turn($r) = "it gains {reclaim_for_cost($r)} this turn";
+    // Accepts antecedent $target for gendered pronoun agreement in translations.
+    it_gains_reclaim_for_cost_this_turn($target, $r) = "it gains {reclaim_for_cost($r)} this turn";
     // It gains reclaim equal to its cost this turn.
-    it_gains_reclaim_equal_cost_this_turn = "it gains {reclaim} equal to its cost this turn";
+    // Accepts antecedent $target for gendered pronoun agreement in translations.
+    it_gains_reclaim_equal_cost_this_turn($target) = "it gains {reclaim} equal to its cost this turn";
     // This card gains reclaim with cost this turn.
     this_card_gains_reclaim_for_cost_this_turn($r) = "this card gains {reclaim_for_cost($r)} this turn";
     // This card gains reclaim equal to its cost this turn.
@@ -1343,4 +1350,11 @@ rlf::rlf! {
     capitalized_sentence($s) = "{@cap $s}";
     // Reclaim with dash-separated cost text.
     reclaim_with_cost($cost) = "{Reclaim} -- {$cost}";
+
+    // =========================================================================
+    // Modal effect assembly phrases
+    // =========================================================================
+
+    // Single modal choice line with energy cost and effect text.
+    modal_choice_line($energy_cost, $effect) = "{bullet} {$energy_cost}{cost_effect_separator}{@cap $effect}";
 }

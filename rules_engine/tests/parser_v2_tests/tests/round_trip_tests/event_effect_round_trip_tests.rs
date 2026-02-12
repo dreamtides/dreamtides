@@ -420,3 +420,17 @@ fn test_materialize_random_characters_from_deck() {
 fn test_choose_one_return_or_draw() {
     assert_rendered_match("{choose_one}\n{bullet} {energy($e1)}: Return an enemy to hand.\n{bullet} {energy($e2)}: Draw {cards($c)}.", "e1: 2\ne2: 3\nc: 2");
 }
+
+// ============================================================================
+// Pronoun-sensitive effect round-trip tests
+// ============================================================================
+
+#[test]
+fn test_it_gains_reclaim_equal_cost_this_turn() {
+    assert_rendered_match("{Discover} a card. It gains {reclaim} equal to its cost this turn.", "");
+}
+
+#[test]
+fn test_it_gains_reclaim_for_cost_this_turn() {
+    assert_rendered_match("{Discover} a card. It gains {reclaim_for_cost($r)} this turn.", "r: 1");
+}
