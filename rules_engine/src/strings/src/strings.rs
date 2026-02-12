@@ -620,54 +620,54 @@ rlf::rlf! {
     // Effect serializer phrases — parameterized
     // =========================================================================
 
-    // Draw cards effect.
-    draw_cards_effect($c) = "draw {cards($c)}.";
-    // Discard cards effect.
-    discard_cards_effect($d) = "discard {cards($d)}.";
-    // Gain energy effect.
-    gain_energy_effect($e) = "gain {energy($e)}.";
-    // Gain points effect.
-    gain_points_effect($p) = "gain {points($p)}.";
-    // Lose points effect.
-    lose_points_effect($p) = "you lose {points($p)}.";
-    // Opponent gains points effect.
-    opponent_gains_points_effect($p) = "the opponent gains {points($p)}.";
-    // Opponent loses points effect.
-    opponent_loses_points_effect($p) = "the opponent loses {points($p)}.";
-    // Foresee effect.
-    foresee_effect($f) = "{foresee($f)}.";
-    // Kindle effect.
-    kindle_effect($k) = "{kindle($k)}.";
-    // Each player discards effect.
-    each_player_discards_effect($d) = "each player discards {cards($d)}.";
-    // Prevent that card effect.
-    prevent_that_card_effect = "{prevent} that card.";
-    // Then materialize it effect.
-    then_materialize_it_effect = "then {materialize} it.";
-    // Gain twice energy instead effect.
-    gain_twice_energy_instead_effect = "gain twice that much {energy_symbol} instead.";
-    // Gain energy equal to that character's cost effect.
-    gain_energy_equal_to_that_cost_effect = "gain {energy_symbol} equal to that character's cost.";
-    // Gain energy equal to this character's cost effect.
-    gain_energy_equal_to_this_cost_effect = "gain {energy_symbol} equal to this character's cost.";
-    // Put top cards of deck into void effect.
-    put_deck_into_void_effect($v) = "put the {top_n_cards($v)} of your deck into your void.";
-    // Banish cards from enemy void effect.
-    banish_cards_from_enemy_void_effect($c) = "{banish} {cards($c)} from the opponent's void.";
-    // Banish enemy void effect.
-    banish_enemy_void_effect = "{banish} the opponent's void.";
-    // Judgment phase at end of turn effect.
-    judgment_phase_at_end_of_turn_effect = "at the end of this turn, trigger an additional {judgment_phase_name} phase.";
-    // Multiply energy effect.
-    multiply_energy_effect($n) = "{multiply_by($n)} the amount of {energy_symbol} you have.";
-    // Spend all energy dissolve effect.
-    spend_all_energy_dissolve_effect = "spend all your {energy_symbol}. {dissolve} an enemy with cost less than or equal to the amount spent.";
-    // Spend all energy draw discard effect.
-    spend_all_energy_draw_discard_effect = "spend all your {energy_symbol}. Draw cards equal to the amount spent, then discard that many cards.";
-    // Each player shuffles and draws effect.
-    each_player_shuffles_and_draws_effect($c) = "each player shuffles their hand and void into their deck and then draws {cards($c)}.";
-    // Return up to events from void effect.
-    return_up_to_events_from_void_effect($n) = "return {up_to_n_events($n)} from your void to your hand.";
+    // Draw cards effect fragment (no trailing period).
+    draw_cards_effect($c) = "draw {cards($c)}";
+    // Discard cards effect fragment (no trailing period).
+    discard_cards_effect($d) = "discard {cards($d)}";
+    // Gain energy effect fragment (no trailing period).
+    gain_energy_effect($e) = "gain {energy($e)}";
+    // Gain points effect fragment (no trailing period).
+    gain_points_effect($p) = "gain {points($p)}";
+    // Lose points effect fragment (no trailing period).
+    lose_points_effect($p) = "you lose {points($p)}";
+    // Opponent gains points effect fragment (no trailing period).
+    opponent_gains_points_effect($p) = "the opponent gains {points($p)}";
+    // Opponent loses points effect fragment (no trailing period).
+    opponent_loses_points_effect($p) = "the opponent loses {points($p)}";
+    // Foresee effect fragment (no trailing period).
+    foresee_effect($f) = "{foresee($f)}";
+    // Kindle effect fragment (no trailing period).
+    kindle_effect($k) = "{kindle($k)}";
+    // Each player discards effect fragment (no trailing period).
+    each_player_discards_effect($d) = "each player discards {cards($d)}";
+    // Prevent that card effect fragment (no trailing period).
+    prevent_that_card_effect = "{prevent} that card";
+    // Then materialize it effect fragment (no trailing period).
+    then_materialize_it_effect = "then {materialize} it";
+    // Gain twice energy instead effect fragment (no trailing period).
+    gain_twice_energy_instead_effect = "gain twice that much {energy_symbol} instead";
+    // Gain energy equal to that character's cost effect fragment (no trailing period).
+    gain_energy_equal_to_that_cost_effect = "gain {energy_symbol} equal to that character's cost";
+    // Gain energy equal to this character's cost effect fragment (no trailing period).
+    gain_energy_equal_to_this_cost_effect = "gain {energy_symbol} equal to this character's cost";
+    // Put top cards of deck into void effect fragment (no trailing period).
+    put_deck_into_void_effect($v) = "put the {top_n_cards($v)} of your deck into your void";
+    // Banish cards from enemy void effect fragment (no trailing period).
+    banish_cards_from_enemy_void_effect($c) = "{banish} {cards($c)} from the opponent's void";
+    // Banish enemy void effect fragment (no trailing period).
+    banish_enemy_void_effect = "{banish} the opponent's void";
+    // Judgment phase at end of turn effect fragment (no trailing period).
+    judgment_phase_at_end_of_turn_effect = "at the end of this turn, trigger an additional {judgment_phase_name} phase";
+    // Multiply energy effect fragment (no trailing period).
+    multiply_energy_effect($n) = "{multiply_by($n)} the amount of {energy_symbol} you have";
+    // Spend all energy dissolve effect fragment (no trailing period).
+    spend_all_energy_dissolve_effect = "spend all your {energy_symbol}. {dissolve} an enemy with cost less than or equal to the amount spent";
+    // Spend all energy draw discard effect fragment (no trailing period).
+    spend_all_energy_draw_discard_effect = "spend all your {energy_symbol}. Draw cards equal to the amount spent, then discard that many cards";
+    // Each player shuffles and draws effect fragment (no trailing period).
+    each_player_shuffles_and_draws_effect($c) = "each player shuffles their hand and void into their deck and then draws {cards($c)}";
+    // Return up to events from void effect fragment (no trailing period).
+    return_up_to_events_from_void_effect($n) = "return {up_to_n_events($n)} from your void to your hand";
     // Fast prefix for activated abilities.
     fast_prefix = "{Fast} -- ";
 
@@ -760,12 +760,12 @@ rlf::rlf! {
     // Effect serializer phrases — standalone
     // =========================================================================
 
-    // Opponent gains points equal to spark effect.
-    opponent_gains_points_equal_spark = "the opponent gains points equal to its spark.";
-    // Take extra turn effect.
-    take_extra_turn_effect = "take an extra turn after this one.";
-    // You win the game effect.
-    you_win_the_game_effect = "you win the game.";
+    // Opponent gains points equal to spark effect fragment (no trailing period).
+    opponent_gains_points_equal_spark = "the opponent gains points equal to its spark";
+    // Take extra turn effect fragment (no trailing period).
+    take_extra_turn_effect = "take an extra turn after this one";
+    // You win the game effect fragment (no trailing period).
+    you_win_the_game_effect = "you win the game";
     // No effect.
     no_effect = "";
 

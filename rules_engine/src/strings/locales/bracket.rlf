@@ -317,30 +317,30 @@ operator_lower = "[ lower]";
 operator_higher = "[ higher]";
 
 
-draw_cards_effect($c) = "[draw {cards($c)}.]";
-discard_cards_effect($d) = "[discard {cards($d)}.]";
-gain_energy_effect($e) = "[gain {energy($e)}.]";
-gain_points_effect($p) = "[gain {points($p)}.]";
-lose_points_effect($p) = "[you lose {points($p)}.]";
-opponent_gains_points_effect($p) = "[the opponent gains {points($p)}.]";
-opponent_loses_points_effect($p) = "[the opponent loses {points($p)}.]";
-foresee_effect($f) = "[{foresee($f)}.]";
-kindle_effect($k) = "[{kindle($k)}.]";
-each_player_discards_effect($d) = "[each player discards {cards($d)}.]";
-prevent_that_card_effect = "[{prevent} that card.]";
-then_materialize_it_effect = "[then {materialize} it.]";
-gain_twice_energy_instead_effect = "[gain twice that much {energy_symbol} instead.]";
-gain_energy_equal_to_that_cost_effect = "[gain {energy_symbol} equal to that character's cost.]";
-gain_energy_equal_to_this_cost_effect = "[gain {energy_symbol} equal to this character's cost.]";
-put_deck_into_void_effect($v) = "[put the {top_n_cards($v)} of your deck into your void.]";
-banish_cards_from_enemy_void_effect($c) = "[{banish} {cards($c)} from the opponent's void.]";
-banish_enemy_void_effect = "[{banish} the opponent's void.]";
-judgment_phase_at_end_of_turn_effect = "[at the end of this turn, trigger an additional {judgment_phase_name} phase.]";
-multiply_energy_effect($n) = "[{multiply_by($n)} the amount of {energy_symbol} you have.]";
-spend_all_energy_dissolve_effect = "[spend all your {energy_symbol}. {dissolve} an enemy with cost less than or equal to the amount spent.]";
-spend_all_energy_draw_discard_effect = "[spend all your {energy_symbol}. Draw cards equal to the amount spent, then discard that many cards.]";
-each_player_shuffles_and_draws_effect($c) = "[each player shuffles their hand and void into their deck and then draws {cards($c)}.]";
-return_up_to_events_from_void_effect($n) = "[return {up_to_n_events($n)} from your void to your hand.]";
+draw_cards_effect($c) = "[draw {cards($c)}]";
+discard_cards_effect($d) = "[discard {cards($d)}]";
+gain_energy_effect($e) = "[gain {energy($e)}]";
+gain_points_effect($p) = "[gain {points($p)}]";
+lose_points_effect($p) = "[you lose {points($p)}]";
+opponent_gains_points_effect($p) = "[the opponent gains {points($p)}]";
+opponent_loses_points_effect($p) = "[the opponent loses {points($p)}]";
+foresee_effect($f) = "[{foresee($f)}]";
+kindle_effect($k) = "[{kindle($k)}]";
+each_player_discards_effect($d) = "[each player discards {cards($d)}]";
+prevent_that_card_effect = "[{prevent} that card]";
+then_materialize_it_effect = "[then {materialize} it]";
+gain_twice_energy_instead_effect = "[gain twice that much {energy_symbol} instead]";
+gain_energy_equal_to_that_cost_effect = "[gain {energy_symbol} equal to that character's cost]";
+gain_energy_equal_to_this_cost_effect = "[gain {energy_symbol} equal to this character's cost]";
+put_deck_into_void_effect($v) = "[put the {top_n_cards($v)} of your deck into your void]";
+banish_cards_from_enemy_void_effect($c) = "[{banish} {cards($c)} from the opponent's void]";
+banish_enemy_void_effect = "[{banish} the opponent's void]";
+judgment_phase_at_end_of_turn_effect = "[at the end of this turn, trigger an additional {judgment_phase_name} phase]";
+multiply_energy_effect($n) = "[{multiply_by($n)} the amount of {energy_symbol} you have]";
+spend_all_energy_dissolve_effect = "[spend all your {energy_symbol}. {dissolve} an enemy with cost less than or equal to the amount spent]";
+spend_all_energy_draw_discard_effect = "[spend all your {energy_symbol}. Draw cards equal to the amount spent, then discard that many cards]";
+each_player_shuffles_and_draws_effect($c) = "[each player shuffles their hand and void into their deck and then draws {cards($c)}]";
+return_up_to_events_from_void_effect($n) = "[return {up_to_n_events($n)} from your void to your hand]";
 fast_prefix = "[{Fast} -- ]";
 
 
@@ -386,9 +386,9 @@ opponent_pays_cost($cost) = "[the opponent pays {$cost}]";
 pay_cost_effect($cost) = "[pay {$cost}]";
 
 
-opponent_gains_points_equal_spark = "[the opponent gains points equal to its spark.]";
-take_extra_turn_effect = "[take an extra turn after this one.]";
-you_win_the_game_effect = "[you win the game.]";
+opponent_gains_points_equal_spark = "[the opponent gains points equal to its spark]";
+take_extra_turn_effect = "[take an extra turn after this one]";
+you_win_the_game_effect = "[you win the game]";
 no_effect = "[]";
 
 
