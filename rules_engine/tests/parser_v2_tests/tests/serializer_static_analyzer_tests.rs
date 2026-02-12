@@ -47,7 +47,6 @@ struct Violation {
 #[derive(Debug, serde::Deserialize)]
 struct Baseline {
     max_allowed_legacy_helper_violations: usize,
-    max_allowed_resolve_rlf_violations: usize,
     max_allowed_trim_end_period_violations: usize,
     max_allowed_hardcoded_english_violations: usize,
     max_allowed_english_grammar_violations: usize,
@@ -122,26 +121,6 @@ fn check_legacy_helpers(filename: &str, content: &str) -> Vec<Violation> {
                     line_text: line.trim().to_string(),
                 });
             }
-        }
-    }
-    violations
-}
-
-/// Checks for `resolve_rlf` usage, which should be eliminated once all
-/// serializers produce fully-evaluated Phrases.
-fn check_resolve_rlf(filename: &str, content: &str) -> Vec<Violation> {
-    let mut violations = Vec::new();
-    for (line_number, line) in content.lines().enumerate() {
-        if is_comment_line(line) {
-            continue;
-        }
-        if line.contains("resolve_rlf(") || line.contains("resolve_rlf (") {
-            violations.push(Violation {
-                file: filename.to_string(),
-                line_number: line_number + 1,
-                rule: "resolve-rlf-usage",
-                line_text: line.trim().to_string(),
-            });
         }
     }
     violations
@@ -336,7 +315,6 @@ fn test_serializer_static_analyzer() {
     let baseline = load_baseline();
 
     let mut legacy_helper_violations = Vec::new();
-    let mut resolve_rlf_violations = Vec::new();
     let mut trim_end_period_violations = Vec::new();
     let mut hardcoded_english_violations = Vec::new();
     let mut english_grammar_violations = Vec::new();
@@ -344,7 +322,6 @@ fn test_serializer_static_analyzer() {
     for filename in SERIALIZER_FILES {
         let content = read_serializer_file(filename);
         legacy_helper_violations.extend(check_legacy_helpers(filename, &content));
-        resolve_rlf_violations.extend(check_resolve_rlf(filename, &content));
         trim_end_period_violations.extend(check_trim_end_period(filename, &content));
         hardcoded_english_violations.extend(check_hardcoded_english(filename, &content));
         english_grammar_violations.extend(check_english_grammar(filename, &content));
@@ -357,11 +334,6 @@ fn test_serializer_static_analyzer() {
         "  Legacy helper violations:    {} (max allowed: {})",
         legacy_helper_violations.len(),
         baseline.max_allowed_legacy_helper_violations
-    );
-    println!(
-        "  resolve_rlf violations:      {} (max allowed: {})",
-        resolve_rlf_violations.len(),
-        baseline.max_allowed_resolve_rlf_violations
     );
     println!(
         "  trim_end_matches violations: {} (max allowed: {})",
@@ -386,15 +358,6 @@ fn test_serializer_static_analyzer() {
             legacy_helper_violations.len(),
             baseline.max_allowed_legacy_helper_violations,
             format_violations(&legacy_helper_violations)
-        );
-    }
-
-    if resolve_rlf_violations.len() > baseline.max_allowed_resolve_rlf_violations {
-        panic!(
-            "resolve_rlf violations ({}) exceed baseline ({}):\n{}",
-            resolve_rlf_violations.len(),
-            baseline.max_allowed_resolve_rlf_violations,
-            format_violations(&resolve_rlf_violations)
         );
     }
 
@@ -444,23 +407,6 @@ fn example() {
         "Should detect exactly 4 legacy helper violations in seeded code, got: {violations:?}"
     );
     assert!(violations.iter().all(|v| v.rule == "banned-legacy-helper"));
-}
-
-/// Verifies that the detector catches resolve_rlf usage.
-#[test]
-fn test_seeded_resolve_rlf_detection() {
-    let seeded_code = r#"
-fn example() {
-    let result = resolve_rlf(&text);
-    SerializedAbility { text: resolve_rlf(&text) }
-}
-"#;
-    let violations = check_resolve_rlf("seeded_test.rs", seeded_code);
-    assert_eq!(
-        violations.len(),
-        2,
-        "Should detect exactly 2 resolve_rlf violations in seeded code, got: {violations:?}"
-    );
 }
 
 /// Verifies that the detector catches trim_end_matches('.') patterns.
@@ -541,7 +487,6 @@ fn example(s: &str) {
 fn test_comments_excluded() {
     let code_with_comments = r#"
 // text_phrase("commented out")
-// resolve_rlf(&text)
 // trim_end_matches('.')
 fn example() {
     // "allies".to_string()
@@ -549,7 +494,6 @@ fn example() {
 }
 "#;
     assert!(check_legacy_helpers("test.rs", code_with_comments).is_empty());
-    assert!(check_resolve_rlf("test.rs", code_with_comments).is_empty());
     assert!(check_trim_end_period("test.rs", code_with_comments).is_empty());
     assert!(check_hardcoded_english("test.rs", code_with_comments).is_empty());
 }

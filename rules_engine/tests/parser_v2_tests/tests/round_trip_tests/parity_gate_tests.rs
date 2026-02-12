@@ -1,10 +1,8 @@
-//! Parity gate test for the ability serializer's resolve_rlf compatibility
-//! guard.
+//! Parity regression test for the ability serializer.
 //!
-//! Verifies that phrase-based assembly produces output identical to the
-//! legacy RLF-resolution path for every ability in the full card corpus.
-//! Once this test passes, the `guard_resolve_rlf` compatibility shim can
-//! be safely deleted.
+//! Verifies that phrase-based assembly produces fully-resolved output
+//! (no unresolved RLF templates) for every ability in the full card corpus.
+//! This confirms that serialized text requires no further RLF evaluation.
 
 use std::collections::HashMap;
 
@@ -190,14 +188,14 @@ fn collect_test_dreamwell_parity(test_dreamwell_toml: &str, results: &mut Vec<Pa
     }
 }
 
-/// Parity gate: verifies that the serializer's phrase-based assembly produces
-/// output identical to RLF resolution for every ability in the full corpus.
+/// Regression test: verifies that the serializer's phrase-based assembly
+/// produces fully-resolved output for every ability in the full corpus.
 ///
-/// This test compares `serialize_ability().text` against the result of running
-/// `rlf::eval_str()` on that same text. Zero mismatches means the
-/// `guard_resolve_rlf` compatibility shim is safe to remove.
+/// Compares `serialize_ability().text` against the result of running
+/// `rlf::eval_str()` on that same text. Zero mismatches confirms that
+/// serialized output contains no unresolved RLF templates.
 #[test]
-fn test_parity_gate_serializer_vs_resolve_rlf() {
+fn test_parity_serializer_output_fully_resolved() {
     let cards_toml =
         std::fs::read_to_string("../../tabula/cards.toml").expect("Failed to read cards.toml");
     let dreamwell_toml = std::fs::read_to_string("../../tabula/dreamwell.toml")
@@ -236,11 +234,11 @@ fn test_parity_gate_serializer_vs_resolve_rlf() {
         }
         panic!(
             "{} parity mismatches found out of {total} abilities. \
-             All mismatches must be triaged before the resolve_rlf guard can be removed.",
+             Serialized output must equal RLF-resolved output for all abilities.",
             mismatches.len()
         );
     }
 
     assert!(total > 0, "No abilities were checked; corpus may be empty or unreadable");
-    println!("Parity gate PASSED: all {total} abilities match. The guard_resolve_rlf shim is safe to remove.");
+    println!("Parity regression PASSED: all {total} abilities produce fully-resolved output.");
 }
