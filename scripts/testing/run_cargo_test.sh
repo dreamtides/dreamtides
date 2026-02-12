@@ -67,7 +67,13 @@ if [ -n "${CARGO_TEST_THREADS:-}" ]; then
 fi
 
 if [ "${#TEST_ARGS[@]}" -gt 0 ] || [ "${#FILTER_ARGS[@]}" -gt 0 ]; then
-    CARGO_ARGS+=(-- "${TEST_ARGS[@]}" "${FILTER_ARGS[@]}")
+    CARGO_ARGS+=(--)
+    if [ "${#TEST_ARGS[@]}" -gt 0 ]; then
+        CARGO_ARGS+=("${TEST_ARGS[@]}")
+    fi
+    if [ "${#FILTER_ARGS[@]}" -gt 0 ]; then
+        CARGO_ARGS+=("${FILTER_ARGS[@]}")
+    fi
 fi
 
 output=$(cargo test "${CARGO_ARGS[@]}" 2>&1) || {
