@@ -57,6 +57,7 @@ struct TestDreamwellFile {
 enum Disposition {
     Match,
     Mismatch { serialized: String, resolved: String },
+    UnresolvedMarker { serialized: String, marker: String },
 }
 
 /// Result of a parity comparison for a single ability.
@@ -98,6 +99,14 @@ fn check_parity(
     };
 
     let serialized_text = ability_serializer::serialize_ability(&ability).text;
+
+    if let Some(marker) = find_unresolved_marker(&serialized_text) {
+        return Some(ParityResult {
+            card_name: name.to_string(),
+            ability_index,
+            disposition: Disposition::UnresolvedMarker { serialized: serialized_text, marker },
+        });
+    }
 
     strings::register_source_phrases();
     let resolved_text = rlf::with_locale(|locale| {
@@ -188,12 +197,27 @@ fn collect_test_dreamwell_parity(test_dreamwell_toml: &str, results: &mut Vec<Pa
     }
 }
 
+/// Detects unresolved RLF markers (`{@` or `{$`) in serialized output.
+///
+/// Returns the first marker found, or None if the output is clean.
+fn find_unresolved_marker(text: &str) -> Option<String> {
+    for marker in ["{@", "{$"] {
+        if let Some(pos) = text.find(marker) {
+            let end =
+                text[pos..].find('}').map(|i| pos + i + 1).unwrap_or(text.len().min(pos + 20));
+            return Some(text[pos..end].to_string());
+        }
+    }
+    None
+}
+
 /// Regression test: verifies that the serializer's phrase-based assembly
 /// produces fully-resolved output for every ability in the full corpus.
 ///
 /// Compares `serialize_ability().text` against the result of running
 /// `rlf::eval_str()` on that same text. Zero mismatches confirms that
-/// serialized output contains no unresolved RLF templates.
+/// serialized output contains no unresolved RLF templates. Also asserts
+/// that no unresolved RLF markers (`{@`, `{$`) remain in output.
 #[test]
 fn test_parity_serializer_output_fully_resolved() {
     let cards_toml =
@@ -212,6 +236,10 @@ fn test_parity_serializer_output_fully_resolved() {
     collect_test_dreamwell_parity(&test_dreamwell_toml, &mut results);
 
     let total = results.len();
+    let marker_failures: Vec<_> = results
+        .iter()
+        .filter(|r| matches!(r.disposition, Disposition::UnresolvedMarker { .. }))
+        .collect();
     let mismatches: Vec<_> =
         results.iter().filter(|r| matches!(r.disposition, Disposition::Mismatch { .. })).collect();
 
@@ -219,9 +247,26 @@ fn test_parity_serializer_output_fully_resolved() {
     println!("Parity Gate Results");
     println!("========================================");
     println!("Total abilities checked: {total}");
-    println!("Matches: {}", total - mismatches.len());
+    println!("Matches: {}", total - mismatches.len() - marker_failures.len());
     println!("Mismatches: {}", mismatches.len());
+    println!("Unresolved markers: {}", marker_failures.len());
     println!("========================================\n");
+
+    if !marker_failures.is_empty() {
+        for m in &marker_failures {
+            if let Disposition::UnresolvedMarker { serialized, marker } = &m.disposition {
+                eprintln!(
+                    "UNRESOLVED MARKER: {}|{}| marker: {marker:?}\n  serialized: {serialized:?}",
+                    m.card_name, m.ability_index
+                );
+            }
+        }
+        panic!(
+            "{} unresolved RLF markers found out of {total} abilities. \
+             Serialized output must not contain {{@}} or {{$}} markers.",
+            marker_failures.len()
+        );
+    }
 
     if !mismatches.is_empty() {
         for m in &mismatches {

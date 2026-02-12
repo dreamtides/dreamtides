@@ -3,6 +3,6 @@
 # They must never increase. Migration tasks should decrease them toward zero.
 
 max_allowed_legacy_helper_violations = 0
-max_allowed_trim_end_period_violations = 14
-max_allowed_hardcoded_english_violations = 3
+max_allowed_trim_end_period_violations = 0
+max_allowed_hardcoded_english_violations = 0
 max_allowed_english_grammar_violations = 0

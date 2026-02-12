@@ -39,6 +39,12 @@ rlf::rlf! {
     materialized_dissolved = "\u{25B8} <b>Materialized, Dissolved:</b>";
     // Bold judgment phase name for card text references.
     judgment_phase_name = "<b>Judgment</b>";
+    // Bare keyword name for Judgment (used in multi-keyword fallback).
+    judgment_keyword_name = "Judgment";
+    // Bare keyword name for Materialized (used in multi-keyword fallback).
+    materialized_keyword_name = "Materialized";
+    // Bare keyword name for Dissolved (used in multi-keyword fallback).
+    dissolved_keyword_name = "Dissolved";
 
     // =========================================================================
     // Keywords
@@ -868,10 +874,10 @@ rlf::rlf! {
     allied_event = :an{ one: "allied event", other: "allied events" };
     // Other character noun with article metadata.
     other_character = :an{ one: "other character", other: "other characters" };
-    // Allied predicate noun inheriting article metadata from base.
-    allied_pred($base) = :an "allied {$base}";
-    // Enemy predicate noun inheriting article metadata from base.
-    enemy_pred($base) = :an "enemy {$base}";
+    // Allied predicate noun inheriting agreement metadata from base.
+    allied_pred($base) = :from($base) "allied {$base}";
+    // Enemy predicate noun inheriting agreement metadata from base.
+    enemy_pred($base) = :from($base) "enemy {$base}";
     // Predicate noun in your void location.
     in_your_void($target) = :from($target) "{$target} in your void";
     // Predicate noun in the opponent's void location.

@@ -93,17 +93,17 @@ fn serialize_keyword_trigger(keywords: &[TriggerKeyword]) -> String {
         }
         _ => {
             let keyword_text =
-                keywords.iter().map(|k| serialize_keyword_name(k)).collect::<Vec<_>>().join(", ");
+                keywords.iter().map(serialize_keyword_name).collect::<Vec<_>>().join(", ");
             strings::trigger(keyword_text).to_string()
         }
     }
 }
 
 /// Returns the display name for a trigger keyword.
-fn serialize_keyword_name(keyword: &TriggerKeyword) -> &'static str {
+fn serialize_keyword_name(keyword: &TriggerKeyword) -> String {
     match keyword {
-        TriggerKeyword::Judgment => "Judgment",
-        TriggerKeyword::Materialized => "Materialized",
-        TriggerKeyword::Dissolved => "Dissolved",
+        TriggerKeyword::Judgment => strings::judgment_keyword_name().to_string(),
+        TriggerKeyword::Materialized => strings::materialized_keyword_name().to_string(),
+        TriggerKeyword::Dissolved => strings::dissolved_keyword_name().to_string(),
     }
 }

@@ -18,6 +18,9 @@ dissolved = "[▸ <b>Dissolved:</b>]";
 materialized_judgment = "[▸ <b>Materialized, Judgment:</b>]";
 materialized_dissolved = "[▸ <b>Materialized, Dissolved:</b>]";
 judgment_phase_name = "[<b>Judgment</b>]";
+judgment_keyword_name = "[Judgment]";
+materialized_keyword_name = "[Materialized]";
+dissolved_keyword_name = "[Dissolved]";
 
 
 keyword($k) = "[<color=#AA00FF>{$k}</color>]";
@@ -440,8 +443,8 @@ enemy_events_plural = "[enemy events]";
 allied_character = :an{ one: "[allied character]", other: "[allied characters]" };
 allied_event = :an{ one: "[allied event]", other: "[allied events]" };
 other_character = :an{ one: "[other character]", other: "[other characters]" };
-allied_pred($base) = :an "[allied {$base}]";
-enemy_pred($base) = :an "[enemy {$base}]";
+allied_pred($base) = :from($base) "[allied {$base}]";
+enemy_pred($base) = :from($base) "[enemy {$base}]";
 in_your_void($target) = :from($target) "[{$target} in your void]";
 in_opponent_void($target) = :from($target) "[{$target} in the opponent's void]";
 in_your_hand($target) = :from($target) "[{$target} in your hand]";

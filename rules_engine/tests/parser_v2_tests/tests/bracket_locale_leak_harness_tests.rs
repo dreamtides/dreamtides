@@ -353,6 +353,76 @@ fn write_leak_trend_artifact(
     artifact_path
 }
 
+/// Detects unresolved RLF markers (`{@` or `{$`) in serialized text.
+///
+/// Returns the first marker found, or None if the text is clean.
+fn find_unresolved_marker(text: &str) -> Option<String> {
+    for marker in ["{@", "{$"] {
+        if let Some(pos) = text.find(marker) {
+            let end =
+                text[pos..].find('}').map(|i| pos + i + 1).unwrap_or(text.len().min(pos + 20));
+            return Some(text[pos..end].to_string());
+        }
+    }
+    None
+}
+
+/// Verifies that no serialized ability output in the full card corpus
+/// contains unresolved RLF markers (`{@` or `{$`). Runs in the default
+/// English locale.
+#[test]
+fn test_no_unresolved_markers_in_serialized_output() {
+    let cards_toml = std::fs::read_to_string(CARDS_TOML_PATH).expect("Failed to read cards.toml");
+    let cards_file: CardsFile = toml::from_str(&cards_toml).expect("Failed to parse cards.toml");
+
+    let test_cards_toml =
+        std::fs::read_to_string(TEST_CARDS_TOML_PATH).expect("Failed to read test-cards.toml");
+    let test_cards_file: TestCardsFile =
+        toml::from_str(&test_cards_toml).expect("Failed to parse test-cards.toml");
+
+    let mut marker_violations = Vec::new();
+    let mut total_abilities = 0usize;
+
+    for (cards, source) in [
+        (cards_file.cards.as_slice(), "cards.toml"),
+        (test_cards_file.test_cards.as_slice(), "test-cards.toml"),
+    ] {
+        for card in cards {
+            let Some(rules_text) = &card.rules_text else { continue };
+            let variables = card.variables.as_deref().unwrap_or("");
+            for (ability_index, ability_block) in rules_text.split("\n\n").enumerate() {
+                let ability_block = ability_block.trim();
+                if ability_block.is_empty() {
+                    continue;
+                }
+                total_abilities += 1;
+                let rendered = match render_ability(ability_block, variables) {
+                    Ok(r) => r,
+                    Err(_) => continue,
+                };
+                if let Some(marker) = find_unresolved_marker(&rendered) {
+                    marker_violations.push(format!(
+                        "- {source} | {} | ability #{ability_index} | marker: {marker:?} | rendered: {rendered:?}",
+                        card.name
+                    ));
+                }
+            }
+        }
+    }
+
+    println!(
+        "Unresolved marker check: scanned {total_abilities} abilities, found {} violations",
+        marker_violations.len()
+    );
+
+    assert!(
+        marker_violations.is_empty(),
+        "Found {} unresolved RLF markers in serialized output:\n{}",
+        marker_violations.len(),
+        marker_violations.iter().take(MAX_REPORTED_ISSUES).cloned().collect::<Vec<_>>().join("\n")
+    );
+}
+
 #[test]
 fn test_full_card_bracket_locale_leak_detector() {
     let baseline = load_baseline();
