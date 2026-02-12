@@ -51,30 +51,30 @@ fn serialize_predicate_count(count: u32, predicate: &Predicate) -> Phrase {
             strings::with_count_allied_subtype(count, serializer_utils::subtype_to_phrase(*subtype))
         }
         Predicate::Another(CardPredicate::Character) => strings::with_count_allies(count),
-        Predicate::Another(card_predicate) => predicate_serializer::serialize_predicate_plural(
-            &Predicate::Another(card_predicate.clone()),
-        ),
-        Predicate::This => predicate_serializer::serialize_predicate_plural(predicate),
-        Predicate::It => predicate_serializer::serialize_predicate_plural(predicate),
-        Predicate::Them => predicate_serializer::serialize_predicate_plural(predicate),
-        Predicate::That => predicate_serializer::serialize_predicate_plural(predicate),
-        Predicate::Enemy(card_predicate) => predicate_serializer::serialize_predicate_plural(
-            &Predicate::Enemy(card_predicate.clone()),
-        ),
-        Predicate::Your(card_predicate) => predicate_serializer::serialize_predicate_plural(
-            &Predicate::Your(card_predicate.clone()),
-        ),
-        Predicate::Any(card_predicate) => predicate_serializer::serialize_predicate_plural(
-            &Predicate::Any(card_predicate.clone()),
-        ),
-        Predicate::AnyOther(card_predicate) => predicate_serializer::serialize_predicate_plural(
-            &Predicate::AnyOther(card_predicate.clone()),
-        ),
-        Predicate::YourVoid(card_predicate) => predicate_serializer::serialize_predicate_plural(
-            &Predicate::YourVoid(card_predicate.clone()),
-        ),
-        Predicate::EnemyVoid(card_predicate) => predicate_serializer::serialize_predicate_plural(
-            &Predicate::EnemyVoid(card_predicate.clone()),
-        ),
+        Predicate::Another(card_predicate) => {
+            predicate_serializer::serialize_predicate(&Predicate::Another(card_predicate.clone()))
+        }
+        Predicate::This => predicate_serializer::serialize_predicate(predicate),
+        Predicate::It => predicate_serializer::serialize_predicate(predicate),
+        Predicate::Them => predicate_serializer::serialize_predicate(predicate),
+        Predicate::That => predicate_serializer::serialize_predicate(predicate),
+        Predicate::Enemy(card_predicate) => {
+            predicate_serializer::serialize_predicate(&Predicate::Enemy(card_predicate.clone()))
+        }
+        Predicate::Your(card_predicate) => {
+            predicate_serializer::serialize_predicate(&Predicate::Your(card_predicate.clone()))
+        }
+        Predicate::Any(card_predicate) => {
+            predicate_serializer::serialize_predicate(&Predicate::Any(card_predicate.clone()))
+        }
+        Predicate::AnyOther(card_predicate) => {
+            predicate_serializer::serialize_predicate(&Predicate::AnyOther(card_predicate.clone()))
+        }
+        Predicate::YourVoid(card_predicate) => {
+            predicate_serializer::serialize_predicate(&Predicate::YourVoid(card_predicate.clone()))
+        }
+        Predicate::EnemyVoid(card_predicate) => {
+            predicate_serializer::serialize_predicate(&Predicate::EnemyVoid(card_predicate.clone()))
+        }
     }
 }

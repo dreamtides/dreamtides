@@ -8,10 +8,10 @@ use crate::serializer::predicate_serializer;
 pub fn serialize_cost(cost: &Cost) -> String {
     match cost {
         Cost::AbandonCharactersCount { target, count } => match count {
-            CollectionExpression::AnyNumberOf => strings::abandon_any_number_of(
-                predicate_serializer::serialize_predicate_plural(target),
-            )
-            .to_string(),
+            CollectionExpression::AnyNumberOf => {
+                strings::abandon_any_number_of(predicate_serializer::serialize_predicate(target))
+                    .to_string()
+            }
             CollectionExpression::Exactly(1) => {
                 strings::abandon_target(predicate_serializer::serialize_predicate(target))
                     .to_string()
@@ -50,11 +50,10 @@ pub fn serialize_cost(cost: &Cost) -> String {
                 strings::return_target_to_hand(predicate_serializer::serialize_predicate(target))
                     .to_string()
             }
-            CollectionExpression::Exactly(n) => strings::return_count_to_hand(
-                *n,
-                predicate_serializer::serialize_predicate_plural(target),
-            )
-            .to_string(),
+            CollectionExpression::Exactly(n) => {
+                strings::return_count_to_hand(*n, predicate_serializer::serialize_predicate(target))
+                    .to_string()
+            }
             CollectionExpression::AllButOne => strings::return_all_but_one_to_hand(
                 predicate_serializer::predicate_base_phrase(target),
             )
@@ -67,18 +66,17 @@ pub fn serialize_cost(cost: &Cost) -> String {
                 predicate_serializer::serialize_predicate(target),
             )
             .to_string(),
-            CollectionExpression::UpTo(n) => strings::return_up_to_to_hand(
-                *n,
-                predicate_serializer::serialize_predicate_plural(target),
-            )
-            .to_string(),
+            CollectionExpression::UpTo(n) => {
+                strings::return_up_to_to_hand(*n, predicate_serializer::serialize_predicate(target))
+                    .to_string()
+            }
             CollectionExpression::EachOther => strings::return_each_other_to_hand(
                 predicate_serializer::serialize_predicate(target),
             )
             .to_string(),
             CollectionExpression::OrMore(n) => strings::return_or_more_to_hand(
                 *n,
-                predicate_serializer::serialize_predicate_plural(target),
+                predicate_serializer::serialize_predicate(target),
             )
             .to_string(),
         },

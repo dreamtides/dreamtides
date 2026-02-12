@@ -111,7 +111,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::EachMatchingGainsSparkForEach { each, for_each, .. } => {
             strings::each_gains_spark_equal_to(
                 serialize_allied_card_predicate(each),
-                serialize_allied_card_predicate_plural(for_each),
+                serialize_allied_card_predicate(for_each),
             )
             .to_string()
         }
@@ -139,7 +139,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             } else {
                 strings::put_up_to_from_void_on_top_of_deck(
                     *count,
-                    predicate_serializer::serialize_card_predicate_plural_phrase(matching),
+                    predicate_serializer::serialize_card_predicate_phrase(matching),
                 )
                 .to_string()
             }
@@ -185,12 +185,12 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             )
             .to_string(),
             CollectionExpression::AnyNumberOf => strings::banish_then_materialize_any_number(
-                predicate_serializer::serialize_predicate_plural(target),
+                predicate_serializer::serialize_predicate(target),
             )
             .to_string(),
             CollectionExpression::UpTo(n) => strings::banish_then_materialize_up_to(
                 *n,
-                predicate_serializer::serialize_predicate_plural(target),
+                predicate_serializer::serialize_predicate(target),
             )
             .to_string(),
             _ => strings::banish_then_materialize_them(predicate_serializer::serialize_predicate(
@@ -241,7 +241,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                 (_, QuantityExpression::Matching(predicate)) => {
                     strings::materialize_copies_equal_to_matching(
                         predicate_serializer::serialize_predicate(target),
-                        predicate_serializer::serialize_predicate_plural(predicate),
+                        predicate_serializer::serialize_predicate(predicate),
                     )
                     .to_string()
                 }
@@ -382,7 +382,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         }
         StandardEffect::DissolveCharactersQuantity { target, quantity } => {
             strings::dissolve_all_with_cost_lte_quantity(
-                predicate_serializer::serialize_predicate_plural(target),
+                predicate_serializer::serialize_predicate(target),
                 serialize_for_count_expression(quantity),
             )
             .to_string()
@@ -652,19 +652,18 @@ pub fn serialize_effect_fragment(effect: &Effect) -> String {
 fn serialize_collection_target(collection: &CollectionExpression, target: &Predicate) -> Phrase {
     match collection {
         CollectionExpression::All => {
-            strings::collection_all(predicate_serializer::serialize_predicate_plural(target))
+            strings::collection_all(predicate_serializer::serialize_predicate(target))
         }
         CollectionExpression::Exactly(1) => predicate_serializer::serialize_predicate(target),
-        CollectionExpression::Exactly(n) => strings::collection_exactly(
-            *n,
-            predicate_serializer::serialize_predicate_plural(target),
-        ),
-        CollectionExpression::UpTo(n) => {
-            strings::collection_up_to(*n, predicate_serializer::serialize_predicate_plural(target))
+        CollectionExpression::Exactly(n) => {
+            strings::collection_exactly(*n, predicate_serializer::serialize_predicate(target))
         }
-        CollectionExpression::AnyNumberOf => strings::collection_any_number_of(
-            predicate_serializer::serialize_predicate_plural(target),
-        ),
+        CollectionExpression::UpTo(n) => {
+            strings::collection_up_to(*n, predicate_serializer::serialize_predicate(target))
+        }
+        CollectionExpression::AnyNumberOf => {
+            strings::collection_any_number_of(predicate_serializer::serialize_predicate(target))
+        }
         _ => predicate_serializer::serialize_predicate(target),
     }
 }
@@ -675,18 +674,6 @@ fn serialize_allied_card_predicate(card_predicate: &CardPredicate) -> Phrase {
             strings::allied_card_with_subtype(serializer_utils::subtype_to_phrase(*subtype))
         }
         _ => strings::allied_card_with_base(predicate_serializer::base_card_text(card_predicate)),
-    }
-}
-
-/// Serialize an allied card predicate in plural form for counting contexts.
-fn serialize_allied_card_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
-    match card_predicate {
-        CardPredicate::CharacterType(subtype) => {
-            strings::allied_card_with_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
-        }
-        _ => strings::allied_card_with_base_plural(predicate_serializer::base_card_text_plural(
-            card_predicate,
-        )),
     }
 }
 
@@ -793,24 +780,24 @@ fn serialize_void_collection_subject(
             (strings::void_subject_single(predicate_text), true)
         }
         CollectionExpression::Exactly(n) => {
-            let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
+            let pred = predicate_serializer::serialize_card_predicate_phrase(predicate);
             (strings::void_subject_exactly(*n, pred), false)
         }
         CollectionExpression::All => (strings::void_subject_all(), false),
         CollectionExpression::AllButOne => {
-            let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
+            let pred = predicate_serializer::serialize_card_predicate_phrase(predicate);
             (strings::void_subject_all_but_one(pred), false)
         }
         CollectionExpression::UpTo(n) => {
-            let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
+            let pred = predicate_serializer::serialize_card_predicate_phrase(predicate);
             (strings::void_subject_up_to(*n, pred), false)
         }
         CollectionExpression::AnyNumberOf => {
-            let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
+            let pred = predicate_serializer::serialize_card_predicate_phrase(predicate);
             (strings::void_subject_any_number(pred), false)
         }
         CollectionExpression::OrMore(n) => {
-            let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
+            let pred = predicate_serializer::serialize_card_predicate_phrase(predicate);
             (strings::void_subject_or_more(*n, pred), false)
         }
         CollectionExpression::EachOther => (strings::void_subject_each_other(), true),

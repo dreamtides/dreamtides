@@ -1,62 +1,38 @@
+use std::collections::HashMap;
+
 use ability_data::predicate::{CardPredicate, Predicate};
-use rlf::Phrase;
+use rlf::{Phrase, VariantKey};
 use strings::strings;
 
 use crate::serializer::serializer_utils;
 
-/// Serializes a predicate to a Phrase.
+/// Serializes a predicate to a variant-aware Phrase carrying both singular and
+/// plural forms. Callers that need plural select the `:other` variant via RLF
+/// templates.
 pub fn serialize_predicate(predicate: &Predicate) -> Phrase {
     match predicate {
         Predicate::This => strings::this_character(),
         Predicate::That => strings::that_character(),
         Predicate::Them => strings::pronoun_them(),
         Predicate::It => strings::pronoun_it(),
-        Predicate::Your(card_predicate) => {
-            if let CardPredicate::CharacterType(subtype) = card_predicate {
-                strings::predicate_with_indefinite_article(strings::subtype(
-                    serializer_utils::subtype_to_phrase(*subtype),
-                ))
-            } else {
-                serialize_card_predicate(card_predicate)
-            }
-        }
-        Predicate::Another(card_predicate) => {
-            strings::predicate_with_indefinite_article(your_predicate_formatted(card_predicate))
-        }
+        Predicate::Your(card_predicate) => serialize_your_predicate(card_predicate),
+        Predicate::Another(card_predicate) => phrase_with_variants(
+            strings::predicate_with_indefinite_article(your_predicate_formatted(card_predicate)),
+            serialize_your_predicate_plural(card_predicate),
+        ),
         Predicate::Any(card_predicate) => serialize_card_predicate(card_predicate),
-        Predicate::Enemy(card_predicate) => {
-            strings::predicate_with_indefinite_article(enemy_predicate_formatted(card_predicate))
-        }
+        Predicate::Enemy(card_predicate) => phrase_with_variants(
+            strings::predicate_with_indefinite_article(enemy_predicate_formatted(card_predicate)),
+            serialize_enemy_predicate_plural(card_predicate),
+        ),
         Predicate::YourVoid(card_predicate) => {
-            strings::in_your_void(serialize_card_predicate_plural(card_predicate))
+            strings::in_your_void(serialize_card_predicate(card_predicate))
         }
         Predicate::EnemyVoid(card_predicate) => {
-            strings::in_opponent_void(serialize_card_predicate_plural(card_predicate))
+            strings::in_opponent_void(serialize_card_predicate(card_predicate))
         }
         Predicate::AnyOther(card_predicate) => {
             strings::another_pred(card_predicate_base_phrase(card_predicate))
-        }
-    }
-}
-
-/// Serializes a predicate in plural form.
-pub fn serialize_predicate_plural(predicate: &Predicate) -> Phrase {
-    match predicate {
-        Predicate::Another(card_predicate) => serialize_your_predicate_plural(card_predicate),
-        Predicate::Any(card_predicate) => serialize_card_predicate_plural(card_predicate),
-        Predicate::Your(card_predicate) => serialize_your_predicate_plural(card_predicate),
-        Predicate::Enemy(card_predicate) => serialize_enemy_predicate_plural(card_predicate),
-        Predicate::YourVoid(card_predicate) => {
-            strings::in_your_void(serialize_card_predicate_plural(card_predicate))
-        }
-        Predicate::EnemyVoid(card_predicate) => {
-            strings::in_opponent_void(serialize_card_predicate_plural(card_predicate))
-        }
-        Predicate::This => strings::these_characters(),
-        Predicate::That => strings::those_characters(),
-        Predicate::Them | Predicate::It => strings::pronoun_them(),
-        Predicate::AnyOther(card_predicate) => {
-            strings::other_pred_plural(card_predicate_base_phrase(card_predicate))
         }
     }
 }
@@ -115,10 +91,10 @@ pub(super) fn predicate_base_phrase(predicate: &Predicate) -> Phrase {
             _ => enemy_predicate_formatted(card_predicate),
         },
         Predicate::YourVoid(card_predicate) => {
-            strings::in_your_void(serialize_card_predicate_plural(card_predicate))
+            strings::in_your_void(serialize_card_predicate(card_predicate))
         }
         Predicate::EnemyVoid(card_predicate) => {
-            strings::in_opponent_void(serialize_card_predicate_plural(card_predicate))
+            strings::in_opponent_void(serialize_card_predicate(card_predicate))
         }
         Predicate::AnyOther(card_predicate) => {
             strings::another_pred(card_predicate_base_phrase(card_predicate))
@@ -129,11 +105,6 @@ pub(super) fn predicate_base_phrase(predicate: &Predicate) -> Phrase {
 /// Serializes a card predicate with an article.
 pub(super) fn serialize_card_predicate_phrase(card_predicate: &CardPredicate) -> Phrase {
     serialize_card_predicate(card_predicate)
-}
-
-/// Serializes a card predicate in plural form.
-pub(super) fn serialize_card_predicate_plural_phrase(card_predicate: &CardPredicate) -> Phrase {
-    serialize_card_predicate_plural(card_predicate)
 }
 
 /// Serializes a card predicate without an article.
@@ -149,11 +120,6 @@ pub(super) fn base_card_phrase(predicate: &CardPredicate) -> Phrase {
 /// Returns the base noun text for a card predicate without an article.
 pub(super) fn base_card_text(predicate: &CardPredicate) -> String {
     card_predicate_base_phrase(predicate).to_string()
-}
-
-/// Returns the plural base noun text for a card predicate.
-pub(super) fn base_card_text_plural(predicate: &CardPredicate) -> String {
-    card_predicate_base_phrase_plural(predicate).to_string()
 }
 
 /// Serializes a predicate for "for each" contexts.
@@ -209,9 +175,7 @@ fn serialize_card_predicate(card_predicate: &CardPredicate) -> Phrase {
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
             strings::pred_with_constraint(
                 serialize_card_predicate(target),
-                strings::with_cost_less_than_allied_count(serialize_card_predicate_plural(
-                    count_matching,
-                )),
+                strings::with_cost_less_than_allied_count(serialize_card_predicate(count_matching)),
             )
         }
         CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
@@ -268,86 +232,6 @@ fn serialize_card_predicate_without_article(card_predicate: &CardPredicate) -> P
             )
         }
         _ => serialize_card_predicate(card_predicate),
-    }
-}
-
-/// Serializes a card predicate in plural form.
-fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
-    match card_predicate {
-        CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
-            card_predicate_base_phrase_plural(card_predicate)
-        }
-        CardPredicate::CharacterType(subtype) => {
-            strings::subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
-        }
-        CardPredicate::NotCharacterType(subtype) => {
-            strings::characters_not_subtype(serializer_utils::subtype_to_phrase(*subtype))
-        }
-        CardPredicate::CharacterWithSpark(spark, operator) => strings::pred_with_constraint(
-            strings::characters_plural(),
-            strings::with_spark_constraint(serializer_utils::serialize_operator(operator), spark.0),
-        ),
-        CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
-            strings::pred_with_constraint(
-                serialize_card_predicate_plural(target),
-                strings::with_cost_less_than_allied_count(serialize_card_predicate_plural(
-                    count_matching,
-                )),
-            )
-        }
-        CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
-            strings::pred_with_constraint(
-                serialize_card_predicate_plural(target),
-                strings::with_cost_less_than_abandoned_ally_constraint(),
-            )
-        }
-        CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
-            strings::pred_with_constraint(
-                serialize_card_predicate_plural(target),
-                strings::with_spark_less_than_abandoned_ally_constraint(),
-            )
-        }
-        CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
-            strings::pred_with_constraint(
-                serialize_card_predicate_plural(target),
-                strings::with_spark_less_than_abandoned_count_this_turn_constraint(),
-            )
-        }
-        CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
-            strings::pred_with_constraint(
-                serialize_card_predicate_plural(target),
-                strings::with_cost_less_than_void_count_constraint(),
-            )
-        }
-        CardPredicate::Fast { target } => {
-            strings::fast_predicate(serialize_card_predicate_plural(target))
-        }
-        CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            strings::pred_with_constraint(
-                serialize_card_predicate_plural(target),
-                strings::with_cost_constraint(
-                    serializer_utils::serialize_operator(cost_operator),
-                    cost.0,
-                ),
-            )
-        }
-        CardPredicate::CharacterWithMaterializedAbility => strings::pred_with_constraint(
-            strings::characters_plural(),
-            strings::with_materialized_abilities_constraint(),
-        ),
-        CardPredicate::CharacterWithMultiActivatedAbility => strings::pred_with_constraint(
-            strings::characters_plural(),
-            strings::with_activated_abilities_constraint(),
-        ),
-        CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
-            strings::pred_with_constraint(
-                serialize_card_predicate_plural(target),
-                strings::with_spark_less_than_energy_paid_constraint(),
-            )
-        }
-        CardPredicate::CouldDissolve { target } => {
-            strings::events_could_dissolve_target(predicate_base_phrase(target))
-        }
     }
 }
 
@@ -430,25 +314,34 @@ fn card_predicate_base_phrase(predicate: &CardPredicate) -> Phrase {
     }
 }
 
-/// Returns the plural base noun phrase for a card predicate.
-fn card_predicate_base_phrase_plural(predicate: &CardPredicate) -> Phrase {
-    match predicate {
-        CardPredicate::Card => strings::cards_plural(),
-        CardPredicate::Character => strings::characters_plural(),
-        CardPredicate::Event => strings::events_plural(),
-        CardPredicate::CharacterType(subtype) => {
-            strings::subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
+/// Serializes a Your predicate, returning a variant-aware phrase.
+///
+/// For simple types (Character, Card, Event, CharacterType), the phrase is
+/// natively variant-aware via your_generic_* helpers. For compound predicates,
+/// the singular uses the generic `serialize_card_predicate` (matching Any
+/// behavior) and the plural uses `serialize_your_predicate_plural` (adding
+/// "ally"/"allied" ownership). These are packaged via `with_plural`.
+fn serialize_your_predicate(card_predicate: &CardPredicate) -> Phrase {
+    match card_predicate {
+        CardPredicate::Character => {
+            strings::predicate_with_indefinite_article(strings::your_generic_character())
         }
-        CardPredicate::NotCharacterType(subtype) => {
-            strings::characters_not_subtype(serializer_utils::subtype_to_phrase(*subtype))
+        CardPredicate::Card => {
+            strings::predicate_with_indefinite_article(strings::your_generic_card())
         }
-        CardPredicate::Fast { target } => card_predicate_base_phrase_plural(target),
-        CardPredicate::CardWithCost { target, .. } => card_predicate_base_phrase_plural(target),
-        CardPredicate::CharacterWithSpark(..) => strings::characters_plural(),
-        CardPredicate::CharacterWithMaterializedAbility => strings::characters_plural(),
-        CardPredicate::CharacterWithMultiActivatedAbility => strings::characters_plural(),
-        CardPredicate::CouldDissolve { .. } => strings::events_plural(),
-        _ => strings::characters_plural(),
+        CardPredicate::Event => {
+            strings::predicate_with_indefinite_article(strings::your_generic_event())
+        }
+        CardPredicate::CharacterType(subtype) => strings::predicate_with_indefinite_article(
+            strings::your_generic_subtype(serializer_utils::subtype_to_phrase(*subtype)),
+        ),
+        CardPredicate::CouldDissolve { target } => strings::predicate_with_indefinite_article(
+            strings::could_dissolve_target(serialize_predicate(target)),
+        ),
+        _ => strings::with_plural(
+            serialize_card_predicate(card_predicate),
+            serialize_your_predicate_plural(card_predicate),
+        ),
     }
 }
 
@@ -488,9 +381,7 @@ fn your_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
             strings::pred_with_constraint(
                 your_predicate_formatted(target),
-                strings::with_cost_less_than_allied_count(serialize_card_predicate_plural(
-                    count_matching,
-                )),
+                strings::with_cost_less_than_allied_count(serialize_card_predicate(count_matching)),
             )
         }
         CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
@@ -561,9 +452,7 @@ fn enemy_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
             strings::pred_with_constraint(
                 enemy_predicate_formatted(target),
-                strings::with_cost_less_than_allied_count(serialize_card_predicate_plural(
-                    count_matching,
-                )),
+                strings::with_cost_less_than_allied_count(serialize_card_predicate(count_matching)),
             )
         }
         CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
@@ -604,33 +493,43 @@ fn enemy_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
     }
 }
 
-/// Serializes a "your" card predicate in plural form.
+/// Returns a phrase whose default text is the plural form of a "your"
+/// predicate. Used as the `$other` argument to `with_plural`.
 fn serialize_your_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
-        CardPredicate::Character => strings::allies_plural(),
-        CardPredicate::Card => strings::your_cards_plural(),
-        CardPredicate::Event => strings::your_events_plural(),
-        CardPredicate::CharacterType(subtype) => {
-            strings::allied_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
-        }
+        CardPredicate::Character => strings::as_plural(strings::ally()),
+        CardPredicate::Card => strings::as_plural(strings::your_card()),
+        CardPredicate::Event => strings::as_plural(strings::your_event()),
+        CardPredicate::CharacterType(subtype) => strings::as_plural(
+            strings::allied_card_with_subtype(serializer_utils::subtype_to_phrase(*subtype)),
+        ),
         CardPredicate::Fast { target } => {
-            strings::fast_predicate(serialize_card_predicate_plural(target))
+            strings::fast_predicate_plural(serialize_card_predicate_plural_text(target))
         }
         CardPredicate::NotCharacterType(subtype) => {
-            strings::allies_not_subtype(serializer_utils::subtype_to_phrase(*subtype))
+            strings::ally_not_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
         }
-        CardPredicate::CharacterWithSpark(spark, operator) => strings::pred_with_constraint(
-            strings::allies_plural(),
-            strings::with_spark_constraint(serializer_utils::serialize_operator(operator), spark.0),
-        ),
-        CardPredicate::CharacterWithMaterializedAbility => strings::pred_with_constraint(
-            strings::allies_plural(),
-            strings::with_materialized_abilities_constraint(),
-        ),
-        CardPredicate::CharacterWithMultiActivatedAbility => strings::pred_with_constraint(
-            strings::allies_plural(),
-            strings::with_activated_abilities_constraint(),
-        ),
+        CardPredicate::CharacterWithSpark(spark, operator) => {
+            strings::as_plural(strings::pred_with_constraint(
+                strings::ally(),
+                strings::with_spark_constraint(
+                    serializer_utils::serialize_operator(operator),
+                    spark.0,
+                ),
+            ))
+        }
+        CardPredicate::CharacterWithMaterializedAbility => {
+            strings::as_plural(strings::pred_with_constraint(
+                strings::ally(),
+                strings::with_materialized_abilities_constraint(),
+            ))
+        }
+        CardPredicate::CharacterWithMultiActivatedAbility => {
+            strings::as_plural(strings::pred_with_constraint(
+                strings::ally(),
+                strings::with_activated_abilities_constraint(),
+            ))
+        }
         CardPredicate::CardWithCost { target, cost_operator, cost } => {
             strings::pred_with_constraint(
                 serialize_your_predicate_plural(target),
@@ -643,9 +542,7 @@ fn serialize_your_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
             strings::pred_with_constraint(
                 serialize_your_predicate_plural(target),
-                strings::with_cost_less_than_allied_count(serialize_card_predicate_plural(
-                    count_matching,
-                )),
+                strings::with_cost_less_than_allied_count(serialize_card_predicate(count_matching)),
             )
         }
         CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
@@ -679,21 +576,155 @@ fn serialize_your_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
             )
         }
         CardPredicate::CouldDissolve { target } => {
-            strings::your_events_could_dissolve(serialize_predicate(target))
+            strings::your_event_could_dissolve_plural(serialize_predicate(target))
         }
     }
 }
 
-/// Serializes an "enemy" card predicate in plural form.
+/// Returns a phrase whose default text is the plural form of an "enemy"
+/// predicate.
 fn serialize_enemy_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
-        CardPredicate::Character => strings::enemies_plural(),
-        CardPredicate::Card => strings::enemy_cards_plural(),
-        CardPredicate::Event => strings::enemy_events_plural(),
+        CardPredicate::Character => strings::as_plural(strings::enemy()),
+        CardPredicate::Card => strings::as_plural(strings::enemy_card()),
+        CardPredicate::Event => strings::as_plural(strings::enemy_event()),
         CardPredicate::CharacterType(subtype) => {
             strings::enemy_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
         }
-        _ => strings::enemy_pred(serialize_card_predicate_plural(card_predicate)),
+        CardPredicate::NotCharacterType(subtype) => {
+            strings::non_subtype_enemy_plural(serializer_utils::subtype_to_phrase(*subtype))
+        }
+        CardPredicate::Fast { target } => {
+            strings::fast_predicate_plural(serialize_card_predicate_plural_text(target))
+        }
+        CardPredicate::CharacterWithSpark(spark, operator) => {
+            strings::as_plural(strings::pred_with_constraint(
+                strings::enemy(),
+                strings::with_spark_constraint(
+                    serializer_utils::serialize_operator(operator),
+                    spark.0,
+                ),
+            ))
+        }
+        CardPredicate::CharacterWithMaterializedAbility => {
+            strings::as_plural(strings::pred_with_constraint(
+                strings::enemy(),
+                strings::with_materialized_abilities_constraint(),
+            ))
+        }
+        CardPredicate::CharacterWithMultiActivatedAbility => {
+            strings::as_plural(strings::pred_with_constraint(
+                strings::enemy(),
+                strings::with_activated_abilities_constraint(),
+            ))
+        }
+        CardPredicate::CardWithCost { target, cost_operator, cost } => {
+            strings::pred_with_constraint(
+                serialize_enemy_predicate_plural(target),
+                strings::with_cost_constraint(
+                    serializer_utils::serialize_operator(cost_operator),
+                    cost.0,
+                ),
+            )
+        }
+        CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
+            strings::pred_with_constraint(
+                serialize_enemy_predicate_plural(target),
+                strings::with_cost_less_than_allied_count(serialize_card_predicate(count_matching)),
+            )
+        }
+        CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
+            strings::pred_with_constraint(
+                serialize_enemy_predicate_plural(target),
+                strings::with_cost_less_than_abandoned_ally_constraint(),
+            )
+        }
+        CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
+            strings::pred_with_constraint(
+                serialize_enemy_predicate_plural(target),
+                strings::with_spark_less_than_that_ally_constraint(),
+            )
+        }
+        CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
+            strings::pred_with_constraint(
+                serialize_enemy_predicate_plural(target),
+                strings::with_spark_less_than_abandoned_count_this_turn_constraint(),
+            )
+        }
+        CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
+            strings::pred_with_constraint(
+                serialize_enemy_predicate_plural(target),
+                strings::with_cost_less_than_void_count_constraint(),
+            )
+        }
+        CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
+            strings::pred_with_constraint(
+                serialize_enemy_predicate_plural(target),
+                strings::with_spark_less_than_energy_paid_constraint(),
+            )
+        }
+        CardPredicate::CouldDissolve { target } => {
+            strings::could_dissolve_target_plural(serialize_predicate(target))
+        }
+    }
+}
+
+/// Returns a phrase whose default text is the plural form of a card predicate
+/// (without ownership qualifiers).
+fn serialize_card_predicate_plural_text(card_predicate: &CardPredicate) -> Phrase {
+    match card_predicate {
+        CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
+            strings::as_plural(card_predicate_base_phrase(card_predicate))
+        }
+        CardPredicate::CharacterType(subtype) => {
+            strings::as_plural(strings::subtype(serializer_utils::subtype_to_phrase(*subtype)))
+        }
+        CardPredicate::NotCharacterType(subtype) => {
+            strings::character_not_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
+        }
+        CardPredicate::CharacterWithSpark(spark, operator) => {
+            strings::as_plural(strings::pred_with_constraint(
+                strings::character(),
+                strings::with_spark_constraint(
+                    serializer_utils::serialize_operator(operator),
+                    spark.0,
+                ),
+            ))
+        }
+        CardPredicate::Fast { target } => {
+            strings::fast_predicate_plural(serialize_card_predicate_plural_text(target))
+        }
+        CardPredicate::CardWithCost { target, cost_operator, cost } => {
+            strings::as_plural(strings::pred_with_constraint(
+                serialize_card_predicate(target),
+                strings::with_cost_constraint(
+                    serializer_utils::serialize_operator(cost_operator),
+                    cost.0,
+                ),
+            ))
+        }
+        CardPredicate::CharacterWithMaterializedAbility => {
+            strings::as_plural(strings::pred_with_constraint(
+                strings::character(),
+                strings::with_materialized_abilities_constraint(),
+            ))
+        }
+        CardPredicate::CharacterWithMultiActivatedAbility => {
+            strings::as_plural(strings::pred_with_constraint(
+                strings::character(),
+                strings::with_activated_abilities_constraint(),
+            ))
+        }
+        CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
+            strings::as_plural(strings::pred_with_constraint(
+                serialize_card_predicate(target),
+                strings::with_spark_less_than_energy_paid_constraint(),
+            ))
+        }
+        CardPredicate::CouldDissolve { target } => {
+            strings::could_dissolve_target_plural(serialize_predicate(target))
+        }
+        _ => strings::as_plural(card_predicate_base_phrase(card_predicate)),
     }
 }
 
@@ -702,4 +733,21 @@ fn serialize_enemy_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
 /// qualifiers for round-trip compatibility.
 fn is_generic_card_type(card_predicate: &CardPredicate) -> bool {
     matches!(card_predicate, CardPredicate::Card | CardPredicate::Character | CardPredicate::Event)
+}
+
+/// Builds a variant-aware Phrase from separate singular and plural RLF
+/// phrases.
+///
+/// This is used when the RLF macro cannot create variant blocks for
+/// parameterized phrases without `:from`. It constructs a Phrase with `one`
+/// and `other` variant keys, inheriting the tag from the singular phrase.
+fn phrase_with_variants(singular: Phrase, plural: Phrase) -> Phrase {
+    Phrase::builder()
+        .text(singular.text.clone())
+        .variants(HashMap::from([
+            (VariantKey::new("one"), singular.text),
+            (VariantKey::new("other"), plural.text),
+        ]))
+        .tags(singular.tags)
+        .build()
 }

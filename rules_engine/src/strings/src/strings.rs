@@ -98,8 +98,6 @@ rlf::rlf! {
 
     // Card noun with article metadata.
     card = :a{ one: "card", other: "cards" };
-    // Plural card noun without article metadata.
-    cards_plural = "cards";
     // Card count with article (e.g., "a card" or "2 cards").
     cards($n) = :match($n) {
         1: "a card",
@@ -128,8 +126,6 @@ rlf::rlf! {
 
     // Ally noun with article metadata.
     ally = :an{ one: "ally", other: "allies" };
-    // Plural allies noun without article metadata.
-    allies_plural = "allies";
     // Ally count with article (e.g., "an ally" or "2 allies").
     count_allies($n) = :match($n) {
         1: "an ally",
@@ -145,27 +141,28 @@ rlf::rlf! {
     // Figment types
     // =========================================================================
 
-    // Celestial figment type.
-    celestial = :a "Celestial";
-    // Halcyon figment type.
-    halcyon = :a "Halcyon";
-    // Radiant figment type.
-    radiant = :a "Radiant";
-    // Shadow figment type.
-    shadow = :a "Shadow";
+    // Celestial figment type, variant-aware for figment composition.
+    celestial = :a{ one: "Celestial", other: "Celestial" };
+    // Halcyon figment type, variant-aware for figment composition.
+    halcyon = :a{ one: "Halcyon", other: "Halcyon" };
+    // Radiant figment type, variant-aware for figment composition.
+    radiant = :a{ one: "Radiant", other: "Radiant" };
+    // Shadow figment type, variant-aware for figment composition.
+    shadow = :a{ one: "Shadow", other: "Shadow" };
 
     // =========================================================================
     // Figment tokens
     // =========================================================================
 
-    // Figment token (singular) with gold formatting, inheriting article metadata.
-    figment($f) = :from($f) "<color=#F57F17><b><u>{$f} Figment</u></color></b>";
-    // Figment tokens (plural) with gold formatting, inheriting article metadata.
-    figments_plural($f) = :from($f) "<color=#F57F17><b><u>{$f} Figments</u></color></b>";
+    // Figment token with gold formatting, variant-aware singular/plural.
+    figment($f) = :from($f) {
+        *one: "<color=#F57F17><b><u>{$f} Figment</u></color></b>",
+        other: "<color=#F57F17><b><u>{$f} Figments</u></color></b>",
+    };
     // N figments with article for singular.
     n_figments($n, $f) = :match($n) {
         1: "a {figment($f)}",
-        *other: "{text_number($n)} {figments_plural($f)}",
+        *other: "{text_number($n)} {figment($f):other}",
     };
 
     // =========================================================================
@@ -221,10 +218,11 @@ rlf::rlf! {
     // Warrior subtype.
     warrior = :a{ one: "Warrior", other: "Warriors" };
 
-    // Subtype display with green bold formatting, inheriting article metadata.
-    subtype($s) = :from($s) "<color=#2E7D32><b>{$s}</b></color>";
-    // Plural subtype display with green bold formatting.
-    subtype_plural($s) = "<color=#2E7D32><b>{$s:other}</b></color>";
+    // Subtype display with green bold formatting, variant-aware.
+    subtype($s) = :from($s) {
+        *one: "<color=#2E7D32><b>{$s}</b></color>",
+        other: "<color=#2E7D32><b>{$s:other}</b></color>",
+    };
 
     // =========================================================================
     // Text number conversion
@@ -485,26 +483,26 @@ rlf::rlf! {
     cost_and_connector = " and ";
     // Pay prefix for trigger costs.
     pay_prefix($cost) = "pay {$cost}";
-    // Abandon any number of a target type.
-    abandon_any_number_of($target) = :from($target) "abandon any number of {$target}";
+    // Abandon any number of a target type (uses plural variant).
+    abandon_any_number_of($target) = :from($target) "abandon any number of {$target:other}";
     // Abandon a specific target.
     abandon_target($target) = :from($target) "abandon {$target}";
     // Return a target to hand.
     return_target_to_hand($target) = :from($target) "return {$target} to hand";
-    // Return a count of targets to hand.
-    return_count_to_hand($n, $target) = :from($target) "return {$n} {$target} to hand";
+    // Return a count of targets to hand (uses plural variant).
+    return_count_to_hand($n, $target) = :from($target) "return {$n} {$target:other} to hand";
     // Return all but one target to hand.
     return_all_but_one_to_hand($target) = :from($target) "return all but one {$target} to hand";
     // Return all targets to hand.
     return_all_to_hand($target) = :from($target) "return all {$target} to hand";
     // Return any number of targets to hand.
     return_any_number_to_hand($target) = :from($target) "return any number of {$target} to hand";
-    // Return up to N targets to hand.
-    return_up_to_to_hand($n, $target) = :from($target) "return up to {$n} {$target} to hand";
+    // Return up to N targets to hand (uses plural variant).
+    return_up_to_to_hand($n, $target) = :from($target) "return up to {$n} {$target:other} to hand";
     // Return each other target to hand.
     return_each_other_to_hand($target) = :from($target) "return each other {$target} to hand";
-    // Return N or more targets to hand.
-    return_or_more_to_hand($n, $target) = :from($target) "return {$n} or more {$target} to hand";
+    // Return N or more targets to hand (uses plural variant).
+    return_or_more_to_hand($n, $target) = :from($target) "return {$n} or more {$target:other} to hand";
 
     // =========================================================================
     // Cost serializer phrases — parameterized
@@ -576,8 +574,8 @@ rlf::rlf! {
     when_you_abandon_count_in_turn_trigger($a) = "when you abandon {count_allies($a)} in a turn, ";
     // Draw N cards in a turn trigger.
     when_you_draw_in_turn_trigger($c) = "when you draw {$c} {card:$c} in a turn, ";
-    // Materialize Nth target in a turn trigger.
-    when_you_materialize_nth_in_turn_trigger($n, $target) = :from($target) "when you {materialize} {text_number($n)} {$target} in a turn, ";
+    // Materialize Nth target in a turn trigger (uses plural variant).
+    when_you_materialize_nth_in_turn_trigger($n, $target) = :from($target) "when you {materialize} {text_number($n)} {$target:other} in a turn, ";
 
     // =========================================================================
     // Condition serializer phrases
@@ -589,8 +587,8 @@ rlf::rlf! {
     if_card_in_your_void = "if this card is in your void,";
     // Condition for having discarded a target this turn.
     if_discarded_this_turn($target) = :from($target) "if you have discarded {$target} this turn";
-    // Condition wrapper for a predicate count.
-    with_predicate_condition($pred) = "with {$pred},";
+    // Condition wrapper for a predicate count (uses plural variant).
+    with_predicate_condition($pred) = "with {$pred:other},";
 
     // =========================================================================
     // Condition serializer phrases — parameterized
@@ -810,16 +808,10 @@ rlf::rlf! {
 
     // Character noun with article metadata.
     character = :a{ one: "character", other: "characters" };
-    // Plural characters noun without article metadata.
-    characters_plural = "characters";
     // Event noun with article metadata.
     event = :an{ one: "event", other: "events" };
-    // Plural events noun without article metadata.
-    events_plural = "events";
     // Enemy noun with article metadata.
     enemy = :an{ one: "enemy", other: "enemies" };
-    // Plural enemies noun without article metadata.
-    enemies_plural = "enemies";
 
     // This card noun with article metadata.
     this_card = :a{ one: "this card", other: "these cards" };
@@ -829,20 +821,36 @@ rlf::rlf! {
     this_event = :an{ one: "this event", other: "these events" };
     // That character noun with article metadata.
     that_character = :a{ one: "that character", other: "those characters" };
-    // Demonstrative plural for these characters.
-    these_characters = "these characters";
-    // Demonstrative plural for those characters.
-    those_characters = "those characters";
-    // Singular predicate pronoun.
-    pronoun_it = "it";
+    // Predicate pronoun, variant-aware.
+    pronoun_it = { *one: "it", other: "them" };
     // Plural predicate pronoun.
     pronoun_them = "them";
-    // Applies an English indefinite article to a predicate noun.
-    predicate_with_indefinite_article($p) = "{@a $p}";
-    // Another qualifying prefix for a predicate noun.
-    another_pred($p) = :from($p) "another {$p}";
-    // Other qualifying prefix for a plural predicate noun.
-    other_pred_plural($p) = :from($p) "other {$p:other}";
+    // Selects the :other (plural) variant of a phrase as its default text.
+    as_plural($p) = "{$p:other}";
+    // Helper for packaging asymmetric singular/plural as variants.
+    // The $other parameter should be an already-pluralized phrase.
+    with_plural($one, $other) = :from($one) { *one: "{$one}", other: "{$other}" };
+    // Asymmetric Your(Character): singular="character", plural="allies".
+    your_generic_character = :a{ *one: "character", other: "allies" };
+    // Asymmetric Your(Card): singular="card", plural="your cards".
+    your_generic_card = :a{ *one: "card", other: "your cards" };
+    // Asymmetric Your(Event): singular="event", plural="your events".
+    your_generic_event = :an{ *one: "event", other: "your events" };
+    // Asymmetric Your(CharacterType): singular=subtype, plural=allied subtypes.
+    your_generic_subtype($t) = :a :from($t) {
+        *one: "{subtype($t)}",
+        other: "allied {subtype($t):other}",
+    };
+    // Applies an English indefinite article to a predicate noun, variant-aware.
+    predicate_with_indefinite_article($p) = :from($p) {
+        *one: "{@a $p}",
+        other: "{$p:other}",
+    };
+    // Another/other qualifying prefix for a predicate noun, variant-aware.
+    another_pred($p) = :from($p) {
+        *one: "another {$p}",
+        other: "other {$p:other}",
+    };
 
     // =========================================================================
     // Ownership-qualified predicate nouns
@@ -850,38 +858,42 @@ rlf::rlf! {
 
     // Your card noun with article metadata.
     your_card = :a{ one: "your card", other: "your cards" };
-    // Plural your cards noun without article metadata.
-    your_cards_plural = "your cards";
     // Your character noun with article metadata.
     your_character = :a{ one: "your character", other: "your characters" };
     // Your event noun with article metadata.
     your_event = :a{ one: "your event", other: "your events" };
-    // Plural your events noun without article metadata.
-    your_events_plural = "your events";
     // Enemy card noun with article metadata.
     enemy_card = :an{ one: "enemy card", other: "enemy cards" };
-    // Plural enemy cards noun without article metadata.
-    enemy_cards_plural = "enemy cards";
     // Enemy character noun with article metadata.
     enemy_character = :an{ one: "enemy character", other: "enemy characters" };
     // Enemy event noun with article metadata.
     enemy_event = :an{ one: "enemy event", other: "enemy events" };
-    // Plural enemy events noun without article metadata.
-    enemy_events_plural = "enemy events";
     // Allied character noun with article metadata.
     allied_character = :an{ one: "allied character", other: "allied characters" };
     // Allied event noun with article metadata.
     allied_event = :an{ one: "allied event", other: "allied events" };
     // Other character noun with article metadata.
     other_character = :an{ one: "other character", other: "other characters" };
-    // Allied predicate noun inheriting agreement metadata from base.
-    allied_pred($base) = :from($base) "allied {$base}";
-    // Enemy predicate noun inheriting agreement metadata from base.
-    enemy_pred($base) = :from($base) "enemy {$base}";
-    // Predicate noun in your void location.
-    in_your_void($target) = :from($target) "{$target} in your void";
-    // Predicate noun in the opponent's void location.
-    in_opponent_void($target) = :from($target) "{$target} in the opponent's void";
+    // Allied predicate noun, variant-aware.
+    allied_pred($base) = :from($base) {
+        *one: "allied {$base}",
+        other: "allied {$base:other}",
+    };
+    // Enemy predicate noun, variant-aware.
+    enemy_pred($base) = :from($base) {
+        *one: "enemy {$base}",
+        other: "enemy {$base:other}",
+    };
+    // Predicate noun in your void location, variant-aware.
+    in_your_void($target) = :from($target) {
+        *one: "{$target} in your void",
+        other: "{$target:other} in your void",
+    };
+    // Predicate noun in the opponent's void location, variant-aware.
+    in_opponent_void($target) = :from($target) {
+        *one: "{$target} in the opponent's void",
+        other: "{$target:other} in the opponent's void",
+    };
     // Predicate noun in your hand location.
     in_your_hand($target) = :from($target) "{$target} in your hand";
 
@@ -889,20 +901,28 @@ rlf::rlf! {
     with_cost_constraint($op, $val) = "with cost {energy($val)}{$op}";
     // Spark constraint phrase.
     with_spark_constraint($op, $val) = "with spark {$val}{$op}";
-    // Predicate with composed constraint inheriting agreement metadata.
-    pred_with_constraint($base, $constraint) = :from($base) "{$base} {$constraint}";
-    // Non-subtype qualifier inheriting subtype metadata.
-    non_subtype($s) = :from($s) "non-{$s}";
+    // Predicate with composed constraint, variant-aware.
+    pred_with_constraint($base, $constraint) = :from($base) {
+        *one: "{$base} {$constraint}",
+        other: "{$base:other} {$constraint}",
+    };
+    // Non-subtype qualifier, variant-aware.
+    non_subtype($s) = :from($s) {
+        *one: "non-{$s}",
+        other: "non-{$s:other}",
+    };
     // Relative clause for events that could dissolve a target.
     could_dissolve_target($target) = :an "event which could {dissolve} {$target}";
-    // Relative clause for events that could dissolve a target (plural).
-    events_could_dissolve_target($target) = "events which could {dissolve} {$target}";
+    // Plural clause for events that could dissolve a target.
+    could_dissolve_target_plural($target) = "events which could {dissolve} {$target}";
     // Owned event that could dissolve a target.
     your_event_could_dissolve($target) = "your event which could {dissolve} {$target}";
-    // Owned events that could dissolve a target (plural).
-    your_events_could_dissolve($target) = "your events which could {dissolve} {$target}";
-    // Fast predicate prefix inheriting agreement metadata.
+    // Plural owned events that could dissolve a target.
+    your_event_could_dissolve_plural($target) = "your events which could {dissolve} {$target}";
+    // Fast predicate prefix.
     fast_predicate($target) = :a "{fast} {$target}";
+    // Fast predicate prefix plural.
+    fast_predicate_plural($target) = "{fast} {$target}";
     // Constraint for materialized abilities (singular).
     with_materialized_ability_constraint = "with a {materialized} ability";
     // Constraint for materialized abilities (plural).
@@ -914,9 +934,9 @@ rlf::rlf! {
     // Constraint for spark compared to energy spent.
     with_spark_less_than_energy_paid_constraint =
         "with spark less than the amount of {energy_symbol} paid";
-    // Constraint for cost compared to allied count.
+    // Constraint for cost compared to allied count (uses plural variant).
     with_cost_less_than_allied_count($target) =
-        "with cost less than the number of allied {$target}";
+        "with cost less than the number of allied {$target:other}";
     // Constraint for cost compared to abandoned ally.
     with_cost_less_than_abandoned_ally_constraint =
         "with cost less than the abandoned ally's cost";
@@ -937,13 +957,13 @@ rlf::rlf! {
     // Compound predicate nouns with subtype propagation
     // =========================================================================
 
-    // Allied subtype noun with article metadata.
+    // Allied subtype noun.
     allied_subtype($t) = :an "allied {subtype($t)}";
-    // Allied subtype noun in plural form.
+    // Allied subtype plural noun.
     allied_subtype_plural($t) = "allied {subtype($t):other}";
-    // Enemy subtype noun with article metadata.
+    // Enemy subtype noun.
     enemy_subtype($t) = :an "enemy {subtype($t)}";
-    // Enemy subtype noun in plural form.
+    // Enemy subtype plural noun.
     enemy_subtype_plural($t) = "enemy {subtype($t):other}";
     // Your subtype noun inheriting article metadata from subtype.
     your_subtype($t) = :from($t) "your {$t}";
@@ -953,16 +973,16 @@ rlf::rlf! {
     subtype_in_your_void($t) = :from($t) "{$t} in your void";
     // Character that is not a subtype.
     character_not_subtype($s) = :a "character that is not {@a subtype($s)}";
-    // Characters that are not a subtype.
-    characters_not_subtype($s) = "characters that are not {subtype($s):other}";
+    // Characters that are not a subtype (plural).
+    character_not_subtype_plural($s) = "characters that are not {subtype($s):other}";
     // Ally that is not a subtype.
     ally_not_subtype($s) = :an "ally that is not {@a subtype($s)}";
-    // Allies that are not a subtype.
-    allies_not_subtype($s) = "allies that are not {subtype($s):other}";
+    // Allies that are not a subtype (plural).
+    ally_not_subtype_plural($s) = "allies that are not {subtype($s):other}";
     // Enemy that is not a subtype.
     non_subtype_enemy($s) = :a "non-{subtype($s)} enemy";
-    // Enemies that are not a subtype.
-    non_subtype_enemies($s) = "non-{subtype($s):other} enemies";
+    // Enemies that are not a subtype (plural).
+    non_subtype_enemy_plural($s) = "non-{subtype($s):other} enemies";
 
     // =========================================================================
     // For-each predicate phrases
@@ -1063,26 +1083,26 @@ rlf::rlf! {
     // Target gains spark until next main phase for each matching predicate.
     gains_spark_until_next_main_for_each($target, $s, $for_each) = "{$target} gains +{$s} spark until your next main phase for each {$for_each}";
     // Each matching gains spark equal to count of another group.
-    each_gains_spark_equal_to($each, $count_of) = "each {$each} gains spark equal to the number of {$count_of}";
+    each_gains_spark_equal_to($each, $count_of) = "each {$each} gains spark equal to the number of {$count_of:other}";
     // Have each matching gain spark.
     have_each_gain_spark($each, $s) = "have each {$each} gain +{$s} spark";
     // Spark of each matching becomes a value.
     spark_of_each_becomes($each, $s) = "the spark of each {$each} becomes {$s}";
-    // Dissolve all with cost less than or equal to quantity count.
-    dissolve_all_with_cost_lte_quantity($target, $quantity) = "{dissolve} all {$target} with cost less than or equal to the number of {$quantity}";
+    // Dissolve all with cost less than or equal to quantity count (uses plural variant).
+    dissolve_all_with_cost_lte_quantity($target, $quantity) = "{dissolve} all {$target:other} with cost less than or equal to the number of {$quantity}";
 
     // =========================================================================
     // Collection expression target phrases
     // =========================================================================
 
-    // All of a target (plural).
-    collection_all($target) = "all {$target}";
-    // Exactly N of a target (plural).
-    collection_exactly($n, $target) = "{$n} {$target}";
-    // Up to N of a target (plural).
-    collection_up_to($n, $target) = "up to {$n} {$target}";
-    // Any number of a target (plural).
-    collection_any_number_of($target) = "any number of {$target}";
+    // All of a target (uses plural variant).
+    collection_all($target) = "all {$target:other}";
+    // Exactly N of a target (uses plural variant).
+    collection_exactly($n, $target) = "{$n} {$target:other}";
+    // Up to N of a target (uses plural variant).
+    collection_up_to($n, $target) = "up to {$n} {$target:other}";
+    // Any number of a target (uses plural variant).
+    collection_any_number_of($target) = "any number of {$target:other}";
 
     // =========================================================================
     // Collection effect phrases
@@ -1103,8 +1123,8 @@ rlf::rlf! {
     materialize_copy_of($target) = "{materialize} a copy of {$target}";
     // Materialize N copies of a target.
     materialize_n_copies_of($n, $target) = "{materialize} {$n} copies of {$target}";
-    // Materialize copies of target equal to count of matching.
-    materialize_copies_equal_to_matching($target, $matching) = "{materialize} a number of copies of {$target} equal to the number of {$matching}";
+    // Materialize copies of target equal to count of matching (uses plural variant).
+    materialize_copies_equal_to_matching($target, $matching) = "{materialize} a number of copies of {$target} equal to the number of {$matching:other}";
     // Materialize copies of target equal to energy spent.
     materialize_copies_equal_to_energy($target) = "{materialize} a number of copies of {$target} equal to the amount of {energy_symbol} spent";
     // Materialize copies of target equal to quantity.
@@ -1128,10 +1148,10 @@ rlf::rlf! {
 
     // Banish a single target then materialize it.
     banish_then_materialize_it($target) = "{banish} {$target}, then {materialize} it";
-    // Banish any number of targets then materialize them.
-    banish_then_materialize_any_number($target) = "{banish} any number of {$target}, then {materialize} them";
-    // Banish up to N allies then materialize them (uses pronoun agreement).
-    banish_then_materialize_up_to($n, $target) = "{banish} up to {$n} {$target}, then {materialize} {pronoun:$n}";
+    // Banish any number of targets then materialize them (uses plural variant).
+    banish_then_materialize_any_number($target) = "{banish} any number of {$target:other}, then {materialize} them";
+    // Banish up to N allies then materialize them (uses plural variant).
+    banish_then_materialize_up_to($n, $target) = "{banish} up to {$n} {$target:other}, then {materialize} {pronoun:$n}";
     // Banish targets then materialize them (default plural).
     banish_then_materialize_them($target) = "{banish} {$target}, then {materialize} them";
 
@@ -1139,14 +1159,16 @@ rlf::rlf! {
     // Allied card predicate phrases
     // =========================================================================
 
-    // Allied card predicate with subtype.
-    allied_card_with_subtype($t) = "allied {subtype($t)}";
-    // Allied card predicate with base text.
-    allied_card_with_base($base) = "allied {$base}";
-    // Allied card predicate plural with subtype.
-    allied_card_with_subtype_plural($t) = "allied {subtype($t):other}";
-    // Allied card predicate plural with base text.
-    allied_card_with_base_plural($base) = "allied {$base}";
+    // Allied card predicate with subtype, variant-aware.
+    allied_card_with_subtype($t) = :from($t) {
+        *one: "allied {subtype($t)}",
+        other: "allied {subtype($t):other}",
+    };
+    // Allied card predicate with base text, variant-aware.
+    allied_card_with_base($base) = :from($base) {
+        *one: "allied {$base}",
+        other: "allied {$base:other}",
+    };
 
     // =========================================================================
     // Gains reclaim effect phrases
@@ -1188,18 +1210,18 @@ rlf::rlf! {
 
     // A single card in your void (subject), capitalizing the predicate.
     void_subject_single($pred) = "{@cap $pred} in your void";
-    // Exactly N cards in your void (subject).
-    void_subject_exactly($n, $pred) = "{$n} {$pred} in your void";
+    // Exactly N cards in your void (subject, uses plural variant).
+    void_subject_exactly($n, $pred) = "{$n} {$pred:other} in your void";
     // All cards currently in your void (subject).
     void_subject_all = "all cards currently in your void";
-    // All but one cards in your void (subject).
-    void_subject_all_but_one($pred) = "all but one {$pred} in your void";
-    // Up to N cards in your void (subject).
-    void_subject_up_to($n, $pred) = "up to {$n} {$pred} in your void";
-    // Any number of cards in your void (subject).
-    void_subject_any_number($pred) = "any number of {$pred} in your void";
-    // N or more cards in your void (subject).
-    void_subject_or_more($n, $pred) = "{$n} or more {$pred} in your void";
+    // All but one cards in your void (subject, uses plural variant).
+    void_subject_all_but_one($pred) = "all but one {$pred:other} in your void";
+    // Up to N cards in your void (subject, uses plural variant).
+    void_subject_up_to($n, $pred) = "up to {$n} {$pred:other} in your void";
+    // Any number of cards in your void (subject, uses plural variant).
+    void_subject_any_number($pred) = "any number of {$pred:other} in your void";
+    // N or more cards in your void (subject, uses plural variant).
+    void_subject_or_more($n, $pred) = "{$n} or more {$pred:other} in your void";
     // Each other card in your void (subject).
     void_subject_each_other = "Each other card in your void";
 
@@ -1228,14 +1250,14 @@ rlf::rlf! {
     // Static ability serializer phrases
     // =========================================================================
 
-    // Your matching cards cost more energy.
-    your_cards_cost_increase($matching, $e) = "{$matching} cost you {energy($e)} more";
-    // Your matching cards cost less energy.
-    your_cards_cost_reduction($matching, $e) = "{$matching} cost you {energy($e)} less";
-    // The opponent's matching cards cost more energy.
-    enemy_cards_cost_increase($matching, $e) = "the opponent's {$matching} cost {energy($e)} more";
-    // Allied matching characters have bonus spark.
-    spark_bonus_other_characters($matching, $s) = "allied {$matching} have +{$s} spark";
+    // Your matching cards cost more energy (uses plural variant).
+    your_cards_cost_increase($matching, $e) = "{$matching:other} cost you {energy($e)} more";
+    // Your matching cards cost less energy (uses plural variant).
+    your_cards_cost_reduction($matching, $e) = "{$matching:other} cost you {energy($e)} less";
+    // The opponent's matching cards cost more energy (uses plural variant).
+    enemy_cards_cost_increase($matching, $e) = "the opponent's {$matching:other} cost {energy($e)} more";
+    // Allied matching characters have bonus spark (uses plural variant).
+    spark_bonus_other_characters($matching, $s) = "allied {$matching:other} have +{$s} spark";
     // To play this card, pay an additional cost.
     additional_cost_to_play($cost) = "To play {this_card}, {$cost}";
     // This card type costs alternate energy.
@@ -1260,12 +1282,12 @@ rlf::rlf! {
     reveal_top_card = "reveal the top card of your deck";
     // You may look at the top card of your deck.
     you_may_look_at_top_card = "you may look at the top card of your deck";
-    // You may play matching cards from the top of your deck.
-    you_may_play_from_top_of_deck($matching) = "you may play {$matching} from the top of your deck";
-    // Judgment ability of matching characters triggers when materialized.
-    judgment_triggers_when_materialized($matching) = "the '{Judgment}' ability of {$matching} triggers when you {materialize} them";
-    // This character's spark equals predicate count.
-    spark_equal_to_predicate_count($matching) = "{this_character}'s spark is equal to the number of {$matching}";
+    // You may play matching cards from the top of your deck (uses plural variant).
+    you_may_play_from_top_of_deck($matching) = "you may play {$matching:other} from the top of your deck";
+    // Judgment ability of matching characters triggers when materialized (uses plural variant).
+    judgment_triggers_when_materialized($matching) = "the '{Judgment}' ability of {$matching:other} triggers when you {materialize} them";
+    // This character's spark equals predicate count (uses plural variant).
+    spark_equal_to_predicate_count($matching) = "{this_character}'s spark is equal to the number of {$matching:other}";
     // You may only play this character from your void.
     play_only_from_void = "you may only play {this_character} from your void";
     // You may play this card from your hand or void for a cost.
@@ -1274,8 +1296,8 @@ rlf::rlf! {
     cards_in_void_have_reclaim = "they have {reclaim} equal to their cost";
     // This card costs less for each matching quantity.
     cost_reduction_for_each($e, $quantity) = "{this_card} costs {energy($e)} less for each {$quantity}";
-    // Your matching characters have bonus spark (allies variant).
-    spark_bonus_your_characters($matching, $s) = "{$matching} have +{$s} spark";
+    // Your matching characters have bonus spark (uses plural variant).
+    spark_bonus_your_characters($matching, $s) = "{$matching:other} have +{$s} spark";
     // Play this card from your void for a cost.
     play_from_void_for_cost($e) = "play {this_card} from your void for {energy($e)}";
     // Play this card from your void with additional cost prefix.

@@ -71,7 +71,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
         TriggerEvent::MaterializeNthThisTurn(predicate, count) => {
             strings::when_you_materialize_nth_in_turn_trigger(
                 *count,
-                predicate_serializer::serialize_predicate_plural(predicate),
+                predicate_serializer::serialize_predicate(predicate),
             )
             .to_string()
         }
