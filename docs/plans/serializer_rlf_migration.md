@@ -1139,3 +1139,95 @@ runtime. Key checks:
   verify that `bracket.rlf` is also updated with bracketed versions.
 - **Keyword consistency:** Verify that all game keyword terms are translated
   consistently across all phrases that reference them.
+
+---
+
+## Appendix F: Migration Closeout (2026-02-12)
+
+### Summary
+
+The serializer RLF migration (Tasks 1 through 7) is complete. All serializer
+code paths now produce output through named RLF phrases. The `resolve_rlf()`
+compatibility shim has been deleted. All CI gates are green.
+
+### Final Gate Outcomes
+
+| Gate | Status | Final Value | Baseline Value |
+|------|--------|-------------|----------------|
+| Bracket-locale render errors | GREEN | 0 | 17 (initial) |
+| Bracket-locale unbracketed text leaks | GREEN | 0 | 0 (always) |
+| Serializer static analyzer: legacy helpers | GREEN | 0 | 0 (always) |
+| Serializer static analyzer: resolve_rlf | GREEN | removed | 4 (initial) |
+| Serializer static analyzer: trim_end_period | GREEN | 0 | 14 (initial) |
+| Serializer static analyzer: hardcoded English | GREEN | 0 | 4 (initial) |
+| Serializer static analyzer: English grammar | GREEN | 0 | 0 (always) |
+| Parity gate (unresolved markers) | GREEN | 0 | N/A (added in Task 6) |
+| Parity gate (mismatches) | GREEN | 0 | N/A (added in Task 6) |
+| Round-trip tests | GREEN | 224/224 | 193/224 (31 ignored) |
+| Golden rendered output | GREEN | stable | N/A (new entries only) |
+| Translation validation | GREEN | passes | N/A (added in Task 2d) |
+| `just review` | GREEN | passes | N/A |
+
+### Leak-Trend Narrative
+
+- **Task 1 baseline:** 278 total abilities, 17 render errors, 0 text leaks.
+  The 17 errors were serializer panics on un-migrated code paths. Text leak
+  count started at 0 because the bracket-locale phrase set was comprehensive
+  from the start.
+- **Tasks 2a-2d (predicate migration):** Render errors decreased as predicate
+  paths were rewritten to use named phrases. No text leak regressions.
+- **Task 3 (effect arms):** Render errors dropped sharply as standard effect
+  arms were migrated to periodless phrase-driven fragments. The
+  `trim_end_matches` violations dropped from 14 to 0.
+- **Tasks 4-5 (assembly + static/trigger):** Remaining render errors
+  eliminated. `resolve_rlf` violations decreased from 4 as assembly phrases
+  replaced string concatenation.
+- **Task 6 (ability assembly + resolve_rlf deletion):** All `resolve_rlf`
+  call sites removed. Parity gate added and immediately green. Hardcoded
+  English violations dropped from 4 to 0.
+- **Task 7 (cleanup + validation):** Final audit confirmed zero violations
+  across all categories. Baseline tightened to all-zeros in commit `c988fc4e`.
+
+### Golden File Delta Summary
+
+The golden rendered output file changed only once from its initial commit.
+The diff contains exclusively additive entries (50 new lines for Dreamwell and
+test card coverage expansion). Zero existing card renderings were modified.
+See `round_trip_plan.md` Golden File Delta Annotations for per-entry detail.
+
+### Residual Risks
+
+1. **New serializer code paths:** Any future card ability types or serializer
+   branches must use `strings::` phrases. The bracket-locale harness detects
+   violations automatically at test time, but the risk is that a developer
+   bypasses the pattern before running tests.
+2. **Phase 2 migration scope:** The serializer still returns `String` (not
+   `Phrase`). This means real i18n is blocked until Phase 2 is completed.
+   The escaped-brace phrases from Phase 1.5 were all replaced during this
+   migration, but the fundamental `String`-based architecture remains.
+3. **Test corpus coverage:** The bracket-locale harness covers `cards.toml`
+   and `test-cards.toml`. The `dreamwell.toml` and `test-dreamwell.toml` files
+   are covered by the golden file test and parity gate but not by the
+   bracket-locale leak detector. Adding them to the leak detector would provide
+   additional safety.
+
+### Deferred Follow-Up Work
+
+1. **Phase 2: Phrase-based composition.** Serializers return `Phrase` instead
+   of `String`. Predicates pass `Phrase` to effect phrases for gender/case
+   agreement. This is the primary remaining architectural change for i18n.
+2. **Translation files.** Create `.rlf` translation files for target locales
+   (zh, ru, es, pt-BR, de, ja, ar, tr, ko, fr). Requires Phase 2.
+3. **`eval_str` removal.** After Phase 2, the serializer produces
+   fully-rendered text. The `eval_str` call in the display layer becomes
+   redundant and can be removed.
+4. **`VariableBindings` removal.** After Phase 2 round-trip test
+   restructuring, `VariableBindings` can be eliminated from the serializer
+   return path.
+5. **Bracket-locale Dreamwell coverage.** Add `dreamwell.toml` and
+   `test-dreamwell.toml` to the bracket-locale leak harness for full corpus
+   coverage.
+6. **RLF feature verification (Appendix D).** The checklist items for
+   target-language features (`:from` + variant blocks, `@count`, `@inflect`,
+   `@particle`, `@el`/`@un`, `@der`/`@ein`) should be verified against the
+   pinned RLF revision before starting Phase 2 translation work.
