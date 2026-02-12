@@ -640,6 +640,13 @@ pub fn serialize_for_count_expression(quantity_expression: &QuantityExpression) 
     }
 }
 
+/// Serializes an effect as a periodless fragment for embedding in compound
+/// phrases. Strips the trailing period from the full effect rendering.
+pub fn serialize_effect_fragment(effect: &Effect) -> String {
+    let rendered = serialize_effect(effect);
+    rendered.strip_suffix(&strings::period_suffix().to_string()).unwrap_or(&rendered).to_string()
+}
+
 /// Serializes a collection expression with a predicate target to produce the
 /// appropriate quantified target phrase for use with verb phrases.
 fn serialize_collection_target(collection: &CollectionExpression, target: &Predicate) -> Phrase {
@@ -660,13 +667,6 @@ fn serialize_collection_target(collection: &CollectionExpression, target: &Predi
         ),
         _ => predicate_serializer::serialize_predicate(target),
     }
-}
-
-/// Serializes an effect as a periodless fragment for embedding in compound
-/// phrases. Strips the trailing period from the full effect rendering.
-fn serialize_effect_fragment(effect: &Effect) -> String {
-    let rendered = serialize_effect(effect);
-    rendered.strip_suffix(&strings::period_suffix().to_string()).unwrap_or(&rendered).to_string()
 }
 
 fn serialize_allied_card_predicate(card_predicate: &CardPredicate) -> Phrase {

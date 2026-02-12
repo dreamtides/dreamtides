@@ -13,45 +13,31 @@ pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
     match static_ability {
         StaticAbility::StaticAbility(ability) => {
             let base = serialize_standard_static_ability(ability);
-            if base.ends_with('.') {
-                base
-            } else {
-                format!("{}{}", base, strings::period_suffix())
-            }
+            strings::effect_with_period(base).to_string()
         }
         StaticAbility::WithOptions(ability) => {
             let base = serialize_standard_static_ability(&ability.ability);
             if let Some(condition) = &ability.condition {
-                if matches!(condition, Condition::ThisCardIsInYourVoid) {
-                    let base_no_period = base.trim_end_matches('.');
-                    format!(
-                        "{}{}",
-                        strings::if_this_card_in_void_prefix(base_no_period),
-                        strings::period_suffix()
-                    )
+                let conditioned = if matches!(condition, Condition::ThisCardIsInYourVoid) {
+                    strings::if_this_card_in_void_prefix(base).to_string()
                 } else if matches!(condition, Condition::CardsInVoidCount { .. })
                     || matches!(condition, Condition::PredicateCount { count: 1, .. })
                 {
-                    let condition_str = condition_serializer::serialize_condition(condition);
-                    let base_no_period = base.trim_end_matches('.');
-                    format!(
-                        "{}{}",
-                        strings::condition_prepended(condition_str, base_no_period),
-                        strings::period_suffix()
+                    strings::condition_prepended(
+                        condition_serializer::serialize_condition(condition),
+                        base,
                     )
+                    .to_string()
                 } else {
-                    let condition_str = condition_serializer::serialize_condition(condition);
-                    let base_no_period = base.trim_end_matches('.');
-                    format!(
-                        "{}{}",
-                        strings::condition_appended(base_no_period, condition_str),
-                        strings::period_suffix()
+                    strings::condition_appended(
+                        base,
+                        condition_serializer::serialize_condition(condition),
                     )
-                }
-            } else if base.ends_with('.') {
-                base
+                    .to_string()
+                };
+                strings::effect_with_period(conditioned).to_string()
             } else {
-                format!("{}{}", base, strings::period_suffix())
+                strings::effect_with_period(base).to_string()
             }
         }
     }
@@ -200,11 +186,10 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
                     strings::capitalized_sentence(cost_serializer::serialize_cost(cost))
                         .to_string();
                 if let Some(effect) = &play_from_void.if_you_do {
-                    let effect_text = effect_serializer::serialize_effect(effect);
                     strings::play_from_void_with_effect(
                         capitalized_cost,
                         play_from_void.energy_cost.map_or(0, |e| e.0),
-                        effect_text.trim_end_matches('.'),
+                        effect_serializer::serialize_effect_fragment(effect),
                     )
                     .to_string()
                 } else {
@@ -215,10 +200,9 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
                     .to_string()
                 }
             } else if let Some(effect) = &play_from_void.if_you_do {
-                let effect_text = effect_serializer::serialize_effect(effect);
                 strings::play_from_void_for_cost_with_effect(
                     play_from_void.energy_cost.map_or(0, |e| e.0),
-                    effect_text.trim_end_matches('.'),
+                    effect_serializer::serialize_effect_fragment(effect),
                 )
                 .to_string()
             } else {
