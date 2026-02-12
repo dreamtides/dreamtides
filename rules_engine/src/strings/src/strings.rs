@@ -845,9 +845,9 @@ rlf::rlf! {
     // Other character noun with article metadata.
     other_character = :an{ one: "other character", other: "other characters" };
     // Allied predicate noun inheriting article metadata from base.
-    allied_pred($base) = :from($base) "allied {$base}";
+    allied_pred($base) = :an "allied {$base}";
     // Enemy predicate noun inheriting article metadata from base.
-    enemy_pred($base) = :from($base) "enemy {$base}";
+    enemy_pred($base) = :an "enemy {$base}";
     // Predicate noun in your void location.
     in_your_void($target) = :from($target) "{$target} in your void";
     // Predicate noun in the opponent's void location.
@@ -856,30 +856,83 @@ rlf::rlf! {
     in_your_hand($target) = :from($target) "{$target} in your hand";
 
     // Cost constraint phrase.
-    with_cost_constraint($op, $val) = "with cost {$op} {$val}";
+    with_cost_constraint($op, $val) = "with cost {energy($val)}{$op}";
     // Spark constraint phrase.
-    with_spark_constraint($op, $val) = "with spark {$op} {$val}";
+    with_spark_constraint($op, $val) = "with spark {$val}{$op}";
     // Predicate with composed constraint inheriting agreement metadata.
     pred_with_constraint($base, $constraint) = :from($base) "{$base} {$constraint}";
     // Non-subtype qualifier inheriting subtype metadata.
     non_subtype($s) = :from($s) "non-{$s}";
     // Relative clause for events that could dissolve a target.
-    could_dissolve_target($target) = "event which could {dissolve} {$target}";
+    could_dissolve_target($target) = :an "event which could {dissolve} {$target}";
+    // Relative clause for events that could dissolve a target (plural).
+    events_could_dissolve_target($target) = "events which could {dissolve} {$target}";
+    // Owned event that could dissolve a target.
+    your_event_could_dissolve($target) = "your event which could {dissolve} {$target}";
+    // Owned events that could dissolve a target (plural).
+    your_events_could_dissolve($target) = "your events which could {dissolve} {$target}";
+    // Fast predicate prefix inheriting agreement metadata.
+    fast_predicate($target) = :a "{fast} {$target}";
+    // Constraint for materialized abilities (singular).
+    with_materialized_ability_constraint = "with a {materialized} ability";
+    // Constraint for materialized abilities (plural).
+    with_materialized_abilities_constraint = "with {materialized} abilities";
+    // Constraint for activated abilities (singular).
+    with_activated_ability_constraint = "with an activated ability";
+    // Constraint for activated abilities (plural).
+    with_activated_abilities_constraint = "with activated abilities";
+    // Constraint for spark compared to energy spent.
+    with_spark_less_than_energy_paid_constraint =
+        "with spark less than the amount of {energy_symbol} paid";
+    // Constraint for cost compared to allied count.
+    with_cost_less_than_allied_count($target) =
+        "with cost less than the number of allied {$target}";
+    // Constraint for cost compared to abandoned ally.
+    with_cost_less_than_abandoned_ally_constraint =
+        "with cost less than the abandoned ally's cost";
+    // Constraint for spark compared to abandoned ally.
+    with_spark_less_than_abandoned_ally_constraint =
+        "with spark less than the abandoned ally's spark";
+    // Constraint for spark compared to abandoned ally count.
+    with_spark_less_than_abandoned_count_this_turn_constraint =
+        "with spark less than the number of allies abandoned this turn";
+    // Constraint for cost compared to void count.
+    with_cost_less_than_void_count_constraint =
+        "with cost less than the number of cards in your void";
+    // Constraint for spark compared to that ally's spark.
+    with_spark_less_than_that_ally_constraint =
+        "with spark less than that ally's spark";
 
     // =========================================================================
     // Compound predicate nouns with subtype propagation
     // =========================================================================
 
-    // Allied subtype noun inheriting article metadata from subtype.
-    allied_subtype($t) = :from($t) "allied {$t}";
-    // Enemy subtype noun inheriting article metadata from subtype.
-    enemy_subtype($t) = :from($t) "enemy {$t}";
+    // Allied subtype noun with article metadata.
+    allied_subtype($t) = :an "allied {subtype($t)}";
+    // Allied subtype noun in plural form.
+    allied_subtype_plural($t) = "allied {subtype($t):other}";
+    // Enemy subtype noun with article metadata.
+    enemy_subtype($t) = :an "enemy {subtype($t)}";
+    // Enemy subtype noun in plural form.
+    enemy_subtype_plural($t) = "enemy {subtype($t):other}";
     // Your subtype noun inheriting article metadata from subtype.
     your_subtype($t) = :from($t) "your {$t}";
     // Other subtype noun inheriting article metadata from subtype.
     other_subtype($t) = :from($t) "other {$t}";
     // Subtype in your void inheriting article metadata from subtype.
     subtype_in_your_void($t) = :from($t) "{$t} in your void";
+    // Character that is not a subtype.
+    character_not_subtype($s) = :a "character that is not {@a subtype($s)}";
+    // Characters that are not a subtype.
+    characters_not_subtype($s) = "characters that are not {subtype($s):other}";
+    // Ally that is not a subtype.
+    ally_not_subtype($s) = :an "ally that is not {@a subtype($s)}";
+    // Allies that are not a subtype.
+    allies_not_subtype($s) = "allies that are not {subtype($s):other}";
+    // Enemy that is not a subtype.
+    non_subtype_enemy($s) = :a "non-{subtype($s)} enemy";
+    // Enemies that are not a subtype.
+    non_subtype_enemies($s) = "non-{subtype($s):other} enemies";
 
     // =========================================================================
     // For-each predicate phrases
@@ -929,6 +982,8 @@ rlf::rlf! {
     for_each_subtype_in_your_void($t) = :from($t) "{subtype($t)} in your void";
     // For-each ally with spark condition phrase.
     for_each_ally_with_spark($s, $op) = "ally with spark {$s}{$op}";
+    // Generic for-each predicate phrase.
+    for_each_predicate($target) = :from($target) "each {$target}";
 
     // =========================================================================
     // Count expression phrases

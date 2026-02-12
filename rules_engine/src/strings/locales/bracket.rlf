@@ -429,24 +429,54 @@ enemy_event = :an{ one: "[enemy event]", other: "[enemy events]" };
 allied_character = :an{ one: "[allied character]", other: "[allied characters]" };
 allied_event = :an{ one: "[allied event]", other: "[allied events]" };
 other_character = :an{ one: "[other character]", other: "[other characters]" };
-allied_pred($base) = :from($base) "[allied {$base}]";
-enemy_pred($base) = :from($base) "[enemy {$base}]";
+allied_pred($base) = :an "[allied {$base}]";
+enemy_pred($base) = :an "[enemy {$base}]";
 in_your_void($target) = :from($target) "[{$target} in your void]";
 in_opponent_void($target) = :from($target) "[{$target} in the opponent's void]";
 in_your_hand($target) = :from($target) "[{$target} in your hand]";
 
-with_cost_constraint($op, $val) = "[with cost {$op} {$val}]";
-with_spark_constraint($op, $val) = "[with spark {$op} {$val}]";
+with_cost_constraint($op, $val) = "[with cost {energy($val)}{$op}]";
+with_spark_constraint($op, $val) = "[with spark {$val}{$op}]";
 pred_with_constraint($base, $constraint) = :from($base) "[{$base} {$constraint}]";
 non_subtype($s) = :from($s) "[non-{$s}]";
-could_dissolve_target($target) = "[event which could {dissolve} {$target}]";
+could_dissolve_target($target) = :an "[event which could {dissolve} {$target}]";
+events_could_dissolve_target($target) = "[events which could {dissolve} {$target}]";
+your_event_could_dissolve($target) = "[your event which could {dissolve} {$target}]";
+your_events_could_dissolve($target) = "[your events which could {dissolve} {$target}]";
+fast_predicate($target) = :a "[{fast} {$target}]";
+with_materialized_ability_constraint = "[with a {materialized} ability]";
+with_materialized_abilities_constraint = "[with {materialized} abilities]";
+with_activated_ability_constraint = "[with an activated ability]";
+with_activated_abilities_constraint = "[with activated abilities]";
+with_spark_less_than_energy_paid_constraint =
+    "[with spark less than the amount of {energy_symbol} paid]";
+with_cost_less_than_allied_count($target) =
+    "[with cost less than the number of allied {$target}]";
+with_cost_less_than_abandoned_ally_constraint =
+    "[with cost less than the abandoned ally's cost]";
+with_spark_less_than_abandoned_ally_constraint =
+    "[with spark less than the abandoned ally's spark]";
+with_spark_less_than_abandoned_count_this_turn_constraint =
+    "[with spark less than the number of allies abandoned this turn]";
+with_cost_less_than_void_count_constraint =
+    "[with cost less than the number of cards in your void]";
+with_spark_less_than_that_ally_constraint =
+    "[with spark less than that ally's spark]";
 
 
-allied_subtype($t) = :from($t) "[allied {$t}]";
-enemy_subtype($t) = :from($t) "[enemy {$t}]";
+allied_subtype($t) = :an "[allied {subtype($t)}]";
+allied_subtype_plural($t) = "[allied {subtype($t):other}]";
+enemy_subtype($t) = :an "[enemy {subtype($t)}]";
+enemy_subtype_plural($t) = "[enemy {subtype($t):other}]";
 your_subtype($t) = :from($t) "[your {$t}]";
 other_subtype($t) = :from($t) "[other {$t}]";
 subtype_in_your_void($t) = :from($t) "[{$t} in your void]";
+character_not_subtype($s) = :a "[character that is not {@a subtype($s)}]";
+characters_not_subtype($s) = "[characters that are not {subtype($s):other}]";
+ally_not_subtype($s) = :an "[ally that is not {@a subtype($s)}]";
+allies_not_subtype($s) = "[allies that are not {subtype($s):other}]";
+non_subtype_enemy($s) = :a "[non-{subtype($s)} enemy]";
+non_subtype_enemies($s) = "[non-{subtype($s):other} enemies]";
 
 
 for_each_ally = "[ally]";
@@ -471,6 +501,7 @@ for_each_subtype($t) = :from($t) "[{subtype($t)}]";
 for_each_other_subtype($t) = :from($t) "[other {subtype($t)}]";
 for_each_subtype_in_your_void($t) = :from($t) "[{subtype($t)} in your void]";
 for_each_ally_with_spark($s, $op) = "[ally with spark {$s}{$op}]";
+for_each_predicate($target) = :from($target) "[each {$target}]";
 
 
 ally_abandoned_this_turn = "[ally abandoned this turn]";

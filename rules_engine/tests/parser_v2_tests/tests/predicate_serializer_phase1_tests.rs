@@ -109,3 +109,16 @@ fn serialize_predicate_plural_keeps_complex_predicate_text() {
         .to_string()
     );
 }
+
+#[test]
+fn serialize_predicate_composes_owned_could_dissolve_event() {
+    register_phrases();
+
+    assert_eq!(
+        "your event which could <color=#AA00FF>dissolve</color> an enemy",
+        predicate_serializer::serialize_your_predicate(&CardPredicate::CouldDissolve {
+            target: Box::new(Predicate::Enemy(CardPredicate::Character)),
+        })
+        .to_string()
+    );
+}
