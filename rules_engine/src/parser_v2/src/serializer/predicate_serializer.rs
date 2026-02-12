@@ -64,8 +64,29 @@ pub fn serialize_predicate_plural(predicate: &Predicate) -> Phrase {
     }
 }
 
-/// Serializes a predicate to its base text without an article.
-pub fn predicate_base_text(predicate: &Predicate) -> Phrase {
+/// Serialize only the cost constraint part of a card predicate.
+///
+/// This is used when the base card type is already implied by context (e.g.,
+/// `{n_random_characters(number)}` already says "characters", so we only need
+/// "with cost {energy(e)} or less").
+pub fn serialize_cost_constraint_only(card_predicate: &CardPredicate) -> Phrase {
+    match card_predicate {
+        CardPredicate::CardWithCost { target, cost_operator, cost } => {
+            if is_generic_card_type(target) {
+                serialize_cost_constraint(cost_operator, *cost)
+            } else {
+                compose_with_constraint(
+                    serialize_card_predicate_without_article(target),
+                    serialize_cost_constraint(cost_operator, *cost),
+                )
+            }
+        }
+        _ => serialize_card_predicate_without_article(card_predicate),
+    }
+}
+
+/// Serializes a predicate to its base phrase without an article.
+pub(super) fn predicate_base_phrase(predicate: &Predicate) -> Phrase {
     match predicate {
         Predicate::This => strings::this_character(),
         Predicate::That => strings::that_character(),
@@ -75,10 +96,10 @@ pub fn predicate_base_text(predicate: &Predicate) -> Phrase {
             if is_generic_card_type(card_predicate) {
                 card_predicate_base_phrase(card_predicate)
             } else {
-                serialize_your_predicate(card_predicate)
+                your_predicate_formatted(card_predicate)
             }
         }
-        Predicate::Another(card_predicate) => serialize_your_predicate(card_predicate),
+        Predicate::Another(card_predicate) => your_predicate_formatted(card_predicate),
         Predicate::Any(card_predicate) => card_predicate_base_phrase(card_predicate),
         Predicate::Enemy(card_predicate) => match card_predicate {
             _ if is_generic_card_type(card_predicate) => card_predicate_base_phrase(card_predicate),
@@ -88,7 +109,7 @@ pub fn predicate_base_text(predicate: &Predicate) -> Phrase {
             CardPredicate::CardWithCost { .. } => {
                 serialize_card_predicate_without_article(card_predicate)
             }
-            _ => serialize_enemy_predicate(card_predicate),
+            _ => enemy_predicate_formatted(card_predicate),
         },
         Predicate::YourVoid(card_predicate) => {
             strings::in_your_void(serialize_card_predicate_plural(card_predicate))
@@ -102,18 +123,43 @@ pub fn predicate_base_text(predicate: &Predicate) -> Phrase {
     }
 }
 
-/// Serializes a "your" card predicate to a Phrase.
-pub fn serialize_your_predicate(card_predicate: &CardPredicate) -> Phrase {
-    your_predicate_formatted(card_predicate)
+/// Serializes a card predicate with an article.
+pub(super) fn serialize_card_predicate_phrase(card_predicate: &CardPredicate) -> Phrase {
+    serialize_card_predicate(card_predicate)
 }
 
-/// Serializes an "enemy" card predicate to a Phrase.
-pub fn serialize_enemy_predicate(card_predicate: &CardPredicate) -> Phrase {
-    enemy_predicate_formatted(card_predicate)
+/// Serializes a card predicate in plural form.
+pub(super) fn serialize_card_predicate_plural_phrase(card_predicate: &CardPredicate) -> Phrase {
+    serialize_card_predicate_plural(card_predicate)
+}
+
+/// Serializes a card predicate without an article.
+pub(super) fn card_predicate_without_article(card_predicate: &CardPredicate) -> Phrase {
+    serialize_card_predicate_without_article(card_predicate)
+}
+
+/// Returns the base noun phrase for a card predicate using RLF phrases.
+pub(super) fn base_card_phrase(predicate: &CardPredicate) -> Phrase {
+    card_predicate_base_phrase(predicate)
+}
+
+/// Returns the base noun text for a card predicate without an article.
+pub(super) fn base_card_text(predicate: &CardPredicate) -> String {
+    card_predicate_base_text(predicate)
+}
+
+/// Returns the plural base noun text for a card predicate.
+pub(super) fn base_card_text_plural(predicate: &CardPredicate) -> String {
+    card_predicate_base_text_plural(predicate)
+}
+
+/// Serializes a predicate for "for each" contexts.
+pub(super) fn for_each_predicate_phrase(predicate: &Predicate) -> Phrase {
+    serialize_for_each_predicate(predicate)
 }
 
 /// Serializes a card predicate with an article.
-pub fn serialize_card_predicate(card_predicate: &CardPredicate) -> Phrase {
+fn serialize_card_predicate(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
         CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
             strings::predicate_with_indefinite_article(card_predicate_base_phrase(card_predicate))
@@ -190,7 +236,7 @@ pub fn serialize_card_predicate(card_predicate: &CardPredicate) -> Phrase {
 /// Serialize a card predicate without the article.
 ///
 /// Use this when the caller already provides an article, like "a random".
-pub fn serialize_card_predicate_without_article(card_predicate: &CardPredicate) -> Phrase {
+fn serialize_card_predicate_without_article(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
         CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
             card_predicate_base_phrase(card_predicate)
@@ -212,29 +258,8 @@ pub fn serialize_card_predicate_without_article(card_predicate: &CardPredicate) 
     }
 }
 
-/// Serialize only the cost constraint part of a card predicate.
-///
-/// This is used when the base card type is already implied by context (e.g.,
-/// `{n_random_characters(number)}` already says "characters", so we only need
-/// "with cost {energy(e)} or less").
-pub fn serialize_cost_constraint_only(card_predicate: &CardPredicate) -> Phrase {
-    match card_predicate {
-        CardPredicate::CardWithCost { target, cost_operator, cost } => {
-            if is_generic_card_type(target) {
-                serialize_cost_constraint(cost_operator, *cost)
-            } else {
-                compose_with_constraint(
-                    serialize_card_predicate_without_article(target),
-                    serialize_cost_constraint(cost_operator, *cost),
-                )
-            }
-        }
-        _ => serialize_card_predicate_without_article(card_predicate),
-    }
-}
-
 /// Serializes a card predicate in plural form.
-pub fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
+fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
         CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
             plural_phrase(&card_predicate_base_phrase(card_predicate))
@@ -303,21 +328,19 @@ pub fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> Phrase
             )
         }
         CardPredicate::CouldDissolve { target } => {
-            strings::events_could_dissolve_target(predicate_base_text(target))
+            strings::events_could_dissolve_target(predicate_base_phrase(target))
         }
     }
 }
 
-/// Serializes the target of a fast card predicate without an article.
-pub fn serialize_fast_target(card_predicate: &CardPredicate) -> Phrase {
+fn serialize_fast_target(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
         CardPredicate::Fast { target } => strings::fast_predicate(serialize_fast_target(target)),
         _ => serialize_card_predicate_without_article(card_predicate),
     }
 }
 
-/// Serializes a predicate for "for each" contexts.
-pub fn serialize_for_each_predicate(predicate: &Predicate) -> Phrase {
+fn serialize_for_each_predicate(predicate: &Predicate) -> Phrase {
     match predicate {
         Predicate::Another(CardPredicate::Character) => strings::for_each_allied_character(),
         Predicate::Another(CardPredicate::CharacterType(subtype)) => {
@@ -364,22 +387,19 @@ pub fn serialize_for_each_predicate(predicate: &Predicate) -> Phrase {
                 serializer_utils::serialize_operator(operator),
             )
         }
-        predicate => strings::for_each_predicate(predicate_base_text(predicate)),
+        predicate => strings::for_each_predicate(predicate_base_phrase(predicate)),
     }
 }
 
-/// Returns the base noun text for a card predicate without an article.
-pub fn card_predicate_base_text(predicate: &CardPredicate) -> String {
+fn card_predicate_base_text(predicate: &CardPredicate) -> String {
     card_predicate_base_phrase(predicate).to_string()
 }
 
-/// Returns the plural base noun text for a card predicate.
-pub fn card_predicate_base_text_plural(predicate: &CardPredicate) -> String {
+fn card_predicate_base_text_plural(predicate: &CardPredicate) -> String {
     plural_phrase(&card_predicate_base_phrase(predicate)).to_string()
 }
 
-/// Returns the base noun phrase for a card predicate using RLF phrases.
-pub fn card_predicate_base_phrase(predicate: &CardPredicate) -> Phrase {
+fn card_predicate_base_phrase(predicate: &CardPredicate) -> Phrase {
     match predicate {
         CardPredicate::Card => strings::card(),
         CardPredicate::Character => strings::character(),
@@ -468,12 +488,12 @@ fn your_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
         }
         CardPredicate::Fast { target } => strings::fast_predicate(serialize_fast_target(target)),
         CardPredicate::CardWithCost { target, cost_operator, cost } => compose_with_constraint(
-            serialize_your_predicate(target),
+            your_predicate_formatted(target),
             serialize_cost_constraint(cost_operator, *cost),
         ),
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
             compose_with_constraint(
-                serialize_your_predicate(target),
+                your_predicate_formatted(target),
                 strings::with_cost_less_than_allied_count(serialize_card_predicate_plural(
                     count_matching,
                 )),
@@ -481,31 +501,31 @@ fn your_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
         }
         CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
             compose_with_constraint(
-                serialize_your_predicate(target),
+                your_predicate_formatted(target),
                 strings::with_cost_less_than_abandoned_ally_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
             compose_with_constraint(
-                serialize_your_predicate(target),
+                your_predicate_formatted(target),
                 strings::with_spark_less_than_abandoned_ally_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
             compose_with_constraint(
-                serialize_your_predicate(target),
+                your_predicate_formatted(target),
                 strings::with_spark_less_than_abandoned_count_this_turn_constraint(),
             )
         }
         CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
             compose_with_constraint(
-                serialize_your_predicate(target),
+                your_predicate_formatted(target),
                 strings::with_cost_less_than_void_count_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
             compose_with_constraint(
-                serialize_your_predicate(target),
+                your_predicate_formatted(target),
                 strings::with_spark_less_than_energy_paid_constraint(),
             )
         }
@@ -542,7 +562,7 @@ fn enemy_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
         ),
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
             compose_with_constraint(
-                serialize_enemy_predicate(target),
+                enemy_predicate_formatted(target),
                 strings::with_cost_less_than_allied_count(serialize_card_predicate_plural(
                     count_matching,
                 )),
@@ -550,31 +570,31 @@ fn enemy_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
         }
         CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
             compose_with_constraint(
-                serialize_enemy_predicate(target),
+                enemy_predicate_formatted(target),
                 strings::with_cost_less_than_abandoned_ally_constraint(),
             )
         }
         CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
             compose_with_constraint(
-                serialize_enemy_predicate(target),
+                enemy_predicate_formatted(target),
                 strings::with_cost_less_than_void_count_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
             compose_with_constraint(
-                serialize_enemy_predicate(target),
+                enemy_predicate_formatted(target),
                 strings::with_spark_less_than_that_ally_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
             compose_with_constraint(
-                serialize_enemy_predicate(target),
+                enemy_predicate_formatted(target),
                 strings::with_spark_less_than_abandoned_count_this_turn_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
             compose_with_constraint(
-                serialize_enemy_predicate(target),
+                enemy_predicate_formatted(target),
                 strings::with_spark_less_than_energy_paid_constraint(),
             )
         }

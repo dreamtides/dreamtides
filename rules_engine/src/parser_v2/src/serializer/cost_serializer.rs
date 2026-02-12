@@ -56,7 +56,7 @@ pub fn serialize_cost(cost: &Cost) -> String {
             )
             .to_string(),
             CollectionExpression::AllButOne => strings::return_all_but_one_to_hand(
-                predicate_serializer::predicate_base_text(target),
+                predicate_serializer::predicate_base_phrase(target),
             )
             .to_string(),
             CollectionExpression::All => {

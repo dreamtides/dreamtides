@@ -115,10 +115,10 @@ fn serialize_predicate_composes_owned_could_dissolve_event() {
     register_phrases();
 
     assert_eq!(
-        "your event which could <color=#AA00FF>dissolve</color> an enemy",
-        predicate_serializer::serialize_your_predicate(&CardPredicate::CouldDissolve {
+        "an event which could <color=#AA00FF>dissolve</color> an enemy",
+        predicate_serializer::serialize_predicate(&Predicate::Your(CardPredicate::CouldDissolve {
             target: Box::new(Predicate::Enemy(CardPredicate::Character)),
-        })
+        }))
         .to_string()
     );
 }

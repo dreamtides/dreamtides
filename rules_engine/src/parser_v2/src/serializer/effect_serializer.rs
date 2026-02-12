@@ -55,11 +55,11 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         }
         StandardEffect::DiscardCards { count } => strings::discard_cards_effect(*count).to_string(),
         StandardEffect::DiscardCardFromEnemyHand { predicate } => {
-            let target = predicate_serializer::serialize_card_predicate_without_article(predicate);
+            let target = predicate_serializer::card_predicate_without_article(predicate);
             format!("{}.", strings::discard_chosen_from_enemy_hand(target))
         }
         StandardEffect::DiscardCardFromEnemyHandThenTheyDraw { predicate } => {
-            let target = predicate_serializer::serialize_card_predicate_without_article(predicate);
+            let target = predicate_serializer::card_predicate_without_article(predicate);
             format!("{}.", strings::discard_chosen_from_enemy_hand_then_draw(target))
         }
         StandardEffect::GainEnergy { gains } => strings::gain_energy_effect(gains.0).to_string(),
@@ -74,7 +74,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             }
         },
         StandardEffect::GainEnergyForEach { gains, for_each } => {
-            let target = predicate_serializer::serialize_for_each_predicate(for_each);
+            let target = predicate_serializer::for_each_predicate_phrase(for_each);
             format!("{}.", strings::gain_energy_for_each(gains.0, target))
         }
         StandardEffect::GainPoints { gains } => strings::gain_points_effect(gains.0).to_string(),
@@ -124,10 +124,10 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         }
         StandardEffect::PutCardsFromVoidOnTopOfDeck { matching, count } => {
             if *count == 1 {
-                let target = predicate_serializer::serialize_card_predicate(matching);
+                let target = predicate_serializer::serialize_card_predicate_phrase(matching);
                 format!("{}.", strings::put_from_void_on_top_of_deck(target))
             } else {
-                let target = predicate_serializer::serialize_card_predicate_plural(matching);
+                let target = predicate_serializer::serialize_card_predicate_plural_phrase(matching);
                 format!("{}.", strings::put_up_to_from_void_on_top_of_deck(*count, target))
             }
         }
@@ -135,12 +135,12 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             if matches!(target, Predicate::That | Predicate::It) {
                 strings::prevent_that_card_effect().to_string()
             } else {
-                let target = predicate_serializer::predicate_base_text(target);
+                let target = predicate_serializer::predicate_base_phrase(target);
                 format!("{}.", strings::prevent_played_target(target))
             }
         }
         StandardEffect::CounterspellUnlessPaysCost { target, cost } => {
-            let target = predicate_serializer::predicate_base_text(target);
+            let target = predicate_serializer::predicate_base_phrase(target);
             let cost = cost_serializer::serialize_cost(cost);
             format!("{}.", strings::prevent_unless_pays(target, cost))
         }
@@ -224,7 +224,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         },
         StandardEffect::BanishCharacterUntilLeavesPlay { target, until_leaves } => {
             let target = predicate_serializer::serialize_predicate(target);
-            let until = predicate_serializer::predicate_base_text(until_leaves);
+            let until = predicate_serializer::predicate_base_phrase(until_leaves);
             format!("{}.", strings::banish_until_leaves(target, until))
         }
         StandardEffect::BanishUntilNextMain { target } => {
@@ -232,11 +232,11 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             format!("{}.", strings::banish_until_next_main(target))
         }
         StandardEffect::Discover { predicate } => {
-            let target = predicate_serializer::serialize_card_predicate(predicate);
+            let target = predicate_serializer::serialize_card_predicate_phrase(predicate);
             format!("{}.", strings::discover_target(target))
         }
         StandardEffect::DiscoverAndThenMaterialize { predicate } => {
-            let target = predicate_serializer::serialize_card_predicate(predicate);
+            let target = predicate_serializer::serialize_card_predicate_phrase(predicate);
             format!("{}.", strings::discover_and_materialize(target))
         }
         StandardEffect::MaterializeCharacter { target } => {
@@ -286,7 +286,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                     format!("{}.", strings::materialize_figments_for_each_played(figment_text))
                 }
                 QuantityExpression::Matching(predicate) => {
-                    let for_each = predicate_serializer::serialize_for_each_predicate(predicate);
+                    let for_each = predicate_serializer::for_each_predicate_phrase(predicate);
                     format!("{}.", strings::materialize_figments_for_each(figment_text, for_each))
                 }
                 _ => {
@@ -317,7 +317,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::ReturnFromYourVoidToHand { target } => {
             let target = match target {
                 Predicate::YourVoid(card_predicate) => {
-                    predicate_serializer::serialize_card_predicate(card_predicate)
+                    predicate_serializer::serialize_card_predicate_phrase(card_predicate)
                 }
                 _ => predicate_serializer::serialize_predicate(target),
             };
@@ -331,7 +331,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             format!("{}.", strings::reclaim_target(target))
         }
         StandardEffect::ReturnRandomFromYourVoidToPlay { predicate } => {
-            let target = predicate_serializer::serialize_card_predicate_without_article(predicate);
+            let target = predicate_serializer::card_predicate_without_article(predicate);
             format!("{}.", strings::reclaim_random(target))
         }
         StandardEffect::PutOnTopOfEnemyDeck { target } => {
@@ -342,7 +342,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             strings::each_player_discards_effect(*count).to_string()
         }
         StandardEffect::EachPlayerAbandonsCharacters { matching, .. } => {
-            let target = predicate_serializer::serialize_card_predicate(matching);
+            let target = predicate_serializer::serialize_card_predicate_phrase(matching);
             format!("{}.", strings::each_player_abandons(target))
         }
         StandardEffect::EachPlayerShufflesHandAndVoidIntoDeckAndDraws { count } => {
@@ -377,7 +377,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             strings::multiply_energy_effect(*multiplier).to_string()
         }
         StandardEffect::CopyNextPlayed { matching, times } => {
-            let target = predicate_serializer::predicate_base_text(matching);
+            let target = predicate_serializer::predicate_base_phrase(matching);
             format!("{}.", strings::copy_next_played(target, times.unwrap_or(1)))
         }
         StandardEffect::Copy { target } => {
@@ -389,12 +389,12 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             format!("{}.", strings::disable_activated_abilities(target))
         }
         StandardEffect::DrawMatchingCard { predicate } => {
-            let target = predicate_serializer::serialize_card_predicate(predicate);
+            let target = predicate_serializer::serialize_card_predicate_phrase(predicate);
             format!("{}.", strings::draw_matching_from_deck(target))
         }
         StandardEffect::TriggerJudgmentAbility { matching, collection } => match collection {
             CollectionExpression::All => {
-                let target = predicate_serializer::predicate_base_text(matching);
+                let target = predicate_serializer::predicate_base_phrase(matching);
                 format!("{}.", strings::trigger_judgment_of_each(target))
             }
             CollectionExpression::Exactly(1) => {
@@ -438,7 +438,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         }
         StandardEffect::GainsSparkUntilYourNextMainForEach { target, gains, for_each } => {
             let target = predicate_serializer::serialize_predicate(target);
-            let for_each_text = predicate_serializer::serialize_for_each_predicate(for_each);
+            let for_each_text = predicate_serializer::for_each_predicate_phrase(for_each);
             format!(
                 "{}.",
                 strings::gains_spark_until_next_main_for_each(target, gains.0, for_each_text)
@@ -448,7 +448,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             strings::gain_twice_energy_instead_effect().to_string()
         }
         StandardEffect::MaterializeCharacterFromVoid { target } => {
-            let target = predicate_serializer::serialize_card_predicate(target);
+            let target = predicate_serializer::serialize_card_predicate_phrase(target);
             format!("{}.", strings::materialize_from_void(target))
         }
         StandardEffect::ThenMaterializeIt => strings::then_materialize_it_effect().to_string(),
@@ -662,10 +662,10 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
 pub fn serialize_for_count_expression(quantity_expression: &QuantityExpression) -> String {
     match quantity_expression {
         QuantityExpression::Matching(predicate) => {
-            predicate_serializer::serialize_for_each_predicate(predicate).to_string()
+            predicate_serializer::for_each_predicate_phrase(predicate).to_string()
         }
         QuantityExpression::PlayedThisTurn(predicate) => {
-            let base = predicate_serializer::card_predicate_base_phrase(predicate);
+            let base = predicate_serializer::base_card_phrase(predicate);
             strings::card_predicate_played_this_turn(base).to_string()
         }
         QuantityExpression::AbandonedThisTurn(CardPredicate::Character) => {
@@ -692,28 +692,28 @@ pub fn serialize_for_count_expression(quantity_expression: &QuantityExpression) 
                 .to_string()
         }
         QuantityExpression::ReturnedToHandThisWay(predicate) => {
-            let base = predicate_serializer::card_predicate_base_phrase(predicate);
+            let base = predicate_serializer::base_card_phrase(predicate);
             strings::card_predicate_returned(base).to_string()
         }
         QuantityExpression::AbandonedThisTurn(predicate) => {
-            let base = predicate_serializer::card_predicate_base_phrase(predicate);
+            let base = predicate_serializer::base_card_phrase(predicate);
             strings::card_predicate_abandoned_this_turn(base).to_string()
         }
         QuantityExpression::AbandonedThisWay(predicate) => {
-            let base = predicate_serializer::card_predicate_base_phrase(predicate);
+            let base = predicate_serializer::base_card_phrase(predicate);
             strings::card_predicate_abandoned(base).to_string()
         }
         QuantityExpression::ForEachEnergySpentOnThisCard => strings::energy_spent().to_string(),
         QuantityExpression::CardsDrawnThisTurn(predicate) => {
-            let base = predicate_serializer::card_predicate_base_phrase(predicate);
+            let base = predicate_serializer::base_card_phrase(predicate);
             strings::card_predicate_drawn_this_turn(base).to_string()
         }
         QuantityExpression::DiscardedThisTurn(predicate) => {
-            let base = predicate_serializer::card_predicate_base_phrase(predicate);
+            let base = predicate_serializer::base_card_phrase(predicate);
             strings::card_predicate_discarded_this_turn(base).to_string()
         }
         QuantityExpression::DissolvedThisTurn(predicate) => {
-            let base = predicate_serializer::card_predicate_base_phrase(predicate);
+            let base = predicate_serializer::base_card_phrase(predicate);
             strings::card_predicate_dissolved_this_turn(base).to_string()
         }
     }
@@ -725,10 +725,8 @@ fn serialize_allied_card_predicate(card_predicate: &CardPredicate) -> String {
             strings::allied_card_with_subtype(serializer_utils::subtype_to_phrase(*subtype))
                 .to_string()
         }
-        _ => strings::allied_card_with_base(predicate_serializer::card_predicate_base_text(
-            card_predicate,
-        ))
-        .to_string(),
+        _ => strings::allied_card_with_base(predicate_serializer::base_card_text(card_predicate))
+            .to_string(),
     }
 }
 
@@ -739,9 +737,9 @@ fn serialize_allied_card_predicate_plural(card_predicate: &CardPredicate) -> Str
             strings::allied_card_with_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
                 .to_string()
         }
-        _ => strings::allied_card_with_base_plural(
-            predicate_serializer::card_predicate_base_text_plural(card_predicate),
-        )
+        _ => strings::allied_card_with_base_plural(predicate_serializer::base_card_text_plural(
+            card_predicate,
+        ))
         .to_string(),
     }
 }
@@ -819,9 +817,9 @@ fn serialize_void_gains_reclaim(
                 ))
                 .to_string()
             } else {
-                strings::capitalized_sentence(predicate_serializer::serialize_card_predicate(
-                    predicate,
-                ))
+                strings::capitalized_sentence(
+                    predicate_serializer::serialize_card_predicate_phrase(predicate),
+                )
                 .to_string()
             };
             if let Some(energy_cost) = cost {
@@ -849,7 +847,7 @@ fn serialize_void_gains_reclaim(
             }
         }
         CollectionExpression::Exactly(n) => {
-            let pred = predicate_serializer::serialize_card_predicate_plural(predicate);
+            let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
             if let Some(energy_cost) = cost {
                 if this_turn {
                     format!(
@@ -886,7 +884,7 @@ fn serialize_void_gains_reclaim(
             }
         }
         CollectionExpression::AllButOne => {
-            let pred = predicate_serializer::serialize_card_predicate_plural(predicate);
+            let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
             if let Some(energy_cost) = cost {
                 if this_turn {
                     format!(
@@ -909,7 +907,7 @@ fn serialize_void_gains_reclaim(
             }
         }
         CollectionExpression::UpTo(n) => {
-            let pred = predicate_serializer::serialize_card_predicate_plural(predicate);
+            let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
             if let Some(energy_cost) = cost {
                 if this_turn {
                     format!(
@@ -933,7 +931,7 @@ fn serialize_void_gains_reclaim(
             }
         }
         CollectionExpression::AnyNumberOf => {
-            let pred = predicate_serializer::serialize_card_predicate_plural(predicate);
+            let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
             if let Some(energy_cost) = cost {
                 if this_turn {
                     format!(
@@ -956,7 +954,7 @@ fn serialize_void_gains_reclaim(
             }
         }
         CollectionExpression::OrMore(n) => {
-            let pred = predicate_serializer::serialize_card_predicate_plural(predicate);
+            let pred = predicate_serializer::serialize_card_predicate_plural_phrase(predicate);
             if let Some(energy_cost) = cost {
                 if this_turn {
                     format!(

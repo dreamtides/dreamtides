@@ -1,5 +1,5 @@
 use ability_data::condition::Condition;
-use ability_data::predicate::CardPredicate;
+use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::static_ability::{CardTypeContext, StandardStaticAbility, StaticAbility};
 use strings::strings;
 
@@ -63,28 +63,28 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
     match ability {
         StandardStaticAbility::YourCardsCostIncrease { matching, increase } => {
             strings::your_cards_cost_increase(
-                predicate_serializer::serialize_card_predicate_plural(matching),
+                predicate_serializer::serialize_predicate_plural(&Predicate::Any(matching.clone())),
                 increase.0,
             )
             .to_string()
         }
         StandardStaticAbility::YourCardsCostReduction { matching, reduction } => {
             strings::your_cards_cost_reduction(
-                predicate_serializer::serialize_card_predicate_plural(matching),
+                predicate_serializer::serialize_predicate_plural(&Predicate::Any(matching.clone())),
                 reduction.0,
             )
             .to_string()
         }
         StandardStaticAbility::EnemyCardsCostIncrease { matching, increase } => {
             strings::enemy_cards_cost_increase(
-                predicate_serializer::serialize_card_predicate_plural(matching),
+                predicate_serializer::serialize_predicate_plural(&Predicate::Any(matching.clone())),
                 increase.0,
             )
             .to_string()
         }
         StandardStaticAbility::SparkBonusOtherCharacters { matching, added_spark } => {
             strings::spark_bonus_other_characters(
-                predicate_serializer::serialize_card_predicate_plural(matching),
+                predicate_serializer::serialize_predicate_plural(&Predicate::Any(matching.clone())),
                 added_spark.0,
             )
             .to_string()
@@ -138,8 +138,8 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
             strings::multiply_card_draw(*multiplier).to_string()
         }
         StandardStaticAbility::OncePerTurnPlayFromVoid { matching } => {
-            strings::once_per_turn_play_from_void(predicate_serializer::serialize_card_predicate(
-                matching,
+            strings::once_per_turn_play_from_void(predicate_serializer::serialize_predicate(
+                &Predicate::Any(matching.clone()),
             ))
             .to_string()
         }
@@ -149,7 +149,8 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         }
         StandardStaticAbility::YouMayPlayFromTopOfDeck { matching } => {
             strings::you_may_play_from_top_of_deck(
-                predicate_serializer::card_predicate_base_text_plural(matching),
+                predicate_serializer::serialize_predicate_plural(&Predicate::Any(matching.clone()))
+                    .to_string(),
             )
             .to_string()
         }
@@ -189,7 +190,10 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
                         serializer_utils::subtype_phrase_name(*subtype)
                     )
                 }
-                _ => predicate_serializer::serialize_card_predicate_plural(matching).to_string(),
+                _ => predicate_serializer::serialize_predicate_plural(&Predicate::Any(
+                    matching.clone(),
+                ))
+                .to_string(),
             };
             strings::spark_bonus_your_characters(predicate_text, added_spark.0).to_string()
         }

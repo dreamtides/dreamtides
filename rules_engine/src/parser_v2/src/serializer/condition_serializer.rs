@@ -11,13 +11,13 @@ pub fn serialize_condition(condition: &Condition) -> String {
             strings::with_allies_sharing_type(*count).to_string()
         }
         Condition::CardsDiscardedThisTurn { count: 1, predicate } => {
-            strings::if_discarded_this_turn(predicate_serializer::serialize_card_predicate(
-                predicate,
+            strings::if_discarded_this_turn(predicate_serializer::serialize_predicate(
+                &Predicate::Any(predicate.clone()),
             ))
             .to_string()
         }
         Condition::CardsDiscardedThisTurn { predicate, .. } => strings::if_discarded_this_turn(
-            predicate_serializer::serialize_card_predicate(predicate),
+            predicate_serializer::serialize_predicate(&Predicate::Any(predicate.clone())),
         )
         .to_string(),
         Condition::CardsDrawnThisTurn { count } => {
