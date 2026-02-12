@@ -35,7 +35,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             if matches!(trigger.trigger, TriggerEvent::Keywords(_)) {
                 strings::create_trigger_until_end_of_turn_keyword(
                     trigger_serializer::serialize_trigger_event(&trigger.trigger),
-                    strings::capitalized_sentence(effect_fragment),
+                    effect_fragment,
                 )
                 .to_string()
             } else {
@@ -493,15 +493,17 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
             } else if context == AbilityContext::Triggered {
                 join_effect_fragments(effects, &then_join)
             } else {
-                let effect_strings: Vec<String> = effects
+                let separator = strings::sentence_separator().to_string();
+                let sentences: Vec<String> = effects
                     .iter()
                     .map(|e| {
-                        strings::capitalized_sentence(serialize_standard_effect(&e.effect))
-                            .to_string()
+                        strings::capitalized_sentence_with_period(serialize_standard_effect(
+                            &e.effect,
+                        ))
+                        .to_string()
                     })
                     .collect();
-                let sentence_join = strings::sentence_joiner().to_string();
-                effect_strings.join(&sentence_join)
+                return prepend_condition_from_list(effects, sentences.join(&separator));
             };
             let with_period = strings::effect_with_period(body).to_string();
             prepend_condition_from_list(effects, with_period)
@@ -782,13 +784,11 @@ fn serialize_void_collection_subject(
     match count {
         CollectionExpression::Exactly(1) => {
             let predicate_text = if let CardPredicate::CharacterType(subtype) = predicate {
-                strings::capitalized_sentence(strings::predicate_with_indefinite_article(
-                    strings::subtype(serializer_utils::subtype_to_phrase(*subtype)),
+                strings::predicate_with_indefinite_article(strings::subtype(
+                    serializer_utils::subtype_to_phrase(*subtype),
                 ))
             } else {
-                strings::capitalized_sentence(
-                    predicate_serializer::serialize_card_predicate_phrase(predicate),
-                )
+                predicate_serializer::serialize_card_predicate_phrase(predicate)
             };
             (strings::void_subject_single(predicate_text), true)
         }

@@ -350,7 +350,7 @@ put_from_void_on_top_of_deck($target) = "[put {$target} from your void on top of
 put_up_to_from_void_on_top_of_deck($n, $target) = "[put up to {cards($n)} {$target} from your void on top of your deck]";
 materialize_random_from_deck($n, $constraint) = "[{materialize} {n_random_characters($n)} {$constraint} from your deck]";
 copy_next_played($target, $times) = "[copy the next {$target} you play {this_turn_times($times)}]";
-create_trigger_until_end_of_turn_keyword($trig, $eff) = "[until end of turn, {$trig} {$eff}]";
+create_trigger_until_end_of_turn_keyword($trig, $eff) = "[until end of turn, {$trig} {@cap $eff}]";
 create_trigger_until_end_of_turn($trig, $eff) = "[until end of turn, {$trig}{$eff}]";
 dissolve_target($target) = "[{dissolve} {$target}]";
 banish_target($target) = "[{banish} {$target}]";
@@ -401,6 +401,7 @@ cost_effect_separator = "[: ]";
 then_joiner = "[, then ]";
 and_joiner = "[ and ]";
 sentence_joiner = "[. ]";
+sentence_separator = "[ ]";
 period_suffix = "[.]";
 
 
@@ -592,7 +593,7 @@ target_gains_reclaim_for_cost_this_turn($target, $r) = "[{$target} gains {reclai
 target_gains_reclaim_equal_cost_this_turn($target) = "[{$target} gains {reclaim} equal to its cost this turn]";
 
 
-void_subject_single($pred) = "[{$pred} in your void]";
+void_subject_single($pred) = "[{@cap $pred} in your void]";
 void_subject_exactly($n, $pred) = "[{$n} {$pred} in your void]";
 void_subject_all = "[all cards currently in your void]";
 void_subject_all_but_one($pred) = "[all but one {$pred} in your void]";

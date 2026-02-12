@@ -689,7 +689,7 @@ rlf::rlf! {
     // Copy the next card you play this turn.
     copy_next_played($target, $times) = "copy the next {$target} you play {this_turn_times($times)}";
     // Create a trigger until end of turn with keyword trigger.
-    create_trigger_until_end_of_turn_keyword($trig, $eff) = "until end of turn, {$trig} {$eff}";
+    create_trigger_until_end_of_turn_keyword($trig, $eff) = "until end of turn, {$trig} {@cap $eff}";
     // Create a trigger until end of turn.
     create_trigger_until_end_of_turn($trig, $eff) = "until end of turn, {$trig}{$eff}";
     // Dissolve a target.
@@ -793,6 +793,8 @@ rlf::rlf! {
     and_joiner = " and ";
     // Joins separate effect sentences in event context (e.g., "Draw a card. Gain 1 energy.").
     sentence_joiner = ". ";
+    // Joins pre-punctuated effect sentences (e.g., "Draw a card." + " " + "Gain 1 energy.").
+    sentence_separator = " ";
     // Terminal punctuation for ability text.
     period_suffix = ".";
 
@@ -1178,8 +1180,8 @@ rlf::rlf! {
     // Void collection subject phrases
     // =========================================================================
 
-    // A single card in your void (subject).
-    void_subject_single($pred) = "{$pred} in your void";
+    // A single card in your void (subject), capitalizing the predicate.
+    void_subject_single($pred) = "{@cap $pred} in your void";
     // Exactly N cards in your void (subject).
     void_subject_exactly($n, $pred) = "{$n} {$pred} in your void";
     // All cards currently in your void (subject).
