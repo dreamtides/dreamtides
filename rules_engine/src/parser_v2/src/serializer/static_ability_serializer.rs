@@ -149,8 +149,7 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         }
         StandardStaticAbility::YouMayPlayFromTopOfDeck { matching } => {
             strings::you_may_play_from_top_of_deck(
-                predicate_serializer::serialize_predicate_plural(&Predicate::Any(matching.clone()))
-                    .to_string(),
+                predicate_serializer::serialize_predicate_plural(&Predicate::Any(matching.clone())),
             )
             .to_string()
         }

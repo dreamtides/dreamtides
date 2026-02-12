@@ -5,6 +5,7 @@ use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use ability_data::trigger_event::TriggerEvent;
 use core_data::numerics::Energy;
+use rlf::Phrase;
 use strings::strings;
 
 use crate::serializer::{
@@ -279,8 +280,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         }
         StandardEffect::MaterializeFigmentsQuantity { count, quantity, figment } => {
             let figment_text =
-                strings::n_figments(*count, serializer_utils::figment_to_phrase(*figment))
-                    .to_string();
+                strings::n_figments(*count, serializer_utils::figment_to_phrase(*figment));
             match quantity {
                 QuantityExpression::PlayedThisTurn(_) => {
                     format!("{}.", strings::materialize_figments_for_each_played(figment_text))
@@ -659,88 +659,79 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
 }
 
 /// Serializes a quantity expression to a "for each" clause string.
-pub fn serialize_for_count_expression(quantity_expression: &QuantityExpression) -> String {
+pub fn serialize_for_count_expression(quantity_expression: &QuantityExpression) -> Phrase {
     match quantity_expression {
         QuantityExpression::Matching(predicate) => {
-            predicate_serializer::for_each_predicate_phrase(predicate).to_string()
+            predicate_serializer::for_each_predicate_phrase(predicate)
         }
         QuantityExpression::PlayedThisTurn(predicate) => {
             let base = predicate_serializer::base_card_phrase(predicate);
-            strings::card_predicate_played_this_turn(base).to_string()
+            strings::card_predicate_played_this_turn(base)
         }
         QuantityExpression::AbandonedThisTurn(CardPredicate::Character) => {
-            strings::ally_abandoned_this_turn().to_string()
+            strings::ally_abandoned_this_turn()
         }
         QuantityExpression::AbandonedThisTurn(CardPredicate::CharacterType(subtype)) => {
             strings::allied_subtype_abandoned_this_turn(serializer_utils::subtype_to_phrase(
                 *subtype,
             ))
-            .to_string()
         }
-        QuantityExpression::AbandonedThisWay(CardPredicate::Character) => {
-            strings::ally_abandoned().to_string()
-        }
+        QuantityExpression::AbandonedThisWay(CardPredicate::Character) => strings::ally_abandoned(),
         QuantityExpression::AbandonedThisWay(CardPredicate::CharacterType(subtype)) => {
             strings::allied_subtype_abandoned(serializer_utils::subtype_to_phrase(*subtype))
-                .to_string()
         }
         QuantityExpression::ReturnedToHandThisWay(CardPredicate::Character) => {
-            strings::ally_returned().to_string()
+            strings::ally_returned()
         }
         QuantityExpression::ReturnedToHandThisWay(CardPredicate::CharacterType(subtype)) => {
             strings::allied_subtype_returned(serializer_utils::subtype_to_phrase(*subtype))
-                .to_string()
         }
         QuantityExpression::ReturnedToHandThisWay(predicate) => {
             let base = predicate_serializer::base_card_phrase(predicate);
-            strings::card_predicate_returned(base).to_string()
+            strings::card_predicate_returned(base)
         }
         QuantityExpression::AbandonedThisTurn(predicate) => {
             let base = predicate_serializer::base_card_phrase(predicate);
-            strings::card_predicate_abandoned_this_turn(base).to_string()
+            strings::card_predicate_abandoned_this_turn(base)
         }
         QuantityExpression::AbandonedThisWay(predicate) => {
             let base = predicate_serializer::base_card_phrase(predicate);
-            strings::card_predicate_abandoned(base).to_string()
+            strings::card_predicate_abandoned(base)
         }
-        QuantityExpression::ForEachEnergySpentOnThisCard => strings::energy_spent().to_string(),
+        QuantityExpression::ForEachEnergySpentOnThisCard => strings::energy_spent(),
         QuantityExpression::CardsDrawnThisTurn(predicate) => {
             let base = predicate_serializer::base_card_phrase(predicate);
-            strings::card_predicate_drawn_this_turn(base).to_string()
+            strings::card_predicate_drawn_this_turn(base)
         }
         QuantityExpression::DiscardedThisTurn(predicate) => {
             let base = predicate_serializer::base_card_phrase(predicate);
-            strings::card_predicate_discarded_this_turn(base).to_string()
+            strings::card_predicate_discarded_this_turn(base)
         }
         QuantityExpression::DissolvedThisTurn(predicate) => {
             let base = predicate_serializer::base_card_phrase(predicate);
-            strings::card_predicate_dissolved_this_turn(base).to_string()
+            strings::card_predicate_dissolved_this_turn(base)
         }
     }
 }
 
-fn serialize_allied_card_predicate(card_predicate: &CardPredicate) -> String {
+fn serialize_allied_card_predicate(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
         CardPredicate::CharacterType(subtype) => {
             strings::allied_card_with_subtype(serializer_utils::subtype_to_phrase(*subtype))
-                .to_string()
         }
-        _ => strings::allied_card_with_base(predicate_serializer::base_card_text(card_predicate))
-            .to_string(),
+        _ => strings::allied_card_with_base(predicate_serializer::base_card_text(card_predicate)),
     }
 }
 
 /// Serialize an allied card predicate in plural form for counting contexts.
-fn serialize_allied_card_predicate_plural(card_predicate: &CardPredicate) -> String {
+fn serialize_allied_card_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
         CardPredicate::CharacterType(subtype) => {
             strings::allied_card_with_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
-                .to_string()
         }
         _ => strings::allied_card_with_base_plural(predicate_serializer::base_card_text_plural(
             card_predicate,
-        ))
-        .to_string(),
+        )),
     }
 }
 
