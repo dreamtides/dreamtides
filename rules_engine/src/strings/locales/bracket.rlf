@@ -682,4 +682,15 @@ condition_appended($base, $condition) = "[{$base} {$condition}]";
 capitalized_sentence($s) = "[{@cap $s}]";
 reclaim_with_cost($cost) = "[{Reclaim} -- {$cost}]";
 
+
+effect_with_period($e) = "[{$e}{period_suffix}]";
+condition_with_effect($cond, $body) = "[{$cond} {$body}]";
+optional_effect_body($body) = "[{you_may_prefix}{$body}]";
+optional_cost_effect_body($cost, $body) = "[{you_may_prefix}{cost_to_connector($cost)}{$body}]";
+cost_effect_body($cost, $body) = "[{cost_to_connector($cost)}{$body}]";
+per_effect_optional($body) = "[{you_may_prefix}{$body}]";
+per_effect_cost($cost, $body) = "[{cost_to_connector($cost)}{$body}]";
+per_effect_condition($cond, $body) = "[{$cond} {$body}]";
+capitalized_sentence_with_period($s) = "[{@cap $s}{period_suffix}]";
+
 modal_choice_line($energy_cost, $effect) = "[{bullet} {$energy_cost}{cost_effect_separator}{@cap $effect}]";

@@ -1,5 +1,5 @@
 use ability_data::collection_expression::CollectionExpression;
-use ability_data::effect::Effect;
+use ability_data::effect::{Effect, EffectWithOptions};
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
@@ -502,147 +502,105 @@ pub fn serialize_effect(effect: &Effect) -> String {
 ///   {cards($d)}.")
 /// - Event: use `. ` (e.g., "Draw {cards($c)}. Discard {cards($d)}.")
 pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -> String {
-    let period = strings::period_suffix().to_string();
     match effect {
         Effect::Effect(standard_effect) => {
-            let fragment = serialize_standard_effect(standard_effect);
-            format!("{fragment}{period}")
+            strings::effect_with_period(serialize_standard_effect(standard_effect)).to_string()
         }
         Effect::WithOptions(options) => {
-            let mut result = String::new();
+            let effect_text = serialize_standard_effect(&options.effect);
+            let body = match (options.optional, &options.trigger_cost) {
+                (true, Some(trigger_cost)) => {
+                    let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
+                    strings::optional_cost_effect_body(cost_str, effect_text).to_string()
+                }
+                (true, None) => strings::optional_effect_body(effect_text).to_string(),
+                (false, Some(trigger_cost)) => {
+                    let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
+                    strings::cost_effect_body(cost_str, effect_text).to_string()
+                }
+                (false, None) => effect_text,
+            };
+            let with_period = strings::effect_with_period(body).to_string();
             if let Some(condition) = &options.condition {
-                result.push_str(&condition_serializer::serialize_condition(condition));
-                result.push(' ');
+                strings::condition_with_effect(
+                    condition_serializer::serialize_condition(condition),
+                    with_period,
+                )
+                .to_string()
+            } else {
+                with_period
             }
-            if options.optional {
-                result.push_str(&strings::you_may_prefix().to_string());
-            }
-            if let Some(trigger_cost) = &options.trigger_cost {
-                let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
-                result.push_str(&strings::cost_to_connector(cost_str).to_string());
-            }
-            result.push_str(&serialize_standard_effect(&options.effect));
-            result.push_str(&period);
-            result
         }
         Effect::List(effects) => {
             let all_optional = effects.iter().all(|e| e.optional);
-            let has_condition = effects.first().and_then(|e| e.condition.as_ref()).is_some();
             let all_have_trigger_cost = effects.iter().all(|e| e.trigger_cost.is_some());
             let and_join = strings::and_joiner().to_string();
             let then_join = strings::then_joiner().to_string();
-            if all_optional && all_have_trigger_cost && !effects.is_empty() {
-                let effect_strings: Vec<String> =
-                    effects.iter().map(|e| serialize_standard_effect(&e.effect)).collect();
-                let mut result = String::new();
-                if has_condition {
-                    if let Some(condition) = &effects[0].condition {
-                        result.push_str(&condition_serializer::serialize_condition(condition));
-                        result.push(' ');
-                    }
+            let body = if all_optional && all_have_trigger_cost && !effects.is_empty() {
+                let joined = join_effect_fragments(effects, &and_join);
+                let cost_str =
+                    effects[0].trigger_cost.as_ref().map(cost_serializer::serialize_trigger_cost);
+                match cost_str {
+                    Some(cost) => strings::optional_cost_effect_body(cost, joined).to_string(),
+                    None => strings::optional_effect_body(joined).to_string(),
                 }
-                result.push_str(&strings::you_may_prefix().to_string());
-                if let Some(trigger_cost) = &effects[0].trigger_cost {
-                    let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
-                    result.push_str(&strings::cost_to_connector(cost_str).to_string());
-                }
-                result.push_str(&effect_strings.join(&and_join));
-                result.push_str(&period);
-                result
             } else if !all_optional && all_have_trigger_cost && !effects.is_empty() {
-                let effect_strings: Vec<String> =
-                    effects.iter().map(|e| serialize_standard_effect(&e.effect)).collect();
-                let mut result = String::new();
-                if has_condition {
-                    if let Some(condition) = &effects[0].condition {
-                        result.push_str(&condition_serializer::serialize_condition(condition));
-                        result.push(' ');
-                    }
+                let joined = join_effect_fragments(effects, &and_join);
+                let cost_str =
+                    effects[0].trigger_cost.as_ref().map(cost_serializer::serialize_trigger_cost);
+                match cost_str {
+                    Some(cost) => strings::cost_effect_body(cost, joined).to_string(),
+                    None => joined,
                 }
-                if let Some(trigger_cost) = &effects[0].trigger_cost {
-                    let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
-                    result.push_str(&strings::cost_to_connector(cost_str).to_string());
-                }
-                result.push_str(&effect_strings.join(&and_join));
-                result.push_str(&period);
-                result
             } else if all_optional && !effects.is_empty() {
-                let effect_strings: Vec<String> =
-                    effects.iter().map(|e| serialize_standard_effect(&e.effect)).collect();
-                let mut result = String::new();
-                if has_condition {
-                    if let Some(condition) = &effects[0].condition {
-                        result.push_str(&condition_serializer::serialize_condition(condition));
-                        result.push(' ');
-                    }
-                }
-                result.push_str(&strings::you_may_prefix().to_string());
-                result.push_str(&effect_strings.join(&then_join));
-                result.push_str(&period);
-                result
+                let joined = join_effect_fragments(effects, &then_join);
+                strings::optional_effect_body(joined).to_string()
+            } else if context == AbilityContext::Triggered {
+                join_effect_fragments(effects, &then_join)
             } else {
-                let mut result = String::new();
-                if has_condition {
-                    if let Some(condition) = &effects[0].condition {
-                        result.push_str(&condition_serializer::serialize_condition(condition));
-                        result.push(' ');
-                    }
-                }
-                if context == AbilityContext::Triggered {
-                    let effect_strings: Vec<String> =
-                        effects.iter().map(|e| serialize_standard_effect(&e.effect)).collect();
-                    result.push_str(&effect_strings.join(&then_join));
-                    result.push_str(&period);
-                } else {
-                    let effect_strings: Vec<String> = effects
-                        .iter()
-                        .map(|e| {
-                            strings::capitalized_sentence(serialize_standard_effect(&e.effect))
-                                .to_string()
-                        })
-                        .collect();
-                    let sentence_join = strings::sentence_joiner().to_string();
-                    result.push_str(&effect_strings.join(&sentence_join));
-                    result.push_str(&period);
-                }
-                result
-            }
+                let effect_strings: Vec<String> = effects
+                    .iter()
+                    .map(|e| {
+                        strings::capitalized_sentence(serialize_standard_effect(&e.effect))
+                            .to_string()
+                    })
+                    .collect();
+                let sentence_join = strings::sentence_joiner().to_string();
+                effect_strings.join(&sentence_join)
+            };
+            let with_period = strings::effect_with_period(body).to_string();
+            prepend_condition_from_list(effects, with_period)
         }
         Effect::ListWithOptions(list_with_options) => {
-            let mut result = String::new();
-            if let Some(condition) = &list_with_options.condition {
-                result.push_str(&condition_serializer::serialize_condition(condition));
-                result.push(' ');
-            }
             let has_shared_trigger_cost = list_with_options.trigger_cost.is_some();
             let all_effects_optional =
                 list_with_options.effects.iter().all(|e| e.optional && e.trigger_cost.is_none());
             let is_optional_with_shared_cost = has_shared_trigger_cost && all_effects_optional;
-            if is_optional_with_shared_cost {
-                result.push_str(&strings::you_may_prefix().to_string());
-            }
-            if let Some(trigger_cost) = &list_with_options.trigger_cost {
-                let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
-                result.push_str(&strings::cost_to_connector(cost_str).to_string());
-            }
             let effect_strings: Vec<String> = list_with_options
                 .effects
                 .iter()
                 .map(|e| {
-                    let mut effect_str = String::new();
-                    if e.optional && !is_optional_with_shared_cost {
-                        effect_str.push_str(&strings::you_may_prefix().to_string());
-                    }
-                    if let Some(trigger_cost) = &e.trigger_cost {
+                    let effect_text = serialize_standard_effect(&e.effect);
+                    let with_condition = if let Some(condition) = &e.condition {
+                        strings::per_effect_condition(
+                            condition_serializer::serialize_condition(condition),
+                            effect_text,
+                        )
+                        .to_string()
+                    } else {
+                        effect_text
+                    };
+                    let with_cost = if let Some(trigger_cost) = &e.trigger_cost {
                         let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
-                        effect_str.push_str(&strings::cost_to_connector(cost_str).to_string());
+                        strings::per_effect_cost(cost_str, with_condition).to_string()
+                    } else {
+                        with_condition
+                    };
+                    if e.optional && !is_optional_with_shared_cost {
+                        strings::per_effect_optional(with_cost).to_string()
+                    } else {
+                        with_cost
                     }
-                    if let Some(condition) = &e.condition {
-                        effect_str.push_str(&condition_serializer::serialize_condition(condition));
-                        effect_str.push(' ');
-                    }
-                    effect_str.push_str(&serialize_standard_effect(&e.effect));
-                    effect_str
                 })
                 .collect();
             let joiner = if has_shared_trigger_cost {
@@ -650,9 +608,31 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
             } else {
                 strings::then_joiner().to_string()
             };
-            result.push_str(&effect_strings.join(&joiner));
-            result.push_str(&period);
-            result
+            let joined = effect_strings.join(&joiner);
+            let body = if is_optional_with_shared_cost {
+                match &list_with_options.trigger_cost {
+                    Some(trigger_cost) => {
+                        let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
+                        strings::optional_cost_effect_body(cost_str, joined).to_string()
+                    }
+                    None => strings::optional_effect_body(joined).to_string(),
+                }
+            } else if let Some(trigger_cost) = &list_with_options.trigger_cost {
+                let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
+                strings::cost_effect_body(cost_str, joined).to_string()
+            } else {
+                joined
+            };
+            let with_period = strings::effect_with_period(body).to_string();
+            if let Some(condition) = &list_with_options.condition {
+                strings::condition_with_effect(
+                    condition_serializer::serialize_condition(condition),
+                    with_period,
+                )
+                .to_string()
+            } else {
+                with_period
+            }
         }
         Effect::Modal(choices) => {
             let mut result = strings::choose_one().to_string();
@@ -748,6 +728,25 @@ fn serialize_allied_card_predicate_plural(card_predicate: &CardPredicate) -> Phr
         _ => strings::allied_card_with_base_plural(predicate_serializer::base_card_text_plural(
             card_predicate,
         )),
+    }
+}
+
+/// Joins serialized effect fragments from an effect list using the given
+/// joiner string.
+fn join_effect_fragments(effects: &[EffectWithOptions], joiner: &str) -> String {
+    let effect_strings: Vec<String> =
+        effects.iter().map(|e| serialize_standard_effect(&e.effect)).collect();
+    effect_strings.join(joiner)
+}
+
+/// Prepends a condition from the first effect in a list, if present.
+fn prepend_condition_from_list(effects: &[EffectWithOptions], body: String) -> String {
+    let condition = effects.first().and_then(|e| e.condition.as_ref());
+    if let Some(condition) = condition {
+        strings::condition_with_effect(condition_serializer::serialize_condition(condition), body)
+            .to_string()
+    } else {
+        body
     }
 }
 

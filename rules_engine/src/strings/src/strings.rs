@@ -1352,6 +1352,29 @@ rlf::rlf! {
     reclaim_with_cost($cost) = "{Reclaim} -- {$cost}";
 
     // =========================================================================
+    // Compound effect assembly phrases
+    // =========================================================================
+
+    // Single effect fragment with trailing period.
+    effect_with_period($e) = "{$e}{period_suffix}";
+    // Condition prefix joined with effect body by a space.
+    condition_with_effect($cond, $body) = "{$cond} {$body}";
+    // Optional prefix with effect body: "you may {body}".
+    optional_effect_body($body) = "{you_may_prefix}{$body}";
+    // Optional prefix with cost and effect body: "you may {cost} to {body}".
+    optional_cost_effect_body($cost, $body) = "{you_may_prefix}{cost_to_connector($cost)}{$body}";
+    // Mandatory cost with effect body: "{cost} to {body}".
+    cost_effect_body($cost, $body) = "{cost_to_connector($cost)}{$body}";
+    // Per-effect optional prefix: "you may {body}".
+    per_effect_optional($body) = "{you_may_prefix}{$body}";
+    // Per-effect cost prefix: "{cost} to {body}".
+    per_effect_cost($cost, $body) = "{cost_to_connector($cost)}{$body}";
+    // Per-effect condition prefix: "{cond} {body}".
+    per_effect_condition($cond, $body) = "{$cond} {$body}";
+    // Capitalized sentence with trailing period.
+    capitalized_sentence_with_period($s) = "{@cap $s}{period_suffix}";
+
+    // =========================================================================
     // Modal effect assembly phrases
     // =========================================================================
 
