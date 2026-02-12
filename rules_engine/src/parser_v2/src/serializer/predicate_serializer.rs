@@ -1,5 +1,4 @@
-use ability_data::predicate::{CardPredicate, Operator, Predicate};
-use core_data::numerics::Energy;
+use ability_data::predicate::{CardPredicate, Predicate};
 use rlf::Phrase;
 use strings::strings;
 
@@ -43,12 +42,10 @@ pub fn serialize_predicate(predicate: &Predicate) -> Phrase {
 /// Serializes a predicate in plural form.
 pub fn serialize_predicate_plural(predicate: &Predicate) -> Phrase {
     match predicate {
-        Predicate::Another(card_predicate) => {
-            serialize_your_predicate_plural_phrase(card_predicate)
-        }
+        Predicate::Another(card_predicate) => serialize_your_predicate_plural(card_predicate),
         Predicate::Any(card_predicate) => serialize_card_predicate_plural(card_predicate),
-        Predicate::Your(card_predicate) => serialize_your_predicate_plural_phrase(card_predicate),
-        Predicate::Enemy(card_predicate) => serialize_enemy_predicate_plural_phrase(card_predicate),
+        Predicate::Your(card_predicate) => serialize_your_predicate_plural(card_predicate),
+        Predicate::Enemy(card_predicate) => serialize_enemy_predicate_plural(card_predicate),
         Predicate::YourVoid(card_predicate) => {
             strings::in_your_void(serialize_card_predicate_plural(card_predicate))
         }
@@ -73,11 +70,17 @@ pub fn serialize_cost_constraint_only(card_predicate: &CardPredicate) -> Phrase 
     match card_predicate {
         CardPredicate::CardWithCost { target, cost_operator, cost } => {
             if is_generic_card_type(target) {
-                serialize_cost_constraint(cost_operator, *cost)
+                strings::with_cost_constraint(
+                    serializer_utils::serialize_operator(cost_operator),
+                    cost.0,
+                )
             } else {
-                compose_with_constraint(
+                strings::pred_with_constraint(
                     serialize_card_predicate_without_article(target),
-                    serialize_cost_constraint(cost_operator, *cost),
+                    strings::with_cost_constraint(
+                        serializer_utils::serialize_operator(cost_operator),
+                        cost.0,
+                    ),
                 )
             }
         }
@@ -145,12 +148,12 @@ pub(super) fn base_card_phrase(predicate: &CardPredicate) -> Phrase {
 
 /// Returns the base noun text for a card predicate without an article.
 pub(super) fn base_card_text(predicate: &CardPredicate) -> String {
-    card_predicate_base_text(predicate)
+    card_predicate_base_phrase(predicate).to_string()
 }
 
 /// Returns the plural base noun text for a card predicate.
 pub(super) fn base_card_text_plural(predicate: &CardPredicate) -> String {
-    card_predicate_base_text_plural(predicate)
+    card_predicate_base_phrase_plural(predicate).to_string()
 }
 
 /// Serializes a predicate for "for each" contexts.
@@ -170,20 +173,25 @@ fn serialize_card_predicate(card_predicate: &CardPredicate) -> Phrase {
         CardPredicate::Fast { target } => strings::predicate_with_indefinite_article(
             strings::fast_predicate(serialize_fast_target(target)),
         ),
-        CardPredicate::CardWithCost { target, cost_operator, cost } => compose_with_constraint(
-            serialize_card_predicate(target),
-            serialize_cost_constraint(cost_operator, *cost),
-        ),
-        CardPredicate::CharacterWithMaterializedAbility => compose_with_constraint(
+        CardPredicate::CardWithCost { target, cost_operator, cost } => {
+            strings::pred_with_constraint(
+                serialize_card_predicate(target),
+                strings::with_cost_constraint(
+                    serializer_utils::serialize_operator(cost_operator),
+                    cost.0,
+                ),
+            )
+        }
+        CardPredicate::CharacterWithMaterializedAbility => strings::pred_with_constraint(
             serialize_card_predicate(&CardPredicate::Character),
             strings::with_materialized_ability_constraint(),
         ),
-        CardPredicate::CharacterWithMultiActivatedAbility => compose_with_constraint(
+        CardPredicate::CharacterWithMultiActivatedAbility => strings::pred_with_constraint(
             serialize_card_predicate(&CardPredicate::Character),
             strings::with_activated_ability_constraint(),
         ),
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_card_predicate(target),
                 strings::with_spark_less_than_energy_paid_constraint(),
             )
@@ -194,12 +202,12 @@ fn serialize_card_predicate(card_predicate: &CardPredicate) -> Phrase {
         CardPredicate::NotCharacterType(subtype) => strings::predicate_with_indefinite_article(
             strings::character_not_subtype(serializer_utils::subtype_to_phrase(*subtype)),
         ),
-        CardPredicate::CharacterWithSpark(spark, operator) => compose_with_constraint(
+        CardPredicate::CharacterWithSpark(spark, operator) => strings::pred_with_constraint(
             serialize_card_predicate(&CardPredicate::Character),
             strings::with_spark_constraint(serializer_utils::serialize_operator(operator), spark.0),
         ),
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_card_predicate(target),
                 strings::with_cost_less_than_allied_count(serialize_card_predicate_plural(
                     count_matching,
@@ -207,25 +215,25 @@ fn serialize_card_predicate(card_predicate: &CardPredicate) -> Phrase {
             )
         }
         CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_card_predicate(target),
                 strings::with_cost_less_than_abandoned_ally_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_card_predicate(target),
                 strings::with_spark_less_than_abandoned_ally_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_card_predicate(target),
                 strings::with_spark_less_than_abandoned_count_this_turn_constraint(),
             )
         }
         CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_card_predicate(target),
                 strings::with_cost_less_than_void_count_constraint(),
             )
@@ -244,12 +252,17 @@ fn serialize_card_predicate_without_article(card_predicate: &CardPredicate) -> P
         CardPredicate::CharacterType(subtype) => {
             strings::subtype(serializer_utils::subtype_to_phrase(*subtype))
         }
-        CardPredicate::CardWithCost { target, cost_operator, cost } => compose_with_constraint(
-            serialize_card_predicate_without_article(target),
-            serialize_cost_constraint(cost_operator, *cost),
-        ),
+        CardPredicate::CardWithCost { target, cost_operator, cost } => {
+            strings::pred_with_constraint(
+                serialize_card_predicate_without_article(target),
+                strings::with_cost_constraint(
+                    serializer_utils::serialize_operator(cost_operator),
+                    cost.0,
+                ),
+            )
+        }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_card_predicate_without_article(target),
                 strings::with_spark_less_than_energy_paid_constraint(),
             )
@@ -270,12 +283,12 @@ fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
         CardPredicate::NotCharacterType(subtype) => {
             strings::characters_not_subtype(serializer_utils::subtype_to_phrase(*subtype))
         }
-        CardPredicate::CharacterWithSpark(spark, operator) => compose_with_constraint(
+        CardPredicate::CharacterWithSpark(spark, operator) => strings::pred_with_constraint(
             strings::characters_plural(),
             strings::with_spark_constraint(serializer_utils::serialize_operator(operator), spark.0),
         ),
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_card_predicate_plural(target),
                 strings::with_cost_less_than_allied_count(serialize_card_predicate_plural(
                     count_matching,
@@ -283,25 +296,25 @@ fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
             )
         }
         CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_card_predicate_plural(target),
                 strings::with_cost_less_than_abandoned_ally_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_card_predicate_plural(target),
                 strings::with_spark_less_than_abandoned_ally_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_card_predicate_plural(target),
                 strings::with_spark_less_than_abandoned_count_this_turn_constraint(),
             )
         }
         CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_card_predicate_plural(target),
                 strings::with_cost_less_than_void_count_constraint(),
             )
@@ -309,20 +322,25 @@ fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
         CardPredicate::Fast { target } => {
             strings::fast_predicate(serialize_card_predicate_plural(target))
         }
-        CardPredicate::CardWithCost { target, cost_operator, cost } => compose_with_constraint(
-            serialize_card_predicate_plural(target),
-            serialize_cost_constraint(cost_operator, *cost),
-        ),
-        CardPredicate::CharacterWithMaterializedAbility => compose_with_constraint(
+        CardPredicate::CardWithCost { target, cost_operator, cost } => {
+            strings::pred_with_constraint(
+                serialize_card_predicate_plural(target),
+                strings::with_cost_constraint(
+                    serializer_utils::serialize_operator(cost_operator),
+                    cost.0,
+                ),
+            )
+        }
+        CardPredicate::CharacterWithMaterializedAbility => strings::pred_with_constraint(
             strings::characters_plural(),
             strings::with_materialized_abilities_constraint(),
         ),
-        CardPredicate::CharacterWithMultiActivatedAbility => compose_with_constraint(
+        CardPredicate::CharacterWithMultiActivatedAbility => strings::pred_with_constraint(
             strings::characters_plural(),
             strings::with_activated_abilities_constraint(),
         ),
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_card_predicate_plural(target),
                 strings::with_spark_less_than_energy_paid_constraint(),
             )
@@ -391,14 +409,6 @@ fn serialize_for_each_predicate(predicate: &Predicate) -> Phrase {
     }
 }
 
-fn card_predicate_base_text(predicate: &CardPredicate) -> String {
-    card_predicate_base_phrase(predicate).to_string()
-}
-
-fn card_predicate_base_text_plural(predicate: &CardPredicate) -> String {
-    card_predicate_base_phrase_plural(predicate).to_string()
-}
-
 fn card_predicate_base_phrase(predicate: &CardPredicate) -> Phrase {
     match predicate {
         CardPredicate::Card => strings::card(),
@@ -442,14 +452,6 @@ fn card_predicate_base_phrase_plural(predicate: &CardPredicate) -> Phrase {
     }
 }
 
-fn serialize_your_predicate_plural_phrase(card_predicate: &CardPredicate) -> Phrase {
-    serialize_your_predicate_plural(card_predicate)
-}
-
-fn serialize_enemy_predicate_plural_phrase(card_predicate: &CardPredicate) -> Phrase {
-    serialize_enemy_predicate_plural(card_predicate)
-}
-
 fn your_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
     match card_predicate {
         CardPredicate::Character => strings::ally(),
@@ -461,24 +463,30 @@ fn your_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
         CardPredicate::NotCharacterType(subtype) => {
             strings::ally_not_subtype(serializer_utils::subtype_to_phrase(*subtype))
         }
-        CardPredicate::CharacterWithSpark(spark, operator) => compose_with_constraint(
+        CardPredicate::CharacterWithSpark(spark, operator) => strings::pred_with_constraint(
             strings::ally(),
             strings::with_spark_constraint(serializer_utils::serialize_operator(operator), spark.0),
         ),
-        CardPredicate::CharacterWithMaterializedAbility => compose_with_constraint(
+        CardPredicate::CharacterWithMaterializedAbility => strings::pred_with_constraint(
             strings::ally(),
             strings::with_materialized_ability_constraint(),
         ),
-        CardPredicate::CharacterWithMultiActivatedAbility => {
-            compose_with_constraint(strings::ally(), strings::with_activated_ability_constraint())
-        }
-        CardPredicate::Fast { target } => strings::fast_predicate(serialize_fast_target(target)),
-        CardPredicate::CardWithCost { target, cost_operator, cost } => compose_with_constraint(
-            your_predicate_formatted(target),
-            serialize_cost_constraint(cost_operator, *cost),
+        CardPredicate::CharacterWithMultiActivatedAbility => strings::pred_with_constraint(
+            strings::ally(),
+            strings::with_activated_ability_constraint(),
         ),
+        CardPredicate::Fast { target } => strings::fast_predicate(serialize_fast_target(target)),
+        CardPredicate::CardWithCost { target, cost_operator, cost } => {
+            strings::pred_with_constraint(
+                your_predicate_formatted(target),
+                strings::with_cost_constraint(
+                    serializer_utils::serialize_operator(cost_operator),
+                    cost.0,
+                ),
+            )
+        }
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 your_predicate_formatted(target),
                 strings::with_cost_less_than_allied_count(serialize_card_predicate_plural(
                     count_matching,
@@ -486,31 +494,31 @@ fn your_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
             )
         }
         CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 your_predicate_formatted(target),
                 strings::with_cost_less_than_abandoned_ally_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 your_predicate_formatted(target),
                 strings::with_spark_less_than_abandoned_ally_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 your_predicate_formatted(target),
                 strings::with_spark_less_than_abandoned_count_this_turn_constraint(),
             )
         }
         CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 your_predicate_formatted(target),
                 strings::with_cost_less_than_void_count_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 your_predicate_formatted(target),
                 strings::with_spark_less_than_energy_paid_constraint(),
             )
@@ -531,23 +539,27 @@ fn enemy_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
         CardPredicate::NotCharacterType(subtype) => {
             strings::non_subtype_enemy(serializer_utils::subtype_to_phrase(*subtype))
         }
-        CardPredicate::CharacterWithSpark(spark, operator) => compose_with_constraint(
+        CardPredicate::CharacterWithSpark(spark, operator) => strings::pred_with_constraint(
             strings::enemy(),
             strings::with_spark_constraint(serializer_utils::serialize_operator(operator), spark.0),
         ),
-        CardPredicate::CharacterWithMaterializedAbility => compose_with_constraint(
+        CardPredicate::CharacterWithMaterializedAbility => strings::pred_with_constraint(
             strings::enemy(),
             strings::with_materialized_ability_constraint(),
         ),
-        CardPredicate::CharacterWithMultiActivatedAbility => {
-            compose_with_constraint(strings::enemy(), strings::with_activated_ability_constraint())
-        }
-        CardPredicate::CardWithCost { cost_operator, cost, .. } => compose_with_constraint(
+        CardPredicate::CharacterWithMultiActivatedAbility => strings::pred_with_constraint(
             strings::enemy(),
-            serialize_cost_constraint(cost_operator, *cost),
+            strings::with_activated_ability_constraint(),
+        ),
+        CardPredicate::CardWithCost { cost_operator, cost, .. } => strings::pred_with_constraint(
+            strings::enemy(),
+            strings::with_cost_constraint(
+                serializer_utils::serialize_operator(cost_operator),
+                cost.0,
+            ),
         ),
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 enemy_predicate_formatted(target),
                 strings::with_cost_less_than_allied_count(serialize_card_predicate_plural(
                     count_matching,
@@ -555,31 +567,31 @@ fn enemy_predicate_formatted(card_predicate: &CardPredicate) -> Phrase {
             )
         }
         CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 enemy_predicate_formatted(target),
                 strings::with_cost_less_than_abandoned_ally_constraint(),
             )
         }
         CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 enemy_predicate_formatted(target),
                 strings::with_cost_less_than_void_count_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 enemy_predicate_formatted(target),
                 strings::with_spark_less_than_that_ally_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 enemy_predicate_formatted(target),
                 strings::with_spark_less_than_abandoned_count_this_turn_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 enemy_predicate_formatted(target),
                 strings::with_spark_less_than_energy_paid_constraint(),
             )
@@ -607,24 +619,29 @@ fn serialize_your_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
         CardPredicate::NotCharacterType(subtype) => {
             strings::allies_not_subtype(serializer_utils::subtype_to_phrase(*subtype))
         }
-        CardPredicate::CharacterWithSpark(spark, operator) => compose_with_constraint(
+        CardPredicate::CharacterWithSpark(spark, operator) => strings::pred_with_constraint(
             strings::allies_plural(),
             strings::with_spark_constraint(serializer_utils::serialize_operator(operator), spark.0),
         ),
-        CardPredicate::CharacterWithMaterializedAbility => compose_with_constraint(
+        CardPredicate::CharacterWithMaterializedAbility => strings::pred_with_constraint(
             strings::allies_plural(),
             strings::with_materialized_abilities_constraint(),
         ),
-        CardPredicate::CharacterWithMultiActivatedAbility => compose_with_constraint(
+        CardPredicate::CharacterWithMultiActivatedAbility => strings::pred_with_constraint(
             strings::allies_plural(),
             strings::with_activated_abilities_constraint(),
         ),
-        CardPredicate::CardWithCost { target, cost_operator, cost } => compose_with_constraint(
-            serialize_your_predicate_plural(target),
-            serialize_cost_constraint(cost_operator, *cost),
-        ),
+        CardPredicate::CardWithCost { target, cost_operator, cost } => {
+            strings::pred_with_constraint(
+                serialize_your_predicate_plural(target),
+                strings::with_cost_constraint(
+                    serializer_utils::serialize_operator(cost_operator),
+                    cost.0,
+                ),
+            )
+        }
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_your_predicate_plural(target),
                 strings::with_cost_less_than_allied_count(serialize_card_predicate_plural(
                     count_matching,
@@ -632,31 +649,31 @@ fn serialize_your_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
             )
         }
         CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_your_predicate_plural(target),
                 strings::with_cost_less_than_abandoned_ally_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_your_predicate_plural(target),
                 strings::with_spark_less_than_abandoned_ally_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_your_predicate_plural(target),
                 strings::with_spark_less_than_abandoned_count_this_turn_constraint(),
             )
         }
         CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_your_predicate_plural(target),
                 strings::with_cost_less_than_void_count_constraint(),
             )
         }
         CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
-            compose_with_constraint(
+            strings::pred_with_constraint(
                 serialize_your_predicate_plural(target),
                 strings::with_spark_less_than_energy_paid_constraint(),
             )
@@ -685,12 +702,4 @@ fn serialize_enemy_predicate_plural(card_predicate: &CardPredicate) -> Phrase {
 /// qualifiers for round-trip compatibility.
 fn is_generic_card_type(card_predicate: &CardPredicate) -> bool {
     matches!(card_predicate, CardPredicate::Card | CardPredicate::Character | CardPredicate::Event)
-}
-
-fn compose_with_constraint(base: Phrase, constraint: Phrase) -> Phrase {
-    strings::pred_with_constraint(base, constraint)
-}
-
-fn serialize_cost_constraint(cost_operator: &Operator<Energy>, cost: Energy) -> Phrase {
-    strings::with_cost_constraint(serializer_utils::serialize_operator(cost_operator), cost.0)
 }
