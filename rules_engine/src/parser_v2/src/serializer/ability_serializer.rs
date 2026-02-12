@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 
 use ability_data::ability::Ability;
 use ability_data::activated_ability::ActivatedAbility;
@@ -34,7 +34,7 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
         )
         .to_string(),
     };
-    SerializedAbility { text: guard_resolve_rlf(&text) }
+    SerializedAbility { text }
 }
 
 /// Serializes just the effect portion of an ability, without any costs.
@@ -53,7 +53,7 @@ pub fn serialize_ability_effect(ability: &Ability) -> SerializedAbility {
         }
         _ => return serialize_ability(ability),
     };
-    SerializedAbility { text: guard_resolve_rlf(&text) }
+    SerializedAbility { text }
 }
 
 /// Extracts and serializes each modal effect choice from a list of abilities.
@@ -76,9 +76,7 @@ pub fn serialize_modal_choices(
                     &choice.effect,
                 ))
                 .to_string();
-                result.insert(ModelEffectChoiceIndex(current_index), SerializedAbility {
-                    text: guard_resolve_rlf(&text),
-                });
+                result.insert(ModelEffectChoiceIndex(current_index), SerializedAbility { text });
                 current_index += 1;
             }
         }
@@ -143,25 +141,6 @@ fn serialize_activated(activated: &ActivatedAbility) -> String {
         (false, true) => strings::activated_ability_once_per_turn(costs, effect).to_string(),
         (false, false) => strings::activated_ability(costs, effect).to_string(),
     }
-}
-
-/// Compatibility guard: resolves any remaining RLF phrase references in a
-/// template string. Retained until the parity gate task confirms that
-/// phrase-based assembly produces identical output for all cards, at which
-/// point this function and its call sites can be deleted.
-fn guard_resolve_rlf(template: &str) -> String {
-    strings::register_source_phrases();
-    rlf::with_locale(|locale| {
-        let resolved = locale
-            .eval_str(template, HashMap::new())
-            .unwrap_or_else(|e| panic!("Error resolving RLF template {template:?}: {e}"))
-            .to_string();
-        debug_assert_eq!(
-            resolved, template,
-            "Parity violation: resolve_rlf changed output.\n  Before: {template:?}\n  After:  {resolved:?}"
-        );
-        resolved
-    })
 }
 
 /// Serializes a named ability into its display text.
