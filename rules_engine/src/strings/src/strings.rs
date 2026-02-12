@@ -1111,10 +1111,6 @@ rlf::rlf! {
     // Materialize figment quantity phrases
     // =========================================================================
 
-    // Materialize figments for each card played this turn.
-    materialize_figments_for_each_played($fig) = "{materialize} {$fig} for each card you have played this turn";
-    // Materialize figments for each matching predicate.
-    materialize_figments_for_each($fig, $for_each) = "{materialize} {$fig} for each {$for_each}";
     // Materialize figments for each quantity.
     materialize_figments_for_each_quantity($fig, $quantity) = "{materialize} {$fig} for each {$quantity}";
 

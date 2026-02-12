@@ -562,8 +562,6 @@ trigger_judgment_of_collection($target) = "[trigger the {Judgment} ability of {$
 trigger_judgment_of_each($target) = "[trigger the {Judgment} ability of each {$target}]";
 
 
-materialize_figments_for_each_played($fig) = "[{materialize} {$fig} for each card you have played this turn]";
-materialize_figments_for_each($fig, $for_each) = "[{materialize} {$fig} for each {$for_each}]";
 materialize_figments_for_each_quantity($fig, $quantity) = "[{materialize} {$fig} for each {$quantity}]";
 
 

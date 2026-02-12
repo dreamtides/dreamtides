@@ -265,21 +265,11 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::MaterializeFigmentsQuantity { count, quantity, figment } => {
             let figment_text =
                 strings::n_figments(*count, serializer_utils::figment_to_phrase(*figment));
-            match quantity {
-                QuantityExpression::PlayedThisTurn(_) => {
-                    strings::materialize_figments_for_each_played(figment_text).to_string()
-                }
-                QuantityExpression::Matching(predicate) => strings::materialize_figments_for_each(
-                    figment_text,
-                    predicate_serializer::for_each_predicate_phrase(predicate),
-                )
-                .to_string(),
-                _ => strings::materialize_figments_for_each_quantity(
-                    figment_text,
-                    serialize_for_count_expression(quantity),
-                )
-                .to_string(),
-            }
+            strings::materialize_figments_for_each_quantity(
+                figment_text,
+                serialize_for_count_expression(quantity),
+            )
+            .to_string()
         }
         StandardEffect::ReturnToHand { target } => match target {
             Predicate::Any(CardPredicate::Character) => {
