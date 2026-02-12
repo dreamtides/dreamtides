@@ -20,39 +20,6 @@ pub fn serialize_operator<T>(operator: &Operator<T>) -> String {
     }
 }
 
-/// Returns the RLF phrase name for a [CardSubtype].
-///
-/// This is the name used in template strings to reference the subtype
-/// phrase (e.g., "agent", "survivor", "spirit_animal").
-pub fn subtype_phrase_name(subtype: CardSubtype) -> &'static str {
-    match subtype {
-        CardSubtype::Agent => "agent",
-        CardSubtype::Ancient => "ancient",
-        CardSubtype::Avatar => "avatar",
-        CardSubtype::Child => "child",
-        CardSubtype::Detective => "detective",
-        CardSubtype::Enigma => "enigma",
-        CardSubtype::Explorer => "explorer",
-        CardSubtype::Guide => "guide",
-        CardSubtype::Hacker => "hacker",
-        CardSubtype::Mage => "mage",
-        CardSubtype::Monster => "monster",
-        CardSubtype::Musician => "musician",
-        CardSubtype::Outsider => "outsider",
-        CardSubtype::Renegade => "renegade",
-        CardSubtype::Robot => "robot",
-        CardSubtype::SpiritAnimal => "spirit_animal",
-        CardSubtype::Super => "super_",
-        CardSubtype::Survivor => "survivor",
-        CardSubtype::Synth => "synth",
-        CardSubtype::Tinkerer => "tinkerer",
-        CardSubtype::Trooper => "trooper",
-        CardSubtype::Visionary => "visionary",
-        CardSubtype::Visitor => "visitor",
-        CardSubtype::Warrior => "warrior",
-    }
-}
-
 /// Converts a [FigmentType] to its corresponding RLF phrase.
 pub fn figment_to_phrase(figment: FigmentType) -> Phrase {
     match figment {

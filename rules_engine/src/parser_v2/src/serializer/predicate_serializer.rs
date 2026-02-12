@@ -1,6 +1,6 @@
 use ability_data::predicate::{CardPredicate, Operator, Predicate};
 use core_data::numerics::Energy;
-use rlf::{Phrase, VariantKey};
+use rlf::Phrase;
 use strings::strings;
 
 use crate::serializer::serializer_utils;
@@ -405,15 +405,7 @@ fn card_predicate_base_phrase(predicate: &CardPredicate) -> Phrase {
         CardPredicate::Character => strings::character(),
         CardPredicate::Event => strings::event(),
         CardPredicate::CharacterType(subtype) => {
-            let name = serializer_utils::subtype_phrase_name(*subtype);
-            Phrase::builder()
-                .text(format!("{{subtype({name})}}"))
-                .variants(
-                    [(VariantKey::new("other"), format!("{{@plural subtype({name})}}"))]
-                        .into_iter()
-                        .collect(),
-                )
-                .build()
+            strings::subtype(serializer_utils::subtype_to_phrase(*subtype))
         }
         CardPredicate::NotCharacterType(subtype) => {
             strings::character_not_subtype(serializer_utils::subtype_to_phrase(*subtype))

@@ -184,10 +184,8 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
             let predicate_text = match matching {
                 CardPredicate::Character => "allies".to_string(),
                 CardPredicate::CharacterType(subtype) => {
-                    format!(
-                        "allied {{@plural subtype({})}}",
-                        serializer_utils::subtype_phrase_name(*subtype)
-                    )
+                    strings::allied_subtype_plural(serializer_utils::subtype_to_phrase(*subtype))
+                        .to_string()
                 }
                 _ => predicate_serializer::serialize_predicate_plural(&Predicate::Any(
                     matching.clone(),
