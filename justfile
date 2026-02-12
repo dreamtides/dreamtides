@@ -479,6 +479,7 @@ insta:
 # nightly-only
 fmt: style-validator-fix
     #!/usr/bin/env bash
+    python3 scripts/llms/llm_symlinks.py > /dev/null
     output=$(cd rules_engine && cargo +nightly fmt 2>&1)
     if [ $? -eq 0 ]; then
         echo "Formatted"
