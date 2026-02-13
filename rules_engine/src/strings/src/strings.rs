@@ -15,18 +15,18 @@ rlf::rlf! {
     // =========================================================================
 
     // Energy amount with colored symbol (e.g., "2[energy]").
-    energy($e) = "<color=#00838F>{$e}\u{25CF}</color>";
+    energy($e) = :a "<color=#00838F>{$e}\u{25CF}</color>";
     // Points amount with colored symbol (e.g., "3[points]").
-    points($p) = "<color=#F57F17>{$p}\u{234F}</color>";
+    points($p) = :a "<color=#F57F17>{$p}\u{234F}</color>";
     // Maximum energy display (e.g., "5 maximum [energy]").
-    maximum_energy($max) = "{$max} maximum {energy_symbol}";
+    maximum_energy($max) = :a "{$max} maximum {energy_symbol}";
 
     // =========================================================================
     // Trigger ability prefixes
     // =========================================================================
 
     // Parameterized trigger prefix with dynamic text.
-    trigger($t) = "\u{25B8} <b>{$t}:</b>";
+    trigger($t) = :a "\u{25B8} <b>{$t}:</b>";
     // Materialized trigger prefix.
     materialized = "\u{25B8} <b>Materialized:</b>";
     // Judgment trigger prefix.
@@ -51,7 +51,7 @@ rlf::rlf! {
     // =========================================================================
 
     // Parameterized keyword formatting in purple.
-    keyword($k) = "<color=#AA00FF>{$k}</color>";
+    keyword($k) = :a "<color=#AA00FF>{$k}</color>";
     // Dissolve keyword.
     dissolve = "<color=#AA00FF>dissolve</color>";
     // Banish keyword.
@@ -73,15 +73,15 @@ rlf::rlf! {
     // Prevented keyword (participial form).
     prevented = "<color=#AA00FF>prevented</color>";
     // Kindle keyword with spark amount.
-    kindle($k) = "<color=#AA00FF>kindle</color> {$k}";
+    kindle($k) = :a "<color=#AA00FF>kindle</color> {$k}";
     // Kindled keyword (participial form).
     kindled = "<color=#AA00FF>kindled</color>";
     // Foresee keyword with card count.
-    foresee($n) = "<color=#AA00FF>foresee</color> {$n}";
+    foresee($n) = :a "<color=#AA00FF>foresee</color> {$n}";
     // Fast keyword with lightning bolt.
     fast = "<b>\u{21AF}fast</b>";
     // Reclaim with energy cost.
-    reclaim_for_cost($r) = "<color=#AA00FF>reclaim</color> <color=#00838F>{$r}\u{25CF}</color>";
+    reclaim_for_cost($r) = :a "<color=#AA00FF>reclaim</color> <color=#00838F>{$r}\u{25CF}</color>";
 
     // =========================================================================
     // Modal card formatting
@@ -99,12 +99,12 @@ rlf::rlf! {
     // Card noun with article metadata.
     card = :a{ one: "card", other: "cards" };
     // Card count with article (e.g., "a card" or "2 cards").
-    cards($n) = :match($n) {
+    cards($n) = :a :match($n) {
         1: "a card",
         *other: "{$n} cards",
     };
     // Top N cards of deck (e.g., "top card" or "top 3 cards").
-    top_n_cards($n) = :match($n) {
+    top_n_cards($n) = :a :match($n) {
         1: "top card",
         *other: "top {$n} {card:$n}",
     };
@@ -114,11 +114,11 @@ rlf::rlf! {
     // =========================================================================
 
     // Spark value passthrough.
-    spark_value($s) = "{$s}";
+    spark_value($s) = :a "{$s}";
     // Spark keyword for ability text.
     spark = "spark";
     // Generic count passthrough for numeric conditions.
-    count($n) = "{$n}";
+    count($n) = :a "{$n}";
 
     // =========================================================================
     // Ally counts
@@ -127,7 +127,7 @@ rlf::rlf! {
     // Ally noun with article metadata.
     ally = :an{ one: "ally", other: "allies" };
     // Ally count with article (e.g., "an ally" or "2 allies").
-    count_allies($n) = :match($n) {
+    count_allies($n) = :a :match($n) {
         1: "an ally",
         *other: "{$n} allies",
     };
@@ -160,7 +160,7 @@ rlf::rlf! {
         other: "<color=#F57F17><b><u>{$f} Figments</u></color></b>",
     };
     // N figments with article for singular.
-    n_figments($n, $f) = :match($n) {
+    n_figments($n, $f) = :a :match($n) {
         1: "a {figment($f)}",
         *other: "{text_number($n)} {figment($f):other}",
     };
@@ -219,17 +219,14 @@ rlf::rlf! {
     warrior = :a{ one: "Warrior", other: "Warriors" };
 
     // Subtype display with green bold formatting, variant-aware.
-    subtype($s) = :from($s) {
-        *one: "<color=#2E7D32><b>{$s}</b></color>",
-        other: "<color=#2E7D32><b>{$s:other}</b></color>",
-    };
+    subtype($s) = :from($s) "<color=#2E7D32><b>{$s}</b></color>";
 
     // =========================================================================
     // Text number conversion
     // =========================================================================
 
     // Convert number to word (1-5) or fall back to numeral.
-    text_number($n) = :match($n) {
+    text_number($n) = :a :match($n) {
         1: "one",
         2: "two",
         3: "three",
@@ -243,14 +240,14 @@ rlf::rlf! {
     // =========================================================================
 
     // Turn duration with repetition count.
-    this_turn_times($n) = :match($n) {
+    this_turn_times($n) = :a :match($n) {
         1: "this turn",
         2: "twice this turn",
         *other: "this turn {text_number($n)} times",
     };
 
     // Multiplier effect (Double, Triple, etc.).
-    multiply_by($n) = :match($n) {
+    multiply_by($n) = :a :match($n) {
         2: "Double",
         3: "Triple",
         *other: "Multiply by {$n}",
@@ -261,7 +258,7 @@ rlf::rlf! {
     // =========================================================================
 
     // Copy count with article (e.g., "a copy" or "two copies").
-    copies($n) = :match($n) {
+    copies($n) = :a :match($n) {
         1: "a copy",
         *other: "{text_number($n)} copies",
     };
@@ -271,7 +268,7 @@ rlf::rlf! {
     // =========================================================================
 
     // Random character count (e.g., "a random character" or "two random characters").
-    n_random_characters($n) = :match($n) {
+    n_random_characters($n) = :a :match($n) {
         1: "a random character",
         *other: "{text_number($n)} random characters",
     };
@@ -281,7 +278,7 @@ rlf::rlf! {
     // =========================================================================
 
     // Up to N events (e.g., "an event" or "up to 3 events").
-    up_to_n_events($n) = :match($n) {
+    up_to_n_events($n) = :a :match($n) {
         1: "an event",
         *other: "up to {$n} events",
     };
@@ -291,7 +288,7 @@ rlf::rlf! {
     // =========================================================================
 
     // Up to N allies (e.g., "an ally" or "up to 3 allies").
-    up_to_n_allies($n) = :match($n) {
+    up_to_n_allies($n) = :a :match($n) {
         1: "an {ally}",
         *other: "up to {$n} {ally:other}",
     };
@@ -348,9 +345,9 @@ rlf::rlf! {
     // Decline to take the action associated with a prompt.
     decline_prompt_button = "Decline";
     // Choose to pay energy to take a prompt action.
-    pay_energy_prompt_button($e) = "Spend {energy($e)}";
+    pay_energy_prompt_button($e) = :a "Spend {energy($e)}";
     // Confirm the amount of energy to pay as an additional cost.
-    pay_energy_additional_cost_button($e) = "Spend {energy($e)}";
+    pay_energy_additional_cost_button($e) = :a "Spend {energy($e)}";
     // Confirm selection of target cards in the void.
     primary_button_submit_void_card_targets = "Submit";
     // Confirm selection of target cards in the hand.
@@ -381,7 +378,7 @@ rlf::rlf! {
     // =========================================================================
 
     // Energy paid annotation for variable-cost cards.
-    card_rules_text_energy_paid($e) = "({energy($e)} paid)";
+    card_rules_text_energy_paid($e) = :a "({energy($e)} paid)";
     // Reclaimed annotation.
     card_rules_text_reclaimed = "(Reclaimed)";
     // Anchored annotation.
@@ -392,9 +389,9 @@ rlf::rlf! {
     // =========================================================================
 
     // Card name for a numbered modal effect choice.
-    modal_effect_choice_card_name($number) = "Choice {$number}";
+    modal_effect_choice_card_name($number) = :a "Choice {$number}";
     // Card name for a character ability.
-    character_ability_card_name($character_name) = "{$character_name} Ability";
+    character_ability_card_name($character_name) = :a "{$character_name} Ability";
 
     // =========================================================================
     // Limit warning messages
@@ -446,8 +443,7 @@ rlf::rlf! {
     help_text_foresee_1 =
         "<color=#AA00FF>Foresee</color> 1: Look at the top card of your deck. You may put it into your void.";
     // Help text for foresee N ability.
-    help_text_foresee_n($n) =
-        "<color=#AA00FF>Foresee</color> {$n}: Look at the top {$n} cards of your deck. You may put them into your void or put them back in any order.";
+    help_text_foresee_n($n) = :a "<color=#AA00FF>Foresee</color> {$n}: Look at the top {$n} cards of your deck. You may put them into your void or put them back in any order.";
     // Help text for anchored status.
     help_text_anchored =
         "<color=#AA00FF><b>Anchored</b></color>: Cannot be dissolved.";
@@ -455,8 +451,7 @@ rlf::rlf! {
     help_text_reclaim_without_cost =
         "{@cap reclaim}: You may play a card from your void, then banish it when it leaves play.";
     // Help text for reclaim with energy cost.
-    help_text_reclaim_with_cost($e) =
-        "{@cap reclaim} {energy($e)}: You may play this card from your void for {energy($e)}, then banish it.";
+    help_text_reclaim_with_cost($e) = :a "{@cap reclaim} {energy($e)}: You may play this card from your void for {energy($e)}, then banish it.";
 
     // =========================================================================
     // Token types
@@ -482,7 +477,7 @@ rlf::rlf! {
     // Connector for combined costs.
     cost_and_connector = " and ";
     // Pay prefix for trigger costs.
-    pay_prefix($cost) = "pay {$cost}";
+    pay_prefix($cost) = :a "pay {$cost}";
     // Abandon any number of a target type (uses plural variant).
     abandon_any_number_of($target) = :from($target) "abandon any number of {$target:other}";
     // Abandon a specific target.
@@ -509,23 +504,23 @@ rlf::rlf! {
     // =========================================================================
 
     // Abandon a count of allies.
-    abandon_count_allies($a) = "abandon {count_allies($a)}";
+    abandon_count_allies($a) = :a "abandon {count_allies($a)}";
     // Discard a count of cards.
-    discard_cards_cost($d) = "discard {cards($d)}";
+    discard_cards_cost($d) = :a "discard {cards($d)}";
     // Energy cost value.
-    energy_cost_value($e) = "{energy($e)}";
+    energy_cost_value($e) = :a "{energy($e)}";
     // Lose maximum energy cost.
-    lose_max_energy_cost($m) = "lose {maximum_energy($m)}";
+    lose_max_energy_cost($m) = :a "lose {maximum_energy($m)}";
     // Banish your entire void.
     banish_your_void_cost = "{banish} your void";
     // Banish another card in your void.
     banish_another_in_void = "{banish} another card in your void";
     // Banish a count of cards from your void.
-    banish_cards_from_void($c) = "{banish} {cards($c)} from your void";
+    banish_cards_from_void($c) = :a "{banish} {cards($c)} from your void";
     // Banish a count of cards from the opponent's void.
-    banish_cards_from_enemy_void($c) = "{banish} {cards($c)} from the opponent's void";
+    banish_cards_from_enemy_void($c) = :a "{banish} {cards($c)} from the opponent's void";
     // Banish your void with a minimum card count.
-    banish_void_min_count($n) = "{banish} your void with {count($n)} or more cards";
+    banish_void_min_count($n) = :a "{banish} your void with {count($n)} or more cards";
     // Banish a target from hand.
     banish_from_hand_cost($target) = :from($target) "{banish} {$target} from hand";
 
@@ -569,11 +564,11 @@ rlf::rlf! {
     // Target banished trigger.
     when_banished_trigger($target) = :from($target) "when {$target} is {banished}, ";
     // Play N cards in a turn trigger.
-    when_you_play_cards_in_turn_trigger($c) = "when you play {$c} {card:$c} in a turn, ";
+    when_you_play_cards_in_turn_trigger($c) = :a "when you play {$c} {card:$c} in a turn, ";
     // Abandon N allies in a turn trigger.
-    when_you_abandon_count_in_turn_trigger($a) = "when you abandon {count_allies($a)} in a turn, ";
+    when_you_abandon_count_in_turn_trigger($a) = :a "when you abandon {count_allies($a)} in a turn, ";
     // Draw N cards in a turn trigger.
-    when_you_draw_in_turn_trigger($c) = "when you draw {$c} {card:$c} in a turn, ";
+    when_you_draw_in_turn_trigger($c) = :a "when you draw {$c} {card:$c} in a turn, ";
     // Materialize Nth target in a turn trigger (uses plural variant).
     when_you_materialize_nth_in_turn_trigger($n, $target) = :from($target) "when you {materialize} {text_number($n)} {$target:other} in a turn, ";
 
@@ -588,24 +583,24 @@ rlf::rlf! {
     // Condition for having discarded a target this turn.
     if_discarded_this_turn($target) = :from($target) "if you have discarded {$target} this turn";
     // Condition wrapper for a predicate count (uses plural variant).
-    with_predicate_condition($pred) = "with {$pred:other},";
+    with_predicate_condition($pred) = :from($pred) "with {$pred:other},";
 
     // =========================================================================
     // Condition serializer phrases — parameterized
     // =========================================================================
 
     // Condition for allies sharing a character type.
-    with_allies_sharing_type($a) = "with {count_allies($a)} that share a character type,";
+    with_allies_sharing_type($a) = :a "with {count_allies($a)} that share a character type,";
     // Condition for drawing a count of cards this turn.
-    if_drawn_count_this_turn($n) = "if you have drawn {count($n)} or more cards this turn";
+    if_drawn_count_this_turn($n) = :a "if you have drawn {count($n)} or more cards this turn";
     // Condition for having a count of cards in your void.
-    while_void_count($n) = "while you have {count($n)} or more cards in your void,";
+    while_void_count($n) = :a "while you have {count($n)} or more cards in your void,";
     // Condition for having an allied subtype.
-    with_allied_subtype($t) = "with an allied {subtype($t)},";
+    with_allied_subtype($t) = :from($t) "with an allied {subtype($t)},";
     // Condition for a count of allied characters with a subtype.
-    with_count_allied_subtype($a, $t) = "{count_allied_subtype($a, $t)}";
+    with_count_allied_subtype($a, $t) = :a "{count_allied_subtype($a, $t)}";
     // Condition for a count of allies.
-    with_count_allies($a) = "{count_allies($a)}";
+    with_count_allies($a) = :a "{count_allies($a)}";
 
     // =========================================================================
     // Operator phrases
@@ -625,25 +620,25 @@ rlf::rlf! {
     // =========================================================================
 
     // Draw cards effect fragment (no trailing period).
-    draw_cards_effect($c) = "draw {cards($c)}";
+    draw_cards_effect($c) = :a "draw {cards($c)}";
     // Discard cards effect fragment (no trailing period).
-    discard_cards_effect($d) = "discard {cards($d)}";
+    discard_cards_effect($d) = :a "discard {cards($d)}";
     // Gain energy effect fragment (no trailing period).
-    gain_energy_effect($e) = "gain {energy($e)}";
+    gain_energy_effect($e) = :a "gain {energy($e)}";
     // Gain points effect fragment (no trailing period).
-    gain_points_effect($p) = "gain {points($p)}";
+    gain_points_effect($p) = :a "gain {points($p)}";
     // Lose points effect fragment (no trailing period).
-    lose_points_effect($p) = "you lose {points($p)}";
+    lose_points_effect($p) = :a "you lose {points($p)}";
     // Opponent gains points effect fragment (no trailing period).
-    opponent_gains_points_effect($p) = "the opponent gains {points($p)}";
+    opponent_gains_points_effect($p) = :a "the opponent gains {points($p)}";
     // Opponent loses points effect fragment (no trailing period).
-    opponent_loses_points_effect($p) = "the opponent loses {points($p)}";
+    opponent_loses_points_effect($p) = :a "the opponent loses {points($p)}";
     // Foresee effect fragment (no trailing period).
-    foresee_effect($f) = "{foresee($f)}";
+    foresee_effect($f) = :a "{foresee($f)}";
     // Kindle effect fragment (no trailing period).
-    kindle_effect($k) = "{kindle($k)}";
+    kindle_effect($k) = :a "{kindle($k)}";
     // Each player discards effect fragment (no trailing period).
-    each_player_discards_effect($d) = "each player discards {cards($d)}";
+    each_player_discards_effect($d) = :a "each player discards {cards($d)}";
     // Prevent that card effect fragment (no trailing period).
     prevent_that_card_effect = "{prevent} that card";
     // Then materialize it effect fragment (no trailing period).
@@ -656,23 +651,23 @@ rlf::rlf! {
     // Gain energy equal to this character's cost effect fragment (no trailing period).
     gain_energy_equal_to_this_cost_effect = "gain {energy_symbol} equal to this character's cost";
     // Put top cards of deck into void effect fragment (no trailing period).
-    put_deck_into_void_effect($v) = "put the {top_n_cards($v)} of your deck into your void";
+    put_deck_into_void_effect($v) = :a "put the {top_n_cards($v)} of your deck into your void";
     // Banish cards from enemy void effect fragment (no trailing period).
-    banish_cards_from_enemy_void_effect($c) = "{banish} {cards($c)} from the opponent's void";
+    banish_cards_from_enemy_void_effect($c) = :a "{banish} {cards($c)} from the opponent's void";
     // Banish enemy void effect fragment (no trailing period).
     banish_enemy_void_effect = "{banish} the opponent's void";
     // Judgment phase at end of turn effect fragment (no trailing period).
     judgment_phase_at_end_of_turn_effect = "at the end of this turn, trigger an additional {judgment_phase_name} phase";
     // Multiply energy effect fragment (no trailing period).
-    multiply_energy_effect($n) = "{multiply_by($n)} the amount of {energy_symbol} you have";
+    multiply_energy_effect($n) = :a "{multiply_by($n)} the amount of {energy_symbol} you have";
     // Spend all energy dissolve effect fragment (no trailing period).
     spend_all_energy_dissolve_effect = "spend all your {energy_symbol}. {dissolve} an enemy with cost less than or equal to the amount spent";
     // Spend all energy draw discard effect fragment (no trailing period).
     spend_all_energy_draw_discard_effect = "spend all your {energy_symbol}. Draw cards equal to the amount spent, then discard that many cards";
     // Each player shuffles and draws effect fragment (no trailing period).
-    each_player_shuffles_and_draws_effect($c) = "each player shuffles their hand and void into their deck and then draws {cards($c)}";
+    each_player_shuffles_and_draws_effect($c) = :a "each player shuffles their hand and void into their deck and then draws {cards($c)}";
     // Return up to events from void effect fragment (no trailing period).
-    return_up_to_events_from_void_effect($n) = "return {up_to_n_events($n)} from your void to your hand";
+    return_up_to_events_from_void_effect($n) = :a "return {up_to_n_events($n)} from your void to your hand";
     // Fast prefix for activated abilities.
     fast_prefix = "{Fast} -- ";
 
@@ -681,45 +676,45 @@ rlf::rlf! {
     // =========================================================================
 
     // Discard a chosen card from the opponent's hand.
-    discard_chosen_from_enemy_hand($target) = "discard a chosen {$target} from the opponent's hand";
+    discard_chosen_from_enemy_hand($target) = :from($target) "discard a chosen {$target} from the opponent's hand";
     // Discard a chosen card from the opponent's hand, then they draw.
-    discard_chosen_from_enemy_hand_then_draw($target) = "discard a chosen {$target} from the opponent's hand. They draw {cards(1)}";
+    discard_chosen_from_enemy_hand_then_draw($target) = :from($target) "discard a chosen {$target} from the opponent's hand. They draw {cards(1)}";
     // Put a card from your void on top of your deck.
-    put_from_void_on_top_of_deck($target) = "put {$target} from your void on top of your deck";
+    put_from_void_on_top_of_deck($target) = :from($target) "put {$target} from your void on top of your deck";
     // Put up to N cards from your void on top of your deck.
-    put_up_to_from_void_on_top_of_deck($n, $target) = "put up to {cards($n)} {$target} from your void on top of your deck";
+    put_up_to_from_void_on_top_of_deck($n, $target) = :a "put up to {cards($n)} {$target} from your void on top of your deck";
     // Materialize random characters from your deck.
-    materialize_random_from_deck($n, $constraint) = "{materialize} {n_random_characters($n)} {$constraint} from your deck";
+    materialize_random_from_deck($n, $constraint) = :a "{materialize} {n_random_characters($n)} {$constraint} from your deck";
     // Copy the next card you play this turn.
-    copy_next_played($target, $times) = "copy the next {$target} you play {this_turn_times($times)}";
+    copy_next_played($target, $times) = :from($target) "copy the next {$target} you play {this_turn_times($times)}";
     // Create a trigger until end of turn with keyword trigger.
-    create_trigger_until_end_of_turn_keyword($trig, $eff) = "until end of turn, {$trig} {@cap $eff}";
+    create_trigger_until_end_of_turn_keyword($trig, $eff) = :a "until end of turn, {$trig} {@cap $eff}";
     // Create a trigger until end of turn.
-    create_trigger_until_end_of_turn($trig, $eff) = "until end of turn, {$trig}{$eff}";
+    create_trigger_until_end_of_turn($trig, $eff) = :a "until end of turn, {$trig}{$eff}";
     // Dissolve a target.
-    dissolve_target($target) = "{dissolve} {$target}";
+    dissolve_target($target) = :from($target) "{dissolve} {$target}";
     // Banish a target.
-    banish_target($target) = "{banish} {$target}";
+    banish_target($target) = :from($target) "{banish} {$target}";
     // Banish a target until another leaves play.
-    banish_until_leaves($target, $until) = "{banish} {$target} until {$until} leaves play";
+    banish_until_leaves($target, $until) = :from($target) "{banish} {$target} until {$until} leaves play";
     // Banish a target until your next main phase.
-    banish_until_next_main($target) = "{banish} {$target} until your next main phase";
+    banish_until_next_main($target) = :from($target) "{banish} {$target} until your next main phase";
     // Banish a target when it leaves play.
-    banish_when_leaves_play($target) = "{banish} {$target} when it leaves play";
+    banish_when_leaves_play($target) = :from($target) "{banish} {$target} when it leaves play";
     // Gain control of a target.
-    gain_control_of($target) = "gain control of {$target}";
+    gain_control_of($target) = :from($target) "gain control of {$target}";
     // Discover a card predicate.
-    discover_target($target) = "{discover} {$target}";
+    discover_target($target) = :from($target) "{discover} {$target}";
     // Discover a card and materialize it.
-    discover_and_materialize($target) = "{discover} {$target} and {materialize} it";
+    discover_and_materialize($target) = :from($target) "{discover} {$target} and {materialize} it";
     // Materialize a target.
-    materialize_target($target) = "{materialize} {$target}";
+    materialize_target($target) = :from($target) "{materialize} {$target}";
     // Materialize a target at end of turn.
-    materialize_at_end_of_turn($target) = "{materialize} {$target} at end of turn";
+    materialize_at_end_of_turn($target) = :from($target) "{materialize} {$target} at end of turn";
     // Materialize a target from your void.
-    materialize_from_void($target) = "{materialize} {$target} from your void";
+    materialize_from_void($target) = :from($target) "{materialize} {$target} from your void";
     // Return a target to hand.
-    return_to_hand($target) = "return {$target} to hand";
+    return_to_hand($target) = :from($target) "return {$target} to hand";
     // Return this character to your hand.
     return_this_to_hand = "return this character to your hand";
     // Return an enemy or ally to hand.
@@ -727,39 +722,39 @@ rlf::rlf! {
     // Return an ally to hand.
     return_ally_to_hand = "return an ally to hand";
     // Return a target from your void to your hand.
-    return_from_void_to_hand($target) = "return {$target} from your void to your hand";
+    return_from_void_to_hand($target) = :from($target) "return {$target} from your void to your hand";
     // Reclaim a target from your void.
-    reclaim_target($target) = "{reclaim} {$target}";
+    reclaim_target($target) = :from($target) "{reclaim} {$target}";
     // Reclaim a random card type.
-    reclaim_random($target) = "{reclaim} a random {$target}";
+    reclaim_random($target) = :from($target) "{reclaim} a random {$target}";
     // Put a target on top of the opponent's deck.
-    put_on_top_of_enemy_deck($target) = "put {$target} on top of the opponent's deck";
+    put_on_top_of_enemy_deck($target) = :from($target) "put {$target} on top of the opponent's deck";
     // Copy a target.
-    copy_target($target) = "copy {$target}";
+    copy_target($target) = :from($target) "copy {$target}";
     // Disable activated abilities of a target while this is in play.
-    disable_activated_abilities($target) = "disable the activated abilities of {$target} while this character is in play";
+    disable_activated_abilities($target) = :from($target) "disable the activated abilities of {$target} while this character is in play";
     // Draw a matching card from your deck.
-    draw_matching_from_deck($target) = "draw {$target} from your deck";
+    draw_matching_from_deck($target) = :from($target) "draw {$target} from your deck";
     // Abandon a target and gain energy for its spark.
-    abandon_and_gain_energy_for_spark($target) = "abandon {$target} and gain {energy_symbol} for each point of spark that character had";
+    abandon_and_gain_energy_for_spark($target) = :from($target) "abandon {$target} and gain {energy_symbol} for each point of spark that character had";
     // Abandon a target at end of turn.
-    abandon_at_end_of_turn($target) = "abandon {$target} at end of turn";
+    abandon_at_end_of_turn($target) = :from($target) "abandon {$target} at end of turn";
     // Each player abandons a matching card.
-    each_player_abandons($target) = "each player abandons {$target}";
+    each_player_abandons($target) = :from($target) "each player abandons {$target}";
     // Target cannot be dissolved this turn.
-    prevent_dissolve_this_turn($target) = "{$target} cannot be {dissolved} this turn";
+    prevent_dissolve_this_turn($target) = :from($target) "{$target} cannot be {dissolved} this turn";
     // Prevent a played target.
-    prevent_played_target($target) = "{prevent} a played {$target}";
+    prevent_played_target($target) = :from($target) "{prevent} a played {$target}";
     // Prevent a played target unless opponent pays cost.
-    prevent_unless_pays($target, $cost) = "{prevent} a played {$target} unless the opponent pays {$cost}";
+    prevent_unless_pays($target, $cost) = :from($target) "{prevent} a played {$target} unless the opponent pays {$cost}";
     // Gain energy equal to a target's cost.
-    gain_energy_equal_to_cost($target) = "gain {energy_symbol} equal to {$target}'s cost";
+    gain_energy_equal_to_cost($target) = :from($target) "gain {energy_symbol} equal to {$target}'s cost";
     // Target gains spark.
-    gains_spark($target, $s) = "{$target} gains +{$s} spark";
+    gains_spark($target, $s) = :from($target) "{$target} gains +{$s} spark";
     // Opponent pays a cost.
-    opponent_pays_cost($cost) = "the opponent pays {$cost}";
+    opponent_pays_cost($cost) = :a "the opponent pays {$cost}";
     // Pay a cost.
-    pay_cost_effect($cost) = "pay {$cost}";
+    pay_cost_effect($cost) = :a "pay {$cost}";
 
     // =========================================================================
     // Effect serializer phrases — standalone
@@ -782,7 +777,7 @@ rlf::rlf! {
     // Optional action prefix for abilities the player may choose to activate.
     you_may_prefix = "you may ";
     // Connects a cost to its effect in activated abilities (e.g., "{cost} to {effect}").
-    cost_to_connector($cost) = "{$cost} to ";
+    cost_to_connector($cost) = :a "{$cost} to ";
     // Prefix for effects that last until the end of the current turn.
     until_end_of_turn_prefix = "Until end of turn, ";
     // Prefix for abilities that can only be used once per turn.
@@ -826,7 +821,7 @@ rlf::rlf! {
     // Plural predicate pronoun.
     pronoun_them = "them";
     // Selects the :other (plural) variant of a phrase as its default text.
-    as_plural($p) = "{$p:other}";
+    as_plural($p) = :from($p) "{$p:other}";
     // Helper for packaging asymmetric singular/plural as variants.
     // The $other parameter should be an already-pluralized phrase.
     with_plural($one, $other) = :from($one) { *one: "{$one}", other: "{$other}" };
@@ -844,12 +839,12 @@ rlf::rlf! {
     // Applies an English indefinite article to a predicate noun, variant-aware.
     predicate_with_indefinite_article($p) = :from($p) {
         *one: "{@a $p}",
-        other: "{$p:other}",
+        other: "{$p}",
     };
     // Another/other qualifying prefix for a predicate noun, variant-aware.
     another_pred($p) = :from($p) {
         *one: "another {$p}",
-        other: "other {$p:other}",
+        other: "other {$p}",
     };
 
     // =========================================================================
@@ -875,54 +870,36 @@ rlf::rlf! {
     // Other character noun with article metadata.
     other_character = :an{ one: "other character", other: "other characters" };
     // Allied predicate noun, variant-aware.
-    allied_pred($base) = :from($base) {
-        *one: "allied {$base}",
-        other: "allied {$base:other}",
-    };
+    allied_pred($base) = :from($base) "allied {$base}";
     // Enemy predicate noun, variant-aware.
-    enemy_pred($base) = :from($base) {
-        *one: "enemy {$base}",
-        other: "enemy {$base:other}",
-    };
+    enemy_pred($base) = :from($base) "enemy {$base}";
     // Predicate noun in your void location, variant-aware.
-    in_your_void($target) = :from($target) {
-        *one: "{$target} in your void",
-        other: "{$target:other} in your void",
-    };
+    in_your_void($target) = :from($target) "{$target} in your void";
     // Predicate noun in the opponent's void location, variant-aware.
-    in_opponent_void($target) = :from($target) {
-        *one: "{$target} in the opponent's void",
-        other: "{$target:other} in the opponent's void",
-    };
+    in_opponent_void($target) = :from($target) "{$target} in the opponent's void";
     // Predicate noun in your hand location.
     in_your_hand($target) = :from($target) "{$target} in your hand";
 
     // Cost constraint phrase.
-    with_cost_constraint($op, $val) = "with cost {energy($val)}{$op}";
+    with_cost_constraint($op, $val) = :a "with cost {energy($val)}{$op}";
     // Spark constraint phrase.
-    with_spark_constraint($op, $val) = "with spark {$val}{$op}";
+    with_spark_constraint($op, $val) = :a "with spark {$val}{$op}";
     // Predicate with composed constraint, variant-aware.
-    pred_with_constraint($base, $constraint) = :from($base) {
-        *one: "{$base} {$constraint}",
-        other: "{$base:other} {$constraint}",
-    };
+    pred_with_constraint($base, $constraint) = :from($base) "{$base} {$constraint}";
     // Non-subtype qualifier, variant-aware.
-    non_subtype($s) = :from($s) {
-        *one: "non-{$s}",
-        other: "non-{$s:other}",
-    };
+    non_subtype($s) = :from($s) "non-{$s}";
     // Relative clause for events that could dissolve a target.
     could_dissolve_target($target) = :an "event which could {dissolve} {$target}";
     // Plural clause for events that could dissolve a target.
-    could_dissolve_target_plural($target) = "events which could {dissolve} {$target}";
+    could_dissolve_target_plural($target) = :from($target) "events which could {dissolve} {$target}";
     // Owned event that could dissolve a target.
-    your_event_could_dissolve($target) = "your event which could {dissolve} {$target}";
+    your_event_could_dissolve($target) = :from($target) "your event which could {dissolve} {$target}";
     // Plural owned events that could dissolve a target.
-    your_event_could_dissolve_plural($target) = "your events which could {dissolve} {$target}";
+    your_event_could_dissolve_plural($target) = :from($target) "your events which could {dissolve} {$target}";
     // Fast predicate prefix.
     fast_predicate($target) = :a "{fast} {$target}";
     // Fast predicate prefix plural.
-    fast_predicate_plural($target) = "{fast} {$target}";
+    fast_predicate_plural($target) = :from($target) "{fast} {$target}";
     // Constraint for materialized abilities (singular).
     with_materialized_ability_constraint = "with a {materialized} ability";
     // Constraint for materialized abilities (plural).
@@ -935,8 +912,7 @@ rlf::rlf! {
     with_spark_less_than_energy_paid_constraint =
         "with spark less than the amount of {energy_symbol} paid";
     // Constraint for cost compared to allied count (uses plural variant).
-    with_cost_less_than_allied_count($target) =
-        "with cost less than the number of allied {$target:other}";
+    with_cost_less_than_allied_count($target) = :from($target) "with cost less than the number of allied {$target:other}";
     // Constraint for cost compared to abandoned ally.
     with_cost_less_than_abandoned_ally_constraint =
         "with cost less than the abandoned ally's cost";
@@ -960,11 +936,11 @@ rlf::rlf! {
     // Allied subtype noun.
     allied_subtype($t) = :an "allied {subtype($t)}";
     // Allied subtype plural noun.
-    allied_subtype_plural($t) = "allied {subtype($t):other}";
+    allied_subtype_plural($t) = :from($t) "allied {subtype($t):other}";
     // Enemy subtype noun.
     enemy_subtype($t) = :an "enemy {subtype($t)}";
     // Enemy subtype plural noun.
-    enemy_subtype_plural($t) = "enemy {subtype($t):other}";
+    enemy_subtype_plural($t) = :from($t) "enemy {subtype($t):other}";
     // Your subtype noun inheriting article metadata from subtype.
     your_subtype($t) = :from($t) "your {$t}";
     // Other subtype noun inheriting article metadata from subtype.
@@ -974,15 +950,15 @@ rlf::rlf! {
     // Character that is not a subtype.
     character_not_subtype($s) = :a "character that is not {@a subtype($s)}";
     // Characters that are not a subtype (plural).
-    character_not_subtype_plural($s) = "characters that are not {subtype($s):other}";
+    character_not_subtype_plural($s) = :from($s) "characters that are not {subtype($s):other}";
     // Ally that is not a subtype.
     ally_not_subtype($s) = :an "ally that is not {@a subtype($s)}";
     // Allies that are not a subtype (plural).
-    ally_not_subtype_plural($s) = "allies that are not {subtype($s):other}";
+    ally_not_subtype_plural($s) = :from($s) "allies that are not {subtype($s):other}";
     // Enemy that is not a subtype.
     non_subtype_enemy($s) = :a "non-{subtype($s)} enemy";
     // Enemies that are not a subtype (plural).
-    non_subtype_enemy_plural($s) = "non-{subtype($s):other} enemies";
+    non_subtype_enemy_plural($s) = :from($s) "non-{subtype($s):other} enemies";
 
     // =========================================================================
     // For-each predicate phrases
@@ -1031,7 +1007,7 @@ rlf::rlf! {
     // For-each subtype in your void phrase inheriting article metadata.
     for_each_subtype_in_your_void($t) = :from($t) "{subtype($t)} in your void";
     // For-each ally with spark condition phrase.
-    for_each_ally_with_spark($s, $op) = "ally with spark {$s}{$op}";
+    for_each_ally_with_spark($s, $op) = :a "ally with spark {$s}{$op}";
     // Generic for-each predicate phrase.
     for_each_predicate($target) = :from($target) "each {$target}";
 
@@ -1073,87 +1049,87 @@ rlf::rlf! {
     // =========================================================================
 
     // Draw cards for each matching predicate.
-    draw_cards_for_each($c, $target) = "draw {cards($c)} for each {$target}";
+    draw_cards_for_each($c, $target) = :a "draw {cards($c)} for each {$target}";
     // Gain energy for each matching predicate.
-    gain_energy_for_each($e, $target) = "gain {energy($e)} for each {$target}";
+    gain_energy_for_each($e, $target) = :a "gain {energy($e)} for each {$target}";
     // Gain points for each matching quantity.
-    gain_points_for_each($p, $target) = "gain {points($p)} for each {$target}";
+    gain_points_for_each($p, $target) = :a "gain {points($p)} for each {$target}";
     // Target gains spark for each matching quantity.
-    gains_spark_for_each($target, $s, $quantity) = "{$target} gains +{$s} spark for each {$quantity}";
+    gains_spark_for_each($target, $s, $quantity) = :from($target) "{$target} gains +{$s} spark for each {$quantity}";
     // Target gains spark until next main phase for each matching predicate.
-    gains_spark_until_next_main_for_each($target, $s, $for_each) = "{$target} gains +{$s} spark until your next main phase for each {$for_each}";
+    gains_spark_until_next_main_for_each($target, $s, $for_each) = :from($target) "{$target} gains +{$s} spark until your next main phase for each {$for_each}";
     // Each matching gains spark equal to count of another group.
-    each_gains_spark_equal_to($each, $count_of) = "each {$each} gains spark equal to the number of {$count_of:other}";
+    each_gains_spark_equal_to($each, $count_of) = :from($each) "each {$each} gains spark equal to the number of {$count_of:other}";
     // Have each matching gain spark.
-    have_each_gain_spark($each, $s) = "have each {$each} gain +{$s} spark";
+    have_each_gain_spark($each, $s) = :from($each) "have each {$each} gain +{$s} spark";
     // Spark of each matching becomes a value.
-    spark_of_each_becomes($each, $s) = "the spark of each {$each} becomes {$s}";
+    spark_of_each_becomes($each, $s) = :from($each) "the spark of each {$each} becomes {$s}";
     // Dissolve all with cost less than or equal to quantity count (uses plural variant).
-    dissolve_all_with_cost_lte_quantity($target, $quantity) = "{dissolve} all {$target:other} with cost less than or equal to the number of {$quantity}";
+    dissolve_all_with_cost_lte_quantity($target, $quantity) = :from($target) "{dissolve} all {$target:other} with cost less than or equal to the number of {$quantity}";
 
     // =========================================================================
     // Collection expression target phrases
     // =========================================================================
 
     // All of a target (uses plural variant).
-    collection_all($target) = "all {$target:other}";
+    collection_all($target) = :from($target) "all {$target:other}";
     // Exactly N of a target (uses plural variant).
-    collection_exactly($n, $target) = "{$n} {$target:other}";
+    collection_exactly($n, $target) = :a "{$n} {$target:other}";
     // Up to N of a target (uses plural variant).
-    collection_up_to($n, $target) = "up to {$n} {$target:other}";
+    collection_up_to($n, $target) = :a "up to {$n} {$target:other}";
     // Any number of a target (uses plural variant).
-    collection_any_number_of($target) = "any number of {$target:other}";
+    collection_any_number_of($target) = :from($target) "any number of {$target:other}";
 
     // =========================================================================
     // Collection effect phrases
     // =========================================================================
 
     // Dissolve a collection target.
-    dissolve_collection($target) = "{dissolve} {$target}";
+    dissolve_collection($target) = :from($target) "{dissolve} {$target}";
     // Banish a collection target.
-    banish_collection_target($target) = "{banish} {$target}";
+    banish_collection_target($target) = :from($target) "{banish} {$target}";
 
     // Materialize them.
     // Accepts antecedent $target for gendered pronoun agreement in translations.
     materialize_them($target) = "{materialize} them";
     // Materialize a collection target.
-    materialize_collection_target($target) = "{materialize} {$target}";
+    materialize_collection_target($target) = :from($target) "{materialize} {$target}";
 
     // Materialize a copy of a target.
-    materialize_copy_of($target) = "{materialize} a copy of {$target}";
+    materialize_copy_of($target) = :from($target) "{materialize} a copy of {$target}";
     // Materialize N copies of a target.
-    materialize_n_copies_of($n, $target) = "{materialize} {$n} copies of {$target}";
+    materialize_n_copies_of($n, $target) = :a "{materialize} {$n} copies of {$target}";
     // Materialize copies of target equal to count of matching (uses plural variant).
-    materialize_copies_equal_to_matching($target, $matching) = "{materialize} a number of copies of {$target} equal to the number of {$matching:other}";
+    materialize_copies_equal_to_matching($target, $matching) = :from($target) "{materialize} a number of copies of {$target} equal to the number of {$matching:other}";
     // Materialize copies of target equal to energy spent.
-    materialize_copies_equal_to_energy($target) = "{materialize} a number of copies of {$target} equal to the amount of {energy_symbol} spent";
+    materialize_copies_equal_to_energy($target) = :from($target) "{materialize} a number of copies of {$target} equal to the amount of {energy_symbol} spent";
     // Materialize copies of target equal to quantity.
-    materialize_copies_equal_to_quantity($target, $quantity) = "{materialize} a number of copies of {$target} equal to the number of {$quantity}";
+    materialize_copies_equal_to_quantity($target, $quantity) = :from($target) "{materialize} a number of copies of {$target} equal to the number of {$quantity}";
 
     // Trigger judgment ability of a collection target.
-    trigger_judgment_of_collection($target) = "trigger the {Judgment} ability of {$target}";
+    trigger_judgment_of_collection($target) = :from($target) "trigger the {Judgment} ability of {$target}";
     // Trigger judgment ability of each matching target.
-    trigger_judgment_of_each($target) = "trigger the {Judgment} ability of each {$target}";
+    trigger_judgment_of_each($target) = :from($target) "trigger the {Judgment} ability of each {$target}";
 
     // =========================================================================
     // Materialize figment quantity phrases
     // =========================================================================
 
     // Materialize figments for each quantity.
-    materialize_figments_for_each_quantity($fig, $quantity) = "{materialize} {$fig} for each {$quantity}";
+    materialize_figments_for_each_quantity($fig, $quantity) = :from($fig) "{materialize} {$fig} for each {$quantity}";
 
     // =========================================================================
     // Banish then materialize phrases
     // =========================================================================
 
     // Banish a single target then materialize it.
-    banish_then_materialize_it($target) = "{banish} {$target}, then {materialize} it";
+    banish_then_materialize_it($target) = :from($target) "{banish} {$target}, then {materialize} it";
     // Banish any number of targets then materialize them (uses plural variant).
-    banish_then_materialize_any_number($target) = "{banish} any number of {$target:other}, then {materialize} them";
+    banish_then_materialize_any_number($target) = :from($target) "{banish} any number of {$target:other}, then {materialize} them";
     // Banish up to N allies then materialize them (uses plural variant).
-    banish_then_materialize_up_to($n, $target) = "{banish} up to {$n} {$target:other}, then {materialize} {pronoun:$n}";
+    banish_then_materialize_up_to($n, $target) = :from($target) "{banish} up to {$n} {$target:other}, then {materialize} {pronoun:$n}";
     // Banish targets then materialize them (default plural).
-    banish_then_materialize_them($target) = "{banish} {$target}, then {materialize} them";
+    banish_then_materialize_them($target) = :from($target) "{banish} {$target}, then {materialize} them";
 
     // =========================================================================
     // Allied card predicate phrases
@@ -1165,10 +1141,7 @@ rlf::rlf! {
         other: "allied {subtype($t):other}",
     };
     // Allied card predicate with base text, variant-aware.
-    allied_card_with_base($base) = :from($base) {
-        *one: "allied {$base}",
-        other: "allied {$base:other}",
-    };
+    allied_card_with_base($base) = :from($base) "allied {$base}";
 
     // =========================================================================
     // Gains reclaim effect phrases
@@ -1176,52 +1149,52 @@ rlf::rlf! {
 
     // It gains reclaim with cost.
     // Accepts antecedent $target for gendered pronoun agreement in translations.
-    it_gains_reclaim_for_cost($target, $r) = "it gains {reclaim_for_cost($r)}";
+    it_gains_reclaim_for_cost($target, $r) = :a "it gains {reclaim_for_cost($r)}";
     // It gains reclaim equal to its cost.
     // Accepts antecedent $target for gendered pronoun agreement in translations.
     it_gains_reclaim_equal_cost($target) = "it gains {reclaim} equal to its cost";
     // This card gains reclaim with cost.
-    this_card_gains_reclaim_for_cost($r) = "this card gains {reclaim_for_cost($r)}";
+    this_card_gains_reclaim_for_cost($r) = :a "this card gains {reclaim_for_cost($r)}";
     // This card gains reclaim equal to its cost.
     this_card_gains_reclaim_equal_cost = "this card gains {reclaim} equal to its cost";
     // Target gains reclaim with cost.
-    target_gains_reclaim_for_cost($target, $r) = "{$target} gains {reclaim_for_cost($r)}";
+    target_gains_reclaim_for_cost($target, $r) = :from($target) "{$target} gains {reclaim_for_cost($r)}";
     // Target gains reclaim equal to its cost.
-    target_gains_reclaim_equal_cost($target) = "{$target} gains {reclaim} equal to its cost";
+    target_gains_reclaim_equal_cost($target) = :from($target) "{$target} gains {reclaim} equal to its cost";
 
     // It gains reclaim with cost this turn.
     // Accepts antecedent $target for gendered pronoun agreement in translations.
-    it_gains_reclaim_for_cost_this_turn($target, $r) = "it gains {reclaim_for_cost($r)} this turn";
+    it_gains_reclaim_for_cost_this_turn($target, $r) = :a "it gains {reclaim_for_cost($r)} this turn";
     // It gains reclaim equal to its cost this turn.
     // Accepts antecedent $target for gendered pronoun agreement in translations.
     it_gains_reclaim_equal_cost_this_turn($target) = "it gains {reclaim} equal to its cost this turn";
     // This card gains reclaim with cost this turn.
-    this_card_gains_reclaim_for_cost_this_turn($r) = "this card gains {reclaim_for_cost($r)} this turn";
+    this_card_gains_reclaim_for_cost_this_turn($r) = :a "this card gains {reclaim_for_cost($r)} this turn";
     // This card gains reclaim equal to its cost this turn.
     this_card_gains_reclaim_equal_cost_this_turn = "this card gains {reclaim} equal to its cost this turn";
     // Target gains reclaim with cost this turn.
-    target_gains_reclaim_for_cost_this_turn($target, $r) = "{$target} gains {reclaim_for_cost($r)} this turn";
+    target_gains_reclaim_for_cost_this_turn($target, $r) = :from($target) "{$target} gains {reclaim_for_cost($r)} this turn";
     // Target gains reclaim equal to its cost this turn.
-    target_gains_reclaim_equal_cost_this_turn($target) = "{$target} gains {reclaim} equal to its cost this turn";
+    target_gains_reclaim_equal_cost_this_turn($target) = :from($target) "{$target} gains {reclaim} equal to its cost this turn";
 
     // =========================================================================
     // Void collection subject phrases
     // =========================================================================
 
     // A single card in your void (subject), capitalizing the predicate.
-    void_subject_single($pred) = "{@cap $pred} in your void";
+    void_subject_single($pred) = :from($pred) "{@cap $pred} in your void";
     // Exactly N cards in your void (subject, uses plural variant).
-    void_subject_exactly($n, $pred) = "{$n} {$pred:other} in your void";
+    void_subject_exactly($n, $pred) = :a "{$n} {$pred:other} in your void";
     // All cards currently in your void (subject).
     void_subject_all = "all cards currently in your void";
     // All but one cards in your void (subject, uses plural variant).
-    void_subject_all_but_one($pred) = "all but one {$pred:other} in your void";
+    void_subject_all_but_one($pred) = :from($pred) "all but one {$pred:other} in your void";
     // Up to N cards in your void (subject, uses plural variant).
-    void_subject_up_to($n, $pred) = "up to {$n} {$pred:other} in your void";
+    void_subject_up_to($n, $pred) = :a "up to {$n} {$pred:other} in your void";
     // Any number of cards in your void (subject, uses plural variant).
-    void_subject_any_number($pred) = "any number of {$pred:other} in your void";
+    void_subject_any_number($pred) = :from($pred) "any number of {$pred:other} in your void";
     // N or more cards in your void (subject, uses plural variant).
-    void_subject_or_more($n, $pred) = "{$n} or more {$pred:other} in your void";
+    void_subject_or_more($n, $pred) = :a "{$n} or more {$pred:other} in your void";
     // Each other card in your void (subject).
     void_subject_each_other = "Each other card in your void";
 
@@ -1230,42 +1203,42 @@ rlf::rlf! {
     // =========================================================================
 
     // Singular subject gains reclaim for a specific cost.
-    void_gains_reclaim_for_cost_singular($subject, $r) = "{$subject} gains {reclaim_for_cost($r)}";
+    void_gains_reclaim_for_cost_singular($subject, $r) = :from($subject) "{$subject} gains {reclaim_for_cost($r)}";
     // Singular subject gains reclaim equal to its cost.
-    void_gains_reclaim_equal_cost_singular($subject) = "{$subject} gains {reclaim} equal to its cost";
+    void_gains_reclaim_equal_cost_singular($subject) = :from($subject) "{$subject} gains {reclaim} equal to its cost";
     // Plural subject gains reclaim for a specific cost.
-    void_gains_reclaim_for_cost_plural($subject, $r) = "{$subject} gain {reclaim_for_cost($r)}";
+    void_gains_reclaim_for_cost_plural($subject, $r) = :from($subject) "{$subject} gain {reclaim_for_cost($r)}";
     // Plural subject gains reclaim equal to their cost.
-    void_gains_reclaim_equal_cost_plural($subject) = "{$subject} gain {reclaim} equal to their cost";
+    void_gains_reclaim_equal_cost_plural($subject) = :from($subject) "{$subject} gain {reclaim} equal to their cost";
     // Singular subject gains reclaim for a specific cost this turn.
-    void_gains_reclaim_for_cost_singular_this_turn($subject, $r) = "{$subject} gains {reclaim_for_cost($r)} this turn";
+    void_gains_reclaim_for_cost_singular_this_turn($subject, $r) = :from($subject) "{$subject} gains {reclaim_for_cost($r)} this turn";
     // Singular subject gains reclaim equal to its cost this turn.
-    void_gains_reclaim_equal_cost_singular_this_turn($subject) = "{$subject} gains {reclaim} equal to its cost this turn";
+    void_gains_reclaim_equal_cost_singular_this_turn($subject) = :from($subject) "{$subject} gains {reclaim} equal to its cost this turn";
     // Plural subject gains reclaim for a specific cost this turn.
-    void_gains_reclaim_for_cost_plural_this_turn($subject, $r) = "{$subject} gain {reclaim_for_cost($r)} this turn";
+    void_gains_reclaim_for_cost_plural_this_turn($subject, $r) = :from($subject) "{$subject} gain {reclaim_for_cost($r)} this turn";
     // Plural subject gains reclaim equal to their cost this turn.
-    void_gains_reclaim_equal_cost_plural_this_turn($subject) = "{$subject} gain {reclaim} equal to their cost this turn";
+    void_gains_reclaim_equal_cost_plural_this_turn($subject) = :from($subject) "{$subject} gain {reclaim} equal to their cost this turn";
 
     // =========================================================================
     // Static ability serializer phrases
     // =========================================================================
 
     // Your matching cards cost more energy (uses plural variant).
-    your_cards_cost_increase($matching, $e) = "{$matching:other} cost you {energy($e)} more";
+    your_cards_cost_increase($matching, $e) = :from($matching) "{$matching:other} cost you {energy($e)} more";
     // Your matching cards cost less energy (uses plural variant).
-    your_cards_cost_reduction($matching, $e) = "{$matching:other} cost you {energy($e)} less";
+    your_cards_cost_reduction($matching, $e) = :from($matching) "{$matching:other} cost you {energy($e)} less";
     // The opponent's matching cards cost more energy (uses plural variant).
-    enemy_cards_cost_increase($matching, $e) = "the opponent's {$matching:other} cost {energy($e)} more";
+    enemy_cards_cost_increase($matching, $e) = :from($matching) "the opponent's {$matching:other} cost {energy($e)} more";
     // Allied matching characters have bonus spark (uses plural variant).
-    spark_bonus_other_characters($matching, $s) = "allied {$matching:other} have +{$s} spark";
+    spark_bonus_other_characters($matching, $s) = :from($matching) "allied {$matching:other} have +{$s} spark";
     // To play this card, pay an additional cost.
-    additional_cost_to_play($cost) = "To play {this_card}, {$cost}";
+    additional_cost_to_play($cost) = :a "To play {this_card}, {$cost}";
     // This card type costs alternate energy.
-    play_for_alternate_cost_simple($card_type, $e) = "{$card_type} costs {energy($e)}";
+    play_for_alternate_cost_simple($card_type, $e) = :a "{$card_type} costs {energy($e)}";
     // Additional cost prefix: Play this card type for alternate energy.
-    play_for_alternate_cost_with_additional($cost, $card_type, $e) = "{$cost}: Play {$card_type} for {energy($e)}";
+    play_for_alternate_cost_with_additional($cost, $card_type, $e) = :a "{$cost}: Play {$card_type} for {energy($e)}";
     // Additional cost with if-you-do abandon effect.
-    play_for_alternate_cost_abandon($cost, $card_type, $e) = "{$cost}: Play {$card_type} for {energy($e)}, then abandon it";
+    play_for_alternate_cost_abandon($cost, $card_type, $e) = :a "{$cost}: Play {$card_type} for {energy($e)}, then abandon it";
     // Characters in your hand have fast.
     characters_in_hand_have_fast = "characters in your hand have {fast}";
     // Disable the materialized abilities of enemies.
@@ -1273,80 +1246,80 @@ rlf::rlf! {
     // Has all character types.
     has_all_character_types = "has all character types";
     // Multiply the amount of energy gained from card effects.
-    multiply_energy_gain($n) = "{multiply_by($n)} the amount of {energy_symbol} you gain from card effects this turn";
+    multiply_energy_gain($n) = :a "{multiply_by($n)} the amount of {energy_symbol} you gain from card effects this turn";
     // Multiply the number of cards drawn from card effects.
-    multiply_card_draw($n) = "{multiply_by($n)} the number of cards you draw from card effects this turn";
+    multiply_card_draw($n) = :a "{multiply_by($n)} the number of cards you draw from card effects this turn";
     // Once per turn, play a matching card from your void.
-    once_per_turn_play_from_void($matching) = "once per turn, you may play {$matching} from your void";
+    once_per_turn_play_from_void($matching) = :from($matching) "once per turn, you may play {$matching} from your void";
     // Reveal the top card of your deck.
     reveal_top_card = "reveal the top card of your deck";
     // You may look at the top card of your deck.
     you_may_look_at_top_card = "you may look at the top card of your deck";
     // You may play matching cards from the top of your deck (uses plural variant).
-    you_may_play_from_top_of_deck($matching) = "you may play {$matching:other} from the top of your deck";
+    you_may_play_from_top_of_deck($matching) = :from($matching) "you may play {$matching:other} from the top of your deck";
     // Judgment ability of matching characters triggers when materialized (uses plural variant).
-    judgment_triggers_when_materialized($matching) = "the '{Judgment}' ability of {$matching:other} triggers when you {materialize} them";
+    judgment_triggers_when_materialized($matching) = :from($matching) "the '{Judgment}' ability of {$matching:other} triggers when you {materialize} them";
     // This character's spark equals predicate count (uses plural variant).
-    spark_equal_to_predicate_count($matching) = "{this_character}'s spark is equal to the number of {$matching:other}";
+    spark_equal_to_predicate_count($matching) = :from($matching) "{this_character}'s spark is equal to the number of {$matching:other}";
     // You may only play this character from your void.
     play_only_from_void = "you may only play {this_character} from your void";
     // You may play this card from your hand or void for a cost.
-    play_from_hand_or_void_for_cost($e) = "you may play {this_card} from your hand or void for {energy($e)}";
+    play_from_hand_or_void_for_cost($e) = :a "you may play {this_card} from your hand or void for {energy($e)}";
     // Cards in your void have reclaim equal to their cost.
     cards_in_void_have_reclaim = "they have {reclaim} equal to their cost";
     // This card costs less for each matching quantity.
-    cost_reduction_for_each($e, $quantity) = "{this_card} costs {energy($e)} less for each {$quantity}";
+    cost_reduction_for_each($e, $quantity) = :a "{this_card} costs {energy($e)} less for each {$quantity}";
     // Your matching characters have bonus spark (uses plural variant).
-    spark_bonus_your_characters($matching, $s) = "{$matching:other} have +{$s} spark";
+    spark_bonus_your_characters($matching, $s) = :from($matching) "{$matching:other} have +{$s} spark";
     // Play this card from your void for a cost.
-    play_from_void_for_cost($e) = "play {this_card} from your void for {energy($e)}";
+    play_from_void_for_cost($e) = :a "play {this_card} from your void for {energy($e)}";
     // Play this card from your void with additional cost prefix.
-    play_from_void_with_additional_cost($cost, $e) = "{$cost}: play {this_card} from your void for {energy($e)}";
+    play_from_void_with_additional_cost($cost, $e) = :a "{$cost}: play {this_card} from your void for {energy($e)}";
     // Play this card from your void with additional cost and if-you-do effect.
-    play_from_void_with_effect($cost, $e, $effect) = "{$cost}: play {this_card} from your void for {energy($e)}, then {$effect}";
+    play_from_void_with_effect($cost, $e, $effect) = :a "{$cost}: play {this_card} from your void for {energy($e)}, then {$effect}";
     // Play this card from your void for cost with if-you-do effect.
-    play_from_void_for_cost_with_effect($e, $effect) = "play {this_card} from your void for {energy($e)}, then {$effect}";
+    play_from_void_for_cost_with_effect($e, $effect) = :a "play {this_card} from your void for {energy($e)}, then {$effect}";
 
     // =========================================================================
     // Static ability condition phrases
     // =========================================================================
 
     // Condition prefix: if this card is in your void.
-    if_this_card_in_void_prefix($base) = "if {this_card} is in your void, {$base}";
+    if_this_card_in_void_prefix($base) = :a "if {this_card} is in your void, {$base}";
     // Condition prepended to base ability text.
-    condition_prepended($condition, $base) = "{$condition} {$base}";
+    condition_prepended($condition, $base) = :a "{$condition} {$base}";
     // Condition appended to base ability text.
-    condition_appended($base, $condition) = "{$base} {$condition}";
+    condition_appended($base, $condition) = :a "{$base} {$condition}";
 
     // =========================================================================
     // Ability serializer structural phrases
     // =========================================================================
 
     // Capitalizes the first visible character of a string.
-    capitalized_sentence($s) = "{@cap $s}";
+    capitalized_sentence($s) = :a "{@cap $s}";
     // Reclaim with dash-separated cost text.
-    reclaim_with_cost($cost) = "{Reclaim} -- {$cost}";
+    reclaim_with_cost($cost) = :a "{Reclaim} -- {$cost}";
 
     // =========================================================================
     // Ability assembly phrases
     // =========================================================================
 
     // Standard triggered ability: trigger text followed by effect text.
-    triggered_ability($trig, $eff) = "{@cap $trig}{$eff}";
+    triggered_ability($trig, $eff) = :a "{@cap $trig}{$eff}";
     // Triggered ability with prefix modifiers (once per turn, until end of turn).
-    prefixed_triggered_ability($pfx, $trig, $eff) = "{$pfx}{$trig}{$eff}";
+    prefixed_triggered_ability($pfx, $trig, $eff) = :a "{$pfx}{$trig}{$eff}";
     // Keyword-triggered ability: trigger followed by capitalized effect.
-    keyword_triggered_ability($trig, $eff) = "{$trig} {@cap $eff}";
+    keyword_triggered_ability($trig, $eff) = :a "{$trig} {@cap $eff}";
     // Keyword-triggered ability with prefix modifiers.
-    prefixed_keyword_triggered_ability($pfx, $trig, $eff) = "{$pfx}{$trig} {@cap $eff}";
+    prefixed_keyword_triggered_ability($pfx, $trig, $eff) = :a "{$pfx}{$trig} {@cap $eff}";
     // Activated ability: capitalized costs, separator, capitalized effect.
-    activated_ability($c, $eff) = "{$c}{cost_effect_separator}{@cap $eff}";
+    activated_ability($c, $eff) = :a "{$c}{cost_effect_separator}{@cap $eff}";
     // Activated ability with once-per-turn suffix on costs.
-    activated_ability_once_per_turn($c, $eff) = "{$c}{once_per_turn_suffix}{cost_effect_separator}{@cap $eff}";
+    activated_ability_once_per_turn($c, $eff) = :a "{$c}{once_per_turn_suffix}{cost_effect_separator}{@cap $eff}";
     // Fast activated ability: fast prefix, costs, separator, effect.
-    fast_activated_ability($c, $eff) = "{fast_prefix}{$c}{cost_effect_separator}{@cap $eff}";
+    fast_activated_ability($c, $eff) = :a "{fast_prefix}{$c}{cost_effect_separator}{@cap $eff}";
     // Fast activated ability with once-per-turn suffix.
-    fast_activated_ability_once_per_turn($c, $eff) = "{fast_prefix}{$c}{once_per_turn_suffix}{cost_effect_separator}{@cap $eff}";
+    fast_activated_ability_once_per_turn($c, $eff) = :a "{fast_prefix}{$c}{once_per_turn_suffix}{cost_effect_separator}{@cap $eff}";
     // Activated ability cost separator for joining multiple costs.
     activated_cost_separator = ", ";
 
@@ -1355,28 +1328,28 @@ rlf::rlf! {
     // =========================================================================
 
     // Single effect fragment with trailing period.
-    effect_with_period($e) = "{$e}{period_suffix}";
+    effect_with_period($e) = :a "{$e}{period_suffix}";
     // Condition prefix joined with effect body by a space.
-    condition_with_effect($cond, $body) = "{$cond} {$body}";
+    condition_with_effect($cond, $body) = :a "{$cond} {$body}";
     // Optional prefix with effect body: "you may {body}".
-    optional_effect_body($body) = "{you_may_prefix}{$body}";
+    optional_effect_body($body) = :a "{you_may_prefix}{$body}";
     // Optional prefix with cost and effect body: "you may {cost} to {body}".
-    optional_cost_effect_body($cost, $body) = "{you_may_prefix}{cost_to_connector($cost)}{$body}";
+    optional_cost_effect_body($cost, $body) = :a "{you_may_prefix}{cost_to_connector($cost)}{$body}";
     // Mandatory cost with effect body: "{cost} to {body}".
-    cost_effect_body($cost, $body) = "{cost_to_connector($cost)}{$body}";
+    cost_effect_body($cost, $body) = :a "{cost_to_connector($cost)}{$body}";
     // Per-effect optional prefix: "you may {body}".
-    per_effect_optional($body) = "{you_may_prefix}{$body}";
+    per_effect_optional($body) = :a "{you_may_prefix}{$body}";
     // Per-effect cost prefix: "{cost} to {body}".
-    per_effect_cost($cost, $body) = "{cost_to_connector($cost)}{$body}";
+    per_effect_cost($cost, $body) = :a "{cost_to_connector($cost)}{$body}";
     // Per-effect condition prefix: "{cond} {body}".
-    per_effect_condition($cond, $body) = "{$cond} {$body}";
+    per_effect_condition($cond, $body) = :a "{$cond} {$body}";
     // Capitalized sentence with trailing period.
-    capitalized_sentence_with_period($s) = "{@cap $s}{period_suffix}";
+    capitalized_sentence_with_period($s) = :a "{@cap $s}{period_suffix}";
 
     // =========================================================================
     // Modal effect assembly phrases
     // =========================================================================
 
     // Single modal choice line with energy cost and effect text.
-    modal_choice_line($energy_cost, $effect) = "{bullet} {$energy_cost}{cost_effect_separator}{@cap $effect}";
+    modal_choice_line($energy_cost, $effect) = :a "{bullet} {$energy_cost}{cost_effect_separator}{@cap $effect}";
 }
