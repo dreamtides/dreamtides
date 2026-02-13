@@ -1,0 +1,16 @@
+[package]
+name = "rlf_lint"
+version = "0.1.0"
+edition = "2021"
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "rlf_lint"
+path = "src/main.rs"
+
+[dependencies]
+strings = { path = "../strings" }
+
+rlf = { workspace = true }

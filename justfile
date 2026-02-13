@@ -352,6 +352,16 @@ style-validator:
 style-validator-verbose:
   cargo run --manifest-path rules_engine/Cargo.toml --bin "style_validator" -- --code-order
 
+rlf-lint:
+  #!/usr/bin/env bash
+  output=$(cargo run --manifest-path rules_engine/Cargo.toml --bin "rlf_lint" 2>&1)
+  if [ $? -ne 0 ]; then
+      echo "$output"
+      exit 1
+  else
+    echo "RLF lint passed"
+  fi
+
 style-validator-fix:
   #!/usr/bin/env bash
   output=$(cargo run --manifest-path rules_engine/Cargo.toml --bin "style_validator" -- --code-order --fix "$@" 2>&1)

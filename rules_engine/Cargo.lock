@@ -4836,6 +4836,14 @@ version = "0.1.0"
 source = "git+https://github.com/thurn/rlf#e854a0574b2866ee8032c8beea399a5b3d7ea4ca"
 
 [[package]]
+name = "rlf_lint"
+version = "0.1.0"
+dependencies = [
+ "rlf",
+ "strings",
+]
+
+[[package]]
 name = "ron"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
