@@ -15,9 +15,9 @@ review:
         python3 scripts/review/review_runner.py
     fi
 
-review-direct: check-snapshots check-format build clippy style-validator review-core-test parser-test tv-check tv-clippy tv-test
+review-direct: check-snapshots check-format build clippy style-validator rlf-lint review-core-test parser-test tv-check tv-clippy tv-test
 
-review-verbose: check-snapshots check-format-verbose build-verbose clippy-verbose style-validator-verbose review-core-test-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
+review-verbose: check-snapshots check-format-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose review-core-test-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
 
 review-scope-plan:
     python3 scripts/review/review_scope.py plan
@@ -361,6 +361,9 @@ rlf-lint:
   else
     echo "RLF lint passed"
   fi
+
+rlf-lint-verbose:
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "rlf_lint"
 
 style-validator-fix:
   #!/usr/bin/env bash

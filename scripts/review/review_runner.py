@@ -161,6 +161,7 @@ def step_specs() -> list[StepSpec]:
         StepSpec("build", [CommandSpec("build", ["just", "build"])]),
         StepSpec("clippy", [CommandSpec("clippy", ["just", "clippy"])]),
         StepSpec("style-validator", [CommandSpec("style-validator", ["just", "style-validator"])]),
+        StepSpec("rlf-lint", [CommandSpec("rlf-lint", ["just", "rlf-lint"])]),
         StepSpec("test-core", [CommandSpec("test-core", ["just", "review-core-test"])]),
         StepSpec(
             "python-test",

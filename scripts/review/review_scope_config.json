@@ -47,11 +47,13 @@
     "build",
     "clippy",
     "style-validator",
+    "rlf-lint",
     "test-core"
   ],
   "markdown_only_skip_steps": [
     "build",
     "clippy",
+    "rlf-lint",
     "test-core",
     "python-test",
     "parser-test",
