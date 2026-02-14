@@ -30,6 +30,9 @@ const STACK_SIZE: usize = 4 * 1024 * 1024; // 4 MB
 const BRACKET_LANGUAGE: &str = "en-x-bracket";
 const BRACKET_LOCALE_PATH: &str =
     concat!(env!("CARGO_MANIFEST_DIR"), "/../../src/strings/locales/bracket.rlf");
+const RUSSIAN_LANGUAGE: &str = "ru";
+const RUSSIAN_LOCALE_PATH: &str =
+    concat!(env!("CARGO_MANIFEST_DIR"), "/../../src/strings/locales/ru.rlf");
 
 thread_local! {
     static ABILITY_PARSER_CACHE: AbilityParser<'static> = ability_parser::ability_parser().boxed();
@@ -136,6 +139,12 @@ pub fn eval_str(template: &str, bindings: &VariableBindings) -> String {
 pub fn register_bracket_test_locale() -> Result<usize, rlf::LoadError> {
     strings::register_source_phrases();
     rlf::with_locale_mut(|locale| locale.load_translations(BRACKET_LANGUAGE, BRACKET_LOCALE_PATH))
+}
+
+/// Registers the Russian locale for localization tests.
+pub fn register_russian_test_locale() -> Result<usize, rlf::LoadError> {
+    strings::register_source_phrases();
+    rlf::with_locale_mut(|locale| locale.load_translations(RUSSIAN_LANGUAGE, RUSSIAN_LOCALE_PATH))
 }
 
 /// Returns the RLF phrase for a [CardSubtype].
