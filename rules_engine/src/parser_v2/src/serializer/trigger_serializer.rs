@@ -1,100 +1,86 @@
 use ability_data::trigger_event::{PlayerTurn, TriggerEvent, TriggerKeyword};
+use rlf::Phrase;
 use strings::strings;
 
 use crate::serializer::predicate_serializer;
 
-/// Serializes a trigger event to its template text representation.
-pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
+/// Serializes a trigger event to its phrase representation.
+pub fn serialize_trigger_event(trigger: &TriggerEvent) -> Phrase {
     match trigger {
         TriggerEvent::Keywords(keywords) => serialize_keyword_trigger(keywords),
         TriggerEvent::Play(predicate) => {
             strings::when_you_play_trigger(predicate_serializer::serialize_predicate(predicate))
-                .to_string()
         }
         TriggerEvent::OpponentPlays(predicate) => strings::when_opponent_plays_trigger(
             predicate_serializer::serialize_predicate(predicate),
-        )
-        .to_string(),
+        ),
         TriggerEvent::PlayFromHand(predicate) => strings::when_you_play_from_hand_trigger(
             predicate_serializer::serialize_predicate(predicate),
-        )
-        .to_string(),
+        ),
         TriggerEvent::PlayCardsInTurn(count) => {
-            strings::when_you_play_cards_in_turn_trigger(*count).to_string()
+            strings::when_you_play_cards_in_turn_trigger(*count)
         }
         TriggerEvent::PlayDuringTurn(predicate, turn) => match turn {
             PlayerTurn::YourTurn => strings::when_you_play_in_turn_trigger(
                 predicate_serializer::serialize_predicate(predicate),
-            )
-            .to_string(),
+            ),
             PlayerTurn::EnemyTurn => strings::when_you_play_during_enemy_turn_trigger(
                 predicate_serializer::serialize_predicate(predicate),
-            )
-            .to_string(),
+            ),
         },
         TriggerEvent::Discard(predicate) => {
             strings::when_you_discard_trigger(predicate_serializer::serialize_predicate(predicate))
-                .to_string()
         }
         TriggerEvent::Materialize(predicate) => strings::when_you_materialize_trigger(
             predicate_serializer::serialize_predicate(predicate),
-        )
-        .to_string(),
+        ),
         TriggerEvent::Dissolved(predicate) => {
             strings::when_dissolved_trigger(predicate_serializer::serialize_predicate(predicate))
-                .to_string()
         }
         TriggerEvent::Banished(predicate) => {
             strings::when_banished_trigger(predicate_serializer::serialize_predicate(predicate))
-                .to_string()
         }
         TriggerEvent::LeavesPlay(predicate) => {
             strings::when_leaves_play_trigger(predicate_serializer::serialize_predicate(predicate))
-                .to_string()
         }
         TriggerEvent::Abandon(predicate) => {
             strings::when_you_abandon_trigger(predicate_serializer::serialize_predicate(predicate))
-                .to_string()
         }
         TriggerEvent::AbandonCardsInTurn(count) => {
-            strings::when_you_abandon_count_in_turn_trigger(*count).to_string()
+            strings::when_you_abandon_count_in_turn_trigger(*count)
         }
         TriggerEvent::PutIntoVoid(predicate) => strings::when_put_into_void_trigger(
             predicate_serializer::serialize_predicate(predicate),
-        )
-        .to_string(),
-        TriggerEvent::DrawCardsInTurn(count) => {
-            strings::when_you_draw_in_turn_trigger(*count).to_string()
-        }
-        TriggerEvent::EndOfYourTurn => strings::at_end_of_your_turn_trigger().to_string(),
-        TriggerEvent::DrawAllCardsInCopyOfDeck => strings::when_deck_empty_trigger().to_string(),
+        ),
+        TriggerEvent::DrawCardsInTurn(count) => strings::when_you_draw_in_turn_trigger(*count),
+        TriggerEvent::EndOfYourTurn => strings::at_end_of_your_turn_trigger(),
+        TriggerEvent::DrawAllCardsInCopyOfDeck => strings::when_deck_empty_trigger(),
         TriggerEvent::MaterializeNthThisTurn(predicate, count) => {
             strings::when_you_materialize_nth_in_turn_trigger(
                 *count,
                 predicate_serializer::serialize_predicate(predicate),
             )
-            .to_string()
         }
-        TriggerEvent::GainEnergy => strings::when_you_gain_energy_trigger().to_string(),
+        TriggerEvent::GainEnergy => strings::when_you_gain_energy_trigger(),
     }
 }
 
-/// Serializes a keyword trigger list to its phrase-driven text representation.
-fn serialize_keyword_trigger(keywords: &[TriggerKeyword]) -> String {
+/// Serializes a keyword trigger list to its phrase representation.
+fn serialize_keyword_trigger(keywords: &[TriggerKeyword]) -> Phrase {
     match keywords {
-        [TriggerKeyword::Judgment] => strings::judgment().to_string(),
-        [TriggerKeyword::Materialized] => strings::materialized().to_string(),
-        [TriggerKeyword::Dissolved] => strings::dissolved().to_string(),
+        [TriggerKeyword::Judgment] => strings::judgment(),
+        [TriggerKeyword::Materialized] => strings::materialized(),
+        [TriggerKeyword::Dissolved] => strings::dissolved(),
         [TriggerKeyword::Materialized, TriggerKeyword::Judgment] => {
-            strings::materialized_judgment().to_string()
+            strings::materialized_judgment()
         }
         [TriggerKeyword::Materialized, TriggerKeyword::Dissolved] => {
-            strings::materialized_dissolved().to_string()
+            strings::materialized_dissolved()
         }
         _ => {
             let keyword_text =
                 keywords.iter().map(serialize_keyword_name).collect::<Vec<_>>().join(", ");
-            strings::trigger(keyword_text).to_string()
+            strings::trigger(keyword_text)
         }
     }
 }
