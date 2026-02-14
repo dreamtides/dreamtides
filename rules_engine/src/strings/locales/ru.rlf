@@ -286,7 +286,7 @@ banish_from_hand_cost($target) = :from($target) "{banish} {$target} from hand";
 at_end_of_your_turn_trigger = "at the end of your turn, ";
 when_deck_empty_trigger = "when you have no cards in your deck, ";
 when_you_gain_energy_trigger = "when you gain energy, ";
-when_you_play_trigger($target) = :from($target) "when you play {$target}, ";
+when_you_play_trigger($target) = :from($target) "когда вы играете {$target}, ";
 when_opponent_plays_trigger($target) = :from($target) "when the opponent plays {$target}, ";
 when_you_play_from_hand_trigger($target) = :from($target) "when you play {$target} from your hand, ";
 when_you_play_in_turn_trigger($target) = :from($target) "when you play {$target} in a turn, ";
@@ -297,7 +297,7 @@ when_you_abandon_trigger($target) = :from($target) "when you abandon {$target}, 
 when_put_into_void_trigger($target) = :from($target) "when {$target} is put into your void, ";
 
 
-when_you_materialize_trigger($target) = :from($target) "when you {materialize} {$target}, ";
+when_you_materialize_trigger($target) = :from($target) "когда вы воплощаете {$target}, ";
 when_dissolved_trigger($target) = :from($target) "when {$target} is {dissolved}, ";
 when_banished_trigger($target) = :from($target) "when {$target} is {banished}, ";
 when_you_play_cards_in_turn_trigger($c) = "when you play {$c} {card:$c} in a turn, ";
@@ -390,7 +390,7 @@ prevent_dissolve_this_turn($target) = "{$target} cannot be {dissolved} this turn
 prevent_played_target($target) = :from($target) "отмените розыгрыш {$target:gen}";
 prevent_unless_pays($target, $cost) = "{prevent} a played {$target} unless the opponent pays {$cost}";
 gain_energy_equal_to_cost($target) = "gain {energy_symbol} equal to {$target}'s cost";
-gains_spark($target, $s) = "{$target} gains +{$s} spark";
+gains_spark($target, $s) = :from($target) "{$target:nom} получает +{$s} к искре";
 opponent_pays_cost($cost) = "the opponent pays {$cost}";
 pay_cost_effect($cost) = "pay {$cost}";
 
@@ -404,7 +404,7 @@ no_effect = "";
 you_may_prefix = "you may ";
 cost_to_connector($cost) = "{$cost} to ";
 until_end_of_turn_prefix = "Until end of turn, ";
-once_per_turn_prefix = "Once per turn, ";
+once_per_turn_prefix = "Один раз за ход, ";
 once_per_turn_suffix = ", once per turn";
 cost_effect_separator = ": ";
 then_joiner = ", then ";
@@ -415,20 +415,20 @@ period_suffix = ".";
 
 
 character = :masc :anim { nom: "персонаж", *acc: "персонажа", gen: "персонажа", one: "персонажа", other: "персонажей" };
-event = :an{ one: "event", other: "events" };
+event = :neut :inan { nom: "событие", *acc: "событие", gen: "события", one: "событие", other: "событий" };
 enemy = :masc :anim { nom: "враг", *acc: "врага", gen: "врага", one: "врага", other: "врагов" };
 
 this_card = :a{ one: "this card", other: "these cards" };
-this_character = :a{ one: "this character", other: "these characters" };
+this_character = :masc :anim { nom: "этот персонаж", *acc: "этого персонажа", gen: "этого персонажа", one: "этого персонажа", other: "этих персонажей" };
 this_event = :an{ one: "this event", other: "these events" };
 that_character = :a{ one: "that character", other: "those characters" };
 pronoun_it = { *one: "it", other: "them" };
 pronoun_them = "them";
 as_plural($p) = "{$p:other}";
 with_plural($one, $other) = :from($one) { *one: "{$one}", other: "{$other}" };
-your_generic_character = :a{ *one: "character", other: "allies" };
+your_generic_character = :masc :anim { *one: "персонажа", other: "союзников" };
 your_generic_card = :a{ *one: "card", other: "your cards" };
-your_generic_event = :an{ *one: "event", other: "your events" };
+your_generic_event = :neut :inan { *one: "событие", other: "ваши события" };
 your_generic_subtype($t) = :a :from($t) {
     *one: "{subtype($t)}",
     other: "allied {subtype($t):other}",

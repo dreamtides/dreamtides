@@ -29,8 +29,9 @@ variables = "r: 2"
 russian = "Возвышение 2●"
 
 [[tests]]
-english = "When you materialize an ally, gain 1●."
-russian = "Когда вы воплощаете союзника, получите 1●."
+english = "When you {materialize} an ally, gain {energy($e)}."
+variables = "e: 1"
+russian = "Когда вы воплощаете союзника, получите <color=#00838F>1●</color>."
 
 [[tests]]
 english = "When you discard a card, gain 1⍏."
@@ -132,8 +133,9 @@ english = "▸ Judgment: You may banish an ally, then materialize it."
 russian = "▸ Суд: Вы можете изгнать союзника, затем воплотить его."
 
 [[tests]]
-english = "Once per turn, when you materialize a character, gain 1●."
-russian = "Один раз за ход, когда вы воплощаете персонажа, получите 1●."
+english = "Once per turn, when you {materialize} a character, gain {energy($e)}."
+variables = "e: 1"
+russian = "Один раз за ход, когда вы воплощаете персонажа, получите <color=#00838F>1●</color>."
 
 [[tests]]
 english = "Has all character types."
@@ -619,7 +621,8 @@ english = "{Materialized} {Dissolve} an enemy."
 russian = "▸ Воплощён: Рассеяйте врага."
 
 [[tests]]
-english = "When you play an event, foresee 1."
+english = "When you play an event, {foresee($f)}."
+variables = "f: 1"
 russian = "Когда вы играете событие, Прозрение 1."
 
 [[tests]]
@@ -854,8 +857,9 @@ english = "▸ Judgment: You may pay 4● to have each allied Spirit Animal gain
 russian = "▸ Суд: Вы можете заплатить 4●, чтобы каждый союзный Дух-Зверь получил +2 к искре."
 
 [[tests]]
-english = "When you play an event, gain 1●."
-russian = "Когда вы играете событие, получите 1●."
+english = "When you play an event, gain {energy($e)}."
+variables = "e: 1"
+russian = "Когда вы играете событие, получите <color=#00838F>1●</color>."
 
 [[tests]]
 english = "▸ Materialized: You may banish an ally, then materialize it."
@@ -895,7 +899,8 @@ variables = "f: 1"
 russian = "▸ <b>Суд:</b> Прозрение 1."
 
 [[tests]]
-english = "When you materialize a character, this character gains +1 spark."
+english = "When you {materialize} a character, this character gains +{$s} spark."
+variables = "s: 1"
 russian = "Когда вы воплощаете персонажа, этот персонаж получает +1 к искре."
 
 [[tests]]
