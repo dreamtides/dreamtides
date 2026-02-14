@@ -19,8 +19,9 @@ english = "▸ Materialized: Return an enemy to hand."
 russian = "▸ Воплощён: Верните врага в руку."
 
 [[tests]]
-english = "Dissolve an enemy with cost 3● or more."
-russian = "Рассеяйте врага стоимостью 3● или больше."
+english = "{Dissolve} an enemy with cost {energy($e)} or more."
+variables = "e: 3"
+russian = "Рассеяйте врага стоимостью <color=#00838F>3●</color> или больше."
 
 [[tests]]
 english = "{reclaim_for_cost($r)}"
@@ -722,7 +723,8 @@ english = "Once per turn, when you play a ↯fast card, draw a card."
 russian = "Один раз за ход, когда вы играете карту с ↯Стремительностью, возьмите карту."
 
 [[tests]]
-english = "Dissolve an enemy with spark 3 or more."
+english = "{Dissolve} an enemy with spark {$s} or more."
+variables = "s: 3"
 russian = "Рассеяйте врага с искрой 3 или больше."
 
 [[tests]]
@@ -763,7 +765,8 @@ english = "Abandon an ally: You may dissolve an enemy with spark less than that 
 russian = "Отрекитесь от союзника: Вы можете рассеять врага с искрой меньше искры этого союзника."
 
 [[tests]]
-english = "Dissolve an enemy with spark 1 or less."
+english = "{Dissolve} an enemy with spark {$s} or less."
+variables = "s: 1"
 russian = "Рассеяйте врага с искрой 1 или меньше."
 
 [[tests]]
@@ -968,8 +971,9 @@ english = "Dissolve an enemy. You lose 4⍏."
 russian = "Рассеяйте врага. Вы теряете 4⍏."
 
 [[tests]]
-english = "Dissolve an enemy with cost 2● or less."
-russian = "Рассеяйте врага стоимостью 2● или меньше."
+english = "{Dissolve} an enemy with cost {energy($e)} or less."
+variables = "e: 2"
+russian = "Рассеяйте врага стоимостью <color=#00838F>2●</color> или меньше."
 
 [[tests]]
 english = "Reclaim -- Abandon an ally"
@@ -980,8 +984,9 @@ english = "▸ Materialized: Discard 2 cards, then draw 2 cards."
 russian = "▸ Воплощён: Сбросьте 2 карты, затем возьмите 2 карты."
 
 [[tests]]
-english = "Banish an enemy with cost 2● or less."
-russian = "Изгоните врага стоимостью 2● или меньше."
+english = "{Banish} an enemy with cost {energy($e)} or less."
+variables = "e: 2"
+russian = "Изгоните врага стоимостью <color=#00838F>2●</color> или меньше."
 
 [[tests]]
 english = "When you materialize a Survivor, reclaim this character."
