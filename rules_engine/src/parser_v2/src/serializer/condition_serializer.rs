@@ -6,42 +6,33 @@ use strings::strings;
 use crate::serializer::{predicate_serializer, serializer_utils};
 
 /// Serializes a condition to its template text representation.
-pub fn serialize_condition(condition: &Condition) -> String {
+pub fn serialize_condition(condition: &Condition) -> Phrase {
     match condition {
         Condition::AlliesThatShareACharacterType { count } => {
-            strings::with_allies_sharing_type(*count).to_string()
+            strings::with_allies_sharing_type(*count)
         }
         Condition::CardsDiscardedThisTurn { count: 1, predicate } => {
             strings::if_discarded_this_turn(predicate_serializer::serialize_predicate(
                 &Predicate::Any(predicate.clone()),
             ))
-            .to_string()
         }
         Condition::CardsDiscardedThisTurn { predicate, .. } => strings::if_discarded_this_turn(
             predicate_serializer::serialize_predicate(&Predicate::Any(predicate.clone())),
-        )
-        .to_string(),
-        Condition::CardsDrawnThisTurn { count } => {
-            strings::if_drawn_count_this_turn(*count).to_string()
-        }
-        Condition::CardsInVoidCount { count } => strings::while_void_count(*count).to_string(),
-        Condition::DissolvedThisTurn { .. } => {
-            strings::if_character_dissolved_this_turn().to_string()
-        }
+        ),
+        Condition::CardsDrawnThisTurn { count } => strings::if_drawn_count_this_turn(*count),
+        Condition::CardsInVoidCount { count } => strings::while_void_count(*count),
+        Condition::DissolvedThisTurn { .. } => strings::if_character_dissolved_this_turn(),
         Condition::PredicateCount { count: 1, predicate } => {
             if let Predicate::Another(CardPredicate::CharacterType(subtype)) = predicate {
                 strings::with_allied_subtype(serializer_utils::subtype_to_phrase(*subtype))
-                    .to_string()
             } else {
                 strings::with_predicate_condition(serialize_predicate_count(1, predicate))
-                    .to_string()
             }
         }
         Condition::PredicateCount { count, predicate } => {
             strings::with_predicate_condition(serialize_predicate_count(*count, predicate))
-                .to_string()
         }
-        Condition::ThisCardIsInYourVoid => strings::if_card_in_your_void().to_string(),
+        Condition::ThisCardIsInYourVoid => strings::if_card_in_your_void(),
     }
 }
 
