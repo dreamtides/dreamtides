@@ -28,7 +28,7 @@ pub enum AbilityContext {
 pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
     match effect {
         StandardEffect::CreateStaticAbilityUntilEndOfTurn { ability } => {
-            static_ability_serializer::serialize_standard_static_ability(ability)
+            static_ability_serializer::serialize_standard_static_ability(ability).to_string()
         }
         StandardEffect::CreateTriggerUntilEndOfTurn { trigger } => {
             let effect_fragment = serialize_effect_fragment(&trigger.effect);
