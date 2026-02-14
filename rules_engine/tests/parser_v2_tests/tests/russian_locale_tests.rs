@@ -1,9 +1,7 @@
 use std::any::Any;
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
-use chumsky::Parser;
 use parser_v2::lexer::lexer_tokenize;
-use parser_v2::parser::ability_parser;
 use parser_v2::serializer::ability_serializer;
 use parser_v2::variables::parser_bindings::VariableBindings;
 use parser_v2::variables::parser_substitutions;
@@ -82,10 +80,8 @@ fn render_ability(ability_text: &str, variables: &str) -> Result<String, String>
         lexer_tokenize::lex(ability_text).map_err(|e| format!("lexer error: {e:?}"))?;
     let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings)
         .map_err(|e| format!("variable resolution error: {e}"))?;
-    let ability = {
-        let parser = ability_parser::ability_parser();
-        parser.parse(&resolved).into_result().map_err(|e| format!("parser error: {e:?}"))?
-    };
+    let ability = test_helpers::parse_resolved_ability(&resolved)
+        .map_err(|e| format!("parser error: {e}"))?;
     catch_unwind(AssertUnwindSafe(|| ability_serializer::serialize_ability(&ability).text))
         .map_err(|panic| format!("serializer panic: {}", panic_message(panic)))
 }
