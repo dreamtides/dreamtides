@@ -202,8 +202,9 @@ c: 1"""
 russian = "Получите <color=#00838F>2●</color>. Возьмите карту."
 
 [[tests]]
-english = "▸ Materialized, Judgment: Gain 2●."
-russian = "▸ Воплощён, Суд: Получите 2●."
+english = "{Materialized_Judgment} Gain {energy($e)}."
+variables = "e: 2"
+russian = "▸ <b>Воплощён, Суд:</b> Получите <color=#00838F>2●</color>."
 
 [[tests]]
 english = "When you materialize an allied Spirit Animal, gain 1●."
@@ -238,8 +239,9 @@ english = "Pay 1 or more ●: Draw a card for each ● spent."
 russian = "Заплатите не менее 1●: Возьмите карту за каждый потраченный ●."
 
 [[tests]]
-english = "▸ Materialized, Judgment: Gain 1●."
-russian = "▸ Воплощён, Суд: Получите 1●."
+english = "{Materialized_Judgment} Gain {energy($e)}."
+variables = "e: 1"
+russian = "▸ <b>Воплощён, Суд:</b> Получите <color=#00838F>1●</color>."
 
 [[tests]]
 english = "▸ Judgment: You may discard a card to dissolve an enemy with spark 1 or less."
@@ -744,8 +746,9 @@ english = "▸ Materialized: Draw a card for each allied Spirit Animal."
 russian = "▸ Воплощён: Возьмите карту за каждого союзного Духа-Зверя."
 
 [[tests]]
-english = "▸ Dissolved: Draw a card."
-russian = "▸ Рассеян: Возьмите карту."
+english = "{Dissolved} Draw {cards($c)}."
+variables = "c: 1"
+russian = "▸ <b>Рассеян:</b> Возьмите карту."
 
 [[tests]]
 english = "When an allied Survivor is ▸ Dissolved:, draw a card."
@@ -768,8 +771,9 @@ english = "Dissolve an enemy. The opponent gains 3⍏."
 russian = "Рассеяйте врага. Противник получает 3⍏."
 
 [[tests]]
-english = "▸ Dissolved: Kindle 2."
-russian = "▸ Рассеян: Разожгите 2."
+english = "{Dissolved} {Kindle($k)}."
+variables = "k: 2"
+russian = "▸ <b>Рассеян:</b> Разожгите 2."
 
 [[tests]]
 english = "When an allied Survivor is ▸ Dissolved:, kindle 2."
@@ -941,8 +945,9 @@ english = "Once per turn, when you discard a card, gain 1●, then kindle 2."
 russian = "Один раз за ход, когда вы сбрасываете карту, получите 1●, затем Разожгите 2."
 
 [[tests]]
-english = "▸ Materialized, Dissolved: Draw a card."
-russian = "▸ Воплощён, Рассеян: Возьмите карту."
+english = "{Materialized_Dissolved} Draw {cards($c)}."
+variables = "c: 1"
+russian = "▸ <b>Воплощён, Рассеян:</b> Возьмите карту."
 
 [[tests]]
 english = "Gain {energy($e)}."

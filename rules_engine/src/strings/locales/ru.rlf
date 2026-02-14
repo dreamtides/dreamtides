@@ -14,13 +14,13 @@ maximum_energy($max) = "{$max} maximum {energy_symbol}";
 trigger($t) = "▸ <b>{$t}:</b>";
 materialized = "▸ <b>Воплощён:</b>";
 judgment = "▸ <b>Суд:</b>";
-dissolved = "▸ <b>Dissolved:</b>";
+dissolved = "▸ <b>Рассеян:</b>";
 materialized_judgment = "▸ <b>Воплощён, Суд:</b>";
 materialized_dissolved = "▸ <b>Воплощён, Рассеян:</b>";
 judgment_phase_name = "<b>Суд</b>";
 judgment_keyword_name = "Суд";
 materialized_keyword_name = "Воплощён";
-dissolved_keyword_name = "Dissolved";
+dissolved_keyword_name = "Рассеян";
 
 
 keyword($k) = "<color=#AA00FF>{$k}</color>";
@@ -34,7 +34,7 @@ reclaimed = "<color=#AA00FF>reclaimed</color>";
 materialize = "<color=#AA00FF>materialize</color>";
 prevent = "<color=#AA00FF>prevent</color>";
 prevented = "<color=#AA00FF>prevented</color>";
-kindle($k) = "<color=#AA00FF>kindle</color> {$k}";
+kindle($k) = "Разожгите {$k}";
 kindled = "<color=#AA00FF>kindled</color>";
 foresee($n) = "Прозрение {$n}";
 fast = "<b>↯fast</b>";
