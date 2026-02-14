@@ -12,14 +12,14 @@ maximum_energy($max) = "{$max} maximum {energy_symbol}";
 
 
 trigger($t) = "▸ <b>{$t}:</b>";
-materialized = "▸ <b>Materialized:</b>";
+materialized = "▸ <b>Воплощён:</b>";
 judgment = "▸ <b>Judgment:</b>";
 dissolved = "▸ <b>Dissolved:</b>";
-materialized_judgment = "▸ <b>Materialized, Judgment:</b>";
-materialized_dissolved = "▸ <b>Materialized, Dissolved:</b>";
+materialized_judgment = "▸ <b>Воплощён, Суд:</b>";
+materialized_dissolved = "▸ <b>Воплощён, Рассеян:</b>";
 judgment_phase_name = "<b>Judgment</b>";
 judgment_keyword_name = "Judgment";
-materialized_keyword_name = "Materialized";
+materialized_keyword_name = "Воплощён";
 dissolved_keyword_name = "Dissolved";
 
 

@@ -84,12 +84,14 @@ d: 1"""
 russian = "Возьмите карту. Сбросьте карту."
 
 [[tests]]
-english = "▸ Materialized: Foresee 2."
-russian = "▸ Воплощён: Прозрение 2."
+english = "{Materialized} {Foresee($f)}."
+variables = "f: 2"
+russian = "▸ <b>Воплощён:</b> Прозрение 2."
 
 [[tests]]
-english = "▸ Materialized: Gain 3●."
-russian = "▸ Воплощён: Получите 3●."
+english = "{Materialized} Gain {energy($e)}."
+variables = "e: 3"
+russian = "▸ <b>Воплощён:</b> Получите <color=#00838F>3●</color>."
 
 [[tests]]
 english = "▸ Materialized: Banish any number of allies, then materialize them."
@@ -366,8 +368,9 @@ d: 2"""
 russian = "Возьмите 3 карты. Сбросьте 2 карты."
 
 [[tests]]
-english = "▸ Materialized: Draw a card."
-russian = "▸ Воплощён: Возьмите карту."
+english = "{Materialized} Draw {cards($c)}."
+variables = "c: 1"
+russian = "▸ <b>Воплощён:</b> Возьмите карту."
 
 [[tests]]
 english = "Dissolve an enemy with cost less than the number of allied Warriors."
@@ -455,8 +458,9 @@ english = "Banish a non-Warrior enemy."
 russian = "Изгоните врага, который не является Воином."
 
 [[tests]]
-english = "▸ Materialized: Draw 2 cards."
-russian = "▸ Воплощён: Возьмите 2 карты."
+english = "{Materialized} Draw {cards($c)}."
+variables = "c: 2"
+russian = "▸ <b>Воплощён:</b> Возьмите 2 карты."
 
 [[tests]]
 english = "Events cost you 1● less."
@@ -488,8 +492,9 @@ english = "Materialize two random characters with cost 3● or less from your de
 russian = "Воплотите двух случайных персонажей стоимостью 3● или меньше из вашей колоды."
 
 [[tests]]
-english = "▸ Materialized: Draw a card."
-russian = "▸ Воплощён: Возьмите карту."
+english = "{Materialized} Draw {cards($c)}."
+variables = "c: 1"
+russian = "▸ <b>Воплощён:</b> Возьмите карту."
 
 [[tests]]
 english = "Once per turn, when you materialize a character with cost 2● or less, draw a card."
