@@ -31,7 +31,7 @@ discover = "<color=#AA00FF>discover</color>";
 discovered = "<color=#AA00FF>discovered</color>";
 reclaim = "<color=#AA00FF>reclaim</color>";
 reclaimed = "<color=#AA00FF>reclaimed</color>";
-materialize = "<color=#AA00FF>materialize</color>";
+materialize = "<color=#AA00FF>воплотите</color>";
 prevent = "<color=#AA00FF>prevent</color>";
 prevented = "<color=#AA00FF>prevented</color>";
 kindle($k) = "Разожгите {$k}";
@@ -62,10 +62,11 @@ spark = "spark";
 count($n) = "{$n}";
 
 
-ally = :an{ one: "ally", other: "allies" };
+ally = :masc :anim { nom: "союзник", *acc: "союзника", gen: "союзника", one: "союзника", other: "союзников" };
 count_allies($n) = :match($n) {
-    1: "an ally",
-    *other: "{$n} allies",
+    1: "союзника",
+    few: "{$n} союзников",
+    *other: "{$n} союзников",
 };
 count_allied_subtype($n, $s) = :from($s) :match($n) {
     1: "an allied {subtype($s)}",
@@ -258,8 +259,8 @@ pay_one_or_more_energy_cost = "pay 1 or more {energy_symbol}";
 cost_or_connector = " or ";
 cost_and_connector = " and ";
 pay_prefix($cost) = "pay {$cost}";
-abandon_any_number_of($target) = :from($target) "abandon any number of {$target:other}";
-abandon_target($target) = :from($target) "abandon {$target}";
+abandon_any_number_of($target) = :from($target) "отрекитесь от любого количества {$target:other}";
+abandon_target($target) = :from($target) "отрекитесь от {$target}";
 return_target_to_hand($target) = :from($target) "return {$target} to hand";
 return_count_to_hand($n, $target) = :from($target) "return {$n} {$target:other} to hand";
 return_all_but_one_to_hand($target) = :from($target) "return all but one {$target} to hand";
@@ -270,8 +271,8 @@ return_each_other_to_hand($target) = :from($target) "return each other {$target}
 return_or_more_to_hand($n, $target) = :from($target) "return {$n} or more {$target:other} to hand";
 
 
-abandon_count_allies($a) = "abandon {count_allies($a)}";
-discard_cards_cost($d) = "discard {cards($d)}";
+abandon_count_allies($a) = "отрекитесь от {count_allies($a)}";
+discard_cards_cost($d) = "сбросьте {cards($d)}";
 energy_cost_value($e) = "{energy($e)}";
 lose_max_energy_cost($m) = "lose {maximum_energy($m)}";
 banish_your_void_cost = "{banish} your void";
@@ -583,7 +584,7 @@ banish_collection_target($target) = "{banish} {$target}";
 materialize_them($target) = "{materialize} them";
 materialize_collection_target($target) = "{materialize} {$target}";
 
-materialize_copy_of($target) = "{materialize} a copy of {$target}";
+materialize_copy_of($target) = :from($target) "{materialize} копию {$target}";
 materialize_n_copies_of($n, $target) = "{materialize} {$n} copies of {$target}";
 materialize_copies_equal_to_matching($target, $matching) = "{materialize} a number of copies of {$target} equal to the number of {$matching:other}";
 materialize_copies_equal_to_energy($target) = "{materialize} a number of copies of {$target} equal to the amount of {energy_symbol} spent";

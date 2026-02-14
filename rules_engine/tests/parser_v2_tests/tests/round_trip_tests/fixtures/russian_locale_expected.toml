@@ -290,8 +290,12 @@ english = "▸ Judgment: You may banish 3 cards from your void to dissolve an en
 russian = "▸ Суд: Вы можете изгнать 3 карты из вашей Пустоты, чтобы рассеять врага стоимостью 2● или меньше."
 
 [[tests]]
-english = "1●, Discard a card: Kindle 2."
-russian = "1●, сбросьте карту: Разожгите 2."
+english = "{energy($e)}, Discard {cards($d)}: {Kindle($k)}."
+variables = """
+e: 1
+d: 1
+k: 2"""
+russian = "<color=#00838F>1●</color>, Сбросьте карту: Разожгите 2."
 
 [[tests]]
 english = "{Judgment} Gain {energy($e)}."
@@ -329,7 +333,8 @@ english = "▸ Judgment: You may draw 2 cards, then discard 3 cards."
 russian = "▸ Суд: Вы можете взять 2 карты, затем сбросить 3 карты."
 
 [[tests]]
-english = "Abandon an ally: Kindle 1."
+english = "Abandon an ally: {Kindle($k)}."
+variables = "k: 1"
 russian = "Отрекитесь от союзника: Разожгите 1."
 
 [[tests]]
@@ -528,12 +533,16 @@ english = "When you play a ↯fast card, gain 1⍏."
 russian = "Когда вы играете карту с ↯Стремительностью, получите 1⍏."
 
 [[tests]]
-english = "3●: Draw a card."
-russian = "3●: Возьмите карту."
+english = "{energy($e)}: Draw {cards($c)}."
+variables = """
+e: 3
+c: 1"""
+russian = "<color=#00838F>3●</color>: Возьмите карту."
 
 [[tests]]
-english = "4●: Materialize a copy of an ally."
-russian = "4●: Воплотите копию союзника."
+english = "{energy($e)}: {Materialize} a copy of an ally."
+variables = "e: 4"
+russian = "<color=#00838F>4●</color>: <color=#AA00FF>Воплотите</color> копию союзника."
 
 [[tests]]
 english = "Take an extra turn after this one."
@@ -800,8 +809,9 @@ variables = "f: 1"
 russian = "Прозрение 1."
 
 [[tests]]
-english = "Abandon an ally: Gain 1●."
-russian = "Отрекитесь от союзника: Получите 1●."
+english = "Abandon an ally: Gain {energy($e)}."
+variables = "e: 1"
+russian = "Отрекитесь от союзника: Получите <color=#00838F>1●</color>."
 
 [[tests]]
 english = "▸ Materialized: Banish the opponent's void."
