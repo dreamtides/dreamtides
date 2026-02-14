@@ -1,2 +1,2 @@
-min_passing = 64
-max_validation_warnings = 74
+min_passing = 70
+max_validation_warnings = 68

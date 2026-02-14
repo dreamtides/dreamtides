@@ -110,8 +110,9 @@ variables = "p: 1"
 russian = "Получите <color=#F57F17>1⍏</color>."
 
 [[tests]]
-english = "When an ally is ▸ Dissolved:, gain 1⍏."
-russian = "Когда союзник рассеивается, получите 1⍏."
+english = "When an ally is {dissolved}, gain {points($p)}."
+variables = "p: 1"
+russian = "Когда союзник рассеивается, получите <color=#F57F17>1⍏</color>."
 
 [[tests]]
 english = "Discover a card with cost 2●."
@@ -252,7 +253,8 @@ english = "▸ Judgment: You may discard a card to dissolve an enemy with spark 
 russian = "▸ Суд: Вы можете сбросить карту, чтобы рассеять врага с искрой 1 или меньше."
 
 [[tests]]
-english = "When an ally is ▸ Dissolved:, this card gains reclaim 1● this turn."
+english = "When an ally is {dissolved}, this card gains {reclaim_for_cost($r)} this turn."
+variables = "r: 1"
 russian = "Когда союзник рассеивается, эта карта получает Возвышение 1● до конца хода."
 
 [[tests]]
@@ -671,7 +673,8 @@ english = "Abandon a character, Discard your hand: Gain 5●."
 russian = "Отрекитесь от персонажа и сбросьте руку: Получите 5●."
 
 [[tests]]
-english = "When an ally is banished, kindle 1."
+english = "When an ally is {banished}, {kindle($k)}."
+variables = "k: 1"
 russian = "Когда союзник изгоняется, Разожгите 1."
 
 [[tests]]
@@ -887,7 +890,8 @@ english = "When you play a card during the opponent's turn, this character gains
 russian = "Когда вы играете карту в ход противника, этот персонаж получает +1 к искре."
 
 [[tests]]
-english = "When an ally is ▸ Dissolved:, draw a card."
+english = "When an ally is {dissolved}, draw {cards($c)}."
+variables = "c: 1"
 russian = "Когда союзник рассеивается, возьмите карту."
 
 [[tests]]
@@ -953,7 +957,8 @@ english = "Discover a Survivor."
 russian = "Откройте Выжившего."
 
 [[tests]]
-english = "When an ally is banished, this character gains +1 spark."
+english = "When an ally is {banished}, this character gains +{$s} spark."
+variables = "s: 1"
 russian = "Когда союзник изгоняется, этот персонаж получает +1 к искре."
 
 [[tests]]
@@ -1021,8 +1026,9 @@ english = "When the opponent plays an event which could dissolve an ally, preven
 russian = "Когда противник играет событие, которое может рассеять союзника, отмените розыгрыш этой карты."
 
 [[tests]]
-english = "When an ally is ▸ Dissolved:, gain 1●."
-russian = "Когда союзник рассеивается, получите 1●."
+english = "When an ally is {dissolved}, gain {energy($e)}."
+variables = "e: 1"
+russian = "Когда союзник рассеивается, получите <color=#00838F>1●</color>."
 
 [[tests]]
 english = "▸ Materialized: Each player discards a card."

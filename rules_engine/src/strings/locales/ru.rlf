@@ -298,8 +298,8 @@ when_put_into_void_trigger($target) = :from($target) "when {$target} is put into
 
 
 when_you_materialize_trigger($target) = :from($target) "когда вы воплощаете {$target}, ";
-when_dissolved_trigger($target) = :from($target) "when {$target} is {dissolved}, ";
-when_banished_trigger($target) = :from($target) "when {$target} is {banished}, ";
+when_dissolved_trigger($target) = :from($target) "когда {$target:nom} рассеивается, ";
+when_banished_trigger($target) = :from($target) "когда {$target:nom} изгоняется, ";
 when_you_play_cards_in_turn_trigger($c) = "when you play {$c} {card:$c} in a turn, ";
 when_you_abandon_count_in_turn_trigger($a) = "when you abandon {count_allies($a)} in a turn, ";
 when_you_draw_in_turn_trigger($c) = "when you draw {$c} {card:$c} in a turn, ";
@@ -426,7 +426,7 @@ pronoun_it = { *one: "it", other: "them" };
 pronoun_them = "them";
 as_plural($p) = "{$p:other}";
 with_plural($one, $other) = :from($one) { *one: "{$one}", other: "{$other}" };
-your_generic_character = :masc :anim { *one: "персонажа", other: "союзников" };
+your_generic_character = :masc :anim { nom: "союзник", *one: "персонажа", other: "союзников" };
 your_generic_card = :fem :inan { *one: "карту", gen: "карты", other: "ваши карты" };
 your_generic_event = :neut :inan { *one: "событие", other: "ваши события" };
 your_generic_subtype($t) = :a :from($t) {
@@ -622,7 +622,7 @@ target_gains_reclaim_equal_cost($target) = "{$target} gains {reclaim} equal to i
 
 it_gains_reclaim_for_cost_this_turn($target, $r) = "it gains {reclaim_for_cost($r)} this turn";
 it_gains_reclaim_equal_cost_this_turn($target) = "it gains {reclaim} equal to its cost this turn";
-this_card_gains_reclaim_for_cost_this_turn($r) = "this card gains {reclaim_for_cost($r)} this turn";
+this_card_gains_reclaim_for_cost_this_turn($r) = "эта карта получает {reclaim_for_cost($r)} до конца хода";
 this_card_gains_reclaim_equal_cost_this_turn = "this card gains {reclaim} equal to its cost this turn";
 target_gains_reclaim_for_cost_this_turn($target, $r) = "{$target} gains {reclaim_for_cost($r)} this turn";
 target_gains_reclaim_equal_cost_this_turn($target) = "{$target} gains {reclaim} equal to its cost this turn";

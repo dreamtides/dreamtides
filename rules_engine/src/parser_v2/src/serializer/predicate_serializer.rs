@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use ability_data::predicate::{CardPredicate, Predicate};
 use rlf::{Phrase, VariantKey};
 use strings::strings;
@@ -741,13 +739,13 @@ fn is_generic_card_type(card_predicate: &CardPredicate) -> bool {
 /// This is used when the RLF macro cannot create variant blocks for
 /// parameterized phrases without `:from`. It constructs a Phrase with `one`
 /// and `other` variant keys, inheriting the tag from the singular phrase.
+/// Packages singular and plural phrases into a single variant-aware phrase.
+///
+/// Preserves all variants from the singular phrase (e.g., case variants
+/// for Russian) and ensures `one`/`other` are set for plural selection.
 fn phrase_with_variants(singular: Phrase, plural: Phrase) -> Phrase {
-    Phrase::builder()
-        .text(singular.text.clone())
-        .variants(HashMap::from([
-            (VariantKey::new("one"), singular.text),
-            (VariantKey::new("other"), plural.text),
-        ]))
-        .tags(singular.tags)
-        .build()
+    let mut variants = singular.variants.clone();
+    variants.insert(VariantKey::new("one"), singular.text.clone());
+    variants.insert(VariantKey::new("other"), plural.text);
+    Phrase::builder().text(singular.text).variants(variants).tags(singular.tags).build()
 }
