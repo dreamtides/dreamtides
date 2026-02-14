@@ -1,1 +1,2 @@
 min_passing = 0
+max_validation_warnings = 75
