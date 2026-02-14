@@ -1,6 +1,10 @@
 [[tests]]
-english = "Draw 2 cards. Discard 2 cards. Gain 2●."
-russian = "Возьмите 2 карты. Сбросьте 2 карты. Получите 2●."
+english = "Draw {cards($c)}. Discard {cards($d)}. Gain {energy($e)}."
+variables = """
+c: 2
+d: 2
+e: 2"""
+russian = "Возьмите 2 карты. Сбросьте 2 карты. Получите <color=#00838F>2●</color>."
 
 [[tests]]
 english = "Prevent a played card."
@@ -72,7 +76,10 @@ english = "4●: This character gains +1 spark for each allied Warrior."
 russian = "4●: Этот персонаж получает +1 к искре за каждого союзного Воина."
 
 [[tests]]
-english = "Draw a card. Discard a card."
+english = "Draw {cards($c)}. Discard {cards($d)}."
+variables = """
+c: 1
+d: 1"""
 russian = "Возьмите карту. Сбросьте карту."
 
 [[tests]]
@@ -285,7 +292,8 @@ english = "When you play a character, materialize a Halcyon Figment."
 russian = "Когда вы играете персонажа, воплотите Фигмент Гальциона."
 
 [[tests]]
-english = "Draw 3 cards."
+english = "Draw {cards($c)}."
+variables = "c: 3"
 russian = "Возьмите 3 карты."
 
 [[tests]]
@@ -346,7 +354,10 @@ english = "Abandon an ally: This character gains +1 spark."
 russian = "Отрекитесь от союзника: Этот персонаж получает +1 к искре."
 
 [[tests]]
-english = "Draw 3 cards. Discard 2 cards."
+english = "Draw {cards($c)}. Discard {cards($d)}."
+variables = """
+c: 3
+d: 2"""
 russian = "Возьмите 3 карты. Сбросьте 2 карты."
 
 [[tests]]
@@ -455,7 +466,8 @@ english = "With an allied Survivor, you may play this card from your hand or voi
 russian = "Если у вас есть союзный Выживший, вы можете сыграть эту карту из руки или из Пустоты за 1●."
 
 [[tests]]
-english = "Draw 3 cards."
+english = "Draw {cards($c)}."
+variables = "c: 3"
 russian = "Возьмите 3 карты."
 
 [[tests]]
@@ -523,7 +535,10 @@ english = "Once per turn, when you play a ↯fast character, gain 1●."
 russian = "Один раз за ход, когда вы играете персонажа с ↯Стремительностью, получите 1●."
 
 [[tests]]
-english = "Draw 2 cards. Discard 2 cards."
+english = "Draw {cards($c)}. Discard {cards($d)}."
+variables = """
+c: 2
+d: 2"""
 russian = "Возьмите 2 карты. Сбросьте 2 карты."
 
 [[tests]]
@@ -547,7 +562,8 @@ english = "▸ Judgment: Each player abandons a character."
 russian = "▸ Суд: Каждый игрок отрекается от персонажа."
 
 [[tests]]
-english = "Draw a card."
+english = "Draw {cards($c)}."
+variables = "c: 1"
 russian = "Возьмите карту."
 
 [[tests]]

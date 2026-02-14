@@ -47,8 +47,9 @@ bullet = "•";
 
 card = :a{ one: "card", other: "cards" };
 cards($n) = :match($n) {
-    1: "a card",
-    *other: "{$n} cards",
+    1: "карту",
+    few: "{$n} карты",
+    *other: "{$n} карт",
 };
 top_n_cards($n) = :match($n) {
     1: "top card",
@@ -324,8 +325,8 @@ operator_lower = " lower";
 operator_higher = " higher";
 
 
-draw_cards_effect($c) = "draw {cards($c)}";
-discard_cards_effect($d) = "discard {cards($d)}";
+draw_cards_effect($c) = "возьмите {cards($c)}";
+discard_cards_effect($d) = "сбросьте {cards($d)}";
 gain_energy_effect($e) = "получите {energy($e)}";
 gain_points_effect($p) = "получите {points($p)}";
 lose_points_effect($p) = "you lose {points($p)}";
