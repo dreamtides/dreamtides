@@ -34,8 +34,9 @@ variables = "e: 1"
 russian = "Когда вы воплощаете союзника, получите <color=#00838F>1●</color>."
 
 [[tests]]
-english = "When you discard a card, gain 1⍏."
-russian = "Когда вы сбрасываете карту, получите 1⍏."
+english = "When you discard a card, gain {points($p)}."
+variables = "p: 1"
+russian = "Когда вы сбрасываете карту, получите <color=#F57F17>1⍏</color>."
 
 [[tests]]
 english = "{Dissolve} all characters."
@@ -340,8 +341,9 @@ variables = "k: 1"
 russian = "Отрекитесь от союзника: Разожгите 1."
 
 [[tests]]
-english = "When you abandon a character, gain 1⍏."
-russian = "Когда вы отрекаетесь от персонажа, получите 1⍏."
+english = "When you abandon a character, gain {points($p)}."
+variables = "p: 1"
+russian = "Когда вы отрекаетесь от персонажа, получите <color=#F57F17>1⍏</color>."
 
 [[tests]]
 english = "Banish a card from hand: Play this event for 0●."
@@ -422,7 +424,8 @@ english = "Put the top 3 cards of your deck into your void. Draw a card."
 russian = "Положите 3 верхние карты вашей колоды в вашу Пустоту. Возьмите карту."
 
 [[tests]]
-english = "When you abandon an ally, this character gains +1 spark."
+english = "When you abandon an ally, this character gains +{$s} spark."
+variables = "s: 1"
 russian = "Когда вы отрекаетесь от союзника, этот персонаж получает +1 к искре."
 
 [[tests]]
@@ -579,7 +582,8 @@ variables = "r: 2"
 russian = "Возвышение 2●"
 
 [[tests]]
-english = "When you discard a card, kindle 1."
+english = "When you discard a card, {kindle($k)}."
+variables = "k: 1"
 russian = "Когда вы сбрасываете карту, Разожгите 1."
 
 [[tests]]
@@ -829,7 +833,8 @@ english = "When you play a Warrior, reclaim a random character with cost 3● or
 russian = "Когда вы играете Воина, возвысьте случайного персонажа стоимостью 3● или меньше."
 
 [[tests]]
-english = "When you abandon a character, draw a card."
+english = "When you abandon a character, draw {cards($c)}."
+variables = "c: 1"
 russian = "Когда вы отрекаетесь от персонажа, возьмите карту."
 
 [[tests]]

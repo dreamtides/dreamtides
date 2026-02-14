@@ -291,9 +291,9 @@ when_opponent_plays_trigger($target) = :from($target) "when the opponent plays {
 when_you_play_from_hand_trigger($target) = :from($target) "when you play {$target} from your hand, ";
 when_you_play_in_turn_trigger($target) = :from($target) "when you play {$target} in a turn, ";
 when_you_play_during_enemy_turn_trigger($target) = :from($target) "when you play {$target} during the opponent's turn, ";
-when_you_discard_trigger($target) = :from($target) "when you discard {$target}, ";
+when_you_discard_trigger($target) = :from($target) "когда вы сбрасываете {$target}, ";
 when_leaves_play_trigger($target) = :from($target) "when {$target} leaves play, ";
-when_you_abandon_trigger($target) = :from($target) "when you abandon {$target}, ";
+when_you_abandon_trigger($target) = :from($target) "когда вы отрекаетесь от {$target}, ";
 when_put_into_void_trigger($target) = :from($target) "when {$target} is put into your void, ";
 
 
@@ -427,7 +427,7 @@ pronoun_them = "them";
 as_plural($p) = "{$p:other}";
 with_plural($one, $other) = :from($one) { *one: "{$one}", other: "{$other}" };
 your_generic_character = :masc :anim { *one: "персонажа", other: "союзников" };
-your_generic_card = :a{ *one: "card", other: "your cards" };
+your_generic_card = :fem :inan { *one: "карту", gen: "карты", other: "ваши карты" };
 your_generic_event = :neut :inan { *one: "событие", other: "ваши события" };
 your_generic_subtype($t) = :a :from($t) {
     *one: "{subtype($t)}",
