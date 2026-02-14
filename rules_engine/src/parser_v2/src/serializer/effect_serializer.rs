@@ -361,7 +361,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> Phrase {
 }
 
 /// Serializes an effect using the default event context.
-pub fn serialize_effect(effect: &Effect) -> String {
+pub fn serialize_effect(effect: &Effect) -> Phrase {
     serialize_effect_with_context(effect, AbilityContext::Event)
 }
 
@@ -371,32 +371,31 @@ pub fn serialize_effect(effect: &Effect) -> String {
 /// - Triggered: use `, then` (e.g., "{Judgment} Draw {cards($c)}, then discard
 ///   {cards($d)}.")
 /// - Event: use `. ` (e.g., "Draw {cards($c)}. Discard {cards($d)}.")
-pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -> String {
+pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -> Phrase {
     match effect {
         Effect::Effect(standard_effect) => {
-            strings::effect_with_period(serialize_standard_effect(standard_effect)).to_string()
+            strings::effect_with_period(serialize_standard_effect(standard_effect))
         }
         Effect::WithOptions(options) => {
-            let effect_text = serialize_standard_effect(&options.effect).to_string();
+            let effect_text = serialize_standard_effect(&options.effect);
             let body = match (options.optional, &options.trigger_cost) {
                 (true, Some(trigger_cost)) => {
                     let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
-                    strings::optional_cost_effect_body(cost_str, effect_text).to_string()
+                    strings::optional_cost_effect_body(cost_str, effect_text)
                 }
-                (true, None) => strings::optional_effect_body(effect_text).to_string(),
+                (true, None) => strings::optional_effect_body(effect_text),
                 (false, Some(trigger_cost)) => {
                     let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
-                    strings::cost_effect_body(cost_str, effect_text).to_string()
+                    strings::cost_effect_body(cost_str, effect_text)
                 }
                 (false, None) => effect_text,
             };
-            let with_period = strings::effect_with_period(body).to_string();
+            let with_period = strings::effect_with_period(body);
             if let Some(condition) = &options.condition {
                 strings::condition_with_effect(
                     condition_serializer::serialize_condition(condition),
                     with_period,
                 )
-                .to_string()
             } else {
                 with_period
             }
@@ -411,22 +410,22 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
                 let cost_str =
                     effects[0].trigger_cost.as_ref().map(cost_serializer::serialize_trigger_cost);
                 match cost_str {
-                    Some(cost) => strings::optional_cost_effect_body(cost, joined).to_string(),
-                    None => strings::optional_effect_body(joined).to_string(),
+                    Some(cost) => strings::optional_cost_effect_body(cost, joined),
+                    None => strings::optional_effect_body(joined),
                 }
             } else if !all_optional && all_have_trigger_cost && !effects.is_empty() {
                 let joined = join_effect_fragments(effects, &and_join);
                 let cost_str =
                     effects[0].trigger_cost.as_ref().map(cost_serializer::serialize_trigger_cost);
                 match cost_str {
-                    Some(cost) => strings::cost_effect_body(cost, joined).to_string(),
-                    None => joined,
+                    Some(cost) => strings::cost_effect_body(cost, joined),
+                    None => Phrase::builder().text(joined).build(),
                 }
             } else if all_optional && !effects.is_empty() {
                 let joined = join_effect_fragments(effects, &then_join);
-                strings::optional_effect_body(joined).to_string()
+                strings::optional_effect_body(joined)
             } else if context == AbilityContext::Triggered {
-                join_effect_fragments(effects, &then_join)
+                Phrase::builder().text(join_effect_fragments(effects, &then_join)).build()
             } else {
                 let separator = strings::sentence_separator().to_string();
                 let sentences: Vec<String> = effects
@@ -438,9 +437,12 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
                         .to_string()
                     })
                     .collect();
-                return prepend_condition_from_list(effects, sentences.join(&separator));
+                return prepend_condition_from_list(
+                    effects,
+                    Phrase::builder().text(sentences.join(&separator)).build(),
+                );
             };
-            let with_period = strings::effect_with_period(body).to_string();
+            let with_period = strings::effect_with_period(body);
             prepend_condition_from_list(effects, with_period)
         }
         Effect::ListWithOptions(list_with_options) => {
@@ -485,23 +487,22 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
                 match &list_with_options.trigger_cost {
                     Some(trigger_cost) => {
                         let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
-                        strings::optional_cost_effect_body(cost_str, joined).to_string()
+                        strings::optional_cost_effect_body(cost_str, joined)
                     }
-                    None => strings::optional_effect_body(joined).to_string(),
+                    None => strings::optional_effect_body(joined),
                 }
             } else if let Some(trigger_cost) = &list_with_options.trigger_cost {
                 let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
-                strings::cost_effect_body(cost_str, joined).to_string()
+                strings::cost_effect_body(cost_str, joined)
             } else {
-                joined
+                Phrase::builder().text(joined).build()
             };
-            let with_period = strings::effect_with_period(body).to_string();
+            let with_period = strings::effect_with_period(body);
             if let Some(condition) = &list_with_options.condition {
                 strings::condition_with_effect(
                     condition_serializer::serialize_condition(condition),
                     with_period,
                 )
-                .to_string()
             } else {
                 with_period
             }
@@ -514,7 +515,7 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
                 let effect_text = serialize_effect_with_context(&choice.effect, context);
                 result.push_str(&strings::modal_choice_line(energy_cost, effect_text).to_string());
             }
-            result
+            Phrase::builder().text(result).build()
         }
     }
 }
@@ -577,9 +578,9 @@ pub fn serialize_for_count_expression(quantity_expression: &QuantityExpression) 
 
 /// Serializes an effect as a periodless fragment for embedding in compound
 /// phrases. Strips the trailing period from the full effect rendering.
-pub fn serialize_effect_fragment(effect: &Effect) -> String {
-    let rendered = serialize_effect(effect);
-    rendered.strip_suffix(&strings::period_suffix().to_string()).unwrap_or(&rendered).to_string()
+pub fn serialize_effect_fragment(effect: &Effect) -> Phrase {
+    let period = strings::period_suffix().to_string();
+    serialize_effect(effect).map_text(|t| t.strip_suffix(&period).unwrap_or(&t).to_string())
 }
 
 /// Serializes a collection expression with a predicate target to produce the
@@ -621,11 +622,10 @@ fn join_effect_fragments(effects: &[EffectWithOptions], joiner: &str) -> String 
 }
 
 /// Prepends a condition from the first effect in a list, if present.
-fn prepend_condition_from_list(effects: &[EffectWithOptions], body: String) -> String {
+fn prepend_condition_from_list(effects: &[EffectWithOptions], body: Phrase) -> Phrase {
     let condition = effects.first().and_then(|e| e.condition.as_ref());
     if let Some(condition) = condition {
         strings::condition_with_effect(condition_serializer::serialize_condition(condition), body)
-            .to_string()
     } else {
         body
     }
