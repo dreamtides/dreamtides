@@ -46,6 +46,7 @@ struct RussianLocaleExpected {
 struct RussianTestEntry {
     english: String,
     russian: String,
+    variables: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -127,7 +128,8 @@ fn test_russian_locale_ratcheting_translations() {
     let mut failures = Vec::new();
 
     for (index, entry) in expected.tests.iter().enumerate() {
-        let result = render_ability(&entry.english, "");
+        let variables = entry.variables.as_deref().unwrap_or("");
+        let result = render_ability(&entry.english, variables);
         match result {
             Ok(rendered) if rendered == entry.russian => {
                 passing += 1;

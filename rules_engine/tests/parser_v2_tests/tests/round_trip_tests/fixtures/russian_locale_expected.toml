@@ -35,8 +35,9 @@ english = "Dissolve all characters."
 russian = "Рассеяйте всех персонажей."
 
 [[tests]]
-english = "Gain 4●."
-russian = "Получите 4●."
+english = "Gain {energy($e)}."
+variables = "e: 4"
+russian = "Получите <color=#00838F>4●</color>."
 
 [[tests]]
 english = "While you have 7 or more cards in your void, they have reclaim equal to their cost."
@@ -91,8 +92,9 @@ english = "Put the top 3 cards of your deck into your void."
 russian = "Положите 3 верхние карты вашей колоды в вашу Пустоту."
 
 [[tests]]
-english = "Gain 1⍏."
-russian = "Получите 1⍏."
+english = "Gain {points($p)}."
+variables = "p: 1"
+russian = "Получите <color=#F57F17>1⍏</color>."
 
 [[tests]]
 english = "When an ally is ▸ Dissolved:, gain 1⍏."
@@ -327,8 +329,9 @@ english = "When you play a Survivor, put the top 2 cards of your deck into your 
 russian = "Когда вы играете Выжившего, положите 2 верхние карты вашей колоды в вашу Пустоту."
 
 [[tests]]
-english = "Gain 6●."
-russian = "Получите 6●."
+english = "Gain {energy($e)}."
+variables = "e: 6"
+russian = "Получите <color=#00838F>6●</color>."
 
 [[tests]]
 english = "▸ Materialized, Judgment: Banish an ally with spark 2 or less, then materialize it."
@@ -363,8 +366,9 @@ english = "▸ Judgment: Gain 1● for each allied Spirit Animal."
 russian = "▸ Суд: Получите 1● за каждого союзного Духа-Зверя."
 
 [[tests]]
-english = "Gain 3●."
-russian = "Получите 3●."
+english = "Gain {energy($e)}."
+variables = "e: 3"
+russian = "Получите <color=#00838F>3●</color>."
 
 [[tests]]
 english = "Abandon an ally, once per turn: Reclaim a Warrior."
@@ -899,8 +903,9 @@ english = "▸ Materialized, Dissolved: Draw a card."
 russian = "▸ Воплощён, Рассеян: Возьмите карту."
 
 [[tests]]
-english = "Gain 1●."
-russian = "Получите 1●."
+english = "Gain {energy($e)}."
+variables = "e: 1"
+russian = "Получите <color=#00838F>1●</color>."
 
 [[tests]]
 english = "▸ Dissolved: A Survivor in your void gains reclaim equal to its cost."

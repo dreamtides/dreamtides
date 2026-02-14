@@ -326,8 +326,8 @@ operator_higher = " higher";
 
 draw_cards_effect($c) = "draw {cards($c)}";
 discard_cards_effect($d) = "discard {cards($d)}";
-gain_energy_effect($e) = "gain {energy($e)}";
-gain_points_effect($p) = "gain {points($p)}";
+gain_energy_effect($e) = "получите {energy($e)}";
+gain_points_effect($p) = "получите {points($p)}";
 lose_points_effect($p) = "you lose {points($p)}";
 opponent_gains_points_effect($p) = "the opponent gains {points($p)}";
 opponent_loses_points_effect($p) = "the opponent loses {points($p)}";
