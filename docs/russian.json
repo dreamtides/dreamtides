@@ -1,0 +1,1466 @@
+[
+  {
+    "card": "A New Advenure",
+    "ability": 0,
+    "english": "Draw 2 cards. Discard 2 cards. Gain 2●.",
+    "russian": "Возьмите 2 карты. Сбросьте 2 карты. Получите 2●."
+  },
+  {
+    "card": "Abolish",
+    "ability": 0,
+    "english": "Prevent a played card.",
+    "russian": "Отмените розыгрыш карты."
+  },
+  {
+    "card": "Abomination of Memory",
+    "ability": 0,
+    "english": "This character's spark is equal to the number of cards in your void.",
+    "russian": "Искра этого персонажа равна количеству карт в вашей Пустоте."
+  },
+  {
+    "card": "Abyssal Enforcer",
+    "ability": 0,
+    "english": "▸ Materialized: Return an enemy to hand.",
+    "russian": "▸ Воплощён: Верните врага в руку."
+  },
+  {
+    "card": "Abyssal Plunge",
+    "ability": 0,
+    "english": "Dissolve an enemy with cost 3● or more.",
+    "russian": "Рассеяйте врага стоимостью 3● или больше."
+  },
+  {
+    "card": "Abyssal Plunge",
+    "ability": 1,
+    "english": "Reclaim 2●",
+    "russian": "Возвышение 2●."
+  },
+  {
+    "card": "Angel of the Eclipse",
+    "ability": 0,
+    "english": "When you materialize an ally, gain 1●.",
+    "russian": "Когда вы воплощаете союзника, получите 1●."
+  },
+  {
+    "card": "Apocalypse Vigilante",
+    "ability": 0,
+    "english": "When you discard a card, gain 1⍏.",
+    "russian": "Когда вы сбрасываете карту, получите 1⍏."
+  },
+  {
+    "card": "Apocalypse",
+    "ability": 0,
+    "english": "Dissolve all characters.",
+    "russian": "Рассеяйте всех персонажей."
+  },
+  {
+    "card": "Arc Gate Opening",
+    "ability": 0,
+    "english": "Gain 4●.",
+    "russian": "Получите 4●."
+  },
+  {
+    "card": "Architect of Memory",
+    "ability": 0,
+    "english": "While you have 7 or more cards in your void, they have reclaim equal to their cost.",
+    "russian": "Пока в вашей Пустоте 7 или больше карт, эти карты получают Возвышение, равное их стоимости."
+  },
+  {
+    "card": "Archive of the Forgotten ",
+    "ability": 0,
+    "english": "Return up to 2 events from your void to your hand.",
+    "russian": "Верните до 2 событий из вашей Пустоты в руку."
+  },
+  {
+    "card": "Ashborn Necromancer",
+    "ability": 0,
+    "english": "Abandon an ally: Put the top 2 cards of your deck into your void.",
+    "russian": "Отрекитесь от союзника: Положите 2 верхние карты вашей колоды в вашу Пустоту."
+  },
+  {
+    "card": "Ashen Avenger",
+    "ability": 0,
+    "english": "2●, Banish another card in your void: Reclaim this character.",
+    "russian": "2●, изгоните другую карту из вашей Пустоты: Возвысьте этого персонажа."
+  },
+  {
+    "card": "Ashen Remnant",
+    "ability": 0,
+    "english": "Abandon an ally: You may put a character from your void on top of your deck.",
+    "russian": "Отрекитесь от союзника: Вы можете положить персонажа из вашей Пустоты на верх вашей колоды."
+  },
+  {
+    "card": "Ashlight Caller",
+    "ability": 0,
+    "english": "▸ Materialized: An event in your void gains reclaim equal to its cost this turn.",
+    "russian": "▸ Воплощён: Событие в вашей Пустоте получает Возвышение, равное его стоимости, до конца хода."
+  },
+  {
+    "card": "Ashmaze Guide",
+    "ability": 0,
+    "english": "When you discard a card, it gains reclaim equal to its cost this turn.",
+    "russian": "Когда вы сбрасываете карту, она получает Возвышение, равное её стоимости, до конца хода."
+  },
+  {
+    "card": "Assault Leader",
+    "ability": 0,
+    "english": "4●: This character gains +1 spark for each allied Warrior.",
+    "russian": "4●: Этот персонаж получает +1 к искре за каждого союзного Воина."
+  },
+  {
+    "card": "Astral Interface",
+    "ability": 0,
+    "english": "Draw a card. Discard a card.",
+    "russian": "Возьмите карту. Сбросьте карту."
+  },
+  {
+    "card": "Astral Navigators",
+    "ability": 0,
+    "english": "▸ Materialized: Foresee 2.",
+    "russian": "▸ Воплощён: Прозрение 2."
+  },
+  {
+    "card": "Aurora Channeler",
+    "ability": 0,
+    "english": "▸ Materialized: Gain 3●.",
+    "russian": "▸ Воплощён: Получите 3●."
+  },
+  {
+    "card": "Aurora Rider",
+    "ability": 0,
+    "english": "▸ Materialized: Banish any number of allies, then materialize them.",
+    "russian": "▸ Воплощён: Изгоните любое количество союзников, затем воплотите их."
+  },
+  {
+    "card": "Auroral Passage",
+    "ability": 0,
+    "english": "Put the top 3 cards of your deck into your void.",
+    "russian": "Положите 3 верхние карты вашей колоды в вашу Пустоту."
+  },
+  {
+    "card": "Autumn Glade",
+    "ability": 0,
+    "english": "Gain 1⍏.",
+    "russian": "Получите 1⍏."
+  },
+  {
+    "card": "Avatar of Cosmic Reckoning",
+    "ability": 0,
+    "english": "When an ally is ▸ Dissolved:, gain 1⍏.",
+    "russian": "Когда союзник рассеивается, получите 1⍏."
+  },
+  {
+    "card": "Beacon of Tomorrow",
+    "ability": 0,
+    "english": "Discover a card with cost 2●.",
+    "russian": "Откройте карту стоимостью 2●."
+  },
+  {
+    "card": "Blade of Oblivion",
+    "ability": 0,
+    "english": "When you abandon 2 allies in a turn, dissolve an enemy.",
+    "russian": "Когда вы отрекаетесь от 2 союзников за ход, рассеяйте врага."
+  },
+  {
+    "card": "Blade of Unity",
+    "ability": 0,
+    "english": "This character's spark is equal to the number of allied Warriors.",
+    "russian": "Искра этого персонажа равна количеству союзных Воинов."
+  },
+  {
+    "card": "Blazing Emberwing",
+    "ability": 0,
+    "english": "The '▸ Judgment:' ability of allies triggers when you materialize them.",
+    "russian": "Способность союзников «▸ Суд:» срабатывает, когда вы воплощаете их."
+  },
+  {
+    "card": "Blooming Path Wanderer",
+    "ability": 0,
+    "english": "▸ Judgment: You may banish an ally, then materialize it.",
+    "russian": "▸ Суд: Вы можете изгнать союзника, затем воплотить его."
+  },
+  {
+    "card": "Bloomweaver",
+    "ability": 0,
+    "english": "Once per turn, when you materialize a character, gain 1●.",
+    "russian": "Один раз за ход, когда вы воплощаете персонажа, получите 1●."
+  },
+  {
+    "card": "Boundless Wanderer",
+    "ability": 0,
+    "english": "Has all character types.",
+    "russian": "У этого персонажа есть все типы персонажей."
+  },
+  {
+    "card": "Boundless Wanderer",
+    "ability": 1,
+    "english": "▸ Judgment: With 3 allies that share a character type, draw a card.",
+    "russian": "▸ Суд: Если у вас есть 3 союзника с общим типом персонажа, возьмите карту."
+  },
+  {
+    "card": "Break the Sequence",
+    "ability": 0,
+    "english": "Choose One:\n• 2●: Return an enemy to hand.\n• 3●: Draw 2 cards.",
+    "russian": "Выберите одно:\n• 2●: Верните врага в руку.\n• 3●: Возьмите 2 карты."
+  },
+  {
+    "card": "Break the Veil",
+    "ability": 0,
+    "english": "Discard a chosen card with cost 3● or less from the opponent's hand.",
+    "russian": "Сбросьте выбранную карту стоимостью 3● или меньше из руки противника."
+  },
+  {
+    "card": "Burst of Obliteration",
+    "ability": 0,
+    "english": "Pay 1 or more ●: Dissolve all characters with spark less than the amount of ● paid.",
+    "russian": "Заплатите не менее 1●: Рассеяйте всех персонажей с искрой меньше числа уплаченных ●."
+  },
+  {
+    "card": "Call to the Unknown",
+    "ability": 0,
+    "english": "Discover a character with a ▸ Materialized: ability.",
+    "russian": "Откройте персонажа со способностью «▸ Воплощён:»."
+  },
+  {
+    "card": "Cascade of Reflections",
+    "ability": 0,
+    "english": "Until end of turn, when you play an event, copy it.",
+    "russian": "До конца хода, когда вы играете событие, скопируйте его."
+  },
+  {
+    "card": "Catalyst Ignition",
+    "ability": 0,
+    "english": "Double the amount of ● you gain from card effects this turn.",
+    "russian": "До конца хода удвойте количество ●, которое вы получаете от эффектов карт."
+  },
+  {
+    "card": "Celestial Reverie",
+    "ability": 0,
+    "english": "Until end of turn, when you play a character, draw a card.",
+    "russian": "До конца хода, когда вы играете персонажа, возьмите карту."
+  },
+  {
+    "card": "Chronicle Reclaimer",
+    "ability": 0,
+    "english": "▸ Judgment: Draw a card, then discard a card.",
+    "russian": "▸ Суд: Возьмите карту, затем сбросьте карту."
+  },
+  {
+    "card": "Cloaked Sentinel",
+    "ability": 0,
+    "english": "The opponent's events cost 1● more.",
+    "russian": "События противника стоят на 1● больше."
+  },
+  {
+    "card": "Company Commander",
+    "ability": 0,
+    "english": "When you materialize an allied Warrior, this character gains +1 spark.",
+    "russian": "Когда вы воплощаете союзного Воина, этот персонаж получает +1 к искре."
+  },
+  {
+    "card": "Conduit of Resonance",
+    "ability": 0,
+    "english": "When you materialize a character, trigger the ▸ Judgment: ability of each ally.",
+    "russian": "Когда вы воплощаете персонажа, срабатывает способность «▸ Суд:» каждого союзника."
+  },
+  {
+    "card": "Cosmic Puppeteer",
+    "ability": 0,
+    "english": "▸ Materialized: Gain control of an enemy with cost 2● or less.",
+    "russian": "▸ Воплощён: Получите контроль над врагом стоимостью 2● или меньше."
+  },
+  {
+    "card": "Cragfall",
+    "ability": 0,
+    "english": "Prevent a played character.",
+    "russian": "Отмените розыгрыш персонажа."
+  },
+  {
+    "card": "Data Pulse",
+    "ability": 0,
+    "english": "Gain 2●. Draw a card.",
+    "russian": "Получите 2●. Возьмите карту."
+  },
+  {
+    "card": "Dawnblade Wanderer",
+    "ability": 0,
+    "english": "▸ Materialized, Judgment: Gain 2●.",
+    "russian": "▸ Воплощён, Суд: Получите 2●."
+  },
+  {
+    "card": "Dawnprowler Panther",
+    "ability": 0,
+    "english": "When you materialize an allied Spirit Animal, gain 1●.",
+    "russian": "Когда вы воплощаете союзного Духа-Зверя, получите 1●."
+  },
+  {
+    "card": "Desperation",
+    "ability": 0,
+    "english": "Abandon any number of allies: Draw a card for each ally abandoned.",
+    "russian": "Отрекитесь от любого количества союзников: Возьмите карту за каждого союзника, от которого вы отреклись."
+  },
+  {
+    "card": "Dimensional Pathfinder",
+    "ability": 0,
+    "english": "▸ Judgment: You may pay 3● to banish up to 2 allies, then materialize them.",
+    "russian": "▸ Суд: Вы можете заплатить 3●, чтобы изгнать до 2 союзников, затем воплотить их."
+  },
+  {
+    "card": "Door to Possibility",
+    "ability": 0,
+    "english": "Discover an event.",
+    "russian": "Откройте событие."
+  },
+  {
+    "card": "Dreadcall Warden",
+    "ability": 0,
+    "english": "2●, Abandon an ally with spark 1 or less: Draw 2 cards.",
+    "russian": "2●, отрекитесь от союзника с искрой 1 или меньше: Возьмите 2 карты."
+  },
+  {
+    "card": "Dreamborne Leviathan",
+    "ability": 0,
+    "english": "Reveal the top card of your deck.",
+    "russian": "Покажите верхнюю карту вашей колоды."
+  },
+  {
+    "card": "Dreamborne Leviathan",
+    "ability": 1,
+    "english": "You may play characters from the top of your deck.",
+    "russian": "Вы можете играть персонажей с верха вашей колоды."
+  },
+  {
+    "card": "Dreamscatter",
+    "ability": 0,
+    "english": "Pay 1 or more ●: Draw a card for each ● spent.",
+    "russian": "Заплатите не менее 1●: Возьмите карту за каждый потраченный ●."
+  },
+  {
+    "card": "Driftcaller Sovereign",
+    "ability": 0,
+    "english": "▸ Materialized, Judgment: Gain 1●.",
+    "russian": "▸ Воплощён, Суд: Получите 1●."
+  },
+  {
+    "card": "Duneveil Vanguard",
+    "ability": 0,
+    "english": "▸ Judgment: You may discard a card to dissolve an enemy with spark 1 or less.",
+    "russian": "▸ Суд: Вы можете сбросить карту, чтобы рассеять врага с искрой 1 или меньше."
+  },
+  {
+    "card": "Dustborn Veteran",
+    "ability": 0,
+    "english": "When an ally is ▸ Dissolved:, this card gains reclaim 1● this turn.",
+    "russian": "Когда союзник рассеивается, эта карта получает Возвышение 1● до конца хода."
+  },
+  {
+    "card": "Ebonwing",
+    "ability": 0,
+    "english": "▸ Materialized, Judgment: Kindle 1.",
+    "russian": "▸ Воплощён, Суд: Разожгите 1."
+  },
+  {
+    "card": "Echo Architect",
+    "ability": 0,
+    "english": "Events cost you 2● more.",
+    "russian": "Ваши события стоят на 2● больше."
+  },
+  {
+    "card": "Echo Architect",
+    "ability": 1,
+    "english": "When you play an event from your hand, copy it.",
+    "russian": "Когда вы играете событие из руки, скопируйте его."
+  },
+  {
+    "card": "Echoes of Eternity",
+    "ability": 0,
+    "english": "Copy the next event you play this turn three times.",
+    "russian": "Скопируйте следующее событие, которое вы сыграете в этот ход, три раза."
+  },
+  {
+    "card": "Echoes of Eternity",
+    "ability": 1,
+    "english": "Reclaim 2●",
+    "russian": "Возвышение 2●."
+  },
+  {
+    "card": "Echoes of the Journey",
+    "ability": 0,
+    "english": "Draw a card for each card you have played this turn.",
+    "russian": "Возьмите карту за каждую карту, которую вы сыграли в этот ход."
+  },
+  {
+    "card": "Echoing Denial",
+    "ability": 0,
+    "english": "Banish a card from hand: Play this event for 0●.",
+    "russian": "Изгоните карту из руки: Сыграйте это событие за 0●."
+  },
+  {
+    "card": "Echoing Denial",
+    "ability": 1,
+    "english": "Prevent a played card.",
+    "russian": "Отмените розыгрыш карты."
+  },
+  {
+    "card": "Eclipse Herald",
+    "ability": 0,
+    "english": "▸ Judgment: You may banish 3 cards from your void to dissolve an enemy with cost 2● or less.",
+    "russian": "▸ Суд: Вы можете изгнать 3 карты из вашей Пустоты, чтобы рассеять врага стоимостью 2● или меньше."
+  },
+  {
+    "card": "Emberwatch Veteran",
+    "ability": 0,
+    "english": "1●, Discard a card: Kindle 2.",
+    "russian": "1●, сбросьте карту: Разожгите 2."
+  },
+  {
+    "card": "Emerald Guardian",
+    "ability": 0,
+    "english": "▸ Judgment: Gain 2●.",
+    "russian": "▸ Суд: Получите 2●."
+  },
+  {
+    "card": "Endless Projection",
+    "ability": 0,
+    "english": "When you play a character, materialize a Halcyon Figment.",
+    "russian": "Когда вы играете персонажа, воплотите Фигмент Гальциона."
+  },
+  {
+    "card": "Epiphany Unfolded",
+    "ability": 0,
+    "english": "Draw 3 cards.",
+    "russian": "Возьмите 3 карты."
+  },
+  {
+    "card": "Eternal Sentry",
+    "ability": 0,
+    "english": "When you draw 2 cards in a turn, if this card is in your void, it gains reclaim 1● this turn.",
+    "russian": "Когда вы берёте 2 карты за ход, если эта карта находится в вашей Пустоте, она получает Возвышение 1● до конца хода."
+  },
+  {
+    "card": "Eternal Stag",
+    "ability": 0,
+    "english": "When you play a Spirit Animal, draw a card.",
+    "russian": "Когда вы играете Духа-Зверя, возьмите карту."
+  },
+  {
+    "card": "Ethereal Courser",
+    "ability": 0,
+    "english": "▸ Materialized: You may return an ally to hand.",
+    "russian": "▸ Воплощён: Вы можете вернуть союзника в руку."
+  },
+  {
+    "card": "Ethereal Trailblazer",
+    "ability": 0,
+    "english": "▸ Judgment: Gain 1●.",
+    "russian": "▸ Суд: Получите 1●."
+  },
+  {
+    "card": "Evacuation Enforcer",
+    "ability": 0,
+    "english": "▸ Judgment: You may draw 2 cards, then discard 3 cards.",
+    "russian": "▸ Суд: Вы можете взять 2 карты, затем сбросить 3 карты."
+  },
+  {
+    "card": "Exiles of the Last Light",
+    "ability": 0,
+    "english": "Abandon an ally: Kindle 1.",
+    "russian": "Отрекитесь от союзника: Разожгите 1."
+  },
+  {
+    "card": "Fathomless Maw",
+    "ability": 0,
+    "english": "When you abandon a character, gain 1⍏.",
+    "russian": "Когда вы отрекаетесь от персонажа, получите 1⍏."
+  },
+  {
+    "card": "Fell the Mighty",
+    "ability": 0,
+    "english": "Banish a card from hand: Play this event for 0●.",
+    "russian": "Изгоните карту из руки: Сыграйте это событие за 0●."
+  },
+  {
+    "card": "Fell the Mighty",
+    "ability": 1,
+    "english": "Dissolve an enemy.",
+    "russian": "Рассеяйте врага."
+  },
+  {
+    "card": "Flagbearer of Decay",
+    "ability": 0,
+    "english": "When you play a Survivor, put the top 2 cards of your deck into your void.",
+    "russian": "Когда вы играете Выжившего, положите 2 верхние карты вашей колоды в вашу Пустоту."
+  },
+  {
+    "card": "Flash of Power",
+    "ability": 0,
+    "english": "Gain 6●.",
+    "russian": "Получите 6●."
+  },
+  {
+    "card": "Flickerveil Adept",
+    "ability": 0,
+    "english": "▸ Materialized, Judgment: Banish an ally with spark 2 or less, then materialize it.",
+    "russian": "▸ Воплощён, Суд: Изгоните союзника с искрой 2 или меньше, затем воплотите его."
+  },
+  {
+    "card": "Forgotten Titan",
+    "ability": 0,
+    "english": "This character costs 1● if you have discarded a card this turn.",
+    "russian": "Этот персонаж стоит 1●, если вы сбрасывали карту в этот ход."
+  },
+  {
+    "card": "Forsworn Champion",
+    "ability": 0,
+    "english": "Abandon an ally: This character gains +1 spark.",
+    "russian": "Отрекитесь от союзника: Этот персонаж получает +1 к искре."
+  },
+  {
+    "card": "Fragments of Vision",
+    "ability": 0,
+    "english": "Draw 3 cards. Discard 2 cards.",
+    "russian": "Возьмите 3 карты. Сбросьте 2 карты."
+  },
+  {
+    "card": "Frost Visionary",
+    "ability": 0,
+    "english": "▸ Materialized: Draw a card.",
+    "russian": "▸ Воплощён: Возьмите карту."
+  },
+  {
+    "card": "Fury of the Clan",
+    "ability": 0,
+    "english": "Dissolve an enemy with cost less than the number of allied Warriors.",
+    "russian": "Рассеяйте врага стоимостью меньше количества союзных Воинов."
+  },
+  {
+    "card": "Genesis Burst",
+    "ability": 0,
+    "english": "Double the amount of ● you have.",
+    "russian": "Удвойте количество ●, которое у вас есть."
+  },
+  {
+    "card": "Ghostlight Wolves",
+    "ability": 0,
+    "english": "▸ Judgment: Gain 1● for each allied Spirit Animal.",
+    "russian": "▸ Суд: Получите 1● за каждого союзного Духа-Зверя."
+  },
+  {
+    "card": "Glimpse of Infinity",
+    "ability": 0,
+    "english": "Gain 3●.",
+    "russian": "Получите 3●."
+  },
+  {
+    "card": "Grim Reclaimer",
+    "ability": 0,
+    "english": "Abandon an ally, once per turn: Reclaim a Warrior.",
+    "russian": "Отрекитесь от союзника, один раз за ход: Возвысьте Воина."
+  },
+  {
+    "card": "Guiding Light",
+    "ability": 0,
+    "english": "Foresee 1. Draw a card.",
+    "russian": "Прозрение 1. Возьмите карту."
+  },
+  {
+    "card": "Guiding Light",
+    "ability": 1,
+    "english": "Reclaim 3●",
+    "russian": "Возвышение 3●"
+  },
+  {
+    "card": "Harvest the Forgotten",
+    "ability": 0,
+    "english": "Put the top 3 cards of your deck into your void. Draw a card.",
+    "russian": "Положите 3 верхние карты вашей колоды в вашу Пустоту. Возьмите карту."
+  },
+  {
+    "card": "Harvester of Despair",
+    "ability": 0,
+    "english": "When you abandon an ally, this character gains +1 spark.",
+    "russian": "Когда вы отрекаетесь от союзника, этот персонаж получает +1 к искре."
+  },
+  {
+    "card": "Herald of the Last Light",
+    "ability": 0,
+    "english": "↯fast -- Abandon this character: Prevent a played event.",
+    "russian": "↯Стремительность — Отрекитесь от этого персонажа: Отмените розыгрыш события."
+  },
+  {
+    "card": "Hope's Vanguard",
+    "ability": 0,
+    "english": "▸ Materialized, Judgment: With 2 allied Survivors, draw a card.",
+    "russian": "▸ Воплощён, Суд: Если у вас есть 2 союзных Выживших, возьмите карту."
+  },
+  {
+    "card": "Horizon Follower",
+    "ability": 0,
+    "english": "▸ Judgment: Gain 1⍏.",
+    "russian": "▸ Суд: Получите 1⍏."
+  },
+  {
+    "card": "Illumination of Glory",
+    "ability": 0,
+    "english": "Gain 1⍏ for each card you have played this turn.",
+    "russian": "Получите 1⍏ за каждую карту, которую вы сыграли в этот ход."
+  },
+  {
+    "card": "Immolate",
+    "ability": 0,
+    "english": "Dissolve an enemy.",
+    "russian": "Рассеяйте врага."
+  },
+  {
+    "card": "Infernal Ascendant",
+    "ability": 0,
+    "english": "When you abandon an ally, kindle 2.",
+    "russian": "Когда вы отрекаетесь от союзника, Разожгите 2."
+  },
+  {
+    "card": "Infernal Rest",
+    "ability": 0,
+    "english": "Lose 1 maximum ●: Play this event for 0●.",
+    "russian": "Уменьшите ваш максимум ● на 1: Сыграйте это событие за 0●."
+  },
+  {
+    "card": "Infernal Rest",
+    "ability": 1,
+    "english": "Prevent a played card.",
+    "russian": "Отмените розыгрыш карты."
+  },
+  {
+    "card": "Intermezzo Balladeer",
+    "ability": 0,
+    "english": "When you play a ↯fast card, this character gains +2 spark.",
+    "russian": "Когда вы играете карту с ↯Стремительностью, этот персонаж получает +2 к искре."
+  },
+  {
+    "card": "Invoker of Myths",
+    "ability": 0,
+    "english": "Once per turn, when you materialize a Warrior, draw a card.",
+    "russian": "Один раз за ход, когда вы воплощаете Воина, возьмите карту."
+  },
+  {
+    "card": "Judgment of the Blade",
+    "ability": 0,
+    "english": "Banish a non-Warrior enemy.",
+    "russian": "Изгоните врага, который не является Воином."
+  },
+  {
+    "card": "Keeper of Forgotten Light",
+    "ability": 0,
+    "english": "▸ Materialized: Draw 2 cards.",
+    "russian": "▸ Воплощён: Возьмите 2 карты."
+  },
+  {
+    "card": "Keeper of the Lightpath",
+    "ability": 0,
+    "english": "Events cost you 1● less.",
+    "russian": "Ваши события стоят на 1● меньше."
+  },
+  {
+    "card": "Keeper of the Tides",
+    "ability": 0,
+    "english": "▸ Materialized: Discover a ↯fast event.",
+    "russian": "▸ Воплощён: Откройте событие с ↯Стремительностью."
+  },
+  {
+    "card": "Key to the Moment",
+    "ability": 0,
+    "english": "Return all but one ally to hand: Draw a card for each ally returned.",
+    "russian": "Верните в руку всех союзников, кроме одного: Возьмите карту за каждого возвращённого союзника."
+  },
+  {
+    "card": "Kindred Sparks",
+    "ability": 0,
+    "english": "With an allied Survivor, you may play this card from your hand or void for 1●.",
+    "russian": "Если у вас есть союзный Выживший, вы можете сыграть эту карту из руки или из Пустоты за 1●."
+  },
+  {
+    "card": "Knowledge Restored",
+    "ability": 0,
+    "english": "Draw 3 cards.",
+    "russian": "Возьмите 3 карты."
+  },
+  {
+    "card": "Lantern Keeper",
+    "ability": 0,
+    "english": "▸ Judgment: Gain 2⍏.",
+    "russian": "▸ Суд: Получите 2⍏."
+  },
+  {
+    "card": "Light of Emergence",
+    "ability": 0,
+    "english": "Materialize two random characters with cost 3● or less from your deck.",
+    "russian": "Воплотите двух случайных персонажей стоимостью 3● или меньше из вашей колоды."
+  },
+  {
+    "card": "Looming Oracle",
+    "ability": 0,
+    "english": "▸ Materialized: Draw a card.",
+    "russian": "▸ Воплощён: Возьмите карту."
+  },
+  {
+    "card": "Lumin-Gate Seer",
+    "ability": 0,
+    "english": "Once per turn, when you materialize a character with cost 2● or less, draw a card.",
+    "russian": "Один раз за ход, когда вы воплощаете персонажа стоимостью 2● или меньше, возьмите карту."
+  },
+  {
+    "card": "Lumineth",
+    "ability": 0,
+    "english": "When you have no cards in your deck, you win the game.",
+    "russian": "Если в вашей колоде нет карт, вы выигрываете игру."
+  },
+  {
+    "card": "Luminwings",
+    "ability": 0,
+    "english": "▸ Judgment: With 2 allied Spirit Animals, gain 2●.",
+    "russian": "▸ Суд: Если у вас есть 2 союзных Духа-Зверя, получите 2●."
+  },
+  {
+    "card": "Lurking Dread",
+    "ability": 0,
+    "english": "Discard a chosen character from the opponent's hand.",
+    "russian": "Сбросьте выбранного персонажа из руки противника."
+  },
+  {
+    "card": "Maelstrom Denial",
+    "ability": 0,
+    "english": "Prevent a played ↯fast card.",
+    "russian": "Отмените розыгрыш карты с ↯Стремительностью."
+  },
+  {
+    "card": "Melodist of the Finale",
+    "ability": 0,
+    "english": "When you play a ↯fast card, gain 1⍏.",
+    "russian": "Когда вы играете карту с ↯Стремительностью, получите 1⍏."
+  },
+  {
+    "card": "Minstrel of Falling Light",
+    "ability": 0,
+    "english": "3●: Draw a card.",
+    "russian": "3●: Возьмите карту."
+  },
+  {
+    "card": "Mirrorlight Architect",
+    "ability": 0,
+    "english": "4●: Materialize a copy of an ally.",
+    "russian": "4●: Воплотите копию союзника."
+  },
+  {
+    "card": "Moment Rewound",
+    "ability": 0,
+    "english": "Take an extra turn after this one.",
+    "russian": "Сделайте дополнительный ход после этого."
+  },
+  {
+    "card": "Momentum of the Fallen",
+    "ability": 0,
+    "english": "Dissolve an enemy. Draw a card.",
+    "russian": "Рассеяйте врага. Возьмите карту."
+  },
+  {
+    "card": "Momentum of the Fallen",
+    "ability": 1,
+    "english": "This event costs 1● if a character dissolved this turn.",
+    "russian": "Это событие стоит 1●, если в этот ход персонаж был рассеян."
+  },
+  {
+    "card": "Moonlit Dancer",
+    "ability": 0,
+    "english": "Characters in your hand have ↯fast.",
+    "russian": "Персонажи в вашей руке имеют ↯Стремительность."
+  },
+  {
+    "card": "Moonlit Dancer",
+    "ability": 1,
+    "english": "Once per turn, when you play a ↯fast character, gain 1●.",
+    "russian": "Один раз за ход, когда вы играете персонажа с ↯Стремительностью, получите 1●."
+  },
+  {
+    "card": "Moonlit Voyage",
+    "ability": 0,
+    "english": "Draw 2 cards. Discard 2 cards.",
+    "russian": "Возьмите 2 карты. Сбросьте 2 карты."
+  },
+  {
+    "card": "Moonlit Voyage",
+    "ability": 1,
+    "english": "Reclaim 2●",
+    "russian": "Возвышение 2●."
+  },
+  {
+    "card": "Mother of Flames",
+    "ability": 0,
+    "english": "When you discard a card, kindle 1.",
+    "russian": "Когда вы сбрасываете карту, Разожгите 1."
+  },
+  {
+    "card": "Mystic Runefish",
+    "ability": 0,
+    "english": "3●: The spark of each allied Spirit Animal becomes 5.",
+    "russian": "3●: Искра каждого союзного Духа-Зверя становится равной 5."
+  },
+  {
+    "card": "Nexus Wayfinder",
+    "ability": 0,
+    "english": "Characters cost you 2● less.",
+    "russian": "Ваши персонажи стоят на 2● меньше."
+  },
+  {
+    "card": "Nightmare Manifest",
+    "ability": 0,
+    "english": "▸ Judgment: Each player abandons a character.",
+    "russian": "▸ Суд: Каждый игрок отрекается от персонажа."
+  },
+  {
+    "card": "Nightmare",
+    "ability": 0,
+    "english": "Draw a card.",
+    "russian": "Возьмите карту."
+  },
+  {
+    "card": "Nocturne",
+    "ability": 0,
+    "english": "▸ Materialized: Draw a card, then discard a card.",
+    "russian": "▸ Воплощён: Возьмите карту, затем сбросьте карту."
+  },
+  {
+    "card": "Nocturne",
+    "ability": 1,
+    "english": "Reclaim 3●",
+    "russian": "Возвышение 3●"
+  },
+  {
+    "card": "Nomad of Endless Paths",
+    "ability": 0,
+    "english": "▸ Materialized: Return an ally to hand.",
+    "russian": "▸ Воплощён: Верните союзника в руку."
+  },
+  {
+    "card": "Obliterator of Worlds",
+    "ability": 0,
+    "english": "Abandon an ally: Play this character for 0●, then abandon it.",
+    "russian": "Отрекитесь от союзника: Сыграйте этого персонажа за 0●, затем отрекитесь от него."
+  },
+  {
+    "card": "Obliterator of Worlds",
+    "ability": 1,
+    "english": "▸ Materialized: Dissolve an enemy.",
+    "russian": "▸ Воплощён: Рассеяйте врага."
+  },
+  {
+    "card": "Oracle of Shifting Skies",
+    "ability": 0,
+    "english": "When you play an event, foresee 1.",
+    "russian": "Когда вы играете событие, Прозрение 1."
+  },
+  {
+    "card": "Packcaller of Shadows",
+    "ability": 0,
+    "english": "Materialize a Celestial Figment for each card you have played this turn.",
+    "russian": "Воплотите Небесный Фигмент за каждую карту, которую вы сыграли в этот ход."
+  },
+  {
+    "card": "Pallid Arbiter",
+    "ability": 0,
+    "english": "Disable the ▸ Materialized: abilities of enemies.",
+    "russian": "Отключите у врагов способности «▸ Воплощён:»."
+  },
+  {
+    "card": "Paradox Enforcer",
+    "ability": 0,
+    "english": "▸ Materialized: Banish an enemy until this character leaves play.",
+    "russian": "▸ Воплощён: Изгоните врага, пока этот персонаж не покинет игру."
+  },
+  {
+    "card": "Passage Through Oblivion",
+    "ability": 0,
+    "english": "Banish an ally. Materialize it at end of turn.",
+    "russian": "Изгоните союзника. Воплотите его в конце хода."
+  },
+  {
+    "card": "Passage Through Oblivion",
+    "ability": 1,
+    "english": "Reclaim 1●",
+    "russian": "Возвышение 1●"
+  },
+  {
+    "card": "Path to Redemption",
+    "ability": 0,
+    "english": "All cards currently in your void gain reclaim equal to their cost this turn.",
+    "russian": "Все карты в вашей Пустоте получают Возвышение, равное их стоимости, до конца хода."
+  },
+  {
+    "card": "Pattern Seeker",
+    "ability": 0,
+    "english": "▸ Judgment: You may discard a card to draw a card and gain 1⍏.",
+    "russian": "▸ Суд: Вы можете сбросить карту, чтобы взять карту и получить 1⍏."
+  },
+  {
+    "card": "Portal of Twin Paths",
+    "ability": 0,
+    "english": "Banish up to 2 allies, then materialize them.",
+    "russian": "Изгоните до 2 союзников, затем воплотите их."
+  },
+  {
+    "card": "Prophet of the Consumed",
+    "ability": 0,
+    "english": "▸ Materialized: Draw a card for each ally abandoned this turn.",
+    "russian": "▸ Воплощён: Возьмите карту за каждого союзника, от которого вы отреклись в этот ход."
+  },
+  {
+    "card": "Pulse of Sacrifice",
+    "ability": 0,
+    "english": "Abandon a character, Discard your hand: Gain 5●.",
+    "russian": "Отрекитесь от персонажа и сбросьте руку: Получите 5●."
+  },
+  {
+    "card": "Pyrestone Avatar",
+    "ability": 0,
+    "english": "When an ally is banished, kindle 1.",
+    "russian": "Когда союзник изгоняется, Разожгите 1."
+  },
+  {
+    "card": "Pyrokinetic Surge",
+    "ability": 0,
+    "english": "Abandon an ally or discard a card: Dissolve an enemy.",
+    "russian": "Отрекитесь от союзника или сбросьте карту: Рассеяйте врага."
+  },
+  {
+    "card": "Radiant Trio",
+    "ability": 0,
+    "english": "Materialize three Radiant Figments.",
+    "russian": "Воплотите 3 Сияющих Фигмента."
+  },
+  {
+    "card": "Rebirth Ritualist",
+    "ability": 0,
+    "english": "2●, Abandon a character, Discard your hand: Draw 3 cards.",
+    "russian": "2●, отрекитесь от персонажа и сбросьте руку: Возьмите 3 карты."
+  },
+  {
+    "card": "Reclaimer of Lost Paths",
+    "ability": 0,
+    "english": "▸ Materialized: A card with cost 3● or less in your void gains reclaim 0●.",
+    "russian": "▸ Воплощён: Карта стоимостью 3● или меньше в вашей Пустоте получает Возвышение 0●."
+  },
+  {
+    "card": "Resilient Wanderer",
+    "ability": 0,
+    "english": "▸ Dissolved: You may pay 1● to return this character to your hand.",
+    "russian": "▸ Рассеян: Вы можете заплатить 1●, чтобы вернуть этого персонажа в руку."
+  },
+  {
+    "card": "Return to Nowhere",
+    "ability": 0,
+    "english": "Return an enemy or ally to hand. Draw a card.",
+    "russian": "Верните врага или союзника в руку. Возьмите карту."
+  },
+  {
+    "card": "Reunion",
+    "ability": 0,
+    "english": "You may return a character from your void to your hand, then draw a card.",
+    "russian": "Вы можете вернуть персонажа из вашей Пустоты в руку, затем взять карту."
+  },
+  {
+    "card": "Revenant of the Lost",
+    "ability": 0,
+    "english": "You may only play this character from your void.",
+    "russian": "Вы можете играть этого персонажа только из вашей Пустоты."
+  },
+  {
+    "card": "Ride of the Vanguard",
+    "ability": 0,
+    "english": "An ally gains +1 spark for each allied Warrior.",
+    "russian": "Союзник получает +1 к искре за каждого союзного Воина."
+  },
+  {
+    "card": "Ridge Vortex Explorer",
+    "ability": 0,
+    "english": "When you discard this character, materialize it.",
+    "russian": "Когда вы сбрасываете этого персонажа, воплотите его."
+  },
+  {
+    "card": "Riftwalker",
+    "ability": 0,
+    "english": "▸ Materialized: Banish an enemy until your next main phase.",
+    "russian": "▸ Воплощён: Изгоните врага до вашей следующей главной фазы."
+  },
+  {
+    "card": "Ripple Through Reality",
+    "ability": 0,
+    "english": "Prevent a played card. Put it on top of the opponent's deck.",
+    "russian": "Отмените розыгрыш карты. Положите её на верх колоды противника."
+  },
+  {
+    "card": "Ripple of Defiance",
+    "ability": 0,
+    "english": "Prevent a played event unless the opponent pays 2●.",
+    "russian": "Отмените розыгрыш события, если только противник не заплатит 2●."
+  },
+  {
+    "card": "Rite of Summoning",
+    "ability": 0,
+    "english": "Discover a character with an activated ability.",
+    "russian": "Откройте персонажа с активируемой способностью."
+  },
+  {
+    "card": "Ruin Scavenger",
+    "ability": 0,
+    "english": "▸ Judgment: You may banish a card from the opponent's void to gain 1●.",
+    "russian": "▸ Суд: Вы можете изгнать карту из Пустоты противника, чтобы получить 1●."
+  },
+  {
+    "card": "Sage of the Prelude",
+    "ability": 0,
+    "english": "Once per turn, when you play a ↯fast card, draw a card.",
+    "russian": "Один раз за ход, когда вы играете карту с ↯Стремительностью, возьмите карту."
+  },
+  {
+    "card": "Scorched Reckoning",
+    "ability": 0,
+    "english": "Dissolve an enemy with spark 3 or more.",
+    "russian": "Рассеяйте врага с искрой 3 или больше."
+  },
+  {
+    "card": "Scrap Reclaimer",
+    "ability": 0,
+    "english": "▸ Judgment: Return this character from your void to your hand.",
+    "russian": "▸ Суд: Верните этого персонажа из вашей Пустоты в руку."
+  },
+  {
+    "card": "Searcher in the Mists",
+    "ability": 0,
+    "english": "▸ Materialized, Dissolved: Put the top 4 cards of your deck into your void.",
+    "russian": "▸ Воплощён, Рассеян: Положите 4 верхние карты вашей колоды в вашу Пустоту."
+  },
+  {
+    "card": "Secrets of the Deep",
+    "ability": 0,
+    "english": "Pay 1 or more ●: Draw a card for each ● spent, then discard 2 cards.",
+    "russian": "Заплатите не менее 1●: Возьмите карту за каждый потраченный ●, затем сбросьте 2 карты."
+  },
+  {
+    "card": "Seeker for the Way",
+    "ability": 0,
+    "english": "▸ Materialized: Draw a Warrior from your deck.",
+    "russian": "▸ Воплощён: Возьмите Воина из вашей колоды."
+  },
+  {
+    "card": "Seeker of the Radiant Wilds",
+    "ability": 0,
+    "english": "▸ Materialized: Draw a card for each allied Spirit Animal.",
+    "russian": "▸ Воплощён: Возьмите карту за каждого союзного Духа-Зверя."
+  },
+  {
+    "card": "Seer of the Fallen",
+    "ability": 0,
+    "english": "▸ Dissolved: Draw a card.",
+    "russian": "▸ Рассеян: Возьмите карту."
+  },
+  {
+    "card": "Seer of the Fallen",
+    "ability": 1,
+    "english": "When an allied Survivor is ▸ Dissolved:, draw a card.",
+    "russian": "Когда союзный Выживший рассеивается, возьмите карту."
+  },
+  {
+    "card": "Shadowpaw",
+    "ability": 0,
+    "english": "▸ Materialized: Return a character from your void to your hand.",
+    "russian": "▸ Воплощён: Верните персонажа из вашей Пустоты в руку."
+  },
+  {
+    "card": "Shardwoven Tyrant",
+    "ability": 0,
+    "english": "Abandon an ally: You may dissolve an enemy with spark less than that ally's spark.",
+    "russian": "Отрекитесь от союзника: Вы можете рассеять врага с искрой меньше искры этого союзника."
+  },
+  {
+    "card": "Shatter the Frail",
+    "ability": 0,
+    "english": "Dissolve an enemy with spark 1 or less.",
+    "russian": "Рассеяйте врага с искрой 1 или меньше."
+  },
+  {
+    "card": "Shattering Gambit",
+    "ability": 0,
+    "english": "Dissolve an enemy. The opponent gains 3⍏.",
+    "russian": "Рассеяйте врага. Противник получает 3⍏."
+  },
+  {
+    "card": "Silent Avenger",
+    "ability": 0,
+    "english": "▸ Dissolved: Kindle 2.",
+    "russian": "▸ Рассеян: Разожгите 2."
+  },
+  {
+    "card": "Silent Avenger",
+    "ability": 1,
+    "english": "When an allied Survivor is ▸ Dissolved:, kindle 2.",
+    "russian": "Когда союзный Выживший рассеивается, Разожгите 2."
+  },
+  {
+    "card": "Skies of Change",
+    "ability": 0,
+    "english": "Discard a card. Draw 2 cards.",
+    "russian": "Сбросьте карту. Возьмите 2 карты."
+  },
+  {
+    "card": "Skyflame Commander",
+    "ability": 0,
+    "english": "Allied Warriors have +1 spark.",
+    "russian": "Союзные Воины получают +1 к искре."
+  },
+  {
+    "card": "Skypath",
+    "ability": 0,
+    "english": "Foresee 1.",
+    "russian": "Прозрение 1."
+  },
+  {
+    "card": "Soulbinder",
+    "ability": 0,
+    "english": "Abandon an ally: Gain 1●.",
+    "russian": "Отрекитесь от союзника: Получите 1●."
+  },
+  {
+    "card": "Soulflame Predator",
+    "ability": 0,
+    "english": "▸ Materialized: Banish the opponent's void.",
+    "russian": "▸ Воплощён: Изгоните все карты из Пустоты противника."
+  },
+  {
+    "card": "Soulkindler",
+    "ability": 0,
+    "english": "If this card is in your void, allied Survivors have +2 spark.",
+    "russian": "Если эта карта находится в вашей Пустоте, союзные Выжившие получают +2 к искре."
+  },
+  {
+    "card": "Speaker for the Forgotten",
+    "ability": 0,
+    "english": "When you play a Warrior, reclaim a random character with cost 3● or less.",
+    "russian": "Когда вы играете Воина, возвысьте случайного персонажа стоимостью 3● или меньше."
+  },
+  {
+    "card": "Specter of Silent Snow",
+    "ability": 0,
+    "english": "When you abandon a character, draw a card.",
+    "russian": "Когда вы отрекаетесь от персонажа, возьмите карту."
+  },
+  {
+    "card": "Spirit Bond",
+    "ability": 0,
+    "english": "Each allied Spirit Animal gains spark equal to the number of allied Spirit Animals.",
+    "russian": "Каждый союзный Дух-Зверь получает искру, равную количеству союзных Духов-Зверей."
+  },
+  {
+    "card": "Spirit Field Reclaimer",
+    "ability": 0,
+    "english": "▸ Judgment: You may pay 1● to kindle 1 and banish a card from the opponent's void.",
+    "russian": "▸ Суд: Вы можете заплатить 1●, чтобы Разжечь 1 и изгнать карту из Пустоты противника."
+  },
+  {
+    "card": "Spirit Reaping",
+    "ability": 0,
+    "english": "Abandon an ally: Gain ● equal to that character's cost.",
+    "russian": "Отрекитесь от союзника: Получите ●, равное стоимости этого персонажа."
+  },
+  {
+    "card": "Spirit of Smoldering Echoes",
+    "ability": 0,
+    "english": "When an event is put into your void, this character gains +1 spark.",
+    "russian": "Когда событие попадает в вашу Пустоту, этот персонаж получает +1 к искре."
+  },
+  {
+    "card": "Spirit of the Greenwood",
+    "ability": 0,
+    "english": "▸ Judgment: Gain 1● for each allied character.",
+    "russian": "▸ Суд: Получите 1● за каждого союзного персонажа."
+  },
+  {
+    "card": "Spiritbound Alpha",
+    "ability": 0,
+    "english": "▸ Judgment: You may pay 4● to have each allied Spirit Animal gain +2 spark.",
+    "russian": "▸ Суд: Вы можете заплатить 4●, чтобы каждый союзный Дух-Зверь получил +2 к искре."
+  },
+  {
+    "card": "Starcatcher",
+    "ability": 0,
+    "english": "When you play an event, gain 1●.",
+    "russian": "Когда вы играете событие, получите 1●."
+  },
+  {
+    "card": "Starlight Guide",
+    "ability": 0,
+    "english": "▸ Materialized: You may banish an ally, then materialize it.",
+    "russian": "▸ Воплощён: Вы можете изгнать союзника, затем воплотить его."
+  },
+  {
+    "card": "Starlit Cascade",
+    "ability": 0,
+    "english": "Until end of turn, when an ally leaves play, gain 2●.",
+    "russian": "До конца хода, когда союзник покидает игру, получите 2●."
+  },
+  {
+    "card": "Starsea Traveler",
+    "ability": 0,
+    "english": "Once per turn, you may play a character with cost 2● or less from your void.",
+    "russian": "Один раз за ход вы можете сыграть персонажа стоимостью 2● или меньше из вашей Пустоты."
+  },
+  {
+    "card": "Summons of the Bonded",
+    "ability": 0,
+    "english": "Discover a Warrior.",
+    "russian": "Откройте Воина."
+  },
+  {
+    "card": "Sundown Surfer",
+    "ability": 0,
+    "english": "When you play a card during the opponent's turn, this character gains +1 spark.",
+    "russian": "Когда вы играете карту в ход противника, этот персонаж получает +1 к искре."
+  },
+  {
+    "card": "Sunset Chronicler",
+    "ability": 0,
+    "english": "When an ally is ▸ Dissolved:, draw a card.",
+    "russian": "Когда союзник рассеивается, возьмите карту."
+  },
+  {
+    "card": "Sunshadow Eagle",
+    "ability": 0,
+    "english": "When you materialize an allied Spirit Animal, that character gains +1 spark.",
+    "russian": "Когда вы воплощаете союзного Духа-Зверя, этот персонаж получает +1 к искре."
+  },
+  {
+    "card": "Surge of Fury",
+    "ability": 0,
+    "english": "At the end of this turn, trigger an additional Judgment phase.",
+    "russian": "В конце этого хода проведите дополнительную фазу Суда."
+  },
+  {
+    "card": "Synaptic Sentinel",
+    "ability": 0,
+    "english": "▸ Judgment: Foresee 1.",
+    "russian": "▸ Суд: Прозрение 1."
+  },
+  {
+    "card": "The Bondweaver",
+    "ability": 0,
+    "english": "When you materialize a character, this character gains +1 spark.",
+    "russian": "Когда вы воплощаете персонажа, этот персонаж получает +1 к искре."
+  },
+  {
+    "card": "The Calling Night",
+    "ability": 0,
+    "english": "▸ Judgment: Draw a card, then the opponent gains 2⍏.",
+    "russian": "▸ Суд: Возьмите карту, затем противник получает 2⍏."
+  },
+  {
+    "card": "The Devourer",
+    "ability": 0,
+    "english": "Banish your void with 8 or more cards: Reclaim this character.",
+    "russian": "Изгоните все карты из вашей Пустоты, если в ней 8 или больше карт: Возвысьте этого персонажа."
+  },
+  {
+    "card": "The Dread Sovereign",
+    "ability": 0,
+    "english": "▸ Judgment: You may abandon a Warrior to discover a Warrior with cost 1● higher and materialize it.",
+    "russian": "▸ Суд: Вы можете отречься от Воина, чтобы открыть Воина стоимостью на 1● выше и воплотить его."
+  },
+  {
+    "card": "The Forsaker",
+    "ability": 0,
+    "english": "Abandon an ally, once per turn: Gain 1⍏.",
+    "russian": "Отрекитесь от союзника, один раз за ход: Получите 1⍏."
+  },
+  {
+    "card": "The Power Within",
+    "ability": 0,
+    "english": "Double the number of cards you draw from card effects this turn.",
+    "russian": "До конца хода удвойте количество карт, которые вы берёте от эффектов карт."
+  },
+  {
+    "card": "The Ringleader",
+    "ability": 0,
+    "english": "▸ Materialized: Copy the next event you play this turn three times.",
+    "russian": "▸ Воплощён: Скопируйте следующее событие, которое вы сыграете в этот ход, три раза."
+  },
+  {
+    "card": "The Rising God",
+    "ability": 0,
+    "english": "Abandon 2 allies: Reclaim this character.",
+    "russian": "Отрекитесь от 2 союзников: Возвысьте этого персонажа."
+  },
+  {
+    "card": "The Waking Titan",
+    "ability": 0,
+    "english": "To play this card, return an ally with cost 3● or more to hand.",
+    "russian": "Чтобы сыграть эту карту, верните в руку союзника стоимостью 3● или больше."
+  },
+  {
+    "card": "The Waking Titan",
+    "ability": 1,
+    "english": "▸ Judgment: Draw a card.",
+    "russian": "▸ Суд: Возьмите карту."
+  },
+  {
+    "card": "Threadbreaker",
+    "ability": 0,
+    "english": "▸ Materialized: Prevent a played card with cost 2● or less.",
+    "russian": "▸ Воплощён: Отмените розыгрыш карты стоимостью 2● или меньше."
+  },
+  {
+    "card": "Through the Rift",
+    "ability": 0,
+    "english": "Discover a Survivor.",
+    "russian": "Откройте Выжившего."
+  },
+  {
+    "card": "Tideborne Voyager",
+    "ability": 0,
+    "english": "When an ally is banished, this character gains +1 spark.",
+    "russian": "Когда союзник изгоняется, этот персонаж получает +1 к искре."
+  },
+  {
+    "card": "Titan of Forgotten Echoes",
+    "ability": 0,
+    "english": "When you play 2 cards in a turn, reclaim this character.",
+    "russian": "Когда вы играете 2 карты за ход, возвысьте этого персонажа."
+  },
+  {
+    "card": "Together Against the Tide",
+    "ability": 0,
+    "english": "Prevent a played event which could dissolve an ally.",
+    "russian": "Отмените розыгрыш события, которое может рассеять союзника."
+  },
+  {
+    "card": "Torchbearer of the Abyss",
+    "ability": 0,
+    "english": "Once per turn, when you discard a card, gain 1●, then kindle 2.",
+    "russian": "Один раз за ход, когда вы сбрасываете карту, получите 1●, затем Разожгите 2."
+  },
+  {
+    "card": "Tranquil Duelist",
+    "ability": 0,
+    "english": "▸ Materialized, Dissolved: Draw a card.",
+    "russian": "▸ Воплощён, Рассеян: Возьмите карту."
+  },
+  {
+    "card": "Twilight Radiance",
+    "ability": 0,
+    "english": "Gain 1●.",
+    "russian": "Получите 1●."
+  },
+  {
+    "card": "Twilight Reclaimer",
+    "ability": 0,
+    "english": "▸ Dissolved: A Survivor in your void gains reclaim equal to its cost.",
+    "russian": "▸ Рассеян: Выживший в вашей Пустоте получает Возвышение, равное его стоимости."
+  },
+  {
+    "card": "Twilight Suppressor",
+    "ability": 0,
+    "english": "▸ Materialized: Disable the activated abilities of an enemy while this character is in play.",
+    "russian": "▸ Воплощён: Отключите активируемые способности врага, пока этот персонаж находится в игре."
+  },
+  {
+    "card": "Unleash Ruin",
+    "ability": 0,
+    "english": "Dissolve an enemy. You lose 4⍏.",
+    "russian": "Рассеяйте врага. Вы теряете 4⍏."
+  },
+  {
+    "card": "Unleashed Destruction",
+    "ability": 0,
+    "english": "Dissolve an enemy with cost 2● or less.",
+    "russian": "Рассеяйте врага стоимостью 2● или меньше."
+  },
+  {
+    "card": "Unleashed Destruction",
+    "ability": 1,
+    "english": "Reclaim -- Abandon an ally",
+    "russian": "Возвышение — Отрекитесь от союзника."
+  },
+  {
+    "card": "Urban Cipher",
+    "ability": 0,
+    "english": "▸ Materialized: Discard 2 cards, then draw 2 cards.",
+    "russian": "▸ Воплощён: Сбросьте 2 карты, затем возьмите 2 карты."
+  },
+  {
+    "card": "Veil Shatter",
+    "ability": 0,
+    "english": "Banish an enemy with cost 2● or less.",
+    "russian": "Изгоните врага стоимостью 2● или меньше."
+  },
+  {
+    "card": "Veil of the Wastes",
+    "ability": 0,
+    "english": "When you materialize a Survivor, reclaim this character.",
+    "russian": "Когда вы воплощаете Выжившего, возвысьте этого персонажа."
+  },
+  {
+    "card": "Virtuoso of Harmony",
+    "ability": 0,
+    "english": "At the end of your turn, gain 2●.",
+    "russian": "В конце вашего хода получите 2●."
+  },
+  {
+    "card": "Voidshield Guardian",
+    "ability": 0,
+    "english": "When the opponent plays an event which could dissolve an ally, prevent that card.",
+    "russian": "Когда противник играет событие, которое может рассеять союзника, отмените розыгрыш этой карты."
+  },
+  {
+    "card": "Volcanic Channeler",
+    "ability": 0,
+    "english": "When an ally is ▸ Dissolved:, gain 1●.",
+    "russian": "Когда союзник рассеивается, получите 1●."
+  },
+  {
+    "card": "Wasteland Arbitrator",
+    "ability": 0,
+    "english": "▸ Materialized: Each player discards a card.",
+    "russian": "▸ Воплощён: Каждый игрок сбрасывает карту."
+  },
+  {
+    "card": "Weight of Memory",
+    "ability": 0,
+    "english": "Dissolve an enemy with cost less than the number of cards in your void.",
+    "russian": "Рассеяйте врага стоимостью меньше количества карт в вашей Пустоте."
+  },
+  {
+    "card": "Wheel of the Heavens",
+    "ability": 0,
+    "english": "Each player shuffles their hand and void into their deck and then draws 5 cards.",
+    "russian": "Каждый игрок замешивает свою руку и свою Пустоту в свою колоду, затем берёт 5 карт."
+  },
+  {
+    "card": "Whisper of the Past",
+    "ability": 0,
+    "english": "An event in your void gains reclaim 0● this turn.",
+    "russian": "Событие в вашей Пустоте получает Возвышение 0● до конца хода."
+  },
+  {
+    "card": "Wolfbond Chieftain",
+    "ability": 0,
+    "english": "▸ Materialized, Judgment: With 2 allied Warriors, gain 1●.",
+    "russian": "▸ Воплощён, Суд: Если у вас есть 2 союзных Воина, получите 1●."
+  },
+  {
+    "card": "Wraith of Twisting Shadows",
+    "ability": 0,
+    "english": "▸ Materialized: Discard a chosen card from the opponent's hand. They draw a card.",
+    "russian": "▸ Воплощён: Сбросьте выбранную карту из руки противника. Затем противник берёт карту."
+  },
+  {
+    "card": "Wreckheap Survivor",
+    "ability": 0,
+    "english": "▸ Judgment: You may pay 1● to return this character from your void to your hand.",
+    "russian": "▸ Суд: Вы можете заплатить 1●, чтобы вернуть этого персонажа из вашей Пустоты в руку."
+  }
+]
