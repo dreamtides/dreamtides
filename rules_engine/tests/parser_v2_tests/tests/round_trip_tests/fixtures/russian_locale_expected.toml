@@ -36,7 +36,7 @@ english = "When you discard a card, gain 1⍏."
 russian = "Когда вы сбрасываете карту, получите 1⍏."
 
 [[tests]]
-english = "Dissolve all characters."
+english = "{Dissolve} all characters."
 russian = "Рассеяйте всех персонажей."
 
 [[tests]]
@@ -340,7 +340,7 @@ english = "Banish a card from hand: Play this event for 0●."
 russian = "Изгоните карту из руки: Сыграйте это событие за 0●."
 
 [[tests]]
-english = "Dissolve an enemy."
+english = "{Dissolve} an enemy."
 russian = "Рассеяйте врага."
 
 [[tests]]
@@ -435,7 +435,7 @@ english = "Gain 1⍏ for each card you have played this turn."
 russian = "Получите 1⍏ за каждую карту, которую вы сыграли в этот ход."
 
 [[tests]]
-english = "Dissolve an enemy."
+english = "{Dissolve} an enemy."
 russian = "Рассеяйте врага."
 
 [[tests]]
@@ -605,7 +605,7 @@ english = "Abandon an ally: Play this character for 0●, then abandon it."
 russian = "Отрекитесь от союзника: Сыграйте этого персонажа за 0●, затем отрекитесь от него."
 
 [[tests]]
-english = "▸ Materialized: Dissolve an enemy."
+english = "{Materialized} {Dissolve} an enemy."
 russian = "▸ Воплощён: Рассеяйте врага."
 
 [[tests]]
@@ -767,7 +767,8 @@ english = "Dissolve an enemy with spark 1 or less."
 russian = "Рассеяйте врага с искрой 1 или меньше."
 
 [[tests]]
-english = "Dissolve an enemy. The opponent gains 3⍏."
+english = "{Dissolve} an enemy. The opponent gains {points($p)}."
+variables = "p: 3"
 russian = "Рассеяйте врага. Противник получает 3⍏."
 
 [[tests]]

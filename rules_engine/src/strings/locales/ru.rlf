@@ -330,7 +330,7 @@ discard_cards_effect($d) = "сбросьте {cards($d)}";
 gain_energy_effect($e) = "получите {energy($e)}";
 gain_points_effect($p) = "получите {points($p)}";
 lose_points_effect($p) = "you lose {points($p)}";
-opponent_gains_points_effect($p) = "the opponent gains {points($p)}";
+opponent_gains_points_effect($p) = "Противник получает {$p}⍏";
 opponent_loses_points_effect($p) = "the opponent loses {points($p)}";
 foresee_effect($f) = "{foresee($f)}";
 kindle_effect($k) = "{kindle($k)}";
@@ -360,7 +360,7 @@ materialize_random_from_deck($n, $constraint) = "{materialize} {n_random_charact
 copy_next_played($target, $times) = "copy the next {$target} you play {this_turn_times($times)}";
 create_trigger_until_end_of_turn_keyword($trig, $eff) = "until end of turn, {$trig} {@cap $eff}";
 create_trigger_until_end_of_turn($trig, $eff) = "until end of turn, {$trig}{$eff}";
-dissolve_target($target) = "{dissolve} {$target}";
+dissolve_target($target) = :from($target) "рассеяйте {$target}";
 banish_target($target) = "{banish} {$target}";
 banish_until_leaves($target, $until) = "{banish} {$target} until {$until} leaves play";
 banish_until_next_main($target) = "{banish} {$target} until your next main phase";
@@ -413,9 +413,9 @@ sentence_separator = " ";
 period_suffix = ".";
 
 
-character = :a{ one: "character", other: "characters" };
+character = :masc :anim { nom: "персонаж", *acc: "персонажа", gen: "персонажа", one: "персонажа", other: "персонажей" };
 event = :an{ one: "event", other: "events" };
-enemy = :an{ one: "enemy", other: "enemies" };
+enemy = :masc :anim { nom: "враг", *acc: "врага", gen: "врага", one: "врага", other: "врагов" };
 
 this_card = :a{ one: "this card", other: "these cards" };
 this_character = :a{ one: "this character", other: "these characters" };
@@ -432,10 +432,7 @@ your_generic_subtype($t) = :a :from($t) {
     *one: "{subtype($t)}",
     other: "allied {subtype($t):other}",
 };
-predicate_with_indefinite_article($p) = :from($p) {
-    *one: "{@a $p}",
-    other: "{$p:other}",
-};
+predicate_with_indefinite_article($p) = :from($p);
 another_pred($p) = :from($p) {
     *one: "another {$p}",
     other: "other {$p:other}",
@@ -572,12 +569,15 @@ spark_of_each_becomes($each, $s) = "the spark of each {$each} becomes {$s}";
 dissolve_all_with_cost_lte_quantity($target, $quantity) = "{dissolve} all {$target:other} with cost less than or equal to the number of {$quantity}";
 
 
-collection_all($target) = "all {$target:other}";
+collection_all($target) = :from($target) :match($target) {
+    anim: "всех {$target:other}",
+    *inan: "все {$target:other}",
+};
 collection_exactly($n, $target) = "{$n} {$target:other}";
 collection_up_to($n, $target) = "up to {$n} {$target:other}";
 collection_any_number_of($target) = "any number of {$target:other}";
 
-dissolve_collection($target) = "{dissolve} {$target}";
+dissolve_collection($target) = :from($target) "рассеяйте {$target}";
 banish_collection_target($target) = "{banish} {$target}";
 
 materialize_them($target) = "{materialize} them";
