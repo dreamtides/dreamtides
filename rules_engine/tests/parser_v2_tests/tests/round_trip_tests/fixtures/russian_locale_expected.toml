@@ -193,8 +193,11 @@ english = "Prevent a played character."
 russian = "Отмените розыгрыш персонажа."
 
 [[tests]]
-english = "Gain 2●. Draw a card."
-russian = "Получите 2●. Возьмите карту."
+english = "Gain {energy($e)}. Draw {cards($c)}."
+variables = """
+e: 2
+c: 1"""
+russian = "Получите <color=#00838F>2●</color>. Возьмите карту."
 
 [[tests]]
 english = "▸ Materialized, Judgment: Gain 2●."
@@ -388,7 +391,10 @@ english = "Abandon an ally, once per turn: Reclaim a Warrior."
 russian = "Отрекитесь от союзника, один раз за ход: Возвысьте Воина."
 
 [[tests]]
-english = "Foresee 1. Draw a card."
+english = "{foresee($f)}. Draw {cards($c)}."
+variables = """
+f: 1
+c: 1"""
 russian = "Прозрение 1. Возьмите карту."
 
 [[tests]]
@@ -761,7 +767,10 @@ english = "When an allied Survivor is ▸ Dissolved:, kindle 2."
 russian = "Когда союзный Выживший рассеивается, Разожгите 2."
 
 [[tests]]
-english = "Discard a card. Draw 2 cards."
+english = "Discard {cards($d)}. Draw {cards($c)}."
+variables = """
+d: 1
+c: 2"""
 russian = "Сбросьте карту. Возьмите 2 карты."
 
 [[tests]]
@@ -769,7 +778,8 @@ english = "Allied Warriors have +1 spark."
 russian = "Союзные Воины получают +1 к искре."
 
 [[tests]]
-english = "Foresee 1."
+english = "{foresee($f)}."
+variables = "f: 1"
 russian = "Прозрение 1."
 
 [[tests]]

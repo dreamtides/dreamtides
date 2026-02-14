@@ -36,7 +36,7 @@ prevent = "<color=#AA00FF>prevent</color>";
 prevented = "<color=#AA00FF>prevented</color>";
 kindle($k) = "<color=#AA00FF>kindle</color> {$k}";
 kindled = "<color=#AA00FF>kindled</color>";
-foresee($n) = "<color=#AA00FF>foresee</color> {$n}";
+foresee($n) = "Прозрение {$n}";
 fast = "<b>↯fast</b>";
 reclaim_for_cost($r) = "Возвышение {$r}●";
 
