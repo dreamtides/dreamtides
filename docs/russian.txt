@@ -1,0 +1,751 @@
+
+Draw 2 cards. Discard 2 cards. Gain 2●.
+Возьмите 2 карты. Сбросьте 2 карты. Получите 2●.
+
+Prevent a played card.
+Отмените розыгрыш карты.
+
+This character's spark is equal to the number of cards in your void.
+Искра этого персонажа равна количеству карт в вашей Пустоте.
+
+▸ Materialized: Return an enemy to hand.
+▸ Воплощён: Верните врага в руку.
+
+Dissolve an enemy with cost 3● or more.
+Рассеяйте врага стоимостью 3● или больше.
+
+Reclaim 2●.
+Возвышение 2●.
+
+When you materialize an ally, gain 1●.
+Когда вы воплощаете союзника, получите 1●.
+
+When you discard a card, gain 1⍏.
+Когда вы сбрасываете карту, получите 1⍏.
+
+Dissolve all characters.
+Рассеяйте всех персонажей.
+
+Gain 4●.
+Получите 4●.
+
+While you have 7 or more cards in your void, they gain reclaim equal to their cost.
+Пока в вашей Пустоте 7 или больше карт, эти карты получают Возвышение, равное их стоимости.
+
+Return up to 2 events from your void to your hand.
+Верните до 2 событий из вашей Пустоты в руку.
+
+Abandon an ally: Put the top 2 cards of your deck into your void.
+Отрекитесь от союзника: Положите 2 верхние карты вашей колоды в вашу Пустоту.
+
+2●, Banish another card in your void: Reclaim this character.
+2●, изгоните другую карту из вашей Пустоты: Возвысьте этого персонажа.
+
+Abandon an ally: You may put a character from your void on top of your deck.
+Отрекитесь от союзника: Вы можете положить персонажа из вашей Пустоты на верх вашей колоды.
+
+▸ Materialized: An event in your void gains reclaim equal to its cost this turn.
+▸ Воплощён: Событие в вашей Пустоте получает Возвышение, равное его стоимости, до конца хода.
+
+When you discard a card, it gains reclaim equal to its cost this turn.
+Когда вы сбрасываете карту, она получает Возвышение, равное её стоимости, до конца хода.
+
+4●: This character gains +1 spark for each allied Warrior.
+4●: Этот персонаж получает +1 к искре за каждого союзного Воина.
+
+Draw a card. Discard a card.
+Возьмите карту. Сбросьте карту.
+
+▸ Materialized: Foresee 2.
+▸ Воплощён: Прозрение 2.
+
+▸ Materialized: Gain 3●.
+▸ Воплощён: Получите 3●.
+
+▸ Materialized: Banish any number of allies, then materialize them.
+▸ Воплощён: Изгоните любое количество союзников, затем воплотите их.
+
+Put the top 3 cards of your deck into your void.
+Положите 3 верхние карты вашей колоды в вашу Пустоту.
+
+Gain 1⍏.
+Получите 1⍏.
+
+When an ally is ▸ Dissolved:, gain 1⍏.
+Когда союзник рассеивается, получите 1⍏.
+
+Discover a card with cost 2●.
+Откройте карту стоимостью 2●.
+
+When you abandon 2 allies in a turn, dissolve an enemy.
+Когда вы отрекаетесь от 2 союзников за ход, рассеяйте врага.
+
+This character's spark is equal to the number of allied Warriors.
+Искра этого персонажа равна количеству союзных Воинов.
+
+The '▸ Judgment:' ability of allies triggers when you materialize them.
+Способность союзников «▸ Суд:» срабатывает, когда вы воплощаете их.
+
+▸ Judgment: You may banish an ally, then materialize it.
+▸ Суд: Вы можете изгнать союзника, затем воплотить его.
+
+Once per turn, when you materialize a character, gain 1●.
+Один раз за ход, когда вы воплощаете персонажа, получите 1●.
+
+Has all character types.
+У этого персонажа есть все типы персонажей.
+
+▸ Judgment: With 3 allies that share a character type, draw a card.
+▸ Суд: Если у вас есть 3 союзника с общим типом персонажа, возьмите карту.
+
+Choose One:
+• 2●: Return an enemy to hand.
+• 3●: Draw 2 cards.
+Выберите одно:
+• 2●: Верните врага в руку.
+• 3●: Возьмите 2 карты.
+
+Discard a chosen card with cost 3● or less from the opponent's hand.
+Сбросьте выбранную карту стоимостью 3● или меньше из руки противника.
+
+Pay 1 or more ●: Dissolve all characters with spark less than the amount of ● paid.
+Заплатите не менее 1●: Рассеяйте всех персонажей с искрой меньше числа уплаченных ●.
+
+Discover a character with a ▸ Materialized: ability.
+Откройте персонажа со способностью «▸ Воплощён:».
+
+Until end of turn, when you play an event, copy it.
+До конца хода, когда вы играете событие, скопируйте его.
+
+Double the amount of ● you gain from card effects this turn.
+До конца хода удвойте количество ●, которое вы получаете от эффектов карт.
+
+Until end of turn, when you play a character, draw a card.
+До конца хода, когда вы играете персонажа, возьмите карту.
+
+▸ Judgment: Draw a card, then discard a card.
+▸ Суд: Возьмите карту, затем сбросьте карту.
+
+The opponent's events cost 1● more.
+События противника стоят на 1● больше.
+
+When you materialize an allied Warrior, this character gains +1 spark.
+Когда вы воплощаете союзного Воина, этот персонаж получает +1 к искре.
+
+When you materialize a character, trigger the ▸ Judgment: ability of each ally.
+Когда вы воплощаете персонажа, срабатывает способность «▸ Суд:» каждого союзника.
+
+▸ Materialized: Gain control of an enemy with cost 2● or less.
+▸ Воплощён: Получите контроль над врагом стоимостью 2● или меньше.
+
+Prevent a played character.
+Отмените розыгрыш персонажа.
+
+Gain 2●. Draw a card.
+Получите 2●. Возьмите карту.
+
+▸ Materialized, Judgment: Gain 2●.
+▸ Воплощён, Суд: Получите 2●.
+
+When you materialize an allied Spirit Animal, gain 1●.
+Когда вы воплощаете союзного Духа-Зверя, получите 1●.
+
+Abandon any number of allies: Draw a card for each ally abandoned.
+Отрекитесь от любого количества союзников: Возьмите карту за каждого союзника, от которого вы отреклись.
+
+▸ Judgment: You may pay 3● to banish up to 2 allies, then materialize them.
+▸ Суд: Вы можете заплатить 3●, чтобы изгнать до 2 союзников, затем воплотить их.
+
+Discover an event.
+Откройте событие.
+
+2●, Abandon an ally with spark 1 or less: Draw 2 cards.
+2●, отрекитесь от союзника с искрой 1 или меньше: Возьмите 2 карты.
+
+Reveal the top card of your deck.
+Покажите верхнюю карту вашей колоды.
+
+You may play characters from the top of your deck.
+Вы можете играть персонажей с верха вашей колоды.
+
+Pay 1 or more ●: Draw a card for each ● spent.
+Заплатите не менее 1●: Возьмите карту за каждый потраченный ●.
+
+Foresee 1.
+Прозрение 1.
+
+Gain 1●.
+Получите 1●.
+
+Gain 2⍏.
+Получите 2⍏.
+
+▸ Materialized, Judgment: Gain 1●.
+▸ Воплощён, Суд: Получите 1●.
+
+▸ Judgment: You may discard a card to dissolve an enemy with spark 1 or less.
+▸ Суд: Вы можете сбросить карту, чтобы рассеять врага с искрой 1 или меньше.
+
+When an ally is ▸ Dissolved:, this card gains reclaim 1● this turn.
+Когда союзник рассеивается, эта карта получает Возвышение 1● до конца хода.
+
+▸ Materialized, Judgment: Kindle 1.
+▸ Воплощён, Суд: Разожгите 1.
+
+Events cost you 2● more.
+Ваши события стоят на 2● больше.
+
+When you play an event from your hand, copy it.
+Когда вы играете событие из руки, скопируйте его.
+
+Copy the next event you play this turn three times.
+Скопируйте следующее событие, которое вы сыграете в этот ход, три раза.
+
+Draw a card for each card you have played this turn.
+Возьмите карту за каждую карту, которую вы сыграли в этот ход.
+
+Banish a card from hand: Play this event for 0●.
+Изгоните карту из руки: Сыграйте это событие за 0●.
+
+▸ Judgment: You may banish 3 cards from your void to dissolve an enemy with cost 2● or less.
+▸ Суд: Вы можете изгнать 3 карты из вашей Пустоты, чтобы рассеять врага стоимостью 2● или меньше.
+
+1●, Discard a card: Kindle 2.
+1●, сбросьте карту: Разожгите 2.
+
+▸ Judgment: Gain 2●.
+▸ Суд: Получите 2●.
+
+When you play a character, materialize a Halcyon Figment.
+Когда вы играете персонажа, воплотите Фигмент Гальциона.
+
+Draw 3 cards.
+Возьмите 3 карты.
+
+When you draw 2 cards in a turn, if this card is in your void, it gains reclaim 1● this turn.
+Когда вы берёте 2 карты за ход, если эта карта находится в вашей Пустоте, она получает Возвышение 1● до конца хода.
+
+When you play a Spirit Animal, draw a card.
+Когда вы играете Духа-Зверя, возьмите карту.
+
+▸ Materialized: You may return an ally to hand.
+▸ Воплощён: Вы можете вернуть союзника в руку.
+
+▸ Judgment: Gain 1●.
+▸ Суд: Получите 1●.
+
+▸ Judgment: You may draw 2 cards, then discard 3 cards.
+▸ Суд: Вы можете взять 2 карты, затем сбросить 3 карты.
+
+Abandon an ally: Kindle 1.
+Отрекитесь от союзника: Разожгите 1.
+
+When you abandon a character, gain 1⍏.
+Когда вы отрекаетесь от персонажа, получите 1⍏.
+
+Dissolve an enemy.
+Рассеяйте врага.
+
+When you play a Survivor, put the top 2 cards of your deck into your void.
+Когда вы играете Выжившего, положите 2 верхние карты вашей колоды в вашу Пустоту.
+
+Gain 6●.
+Получите 6●.
+
+▸ Materialized, Judgment: Banish an ally with spark 2 or less, then materialize it.
+▸ Воплощён, Суд: Изгоните союзника с искрой 2 или меньше, затем воплотите его.
+
+This character costs 1● if you have discarded a card this turn.
+Этот персонаж стоит 1●, если вы сбрасывали карту в этот ход.
+
+Abandon an ally: This character gains +1 spark.
+Отрекитесь от союзника: Этот персонаж получает +1 к искре.
+
+Draw 3 cards. Discard 2 cards.
+Возьмите 3 карты. Сбросьте 2 карты.
+
+▸ Materialized: Draw a card.
+▸ Воплощён: Возьмите карту.
+
+Dissolve an enemy with cost less than the number of allied Warriors.
+Рассеяйте врага стоимостью меньше количества союзных Воинов.
+
+Double the amount of ● you have.
+Удвойте количество ●, которое у вас есть.
+
+▸ Judgment: Gain 1● for each allied Spirit Animal.
+▸ Суд: Получите 1● за каждого союзного Духа-Зверя.
+
+Gain 3●.
+Получите 3●.
+
+Abandon an ally, once per turn: Reclaim a Warrior.
+Отрекитесь от союзника, один раз за ход: Возвысьте Воина.
+
+Foresee 1. Draw a card.
+Прозрение 1. Возьмите карту.
+
+Put the top 3 cards of your deck into your void. Draw a card.
+Положите 3 верхние карты вашей колоды в вашу Пустоту. Возьмите карту.
+
+When you abandon an ally, this character gains +1 spark.
+Когда вы отрекаетесь от союзника, этот персонаж получает +1 к искре.
+
+↯fast -- Abandon this character: Prevent a played event.
+↯Стремительность — Отрекитесь от этого персонажа: Отмените розыгрыш события.
+
+▸ Materialized, Judgment: With 2 allied Survivors, draw a card.
+▸ Воплощён, Суд: Если у вас есть 2 союзных Выживших, возьмите карту.
+
+▸ Judgment: Gain 1⍏.
+▸ Суд: Получите 1⍏.
+
+Gain 1⍏ for each card you have played this turn.
+Получите 1⍏ за каждую карту, которую вы сыграли в этот ход.
+
+When you abandon an ally, kindle 2.
+Когда вы отрекаетесь от союзника, Разожгите 2.
+
+Lose 1 maximum ●: Play this event for 0●.
+Уменьшите ваш максимум ● на 1: Сыграйте это событие за 0●.
+
+When you play a ↯fast card, this character gains +2 spark.
+Когда вы играете карту с ↯Стремительностью, этот персонаж получает +2 к искре.
+
+Once per turn, when you materialize a Warrior, draw a card.
+Один раз за ход, когда вы воплощаете Воина, возьмите карту.
+
+Banish a non-Warrior enemy.
+Изгоните врага, который не является Воином.
+
+▸ Materialized: Draw 2 cards.
+▸ Воплощён: Возьмите 2 карты.
+
+Events cost you 1● less.
+Ваши события стоят на 1● меньше.
+
+▸ Materialized: Discover a ↯fast event.
+▸ Воплощён: Откройте событие с ↯Стремительностью.
+
+Return all but one ally to hand: Draw a card for each ally returned.
+Верните в руку всех союзников, кроме одного: Возьмите карту за каждого возвращённого союзника.
+
+With an allied Survivor, you may play this card from your hand or void for 1●.
+Если у вас есть союзный Выживший, вы можете сыграть эту карту из руки или из Пустоты за 1●.
+
+▸ Judgment: Gain 2⍏.
+▸ Суд: Получите 2⍏.
+
+Materialize two random characters with cost 3● or less from your deck.
+Воплотите двух случайных персонажей стоимостью 3● или меньше из вашей колоды.
+
+Once per turn, when you materialize a character with cost 2● or less, draw a card.
+Один раз за ход, когда вы воплощаете персонажа стоимостью 2● или меньше, возьмите карту.
+
+When you have no cards in your deck, you win the game.
+Если в вашей колоде нет карт, вы выигрываете игру.
+
+▸ Judgment: With 2 allied Spirit Animals, gain 2●.
+▸ Суд: Если у вас есть 2 союзных Духа-Зверя, получите 2●.
+
+Discard a chosen character from the opponent's hand.
+Сбросьте выбранного персонажа из руки противника.
+
+Prevent a played ↯fast card.
+Отмените розыгрыш карты с ↯Стремительностью.
+
+When you play a ↯fast card, gain 1⍏.
+Когда вы играете карту с ↯Стремительностью, получите 1⍏.
+
+3●: Draw a card.
+3●: Возьмите карту.
+
+4●: Materialize a copy of an ally.
+4●: Воплотите копию союзника.
+
+Take an extra turn after this one.
+Сделайте дополнительный ход после этого.
+
+Dissolve an enemy. Draw a card.
+Рассеяйте врага. Возьмите карту.
+
+This event costs 1● if a character dissolved this turn.
+Это событие стоит 1●, если в этот ход персонаж был рассеян.
+
+Characters in your hand have ↯fast.
+Персонажи в вашей руке имеют ↯Стремительность.
+
+Once per turn, when you play a ↯fast character, gain 1●.
+Один раз за ход, когда вы играете персонажа с ↯Стремительностью, получите 1●.
+
+When you discard a card, kindle 1.
+Когда вы сбрасываете карту, Разожгите 1.
+
+3●: The spark of each allied Spirit Animal becomes 5.
+3●: Искра каждого союзного Духа-Зверя становится равной 5.
+
+Characters cost you 2● less.
+Ваши персонажи стоят на 2● меньше.
+
+▸ Judgment: Each player abandons a character.
+▸ Суд: Каждый игрок отрекается от персонажа.
+
+▸ Materialized: Draw a card, then discard a card.
+▸ Воплощён: Возьмите карту, затем сбросьте карту.
+
+▸ Materialized: Return an ally to hand.
+▸ Воплощён: Верните союзника в руку.
+
+Abandon an ally: Play this character for 0●, then abandon it.
+Отрекитесь от союзника: Сыграйте этого персонажа за 0●, затем отрекитесь от него.
+
+▸ Materialized: Dissolve an enemy.
+▸ Воплощён: Рассеяйте врага.
+
+When you play an event, foresee 1.
+Когда вы играете событие, Прозрение 1.
+
+Materialize a Celestial Figment for each card you have played this turn.
+Воплотите Небесный Фигмент за каждую карту, которую вы сыграли в этот ход.
+
+Disable the ▸ Materialized: abilities of enemies.
+Отключите у врагов способности «▸ Воплощён:».
+
+▸ Materialized: Banish an enemy until this character leaves play.
+▸ Воплощён: Изгоните врага, пока этот персонаж не покинет игру.
+
+Banish an ally. Materialize it at end of turn.
+Изгоните союзника. Воплотите его в конце хода.
+
+All cards currently in your void gain reclaim equal to their cost this turn.
+Все карты в вашей Пустоте получают Возвышение, равное их стоимости, до конца хода.
+
+▸ Judgment: You may discard a card to draw a card and gain 1⍏.
+▸ Суд: Вы можете сбросить карту, чтобы взять карту и получить 1⍏.
+
+Banish up to 2 allies, then materialize them.
+Изгоните до 2 союзников, затем воплотите их.
+
+▸ Materialized: Draw a card for each ally abandoned this turn.
+▸ Воплощён: Возьмите карту за каждого союзника, от которого вы отреклись в этот ход.
+
+Abandon a character, Discard your hand: Gain 5●.
+Отрекитесь от персонажа и сбросьте руку: Получите 5●.
+
+When an ally is banished, kindle 1.
+Когда союзник изгоняется, Разожгите 1.
+
+Abandon an ally or discard a card: Dissolve an enemy.
+Отрекитесь от союзника или сбросьте карту: Рассеяйте врага.
+
+Materialize three Radiant Figments.
+Воплотите 3 Сияющих Фигмента.
+
+2●, Abandon a character, Discard your hand: Draw 3 cards.
+2●, отрекитесь от персонажа и сбросьте руку: Возьмите 3 карты.
+
+▸ Materialized: A card with cost 3● or less in your void gains reclaim 0●.
+▸ Воплощён: Карта стоимостью 3● или меньше в вашей Пустоте получает Возвышение 0●.
+
+▸ Dissolved: You may pay 1● to return this character to your hand.
+▸ Рассеян: Вы можете заплатить 1●, чтобы вернуть этого персонажа в руку.
+
+Return an enemy or ally to hand. Draw a card.
+Верните врага или союзника в руку. Возьмите карту.
+
+You may return a character from your void to your hand, then draw a card.
+Вы можете вернуть персонажа из вашей Пустоты в руку, затем взять карту.
+
+You may only play this character from your void.
+Вы можете играть этого персонажа только из вашей Пустоты.
+
+An ally gains +1 spark for each allied Warrior.
+Союзник получает +1 к искре за каждого союзного Воина.
+
+When you discard this character, materialize it.
+Когда вы сбрасываете этого персонажа, воплотите его.
+
+▸ Materialized: Banish an enemy until your next main phase.
+▸ Воплощён: Изгоните врага до вашей следующей главной фазы.
+
+Prevent a played card. Put it on top of the opponent's deck.
+Отмените розыгрыш карты. Положите её на верх колоды противника.
+
+Prevent a played event unless the opponent pays 2●.
+Отмените розыгрыш события, если только противник не заплатит 2●.
+
+Discover a character with an activated ability.
+Откройте персонажа с активируемой способностью.
+
+▸ Judgment: You may banish a card from the opponent's void to gain 1●.
+▸ Суд: Вы можете изгнать карту из Пустоты противника, чтобы получить 1●.
+
+Once per turn, when you play a ↯fast card, draw a card.
+Один раз за ход, когда вы играете карту с ↯Стремительностью, возьмите карту.
+
+Dissolve an enemy with spark 3 or more.
+Рассеяйте врага с искрой 3 или больше.
+
+▸ Judgment: Return this character from your void to your hand.
+▸ Суд: Верните этого персонажа из вашей Пустоты в руку.
+
+▸ Materialized, Dissolved: Put the top 4 cards of your deck into your void.
+▸ Воплощён, Рассеян: Положите 4 верхние карты вашей колоды в вашу Пустоту.
+
+Pay 1 or more ●: Draw a card for each ● spent, then discard 2 cards.
+Заплатите не менее 1●: Возьмите карту за каждый потраченный ●, затем сбросьте 2 карты.
+
+▸ Materialized: Draw a Warrior from your deck.
+▸ Воплощён: Возьмите Воина из вашей колоды.
+
+▸ Materialized: Draw a card for each allied Spirit Animal.
+▸ Воплощён: Возьмите карту за каждого союзного Духа-Зверя.
+
+▸ Dissolved: Draw a card.
+▸ Рассеян: Возьмите карту.
+
+When an allied Survivor is ▸ Dissolved:, draw a card.
+Когда союзный Выживший рассеивается, возьмите карту.
+
+▸ Materialized: Return a character from your void to your hand.
+▸ Воплощён: Верните персонажа из вашей Пустоты в руку.
+
+Abandon an ally: You may dissolve an enemy with spark less than that ally's spark.
+Отрекитесь от союзника: Вы можете рассеять врага с искрой меньше искры этого союзника.
+
+Dissolve an enemy with spark 1 or less.
+Рассеяйте врага с искрой 1 или меньше.
+
+Dissolve an enemy. The opponent gains 3⍏.
+Рассеяйте врага. Противник получает 3⍏.
+
+▸ Dissolved: Kindle 2.
+▸ Рассеян: Разожгите 2.
+
+When an allied Survivor is ▸ Dissolved:, kindle 2.
+Когда союзный Выживший рассеивается, Разожгите 2.
+
+Discard a card. Draw 2 cards.
+Сбросьте карту. Возьмите 2 карты.
+
+Allied Warriors have +1 spark.
+Союзные Воины получают +1 к искре.
+
+Abandon an ally: Gain 1●.
+Отрекитесь от союзника: Получите 1●.
+
+▸ Materialized: Banish the opponent's void.
+▸ Воплощён: Изгоните все карты из Пустоты противника.
+
+If this card is in your void, allied Survivors have +2 spark.
+Если эта карта находится в вашей Пустоте, союзные Выжившие получают +2 к искре.
+
+When you play a Warrior, reclaim a random character with cost 3● or less.
+Когда вы играете Воина, возвысьте случайного персонажа стоимостью 3● или меньше.
+
+When you abandon a character, draw a card.
+Когда вы отрекаетесь от персонажа, возьмите карту.
+
+Each allied Spirit Animal gains spark equal to the number of allied Spirit Animals.
+Каждый союзный Дух-Зверь получает искру, равную количеству союзных Духов-Зверей.
+
+▸ Judgment: You may pay 1● to kindle 1 and banish a card from the opponent's void.
+▸ Суд: Вы можете заплатить 1●, чтобы Разжечь 1 и изгнать карту из Пустоты противника.
+
+Abandon an ally: Gain ● equal to that character's cost.
+Отрекитесь от союзника: Получите ●, равное стоимости этого персонажа.
+
+When an event is put into your void, this character gains +1 spark.
+Когда событие попадает в вашу Пустоту, этот персонаж получает +1 к искре.
+
+▸ Judgment: Gain 1● for each allied character.
+▸ Суд: Получите 1● за каждого союзного персонажа.
+
+▸ Judgment: You may pay 4● to have each allied Spirit Animal gain +2 spark.
+▸ Суд: Вы можете заплатить 4●, чтобы каждый союзный Дух-Зверь получил +2 к искре.
+
+When you play an event, gain 1●.
+Когда вы играете событие, получите 1●.
+
+▸ Materialized: You may banish an ally, then materialize it.
+▸ Воплощён: Вы можете изгнать союзника, затем воплотить его.
+
+Until end of turn, when an ally leaves play, gain 2●.
+До конца хода, когда союзник покидает игру, получите 2●.
+
+Once per turn, you may play a character with cost 2● or less from your void.
+Один раз за ход вы можете сыграть персонажа стоимостью 2● или меньше из вашей Пустоты.
+
+Discover a Warrior.
+Откройте Воина.
+
+When you play a card during the opponent's turn, this character gains +1 spark.
+Когда вы играете карту в ход противника, этот персонаж получает +1 к искре.
+
+When an ally is ▸ Dissolved:, draw a card.
+Когда союзник рассеивается, возьмите карту.
+
+When you materialize an allied Spirit Animal, that character gains +1 spark.
+Когда вы воплощаете союзного Духа-Зверя, этот персонаж получает +1 к искре.
+
+At the end of this turn, trigger an additional Judgment phase.
+В конце этого хода проведите дополнительную фазу Суда.
+
+▸ Judgment: Foresee 1.
+▸ Суд: Прозрение 1.
+
+2●: Dissolve an enemy.
+2●: Рассеяйте врага.
+
+1●, once per turn: Draw a card.
+1●, один раз за ход: Возьмите карту.
+
+Discard 2 cards.
+Сбросьте 2 карты.
+
+Discard a card.
+Сбросьте карту.
+
+Draw a card.
+Возьмите карту.
+
+1●: Draw a card.
+1●: Возьмите карту.
+
+2●: Draw 2 cards.
+2●: Возьмите 2 карты.
+
+↯fast -- 1●, once per turn: Draw a card.
+↯Стремительность — 1●, один раз за ход: Возьмите карту.
+
+↯fast -- 3●: Draw a card.
+↯Стремительность — 3●: Возьмите карту.
+
+Choose One:
+• 1●: Draw a card.
+• 2●: Dissolve an enemy.
+Выберите одно:
+• 1●: Возьмите карту.
+• 2●: Рассеяйте врага.
+
+Choose One:
+• 1●: Draw a card.
+• 3●: Draw 2 cards.
+Выберите одно:
+• 1●: Возьмите карту.
+• 3●: Возьмите 2 карты.
+
+Prevent a played event which could dissolve an ally.
+Отмените розыгрыш события, которое может рассеять союзника.
+
+Return an enemy to hand.
+Верните врага в руку.
+
+Return a card from your void to your hand.
+Верните карту из вашей Пустоты в руку.
+
+When you play a card during the opponent's turn, this character gains +2 spark.
+Когда вы играете карту в ход противника, этот персонаж получает +2 к искре.
+
+When you materialize a character, this character gains +1 spark.
+Когда вы воплощаете персонажа, этот персонаж получает +1 к искре.
+
+▸ Judgment: Draw a card, then the opponent gains 2⍏.
+▸ Суд: Возьмите карту, затем противник получает 2⍏.
+
+Banish your void with 8 or more cards: Reclaim this character.
+Изгоните все карты из вашей Пустоты, если в ней 8 или больше карт: Возвысьте этого персонажа.
+
+▸ Judgment: You may abandon a Warrior to discover a Warrior with cost 1● higher and materialize it.
+▸ Суд: Вы можете отречься от Воина, чтобы открыть Воина стоимостью на 1● выше и воплотить его.
+
+Abandon an ally, once per turn: Gain 1⍏.
+Отрекитесь от союзника, один раз за ход: Получите 1⍏.
+
+Double the number of cards you draw from card effects this turn.
+До конца хода удвойте количество карт, которые вы берёте от эффектов карт.
+
+▸ Materialized: Copy the next event you play this turn three times.
+▸ Воплощён: Скопируйте следующее событие, которое вы сыграете в этот ход, три раза.
+
+Abandon 2 allies: Reclaim this character.
+Отрекитесь от 2 союзников: Возвысьте этого персонажа.
+
+To play this card, return an ally with cost 3● or more to hand.
+Чтобы сыграть эту карту, верните в руку союзника стоимостью 3● или больше.
+
+▸ Judgment: Draw a card.
+▸ Суд: Возьмите карту.
+
+▸ Materialized: Prevent a played card with cost 2● or less.
+▸ Воплощён: Отмените розыгрыш карты стоимостью 2● или меньше.
+
+Discover a Survivor.
+Откройте Выжившего.
+
+When an ally is banished, this character gains +1 spark.
+Когда союзник изгоняется, этот персонаж получает +1 к искре.
+
+When you play 2 cards in a turn, reclaim this character.
+Когда вы играете 2 карты за ход, возвысьте этого персонажа.
+
+Once per turn, when you discard a card, gain 1●, then kindle 2.
+Один раз за ход, когда вы сбрасываете карту, получите 1●, затем Разожгите 2.
+
+▸ Materialized, Dissolved: Draw a card.
+▸ Воплощён, Рассеян: Возьмите карту.
+
+▸ Dissolved: A Survivor in your void gains reclaim equal to its cost.
+▸ Рассеян: Выживший в вашей Пустоте получает Возвышение, равное его стоимости.
+
+▸ Materialized: Disable the activated abilities of an enemy while this character is in play.
+▸ Воплощён: Отключите активируемые способности врага, пока этот персонаж находится в игре.
+
+Dissolve an enemy. You lose 4⍏.
+Рассеяйте врага. Вы теряете 4⍏.
+
+Dissolve an enemy with cost 2● or less.
+Рассеяйте врага стоимостью 2● или меньше.
+
+Reclaim -- Abandon an ally.
+Возвышение — Отрекитесь от союзника.
+
+▸ Materialized: Discard 2 cards, then draw 2 cards.
+▸ Воплощён: Сбросьте 2 карты, затем возьмите 2 карты.
+
+Banish an enemy with cost 2● or less.
+Изгоните врага стоимостью 2● или меньше.
+
+When you materialize a Survivor, reclaim this character.
+Когда вы воплощаете Выжившего, возвысьте этого персонажа.
+
+At the end of your turn, gain 2●.
+В конце вашего хода получите 2●.
+
+When the opponent plays an event which could dissolve an ally, prevent that card.
+Когда противник играет событие, которое может рассеять союзника, отмените розыгрыш этой карты.
+
+When an ally is ▸ Dissolved:, gain 1●.
+Когда союзник рассеивается, получите 1●.
+
+▸ Materialized: Each player discards a card.
+▸ Воплощён: Каждый игрок сбрасывает карту.
+
+Dissolve an enemy with cost less than the number of cards in your void.
+Рассеяйте врага стоимостью меньше количества карт в вашей Пустоте.
+
+Each player shuffles their hand and void into their deck and then draws 5 cards.
+Каждый игрок замешивает свою руку и свою Пустоту в свою колоду, затем берёт 5 карт.
+
+An event in your void gains reclaim 0● this turn.
+Событие в вашей Пустоте получает Возвышение 0● до конца хода.
+
+▸ Materialized, Judgment: With 2 allied Warriors, gain 1●.
+▸ Воплощён, Суд: Если у вас есть 2 союзных Воина, получите 1●.
+
+▸ Materialized: Discard a chosen card from the opponent's hand. They draw a card.
+▸ Воплощён: Сбросьте выбранную карту из руки противника. Затем противник берёт карту.
+
+▸ Judgment: You may pay 1● to return this character from your void to your hand.
+▸ Суд: Вы можете заплатить 1●, чтобы вернуть этого персонажа из вашей Пустоты в руку.
+
