@@ -9,14 +9,18 @@ Given a technical design document, decompose it into well-structured, independen
 implementation tasks using the `TaskCreate` tool. Each task should be completable
 in a single Claude session without overflowing the context window.
 
-Each task should link to the technical design document in its initial task
+Each task should link to the relevant technical design document section in its initial task
 description.
 
 ## Workflow
 
+### Phase 0: Read the Design Document
+
+Read the design document in full before doing anything else.
+
 ### Phase 1: Research (Parallel)
 
-Spawn 2-4 **Haiku Explore** agents in parallel (`run_in_background: true`) to
+Spawn 2-4 **Explore** agents in parallel (`run_in_background: true`) to
 gather context. Tailor prompts to the design doc. Common research questions:
 
 - **Codebase structure**: Which existing files/modules will be modified or extended?
@@ -39,7 +43,7 @@ Using research results and the design doc, design the task breakdown:
 
 ### Phase 3: Task Creation
 
-Create tasks using `TaskCreate`. Tasks must be created in parallel via subagents.
+Create tasks using `TaskCreate`, issuing multiple calls in parallel where possible.
 After creation, use `TaskUpdate` to set `addBlockedBy` dependencies.
 
 ## Task Ordering
@@ -50,7 +54,7 @@ advantage as a **soft dependency mechanism**:
 1. **First tasks**: Foundational types, traits, enums, data structures
 2. **Middle tasks**: Core logic, implementations that build on foundations
 3. **Later tasks**: Integration points, higher-level features using core logic
-4. **Final tasks**: Tests-only tasks, cleanup, polish, documentation
+4. **Final tasks**: Tests-only tasks, cleanup, polish
 
 This natural ordering reduces merge conflicts even without explicit dependencies
 because foundational code gets merged first, and later tasks build on a stable base.
@@ -143,7 +147,7 @@ Read these files for context before starting:
   examples of the pattern to follow. Use exact paths from research results.
 - **Requirements**: Numbered list of concrete changes. Each requirement should map to
   a small, verifiable code change. Avoid vague instructions like "implement the feature."
-- **Acceptance Criteria**: Always end with the three standard criteria (check, fmt, review,
+- **Acceptance Criteria**: Always end with the four standard criteria (check, fmt, review,
   commit). Add 2-5 task-specific criteria that are objectively verifiable.
 
 ### Sizing guidelines
