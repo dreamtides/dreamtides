@@ -4,19 +4,19 @@ use core_data::figment_type::FigmentType;
 use rlf::Phrase;
 use strings::strings;
 
-/// Serializes an operator to its string representation.
+/// Serializes an operator to its phrase representation.
 ///
-/// Returns a string with a leading space for non-empty operators. This allows
+/// Returns a phrase with a leading space for non-empty operators. This allows
 /// format strings like `"cost {energy(e)}{}"` to work correctly for all
 /// operators, producing `"cost {energy(e)}"` for Exactly and
 /// `"cost {energy(e)} or less"` for OrLess.
-pub fn serialize_operator<T>(operator: &Operator<T>) -> String {
+pub fn serialize_operator<T>(operator: &Operator<T>) -> Phrase {
     match operator {
-        Operator::OrLess => strings::operator_or_less().to_string(),
-        Operator::OrMore => strings::operator_or_more().to_string(),
-        Operator::Exactly => String::new(),
-        Operator::LowerBy(_) => strings::operator_lower().to_string(),
-        Operator::HigherBy(_) => strings::operator_higher().to_string(),
+        Operator::OrLess => strings::operator_or_less(),
+        Operator::OrMore => strings::operator_or_more(),
+        Operator::Exactly => Phrase::empty(),
+        Operator::LowerBy(_) => strings::operator_lower(),
+        Operator::HigherBy(_) => strings::operator_higher(),
     }
 }
 

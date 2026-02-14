@@ -117,9 +117,9 @@ pub(super) fn base_card_phrase(predicate: &CardPredicate) -> Phrase {
     card_predicate_base_phrase(predicate)
 }
 
-/// Returns the base noun text for a card predicate without an article.
-pub(super) fn base_card_text(predicate: &CardPredicate) -> String {
-    card_predicate_base_phrase(predicate).to_string()
+/// Returns the base noun phrase for a card predicate without an article.
+pub(super) fn base_card_text(predicate: &CardPredicate) -> Phrase {
+    card_predicate_base_phrase(predicate)
 }
 
 /// Serializes a predicate for "for each" contexts.
