@@ -291,8 +291,9 @@ english = "1●, Discard a card: Kindle 2."
 russian = "1●, сбросьте карту: Разожгите 2."
 
 [[tests]]
-english = "▸ Judgment: Gain 2●."
-russian = "▸ Суд: Получите 2●."
+english = "{Judgment} Gain {energy($e)}."
+variables = "e: 2"
+russian = "▸ <b>Суд:</b> Получите <color=#00838F>2●</color>."
 
 [[tests]]
 english = "When you play a character, materialize a Halcyon Figment."
@@ -316,8 +317,9 @@ english = "▸ Materialized: You may return an ally to hand."
 russian = "▸ Воплощён: Вы можете вернуть союзника в руку."
 
 [[tests]]
-english = "▸ Judgment: Gain 1●."
-russian = "▸ Суд: Получите 1●."
+english = "{Judgment} Gain {energy($e)}."
+variables = "e: 1"
+russian = "▸ <b>Суд:</b> Получите <color=#00838F>1●</color>."
 
 [[tests]]
 english = "▸ Judgment: You may draw 2 cards, then discard 3 cards."
@@ -422,8 +424,9 @@ english = "▸ Materialized, Judgment: With 2 allied Survivors, draw a card."
 russian = "▸ Воплощён, Суд: Если у вас есть 2 союзных Выживших, возьмите карту."
 
 [[tests]]
-english = "▸ Judgment: Gain 1⍏."
-russian = "▸ Суд: Получите 1⍏."
+english = "{Judgment} Gain {points($p)}."
+variables = "p: 1"
+russian = "▸ <b>Суд:</b> Получите <color=#F57F17>1⍏</color>."
 
 [[tests]]
 english = "Gain 1⍏ for each card you have played this turn."
@@ -484,8 +487,9 @@ variables = "c: 3"
 russian = "Возьмите 3 карты."
 
 [[tests]]
-english = "▸ Judgment: Gain 2⍏."
-russian = "▸ Суд: Получите 2⍏."
+english = "{Judgment} Gain {points($p)}."
+variables = "p: 2"
+russian = "▸ <b>Суд:</b> Получите <color=#F57F17>2⍏</color>."
 
 [[tests]]
 english = "Materialize two random characters with cost 3● or less from your deck."
@@ -868,8 +872,9 @@ english = "At the end of this turn, trigger an additional Judgment phase."
 russian = "В конце этого хода проведите дополнительную фазу Суда."
 
 [[tests]]
-english = "▸ Judgment: Foresee 1."
-russian = "▸ Суд: Прозрение 1."
+english = "{Judgment} {Foresee($f)}."
+variables = "f: 1"
+russian = "▸ <b>Суд:</b> Прозрение 1."
 
 [[tests]]
 english = "When you materialize a character, this character gains +1 spark."
