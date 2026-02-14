@@ -38,14 +38,14 @@ kindle($k) = "<color=#AA00FF>kindle</color> {$k}";
 kindled = "<color=#AA00FF>kindled</color>";
 foresee($n) = "<color=#AA00FF>foresee</color> {$n}";
 fast = "<b>↯fast</b>";
-reclaim_for_cost($r) = "<color=#AA00FF>reclaim</color> <color=#00838F>{$r}●</color>";
+reclaim_for_cost($r) = "Возвышение {$r}●";
 
 
 choose_one = "<b>Choose One:</b>";
 bullet = "•";
 
 
-card = :a{ one: "card", other: "cards" };
+card = :fem :inan { *one: "карта", gen: "карты", other: "карты" };
 cards($n) = :match($n) {
     1: "карту",
     few: "{$n} карты",
@@ -386,7 +386,7 @@ abandon_and_gain_energy_for_spark($target) = "abandon {$target} and gain {energy
 abandon_at_end_of_turn($target) = "abandon {$target} at end of turn";
 each_player_abandons($target) = "each player abandons {$target}";
 prevent_dissolve_this_turn($target) = "{$target} cannot be {dissolved} this turn";
-prevent_played_target($target) = "{prevent} a played {$target}";
+prevent_played_target($target) = :from($target) "отмените розыгрыш {$target:gen}";
 prevent_unless_pays($target, $cost) = "{prevent} a played {$target} unless the opponent pays {$cost}";
 gain_energy_equal_to_cost($target) = "gain {energy_symbol} equal to {$target}'s cost";
 gains_spark($target, $s) = "{$target} gains +{$s} spark";

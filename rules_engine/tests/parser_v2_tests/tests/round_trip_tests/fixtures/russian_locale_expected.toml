@@ -7,7 +7,7 @@ e: 2"""
 russian = "Возьмите 2 карты. Сбросьте 2 карты. Получите <color=#00838F>2●</color>."
 
 [[tests]]
-english = "Prevent a played card."
+english = "{Prevent} a played card."
 russian = "Отмените розыгрыш карты."
 
 [[tests]]
@@ -23,8 +23,9 @@ english = "Dissolve an enemy with cost 3● or more."
 russian = "Рассеяйте врага стоимостью 3● или больше."
 
 [[tests]]
-english = "Reclaim 2●"
-russian = "Возвышение 2●."
+english = "{reclaim_for_cost($r)}"
+variables = "r: 2"
+russian = "Возвышение 2●"
 
 [[tests]]
 english = "When you materialize an ally, gain 1●."
@@ -260,8 +261,9 @@ english = "Copy the next event you play this turn three times."
 russian = "Скопируйте следующее событие, которое вы сыграете в этот ход, три раза."
 
 [[tests]]
-english = "Reclaim 2●"
-russian = "Возвышение 2●."
+english = "{reclaim_for_cost($r)}"
+variables = "r: 2"
+russian = "Возвышение 2●"
 
 [[tests]]
 english = "Draw a card for each card you have played this turn."
@@ -272,7 +274,7 @@ english = "Banish a card from hand: Play this event for 0●."
 russian = "Изгоните карту из руки: Сыграйте это событие за 0●."
 
 [[tests]]
-english = "Prevent a played card."
+english = "{Prevent} a played card."
 russian = "Отмените розыгрыш карты."
 
 [[tests]]
@@ -390,7 +392,8 @@ english = "Foresee 1. Draw a card."
 russian = "Прозрение 1. Возьмите карту."
 
 [[tests]]
-english = "Reclaim 3●"
+english = "{reclaim_for_cost($r)}"
+variables = "r: 3"
 russian = "Возвышение 3●"
 
 [[tests]]
@@ -430,7 +433,7 @@ english = "Lose 1 maximum ●: Play this event for 0●."
 russian = "Уменьшите ваш максимум ● на 1: Сыграйте это событие за 0●."
 
 [[tests]]
-english = "Prevent a played card."
+english = "{Prevent} a played card."
 russian = "Отмените розыгрыш карты."
 
 [[tests]]
@@ -542,8 +545,9 @@ d: 2"""
 russian = "Возьмите 2 карты. Сбросьте 2 карты."
 
 [[tests]]
-english = "Reclaim 2●"
-russian = "Возвышение 2●."
+english = "{reclaim_for_cost($r)}"
+variables = "r: 2"
+russian = "Возвышение 2●"
 
 [[tests]]
 english = "When you discard a card, kindle 1."
@@ -571,7 +575,8 @@ english = "▸ Materialized: Draw a card, then discard a card."
 russian = "▸ Воплощён: Возьмите карту, затем сбросьте карту."
 
 [[tests]]
-english = "Reclaim 3●"
+english = "{reclaim_for_cost($r)}"
+variables = "r: 3"
 russian = "Возвышение 3●"
 
 [[tests]]
@@ -607,7 +612,8 @@ english = "Banish an ally. Materialize it at end of turn."
 russian = "Изгоните союзника. Воплотите его в конце хода."
 
 [[tests]]
-english = "Reclaim 1●"
+english = "{reclaim_for_cost($r)}"
+variables = "r: 1"
 russian = "Возвышение 1●"
 
 [[tests]]
