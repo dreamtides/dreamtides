@@ -6,6 +6,7 @@ use ability_data::effect::{Effect, ModelEffectChoiceIndex};
 use ability_data::named_ability::NamedAbility;
 use ability_data::trigger_event::TriggerEvent;
 use ability_data::triggered_ability::TriggeredAbility;
+use rlf::Phrase;
 use strings::strings;
 
 use crate::serializer::effect_serializer::AbilityContext;
@@ -107,16 +108,15 @@ fn serialize_triggered(triggered: &TriggeredAbility) -> String {
     }
 }
 
-/// Builds the combined prefix string for trigger modifiers.
-fn build_trigger_prefix(has_until_end_of_turn: bool, has_once_per_turn: bool) -> String {
-    let mut prefix = String::new();
-    if has_until_end_of_turn {
-        prefix.push_str(&strings::until_end_of_turn_prefix().to_string());
-    }
+/// Builds the combined prefix phrase for trigger modifiers.
+fn build_trigger_prefix(has_until_end_of_turn: bool, has_once_per_turn: bool) -> Phrase {
+    let prefix = Phrase::empty();
+    let prefix = if has_until_end_of_turn { strings::until_end_of_turn_prefix() } else { prefix };
     if has_once_per_turn {
-        prefix.push_str(&strings::once_per_turn_prefix().to_string());
+        prefix.map_text(|t| format!("{t}{}", strings::once_per_turn_prefix()))
+    } else {
+        prefix
     }
-    prefix
 }
 
 /// Assembles an activated ability using phrase-based composition.
