@@ -169,8 +169,8 @@ n_random_characters($n) = :match($n) {
 
 
 up_to_n_events($n) = :match($n) {
-    1: "an event",
-    *other: "up to {$n} events",
+    1: "событие",
+    *other: "до {$n} событий",
 };
 
 
@@ -690,7 +690,7 @@ for_each_allied_character = :masc :anim { nom: "союзный персонаж"
 for_each_enemy = :masc :anim { nom: "враг", *gen: "врага" };
 for_each_character = :masc :anim { nom: "персонаж", *gen: "персонажа" };
 for_each_card = :fem :inan { nom: "карта", *gen: "карту" };
-for_each_card_in_your_void = :fem :inan { nom: "карта в вашей Пустоте", *gen: "карты в вашей Пустоте" };
+for_each_card_in_your_void = :fem :inan { nom: "карта в вашей Пустоте", *gen: "карту в вашей Пустоте" };
 for_each_this_character = :masc :anim { nom: "этот персонаж", *gen: "этого персонажа" };
 for_each_that_character = :masc :anim { nom: "тот персонаж", *gen: "того персонажа" };
 for_each_other_character = :masc :anim { nom: "другой персонаж", *gen: "другого персонажа" };
@@ -698,7 +698,7 @@ for_each_allied_event = :neut :inan { nom: "союзное событие", *gen
 for_each_event = :neut :inan { nom: "событие", *gen: "события" };
 for_each_character_in_your_void = :masc :anim { nom: "персонаж в вашей Пустоте", *gen: "персонажа в вашей Пустоте" };
 for_each_event_in_your_void = :neut :inan { nom: "событие в вашей Пустоте", *gen: "события в вашей Пустоте" };
-for_each_card_in_enemy_void = :fem :inan { nom: "карта в Пустоте противника", *gen: "карты в Пустоте противника" };
+for_each_card_in_enemy_void = :fem :inan { nom: "карта в Пустоте противника", *gen: "карту в Пустоте противника" };
 for_each_character_in_enemy_void = :masc :anim { nom: "персонаж в Пустоте противника", *gen: "персонажа в Пустоте противника" };
 for_each_event_in_enemy_void = :neut :inan { nom: "событие в Пустоте противника", *gen: "события в Пустоте противника" };
 for_each_allied_subtype($t) = :from($t) { nom: "союзный {subtype($t):nom}", *gen: "союзного {subtype($t)}" };
@@ -722,25 +722,43 @@ ally_abandoned = :masc :anim { gen: "союзника, от которого в�
 allied_subtype_abandoned($t) = :from($t) { nom: "союзный {subtype($t):nom}, от которого вы отреклись", *gen: "союзного {subtype($t)}, от которого вы отреклись" };
 ally_returned = :masc :anim { gen: "возвращённого союзника" };
 allied_subtype_returned($t) = :from($t) { nom: "союзный {subtype($t):nom}, которого вы вернули", *gen: "союзного {subtype($t)}, которого вы вернули" };
-card_predicate_returned($base) = :from($base) "{$base} returned";
+card_predicate_returned($base) = :from($base) {
+    nom: :match($base) { *masc: "возвращённый {$base:nom}", fem: "возвращённая {$base:nom}", neut: "возвращённое {$base:nom}" },
+    *gen: :match($base) { *masc: "возвращённого {$base:gen}", fem: "возвращённой {$base:gen}", neut: "возвращённого {$base:gen}" },
+};
 energy_spent = :inan { gen: "потраченного {energy_symbol}" };
 card_predicate_played_this_turn($base) = :from($base) { nom: "{$base:nom}, которую вы сыграли в этот ход", *gen: "{$base:gen}, которую вы сыграли в этот ход" };
-card_predicate_drawn_this_turn($base) = :from($base) "{$base} you have drawn this turn";
-card_predicate_discarded_this_turn($base) = :from($base) "{$base} you have discarded this turn";
-card_predicate_dissolved_this_turn($base) = :from($base) "{$base} which dissolved this turn";
-card_predicate_abandoned_this_turn($base) = :from($base) "{$base} abandoned this turn";
-card_predicate_abandoned($base) = :from($base) "{$base} abandoned";
+card_predicate_drawn_this_turn($base) = :from($base) {
+    nom: :match($base) { *fem: "{$base:nom}, которую вы взяли в этот ход", masc: "{$base:nom}, которого вы взяли в этот ход", neut: "{$base:nom}, которое вы взяли в этот ход" },
+    *gen: :match($base) { *fem: "{$base:gen}, которую вы взяли в этот ход", masc: "{$base:gen}, которого вы взяли в этот ход", neut: "{$base:gen}, которое вы взяли в этот ход" },
+};
+card_predicate_discarded_this_turn($base) = :from($base) {
+    nom: :match($base) { *fem: "{$base:nom}, которую вы сбросили в этот ход", masc: "{$base:nom}, которого вы сбросили в этот ход", neut: "{$base:nom}, которое вы сбросили в этот ход" },
+    *gen: :match($base) { *fem: "{$base:gen}, которую вы сбросили в этот ход", masc: "{$base:gen}, которого вы сбросили в этот ход", neut: "{$base:gen}, которое вы сбросили в этот ход" },
+};
+card_predicate_dissolved_this_turn($base) = :from($base) {
+    nom: :match($base) { *masc: "{$base:nom}, рассеянный в этот ход", fem: "{$base:nom}, рассеянная в этот ход", neut: "{$base:nom}, рассеянное в этот ход" },
+    *gen: :match($base) { *masc: "{$base:gen}, рассеянного в этот ход", fem: "{$base:gen}, рассеянной в этот ход", neut: "{$base:gen}, рассеянного в этот ход" },
+};
+card_predicate_abandoned_this_turn($base) = :from($base) {
+    nom: :match($base) { *masc: "{$base:nom}, от которого вы отреклись в этот ход", fem: "{$base:nom}, от которой вы отреклись в этот ход", neut: "{$base:nom}, от которого вы отреклись в этот ход" },
+    *gen: :match($base) { *masc: "{$base:gen}, от которого вы отреклись в этот ход", fem: "{$base:gen}, от которой вы отреклись в этот ход", neut: "{$base:gen}, от которого вы отреклись в этот ход" },
+};
+card_predicate_abandoned($base) = :from($base) {
+    nom: :match($base) { *masc: "{$base:nom}, от которого вы отреклись", fem: "{$base:nom}, от которой вы отреклись", neut: "{$base:nom}, от которого вы отреклись" },
+    *gen: :match($base) { *masc: "{$base:gen}, от которого вы отреклись", fem: "{$base:gen}, от которой вы отреклись", neut: "{$base:gen}, от которого вы отреклись" },
+};
 
 
 draw_cards_for_each($c, $target) = :from($target) :match($target) { *anim: "возьмите {cards($c)} за каждого {$target:gen}", inan: "возьмите {cards($c)} за каждую {$target:gen}" };
 gain_energy_for_each($e, $target) = :from($target) :match($target) { *anim: "получите {energy($e)} за каждого {$target:gen}", inan: "получите {energy($e)} за каждую {$target:gen}" };
 gain_points_for_each($p, $target) = :from($target) :match($target) { *anim: "получите {points($p)} за каждого {$target:gen}", inan: "получите {points($p)} за каждую {$target:gen}" };
 gains_spark_for_each($target, $s, $quantity) = :from($target) "{$target:nom} получает +{$s} к искре за каждого {$quantity}";
-gains_spark_until_next_main_for_each($target, $s, $for_each) = "{$target} gains +{$s} spark until your next main phase for each {$for_each}";
+gains_spark_until_next_main_for_each($target, $s, $for_each) = :from($target) "{$target:nom} получает +{$s} к искре до вашей следующей главной фазы за каждого {$for_each}";
 each_gains_spark_equal_to($each, $count_of) = :from($each) "каждый {$each:nom} получает искру, равную количеству {$count_of:other}";
-have_each_gain_spark($each, $s) = "have each {$each} gain +{$s} spark";
+have_each_gain_spark($each, $s) = :from($each) "каждый {$each:nom} получает +{$s} к искре";
 spark_of_each_becomes($each, $s) = :from($each) "Искра каждого {$each:gen} становится равной {$s}";
-dissolve_all_with_cost_lte_quantity($target, $quantity) = "{dissolve} all {$target:other} with cost less than or equal to the number of {$quantity}";
+dissolve_all_with_cost_lte_quantity($target, $quantity) = :from($target) "рассеяйте всех {$target:other} стоимостью не больше количества {$quantity}";
 
 
 collection_all($target) = :from($target) :match($target) {
@@ -758,16 +776,16 @@ materialize_them($target) = "воплотите их";
 materialize_collection_target($target) = "{materialize} {$target}";
 
 materialize_copy_of($target) = :from($target) "{materialize} копию {$target}";
-materialize_n_copies_of($n, $target) = "{materialize} {$n} copies of {$target}";
-materialize_copies_equal_to_matching($target, $matching) = "{materialize} a number of copies of {$target} equal to the number of {$matching:other}";
-materialize_copies_equal_to_energy($target) = "{materialize} a number of copies of {$target} equal to the amount of {energy_symbol} spent";
-materialize_copies_equal_to_quantity($target, $quantity) = "{materialize} a number of copies of {$target} equal to the number of {$quantity}";
+materialize_n_copies_of($n, $target) = "{materialize} {copies($n)} {$target}";
+materialize_copies_equal_to_matching($target, $matching) = "{materialize} столько копий {$target}, сколько у вас {$matching:other}";
+materialize_copies_equal_to_energy($target) = "{materialize} столько копий {$target}, сколько {energy_symbol} было потрачено";
+materialize_copies_equal_to_quantity($target, $quantity) = "{materialize} столько копий {$target}, сколько у вас {$quantity}";
 
-trigger_judgment_of_collection($target) = "trigger the {Judgment} ability of {$target}";
+trigger_judgment_of_collection($target) = "срабатывает способность «{judgment}» {$target}";
 trigger_judgment_of_each($target) = :from($target) "срабатывает способность «{judgment}» каждого {$target:gen}";
 
 
-materialize_figments_for_each_quantity($fig, $quantity) = "{materialize} {$fig} for each {$quantity}";
+materialize_figments_for_each_quantity($fig, $quantity) = "{materialize} {$fig} за каждую {$quantity}";
 
 
 banish_then_materialize_it($target) = :from($target) { *one: "изгоните {$target}, затем воплотите его", inf: "изгнать {$target}, затем воплотить его" };
@@ -866,7 +884,7 @@ spark_equal_to_predicate_count($matching) = "Искра {this_character:gen} р�
 play_only_from_void = "вы можете играть этого персонажа только из вашей Пустоты";
 play_from_hand_or_void_for_cost($e) = "вы можете сыграть эту карту из руки или из Пустоты за {energy($e)}";
 cards_in_void_have_reclaim = "they have {reclaim} equal to their cost";
-cost_reduction_for_each($e, $quantity) = "{this_card} costs {energy($e)} less for each {$quantity}";
+cost_reduction_for_each($e, $quantity) = "{this_card:nom} стоит на {energy($e)} меньше за каждого {$quantity}";
 spark_bonus_your_characters($matching, $s) = :from($matching) "союзные {$matching:nom_pl} получают +{$s} к искре";
 play_from_void_for_cost($e) = "play {this_card} from your void for {energy($e)}";
 play_from_void_with_additional_cost($cost, $e) = "{$cost}: play {this_card} from your void for {energy($e)}";
