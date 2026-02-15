@@ -179,8 +179,11 @@ english = "Until end of turn, when you play a character, draw a card."
 russian = "До конца хода, когда вы играете персонажа, возьмите карту."
 
 [[tests]]
-english = "▸ Judgment: Draw a card, then discard a card."
-russian = "▸ Суд: Возьмите карту, затем сбросьте карту."
+english = "{Judgment} Draw {cards($c)}, then discard {cards($d)}."
+variables = """
+c: 1
+d: 1"""
+russian = "▸ <b>Суд:</b> Возьмите карту, затем сбросьте карту."
 
 [[tests]]
 english = "The opponent's events cost 1● more."
@@ -261,8 +264,9 @@ variables = "r: 1"
 russian = "Когда союзник рассеивается, эта карта получает Возвышение 1● до конца хода."
 
 [[tests]]
-english = "▸ Materialized, Judgment: Kindle 1."
-russian = "▸ Воплощён, Суд: Разожгите 1."
+english = "{Materialized_Judgment} {Kindle($k)}."
+variables = "k: 1"
+russian = "▸ <b>Воплощён, Суд:</b> Разожгите 1."
 
 [[tests]]
 english = "Events cost you 2● more."
@@ -461,7 +465,8 @@ english = "{Dissolve} an enemy."
 russian = "Рассеяйте врага."
 
 [[tests]]
-english = "When you abandon an ally, kindle 2."
+english = "When you abandon an ally, {kindle($k)}."
+variables = "k: 2"
 russian = "Когда вы отрекаетесь от союзника, Разожгите 2."
 
 [[tests]]
@@ -615,8 +620,11 @@ variables = "c: 1"
 russian = "Возьмите карту."
 
 [[tests]]
-english = "▸ Materialized: Draw a card, then discard a card."
-russian = "▸ Воплощён: Возьмите карту, затем сбросьте карту."
+english = "{Materialized} Draw {cards($c)}, then discard {cards($d)}."
+variables = """
+c: 1
+d: 1"""
+russian = "▸ <b>Воплощён:</b> Возьмите карту, затем сбросьте карту."
 
 [[tests]]
 english = "{reclaim_for_cost($r)}"
@@ -926,8 +934,11 @@ variables = "s: 1"
 russian = "Когда вы воплощаете персонажа, этот персонаж получает +1 к искре."
 
 [[tests]]
-english = "▸ Judgment: Draw a card, then the opponent gains 2⍏."
-russian = "▸ Суд: Возьмите карту, затем противник получает 2⍏."
+english = "{Judgment} Draw {cards($c)}, then the opponent gains {points($p)}."
+variables = """
+c: 1
+p: 2"""
+russian = "▸ <b>Суд:</b> Возьмите карту, затем противник получает 2⍏."
 
 [[tests]]
 english = "Banish your void with 8 or more cards: Reclaim this character."
