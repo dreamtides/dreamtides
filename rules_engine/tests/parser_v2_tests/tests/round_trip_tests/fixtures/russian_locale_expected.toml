@@ -69,11 +69,11 @@ english = "Abandon an ally: You may put a character from your void on top of you
 russian = "Отрекитесь от союзника: Вы можете положить персонажа из вашей Пустоты на верх вашей колоды."
 
 [[tests]]
-english = "▸ Materialized: An event in your void gains reclaim equal to its cost this turn."
-russian = "▸ Воплощён: Событие в вашей Пустоте получает Возвышение, равное его стоимости, до конца хода."
+english = "{Materialized} An event in your void gains {reclaim} equal to its cost this turn."
+russian = "▸ <b>Воплощён:</b> Событие в вашей Пустоте получает Возвышение, равное его стоимости, до конца хода."
 
 [[tests]]
-english = "When you discard a card, it gains reclaim equal to its cost this turn."
+english = "When you discard a card, it gains {reclaim} equal to its cost this turn."
 russian = "Когда вы сбрасываете карту, она получает Возвышение, равное её стоимости, до конца хода."
 
 [[tests]]
@@ -191,8 +191,9 @@ d: 1"""
 russian = "▸ <b>Суд:</b> Возьмите карту, затем сбросьте карту."
 
 [[tests]]
-english = "The opponent's events cost 1● more."
-russian = "События противника стоят на 1● больше."
+english = "The opponent's events cost {energy($e)} more."
+variables = "e: 1"
+russian = "События противника стоят на <color=#00838F>1●</color> больше."
 
 [[tests]]
 english = "When you {materialize} an allied {subtype($t)}, this character gains +{$s} spark."
@@ -280,8 +281,9 @@ variables = "k: 1"
 russian = "▸ <b>Воплощён, Суд:</b> Разожгите 1."
 
 [[tests]]
-english = "Events cost you 2● more."
-russian = "Ваши события стоят на 2● больше."
+english = "Events cost you {energy($e)} more."
+variables = "e: 2"
+russian = "Ваши события стоят на <color=#00838F>2●</color> больше."
 
 [[tests]]
 english = "When you play an event from your hand, copy it."
@@ -393,8 +395,9 @@ english = "▸ Materialized, Judgment: Banish an ally with spark 2 or less, then
 russian = "▸ Воплощён, Суд: Изгоните союзника с искрой 2 или меньше, затем воплотите его."
 
 [[tests]]
-english = "This character costs 1● if you have discarded a card this turn."
-russian = "Этот персонаж стоит 1●, если вы сбрасывали карту в этот ход."
+english = "This character costs {energy($e)} if you have discarded a card this turn."
+variables = "e: 1"
+russian = "Этот персонаж стоит <color=#00838F>1●</color> если вы сбрасывали карту в этот ход."
 
 [[tests]]
 english = "Abandon an ally: This character gains +{$s} spark."

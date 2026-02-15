@@ -311,7 +311,7 @@ when_you_materialize_nth_in_turn_trigger($n, $target) = :from($target) "when you
 
 if_character_dissolved_this_turn = "if a character dissolved this turn";
 if_card_in_your_void = "Если эта карта находится в вашей Пустоте,";
-if_discarded_this_turn($target) = :from($target) "if you have discarded {$target} this turn";
+if_discarded_this_turn($target) = :from($target) "если вы сбрасывали {$target:acc} в этот ход";
 with_predicate_condition($pred) = "with {$pred:other},";
 
 
@@ -417,8 +417,28 @@ sentence_separator = " ";
 period_suffix = ".";
 
 
-character = :masc :anim { nom: "персонаж", *acc: "персонажа", gen: "персонажа", one: "персонажа", other: "персонажей" };
-event = :neut :inan { nom: "событие", *acc: "событие", gen: "события", one: "событие", other: "событий" };
+character = :masc :anim {
+    nom: "персонаж",
+    *acc: "персонажа",
+    gen: "персонажа",
+    nom_pl: "персонажи",
+    one: "персонажа",
+    other: "персонажей",
+};
+event = :neut :inan {
+    nom: "событие",
+    nom.few: "события",
+    nom.many: "событий",
+    *acc: "событие",
+    acc.few: "события",
+    acc.many: "событий",
+    gen: "события",
+    gen.few: "событий",
+    gen.many: "событий",
+    nom_pl: "события",
+    one: "событие",
+    other: "событий",
+};
 enemy = :masc :anim { nom: "враг", *acc: "врага", gen: "врага", one: "врага", other: "врагов" };
 
 this_card = :a{ one: "this card", other: "these cards" };
@@ -635,39 +655,51 @@ this_card_gains_reclaim_equal_cost = "this card gains {reclaim} equal to its cos
 target_gains_reclaim_for_cost($target, $r) = "{$target} gains {reclaim_for_cost($r)}";
 target_gains_reclaim_equal_cost($target) = "{$target} gains {reclaim} equal to its cost";
 
-it_gains_reclaim_for_cost_this_turn($target, $r) = "it gains {reclaim_for_cost($r)} this turn";
-it_gains_reclaim_equal_cost_this_turn($target) = "it gains {reclaim} equal to its cost this turn";
+it_gains_reclaim_for_cost_this_turn($target, $r) = :from($target) :match($target) {
+    *fem: "она получает {reclaim_for_cost($r)} до конца хода",
+    neut: "оно получает {reclaim_for_cost($r)} до конца хода",
+    masc: "он получает {reclaim_for_cost($r)} до конца хода",
+};
+it_gains_reclaim_equal_cost_this_turn($target) = :from($target) :match($target) {
+    *fem: "она получает Возвышение, равное её стоимости, до конца хода",
+    neut: "оно получает Возвышение, равное его стоимости, до конца хода",
+    masc: "он получает Возвышение, равное его стоимости, до конца хода",
+};
 this_card_gains_reclaim_for_cost_this_turn($r) = "эта карта получает {reclaim_for_cost($r)} до конца хода";
-this_card_gains_reclaim_equal_cost_this_turn = "this card gains {reclaim} equal to its cost this turn";
-target_gains_reclaim_for_cost_this_turn($target, $r) = "{$target} gains {reclaim_for_cost($r)} this turn";
-target_gains_reclaim_equal_cost_this_turn($target) = "{$target} gains {reclaim} equal to its cost this turn";
+this_card_gains_reclaim_equal_cost_this_turn = "эта карта получает Возвышение, равное её стоимости, до конца хода";
+target_gains_reclaim_for_cost_this_turn($target, $r) = "{$target} получает {reclaim_for_cost($r)} до конца хода";
+target_gains_reclaim_equal_cost_this_turn($target) = :from($target) :match($target) {
+    *fem: "{$target} получает Возвышение, равное её стоимости, до конца хода",
+    neut: "{$target} получает Возвышение, равное его стоимости, до конца хода",
+    masc: "{$target} получает Возвышение, равное его стоимости, до конца хода",
+};
 
 
-void_subject_single($pred) = "{@cap $pred} in your void";
-void_subject_exactly($n, $pred) = "{$n} {$pred:other} in your void";
-void_subject_all = "all cards currently in your void";
-void_subject_all_but_one($pred) = "all but one {$pred:other} in your void";
-void_subject_up_to($n, $pred) = "up to {$n} {$pred:other} in your void";
-void_subject_any_number($pred) = "any number of {$pred:other} in your void";
-void_subject_or_more($n, $pred) = "{$n} or more {$pred:other} in your void";
-void_subject_each_other = "Each other card in your void";
+void_subject_single($pred) = "{@cap $pred:nom} в вашей Пустоте";
+void_subject_exactly($n, $pred) = "{$n} {$pred:other} в вашей Пустоте";
+void_subject_all = "все карты в вашей Пустоте";
+void_subject_all_but_one($pred) = "все {$pred:other}, кроме одного, в вашей Пустоте";
+void_subject_up_to($n, $pred) = "до {$n} {$pred:other} в вашей Пустоте";
+void_subject_any_number($pred) = "любое количество {$pred:other} в вашей Пустоте";
+void_subject_or_more($n, $pred) = "{$n} или больше {$pred:other} в вашей Пустоте";
+void_subject_each_other = "каждая другая карта в вашей Пустоте";
 
-void_gains_reclaim_for_cost_singular($subject, $r) = "{$subject} gains {reclaim_for_cost($r)}";
-void_gains_reclaim_equal_cost_singular($subject) = "{$subject} gains {reclaim} equal to its cost";
-void_gains_reclaim_for_cost_plural($subject, $r) = "{$subject} gain {reclaim_for_cost($r)}";
-void_gains_reclaim_equal_cost_plural($subject) = "{$subject} gain {reclaim} equal to their cost";
-void_gains_reclaim_for_cost_singular_this_turn($subject, $r) = "{$subject} gains {reclaim_for_cost($r)} this turn";
-void_gains_reclaim_equal_cost_singular_this_turn($subject) = "{$subject} gains {reclaim} equal to its cost this turn";
-void_gains_reclaim_for_cost_plural_this_turn($subject, $r) = "{$subject} gain {reclaim_for_cost($r)} this turn";
-void_gains_reclaim_equal_cost_plural_this_turn($subject) = "{$subject} gain {reclaim} equal to their cost this turn";
+void_gains_reclaim_for_cost_singular($subject, $r) = "{$subject} получает {reclaim_for_cost($r)}";
+void_gains_reclaim_equal_cost_singular($subject) = "{$subject} получает Возвышение, равное его стоимости";
+void_gains_reclaim_for_cost_plural($subject, $r) = "{$subject} получают {reclaim_for_cost($r)}";
+void_gains_reclaim_equal_cost_plural($subject) = "{$subject} получают Возвышение, равное их стоимости";
+void_gains_reclaim_for_cost_singular_this_turn($subject, $r) = "{$subject} получает {reclaim_for_cost($r)} до конца хода";
+void_gains_reclaim_equal_cost_singular_this_turn($subject) = "{$subject} получает Возвышение, равное его стоимости, до конца хода";
+void_gains_reclaim_for_cost_plural_this_turn($subject, $r) = "{$subject} получают {reclaim_for_cost($r)} до конца хода";
+void_gains_reclaim_equal_cost_plural_this_turn($subject) = "{$subject} получают Возвышение, равное их стоимости, до конца хода";
 
 
-your_cards_cost_increase($matching, $e) = "{$matching:other} cost you {energy($e)} more";
-your_cards_cost_reduction($matching, $e) = "{$matching:other} cost you {energy($e)} less";
-enemy_cards_cost_increase($matching, $e) = "the opponent's {$matching:other} cost {energy($e)} more";
+your_cards_cost_increase($matching, $e) = "Ваши {$matching:nom_pl} стоят на {energy($e)} больше";
+your_cards_cost_reduction($matching, $e) = "Ваши {$matching:nom_pl} стоят на {energy($e)} меньше";
+enemy_cards_cost_increase($matching, $e) = "{$matching:nom_pl} противника стоят на {energy($e)} больше";
 spark_bonus_other_characters($matching, $s) = :from($matching) "Союзные {$matching:nom_pl} получают +{$s} к искре";
 additional_cost_to_play($cost) = "To play {this_card}, {$cost}";
-play_for_alternate_cost_simple($card_type, $e) = "{$card_type} costs {energy($e)}";
+play_for_alternate_cost_simple($card_type, $e) = "{$card_type:nom} стоит {energy($e)}";
 play_for_alternate_cost_with_additional($cost, $card_type, $e) = "{$cost}: Play {$card_type} for {energy($e)}";
 play_for_alternate_cost_abandon($cost, $card_type, $e) = "{$cost}: Play {$card_type} for {energy($e)}, then abandon it";
 characters_in_hand_have_fast = "characters in your hand have {fast}";
