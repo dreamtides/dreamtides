@@ -338,7 +338,7 @@ opponent_gains_points_effect($p) = "противник получает {$p}⍏"
 opponent_loses_points_effect($p) = "the opponent loses {points($p)}";
 foresee_effect($f) = "{foresee($f)}";
 kindle_effect($k) = "{kindle($k)}";
-each_player_discards_effect($d) = "each player discards {cards($d)}";
+each_player_discards_effect($d) = "каждый игрок сбрасывает {cards($d)}";
 prevent_that_card_effect = "{prevent} that card";
 then_materialize_it_effect($target) = "затем воплотите его";
 gain_twice_energy_instead_effect = "gain twice that much {energy_symbol} instead";
@@ -356,8 +356,14 @@ return_up_to_events_from_void_effect($n) = "return {up_to_n_events($n)} from you
 fast_prefix = "{Fast} -- ";
 
 
-discard_chosen_from_enemy_hand($target) = "discard a chosen {$target} from the opponent's hand";
-discard_chosen_from_enemy_hand_then_draw($target) = "discard a chosen {$target} from the opponent's hand. They draw {cards(1)}";
+discard_chosen_from_enemy_hand($target) = :from($target) :match($target) {
+    *anim: "сбросьте выбранного {$target} из руки противника",
+    inan: "сбросьте выбранную {$target} из руки противника",
+};
+discard_chosen_from_enemy_hand_then_draw($target) = :from($target) :match($target) {
+    *anim: "сбросьте выбранного {$target} из руки противника. Затем противник берёт {cards(1)}",
+    inan: "сбросьте выбранную {$target} из руки противника. Затем противник берёт {cards(1)}",
+};
 put_from_void_on_top_of_deck($target) = "put {$target} from your void on top of your deck";
 put_up_to_from_void_on_top_of_deck($n, $target) = "put up to {cards($n)} {$target} from your void on top of your deck";
 materialize_random_from_deck($n, $constraint) = "{materialize} {n_random_characters($n)} {$constraint} from your deck";
@@ -382,7 +388,11 @@ return_ally_to_hand = { *one: "верните союзника в руку", inf
 return_from_void_to_hand($target) = :from($target) { *one: "верните {$target} из вашей Пустоты в руку", inf: "вернуть {$target} из вашей Пустоты в руку" };
 reclaim_target($target) = :from($target) "{reclaim} {$target:acc}";
 reclaim_random($target) = "{reclaim} a random {$target}";
-put_on_top_of_enemy_deck($target) = "put {$target} on top of the opponent's deck";
+put_on_top_of_enemy_deck($target) = :from($target) :match($target) {
+    *fem: "положите её на верх колоды противника",
+    masc: "положите его на верх колоды противника",
+    neut: "положите его на верх колоды противника",
+};
 copy_target($target) = "copy {$target}";
 disable_activated_abilities($target) = "disable the activated abilities of {$target} while this character is in play";
 draw_matching_from_deck($target) = "draw {$target} from your deck";
@@ -522,8 +532,8 @@ with_activated_ability_constraint = "with an activated ability";
 with_activated_abilities_constraint = "with activated abilities";
 with_spark_less_than_energy_paid_constraint =
     "with spark less than the amount of {energy_symbol} paid";
-with_cost_less_than_allied_count($target) =
-    "with cost less than the number of allied {$target:other}";
+with_cost_less_than_allied_count($target) = :from($target)
+    "стоимостью меньше количества союзных {$target:other}";
 with_cost_less_than_abandoned_ally_constraint =
     "with cost less than the abandoned ally's cost";
 with_spark_less_than_abandoned_ally_constraint =
@@ -531,7 +541,7 @@ with_spark_less_than_abandoned_ally_constraint =
 with_spark_less_than_abandoned_count_this_turn_constraint =
     "with spark less than the number of allies abandoned this turn";
 with_cost_less_than_void_count_constraint =
-    "with cost less than the number of cards in your void";
+    "стоимостью меньше количества карт в вашей Пустоте";
 with_spark_less_than_that_ally_constraint =
     "with spark less than that ally's spark";
 
@@ -547,15 +557,23 @@ character_not_subtype($s) = :a "character that is not {@a subtype($s)}";
 character_not_subtype_plural($s) = "characters that are not {subtype($s):other}";
 ally_not_subtype($s) = :an "ally that is not {@a subtype($s)}";
 ally_not_subtype_plural($s) = "allies that are not {subtype($s):other}";
-non_subtype_enemy($s) = :a "non-{subtype($s)} enemy";
-non_subtype_enemy_plural($s) = "non-{subtype($s):other} enemies";
+non_subtype_enemy($s) = :from($s) :match($s) {
+    *masc: "врага, который не является {subtype($s):ins}",
+    fem: "врага, который не является {subtype($s):ins}",
+    neut: "врага, который не является {subtype($s):ins}",
+};
+non_subtype_enemy_plural($s) = :from($s) :match($s) {
+    *masc: "врагов, которые не являются {subtype($s):ins}",
+    fem: "врагов, которые не являются {subtype($s):ins}",
+    neut: "врагов, которые не являются {subtype($s):ins}",
+};
 
 
-for_each_ally = "ally";
-for_each_allied_character = "allied character";
-for_each_enemy = "enemy";
-for_each_character = "character";
-for_each_card = "card";
+for_each_ally = :masc :anim { nom: "союзник", *gen: "союзника" };
+for_each_allied_character = :masc :anim { nom: "союзный персонаж", *gen: "союзного персонажа" };
+for_each_enemy = :masc :anim { nom: "враг", *gen: "врага" };
+for_each_character = :masc :anim { nom: "персонаж", *gen: "персонажа" };
+for_each_card = :fem :inan { nom: "карта", *gen: "карту" };
 for_each_card_in_your_void = "card in your void";
 for_each_this_character = "this character";
 for_each_that_character = "that character";
@@ -567,7 +585,7 @@ for_each_event_in_your_void = "event in your void";
 for_each_card_in_enemy_void = "card in the opponent's void";
 for_each_character_in_enemy_void = "character in the opponent's void";
 for_each_event_in_enemy_void = "event in the opponent's void";
-for_each_allied_subtype($t) = :from($t) "союзного {subtype($t)}";
+for_each_allied_subtype($t) = :from($t) { nom: "союзный {subtype($t):nom}", *gen: "союзного {subtype($t)}" };
 for_each_enemy_subtype($t) = :from($t) "enemy {subtype($t)}";
 for_each_subtype($t) = :from($t) "{subtype($t)}";
 for_each_other_subtype($t) = :from($t) "other {subtype($t)}";
@@ -576,7 +594,7 @@ for_each_ally_with_spark($s, $op) = "ally with spark {$s}{$op}";
 for_each_predicate($target) = :from($target) "each {$target}";
 
 
-ally_abandoned_this_turn = "ally abandoned this turn";
+ally_abandoned_this_turn = :masc :anim { nom: "союзник, от которого вы отреклись в этот ход", *gen: "союзника, от которого вы отреклись в этот ход" };
 allied_subtype_abandoned_this_turn($t) = :from($t) "allied {subtype($t)} abandoned this turn";
 ally_abandoned = "ally abandoned";
 allied_subtype_abandoned($t) = :from($t) "allied {subtype($t)} abandoned";
@@ -584,7 +602,7 @@ ally_returned = "ally returned";
 allied_subtype_returned($t) = :from($t) "allied {subtype($t)} returned";
 card_predicate_returned($base) = :from($base) "{$base} returned";
 energy_spent = "{energy_symbol} spent";
-card_predicate_played_this_turn($base) = :from($base) "{$base} you have played this turn";
+card_predicate_played_this_turn($base) = :from($base) { nom: "{$base:nom}, которую вы сыграли в этот ход", *gen: "{$base:gen}, которую вы сыграли в этот ход" };
 card_predicate_drawn_this_turn($base) = :from($base) "{$base} you have drawn this turn";
 card_predicate_discarded_this_turn($base) = :from($base) "{$base} you have discarded this turn";
 card_predicate_dissolved_this_turn($base) = :from($base) "{$base} which dissolved this turn";
@@ -592,9 +610,9 @@ card_predicate_abandoned_this_turn($base) = :from($base) "{$base} abandoned this
 card_predicate_abandoned($base) = :from($base) "{$base} abandoned";
 
 
-draw_cards_for_each($c, $target) = "draw {cards($c)} for each {$target}";
-gain_energy_for_each($e, $target) = "gain {energy($e)} for each {$target}";
-gain_points_for_each($p, $target) = "gain {points($p)} for each {$target}";
+draw_cards_for_each($c, $target) = :from($target) :match($target) { *anim: "возьмите {cards($c)} за каждого {$target:gen}", inan: "возьмите {cards($c)} за каждую {$target:gen}" };
+gain_energy_for_each($e, $target) = :from($target) :match($target) { *anim: "получите {energy($e)} за каждого {$target:gen}", inan: "получите {energy($e)} за каждую {$target:gen}" };
+gain_points_for_each($p, $target) = :from($target) :match($target) { *anim: "получите {points($p)} за каждого {$target:gen}", inan: "получите {points($p)} за каждую {$target:gen}" };
 gains_spark_for_each($target, $s, $quantity) = :from($target) "{$target:nom} получает +{$s} к искре за каждого {$quantity}";
 gains_spark_until_next_main_for_each($target, $s, $for_each) = "{$target} gains +{$s} spark until your next main phase for each {$for_each}";
 each_gains_spark_equal_to($each, $count_of) = :from($each) "каждый {$each:nom} получает искру, равную количеству {$count_of:other}";
