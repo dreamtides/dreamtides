@@ -389,7 +389,7 @@ abandon_at_end_of_turn($target) = "abandon {$target} at end of turn";
 each_player_abandons($target) = "each player abandons {$target}";
 prevent_dissolve_this_turn($target) = "{$target} cannot be {dissolved} this turn";
 prevent_played_target($target) = :from($target) "отмените розыгрыш {$target:gen}";
-prevent_unless_pays($target, $cost) = "{prevent} a played {$target} unless the opponent pays {$cost}";
+prevent_unless_pays($target, $cost) = :from($target) "отмените розыгрыш {$target:gen}, если только противник не заплатит {$cost}";
 gain_energy_equal_to_cost($target) = "gain {energy_symbol} equal to {$target}'s cost";
 gains_spark($target, $s) = :from($target) "{$target:nom} получает +{$s} к искре";
 opponent_pays_cost($cost) = "the opponent pays {$cost}";
@@ -472,18 +472,27 @@ with_cost_constraint($op, $val) = "стоимостью {energy($val)}{$op}";
 with_spark_constraint($op, $val) = "с искрой {$val}{$op}";
 pred_with_constraint($base, $constraint) = :from($base) {
     *one: "{$base} {$constraint}",
+    gen: "{$base:gen} {$constraint}",
     other: "{$base:other} {$constraint}",
 };
 non_subtype($s) = :from($s) {
     *one: "non-{$s}",
     other: "non-{$s:other}",
 };
-could_dissolve_target($target) = :an "event which could {dissolve} {$target}";
-could_dissolve_target_plural($target) = "events which could {dissolve} {$target}";
-your_event_could_dissolve($target) = "your event which could {dissolve} {$target}";
-your_event_could_dissolve_plural($target) = "your events which could {dissolve} {$target}";
-fast_predicate($target) = :a "{fast} {$target}";
-fast_predicate_plural($target) = "{fast} {$target}";
+could_dissolve_target($target) = :from($target) {
+    nom: "событие, которое может рассеять {$target}",
+    *acc: "событие, которое может рассеять {$target}",
+    gen: "события, которое может рассеять {$target}",
+};
+could_dissolve_target_plural($target) = "события, которые могут рассеять {$target}";
+your_event_could_dissolve($target) = "ваше событие, которое может рассеять {$target}";
+your_event_could_dissolve_plural($target) = "ваши события, которые могут рассеять {$target}";
+fast_predicate($target) = :from($target) {
+    nom: "{$target:nom} с ↯Стремительностью",
+    *acc: "{$target:acc} с ↯Стремительностью",
+    gen: "{$target:gen} с ↯Стремительностью",
+};
+fast_predicate_plural($target) = :from($target) "{$target} с ↯Стремительностью";
 with_materialized_ability_constraint = "со способностью «▸ Воплощён:»";
 with_materialized_abilities_constraint = "with {materialized} abilities";
 with_activated_ability_constraint = "with an activated ability";

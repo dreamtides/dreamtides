@@ -199,7 +199,7 @@ english = "▸ Materialized: Gain control of an enemy with cost 2● or less."
 russian = "▸ Воплощён: Получите контроль над врагом стоимостью 2● или меньше."
 
 [[tests]]
-english = "Prevent a played character."
+english = "{Prevent} a played character."
 russian = "Отмените розыгрыш персонажа."
 
 [[tests]]
@@ -440,7 +440,7 @@ variables = "s: 1"
 russian = "Когда вы отрекаетесь от союзника, этот персонаж получает +1 к искре."
 
 [[tests]]
-english = "↯fast -- Abandon this character: Prevent a played event."
+english = "{Fast} -- Abandon this character: {Prevent} a played event."
 russian = "↯Стремительность — Отрекитесь от этого персонажа: Отмените розыгрыш события."
 
 [[tests]]
@@ -541,7 +541,7 @@ english = "Discard a chosen character from the opponent's hand."
 russian = "Сбросьте выбранного персонажа из руки противника."
 
 [[tests]]
-english = "Prevent a played ↯fast card."
+english = "{Prevent} a played {fast} card."
 russian = "Отмените розыгрыш карты с ↯Стремительностью."
 
 [[tests]]
@@ -732,12 +732,13 @@ english = "▸ Materialized: Banish an enemy until your next main phase."
 russian = "▸ Воплощён: Изгоните врага до вашей следующей главной фазы."
 
 [[tests]]
-english = "Prevent a played card. Put it on top of the opponent's deck."
+english = "{Prevent} a played card. Put it on top of the opponent's deck."
 russian = "Отмените розыгрыш карты. Положите её на верх колоды противника."
 
 [[tests]]
-english = "Prevent a played event unless the opponent pays 2●."
-russian = "Отмените розыгрыш события, если только противник не заплатит 2●."
+english = "{Prevent} a played event unless the opponent pays {energy($e)}."
+variables = "e: 2"
+russian = "Отмените розыгрыш события, если только противник не заплатит <color=#00838F>2●</color>."
 
 [[tests]]
 english = "Discover a character with an activated ability."
@@ -961,8 +962,9 @@ english = "▸ Judgment: Draw a card."
 russian = "▸ Суд: Возьмите карту."
 
 [[tests]]
-english = "▸ Materialized: Prevent a played card with cost 2● or less."
-russian = "▸ Воплощён: Отмените розыгрыш карты стоимостью 2● или меньше."
+english = "{Materialized} {Prevent} a played card with cost {energy($e)} or less."
+variables = "e: 2"
+russian = "▸ <b>Воплощён:</b> Отмените розыгрыш карты стоимостью <color=#00838F>2●</color> или меньше."
 
 [[tests]]
 english = "{Discover} {@a subtype($t)}."
@@ -979,7 +981,7 @@ english = "When you play 2 cards in a turn, reclaim this character."
 russian = "Когда вы играете 2 карты за ход, возвысьте этого персонажа."
 
 [[tests]]
-english = "Prevent a played event which could dissolve an ally."
+english = "{Prevent} a played event which could {dissolve} an ally."
 russian = "Отмените розыгрыш события, которое может рассеять союзника."
 
 [[tests]]
@@ -1035,7 +1037,7 @@ english = "At the end of your turn, gain 2●."
 russian = "В конце вашего хода получите 2●."
 
 [[tests]]
-english = "When the opponent plays an event which could dissolve an ally, prevent that card."
+english = "When the opponent plays an event which could {dissolve} an ally, {prevent} that card."
 russian = "Когда противник играет событие, которое может рассеять союзника, отмените розыгрыш этой карты."
 
 [[tests]]
