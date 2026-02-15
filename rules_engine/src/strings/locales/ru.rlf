@@ -45,7 +45,7 @@ choose_one = "<b>Выберите одно:</b>";
 bullet = "•";
 
 
-card = :fem :inan { nom: "карта", *acc: "карту", gen: "карты", one: "карту", other: "карт" };
+card = :fem :inan { nom: "карта", *acc: "карту", gen: "карты", one: "карту", few: "карты", many: "карт", other: "карт" };
 cards($n) = :match($n) {
     1: "карту",
     few: "{$n} карты",
@@ -107,19 +107,21 @@ musician = :a{ one: "Musician", other: "Musicians" };
 outsider = :an{ one: "Outsider", other: "Outsiders" };
 renegade = :a{ one: "Renegade", other: "Renegades" };
 robot = :a{ one: "Robot", other: "Robots" };
-spirit_animal = :masc :anim { nom: "Дух-Зверь", *acc: "Духа-Зверя", gen: "Духа-Зверя", nom_pl: "Духи-Звери", nom.few: "Духа-Зверя", gen.few: "Духов-Зверей", one: "Духа-Зверя", other: "Духов-Зверей" };
+spirit_animal = :masc :anim { nom: "Дух-Зверь", *acc: "Духа-Зверя", gen: "Духа-Зверя", ins: "Духом-Зверем", inf: "Духа-Зверя", nom_pl: "Духи-Звери", nom.few: "Духа-Зверя", gen.few: "Духов-Зверей", one: "Духа-Зверя", other: "Духов-Зверей" };
 super_ = :a{ one: "Super", other: "Supers" };
-survivor = :masc :anim { nom: "Выживший", *acc: "Выжившего", gen: "Выжившего", nom_pl: "Выжившие", nom.few: "Выживших", one: "Выжившего", other: "Выживших" };
+survivor = :masc :anim { nom: "Выживший", *acc: "Выжившего", gen: "Выжившего", ins: "Выжившим", inf: "Выжившего", nom_pl: "Выжившие", nom.few: "Выживших", one: "Выжившего", other: "Выживших" };
 synth = :a{ one: "Synth", other: "Synths" };
 tinkerer = :a{ one: "Tinkerer", other: "Tinkerers" };
 trooper = :a{ one: "Trooper", other: "Troopers" };
 visionary = :a{ one: "Visionary", other: "Visionaries" };
 visitor = :a{ one: "Visitor", other: "Visitors" };
-warrior = :masc :anim { nom: "Воин", *acc: "Воина", gen: "Воина", nom_pl: "Воины", one: "Воина", other: "Воинов" };
+warrior = :masc :anim { nom: "Воин", *acc: "Воина", gen: "Воина", ins: "Воином", inf: "Воина", nom_pl: "Воины", one: "Воина", other: "Воинов" };
 
 subtype($s) = :from($s) {
     nom: "<color=#2E7D32><b>{$s:nom}</b></color>",
     *one: "<color=#2E7D32><b>{$s}</b></color>",
+    ins: "<color=#2E7D32><b>{$s:ins}</b></color>",
+    inf: "<color=#2E7D32><b>{$s:inf}</b></color>",
     nom_pl: "<color=#2E7D32><b>{$s:nom_pl}</b></color>",
     other: "<color=#2E7D32><b>{$s:other}</b></color>",
 };
@@ -387,7 +389,7 @@ discard_chosen_from_enemy_hand_then_draw($target) = :from($target) :match($targe
     *anim: "сбросьте выбранного {$target} из руки противника. Затем противник берёт {cards(1)}",
     inan: "сбросьте выбранную {$target} из руки противника. Затем противник берёт {cards(1)}",
 };
-put_from_void_on_top_of_deck($target) = :from($target) { *one: "положите {$target} из вашей Пустоты на верх вашей колоды", inf: "положить {$target} из вашей Пустоты на верх вашей колоды" };
+put_from_void_on_top_of_deck($target) = :from($target) { *one: "положите {$target} из вашей Пустоты на верх вашей колоды", inf: "положить {$target:inf} из вашей Пустоты на верх вашей колоды" };
 put_up_to_from_void_on_top_of_deck($n, $target) = "put up to {cards($n)} {$target} from your void on top of your deck";
 materialize_random_from_deck($n, $constraint) = "воплотите {n_random_characters($n)} {$constraint} из вашей колоды";
 copy_next_played($target, $times) = :from($target) :match($target) {
@@ -397,14 +399,14 @@ copy_next_played($target, $times) = :from($target) :match($target) {
 };
 create_trigger_until_end_of_turn_keyword($trig, $eff) = "До конца хода, {$trig} {@cap $eff}";
 create_trigger_until_end_of_turn($trig, $eff) = "До конца хода, {$trig}{$eff}";
-dissolve_target($target) = :from($target) "рассеяйте {$target}";
+dissolve_target($target) = :from($target) { *one: "рассеяйте {$target}", inf: "рассеять {$target:inf}" };
 banish_target($target) = :from($target) "изгоните {$target}";
 banish_until_leaves($target, $until) = :from($target) "изгоните {$target:acc}, пока {$until:nom} не покинет игру";
 banish_until_next_main($target) = :from($target) "изгоните {$target:acc} до вашей следующей главной фазы";
 banish_when_leaves_play($target) = :from($target) "{banish} {$target} when it leaves play";
 gain_control_of($target) = :from($target) "получите контроль над {$target:ins}";
 discover_target($target) = :from($target) { *one: "Откройте {$target}", inf: "открыть {$target}" };
-discover_and_materialize($target) = :from($target) { *one: "Откройте {$target} и воплотите его", inf: "открыть {$target} и воплотить его" };
+discover_and_materialize($target) = :from($target) { *one: "Откройте {$target} и воплотите его", inf: "открыть {$target:inf} и воплотить его" };
 materialize_target($target) = :from($target) :match($target) {
     *masc.anim: "воплотите {$target:acc}",
     fem.anim: "воплотите {$target:acc}",
@@ -417,7 +419,7 @@ return_to_hand($target) = :from($target) { *one: "верните {$target} в р
 return_this_to_hand = { *one: "верните этого персонажа в руку", inf: "вернуть этого персонажа в руку" };
 return_any_character_to_hand = { *one: "верните врага или союзника в руку", inf: "вернуть врага или союзника в руку" };
 return_ally_to_hand = { *one: "верните союзника в руку", inf: "вернуть союзника в руку" };
-return_from_void_to_hand($target) = :from($target) { *one: "верните {$target} из вашей Пустоты в руку", inf: "вернуть {$target} из вашей Пустоты в руку" };
+return_from_void_to_hand($target) = :from($target) { *one: "верните {$target} из вашей Пустоты в руку", inf: "вернуть {$target:inf} из вашей Пустоты в руку" };
 reclaim_target($target) = :from($target) "возвысьте {$target:acc}";
 reclaim_random($target) = :from($target) :match($target) {
     *masc.anim: "возвысьте случайного {$target:acc}",
@@ -469,6 +471,7 @@ character = :masc :anim {
     *acc: "персонажа",
     gen: "персонажа",
     ins: "персонажем",
+    inf: "персонажа",
     nom_pl: "персонажи",
     one: "персонажа",
     other: "персонажей",
@@ -492,10 +495,10 @@ event = :neut :inan {
     many: "событий",
     other: "событий",
 };
-enemy = :masc :anim { nom: "враг", *acc: "врага", gen: "врага", ins: "врагом", one: "врага", other: "врагов" };
+enemy = :masc :anim { nom: "враг", *acc: "врага", gen: "врага", ins: "врагом", inf: "врага", one: "врага", other: "врагов" };
 
 this_card = :fem :inan { nom: "эта карта", *acc: "эту карту", gen: "этой карты", one: "эту карту", other: "эти карты" };
-this_character = :masc :anim { nom: "этот персонаж", *acc: "этого персонажа", gen: "этого персонажа", ins: "этим персонажем", one: "этого персонажа", other: "этих персонажей" };
+this_character = :masc :anim { nom: "этот персонаж", *acc: "этого персонажа", gen: "этого персонажа", ins: "этим персонажем", inf: "этого персонажа", one: "этого персонажа", other: "этих персонажей" };
 this_event = :neut :inan { nom: "это событие", *acc: "это событие", gen: "этого события", one: "это событие", other: "эти события" };
 that_character = :masc :anim { nom: "этот персонаж", *acc: "этого персонажа", gen: "этого персонажа", ins: "этим персонажем", one: "этого персонажа", other: "этих персонажей" };
 pronoun_it = {
@@ -566,6 +569,7 @@ with_spark_constraint($op, $val) = "с искрой {$val}{$op}";
 pred_with_constraint($base, $constraint) = :from($base) {
     *one: "{$base} {$constraint}",
     gen: "{$base:gen} {$constraint}",
+    inf: "{$base:inf} {$constraint}",
     other: "{$base:other} {$constraint}",
 };
 non_subtype($s) = :from($s) {
@@ -602,7 +606,7 @@ with_spark_less_than_that_ally_constraint =
     "с искрой меньше искры этого союзника";
 
 
-allied_subtype($t) = :from($t) { nom: "союзный {subtype($t):nom}", *acc: "союзного {subtype($t)}", gen: "союзного {subtype($t)}", nom_pl: "союзные {subtype($t):nom_pl}", other: "союзных {subtype($t):other}" };
+allied_subtype($t) = :from($t) { nom: "союзный {subtype($t):nom}", *acc: "союзного {subtype($t)}", gen: "союзного {subtype($t)}", ins: "союзным {subtype($t):ins}", inf: "союзного {subtype($t):inf}", nom_pl: "союзные {subtype($t):nom_pl}", other: "союзных {subtype($t):other}" };
 allied_subtype_plural($t) = "союзных {subtype($t):other}";
 enemy_subtype($t) = :an "enemy {subtype($t)}";
 enemy_subtype_plural($t) = "enemy {subtype($t):other}";

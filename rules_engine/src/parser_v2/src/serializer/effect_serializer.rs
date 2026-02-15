@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use ability_data::collection_expression::CollectionExpression;
 use ability_data::effect::{Effect, EffectWithOptions};
 use ability_data::predicate::{CardPredicate, Predicate};
@@ -5,7 +7,7 @@ use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use ability_data::trigger_event::TriggerEvent;
 use core_data::numerics::Energy;
-use rlf::Phrase;
+use rlf::{Phrase, VariantKey};
 use strings::strings;
 
 use crate::serializer::{
@@ -406,7 +408,7 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
             let and_join = strings::and_joiner().to_string();
             let then_join = strings::then_joiner().to_string();
             let body = if all_optional && all_have_trigger_cost && !effects.is_empty() {
-                let joined = join_effect_fragments(effects, &and_join);
+                let joined = join_effect_phrases(effects, &and_join);
                 let cost_str =
                     effects[0].trigger_cost.as_ref().map(cost_serializer::serialize_trigger_cost);
                 match cost_str {
@@ -414,18 +416,18 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
                     None => strings::optional_effect_body(joined),
                 }
             } else if !all_optional && all_have_trigger_cost && !effects.is_empty() {
-                let joined = join_effect_fragments(effects, &and_join);
+                let joined = join_effect_phrases(effects, &and_join);
                 let cost_str =
                     effects[0].trigger_cost.as_ref().map(cost_serializer::serialize_trigger_cost);
                 match cost_str {
                     Some(cost) => strings::cost_effect_body(cost, joined),
-                    None => Phrase::builder().text(joined).build(),
+                    None => joined,
                 }
             } else if all_optional && !effects.is_empty() {
-                let joined = join_effect_fragments(effects, &then_join);
+                let joined = join_effect_phrases(effects, &then_join);
                 strings::optional_effect_body(joined)
             } else if context == AbilityContext::Triggered {
-                Phrase::builder().text(join_effect_fragments(effects, &then_join)).build()
+                join_effect_phrases(effects, &then_join)
             } else {
                 let separator = strings::sentence_separator().to_string();
                 let sentences: Vec<String> = effects
@@ -450,39 +452,43 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
             let all_effects_optional =
                 list_with_options.effects.iter().all(|e| e.optional && e.trigger_cost.is_none());
             let is_optional_with_shared_cost = has_shared_trigger_cost && all_effects_optional;
-            let effect_strings: Vec<String> = list_with_options
-                .effects
-                .iter()
-                .map(|e| {
-                    let effect_text = serialize_standard_effect(&e.effect).to_string();
-                    let with_condition = if let Some(condition) = &e.condition {
-                        strings::per_effect_condition(
-                            condition_serializer::serialize_condition(condition),
-                            effect_text,
-                        )
-                        .to_string()
-                    } else {
-                        effect_text
-                    };
-                    let with_cost = if let Some(trigger_cost) = &e.trigger_cost {
-                        let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
-                        strings::per_effect_cost(cost_str, with_condition).to_string()
-                    } else {
-                        with_condition
-                    };
-                    if e.optional && !is_optional_with_shared_cost {
-                        strings::per_effect_optional(with_cost).to_string()
-                    } else {
-                        with_cost
+            let inf_key = VariantKey::new("inf");
+            let mut effect_strings = Vec::new();
+            let mut inf_strings = Vec::new();
+            for e in &list_with_options.effects {
+                let effect_phrase = serialize_standard_effect(&e.effect);
+                let effect_inf = effect_phrase.variants.get(&inf_key).cloned();
+                let effect_text = effect_phrase.to_string();
+                let with_condition = if let Some(condition) = &e.condition {
+                    strings::per_effect_condition(
+                        condition_serializer::serialize_condition(condition),
+                        effect_text,
+                    )
+                    .to_string()
+                } else {
+                    effect_text
+                };
+                let with_cost = if let Some(trigger_cost) = &e.trigger_cost {
+                    let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
+                    strings::per_effect_cost(cost_str, with_condition).to_string()
+                } else {
+                    with_condition
+                };
+                if e.optional && !is_optional_with_shared_cost {
+                    effect_strings.push(strings::per_effect_optional(with_cost).to_string());
+                } else {
+                    effect_strings.push(with_cost);
+                    if let Some(inf) = effect_inf {
+                        inf_strings.push(inf);
                     }
-                })
-                .collect();
+                }
+            }
             let joiner = if has_shared_trigger_cost {
                 strings::and_joiner().to_string()
             } else {
                 strings::then_joiner().to_string()
             };
-            let joined = effect_strings.join(&joiner);
+            let joined = join_string_phrases_with_inf(&effect_strings, &inf_strings, &joiner);
             let body = if is_optional_with_shared_cost {
                 match &list_with_options.trigger_cost {
                     Some(trigger_cost) => {
@@ -495,7 +501,7 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
                 let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
                 strings::cost_effect_body(cost_str, joined)
             } else {
-                Phrase::builder().text(joined).build()
+                joined
             };
             let with_period = strings::effect_with_period(body);
             if let Some(condition) = &list_with_options.condition {
@@ -614,11 +620,39 @@ fn serialize_allied_card_predicate(card_predicate: &CardPredicate) -> Phrase {
 }
 
 /// Joins serialized effect fragments from an effect list using the given
-/// joiner string.
-fn join_effect_fragments(effects: &[EffectWithOptions], joiner: &str) -> String {
-    let effect_strings: Vec<String> =
-        effects.iter().map(|e| serialize_standard_effect(&e.effect).to_string()).collect();
-    effect_strings.join(joiner)
+/// joiner string, preserving the `inf` variant when all fragments have one.
+fn join_effect_phrases(effects: &[EffectWithOptions], joiner: &str) -> Phrase {
+    let phrases: Vec<Phrase> =
+        effects.iter().map(|e| serialize_standard_effect(&e.effect)).collect();
+    join_phrases_with_inf(&phrases, joiner)
+}
+
+/// Builds a [Phrase] from pre-serialized effect strings, preserving the
+/// `inf` variant when all fragments have one.
+fn join_string_phrases_with_inf(
+    effect_strings: &[String],
+    inf_strings: &[String],
+    joiner: &str,
+) -> Phrase {
+    let default_text = effect_strings.join(joiner);
+    if inf_strings.len() == effect_strings.len() && !inf_strings.is_empty() {
+        let inf_text = inf_strings.join(joiner);
+        let mut variants = HashMap::new();
+        variants.insert(VariantKey::new("inf"), inf_text);
+        Phrase::builder().text(default_text).variants(variants).build()
+    } else {
+        Phrase::builder().text(default_text).build()
+    }
+}
+
+/// Joins a slice of [Phrase] values with a joiner, producing a result
+/// [Phrase] that carries an `inf` variant when every input phrase has one.
+fn join_phrases_with_inf(phrases: &[Phrase], joiner: &str) -> Phrase {
+    let inf_key = VariantKey::new("inf");
+    let default_strings: Vec<String> = phrases.iter().map(|p| p.text.clone()).collect();
+    let inf_strings: Vec<String> =
+        phrases.iter().filter_map(|p| p.variants.get(&inf_key).cloned()).collect();
+    join_string_phrases_with_inf(&default_strings, &inf_strings, joiner)
 }
 
 /// Prepends a condition from the first effect in a list, if present.
