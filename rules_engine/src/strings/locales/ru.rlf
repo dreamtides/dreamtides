@@ -29,7 +29,7 @@ banish = "<color=#AA00FF>banish</color>";
 banished = "<color=#AA00FF>banished</color>";
 discover = "<color=#AA00FF>Откройте</color>";
 discovered = "<color=#AA00FF>discovered</color>";
-reclaim = "<color=#AA00FF>reclaim</color>";
+reclaim = "<color=#AA00FF>возвысьте</color>";
 reclaimed = "<color=#AA00FF>reclaimed</color>";
 materialize = "<color=#AA00FF>воплотите</color>";
 prevent = "<color=#AA00FF>prevent</color>";
@@ -108,7 +108,7 @@ renegade = :a{ one: "Renegade", other: "Renegades" };
 robot = :a{ one: "Robot", other: "Robots" };
 spirit_animal = :masc :anim { nom: "Дух-Зверь", *acc: "Духа-Зверя", gen: "Духа-Зверя", nom_pl: "Духи-Звери", nom.few: "Духа-Зверя", gen.few: "Духов-Зверей", one: "Духа-Зверя", other: "Духов-Зверей" };
 super_ = :a{ one: "Super", other: "Supers" };
-survivor = :masc :anim { nom: "Выживший", *acc: "Выжившего", gen: "Выжившего", nom_pl: "Выжившие", one: "Выжившего", other: "Выживших" };
+survivor = :masc :anim { nom: "Выживший", *acc: "Выжившего", gen: "Выжившего", nom_pl: "Выжившие", nom.few: "Выживших", one: "Выжившего", other: "Выживших" };
 synth = :a{ one: "Synth", other: "Synths" };
 tinkerer = :a{ one: "Tinkerer", other: "Tinkerers" };
 trooper = :a{ one: "Trooper", other: "Troopers" };
@@ -310,7 +310,7 @@ when_you_materialize_nth_in_turn_trigger($n, $target) = :from($target) "when you
 
 
 if_character_dissolved_this_turn = "if a character dissolved this turn";
-if_card_in_your_void = "if this card is in your void,";
+if_card_in_your_void = "Если эта карта находится в вашей Пустоте,";
 if_discarded_this_turn($target) = :from($target) "if you have discarded {$target} this turn";
 with_predicate_condition($pred) = "with {$pred:other},";
 
@@ -319,7 +319,7 @@ with_allies_sharing_type($a) = "with {count_allies($a)} that share a character t
 if_drawn_count_this_turn($n) = "if you have drawn {count($n)} or more cards this turn";
 while_void_count($n) = "while you have {count($n)} or more cards in your void,";
 with_allied_subtype($t) = "with an allied {subtype($t)},";
-with_count_allied_subtype($a, $t) = "{count_allied_subtype($a, $t)}";
+with_count_allied_subtype($a, $t) = "Если у вас есть {count_allied_subtype($a, $t)},";
 with_count_allies($a) = "{count_allies($a)}";
 
 
@@ -380,7 +380,7 @@ return_this_to_hand = { *one: "верните этого персонажа в �
 return_any_character_to_hand = { *one: "верните врага или союзника в руку", inf: "вернуть врага или союзника в руку" };
 return_ally_to_hand = { *one: "верните союзника в руку", inf: "вернуть союзника в руку" };
 return_from_void_to_hand($target) = :from($target) { *one: "верните {$target} из вашей Пустоты в руку", inf: "вернуть {$target} из вашей Пустоты в руку" };
-reclaim_target($target) = "{reclaim} {$target}";
+reclaim_target($target) = :from($target) "{reclaim} {$target:acc}";
 reclaim_random($target) = "{reclaim} a random {$target}";
 put_on_top_of_enemy_deck($target) = "put {$target} on top of the opponent's deck";
 copy_target($target) = "copy {$target}";
