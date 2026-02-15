@@ -1201,3 +1201,62 @@ russian = "Когда вы воплощаете персонажа, срабат
 [[tests]]
 english = "▸ Judgment: Each player abandons a character."
 russian = "▸ Суд: Каждый игрок отрекается от персонажа."
+
+# Batch 2.33: Void collection and return-from-void
+[[tests]]
+english = "Return up to 2 events from your void to your hand."
+russian = "Верните до 2 событий из вашей Пустоты в руку."
+
+[[tests]]
+english = "You may return a character from your void to your hand, then draw a card."
+russian = "Вы можете вернуть персонажа из вашей Пустоты в руку, затем взять карту."
+
+[[tests]]
+english = "Abandon an ally: You may put a character from your void on top of your deck."
+russian = "Отрекитесь от союзника: Вы можете положить персонажа из вашей Пустоты на верх вашей колоды."
+
+[[tests]]
+english = "Reveal the top card of your deck."
+russian = "Покажите верхнюю карту вашей колоды."
+
+[[tests]]
+english = "You may play characters from the top of your deck."
+russian = "Вы можете играть персонажей с верха вашей колоды."
+
+# Batch 2.34: Play for alternate cost and fast keyword
+[[tests]]
+english = "Banish a card from hand: Play this event for 0●."
+russian = "Изгоните карту из руки: Сыграйте это событие за 0●."
+
+[[tests]]
+english = "Lose 1 maximum ●: Play this event for 0●."
+russian = "Уменьшите ваш максимум ● на 1: Сыграйте это событие за 0●."
+
+[[tests]]
+english = "↯fast -- Abandon this character: Prevent a played event."
+russian = "↯Стремительность — Отрекитесь от этого персонажа: Отмените розыгрыш события."
+
+[[tests]]
+english = "Characters in your hand have ↯fast."
+russian = "Персонажи в вашей руке имеют ↯Стремительность."
+
+# Batch 2.35: Pay-or-more and variable-count
+[[tests]]
+english = "Pay 1 or more ●: Dissolve all characters with spark less than the amount of ● paid."
+russian = "Заплатите не менее 1●: Рассеяйте всех персонажей с искрой меньше числа уплаченных ●."
+
+[[tests]]
+english = "Pay 1 or more ●: Draw a card for each ● spent."
+russian = "Заплатите не менее 1●: Возьмите карту за каждый потраченный ●."
+
+[[tests]]
+english = "Pay 1 or more ●: Draw a card for each ● spent, then discard 2 cards."
+russian = "Заплатите не менее 1●: Возьмите карту за каждый потраченный ●, затем сбросьте 2 карты."
+
+[[tests]]
+english = "Abandon any number of allies: Draw a card for each ally abandoned."
+russian = "Отрекитесь от любого количества союзников: Возьмите карту за каждого союзника, от которого вы отреклись."
+
+[[tests]]
+english = "Return all but one ally to hand: Draw a card for each ally returned."
+russian = "Верните в руку всех союзников, кроме одного: Возьмите карту за каждого возвращённого союзника."

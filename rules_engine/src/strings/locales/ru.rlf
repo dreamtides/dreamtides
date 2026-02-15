@@ -8,7 +8,7 @@ fast_symbol = "↯";
 
 energy($e) = "<color=#00838F>{$e}●</color>";
 points($p) = "<color=#F57F17>{$p}⍏</color>";
-maximum_energy($max) = "{$max} maximum {energy_symbol}";
+maximum_energy($max) = "максимум {energy_symbol}";
 
 
 trigger($t) = "▸ <b>{$t}:</b>";
@@ -37,7 +37,7 @@ prevented = "<color=#AA00FF>prevented</color>";
 kindle($k) = "Разожгите {$k}";
 kindled = "<color=#AA00FF>kindled</color>";
 foresee($n) = "Прозрение {$n}";
-fast = "<b>↯fast</b>";
+fast = "↯Стремительность";
 reclaim_for_cost($r) = "Возвышение {$r}●";
 
 
@@ -258,7 +258,7 @@ token_type_reclaim_ability = "Reclaim Ability";
 
 
 discard_your_hand_cost = "сбросьте руку";
-pay_one_or_more_energy_cost = "pay 1 or more {energy_symbol}";
+pay_one_or_more_energy_cost = "заплатите не менее 1{energy_symbol}";
 cost_or_connector = " или ";
 cost_and_connector = " и ";
 pay_prefix($cost) = "pay {$cost}";
@@ -266,7 +266,7 @@ abandon_any_number_of($target) = :from($target) "отрекитесь от лю�
 abandon_target($target) = :from($target) "отрекитесь от {$target}";
 return_target_to_hand($target) = :from($target) "return {$target} to hand";
 return_count_to_hand($n, $target) = :from($target) "return {$n} {$target:other} to hand";
-return_all_but_one_to_hand($target) = :from($target) "return all but one {$target} to hand";
+return_all_but_one_to_hand($target) = :from($target) "верните в руку всех {$target:other}, кроме одного";
 return_all_to_hand($target) = :from($target) "return all {$target} to hand";
 return_any_number_to_hand($target) = :from($target) "return any number of {$target} to hand";
 return_up_to_to_hand($n, $target) = :from($target) "return up to {$n} {$target:other} to hand";
@@ -277,13 +277,13 @@ return_or_more_to_hand($n, $target) = :from($target) "return {$n} or more {$targ
 abandon_count_allies($a) = "отрекитесь от {count_allies($a)}";
 discard_cards_cost($d) = "сбросьте {cards($d)}";
 energy_cost_value($e) = "{energy($e)}";
-lose_max_energy_cost($m) = "lose {maximum_energy($m)}";
+lose_max_energy_cost($m) = "уменьшите ваш {maximum_energy($m)} на {$m}";
 banish_your_void_cost = "{banish} your void";
 banish_another_in_void = "изгоните другую карту из вашей Пустоты";
 banish_cards_from_void($c) = "{banish} {cards($c)} from your void";
 banish_cards_from_enemy_void($c) = "изгоните {cards($c)} из Пустоты противника";
 banish_void_min_count($n) = "{banish} your void with {count($n)} or more cards";
-banish_from_hand_cost($target) = :from($target) "{banish} {$target} from hand";
+banish_from_hand_cost($target) = :from($target) "изгоните {$target} из руки";
 
 
 at_end_of_your_turn_trigger = "at the end of your turn, ";
@@ -352,8 +352,8 @@ multiply_energy_effect($n) = "{multiply_by($n)} the amount of {energy_symbol} yo
 spend_all_energy_dissolve_effect = "spend all your {energy_symbol}. {dissolve} an enemy with cost less than or equal to the amount spent";
 spend_all_energy_draw_discard_effect = "spend all your {energy_symbol}. Draw cards equal to the amount spent, then discard that many cards";
 each_player_shuffles_and_draws_effect($c) = "each player shuffles their hand and void into their deck and then draws {cards($c)}";
-return_up_to_events_from_void_effect($n) = "return {up_to_n_events($n)} from your void to your hand";
-fast_prefix = "{Fast} -- ";
+return_up_to_events_from_void_effect($n) = "верните {up_to_n_events($n)} из вашей Пустоты в руку";
+fast_prefix = "{fast} — ";
 
 
 discard_chosen_from_enemy_hand($target) = :from($target) :match($target) {
@@ -364,7 +364,7 @@ discard_chosen_from_enemy_hand_then_draw($target) = :from($target) :match($targe
     *anim: "сбросьте выбранного {$target} из руки противника. Затем противник берёт {cards(1)}",
     inan: "сбросьте выбранную {$target} из руки противника. Затем противник берёт {cards(1)}",
 };
-put_from_void_on_top_of_deck($target) = "put {$target} from your void on top of your deck";
+put_from_void_on_top_of_deck($target) = :from($target) { *one: "положите {$target} из вашей Пустоты на верх вашей колоды", inf: "положить {$target} из вашей Пустоты на верх вашей колоды" };
 put_up_to_from_void_on_top_of_deck($n, $target) = "put up to {cards($n)} {$target} from your void on top of your deck";
 materialize_random_from_deck($n, $constraint) = "{materialize} {n_random_characters($n)} {$constraint} from your deck";
 copy_next_played($target, $times) = "copy the next {$target} you play {this_turn_times($times)}";
@@ -531,7 +531,7 @@ with_materialized_abilities_constraint = "with {materialized} abilities";
 with_activated_ability_constraint = "with an activated ability";
 with_activated_abilities_constraint = "with activated abilities";
 with_spark_less_than_energy_paid_constraint =
-    "with spark less than the amount of {energy_symbol} paid";
+    "с искрой меньше числа уплаченных {energy_symbol}";
 with_cost_less_than_allied_count($target) = :from($target)
     "стоимостью меньше количества союзных {$target:other}";
 with_cost_less_than_abandoned_ally_constraint =
@@ -596,12 +596,12 @@ for_each_predicate($target) = :from($target) "each {$target}";
 
 ally_abandoned_this_turn = :masc :anim { nom: "союзник, от которого вы отреклись в этот ход", *gen: "союзника, от которого вы отреклись в этот ход" };
 allied_subtype_abandoned_this_turn($t) = :from($t) "allied {subtype($t)} abandoned this turn";
-ally_abandoned = "ally abandoned";
+ally_abandoned = :masc :anim { gen: "союзника, от которого вы отреклись" };
 allied_subtype_abandoned($t) = :from($t) "allied {subtype($t)} abandoned";
-ally_returned = "ally returned";
+ally_returned = :masc :anim { gen: "возвращённого союзника" };
 allied_subtype_returned($t) = :from($t) "allied {subtype($t)} returned";
 card_predicate_returned($base) = :from($base) "{$base} returned";
-energy_spent = "{energy_symbol} spent";
+energy_spent = :inan { gen: "потраченного {energy_symbol}" };
 card_predicate_played_this_turn($base) = :from($base) { nom: "{$base:nom}, которую вы сыграли в этот ход", *gen: "{$base:gen}, которую вы сыграли в этот ход" };
 card_predicate_drawn_this_turn($base) = :from($base) "{$base} you have drawn this turn";
 card_predicate_discarded_this_turn($base) = :from($base) "{$base} you have discarded this turn";
@@ -718,17 +718,17 @@ enemy_cards_cost_increase($matching, $e) = "{$matching:nom_pl} противни�
 spark_bonus_other_characters($matching, $s) = :from($matching) "Союзные {$matching:nom_pl} получают +{$s} к искре";
 additional_cost_to_play($cost) = "To play {this_card}, {$cost}";
 play_for_alternate_cost_simple($card_type, $e) = "{$card_type:nom} стоит {energy($e)}";
-play_for_alternate_cost_with_additional($cost, $card_type, $e) = "{$cost}: Play {$card_type} for {energy($e)}";
+play_for_alternate_cost_with_additional($cost, $card_type, $e) = :from($card_type) "{$cost}: Сыграйте {$card_type:acc} за {energy($e)}";
 play_for_alternate_cost_abandon($cost, $card_type, $e) = "{$cost}: Play {$card_type} for {energy($e)}, then abandon it";
-characters_in_hand_have_fast = "characters in your hand have {fast}";
+characters_in_hand_have_fast = "персонажи в вашей руке имеют {fast}";
 disable_enemy_materialized_abilities = "disable the {Materialized} abilities of enemies";
 has_all_character_types = "has all character types";
 multiply_energy_gain($n) = "{multiply_by($n)} the amount of {energy_symbol} you gain from card effects this turn";
 multiply_card_draw($n) = "{multiply_by($n)} the number of cards you draw from card effects this turn";
 once_per_turn_play_from_void($matching) = "once per turn, you may play {$matching} from your void";
-reveal_top_card = "reveal the top card of your deck";
+reveal_top_card = "покажите верхнюю карту вашей колоды";
 you_may_look_at_top_card = "you may look at the top card of your deck";
-you_may_play_from_top_of_deck($matching) = "you may play {$matching:other} from the top of your deck";
+you_may_play_from_top_of_deck($matching) = :from($matching) "вы можете играть {$matching:other} с верха вашей колоды";
 judgment_triggers_when_materialized($matching) = "the '{Judgment}' ability of {$matching:other} triggers when you {materialize} them";
 spark_equal_to_predicate_count($matching) = "Искра {this_character:gen} равна количеству {$matching:other}";
 play_only_from_void = "you may only play {this_character} from your void";
