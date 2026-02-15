@@ -1330,3 +1330,36 @@ variables = "n: 3"
 english = "{Materialized} Draw {@a subtype($t)} from your deck."
 russian = "▸ Воплощён: Возьмите Воина из вашей колоды."
 variables = "t: Warrior"
+
+# Batch 2.42: Complex when-triggers with cross-references
+[[tests]]
+english = "When you play a character, {materialize} {@a figment($f)}."
+russian = "Когда вы играете персонажа, воплотите Фигмент Гальциона."
+variables = "f: HalcyonFigment"
+
+[[tests]]
+english = "When you {materialize} {allied_subtype($t)}, that character gains {spark($s)}."
+russian = "Когда вы воплощаете союзного Духа-Зверя, этот персонаж получает +1 к искре."
+variables = "t: SpiritAnimal, s: 1"
+
+[[tests]]
+english = "When you play {@a subtype($t)}, {reclaim} a random character with cost {energy($e)} or less."
+russian = "Когда вы играете Воина, возвысьте случайного персонажа стоимостью 3● или меньше."
+variables = "t: Warrior, e: 3"
+
+# Batch 2.43: Play-from-void and card restrictions
+[[tests]]
+english = "With {allied_subtype($t)}, you may play this card from your hand or void for {energy($e)}."
+russian = "Если у вас есть союзный Выживший, вы можете сыграть эту карту из руки или из Пустоты за 1●."
+variables = "t: Survivor, e: 1"
+
+[[tests]]
+english = "{Abandon} an ally: Play this character for {energy($e)}, then {abandon} it."
+russian = "Отрекитесь от союзника: Сыграйте этого персонажа за 0●, затем отрекитесь от него."
+variables = "e: 0"
+
+# Batch 2.44: Remaining complex effects
+[[tests]]
+english = "At the end of your turn, gain {energy($e)}."
+russian = "В конце вашего хода получите 2●."
+variables = "e: 2"
