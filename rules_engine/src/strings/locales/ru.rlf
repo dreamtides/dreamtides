@@ -70,8 +70,8 @@ count_allies($n) = :match($n) {
     *other: "{$n} союзников",
 };
 count_allied_subtype($n, $s) = :from($s) :match($n) {
-    1: "an allied {subtype($s)}",
-    *other: "{$n} allied {subtype($s):other}",
+    1: "союзного {subtype($s)}",
+    *other: "{$n} союзных {subtype($s):other}",
 };
 
 
@@ -108,16 +108,18 @@ renegade = :a{ one: "Renegade", other: "Renegades" };
 robot = :a{ one: "Robot", other: "Robots" };
 spirit_animal = :a{ one: "Spirit Animal", other: "Spirit Animals" };
 super_ = :a{ one: "Super", other: "Supers" };
-survivor = :masc :anim { nom: "Выживший", *acc: "Выжившего", gen: "Выжившего", one: "Выжившего", other: "Выживших" };
+survivor = :masc :anim { nom: "Выживший", *acc: "Выжившего", gen: "Выжившего", nom_pl: "Выжившие", one: "Выжившего", other: "Выживших" };
 synth = :a{ one: "Synth", other: "Synths" };
 tinkerer = :a{ one: "Tinkerer", other: "Tinkerers" };
 trooper = :a{ one: "Trooper", other: "Troopers" };
 visionary = :a{ one: "Visionary", other: "Visionaries" };
 visitor = :a{ one: "Visitor", other: "Visitors" };
-warrior = :masc :anim { nom: "Воин", *acc: "Воина", gen: "Воина", one: "Воина", other: "Воинов" };
+warrior = :masc :anim { nom: "Воин", *acc: "Воина", gen: "Воина", nom_pl: "Воины", one: "Воина", other: "Воинов" };
 
 subtype($s) = :from($s) {
+    nom: "<color=#2E7D32><b>{$s:nom}</b></color>",
     *one: "<color=#2E7D32><b>{$s}</b></color>",
+    nom_pl: "<color=#2E7D32><b>{$s:nom_pl}</b></color>",
     other: "<color=#2E7D32><b>{$s:other}</b></color>",
 };
 
@@ -430,9 +432,10 @@ with_plural($one, $other) = :from($one) { *one: "{$one}", other: "{$other}" };
 your_generic_character = :masc :anim { nom: "союзник", *one: "персонажа", other: "союзников" };
 your_generic_card = :fem :inan { *one: "карту", gen: "карты", other: "ваши карты" };
 your_generic_event = :neut :inan { *one: "событие", other: "ваши события" };
-your_generic_subtype($t) = :a :from($t) {
+your_generic_subtype($t) = :from($t) {
     *one: "{subtype($t)}",
-    other: "allied {subtype($t):other}",
+    nom_pl: "союзные {subtype($t):nom_pl}",
+    other: "союзных {subtype($t):other}",
 };
 predicate_with_indefinite_article($p) = :from($p);
 another_pred($p) = :from($p) {
@@ -513,8 +516,8 @@ with_spark_less_than_that_ally_constraint =
     "with spark less than that ally's spark";
 
 
-allied_subtype($t) = :an "allied {subtype($t)}";
-allied_subtype_plural($t) = "allied {subtype($t):other}";
+allied_subtype($t) = :from($t) { nom: "союзный {subtype($t):nom}", *acc: "союзного {subtype($t)}", gen: "союзного {subtype($t)}", nom_pl: "союзные {subtype($t):nom_pl}", other: "союзных {subtype($t):other}" };
+allied_subtype_plural($t) = "союзных {subtype($t):other}";
 enemy_subtype($t) = :an "enemy {subtype($t)}";
 enemy_subtype_plural($t) = "enemy {subtype($t):other}";
 your_subtype($t) = :from($t) "your {$t}";
@@ -544,7 +547,7 @@ for_each_event_in_your_void = "event in your void";
 for_each_card_in_enemy_void = "card in the opponent's void";
 for_each_character_in_enemy_void = "character in the opponent's void";
 for_each_event_in_enemy_void = "event in the opponent's void";
-for_each_allied_subtype($t) = :from($t) "allied {subtype($t)}";
+for_each_allied_subtype($t) = :from($t) "союзного {subtype($t)}";
 for_each_enemy_subtype($t) = :from($t) "enemy {subtype($t)}";
 for_each_subtype($t) = :from($t) "{subtype($t)}";
 for_each_other_subtype($t) = :from($t) "other {subtype($t)}";
@@ -572,7 +575,7 @@ card_predicate_abandoned($base) = :from($base) "{$base} abandoned";
 draw_cards_for_each($c, $target) = "draw {cards($c)} for each {$target}";
 gain_energy_for_each($e, $target) = "gain {energy($e)} for each {$target}";
 gain_points_for_each($p, $target) = "gain {points($p)} for each {$target}";
-gains_spark_for_each($target, $s, $quantity) = "{$target} gains +{$s} spark for each {$quantity}";
+gains_spark_for_each($target, $s, $quantity) = :from($target) "{$target:nom} получает +{$s} к искре за каждого {$quantity}";
 gains_spark_until_next_main_for_each($target, $s, $for_each) = "{$target} gains +{$s} spark until your next main phase for each {$for_each}";
 each_gains_spark_equal_to($each, $count_of) = "each {$each} gains spark equal to the number of {$count_of:other}";
 have_each_gain_spark($each, $s) = "have each {$each} gain +{$s} spark";
@@ -614,8 +617,9 @@ banish_then_materialize_them($target) = :from($target) { *one: "изгоните
 
 
 allied_card_with_subtype($t) = :from($t) {
-    *one: "allied {subtype($t)}",
-    other: "allied {subtype($t):other}",
+    *one: "союзного {subtype($t)}",
+    nom_pl: "союзные {subtype($t):nom_pl}",
+    other: "союзных {subtype($t):other}",
 };
 allied_card_with_base($base) = :from($base) {
     *one: "allied {$base}",
@@ -660,7 +664,7 @@ void_gains_reclaim_equal_cost_plural_this_turn($subject) = "{$subject} gain {rec
 your_cards_cost_increase($matching, $e) = "{$matching:other} cost you {energy($e)} more";
 your_cards_cost_reduction($matching, $e) = "{$matching:other} cost you {energy($e)} less";
 enemy_cards_cost_increase($matching, $e) = "the opponent's {$matching:other} cost {energy($e)} more";
-spark_bonus_other_characters($matching, $s) = "allied {$matching:other} have +{$s} spark";
+spark_bonus_other_characters($matching, $s) = :from($matching) "Союзные {$matching:nom_pl} получают +{$s} к искре";
 additional_cost_to_play($cost) = "To play {this_card}, {$cost}";
 play_for_alternate_cost_simple($card_type, $e) = "{$card_type} costs {energy($e)}";
 play_for_alternate_cost_with_additional($cost, $card_type, $e) = "{$cost}: Play {$card_type} for {energy($e)}";
@@ -675,12 +679,12 @@ reveal_top_card = "reveal the top card of your deck";
 you_may_look_at_top_card = "you may look at the top card of your deck";
 you_may_play_from_top_of_deck($matching) = "you may play {$matching:other} from the top of your deck";
 judgment_triggers_when_materialized($matching) = "the '{Judgment}' ability of {$matching:other} triggers when you {materialize} them";
-spark_equal_to_predicate_count($matching) = "{this_character}'s spark is equal to the number of {$matching:other}";
+spark_equal_to_predicate_count($matching) = "Искра {this_character:gen} равна количеству {$matching:other}";
 play_only_from_void = "you may only play {this_character} from your void";
 play_from_hand_or_void_for_cost($e) = "you may play {this_card} from your hand or void for {energy($e)}";
 cards_in_void_have_reclaim = "they have {reclaim} equal to their cost";
 cost_reduction_for_each($e, $quantity) = "{this_card} costs {energy($e)} less for each {$quantity}";
-spark_bonus_your_characters($matching, $s) = "{$matching:other} have +{$s} spark";
+spark_bonus_your_characters($matching, $s) = :from($matching) "союзные {$matching:nom_pl} получают +{$s} к искре";
 play_from_void_for_cost($e) = "play {this_card} from your void for {energy($e)}";
 play_from_void_with_additional_cost($cost, $e) = "{$cost}: play {this_card} from your void for {energy($e)}";
 play_from_void_with_effect($cost, $e, $effect) = "{$cost}: play {this_card} from your void for {energy($e)}, then {$effect}";

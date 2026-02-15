@@ -77,8 +77,12 @@ english = "When you discard a card, it gains reclaim equal to its cost this turn
 russian = "Когда вы сбрасываете карту, она получает Возвышение, равное её стоимости, до конца хода."
 
 [[tests]]
-english = "4●: This character gains +1 spark for each allied Warrior."
-russian = "4●: Этот персонаж получает +1 к искре за каждого союзного Воина."
+english = "{energy($e)}: This character gains +{$s} spark for each allied {subtype($t)}."
+variables = """
+e: 4
+s: 1
+t: Warrior"""
+russian = "<color=#00838F>4●</color>: Этот персонаж получает +1 к искре за каждого союзного <color=#2E7D32><b>Воина</b></color>."
 
 [[tests]]
 english = "Draw {cards($c)}. Discard {cards($d)}."
@@ -126,8 +130,9 @@ english = "When you abandon 2 allies in a turn, dissolve an enemy."
 russian = "Когда вы отрекаетесь от 2 союзников за ход, рассеяйте врага."
 
 [[tests]]
-english = "This character's spark is equal to the number of allied Warriors."
-russian = "Искра этого персонажа равна количеству союзных Воинов."
+english = "This character's spark is equal to the number of allied {@plural subtype($t)}."
+variables = "t: Warrior"
+russian = "Искра этого персонажа равна количеству союзных <color=#2E7D32><b>Воинов</b></color>."
 
 [[tests]]
 english = "The '▸ Judgment:' ability of allies triggers when you materialize them."
@@ -190,8 +195,11 @@ english = "The opponent's events cost 1● more."
 russian = "События противника стоят на 1● больше."
 
 [[tests]]
-english = "When you materialize an allied Warrior, this character gains +1 spark."
-russian = "Когда вы воплощаете союзного Воина, этот персонаж получает +1 к искре."
+english = "When you {materialize} an allied {subtype($t)}, this character gains +{$s} spark."
+variables = """
+t: Warrior
+s: 1"""
+russian = "Когда вы воплощаете союзного <color=#2E7D32><b>Воина</b></color>, этот персонаж получает +1 к искре."
 
 [[tests]]
 english = "When you materialize a character, trigger the ▸ Judgment: ability of each ally."
@@ -484,8 +492,11 @@ variables = "s: 2"
 russian = "Когда вы играете карту с ↯Стремительностью, этот персонаж получает +2 к искре."
 
 [[tests]]
-english = "Once per turn, when you materialize a Warrior, draw a card."
-russian = "Один раз за ход, когда вы воплощаете Воина, возьмите карту."
+english = "Once per turn, when you {materialize} {@a subtype($t)}, draw {cards($c)}."
+variables = """
+t: Warrior
+c: 1"""
+russian = "Один раз за ход, когда вы воплощаете <color=#2E7D32><b>Воина</b></color>, возьмите карту."
 
 [[tests]]
 english = "Banish a non-Warrior enemy."
@@ -832,8 +843,11 @@ c: 2"""
 russian = "Сбросьте карту. Возьмите 2 карты."
 
 [[tests]]
-english = "Allied Warriors have +1 spark."
-russian = "Союзные Воины получают +1 к искре."
+english = "Allied {@plural subtype($t)} have +{$s} spark."
+variables = """
+t: Warrior
+s: 1"""
+russian = "Союзные <color=#2E7D32><b>Воины</b></color> получают +1 к искре."
 
 [[tests]]
 english = "{foresee($f)}."
