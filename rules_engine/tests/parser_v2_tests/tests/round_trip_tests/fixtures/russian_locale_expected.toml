@@ -15,8 +15,8 @@ english = "This character's spark is equal to the number of cards in your void."
 russian = "Искра этого персонажа равна количеству карт в вашей Пустоте."
 
 [[tests]]
-english = "▸ Materialized: Return an enemy to hand."
-russian = "▸ Воплощён: Верните врага в руку."
+english = "{Materialized} Return an enemy to hand."
+russian = "▸ <b>Воплощён:</b> Верните врага в руку."
 
 [[tests]]
 english = "{Dissolve} an enemy with cost {energy($e)} or more."
@@ -325,8 +325,8 @@ english = "When you play a Spirit Animal, draw a card."
 russian = "Когда вы играете Духа-Зверя, возьмите карту."
 
 [[tests]]
-english = "▸ Materialized: You may return an ally to hand."
-russian = "▸ Воплощён: Вы можете вернуть союзника в руку."
+english = "{Materialized} You may return an ally to hand."
+russian = "▸ <b>Воплощён:</b> Вы можете вернуть союзника в руку."
 
 [[tests]]
 english = "{Judgment} Gain {energy($e)}."
@@ -615,8 +615,8 @@ variables = "r: 3"
 russian = "Возвышение 3●"
 
 [[tests]]
-english = "▸ Materialized: Return an ally to hand."
-russian = "▸ Воплощён: Верните союзника в руку."
+english = "{Materialized} Return an ally to hand."
+russian = "▸ <b>Воплощён:</b> Верните союзника в руку."
 
 [[tests]]
 english = "Abandon an ally: Play this character for 0●, then abandon it."
@@ -698,7 +698,8 @@ english = "▸ Dissolved: You may pay 1● to return this character to your hand
 russian = "▸ Рассеян: Вы можете заплатить 1●, чтобы вернуть этого персонажа в руку."
 
 [[tests]]
-english = "Return an enemy or ally to hand. Draw a card."
+english = "Return an enemy or ally to hand. Draw {cards($c)}."
+variables = "c: 1"
 russian = "Верните врага или союзника в руку. Возьмите карту."
 
 [[tests]]
@@ -776,8 +777,8 @@ english = "When an allied Survivor is ▸ Dissolved:, draw a card."
 russian = "Когда союзный Выживший рассеивается, возьмите карту."
 
 [[tests]]
-english = "▸ Materialized: Return a character from your void to your hand."
-russian = "▸ Воплощён: Верните персонажа из вашей Пустоты в руку."
+english = "{Materialized} Return a character from your void to your hand."
+russian = "▸ <b>Воплощён:</b> Верните персонажа из вашей Пустоты в руку."
 
 [[tests]]
 english = "Abandon an ally: You may dissolve an enemy with spark less than that ally's spark."
