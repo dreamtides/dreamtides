@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeSet;
 
 use ability_data::collection_expression::CollectionExpression;
 use ability_data::effect::{Effect, EffectWithOptions};
@@ -452,35 +452,27 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
             let all_effects_optional =
                 list_with_options.effects.iter().all(|e| e.optional && e.trigger_cost.is_none());
             let is_optional_with_shared_cost = has_shared_trigger_cost && all_effects_optional;
-            let inf_key = VariantKey::new("inf");
-            let mut effect_strings = Vec::new();
-            let mut inf_strings = Vec::new();
+            let mut effect_phrases = Vec::new();
             for e in &list_with_options.effects {
                 let effect_phrase = serialize_standard_effect(&e.effect);
-                let effect_inf = effect_phrase.variants.get(&inf_key).cloned();
-                let effect_text = effect_phrase.to_string();
                 let with_condition = if let Some(condition) = &e.condition {
                     strings::per_effect_condition(
                         condition_serializer::serialize_condition(condition),
-                        effect_text,
+                        effect_phrase,
                     )
-                    .to_string()
                 } else {
-                    effect_text
+                    effect_phrase
                 };
                 let with_cost = if let Some(trigger_cost) = &e.trigger_cost {
                     let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost);
-                    strings::per_effect_cost(cost_str, with_condition).to_string()
+                    strings::per_effect_cost(cost_str, with_condition)
                 } else {
                     with_condition
                 };
                 if e.optional && !is_optional_with_shared_cost {
-                    effect_strings.push(strings::per_effect_optional(with_cost).to_string());
+                    effect_phrases.push(strings::per_effect_optional(with_cost));
                 } else {
-                    effect_strings.push(with_cost);
-                    if let Some(inf) = effect_inf {
-                        inf_strings.push(inf);
-                    }
+                    effect_phrases.push(with_cost);
                 }
             }
             let joiner = if has_shared_trigger_cost {
@@ -488,7 +480,7 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
             } else {
                 strings::then_joiner().to_string()
             };
-            let joined = join_string_phrases_with_inf(&effect_strings, &inf_strings, &joiner);
+            let joined = join_phrases(&effect_phrases, &joiner);
             let body = if is_optional_with_shared_cost {
                 match &list_with_options.trigger_cost {
                     Some(trigger_cost) => {
@@ -620,39 +612,35 @@ fn serialize_allied_card_predicate(card_predicate: &CardPredicate) -> Phrase {
 }
 
 /// Joins serialized effect fragments from an effect list using the given
-/// joiner string, preserving the `inf` variant when all fragments have one.
+/// joiner string, preserving shared variants.
 fn join_effect_phrases(effects: &[EffectWithOptions], joiner: &str) -> Phrase {
     let phrases: Vec<Phrase> =
         effects.iter().map(|e| serialize_standard_effect(&e.effect)).collect();
-    join_phrases_with_inf(&phrases, joiner)
-}
-
-/// Builds a [Phrase] from pre-serialized effect strings, preserving the
-/// `inf` variant when all fragments have one.
-fn join_string_phrases_with_inf(
-    effect_strings: &[String],
-    inf_strings: &[String],
-    joiner: &str,
-) -> Phrase {
-    let default_text = effect_strings.join(joiner);
-    if inf_strings.len() == effect_strings.len() && !inf_strings.is_empty() {
-        let inf_text = inf_strings.join(joiner);
-        let mut variants = HashMap::new();
-        variants.insert(VariantKey::new("inf"), inf_text);
-        Phrase::builder().text(default_text).variants(variants).build()
-    } else {
-        Phrase::builder().text(default_text).build()
-    }
+    join_phrases(&phrases, joiner)
 }
 
 /// Joins a slice of [Phrase] values with a joiner, producing a result
-/// [Phrase] that carries an `inf` variant when every input phrase has one.
-fn join_phrases_with_inf(phrases: &[Phrase], joiner: &str) -> Phrase {
-    let inf_key = VariantKey::new("inf");
-    let default_strings: Vec<String> = phrases.iter().map(|p| p.text.clone()).collect();
-    let inf_strings: Vec<String> =
-        phrases.iter().filter_map(|p| p.variants.get(&inf_key).cloned()).collect();
-    join_string_phrases_with_inf(&default_strings, &inf_strings, joiner)
+/// [Phrase] that preserves all variant keys present in every input phrase.
+fn join_phrases(phrases: &[Phrase], joiner: &str) -> Phrase {
+    let shared_keys: BTreeSet<VariantKey> = phrases
+        .first()
+        .map(|p| {
+            p.variants
+                .keys()
+                .filter(|k| phrases.iter().all(|q| q.variants.contains_key(k)))
+                .cloned()
+                .collect()
+        })
+        .unwrap_or_default();
+    let default_text: String =
+        phrases.iter().map(|p| p.text.as_str()).collect::<Vec<_>>().join(joiner);
+    let mut variants = std::collections::HashMap::new();
+    for key in shared_keys {
+        let joined =
+            phrases.iter().map(|p| p.variants[&key].as_str()).collect::<Vec<_>>().join(joiner);
+        variants.insert(key, joined);
+    }
+    Phrase::builder().text(default_text).variants(variants).build()
 }
 
 /// Prepends a condition from the first effect in a list, if present.
