@@ -1138,3 +1138,66 @@ russian = "▸ <b>Суд:</b> Вы можете изгнать союзника,
 [[tests]]
 english = "{Materialized} {Banish} any number of allies, then {materialize} them."
 russian = "▸ <b>Воплощён:</b> Изгоните любое количество союзников, затем воплотите их."
+
+# Batch 2.30: Judgment with complex effects
+[[tests]]
+english = "▸ Judgment: You may discard a card to draw a card and gain 1⍏."
+russian = "▸ Суд: Вы можете сбросить карту, чтобы взять карту и получить 1⍏."
+
+[[tests]]
+english = "▸ Judgment: You may draw 2 cards, then discard 3 cards."
+russian = "▸ Суд: Вы можете взять 2 карты, затем сбросить 3 карты."
+
+[[tests]]
+english = "▸ Judgment: You may discard a card to dissolve an enemy with spark 1 or less."
+russian = "▸ Суд: Вы можете сбросить карту, чтобы рассеять врага с искрой 1 или меньше."
+
+[[tests]]
+english = "▸ Judgment: You may banish a card from the opponent's void to gain 1●."
+russian = "▸ Суд: Вы можете изгнать карту из Пустоты противника, чтобы получить 1●."
+
+[[tests]]
+english = "▸ Judgment: Return this character from your void to your hand."
+russian = "▸ Суд: Верните этого персонажа из вашей Пустоты в руку."
+
+# Batch 2.31: Activated abilities with complex costs
+[[tests]]
+english = "2●, Abandon an ally with spark 1 or less: Draw 2 cards."
+russian = "2●, отрекитесь от союзника с искрой 1 или меньше: Возьмите 2 карты."
+
+[[tests]]
+english = "2●, Banish another card in your void: Reclaim this character."
+russian = "2●, изгоните другую карту из вашей Пустоты: Возвысьте этого персонажа."
+
+[[tests]]
+english = "2●, Abandon a character, Discard your hand: Draw 3 cards."
+russian = "2●, отрекитесь от персонажа и сбросьте руку: Возьмите 3 карты."
+
+[[tests]]
+english = "Abandon a character, Discard your hand: Gain 5●."
+russian = "Отрекитесь от персонажа и сбросьте руку: Получите 5●."
+
+[[tests]]
+english = "Abandon an ally or discard a card: Dissolve an enemy."
+russian = "Отрекитесь от союзника или сбросьте карту: Рассеяйте врага."
+
+# Batch 2.32: In-a-turn triggers and each-player effects
+[[tests]]
+english = "When you abandon 2 allies in a turn, dissolve an enemy."
+russian = "Когда вы отрекаетесь от 2 союзников за ход, рассеяйте врага."
+
+[[tests]]
+english = "When you play 2 cards in a turn, reclaim this character."
+russian = "Когда вы играете 2 карты за ход, возвысьте этого персонажа."
+
+[[tests]]
+english = "When you draw 2 cards in a turn, if this card is in your void, it gains reclaim 1● this turn."
+russian = "Когда вы берёте 2 карты за ход, если эта карта находится в вашей Пустоте, она получает Возвышение 1● до конца хода."
+
+[[tests]]
+english = "When you materialize a character, trigger the ▸ Judgment: ability of each ally."
+russian = "Когда вы воплощаете персонажа, срабатывает способность «▸ Суд:» каждого союзника."
+
+[[tests]]
+english = "▸ Judgment: Each player abandons a character."
+russian = "▸ Суд: Каждый игрок отрекается от персонажа."
