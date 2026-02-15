@@ -41,7 +41,7 @@ fast = "↯Стремительность";
 reclaim_for_cost($r) = "Возвышение {$r}●";
 
 
-choose_one = "<b>Choose One:</b>";
+choose_one = "<b>Выберите одно:</b>";
 bullet = "•";
 
 
@@ -156,8 +156,12 @@ copies($n) = :match($n) {
 
 
 n_random_characters($n) = :match($n) {
-    1: "a random character",
-    *other: "{text_number($n)} random characters",
+    1: "случайного персонажа",
+    2: "двух случайных персонажей",
+    3: "трёх случайных персонажей",
+    4: "четырёх случайных персонажей",
+    5: "пяти случайных персонажей",
+    *other: "{$n} случайных персонажей",
 };
 
 
@@ -306,7 +310,7 @@ banish_from_hand_cost($target) = :from($target) "изгоните {$target} из
 
 
 at_end_of_your_turn_trigger = "в конце вашего хода, ";
-when_deck_empty_trigger = "when you have no cards in your deck, ";
+when_deck_empty_trigger = "если в вашей колоде нет карт, ";
 when_you_gain_energy_trigger = "when you gain energy, ";
 when_you_play_trigger($target) = :from($target) "когда вы играете {$target}, ";
 when_opponent_plays_trigger($target) = :from($target) "when the opponent plays {$target}, ";
@@ -334,7 +338,7 @@ if_discarded_this_turn($target) = :from($target) "если вы сбрасыва
 with_predicate_condition($pred) = "with {$pred:other},";
 
 
-with_allies_sharing_type($a) = "with {count_allies($a)} that share a character type,";
+with_allies_sharing_type($a) = "если у вас есть {count_allies($a)} с общим типом персонажа,";
 if_drawn_count_this_turn($n) = "if you have drawn {count($n)} or more cards this turn";
 while_void_count($n) = "Пока в вашей Пустоте {count($n)} или больше карт,";
 with_allied_subtype($t) = :from($t) "если у вас есть союзный {subtype($t)},";
@@ -344,8 +348,8 @@ with_count_allies($a) = "{count_allies($a)}";
 
 operator_or_less = " или меньше";
 operator_or_more = " или больше";
-operator_lower = " lower";
-operator_higher = " higher";
+operator_lower = " ниже";
+operator_higher = " выше";
 
 
 draw_cards_effect($c) = "возьмите {cards($c)}";
@@ -370,7 +374,7 @@ judgment_phase_at_end_of_turn_effect = "в конце этого хода про
 multiply_energy_effect($n) = "удвойте количество {energy_symbol}, которое у вас есть";
 spend_all_energy_dissolve_effect = "spend all your {energy_symbol}. {dissolve} an enemy with cost less than or equal to the amount spent";
 spend_all_energy_draw_discard_effect = "spend all your {energy_symbol}. Draw cards equal to the amount spent, then discard that many cards";
-each_player_shuffles_and_draws_effect($c) = "each player shuffles their hand and void into their deck and then draws {cards($c)}";
+each_player_shuffles_and_draws_effect($c) = "каждый игрок замешивает свою руку и свою Пустоту в свою колоду, затем берёт {cards($c)}";
 return_up_to_events_from_void_effect($n) = "верните {up_to_n_events($n)} из вашей Пустоты в руку";
 fast_prefix = "{fast} — ";
 
@@ -385,7 +389,7 @@ discard_chosen_from_enemy_hand_then_draw($target) = :from($target) :match($targe
 };
 put_from_void_on_top_of_deck($target) = :from($target) { *one: "положите {$target} из вашей Пустоты на верх вашей колоды", inf: "положить {$target} из вашей Пустоты на верх вашей колоды" };
 put_up_to_from_void_on_top_of_deck($n, $target) = "put up to {cards($n)} {$target} from your void on top of your deck";
-materialize_random_from_deck($n, $constraint) = "{materialize} {n_random_characters($n)} {$constraint} from your deck";
+materialize_random_from_deck($n, $constraint) = "воплотите {n_random_characters($n)} {$constraint} из вашей колоды";
 copy_next_played($target, $times) = :from($target) :match($target) {
     *neut: "скопируйте следующее {$target:acc}, которое вы сыграете {this_turn_times($times)}",
     masc: "скопируйте следующего {$target:acc}, которого вы сыграете {this_turn_times($times)}",
@@ -427,7 +431,7 @@ put_on_top_of_enemy_deck($target) = :from($target) :match($target) {
     neut: "положите его на верх колоды противника",
 };
 copy_target($target) = :from($target) "скопируйте {$target:acc}";
-disable_activated_abilities($target) = "disable the activated abilities of {$target} while this character is in play";
+disable_activated_abilities($target) = "отключите активируемые способности {$target:gen}, пока этот персонаж находится в игре";
 draw_matching_from_deck($target) = :from($target) "возьмите {$target:acc} из вашей колоды";
 abandon_and_gain_energy_for_spark($target) = "abandon {$target} and gain {energy_symbol} for each point of spark that character had";
 abandon_at_end_of_turn($target) = "abandon {$target} at end of turn";
@@ -443,7 +447,7 @@ pay_cost_effect($cost) = "pay {$cost}";
 
 opponent_gains_points_equal_spark($target) = "the opponent gains points equal to its spark";
 take_extra_turn_effect = "сделайте дополнительный ход после этого";
-you_win_the_game_effect = "you win the game";
+you_win_the_game_effect = "вы выигрываете игру";
 no_effect = "";
 
 
@@ -490,9 +494,9 @@ event = :neut :inan {
 };
 enemy = :masc :anim { nom: "враг", *acc: "врага", gen: "врага", ins: "врагом", one: "врага", other: "врагов" };
 
-this_card = :a{ one: "this card", other: "these cards" };
+this_card = :fem :inan { nom: "эта карта", *acc: "эту карту", gen: "этой карты", one: "эту карту", other: "эти карты" };
 this_character = :masc :anim { nom: "этот персонаж", *acc: "этого персонажа", gen: "этого персонажа", ins: "этим персонажем", one: "этого персонажа", other: "этих персонажей" };
-this_event = :an{ one: "this event", other: "these events" };
+this_event = :neut :inan { nom: "это событие", *acc: "это событие", gen: "этого события", one: "это событие", other: "эти события" };
 that_character = :masc :anim { nom: "этот персонаж", *acc: "этого персонажа", gen: "этого персонажа", ins: "этим персонажем", one: "этого персонажа", other: "этих персонажей" };
 pronoun_it = {
     nom.one: "он",
@@ -568,14 +572,10 @@ non_subtype($s) = :from($s) {
     *one: "non-{$s}",
     other: "non-{$s:other}",
 };
-could_dissolve_target($target) = :from($target) {
-    nom: "событие, которое может рассеять {$target}",
-    *acc: "событие, которое может рассеять {$target}",
-    gen: "события, которое может рассеять {$target}",
-};
-could_dissolve_target_plural($target) = "события, которые могут рассеять {$target}";
-your_event_could_dissolve($target) = "ваше событие, которое может рассеять {$target}";
-your_event_could_dissolve_plural($target) = "ваши события, которые могут рассеять {$target}";
+could_dissolve_target($target) = :fem :inan "событие, которое может рассеять {$target:acc}";
+could_dissolve_target_plural($target) = :neut :inan "события, которые могут рассеять {$target:acc}";
+your_event_could_dissolve($target) = :neut :inan "ваше событие, которое может рассеять {$target:acc}";
+your_event_could_dissolve_plural($target) = :neut :inan "ваши события, которые могут рассеять {$target:acc}";
 fast_predicate($target) = :from($target) {
     nom: "{$target:nom} с ↯Стремительностью",
     *acc: "{$target:acc} с ↯Стремительностью",
@@ -583,9 +583,9 @@ fast_predicate($target) = :from($target) {
 };
 fast_predicate_plural($target) = :from($target) "{$target} с ↯Стремительностью";
 with_materialized_ability_constraint = "со способностью «▸ Воплощён:»";
-with_materialized_abilities_constraint = "with {materialized} abilities";
-with_activated_ability_constraint = "with an activated ability";
-with_activated_abilities_constraint = "with activated abilities";
+with_materialized_abilities_constraint = "с {materialized} способностями";
+with_activated_ability_constraint = "с активируемой способностью";
+with_activated_abilities_constraint = "с активируемыми способностями";
 with_spark_less_than_energy_paid_constraint =
     "с искрой меньше числа уплаченных {energy_symbol}";
 with_cost_less_than_allied_count($target) = :from($target)
@@ -599,7 +599,7 @@ with_spark_less_than_abandoned_count_this_turn_constraint =
 with_cost_less_than_void_count_constraint =
     "стоимостью меньше количества карт в вашей Пустоте";
 with_spark_less_than_that_ally_constraint =
-    "with spark less than that ally's spark";
+    "с искрой меньше искры этого союзника";
 
 
 allied_subtype($t) = :from($t) { nom: "союзный {subtype($t):nom}", *acc: "союзного {subtype($t)}", gen: "союзного {subtype($t)}", nom_pl: "союзные {subtype($t):nom_pl}", other: "союзных {subtype($t):other}" };
@@ -790,7 +790,7 @@ once_per_turn_play_from_void($matching) = :from($matching) :match($matching) {
 reveal_top_card = "покажите верхнюю карту вашей колоды";
 you_may_look_at_top_card = "you may look at the top card of your deck";
 you_may_play_from_top_of_deck($matching) = :from($matching) "вы можете играть {$matching:other} с верха вашей колоды";
-judgment_triggers_when_materialized($matching) = "the '{Judgment}' ability of {$matching:other} triggers when you {materialize} them";
+judgment_triggers_when_materialized($matching) = "способность {$matching:other} «{Judgment}» срабатывает, когда вы воплощаете их";
 spark_equal_to_predicate_count($matching) = "Искра {this_character:gen} равна количеству {$matching:other}";
 play_only_from_void = "вы можете играть этого персонажа только из вашей Пустоты";
 play_from_hand_or_void_for_cost($e) = "вы можете сыграть эту карту из руки или из Пустоты за {energy($e)}";
@@ -832,3 +832,4 @@ per_effect_condition($cond, $body) = "{$cond} {$body}";
 capitalized_sentence_with_period($s) = "{@cap $s}{period_suffix}";
 
 modal_choice_line($energy_cost, $effect) = "{bullet} {$energy_cost}{cost_effect_separator}{@cap $effect}";
+
