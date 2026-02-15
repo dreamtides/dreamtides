@@ -52,8 +52,9 @@ cards($n) = :match($n) {
     *other: "{$n} карт",
 };
 top_n_cards($n) = :match($n) {
-    1: "top card",
-    *other: "top {$n} {card:$n}",
+    1: "верхнюю карту",
+    few: "{$n} верхние карты",
+    *other: "{$n} верхних карт",
 };
 
 
@@ -107,7 +108,7 @@ renegade = :a{ one: "Renegade", other: "Renegades" };
 robot = :a{ one: "Robot", other: "Robots" };
 spirit_animal = :a{ one: "Spirit Animal", other: "Spirit Animals" };
 super_ = :a{ one: "Super", other: "Supers" };
-survivor = :a{ one: "Survivor", other: "Survivors" };
+survivor = :masc :anim { nom: "Выживший", *acc: "Выжившего", gen: "Выжившего", one: "Выжившего", other: "Выживших" };
 synth = :a{ one: "Synth", other: "Synths" };
 tinkerer = :a{ one: "Tinkerer", other: "Tinkerers" };
 trooper = :a{ one: "Trooper", other: "Troopers" };
@@ -341,7 +342,7 @@ then_materialize_it_effect($target) = "затем воплотите его";
 gain_twice_energy_instead_effect = "gain twice that much {energy_symbol} instead";
 gain_energy_equal_to_that_cost_effect = "gain {energy_symbol} equal to that character's cost";
 gain_energy_equal_to_this_cost_effect = "gain {energy_symbol} equal to this character's cost";
-put_deck_into_void_effect($v) = "put the {top_n_cards($v)} of your deck into your void";
+put_deck_into_void_effect($v) = "положите {top_n_cards($v)} вашей колоды в вашу Пустоту";
 banish_cards_from_enemy_void_effect($c) = "{banish} {cards($c)} from the opponent's void";
 banish_enemy_void_effect = "{banish} the opponent's void";
 judgment_phase_at_end_of_turn_effect = "at the end of this turn, trigger an additional {judgment_phase_name} phase";

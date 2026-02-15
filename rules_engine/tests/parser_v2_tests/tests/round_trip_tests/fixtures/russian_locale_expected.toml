@@ -56,7 +56,8 @@ english = "Return up to 2 events from your void to your hand."
 russian = "Верните до 2 событий из вашей Пустоты в руку."
 
 [[tests]]
-english = "Abandon an ally: Put the top 2 cards of your deck into your void."
+english = "Abandon an ally: Put the {top_n_cards($v)} of your deck into your void."
+variables = "v: 2"
 russian = "Отрекитесь от союзника: Положите 2 верхние карты вашей колоды в вашу Пустоту."
 
 [[tests]]
@@ -101,7 +102,8 @@ english = "▸ Materialized: Banish any number of allies, then materialize them.
 russian = "▸ Воплощён: Изгоните любое количество союзников, затем воплотите их."
 
 [[tests]]
-english = "Put the top 3 cards of your deck into your void."
+english = "Put the {top_n_cards($v)} of your deck into your void."
+variables = "v: 3"
 russian = "Положите 3 верхние карты вашей колоды в вашу Пустоту."
 
 [[tests]]
@@ -356,7 +358,10 @@ english = "{Dissolve} an enemy."
 russian = "Рассеяйте врага."
 
 [[tests]]
-english = "When you play a Survivor, put the top 2 cards of your deck into your void."
+english = "When you play {@a subtype($t)}, put the {top_n_cards($v)} of your deck into your void."
+variables = """
+t: Survivor
+v: 2"""
 russian = "Когда вы играете Выжившего, положите 2 верхние карты вашей колоды в вашу Пустоту."
 
 [[tests]]
@@ -422,7 +427,10 @@ variables = "r: 3"
 russian = "Возвышение 3●"
 
 [[tests]]
-english = "Put the top 3 cards of your deck into your void. Draw a card."
+english = "Put the {top_n_cards($v)} of your deck into your void. Draw {cards($c)}."
+variables = """
+v: 3
+c: 1"""
 russian = "Положите 3 верхние карты вашей колоды в вашу Пустоту. Возьмите карту."
 
 [[tests]]
@@ -752,8 +760,9 @@ english = "▸ Judgment: Return this character from your void to your hand."
 russian = "▸ Суд: Верните этого персонажа из вашей Пустоты в руку."
 
 [[tests]]
-english = "▸ Materialized, Dissolved: Put the top 4 cards of your deck into your void."
-russian = "▸ Воплощён, Рассеян: Положите 4 верхние карты вашей колоды в вашу Пустоту."
+english = "{Materialized_Dissolved} Put the {top_n_cards($v)} of your deck into your void."
+variables = "v: 4"
+russian = "▸ <b>Воплощён, Рассеян:</b> Положите 4 верхние карты вашей колоды в вашу Пустоту."
 
 [[tests]]
 english = "Pay 1 or more ●: Draw a card for each ● spent, then discard 2 cards."
