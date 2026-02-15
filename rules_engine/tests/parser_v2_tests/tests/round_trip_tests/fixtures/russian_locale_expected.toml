@@ -226,8 +226,11 @@ variables = "e: 2"
 russian = "▸ <b>Воплощён, Суд:</b> Получите <color=#00838F>2●</color>."
 
 [[tests]]
-english = "When you materialize an allied Spirit Animal, gain 1●."
-russian = "Когда вы воплощаете союзного Духа-Зверя, получите 1●."
+english = "When you {materialize} an allied {subtype($t)}, gain {energy($e)}."
+variables = """
+t: SpiritAnimal
+e: 1"""
+russian = "Когда вы воплощаете союзного <color=#2E7D32><b>Духа-Зверя</b></color>, получите <color=#00838F>1●</color>."
 
 [[tests]]
 english = "Abandon any number of allies: Draw a card for each ally abandoned."
@@ -336,8 +339,11 @@ english = "When you draw 2 cards in a turn, if this card is in your void, it gai
 russian = "Когда вы берёте 2 карты за ход, если эта карта находится в вашей Пустоте, она получает Возвышение 1● до конца хода."
 
 [[tests]]
-english = "When you play a Spirit Animal, draw a card."
-russian = "Когда вы играете Духа-Зверя, возьмите карту."
+english = "When you play {@a subtype($t)}, draw {cards($c)}."
+variables = """
+t: SpiritAnimal
+c: 1"""
+russian = "Когда вы играете <color=#2E7D32><b>Духа-Зверя</b></color>, возьмите карту."
 
 [[tests]]
 english = "{Materialized} You may return an ally to hand."
@@ -375,7 +381,7 @@ english = "When you play {@a subtype($t)}, put the {top_n_cards($v)} of your dec
 variables = """
 t: Survivor
 v: 2"""
-russian = "Когда вы играете Выжившего, положите 2 верхние карты вашей колоды в вашу Пустоту."
+russian = "Когда вы играете <color=#2E7D32><b>Выжившего</b></color>, положите 2 верхние карты вашей колоды в вашу Пустоту."
 
 [[tests]]
 english = "Gain {energy($e)}."
@@ -416,8 +422,11 @@ english = "Double the amount of ● you have."
 russian = "Удвойте количество ●, которое у вас есть."
 
 [[tests]]
-english = "▸ Judgment: Gain 1● for each allied Spirit Animal."
-russian = "▸ Суд: Получите 1● за каждого союзного Духа-Зверя."
+english = "{Judgment} Gain {energy($e)} for each allied {subtype($t)}."
+variables = """
+e: 1
+t: SpiritAnimal"""
+russian = "▸ <b>Суд:</b> Получите <color=#00838F>1●</color> за каждого союзного <color=#2E7D32><b>Духа-Зверя</b></color>."
 
 [[tests]]
 english = "Gain {energy($e)}."
@@ -796,8 +805,11 @@ english = "▸ Materialized: Draw a Warrior from your deck."
 russian = "▸ Воплощён: Возьмите Воина из вашей колоды."
 
 [[tests]]
-english = "▸ Materialized: Draw a card for each allied Spirit Animal."
-russian = "▸ Воплощён: Возьмите карту за каждого союзного Духа-Зверя."
+english = "{Materialized} Draw {cards($c)} for each allied {subtype($t)}."
+variables = """
+c: 1
+t: SpiritAnimal"""
+russian = "▸ <b>Воплощён:</b> Возьмите карту за каждого союзного <color=#2E7D32><b>Духа-Зверя</b></color>."
 
 [[tests]]
 english = "{Dissolved} Draw {cards($c)}."
@@ -877,8 +889,9 @@ variables = "c: 1"
 russian = "Когда вы отрекаетесь от персонажа, возьмите карту."
 
 [[tests]]
-english = "Each allied Spirit Animal gains spark equal to the number of allied Spirit Animals."
-russian = "Каждый союзный Дух-Зверь получает искру, равную количеству союзных Духов-Зверей."
+english = "Each allied {subtype($t)} gains spark equal to the number of allied {@plural subtype($t)}."
+variables = "t: SpiritAnimal"
+russian = "Каждый союзный <color=#2E7D32><b>Дух-Зверь</b></color> получает искру, равную количеству союзных <color=#2E7D32><b>Духов-Зверей</b></color>."
 
 [[tests]]
 english = "▸ Judgment: You may pay 1● to kindle 1 and banish a card from the opponent's void."
