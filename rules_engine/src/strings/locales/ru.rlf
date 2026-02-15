@@ -24,18 +24,18 @@ dissolved_keyword_name = "Рассеян";
 
 
 keyword($k) = "<color=#AA00FF>{$k}</color>";
-dissolve = "<color=#AA00FF>dissolve</color>";
+dissolve = "<color=#AA00FF>рассеяйте</color>";
 banish = "<color=#AA00FF>изгоните</color>";
-banished = "<color=#AA00FF>banished</color>";
+banished = "<color=#AA00FF>изгнан</color>";
 discover = "<color=#AA00FF>Откройте</color>";
-discovered = "<color=#AA00FF>discovered</color>";
+discovered = "<color=#AA00FF>открыт</color>";
 reclaim = "<color=#AA00FF>возвысьте</color>";
-reclaimed = "<color=#AA00FF>reclaimed</color>";
+reclaimed = "<color=#AA00FF>возвышен</color>";
 materialize = "<color=#AA00FF>воплотите</color>";
-prevent = "<color=#AA00FF>prevent</color>";
-prevented = "<color=#AA00FF>prevented</color>";
+prevent = "<color=#AA00FF>отмените розыгрыш</color>";
+prevented = "<color=#AA00FF>отменён</color>";
 kindle($k) = "Разожгите {$k}";
-kindled = "<color=#AA00FF>kindled</color>";
+kindled = "<color=#AA00FF>разожжён</color>";
 foresee($n) = "Прозрение {$n}";
 fast = "↯Стремительность";
 reclaim_for_cost($r) = "Возвышение {$r}●";
@@ -59,7 +59,7 @@ top_n_cards($n) = :match($n) {
 
 
 spark_value($s) = "{$s}";
-spark = "spark";
+spark = "искра";
 count($n) = "{$n}";
 
 
@@ -128,11 +128,11 @@ subtype($s) = :from($s) {
 
 
 text_number($n) = :match($n) {
-    1: "one",
-    2: "two",
-    3: "three",
-    4: "four",
-    5: "five",
+    1: "один",
+    2: "два",
+    3: "три",
+    4: "четыре",
+    5: "пять",
     *other: "{$n}",
 };
 
@@ -145,15 +145,16 @@ this_turn_times($n) = :match($n) {
 };
 
 multiply_by($n) = :match($n) {
-    2: "Double",
-    3: "Triple",
-    *other: "Multiply by {$n}",
+    2: "Удвойте",
+    3: "Утройте",
+    *other: "Умножьте на {$n}",
 };
 
 
 copies($n) = :match($n) {
-    1: "a copy",
-    *other: "{text_number($n)} copies",
+    1: "копию",
+    few: "{text_number($n)} копии",
+    *other: "{text_number($n)} копий",
 };
 
 
@@ -460,7 +461,7 @@ once_per_turn_prefix = "Один раз за ход, ";
 once_per_turn_suffix = ", один раз за ход";
 cost_effect_separator = ": ";
 then_joiner = ", затем ";
-and_joiner = " and ";
+and_joiner = " и ";
 sentence_joiner = ". ";
 sentence_separator = " ";
 period_suffix = ".";
