@@ -290,14 +290,14 @@ cost_and_connector = " и ";
 pay_prefix($cost) = "заплатить {$cost}";
 abandon_any_number_of($target) = :from($target) "отрекитесь от любого количества {$target:other}";
 abandon_target($target) = :from($target) "отрекитесь от {$target}";
-return_target_to_hand($target) = :from($target) "return {$target} to hand";
-return_count_to_hand($n, $target) = :from($target) "return {$n} {$target:other} to hand";
+return_target_to_hand($target) = :from($target) "верните {$target:acc} в руку";
+return_count_to_hand($n, $target) = :from($target) "верните {$n} {$target:other} в руку";
 return_all_but_one_to_hand($target) = :from($target) "верните в руку всех {$target:other}, кроме одного";
-return_all_to_hand($target) = :from($target) "return all {$target} to hand";
-return_any_number_to_hand($target) = :from($target) "return any number of {$target} to hand";
-return_up_to_to_hand($n, $target) = :from($target) "return up to {$n} {$target:other} to hand";
-return_each_other_to_hand($target) = :from($target) "return each other {$target} to hand";
-return_or_more_to_hand($n, $target) = :from($target) "return {$n} or more {$target:other} to hand";
+return_all_to_hand($target) = :from($target) "верните всех {$target:other} в руку";
+return_any_number_to_hand($target) = :from($target) "верните любое количество {$target:other} в руку";
+return_up_to_to_hand($n, $target) = :from($target) "верните до {$n} {$target:other} в руку";
+return_each_other_to_hand($target) = :from($target) "верните каждого другого {$target:gen} в руку";
+return_or_more_to_hand($n, $target) = :from($target) "верните {$n} или больше {$target:other} в руку";
 
 
 abandon_count_allies($a) = "отрекитесь от {count_allies($a)}";
@@ -306,7 +306,7 @@ energy_cost_value($e) = "{energy($e)}";
 lose_max_energy_cost($m) = "уменьшите ваш {maximum_energy($m)} на {$m}";
 banish_your_void_cost = "изгоните все карты из вашей Пустоты";
 banish_another_in_void = "изгоните другую карту из вашей Пустоты";
-banish_cards_from_void($c) = "{banish} {cards($c)} from your void";
+banish_cards_from_void($c) = "изгоните {cards($c)} из вашей Пустоты";
 banish_cards_from_enemy_void($c) = "изгоните {cards($c)} из Пустоты противника";
 banish_void_min_count($n) = "изгоните все карты из вашей Пустоты, если в ней {count($n)} или больше карт";
 banish_from_hand_cost($target) = :from($target) "изгоните {$target} из руки";
@@ -391,7 +391,7 @@ discard_chosen_from_enemy_hand_then_draw($target) = :from($target) :match($targe
     inan: "сбросьте выбранную {$target} из руки противника. Затем противник берёт {cards(1)}",
 };
 put_from_void_on_top_of_deck($target) = :from($target) { *one: "положите {$target} из вашей Пустоты на верх вашей колоды", inf: "положить {$target:inf} из вашей Пустоты на верх вашей колоды" };
-put_up_to_from_void_on_top_of_deck($n, $target) = "put up to {cards($n)} {$target} from your void on top of your deck";
+put_up_to_from_void_on_top_of_deck($n, $target) = "положите до {cards($n)} из вашей Пустоты на верх вашей колоды";
 materialize_random_from_deck($n, $constraint) = "воплотите {n_random_characters($n)} {$constraint} из вашей колоды";
 copy_next_played($target, $times) = :from($target) :match($target) {
     *neut: "скопируйте следующее {$target:acc}, которое вы сыграете {this_turn_times($times)}",
@@ -404,7 +404,7 @@ dissolve_target($target) = :from($target) { *one: "рассеяйте {$target}"
 banish_target($target) = :from($target) "изгоните {$target}";
 banish_until_leaves($target, $until) = :from($target) "изгоните {$target:acc}, пока {$until:nom} не покинет игру";
 banish_until_next_main($target) = :from($target) "изгоните {$target:acc} до вашей следующей главной фазы";
-banish_when_leaves_play($target) = :from($target) "{banish} {$target} when it leaves play";
+banish_when_leaves_play($target) = :from($target) "изгоните {$target:acc}, когда он покидает поле боя";
 gain_control_of($target) = :from($target) "получите контроль над {$target:ins}";
 discover_target($target) = :from($target) { *one: "Откройте {$target}", inf: "открыть {$target}" };
 discover_and_materialize($target) = :from($target) { *one: "Откройте {$target} и воплотите его", inf: "открыть {$target:inf} и воплотить его" };
@@ -415,7 +415,7 @@ materialize_target($target) = :from($target) :match($target) {
     inan: "воплотите {$target:acc}",
 };
 materialize_at_end_of_turn($target) = :from($target) "воплотите {$target} в конце хода";
-materialize_from_void($target) = "{materialize} {$target} from your void";
+materialize_from_void($target) = :from($target) "воплотите {$target:acc} из вашей Пустоты";
 return_to_hand($target) = :from($target) { *one: "верните {$target} в руку", inf: "вернуть {$target} в руку" };
 return_this_to_hand = { *one: "верните этого персонажа в руку", inf: "вернуть этого персонажа в руку" };
 return_any_character_to_hand = { *one: "верните врага или союзника в руку", inf: "вернуть врага или союзника в руку" };
@@ -436,10 +436,10 @@ put_on_top_of_enemy_deck($target) = :from($target) :match($target) {
 copy_target($target) = :from($target) "скопируйте {$target:acc}";
 disable_activated_abilities($target) = "отключите активируемые способности {$target:gen}, пока этот персонаж находится в игре";
 draw_matching_from_deck($target) = :from($target) "возьмите {$target:acc} из вашей колоды";
-abandon_and_gain_energy_for_spark($target) = "abandon {$target} and gain {energy_symbol} for each point of spark that character had";
-abandon_at_end_of_turn($target) = "abandon {$target} at end of turn";
+abandon_and_gain_energy_for_spark($target) = :from($target) "отрекитесь от {$target:gen} и получите {energy_symbol} равное его искре";
+abandon_at_end_of_turn($target) = :from($target) "отрекитесь от {$target:gen} в конце хода";
 each_player_abandons($target) = :from($target) "каждый игрок отрекается от {$target:gen}";
-prevent_dissolve_this_turn($target) = "{$target} cannot be {dissolved} this turn";
+prevent_dissolve_this_turn($target) = :from($target) "{$target:nom} не может быть рассеян в этом ходу";
 prevent_played_target($target) = :from($target) "отмените розыгрыш {$target:gen}";
 prevent_unless_pays($target, $cost) = :from($target) "отмените розыгрыш {$target:gen}, если только противник не заплатит {$cost}";
 gain_energy_equal_to_cost($target) = "Получите {energy_symbol}, равное стоимости этого персонажа";
