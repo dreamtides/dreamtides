@@ -437,8 +437,9 @@ variables = "e: 3"
 russian = "Получите <color=#00838F>3●</color>."
 
 [[tests]]
-english = "Abandon an ally, once per turn: Reclaim a Warrior."
-russian = "Отрекитесь от союзника, один раз за ход: Возвысьте Воина."
+english = "Abandon an ally, once per turn: {Reclaim} {@a subtype($t)}."
+russian = "Отрекитесь от союзника, один раз за ход: Возвысьте <color=#2E7D32><b>Воина</b></color>."
+variables = "t: Warrior"
 
 [[tests]]
 english = "{foresee($f)}. Draw {cards($c)}."
@@ -1260,3 +1261,72 @@ russian = "Отрекитесь от любого количества союз�
 [[tests]]
 english = "Return all but one ally to hand: Draw a card for each ally returned."
 russian = "Верните в руку всех союзников, кроме одного: Возьмите карту за каждого возвращённого союзника."
+
+# Batch 2.39: Reclaim activated abilities and dissolved triggers (continued from earlier batch)
+[[tests]]
+english = "Abandon an ally, once per turn: Gain {points($p)}."
+russian = "Отрекитесь от союзника, один раз за ход: Получите 1⍏."
+variables = "p: 1"
+
+[[tests]]
+english = "Abandon {count_allies($a)}: {Reclaim} this character."
+russian = "Отрекитесь от 2 союзников: Возвысьте этого персонажа."
+variables = "a: 2"
+
+[[tests]]
+english = "{Banish} your void with {count($n)} or more cards: {Reclaim} this character."
+russian = "Изгоните все карты из вашей Пустоты, если в ней 8 или больше карт: Возвысьте этого персонажа."
+variables = "n: 8"
+
+[[tests]]
+english = "{Dissolved} You may pay {energy($e)} to return this character to your hand."
+russian = "▸ Рассеян: Вы можете заплатить 1●, чтобы вернуть этого персонажа в руку."
+variables = "e: 1"
+
+# Batch 2.40: Banish enemy with duration and control
+[[tests]]
+english = "{Materialized} {Banish} an enemy until your next main phase."
+russian = "▸ Воплощён: Изгоните врага до вашей следующей главной фазы."
+
+[[tests]]
+english = "{Materialized} {Banish} an enemy until this character leaves play."
+russian = "▸ Воплощён: Изгоните врага, пока этот персонаж не покинет игру."
+
+[[tests]]
+english = "{Materialized} Gain control of an enemy with cost {energy($e)} or less."
+russian = "▸ Воплощён: Получите контроль над врагом стоимостью 2● или меньше."
+variables = "e: 2"
+
+[[tests]]
+english = "{Materialized} {Banish} the opponent's void."
+russian = "▸ Воплощён: Изгоните все карты из Пустоты противника."
+
+[[tests]]
+english = "Disable the {Materialized} abilities of enemies."
+russian = "Отключите у врагов способности «▸ Воплощён:»."
+
+# Batch 2.41: Materialized triggers with complex effects
+[[tests]]
+english = "{Materialized_Judgment} {Banish} an ally with spark {$s} or less, then {materialize} it."
+russian = "▸ Воплощён, Суд: Изгоните союзника с искрой 2 или меньше, затем воплотите его."
+variables = "s: 2"
+
+[[tests]]
+english = "{Materialized} Discard {cards($d)}, then draw {cards($c)}."
+russian = "▸ Воплощён: Сбросьте 2 карты, затем возьмите 2 карты."
+variables = "d: 2, c: 2"
+
+[[tests]]
+english = "{Materialized_Judgment} With {count_allied_subtype($a, $t)}, gain {energy($e)}."
+russian = "▸ Воплощён, Суд: Если у вас есть 2 союзных Воина, получите 1●."
+variables = "a: 2, t: Warrior, e: 1"
+
+[[tests]]
+english = "{Materialized} Copy the next event you play {this_turn_times($n)}."
+russian = "▸ Воплощён: Скопируйте следующее событие, которое вы сыграете в этот ход, три раза."
+variables = "n: 3"
+
+[[tests]]
+english = "{Materialized} Draw {@a subtype($t)} from your deck."
+russian = "▸ Воплощён: Возьмите Воина из вашей колоды."
+variables = "t: Warrior"

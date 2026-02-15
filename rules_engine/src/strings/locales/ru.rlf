@@ -25,7 +25,7 @@ dissolved_keyword_name = "Рассеян";
 
 keyword($k) = "<color=#AA00FF>{$k}</color>";
 dissolve = "<color=#AA00FF>dissolve</color>";
-banish = "<color=#AA00FF>banish</color>";
+banish = "<color=#AA00FF>изгоните</color>";
 banished = "<color=#AA00FF>banished</color>";
 discover = "<color=#AA00FF>Откройте</color>";
 discovered = "<color=#AA00FF>discovered</color>";
@@ -63,7 +63,7 @@ spark = "spark";
 count($n) = "{$n}";
 
 
-ally = :masc :anim { nom: "союзник", *acc: "союзника", gen: "союзника", one: "союзника", other: "союзников", inf: "союзника" };
+ally = :masc :anim { nom: "союзник", *acc: "союзника", gen: "союзника", ins: "союзником", one: "союзника", other: "союзников", inf: "союзника" };
 count_allies($n) = :match($n) {
     1: "союзника",
     few: "{$n} союзников",
@@ -135,9 +135,10 @@ text_number($n) = :match($n) {
 
 
 this_turn_times($n) = :match($n) {
-    1: "this turn",
-    2: "twice this turn",
-    *other: "this turn {text_number($n)} times",
+    1: "в этот ход",
+    2: "дважды в этот ход",
+    3: "три раза",
+    *other: "в этот ход {text_number($n)} раз",
 };
 
 multiply_by($n) = :match($n) {
@@ -295,11 +296,11 @@ abandon_count_allies($a) = "отрекитесь от {count_allies($a)}";
 discard_cards_cost($d) = "сбросьте {cards($d)}";
 energy_cost_value($e) = "{energy($e)}";
 lose_max_energy_cost($m) = "уменьшите ваш {maximum_energy($m)} на {$m}";
-banish_your_void_cost = "{banish} your void";
+banish_your_void_cost = "изгоните все карты из вашей Пустоты";
 banish_another_in_void = "изгоните другую карту из вашей Пустоты";
 banish_cards_from_void($c) = "{banish} {cards($c)} from your void";
 banish_cards_from_enemy_void($c) = "изгоните {cards($c)} из Пустоты противника";
-banish_void_min_count($n) = "{banish} your void with {count($n)} or more cards";
+banish_void_min_count($n) = "изгоните все карты из вашей Пустоты, если в ней {count($n)} или больше карт";
 banish_from_hand_cost($target) = :from($target) "изгоните {$target} из руки";
 
 
@@ -362,8 +363,8 @@ gain_twice_energy_instead_effect = "gain twice that much {energy_symbol} instead
 gain_energy_equal_to_that_cost_effect = "gain {energy_symbol} equal to that character's cost";
 gain_energy_equal_to_this_cost_effect = "gain {energy_symbol} equal to this character's cost";
 put_deck_into_void_effect($v) = "положите {top_n_cards($v)} вашей колоды в вашу Пустоту";
-banish_cards_from_enemy_void_effect($c) = "{banish} {cards($c)} from the opponent's void";
-banish_enemy_void_effect = "{banish} the opponent's void";
+banish_cards_from_enemy_void_effect($c) = "изгоните {cards($c)} из Пустоты противника";
+banish_enemy_void_effect = "изгоните все карты из Пустоты противника";
 judgment_phase_at_end_of_turn_effect = "at the end of this turn, trigger an additional {judgment_phase_name} phase";
 multiply_energy_effect($n) = "{multiply_by($n)} the amount of {energy_symbol} you have";
 spend_all_energy_dissolve_effect = "spend all your {energy_symbol}. {dissolve} an enemy with cost less than or equal to the amount spent";
@@ -384,15 +385,19 @@ discard_chosen_from_enemy_hand_then_draw($target) = :from($target) :match($targe
 put_from_void_on_top_of_deck($target) = :from($target) { *one: "положите {$target} из вашей Пустоты на верх вашей колоды", inf: "положить {$target} из вашей Пустоты на верх вашей колоды" };
 put_up_to_from_void_on_top_of_deck($n, $target) = "put up to {cards($n)} {$target} from your void on top of your deck";
 materialize_random_from_deck($n, $constraint) = "{materialize} {n_random_characters($n)} {$constraint} from your deck";
-copy_next_played($target, $times) = "copy the next {$target} you play {this_turn_times($times)}";
+copy_next_played($target, $times) = :from($target) :match($target) {
+    *neut: "скопируйте следующее {$target:acc}, которое вы сыграете {this_turn_times($times)}",
+    masc: "скопируйте следующего {$target:acc}, которого вы сыграете {this_turn_times($times)}",
+    fem: "скопируйте следующую {$target:acc}, которую вы сыграете {this_turn_times($times)}",
+};
 create_trigger_until_end_of_turn_keyword($trig, $eff) = "До конца хода, {$trig} {@cap $eff}";
 create_trigger_until_end_of_turn($trig, $eff) = "До конца хода, {$trig}{$eff}";
 dissolve_target($target) = :from($target) "рассеяйте {$target}";
 banish_target($target) = :from($target) "изгоните {$target}";
-banish_until_leaves($target, $until) = "{banish} {$target} until {$until} leaves play";
-banish_until_next_main($target) = "{banish} {$target} until your next main phase";
-banish_when_leaves_play($target) = "{banish} {$target} when it leaves play";
-gain_control_of($target) = "gain control of {$target}";
+banish_until_leaves($target, $until) = :from($target) "изгоните {$target:acc}, пока {$until:nom} не покинет игру";
+banish_until_next_main($target) = :from($target) "изгоните {$target:acc} до вашей следующей главной фазы";
+banish_when_leaves_play($target) = :from($target) "{banish} {$target} when it leaves play";
+gain_control_of($target) = :from($target) "получите контроль над {$target:ins}";
 discover_target($target) = :from($target) { *one: "Откройте {$target}", inf: "открыть {$target}" };
 discover_and_materialize($target) = :from($target) { *one: "Откройте {$target} и воплотите его", inf: "открыть {$target} и воплотить его" };
 materialize_target($target) = "{materialize} {$target}";
@@ -403,8 +408,8 @@ return_this_to_hand = { *one: "верните этого персонажа в �
 return_any_character_to_hand = { *one: "верните врага или союзника в руку", inf: "вернуть врага или союзника в руку" };
 return_ally_to_hand = { *one: "верните союзника в руку", inf: "вернуть союзника в руку" };
 return_from_void_to_hand($target) = :from($target) { *one: "верните {$target} из вашей Пустоты в руку", inf: "вернуть {$target} из вашей Пустоты в руку" };
-reclaim_target($target) = :from($target) "{reclaim} {$target:acc}";
-reclaim_random($target) = "{reclaim} a random {$target}";
+reclaim_target($target) = :from($target) "возвысьте {$target:acc}";
+reclaim_random($target) = :from($target) "{reclaim} a random {$target}";
 put_on_top_of_enemy_deck($target) = :from($target) :match($target) {
     *fem: "положите её на верх колоды противника",
     masc: "положите его на верх колоды противника",
@@ -412,7 +417,7 @@ put_on_top_of_enemy_deck($target) = :from($target) :match($target) {
 };
 copy_target($target) = :from($target) "скопируйте {$target:acc}";
 disable_activated_abilities($target) = "disable the activated abilities of {$target} while this character is in play";
-draw_matching_from_deck($target) = "draw {$target} from your deck";
+draw_matching_from_deck($target) = :from($target) "возьмите {$target:acc} из вашей колоды";
 abandon_and_gain_energy_for_spark($target) = "abandon {$target} and gain {energy_symbol} for each point of spark that character had";
 abandon_at_end_of_turn($target) = "abandon {$target} at end of turn";
 each_player_abandons($target) = :from($target) "каждый игрок отрекается от {$target:gen}";
@@ -435,7 +440,7 @@ you_may_prefix = "вы можете ";
 cost_to_connector($cost) = "{$cost}, чтобы ";
 until_end_of_turn_prefix = "До конца хода, ";
 once_per_turn_prefix = "Один раз за ход, ";
-once_per_turn_suffix = ", once per turn";
+once_per_turn_suffix = ", один раз за ход";
 cost_effect_separator = ": ";
 then_joiner = ", затем ";
 and_joiner = " and ";
@@ -448,6 +453,7 @@ character = :masc :anim {
     nom: "персонаж",
     *acc: "персонажа",
     gen: "персонажа",
+    ins: "персонажем",
     nom_pl: "персонажи",
     one: "персонажа",
     other: "персонажей",
@@ -471,10 +477,10 @@ event = :neut :inan {
     many: "событий",
     other: "событий",
 };
-enemy = :masc :anim { nom: "враг", *acc: "врага", gen: "врага", one: "врага", other: "врагов" };
+enemy = :masc :anim { nom: "враг", *acc: "врага", gen: "врага", ins: "врагом", one: "врага", other: "врагов" };
 
 this_card = :a{ one: "this card", other: "these cards" };
-this_character = :masc :anim { nom: "этот персонаж", *acc: "этого персонажа", gen: "этого персонажа", one: "этого персонажа", other: "этих персонажей" };
+this_character = :masc :anim { nom: "этот персонаж", *acc: "этого персонажа", gen: "этого персонажа", ins: "этим персонажем", one: "этого персонажа", other: "этих персонажей" };
 this_event = :an{ one: "this event", other: "these events" };
 that_character = :a{ one: "that character", other: "those characters" };
 pronoun_it = {
@@ -760,7 +766,7 @@ play_for_alternate_cost_simple($card_type, $e) = "{$card_type:nom} стоит {e
 play_for_alternate_cost_with_additional($cost, $card_type, $e) = :from($card_type) "{$cost}: Сыграйте {$card_type:acc} за {energy($e)}";
 play_for_alternate_cost_abandon($cost, $card_type, $e) = "{$cost}: Play {$card_type} for {energy($e)}, then abandon it";
 characters_in_hand_have_fast = "персонажи в вашей руке имеют {fast}";
-disable_enemy_materialized_abilities = "disable the {Materialized} abilities of enemies";
+disable_enemy_materialized_abilities = "отключите у врагов способности «{materialized}»";
 has_all_character_types = "У этого персонажа есть все типы персонажей";
 multiply_energy_gain($n) = "До конца хода удвойте количество {energy_symbol}, которое вы получаете от эффектов карт";
 multiply_card_draw($n) = "До конца хода удвойте количество карт, которые вы берёте от эффектов карт";
