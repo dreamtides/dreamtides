@@ -291,11 +291,11 @@ when_you_play_trigger($target) = :from($target) "когда вы играете 
 when_opponent_plays_trigger($target) = :from($target) "when the opponent plays {$target}, ";
 when_you_play_from_hand_trigger($target) = :from($target) "when you play {$target} from your hand, ";
 when_you_play_in_turn_trigger($target) = :from($target) "when you play {$target} in a turn, ";
-when_you_play_during_enemy_turn_trigger($target) = :from($target) "when you play {$target} during the opponent's turn, ";
+when_you_play_during_enemy_turn_trigger($target) = :from($target) "когда вы играете {$target} в ход противника, ";
 when_you_discard_trigger($target) = :from($target) "когда вы сбрасываете {$target}, ";
 when_leaves_play_trigger($target) = :from($target) "when {$target} leaves play, ";
 when_you_abandon_trigger($target) = :from($target) "когда вы отрекаетесь от {$target}, ";
-when_put_into_void_trigger($target) = :from($target) "when {$target} is put into your void, ";
+when_put_into_void_trigger($target) = :from($target) "когда {$target:nom} попадает в вашу Пустоту, ";
 
 
 when_you_materialize_trigger($target) = :from($target) "когда вы воплощаете {$target}, ";

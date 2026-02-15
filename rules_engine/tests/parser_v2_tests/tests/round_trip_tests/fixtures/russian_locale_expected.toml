@@ -383,7 +383,8 @@ english = "This character costs 1● if you have discarded a card this turn."
 russian = "Этот персонаж стоит 1●, если вы сбрасывали карту в этот ход."
 
 [[tests]]
-english = "Abandon an ally: This character gains +1 spark."
+english = "Abandon an ally: This character gains +{$s} spark."
+variables = "s: 1"
 russian = "Отрекитесь от союзника: Этот персонаж получает +1 к искре."
 
 [[tests]]
@@ -478,7 +479,8 @@ english = "{Prevent} a played card."
 russian = "Отмените розыгрыш карты."
 
 [[tests]]
-english = "When you play a ↯fast card, this character gains +2 spark."
+english = "When you play a {fast} card, this character gains +{$s} spark."
+variables = "s: 2"
 russian = "Когда вы играете карту с ↯Стремительностью, этот персонаж получает +2 к искре."
 
 [[tests]]
@@ -873,7 +875,8 @@ english = "Abandon an ally: Gain ● equal to that character's cost."
 russian = "Отрекитесь от союзника: Получите ●, равное стоимости этого персонажа."
 
 [[tests]]
-english = "When an event is put into your void, this character gains +1 spark."
+english = "When an event is put into your void, this character gains +{$s} spark."
+variables = "s: 1"
 russian = "Когда событие попадает в вашу Пустоту, этот персонаж получает +1 к искре."
 
 [[tests]]
@@ -907,7 +910,8 @@ variables = "t: Warrior"
 russian = "Откройте <color=#2E7D32><b>Воина</b></color>."
 
 [[tests]]
-english = "When you play a card during the opponent's turn, this character gains +1 spark."
+english = "When you play a card during the opponent's turn, this character gains +{$s} spark."
+variables = "s: 1"
 russian = "Когда вы играете карту в ход противника, этот персонаж получает +1 к искре."
 
 [[tests]]
