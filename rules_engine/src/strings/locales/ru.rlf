@@ -27,7 +27,7 @@ keyword($k) = "<color=#AA00FF>{$k}</color>";
 dissolve = "<color=#AA00FF>dissolve</color>";
 banish = "<color=#AA00FF>banish</color>";
 banished = "<color=#AA00FF>banished</color>";
-discover = "<color=#AA00FF>discover</color>";
+discover = "<color=#AA00FF>Откройте</color>";
 discovered = "<color=#AA00FF>discovered</color>";
 reclaim = "<color=#AA00FF>reclaim</color>";
 reclaimed = "<color=#AA00FF>reclaimed</color>";
@@ -45,7 +45,7 @@ choose_one = "<b>Choose One:</b>";
 bullet = "•";
 
 
-card = :fem :inan { *one: "карта", gen: "карты", other: "карты" };
+card = :fem :inan { nom: "карта", *acc: "карту", gen: "карты", one: "карту", other: "карт" };
 cards($n) = :match($n) {
     1: "карту",
     few: "{$n} карты",
@@ -114,7 +114,7 @@ tinkerer = :a{ one: "Tinkerer", other: "Tinkerers" };
 trooper = :a{ one: "Trooper", other: "Troopers" };
 visionary = :a{ one: "Visionary", other: "Visionaries" };
 visitor = :a{ one: "Visitor", other: "Visitors" };
-warrior = :a{ one: "Warrior", other: "Warriors" };
+warrior = :masc :anim { nom: "Воин", *acc: "Воина", gen: "Воина", one: "Воина", other: "Воинов" };
 
 subtype($s) = :from($s) {
     *one: "<color=#2E7D32><b>{$s}</b></color>",
@@ -368,8 +368,8 @@ banish_until_leaves($target, $until) = "{banish} {$target} until {$until} leaves
 banish_until_next_main($target) = "{banish} {$target} until your next main phase";
 banish_when_leaves_play($target) = "{banish} {$target} when it leaves play";
 gain_control_of($target) = "gain control of {$target}";
-discover_target($target) = "{discover} {$target}";
-discover_and_materialize($target) = "{discover} {$target} and {materialize} it";
+discover_target($target) = :from($target) { *one: "Откройте {$target}", inf: "открыть {$target}" };
+discover_and_materialize($target) = :from($target) { *one: "Откройте {$target} и воплотите его", inf: "открыть {$target} и воплотить его" };
 materialize_target($target) = "{materialize} {$target}";
 materialize_at_end_of_turn($target) = :from($target) "воплотите {$target} в конце хода";
 materialize_from_void($target) = "{materialize} {$target} from your void";
@@ -484,7 +484,7 @@ your_event_could_dissolve($target) = "your event which could {dissolve} {$target
 your_event_could_dissolve_plural($target) = "your events which could {dissolve} {$target}";
 fast_predicate($target) = :a "{fast} {$target}";
 fast_predicate_plural($target) = "{fast} {$target}";
-with_materialized_ability_constraint = "with a {materialized} ability";
+with_materialized_ability_constraint = "со способностью «▸ Воплощён:»";
 with_materialized_abilities_constraint = "with {materialized} abilities";
 with_activated_ability_constraint = "with an activated ability";
 with_activated_abilities_constraint = "with activated abilities";

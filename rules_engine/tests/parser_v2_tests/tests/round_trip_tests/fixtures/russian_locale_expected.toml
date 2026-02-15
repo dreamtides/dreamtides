@@ -117,8 +117,9 @@ variables = "p: 1"
 russian = "Когда союзник рассеивается, получите <color=#F57F17>1⍏</color>."
 
 [[tests]]
-english = "Discover a card with cost 2●."
-russian = "Откройте карту стоимостью 2●."
+english = "{Discover} a card with cost {energy($e)}."
+variables = "e: 2"
+russian = "Откройте карту стоимостью <color=#00838F>2●</color>."
 
 [[tests]]
 english = "When you abandon 2 allies in a turn, dissolve an enemy."
@@ -162,7 +163,7 @@ english = "Pay 1 or more ●: Dissolve all characters with spark less than the a
 russian = "Заплатите не менее 1●: Рассеяйте всех персонажей с искрой меньше числа уплаченных ●."
 
 [[tests]]
-english = "Discover a character with a ▸ Materialized: ability."
+english = "{Discover} a character with a {materialized} ability."
 russian = "Откройте персонажа со способностью «▸ Воплощён:»."
 
 [[tests]]
@@ -226,7 +227,7 @@ english = "▸ Judgment: You may pay 3● to banish up to 2 allies, then materia
 russian = "▸ Суд: Вы можете заплатить 3●, чтобы изгнать до 2 союзников, затем воплотить их."
 
 [[tests]]
-english = "Discover an event."
+english = "{Discover} an event."
 russian = "Откройте событие."
 
 [[tests]]
@@ -892,8 +893,9 @@ english = "Once per turn, you may play a character with cost 2● or less from y
 russian = "Один раз за ход вы можете сыграть персонажа стоимостью 2● или меньше из вашей Пустоты."
 
 [[tests]]
-english = "Discover a Warrior."
-russian = "Откройте Воина."
+english = "{Discover} {@a subtype($t)}."
+variables = "t: Warrior"
+russian = "Откройте <color=#2E7D32><b>Воина</b></color>."
 
 [[tests]]
 english = "When you play a card during the opponent's turn, this character gains +1 spark."
@@ -963,8 +965,9 @@ english = "▸ Materialized: Prevent a played card with cost 2● or less."
 russian = "▸ Воплощён: Отмените розыгрыш карты стоимостью 2● или меньше."
 
 [[tests]]
-english = "Discover a Survivor."
-russian = "Откройте Выжившего."
+english = "{Discover} {@a subtype($t)}."
+variables = "t: Survivor"
+russian = "Откройте <color=#2E7D32><b>Выжившего</b></color>."
 
 [[tests]]
 english = "When an ally is {banished}, this character gains +{$s} spark."
