@@ -62,7 +62,7 @@ spark = "spark";
 count($n) = "{$n}";
 
 
-ally = :masc :anim { nom: "союзник", *acc: "союзника", gen: "союзника", one: "союзника", other: "союзников" };
+ally = :masc :anim { nom: "союзник", *acc: "союзника", gen: "союзника", one: "союзника", other: "союзников", inf: "союзника" };
 count_allies($n) = :match($n) {
     1: "союзника",
     few: "{$n} союзников",
@@ -163,12 +163,12 @@ up_to_n_events($n) = :match($n) {
 
 
 up_to_n_allies($n) = :match($n) {
-    1: "an {ally}",
-    *other: "up to {$n} {ally:other}",
+    1: "{ally}",
+    *other: "до {$n} {ally:other}",
 };
 
 
-pronoun = { one: "it", other: "them" };
+pronoun = { one: "его", few: "их", other: "их" };
 
 
 bug_icon = "";
@@ -337,7 +337,7 @@ foresee_effect($f) = "{foresee($f)}";
 kindle_effect($k) = "{kindle($k)}";
 each_player_discards_effect($d) = "each player discards {cards($d)}";
 prevent_that_card_effect = "{prevent} that card";
-then_materialize_it_effect($target) = "then {materialize} it";
+then_materialize_it_effect($target) = "затем воплотите его";
 gain_twice_energy_instead_effect = "gain twice that much {energy_symbol} instead";
 gain_energy_equal_to_that_cost_effect = "gain {energy_symbol} equal to that character's cost";
 gain_energy_equal_to_this_cost_effect = "gain {energy_symbol} equal to this character's cost";
@@ -370,7 +370,7 @@ gain_control_of($target) = "gain control of {$target}";
 discover_target($target) = "{discover} {$target}";
 discover_and_materialize($target) = "{discover} {$target} and {materialize} it";
 materialize_target($target) = "{materialize} {$target}";
-materialize_at_end_of_turn($target) = "{materialize} {$target} at end of turn";
+materialize_at_end_of_turn($target) = :from($target) "воплотите {$target} в конце хода";
 materialize_from_void($target) = "{materialize} {$target} from your void";
 return_to_hand($target) = :from($target) { *one: "верните {$target} в руку", inf: "вернуть {$target} в руку" };
 return_this_to_hand = { *one: "верните этого персонажа в руку", inf: "вернуть этого персонажа в руку" };
@@ -407,7 +407,7 @@ until_end_of_turn_prefix = "Until end of turn, ";
 once_per_turn_prefix = "Один раз за ход, ";
 once_per_turn_suffix = ", once per turn";
 cost_effect_separator = ": ";
-then_joiner = ", then ";
+then_joiner = ", затем ";
 and_joiner = " and ";
 sentence_joiner = ". ";
 sentence_separator = " ";
@@ -422,8 +422,8 @@ this_card = :a{ one: "this card", other: "these cards" };
 this_character = :masc :anim { nom: "этот персонаж", *acc: "этого персонажа", gen: "этого персонажа", one: "этого персонажа", other: "этих персонажей" };
 this_event = :an{ one: "this event", other: "these events" };
 that_character = :a{ one: "that character", other: "those characters" };
-pronoun_it = { *one: "it", other: "them" };
-pronoun_them = "them";
+pronoun_it = { *one: "его", other: "их" };
+pronoun_them = "их";
 as_plural($p) = "{$p:other}";
 with_plural($one, $other) = :from($one) { *one: "{$one}", other: "{$other}" };
 your_generic_character = :masc :anim { nom: "союзник", *one: "персонажа", other: "союзников" };
@@ -575,13 +575,13 @@ collection_all($target) = :from($target) :match($target) {
     *inan: "все {$target:other}",
 };
 collection_exactly($n, $target) = "{$n} {$target:other}";
-collection_up_to($n, $target) = "up to {$n} {$target:other}";
-collection_any_number_of($target) = "any number of {$target:other}";
+collection_up_to($n, $target) = :from($target) "до {$n} {$target:other}";
+collection_any_number_of($target) = :from($target) "любое количество {$target:other}";
 
 dissolve_collection($target) = :from($target) "рассеяйте {$target}";
 banish_collection_target($target) = "{banish} {$target}";
 
-materialize_them($target) = "{materialize} them";
+materialize_them($target) = "воплотите их";
 materialize_collection_target($target) = "{materialize} {$target}";
 
 materialize_copy_of($target) = :from($target) "{materialize} копию {$target}";
@@ -597,10 +597,10 @@ trigger_judgment_of_each($target) = "trigger the {Judgment} ability of each {$ta
 materialize_figments_for_each_quantity($fig, $quantity) = "{materialize} {$fig} for each {$quantity}";
 
 
-banish_then_materialize_it($target) = "{banish} {$target}, then {materialize} it";
-banish_then_materialize_any_number($target) = "{banish} any number of {$target:other}, then {materialize} them";
-banish_then_materialize_up_to($n, $target) = "{banish} up to {$n} {$target:other}, then {materialize} {pronoun:$n}";
-banish_then_materialize_them($target) = "{banish} {$target}, then {materialize} them";
+banish_then_materialize_it($target) = :from($target) { *one: "изгоните {$target}, затем воплотите его", inf: "изгнать {$target}, затем воплотить его" };
+banish_then_materialize_any_number($target) = :from($target) { *one: "изгоните любое количество {$target:other}, затем воплотите их", inf: "изгнать любое количество {$target:other}, затем воплотить их" };
+banish_then_materialize_up_to($n, $target) = :from($target) { *one: "изгоните до {$n} {$target:other}, затем воплотите {pronoun:$n}", inf: "изгнать до {$n} {$target:other}, затем воплотить {pronoun:$n}" };
+banish_then_materialize_them($target) = :from($target) { *one: "изгоните {$target}, затем воплотите их", inf: "изгнать {$target}, затем воплотить их" };
 
 
 allied_card_with_subtype($t) = :from($t) {

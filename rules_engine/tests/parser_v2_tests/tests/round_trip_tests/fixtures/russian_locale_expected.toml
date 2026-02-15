@@ -1058,3 +1058,24 @@ russian = "▸ Воплощён: Сбросьте выбранную карту 
 [[tests]]
 english = "▸ Judgment: You may pay 1● to return this character from your void to your hand."
 russian = "▸ Суд: Вы можете заплатить 1●, чтобы вернуть этого персонажа из вашей Пустоты в руку."
+
+[[tests]]
+english = "{Banish} {up_to_n_allies($n)}, then {materialize} {pronoun:$n}."
+variables = "n: 2"
+russian = "Изгоните до 2 союзников, затем воплотите их."
+
+[[tests]]
+english = "{Banish} an ally. {Materialize} it at end of turn."
+russian = "Изгоните союзника. Воплотите его в конце хода."
+
+[[tests]]
+english = "{Materialized} You may {banish} an ally, then {materialize} it."
+russian = "▸ <b>Воплощён:</b> Вы можете изгнать союзника, затем воплотить его."
+
+[[tests]]
+english = "{Judgment} You may {banish} an ally, then {materialize} it."
+russian = "▸ <b>Суд:</b> Вы можете изгнать союзника, затем воплотить его."
+
+[[tests]]
+english = "{Materialized} {Banish} any number of allies, then {materialize} them."
+russian = "▸ <b>Воплощён:</b> Изгоните любое количество союзников, затем воплотите их."
