@@ -314,11 +314,11 @@ banish_from_hand_cost($target) = :from($target) "изгоните {$target} из
 
 at_end_of_your_turn_trigger = "в конце вашего хода, ";
 when_deck_empty_trigger = "если в вашей колоде нет карт, ";
-when_you_gain_energy_trigger = "when you gain energy, ";
+when_you_gain_energy_trigger = "когда вы получаете {energy_symbol}, ";
 when_you_play_trigger($target) = :from($target) "когда вы играете {$target}, ";
-when_opponent_plays_trigger($target) = :from($target) "when the opponent plays {$target}, ";
+when_opponent_plays_trigger($target) = :from($target) "когда противник играет {$target}, ";
 when_you_play_from_hand_trigger($target) = :from($target) "когда вы играете {$target} из руки, ";
-when_you_play_in_turn_trigger($target) = :from($target) "when you play {$target} in a turn, ";
+when_you_play_in_turn_trigger($target) = :from($target) "когда вы играете {$target} за ход, ";
 when_you_play_during_enemy_turn_trigger($target) = :from($target) "когда вы играете {$target} в ход противника, ";
 when_you_discard_trigger($target) = :from($target) "когда вы сбрасываете {$target}, ";
 when_leaves_play_trigger($target) = :from($target) "когда {$target:nom} покидает игру, ";
@@ -332,17 +332,17 @@ when_banished_trigger($target) = :from($target) "когда {$target:nom} изг
 when_you_play_cards_in_turn_trigger($c) = "когда вы играете {$c} {card:$c} за ход, ";
 when_you_abandon_count_in_turn_trigger($a) = "когда вы отрекаетесь от {count_allies($a)} за ход, ";
 when_you_draw_in_turn_trigger($c) = "когда вы берёте {$c} {card:$c} за ход, ";
-when_you_materialize_nth_in_turn_trigger($n, $target) = :from($target) "when you {materialize} {text_number($n)} {$target:other} in a turn, ";
+when_you_materialize_nth_in_turn_trigger($n, $target) = :from($target) "когда вы воплощаете {text_number($n)} {$target:other} за ход, ";
 
 
-if_character_dissolved_this_turn = "if a character dissolved this turn";
+if_character_dissolved_this_turn = "если в этот ход персонаж был рассеян";
 if_card_in_your_void = "Если эта карта находится в вашей Пустоте,";
 if_discarded_this_turn($target) = :from($target) "если вы сбрасывали {$target:acc} в этот ход";
-with_predicate_condition($pred) = "with {$pred:other},";
+with_predicate_condition($pred) = :from($pred) "если у вас есть {$pred:other},";
 
 
 with_allies_sharing_type($a) = "если у вас есть {count_allies($a)} с общим типом персонажа,";
-if_drawn_count_this_turn($n) = "if you have drawn {count($n)} or more cards this turn";
+if_drawn_count_this_turn($n) = "если вы взяли {count($n)} или больше карт в этом ходу";
 while_void_count($n) = "Пока в вашей Пустоте {count($n)} или больше карт,";
 with_allied_subtype($t) = :from($t) "если у вас есть союзный {subtype($t)},";
 with_count_allied_subtype($a, $t) = "Если у вас есть {count_allied_subtype($a, $t)},";
