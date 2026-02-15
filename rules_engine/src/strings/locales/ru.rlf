@@ -533,27 +533,73 @@ your_generic_subtype($t) = :from($t) {
 };
 predicate_with_indefinite_article($p) = :from($p);
 another_pred($p) = :from($p) {
-    *one: "another {$p}",
-    other: "other {$p:other}",
+    *one: :match($p) { *masc: "другой {$p}", fem: "другая {$p}", neut: "другое {$p}" },
+    other: "других {$p:other}",
 };
 
 
-your_card = :a{ one: "your card", other: "your cards" };
-your_character = :a{ one: "your character", other: "your characters" };
-your_event = :a{ one: "your event", other: "your events" };
-enemy_card = :an{ one: "enemy card", other: "enemy cards" };
-enemy_character = :an{ one: "enemy character", other: "enemy characters" };
-enemy_event = :an{ one: "enemy event", other: "enemy events" };
-allied_character = :an{ one: "allied character", other: "allied characters" };
-allied_event = :an{ one: "allied event", other: "allied events" };
-other_character = :an{ one: "other character", other: "other characters" };
+your_card = :fem :inan {
+    nom: "ваша карта", acc: "вашу карту", gen: "вашей карты",
+    nom_pl: "ваши карты",
+    *one: "вашу карту", other: "ваших карт",
+};
+your_character = :masc :anim {
+    nom: "ваш персонаж", acc: "вашего персонажа", gen: "вашего персонажа", ins: "вашим персонажем", inf: "вашего персонажа",
+    nom_pl: "ваши персонажи",
+    *one: "вашего персонажа", other: "ваших персонажей",
+};
+your_event = :neut :inan {
+    nom: "ваше событие", acc: "ваше событие", gen: "вашего события",
+    nom_pl: "ваши события",
+    *one: "ваше событие", other: "ваших событий",
+};
+enemy_card = :fem :inan {
+    nom: "карта противника", acc: "карту противника", gen: "карты противника",
+    nom_pl: "карты противника",
+    *one: "карту противника", other: "карт противника",
+};
+enemy_character = :masc :anim {
+    nom: "персонаж противника", acc: "персонажа противника", gen: "персонажа противника", ins: "персонажем противника", inf: "персонажа противника",
+    nom_pl: "персонажи противника",
+    *one: "персонажа противника", other: "персонажей противника",
+};
+enemy_event = :neut :inan {
+    nom: "событие противника", acc: "событие противника", gen: "события противника",
+    nom_pl: "события противника",
+    *one: "событие противника", other: "событий противника",
+};
+allied_character = :masc :anim {
+    nom: "союзный персонаж", acc: "союзного персонажа", gen: "союзного персонажа", ins: "союзным персонажем", inf: "союзного персонажа",
+    nom_pl: "союзные персонажи",
+    *one: "союзного персонажа", other: "союзных персонажей",
+};
+allied_event = :neut :inan {
+    nom: "союзное событие", acc: "союзное событие", gen: "союзного события",
+    nom_pl: "союзные события",
+    *one: "союзное событие", other: "союзных событий",
+};
+other_character = :masc :anim {
+    nom: "другой персонаж", acc: "другого персонажа", gen: "другого персонажа", ins: "другим персонажем", inf: "другого персонажа",
+    nom_pl: "другие персонажи",
+    *one: "другого персонажа", other: "других персонажей",
+};
 allied_pred($base) = :from($base) {
-    *one: "allied {$base}",
-    other: "allied {$base:other}",
+    nom: :match($base) { *masc: "союзный {$base:nom}", fem: "союзная {$base:nom}", neut: "союзное {$base:nom}" },
+    *one: :match($base) { *masc: "союзного {$base}", fem: "союзную {$base}", neut: "союзное {$base}" },
+    gen: :match($base) { *masc: "союзного {$base:gen}", fem: "союзной {$base:gen}", neut: "союзного {$base:gen}" },
+    ins: :match($base) { *masc: "союзным {$base:ins}", fem: "союзной {$base:ins}", neut: "союзным {$base:ins}" },
+    inf: :match($base) { *masc: "союзного {$base:inf}", fem: "союзную {$base:inf}", neut: "союзное {$base:inf}" },
+    nom_pl: "союзные {$base:nom_pl}",
+    other: "союзных {$base:other}",
 };
 enemy_pred($base) = :from($base) {
-    *one: "enemy {$base}",
-    other: "enemy {$base:other}",
+    nom: "{$base:nom} противника",
+    *one: "{$base} противника",
+    gen: "{$base:gen} противника",
+    ins: "{$base:ins} противника",
+    inf: "{$base:inf} противника",
+    nom_pl: "{$base:nom_pl} противника",
+    other: "{$base:other} противника",
 };
 in_your_void($target) = :from($target) {
     *one: "{$target} в вашей Пустоте",
@@ -563,7 +609,10 @@ in_opponent_void($target) = :from($target) {
     *one: "{$target} в Пустоте противника",
     other: "{$target:other} в Пустоте противника",
 };
-in_your_hand($target) = :from($target) "{$target} in your hand";
+in_your_hand($target) = :from($target) {
+    *one: "{$target} в вашей руке",
+    other: "{$target:other} в вашей руке",
+};
 
 with_cost_constraint($op, $val) = "стоимостью {energy($val)}{$op}";
 with_spark_constraint($op, $val) = "с искрой {$val}{$op}";
@@ -574,8 +623,8 @@ pred_with_constraint($base, $constraint) = :from($base) {
     other: "{$base:other} {$constraint}",
 };
 non_subtype($s) = :from($s) {
-    *one: "non-{$s}",
-    other: "non-{$s:other}",
+    *one: "не-{$s}",
+    other: "не-{$s:other}",
 };
 could_dissolve_target($target) = :fem :inan "событие, которое может рассеять {$target:acc}";
 could_dissolve_target_plural($target) = :neut :inan "события, которые могут рассеять {$target:acc}";
@@ -609,15 +658,21 @@ with_spark_less_than_that_ally_constraint =
 
 allied_subtype($t) = :from($t) { nom: "союзный {subtype($t):nom}", *acc: "союзного {subtype($t)}", gen: "союзного {subtype($t)}", ins: "союзным {subtype($t):ins}", inf: "союзного {subtype($t):inf}", nom_pl: "союзные {subtype($t):nom_pl}", other: "союзных {subtype($t):other}" };
 allied_subtype_plural($t) = "союзных {subtype($t):other}";
-enemy_subtype($t) = :an "enemy {subtype($t)}";
-enemy_subtype_plural($t) = "enemy {subtype($t):other}";
-your_subtype($t) = :from($t) "your {$t}";
-other_subtype($t) = :from($t) "other {$t}";
-subtype_in_your_void($t) = :from($t) "{$t} in your void";
-character_not_subtype($s) = :a "character that is not {@a subtype($s)}";
-character_not_subtype_plural($s) = "characters that are not {subtype($s):other}";
-ally_not_subtype($s) = :an "ally that is not {@a subtype($s)}";
-ally_not_subtype_plural($s) = "allies that are not {subtype($s):other}";
+enemy_subtype($t) = :from($t) { nom: "{subtype($t):nom} противника", *acc: "{subtype($t)} противника", gen: "{subtype($t)} противника", ins: "{subtype($t):ins} противника", inf: "{subtype($t):inf} противника", nom_pl: "{subtype($t):nom_pl} противника", other: "{subtype($t):other} противника" };
+enemy_subtype_plural($t) = "{subtype($t):other} противника";
+your_subtype($t) = :from($t) { nom: "ваш {subtype($t):nom}", *one: "вашего {subtype($t)}", gen: "вашего {subtype($t)}", ins: "вашим {subtype($t):ins}", inf: "вашего {subtype($t):inf}", nom_pl: "ваши {subtype($t):nom_pl}", other: "ваших {subtype($t):other}" };
+other_subtype($t) = :from($t) {
+    nom: :match($t) { *masc: "другой {subtype($t):nom}", fem: "другая {subtype($t):nom}", neut: "другое {subtype($t):nom}" },
+    *one: :match($t) { *masc: "другого {subtype($t)}", fem: "другую {subtype($t)}", neut: "другое {subtype($t)}" },
+    gen: :match($t) { *masc: "другого {subtype($t)}", fem: "другой {subtype($t)}", neut: "другого {subtype($t)}" },
+    nom_pl: "другие {subtype($t):nom_pl}",
+    other: "других {subtype($t):other}",
+};
+subtype_in_your_void($t) = :from($t) { *one: "{subtype($t)} в вашей Пустоте", other: "{subtype($t):other} в вашей Пустоте" };
+character_not_subtype($s) = :masc :anim "персонажа, не являющегося {subtype($s):ins}";
+character_not_subtype_plural($s) = "персонажей, не являющихся {subtype($s):ins}";
+ally_not_subtype($s) = :masc :anim "союзника, не являющегося {subtype($s):ins}";
+ally_not_subtype_plural($s) = "союзников, не являющихся {subtype($s):ins}";
 non_subtype_enemy($s) = :from($s) :match($s) {
     *masc: "врага, который не является {subtype($s):ins}",
     fem: "врага, который не является {subtype($s):ins}",
@@ -635,32 +690,38 @@ for_each_allied_character = :masc :anim { nom: "союзный персонаж"
 for_each_enemy = :masc :anim { nom: "враг", *gen: "врага" };
 for_each_character = :masc :anim { nom: "персонаж", *gen: "персонажа" };
 for_each_card = :fem :inan { nom: "карта", *gen: "карту" };
-for_each_card_in_your_void = "card in your void";
-for_each_this_character = "this character";
-for_each_that_character = "that character";
-for_each_other_character = "other character";
-for_each_allied_event = "allied event";
-for_each_event = "event";
-for_each_character_in_your_void = "character in your void";
-for_each_event_in_your_void = "event in your void";
-for_each_card_in_enemy_void = "card in the opponent's void";
-for_each_character_in_enemy_void = "character in the opponent's void";
-for_each_event_in_enemy_void = "event in the opponent's void";
+for_each_card_in_your_void = :fem :inan { nom: "карта в вашей Пустоте", *gen: "карты в вашей Пустоте" };
+for_each_this_character = :masc :anim { nom: "этот персонаж", *gen: "этого персонажа" };
+for_each_that_character = :masc :anim { nom: "тот персонаж", *gen: "того персонажа" };
+for_each_other_character = :masc :anim { nom: "другой персонаж", *gen: "другого персонажа" };
+for_each_allied_event = :neut :inan { nom: "союзное событие", *gen: "союзного события" };
+for_each_event = :neut :inan { nom: "событие", *gen: "события" };
+for_each_character_in_your_void = :masc :anim { nom: "персонаж в вашей Пустоте", *gen: "персонажа в вашей Пустоте" };
+for_each_event_in_your_void = :neut :inan { nom: "событие в вашей Пустоте", *gen: "события в вашей Пустоте" };
+for_each_card_in_enemy_void = :fem :inan { nom: "карта в Пустоте противника", *gen: "карты в Пустоте противника" };
+for_each_character_in_enemy_void = :masc :anim { nom: "персонаж в Пустоте противника", *gen: "персонажа в Пустоте противника" };
+for_each_event_in_enemy_void = :neut :inan { nom: "событие в Пустоте противника", *gen: "события в Пустоте противника" };
 for_each_allied_subtype($t) = :from($t) { nom: "союзный {subtype($t):nom}", *gen: "союзного {subtype($t)}" };
-for_each_enemy_subtype($t) = :from($t) "enemy {subtype($t)}";
+for_each_enemy_subtype($t) = :from($t) { nom: "{subtype($t):nom} противника", *gen: "{subtype($t)} противника" };
 for_each_subtype($t) = :from($t) "{subtype($t)}";
-for_each_other_subtype($t) = :from($t) "other {subtype($t)}";
-for_each_subtype_in_your_void($t) = :from($t) "{subtype($t)} in your void";
-for_each_ally_with_spark($s, $op) = "ally with spark {$s}{$op}";
-for_each_predicate($target) = :from($target) "each {$target}";
+for_each_other_subtype($t) = :from($t) {
+    nom: :match($t) { *masc: "другой {subtype($t):nom}", fem: "другая {subtype($t):nom}", neut: "другое {subtype($t):nom}" },
+    *gen: :match($t) { *masc: "другого {subtype($t)}", fem: "другой {subtype($t)}", neut: "другого {subtype($t)}" },
+};
+for_each_subtype_in_your_void($t) = :from($t) { nom: "{subtype($t):nom} в вашей Пустоте", *gen: "{subtype($t)} в вашей Пустоте" };
+for_each_ally_with_spark($s, $op) = :masc :anim "союзника с искрой {$s}{$op}";
+for_each_predicate($target) = :from($target) {
+    nom: :match($target) { *anim: "каждый {$target:nom}", inan: "каждая {$target:nom}" },
+    *gen: :match($target) { *anim: "каждого {$target:gen}", inan: "каждой {$target:gen}" },
+};
 
 
 ally_abandoned_this_turn = :masc :anim { nom: "союзник, от которого вы отреклись в этот ход", *gen: "союзника, от которого вы отреклись в этот ход" };
-allied_subtype_abandoned_this_turn($t) = :from($t) "allied {subtype($t)} abandoned this turn";
+allied_subtype_abandoned_this_turn($t) = :from($t) { nom: "союзный {subtype($t):nom}, от которого вы отреклись в этот ход", *gen: "союзного {subtype($t)}, от которого вы отреклись в этот ход" };
 ally_abandoned = :masc :anim { gen: "союзника, от которого вы отреклись" };
-allied_subtype_abandoned($t) = :from($t) "allied {subtype($t)} abandoned";
+allied_subtype_abandoned($t) = :from($t) { nom: "союзный {subtype($t):nom}, от которого вы отреклись", *gen: "союзного {subtype($t)}, от которого вы отреклись" };
 ally_returned = :masc :anim { gen: "возвращённого союзника" };
-allied_subtype_returned($t) = :from($t) "allied {subtype($t)} returned";
+allied_subtype_returned($t) = :from($t) { nom: "союзный {subtype($t):nom}, которого вы вернули", *gen: "союзного {subtype($t)}, которого вы вернули" };
 card_predicate_returned($base) = :from($base) "{$base} returned";
 energy_spent = :inan { gen: "потраченного {energy_symbol}" };
 card_predicate_played_this_turn($base) = :from($base) { nom: "{$base:nom}, которую вы сыграли в этот ход", *gen: "{$base:gen}, которую вы сыграли в этот ход" };
@@ -722,8 +783,13 @@ allied_card_with_subtype($t) = :from($t) {
     other: "союзных {subtype($t):other}",
 };
 allied_card_with_base($base) = :from($base) {
-    *one: "allied {$base}",
-    other: "allied {$base:other}",
+    nom: :match($base) { *masc: "союзный {$base:nom}", fem: "союзная {$base:nom}", neut: "союзное {$base:nom}" },
+    *one: :match($base) { *masc: "союзного {$base}", fem: "союзную {$base}", neut: "союзное {$base}" },
+    gen: :match($base) { *masc: "союзного {$base:gen}", fem: "союзной {$base:gen}", neut: "союзного {$base:gen}" },
+    ins: :match($base) { *masc: "союзным {$base:ins}", fem: "союзной {$base:ins}", neut: "союзным {$base:ins}" },
+    inf: :match($base) { *masc: "союзного {$base:inf}", fem: "союзную {$base:inf}", neut: "союзное {$base:inf}" },
+    nom_pl: "союзные {$base:nom_pl}",
+    other: "союзных {$base:other}",
 };
 
 
