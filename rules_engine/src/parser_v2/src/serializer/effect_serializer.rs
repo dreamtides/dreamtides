@@ -1,5 +1,3 @@
-use std::collections::BTreeSet;
-
 use ability_data::collection_expression::CollectionExpression;
 use ability_data::effect::{Effect, EffectWithOptions};
 use ability_data::predicate::{CardPredicate, Predicate};
@@ -7,7 +5,7 @@ use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use ability_data::trigger_event::TriggerEvent;
 use core_data::numerics::Energy;
-use rlf::{Phrase, VariantKey};
+use rlf::Phrase;
 use strings::strings;
 
 use crate::serializer::{
@@ -480,7 +478,7 @@ pub fn serialize_effect_with_context(effect: &Effect, context: AbilityContext) -
             } else {
                 strings::then_joiner().to_string()
             };
-            let joined = join_phrases(&effect_phrases, &joiner);
+            let joined = Phrase::join(&effect_phrases, &joiner);
             let body = if is_optional_with_shared_cost {
                 match &list_with_options.trigger_cost {
                     Some(trigger_cost) => {
@@ -612,35 +610,11 @@ fn serialize_allied_card_predicate(card_predicate: &CardPredicate) -> Phrase {
 }
 
 /// Joins serialized effect fragments from an effect list using the given
-/// joiner string, preserving shared variants.
+/// joiner string, preserving shared variants via [Phrase::join].
 fn join_effect_phrases(effects: &[EffectWithOptions], joiner: &str) -> Phrase {
     let phrases: Vec<Phrase> =
         effects.iter().map(|e| serialize_standard_effect(&e.effect)).collect();
-    join_phrases(&phrases, joiner)
-}
-
-/// Joins a slice of [Phrase] values with a joiner, producing a result
-/// [Phrase] that preserves all variant keys present in every input phrase.
-fn join_phrases(phrases: &[Phrase], joiner: &str) -> Phrase {
-    let shared_keys: BTreeSet<VariantKey> = phrases
-        .first()
-        .map(|p| {
-            p.variants
-                .keys()
-                .filter(|k| phrases.iter().all(|q| q.variants.contains_key(k)))
-                .cloned()
-                .collect()
-        })
-        .unwrap_or_default();
-    let default_text: String =
-        phrases.iter().map(|p| p.text.as_str()).collect::<Vec<_>>().join(joiner);
-    let mut variants = std::collections::HashMap::new();
-    for key in shared_keys {
-        let joined =
-            phrases.iter().map(|p| p.variants[&key].as_str()).collect::<Vec<_>>().join(joiner);
-        variants.insert(key, joined);
-    }
-    Phrase::builder().text(default_text).variants(variants).build()
+    Phrase::join(&phrases, joiner)
 }
 
 /// Prepends a condition from the first effect in a list, if present.
