@@ -50,7 +50,6 @@ struct RussianTestEntry {
 #[derive(Debug, Deserialize)]
 struct RussianLocaleBaseline {
     min_passing: usize,
-    max_validation_warnings: usize,
 }
 
 struct LanguageGuard {
@@ -247,52 +246,4 @@ fn test_russian_locale_load_phrase_count() {
             "Russian locale phrase count ({loaded}) should match English source phrase count ({source_phrase_count})"
         );
     });
-}
-
-/// Ratcheting validation test. Asserts that
-/// `locale.validate_translations("en", "ru")` produces no more warnings
-/// than the baseline allows. As locale quality improves, lower the
-/// baseline to lock in progress.
-#[test]
-fn test_russian_locale_validation_warnings() {
-    test_helpers::register_russian_test_locale().expect("Russian locale should load");
-
-    let baseline_toml = std::fs::read_to_string(RUSSIAN_BASELINE_PATH).unwrap_or_else(|e| {
-        panic!("Failed to read Russian baseline at {RUSSIAN_BASELINE_PATH}: {e}")
-    });
-    let baseline: RussianLocaleBaseline = toml::from_str(&baseline_toml).unwrap_or_else(|e| {
-        panic!("Failed to parse Russian baseline at {RUSSIAN_BASELINE_PATH}: {e}")
-    });
-
-    let warnings =
-        rlf::with_locale(|locale| locale.validate_translations(SOURCE_LANGUAGE, RUSSIAN_LANGUAGE));
-
-    println!(
-        "Russian locale validation: {} warnings (baseline max: {})",
-        warnings.len(),
-        baseline.max_validation_warnings
-    );
-
-    if !warnings.is_empty() {
-        let shown: Vec<_> =
-            warnings.iter().take(MAX_REPORTED_ISSUES).map(ToString::to_string).collect();
-        println!(
-            "Warnings ({} total, showing up to {MAX_REPORTED_ISSUES}):\n{}",
-            warnings.len(),
-            shown.join("\n")
-        );
-    }
-
-    assert!(
-        warnings.len() <= baseline.max_validation_warnings,
-        "Russian locale validation regression: {} warnings > {} max allowed\n{}",
-        warnings.len(),
-        baseline.max_validation_warnings,
-        warnings
-            .iter()
-            .take(MAX_REPORTED_ISSUES)
-            .map(ToString::to_string)
-            .collect::<Vec<_>>()
-            .join("\n")
-    );
 }

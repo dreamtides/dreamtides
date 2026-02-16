@@ -4801,7 +4801,7 @@ dependencies = [
 [[package]]
 name = "rlf"
 version = "0.1.0"
-source = "git+https://github.com/thurn/rlf#25f694a99fdfcef76cff9593934fc64a603b0b0f"
+source = "git+https://github.com/thurn/rlf#db89c26a8e507235b5c66ae099197d53f9129933"
 dependencies = [
  "bon",
  "const-fnv1a-hash",
@@ -4821,7 +4821,7 @@ dependencies = [
 [[package]]
 name = "rlf-macros"
 version = "0.1.0"
-source = "git+https://github.com/thurn/rlf#25f694a99fdfcef76cff9593934fc64a603b0b0f"
+source = "git+https://github.com/thurn/rlf#db89c26a8e507235b5c66ae099197d53f9129933"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4833,7 +4833,7 @@ dependencies = [
 [[package]]
 name = "rlf-semantics"
 version = "0.1.0"
-source = "git+https://github.com/thurn/rlf#25f694a99fdfcef76cff9593934fc64a603b0b0f"
+source = "git+https://github.com/thurn/rlf#db89c26a8e507235b5c66ae099197d53f9129933"
 
 [[package]]
 name = "rlf_lint"
