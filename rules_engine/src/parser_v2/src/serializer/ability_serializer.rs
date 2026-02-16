@@ -141,11 +141,11 @@ fn serialize_activated(activated: &ActivatedAbility) -> String {
 /// capitalization.
 ///
 /// Energy costs are separated from non-energy costs by the activated
-/// cost separator (", "). Non-energy costs among themselves are joined
-/// by the non-energy cost separator (", " in English, " и " in
+/// cost separator. Non-energy costs use a distinct separator between
+/// items, with a potentially different final separator before the last
+/// item (e.g. ", " between items but " и " before the last in
 /// Russian). The first cost is always capitalized; subsequent
-/// non-energy costs are wrapped with `activated_subsequent_cost` which
-/// capitalizes in English but not in Russian.
+/// non-energy costs are wrapped with `activated_subsequent_cost`.
 fn join_activated_costs(costs: &[Cost]) -> String {
     let mut energy_parts = Vec::new();
     let mut non_energy_parts = Vec::new();
@@ -157,7 +157,6 @@ fn join_activated_costs(costs: &[Cost]) -> String {
         }
     }
 
-    let non_energy_separator = strings::activated_non_energy_cost_separator().to_string();
     let cost_separator = strings::activated_cost_separator().to_string();
 
     if energy_parts.is_empty() {
@@ -174,7 +173,7 @@ fn join_activated_costs(costs: &[Cost]) -> String {
                 }
             })
             .collect();
-        non_energy_strings.join(&non_energy_separator)
+        join_with_final_separator(&non_energy_strings)
     } else {
         // Energy costs present: join energy parts, then append
         // non-energy costs with subsequent formatting using the standard
@@ -189,8 +188,32 @@ fn join_activated_costs(costs: &[Cost]) -> String {
                 .collect();
             format!(
                 "{energy_str}{cost_separator}{}",
-                non_energy_strings.join(&non_energy_separator)
+                join_with_final_separator(&non_energy_strings)
             )
+        }
+    }
+}
+
+/// Joins strings using the non-energy cost separator, with a
+/// potentially different separator before the final element.
+fn join_with_final_separator(items: &[String]) -> String {
+    let len = items.len();
+    match len {
+        0 => String::new(),
+        1 => items[0].clone(),
+        _ => {
+            let separator = strings::activated_non_energy_cost_separator().to_string();
+            let final_separator = strings::activated_final_non_energy_cost_separator().to_string();
+            let mut result = items[0].clone();
+            for (i, item) in items.iter().enumerate().skip(1) {
+                if i == len - 1 {
+                    result.push_str(&final_separator);
+                } else {
+                    result.push_str(&separator);
+                }
+                result.push_str(item);
+            }
+            result
         }
     }
 }

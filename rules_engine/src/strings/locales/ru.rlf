@@ -1680,7 +1680,8 @@ fast_activated_ability($c, $eff) = "{fast_prefix}{$c}{cost_effect_separator}{@ca
 fast_activated_ability_once_per_turn($c, $eff) =
     "{fast_prefix}{$c}{once_per_turn_suffix}{cost_effect_separator}{@cap $eff}";
 activated_cost_separator = ", ";
-activated_non_energy_cost_separator = " и ";
+activated_non_energy_cost_separator = ", ";
+activated_final_non_energy_cost_separator = " и ";
 activated_subsequent_cost($s) = "{$s}";
 
 effect_with_period($e) = "{$e}{period_suffix}";
