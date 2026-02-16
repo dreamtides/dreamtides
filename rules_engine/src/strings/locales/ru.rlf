@@ -595,14 +595,22 @@ return_or_more_to_hand($n, $target) = :from($target)
 
 
 abandon_count_allies($a) = "отрекитесь от {count_allies($a)}";
-discard_cards_cost($d) = "сбросьте {cards($d)}";
+discard_cards_cost($d) = {
+    *imp: "сбросьте {cards($d)}",
+    inf: "сбросить {cards($d)}",
+};
 energy_cost_value($e) = "{energy($e)}";
 lose_max_energy_cost($m) = "уменьшите ваш {maximum_energy($m)} на {$m}";
 banish_your_void_cost = "изгоните все карты из вашей Пустоты";
 banish_another_in_void = "изгоните другую карту из вашей Пустоты";
-banish_cards_from_void($c) = "изгоните {cards($c)} из вашей Пустоты";
-banish_cards_from_enemy_void($c) =
-    "изгоните {cards($c)} из Пустоты противника";
+banish_cards_from_void($c) = {
+    *imp: "изгоните {cards($c)} из вашей Пустоты",
+    inf: "изгнать {cards($c)} из вашей Пустоты",
+};
+banish_cards_from_enemy_void($c) = {
+    *imp: "изгоните {cards($c)} из Пустоты противника",
+    inf: "изгнать {cards($c)} из Пустоты противника",
+};
 banish_void_min_count($n) = "изгоните все карты из вашей Пустоты, если в ней {count($n)} или больше карт";
 banish_from_hand_cost($target) = :from($target) "изгоните {$target} из руки";
 
@@ -663,21 +671,30 @@ with_count_allied_subtype($a, $t) = "{count_allied_subtype($a, $t)}";
 with_count_allies($a) = "{count_allies($a)}";
 
 
-operator_or_less = " или меньше";
-operator_or_more = " или больше";
-operator_lower = " ниже";
-operator_higher = " выше";
+operator_or_less = { *one: " или меньше", pre: "" };
+operator_or_more = { *one: " или больше", pre: "" };
+operator_lower = { *one: " ниже", pre: "на " };
+operator_higher = { *one: " выше", pre: "на " };
 
 
-draw_cards_effect($c) = "возьмите {cards($c)}";
-discard_cards_effect($d) = "сбросьте {cards($d)}";
-gain_energy_effect($e) = "получите {energy($e)}";
-gain_points_effect($p) = "получите {points($p)}";
+draw_cards_effect($c) = { *imp: "возьмите {cards($c)}", inf: "взять {cards($c)}" };
+discard_cards_effect($d) = {
+    *imp: "сбросьте {cards($d)}",
+    inf: "сбросить {cards($d)}",
+};
+gain_energy_effect($e) = {
+    *imp: "получите {energy($e)}",
+    inf: "получить {energy($e)}",
+};
+gain_points_effect($p) = {
+    *imp: "получите {points($p)}",
+    inf: "получить {points($p)}",
+};
 lose_points_effect($p) = "вы теряете {points($p)}";
 opponent_gains_points_effect($p) = "противник получает {$p}⍏";
 opponent_loses_points_effect($p) = "противник теряет {points($p)}";
 foresee_effect($f) = "{foresee($f)}";
-kindle_effect($k) = "{kindle($k)}";
+kindle_effect($k) = { *imp: "{kindle($k)}", inf: "Разжечь {$k}" };
 each_player_discards_effect($d) = "каждый игрок сбрасывает {cards($d)}";
 prevent_that_card_effect = "отмените розыгрыш этой карты";
 then_materialize_it_effect($target) = "затем воплотите его";
@@ -688,8 +705,10 @@ gain_energy_equal_to_that_cost_effect =
 gain_energy_equal_to_this_cost_effect = "получите {energy_symbol} равное стоимости этого персонажа";
 put_deck_into_void_effect($v) =
     "положите {top_n_cards($v)} вашей колоды в вашу Пустоту";
-banish_cards_from_enemy_void_effect($c) =
-    "изгоните {cards($c)} из Пустоты противника";
+banish_cards_from_enemy_void_effect($c) = {
+    *imp: "изгоните {cards($c)} из Пустоты противника",
+    inf: "изгнать {cards($c)} из Пустоты противника",
+};
 banish_enemy_void_effect =
     "изгоните все карты из Пустоты противника";
 judgment_phase_at_end_of_turn_effect = "в конце этого хода проведите дополнительную фазу {judgment_phase_name}";
@@ -1077,7 +1096,7 @@ in_your_hand($target) = :from($target) {
     other: "{$target:other} в вашей руке",
 };
 
-with_cost_constraint($op, $val) = "стоимостью {energy($val)}{$op}";
+with_cost_constraint($op, $val) = "стоимостью {$op:pre}{energy($val)}{$op}";
 with_spark_constraint($op, $val) = "с искрой {$val}{$op}";
 pred_with_constraint($base, $constraint) = :from($base) {
     *one: "{$base} {$constraint}",
