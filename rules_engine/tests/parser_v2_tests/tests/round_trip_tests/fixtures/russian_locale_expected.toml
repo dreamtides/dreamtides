@@ -363,7 +363,6 @@ english = "When you draw {$c} {card:$c} in a turn, if this card is in your void,
 variables = """c: 2
 r: 1"""
 russian = "Когда вы берёте 2 карты за ход, если эта карта находится в вашей Пустоте, она получает <color=#964B00>Возвышение</color> <color=#00838F>1●</color> до конца хода."
-disabled = true
 
 [[tests]]
 english = "When you play {@a subtype($t)}, draw {cards($c)}."
@@ -786,7 +785,6 @@ english = "{Materialize} {n_figments($n, $g)}."
 variables = """n: 3
 g: radiant"""
 russian = "Воплотите 3 Сияющих Фигмента."
-disabled = true
 
 [[tests]]
 english = "{energy($e)}, Abandon a character, Discard your hand: Draw {cards($c)}."
@@ -958,7 +956,6 @@ english = "If this card is in your void, allied {@plural subtype($t)} have +{$s}
 variables = """t: Survivor
 s: 2"""
 russian = "Если эта карта находится в вашей Пустоте, союзные <color=#2E7D32><b>Выжившие</b></color> получают +2 к искре."
-disabled = true
 
 [[tests]]
 english = "When you play {@a subtype($t)}, {reclaim} a random character with cost {energy($e)} or less."
@@ -986,7 +983,6 @@ russian = "▸ <b>Суд:</b> Вы можете заплатить <color=#00838
 [[tests]]
 english = "Abandon an ally: Gain {energy_symbol} equal to that character's cost."
 russian = "Отрекитесь от союзника: Получите <color=#00838F>●</color>, равное стоимости этого персонажа."
-disabled = true
 
 [[tests]]
 english = "When an event is put into your void, this character gains +{$s} spark."
@@ -1004,7 +1000,6 @@ variables = """e: 4
 t: SpiritAnimal
 s: 2"""
 russian = "▸ <b>Суд:</b> Вы можете заплатить <color=#00838F>4●</color>, чтобы каждый союзный <color=#2E7D32><b>Дух-Зверь</b></color> получил +2 к искре."
-disabled = true
 
 [[tests]]
 english = "When you play an event, gain {energy($e)}."
@@ -1049,7 +1044,6 @@ russian = "Когда вы воплощаете союзного <color=#2E7D32>
 [[tests]]
 english = "At the end of this turn, trigger an additional {judgment_phase_name} phase."
 russian = "В конце этого хода проведите дополнительную фазу <b>Суда</b>."
-disabled = true
 
 [[tests]]
 english = "{Judgment} {Foresee($f)}."
@@ -1102,7 +1096,6 @@ english = "To play this card, return an ally with cost {energy($e)} or more to h
 variables = """e: 3
 c: 1"""
 russian = "Чтобы сыграть эту карту, верните в руку союзника стоимостью <color=#00838F>3●</color> или больше."
-disabled = true
 
 [[tests]]
 english = "{Judgment} Draw {cards($c)}."
@@ -1173,7 +1166,7 @@ russian = "Рассеяйте врага стоимостью <color=#00838F>2�
 english = "{Reclaim} -- Abandon an ally"
 variables = "e: 2"
 russian = "<color=#964B00>Возвышение</color> — Отрекитесь от союзника."
-disabled = true
+
 [[tests]]
 english = "{Materialized} Discard {cards($d)}, then draw {cards($c)}."
 variables = """d: 2
@@ -1194,7 +1187,6 @@ russian = "Когда вы воплощаете <color=#2E7D32><b>Выживше
 english = "At the end of your turn, gain {energy($e)}."
 variables = "e: 2"
 russian = "В конце вашего хода получите <color=#00838F>2●</color>."
-disabled = true
 
 [[tests]]
 english = "When the opponent plays an event which could {dissolve} an ally, {prevent} that card."
@@ -1333,7 +1325,6 @@ english = "When you draw {$c} {card:$c} in a turn, if this card is in your void,
 variables = """c: 2
 r: 1"""
 russian = "Когда вы берёте 2 карты за ход, если эта карта находится в вашей Пустоте, она получает <color=#964B00>Возвышение</color> <color=#00838F>1●</color> до конца хода."
-disabled = true
 
 [[tests]]
 english = "When you {materialize} a character, trigger the {Judgment} ability of each ally."
@@ -1501,7 +1492,6 @@ russian = "Отрекитесь от союзника: Сыграйте этог
 english = "At the end of your turn, gain {energy($e)}."
 variables = "e: 2"
 russian = "В конце вашего хода получите <color=#00838F>2●</color>."
-disabled = true
 
 [[tests]]
 english = "The '{Judgment}' ability of allies triggers when you {materialize} them."
@@ -1536,7 +1526,6 @@ russian = """<b>Выберите одно:</b>
 english = "{Materialize} {n_figments($n, $g)}."
 variables = "n: 3, g: radiant"
 russian = "Воплотите 3 Сияющих Фигмента."
-disabled = true
 
 [[tests]]
 english = "{Materialize} {@a figment($g)} for each card you have played this turn."
@@ -1579,7 +1568,7 @@ russian = "Это событие стоит <color=#00838F>1●</color>, есл�
 [[tests]]
 english = "{Reclaim} -- Abandon an ally"
 russian = "<color=#964B00>Возвышение</color> — Отрекитесь от союзника."
-disabled = true
+
 [[tests]]
 english = "{Judgment} Draw {cards($c)}."
 variables = "c: 1"

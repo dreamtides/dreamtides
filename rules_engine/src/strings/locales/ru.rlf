@@ -125,8 +125,8 @@ shadow = :masc :inan {
 figment($f) = :from($f);
 n_figments($n, $f) = :match($n) {
     1: "{figment($f)}",
-    few: "{text_number($n)} {figment($f):few}",
-    *other: "{text_number($n)} {figment($f):other}",
+    few: "{$n} {figment($f):few}",
+    *other: "{$n} {figment($f):other}",
 };
 
 
@@ -603,7 +603,7 @@ abandon_target($target) = :from($target) {
     *one: "отрекитесь от {$target}",
     inf: "отречься от {$target}",
 };
-return_target_to_hand($target) = :from($target) "верните {$target:acc} в руку";
+return_target_to_hand($target) = :from($target) "верните в руку {$target:acc}";
 return_count_to_hand($n, $target) = :from($target)
     "верните {$n} {$target:other} в руку";
 return_all_but_one_to_hand($target) = :from($target)
@@ -640,7 +640,7 @@ banish_void_min_count($n) = "изгоните все карты из вашей 
 banish_from_hand_cost($target) = :from($target) "изгоните {$target} из руки";
 
 
-at_end_of_your_turn_trigger = "в конце вашего хода, ";
+at_end_of_your_turn_trigger = "в конце вашего хода ";
 when_deck_empty_trigger = "если в вашей колоде нет карт, ";
 when_you_gain_energy_trigger = "когда вы получаете {energy_symbol}, ";
 when_you_play_trigger($target) = :from($target) "когда вы играете {$target}, ";
@@ -679,7 +679,7 @@ when_you_materialize_nth_in_turn_trigger($n, $target) = :from($target)
 if_character_dissolved_this_turn =
     "если в этот ход персонаж был рассеян";
 if_card_in_your_void =
-    "Если эта карта находится в вашей Пустоте,";
+    "если эта карта находится в вашей Пустоте,";
 if_discarded_this_turn($target) = :from($target)
     "если вы сбрасывали {$target:acc} в этот ход";
 with_predicate_condition($pred) = :from($pred) "если у вас есть {$pred:other},";
@@ -725,8 +725,7 @@ prevent_that_card_effect = "отмените розыгрыш этой карт�
 then_materialize_it_effect($target) = "затем воплотите его";
 gain_twice_energy_instead_effect =
     "получите вдвое больше {energy_symbol} вместо этого";
-gain_energy_equal_to_that_cost_effect =
-    "получите {energy_symbol} равное стоимости того персонажа";
+gain_energy_equal_to_that_cost_effect = "получите {energy_symbol}, равное стоимости этого персонажа";
 gain_energy_equal_to_this_cost_effect = "получите {energy_symbol} равное стоимости этого персонажа";
 put_deck_into_void_effect($v) =
     "положите {top_n_cards($v)} вашей колоды в вашу Пустоту";
@@ -736,7 +735,7 @@ banish_cards_from_enemy_void_effect($c) = {
 };
 banish_enemy_void_effect =
     "изгоните все карты из Пустоты противника";
-judgment_phase_at_end_of_turn_effect = "в конце этого хода проведите дополнительную фазу {judgment_phase_name}";
+judgment_phase_at_end_of_turn_effect = "в конце этого хода проведите дополнительную фазу <b>Суда</b>";
 multiply_energy_effect($n) =
     "удвойте количество {energy_symbol}, которое у вас есть";
 spend_all_energy_dissolve_effect = "потратьте все ваши {energy_symbol}. {@cap dissolve} врага стоимостью не больше потраченного количества";
@@ -1446,8 +1445,10 @@ gains_spark_for_each($target, $s, $quantity) = :from($target)
     "{$target:nom} получает +{$s} к искре за каждого {$quantity}";
 gains_spark_until_next_main_for_each($target, $s, $for_each) = :from($target) "{$target:nom} получает +{$s} к искре до вашей следующей главной фазы за каждого {$for_each}";
 each_gains_spark_equal_to($each, $count_of) = :from($each) "каждый {$each:nom} получает искру, равную количеству {$count_of:other}";
-have_each_gain_spark($each, $s) = :from($each)
-    "каждый {$each:nom} получает +{$s} к искре";
+have_each_gain_spark($each, $s) = :from($each) {
+    *one: "каждый {$each:nom} получает +{$s} к искре",
+    inf: "каждый {$each:nom} получил +{$s} к искре",
+};
 spark_of_each_becomes($each, $s) = :from($each)
     "Искра каждого {$each:gen} становится равной {$s}";
 dissolve_all_with_cost_lte_quantity($target, $quantity) = :from($target) "рассеяйте всех {$target:other} стоимостью не больше количества {$quantity}";
@@ -1618,7 +1619,7 @@ your_cards_cost_reduction($matching, $e) =
 enemy_cards_cost_increase($matching, $e) =
     "{$matching:nom_pl} противника стоят на {energy($e)} больше";
 spark_bonus_other_characters($matching, $s) = :from($matching)
-    "Союзные {$matching:nom_pl} получают +{$s} к искре";
+    "союзные {$matching:nom_pl} получают +{$s} к искре";
 additional_cost_to_play($cost) = "Чтобы сыграть эту карту, {$cost}";
 play_for_alternate_cost_simple($card_type, $e) = "{$card_type:nom} стоит {energy($e)}";
 play_for_alternate_cost_with_additional($cost, $card_type, $e) = :from($card_type)
@@ -1667,7 +1668,7 @@ condition_appended($base, $condition) = "{$base}, {$condition}";
 
 
 capitalized_sentence($s) = "{@cap $s}";
-reclaim_with_cost($cost) = "<color=#964B00>Возвышение</color> — {$cost}";
+reclaim_with_cost($cost) = "<color=#964B00>Возвышение</color> — {$cost}.";
 
 triggered_ability($trig, $eff) = "{@cap $trig}{$eff}";
 prefixed_triggered_ability($pfx, $trig, $eff) = "{$pfx}{$trig}{$eff}";
