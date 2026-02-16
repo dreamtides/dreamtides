@@ -207,26 +207,26 @@ eye_slash_icon = "笠";
 asterisk_icon = "";
 
 
-prompt_choose_character = "Choose a character";
-prompt_select_stack_card = "Select a card";
-prompt_select_from_void = "Select from your void";
-prompt_select_from_hand = "Select from your hand";
-prompt_select_option = "Select an option";
-prompt_choose_energy_amount = "Choose energy amount";
-prompt_select_card_order = "Select card position";
-prompt_pick_mode = "Choose a mode";
+prompt_choose_character = "Выберите персонажа";
+prompt_select_stack_card = "Выберите карту";
+prompt_select_from_void = "Выберите из вашей Пустоты";
+prompt_select_from_hand = "Выберите из вашей руки";
+prompt_select_option = "Выберите вариант";
+prompt_choose_energy_amount = "Выберите количество энергии";
+prompt_select_card_order = "Выберите позицию карты";
+prompt_pick_mode = "Выберите режим";
 
 
-dev_menu_button = "{bug_icon} Dev";
-decline_prompt_button = "Decline";
-pay_energy_prompt_button($e) = "Spend {energy($e)}";
-pay_energy_additional_cost_button($e) = "Spend {energy($e)}";
-primary_button_submit_void_card_targets = "Submit";
-primary_button_submit_hand_card_targets = "Submit";
-primary_button_submit_deck_card_order = "Submit";
-primary_button_resolve_stack = "Resolve";
-primary_button_end_turn = "End Turn";
-primary_button_start_next_turn = "Next Turn";
+dev_menu_button = "{bug_icon} Разраб";
+decline_prompt_button = "Отклонить";
+pay_energy_prompt_button($e) = "Заплатить {energy($e)}";
+pay_energy_additional_cost_button($e) = "Заплатить {energy($e)}";
+primary_button_submit_void_card_targets = "Подтвердить";
+primary_button_submit_hand_card_targets = "Подтвердить";
+primary_button_submit_deck_card_order = "Подтвердить";
+primary_button_resolve_stack = "Разрешить";
+primary_button_end_turn = "Завершить ход";
+primary_button_start_next_turn = "Следующий ход";
 increment_energy_prompt_button = "+1{energy_symbol}";
 decrement_energy_prompt_button = "-1{energy_symbol}";
 hide_stack_button = "{eye_icon}";
@@ -235,52 +235,52 @@ show_battlefield_button = "{eye_icon}";
 hide_battlefield_button = "{eye_slash_icon}";
 
 
-card_rules_text_energy_paid($e) = "({energy($e)} paid)";
-card_rules_text_reclaimed = "(Reclaimed)";
-card_rules_text_anchored = "(Anchored)";
+card_rules_text_energy_paid($e) = "(Заплачено {energy($e)})";
+card_rules_text_reclaimed = "(Возвышено)";
+card_rules_text_anchored = "(Закреплён)";
 
 
-modal_effect_choice_card_name($number) = "Choice {$number}";
-character_ability_card_name($character_name) = "{$character_name} Ability";
+modal_effect_choice_card_name($number) = "Выбор {$number}";
+character_ability_card_name($character_name) = "Способность: {$character_name}";
 
 
 hand_size_limit_exceeded_warning_message =
-    "Note: Cards drawn in excess of 10 become {energy_symbol} instead.";
+    "Примечание: Карты, взятые сверх 10, вместо этого становятся {energy_symbol}.";
 character_limit_exceeded_warning_message =
-    "Character limit exceeded: A character will be abandoned, with its spark permanently added to your total.";
+    "Превышен лимит персонажей: Один персонаж будет отречён, а его искра навсегда добавлена к вашему итогу.";
 combined_limit_warning_message =
-    "Character limit exceeded: A character will be abandoned. Cards drawn in excess of 10 become {energy_symbol} instead.";
+    "Превышен лимит персонажей: Один персонаж будет отречён. Карты, взятые сверх 10, вместо этого становятся {energy_symbol}.";
 
 
-error_message_panel_title = "Error";
+error_message_panel_title = "Ошибка";
 
 
-card_type_character = "Character";
-card_type_event = "Event";
-card_type_dreamsign = "Dreamsign";
-card_type_dreamcaller = "Dreamcaller";
-card_type_dreamwell = "Dreamwell";
+card_type_character = "Персонаж";
+card_type_event = "Событие";
+card_type_dreamsign = "Знак Грёз";
+card_type_dreamcaller = "Призыватель Грёз";
+card_type_dreamwell = "Источник Грёз";
 
 
 help_text_dissolve =
-    "{@cap dissolve}: Send a character to the void";
+    "{@cap dissolve}: Отправить персонажа в Пустоту";
 help_text_prevent =
-    "{@cap prevent}: Send a card to the void in response to it being played";
+    "{@cap prevent}: Отправить карту в Пустоту в ответ на её розыгрыш";
 help_text_foresee_1 =
-    "<color=#AA00FF>Foresee</color> 1: Look at the top card of your deck. You may put it into your void.";
+    "<color=#AA00FF>Прозрение</color> 1: Посмотрите верхнюю карту вашей колоды. Вы можете положить её в вашу Пустоту.";
 help_text_foresee_n($n) =
-    "<color=#AA00FF>Foresee</color> {$n}: Look at the top {$n} cards of your deck. You may put them into your void or put them back in any order.";
+    "<color=#AA00FF>Прозрение</color> {$n}: Посмотрите {$n} верхних карт вашей колоды. Вы можете положить их в вашу Пустоту или вернуть обратно в любом порядке.";
 help_text_anchored =
-    "<color=#AA00FF><b>Anchored</b></color>: Cannot be dissolved.";
+    "<color=#AA00FF><b>Закреплён</b></color>: Не может быть рассеян.";
 help_text_reclaim_without_cost =
-    "{@cap reclaim}: You may play a card from your void, then banish it when it leaves play.";
+    "{@cap reclaim}: Вы можете сыграть карту из вашей Пустоты, затем изгнать её, когда она покинет игру.";
 help_text_reclaim_with_cost($e) =
-    "{@cap reclaim} {energy($e)}: You may play this card from your void for {energy($e)}, then banish it.";
+    "{@cap reclaim} {energy($e)}: Вы можете сыграть эту карту из вашей Пустоты за {energy($e)}, затем изгнать её.";
 
 
-token_type_activated_ability = "Activated Ability";
-token_type_triggered_ability = "Triggered Ability";
-token_type_reclaim_ability = "Reclaim Ability";
+token_type_activated_ability = "Активируемая способность";
+token_type_triggered_ability = "Срабатывающая способность";
+token_type_reclaim_ability = "Способность Возвышения";
 
 
 discard_your_hand_cost = "сбросьте руку";
