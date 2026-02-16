@@ -663,10 +663,10 @@ with_count_allied_subtype($a, $t) = "{count_allied_subtype($a, $t)}";
 with_count_allies($a) = "{count_allies($a)}";
 
 
-operator_or_less = " или меньше";
-operator_or_more = " или больше";
-operator_lower = " ниже";
-operator_higher = " выше";
+operator_or_less = { *one: " или меньше", pre: "" };
+operator_or_more = { *one: " или больше", pre: "" };
+operator_lower = { *one: " ниже", pre: "на " };
+operator_higher = { *one: " выше", pre: "на " };
 
 
 draw_cards_effect($c) = "возьмите {cards($c)}";
@@ -1077,7 +1077,7 @@ in_your_hand($target) = :from($target) {
     other: "{$target:other} в вашей руке",
 };
 
-with_cost_constraint($op, $val) = "стоимостью {energy($val)}{$op}";
+with_cost_constraint($op, $val) = "стоимостью {$op:pre}{energy($val)}{$op}";
 with_spark_constraint($op, $val) = "с искрой {$val}{$op}";
 pred_with_constraint($base, $constraint) = :from($base) {
     *one: "{$base} {$constraint}",
