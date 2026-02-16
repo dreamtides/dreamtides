@@ -25,8 +25,7 @@ russian = "Рассеяйте врага стоимостью <color=#00838F>3�
 [[tests]]
 english = "{reclaim_for_cost($r)}"
 variables = "r: 2"
-russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>."
-disabled = true
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>"
 [[tests]]
 english = "When you {materialize} an ally, gain {energy($e)}."
 variables = "e: 1"
@@ -315,8 +314,7 @@ russian = "Скопируйте следующее событие, которо�
 [[tests]]
 english = "{reclaim_for_cost($r)}"
 variables = "r: 2"
-russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>."
-disabled = true
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>"
 [[tests]]
 english = "Draw {cards($c)} for each card you have played this turn."
 variables = "c: 1"
@@ -664,8 +662,7 @@ russian = "Возьмите 2 карты. Сбросьте 2 карты."
 [[tests]]
 english = "{reclaim_for_cost($r)}"
 variables = "r: 2"
-russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>."
-disabled = true
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>"
 [[tests]]
 english = "When you discard a card, {kindle($k)}."
 variables = "k: 1"
@@ -1582,8 +1579,7 @@ russian = "<color=#964B00>Возвышение</color> <color=#00838F>3●</colo
 [[tests]]
 english = "{Reclaim_For_Cost($r)}"
 variables = "r: 2"
-russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>."
-disabled = true
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>"
 [[tests]]
 english = "{Judgment} You may abandon {@a subtype($t)} to {discover} {@a subtype($t)} with cost {energy($e)} higher and {materialize} it."
 variables = "t: Warrior, e: 1"
