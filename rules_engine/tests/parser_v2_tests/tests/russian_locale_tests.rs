@@ -255,3 +255,77 @@ fn test_russian_locale_load_phrase_count() {
         );
     });
 }
+
+/// Validates Russian locale coverage against English source definitions:
+/// no missing phrases, no orphan phrases, and matching parameter counts.
+#[test]
+fn test_russian_locale_translation_validation_gate() {
+    activate_russian_locale();
+    let (missing, orphans, mismatches) = rlf::with_locale(|locale| {
+        let source = locale
+            .registry_for(SOURCE_LANGUAGE)
+            .expect("English source phrases should be registered");
+        let russian =
+            locale.registry_for(RUSSIAN_LANGUAGE).expect("Russian phrases should be registered");
+
+        let mut source_names: Vec<&str> = source.phrase_names().collect();
+        source_names.sort();
+        let mut russian_names: Vec<&str> = russian.phrase_names().collect();
+        russian_names.sort();
+
+        let mut missing_phrases = Vec::new();
+        for name in &source_names {
+            if russian.get(name).is_none() {
+                missing_phrases.push((*name).to_string());
+            }
+        }
+
+        let mut orphan_phrases = Vec::new();
+        for name in &russian_names {
+            if source.get(name).is_none() {
+                orphan_phrases.push((*name).to_string());
+            }
+        }
+
+        let mut parameter_mismatches = Vec::new();
+        for name in &source_names {
+            let Some(source_def) = source.get(name) else {
+                continue;
+            };
+            let Some(russian_def) = russian.get(name) else {
+                continue;
+            };
+            if source_def.parameters.len() != russian_def.parameters.len() {
+                parameter_mismatches.push(format!(
+                    "{name}: source has {} param(s), ru has {}",
+                    source_def.parameters.len(),
+                    russian_def.parameters.len()
+                ));
+            }
+        }
+
+        (missing_phrases, orphan_phrases, parameter_mismatches)
+    });
+
+    let failure_count = missing.len() + orphans.len() + mismatches.len();
+    println!(
+        "Russian locale translation validation: {failure_count} failure(s) (missing: {}, orphans: {}, parameter mismatches: {})",
+        missing.len(),
+        orphans.len(),
+        mismatches.len()
+    );
+
+    assert!(
+        failure_count == 0,
+        "Russian locale translation validation failed with {failure_count} issue(s)\n\
+         Missing ({}):\n  {}\n\
+         Orphans ({}):\n  {}\n\
+         Parameter mismatches ({}):\n  {}",
+        missing.len(),
+        if missing.is_empty() { "(none)".to_string() } else { missing.join("\n  ") },
+        orphans.len(),
+        if orphans.is_empty() { "(none)".to_string() } else { orphans.join("\n  ") },
+        mismatches.len(),
+        if mismatches.is_empty() { "(none)".to_string() } else { mismatches.join("\n  ") }
+    );
+}
