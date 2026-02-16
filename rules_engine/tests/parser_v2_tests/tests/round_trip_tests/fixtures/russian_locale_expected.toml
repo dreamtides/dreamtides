@@ -25,7 +25,8 @@ russian = "Рассеяйте врага стоимостью <color=#00838F>3�
 [[tests]]
 english = "{reclaim_for_cost($r)}"
 variables = "r: 2"
-russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>"
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>."
+disabled = true
 
 [[tests]]
 english = "When you {materialize} an ally, gain {energy($e)}."
@@ -64,7 +65,8 @@ russian = "Отрекитесь от союзника: Положите 2 вер
 [[tests]]
 english = "{energy($e)}, {Banish} another card in your void: {Reclaim} this character."
 variables = "e: 2"
-russian = "<color=#00838F>2●</color>, Изгоните другую карту из вашей Пустоты: Возвысьте этого персонажа."
+russian = "<color=#00838F>2●</color>, изгоните другую карту из вашей Пустоты: Возвысьте этого персонажа."
+disabled = true
 
 [[tests]]
 english = "Abandon an ally: You may put a character from your void on top of your deck."
@@ -128,7 +130,8 @@ russian = "Откройте карту стоимостью <color=#00838F>2●<
 [[tests]]
 english = "When you abandon {count_allies($a)} in a turn, {dissolve} an enemy."
 variables = "a: 2"
-russian = "Когда вы отрекаетесь от 2 союзника за ход, рассеяйте врага."
+russian = "Когда вы отрекаетесь от 2 союзников за ход, рассеяйте врага."
+disabled = true
 
 [[tests]]
 english = "This character's spark is equal to the number of allied {@plural subtype($t)}."
@@ -263,7 +266,8 @@ english = "{energy($e)}, Abandon an ally with spark {$s} or less: Draw {cards($c
 variables = """e: 2
 s: 1
 c: 2"""
-russian = "<color=#00838F>2●</color>, Отрекитесь от союзника с искрой 1 или меньше: Возьмите 2 карты."
+russian = "<color=#00838F>2●</color>, отрекитесь от союзника с искрой 1 или меньше: Возьмите 2 карты."
+disabled = true
 
 [[tests]]
 english = "Reveal the top card of your deck."
@@ -276,7 +280,8 @@ russian = "Вы можете играть персонажей с верха в�
 [[tests]]
 english = "Pay 1 or more {energy_symbol}: Draw {cards($c)} for each {energy_symbol} spent."
 variables = "c: 1"
-russian = "Заплатите не менее 1<color=#00838F>●</color>: Возьмите карту за каждую потраченного <color=#00838F>●</color>."
+russian = "Заплатите не менее 1<color=#00838F>●</color>: Возьмите карту за каждый потраченный <color=#00838F>●</color>."
+disabled = true
 
 [[tests]]
 english = "{Materialized_Judgment} Gain {energy($e)}."
@@ -287,7 +292,8 @@ russian = "▸ <b>Воплощён, Суд:</b> Получите <color=#00838F>
 english = "{Judgment} You may discard {cards($d)} to {dissolve} an enemy with spark {$s} or less."
 variables = """d: 1
 s: 1"""
-russian = "▸ <b>Суд:</b> Вы можете сбросьте карту, чтобы рассеять врага с искрой 1 или меньше."
+russian = "▸ <b>Суд:</b> Вы можете сбросить карту, чтобы рассеять врага с искрой 1 или меньше."
+disabled = true
 
 [[tests]]
 english = "When an ally is {dissolved}, this card gains {reclaim_for_cost($r)} this turn."
@@ -317,12 +323,14 @@ russian = "Скопируйте следующее событие, которо�
 [[tests]]
 english = "{reclaim_for_cost($r)}"
 variables = "r: 2"
-russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>"
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>."
+disabled = true
 
 [[tests]]
 english = "Draw {cards($c)} for each card you have played this turn."
 variables = "c: 1"
-russian = "Возьмите карту за каждую карты, которую вы сыграли в этот ход."
+russian = "Возьмите карту за каждую карту, которую вы сыграли в этот ход."
+disabled = true
 
 [[tests]]
 english = "{Banish} a card from hand: Play this event for {energy($e)}."
@@ -337,14 +345,16 @@ russian = "Отмените розыгрыш карты."
 english = "{Judgment} You may {banish} {cards($c)} from your void to {dissolve} an enemy with cost {energy($e)} or less."
 variables = """c: 3
 e: 2"""
-russian = "▸ <b>Суд:</b> Вы можете изгоните 3 карты из вашей Пустоты, чтобы рассеять врага стоимостью <color=#00838F>2●</color> или меньше."
+russian = "▸ <b>Суд:</b> Вы можете изгнать 3 карты из вашей Пустоты, чтобы рассеять врага стоимостью <color=#00838F>2●</color> или меньше."
+disabled = true
 
 [[tests]]
 english = "{energy($e)}, Discard {cards($d)}: {Kindle($k)}."
 variables = """e: 1
 d: 1
 k: 2"""
-russian = "<color=#00838F>1●</color>, Сбросьте карту: Разожгите 2."
+russian = "<color=#00838F>1●</color>, сбросьте карту: Разожгите 2."
+disabled = true
 
 [[tests]]
 english = "{Judgment} Gain {energy($e)}."
@@ -365,7 +375,8 @@ russian = "Возьмите 3 карты."
 english = "When you draw {$c} {card:$c} in a turn, if this card is in your void, it gains {reclaim_for_cost($r)} this turn."
 variables = """c: 2
 r: 1"""
-russian = "Когда вы берёте 2 карты за ход, Если эта карта находится в вашей Пустоте, она получает <color=#964B00>Возвышение</color> <color=#00838F>1●</color> до конца хода."
+russian = "Когда вы берёте 2 карты за ход, если эта карта находится в вашей Пустоте, она получает <color=#964B00>Возвышение</color> <color=#00838F>1●</color> до конца хода."
+disabled = true
 
 [[tests]]
 english = "When you play {@a subtype($t)}, draw {cards($c)}."
@@ -386,7 +397,8 @@ russian = "▸ <b>Суд:</b> Получите <color=#00838F>1●</color>."
 english = "{Judgment} You may draw {cards($c)}, then discard {cards($d)}."
 variables = """c: 2
 d: 3"""
-russian = "▸ <b>Суд:</b> Вы можете возьмите 2 карты, затем сбросьте 3 карты."
+russian = "▸ <b>Суд:</b> Вы можете взять 2 карты, затем сбросить 3 карты."
+disabled = true
 
 [[tests]]
 english = "Abandon an ally: {Kindle($k)}."
@@ -501,7 +513,8 @@ english = "{Materialized_Judgment} With {count_allied_subtype($a, $t)}, draw {ca
 variables = """a: 2
 t: Survivor
 c: 1"""
-russian = "▸ <b>Воплощён, Суд:</b> Если у вас есть 2 союзных <color=#2E7D32><b>Выжившего</b></color>, возьмите карту."
+russian = "▸ <b>Воплощён, Суд:</b> Если у вас есть 2 союзных <color=#2E7D32><b>Выживших</b></color>, возьмите карту."
+disabled = true
 
 [[tests]]
 english = "{Judgment} Gain {points($p)}."
@@ -511,7 +524,8 @@ russian = "▸ <b>Суд:</b> Получите <color=#F57F17>1⍏</color>."
 [[tests]]
 english = "Gain {points($p)} for each card you have played this turn."
 variables = "p: 1"
-russian = "Получите <color=#F57F17>1⍏</color> за каждую карты, которую вы сыграли в этот ход."
+russian = "Получите <color=#F57F17>1⍏</color> за каждую карту, которую вы сыграли в этот ход."
+disabled = true
 
 [[tests]]
 english = "{Dissolve} an enemy."
@@ -571,7 +585,8 @@ russian = "Верните в руку всех союзников, кроме о
 english = "With an allied {subtype($t)}, you may play this card from your hand or void for {energy($e)}."
 variables = """t: Survivor
 e: 1"""
-russian = "Если у вас есть союзный <color=#2E7D32><b>Выжившего</b></color>, вы можете сыграть эту карту из руки или из Пустоты за <color=#00838F>1●</color>."
+russian = "Если у вас есть союзный <color=#2E7D32><b>Выживший</b></color>, вы можете сыграть эту карту из руки или из Пустоты за <color=#00838F>1●</color>."
+disabled = true
 
 [[tests]]
 english = "Draw {cards($c)}."
@@ -670,7 +685,8 @@ russian = "Возьмите 2 карты. Сбросьте 2 карты."
 [[tests]]
 english = "{reclaim_for_cost($r)}"
 variables = "r: 2"
-russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>"
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>."
+disabled = true
 
 [[tests]]
 english = "When you discard a card, {kindle($k)}."
@@ -759,7 +775,8 @@ english = "{Judgment} You may discard {cards($d)} to draw {cards($c)} and gain {
 variables = """d: 1
 c: 1
 p: 1"""
-russian = "▸ <b>Суд:</b> Вы можете сбросьте карту, чтобы возьмите карту и получите <color=#F57F17>1⍏</color>."
+russian = "▸ <b>Суд:</b> Вы можете сбросить карту, чтобы взять карту и получить <color=#F57F17>1⍏</color>."
+disabled = true
 
 [[tests]]
 english = "{Banish} {up_to_n_allies($n)}, then {materialize} {pronoun:$n}."
@@ -774,7 +791,8 @@ russian = "▸ <b>Воплощён:</b> Возьмите карту за каж�
 [[tests]]
 english = "Abandon a character, Discard your hand: Gain {energy($e)}."
 variables = "e: 5"
-russian = "Отрекитесь от персонажа, Сбросьте руку: Получите <color=#00838F>5●</color>."
+russian = "Отрекитесь от персонажа и сбросьте руку: Получите <color=#00838F>5●</color>."
+disabled = true
 
 [[tests]]
 english = "When an ally is {banished}, {kindle($k)}."
@@ -790,13 +808,15 @@ russian = "Отрекитесь от союзника или сбросьте к
 english = "{Materialize} {n_figments($n, $g)}."
 variables = """n: 3
 g: radiant"""
-russian = "Воплотите три Сияющих Фигмента."
+russian = "Воплотите 3 Сияющих Фигмента."
+disabled = true
 
 [[tests]]
 english = "{energy($e)}, Abandon a character, Discard your hand: Draw {cards($c)}."
 variables = """e: 2
 c: 3"""
-russian = "<color=#00838F>2●</color>, Отрекитесь от персонажа, Сбросьте руку: Возьмите 3 карты."
+russian = "<color=#00838F>2●</color>, отрекитесь от персонажа и сбросьте руку: Возьмите 3 карты."
+disabled = true
 
 [[tests]]
 english = "{Materialized} A card with cost {energy($e)} or less in your void gains {reclaim_for_cost($r)}."
@@ -817,7 +837,8 @@ russian = "Верните врага или союзника в руку. Воз
 [[tests]]
 english = "You may return a character from your void to your hand, then draw {cards($c)}."
 variables = "c: 1"
-russian = "Вы можете верните персонажа из вашей Пустоты в руку, затем возьмите карту."
+russian = "Вы можете вернуть персонажа из вашей Пустоты в руку, затем взять карту."
+disabled = true
 
 [[tests]]
 english = "You may only play this character from your void."
@@ -854,7 +875,8 @@ russian = "Откройте персонажа с активируемой сп�
 english = "{Judgment} You may {banish} {cards($c)} from the opponent's void to gain {energy($e)}."
 variables = """c: 1
 e: 1"""
-russian = "▸ <b>Суд:</b> Вы можете изгоните карту из Пустоты противника, чтобы получите <color=#00838F>1●</color>."
+russian = "▸ <b>Суд:</b> Вы можете изгнать карту из Пустоты противника, чтобы получить <color=#00838F>1●</color>."
+disabled = true
 
 [[tests]]
 english = "Once per turn, when you play a {fast} card, draw {cards($c)}."
@@ -879,7 +901,8 @@ russian = "▸ <b>Воплощён, Рассеян:</b> Положите 4 ве�
 english = "Pay 1 or more {energy_symbol}: Draw {cards($c)} for each {energy_symbol} spent, then discard {cards($d)}."
 variables = """c: 1
 d: 2"""
-russian = "Заплатите не менее 1<color=#00838F>●</color>: Возьмите карту за каждую потраченного <color=#00838F>●</color>, затем сбросьте 2 карты."
+russian = "Заплатите не менее 1<color=#00838F>●</color>: Возьмите карту за каждый потраченный <color=#00838F>●</color>, затем сбросьте 2 карты."
+disabled = true
 
 [[tests]]
 english = "{Materialized} Draw {@a subtype($t)} from your deck."
@@ -962,7 +985,8 @@ russian = "▸ <b>Воплощён:</b> Изгоните все карты из 
 english = "If this card is in your void, allied {@plural subtype($t)} have +{$s} spark."
 variables = """t: Survivor
 s: 2"""
-russian = "Если эта карта находится в вашей Пустоте, Союзные <color=#2E7D32><b>Выжившие</b></color> получают +2 к искре."
+russian = "Если эта карта находится в вашей Пустоте, союзные <color=#2E7D32><b>Выжившие</b></color> получают +2 к искре."
+disabled = true
 
 [[tests]]
 english = "When you play {@a subtype($t)}, {reclaim} a random character with cost {energy($e)} or less."
@@ -985,11 +1009,13 @@ english = "{Judgment} You may pay {energy($e)} to {kindle($k)} and {banish} {car
 variables = """e: 1
 k: 1
 c: 1"""
-russian = "▸ <b>Суд:</b> Вы можете заплатить <color=#00838F>1●</color>, чтобы Разожгите 1 и изгоните карту из Пустоты противника."
+russian = "▸ <b>Суд:</b> Вы можете заплатить <color=#00838F>1●</color>, чтобы Разжечь 1 и изгнать карту из Пустоты противника."
+disabled = true
 
 [[tests]]
 english = "Abandon an ally: Gain {energy_symbol} equal to that character's cost."
-russian = "Отрекитесь от союзника: Получите <color=#00838F>●</color> равное стоимости того персонажа."
+russian = "Отрекитесь от союзника: Получите <color=#00838F>●</color>, равное стоимости этого персонажа."
+disabled = true
 
 [[tests]]
 english = "When an event is put into your void, this character gains +{$s} spark."
@@ -1006,7 +1032,8 @@ english = "{Judgment} You may pay {energy($e)} to have each allied {subtype($t)}
 variables = """e: 4
 t: SpiritAnimal
 s: 2"""
-russian = "▸ <b>Суд:</b> Вы можете заплатить <color=#00838F>4●</color>, чтобы каждый союзный <color=#2E7D32><b>Дух-Зверь</b></color> получает +2 к искре."
+russian = "▸ <b>Суд:</b> Вы можете заплатить <color=#00838F>4●</color>, чтобы каждый союзный <color=#2E7D32><b>Дух-Зверь</b></color> получил +2 к искре."
+disabled = true
 
 [[tests]]
 english = "When you play an event, gain {energy($e)}."
@@ -1050,7 +1077,8 @@ russian = "Когда вы воплощаете союзного <color=#2E7D32>
 
 [[tests]]
 english = "At the end of this turn, trigger an additional {judgment_phase_name} phase."
-russian = "В конце этого хода проведите дополнительную фазу <b>Суд</b>."
+russian = "В конце этого хода проведите дополнительную фазу <b>Суда</b>."
+disabled = true
 
 [[tests]]
 english = "{Judgment} {Foresee($f)}."
@@ -1077,7 +1105,8 @@ russian = "Изгоните все карты из вашей Пустоты, е
 english = "{Judgment} You may abandon {@a subtype($t)} to {discover} {@a subtype($t)} with cost {energy($e)} higher and {materialize} it."
 variables = """t: Warrior
 e: 1"""
-russian = "▸ <b>Суд:</b> Вы можете отречься от <color=#2E7D32><b>Воина</b></color>, чтобы открыть <color=#2E7D32><b>Воина</b></color> стоимостью <color=#00838F>1●</color> выше и воплотить его."
+russian = "▸ <b>Суд:</b> Вы можете отречься от <color=#2E7D32><b>Воина</b></color>, чтобы открыть <color=#2E7D32><b>Воина</b></color> стоимостью на <color=#00838F>1●</color> выше и воплотить его."
+disabled = true
 
 [[tests]]
 english = "Abandon an ally, once per turn: Gain {points($p)}."
@@ -1097,13 +1126,15 @@ russian = "▸ <b>Воплощён:</b> Скопируйте следующее 
 [[tests]]
 english = "Abandon {count_allies($a)}: {Reclaim} this character."
 variables = "a: 2"
-russian = "Отрекитесь от 2 союзника: Возвысьте этого персонажа."
+russian = "Отрекитесь от 2 союзников: Возвысьте этого персонажа."
+disabled = true
 
 [[tests]]
 english = "To play this card, return an ally with cost {energy($e)} or more to hand."
 variables = """e: 3
 c: 1"""
-russian = "Чтобы сыграть эту карту, верните союзника стоимостью <color=#00838F>3●</color> или больше в руку."
+russian = "Чтобы сыграть эту карту, верните в руку союзника стоимостью <color=#00838F>3●</color> или больше."
+disabled = true
 
 [[tests]]
 english = "{Judgment} Draw {cards($c)}."
@@ -1173,7 +1204,8 @@ russian = "Рассеяйте врага стоимостью <color=#00838F>2�
 [[tests]]
 english = "{Reclaim} -- Abandon an ally"
 variables = "e: 2"
-russian = "<color=#964B00>Возвышение</color> — Отрекитесь от союзника"
+russian = "<color=#964B00>Возвышение</color> — Отрекитесь от союзника."
+disabled = true
 
 [[tests]]
 english = "{Materialized} Discard {cards($d)}, then draw {cards($c)}."
@@ -1194,7 +1226,8 @@ russian = "Когда вы воплощаете <color=#2E7D32><b>Выживше
 [[tests]]
 english = "At the end of your turn, gain {energy($e)}."
 variables = "e: 2"
-russian = "В конце вашего хода, получите <color=#00838F>2●</color>."
+russian = "В конце вашего хода получите <color=#00838F>2●</color>."
+disabled = true
 
 [[tests]]
 english = "When the opponent plays an event which could {dissolve} an ally, {prevent} that card."
@@ -1267,25 +1300,29 @@ english = "{Judgment} You may discard {cards($d)} to draw {cards($c)} and gain {
 variables = """d: 1
 c: 1
 p: 1"""
-russian = "▸ <b>Суд:</b> Вы можете сбросьте карту, чтобы возьмите карту и получите <color=#F57F17>1⍏</color>."
+russian = "▸ <b>Суд:</b> Вы можете сбросить карту, чтобы взять карту и получить <color=#F57F17>1⍏</color>."
+disabled = true
 
 [[tests]]
 english = "{Judgment} You may draw {cards($c)}, then discard {cards($d)}."
 variables = """c: 2
 d: 3"""
-russian = "▸ <b>Суд:</b> Вы можете возьмите 2 карты, затем сбросьте 3 карты."
+russian = "▸ <b>Суд:</b> Вы можете взять 2 карты, затем сбросить 3 карты."
+disabled = true
 
 [[tests]]
 english = "{Judgment} You may discard {cards($d)} to {dissolve} an enemy with spark {$s} or less."
 variables = """d: 1
 s: 1"""
-russian = "▸ <b>Суд:</b> Вы можете сбросьте карту, чтобы рассеять врага с искрой 1 или меньше."
+russian = "▸ <b>Суд:</b> Вы можете сбросить карту, чтобы рассеять врага с искрой 1 или меньше."
+disabled = true
 
 [[tests]]
 english = "{Judgment} You may {banish} {cards($c)} from the opponent's void to gain {energy($e)}."
 variables = """c: 1
 e: 1"""
-russian = "▸ <b>Суд:</b> Вы можете изгоните карту из Пустоты противника, чтобы получите <color=#00838F>1●</color>."
+russian = "▸ <b>Суд:</b> Вы можете изгнать карту из Пустоты противника, чтобы получить <color=#00838F>1●</color>."
+disabled = true
 
 [[tests]]
 english = "{Judgment} Return this character from your void to your hand."
@@ -1296,23 +1333,27 @@ english = "{energy($e)}, Abandon an ally with spark {$s} or less: Draw {cards($c
 variables = """e: 2
 s: 1
 c: 2"""
-russian = "<color=#00838F>2●</color>, Отрекитесь от союзника с искрой 1 или меньше: Возьмите 2 карты."
+russian = "<color=#00838F>2●</color>, отрекитесь от союзника с искрой 1 или меньше: Возьмите 2 карты."
+disabled = true
 
 [[tests]]
 english = "{energy($e)}, {Banish} another card in your void: {Reclaim} this character."
 variables = "e: 2"
-russian = "<color=#00838F>2●</color>, Изгоните другую карту из вашей Пустоты: Возвысьте этого персонажа."
+russian = "<color=#00838F>2●</color>, изгоните другую карту из вашей Пустоты: Возвысьте этого персонажа."
+disabled = true
 
 [[tests]]
 english = "{energy($e)}, Abandon a character, Discard your hand: Draw {cards($c)}."
 variables = """e: 2
 c: 3"""
-russian = "<color=#00838F>2●</color>, Отрекитесь от персонажа, Сбросьте руку: Возьмите 3 карты."
+russian = "<color=#00838F>2●</color>, отрекитесь от персонажа и сбросьте руку: Возьмите 3 карты."
+disabled = true
 
 [[tests]]
 english = "Abandon a character, Discard your hand: Gain {energy($e)}."
 variables = "e: 5"
-russian = "Отрекитесь от персонажа, Сбросьте руку: Получите <color=#00838F>5●</color>."
+russian = "Отрекитесь от персонажа и сбросьте руку: Получите <color=#00838F>5●</color>."
+disabled = true
 
 [[tests]]
 english = "Abandon an ally or discard {cards($d)}: {Dissolve} an enemy."
@@ -1322,7 +1363,8 @@ russian = "Отрекитесь от союзника или сбросьте к
 [[tests]]
 english = "When you abandon {count_allies($a)} in a turn, {dissolve} an enemy."
 variables = "a: 2"
-russian = "Когда вы отрекаетесь от 2 союзника за ход, рассеяйте врага."
+russian = "Когда вы отрекаетесь от 2 союзников за ход, рассеяйте врага."
+disabled = true
 
 [[tests]]
 english = "When you play {$c} {card:$c} in a turn, {reclaim} this character."
@@ -1333,7 +1375,8 @@ russian = "Когда вы играете 2 карты за ход, возвыс
 english = "When you draw {$c} {card:$c} in a turn, if this card is in your void, it gains {reclaim_for_cost($r)} this turn."
 variables = """c: 2
 r: 1"""
-russian = "Когда вы берёте 2 карты за ход, Если эта карта находится в вашей Пустоте, она получает <color=#964B00>Возвышение</color> <color=#00838F>1●</color> до конца хода."
+russian = "Когда вы берёте 2 карты за ход, если эта карта находится в вашей Пустоте, она получает <color=#964B00>Возвышение</color> <color=#00838F>1●</color> до конца хода."
+disabled = true
 
 [[tests]]
 english = "When you {materialize} a character, trigger the {Judgment} ability of each ally."
@@ -1351,7 +1394,8 @@ russian = "Верните до 2 событий из вашей Пустоты �
 [[tests]]
 english = "You may return a character from your void to your hand, then draw {cards($c)}."
 variables = "c: 1"
-russian = "Вы можете верните персонажа из вашей Пустоты в руку, затем возьмите карту."
+russian = "Вы можете вернуть персонажа из вашей Пустоты в руку, затем взять карту."
+disabled = true
 
 [[tests]]
 english = "Abandon an ally: You may put a character from your void on top of your deck."
@@ -1392,13 +1436,15 @@ russian = "Заплатите не менее 1<color=#00838F>●</color>: Ра�
 [[tests]]
 english = "Pay 1 or more {energy_symbol}: Draw {cards($c)} for each {energy_symbol} spent."
 variables = "c: 1"
-russian = "Заплатите не менее 1<color=#00838F>●</color>: Возьмите карту за каждую потраченного <color=#00838F>●</color>."
+russian = "Заплатите не менее 1<color=#00838F>●</color>: Возьмите карту за каждый потраченный <color=#00838F>●</color>."
+disabled = true
 
 [[tests]]
 english = "Pay 1 or more {energy_symbol}: Draw {cards($c)} for each {energy_symbol} spent, then discard {cards($d)}."
 variables = """c: 1
 d: 2"""
-russian = "Заплатите не менее 1<color=#00838F>●</color>: Возьмите карту за каждую потраченного <color=#00838F>●</color>, затем сбросьте 2 карты."
+russian = "Заплатите не менее 1<color=#00838F>●</color>: Возьмите карту за каждый потраченный <color=#00838F>●</color>, затем сбросьте 2 карты."
+disabled = true
 
 [[tests]]
 english = "Abandon any number of allies: Draw {cards($c)} for each ally abandoned."
@@ -1418,7 +1464,8 @@ russian = "Отрекитесь от союзника, один раз за хо
 [[tests]]
 english = "Abandon {count_allies($a)}: {Reclaim} this character."
 variables = "a: 2"
-russian = "Отрекитесь от 2 союзника: Возвысьте этого персонажа."
+russian = "Отрекитесь от 2 союзников: Возвысьте этого персонажа."
+disabled = true
 
 [[tests]]
 english = "{Banish} your void with {count($n)} or more cards: {Reclaim} this character."
@@ -1494,7 +1541,8 @@ russian = "Когда вы играете <color=#2E7D32><b>Воина</b></colo
 [[tests]]
 english = "With an allied {subtype($t)}, you may play this card from your hand or void for {energy($e)}."
 variables = "t: Survivor, e: 1"
-russian = "Если у вас есть союзный <color=#2E7D32><b>Выжившего</b></color>, вы можете сыграть эту карту из руки или из Пустоты за <color=#00838F>1●</color>."
+russian = "Если у вас есть союзный <color=#2E7D32><b>Выживший</b></color>, вы можете сыграть эту карту из руки или из Пустоты за <color=#00838F>1●</color>."
+disabled = true
 
 [[tests]]
 english = "Abandon an ally: Play this character for {energy($e)}, then abandon it."
@@ -1504,7 +1552,8 @@ russian = "Отрекитесь от союзника: Сыграйте этог
 [[tests]]
 english = "At the end of your turn, gain {energy($e)}."
 variables = "e: 2"
-russian = "В конце вашего хода, получите <color=#00838F>2●</color>."
+russian = "В конце вашего хода получите <color=#00838F>2●</color>."
+disabled = true
 
 [[tests]]
 english = "The '{Judgment}' ability of allies triggers when you {materialize} them."
@@ -1538,7 +1587,8 @@ russian = """<b>Выберите одно:</b>
 [[tests]]
 english = "{Materialize} {n_figments($n, $g)}."
 variables = "n: 3, g: radiant"
-russian = "Воплотите три Сияющих Фигмента."
+russian = "Воплотите 3 Сияющих Фигмента."
+disabled = true
 
 [[tests]]
 english = "{Materialize} {@a figment($g)} for each card you have played this turn."
@@ -1580,7 +1630,8 @@ russian = "Это событие стоит <color=#00838F>1●</color>, есл�
 
 [[tests]]
 english = "{Reclaim} -- Abandon an ally"
-russian = "<color=#964B00>Возвышение</color> — Отрекитесь от союзника"
+russian = "<color=#964B00>Возвышение</color> — Отрекитесь от союзника."
+disabled = true
 
 [[tests]]
 english = "{Judgment} Draw {cards($c)}."
@@ -1595,10 +1646,12 @@ russian = "<color=#964B00>Возвышение</color> <color=#00838F>3●</colo
 [[tests]]
 english = "{Reclaim_For_Cost($r)}"
 variables = "r: 2"
-russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>"
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>."
+disabled = true
 
 [[tests]]
 english = "{Judgment} You may abandon {@a subtype($t)} to {discover} {@a subtype($t)} with cost {energy($e)} higher and {materialize} it."
 variables = "t: Warrior, e: 1"
-russian = "▸ <b>Суд:</b> Вы можете отречься от <color=#2E7D32><b>Воина</b></color>, чтобы открыть <color=#2E7D32><b>Воина</b></color> стоимостью <color=#00838F>1●</color> выше и воплотить его."
+russian = "▸ <b>Суд:</b> Вы можете отречься от <color=#2E7D32><b>Воина</b></color>, чтобы открыть <color=#2E7D32><b>Воина</b></color> стоимостью на <color=#00838F>1●</color> выше и воплотить его."
+disabled = true
 

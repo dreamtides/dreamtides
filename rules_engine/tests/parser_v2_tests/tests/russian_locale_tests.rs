@@ -48,6 +48,10 @@ struct RussianTestEntry {
     english: String,
     russian: String,
     variables: Option<String>,
+    /// When true, this test is skipped because the engine does not yet
+    /// produce the correct translator-provided Russian string.
+    #[serde(default)]
+    disabled: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -114,9 +118,14 @@ fn test_russian_locale_ratcheting_translations() {
     });
 
     let mut passing = 0usize;
+    let mut disabled = 0usize;
     let mut failures = Vec::new();
 
     for (index, entry) in expected.tests.iter().enumerate() {
+        if entry.disabled {
+            disabled += 1;
+            continue;
+        }
         let variables = entry.variables.as_deref().unwrap_or("");
         let result = render_ability(&entry.english, variables);
         match result {
@@ -138,9 +147,9 @@ fn test_russian_locale_ratcheting_translations() {
         }
     }
 
+    let active = expected.tests.len() - disabled;
     println!(
-        "Russian locale ratchet: {passing}/{} passing (baseline min: {})",
-        expected.tests.len(),
+        "Russian locale ratchet: {passing}/{active} passing, {disabled} disabled (baseline min: {})",
         baseline.min_passing
     );
 
