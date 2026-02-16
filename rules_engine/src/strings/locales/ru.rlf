@@ -1,5 +1,4 @@
-// Russian locale stub — generated from bracket.rlf by stripping outer brackets.
-// All phrase bodies currently contain English text as placeholders for translation.
+// Russian locale definitions for Dreamtides serializer text.
 
 energy_symbol = "<color=#00838F>●</color>";
 points_symbol = "<color=#F57F17>⍏</color>";
@@ -1171,7 +1170,7 @@ allied_subtype($t) = :from($t) {
     nom_pl: "союзные {subtype($t):nom_pl}",
     other: "союзных {subtype($t):other}",
 };
-allied_subtype_plural($t) = "союзных {subtype($t):other}";
+allied_subtype_plural($t) = :from($t) "союзных {subtype($t):other}";
 enemy_subtype($t) = :from($t) {
     nom: "{subtype($t):nom} противника",
     *acc: "{subtype($t)} противника",
@@ -1181,7 +1180,7 @@ enemy_subtype($t) = :from($t) {
     nom_pl: "{subtype($t):nom_pl} противника",
     other: "{subtype($t):other} противника",
 };
-enemy_subtype_plural($t) = "{subtype($t):other} противника";
+enemy_subtype_plural($t) = :from($t) "{subtype($t):other} противника";
 your_subtype($t) = :from($t) {
     nom: "ваш {subtype($t):nom}",
     *one: "вашего {subtype($t)}",
@@ -1458,16 +1457,16 @@ collection_all($target) = :from($target) :match($target) {
     anim: "всех {$target:other}",
     *inan: "все {$target:other}",
 };
-collection_exactly($n, $target) = "{$n} {$target:other}";
+collection_exactly($n, $target) = :from($target) "{$n} {$target:other}";
 collection_up_to($n, $target) = :from($target) "до {$n} {$target:other}";
 collection_any_number_of($target) = :from($target)
     "любое количество {$target:other}";
 
 dissolve_collection($target) = :from($target) "рассеяйте {$target}";
-banish_collection_target($target) = "{banish} {$target}";
+banish_collection_target($target) = :from($target) "{banish} {$target}";
 
 materialize_them($target) = "воплотите их";
-materialize_collection_target($target) = "{materialize} {$target}";
+materialize_collection_target($target) = :from($target) "{materialize} {$target}";
 
 materialize_copy_of($target) = :from($target) "{materialize} копию {$target}";
 materialize_n_copies_of($n, $target) = "{materialize} {copies($n)} {$target}";
