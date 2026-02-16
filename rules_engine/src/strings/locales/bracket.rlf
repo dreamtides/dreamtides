@@ -45,15 +45,9 @@ choose_one = "[<b>Choose One:</b>]";
 bullet = "[•]";
 
 
-card = :a{ one: "[card]", other: "[cards]" };
-cards($n) = :match($n) {
-    1: "[a card]",
-    *other: "[{$n} cards]",
-};
-top_n_cards($n) = :match($n) {
-    1: "[top card]",
-    *other: "[top {$n} {card:$n}]",
-};
+card = :a { one: "[card]", other: "[cards]" };
+cards($n) = :match($n) { 1: "[a card]", *other: "[{$n} cards]" };
+top_n_cards($n) = :match($n) { 1: "[top card]", *other: "[top {$n} {card:$n}]" };
 
 
 spark_value($s) = "[{$s}]";
@@ -61,21 +55,18 @@ spark = "[spark]";
 count($n) = "[{$n}]";
 
 
-ally = :an{ one: "[ally]", other: "[allies]" };
-count_allies($n) = :match($n) {
-    1: "[an ally]",
-    *other: "[{$n} allies]",
-};
+ally = :an { one: "[ally]", other: "[allies]" };
+count_allies($n) = :match($n) { 1: "[an ally]", *other: "[{$n} allies]" };
 count_allied_subtype($n, $s) = :from($s) :match($n) {
     1: "[an allied {subtype($s)}]",
     *other: "[{$n} allied {subtype($s):other}]",
 };
 
 
-celestial = :a{ one: "[Celestial]", other: "[Celestial]" };
-halcyon = :a{ one: "[Halcyon]", other: "[Halcyon]" };
-radiant = :a{ one: "[Radiant]", other: "[Radiant]" };
-shadow = :a{ one: "[Shadow]", other: "[Shadow]" };
+celestial = :a { one: "[Celestial]", other: "[Celestial]" };
+halcyon = :a { one: "[Halcyon]", other: "[Halcyon]" };
+radiant = :a { one: "[Radiant]", other: "[Radiant]" };
+shadow = :a { one: "[Shadow]", other: "[Shadow]" };
 
 
 figment($f) = :from($f) {
@@ -88,30 +79,30 @@ n_figments($n, $f) = :match($n) {
 };
 
 
-agent = :an{ one: "[Agent]", other: "[Agents]" };
-ancient = :an{ one: "[Ancient]", other: "[Ancients]" };
-avatar = :an{ one: "[Avatar]", other: "[Avatars]" };
-child = :a{ one: "[Child]", other: "[Children]" };
-detective = :a{ one: "[Detective]", other: "[Detectives]" };
-enigma = :an{ one: "[Enigma]", other: "[Enigmas]" };
-explorer = :an{ one: "[Explorer]", other: "[Explorers]" };
-guide = :a{ one: "[Guide]", other: "[Guides]" };
-hacker = :a{ one: "[Hacker]", other: "[Hackers]" };
-mage = :a{ one: "[Mage]", other: "[Mages]" };
-monster = :a{ one: "[Monster]", other: "[Monsters]" };
-musician = :a{ one: "[Musician]", other: "[Musicians]" };
-outsider = :an{ one: "[Outsider]", other: "[Outsiders]" };
-renegade = :a{ one: "[Renegade]", other: "[Renegades]" };
-robot = :a{ one: "[Robot]", other: "[Robots]" };
-spirit_animal = :a{ one: "[Spirit Animal]", other: "[Spirit Animals]" };
-super_ = :a{ one: "[Super]", other: "[Supers]" };
-survivor = :a{ one: "[Survivor]", other: "[Survivors]" };
-synth = :a{ one: "[Synth]", other: "[Synths]" };
-tinkerer = :a{ one: "[Tinkerer]", other: "[Tinkerers]" };
-trooper = :a{ one: "[Trooper]", other: "[Troopers]" };
-visionary = :a{ one: "[Visionary]", other: "[Visionaries]" };
-visitor = :a{ one: "[Visitor]", other: "[Visitors]" };
-warrior = :a{ one: "[Warrior]", other: "[Warriors]" };
+agent = :an { one: "[Agent]", other: "[Agents]" };
+ancient = :an { one: "[Ancient]", other: "[Ancients]" };
+avatar = :an { one: "[Avatar]", other: "[Avatars]" };
+child = :a { one: "[Child]", other: "[Children]" };
+detective = :a { one: "[Detective]", other: "[Detectives]" };
+enigma = :an { one: "[Enigma]", other: "[Enigmas]" };
+explorer = :an { one: "[Explorer]", other: "[Explorers]" };
+guide = :a { one: "[Guide]", other: "[Guides]" };
+hacker = :a { one: "[Hacker]", other: "[Hackers]" };
+mage = :a { one: "[Mage]", other: "[Mages]" };
+monster = :a { one: "[Monster]", other: "[Monsters]" };
+musician = :a { one: "[Musician]", other: "[Musicians]" };
+outsider = :an { one: "[Outsider]", other: "[Outsiders]" };
+renegade = :a { one: "[Renegade]", other: "[Renegades]" };
+robot = :a { one: "[Robot]", other: "[Robots]" };
+spirit_animal = :a { one: "[Spirit Animal]", other: "[Spirit Animals]" };
+super_ = :a { one: "[Super]", other: "[Supers]" };
+survivor = :a { one: "[Survivor]", other: "[Survivors]" };
+synth = :a { one: "[Synth]", other: "[Synths]" };
+tinkerer = :a { one: "[Tinkerer]", other: "[Tinkerers]" };
+trooper = :a { one: "[Trooper]", other: "[Troopers]" };
+visionary = :a { one: "[Visionary]", other: "[Visionaries]" };
+visitor = :a { one: "[Visitor]", other: "[Visitors]" };
+warrior = :a { one: "[Warrior]", other: "[Warriors]" };
 
 subtype($s) = :from($s) {
     *one: "[<color=#2E7D32><b>{$s}</b></color>]",
@@ -135,17 +126,10 @@ this_turn_times($n) = :match($n) {
     *other: "[this turn {text_number($n)} times]",
 };
 
-multiply_by($n) = :match($n) {
-    2: "[Double]",
-    3: "[Triple]",
-    *other: "[Multiply by {$n}]",
-};
+multiply_by($n) = :match($n) { 2: "[Double]", 3: "[Triple]", *other: "[Multiply by {$n}]" };
 
 
-copies($n) = :match($n) {
-    1: "[a copy]",
-    *other: "[{text_number($n)} copies]",
-};
+copies($n) = :match($n) { 1: "[a copy]", *other: "[{text_number($n)} copies]" };
 
 
 n_random_characters($n) = :match($n) {
@@ -154,16 +138,10 @@ n_random_characters($n) = :match($n) {
 };
 
 
-up_to_n_events($n) = :match($n) {
-    1: "[an event]",
-    *other: "[up to {$n} events]",
-};
+up_to_n_events($n) = :match($n) { 1: "[an event]", *other: "[up to {$n} events]" };
 
 
-up_to_n_allies($n) = :match($n) {
-    1: "[an {ally}]",
-    *other: "[up to {$n} {ally:other}]",
-};
+up_to_n_allies($n) = :match($n) { 1: "[an {ally}]", *other: "[up to {$n} {ally:other}]" };
 
 
 pronoun = { one: "[it]", other: "[them]" };
@@ -215,10 +193,8 @@ character_ability_card_name($character_name) = "[{$character_name} Ability]";
 
 hand_size_limit_exceeded_warning_message =
     "[Note: Cards drawn in excess of 10 become {energy_symbol} instead.]";
-character_limit_exceeded_warning_message =
-    "[Character limit exceeded: A character will be abandoned, with its spark permanently added to your total.]";
-combined_limit_warning_message =
-    "[Character limit exceeded: A character will be abandoned. Cards drawn in excess of 10 become {energy_symbol} instead.]";
+character_limit_exceeded_warning_message = "[Character limit exceeded: A character will be abandoned, with its spark permanently added to your total.]";
+combined_limit_warning_message = "[Character limit exceeded: A character will be abandoned. Cards drawn in excess of 10 become {energy_symbol} instead.]";
 
 
 error_message_panel_title = "[Error]";
@@ -231,20 +207,14 @@ card_type_dreamcaller = "[Dreamcaller]";
 card_type_dreamwell = "[Dreamwell]";
 
 
-help_text_dissolve =
-    "[{@cap dissolve}: Send a character to the void]";
-help_text_prevent =
-    "[{@cap prevent}: Send a card to the void in response to it being played]";
-help_text_foresee_1 =
-    "[<color=#AA00FF>Foresee</color> 1: Look at the top card of your deck. You may put it into your void.]";
-help_text_foresee_n($n) =
-    "[<color=#AA00FF>Foresee</color> {$n}: Look at the top {$n} cards of your deck. You may put them into your void or put them back in any order.]";
-help_text_anchored =
-    "[<color=#AA00FF><b>Anchored</b></color>: Cannot be dissolved.]";
+help_text_dissolve = "[{@cap dissolve}: Send a character to the void]";
+help_text_prevent = "[{@cap prevent}: Send a card to the void in response to it being played]";
+help_text_foresee_1 = "[<color=#AA00FF>Foresee</color> 1: Look at the top card of your deck. You may put it into your void.]";
+help_text_foresee_n($n) = "[<color=#AA00FF>Foresee</color> {$n}: Look at the top {$n} cards of your deck. You may put them into your void or put them back in any order.]";
+help_text_anchored = "[<color=#AA00FF><b>Anchored</b></color>: Cannot be dissolved.]";
 help_text_reclaim_without_cost =
     "[{@cap reclaim}: You may play a card from your void, then banish it when it leaves play.]";
-help_text_reclaim_with_cost($e) =
-    "[{@cap reclaim} {energy($e)}: You may play this card from your void for {energy($e)}, then banish it.]";
+help_text_reclaim_with_cost($e) = "[{@cap reclaim} {energy($e)}: You may play this card from your void for {energy($e)}, then banish it.]";
 
 
 token_type_activated_ability = "[Activated Ability]";
@@ -266,7 +236,8 @@ return_all_to_hand($target) = :from($target) "[return all {$target} to hand]";
 return_any_number_to_hand($target) = :from($target) "[return any number of {$target} to hand]";
 return_up_to_to_hand($n, $target) = :from($target) "[return up to {$n} {$target:other} to hand]";
 return_each_other_to_hand($target) = :from($target) "[return each other {$target} to hand]";
-return_or_more_to_hand($n, $target) = :from($target) "[return {$n} or more {$target:other} to hand]";
+return_or_more_to_hand($n, $target) = :from($target)
+    "[return {$n} or more {$target:other} to hand]";
 
 
 abandon_count_allies($a) = "[abandon {count_allies($a)}]";
@@ -286,9 +257,11 @@ when_deck_empty_trigger = "[when you have no cards in your deck, ]";
 when_you_gain_energy_trigger = "[when you gain energy, ]";
 when_you_play_trigger($target) = :from($target) "[when you play {$target}, ]";
 when_opponent_plays_trigger($target) = :from($target) "[when the opponent plays {$target}, ]";
-when_you_play_from_hand_trigger($target) = :from($target) "[when you play {$target} from your hand, ]";
+when_you_play_from_hand_trigger($target) = :from($target)
+    "[when you play {$target} from your hand, ]";
 when_you_play_in_turn_trigger($target) = :from($target) "[when you play {$target} in a turn, ]";
-when_you_play_during_enemy_turn_trigger($target) = :from($target) "[when you play {$target} during the opponent's turn, ]";
+when_you_play_during_enemy_turn_trigger($target) = :from($target)
+    "[when you play {$target} during the opponent's turn, ]";
 when_you_discard_trigger($target) = :from($target) "[when you discard {$target}, ]";
 when_leaves_play_trigger($target) = :from($target) "[when {$target} leaves play, ]";
 when_you_abandon_trigger($target) = :from($target) "[when you abandon {$target}, ]";
@@ -301,7 +274,8 @@ when_banished_trigger($target) = :from($target) "[when {$target} is {banished}, 
 when_you_play_cards_in_turn_trigger($c) = "[when you play {$c} {card:$c} in a turn, ]";
 when_you_abandon_count_in_turn_trigger($a) = "[when you abandon {count_allies($a)} in a turn, ]";
 when_you_draw_in_turn_trigger($c) = "[when you draw {$c} {card:$c} in a turn, ]";
-when_you_materialize_nth_in_turn_trigger($n, $target) = :from($target) "[when you {materialize} {text_number($n)} {$target:other} in a turn, ]";
+when_you_materialize_nth_in_turn_trigger($n, $target) = :from($target)
+    "[when you {materialize} {text_number($n)} {$target:other} in a turn, ]";
 
 
 if_character_dissolved_this_turn = "[if a character dissolved this turn]";
@@ -342,20 +316,26 @@ gain_energy_equal_to_this_cost_effect = "[gain {energy_symbol} equal to this cha
 put_deck_into_void_effect($v) = "[put the {top_n_cards($v)} of your deck into your void]";
 banish_cards_from_enemy_void_effect($c) = "[{banish} {cards($c)} from the opponent's void]";
 banish_enemy_void_effect = "[{banish} the opponent's void]";
-judgment_phase_at_end_of_turn_effect = "[at the end of this turn, trigger an additional {judgment_phase_name} phase]";
+judgment_phase_at_end_of_turn_effect =
+    "[at the end of this turn, trigger an additional {judgment_phase_name} phase]";
 multiply_energy_effect($n) = "[{multiply_by($n)} the amount of {energy_symbol} you have]";
 spend_all_energy_dissolve_effect = "[spend all your {energy_symbol}. {dissolve} an enemy with cost less than or equal to the amount spent]";
 spend_all_energy_draw_discard_effect = "[spend all your {energy_symbol}. Draw cards equal to the amount spent, then discard that many cards]";
-each_player_shuffles_and_draws_effect($c) = "[each player shuffles their hand and void into their deck and then draws {cards($c)}]";
-return_up_to_events_from_void_effect($n) = "[return {up_to_n_events($n)} from your void to your hand]";
+each_player_shuffles_and_draws_effect($c) =
+    "[each player shuffles their hand and void into their deck and then draws {cards($c)}]";
+return_up_to_events_from_void_effect($n) =
+    "[return {up_to_n_events($n)} from your void to your hand]";
 fast_prefix = "[{Fast} -- ]";
 
 
 discard_chosen_from_enemy_hand($target) = "[discard a chosen {$target} from the opponent's hand]";
-discard_chosen_from_enemy_hand_then_draw($target) = "[discard a chosen {$target} from the opponent's hand. They draw {cards(1)}]";
+discard_chosen_from_enemy_hand_then_draw($target) =
+    "[discard a chosen {$target} from the opponent's hand. They draw {cards(1)}]";
 put_from_void_on_top_of_deck($target) = "[put {$target} from your void on top of your deck]";
-put_up_to_from_void_on_top_of_deck($n, $target) = "[put up to {cards($n)} {$target} from your void on top of your deck]";
-materialize_random_from_deck($n, $constraint) = "[{materialize} {n_random_characters($n)} {$constraint} from your deck]";
+put_up_to_from_void_on_top_of_deck($n, $target) =
+    "[put up to {cards($n)} {$target} from your void on top of your deck]";
+materialize_random_from_deck($n, $constraint) =
+    "[{materialize} {n_random_characters($n)} {$constraint} from your deck]";
 copy_next_played($target, $times) = "[copy the next {$target} you play {this_turn_times($times)}]";
 create_trigger_until_end_of_turn_keyword($trig, $eff) = "[until end of turn, {$trig} {@cap $eff}]";
 create_trigger_until_end_of_turn($trig, $eff) = "[until end of turn, {$trig}{$eff}]";
@@ -379,14 +359,17 @@ reclaim_target($target) = "[{reclaim} {$target}]";
 reclaim_random($target) = "[{reclaim} a random {$target}]";
 put_on_top_of_enemy_deck($target) = "[put {$target} on top of the opponent's deck]";
 copy_target($target) = "[copy {$target}]";
-disable_activated_abilities($target) = "[disable the activated abilities of {$target} while this character is in play]";
+disable_activated_abilities($target) =
+    "[disable the activated abilities of {$target} while this character is in play]";
 draw_matching_from_deck($target) = "[draw {$target} from your deck]";
-abandon_and_gain_energy_for_spark($target) = "[abandon {$target} and gain {energy_symbol} for each point of spark that character had]";
+abandon_and_gain_energy_for_spark($target) =
+    "[abandon {$target} and gain {energy_symbol} for each point of spark that character had]";
 abandon_at_end_of_turn($target) = "[abandon {$target} at end of turn]";
 each_player_abandons($target) = "[each player abandons {$target}]";
 prevent_dissolve_this_turn($target) = "[{$target} cannot be {dissolved} this turn]";
 prevent_played_target($target) = "[{prevent} a played {$target}]";
-prevent_unless_pays($target, $cost) = "[{prevent} a played {$target} unless the opponent pays {$cost}]";
+prevent_unless_pays($target, $cost) =
+    "[{prevent} a played {$target} unless the opponent pays {$cost}]";
 gain_energy_equal_to_cost($target) = "[gain {energy_symbol} equal to {$target}'s cost]";
 gains_spark($target, $s) = "[{$target} gains +{$s} spark]";
 opponent_pays_cost($cost) = "[the opponent pays {$cost}]";
@@ -412,52 +395,40 @@ sentence_separator = "[ ]";
 period_suffix = "[.]";
 
 
-character = :a{ one: "[character]", other: "[characters]" };
-event = :an{ one: "[event]", other: "[events]" };
-enemy = :an{ one: "[enemy]", other: "[enemies]" };
+character = :a { one: "[character]", other: "[characters]" };
+event = :an { one: "[event]", other: "[events]" };
+enemy = :an { one: "[enemy]", other: "[enemies]" };
 
-this_card = :a{ one: "[this card]", other: "[these cards]" };
-this_character = :a{ one: "[this character]", other: "[these characters]" };
-this_event = :an{ one: "[this event]", other: "[these events]" };
-that_character = :a{ one: "[that character]", other: "[those characters]" };
+this_card = :a { one: "[this card]", other: "[these cards]" };
+this_character = :a { one: "[this character]", other: "[these characters]" };
+this_event = :an { one: "[this event]", other: "[these events]" };
+that_character = :a { one: "[that character]", other: "[those characters]" };
 pronoun_it = { *one: "[it]", other: "[them]" };
 pronoun_them = "[them]";
 as_plural($p) = "{$p:other}";
 with_plural($one, $other) = :from($one) { *one: "{$one}", other: "{$other}" };
-your_generic_character = :a{ *one: "[character]", other: "[allies]" };
-your_generic_card = :a{ *one: "[card]", other: "[your cards]" };
-your_generic_event = :an{ *one: "[event]", other: "[your events]" };
+your_generic_character = :a { *one: "[character]", other: "[allies]" };
+your_generic_card = :a { *one: "[card]", other: "[your cards]" };
+your_generic_event = :an { *one: "[event]", other: "[your events]" };
 your_generic_subtype($t) = :a :from($t) {
     *one: "[{subtype($t)}]",
     other: "[allied {subtype($t):other}]",
 };
-predicate_with_indefinite_article($p) = :from($p) {
-    *one: "[{@a $p}]",
-    other: "[{$p:other}]",
-};
-another_pred($p) = :from($p) {
-    *one: "[another {$p}]",
-    other: "[other {$p:other}]",
-};
+predicate_with_indefinite_article($p) = :from($p) { *one: "[{@a $p}]", other: "[{$p:other}]" };
+another_pred($p) = :from($p) { *one: "[another {$p}]", other: "[other {$p:other}]" };
 
 
-your_card = :a{ one: "[your card]", other: "[your cards]" };
-your_character = :a{ one: "[your character]", other: "[your characters]" };
-your_event = :a{ one: "[your event]", other: "[your events]" };
-enemy_card = :an{ one: "[enemy card]", other: "[enemy cards]" };
-enemy_character = :an{ one: "[enemy character]", other: "[enemy characters]" };
-enemy_event = :an{ one: "[enemy event]", other: "[enemy events]" };
-allied_character = :an{ one: "[allied character]", other: "[allied characters]" };
-allied_event = :an{ one: "[allied event]", other: "[allied events]" };
-other_character = :an{ one: "[other character]", other: "[other characters]" };
-allied_pred($base) = :from($base) {
-    *one: "[allied {$base}]",
-    other: "[allied {$base:other}]",
-};
-enemy_pred($base) = :from($base) {
-    *one: "[enemy {$base}]",
-    other: "[enemy {$base:other}]",
-};
+your_card = :a { one: "[your card]", other: "[your cards]" };
+your_character = :a { one: "[your character]", other: "[your characters]" };
+your_event = :a { one: "[your event]", other: "[your events]" };
+enemy_card = :an { one: "[enemy card]", other: "[enemy cards]" };
+enemy_character = :an { one: "[enemy character]", other: "[enemy characters]" };
+enemy_event = :an { one: "[enemy event]", other: "[enemy events]" };
+allied_character = :an { one: "[allied character]", other: "[allied characters]" };
+allied_event = :an { one: "[allied event]", other: "[allied events]" };
+other_character = :an { one: "[other character]", other: "[other characters]" };
+allied_pred($base) = :from($base) { *one: "[allied {$base}]", other: "[allied {$base:other}]" };
+enemy_pred($base) = :from($base) { *one: "[enemy {$base}]", other: "[enemy {$base:other}]" };
 in_your_void($target) = :from($target) {
     *one: "[{$target} in your void]",
     other: "[{$target:other} in your void]",
@@ -474,10 +445,7 @@ pred_with_constraint($base, $constraint) = :from($base) {
     *one: "[{$base} {$constraint}]",
     other: "[{$base:other} {$constraint}]",
 };
-non_subtype($s) = :from($s) {
-    *one: "[non-{$s}]",
-    other: "[non-{$s:other}]",
-};
+non_subtype($s) = :from($s) { *one: "[non-{$s}]", other: "[non-{$s:other}]" };
 could_dissolve_target($target) = :an "[event which could {dissolve} {$target}]";
 could_dissolve_target_plural($target) = "[events which could {dissolve} {$target}]";
 your_event_could_dissolve($target) = "[your event which could {dissolve} {$target}]";
@@ -492,16 +460,14 @@ with_spark_less_than_energy_paid_constraint =
     "[with spark less than the amount of {energy_symbol} paid]";
 with_cost_less_than_allied_count($target) =
     "[with cost less than the number of allied {$target:other}]";
-with_cost_less_than_abandoned_ally_constraint =
-    "[with cost less than the abandoned ally's cost]";
+with_cost_less_than_abandoned_ally_constraint = "[with cost less than the abandoned ally's cost]";
 with_spark_less_than_abandoned_ally_constraint =
     "[with spark less than the abandoned ally's spark]";
 with_spark_less_than_abandoned_count_this_turn_constraint =
     "[with spark less than the number of allies abandoned this turn]";
 with_cost_less_than_void_count_constraint =
     "[with cost less than the number of cards in your void]";
-with_spark_less_than_that_ally_constraint =
-    "[with spark less than that ally's spark]";
+with_spark_less_than_that_ally_constraint = "[with spark less than that ally's spark]";
 
 
 allied_subtype($t) = :an "[allied {subtype($t)}]";
@@ -564,11 +530,14 @@ draw_cards_for_each($c, $target) = "[draw {cards($c)} for each {$target}]";
 gain_energy_for_each($e, $target) = "[gain {energy($e)} for each {$target}]";
 gain_points_for_each($p, $target) = "[gain {points($p)} for each {$target}]";
 gains_spark_for_each($target, $s, $quantity) = "[{$target} gains +{$s} spark for each {$quantity}]";
-gains_spark_until_next_main_for_each($target, $s, $for_each) = "[{$target} gains +{$s} spark until your next main phase for each {$for_each}]";
-each_gains_spark_equal_to($each, $count_of) = "[each {$each} gains spark equal to the number of {$count_of:other}]";
+gains_spark_until_next_main_for_each($target, $s, $for_each) =
+    "[{$target} gains +{$s} spark until your next main phase for each {$for_each}]";
+each_gains_spark_equal_to($each, $count_of) =
+    "[each {$each} gains spark equal to the number of {$count_of:other}]";
 have_each_gain_spark($each, $s) = "[have each {$each} gain +{$s} spark]";
 spark_of_each_becomes($each, $s) = "[the spark of each {$each} becomes {$s}]";
-dissolve_all_with_cost_lte_quantity($target, $quantity) = "[{dissolve} all {$target:other} with cost less than or equal to the number of {$quantity}]";
+dissolve_all_with_cost_lte_quantity($target, $quantity) =
+    "[{dissolve} all {$target:other} with cost less than or equal to the number of {$quantity}]";
 
 
 collection_all($target) = "[all {$target:other}]";
@@ -584,20 +553,26 @@ materialize_collection_target($target) = "[{materialize} {$target}]";
 
 materialize_copy_of($target) = "[{materialize} a copy of {$target}]";
 materialize_n_copies_of($n, $target) = "[{materialize} {$n} copies of {$target}]";
-materialize_copies_equal_to_matching($target, $matching) = "[{materialize} a number of copies of {$target} equal to the number of {$matching:other}]";
-materialize_copies_equal_to_energy($target) = "[{materialize} a number of copies of {$target} equal to the amount of {energy_symbol} spent]";
-materialize_copies_equal_to_quantity($target, $quantity) = "[{materialize} a number of copies of {$target} equal to the number of {$quantity}]";
+materialize_copies_equal_to_matching($target, $matching) =
+    "[{materialize} a number of copies of {$target} equal to the number of {$matching:other}]";
+materialize_copies_equal_to_energy($target) =
+    "[{materialize} a number of copies of {$target} equal to the amount of {energy_symbol} spent]";
+materialize_copies_equal_to_quantity($target, $quantity) =
+    "[{materialize} a number of copies of {$target} equal to the number of {$quantity}]";
 
 trigger_judgment_of_collection($target) = "[trigger the {Judgment} ability of {$target}]";
 trigger_judgment_of_each($target) = "[trigger the {Judgment} ability of each {$target}]";
 
 
-materialize_figments_for_each_quantity($fig, $quantity) = "[{materialize} {$fig} for each {$quantity}]";
+materialize_figments_for_each_quantity($fig, $quantity) =
+    "[{materialize} {$fig} for each {$quantity}]";
 
 
 banish_then_materialize_it($target) = "[{banish} {$target}, then {materialize} it]";
-banish_then_materialize_any_number($target) = "[{banish} any number of {$target:other}, then {materialize} them]";
-banish_then_materialize_up_to($n, $target) = "[{banish} up to {$n} {$target:other}, then {materialize} {pronoun:$n}]";
+banish_then_materialize_any_number($target) =
+    "[{banish} any number of {$target:other}, then {materialize} them]";
+banish_then_materialize_up_to($n, $target) =
+    "[{banish} up to {$n} {$target:other}, then {materialize} {pronoun:$n}]";
 banish_then_materialize_them($target) = "[{banish} {$target}, then {materialize} them]";
 
 
@@ -620,10 +595,14 @@ target_gains_reclaim_equal_cost($target) = "[{$target} gains {reclaim} equal to 
 
 it_gains_reclaim_for_cost_this_turn($target, $r) = "[it gains {reclaim_for_cost($r)} this turn]";
 it_gains_reclaim_equal_cost_this_turn($target) = "[it gains {reclaim} equal to its cost this turn]";
-this_card_gains_reclaim_for_cost_this_turn($r) = "[this card gains {reclaim_for_cost($r)} this turn]";
-this_card_gains_reclaim_equal_cost_this_turn = "[this card gains {reclaim} equal to its cost this turn]";
-target_gains_reclaim_for_cost_this_turn($target, $r) = "[{$target} gains {reclaim_for_cost($r)} this turn]";
-target_gains_reclaim_equal_cost_this_turn($target) = "[{$target} gains {reclaim} equal to its cost this turn]";
+this_card_gains_reclaim_for_cost_this_turn($r) =
+    "[this card gains {reclaim_for_cost($r)} this turn]";
+this_card_gains_reclaim_equal_cost_this_turn =
+    "[this card gains {reclaim} equal to its cost this turn]";
+target_gains_reclaim_for_cost_this_turn($target, $r) =
+    "[{$target} gains {reclaim_for_cost($r)} this turn]";
+target_gains_reclaim_equal_cost_this_turn($target) =
+    "[{$target} gains {reclaim} equal to its cost this turn]";
 
 
 void_subject_single($pred) = "[{@cap $pred} in your void]";
@@ -639,40 +618,58 @@ void_gains_reclaim_for_cost_singular($subject, $r) = "[{$subject} gains {reclaim
 void_gains_reclaim_equal_cost_singular($subject) = "[{$subject} gains {reclaim} equal to its cost]";
 void_gains_reclaim_for_cost_plural($subject, $r) = "[{$subject} gain {reclaim_for_cost($r)}]";
 void_gains_reclaim_equal_cost_plural($subject) = "[{$subject} gain {reclaim} equal to their cost]";
-void_gains_reclaim_for_cost_singular_this_turn($subject, $r) = "[{$subject} gains {reclaim_for_cost($r)} this turn]";
-void_gains_reclaim_equal_cost_singular_this_turn($subject) = "[{$subject} gains {reclaim} equal to its cost this turn]";
-void_gains_reclaim_for_cost_plural_this_turn($subject, $r) = "[{$subject} gain {reclaim_for_cost($r)} this turn]";
-void_gains_reclaim_equal_cost_plural_this_turn($subject) = "[{$subject} gain {reclaim} equal to their cost this turn]";
+void_gains_reclaim_for_cost_singular_this_turn($subject, $r) =
+    "[{$subject} gains {reclaim_for_cost($r)} this turn]";
+void_gains_reclaim_equal_cost_singular_this_turn($subject) =
+    "[{$subject} gains {reclaim} equal to its cost this turn]";
+void_gains_reclaim_for_cost_plural_this_turn($subject, $r) =
+    "[{$subject} gain {reclaim_for_cost($r)} this turn]";
+void_gains_reclaim_equal_cost_plural_this_turn($subject) =
+    "[{$subject} gain {reclaim} equal to their cost this turn]";
 
 
 your_cards_cost_increase($matching, $e) = "[{$matching:other} cost you {energy($e)} more]";
 your_cards_cost_reduction($matching, $e) = "[{$matching:other} cost you {energy($e)} less]";
-enemy_cards_cost_increase($matching, $e) = "[the opponent's {$matching:other} cost {energy($e)} more]";
+enemy_cards_cost_increase($matching, $e) =
+    "[the opponent's {$matching:other} cost {energy($e)} more]";
 spark_bonus_other_characters($matching, $s) = "[allied {$matching:other} have +{$s} spark]";
 additional_cost_to_play($cost) = "[To play {this_card}, {$cost}]";
 play_for_alternate_cost_simple($card_type, $e) = "[{$card_type} costs {energy($e)}]";
-play_for_alternate_cost_with_additional($cost, $card_type, $e) = "[{$cost}: Play {$card_type} for {energy($e)}]";
-play_for_alternate_cost_abandon($cost, $card_type, $e) = "[{$cost}: Play {$card_type} for {energy($e)}, then abandon it]";
+play_for_alternate_cost_with_additional($cost, $card_type, $e) =
+    "[{$cost}: Play {$card_type} for {energy($e)}]";
+play_for_alternate_cost_abandon($cost, $card_type, $e) =
+    "[{$cost}: Play {$card_type} for {energy($e)}, then abandon it]";
 characters_in_hand_have_fast = "[characters in your hand have {fast}]";
 disable_enemy_materialized_abilities = "[disable the {Materialized} abilities of enemies]";
 has_all_character_types = "[has all character types]";
-multiply_energy_gain($n) = "[{multiply_by($n)} the amount of {energy_symbol} you gain from card effects this turn]";
-multiply_card_draw($n) = "[{multiply_by($n)} the number of cards you draw from card effects this turn]";
-once_per_turn_play_from_void($matching) = "[once per turn, you may play {$matching} from your void]";
+multiply_energy_gain($n) =
+    "[{multiply_by($n)} the amount of {energy_symbol} you gain from card effects this turn]";
+multiply_card_draw($n) =
+    "[{multiply_by($n)} the number of cards you draw from card effects this turn]";
+once_per_turn_play_from_void($matching) =
+    "[once per turn, you may play {$matching} from your void]";
 reveal_top_card = "[reveal the top card of your deck]";
 you_may_look_at_top_card = "[you may look at the top card of your deck]";
-you_may_play_from_top_of_deck($matching) = "[you may play {$matching:other} from the top of your deck]";
-judgment_triggers_when_materialized($matching) = "[the '{Judgment}' ability of {$matching:other} triggers when you {materialize} them]";
-spark_equal_to_predicate_count($matching) = "[{this_character}'s spark is equal to the number of {$matching:other}]";
+you_may_play_from_top_of_deck($matching) =
+    "[you may play {$matching:other} from the top of your deck]";
+judgment_triggers_when_materialized($matching) =
+    "[the '{Judgment}' ability of {$matching:other} triggers when you {materialize} them]";
+spark_equal_to_predicate_count($matching) =
+    "[{this_character}'s spark is equal to the number of {$matching:other}]";
 play_only_from_void = "[you may only play {this_character} from your void]";
-play_from_hand_or_void_for_cost($e) = "[you may play {this_card} from your hand or void for {energy($e)}]";
+play_from_hand_or_void_for_cost($e) =
+    "[you may play {this_card} from your hand or void for {energy($e)}]";
 cards_in_void_have_reclaim = "[they have {reclaim} equal to their cost]";
-cost_reduction_for_each($e, $quantity) = "[{this_card} costs {energy($e)} less for each {$quantity}]";
+cost_reduction_for_each($e, $quantity) =
+    "[{this_card} costs {energy($e)} less for each {$quantity}]";
 spark_bonus_your_characters($matching, $s) = "[{$matching:other} have +{$s} spark]";
 play_from_void_for_cost($e) = "[play {this_card} from your void for {energy($e)}]";
-play_from_void_with_additional_cost($cost, $e) = "[{$cost}: play {this_card} from your void for {energy($e)}]";
-play_from_void_with_effect($cost, $e, $effect) = "[{$cost}: play {this_card} from your void for {energy($e)}, then {$effect}]";
-play_from_void_for_cost_with_effect($e, $effect) = "[play {this_card} from your void for {energy($e)}, then {$effect}]";
+play_from_void_with_additional_cost($cost, $e) =
+    "[{$cost}: play {this_card} from your void for {energy($e)}]";
+play_from_void_with_effect($cost, $e, $effect) =
+    "[{$cost}: play {this_card} from your void for {energy($e)}, then {$effect}]";
+play_from_void_for_cost_with_effect($e, $effect) =
+    "[play {this_card} from your void for {energy($e)}, then {$effect}]";
 
 
 if_this_card_in_void_prefix($base) = "[if {this_card} is in your void, {$base}]";
@@ -688,9 +685,11 @@ prefixed_triggered_ability($pfx, $trig, $eff) = "[{$pfx}{$trig}{$eff}]";
 keyword_triggered_ability($trig, $eff) = "[{$trig} {@cap $eff}]";
 prefixed_keyword_triggered_ability($pfx, $trig, $eff) = "[{$pfx}{$trig} {@cap $eff}]";
 activated_ability($c, $eff) = "[{$c}{cost_effect_separator}{@cap $eff}]";
-activated_ability_once_per_turn($c, $eff) = "[{$c}{once_per_turn_suffix}{cost_effect_separator}{@cap $eff}]";
+activated_ability_once_per_turn($c, $eff) =
+    "[{$c}{once_per_turn_suffix}{cost_effect_separator}{@cap $eff}]";
 fast_activated_ability($c, $eff) = "[{fast_prefix}{$c}{cost_effect_separator}{@cap $eff}]";
-fast_activated_ability_once_per_turn($c, $eff) = "[{fast_prefix}{$c}{once_per_turn_suffix}{cost_effect_separator}{@cap $eff}]";
+fast_activated_ability_once_per_turn($c, $eff) =
+    "[{fast_prefix}{$c}{once_per_turn_suffix}{cost_effect_separator}{@cap $eff}]";
 activated_cost_separator = "[, ]";
 
 effect_with_period($e) = "[{$e}{period_suffix}]";
@@ -703,4 +702,5 @@ per_effect_cost($cost, $body) = "[{cost_to_connector($cost)}{$body}]";
 per_effect_condition($cond, $body) = "[{$cond} {$body}]";
 capitalized_sentence_with_period($s) = "[{@cap $s}{period_suffix}]";
 
-modal_choice_line($energy_cost, $effect) = "[{bullet} {$energy_cost}{cost_effect_separator}{@cap $effect}]";
+modal_choice_line($energy_cost, $effect) =
+    "[{bullet} {$energy_cost}{cost_effect_separator}{@cap $effect}]";

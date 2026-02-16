@@ -1,0 +1,14 @@
+[package]
+name = "rlf_fmt"
+version = "0.1.0"
+edition = "2021"
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "rlf_fmt"
+path = "src/main.rs"
+
+[dependencies]
+rlf = { workspace = true }

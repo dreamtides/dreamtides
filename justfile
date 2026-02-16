@@ -352,6 +352,19 @@ style-validator:
 style-validator-verbose:
   cargo run --manifest-path rules_engine/Cargo.toml --bin "style_validator" -- --code-order
 
+rlf-fmt:
+  #!/usr/bin/env bash
+  output=$(cargo run --manifest-path rules_engine/Cargo.toml --bin "rlf_fmt" 2>&1)
+  if [ $? -ne 0 ]; then
+      echo "$output"
+      exit 1
+  else
+    echo "RLF formatted"
+  fi
+
+rlf-fmt-verbose:
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "rlf_fmt"
+
 rlf-lint:
   #!/usr/bin/env bash
   output=$(cargo run --manifest-path rules_engine/Cargo.toml --bin "rlf_lint" 2>&1)
@@ -490,7 +503,7 @@ insta:
 
 # Reformats code. Requires nightly because several useful options (e.g. imports_granularity) are
 # nightly-only
-fmt: style-validator-fix
+fmt: style-validator-fix rlf-fmt
     #!/usr/bin/env bash
     python3 scripts/llms/llm_symlinks.py > /dev/null
     output=$(cd rules_engine && cargo +nightly fmt 2>&1)
