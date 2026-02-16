@@ -205,9 +205,11 @@ fn serialize_named_ability(named: &NamedAbility) -> String {
                 strings::capitalized_sentence(strings::reclaim()).to_string()
             }
         }
-        NamedAbility::ReclaimForCost(cost) => strings::reclaim_with_cost(
-            strings::capitalized_sentence(cost_serializer::serialize_cost(cost)),
-        )
-        .to_string(),
+        NamedAbility::ReclaimForCost(cost) => {
+            strings::capitalized_sentence(strings::reclaim_with_cost(
+                strings::capitalized_sentence(cost_serializer::serialize_cost(cost)),
+            ))
+            .to_string()
+        }
     }
 }

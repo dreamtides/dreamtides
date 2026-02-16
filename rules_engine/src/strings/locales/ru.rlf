@@ -83,7 +83,7 @@ count_allies($n) = :match($n) {
 };
 count_allied_subtype($n, $s) = :from($s) :match($n) {
     1: "союзного {subtype($s)}",
-    few: "{$n} союзных {subtype($s)}",
+    few: "{$n} союзных {subtype($s):few}",
     *other: "{$n} союзных {subtype($s):other}",
 };
 
@@ -139,6 +139,7 @@ agent = :masc :anim {
     nom_pl: "Агенты",
     nom.few: "Агента",
     gen.few: "Агентов",
+    few: "Агента",
     one: "Агента",
     other: "Агентов",
 };
@@ -151,6 +152,7 @@ ancient = :masc :anim {
     nom_pl: "Древние",
     nom.few: "Древних",
     gen.few: "Древних",
+    few: "Древних",
     one: "Древнего",
     other: "Древних",
 };
@@ -163,6 +165,7 @@ avatar = :masc :anim {
     nom_pl: "Аватары",
     nom.few: "Аватара",
     gen.few: "Аватаров",
+    few: "Аватара",
     one: "Аватара",
     other: "Аватаров",
 };
@@ -175,6 +178,7 @@ child = :neut :anim {
     nom_pl: "Дети",
     nom.few: "Дитяти",
     gen.few: "Детей",
+    few: "Дитяти",
     one: "Дитя",
     other: "Детей",
 };
@@ -187,6 +191,7 @@ detective = :masc :anim {
     nom_pl: "Детективы",
     nom.few: "Детектива",
     gen.few: "Детективов",
+    few: "Детектива",
     one: "Детектива",
     other: "Детективов",
 };
@@ -199,6 +204,7 @@ enigma = :fem :inan {
     nom_pl: "Загадки",
     nom.few: "Загадки",
     gen.few: "Загадок",
+    few: "Загадки",
     one: "Загадку",
     other: "Загадок",
 };
@@ -211,6 +217,7 @@ explorer = :masc :anim {
     nom_pl: "Исследователи",
     nom.few: "Исследователя",
     gen.few: "Исследователей",
+    few: "Исследователя",
     one: "Исследователя",
     other: "Исследователей",
 };
@@ -223,6 +230,7 @@ guide = :masc :anim {
     nom_pl: "Проводники",
     nom.few: "Проводника",
     gen.few: "Проводников",
+    few: "Проводника",
     one: "Проводника",
     other: "Проводников",
 };
@@ -235,6 +243,7 @@ hacker = :masc :anim {
     nom_pl: "Хакеры",
     nom.few: "Хакера",
     gen.few: "Хакеров",
+    few: "Хакера",
     one: "Хакера",
     other: "Хакеров",
 };
@@ -247,6 +256,7 @@ mage = :masc :anim {
     nom_pl: "Маги",
     nom.few: "Мага",
     gen.few: "Магов",
+    few: "Мага",
     one: "Мага",
     other: "Магов",
 };
@@ -259,6 +269,7 @@ monster = :masc :anim {
     nom_pl: "Монстры",
     nom.few: "Монстра",
     gen.few: "Монстров",
+    few: "Монстра",
     one: "Монстра",
     other: "Монстров",
 };
@@ -271,6 +282,7 @@ musician = :masc :anim {
     nom_pl: "Музыканты",
     nom.few: "Музыканта",
     gen.few: "Музыкантов",
+    few: "Музыканта",
     one: "Музыканта",
     other: "Музыкантов",
 };
@@ -283,6 +295,7 @@ outsider = :masc :anim {
     nom_pl: "Чужаки",
     nom.few: "Чужака",
     gen.few: "Чужаков",
+    few: "Чужака",
     one: "Чужака",
     other: "Чужаков",
 };
@@ -295,6 +308,7 @@ renegade = :masc :anim {
     nom_pl: "Ренегаты",
     nom.few: "Ренегата",
     gen.few: "Ренегатов",
+    few: "Ренегата",
     one: "Ренегата",
     other: "Ренегатов",
 };
@@ -307,6 +321,7 @@ robot = :masc :inan {
     nom_pl: "Роботы",
     nom.few: "Робота",
     gen.few: "Роботов",
+    few: "Робота",
     one: "Робота",
     other: "Роботов",
 };
@@ -319,6 +334,7 @@ spirit_animal = :masc :anim {
     nom_pl: "Духи-Звери",
     nom.few: "Духа-Зверя",
     gen.few: "Духов-Зверей",
+    few: "Духа-Зверя",
     one: "Духа-Зверя",
     other: "Духов-Зверей",
 };
@@ -331,6 +347,7 @@ super_ = :masc :anim {
     nom_pl: "Суперы",
     nom.few: "Супера",
     gen.few: "Суперов",
+    few: "Супера",
     one: "Супера",
     other: "Суперов",
 };
@@ -342,6 +359,7 @@ survivor = :masc :anim {
     inf: "Выжившего",
     nom_pl: "Выжившие",
     nom.few: "Выживших",
+    few: "Выживших",
     one: "Выжившего",
     other: "Выживших",
 };
@@ -354,6 +372,7 @@ synth = :masc :anim {
     nom_pl: "Синты",
     nom.few: "Синта",
     gen.few: "Синтов",
+    few: "Синта",
     one: "Синта",
     other: "Синтов",
 };
@@ -366,6 +385,7 @@ tinkerer = :masc :anim {
     nom_pl: "Изобретатели",
     nom.few: "Изобретателя",
     gen.few: "Изобретателей",
+    few: "Изобретателя",
     one: "Изобретателя",
     other: "Изобретателей",
 };
@@ -378,6 +398,7 @@ trooper = :masc :anim {
     nom_pl: "Бойцы",
     nom.few: "Бойца",
     gen.few: "Бойцов",
+    few: "Бойца",
     one: "Бойца",
     other: "Бойцов",
 };
@@ -390,6 +411,7 @@ visionary = :masc :anim {
     nom_pl: "Провидцы",
     nom.few: "Провидца",
     gen.few: "Провидцев",
+    few: "Провидца",
     one: "Провидца",
     other: "Провидцев",
 };
@@ -402,6 +424,7 @@ visitor = :masc :anim {
     nom_pl: "Гости",
     nom.few: "Гостя",
     gen.few: "Гостей",
+    few: "Гостя",
     one: "Гостя",
     other: "Гостей",
 };
@@ -412,6 +435,7 @@ warrior = :masc :anim {
     ins: "Воином",
     inf: "Воина",
     nom_pl: "Воины",
+    few: "Воина",
     one: "Воина",
     other: "Воинов",
 };
@@ -421,6 +445,7 @@ subtype($s) = :from($s) {
     *one: "<color=#2E7D32><b>{$s}</b></color>",
     ins: "<color=#2E7D32><b>{$s:ins}</b></color>",
     inf: "<color=#2E7D32><b>{$s:inf}</b></color>",
+    few: "<color=#2E7D32><b>{$s:few}</b></color>",
     nom_pl: "<color=#2E7D32><b>{$s:nom_pl}</b></color>",
     other: "<color=#2E7D32><b>{$s:other}</b></color>",
 };
@@ -594,7 +619,7 @@ return_or_more_to_hand($n, $target) = :from($target)
     "верните {$n} или больше {$target:other} в руку";
 
 
-abandon_count_allies($a) = "отрекитесь от {count_allies($a)}";
+abandon_count_allies($a) = "отрекитесь от {$a} {ally:other}";
 discard_cards_cost($d) = {
     *imp: "сбросьте {cards($d)}",
     inf: "сбросить {cards($d)}",
@@ -645,7 +670,7 @@ when_banished_trigger($target) = :from($target) "когда {$target:nom} изг
 when_you_play_cards_in_turn_trigger($c) =
     "когда вы играете {$c} {card:$c} за ход, ";
 when_you_abandon_count_in_turn_trigger($a) =
-    "когда вы отрекаетесь от {count_allies($a)} за ход, ";
+    "когда вы отрекаетесь от {$a} {ally:other} за ход, ";
 when_you_draw_in_turn_trigger($c) = "когда вы берёте {$c} {card:$c} за ход, ";
 when_you_materialize_nth_in_turn_trigger($n, $target) = :from($target)
     "когда вы воплощаете {text_number($n)} {$target:other} за ход, ";
@@ -666,7 +691,7 @@ if_drawn_count_this_turn($n) =
     "если вы взяли {count($n)} или больше карт в этом ходу";
 while_void_count($n) =
     "Пока в вашей Пустоте {count($n)} или больше карт,";
-with_allied_subtype($t) = :from($t) "если у вас есть союзный {subtype($t)},";
+with_allied_subtype($t) = :from($t) "если у вас есть союзный {subtype($t):nom},";
 with_count_allied_subtype($a, $t) = "{count_allied_subtype($a, $t)}";
 with_count_allies($a) = "{count_allies($a)}";
 
@@ -1328,7 +1353,10 @@ card_predicate_returned($base) = :from($base) {
         neut: "возвращённого {$base:gen}",
     },
 };
-energy_spent = :inan { gen: "потраченного {energy_symbol}" };
+energy_spent = :masc :inan {
+    *acc: "потраченный {energy_symbol}",
+    gen: "потраченного {energy_symbol}",
+};
 card_predicate_played_this_turn($base) = :from($base) {
     nom: "{$base:nom}, которую вы сыграли в этот ход",
     gen: "{$base:gen}, которую вы сыграли в этот ход",
@@ -1398,15 +1426,21 @@ card_predicate_abandoned($base) = :from($base) {
 
 draw_cards_for_each($c, $target) = :from($target) :match($target) {
     *anim: "возьмите {cards($c)} за каждого {$target:gen}",
-    inan: "возьмите {cards($c)} за каждую {$target:gen}",
+    masc.inan: "возьмите {cards($c)} за каждый {$target}",
+    neut.inan: "возьмите {cards($c)} за каждое {$target}",
+    fem.inan: "возьмите {cards($c)} за каждую {$target}",
 };
 gain_energy_for_each($e, $target) = :from($target) :match($target) {
     *anim: "получите {energy($e)} за каждого {$target:gen}",
-    inan: "получите {energy($e)} за каждую {$target:gen}",
+    masc.inan: "получите {energy($e)} за каждый {$target}",
+    neut.inan: "получите {energy($e)} за каждое {$target}",
+    fem.inan: "получите {energy($e)} за каждую {$target}",
 };
 gain_points_for_each($p, $target) = :from($target) :match($target) {
     *anim: "получите {points($p)} за каждого {$target:gen}",
-    inan: "получите {points($p)} за каждую {$target:gen}",
+    masc.inan: "получите {points($p)} за каждый {$target}",
+    neut.inan: "получите {points($p)} за каждое {$target}",
+    fem.inan: "получите {points($p)} за каждую {$target}",
 };
 gains_spark_for_each($target, $s, $quantity) = :from($target)
     "{$target:nom} получает +{$s} к искре за каждого {$quantity}";
