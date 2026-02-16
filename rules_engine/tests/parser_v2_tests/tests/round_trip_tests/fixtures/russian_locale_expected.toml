@@ -26,7 +26,7 @@ russian = "Рассеяйте врага стоимостью <color=#00838F>3�
 [[tests]]
 english = "{reclaim_for_cost($r)}"
 variables = "r: 2"
-russian = "Возвышение 2●"
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>"
 
 [[tests]]
 english = "When you {materialize} an ally, gain {energy($e)}."
@@ -136,7 +136,7 @@ russian = "Искра этого персонажа равна количест�
 
 [[tests]]
 english = "The '{Judgment}' ability of allies triggers when you {materialize} them."
-russian = "Способность союзников «▸ Суд:» срабатывает, когда вы воплощаете их."
+russian = "Способность союзников «▸ <b>Суд:</b>» срабатывает, когда вы воплощаете их."
 
 [[tests]]
 english = "▸ Judgment: You may banish an ally, then materialize it."
@@ -273,7 +273,7 @@ russian = "▸ Суд: Вы можете сбросить карту, чтобы
 [[tests]]
 english = "When an ally is {dissolved}, this card gains {reclaim_for_cost($r)} this turn."
 variables = "r: 1"
-russian = "Когда союзник рассеивается, эта карта получает Возвышение 1● до конца хода."
+russian = "Когда союзник рассеивается, эта карта получает <color=#964B00>Возвышение</color> <color=#00838F>1●</color> до конца хода."
 
 [[tests]]
 english = "{Materialized_Judgment} {Kindle($k)}."
@@ -296,7 +296,7 @@ russian = "Скопируйте следующее событие, которо�
 [[tests]]
 english = "{reclaim_for_cost($r)}"
 variables = "r: 2"
-russian = "Возвышение 2●"
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>"
 
 [[tests]]
 english = "Draw a card for each card you have played this turn."
@@ -397,7 +397,7 @@ russian = "▸ Воплощён, Суд: Изгоните союзника с и
 [[tests]]
 english = "This character costs {energy($e)} if you have discarded a card this turn."
 variables = "e: 1"
-russian = "Этот персонаж стоит <color=#00838F>1●</color> если вы сбрасывали карту в этот ход."
+russian = "Этот персонаж стоит <color=#00838F>1●</color>, если вы сбрасывали карту в этот ход."
 
 [[tests]]
 english = "Abandon an ally: This character gains +{$s} spark."
@@ -451,7 +451,7 @@ russian = "Прозрение 1. Возьмите карту."
 [[tests]]
 english = "{reclaim_for_cost($r)}"
 variables = "r: 3"
-russian = "Возвышение 3●"
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>3●</color>"
 
 [[tests]]
 english = "Put the {top_n_cards($v)} of your deck into your void. Draw {cards($c)}."
@@ -621,7 +621,7 @@ russian = "Возьмите 2 карты. Сбросьте 2 карты."
 [[tests]]
 english = "{reclaim_for_cost($r)}"
 variables = "r: 2"
-russian = "Возвышение 2●"
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>"
 
 [[tests]]
 english = "When you discard a card, {kindle($k)}."
@@ -655,7 +655,7 @@ russian = "▸ <b>Воплощён:</b> Возьмите карту, затем 
 [[tests]]
 english = "{reclaim_for_cost($r)}"
 variables = "r: 3"
-russian = "Возвышение 3●"
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>3●</color>"
 
 [[tests]]
 english = "{Materialized} Return an ally to hand."
@@ -667,7 +667,7 @@ russian = "Отрекитесь от союзника: Сыграйте этог
 
 [[tests]]
 english = "{Materialized} {Dissolve} an enemy."
-russian = "▸ Воплощён: Рассеяйте врага."
+russian = "▸ <b>Воплощён:</b> Рассеяйте врага."
 
 [[tests]]
 english = "When you play an event, {foresee($f)}."
@@ -693,7 +693,7 @@ russian = "Изгоните союзника. Воплотите его в ко�
 [[tests]]
 english = "{reclaim_for_cost($r)}"
 variables = "r: 1"
-russian = "Возвышение 1●"
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>1●</color>"
 
 [[tests]]
 english = "All cards currently in your void gain reclaim equal to their cost this turn."
@@ -1265,12 +1265,12 @@ russian = "Верните в руку всех союзников, кроме о
 # Batch 2.39: Reclaim activated abilities and dissolved triggers (continued from earlier batch)
 [[tests]]
 english = "Abandon an ally, once per turn: Gain {points($p)}."
-russian = "Отрекитесь от союзника, один раз за ход: Получите 1⍏."
+russian = "Отрекитесь от союзника, один раз за ход: Получите <color=#F57F17>1⍏</color>."
 variables = "p: 1"
 
 [[tests]]
 english = "Abandon {count_allies($a)}: {Reclaim} this character."
-russian = "Отрекитесь от 2 союзников: Возвысьте этого персонажа."
+russian = "Отрекитесь от 2 союзника: Возвысьте этого персонажа."
 variables = "a: 2"
 
 [[tests]]
@@ -1280,62 +1280,62 @@ variables = "n: 8"
 
 [[tests]]
 english = "{Dissolved} You may pay {energy($e)} to return this character to your hand."
-russian = "▸ Рассеян: Вы можете заплатить 1●, чтобы вернуть этого персонажа в руку."
+russian = "▸ <b>Рассеян:</b> Вы можете заплатить <color=#00838F>1●</color>, чтобы вернуть этого персонажа в руку."
 variables = "e: 1"
 
 # Batch 2.40: Banish enemy with duration and control
 [[tests]]
 english = "{Materialized} {Banish} an enemy until your next main phase."
-russian = "▸ Воплощён: Изгоните врага до вашей следующей главной фазы."
+russian = "▸ <b>Воплощён:</b> Изгоните врага до вашей следующей главной фазы."
 
 [[tests]]
 english = "{Materialized} {Banish} an enemy until this character leaves play."
-russian = "▸ Воплощён: Изгоните врага, пока этот персонаж не покинет игру."
+russian = "▸ <b>Воплощён:</b> Изгоните врага, пока этот персонаж не покинет игру."
 
 [[tests]]
 english = "{Materialized} Gain control of an enemy with cost {energy($e)} or less."
-russian = "▸ Воплощён: Получите контроль над врагом стоимостью 2● или меньше."
+russian = "▸ <b>Воплощён:</b> Получите контроль над врагом стоимостью <color=#00838F>2●</color> или меньше."
 variables = "e: 2"
 
 [[tests]]
 english = "{Materialized} {Banish} the opponent's void."
-russian = "▸ Воплощён: Изгоните все карты из Пустоты противника."
+russian = "▸ <b>Воплощён:</b> Изгоните все карты из Пустоты противника."
 
 [[tests]]
 english = "Disable the {Materialized} abilities of enemies."
-russian = "Отключите у врагов способности «▸ Воплощён:»."
+russian = "Отключите у врагов способности «▸ <b>Воплощён:</b>»."
 
 # Batch 2.41: Materialized triggers with complex effects
 [[tests]]
 english = "{Materialized_Judgment} {Banish} an ally with spark {$s} or less, then {materialize} it."
-russian = "▸ Воплощён, Суд: Изгоните союзника с искрой 2 или меньше, затем воплотите его."
+russian = "▸ <b>Воплощён, Суд:</b> Изгоните союзника с искрой 2 или меньше, затем воплотите его."
 variables = "s: 2"
 
 [[tests]]
 english = "{Materialized} Discard {cards($d)}, then draw {cards($c)}."
-russian = "▸ Воплощён: Сбросьте 2 карты, затем возьмите 2 карты."
+russian = "▸ <b>Воплощён:</b> Сбросьте 2 карты, затем возьмите 2 карты."
 variables = "d: 2, c: 2"
 
 [[tests]]
 english = "{Materialized_Judgment} With {count_allied_subtype($a, $t)}, gain {energy($e)}."
-russian = "▸ Воплощён, Суд: Если у вас есть 2 союзных Воина, получите 1●."
+russian = "▸ <b>Воплощён, Суд:</b> Если у вас есть 2 союзных <color=#2E7D32><b>Воина</b></color>, получите <color=#00838F>1●</color>."
 variables = "a: 2, t: Warrior, e: 1"
 
 [[tests]]
 english = "{Materialized} Copy the next event you play {this_turn_times($n)}."
-russian = "▸ Воплощён: Скопируйте следующее событие, которое вы сыграете в этот ход, три раза."
+russian = "▸ <b>Воплощён:</b> Скопируйте следующее событие, которое вы сыграете в этот ход, три раза."
 variables = "n: 3"
 
 [[tests]]
 english = "{Materialized} Draw {@a subtype($t)} from your deck."
-russian = "▸ Воплощён: Возьмите Воина из вашей колоды."
+russian = "▸ <b>Воплощён:</b> Возьмите <color=#2E7D32><b>Воина</b></color> из вашей колоды."
 variables = "t: Warrior"
 
 # Batch 2.42: Complex when-triggers with cross-references
 [[tests]]
 english = "When you play a character, {materialize} {@a figment($f)}."
 russian = "Когда вы играете персонажа, воплотите Фигмент Гальциона."
-variables = "f: HalcyonFigment"
+variables = "f: halcyon"
 
 [[tests]]
 english = "When you {materialize} {allied_subtype($t)}, that character gains {spark($s)}."
@@ -1344,7 +1344,7 @@ variables = "t: SpiritAnimal, s: 1"
 
 [[tests]]
 english = "When you play {@a subtype($t)}, {reclaim} a random character with cost {energy($e)} or less."
-russian = "Когда вы играете Воина, возвысьте случайного персонажа стоимостью 3● или меньше."
+russian = "Когда вы играете <color=#2E7D32><b>Воина</b></color>, возвысьте случайного персонажа стоимостью <color=#00838F>3●</color> или меньше."
 variables = "t: Warrior, e: 3"
 
 # Batch 2.43: Play-from-void and card restrictions
@@ -1361,7 +1361,7 @@ variables = "e: 0"
 # Batch 2.44: Remaining complex effects
 [[tests]]
 english = "At the end of your turn, gain {energy($e)}."
-russian = "В конце вашего хода получите 2●."
+russian = "В конце вашего хода, получите <color=#00838F>2●</color>."
 variables = "e: 2"
 
 
@@ -1384,7 +1384,7 @@ russian = "Откройте персонажа с активируемой сп�
 
 [[tests]]
 english = "{Materialized} {Discover} a {fast} event."
-russian = "▸ <b>Воплощён:</b> Откройте событие с <color=#A0522D>↯Стремительностью</color>."
+russian = "▸ <b>Воплощён:</b> Откройте событие с ↯Стремительностью."
 
 # Batch 2.46: Modal cards, figments, and materialize patterns
 [[tests]]
@@ -1403,7 +1403,7 @@ variables = "n: 3, g: radiant"
 
 [[tests]]
 english = "{Materialize} {@a figment($g)} for each card you have played this turn."
-russian = "Воплотите Небесный Фигмент за каждую карту, которую вы сыграли в этот ход."
+russian = "<color=#AA00FF>Воплотите</color> Небесный Фигмент за каждую карту, которую вы сыграли в этот ход."
 variables = "g: celestial"
 
 [[tests]]
@@ -1427,7 +1427,7 @@ russian = "Если в вашей колоде нет карт, вы выигр�
 
 [[tests]]
 english = "{Dissolved} {@cap @a subtype($t)} in your void gains {reclaim} equal to its cost."
-russian = "▸ <b>Рассеян:</b> Выживший в вашей Пустоте получает <color=#964B00>Возвышение</color>, равное его стоимости."
+russian = "▸ <b>Рассеян:</b> <color=#2E7D32><b>Выживший</b></color> в вашей Пустоте получает Возвышение, равное его стоимости."
 variables = "t: Survivor"
 
 [[tests]]
@@ -1443,7 +1443,7 @@ variables = "e: 1"
 # Batch 2.48: Reclaim variants and final entries
 [[tests]]
 english = "{Reclaim} -- Abandon an ally"
-russian = "<color=#964B00>Возвышение</color> — Отрекитесь от союзника."
+russian = "<color=#964B00>Возвышение</color> — Отрекитесь от союзника"
 
 [[tests]]
 english = "{Judgment} Draw {cards($c)}."
@@ -1457,10 +1457,10 @@ variables = "r: 3"
 
 [[tests]]
 english = "{Reclaim_For_Cost($r)}"
-russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>."
+russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>"
 variables = "r: 2"
 
 [[tests]]
 english = "{Judgment} You may abandon {@a subtype($t)} to {discover} {@a subtype($t)} with cost {energy($e)} higher and {materialize} it."
-russian = "▸ <b>Суд:</b> Вы можете отречься от Воина, чтобы открыть Воина стоимостью на <color=#00838F>1●</color> выше и воплотить его."
+russian = "▸ <b>Суд:</b> Вы можете отречься от <color=#2E7D32><b>Воина</b></color>, чтобы открыть <color=#2E7D32><b>Воина</b></color> стоимостью <color=#00838F>1●</color> выше и воплотить его."
 variables = "t: Warrior, e: 1"

@@ -38,7 +38,7 @@ kindle($k) = "Разожгите {$k}";
 kindled = "<color=#AA00FF>разожжён</color>";
 foresee($n) = "Прозрение {$n}";
 fast = "↯Стремительность";
-reclaim_for_cost($r) = "Возвышение {$r}●";
+reclaim_for_cost($r) = "<color=#964B00>Возвышение</color> <color=#00838F>{$r}●</color>";
 
 
 choose_one = "<b>Выберите одно:</b>";
@@ -66,28 +66,26 @@ count($n) = "{$n}";
 ally = :masc :anim { nom: "союзник", *acc: "союзника", gen: "союзника", ins: "союзником", one: "союзника", other: "союзников", inf: "союзника" };
 count_allies($n) = :match($n) {
     1: "союзника",
-    few: "{$n} союзников",
+    few: "{$n} союзника",
     *other: "{$n} союзников",
 };
 count_allied_subtype($n, $s) = :from($s) :match($n) {
     1: "союзного {subtype($s)}",
+    few: "{$n} союзных {subtype($s)}",
     *other: "{$n} союзных {subtype($s):other}",
 };
 
 
-celestial = :masc :inan { nom: "Небесный", *acc: "Небесного", gen: "Небесного", one: "Небесного", other: "Небесных" };
-halcyon = :masc :inan { nom: "Гальцион", *acc: "Гальциона", gen: "Гальциона", one: "Гальциона", other: "Гальционов" };
-radiant = :masc :inan { nom: "Сияющий", *acc: "Сияющего", gen: "Сияющего", one: "Сияющего", other: "Сияющих" };
-shadow = :fem :inan { nom: "Теневая", *acc: "Теневую", gen: "Теневой", one: "Теневую", other: "Теневых" };
+celestial = :masc :inan { nom: "Небесный Фигмент", *acc: "Небесный Фигмент", gen: "Небесного Фигмента", one: "Небесный Фигмент", few: "Небесных Фигмента", other: "Небесных Фигментов" };
+halcyon = :masc :inan { nom: "Фигмент Гальциона", *acc: "Фигмент Гальциона", gen: "Фигмента Гальциона", one: "Фигмент Гальциона", few: "Фигмента Гальциона", other: "Фигментов Гальциона" };
+radiant = :masc :inan { nom: "Сияющий Фигмент", *acc: "Сияющий Фигмент", gen: "Сияющего Фигмента", one: "Сияющий Фигмент", few: "Сияющих Фигмента", other: "Сияющих Фигментов" };
+shadow = :masc :inan { nom: "Теневой Фигмент", *acc: "Теневой Фигмент", gen: "Теневого Фигмента", one: "Теневой Фигмент", few: "Теневых Фигмента", other: "Теневых Фигментов" };
 
 
-figment($f) = :from($f) {
-    *nom: "<color=#F57F17><b><u>Фигмент {$f:gen}</u></color></b>",
-    acc: "<color=#F57F17><b><u>Фигмент {$f:gen}</u></color></b>",
-    gen: "<color=#F57F17><b><u>Фигмента {$f:gen}</u></color></b>",
-};
+figment($f) = :from($f);
 n_figments($n, $f) = :match($n) {
-    1: "a {figment($f)}",
+    1: "{figment($f)}",
+    few: "{text_number($n)} {figment($f):few}",
     *other: "{text_number($n)} {figment($f):other}",
 };
 
@@ -140,7 +138,7 @@ text_number($n) = :match($n) {
 this_turn_times($n) = :match($n) {
     1: "в этот ход",
     2: "дважды в этот ход",
-    3: "три раза",
+    3: "в этот ход, три раза",
     *other: "в этот ход {text_number($n)} раз",
 };
 
@@ -289,7 +287,7 @@ cost_or_connector = " или ";
 cost_and_connector = " и ";
 pay_prefix($cost) = "заплатить {$cost}";
 abandon_any_number_of($target) = :from($target) "отрекитесь от любого количества {$target:other}";
-abandon_target($target) = :from($target) "отрекитесь от {$target}";
+abandon_target($target) = :from($target) { *one: "отрекитесь от {$target}", inf: "отречься от {$target}" };
 return_target_to_hand($target) = :from($target) "верните {$target:acc} в руку";
 return_count_to_hand($n, $target) = :from($target) "верните {$n} {$target:other} в руку";
 return_all_but_one_to_hand($target) = :from($target) "верните в руку всех {$target:other}, кроме одного";
@@ -345,7 +343,7 @@ with_allies_sharing_type($a) = "если у вас есть {count_allies($a)} �
 if_drawn_count_this_turn($n) = "если вы взяли {count($n)} или больше карт в этом ходу";
 while_void_count($n) = "Пока в вашей Пустоте {count($n)} или больше карт,";
 with_allied_subtype($t) = :from($t) "если у вас есть союзный {subtype($t)},";
-with_count_allied_subtype($a, $t) = "Если у вас есть {count_allied_subtype($a, $t)},";
+with_count_allied_subtype($a, $t) = "{count_allied_subtype($a, $t)}";
 with_count_allies($a) = "{count_allies($a)}";
 
 
@@ -626,7 +624,7 @@ non_subtype($s) = :from($s) {
     *one: "не-{$s}",
     other: "не-{$s:other}",
 };
-could_dissolve_target($target) = :fem :inan "событие, которое может рассеять {$target:acc}";
+could_dissolve_target($target) = :from($target) { *nom: "событие, которое может рассеять {$target:acc}", gen: "события, которое может рассеять {$target:acc}" };
 could_dissolve_target_plural($target) = :neut :inan "события, которые могут рассеять {$target:acc}";
 your_event_could_dissolve($target) = :neut :inan "ваше событие, которое может рассеять {$target:acc}";
 your_event_could_dissolve_plural($target) = :neut :inan "ваши события, которые могут рассеять {$target:acc}";
@@ -727,7 +725,7 @@ card_predicate_returned($base) = :from($base) {
     *gen: :match($base) { *masc: "возвращённого {$base:gen}", fem: "возвращённой {$base:gen}", neut: "возвращённого {$base:gen}" },
 };
 energy_spent = :inan { gen: "потраченного {energy_symbol}" };
-card_predicate_played_this_turn($base) = :from($base) { nom: "{$base:nom}, которую вы сыграли в этот ход", *gen: "{$base:gen}, которую вы сыграли в этот ход" };
+card_predicate_played_this_turn($base) = :from($base) { nom: "{$base:nom}, которую вы сыграли в этот ход", gen: "{$base:gen}, которую вы сыграли в этот ход", *acc: "{$base:acc}, которую вы сыграли в этот ход" };
 card_predicate_drawn_this_turn($base) = :from($base) {
     nom: :match($base) { *fem: "{$base:nom}, которую вы взяли в этот ход", masc: "{$base:nom}, которого вы взяли в этот ход", neut: "{$base:nom}, которое вы взяли в этот ход" },
     *gen: :match($base) { *fem: "{$base:gen}, которую вы взяли в этот ход", masc: "{$base:gen}, которого вы взяли в этот ход", neut: "{$base:gen}, которое вы взяли в этот ход" },
@@ -906,11 +904,11 @@ play_from_void_for_cost_with_effect($e, $effect) = "разыграйте {this_c
 
 if_this_card_in_void_prefix($base) = "если эта карта находится в вашей Пустоте, {$base}";
 condition_prepended($condition, $base) = "{$condition} {$base}";
-condition_appended($base, $condition) = "{$base} {$condition}";
+condition_appended($base, $condition) = "{$base}, {$condition}";
 
 
 capitalized_sentence($s) = "{@cap $s}";
-reclaim_with_cost($cost) = "{Reclaim} -- {$cost}";
+reclaim_with_cost($cost) = "<color=#964B00>Возвышение</color> — {$cost}";
 
 triggered_ability($trig, $eff) = "{@cap $trig}{$eff}";
 prefixed_triggered_ability($pfx, $trig, $eff) = "{$pfx}{$trig}{$eff}";
@@ -925,7 +923,7 @@ activated_cost_separator = ", ";
 effect_with_period($e) = "{$e}{period_suffix}";
 condition_with_effect($cond, $body) = "{$cond} {$body}";
 optional_effect_body($body) = "{you_may_prefix}{$body:inf}";
-optional_cost_effect_body($cost, $body) = "{you_may_prefix}{cost_to_connector($cost)}{$body:inf}";
+optional_cost_effect_body($cost, $body) = "{you_may_prefix}{$cost:inf}, чтобы {$body:inf}";
 cost_effect_body($cost, $body) = "{cost_to_connector($cost)}{$body}";
 per_effect_optional($body) = "{you_may_prefix}{$body:inf}";
 per_effect_cost($cost, $body) = "{cost_to_connector($cost)}{$body}";
