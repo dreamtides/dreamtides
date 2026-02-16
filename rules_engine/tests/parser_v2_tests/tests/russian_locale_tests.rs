@@ -1,5 +1,6 @@
 use std::any::Any;
 use std::panic::{catch_unwind, AssertUnwindSafe};
+use std::sync::Once;
 
 use parser_v2::lexer::lexer_tokenize;
 use parser_v2::serializer::ability_serializer;
@@ -15,6 +16,8 @@ const SOURCE_LANGUAGE: &str = "en";
 const RUSSIAN_EXPECTED_PATH: &str = "tests/round_trip_tests/fixtures/russian_locale_expected.toml";
 const RUSSIAN_BASELINE_PATH: &str = "tests/round_trip_tests/fixtures/russian_locale_baseline.toml";
 const MAX_REPORTED_ISSUES: usize = 40;
+
+static RUSSIAN_LOCALE_INIT: Once = Once::new();
 
 #[derive(Debug, Deserialize)]
 struct CardsFile {
@@ -52,22 +55,15 @@ struct RussianLocaleBaseline {
     min_passing: usize,
 }
 
-struct LanguageGuard {
-    previous_language: String,
-}
-
-impl Drop for LanguageGuard {
-    fn drop(&mut self) {
-        rlf::with_locale_mut(|locale| locale.set_language(&self.previous_language));
-    }
-}
-
-/// Switches the global locale to Russian and returns a guard that restores
-/// the previous language on drop.
-fn activate_russian_locale() -> LanguageGuard {
-    let previous_language = rlf::with_locale(|locale| locale.language().to_string());
-    rlf::with_locale_mut(|locale| locale.set_language(RUSSIAN_LANGUAGE));
-    LanguageGuard { previous_language }
+/// Registers the Russian locale and sets it as active. Safe to call from
+/// multiple test threads — the `Once` ensures initialization happens exactly
+/// once and the language is never restored to English, avoiding a race where
+/// one test's cleanup resets the locale while another test is still running.
+fn activate_russian_locale() {
+    RUSSIAN_LOCALE_INIT.call_once(|| {
+        test_helpers::register_russian_test_locale().expect("Russian locale should load");
+        rlf::with_locale_mut(|locale| locale.set_language(RUSSIAN_LANGUAGE));
+    });
 }
 
 /// Parses ability text through the lexer, parser, and serializer pipeline,
@@ -101,7 +97,7 @@ fn panic_message(panic: Box<dyn Any + Send>) -> String {
 /// the baseline minimum.
 #[test]
 fn test_russian_locale_ratcheting_translations() {
-    test_helpers::register_russian_test_locale().expect("Russian locale should load");
+    activate_russian_locale();
 
     let expected_toml = std::fs::read_to_string(RUSSIAN_EXPECTED_PATH).unwrap_or_else(|e| {
         panic!("Failed to read Russian expected fixture at {RUSSIAN_EXPECTED_PATH}: {e}")
@@ -116,8 +112,6 @@ fn test_russian_locale_ratcheting_translations() {
     let baseline: RussianLocaleBaseline = toml::from_str(&baseline_toml).unwrap_or_else(|e| {
         panic!("Failed to parse Russian baseline at {RUSSIAN_BASELINE_PATH}: {e}")
     });
-
-    let _language_guard = activate_russian_locale();
 
     let mut passing = 0usize;
     let mut failures = Vec::new();
@@ -173,8 +167,7 @@ fn test_russian_locale_ratcheting_translations() {
 /// through the Russian locale and asserts no panics occur.
 #[test]
 fn test_russian_locale_no_crash_all_abilities() {
-    test_helpers::register_russian_test_locale().expect("Russian locale should load");
-    let _language_guard = activate_russian_locale();
+    activate_russian_locale();
 
     let cards_toml = std::fs::read_to_string(CARDS_TOML_PATH).expect("Failed to read cards.toml");
     let cards_file: CardsFile = toml::from_str(&cards_toml).expect("Failed to parse cards.toml");
@@ -233,8 +226,14 @@ fn test_russian_locale_no_crash_all_abilities() {
 /// phrase count as English.
 #[test]
 fn test_russian_locale_load_phrase_count() {
-    let loaded = test_helpers::register_russian_test_locale()
-        .expect("Russian locale should load from locale file");
+    activate_russian_locale();
+    let loaded = rlf::with_locale(|locale| {
+        locale
+            .registry_for(RUSSIAN_LANGUAGE)
+            .expect("Russian phrases should be registered")
+            .phrase_names()
+            .count()
+    });
     rlf::with_locale(|locale| {
         let source_phrase_count = locale
             .registry_for(SOURCE_LANGUAGE)
