@@ -1482,9 +1482,9 @@ variables = "f: halcyon"
 russian = "Когда вы играете персонажа, воплотите Фигмент Гальциона."
 
 [[tests]]
-english = "When you {materialize} {allied_subtype($t)}, that character gains {spark($s)}."
+english = "When you {materialize} an allied {subtype($t)}, that character gains +{$s} spark."
 variables = "t: SpiritAnimal, s: 1"
-russian = "Когда вы воплощаете союзного Духа-Зверя, этот персонаж получает +1 к искре."
+russian = "Когда вы воплощаете союзного <color=#2E7D32><b>Духа-Зверя</b></color>, этот персонаж получает +1 к искре."
 
 [[tests]]
 english = "When you play {@a subtype($t)}, {reclaim} a random character with cost {energy($e)} or less."
@@ -1492,14 +1492,14 @@ variables = "t: Warrior, e: 3"
 russian = "Когда вы играете <color=#2E7D32><b>Воина</b></color>, возвысьте случайного персонажа стоимостью <color=#00838F>3●</color> или меньше."
 
 [[tests]]
-english = "With {allied_subtype($t)}, you may play this card from your hand or void for {energy($e)}."
+english = "With an allied {subtype($t)}, you may play this card from your hand or void for {energy($e)}."
 variables = "t: Survivor, e: 1"
-russian = "Если у вас есть союзный Выживший, вы можете сыграть эту карту из руки или из Пустоты за 1●."
+russian = "Если у вас есть союзный <color=#2E7D32><b>Выжившего</b></color>, вы можете сыграть эту карту из руки или из Пустоты за <color=#00838F>1●</color>."
 
 [[tests]]
-english = "{Abandon} an ally: Play this character for {energy($e)}, then {abandon} it."
+english = "Abandon an ally: Play this character for {energy($e)}, then abandon it."
 variables = "e: 0"
-russian = "Отрекитесь от союзника: Сыграйте этого персонажа за 0●, затем отрекитесь от него."
+russian = "Отрекитесь от союзника: Сыграйте этого персонажа за <color=#00838F>0●</color>, затем отрекитесь от него."
 
 [[tests]]
 english = "At the end of your turn, gain {energy($e)}."
