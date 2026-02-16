@@ -1361,6 +1361,10 @@ rlf::rlf! {
         "{fast_prefix}{$c}{once_per_turn_suffix}{cost_effect_separator}{@cap $eff}";
     // Activated ability cost separator for joining multiple costs.
     activated_cost_separator = ", ";
+    // Separator for joining non-energy costs in activated abilities.
+    activated_non_energy_cost_separator = ", ";
+    // Formats a subsequent (non-first) cost in an activated ability.
+    activated_subsequent_cost($s) = "{@cap $s}";
 
     // =========================================================================
     // Compound effect assembly phrases

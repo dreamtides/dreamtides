@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 
 use ability_data::ability::Ability;
 use ability_data::activated_ability::ActivatedAbility;
+use ability_data::cost::Cost;
 use ability_data::effect::{Effect, ModelEffectChoiceIndex};
 use ability_data::named_ability::NamedAbility;
 use ability_data::trigger_event::TriggerEvent;
@@ -123,14 +124,7 @@ fn build_trigger_prefix(has_until_end_of_turn: bool, has_once_per_turn: bool) ->
 fn serialize_activated(activated: &ActivatedAbility) -> String {
     let is_fast = activated.options.as_ref().is_some_and(|options| options.is_fast);
     let has_once_per_turn = activated.options.as_ref().is_some_and(|options| !options.is_multi);
-    let costs = activated
-        .costs
-        .iter()
-        .map(|cost| {
-            strings::capitalized_sentence(cost_serializer::serialize_cost(cost)).to_string()
-        })
-        .collect::<Vec<_>>()
-        .join(&strings::activated_cost_separator().to_string());
+    let costs = join_activated_costs(&activated.costs);
     let effect = effect_serializer::serialize_effect_with_context(
         &activated.effect,
         AbilityContext::Triggered,
@@ -140,6 +134,64 @@ fn serialize_activated(activated: &ActivatedAbility) -> String {
         (true, false) => strings::fast_activated_ability(costs, effect).to_string(),
         (false, true) => strings::activated_ability_once_per_turn(costs, effect).to_string(),
         (false, false) => strings::activated_ability(costs, effect).to_string(),
+    }
+}
+
+/// Joins activated ability costs with correct separators and
+/// capitalization.
+///
+/// Energy costs are separated from non-energy costs by the activated
+/// cost separator (", "). Non-energy costs among themselves are joined
+/// by the non-energy cost separator (", " in English, " и " in
+/// Russian). The first cost is always capitalized; subsequent
+/// non-energy costs are wrapped with `activated_subsequent_cost` which
+/// capitalizes in English but not in Russian.
+fn join_activated_costs(costs: &[Cost]) -> String {
+    let mut energy_parts = Vec::new();
+    let mut non_energy_parts = Vec::new();
+    for cost in costs {
+        if matches!(cost, Cost::Energy(_)) {
+            energy_parts.push(cost_serializer::serialize_cost(cost).to_string());
+        } else {
+            non_energy_parts.push(cost_serializer::serialize_cost(cost));
+        }
+    }
+
+    let non_energy_separator = strings::activated_non_energy_cost_separator().to_string();
+    let cost_separator = strings::activated_cost_separator().to_string();
+
+    if energy_parts.is_empty() {
+        // No energy costs: capitalize first non-energy cost, apply
+        // subsequent formatting to the rest.
+        let non_energy_strings: Vec<String> = non_energy_parts
+            .into_iter()
+            .enumerate()
+            .map(|(i, phrase)| {
+                if i == 0 {
+                    strings::capitalized_sentence(phrase).to_string()
+                } else {
+                    strings::activated_subsequent_cost(phrase).to_string()
+                }
+            })
+            .collect();
+        non_energy_strings.join(&non_energy_separator)
+    } else {
+        // Energy costs present: join energy parts, then append
+        // non-energy costs with subsequent formatting using the standard
+        // separator between groups and the non-energy separator within.
+        let energy_str = energy_parts.join(&cost_separator);
+        if non_energy_parts.is_empty() {
+            energy_str
+        } else {
+            let non_energy_strings: Vec<String> = non_energy_parts
+                .into_iter()
+                .map(|p| strings::activated_subsequent_cost(p).to_string())
+                .collect();
+            format!(
+                "{energy_str}{cost_separator}{}",
+                non_energy_strings.join(&non_energy_separator)
+            )
+        }
     }
 }
 

@@ -66,7 +66,6 @@ russian = "Отрекитесь от союзника: Положите 2 вер
 english = "{energy($e)}, {Banish} another card in your void: {Reclaim} this character."
 variables = "e: 2"
 russian = "<color=#00838F>2●</color>, изгоните другую карту из вашей Пустоты: Возвысьте этого персонажа."
-disabled = true
 
 [[tests]]
 english = "Abandon an ally: You may put a character from your void on top of your deck."
@@ -267,7 +266,6 @@ variables = """e: 2
 s: 1
 c: 2"""
 russian = "<color=#00838F>2●</color>, отрекитесь от союзника с искрой 1 или меньше: Возьмите 2 карты."
-disabled = true
 
 [[tests]]
 english = "Reveal the top card of your deck."
@@ -352,7 +350,6 @@ variables = """e: 1
 d: 1
 k: 2"""
 russian = "<color=#00838F>1●</color>, сбросьте карту: Разожгите 2."
-disabled = true
 
 [[tests]]
 english = "{Judgment} Gain {energy($e)}."
@@ -788,7 +785,6 @@ russian = "▸ <b>Воплощён:</b> Возьмите карту за каж�
 english = "Abandon a character, Discard your hand: Gain {energy($e)}."
 variables = "e: 5"
 russian = "Отрекитесь от персонажа и сбросьте руку: Получите <color=#00838F>5●</color>."
-disabled = true
 
 [[tests]]
 english = "When an ally is {banished}, {kindle($k)}."
@@ -812,7 +808,6 @@ english = "{energy($e)}, Abandon a character, Discard your hand: Draw {cards($c)
 variables = """e: 2
 c: 3"""
 russian = "<color=#00838F>2●</color>, отрекитесь от персонажа и сбросьте руку: Возьмите 3 карты."
-disabled = true
 
 [[tests]]
 english = "{Materialized} A card with cost {energy($e)} or less in your void gains {reclaim_for_cost($r)}."
@@ -1322,26 +1317,22 @@ variables = """e: 2
 s: 1
 c: 2"""
 russian = "<color=#00838F>2●</color>, отрекитесь от союзника с искрой 1 или меньше: Возьмите 2 карты."
-disabled = true
 
 [[tests]]
 english = "{energy($e)}, {Banish} another card in your void: {Reclaim} this character."
 variables = "e: 2"
 russian = "<color=#00838F>2●</color>, изгоните другую карту из вашей Пустоты: Возвысьте этого персонажа."
-disabled = true
 
 [[tests]]
 english = "{energy($e)}, Abandon a character, Discard your hand: Draw {cards($c)}."
 variables = """e: 2
 c: 3"""
 russian = "<color=#00838F>2●</color>, отрекитесь от персонажа и сбросьте руку: Возьмите 3 карты."
-disabled = true
 
 [[tests]]
 english = "Abandon a character, Discard your hand: Gain {energy($e)}."
 variables = "e: 5"
 russian = "Отрекитесь от персонажа и сбросьте руку: Получите <color=#00838F>5●</color>."
-disabled = true
 
 [[tests]]
 english = "Abandon an ally or discard {cards($d)}: {Dissolve} an enemy."
