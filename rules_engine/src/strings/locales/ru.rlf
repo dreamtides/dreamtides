@@ -645,11 +645,11 @@ with_spark_less_than_energy_paid_constraint =
 with_cost_less_than_allied_count($target) = :from($target)
     "стоимостью меньше количества союзных {$target:other}";
 with_cost_less_than_abandoned_ally_constraint =
-    "with cost less than the abandoned ally's cost";
+    "стоимостью меньше стоимости союзника, от которого вы отреклись";
 with_spark_less_than_abandoned_ally_constraint =
-    "with spark less than the abandoned ally's spark";
+    "с искрой меньше искры союзника, от которого вы отреклись";
 with_spark_less_than_abandoned_count_this_turn_constraint =
-    "with spark less than the number of allies abandoned this turn";
+    "с искрой меньше количества союзников, от которых вы отреклись в этот ход";
 with_cost_less_than_void_count_constraint =
     "стоимостью меньше количества карт в вашей Пустоте";
 with_spark_less_than_that_ally_constraint =
@@ -811,12 +811,24 @@ allied_card_with_base($base) = :from($base) {
 };
 
 
-it_gains_reclaim_for_cost($target, $r) = "it gains {reclaim_for_cost($r)}";
-it_gains_reclaim_equal_cost($target) = "it gains {reclaim} equal to its cost";
-this_card_gains_reclaim_for_cost($r) = "this card gains {reclaim_for_cost($r)}";
-this_card_gains_reclaim_equal_cost = "this card gains {reclaim} equal to its cost";
-target_gains_reclaim_for_cost($target, $r) = "{$target} gains {reclaim_for_cost($r)}";
-target_gains_reclaim_equal_cost($target) = "{$target} gains {reclaim} equal to its cost";
+it_gains_reclaim_for_cost($target, $r) = :from($target) :match($target) {
+    *fem: "она получает {reclaim_for_cost($r)}",
+    neut: "оно получает {reclaim_for_cost($r)}",
+    masc: "он получает {reclaim_for_cost($r)}",
+};
+it_gains_reclaim_equal_cost($target) = :from($target) :match($target) {
+    *fem: "она получает Возвышение, равное её стоимости",
+    neut: "оно получает Возвышение, равное его стоимости",
+    masc: "он получает Возвышение, равное его стоимости",
+};
+this_card_gains_reclaim_for_cost($r) = "эта карта получает {reclaim_for_cost($r)}";
+this_card_gains_reclaim_equal_cost = "эта карта получает Возвышение, равное её стоимости";
+target_gains_reclaim_for_cost($target, $r) = "{$target} получает {reclaim_for_cost($r)}";
+target_gains_reclaim_equal_cost($target) = :from($target) :match($target) {
+    *fem: "{$target} получает Возвышение, равное её стоимости",
+    neut: "{$target} получает Возвышение, равное его стоимости",
+    masc: "{$target} получает Возвышение, равное его стоимости",
+};
 
 it_gains_reclaim_for_cost_this_turn($target, $r) = :from($target) :match($target) {
     *fem: "она получает {reclaim_for_cost($r)} до конца хода",
@@ -877,19 +889,19 @@ once_per_turn_play_from_void($matching) = :from($matching) :match($matching) {
     inan: "один раз за ход вы можете сыграть {$matching:acc} из вашей Пустоты",
 };
 reveal_top_card = "покажите верхнюю карту вашей колоды";
-you_may_look_at_top_card = "you may look at the top card of your deck";
+you_may_look_at_top_card = "вы можете посмотреть верхнюю карту вашей колоды";
 you_may_play_from_top_of_deck($matching) = :from($matching) "вы можете играть {$matching:other} с верха вашей колоды";
 judgment_triggers_when_materialized($matching) = "способность {$matching:other} «{Judgment}» срабатывает, когда вы воплощаете их";
 spark_equal_to_predicate_count($matching) = "Искра {this_character:gen} равна количеству {$matching:other}";
 play_only_from_void = "вы можете играть этого персонажа только из вашей Пустоты";
 play_from_hand_or_void_for_cost($e) = "вы можете сыграть эту карту из руки или из Пустоты за {energy($e)}";
-cards_in_void_have_reclaim = "they have {reclaim} equal to their cost";
+cards_in_void_have_reclaim = "эти карты получают Возвышение, равное их стоимости";
 cost_reduction_for_each($e, $quantity) = "{this_card:nom} стоит на {energy($e)} меньше за каждого {$quantity}";
 spark_bonus_your_characters($matching, $s) = :from($matching) "союзные {$matching:nom_pl} получают +{$s} к искре";
-play_from_void_for_cost($e) = "play {this_card} from your void for {energy($e)}";
-play_from_void_with_additional_cost($cost, $e) = "{$cost}: play {this_card} from your void for {energy($e)}";
-play_from_void_with_effect($cost, $e, $effect) = "{$cost}: play {this_card} from your void for {energy($e)}, then {$effect}";
-play_from_void_for_cost_with_effect($e, $effect) = "play {this_card} from your void for {energy($e)}, then {$effect}";
+play_from_void_for_cost($e) = "разыграйте {this_card:acc} из вашей Пустоты за {energy($e)}";
+play_from_void_with_additional_cost($cost, $e) = "{$cost}: разыграйте {this_card:acc} из вашей Пустоты за {energy($e)}";
+play_from_void_with_effect($cost, $e, $effect) = "{$cost}: разыграйте {this_card:acc} из вашей Пустоты за {energy($e)}, затем {$effect}";
+play_from_void_for_cost_with_effect($e, $effect) = "разыграйте {this_card:acc} из вашей Пустоты за {energy($e)}. {@cap $effect}";
 
 
 if_this_card_in_void_prefix($base) = "если эта карта находится в вашей Пустоте, {$base}";
