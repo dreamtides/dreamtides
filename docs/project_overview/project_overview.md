@@ -3,8 +3,8 @@
 Technical architecture of the Dreamtides roguelike deckbuilding game. Dreamtides
 is a two-player card game similar to Magic: the Gathering. Players materialize
 characters (putting them into play) and play one-time events. Characters have
-spark, which earns victory points during the judgment phase. Cards cost energy to
-play. The first player to 12 points wins.
+spark, which earns victory points during the judgment phase. Cards cost energy
+to play. The first player to 12 points wins.
 
 ## Project Architecture
 
@@ -54,8 +54,8 @@ organized in layers:
   (Component trait, buttons, panels), `display_data` (Command enum, BattleView).
 - **Layer 6 (AI):** `ai_uct` (Monte Carlo Tree Search) and `ai_agents` (action
   selection entry point).
-- **Layer 7 (assembly):** `game_creation`, `database`, `display` (rendering,
-  17 deps), `rules_engine` (top-level facade, 17 deps).
+- **Layer 7 (assembly):** `game_creation`, `database`, `display` (rendering, 17
+  deps), `rules_engine` (top-level facade, 17 deps).
 
 ## Card Data Pipeline
 
@@ -63,7 +63,8 @@ Card data lives in TOML files under rules_engine/tabula/ (mirrored in
 client/Assets/StreamingAssets/Tabula/). The main file is cards.toml (large — do
 not read directly). Each card has an id, name, energy-cost, card-type, optional
 subtype/spark, and crucially a `rules-text` field with directive syntax like
-`"{energy($e)}: Draw {cards($c)}."` plus a `variables` field like `"e: 2, c: 1"`.
+`"{energy($e)}: Draw {cards($c)}."` plus a `variables` field like
+`"e: 2, c: 1"`.
 
 The tabula card set is shared between client and rules engine via symlinked
 paths. The standalone `tv` app is used to inspect and edit tabula TOML data.
@@ -115,15 +116,16 @@ background thread while waiting for human input.
 
 ### Stack and Priority
 
-When a card is played (PlayCardFromHand or PlayCardFromVoid for Reclaim),
-energy is spent and the card moves to the stack. The opponent receives priority
-to respond. A single priority pass resolves the top stack card — events execute
+When a card is played (PlayCardFromHand or PlayCardFromVoid for Reclaim), energy
+is spent and the card moves to the stack. The opponent receives priority to
+respond. A single priority pass resolves the top stack card — events execute
 their effects then move to the void; characters move to the battlefield. If the
 stack still has items, the resolved card's controller receives priority.
 
 ### Effect Resolution
 
 After every action, three cleanup passes run in sequence:
+
 1. **Drain pending effects** — the `pending_effects` VecDeque is processed FIFO.
    List effects push their first element for execution and re-queue the
    remainder. The loop halts if a prompt is created or the game ends.
@@ -166,8 +168,8 @@ infrastructure in the `logging` crate.
 
 ### Animation Recording
 
-During mutations, `BattleState::push_animation()` records animation events.
-Each AnimationStep captures the BattleAnimation variant (PlayCard, DrawCards,
+During mutations, `BattleState::push_animation()` records animation events. Each
+AnimationStep captures the BattleAnimation variant (PlayCard, DrawCards,
 GainEnergy, ScorePoints, etc.) plus a full snapshot clone of the BattleState at
 that moment. This snapshot-per-step approach means the renderer can later
 reconstruct exact intermediate game states.
@@ -180,12 +182,13 @@ interleaved snapshot-then-VFX command sequences, followed by a final snapshot.
 
 The output is a CommandSequence — a list of sequential ParallelCommandGroups.
 Each group contains Commands executed simultaneously. The primary command is
-UpdateBattle, which carries a complete BattleView (display_data/src/battle_view.rs)
-— the full visual state of the battle including all card views, player state,
-interface controls, and targeting arrows. This "react-style" snapshot approach
-means the client reconstructs its entire UI from each update rather than
-applying deltas. Other commands handle VFX: FireProjectile, DissolveCard,
-DisplayEffect, PlayAudioClip, Wait, DisplayGameMessage, etc.
+UpdateBattle, which carries a complete BattleView
+(display_data/src/battle_view.rs) — the full visual state of the battle
+including all card views, player state, interface controls, and targeting
+arrows. This "react-style" snapshot approach means the client reconstructs its
+entire UI from each update rather than applying deltas. Other commands handle
+VFX: FireProjectile, DissolveCard, DisplayEffect, PlayAudioClip, Wait,
+DisplayGameMessage, etc.
 
 ### Masonry UI
 
@@ -195,8 +198,8 @@ BoxComponent, TextComponent, ButtonComponent, and PanelComponent compose into
 FlexNode trees with full CSS flexbox styling. These trees are serialized in
 UpdateBattle commands. On the client side, a Masonry reconciler
 (client/Assets/Dreamtides/Masonry/Reconciler.cs) diffs the new FlexNode tree
-against the previous one and applies changes to Unity's UIToolkit
-VisualElements — a virtual-DOM pattern.
+against the previous one and applies changes to Unity's UIToolkit VisualElements
+— a virtual-DOM pattern.
 
 ## Client Architecture
 
@@ -221,11 +224,11 @@ Game entities extend Displayable (Layout/Displayable.cs), which provides
 lifecycle hooks and mouse event handling (down/drag/up/hover). Cards have two
 visual modes: sprite-based for hand/stack and a 3D battlefield representation,
 toggled by GameContext. Cards and other objects are positioned via ObjectLayout
-subclasses (CurveObjectLayout, PileObjectLayout, ScrollableUserHandLayout,
-etc.) which compute positions and animate transitions via DOTween.
+subclasses (CurveObjectLayout, PileObjectLayout, ScrollableUserHandLayout, etc.)
+which compute positions and animate transitions via DOTween.
 
-Dreamtides uses multiple UI surfaces in parallel: world-space 3D objects,
-legacy UGUI canvas content, and Rust-driven UIToolkit overlays through Masonry.
+Dreamtides uses multiple UI surfaces in parallel: world-space 3D objects, legacy
+UGUI canvas content, and Rust-driven UIToolkit overlays through Masonry.
 
 On each UpdateBattle command, ActionServiceImpl updates status displays, action
 buttons, screen overlay, and other UI, then delegates to CardService for card
@@ -252,7 +255,7 @@ prompt responses get 0.5x.
 
 Tests live in rules_engine/tests/ (never inline mod tests). TestBattle builds
 battle configurations; TestSession drives actions through the full engine
-pipeline. Tests operate at the *simulated user interface* level —
+pipeline. Tests operate at the _simulated user interface_ level —
 `perform_user_action()` exercises the complete path from action dispatch through
 rendering. Both user and enemy client views are validated for consistency. The
 StateProvider trait (rules_engine/src/state_provider/) is the dependency
@@ -266,6 +269,7 @@ tests when practical.
 ## Build and Tooling
 
 All development commands go through `just` (not `cargo` directly):
+
 - `just dev` — run HTTP dev server for Unity development
 - `just fmt` — runs style_validator --fix, rlf-fmt, and cargo +nightly fmt
 - `just check` / `just clippy` — type checking and linting

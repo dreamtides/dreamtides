@@ -9,6 +9,7 @@ The most complex subsystem. Adding a new keyword or effect requires coordinated
 changes across 5+ files with no existing guide.
 
 Document should cover:
+
 - End-to-end walkthrough: "how to add a new keyword" from TOML rules-text
   through to rendered UI text.
 - The four PHRASES tables in parser_substitutions.rs (PHRASES, BARE_PHRASES,
@@ -39,16 +40,18 @@ Anyone adding or modifying cards needs this reference. The format has many
 implicit conventions not documented anywhere.
 
 Document should cover:
+
 - Complete field reference for [[cards]] entries: id, name, energy-cost (integer
-  or "*" for variable), card-type, subtype, spark, is-fast, rules-text,
+  or "\*" for variable), card-type, subtype, spark, is-fast, rules-text,
   variables, prompts, image-number, rarity.
-- The rules-text directive syntax: {keyword}, {keyword($var)},
-  {@transform keyword($var)}, {keyword($var):selector}. Concrete examples of
-  each pattern.
+- The rules-text directive syntax: {keyword},
+  {keyword($var)},
+  {@transform keyword($var)}, {keyword($var):selector}.
+  Concrete examples of each pattern.
 - The variables field format: comma/newline-separated "key: value" pairs where
   values are integers, subtypes (CardSubtype enum values), or figments
   (FigmentType enum values).
-- Modal card conventions: energy-cost "*", variables with e1/e2/c1/c2 numbered
+- Modal card conventions: energy-cost "\*", variables with e1/e2/c1/c2 numbered
   variants, {choose_one} directive.
 - Dreamwell card format (dreamwell.toml): produced-energy, effects, phase.
 - File locations and sync requirements: rules_engine/tabula/ vs
@@ -67,17 +70,18 @@ An in-house DSL with no external documentation. Every UI string change requires
 understanding this system.
 
 Document should cover:
-- The rlf! macro syntax: constant phrases, parameterized phrases ($var),
-  plural matching (:match), variant metadata (:a, :an, :from), variant
-  selection (:one, :other).
+
+- The rlf! macro syntax: constant phrases, parameterized phrases ($var), plural
+  matching (:match), variant metadata (:a, :an, :from), variant selection (:one,
+  :other).
 - How to add a new phrase: define in strings.rlf.rs, use via
   strings::phrase_name() which returns rlf::Phrase.
 - Phrase composition: Phrase::empty(), map_text(), to_string(),
   capitalized_sentence() wrapper.
-- Rich text conventions: Unity-compatible tags (<color=#HEX>, <b>, <u>),
-  color coding by keyword category (purple for keywords like dissolve/banish,
-  teal for energy, etc.).
-- How serializers connect to RLF: effect_serializer calls strings::* functions,
+- Rich text conventions: Unity-compatible tags (<color=#HEX>, <b>, <u>), color
+  coding by keyword category (purple for keywords like dissolve/banish, teal for
+  energy, etc.).
+- How serializers connect to RLF: effect_serializer calls strings::\* functions,
   bindings.insert() for variable values, VariableValue types.
 - The rlf_fmt and rlf_lint tools: what they validate, how to run them.
 - Relationship to the parser: RLF function call syntax in rules-text directives
@@ -93,8 +97,10 @@ The most subtle runtime system. Incorrect assumptions about ordering cause bugs
 that only manifest in specific card interactions.
 
 Document should cover:
+
 - The three cleanup passes after every action: drain pending_effects, fire
-  triggers, advance turn state machine. Each auto-executed action runs all three.
+  triggers, advance turn state machine. Each auto-executed action runs all
+  three.
 - Pending effects queue (VecDeque<PendingEffect>): FIFO processing, how List
   effects decompose (first element executed, remainder re-queued at front).
 - Prompt interleaving: how PromptData halts all three loops, how OnSelected
@@ -120,9 +126,10 @@ battle_state/src/triggers/, battle_state/src/prompt_types/prompt_data.rs.
 How game state changes become visual sequences on the client.
 
 Document should cover:
+
 - Animation recording: BattleState::push_animation() captures a full state
-  snapshot with each BattleAnimation event. Closure-based to skip when animations
-  disabled (AI simulation). ~21 call sites across battle_mutations.
+  snapshot with each BattleAnimation event. Closure-based to skip when
+  animations disabled (AI simulation). ~21 call sites across battle_mutations.
 - How to add a new BattleAnimation variant: add to enum, push in mutation code,
   handle in animations::render(), add card-specific VFX via apply_card_fx.
 - The rendering pipeline: renderer::connect() (single snapshot) vs
@@ -139,23 +146,25 @@ Document should cover:
   reconstructs UI from each UpdateBattle. When this works well vs when
   imperative commands (FireProjectile, DissolveCard) are needed.
 
-Key files: display/src/rendering/renderer.rs, display/src/rendering/animations.rs,
-display/src/rendering/battle_rendering.rs, display/src/core/response_builder.rs,
-display_data/src/command.rs, display_data/src/battle_view.rs.
+Key files: display/src/rendering/renderer.rs,
+display/src/rendering/animations.rs, display/src/rendering/battle_rendering.rs,
+display/src/core/response_builder.rs, display_data/src/command.rs,
+display_data/src/battle_view.rs.
 
 ## 6. Testing Cookbook
 
-Tests are the primary way new behavior is validated. The test API has conventions
-that aren't obvious from reading individual tests.
+Tests are the primary way new behavior is validated. The test API has
+conventions that aren't obvious from reading individual tests.
 
 Document should cover:
-- TestBattle builder: default state (99 energy, both players, user's turn),
-  how to configure players (TestPlayer builder), setting seed, configuring
+
+- TestBattle builder: default state (99 energy, both players, user's turn), how
+  to configure players (TestPlayer builder), setting seed, configuring
   dreamwell, enabling AI opponent.
 - TestSession: connect() initialization, perform_user_action() /
   perform_enemy_action(), how both user and enemy clients are updated.
-- TestClient query API: cards.user_hand(), cards.enemy_battlefield(), etc.
-  How to find specific cards, assert on card state.
+- TestClient query API: cards.user_hand(), cards.enemy_battlefield(), etc. How
+  to find specific cards, assert on card state.
 - Common test patterns: play a card and verify effect, test triggered abilities,
   test prompt interactions, verify both client views match.
 - TestStateProvider: global Tabula cache via OnceLock, should_panic_on_error
@@ -176,6 +185,7 @@ tests/battle_tests/ (examples).
 Building new UI from Rust that renders in Unity. Both sides of the bridge.
 
 Document should cover:
+
 - Rust side: Component trait (render() for composition, flex_node() for
   resolution), WrapperComponent for type erasure.
 - Available components: BoxComponent, TextComponent, ButtonComponent,
@@ -202,14 +212,15 @@ The style_validator causes frequent just review failures for contributors
 unfamiliar with the conventions.
 
 Document should cover:
+
 - Item ordering in files: PrivateConst → PrivateStatic → ThreadLocal →
   PublicTypeAlias → PublicConst → PublicTrait → PublicStructOrEnum →
-  PublicFunction → PrivateItems → TestModule. Private consts/statics come
-  BEFORE public items.
+  PublicFunction → PrivateItems → TestModule. Private consts/statics come BEFORE
+  public items.
 - Import conventions: use crate:: not super::, no use declarations inside
   function bodies, no pub use.
-- Naming conventions: function calls use exactly one qualifier, struct names
-  use zero qualifiers, enum values use one qualifier.
+- Naming conventions: function calls use exactly one qualifier, struct names use
+  zero qualifiers, enum values use one qualifier.
 - No inline mod tests — tests go in rules_engine/tests/.
 - No code in mod.rs or lib.rs except module declarations.
 - Cargo.toml: dependencies alphabetized in two groups (internal then external).
@@ -217,5 +228,5 @@ Document should cover:
 - Clippy configuration: workspace-level lints in Cargo.toml, the
   unnested_or_patterns exception for chumsky select! macro.
 
-Key files: style_validator/src/ (all), rules_engine/Cargo.toml (workspace
-lints section), justfile (fmt and review recipes).
+Key files: style_validator/src/ (all), rules_engine/Cargo.toml (workspace lints
+section), justfile (fmt and review recipes).
