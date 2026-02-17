@@ -38,49 +38,20 @@ failures across an entire TOML file and report them together.
 
 ## Individual Round-Trip Tests
 
-Many handwritten round-trip tests cover specific ability patterns across all
-ability types. These live in the `tests/round_trip_tests/` subdirectory,
-organized into files by ability category.
-
-- `event_effect_round_trip_tests.rs` covers one-shot effects such as dissolve,
-  banish, prevent, draw, discard, discover, reclaim, gain energy, gain points,
-  kindle, foresee, and their compound combinations.
-- `triggered_ability_round_trip_tests.rs` covers abilities that fire in response
-  to game events, including materialized, dissolved, and judgment phase
-  triggers.
-- `activated_ability_round_trip_tests.rs` covers abilities with explicit costs
-  (energy, abandon, discard, return-to-hand, banish) separated from effects by a
-  colon, including the fast keyword prefix and once-per-turn restrictions.
-- `static_ability_round_trip_tests.rs` covers passive rule-modifying abilities
-  such as cost reductions, spark bonuses, and reclaim granting.
-- `judgment_ability_round_trip_tests.rs` covers judgment-phase-specific trigger
-  patterns and end-of-turn effects.
-- `materialized_ability_round_trip_tests.rs` covers abilities that trigger when
-  a character enters or leaves the battlefield.
-
-Each test exercises a specific grammatical pattern the parser must recognize.
-The tests serve as living documentation of every supported ability syntax.
+Handwritten round-trip tests cover specific ability patterns across all ability
+types. They live in the `tests/round_trip_tests/` subdirectory, organized into
+files by ability category (event effects, triggered abilities, activated
+abilities, static abilities, judgment abilities, materialized abilities). Each
+test exercises a specific grammatical pattern and serves as living documentation
+of supported ability syntax.
 
 ## Bulk TOML Round-Trip Tests
 
-Four bulk tests iterate over every card in each of the four TOML data files,
-running the dual-path comparison on every ability in the game.
-
-- `cards_toml_round_trip_tests.rs` processes `cards.toml`, the production set.
-- `test_cards_toml_round_trip_tests.rs` processes `test-cards.toml`.
-- `dreamwell_toml_round_trip_tests.rs` processes `dreamwell.toml`.
-- `test_dreamwell_toml_round_trip_tests.rs` processes `test-dreamwell.toml`.
-
-All four follow the same collect-then-report pattern. The test reads the TOML
-file, iterates over every card, splits multi-ability rules text on double
-newline boundaries, and runs the rendered comparison for each ability block.
-Errors are accumulated into a vector rather than causing an immediate panic.
-After processing every card, `print_bulk_results` outputs a summary showing
-total abilities tested, successes, and failures. Each failure includes the card
-name, original rules text, variable bindings, and the specific Path A vs Path B
-mismatch. Only after all results are printed does the test panic if errors were
-collected. This design ensures a single test run reveals every broken card,
-which is essential when changes affect many abilities simultaneously.
+Four bulk tests iterate over every card in each TOML data file (cards.toml,
+test-cards.toml, dreamwell.toml, test-dreamwell.toml), running the dual-path
+comparison on every ability. All follow a collect-then-report pattern: errors
+are accumulated and reported together after processing all cards, so a single
+test run reveals every broken card rather than stopping at the first failure.
 
 ## Parse-Only Validation
 
@@ -117,96 +88,37 @@ such changes because it compares against a fixed historical baseline.
 
 ## Serializer Static Analyzer
 
-A custom static analysis tool in `serializer_static_analyzer_tests.rs` scans the
-serializer source files for code quality violations that would undermine the
-localization architecture. The analyzer checks four categories.
-
-- Banned legacy helpers: functions like `text_phrase`, `make_phrase`,
-  `with_article`, and `phrase_plural` that bypass the RLF system.
-- Period manipulation patterns: `trim_end_matches('.')`, indicating the effect
-  fragment convention has not been followed.
-- Hardcoded English string literals: patterns like `"allies".to_string()` that
-  embed English directly rather than delegating to RLF phrases.
-- English grammar logic: patterns like `starts_with(['a','e','i','o','u'])` that
-  implement language-specific code in serializers.
-
-The analyzer uses a ratcheting baseline stored in
-`fixtures/serializer_static_analyzer_baseline.toml`. Each violation category has
-a maximum allowed count (all currently zero), and the test fails if any category
-exceeds its baseline. Baselines can only decrease, never increase. The analyzer
-includes self-test logic verifying the detectors work on seeded code and that
-allowed patterns (comments, function definitions, `strings::` calls) are not
-falsely flagged.
+A custom static analysis tool scans the serializer source files for code quality
+violations that would undermine localization: banned legacy helpers, hardcoded
+English strings, English grammar logic, and period manipulation patterns. The
+analyzer uses a ratcheting baseline (all categories currently at zero allowed
+violations) that can only decrease, never increase.
 
 ## Locale Tests
 
-Two sets of locale tests verify that serializer output is fully compatible with
-the localization system.
-
-The bracket locale leak harness in `bracket_locale_leak_harness_tests.rs`
-registers a special `en-x-bracket` locale where every RLF phrase is wrapped in
-square brackets. It renders every ability through the parse-then-serialize
-pipeline and scans for text not inside brackets, which would indicate English
-that bypassed RLF. A ratcheting baseline in
-`fixtures/bracket_locale_leak_baseline.toml` tracks the total ability count and
-maximum allowed leaks (currently zero). A companion sub-test checks that no
-unresolved RLF markers (`{@` or `{$` syntax) appear in serialized output when
-running in the English locale. The test also writes a trend artifact to
-`target/parser_v2_artifacts/bracket_locale_leak_trend.toml`.
-
-The Russian locale tests in `russian_locale_tests.rs` verify translations end to
-end through four sub-tests. A ratcheting translation test compares serialized
-Russian output against expected translations in
-`fixtures/russian_locale_expected.toml`, ensuring pass count never decreases. A
-no-crash test renders all abilities through the Russian locale, catching missing
-phrase definitions. A phrase count test verifies Russian loads the same number
-of phrases as English. A translation validation gate checks for missing phrases,
-orphan phrases, and parameter count mismatches between locales.
+Two sets of locale tests verify localization compatibility. The bracket locale
+leak harness registers a special locale where every RLF phrase is wrapped in
+square brackets, then scans serialized output for text not inside brackets
+(indicating English that bypassed RLF). The Russian locale tests verify
+end-to-end translations, check for missing or orphan phrases, and ensure
+parameter count consistency between locales. Both use ratcheting baselines.
 
 ## Parser CLI
 
-The parser CLI is a standalone debugging tool at `parser_cli.rs` in the
-`parser_v2` crate. It provides direct access to each pipeline stage.
-
-The `parse` subcommand accepts ability text and optional variable bindings. The
-`--stage` flag selects the pipeline depth: `lex` shows raw tokens, useful for
-verifying directive tokenization; `resolve-variables` shows the typed
-ResolvedToken stream after variable resolution; `full` runs the complete parse
-and displays the Ability AST. Three output formats are available via `--format`:
-`json`, `ron` (default), and `debug`.
-
-The `parse-file` subcommand processes all cards in a TOML file and writes
-resolved tokens to JSON. The `parse-abilities` subcommand processes an entire
-directory of TOML files, producing `parsed_abilities.json`. The
-`verify-abilities` subcommand compares a generated JSON file against a fresh
-parse. The `verify` subcommand checks that all cards in a TOML file can be lexed
-and resolved, printing per-card results.
-
-Error reporting uses the ariadne crate for rich diagnostics with source spans,
-colored labels, and Levenshtein-based "did you mean?" suggestions.
+The parser CLI at `parser_cli.rs` provides direct access to each pipeline stage
+for debugging. The `parse` subcommand accepts ability text with a `--stage` flag
+to select pipeline depth (lex, resolve-variables, or full parse) and a
+`--format` flag for output format (json, ron, debug). Additional subcommands
+handle batch processing and verification of TOML files. Error reporting uses the
+ariadne crate for rich diagnostics with "did you mean?" suggestions.
 
 ## Infrastructure Details
 
-The test helpers address two practical challenges: parser construction cost and
-stack space requirements.
-
-Parser caching uses a `thread_local!` static holding a boxed Chumsky parser. The
-`ABILITY_PARSER_CACHE` is constructed once per thread and reused for all parse
-operations, avoiding the significant overhead of rebuilding the full combinator
-tree for each test case.
-
-Stack space management uses the `stacker` crate for on-demand growth. The
-`with_stack` wrapper calls `stacker::maybe_grow` with configured red zone and
-growth parameters. When remaining stack drops below the threshold, stacker
-allocates a new segment. The `RUST_MIN_STACK` environment variable is set to a
-large value for parser tests, complementing the dynamic growth. The deep parser
-hierarchy -- nested choice combinators, recursive card predicate parsing, and
-multiple effect composition layers -- demands this extra space, especially under
-parallel test execution.
-
-The test library lives at `rules_engine/tests/parser_v2_tests/` as a separate
-crate with dependencies on `ability_data`, `core_data`, `parser_v2`, `strings`,
-`chumsky`, `insta`, `rlf`, `stacker`, and `toml`. Fixture files live in
+Parser caching uses a thread_local static holding a boxed Chumsky parser,
+constructed once per thread and reused for all parse operations. Stack space
+management uses the stacker crate for on-demand growth, complemented by a large
+RUST_MIN_STACK environment variable. The test library lives at
+`rules_engine/tests/parser_v2_tests/` with fixture files in
 `tests/round_trip_tests/fixtures/`.
 
 ## Build Pipeline Integration

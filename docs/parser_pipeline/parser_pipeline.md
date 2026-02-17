@@ -107,30 +107,19 @@ token stream.
 Variable resolution (parser_v2/src/variables/) transforms Token streams into
 ResolvedToken streams, bridging lexing and parsing.
 
-**The four PHRASES tables** in parser_substitutions.rs:
+**The four PHRASES tables** in parser_substitutions.rs map directive names to
+(default_variable, ResolvedToken constructor) pairs: PHRASES for integer-valued
+concepts, BARE_PHRASES for no-variable directives, SUBTYPE_PHRASES for
+CardSubtype values, and FIGMENT_PHRASES for FigmentType values.
 
-| Table           | Purpose                 | Example entries                                 |
-| --------------- | ----------------------- | ----------------------------------------------- |
-| PHRASES         | Integer-valued concepts | energy/e, cards/c, spark/s, foresee/f, kindle/k |
-| BARE_PHRASES    | No-variable directives  | choose_one, energy_symbol, judgment_phase_name  |
-| SUBTYPE_PHRASES | CardSubtype values      | subtype/t, a_subtype/t, plural_subtype/t        |
-| FIGMENT_PHRASES | FigmentType values      | figment/g, figments/g                           |
+**The ResolvedToken enum** has one variant per semantic concept: a Token
+pass-through, integer-valued variants for game quantities, type-valued variants
+for subtypes and figments, and compound variants bundling a count with a type.
 
-Each PHRASES entry maps a phrase name to a (default_variable, ResolvedToken
-constructor) pair. The default variable convention allows multiple phrases to
-coexist on one card using different variable names.
-
-**The ResolvedToken enum** has one variant per semantic concept. Categories
-include a Token pass-through for non-directives, integer-valued variants for
-game quantities (Energy, CardCount, SparkAmount, ForeseeCount, KindleAmount,
-etc.), type-valued variants (Subtype, Figment), and compound variants that
-bundle a count with a type (FigmentCount, SubtypeCount).
-
-**Resolution priority:** Directives are resolved through a 12-step priority
-chain: dollar-prefix stripping, RLF transform stripping, pronoun handling, then
-lookups in PHRASES, BARE_PHRASES, SUBTYPE_PHRASES, FIGMENT_PHRASES, compound
-phrase handling, numbered variants (e1/e2), RLF function-call syntax, and
-finally a pass-through fallback.
+**Resolution priority:** Directives are resolved through a priority chain
+covering syntactic preprocessing (prefix/transform stripping), phrase table
+lookups, compound phrases, numbered variants (e1/e2), RLF function-call syntax,
+and a pass-through fallback.
 
 See [variable_resolution.md](variable_resolution.md) for the complete reference.
 
@@ -321,38 +310,30 @@ files.
 
 ## Detail Documents
 
-- [toml_format.md](toml_format.md): Complete TOML card definition field
-  reference, all directive syntax patterns with examples, variables field
-  conventions, and modal card format. Read when authoring or modifying card
-  data.
+- [toml_format.md](toml_format.md): TOML card definition format, directive
+  syntax patterns, variables field, and modal card conventions. Read when
+  authoring or modifying card data.
 
-- [variable_resolution.md](variable_resolution.md): All four PHRASES tables with
-  every entry, the full ResolvedToken enum, the 12-step resolution priority
-  chain, resolve_rlf_syntax internals, and VariableBindings parsing. Read when
-  adding new phrase types or debugging variable resolution.
+- [variable_resolution.md](variable_resolution.md): PHRASES tables, the
+  ResolvedToken enum, the resolution priority chain, and VariableBindings. Read
+  when adding new phrase types or debugging variable resolution.
 
-- [parser_structure.md](parser_structure.md): Chumsky parser architecture, all
-  five ability types with grammar descriptions, the five effect sub-parser
-  modules with their domains and variants, effect composition, trigger/cost/
-  condition parsers, and ordering rules. Read when adding parser grammar or
-  debugging parse failures.
+- [parser_structure.md](parser_structure.md): Chumsky parser architecture,
+  ability types, effect sub-parsers, effect composition, and ordering rules.
+  Read when adding parser grammar or debugging parse failures.
 
-- [predicates.md](predicates.md): The two-layer Predicate/CardPredicate
-  architecture, all enum variants with semantics, the recursive
-  card_predicate_parser, suffix system, trigger dual-parse pattern, and
-  targeting pitfalls. Read when working with card targeting.
+- [predicates.md](predicates.md): Two-layer Predicate/CardPredicate
+  architecture, suffix system, trigger dual-parse pattern, and targeting
+  pitfalls. Read when working with card targeting.
 
-- [serialization.md](serialization.md): Serializer module architecture, RLF
-  phrase system (terms, parameterized phrases, variants, transforms), color
-  conventions, plural agreement mechanics, and the round-trip property. Read
-  when modifying display text output or adding RLF phrases.
+- [serialization.md](serialization.md): Serializer architecture, RLF phrase
+  system, color conventions, and the round-trip property. Read when modifying
+  display text or adding RLF phrases.
 
-- [testing.md](testing.md): Round-trip test mechanism, individual and bulk
-  tests, golden output fixtures, serializer static analyzer, locale leak
-  detection, parser CLI debugging tool, and build pipeline integration. Read
-  when writing parser tests or debugging test failures.
+- [testing.md](testing.md): Round-trip tests, golden output, static analyzer,
+  locale leak detection, parser CLI, and build pipeline integration. Read when
+  writing parser tests or debugging test failures.
 
-- [tabula_generate.md](tabula_generate.md): The generate command and its three
-  artifacts, staleness check mechanics, build pipeline integration, runtime
-  loading via Tabula::load, watch mode, and file locations. Read when working
-  with the build pipeline or card data loading.
+- [tabula_generate.md](tabula_generate.md): Generate command, staleness check,
+  runtime loading, watch mode, and file locations. Read when working with the
+  build pipeline or card data loading.

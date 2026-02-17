@@ -127,31 +127,10 @@ then as a card subtype name (case-insensitive, matching CardSubtype), then as a
 figment type name (lowercase: celestial, radiant, halcyon, shadow). An
 unrecognized value produces a parse error.
 
-### Common Variable Name Conventions
-
-The following single-letter abbreviations are conventional across the card data.
-These are not enforced by the system but are followed consistently.
-
-| Variable | Meaning                       | Typical type   |
-| -------- | ----------------------------- | -------------- |
-| e        | Energy amount                 | Integer        |
-| c        | Card count (for draw/discard) | Integer        |
-| s        | Spark amount                  | Integer        |
-| f        | Foresee depth                 | Integer        |
-| p        | Point amount                  | Integer        |
-| d        | Discard count                 | Integer        |
-| k        | Kindle amount                 | Integer        |
-| n        | Generic count                 | Integer        |
-| r        | Reclaim cost                  | Integer        |
-| v        | Void/mill count               | Integer        |
-| m        | Maximum energy change         | Integer        |
-| a        | Ally count                    | Integer        |
-| t        | Subtype name                  | Subtype string |
-| g        | Figment type                  | Figment string |
-
-Modal cards use numbered suffixes to distinguish per-mode values: e1 and e2 for
-the energy costs of the first and second modes, and c1 and c2 for card counts
-within each mode. See the modal card conventions section for details.
+Variable names follow single-letter conventions matching the PHRASES table
+defaults (e for energy, c for cards, s for spark, etc.). Modal cards use
+numbered suffixes (e1, e2) to distinguish per-mode values. See the PHRASES
+tables in parser_substitutions.rs for the complete mapping.
 
 ## Multi-Paragraph Abilities
 

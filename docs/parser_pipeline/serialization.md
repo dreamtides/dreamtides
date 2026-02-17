@@ -34,115 +34,44 @@ RLF phrase definition.
 
 ## Entry Point
 
-The serialize_ability function in ability_serializer.rs is the top-level entry
-point. It accepts a reference to an Ability enum and dispatches on its five
-variants.
-
-For Event abilities, the function serializes the effect and wraps it in a
-capitalized sentence. The capitalized_sentence function applies the @cap
-transform to uppercase the first visible character, skipping any rich text tags.
-
-For Triggered abilities, the function composes a trigger phrase with an effect
-phrase. It checks for optional modifiers (once per turn, until end of turn) and
-selects among four assembly phrases depending on whether the trigger is a
-keyword trigger (like Materialized or Judgment) and whether a prefix modifier is
-present.
-
-For Activated abilities, the function joins one or more cost phrases with an
-effect phrase. Energy costs are separated from non-energy costs using different
-separators. The first non-energy cost is capitalized, and subsequent costs
-receive distinct formatting. Four assembly phrases cover the fast and
-once-per-turn flag combinations.
-
-For Named abilities, currently limited to Reclaim and its cost variants, the
-function produces keyword formatting with optional energy cost values. For
-Static abilities, it delegates to the static_ability_serializer and wraps the
-result in a capitalized sentence.
-
-Two additional public functions exist alongside serialize_ability. The
-serialize_ability_effect function serializes only the effect portion of an
-ability, omitting costs. The serialize_modal_choices function extracts each
-modal option from a list of abilities and serializes them individually,
-returning a map from choice index to serialized text.
+The serialize_ability function in ability_serializer.rs dispatches on the five
+Ability variants, composing the appropriate trigger, cost, and effect phrases
+for each. Each variant has its own assembly logic — triggered abilities compose
+trigger phrases with effects, activated abilities join cost phrases with
+effects, and event abilities simply capitalize the effect as a sentence. Two
+additional public functions handle partial serialization:
+serialize_ability_effect (effect only, omitting costs) and
+serialize_modal_choices (per-mode text for modal cards).
 
 ## Effect Serialization
 
-The effect_serializer module is the heart of the serializer. Its central
-function is serialize_effect_with_context, which handles the five Effect enum
-variants.
+The effect_serializer module handles the five Effect enum variants (plain,
+WithOptions, List, ListWithOptions, Modal). Each variant has its own composition
+logic for wrapping effects with costs, conditions, optional flags, and joining
+multiple effects.
 
-For a plain Effect containing a single StandardEffect, the function serializes
-the standard effect and wraps it with a trailing period via the
-effect_with_period phrase.
+The AbilityContext enum controls joining strategy: in Triggered context, effects
+are joined with ", then" (e.g., "draw a card, then dissolve an enemy"); in Event
+context, each effect becomes a separate capitalized sentence (e.g., "Draw a
+card. Dissolve an enemy.").
 
-For a WithOptions effect, the function applies layered wrappers in order. It
-serializes the inner standard effect, optionally wraps it with a cost connector
-(like "pay 2 energy to draw a card"), optionally prepends "you may," adds a
-trailing period, and finally prepends any condition clause.
-
-For a List of effects, joining behavior depends on multiple factors. If all
-effects are optional with trigger costs, they are joined with "and" and wrapped
-in an optional cost body. If the context is Triggered, mandatory effects are
-joined with ", then" for natural triggered ability phrasing. In Event context,
-effects become separate capitalized sentences joined with period-space
-separators.
-
-For a ListWithOptions effect, each individual effect may carry its own
-condition, cost, or optional flag. Per-effect wrappers are applied first, then
-effects are joined with "and" (shared trigger cost) or ", then" (no shared
-cost). Any shared trigger cost, optional flag, or condition wraps the joined
-result as an outer layer.
-
-For a Modal effect, the function produces a "Choose One:" header followed by
-bulleted lines, each with an energy cost and serialized effect text.
-
-The AbilityContext enum controls the joining strategy with two variants:
-Triggered and Event. In Triggered context, multiple mandatory effects use ",
-then" as a joiner, producing text like "draw a card, then dissolve an enemy." In
-Event context (the default), each effect becomes its own capitalized sentence,
-producing text like "Draw a card. Dissolve an enemy."
-
-The serialize_standard_effect function handles all StandardEffect variants
-through a large match expression. Each arm extracts relevant data, delegates
-sub-components to sibling serializers (predicates to predicate_serializer, costs
-to cost_serializer, triggers to trigger_serializer), and calls the corresponding
-RLF phrase function.
+The serialize_standard_effect function matches on all StandardEffect variants,
+delegating sub-components to sibling serializers and calling the corresponding
+RLF phrase functions.
 
 ## RLF Phrase System
 
-The RLF phrase system is the foundation of all display text. All definitions
-live in a single file wrapped in the rlf! procedural macro. The macro generates
-one public Rust function per definition, each returning an rlf::Phrase value.
+All display text definitions live in a single file wrapped in the rlf!
+procedural macro, which generates one public Rust function per definition. RLF
+has two definition types: terms (fixed phrases like the dissolve keyword) and
+parameterized phrases (like draw_cards_effect, which takes a card count).
 
-RLF has two definition types. A term has no parameters and produces a fixed
-phrase, such as the dissolve keyword or the card noun. A parameterized phrase
-accepts arguments, such as draw_cards_effect (which takes a card count) or
-dissolve_target (which takes a predicate phrase). Parameterized functions accept
-"impl Into Value," so callers can pass integers, strings, or other Phrase
-objects.
-
-The Phrase type carries a default display text string, a map of variant keys to
-alternative forms (for plural agreement), and a list of tags (grammatical
-metadata like :a or :an). The key methods are:
-
-- Phrase::empty returns an empty phrase used as an identity element for
-  conditional composition. The build_trigger_prefix function starts with
-  Phrase::empty and conditionally replaces it with modifier phrases.
-- Phrase::join concatenates multiple phrases with a separator, preserving
-  variant keys that appear in all inputs. The effect serializer uses this to
-  join effect phrases with ", then" or " and " separators.
-- Phrase::map_text transforms the default text while preserving tags and
-  variants, used for appending or prepending text such as modifier prefixes.
-- capitalized_sentence applies @cap to capitalize the first visible character,
-  skipping leading rich text tags.
-
-Serialization typically involves multiple layers of phrase composition.
-Producing "dissolve an enemy" involves the predicate serializer creating an
-enemy phrase with variants and an :an tag, wrapping it with an indefinite
-article for the singular form, combining it with the dissolve keyword through
-dissolve_target (which uses :from to propagate variants), adding a trailing
-period, and finally capitalizing the sentence. Each layer delegates to the next
-without directly manipulating markup.
+Phrases compose through nesting, joining, and variant propagation. Key Phrase
+methods include join (concatenating with separators), map_text (transforming
+text while preserving metadata), and the @cap transform (capitalizing the first
+visible character, skipping rich text tags). The :from modifier propagates
+variant information through composition layers, ensuring plural agreement works
+across nested phrases.
 
 ## Color Conventions
 

@@ -26,95 +26,43 @@ ownership, keeping both parsers small and composable.
 
 ## The Predicate Enum
 
-The Predicate enum is defined in ability_data/src/predicate.rs.
+The Predicate enum is defined in ability_data/src/predicate.rs. Variants divide
+into two groups.
 
-- **This** matches the card that owns the ability. Parsed from "this character",
-  "this event", or "this card." It carries no inner CardPredicate because the
-  target is always the specific card bearing the ability text.
-- **It** is a back-reference to a card targeted by a prior effect in the same
-  ability. Parsed from the word "it" and used in chains like "banish a
-  character, then materialize it." The referenced card is resolved at runtime.
-- **Them** is the plural counterpart of It. Parsed from "them" for patterns like
-  "banish any number of cards, then materialize them."
-- **That** refers to the card that triggered a triggered ability. Parsed from
-  "that character", "that event", or "that card" in effect clauses following a
-  trigger, such as "when you materialize a spirit animal, that character gains
-  +1 spark."
-- **Enemy** wraps a CardPredicate and matches cards controlled by the opponent.
-  Parsed from "enemy" followed by an optional CardPredicate; bare "enemy"
-  defaults to Character. The pattern "non-Warrior enemy" is handled by a
-  dedicated parser producing Enemy(NotCharacterType(subtype)).
-- **Another** wraps a CardPredicate and matches cards controlled by the ability
-  owner, excluding the owning card itself. Parsed from "another" plus a required
-  CardPredicate, or from "ally"/"allies" plus an optional CardPredicate
-  (defaulting to Character), or from "allied" plus a required CardPredicate. The
-  exclusion of self is the key distinction from Your.
-- **Your** wraps a CardPredicate and matches any card controlled by the ability
-  owner, including the owning card. The main predicate parser never produces
-  Your directly. It is only created by the trigger parser's dual-parse pattern
-  (described below), reflecting the convention that trigger contexts default to
-  "your own card."
-- **Any** wraps a CardPredicate and matches any card regardless of controller.
-  It is the default ownership scope: bare "character" becomes Any(Character),
-  bare "event" becomes Any(Event). The phrase "enemy or ally" also maps to
-  Any(Character).
-- **AnyOther** wraps a CardPredicate and matches any card from either player
-  except the owning card. Used in counting contexts like "for each other
-  character" where the source card should not count itself.
-- **YourVoid** wraps a CardPredicate and matches cards in the owner's void
-  (discard pile). Parsed from a CardPredicate followed by "in your void."
-- **EnemyVoid** wraps a CardPredicate and matches cards in the opponent's void.
-  Parsed from a CardPredicate followed by "in the opponent's void."
+**Reference variants** (This, It, Them, That) carry no inner CardPredicate. They
+refer to a specific card identified by context: the ability's owner (This), a
+prior target (It/Them), or the triggering card (That).
+
+**Ownership-scoped variants** wrap a CardPredicate and answer "whose card?":
+Enemy (opponent's), Another (yours excluding self), Your (yours including self),
+Any (either player, the default), AnyOther (either player excluding self),
+YourVoid (your discard pile), and EnemyVoid (opponent's discard pile).
 
 The distinction between Another and Your is one of the most important semantic
 boundaries. Another always excludes the owning card, making it appropriate for
 "ally" effects. Your includes the owning card and is reserved for trigger
-contexts where the triggering card might be the ability's owner. The distinction
-between Any and AnyOther follows the same self-exclusion pattern but across both
-players' cards.
+contexts where the triggering card might be the ability's owner. The main
+predicate parser never produces Your directly — it only comes from the trigger
+parser's dual-parse pattern.
 
 ## The CardPredicate Enum
 
 CardPredicate variants fall into three complexity tiers.
 
-**Simple type predicates** are leaf nodes. Card matches any card type. Character
-matches character-type cards and is the most common variant, serving as the
-default when no explicit type is specified. Event matches event-type cards.
-CharacterType takes a CardSubtype and matches characters of that subtype.
-NotCharacterType matches characters not of a given subtype and only appears in
-the "non-Subtype enemy" pattern. CharacterWithMaterializedAbility matches
-characters with a "materialized" keyword ability.
-CharacterWithMultiActivatedAbility matches characters with an activated ability.
-Both keyword-ability variants require an explicit base type in the parser (they
-do not use the or_not() optional-base pattern).
+**Simple type predicates** are leaf nodes: Card, Character (the default when no
+type is specified), Event, CharacterType (a specific subtype), NotCharacterType
+(negation, only for "non-Subtype enemy"), and keyword-ability variants.
 
-**Numeric constraint predicates** carry a boxed target CardPredicate (the base
-type being filtered) plus an Operator and a comparison value or reference.
-CharacterWithSpark compares spark against a fixed value. CardWithCost compares
-cost against a fixed energy value and is the most common numeric predicate.
-CharacterWithCostComparedToControlled compares cost against the count of allied
-characters of a specific subtype. CharacterWithCostComparedToAbandoned compares
-cost against an abandoned ally's cost. CharacterWithSparkComparedToAbandoned
-compares spark against an abandoned ally's spark.
-CharacterWithSparkComparedToAbandonedCountThisTurn compares spark against the
-number of allies abandoned this turn. CharacterWithSparkComparedToEnergySpent
-compares spark against the energy paid. CharacterWithCostComparedToVoidCount
-compares cost against the number of cards in the owner's void.
+**Numeric constraint predicates** carry a boxed base CardPredicate plus an
+Operator and a comparison value. These cover cost and spark comparisons against
+fixed values and dynamic game-state quantities (count of controlled subtypes,
+abandoned ally's stats, energy spent, cards in void). The Operator enum covers
+relative (LowerBy, HigherBy) and absolute (OrLess, Exactly, OrMore) comparisons.
 
-**Wrapper predicates** create nesting. Fast wraps another CardPredicate and
-requires the fast keyword; it is the source of the parser's only recursion.
-CouldDissolve wraps a full Predicate (not a CardPredicate) and matches events
-that could dissolve the specified target. It is the only CardPredicate variant
-that wraps a Predicate, necessary because the dissolution target has its own
-ownership scope.
-
-The Operator enum covers: LowerBy (relative decrease), OrLess (absolute upper
-bound), Exactly (exact match), OrMore (absolute lower bound), and HigherBy
-(relative increase). Two families of operator parsers exist: absolute operators
-("or less", "or more", "higher", "lower") for fixed-value suffixes, and
-comparison operators ("less than", "greater than", "equal to") for "compared to"
-suffixes. Notably, "less than" maps to OrLess and "greater than" maps to OrMore,
-so the runtime uses inclusive comparison despite the English wording.
+**Wrapper predicates** create nesting. Fast wraps another CardPredicate and is
+the source of the parser's only recursion. CouldDissolve wraps a full Predicate
+(not a CardPredicate) because the dissolution target has its own ownership
+scope.
 
 ## The card_predicate_parser
 
@@ -142,33 +90,12 @@ first.
 ## Predicate Suffix System
 
 The predicate_suffix_parser module provides suffix functions in three
-categories.
-
-**Absolute numeric constraints** compare cost or spark against a fixed value.
-The with_cost_suffix parses "with cost" followed by an energy value and an
-optional operator ("or less", "or more", "higher", "lower", or nothing for
-exactly). For "higher" and "lower", the energy value is embedded in the HigherBy
-or LowerBy variant. The with_spark_suffix parses "with spark" followed by a
-spark value and a required operator ("or less" or "or more").
-
-**Comparative constraints** compare cost or spark against a dynamic game-state
-quantity. The with_cost_compared_to_controlled_suffix parses "with cost
-less/greater/equal to the number of allied Subtype" and returns an operator plus
-a CharacterType predicate representing what to count. The
-with_cost_compared_to_void_count_suffix compares cost against the number of
-cards in your void. The with_spark_compared_to_abandoned_suffix compares spark
-against "that ally's spark." The with_spark_compared_to_energy_spent_suffix
-compares spark against "the amount of energy paid."
-
-**Keyword ability constraints** check for specific abilities. The
-with_materialized_ability_suffix parses "with a materialized ability" (handling
-optional quote marks around the directive). The with_activated_ability_suffix
-parses "with an activated ability."
-
-The which_could_dissolve_suffix stands apart: it parses "event which could
-dissolve an ally" and returns a fixed Predicate value of Another(Character). It
-is the only suffix that produces a full Predicate and the only one not paired
-with a base predicate in the choice list.
+categories: absolute numeric constraints (comparing cost or spark against a
+fixed value), comparative constraints (comparing against dynamic game-state
+quantities like allied subtype count or void count), and keyword ability
+constraints (checking for materialized or activated abilities). The
+which_could_dissolve_suffix stands apart as the only suffix that produces a full
+Predicate rather than a CardPredicate.
 
 ## The Trigger Parser's Dual-Parse Pattern
 
