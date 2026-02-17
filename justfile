@@ -15,9 +15,9 @@ review:
         python3 scripts/review/review_runner.py
     fi
 
-review-direct: check-snapshots check-format check-docs-format build clippy style-validator rlf-lint review-core-test parser-test tv-check tv-clippy tv-test
+review-direct: check-snapshots check-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test parser-test tv-check tv-clippy tv-test
 
-review-verbose: check-snapshots check-format-verbose check-docs-format-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose review-core-test-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
+review-verbose: check-snapshots check-format-verbose check-docs-format-verbose check-token-limits-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose review-core-test-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
 
 review-scope-plan:
     python3 scripts/review/review_scope.py plan
@@ -536,6 +536,19 @@ check-docs-format:
 
 check-docs-format-verbose:
     uvx --with mdformat-gfm mdformat --wrap 80 --number --check docs/
+
+check-token-limits:
+    #!/usr/bin/env bash
+    output=$(python3 scripts/llms/check_token_limits.py 2>&1)
+    if [ $? -eq 0 ]; then
+        echo "Token limits OK"
+    else
+        echo "$output"
+        exit 1
+    fi
+
+check-token-limits-verbose:
+    python3 scripts/llms/check_token_limits.py
 
 fmt-verbose:
     cd rules_engine && cargo +nightly fmt

@@ -134,6 +134,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
             "check-snapshots",
             "check-format",
             "check-docs-format",
+            "check-token-limits",
             "review-scope-validate",
             "build",
             "clippy",
@@ -175,6 +176,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
                 "check-snapshots",
                 "check-format",
                 "check-docs-format",
+                "check-token-limits",
                 "review-scope-validate",
                 "build",
                 "clippy",
@@ -494,6 +496,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.assertIn("check-snapshots", decision.selected_steps)
         self.assertIn("check-format", decision.selected_steps)
         self.assertIn("check-docs-format", decision.selected_steps)
+        self.assertIn("check-token-limits", decision.selected_steps)
         self.assertIn("review-scope-validate", decision.selected_steps)
         self.assertIn("style-validator", decision.selected_steps)
         self.assertNotIn("build", decision.selected_steps)

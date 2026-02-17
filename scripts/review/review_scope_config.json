@@ -44,6 +44,7 @@
     "check-snapshots",
     "check-format",
     "check-docs-format",
+    "check-token-limits",
     "review-scope-validate",
     "build",
     "clippy",
