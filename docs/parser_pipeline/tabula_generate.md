@@ -180,9 +180,9 @@ allows graceful shutdown. The watcher can be started via `just watch-tabula`.
 
 The TOML source files live in `client/Assets/StreamingAssets/Tabula/`. This
 directory is shared with the Unity client and contains all card definition
-files: cards.toml (the main production card set, approximately 78KB),
-test-cards.toml, dreamwell.toml, test-dreamwell.toml, card-lists.toml,
-card-fx.toml, and several smaller type-definition files.
+files: cards.toml (the main production card set), test-cards.toml,
+dreamwell.toml, test-dreamwell.toml, card-lists.toml, card-fx.toml, and several
+smaller type-definition files.
 
 A symlink at `rules_engine/tabula/` points to
 `../client/Assets/StreamingAssets/Tabula`, giving the Rust code convenient

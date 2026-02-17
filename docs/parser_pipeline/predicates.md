@@ -26,7 +26,7 @@ ownership, keeping both parsers small and composable.
 
 ## The Predicate Enum
 
-The Predicate enum has eleven variants defined in ability_data/src/predicate.rs.
+The Predicate enum is defined in ability_data/src/predicate.rs.
 
 - **This** matches the card that owns the ability. Parsed from "this character",
   "this event", or "this card." It carries no inner CardPredicate because the
@@ -75,7 +75,7 @@ players' cards.
 
 ## The CardPredicate Enum
 
-CardPredicate has sixteen variants in three complexity tiers.
+CardPredicate variants fall into three complexity tiers.
 
 **Simple type predicates** are leaf nodes. Card matches any card type. Character
 matches character-type cards and is the most common variant, serving as the
@@ -108,14 +108,13 @@ that could dissolve the specified target. It is the only CardPredicate variant
 that wraps a Predicate, necessary because the dissolution target has its own
 ownership scope.
 
-The Operator enum has five variants: LowerBy (relative decrease), OrLess
-(absolute upper bound), Exactly (exact match), OrMore (absolute lower bound),
-and HigherBy (relative increase). Two families of operator parsers exist:
-absolute operators ("or less", "or more", "higher", "lower") for fixed-value
-suffixes, and comparison operators ("less than", "greater than", "equal to") for
-"compared to" suffixes. Notably, "less than" maps to OrLess and "greater than"
-maps to OrMore, so the runtime uses inclusive comparison despite the English
-wording.
+The Operator enum covers: LowerBy (relative decrease), OrLess (absolute upper
+bound), Exactly (exact match), OrMore (absolute lower bound), and HigherBy
+(relative increase). Two families of operator parsers exist: absolute operators
+("or less", "or more", "higher", "lower") for fixed-value suffixes, and
+comparison operators ("less than", "greater than", "equal to") for "compared to"
+suffixes. Notably, "less than" maps to OrLess and "greater than" maps to OrMore,
+so the runtime uses inclusive comparison despite the English wording.
 
 ## The card_predicate_parser
 
@@ -142,7 +141,7 @@ first.
 
 ## Predicate Suffix System
 
-The predicate_suffix_parser module provides nine suffix functions in three
+The predicate_suffix_parser module provides suffix functions in three
 categories.
 
 **Absolute numeric constraints** compare cost or spark against a fixed value.

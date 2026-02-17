@@ -70,12 +70,12 @@ default variable "g". Both resolve to ResolvedToken::Figment(FigmentType).
 
 ## The ResolvedToken Enum
 
-ResolvedToken has approximately 22 variants in four categories.
+ResolvedToken variants fall into four categories.
 
 **Pass-through.** Token wraps an original lexer Token unchanged, covering words,
 punctuation, bare directives, and unrecognized directives.
 
-**Integer-valued.** Eighteen variants each wrap a u32:
+**Integer-valued.** Many variants each wrap a u32:
 
 - Energy, Mode1Energy, Mode2Energy -- energy costs; modal variants for
   choose-one cards with separate costs bound to e1 and e2
@@ -222,7 +222,7 @@ a note line ("Available variables include: e, s, c").
 
 A parallel suggest_directive function operates on phrase names for unrecognized
 directives that cause parse errors. A third function, suggest_word, covers plain
-English parser vocabulary from a static list of approximately 75 known words.
+English parser vocabulary from a static list of known words.
 
 The phrase_names and variable_names iterators aggregate names from all four
 tables, the two compound phrase names, and hardcoded variable names (g, n, t, a,

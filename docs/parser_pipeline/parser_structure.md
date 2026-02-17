@@ -47,12 +47,12 @@ flags.
 only two patterns: reclaim_for_cost (a reclaim directive, "--", then a cost) and
 plain reclaim (a ReclaimCost resolved token).
 
-**Static abilities** are tried fourth. The parser recognizes approximately 17
-patterns covering continuous rule modifications in three structural forms: a
-condition prefix then a standard static ability, a standard static ability then
-"if" with a condition suffix, or a standalone standard static ability. Patterns
-include play-only-from-void, cards-in-void-have-reclaim, additional-cost-to-
-play, once-per-turn-play-from-void, alternate cost patterns, characters-in-
+**Static abilities** are tried fourth. The parser recognizes many patterns
+covering continuous rule modifications in three structural forms: a condition
+prefix then a standard static ability, a standard static ability then "if" with
+a condition suffix, or a standalone standard static ability. Patterns include
+play-only-from-void, cards-in-void-have-reclaim, additional-cost-to- play,
+once-per-turn-play-from-void, alternate cost patterns, characters-in-
 hand-have-fast, disable-enemy-materialized-abilities, has-all-character-types,
 allied-spark-bonus, spark-equal-to-predicate-count, cost modifications,
 reveal-top-card-of-deck, play-from-top-of-deck, and judgment-triggers-when-
@@ -108,13 +108,13 @@ banish from your void, banish from opponent's void, pay energy, and discard.
 Each module lives under parser/effect/ and exports a parser() function returning
 a choice() over its recognized patterns. All return StandardEffect variants.
 
-| Module                  | Domain                                                                            | Parser Fns | Key ResolvedTokens Used                                                            |
-| ----------------------- | --------------------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------- |
-| card_effect_parsers     | Drawing, discarding, energy/point gain, void manipulation, reclaim                | 18         | CardCount, DiscardCount, Energy, PointCount, ReclaimCost, UpToNEvents, Subtype     |
-| spark_effect_parsers    | Spark: kindle, spark gain, spark-for-each, spark-becomes                          | 6          | KindleAmount, SparkAmount                                                          |
-| control_effects_parsers | Ownership transfer, deck manipulation, ability disabling                          | 3          | None (words and predicates only)                                                   |
-| resource_effect_parsers | Multiplier effects, point loss, opponent point gain                               | 5          | Number, PointCount                                                                 |
-| game_effects_parsers    | Foresee, discover, dissolve, banish, materialize, counterspell, copy, extra turns | 28         | ForeseeCount, CardCount, Number, Figment, FigmentCount, UpToNAllies, ThisTurnTimes |
+| Module                  | Domain                                                                            | Key ResolvedTokens Used                                                            |
+| ----------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| card_effect_parsers     | Drawing, discarding, energy/point gain, void manipulation, reclaim                | CardCount, DiscardCount, Energy, PointCount, ReclaimCost, UpToNEvents, Subtype     |
+| spark_effect_parsers    | Spark: kindle, spark gain, spark-for-each, spark-becomes                          | KindleAmount, SparkAmount                                                          |
+| control_effects_parsers | Ownership transfer, deck manipulation, ability disabling                          | None (words and predicates only)                                                   |
+| resource_effect_parsers | Multiplier effects, point loss, opponent point gain                               | Number, PointCount                                                                 |
+| game_effects_parsers    | Foresee, discover, dissolve, banish, materialize, counterspell, copy, extra turns | ForeseeCount, CardCount, Number, Figment, FigmentCount, UpToNAllies, ThisTurnTimes |
 
 **card_effect_parsers.** Handles card movement and resource acquisition: "draw"
 plus CardCount for drawing, "draw" plus card predicate and "from your deck" for
@@ -133,11 +133,11 @@ allied" as prefix. Each-gains-for-each uses "each CARD_PREDICATE gains spark
 equal to the number of CARD_PREDICATE". Spark-becomes matches "the spark of each
 allied CARD_PREDICATE becomes N".
 
-**control_effects_parsers.** The smallest module (35 lines), using no typed
-ResolvedToken variants. Gain-control: "gain control of" plus predicate.
-Put-on-top: "put" plus predicate plus "on top of the opponent's deck".
-Disable-activated-abilities: "disable the activated abilities of" plus predicate
-plus "while this character is in play".
+**control_effects_parsers.** The smallest module, using no typed ResolvedToken
+variants. Gain-control: "gain control of" plus predicate. Put-on-top: "put" plus
+predicate plus "on top of the opponent's deck". Disable-activated-abilities:
+"disable the activated abilities of" plus predicate plus "while this character
+is in play".
 
 **resource_effect_parsers.** Two multiplier parsers start with a Number token
 and produce CreateStaticAbilityUntilEndOfTurn wrapping temporary rule
@@ -145,17 +145,16 @@ modifications. Multiply-your-energy produces an immediate effect instead. Lose-
 points matches "you lose" plus PointCount. Enemy-gains-points matches "the
 opponent gains" plus PointCount.
 
-**game_effects_parsers.** The largest module (~28 functions). Foresee is a
-single ForeseeCount token. Discover uses the discover directive plus card
-predicate, with optional "and materialize it" continuation. Counterspell has
-three variants (prevent played, prevent that card, prevent-unless-pays-cost).
-Dissolve has three variants by specificity (all-with-predicate, all-characters,
-single). Banish has ten parsers covering combinations of from-void, up-to-N,
-any-number, then-materialize, until-leaves-play, until-next-main, and simple
-banish. Materialize has seven: at-end-of-turn, random-from-deck, collection,
-copy-of, figments-quantity, figments, and simple. Also includes copy-next-
-played, copy-it, shuffle-and-draw, trigger-judgment, extra turn, and
-you-win-the-game.
+**game_effects_parsers.** The largest module. Foresee is a single ForeseeCount
+token. Discover uses the discover directive plus card predicate, with optional
+"and materialize it" continuation. Counterspell has three variants (prevent
+played, prevent that card, prevent-unless-pays-cost). Dissolve has three
+variants by specificity (all-with-predicate, all-characters, single). Banish has
+ten parsers covering combinations of from-void, up-to-N, any-number,
+then-materialize, until-leaves-play, until-next-main, and simple banish.
+Materialize has seven: at-end-of-turn, random-from-deck, collection, copy-of,
+figments-quantity, figments, and simple. Also includes copy-next- played,
+copy-it, shuffle-and-draw, trigger-judgment, extra turn, and you-win-the-game.
 
 ## 5. Ordering Sensitivity
 

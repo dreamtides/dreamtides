@@ -102,18 +102,17 @@ then" as a joiner, producing text like "draw a card, then dissolve an enemy." In
 Event context (the default), each effect becomes its own capitalized sentence,
 producing text like "Draw a card. Dissolve an enemy."
 
-The serialize_standard_effect function handles the approximately 60
-StandardEffect variants through a large match expression. Each arm extracts
-relevant data, delegates sub-components to sibling serializers (predicates to
-predicate_serializer, costs to cost_serializer, triggers to trigger_serializer),
-and calls the corresponding RLF phrase function.
+The serialize_standard_effect function handles all StandardEffect variants
+through a large match expression. Each arm extracts relevant data, delegates
+sub-components to sibling serializers (predicates to predicate_serializer, costs
+to cost_serializer, triggers to trigger_serializer), and calls the corresponding
+RLF phrase function.
 
 ## RLF Phrase System
 
-The RLF phrase system is the foundation of all display text. Approximately 1400
-lines of definitions live in a single file wrapped in the rlf! procedural macro.
-The macro generates one public Rust function per definition, each returning an
-rlf::Phrase value.
+The RLF phrase system is the foundation of all display text. All definitions
+live in a single file wrapped in the rlf! procedural macro. The macro generates
+one public Rust function per definition, each returning an rlf::Phrase value.
 
 RLF has two definition types. A term has no parameters and produces a fixed
 phrase, such as the dissolve keyword or the card noun. A parameterized phrase
@@ -171,8 +170,8 @@ tags.
 The RLF variant system handles plural agreement throughout serializer output.
 Nouns carry "one" and "other" variants for singular and plural forms. The card
 term carries "card" and "cards," the character term carries "character" and
-"characters," and each of the 24 character subtypes carries its own forms, with
-irregular plurals handled individually (Child/Children, Visionary/Visionaries).
+"characters," and each character subtype carries its own forms, with irregular
+plurals handled individually (Child/Children, Visionary/Visionaries).
 
 Variant selection uses three mechanisms. The :match directive selects a branch
 based on a numeric parameter: the cards phrase uses :match to produce "a card"
@@ -221,7 +220,7 @@ active locale causes it to produce output in a different language without
 changes to the serialization logic. The same AST walk occurs regardless of
 locale; only the phrase definitions change.
 
-Over 224 individual round-trip tests plus bulk tests covering every card verify
+Extensive individual round-trip tests plus bulk tests covering every card verify
 this property. A golden rendered output test captures a baseline of all
 serialized abilities and detects unintended changes. A bracket locale leak test
 wraps every phrase in square brackets to detect English text that bypasses the

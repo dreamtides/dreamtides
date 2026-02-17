@@ -38,7 +38,7 @@ failures across an entire TOML file and report them together.
 
 ## Individual Round-Trip Tests
 
-Over 224 handwritten round-trip tests cover specific ability patterns across all
+Many handwritten round-trip tests cover specific ability patterns across all
 ability types. These live in the `tests/round_trip_tests/` subdirectory,
 organized into files by ability category.
 
@@ -118,8 +118,8 @@ such changes because it compares against a fixed historical baseline.
 ## Serializer Static Analyzer
 
 A custom static analysis tool in `serializer_static_analyzer_tests.rs` scans the
-eight serializer source files for code quality violations that would undermine
-the localization architecture. The analyzer checks four categories.
+serializer source files for code quality violations that would undermine the
+localization architecture. The analyzer checks four categories.
 
 - Banned legacy helpers: functions like `text_phrase`, `make_phrase`,
   `with_article`, and `phrase_plural` that bypass the RLF system.
@@ -196,13 +196,13 @@ operations, avoiding the significant overhead of rebuilding the full combinator
 tree for each test case.
 
 Stack space management uses the `stacker` crate for on-demand growth. The
-`with_stack` wrapper calls `stacker::maybe_grow` with a 1 MB red zone and 4 MB
-growth increment. When remaining stack drops below the threshold, stacker
-allocates a new segment. The `RUST_MIN_STACK` environment variable is set to
-8388608 (8 MB) for parser tests, complementing the dynamic growth. The deep
-parser hierarchy -- nested choice combinators, recursive card predicate parsing,
-and multiple effect composition layers -- demands this extra space, especially
-under parallel test execution.
+`with_stack` wrapper calls `stacker::maybe_grow` with configured red zone and
+growth parameters. When remaining stack drops below the threshold, stacker
+allocates a new segment. The `RUST_MIN_STACK` environment variable is set to a
+large value for parser tests, complementing the dynamic growth. The deep parser
+hierarchy -- nested choice combinators, recursive card predicate parsing, and
+multiple effect composition layers -- demands this extra space, especially under
+parallel test execution.
 
 The test library lives at `rules_engine/tests/parser_v2_tests/` as a separate
 crate with dependencies on `ability_data`, `core_data`, `parser_v2`, `strings`,

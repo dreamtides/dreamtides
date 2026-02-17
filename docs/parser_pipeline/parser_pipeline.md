@@ -120,11 +120,11 @@ Each PHRASES entry maps a phrase name to a (default_variable, ResolvedToken
 constructor) pair. The default variable convention allows multiple phrases to
 coexist on one card using different variable names.
 
-**The ResolvedToken enum** has approximately 24 variants. Each represents a
-distinct semantic concept: Token (pass-through for non-directives), 18 integer-
-valued variants (Energy, Mode1Energy, Mode2Energy, CardCount, SparkAmount,
-ForeseeCount, KindleAmount, etc.), two type-valued variants (Subtype, Figment),
-and two compound variants (FigmentCount, SubtypeCount).
+**The ResolvedToken enum** has one variant per semantic concept. Categories
+include a Token pass-through for non-directives, integer-valued variants for
+game quantities (Energy, CardCount, SparkAmount, ForeseeCount, KindleAmount,
+etc.), type-valued variants (Subtype, Figment), and compound variants that
+bundle a count with a type (FigmentCount, SubtypeCount).
 
 **Resolution priority:** Directives are resolved through a 12-step priority
 chain: dollar-prefix stripping, RLF transform stripping, pronoun handling, then
@@ -148,8 +148,8 @@ produces Ability AST nodes.
    a colon, then an effect. Costs include energy, abandon, discard, return,
    banish.
 3. **Named** — currently only Reclaim and ReclaimForCost.
-4. **Static** — 17+ rule-modification patterns (cost modifications, spark
-   bonuses, reclaim granting, play-from-void rules, etc.).
+4. **Static** — rule-modification patterns (cost modifications, spark bonuses,
+   reclaim granting, play-from-void rules, etc.).
 5. **Event** — the fallback. Any text not matching the above is parsed as an
    event effect.
 
@@ -159,22 +159,21 @@ singles with modal, optional, conditional, or cost-gated structure.
 
 **The five effect sub-parser modules:**
 
-| Module                  | Domain                                                          | Variants |
-| ----------------------- | --------------------------------------------------------------- | -------- |
-| card_effect_parsers     | Card movement, draw, discard, energy, points                    | ~18      |
-| spark_effect_parsers    | Kindle, spark gain, spark manipulation                          | ~6       |
-| control_effects_parsers | Gain control, deck manipulation, disable abilities              | ~3       |
-| resource_effect_parsers | Resource multipliers, point manipulation                        | ~5       |
-| game_effects_parsers    | Foresee, discover, dissolve, banish, materialize, prevent, copy | ~20      |
+| Module                  | Domain                                                          |
+| ----------------------- | --------------------------------------------------------------- |
+| card_effect_parsers     | Card movement, draw, discard, energy, points                    |
+| spark_effect_parsers    | Kindle, spark gain, spark manipulation                          |
+| control_effects_parsers | Gain control, deck manipulation, disable abilities              |
+| resource_effect_parsers | Resource multipliers, point manipulation                        |
+| game_effects_parsers    | Foresee, discover, dissolve, banish, materialize, prevent, copy |
 
 **Ordering is critical.** Chumsky's choice() commits to the first matching
 alternative. More specific patterns must precede less specific ones within each
 sub-parser.
 
-**Predicate/targeting** uses a two-layer architecture: Predicate (11 variants
-covering ownership scope — This, Enemy, Another, Your, Any, etc.) wrapping
-CardPredicate (14+ variants covering type constraints — Character, Event,
-subtype, cost/spark comparisons, etc.).
+**Predicate/targeting** uses a two-layer architecture: Predicate (ownership
+scope — This, Enemy, Another, Your, Any, etc.) wrapping CardPredicate (type
+constraints — Character, Event, subtype, cost/spark comparisons, etc.).
 
 See [parser_structure.md](parser_structure.md) and
 [predicates.md](predicates.md) for complete references.
@@ -206,7 +205,7 @@ functions. Phrases compose through nesting, joining, and variant propagation.
 
 **Round-trip property:** Both paths (parse-then-serialize and direct template
 rendering) use identical RLF phrase definitions, so they produce identical
-output. Over 224 individual tests plus bulk tests verify this.
+output. Extensive individual and bulk round-trip tests verify this.
 
 See [serialization.md](serialization.md) for the complete reference.
 
@@ -315,8 +314,7 @@ files.
   from scratch using RLF phrases. Original template text is not preserved.
 
 - **Stack requirements.** Deep Chumsky parser hierarchy needs extra stack space.
-  Tests use RUST_MIN_STACK=8388608 and the stacker crate for 4MB additional
-  stack.
+  Tests use RUST_MIN_STACK and the stacker crate for additional stack.
 
 - **Regenerate after TOML changes.** Always run `just tabula-generate` after
   modifying card data. The staleness check blocks all tests otherwise.
