@@ -41,13 +41,11 @@ implicit conventions not documented anywhere.
 
 Document should cover:
 
-- Complete field reference for [[cards]] entries: id, name, energy-cost (integer
-  or "\*" for variable), card-type, subtype, spark, is-fast, rules-text,
-  variables, prompts, image-number, rarity.
-- The rules-text directive syntax: {keyword},
-  {keyword($var)},
-  {@transform keyword($var)}, {keyword($var):selector}.
-  Concrete examples of each pattern.
+- Complete field reference for \[[cards]\] entries: id, name, energy-cost
+  (integer or "\*" for variable), card-type, subtype, spark, is-fast,
+  rules-text, variables, prompts, image-number, rarity.
+- The rules-text directive syntax: {keyword}, {keyword($var)}, {@transform
+  keyword($var)}, {keyword($var):selector}. Concrete examples of each pattern.
 - The variables field format: comma/newline-separated "key: value" pairs where
   values are integers, subtypes (CardSubtype enum values), or figments
   (FigmentType enum values).
@@ -78,7 +76,7 @@ Document should cover:
   strings::phrase_name() which returns rlf::Phrase.
 - Phrase composition: Phrase::empty(), map_text(), to_string(),
   capitalized_sentence() wrapper.
-- Rich text conventions: Unity-compatible tags (<color=#HEX>, <b>, <u>), color
+- Rich text conventions: Unity-compatible tags (\<color=#HEX>, <b>, <u>), color
   coding by keyword category (purple for keywords like dissolve/banish, teal for
   energy, etc.).
 - How serializers connect to RLF: effect_serializer calls strings::\* functions,

@@ -15,9 +15,9 @@ review:
         python3 scripts/review/review_runner.py
     fi
 
-review-direct: check-snapshots check-format build clippy style-validator rlf-lint review-core-test parser-test tv-check tv-clippy tv-test
+review-direct: check-snapshots check-format check-docs-format build clippy style-validator rlf-lint review-core-test parser-test tv-check tv-clippy tv-test
 
-review-verbose: check-snapshots check-format-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose review-core-test-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
+review-verbose: check-snapshots check-format-verbose check-docs-format-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose review-core-test-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
 
 review-scope-plan:
     python3 scripts/review/review_scope.py plan
@@ -516,13 +516,26 @@ fmt: style-validator-fix rlf-fmt fmt-docs
 
 fmt-docs:
     #!/usr/bin/env bash
-    output=$(npx prettier --prose-wrap always --print-width 80 --write "docs/**/*.md" 2>&1)
+    output=$(uvx --with mdformat-gfm mdformat --wrap 80 --number docs/ 2>&1)
     if [ $? -eq 0 ]; then
         echo "Docs formatted"
     else
         echo "$output"
         exit 1
     fi
+
+check-docs-format:
+    #!/usr/bin/env bash
+    output=$(uvx --with mdformat-gfm mdformat --wrap 80 --number --check docs/ 2>&1)
+    if [ $? -eq 0 ]; then
+        echo "Docs format OK"
+    else
+        echo "$output"
+        exit 1
+    fi
+
+check-docs-format-verbose:
+    uvx --with mdformat-gfm mdformat --wrap 80 --number --check docs/
 
 fmt-verbose:
     cd rules_engine && cargo +nightly fmt
