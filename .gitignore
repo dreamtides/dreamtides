@@ -26,3 +26,4 @@ plans/
 # Serena (per-worktree config, created by llmc)
 .serena/
 .lattice/
+.venv/

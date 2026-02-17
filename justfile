@@ -741,5 +741,8 @@ tv-test *args='':
 tv-build:
     cd rules_engine/src/tv && pnpm tauri build
 
+tokens:
+    python3 scripts/llms/count_tokens.py
+
 update-rlf:
     cargo update --manifest-path rules_engine/Cargo.toml -p rlf

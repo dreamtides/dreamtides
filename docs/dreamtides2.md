@@ -24,6 +24,11 @@ All shared types derive `serde` + `schemars` traits. The `schema_generator`
 crate emits JSON Schema, which `quicktype` converts to C# classes
 (client/Assets/Dreamtides/Schema/Schema.cs). Run `just schema` to regenerate.
 
+The command protocol aims for a react-style model where each update describes
+complete UI state instead of imperative mutations. Some engine paths still mix
+snapshot-style updates with more imperative sequencing, and new work should
+prefer full-state command updates for consistency.
+
 ## Crate Structure
 
 The rules engine has ~34 crates in a Cargo workspace (rules_engine/Cargo.toml),
@@ -59,6 +64,9 @@ client/Assets/StreamingAssets/Tabula/). The main file is cards.toml (large — d
 not read directly). Each card has an id, name, energy-cost, card-type, optional
 subtype/spark, and crucially a `rules-text` field with directive syntax like
 `"{energy($e)}: Draw {cards($c)}."` plus a `variables` field like `"e: 2, c: 1"`.
+
+The tabula card set is shared between client and rules engine via symlinked
+paths. The standalone `tv` app is used to inspect and edit tabula TOML data.
 
 The `tabula generate` command (run via `just tabula-generate`) parses all card
 text through a multi-stage pipeline:
@@ -147,6 +155,13 @@ from a shared deck of special cards providing energy production and bonus
 effects. **Draw** gives the active player one card. **Main** is where players
 take actions freely.
 
+## Logging
+
+Battle execution emits structured logs for debugging and analysis. The primary
+battle log entrypoint is `battle_trace!`
+(rules_engine/src/battle_queries/src/macros/battle_trace.rs), with additional
+infrastructure in the `logging` crate.
+
 ## Animation and Display
 
 ### Animation Recording
@@ -192,6 +207,10 @@ frame-delayed start callback. Key services: ActionServiceImpl handles Rust
 communication, CardService manages card GameObjects, InputService dispatches
 mouse/touch events to Displayable objects.
 
+Gameplay currently runs in a single Unity scene. Most game entities are
+prefab-backed MonoBehaviour components, with
+client/Assets/Dreamtides/Components/Card.cs as the primary runtime card view.
+
 ActionServiceImpl supports two backends: native FFI via Plugin.cs (DllImport
 with JSON over a 10MB byte buffer) and HTTP to the dev server. In production,
 `Plugin.HasPendingUpdates()` is checked every frame as a cheap gate before
@@ -205,6 +224,9 @@ toggled by GameContext. Cards and other objects are positioned via ObjectLayout
 subclasses (CurveObjectLayout, PileObjectLayout, ScrollableUserHandLayout,
 etc.) which compute positions and animate transitions via DOTween.
 
+Dreamtides uses multiple UI surfaces in parallel: world-space 3D objects,
+legacy UGUI canvas content, and Rust-driven UIToolkit overlays through Masonry.
+
 On each UpdateBattle command, ActionServiceImpl updates status displays, action
 buttons, screen overlay, and other UI, then delegates to CardService for card
 management. CardService diffs the card list against existing Card GameObjects,
@@ -212,6 +234,10 @@ assigns each to the correct ObjectLayout based on its Position, then calls
 ApplyAllLayouts to animate everything into place. BattleLayout.cs holds
 references to all zone layouts (hands, battlefields, decks, voids, stacks,
 browser, dreamwell, etc.).
+
+Most movement animations come from automatic ObjectLayout transitions between
+snapshots. For bespoke sequences, CardAnimationService coordinates explicit
+DOTween timelines (client/Assets/Dreamtides/Services/CardAnimationService.cs).
 
 ## AI System
 
@@ -232,6 +258,10 @@ rendering. Both user and enemy client views are validated for consistency. The
 StateProvider trait (rules_engine/src/state_provider/) is the dependency
 injection boundary — production uses file-backed state, tests use in-memory
 state.
+
+Client tests also run in Unity editor mode under
+client/Assets/Dreamtides/Tests/. New UI behavior should include targeted editor
+tests when practical.
 
 ## Build and Tooling
 
