@@ -133,6 +133,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.step_names = [
             "check-snapshots",
             "check-format",
+            "check-docs-format",
             "review-scope-validate",
             "build",
             "clippy",
@@ -173,6 +174,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
             always_run_steps=(
                 "check-snapshots",
                 "check-format",
+                "check-docs-format",
                 "review-scope-validate",
                 "build",
                 "clippy",
@@ -491,6 +493,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.assertEqual(decision.unmapped_paths, [])
         self.assertIn("check-snapshots", decision.selected_steps)
         self.assertIn("check-format", decision.selected_steps)
+        self.assertIn("check-docs-format", decision.selected_steps)
         self.assertIn("review-scope-validate", decision.selected_steps)
         self.assertIn("style-validator", decision.selected_steps)
         self.assertNotIn("build", decision.selected_steps)

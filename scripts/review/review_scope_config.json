@@ -43,6 +43,7 @@
   "always_run_steps": [
     "check-snapshots",
     "check-format",
+    "check-docs-format",
     "review-scope-validate",
     "build",
     "clippy",

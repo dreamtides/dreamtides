@@ -157,6 +157,7 @@ def step_specs() -> list[StepSpec]:
     return [
         StepSpec("check-snapshots", [CommandSpec("check-snapshots", ["just", "check-snapshots"])]),
         StepSpec("check-format", [CommandSpec("check-format", ["just", "check-format"])]),
+        StepSpec("check-docs-format", [CommandSpec("check-docs-format", ["just", "check-docs-format"])]),
         StepSpec("review-scope-validate", [CommandSpec("review-scope-validate", ["just", "review-scope-validate"])]),
         StepSpec("build", [CommandSpec("build", ["just", "build"])]),
         StepSpec("clippy", [CommandSpec("clippy", ["just", "clippy"])]),
