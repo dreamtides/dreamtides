@@ -1,25 +1,34 @@
-# TOML Card Data Format
+# TOML Card Definition Format
 
-This document describes the TOML file format used to define cards in Dreamtides.
-TOML card definitions are the primary input to the
-[parser pipeline](pipeline_overview.md), which transforms rules-text fields into
-structured ability ASTs. The format covers two card categories -- regular cards
-and dreamwell cards -- each with its own schema and field set.
+Reference for the TOML file format used to define cards in Dreamtides. Card
+definitions are the primary input to the parser pipeline, which transforms
+rules-text fields into structured ability ASTs. The format covers two card
+categories -- regular cards and dreamwell cards -- each with its own schema.
 
-## Card Definition Structure
+## Table of Contents
 
-### Regular Cards
+- [Regular Card Fields](#regular-card-fields)
+- [Dreamwell Card Fields](#dreamwell-card-fields)
+- [Rules-Text Directive Syntax](#rules-text-directive-syntax)
+- [Variables Field Format](#variables-field-format)
+- [Multi-Paragraph Abilities](#multi-paragraph-abilities)
+- [Modal Card Conventions](#modal-card-conventions)
+- [Prompts Field](#prompts-field)
+- [File Locations and Tooling](#file-locations-and-tooling)
+
+## Regular Card Fields
 
 Regular cards are defined as entries in TOML array-of-tables sections.
-Production cards use the table name "cards" while test cards use "test-cards".
-Each entry contains the following fields.
+Production cards use the table name `[[cards]]` while test cards use
+`[[test-cards]]`. All fields use kebab-case naming. Every field is optional at
+the TOML deserialization level; validation happens during the build phase.
 
 - **name** -- Display name of the card.
 - **id** -- UUID string uniquely identifying the card. Used as the key in the
   pre-parsed abilities JSON and as a compile-time constant in generated Rust
   code.
 - **energy-cost** -- Integer energy required to play the card, or "\*" for modal
-  cards with no fixed cost.
+  cards with no fixed cost. Empty string or omitted treated as no cost.
 - **rules-text** -- Ability text using the directive syntax described below.
   Empty string for vanilla cards. Triple-quoted TOML strings for multi-line
   text.
@@ -27,14 +36,17 @@ Each entry contains the following fields.
   text. Empty string when there are no variables.
 - **card-type** -- Either "Character" or "Event". Characters persist on the
   battlefield; events go to the void after resolution.
-- **subtype** -- Creature subtype such as "Warrior" or "Ancient". Empty string
+- **subtype** -- Character subtype such as "Warrior" or "Ancient". Empty string
   for events and characters with no subtype.
-- **is-fast** -- Boolean for fast-speed play (during the opponent's turn). An
-  activated ability can be independently marked fast via the rules-text fast
-  prefix, even when the card itself has is-fast set to false.
+- **is-fast** -- Boolean for fast-speed play (during the opponent's turn).
+  Defaults to false. An activated ability can be independently marked fast via
+  the rules-text fast prefix, even when the card itself has is-fast set to
+  false.
 - **spark** -- Integer spark value earning victory points at judgment. Empty
-  string for events.
-- **image-number** -- Numeric identifier referencing the card's art asset.
+  string or "\*" treated as no spark value. Events typically use empty string.
+- **image-number** -- Numeric identifier referencing the card's art asset
+  (Shutterstock image ID). Resolves to an asset path under
+  Assets/ThirdParty/GameAssets/CardImages/Standard/.
 - **rarity** -- One of "Common", "Uncommon", "Rare", "Legendary", or "Special".
   Present on production cards; omitted from test cards.
 - **prompts** -- Player-facing UI text for targeting choices. Empty string when
@@ -43,22 +55,33 @@ Each entry contains the following fields.
 Production cards include two additional fields: **art-owned** (boolean tracking
 asset licensing) and **card-number** (sequential identifier within the set).
 
-### Dreamwell Cards
+### Special Deserialization Rules
+
+The spark field uses a custom deserializer that handles multiple input types:
+missing or None becomes no value, integers convert directly, empty string
+becomes no value, and "\*" becomes no value. This allows TOML authors to use
+whichever form is clearest for the card type.
+
+## Dreamwell Card Fields
 
 Dreamwell cards are energy-producing cards analogous to lands in other card
-games. They use a different schema with the following fields.
+games. They use a different schema with the table name `[[dreamwell]]` for
+production or `[[test-dreamwell]]` for tests.
 
 - **name** -- Display name, same as regular cards.
 - **id** -- UUID identifier, same as regular cards.
 - **energy-produced** -- Integer specifying how much energy the dreamwell
-  provides when played.
+  provides when drawn. Required for dreamwell cards.
 - **rules-text** -- Optional ability text using the same directive syntax as
   regular cards. Many dreamwell cards have no abilities and either set this to
   an empty string or omit it entirely.
 - **variables** -- Variable bindings, same format as regular cards.
-- **phase** -- Integer where 0 indicates a starter dreamwell (available at game
-  start) and 1 indicates a normal dreamwell (acquired during play).
-- **image-number** -- Art asset reference, same as regular cards.
+- **phase** -- Integer controlling deck ordering. Phase 0 cards are starter
+  dreamwells available at game start (typically no abilities, just energy
+  production). Phase 1 cards appear later in the shuffled deck and often carry
+  bonus effects like Foresee or point gain. Defaults to 0 if omitted.
+- **image-number** -- Art asset reference. Dreamwell images resolve to a
+  separate asset path under Assets/ThirdParty/GameAssets/CardImages/Dreamwell/.
 - **prompts** -- Player-facing choice text, same as regular cards.
 
 Dreamwell cards lack energy-cost, card-type, subtype, spark, is-fast, and
@@ -70,7 +93,6 @@ explicitly.
 
 The rules-text field uses a directive syntax where game concepts are wrapped in
 curly braces. Everything outside curly braces is treated as plain English text.
-The following table catalogues all directive patterns used in the system.
 
 | Pattern               | Form                    | Description                                                                                                                            |
 | --------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
@@ -92,12 +114,12 @@ The following table catalogues all directive patterns used in the system.
 ### Capitalization Convention
 
 Directives that begin a sentence or name an ability use an uppercase first
-letter in the TOML source, such as {Dissolve}, {Foresee($f)}, or {Materialized}.
-When the same keyword appears inline within a sentence (often in prompts or
-after other words), it uses a lowercase first letter, such as {dissolve},
-{materialize}, or {reclaim}. The lexer lowercases all input before tokenization,
-so this distinction affects only the display path that preserves original casing
--- the parser treats both forms identically.
+letter in the TOML source, such as {Dissolve}, {Foresee($f)}, or
+{Materialized}. When the same keyword appears inline within a sentence (often in
+prompts or after other words), it uses a lowercase first letter, such as
+{dissolve}, {materialize}, or {reclaim}. The lexer lowercases all input before
+tokenization, so this distinction affects only the display path that preserves
+original casing -- the parser treats both forms identically.
 
 ### Trigger and Tense Keywords
 
@@ -112,6 +134,37 @@ Some keywords have both present and past-tense forms. Present tense
 tense ({materialized}, {dissolved}, {banished}) describes a trigger condition.
 Both are bare keywords with no variable argument.
 
+### Phrase Tables
+
+The parser resolves directives through four phrase tables defined in
+parser_substitutions.rs. Each table maps a phrase name to a default variable
+name and a typed ResolvedToken constructor.
+
+**PHRASES** -- Integer-valued concepts. Maps names like "energy", "cards",
+"spark", "foresee", "kindle", "points", "reclaim_for_cost", "copies", "count",
+"discards", "maximum_energy", "top_n_cards", "up_to_n_allies", "up_to_n_events",
+"text_number", "this_turn_times", and "multiply_by" to their respective
+ResolvedToken variants. Default variables follow single-letter conventions (e for
+energy, c for cards, s for spark, f for foresee, k for kindle, p for points, r
+for reclaim cost, d for discards, n for counts, m for maximum energy, v for top
+cards). Short-form aliases "c", "e", and "s" are also supported.
+
+**BARE_PHRASES** -- Keywords requiring no variable: "choose_one",
+"energy_symbol", and "judgment_phase_name". These pass through as directive
+tokens.
+
+**SUBTYPE_PHRASES** -- Card subtype references: "subtype", "a_subtype",
+"asubtype", and "plural_subtype". All default to variable "t" and produce a
+Subtype token resolved from the CardSubtype enum.
+
+**FIGMENT_PHRASES** -- Figment type references: "figment" and "figments". Both
+default to variable "g" and produce a Figment token resolved from the
+FigmentType enum.
+
+**Compound phrases** combine a count with a type: "n_figments" (defaults n and
+g, produces FigmentCount with count and type) and "count_allied_subtype"
+(defaults a and t, produces SubtypeCount with count and subtype).
+
 ## Variables Field Format
 
 The variables field contains bindings that provide concrete values for the
@@ -123,14 +176,24 @@ strings) or by commas.
 ### Value Types
 
 Variable values are interpreted in priority order: first as an unsigned integer,
-then as a card subtype name (case-insensitive, matching CardSubtype), then as a
-figment type name (lowercase: celestial, radiant, halcyon, shadow). An
-unrecognized value produces a parse error.
+then as a card subtype name (case-insensitive, matching CardSubtype enum values
+such as Warrior, Explorer, Musician, Ancient, Mage, etc.), then as a figment
+type name (lowercase: celestial, radiant, halcyon, shadow). An unrecognized
+value produces a parse error.
+
+### Naming Conventions
 
 Variable names follow single-letter conventions matching the PHRASES table
-defaults (e for energy, c for cards, s for spark, etc.). Modal cards use
-numbered suffixes (e1, e2) to distinguish per-mode values. See the PHRASES
-tables in parser_substitutions.rs for the complete mapping.
+defaults: e for energy, c for cards, s for spark, f for foresee, k for kindle,
+p for points, r for reclaim cost, d for discards, n for counts, t for subtype, g
+for figment type, m for maximum energy, v for top cards, a for ally count.
+
+Modal cards use numbered suffixes to distinguish per-mode values: e1 and e2 for
+energy costs, c1 and c2 for card counts. The variable resolution stage maps e1
+to Mode1Energy and e2 to Mode2Energy (distinct from the standard Energy
+variant), allowing the parser to associate each cost with the correct mode.
+Other numbered variants (c1, c2, etc.) use the full variable name for lookup but
+produce the same token type as their base name.
 
 ## Multi-Paragraph Abilities
 
@@ -196,15 +259,15 @@ selection ("Choose a card in your void."), and variable-cost instructions ("Pay
 one or more energy: Draw cards for each energy spent."). The field is an empty
 string when no player choices are needed.
 
-## File Locations
+## File Locations and Tooling
+
+### TOML Source Files
 
 The TOML card data files live in the Unity project at
 client/Assets/StreamingAssets/Tabula/. The rules engine accesses these files
 through a symlink at rules_engine/tabula that points to the same directory, so
 both the Rust and C# codebases read from a single source of truth with no manual
 synchronization needed.
-
-The directory contains the following card data files.
 
 - **cards.toml** -- Production card definitions. This file is large and should
   not be read directly; use test card files or the parsed abilities JSON for
@@ -214,17 +277,59 @@ The directory contains the following card data files.
   behaviors.
 - **dreamwell.toml** -- Production dreamwell card definitions.
 - **test-dreamwell.toml** -- Test dreamwell definitions for the test suite.
+- **card-lists.toml** -- Defines named groups of cards for gameplay features
+  like starter decks.
 
-The directory also contains supplementary TOML files (card-lists.toml,
-card-fx.toml, effect-types.toml, trigger-types.toml, predicate-types.toml,
-sheets.toml) that serve the Tabula editor tool and other subsystems but are not
-part of the ability parser pipeline's input.
+The directory also contains supplementary TOML files (card-fx.toml,
+effect-types.toml, trigger-types.toml, predicate-types.toml, sheets.toml) that
+serve the Tabula editor tool and other subsystems but are not part of the
+ability parser pipeline's input.
 
-The generated file parsed_abilities.json is written to the same Tabula
-directory. It contains pre-parsed ability ASTs for every card and is loaded at
-game runtime, avoiding any parsing at startup. The generated Rust files
-test_card.rs and card_lists.rs are written to
-rules_engine/src/tabula_generated/src/. After modifying any TOML card data file,
-"just tabula-generate" must be run to regenerate all derived artifacts. The
-staleness check "just tabula-check" verifies generated files match current
-sources and blocks test execution if they are out of date.
+### Generated Files
+
+The `just tabula-generate` command runs the full parse path offline, producing
+three artifacts:
+
+- **parsed_abilities.json** -- Pre-parsed ability ASTs as JSON, written to the
+  Tabula directory alongside the TOML source files. Loaded at game runtime
+  instead of re-parsing. The JSON maps card UUIDs to arrays of Ability objects.
+- **test_card.rs** -- Compile-time BaseCardId and DreamwellCardId constants for
+  test cards, with doc comments from card rules text. Written to
+  tabula_generated/src/. Also generates ALL_TEST_CARD_IDS and
+  ALL_TEST_DREAMWELL_CARD_IDS arrays.
+- **card_lists.rs** -- Compile-time card list constants and lookup functions.
+  Written to tabula_generated/src/.
+
+### Staleness Check
+
+`just tabula-check` regenerates all artifacts in memory and compares them
+against the files on disk. Rust files use byte-for-byte comparison; JSON uses
+structural comparison (ignoring formatting). This runs as a prerequisite of
+`just test` and `just review`. After modifying any TOML card data file, run
+`just tabula-generate` before tests. The staleness check blocks test execution
+if files are out of date.
+
+### The TV App
+
+The tv app is a Tauri-based desktop application for viewing and editing TOML
+card data in a spreadsheet format. It provides features like sorting, filtering,
+derived columns, image rendering, file watching, and cell-level validation. Run
+`just tv-dev` to launch it, or `just tv-cards` to open it with the main
+cards.toml file. This is the recommended way to inspect and modify the large
+cards.toml file rather than reading it directly.
+
+### Key Source Files
+
+- tabula_data/src/card_definition_raw.rs -- Raw field definitions for TOML
+  deserialization.
+- tabula_data/src/card_definition_builder.rs -- Validation and construction of
+  CardDefinition from raw data.
+- tabula_data/src/toml_loader.rs -- TOML file loading and deserialization entry
+  points.
+- tabula_data/src/dreamwell_definition.rs -- Dreamwell-specific data
+  structures.
+- tabula_cli/src/commands/generate.rs -- The tabula generate command
+  implementation.
+- tabula_cli/src/commands/check.rs -- The staleness check implementation.
+- parser_v2/src/variables/parser_substitutions.rs -- Phrase tables and directive
+  resolution.

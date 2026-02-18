@@ -78,7 +78,8 @@ conventional abbreviations (e for energy, c for cards, s for spark, t for
 subtype, g for figment). Values are integers, CardSubtype names, or FigmentType
 names.
 
-See [toml_format.md](toml_format.md) for the complete TOML reference.
+See [toml_card_format.md](../toml_card_format/toml_card_format.md) for the
+complete TOML reference.
 
 ## Stage 1: Lexing
 
@@ -310,8 +311,9 @@ files.
 
 ## Detail Documents
 
-- [toml_format.md](toml_format.md): TOML card definition format, directive
-  syntax patterns, variables field, and modal card conventions. Read when
+- [toml_card_format.md](../toml_card_format/toml_card_format.md): TOML card
+  definition format, directive syntax patterns, variables field, modal card
+  conventions, dreamwell format, file locations, and tooling. Read when
   authoring or modifying card data.
 
 - [variable_resolution.md](variable_resolution.md): PHRASES tables, the
