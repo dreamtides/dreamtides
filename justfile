@@ -780,5 +780,8 @@ tv-build:
 tokens *FILE:
     python3 scripts/llms/count_tokens.py {{FILE}}
 
+doc-reads:
+    python3 scripts/hooks/show_doc_reads.py
+
 update-rlf:
     cargo update --manifest-path rules_engine/Cargo.toml -p rlf

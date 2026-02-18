@@ -23,6 +23,9 @@ plans/
 # Local Cargo config (contains [patch] overrides for local dev)
 .cargo/
 
+# Claude Code hook data
+.claude/doc-read-counts.json
+
 # Serena (per-worktree config, created by llmc)
 .serena/
 .lattice/
