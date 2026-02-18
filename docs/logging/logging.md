@@ -43,8 +43,8 @@ the project root.
 
 **Plugin/FFI** (plugin.rs): Initializes on first `connect` call. Log directory
 comes from the client's persistent data path. AI diagram logging is disabled for
-performance. Also writes to Android logcat via `android_logging::write_to_logcat()`
-on Android builds.
+performance. Also writes to Android logcat via
+`android_logging::write_to_logcat()` on Android builds.
 
 **Tests**: Do not explicitly initialize logging. Battle tracing is controlled
 independently via the `BattleState.tracing` field.
@@ -82,8 +82,8 @@ When file logging is active, two files are produced in the log directory:
 - **dreamtides.json**: Machine-readable JSON array of `BattleTraceEvent`
   records, each containing the message, variable values, full battle state
   snapshot, and timestamp. Used for post-game analysis and crash debugging. The
-  `write_tracing_event` module also captures animation and command sequence data,
-  and records panic snapshots.
+  `write_tracing_event` module also captures animation and command sequence
+  data, and records panic snapshots.
 
 File paths are accessible via `logging::trace_json_path()` and
 `logging::log_file_path()`.

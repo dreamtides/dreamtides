@@ -11,6 +11,17 @@
           }
         ]
       }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/scripts/hooks/count_subagent_doc_reads.sh",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }

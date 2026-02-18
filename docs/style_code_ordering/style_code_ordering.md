@@ -31,16 +31,16 @@ The style validator enforces a strict ordering of items within each Rust source
 file. Items must appear in the following sequence (enforced via derived `Ord` on
 the `ItemCategory` enum discriminants):
 
-1. **Private constants** (`const` without `pub`)
-2. **Private statics** (`static` without `pub`)
-3. **`thread_local!` macro invocations**
-4. **Public type aliases** (`pub type`)
-5. **Public constants** (`pub const`)
-6. **Public traits** (`pub trait`)
-7. **Public structs and enums** (`pub struct`, `pub enum`)
-8. **Public functions** (`pub fn`)
-9. **Private items** (everything else: private functions, private structs,
-   private enums, private traits, private type aliases, impl blocks)
+01. **Private constants** (`const` without `pub`)
+02. **Private statics** (`static` without `pub`)
+03. **`thread_local!` macro invocations**
+04. **Public type aliases** (`pub type`)
+05. **Public constants** (`pub const`)
+06. **Public traits** (`pub trait`)
+07. **Public structs and enums** (`pub struct`, `pub enum`)
+08. **Public functions** (`pub fn`)
+09. **Private items** (everything else: private functions, private structs,
+    private enums, private traits, private type aliases, impl blocks)
 10. **Test modules** (`#[cfg(test)] mod ...`)
 
 The key surprise for newcomers is that private constants and statics come
@@ -52,8 +52,8 @@ Items not subject to ordering: `use` statements and non-test `mod` declarations
 are skipped entirely by the ordering check. (`use` statement ordering is handled
 by rustfmt, not the style validator.)
 
-Both `just fmt` and `just review` pass the `--code-order` flag, so this check
-is always active in practice. `just fmt` additionally passes `--fix` to
+Both `just fmt` and `just review` pass the `--code-order` flag, so this check is
+always active in practice. `just fmt` additionally passes `--fix` to
 auto-correct spacing violations.
 
 ## Spacing Between Items
@@ -68,8 +68,8 @@ The `--fix` flag can auto-insert missing blank lines. It does not reorder items
 
 ## Naming Qualification Rules
 
-This is the most frequently violated convention and the one explicitly called out
-as "the #1 agent error" in the project instructions. The style validator
+This is the most frequently violated convention and the one explicitly called
+out as "the #1 agent error" in the project instructions. The style validator
 programmatically enforces qualification counts on all paths using `syn` AST
 walking.
 
@@ -145,15 +145,16 @@ triggers a violation. This keeps module files as pure organizational manifests.
 
 Three separate checks enforce test placement:
 
-**No inline `mod tests {}` blocks:** Inline test modules with content are banned.
-Tests must live as integration tests under `rules_engine/tests/`. Two
+**No inline `mod tests {}` blocks:** Inline test modules with content are
+banned. Tests must live as integration tests under `rules_engine/tests/`. Two
 files are whitelisted: `parser_v2/src/error/parser_error_suggestions.rs` and
 `battle_state/src/battle_cards/card_set.rs`.
 
-**No `tests/` directories under `src/`:** The validator walks `rules_engine/src/`
-and flags any directory named `tests`. All test code belongs in the top-level
-`rules_engine/tests/` directory, which contains five test crates: `battle_tests`,
-`parser_v2_tests`, `tabula_cli_tests`, `tabula_data_tests`, and `tv_tests`.
+**No `tests/` directories under `src/`:** The validator walks
+`rules_engine/src/` and flags any directory named `tests`. All test code belongs
+in the top-level `rules_engine/tests/` directory, which contains five test
+crates: `battle_tests`, `parser_v2_tests`, `tabula_cli_tests`,
+`tabula_data_tests`, and `tv_tests`.
 
 **Test file naming:** Under `rules_engine/tests/`, test files must end in
 `_tests.rs` (not `_test.rs`). Helper and utility files are exempted.
@@ -176,18 +177,18 @@ The auto-fixer can sort and reorder dependencies in-place.
 ## Workspace Dependency Enforcement
 
 For all Cargo.toml files under `src/` (excluding the `tv/` Tauri app directory),
-external dependencies must use `workspace = true` rather than specifying versions
-directly. This centralizes version management in the root
+external dependencies must use `workspace = true` rather than specifying
+versions directly. This centralizes version management in the root
 `rules_engine/Cargo.toml`. Path dependencies (internal crates) are exempt from
 this rule.
 
 ## Doc Comment Link Validation
 
-If a doc comment contains a bracketed type reference like `[TypeName]`, that type
-must be either imported via a `use` statement, defined locally in the same file,
-or be a built-in type from an allowlist (`String`, `Vec`, `Option`, `Result`,
-`Box`, `Arc`, `Rc`, `HashMap`, `HashSet`, `BTreeMap`, `BTreeSet`, `Cell`,
-`RefCell`). This prevents broken intra-doc links.
+If a doc comment contains a bracketed type reference like `[TypeName]`, that
+type must be either imported via a `use` statement, defined locally in the same
+file, or be a built-in type from an allowlist (`String`, `Vec`, `Option`,
+`Result`, `Box`, `Arc`, `Rc`, `HashMap`, `HashSet`, `BTreeMap`, `BTreeSet`,
+`Cell`, `RefCell`). This prevents broken intra-doc links.
 
 ## Clippy Configuration
 
@@ -208,15 +209,15 @@ The `just clippy` recipe additionally passes `-D warnings -D clippy::all` to
 deny all warnings and all default clippy lints beyond the workspace
 configuration.
 
-Individual crates inherit these workspace lints via `[lints] workspace = true` in
-their own Cargo.toml files.
+Individual crates inherit these workspace lints via `[lints] workspace = true`
+in their own Cargo.toml files.
 
 ## The allow_attributes Deny Rule
 
 The `allow_attributes` clippy lint is denied at the workspace level. This means
 any use of `#[allow(...)]` is itself a compile error. The only way to suppress a
-lint is via `#[expect(...)]`, which additionally warns if the expected lint never
-fires (catching stale suppressions).
+lint is via `#[expect(...)]`, which additionally warns if the expected lint
+never fires (catching stale suppressions).
 
 This is directly relevant to the chumsky `select!` macro issue: the macro
 expansion triggers `unnested_or_patterns`, and the suppression must use
@@ -273,23 +274,23 @@ control flow and reduces indentation.
 placeholders whenever the expression is a simple variable name.
 
 **`gen` blocks and other 2024 features:** Where applicable, prefer the idiomatic
-2024 edition patterns over older workarounds. When in doubt, match the style used
-in surrounding code.
+2024 edition patterns over older workarounds. When in doubt, match the style
+used in surrounding code.
 
 ## The Review Pipeline
 
 `just review` is the pre-push validation gate. It runs the following checks in
 sequence (taking approximately 5 minutes):
 
-1. Pending snapshot check
-2. Rustfmt format verification (nightly, check-only)
-3. Markdown documentation format check
-4. Token limit check (for LLM context sizes)
-5. Full workspace build
-6. Clippy (workspace lints + all warnings denied)
-7. Style validator (all 16 checks including code ordering, check-only)
-8. RLF lint
-9. Core tests (all workspace tests except parser and TV)
+01. Pending snapshot check
+02. Rustfmt format verification (nightly, check-only)
+03. Markdown documentation format check
+04. Token limit check (for LLM context sizes)
+05. Full workspace build
+06. Clippy (workspace lints + all warnings denied)
+07. Style validator (all 16 checks including code ordering, check-only)
+08. RLF lint
+09. Core tests (all workspace tests except parser and TV)
 10. Parser tests (separate due to stack size requirements)
 11. TV app checks (TypeScript type checking, ESLint, Rust clippy, tests)
 
@@ -300,13 +301,13 @@ faster iteration.
 
 Running `just fmt` auto-fixes the following violations:
 
-| Check | What gets fixed |
-|-------|-----------------|
-| `pub use` statements | Downgraded to plain `use` |
-| Inline `use` statements | Extracted to file top, deduplicated |
-| `super::`/`self::` imports | Converted to equivalent `crate::` paths |
-| Code spacing | Missing blank lines inserted between items |
-| Cargo.toml dependency order | Internal deps sorted first, then external |
+| Check                       | What gets fixed                            |
+| --------------------------- | ------------------------------------------ |
+| `pub use` statements        | Downgraded to plain `use`                  |
+| Inline `use` statements     | Extracted to file top, deduplicated        |
+| `super::`/`self::` imports  | Converted to equivalent `crate::` paths    |
+| Code spacing                | Missing blank lines inserted between items |
+| Cargo.toml dependency order | Internal deps sorted first, then external  |
 
 Checks that require manual fixes: naming qualification (qualifier counts),
 module file restrictions, doc comment links, inline test modules, test directory

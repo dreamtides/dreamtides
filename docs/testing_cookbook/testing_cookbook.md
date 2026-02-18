@@ -2,9 +2,9 @@
 
 Dreamtides tests exercise the full rules engine pipeline from action dispatch
 through rendering. Tests live in `rules_engine/tests/` as integration tests
-(never inline `mod tests`). The test infrastructure provides a builder-based
-API for configuring battles, performing actions, and asserting on both player
-views simultaneously.
+(never inline `mod tests`). The test infrastructure provides a builder-based API
+for configuring battles, performing actions, and asserting on both player views
+simultaneously.
 
 ## Table of Contents
 
@@ -45,7 +45,8 @@ Builder methods (all optional, chainable):
 - **.user(TestPlayer)** / **.enemy(TestPlayer)**: Override default player
   configuration (energy, points, etc.).
 - **.enemy_agent(GameAI)**: Use an AI opponent instead of a second human. GameAI
-  variants include FirstAvailableAction, RandomAction, and MonteCarlo(iterations).
+  variants include FirstAvailableAction, RandomAction, and
+  MonteCarlo(iterations).
 - **.seed(u64)**: Set the RNG seed for deterministic behavior. If omitted, a
   default seed of 314159265358979323 (digits of pi) is used. All tests are
   deterministic.
@@ -82,8 +83,8 @@ response version tracking, and the last command sequences for each player.
 
 Key methods:
 
-- **perform_user_action(action)**: Execute a GameAction as the user (player one).
-  Calls the engine synchronously, then applies resulting commands to both
+- **perform_user_action(action)**: Execute a GameAction as the user (player
+  one). Calls the engine synchronously, then applies resulting commands to both
   clients.
 - **perform_enemy_action(action)**: Same, but as the enemy (player two).
 - **perform_player_action(DisplayPlayer, action)**: Dispatches to the
@@ -98,8 +99,8 @@ tests.
 
 ## TestClient Query API
 
-TestClient represents what one player sees. After every action, both clients
-are updated with the engine's response commands.
+TestClient represents what one player sees. After every action, both clients are
+updated with the engine's response commands.
 
 ### Zone Queries
 
@@ -175,8 +176,8 @@ use. Import it via `use test_utils::session::test_session_prelude::*`.
 - **add_to_void(player, BaseCardId)**: Place a card in the void.
 - **play_card_from_hand(player, card_id)**: Play a card already in hand by
   looking up its can_play action.
-- **play_card_from_void(player, card_id)**: For Reclaim: finds the reclaim
-  token card (ID prefixed "V") in hand and plays it.
+- **play_card_from_void(player, card_id)**: For Reclaim: finds the reclaim token
+  card (ID prefixed "V") in hand and plays it.
 - **activate_ability(player, character_id, ability_number)**: Play an ability
   token card (ID formatted as "A{character_id}/{ability_number}").
 
@@ -204,8 +205,8 @@ use. Import it via `use test_utils::session::test_session_prelude::*`.
 - **find_command(player, extractor)**: Search the last command sequence for a
   specific command type using a closure. Returns the extracted value.
 - **find_all_commands(player, extractor)**: Returns all matching commands.
-- **set_next_dreamwell_card(player, id)**: Control which dreamwell card is
-  drawn next.
+- **set_next_dreamwell_card(player, id)**: Control which dreamwell card is drawn
+  next.
 
 ## DebugBattleAction
 
@@ -242,13 +243,13 @@ Materialize Another Character").
 
 **Generated constants**: The `just tabula-generate` command reads test TOML
 files and generates Rust constants in the `test_card` module with
-SCREAMING_SNAKE_CASE names derived from card names. For example, "Test Draw
-One" becomes `test_card::TEST_DRAW_ONE`. Tests reference cards exclusively
-through these typed constants, never raw UUIDs.
+SCREAMING_SNAKE_CASE names derived from card names. For example, "Test Draw One"
+becomes `test_card::TEST_DRAW_ONE`. Tests reference cards exclusively through
+these typed constants, never raw UUIDs.
 
 **Card design**: Most test cards have low energy costs (0-4) to keep tests
-simple. They are either Character type (with a spark value) or Event type.
-Modal cards use the special cost "\*" to indicate mode-dependent pricing.
+simple. They are either Character type (with a spark value) or Event type. Modal
+cards use the special cost "\*" to indicate mode-dependent pricing.
 
 **Variables and rules text**: Rules text uses the standard directive syntax with
 curly braces. Variables are defined as "key: value" pairs. Cards requiring
@@ -284,8 +285,8 @@ legal choice. This auto-resolution is the most common source of confusion in
 stack-related tests. The should_auto_execute_action function checks whether
 there is exactly one legal action available and, if so, executes it without
 waiting for player input. The auto-executed actions include PassPriority (when
-passing is the only option), StartNextTurn, single-choice prompt selections,
-and single-target character or stack card selections.
+passing is the only option), StartNextTurn, single-choice prompt selections, and
+single-target character or stack card selections.
 
 This means stack items resolve immediately if the opponent has no cards to
 respond with. When a player plays a card onto the stack, the opponent receives
@@ -306,13 +307,13 @@ test must ensure at least two valid targets are present.
 When testing stack resolution explicitly, tests build up multiple stack items,
 verify stack sizes and priority (who can_act via me.can_act() and
 opponent.can_act()), then resolve items one at a time with
-BattleAction::PassPriority. Each pass resolves the top card (LIFO order).
-After each resolution, the resolved card's controller receives priority if
-the stack is not empty. Tests can verify arrows between stack cards (showing
-targeting relationships) and info_zoom_data (showing targeting icons on card
-hover). When a target is removed from the stack before its targeting card
-resolves, the targeting card resolves with no effect and any arrows pointing
-to the removed card disappear.
+BattleAction::PassPriority. Each pass resolves the top card (LIFO order). After
+each resolution, the resolved card's controller receives priority if the stack
+is not empty. Tests can verify arrows between stack cards (showing targeting
+relationships) and info_zoom_data (showing targeting icons on card hover). When
+a target is removed from the stack before its targeting card resolves, the
+targeting card resolves with no effect and any arrows pointing to the removed
+card disappear.
 
 ### Prompt and Browser Interactions
 
@@ -371,8 +372,8 @@ Key behaviors:
   silently swallow errors. Panics also propagate directly (no catch_unwind) so
   test failures show full stack traces.
 - **Default deck**: TestDeckName::Vanilla (production uses Core11).
-- **Default dreamwell**: TestDreamwellNoAbilities (simple energy-producing
-  cards with no abilities), overridable via with_dreamwell on the builder.
+- **Default dreamwell**: TestDreamwellNoAbilities (simple energy-producing cards
+  with no abilities), overridable via with_dreamwell on the builder.
 
 ## Running Tests
 
@@ -406,10 +407,10 @@ embedded as RON-formatted strings in the test source. Run via
 **Battle tests** (`battle_tests` crate) exercise the full engine end-to-end.
 They create a TestBattle, connect to the engine, perform game actions, and
 assert on the resulting client state. They use the TestSessionBattleExtension
-API for high-level operations. Organized into subdirectories: basic_tests
-(turn sequences, undo, limits, triggered abilities), effect_tests (dissolve,
-draw, counterspell, foresee, etc.), static_ability_tests (reclaim), and
-property_tests (determinism). Run via `just battle-test`.
+API for high-level operations. Organized into subdirectories: basic_tests (turn
+sequences, undo, limits, triggered abilities), effect_tests (dissolve, draw,
+counterspell, foresee, etc.), static_ability_tests (reclaim), and property_tests
+(determinism). Run via `just battle-test`.
 
 In the review gate, parser tests and battle tests run as separate steps since
 parser tests require elevated stack sizes.

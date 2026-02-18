@@ -37,6 +37,7 @@ The system has two consumers:
   not at runtime.
 
 Key files:
+
 - `strings/src/strings.rlf.rs` — all phrase definitions (the single source of
   truth for UI text)
 - `strings/locales/ru.rlf` — Russian locale override
@@ -145,9 +146,9 @@ English: 1 maps to "one", everything else to "other"). Literal selectors like
 
 ### The `*` Default Marker
 
-Within a variant block, prefixing a key with `*` marks it as the default
-variant (the text used when the phrase is rendered without a selector). Without
-`*`, the first entry is the default.
+Within a variant block, prefixing a key with `*` marks it as the default variant
+(the text used when the phrase is rendered without a selector). Without `*`, the
+first entry is the default.
 
 ### Transforms
 
@@ -172,6 +173,7 @@ the macro parser.
 ### The Phrase Struct
 
 An `rlf::Phrase` has three fields:
+
 - `text: String` — the default display text
 - `variants: HashMap<VariantKey, String>` — variant key to variant text
 - `tags: Vec<Tag>` — metadata tags
@@ -182,8 +184,8 @@ An `rlf::Phrase` has three fields:
   an identity value in serializers.
 - `map_text(f)` — transforms the text while preserving variants and tags. Used
   for stripping trailing periods or appending suffixes.
-- `variant(key)` — looks up a variant with progressive fallback (strips
-  trailing dot-segments). Panics if no match found.
+- `variant(key)` — looks up a variant with progressive fallback (strips trailing
+  dot-segments). Panics if no match found.
 - `has_tag(tag)` — checks for a metadata tag.
 - `join(phrases, separator)` — joins multiple phrases with a separator. Only
   variant keys present in all phrases are preserved. Used for effect lists.
@@ -192,6 +194,7 @@ An `rlf::Phrase` has three fields:
 ### The Value Type
 
 `rlf::Value` is the dynamic type for phrase parameters:
+
 - `Value::Number(i64)` — for counts and numeric parameters
 - `Value::Float(f64)` — for decimal values
 - `Value::String(String)` — for text parameters
@@ -244,8 +247,7 @@ Each ability type has a dedicated serializer:
 - `effect_serializer.rs` — StandardEffect to Phrase (the largest module)
 - `trigger_serializer.rs` — TriggerEvent to Phrase
 - `cost_serializer.rs` — Cost to Phrase
-- `predicate_serializer.rs` — Predicate/CardPredicate to Phrase
-  (variant-aware)
+- `predicate_serializer.rs` — Predicate/CardPredicate to Phrase (variant-aware)
 - `static_ability_serializer.rs` — StaticAbility to Phrase
 - `condition_serializer.rs` — Condition to Phrase
 - `serializer_utils.rs` — helpers for operators, subtypes, figments
@@ -254,8 +256,9 @@ Each ability type has a dedicated serializer:
 
 The entry point `serialize_ability()` takes an `&Ability` and returns a
 `SerializedAbility` with a `.text: String` field. Each branch delegates to the
-appropriate sub-serializer, wraps the result in `strings::capitalized_sentence()`
-for proper capitalization, and calls `.to_string()`.
+appropriate sub-serializer, wraps the result in
+`strings::capitalized_sentence()` for proper capitalization, and calls
+`.to_string()`.
 
 Sub-serializers follow a consistent pattern: pattern-match on the AST node, then
 call a `strings::*` function with concrete Rust values (integers, sub-phrases).
@@ -268,10 +271,11 @@ top level extracts the rendered text with all markup embedded.
 
 ### The Display Layer
 
-The display crate's `card_rendering.rs` calls `ability_serializer::serialize_ability()`
-to build per-ability rules text lines, joined with line breaks for the final
-card text display. A separate `serialize_ability_effect()` entry point returns
-just the effect portion (no costs) for ability token text.
+The display crate's `card_rendering.rs` calls
+`ability_serializer::serialize_ability()` to build per-ability rules text lines,
+joined with line breaks for the final card text display. A separate
+`serialize_ability_effect()` entry point returns just the effect portion (no
+costs) for ability token text.
 
 ## Parser Integration
 
@@ -282,10 +286,10 @@ that appear in TOML rules-text.
 
 ### What It Resolves
 
-When a card's rules-text contains directives like `{energy($e)}`, `{@a
-subtype($t)}`, or `{subtype($t):other}`, the variable resolver needs to convert
-these into typed `ResolvedToken` values for the parser. `resolve_rlf_syntax()`
-handles the RLF function-call syntax specifically.
+When a card's rules-text contains directives like `{energy($e)}`,
+`{@a subtype($t)}`, or `{subtype($t):other}`, the variable resolver needs to
+convert these into typed `ResolvedToken` values for the parser.
+`resolve_rlf_syntax()` handles the RLF function-call syntax specifically.
 
 ### Resolution Steps
 
@@ -318,8 +322,8 @@ default variable names and typed constructors:
 
 ## Locales
 
-RLF supports locale overrides through separate `.rlf` files. The project has
-two additional locale files in `strings/locales/`:
+RLF supports locale overrides through separate `.rlf` files. The project has two
+additional locale files in `strings/locales/`:
 
 - `ru.rlf` — Russian locale with translated phrase overrides
 - `bracket.rlf` — test locale that wraps all text in brackets for visual
@@ -337,9 +341,10 @@ The `rlf_fmt` binary formats RLF phrase definition files. Run via `just fmt`
 (which also runs `style_validator --fix` and `cargo +nightly fmt`).
 
 It formats two kinds of files:
+
 - `.rlf` locale files in `strings/locales/`
-- The `strings.rlf.rs` Rust source file (extracts and reformats the `rlf!`
-  macro body)
+- The `strings.rlf.rs` Rust source file (extracts and reformats the `rlf!` macro
+  body)
 
 Formatting rules include: 100-character max line width, block expansion to
 multi-line when needed, tag spacing normalization (`:tag{` becomes `:tag {`),
@@ -352,6 +357,7 @@ The `rlf_lint` binary validates RLF phrase definitions for common issues. Run as
 part of `just review` (the full pre-push validation gate).
 
 Static lints (AST analysis):
+
 - **Redundant passthrough blocks** — `:from` phrases with variant blocks where
   every entry just passes its key through to the parameter
 - **Redundant from-selectors** — explicit variant selectors inside variant
@@ -362,6 +368,7 @@ Static lints (AST analysis):
   simplified to `:from($p);`
 
 Runtime lints:
+
 - Evaluates each phrase with dummy arguments to catch warnings that only
   manifest during evaluation
 
@@ -371,9 +378,9 @@ The linter exits with status 1 if any warnings are found.
 
 To add a new phrase to the RLF system:
 
-1. **Define the phrase** in `strings/src/strings.rlf.rs` inside the `rlf!`
-   macro block. Choose the appropriate syntax based on whether it needs
-   parameters, pluralization, variant inheritance, or transforms.
+1. **Define the phrase** in `strings/src/strings.rlf.rs` inside the `rlf!` macro
+   block. Choose the appropriate syntax based on whether it needs parameters,
+   pluralization, variant inheritance, or transforms.
 
 2. **Use the generated function** — the `rlf!` macro generates
    `strings::phrase_name()` (or `strings::phrase_name(param)` for parameterized

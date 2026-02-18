@@ -73,8 +73,8 @@
   to masonry nodes, working with the client-side reconciler or style system,
   debugging UI rendering issues, or understanding how Rust UI reaches Unity.
 
-- [testing_cookbook.md](testing_cookbook/testing_cookbook.md): How to write and run
-  integration tests — the TestBattle builder and TestPlayer configuration,
+- [testing_cookbook.md](testing_cookbook/testing_cookbook.md): How to write and
+  run integration tests — the TestBattle builder and TestPlayer configuration,
   TestSession dual-client orchestration, TestClient zone queries and state
   assertions, the TestSessionBattleExtension high-level API (create_and_play,
   click_card, activate_ability, select_card_order, etc.), DebugBattleAction for
@@ -85,12 +85,12 @@
   between parser tests and battle tests. Read when writing new tests, adding
   test cards, debugging test failures, or understanding the test infrastructure.
 
-- [ai_system.md](ai_system/ai_system.md): How the AI opponent selects actions
-  — the GameAI agent types, Monte Carlo Tree Search with UCT (search
-  architecture, tree policy, random rollouts, backpropagation), information-set
-  sampling for hidden cards, dynamic iteration budgets with phase-based
-  multipliers, root parallelization via rayon, speculative search pre-computation
-  on background threads, integration with the battle action loop, and the
+- [ai_system.md](ai_system/ai_system.md): How the AI opponent selects actions —
+  the GameAI agent types, Monte Carlo Tree Search with UCT (search architecture,
+  tree policy, random rollouts, backpropagation), information-set sampling for
+  hidden cards, dynamic iteration budgets with phase-based multipliers, root
+  parallelization via rayon, speculative search pre-computation on background
+  threads, integration with the battle action loop, and the
   ai_data/ai_agents/ai_uct crate organization. Read when working on AI behavior,
   tuning search parameters, debugging AI decisions, or understanding how the
   engine drives AI turns.
@@ -102,20 +102,20 @@
   tracing with JSON state snapshots and tracing::debug events), output files
   (dreamtides.log for human-readable trees, dreamtides.json for machine-readable
   trace events with full battle state snapshots), and the logging crate public
-  API. Read when debugging battle execution, working with tracing output,
-  adding new log instrumentation, or understanding how logging is initialized
-  across different runtime environments.
+  API. Read when debugging battle execution, working with tracing output, adding
+  new log instrumentation, or understanding how logging is initialized across
+  different runtime environments.
 
 - [style_code_ordering.md](style_code_ordering/style_code_ordering.md): All
   style and code ordering rules enforced by the custom style_validator binary,
   workspace clippy lints, and rustfmt — file item ordering (the 10-category
-  sequence from private consts through test modules), naming qualification
-  rules (qualifier counts for function calls, type names, and enum variants),
-  import conventions (crate:: required, pub use banned, no inline use), module
-  file restrictions, test location enforcement, Cargo.toml dependency ordering
+  sequence from private consts through test modules), naming qualification rules
+  (qualifier counts for function calls, type names, and enum variants), import
+  conventions (crate:: required, pub use banned, no inline use), module file
+  restrictions, test location enforcement, Cargo.toml dependency ordering
   (internal first then external, alphabetized), the allow_attributes deny rule
   and #[expect()] vs #[allow()] distinction, clippy configuration (~30 denied
   lints), rustfmt settings, RLF formatting/linting, the full review pipeline
   sequence, and which violations are auto-fixable via just fmt. Read when
-  encountering style_validator or clippy failures during just review, adding
-  new files or modules, or understanding the project's code conventions.
+  encountering style_validator or clippy failures during just review, adding new
+  files or modules, or understanding the project's code conventions.

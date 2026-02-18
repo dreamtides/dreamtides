@@ -114,12 +114,12 @@ curly braces. Everything outside curly braces is treated as plain English text.
 ### Capitalization Convention
 
 Directives that begin a sentence or name an ability use an uppercase first
-letter in the TOML source, such as {Dissolve}, {Foresee($f)}, or
-{Materialized}. When the same keyword appears inline within a sentence (often in
-prompts or after other words), it uses a lowercase first letter, such as
-{dissolve}, {materialize}, or {reclaim}. The lexer lowercases all input before
-tokenization, so this distinction affects only the display path that preserves
-original casing -- the parser treats both forms identically.
+letter in the TOML source, such as {Dissolve}, {Foresee($f)}, or {Materialized}.
+When the same keyword appears inline within a sentence (often in prompts or
+after other words), it uses a lowercase first letter, such as {dissolve},
+{materialize}, or {reclaim}. The lexer lowercases all input before tokenization,
+so this distinction affects only the display path that preserves original casing
+-- the parser treats both forms identically.
 
 ### Trigger and Tense Keywords
 
@@ -144,10 +144,10 @@ name and a typed ResolvedToken constructor.
 "spark", "foresee", "kindle", "points", "reclaim_for_cost", "copies", "count",
 "discards", "maximum_energy", "top_n_cards", "up_to_n_allies", "up_to_n_events",
 "text_number", "this_turn_times", and "multiply_by" to their respective
-ResolvedToken variants. Default variables follow single-letter conventions (e for
-energy, c for cards, s for spark, f for foresee, k for kindle, p for points, r
-for reclaim cost, d for discards, n for counts, m for maximum energy, v for top
-cards). Short-form aliases "c", "e", and "s" are also supported.
+ResolvedToken variants. Default variables follow single-letter conventions (e
+for energy, c for cards, s for spark, f for foresee, k for kindle, p for points,
+r for reclaim cost, d for discards, n for counts, m for maximum energy, v for
+top cards). Short-form aliases "c", "e", and "s" are also supported.
 
 **BARE_PHRASES** -- Keywords requiring no variable: "choose_one",
 "energy_symbol", and "judgment_phase_name". These pass through as directive
@@ -184,8 +184,8 @@ value produces a parse error.
 ### Naming Conventions
 
 Variable names follow single-letter conventions matching the PHRASES table
-defaults: e for energy, c for cards, s for spark, f for foresee, k for kindle,
-p for points, r for reclaim cost, d for discards, n for counts, t for subtype, g
+defaults: e for energy, c for cards, s for spark, f for foresee, k for kindle, p
+for points, r for reclaim cost, d for discards, n for counts, t for subtype, g
 for figment type, m for maximum energy, v for top cards, a for ally count.
 
 Modal cards use numbered suffixes to distinguish per-mode values: e1 and e2 for
@@ -326,8 +326,7 @@ cards.toml file rather than reading it directly.
   CardDefinition from raw data.
 - tabula_data/src/toml_loader.rs -- TOML file loading and deserialization entry
   points.
-- tabula_data/src/dreamwell_definition.rs -- Dreamwell-specific data
-  structures.
+- tabula_data/src/dreamwell_definition.rs -- Dreamwell-specific data structures.
 - tabula_cli/src/commands/generate.rs -- The tabula generate command
   implementation.
 - tabula_cli/src/commands/check.rs -- The staleness check implementation.

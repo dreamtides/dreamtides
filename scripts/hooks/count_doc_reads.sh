@@ -11,7 +11,8 @@ if [ -z "$FILE_PATH" ]; then
   exit 0
 fi
 
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-"$(cd "$SCRIPT_DIR/../.." && pwd)"}"
 DOCS_DIR="$PROJECT_DIR/docs"
 COUNTS_FILE="$PROJECT_DIR/.claude/doc-read-counts.json"
 

@@ -30,11 +30,11 @@ moment. This snapshot-per-step approach means the renderer can later reconstruct
 exact intermediate game states for each event.
 
 The method takes a closure for the BattleAnimation value rather than a direct
-value. This is a performance optimization: the `animations` field on
-BattleState is an `Option<AnimationData>`, and when it is `None` (during AI
-simulation or testing), the closure never executes and no snapshot is created.
-When animation recording is enabled, the method clones the full state, invokes
-the closure, and pushes the resulting AnimationStep onto the animation timeline.
+value. This is a performance optimization: the `animations` field on BattleState
+is an `Option<AnimationData>`, and when it is `None` (during AI simulation or
+testing), the closure never executes and no snapshot is created. When animation
+recording is enabled, the method clones the full state, invokes the closure, and
+pushes the resulting AnimationStep onto the animation timeline.
 
 Some mutations use a `ShouldAnimate` enum parameter for finer control, allowing
 callers to suppress duplicate animations when the same mutation is invoked
@@ -113,8 +113,8 @@ several rendering patterns depending on the animation variant:
   game object ID and emit FireProjectile commands with sound and travel time.
 - **Effect display**: GainSpark uses a DisplayEffect command with a visual asset
   and duration.
-- **Message-based**: MakeChoice and SelectModalEffectChoice show opponent actions
-  through DisplayEnemyMessage commands.
+- **Message-based**: MakeChoice and SelectModalEffectChoice show opponent
+  actions through DisplayEnemyMessage commands.
 - **Conditional**: PlayedCard checks whether the card still exists in the final
   state; if an opponent's card resolved away quickly, a pause is inserted so the
   player can see it.
@@ -134,8 +134,9 @@ Key methods:
 - **push(command)**: Adds a single command as its own sequential group.
 - **push_battle_view(view)**: Adds an UpdateBattle command carrying the
   BattleView, and attaches all pending commands to execute in parallel with this
-  update. Clears the pending queue afterward. This is the primary synchronization
-  point between state snapshots and their accompanying visual effects.
+  update. Clears the pending queue afterward. This is the primary
+  synchronization point between state snapshots and their accompanying visual
+  effects.
 - **run_with_next_battle_view(command)**: Queues a command to fire in parallel
   with the next battle view push. Typically called multiple times to accumulate
   projectiles, dissolves, or audio before pushing the snapshot they accompany.
@@ -173,14 +174,17 @@ Helper constructors on CommandSequence:
 The Command enum has 18 variants organized by purpose:
 
 **State updates:**
+
 - **UpdateBattle**: Carries a complete BattleView plus an optional sound. The
   primary command; each instance is a full UI reconstruction point.
 - **UpdateQuest**: Updates the quest/overworld view with optional sound.
 
 **Timing:**
+
 - **Wait**: A pure delay for pacing between animation stages.
 
 **Projectiles and effects:**
+
 - **FireProjectile**: Launches a visual projectile between two game objects with
   configurable travel time, sounds, hit effects, and optional target
   repositioning.
@@ -188,6 +192,7 @@ The Command enum has 18 variants organized by purpose:
   scale, and optional sound.
 
 **Card operations:**
+
 - **DissolveCard**: Fades a card out (or back in if reversed) using a
   shader-based dissolve effect with configurable color, speed, sound, and delay.
 - **MoveCardsWithCustomAnimation**: Moves multiple cards with animation type
@@ -197,14 +202,17 @@ The Command enum has 18 variants organized by purpose:
   deck.
 
 **Audio:**
+
 - **PlayAudioClip**: Plays a sound with a pause duration before continuing.
 
 **Messages:**
+
 - **DisplayGameMessage**: Shows UI text like "Your Turn", "Victory", "Defeat".
 - **DisplayEnemyMessage**: Shows an opponent status message with duration.
 - **DisplayJudgment**: Shows judgment animation with optional new score.
 
 **Special animations:**
+
 - **DisplayDreamwellActivation**: Animates a dreamwell card activation with
   energy updates.
 - **PlayStudioAnimation**: Plays cinematic enter/exit sequences for identity
@@ -213,6 +221,7 @@ The Command enum has 18 variants organized by purpose:
   locations.
 
 **Visual customization:**
+
 - **SetCardTrail**: Adds a particle trail effect to cards for a duration.
 - **UpdateScreenOverlay**: Sets or clears a flexible-node UI overlay.
 - **AnchorToScreenPosition**: Anchors a UI element to a screen position with
@@ -342,9 +351,9 @@ the dictionary:
 - Existing cards are updated with new visual data.
 - Cards no longer present are queued for deletion.
 
-Each card is assigned to the correct ObjectLayout based on its position
-(hand, battlefield, deck, void, stack, etc.), and `ApplyAllLayouts()` triggers
-position calculation and animation for every layout.
+Each card is assigned to the correct ObjectLayout based on its position (hand,
+battlefield, deck, void, stack, etc.), and `ApplyAllLayouts()` triggers position
+calculation and animation for every layout.
 
 ### ObjectLayout System
 
@@ -387,7 +396,8 @@ deterministic parallel and sequential execution.
 Key files: display/src/rendering/renderer.rs,
 display/src/rendering/animations.rs, display/src/rendering/battle_rendering.rs,
 display/src/core/response_builder.rs, display_data/src/command.rs,
-display_data/src/battle_view.rs, battle_state/src/battle/battle_animation_data.rs.
+display_data/src/battle_view.rs,
+battle_state/src/battle/battle_animation_data.rs.
 
 ## Adding a New Animation
 

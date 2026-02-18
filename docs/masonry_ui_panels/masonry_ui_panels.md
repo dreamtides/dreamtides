@@ -4,8 +4,8 @@ How Rust-defined UI is built, serialized, and rendered in Unity. The masonry
 system is a server-side UI framework: the Rust rules engine builds a FlexNode
 tree (a serializable CSS-flexbox-like DOM), serializes it to JSON, and sends it
 to the Unity client for rendering via UIToolkit VisualElements. A virtual-DOM
-reconciler on the client diffs each new tree against the previous one and patches
-the live UI.
+reconciler on the client diffs each new tree against the previous one and
+patches the live UI.
 
 ## Table of Contents
 
@@ -33,8 +33,8 @@ Three Rust crates participate, layered bottom-up:
 - **ui_components** -- Reusable Component trait and concrete component types
   (boxes, text, buttons, panels, scroll views). Components compose into FlexNode
   trees via a render/resolve pattern.
-- **display** -- Game-specific rendering logic. The interface_rendering and panel
-  modules assemble components into the actual UI sent each frame.
+- **display** -- Game-specific rendering logic. The interface_rendering and
+  panel modules assemble components into the actual UI sent each frame.
 
 On the Unity side, three C# files form the rendering layer:
 
@@ -59,16 +59,17 @@ has:
 - **node_type** -- Determines specialized behavior. Variants: Text (label
   string), TypewriterTextNode (animated character-by-character reveal with sound
   effects), ScrollViewNode (scrollable container with elasticity, page size,
-  scrollbar visibility, and touch behavior settings), DraggableNode (drag-and-drop
-  with target identifiers, drop actions, and custom indicators), TextFieldNode
-  (text input with multiline, password, max length, and selection settings), and
-  SliderNode (slider with range, direction, preference persistence, and
-  sub-element styles for label, tracker, dragger, and drag container).
+  scrollbar visibility, and touch behavior settings), DraggableNode
+  (drag-and-drop with target identifiers, drop actions, and custom indicators),
+  TextFieldNode (text input with multiline, password, max length, and selection
+  settings), and SliderNode (slider with range, direction, preference
+  persistence, and sub-element styles for label, tracker, dragger, and drag
+  container).
 - **children** -- A Vec of child FlexNodes forming the recursive tree.
-- **event_handlers** -- Optional EventHandlers struct. Each field is an
-  Option of GameAction: on_click, on_long_press, on_mouse_enter,
-  on_mouse_leave, on_mouse_down, on_mouse_up, and on_field_changed. The Rust
-  renderer pre-bakes the exact action each interaction should trigger.
+- **event_handlers** -- Optional EventHandlers struct. Each field is an Option
+  of GameAction: on_click, on_long_press, on_mouse_enter, on_mouse_leave,
+  on_mouse_down, on_mouse_up, and on_field_changed. The Rust renderer pre-bakes
+  the exact action each interaction should trigger.
 - **style** -- Base FlexStyle for the node.
 - **hover_style** -- Merged over the base style on mouse enter, reverted on
   mouse leave.
@@ -88,10 +89,10 @@ properties. It uses the bon Builder derive for ergonomic construction. Property
 groups:
 
 **Layout and flexbox:** align_content, align_items, align_self (FlexAlign with
-Auto, FlexStart, Center, FlexEnd, Stretch), display (Flex or None),
-flex_basis, flex_direction (Column, ColumnReverse, Row, RowReverse), flex_grow,
-flex_shrink, flex_wrap (NoWrap, Wrap, WrapReverse), justify_content (FlexStart,
-Center, FlexEnd, SpaceBetween, SpaceAround), and position (Relative, Absolute).
+Auto, FlexStart, Center, FlexEnd, Stretch), display (Flex or None), flex_basis,
+flex_direction (Column, ColumnReverse, Row, RowReverse), flex_grow, flex_shrink,
+flex_wrap (NoWrap, Wrap, WrapReverse), justify_content (FlexStart, Center,
+FlexEnd, SpaceBetween, SpaceAround), and position (Relative, Absolute).
 
 **Sizing:** width, height, min_width, min_height, max_width, max_height -- all
 Dimension values.
@@ -100,17 +101,17 @@ Dimension values.
 or four-side values), plus inset as FlexInsets (top, right, bottom, left).
 
 **Borders:** border_color (per-side DisplayColor), border_radius (per-corner
-Dimension), and border_width (per-side float). All support uniform shorthand
-via From impls.
+Dimension), and border_width (per-side float). All support uniform shorthand via
+From impls.
 
 **Visual:** background_color, background_image (SpriteAddress),
 background_image_tint_color, color, opacity, visibility, overflow, and
 picking_mode (Position passes events, Ignore lets them through).
 
-**Typography:** font (FontAddress), font_size, font_style (Normal, Bold,
-Italic, BoldAndItalic), letter_spacing, word_spacing, paragraph_spacing,
-text_align (nine variants from UpperLeft to LowerRight), text_overflow (Clip or
-Ellipsis), text_overflow_position (End, Start, Middle), text_outline_color,
+**Typography:** font (FontAddress), font_size, font_style (Normal, Bold, Italic,
+BoldAndItalic), letter_spacing, word_spacing, paragraph_spacing, text_align
+(nine variants from UpperLeft to LowerRight), text_overflow (Clip or Ellipsis),
+text_overflow_position (End, Start, Middle), text_outline_color,
 text_outline_width, text_shadow (offset, blur_radius, color), and white_space
 (Normal, NoWrap).
 
@@ -144,9 +145,9 @@ compositional model with three methods:
   implementation calls render recursively until reaching a leaf, then returns
   that leaf's FlexNode. Leaf components override this to return their FlexNode
   directly.
-- **wrap(self)** -- Type erasure. Eagerly resolves to a FlexNode and wraps it
-  in a WrapperComponent. This allows heterogeneous component collections since
-  all WrapperComponent values share one concrete type.
+- **wrap(self)** -- Type erasure. Eagerly resolves to a FlexNode and wraps it in
+  a WrapperComponent. This allows heterogeneous component collections since all
+  WrapperComponent values share one concrete type.
 
 Component requires Clone. There is a blanket impl for Option that delegates to
 the inner component or returns None, enabling conditional rendering.
@@ -163,8 +164,8 @@ The foundational layout container (ui_components/src/box_component.rs). Wraps a
 raw FlexNode. Uses a custom typestate builder: calling builder() produces an
 Unnamed state, then name() transitions to Named, which unlocks child, children,
 on_click, event_handlers, style, hover_style, pressed_style, on_attach_style,
-and on_attach_style_duration. The name is required -- every box must be named for
-debugging. Default flex_direction is Row.
+and on_attach_style_duration. The name is required -- every box must be named
+for debugging. Default flex_direction is Row.
 
 ### TextComponent
 
@@ -180,8 +181,8 @@ A styled interactive button (ui_components/src/button_component.rs). Uses bon
 Builder. Fields: label, action (a GameAction to fire on click), optional
 flex_grow, and is_primary (defaults false). The render method returns a
 BoxComponent with background image (primary or secondary variant), fixed height,
-center alignment, hover style (gray-300 tint), pressed style (gray-500 tint
-plus 0.97 scale), and a TextComponent child with ButtonLabel typography.
+center alignment, hover style (gray-300 tint), pressed style (gray-500 tint plus
+0.97 scale), and a TextComponent child with ButtonLabel typography.
 
 ### PanelComponent
 
@@ -232,8 +233,8 @@ command. The InterfaceView contains:
 - **has_open_panels** -- Whether a panel is currently displayed.
 - **Action buttons** -- primary_action_button, secondary_action_button,
   increment_button, decrement_button, dev_button, and undo_button. Each is a
-  ButtonView (label plus optional GameAction), rendered by Unity as fixed-position
-  native buttons separate from the masonry overlay.
+  ButtonView (label plus optional GameAction), rendered by Unity as
+  fixed-position native buttons separate from the masonry overlay.
 - **browser** -- Optional CardBrowserView for deck/void browsing.
 - **card_order_selector** -- Optional view for deck card reordering prompts.
 
@@ -259,9 +260,9 @@ shows prompt choice one when a Choose prompt has multiple options. Increment and
 decrement buttons appear only during ChooseEnergyValue prompts.
 
 An InterfaceMessage component (display/src/rendering/interface_message.rs)
-renders text anchored at the top or bottom of the screen. It supports a temporary
-mode with CSS opacity transitions: fading in over 300 milliseconds, then fading
-out after a configurable on_attach_style_duration.
+renders text anchored at the top or bottom of the screen. It supports a
+temporary mode with CSS opacity transitions: fading in over 300 milliseconds,
+then fading out after a configurable on_attach_style_duration.
 
 ## The Panel System
 
@@ -275,9 +276,8 @@ PanelAddress enum values to specific panel implementations:
   deck. Each button dispatches a GameAction (typically DebugAction or
   BattleDisplayAction::OpenPanel).
 - **SetOpponentAgentPanel** -- Scrollable list of AI agent configurations
-  (MonteCarlo with various iteration counts, RandomAction,
-  FirstAvailableAction, WaitFiveSeconds, Human). Each dispatches
-  DebugAction::SetOpponentAgent.
+  (MonteCarlo with various iteration counts, RandomAction, FirstAvailableAction,
+  WaitFiveSeconds, Human). Each dispatches DebugAction::SetOpponentAgent.
 - **AddCardToHandPanel** -- Shows current hand count and a scrollable list of
   all test cards with Add buttons dispatching DebugBattleAction::AddCardToHand.
 - **PlayOpponentCardPanel** -- Scrollable list of test cards with Play buttons
@@ -306,10 +306,11 @@ updated in place by index, then MasonRenderer.ApplyToElement updates styles and
 properties. When types differ, a new element is created from scratch.
 
 Child reconciliation walks the new children by index. If the index exists in the
-old element, the child is recursively updated (and replaced if the type changed).
-New indices beyond the old child count create new elements. Old indices beyond
-the new child count are removed. Elements with internal children (TextField,
-Slider) skip child updates to avoid clobbering Unity's internal sub-elements.
+old element, the child is recursively updated (and replaced if the type
+changed). New indices beyond the old child count create new elements. Old
+indices beyond the new child count are removed. Elements with internal children
+(TextField, Slider) skip child updates to avoid clobbering Unity's internal
+sub-elements.
 
 ## Client-Side Style Application
 
@@ -365,12 +366,12 @@ the UIDocument and provides four overlay containers:
 
 Each container is an absolutely-positioned wrapper spanning the full screen with
 pickingMode Ignore, containing a NodeVisualElement as the reconciliation target.
-The private Reconcile method calls Reconciler.Update and swaps in any new element
-if the node type changed.
+The private Reconcile method calls Reconciler.Update and swaps in any new
+element if the node type changed.
 
 DocumentService also handles coordinate conversion between screen pixels, Unity
-UIToolkit logical pixels, and world-space positions. It computes safe area insets
-in element-space pixels for the MasonRenderer dimension unit conversion.
+UIToolkit logical pixels, and world-space positions. It computes safe area
+insets in element-space pixels for the MasonRenderer dimension unit conversion.
 
 ## Event Handling Flow
 
@@ -408,8 +409,8 @@ deck, void, or status zone), CloseCardBrowser, SetSelectedEnergyAdditionalCost,
 OpenPanel (with a PanelAddress), CloseCurrentPanel, and ToggleStackVisibility.
 
 The same ActionService.PerformAction entry point also serves native Unity
-GameObjects (cards, action buttons) which store their GameAction from CardView or
-ButtonView data and fire it on mouse up.
+GameObjects (cards, action buttons) which store their GameAction from CardView
+or ButtonView data and fire it on mouse up.
 
 ## DisplayProperties and Mobile Adaptation
 
@@ -431,6 +432,7 @@ On the client side, DocumentService uses a reference resolution of 225x400 at
 ## Key Files Reference
 
 **Rust -- masonry crate:**
+
 - masonry/src/flex_node.rs -- FlexNode, NodeType, EventHandlers
 - masonry/src/flex_style.rs -- FlexStyle with all CSS flexbox properties
 - masonry/src/flex_enums.rs -- All style enums (FlexAlign, FlexDirection, etc.)
@@ -438,6 +440,7 @@ On the client side, DocumentService uses a reference resolution of 225x400 at
 - masonry/src/borders.rs -- BorderWidth, BorderColor, BorderRadius
 
 **Rust -- ui_components crate:**
+
 - ui_components/src/component.rs -- Component trait, NodeComponent
 - ui_components/src/box_component.rs -- BoxComponent and typestate builder
 - ui_components/src/text_component.rs -- TextComponent
@@ -451,6 +454,7 @@ On the client side, DocumentService uses a reference resolution of 225x400 at
 - ui_components/src/display_properties.rs -- DisplayProperties
 
 **Rust -- display crate:**
+
 - display/src/rendering/interface_rendering.rs -- InterfaceView assembly
 - display/src/rendering/interface_message.rs -- InterfaceMessage component
 - display/src/rendering/supplemental_card_info.rs -- Card info zoom overlay
@@ -460,9 +464,11 @@ On the client side, DocumentService uses a reference resolution of 225x400 at
 - display/src/panels/add_card_to_hand_panel.rs -- Card addition panel
 - display/src/panels/play_opponent_card_panel.rs -- Opponent card panel
 - display/src/panels/view_logs_panel.rs -- Log viewer panel
-- display/src/display_actions/apply_battle_display_action.rs -- Display action dispatch
+- display/src/display_actions/apply_battle_display_action.rs -- Display action
+  dispatch
 
 **Unity -- Masonry:**
+
 - client/Assets/Dreamtides/Masonry/Reconciler.cs -- Virtual-DOM diffing
 - client/Assets/Dreamtides/Masonry/MasonRenderer.cs -- Style application
 - client/Assets/Dreamtides/Masonry/Elements.cs -- IMasonElement, Callbacks
@@ -474,5 +480,6 @@ On the client side, DocumentService uses a reference resolution of 225x400 at
 - client/Assets/Dreamtides/Masonry/TypewriterText.cs -- Typewriter text element
 
 **Unity -- Services:**
+
 - client/Assets/Dreamtides/Services/DocumentService.cs -- Overlay containers
 - client/Assets/Dreamtides/Services/ActionServiceImpl.cs -- Action dispatch

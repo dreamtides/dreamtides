@@ -10,10 +10,10 @@ layers. `core_data` and `rules_engine` (facade) are shared.
 **Flow:** game actions → mutate game state → return commands (full UI state
 snapshots).
 
-Card data in TOML files; do NOT read `cards.toml` directly (too large). Test
-cards in `test-cards.toml`, dreamwell in `dreamwell.toml`. Generated files
-(`parsed_abilities.json`, `test_card.rs`) come from `just tabula-generate`;
-regenerate after any TOML change.
+Card data in TOML files; do NOT read `cards.toml` directly (too large — grep
+for specific cards by name). Test cards in `test-cards.toml`, dreamwell in
+`dreamwell.toml`. Generated files (`parsed_abilities.json`, `test_card.rs`)
+come from `just tabula-generate`; regenerate after any TOML change.
 
 ## Rust Style
 
@@ -29,7 +29,9 @@ regenerate after any TOML change.
 - CORRECT: `Zone::Battlefield`
 
 **Imports:** `crate::` not `super::`. All `use` at file top, never inside
-function bodies. No `pub use`. Only module declarations in `mod.rs`/`lib.rs`.
+function bodies. No `pub use`. Never import functions directly
+(`use module::my_fn;` is wrong — call as `module::my_fn()` instead). Only
+module declarations in `mod.rs`/`lib.rs`.
 
 **File item order:** private consts/statics, thread_local, public type aliases,
 public constants, public traits, public structs/enums, public functions, then
@@ -50,7 +52,8 @@ Run one test with e.g. `just battle-test <NAME>`.
 
 ## Build Commands (always `just`, never raw `cargo`)
 
-- `just fmt` — format (style_validator --fix + rustfmt)
+- `just fmt` — format (style_validator --fix + rustfmt). Run first to auto-fix
+  most style violations before attempting manual fixes.
 - `just check` — type check
 - `just clippy` — lint
 - `just review` — full gate (~5 min, keep polling, don't restart)
@@ -72,7 +75,7 @@ Full index: `docs/index.md`. Key references:
 - `docs/toml_card_format/toml_card_format.md` — TOML card data fields
 - `docs/effect_resolution/effect_resolution.md` — effects, triggers, prompts
 - `docs/testing_cookbook/testing_cookbook.md` — writing integration tests
-- `docs/style_code_ordering/style_code_ordering.md` — style rules, lint fixes
+- `docs/style_code_ordering/style_code_ordering.md` — code style rules, lint fixes
 - `docs/display_animation/display_animation.md` — animations, rendering
 - `docs/masonry_ui_panels/masonry_ui_panels.md` — Rust UI panels
 - `docs/rlf_localization/rlf_localization.md` — localized strings, rlf! macro

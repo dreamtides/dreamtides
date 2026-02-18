@@ -80,11 +80,11 @@ each entry:
   After checking these flags, delegates to the same `apply_standard_effect`
   path.
 
-- **List(Vec\<EffectWithOptions\>)**: A sequential list of effects. The drain
+- **List(Vec\<EffectWithOptions>)**: A sequential list of effects. The drain
   loop removes the first element, applies it immediately, and pushes the
   remainder back to the **front** of the VecDeque via `push_front`. This ensures
-  the remaining effects process next, before any other pending effects already in
-  the queue. A list like [A, B, C] decomposes as: execute A, push [B, C] to
+  the remaining effects process next, before any other pending effects already
+  in the queue. A list like [A, B, C] decomposes as: execute A, push [B, C] to
   front; next iteration: execute B, push [C] to front; next: execute C, done.
   Between each step the loop re-checks for prompts, so if A creates a prompt,
   [B, C] waits at the front until the prompt resolves.
@@ -94,7 +94,7 @@ each entry:
   individual elements. Decomposition is identical after checking the shared
   options.
 
-- **Modal(Vec\<ModalEffectChoice\>)**: A choice among multiple effects. Each
+- **Modal(Vec\<ModalEffectChoice>)**: A choice among multiple effects. Each
   ModalEffectChoice carries an energy cost and an inner Effect (which can itself
   be any variant). Requires a `modal_choice` index to be present on the
   PendingEffect. The chosen alternative's inner Effect is executed recursively.
@@ -149,8 +149,8 @@ The nine PromptType variants:
   with toggle-and-submit. Tracks the hand card effect type (currently only
   Discard).
 - **Choose**: General pick-one-from-a-list prompt. Each choice has a label, an
-  effect to apply, and optional targets. Used for "counterspell unless pays cost"
-  and similar binary decisions.
+  effect to apply, and optional targets. Used for "counterspell unless pays
+  cost" and similar binary decisions.
 - **ChooseEnergyValue**: Pick an energy amount between a minimum and maximum.
   Used for variable additional costs like "spend one or more energy."
 - **ModalEffect**: Choose one of several modal effect alternatives. Each
@@ -170,9 +170,9 @@ written back:
   targets are chosen before the card resolves. The selection is appended to the
   stack item's targets list.
 - **AddPendingEffectTarget(PendingEffectIndex)**: Used during the
-  cleanup/trigger pipeline when an effect is already in the pending_effects queue
-  and needs targeting information filled in. The selection is written into the
-  pending effect's `requested_targets` field.
+  cleanup/trigger pipeline when an effect is already in the pending_effects
+  queue and needs targeting information filled in. The selection is written into
+  the pending effect's `requested_targets` field.
 
 The distinction maps to two timing windows: AddStackTargets is for upfront
 targeting when a card is played, while AddPendingEffectTarget is for
@@ -190,10 +190,11 @@ Triggers follow a registration-matching-firing lifecycle.
 **Registration**: When a card moves to the battlefield via `move_card`, the
 `on_enter_battlefield` function reads the card's AbilityList and iterates over
 the precomputed `battlefield_triggers` EnumSet (a bitset of TriggerName values).
-For each trigger type, it calls `battle.triggers.listeners.add_listener(trigger,
-card_id)`. Stack triggers are handled similarly via `on_enter_stack` (currently
-only used for PlayedCardFromVoid). Registration and deregistration use the same
-EnumSet, keeping them automatically symmetric.
+For each trigger type, it calls
+`battle.triggers.listeners.add_listener(trigger, card_id)`. Stack triggers are
+handled similarly via `on_enter_stack` (currently only used for
+PlayedCardFromVoid). Registration and deregistration use the same EnumSet,
+keeping them automatically symmetric.
 
 **Deregistration**: When a card leaves the battlefield or stack, the
 corresponding `on_leave_battlefield` or `on_leave_stack` function removes
@@ -211,10 +212,10 @@ the back of the events VecDeque.
 **Firing**: The `fire_triggers` loop pops entries from the front of the events
 queue. For each entry, it first verifies the listener card is still on the
 battlefield (it may have been dissolved since the trigger was queued). If so, it
-iterates over the card's triggered abilities and calls `trigger_queries::matches`
-to check if the queued trigger matches the ability's TriggerEvent condition. On
-match, it constructs an EffectSource::Triggered and delegates to
-`apply_effect_with_prompt_for_targets::execute`.
+iterates over the card's triggered abilities and calls
+`trigger_queries::matches` to check if the queued trigger matches the ability's
+TriggerEvent condition. On match, it constructs an EffectSource::Triggered and
+delegates to `apply_effect_with_prompt_for_targets::execute`.
 
 **TriggerState** on BattleState contains two fields: `listeners`
 (TriggerListeners, which tracks per-trigger-name CardSets of listening cards)
@@ -270,23 +271,23 @@ variants (Card, Character, Event, CharacterType, NotCharacterType).
 ## Trigger Chaining
 
 The system achieves flat, non-recursive trigger chaining through queue design.
-When `fire_triggers` pops a trigger and fires it, the resulting effect may mutate
-game state (dissolve a character, materialize something, gain energy). Those
-mutations call `battle.triggers.push()`, which appends new TriggerForListener
-entries to the **back** of the same VecDeque. The loop then continues popping
-from the front, processing newly-generated triggers after all previously-queued
-ones, in strict FIFO order.
+When `fire_triggers` pops a trigger and fires it, the resulting effect may
+mutate game state (dissolve a character, materialize something, gain energy).
+Those mutations call `battle.triggers.push()`, which appends new
+TriggerForListener entries to the **back** of the same VecDeque. The loop then
+continues popping from the front, processing newly-generated triggers after all
+previously-queued ones, in strict FIFO order.
 
 There is no recursion -- `fire_triggered_ability` does not call back into the
-trigger loop. A single flat loop drains everything, including cascading triggers.
-This prevents stack overflow from deeply chained triggers and ensures
+trigger loop. A single flat loop drains everything, including cascading
+triggers. This prevents stack overflow from deeply chained triggers and ensures
 deterministic ordering. Termination is guaranteed because the number of cards in
 play is finite (max 128 per battle) and each trigger fires based on a state
 change that can only happen a bounded number of times.
 
-If a triggered effect creates a prompt (requires player input for targeting), the
-loop breaks. The prompt is resolved by the player's next action, which re-runs
-the three-pass cascade. The trigger loop picks up where it left off.
+If a triggered effect creates a prompt (requires player input for targeting),
+the loop breaks. The prompt is resolved by the player's next action, which
+re-runs the three-pass cascade. The trigger loop picks up where it left off.
 
 ## EffectSource Tracking
 
@@ -317,7 +318,8 @@ extracts it uniformly:
 Controller propagation determines who is affected by effects that reference
 "your" or "enemy." For example, DrawCards uses `source.controller()` to
 determine who draws; Predicate::Your queries the battlefield of
-`source.controller()`; Predicate::Enemy queries `source.controller().opponent()`.
+`source.controller()`; Predicate::Enemy queries
+`source.controller().opponent()`.
 
 EffectSource also provides `card_id()` (returns the card associated with the
 source, if any -- None for Game, Player, and Dreamwell) and `ability_number()`
@@ -345,17 +347,17 @@ before the turn fully transitions.
 
 The outer action loop in `handle_battle_action::execute` wraps the three-pass
 cascade with auto-execution logic. After applying an action and running cleanup,
-it determines who acts next and computes their legal actions. If there is exactly
-one legal action matching certain patterns, it executes automatically without
-returning to the caller:
+it determines who acts next and computes their legal actions. If there is
+exactly one legal action matching certain patterns, it executes automatically
+without returning to the caller:
 
 - PassPriority as the only option (nothing to respond with on the stack)
 - StartNextTurn as the only option (no fast actions available)
 - SelectPromptChoice with exactly one choice (forced single-option prompt)
 - SelectCharacterTarget or SelectStackCardTarget with exactly one valid target
 
-This allows chains of trivial decisions to resolve instantly. The loop only exits
-when the game ends or a human player faces a non-trivial choice.
+This allows chains of trivial decisions to resolve instantly. The loop only
+exits when the game ends or a human player faces a non-trivial choice.
 
 ## Adding a New Triggered Effect
 
@@ -363,8 +365,8 @@ To add a new triggered effect:
 
 - Add a new variant to the Trigger enum in battle_state/src/triggers/trigger.rs
   and a corresponding TriggerName variant for listener tracking.
-- Add a matching TriggerEvent variant in ability_data/src/trigger_event.rs if the
-  ability condition needs new semantics.
+- Add a matching TriggerEvent variant in ability_data/src/trigger_event.rs if
+  the ability condition needs new semantics.
 - Push the new Trigger at the appropriate mutation site (e.g., in move_card.rs,
   a phase mutation, or an effect application function) via
   `battle.triggers.push(source, Trigger::NewVariant(...))`.
@@ -405,8 +407,8 @@ To add a new triggered effect:
   OnSelected definitions.
 - **battle_state/src/core/effect_source.rs**: EffectSource enum and controller
   propagation.
-- **ability_data/src/effect.rs**: Effect enum, EffectWithOptions, ListWithOptions,
-  ModalEffectChoice.
+- **ability_data/src/effect.rs**: Effect enum, EffectWithOptions,
+  ListWithOptions, ModalEffectChoice.
 - **ability_data/src/standard_effect.rs**: StandardEffect enum with ~70 atomic
   effect variants.
 - **ability_data/src/trigger_event.rs**: TriggerEvent enum (ability conditions)
