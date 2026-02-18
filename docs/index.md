@@ -85,6 +85,27 @@
   between parser tests and battle tests. Read when writing new tests, adding
   test cards, debugging test failures, or understanding the test infrastructure.
 
+- [ai_system.md](ai_system/ai_system.md): How the AI opponent selects actions
+  — the GameAI agent types, Monte Carlo Tree Search with UCT (search
+  architecture, tree policy, random rollouts, backpropagation), information-set
+  sampling for hidden cards, dynamic iteration budgets with phase-based
+  multipliers, root parallelization via rayon, speculative search pre-computation
+  on background threads, integration with the battle action loop, and the
+  ai_data/ai_agents/ai_uct crate organization. Read when working on AI behavior,
+  tuning search parameters, debugging AI decisions, or understanding how the
+  engine drives AI turns.
+
+- [logging.md](logging/logging.md): How the logging subsystem works — the
+  tracing subscriber stack (ForestLayer tree-structured output, ErrorLayer,
+  EnvFilter), emoji tag categorization by module and level, initialization paths
+  for dev server vs plugin/FFI vs tests, the battle_trace! macro (conditional
+  tracing with JSON state snapshots and tracing::debug events), output files
+  (dreamtides.log for human-readable trees, dreamtides.json for machine-readable
+  trace events with full battle state snapshots), and the logging crate public
+  API. Read when debugging battle execution, working with tracing output,
+  adding new log instrumentation, or understanding how logging is initialized
+  across different runtime environments.
+
 - [style_code_ordering.md](style_code_ordering/style_code_ordering.md): All
   style and code ordering rules enforced by the custom style_validator binary,
   workspace clippy lints, and rustfmt — file item ordering (the 10-category
