@@ -18,8 +18,6 @@ VENV_DIR = REPO_ROOT / "scripts" / "llms" / ".venv"
 # Default files to measure when no argument is given.
 DEFAULT_FILES = [
     "AGENTS.md",
-    "AGENTS_OPUS.md",
-    "AGENTS_GPT.md",
 ]
 
 

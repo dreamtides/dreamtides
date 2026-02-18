@@ -64,6 +64,21 @@ After every task:
 2. `just fmt` then `just review` (allow ~5 min)
 3. Commit with detailed description. Do not print a summary of changes.
 
+## Documentation
+
+Full index: `docs/index.md`. Key references:
+- `docs/project_overview/project_overview.md` — architecture, crates, systems
+- `docs/parser_pipeline/parser_pipeline.md` — adding/modifying card abilities
+- `docs/toml_card_format/toml_card_format.md` — TOML card data fields
+- `docs/effect_resolution/effect_resolution.md` — effects, triggers, prompts
+- `docs/testing_cookbook/testing_cookbook.md` — writing integration tests
+- `docs/style_code_ordering/style_code_ordering.md` — style rules, lint fixes
+- `docs/display_animation/display_animation.md` — animations, rendering
+- `docs/masonry_ui_panels/masonry_ui_panels.md` — Rust UI panels
+- `docs/rlf_localization/rlf_localization.md` — localized strings, rlf! macro
+- `docs/ai_system/ai_system.md` — AI opponent MCTS
+- `docs/logging/logging.md` — logging, tracing, battle_trace!
+
 ## Vocabulary
 
 Materialize: play a character.
