@@ -37,6 +37,17 @@ navigate to the "battle" site to initiate a card battle. After completing a
 battle, the user is able to select another dreamscape to navigate to, and the
 process repeats.
 
+## The Golden Rule: Configuration via TOML
+
+The rest of this document goes into detail about specific game systems. To the
+maximum extent possible, though, Dreamtides gameplay is intended to be
+completely configurable via TOML file changes. If a section in the plan says
+"shops contain 6 items", this is implied to be configured in TOML. Whenever
+reasonable, we should even allow more complex algorithmic changes via data
+(dreamscape generation, draft pool rules, battle rewards, etc). When
+implementing any rules engine feature, we should ask the question "could we make
+this configurable?"
+
 ## Current Quest Prototype
 
 A prototype of client UI patterns for the quest system is available in
@@ -104,7 +115,7 @@ dreamcallers. Dreamcallers are animated 3D characters, and we'll typically play
 character animations on this screen. The user can read the special abilities of
 the offered dreamcallers and pick one to lead their deck. Dreamcallers affect
 which cards are offered in future Draft sites, refer to the
-[Resonance](resonance--draft-pick-generation) section below for more details.
+[Resonance](#resonance--draft-pick-generation) section below for more details.
 
 There is a certain element of strategy to *when* the user visits this site, and
 it's intended to not be obvious whether it's better to visit other sites before
@@ -127,27 +138,39 @@ also modify shop prices.
 
 Icon: "Store"
 
-### Dreamsign
+### Dreamsign Offering
 
-Text
+At a dreamsign offering site, the user is presented with a single dreamsign to
+gain. The offering may be rejected, but there is no reward for doing so.
 
 Icon: "Sparkles"
 
 ### Dreamsign Draft
 
-Text
+At a dreamsign draft site, the user is presented with around three dreamsigns
+and is able to select one to gain. It is again possible to select no dreamsign.
 
 Icon: "Sparkles Alt"
 
 ### Dream Journey
 
-Text
+A dream journey functions in a manner similar to a random event in other
+roguelike deckbuilding games. The player is offered a selection between around
+two cards with unique art. Each card has a description, although the amount of
+information revealed about the effects is variable, and some dream journeys have
+highly random effects. This is where we put the biggest random effects which can
+structurally change a quest or modify the user's entire deck.
 
 Icon: "Moon + Star"
 
 ### Tempting Offer
 
-Text
+A tempting offer is a site where the user is faced with a pair of dream journey
+options with positive effects, in a simliar manner to the dream journey site.
+This time, however, each dream journey is also associated with a 'cost' card
+with its own card and description, showing some price to be paid to unlock the
+journey effect. The user may select a option to pay its cost and receive the
+benefit.
 
 Icon: "Law"
 
