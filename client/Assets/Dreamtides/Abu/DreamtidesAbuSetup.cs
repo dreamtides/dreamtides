@@ -43,9 +43,10 @@ namespace Dreamtides.Abu
       var bridge = FindFirstObjectByType<AbuBridge>();
       if (bridge == null)
       {
+        // AbuBridge.Awake() calls DontDestroyOnLoad on itself, so no need
+        // to call it here after AddComponent.
         var bridgeObject = new GameObject("AbuBridge");
         bridge = bridgeObject.AddComponent<AbuBridge>();
-        DontDestroyOnLoad(bridgeObject);
       }
 
       var walker = new DreamtidesSceneWalker(_registry);
