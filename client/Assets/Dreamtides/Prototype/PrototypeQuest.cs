@@ -107,8 +107,13 @@ public class PrototypeQuest : Service
     ApplyPendingShopOverrides();
   }
 
-  protected override void OnInitialize(GameMode _mode, TestConfiguration? testConfiguration)
+  protected override void OnInitialize(GameMode mode, TestConfiguration? testConfiguration)
   {
+    if (mode != GameMode.Quest)
+    {
+      return;
+    }
+
     EnsureFlowsInitialized();
     StartCoroutine(InitializeQuestSequence());
   }
