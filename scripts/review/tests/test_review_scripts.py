@@ -165,10 +165,10 @@ class ReviewScopePlannerTests(unittest.TestCase):
                 "scripts/review/review_scope_config.json",
                 "rules_engine/tabula/",
             ),
-            parser_crate_seeds=("parser_v2", "parser_v2_tests", "parser_v2_benchmarks"),
+            parser_crate_seeds=("parser", "parser_tests", "parser_benchmarks"),
             parser_path_prefixes=(
-                "rules_engine/src/parser_v2/",
-                "rules_engine/tests/parser_v2_tests/",
+                "rules_engine/src/parser/",
+                "rules_engine/tests/parser_tests/",
             ),
             tv_crate_seeds=("tv", "tv_tests"),
             tv_path_prefixes=("rules_engine/src/tv/", "rules_engine/tests/tv_tests/"),
@@ -207,15 +207,15 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.metadata = review_scope.WorkspaceMetadata(
             crate_roots={
                 "core_data": "rules_engine/src/core_data",
-                "parser_v2": "rules_engine/src/parser_v2",
-                "parser_v2_tests": "rules_engine/tests/parser_v2_tests",
+                "parser": "rules_engine/src/parser",
+                "parser_tests": "rules_engine/tests/parser_tests",
                 "rules_engine": "rules_engine/src/rules_engine",
                 "tv_tests": "rules_engine/tests/tv_tests",
             },
             reverse_dependencies={
-                "core_data": {"parser_v2", "rules_engine"},
-                "parser_v2": {"parser_v2_tests"},
-                "parser_v2_tests": set(),
+                "core_data": {"parser", "rules_engine"},
+                "parser": {"parser_tests"},
+                "parser_tests": set(),
                 "rules_engine": set(),
                 "tv_tests": set(),
             },
@@ -319,7 +319,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
             if args == ["git", "merge-base", "origin/master", "HEAD"]:
                 return (0, "123abc\n", "")
             if args == ["git", "diff", "--name-only", "123abc...HEAD"]:
-                return (0, "rules_engine/src/parser_v2/src/lib.rs\n", "")
+                return (0, "rules_engine/src/parser/src/lib.rs\n", "")
             raise AssertionError(f"unexpected command: {args}")
 
         changed = review_scope.resolve_changed_files(env, Path.cwd(), command_runner=command_runner)
@@ -327,7 +327,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.assertEqual(
             changed.changed_files,
             [
-                "rules_engine/src/parser_v2/src/lib.rs",
+                "rules_engine/src/parser/src/lib.rs",
                 "rules_engine/src/core_data/src/lib.rs",
             ],
         )

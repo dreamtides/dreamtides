@@ -42,9 +42,8 @@ Key files:
   truth for UI text)
 - `strings/locales/ru.rlf` — Russian locale override
 - `strings/locales/bracket.rlf` — bracket-wrapped test locale
-- `parser_v2/src/serializer/` — serializer modules that call `strings::*`
-  functions
-- `parser_v2/src/variables/parser_substitutions.rs` — parser-side RLF syntax
+- `parser/src/serializer/` — serializer modules that call `strings::*` functions
+- `parser/src/variables/parser_substitutions.rs` — parser-side RLF syntax
   resolution
 
 ## Phrase Definition Syntax
@@ -387,8 +386,8 @@ To add a new phrase to the RLF system:
    phrases) returning `rlf::Phrase`.
 
 3. **Connect to serializers** — in the appropriate serializer module under
-   `parser_v2/src/serializer/`, add a match arm that calls the new
-   `strings::*()` function and returns the resulting Phrase.
+   `parser/src/serializer/`, add a match arm that calls the new `strings::*()`
+   function and returns the resulting Phrase.
 
 4. **Run `just fmt`** to format the new phrase definition.
 

@@ -22,7 +22,7 @@ grammatical agreement, article selection, case declension, and word order.
 
 ## Problem Statement
 
-The current serializer (`src/parser_v2/src/serializer/`) generates English-only
+The current serializer (`src/parser/src/serializer/`) generates English-only
 text through composable functions:
 
 ```rust
@@ -606,7 +606,7 @@ Start with English to establish all message IDs. Other languages will use
 
 ### Phase 3: Serializer Updates
 
-Modify `src/parser_v2/src/serializer/` to add `_localized` variants:
+Modify `src/parser/src/serializer/` to add `_localized` variants:
 
 ```rust
 // Current
@@ -695,7 +695,7 @@ rules_engine/
 │   │   ├── builder.rs            # LocalizedStringBuilder
 │   │   └── bundles.rs            # FluentBundle loading
 │   │
-│   └── parser_v2/src/serializer/
+│   └── parser/src/serializer/
 │       ├── ability_serializer.rs    # Add _localized variants
 │       ├── effect_serializer.rs     # Add _localized variants
 │       └── predicate_serializer.rs  # Add _localized variants

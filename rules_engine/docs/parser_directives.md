@@ -200,7 +200,7 @@ This character's spark is equal to the number of cards in your void.
 
 ## Parser Architecture Overview
 
-For the complete parser architecture, see `parser_v2_design.md`. Summary:
+For the complete parser architecture, see `parser_design.md`. Summary:
 
 ### Processing Flow
 
@@ -240,7 +240,7 @@ pub enum ResolvedToken {
 ### Crate Structure
 
 ```
-rules_engine/src/parser_v2/
+rules_engine/src/parser/
 ├── src/
 │   ├── lexer/           # Tokenization
 │   ├── variables/       # Variable resolution
@@ -250,7 +250,7 @@ rules_engine/src/parser_v2/
 │   ├── serializer/      # Ability → String
 │   └── error/           # Error handling + suggestions
 
-rules_engine/tests/parser_v2_tests/
+rules_engine/tests/parser_tests/
 ├── src/test_helpers.rs  # Test utilities
 └── tests/               # Test files
 ```

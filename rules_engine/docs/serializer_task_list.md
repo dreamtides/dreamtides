@@ -1,7 +1,7 @@
 # Serializer Task List
 
 This document outlines tasks for improving and expanding the ability serializer in
-`src/parser_v2/src/serializer/`. The serializer converts `Ability` data structures into
+`src/parser/src/serializer/`. The serializer converts `Ability` data structures into
 human-readable rules text strings.
 
 ## Current Architecture

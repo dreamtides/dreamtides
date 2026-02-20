@@ -83,7 +83,7 @@ complete TOML reference.
 
 ## Stage 1: Lexing
 
-The lexer (parser_v2/src/lexer/) lowercases all input and scans it into a flat
+The lexer (parser/src/lexer/) lowercases all input and scans it into a flat
 token stream.
 
 - **Lowercasing:** The entire input is lowercased before scanning. All Word and
@@ -105,7 +105,7 @@ token stream.
 
 ## Stage 2: Variable Resolution
 
-Variable resolution (parser_v2/src/variables/) transforms Token streams into
+Variable resolution (parser/src/variables/) transforms Token streams into
 ResolvedToken streams, bridging lexing and parsing.
 
 **The four PHRASES tables** in parser_substitutions.rs map directive names to
@@ -126,7 +126,7 @@ See [variable_resolution.md](variable_resolution.md) for the complete reference.
 
 ## Stage 3: Parsing
 
-The Chumsky parser (parser_v2/src/parser/) consumes ResolvedToken streams and
+The Chumsky parser (parser/src/parser/) consumes ResolvedToken streams and
 produces Ability AST nodes.
 
 **Five ability types in priority order:**
@@ -170,8 +170,8 @@ See [parser_structure.md](parser_structure.md) and
 
 ## Stage 4: Serialization
 
-The serializer (parser_v2/src/serializer/) walks an Ability AST and produces
-rich display text through RLF phrase composition.
+The serializer (parser/src/serializer/) walks an Ability AST and produces rich
+display text through RLF phrase composition.
 
 **Architecture:** Eight files mirror the parser structure. The entry point
 serialize_ability dispatches on the Ability variant. The effect serializer

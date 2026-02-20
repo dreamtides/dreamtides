@@ -7,7 +7,7 @@ use syn::{Item, UseTree, Visibility};
 
 use crate::violation::{StyleViolation, ViolationKind};
 
-const ALLOWLIST: &[&str] = &["parser::parser_utils", "parser_v2::parser::parser_helpers"];
+const ALLOWLIST: &[&str] = &["parser::parser_utils", "parser::parser::parser_helpers"];
 
 pub fn check_all_files(files: &[PathBuf], root: &Path) -> Result<Vec<StyleViolation>> {
     // First pass: collect all public functions

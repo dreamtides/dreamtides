@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use convert_case::{Case, Casing};
-use parser_v2::ability_directory_parser;
+use parser::ability_directory_parser;
 use tabula_data::toml_loader::{self, CardListsFile, TestCardsFile, TestDreamwellFile};
 
 /// Generates code from TOML source files into the tabula_generated crate.

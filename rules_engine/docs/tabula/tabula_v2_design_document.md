@@ -5,7 +5,7 @@
 Tabula V2 is a complete rewrite of the card data loading system to replace
 `tabula_data` with `tabula_data_v2`. This refactor eliminates the legacy
 `tabula.json` file in favor of loading data directly from TOML and FTL files at
-runtime, parsing card abilities using `parser_v2` during game initialization,
+runtime, parsing card abilities using `parser` during game initialization,
 and generating code from the new CLI system.
 
 **Primary Goals:**
@@ -67,7 +67,7 @@ src/tabula_data_v2/
 │   ├── card_effect_row.rs          # CardEffectRow (from card-fx.toml)
 │   ├── card_list_row.rs            # CardListRow (from card-lists.toml)
 │   ├── fluent_loader.rs            # Fluent string loading from .ftl
-│   ├── ability_parser.rs           # parser_v2 integration wrapper
+│   ├── ability_parser.rs           # parser integration wrapper
 │   ├── toml_loader.rs              # TOML file loading utilities
 │   ├── tabula_struct.rs            # Main Tabula struct
 │   └── tabula_error.rs             # Error types with location info
@@ -166,7 +166,7 @@ impl FluentStrings {
 
 The `DisplayedAbility` struct is deleted. Instead of storing display-ready text,
 UI strings are rendered on-demand using the serializer system from
-`parser_v2/src/serializer/ability_serializer`.
+`parser/src/serializer/ability_serializer`.
 
 **Storage Decision:** CardDefinition stores only the parsed `Ability` enum:
 
@@ -180,7 +180,7 @@ pub struct CardDefinition {
 **Serializer API:** The ability serializer provides three main functions:
 
 ```rust
-use parser_v2::serializer::ability_serializer::{
+use parser::serializer::ability_serializer::{
     self, SerializedAbility, serialize_ability, serialize_ability_effect,
     serialize_modal_choices
 };
@@ -326,7 +326,7 @@ format - we serialize the final `CardDefinition`, not the raw TOML data.
 # Internal
 ability_data = { path = "../ability_data" }
 core_data = { path = "../core_data" }
-parser_v2 = { path = "../parser_v2" }
+parser = { path = "../parser" }
 
 # External
 anyhow = "1"
@@ -382,7 +382,7 @@ context window.
 
 **Important:** This migration has three waves:
 - **Wave 1 (Preparation):** Tasks 1-7 build `tabula_data_v2` in isolation and extend
-  the `parser_v2` serializers for display use cases. Each task should leave `just check`
+  the `parser` serializers for display use cases. Each task should leave `just check`
   passing.
 - **Wave 2 (Migration):** Tasks 8-15 migrate dependent crates in dependency order.
   **Code will NOT compile until Task 15 is complete.** Do not run `just check` during
@@ -531,7 +531,7 @@ Extend the existing `tabula_cli` with a `generate` command for code generation.
 
 ### Task 7: Extend Ability Serializer for Display Use Cases
 
-Extend `parser_v2/src/serializer/ability_serializer.rs` with additional functions
+Extend `parser/src/serializer/ability_serializer.rs` with additional functions
 needed by the display layer. The display crate will use these serializers directly
 (no intermediate helper module).
 
@@ -544,7 +544,7 @@ needed by the display layer. The display crate will use these serializers direct
   - `serialize_modal_choices(abilities: &[Ability]) -> BTreeMap<ModelEffectChoiceIndex, SerializedAbility>`
     - Extracts each modal choice's effect text from Event/Activated abilities
     - Used by `modal_effect_prompt_rendering` for modal choice cards
-- Make necessary serializer modules public in `parser_v2/src/serializer/mod.rs`
+- Make necessary serializer modules public in `parser/src/serializer/mod.rs`
 
 **Current Display Usage Patterns to Support:**
 
@@ -573,7 +573,7 @@ needed by the display layer. The display crate will use these serializers direct
    ```
 
 **Key Files for Context:**
-- `src/parser_v2/src/serializer/ability_serializer.rs` (add new functions here)
+- `src/parser/src/serializer/ability_serializer.rs` (add new functions here)
 - `src/display/src/rendering/card_rendering.rs:86-100` (`ability_token_text`)
 - `src/display/src/rendering/card_rendering.rs:102-148` (`rules_text`)
 - `src/display/src/rendering/modal_effect_prompt_rendering.rs:61-75` (`modal_effect_descriptions`)
@@ -700,11 +700,11 @@ Game creation depends on all battle crates.
 ### Task 13: Migrate display (Layer 7)
 
 Display crate depends on all battle layers and state_provider. Uses the
-ability serializers from `parser_v2` directly (see Task 7).
+ability serializers from `parser` directly (see Task 7).
 
 **Deliverables:**
 
-- Add `parser_v2` to `display/Cargo.toml` dependencies
+- Add `parser` to `display/Cargo.toml` dependencies
 
 - Update `card_rendering.rs`:
   - Delete `get_displayed_text()` function - replace with serializer calls
@@ -760,7 +760,7 @@ ability serializers from `parser_v2` directly (see Task 7).
 - `src/display/src/rendering/dreamwell_card_rendering.rs:79-85` (rules_text)
 - `src/display/src/rendering/modal_effect_prompt_rendering.rs:61-139` (modal handling)
 - `src/display/src/rendering/animations.rs:209-222` (SelectModalEffectChoice)
-- `src/parser_v2/src/serializer/ability_serializer.rs` (serializer API)
+- `src/parser/src/serializer/ability_serializer.rs` (serializer API)
 
 **Validation:** None - code will not compile until Wave 2 is complete
 
@@ -921,7 +921,7 @@ Fix test failures in display, messaging, and integration tests.
 - `tests/battle_tests/basic_tests/enemy_message_tests.rs`
 - `tests/battle_tests/basic_tests/duplicate_action_prevention_tests.rs`
 - Any remaining test failures from `tests/tabula_cli_tests/`
-- Any remaining test failures from `tests/parser_v2_tests/`
+- Any remaining test failures from `tests/parser_tests/`
 
 **Run:** `just test` to run all tests
 

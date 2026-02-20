@@ -6,7 +6,7 @@ This document describes a comprehensive localization strategy for the Dreamtides
 
 ## Current Architecture Analysis
 
-The serializer (`src/parser_v2/src/serializer/`) generates English rules text through composable functions:
+The serializer (`src/parser/src/serializer/`) generates English rules text through composable functions:
 
 ```rust
 // Current English-only approach
@@ -1693,7 +1693,7 @@ src/
 │   ├── registry.rs         # TermRegistry
 │   └── bundles.rs          # Bundle loading/management
 │
-├── parser_v2/src/serializer/
+├── parser/src/serializer/
 │   ├── mod.rs
 │   ├── ability_serializer.rs    # Updated with _localized variants
 │   ├── effect_serializer.rs

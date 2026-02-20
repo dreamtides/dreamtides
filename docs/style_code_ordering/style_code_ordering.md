@@ -110,7 +110,7 @@ generic type parameters.
 validator cross-references all `use` statements against known public functions
 across the entire codebase. You must import the module and call
 `apply_effect::execute()`. Two module paths are allowlisted:
-`parser::parser_utils` and `parser_v2::parser::parser_helpers`.
+`parser::parser_utils` and `parser::parser::parser_helpers`.
 
 ## Import Conventions
 
@@ -147,14 +147,14 @@ Three separate checks enforce test placement:
 
 **No inline `mod tests {}` blocks:** Inline test modules with content are
 banned. Tests must live as integration tests under `rules_engine/tests/`. Two
-files are whitelisted: `parser_v2/src/error/parser_error_suggestions.rs` and
+files are whitelisted: `parser/src/error/parser_error_suggestions.rs` and
 `battle_state/src/battle_cards/card_set.rs`.
 
 **No `tests/` directories under `src/`:** The validator walks
 `rules_engine/src/` and flags any directory named `tests`. All test code belongs
 in the top-level `rules_engine/tests/` directory, which contains five test
-crates: `battle_tests`, `parser_v2_tests`, `tabula_cli_tests`,
-`tabula_data_tests`, and `tv_tests`.
+crates: `battle_tests`, `parser_tests`, `tabula_cli_tests`, `tabula_data_tests`,
+and `tv_tests`.
 
 **Test file naming:** Under `rules_engine/tests/`, test files must end in
 `_tests.rs` (not `_test.rs`). Helper and utility files are exempted.
@@ -222,7 +222,7 @@ never fires (catching stale suppressions).
 This is directly relevant to the chumsky `select!` macro issue: the macro
 expansion triggers `unnested_or_patterns`, and the suppression must use
 `#[expect(clippy::unnested_or_patterns)]`, not `#[allow()]`. Currently two
-parser helper functions in `parser_v2/src/parser/parser_helpers.rs` carry this
+parser helper functions in `parser/src/parser/parser_helpers.rs` carry this
 annotation.
 
 The `tv/` Tauri app directory is excluded from style validation and does contain

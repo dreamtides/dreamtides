@@ -1,0 +1,1248 @@
+use insta::assert_ron_snapshot;
+use parser_tests::test_helpers::*;
+
+#[test]
+fn test_until_end_of_turn_when_you_play_event_copy_it() {
+    let result = parse_ability("Until end of turn, when you play an event, copy it.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(CreateTriggerUntilEndOfTurn(
+        trigger: TriggeredAbility(
+          trigger: Play(Your(Event)),
+          effect: Effect(Copy(
+            target: It,
+          )),
+          options: Some(TriggeredAbilityOptions(
+            once_per_turn: false,
+            until_end_of_turn: true,
+          )),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_ally_dissolved_gains_reclaim_for_cost() {
+    let result = parse_ability(
+        "When an ally is {dissolved}, this card gains {reclaim_for_cost} this turn.",
+        "r: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Dissolved(Another(Character)),
+      effect: Effect(GainsReclaim(
+        target: This,
+        count: Exactly(1),
+        this_turn: true,
+        cost: Some(Energy(3)),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialize_random_characters_with_cost() {
+    let result = parse_ability(
+        "{Materialize} {n_random_characters} with cost {e} or less from your deck.",
+        "n: 3, e: 5",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(MaterializeRandomFromDeck(
+        count: 3,
+        predicate: CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
+          cost: Energy(5),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_materialize_random_subtype_from_deck() {
+    let result = parse_ability(
+        "{Judgment} {Materialize} {n_random_characters} {subtype} from your deck.",
+        "n: 2, t: Warrior",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: Effect(MaterializeRandomFromDeck(
+        count: 2,
+        predicate: CharacterType(Warrior),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_foresee() {
+    let result = parse_ability("{Judgment} {Foresee}.", "f: 3");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: Effect(Foresee(
+        count: 3,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_foresee() {
+    let result = parse_ability("{Materialized} {Foresee}.", "f: 3");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(Foresee(
+        count: 3,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_prevent_a_card() {
+    let result = parse_ability("{Prevent} a played card.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Counterspell(
+        target: Enemy(Card),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_prevent_event_unless_opponent_pays() {
+    let result = parse_ability("{Prevent} a played event unless the opponent pays {e}.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(CounterspellUnlessPaysCost(
+        target: Enemy(Event),
+        cost: Energy(Energy(1)),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_dissolve_an_enemy() {
+    let result = parse_ability("{Dissolve} an enemy.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharacter(
+        target: Enemy(Character),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_a_subtype() {
+    let result = parse_ability("{Discover} {a_subtype}.", "t: Warrior");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: CharacterType(Warrior),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_dissolve_enemy_with_spark_or_less() {
+    let result = parse_ability("{Dissolve} an enemy with spark {s} or less.", "s: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharacter(
+        target: Enemy(CharacterWithSpark(Spark(3), OrLess)),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_dissolve_enemy_with_spark_or_more() {
+    let result = parse_ability("{Dissolve} an enemy with spark {s} or more.", "s: 5");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharacter(
+        target: Enemy(CharacterWithSpark(Spark(5), OrMore)),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_dissolve_enemy_with_cost_or_more() {
+    let result = parse_ability("{Dissolve} an enemy with cost {e} or more.", "e: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharacter(
+        target: Enemy(CardWithCost(
+          target: Character,
+          cost_operator: OrMore,
+          cost: Energy(3),
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_banish_enemy_with_cost_or_less() {
+    let result = parse_ability("{Banish} an enemy with cost {e} or less.", "e: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(BanishCharacter(
+        target: Enemy(CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
+          cost: Energy(2),
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_banish_opponent_void() {
+    assert_ron_snapshot!(
+        parse_ability("{Materialized} {Banish} the opponent's void.", ""),
+        @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(BanishEnemyVoid),
+    ))
+    "###,
+    );
+}
+
+#[test]
+fn test_materialized_you_may_banish_ally_then_materialize_it() {
+    let result =
+        parse_ability("{Materialized} You may {banish} an ally, then {materialize} it.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: BanishThenMaterialize(
+          target: Another(Character),
+          count: Exactly(1),
+        ),
+        optional: true,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_you_may_banish_ally_then_materialize_it() {
+    let result = parse_ability("{Judgment} You may {banish} an ally, then {materialize} it.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: BanishThenMaterialize(
+          target: Another(Character),
+          count: Exactly(1),
+        ),
+        optional: true,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_prevent_a_played_fast_card() {
+    let result = parse_ability("{Prevent} a played {fast} card.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Counterspell(
+        target: Enemy(Fast(
+          target: Card,
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_prevent_a_played_character() {
+    let result = parse_ability("{Prevent} a played character.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Counterspell(
+        target: Enemy(Character),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_prevent_played_card_with_cost() {
+    let result =
+        parse_ability("{Materialized} {Prevent} a played card with cost {e} or less.", "e: 3");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(Counterspell(
+        target: Enemy(CardWithCost(
+          target: Card,
+          cost_operator: OrLess,
+          cost: Energy(3),
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_prevent_played_card_put_on_top_of_opponent_deck() {
+    let result =
+        parse_ability("{Prevent} a played card. Put it on top of the opponent's deck.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: List([
+        EffectWithOptions(
+          effect: Counterspell(
+            target: Enemy(Card),
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: PutOnTopOfEnemyDeck(
+            target: It,
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_an_event() {
+    let result = parse_ability("{Discover} an event.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Event,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_dissolve_all_characters() {
+    let result = parse_ability("{Dissolve} all characters.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharactersCount(
+        target: Any(Character),
+        count: All,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_discover_fast_event() {
+    let result = parse_ability("{Materialized} {Discover} a {fast} event.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: Event,
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_character() {
+    let result = parse_ability("{Discover} a {fast} character.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: Character,
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_card() {
+    let result = parse_ability("{Discover} a {fast} card.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: Card,
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_subtype() {
+    let result = parse_ability("{Discover} a {fast} {a_subtype}.", "t: Warrior");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: CharacterType(Warrior),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_character_with_spark() {
+    let result = parse_ability("{Discover} a {fast} character with spark {s} or less.", "s: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: CharacterWithSpark(Spark(2), OrLess),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_card_with_cost() {
+    let result = parse_ability("{Discover} a {fast} character with cost {e} or less.", "e: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: CardWithCost(
+            target: Character,
+            cost_operator: OrLess,
+            cost: Energy(3),
+          ),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_card_with_cost() {
+    let result = parse_ability("{Discover} a card with cost {e}.", "e: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: CardWithCost(
+          target: Card,
+          cost_operator: Exactly,
+          cost: Energy(3),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_banish_non_subtype_enemy() {
+    let result = parse_ability("{Banish} a non-{subtype} enemy.", "t: Warrior");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(BanishCharacter(
+        target: Enemy(NotCharacterType(Warrior)),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_event_with_cost() {
+    let result = parse_ability("{Discover} an event with cost {e}.", "e: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: CardWithCost(
+          target: Event,
+          cost_operator: Exactly,
+          cost: Energy(2),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_character_with_cost() {
+    let result = parse_ability("{Discover} a character with cost {e} or less.", "e: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
+          cost: Energy(3),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_subtype_with_cost() {
+    let result = parse_ability("{Discover} {a_subtype} with cost {e} or more.", "t: Warrior, e: 4");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: CardWithCost(
+          target: CharacterType(Warrior),
+          cost_operator: OrMore,
+          cost: Energy(4),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_event_with_cost() {
+    let result = parse_ability("{Discover} a {fast} event with cost {e}.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: CardWithCost(
+            target: Event,
+            cost_operator: Exactly,
+            cost: Energy(1),
+          ),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_subtype_with_cost() {
+    let result =
+        parse_ability("{Discover} a {fast} {subtype} with cost {e} or less.", "t: Mage, e: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: CardWithCost(
+            target: CharacterType(Mage),
+            cost_operator: OrLess,
+            cost: Energy(2),
+          ),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_subtype_with_spark() {
+    let result =
+        parse_ability("{Discover} {a_subtype} with spark {s} or less.", "t: Warrior, s: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: CharacterWithSpark(Spark(2), OrLess),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_character_with_spark_general() {
+    let result = parse_ability("{Discover} a {fast} character with spark {s} or more.", "s: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: CharacterWithSpark(Spark(3), OrMore),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_subtype_with_spark_general() {
+    let result =
+        parse_ability("{Discover} a {fast} {subtype} with spark {s} or less.", "t: Warrior, s: 1");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: CharacterWithSpark(Spark(1), OrLess),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_banish_ally_materialize_at_end_of_turn_reclaim() {
+    let result = parse_abilities(
+        "{Banish} an ally. {Materialize} it at end of turn.\n\n{Reclaim_For_Cost}",
+        "r: 2",
+    );
+    assert_eq!(result.len(), 2);
+    assert_ron_snapshot!(result[0], @r###"
+    Event(EventAbility(
+      effect: List([
+        EffectWithOptions(
+          effect: BanishCharacter(
+            target: Another(Character),
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: MaterializeCharacterAtEndOfTurn(
+            target: It,
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+    assert_ron_snapshot!(result[1], @r###"
+    Named(Reclaim(Some(Energy(2))))
+    "###);
+}
+
+#[test]
+fn test_dissolve_enemy_with_cost_less_than_allied_subtype() {
+    let result = parse_ability(
+        "{Dissolve} an enemy with cost less than the number of allied {plural_subtype}.",
+        "t: Warrior",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharacter(
+        target: Enemy(CharacterWithCostComparedToControlled(
+          target: Character,
+          cost_operator: OrLess,
+          count_matching: CharacterType(Warrior),
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_dissolve_enemy_with_cost_less_than_void_count() {
+    let result = parse_ability(
+        "{Dissolve} an enemy with cost less than the number of cards in your void.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharacter(
+        target: Enemy(CharacterWithCostComparedToVoidCount(
+          target: Character,
+          cost_operator: OrLess,
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_pay_energy_to_kindle_and_banish_cards_from_opponent_void() {
+    let result = parse_ability(
+        "{Judgment} Pay {e} to {kindle} and {banish} {cards} from the opponent's void.",
+        "e: 1, k: 1, c: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: ListWithOptions(ListWithOptions(
+        effects: [
+          EffectWithOptions(
+            effect: Kindle(
+              amount: Spark(1),
+            ),
+            optional: false,
+          ),
+          EffectWithOptions(
+            effect: BanishCardsFromEnemyVoid(
+              count: 2,
+            ),
+            optional: false,
+          ),
+        ],
+        trigger_cost: Some(Energy(Energy(1))),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_you_may_pay_energy_to_kindle_and_banish_cards_from_opponent_void() {
+    let result = parse_ability(
+        "{Judgment} You may pay {e} to {kindle} and {banish} {cards} from the opponent's void.",
+        "e: 1, k: 1, c: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: ListWithOptions(ListWithOptions(
+        effects: [
+          EffectWithOptions(
+            effect: Kindle(
+              amount: Spark(1),
+            ),
+            optional: true,
+          ),
+          EffectWithOptions(
+            effect: BanishCardsFromEnemyVoid(
+              count: 2,
+            ),
+            optional: true,
+          ),
+        ],
+        trigger_cost: Some(Energy(Energy(1))),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_you_may_banish_cards_from_your_void_to_dissolve_enemy_with_cost() {
+    let result = parse_ability(
+        "{Judgment} You may {banish} {cards} from your void to {dissolve} an enemy with cost {e} or less.",
+        "c: 3, e: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: DissolveCharacter(
+          target: Enemy(CardWithCost(
+            target: Character,
+            cost_operator: OrLess,
+            cost: Energy(2),
+          )),
+        ),
+        optional: true,
+        trigger_cost: Some(BanishCardsFromYourVoid(3)),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_you_may_banish_cards_from_opponent_void_to_gain_energy() {
+    let result = parse_ability(
+        "{Judgment} You may {banish} {cards} from the opponent's void to gain {e}.",
+        "c: 1, e: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: GainEnergy(
+          gains: Energy(1),
+        ),
+        optional: true,
+        trigger_cost: Some(BanishCardsFromEnemyVoid(1)),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_you_may_abandon_subtype_to_discover_subtype_with_cost_higher_and_materialize_it() {
+    let result = parse_ability(
+        "{Judgment} You may abandon {a_subtype} to {discover} {a_subtype} with cost {e} higher and {materialize} it.",
+        "t: Warrior, e: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: DiscoverAndThenMaterialize(
+          predicate: CardWithCost(
+            target: CharacterType(Warrior),
+            cost_operator: HigherBy(Energy(2)),
+            cost: Energy(2),
+          ),
+        ),
+        optional: true,
+        trigger_cost: Some(AbandonCharactersCount(
+          target: Any(CharacterType(Warrior)),
+          count: Exactly(1),
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_you_may_pay_energy_to_banish_up_to_n_allies_then_materialize_them() {
+    let result = parse_ability(
+        "{Judgment} You may pay {e} to {banish} {up_to_n_allies}, then {materialize} {pronoun:$n}.",
+        "e: 1, n: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: BanishThenMaterialize(
+          target: Another(Character),
+          count: UpTo(2),
+        ),
+        optional: true,
+        trigger_cost: Some(Energy(Energy(1))),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_banish_ally_with_spark_then_materialize_it() {
+    let result = parse_ability(
+        "{Materialized} {Banish} an ally with spark {s} or less, then {materialize} it.",
+        "s: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(BanishThenMaterialize(
+        target: Another(CharacterWithSpark(Spark(2), OrLess)),
+        count: Exactly(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_banish_any_number_of_allies_then_materialize_them() {
+    let result =
+        parse_ability("{Materialized} {Banish} any number of allies, then {materialize} them.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(BanishThenMaterialize(
+        target: Another(Character),
+        count: AnyNumberOf,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_banish_up_to_n_allies_then_materialize_them() {
+    let result =
+        parse_ability("{Banish} {up_to_n_allies}, then {materialize} {pronoun:$n}.", "n: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(BanishThenMaterialize(
+        target: Another(Character),
+        count: UpTo(3),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_you_may_banish_ally_then_materialize_it() {
+    let result = parse_ability("You may {banish} an ally, then {materialize} it.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: WithOptions(EffectWithOptions(
+        effect: BanishThenMaterialize(
+          target: Another(Character),
+          count: Exactly(1),
+        ),
+        optional: true,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialize_n_figments() {
+    let result = parse_ability("{Materialize} {n_figments}.", "g: celestial, n: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(MaterializeFigments(
+        figment: Celestial,
+        count: 2,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialize_a_figment_for_each_card_played_this_turn() {
+    let result = parse_ability(
+        "{Materialize} {@a figment} for each card you have played this turn.",
+        "g: shadow",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(MaterializeFigmentsQuantity(
+        figment: Shadow,
+        count: 1,
+        quantity: PlayedThisTurn(Card),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_banish_enemy_until_character_leaves_play() {
+    let result =
+        parse_ability("{Materialized} {Banish} an enemy until this character leaves play.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(BanishCharacterUntilLeavesPlay(
+        target: Enemy(Character),
+        until_leaves: This,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_banish_enemy_until_next_main_phase() {
+    let result = parse_ability("{Materialized} {Banish} an enemy until your next main phase.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(BanishUntilNextMain(
+        target: Enemy(Character),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_event_in_void_gains_reclaim() {
+    let result = parse_ability(
+        "{Materialized} An event in your void gains {reclaim} equal to its cost this turn.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(GainsReclaim(
+        target: YourVoid(Event),
+        count: Exactly(1),
+        this_turn: true,
+        cost: None,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_copy_next_event() {
+    let result =
+        parse_ability("{Materialized} Copy the next event you play {this_turn_times}.", "n: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(CopyNextPlayed(
+        matching: Your(Event),
+        times: Some(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_event_copy_next_event() {
+    let result = parse_ability("Copy the next event you play {this_turn_times}.", "n: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(CopyNextPlayed(
+        matching: Your(Event),
+        times: Some(2),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_event_trigger_additional_judgment_phase() {
+    let result = parse_ability(
+        "At the end of this turn, trigger an additional {judgment_phase_name} phase.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(TriggerAdditionalJudgmentPhaseAtEndOfTurn),
+    ))
+    "###);
+}
+
+#[test]
+fn test_event_copy_next_fast_character() {
+    let result =
+        parse_ability("Copy the next {fast} character you play {this_turn_times}.", "n: 1");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(CopyNextPlayed(
+        matching: Your(Fast(
+          target: Character,
+        )),
+        times: Some(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_event_copy_next_event_with_reclaim_for_cost() {
+    let result = parse_abilities(
+        "Copy the next event you play {this_turn_times}.\n\n{Reclaim_For_Cost}",
+        "n: 1, r: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(EventAbility(
+        effect: Effect(CopyNextPlayed(
+          matching: Your(Event),
+          times: Some(1),
+        )),
+      )),
+      Named(Reclaim(Some(Energy(2)))),
+    ]
+    "###);
+}
+
+#[test]
+fn test_each_player_shuffles_hand_and_void_and_draws() {
+    let result = parse_ability(
+        "Each player shuffles their hand and void into their deck and then draws {cards}.",
+        "c: 5",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(EachPlayerShufflesHandAndVoidIntoDeckAndDraws(
+        count: 5,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_each_player_shuffles_hand_and_void_and_draws() {
+    let result = parse_ability(
+        "{Judgment} Each player shuffles their hand and void into their deck and then draws {cards}.",
+        "c: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: Effect(EachPlayerShufflesHandAndVoidIntoDeckAndDraws(
+        count: 3,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_copy_it() {
+    let result = parse_ability("copy it.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Copy(
+        target: It,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_you_play_event_from_hand_copy_it() {
+    let result = parse_ability("When you play an event from your hand, copy it.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: PlayFromHand(Your(Event)),
+      effect: Effect(Copy(
+        target: It,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_take_an_extra_turn_after_this_one() {
+    let result = parse_ability("Take an extra turn after this one.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(TakeExtraTurn),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_you_materialize_trigger_judgment_ability_each_ally() {
+    let result = parse_ability(
+        "When you {materialize} a character, trigger the {Judgment} ability of each ally.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Materialize(Your(Character)),
+      effect: Effect(TriggerJudgmentAbility(
+        matching: Another(Character),
+        collection: All,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_you_materialize_trigger_judgment_ability_each_enemy() {
+    let result = parse_ability(
+        "When you {materialize} a character, trigger the {Judgment} ability of each enemy.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Materialize(Your(Character)),
+      effect: Effect(TriggerJudgmentAbility(
+        matching: Enemy(Character),
+        collection: All,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_you_discard_card_it_gains_reclaim_equal_to_cost() {
+    let result = parse_ability(
+        "When you discard a card, it gains {reclaim} equal to its cost this turn.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Discard(Your(Card)),
+      effect: Effect(GainsReclaim(
+        target: It,
+        count: Exactly(1),
+        this_turn: true,
+        cost: None,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_modal_return_enemy_or_draw_cards() {
+    let result = parse_ability(
+        "{choose_one}\n{bullet} {energy(e1)}: Return an enemy to hand.\n{bullet} {energy(e2)}: Draw {cards}.",
+        "e1: 1, e2: 2, c: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Modal([
+        ModalEffectChoice(
+          energy_cost: Energy(1),
+          effect: Effect(ReturnToHand(
+            target: Enemy(Character),
+          )),
+        ),
+        ModalEffectChoice(
+          energy_cost: Energy(2),
+          effect: Effect(DrawCards(
+            count: 3,
+          )),
+        ),
+      ]),
+    ))
+    "###);
+}
+
+#[test]
+fn test_prevent_played_event_which_could_dissolve_ally() {
+    let result = parse_ability("{Prevent} a played event which could {dissolve} an ally.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Counterspell(
+        target: Enemy(CouldDissolve(
+          target: Another(Character),
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_opponent_plays_card_which_could_dissolve_ally_prevent_that_card() {
+    let result = parse_ability(
+        "When the opponent plays an event which could {dissolve} an ally, {prevent} that card.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: OpponentPlays(Any(CouldDissolve(
+        target: Another(Character),
+      ))),
+      effect: Effect(Counterspell(
+        target: That,
+      )),
+    ))
+    "###);
+}

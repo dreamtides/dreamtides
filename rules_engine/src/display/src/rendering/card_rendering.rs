@@ -25,7 +25,7 @@ use display_data::card_view::{
 };
 use masonry::flex_enums::FlexDirection;
 use masonry::flex_style::FlexStyle;
-use parser_v2::serializer::ability_serializer;
+use parser::serializer::ability_serializer;
 use strings::strings;
 use tabula_data::card_definition::CardDefinition;
 use ui_components::box_component::BoxComponent;

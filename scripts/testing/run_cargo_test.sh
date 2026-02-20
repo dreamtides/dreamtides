@@ -3,7 +3,7 @@
 # Fails if a filter is provided but no tests match.
 #
 # Usage: run_cargo_test.sh <package> [test_filter_args...]
-# Example: run_cargo_test.sh parser_v2_tests my_test_name
+# Example: run_cargo_test.sh parser_tests my_test_name
 #
 # Environment variables:
 #   REVIEW_PERF - If set to 1, route through review/profile_cargo_test.py

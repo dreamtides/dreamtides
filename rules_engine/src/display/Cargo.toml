@@ -23,7 +23,7 @@ core_data = { path = "../core_data" }
 display_data = { path = "../display_data" }
 logging = { path = "../logging" }
 masonry = { path = "../masonry" }
-parser_v2 = { path = "../parser_v2" }
+parser = { path = "../parser" }
 quest_state = { path = "../quest_state" }
 state_provider = { path = "../state_provider" }
 strings = { path = "../strings" }

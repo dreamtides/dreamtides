@@ -30,8 +30,8 @@ writes each artifact sequentially, and prints a confirmation for each file.
 ## Generating parsed_abilities.json
 
 The generate command delegates ability parsing to
-`ability_directory_parser::parse_abilities_from_directory` in the parser_v2
-crate. This function scans every `.toml` file in the Tabula directory using raw
+`ability_directory_parser::parse_abilities_from_directory` in the parser crate.
+This function scans every `.toml` file in the Tabula directory using raw
 `toml::Value` parsing rather than typed deserialization. This generic approach
 means the parser does not need to know the TOML table name; it simply iterates
 over every array-of-tables section and extracts any entry that has both an `id`

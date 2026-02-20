@@ -29,9 +29,9 @@ Document should cover:
 - Common pitfalls: lexer lowercases everything, double newlines split abilities,
   display-only directives like {card:$c} are filtered out during parsing.
 
-Key files: parser_v2/src/variables/parser_substitutions.rs,
-parser_v2/src/parser/ability_parser.rs, ability_data/src/standard_effect.rs,
-parser_v2/src/serializer/effect_serializer.rs, strings/src/strings.rlf.rs,
+Key files: parser/src/variables/parser_substitutions.rs,
+parser/src/parser/ability_parser.rs, ability_data/src/standard_effect.rs,
+parser/src/serializer/effect_serializer.rs, strings/src/strings.rlf.rs,
 tabula_cli/src/commands/generate.rs.
 
 ## 2. TOML Card Definition Format
@@ -86,8 +86,8 @@ Document should cover:
   (energy($e), @a subtype($t)) is resolved by resolve_rlf_syntax() in
   parser_substitutions.rs, separate from the display serialization path.
 
-Key files: strings/src/strings.rlf.rs, parser_v2/src/serializer/ (all files),
-parser_v2/src/variables/parser_substitutions.rs (resolve_rlf_syntax).
+Key files: strings/src/strings.rlf.rs, parser/src/serializer/ (all files),
+parser/src/variables/parser_substitutions.rs (resolve_rlf_syntax).
 
 ## 4. Effect Resolution & Trigger System
 

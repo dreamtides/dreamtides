@@ -216,7 +216,7 @@ describes the issue: missing variable, syntax error, or unknown reference.
 ## Migration Considerations
 
 ### Reusing Existing Code
-The ability parser in rules_engine/src/parser_v2 provides additional
+The ability parser in rules_engine/src/parser provides additional
 validation but is separate from the Fluent-based preview rendering.
 Consider whether to integrate parser validation for syntax highlighting
 of invalid ability text.

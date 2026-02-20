@@ -8,7 +8,7 @@ use syn::{File, Item, ItemMod};
 use crate::violation::{StyleViolation, ViolationKind};
 
 const WHITELISTED_FILES: &[&str] = &[
-    "src/parser_v2/src/error/parser_error_suggestions.rs",
+    "src/parser/src/error/parser_error_suggestions.rs",
     "src/battle_state/src/battle_cards/card_set.rs",
 ];
 

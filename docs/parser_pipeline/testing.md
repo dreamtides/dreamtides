@@ -118,13 +118,13 @@ Parser caching uses a thread_local static holding a boxed Chumsky parser,
 constructed once per thread and reused for all parse operations. Stack space
 management uses the stacker crate for on-demand growth, complemented by a large
 RUST_MIN_STACK environment variable. The test library lives at
-`rules_engine/tests/parser_v2_tests/` with fixture files in
+`rules_engine/tests/parser_tests/` with fixture files in
 `tests/round_trip_tests/fixtures/`.
 
 ## Build Pipeline Integration
 
 Parser tests are separate from the main test suite due to their stack
-requirements. The `just parser-test` command runs all parser_v2 tests with
+requirements. The `just parser-test` command runs all parser tests with
 `RUST_MIN_STACK` configuration. A specific test can be run via
 `just parser-test TEST_NAME`. The `just parser-baselines` command runs only the
 bracket locale leak harness and golden rendered output tests.

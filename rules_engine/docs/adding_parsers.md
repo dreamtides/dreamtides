@@ -224,7 +224,7 @@ use crate::parser::{card_predicate_parser, predicate_parser};
 
 ### Step 1: Implement the Parser
 
-Parser code lives in `rules_engine/src/parser_v2/src/parser/`. Effects are
+Parser code lives in `rules_engine/src/parser/src/parser/`. Effects are
 split across files in the `effect/` subdirectory:
 
 - `card_effect_parsers.rs` - Draw, discard, materialize, etc.
@@ -318,7 +318,7 @@ recursive(|cp| {
 })
 ```
 
-See section 4.9 of `rules_engine/docs/parser_v2_design.md` for comprehensive
+See section 4.9 of `rules_engine/docs/parser_design.md` for comprehensive
 guidance on avoiding left recursion.
 
 #### Boxing for Compile Performance
@@ -345,7 +345,7 @@ fn category_effects<'a>(
 
 ### Step 2: Add Parsing Tests
 
-Tests go in `rules_engine/tests/parser_v2_tests/tests/`. Use the insta crate
+Tests go in `rules_engine/tests/parser_tests/tests/`. Use the insta crate
 with RON snapshots for parser output assertions.
 
 Create tests for full card text, not individual component parts. Import test
@@ -353,7 +353,7 @@ helpers and use `assert_ron_snapshot!`:
 
 ```rust
 use insta::assert_ron_snapshot;
-use parser_v2_tests::test_helpers::*;
+use parser_tests::test_helpers::*;
 
 #[test]
 fn test_your_new_ability() {
@@ -404,7 +404,7 @@ just parser-test-insta game_effects_parser_tests
 
 Serialization converts `Ability` structs back to template text for round-trip
 verification. Update the appropriate serializer module in
-`rules_engine/src/parser_v2/src/serializer/`:
+`rules_engine/src/parser/src/serializer/`:
 
 - **Effects**: Add to `effect_serializer::serialize_standard_effect()`
 - **Costs**: Add to `cost_serializer::serialize_cost()`
@@ -439,7 +439,7 @@ Use these canonical variable names:
 ### Step 4: Add Round-Trip Tests
 
 Round-trip tests verify that parsing then serializing produces reasonable output.
-Add tests to the appropriate file in `rules_engine/tests/parser_v2_tests/tests/ability_round_trip_tests/`:
+Add tests to the appropriate file in `rules_engine/tests/parser_tests/tests/ability_round_trip_tests/`:
 
 - `judgment_abilities.rs` - For {Judgment} and {Materialized} triggered abilities
 - `event_abilities.rs` - For event card abilities
@@ -450,8 +450,8 @@ Add tests to the appropriate file in `rules_engine/tests/parser_v2_tests/tests/a
 Example:
 
 ```rust
-use parser_v2::serializer::ability_serializer;
-use parser_v2_tests::test_helpers::*;
+use parser::serializer::ability_serializer;
+use parser_tests::test_helpers::*;
 
 #[test]
 fn test_round_trip_your_new_effect() {
@@ -470,12 +470,12 @@ just for serialization.
 ### Step 5: Update Spanned Ability Support
 
 Spanned abilities track text spans for UI display segmentation. Update
-`rules_engine/src/parser_v2/src/builder/parser_builder.rs` if your new ability
+`rules_engine/src/parser/src/builder/parser_builder.rs` if your new ability
 requires special span handling.
 
 ### Step 6: Add Spanned Ability Tests
 
-Add tests to the appropriate file in `rules_engine/tests/parser_v2_tests/tests/spanned_ability_tests/`:
+Add tests to the appropriate file in `rules_engine/tests/parser_tests/tests/spanned_ability_tests/`:
 
 - `triggered_tests.rs` - For triggered abilities
 - `event_tests.rs` - For event abilities
@@ -485,8 +485,8 @@ Add tests to the appropriate file in `rules_engine/tests/parser_v2_tests/tests/s
 Example:
 
 ```rust
-use parser_v2::builder::parser_spans::{SpannedAbility, SpannedEffect};
-use parser_v2_tests::test_helpers::*;
+use parser::builder::parser_spans::{SpannedAbility, SpannedEffect};
+use parser_tests::test_helpers::*;
 
 #[test]
 fn test_spanned_your_new_effect() {
@@ -625,7 +625,7 @@ For detailed reference information, see:
   types (Ability, Effect, StandardEffect, Predicate, etc.)
 - **Directives**: `rules_engine/docs/parser_directives.md` - Complete directive
   reference and common patterns
-- **Parser architecture**: `rules_engine/docs/parser_v2_design.md` - Full
+- **Parser architecture**: `rules_engine/docs/parser_design.md` - Full
   parser design and processing flow
 - **Environment setup**: `rules_engine/docs/environment_setup.md`
 - **Adding effects**: `rules_engine/docs/adding_new_effects.md`

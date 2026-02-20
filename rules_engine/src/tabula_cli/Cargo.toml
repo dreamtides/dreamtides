@@ -18,7 +18,7 @@ doctest = false
 bench = false
 
 [dependencies]
-parser_v2 = { path = "../parser_v2" }
+parser = { path = "../parser" }
 tabula_data = { path = "../tabula_data" }
 
 anyhow = { workspace = true }

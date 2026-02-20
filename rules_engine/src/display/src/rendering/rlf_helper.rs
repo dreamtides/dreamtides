@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use ability_data::variable_value::VariableValue;
 use core_data::card_types::CardSubtype;
 use core_data::figment_type::FigmentType;
-use parser_v2::variables::parser_bindings::VariableBindings;
+use parser::variables::parser_bindings::VariableBindings;
 use rlf::{Phrase, Value};
 use strings::strings;
 

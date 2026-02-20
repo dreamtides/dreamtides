@@ -90,7 +90,7 @@ watch-release:
 
 test: tabula-check
     #!/usr/bin/env bash
-    # Set RUST_MIN_STACK for parser_v2 tests which need extra stack space for
+    # Set RUST_MIN_STACK for parser tests which need extra stack space for
     # deep Chumsky parser hierarchies. Limit test parallelism to prevent memory
     # exhaustion in low-memory environments (like Docker).
 
@@ -149,10 +149,10 @@ review-core-test: tabula-check
             --manifest-path rules_engine/Cargo.toml \
             --workspace \
             --exclude tv_tests \
-            --exclude parser_v2_tests \
+            --exclude parser_tests \
             "${PROFILE_ARGS[@]}"
     else
-        output=$(RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --workspace --exclude tv_tests --exclude parser_v2_tests -- $TEST_THREADS 2>&1)
+        output=$(RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --workspace --exclude tv_tests --exclude parser_tests -- $TEST_THREADS 2>&1)
         if [ $? -eq 0 ]; then
             echo "Tests passed"
         else
@@ -169,7 +169,7 @@ review-core-test-verbose:
     else
         TEST_THREADS=""
     fi
-    RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --workspace --exclude tv_tests --exclude parser_v2_tests -- $TEST_THREADS
+    RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --workspace --exclude tv_tests --exclude parser_tests -- $TEST_THREADS
 
 battle-test *args='':
     ./scripts/testing/run_cargo_test.sh battle_tests "$@"
@@ -182,7 +182,7 @@ parser-test *args='':
     fi
     export RUST_MIN_STACK=8388608
     export CARGO_TEST_QUIET=1
-    ./scripts/testing/run_cargo_test.sh parser_v2_tests "$@"
+    ./scripts/testing/run_cargo_test.sh parser_tests "$@"
 
 parser-baselines:
     just parser-test test_full_card_bracket_locale_leak_detector
@@ -196,7 +196,7 @@ parser-test-insta *args='':
     else
         TEST_THREADS=""
     fi
-    cd rules_engine && RUST_MIN_STACK=8388608 cargo insta test --accept -p parser_v2_tests -- $TEST_THREADS "$@"
+    cd rules_engine && RUST_MIN_STACK=8388608 cargo insta test --accept -p parser_tests -- $TEST_THREADS "$@"
 
 lat *args='':
     cargo run --manifest-path rules_engine/Cargo.toml --bin lat -- "$@"
@@ -387,17 +387,17 @@ style-validator-fix:
   fi
 
 parser *args='':
-  cargo run --manifest-path rules_engine/Cargo.toml --bin "parser_v2" -- "$@"
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "parser" -- "$@"
 
 parser-release *args='':
-  cargo run --manifest-path rules_engine/Cargo.toml --release --bin "parser_v2" -- "$@"
+  cargo run --manifest-path rules_engine/Cargo.toml --release --bin "parser" -- "$@"
 
 parse-abilities:
-  cargo run --manifest-path rules_engine/Cargo.toml --bin "parser_v2" -- parse-abilities --directory rules_engine/tabula --output rules_engine/tabula/parsed_abilities.json
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "parser" -- parse-abilities --directory rules_engine/tabula --output rules_engine/tabula/parsed_abilities.json
 
 verify-parsed-abilities:
   #!/usr/bin/env bash
-  output=$(cargo run --manifest-path rules_engine/Cargo.toml --bin "parser_v2" -- verify-abilities --directory rules_engine/tabula --input rules_engine/tabula/parsed_abilities.json 2>&1)
+  output=$(cargo run --manifest-path rules_engine/Cargo.toml --bin "parser" -- verify-abilities --directory rules_engine/tabula --input rules_engine/tabula/parsed_abilities.json 2>&1)
   if [ $? -eq 0 ]; then
       echo "Parsed abilities verification passed"
   else
@@ -641,7 +641,7 @@ bench-full:
     cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- ai_full/ai_full
 
 bench-parser:
-    cargo criterion --manifest-path rules_engine/Cargo.toml -p parser_v2_benchmarks
+    cargo criterion --manifest-path rules_engine/Cargo.toml -p parser_benchmarks
 
 iai:
     ./scripts/benchmarking/benchmark_on_linux.py 'iai_benchmarks'

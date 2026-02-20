@@ -17,8 +17,8 @@ description: Work with the RLF (Rust Localization Framework) system for defining
 | Label rendering | `rules_engine/src/display/src/rendering/labels.rs` |
 | Bracket locale (leak detection) | `rules_engine/src/strings/locales/bracket.rlf` |
 | Russian locale | `rules_engine/src/strings/locales/ru.rlf` |
-| Bracket locale tests | `rules_engine/tests/parser_v2_tests/tests/bracket_locale_tests.rs` |
-| Bracket leak harness | `rules_engine/tests/parser_v2_tests/tests/bracket_locale_leak_harness_tests.rs` |
+| Bracket locale tests | `rules_engine/tests/parser_tests/tests/bracket_locale_tests.rs` |
+| Bracket leak harness | `rules_engine/tests/parser_tests/tests/bracket_locale_leak_harness_tests.rs` |
 | RLF lint binary | `rules_engine/src/rlf-lint/` |
 | RLF docs | `~/rlf/docs/` |
 

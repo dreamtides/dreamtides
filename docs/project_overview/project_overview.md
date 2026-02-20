@@ -41,7 +41,7 @@ organized in layers:
 - **Layer 1 (data):** `ability_data` (Ability/Effect/StandardEffect types),
   `ai_data` (GameAI enum), `tabula_generated` (generated card ID constants).
 - **Layer 2 (card data):** `tabula_data` (TOML loading, CardDefinition
-  building), `parser_v2` (ability text parser), `quest_state`, `action_data`
+  building), `parser` (ability text parser), `quest_state`, `action_data`
   (GameAction/BattleAction enums).
 - **Layer 3 (state):** `battle_state` is the central hub — BattleState struct
   plus all card zone storage, triggers, prompts, pending effects. Nearly
@@ -72,14 +72,14 @@ paths. The standalone `tv` app is used to inspect and edit tabula TOML data.
 The `tabula generate` command (run via `just tabula-generate`) parses all card
 text through a multi-stage pipeline:
 
-1. **Lex** (parser_v2/src/lexer/): Lowercases all input, tokenizes into
+1. **Lex** (parser/src/lexer/): Lowercases all input, tokenizes into
    Word/Directive/punctuation tokens. Directives are `{...}` blocks.
-2. **Resolve variables** (parser_v2/src/variables/): Substitutes directives
-   against typed VariableBindings. `{energy}` with binding `e: 2` becomes
+2. **Resolve variables** (parser/src/variables/): Substitutes directives against
+   typed VariableBindings. `{energy}` with binding `e: 2` becomes
    `ResolvedToken::Energy(2)`. Handles RLF function syntax, subtypes, figments,
    modal variants, and bare phrases. Each semantic concept maps to a distinct
    ResolvedToken variant.
-3. **Parse** (parser_v2/src/parser/): A chumsky parser combinator converts the
+3. **Parse** (parser/src/parser/): A chumsky parser combinator converts the
    resolved token stream into an Ability AST. Five ability types: Event,
    Triggered, Activated, Static, Named. Effects resolve to StandardEffect
    variants (DrawCards, DissolveCharacter, GainEnergy, Foresee, Kindle, etc.).
@@ -90,8 +90,8 @@ text through a multi-stage pipeline:
 
 At runtime, `Tabula::load()` (tabula_data) reads the pre-parsed JSON alongside
 the TOML metadata and builds CardDefinition structs. No re-parsing occurs at
-runtime. For display, the serializer (parser_v2/src/serializer/) walks the
-Ability tree and calls RLF phrase functions from `strings` to produce
+runtime. For display, the serializer (parser/src/serializer/) walks the Ability
+tree and calls RLF phrase functions from `strings` to produce
 rich-text-formatted rules text with colored keywords and plural-aware counts.
 
 ## Battle Execution

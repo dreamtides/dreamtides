@@ -330,5 +330,5 @@ cards.toml file rather than reading it directly.
 - tabula_cli/src/commands/generate.rs -- The tabula generate command
   implementation.
 - tabula_cli/src/commands/check.rs -- The staleness check implementation.
-- parser_v2/src/variables/parser_substitutions.rs -- Phrase tables and directive
+- parser/src/variables/parser_substitutions.rs -- Phrase tables and directive
   resolution.

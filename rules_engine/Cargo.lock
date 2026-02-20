@@ -1538,7 +1538,7 @@ dependencies = [
  "display_data",
  "logging",
  "masonry",
- "parser_v2",
+ "parser",
  "quest_state",
  "rlf",
  "schemars 1.0.2",
@@ -3832,7 +3832,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "parser_v2"
+name = "parser"
 version = "0.1.0"
 dependencies = [
  "ability_data",
@@ -3853,28 +3853,28 @@ dependencies = [
 ]
 
 [[package]]
-name = "parser_v2_benchmarks"
+name = "parser_benchmarks"
 version = "0.1.0"
 dependencies = [
  "ability_data",
  "chumsky",
  "core_data",
  "criterion",
- "parser_v2",
+ "parser",
  "serde",
  "toml",
 ]
 
 [[package]]
-name = "parser_v2_tests"
+name = "parser_tests"
 version = "0.1.0"
 dependencies = [
  "ability_data",
  "chumsky",
  "core_data",
  "insta",
- "parser_v2",
- "parser_v2_benchmarks",
+ "parser",
+ "parser_benchmarks",
  "regex",
  "rlf",
  "serde",
@@ -5655,7 +5655,7 @@ dependencies = [
  "ctrlc",
  "notify",
  "notify-debouncer-mini",
- "parser_v2",
+ "parser",
  "serde_json",
  "tabula_data",
 ]

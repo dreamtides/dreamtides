@@ -20,14 +20,14 @@
   ],
   "parser": {
     "crate_seeds": [
-      "parser_v2",
-      "parser_v2_benchmarks",
-      "parser_v2_tests"
+      "parser",
+      "parser_benchmarks",
+      "parser_tests"
     ],
     "path_prefixes": [
-      "rules_engine/benchmarks/parser_v2/",
-      "rules_engine/src/parser_v2/",
-      "rules_engine/tests/parser_v2_tests/"
+      "rules_engine/benchmarks/parser_benchmarks/",
+      "rules_engine/src/parser/",
+      "rules_engine/tests/parser_tests/"
     ]
   },
   "tv": {

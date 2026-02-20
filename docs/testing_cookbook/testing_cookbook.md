@@ -395,7 +395,7 @@ All test commands use `just` (never raw `cargo`):
 Parser tests and battle tests are separate Cargo packages testing fundamentally
 different things.
 
-**Parser tests** (`parser_v2_tests` crate) directly invoke the lexer, variable
+**Parser tests** (`parser_tests` crate) directly invoke the lexer, variable
 resolver, and parser to convert ability text strings into Ability AST
 structures. They do not use TestSession or the rules engine. A thread-local
 cached parser avoids the expensive cost of constructing the Chumsky parser on

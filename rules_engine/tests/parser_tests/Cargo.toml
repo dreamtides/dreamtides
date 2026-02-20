@@ -1,0 +1,22 @@
+[package]
+name = "parser_tests"
+version = "0.1.0"
+edition = "2021"
+
+[lints]
+workspace = true
+
+[dependencies]
+ability_data = { path = "../../src/ability_data" }
+core_data = { path = "../../src/core_data" }
+parser = { path = "../../src/parser" }
+parser_benchmarks = { path = "../../benchmarks/parser_benchmarks" }
+strings = { path = "../../src/strings" }
+
+chumsky = { workspace = true }
+insta = { workspace = true }
+regex = { workspace = true }
+rlf = { workspace = true }
+serde = { workspace = true }
+stacker = "0.1"
+toml = { workspace = true }

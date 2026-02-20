@@ -10,7 +10,7 @@ This document specifies Parser V2 for the Dreamtides card game rules engine. V2 
 1. Read sections 1-5 once at project start
 2. When starting milestone N, read only section 13.N
 3. Reference appendices when you encounter specific syntax questions
-4. Record progress in docs/parser_v2/PROGRESS.md
+4. Record progress in docs/parser/PROGRESS.md
 
 ---
 
@@ -65,7 +65,7 @@ This document specifies Parser V2 for the Dreamtides card game rules engine. V2 
 Parser V2 consolidates into a single crate with clear module separation. **Important:** Do not put code into `mod.rs` files. Each module should have a descriptively-named file. All filenames must be globally unique (prefixed with their module context).
 
 ```
-rules_engine/src/parser_v2/
+rules_engine/src/parser/
 ├── Cargo.toml
 ├── src/
 │   ├── lib.rs                    # Public API + module declarations
@@ -119,7 +119,7 @@ rules_engine/src/parser_v2/
 │       ├── parser_diagnostics.rs # Ariadne integration
 │       └── parser_error_suggestions.rs # Error recovery strategies
 
-rules_engine/tests/parser_v2_tests/
+rules_engine/tests/parser_tests/
 ├── Cargo.toml
 ├── src/
 │   └── lib.rs                    # Test utilities
@@ -135,7 +135,7 @@ rules_engine/tests/parser_v2_tests/
     ├── round_trip_tests.rs
     └── error_tests.rs
 
-rules_engine/benchmarks/parser_v2/
+rules_engine/benchmarks/parser_benchmarks/
 ├── Cargo.toml
 └── benches/
     ├── parser_bench.rs
@@ -762,7 +762,7 @@ After every code change:
 1. **Format:** `just fmt`
 2. **Type check:** `just check`
 3. **Lint:** `just clippy`
-4. **Run parser tests:** `cargo test -p parser_v2_tests`
+4. **Run parser tests:** `cargo test -p parser_tests`
 5. **Full validation:** `just review`
 
 ### 11.2 Code Style Rules

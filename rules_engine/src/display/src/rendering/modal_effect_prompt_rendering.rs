@@ -12,7 +12,7 @@ use core_data::display_color;
 use core_data::numerics::Energy;
 use display_data::card_view::{CardActions, CardView};
 use display_data::object_position::{ObjectPosition, Position};
-use parser_v2::serializer::ability_serializer;
+use parser::serializer::ability_serializer;
 use strings::strings;
 
 use crate::core::adapter;

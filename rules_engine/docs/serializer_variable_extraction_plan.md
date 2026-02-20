@@ -2,7 +2,7 @@
 
 ## Goal
 
-Modify `serialize_ability()` in `src/parser_v2/src/serializer/ability_serializer.rs` to return both the serialized ability string **and** a `VariableBindings` map containing the variable-to-value mappings needed to recreate the ability.
+Modify `serialize_ability()` in `src/parser/src/serializer/ability_serializer.rs` to return both the serialized ability string **and** a `VariableBindings` map containing the variable-to-value mappings needed to recreate the ability.
 
 ## Current State
 
@@ -22,9 +22,9 @@ Ability struct with concrete values
 ```
 
 ### Key Files
-- **Serializer**: `src/parser_v2/src/serializer/ability_serializer.rs` - Entry point
-- **Variable mapping**: `src/parser_v2/src/variables/parser_substitutions.rs` - `DIRECTIVES` table maps directive names to variable names
-- **Bindings type**: `src/parser_v2/src/variables/parser_bindings.rs` - `VariableBindings` struct
+- **Serializer**: `src/parser/src/serializer/ability_serializer.rs` - Entry point
+- **Variable mapping**: `src/parser/src/variables/parser_substitutions.rs` - `DIRECTIVES` table maps directive names to variable names
+- **Bindings type**: `src/parser/src/variables/parser_bindings.rs` - `VariableBindings` struct
 - **Value type**: `src/ability_data/src/variable_value.rs` - `VariableValue` enum (Integer, Subtype, Figment)
 
 ### Directive → Variable Mapping (from parser_substitutions.rs:9-44)
@@ -121,7 +121,7 @@ format!("{{{}}}", "e")
 
 ### Milestone 5: Update Round-Trip Tests to Validate Variable Mappings
 
-**Files**: All files in `tests/parser_v2_tests/tests/ability_round_trip_tests/`
+**Files**: All files in `tests/parser_tests/tests/ability_round_trip_tests/`
 
 1. Update test pattern to capture returned `SerializedAbility`
 2. Add assertions that `result.variables` matches the input variables

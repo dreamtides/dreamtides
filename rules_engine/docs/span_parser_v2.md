@@ -71,7 +71,7 @@ lookups.
 ### 2.2 File Structure
 
 ```
-rules_engine/src/parser_v2/src/
+rules_engine/src/parser/src/
 ├── displayed/
 │   ├── mod.rs                           # Module declarations only
 │   ├── displayed_ability_parser.rs      # Main entry point & orchestration
@@ -512,21 +512,21 @@ fn split_cost_list(
 
 ### 5.1 Files to Remove
 
-- `src/parser_v2/src/builder/parser_spans.rs` - SpannedAbility types
-- `src/parser_v2/src/builder/parser_builder.rs` - SpannedAbility builder
+- `src/parser/src/builder/parser_spans.rs` - SpannedAbility types
+- `src/parser/src/builder/parser_builder.rs` - SpannedAbility builder
 
 ### 5.2 Files to Modify
 
-- `src/parser_v2/src/builder/parser_display.rs` - Update to use new
+- `src/parser/src/builder/parser_display.rs` - Update to use new
   DisplayedAbility types
-- `src/parser_v2/src/builder/mod.rs` - Update module exports
-- `src/parser_v2/src/lib.rs` - Add `displayed` module
+- `src/parser/src/builder/mod.rs` - Update module exports
+- `src/parser/src/lib.rs` - Add `displayed` module
 - `src/ability_data/src/ability.rs` - Update DisplayedAbility types
-- `tests/parser_v2_tests/src/test_helpers.rs` - Update helper functions
+- `tests/parser_tests/src/test_helpers.rs` - Update helper functions
 
 ### 5.3 Test Migration
 
-Existing tests in `tests/parser_v2_tests/tests/spanned_ability_tests/` will be
+Existing tests in `tests/parser_tests/tests/spanned_ability_tests/` will be
 migrated to use the new types. Test assertions will change from span-based to
 string-based.
 
@@ -537,14 +537,14 @@ string-based.
 ### Milestone 1: Core Types & Infrastructure
 
 **Deliverables:**
-1. Create `src/parser_v2/src/displayed/mod.rs` with module declarations
+1. Create `src/parser/src/displayed/mod.rs` with module declarations
 2. Create `displayed_ability_types.rs` with all Displayed* structs and enums
 3. Create `displayed_text_extraction.rs` with token→string utilities
 
 **Files to create:**
-- `src/parser_v2/src/displayed/mod.rs`
-- `src/parser_v2/src/displayed/displayed_ability_types.rs`
-- `src/parser_v2/src/displayed/displayed_text_extraction.rs`
+- `src/parser/src/displayed/mod.rs`
+- `src/parser/src/displayed/displayed_ability_types.rs`
+- `src/parser/src/displayed/displayed_text_extraction.rs`
 
 **Tests:**
 - Unit tests for text extraction utilities
@@ -558,7 +558,7 @@ string-based.
 4. Implement simple effect parsing (Effect::Effect variant)
 
 **Files to create:**
-- `src/parser_v2/src/displayed/displayed_ability_parser.rs`
+- `src/parser/src/displayed/displayed_ability_parser.rs`
 
 **Tests:**
 - Event abilities without additional cost
@@ -577,7 +577,7 @@ string-based.
 6. Implement Predicate and CardPredicate extraction from effects
 
 **Files to create:**
-- `src/parser_v2/src/displayed/displayed_effect_parser.rs`
+- `src/parser/src/displayed/displayed_effect_parser.rs`
 
 **Tests:**
 - Simple effects
@@ -599,7 +599,7 @@ string-based.
 4. Implement Choice parsing with options extraction
 
 **Files to create:**
-- `src/parser_v2/src/displayed/displayed_cost_parser.rs`
+- `src/parser/src/displayed/displayed_cost_parser.rs`
 
 **Tests:**
 - Simple energy costs
@@ -616,7 +616,7 @@ string-based.
 4. Integrate with effect parsing
 
 **Files to create:**
-- `src/parser_v2/src/displayed/displayed_trigger_parser.rs`
+- `src/parser/src/displayed/displayed_trigger_parser.rs`
 
 **Tests:**
 - Keyword triggers ({Judgment}, {Materialized}, {Dissolved})
@@ -636,7 +636,7 @@ string-based.
 4. Implement StaticAbilityWithOptions condition extraction
 
 **Files to create:**
-- `src/parser_v2/src/displayed/displayed_static_parser.rs`
+- `src/parser/src/displayed/displayed_static_parser.rs`
 
 **Tests:**
 - Simple activated abilities
@@ -657,13 +657,13 @@ string-based.
 
 **Files to modify:**
 - `src/ability_data/src/ability.rs`
-- `src/parser_v2/src/builder/mod.rs`
-- `src/parser_v2/src/builder/parser_display.rs`
-- `tests/parser_v2_tests/src/test_helpers.rs`
+- `src/parser/src/builder/mod.rs`
+- `src/parser/src/builder/parser_display.rs`
+- `tests/parser_tests/src/test_helpers.rs`
 
 **Files to remove:**
-- `src/parser_v2/src/builder/parser_spans.rs`
-- `src/parser_v2/src/builder/parser_builder.rs`
+- `src/parser/src/builder/parser_spans.rs`
+- `src/parser/src/builder/parser_builder.rs`
 
 **Tests:**
 - Migrate all tests from `spanned_ability_tests/` directory
@@ -676,7 +676,7 @@ string-based.
 ### 7.1 Test Organization
 
 Tests will be organized in
-`tests/parser_v2_tests/tests/displayed_ability_tests/`:
+`tests/parser_tests/tests/displayed_ability_tests/`:
 
 ```
 displayed_ability_tests/
@@ -875,5 +875,5 @@ After each milestone:
 1. `just fmt` - Format code
 2. `just check` - Type check
 3. `just clippy` - Lint check
-4. `cargo test -p parser_v2_tests` - Run parser tests
+4. `cargo test -p parser_tests` - Run parser tests
 5. `just review` - Full validation

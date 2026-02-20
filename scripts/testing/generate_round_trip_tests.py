@@ -175,7 +175,7 @@ def generate_test(card_name: str, rules_text: str, variables: str) -> str:
 def main():
     project_root = Path(__file__).parent.parent.parent
     cards_toml_path = project_root / "rules_engine" / "tabula" / "cards.toml"
-    output_dir = project_root / "rules_engine" / "tests" / "parser_v2_tests" / "tests" / "round_trip_tests"
+    output_dir = project_root / "rules_engine" / "tests" / "parser_tests" / "tests" / "round_trip_tests"
 
     # Create output directory
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -207,7 +207,7 @@ def main():
 //! GENERATED FILE - Do not edit manually.
 //! Regenerate with: python scripts/testing/generate_round_trip_tests.py
 
-use parser_v2_tests::test_helpers::*;
+use parser_tests::test_helpers::*;
 
 '''
 
