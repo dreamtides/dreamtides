@@ -151,9 +151,9 @@ manipulation is natural, and keeps the Unity side focused on scene walking.
 through to the CLI response as-is.
 
 **Project configuration**: ESM modules (`"type": "module"` in `package.json`).
-TypeScript with `target: ES2022`, `module: NodeNext`, `strict: true`.
-Dependencies: `ws`, `@types/ws`, `zod` (for request validation). No
-playwright-core. Output compiled to `dist/daemon.js`.
+TypeScript with `target: ES2022`, `module: NodeNext`, `strict: true`. Uses
+`pnpm` as the package manager. Dependencies: `ws`, `@types/ws`, `zod` (for
+request validation). No playwright-core. Output compiled to `dist/daemon.js`.
 
 **Security**: The Unix socket server should reject HTTP requests (check if the
 first bytes look like `GET /` or `POST /`) to prevent accidental web access.
@@ -280,36 +280,98 @@ walker:
 the scene (likely on the Registry prefab or as a separate `DontDestroyOnLoad`
 object). The Dreamtides walker registers itself with ABU during initialization.
 
-### Testing Strategy
+### Critical Problem: User Input Simulation
+
+Sending clicks and other gestures to Unity is the hardest problem in this
+project. ABU must correctly deliver input to **three distinct systems** -- UI
+Toolkit VisualElements, 3D Displayable GameObjects, and UGUI CanvasButtons --
+each of which has its own event model, threading constraints, and edge cases.
+
+We do **not** need to have a complete solution before starting, but we need to
+treat this as the highest-risk area and **empirically validate** each input
+pathway as early as possible via Unity editor tests (`just unity-tests`). The
+plan for each input system is our best hypothesis; the editor tests are how we
+confirm or refute it. Specifically:
+
+- **UI Toolkit**: Can `element.SendEvent(ClickEvent.GetPooled())` be called
+  from `Update()` and have it propagate correctly through the UI Toolkit event
+  system? Or must we fall back to `Callbacks.OnClick()` direct invocation? We
+  need an editor test that creates a VisualElement, registers a click callback,
+  fires a synthesized ClickEvent, and asserts the callback was invoked.
+
+- **3D Displayables**: Does injecting a fake `IInputProvider` into
+  `InputService` and letting `HandleDisplayableClickAndDrag()` drive the
+  `MouseDown()`/`MouseUp(isSameObject: true)` sequence actually work from a
+  test context? We need an editor test that instantiates a `Displayable`
+  subclass, simulates the click sequence, and asserts the expected side effect.
+
+- **CanvasButtons**: Does calling `CanvasButton.OnClick()` directly work in
+  editor tests, or does UGUI require a full EventSystem? We need an editor test
+  that verifies this.
+
+These three input validation tests should be among the **very first things
+built** in the project. If any of the hypothesized approaches fail, we need to
+discover that immediately and course-correct, not after building thousands of
+lines of code on top of a broken assumption.
+
+### Testing Strategy: Continuous Validation
+
+**Core principle: Every step of this project must produce real-world evidence of
+correctness.** It is *not* acceptable to write large amounts of C# code and
+defer testing to the end. Every task that produces C# code must also produce
+editor tests that run via `just unity-tests` and demonstrate the code actually
+works. If a piece of C# code cannot be validated by an editor test, that is a
+design problem to be solved before proceeding, not a testing gap to be accepted.
+
+This means:
+- No task is "done" until its editor tests pass via `just unity-tests`.
+- If an approach cannot be tested in EditMode, redesign it so it can be, or
+  escalate the problem.
+- Agent implementors must run `just unity-tests` after every meaningful C#
+  change, not just at milestones.
 
 #### Verification Tools Available to Agents
 
 | Tool | What it checks | Latency | Autonomous? |
 |------|---------------|---------|-------------|
 | `tsc --noEmit` | TypeScript type errors in daemon | ~2s | Yes |
-| `npm test` | Daemon unit/integration tests | ~5s | Yes |
+| `pnpm test` | Daemon unit/integration tests | ~5s | Yes |
 | VS Code `getDiagnostics` | C# type errors per file | Instant | Yes |
 | Unity batch mode (`-batchmode -quit`) | Full C# compilation | ~60s | Yes |
-| `just unity-tests` | EditMode NUnit tests | ~1-3 min | Yes |
+| **`just unity-tests`** | **EditMode NUnit tests** | **~1-3 min** | **Yes** |
 | `just fmt-csharp` | C# formatting (csharpier) | ~5s | Yes |
 | ABU itself (once bootstrapped) | End-to-end UI interaction | ~5s/command | Yes |
 
-Agents should run the fastest applicable check after every edit. The full suite
-(`just unity-tests` + `npm test`) is the gate before each milestone.
+Agents should run the fastest applicable check after every edit. **`just
+unity-tests` is the primary correctness gate for all C# code** and must pass
+after every task. The full suite (`just unity-tests` + `pnpm test`) is the gate
+before each milestone.
 
 #### Daemon Tests (Node.js)
 
-Test the daemon independently with mock WebSocket clients. Verify: PID file and
-socket creation, NDJSON request/response round-trips, snapshot JSON-to-ARIA-text
-formatting, error handling for missing Unity client, timeout behavior. These run
-without Unity.
+Test the daemon independently with mock WebSocket clients using `pnpm test`.
+Verify: PID file and socket creation, NDJSON request/response round-trips,
+snapshot JSON-to-ARIA-text formatting, error handling for missing Unity client,
+timeout behavior. These run without Unity.
 
 #### Bridge Tests (Unity EditMode)
 
 EditMode tests can programmatically create VisualElement trees and GameObjects
 without a running scene. The ABU UPM package and the Dreamtides integration
 each get their own test assembly (`.asmdef` with `UNITY_INCLUDE_TESTS` define,
-editor-only platform).
+editor-only platform). All tests run via `just unity-tests`.
+
+**Gate 0 — Input simulation validation (build this FIRST):**
+- UI Toolkit click: create a `VisualElement`, register a click callback, fire
+  `SendEvent(ClickEvent.GetPooled())`, assert the callback was invoked. If this
+  fails, test direct `Callbacks.OnClick()` invocation as a fallback.
+- Displayable click: instantiate a `Displayable` subclass, inject a fake
+  `IInputProvider`, trigger `HandleDisplayableClickAndDrag()`, assert the
+  expected `MouseUp(isSameObject: true)` side effect fires.
+- CanvasButton click: instantiate a `CanvasButton`, call `OnClick()` directly,
+  assert the expected side effect.
+- **This gate is the single most important deliverable in the project.** If
+  any of these tests fail, stop and redesign before building anything else.
 
 **Gate 1 — After WebSocket message types / command schema:**
 - Round-trip serialization tests: serialize a command to JSON, deserialize it,
@@ -383,12 +445,15 @@ subsequent changes to ABU.
 - The ABU UPM package depends only on `com.unity.nuget.newtonsoft-json`. No
   other third-party Unity dependencies.
 - The TypeScript daemon depends on `ws`, `@types/ws`, and `zod`. No
-  playwright-core or browser dependencies.
+  playwright-core or browser dependencies. Use `pnpm` for all Node.js package
+  management.
 - ABU is designed for turn-based games or games without a major reflex element.
   Real-time twitch gameplay is out of scope.
 - The `~/abu` repository does not exist yet. It must be created from scratch.
 - WebSocket port is configurable via `ABU_WS_PORT` (default 9999). Fixed port
   for v0.1; no dynamic negotiation.
+- All C# code must be continuously validated via `just unity-tests`. No task
+  is complete without passing editor tests that demonstrate correctness.
 
 ## Non-Goals
 
@@ -404,10 +469,17 @@ subsequent changes to ABU.
 
 ## Open Questions
 
+- **Input simulation across all three UI systems**: This is the project's
+  highest-risk area. Each of the three UI systems (UI Toolkit, 3D Displayables,
+  UGUI CanvasButtons) has a different event model, and our planned approaches
+  for simulating input into each are hypotheses that must be validated
+  empirically via editor tests before building on top of them. See the "Critical
+  Problem: User Input Simulation" section above. Gate 0 exists specifically to
+  validate or refute these hypotheses as the first deliverable.
 - **Synthesized ClickEvent propagation**: Whether
   `element.SendEvent(ClickEvent.GetPooled())` works correctly when called from
   `Update()` outside the UI Toolkit event dispatch cycle needs to be verified
-  during implementation. If it does not work, fall back to direct
+  via editor test. If it does not work, fall back to direct
   `Callbacks.OnClick()` invocation.
 - **CanvasButton detection**: Whether to use `FindObjectsByType<CanvasButton>()`
   or `DocumentService`'s four direct references. Both work; the latter is more
