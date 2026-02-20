@@ -1,6 +1,5 @@
 #nullable enable
 
-using System;
 using System.Collections;
 using Dreamtides.Buttons;
 using Dreamtides.Layout;
@@ -11,7 +10,6 @@ using Dreamtides.TestFakes;
 using Dreamtides.Tests.TestUtils;
 using NUnit.Framework;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
@@ -126,120 +124,57 @@ namespace Dreamtides.Tests.Abu
       Assert.IsTrue(clickFired, "Click callback should have been invoked via direct OnClick call");
     }
 
-    /// <summary>
-    /// Documents that element.SendEvent(ClickEvent.GetPooled()) does NOT
-    /// trigger registered click callbacks in EditMode batch tests, even when
-    /// the element is attached to a live panel. This confirms that the direct
-    /// Callbacks.OnClick() invocation (tested above) is the correct approach
-    /// for ABU's click simulation of UI Toolkit elements.
-    ///
-    /// SendEvent dispatches the event into the UI Toolkit event system, but
-    /// ClickEvent requires a full mouse down/up sequence through the event
-    /// propagation pipeline. A bare SendEvent(ClickEvent) does not trigger
-    /// the registered ClickEvent callback.
-    /// </summary>
-    [UnityTest]
-    public IEnumerator UiToolkitClickSimulation_SendEvent_DoesNotWork()
-    {
-      yield return Initialize();
-
-      var panelSettings = AssetDatabase.LoadAssetAtPath<PanelSettings>(
-        "Assets/Settings/UI Toolkit/MainPanel.asset"
-      );
-
-      var docGo = CreateGameObject();
-      var uiDoc = docGo.AddComponent<UIDocument>();
-      uiDoc.panelSettings = panelSettings;
-
-      yield return null;
-
-      var root = uiDoc.rootVisualElement;
-      if (root == null)
-      {
-        Assert.Inconclusive(
-          "UIDocument.rootVisualElement is null in this test environment."
-        );
-        yield break;
-      }
-
-      var element = new NodeVisualElement();
-      root.Add(element);
-
-      var callbacks = element.Callbacks.Value;
-      var clickFired = false;
-
-      callbacks.SetCallback(element, Callbacks.Event.Click, () => { clickFired = true; });
-
-      using var clickEvent = ClickEvent.GetPooled();
-      element.SendEvent(clickEvent);
-
-      // Documented finding: SendEvent(ClickEvent) does NOT trigger the
-      // registered callback. Direct Callbacks.OnClick() invocation is required.
-      Assert.IsFalse(
-        clickFired,
-        "SendEvent(ClickEvent) should NOT trigger callbacks (confirms direct invocation is needed)"
-      );
-    }
-
     // -- Test 2: UI Toolkit Hover Simulation --
 
     /// <summary>
-    /// Verifies that UI Toolkit hover simulation works by calling
-    /// Callbacks.OnMouseEnter() directly. The OnMouseEnter method was changed
-    /// from private to internal on the Callbacks class, and
+    /// Verifies that UI Toolkit hover enter and leave simulation works by
+    /// calling Callbacks.OnMouseEnter() and OnMouseLeave() directly on the
+    /// same element. The OnMouseEnter/OnMouseLeave methods were changed from
+    /// private to internal on the Callbacks class, and
     /// [assembly: InternalsVisibleTo("Dreamtides.Tests")] was added to
     /// Elements.cs to enable direct invocation from tests.
     ///
-    /// Approach used: Direct Callbacks.OnMouseEnter() invocation. This is
-    /// the most reliable approach for EditMode tests since
-    /// element.SendEvent(MouseEnterEvent.GetPooled()) may not work reliably
-    /// without a live panel in batch mode.
+    /// Approach used: Direct Callbacks.OnMouseEnter()/OnMouseLeave()
+    /// invocation. This is the most reliable approach for EditMode tests
+    /// since element.SendEvent() may not work reliably without a live panel
+    /// in batch mode. Testing both enter and leave on the same element
+    /// exercises a realistic hover sequence.
     /// </summary>
     [UnityTest]
-    public IEnumerator UiToolkitHoverSimulation_DirectCallbackInvocation()
+    public IEnumerator UiToolkitHoverEnterAndLeaveSimulation()
     {
       yield return Initialize();
 
       var element = new NodeVisualElement();
       var callbacks = element.Callbacks.Value;
-      var hoverFired = false;
+      var enterFired = false;
+      var leaveFired = false;
 
       callbacks.SetCallback(
         element,
         Callbacks.Event.MouseEnter,
-        () => { hoverFired = true; }
+        () => { enterFired = true; }
       );
-
-      // Call OnMouseEnter directly (made internal for test access)
-      using var mouseEnterEvent = MouseEnterEvent.GetPooled();
-      callbacks.OnMouseEnter(mouseEnterEvent);
-
-      Assert.IsTrue(
-        hoverFired,
-        "MouseEnter callback should have been invoked via direct OnMouseEnter call"
-      );
-    }
-
-    /// <summary>
-    /// Verifies that UI Toolkit hover leave simulation works by calling
-    /// Callbacks.OnMouseLeave() directly.
-    /// </summary>
-    [UnityTest]
-    public IEnumerator UiToolkitHoverLeaveSimulation_DirectCallbackInvocation()
-    {
-      yield return Initialize();
-
-      var element = new NodeVisualElement();
-      var callbacks = element.Callbacks.Value;
-      var leaveFired = false;
-
       callbacks.SetCallback(
         element,
         Callbacks.Event.MouseLeave,
         () => { leaveFired = true; }
       );
 
-      // Call OnMouseLeave directly (made internal for test access)
+      // Simulate hover enter
+      using var mouseEnterEvent = MouseEnterEvent.GetPooled();
+      callbacks.OnMouseEnter(mouseEnterEvent);
+
+      Assert.IsTrue(
+        enterFired,
+        "MouseEnter callback should have been invoked via direct OnMouseEnter call"
+      );
+      Assert.IsFalse(
+        leaveFired,
+        "MouseLeave callback should not have fired yet"
+      );
+
+      // Simulate hover leave
       using var mouseLeaveEvent = MouseLeaveEvent.GetPooled();
       callbacks.OnMouseLeave(mouseLeaveEvent);
 
@@ -407,6 +342,15 @@ namespace Dreamtides.Tests.Abu
       Assert.IsTrue(
         displayable.HoverCalled,
         "MouseHover() should be called on subsequent frames while hovering the same object"
+      );
+
+      // Remove hover target to trigger MouseHoverEnd
+      fakeInput.HoverTarget = null;
+      Registry.InputService.Update();
+
+      Assert.IsTrue(
+        displayable.HoverEndCalled,
+        "MouseHoverEnd() should be called when hover target is removed"
       );
     }
   }
