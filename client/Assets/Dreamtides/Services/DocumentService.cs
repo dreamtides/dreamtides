@@ -73,6 +73,11 @@ namespace Dreamtides.Services
 
     public bool MouseOverDocumentElement()
     {
+      if (_document == null)
+      {
+        return false;
+      }
+
       foreach (var node in _screenOverlay.Self.Children())
       {
         var pointer = ScreenPositionToElementPosition(Registry.InputService.PointerPosition());

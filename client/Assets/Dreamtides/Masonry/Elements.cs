@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Dreamtides.Schema;
 using Dreamtides.Services;
 using Dreamtides.Utils;
 using UnityEngine.UIElements;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 #nullable enable
 
@@ -142,12 +145,12 @@ namespace Dreamtides.Masonry
       _actions.GetValueOrDefault(Event.MouseUp)?.Invoke();
     }
 
-    void OnMouseEnter(MouseEnterEvent evt)
+    internal void OnMouseEnter(MouseEnterEvent evt)
     {
       _actions.GetValueOrDefault(Event.MouseEnter)?.Invoke();
     }
 
-    void OnMouseLeave(MouseLeaveEvent evt)
+    internal void OnMouseLeave(MouseLeaveEvent evt)
     {
       _actions.GetValueOrDefault(Event.MouseLeave)?.Invoke();
     }
