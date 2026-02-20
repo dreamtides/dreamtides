@@ -18,6 +18,7 @@ client/Assets/StreamingAssets/Tabula.xlsm
 .worktrees
 state.json
 .logs
+scripts/test_output/
 
 # Local Cargo config (contains [patch] overrides for local dev)
 .cargo/
