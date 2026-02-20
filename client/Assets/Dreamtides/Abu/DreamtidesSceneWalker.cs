@@ -71,7 +71,7 @@ namespace Dreamtides.Abu
     {
       var role = DetermineRole(element);
       var label = DetermineLabel(element);
-      var interactive = IsInteractive(element, role);
+      var interactive = IsInteractive(element);
 
       var node = new AbuSceneNode
       {
@@ -83,8 +83,7 @@ namespace Dreamtides.Abu
       if (interactive)
       {
         var callbacks = BuildUiToolkitCallbacks(element);
-        var refStr = refRegistry.Register(callbacks);
-        // Store the ref in the node (the daemon uses this later)
+        refRegistry.Register(callbacks);
         node.Label ??= element.name;
       }
 
@@ -132,7 +131,7 @@ namespace Dreamtides.Abu
       }
     }
 
-    static bool IsInteractive(VisualElement element, string role)
+    static bool IsInteractive(VisualElement element)
     {
       // Draggable is a stub; mark as non-interactive
       if (element is Draggable)
@@ -242,16 +241,24 @@ namespace Dreamtides.Abu
       // (validated by Gate 0)
       callbacks.OnClick = () =>
       {
+        var originalProvider = _registry.InputService.InputProvider;
         var fakeInput = new DisplayableClickInputProvider(displayable);
-        _registry.InputService.InputProvider = fakeInput;
+        try
+        {
+          _registry.InputService.InputProvider = fakeInput;
 
-        // Frame 1: pressed with target
-        fakeInput.Phase = ClickPhase.Pressed;
-        _registry.InputService.Update();
+          // Frame 1: pressed with target
+          fakeInput.Phase = ClickPhase.Pressed;
+          _registry.InputService.Update();
 
-        // Frame 2: released with same target
-        fakeInput.Phase = ClickPhase.Released;
-        _registry.InputService.Update();
+          // Frame 2: released with same target
+          fakeInput.Phase = ClickPhase.Released;
+          _registry.InputService.Update();
+        }
+        finally
+        {
+          _registry.InputService.InputProvider = originalProvider;
+        }
       };
 
       // Hover: Call hover methods directly on the Displayable
@@ -300,13 +307,12 @@ namespace Dreamtides.Abu
 
     static RefCallbacks BuildCanvasButtonCallbacks(CanvasButton button)
     {
-      var callbacks = new RefCallbacks
+      return new RefCallbacks
       {
         // Click: Call OnClick() directly (validated by Gate 0)
         OnClick = () => button.OnClick(),
+        OnHover = () => button.MouseHoverStart(),
       };
-
-      return callbacks;
     }
 
     /// <summary>

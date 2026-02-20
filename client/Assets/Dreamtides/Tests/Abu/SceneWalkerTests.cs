@@ -5,11 +5,7 @@ using System.Linq;
 using Abu;
 using Dreamtides.Abu;
 using Dreamtides.Buttons;
-using Dreamtides.Layout;
 using Dreamtides.Masonry;
-using Dreamtides.Schema;
-using Dreamtides.Services;
-using Dreamtides.TestFakes;
 using Dreamtides.Tests.TestUtils;
 using NUnit.Framework;
 using TMPro;
@@ -22,14 +18,6 @@ namespace Dreamtides.Tests.Abu
   [TestFixture]
   public class SceneWalkerTests : DreamtidesUnitTest
   {
-    /// <summary>
-    /// Test Displayable subclass that always reports interactive.
-    /// </summary>
-    sealed class InteractiveTestDisplayable : Displayable
-    {
-      public override bool CanHandleMouseEvents() => true;
-    }
-
     DreamtidesSceneWalker CreateWalker()
     {
       return new DreamtidesSceneWalker(Registry);
@@ -134,18 +122,7 @@ namespace Dreamtides.Tests.Abu
 
       Registry.DocumentService.HasOpenPanels = false;
 
-      var button = CreateSceneObject<DisplayableButton>(b =>
-      {
-        b._background = b.gameObject.AddComponent<SpriteRenderer>();
-        var textGo = new GameObject("ButtonText");
-        textGo.transform.SetParent(b.transform);
-        b._text = textGo.AddComponent<TextMeshPro>();
-        b._text.text = "TestDisplayableBtn";
-        var colliderGo = new GameObject("ButtonCollider");
-        colliderGo.transform.SetParent(b.transform);
-        b._collider = colliderGo.AddComponent<BoxCollider>();
-        b._noOutlineMaterial = new Material(Shader.Find("Sprites/Default"));
-      });
+      CreateTestDisplayableButton("TestDisplayableBtn");
 
       var walker = CreateWalker();
       var refRegistry = new RefRegistry();
@@ -176,18 +153,7 @@ namespace Dreamtides.Tests.Abu
 
       Registry.DocumentService.HasOpenPanels = true;
 
-      var button = CreateSceneObject<DisplayableButton>(b =>
-      {
-        b._background = b.gameObject.AddComponent<SpriteRenderer>();
-        var textGo = new GameObject("ButtonText");
-        textGo.transform.SetParent(b.transform);
-        b._text = textGo.AddComponent<TextMeshPro>();
-        b._text.text = "OccludedButton";
-        var colliderGo = new GameObject("ButtonCollider");
-        colliderGo.transform.SetParent(b.transform);
-        b._collider = colliderGo.AddComponent<BoxCollider>();
-        b._noOutlineMaterial = new Material(Shader.Find("Sprites/Default"));
-      });
+      CreateTestDisplayableButton("OccludedButton");
 
       // Add a UI Toolkit element that should still appear
       var uiElement = new NodeVisualElement { name = "StillVisible" };
@@ -320,6 +286,25 @@ namespace Dreamtides.Tests.Abu
     }
 
     // -- Helper methods --
+
+    /// <summary>
+    /// Creates a fully configured DisplayableButton for use in tests.
+    /// </summary>
+    DisplayableButton CreateTestDisplayableButton(string label)
+    {
+      return CreateSceneObject<DisplayableButton>(b =>
+      {
+        b._background = b.gameObject.AddComponent<SpriteRenderer>();
+        var textGo = new GameObject("ButtonText");
+        textGo.transform.SetParent(b.transform);
+        b._text = textGo.AddComponent<TextMeshPro>();
+        b._text.text = label;
+        var colliderGo = new GameObject("ButtonCollider");
+        colliderGo.transform.SetParent(b.transform);
+        b._collider = colliderGo.AddComponent<BoxCollider>();
+        b._noOutlineMaterial = new Material(Shader.Find("Sprites/Default"));
+      });
+    }
 
     /// <summary>
     /// Recursively search the scene tree for a node matching the predicate.
