@@ -49,18 +49,19 @@ CLI timeouts: 5s write, 30s read. Retries: 5x with 200ms exponential backoff.
 | `launch` | `headless?`, `viewport?` | `null` | No-op, returns success (Unity is already running) |
 | `snapshot` | `interactive?`, `compact?`, `maxDepth?` | `{"snapshot": "<aria-tree>"}` | Walk scene, build ARIA text tree |
 | `click` | `selector` (e.g. `"@e3"`) | `null` | Resolve ref, simulate click, wait for settled |
-| `fill` | `selector`, `value` | `null` | Resolve ref to text field, set value, wait for settled |
+| `hover` | `selector` (e.g. `"@e3"`) | `null` | Resolve ref, simulate hover, wait for settled |
+| `drag` | `selector`, `target?` | `null` | Resolve source ref, simulate drag (optionally to target ref), wait for settled |
 | `screenshot` | `selector?`, `annotate?` | `{"screenshot": "<base64>"}` | Capture screen as PNG, encode base64 |
 | `close` | (none) | `null` | No-op or disconnect |
 
-All other commands (press, type, wait, ~100 browser-specific ones) return an
-error or no-op in v0.1.
+All other commands (fill, press, type, wait, ~100 browser-specific ones) return
+an error or no-op in v0.1.
 
 ### Snapshot Format
 
 The snapshot is an indented text tree using ARIA roles. Each line has a dash,
 role, quoted name, and optional attributes. Interactive elements get ephemeral
-refs (`[ref=eN]`) that the CLI passes back as `@eN` for click/fill.
+refs (`[ref=eN]`) that the CLI passes back as `@eN` for click/hover/drag.
 
 ```
 - application "Dreamtides"
@@ -173,7 +174,7 @@ sends them over the WebSocket.
 
 **Pluggable scene walker interface**: ABU defines a scene walker interface that
 game-specific code implements. Walkers produce a list of nodes (role, label,
-interactive flag, screen bounds, invoke/setValue callbacks). ABU ships default
+interactive flag, screen bounds, invoke/hover/drag callbacks). ABU ships default
 walkers for UI Toolkit (walks `VisualElement` trees, checks
 `pickingMode`/`focusable`) and UGUI (`Selectable.allSelectablesArray`). Game
 developers register additional walkers for custom systems. Note: Unity's
@@ -183,7 +184,7 @@ cannot find objects by interface. Walkers must search for concrete types (e.g.,
 
 **Ref registry**: After all walkers produce nodes, ABU assigns monotonically
 incrementing refs (`e1`, `e2`, ...) to interactive elements. A registry maps ref
-strings to the invoke/setValue callbacks. The registry is rebuilt on every
+strings to the invoke/hover/drag callbacks. The registry is rebuilt on every
 snapshot and invalidated on the next snapshot.
 
 **Click dispatch**: When a `click` command arrives with a ref like `@e3`, the
@@ -191,6 +192,26 @@ bridge looks up `e3` in the ref registry and calls the associated invoke
 callback. Different element types use different invoke strategies -- this is
 determined by the walker that produced the node. After invocation, the bridge
 enters a settling state before responding.
+
+**Hover dispatch**: When a `hover` command arrives with a ref, the bridge looks
+up the ref and calls the associated hover callback. For UI Toolkit elements,
+this fires `MouseEnterEvent` on the target. For 3D Displayables, it calls
+`MouseHoverStart()` and then `MouseHover()` for a brief period (a few frames)
+to trigger hover-dependent behavior (e.g., info zoom after 0.15 seconds). The
+previous hover target (if any) receives the corresponding leave/end event
+first. After hover effects settle, the bridge responds.
+
+**Drag dispatch**: When a `drag` command arrives with a source ref (and
+optional target ref), the bridge simulates a full drag sequence: `MouseDown()`
+on the source, multiple frames of `MouseDrag()` (moving toward the target
+position or a sufficient distance to trigger play thresholds), then
+`MouseUp()`. For UI Toolkit `Draggable` elements, it synthesizes the
+corresponding pointer events. For 3D Displayables (e.g., cards), it injects a
+fake `IInputProvider` that drives `HandleDisplayableClickAndDrag()` through
+the press-drag-release cycle. If no target is specified, the bridge simulates
+dragging far enough to trigger the element's default action (e.g., playing a
+card from hand). After the drag sequence completes and the UI settles, the
+bridge responds.
 
 **Settled detection**: ABU defines a pluggable `ISettledProvider` interface.
 Games register a custom predicate for "the UI has settled." ABU ships a default
@@ -216,7 +237,8 @@ bidirectionally over a single persistent WebSocket connection.
 ```json
 {"id": "uuid", "command": "snapshot", "params": {"interactive": true, "compact": false}}
 {"id": "uuid", "command": "click", "params": {"ref": "e3"}}
-{"id": "uuid", "command": "fill", "params": {"ref": "e5", "value": "hello"}}
+{"id": "uuid", "command": "hover", "params": {"ref": "e3"}}
+{"id": "uuid", "command": "drag", "params": {"ref": "e3", "target": "e5"}}
 {"id": "uuid", "command": "screenshot", "params": {}}
 ```
 
@@ -253,8 +275,11 @@ walker:
    interactive. For click invocation, it can use
    `element.SendEvent(ClickEvent.GetPooled())` or fall back to direct
    `Callbacks.OnClick()` invocation (which is public) if synthesized events do
-   not propagate correctly from `Update()`. For `fill` on text fields, set
-   `textField.value` directly and then fire the `FieldChanged` callback.
+   not propagate correctly from `Update()`. For hover, it fires
+   `MouseEnterEvent` on the target element, which triggers the Masonry
+   `HoverStyle` application and any `OnMouseEnter` event handler. For drag on
+   `Draggable` elements, it synthesizes the pointer-down/move/up event sequence
+   to drive the UI Toolkit drag-and-drop system.
 
 2. Finds all `Displayable` objects via `FindObjectsByType<Displayable>()`,
    filters by `CanHandleMouseEvents()`, extracts labels (e.g.,
@@ -262,6 +287,16 @@ walker:
    invocation, it injects a fake `IInputProvider` into
    `InputService.InputProvider` that returns the target Displayable for one
    frame, triggering the `MouseDown()`/`MouseUp(isSameObject: true)` sequence.
+   For hover, it calls `MouseHoverStart()` on the target Displayable (clearing
+   any previous hover via `MouseHoverEnd()` on `InputService._lastHovered`),
+   then calls `MouseHover()` across several frames to trigger time-dependent
+   effects like card info zoom (which requires 0.15 seconds of sustained
+   hover). For drag, it injects a fake `IInputProvider` that drives the full
+   `MouseDown()` → `MouseDrag()` (across multiple frames with increasing
+   distance) → `MouseUp()` sequence, simulating the press-drag-release cycle.
+   When no target ref is specified, the drag distance exceeds the play
+   threshold (0.5m on mobile, 1m+ on desktop) to trigger the card's play
+   action.
 
 3. Detects the four `CanvasButton` instances via `DocumentService.MenuButton`,
    `DocumentService.UndoButton`, etc. For click invocation, calls
@@ -282,7 +317,7 @@ object). The Dreamtides walker registers itself with ABU during initialization.
 
 ### Critical Problem: User Input Simulation
 
-Sending clicks and other gestures to Unity is the hardest problem in this
+Sending clicks, hovers, and drags to Unity is the hardest problem in this
 project. ABU must correctly deliver input to **three distinct systems** -- UI
 Toolkit VisualElements, 3D Displayable GameObjects, and UGUI CanvasButtons --
 each of which has its own event model, threading constraints, and edge cases.
@@ -365,9 +400,19 @@ editor-only platform). All tests run via `just unity-tests`.
 - UI Toolkit click: create a `VisualElement`, register a click callback, fire
   `SendEvent(ClickEvent.GetPooled())`, assert the callback was invoked. If this
   fails, test direct `Callbacks.OnClick()` invocation as a fallback.
+- UI Toolkit hover: create a `VisualElement`, register a MouseEnter callback,
+  fire `SendEvent(MouseEnterEvent.GetPooled())`, assert the callback was
+  invoked.
 - Displayable click: instantiate a `Displayable` subclass, inject a fake
   `IInputProvider`, trigger `HandleDisplayableClickAndDrag()`, assert the
   expected `MouseUp(isSameObject: true)` side effect fires.
+- Displayable hover: instantiate a `Displayable` subclass, call
+  `MouseHoverStart()` and `MouseHover()`, assert the expected hover side
+  effects fire (e.g., info zoom display after the hover delay).
+- Displayable drag: instantiate a `Displayable` subclass (e.g., `Card`),
+  inject a fake `IInputProvider`, drive the `MouseDown()` → `MouseDrag()` →
+  `MouseUp()` sequence across multiple frames, assert the expected drag
+  completion effect fires (e.g., card play action).
 - CanvasButton click: instantiate a `CanvasButton`, call `OnClick()` directly,
   assert the expected side effect.
 - **This gate is the single most important deliverable in the project.** If
@@ -408,11 +453,15 @@ editor-only platform). All tests run via `just unity-tests`.
   pipeline, verify 3D Displayable and CanvasButton elements are excluded while
   UI Toolkit elements remain.
 
-**Gate 7 — After click dispatch:**
+**Gate 7 — After click/hover/drag dispatch:**
 - Register a mock callback via the ref registry, dispatch a click command to
   its ref, assert the callback was invoked.
 - For UI Toolkit: create a `VisualElement` with a registered click handler,
   dispatch via the walker's invoke callback, verify the handler fired.
+- Dispatch a hover command to a ref, verify the hover callback was invoked
+  and any previous hover target received a leave/end event.
+- Dispatch a drag command with source ref (and optionally target ref), verify
+  the drag sequence callback was invoked and completed.
 
 **Gate 8 — After settled detection:**
 - Test with `DOTween.TotalPlayingTweens() == 0`: assert settled immediately.
@@ -430,8 +479,9 @@ editor-only platform). All tests run via `just unity-tests`.
 Once the basic `snapshot` command works end-to-end, ABU becomes self-testing.
 Run the actual `agent-browser` CLI against the daemon with Unity running.
 Verify: `agent-browser snapshot` returns a valid ARIA tree, `agent-browser
-click @eN` activates the correct element, `agent-browser screenshot` returns a
-valid PNG. After this milestone, agents can use ABU to verify their own
+click @eN` activates the correct element, `agent-browser hover @eN` triggers
+hover effects, `agent-browser drag @eN` completes a drag action,
+`agent-browser screenshot` returns a valid PNG. After this milestone, agents can use ABU to verify their own
 subsequent changes to ABU.
 
 ## Constraints
@@ -458,8 +508,8 @@ subsequent changes to ABU.
 ## Non-Goals
 
 - Modifying the `agent-browser` CLI or its source code.
-- Supporting `press`, `type`, or `wait` commands in v0.1 (they return errors or
-  no-ops).
+- Supporting `fill`, `press`, `type`, or `wait` commands in v0.1 (they return
+  errors or no-ops).
 - Per-element occlusion testing (coarse `HasOpenPanels` flag is sufficient for
   v0.1; `IPanel.Pick()` deferred).
 - Controller/gamepad input simulation.
@@ -472,15 +522,30 @@ subsequent changes to ABU.
 - **Input simulation across all three UI systems**: This is the project's
   highest-risk area. Each of the three UI systems (UI Toolkit, 3D Displayables,
   UGUI CanvasButtons) has a different event model, and our planned approaches
-  for simulating input into each are hypotheses that must be validated
-  empirically via editor tests before building on top of them. See the "Critical
-  Problem: User Input Simulation" section above. Gate 0 exists specifically to
-  validate or refute these hypotheses as the first deliverable.
+  for simulating click, hover, and drag input into each are hypotheses that
+  must be validated empirically via editor tests before building on top of
+  them. See the "Critical Problem: User Input Simulation" section above. Gate
+  0 exists specifically to validate or refute these hypotheses as the first
+  deliverable.
 - **Synthesized ClickEvent propagation**: Whether
   `element.SendEvent(ClickEvent.GetPooled())` works correctly when called from
   `Update()` outside the UI Toolkit event dispatch cycle needs to be verified
   via editor test. If it does not work, fall back to direct
   `Callbacks.OnClick()` invocation.
+- **Drag simulation across multiple frames**: Drag requires driving
+  `MouseDown()` → `MouseDrag()` (repeated) → `MouseUp()` across multiple
+  `Update()` frames, unlike click which can fire in a single frame. The fake
+  `IInputProvider` must report `IsPointerPressed() == true` for the correct
+  number of frames and then switch to `false` to trigger release. The required
+  drag distance varies: cards use 0.5m (mobile) or visual threshold (desktop)
+  for play, and 0.25m to clear info zoom. We need to determine empirically
+  how many frames and what positions the fake provider must report to
+  reliably trigger drag-to-play.
+- **Hover timing for 3D Displayables**: Card info zoom requires 0.15 seconds
+  of sustained hover via `MouseHover()` calls. The hover simulation must span
+  enough frames to exceed this threshold. The bridge needs to either wait the
+  required duration before responding, or trigger the hover effect immediately
+  by bypassing the timer check.
 - **CanvasButton detection**: Whether to use `FindObjectsByType<CanvasButton>()`
   or `DocumentService`'s four direct references. Both work; the latter is more
   explicit for the four known instances.
