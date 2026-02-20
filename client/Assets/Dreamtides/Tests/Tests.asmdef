@@ -8,7 +8,8 @@
         "Dreamtides",
         "DreamtidesEditor",
         "Unity.TextMeshPro",
-        "Unity.Cinemachine"
+        "Unity.Cinemachine",
+        "AbuBridge.Runtime"
     ],
     "includePlatforms": [
         "Editor"
