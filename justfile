@@ -665,9 +665,9 @@ coverage:
     cargo tarpaulin --manifest-path rules_engine/Cargo.toml --out Html
 
 rsync-for-review:
-    rsync --delete --stats --copy-links -avqr --exclude='rules_engine/target' ./rules_engine ~/dreamtides_tests/
+    rsync --delete --stats --copy-links -avqr --exclude='rules_engine/target' --exclude='node_modules' ./rules_engine ~/dreamtides_tests/
     echo $'\a'
-    rsync --delete --stats --copy-links -avqr --exclude='client/Library' --exclude='client/test_output' --exclude='client/Assets/ThirdParty' ./client ~/dreamtides_tests/
+    rsync --delete --stats --copy-links -avqr --exclude='client/Library' --exclude='client/test_output' --exclude='client/Assets/ThirdParty' --exclude='node_modules' ./client ~/dreamtides_tests/
     echo $'\a'
     rsync --delete --stats --copy-links -avqr ./scripts ~/dreamtides_tests/
     echo $'\a'
@@ -677,9 +677,9 @@ rsync-for-review:
     echo $'\a'
 
 rsync-third-party:
-    rsync --delete --stats --copy-links -avqr --exclude='rules_engine/target' ./rules_engine ~/dreamtides_tests/
+    rsync --delete --stats --copy-links -avqr --exclude='rules_engine/target' --exclude='node_modules' ./rules_engine ~/dreamtides_tests/
     echo $'\a'
-    rsync --delete --stats --copy-links -avqr --exclude='client/Library' --exclude='client/test_output' ./client ~/dreamtides_tests/
+    rsync --delete --stats --copy-links -avqr --exclude='client/Library' --exclude='client/test_output' --exclude='node_modules' ./client ~/dreamtides_tests/
     echo $'\a'
     rsync --delete --stats --copy-links -avqr ./scripts ~/dreamtides_tests/
     echo $'\a'
