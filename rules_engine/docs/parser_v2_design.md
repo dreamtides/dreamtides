@@ -106,8 +106,7 @@ rules_engine/src/parser/
 │   ├── builder/
 │   │   ├── mod.rs                # Module declarations
 │   │   ├── parser_builder.rs     # Ability construction
-│   │   ├── parser_spans.rs       # SpannedAbility types
-│   │   └── parser_display.rs     # Display text extraction
+│   │   └── parser_spans.rs       # SpannedAbility types
 │   │
 │   ├── serializer/
 │   │   ├── mod.rs                # Module declarations

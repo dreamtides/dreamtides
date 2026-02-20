@@ -157,26 +157,13 @@ localization system.
 
 ## Relationship to the Builder Layer
 
-The codebase contains two parallel paths from an Ability AST to displayable
-text: the serializer and the builder layer. These serve fundamentally different
-purposes.
+The serializer is the sole path from an Ability AST to displayable text. Given
+an AST, it produces the correct rendering by walking the tree and composing RLF
+phrases. It does not use the original template text, variable bindings, or lexer
+output. This makes it suitable for localization, since the same AST produces
+correct output in any locale.
 
-The serializer performs canonical reconstruction. Given an AST, it produces the
-one correct rendering by walking the tree and composing RLF phrases. It does not
-use the original template text, variable bindings, or lexer output. This makes
-it suitable for localization, since the same AST produces correct output in any
-locale. The serializer is the production display path used in the game.
-
-The builder layer performs original-text extraction. Given an AST and the
-original LexResult (including the un-lowercased input string and byte-offset
-spans), it slices the original authored text into semantically tagged segments
-for trigger, cost, and effect. The builder preserves exact original casing,
-spacing, and formatting by using spans to recover text that the lexer's
-lowercasing discarded.
-
-The builder produces a structured DisplayedAbility type with separate fields for
-costs, effects, and triggers. However, it does not support localization, has
-fragile assumptions (hardcoded prefix lengths, exactly two modal modes), and is
-not currently used in production. It exists as infrastructure for a potential
-future UI path that displays authored text with structural annotations rather
-than the serializer's canonical reconstruction.
+The builder layer (`parser_builder.rs`) constructs semantic `Ability` values
+from the parser AST. The `parser_spans.rs` module defines `SpannedAbility` types
+that preserve original-text byte-offset spans from the lexer, used during
+building.
