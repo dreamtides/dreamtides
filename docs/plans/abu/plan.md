@@ -35,24 +35,26 @@ to 5 seconds.
 with 0700 permissions.
 
 **Wire format**:
+
 ```
 Request:  {"id": "<uuid>", "action": "<command>", ...params}\n
 Success:  {"id": "<uuid>", "success": true, "data": <payload>}\n
 Error:    {"id": "<uuid>", "success": false, "error": "<message>"}\n
 ```
+
 CLI timeouts: 5s write, 30s read. Retries: 5x with 200ms exponential backoff.
 
 ### Commands to Implement
 
-| Command | Request params | Response data | Behavior |
-|---------|---------------|---------------|----------|
-| `launch` | `headless?`, `viewport?` | `null` | No-op, returns success (Unity is already running) |
-| `snapshot` | `interactive?`, `compact?`, `maxDepth?` | `{"snapshot": "<aria-tree>"}` | Walk scene, build ARIA text tree |
-| `click` | `selector` (e.g. `"@e3"`) | `null` | Resolve ref, simulate click, wait for settled |
-| `hover` | `selector` (e.g. `"@e3"`) | `null` | Resolve ref, simulate hover, wait for settled |
-| `drag` | `selector`, `target?` | `null` | Resolve source ref, simulate drag (optionally to target ref), wait for settled |
-| `screenshot` | `selector?`, `annotate?` | `{"screenshot": "<base64>"}` | Capture screen as PNG, encode base64 |
-| `close` | (none) | `null` | No-op or disconnect |
+| Command      | Request params                          | Response data                 | Behavior                                                                       |
+| ------------ | --------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------ |
+| `launch`     | `headless?`, `viewport?`                | `null`                        | No-op, returns success (Unity is already running)                              |
+| `snapshot`   | `interactive?`, `compact?`, `maxDepth?` | `{"snapshot": "<aria-tree>"}` | Walk scene, build ARIA text tree                                               |
+| `click`      | `selector` (e.g. `"@e3"`)               | `null`                        | Resolve ref, simulate click, wait for settled                                  |
+| `hover`      | `selector` (e.g. `"@e3"`)               | `null`                        | Resolve ref, simulate hover, wait for settled                                  |
+| `drag`       | `selector`, `target?`                   | `null`                        | Resolve source ref, simulate drag (optionally to target ref), wait for settled |
+| `screenshot` | `selector?`, `annotate?`                | `{"screenshot": "<base64>"}`  | Capture screen as PNG, encode base64                                           |
+| `close`      | (none)                                  | `null`                        | No-op or disconnect                                                            |
 
 All other commands (fill, press, type, wait, ~100 browser-specific ones) return
 an error or no-op in v0.1.
@@ -89,9 +91,9 @@ Dreamtides has two active UI systems that ABU must walk:
 (`client/Assets/Dreamtides/Services/DocumentService.cs:24`). Root:
 `DocumentService.RootVisualElement` (line 51). Four absolute-positioned
 container layers: `InfoZoomContainer`, `ScreenOverlay`, `ScreenAnchoredNode`,
-`EffectPreviewOverlay` (lines 63-66). Interactive elements have `pickingMode ==
-PickingMode.Position`, set by `MasonRenderer.ApplyNode()` when `PressedStyle`,
-`HoverStyle`, or `EventHandlers` are non-null
+`EffectPreviewOverlay` (lines 63-66). Interactive elements have
+`pickingMode == PickingMode.Position`, set by `MasonRenderer.ApplyNode()` when
+`PressedStyle`, `HoverStyle`, or `EventHandlers` are non-null
 (`client/Assets/Dreamtides/Masonry/MasonRenderer.cs:266-274`). Click callbacks
 are stored in `Callbacks._actions[Event.Click]` with a public
 `OnClick(ClickEvent)` method
@@ -196,22 +198,21 @@ enters a settling state before responding.
 **Hover dispatch**: When a `hover` command arrives with a ref, the bridge looks
 up the ref and calls the associated hover callback. For UI Toolkit elements,
 this fires `MouseEnterEvent` on the target. For 3D Displayables, it calls
-`MouseHoverStart()` and then `MouseHover()` for a brief period (a few frames)
-to trigger hover-dependent behavior (e.g., info zoom after 0.15 seconds). The
-previous hover target (if any) receives the corresponding leave/end event
-first. After hover effects settle, the bridge responds.
+`MouseHoverStart()` and then `MouseHover()` for a brief period (a few frames) to
+trigger hover-dependent behavior (e.g., info zoom after 0.15 seconds). The
+previous hover target (if any) receives the corresponding leave/end event first.
+After hover effects settle, the bridge responds.
 
-**Drag dispatch**: When a `drag` command arrives with a source ref (and
-optional target ref), the bridge simulates a full drag sequence: `MouseDown()`
-on the source, multiple frames of `MouseDrag()` (moving toward the target
-position or a sufficient distance to trigger play thresholds), then
-`MouseUp()`. For UI Toolkit `Draggable` elements, it synthesizes the
-corresponding pointer events. For 3D Displayables (e.g., cards), it injects a
-fake `IInputProvider` that drives `HandleDisplayableClickAndDrag()` through
-the press-drag-release cycle. If no target is specified, the bridge simulates
-dragging far enough to trigger the element's default action (e.g., playing a
-card from hand). After the drag sequence completes and the UI settles, the
-bridge responds.
+**Drag dispatch**: When a `drag` command arrives with a source ref (and optional
+target ref), the bridge simulates a full drag sequence: `MouseDown()` on the
+source, multiple frames of `MouseDrag()` (moving toward the target position or a
+sufficient distance to trigger play thresholds), then `MouseUp()`. For UI
+Toolkit `Draggable` elements, it synthesizes the corresponding pointer events.
+For 3D Displayables (e.g., cards), it injects a fake `IInputProvider` that
+drives `HandleDisplayableClickAndDrag()` through the press-drag-release cycle.
+If no target is specified, the bridge simulates dragging far enough to trigger
+the element's default action (e.g., playing a card from hand). After the drag
+sequence completes and the UI settles, the bridge responds.
 
 **Settled detection**: ABU defines a pluggable `ISettledProvider` interface.
 Games register a custom predicate for "the UI has settled." ABU ships a default
@@ -234,6 +235,7 @@ The daemon and bridge must agree on a JSON message format. Messages flow
 bidirectionally over a single persistent WebSocket connection.
 
 **Daemon to Unity (commands)**:
+
 ```json
 {"id": "uuid", "command": "snapshot", "params": {"interactive": true, "compact": false}}
 {"id": "uuid", "command": "click", "params": {"ref": "e3"}}
@@ -243,6 +245,7 @@ bidirectionally over a single persistent WebSocket connection.
 ```
 
 **Unity to Daemon (responses)**:
+
 ```json
 {"id": "uuid", "success": true, "data": {"nodes": [...]}}
 {"id": "uuid", "success": true, "data": null}
@@ -290,13 +293,12 @@ walker:
    For hover, it calls `MouseHoverStart()` on the target Displayable (clearing
    any previous hover via `MouseHoverEnd()` on `InputService._lastHovered`),
    then calls `MouseHover()` across several frames to trigger time-dependent
-   effects like card info zoom (which requires 0.15 seconds of sustained
-   hover). For drag, it injects a fake `IInputProvider` that drives the full
+   effects like card info zoom (which requires 0.15 seconds of sustained hover).
+   For drag, it injects a fake `IInputProvider` that drives the full
    `MouseDown()` → `MouseDrag()` (across multiple frames with increasing
    distance) → `MouseUp()` sequence, simulating the press-drag-release cycle.
-   When no target ref is specified, the drag distance exceeds the play
-   threshold (0.5m on mobile, 1m+ on desktop) to trigger the card's play
-   action.
+   When no target ref is specified, the drag distance exceeds the play threshold
+   (0.5m on mobile, 1m+ on desktop) to trigger the card's play action.
 
 3. Detects the four `CanvasButton` instances via `DocumentService.MenuButton`,
    `DocumentService.UndoButton`, etc. For click invocation, calls
@@ -328,17 +330,17 @@ pathway as early as possible via Unity editor tests (`just unity-tests`). The
 plan for each input system is our best hypothesis; the editor tests are how we
 confirm or refute it. Specifically:
 
-- **UI Toolkit**: Can `element.SendEvent(ClickEvent.GetPooled())` be called
-  from `Update()` and have it propagate correctly through the UI Toolkit event
+- **UI Toolkit**: Can `element.SendEvent(ClickEvent.GetPooled())` be called from
+  `Update()` and have it propagate correctly through the UI Toolkit event
   system? Or must we fall back to `Callbacks.OnClick()` direct invocation? We
   need an editor test that creates a VisualElement, registers a click callback,
   fires a synthesized ClickEvent, and asserts the callback was invoked.
 
 - **3D Displayables**: Does injecting a fake `IInputProvider` into
   `InputService` and letting `HandleDisplayableClickAndDrag()` drive the
-  `MouseDown()`/`MouseUp(isSameObject: true)` sequence actually work from a
-  test context? We need an editor test that instantiates a `Displayable`
-  subclass, simulates the click sequence, and asserts the expected side effect.
+  `MouseDown()`/`MouseUp(isSameObject: true)` sequence actually work from a test
+  context? We need an editor test that instantiates a `Displayable` subclass,
+  simulates the click sequence, and asserts the expected side effect.
 
 - **CanvasButtons**: Does calling `CanvasButton.OnClick()` directly work in
   editor tests, or does UGUI require a full EventSystem? We need an editor test
@@ -359,6 +361,7 @@ works. If a piece of C# code cannot be validated by an editor test, that is a
 design problem to be solved before proceeding, not a testing gap to be accepted.
 
 This means:
+
 - No task is "done" until its editor tests pass via `just unity-tests`.
 - If an approach cannot be tested in EditMode, redesign it so it can be, or
   escalate the problem.
@@ -367,20 +370,20 @@ This means:
 
 #### Verification Tools Available to Agents
 
-| Tool | What it checks | Latency | Autonomous? |
-|------|---------------|---------|-------------|
-| `tsc --noEmit` | TypeScript type errors in daemon | ~2s | Yes |
-| `pnpm test` | Daemon unit/integration tests | ~5s | Yes |
-| VS Code `getDiagnostics` | C# type errors per file | Instant | Yes |
-| Unity batch mode (`-batchmode -quit`) | Full C# compilation | ~60s | Yes |
-| **`just unity-tests`** | **EditMode NUnit tests** | **~1-3 min** | **Yes** |
-| `just fmt-csharp` | C# formatting (csharpier) | ~5s | Yes |
-| ABU itself (once bootstrapped) | End-to-end UI interaction | ~5s/command | Yes |
+| Tool                                  | What it checks                   | Latency      | Autonomous? |
+| ------------------------------------- | -------------------------------- | ------------ | ----------- |
+| `tsc --noEmit`                        | TypeScript type errors in daemon | ~2s          | Yes         |
+| `pnpm test`                           | Daemon unit/integration tests    | ~5s          | Yes         |
+| VS Code `getDiagnostics`              | C# type errors per file          | Instant      | Yes         |
+| Unity batch mode (`-batchmode -quit`) | Full C# compilation              | ~60s         | Yes         |
+| **`just unity-tests`**                | **EditMode NUnit tests**         | **~1-3 min** | **Yes**     |
+| `just fmt-csharp`                     | C# formatting (csharpier)        | ~5s          | Yes         |
+| ABU itself (once bootstrapped)        | End-to-end UI interaction        | ~5s/command  | Yes         |
 
-Agents should run the fastest applicable check after every edit. **`just
-unity-tests` is the primary correctness gate for all C# code** and must pass
-after every task. The full suite (`just unity-tests` + `pnpm test`) is the gate
-before each milestone.
+Agents should run the fastest applicable check after every edit.
+**`just unity-tests` is the primary correctness gate for all C# code** and must
+pass after every task. The full suite (`just unity-tests` + `pnpm test`) is the
+gate before each milestone.
 
 #### Daemon Tests (Node.js)
 
@@ -392,11 +395,12 @@ timeout behavior. These run without Unity.
 #### Bridge Tests (Unity EditMode)
 
 EditMode tests can programmatically create VisualElement trees and GameObjects
-without a running scene. The ABU UPM package and the Dreamtides integration
-each get their own test assembly (`.asmdef` with `UNITY_INCLUDE_TESTS` define,
+without a running scene. The ABU UPM package and the Dreamtides integration each
+get their own test assembly (`.asmdef` with `UNITY_INCLUDE_TESTS` define,
 editor-only platform). All tests run via `just unity-tests`.
 
 **Gate 0 — Input simulation validation (build this FIRST):**
+
 - UI Toolkit click: create a `VisualElement`, register a click callback, fire
   `SendEvent(ClickEvent.GetPooled())`, assert the callback was invoked. If this
   fails, test direct `Callbacks.OnClick()` invocation as a fallback.
@@ -407,29 +411,32 @@ editor-only platform). All tests run via `just unity-tests`.
   `IInputProvider`, trigger `HandleDisplayableClickAndDrag()`, assert the
   expected `MouseUp(isSameObject: true)` side effect fires.
 - Displayable hover: instantiate a `Displayable` subclass, call
-  `MouseHoverStart()` and `MouseHover()`, assert the expected hover side
-  effects fire (e.g., info zoom display after the hover delay).
-- Displayable drag: instantiate a `Displayable` subclass (e.g., `Card`),
-  inject a fake `IInputProvider`, drive the `MouseDown()` → `MouseDrag()` →
-  `MouseUp()` sequence across multiple frames, assert the expected drag
-  completion effect fires (e.g., card play action).
+  `MouseHoverStart()` and `MouseHover()`, assert the expected hover side effects
+  fire (e.g., info zoom display after the hover delay).
+- Displayable drag: instantiate a `Displayable` subclass (e.g., `Card`), inject
+  a fake `IInputProvider`, drive the `MouseDown()` → `MouseDrag()` → `MouseUp()`
+  sequence across multiple frames, assert the expected drag completion effect
+  fires (e.g., card play action).
 - CanvasButton click: instantiate a `CanvasButton`, call `OnClick()` directly,
   assert the expected side effect.
-- **This gate is the single most important deliverable in the project.** If
-  any of these tests fail, stop and redesign before building anything else.
+- **This gate is the single most important deliverable in the project.** If any
+  of these tests fail, stop and redesign before building anything else.
 
 **Gate 1 — After WebSocket message types / command schema:**
+
 - Round-trip serialization tests: serialize a command to JSON, deserialize it,
   assert field equality.
-- Response serialization: build a success/error response, serialize, verify
-  JSON structure.
+- Response serialization: build a success/error response, serialize, verify JSON
+  structure.
 
 **Gate 2 — After ref registry implementation:**
+
 - Assign refs to a list of mock nodes, verify monotonic `e1`, `e2`, ... naming.
 - Look up by `@eN` string, verify correct node returned.
 - Invalidation: build a registry, call invalidate, verify all lookups fail.
 
 **Gate 3 — After UI Toolkit walker:**
+
 - Create a `VisualElement` tree in code: root with children, some with
   `pickingMode = PickingMode.Position`, others with `PickingMode.Ignore`.
 - Run the walker, assert it finds exactly the interactive elements.
@@ -438,6 +445,7 @@ editor-only platform). All tests run via `just unity-tests`.
 - Verify roles and labels are extracted correctly.
 
 **Gate 4 — After Displayable walker:**
+
 - Instantiate GameObjects with `Displayable` subclass components (e.g., a
   minimal `ActionButton`).
 - Run the walker, verify discovery via `FindObjectsByType<Displayable>()`.
@@ -445,30 +453,35 @@ editor-only platform). All tests run via `just unity-tests`.
   false, assert it is excluded.
 
 **Gate 5 — After CanvasButton walker:**
+
 - Instantiate a GameObject with a `CanvasButton` component.
 - Run the walker, verify it is discovered and marked interactive.
 
 **Gate 6 — After occlusion logic:**
+
 - Set `HasOpenPanels = true` (or mock the condition), run the full walker
   pipeline, verify 3D Displayable and CanvasButton elements are excluded while
   UI Toolkit elements remain.
 
 **Gate 7 — After click/hover/drag dispatch:**
-- Register a mock callback via the ref registry, dispatch a click command to
-  its ref, assert the callback was invoked.
+
+- Register a mock callback via the ref registry, dispatch a click command to its
+  ref, assert the callback was invoked.
 - For UI Toolkit: create a `VisualElement` with a registered click handler,
   dispatch via the walker's invoke callback, verify the handler fired.
-- Dispatch a hover command to a ref, verify the hover callback was invoked
-  and any previous hover target received a leave/end event.
+- Dispatch a hover command to a ref, verify the hover callback was invoked and
+  any previous hover target received a leave/end event.
 - Dispatch a drag command with source ref (and optionally target ref), verify
   the drag sequence callback was invoked and completed.
 
 **Gate 8 — After settled detection:**
+
 - Test with `DOTween.TotalPlayingTweens() == 0`: assert settled immediately.
 - If testable: mock a non-zero tween count, verify the bridge waits before
   reporting settled.
 
 **Gate 9 — After ConcurrentQueue threading model:**
+
 - Enqueue a command on a background thread, verify it is dequeued and executed
   on the main thread in `Update()`.
 - Enqueue a response from the main thread, verify it is dequeued on the
@@ -478,11 +491,12 @@ editor-only platform). All tests run via `just unity-tests`.
 
 Once the basic `snapshot` command works end-to-end, ABU becomes self-testing.
 Run the actual `agent-browser` CLI against the daemon with Unity running.
-Verify: `agent-browser snapshot` returns a valid ARIA tree, `agent-browser
-click @eN` activates the correct element, `agent-browser hover @eN` triggers
-hover effects, `agent-browser drag @eN` completes a drag action,
-`agent-browser screenshot` returns a valid PNG. After this milestone, agents can use ABU to verify their own
-subsequent changes to ABU.
+Verify: `agent-browser snapshot` returns a valid ARIA tree,
+`agent-browser click @eN` activates the correct element,
+`agent-browser hover @eN` triggers hover effects, `agent-browser drag @eN`
+completes a drag action, `agent-browser screenshot` returns a valid PNG. After
+this milestone, agents can use ABU to verify their own subsequent changes to
+ABU.
 
 ## Constraints
 
@@ -502,8 +516,8 @@ subsequent changes to ABU.
 - The `~/abu` repository does not exist yet. It must be created from scratch.
 - WebSocket port is configurable via `ABU_WS_PORT` (default 9999). Fixed port
   for v0.1; no dynamic negotiation.
-- All C# code must be continuously validated via `just unity-tests`. No task
-  is complete without passing editor tests that demonstrate correctness.
+- All C# code must be continuously validated via `just unity-tests`. No task is
+  complete without passing editor tests that demonstrate correctness.
 
 ## Non-Goals
 
@@ -522,11 +536,10 @@ subsequent changes to ABU.
 - **Input simulation across all three UI systems**: This is the project's
   highest-risk area. Each of the three UI systems (UI Toolkit, 3D Displayables,
   UGUI CanvasButtons) has a different event model, and our planned approaches
-  for simulating click, hover, and drag input into each are hypotheses that
-  must be validated empirically via editor tests before building on top of
-  them. See the "Critical Problem: User Input Simulation" section above. Gate
-  0 exists specifically to validate or refute these hypotheses as the first
-  deliverable.
+  for simulating click, hover, and drag input into each are hypotheses that must
+  be validated empirically via editor tests before building on top of them. See
+  the "Critical Problem: User Input Simulation" section above. Gate 0 exists
+  specifically to validate or refute these hypotheses as the first deliverable.
 - **Synthesized ClickEvent propagation**: Whether
   `element.SendEvent(ClickEvent.GetPooled())` works correctly when called from
   `Update()` outside the UI Toolkit event dispatch cycle needs to be verified
@@ -538,11 +551,11 @@ subsequent changes to ABU.
   `IInputProvider` must report `IsPointerPressed() == true` for the correct
   number of frames and then switch to `false` to trigger release. The required
   drag distance varies: cards use 0.5m (mobile) or visual threshold (desktop)
-  for play, and 0.25m to clear info zoom. We need to determine empirically
-  how many frames and what positions the fake provider must report to
-  reliably trigger drag-to-play.
-- **Hover timing for 3D Displayables**: Card info zoom requires 0.15 seconds
-  of sustained hover via `MouseHover()` calls. The hover simulation must span
+  for play, and 0.25m to clear info zoom. We need to determine empirically how
+  many frames and what positions the fake provider must report to reliably
+  trigger drag-to-play.
+- **Hover timing for 3D Displayables**: Card info zoom requires 0.15 seconds of
+  sustained hover via `MouseHover()` calls. The hover simulation must span
   enough frames to exceed this threshold. The bridge needs to either wait the
   required duration before responding, or trigger the hover effect immediately
   by bypassing the timer check.

@@ -116,7 +116,7 @@ The design document should cover:
 1. The TypeScript daemon: project structure, socket/protocol handling, command
    routing, WebSocket server for Unity connections
 2. The Unity C# bridge: WebSocket client connection, scene walking (UI Toolkit
-   + UGUI + 3D GameObjects), ref assignment, input simulation, threading model
+   - UGUI + 3D GameObjects), ref assignment, input simulation, threading model
 3. The snapshot format: how Unity's three object systems map into a unified
    accessibility-style tree
 4. Which agent-browser commands to implement and how each maps to Unity

@@ -119,3 +119,14 @@
   sequence, and which violations are auto-fixable via just fmt. Read when
   encountering style_validator or clippy failures during just review, adding new
   files or modules, or understanding the project's code conventions.
+
+- [abu.md](abu/abu.md): How to run and extend ABU (Agent-Browser for Unity) —
+  start the daemon, connect Unity via `DreamtidesAbuSetup`, use the
+  agent-browser CLI to snapshot/click/hover/drag/screenshot, the three
+  Dreamtides UI systems the walker traverses (UI Toolkit, 3D Displayables,
+  CanvasButtons), occlusion rules, settled detection via
+  `ActionService.IsProcessingCommands` and DOTween, the `ISceneWalker` and
+  `ISettledProvider` interfaces for adapting ABU to other games, and package
+  integration via `manifest.json`. Read when using the agent-browser CLI with
+  Dreamtides, debugging ABU connectivity or snapshot accuracy, or porting ABU to
+  a new game.
