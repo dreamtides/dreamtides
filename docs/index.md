@@ -132,12 +132,16 @@
   performance regressions, adding new benchmarks, or profiling AI search
   performance.
 
-- [abu.md](abu/abu.md): How to run and extend ABU (Agent-Browser for Unity) —
-  start Unity with `DreamtidesAbuSetup`, use the Python CLI
-  (`scripts/abu/abu.py`) to snapshot/click/hover/drag/screenshot, the NDJSON
-  wire protocol over TCP port 9999, the three Dreamtides UI systems the walker
-  traverses (UI Toolkit, 3D Displayables, CanvasButtons), occlusion rules,
-  settled detection via `ActionService.IsProcessingCommands` and DOTween, the
-  `ISceneWalker` and `ISettledProvider` interfaces for adapting ABU to other
-  games. Read when using the ABU Python CLI with Dreamtides, debugging ABU
-  connectivity or snapshot accuracy, or porting ABU to a new game.
+- [abu.md](abu/abu.md): Complete guide to ABU (Agent-Browser for Unity) — the
+  Python CLI (`scripts/abu/abu.py`) and C# Unity TCP server
+  (`client/Assets/Dreamtides/Abu/`), running ABU with DreamtidesAbuSetup,
+  snapshot/click/hover/drag/screenshot commands, the NDJSON wire protocol over
+  TCP port 9999, C# transport and command handling internals (TcpServer,
+  AbuBridge, SnapshotCommandHandler, SnapshotFormatter, RefRegistry,
+  CommandSchema), the three Dreamtides UI systems the walker traverses (UI
+  Toolkit, 3D Displayables, CanvasButtons), namespace conventions and coding
+  rules, common pitfalls (stale refs, compact mode, BusyToken, single-client
+  TCP), the `ISceneWalker` and `ISettledProvider` interfaces for adapting ABU to
+  other games, and the full test suite layout. Read when using the ABU Python
+  CLI, working on ABU C# code, debugging connectivity or snapshot accuracy, or
+  porting ABU to a new game.
