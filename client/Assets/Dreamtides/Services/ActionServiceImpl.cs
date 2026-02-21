@@ -470,7 +470,7 @@ namespace Dreamtides.Services
     {
       var json = JsonConvert.SerializeObject(request, Converter.Settings);
       var url = $"http://localhost:26598/{endpoint}";
-      var webRequest = new UnityWebRequest(url, method);
+      using var webRequest = new UnityWebRequest(url, method);
       webRequest.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(json));
       webRequest.downloadHandler = new DownloadHandlerBuffer();
       webRequest.SetRequestHeader("Content-Type", "application/json");
