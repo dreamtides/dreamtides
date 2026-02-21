@@ -13,51 +13,35 @@ import threading
 import signal
 import argparse
 
-def find_highest_unity_version(hub_path):
-    if not hub_path.exists():
-        raise FileNotFoundError("Unity Hub directory not found")
-
-    versions = []
-    for version_dir in hub_path.iterdir():
-        if version_dir.is_dir():
-            try:
-                version = version_dir.name
-                if version.startswith("20") or version[0].isdigit():
-                    versions.append(version)
-            except:
-                continue
-
-    if not versions:
-        raise FileNotFoundError("No Unity versions found in Hub directory")
-
-    return sorted(versions, reverse=True)[0]
-
-def get_unity_path_osx():
-    hub_path = Path("/Applications/Unity/Hub/Editor")
-    highest_version = find_highest_unity_version(hub_path)
-    unity_path = hub_path / highest_version / "Unity.app/Contents/MacOS/Unity"
-
-    if not unity_path.exists():
-        raise FileNotFoundError(f"Unity executable not found at {unity_path}")
-
-    return str(unity_path)
-
-def get_unity_path_windows():
-    hub_path = Path("C:/Program Files/Unity/Hub/Editor")
-    highest_version = find_highest_unity_version(hub_path)
-    unity_path = hub_path / highest_version / "Editor/Unity.exe"
-
-    if not unity_path.exists():
-        raise FileNotFoundError(f"Unity executable not found at {unity_path}")
-
-    return str(unity_path)
+def read_project_unity_version(project_path):
+    version_file = project_path / "ProjectSettings" / "ProjectVersion.txt"
+    if version_file.exists():
+        for line in version_file.read_text().splitlines():
+            if line.startswith("m_EditorVersion:"):
+                return line.split(":")[1].strip()
+    return None
 
 def get_unity_path():
+    project_path = Path.home() / "dreamtides_tests/client"
+    version = read_project_unity_version(project_path)
     system = platform.system()
+
     if system == "Darwin":
-        return get_unity_path_osx()
+        hub_path = Path("/Applications/Unity/Hub/Editor")
+        if version:
+            unity_path = hub_path / version / "Unity.app/Contents/MacOS/Unity"
+            if unity_path.exists():
+                return str(unity_path)
+            raise FileNotFoundError(f"Unity {version} not found at {unity_path}")
+        raise FileNotFoundError("Could not read Unity version from ProjectVersion.txt")
     elif system == "Windows":
-        return get_unity_path_windows()
+        hub_path = Path("C:/Program Files/Unity/Hub/Editor")
+        if version:
+            unity_path = hub_path / version / "Editor/Unity.exe"
+            if unity_path.exists():
+                return str(unity_path)
+            raise FileNotFoundError(f"Unity {version} not found at {unity_path}")
+        raise FileNotFoundError("Could not read Unity version from ProjectVersion.txt")
     else:
         raise OSError(f"Unsupported operating system: {system}")
 

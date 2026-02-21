@@ -138,6 +138,37 @@ namespace Dreamtides.Tests.Abu
     }
 
     /// <summary>
+    /// When LastResponseIncremental is true, the provider should not report
+    /// settled even if commands are done and animations are complete.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator IncrementalResponse_PreventsSettledUntilFinal()
+    {
+      yield return Initialize();
+      var incrementalService = CreateGameObject().AddComponent<IncrementalResponseActionService>();
+
+      var provider = new DreamtidesSettledProvider(
+        incrementalService,
+        settleFrames: 1,
+        animationsComplete: () => true
+      );
+
+      provider.NotifyActionDispatched();
+
+      // Should not settle while LastResponseIncremental is true
+      Assert.IsFalse(provider.IsSettled());
+      yield return null;
+      Assert.IsFalse(provider.IsSettled());
+      yield return null;
+
+      // Simulate receiving a Final response
+      incrementalService.SimulateFinalResponse();
+
+      // Now should settle after 1 frame
+      Assert.IsTrue(provider.IsSettled());
+    }
+
+    /// <summary>
     /// When animations are not complete, conditions are not met and the
     /// settled frame count should not advance.
     /// </summary>
@@ -180,12 +211,34 @@ namespace Dreamtides.Tests.Abu
     public override bool LastResponseIncremental { get; protected set; }
     public override Guid? LastResponseReceived { get; protected set; }
 
-    public override void PerformAction(
-      GameAction? action,
-      Guid? requestIdentifier = null
-    ) { }
+    public override void PerformAction(GameAction? action, Guid? requestIdentifier = null) { }
 
     public override void Log(ClientLogRequest request) { }
+
+    public override void TriggerReconnect() { }
+  }
+
+  /// <summary>
+  /// Test helper: an ActionService that reports LastResponseIncremental = true.
+  /// Used to verify that settled detection waits for a Final poll response.
+  /// </summary>
+  sealed class IncrementalResponseActionService : ActionService
+  {
+    public override bool Connected { get; protected set; }
+    public override float LastActionTime => 0f;
+    public override bool IsProcessingCommands => false;
+    public override bool LastResponseIncremental { get; protected set; } = true;
+    public override Guid? LastResponseReceived { get; protected set; }
+
+    public void SimulateFinalResponse()
+    {
+      LastResponseIncremental = false;
+    }
+
+    public override void PerformAction(GameAction? action, Guid? requestIdentifier = null) { }
+
+    public override void Log(ClientLogRequest request) { }
+
     public override void TriggerReconnect() { }
   }
 }

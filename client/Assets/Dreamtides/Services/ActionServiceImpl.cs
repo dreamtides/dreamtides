@@ -351,10 +351,6 @@ namespace Dreamtides.Services
       {
         LastResponseIncremental = true;
       }
-      else if (response.ResponseType == PollResponseType.Final)
-      {
-        LastResponseIncremental = false;
-      }
 
       if (response.Commands?.Groups.Count > 0)
       {
@@ -365,6 +361,10 @@ namespace Dreamtides.Services
           animate: true,
           onComplete: () =>
           {
+            if (response.ResponseType == PollResponseType.Final)
+            {
+              LastResponseIncremental = false;
+            }
             Registry.LoggingService.EndSpan(LogSpanName.Poll);
             if (response.ResponseVersion != null)
             {
@@ -372,6 +372,10 @@ namespace Dreamtides.Services
             }
           }
         );
+      }
+      else if (response.ResponseType == PollResponseType.Final)
+      {
+        LastResponseIncremental = false;
       }
     }
 
