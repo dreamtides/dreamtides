@@ -2,6 +2,7 @@
 
 using System.Collections;
 using System.Runtime.CompilerServices;
+using Abu;
 using DG.Tweening;
 using Dreamtides.Schema;
 using Dreamtides.Utils;
@@ -27,6 +28,8 @@ namespace Dreamtides.Services
 
     public IEnumerator HandleDreamwellActivationCommand(DisplayDreamwellActivationCommand command)
     {
+      using var busy = new BusyToken();
+
       // Get the card from the layout service
       var card = Registry.CardService.GetCard(command.CardId);
 

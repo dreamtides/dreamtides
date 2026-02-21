@@ -59,7 +59,8 @@ namespace Dreamtides.Abu
         return true;
       }
 
-      var conditionsMet = !_actionService.IsProcessingCommands && _animationsComplete();
+      var conditionsMet =
+        !_actionService.IsProcessingCommands && _animationsComplete() && !BusyToken.IsAnyActive;
 
       if (conditionsMet)
       {
