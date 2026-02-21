@@ -45,6 +45,7 @@ pub fn execute(
                 ],
             },
             configuration: PromptConfiguration { ..Default::default() },
+            prompt_description: None,
         });
     } else {
         counterspell::execute(battle, source, targeting::stack_card_id(targets)?);

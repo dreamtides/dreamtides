@@ -27,8 +27,6 @@ pub struct CardDefinitionRaw {
     pub phase: Option<i32>,
     /// Rules text describing card abilities.
     pub rules_text: Option<String>,
-    /// Prompt text shown when the card requires player input.
-    pub prompts: Option<String>,
     /// Variable definitions for rules text placeholders.
     pub variables: Option<String>,
     /// Image asset identifier.

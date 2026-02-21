@@ -11,6 +11,7 @@ use battle_state::prompt_types::prompt_data::{
     PromptType,
 };
 use core_data::types::PlayerName;
+use parser::serializer::prompt_serializer;
 
 use crate::card_ability_queries::{effect_predicates, effect_queries, target_predicates};
 
@@ -111,6 +112,7 @@ pub fn query(
                         choices: modal.clone(),
                     }),
                     configuration: PromptConfiguration { optional: false },
+                    prompt_description: None,
                 }])
             }
         }
@@ -130,6 +132,8 @@ fn standard_effect_targeting_prompt(
     that_card: Option<CardId>,
     on_selected: OnSelected,
 ) -> Option<PromptData> {
+    let prompt_description = prompt_serializer::serialize_prompt(effect);
+
     if let Some(target_predicate) = target_predicates::get_character_target_predicate(effect) {
         let valid = effect_predicates::matching_characters(
             battle,
@@ -147,6 +151,7 @@ fn standard_effect_targeting_prompt(
             player,
             prompt_type: PromptType::ChooseCharacter { on_selected, valid },
             configuration: PromptConfiguration { optional },
+            prompt_description,
         })
     } else if let Some(target_predicate) = target_predicates::get_stack_target_predicate(effect) {
         let valid =
@@ -160,6 +165,7 @@ fn standard_effect_targeting_prompt(
             player,
             prompt_type: PromptType::ChooseStackCard { on_selected, valid },
             configuration: PromptConfiguration { optional },
+            prompt_description,
         })
     } else if let Some(target_predicate) = target_predicates::get_void_target_predicate(effect) {
         let valid =
@@ -184,6 +190,7 @@ fn standard_effect_targeting_prompt(
                 maximum_selection,
             }),
             configuration: PromptConfiguration { optional },
+            prompt_description,
         })
     } else {
         None

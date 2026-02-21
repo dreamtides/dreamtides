@@ -26,9 +26,6 @@ pub struct CardDefinition {
     /// Rules text of this card in the currently-active language, formatted for
     /// display.
     pub displayed_rules_text: String,
-    /// Prompts to display for this card in the currently-active language,
-    /// formatted for display.
-    pub displayed_prompts: Vec<String>,
     /// Type of this card.
     pub card_type: CardType,
     /// Subtype of this card, if any.

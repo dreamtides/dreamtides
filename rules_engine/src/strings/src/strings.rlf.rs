@@ -1398,4 +1398,56 @@ rlf::rlf! {
     // Single modal choice line with energy cost and effect text.
     modal_choice_line($energy_cost, $effect) =
         "{bullet} {$energy_cost}{cost_effect_separator}{@cap $effect}";
+
+    // =========================================================================
+    // Prompt serializer — templates
+    // =========================================================================
+
+    // Choose a target to perform an action.
+    prompt_choose_to_action($target, $action) = "Choose {$target} to {$action}.";
+    // Choose a target (no action verb).
+    prompt_choose_target($target) = "Choose {$target}.";
+    // Choose up to N targets to perform an action (uses plural variant).
+    prompt_choose_up_to($n, $target, $action) = :from($target)
+        "Choose up to {$n} {$target:other} to {$action}.";
+
+    // =========================================================================
+    // Prompt serializer — action verb phrases
+    // =========================================================================
+
+    // Return to hand action for prompts.
+    prompt_action_return_to_hand = "return to hand";
+    // Gain control of action for prompts.
+    prompt_action_gain_control = "gain control of";
+    // Copy action for prompts.
+    prompt_action_copy = "copy";
+    // Give spark to action for prompts.
+    prompt_action_give_spark = "give spark to";
+    // Abandon action for prompts.
+    prompt_action_abandon = "abandon";
+    // Gain energy from action for prompts.
+    prompt_action_gain_energy = "gain energy from";
+    // Give reclaim to action for prompts.
+    prompt_action_give_reclaim = "give {reclaim} to";
+    // Protect action for prompts.
+    prompt_action_protect = "protect";
+    // Disable abilities of action for prompts.
+    prompt_action_disable_abilities = "disable abilities of";
+    // Abandon at end of turn action for prompts.
+    prompt_action_abandon_at_end_of_turn = "abandon at end of turn";
+    // Banish when leaves play action for prompts.
+    prompt_action_banish_when_leaves = "{banish} when it leaves play";
+    // Put on top of opponent's deck action for prompts.
+    prompt_action_put_on_enemy_deck = "put on top of opponent's deck";
+    // Banish then materialize action for prompts.
+    prompt_action_banish_then_materialize = "{banish}, then {materialize}";
+    // Return action for void prompts.
+    prompt_action_return = "return";
+
+    // =========================================================================
+    // Prompt serializer — additional cost prompts
+    // =========================================================================
+
+    // Prompt for paying one or more energy as an additional cost.
+    prompt_pay_one_or_more_energy = "Pay one or more energy.";
 }

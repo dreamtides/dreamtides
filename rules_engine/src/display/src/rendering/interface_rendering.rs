@@ -1,15 +1,13 @@
 use action_data::battle_display_action::BattleDisplayAction;
 use action_data::game_action_data::GameAction;
 use action_data::panel_address::PanelAddress;
-use battle_queries::battle_card_queries::card;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
 use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
-use battle_state::core::effect_source::CardSource;
-use battle_state::prompt_types::prompt_data::{PromptData, PromptType};
+use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::numerics::Energy;
 use display_data::battle_view::{
     ButtonView, CardBrowserView, CardOrderSelectorView, InterfaceView,
@@ -91,10 +89,10 @@ fn render_prompt_message(
         return None;
     }
 
-    let message = match get_prompt_message_from_source(battle, prompt) {
-        Some(msg) => msg,
-        None => get_generic_prompt_message(builder, &prompt.prompt_type),
-    };
+    let message = prompt
+        .prompt_description
+        .clone()
+        .unwrap_or_else(|| get_generic_prompt_message(builder, &prompt.prompt_type));
 
     Some(
         InterfaceMessage::builder()
@@ -103,26 +101,6 @@ fn render_prompt_message(
             .temporary(false)
             .build(),
     )
-}
-
-fn get_prompt_message_from_source(battle: &BattleState, prompt: &PromptData) -> Option<String> {
-    if matches!(prompt.prompt_type, PromptType::ModalEffect(..)) {
-        // Do not apply message to modal choices.
-        return None;
-    }
-
-    match prompt.source.card_source() {
-        CardSource::CardId(card_id) => {
-            // TODO: Handle multiple prompts per card.
-            let definition = card::get_definition(battle, card_id);
-            definition.displayed_prompts.first().cloned()
-        }
-        CardSource::DreamwellCard(dreamwell_card_id) => {
-            let definition = battle.dreamwell.definition(dreamwell_card_id);
-            definition.displayed_prompts.first().cloned()
-        }
-        CardSource::None => None,
-    }
 }
 
 fn get_generic_prompt_message(_builder: &ResponseBuilder, prompt_type: &PromptType) -> String {

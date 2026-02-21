@@ -6,7 +6,6 @@ rules-text = ""
 phase = 1
 image-number = 1963305268
 variables = ""
-prompts = ""
 
 [[test-dreamwell]]
 name = "Dreamwell Produce 1"
@@ -16,7 +15,6 @@ rules-text = ""
 image-number = 1963305268
 phase = 1
 variables = ""
-prompts = ""
 
 [[test-dreamwell]]
 name = "Dreamwell Produce 2 Starter"
@@ -26,7 +24,6 @@ rules-text = ""
 phase = 0
 image-number = 1963305268
 variables = ""
-prompts = ""
 
 [[test-dreamwell]]
 name = "Dreamwell Foresee"
@@ -36,7 +33,6 @@ rules-text = "{Foresee($f)}."
 variables = "f: 1"
 phase = 1
 image-number = 1897537165
-prompts = ""
 
 [[test-dreamwell]]
 name = "Dreamwell Gain Points"
@@ -46,7 +42,6 @@ rules-text = "Gain {points($p)}."
 variables = "p: 2"
 phase = 1
 image-number = 1789989917
-prompts = ""
 
 [[test-dreamwell]]
 name = "Dreamwell Gain Energy"
@@ -56,7 +51,6 @@ rules-text = "Gain {energy($e)}."
 variables = "e: 1"
 phase = 1
 image-number = 1786390154
-prompts = ""
 
 [[test-dreamwell]]
 name = "Dreamwell Draw Discard"
@@ -66,7 +60,6 @@ rules-text = "Draw {cards($c)}. Discard {cards($d)}."
 variables = """
 c: 1
 d: 1"""
-prompts = "Select a card to discard."
 phase = 1
 image-number = 1011222385
 
@@ -78,7 +71,6 @@ rules-text = "Put the {top_n_cards($v)} of your deck into your void."
 variables = "v: 3"
 phase = 1
 image-number = 2421338077
-prompts = ""
 
 [metadata]
 schema_version = 1

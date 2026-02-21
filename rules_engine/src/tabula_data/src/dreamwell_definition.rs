@@ -23,9 +23,6 @@ pub struct DreamwellCardDefinition {
     /// Rules text of this card in the currently-active language, formatted for
     /// display.
     pub displayed_rules_text: String,
-    /// Prompts to display for this card in the currently-active language,
-    /// formatted for display.
-    pub displayed_prompts: Vec<String>,
     /// "Phase" of this card, controls the order in which it appears in the
     /// shuffled dreamwell deck. Cards with a lower phase number appear first in
     /// the randomized order.

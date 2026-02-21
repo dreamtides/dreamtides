@@ -30,7 +30,6 @@ pub fn build_card(
         energy_cost: parse_energy_cost(raw, file)?,
         abilities,
         displayed_rules_text: raw.rules_text.clone().unwrap_or_default(),
-        displayed_prompts: raw.prompts.as_ref().map(|s| vec![s.clone()]).unwrap_or_default(),
         card_type: parse_card_type(card_type_str, file, Some(card_id))?,
         card_subtype: parse_card_subtype(raw, file, Some(card_id))?,
         is_fast: raw.is_fast.unwrap_or(false),
@@ -59,7 +58,6 @@ pub fn build_dreamwell(
         energy_produced: Energy(energy_produced as u32),
         abilities,
         displayed_rules_text: raw.rules_text.clone().unwrap_or_default(),
-        displayed_prompts: raw.prompts.as_ref().map(|s| vec![s.clone()]).unwrap_or_default(),
         phase: parse_phase(raw, file, Some(card_id))?,
         image: build_dreamwell_sprite_address(image_number),
     })

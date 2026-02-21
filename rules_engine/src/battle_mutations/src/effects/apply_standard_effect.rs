@@ -157,6 +157,7 @@ fn foresee(
             player,
             prompt_type: PromptType::SelectDeckCardOrder { prompt },
             configuration: PromptConfiguration::default(),
+            prompt_description: None,
         });
 
         Some(EffectWasApplied)

@@ -8,7 +8,6 @@ subtype = "Musician"
 is-fast = false
 spark = 5
 image-number = 1794244540
-prompts = ""
 variables = ""
 
 [[test-cards]]
@@ -16,7 +15,6 @@ name = "Test Dissolve"
 id = "d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6"
 energy-cost = 2
 rules-text = "{Dissolve} an enemy."
-prompts = "Choose an enemy character to {dissolve}."
 card-type = "Event"
 is-fast = true
 image-number = 1907487244
@@ -29,7 +27,6 @@ name = "Test Counterspell"
 id = "aad836b0-3ece-477c-b923-b099360f0115"
 energy-cost = 2
 rules-text = "{Prevent} a played card."
-prompts = "Choose a card to {prevent}."
 card-type = "Event"
 is-fast = true
 image-number = 1282908322
@@ -43,7 +40,6 @@ id = "76b6d00c-5a28-4ee3-9655-e4fea1d8a4d8"
 energy-cost = 1
 rules-text = "{Prevent} a played event unless the opponent pays {energy($e)}."
 variables = "e: 2"
-prompts = "Choose an event to {prevent}."
 card-type = "Event"
 is-fast = true
 image-number = 2123360837
@@ -56,7 +52,6 @@ id = "e06a8cfe-483f-42c0-aac8-9c12b21b3f99"
 energy-cost = 2
 rules-text = "Pay 1 or more {energy_symbol}: Draw {cards($c)} for each {energy_symbol} spent."
 variables = "c: 1"
-prompts = "Pay one or more energy: Draw cards for each energy spent."
 card-type = "Event"
 is-fast = true
 image-number = 489056605
@@ -74,7 +69,6 @@ is-fast = true
 spark = 1
 image-number = 403770319
 subtype = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Fast Multi Activated Ability Draw Card Character"
@@ -89,7 +83,6 @@ is-fast = false
 spark = 2
 image-number = 1794244540
 subtype = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Return One Or Two Void Event Cards To Hand"
@@ -97,7 +90,6 @@ id = "559e62a0-7ead-4136-8bd4-6cc58db4bef7"
 energy-cost = 4
 rules-text = "Return {up_to_n_events($n)} from your void to your hand."
 variables = "n: 2"
-prompts = "Choose up to 2 events in your void to return."
 card-type = "Event"
 is-fast = false
 image-number = 644603677
@@ -116,7 +108,6 @@ variables = """
 e1: 2
 e2: 3
 c: 2"""
-prompts = "Choose an enemy character to return to hand."
 card-type = "Event"
 is-fast = true
 image-number = 1200949264
@@ -128,7 +119,6 @@ name = "Test Prevent Event Which Could Dissolve Ally"
 id = "a9f3e4c7-2b1d-4e8a-9c3f-5d7b8e2a1c4d"
 energy-cost = 1
 rules-text = "{Prevent} a played event which could {dissolve} an ally."
-prompts = "Choose an event to {prevent}."
 card-type = "Event"
 is-fast = true
 image-number = 1621160806
@@ -153,14 +143,12 @@ is-fast = true
 image-number = 1328168243
 subtype = ""
 spark = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Counterspell Character"
 id = "86ed0d3f-320b-49d0-b022-cd94aa07edbd"
 energy-cost = 2
 rules-text = "{Prevent} a played character."
-prompts = "Choose a character to {prevent}."
 card-type = "Event"
 is-fast = true
 image-number = 1239919309
@@ -173,7 +161,6 @@ name = "Test Named Dissolve"
 id = "3c1dbdc7-702e-4748-af3c-4fd837bcb404"
 energy-cost = 2
 rules-text = "{Dissolve} an enemy."
-prompts = "Choose an enemy character to {dissolve}."
 card-type = "Event"
 is-fast = true
 image-number = 1907487244
@@ -192,7 +179,6 @@ is-fast = true
 image-number = 489056605
 subtype = ""
 spark = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Trigger Gain Spark When Materialize Another Character"
@@ -205,7 +191,6 @@ is-fast = false
 spark = 5
 image-number = 403770319
 subtype = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Trigger Gain Two Spark On Play Card Enemy Turn"
@@ -218,7 +203,6 @@ is-fast = true
 spark = 5
 image-number = 403770319
 subtype = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Activated Ability Draw Card"
@@ -233,7 +217,6 @@ is-fast = false
 spark = 3
 image-number = 1794244540
 subtype = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Multi Activated Ability Draw Card Character"
@@ -248,7 +231,6 @@ is-fast = false
 spark = 3
 image-number = 1794244540
 subtype = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Fast Activated Ability Draw Card Character"
@@ -263,7 +245,6 @@ is-fast = false
 spark = 3
 image-number = 1794244540
 subtype = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Activated Ability Dissolve Character"
@@ -271,7 +252,6 @@ id = "785e0341-fdd8-4e05-acb4-cbceed70ea6c"
 energy-cost = 3
 rules-text = "{energy($e)}: {Dissolve} an enemy."
 variables = "e: 2"
-prompts = "Choose an enemy character to {dissolve}."
 card-type = "Character"
 is-fast = false
 spark = 4
@@ -296,7 +276,6 @@ is-fast = false
 spark = 3
 image-number = 1794244540
 subtype = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Foresee One"
@@ -309,7 +288,6 @@ is-fast = true
 image-number = 489056605
 subtype = ""
 spark = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Foresee Two"
@@ -322,7 +300,6 @@ is-fast = true
 image-number = 489056605
 subtype = ""
 spark = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Foresee One Draw A Card"
@@ -337,7 +314,6 @@ is-fast = true
 image-number = 1328168243
 subtype = ""
 spark = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Draw One Reclaim"
@@ -355,7 +331,6 @@ is-fast = true
 image-number = 1328168243
 subtype = ""
 spark = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Foresee One Reclaim"
@@ -373,14 +348,12 @@ is-fast = true
 image-number = 1328168243
 subtype = ""
 spark = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Return Void Card To Hand"
 id = "46e20fe4-36ca-438d-91a6-fac880ee9495"
 energy-cost = 1
 rules-text = "Return a card from your void to your hand."
-prompts = "Choose a card in your void."
 card-type = "Event"
 is-fast = true
 image-number = 1328168243
@@ -406,7 +379,6 @@ is-fast = false
 image-number = 1200949264
 subtype = ""
 spark = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Modal Draw One Or Dissolve Enemy"
@@ -420,7 +392,6 @@ variables = """
 e1: 1
 c: 1
 e2: 2"""
-prompts = "Choose an enemy character to {dissolve}."
 card-type = "Event"
 is-fast = true
 image-number = 1200949264
@@ -432,7 +403,6 @@ name = "Test Return To Hand"
 id = "cf2f292b-f02c-4130-aff7-3f48fd147633"
 energy-cost = 1
 rules-text = "Return an enemy to hand."
-prompts = "Choose an enemy character to return to hand."
 card-type = "Event"
 is-fast = true
 image-number = 1200949264
@@ -451,7 +421,6 @@ is-fast = false
 image-number = 1200949264
 subtype = ""
 spark = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Gain Energy"
@@ -464,7 +433,6 @@ is-fast = false
 image-number = 1200949264
 subtype = ""
 spark = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Deck To Void"
@@ -477,7 +445,6 @@ is-fast = false
 image-number = 1200949264
 subtype = ""
 spark = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Discard"
@@ -490,7 +457,6 @@ is-fast = false
 image-number = 1200949264
 subtype = ""
 spark = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Discard Two"
@@ -503,7 +469,6 @@ is-fast = false
 image-number = 1200949264
 subtype = ""
 spark = ""
-prompts = ""
 
 [[test-cards]]
 name = "Test Materialized Draw Card"
@@ -516,7 +481,6 @@ is-fast = false
 spark = 1
 image-number = 1200949264
 subtype = ""
-prompts = ""
 
 
 [metadata]

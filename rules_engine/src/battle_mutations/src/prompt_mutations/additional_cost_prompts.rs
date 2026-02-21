@@ -7,6 +7,7 @@ use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{PromptConfiguration, PromptData, PromptType};
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
+use strings::strings;
 
 /// Adds a prompt for the controller of the `card_id` card to pay additional
 /// costs for this card, if any.
@@ -58,10 +59,13 @@ fn create_prompt_for_cost(
     source: EffectSource,
     cost: &Cost,
 ) -> PromptData {
-    let prompt = match cost {
+    let (prompt, prompt_description) = match cost {
         Cost::SpendOneOrMoreEnergy => {
             let energy = battle.players.player(player).current_energy;
-            PromptType::ChooseEnergyValue { minimum: Energy(1), maximum: energy }
+            (
+                PromptType::ChooseEnergyValue { minimum: Energy(1), maximum: energy },
+                Some(strings::prompt_pay_one_or_more_energy().to_string()),
+            )
         }
         _ => todo!("Implement additional cost prompt for {:?}", cost),
     };
@@ -71,5 +75,6 @@ fn create_prompt_for_cost(
         prompt_type: prompt,
         source,
         configuration: PromptConfiguration { optional: false },
+        prompt_description,
     }
 }

@@ -51,6 +51,7 @@ pub fn execute(
                 maximum_selection: cards_to_discard,
             }),
             configuration: Default::default(),
+            prompt_description: None,
         };
 
         battle.prompts.push_back(prompt);

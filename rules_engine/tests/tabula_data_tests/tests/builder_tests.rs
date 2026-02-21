@@ -21,7 +21,6 @@ fn raw_card_character() -> CardDefinitionRaw {
         spark: Some(5),
         phase: None,
         rules_text: Some("Draw a card.".to_string()),
-        prompts: None,
         variables: None,
         image_number: Some(12345),
         rarity: Some("Common".to_string()),
@@ -40,7 +39,6 @@ fn raw_card_event() -> CardDefinitionRaw {
         spark: None,
         phase: None,
         rules_text: Some("Deal damage.".to_string()),
-        prompts: Some("Choose a target.".to_string()),
         variables: None,
         image_number: Some(67890),
         rarity: Some("Rare".to_string()),
@@ -59,7 +57,6 @@ fn raw_dreamwell_card() -> CardDefinitionRaw {
         spark: None,
         phase: Some(2),
         rules_text: Some("Gain energy.".to_string()),
-        prompts: None,
         variables: None,
         image_number: Some(11111),
         rarity: None,
@@ -91,7 +88,6 @@ fn build_card_event_succeeds() {
     assert_eq!(card.displayed_name, "Test Event");
     assert!(card.is_fast);
     assert!(card.spark.is_none());
-    assert_eq!(card.displayed_prompts, vec!["Choose a target."]);
 }
 
 #[test]

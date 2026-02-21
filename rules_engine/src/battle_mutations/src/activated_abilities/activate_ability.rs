@@ -110,6 +110,7 @@ pub fn execute(
                 abilities: ability_options,
             },
             configuration: PromptConfiguration { optional: false },
+            prompt_description: None,
         });
 
         battle_trace!("Created activated ability choice prompt", battle);

@@ -557,6 +557,7 @@ dependencies = [
  "fastrand",
  "logging",
  "parking_lot",
+ "parser",
  "quest_state",
  "rand 0.9.0",
  "serde",
