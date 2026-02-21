@@ -64,7 +64,12 @@ fn create_prompt_for_cost(
             let energy = battle.players.player(player).current_energy;
             (
                 PromptType::ChooseEnergyValue { minimum: Energy(1), maximum: energy },
-                Some(strings::prompt_pay_one_or_more_energy().to_string()),
+                Some(
+                    strings::capitalized_sentence_with_period(
+                        strings::pay_one_or_more_energy_cost(),
+                    )
+                    .to_string(),
+                ),
             )
         }
         _ => todo!("Implement additional cost prompt for {:?}", cost),

@@ -132,7 +132,7 @@ fn standard_effect_targeting_prompt(
     that_card: Option<CardId>,
     on_selected: OnSelected,
 ) -> Option<PromptData> {
-    let prompt_description = prompt_serializer::serialize_prompt(effect);
+    let prompt_description = Some(prompt_serializer::serialize_prompt(effect));
 
     if let Some(target_predicate) = target_predicates::get_character_target_predicate(effect) {
         let valid = effect_predicates::matching_characters(

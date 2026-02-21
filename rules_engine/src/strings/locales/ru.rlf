@@ -1696,25 +1696,3 @@ capitalized_sentence_with_period($s) = "{@cap $s}{period_suffix}";
 
 modal_choice_line($energy_cost, $effect) =
     "{bullet} {$energy_cost}{cost_effect_separator}{@cap $effect}";
-
-prompt_choose_to_action($target, $action) = "Выберите {$target}, чтобы {$action}.";
-prompt_choose_target($target) = "Выберите {$target}.";
-prompt_choose_up_to($n, $target, $action) = :from($target)
-    "Выберите до {$n} {$target:other}, чтобы {$action}.";
-
-prompt_action_return_to_hand = "вернуть в руку";
-prompt_action_gain_control = "получить контроль над";
-prompt_action_copy = "скопировать";
-prompt_action_give_spark = "дать искру";
-prompt_action_abandon = "покинуть";
-prompt_action_gain_energy = "получить энергию от";
-prompt_action_give_reclaim = "дать {reclaim}";
-prompt_action_protect = "защитить";
-prompt_action_disable_abilities = "отключить способности";
-prompt_action_abandon_at_end_of_turn = "покинуть в конце хода";
-prompt_action_banish_when_leaves = "{banish}, когда покинет поле";
-prompt_action_put_on_enemy_deck = "положить наверх колоды противника";
-prompt_action_banish_then_materialize = "{banish}, затем {materialize}";
-prompt_action_return = "вернуть";
-
-prompt_pay_one_or_more_energy = "Заплатите одну или более энергии.";
