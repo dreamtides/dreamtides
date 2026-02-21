@@ -8,8 +8,7 @@
         "Dreamtides",
         "DreamtidesEditor",
         "Unity.TextMeshPro",
-        "Unity.Cinemachine",
-        "AbuBridge.Runtime"
+        "Unity.Cinemachine"
     ],
     "includePlatforms": [
         "Editor"
@@ -19,7 +18,8 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll",
-        "DOTween.dll"
+        "DOTween.dll",
+        "Newtonsoft.Json.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [
