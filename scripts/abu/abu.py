@@ -16,9 +16,25 @@ import tempfile
 import uuid
 from typing import Any
 
+# Save builtins before shadowing with domain-specific subclasses.
+builtins_ConnectionRefusedError = ConnectionRefusedError
+builtins_TimeoutError = TimeoutError
+
 
 class AbuError(Exception):
-    """Raised when Unity returns an error response."""
+    """Raised when an abu command fails."""
+
+
+class ConnectionError(AbuError):
+    """Raised when the CLI cannot connect to Unity."""
+
+
+class TimeoutError(AbuError):
+    """Raised when waiting for a Unity response times out."""
+
+
+class EmptyResponseError(AbuError):
+    """Raised when Unity closes the connection without a response."""
 
 
 def strip_ref(ref: str) -> str:
@@ -93,20 +109,23 @@ def handle_response(command: str, response: dict[str, Any]) -> str:
 
 
 def send_command(command: str, params: dict[str, Any], port: int) -> dict[str, Any]:
-    """Connect to Unity, send one command, and read one response."""
+    """Connect to Unity, send one command, and read one response.
+
+    Raises ConnectionError if the connection is refused, TimeoutError if the
+    socket read times out, or EmptyResponseError if Unity closes the
+    connection without sending a response.
+    """
     message = build_command(command, params)
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
         sock.settimeout(30.0)
         sock.connect(("localhost", port))
-    except (ConnectionRefusedError, OSError):
+    except (builtins_ConnectionRefusedError, OSError):
         sock.close()
-        print(
-            f"Error: Could not connect to Unity on localhost:{port}. Is the game running?",
-            file=sys.stderr,
+        raise ConnectionError(
+            f"Could not connect to Unity on localhost:{port}. Is the game running?"
         )
-        sys.exit(1)
 
     try:
         sock.sendall(message.encode("utf-8"))
@@ -114,12 +133,8 @@ def send_command(command: str, params: dict[str, Any], port: int) -> dict[str, A
         while True:
             try:
                 chunk = sock.recv(4096)
-            except TimeoutError:
-                print(
-                    "Error: Timed out waiting for response from Unity",
-                    file=sys.stderr,
-                )
-                sys.exit(1)
+            except builtins_TimeoutError:
+                raise TimeoutError("Timed out waiting for response from Unity")
             if not chunk:
                 break
             buf += chunk
@@ -127,11 +142,9 @@ def send_command(command: str, params: dict[str, Any], port: int) -> dict[str, A
                 break
 
         if not buf.strip():
-            print(
-                "Error: Connection closed without response from Unity",
-                file=sys.stderr,
+            raise EmptyResponseError(
+                "Connection closed without response from Unity"
             )
-            sys.exit(1)
 
         line = buf.split(b"\n", 1)[0]
         return json.loads(line.decode("utf-8"))
@@ -191,9 +204,8 @@ def main() -> None:
     params = build_params(args)
     port = int(os.environ.get("ABU_PORT", "9999"))
 
-    response = send_command(command, params, port)
-
     try:
+        response = send_command(command, params, port)
         output = handle_response(command, response)
     except AbuError as e:
         print(f"Error: {e}", file=sys.stderr)
