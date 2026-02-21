@@ -66,7 +66,6 @@ namespace Dreamtides.Tests.Abu
     /// <summary>
     /// When conditions are never met (IsProcessingCommands stays true), the
     /// max timeout should cause the provider to report settled anyway.
-    /// Uses a mock ActionService that always reports processing.
     /// </summary>
     [UnityTest]
     public IEnumerator MaxTimeout_ReportsSettledAfterTimeout()
@@ -138,31 +137,32 @@ namespace Dreamtides.Tests.Abu
     }
 
     /// <summary>
-    /// When LastResponseIncremental is true, the provider should not report
-    /// settled even if commands are done and animations are complete.
+    /// While WaitingForFinalResponse is true, the provider should never
+    /// report settled, even after the normal timeout expires.
     /// </summary>
     [UnityTest]
-    public IEnumerator IncrementalResponse_PreventsSettledUntilFinal()
+    public IEnumerator WaitingForFinal_PreventsSettledEvenAfterTimeout()
     {
       yield return Initialize();
-      var incrementalService = CreateGameObject().AddComponent<IncrementalResponseActionService>();
+      var waitingService = CreateGameObject().AddComponent<WaitingForFinalActionService>();
 
       var provider = new DreamtidesSettledProvider(
-        incrementalService,
+        waitingService,
         settleFrames: 1,
+        maxTimeoutSeconds: 0.1f,
         animationsComplete: () => true
       );
 
       provider.NotifyActionDispatched();
 
-      // Should not settle while LastResponseIncremental is true
+      // Should not settle while WaitingForFinalResponse is true,
+      // even after timeout expires
       Assert.IsFalse(provider.IsSettled());
-      yield return null;
+      yield return new UnityEngine.WaitForSeconds(0.2f);
       Assert.IsFalse(provider.IsSettled());
-      yield return null;
 
       // Simulate receiving a Final response
-      incrementalService.SimulateFinalResponse();
+      waitingService.SimulateFinalResponse();
 
       // Now should settle after 1 frame
       Assert.IsTrue(provider.IsSettled());
@@ -210,6 +210,7 @@ namespace Dreamtides.Tests.Abu
     public override bool IsProcessingCommands => true;
     public override bool LastResponseIncremental { get; protected set; }
     public override Guid? LastResponseReceived { get; protected set; }
+    public override bool WaitingForFinalResponse { get; protected set; }
 
     public override void PerformAction(GameAction? action, Guid? requestIdentifier = null) { }
 
@@ -219,20 +220,22 @@ namespace Dreamtides.Tests.Abu
   }
 
   /// <summary>
-  /// Test helper: an ActionService that reports LastResponseIncremental = true.
-  /// Used to verify that settled detection waits for a Final poll response.
+  /// Test helper: an ActionService that reports WaitingForFinalResponse = true.
+  /// Used to verify that settled detection waits for a Final poll response
+  /// and that the timeout does not fire while waiting for the server.
   /// </summary>
-  sealed class IncrementalResponseActionService : ActionService
+  sealed class WaitingForFinalActionService : ActionService
   {
     public override bool Connected { get; protected set; }
     public override float LastActionTime => 0f;
     public override bool IsProcessingCommands => false;
-    public override bool LastResponseIncremental { get; protected set; } = true;
+    public override bool LastResponseIncremental { get; protected set; }
     public override Guid? LastResponseReceived { get; protected set; }
+    public override bool WaitingForFinalResponse { get; protected set; } = true;
 
     public void SimulateFinalResponse()
     {
-      LastResponseIncremental = false;
+      WaitingForFinalResponse = false;
     }
 
     public override void PerformAction(GameAction? action, Guid? requestIdentifier = null) { }

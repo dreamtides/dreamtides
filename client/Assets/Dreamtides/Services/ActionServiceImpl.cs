@@ -22,6 +22,14 @@ namespace Dreamtides.Services
     public abstract bool IsProcessingCommands { get; }
     public abstract bool LastResponseIncremental { get; protected set; }
     public abstract Guid? LastResponseReceived { get; protected set; }
+
+    /// <summary>
+    /// True from when PerformAction is called until a Final poll response's
+    /// commands have been fully processed. Used by settled detection to avoid
+    /// reporting settled while the server is still processing an action.
+    /// </summary>
+    public abstract bool WaitingForFinalResponse { get; protected set; }
+
     public abstract void PerformAction(GameAction? action, Guid? requestIdentifier = null);
     public abstract void Log(ClientLogRequest request);
     public abstract void TriggerReconnect();
@@ -87,6 +95,8 @@ namespace Dreamtides.Services
     /// response was received.
     /// </summary>
     public override Guid? LastResponseReceived { get; protected set; }
+
+    public override bool WaitingForFinalResponse { get; protected set; }
 
     protected override void OnInitialize(GameMode mode, TestConfiguration? testConfiguration)
     {
@@ -161,6 +171,7 @@ namespace Dreamtides.Services
       }
 
       _lastActionTime = Time.time;
+      WaitingForFinalResponse = true;
       var requestId = requestIdentifier ?? Guid.NewGuid();
       Registry.LoggingService.StartSpan(LogSpanName.PerformAction);
       Registry.LoggingService.Log(
@@ -364,6 +375,7 @@ namespace Dreamtides.Services
             if (response.ResponseType == PollResponseType.Final)
             {
               LastResponseIncremental = false;
+              WaitingForFinalResponse = false;
             }
             Registry.LoggingService.EndSpan(LogSpanName.Poll);
             if (response.ResponseVersion != null)
@@ -376,6 +388,7 @@ namespace Dreamtides.Services
       else if (response.ResponseType == PollResponseType.Final)
       {
         LastResponseIncremental = false;
+        WaitingForFinalResponse = false;
       }
     }
 

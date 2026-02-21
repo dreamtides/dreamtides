@@ -52,6 +52,16 @@ namespace Dreamtides.Abu
         return true;
       }
 
+      // While the server is still processing an action (waiting for the
+      // Final poll response), never report settled. The timeout only
+      // applies to the local animation/command processing phase after the
+      // Final response has been received.
+      if (_actionService.WaitingForFinalResponse)
+      {
+        _settledFrameCount = 0;
+        return false;
+      }
+
       // Max timeout: report settled to prevent indefinite hanging
       if (Time.realtimeSinceStartup - _actionTime >= _maxTimeoutSeconds)
       {
@@ -59,10 +69,7 @@ namespace Dreamtides.Abu
         return true;
       }
 
-      var conditionsMet =
-        !_actionService.IsProcessingCommands
-        && !_actionService.LastResponseIncremental
-        && _animationsComplete();
+      var conditionsMet = !_actionService.IsProcessingCommands && _animationsComplete();
 
       if (conditionsMet)
       {

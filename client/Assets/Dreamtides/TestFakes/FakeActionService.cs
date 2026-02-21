@@ -19,6 +19,7 @@ namespace Dreamtides.TestFakes
     public override bool IsProcessingCommands { get; } = false;
     public override bool LastResponseIncremental { get; protected set; } = false;
     public override Guid? LastResponseReceived { get; protected set; } = null;
+    public override bool WaitingForFinalResponse { get; protected set; } = false;
 
     public void ClearPerformedActions()
     {
