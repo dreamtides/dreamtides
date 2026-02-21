@@ -11,6 +11,7 @@ use battle_state::prompt_types::prompt_data::{
 };
 use core_data::identifiers::AbilityNumber;
 use core_data::types::PlayerName;
+use strings::strings;
 
 use crate::effects::pay_cost;
 use crate::prompt_mutations::card_choice_prompts;
@@ -110,7 +111,7 @@ pub fn execute(
                 abilities: ability_options,
             },
             configuration: PromptConfiguration { optional: false },
-            prompt_description: None,
+            prompt_description: strings::prompt_choose_activated_ability_description().to_string(),
         });
 
         battle_trace!("Created activated ability choice prompt", battle);

@@ -17,6 +17,7 @@ use battle_state::prompt_types::prompt_data::{
 };
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
+use strings::strings;
 
 use crate::card_mutations::battle_deck::SetRevealedToPlayer;
 use crate::card_mutations::{battle_deck, counterspell, move_card, spark};
@@ -157,7 +158,7 @@ fn foresee(
             player,
             prompt_type: PromptType::SelectDeckCardOrder { prompt },
             configuration: PromptConfiguration::default(),
-            prompt_description: None,
+            prompt_description: strings::prompt_foresee_card_order_description().to_string(),
         });
 
         Some(EffectWasApplied)

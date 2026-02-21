@@ -297,22 +297,16 @@ rlf::rlf! {
     // Prompt messages
     // =========================================================================
 
-    // Prompt to target a character.
-    prompt_choose_character = "Choose a character";
-    // Prompt to pick a card on the stack.
-    prompt_select_stack_card = "Select a card";
-    // Prompt to pick a card from your void.
-    prompt_select_from_void = "Select from your void";
-    // Prompt to pick a card from your hand.
-    prompt_select_from_hand = "Select from your hand";
-    // Prompt to pick a choice among several options.
-    prompt_select_option = "Select an option";
-    // Prompt to pick an amount of energy.
-    prompt_choose_energy_amount = "Choose energy amount";
+    // Prompt to pick a mode of a modal card.
+    prompt_choose_mode_description = "Choose a mode.";
     // Prompt to pick card ordering within the deck.
-    prompt_select_card_order = "Select card position";
-    // Prompt to pick a mode of a modal card to play.
-    prompt_pick_mode = "Choose a mode";
+    prompt_foresee_card_order_description = "Select card position.";
+    // Prompt to pick cards to discard from hand.
+    prompt_choose_cards_to_discard_description = "Choose cards to discard from your hand.";
+    // Prompt to pay a cost or decline (counterspell).
+    prompt_pay_or_decline_description = "Choose whether to pay the cost.";
+    // Prompt to choose an activated ability.
+    prompt_choose_activated_ability_description = "Choose an activated ability.";
 
     // =========================================================================
     // Buttons

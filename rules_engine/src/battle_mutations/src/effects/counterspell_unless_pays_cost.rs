@@ -9,7 +9,7 @@ use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{
     PromptChoice, PromptChoiceLabel, PromptConfiguration, PromptData, PromptType,
 };
-use strings::strings::phrase_ids;
+use strings::strings;
 
 use crate::card_mutations::counterspell;
 use crate::effects::apply_effect::EffectWasApplied;
@@ -36,7 +36,9 @@ pub fn execute(
                         targets: prompt_targets.clone(),
                     },
                     PromptChoice {
-                        label: PromptChoiceLabel::String(phrase_ids::DECLINE_PROMPT_BUTTON),
+                        label: PromptChoiceLabel::String(
+                            strings::phrase_ids::DECLINE_PROMPT_BUTTON,
+                        ),
                         effect: Effect::Effect(StandardEffect::Counterspell {
                             target: Predicate::It,
                         }),
@@ -45,7 +47,7 @@ pub fn execute(
                 ],
             },
             configuration: PromptConfiguration { ..Default::default() },
-            prompt_description: None,
+            prompt_description: strings::prompt_pay_or_decline_description().to_string(),
         });
     } else {
         counterspell::execute(battle, source, targeting::stack_card_id(targets)?);

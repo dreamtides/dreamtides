@@ -89,32 +89,13 @@ fn render_prompt_message(
         return None;
     }
 
-    let message = prompt
-        .prompt_description
-        .clone()
-        .unwrap_or_else(|| get_generic_prompt_message(builder, &prompt.prompt_type));
-
     Some(
         InterfaceMessage::builder()
-            .text(message)
+            .text(prompt.prompt_description.clone())
             .anchor_position(AnchorPosition::Top)
             .temporary(false)
             .build(),
     )
-}
-
-fn get_generic_prompt_message(_builder: &ResponseBuilder, prompt_type: &PromptType) -> String {
-    match prompt_type {
-        PromptType::ChooseCharacter { .. } => strings::prompt_choose_character().to_string(),
-        PromptType::ChooseStackCard { .. } => strings::prompt_select_stack_card().to_string(),
-        PromptType::ChooseVoidCard { .. } => strings::prompt_select_from_void().to_string(),
-        PromptType::ChooseHandCards { .. } => strings::prompt_select_from_hand().to_string(),
-        PromptType::Choose { .. } => strings::prompt_select_option().to_string(),
-        PromptType::ChooseEnergyValue { .. } => strings::prompt_choose_energy_amount().to_string(),
-        PromptType::SelectDeckCardOrder { .. } => strings::prompt_select_card_order().to_string(),
-        PromptType::ModalEffect(_) => strings::prompt_pick_mode().to_string(),
-        PromptType::ChooseActivatedAbility { .. } => strings::prompt_select_option().to_string(),
-    }
 }
 
 fn primary_action_button(

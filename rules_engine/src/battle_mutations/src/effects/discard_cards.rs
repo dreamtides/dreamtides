@@ -8,6 +8,7 @@ use battle_state::prompt_types::prompt_data::{
 };
 use battle_state::triggers::trigger::Trigger;
 use core_data::types::PlayerName;
+use strings::strings;
 
 use crate::card_mutations::move_card;
 use crate::effects::apply_effect::EffectWasApplied;
@@ -51,7 +52,7 @@ pub fn execute(
                 maximum_selection: cards_to_discard,
             }),
             configuration: Default::default(),
-            prompt_description: None,
+            prompt_description: strings::prompt_choose_cards_to_discard_description().to_string(),
         };
 
         battle.prompts.push_back(prompt);

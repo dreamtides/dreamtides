@@ -12,6 +12,7 @@ use battle_state::prompt_types::prompt_data::{
 };
 use core_data::types::PlayerName;
 use parser::serializer::prompt_serializer;
+use strings::strings;
 
 use crate::card_ability_queries::{effect_predicates, effect_queries, target_predicates};
 
@@ -112,7 +113,7 @@ pub fn query(
                         choices: modal.clone(),
                     }),
                     configuration: PromptConfiguration { optional: false },
-                    prompt_description: None,
+                    prompt_description: strings::prompt_choose_mode_description().to_string(),
                 }])
             }
         }
@@ -132,7 +133,7 @@ fn standard_effect_targeting_prompt(
     that_card: Option<CardId>,
     on_selected: OnSelected,
 ) -> Option<PromptData> {
-    let prompt_description = Some(prompt_serializer::serialize_prompt(effect));
+    let prompt_description = prompt_serializer::serialize_prompt(effect);
 
     if let Some(target_predicate) = target_predicates::get_character_target_predicate(effect) {
         let valid = effect_predicates::matching_characters(

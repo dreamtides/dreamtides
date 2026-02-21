@@ -38,9 +38,8 @@ pub struct PromptData {
     #[serde(default)]
     pub configuration: PromptConfiguration,
 
-    /// Auto-generated prompt description text, if available.
-    #[serde(default)]
-    pub prompt_description: Option<String>,
+    /// Description text for this prompt.
+    pub prompt_description: String,
 }
 
 #[derive(Debug, Clone, EnumDiscriminants, Serialize, Deserialize)]
