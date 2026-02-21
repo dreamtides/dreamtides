@@ -65,7 +65,8 @@ Run one test with e.g. `just battle-test <NAME>`.
 After every task:
 1. Follow logging conventions (`battle_trace!`)
 2. `just fmt` then `just review` (allow ~5 min)
-3. Commit with detailed description. Do not print a summary of changes.
+3. Always commit with detailed description, even without being asked. Do not
+   print a summary of changes.
 
 ## Documentation
 
