@@ -75,7 +75,11 @@ namespace Dreamtides.Abu
         }
 
         // Filter Supplementary Private Use Area (represented as surrogate pairs)
-        if (char.IsHighSurrogate(c) && i + 1 < stripped.Length && char.IsLowSurrogate(stripped[i + 1]))
+        if (
+          char.IsHighSurrogate(c)
+          && i + 1 < stripped.Length
+          && char.IsLowSurrogate(stripped[i + 1])
+        )
         {
           var codePoint = char.ConvertToUtf32(c, stripped[i + 1]);
           if (codePoint >= 0xF0000 && codePoint <= 0xFFFFF)
@@ -95,15 +99,23 @@ namespace Dreamtides.Abu
 
     AbuSceneNode WalkBattle(RefRegistry refRegistry)
     {
-      var region = new AbuSceneNode { Role = "region", Label = "Battle", Interactive = false };
+      var region = new AbuSceneNode
+      {
+        Role = "region",
+        Label = "Battle",
+        Interactive = false,
+      };
       var layout = _registry.BattleLayout;
       var hasOpenPanels = _registry.DocumentService.HasOpenPanels;
 
       // Build browser button lookup
       var browserButtons = new Dictionary<CardBrowserType, CardBrowserButton>();
-      foreach (var btn in Object.FindObjectsByType<CardBrowserButton>(
-        FindObjectsInactive.Exclude,
-        FindObjectsSortMode.None))
+      foreach (
+        var btn in Object.FindObjectsByType<CardBrowserButton>(
+          FindObjectsInactive.Exclude,
+          FindObjectsSortMode.None
+        )
+      )
       {
         browserButtons[btn._type] = btn;
       }
@@ -114,32 +126,38 @@ namespace Dreamtides.Abu
       if (!hasOpenPanels)
       {
         // 2. User
-        region.Children.Add(WalkPlayer(
-          "User",
-          layout.UserStatusDisplay,
-          layout.UserBattlefield,
-          layout.UserHand.Objects,
-          layout.UserDreamwell,
-          browserButtons,
-          CardBrowserType.UserDeck,
-          CardBrowserType.UserVoid,
-          CardBrowserType.UserStatus,
-          isUser: true,
-          refRegistry));
+        region.Children.Add(
+          WalkPlayer(
+            "User",
+            layout.UserStatusDisplay,
+            layout.UserBattlefield,
+            layout.UserHand.Objects,
+            layout.UserDreamwell,
+            browserButtons,
+            CardBrowserType.UserDeck,
+            CardBrowserType.UserVoid,
+            CardBrowserType.UserStatus,
+            isUser: true,
+            refRegistry
+          )
+        );
 
         // 3. Opponent
-        region.Children.Add(WalkPlayer(
-          "Opponent",
-          layout.EnemyStatusDisplay,
-          layout.EnemyBattlefield,
-          layout.EnemyHand.Objects,
-          layout.EnemyDreamwell,
-          browserButtons,
-          CardBrowserType.EnemyDeck,
-          CardBrowserType.EnemyVoid,
-          CardBrowserType.EnemyStatus,
-          isUser: false,
-          refRegistry));
+        region.Children.Add(
+          WalkPlayer(
+            "Opponent",
+            layout.EnemyStatusDisplay,
+            layout.EnemyBattlefield,
+            layout.EnemyHand.Objects,
+            layout.EnemyDreamwell,
+            browserButtons,
+            CardBrowserType.EnemyDeck,
+            CardBrowserType.EnemyVoid,
+            CardBrowserType.EnemyStatus,
+            isUser: false,
+            refRegistry
+          )
+        );
 
         // 4. Stack (if any cards on stack)
         var stackGroup = WalkStack(layout, refRegistry);
@@ -149,7 +167,11 @@ namespace Dreamtides.Abu
         }
 
         // 5. Game modifiers (if any)
-        var modifiersGroup = WalkObjectLayoutGroup("Game Modifiers", layout.GameModifiersDisplay, refRegistry);
+        var modifiersGroup = WalkObjectLayoutGroup(
+          "Game Modifiers",
+          layout.GameModifiersDisplay,
+          refRegistry
+        );
         if (modifiersGroup != null)
         {
           region.Children.Add(modifiersGroup);
@@ -168,12 +190,14 @@ namespace Dreamtides.Abu
         // 8. Thinking indicator
         if (layout.ThinkingIndicator.activeSelf)
         {
-          region.Children.Add(new AbuSceneNode
-          {
-            Role = "label",
-            Label = "Opponent is thinking...",
-            Interactive = false,
-          });
+          region.Children.Add(
+            new AbuSceneNode
+            {
+              Role = "label",
+              Label = "Opponent is thinking...",
+              Interactive = false,
+            }
+          );
         }
       }
 
@@ -191,7 +215,12 @@ namespace Dreamtides.Abu
 
     AbuSceneNode WalkControls(RefRegistry refRegistry)
     {
-      var group = new AbuSceneNode { Role = "group", Label = "Controls", Interactive = false };
+      var group = new AbuSceneNode
+      {
+        Role = "group",
+        Label = "Controls",
+        Interactive = false,
+      };
       var doc = _registry.DocumentService;
 
       TryAddCanvasButtonWithLabel(group, refRegistry, doc.MenuButton, "Menu");
@@ -206,14 +235,20 @@ namespace Dreamtides.Abu
       AbuSceneNode parent,
       RefRegistry refRegistry,
       CanvasButton? button,
-      string label)
+      string label
+    )
     {
       if (button == null || !button.gameObject.activeSelf || button._canvasGroup.alpha <= 0)
       {
         return;
       }
 
-      var node = new AbuSceneNode { Role = "button", Label = label, Interactive = true };
+      var node = new AbuSceneNode
+      {
+        Role = "button",
+        Label = label,
+        Interactive = true,
+      };
       var callbacks = BuildCanvasButtonCallbacks(button);
       refRegistry.Register(callbacks);
       parent.Children.Add(node);
@@ -232,9 +267,15 @@ namespace Dreamtides.Abu
       CardBrowserType voidType,
       CardBrowserType statusType,
       bool isUser,
-      RefRegistry refRegistry)
+      RefRegistry refRegistry
+    )
     {
-      var group = new AbuSceneNode { Role = "group", Label = playerLabel, Interactive = false };
+      var group = new AbuSceneNode
+      {
+        Role = "group",
+        Label = playerLabel,
+        Interactive = false,
+      };
 
       // Status
       group.Children.Add(WalkStatus(statusDisplay, isUser));
@@ -292,12 +333,14 @@ namespace Dreamtides.Abu
       }
       else if (handObjects.Count > 0)
       {
-        group.Children.Add(new AbuSceneNode
-        {
-          Role = "label",
-          Label = $"Hand: {handObjects.Count} cards",
-          Interactive = false,
-        });
+        group.Children.Add(
+          new AbuSceneNode
+          {
+            Role = "label",
+            Label = $"Hand: {handObjects.Count} cards",
+            Interactive = false,
+          }
+        );
       }
 
       // Dreamwell
@@ -330,51 +373,68 @@ namespace Dreamtides.Abu
 
     AbuSceneNode WalkStatus(PlayerStatusDisplay statusDisplay, bool isUser)
     {
-      var group = new AbuSceneNode { Role = "group", Label = "Status", Interactive = false };
+      var group = new AbuSceneNode
+      {
+        Role = "group",
+        Label = "Status",
+        Interactive = false,
+      };
 
       var energyText = StripRichText(statusDisplay._energy._originalText);
       if (!string.IsNullOrEmpty(energyText))
       {
-        group.Children.Add(new AbuSceneNode
-        {
-          Role = "label",
-          Label = $"Energy: {energyText}",
-          Interactive = false,
-        });
+        group.Children.Add(
+          new AbuSceneNode
+          {
+            Role = "label",
+            Label = $"Energy: {energyText}",
+            Interactive = false,
+          }
+        );
       }
 
       var scoreText = StripRichText(statusDisplay._score._originalText);
       if (!string.IsNullOrEmpty(scoreText))
       {
-        group.Children.Add(new AbuSceneNode
-        {
-          Role = "label",
-          Label = $"Score: {scoreText}",
-          Interactive = false,
-        });
+        group.Children.Add(
+          new AbuSceneNode
+          {
+            Role = "label",
+            Label = $"Score: {scoreText}",
+            Interactive = false,
+          }
+        );
       }
 
       var sparkText = StripRichText(statusDisplay._totalSpark._originalText);
       if (!string.IsNullOrEmpty(sparkText))
       {
-        group.Children.Add(new AbuSceneNode
-        {
-          Role = "label",
-          Label = $"Spark: {sparkText}",
-          Interactive = false,
-        });
+        group.Children.Add(
+          new AbuSceneNode
+          {
+            Role = "label",
+            Label = $"Spark: {sparkText}",
+            Interactive = false,
+          }
+        );
       }
 
       if (isUser)
       {
-        var hasTurn = statusDisplay._leftTurnIndicator.activeSelf
-          || statusDisplay._rightTurnIndicator.activeSelf;
-        group.Children.Add(new AbuSceneNode
-        {
-          Role = "label",
-          Label = hasTurn ? "Turn: yours" : "Turn: opponent's",
-          Interactive = false,
-        });
+        var hasTurn =
+          (statusDisplay._leftTurnIndicator != null && statusDisplay._leftTurnIndicator.activeSelf)
+          || (
+            statusDisplay._rightTurnIndicator != null
+            && statusDisplay._rightTurnIndicator.activeSelf
+          );
+        group.Children.Add(
+          new AbuSceneNode
+          {
+            Role = "label",
+            Label = hasTurn ? "Turn: yours" : "Turn: opponent's",
+            Interactive = false,
+          }
+        );
       }
 
       return group;
@@ -387,7 +447,8 @@ namespace Dreamtides.Abu
       Dictionary<CardBrowserType, CardBrowserButton> browserButtons,
       CardBrowserType type,
       string zoneName,
-      RefRegistry refRegistry)
+      RefRegistry refRegistry
+    )
     {
       if (!browserButtons.TryGetValue(type, out var button))
       {
@@ -423,12 +484,14 @@ namespace Dreamtides.Abu
       }
       else
       {
-        parent.Children.Add(new AbuSceneNode
-        {
-          Role = "label",
-          Label = $"{zoneName}: 0 cards",
-          Interactive = false,
-        });
+        parent.Children.Add(
+          new AbuSceneNode
+          {
+            Role = "label",
+            Label = $"{zoneName}: 0 cards",
+            Interactive = false,
+          }
+        );
       }
     }
 
@@ -447,7 +510,11 @@ namespace Dreamtides.Abu
 
     // ── Card nodes ────────────────────────────────────────────────────
 
-    AbuSceneNode? BuildCardNode(Displayable displayable, string zoneContext, RefRegistry refRegistry)
+    AbuSceneNode? BuildCardNode(
+      Displayable displayable,
+      string zoneContext,
+      RefRegistry refRegistry
+    )
     {
       if (displayable is not Card card)
       {
@@ -466,7 +533,12 @@ namespace Dreamtides.Abu
       }
 
       var label = BuildCardLabel(revealed, zoneContext);
-      var node = new AbuSceneNode { Role = "button", Label = label, Interactive = true };
+      var node = new AbuSceneNode
+      {
+        Role = "button",
+        Label = label,
+        Interactive = true,
+      };
       RegisterDisplayableCallbacks(card, refRegistry);
       return node;
     }
@@ -511,7 +583,12 @@ namespace Dreamtides.Abu
 
     AbuSceneNode WalkActionButtons(BattleLayout layout, RefRegistry refRegistry)
     {
-      var group = new AbuSceneNode { Role = "group", Label = "Actions", Interactive = false };
+      var group = new AbuSceneNode
+      {
+        Role = "group",
+        Label = "Actions",
+        Interactive = false,
+      };
       TryAddActionButton(group, layout.PrimaryActionButton, refRegistry);
       TryAddActionButton(group, layout.SecondaryActionButton, refRegistry);
       TryAddActionButton(group, layout.IncrementActionButton, refRegistry);
@@ -532,7 +609,12 @@ namespace Dreamtides.Abu
         return;
       }
 
-      var node = new AbuSceneNode { Role = "button", Label = label, Interactive = true };
+      var node = new AbuSceneNode
+      {
+        Role = "button",
+        Label = label,
+        Interactive = true,
+      };
       RegisterDisplayableCallbacks(button, refRegistry);
       parent.Children.Add(node);
     }
@@ -544,12 +626,14 @@ namespace Dreamtides.Abu
       var essenceText = _registry.DreamscapeLayout.EssenceTotal._originalText;
       if (!string.IsNullOrEmpty(essenceText))
       {
-        parent.Children.Add(new AbuSceneNode
-        {
-          Role = "label",
-          Label = $"Essence: {StripRichText(essenceText)}",
-          Interactive = false,
-        });
+        parent.Children.Add(
+          new AbuSceneNode
+          {
+            Role = "label",
+            Label = $"Essence: {StripRichText(essenceText)}",
+            Interactive = false,
+          }
+        );
       }
     }
 
@@ -557,7 +641,12 @@ namespace Dreamtides.Abu
 
     AbuSceneNode? WalkStack(BattleLayout layout, RefRegistry refRegistry)
     {
-      var stackGroup = new AbuSceneNode { Role = "group", Label = "Stack", Interactive = false };
+      var stackGroup = new AbuSceneNode
+      {
+        Role = "group",
+        Label = "Stack",
+        Interactive = false,
+      };
 
       AddStackObjects(stackGroup, layout.DefaultStack, refRegistry);
       AddStackObjects(stackGroup, layout.TargetingUserStack, refRegistry);
@@ -583,7 +672,12 @@ namespace Dreamtides.Abu
 
     AbuSceneNode? WalkObjectLayoutGroup(string label, ObjectLayout layout, RefRegistry refRegistry)
     {
-      var group = new AbuSceneNode { Role = "group", Label = label, Interactive = false };
+      var group = new AbuSceneNode
+      {
+        Role = "group",
+        Label = label,
+        Interactive = false,
+      };
       foreach (var obj in layout.Objects)
       {
         var cardNode = BuildCardNode(obj, label, refRegistry);
@@ -624,7 +718,10 @@ namespace Dreamtides.Abu
           _registry.InputService.InputProvider = originalProvider;
         }
       };
-      callbacks.OnHover = () => { displayable.MouseHoverStart(); };
+      callbacks.OnHover = () =>
+      {
+        displayable.MouseHoverStart();
+      };
       return callbacks;
     }
 
@@ -648,7 +745,12 @@ namespace Dreamtides.Abu
         return null;
       }
 
-      var region = new AbuSceneNode { Role = "region", Label = "UIToolkit", Interactive = false };
+      var region = new AbuSceneNode
+      {
+        Role = "region",
+        Label = "UIToolkit",
+        Interactive = false,
+      };
       foreach (var child in rootElement.Children())
       {
         var childNode = WalkVisualElement(child, refRegistry);
@@ -688,7 +790,12 @@ namespace Dreamtides.Abu
 
     AbuSceneNode WalkUiToolkit(RefRegistry refRegistry)
     {
-      var region = new AbuSceneNode { Role = "region", Label = "UIToolkit", Interactive = false };
+      var region = new AbuSceneNode
+      {
+        Role = "region",
+        Label = "UIToolkit",
+        Interactive = false,
+      };
       var doc = _registry.DocumentService;
       var rootElement = doc._document != null ? doc.RootVisualElement : null;
       if (rootElement != null)
@@ -804,7 +911,12 @@ namespace Dreamtides.Abu
 
     AbuSceneNode WalkFallbackScene3D(RefRegistry refRegistry)
     {
-      var region = new AbuSceneNode { Role = "region", Label = "Scene3D", Interactive = false };
+      var region = new AbuSceneNode
+      {
+        Role = "region",
+        Label = "Scene3D",
+        Interactive = false,
+      };
       var hasOpenPanels = _registry.DocumentService.HasOpenPanels;
 
       if (!hasOpenPanels)
@@ -831,7 +943,12 @@ namespace Dreamtides.Abu
         }
 
         var label = DetermineDisplayableLabel(displayable);
-        var node = new AbuSceneNode { Role = "button", Label = label, Interactive = true };
+        var node = new AbuSceneNode
+        {
+          Role = "button",
+          Label = label,
+          Interactive = true,
+        };
         RegisterDisplayableCallbacks(displayable, refRegistry);
         parent.Children.Add(node);
       }
@@ -871,7 +988,12 @@ namespace Dreamtides.Abu
       }
 
       var label = button._text.text;
-      var node = new AbuSceneNode { Role = "button", Label = label, Interactive = true };
+      var node = new AbuSceneNode
+      {
+        Role = "button",
+        Label = label,
+        Interactive = true,
+      };
       var callbacks = BuildCanvasButtonCallbacks(button);
       refRegistry.Register(callbacks);
       parent.Children.Add(node);

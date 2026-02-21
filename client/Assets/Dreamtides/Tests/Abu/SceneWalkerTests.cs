@@ -6,6 +6,7 @@ using Abu;
 using Dreamtides.Abu;
 using Dreamtides.Buttons;
 using Dreamtides.Components;
+using Dreamtides.Layout;
 using Dreamtides.Masonry;
 using Dreamtides.Schema;
 using Dreamtides.Tests.TestUtils;
@@ -140,10 +141,7 @@ namespace Dreamtides.Tests.Abu
       var scene3dRegion = root.Children.FirstOrDefault(c => c.Label == "Scene3D");
       Assert.IsNotNull(scene3dRegion, "Should have a Scene3D region");
 
-      var found = FindNode(
-        scene3dRegion!,
-        n => n.Label == "TestDisplayableBtn" && n.Interactive
-      );
+      var found = FindNode(scene3dRegion!, n => n.Label == "TestDisplayableBtn" && n.Interactive);
       Assert.IsNotNull(found, "Interactive DisplayableButton should appear in tree");
       Assert.AreEqual("button", found!.Role);
     }
@@ -209,7 +207,14 @@ namespace Dreamtides.Tests.Abu
       element.pickingMode = PickingMode.Position;
       var callbacks = element.Callbacks.Value;
       var clickFired = false;
-      callbacks.SetCallback(element, Callbacks.Event.Click, () => { clickFired = true; });
+      callbacks.SetCallback(
+        element,
+        Callbacks.Event.Click,
+        () =>
+        {
+          clickFired = true;
+        }
+      );
 
       Registry.DocumentService.RootVisualElement.Add(element);
 
@@ -279,7 +284,10 @@ namespace Dreamtides.Tests.Abu
       callbacks.SetCallback(
         element,
         Callbacks.Event.MouseEnter,
-        () => { hoverFired = true; }
+        () =>
+        {
+          hoverFired = true;
+        }
       );
 
       Registry.DocumentService.RootVisualElement.Add(element);
@@ -355,7 +363,15 @@ namespace Dreamtides.Tests.Abu
       userStatus.SetEnergy(3, 7, false);
       userStatus.SetScore(2, false);
       userStatus.SetTotalSpark(49, false);
-      userStatus._leftTurnIndicator.SetActive(true);
+
+      // Create turn indicator GameObjects (not created by generated layout)
+      var leftIndicator = new GameObject("LeftTurnIndicator");
+      leftIndicator.transform.SetParent(userStatus.transform);
+      userStatus._leftTurnIndicator = leftIndicator;
+      var rightIndicator = new GameObject("RightTurnIndicator");
+      rightIndicator.transform.SetParent(userStatus.transform);
+      userStatus._rightTurnIndicator = rightIndicator;
+      leftIndicator.SetActive(true);
 
       var walker = CreateWalker();
       var refRegistry = new RefRegistry();
@@ -368,7 +384,10 @@ namespace Dreamtides.Tests.Abu
       var statusGroup = FindNode(userGroup!, n => n.Label == "Status");
       Assert.IsNotNull(statusGroup, "User should have a Status group");
 
-      var energyLabel = FindNode(statusGroup!, n => n.Label != null && n.Label.StartsWith("Energy:"));
+      var energyLabel = FindNode(
+        statusGroup!,
+        n => n.Label != null && n.Label.StartsWith("Energy:")
+      );
       Assert.IsNotNull(energyLabel, "Status should have an Energy label");
 
       var scoreLabel = FindNode(statusGroup!, n => n.Label != null && n.Label.StartsWith("Score:"));
@@ -395,6 +414,9 @@ namespace Dreamtides.Tests.Abu
 
       Registry.BattleLayout.Contents.SetActive(true);
       Registry.DocumentService.HasOpenPanels = false;
+
+      // Initialize the battlefield layout's GameContext before adding cards
+      Registry.BattleLayout.UserBattlefield._internalGameContext = GameContext.Battlefield;
 
       var card = CreateTestCard();
       card._cardView.Revealed = new RevealedCardView
@@ -447,10 +469,7 @@ namespace Dreamtides.Tests.Abu
       var battleRegion = root.Children.FirstOrDefault(c => c.Label == "Battle");
       Assert.IsNotNull(battleRegion);
 
-      var thinkingLabel = FindNode(
-        battleRegion!,
-        n => n.Label == "Opponent is thinking..."
-      );
+      var thinkingLabel = FindNode(battleRegion!, n => n.Label == "Opponent is thinking...");
       Assert.IsNotNull(thinkingLabel, "Thinking indicator should appear as a label");
     }
 
@@ -501,6 +520,9 @@ namespace Dreamtides.Tests.Abu
       Registry.BattleLayout.Contents.SetActive(true);
       Registry.DocumentService.HasOpenPanels = false;
 
+      // Initialize the battlefield layout's GameContext before adding cards
+      Registry.BattleLayout.UserBattlefield._internalGameContext = GameContext.Battlefield;
+
       var card = CreateTestCard();
       card._cardView.Revealed = new RevealedCardView
       {
@@ -520,10 +542,7 @@ namespace Dreamtides.Tests.Abu
         n => n.Label != null && n.Label.Contains("The Black Knight, Malignant Usurper")
       );
       Assert.IsNotNull(cardNode, "Card name should have rich text stripped and newline replaced");
-      Assert.IsFalse(
-        cardNode!.Label!.Contains("<size"),
-        "Label should not contain rich text tags"
-      );
+      Assert.IsFalse(cardNode!.Label!.Contains("<size"), "Label should not contain rich text tags");
     }
 
     // -- Helper methods --
