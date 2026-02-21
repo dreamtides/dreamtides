@@ -68,8 +68,8 @@ namespace Dreamtides.Abu
       {
         var c = stripped[i];
         var code = (int)c;
-        // Filter Unicode Private Use Area characters (icon glyphs)
-        if (code >= 0xE000 && code <= 0xF8FF)
+        // Filter icon glyphs (PUA + CJK compat / presentation forms / specials)
+        if (code >= 0xE000 && code <= 0xFFFF)
         {
           continue;
         }
@@ -550,16 +550,6 @@ namespace Dreamtides.Abu
 
       var annotations = new List<string>();
 
-      if (revealed.Actions?.CanPlay != null)
-      {
-        annotations.Add("drag to play");
-      }
-
-      if (revealed.Actions?.OnClick != null)
-      {
-        annotations.Add("click to select");
-      }
-
       if (zoneContext == "Hand" && !string.IsNullOrEmpty(revealed.Cost))
       {
         annotations.Add($"cost: {StripRichText(revealed.Cost)}");
@@ -623,14 +613,20 @@ namespace Dreamtides.Abu
 
     void AddEssenceLabel(AbuSceneNode parent)
     {
-      var essenceText = _registry.DreamscapeLayout.EssenceTotal._originalText;
+      var essenceComponent = _registry.DreamscapeLayout.EssenceTotal;
+      var essenceText = essenceComponent._originalText;
+      if (string.IsNullOrEmpty(essenceText))
+      {
+        essenceText = StripRichText(essenceComponent._text.text);
+      }
+
       if (!string.IsNullOrEmpty(essenceText))
       {
         parent.Children.Add(
           new AbuSceneNode
           {
             Role = "label",
-            Label = $"Essence: {StripRichText(essenceText)}",
+            Label = $"Essence: {essenceText}",
             Interactive = false,
           }
         );
@@ -765,7 +761,7 @@ namespace Dreamtides.Abu
 
     static bool HasContent(AbuSceneNode node)
     {
-      if (node.Interactive)
+      if (node.Interactive && !string.IsNullOrEmpty(node.Label))
       {
         return true;
       }

@@ -545,6 +545,203 @@ namespace Dreamtides.Tests.Abu
       Assert.IsFalse(cardNode!.Label!.Contains("<size"), "Label should not contain rich text tags");
     }
 
+    // -- Test 14: Icon characters stripped from status labels --
+
+    /// <summary>
+    /// Set energy/score values, walk, assert exact label text without icon
+    /// artifacts.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator BattleMode_IconCharactersStrippedFromStatusLabels()
+    {
+      yield return Initialize();
+      SetUpUIDocument();
+
+      Registry.BattleLayout.Contents.SetActive(true);
+      Registry.DocumentService.HasOpenPanels = false;
+
+      var userStatus = Registry.BattleLayout.UserStatusDisplay;
+      userStatus.SetEnergy(3, 7, false);
+      userStatus.SetScore(2, false);
+
+      var walker = CreateWalker();
+      var refRegistry = new RefRegistry();
+      var root = walker.Walk(refRegistry);
+
+      var battleRegion = root.Children.FirstOrDefault(c => c.Label == "Battle");
+      Assert.IsNotNull(battleRegion);
+      var userGroup = FindNode(battleRegion!, n => n.Label == "User");
+      Assert.IsNotNull(userGroup);
+      var statusGroup = FindNode(userGroup!, n => n.Label == "Status");
+      Assert.IsNotNull(statusGroup);
+
+      var energyLabel = FindNode(
+        statusGroup!,
+        n => n.Label != null && n.Label.StartsWith("Energy:")
+      );
+      Assert.IsNotNull(energyLabel);
+      Assert.AreEqual("Energy: 3/7", energyLabel!.Label);
+
+      var scoreLabel = FindNode(statusGroup!, n => n.Label != null && n.Label.StartsWith("Score:"));
+      Assert.IsNotNull(scoreLabel);
+      Assert.AreEqual("Score: 2", scoreLabel!.Label);
+    }
+
+    // -- Test 15: Card labels exclude interaction annotations --
+
+    /// <summary>
+    /// Create a hand card with CanPlay/OnClick actions, walk, assert label
+    /// contains cost but NOT drag/click annotations.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator BattleMode_CardLabelsExcludeInteractionAnnotations()
+    {
+      yield return Initialize();
+      SetUpUIDocument();
+
+      Registry.BattleLayout.Contents.SetActive(true);
+      Registry.DocumentService.HasOpenPanels = false;
+
+      Registry.BattleLayout.UserHand._layout1._internalGameContext = GameContext.Hand;
+
+      var card = CreateTestCard();
+      card._cardView.Revealed = new RevealedCardView
+      {
+        Name = "Minstrel of Falling Light\n<size=75%>Musician</size>",
+        CardType = "Character",
+        Cost = "2",
+        Actions = new CardActions
+        {
+          CanPlay = GameActionEnum.NoOp,
+          OnClick = GameActionEnum.NoOp,
+        },
+      };
+      card.GameContext = GameContext.Hand;
+      Registry.BattleLayout.UserHand.Add(card);
+
+      var walker = CreateWalker();
+      var refRegistry = new RefRegistry();
+      var root = walker.Walk(refRegistry);
+
+      var battleRegion = root.Children.FirstOrDefault(c => c.Label == "Battle");
+      Assert.IsNotNull(battleRegion);
+      var userGroup = FindNode(battleRegion!, n => n.Label == "User");
+      Assert.IsNotNull(userGroup);
+
+      var cardNode = FindNode(
+        userGroup!,
+        n => n.Label != null && n.Label.Contains("Minstrel of Falling Light")
+      );
+      Assert.IsNotNull(cardNode, "Card should appear in hand");
+      Assert.IsTrue(cardNode!.Label!.Contains("cost: 2"), "Label should contain cost annotation");
+      Assert.IsFalse(
+        cardNode.Label.Contains("drag to play"),
+        "Label should NOT contain drag to play"
+      );
+      Assert.IsFalse(
+        cardNode.Label.Contains("click to select"),
+        "Label should NOT contain click to select"
+      );
+    }
+
+    // -- Test 16: Empty UIToolkit containers filtered --
+
+    /// <summary>
+    /// Walk battle mode with empty overlay containers. Assert no UIToolkit
+    /// region when overlay containers are empty.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator BattleMode_EmptyUiToolkitContainersFiltered()
+    {
+      yield return Initialize();
+      SetUpUIDocument();
+
+      Registry.BattleLayout.Contents.SetActive(true);
+      Registry.DocumentService.HasOpenPanels = false;
+
+      // Add an unlabeled interactive element (simulates empty overlay container)
+      var element = new NodeVisualElement();
+      element.pickingMode = PickingMode.Position;
+      Registry.DocumentService.RootVisualElement.Add(element);
+
+      var walker = CreateWalker();
+      var refRegistry = new RefRegistry();
+      var root = walker.Walk(refRegistry);
+
+      var battleRegion = root.Children.FirstOrDefault(c => c.Label == "Battle");
+      Assert.IsNotNull(battleRegion);
+
+      var uiToolkitRegion = FindNode(battleRegion!, n => n.Label == "UIToolkit");
+      Assert.IsNull(
+        uiToolkitRegion,
+        "UIToolkit region should not appear when overlay containers are empty"
+      );
+    }
+
+    // -- Test 17: UIToolkit containers with real content shown --
+
+    /// <summary>
+    /// Add a named interactive element, walk, assert UIToolkit region appears
+    /// with the element.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator BattleMode_UiToolkitContainersWithRealContentShown()
+    {
+      yield return Initialize();
+      SetUpUIDocument();
+
+      Registry.BattleLayout.Contents.SetActive(true);
+      Registry.DocumentService.HasOpenPanels = false;
+
+      var element = new NodeVisualElement { name = "RealOverlayButton" };
+      element.pickingMode = PickingMode.Position;
+      Registry.DocumentService.RootVisualElement.Add(element);
+
+      var walker = CreateWalker();
+      var refRegistry = new RefRegistry();
+      var root = walker.Walk(refRegistry);
+
+      var battleRegion = root.Children.FirstOrDefault(c => c.Label == "Battle");
+      Assert.IsNotNull(battleRegion);
+
+      var uiToolkitRegion = FindNode(battleRegion!, n => n.Label == "UIToolkit");
+      Assert.IsNotNull(uiToolkitRegion, "UIToolkit region should appear with real content");
+
+      var buttonNode = FindNode(
+        uiToolkitRegion!,
+        n => n.Label == "RealOverlayButton" && n.Interactive
+      );
+      Assert.IsNotNull(buttonNode, "Named interactive element should be in the tree");
+    }
+
+    // -- Test 18: Essence label appears during battle --
+
+    /// <summary>
+    /// Set essence value via _originalText, walk, assert "Essence: 42" label
+    /// exists.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator BattleMode_EssenceLabelAppearsDuringBattle()
+    {
+      yield return Initialize();
+      SetUpUIDocument();
+
+      Registry.BattleLayout.Contents.SetActive(true);
+      Registry.DocumentService.HasOpenPanels = false;
+
+      Registry.DreamscapeLayout.EssenceTotal._originalText = "42";
+
+      var walker = CreateWalker();
+      var refRegistry = new RefRegistry();
+      var root = walker.Walk(refRegistry);
+
+      var battleRegion = root.Children.FirstOrDefault(c => c.Label == "Battle");
+      Assert.IsNotNull(battleRegion);
+
+      var essenceLabel = FindNode(battleRegion!, n => n.Label == "Essence: 42");
+      Assert.IsNotNull(essenceLabel, "Essence label should appear during battle");
+    }
+
     // -- Helper methods --
 
     /// <summary>

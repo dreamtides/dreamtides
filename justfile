@@ -651,6 +651,7 @@ rsync-for-review:
     echo $'\a'
     rsync --delete --stats --copy-links -avqr --exclude='client/Library' --exclude='client/test_output' --exclude='client/Assets/ThirdParty' --exclude='node_modules' ./client ~/dreamtides_tests/
     echo $'\a'
+    rm -rf ~/dreamtides_tests/client/Library/PackageManager
     rsync --delete --stats --copy-links -avqr ./scripts ~/dreamtides_tests/
     echo $'\a'
     cp justfile ~/dreamtides_tests/
