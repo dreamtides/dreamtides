@@ -5,7 +5,9 @@ using System.Linq;
 using Abu;
 using Dreamtides.Abu;
 using Dreamtides.Buttons;
+using Dreamtides.Components;
 using Dreamtides.Masonry;
+using Dreamtides.Schema;
 using Dreamtides.Tests.TestUtils;
 using NUnit.Framework;
 using TMPro;
@@ -36,31 +38,21 @@ namespace Dreamtides.Tests.Abu
       Registry.DocumentService._document = uiDocument;
     }
 
-    /// <summary>
-    /// Activates the BattleLayout.Contents game object to enable battle mode.
-    /// </summary>
-    void ActivateBattleContents()
-    {
-      Registry.BattleLayout.Contents.SetActive(true);
-    }
-
-    /// <summary>
-    /// Deactivates the BattleLayout.Contents game object to disable battle
-    /// mode and use the non-battle fallback.
-    /// </summary>
-    void DeactivateBattleContents()
-    {
-      Registry.BattleLayout.Contents.SetActive(false);
-    }
-
     // -- Test 1: UI Toolkit basic walk (non-battle fallback) --
 
+    /// <summary>
+    /// Add a VisualElement with pickingMode = Position to
+    /// DocumentService.RootVisualElement. Walk in non-battle mode. Verify
+    /// the element appears as interactive in the output tree.
+    /// </summary>
     [UnityTest]
     public IEnumerator UiToolkitBasicWalk_InteractiveElementAppearsInTree()
     {
       yield return Initialize();
       SetUpUIDocument();
-      DeactivateBattleContents();
+
+      // Ensure we're not in battle mode
+      Registry.BattleLayout.Contents.SetActive(false);
 
       var element = new NodeVisualElement { name = "TestButton" };
       element.pickingMode = PickingMode.Position;
@@ -72,9 +64,11 @@ namespace Dreamtides.Tests.Abu
 
       Assert.AreEqual("application", root.Role);
 
+      // Find UIToolkit region
       var uiToolkitRegion = root.Children.FirstOrDefault(c => c.Label == "UIToolkit");
       Assert.IsNotNull(uiToolkitRegion, "Should have a UIToolkit region");
 
+      // Find the interactive element somewhere in the tree
       var found = FindNode(uiToolkitRegion!, n => n.Label == "TestButton" && n.Interactive);
       Assert.IsNotNull(found, "Interactive element should appear in the tree");
       Assert.AreEqual("button", found!.Role);
@@ -82,12 +76,17 @@ namespace Dreamtides.Tests.Abu
 
     // -- Test 2: Non-interactive container recursion --
 
+    /// <summary>
+    /// Add a container with pickingMode = Ignore containing an interactive child.
+    /// Walk in non-battle mode. Verify the container is "group" role and child is found.
+    /// </summary>
     [UnityTest]
     public IEnumerator NonInteractiveContainerRecursion_ChildFoundInGroup()
     {
       yield return Initialize();
       SetUpUIDocument();
-      DeactivateBattleContents();
+
+      Registry.BattleLayout.Contents.SetActive(false);
 
       var container = new NodeVisualElement { name = "Container" };
       container.pickingMode = PickingMode.Ignore;
@@ -105,11 +104,13 @@ namespace Dreamtides.Tests.Abu
       var uiToolkitRegion = root.Children.FirstOrDefault(c => c.Label == "UIToolkit");
       Assert.IsNotNull(uiToolkitRegion);
 
+      // Find container - should be group
       var containerNode = FindNode(uiToolkitRegion!, n => n.Label == "Container");
       Assert.IsNotNull(containerNode, "Container should appear in tree");
       Assert.AreEqual("group", containerNode!.Role);
       Assert.IsFalse(containerNode.Interactive);
 
+      // Find child inside - should be interactive button
       var childNode = FindNode(uiToolkitRegion!, n => n.Label == "ChildButton" && n.Interactive);
       Assert.IsNotNull(childNode, "Interactive child should be found inside container");
       Assert.AreEqual("button", childNode!.Role);
@@ -117,12 +118,18 @@ namespace Dreamtides.Tests.Abu
 
     // -- Test 3: Displayable discovery (non-battle fallback) --
 
+    /// <summary>
+    /// Create an interactive Displayable. Walk in non-battle mode. Verify it
+    /// appears in the output.
+    /// </summary>
     [UnityTest]
     public IEnumerator DisplayableDiscovery_InteractiveDisplayableAppearsInTree()
     {
       yield return Initialize();
       SetUpUIDocument();
-      DeactivateBattleContents();
+
+      Registry.BattleLayout.Contents.SetActive(false);
+      Registry.DocumentService.HasOpenPanels = false;
 
       CreateTestDisplayableButton("TestDisplayableBtn");
 
@@ -131,7 +138,7 @@ namespace Dreamtides.Tests.Abu
       var root = walker.Walk(refRegistry);
 
       var scene3dRegion = root.Children.FirstOrDefault(c => c.Label == "Scene3D");
-      Assert.IsNotNull(scene3dRegion, "Should have a Scene3D region in non-battle mode");
+      Assert.IsNotNull(scene3dRegion, "Should have a Scene3D region");
 
       var found = FindNode(
         scene3dRegion!,
@@ -141,54 +148,62 @@ namespace Dreamtides.Tests.Abu
       Assert.AreEqual("button", found!.Role);
     }
 
-    // -- Test 4: Occlusion (battle mode, panels open) --
+    // -- Test 4: Occlusion --
 
+    /// <summary>
+    /// Set HasOpenPanels = true. Create a Displayable. Walk in non-battle mode.
+    /// Verify Displayable is NOT in output. UI Toolkit elements should still appear.
+    /// </summary>
     [UnityTest]
-    public IEnumerator Occlusion_3dContentOmittedWhenPanelsOpen()
+    public IEnumerator Occlusion_DisplayablesOmittedWhenPanelsOpen()
     {
       yield return Initialize();
       SetUpUIDocument();
-      ActivateBattleContents();
 
+      Registry.BattleLayout.Contents.SetActive(false);
       Registry.DocumentService.HasOpenPanels = true;
 
-      var element = new NodeVisualElement { name = "StillVisible" };
-      element.pickingMode = PickingMode.Position;
-      Registry.DocumentService.RootVisualElement.Add(element);
+      CreateTestDisplayableButton("OccludedButton");
+
+      // Add a UI Toolkit element that should still appear
+      var uiElement = new NodeVisualElement { name = "StillVisible" };
+      uiElement.pickingMode = PickingMode.Position;
+      Registry.DocumentService.RootVisualElement.Add(uiElement);
 
       var walker = CreateWalker();
       var refRegistry = new RefRegistry();
       var root = walker.Walk(refRegistry);
 
-      var battleRegion = root.Children.FirstOrDefault(c => c.Label == "Battle");
-      Assert.IsNotNull(battleRegion, "Should have a Battle region");
+      var scene3dRegion = root.Children.FirstOrDefault(c => c.Label == "Scene3D");
+      Assert.IsNotNull(scene3dRegion);
 
-      // Controls should still be present
-      var controlsGroup = FindNode(battleRegion!, n => n.Label == "Controls");
-      Assert.IsNotNull(controlsGroup, "Controls should be present even when panels are open");
+      // Displayable should NOT be in the Scene3D region
+      var occludedNode = FindNode(scene3dRegion!, n => n.Label == "OccludedButton");
+      Assert.IsNull(occludedNode, "Displayable should be omitted when HasOpenPanels is true");
 
-      // User and Opponent groups should NOT be present
-      var userGroup = FindNode(battleRegion!, n => n.Label == "User");
-      Assert.IsNull(userGroup, "User group should be omitted when HasOpenPanels is true");
-
-      var opponentGroup = FindNode(battleRegion!, n => n.Label == "Opponent");
-      Assert.IsNull(opponentGroup, "Opponent group should be omitted when HasOpenPanels is true");
-
-      // UI Toolkit overlay should still be present with the element
-      var uiToolkitRegion = FindNode(battleRegion!, n => n.Label == "UIToolkit");
-      Assert.IsNotNull(uiToolkitRegion, "UIToolkit overlay should be present in battle mode");
+      // UI Toolkit element should still be present
+      var uiToolkitRegion = root.Children.FirstOrDefault(c => c.Label == "UIToolkit");
+      Assert.IsNotNull(uiToolkitRegion);
       var visibleNode = FindNode(uiToolkitRegion!, n => n.Label == "StillVisible");
-      Assert.IsNotNull(visibleNode, "UI Toolkit element should be present when panels are open");
+      Assert.IsNotNull(
+        visibleNode,
+        "UI Toolkit element should still be in tree when panels are open"
+      );
     }
 
     // -- Test 5: Click dispatch --
 
+    /// <summary>
+    /// Walk to get refs. Dispatch a click to a UI Toolkit ref. Verify the action
+    /// was recorded.
+    /// </summary>
     [UnityTest]
     public IEnumerator ClickDispatch_UiToolkitClickRecordsAction()
     {
       yield return Initialize();
       SetUpUIDocument();
-      DeactivateBattleContents();
+
+      Registry.BattleLayout.Contents.SetActive(false);
 
       var element = new NodeVisualElement { name = "ClickTarget" };
       element.pickingMode = PickingMode.Position;
@@ -202,6 +217,7 @@ namespace Dreamtides.Tests.Abu
       var refRegistry = new RefRegistry();
       var root = walker.Walk(refRegistry);
 
+      // Find the interactive element and its ref
       var targetNode = FindNode(root, n => n.Label == "ClickTarget" && n.Interactive);
       Assert.IsNotNull(targetNode, "Should find the clickable element");
 
@@ -215,56 +231,19 @@ namespace Dreamtides.Tests.Abu
       Assert.IsTrue(clickFired, "Click callback should have been invoked via ref dispatch");
     }
 
-    // -- Test 6: Tree structure (battle mode) --
+    // -- Test 6: Tree structure (non-battle) --
 
+    /// <summary>
+    /// Verify the non-battle snapshot tree has the expected structure with
+    /// application root and two region children.
+    /// </summary>
     [UnityTest]
-    public IEnumerator TreeStructure_BattleModeHasExpectedGroups()
+    public IEnumerator TreeStructure_NonBattleHasApplicationRootWithRegions()
     {
       yield return Initialize();
       SetUpUIDocument();
-      ActivateBattleContents();
-      Registry.DocumentService.HasOpenPanels = false;
 
-      var walker = CreateWalker();
-      var refRegistry = new RefRegistry();
-      var root = walker.Walk(refRegistry);
-
-      Assert.AreEqual("application", root.Role);
-      Assert.AreEqual("Dreamtides", root.Label);
-
-      var battleRegion = root.Children.FirstOrDefault(c => c.Label == "Battle");
-      Assert.IsNotNull(battleRegion, "Should have a Battle region");
-      Assert.AreEqual("region", battleRegion!.Role);
-
-      var controlsGroup = FindNode(battleRegion, n => n.Label == "Controls");
-      Assert.IsNotNull(controlsGroup, "Should have Controls group");
-
-      var userGroup = FindNode(battleRegion, n => n.Label == "User");
-      Assert.IsNotNull(userGroup, "Should have User group");
-
-      var opponentGroup = FindNode(battleRegion, n => n.Label == "Opponent");
-      Assert.IsNotNull(opponentGroup, "Should have Opponent group");
-
-      var actionsGroup = FindNode(battleRegion, n => n.Label == "Actions");
-      Assert.IsNotNull(actionsGroup, "Should have Actions group");
-
-      // User group should have Status subgroup
-      var userStatus = FindNode(userGroup!, n => n.Label == "Status");
-      Assert.IsNotNull(userStatus, "User should have Status subgroup");
-
-      // Opponent group should have Status subgroup
-      var opponentStatus = FindNode(opponentGroup!, n => n.Label == "Status");
-      Assert.IsNotNull(opponentStatus, "Opponent should have Status subgroup");
-    }
-
-    // -- Test 7: Tree structure (non-battle fallback) --
-
-    [UnityTest]
-    public IEnumerator TreeStructure_NonBattleHasUiToolkitAndScene3D()
-    {
-      yield return Initialize();
-      SetUpUIDocument();
-      DeactivateBattleContents();
+      Registry.BattleLayout.Contents.SetActive(false);
 
       var walker = CreateWalker();
       var refRegistry = new RefRegistry();
@@ -279,14 +258,19 @@ namespace Dreamtides.Tests.Abu
       Assert.AreEqual("Scene3D", root.Children[1].Label);
     }
 
-    // -- Test 8: Hover callback registration --
+    // -- Test 7: Hover callback registration --
 
+    /// <summary>
+    /// Verify that hover callbacks are registered for interactive UI Toolkit
+    /// elements.
+    /// </summary>
     [UnityTest]
     public IEnumerator HoverCallback_RegisteredForInteractiveElements()
     {
       yield return Initialize();
       SetUpUIDocument();
-      DeactivateBattleContents();
+
+      Registry.BattleLayout.Contents.SetActive(false);
 
       var element = new NodeVisualElement { name = "HoverTarget" };
       element.pickingMode = PickingMode.Position;
@@ -315,91 +299,238 @@ namespace Dreamtides.Tests.Abu
       Assert.IsTrue(hoverFired, "Hover callback should have been invoked");
     }
 
-    // -- Test 9: Battle mode card in battlefield --
+    // -- Test 8: Battle mode tree structure --
 
+    /// <summary>
+    /// Verify that in battle mode, the tree has a "Battle" region with
+    /// "Controls", "User", and "Opponent" groups.
+    /// </summary>
     [UnityTest]
-    public IEnumerator BattleMode_CardInBattlefieldAppearsInUserGroup()
+    public IEnumerator BattleMode_HasBattleRegionWithPlayerGroups()
     {
       yield return Initialize();
       SetUpUIDocument();
-      ActivateBattleContents();
+
+      Registry.BattleLayout.Contents.SetActive(true);
+      Registry.DocumentService.HasOpenPanels = false;
+
+      var walker = CreateWalker();
+      var refRegistry = new RefRegistry();
+      var root = walker.Walk(refRegistry);
+
+      Assert.AreEqual("application", root.Role);
+      Assert.AreEqual("Dreamtides", root.Label);
+
+      var battleRegion = root.Children.FirstOrDefault(c => c.Label == "Battle");
+      Assert.IsNotNull(battleRegion, "Should have a Battle region");
+      Assert.AreEqual("region", battleRegion!.Role);
+
+      var controlsGroup = battleRegion.Children.FirstOrDefault(c => c.Label == "Controls");
+      Assert.IsNotNull(controlsGroup, "Battle should have a Controls group");
+
+      var userGroup = battleRegion.Children.FirstOrDefault(c => c.Label == "User");
+      Assert.IsNotNull(userGroup, "Battle should have a User group");
+
+      var opponentGroup = battleRegion.Children.FirstOrDefault(c => c.Label == "Opponent");
+      Assert.IsNotNull(opponentGroup, "Battle should have an Opponent group");
+    }
+
+    // -- Test 9: Battle mode user status --
+
+    /// <summary>
+    /// Verify that the user's status subgroup includes energy, score, spark,
+    /// and turn labels.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator BattleMode_UserStatusHasLabels()
+    {
+      yield return Initialize();
+      SetUpUIDocument();
+
+      Registry.BattleLayout.Contents.SetActive(true);
+      Registry.DocumentService.HasOpenPanels = false;
+
+      // Set status values
+      var userStatus = Registry.BattleLayout.UserStatusDisplay;
+      userStatus.SetEnergy(3, 7, false);
+      userStatus.SetScore(2, false);
+      userStatus.SetTotalSpark(49, false);
+      userStatus._leftTurnIndicator.SetActive(true);
+
+      var walker = CreateWalker();
+      var refRegistry = new RefRegistry();
+      var root = walker.Walk(refRegistry);
+
+      var battleRegion = root.Children.FirstOrDefault(c => c.Label == "Battle");
+      Assert.IsNotNull(battleRegion);
+      var userGroup = FindNode(battleRegion!, n => n.Label == "User");
+      Assert.IsNotNull(userGroup);
+      var statusGroup = FindNode(userGroup!, n => n.Label == "Status");
+      Assert.IsNotNull(statusGroup, "User should have a Status group");
+
+      var energyLabel = FindNode(statusGroup!, n => n.Label != null && n.Label.StartsWith("Energy:"));
+      Assert.IsNotNull(energyLabel, "Status should have an Energy label");
+
+      var scoreLabel = FindNode(statusGroup!, n => n.Label != null && n.Label.StartsWith("Score:"));
+      Assert.IsNotNull(scoreLabel, "Status should have a Score label");
+
+      var sparkLabel = FindNode(statusGroup!, n => n.Label != null && n.Label.StartsWith("Spark:"));
+      Assert.IsNotNull(sparkLabel, "Status should have a Spark label");
+
+      var turnLabel = FindNode(statusGroup!, n => n.Label == "Turn: yours");
+      Assert.IsNotNull(turnLabel, "Status should have a Turn label");
+    }
+
+    // -- Test 10: Battle mode card on battlefield --
+
+    /// <summary>
+    /// Place a revealed card on the user battlefield. Walk. Verify it appears
+    /// under the User > Battlefield group with spark annotation.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator BattleMode_RevealedCardAppearsonBattlefield()
+    {
+      yield return Initialize();
+      SetUpUIDocument();
+
+      Registry.BattleLayout.Contents.SetActive(true);
       Registry.DocumentService.HasOpenPanels = false;
 
       var card = CreateTestCard();
-      card.GameContext = Layout.GameContext.Battlefield;
-      card._cardView.Revealed = new Schema.RevealedCardView
+      card._cardView.Revealed = new RevealedCardView
       {
-        Name = "Test Character",
+        Name = "Test Knight",
         CardType = "Character",
         Spark = "5",
       };
+      card.GameContext = GameContext.Battlefield;
       Registry.BattleLayout.UserBattlefield.Add(card);
 
       var walker = CreateWalker();
       var refRegistry = new RefRegistry();
       var root = walker.Walk(refRegistry);
 
-      var battleRegion = FindNode(root, n => n.Label == "Battle");
+      var battleRegion = root.Children.FirstOrDefault(c => c.Label == "Battle");
       Assert.IsNotNull(battleRegion);
       var userGroup = FindNode(battleRegion!, n => n.Label == "User");
       Assert.IsNotNull(userGroup);
-      var battlefield = FindNode(userGroup!, n => n.Label == "Battlefield");
-      Assert.IsNotNull(battlefield);
+      var battlefieldGroup = FindNode(userGroup!, n => n.Label == "Battlefield");
+      Assert.IsNotNull(battlefieldGroup, "User should have a Battlefield group");
 
       var cardNode = FindNode(
-        battlefield!,
-        n => n.Label != null && n.Label.Contains("Test Character")
+        battlefieldGroup!,
+        n => n.Label != null && n.Label.Contains("Test Knight") && n.Label.Contains("spark: 5")
       );
-      Assert.IsNotNull(cardNode, "Card should appear in User's Battlefield group");
+      Assert.IsNotNull(cardNode, "Card should appear on battlefield with spark annotation");
       Assert.IsTrue(cardNode!.Interactive);
-      Assert.IsTrue(
-        cardNode.Label!.Contains("spark: 5"),
-        "Battlefield card should show spark annotation"
-      );
     }
 
-    // -- Test 10: StripRichText handles tags and PUA characters --
+    // -- Test 11: Battle mode thinking indicator --
 
+    /// <summary>
+    /// Enable the thinking indicator. Walk. Verify the label appears.
+    /// </summary>
     [UnityTest]
-    public IEnumerator StripRichText_HandlesRichTextAndPua()
+    public IEnumerator BattleMode_ThinkingIndicatorShown()
     {
       yield return Initialize();
       SetUpUIDocument();
-      ActivateBattleContents();
-      Registry.DocumentService.HasOpenPanels = false;
 
-      // Set up energy with rich text tags and PUA icon
-      var status = Registry.BattleLayout.UserStatusDisplay;
-      status._energy._originalText = "3/7<color=#00838F>\ufa1f</color>";
-      status._score._originalText = "2<size=80%>\ufb43</size>";
-      status._totalSpark._originalText = "49";
+      Registry.BattleLayout.Contents.SetActive(true);
+      Registry.DocumentService.HasOpenPanels = false;
+      Registry.BattleLayout.ThinkingIndicator.SetActive(true);
 
       var walker = CreateWalker();
       var refRegistry = new RefRegistry();
       var root = walker.Walk(refRegistry);
 
-      var battleRegion = FindNode(root, n => n.Label == "Battle");
+      var battleRegion = root.Children.FirstOrDefault(c => c.Label == "Battle");
       Assert.IsNotNull(battleRegion);
+
+      var thinkingLabel = FindNode(
+        battleRegion!,
+        n => n.Label == "Opponent is thinking..."
+      );
+      Assert.IsNotNull(thinkingLabel, "Thinking indicator should appear as a label");
+    }
+
+    // -- Test 12: Battle mode panels open hides 3D content --
+
+    /// <summary>
+    /// In battle mode with HasOpenPanels = true, verify that User/Opponent
+    /// groups are not present but Controls still are.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator BattleMode_PanelsOpenHides3DContent()
+    {
+      yield return Initialize();
+      SetUpUIDocument();
+
+      Registry.BattleLayout.Contents.SetActive(true);
+      Registry.DocumentService.HasOpenPanels = true;
+
+      var walker = CreateWalker();
+      var refRegistry = new RefRegistry();
+      var root = walker.Walk(refRegistry);
+
+      var battleRegion = root.Children.FirstOrDefault(c => c.Label == "Battle");
+      Assert.IsNotNull(battleRegion);
+
+      var controlsGroup = FindNode(battleRegion!, n => n.Label == "Controls");
+      Assert.IsNotNull(controlsGroup, "Controls should still be present when panels are open");
+
       var userGroup = FindNode(battleRegion!, n => n.Label == "User");
-      Assert.IsNotNull(userGroup);
-      var statusGroup = FindNode(userGroup!, n => n.Label == "Status");
-      Assert.IsNotNull(statusGroup);
+      Assert.IsNull(userGroup, "User group should not be present when panels are open");
 
-      var energyLabel = FindNode(statusGroup!, n => n.Label != null && n.Label.StartsWith("Energy:"));
-      Assert.IsNotNull(energyLabel, "Should have energy label");
-      Assert.AreEqual("Energy: 3/7", energyLabel!.Label);
+      var opponentGroup = FindNode(battleRegion!, n => n.Label == "Opponent");
+      Assert.IsNull(opponentGroup, "Opponent group should not be present when panels are open");
+    }
 
-      var scoreLabel = FindNode(statusGroup!, n => n.Label != null && n.Label.StartsWith("Score:"));
-      Assert.IsNotNull(scoreLabel, "Should have score label");
-      Assert.AreEqual("Score: 2", scoreLabel!.Label);
+    // -- Test 13: Rich text stripping --
 
-      var sparkLabel = FindNode(statusGroup!, n => n.Label != null && n.Label.StartsWith("Spark:"));
-      Assert.IsNotNull(sparkLabel, "Should have spark label");
-      Assert.AreEqual("Spark: 49", sparkLabel!.Label);
+    /// <summary>
+    /// Verify that card names with rich text tags and newlines are properly
+    /// cleaned up in labels.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator BattleMode_RichTextStrippedFromCardLabels()
+    {
+      yield return Initialize();
+      SetUpUIDocument();
+
+      Registry.BattleLayout.Contents.SetActive(true);
+      Registry.DocumentService.HasOpenPanels = false;
+
+      var card = CreateTestCard();
+      card._cardView.Revealed = new RevealedCardView
+      {
+        Name = "The Black Knight\n<size=75%>Malignant Usurper</size>",
+        CardType = "Character",
+        Spark = "5",
+      };
+      card.GameContext = GameContext.Battlefield;
+      Registry.BattleLayout.UserBattlefield.Add(card);
+
+      var walker = CreateWalker();
+      var refRegistry = new RefRegistry();
+      var root = walker.Walk(refRegistry);
+
+      var cardNode = FindNode(
+        root,
+        n => n.Label != null && n.Label.Contains("The Black Knight, Malignant Usurper")
+      );
+      Assert.IsNotNull(cardNode, "Card name should have rich text stripped and newline replaced");
+      Assert.IsFalse(
+        cardNode!.Label!.Contains("<size"),
+        "Label should not contain rich text tags"
+      );
     }
 
     // -- Helper methods --
 
+    /// <summary>
+    /// Creates a fully configured DisplayableButton for use in tests.
+    /// </summary>
     DisplayableButton CreateTestDisplayableButton(string label)
     {
       return CreateSceneObject<DisplayableButton>(b =>
@@ -416,6 +547,9 @@ namespace Dreamtides.Tests.Abu
       });
     }
 
+    /// <summary>
+    /// Recursively search the scene tree for a node matching the predicate.
+    /// </summary>
     static AbuSceneNode? FindNode(AbuSceneNode node, System.Func<AbuSceneNode, bool> predicate)
     {
       if (predicate(node))

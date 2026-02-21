@@ -16,13 +16,13 @@ namespace Dreamtides.Abu
 {
   /// <summary>
   /// Walks all Dreamtides UI systems and produces a structured accessibility
-  /// snapshot tree. In battle mode, produces a zone-based hierarchy with
-  /// player status, hand, battlefield, and action groups. Outside battle,
-  /// falls back to a flat UIToolkit + 3D walk.
+  /// snapshot tree. In battle mode, the tree is organized by zone (hand,
+  /// battlefield, etc.) with semantic labels. Outside battle, falls back to
+  /// a flat UIToolkit + 3D walk.
   /// </summary>
   public class DreamtidesSceneWalker : ISceneWalker
   {
-    static readonly Regex RichTextTagPattern = new("<[^>]+>", RegexOptions.Compiled);
+    static readonly Regex RichTextTagPattern = new("<[^>]+>");
 
     readonly Registry _registry;
 
@@ -47,37 +47,139 @@ namespace Dreamtides.Abu
       else
       {
         root.Children.Add(WalkUiToolkit(refRegistry));
-        root.Children.Add(WalkScene3DFallback(refRegistry));
+        root.Children.Add(WalkFallbackScene3D(refRegistry));
       }
 
       return root;
     }
 
-    // ── Battle mode ──────────────────────────────────────────────────
+    // ── Rich text stripping ───────────────────────────────────────────
+
+    static string StripRichText(string? text)
+    {
+      if (string.IsNullOrEmpty(text))
+      {
+        return "";
+      }
+
+      var stripped = RichTextTagPattern.Replace(text, "");
+      var sb = new System.Text.StringBuilder(stripped.Length);
+      for (var i = 0; i < stripped.Length; i++)
+      {
+        var c = stripped[i];
+        var code = (int)c;
+        // Filter Unicode Private Use Area characters (icon glyphs)
+        if (code >= 0xE000 && code <= 0xF8FF)
+        {
+          continue;
+        }
+
+        // Filter Supplementary Private Use Area (represented as surrogate pairs)
+        if (char.IsHighSurrogate(c) && i + 1 < stripped.Length && char.IsLowSurrogate(stripped[i + 1]))
+        {
+          var codePoint = char.ConvertToUtf32(c, stripped[i + 1]);
+          if (codePoint >= 0xF0000 && codePoint <= 0xFFFFF)
+          {
+            i++; // skip low surrogate
+            continue;
+          }
+        }
+
+        sb.Append(c);
+      }
+
+      return sb.ToString().Trim();
+    }
+
+    // ── Battle mode walk ──────────────────────────────────────────────
 
     AbuSceneNode WalkBattle(RefRegistry refRegistry)
     {
-      var region = new AbuSceneNode { Role = "region", Label = "Battle" };
-      var browserButtons = BuildBrowserButtonMap();
+      var region = new AbuSceneNode { Role = "region", Label = "Battle", Interactive = false };
+      var layout = _registry.BattleLayout;
       var hasOpenPanels = _registry.DocumentService.HasOpenPanels;
 
+      // Build browser button lookup
+      var browserButtons = new Dictionary<CardBrowserType, CardBrowserButton>();
+      foreach (var btn in Object.FindObjectsByType<CardBrowserButton>(
+        FindObjectsInactive.Exclude,
+        FindObjectsSortMode.None))
+      {
+        browserButtons[btn._type] = btn;
+      }
+
+      // 1. Controls (always shown)
       region.Children.Add(WalkControls(refRegistry));
 
       if (!hasOpenPanels)
       {
+        // 2. User
         region.Children.Add(WalkPlayer(
-          refRegistry, browserButtons, "User", isUser: true));
+          "User",
+          layout.UserStatusDisplay,
+          layout.UserBattlefield,
+          layout.UserHand.Objects,
+          layout.UserDreamwell,
+          browserButtons,
+          CardBrowserType.UserDeck,
+          CardBrowserType.UserVoid,
+          CardBrowserType.UserStatus,
+          isUser: true,
+          refRegistry));
+
+        // 3. Opponent
         region.Children.Add(WalkPlayer(
-          refRegistry, browserButtons, "Opponent", isUser: false));
-        region.Children.Add(WalkActionButtons(refRegistry));
-        AddStacks(region, refRegistry);
-        AddGameModifiers(region, refRegistry);
+          "Opponent",
+          layout.EnemyStatusDisplay,
+          layout.EnemyBattlefield,
+          layout.EnemyHand.Objects,
+          layout.EnemyDreamwell,
+          browserButtons,
+          CardBrowserType.EnemyDeck,
+          CardBrowserType.EnemyVoid,
+          CardBrowserType.EnemyStatus,
+          isUser: false,
+          refRegistry));
+
+        // 4. Stack (if any cards on stack)
+        var stackGroup = WalkStack(layout, refRegistry);
+        if (stackGroup != null)
+        {
+          region.Children.Add(stackGroup);
+        }
+
+        // 5. Game modifiers (if any)
+        var modifiersGroup = WalkObjectLayoutGroup("Game Modifiers", layout.GameModifiersDisplay, refRegistry);
+        if (modifiersGroup != null)
+        {
+          region.Children.Add(modifiersGroup);
+        }
+
+        // 6. Action buttons
+        var actionsGroup = WalkActionButtons(layout, refRegistry);
+        if (actionsGroup.Children.Count > 0)
+        {
+          region.Children.Add(actionsGroup);
+        }
+
+        // 7. Essence label
         AddEssenceLabel(region);
-        AddThinkingIndicator(region);
+
+        // 8. Thinking indicator
+        if (layout.ThinkingIndicator.activeSelf)
+        {
+          region.Children.Add(new AbuSceneNode
+          {
+            Role = "label",
+            Label = "Opponent is thinking...",
+            Interactive = false,
+          });
+        }
       }
 
-      var uiOverlay = WalkUiToolkit(refRegistry);
-      if (uiOverlay.Children.Count > 0)
+      // 9. UI overlays (filtered, only when content exists)
+      var uiOverlay = WalkUiToolkitFiltered(refRegistry);
+      if (uiOverlay != null)
       {
         region.Children.Add(uiOverlay);
       }
@@ -85,21 +187,26 @@ namespace Dreamtides.Abu
       return region;
     }
 
-    // ── Controls ─────────────────────────────────────────────────────
+    // ── Controls ──────────────────────────────────────────────────────
 
     AbuSceneNode WalkControls(RefRegistry refRegistry)
     {
-      var group = new AbuSceneNode { Role = "group", Label = "Controls" };
+      var group = new AbuSceneNode { Role = "group", Label = "Controls", Interactive = false };
       var doc = _registry.DocumentService;
-      TryAddCanvasButton(group, refRegistry, doc.MenuButton, "Menu");
-      TryAddCanvasButton(group, refRegistry, doc.UndoButton, "Undo");
-      TryAddCanvasButton(group, refRegistry, doc.DevButton, "Dev");
-      TryAddCanvasButton(group, refRegistry, doc.BugButton, "Bug Report");
+
+      TryAddCanvasButtonWithLabel(group, refRegistry, doc.MenuButton, "Menu");
+      TryAddCanvasButtonWithLabel(group, refRegistry, doc.UndoButton, "Undo");
+      TryAddCanvasButtonWithLabel(group, refRegistry, doc.DevButton, "Dev");
+      TryAddCanvasButtonWithLabel(group, refRegistry, doc.BugButton, "Bug Report");
+
       return group;
     }
 
-    void TryAddCanvasButton(
-      AbuSceneNode parent, RefRegistry refRegistry, CanvasButton? button, string label)
+    void TryAddCanvasButtonWithLabel(
+      AbuSceneNode parent,
+      RefRegistry refRegistry,
+      CanvasButton? button,
+      string label)
     {
       if (button == null || !button.gameObject.activeSelf || button._canvasGroup.alpha <= 0)
       {
@@ -107,217 +214,246 @@ namespace Dreamtides.Abu
       }
 
       var node = new AbuSceneNode { Role = "button", Label = label, Interactive = true };
-      refRegistry.Register(BuildCanvasButtonCallbacks(button));
+      var callbacks = BuildCanvasButtonCallbacks(button);
+      refRegistry.Register(callbacks);
       parent.Children.Add(node);
     }
 
-    // ── Player ───────────────────────────────────────────────────────
+    // ── Player ────────────────────────────────────────────────────────
 
     AbuSceneNode WalkPlayer(
-      RefRegistry refRegistry,
+      string playerLabel,
+      PlayerStatusDisplay statusDisplay,
+      ObjectLayout battlefield,
+      IReadOnlyList<Displayable> handObjects,
+      ObjectLayout dreamwell,
       Dictionary<CardBrowserType, CardBrowserButton> browserButtons,
-      string label,
-      bool isUser)
+      CardBrowserType deckType,
+      CardBrowserType voidType,
+      CardBrowserType statusType,
+      bool isUser,
+      RefRegistry refRegistry)
     {
-      var group = new AbuSceneNode { Role = "group", Label = label };
-      var layout = _registry.BattleLayout;
+      var group = new AbuSceneNode { Role = "group", Label = playerLabel, Interactive = false };
 
-      group.Children.Add(WalkStatus(isUser));
-      AddBrowserButtons(group, refRegistry, browserButtons, isUser);
-      group.Children.Add(WalkBattlefield(refRegistry, isUser));
+      // Status
+      group.Children.Add(WalkStatus(statusDisplay, isUser));
 
-      if (isUser)
-      {
-        AddDreamwell(group, refRegistry, layout.UserDreamwell);
-        group.Children.Add(WalkHand(refRegistry, layout.UserHand.Objects, isUser: true));
-      }
-      else
-      {
-        AddDreamwell(group, refRegistry, layout.EnemyDreamwell);
-        AddEnemyHandCount(group, layout.EnemyHand);
-      }
+      // Deck browser
+      AddBrowserButton(group, browserButtons, deckType, "Deck", refRegistry);
 
-      return group;
-    }
+      // Identity browser
+      AddBrowserButton(group, browserButtons, statusType, "Identity", refRegistry);
 
-    // ── Status ───────────────────────────────────────────────────────
+      // Void browser
+      AddBrowserButton(group, browserButtons, voidType, "Void", refRegistry);
 
-    AbuSceneNode WalkStatus(bool isUser)
-    {
-      var group = new AbuSceneNode { Role = "group", Label = "Status" };
-      var layout = _registry.BattleLayout;
-      var status = isUser ? layout.UserStatusDisplay : layout.EnemyStatusDisplay;
-
-      AddLabel(group, "Energy: " + StripRichText(status._energy._originalText ?? ""));
-      AddLabel(group, "Score: " + StripRichText(status._score._originalText ?? ""));
-      AddLabel(group, "Spark: " + StripRichText(status._totalSpark._originalText ?? ""));
-
-      if (isUser)
-      {
-        if (status._leftTurnIndicator.activeSelf || status._rightTurnIndicator.activeSelf)
-        {
-          AddLabel(group, "Turn: yours");
-        }
-      }
-      else
-      {
-        if (status._leftTurnIndicator.activeSelf || status._rightTurnIndicator.activeSelf)
-        {
-          AddLabel(group, "Turn: opponent's");
-        }
-      }
-
-      return group;
-    }
-
-    // ── Browser buttons ──────────────────────────────────────────────
-
-    static Dictionary<CardBrowserType, CardBrowserButton> BuildBrowserButtonMap()
-    {
-      var result = new Dictionary<CardBrowserType, CardBrowserButton>();
-      var buttons = Object.FindObjectsByType<CardBrowserButton>(
-        FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-      foreach (var button in buttons)
-      {
-        result[button._type] = button;
-      }
-
-      return result;
-    }
-
-    void AddBrowserButtons(
-      AbuSceneNode parent,
-      RefRegistry refRegistry,
-      Dictionary<CardBrowserType, CardBrowserButton> browserButtons,
-      bool isUser)
-    {
-      var layout = _registry.BattleLayout;
-
-      var deckType = isUser ? CardBrowserType.UserDeck : CardBrowserType.EnemyDeck;
-      var voidType = isUser ? CardBrowserType.UserVoid : CardBrowserType.EnemyVoid;
-      var identityType = isUser ? CardBrowserType.UserStatus : CardBrowserType.EnemyStatus;
-      var deckLayout = isUser ? layout.UserDeck : layout.EnemyDeck;
-      var voidLayout = isUser ? layout.UserVoid : layout.EnemyVoid;
-
-      AddZoneBrowserButton(parent, refRegistry, browserButtons, deckType,
-        deckLayout.Objects.Count, "Deck");
-      AddIdentityBrowserButton(parent, refRegistry, browserButtons, identityType);
-      AddZoneBrowserButton(parent, refRegistry, browserButtons, voidType,
-        voidLayout.Objects.Count, "Void");
-    }
-
-    void AddZoneBrowserButton(
-      AbuSceneNode parent,
-      RefRegistry refRegistry,
-      Dictionary<CardBrowserType, CardBrowserButton> browserButtons,
-      CardBrowserType type,
-      int count,
-      string zoneName)
-    {
-      var cardWord = count == 1 ? "card" : "cards";
-      if (count > 0 && browserButtons.TryGetValue(type, out var button))
-      {
-        var node = new AbuSceneNode
-        {
-          Role = "button",
-          Label = $"Browse {zoneName} ({count} {cardWord})",
-          Interactive = true,
-        };
-        refRegistry.Register(BuildDisplayableCallbacks(button));
-        parent.Children.Add(node);
-      }
-      else
-      {
-        AddLabel(parent, $"{zoneName}: {count} {cardWord}");
-      }
-    }
-
-    void AddIdentityBrowserButton(
-      AbuSceneNode parent,
-      RefRegistry refRegistry,
-      Dictionary<CardBrowserType, CardBrowserButton> browserButtons,
-      CardBrowserType type)
-    {
-      if (browserButtons.TryGetValue(type, out var button))
-      {
-        var node = new AbuSceneNode
-        {
-          Role = "button",
-          Label = "Browse Identity",
-          Interactive = true,
-        };
-        refRegistry.Register(BuildDisplayableCallbacks(button));
-        parent.Children.Add(node);
-      }
-    }
-
-    // ── Battlefield ──────────────────────────────────────────────────
-
-    AbuSceneNode WalkBattlefield(RefRegistry refRegistry, bool isUser)
-    {
-      var layout = _registry.BattleLayout;
-      var objects = isUser
-        ? layout.UserBattlefield.Objects
-        : layout.EnemyBattlefield.Objects;
-
-      var group = new AbuSceneNode { Role = "group", Label = "Battlefield" };
-
-      foreach (var displayable in objects)
-      {
-        if (displayable is Card card)
-        {
-          var cardNode = BuildCardNode(card, refRegistry, isBattlefield: true);
-          if (cardNode != null)
-          {
-            group.Children.Add(cardNode);
-          }
-        }
-      }
-
-      return group;
-    }
-
-    // ── Hand ─────────────────────────────────────────────────────────
-
-    AbuSceneNode WalkHand(
-      RefRegistry refRegistry, IReadOnlyList<Displayable> objects, bool isUser)
-    {
-      var cardWord = objects.Count == 1 ? "card" : "cards";
-      var group = new AbuSceneNode
+      // Battlefield
+      var battlefieldGroup = new AbuSceneNode
       {
         Role = "group",
-        Label = $"Hand ({objects.Count} {cardWord})",
+        Label = "Battlefield",
+        Interactive = false,
       };
-
-      foreach (var displayable in objects)
+      foreach (var obj in battlefield.Objects)
       {
-        if (displayable is Card card)
+        var cardNode = BuildCardNode(obj, "Battlefield", refRegistry);
+        if (cardNode != null)
         {
-          var cardNode = BuildCardNode(card, refRegistry, isBattlefield: false);
+          battlefieldGroup.Children.Add(cardNode);
+        }
+      }
+      if (battlefieldGroup.Children.Count > 0)
+      {
+        group.Children.Add(battlefieldGroup);
+      }
+
+      // Hand
+      if (isUser)
+      {
+        var handGroup = new AbuSceneNode
+        {
+          Role = "group",
+          Label = $"Hand ({handObjects.Count} cards)",
+          Interactive = false,
+        };
+        foreach (var obj in handObjects)
+        {
+          var cardNode = BuildCardNode(obj, "Hand", refRegistry);
           if (cardNode != null)
           {
-            group.Children.Add(cardNode);
+            handGroup.Children.Add(cardNode);
           }
+        }
+        if (handGroup.Children.Count > 0)
+        {
+          group.Children.Add(handGroup);
+        }
+      }
+      else if (handObjects.Count > 0)
+      {
+        group.Children.Add(new AbuSceneNode
+        {
+          Role = "label",
+          Label = $"Hand: {handObjects.Count} cards",
+          Interactive = false,
+        });
+      }
+
+      // Dreamwell
+      if (dreamwell.Objects.Count > 0)
+      {
+        var dreamwellGroup = new AbuSceneNode
+        {
+          Role = "group",
+          Label = "Dreamwell",
+          Interactive = false,
+        };
+        foreach (var obj in dreamwell.Objects)
+        {
+          var cardNode = BuildCardNode(obj, "Dreamwell", refRegistry);
+          if (cardNode != null)
+          {
+            dreamwellGroup.Children.Add(cardNode);
+          }
+        }
+        if (dreamwellGroup.Children.Count > 0)
+        {
+          group.Children.Add(dreamwellGroup);
         }
       }
 
       return group;
     }
 
-    void AddEnemyHandCount(AbuSceneNode parent, ObjectLayout enemyHand)
+    // ── Status ────────────────────────────────────────────────────────
+
+    AbuSceneNode WalkStatus(PlayerStatusDisplay statusDisplay, bool isUser)
     {
-      var count = enemyHand.Objects.Count;
+      var group = new AbuSceneNode { Role = "group", Label = "Status", Interactive = false };
+
+      var energyText = StripRichText(statusDisplay._energy._originalText);
+      if (!string.IsNullOrEmpty(energyText))
+      {
+        group.Children.Add(new AbuSceneNode
+        {
+          Role = "label",
+          Label = $"Energy: {energyText}",
+          Interactive = false,
+        });
+      }
+
+      var scoreText = StripRichText(statusDisplay._score._originalText);
+      if (!string.IsNullOrEmpty(scoreText))
+      {
+        group.Children.Add(new AbuSceneNode
+        {
+          Role = "label",
+          Label = $"Score: {scoreText}",
+          Interactive = false,
+        });
+      }
+
+      var sparkText = StripRichText(statusDisplay._totalSpark._originalText);
+      if (!string.IsNullOrEmpty(sparkText))
+      {
+        group.Children.Add(new AbuSceneNode
+        {
+          Role = "label",
+          Label = $"Spark: {sparkText}",
+          Interactive = false,
+        });
+      }
+
+      if (isUser)
+      {
+        var hasTurn = statusDisplay._leftTurnIndicator.activeSelf
+          || statusDisplay._rightTurnIndicator.activeSelf;
+        group.Children.Add(new AbuSceneNode
+        {
+          Role = "label",
+          Label = hasTurn ? "Turn: yours" : "Turn: opponent's",
+          Interactive = false,
+        });
+      }
+
+      return group;
+    }
+
+    // ── Browser buttons ───────────────────────────────────────────────
+
+    void AddBrowserButton(
+      AbuSceneNode parent,
+      Dictionary<CardBrowserType, CardBrowserButton> browserButtons,
+      CardBrowserType type,
+      string zoneName,
+      RefRegistry refRegistry)
+    {
+      if (!browserButtons.TryGetValue(type, out var button))
+      {
+        return;
+      }
+
+      var count = GetBrowserZoneCount(type);
+
+      if (zoneName == "Identity")
+      {
+        // Identity always shows as a button
+        var node = new AbuSceneNode
+        {
+          Role = "button",
+          Label = $"Browse {zoneName}",
+          Interactive = true,
+        };
+        RegisterDisplayableCallbacks(button, refRegistry);
+        parent.Children.Add(node);
+        return;
+      }
+
       if (count > 0)
       {
-        var cardWord = count == 1 ? "card" : "cards";
-        AddLabel(parent, $"Hand: {count} {cardWord}");
+        var node = new AbuSceneNode
+        {
+          Role = "button",
+          Label = $"Browse {zoneName} ({count} cards)",
+          Interactive = true,
+        };
+        RegisterDisplayableCallbacks(button, refRegistry);
+        parent.Children.Add(node);
+      }
+      else
+      {
+        parent.Children.Add(new AbuSceneNode
+        {
+          Role = "label",
+          Label = $"{zoneName}: 0 cards",
+          Interactive = false,
+        });
       }
     }
 
-    // ── Card node building ───────────────────────────────────────────
-
-    AbuSceneNode? BuildCardNode(Card card, RefRegistry refRegistry, bool isBattlefield)
+    int GetBrowserZoneCount(CardBrowserType type)
     {
+      var layout = _registry.BattleLayout;
+      return type switch
+      {
+        CardBrowserType.UserDeck => layout.UserDeck.Objects.Count,
+        CardBrowserType.EnemyDeck => layout.EnemyDeck.Objects.Count,
+        CardBrowserType.UserVoid => layout.UserVoid.Objects.Count,
+        CardBrowserType.EnemyVoid => layout.EnemyVoid.Objects.Count,
+        _ => 0,
+      };
+    }
+
+    // ── Card nodes ────────────────────────────────────────────────────
+
+    AbuSceneNode? BuildCardNode(Displayable displayable, string zoneContext, RefRegistry refRegistry)
+    {
+      if (displayable is not Card card)
+      {
+        return null;
+      }
+
       if (!card.CanHandleMouseEvents())
       {
         return null;
@@ -329,18 +465,19 @@ namespace Dreamtides.Abu
         return null;
       }
 
-      var label = BuildCardLabel(revealed, isBattlefield);
+      var label = BuildCardLabel(revealed, zoneContext);
       var node = new AbuSceneNode { Role = "button", Label = label, Interactive = true };
-      refRegistry.Register(BuildDisplayableCallbacks(card));
+      RegisterDisplayableCallbacks(card, refRegistry);
       return node;
     }
 
-    static string BuildCardLabel(RevealedCardView revealed, bool isBattlefield)
+    static string BuildCardLabel(RevealedCardView revealed, string zoneContext)
     {
-      var name = StripRichText(revealed.Name ?? "").Replace("\n", ", ");
-      var cardType = StripRichText(revealed.CardType ?? "");
+      var name = StripRichText(revealed.Name)?.Replace("\n", ", ") ?? "Unknown";
+      var cardType = StripRichText(revealed.CardType);
 
       var annotations = new List<string>();
+
       if (revealed.Actions?.CanPlay != null)
       {
         annotations.Add("drag to play");
@@ -351,169 +488,207 @@ namespace Dreamtides.Abu
         annotations.Add("click to select");
       }
 
-      if (!isBattlefield && revealed.Cost != null)
+      if (zoneContext == "Hand" && !string.IsNullOrEmpty(revealed.Cost))
       {
-        annotations.Add("cost: " + StripRichText(revealed.Cost));
+        annotations.Add($"cost: {StripRichText(revealed.Cost)}");
       }
 
-      if (isBattlefield && revealed.Spark != null)
+      if (zoneContext == "Battlefield" && !string.IsNullOrEmpty(revealed.Spark))
       {
-        annotations.Add("spark: " + StripRichText(revealed.Spark));
+        annotations.Add($"spark: {StripRichText(revealed.Spark)}");
       }
 
-      var suffix = annotations.Count > 0 ? " (" + string.Join(", ", annotations) + ")" : "";
-      return string.IsNullOrEmpty(cardType)
-        ? name + suffix
-        : name + ", " + cardType + suffix;
+      var suffix = annotations.Count > 0 ? $" ({string.Join(", ", annotations)})" : "";
+      if (!string.IsNullOrEmpty(cardType))
+      {
+        return $"{name}, {cardType}{suffix}";
+      }
+
+      return $"{name}{suffix}";
     }
 
-    // ── Action buttons ───────────────────────────────────────────────
+    // ── Action buttons ────────────────────────────────────────────────
 
-    AbuSceneNode WalkActionButtons(RefRegistry refRegistry)
+    AbuSceneNode WalkActionButtons(BattleLayout layout, RefRegistry refRegistry)
     {
-      var group = new AbuSceneNode { Role = "group", Label = "Actions" };
-      var layout = _registry.BattleLayout;
-      TryAddActionButton(group, refRegistry, layout.PrimaryActionButton);
-      TryAddActionButton(group, refRegistry, layout.SecondaryActionButton);
-      TryAddActionButton(group, refRegistry, layout.IncrementActionButton);
-      TryAddActionButton(group, refRegistry, layout.DecrementActionButton);
+      var group = new AbuSceneNode { Role = "group", Label = "Actions", Interactive = false };
+      TryAddActionButton(group, layout.PrimaryActionButton, refRegistry);
+      TryAddActionButton(group, layout.SecondaryActionButton, refRegistry);
+      TryAddActionButton(group, layout.IncrementActionButton, refRegistry);
+      TryAddActionButton(group, layout.DecrementActionButton, refRegistry);
       return group;
     }
 
-    void TryAddActionButton(AbuSceneNode parent, RefRegistry refRegistry, ActionButton button)
+    void TryAddActionButton(AbuSceneNode parent, ActionButton button, RefRegistry refRegistry)
     {
-      if (!button.gameObject.activeSelf
-          || !button._text.gameObject.activeSelf
-          || !button._collider.enabled)
+      if (!button.gameObject.activeSelf || !button._text.gameObject.activeSelf)
       {
         return;
       }
 
-      var label = StripRichText(button._text.text ?? button.gameObject.name);
+      var label = StripRichText(button._text.text);
+      if (string.IsNullOrEmpty(label))
+      {
+        return;
+      }
+
       var node = new AbuSceneNode { Role = "button", Label = label, Interactive = true };
-      refRegistry.Register(BuildDisplayableCallbacks(button));
+      RegisterDisplayableCallbacks(button, refRegistry);
       parent.Children.Add(node);
     }
 
-    // ── Stacks ───────────────────────────────────────────────────────
-
-    void AddStacks(AbuSceneNode parent, RefRegistry refRegistry)
-    {
-      var layout = _registry.BattleLayout;
-      var stackObjects = new List<Displayable>();
-      stackObjects.AddRange(layout.DefaultStack.Objects);
-      stackObjects.AddRange(layout.TargetingUserStack.Objects);
-      stackObjects.AddRange(layout.TargetingEnemyStack.Objects);
-      stackObjects.AddRange(layout.TargetingBothStack.Objects);
-
-      if (stackObjects.Count == 0)
-      {
-        return;
-      }
-
-      var group = new AbuSceneNode { Role = "group", Label = "Stack" };
-      foreach (var displayable in stackObjects)
-      {
-        if (displayable is Card card)
-        {
-          var cardNode = BuildCardNode(card, refRegistry, isBattlefield: false);
-          if (cardNode != null)
-          {
-            group.Children.Add(cardNode);
-          }
-        }
-      }
-
-      if (group.Children.Count > 0)
-      {
-        parent.Children.Add(group);
-      }
-    }
-
-    // ── Game Modifiers ───────────────────────────────────────────────
-
-    void AddGameModifiers(AbuSceneNode parent, RefRegistry refRegistry)
-    {
-      var objects = _registry.BattleLayout.GameModifiersDisplay.Objects;
-      if (objects.Count == 0)
-      {
-        return;
-      }
-
-      var group = new AbuSceneNode { Role = "group", Label = "Game Modifiers" };
-      foreach (var displayable in objects)
-      {
-        if (displayable is Card card)
-        {
-          var cardNode = BuildCardNode(card, refRegistry, isBattlefield: false);
-          if (cardNode != null)
-          {
-            group.Children.Add(cardNode);
-          }
-        }
-      }
-
-      if (group.Children.Count > 0)
-      {
-        parent.Children.Add(group);
-      }
-    }
-
-    // ── Dreamwell ────────────────────────────────────────────────────
-
-    void AddDreamwell(AbuSceneNode parent, RefRegistry refRegistry, ObjectLayout dreamwell)
-    {
-      if (dreamwell.Objects.Count == 0)
-      {
-        return;
-      }
-
-      var group = new AbuSceneNode { Role = "group", Label = "Dreamwell" };
-      foreach (var displayable in dreamwell.Objects)
-      {
-        if (displayable is Card card)
-        {
-          var cardNode = BuildCardNode(card, refRegistry, isBattlefield: false);
-          if (cardNode != null)
-          {
-            group.Children.Add(cardNode);
-          }
-        }
-      }
-
-      if (group.Children.Count > 0)
-      {
-        parent.Children.Add(group);
-      }
-    }
-
-    // ── Essence ──────────────────────────────────────────────────────
+    // ── Essence ───────────────────────────────────────────────────────
 
     void AddEssenceLabel(AbuSceneNode parent)
     {
-      var essenceTotal = _registry.DreamscapeLayout.EssenceTotal;
-      var text = essenceTotal._originalText;
-      if (!string.IsNullOrEmpty(text))
+      var essenceText = _registry.DreamscapeLayout.EssenceTotal._originalText;
+      if (!string.IsNullOrEmpty(essenceText))
       {
-        AddLabel(parent, "Essence: " + StripRichText(text));
+        parent.Children.Add(new AbuSceneNode
+        {
+          Role = "label",
+          Label = $"Essence: {StripRichText(essenceText)}",
+          Interactive = false,
+        });
       }
     }
 
-    // ── Thinking indicator ───────────────────────────────────────────
+    // ── Stack ─────────────────────────────────────────────────────────
 
-    void AddThinkingIndicator(AbuSceneNode parent)
+    AbuSceneNode? WalkStack(BattleLayout layout, RefRegistry refRegistry)
     {
-      if (_registry.BattleLayout.ThinkingIndicator.activeSelf)
+      var stackGroup = new AbuSceneNode { Role = "group", Label = "Stack", Interactive = false };
+
+      AddStackObjects(stackGroup, layout.DefaultStack, refRegistry);
+      AddStackObjects(stackGroup, layout.TargetingUserStack, refRegistry);
+      AddStackObjects(stackGroup, layout.TargetingEnemyStack, refRegistry);
+      AddStackObjects(stackGroup, layout.TargetingBothStack, refRegistry);
+
+      return stackGroup.Children.Count > 0 ? stackGroup : null;
+    }
+
+    void AddStackObjects(AbuSceneNode parent, ObjectLayout stack, RefRegistry refRegistry)
+    {
+      foreach (var obj in stack.Objects)
       {
-        AddLabel(parent, "Opponent is thinking...");
+        var cardNode = BuildCardNode(obj, "Stack", refRegistry);
+        if (cardNode != null)
+        {
+          parent.Children.Add(cardNode);
+        }
       }
     }
 
-    // ── UIToolkit fallback ───────────────────────────────────────────
+    // ── Object layout group helper ────────────────────────────────────
+
+    AbuSceneNode? WalkObjectLayoutGroup(string label, ObjectLayout layout, RefRegistry refRegistry)
+    {
+      var group = new AbuSceneNode { Role = "group", Label = label, Interactive = false };
+      foreach (var obj in layout.Objects)
+      {
+        var cardNode = BuildCardNode(obj, label, refRegistry);
+        if (cardNode != null)
+        {
+          group.Children.Add(cardNode);
+        }
+      }
+
+      return group.Children.Count > 0 ? group : null;
+    }
+
+    // ── Displayable callbacks ─────────────────────────────────────────
+
+    void RegisterDisplayableCallbacks(Displayable displayable, RefRegistry refRegistry)
+    {
+      var callbacks = BuildDisplayableCallbacks(displayable);
+      refRegistry.Register(callbacks);
+    }
+
+    RefCallbacks BuildDisplayableCallbacks(Displayable displayable)
+    {
+      var callbacks = new RefCallbacks();
+      callbacks.OnClick = () =>
+      {
+        var originalProvider = _registry.InputService.InputProvider;
+        var fakeInput = new DisplayableClickInputProvider(displayable);
+        try
+        {
+          _registry.InputService.InputProvider = fakeInput;
+          fakeInput.Phase = ClickPhase.Pressed;
+          _registry.InputService.Update();
+          fakeInput.Phase = ClickPhase.Released;
+          _registry.InputService.Update();
+        }
+        finally
+        {
+          _registry.InputService.InputProvider = originalProvider;
+        }
+      };
+      callbacks.OnHover = () => { displayable.MouseHoverStart(); };
+      return callbacks;
+    }
+
+    static RefCallbacks BuildCanvasButtonCallbacks(CanvasButton button)
+    {
+      return new RefCallbacks
+      {
+        OnClick = () => button.OnClick(),
+        OnHover = () => button.MouseHoverStart(),
+      };
+    }
+
+    // ── UIToolkit (filtered for battle overlays) ──────────────────────
+
+    AbuSceneNode? WalkUiToolkitFiltered(RefRegistry refRegistry)
+    {
+      var doc = _registry.DocumentService;
+      var rootElement = doc._document != null ? doc.RootVisualElement : null;
+      if (rootElement == null)
+      {
+        return null;
+      }
+
+      var region = new AbuSceneNode { Role = "region", Label = "UIToolkit", Interactive = false };
+      foreach (var child in rootElement.Children())
+      {
+        var childNode = WalkVisualElement(child, refRegistry);
+        if (childNode != null && HasContent(childNode))
+        {
+          region.Children.Add(childNode);
+        }
+      }
+
+      return region.Children.Count > 0 ? region : null;
+    }
+
+    static bool HasContent(AbuSceneNode node)
+    {
+      if (node.Interactive)
+      {
+        return true;
+      }
+
+      if (node.Role == "label" && !string.IsNullOrEmpty(node.Label))
+      {
+        return true;
+      }
+
+      foreach (var child in node.Children)
+      {
+        if (HasContent(child))
+        {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    // ── UIToolkit full walk (fallback for non-battle) ─────────────────
 
     AbuSceneNode WalkUiToolkit(RefRegistry refRegistry)
     {
-      var region = new AbuSceneNode { Role = "region", Label = "UIToolkit" };
+      var region = new AbuSceneNode { Role = "region", Label = "UIToolkit", Interactive = false };
       var doc = _registry.DocumentService;
       var rootElement = doc._document != null ? doc.RootVisualElement : null;
       if (rootElement != null)
@@ -607,7 +782,6 @@ namespace Dreamtides.Abu
     RefCallbacks BuildUiToolkitCallbacks(VisualElement element)
     {
       var callbacks = new RefCallbacks();
-
       if (element is INodeCallbacks nodeCallbacks)
       {
         var cb = nodeCallbacks.Callbacks.Value;
@@ -616,7 +790,6 @@ namespace Dreamtides.Abu
           using var clickEvent = ClickEvent.GetPooled();
           cb.OnClick(clickEvent);
         };
-
         callbacks.OnHover = () =>
         {
           using var enterEvent = MouseEnterEvent.GetPooled();
@@ -627,20 +800,28 @@ namespace Dreamtides.Abu
       return callbacks;
     }
 
-    // ── Scene3D fallback (non-battle) ────────────────────────────────
+    // ── Fallback Scene3D (non-battle) ─────────────────────────────────
 
-    AbuSceneNode WalkScene3DFallback(RefRegistry refRegistry)
+    AbuSceneNode WalkFallbackScene3D(RefRegistry refRegistry)
     {
-      var region = new AbuSceneNode { Role = "region", Label = "Scene3D" };
-      WalkDisplayables(region, refRegistry);
-      WalkCanvasButtonsFallback(region, refRegistry);
+      var region = new AbuSceneNode { Role = "region", Label = "Scene3D", Interactive = false };
+      var hasOpenPanels = _registry.DocumentService.HasOpenPanels;
+
+      if (!hasOpenPanels)
+      {
+        WalkDisplayables(region, refRegistry);
+        WalkCanvasButtons(region, refRegistry);
+      }
+
       return region;
     }
 
     void WalkDisplayables(AbuSceneNode parent, RefRegistry refRegistry)
     {
       var displayables = Object.FindObjectsByType<Displayable>(
-        FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        FindObjectsInactive.Exclude,
+        FindObjectsSortMode.None
+      );
 
       foreach (var displayable in displayables)
       {
@@ -650,14 +831,8 @@ namespace Dreamtides.Abu
         }
 
         var label = DetermineDisplayableLabel(displayable);
-        var node = new AbuSceneNode
-        {
-          Role = "button",
-          Label = label,
-          Interactive = true,
-        };
-
-        refRegistry.Register(BuildDisplayableCallbacks(displayable));
+        var node = new AbuSceneNode { Role = "button", Label = label, Interactive = true };
+        RegisterDisplayableCallbacks(displayable, refRegistry);
         parent.Children.Add(node);
       }
     }
@@ -679,17 +854,16 @@ namespace Dreamtides.Abu
       }
     }
 
-    void WalkCanvasButtonsFallback(AbuSceneNode parent, RefRegistry refRegistry)
+    void WalkCanvasButtons(AbuSceneNode parent, RefRegistry refRegistry)
     {
       var doc = _registry.DocumentService;
-      TryAddCanvasButtonFallback(parent, refRegistry, doc.MenuButton);
-      TryAddCanvasButtonFallback(parent, refRegistry, doc.UndoButton);
-      TryAddCanvasButtonFallback(parent, refRegistry, doc.DevButton);
-      TryAddCanvasButtonFallback(parent, refRegistry, doc.BugButton);
+      TryAddCanvasButton(parent, refRegistry, doc.MenuButton);
+      TryAddCanvasButton(parent, refRegistry, doc.UndoButton);
+      TryAddCanvasButton(parent, refRegistry, doc.DevButton);
+      TryAddCanvasButton(parent, refRegistry, doc.BugButton);
     }
 
-    void TryAddCanvasButtonFallback(
-      AbuSceneNode parent, RefRegistry refRegistry, CanvasButton? button)
+    void TryAddCanvasButton(AbuSceneNode parent, RefRegistry refRegistry, CanvasButton? button)
     {
       if (button == null || !button.gameObject.activeSelf || button._canvasGroup.alpha <= 0)
       {
@@ -698,90 +872,12 @@ namespace Dreamtides.Abu
 
       var label = button._text.text;
       var node = new AbuSceneNode { Role = "button", Label = label, Interactive = true };
-      refRegistry.Register(BuildCanvasButtonCallbacks(button));
+      var callbacks = BuildCanvasButtonCallbacks(button);
+      refRegistry.Register(callbacks);
       parent.Children.Add(node);
     }
 
-    // ── Callback builders ────────────────────────────────────────────
-
-    RefCallbacks BuildDisplayableCallbacks(Displayable displayable)
-    {
-      var callbacks = new RefCallbacks
-      {
-        OnClick = () =>
-        {
-          var originalProvider = _registry.InputService.InputProvider;
-          var fakeInput = new DisplayableClickInputProvider(displayable);
-          try
-          {
-            _registry.InputService.InputProvider = fakeInput;
-            fakeInput.Phase = ClickPhase.Pressed;
-            _registry.InputService.Update();
-            fakeInput.Phase = ClickPhase.Released;
-            _registry.InputService.Update();
-          }
-          finally
-          {
-            _registry.InputService.InputProvider = originalProvider;
-          }
-        },
-        OnHover = () => { displayable.MouseHoverStart(); },
-      };
-      return callbacks;
-    }
-
-    static RefCallbacks BuildCanvasButtonCallbacks(CanvasButton button)
-    {
-      return new RefCallbacks
-      {
-        OnClick = () => button.OnClick(),
-        OnHover = () => button.MouseHoverStart(),
-      };
-    }
-
-    // ── Utilities ────────────────────────────────────────────────────
-
-    static void AddLabel(AbuSceneNode parent, string text)
-    {
-      parent.Children.Add(new AbuSceneNode { Role = "label", Label = text });
-    }
-
-    static string StripRichText(string? text)
-    {
-      if (string.IsNullOrEmpty(text))
-      {
-        return "";
-      }
-
-      var stripped = RichTextTagPattern.Replace(text, "");
-      var chars = new List<char>(stripped.Length);
-      for (var i = 0; i < stripped.Length; i++)
-      {
-        var c = stripped[i];
-        // Filter Unicode Private Use Area characters (icon fonts)
-        if (c >= 0xE000 && c <= 0xF8FF)
-        {
-          continue;
-        }
-
-        // Filter supplementary PUA (surrogate pairs)
-        if (char.IsHighSurrogate(c) && i + 1 < stripped.Length && char.IsLowSurrogate(stripped[i + 1]))
-        {
-          var codePoint = char.ConvertToUtf32(c, stripped[i + 1]);
-          if (codePoint >= 0xF0000 && codePoint <= 0xFFFFF)
-          {
-            i++; // skip low surrogate
-            continue;
-          }
-        }
-
-        chars.Add(c);
-      }
-
-      return new string(chars.ToArray()).Trim();
-    }
-
-    // ── Click simulation ─────────────────────────────────────────────
+    // ── Input simulation ──────────────────────────────────────────────
 
     enum ClickPhase
     {
