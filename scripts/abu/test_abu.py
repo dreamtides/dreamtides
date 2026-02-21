@@ -122,7 +122,18 @@ class TestHandleResponse(unittest.TestCase):
             },
         }
         result = handle_response("snapshot", response)
-        self.assertIsInstance(result, str)
+        self.assertEqual(result, "- application \"Dreamtides\"")
+
+    def test_snapshot_response_json_mode(self) -> None:
+        response = {
+            "id": "test-id",
+            "success": True,
+            "data": {
+                "snapshot": "- application \"Dreamtides\"",
+                "refs": {"e1": {"role": "button", "name": "End Turn"}},
+            },
+        }
+        result = handle_response("snapshot", response, json_output=True)
         parsed = json.loads(result)
         self.assertEqual(parsed["snapshot"], "- application \"Dreamtides\"")
         self.assertIn("e1", parsed["refs"])
@@ -138,6 +149,19 @@ class TestHandleResponse(unittest.TestCase):
             },
         }
         result = handle_response("click", response)
+        self.assertEqual(result, "- app")
+
+    def test_click_response_json_mode(self) -> None:
+        response = {
+            "id": "test-id",
+            "success": True,
+            "data": {
+                "clicked": True,
+                "snapshot": "- app",
+                "refs": {},
+            },
+        }
+        result = handle_response("click", response, json_output=True)
         parsed = json.loads(result)
         self.assertTrue(parsed["clicked"])
 

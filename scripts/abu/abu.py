@@ -84,12 +84,15 @@ def build_command(command: str, params: dict[str, Any]) -> str:
     return json.dumps(message) + "\n"
 
 
-def handle_response(command: str, response: dict[str, Any]) -> str:
+def handle_response(
+    command: str, response: dict[str, Any], *, json_output: bool = False
+) -> str:
     """Process a response from Unity and return the output string.
 
-    For most commands, returns the JSON-serialized data object.
-    For screenshot, decodes base64 data and writes to a temp file,
-    returning the file path. Raises AbuError on error responses.
+    By default, returns the formatted ARIA tree for commands that include a
+    snapshot (snapshot, click, hover, drag). Pass json_output=True to get the
+    raw JSON data instead. For screenshot, decodes base64 data and writes to a
+    temp file, returning the file path. Raises AbuError on error responses.
     """
     if not response.get("success", False):
         raise AbuError(response.get("error", "Unknown error"))
@@ -104,6 +107,13 @@ def handle_response(command: str, response: dict[str, Any]) -> str:
         with open(file_path, "wb") as f:
             f.write(png_bytes)
         return file_path
+
+    if json_output:
+        return json.dumps(data)
+
+    snapshot = data.get("snapshot")
+    if snapshot is not None:
+        return snapshot
 
     return json.dumps(data)
 
@@ -158,6 +168,9 @@ def build_parser() -> argparse.ArgumentParser:
         prog="abu.py",
         description="Communicate with Unity over TCP using the abu NDJSON protocol.",
     )
+    parser.add_argument(
+        "--json", action="store_true", help="Output raw JSON instead of formatted text"
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # snapshot
@@ -206,7 +219,7 @@ def main() -> None:
 
     try:
         response = send_command(command, params, port)
-        output = handle_response(command, response)
+        output = handle_response(command, response, json_output=args.json)
     except AbuError as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
