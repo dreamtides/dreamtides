@@ -120,6 +120,16 @@
   encountering style_validator or clippy failures during just review, adding new
   files or modules, or understanding the project's code conventions.
 
+- [benchmarks.md](benchmarks/benchmarks.md): How to run and interpret
+  performance benchmarks — Criterion statistical timing benchmarks, IAI
+  instruction-level profiling via Valgrind Callgrind, the Docker-based Linux
+  runner for IAI from macOS, all just commands for specific benchmark suites,
+  interpreting IAI output metrics (instructions, cache hits, estimated cycles),
+  the 10M cycle regression threshold for MCTS search, profiling with Samply, and
+  the benchmark crate layout. Read when running benchmarks, investigating
+  performance regressions, adding new benchmarks, or profiling AI search
+  performance.
+
 - [abu.md](abu/abu.md): How to run and extend ABU (Agent-Browser for Unity) —
   start the daemon, connect Unity via `DreamtidesAbuSetup`, use the
   agent-browser CLI to snapshot/click/hover/drag/screenshot, the three

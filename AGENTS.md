@@ -81,6 +81,7 @@ Full index: `docs/index.md`. Key references:
 - `docs/rlf_localization/rlf_localization.md` — localized strings, rlf! macro
 - `docs/ai_system/ai_system.md` — AI opponent MCTS
 - `docs/logging/logging.md` — logging, tracing, battle_trace!
+- `docs/benchmarks/benchmarks.md` — performance benchmarks, IAI, Criterion
 
 ## Vocabulary
 
