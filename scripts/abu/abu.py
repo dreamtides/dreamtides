@@ -2,7 +2,7 @@
 """Communicate with Unity over TCP using the abu NDJSON protocol.
 
 Provides subcommands for all abu operations: snapshot, click, hover, drag,
-screenshot, launch, and close. Connects to Unity on localhost via a one-shot
+and screenshot. Connects to Unity on localhost via a one-shot
 TCP connection, sends one NDJSON command, reads one NDJSON response, and exits.
 """
 
@@ -70,7 +70,7 @@ def build_params(args: argparse.Namespace) -> dict[str, Any]:
             params["target"] = strip_ref(args.target)
         return params
 
-    # screenshot, launch, close
+    # screenshot
     return {}
 
 
@@ -200,12 +200,6 @@ def build_parser() -> argparse.ArgumentParser:
 
     # screenshot
     subparsers.add_parser("screenshot", help="Capture a screenshot")
-
-    # launch
-    subparsers.add_parser("launch", help="Launch the game")
-
-    # close
-    subparsers.add_parser("close", help="Close the game")
 
     return parser
 

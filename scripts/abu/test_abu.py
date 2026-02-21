@@ -82,14 +82,6 @@ class TestBuildParams(unittest.TestCase):
         ns = argparse.Namespace(command="screenshot")
         self.assertEqual(build_params(ns), {})
 
-    def test_launch_params(self) -> None:
-        ns = argparse.Namespace(command="launch")
-        self.assertEqual(build_params(ns), {})
-
-    def test_close_params(self) -> None:
-        ns = argparse.Namespace(command="close")
-        self.assertEqual(build_params(ns), {})
-
 
 class TestBuildCommand(unittest.TestCase):
     """Test NDJSON command construction."""
@@ -240,16 +232,6 @@ class TestBuildParser(unittest.TestCase):
         parser = build_parser()
         args = parser.parse_args(["screenshot"])
         self.assertEqual(args.command, "screenshot")
-
-    def test_launch(self) -> None:
-        parser = build_parser()
-        args = parser.parse_args(["launch"])
-        self.assertEqual(args.command, "launch")
-
-    def test_close(self) -> None:
-        parser = build_parser()
-        args = parser.parse_args(["close"])
-        self.assertEqual(args.command, "close")
 
 
 class TestSendCommand(unittest.TestCase):
