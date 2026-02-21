@@ -11,16 +11,17 @@ namespace Dreamtides.Abu
   /// Attach this to a GameObject in the Dreamtides scene to enable ABU
   /// integration. Does not extend the Dreamtides Service base class.
   ///
+  /// When active, Unity runs a TCP server on port 9999 (configurable via the
+  /// ABU_PORT environment variable) that accepts NDJSON commands from the
+  /// Python CLI.
+  ///
   /// For v0.1, this component is not added to production scenes. To test
   /// the full ABU pipeline manually:
   ///
-  /// 1. Set AGENT_BROWSER_HOME=~/abu/daemon/ in your shell environment.
-  /// 2. Start the daemon: cd ~/abu/daemon and run node dist/daemon.js
-  ///    (or let the agent-browser CLI start it automatically).
-  /// 3. Open the Unity editor with a scene containing this DreamtidesAbuSetup
+  /// 1. Open the Unity editor with a scene containing this DreamtidesAbuSetup
   ///    component (add it to the Registry prefab or a standalone GameObject).
-  /// 4. Enter Play mode.
-  /// 5. Run: agent-browser snapshot to get a scene snapshot.
+  /// 2. Enter Play mode.
+  /// 3. Run: python3 scripts/abu/abu.py snapshot to get a scene snapshot.
   /// </summary>
   public class DreamtidesAbuSetup : MonoBehaviour
   {
