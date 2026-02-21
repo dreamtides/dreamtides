@@ -80,7 +80,9 @@ namespace Abu
         void HandleSnapshot(AbuCommand command, Action<AbuResponse> onComplete)
         {
             _refRegistry.Clear();
-            var snapshotData = BuildSnapshotData();
+            var snapshotParams = command.Params?.ToObject<SnapshotParams>();
+            var compact = snapshotParams?.Compact ?? false;
+            var snapshotData = BuildSnapshotData(compact);
 
             onComplete(
                 new AbuResponse
@@ -92,7 +94,7 @@ namespace Abu
             );
         }
 
-        SnapshotData BuildSnapshotData()
+        SnapshotData BuildSnapshotData(bool compact)
         {
             var rootChildren = new List<AbuSceneNode>();
             foreach (var walker in _walkers)
@@ -109,7 +111,12 @@ namespace Abu
                 Children = rootChildren,
             };
 
-            return new SnapshotData { Nodes = new List<AbuSceneNode> { rootNode } };
+            var result = SnapshotFormatter.Format(new List<AbuSceneNode> { rootNode }, compact);
+            return new SnapshotData
+            {
+                Snapshot = result.Snapshot,
+                Refs = result.Refs,
+            };
         }
 
         void HandleClick(AbuCommand command, Action<AbuResponse> onComplete)
@@ -273,7 +280,7 @@ namespace Abu
             }
 
             _refRegistry.Clear();
-            var snapshotData = BuildSnapshotData();
+            var snapshotData = BuildSnapshotData(false);
 
             onComplete(
                 new AbuResponse
@@ -283,7 +290,8 @@ namespace Abu
                     Data = new ActionSnapshotData
                     {
                         ActionData = data,
-                        Nodes = snapshotData.Nodes,
+                        Snapshot = snapshotData.Snapshot,
+                        Refs = snapshotData.Refs,
                     },
                 }
             );

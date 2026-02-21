@@ -94,23 +94,12 @@ namespace Abu.Tests
         {
             var snapshotData = new SnapshotData
             {
-                Nodes = new List<AbuSceneNode>
+                Snapshot = "- application \"TestApp\"\n  - button \"OK\" [ref=e1]",
+                Refs = new Dictionary<string, SnapshotRef>
                 {
-                    new AbuSceneNode
                     {
-                        Role = "application",
-                        Label = "TestApp",
-                        Interactive = false,
-                        Children = new List<AbuSceneNode>
-                        {
-                            new AbuSceneNode
-                            {
-                                Role = "button",
-                                Label = "OK",
-                                Interactive = true,
-                                Children = new List<AbuSceneNode>(),
-                            },
-                        },
+                        "e1",
+                        new SnapshotRef { Role = "button", Name = "OK" }
                     },
                 },
             };
@@ -128,18 +117,14 @@ namespace Abu.Tests
             Assert.AreEqual(true, parsed["success"]!.Value<bool>());
             var data = parsed["data"];
             Assert.IsNotNull(data);
-            var nodes = data!["nodes"] as JArray;
-            Assert.IsNotNull(nodes);
-            Assert.AreEqual(1, nodes!.Count);
-            Assert.AreEqual("application", nodes[0]["role"]!.Value<string>());
-            Assert.AreEqual("TestApp", nodes[0]["label"]!.Value<string>());
-
-            var childNodes = nodes[0]["children"] as JArray;
-            Assert.IsNotNull(childNodes);
-            Assert.AreEqual(1, childNodes!.Count);
-            Assert.AreEqual("button", childNodes[0]["role"]!.Value<string>());
-            Assert.AreEqual("OK", childNodes[0]["label"]!.Value<string>());
-            Assert.AreEqual(true, childNodes[0]["interactive"]!.Value<bool>());
+            Assert.AreEqual(
+                "- application \"TestApp\"\n  - button \"OK\" [ref=e1]",
+                data!["snapshot"]!.Value<string>()
+            );
+            var refs = data["refs"] as JObject;
+            Assert.IsNotNull(refs);
+            Assert.AreEqual("button", refs!["e1"]!["role"]!.Value<string>());
+            Assert.AreEqual("OK", refs["e1"]!["name"]!.Value<string>());
         }
 
         [Test]

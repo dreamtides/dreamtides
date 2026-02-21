@@ -93,18 +93,33 @@ namespace Abu
     }
 
     /// <summary>
-    /// Snapshot response data containing scene nodes.
+    /// A ref entry describing an interactive node in the formatted snapshot.
+    /// </summary>
+    public class SnapshotRef
+    {
+        [JsonProperty("role")]
+        public string Role { get; set; } = "";
+
+        [JsonProperty("name")]
+        public string Name { get; set; } = "";
+    }
+
+    /// <summary>
+    /// Snapshot response data containing formatted ARIA-style text and ref mappings.
     /// </summary>
     public class SnapshotData
     {
-        [JsonProperty("nodes")]
-        public List<AbuSceneNode> Nodes { get; set; } = new List<AbuSceneNode>();
+        [JsonProperty("snapshot")]
+        public string Snapshot { get; set; } = "";
+
+        [JsonProperty("refs")]
+        public Dictionary<string, SnapshotRef> Refs { get; set; } = new Dictionary<string, SnapshotRef>();
     }
 
     /// <summary>
     /// Combined action + snapshot response data returned after an action settles.
     /// Serializes the action-specific fields (e.g. clicked, hovered) from ActionData
-    /// alongside the snapshot nodes array.
+    /// alongside the formatted snapshot text and refs.
     /// </summary>
     public class ActionSnapshotData
     {
@@ -125,7 +140,10 @@ namespace Abu
             }
         }
 
-        [JsonProperty("nodes")]
-        public List<AbuSceneNode> Nodes { get; set; } = new List<AbuSceneNode>();
+        [JsonProperty("snapshot")]
+        public string Snapshot { get; set; } = "";
+
+        [JsonProperty("refs")]
+        public Dictionary<string, SnapshotRef> Refs { get; set; } = new Dictionary<string, SnapshotRef>();
     }
 }
