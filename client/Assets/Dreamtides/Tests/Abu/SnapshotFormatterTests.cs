@@ -7,19 +7,24 @@ namespace Abu.Tests
 {
     public class SnapshotFormatterTests
     {
+        static AbuSceneNode Node(
+            string role,
+            string? label = null,
+            bool interactive = false,
+            params AbuSceneNode[] children
+        ) =>
+            new AbuSceneNode
+            {
+                Role = role,
+                Label = label,
+                Interactive = interactive,
+                Children = new List<AbuSceneNode>(children),
+            };
+
         [Test]
         public void FormatsASingleNonInteractiveNode()
         {
-            var nodes = new List<AbuSceneNode>
-            {
-                new AbuSceneNode
-                {
-                    Role = "application",
-                    Label = "Dreamtides",
-                    Interactive = false,
-                    Children = new List<AbuSceneNode>(),
-                },
-            };
+            var nodes = new List<AbuSceneNode> { Node("application", "Dreamtides") };
             var result = SnapshotFormatter.Format(nodes, false);
             Assert.AreEqual("- application \"Dreamtides\"", result.Snapshot);
             Assert.AreEqual(0, result.Refs.Count);
@@ -28,16 +33,7 @@ namespace Abu.Tests
         [Test]
         public void FormatsASingleInteractiveNodeWithRef()
         {
-            var nodes = new List<AbuSceneNode>
-            {
-                new AbuSceneNode
-                {
-                    Role = "button",
-                    Label = "OK",
-                    Interactive = true,
-                    Children = new List<AbuSceneNode>(),
-                },
-            };
+            var nodes = new List<AbuSceneNode> { Node("button", "OK", true) };
             var result = SnapshotFormatter.Format(nodes, false);
             Assert.AreEqual("- button \"OK\" [ref=e1]", result.Snapshot);
             Assert.AreEqual(1, result.Refs.Count);
@@ -48,16 +44,7 @@ namespace Abu.Tests
         [Test]
         public void FormatsANodeWithNullLabel()
         {
-            var nodes = new List<AbuSceneNode>
-            {
-                new AbuSceneNode
-                {
-                    Role = "group",
-                    Label = null,
-                    Interactive = false,
-                    Children = new List<AbuSceneNode>(),
-                },
-            };
+            var nodes = new List<AbuSceneNode> { Node("group") };
             var result = SnapshotFormatter.Format(nodes, false);
             Assert.AreEqual("- group", result.Snapshot);
             Assert.AreEqual(0, result.Refs.Count);
@@ -66,16 +53,7 @@ namespace Abu.Tests
         [Test]
         public void FormatsAnInteractiveNodeWithNullLabelUsingEmptyStringForName()
         {
-            var nodes = new List<AbuSceneNode>
-            {
-                new AbuSceneNode
-                {
-                    Role = "button",
-                    Label = null,
-                    Interactive = true,
-                    Children = new List<AbuSceneNode>(),
-                },
-            };
+            var nodes = new List<AbuSceneNode> { Node("button", null, true) };
             var result = SnapshotFormatter.Format(nodes, false);
             Assert.AreEqual("- button [ref=e1]", result.Snapshot);
             Assert.AreEqual(1, result.Refs.Count);
@@ -88,31 +66,9 @@ namespace Abu.Tests
         {
             var nodes = new List<AbuSceneNode>
             {
-                new AbuSceneNode
-                {
-                    Role = "application",
-                    Label = "Dreamtides",
-                    Interactive = false,
-                    Children = new List<AbuSceneNode>
-                    {
-                        new AbuSceneNode
-                        {
-                            Role = "region",
-                            Label = "UIToolkit",
-                            Interactive = false,
-                            Children = new List<AbuSceneNode>
-                            {
-                                new AbuSceneNode
-                                {
-                                    Role = "button",
-                                    Label = "End Turn",
-                                    Interactive = true,
-                                    Children = new List<AbuSceneNode>(),
-                                },
-                            },
-                        },
-                    },
-                },
+                Node("application", "Dreamtides", false,
+                    Node("region", "UIToolkit", false,
+                        Node("button", "End Turn", true))),
             };
             var result = SnapshotFormatter.Format(nodes, false);
             var expected = string.Join(
@@ -132,63 +88,13 @@ namespace Abu.Tests
         {
             var nodes = new List<AbuSceneNode>
             {
-                new AbuSceneNode
-                {
-                    Role = "application",
-                    Label = "Dreamtides",
-                    Interactive = false,
-                    Children = new List<AbuSceneNode>
-                    {
-                        new AbuSceneNode
-                        {
-                            Role = "region",
-                            Label = "UIToolkit",
-                            Interactive = false,
-                            Children = new List<AbuSceneNode>
-                            {
-                                new AbuSceneNode
-                                {
-                                    Role = "button",
-                                    Label = "End Turn",
-                                    Interactive = true,
-                                    Children = new List<AbuSceneNode>(),
-                                },
-                                new AbuSceneNode
-                                {
-                                    Role = "group",
-                                    Label = "Hand",
-                                    Interactive = false,
-                                    Children = new List<AbuSceneNode>
-                                    {
-                                        new AbuSceneNode
-                                        {
-                                            Role = "button",
-                                            Label = "Lightning Bolt",
-                                            Interactive = true,
-                                            Children = new List<AbuSceneNode>(),
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                        new AbuSceneNode
-                        {
-                            Role = "region",
-                            Label = "Scene3D",
-                            Interactive = false,
-                            Children = new List<AbuSceneNode>
-                            {
-                                new AbuSceneNode
-                                {
-                                    Role = "button",
-                                    Label = "Undo",
-                                    Interactive = true,
-                                    Children = new List<AbuSceneNode>(),
-                                },
-                            },
-                        },
-                    },
-                },
+                Node("application", "Dreamtides", false,
+                    Node("region", "UIToolkit", false,
+                        Node("button", "End Turn", true),
+                        Node("group", "Hand", false,
+                            Node("button", "Lightning Bolt", true))),
+                    Node("region", "Scene3D", false,
+                        Node("button", "Undo", true))),
             };
             var result = SnapshotFormatter.Format(nodes, false);
             var expected = string.Join(
@@ -216,49 +122,11 @@ namespace Abu.Tests
         {
             var nodes = new List<AbuSceneNode>
             {
-                new AbuSceneNode
-                {
-                    Role = "application",
-                    Label = "App",
-                    Interactive = false,
-                    Children = new List<AbuSceneNode>
-                    {
-                        new AbuSceneNode
-                        {
-                            Role = "region",
-                            Label = "A",
-                            Interactive = false,
-                            Children = new List<AbuSceneNode>
-                            {
-                                new AbuSceneNode
-                                {
-                                    Role = "group",
-                                    Label = "B",
-                                    Interactive = false,
-                                    Children = new List<AbuSceneNode>
-                                    {
-                                        new AbuSceneNode
-                                        {
-                                            Role = "group",
-                                            Label = "C",
-                                            Interactive = false,
-                                            Children = new List<AbuSceneNode>
-                                            {
-                                                new AbuSceneNode
-                                                {
-                                                    Role = "button",
-                                                    Label = "Deep",
-                                                    Interactive = true,
-                                                    Children = new List<AbuSceneNode>(),
-                                                },
-                                            },
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
+                Node("application", "App", false,
+                    Node("region", "A", false,
+                        Node("group", "B", false,
+                            Node("group", "C", false,
+                                Node("button", "Deep", true))))),
             };
             var result = SnapshotFormatter.Format(nodes, false);
             var expected = string.Join(
@@ -277,20 +145,8 @@ namespace Abu.Tests
         {
             var nodes = new List<AbuSceneNode>
             {
-                new AbuSceneNode
-                {
-                    Role = "region",
-                    Label = "First",
-                    Interactive = false,
-                    Children = new List<AbuSceneNode>(),
-                },
-                new AbuSceneNode
-                {
-                    Role = "region",
-                    Label = "Second",
-                    Interactive = false,
-                    Children = new List<AbuSceneNode>(),
-                },
+                Node("region", "First"),
+                Node("region", "Second"),
             };
             var result = SnapshotFormatter.Format(nodes, false);
             var expected = string.Join("\n", "- region \"First\"", "- region \"Second\"");
@@ -300,16 +156,7 @@ namespace Abu.Tests
         [Test]
         public void TreatsEmptyStringLabelSameAsNull()
         {
-            var nodes = new List<AbuSceneNode>
-            {
-                new AbuSceneNode
-                {
-                    Role = "group",
-                    Label = "",
-                    Interactive = false,
-                    Children = new List<AbuSceneNode>(),
-                },
-            };
+            var nodes = new List<AbuSceneNode> { Node("group", "") };
             var result = SnapshotFormatter.Format(nodes, false);
             Assert.AreEqual("- group", result.Snapshot);
         }
@@ -319,47 +166,11 @@ namespace Abu.Tests
         {
             var nodes = new List<AbuSceneNode>
             {
-                new AbuSceneNode
-                {
-                    Role = "application",
-                    Label = "App",
-                    Interactive = false,
-                    Children = new List<AbuSceneNode>
-                    {
-                        new AbuSceneNode
-                        {
-                            Role = "group",
-                            Label = null,
-                            Interactive = false,
-                            Children = new List<AbuSceneNode>
-                            {
-                                new AbuSceneNode
-                                {
-                                    Role = "generic",
-                                    Label = null,
-                                    Interactive = false,
-                                    Children = new List<AbuSceneNode>(),
-                                },
-                            },
-                        },
-                        new AbuSceneNode
-                        {
-                            Role = "group",
-                            Label = null,
-                            Interactive = false,
-                            Children = new List<AbuSceneNode>
-                            {
-                                new AbuSceneNode
-                                {
-                                    Role = "button",
-                                    Label = "Click Me",
-                                    Interactive = true,
-                                    Children = new List<AbuSceneNode>(),
-                                },
-                            },
-                        },
-                    },
-                },
+                Node("application", "App", false,
+                    Node("group", null, false,
+                        Node("generic")),
+                    Node("group", null, false,
+                        Node("button", "Click Me", true))),
             };
             var result = SnapshotFormatter.Format(nodes, true);
             var expected = string.Join(
@@ -376,22 +187,8 @@ namespace Abu.Tests
         {
             var nodes = new List<AbuSceneNode>
             {
-                new AbuSceneNode
-                {
-                    Role = "region",
-                    Label = "Info Panel",
-                    Interactive = false,
-                    Children = new List<AbuSceneNode>
-                    {
-                        new AbuSceneNode
-                        {
-                            Role = "generic",
-                            Label = "Some Text",
-                            Interactive = false,
-                            Children = new List<AbuSceneNode>(),
-                        },
-                    },
-                },
+                Node("region", "Info Panel", false,
+                    Node("generic", "Some Text")),
             };
             var result = SnapshotFormatter.Format(nodes, true);
             var expected = string.Join(
@@ -407,31 +204,9 @@ namespace Abu.Tests
         {
             var nodes = new List<AbuSceneNode>
             {
-                new AbuSceneNode
-                {
-                    Role = "group",
-                    Label = null,
-                    Interactive = false,
-                    Children = new List<AbuSceneNode>
-                    {
-                        new AbuSceneNode
-                        {
-                            Role = "group",
-                            Label = null,
-                            Interactive = false,
-                            Children = new List<AbuSceneNode>
-                            {
-                                new AbuSceneNode
-                                {
-                                    Role = "button",
-                                    Label = "Nested",
-                                    Interactive = true,
-                                    Children = new List<AbuSceneNode>(),
-                                },
-                            },
-                        },
-                    },
-                },
+                Node("group", null, false,
+                    Node("group", null, false,
+                        Node("button", "Nested", true))),
             };
             var result = SnapshotFormatter.Format(nodes, true);
             var expected = string.Join(
@@ -448,22 +223,8 @@ namespace Abu.Tests
         {
             var nodes = new List<AbuSceneNode>
             {
-                new AbuSceneNode
-                {
-                    Role = "group",
-                    Label = null,
-                    Interactive = false,
-                    Children = new List<AbuSceneNode>
-                    {
-                        new AbuSceneNode
-                        {
-                            Role = "generic",
-                            Label = null,
-                            Interactive = false,
-                            Children = new List<AbuSceneNode>(),
-                        },
-                    },
-                },
+                Node("group", null, false,
+                    Node("generic")),
             };
             var result = SnapshotFormatter.Format(nodes, false);
             var expected = string.Join("\n", "- group", "  - generic");

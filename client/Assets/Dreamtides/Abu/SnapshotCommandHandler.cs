@@ -111,12 +111,7 @@ namespace Abu
                 Children = rootChildren,
             };
 
-            var result = SnapshotFormatter.Format(new List<AbuSceneNode> { rootNode }, compact);
-            return new SnapshotData
-            {
-                Snapshot = result.Snapshot,
-                Refs = result.Refs,
-            };
+            return SnapshotFormatter.Format(new List<AbuSceneNode> { rootNode }, compact);
         }
 
         void HandleClick(AbuCommand command, Action<AbuResponse> onComplete)

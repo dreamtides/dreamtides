@@ -6,22 +6,6 @@ using System.Text;
 namespace Abu
 {
     /// <summary>
-    /// Result of formatting a scene node tree into ARIA-style text.
-    /// </summary>
-    public class SnapshotFormatResult
-    {
-        /// <summary>
-        /// The formatted ARIA-style text representation of the scene tree.
-        /// </summary>
-        public string Snapshot { get; set; } = "";
-
-        /// <summary>
-        /// Mapping from ref strings (e.g. "e1") to their role and name.
-        /// </summary>
-        public Dictionary<string, SnapshotRef> Refs { get; set; } = new Dictionary<string, SnapshotRef>();
-    }
-
-    /// <summary>
     /// Converts a list of scene nodes into ARIA-style indented text with ref annotations.
     /// </summary>
     public static class SnapshotFormatter
@@ -29,7 +13,7 @@ namespace Abu
         /// <summary>
         /// Formats scene nodes into ARIA-style indented text.
         /// </summary>
-        public static SnapshotFormatResult Format(List<AbuSceneNode> nodes, bool compact)
+        public static SnapshotData Format(List<AbuSceneNode> nodes, bool compact)
         {
             var lines = new List<string>();
             var refs = new Dictionary<string, SnapshotRef>();
@@ -40,7 +24,7 @@ namespace Abu
                 Walk(node, 0, compact, lines, refs, ref refCounter);
             }
 
-            return new SnapshotFormatResult
+            return new SnapshotData
             {
                 Snapshot = string.Join("\n", lines),
                 Refs = refs,

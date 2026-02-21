@@ -119,9 +119,9 @@ namespace Abu
     /// <summary>
     /// Combined action + snapshot response data returned after an action settles.
     /// Serializes the action-specific fields (e.g. clicked, hovered) from ActionData
-    /// alongside the formatted snapshot text and refs.
+    /// alongside the inherited formatted snapshot text and refs.
     /// </summary>
-    public class ActionSnapshotData
+    public class ActionSnapshotData : SnapshotData
     {
         [JsonExtensionData]
         public Dictionary<string, Newtonsoft.Json.Linq.JToken>? ActionFields { get; set; }
@@ -139,11 +139,5 @@ namespace Abu
                 }
             }
         }
-
-        [JsonProperty("snapshot")]
-        public string Snapshot { get; set; } = "";
-
-        [JsonProperty("refs")]
-        public Dictionary<string, SnapshotRef> Refs { get; set; } = new Dictionary<string, SnapshotRef>();
     }
 }
