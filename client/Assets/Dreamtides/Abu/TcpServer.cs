@@ -125,7 +125,16 @@ namespace Abu
                         };
                     }
 
-                    ReadLoop(client);
+                    var readThread = new Thread(() =>
+                    {
+                        ReadLoop(client);
+                        CloseClientIfActive(client);
+                    })
+                    {
+                        Name = "AbuTcpRead",
+                        IsBackground = true,
+                    };
+                    readThread.Start();
                 }
                 catch (SocketException) when (token.IsCancellationRequested)
                 {
@@ -148,7 +157,7 @@ namespace Abu
 
             try
             {
-                using var reader = new StreamReader(client.GetStream());
+                using var reader = new StreamReader(client.GetStream(), leaveOpen: true);
 
                 while (!token.IsCancellationRequested && client.Connected)
                 {
@@ -196,6 +205,17 @@ namespace Abu
             }
 
             Debug.Log("[Abu] Client disconnected.");
+        }
+
+        void CloseClientIfActive(TcpClient client)
+        {
+            lock (_clientLock)
+            {
+                if (_activeClient == client)
+                {
+                    CloseActiveClient();
+                }
+            }
         }
 
         void CloseActiveClient()
