@@ -19,6 +19,7 @@ which game state changes happen after every player action.
 - [Turn State Machine Integration](#turn-state-machine-integration)
 - [Auto-Executed Actions](#auto-executed-actions)
 - [Adding a New Triggered Effect](#adding-a-new-triggered-effect)
+- [Implementing a New StandardEffect](#implementing-a-new-standardeffect)
 - [Key Files](#key-files)
 
 ## Post-Action Cleanup Cascade
@@ -379,6 +380,37 @@ To add a new triggered effect:
 - The triggered ability's effect goes through the existing
   `apply_effect_with_prompt_for_targets` path and needs no special handling
   unless it introduces a new StandardEffect.
+
+## Implementing a New StandardEffect
+
+When adding a new StandardEffect variant's implementation in
+apply_standard_effect.rs, follow these conventions:
+
+**File organization**: Keep function definitions in apply_standard_effect.rs in
+alphabetical order. If an effect implementation exceeds 10 lines, create it in a
+separate file under `battle_mutations/src/effects/` instead of inlining it in
+apply_standard_effect.rs.
+
+**Animations**: Some effects cause animations to be displayed. The available
+animations are defined in battle_state/src/battle/battle_animation.rs. Do not
+add new BattleAnimation variants. If an existing animation matches, fire it as
+follows:
+
+```rust
+battle.push_animation(source, || BattleAnimation::ApplyTargetedEffect {
+    effect_name: TargetedEffectName::Dissolve,
+    targets: vec![id.card_id()],
+});
+```
+
+**Tracing**: Most effects should include a trace entry describing what happened,
+along with relevant parameters:
+
+```rust
+use battle_queries::battle_trace;
+// ...
+battle_trace!("Dissolving character", battle, id);
+```
 
 ## Key Files
 

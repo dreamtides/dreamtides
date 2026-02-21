@@ -480,24 +480,6 @@ check-snapshots:
 watch-tabula:
     cargo watch -C rules_engine -x "run --bin tabula_cli server"
 
-tabula-old *args='':
-  cargo run --manifest-path rules_engine/Cargo.toml --bin "tabula_cli" -- \
-      --key-file ./service_account_key.json \
-      --spreadsheet-id "1AqSIZ_kwo3H3vfNsG-ubPV5GobkPVV_XEQEKZpRWqrA" \
-      --string-ids rules_engine/src/tabula_ids/src/string_id.rs \
-      --test-card-ids rules_engine/src/tabula_ids/src/test_card.rs \
-      --card-lists rules_engine/src/tabula_ids/src/card_lists.rs \
-      --write-json client/Assets/StreamingAssets/tabula.json "$@"
-  cd rules_engine && cargo +nightly fmt
-
-tabula-add-card *args='':
-  cargo run --manifest-path rules_engine/Cargo.toml --bin "tabula_add_card" -- \
-      --tabula-path client/Assets/StreamingAssets/tabula.json \
-      --string-ids rules_engine/src/tabula_ids/src/string_id.rs \
-      --test-card-ids rules_engine/src/tabula_ids/src/test_card.rs \
-      --card-lists rules_engine/src/tabula_ids/src/card_lists.rs \
-      --codegen "$@"
-
 insta:
   cd rules_engine && cargo insta review
 

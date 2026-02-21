@@ -38,10 +38,12 @@
   pending effects queue FIFO processing and list decomposition, prompt halting
   and OnSelected resumption, trigger lifecycle (registration, matching, flat
   queue chaining), all nine PromptType variants, EffectSource controller
-  propagation, the turn phase integration, and a checklist for adding new
-  triggered effects. Read when debugging effect ordering, adding triggered
-  abilities, working with prompt interactions, or understanding the runtime
-  control flow after any player action.
+  propagation, the turn phase integration, a checklist for adding new triggered
+  effects, and conventions for implementing new StandardEffect variants (file
+  organization, animation, tracing). Read when debugging effect ordering, adding
+  triggered abilities, implementing new effects, working with prompt
+  interactions, or understanding the runtime control flow after any player
+  action.
 
 - [display_animation.md](display_animation/display_animation.md): How game state
   changes become visual sequences — animation recording via push_animation()

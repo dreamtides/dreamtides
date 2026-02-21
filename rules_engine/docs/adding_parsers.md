@@ -628,8 +628,7 @@ For detailed reference information, see:
 - **Parser architecture**: `rules_engine/docs/parser_design.md` - Full
   parser design and processing flow
 - **Environment setup**: `rules_engine/docs/environment_setup.md`
-- **Adding effects**: `rules_engine/docs/adding_new_effects.md`
-- **Adding triggers**: `rules_engine/docs/adding_new_triggers.md`
+- **Effect resolution**: `docs/effect_resolution/effect_resolution.md`
 - **Chumsky guide**: `docs/chumsky/guide/getting_started.md`
 - **Chumsky recursion**: `docs/chumsky/guide/recursion.md`
 

@@ -42,8 +42,8 @@ The search action candidate benchmark is the primary performance indicator.
 
 - `just bench-iai` — run IAI benchmarks directly (requires Valgrind and
   iai-callgrind-runner installed locally on Linux)
-- `just iai` — run IAI benchmarks inside a Docker container (works from macOS
-  or any platform with Docker). Uses `scripts/benchmarking/benchmark_on_linux.py`
+- `just iai` — run IAI benchmarks inside a Docker container (works from macOS or
+  any platform with Docker). Uses `scripts/benchmarking/benchmark_on_linux.py`
   to build an Ubuntu 24.04 container with Valgrind and iai-callgrind-runner,
   rsync the source, and execute benchmarks.
 
@@ -67,9 +67,9 @@ IAI benchmarks report several metrics per benchmark function:
 - **Estimated Cycles**: approximate CPU cycles (the primary metric)
 
 The `bench_core11_search_action_candidate` Estimated Cycles value is the
-source-of-truth performance number. It should stay at or below approximately
-10 million cycles. Any increase over 10% is a significant regression that should
-be investigated.
+source-of-truth performance number. It should stay at or below approximately 10
+million cycles. Any increase over 10% is a significant regression that should be
+investigated.
 
 ## Profiling
 
