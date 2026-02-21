@@ -7,16 +7,16 @@ using UnityEngine;
 namespace Abu
 {
     /// <summary>
-    /// Main MonoBehaviour for the ABU bridge. Connects to the daemon via WebSocket,
-    /// dispatches received commands to a registered handler on the main thread,
-    /// and sends responses back.
+    /// Main MonoBehaviour for the ABU bridge. Listens for incoming TCP
+    /// connections, dispatches received commands to a registered handler on
+    /// the main thread, and sends responses back.
     /// </summary>
     [AddComponentMenu("")]
     public class AbuBridge : MonoBehaviour
     {
         const int DefaultPort = 9999;
 
-        WebSocketClient? _webSocketClient;
+        TcpServer? _tcpServer;
         ICommandHandler _commandHandler = new DefaultCommandHandler();
         readonly List<ISceneWalker> _walkers = new List<ISceneWalker>();
         readonly RefRegistry _refRegistry = new RefRegistry();
@@ -68,32 +68,37 @@ namespace Abu
         void Awake()
         {
             DontDestroyOnLoad(gameObject);
-            var portString = Environment.GetEnvironmentVariable("ABU_WS_PORT");
+            var portString = Environment.GetEnvironmentVariable("ABU_PORT");
+            if (string.IsNullOrEmpty(portString))
+            {
+                portString = Environment.GetEnvironmentVariable("ABU_WS_PORT");
+            }
+
             var port = DefaultPort;
             if (!string.IsNullOrEmpty(portString) && int.TryParse(portString, out var parsed))
             {
                 port = parsed;
             }
 
-            _webSocketClient = new WebSocketClient(port);
-            _webSocketClient.Start();
+            _tcpServer = new TcpServer(port);
+            _tcpServer.Start();
         }
 
         void Update()
         {
-            if (_webSocketClient == null)
+            if (_tcpServer == null)
             {
                 return;
             }
 
-            while (_webSocketClient.ReceiveQueue.TryDequeue(out var command))
+            while (_tcpServer.ReceiveQueue.TryDequeue(out var command))
             {
                 _commandHandler.HandleCommand(
                     command,
                     this,
                     response =>
                     {
-                        _webSocketClient.Send(response);
+                        _tcpServer.Send(response);
                     }
                 );
             }
@@ -101,8 +106,8 @@ namespace Abu
 
         void OnDestroy()
         {
-            _webSocketClient?.Shutdown();
-            _webSocketClient = null;
+            _tcpServer?.Shutdown();
+            _tcpServer = null;
         }
     }
 }
