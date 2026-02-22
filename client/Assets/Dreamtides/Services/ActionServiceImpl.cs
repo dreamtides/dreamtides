@@ -30,6 +30,14 @@ namespace Dreamtides.Services
     /// </summary>
     public abstract bool WaitingForFinalResponse { get; protected set; }
 
+    /// <summary>
+    /// Fired for each command processed during ApplyGroup, allowing external
+    /// observers to record game events.
+    /// </summary>
+    public event Action<Command>? OnCommandProcessed;
+
+    protected void FireCommandProcessed(Command command) => OnCommandProcessed?.Invoke(command);
+
     public abstract void PerformAction(GameAction? action, Guid? requestIdentifier = null);
     public abstract void Log(ClientLogRequest request);
     public abstract void TriggerReconnect();
@@ -593,6 +601,8 @@ namespace Dreamtides.Services
       Registry.CardEffectPreviewService.ClearBattlePreview();
       foreach (var command in group.Commands)
       {
+        FireCommandProcessed(command);
+
         if (command.UpdateBattle != null)
         {
           Registry.LoggingService.Log("ActionService", "Applying command: UpdateBattle");

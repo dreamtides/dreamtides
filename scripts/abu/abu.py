@@ -112,9 +112,21 @@ def handle_response(
     if json_output:
         return json.dumps(data)
 
+    parts: list[str] = []
+    history = data.get("history")
+    if history and isinstance(history, list) and len(history) > 0:
+        parts.append("--- History ---")
+        for entry in history:
+            parts.append(entry)
+        parts.append("---")
+
     snapshot = data.get("snapshot")
     if snapshot is not None:
-        return snapshot
+        parts.append(snapshot)
+        return "\n".join(parts)
+
+    if parts:
+        return "\n".join(parts)
 
     return json.dumps(data)
 

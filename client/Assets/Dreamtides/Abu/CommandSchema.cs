@@ -114,6 +114,9 @@ namespace Abu
 
         [JsonProperty("refs")]
         public Dictionary<string, SnapshotRef> Refs { get; set; } = new Dictionary<string, SnapshotRef>();
+
+        [JsonProperty("history", NullValueHandling = NullValueHandling.Ignore)]
+        public List<string>? History { get; set; }
     }
 
     /// <summary>

@@ -173,6 +173,71 @@ class TestHandleResponse(unittest.TestCase):
         with open(result, "rb") as f:
             self.assertEqual(f.read(), png_bytes)
 
+    def test_response_with_history(self) -> None:
+        response = {
+            "id": "test-id",
+            "success": True,
+            "data": {
+                "clicked": True,
+                "snapshot": "- app",
+                "refs": {},
+                "history": [
+                    "Opponent's turn begins",
+                    "Stormcaller moved from battlefield to void",
+                    "Your turn begins",
+                ],
+            },
+        }
+        result = handle_response("click", response)
+        lines = result.split("\n")
+        self.assertEqual(lines[0], "--- History ---")
+        self.assertEqual(lines[1], "Opponent's turn begins")
+        self.assertEqual(lines[2], "Stormcaller moved from battlefield to void")
+        self.assertEqual(lines[3], "Your turn begins")
+        self.assertEqual(lines[4], "---")
+        self.assertEqual(lines[5], "- app")
+
+    def test_response_without_history(self) -> None:
+        response = {
+            "id": "test-id",
+            "success": True,
+            "data": {
+                "snapshot": "- app",
+                "refs": {},
+            },
+        }
+        result = handle_response("snapshot", response)
+        self.assertEqual(result, "- app")
+
+    def test_response_with_empty_history(self) -> None:
+        response = {
+            "id": "test-id",
+            "success": True,
+            "data": {
+                "clicked": True,
+                "snapshot": "- app",
+                "refs": {},
+                "history": [],
+            },
+        }
+        result = handle_response("click", response)
+        self.assertEqual(result, "- app")
+
+    def test_response_with_history_json_mode(self) -> None:
+        response = {
+            "id": "test-id",
+            "success": True,
+            "data": {
+                "clicked": True,
+                "snapshot": "- app",
+                "refs": {},
+                "history": ["Your turn begins"],
+            },
+        }
+        result = handle_response("click", response, json_output=True)
+        parsed = json.loads(result)
+        self.assertEqual(parsed["history"], ["Your turn begins"])
+
     def test_error_response_raises(self) -> None:
         response = {
             "id": "test-id",

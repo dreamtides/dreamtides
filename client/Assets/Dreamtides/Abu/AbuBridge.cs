@@ -50,6 +50,17 @@ namespace Abu
     }
 
     /// <summary>
+    /// Set the history provider for recording game events between actions.
+    /// </summary>
+    public void SetHistoryProvider(IHistoryProvider provider)
+    {
+      if (_snapshotCommandHandler != null)
+      {
+        _snapshotCommandHandler.SetHistoryProvider(provider);
+      }
+    }
+
+    /// <summary>
     /// Access the ref registry for external use (e.g., by walkers during snapshot).
     /// </summary>
     public RefRegistry RefRegistry => _refRegistry;

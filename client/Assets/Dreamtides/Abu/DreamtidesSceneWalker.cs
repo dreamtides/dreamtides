@@ -55,7 +55,7 @@ namespace Dreamtides.Abu
 
     // ── Rich text stripping ───────────────────────────────────────────
 
-    static string StripRichText(string? text)
+    public static string StripRichText(string? text)
     {
       if (string.IsNullOrEmpty(text))
       {

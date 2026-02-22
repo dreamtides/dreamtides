@@ -55,6 +55,10 @@ namespace Dreamtides.Abu
 
       var settledProvider = new DreamtidesSettledProvider(_registry.ActionService);
       bridge.SetSettledProvider(settledProvider);
+
+      var historyRecorder = new HistoryRecorder(_registry.CardService);
+      _registry.ActionService.OnCommandProcessed += historyRecorder.OnCommand;
+      bridge.SetHistoryProvider(historyRecorder);
     }
   }
 }

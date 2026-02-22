@@ -172,5 +172,64 @@ namespace Abu.Tests
             Assert.AreEqual("generic", parsed["role"]!.Value<string>());
             Assert.IsFalse(parsed.ContainsKey("label"));
         }
+
+        [Test]
+        public void SnapshotDataWithHistorySerializesHistoryList()
+        {
+            var data = new SnapshotData
+            {
+                Snapshot = "- app",
+                Refs = new Dictionary<string, SnapshotRef>(),
+                History = new List<string> { "Your turn begins", "Stormcaller moved from hand to stack" },
+            };
+
+            var json = JsonConvert.SerializeObject(data);
+            var parsed = JObject.Parse(json);
+
+            Assert.IsTrue(parsed.ContainsKey("history"));
+            var history = parsed["history"] as JArray;
+            Assert.IsNotNull(history);
+            Assert.AreEqual(2, history!.Count);
+            Assert.AreEqual("Your turn begins", history[0]!.Value<string>());
+            Assert.AreEqual("Stormcaller moved from hand to stack", history[1]!.Value<string>());
+        }
+
+        [Test]
+        public void SnapshotDataWithNullHistoryOmitsKey()
+        {
+            var data = new SnapshotData
+            {
+                Snapshot = "- app",
+                Refs = new Dictionary<string, SnapshotRef>(),
+                History = null,
+            };
+
+            var json = JsonConvert.SerializeObject(data);
+            var parsed = JObject.Parse(json);
+
+            Assert.IsFalse(parsed.ContainsKey("history"));
+        }
+
+        [Test]
+        public void ActionSnapshotDataInheritsHistory()
+        {
+            var data = new ActionSnapshotData
+            {
+                Snapshot = "- app",
+                Refs = new Dictionary<string, SnapshotRef>(),
+                History = new List<string> { "Opponent's turn begins" },
+                ActionData = new { clicked = true },
+            };
+
+            var json = JsonConvert.SerializeObject(data);
+            var parsed = JObject.Parse(json);
+
+            Assert.IsTrue(parsed.ContainsKey("history"));
+            var history = parsed["history"] as JArray;
+            Assert.IsNotNull(history);
+            Assert.AreEqual(1, history!.Count);
+            Assert.AreEqual("Opponent's turn begins", history[0]!.Value<string>());
+            Assert.IsTrue(parsed.ContainsKey("clicked"));
+        }
     }
 }

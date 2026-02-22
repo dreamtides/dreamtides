@@ -17,6 +17,7 @@ namespace Abu
         readonly List<ISceneWalker> _walkers;
         readonly RefRegistry _refRegistry;
         ISettledProvider _settledProvider;
+        IHistoryProvider? _historyProvider;
 
         public SnapshotCommandHandler(
             AbuBridge bridge,
@@ -37,6 +38,14 @@ namespace Abu
         public void SetSettledProvider(ISettledProvider provider)
         {
             _settledProvider = provider;
+        }
+
+        /// <summary>
+        /// Set the history provider for recording game events.
+        /// </summary>
+        public void SetHistoryProvider(IHistoryProvider? provider)
+        {
+            _historyProvider = provider;
         }
 
         public void HandleCommand(AbuCommand command, AbuBridge bridge, Action<AbuResponse> onComplete)
@@ -274,6 +283,8 @@ namespace Abu
                 yield return null;
             }
 
+            var history = _historyProvider?.TakeHistory();
+
             _refRegistry.Clear();
             var snapshotData = BuildSnapshotData(false);
 
@@ -287,6 +298,7 @@ namespace Abu
                         ActionData = data,
                         Snapshot = snapshotData.Snapshot,
                         Refs = snapshotData.Refs,
+                        History = history,
                     },
                 }
             );
