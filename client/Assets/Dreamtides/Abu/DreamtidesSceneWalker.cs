@@ -550,6 +550,13 @@ namespace Dreamtides.Abu
         return null;
       }
 
+      // Token cards on the stack represent triggered abilities and should
+      // not appear in the snapshot tree.
+      if (zoneContext == "Stack" && card.CardView.Prefab == CardPrefab.Token)
+      {
+        return null;
+      }
+
       var revealed = card.CardView.Revealed;
       if (revealed == null)
       {

@@ -22,6 +22,7 @@ namespace Dreamtides.Abu
       public string Zone;
       public DisplayPlayer? Player;
       public string? Name;
+      public bool IsToken;
     }
 
     public HistoryRecorder(CardService cardService)
@@ -132,13 +133,27 @@ namespace Dreamtides.Abu
           cardView.Revealed != null
             ? DreamtidesSceneWalker.StripRichText(cardView.Revealed.Name)
             : null;
+        var isToken = cardView.Prefab == CardPrefab.Token;
 
         newPositions[cardView.Id] = new TrackedCard
         {
           Zone = zone,
           Player = player,
           Name = name,
+          IsToken = isToken,
         };
+
+        // Token cards on the stack represent triggered abilities.
+        // Log the trigger on first appearance and skip normal transition tracking.
+        if (isToken)
+        {
+          if (zone == "stack" && !_cardPositions.ContainsKey(cardView.Id))
+          {
+            RecordAbilityTriggered(cardView);
+          }
+
+          continue;
+        }
 
         if (_cardPositions.TryGetValue(cardView.Id, out var old) && old.Zone != zone)
         {
@@ -161,7 +176,7 @@ namespace Dreamtides.Abu
       // Check for cards present in old state but absent in new state
       foreach (var kvp in _cardPositions)
       {
-        if (!newPositions.ContainsKey(kvp.Key))
+        if (!newPositions.ContainsKey(kvp.Key) && !kvp.Value.IsToken)
         {
           var cardName = kvp.Value.Name ?? "a card";
           if (!IsInternalZone(kvp.Value.Zone))
@@ -176,6 +191,20 @@ namespace Dreamtides.Abu
       {
         _cardPositions[kvp.Key] = kvp.Value;
       }
+    }
+
+    void RecordAbilityTriggered(CardView cardView)
+    {
+      var cardName =
+        cardView.Revealed != null
+          ? DreamtidesSceneWalker.StripRichText(cardView.Revealed.Name)
+          : "Unknown";
+      var rulesText =
+        cardView.Revealed != null
+          ? DreamtidesSceneWalker.StripRichText(cardView.Revealed.RulesText)
+          : null;
+      var displayRules = string.IsNullOrEmpty(rulesText) ? "" : $" -- {rulesText}";
+      _entries.Add($"Ability triggered: {cardName}{displayRules}");
     }
 
     string? BuildTransitionEntry(TrackedCard old, TrackedCard current)
