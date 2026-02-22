@@ -90,9 +90,9 @@ Foresee prompt for the CardOrderSelector). Then use the CLI to validate.
 just abu --wait 30 snapshot --compact           # wait for connection, then snapshot
 ```
 
-The `--wait 30` flag retries the TCP connection for up to 30 seconds, eliminating
-the need to manually sleep. The `--compact` flag omits non-interactive unlabeled
-nodes for readability. Drop it to see the full tree.
+The `--wait 30` flag retries the TCP connection for up to 30 seconds,
+eliminating the need to manually sleep. The `--compact` flag omits
+non-interactive unlabeled nodes for readability. Drop it to see the full tree.
 
 **Single-command recompile and restart:**
 
@@ -143,8 +143,8 @@ added both in your new code and in an existing section (e.g. action buttons
 appearing in both the main Actions group and a feature-specific group).
 
 **Ref numbers shifted** — Refs are assigned in DFS order and change whenever the
-tree structure changes. Always re-read the snapshot after any action before using
-ref numbers.
+tree structure changes. Always re-read the snapshot after any action before
+using ref numbers.
 
 **Refresh times out** — The `unity.py refresh` command has a 120-second timeout.
 If Unity is in play mode, exit first. If compilation is genuinely slow, the
