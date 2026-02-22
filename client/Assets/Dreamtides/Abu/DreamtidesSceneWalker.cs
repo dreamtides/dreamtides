@@ -223,6 +223,13 @@ namespace Dreamtides.Abu
         region.Children.Add(cardOrderGroup);
       }
 
+      // Browser (e.g. modal effect choices, shown when active)
+      var browserGroup = WalkObjectLayoutGroup("Browser", layout.Browser, refRegistry);
+      if (browserGroup != null)
+      {
+        region.Children.Add(browserGroup);
+      }
+
       // 10. UI overlays (filtered, only when content exists)
       var uiOverlay = WalkUiToolkitFiltered(refRegistry);
       if (uiOverlay != null)
