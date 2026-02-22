@@ -298,10 +298,19 @@ def run_hs(lua_code: str) -> str:
             "Install via: Hammerspoon > Preferences > Install CLI tool"
         )
     except subprocess.TimeoutExpired:
-        raise HammerspoonError("Hammerspoon CLI timed out")
+        raise HammerspoonError(
+            "Hammerspoon CLI timed out. "
+            "Try: killall Hammerspoon && open -a Hammerspoon"
+        )
 
     if result.returncode != 0:
-        raise HammerspoonError(f"hs failed: {result.stderr.strip()}")
+        stderr = result.stderr.strip()
+        if "ipc" in stderr.lower():
+            raise HammerspoonError(
+                f"Hammerspoon IPC connection failed: {stderr}\n"
+                "Try: killall Hammerspoon && open -a Hammerspoon"
+            )
+        raise HammerspoonError(f"hs failed: {stderr}")
 
     lines = result.stdout.strip().splitlines()
     return "\n".join(
@@ -309,14 +318,44 @@ def run_hs(lua_code: str) -> str:
     )
 
 
+def _restart_hammerspoon() -> None:
+    """Kill and relaunch Hammerspoon."""
+    subprocess.run(
+        ["pkill", "-x", "Hammerspoon"],
+        capture_output=True,
+    )
+    time.sleep(2)
+    subprocess.run(["open", "-a", "Hammerspoon"])
+    time.sleep(5)
+
+
 def ensure_hammerspoon() -> None:
-    """Check that Hammerspoon is running, launch if needed."""
+    """Verify Hammerspoon is running with a working IPC connection.
+
+    Launches Hammerspoon if it is not running. Performs a health check
+    to verify IPC is responsive. If the check fails, restarts
+    Hammerspoon and retries once before raising.
+    """
     result = subprocess.run(["pgrep", "-x", "Hammerspoon"], capture_output=True)
     if result.returncode != 0:
         print("Hammerspoon is not running. Launching...")
         subprocess.run(["open", "-a", "Hammerspoon"])
-        time.sleep(3)
+        time.sleep(5)
         print("Hammerspoon launched.")
+
+    try:
+        run_hs('return "ok"')
+    except HammerspoonError:
+        print("Hammerspoon IPC is not responding. Restarting...")
+        _restart_hammerspoon()
+        try:
+            run_hs('return "ok"')
+        except HammerspoonError:
+            raise HammerspoonError(
+                "Hammerspoon is not responding after restart. "
+                "Try manually relaunching from the menu bar."
+            )
+        print("Hammerspoon restarted successfully.")
 
 
 def is_worktree() -> bool:

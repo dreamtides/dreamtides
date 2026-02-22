@@ -582,6 +582,7 @@ namespace Dreamtides.Abu
     {
       var name = StripRichText(revealed.Name)?.Replace("\n", ", ") ?? "Unknown";
       var cardType = StripRichText(revealed.CardType);
+      var showDetails = zoneContext is "Hand" or "Battlefield" or "Stack";
 
       var annotations = new List<string>();
 
@@ -590,7 +591,7 @@ namespace Dreamtides.Abu
         annotations.Add($"cost: {StripRichText(revealed.Cost)}");
       }
 
-      if (zoneContext == "Battlefield" && !string.IsNullOrEmpty(revealed.Spark))
+      if (showDetails && !string.IsNullOrEmpty(revealed.Spark))
       {
         annotations.Add($"spark: {StripRichText(revealed.Spark)}");
       }
@@ -601,12 +602,26 @@ namespace Dreamtides.Abu
       }
 
       var suffix = annotations.Count > 0 ? $" ({string.Join(", ", annotations)})" : "";
+      string label;
       if (!string.IsNullOrEmpty(cardType))
       {
-        return $"{name}, {cardType}{suffix}";
+        label = $"{name}, {cardType}{suffix}";
+      }
+      else
+      {
+        label = $"{name}{suffix}";
       }
 
-      return $"{name}{suffix}";
+      if (showDetails)
+      {
+        var rulesText = StripRichText(revealed.RulesText)?.Replace("\n", " ");
+        if (!string.IsNullOrEmpty(rulesText))
+        {
+          label += $" -- {rulesText}";
+        }
+      }
+
+      return label;
     }
 
     // ── Action buttons ────────────────────────────────────────────────
