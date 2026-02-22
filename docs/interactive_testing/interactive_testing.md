@@ -23,18 +23,19 @@ snapshot. The TCP server needs time to start.
 4. Parse the history and updated snapshot from the response
 5. Repeat
 
-Use `snapshot --compact` for routine state checks. Use full `snapshot` (no
-flag) when debugging missing UI elements.
+Use `snapshot --compact` for routine state checks. Use full `snapshot` (no flag)
+when debugging missing UI elements.
 
 ## Playing Cards
 
 Cards are played by dragging them to the Play Zone target:
+
 ```sh
 just abu drag <card_ref> <play_zone_ref>
 ```
 
-The Play Zone ref changes with every snapshot. Always re-read the play zone
-ref from the most recent snapshot.
+The Play Zone ref changes with every snapshot. Always re-read the play zone ref
+from the most recent snapshot.
 
 ## Understanding the Snapshot
 
@@ -52,6 +53,7 @@ Key elements in a typical battle snapshot:
 ### Card Display Format
 
 Cards in hand show:
+
 ```
 "Name, Type (cost: N, spark: N, can play) -- Rules text"
 ```
@@ -80,8 +82,8 @@ section. History entries describe what happened:
 - Game events: "Victory", "Defeat"
 - Dreamwell activations: "Dreamwell: Name -- effect"
 
-**IMPORTANT**: Refs are invalidated after every action. Always use refs from
-the most recent snapshot.
+**IMPORTANT**: Refs are invalidated after every action. Always use refs from the
+most recent snapshot.
 
 ## Responding to Game Prompts
 
@@ -89,6 +91,7 @@ the most recent snapshot.
 
 When a card requires a target, the snapshot shows an interface message like
 "Dissolve an enemy." Click the target directly:
+
 ```sh
 just abu click <target_ref>
 ```
@@ -96,17 +99,18 @@ just abu click <target_ref>
 ### Foresee (Card Reordering)
 
 During Foresee, a Card Order Selector appears with Deck Positions and a Void
-slot. Drag cards between positions to reorder, or drag to Void to discard.
-Click Submit when done. To keep the default order, just click Submit.
+slot. Drag cards between positions to reorder, or drag to Void to discard. Click
+Submit when done. To keep the default order, just click Submit.
 
 ### Energy Payment (e.g., Dreamscatter)
 
-For variable-cost effects, use the +1/−1 buttons to adjust the amount,
-then click "Spend N●" to confirm.
+For variable-cost effects, use the +1/−1 buttons to adjust the amount, then
+click "Spend N●" to confirm.
 
 ### Stack Interaction
 
 When cards are on the stack:
+
 - **Resolve** button: Let the top card resolve
 - You can play fast cards in response by dragging them to Play Zone
 - The opponent may also respond (their plays appear in history)
@@ -121,43 +125,44 @@ Stack resolves LIFO (last-in, first-out).
 
 ## Common Gotchas
 
-- **Chaining abu commands in bash**: When chaining multiple abu.py calls
-  with `&&`, each returns a separate snapshot. Only the last snapshot's refs
-  are valid. Prefer sequential single commands.
+- **Chaining abu commands in bash**: When chaining multiple abu.py calls with
+  `&&`, each returns a separate snapshot. Only the last snapshot's refs are
+  valid. Prefer sequential single commands.
 - **Refs change on every action**: Never reuse refs from a previous snapshot.
   The ref for "End Turn" will be different after each action.
 - **"can play" tag**: Only cards marked "can play" can be played right now.
   Missing this tag means insufficient energy, wrong phase, or card-specific
   restrictions.
-- **Activated abilities in hand**: When a character with an activated ability
-  is on the battlefield, the ability appears as a separate card in your hand.
-  Drag it to the Play Zone to activate.
-- **Reclaim abilities**: Cards with Reclaim can be played from the void.
-  They appear as "Reclaim Ability" entries in your hand after the original
-  goes to the void.
+- **Activated abilities in hand**: When a character with an activated ability is
+  on the battlefield, the ability appears as a separate card in your hand. Drag
+  it to the Play Zone to activate.
+- **Reclaim abilities**: Cards with Reclaim can be played from the void. They
+  appear as "Reclaim Ability" entries in your hand after the original goes to
+  the void.
 
 ## Interpreting History Messages
 
 Some history messages can be misleading:
 
-- **"moved to void"** vs **"moved to banished"**: Reclaimed cards go to
-  banished instead of void when they leave play.
+- **"moved to void"** vs **"moved to banished"**: Reclaimed cards go to banished
+  instead of void when they leave play.
 
 ## Testing Strategy
 
 1. **Play a full game** to test basic card flow, scoring, and victory
 2. **Focus on interactions**: Stack responses, counter-spells, triggered
    abilities
-3. **Test edge cases**: Hand size limit (10 cards), character limit (8),
-   energy overflow from Dreamwell
-4. **Document bugs immediately**: Stop and write a detailed description
-   when something seems wrong
+3. **Test edge cases**: Hand size limit (10 cards), character limit (8), energy
+   overflow from Dreamwell
+4. **Document bugs immediately**: Stop and write a detailed description when
+   something seems wrong
 5. **Take screenshots** when the snapshot doesn't match expected UI state
 
 ## Writing Narrative Files
 
-Write playtest narratives to `/tmp/narrative.md`.
-Include:
+Write playtest narratives to `/tmp/narrative.md`. Include:
+
+
 - Game state at key decision points (energy, score, spark, hand)
 - Actions taken and their results
 - Opponent responses and triggered abilities
