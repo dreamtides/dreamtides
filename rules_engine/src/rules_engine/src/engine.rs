@@ -41,7 +41,7 @@ static TEST_STATE_PROVIDERS: LazyLock<Mutex<HashMap<Uuid, TestStateProvider>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 static DEFAULT_AI_OPPONENT: LazyLock<PlayerType> =
-    LazyLock::new(|| PlayerType::Agent(GameAI::MonteCarlo(50)));
+    LazyLock::new(|| PlayerType::Agent(GameAI::MonteCarlo(5)));
 
 thread_local! {
     static PANIC_INFO: RefCell<Option<(String, String, Backtrace)>> = const { RefCell::new(None) };
