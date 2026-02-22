@@ -68,6 +68,12 @@ namespace Dreamtides.Abu
       {
         var c = stripped[i];
         var code = (int)c;
+        // Filter icon glyphs mapped to CJK code points by icon fonts
+        if (code >= 0x3400 && code <= 0x9FFF)
+        {
+          continue;
+        }
+
         // Filter icon glyphs (PUA + CJK compat / presentation forms / specials)
         if (code >= 0xE000 && code <= 0xFFFF)
         {
@@ -132,7 +138,6 @@ namespace Dreamtides.Abu
             layout.UserStatusDisplay,
             layout.UserBattlefield,
             layout.UserHand.Objects,
-            layout.UserDreamwell,
             browserButtons,
             CardBrowserType.UserDeck,
             CardBrowserType.UserVoid,
@@ -149,7 +154,6 @@ namespace Dreamtides.Abu
             layout.EnemyStatusDisplay,
             layout.EnemyBattlefield,
             layout.EnemyHand.Objects,
-            layout.EnemyDreamwell,
             browserButtons,
             CardBrowserType.EnemyDeck,
             CardBrowserType.EnemyVoid,
@@ -187,7 +191,18 @@ namespace Dreamtides.Abu
         // 7. Essence label
         AddEssenceLabel(region);
 
-        // 8. Thinking indicator
+        // 8. Play zone (drag target for playing cards from hand)
+        region.Children.Add(
+          new AbuSceneNode
+          {
+            Role = "target",
+            Label = "Play Zone",
+            Interactive = true,
+          }
+        );
+        refRegistry.Register(new RefCallbacks());
+
+        // 9. Thinking indicator
         if (layout.ThinkingIndicator.activeSelf)
         {
           region.Children.Add(
@@ -201,7 +216,7 @@ namespace Dreamtides.Abu
         }
       }
 
-      // 9. UI overlays (filtered, only when content exists)
+      // 10. UI overlays (filtered, only when content exists)
       var uiOverlay = WalkUiToolkitFiltered(refRegistry);
       if (uiOverlay != null)
       {
@@ -227,6 +242,7 @@ namespace Dreamtides.Abu
       TryAddCanvasButtonWithLabel(group, refRegistry, doc.UndoButton, "Undo");
       TryAddCanvasButtonWithLabel(group, refRegistry, doc.DevButton, "Dev");
       TryAddCanvasButtonWithLabel(group, refRegistry, doc.BugButton, "Bug Report");
+      TryAddCloseBrowserButton(group, refRegistry);
 
       return group;
     }
@@ -254,6 +270,29 @@ namespace Dreamtides.Abu
       parent.Children.Add(node);
     }
 
+    void TryAddCloseBrowserButton(AbuSceneNode parent, RefRegistry refRegistry)
+    {
+      var button = _registry.BattleLayout.CloseBrowserButton;
+      if (!button.gameObject.activeSelf)
+      {
+        return;
+      }
+
+      var node = new AbuSceneNode
+      {
+        Role = "button",
+        Label = "Close Browser",
+        Interactive = true,
+      };
+      refRegistry.Register(
+        new RefCallbacks
+        {
+          OnClick = () => button.OnClick(),
+        }
+      );
+      parent.Children.Add(node);
+    }
+
     // ── Player ────────────────────────────────────────────────────────
 
     AbuSceneNode WalkPlayer(
@@ -261,7 +300,6 @@ namespace Dreamtides.Abu
       PlayerStatusDisplay statusDisplay,
       ObjectLayout battlefield,
       IReadOnlyList<Displayable> handObjects,
-      ObjectLayout dreamwell,
       Dictionary<CardBrowserType, CardBrowserButton> browserButtons,
       CardBrowserType deckType,
       CardBrowserType voidType,
@@ -341,29 +379,6 @@ namespace Dreamtides.Abu
             Interactive = false,
           }
         );
-      }
-
-      // Dreamwell
-      if (dreamwell.Objects.Count > 0)
-      {
-        var dreamwellGroup = new AbuSceneNode
-        {
-          Role = "group",
-          Label = "Dreamwell",
-          Interactive = false,
-        };
-        foreach (var obj in dreamwell.Objects)
-        {
-          var cardNode = BuildCardNode(obj, "Dreamwell", refRegistry);
-          if (cardNode != null)
-          {
-            dreamwellGroup.Children.Add(cardNode);
-          }
-        }
-        if (dreamwellGroup.Children.Count > 0)
-        {
-          group.Children.Add(dreamwellGroup);
-        }
       }
 
       return group;
@@ -532,18 +547,35 @@ namespace Dreamtides.Abu
         return null;
       }
 
-      var label = BuildCardLabel(revealed, zoneContext);
+      var canPlay = zoneContext == "Hand"
+        && revealed.Actions.CanPlay is { } cp
+        && !cp.IsNull
+        && _registry.CapabilitiesService.CanPlayCards();
+
+      var label = BuildCardLabel(revealed, zoneContext, canPlay);
       var node = new AbuSceneNode
       {
         Role = "button",
         Label = label,
         Interactive = true,
       };
-      RegisterDisplayableCallbacks(card, refRegistry);
+      var callbacks = BuildDisplayableCallbacks(card);
+      if (canPlay)
+      {
+        callbacks.OnDrag = _ =>
+        {
+          var action = card.CardView.Revealed?.Actions?.CanPlay?.ToGameAction();
+          if (action.HasValue)
+          {
+            _registry.ActionService.PerformAction(action.Value);
+          }
+        };
+      }
+      refRegistry.Register(callbacks);
       return node;
     }
 
-    static string BuildCardLabel(RevealedCardView revealed, string zoneContext)
+    static string BuildCardLabel(RevealedCardView revealed, string zoneContext, bool canPlay)
     {
       var name = StripRichText(revealed.Name)?.Replace("\n", ", ") ?? "Unknown";
       var cardType = StripRichText(revealed.CardType);
@@ -558,6 +590,11 @@ namespace Dreamtides.Abu
       if (zoneContext == "Battlefield" && !string.IsNullOrEmpty(revealed.Spark))
       {
         annotations.Add($"spark: {StripRichText(revealed.Spark)}");
+      }
+
+      if (canPlay)
+      {
+        annotations.Add("can play");
       }
 
       var suffix = annotations.Count > 0 ? $" ({string.Join(", ", annotations)})" : "";
@@ -826,7 +863,7 @@ namespace Dreamtides.Abu
       {
         var callbacks = BuildUiToolkitCallbacks(element);
         refRegistry.Register(callbacks);
-        node.Label ??= element.name;
+        node.Label ??= StripRichText(element.name);
       }
 
       foreach (var child in element.Children())
@@ -857,19 +894,16 @@ namespace Dreamtides.Abu
 
     static string? DetermineLabel(VisualElement element)
     {
-      switch (element)
+      string? raw = element switch
       {
-        case NodeLabel label when !string.IsNullOrEmpty(label.text):
-          return label.text;
-        case NodeTypewriterText typewriter when !string.IsNullOrEmpty(typewriter.text):
-          return typewriter.text;
-        case NodeTextField textField when !string.IsNullOrEmpty(textField.value):
-          return textField.value;
-        case NodeSlider slider when !string.IsNullOrEmpty(slider.label):
-          return slider.label;
-        default:
-          return !string.IsNullOrEmpty(element.name) ? element.name : null;
-      }
+        NodeLabel label when !string.IsNullOrEmpty(label.text) => label.text,
+        NodeTypewriterText typewriter when !string.IsNullOrEmpty(typewriter.text) => typewriter.text,
+        NodeTextField textField when !string.IsNullOrEmpty(textField.value) => textField.value,
+        NodeSlider slider when !string.IsNullOrEmpty(slider.label) => slider.label,
+        _ => !string.IsNullOrEmpty(element.name) ? element.name : null,
+      };
+      var stripped = StripRichText(raw);
+      return string.IsNullOrEmpty(stripped) ? null : stripped;
     }
 
     static bool IsInteractive(VisualElement element)
