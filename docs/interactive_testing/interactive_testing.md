@@ -30,7 +30,7 @@ flag) when debugging missing UI elements.
 
 Cards are played by dragging them to the Play Zone target:
 ```sh
-python3 scripts/abu/abu.py drag <card_ref> <play_zone_ref>
+just abu drag <card_ref> <play_zone_ref>
 ```
 
 The Play Zone ref changes with every snapshot. Always re-read the play zone
@@ -90,7 +90,7 @@ the most recent snapshot.
 When a card requires a target, the snapshot shows an interface message like
 "Dissolve an enemy." Click the target directly:
 ```sh
-python3 scripts/abu/abu.py click <target_ref>
+just abu click <target_ref>
 ```
 
 ### Foresee (Card Reordering)
@@ -119,19 +119,6 @@ Stack resolves LIFO (last-in, first-out).
 - **Next Turn**: Acknowledge opponent's turn end, advance to your turn
 - During opponent's turn, you may still play fast cards
 
-## Known Limitations
-
-### Modal Cards (Choose One) Are Inaccessible
-
-Cards with "Choose One:" in their text (e.g., Break the Sequence) cannot be
-played through Abu. The mode selection UI renders choices as 3D displayable
-cards while a UIToolkit overlay shows "Choose a mode." This causes the
-occlusion check (HasOpenPanels) to hide the 3D scene, making mode buttons
-invisible in snapshots.
-
-**Workaround**: Avoid playing modal cards. If you accidentally play one, use
-Undo (click the Undo button) to reverse the action.
-
 ## Common Gotchas
 
 - **Chaining abu commands in bash**: When chaining multiple abu.py calls
@@ -153,11 +140,6 @@ Undo (click the Undo button) to reverse the action.
 
 Some history messages can be misleading:
 
-- **"X removed"**: This can mean a modifier was removed/applied on a card,
-  NOT that the card itself was removed from the battlefield. Always check
-  the snapshot to verify the actual board state. For example, when Sundown
-  Surfer gains +1 spark, history may say "Sundown Surfer removed" even
-  though the card is still in play with higher spark.
 - **"moved to void"** vs **"moved to banished"**: Reclaimed cards go to
   banished instead of void when they leave play.
 
@@ -174,7 +156,7 @@ Some history messages can be misleading:
 
 ## Writing Narrative Files
 
-Write playtest narratives to `/tmp/narratives/narrative_<unixtime>.md`.
+Write playtest narratives to `/tmp/narrative.md`.
 Include:
 - Game state at key decision points (energy, score, spark, hand)
 - Actions taken and their results
