@@ -25,6 +25,7 @@ scripts/test_output/
 
 # Claude Code hook data
 .claude/doc-read-counts.json
+.validation_marker
 
 # Serena (per-worktree config, created by llmc)
 .serena/

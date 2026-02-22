@@ -10,6 +10,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/scripts/hooks/mark_validation.sh",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SubagentStop": [
@@ -19,6 +29,17 @@
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/scripts/hooks/count_subagent_doc_reads.sh",
             "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/scripts/hooks/enforce_finalsteps.sh",
+            "timeout": 30
           }
         ]
       }
