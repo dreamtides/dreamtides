@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Control Unity Editor via Hammerspoon for asset refresh and play mode.
+"""Control Unity Editor via Hammerspoon for asset refresh, play mode, and tests.
 
 Provides subcommands for Unity Editor operations: refresh (trigger asset
-compilation and wait for completion) and play (toggle play mode). Uses
-Hammerspoon's selectMenuItem to drive Unity's menu bar and tails the Editor
-log to detect compilation results.
+compilation and wait for completion), play (toggle play mode), and test
+(refresh then run all Edit Mode tests). Uses Hammerspoon's selectMenuItem
+to drive Unity's menu bar and tails the Editor log to detect results.
 
 Prerequisites:
   1. Hammerspoon.app installed and running
@@ -14,6 +14,7 @@ Prerequisites:
 """
 
 import argparse
+import re
 import shutil
 import subprocess
 import sys
@@ -24,6 +25,7 @@ from pathlib import Path
 UNITY_BUNDLE_ID = "com.unity3d.UnityEditor5.x"
 EDITOR_LOG = Path.home() / "Library" / "Logs" / "Unity" / "Editor.log"
 TIMEOUT_SECONDS = 120
+TEST_TIMEOUT_SECONDS = 300
 POLL_INTERVAL = 0.3
 
 
@@ -54,6 +56,20 @@ class RefreshResult:
     finished: bool
     success: bool
     errors: list[str] = field(default_factory=list)
+    summary: str = ""
+
+
+@dataclass(frozen=True)
+class TestResult:
+    """Result of running Unity Edit Mode tests."""
+
+    finished: bool
+    success: bool
+    passed: int = 0
+    failed: int = 0
+    skipped: int = 0
+    total: int = 0
+    failures: list[str] = field(default_factory=list)
     summary: str = ""
 
 
@@ -135,6 +151,11 @@ def send_menu_item(path: list[str]) -> str:
 def send_refresh() -> str:
     """Trigger Assets > Refresh in Unity."""
     return send_menu_item(["Assets", "Refresh"])
+
+
+def send_run_tests() -> str:
+    """Trigger Tools > Run All Tests in Unity."""
+    return send_menu_item(["Tools", "Run All Tests"])
 
 
 def toggle_play_mode() -> str:
@@ -230,6 +251,116 @@ def wait_for_refresh(log_offset: int) -> RefreshResult:
     )
 
 
+def wait_for_tests(log_offset: int) -> TestResult:
+    """Poll the Editor log for test run completion.
+
+    Watches for [TestRunner] markers logged by RunAllTestsCommand.cs.
+    Returns a TestResult describing the outcome.
+    """
+    start = time.time()
+
+    while time.time() - start < TEST_TIMEOUT_SECONDS:
+        content = read_new_log(log_offset)
+
+        for line in content.splitlines():
+            if "[TestRunner] Run finished:" in line:
+                failures = []
+                for log_line in content.splitlines():
+                    if "[TestRunner] FAIL:" in log_line:
+                        # Extract the FAIL message after the Unity log prefix
+                        idx = log_line.find("[TestRunner] FAIL:")
+                        if idx >= 0:
+                            failures.append(log_line[idx:].strip())
+
+                match = re.search(
+                    r"(\d+) passed, (\d+) failed, (\d+) skipped "
+                    r"\(total: (\d+)\)",
+                    line,
+                )
+                if match:
+                    passed = int(match.group(1))
+                    failed = int(match.group(2))
+                    skipped = int(match.group(3))
+                    total = int(match.group(4))
+                    return TestResult(
+                        finished=True,
+                        success=failed == 0,
+                        passed=passed,
+                        failed=failed,
+                        skipped=skipped,
+                        total=total,
+                        failures=failures,
+                        summary=f"{passed} passed, {failed} failed, "
+                        f"{skipped} skipped (total: {total})",
+                    )
+
+        time.sleep(POLL_INTERVAL)
+
+    return TestResult(
+        finished=False,
+        success=False,
+        summary=f"Timed out after {TEST_TIMEOUT_SECONDS}s",
+    )
+
+
+def do_refresh(play: bool = False) -> None:
+    """Execute a refresh and optionally enter play mode."""
+    log_offset = get_log_size()
+    result_msg = send_refresh()
+    print(result_msg)
+
+    print("Waiting for asset refresh to complete...")
+    result = wait_for_refresh(log_offset)
+
+    if not result.finished:
+        print(f"Error: {result.summary}", file=sys.stderr)
+        sys.exit(1)
+
+    if result.success:
+        if result.summary:
+            print(f"  {result.summary}")
+        print("Asset refresh finished.")
+    else:
+        print("\nCompilation errors:")
+        for err in result.errors:
+            print(f"  {err}")
+        print("Asset refresh finished with errors.")
+        sys.exit(1)
+
+    if play:
+        play_result = toggle_play_mode()
+        print(play_result)
+
+
+def do_test() -> None:
+    """Refresh, then run all Edit Mode tests and report results."""
+    # Step 1: Refresh to trigger recompilation
+    do_refresh()
+
+    # Step 2: Run tests
+    print("\nTriggering test run...")
+    log_offset = get_log_size()
+    result_msg = send_run_tests()
+    print(result_msg)
+
+    print("Waiting for tests to complete...")
+    result = wait_for_tests(log_offset)
+
+    if not result.finished:
+        print(f"Error: {result.summary}", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"\nTest results: {result.summary}")
+
+    if result.success:
+        print("All tests passed.")
+    else:
+        print("\nFailures:")
+        for failure in result.failures:
+            print(f"  {failure}")
+        sys.exit(1)
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser with all subcommands."""
     parser = argparse.ArgumentParser(
@@ -247,6 +378,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     subparsers.add_parser("play", help="Toggle play mode")
+
+    subparsers.add_parser(
+        "test", help="Refresh then run all Edit Mode tests"
+    )
 
     return parser
 
@@ -275,35 +410,14 @@ def main() -> None:
         ensure_hammerspoon()
 
         if args.command == "refresh":
-            log_offset = get_log_size()
-            result_msg = send_refresh()
-            print(result_msg)
-
-            print("Waiting for asset refresh to complete...")
-            result = wait_for_refresh(log_offset)
-
-            if not result.finished:
-                print(f"Error: {result.summary}", file=sys.stderr)
-                sys.exit(1)
-
-            if result.success:
-                if result.summary:
-                    print(f"  {result.summary}")
-                print("Asset refresh finished.")
-            else:
-                print("\nCompilation errors:")
-                for err in result.errors:
-                    print(f"  {err}")
-                print("Asset refresh finished with errors.")
-                sys.exit(1)
-
-            if args.play:
-                play_result = toggle_play_mode()
-                print(play_result)
+            do_refresh(play=args.play)
 
         elif args.command == "play":
             result_msg = toggle_play_mode()
             print(result_msg)
+
+        elif args.command == "test":
+            do_test()
 
     except UnityError as e:
         print(f"Error: {e}", file=sys.stderr)
