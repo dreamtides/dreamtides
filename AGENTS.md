@@ -1,96 +1,99 @@
-Dreamtides is a roguelike deckbuilding game with a Rust rules engine
-(`rules_engine/`) and Unity C# frontend (`client/`). Two major systems: battles
-(card combat) and quest mode (overworld/map progression).
+Please follow all of the "code style" and "validating changes" rules below at all times.
 
-## Architecture
+Please use `just` commands instead of `cargo`, e.g. `just fmt`, `just check`,
+`just-clippy`, `just-test`, `just parser-test`
 
-Each major system (battles, quests) has its own state/queries/mutations crate
-layers. `core_data` and `rules_engine` (facade) are shared.
 
-**Flow:** game actions → mutate game state → return commands (full UI state
-snapshots).
+# CODE STYLE
 
-Card data in TOML files; do NOT read `cards.toml` directly (too large — grep
-for specific cards by name). Test cards in `test-cards.toml`, dreamwell in
-`dreamwell.toml`. Generated files (`parsed_abilities.json`, `test_card.rs`)
-come from `just tabula-generate`; regenerate after any TOML change.
 
-## Rust Style
+- Prefer writing code inline (when possible) to creating new variables via "let" statements
+- Add a short doc comment to top-level public functions, fields, and types. Don't add inline comments.
+- DO NOT fully-qualify names in code ever
+- Function calls and enum values have exactly one qualifier, struct names and enum types have
+  zero qualifiers:
+  - WRONG FUNCTION CALL: crate::zone_mutations::move_card::to_destination_zone()
+  - WRONG FUNCTION CALL: to_destination_zone()
+  - WRONG ENUM VALUE: battle_state::battle_cards::zone::Zone::Battlefield
+  - WRONG STRUCT NAME: battle_state::BattleState
+  - CORRECT ENUM VALUE: Zone::Battlefield
+  - CORRECT FUNCTION CALL: move_card::to_destination_zone()
+  - CORRECT STRUCT NAME: BattleState
+- Public functions and types go at the TOP of the file, then private ones.
+- Don't add "pub use" for anything.
+- Keep Cargo.toml dependencies alphabetized in two lists, internal then external dependencies.
+- Use modern Rust features such as let-else statements and "{inline:?}" variable formatting
+- Do not add code to `mod.rs` or `lib.rs` files except for module declarations
+- Do not add `use` declarations within function bodies, only place them at the top of files
+- Qualify imports via `crate::`, not via `super::`
+- Do not write inline `mod tests {` tests, place them in the `/tests/` directory
+- Do not write code only used by tests. Test against real public API.
 
-**Naming qualification — the #1 agent error:**
-- Function calls: exactly ONE qualifier
-- Struct/enum type names: ZERO qualifiers
-- Enum values: ONE qualifier
-- WRONG: `crate::zone_mutations::move_card::to_destination_zone()`
-- WRONG: `to_destination_zone()`
-- WRONG: `battle_state::BattleState`
-- CORRECT: `move_card::to_destination_zone()`
-- CORRECT: `BattleState`
-- CORRECT: `Zone::Battlefield`
 
-**Imports:** `crate::` not `super::`. All `use` at file top, never inside
-function bodies. No `pub use`. Never import functions directly
-(`use module::my_fn;` is wrong — call as `module::my_fn()` instead). Only
-module declarations in `mod.rs`/`lib.rs`.
+# VALIDATING CHANGES
 
-**File item order:** private consts/statics, thread_local, public type aliases,
-public constants, public traits, public structs/enums, public functions, then
-all remaining private items.
 
-**General:**
-- Prefer inline expressions over `let` bindings
-- Short doc comments on public items only; no inline comments
-- Cargo.toml deps alphabetized: internal first, then external
-- chumsky `select!` triggers unnested_or_patterns; use `#[expect()]` not
-  `#[allow()]`
+- After completing work, please always run "just fmt" to apply rustfmt
+  formatting rules
+- Run `just check` to type check code
+- Run `just clippy` to check for lint warnings
+- After writing a test, use `just battle-test <TEST NAME>` to run it
+- After completing work, please ALWAYS run `just review` to validate changes
+- Do not print a summary of changes after completing work.
+- Prefer the `just` commands over `cargo` commands since they have project-specific rules
 
-## Testing
 
-Tests live in `rules_engine/tests/` as integration tests. NEVER write inline
-`mod tests {}`. No test-only production code — test against the real public API.
-Run one test with e.g. `just battle-test <NAME>`.
+# PROJECT CONTEXT
 
-## Build Commands (always `just`, never raw `cargo`)
 
-- `just fmt` — format (style_validator --fix + rustfmt). Run first to auto-fix
-  most style violations before attempting manual fixes.
-- `just check` — type check
-- `just clippy` — lint
-- `just review` — full gate (~5 min, keep polling, don't restart)
-- `just tabula-generate` — regenerate from TOML
-- `just schema` — regenerate C# types from Rust
-- Abu Python tests: `cd scripts/abu && python3 -m unittest test_abu -v`
-  (`pytest` is not installed; module name not file path; cwd must be `scripts/abu/`)
+This project is an implementation of a rules engine for the 'Dreamtides'
+card game. Dreamtides is a game similar to TCGs like 'Magic: the Gathering'.
+Players put 'character' cards into play and use one-time 'event' cards to affect
+the game. Cards are played using a resource called 'energy'. Characters have a
+value called 'spark' that lets them generate victory 'points'. Playing a character
+is called 'materializing' it and destroying it is called 'dissolving' it.
+Dissolved characters and played events go the discard pile, which is called the
+'void'. Playing one game or match of Dreamtides is known as a 'battle'.
 
-## C# Code Navigation
+A few relevant keywords:
 
-Scope C# globs to `client/Assets/`, not `client/`. Unity's `client/Library/`
-contains package caches that balloon glob results with unrelated package files.
+- Reclaim: Play from void (discard pile)
+- Kindle: Add spark to your leftmost character
+- Foresee: Look at top N of deck and reorder or put in void
+- Prevent: Stop a card from resolving (counterspell)
 
-## Acceptance Checklist
 
-After every task:
-1. Follow logging conventions (`battle_trace!`)
-2. `just fmt` then `just review` (allow ~5 min)
-3. *Always* commit with detailed description. Do not print a summary of changes.
+# ADDITIONAL DOCUMENTATION
 
-## Documentation
 
-Full index: `docs/index.md`. Top 5 docs are:
-- `docs/project_overview/project_overview.md` — architecture, crates, systems
-- `docs/effect_resolution/effect_resolution.md` — effects, triggers, prompts
-- `docs/parser_pipeline/parser_pipeline.md` — adding/modifying card abilities
-- `docs/testing_cookbook/testing_cookbook.md` — writing integration tests
-- `docs/style_code_ordering/style_code_ordering.md` — code style rules, lint fixes
+More task-specification documentation is available:
 
-## Vocabulary
+- Development environment setup: `rules_engine/docs/environment_setup.md`
+- Adding new battle effects: `rules_engine/docs/adding_new_effects.md`
+- Adding new trigger conditions: `rules_engine/docs/adding_new_triggers.md`
+- Running benchmarks: `rules_engine/docs/benchmarks.md`
 
-Materialize: play a character.
-Energy: resource to play cards.
-Spark: character stat that earns victory points.
-Dissolve: destroy a card.
-Void: discard pile.
-Reclaim: play from void.
-Kindle: add spark to leftmost character.
-Foresee N: look at top N of deck, reorder/void.
-Prevent: counter a card.
+
+# CODE STRUCTURE
+
+
+The code is structured as a series of Rust crates using the cargo "workspace" feature.
+
+Dreamtides:
+  - `justfile`
+  - `rules_engine/`
+    - 'Cargo.toml`
+  - `client/
+
+Rules engine Rust source code lives in the `rules_engine/` directory.
+Client source code lives in the `client/` directory.
+
+Card data lives in `rules_engine/tabula/cards.toml`. Do NOT read this file directly, it is much too large.
+
+
+# TASKS
+
+
+When ending a session or when you discover work outside of the scope of the current session,
+please track it via the `TaskCreate` tool. When asked to work on a task, please use TaskUpdate
+to mark it as in progress, then mark it as completed when you finish.
