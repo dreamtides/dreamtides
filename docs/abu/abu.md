@@ -31,6 +31,7 @@ python3 scripts/abu/abu.py refresh --play         # refresh then enter play mode
 python3 scripts/abu/abu.py play                   # toggle play mode
 python3 scripts/abu/abu.py test                   # refresh then run all Edit Mode tests
 python3 scripts/abu/abu.py cycle                  # exit play → refresh → enter play
+python3 scripts/abu/abu.py restart                # kill and relaunch Unity, restore scene
 
 # In-game commands (require Unity in Play mode)
 python3 scripts/abu/abu.py snapshot              # ARIA-style scene tree
@@ -128,7 +129,8 @@ dependencies). Key functions:
 - `send_menu_item(path)` — drive Unity menu bar via Hammerspoon
 - `wait_for_refresh(log_offset)` — poll Editor log for refresh completion
 - `wait_for_tests(log_offset)` — poll Editor log for test run completion
-- `do_refresh()`, `do_test()`, `do_cycle()` — high-level editor workflows
+- `find_unity_process()` — discover running Unity via `ps`
+- `do_refresh()`, `do_test()`, `do_cycle()`, `do_restart()` — high-level editor workflows
 - `main()` — entry point; dispatches editor or TCP commands
 
 Error handling uses an `AbuError` hierarchy (`ConnectionError`, `TimeoutError`,

@@ -22,11 +22,13 @@ from abu import (
     RefreshResult,
     RefreshTimeoutError,
     UnityNotFoundError,
+    UnityProcessInfo,
     _report_result,
     build_command,
     build_params,
     build_parser,
     do_status,
+    find_unity_process,
     handle_response,
     is_pid_alive,
     is_worktree,
@@ -719,6 +721,143 @@ class TestDoStatus(unittest.TestCase):
         self.assertIn("State file:    stale", output)
         self.assertIn("99999 (not running)", output)
         self.assertIn("unreachable", output)
+
+
+class TestBuildParserRestart(unittest.TestCase):
+    """Test argparse recognizes the restart subcommand."""
+
+    def test_restart_command(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["restart"])
+        self.assertEqual(args.command, "restart")
+
+
+class TestFindUnityProcess(unittest.TestCase):
+    """Test Unity process discovery."""
+
+    @patch("abu.subprocess.run")
+    def test_finds_unity_process(self, mock_run: MagicMock) -> None:
+        ps_list = subprocess.CompletedProcess(
+            args=[], returncode=0,
+            stdout=(
+                "  PID COMM\n"
+                "  123 /Applications/Unity/Hub/Editor/6000.1.3f1"
+                "/Unity.app/Contents/MacOS/Unity\n"
+            ),
+            stderr="",
+        )
+        ps_args = subprocess.CompletedProcess(
+            args=[], returncode=0,
+            stdout=(
+                "/Applications/Unity/Hub/Editor/6000.1.3f1"
+                "/Unity.app/Contents/MacOS/Unity"
+                " -projectPath /Users/me/project/client\n"
+            ),
+            stderr="",
+        )
+        mock_run.side_effect = [ps_list, ps_args]
+        info = find_unity_process()
+        self.assertEqual(info.pid, 123)
+        self.assertIn("Unity.app/Contents/MacOS/Unity", info.executable)
+        self.assertEqual(info.project_path, "/Users/me/project/client")
+
+    @patch("abu.subprocess.run")
+    def test_finds_unity_with_lowercase_projectpath(self, mock_run: MagicMock) -> None:
+        ps_list = subprocess.CompletedProcess(
+            args=[], returncode=0,
+            stdout=(
+                "  PID COMM\n"
+                "  123 /Applications/Unity/Hub/Editor/6000.2.2f1"
+                "/Unity.app/Contents/MacOS/Unity\n"
+            ),
+            stderr="",
+        )
+        ps_args = subprocess.CompletedProcess(
+            args=[], returncode=0,
+            stdout=(
+                "/Applications/Unity/Hub/Editor/6000.2.2f1"
+                "/Unity.app/Contents/MacOS/Unity"
+                " -projectpath /Users/me/project/client\n"
+            ),
+            stderr="",
+        )
+        mock_run.side_effect = [ps_list, ps_args]
+        info = find_unity_process()
+        self.assertEqual(info.project_path, "/Users/me/project/client")
+
+    @patch("abu.subprocess.run")
+    def test_skips_batch_mode_workers(self, mock_run: MagicMock) -> None:
+        ps_list = subprocess.CompletedProcess(
+            args=[], returncode=0,
+            stdout=(
+                "  PID COMM\n"
+                "  100 /Applications/Unity/Hub/Editor/6000.2.2f1"
+                "/Unity.app/Contents/MacOS/Unity\n"
+                "  200 /Applications/Unity/Hub/Editor/6000.2.2f1"
+                "/Unity.app/Contents/MacOS/Unity\n"
+            ),
+            stderr="",
+        )
+        # First candidate is a batchMode worker
+        ps_args_worker = subprocess.CompletedProcess(
+            args=[], returncode=0,
+            stdout=(
+                "/Applications/Unity/Hub/Editor/6000.2.2f1"
+                "/Unity.app/Contents/MacOS/Unity"
+                " -batchMode -name AssetImportWorker0"
+                " -projectPath /Users/me/project/client\n"
+            ),
+            stderr="",
+        )
+        # Second candidate is the main editor
+        ps_args_main = subprocess.CompletedProcess(
+            args=[], returncode=0,
+            stdout=(
+                "/Applications/Unity/Hub/Editor/6000.2.2f1"
+                "/Unity.app/Contents/MacOS/Unity"
+                " -projectpath /Users/me/project/client\n"
+            ),
+            stderr="",
+        )
+        mock_run.side_effect = [ps_list, ps_args_worker, ps_args_main]
+        info = find_unity_process()
+        self.assertEqual(info.pid, 200)
+
+    @patch("abu.subprocess.run")
+    def test_raises_when_no_unity(self, mock_run: MagicMock) -> None:
+        ps_list = subprocess.CompletedProcess(
+            args=[], returncode=0,
+            stdout="  PID COMM\n  456 /usr/bin/python3\n",
+            stderr="",
+        )
+        mock_run.return_value = ps_list
+        with self.assertRaises(UnityNotFoundError):
+            find_unity_process()
+
+    @patch("abu.CLIENT_DIR", "/fallback/client")
+    @patch("abu.subprocess.run")
+    def test_falls_back_to_client_dir(self, mock_run: MagicMock) -> None:
+        ps_list = subprocess.CompletedProcess(
+            args=[], returncode=0,
+            stdout=(
+                "  PID COMM\n"
+                "  789 /Applications/Unity/Hub/Editor/6000.1.3f1"
+                "/Unity.app/Contents/MacOS/Unity\n"
+            ),
+            stderr="",
+        )
+        ps_args = subprocess.CompletedProcess(
+            args=[], returncode=0,
+            stdout=(
+                "/Applications/Unity/Hub/Editor/6000.1.3f1"
+                "/Unity.app/Contents/MacOS/Unity\n"
+            ),
+            stderr="",
+        )
+        mock_run.side_effect = [ps_list, ps_args]
+        info = find_unity_process()
+        self.assertEqual(info.pid, 789)
+        self.assertEqual(info.project_path, "/fallback/client")
 
 
 if __name__ == "__main__":

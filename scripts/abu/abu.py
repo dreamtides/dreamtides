@@ -18,6 +18,7 @@ import json
 import os
 import re
 import shutil
+import signal
 import socket
 import subprocess
 import sys
@@ -39,6 +40,9 @@ TEST_TIMEOUT_SECONDS = 300
 POLL_INTERVAL = 0.3
 ABU_PORT = 9999
 ABU_STATE_FILE = Path(__file__).resolve().parent.parent.parent / ".abu-state.json"
+RESTART_TIMEOUT_SECONDS = 180
+UNITY_EXECUTABLE_PATTERN = "/Unity.app/Contents/MacOS/Unity"
+CLIENT_DIR = Path(__file__).resolve().parent.parent.parent / "client"
 
 
 class AbuError(Exception):
@@ -649,6 +653,168 @@ def do_status() -> None:
     print(f"  TCP (:{ABU_PORT}):   {'reachable' if tcp_up else 'unreachable'}")
 
 
+@dataclass(frozen=True)
+class UnityProcessInfo:
+    """Information about a running Unity Editor process."""
+
+    pid: int
+    executable: str
+    project_path: str
+
+
+def find_unity_process() -> UnityProcessInfo:
+    """Find the main Unity Editor process via ps.
+
+    Searches for processes whose command matches the Unity executable
+    pattern, then filters out batch-mode workers (AssetImportWorker
+    subprocesses). Extracts the executable path and project path from
+    the full command-line arguments. Raises UnityNotFoundError if no
+    Unity editor process is found.
+    """
+    try:
+        result = subprocess.run(
+            ["ps", "-eo", "pid,comm"],
+            capture_output=True, text=True, check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        raise AbuError(f"Failed to list processes: {e}")
+
+    candidates: list[tuple[int, str]] = []
+    for line in result.stdout.splitlines():
+        line = line.strip()
+        parts = line.split(None, 1)
+        if len(parts) == 2 and UNITY_EXECUTABLE_PATTERN in parts[1]:
+            try:
+                candidates.append((int(parts[0]), parts[1].strip()))
+            except ValueError:
+                continue
+
+    if not candidates:
+        raise UnityNotFoundError(
+            "No running Unity Editor process found. "
+            "Is Unity open?"
+        )
+
+    # Find the main editor process (not a -batchMode worker)
+    for pid, executable in candidates:
+        try:
+            args_result = subprocess.run(
+                ["ps", "-p", str(pid), "-o", "args="],
+                capture_output=True, text=True, check=True,
+            )
+        except subprocess.CalledProcessError:
+            continue
+
+        args_line = args_result.stdout.strip()
+        if "-batchMode" in args_line:
+            continue
+
+        project_path = str(CLIENT_DIR)
+        match = re.search(r"-projectPath\s+(\S+)", args_line, re.IGNORECASE)
+        if match:
+            project_path = match.group(1)
+
+        return UnityProcessInfo(
+            pid=pid, executable=executable, project_path=project_path,
+        )
+
+    # All candidates were batch-mode workers; use the first one as fallback
+    pid, executable = candidates[0]
+    return UnityProcessInfo(
+        pid=pid, executable=executable, project_path=str(CLIENT_DIR),
+    )
+
+
+def do_restart() -> None:
+    """Kill the running Unity Editor and relaunch it with the same project."""
+    print("Finding Unity Editor process...")
+    info = find_unity_process()
+    print(f"  Found Unity (PID {info.pid}): {info.executable}")
+    print(f"  Project path: {info.project_path}")
+
+    # Read current scene from state file
+    state = read_state_file()
+    active_scene = state.get("activeScene", "") if state else ""
+
+    # Write restart marker file
+    marker_path = Path(info.project_path) / ".abu-restart.json"
+    if active_scene:
+        marker = json.dumps({"scene": active_scene})
+        marker_path.write_text(marker)
+        print(f"  Scene to restore: {active_scene}")
+
+    # Kill Unity with SIGKILL (works even when frozen)
+    print(f"Killing Unity (PID {info.pid})...")
+    os.kill(info.pid, signal.SIGKILL)
+
+    # Wait for process death
+    deadline = time.monotonic() + 10
+    while time.monotonic() < deadline and is_pid_alive(info.pid):
+        time.sleep(0.2)
+
+    if is_pid_alive(info.pid):
+        print("Warning: Unity process did not exit within 10 seconds", file=sys.stderr)
+
+    print("Unity process terminated.")
+
+    # Clean up crash artifacts to prevent the "recovering scene backups"
+    # dialog from blocking startup.
+    temp_dir = Path(info.project_path) / "Temp"
+    for name in ("__Backupscenes", "BackupScenes"):
+        backup_dir = temp_dir / name
+        if backup_dir.is_dir():
+            shutil.rmtree(backup_dir, ignore_errors=True)
+            print(f"  Cleaned up {name}")
+
+    # Relaunch Unity via 'open' for proper macOS app activation.
+    # Extract the .app bundle path from the executable path.
+    app_idx = info.executable.find(".app/")
+    app_path = info.executable[:app_idx + 4] if app_idx >= 0 else info.executable
+    print(f"Relaunching Unity ({app_path})...")
+    subprocess.Popen(
+        ["open", "-n", "-a", app_path, "--args",
+         "-projectPath", info.project_path],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+    # Poll Editor.log for [AbuRestart] Ready (domain reload + initial
+    # compilation done), then wait for log stability to ensure asset
+    # import workers and background tasks finish. Unity truncates
+    # Editor.log on startup, so scan from offset 0.
+    print("Waiting for Unity Editor to be ready...")
+    start = time.monotonic()
+    saw_marker = False
+    last_log_size = 0
+    stable_since: float | None = None
+    log_stable_seconds = 10.0
+
+    while time.monotonic() - start < RESTART_TIMEOUT_SECONDS:
+        if not saw_marker:
+            content = read_new_log(0)
+            if "[AbuRestart] Ready" in content:
+                saw_marker = True
+                last_log_size = get_log_size()
+                stable_since = time.monotonic()
+                print("  Domain reload complete, waiting for editor to settle...")
+        else:
+            current_size = get_log_size()
+            if current_size != last_log_size:
+                last_log_size = current_size
+                stable_since = time.monotonic()
+            elif stable_since and time.monotonic() - stable_since >= log_stable_seconds:
+                print("Unity Editor is ready.")
+                return
+
+        time.sleep(POLL_INTERVAL)
+
+    print(
+        f"Warning: Timed out after {RESTART_TIMEOUT_SECONDS}s waiting for "
+        "Unity to signal readiness. Unity may still be starting up.",
+        file=sys.stderr,
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser with all subcommands."""
     parser = argparse.ArgumentParser(
@@ -722,6 +888,11 @@ def build_parser() -> argparse.ArgumentParser:
         "status", help="Show Unity Editor state from abu state file and TCP probe"
     )
 
+    # restart
+    subparsers.add_parser(
+        "restart", help="Kill and relaunch Unity Editor, restoring the active scene"
+    )
+
     return parser
 
 
@@ -735,7 +906,7 @@ def main() -> None:
         do_status()
         return
 
-    editor_commands = {"refresh", "play", "test", "cycle"}
+    editor_commands = {"refresh", "play", "test", "cycle", "restart"}
 
     if command in editor_commands:
         if is_worktree():
@@ -765,6 +936,8 @@ def main() -> None:
                 do_test()
             elif command == "cycle":
                 do_cycle()
+            elif command == "restart":
+                do_restart()
 
         except AbuError as e:
             print(f"Error: {e}", file=sys.stderr)
