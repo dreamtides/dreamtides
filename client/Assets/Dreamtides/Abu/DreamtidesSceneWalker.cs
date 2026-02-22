@@ -216,6 +216,13 @@ namespace Dreamtides.Abu
         }
       }
 
+      // Card Order Selector (shown when active)
+      var cardOrderGroup = WalkCardOrderSelector(layout, refRegistry);
+      if (cardOrderGroup != null)
+      {
+        region.Children.Add(cardOrderGroup);
+      }
+
       // 10. UI overlays (filtered, only when content exists)
       var uiOverlay = WalkUiToolkitFiltered(refRegistry);
       if (uiOverlay != null)
@@ -699,6 +706,180 @@ namespace Dreamtides.Abu
           parent.Children.Add(cardNode);
         }
       }
+    }
+
+    // ── Card Order Selector ────────────────────────────────────────────
+
+    AbuSceneNode? WalkCardOrderSelector(BattleLayout layout, RefRegistry refRegistry)
+    {
+      var selector = layout.CardOrderSelector;
+      if (!selector.IsOpen)
+      {
+        return null;
+      }
+
+      var group = new AbuSceneNode
+      {
+        Role = "group",
+        Label = "Card Order Selector",
+        Interactive = false,
+      };
+
+      // Build target ref lookup so card OnDrag can map target refs to actions
+      var targetRefToPosition = new Dictionary<string, CardOrderSelectionTarget>();
+
+      // Deck position targets: 0..N for N cards currently in deck
+      var deckCount = selector.Objects.Count;
+      for (var i = 0; i <= deckCount; i++)
+      {
+        var position = i;
+        var targetNode = new AbuSceneNode
+        {
+          Role = "target",
+          Label = $"Deck Position {i + 1}",
+          Interactive = true,
+        };
+        var targetRef = refRegistry.Register(new RefCallbacks());
+        targetRefToPosition[targetRef] = new CardOrderSelectionTarget
+        {
+          CardOrderSelectionTargetClass = new CardOrderSelectionTargetClass { Deck = position },
+        };
+        group.Children.Add(targetNode);
+      }
+
+      // Void target
+      if (selector.View?.IncludeVoid == true)
+      {
+        var voidNode = new AbuSceneNode
+        {
+          Role = "target",
+          Label = "Void",
+          Interactive = true,
+        };
+        var voidRef = refRegistry.Register(new RefCallbacks());
+        targetRefToPosition[voidRef] = new CardOrderSelectionTarget
+        {
+          Enum = CardOrderSelectionTargetEnum.Void,
+        };
+        group.Children.Add(voidNode);
+      }
+
+      // Walk deck cards
+      var deckGroup = new AbuSceneNode
+      {
+        Role = "group",
+        Label = $"Deck ({deckCount} cards)",
+        Interactive = false,
+      };
+      for (var i = 0; i < selector.Objects.Count; i++)
+      {
+        var cardNode = BuildOrderSelectorCardNode(
+          selector.Objects[i], $"deck position {i + 1}", targetRefToPosition, refRegistry
+        );
+        if (cardNode != null)
+        {
+          deckGroup.Children.Add(cardNode);
+        }
+      }
+      if (deckGroup.Children.Count > 0)
+      {
+        group.Children.Add(deckGroup);
+      }
+
+      // Walk void cards
+      var voidObjects = layout.CardOrderSelectorVoid.Objects;
+      if (voidObjects.Count > 0)
+      {
+        var voidGroup = new AbuSceneNode
+        {
+          Role = "group",
+          Label = $"Void ({voidObjects.Count} cards)",
+          Interactive = false,
+        };
+        foreach (var obj in voidObjects)
+        {
+          var cardNode = BuildOrderSelectorCardNode(
+            obj, "void", targetRefToPosition, refRegistry
+          );
+          if (cardNode != null)
+          {
+            voidGroup.Children.Add(cardNode);
+          }
+        }
+        if (voidGroup.Children.Count > 0)
+        {
+          group.Children.Add(voidGroup);
+        }
+      }
+
+      return group.Children.Count > 0 ? group : null;
+    }
+
+    AbuSceneNode? BuildOrderSelectorCardNode(
+      Displayable displayable,
+      string locationLabel,
+      Dictionary<string, CardOrderSelectionTarget> targetRefToPosition,
+      RefRegistry refRegistry
+    )
+    {
+      if (displayable is not Card card)
+      {
+        return null;
+      }
+
+      var revealed = card.CardView.Revealed;
+      if (revealed == null)
+      {
+        return null;
+      }
+
+      var cardId = revealed.Actions.CanSelectOrder;
+      if (cardId == null)
+      {
+        return null;
+      }
+
+      var name = StripRichText(revealed.Name)?.Replace("\n", ", ") ?? "Unknown";
+      var cardType = StripRichText(revealed.CardType);
+      var label = !string.IsNullOrEmpty(cardType)
+        ? $"{name}, {cardType} (at {locationLabel})"
+        : $"{name} (at {locationLabel})";
+
+      var node = new AbuSceneNode
+      {
+        Role = "button",
+        Label = label,
+        Interactive = true,
+      };
+
+      var callbacks = BuildDisplayableCallbacks(card);
+      var capturedCardId = cardId.Value;
+      callbacks.OnDrag = targetRef =>
+      {
+        if (targetRef != null && targetRefToPosition.TryGetValue(targetRef, out var target))
+        {
+          var action = new GameAction
+          {
+            GameActionClass = new()
+            {
+              BattleAction = new()
+              {
+                BattleActionClass = new()
+                {
+                  SelectOrderForDeckCard = new DeckCardSelectedOrder
+                  {
+                    CardId = capturedCardId,
+                    Target = target,
+                  },
+                },
+              },
+            },
+          };
+          _registry.ActionService.PerformAction(action);
+        }
+      };
+      refRegistry.Register(callbacks);
+      return node;
     }
 
     // ── Object layout group helper ────────────────────────────────────
