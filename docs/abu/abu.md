@@ -130,7 +130,8 @@ dependencies). Key functions:
 - `wait_for_refresh(log_offset)` — poll Editor log for refresh completion
 - `wait_for_tests(log_offset)` — poll Editor log for test run completion
 - `find_unity_process()` — discover running Unity via `ps`
-- `do_refresh()`, `do_test()`, `do_cycle()`, `do_restart()` — high-level editor workflows
+- `do_refresh()`, `do_test()`, `do_cycle()`, `do_restart()` — high-level editor
+  workflows
 - `main()` — entry point; dispatches editor or TCP commands
 
 Error handling uses an `AbuError` hierarchy (`ConnectionError`, `TimeoutError`,

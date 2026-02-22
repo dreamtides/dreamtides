@@ -610,11 +610,7 @@ namespace Dreamtides.Tests.Abu
         Name = "Minstrel of Falling Light\n<size=75%>Musician</size>",
         CardType = "Character",
         Cost = "2",
-        Actions = new CardActions
-        {
-          CanPlay = GameActionEnum.NoOp,
-          OnClick = GameActionEnum.NoOp,
-        },
+        Actions = new CardActions { CanPlay = GameActionEnum.NoOp, OnClick = GameActionEnum.NoOp },
       };
       card.GameContext = GameContext.Hand;
       Registry.BattleLayout.UserHand.Add(card);

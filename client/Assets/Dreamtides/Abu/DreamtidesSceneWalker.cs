@@ -291,12 +291,7 @@ namespace Dreamtides.Abu
         Label = "Close Browser",
         Interactive = true,
       };
-      refRegistry.Register(
-        new RefCallbacks
-        {
-          OnClick = () => button.OnClick(),
-        }
-      );
+      refRegistry.Register(new RefCallbacks { OnClick = () => button.OnClick() });
       parent.Children.Add(node);
     }
 
@@ -554,7 +549,8 @@ namespace Dreamtides.Abu
         return null;
       }
 
-      var canPlay = zoneContext == "Hand"
+      var canPlay =
+        zoneContext == "Hand"
         && revealed.Actions.CanPlay is { } cp
         && !cp.IsNull
         && _registry.CapabilitiesService.CanPlayCards();
@@ -774,7 +770,10 @@ namespace Dreamtides.Abu
       for (var i = 0; i < selector.Objects.Count; i++)
       {
         var cardNode = BuildOrderSelectorCardNode(
-          selector.Objects[i], $"deck position {i + 1}", targetRefToPosition, refRegistry
+          selector.Objects[i],
+          $"deck position {i + 1}",
+          targetRefToPosition,
+          refRegistry
         );
         if (cardNode != null)
         {
@@ -798,9 +797,7 @@ namespace Dreamtides.Abu
         };
         foreach (var obj in voidObjects)
         {
-          var cardNode = BuildOrderSelectorCardNode(
-            obj, "void", targetRefToPosition, refRegistry
-          );
+          var cardNode = BuildOrderSelectorCardNode(obj, "void", targetRefToPosition, refRegistry);
           if (cardNode != null)
           {
             voidGroup.Children.Add(cardNode);
@@ -1078,7 +1075,8 @@ namespace Dreamtides.Abu
       string? raw = element switch
       {
         NodeLabel label when !string.IsNullOrEmpty(label.text) => label.text,
-        NodeTypewriterText typewriter when !string.IsNullOrEmpty(typewriter.text) => typewriter.text,
+        NodeTypewriterText typewriter when !string.IsNullOrEmpty(typewriter.text) =>
+          typewriter.text,
         NodeTextField textField when !string.IsNullOrEmpty(textField.value) => textField.value,
         NodeSlider slider when !string.IsNullOrEmpty(slider.label) => slider.label,
         _ => !string.IsNullOrEmpty(element.name) ? element.name : null,

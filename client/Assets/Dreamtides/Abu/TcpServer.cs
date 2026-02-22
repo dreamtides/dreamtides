@@ -150,7 +150,13 @@ namespace Abu
 
       try
       {
-        using var reader = new StreamReader(client.GetStream(), System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: 1024, leaveOpen: true);
+        using var reader = new StreamReader(
+          client.GetStream(),
+          System.Text.Encoding.UTF8,
+          detectEncodingFromByteOrderMarks: true,
+          bufferSize: 1024,
+          leaveOpen: true
+        );
 
         while (!token.IsCancellationRequested && client.Connected)
         {

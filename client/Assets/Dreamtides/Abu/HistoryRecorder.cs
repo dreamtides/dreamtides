@@ -128,9 +128,10 @@ namespace Dreamtides.Abu
       {
         var zone = ClassifyZone(cardView.Position.Position);
         var player = GetPlayer(cardView.Position.Position);
-        var name = cardView.Revealed != null
-          ? DreamtidesSceneWalker.StripRichText(cardView.Revealed.Name)
-          : null;
+        var name =
+          cardView.Revealed != null
+            ? DreamtidesSceneWalker.StripRichText(cardView.Revealed.Name)
+            : null;
 
         newPositions[cardView.Id] = new TrackedCard
         {
@@ -141,7 +142,15 @@ namespace Dreamtides.Abu
 
         if (_cardPositions.TryGetValue(cardView.Id, out var old) && old.Zone != zone)
         {
-          var entry = BuildTransitionEntry(old, new TrackedCard { Zone = zone, Player = player, Name = name });
+          var entry = BuildTransitionEntry(
+            old,
+            new TrackedCard
+            {
+              Zone = zone,
+              Player = player,
+              Name = name,
+            }
+          );
           if (entry != null)
           {
             _entries.Add(entry);
@@ -296,17 +305,28 @@ namespace Dreamtides.Abu
       if (position.PositionClass != null)
       {
         var pc = position.PositionClass;
-        if (pc.OnStack != null) return "stack";
-        if (pc.InHand != null) return "hand";
-        if (pc.InDeck != null) return "deck";
-        if (pc.InVoid != null) return "void";
-        if (pc.InBanished != null) return "banished";
-        if (pc.OnBattlefield != null) return "battlefield";
-        if (pc.InDreamwell != null) return "dreamwell";
-        if (pc.InPlayerStatus != null) return "player-status";
-        if (pc.CardOrderSelector != null) return "card-order-selector";
-        if (pc.HiddenWithinCard != null) return "hidden-within-card";
-        if (pc.AboveVoid != null) return "above-void";
+        if (pc.OnStack != null)
+          return "stack";
+        if (pc.InHand != null)
+          return "hand";
+        if (pc.InDeck != null)
+          return "deck";
+        if (pc.InVoid != null)
+          return "void";
+        if (pc.InBanished != null)
+          return "banished";
+        if (pc.OnBattlefield != null)
+          return "battlefield";
+        if (pc.InDreamwell != null)
+          return "dreamwell";
+        if (pc.InPlayerStatus != null)
+          return "player-status";
+        if (pc.CardOrderSelector != null)
+          return "card-order-selector";
+        if (pc.HiddenWithinCard != null)
+          return "hidden-within-card";
+        if (pc.AboveVoid != null)
+          return "above-void";
       }
 
       return "unknown";
@@ -320,22 +340,39 @@ namespace Dreamtides.Abu
       }
 
       var pc = position.PositionClass;
-      if (pc.InHand != null) return pc.InHand;
-      if (pc.InDeck != null) return pc.InDeck;
-      if (pc.InVoid != null) return pc.InVoid;
-      if (pc.InBanished != null) return pc.InBanished;
-      if (pc.OnBattlefield != null) return pc.OnBattlefield;
-      if (pc.InDreamwell != null) return pc.InDreamwell;
-      if (pc.InPlayerStatus != null) return pc.InPlayerStatus;
-      if (pc.AboveVoid != null) return pc.AboveVoid;
+      if (pc.InHand != null)
+        return pc.InHand;
+      if (pc.InDeck != null)
+        return pc.InDeck;
+      if (pc.InVoid != null)
+        return pc.InVoid;
+      if (pc.InBanished != null)
+        return pc.InBanished;
+      if (pc.OnBattlefield != null)
+        return pc.OnBattlefield;
+      if (pc.InDreamwell != null)
+        return pc.InDreamwell;
+      if (pc.InPlayerStatus != null)
+        return pc.InPlayerStatus;
+      if (pc.AboveVoid != null)
+        return pc.AboveVoid;
       return null;
     }
 
     static bool IsInternalZone(string zone)
     {
-      return zone is "offscreen" or "default" or "on-screen-storage" or "browser"
-        or "internal" or "unknown" or "player-status" or "card-order-selector"
-        or "hidden-within-card" or "game-modifier" or "above-void";
+      return zone
+        is "offscreen"
+          or "default"
+          or "on-screen-storage"
+          or "browser"
+          or "internal"
+          or "unknown"
+          or "player-status"
+          or "card-order-selector"
+          or "hidden-within-card"
+          or "game-modifier"
+          or "above-void";
     }
   }
 }

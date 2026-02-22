@@ -115,7 +115,14 @@ namespace Dreamtides.Tests.Abu
       var callbacks = element.Callbacks.Value;
       var clickFired = false;
 
-      callbacks.SetCallback(element, Callbacks.Event.Click, () => { clickFired = true; });
+      callbacks.SetCallback(
+        element,
+        Callbacks.Event.Click,
+        () =>
+        {
+          clickFired = true;
+        }
+      );
 
       // Simulate a click by calling OnClick directly with a pooled ClickEvent.
       using var clickEvent = ClickEvent.GetPooled();
@@ -153,12 +160,18 @@ namespace Dreamtides.Tests.Abu
       callbacks.SetCallback(
         element,
         Callbacks.Event.MouseEnter,
-        () => { enterFired = true; }
+        () =>
+        {
+          enterFired = true;
+        }
       );
       callbacks.SetCallback(
         element,
         Callbacks.Event.MouseLeave,
-        () => { leaveFired = true; }
+        () =>
+        {
+          leaveFired = true;
+        }
       );
 
       // Simulate hover enter
@@ -169,10 +182,7 @@ namespace Dreamtides.Tests.Abu
         enterFired,
         "MouseEnter callback should have been invoked via direct OnMouseEnter call"
       );
-      Assert.IsFalse(
-        leaveFired,
-        "MouseLeave callback should not have fired yet"
-      );
+      Assert.IsFalse(leaveFired, "MouseLeave callback should not have fired yet");
 
       // Simulate hover leave
       using var mouseLeaveEvent = MouseLeaveEvent.GetPooled();
