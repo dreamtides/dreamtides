@@ -474,6 +474,9 @@ tabula-roundtrip-revert:
 tabula-verify-vba:
    ./scripts/tabula/verify_vba.py
 
+abu *args='':
+  ./scripts/abu/abu.py "$@"
+
 check-snapshots:
    ./scripts/testing/check_pending_snapshots.py
 
