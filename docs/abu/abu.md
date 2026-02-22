@@ -342,3 +342,10 @@ server for full roundtrip testing without Unity.
 Integration between Python and C# is not covered by automated tests. Validate
 manually by entering Unity Play mode with `DreamtidesAbuSetup` attached and
 running `python3 scripts/abu/abu.py snapshot`.
+
+## Related Documents
+
+- [abu_development.md](abu_development.md): Step-by-step guide to modifying the
+  scene walker, adding new UI features, and interactively testing changes using
+  the Unity/CLI workflow. Read when making changes to Abu or adding support for
+  new game UI elements.

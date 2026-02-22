@@ -142,6 +142,7 @@
   Toolkit, 3D Displayables, CanvasButtons), namespace conventions and coding
   rules, common pitfalls (stale refs, compact mode, BusyToken, single-client
   TCP), the `ISceneWalker` and `ISettledProvider` interfaces for adapting ABU to
-  other games, and the full test suite layout. Read when using the ABU Python
-  CLI, working on ABU C# code, debugging connectivity or snapshot accuracy, or
-  porting ABU to a new game.
+  other games, the full test suite layout, and a child doc on developing new Abu
+  features with interactive testing. Read when using the ABU Python CLI, working
+  on ABU C# code, debugging connectivity or snapshot accuracy, or porting ABU to
+  a new game.

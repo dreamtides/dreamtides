@@ -27,6 +27,7 @@ EDITOR_LOG = Path.home() / "Library" / "Logs" / "Unity" / "Editor.log"
 TIMEOUT_SECONDS = 120
 TEST_TIMEOUT_SECONDS = 300
 POLL_INTERVAL = 0.3
+ABU_PORT = 9999
 
 
 class UnityError(Exception):
@@ -303,6 +304,21 @@ def wait_for_tests(log_offset: int) -> TestResult:
     )
 
 
+def is_play_mode_active() -> bool:
+    """Check if Unity is in play mode by probing the Abu TCP port."""
+    import socket as _socket
+
+    sock = _socket.socket(_socket.AF_INET, _socket.SOCK_STREAM)
+    try:
+        sock.settimeout(1.0)
+        sock.connect(("localhost", ABU_PORT))
+        sock.close()
+        return True
+    except (ConnectionRefusedError, OSError):
+        sock.close()
+        return False
+
+
 def do_refresh(play: bool = False) -> None:
     """Execute a refresh and optionally enter play mode."""
     log_offset = get_log_size()
@@ -361,6 +377,23 @@ def do_test() -> None:
         sys.exit(1)
 
 
+def do_cycle() -> None:
+    """Exit play mode if active, refresh, then re-enter play mode."""
+    if is_play_mode_active():
+        print("Play mode is active, exiting...")
+        result_msg = toggle_play_mode()
+        print(result_msg)
+        time.sleep(2)
+    else:
+        print("Play mode is not active.")
+
+    do_refresh()
+
+    print("\nEntering play mode...")
+    play_result = toggle_play_mode()
+    print(play_result)
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser with all subcommands."""
     parser = argparse.ArgumentParser(
@@ -381,6 +414,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     subparsers.add_parser(
         "test", help="Refresh then run all Edit Mode tests"
+    )
+
+    subparsers.add_parser(
+        "cycle", help="Exit play mode (if active), refresh, re-enter play mode"
     )
 
     return parser
@@ -418,6 +455,9 @@ def main() -> None:
 
         elif args.command == "test":
             do_test()
+
+        elif args.command == "cycle":
+            do_cycle()
 
     except UnityError as e:
         print(f"Error: {e}", file=sys.stderr)

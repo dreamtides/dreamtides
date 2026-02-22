@@ -13,6 +13,7 @@ import os
 import socket
 import sys
 import tempfile
+import time
 import uuid
 from typing import Any
 
@@ -162,6 +163,40 @@ def send_command(command: str, params: dict[str, Any], port: int) -> dict[str, A
         sock.close()
 
 
+def send_command_with_wait(
+    command: str, params: dict[str, Any], port: int, wait_timeout: int
+) -> dict[str, Any]:
+    """Retry send_command with exponential backoff until connected.
+
+    Retries on ConnectionError and EmptyResponseError up to wait_timeout
+    seconds. Raises the last error if the timeout is exceeded.
+    """
+    deadline = time.monotonic() + wait_timeout
+    delay = 1.0
+    max_delay = 5.0
+    last_error: AbuError | None = None
+
+    while time.monotonic() < deadline:
+        try:
+            return send_command(command, params, port)
+        except (ConnectionError, EmptyResponseError) as e:
+            last_error = e
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                break
+            sleep_time = min(delay, remaining, max_delay)
+            print(
+                f"Waiting for Unity (retrying in {sleep_time:.0f}s)...",
+                file=sys.stderr,
+            )
+            time.sleep(sleep_time)
+            delay = min(delay * 1.5, max_delay)
+
+    raise last_error or ConnectionError(
+        f"Could not connect to Unity on localhost:{port} within {wait_timeout}s"
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser with all subcommands."""
     parser = argparse.ArgumentParser(
@@ -170,6 +205,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--json", action="store_true", help="Output raw JSON instead of formatted text"
+    )
+    parser.add_argument(
+        "--wait",
+        type=int,
+        default=None,
+        metavar="SECONDS",
+        help="Retry connection for up to SECONDS before giving up",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -212,7 +254,10 @@ def main() -> None:
     port = int(os.environ.get("ABU_PORT", "9999"))
 
     try:
-        response = send_command(command, params, port)
+        if args.wait is not None:
+            response = send_command_with_wait(command, params, port, args.wait)
+        else:
+            response = send_command(command, params, port)
         output = handle_response(command, response, json_output=args.json)
     except AbuError as e:
         print(f"Error: {e}", file=sys.stderr)
