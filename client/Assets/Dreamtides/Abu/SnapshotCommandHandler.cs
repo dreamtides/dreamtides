@@ -239,6 +239,7 @@ namespace Abu
                 return;
             }
 
+            _historyProvider?.ClearHistory();
             _settledProvider.NotifyActionDispatched();
             _bridge.StartCoroutine(WaitForSettledThenRespond(command.Id, responseData, onComplete));
         }

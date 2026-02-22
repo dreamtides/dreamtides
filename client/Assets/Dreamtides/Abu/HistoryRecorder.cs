@@ -55,6 +55,11 @@ namespace Dreamtides.Abu
       }
     }
 
+    public void ClearHistory()
+    {
+      _entries.Clear();
+    }
+
     public List<string>? TakeHistory()
     {
       if (_entries.Count == 0)
@@ -101,9 +106,8 @@ namespace Dreamtides.Abu
       }
 
       var prefix = activation.Player == DisplayPlayer.User ? "Dreamwell" : "Enemy dreamwell";
-      var entry = string.IsNullOrEmpty(rulesText)
-        ? $"{prefix}: {cardName}"
-        : $"{prefix}: {cardName} -- {rulesText}";
+      var displayRulesText = string.IsNullOrEmpty(rulesText) ? "(no rules text)" : rulesText;
+      var entry = $"{prefix}: {cardName} -- {displayRulesText}";
       _entries.Add(entry);
     }
 
@@ -249,8 +253,6 @@ namespace Dreamtides.Abu
 
     static string? BuildFaceDownEntry(string from, string to, DisplayPlayer? player)
     {
-      var playerPrefix = player == DisplayPlayer.Enemy ? "Enemy " : "";
-
       if (from == "deck" && to == "hand")
       {
         return player == DisplayPlayer.Enemy ? "Enemy drew a card" : "Drew a card";
@@ -258,12 +260,16 @@ namespace Dreamtides.Abu
 
       if (to == "void")
       {
-        return $"{playerPrefix}a card moved to void";
+        return player == DisplayPlayer.Enemy
+          ? "Enemy: a card moved to void"
+          : "A card moved to void";
       }
 
       if (to == "banished")
       {
-        return $"{playerPrefix}a card moved to banished";
+        return player == DisplayPlayer.Enemy
+          ? "Enemy: a card moved to banished"
+          : "A card moved to banished";
       }
 
       return null;

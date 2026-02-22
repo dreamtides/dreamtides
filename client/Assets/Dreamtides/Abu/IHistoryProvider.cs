@@ -11,6 +11,12 @@ namespace Abu
     public interface IHistoryProvider
     {
         /// <summary>
+        /// Clears any accumulated history entries. Called at action dispatch
+        /// time to ensure only events from the current action are recorded.
+        /// </summary>
+        void ClearHistory();
+
+        /// <summary>
         /// Returns accumulated history entries and clears the buffer.
         /// Returns null if no events occurred.
         /// </summary>

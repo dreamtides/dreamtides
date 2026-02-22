@@ -21,6 +21,7 @@ namespace Abu
     readonly List<ISceneWalker> _walkers = new List<ISceneWalker>();
     readonly RefRegistry _refRegistry = new RefRegistry();
     ISettledProvider _settledProvider = new DefaultSettledProvider();
+    IHistoryProvider? _historyProvider;
     SnapshotCommandHandler? _snapshotCommandHandler;
 
     /// <summary>
@@ -54,6 +55,7 @@ namespace Abu
     /// </summary>
     public void SetHistoryProvider(IHistoryProvider provider)
     {
+      _historyProvider = provider;
       if (_snapshotCommandHandler != null)
       {
         _snapshotCommandHandler.SetHistoryProvider(provider);
@@ -73,6 +75,10 @@ namespace Abu
         _refRegistry,
         _settledProvider
       );
+      if (_historyProvider != null)
+      {
+        _snapshotCommandHandler.SetHistoryProvider(_historyProvider);
+      }
       _commandHandler = _snapshotCommandHandler;
     }
 
