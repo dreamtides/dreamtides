@@ -146,6 +146,46 @@ Some history messages can be misleading:
 
 - **"moved to void"** vs **"moved to banished"**: Reclaimed cards go to banished
   instead of void when they leave play.
+- **"X removed"**: History entries like "Sundown Surfer removed" appear when
+  triggered abilities modify a card (e.g., adding spark). The card is NOT being
+  removed from play — this message represents an internal state update. Track
+  the actual spark values in the snapshot to see what changed.
+- **"X removed" during reclaim**: When a Reclaim Ability is used, the original
+  card moves from void to stack and the reclaim entry is "removed" from hand.
+  This is normal.
+
+## Known ABU Limitations
+
+### Modal Cards Cannot Be Played
+
+Modal cards (e.g., "Break the Sequence — Choose One: ...") show "cost: " with an
+empty cost in hand. When played, two large choice cards appear as 3D
+Displayables but the scene walker does not capture them. **Modal cards are
+currently unplayable via ABU.** Use the Undo button to back out if you
+accidentally play one, and avoid modal cards during testing.
+
+### Opponent Responses and Sundown Surfer Triggers
+
+When you play cards during your turn, the AI opponent may respond with fast
+events (Guiding Light, Dreamscatter, Ripple of Defiance, Abolish, Immolate).
+**Each opponent response triggers Sundown Surfer's "When you play a card during
+the opponent's turn" ability**, adding +1 spark per Surfer per response. This
+can dramatically escalate the opponent's spark total. Strategy: avoid playing
+non-essential cards when the opponent has Sundown Surfers and energy to respond.
+
+### Discard Selection
+
+When an effect requires discarding from hand (e.g., Astral Interface's "Draw a
+card. Discard a card."), click the card you want to discard. The snapshot won't
+visually indicate the selection, but a Submit button appears. Click Submit to
+confirm. The hand count stays at 10 until after you submit.
+
+### Ripple of Defiance Payment
+
+When Ripple of Defiance targets your event, you'll see "Spend 2●" and "Decline"
+buttons. Click "Spend 2●" to pay the tax and keep your event, or "Decline" to
+let it be prevented. The opponent can chain multiple Ripples, each requiring a
+separate 2 energy payment.
 
 ## Testing Strategy
 
@@ -158,10 +198,61 @@ Some history messages can be misleading:
    something seems wrong
 5. **Take screenshots** when the snapshot doesn't match expected UI state
 
+## Setup: Restarting a Fresh Game
+
+After `clear-save`, you need to exit and re-enter play mode to start a new game.
+The `cycle` command may fail with "Assets > Refresh menu item not found".
+Workaround:
+
+```sh
+python3 scripts/abu/abu.py clear-save
+python3 scripts/abu/abu.py play          # exit play mode (if active)
+sleep 3
+python3 scripts/abu/abu.py play          # re-enter play mode
+sleep 5
+python3 scripts/abu/abu.py snapshot --compact
+```
+
+Check `status` between steps to confirm play mode toggled correctly.
+
+## Game Strategy Notes
+
+### Early Game (Turns 1-3)
+
+- Play characters with high spark first (e.g., Minstrel of Falling Light at
+  spark 2 is better than Sundown Surfer at spark 1)
+- Guiding Light (cost 1, Foresee + draw) is excellent early tempo
+- Establish board presence before using activated abilities
+
+### Mid Game (Turns 4-6)
+
+- Hold counter-spells (Abolish, Cragfall, Ripple of Defiance) for the opponent's
+  threats rather than playing them proactively
+- Counter-spells are fast — they can only be played in response to cards on the
+  stack, not proactively
+- Avoid playing cards during your own turn when the opponent has Sundown Surfers
+  \+ energy, as each response triggers spark growth
+
+### Scoring
+
+- Points are scored during Judgment (start of each turn) by the active player if
+  their spark exceeds the opponent's. Points = difference in spark.
+- Dreamwell cards can also grant points directly (e.g., Autumn Glade)
+- Victory at 12 points. Monitor both scores relative to the threshold.
+
+### Key Card Interactions
+
+- **Sundown Surfer**: Gains +1 spark each time its owner plays a card during the
+  opponent's turn. This compounds rapidly and is very dangerous.
+- **Reclaim abilities**: Appear in hand as separate entries. Cost is the Reclaim
+  cost, not the original card cost. Reclaimed cards go to banished (not void)
+  when they leave play.
+- **Activated abilities**: Cost energy but don't go to the stack like regular
+  cards. They appear as hand entries with the ability cost.
+
 ## Writing Narrative Files
 
 Write playtest narratives to `/tmp/narrative.md`. Include:
-
 
 - Game state at key decision points (energy, score, spark, hand)
 - Actions taken and their results
