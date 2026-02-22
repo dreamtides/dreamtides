@@ -38,6 +38,7 @@ TIMEOUT_SECONDS = 120
 TEST_TIMEOUT_SECONDS = 300
 POLL_INTERVAL = 0.3
 ABU_PORT = 9999
+ABU_STATE_FILE = Path(__file__).resolve().parent.parent.parent / ".abu-state.json"
 
 
 class AbuError(Exception):
@@ -596,6 +597,58 @@ def do_cycle() -> None:
     print(play_result)
 
 
+def read_state_file() -> dict[str, Any] | None:
+    """Read and parse the abu state file, returning None if unavailable."""
+    try:
+        return json.loads(ABU_STATE_FILE.read_text())
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def is_pid_alive(pid: int) -> bool:
+    """Check whether a process with the given PID is running."""
+    try:
+        os.kill(pid, 0)
+        return True
+    except (OSError, ProcessLookupError):
+        return False
+
+
+def do_status() -> None:
+    """Print a combined status report from state file, PID, and TCP probe."""
+    state = read_state_file()
+    tcp_up = is_play_mode_active()
+
+    print("Unity Editor Status")
+    print("=" * 40)
+
+    if state is None:
+        print("  State file:    not found")
+        print("  Unity PID:     unknown")
+        print("  Play mode:     unknown")
+        print("  Game mode:     unknown")
+    else:
+        pid = state.get("unityPid", 0)
+        alive = is_pid_alive(pid) if pid else False
+        play_state = state.get("playModeState", "unknown")
+        game_mode = state.get("gameMode", "unknown")
+        timestamp = state.get("timestampUtc", "unknown")
+
+        if alive:
+            print("  State file:    ok")
+            print(f"  Unity PID:     {pid} (running)")
+        else:
+            print("  State file:    stale")
+            print(f"  Unity PID:     {pid} (not running)")
+
+        in_play = play_state in ("EnteredPlayMode", "ExitingPlayMode")
+        print(f"  Play mode:     {'active' if in_play else 'inactive'}")
+        print(f"  Game mode:     {game_mode}")
+        print(f"  Last updated:  {timestamp}")
+
+    print(f"  TCP (:{ABU_PORT}):   {'reachable' if tcp_up else 'unreachable'}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser with all subcommands."""
     parser = argparse.ArgumentParser(
@@ -664,6 +717,11 @@ def build_parser() -> argparse.ArgumentParser:
         "cycle", help="Exit play mode (if active), refresh, re-enter play mode"
     )
 
+    # status
+    subparsers.add_parser(
+        "status", help="Show Unity Editor state from abu state file and TCP probe"
+    )
+
     return parser
 
 
@@ -672,6 +730,10 @@ def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
     command: str = args.command
+
+    if command == "status":
+        do_status()
+        return
 
     editor_commands = {"refresh", "play", "test", "cycle"}
 

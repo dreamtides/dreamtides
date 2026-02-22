@@ -13,6 +13,7 @@ import uuid
 from unittest.mock import MagicMock, patch
 
 from abu import (
+    ABU_STATE_FILE,
     AbuError,
     CompilationError,
     ConnectionError,
@@ -25,8 +26,11 @@ from abu import (
     build_command,
     build_params,
     build_parser,
+    do_status,
     handle_response,
+    is_pid_alive,
     is_worktree,
+    read_state_file,
     send_command,
     strip_ref,
     wait_for_refresh,
@@ -605,6 +609,116 @@ class TestRefreshResult(unittest.TestCase):
         )
         self.assertFalse(result.success)
         self.assertEqual(len(result.errors), 1)
+
+
+class TestBuildParserStatus(unittest.TestCase):
+    """Test argparse recognizes the status subcommand."""
+
+    def test_status_command(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["status"])
+        self.assertEqual(args.command, "status")
+
+
+class TestReadStateFile(unittest.TestCase):
+    """Test state file reading."""
+
+    @patch("abu.ABU_STATE_FILE")
+    def test_returns_none_when_missing(self, mock_path: MagicMock) -> None:
+        mock_path.read_text.side_effect = FileNotFoundError
+        self.assertIsNone(read_state_file())
+
+    @patch("abu.ABU_STATE_FILE")
+    def test_returns_none_on_invalid_json(self, mock_path: MagicMock) -> None:
+        mock_path.read_text.return_value = "not json"
+        self.assertIsNone(read_state_file())
+
+    @patch("abu.ABU_STATE_FILE")
+    def test_returns_parsed_state(self, mock_path: MagicMock) -> None:
+        state = {
+            "version": 1,
+            "playModeState": "EnteredPlayMode",
+            "gameMode": "Battle",
+            "unityPid": 12345,
+            "timestampUtc": "2026-02-22T12:34:56Z",
+        }
+        mock_path.read_text.return_value = json.dumps(state)
+        result = read_state_file()
+        self.assertEqual(result, state)
+
+
+class TestIsPidAlive(unittest.TestCase):
+    """Test PID liveness checking."""
+
+    def test_current_process_is_alive(self) -> None:
+        self.assertTrue(is_pid_alive(os.getpid()))
+
+    def test_nonexistent_pid(self) -> None:
+        # PID 2^30 is almost certainly not running
+        self.assertFalse(is_pid_alive(2**30))
+
+
+class TestDoStatus(unittest.TestCase):
+    """Test the do_status output."""
+
+    @patch("abu.is_play_mode_active", return_value=False)
+    @patch("abu.read_state_file", return_value=None)
+    def test_no_state_file(self, _mock_read: MagicMock, _mock_tcp: MagicMock) -> None:
+        import io
+        from contextlib import redirect_stdout
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            do_status()
+        output = buf.getvalue()
+        self.assertIn("State file:    not found", output)
+        self.assertIn("Unity PID:     unknown", output)
+        self.assertIn("TCP", output)
+
+    @patch("abu.is_play_mode_active", return_value=True)
+    @patch("abu.is_pid_alive", return_value=True)
+    @patch("abu.read_state_file", return_value={
+        "version": 1,
+        "playModeState": "EnteredPlayMode",
+        "gameMode": "Battle",
+        "unityPid": 12345,
+        "timestampUtc": "2026-02-22T12:34:56Z",
+    })
+    def test_active_play_mode(
+        self, _mock_read: MagicMock, _mock_pid: MagicMock, _mock_tcp: MagicMock,
+    ) -> None:
+        import io
+        from contextlib import redirect_stdout
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            do_status()
+        output = buf.getvalue()
+        self.assertIn("State file:    ok", output)
+        self.assertIn("12345 (running)", output)
+        self.assertIn("Play mode:     active", output)
+        self.assertIn("Game mode:     Battle", output)
+        self.assertIn("reachable", output)
+
+    @patch("abu.is_play_mode_active", return_value=False)
+    @patch("abu.is_pid_alive", return_value=False)
+    @patch("abu.read_state_file", return_value={
+        "version": 1,
+        "playModeState": "EnteredPlayMode",
+        "gameMode": "Quest",
+        "unityPid": 99999,
+        "timestampUtc": "2026-02-22T12:00:00Z",
+    })
+    def test_stale_pid(
+        self, _mock_read: MagicMock, _mock_pid: MagicMock, _mock_tcp: MagicMock,
+    ) -> None:
+        import io
+        from contextlib import redirect_stdout
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            do_status()
+        output = buf.getvalue()
+        self.assertIn("State file:    stale", output)
+        self.assertIn("99999 (not running)", output)
+        self.assertIn("unreachable", output)
 
 
 if __name__ == "__main__":

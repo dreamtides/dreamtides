@@ -30,3 +30,4 @@ scripts/test_output/
 .serena/
 .lattice/
 .venv/
+.abu-state.json
