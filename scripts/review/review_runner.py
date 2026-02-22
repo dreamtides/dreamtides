@@ -170,7 +170,16 @@ def step_specs() -> list[StepSpec]:
             [
                 CommandSpec(
                     "python-test",
-                    ["python3", "-m", "unittest", "discover", "-s", "scripts/review/tests", "-p", "test_*.py"],
+                    ["just", "python-test"],
+                )
+            ],
+        ),
+        StepSpec(
+            "pyre-check",
+            [
+                CommandSpec(
+                    "pyre-check",
+                    ["just", "pyre-check"],
                 )
             ],
         ),

@@ -15,9 +15,9 @@ review:
         python3 scripts/review/review_runner.py
     fi
 
-review-direct: check-snapshots check-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test unity-test parser-test tv-check tv-clippy tv-test
+review-direct: check-snapshots check-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test python-test pyre-check unity-test parser-test tv-check tv-clippy tv-test
 
-review-verbose: check-snapshots check-format-verbose check-docs-format-verbose check-token-limits-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose review-core-test-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
+review-verbose: check-snapshots check-format-verbose check-docs-format-verbose check-token-limits-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose review-core-test-verbose python-test-verbose pyre-check-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
 
 review-scope-plan:
     python3 scripts/review/review_scope.py plan
@@ -170,6 +170,37 @@ review-core-test-verbose:
         TEST_THREADS=""
     fi
     RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml --workspace --exclude tv_tests --exclude parser_tests -- $TEST_THREADS
+
+python-test:
+  #!/usr/bin/env bash
+  output=$(python3 -m unittest discover -s scripts/review/tests -p "test_*.py" 2>&1)
+  if [ $? -ne 0 ]; then
+      echo "$output"
+      exit 1
+  fi
+  output=$(cd scripts/abu && python3 -m unittest discover -s . -p "test_*.py" 2>&1)
+  if [ $? -ne 0 ]; then
+      echo "$output"
+      exit 1
+  fi
+  echo "Python tests passed"
+
+python-test-verbose:
+  python3 -m unittest discover -s scripts/review/tests -p "test_*.py"
+  cd scripts/abu && python3 -m unittest discover -s . -p "test_*.py"
+
+pyre-check:
+  #!/usr/bin/env bash
+  output=$(uvx --from pyre-check pyre check 2>&1)
+  if [ $? -eq 0 ]; then
+      echo "Pyre check passed"
+  else
+      echo "$output"
+      exit 1
+  fi
+
+pyre-check-verbose:
+  uvx --from pyre-check pyre check
 
 battle-test *args='':
     ./scripts/testing/run_cargo_test.sh battle_tests "$@"

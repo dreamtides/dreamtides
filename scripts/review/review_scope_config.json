@@ -64,6 +64,7 @@
     "rlf-lint",
     "test-core",
     "python-test",
+    "pyre-check",
     "parser-test",
     "tv-check",
     "tv-clippy",
@@ -85,7 +86,8 @@
     "tv-test"
   ],
   "python_steps": [
-    "python-test"
+    "python-test",
+    "pyre-check"
   ],
   "csharp_steps": [
     "unity-test"

@@ -52,7 +52,7 @@ def main() -> int:
     ensure_venv()
     reexec_in_venv()
 
-    import tiktoken
+    import tiktoken  # pyre-ignore[21]
 
     enc = tiktoken.get_encoding("cl100k_base")
     failures: list[str] = []

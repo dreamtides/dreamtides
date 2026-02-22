@@ -980,11 +980,10 @@ def main() -> None:
             else:
                 response = send_command(command, params, port)
             output = handle_response(command, response, json_output=args.json)
+            print(output)
         except AbuError as e:
             print(f"Error: {e}", file=sys.stderr)
             sys.exit(1)
-
-        print(output)
 
 
 if __name__ == "__main__":

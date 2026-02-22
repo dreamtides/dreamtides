@@ -1,0 +1,706 @@
+2026-02-22 11:16:08,001 [PID 44838] INFO No binary specified, looking for `pyre.bin` in PATH
+2026-02-22 11:16:08,002 [PID 44838] INFO Pyre binary is located at `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/bin/pyre.bin`
+2026-02-22 11:16:08,002 [PID 44838] INFO Could not determine the number of Pyre workers from configuration. Auto-set the value to 4.
+2026-02-22 11:16:08,002 [PID 44838] INFO No typeshed specified, looking for it...
+2026-02-22 11:16:08,002 [PID 44838] INFO Found: `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed`
+2026-02-22 11:16:08,003 [PID 44838] INFO Writing arguments into /var/folders/zb/8gr701jj249c3v2ywgtz0vcr0000gn/T/pyre_arguments_y_3gaa7m.json...
+2026-02-22 11:16:08,003 [PID 44838] DEBUG Arguments:
+{
+  "source_paths": {
+    "kind": "simple",
+    "paths": [
+      "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+    ]
+  },
+  "search_paths": [
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stdlib",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ExifRead",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyMySQL",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyYAML",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/aiofiles",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/chevron",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/colorama",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ldap3",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/mysqlclient",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/paramiko",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/psycopg2",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pycurl",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/python-dateutil",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pytz",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/regex",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/requests",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/retry",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/tqdm",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ujson"
+  ],
+  "excludes": [
+    "**/venv/**",
+    "**/.venv/**",
+    "**/site-packages/**"
+  ],
+  "checked_directory_allowlist": [
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+  ],
+  "checked_directory_blocklist": [],
+  "extensions": [],
+  "log_path": "/Users/dthurn/Documents/GoogleDrive/dreamtides/.pyre",
+  "global_root": "/Users/dthurn/Documents/GoogleDrive/dreamtides",
+  "debug": false,
+  "python_version": {
+    "major": 3,
+    "minor": 14,
+    "micro": 3
+  },
+  "system_platform": "darwin",
+  "shared_memory": {},
+  "parallel": true,
+  "number_of_workers": 4,
+  "additional_logging_sections": [],
+  "show_error_traces": false,
+  "strict": false
+}
+2026-02-22 11:16:10,974 [PID 44838] PERFORMANCE  Initialized shared memory (heap size: 8589934592, dep table pow: 1, hash table pow: 26): 0.000s
+2026-02-22 11:16:10,989 [PID 44838] PERFORMANCE  Initialized multiprocessing workers (workers: 4): 0.014s
+2026-02-22 11:16:10,989 [PID 44838] INFO  Building module tracker...
+2026-02-22 11:16:11,040 [PID 44838] PERFORMANCE  Module tracker built: 0.049s
+2026-02-22 11:16:11,040 [PID 44838] PERFORMANCE  Full environment built: 0.050s
+2026-02-22 11:16:11,040 [PID 44838] INFO  Collecting all definitions...
+2026-02-22 11:16:11,249 [PID 44838] PERFORMANCE  Collected definitions (defines: 459): 0.199s
+2026-02-22 11:16:11,249 [PID 44838] INFO  Checking 459 functions...
+2026-02-22 11:16:11,694 [PID 44838] INFO  Processed 58 of 459 functions
+2026-02-22 11:16:11,740 [PID 44838] INFO  Processed 116 of 459 functions
+2026-02-22 11:16:11,827 [PID 44838] INFO  Processed 174 of 459 functions
+2026-02-22 11:16:11,857 [PID 44838] INFO  Processed 232 of 459 functions
+2026-02-22 11:16:11,991 [PID 44838] INFO  Processed 290 of 459 functions
+2026-02-22 11:16:12,034 [PID 44838] INFO  Processed 343 of 459 functions
+2026-02-22 11:16:12,120 [PID 44838] INFO  Processed 401 of 459 functions
+2026-02-22 11:16:12,120 [PID 44838] INFO  Processed 459 of 459 functions
+2026-02-22 11:16:12,120 [PID 44838] PERFORMANCE  Check_TypeCheck: 0.885s
+2026-02-22 11:16:12,120 [PID 44838] MEMORY  Shared memory size post-typecheck (size: 3)
+2026-02-22 11:16:12,120 [PID 44838] INFO  Postprocessing 30 sources...
+2026-02-22 11:16:12,203 [PID 44838] INFO  Postprocessed 6 of 30 sources
+2026-02-22 11:16:12,203 [PID 44838] INFO  Postprocessed 14 of 30 sources
+2026-02-22 11:16:12,203 [PID 44838] INFO  Postprocessed 22 of 30 sources
+2026-02-22 11:16:12,204 [PID 44838] INFO  Postprocessed 30 of 30 sources
+2026-02-22 11:16:12,204 [PID 44838] PERFORMANCE  Check_Postprocessing: 0.076s
+2026-02-22 11:16:12,204 [PID 44838] PERFORMANCE  Check (request kind: FullCheck): 1.211s
+2026-02-22 11:16:12,221 [PID 44838] ERROR Found 119 type errors!
+2026-02-22 11:16:25,427 [PID 45122] INFO No binary specified, looking for `pyre.bin` in PATH
+2026-02-22 11:16:25,427 [PID 45122] INFO Pyre binary is located at `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/bin/pyre.bin`
+2026-02-22 11:16:25,428 [PID 45122] INFO Could not determine the number of Pyre workers from configuration. Auto-set the value to 4.
+2026-02-22 11:16:25,428 [PID 45122] INFO No typeshed specified, looking for it...
+2026-02-22 11:16:25,428 [PID 45122] INFO Found: `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed`
+2026-02-22 11:16:25,429 [PID 45122] INFO Writing arguments into /var/folders/zb/8gr701jj249c3v2ywgtz0vcr0000gn/T/pyre_arguments_pifrl35s.json...
+2026-02-22 11:16:25,429 [PID 45122] DEBUG Arguments:
+{
+  "source_paths": {
+    "kind": "simple",
+    "paths": [
+      "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+    ]
+  },
+  "search_paths": [
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stdlib",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ExifRead",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyMySQL",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyYAML",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/aiofiles",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/chevron",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/colorama",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ldap3",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/mysqlclient",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/paramiko",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/psycopg2",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pycurl",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/python-dateutil",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pytz",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/regex",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/requests",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/retry",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/tqdm",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ujson"
+  ],
+  "excludes": [
+    "**/venv/**",
+    "**/.venv/**",
+    "**/site-packages/**"
+  ],
+  "checked_directory_allowlist": [
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+  ],
+  "checked_directory_blocklist": [],
+  "extensions": [],
+  "log_path": "/Users/dthurn/Documents/GoogleDrive/dreamtides/.pyre",
+  "global_root": "/Users/dthurn/Documents/GoogleDrive/dreamtides",
+  "debug": false,
+  "python_version": {
+    "major": 3,
+    "minor": 14,
+    "micro": 3
+  },
+  "system_platform": "darwin",
+  "shared_memory": {},
+  "parallel": true,
+  "number_of_workers": 4,
+  "additional_logging_sections": [],
+  "show_error_traces": false,
+  "strict": false
+}
+2026-02-22 11:16:25,488 [PID 45122] PERFORMANCE  Initialized shared memory (heap size: 8589934592, dep table pow: 1, hash table pow: 26): 0.001s
+2026-02-22 11:16:25,503 [PID 45122] PERFORMANCE  Initialized multiprocessing workers (workers: 4): 0.013s
+2026-02-22 11:16:25,503 [PID 45122] INFO  Building module tracker...
+2026-02-22 11:16:25,533 [PID 45122] PERFORMANCE  Module tracker built: 0.036s
+2026-02-22 11:16:25,533 [PID 45122] PERFORMANCE  Full environment built: 0.037s
+2026-02-22 11:16:25,533 [PID 45122] INFO  Collecting all definitions...
+2026-02-22 11:16:25,736 [PID 45122] PERFORMANCE  Collected definitions (defines: 459): 0.196s
+2026-02-22 11:16:25,736 [PID 45122] INFO  Checking 459 functions...
+2026-02-22 11:16:26,187 [PID 45122] INFO  Processed 58 of 459 functions
+2026-02-22 11:16:26,275 [PID 45122] INFO  Processed 116 of 459 functions
+2026-02-22 11:16:26,312 [PID 45122] INFO  Processed 174 of 459 functions
+2026-02-22 11:16:26,368 [PID 45122] INFO  Processed 232 of 459 functions
+2026-02-22 11:16:26,489 [PID 45122] INFO  Processed 290 of 459 functions
+2026-02-22 11:16:26,533 [PID 45122] INFO  Processed 343 of 459 functions
+2026-02-22 11:16:26,600 [PID 45122] INFO  Processed 401 of 459 functions
+2026-02-22 11:16:26,669 [PID 45122] INFO  Processed 459 of 459 functions
+2026-02-22 11:16:26,669 [PID 45122] PERFORMANCE  Check_TypeCheck: 0.938s
+2026-02-22 11:16:26,669 [PID 45122] MEMORY  Shared memory size post-typecheck (size: 3)
+2026-02-22 11:16:26,669 [PID 45122] INFO  Postprocessing 30 sources...
+2026-02-22 11:16:26,744 [PID 45122] INFO  Postprocessed 8 of 30 sources
+2026-02-22 11:16:26,744 [PID 45122] INFO  Postprocessed 14 of 30 sources
+2026-02-22 11:16:26,744 [PID 45122] INFO  Postprocessed 22 of 30 sources
+2026-02-22 11:16:26,755 [PID 45122] INFO  Postprocessed 30 of 30 sources
+2026-02-22 11:16:26,755 [PID 45122] PERFORMANCE  Check_Postprocessing: 0.077s
+2026-02-22 11:16:26,755 [PID 45122] PERFORMANCE  Check (request kind: FullCheck): 1.249s
+2026-02-22 11:16:26,773 [PID 45122] ERROR Found 119 type errors!
+2026-02-22 11:16:30,838 [PID 45259] INFO No binary specified, looking for `pyre.bin` in PATH
+2026-02-22 11:16:30,838 [PID 45259] INFO Pyre binary is located at `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/bin/pyre.bin`
+2026-02-22 11:16:30,838 [PID 45259] INFO Could not determine the number of Pyre workers from configuration. Auto-set the value to 4.
+2026-02-22 11:16:30,838 [PID 45259] INFO No typeshed specified, looking for it...
+2026-02-22 11:16:30,838 [PID 45259] INFO Found: `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed`
+2026-02-22 11:16:30,839 [PID 45259] INFO Writing arguments into /var/folders/zb/8gr701jj249c3v2ywgtz0vcr0000gn/T/pyre_arguments_5et4zk7x.json...
+2026-02-22 11:16:30,839 [PID 45259] DEBUG Arguments:
+{
+  "source_paths": {
+    "kind": "simple",
+    "paths": [
+      "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+    ]
+  },
+  "search_paths": [
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stdlib",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ExifRead",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyMySQL",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyYAML",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/aiofiles",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/chevron",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/colorama",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ldap3",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/mysqlclient",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/paramiko",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/psycopg2",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pycurl",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/python-dateutil",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pytz",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/regex",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/requests",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/retry",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/tqdm",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ujson"
+  ],
+  "excludes": [
+    "**/venv/**",
+    "**/.venv/**",
+    "**/site-packages/**"
+  ],
+  "checked_directory_allowlist": [
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+  ],
+  "checked_directory_blocklist": [],
+  "extensions": [],
+  "log_path": "/Users/dthurn/Documents/GoogleDrive/dreamtides/.pyre",
+  "global_root": "/Users/dthurn/Documents/GoogleDrive/dreamtides",
+  "debug": false,
+  "python_version": {
+    "major": 3,
+    "minor": 14,
+    "micro": 3
+  },
+  "system_platform": "darwin",
+  "shared_memory": {},
+  "parallel": true,
+  "number_of_workers": 4,
+  "additional_logging_sections": [],
+  "show_error_traces": false,
+  "strict": false
+}
+2026-02-22 11:16:30,896 [PID 45259] PERFORMANCE  Initialized shared memory (heap size: 8589934592, dep table pow: 1, hash table pow: 26): 0.000s
+2026-02-22 11:16:30,907 [PID 45259] PERFORMANCE  Initialized multiprocessing workers (workers: 4): 0.012s
+2026-02-22 11:16:30,907 [PID 45259] INFO  Building module tracker...
+2026-02-22 11:16:30,949 [PID 45259] PERFORMANCE  Module tracker built: 0.036s
+2026-02-22 11:16:30,949 [PID 45259] PERFORMANCE  Full environment built: 0.037s
+2026-02-22 11:16:30,950 [PID 45259] INFO  Collecting all definitions...
+2026-02-22 11:16:31,151 [PID 45259] PERFORMANCE  Collected definitions (defines: 459): 0.195s
+2026-02-22 11:16:31,151 [PID 45259] INFO  Checking 459 functions...
+2026-02-22 11:16:31,591 [PID 45259] INFO  Processed 58 of 459 functions
+2026-02-22 11:16:31,621 [PID 45259] INFO  Processed 116 of 459 functions
+2026-02-22 11:16:31,721 [PID 45259] INFO  Processed 174 of 459 functions
+2026-02-22 11:16:31,751 [PID 45259] INFO  Processed 232 of 459 functions
+2026-02-22 11:16:31,886 [PID 45259] INFO  Processed 290 of 459 functions
+2026-02-22 11:16:31,932 [PID 45259] INFO  Processed 343 of 459 functions
+2026-02-22 11:16:32,007 [PID 45259] INFO  Processed 401 of 459 functions
+2026-02-22 11:16:32,023 [PID 45259] INFO  Processed 459 of 459 functions
+2026-02-22 11:16:32,023 [PID 45259] PERFORMANCE  Check_TypeCheck: 0.869s
+2026-02-22 11:16:32,023 [PID 45259] MEMORY  Shared memory size post-typecheck (size: 3)
+2026-02-22 11:16:32,023 [PID 45259] INFO  Postprocessing 30 sources...
+2026-02-22 11:16:32,081 [PID 45259] INFO  Postprocessed 8 of 30 sources
+2026-02-22 11:16:32,082 [PID 45259] INFO  Postprocessed 14 of 30 sources
+2026-02-22 11:16:32,082 [PID 45259] INFO  Postprocessed 22 of 30 sources
+2026-02-22 11:16:32,097 [PID 45259] INFO  Postprocessed 30 of 30 sources
+2026-02-22 11:16:32,097 [PID 45259] PERFORMANCE  Check_Postprocessing: 0.080s
+2026-02-22 11:16:32,097 [PID 45259] PERFORMANCE  Check (request kind: FullCheck): 1.183s
+2026-02-22 11:16:32,112 [PID 45259] ERROR Found 119 type errors!
+2026-02-22 11:17:06,806 [PID 45806] INFO No binary specified, looking for `pyre.bin` in PATH
+2026-02-22 11:17:06,806 [PID 45806] INFO Pyre binary is located at `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/bin/pyre.bin`
+2026-02-22 11:17:06,806 [PID 45806] INFO Could not determine the number of Pyre workers from configuration. Auto-set the value to 4.
+2026-02-22 11:17:06,806 [PID 45806] INFO No typeshed specified, looking for it...
+2026-02-22 11:17:06,806 [PID 45806] INFO Found: `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed`
+2026-02-22 11:17:06,807 [PID 45806] INFO Writing arguments into /var/folders/zb/8gr701jj249c3v2ywgtz0vcr0000gn/T/pyre_arguments_jq9qe7q6.json...
+2026-02-22 11:17:06,807 [PID 45806] DEBUG Arguments:
+{
+  "source_paths": {
+    "kind": "simple",
+    "paths": [
+      "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+    ]
+  },
+  "search_paths": [
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts/review",
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts/abu",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stdlib",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ExifRead",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyMySQL",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyYAML",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/aiofiles",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/chevron",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/colorama",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ldap3",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/mysqlclient",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/paramiko",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/psycopg2",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pycurl",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/python-dateutil",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pytz",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/regex",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/requests",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/retry",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/tqdm",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ujson"
+  ],
+  "excludes": [
+    "**/venv/**",
+    "**/.venv/**",
+    "**/site-packages/**"
+  ],
+  "checked_directory_allowlist": [
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+  ],
+  "checked_directory_blocklist": [],
+  "extensions": [],
+  "log_path": "/Users/dthurn/Documents/GoogleDrive/dreamtides/.pyre",
+  "global_root": "/Users/dthurn/Documents/GoogleDrive/dreamtides",
+  "debug": false,
+  "python_version": {
+    "major": 3,
+    "minor": 14,
+    "micro": 3
+  },
+  "system_platform": "darwin",
+  "shared_memory": {},
+  "parallel": true,
+  "number_of_workers": 4,
+  "additional_logging_sections": [],
+  "show_error_traces": false,
+  "strict": false
+}
+2026-02-22 11:17:06,878 [PID 45806] PERFORMANCE  Initialized shared memory (heap size: 8589934592, dep table pow: 1, hash table pow: 26): 0.000s
+2026-02-22 11:17:06,878 [PID 45806] PERFORMANCE  Initialized multiprocessing workers (workers: 4): 0.010s
+2026-02-22 11:17:06,878 [PID 45806] INFO  Building module tracker...
+2026-02-22 11:17:06,924 [PID 45806] PERFORMANCE  Module tracker built: 0.037s
+2026-02-22 11:17:06,924 [PID 45806] PERFORMANCE  Full environment built: 0.037s
+2026-02-22 11:17:06,924 [PID 45806] INFO  Collecting all definitions...
+2026-02-22 11:17:07,113 [PID 45806] PERFORMANCE  Collected definitions (defines: 459): 0.196s
+2026-02-22 11:17:07,113 [PID 45806] INFO  Checking 459 functions...
+2026-02-22 11:17:07,539 [PID 45806] INFO  Processed 58 of 459 functions
+2026-02-22 11:17:07,652 [PID 45806] INFO  Processed 116 of 459 functions
+2026-02-22 11:17:07,682 [PID 45806] INFO  Processed 174 of 459 functions
+2026-02-22 11:17:07,712 [PID 45806] INFO  Processed 232 of 459 functions
+2026-02-22 11:17:07,786 [PID 45806] INFO  Processed 290 of 459 functions
+2026-02-22 11:17:08,018 [PID 45806] INFO  Processed 348 of 459 functions
+2026-02-22 11:17:08,048 [PID 45806] INFO  Processed 406 of 459 functions
+2026-02-22 11:17:08,078 [PID 45806] INFO  Processed 459 of 459 functions
+2026-02-22 11:17:08,079 [PID 45806] PERFORMANCE  Check_TypeCheck: 0.961s
+2026-02-22 11:17:08,079 [PID 45806] MEMORY  Shared memory size post-typecheck (size: 3)
+2026-02-22 11:17:08,079 [PID 45806] INFO  Postprocessing 30 sources...
+2026-02-22 11:17:08,138 [PID 45806] INFO  Postprocessed 8 of 30 sources
+2026-02-22 11:17:08,138 [PID 45806] INFO  Postprocessed 16 of 30 sources
+2026-02-22 11:17:08,138 [PID 45806] INFO  Postprocessed 22 of 30 sources
+2026-02-22 11:17:08,138 [PID 45806] INFO  Postprocessed 30 of 30 sources
+2026-02-22 11:17:08,138 [PID 45806] PERFORMANCE  Check_Postprocessing: 0.065s
+2026-02-22 11:17:08,138 [PID 45806] PERFORMANCE  Check (request kind: FullCheck): 1.262s
+2026-02-22 11:17:08,167 [PID 45806] ERROR Found 3 type errors!
+2026-02-22 11:17:44,453 [PID 46558] INFO No binary specified, looking for `pyre.bin` in PATH
+2026-02-22 11:17:44,454 [PID 46558] INFO Pyre binary is located at `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/bin/pyre.bin`
+2026-02-22 11:17:44,454 [PID 46558] INFO Could not determine the number of Pyre workers from configuration. Auto-set the value to 4.
+2026-02-22 11:17:44,454 [PID 46558] INFO No typeshed specified, looking for it...
+2026-02-22 11:17:44,454 [PID 46558] INFO Found: `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed`
+2026-02-22 11:17:44,455 [PID 46558] INFO Writing arguments into /var/folders/zb/8gr701jj249c3v2ywgtz0vcr0000gn/T/pyre_arguments_javgkdqc.json...
+2026-02-22 11:17:44,456 [PID 46558] DEBUG Arguments:
+{
+  "source_paths": {
+    "kind": "simple",
+    "paths": [
+      "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+    ]
+  },
+  "search_paths": [
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts/review",
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts/abu",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stdlib",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ExifRead",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyMySQL",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyYAML",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/aiofiles",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/chevron",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/colorama",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ldap3",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/mysqlclient",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/paramiko",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/psycopg2",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pycurl",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/python-dateutil",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pytz",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/regex",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/requests",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/retry",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/tqdm",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ujson"
+  ],
+  "excludes": [
+    "**/venv/**",
+    "**/.venv/**",
+    "**/site-packages/**"
+  ],
+  "checked_directory_allowlist": [
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+  ],
+  "checked_directory_blocklist": [],
+  "extensions": [],
+  "log_path": "/Users/dthurn/Documents/GoogleDrive/dreamtides/.pyre",
+  "global_root": "/Users/dthurn/Documents/GoogleDrive/dreamtides",
+  "debug": false,
+  "python_version": {
+    "major": 3,
+    "minor": 14,
+    "micro": 3
+  },
+  "system_platform": "darwin",
+  "shared_memory": {},
+  "parallel": true,
+  "number_of_workers": 4,
+  "additional_logging_sections": [],
+  "show_error_traces": false,
+  "strict": false
+}
+2026-02-22 11:17:44,587 [PID 46558] PERFORMANCE  Initialized shared memory (heap size: 8589934592, dep table pow: 1, hash table pow: 26): 0.000s
+2026-02-22 11:17:44,603 [PID 46558] PERFORMANCE  Initialized multiprocessing workers (workers: 4): 0.013s
+2026-02-22 11:17:44,603 [PID 46558] INFO  Building module tracker...
+2026-02-22 11:17:44,646 [PID 46558] PERFORMANCE  Module tracker built: 0.045s
+2026-02-22 11:17:44,646 [PID 46558] PERFORMANCE  Full environment built: 0.046s
+2026-02-22 11:17:44,646 [PID 46558] INFO  Collecting all definitions...
+2026-02-22 11:17:44,851 [PID 46558] PERFORMANCE  Collected definitions (defines: 459): 0.209s
+2026-02-22 11:17:44,851 [PID 46558] INFO  Checking 459 functions...
+2026-02-22 11:17:45,310 [PID 46558] INFO  Processed 58 of 459 functions
+2026-02-22 11:17:45,354 [PID 46558] INFO  Processed 116 of 459 functions
+2026-02-22 11:17:45,457 [PID 46558] INFO  Processed 174 of 459 functions
+2026-02-22 11:17:45,472 [PID 46558] INFO  Processed 232 of 459 functions
+2026-02-22 11:17:45,554 [PID 46558] INFO  Processed 290 of 459 functions
+2026-02-22 11:17:45,659 [PID 46558] INFO  Processed 348 of 459 functions
+2026-02-22 11:17:45,814 [PID 46558] INFO  Processed 406 of 459 functions
+2026-02-22 11:17:45,859 [PID 46558] INFO  Processed 459 of 459 functions
+2026-02-22 11:17:45,859 [PID 46558] PERFORMANCE  Check_TypeCheck: 1.009s
+2026-02-22 11:17:45,859 [PID 46558] MEMORY  Shared memory size post-typecheck (size: 3)
+2026-02-22 11:17:45,859 [PID 46558] INFO  Postprocessing 30 sources...
+2026-02-22 11:17:45,934 [PID 46558] INFO  Postprocessed 8 of 30 sources
+2026-02-22 11:17:45,935 [PID 46558] INFO  Postprocessed 14 of 30 sources
+2026-02-22 11:17:45,935 [PID 46558] INFO  Postprocessed 22 of 30 sources
+2026-02-22 11:17:45,935 [PID 46558] INFO  Postprocessed 30 of 30 sources
+2026-02-22 11:17:45,935 [PID 46558] PERFORMANCE  Check_Postprocessing: 0.070s
+2026-02-22 11:17:45,935 [PID 46558] PERFORMANCE  Check (request kind: FullCheck): 1.336s
+2026-02-22 11:17:45,947 [PID 46558] SUCCESS No type errors found
+2026-02-22 11:18:12,503 [PID 47131] INFO No binary specified, looking for `pyre.bin` in PATH
+2026-02-22 11:18:12,503 [PID 47131] INFO Pyre binary is located at `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/bin/pyre.bin`
+2026-02-22 11:18:12,503 [PID 47131] INFO Could not determine the number of Pyre workers from configuration. Auto-set the value to 4.
+2026-02-22 11:18:12,503 [PID 47131] INFO No typeshed specified, looking for it...
+2026-02-22 11:18:12,503 [PID 47131] INFO Found: `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed`
+2026-02-22 11:18:12,504 [PID 47131] INFO Writing arguments into /var/folders/zb/8gr701jj249c3v2ywgtz0vcr0000gn/T/pyre_arguments_atis1qml.json...
+2026-02-22 11:18:12,504 [PID 47131] DEBUG Arguments:
+{
+  "source_paths": {
+    "kind": "simple",
+    "paths": [
+      "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+    ]
+  },
+  "search_paths": [
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts/review",
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts/abu",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stdlib",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ExifRead",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyMySQL",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyYAML",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/aiofiles",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/chevron",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/colorama",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ldap3",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/mysqlclient",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/paramiko",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/psycopg2",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pycurl",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/python-dateutil",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pytz",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/regex",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/requests",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/retry",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/tqdm",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ujson"
+  ],
+  "excludes": [
+    "**/venv/**",
+    "**/.venv/**",
+    "**/site-packages/**"
+  ],
+  "checked_directory_allowlist": [
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+  ],
+  "checked_directory_blocklist": [],
+  "extensions": [],
+  "log_path": "/Users/dthurn/Documents/GoogleDrive/dreamtides/.pyre",
+  "global_root": "/Users/dthurn/Documents/GoogleDrive/dreamtides",
+  "debug": false,
+  "python_version": {
+    "major": 3,
+    "minor": 14,
+    "micro": 3
+  },
+  "system_platform": "darwin",
+  "shared_memory": {},
+  "parallel": true,
+  "number_of_workers": 4,
+  "additional_logging_sections": [],
+  "show_error_traces": false,
+  "strict": false
+}
+2026-02-22 11:18:12,566 [PID 47131] PERFORMANCE  Initialized shared memory (heap size: 8589934592, dep table pow: 1, hash table pow: 26): 0.000s
+2026-02-22 11:18:12,581 [PID 47131] PERFORMANCE  Initialized multiprocessing workers (workers: 4): 0.010s
+2026-02-22 11:18:12,581 [PID 47131] INFO  Building module tracker...
+2026-02-22 11:18:12,624 [PID 47131] PERFORMANCE  Module tracker built: 0.038s
+2026-02-22 11:18:12,624 [PID 47131] PERFORMANCE  Full environment built: 0.038s
+2026-02-22 11:18:12,624 [PID 47131] INFO  Collecting all definitions...
+2026-02-22 11:18:12,808 [PID 47131] PERFORMANCE  Collected definitions (defines: 459): 0.197s
+2026-02-22 11:18:12,809 [PID 47131] INFO  Checking 459 functions...
+2026-02-22 11:18:13,242 [PID 47131] INFO  Processed 58 of 459 functions
+2026-02-22 11:18:13,357 [PID 47131] INFO  Processed 116 of 459 functions
+2026-02-22 11:18:13,387 [PID 47131] INFO  Processed 174 of 459 functions
+2026-02-22 11:18:13,418 [PID 47131] INFO  Processed 232 of 459 functions
+2026-02-22 11:18:13,488 [PID 47131] INFO  Processed 290 of 459 functions
+2026-02-22 11:18:13,735 [PID 47131] INFO  Processed 348 of 459 functions
+2026-02-22 11:18:13,762 [PID 47131] INFO  Processed 406 of 459 functions
+2026-02-22 11:18:13,792 [PID 47131] INFO  Processed 459 of 459 functions
+2026-02-22 11:18:13,792 [PID 47131] PERFORMANCE  Check_TypeCheck: 0.982s
+2026-02-22 11:18:13,792 [PID 47131] MEMORY  Shared memory size post-typecheck (size: 3)
+2026-02-22 11:18:13,792 [PID 47131] INFO  Postprocessing 30 sources...
+2026-02-22 11:18:13,868 [PID 47131] INFO  Postprocessed 6 of 30 sources
+2026-02-22 11:18:13,868 [PID 47131] INFO  Postprocessed 14 of 30 sources
+2026-02-22 11:18:13,868 [PID 47131] INFO  Postprocessed 22 of 30 sources
+2026-02-22 11:18:13,868 [PID 47131] INFO  Postprocessed 30 of 30 sources
+2026-02-22 11:18:13,868 [PID 47131] PERFORMANCE  Check_Postprocessing: 0.071s
+2026-02-22 11:18:13,868 [PID 47131] PERFORMANCE  Check (request kind: FullCheck): 1.290s
+2026-02-22 11:18:13,882 [PID 47131] SUCCESS No type errors found
+2026-02-22 11:28:39,403 [PID 55273] INFO No binary specified, looking for `pyre.bin` in PATH
+2026-02-22 11:28:39,403 [PID 55273] INFO Pyre binary is located at `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/bin/pyre.bin`
+2026-02-22 11:28:39,403 [PID 55273] INFO Could not determine the number of Pyre workers from configuration. Auto-set the value to 4.
+2026-02-22 11:28:39,404 [PID 55273] INFO No typeshed specified, looking for it...
+2026-02-22 11:28:39,404 [PID 55273] INFO Found: `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed`
+2026-02-22 11:28:39,405 [PID 55273] INFO Writing arguments into /var/folders/zb/8gr701jj249c3v2ywgtz0vcr0000gn/T/pyre_arguments_apymytnq.json...
+2026-02-22 11:28:39,405 [PID 55273] DEBUG Arguments:
+{
+  "source_paths": {
+    "kind": "simple",
+    "paths": [
+      "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+    ]
+  },
+  "search_paths": [
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts/review",
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts/abu",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stdlib",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ExifRead",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyMySQL",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyYAML",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/aiofiles",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/chevron",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/colorama",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ldap3",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/mysqlclient",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/paramiko",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/psycopg2",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pycurl",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/python-dateutil",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pytz",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/regex",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/requests",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/retry",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/tqdm",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ujson"
+  ],
+  "excludes": [
+    "**/venv/**",
+    "**/.venv/**",
+    "**/site-packages/**"
+  ],
+  "checked_directory_allowlist": [
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+  ],
+  "checked_directory_blocklist": [],
+  "extensions": [],
+  "log_path": "/Users/dthurn/Documents/GoogleDrive/dreamtides/.pyre",
+  "global_root": "/Users/dthurn/Documents/GoogleDrive/dreamtides",
+  "debug": false,
+  "python_version": {
+    "major": 3,
+    "minor": 14,
+    "micro": 3
+  },
+  "system_platform": "darwin",
+  "shared_memory": {},
+  "parallel": true,
+  "number_of_workers": 4,
+  "additional_logging_sections": [],
+  "show_error_traces": false,
+  "strict": false
+}
+2026-02-22 11:28:39,576 [PID 55273] PERFORMANCE  Initialized shared memory (heap size: 8589934592, dep table pow: 1, hash table pow: 26): 0.001s
+2026-02-22 11:28:39,591 [PID 55273] PERFORMANCE  Initialized multiprocessing workers (workers: 4): 0.013s
+2026-02-22 11:28:39,591 [PID 55273] INFO  Building module tracker...
+2026-02-22 11:28:39,636 [PID 55273] PERFORMANCE  Module tracker built: 0.053s
+2026-02-22 11:28:39,636 [PID 55273] PERFORMANCE  Full environment built: 0.054s
+2026-02-22 11:28:39,636 [PID 55273] INFO  Collecting all definitions...
+2026-02-22 11:28:39,876 [PID 55273] PERFORMANCE  Collected definitions (defines: 459): 0.236s
+2026-02-22 11:28:39,877 [PID 55273] INFO  Checking 459 functions...
+2026-02-22 11:28:40,289 [PID 55273] INFO  Processed 58 of 459 functions
+2026-02-22 11:28:40,404 [PID 55273] INFO  Processed 116 of 459 functions
+2026-02-22 11:28:40,434 [PID 55273] INFO  Processed 174 of 459 functions
+2026-02-22 11:28:40,449 [PID 55273] INFO  Processed 232 of 459 functions
+2026-02-22 11:28:40,539 [PID 55273] INFO  Processed 290 of 459 functions
+2026-02-22 11:28:40,760 [PID 55273] INFO  Processed 348 of 459 functions
+2026-02-22 11:28:40,795 [PID 55273] INFO  Processed 406 of 459 functions
+2026-02-22 11:28:40,810 [PID 55273] INFO  Processed 459 of 459 functions
+2026-02-22 11:28:40,810 [PID 55273] PERFORMANCE  Check_TypeCheck: 0.938s
+2026-02-22 11:28:40,810 [PID 55273] MEMORY  Shared memory size post-typecheck (size: 3)
+2026-02-22 11:28:40,810 [PID 55273] INFO  Postprocessing 30 sources...
+2026-02-22 11:28:40,882 [PID 55273] INFO  Postprocessed 8 of 30 sources
+2026-02-22 11:28:40,882 [PID 55273] INFO  Postprocessed 16 of 30 sources
+2026-02-22 11:28:40,882 [PID 55273] INFO  Postprocessed 24 of 30 sources
+2026-02-22 11:28:40,882 [PID 55273] INFO  Postprocessed 30 of 30 sources
+2026-02-22 11:28:40,882 [PID 55273] PERFORMANCE  Check_Postprocessing: 0.071s
+2026-02-22 11:28:40,882 [PID 55273] PERFORMANCE  Check (request kind: FullCheck): 1.301s
+2026-02-22 11:28:40,909 [PID 55273] SUCCESS No type errors found
+2026-02-22 11:38:31,021 [PID 63028] INFO No binary specified, looking for `pyre.bin` in PATH
+2026-02-22 11:38:31,022 [PID 63028] INFO Pyre binary is located at `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/bin/pyre.bin`
+2026-02-22 11:38:31,022 [PID 63028] INFO Could not determine the number of Pyre workers from configuration. Auto-set the value to 4.
+2026-02-22 11:38:31,022 [PID 63028] INFO No typeshed specified, looking for it...
+2026-02-22 11:38:31,022 [PID 63028] INFO Found: `/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed`
+2026-02-22 11:38:31,023 [PID 63028] INFO Writing arguments into /var/folders/zb/8gr701jj249c3v2ywgtz0vcr0000gn/T/pyre_arguments_ikxenmpr.json...
+2026-02-22 11:38:31,023 [PID 63028] DEBUG Arguments:
+{
+  "source_paths": {
+    "kind": "simple",
+    "paths": [
+      "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+    ]
+  },
+  "search_paths": [
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts/review",
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts/abu",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stdlib",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ExifRead",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyMySQL",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/PyYAML",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/aiofiles",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/chevron",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/colorama",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ldap3",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/mysqlclient",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/paramiko",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/psycopg2",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pycurl",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/python-dateutil",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/pytz",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/regex",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/requests",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/retry",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/tqdm",
+    "/Users/dthurn/.cache/uv/archive-v0/RNomuroPDOMOqVCXQE3wb/lib/pyre_check/typeshed/stubs/ujson"
+  ],
+  "excludes": [
+    "**/venv/**",
+    "**/.venv/**",
+    "**/site-packages/**"
+  ],
+  "checked_directory_allowlist": [
+    "/Users/dthurn/Documents/GoogleDrive/dreamtides/scripts"
+  ],
+  "checked_directory_blocklist": [],
+  "extensions": [],
+  "log_path": "/Users/dthurn/Documents/GoogleDrive/dreamtides/.pyre",
+  "global_root": "/Users/dthurn/Documents/GoogleDrive/dreamtides",
+  "debug": false,
+  "python_version": {
+    "major": 3,
+    "minor": 14,
+    "micro": 3
+  },
+  "system_platform": "darwin",
+  "shared_memory": {},
+  "parallel": true,
+  "number_of_workers": 4,
+  "additional_logging_sections": [],
+  "show_error_traces": false,
+  "strict": false
+}
+2026-02-22 11:38:31,161 [PID 63028] PERFORMANCE  Initialized shared memory (heap size: 8589934592, dep table pow: 1, hash table pow: 26): 0.002s
+2026-02-22 11:38:31,176 [PID 63028] PERFORMANCE  Initialized multiprocessing workers (workers: 4): 0.013s
+2026-02-22 11:38:31,176 [PID 63028] INFO  Building module tracker...
+2026-02-22 11:38:31,234 [PID 63028] PERFORMANCE  Module tracker built: 0.049s
+2026-02-22 11:38:31,234 [PID 63028] PERFORMANCE  Full environment built: 0.050s
+2026-02-22 11:38:31,234 [PID 63028] INFO  Collecting all definitions...
+2026-02-22 11:38:31,468 [PID 63028] PERFORMANCE  Collected definitions (defines: 459): 0.234s
+2026-02-22 11:38:31,468 [PID 63028] INFO  Checking 459 functions...
+2026-02-22 11:38:31,899 [PID 63028] INFO  Processed 58 of 459 functions
+2026-02-22 11:38:32,030 [PID 63028] INFO  Processed 116 of 459 functions
+2026-02-22 11:38:32,045 [PID 63028] INFO  Processed 174 of 459 functions
+2026-02-22 11:38:32,074 [PID 63028] INFO  Processed 232 of 459 functions
+2026-02-22 11:38:32,145 [PID 63028] INFO  Processed 290 of 459 functions
+2026-02-22 11:38:32,388 [PID 63028] INFO  Processed 348 of 459 functions
+2026-02-22 11:38:32,419 [PID 63028] INFO  Processed 406 of 459 functions
+2026-02-22 11:38:32,449 [PID 63028] INFO  Processed 459 of 459 functions
+2026-02-22 11:38:32,449 [PID 63028] PERFORMANCE  Check_TypeCheck: 0.981s
+2026-02-22 11:38:32,449 [PID 63028] MEMORY  Shared memory size post-typecheck (size: 3)
+2026-02-22 11:38:32,449 [PID 63028] INFO  Postprocessing 30 sources...
+2026-02-22 11:38:32,522 [PID 63028] INFO  Postprocessed 8 of 30 sources
+2026-02-22 11:38:32,522 [PID 63028] INFO  Postprocessed 16 of 30 sources
+2026-02-22 11:38:32,522 [PID 63028] INFO  Postprocessed 22 of 30 sources
+2026-02-22 11:38:32,522 [PID 63028] INFO  Postprocessed 30 of 30 sources
+2026-02-22 11:38:32,522 [PID 63028] PERFORMANCE  Check_Postprocessing: 0.071s
+2026-02-22 11:38:32,522 [PID 63028] PERFORMANCE  Check (request kind: FullCheck): 1.338s
+2026-02-22 11:38:32,538 [PID 63028] SUCCESS No type errors found

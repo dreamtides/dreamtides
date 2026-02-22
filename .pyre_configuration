@@ -1,0 +1,12 @@
+{
+  "source_directories": ["scripts"],
+  "search_path": [
+    "scripts/review",
+    "scripts/abu"
+  ],
+  "exclude": [
+    "**/venv/**",
+    "**/.venv/**",
+    "**/site-packages/**"
+  ]
+}
