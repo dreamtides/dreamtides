@@ -264,6 +264,14 @@ def wait_for_tests(log_offset: int) -> TestResult:
         content = read_new_log(log_offset)
 
         for line in content.splitlines():
+            if "An unexpected error happened while running tests" in line:
+                return TestResult(
+                    finished=True,
+                    success=False,
+                    failures=["An unexpected error happened while running tests"],
+                    summary="Test runner encountered an unexpected error",
+                )
+
             if "[TestRunner] Run finished:" in line:
                 failures = []
                 for log_line in content.splitlines():
@@ -350,6 +358,13 @@ def do_refresh(play: bool = False) -> None:
 
 def do_test() -> None:
     """Refresh, then run all Edit Mode tests and report results."""
+    # Step 0: Exit play mode if active (tests require Edit Mode)
+    if is_play_mode_active():
+        print("Play mode is active, exiting before running tests...")
+        result_msg = toggle_play_mode()
+        print(result_msg)
+        time.sleep(2)
+
     # Step 1: Refresh to trigger recompilation
     do_refresh()
 

@@ -89,8 +89,17 @@ The system has two halves: a Python CLI and a set of C# classes inside Unity.
   `ISettledProvider` and waits for `!ActionService.IsProcessingCommands` AND
   `DOTween.TotalPlayingTweens() == 0` held for 3 consecutive frames (with a 3s
   timeout fallback).
+- **HistoryRecorder** (`HistoryRecorder.cs`) implements `IHistoryProvider` and
+  observes `ActionService.OnCommandProcessed` to produce per-action history
+  entries: game messages (turn begins, victory/defeat), dreamwell activations,
+  shuffle events, and card zone transitions derived from `UpdateBattle` diffs.
+- **IHistoryProvider** (`IHistoryProvider.cs`) is the interface in
+  `namespace Abu` with two methods: `ClearHistory()` (called at action dispatch)
+  and `TakeHistory()` (called after settle; returns null if no events occurred).
 - **DreamtidesAbuSetup** (`DreamtidesAbuSetup.cs`) is a `MonoBehaviour` that
-  wires the walker and settled provider to the bridge on `Start()`.
+  wires the walker, settled provider, and history recorder to the bridge on
+  `Start()`. Subscribes `_historyRecorder.OnCommand` to
+  `ActionService.OnCommandProcessed` and unsubscribes in `OnDestroy()`.
 
 All C# compiles under the `Dreamtides` assembly (`Dreamtides.asmdef`). There is
 no separate Abu assembly definition. Core files use `namespace Abu`; the three
@@ -153,24 +162,25 @@ DFS order as `SnapshotFormatter`, so ref strings align.
 
 **CommandSchema** (`CommandSchema.cs`) defines the wire types:
 
-| Type                 | Wire shape                            | Notes                                        |
-| -------------------- | ------------------------------------- | -------------------------------------------- |
-| `AbuCommand`         | `{id, command, params}`               | `params` is `JObject?`                       |
-| `AbuResponse`        | `{id, success, data?, error?}`        |                                              |
-| `SnapshotData`       | `{snapshot, refs}`                    | `refs` is `Dictionary<string, SnapshotRef>`  |
-| `ActionSnapshotData` | inherits `SnapshotData` + action flag | Action fields merged via `JsonExtensionData` |
-| `SnapshotRef`        | `{role, name}`                        | Entry in refs dict                           |
-| `SnapshotParams`     | `{interactive?, compact?, maxDepth?}` | `maxDepth` parsed but not implemented        |
-| `RefParams`          | `{ref}`                               | For click/hover                              |
-| `DragParams`         | `{source, target?}`                   | For drag                                     |
+| Type                 | Wire shape                            | Notes                                                                    |
+| -------------------- | ------------------------------------- | ------------------------------------------------------------------------ |
+| `AbuCommand`         | `{id, command, params}`               | `params` is `JObject?`                                                   |
+| `AbuResponse`        | `{id, success, data?, error?}`        |                                                                          |
+| `SnapshotData`       | `{snapshot, refs, history?}`          | `refs` is `Dictionary<string, SnapshotRef>`; `history` omitted when null |
+| `ActionSnapshotData` | inherits `SnapshotData` + action flag | Action fields merged via `JsonExtensionData`                             |
+| `SnapshotRef`        | `{role, name}`                        | Entry in refs dict                                                       |
+| `SnapshotParams`     | `{interactive?, compact?, maxDepth?}` | `maxDepth` parsed but not implemented                                    |
+| `RefParams`          | `{ref}`                               | For click/hover                                                          |
+| `DragParams`         | `{source, target?}`                   | For drag                                                                 |
 
 Interfaces:
 
-| Interface          | File                  | Contract                                         |
-| ------------------ | --------------------- | ------------------------------------------------ |
-| `ISceneWalker`     | `ISceneWalker.cs`     | `Walk(RefRegistry) → AbuSceneNode`               |
-| `ISettledProvider` | `ISettledProvider.cs` | `IsSettled() → bool`, `NotifyActionDispatched()` |
-| `ICommandHandler`  | `ICommandHandler.cs`  | `HandleCommand(command, bridge, onComplete)`     |
+| Interface          | File                  | Contract                                                              |
+| ------------------ | --------------------- | --------------------------------------------------------------------- |
+| `ISceneWalker`     | `ISceneWalker.cs`     | `Walk(RefRegistry) → AbuSceneNode`                                    |
+| `ISettledProvider` | `ISettledProvider.cs` | `IsSettled() → bool`, `NotifyActionDispatched()`                      |
+| `ICommandHandler`  | `ICommandHandler.cs`  | `HandleCommand(command, bridge, onComplete)`                          |
+| `IHistoryProvider` | `IHistoryProvider.cs` | `ClearHistory()`, `TakeHistory() → List<string>?`; in `namespace Abu` |
 
 ## Wire Protocol
 
@@ -195,10 +205,16 @@ one command and reads exactly one response per process invocation.
 | Command      | `data` shape                                                                  |
 | ------------ | ----------------------------------------------------------------------------- |
 | `snapshot`   | `{"snapshot": "<ARIA text>", "refs": {"e1": {"role": "...", "name": "..."}}}` |
-| `click`      | `{"clicked": true, "snapshot": "...", "refs": {...}}`                         |
-| `hover`      | `{"hovered": true, "snapshot": "...", "refs": {...}}`                         |
-| `drag`       | `{"dragged": true, "snapshot": "...", "refs": {...}}`                         |
+| `click`      | `{"clicked": true, "snapshot": "...", "refs": {...}, "history": [...]}`       |
+| `hover`      | `{"hovered": true, "snapshot": "...", "refs": {...}, "history": [...]}`       |
+| `drag`       | `{"dragged": true, "snapshot": "...", "refs": {...}, "history": [...]}`       |
 | `screenshot` | `{"base64": "<base64-encoded PNG>"}`                                          |
+
+The `history` key is present only on action responses (click/hover/drag) and
+only when game events occurred. It is absent on snapshot responses and absent
+(not null) when the action produced no observable events. The CLI prints history
+entries before the snapshot when present, separated by `--- History ---` / `---`
+delimiters.
 
 Action commands (click/hover/drag) return a post-action snapshot after the UI
 settles — refs in this snapshot are fresh and supersede any previous snapshot.
@@ -256,17 +272,30 @@ traverses UIToolkit overlays and 3D scene elements.
 ## Conventions
 
 - **Two namespaces coexist**: core files use `namespace Abu`; Dreamtides
-  integration files use `namespace Dreamtides.Abu` with `using Abu;`. Do not
-  change either namespace.
+  integration files (`DreamtidesAbuSetup`, `DreamtidesSceneWalker`,
+  `DreamtidesSettledProvider`, `HistoryRecorder`) use `namespace Dreamtides.Abu`
+  with `using Abu;`. Game-agnostic interfaces (`IHistoryProvider`,
+  `ISceneWalker`, `ISettledProvider`) live in `namespace Abu`. Do not change
+  either namespace.
 - **No separate asmdef**: All Abu C# files compile under `Dreamtides.asmdef`.
   Never add a nested `.asmdef` inside `client/Assets/Dreamtides/Abu/`.
 - **Ref assignment is DFS pre-order**: `RefRegistry` assigns refs during
   `ISceneWalker.Walk()` and `SnapshotFormatter` assigns display refs during
   `Format()`. Both use the same DFS order on the same tree, so ref strings
   align. Never change walk order without updating both.
-- **Snapshot shape**: `SnapshotData` carries `Snapshot` (string) and `Refs`
-  (dict). `ActionSnapshotData` inherits `SnapshotData` and merges action fields
-  via `JsonExtensionData`. Action snapshots are never compact.
+- **Snapshot shape**: `SnapshotData` carries `Snapshot` (string), `Refs` (dict),
+  and optional `History` (list). `ActionSnapshotData` inherits `SnapshotData`
+  and merges action fields via `JsonExtensionData`. Action snapshots are never
+  compact. The `history` key is omitted entirely (not null) when no events
+  occurred.
+- **History lifecycle (reset-collect-drain)**: `ClearHistory()` is called
+  immediately before `NotifyActionDispatched()`. `OnCommand()` accumulates
+  entries while the action processes. `TakeHistory()` is called after
+  `IsSettled()` returns true. All three steps must occur for correct per-action
+  scoping.
+- **MonoBehaviour lifecycle for observers**: Subscribe to delegates in `Start()`
+  (not `Awake()`), after `Registry` discovery. Always unsubscribe in
+  `OnDestroy()`. `DreamtidesAbuSetup` demonstrates the correct pattern.
 - **Port configuration**: default port 9999; read from `ABU_PORT` env var in
   both `AbuBridge.cs` and `abu.py`. Legacy `ABU_WS_PORT` is also accepted in
   `AbuBridge.cs` as fallback.
@@ -274,6 +303,8 @@ traverses UIToolkit overlays and 3D scene elements.
   only, all type hints, `main() -> None`, `if __name__ == "__main__": main()`.
 - **Error handling**: `AbuError` hierarchy in `abu.py` (`ConnectionError`,
   `TimeoutError`, `EmptyResponseError`). Print to stderr, exit code 1 on error.
+- **C# glob scope**: scope C# globs to `client/Assets/`, not `client/`. Unity's
+  `client/Library/` directory contains package caches that pollute glob results.
 - **Do not modify**: `DreamtidesSceneWalker.cs` and
   `DreamtidesSettledProvider.cs` are large and working; avoid modifications
   unless necessary.
@@ -313,9 +344,8 @@ instance.
 ## Testing and Validation
 
 ```sh
-# Python CLI unit tests
-python3 scripts/abu/test_abu.py
-# or: python3 -m pytest scripts/abu/test_abu.py
+# Python CLI unit tests (run from the scripts/abu/ directory)
+cd scripts/abu && python3 -m unittest test_abu -v
 
 # C# bridge tests (includes SnapshotFormatterTests, CommandSchemaTests, etc.)
 just unity-tests
@@ -323,6 +353,10 @@ just unity-tests
 # C# formatting
 just fmt-csharp
 ```
+
+Do not use `pytest` — it is not installed. The test module is invoked by name
+(`test_abu`), not by path, because the working directory must be `scripts/abu/`
+for the `from abu import ...` import in the test file to resolve.
 
 **Python tests** (`scripts/abu/test_abu.py`): unittest-based with a mock TCP
 server for full roundtrip testing without Unity.

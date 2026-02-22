@@ -150,11 +150,14 @@
   snapshot/click/hover/drag/screenshot commands, the NDJSON wire protocol over
   TCP port 9999, C# transport and command handling internals (TcpServer,
   AbuBridge, SnapshotCommandHandler, SnapshotFormatter, RefRegistry,
-  CommandSchema), the three Dreamtides UI systems the walker traverses (UI
-  Toolkit, 3D Displayables, CanvasButtons), namespace conventions and coding
-  rules, common pitfalls (stale refs, compact mode, BusyToken, single-client
-  TCP), the `ISceneWalker` and `ISettledProvider` interfaces for adapting ABU to
-  other games, the full test suite layout, and a child doc on developing new Abu
-  features with interactive testing. Read when using the ABU Python CLI, working
-  on ABU C# code, debugging connectivity or snapshot accuracy, or porting ABU to
-  a new game.
+  CommandSchema), per-action history recording (HistoryRecorder,
+  IHistoryProvider, reset-collect-drain lifecycle), the three Dreamtides UI
+  systems the walker traverses (UI Toolkit, 3D Displayables, CanvasButtons),
+  namespace conventions and coding rules (Abu vs Dreamtides.Abu, C# glob scope
+  to client/Assets/), common pitfalls (stale refs, compact mode, BusyToken,
+  single-client TCP), the `ISceneWalker`, `ISettledProvider`, and
+  `IHistoryProvider` interfaces for adapting ABU to other games, the full test
+  suite layout (including correct Python unittest invocation), and a child doc
+  on developing new Abu features with interactive testing. Read when using the
+  ABU Python CLI, working on ABU C# code, debugging connectivity or snapshot
+  accuracy, or porting ABU to a new game.

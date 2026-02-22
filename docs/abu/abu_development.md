@@ -109,8 +109,19 @@ just abu drag e10 e3                  # drag source to target
 just abu hover e7                     # hover an element
 ```
 
-Each action command returns a fresh snapshot after the UI settles. Check that
-nodes moved, labels changed, or groups appeared/disappeared as expected.
+Each action command returns a fresh snapshot after the UI settles. History
+entries (game events that occurred during the action) appear before the
+snapshot, bracketed by `--- History ---` / `---` lines. History is absent when
+the action produced no observable events (e.g. hover over an empty zone).
+
+**Inspecting raw JSON (for debugging history or wire protocol):**
+
+```sh
+just abu --json click e5 2>/dev/null  # suppress command echo, print raw JSON
+```
+
+The `just` wrapper echoes the underlying command to stderr; suppress it with
+`2>/dev/null` when piping JSON to a parser.
 
 **Full validation cycle:**
 
@@ -129,6 +140,10 @@ nodes moved, labels changed, or groups appeared/disappeared as expected.
 require play mode.
 
 ## Troubleshooting
+
+**`No module named pytest`** — Abu Python tests use `unittest`, not `pytest`.
+Run `cd scripts/abu && python3 -m unittest test_abu -v`. The module name
+`test_abu` (not a file path) requires `scripts/abu/` as the working directory.
 
 **"Could not connect to Unity on localhost:9999"** — The game is not in play
 mode, or it hasn't finished initializing. Use `--wait 30` to automatically retry

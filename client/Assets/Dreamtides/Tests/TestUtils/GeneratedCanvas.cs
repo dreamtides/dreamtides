@@ -642,6 +642,7 @@ namespace Dreamtides.Tests.TestUtils
       closeBrowserButtonGoRect.anchorMax = new Vector2(0.5f, 0.5f);
       closeBrowserButtonGoRect.anchoredPosition = new Vector2(-15f, 20f);
       closeBrowserButtonGoRect.sizeDelta = new Vector2(22f, 22f);
+      closeBrowserButtonGo.AddComponent<CloseBrowserButton>();
       result.Objects.Add("SafeArea/CardBrowserRight/CloseBrowserButton", closeBrowserButtonGo);
 
       var textTMP13Go = new GameObject("Text (TMP)");
@@ -689,6 +690,7 @@ namespace Dreamtides.Tests.TestUtils
       closeBrowserButtonLandscapeGoRect.anchorMax = new Vector2(0.5f, 0.5f);
       closeBrowserButtonLandscapeGoRect.anchoredPosition = new Vector2(-75f, 132f);
       closeBrowserButtonLandscapeGoRect.sizeDelta = new Vector2(40f, 40f);
+      closeBrowserButtonLandscapeGo.AddComponent<CloseBrowserButton>();
       result.Objects.Add(
         "SafeArea/CardBrowserRightLandscape/CloseBrowserButtonLandscape",
         closeBrowserButtonLandscapeGo
@@ -993,6 +995,7 @@ namespace Dreamtides.Tests.TestUtils
       closeBrowserButton1GoRect.pivot = new Vector2(1f, 0.5f);
       closeBrowserButton1GoRect.anchoredPosition = new Vector2(-6f, -3.9f);
       closeBrowserButton1GoRect.sizeDelta = new Vector2(22f, 22f);
+      closeBrowserButton1Go.AddComponent<CloseBrowserButton>();
       result.Objects.Add(
         "SafeArea/QuestDeckBrowserPortrait/ControlBar/CloseBrowserButton",
         closeBrowserButton1Go
@@ -1084,6 +1087,7 @@ namespace Dreamtides.Tests.TestUtils
       closeBrowserButton2GoRect.pivot = new Vector2(1f, 0.5f);
       closeBrowserButton2GoRect.anchoredPosition = new Vector2(-22f, -10f);
       closeBrowserButton2GoRect.sizeDelta = new Vector2(22f, 22f);
+      closeBrowserButton2Go.AddComponent<CloseBrowserButton>();
       result.Objects.Add(
         "SafeArea/QuestDeckBrowserLandscape/ControlBar/CloseBrowserButton",
         closeBrowserButton2Go

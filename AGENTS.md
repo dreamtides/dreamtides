@@ -59,6 +59,13 @@ Run one test with e.g. `just battle-test <NAME>`.
 - `just review` — full gate (~5 min, keep polling, don't restart)
 - `just tabula-generate` — regenerate from TOML
 - `just schema` — regenerate C# types from Rust
+- Abu Python tests: `cd scripts/abu && python3 -m unittest test_abu -v`
+  (`pytest` is not installed; module name not file path; cwd must be `scripts/abu/`)
+
+## C# Code Navigation
+
+Scope C# globs to `client/Assets/`, not `client/`. Unity's `client/Library/`
+contains package caches that balloon glob results with unrelated package files.
 
 ## Acceptance Checklist
 
