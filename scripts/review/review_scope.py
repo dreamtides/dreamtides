@@ -39,12 +39,15 @@ class ScopeConfig:
     parser_path_prefixes: tuple[str, ...]
     tv_crate_seeds: tuple[str, ...]
     tv_path_prefixes: tuple[str, ...]
+    csharp_crate_seeds: tuple[str, ...]
+    csharp_path_prefixes: tuple[str, ...]
     always_run_steps: tuple[str, ...]
     markdown_only_skip_steps: tuple[str, ...]
     python_docs_only_skip_steps: tuple[str, ...]
     parser_steps: tuple[str, ...]
     tv_steps: tuple[str, ...]
     python_steps: tuple[str, ...]
+    csharp_steps: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -277,11 +280,14 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
 
     parser_section = payload.get("parser", {})
     tv_section = payload.get("tv", {})
+    csharp_section = payload.get("csharp", {})
 
     if not isinstance(parser_section, dict):
         raise ScopePlannerError("scope config 'parser' must be an object")
     if not isinstance(tv_section, dict):
         raise ScopePlannerError("scope config 'tv' must be an object")
+    if not isinstance(csharp_section, dict):
+        raise ScopePlannerError("scope config 'csharp' must be an object")
 
     def read_rules(value: Any, field_name: str) -> tuple[str, ...]:
         if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
@@ -302,6 +308,8 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
         parser_path_prefixes=read_rules(parser_section.get("path_prefixes", []), "parser.path_prefixes"),
         tv_crate_seeds=read_names(tv_section.get("crate_seeds", []), "tv.crate_seeds"),
         tv_path_prefixes=read_rules(tv_section.get("path_prefixes", []), "tv.path_prefixes"),
+        csharp_crate_seeds=read_names(csharp_section.get("crate_seeds", []), "csharp.crate_seeds"),
+        csharp_path_prefixes=read_rules(csharp_section.get("path_prefixes", []), "csharp.path_prefixes"),
         always_run_steps=read_names(payload.get("always_run_steps", []), "always_run_steps"),
         markdown_only_skip_steps=read_names(payload.get("markdown_only_skip_steps", []), "markdown_only_skip_steps"),
         python_docs_only_skip_steps=read_names(
@@ -310,6 +318,7 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
         parser_steps=read_names(payload.get("parser_steps", []), "parser_steps"),
         tv_steps=read_names(payload.get("tv_steps", []), "tv_steps"),
         python_steps=read_names(payload.get("python_steps", []), "python_steps"),
+        csharp_steps=read_names(payload.get("csharp_steps", []), "csharp_steps"),
     )
 
 
@@ -416,6 +425,13 @@ def scoped_domains(config: ScopeConfig) -> tuple[ScopedDomain, ...]:
             path_prefixes=(),
             file_extensions=PYTHON_EXTENSIONS,
             gated_steps=config.python_steps,
+        ),
+        ScopedDomain(
+            name="csharp",
+            crate_seeds=config.csharp_crate_seeds,
+            path_prefixes=config.csharp_path_prefixes,
+            file_extensions=(),
+            gated_steps=config.csharp_steps,
         ),
     )
 

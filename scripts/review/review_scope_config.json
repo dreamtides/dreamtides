@@ -40,6 +40,12 @@
       "rules_engine/tests/tv_tests/"
     ]
   },
+  "csharp": {
+    "crate_seeds": [],
+    "path_prefixes": [
+      "client/Assets/"
+    ]
+  },
   "always_run_steps": [
     "check-snapshots",
     "check-format",
@@ -61,12 +67,14 @@
     "parser-test",
     "tv-check",
     "tv-clippy",
-    "tv-test"
+    "tv-test",
+    "unity-check"
   ],
   "python_docs_only_skip_steps": [
     "build",
     "clippy",
-    "test-core"
+    "test-core",
+    "unity-check"
   ],
   "parser_steps": [
     "parser-test"
@@ -78,5 +86,8 @@
   ],
   "python_steps": [
     "python-test"
+  ],
+  "csharp_steps": [
+    "unity-check"
   ]
 }

@@ -142,6 +142,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
             "rlf-lint",
             "test-core",
             "python-test",
+            "unity-check",
             "parser-test",
             "tv-check",
             "tv-clippy",
@@ -172,6 +173,8 @@ class ReviewScopePlannerTests(unittest.TestCase):
             ),
             tv_crate_seeds=("tv", "tv_tests"),
             tv_path_prefixes=("rules_engine/src/tv/", "rules_engine/tests/tv_tests/"),
+            csharp_crate_seeds=(),
+            csharp_path_prefixes=("client/Assets/",),
             always_run_steps=(
                 "check-snapshots",
                 "check-format",
@@ -194,15 +197,18 @@ class ReviewScopePlannerTests(unittest.TestCase):
                 "tv-check",
                 "tv-clippy",
                 "tv-test",
+                "unity-check",
             ),
             python_docs_only_skip_steps=(
                 "build",
                 "clippy",
                 "test-core",
+                "unity-check",
             ),
             parser_steps=("parser-test",),
             tv_steps=("tv-check", "tv-clippy", "tv-test"),
             python_steps=("python-test",),
+            csharp_steps=("unity-check",),
         )
         self.metadata = review_scope.WorkspaceMetadata(
             crate_roots={

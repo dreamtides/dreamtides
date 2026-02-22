@@ -15,7 +15,7 @@ review:
         python3 scripts/review/review_runner.py
     fi
 
-review-direct: check-snapshots check-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test parser-test tv-check tv-clippy tv-test
+review-direct: check-snapshots check-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test unity-check parser-test tv-check tv-clippy tv-test
 
 review-verbose: check-snapshots check-format-verbose check-docs-format-verbose check-token-limits-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose review-core-test-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
 
@@ -556,6 +556,13 @@ check-docs:
 
 unity-tests:
     ./scripts/testing/test_unity.py
+
+# Unity Editor commands via Hammerspoon
+unity command *args:
+    python3 scripts/unity/unity.py {{command}} {{args}}
+
+unity-check:
+    python3 scripts/unity/unity.py refresh
 
 outdated:
     # Check for outdated dependencies, consider installing cargo-edit and running 'cargo upgrade' if this fails
