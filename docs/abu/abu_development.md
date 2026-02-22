@@ -40,6 +40,11 @@ it if so, triggers a refresh (compilation), and re-enters play mode — all in o
 step. Changes to C# code do not hot-reload during play mode, so this cycle is
 required after every edit.
 
+**Checking state:** Use `python3 scripts/abu/abu.py status` to see a combined
+report of Unity's state file, PID liveness, play mode, game mode, and TCP
+reachability. Useful for diagnosing startup issues or confirming the editor is
+ready before running commands.
+
 ## Adding a New UI Feature
 
 When a game UI element is not represented in Abu snapshots, add support in the

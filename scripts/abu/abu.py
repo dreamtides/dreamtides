@@ -40,6 +40,13 @@ TEST_TIMEOUT_SECONDS = 300
 POLL_INTERVAL = 0.3
 ABU_PORT = 9999
 ABU_STATE_FILE = Path(__file__).resolve().parent.parent.parent / ".abu-state.json"
+SAVE_DIR = (
+    Path.home()
+    / "Library"
+    / "Application Support"
+    / "Dreamtides"
+    / "Dreamtides"
+)
 RESTART_TIMEOUT_SECONDS = 180
 UNITY_EXECUTABLE_PATTERN = "/Unity.app/Contents/MacOS/Unity"
 CLIENT_DIR = Path(__file__).resolve().parent.parent.parent / "client"
@@ -815,6 +822,18 @@ def do_restart() -> None:
     )
 
 
+def do_clear_save() -> None:
+    """Delete all save files from the Dreamtides save directory."""
+    matches = sorted(SAVE_DIR.glob("save-*.json"))
+    if not matches:
+        print("No save files found.")
+        return
+    for path in matches:
+        path.unlink()
+        print(f"  Deleted {path.name}")
+    print(f"Cleared {len(matches)} save file(s).")
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser with all subcommands."""
     parser = argparse.ArgumentParser(
@@ -893,6 +912,11 @@ def build_parser() -> argparse.ArgumentParser:
         "restart", help="Kill and relaunch Unity Editor, restoring the active scene"
     )
 
+    # clear-save
+    subparsers.add_parser(
+        "clear-save", help="Delete all Dreamtides save files"
+    )
+
     return parser
 
 
@@ -904,6 +928,10 @@ def main() -> None:
 
     if command == "status":
         do_status()
+        return
+
+    if command == "clear-save":
+        do_clear_save()
         return
 
     editor_commands = {"refresh", "play", "test", "cycle", "restart"}

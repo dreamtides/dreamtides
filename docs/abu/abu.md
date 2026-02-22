@@ -32,10 +32,13 @@ python3 scripts/abu/abu.py play                   # toggle play mode
 python3 scripts/abu/abu.py test                   # refresh then run all Edit Mode tests
 python3 scripts/abu/abu.py cycle                  # exit play → refresh → enter play
 python3 scripts/abu/abu.py restart                # kill and relaunch Unity, restore scene
+python3 scripts/abu/abu.py status                # show Unity state from state file and TCP probe
+python3 scripts/abu/abu.py clear-save            # delete all Dreamtides save files
 
 # In-game commands (require Unity in Play mode)
 python3 scripts/abu/abu.py snapshot              # ARIA-style scene tree
 python3 scripts/abu/abu.py snapshot --compact    # abbreviated tree (interactive + labeled nodes)
+python3 scripts/abu/abu.py snapshot --interactive # show only interactive elements
 python3 scripts/abu/abu.py click e1              # click element with ref e1
 python3 scripts/abu/abu.py click @e1             # leading @ is stripped automatically
 python3 scripts/abu/abu.py hover e1              # hover element
@@ -130,8 +133,8 @@ dependencies). Key functions:
 - `wait_for_refresh(log_offset)` — poll Editor log for refresh completion
 - `wait_for_tests(log_offset)` — poll Editor log for test run completion
 - `find_unity_process()` — discover running Unity via `ps`
-- `do_refresh()`, `do_test()`, `do_cycle()`, `do_restart()` — high-level editor
-  workflows
+- `do_refresh()`, `do_test()`, `do_cycle()`, `do_restart()`, `do_status()`,
+  `do_clear_save()` — high-level editor workflows
 - `main()` — entry point; dispatches editor or TCP commands
 
 Error handling uses an `AbuError` hierarchy (`ConnectionError`, `TimeoutError`,
