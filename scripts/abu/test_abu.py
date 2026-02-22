@@ -421,14 +421,28 @@ class TestIsWorktree(unittest.TestCase):
     @patch("abu.subprocess.run")
     def test_main_repo_not_worktree(self, mock_run: MagicMock) -> None:
         mock_run.return_value = subprocess.CompletedProcess(
-            args=[], returncode=0, stdout=".git\n", stderr=""
+            args=[], returncode=0, stdout=".git\n.git\n", stderr=""
         )
         self.assertFalse(is_worktree())
 
     @patch("abu.subprocess.run")
+    def test_subdirectory_not_worktree(self, mock_run: MagicMock) -> None:
+        mock_run.return_value = subprocess.CompletedProcess(
+            args=[], returncode=0,
+            stdout="/Users/me/project/.git\n../../.git\n", stderr=""
+        )
+        with patch("abu.os.path.realpath", side_effect=[
+            "/Users/me/project/.git",
+            "/Users/me/project/.git",
+        ]):
+            self.assertFalse(is_worktree())
+
+    @patch("abu.subprocess.run")
     def test_worktree_detected(self, mock_run: MagicMock) -> None:
         mock_run.return_value = subprocess.CompletedProcess(
-            args=[], returncode=0, stdout="/path/to/main/.git\n", stderr=""
+            args=[], returncode=0,
+            stdout="/Users/me/project/.git/worktrees/branch\n/Users/me/project/.git\n",
+            stderr=""
         )
         self.assertTrue(is_worktree())
 

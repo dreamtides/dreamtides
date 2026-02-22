@@ -287,6 +287,7 @@ def run_hs(lua_code: str) -> str:
     try:
         result = subprocess.run(
             ["hs", "-c", lua_code],
+            stdin=subprocess.DEVNULL,
             capture_output=True,
             text=True,
             timeout=10,
@@ -322,10 +323,13 @@ def is_worktree() -> bool:
     """Check if the current directory is inside a git worktree."""
     try:
         result = subprocess.run(
-            ["git", "rev-parse", "--git-common-dir"],
+            ["git", "rev-parse", "--git-dir", "--git-common-dir"],
             capture_output=True, text=True, check=True,
         )
-        return result.stdout.strip() != ".git"
+        lines = result.stdout.strip().splitlines()
+        if len(lines) != 2:
+            return False
+        return os.path.realpath(lines[0]) != os.path.realpath(lines[1])
     except subprocess.CalledProcessError:
         return False
 
@@ -529,6 +533,20 @@ def is_play_mode_active() -> bool:
         return False
 
 
+def enter_play_mode() -> None:
+    """Toggle play mode on and verify it actually started."""
+    play_result = toggle_play_mode()
+    print(play_result)
+    time.sleep(3)
+    if not is_play_mode_active():
+        print(
+            "Error: Play mode did not start. This usually means Unity has "
+            "unresolved compilation errors.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+
 def do_refresh(play: bool = False) -> None:
     """Execute a refresh and optionally enter play mode."""
     log_offset = get_log_size()
@@ -554,8 +572,7 @@ def do_refresh(play: bool = False) -> None:
         sys.exit(1)
 
     if play:
-        play_result = toggle_play_mode()
-        print(play_result)
+        enter_play_mode()
 
 
 def do_test() -> None:
@@ -604,8 +621,7 @@ def do_cycle() -> None:
     do_refresh()
 
     print("\nEntering play mode...")
-    play_result = toggle_play_mode()
-    print(play_result)
+    enter_play_mode()
 
 
 def read_state_file() -> dict[str, Any] | None:
