@@ -1,5 +1,19 @@
 # Dreamtides Documentation Index
 
+- [battle_rules.md](battle_rules/battle_rules.md): Complete rules reference for
+  Dreamtides battles — objective and win conditions, all card types (Character,
+  Event, Dreamcaller, Dreamsign, Dreamwell), zones, the Dreamwell energy system
+  (shared deck, production accumulation, phase cycling, all 7 current cards),
+  turn structure (Starting through Ending), playing cards and costs, the stack
+  and priority system, spark-based Judgment scoring, character limit (8 max with
+  spark bonus), hand size limit, all keywords (Dissolve, Banish, Materialize,
+  Prevent, Abandon, Kindle, Foresee, Reclaim, Fast, Discover, Anchored, Copy,
+  Gain Control), trigger keywords (Materialized, Judgment, Dissolved), ability
+  types (event, triggered, activated, static, modal), effects reference by
+  category, targeting predicates, character subtypes, figments, rarity, and a
+  glossary. Read when needing to understand game mechanics, card interactions,
+  or the rules of Dreamtides battles.
+
 - [project_overview.md](project_overview/project_overview.md): Technical
   architecture overview covering the full project structure, crate layers, card
   data pipeline, battle execution, display/animation system, client
