@@ -145,12 +145,13 @@
   performance.
 
 - [abu.md](abu/abu.md): Complete guide to ABU (Agent-Browser for Unity) — the
-  Python CLI (`scripts/abu/abu.py`) and C# Unity TCP server
-  (`client/Assets/Dreamtides/Abu/`), running ABU with DreamtidesAbuSetup,
-  snapshot/click/hover/drag/screenshot commands, the NDJSON wire protocol over
-  TCP port 9999, C# transport and command handling internals (TcpServer,
-  AbuBridge, SnapshotCommandHandler, SnapshotFormatter, RefRegistry,
-  CommandSchema), per-action history recording (HistoryRecorder,
+  Python CLI (`scripts/abu/abu.py`) for both Unity Editor control (refresh,
+  play, test, cycle via Hammerspoon) and in-game interaction (snapshot, click,
+  hover, drag, screenshot over TCP), the C# Unity TCP server
+  (`client/Assets/Dreamtides/Abu/`), running ABU with DreamtidesAbuSetup, the
+  NDJSON wire protocol over TCP port 9999, C# transport and command handling
+  internals (TcpServer, AbuBridge, SnapshotCommandHandler, SnapshotFormatter,
+  RefRegistry, CommandSchema), per-action history recording (HistoryRecorder,
   IHistoryProvider, reset-collect-drain lifecycle), the three Dreamtides UI
   systems the walker traverses (UI Toolkit, 3D Displayables, CanvasButtons),
   namespace conventions and coding rules (Abu vs Dreamtides.Abu, C# glob scope
@@ -159,5 +160,5 @@
   `IHistoryProvider` interfaces for adapting ABU to other games, the full test
   suite layout (including correct Python unittest invocation), and a child doc
   on developing new Abu features with interactive testing. Read when using the
-  ABU Python CLI, working on ABU C# code, debugging connectivity or snapshot
-  accuracy, or porting ABU to a new game.
+  ABU Python CLI, controlling the Unity Editor, working on ABU C# code,
+  debugging connectivity or snapshot accuracy, or porting ABU to a new game.

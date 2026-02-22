@@ -1,9 +1,10 @@
 # ABU (Agent-Browser for Unity)
 
-ABU enables AI agents to interact with the Dreamtides Unity client through a
-Python CLI. Unity runs a TCP server on port 9999; the CLI connects one-shot per
-command, sends NDJSON, reads the response, and exits. All C# source lives in
-`client/Assets/Dreamtides/Abu/`.
+ABU enables AI agents to control the Unity Editor and interact with a running
+Dreamtides game through a single Python CLI. Editor commands (refresh, play,
+test, cycle) drive Unity's menu bar via Hammerspoon. In-game commands (snapshot,
+click, hover, drag, screenshot) connect over TCP port 9999 using NDJSON. All C#
+source lives in `client/Assets/Dreamtides/Abu/`.
 
 ## Table of Contents
 
@@ -24,10 +25,14 @@ command, sends NDJSON, reads the response, and exits. All C# source lives in
 ## Running ABU
 
 ```sh
-# 1. Open Unity and enter Play mode with DreamtidesAbuSetup on a GameObject.
-#    Unity logs "[Abu] TCP server listening on port 9999" when ready.
+# Editor commands (require Hammerspoon)
+python3 scripts/abu/abu.py refresh               # trigger asset refresh, wait for completion
+python3 scripts/abu/abu.py refresh --play         # refresh then enter play mode
+python3 scripts/abu/abu.py play                   # toggle play mode
+python3 scripts/abu/abu.py test                   # refresh then run all Edit Mode tests
+python3 scripts/abu/abu.py cycle                  # exit play → refresh → enter play
 
-# 2. Interact with the running game
+# In-game commands (require Unity in Play mode)
 python3 scripts/abu/abu.py snapshot              # ARIA-style scene tree
 python3 scripts/abu/abu.py snapshot --compact    # abbreviated tree (interactive + labeled nodes)
 python3 scripts/abu/abu.py click e1              # click element with ref e1
@@ -40,8 +45,10 @@ python3 scripts/abu/abu.py screenshot            # save PNG, print path
 ABU_PORT=9998 python3 scripts/abu/abu.py snapshot
 ```
 
-Unity listens on port 9999 by default. Set `ABU_PORT` (or the legacy
-`ABU_WS_PORT`) to override.
+Editor commands use Hammerspoon to drive Unity's menu bar and cannot run from a
+git worktree. In-game commands connect over TCP to Unity in Play mode. Unity
+listens on port 9999 by default. Set `ABU_PORT` (or the legacy `ABU_WS_PORT`) to
+override.
 
 ## Adding DreamtidesAbuSetup to a Scene
 
@@ -117,10 +124,17 @@ dependencies). Key functions:
 - `send_command(command, params, port)` — one-shot TCP connect/send/recv
 - `handle_response(command, response)` — extracts output; decodes base64 for
   screenshot
-- `main()` — entry point; reads `ABU_PORT` env var
+- `run_hs(lua_code)` — execute Lua via Hammerspoon CLI
+- `send_menu_item(path)` — drive Unity menu bar via Hammerspoon
+- `wait_for_refresh(log_offset)` — poll Editor log for refresh completion
+- `wait_for_tests(log_offset)` — poll Editor log for test run completion
+- `do_refresh()`, `do_test()`, `do_cycle()` — high-level editor workflows
+- `main()` — entry point; dispatches editor or TCP commands
 
 Error handling uses an `AbuError` hierarchy (`ConnectionError`, `TimeoutError`,
-`EmptyResponseError`). Errors print to stderr with exit code 1.
+`EmptyResponseError`, `HammerspoonError`, `UnityNotFoundError`,
+`RefreshTimeoutError`, `CompilationError`). Errors print to stderr with exit
+code 1.
 
 Python style: shebang `#!/usr/bin/env python3`, module docstring, stdlib only,
 all type hints, `main() -> None`, `if __name__ == "__main__": main()`.
@@ -358,8 +372,10 @@ Do not use `pytest` — it is not installed. The test module is invoked by name
 (`test_abu`), not by path, because the working directory must be `scripts/abu/`
 for the `from abu import ...` import in the test file to resolve.
 
-**Python tests** (`scripts/abu/test_abu.py`): unittest-based with a mock TCP
-server for full roundtrip testing without Unity.
+**Python tests** (`scripts/abu/test_abu.py`): unittest-based covering both TCP
+communication (mock server roundtrip tests) and editor control functions
+(worktree detection, log parsing, refresh polling, parser configuration,
+exception hierarchy).
 
 **C# tests** (`client/Assets/Dreamtides/Tests/Abu/`):
 

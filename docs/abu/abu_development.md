@@ -22,19 +22,19 @@ builds a tree of `AbuSceneNode` objects representing the current UI. Battle mode
 is handled in `WalkBattle()`; non-battle mode falls back to `WalkUiToolkit()`
 and `WalkFallbackScene3D()`.
 
-**Step 2 — Compile.** Run `./scripts/unity/unity.py refresh` to trigger asset
+**Step 2 — Compile.** Run `python3 scripts/abu/abu.py refresh` to trigger asset
 compilation. This drives Unity's Assets > Refresh menu via Hammerspoon and waits
 for the compiler to finish. If there are C# errors, they are printed and the
 script exits non-zero.
 
-**Step 3 — Test.** Enter play mode with `./scripts/unity/unity.py play`, then
+**Step 3 — Test.** Enter play mode with `python3 scripts/abu/abu.py play`, then
 use `just abu --wait 30 snapshot --compact` to inspect the accessibility tree.
 The `--wait` flag retries the connection for up to the specified number of
 seconds, so you don't need to guess how long Unity takes to initialize. Use
 `just abu click`, `just abu drag`, and `just abu hover` to interact and verify
 that actions produce the expected state changes.
 
-**Iterating:** Use `./scripts/unity/unity.py cycle` to automate the
+**Iterating:** Use `python3 scripts/abu/abu.py cycle` to automate the
 edit-compile-test loop. This command detects whether play mode is active, exits
 it if so, triggers a refresh (compilation), and re-enters play mode — all in one
 step. Changes to C# code do not hot-reload during play mode, so this cycle is
@@ -86,8 +86,8 @@ Foresee prompt for the CardOrderSelector). Then use the CLI to validate.
 **Taking snapshots:**
 
 ```sh
-./scripts/unity/unity.py play                   # enter play mode
-just abu --wait 30 snapshot --compact           # wait for connection, then snapshot
+python3 scripts/abu/abu.py play                  # enter play mode
+just abu --wait 30 snapshot --compact            # wait for connection, then snapshot
 ```
 
 The `--wait 30` flag retries the TCP connection for up to 30 seconds,
@@ -97,8 +97,8 @@ non-interactive unlabeled nodes for readability. Drop it to see the full tree.
 **Single-command recompile and restart:**
 
 ```sh
-./scripts/unity/unity.py cycle                  # exit play → refresh → enter play
-just abu --wait 30 snapshot --compact           # snapshot after cycle completes
+python3 scripts/abu/abu.py cycle                 # exit play → refresh → enter play
+just abu --wait 30 snapshot --compact            # snapshot after cycle completes
 ```
 
 **Performing actions and verifying state changes:**
@@ -136,7 +136,7 @@ The `just` wrapper echoes the underlying command to stderr; suppress it with
 
 **C# unit tests** for the scene walker live in
 `client/Assets/Dreamtides/Tests/Abu/SceneWalkerTests.cs`. Run them with
-`./scripts/unity/unity.py test`. These tests use mock registries and do not
+`python3 scripts/abu/abu.py test`. These tests use mock registries and do not
 require play mode.
 
 ## Troubleshooting
@@ -149,9 +149,9 @@ Run `cd scripts/abu && python3 -m unittest test_abu -v`. The module name
 mode, or it hasn't finished initializing. Use `--wait 30` to automatically retry
 instead of failing immediately.
 
-**Snapshot is stale after code changes** — Use `./scripts/unity/unity.py cycle`
-to exit play mode, recompile, and re-enter in one step. C# changes do not take
-effect during an active play session.
+**Snapshot is stale after code changes** — Use
+`python3 scripts/abu/abu.py cycle` to exit play mode, recompile, and re-enter in
+one step. C# changes do not take effect during an active play session.
 
 **Duplicate nodes in snapshot** — Check whether a feature's nodes are being
 added both in your new code and in an existing section (e.g. action buttons
@@ -161,6 +161,6 @@ appearing in both the main Actions group and a feature-specific group).
 tree structure changes. Always re-read the snapshot after any action before
 using ref numbers.
 
-**Refresh times out** — The `unity.py refresh` command has a 120-second timeout.
+**Refresh times out** — The `abu.py refresh` command has a 120-second timeout.
 If Unity is in play mode, exit first. If compilation is genuinely slow, the
 timeout may need adjustment.

@@ -562,13 +562,13 @@ unity-tests:
 
 # Unity Editor commands via Hammerspoon
 unity command *args:
-    python3 scripts/unity/unity.py {{command}} {{args}}
+    python3 scripts/abu/abu.py {{command}} {{args}}
 
 unity-test:
-    python3 scripts/unity/unity.py test
+    python3 scripts/abu/abu.py test
 
 unity-check:
-    python3 scripts/unity/unity.py refresh
+    python3 scripts/abu/abu.py refresh
 
 outdated:
     # Check for outdated dependencies, consider installing cargo-edit and running 'cargo upgrade' if this fails
