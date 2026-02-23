@@ -430,12 +430,20 @@ def resolve_editor_log() -> Path:
 
 def all_state_files() -> list[Path]:
     """Return paths to all abu state files (main repo + worktrees)."""
-    files: list[Path] = [ABU_STATE_FILE]
+    seen: set[Path] = set()
+    files: list[Path] = []
+    for candidate in [ABU_STATE_FILE]:
+        resolved = candidate.resolve()
+        if resolved not in seen and resolved.exists():
+            seen.add(resolved)
+            files.append(candidate)
     if WORKTREE_BASE.is_dir():
         for child in WORKTREE_BASE.iterdir():
             if child.is_dir():
                 candidate = child / ".abu-state.json"
-                if candidate.exists():
+                resolved = candidate.resolve()
+                if candidate.exists() and resolved not in seen:
+                    seen.add(resolved)
                     files.append(candidate)
     return files
 
