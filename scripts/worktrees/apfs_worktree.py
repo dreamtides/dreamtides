@@ -198,7 +198,7 @@ def cleanup_worktree(worktree_path: Path) -> None:
 def cmd_create(args: argparse.Namespace) -> None:
     """Create a new worktree with APFS-cloned caches."""
     branch: str = args.branch
-    new_branch: bool = args.new_branch
+    existing: bool = args.existing
     base: str = args.base
     dry_run: bool = args.dry_run
 
@@ -230,10 +230,10 @@ def cmd_create(args: argparse.Namespace) -> None:
     else:
         worktree_path.parent.mkdir(parents=True, exist_ok=True)
         git_args: list[str] = ["git", "worktree", "add"]
-        if new_branch:
-            git_args.extend(["-b", branch, str(worktree_path), base])
-        else:
+        if existing:
             git_args.extend([str(worktree_path), branch])
+        else:
+            git_args.extend(["-b", branch, str(worktree_path), base])
         result = run_cmd(git_args, check=False, cwd=REPO_ROOT)
         if result.returncode != 0:
             print("Error: git worktree add failed")
@@ -350,9 +350,9 @@ def main() -> None:
     create_parser = subparsers.add_parser("create", help="Create a new worktree")
     create_parser.add_argument("branch", help="Branch name")
     create_parser.add_argument(
-        "--new-branch",
+        "--existing",
         action="store_true",
-        help="Create a new branch",
+        help="Check out an existing branch instead of creating a new one",
     )
     create_parser.add_argument(
         "--base",
