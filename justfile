@@ -27,6 +27,13 @@ code-review-worktree:
         git -C "$WORKTREE" checkout -B code-review "$BASE" >/dev/null
         git -C "$WORKTREE" clean -fd >/dev/null
     fi
+    # Mark slot as busy so concurrent `claim` won't steal it.
+    # Staging a file makes git status show a non-?? line, which
+    # causes _is_worktree_available to return False.
+    touch "$WORKTREE/.review-lock"
+    git -C "$WORKTREE" add .review-lock
+    cleanup() { git -C "$WORKTREE" reset HEAD .review-lock 2>/dev/null; rm -f "$WORKTREE/.review-lock"; }
+    trap cleanup EXIT
     cd "$WORKTREE" && just review || { osascript -e 'display dialog "Review failed" with icon stop' 2>/dev/null; exit 1; }
 
 # Run this before pushing
