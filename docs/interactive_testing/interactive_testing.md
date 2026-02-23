@@ -185,6 +185,13 @@ buttons. Click "Spend 2●" to pay the tax and keep your event, or "Decline" to
 let it be prevented. The opponent can chain multiple Ripples, each requiring a
 separate 2 energy payment.
 
+**Auto-decline**: If you cannot afford the 2 energy tax when Ripple targets your
+event, the system automatically declines for you — the entire chain resolves
+without prompting. In observed gameplay, this happened silently within a single
+action response (no intermediate "Spend 2●" / "Decline" UI appeared). Be aware
+of your energy AFTER playing an event, not just the play cost — you need 2 spare
+energy to survive a Ripple.
+
 ## Testing Strategy
 
 1. **Play a full game** to test basic card flow, scoring, and victory
@@ -229,46 +236,18 @@ Check `status` between steps to confirm play mode toggled correctly.
   with fast cards. If the opponent has Sundown Surfers, each response grows
   their spark. Play characters and essential non-fast cards, then save fast
   cards for the ending phase.
-- **Activated abilities are safe.** They don't go to the stack and don't give
-  the opponent priority. Use these freely even when the opponent has energy and
-  Surfers.
+- **Activated abilities go on the stack.** The opponent can respond to them with
+  fast cards, triggering Sundown Surfers. Use with caution when the opponent has
+  Surfers and energy.
 
 ### Passive vs Proactive Play
 
-A common mistake is feeling compelled to play cards every main phase just
-because you have energy and playable cards. Often the correct play is to do
-nothing during your main phase and immediately click End Turn — even at full
-energy. Reasons to be passive:
+Often the correct play is to pass your main phase and End Turn — especially when
+the opponent has Surfers and energy. This denies Surfer triggers, preserves
+energy for counter-spells, and forces the opponent to act first.
 
-- **Denying the opponent triggers.** If the opponent has Sundown Surfers, every
-  card you put on the stack is an invitation for them to respond and trigger the
-  spiral. Passing your main phase gives them zero opportunities.
-- **Preserving energy for the opponent's turn.** Unspent energy lets you play
-  counter-spells (Abolish, Cragfall) and fast removal (Immolate) during the
-  opponent's turn. A reactive posture is often stronger than a proactive one,
-  especially when you're ahead on spark.
-- **Forcing the opponent to act first.** If you're winning the spark race, the
-  opponent must play cards to catch up. Let them commit resources first, then
-  respond. Don't give them free information about your hand by playing into an
-  empty board.
-- **Protecting your board.** Characters already on the battlefield are
-  generating spark. Playing more cards risks the opponent responding with Break
-  the Sequence or other removal, potentially netting them Surfer triggers in the
-  process.
-
-**When to be proactive:**
-
-- You're behind on spark and need to close the gap before Judgment.
-- You have a character that generates immediate value on materialization (e.g.,
-  Minstrel's draw ability) and the opponent lacks Surfers or energy to respond.
-- You have Immolate and the opponent has high-value Surfers to dissolve —
-  removing a Surfer is almost always worth the stack interaction risk.
-- It's the early game (turns 1-2) and neither side has Surfers yet. Board
-  development is safe when there's no spiral threat.
-
-**Rule of thumb:** If you're ahead on spark and the opponent has Surfers +
-energy, pass your main phase. Use activated abilities (free, no stack), then End
-Turn. Play fast cards in the ending phase only if needed.
+**Be proactive when:** behind on spark, opponent lacks Surfers/energy, early
+game (turns 1-2), or you have Immolate to remove high-value Surfers.
 
 ### Early Game (Turns 1-3)
 
@@ -334,17 +313,13 @@ your turn triggers ALL of them.
    triggering all Surfers again
 6. This repeats until the opponent runs out of energy or fast cards
 
-In a real game, an opponent with 3 Surfers playing 5 fast cards during your turn
-gains +15 spark from triggers alone — easily enough to score 12+ points at
-Judgment and win immediately.
-
 **Counter-strategies:**
 
 - **Dissolve Surfers early with Immolate.** This is the #1 priority. Don't waste
   Immolate on Minstrels when Surfers are on the board.
-- **Don't put cards on the stack during your main phase** when the opponent has
-  Surfers + energy. Each response triggers the spiral. Use activated abilities
-  instead (they don't use the stack).
+- **Minimize stack interactions during your main phase** when the opponent has
+  Surfers + energy. Each response triggers the spiral. Note: activated abilities
+  also use the stack and can be responded to.
 - **Save fast cards for the ending phase.** After you click End Turn, you can
   still play fast cards. The opponent can respond, but you've already committed
   to ending — minimizing the window for responses.
@@ -379,8 +354,10 @@ Immolate, making it safe. If opponent has energy, they may Abolish your Immolate
 - **Reclaim abilities**: Appear in hand as separate entries. Cost is the Reclaim
   cost, not the original card cost. Reclaimed cards go to banished (not void)
   when they leave play.
-- **Activated abilities**: Cost energy but don't go to the stack. They appear as
-  hand entries with the ability cost. Safe to use when the opponent has Surfers.
+- **Activated abilities**: Cost energy and DO go on the stack. They appear as
+  hand entries with the ability cost. The opponent can respond with fast cards,
+  triggering Sundown Surfers. Plan ability usage considering opponent energy and
+  Surfer presence.
 - **Ripple of Defiance**: Forces the opponent to pay 2 energy or have their
   event prevented. When targeting your event, you see "Spend 2●" and "Decline"
   buttons.
@@ -390,15 +367,13 @@ Immolate, making it safe. If opponent has energy, they may Abolish your Immolate
 
 ## Known Bugs and History Gaps
 
-### Break the Sequence Missing History Entries
+### Break the Sequence History Entries
 
-When Break the Sequence resolves and returns an enemy character to hand, the
-target character's zone transition does NOT appear in history. Only "Break the
-Sequence moved from hand to stack" and "Break the Sequence moved to void" are
-logged. The affected character silently disappears from the battlefield. To
-detect this, compare battlefield character counts before and after the action.
-The void count will be unchanged since the character goes to its owner's hand,
-not to the void.
+Previously documented as missing zone transitions, but in observed gameplay (Feb
+2026), Break the Sequence correctly logged both "Break the Sequence moved to
+void" and "Sundown Surfer moved from battlefield to hand" in the history. The
+bug may have been fixed. Still verify: compare battlefield character counts
+before and after to confirm the bounce happened.
 
 ### Opponent Can Chain Fast Cards During Your Stack Resolution
 
@@ -454,6 +429,40 @@ cards in response, you cannot use activated abilities until the entire stack
 resolves. Plan ability usage BEFORE putting cards on the stack, or after the
 stack fully clears.
 
+### Activated Abilities Use the Stack
+
+**Correction to earlier guidance:** Activated abilities (like Minstrel of
+Falling Light's "3 energy: Draw a card") DO use the stack and CAN be responded
+to. They are NOT safe from opponent interaction. When you activate an ability:
+
+1. Energy is deducted immediately
+2. The effect goes on the stack
+3. The opponent gets priority to respond (play fast cards, etc.)
+4. Sundown Surfers trigger from opponent responses during your turn
+5. The ability effect resolves after the stack clears (LIFO)
+
+**Implication**: If the opponent has Sundown Surfers + energy, even using
+activated abilities gives them a window to trigger the spiral. Consider whether
+the draw is worth the risk of Surfer triggers. Sometimes ending the turn and
+saving energy for defense is better.
+
+### Together Against the Tide Appears Unplayable
+
+In observed gameplay, Together Against the Tide ("Prevent a played event which
+could dissolve an ally") never showed the "can play" tag, even when Immolate
+("Dissolve an enemy") was on the stack. This card was dead weight throughout an
+entire game. Possible causes:
+
+- The card may not be classified as "fast" even though prevent effects are
+  supposed to be fast per the rules
+- The targeting logic may not recognize Immolate as an event "which could
+  dissolve an ally" from the defending player's perspective
+- Some other precondition may not be met
+
+Until this is resolved, treat Together Against the Tide as low priority and
+prefer Abolish or Cragfall for stack interaction. Discard it early via Foresee
+or Astral Interface.
+
 ### Abolish Timing
 
 Abolish only shows "can play" when there is a valid target on the stack (a
@@ -477,8 +486,8 @@ A recommended turn structure for playing well:
    Surfer count before making any plays
 2. **Play characters first**: These must go on the stack, so get them out while
    you still have energy to respond if the opponent plays fast cards
-3. **Use activated abilities**: These are safe (no stack, no opponent priority).
-   Draw cards, filter your deck
+3. **Use activated abilities**: These go on the stack and can be responded to.
+   Use when opponent lacks Surfers/energy to minimize trigger risk
 4. **Click End Turn**: This enters the ending phase
 5. **Play fast cards during the ending phase**: Guiding Light, removal spells,
    and other fast events are best played here. The opponent can still respond,
