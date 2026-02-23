@@ -25,6 +25,7 @@ namespace Dreamtides.Editors
   {
     private const string MenuRoot = "Tools/Play Mode/";
     private const string MenuQuest = MenuRoot + "Quest #&q"; // Shift + Alt + Q
+    private const string MenuPrototypeQuest = MenuRoot + "Prototype Quest #&p"; // Shift + Alt + P
     private const string MenuBattle = MenuRoot + "Battle #&b"; // Shift + Alt + B
 
     static PlayModeGameModeMenu()
@@ -58,6 +59,21 @@ namespace Dreamtides.Editors
       return true;
     }
 
+    [MenuItem(MenuPrototypeQuest)]
+    private static void SetPrototypeQuest()
+    {
+      PlayModeSelection.Current = GameMode.PrototypeQuest;
+      Debug.Log($"Set play mode to {PlayModeSelection.Current}");
+      UpdateChecks();
+    }
+
+    [MenuItem(MenuPrototypeQuest, true)]
+    private static bool ValidatePrototypeQuest()
+    {
+      Menu.SetChecked(MenuPrototypeQuest, PlayModeSelection.Current == GameMode.PrototypeQuest);
+      return true;
+    }
+
     [MenuItem(MenuBattle)]
     private static void SetBattle()
     {
@@ -76,6 +92,7 @@ namespace Dreamtides.Editors
     private static void UpdateChecks()
     {
       Menu.SetChecked(MenuQuest, PlayModeSelection.Current == GameMode.Quest);
+      Menu.SetChecked(MenuPrototypeQuest, PlayModeSelection.Current == GameMode.PrototypeQuest);
       Menu.SetChecked(MenuBattle, PlayModeSelection.Current == GameMode.Battle);
     }
   }

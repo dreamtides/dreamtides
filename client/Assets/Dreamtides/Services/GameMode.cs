@@ -6,6 +6,7 @@ namespace Dreamtides.Services
   {
     MainMenu = 0,
     Battle = 1,
-    Quest = 2,
+    PrototypeQuest = 2,
+    Quest = 3,
   }
 }

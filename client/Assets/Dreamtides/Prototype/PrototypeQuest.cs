@@ -109,8 +109,9 @@ public class PrototypeQuest : Service
 
   protected override void OnInitialize(GameMode mode, TestConfiguration? testConfiguration)
   {
-    if (mode != GameMode.Quest)
+    if (mode != GameMode.PrototypeQuest)
     {
+      gameObject.SetActive(false);
       return;
     }
 

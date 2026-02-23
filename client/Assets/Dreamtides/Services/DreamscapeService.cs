@@ -47,7 +47,7 @@ namespace Dreamtides.Services
     protected override void OnInitialize(GameMode mode, TestConfiguration? testConfiguration)
     {
       const int index = 0;
-      if (mode == GameMode.Quest)
+      if (mode == GameMode.PrototypeQuest)
       {
         _dreamscapes[index].gameObject.SetActive(true);
         _siteButtons.gameObject.SetActive(true);
