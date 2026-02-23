@@ -252,13 +252,13 @@ Check `status` between steps to confirm play mode toggled correctly.
 
 ### Break the Sequence Missing History Entries
 
-When Break the Sequence resolves and banishes/returns an enemy character, the
+When Break the Sequence resolves and returns an enemy character to hand, the
 target character's zone transition does NOT appear in history. Only "Break the
 Sequence moved from hand to stack" and "Break the Sequence moved to void" are
 logged. The affected character silently disappears from the battlefield. To
 detect this, compare battlefield character counts before and after the action.
-Also check the void count — if unchanged, the character was banished rather than
-dissolved.
+The void count will be unchanged since the character goes to its owner's hand,
+not to the void.
 
 ### Opponent Can Chain Fast Cards During Your Stack Resolution
 
