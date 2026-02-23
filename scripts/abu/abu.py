@@ -484,21 +484,12 @@ def send_menu_item(path: list[str]) -> str:
             target_pid = pid
 
     if target_pid is not None:
-        lua = f"""
-    local app = hs.application.applicationForPID({target_pid})
-    if not app then
-        return "ERROR: Unity Editor (PID {target_pid}) not found"
-    end
-    local result = app:selectMenuItem({{{lua_path}}})
-    if result then
-        return "OK: Selected {menu_label} (pid " .. app:pid() .. ")"
-    else
-        return "ERROR: {menu_label} menu item not found"
-    end
-    """
+        find_app = f"hs.application.applicationForPID({target_pid})"
     else:
-        lua = f"""
-    local app = hs.application.find("{UNITY_BUNDLE_ID}")
+        find_app = f'hs.application.find("{UNITY_BUNDLE_ID}")'
+
+    lua = f"""
+    local app = {find_app}
     if not app then
         return "ERROR: Unity Editor not found"
     end
