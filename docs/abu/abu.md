@@ -112,6 +112,27 @@ a worktree editor, it passes
 editor has its own log. `check_log_conflict()` detects and errors if two live
 editors share a log path.
 
+### Window Tinting
+
+Worktree Unity editors display a colored strip at the top of the window so they
+are visually distinguishable from the main editor. Two components work together:
+
+1. **C# title prefix** (`WorktreeWindowTitle.cs`): An `[InitializeOnLoad]`
+   editor script that detects whether the project lives under
+   `~/dreamtides-worktrees/` and, if so, prefixes the window title with the
+   uppercased worktree name (e.g. `[ALPHA] Unity - ...`). The main repo editor
+   is left untouched.
+
+2. **Hammerspoon tinting** (`scripts/abu/unity_tint.lua`): A Lua module loaded
+   by `~/.hammerspoon/init.lua` that watches for Unity windows whose title
+   starts with `[NAME]`. It draws a 5px colored `hs.canvas` strip at the top
+   edge of matching windows. Each worktree gets a stable color from a 6-color
+   palette (cornflower blue, amber, violet, rose, teal, gold) based on a hash of
+   the name. The strip follows window move/resize and is cleaned up on close.
+
+To reload after changes: `hs.reload()` in the Hammerspoon console, or click
+"Reload Config" from the Hammerspoon menu bar icon.
+
 ### Status Display
 
 `abu status` shows the worktree name (or "main repo") and the resolved port:

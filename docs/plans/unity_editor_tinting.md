@@ -126,4 +126,5 @@ _G._unityTint = { canvases = { strip }, timer = timer, watcher = watcher }
   frontmost). If both are visible side-by-side, it would need two strip canvases
   and a window filter instead of an app watcher.
 - The 1px strip is subtle. Bump `STRIP_HEIGHT` to 2-3 if it's hard to see.
-- To load on Hammerspoon startup, add a `dofile()` call to `~/.hammerspoon/init.lua`.
+- To load on Hammerspoon startup, add a `dofile()` call to
+  `~/.hammerspoon/init.lua`.
