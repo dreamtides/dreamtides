@@ -10,6 +10,7 @@ import subprocess
 import threading
 import unittest
 import uuid
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from abu import (
@@ -17,6 +18,7 @@ from abu import (
     AbuError,
     CompilationError,
     ConnectionError,
+    DEFAULT_ABU_PORT,
     EmptyResponseError,
     HammerspoonError,
     RefreshResult,
@@ -27,13 +29,17 @@ from abu import (
     build_command,
     build_params,
     build_parser,
+    check_log_conflict,
     do_status,
     find_unity_process,
     handle_response,
     is_pid_alive,
     is_worktree,
     read_state_file,
+    resolve_port,
+    resolve_worktree_name,
     send_command,
+    send_menu_item,
     strip_ref,
     wait_for_refresh,
 )
@@ -872,6 +878,131 @@ class TestFindUnityProcess(unittest.TestCase):
         info = find_unity_process()
         self.assertEqual(info.pid, 789)
         self.assertEqual(info.project_path, "/fallback/client")
+
+
+class TestResolveWorktreeName(unittest.TestCase):
+    """Test worktree name resolution from repo root."""
+
+    @patch("abu.MAIN_REPO_ROOT", Path("/Users/me/project"))
+    @patch("abu.WORKTREE_BASE", Path("/Users/me/dreamtides-worktrees"))
+    def test_main_repo_returns_none(self) -> None:
+        self.assertIsNone(resolve_worktree_name())
+
+    @patch("abu.MAIN_REPO_ROOT", Path("/Users/me/dreamtides-worktrees/alpha"))
+    @patch("abu.WORKTREE_BASE", Path("/Users/me/dreamtides-worktrees"))
+    def test_worktree_returns_name(self) -> None:
+        self.assertEqual(resolve_worktree_name(), "alpha")
+
+    @patch("abu.MAIN_REPO_ROOT", Path("/Users/me/dreamtides-worktrees/beta/nested"))
+    @patch("abu.WORKTREE_BASE", Path("/Users/me/dreamtides-worktrees"))
+    def test_nested_worktree_returns_top_level_name(self) -> None:
+        self.assertEqual(resolve_worktree_name(), "beta")
+
+
+class TestResolvePort(unittest.TestCase):
+    """Test port resolution: env var > worktree .ports.json > default."""
+
+    @patch("abu.resolve_worktree_name", return_value=None)
+    def test_main_repo_returns_default(self, _mock: MagicMock) -> None:
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(resolve_port(), DEFAULT_ABU_PORT)
+
+    @patch("abu.resolve_worktree_name", return_value=None)
+    def test_env_var_overrides(self, _mock: MagicMock) -> None:
+        with patch.dict(os.environ, {"ABU_PORT": "8888"}):
+            self.assertEqual(resolve_port(), 8888)
+
+    @patch("abu.PORTS_FILE")
+    @patch("abu.resolve_worktree_name", return_value="alpha")
+    def test_worktree_reads_ports_file(self, _mock_name: MagicMock, mock_ports_file: MagicMock) -> None:
+        mock_ports_file.read_text.return_value = json.dumps({"alpha": 10000})
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(resolve_port(), 10000)
+
+
+class TestSendMenuItemPidTargeted(unittest.TestCase):
+    """Test PID-targeted vs bundle-ID Hammerspoon dispatch."""
+
+    @patch("abu.run_hs", return_value="OK: Selected Assets > Refresh (pid 123)")
+    @patch("abu.is_pid_alive", return_value=True)
+    @patch("abu.read_state_file", return_value={"unityPid": 123})
+    def test_valid_pid_uses_application_for_pid(
+        self, _mock_state: MagicMock, _mock_alive: MagicMock, mock_hs: MagicMock,
+    ) -> None:
+        result = send_menu_item(["Assets", "Refresh"])
+        self.assertIn("OK", result)
+        lua_code = mock_hs.call_args[0][0]
+        self.assertIn("applicationForPID(123)", lua_code)
+
+    @patch("abu.run_hs", return_value="OK: Selected Assets > Refresh (pid 456)")
+    @patch("abu.read_state_file", return_value=None)
+    def test_missing_state_falls_back_to_bundle_id(
+        self, _mock_state: MagicMock, mock_hs: MagicMock,
+    ) -> None:
+        result = send_menu_item(["Assets", "Refresh"])
+        self.assertIn("OK", result)
+        lua_code = mock_hs.call_args[0][0]
+        self.assertIn("hs.application.find", lua_code)
+
+    @patch("abu.run_hs", return_value="OK: Selected Assets > Refresh (pid 456)")
+    @patch("abu.is_pid_alive", return_value=False)
+    @patch("abu.read_state_file", return_value={"unityPid": 999})
+    def test_stale_pid_falls_back_to_bundle_id(
+        self, _mock_state: MagicMock, _mock_alive: MagicMock, mock_hs: MagicMock,
+    ) -> None:
+        result = send_menu_item(["Assets", "Refresh"])
+        self.assertIn("OK", result)
+        lua_code = mock_hs.call_args[0][0]
+        self.assertIn("hs.application.find", lua_code)
+
+
+class TestCheckLogConflict(unittest.TestCase):
+    """Test log conflict detection between multiple editors."""
+
+    @patch("abu.is_pid_alive", return_value=True)
+    @patch("abu.all_state_files")
+    def test_detects_shared_log_file(
+        self, mock_files: MagicMock, _mock_alive: MagicMock,
+    ) -> None:
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmpdir:
+            state1 = Path(tmpdir) / "main" / ".abu-state.json"
+            state2 = Path(tmpdir) / "wt" / ".abu-state.json"
+            state1.parent.mkdir()
+            state2.parent.mkdir()
+            state1.write_text(json.dumps({
+                "unityPid": 100,
+                "logFile": "/shared/Editor.log",
+            }))
+            state2.write_text(json.dumps({
+                "unityPid": 200,
+                "logFile": "/shared/Editor.log",
+            }))
+            mock_files.return_value = [state1, state2]
+            with self.assertRaises(SystemExit):
+                check_log_conflict()
+
+    @patch("abu.is_pid_alive", return_value=True)
+    @patch("abu.all_state_files")
+    def test_passes_with_distinct_logs(
+        self, mock_files: MagicMock, _mock_alive: MagicMock,
+    ) -> None:
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmpdir:
+            state1 = Path(tmpdir) / "main" / ".abu-state.json"
+            state2 = Path(tmpdir) / "wt" / ".abu-state.json"
+            state1.parent.mkdir()
+            state2.parent.mkdir()
+            state1.write_text(json.dumps({
+                "unityPid": 100,
+                "logFile": "/main/Editor.log",
+            }))
+            state2.write_text(json.dumps({
+                "unityPid": 200,
+                "logFile": "/wt/Editor.log",
+            }))
+            mock_files.return_value = [state1, state2]
+            check_log_conflict()  # Should not raise
 
 
 if __name__ == "__main__":

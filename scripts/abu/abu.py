@@ -38,8 +38,11 @@ EDITOR_LOG = Path.home() / "Library" / "Logs" / "Unity" / "Editor.log"
 TIMEOUT_SECONDS = 120
 TEST_TIMEOUT_SECONDS = 300
 POLL_INTERVAL = 0.3
-ABU_PORT = 9999
+DEFAULT_ABU_PORT = 9999
 ABU_STATE_FILE = Path(__file__).resolve().parent.parent.parent / ".abu-state.json"
+WORKTREE_BASE = Path.home() / "dreamtides-worktrees"
+PORTS_FILE = WORKTREE_BASE / ".ports.json"
+MAIN_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 SAVE_DIR = (
     Path.home()
     / "Library"
@@ -381,11 +384,120 @@ def is_worktree() -> bool:
         return False
 
 
+def resolve_worktree_name() -> str | None:
+    """Return the worktree name if running inside a worktree, else None."""
+    try:
+        resolved = MAIN_REPO_ROOT.resolve()
+        base = WORKTREE_BASE.resolve()
+        if resolved.is_relative_to(base):
+            return resolved.relative_to(base).parts[0]
+    except (ValueError, IndexError):
+        pass
+    return None
+
+
+def resolve_port() -> int:
+    """Resolve the ABU port: env var > worktree .ports.json > default 9999."""
+    env_port = os.environ.get("ABU_PORT")
+    if env_port:
+        return int(env_port)
+    name = resolve_worktree_name()
+    if name is None:
+        return DEFAULT_ABU_PORT
+    try:
+        ports: dict[str, int] = json.loads(PORTS_FILE.read_text())
+        if name in ports:
+            return ports[name]
+    except (OSError, json.JSONDecodeError):
+        pass
+    print(
+        f"Error: Worktree '{name}' has no port assigned in {PORTS_FILE}.\n"
+        f"Run 'just worktree-create' to set up the worktree properly.",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
+
+def resolve_editor_log() -> Path:
+    """Resolve the Editor log path from the state file or fall back to default."""
+    state = read_state_file()
+    if state:
+        log_file = state.get("logFile")
+        if log_file:
+            return Path(log_file)
+    return EDITOR_LOG
+
+
+def all_state_files() -> list[Path]:
+    """Return paths to all abu state files (main repo + worktrees)."""
+    files: list[Path] = [ABU_STATE_FILE]
+    if WORKTREE_BASE.is_dir():
+        for child in WORKTREE_BASE.iterdir():
+            if child.is_dir():
+                candidate = child / ".abu-state.json"
+                if candidate.exists():
+                    files.append(candidate)
+    return files
+
+
+def check_log_conflict() -> None:
+    """Check that no two live editors share the same log file path."""
+    log_to_editors: dict[str, list[str]] = {}
+    for state_file in all_state_files():
+        try:
+            state = json.loads(state_file.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        pid = state.get("unityPid", 0)
+        if not pid or not is_pid_alive(pid):
+            continue
+        log_file = state.get("logFile", str(EDITOR_LOG))
+        log_to_editors.setdefault(log_file, []).append(str(state_file.parent))
+
+    for log_path, editors in log_to_editors.items():
+        if len(editors) > 1:
+            print(
+                f"Error: Multiple live editors share log file {log_path}:\n"
+                + "\n".join(f"  - {e}" for e in editors)
+                + "\nRestart the conflicting editor with 'abu restart' to assign "
+                "a per-worktree log file.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+
+
 def send_menu_item(path: list[str]) -> str:
-    """Send a selectMenuItem command to Unity via Hammerspoon."""
+    """Send a selectMenuItem command to Unity via Hammerspoon.
+
+    Uses PID-targeted lookup when the state file has a live unityPid,
+    falling back to bundle ID search otherwise.
+    """
     lua_path = ", ".join(f'"{item}"' for item in path)
     menu_label = " > ".join(path)
-    lua = f"""
+
+    # Try to get a live PID from the state file for targeted lookup
+    target_pid: int | None = None
+    state = read_state_file()
+    if state:
+        pid = state.get("unityPid", 0)
+        if pid and is_pid_alive(pid):
+            target_pid = pid
+
+    if target_pid is not None:
+        lua = f"""
+    local app = hs.application.applicationForPID({target_pid})
+    if not app then
+        return "ERROR: Unity Editor (PID {target_pid}) not found"
+    end
+    local result = app:selectMenuItem({{{lua_path}}})
+    if result then
+        return "OK: Selected {menu_label} (pid " .. app:pid() .. ")"
+    else
+        return "ERROR: {menu_label} menu item not found"
+    end
+    """
+    else:
+        lua = f"""
     local app = hs.application.find("{UNITY_BUNDLE_ID}")
     if not app then
         return "ERROR: Unity Editor not found"
@@ -420,18 +532,22 @@ def toggle_play_mode() -> str:
     return send_menu_item(["Edit", "Play Mode", "Play"])
 
 
-def get_log_size() -> int:
+def get_log_size(log_path: Path | None = None) -> int:
     """Return the current size of the Unity Editor log."""
+    if log_path is None:
+        log_path = resolve_editor_log()
     try:
-        return EDITOR_LOG.stat().st_size
+        return log_path.stat().st_size
     except OSError:
         return 0
 
 
-def read_new_log(offset: int) -> str:
+def read_new_log(offset: int, log_path: Path | None = None) -> str:
     """Read new content from the Unity Editor log starting at offset."""
+    if log_path is None:
+        log_path = resolve_editor_log()
     try:
-        with open(EDITOR_LOG, "r", errors="replace") as f:
+        with open(log_path, "r", errors="replace") as f:
             f.seek(offset)
             return f.read()
     except OSError:
@@ -567,12 +683,14 @@ def wait_for_tests(log_offset: int) -> TestResult:
     )
 
 
-def is_play_mode_active() -> bool:
+def is_play_mode_active(port: int | None = None) -> bool:
     """Check if Unity is in play mode by probing the Abu TCP port."""
+    if port is None:
+        port = resolve_port()
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         sock.settimeout(1.0)
-        sock.connect(("localhost", ABU_PORT))
+        sock.connect(("localhost", port))
         sock.close()
         return True
     except (builtins_ConnectionRefusedError, OSError):
@@ -596,6 +714,7 @@ def enter_play_mode() -> None:
 
 def do_refresh(play: bool = False) -> None:
     """Execute a refresh and optionally enter play mode."""
+    check_log_conflict()
     log_offset = get_log_size()
     result_msg = send_refresh()
     print(result_msg)
@@ -690,11 +809,18 @@ def is_pid_alive(pid: int) -> bool:
 
 def do_status() -> None:
     """Print a combined status report from state file, PID, and TCP probe."""
+    port = resolve_port()
     state = read_state_file()
-    tcp_up = is_play_mode_active()
+    tcp_up = is_play_mode_active(port)
+    wt_name = resolve_worktree_name()
 
     print("Unity Editor Status")
     print("=" * 40)
+
+    if wt_name:
+        print(f"  Worktree:      {wt_name}")
+    else:
+        print("  Worktree:      (main repo)")
 
     if state is None:
         print("  State file:    not found")
@@ -720,7 +846,7 @@ def do_status() -> None:
         print(f"  Game mode:     {game_mode}")
         print(f"  Last updated:  {timestamp}")
 
-    print(f"  TCP (:{ABU_PORT}):   {'reachable' if tcp_up else 'unreachable'}")
+    print(f"  TCP (:{port}):   {'reachable' if tcp_up else 'unreachable'}")
 
 
 @dataclass(frozen=True)
@@ -765,7 +891,12 @@ def find_unity_process() -> UnityProcessInfo:
             "Is Unity open?"
         )
 
-    # Find the main editor process (not a -batchMode worker)
+    # Find the main editor process (not a -batchMode worker).
+    # Prefer the process whose -projectPath matches CLIENT_DIR.
+    target_client = str(Path(str(CLIENT_DIR)).resolve())
+    matched: UnityProcessInfo | None = None
+    first_non_batch: UnityProcessInfo | None = None
+
     for pid, executable in candidates:
         try:
             args_result = subprocess.run(
@@ -784,9 +915,23 @@ def find_unity_process() -> UnityProcessInfo:
         if match:
             project_path = match.group(1)
 
-        return UnityProcessInfo(
+        info = UnityProcessInfo(
             pid=pid, executable=executable, project_path=project_path,
         )
+
+        if first_non_batch is None:
+            first_non_batch = info
+
+        try:
+            if Path(project_path).resolve() == Path(target_client):
+                matched = info
+        except (OSError, ValueError):
+            pass
+
+    if matched is not None:
+        return matched
+    if first_non_batch is not None:
+        return first_non_batch
 
     # All candidates were batch-mode workers; use the first one as fallback
     pid, executable = candidates[0]
@@ -797,6 +942,7 @@ def find_unity_process() -> UnityProcessInfo:
 
 def do_restart() -> None:
     """Kill the running Unity Editor and relaunch it with the same project."""
+    check_log_conflict()
     print("Finding Unity Editor process...")
     info = find_unity_process()
     print(f"  Found Unity (PID {info.pid}): {info.executable}")
@@ -841,9 +987,25 @@ def do_restart() -> None:
     app_idx = info.executable.find(".app/")
     app_path = info.executable[:app_idx + 4] if app_idx >= 0 else info.executable
     print(f"Relaunching Unity ({app_path})...")
+
+    launch_args: list[str] = [
+        "open", "-n", "-a", app_path, "--args",
+        "-projectPath", info.project_path,
+    ]
+
+    # For worktree editors, assign a per-worktree log file
+    wt_name = resolve_worktree_name()
+    if wt_name:
+        log_dir = WORKTREE_BASE / wt_name / "Logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        restart_log = log_dir / "Editor.log"
+        launch_args.extend(["-logFile", str(restart_log)])
+        print(f"  Log file: {restart_log}")
+    else:
+        restart_log = EDITOR_LOG
+
     subprocess.Popen(
-        ["open", "-n", "-a", app_path, "--args",
-         "-projectPath", info.project_path],
+        launch_args,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
@@ -861,14 +1023,14 @@ def do_restart() -> None:
 
     while time.monotonic() - start < RESTART_TIMEOUT_SECONDS:
         if not saw_marker:
-            content = read_new_log(0)
+            content = read_new_log(0, restart_log)
             if "[AbuRestart] Ready" in content:
                 saw_marker = True
-                last_log_size = get_log_size()
+                last_log_size = get_log_size(restart_log)
                 stable_since = time.monotonic()
                 print("  Domain reload complete, waiting for editor to settle...")
         else:
-            current_size = get_log_size()
+            current_size = get_log_size(restart_log)
             if current_size != last_log_size:
                 last_log_size = current_size
                 stable_since = time.monotonic()
@@ -1113,15 +1275,6 @@ def main() -> None:
     editor_commands = {"refresh", "play", "test", "cycle", "restart", "set-mode"}
 
     if command in editor_commands:
-        if is_worktree():
-            print(
-                "Error: Unity commands cannot run from a git worktree.\n"
-                "Hammerspoon can only interact with the Unity Editor open in the\n"
-                "main working copy. Run from the main repository instead.",
-                file=sys.stderr,
-            )
-            sys.exit(1)
-
         try:
             if not shutil.which("hs"):
                 raise HammerspoonError(
@@ -1150,7 +1303,7 @@ def main() -> None:
             sys.exit(1)
     else:
         params = build_params(args)
-        port = int(os.environ.get("ABU_PORT", "9999"))
+        port = resolve_port()
 
         try:
             if args.wait is not None:

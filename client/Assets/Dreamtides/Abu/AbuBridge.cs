@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace Abu
@@ -82,6 +83,72 @@ namespace Abu
       _commandHandler = _snapshotCommandHandler;
     }
 
+    static int ResolveWorktreePort()
+    {
+      try
+      {
+        // Application.dataPath gives ".../client/Assets"; go up 2 levels for repo root
+        var repoRoot = Path.GetFullPath(Path.Combine(Application.dataPath, "..", ".."));
+        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        var worktreeBase = Path.Combine(home, "dreamtides-worktrees");
+
+        if (!repoRoot.StartsWith(worktreeBase + Path.DirectorySeparatorChar) &&
+            !repoRoot.StartsWith(worktreeBase + "/"))
+        {
+          return DefaultPort;
+        }
+
+        // Extract worktree name (first path component after worktreeBase)
+        var relative = repoRoot.Substring(worktreeBase.Length + 1);
+        var sep = relative.IndexOfAny(new[] { '/', Path.DirectorySeparatorChar });
+        var worktreeName = sep >= 0 ? relative.Substring(0, sep) : relative;
+
+        var portsFile = Path.Combine(worktreeBase, ".ports.json");
+        if (!File.Exists(portsFile))
+        {
+          Debug.LogWarning($"[Abu] Worktree '{worktreeName}' detected but {portsFile} not found, using default port");
+          return DefaultPort;
+        }
+
+        var json = File.ReadAllText(portsFile);
+        // Simple JSON parsing without Newtonsoft dependency - parse {"name": port} pairs
+        // The file format is: { "alpha": 10000, "beta": 10001 }
+        var searchKey = $"\"{worktreeName}\"";
+        var keyIndex = json.IndexOf(searchKey, StringComparison.Ordinal);
+        if (keyIndex < 0)
+        {
+          Debug.LogWarning($"[Abu] Worktree '{worktreeName}' not found in {portsFile}, using default port");
+          return DefaultPort;
+        }
+
+        var colonIndex = json.IndexOf(':', keyIndex + searchKey.Length);
+        if (colonIndex < 0)
+        {
+          return DefaultPort;
+        }
+
+        // Extract the number after the colon
+        var afterColon = json.Substring(colonIndex + 1).TrimStart();
+        var numEnd = 0;
+        while (numEnd < afterColon.Length && char.IsDigit(afterColon[numEnd]))
+        {
+          numEnd++;
+        }
+
+        if (numEnd > 0 && int.TryParse(afterColon.Substring(0, numEnd), out var port))
+        {
+          Debug.Log($"[Abu] Worktree '{worktreeName}' using port {port}");
+          return port;
+        }
+      }
+      catch (Exception e)
+      {
+        Debug.LogWarning($"[Abu] Failed to resolve worktree port: {e.Message}");
+      }
+
+      return DefaultPort;
+    }
+
     void Awake()
     {
       DontDestroyOnLoad(gameObject);
@@ -95,6 +162,10 @@ namespace Abu
       if (!string.IsNullOrEmpty(portString) && int.TryParse(portString, out var parsed))
       {
         port = parsed;
+      }
+      else
+      {
+        port = ResolveWorktreePort();
       }
 
       _tcpServer = new TcpServer(port);

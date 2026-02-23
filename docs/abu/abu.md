@@ -9,6 +9,7 @@ source lives in `client/Assets/Dreamtides/Abu/`.
 ## Table of Contents
 
 - [Running ABU](#running-abu)
+- [Worktree Support](#worktree-support)
 - [Adding DreamtidesAbuSetup to a Scene](#adding-dreamtidesabusetup-to-a-scene)
 - [Architecture](#architecture)
 - [Python CLI](#python-cli)
@@ -56,10 +57,76 @@ python3 scripts/abu/abu.py screenshot            # save PNG, print path
 ABU_PORT=9998 python3 scripts/abu/abu.py snapshot
 ```
 
-Editor commands use Hammerspoon to drive Unity's menu bar and cannot run from a
-git worktree. In-game commands connect over TCP to Unity in Play mode. Unity
-listens on port 9999 by default. Set `ABU_PORT` (or the legacy `ABU_WS_PORT`) to
-override.
+Editor commands use Hammerspoon to drive Unity's menu bar via PID-targeted
+lookup, so they work from both the main repo and worktrees. In-game commands
+connect over TCP to Unity in Play mode. Port resolution order: `ABU_PORT` env
+var > worktree `.ports.json` > default 9999. See
+[Worktree Support](#worktree-support) for details.
+
+## Worktree Support
+
+ABU supports running multiple Unity editors concurrently — one per git worktree.
+Each editor gets its own TCP port, state file, and log file, with no manual
+configuration required.
+
+### Port Registry
+
+`just worktree-create <name>` allocates a unique port (starting at 10000) in
+`~/dreamtides-worktrees/.ports.json`. `just worktree-remove <name>` deallocates
+it. The main repo always uses port 9999.
+
+```json
+// ~/dreamtides-worktrees/.ports.json
+{
+  "alpha": 10000,
+  "beta": 10001
+}
+```
+
+### Auto-Detection
+
+Both the Python CLI (`abu.py`) and C# bridge (`AbuBridge.cs`) auto-detect their
+worktree context:
+
+1. **Python side**: `resolve_port()` checks `ABU_PORT` env var first, then
+   detects if the repo root is under `~/dreamtides-worktrees/`, reads the
+   worktree name, and looks up its port in `.ports.json`.
+2. **C# side**: `AbuBridge.Awake()` checks env vars first, then calls
+   `ResolveWorktreePort()` which reads `Application.dataPath` to detect the
+   worktree and looks up the port.
+
+### PID-Targeted Hammerspoon
+
+Editor commands (refresh, play, test, cycle, restart) use the `unityPid` from
+`.abu-state.json` to target the correct Unity process via
+`hs.application.applicationForPID(pid)`. This ensures menu commands reach the
+right editor when multiple are running. Falls back to bundle-ID search when the
+PID is unavailable.
+
+### Per-Editor Log Files
+
+Each editor writes its log file path to `.abu-state.json` (the `logFile` field).
+The Python CLI reads this to poll the correct log. When `abu restart` relaunches
+a worktree editor, it passes
+`-logFile ~/dreamtides-worktrees/<name>/Logs/Editor.log` to Unity, ensuring each
+editor has its own log. `check_log_conflict()` detects and errors if two live
+editors share a log path.
+
+### Status Display
+
+`abu status` shows the worktree name (or "main repo") and the resolved port:
+
+```
+Unity Editor Status
+========================================
+  Worktree:      alpha
+  State file:    ok
+  Unity PID:     12345 (running)
+  Play mode:     inactive
+  Game mode:     Battle
+  Last updated:  2026-02-23T12:00:00Z
+  TCP (:10000):  unreachable
+```
 
 ## Adding DreamtidesAbuSetup to a Scene
 
@@ -324,8 +391,10 @@ traverses UIToolkit overlays and 3D scene elements.
 - **MonoBehaviour lifecycle for observers**: Subscribe to delegates in `Start()`
   (not `Awake()`), after `Registry` discovery. Always unsubscribe in
   `OnDestroy()`. `DreamtidesAbuSetup` demonstrates the correct pattern.
-- **Port configuration**: default port 9999; read from `ABU_PORT` env var in
-  both `AbuBridge.cs` and `abu.py`. Legacy `ABU_WS_PORT` is also accepted in
+- **Port configuration**: default port 9999 for the main repo. Worktree ports
+  are allocated starting at 10000 in `~/dreamtides-worktrees/.ports.json`. Both
+  `AbuBridge.cs` and `abu.py` auto-detect the worktree port. `ABU_PORT` env var
+  overrides auto-detection. Legacy `ABU_WS_PORT` is also accepted in
   `AbuBridge.cs` as fallback.
 - **Python style**: shebang `#!/usr/bin/env python3`, module docstring, stdlib
   only, all type hints, `main() -> None`, `if __name__ == "__main__": main()`.

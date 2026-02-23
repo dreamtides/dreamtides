@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import fnmatch
+import json
 import os
 import shutil
 import subprocess
@@ -18,6 +19,8 @@ from pathlib import Path
 
 REPO_ROOT: Path = Path(__file__).resolve().parent.parent.parent
 DEFAULT_WORKTREE_BASE: Path = Path.home() / "dreamtides-worktrees"
+PORTS_FILE: Path = DEFAULT_WORKTREE_BASE / ".ports.json"
+FIRST_WORKTREE_PORT: int = 10000
 
 EXCLUDE: set[str] = {
     ".DS_Store",
@@ -70,6 +73,42 @@ def get_free_gb(path: Path) -> float:
     """Return free disk space in GB for the volume containing path."""
     stat = os.statvfs(path)
     return (stat.f_bavail * stat.f_frsize) / (1024**3)
+
+
+def read_ports() -> dict[str, int]:
+    """Read the port registry from .ports.json."""
+    try:
+        return json.loads(PORTS_FILE.read_text())
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def write_ports(ports: dict[str, int]) -> None:
+    """Write the port registry to .ports.json."""
+    PORTS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    PORTS_FILE.write_text(json.dumps(ports, indent=2) + "\n")
+
+
+def allocate_port(name: str) -> int:
+    """Allocate a port for a worktree and write it to .ports.json."""
+    ports = read_ports()
+    if name in ports:
+        return ports[name]
+    used: set[int] = set(ports.values())
+    port: int = FIRST_WORKTREE_PORT
+    while port in used:
+        port += 1
+    ports[name] = port
+    write_ports(ports)
+    return port
+
+
+def deallocate_port(name: str) -> None:
+    """Remove a worktree's port from .ports.json."""
+    ports = read_ports()
+    if name in ports:
+        del ports[name]
+        write_ports(ports)
 
 
 def verify_apfs(path: Path) -> bool:
@@ -252,6 +291,12 @@ def cmd_create(args: argparse.Namespace) -> None:
             print("Error: git worktree add failed")
             sys.exit(1)
 
+    # Allocate a port for this worktree
+    if not dry_run:
+        wt_name: str = worktree_path.name
+        port: int = allocate_port(wt_name)
+        print(f"  Allocated port {port} for worktree '{wt_name}'")
+
     print("Discovering untracked/gitignored items...")
     items: list[str] = discover_untracked_items(REPO_ROOT)
 
@@ -324,6 +369,9 @@ def cmd_remove(args: argparse.Namespace) -> None:
 
     if target_path.exists():
         shutil.rmtree(target_path, ignore_errors=True)
+
+    # Deallocate port for this worktree
+    deallocate_port(target_path.name)
 
     if delete_branch and branch_name:
         print(f"Deleting branch: {branch_name}")

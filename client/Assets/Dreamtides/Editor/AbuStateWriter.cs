@@ -49,6 +49,20 @@ namespace Dreamtides.Editors
       }
     }
 
+    private static string GetLogFilePath()
+    {
+      var args = Environment.GetCommandLineArgs();
+      for (var i = 0; i < args.Length - 1; i++)
+      {
+        if (args[i] == "-logFile")
+        {
+          return args[i + 1];
+        }
+      }
+      var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+      return Path.Combine(home, "Library", "Logs", "Unity", "Editor.log");
+    }
+
     private static void WriteState(string? playModeOverride)
     {
       try
@@ -63,6 +77,7 @@ namespace Dreamtides.Editors
           unityPid = System.Diagnostics.Process.GetCurrentProcess().Id,
           timestampUtc = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"),
           activeScene = SceneManager.GetActiveScene().path,
+          logFile = GetLogFilePath(),
         };
         var json = JsonUtility.ToJson(data, prettyPrint: true);
         var path = Path.GetFullPath(
@@ -85,6 +100,7 @@ namespace Dreamtides.Editors
       public int unityPid;
       public string timestampUtc;
       public string activeScene;
+      public string logFile;
     }
   }
 }
