@@ -713,9 +713,29 @@ def enter_play_mode() -> None:
         sys.exit(1)
 
 
+def check_log_accessible() -> None:
+    """Verify the Editor log file exists and is readable.
+
+    When Unity is launched with a per-worktree log file, the log directory
+    can be deleted by git operations (e.g. git clean) because .gitignore
+    contains 'Logs/'. Unity keeps writing to the orphaned file descriptor
+    but abu cannot read the file by path, causing poll loops to hang.
+    """
+    log_path = resolve_editor_log()
+    if log_path != EDITOR_LOG and not log_path.exists():
+        print(
+            f"Error: Editor log file not found at {log_path}\n"
+            "The log directory may have been deleted (e.g. by git clean).\n"
+            "Restart Unity for this worktree with 'abu restart' to fix.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+
 def do_refresh(play: bool = False) -> None:
     """Execute a refresh and optionally enter play mode."""
     check_log_conflict()
+    check_log_accessible()
     log_offset = get_log_size()
     result_msg = send_refresh()
     print(result_msg)
@@ -988,7 +1008,8 @@ def do_open(name: str) -> None:
 
     version, app_path = find_unity_executable(client_path)
 
-    log_dir = worktree_root / "Logs"
+    # Use .abu-logs instead of Logs to avoid .gitignore 'Logs/' pattern
+    log_dir = worktree_root / ".abu-logs"
     log_dir.mkdir(parents=True, exist_ok=True)
     log_path = log_dir / "Editor.log"
 
@@ -1075,7 +1096,7 @@ def do_restart() -> None:
     # For worktree editors, assign a per-worktree log file
     wt_name = resolve_worktree_name()
     if wt_name:
-        log_dir = WORKTREE_BASE / wt_name / "Logs"
+        log_dir = WORKTREE_BASE / wt_name / ".abu-logs"
         log_dir.mkdir(parents=True, exist_ok=True)
         restart_log = log_dir / "Editor.log"
         launch_args.extend(["-logFile", str(restart_log)])
