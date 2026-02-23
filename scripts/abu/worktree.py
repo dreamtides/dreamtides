@@ -473,7 +473,7 @@ def sync_tree(source_root: Path, dest_root: Path, dry_run: bool) -> tuple[int, i
 
         for name in filenames:
             src_file: Path = dirpath / name
-            rel: str = str(rel_dir / name)
+            rel = str(rel_dir / name)
             source_entries.add(rel)
             dest_file: Path = dest_root / rel_dir / name
 
@@ -654,7 +654,7 @@ def cmd_activate(args: argparse.Namespace) -> None:
 
     if not worktree_path.exists():
         print(f"Error: Worktree '{branch}' does not exist at {worktree_path}")
-        print("Use 'worktree-create' to create a new worktree.")
+        print("Use 'abu worktree create' to create a new worktree.")
         sys.exit(1)
 
     # Check main repo is clean
@@ -808,11 +808,112 @@ def cmd_list(args: argparse.Namespace) -> None:
         print(f"No worktrees found under {DEFAULT_WORKTREE_BASE}")
 
 
+def register_subcommands(parent_subparsers: argparse._SubParsersAction) -> None:  # type: ignore[type-arg]
+    """Register the 'worktree' parent command and its sub-subcommands."""
+    worktree_parser = parent_subparsers.add_parser(
+        "worktree", help="Manage APFS-backed worktrees"
+    )
+    wt_sub = worktree_parser.add_subparsers(dest="worktree_command", required=True)
+
+    create_parser = wt_sub.add_parser("create", help="Create a new worktree")
+    create_parser.add_argument("branch", help="Branch name")
+    create_parser.add_argument(
+        "--existing",
+        action="store_true",
+        help="Check out an existing branch instead of creating a new one",
+    )
+    create_parser.add_argument(
+        "--base",
+        default="master",
+        help="Base branch for new branches (default: master)",
+    )
+    create_parser.add_argument(
+        "--dest",
+        help="Custom worktree destination path",
+    )
+    create_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without doing it",
+    )
+
+    remove_parser = wt_sub.add_parser("remove", help="Remove a worktree")
+    remove_parser.add_argument(
+        "target",
+        help="Branch name or path to worktree",
+    )
+    remove_parser.add_argument(
+        "--delete-branch",
+        action="store_true",
+        help="Also delete the git branch",
+    )
+
+    refresh_parser = wt_sub.add_parser(
+        "refresh",
+        help="Re-clone gitignored dirs from main repo to reduce disk usage",
+    )
+    refresh_parser.add_argument(
+        "target",
+        nargs="?",
+        default=None,
+        help="Branch name or path to worktree (default: current directory)",
+    )
+    refresh_parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Refresh all worktrees under ~/dreamtides-worktrees/",
+    )
+    refresh_parser.add_argument(
+        "--build",
+        action="store_true",
+        help="Run cargo check on main repo first to warm the cache",
+    )
+    refresh_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without doing it",
+    )
+
+    activate_parser = wt_sub.add_parser(
+        "activate",
+        help="Reset an existing worktree to match a fresh creation from the base branch",
+    )
+    activate_parser.add_argument("branch", help="Worktree name to activate")
+    activate_parser.add_argument(
+        "--base",
+        default="master",
+        help="Base branch to reset to (default: master)",
+    )
+    activate_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without doing it",
+    )
+
+    wt_sub.add_parser("list", help="List worktrees")
+
+
+def dispatch(args: argparse.Namespace) -> None:
+    """Route to the correct worktree subcommand handler."""
+    cmd: str = args.worktree_command
+    if cmd == "create":
+        cmd_create(args)
+    elif cmd == "remove":
+        cmd_remove(args)
+    elif cmd == "refresh":
+        cmd_refresh(args)
+    elif cmd == "activate":
+        cmd_activate(args)
+    elif cmd == "list":
+        cmd_list(args)
+
+
 def main() -> None:
+    """Standalone entry point for running worktree commands directly."""
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
         description="APFS-backed ephemeral git worktrees",
     )
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers = parser.add_subparsers(dest="worktree_command", required=True)
 
     create_parser = subparsers.add_parser("create", help="Create a new worktree")
     create_parser.add_argument("branch", help="Branch name")
@@ -892,17 +993,7 @@ def main() -> None:
     subparsers.add_parser("list", help="List worktrees")
 
     parsed_args: argparse.Namespace = parser.parse_args()
-
-    if parsed_args.command == "create":
-        cmd_create(parsed_args)
-    elif parsed_args.command == "remove":
-        cmd_remove(parsed_args)
-    elif parsed_args.command == "refresh":
-        cmd_refresh(parsed_args)
-    elif parsed_args.command == "activate":
-        cmd_activate(parsed_args)
-    elif parsed_args.command == "list":
-        cmd_list(parsed_args)
+    dispatch(parsed_args)
 
 
 if __name__ == "__main__":

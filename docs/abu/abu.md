@@ -9,6 +9,7 @@ source lives in `client/Assets/Dreamtides/Abu/`.
 ## Table of Contents
 
 - [Running ABU](#running-abu)
+- [Worktree Management](#worktree-management)
 - [Worktree Support](#worktree-support)
 - [Adding DreamtidesAbuSetup to a Scene](#adding-dreamtidesabusetup-to-a-scene)
 - [Architecture](#architecture)
@@ -63,6 +64,57 @@ connect over TCP to Unity in Play mode. Port resolution order: `ABU_PORT` env
 var > worktree `.ports.json` > default 9999. See
 [Worktree Support](#worktree-support) for details.
 
+## Worktree Management
+
+ABU includes APFS-backed worktree lifecycle commands under the `worktree`
+subcommand group. These create git worktrees with APFS copy-on-write clones of
+all gitignored directories (build caches, Unity Library, etc.), enabling
+near-instant setup with warm caches at negligible disk cost.
+
+```sh
+# Create a new worktree (creates branch + APFS-cloned caches)
+abu worktree create my-branch
+abu worktree create my-branch --base develop      # branch from develop instead of master
+abu worktree create my-branch --existing           # check out existing branch
+abu worktree create my-branch --dest /custom/path  # custom location
+abu worktree create my-branch --dry-run            # preview without creating
+
+# Remove a worktree
+abu worktree remove my-branch
+abu worktree remove my-branch --delete-branch      # also delete the git branch
+
+# Refresh gitignored dirs from main repo (reduce COW divergence)
+abu worktree refresh                              # refresh current worktree
+abu worktree refresh alpha                        # refresh specific worktree
+abu worktree refresh --all                        # refresh all worktrees
+abu worktree refresh --build                      # cargo check first to warm cache
+abu worktree refresh --dry-run                    # preview
+
+# Activate (fast reset) an existing worktree
+abu worktree activate alpha                       # reset to master
+abu worktree activate alpha --base develop        # reset to develop
+abu worktree activate alpha --dry-run             # preview
+
+# List worktrees
+abu worktree list
+```
+
+The justfile provides shorthand aliases: `just worktree-create`,
+`just worktree-remove`, `just worktree-refresh`, `just worktree-activate`,
+`just worktree-list`. These all delegate to `abu worktree`.
+
+**Activate vs Remove+Create:** `abu worktree activate` is much faster than
+removing and recreating a worktree. It uses `git reset --hard` instead of full
+worktree removal/creation, and incrementally syncs gitignored directories
+(comparing mtime/size) instead of performing full APFS clones.
+
+**Port allocation:** Each worktree gets a unique TCP port (starting at 10000)
+stored in `~/dreamtides-worktrees/.ports.json`. Ports are allocated on create
+and deallocated on remove.
+
+**Opening in Unity:** After creating a worktree, launch Unity with
+`abu open <name>` to open it with a per-worktree log file.
+
 ## Worktree Support
 
 ABU supports running multiple Unity editors concurrently — one per git worktree.
@@ -71,8 +123,8 @@ configuration required.
 
 ### Port Registry
 
-`just worktree-create <name>` allocates a unique port (starting at 10000) in
-`~/dreamtides-worktrees/.ports.json`. `just worktree-remove <name>` deallocates
+`abu worktree create <name>` allocates a unique port (starting at 10000) in
+`~/dreamtides-worktrees/.ports.json`. `abu worktree remove <name>` deallocates
 it. The main repo always uses port 9999.
 
 ```json
@@ -214,8 +266,9 @@ Dreamtides integration files (`DreamtidesAbuSetup`, `DreamtidesSceneWalker`,
 
 ## Python CLI
 
-`scripts/abu/abu.py` is a single-file CLI using only Python stdlib (no pip
-dependencies). Key functions:
+`scripts/abu/abu.py` is the main CLI entry point using only Python stdlib (no
+pip dependencies). Worktree lifecycle commands live in `scripts/abu/worktree.py`
+and are registered as a subcommand group. Key functions in `abu.py`:
 
 - `build_params(args)` — converts argparse namespace to wire params dict
 - `build_command(command, params)` — wraps params in `{id, command, params}`
@@ -479,7 +532,9 @@ for the `from abu import ...` import in the test file to resolve.
 **Python tests** (`scripts/abu/test_abu.py`): unittest-based covering both TCP
 communication (mock server roundtrip tests) and editor control functions
 (worktree detection, log parsing, refresh polling, parser configuration,
-exception hierarchy).
+exception hierarchy). Worktree module tests (`scripts/abu/test_worktree.py`)
+cover argument parsing, exclusion filters, port allocation/deallocation, path
+resolution, and dispatch routing.
 
 **C# tests** (`client/Assets/Dreamtides/Tests/Abu/`):
 

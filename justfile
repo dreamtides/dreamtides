@@ -813,19 +813,19 @@ update-rlf:
     cargo update --manifest-path rules_engine/Cargo.toml -p rlf
 
 worktree-create branch *args='':
-    python3 scripts/worktrees/apfs_worktree.py create {{branch}} {{args}}
+    python3 scripts/abu/abu.py worktree create {{branch}} {{args}}
 
 worktree-remove branch *args='':
-    python3 scripts/worktrees/apfs_worktree.py remove {{branch}} {{args}}
+    python3 scripts/abu/abu.py worktree remove {{branch}} {{args}}
 
 worktree-refresh *args='':
-    python3 scripts/worktrees/apfs_worktree.py refresh {{args}}
+    python3 scripts/abu/abu.py worktree refresh {{args}}
 
 unity-open name:
     python3 scripts/abu/abu.py open {{name}}
 
 worktree-activate branch *args='':
-    python3 scripts/worktrees/apfs_worktree.py activate {{branch}} {{args}}
+    python3 scripts/abu/abu.py worktree activate {{branch}} {{args}}
 
 worktree-list:
-    python3 scripts/worktrees/apfs_worktree.py list
+    python3 scripts/abu/abu.py worktree list

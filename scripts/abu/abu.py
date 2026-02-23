@@ -29,6 +29,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+import worktree as worktree_mod
+
 # Save builtins before shadowing with domain-specific subclasses.
 builtins_ConnectionRefusedError = ConnectionRefusedError
 builtins_TimeoutError = TimeoutError
@@ -412,7 +414,7 @@ def resolve_port() -> int:
         pass
     print(
         f"Error: Worktree '{name}' has no port assigned in {PORTS_FILE}.\n"
-        f"Run 'just worktree-create' to set up the worktree properly.",
+        f"Run 'abu worktree create' to set up the worktree properly.",
         file=sys.stderr,
     )
     sys.exit(1)
@@ -977,7 +979,7 @@ def do_open(name: str) -> None:
     if not worktree_root.is_dir():
         raise AbuError(
             f"Worktree '{name}' not found at {worktree_root}. "
-            "Run 'just worktree-create' first."
+            "Run 'abu worktree create' first."
         )
 
     client_path = worktree_root / "client"
@@ -1334,6 +1336,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="List all available card names and exit",
     )
 
+    # worktree
+    worktree_mod.register_subcommands(subparsers)
+
     return parser
 
 
@@ -1353,6 +1358,10 @@ def main() -> None:
 
     if command == "create-save":
         do_create_save(args)
+        return
+
+    if command == "worktree":
+        worktree_mod.dispatch(args)
         return
 
     if command == "open":
