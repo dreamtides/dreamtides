@@ -188,10 +188,40 @@ namespace Dreamtides.Abu
           region.Children.Add(actionsGroup);
         }
 
-        // 7. Essence label
+        // 7. Playable cards summary
+        var playableCards = new List<string>();
+        foreach (var obj in layout.UserHand.Objects)
+        {
+          if (
+            obj is Card card
+            && card.CanHandleMouseEvents()
+            && card.CardView.Revealed is { } rev
+            && rev.Actions.CanPlay is { } cp
+            && !cp.IsNull
+            && _registry.CapabilitiesService.CanPlayCards()
+          )
+          {
+            var name = StripRichText(rev.Name)?.Replace("\n", ", ") ?? "Unknown";
+            var cost = StripRichText(rev.Cost);
+            playableCards.Add(!string.IsNullOrEmpty(cost) ? $"{name} (cost: {cost})" : name);
+          }
+        }
+        if (playableCards.Count > 0)
+        {
+          region.Children.Add(
+            new AbuSceneNode
+            {
+              Role = "label",
+              Label = $"Playable Cards: {string.Join(", ", playableCards)}",
+              Interactive = false,
+            }
+          );
+        }
+
+        // 8. Essence label
         AddEssenceLabel(region);
 
-        // 8. Play zone (drag target for playing cards from hand)
+        // 9. Play zone (drag target for playing cards from hand)
         region.Children.Add(
           new AbuSceneNode
           {
@@ -202,7 +232,7 @@ namespace Dreamtides.Abu
         );
         refRegistry.Register(new RefCallbacks());
 
-        // 9. Thinking indicator
+        // 10. Thinking indicator
         if (layout.ThinkingIndicator.activeSelf)
         {
           region.Children.Add(
@@ -230,7 +260,7 @@ namespace Dreamtides.Abu
         region.Children.Add(browserGroup);
       }
 
-      // 10. UI overlays (filtered, only when content exists)
+      // 11. UI overlays (filtered, only when content exists)
       var uiOverlay = WalkUiToolkitFiltered(refRegistry);
       if (uiOverlay != null)
       {
