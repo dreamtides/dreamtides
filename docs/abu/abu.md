@@ -35,6 +35,7 @@ python3 scripts/abu/abu.py cycle                  # exit play → refresh → en
 python3 scripts/abu/abu.py restart                # kill and relaunch Unity, restore scene
 python3 scripts/abu/abu.py status                # show Unity state from state file and TCP probe
 python3 scripts/abu/abu.py clear-save            # delete all Dreamtides save files
+python3 scripts/abu/abu.py set-mode Battle       # set game mode (Quest, Battle, PrototypeQuest)
 
 # Test save generation (no Unity required)
 python3 scripts/abu/abu.py create-save --energy 99 --card "Break the Sequence"
@@ -140,7 +141,8 @@ dependencies). Key functions:
 - `wait_for_tests(log_offset)` — poll Editor log for test run completion
 - `find_unity_process()` — discover running Unity via `ps`
 - `do_refresh()`, `do_test()`, `do_cycle()`, `do_restart()`, `do_status()`,
-  `do_clear_save()`, `do_create_save()` — high-level editor workflows
+  `do_clear_save()`, `do_set_mode()`, `do_create_save()` — high-level editor
+  workflows
 - `main()` — entry point; dispatches editor or TCP commands
 
 Error handling uses an `AbuError` hierarchy (`ConnectionError`, `TimeoutError`,
