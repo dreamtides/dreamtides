@@ -346,6 +346,20 @@ Judgment and win immediately.
 - **Preserve Abolish for the opponent's Surfer plays.** If the opponent tries to
   play a Surfer, counter it before it reaches the battlefield.
 
+### The Archive-Immolate Loop
+
+In the late game, the most important resource loop is:
+
+1. Play Archive of the Forgotten (4 energy) to retrieve 2 Immolates from void
+2. Play Immolate (3 each) to dissolve high-value opponent characters
+3. Repeat next turn (Archive and Immolate go to void, ready to be Archived
+   again)
+
+This loop costs 10 energy per cycle and removes 2 enemy characters. Plan your
+energy budget around it. Note: opponent at 0 energy cannot respond to Archive or
+Immolate, making it safe. If opponent has energy, they may Abolish your Immolate
+— always have counter-spells ready.
+
 ### Key Card Interactions
 
 - **Sundown Surfer**: Gains +1 spark each time its owner plays a card during the
@@ -423,6 +437,14 @@ Dreamscatter costs 2 energy to play PLUS requires paying at least 1 additional
 energy for the draw effect. So the minimum total cost is 3 energy. The "can
 play" tag only appears when you have enough for both the play cost and minimum
 payment.
+
+### Activated Abilities Blocked During Stack Resolution
+
+Activated abilities (Minstrel draw, etc.) lose their "can play" tag while any
+card is on the stack. If you play a Dreamscatter and the opponent chains fast
+cards in response, you cannot use activated abilities until the entire stack
+resolves. Plan ability usage BEFORE putting cards on the stack, or after the
+stack fully clears.
 
 ### Abolish Timing
 
