@@ -818,8 +818,8 @@ worktree-create branch *args='':
 worktree-remove branch *args='':
     python3 scripts/worktrees/apfs_worktree.py remove {{branch}} {{args}}
 
-worktree-refresh branch *args='':
-    python3 scripts/worktrees/apfs_worktree.py refresh {{branch}} {{args}}
+worktree-refresh *args='':
+    python3 scripts/worktrees/apfs_worktree.py refresh {{args}}
 
 worktree-list:
     python3 scripts/worktrees/apfs_worktree.py list

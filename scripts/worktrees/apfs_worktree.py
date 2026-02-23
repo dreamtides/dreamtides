@@ -368,58 +368,31 @@ def resolve_worktree_path(target: str | None) -> Path:
     sys.exit(1)
 
 
-def cmd_refresh(args: argparse.Namespace) -> None:
-    """Re-clone gitignored directories from the main repo to reduce COW divergence."""
-    dry_run: bool = args.dry_run
-    build: bool = args.build
-
-    worktree_path: Path = resolve_worktree_path(args.target)
-    main_repo: Path = find_main_repo().resolve()
-
-    if worktree_path == main_repo:
-        print("Error: Cannot refresh the main repo itself.")
-        sys.exit(1)
-
+def list_worktree_paths() -> list[Path]:
+    """Return paths of all worktrees under the default base directory."""
     result = run_cmd(
         ["git", "worktree", "list", "--porcelain"],
         capture=True,
     )
-    is_worktree: bool = False
+    main_repo: Path = find_main_repo().resolve()
+    wt_base: Path = DEFAULT_WORKTREE_BASE.resolve()
+    paths: list[Path] = []
     for line in result.stdout.splitlines():
-        if line.startswith("worktree ") and Path(line.split(" ", 1)[1]).resolve() == worktree_path:
-            is_worktree = True
-            break
-    if not is_worktree:
-        print(f"Error: {worktree_path} is not a known git worktree")
-        sys.exit(1)
+        if line.startswith("worktree "):
+            wt_path: Path = Path(line.split(" ", 1)[1]).resolve()
+            if wt_path != main_repo and str(wt_path).startswith(str(wt_base)):
+                paths.append(wt_path)
+    return paths
 
+
+def refresh_one_worktree(
+    worktree_path: Path,
+    main_repo: Path,
+    items: list[str],
+    dry_run: bool,
+) -> None:
+    """Refresh a single worktree by re-cloning gitignored directories."""
     print(f"Refreshing worktree: {worktree_path}")
-    print(f"Clone source: {main_repo}")
-
-    if build:
-        print("\nBuilding on master to warm the cache...")
-        if dry_run:
-            print("[dry-run] Would run: cargo check in main repo")
-        else:
-            build_result = run_cmd(
-                [
-                    "cargo",
-                    "check",
-                    "--manifest-path",
-                    str(main_repo / "rules_engine" / "Cargo.toml"),
-                    "--workspace",
-                    "--all-targets",
-                    "--all-features",
-                ],
-                check=False,
-            )
-            if build_result.returncode != 0:
-                print("Warning: cargo check failed, continuing with refresh anyway")
-            else:
-                print("Build complete.")
-
-    print("\nDiscovering items to refresh...")
-    items: list[str] = discover_untracked_items(main_repo)
 
     refreshed_count: int = 0
     skip_count: int = 0
@@ -468,10 +441,77 @@ def cmd_refresh(args: argparse.Namespace) -> None:
         refreshed_count += 1
 
     total_old_mb: float = total_old_bytes / (1024 * 1024)
-    print(f"\nDone! Refreshed {refreshed_count} items ({total_old_mb:.0f}MB replaced with fresh clones)")
+    print(f"  Refreshed {refreshed_count} items ({total_old_mb:.0f}MB replaced with fresh clones)")
     print(f"  Skipped: {skip_count} excluded items")
+
+
+def cmd_refresh(args: argparse.Namespace) -> None:
+    """Re-clone gitignored directories from the main repo to reduce COW divergence."""
+    dry_run: bool = args.dry_run
+    build: bool = args.build
+    refresh_all: bool = args.all
+
+    main_repo: Path = find_main_repo().resolve()
+
+    if refresh_all:
+        worktree_paths: list[Path] = list_worktree_paths()
+        if not worktree_paths:
+            print(f"No worktrees found under {DEFAULT_WORKTREE_BASE}")
+            return
+    else:
+        wt_path: Path = resolve_worktree_path(args.target)
+        if wt_path == main_repo:
+            print("Error: Cannot refresh the main repo itself.")
+            sys.exit(1)
+        result = run_cmd(
+            ["git", "worktree", "list", "--porcelain"],
+            capture=True,
+        )
+        is_worktree: bool = False
+        for line in result.stdout.splitlines():
+            if line.startswith("worktree ") and Path(line.split(" ", 1)[1]).resolve() == wt_path:
+                is_worktree = True
+                break
+        if not is_worktree:
+            print(f"Error: {wt_path} is not a known git worktree")
+            sys.exit(1)
+        worktree_paths = [wt_path]
+
+    print(f"Clone source: {main_repo}")
+    if len(worktree_paths) > 1:
+        print(f"Refreshing {len(worktree_paths)} worktrees\n")
+
+    if build:
+        print("Building on master to warm the cache...")
+        if dry_run:
+            print("[dry-run] Would run: cargo check in main repo\n")
+        else:
+            build_result = run_cmd(
+                [
+                    "cargo",
+                    "check",
+                    "--manifest-path",
+                    str(main_repo / "rules_engine" / "Cargo.toml"),
+                    "--workspace",
+                    "--all-targets",
+                    "--all-features",
+                ],
+                check=False,
+            )
+            if build_result.returncode != 0:
+                print("Warning: cargo check failed, continuing with refresh anyway\n")
+            else:
+                print("Build complete.\n")
+
+    items: list[str] = discover_untracked_items(main_repo)
+
+    for i, worktree_path in enumerate(worktree_paths):
+        if i > 0:
+            print()
+        refresh_one_worktree(worktree_path, main_repo, items, dry_run)
+
     if not dry_run:
-        print(f"  Free disk: {get_free_gb(worktree_path):.1f}GB")
+        print(f"\nFree disk: {get_free_gb(main_repo):.1f}GB")
 
 
 def cmd_list(args: argparse.Namespace) -> None:
@@ -540,6 +580,11 @@ def main() -> None:
         nargs="?",
         default=None,
         help="Branch name or path to worktree (default: current directory)",
+    )
+    refresh_parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Refresh all worktrees under ~/dreamtides-worktrees/",
     )
     refresh_parser.add_argument(
         "--build",
