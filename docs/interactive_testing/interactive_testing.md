@@ -249,6 +249,20 @@ energy for counter-spells, and forces the opponent to act first.
 **Be proactive when:** behind on spark, opponent lacks Surfers/energy, early
 game (turns 1-2), or you have Immolate to remove high-value Surfers.
 
+### Reading the Opponent
+
+Track what the opponent has played, reclaimed, and lost to removal throughout
+the game. If they played two Abolishes already, a third is less likely — your
+next character is safer. If they have Sundown Surfers on the battlefield and
+haven't used Dreamscatter yet, assume it's in hand and plan around the trigger
+chain. Use the Abu history to review past zone transitions and reconstruct what
+the opponent has committed.
+
+Also consider the opponent's energy. A tapped-out opponent can't respond to
+anything — that's your window to play characters and use abilities freely. An
+opponent at full energy with cards in hand is dangerous; minimize stack
+interactions and hold counter-spells.
+
 ### Early Game (Turns 1-3)
 
 - Play characters with high spark first (e.g., Minstrel of Falling Light at
@@ -416,10 +430,9 @@ for multiple resolve cycles.
 
 ### Dreamscatter Energy Requirement
 
-Dreamscatter costs 2 energy to play PLUS requires paying at least 1 additional
-energy for the draw effect. So the minimum total cost is 3 energy. The "can
-play" tag only appears when you have enough for both the play cost and minimum
-payment.
+Dreamscatter costs 2 energy to play PLUS at least 1 additional energy for the
+draw effect (minimum total 3 energy). The "can play" tag only appears when you
+have enough for both.
 
 ### Activated Abilities Blocked During Stack Resolution
 
@@ -431,20 +444,10 @@ stack fully clears.
 
 ### Activated Abilities Use the Stack
 
-**Correction to earlier guidance:** Activated abilities (like Minstrel of
-Falling Light's "3 energy: Draw a card") DO use the stack and CAN be responded
-to. They are NOT safe from opponent interaction. When you activate an ability:
-
-1. Energy is deducted immediately
-2. The effect goes on the stack
-3. The opponent gets priority to respond (play fast cards, etc.)
-4. Sundown Surfers trigger from opponent responses during your turn
-5. The ability effect resolves after the stack clears (LIFO)
-
-**Implication**: If the opponent has Sundown Surfers + energy, even using
-activated abilities gives them a window to trigger the spiral. Consider whether
-the draw is worth the risk of Surfer triggers. Sometimes ending the turn and
-saving energy for defense is better.
+Activated abilities DO use the stack and CAN be responded to. Energy is deducted
+immediately, then the effect goes on the stack and the opponent gets priority.
+If the opponent has Sundown Surfers + energy, even activated abilities give them
+a window to trigger the spiral.
 
 ### Together Against the Tide Appears Unplayable
 
