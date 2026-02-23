@@ -745,7 +745,7 @@ def ensure_unity_running() -> None:
         return
 
     # Kill orphaned Unity if log is inaccessible
-    if unity_alive and not log_ok:
+    if unity_alive and not log_ok and state is not None:
         old_pid = state["unityPid"]
         print(f"Log file inaccessible, killing Unity (PID {old_pid})...")
         os.kill(old_pid, signal.SIGKILL)
