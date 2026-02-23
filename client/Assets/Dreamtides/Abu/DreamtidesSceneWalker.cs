@@ -325,7 +325,7 @@ namespace Dreamtides.Abu
       };
 
       // Status
-      group.Children.Add(WalkStatus(statusDisplay, isUser, handObjects));
+      group.Children.Add(WalkStatus(statusDisplay, isUser, handObjects, battlefield));
 
       // Deck browser
       AddBrowserButton(group, browserButtons, deckType, "Deck", refRegistry);
@@ -434,7 +434,8 @@ namespace Dreamtides.Abu
     AbuSceneNode WalkStatus(
       PlayerStatusDisplay statusDisplay,
       bool isUser,
-      IReadOnlyList<Displayable> handObjects
+      IReadOnlyList<Displayable> handObjects,
+      ObjectLayout battlefield
     )
     {
       var group = new AbuSceneNode
@@ -473,11 +474,35 @@ namespace Dreamtides.Abu
       var sparkText = StripRichText(statusDisplay._totalSpark._originalText);
       if (!string.IsNullOrEmpty(sparkText))
       {
+        var sparkLabel = $"Spark: {sparkText}";
+        var characterSpark = 0;
+        var characterCount = 0;
+        foreach (var obj in battlefield.Objects)
+        {
+          if (obj is Card card && card.CardView.Revealed is { } rev)
+          {
+            var cardSparkText = StripRichText(rev.Spark);
+            if (int.TryParse(cardSparkText, out var cardSpark))
+            {
+              characterSpark += cardSpark;
+              characterCount++;
+            }
+          }
+        }
+
+        if (characterCount > 0 && int.TryParse(sparkText, out var totalSpark))
+        {
+          var bonus = totalSpark - characterSpark;
+          sparkLabel = bonus != 0
+            ? $"Spark: {sparkText} ({characterSpark} from {characterCount} characters + {bonus} bonus)"
+            : $"Spark: {sparkText} (from {characterCount} characters)";
+        }
+
         group.Children.Add(
           new AbuSceneNode
           {
             Role = "label",
-            Label = $"Spark: {sparkText}",
+            Label = sparkLabel,
             Interactive = false,
           }
         );
