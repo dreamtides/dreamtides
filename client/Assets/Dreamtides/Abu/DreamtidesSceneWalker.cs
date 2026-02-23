@@ -325,7 +325,7 @@ namespace Dreamtides.Abu
       };
 
       // Status
-      group.Children.Add(WalkStatus(statusDisplay, isUser));
+      group.Children.Add(WalkStatus(statusDisplay, isUser, handObjects));
 
       // Deck browser
       AddBrowserButton(group, browserButtons, deckType, "Deck", refRegistry);
@@ -431,7 +431,11 @@ namespace Dreamtides.Abu
 
     // ── Status ────────────────────────────────────────────────────────
 
-    AbuSceneNode WalkStatus(PlayerStatusDisplay statusDisplay, bool isUser)
+    AbuSceneNode WalkStatus(
+      PlayerStatusDisplay statusDisplay,
+      bool isUser,
+      IReadOnlyList<Displayable> handObjects
+    )
     {
       var group = new AbuSceneNode
       {
@@ -494,6 +498,26 @@ namespace Dreamtides.Abu
           {
             Role = "label",
             Label = $"Turn: {turnNumber} ({turnOwner})",
+            Interactive = false,
+          }
+        );
+      }
+      else
+      {
+        var handCount = 0;
+        foreach (var obj in handObjects)
+        {
+          if (obj is not Card c || c.CardView.Prefab != CardPrefab.Token)
+          {
+            handCount++;
+          }
+        }
+
+        group.Children.Add(
+          new AbuSceneNode
+          {
+            Role = "label",
+            Label = $"Hand: {handCount} cards",
             Interactive = false,
           }
         );
