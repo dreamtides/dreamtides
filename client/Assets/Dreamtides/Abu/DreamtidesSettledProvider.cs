@@ -39,6 +39,19 @@ namespace Dreamtides.Abu
       Func<bool>? animationsComplete = null
     )
     {
+      if (settleFrames < 1)
+      {
+        throw new ArgumentOutOfRangeException(nameof(settleFrames), "Settle frames must be >= 1.");
+      }
+
+      if (maxTimeoutSeconds < 0f)
+      {
+        throw new ArgumentOutOfRangeException(
+          nameof(maxTimeoutSeconds),
+          "Max timeout seconds must be >= 0."
+        );
+      }
+
       _actionService = actionService;
       _settleFrames = settleFrames;
       _maxTimeoutSeconds = maxTimeoutSeconds;
@@ -52,47 +65,64 @@ namespace Dreamtides.Abu
         return true;
       }
 
-      // While the server is still processing an action (waiting for the
-      // Final poll response), never report settled. The timeout only
-      // applies to the local animation/command processing phase after the
-      // Final response has been received.
-      if (_actionService.WaitingForFinalResponse)
+      if (IsWaitingForFinalResponse())
+      {
+        return false;
+      }
+
+      if (IsTimedOut())
+      {
+        return MarkActionComplete();
+      }
+
+      return EvaluateLocalSettleState();
+    }
+
+    public void NotifyActionDispatched()
+    {
+      _actionTime = Time.realtimeSinceStartup;
+      _actionInProgress = true;
+      _settledFrameCount = 0;
+    }
+
+    bool EvaluateLocalSettleState()
+    {
+      if (!IsLocalSettled())
       {
         _settledFrameCount = 0;
         return false;
       }
 
-      // Max timeout: report settled to prevent indefinite hanging
-      if (Time.realtimeSinceStartup - _actionTime >= _maxTimeoutSeconds)
-      {
-        _actionInProgress = false;
-        return true;
-      }
-
-      var conditionsMet = !_actionService.IsProcessingCommands && _animationsComplete();
-
-      if (conditionsMet)
-      {
-        _settledFrameCount++;
-        if (_settledFrameCount >= _settleFrames)
-        {
-          _actionInProgress = false;
-          return true;
-        }
-      }
-      else
-      {
-        _settledFrameCount = 0;
-      }
-
-      return false;
+      _settledFrameCount++;
+      return _settledFrameCount >= _settleFrames && MarkActionComplete();
     }
 
-    public void NotifyActionDispatched()
+    bool IsLocalSettled()
     {
+      return !_actionService.IsProcessingCommands && _animationsComplete();
+    }
+
+    bool IsWaitingForFinalResponse()
+    {
+      if (!_actionService.WaitingForFinalResponse)
+      {
+        return false;
+      }
+
       _settledFrameCount = 0;
-      _actionTime = Time.realtimeSinceStartup;
-      _actionInProgress = true;
+      return true;
+    }
+
+    bool IsTimedOut()
+    {
+      return Time.realtimeSinceStartup - _actionTime >= _maxTimeoutSeconds;
+    }
+
+    bool MarkActionComplete()
+    {
+      _actionInProgress = false;
+      _settledFrameCount = 0;
+      return true;
     }
 
     static bool DefaultAnimationsComplete()
