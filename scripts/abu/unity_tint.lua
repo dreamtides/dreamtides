@@ -1,7 +1,8 @@
 -- unity_tint.lua
 -- Draws a colored strip at the top of worktree Unity Editor windows.
 -- Worktree windows are identified by a [NAME] prefix in their title,
--- set by WorktreeWindowTitle.cs.
+-- set by WorktreeWindowTitle.cs. Strips are only visible when Unity is
+-- the frontmost application.
 
 -- Clean up previous state on reload
 if _G._unityTint then
@@ -11,15 +12,13 @@ if _G._unityTint then
       c:delete()
     end
   end
-  if old.filter then
-    old.filter:unsubscribeAll()
-    old.filter = nil
-  end
+  if old.timer then old.timer:stop() end
+  if old.watcher then old.watcher:stop() end
 end
 
-_G._unityTint = { canvases = {}, filter = nil }
+_G._unityTint = { canvases = {}, timer = nil, watcher = nil }
 
-local STRIP_HEIGHT = 5
+local STRIP_HEIGHT = 1
 
 -- Visually distinct colors (avoiding green/pure-red)
 local PALETTE = {
@@ -48,75 +47,78 @@ local function colorForName(name)
   return PALETTE[hashName(name)]
 end
 
-local function createOrUpdateCanvas(win)
-  if not win or not win:id() then return end
-  local name = extractWorktreeName(win:title())
-  if not name then
-    -- Not a worktree window; remove any existing canvas
-    local existing = _G._unityTint.canvases[win:id()]
-    if existing then
-      existing:delete()
-      _G._unityTint.canvases[win:id()] = nil
+local function showStrips()
+  local app = hs.application.frontmostApplication()
+  if not app or app:name() ~= "Unity" then return end
+
+  local seen = {}
+  for _, win in ipairs(app:allWindows()) do
+    local wid = win:id()
+    if wid then
+      local name = extractWorktreeName(win:title())
+      if name then
+        seen[wid] = true
+        local f = win:frame()
+        local c = _G._unityTint.canvases[wid]
+        if c then
+          c:frame({ x = f.x, y = f.y, w = f.w, h = STRIP_HEIGHT })
+          c[1].fillColor = colorForName(name)
+          c:show()
+        else
+          c = hs.canvas.new({ x = f.x, y = f.y, w = f.w, h = STRIP_HEIGHT })
+          c:level(hs.canvas.windowLevels.floating)
+          c:clickActivating(false)
+          c:canvasMouseEvents(false, false)
+          c[1] = {
+            type = "rectangle",
+            fillColor = colorForName(name),
+            action = "fill",
+          }
+          c:show()
+          _G._unityTint.canvases[wid] = c
+        end
+      end
     end
-    return
   end
 
-  local frame = win:frame()
-  local c = _G._unityTint.canvases[win:id()]
-  if c then
-    c:frame({ x = frame.x, y = frame.y, w = frame.w, h = STRIP_HEIGHT })
-  else
-    c = hs.canvas.new({ x = frame.x, y = frame.y, w = frame.w, h = STRIP_HEIGHT })
-    c:level(hs.canvas.windowLevels.floating)
-    c:behavior(hs.canvas.windowBehaviors.transient)
-    c[1] = {
-      type = "rectangle",
-      fillColor = colorForName(name),
-      action = "fill",
-    }
-    c:show()
-    _G._unityTint.canvases[win:id()] = c
+  -- Remove canvases for windows that no longer exist or lost their prefix
+  for wid, c in pairs(_G._unityTint.canvases) do
+    if not seen[wid] then
+      c:delete()
+      _G._unityTint.canvases[wid] = nil
+    end
   end
 end
 
-local function removeCanvas(win)
-  if not win or not win:id() then return end
-  local c = _G._unityTint.canvases[win:id()]
-  if c then
-    c:delete()
-    _G._unityTint.canvases[win:id()] = nil
-  end
-end
-
-local function hideCanvas(win)
-  if not win or not win:id() then return end
-  local c = _G._unityTint.canvases[win:id()]
-  if c then
+local function hideAllStrips()
+  for _, c in pairs(_G._unityTint.canvases) do
     c:hide()
   end
 end
 
-local function showCanvas(win)
-  if not win or not win:id() then return end
-  local c = _G._unityTint.canvases[win:id()]
-  if c then
-    c:show()
-    createOrUpdateCanvas(win) -- reposition in case window moved while hidden
+local watcher = hs.application.watcher.new(function(appName, eventType)
+  if eventType == hs.application.watcher.activated then
+    if appName == "Unity" then
+      showStrips()
+    else
+      hideAllStrips()
+    end
   end
-end
+end)
+watcher:start()
+_G._unityTint.watcher = watcher
 
-local filter = hs.window.filter.new("Unity")
-_G._unityTint.filter = filter
+-- Poll to track window moves/resizes while Unity is frontmost
+local timer = hs.timer.doEvery(0.5, function()
+  local app = hs.application.frontmostApplication()
+  if app and app:name() == "Unity" then
+    showStrips()
+  end
+end)
+_G._unityTint.timer = timer
 
-filter:subscribe(hs.window.filter.windowCreated, createOrUpdateCanvas)
-filter:subscribe(hs.window.filter.windowTitleChanged, createOrUpdateCanvas)
-filter:subscribe(hs.window.filter.windowMoved, createOrUpdateCanvas)
-filter:subscribe(hs.window.filter.windowDestroyed, removeCanvas)
-filter:subscribe(hs.window.filter.windowHidden, hideCanvas)
-filter:subscribe(hs.window.filter.windowUnhidden, showCanvas)
-
--- Apply tint to any existing Unity windows with worktree prefixes
-local existingWindows = filter:getWindows()
-for _, win in ipairs(existingWindows) do
-  createOrUpdateCanvas(win)
+-- Apply immediately if Unity is already frontmost
+local frontApp = hs.application.frontmostApplication()
+if frontApp and frontApp:name() == "Unity" then
+  showStrips()
 end

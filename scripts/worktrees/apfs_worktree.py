@@ -639,6 +639,157 @@ def cmd_refresh(args: argparse.Namespace) -> None:
         print(f"\nFree disk: {get_free_gb(main_repo):.1f}GB")
 
 
+def cmd_activate(args: argparse.Namespace) -> None:
+    """Activate an existing worktree, resetting it to match a fresh creation from the base branch.
+
+    Much faster than remove + create because it:
+    - Uses git reset --hard instead of full worktree remove/add
+    - Incrementally syncs gitignored dirs (mtime/size comparison) instead of full APFS clones
+    """
+    branch: str = args.branch
+    base: str = args.base
+    dry_run: bool = args.dry_run
+
+    worktree_path: Path = DEFAULT_WORKTREE_BASE / branch
+
+    if not worktree_path.exists():
+        print(f"Error: Worktree '{branch}' does not exist at {worktree_path}")
+        print("Use 'worktree-create' to create a new worktree.")
+        sys.exit(1)
+
+    # Check main repo is clean
+    result = run_cmd(
+        ["git", "status", "--porcelain"],
+        capture=True,
+        cwd=REPO_ROOT,
+    )
+    if result.stdout.strip():
+        print("Error: Main repo has uncommitted changes. Commit or stash first.")
+        sys.exit(1)
+
+    main_repo: Path = find_main_repo().resolve()
+
+    print(f"Activating worktree: {worktree_path}")
+
+    # Step 1: Reset tracked files to match base branch
+    print(f"Resetting to {base}...")
+    if dry_run:
+        print(f"  [dry-run] Would run: git reset --hard {base}")
+        print("  [dry-run] Would run: git clean -fd")
+    else:
+        result = run_cmd(
+            ["git", "reset", "--hard", base],
+            check=False,
+            cwd=worktree_path,
+        )
+        if result.returncode != 0:
+            print(f"Error: git reset --hard {base} failed")
+            sys.exit(1)
+        run_cmd(["git", "clean", "-fd"], cwd=worktree_path)
+
+    # Step 2: Sync gitignored items from main repo
+    print("Syncing gitignored items...")
+    main_items: list[str] = discover_untracked_items(main_repo)
+    main_items_set: set[str] = set(main_items)
+
+    total_cloned: int = 0
+    total_deleted: int = 0
+    total_unchanged: int = 0
+    dir_count: int = 0
+
+    for item in main_items:
+        if should_exclude(item):
+            continue
+
+        source: Path = main_repo / item
+        dest: Path = worktree_path / item
+
+        if not (source.exists() or source.is_symlink()):
+            continue
+
+        # Handle symlinks
+        if source.is_symlink():
+            target: Path = Path(os.readlink(source))
+            if dest.is_symlink() and Path(os.readlink(dest)) == target:
+                total_unchanged += 1
+            else:
+                if not dry_run:
+                    dest.parent.mkdir(parents=True, exist_ok=True)
+                    if dest.exists() or dest.is_symlink():
+                        if dest.is_dir() and not dest.is_symlink():
+                            shutil.rmtree(dest)
+                        else:
+                            dest.unlink()
+                    dest.symlink_to(target)
+                total_cloned += 1
+            continue
+
+        resolved: Path = source.resolve()
+        if not resolved.exists():
+            continue
+
+        if resolved.is_dir():
+            if dest.exists() or dest.is_symlink():
+                # Exists in both: incremental sync
+                cloned, deleted_count, unchanged = sync_tree(source, dest, dry_run)
+                total_cloned += cloned
+                total_deleted += deleted_count
+                total_unchanged += unchanged
+                if cloned > 0 or deleted_count > 0:
+                    print(f"  {item}: {cloned} cloned, {deleted_count} deleted, {unchanged} unchanged")
+            else:
+                # Exists in main only: fresh APFS clone
+                if clone_item(source, dest, dry_run):
+                    total_cloned += 1
+                    print(f"  {item}: cloned (new)")
+            dir_count += 1
+        else:
+            # Single file: clone if changed or missing
+            if dest.exists():
+                try:
+                    src_stat: os.stat_result = source.stat()
+                    dst_stat: os.stat_result = dest.stat()
+                    if (
+                        src_stat.st_size == dst_stat.st_size
+                        and abs(src_stat.st_mtime - dst_stat.st_mtime) < 0.01
+                    ):
+                        total_unchanged += 1
+                        continue
+                except OSError:
+                    pass
+            if clone_item(source, dest, dry_run):
+                total_cloned += 1
+
+    # Step 3: Remove gitignored items in worktree that don't exist in main repo
+    worktree_items: list[str] = discover_untracked_items(worktree_path)
+    removed_count: int = 0
+    for item in worktree_items:
+        if should_exclude(item):
+            continue
+        if item not in main_items_set:
+            dest = worktree_path / item
+            if dest.exists() or dest.is_symlink():
+                if not dry_run:
+                    if dest.is_dir() and not dest.is_symlink():
+                        shutil.rmtree(dest, ignore_errors=True)
+                    else:
+                        dest.unlink()
+                print(f"  Removed extra: {item}")
+                removed_count += 1
+
+    # Ensure port is allocated
+    if not dry_run:
+        port: int = allocate_port(branch)
+        print(f"  Port: {port}")
+
+    total_removed: int = total_deleted + removed_count
+    print(f"\nDone! Worktree activated at: {worktree_path}")
+    print(f"  Branch: {branch} (reset to {base})")
+    print(f"  Synced {dir_count} directories: {total_cloned} cloned, {total_removed} deleted, {total_unchanged} unchanged")
+    if not dry_run:
+        print(f"  Free disk: {get_free_gb(worktree_path):.1f}GB")
+
+
 def cmd_list(args: argparse.Namespace) -> None:
     """List worktrees under the default base directory."""
     result = run_cmd(
@@ -722,6 +873,22 @@ def main() -> None:
         help="Show what would be done without doing it",
     )
 
+    activate_parser = subparsers.add_parser(
+        "activate",
+        help="Reset an existing worktree to match a fresh creation from the base branch",
+    )
+    activate_parser.add_argument("branch", help="Worktree name to activate")
+    activate_parser.add_argument(
+        "--base",
+        default="master",
+        help="Base branch to reset to (default: master)",
+    )
+    activate_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without doing it",
+    )
+
     subparsers.add_parser("list", help="List worktrees")
 
     parsed_args: argparse.Namespace = parser.parse_args()
@@ -732,6 +899,8 @@ def main() -> None:
         cmd_remove(parsed_args)
     elif parsed_args.command == "refresh":
         cmd_refresh(parsed_args)
+    elif parsed_args.command == "activate":
+        cmd_activate(parsed_args)
     elif parsed_args.command == "list":
         cmd_list(parsed_args)
 

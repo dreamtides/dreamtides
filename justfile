@@ -821,5 +821,8 @@ worktree-remove branch *args='':
 worktree-refresh *args='':
     python3 scripts/worktrees/apfs_worktree.py refresh {{args}}
 
+worktree-activate branch *args='':
+    python3 scripts/worktrees/apfs_worktree.py activate {{branch}} {{args}}
+
 worktree-list:
     python3 scripts/worktrees/apfs_worktree.py list

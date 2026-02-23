@@ -125,7 +125,7 @@ are visually distinguishable from the main editor. Two components work together:
 
 2. **Hammerspoon tinting** (`scripts/abu/unity_tint.lua`): A Lua module loaded
    by `~/.hammerspoon/init.lua` that watches for Unity windows whose title
-   starts with `[NAME]`. It draws a 5px colored `hs.canvas` strip at the top
+   starts with `[NAME]`. It draws a 1px colored `hs.canvas` strip at the top
    edge of matching windows. Each worktree gets a stable color from a 6-color
    palette (cornflower blue, amber, violet, rose, teal, gold) based on a hash of
    the name. The strip follows window move/resize and is cleaned up on close.
