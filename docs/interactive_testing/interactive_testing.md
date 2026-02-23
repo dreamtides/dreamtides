@@ -298,6 +298,14 @@ Turn. Play fast cards in the ending phase only if needed.
   recovery tool for getting Immolates back after they've been used
 - If behind on spark, avoid ending your turn unless you can close the gap first
   — the opponent scores the full difference at Judgment
+- **Use Foresee aggressively to filter weak cards.** In the late game, cheap
+  counter-spells like Ripple of Defiance (cost 1, only prevents events if
+  opponent pays 2) are nearly worthless — opponents have plenty of energy to pay
+  the tax. When Foresee reveals a weak late-game card, send it to void instead
+  of keeping it on top. Drawing a dead Ripple instead of an Immolate or
+  character can cost you the game. Prioritize drawing: Immolate, Archive of the
+  Forgotten, characters, Abolish. Void: Ripple of Defiance, Guiding Light (if
+  you already have Reclaim copies), excess Dreamscatter.
 
 ### Scoring
 
