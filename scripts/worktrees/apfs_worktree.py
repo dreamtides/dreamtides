@@ -184,6 +184,34 @@ def clone_item(source: Path, dest: Path, dry_run: bool) -> bool:
     return True
 
 
+def find_main_repo() -> Path:
+    """Find the main (non-worktree) repo root via git worktree list."""
+    result = run_cmd(
+        ["git", "worktree", "list", "--porcelain"],
+        capture=True,
+    )
+    for line in result.stdout.splitlines():
+        if line.startswith("worktree "):
+            return Path(line.split(" ", 1)[1])
+    print("Error: Could not find main worktree")
+    sys.exit(1)
+
+
+def get_dir_size_bytes(path: Path) -> int:
+    """Return total size in bytes of a directory tree."""
+    result = run_cmd(
+        ["du", "-sk", str(path)],
+        capture=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return 0
+    try:
+        return int(result.stdout.split()[0]) * 1024
+    except (ValueError, IndexError):
+        return 0
+
+
 def cleanup_worktree(worktree_path: Path) -> None:
     """Clean up a partially created worktree."""
     run_cmd(
@@ -323,6 +351,129 @@ def cmd_remove(args: argparse.Namespace) -> None:
     print("Done!")
 
 
+def resolve_worktree_path(target: str | None) -> Path:
+    """Resolve a worktree target (branch name, path, or None for cwd) to an absolute path."""
+    if target is None:
+        return Path.cwd().resolve()
+
+    target_path: Path = Path(target).expanduser().resolve()
+    if target_path.exists():
+        return target_path
+
+    candidate: Path = DEFAULT_WORKTREE_BASE / target
+    if candidate.exists():
+        return candidate
+
+    print(f"Error: Worktree not found: {target} (also checked {candidate})")
+    sys.exit(1)
+
+
+def cmd_refresh(args: argparse.Namespace) -> None:
+    """Re-clone gitignored directories from the main repo to reduce COW divergence."""
+    dry_run: bool = args.dry_run
+    build: bool = args.build
+
+    worktree_path: Path = resolve_worktree_path(args.target)
+    main_repo: Path = find_main_repo().resolve()
+
+    if worktree_path == main_repo:
+        print("Error: Cannot refresh the main repo itself.")
+        sys.exit(1)
+
+    result = run_cmd(
+        ["git", "worktree", "list", "--porcelain"],
+        capture=True,
+    )
+    is_worktree: bool = False
+    for line in result.stdout.splitlines():
+        if line.startswith("worktree ") and Path(line.split(" ", 1)[1]).resolve() == worktree_path:
+            is_worktree = True
+            break
+    if not is_worktree:
+        print(f"Error: {worktree_path} is not a known git worktree")
+        sys.exit(1)
+
+    print(f"Refreshing worktree: {worktree_path}")
+    print(f"Clone source: {main_repo}")
+
+    if build:
+        print("\nBuilding on master to warm the cache...")
+        if dry_run:
+            print("[dry-run] Would run: cargo check in main repo")
+        else:
+            build_result = run_cmd(
+                [
+                    "cargo",
+                    "check",
+                    "--manifest-path",
+                    str(main_repo / "rules_engine" / "Cargo.toml"),
+                    "--workspace",
+                    "--all-targets",
+                    "--all-features",
+                ],
+                check=False,
+            )
+            if build_result.returncode != 0:
+                print("Warning: cargo check failed, continuing with refresh anyway")
+            else:
+                print("Build complete.")
+
+    print("\nDiscovering items to refresh...")
+    items: list[str] = discover_untracked_items(main_repo)
+
+    refreshed_count: int = 0
+    skip_count: int = 0
+    total_old_bytes: int = 0
+
+    for item in items:
+        if should_exclude(item):
+            skip_count += 1
+            continue
+
+        source: Path = main_repo / item
+        dest: Path = worktree_path / item
+
+        if not (dest.exists() or dest.is_symlink()):
+            continue
+
+        if not (source.exists() or source.is_symlink()):
+            continue
+
+        if source.is_symlink():
+            new_target: Path = Path(os.readlink(source))
+            if dest.is_symlink() and Path(os.readlink(dest)) == new_target:
+                continue
+            if dry_run:
+                print(f"  [symlink] {item} -> {new_target}")
+            else:
+                if dest.exists() or dest.is_symlink():
+                    dest.unlink()
+                dest.symlink_to(new_target)
+            refreshed_count += 1
+            continue
+
+        if not source.resolve().is_dir():
+            continue
+
+        old_size: int = get_dir_size_bytes(dest)
+        total_old_bytes += old_size
+        size_mb: float = old_size / (1024 * 1024)
+
+        if dry_run:
+            print(f"  [refresh] {item} ({size_mb:.0f}MB)")
+        else:
+            print(f"  Refreshing {item} ({size_mb:.0f}MB)...")
+            shutil.rmtree(dest, ignore_errors=True)
+            clone_item(source, dest, dry_run=False)
+        refreshed_count += 1
+
+    total_old_mb: float = total_old_bytes / (1024 * 1024)
+    print(f"\nDone! Refreshed {refreshed_count} items ({total_old_mb:.0f}MB replaced with fresh clones)")
+    print(f"  Skipped: {skip_count} excluded items")
+    if not dry_run:
+        print(f"  Free disk: {get_free_gb(worktree_path):.1f}GB")
+
+
 def cmd_list(args: argparse.Namespace) -> None:
     """List worktrees under the default base directory."""
     result = run_cmd(
@@ -380,6 +531,27 @@ def main() -> None:
         help="Also delete the git branch",
     )
 
+    refresh_parser = subparsers.add_parser(
+        "refresh",
+        help="Re-clone gitignored dirs from main repo to reduce disk usage",
+    )
+    refresh_parser.add_argument(
+        "target",
+        nargs="?",
+        default=None,
+        help="Branch name or path to worktree (default: current directory)",
+    )
+    refresh_parser.add_argument(
+        "--build",
+        action="store_true",
+        help="Run cargo check on main repo first to warm the cache",
+    )
+    refresh_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without doing it",
+    )
+
     subparsers.add_parser("list", help="List worktrees")
 
     parsed_args: argparse.Namespace = parser.parse_args()
@@ -388,6 +560,8 @@ def main() -> None:
         cmd_create(parsed_args)
     elif parsed_args.command == "remove":
         cmd_remove(parsed_args)
+    elif parsed_args.command == "refresh":
+        cmd_refresh(parsed_args)
     elif parsed_args.command == "list":
         cmd_list(parsed_args)
 
