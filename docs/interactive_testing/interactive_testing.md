@@ -233,6 +233,43 @@ Check `status` between steps to confirm play mode toggled correctly.
   the opponent priority. Use these freely even when the opponent has energy and
   Surfers.
 
+### Passive vs Proactive Play
+
+A common mistake is feeling compelled to play cards every main phase just
+because you have energy and playable cards. Often the correct play is to do
+nothing during your main phase and immediately click End Turn — even at full
+energy. Reasons to be passive:
+
+- **Denying the opponent triggers.** If the opponent has Sundown Surfers, every
+  card you put on the stack is an invitation for them to respond and trigger the
+  spiral. Passing your main phase gives them zero opportunities.
+- **Preserving energy for the opponent's turn.** Unspent energy lets you play
+  counter-spells (Abolish, Cragfall) and fast removal (Immolate) during the
+  opponent's turn. A reactive posture is often stronger than a proactive one,
+  especially when you're ahead on spark.
+- **Forcing the opponent to act first.** If you're winning the spark race, the
+  opponent must play cards to catch up. Let them commit resources first, then
+  respond. Don't give them free information about your hand by playing into an
+  empty board.
+- **Protecting your board.** Characters already on the battlefield are
+  generating spark. Playing more cards risks the opponent responding with Break
+  the Sequence or other removal, potentially netting them Surfer triggers in the
+  process.
+
+**When to be proactive:**
+
+- You're behind on spark and need to close the gap before Judgment.
+- You have a character that generates immediate value on materialization (e.g.,
+  Minstrel's draw ability) and the opponent lacks Surfers or energy to respond.
+- You have Immolate and the opponent has high-value Surfers to dissolve —
+  removing a Surfer is almost always worth the stack interaction risk.
+- It's the early game (turns 1-2) and neither side has Surfers yet. Board
+  development is safe when there's no spiral threat.
+
+**Rule of thumb:** If you're ahead on spark and the opponent has Surfers +
+energy, pass your main phase. Use activated abilities (free, no stack), then End
+Turn. Play fast cards in the ending phase only if needed.
+
 ### Early Game (Turns 1-3)
 
 - Play characters with high spark first (e.g., Minstrel of Falling Light at
