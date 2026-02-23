@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run `just review` in a claimed worktree slot so the main repo stays
+# Run `just review-verbose` in a claimed worktree slot so the main repo stays
 # free for continued work. Uses `abu worktree claim` to get a slot,
 # with a fallback that resets an existing code-review slot.
 set -euo pipefail
@@ -38,4 +38,4 @@ git -C "$WORKTREE" add .review-lock
 cleanup() { git -C "$WORKTREE" reset HEAD .review-lock 2>/dev/null; rm -f "$WORKTREE/.review-lock"; }
 trap cleanup EXIT
 
-cd "$WORKTREE" && just review || { osascript -e 'display dialog "Review failed" with icon stop' 2>/dev/null; exit 1; }
+cd "$WORKTREE" && just review-verbose || { osascript -e 'display dialog "Review failed" with icon stop' 2>/dev/null; exit 1; }
