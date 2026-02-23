@@ -6039,6 +6039,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "test_save_generator"
+version = "0.0.0"
+dependencies = [
+ "ai_data",
+ "battle_mutations",
+ "battle_state",
+ "core_data",
+ "database",
+ "dirs",
+ "game_creation",
+ "rand 0.9.0",
+ "tabula_data",
+ "tabula_generated",
+ "uuid",
+]
+
+[[package]]
 name = "test_utils"
 version = "0.0.0"
 dependencies = [

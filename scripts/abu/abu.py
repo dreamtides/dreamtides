@@ -889,6 +889,51 @@ def do_clear_save() -> None:
     print(f"Cleared {len(matches)} save file(s).")
 
 
+def do_create_save(args: argparse.Namespace) -> None:
+    """Generate a test save file by invoking the test_save_generator binary."""
+    project_root = Path(__file__).resolve().parent.parent.parent
+    binary = "test_save_generator"
+
+    # Build the binary first
+    print("Building test_save_generator...")
+    build_result = subprocess.run(
+        ["cargo", "build", "--release", "-p", "test_save_generator"],
+        cwd=project_root / "rules_engine",
+        capture_output=True,
+        text=True,
+    )
+    if build_result.returncode != 0:
+        print(f"Build failed:\n{build_result.stderr}", file=sys.stderr)
+        sys.exit(1)
+
+    binary_path = (
+        project_root / "rules_engine" / "target" / "release" / binary
+    )
+
+    cmd: list[str] = [str(binary_path)]
+    cmd.extend(["--save-dir", str(SAVE_DIR)])
+
+    if args.list_cards:
+        cmd.append("--list-cards")
+    else:
+        # Clear existing saves first so the game loads the new one
+        do_clear_save()
+
+        if args.energy is not None:
+            cmd.extend(["--energy", str(args.energy)])
+        if args.cards:
+            for card_name in args.cards:
+                cmd.extend(["--card", card_name])
+
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.stdout:
+        print(result.stdout, end="")
+    if result.stderr:
+        print(result.stderr, end="", file=sys.stderr)
+    if result.returncode != 0:
+        sys.exit(result.returncode)
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser with all subcommands."""
     parser = argparse.ArgumentParser(
@@ -972,6 +1017,24 @@ def build_parser() -> argparse.ArgumentParser:
         "clear-save", help="Delete all Dreamtides save files"
     )
 
+    # create-save
+    create_save_parser = subparsers.add_parser(
+        "create-save",
+        help="Generate a test save file with custom battle parameters",
+    )
+    create_save_parser.add_argument(
+        "--energy", type=int, default=None,
+        help="Set player energy to this value",
+    )
+    create_save_parser.add_argument(
+        "--card", action="append", default=None, dest="cards",
+        help="Add a card to player's hand by name (can be repeated)",
+    )
+    create_save_parser.add_argument(
+        "--list-cards", action="store_true",
+        help="List all available card names and exit",
+    )
+
     return parser
 
 
@@ -987,6 +1050,10 @@ def main() -> None:
 
     if command == "clear-save":
         do_clear_save()
+        return
+
+    if command == "create-save":
+        do_create_save(args)
         return
 
     editor_commands = {"refresh", "play", "test", "cycle", "restart"}

@@ -21,6 +21,7 @@ source lives in `client/Assets/Dreamtides/Abu/`.
 - [Common Pitfalls](#common-pitfalls)
 - [Adapting ABU to Another Game](#adapting-abu-to-another-game)
 - [Testing and Validation](#testing-and-validation)
+- [Test Save Generation](#test-save-generation)
 
 ## Running ABU
 
@@ -34,6 +35,11 @@ python3 scripts/abu/abu.py cycle                  # exit play → refresh → en
 python3 scripts/abu/abu.py restart                # kill and relaunch Unity, restore scene
 python3 scripts/abu/abu.py status                # show Unity state from state file and TCP probe
 python3 scripts/abu/abu.py clear-save            # delete all Dreamtides save files
+
+# Test save generation (no Unity required)
+python3 scripts/abu/abu.py create-save --energy 99 --card "Break the Sequence"
+python3 scripts/abu/abu.py create-save --energy 50 --card "Abolish" --card "Apocalypse"
+python3 scripts/abu/abu.py create-save --list-cards  # list all available card names
 
 # In-game commands (require Unity in Play mode)
 python3 scripts/abu/abu.py snapshot              # ARIA-style scene tree
@@ -134,7 +140,7 @@ dependencies). Key functions:
 - `wait_for_tests(log_offset)` — poll Editor log for test run completion
 - `find_unity_process()` — discover running Unity via `ps`
 - `do_refresh()`, `do_test()`, `do_cycle()`, `do_restart()`, `do_status()`,
-  `do_clear_save()` — high-level editor workflows
+  `do_clear_save()`, `do_create_save()` — high-level editor workflows
 - `main()` — entry point; dispatches editor or TCP commands
 
 Error handling uses an `AbuError` hierarchy (`ConnectionError`, `TimeoutError`,
@@ -398,6 +404,55 @@ exception hierarchy).
 Integration between Python and C# is not covered by automated tests. Validate
 manually by entering Unity Play mode with `DreamtidesAbuSetup` attached and
 running `python3 scripts/abu/abu.py snapshot`.
+
+## Test Save Generation
+
+The `create-save` command generates save files with custom battle parameters for
+debugging and testing specific cards or scenarios without playing through a game
+manually.
+
+```sh
+# Create a save with 99 energy and Break the Sequence in hand
+python3 scripts/abu/abu.py create-save --energy 99 --card "Break the Sequence"
+
+# Multiple cards can be added
+python3 scripts/abu/abu.py create-save --energy 50 --card "Abolish" --card "Apocalypse"
+
+# List all available card names
+python3 scripts/abu/abu.py create-save --list-cards
+
+# Create a save with just extra energy (default 5-card hand from Core11 deck)
+python3 scripts/abu/abu.py create-save --energy 20
+```
+
+**How it works:** The command builds and runs the `test_save_generator` Rust
+binary (`rules_engine/src/test_save_generator/`). This binary loads the
+production card database (Tabula), creates a new battle with Core11 decks and
+the default dreamwell, then applies the requested modifications (energy, cards
+in hand). The save file is written to the standard Dreamtides save directory.
+
+**Behavior details:**
+
+- Existing save files are cleared before generating a new one, so the game loads
+  the test save on next connect.
+- The battle starts in the Main phase with player one active. Cards are drawn
+  normally (5 cards), then requested cards are moved from the deck to hand on
+  top of the initial draw.
+- Energy sets both `current_energy` and `produced_energy` so it persists across
+  turns.
+- Card names are case-insensitive. Misspelled names trigger a "did you mean?"
+  suggestion.
+- Cards must be in the Core11 deck to be moved to hand. Use `--list-cards` to
+  see all available card names in the database.
+
+**Typical workflow:** Clear save → create test save → enter play mode → snapshot
+to verify the test state.
+
+```sh
+python3 scripts/abu/abu.py create-save --energy 99 --card "Break the Sequence"
+python3 scripts/abu/abu.py play
+just abu --wait 30 snapshot --compact
+```
 
 ## Related Documents
 
