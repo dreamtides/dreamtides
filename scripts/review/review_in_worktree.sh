@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Run `just review-verbose` in a claimed worktree slot so the main repo stays
-# free for continued work. Tries unique branch names so multiple concurrent
-# reviews can each claim their own slot.
+# free for continued work.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -9,8 +8,19 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 BASE="$(git -C "$REPO_ROOT" rev-parse HEAD)"
 
-# Try branch names code-review-1 through code-review-3 (one per pool slot).
-# claim rejects a branch already checked out in a slot, so we try the next.
+# Clean up stale code-review branches from previous runs.
+# Detach HEAD in unlocked slots so claim doesn't hit a branch conflict.
+for slot in alpha beta gamma; do
+    SLOT_PATH="$HOME/dreamtides-worktrees/$slot"
+    if [ -d "$SLOT_PATH" ] && [ ! -f "$SLOT_PATH/.review-lock" ]; then
+        BRANCH=$(git -C "$SLOT_PATH" branch --show-current 2>/dev/null || true)
+        if [[ "$BRANCH" == code-review-* ]]; then
+            git -C "$SLOT_PATH" checkout --detach 2>/dev/null || true
+            git -C "$REPO_ROOT" branch -D "$BRANCH" 2>/dev/null || true
+        fi
+    fi
+done
+
 WORKTREE=""
 for i in 1 2 3; do
     if WORKTREE=$(python3 "$REPO_ROOT/scripts/abu/abu.py" worktree claim "code-review-$i" --base "$BASE"); then
