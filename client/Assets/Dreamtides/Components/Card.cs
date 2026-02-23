@@ -763,7 +763,6 @@ namespace Dreamtides.Components
       Registry.SoundService.PlayCardSound();
       Registry.CardAnimationService.ClearInfoZoom();
       Registry.CardAnimationService.IsPointerDownOnCard = false;
-      Debug.Log("MouseUp: isSameObject: " + isSameObject);
 
       if (
         CardView.Revealed?.Actions?.OnClick is { } onClick

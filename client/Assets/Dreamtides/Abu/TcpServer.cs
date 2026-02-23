@@ -108,7 +108,6 @@ namespace Abu
         try
         {
           var client = _listener!.AcceptTcpClient();
-          Debug.Log("[Abu] Client connected.");
 
           CloseActiveClient();
 
@@ -202,8 +201,6 @@ namespace Abu
       {
         Debug.LogWarning($"[Abu] Read error: {ex.Message}");
       }
-
-      Debug.Log("[Abu] Client disconnected.");
     }
 
     void CloseClientIfActive(TcpClient client)
