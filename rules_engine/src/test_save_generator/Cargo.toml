@@ -1,0 +1,27 @@
+[package]
+name = "test_save_generator"
+version = "0.0.0"
+edition = "2024"
+[lints]
+workspace = true
+
+
+[[bin]]
+name = "test_save_generator"
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+ai_data = { path = "../ai_data" }
+battle_mutations = { path = "../battle_mutations" }
+battle_state = { path = "../battle_state" }
+core_data = { path = "../core_data" }
+database = { path = "../database" }
+game_creation = { path = "../game_creation" }
+tabula_data = { path = "../tabula_data" }
+tabula_generated = { path = "../tabula_generated" }
+
+dirs = { workspace = true }
+rand = { workspace = true }
+uuid = { workspace = true }
