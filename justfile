@@ -2,6 +2,33 @@ set positional-arguments
 
 code-review: check-format build workspace-lints clippy style-validator test cli-unity-test
 
+# Run review in a worktree so you can keep working in the main repo
+code-review-worktree:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    BASE="$(git rev-parse HEAD)"
+    if WORKTREE=$(python3 scripts/abu/abu.py worktree claim code-review --base "$BASE" 2>/dev/null); then
+        echo "Review worktree: $WORKTREE" >&2
+    else
+        # code-review branch already checked out — find its slot and reset it
+        WORKTREE=""
+        for slot in alpha beta gamma; do
+            SLOT_PATH="$HOME/dreamtides-worktrees/$slot"
+            if [ -d "$SLOT_PATH" ] && [ "$(git -C "$SLOT_PATH" branch --show-current 2>/dev/null)" = "code-review" ]; then
+                WORKTREE="$SLOT_PATH"
+                break
+            fi
+        done
+        if [ -z "$WORKTREE" ]; then
+            echo "Error: Could not claim or find a review worktree" >&2
+            exit 1
+        fi
+        echo "Reusing review worktree: $WORKTREE" >&2
+        git -C "$WORKTREE" checkout -B code-review "$BASE" >/dev/null
+        git -C "$WORKTREE" clean -fd >/dev/null
+    fi
+    cd "$WORKTREE" && just review || { osascript -e 'display dialog "Review failed" with icon stop' 2>/dev/null; exit 1; }
+
 # Run this before pushing
 code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; just clean-test-dir; exit 1)
@@ -826,6 +853,9 @@ unity-open name:
 
 worktree-activate branch *args='':
     python3 scripts/abu/abu.py worktree activate {{branch}} {{args}}
+
+worktree-claim branch *args='':
+    python3 scripts/abu/abu.py worktree claim {{branch}} {{args}}
 
 worktree-list:
     python3 scripts/abu/abu.py worktree list
