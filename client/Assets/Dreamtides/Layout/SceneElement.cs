@@ -16,12 +16,14 @@ namespace Dreamtides.Layout
 
     GameMode _mode = GameMode.Quest;
     TestConfiguration? _testConfiguration;
+    bool _initialized;
 
     public Registry Registry =>
       _registry ?? throw new InvalidOperationException($"{name} not initialized!");
 
     public void Initialize(Registry registry, GameMode mode, TestConfiguration? testConfiguration)
     {
+      _initialized = true;
       _registry = registry;
       _mode = mode;
       _testConfiguration = testConfiguration;
@@ -32,7 +34,7 @@ namespace Dreamtides.Layout
 
     public void Update()
     {
-      if (_registry != null)
+      if (_initialized)
       {
         OnUpdate(_mode, _testConfiguration);
       }
