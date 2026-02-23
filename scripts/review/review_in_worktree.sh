@@ -17,6 +17,10 @@ else
     for slot in alpha beta gamma; do
         SLOT_PATH="$HOME/dreamtides-worktrees/$slot"
         if [ -d "$SLOT_PATH" ] && [ "$(git -C "$SLOT_PATH" branch --show-current 2>/dev/null)" = "code-review" ]; then
+            if [ -f "$SLOT_PATH/.review-lock" ]; then
+                echo "Error: Review already in progress in slot '$slot'" >&2
+                exit 1
+            fi
             WORKTREE="$SLOT_PATH"
             break
         fi
