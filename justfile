@@ -811,3 +811,12 @@ doc-reads:
 
 update-rlf:
     cargo update --manifest-path rules_engine/Cargo.toml -p rlf
+
+worktree-create branch *args='':
+    python3 scripts/worktrees/apfs_worktree.py create {{branch}} {{args}}
+
+worktree-remove branch *args='':
+    python3 scripts/worktrees/apfs_worktree.py remove {{branch}} {{args}}
+
+worktree-list:
+    python3 scripts/worktrees/apfs_worktree.py list
