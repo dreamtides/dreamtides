@@ -13,10 +13,13 @@ BASE="$(git -C "$REPO_ROOT" rev-parse HEAD)"
 # claim rejects a branch already checked out in a slot, so we try the next.
 WORKTREE=""
 for i in 1 2 3; do
-    if WORKTREE=$(python3 "$REPO_ROOT/scripts/abu/abu.py" worktree claim "code-review-$i" --base "$BASE" 2>/dev/null); then
-        echo "Review worktree ($i): $WORKTREE" >&2
+    CLAIM_ERR=$(mktemp)
+    if WORKTREE=$(python3 "$REPO_ROOT/scripts/abu/abu.py" worktree claim "code-review-$i" --base "$BASE" 2>"$CLAIM_ERR"); then
+        cat "$CLAIM_ERR" >&2
+        rm -f "$CLAIM_ERR"
         break
     fi
+    rm -f "$CLAIM_ERR"
     WORKTREE=""
 done
 
