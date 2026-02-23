@@ -51,6 +51,14 @@ RESTART_TIMEOUT_SECONDS = 180
 UNITY_EXECUTABLE_PATTERN = "/Unity.app/Contents/MacOS/Unity"
 CLIENT_DIR = Path(__file__).resolve().parent.parent.parent / "client"
 
+# Mode name mapping: normalized input → (menu label, GameMode enum name for log)
+MODE_MAP: dict[str, tuple[str, str]] = {
+    "quest": ("Quest", "Quest"),
+    "battle": ("Battle", "Battle"),
+    "prototypequest": ("Prototype Quest", "PrototypeQuest"),
+    "prototype quest": ("Prototype Quest", "PrototypeQuest"),
+}
+
 
 class AbuError(Exception):
     """Raised when an abu command fails."""
@@ -889,6 +897,44 @@ def do_clear_save() -> None:
     print(f"Cleared {len(matches)} save file(s).")
 
 
+def do_set_mode(mode_name: str) -> None:
+    """Set the Unity play mode game mode via the Tools > Play Mode menu.
+
+    Drives the menu item via Hammerspoon and polls Editor.log until the
+    confirmation Debug.Log fires.
+    """
+    normalized = mode_name.lower().strip()
+    if normalized not in MODE_MAP:
+        valid = ", ".join(sorted({v[0] for v in MODE_MAP.values()}))
+        print(
+            f"Error: Unknown mode '{mode_name}'. Valid modes: {valid}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    menu_label, log_enum = MODE_MAP[normalized]
+    expected_log = f"Set play mode to {log_enum}"
+
+    log_offset = get_log_size()
+    result_msg = send_menu_item(["Tools", "Play Mode", menu_label])
+    print(result_msg)
+
+    print(f"Waiting for mode change to {menu_label}...")
+    start = time.time()
+    while time.time() - start < 30:
+        content = read_new_log(log_offset)
+        if expected_log in content:
+            print(f"Mode set to {menu_label}.")
+            return
+        time.sleep(POLL_INTERVAL)
+
+    print(
+        f"Warning: Did not see '{expected_log}' in Editor.log within 30s",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
+
 def do_create_save(args: argparse.Namespace) -> None:
     """Generate a test save file by invoking the test_save_generator binary."""
     project_root = Path(__file__).resolve().parent.parent.parent
@@ -1017,6 +1063,14 @@ def build_parser() -> argparse.ArgumentParser:
         "clear-save", help="Delete all Dreamtides save files"
     )
 
+    # set-mode
+    set_mode_parser = subparsers.add_parser(
+        "set-mode", help="Set the game mode for play mode (Quest, Battle, PrototypeQuest)"
+    )
+    set_mode_parser.add_argument(
+        "mode", help="Mode name: Quest, Battle, or PrototypeQuest"
+    )
+
     # create-save
     create_save_parser = subparsers.add_parser(
         "create-save",
@@ -1056,7 +1110,7 @@ def main() -> None:
         do_create_save(args)
         return
 
-    editor_commands = {"refresh", "play", "test", "cycle", "restart"}
+    editor_commands = {"refresh", "play", "test", "cycle", "restart", "set-mode"}
 
     if command in editor_commands:
         if is_worktree():
@@ -1088,6 +1142,8 @@ def main() -> None:
                 do_cycle()
             elif command == "restart":
                 do_restart()
+            elif command == "set-mode":
+                do_set_mode(args.mode)
 
         except AbuError as e:
             print(f"Error: {e}", file=sys.stderr)
