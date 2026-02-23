@@ -215,38 +215,119 @@ Check `status` between steps to confirm play mode toggled correctly.
 
 ## Game Strategy Notes
 
+### General Principles
+
+- **Hold fast cards until the ending phase.** A common mistake is playing cards
+  as soon as possible during your main phase. Fast cards (events and abilities
+  marked fast) can be played during the ending phase after you click End Turn.
+  Playing them then denies the opponent a chance to respond with their own fast
+  cards before you pass. If you play fast events during your main phase, the
+  opponent gets priority and can respond — potentially triggering Sundown
+  Surfers or disrupting your plan.
+- **Minimize stack interactions when the opponent has energy.** Every card you
+  put on the stack during your main phase gives the opponent a window to respond
+  with fast cards. If the opponent has Sundown Surfers, each response grows
+  their spark. Play characters and essential non-fast cards, then save fast
+  cards for the ending phase.
+- **Activated abilities are safe.** They don't go to the stack and don't give
+  the opponent priority. Use these freely even when the opponent has energy and
+  Surfers.
+
 ### Early Game (Turns 1-3)
 
 - Play characters with high spark first (e.g., Minstrel of Falling Light at
   spark 2 is better than Sundown Surfer at spark 1)
 - Guiding Light (cost 1, Foresee + draw) is excellent early tempo
 - Establish board presence before using activated abilities
+- Don't waste Abolish or other counter-spells early — save them for high-value
+  targets later
 
 ### Mid Game (Turns 4-6)
 
 - Hold counter-spells (Abolish, Cragfall, Ripple of Defiance) for the opponent's
-  threats rather than playing them proactively
-- Counter-spells are fast — they can only be played in response to cards on the
-  stack, not proactively
-- Avoid playing cards during your own turn when the opponent has Sundown Surfers
-  \+ energy, as each response triggers spark growth
+  key plays. These are fast and reactive — they can only be played in response
+  to cards on the stack
+- Watch for the opponent deploying Sundown Surfers. If they have even one
+  Surfer, be cautious about how many cards you play during your main phase
+- Start tracking the spark gap and planning around Judgment scoring
+
+### Late Game (Turns 7+)
+
+- Scoring accelerates as spark totals grow. A single turn with a large spark gap
+  can end the game
+- Immolate becomes the highest-value card — dissolving a 5+ spark Surfer swings
+  the gap by 5+ in your favor
+- Archive of the Forgotten (cost 4, returns up to 2 events from void) is the key
+  recovery tool for getting Immolates back after they've been used
+- If behind on spark, avoid ending your turn unless you can close the gap first
+  — the opponent scores the full difference at Judgment
 
 ### Scoring
 
 - Points are scored during Judgment (start of each turn) by the active player if
-  their spark exceeds the opponent's. Points = difference in spark.
+  their spark exceeds the opponent's. Points = difference.
 - Dreamwell cards can also grant points directly (e.g., Autumn Glade)
 - Victory at 12 points. Monitor both scores relative to the threshold.
+- A 6-spark lead sustained for 2 turns = 12 points = instant victory. Prevent
+  large spark gaps from persisting across turns.
+
+### The Sundown Surfer Spiral
+
+Sundown Surfer is the most dangerous card in the Core11 mirror match. It gains
++1 spark each time its owner plays a card during the opponent's turn. With
+multiple Surfers on the battlefield, each fast card the opponent plays during
+your turn triggers ALL of them.
+
+**How the spiral works:**
+
+1. Opponent has 2-3 Sundown Surfers on the battlefield
+2. During your turn, you play a card on the stack
+3. Opponent responds with a fast card (Guiding Light, Break the Sequence, Ripple
+   of Defiance, Cragfall, etc.)
+4. Each Surfer triggers, gaining +1 spark per Surfer per card played
+5. When you resolve the opponent's response, they may play another fast card,
+   triggering all Surfers again
+6. This repeats until the opponent runs out of energy or fast cards
+
+In a real game, an opponent with 3 Surfers playing 5 fast cards during your turn
+gains +15 spark from triggers alone — easily enough to score 12+ points at
+Judgment and win immediately.
+
+**Counter-strategies:**
+
+- **Dissolve Surfers early with Immolate.** This is the #1 priority. Don't waste
+  Immolate on Minstrels when Surfers are on the board.
+- **Don't put cards on the stack during your main phase** when the opponent has
+  Surfers + energy. Each response triggers the spiral. Use activated abilities
+  instead (they don't use the stack).
+- **Save fast cards for the ending phase.** After you click End Turn, you can
+  still play fast cards. The opponent can respond, but you've already committed
+  to ending — minimizing the window for responses.
+- **Your own plays during your turn are safe.** Only the opponent's plays during
+  your turn trigger their Surfers. Abolish and other cards you play do NOT
+  trigger them.
+- **Preserve Abolish for the opponent's Surfer plays.** If the opponent tries to
+  play a Surfer, counter it before it reaches the battlefield.
 
 ### Key Card Interactions
 
 - **Sundown Surfer**: Gains +1 spark each time its owner plays a card during the
-  opponent's turn. This compounds rapidly and is very dangerous.
+  opponent's turn. This compounds rapidly. See "The Sundown Surfer Spiral"
+  above.
+- **Break the Sequence**: Returns an enemy character to hand. The opponent loves
+  using this during your turn to bounce your characters while triggering
+  Surfers. History does not log the target's zone transition (known bug).
 - **Reclaim abilities**: Appear in hand as separate entries. Cost is the Reclaim
   cost, not the original card cost. Reclaimed cards go to banished (not void)
   when they leave play.
-- **Activated abilities**: Cost energy but don't go to the stack like regular
-  cards. They appear as hand entries with the ability cost.
+- **Activated abilities**: Cost energy but don't go to the stack. They appear as
+  hand entries with the ability cost. Safe to use when the opponent has Surfers.
+- **Ripple of Defiance**: Forces the opponent to pay 2 energy or have their
+  event prevented. When targeting your event, you see "Spend 2●" and "Decline"
+  buttons.
+- **Archive of the Forgotten**: Returns up to 2 events from void to hand.
+  Critical for recovering Immolates. Plan the Archive → Immolate sequence when
+  the opponent has high-spark Surfers.
 
 ## Known Bugs and History Gaps
 
@@ -321,37 +402,20 @@ Write playtest narratives to `/tmp/narrative.md`. Include:
 - Opponent responses and triggered abilities
 - Any bugs or unexpected behavior encountered
 
-## Game Strategy Notes (Detailed)
+## Turn Sequencing Advice
 
-### Sundown Surfer Death Spiral
+A recommended turn structure for playing well:
 
-The most dangerous opponent strategy involves multiple Sundown Surfers. Each
-card the opponent plays during your turn triggers ALL their Surfers. In a
-typical late-game turn with 3 Surfers and 5+ fast cards available, the opponent
-can gain 15+ spark from triggers alone. The only effective counter is Immolate —
-prioritize dissolving Surfers immediately over other targets.
-
-**Critical**: Your own plays during your turn do NOT trigger the opponent's
-Surfers. Only opponent plays during your turn trigger them. This means Abolish
-and other responses you play are safe from triggering Surfer growth.
-
-### Energy Management for Counter-Play
-
-When the opponent has Sundown Surfers + energy, avoid putting cards on the stack
-during your turn. Each opponent response adds +N spark (N = number of Surfers).
-Instead, focus on activated abilities (which don't go to the stack and don't
-give the opponent priority) or end your turn early.
-
-### Archive of the Forgotten as Recovery Tool
-
-Archive (cost 4, returns up to 2 events from void) is critical for recovering
-Immolates. Plan ahead: if your Immolates are in the void and the opponent has
-high-spark Surfers, an Archive into double Immolate can swing the board by 10+
-spark.
-
-### Scoring Math
-
-Victory at 12 points. Track the "spark gap" — the difference in spark between
-you and the opponent. Every turn the leading player scores that gap as points. A
-6-spark lead for 2 turns = 12 points = victory. Prevent large spark gaps from
-persisting across turns.
+1. **Assess the board**: Check spark totals, opponent energy, and opponent
+   Surfer count before making any plays
+2. **Play characters first**: These must go on the stack, so get them out while
+   you still have energy to respond if the opponent plays fast cards
+3. **Use activated abilities**: These are safe (no stack, no opponent priority).
+   Draw cards, filter your deck
+4. **Click End Turn**: This enters the ending phase
+5. **Play fast cards during the ending phase**: Guiding Light, removal spells,
+   and other fast events are best played here. The opponent can still respond,
+   but the turn is already ending — limiting their window
+6. **Hold counter-spells**: Keep Abolish and Together Against the Tide in hand
+   for the opponent's turn. They'll show "can play" when the opponent puts
+   something on the stack
