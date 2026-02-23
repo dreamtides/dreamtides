@@ -256,6 +256,11 @@ namespace Dreamtides.Abu
         return $"{name} moved from stack to battlefield";
       }
 
+      if (from == "battlefield" && to == "hand")
+      {
+        return $"{name} moved from battlefield to hand";
+      }
+
       if (from == "battlefield" && to == "void")
       {
         return $"{name} moved from battlefield to void";
