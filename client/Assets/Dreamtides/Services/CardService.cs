@@ -76,8 +76,6 @@ namespace Dreamtides.Services
       Sequence? sequence = null
     )
     {
-      Registry.LoggingService.Log("CardService", $"Applying {cardViews.Count} card updates");
-
       var toDelete = Cards.Keys.ToHashSet();
 
       if (updateSound != null)
