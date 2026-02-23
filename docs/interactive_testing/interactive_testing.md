@@ -248,6 +248,70 @@ Check `status` between steps to confirm play mode toggled correctly.
 - **Activated abilities**: Cost energy but don't go to the stack like regular
   cards. They appear as hand entries with the ability cost.
 
+## Known Bugs and History Gaps
+
+### Break the Sequence Missing History Entries
+
+When Break the Sequence resolves and banishes/returns an enemy character, the
+target character's zone transition does NOT appear in history. Only "Break the
+Sequence moved from hand to stack" and "Break the Sequence moved to void" are
+logged. The affected character silently disappears from the battlefield. To
+detect this, compare battlefield character counts before and after the action.
+Also check the void count — if unchanged, the character was banished rather than
+dissolved.
+
+### Opponent Can Chain Fast Cards During Your Stack Resolution
+
+When you play a card and the opponent responds, resolving their response may
+trigger further opponent plays before your original card resolves. This can lead
+to deeply nested stacks. Be patient and keep clicking Resolve until the stack
+fully empties. Always check the stack in the snapshot — if a Stack group exists,
+cards are still pending.
+
+## Abu Usage Tips for Agents
+
+### Activated Abilities and Virtual Hand Entries
+
+The hand count displayed in the snapshot (e.g., "Hand (13 cards)") includes
+virtual entries for activated abilities and reclaim abilities. These do NOT
+count toward the 10-card hand limit. To estimate real hand cards, subtract the
+number of activated ability entries (one per battlefield character with an
+ability) and reclaim ability entries (one per void card with Reclaim).
+
+### Discard Selection
+
+When selecting cards to discard, clicking virtual entries (Activated Ability,
+Reclaim Ability) does NOT produce a Submit button since they are not valid
+discard targets. Only click real cards (Character, Event) when discarding.
+
+### Foresee Interactions
+
+When Foresee triggers during dreamwell resolution (e.g., Skypath), the Card
+Order Selector appears and you must Submit before the draw phase proceeds. Just
+click Submit to keep the default order if you want to leave cards where they
+are.
+
+### Archive of the Forgotten Browser Selection
+
+When Archive resolves, a Browser group appears showing void contents. Click 1-2
+events to select them, then click Submit. Note: if the opponent responds to the
+Archive being on the stack, the browser may appear before the Archive actually
+resolves — the Archive still needs to go through stack resolution. Be prepared
+for multiple resolve cycles.
+
+### Dreamscatter Energy Requirement
+
+Dreamscatter costs 2 energy to play PLUS requires paying at least 1 additional
+energy for the draw effect. So the minimum total cost is 3 energy. The "can
+play" tag only appears when you have enough for both the play cost and minimum
+payment.
+
+### Abolish Timing
+
+Abolish only shows "can play" when there is a valid target on the stack (a
+played card to prevent). It cannot be played proactively. It activates during
+the opponent's turn when they play cards.
+
 ## Writing Narrative Files
 
 Write playtest narratives to `/tmp/narrative.md`. Include:
@@ -256,3 +320,38 @@ Write playtest narratives to `/tmp/narrative.md`. Include:
 - Actions taken and their results
 - Opponent responses and triggered abilities
 - Any bugs or unexpected behavior encountered
+
+## Game Strategy Notes (Detailed)
+
+### Sundown Surfer Death Spiral
+
+The most dangerous opponent strategy involves multiple Sundown Surfers. Each
+card the opponent plays during your turn triggers ALL their Surfers. In a
+typical late-game turn with 3 Surfers and 5+ fast cards available, the opponent
+can gain 15+ spark from triggers alone. The only effective counter is Immolate —
+prioritize dissolving Surfers immediately over other targets.
+
+**Critical**: Your own plays during your turn do NOT trigger the opponent's
+Surfers. Only opponent plays during your turn trigger them. This means Abolish
+and other responses you play are safe from triggering Surfer growth.
+
+### Energy Management for Counter-Play
+
+When the opponent has Sundown Surfers + energy, avoid putting cards on the stack
+during your turn. Each opponent response adds +N spark (N = number of Surfers).
+Instead, focus on activated abilities (which don't go to the stack and don't
+give the opponent priority) or end your turn early.
+
+### Archive of the Forgotten as Recovery Tool
+
+Archive (cost 4, returns up to 2 events from void) is critical for recovering
+Immolates. Plan ahead: if your Immolates are in the void and the opponent has
+high-spark Surfers, an Archive into double Immolate can swing the board by 10+
+spark.
+
+### Scoring Math
+
+Victory at 12 points. Track the "spark gap" — the difference in spark between
+you and the opponent. Every turn the leading player scores that gap as points. A
+6-spark lead for 2 turns = 12 points = victory. Prevent large spark gaps from
+persisting across turns.
