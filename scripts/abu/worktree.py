@@ -51,6 +51,7 @@ EXCLUDE: set[str] = {
 
 MIN_FREE_GB: int = 2
 WARN_FREE_GB: int = 5
+POOL_SLOTS: tuple[str, ...] = ("alpha", "beta", "gamma")
 
 
 def run_cmd(
@@ -790,6 +791,204 @@ def cmd_activate(args: argparse.Namespace) -> None:
         print(f"  Free disk: {get_free_gb(worktree_path):.1f}GB")
 
 
+def _eprint(*args: object) -> None:
+    """Print to stderr."""
+    print(*args, file=sys.stderr)
+
+
+def _worktree_branch(worktree_path: Path) -> str | None:
+    """Get the branch checked out in a worktree, or None if detached/unknown."""
+    result = run_cmd(
+        ["git", "worktree", "list", "--porcelain"],
+        capture=True,
+        cwd=REPO_ROOT,
+    )
+    resolved: Path = worktree_path.resolve()
+    lines: list[str] = result.stdout.splitlines()
+    for i, line in enumerate(lines):
+        if line.startswith("worktree ") and Path(line.split(" ", 1)[1]).resolve() == resolved:
+            for j in range(i + 1, min(i + 5, len(lines))):
+                if lines[j].startswith("branch refs/heads/"):
+                    return lines[j].removeprefix("branch refs/heads/")
+            return None
+    return None
+
+
+def _is_worktree_available(worktree_path: Path, base: str) -> bool:
+    """Check if a worktree is available (merged into base and clean)."""
+    result = run_cmd(
+        ["git", "merge-base", "--is-ancestor", "HEAD", base],
+        capture=True,
+        check=False,
+        cwd=worktree_path,
+    )
+    if result.returncode != 0:
+        return False
+
+    result = run_cmd(
+        ["git", "status", "--porcelain"],
+        capture=True,
+        cwd=worktree_path,
+    )
+    for line in result.stdout.splitlines():
+        if not line.startswith("??"):
+            return False
+
+    return True
+
+
+def _sync_gitignored(worktree_path: Path, main_repo: Path) -> None:
+    """Sync gitignored items from main repo to worktree, printing diagnostics to stderr."""
+    _eprint("Syncing gitignored items...")
+    main_items: list[str] = discover_untracked_items(main_repo)
+    main_items_set: set[str] = set(main_items)
+
+    total_cloned: int = 0
+    total_deleted: int = 0
+    total_unchanged: int = 0
+    dir_count: int = 0
+
+    for item in main_items:
+        if should_exclude(item):
+            continue
+
+        source: Path = main_repo / item
+        dest: Path = worktree_path / item
+
+        if not (source.exists() or source.is_symlink()):
+            continue
+
+        if source.is_symlink():
+            target: Path = Path(os.readlink(source))
+            if dest.is_symlink() and Path(os.readlink(dest)) == target:
+                total_unchanged += 1
+            else:
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                if dest.exists() or dest.is_symlink():
+                    if dest.is_dir() and not dest.is_symlink():
+                        shutil.rmtree(dest)
+                    else:
+                        dest.unlink()
+                dest.symlink_to(target)
+                total_cloned += 1
+            continue
+
+        resolved: Path = source.resolve()
+        if not resolved.exists():
+            continue
+
+        if resolved.is_dir():
+            if dest.exists() or dest.is_symlink():
+                cloned, deleted_count, unchanged = sync_tree(source, dest, False)
+                total_cloned += cloned
+                total_deleted += deleted_count
+                total_unchanged += unchanged
+                if cloned > 0 or deleted_count > 0:
+                    _eprint(f"  {item}: {cloned} cloned, {deleted_count} deleted, {unchanged} unchanged")
+            else:
+                if clone_item(source, dest, False):
+                    total_cloned += 1
+                    _eprint(f"  {item}: cloned (new)")
+            dir_count += 1
+        else:
+            if dest.exists():
+                try:
+                    src_stat: os.stat_result = source.stat()
+                    dst_stat: os.stat_result = dest.stat()
+                    if (
+                        src_stat.st_size == dst_stat.st_size
+                        and abs(src_stat.st_mtime - dst_stat.st_mtime) < 0.01
+                    ):
+                        total_unchanged += 1
+                        continue
+                except OSError:
+                    pass
+            if clone_item(source, dest, False):
+                total_cloned += 1
+
+    worktree_items: list[str] = discover_untracked_items(worktree_path)
+    removed_count: int = 0
+    for item in worktree_items:
+        if should_exclude(item):
+            continue
+        if item not in main_items_set:
+            dest = worktree_path / item
+            if dest.exists() or dest.is_symlink():
+                if dest.is_dir() and not dest.is_symlink():
+                    shutil.rmtree(dest, ignore_errors=True)
+                else:
+                    dest.unlink()
+                _eprint(f"  Removed extra: {item}")
+                removed_count += 1
+
+    total_removed: int = total_deleted + removed_count
+    _eprint(f"  Synced {dir_count} directories: {total_cloned} cloned, {total_removed} deleted, {total_unchanged} unchanged")
+
+
+def _claim_reuse(worktree_path: Path, slot: str, branch: str, base: str) -> None:
+    """Reuse an available worktree slot for a new branch."""
+    old_branch: str | None = _worktree_branch(worktree_path)
+    _eprint(f"Reusing slot '{slot}' (was branch '{old_branch}')")
+
+    run_cmd(
+        ["git", "checkout", "-B", branch, base],
+        cwd=worktree_path,
+    )
+    run_cmd(["git", "clean", "-fd"], cwd=worktree_path)
+
+    if old_branch and old_branch != branch:
+        run_cmd(
+            ["git", "branch", "-D", old_branch],
+            check=False,
+            cwd=REPO_ROOT,
+        )
+
+    main_repo: Path = find_main_repo().resolve()
+    _sync_gitignored(worktree_path, main_repo)
+    allocate_port(slot)
+
+
+def _claim_create(worktree_path: Path, slot: str, branch: str, base: str) -> None:
+    """Create a new worktree slot."""
+    _eprint(f"Creating slot '{slot}'")
+
+    worktree_path.parent.mkdir(parents=True, exist_ok=True)
+    result = run_cmd(
+        ["git", "worktree", "add", "-b", branch, str(worktree_path), base],
+        check=False,
+        cwd=REPO_ROOT,
+    )
+    if result.returncode != 0:
+        _eprint("Error: git worktree add failed")
+        sys.exit(1)
+
+    allocate_port(slot)
+
+    main_repo: Path = find_main_repo().resolve()
+    _eprint("Discovering untracked/gitignored items...")
+    items: list[str] = discover_untracked_items(main_repo)
+
+    clone_count: int = 0
+    skip_count: int = 0
+
+    for item in items:
+        if should_exclude(item):
+            skip_count += 1
+            continue
+
+        source: Path = main_repo / item
+        dest: Path = worktree_path / item
+
+        if dest.exists() or dest.is_symlink():
+            continue
+
+        success: bool = clone_item(source, dest, False)
+        if success:
+            clone_count += 1
+
+    _eprint(f"  Cloned: {clone_count} items, excluded: {skip_count} items")
+
+
 def cmd_list(args: argparse.Namespace) -> None:
     """List worktrees under the default base directory."""
     result = run_cmd(
@@ -806,6 +1005,62 @@ def cmd_list(args: argparse.Namespace) -> None:
             found += 1
     if found == 0:
         print(f"No worktrees found under {DEFAULT_WORKTREE_BASE}")
+
+
+def cmd_claim(args: argparse.Namespace) -> None:
+    """Claim an available worktree slot for a new branch."""
+    branch: str = args.branch
+    base: str = args.base
+
+    if not verify_apfs(Path.home()):
+        _eprint("Error: Filesystem is not APFS. APFS clones require an APFS volume.")
+        sys.exit(1)
+
+    free_gb: float = get_free_gb(Path.home())
+    if free_gb < MIN_FREE_GB:
+        _eprint(f"Error: Only {free_gb:.1f}GB free. Need at least {MIN_FREE_GB}GB.")
+        sys.exit(1)
+    if free_gb < WARN_FREE_GB:
+        _eprint(f"Warning: Only {free_gb:.1f}GB free. Proceeding with caution.")
+
+    for slot in POOL_SLOTS:
+        slot_path: Path = DEFAULT_WORKTREE_BASE / slot
+        if slot_path.exists():
+            slot_branch: str | None = _worktree_branch(slot_path)
+            if slot_branch == branch:
+                _eprint(f"Error: Branch '{branch}' is already checked out in slot '{slot}'")
+                sys.exit(1)
+
+    available: list[tuple[str, Path]] = []
+    occupied: list[tuple[str, Path]] = []
+    empty: list[str] = []
+
+    for slot in POOL_SLOTS:
+        slot_path = DEFAULT_WORKTREE_BASE / slot
+        if not slot_path.exists():
+            empty.append(slot)
+        elif _is_worktree_available(slot_path, base):
+            available.append((slot, slot_path))
+        else:
+            occupied.append((slot, slot_path))
+
+    if available:
+        slot, slot_path = available[0]
+        _claim_reuse(slot_path, slot, branch, base)
+        print(slot_path)
+    elif empty:
+        slot = empty[0]
+        slot_path = DEFAULT_WORKTREE_BASE / slot
+        _claim_create(slot_path, slot, branch, base)
+        print(slot_path)
+    else:
+        _eprint("Error: All worktree slots are occupied and none are available.")
+        _eprint("Occupied slots:")
+        for slot, slot_path in occupied:
+            slot_branch = _worktree_branch(slot_path)
+            _eprint(f"  {slot}: {slot_branch}")
+        _eprint("Use 'abu worktree remove <slot>' to free a slot.")
+        sys.exit(1)
 
 
 def register_subcommands(parent_subparsers: argparse._SubParsersAction) -> None:  # type: ignore[type-arg]
@@ -892,6 +1147,14 @@ def register_subcommands(parent_subparsers: argparse._SubParsersAction) -> None:
 
     wt_sub.add_parser("list", help="List worktrees")
 
+    claim_parser = wt_sub.add_parser("claim", help="Claim an available worktree slot")
+    claim_parser.add_argument("branch", help="Branch name to create")
+    claim_parser.add_argument(
+        "--base",
+        default="master",
+        help="Base branch (default: master)",
+    )
+
 
 def dispatch(args: argparse.Namespace) -> None:
     """Route to the correct worktree subcommand handler."""
@@ -906,6 +1169,8 @@ def dispatch(args: argparse.Namespace) -> None:
         cmd_activate(args)
     elif cmd == "list":
         cmd_list(args)
+    elif cmd == "claim":
+        cmd_claim(args)
 
 
 def main() -> None:
@@ -991,6 +1256,14 @@ def main() -> None:
     )
 
     subparsers.add_parser("list", help="List worktrees")
+
+    claim_parser = subparsers.add_parser("claim", help="Claim an available worktree slot")
+    claim_parser.add_argument("branch", help="Branch name to create")
+    claim_parser.add_argument(
+        "--base",
+        default="master",
+        help="Base branch (default: master)",
+    )
 
     parsed_args: argparse.Namespace = parser.parse_args()
     dispatch(parsed_args)

@@ -13,7 +13,11 @@ from worktree import (
     DEFAULT_WORKTREE_BASE,
     EXCLUDE,
     FIRST_WORKTREE_PORT,
+    POOL_SLOTS,
+    _is_worktree_available,
+    _worktree_branch,
     allocate_port,
+    cmd_claim,
     deallocate_port,
     dispatch,
     read_ports,
@@ -168,6 +172,179 @@ class TestResolveWorktreePath(unittest.TestCase):
             resolve_worktree_path("nosuch")
 
 
+class TestWorktreeBranch(unittest.TestCase):
+    """Test _worktree_branch helper."""
+
+    @patch("worktree.run_cmd")
+    def test_finds_branch(self, mock_run: MagicMock) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            wt_path = Path(tmpdir) / "alpha"
+            wt_path.mkdir()
+            mock_run.return_value = MagicMock(
+                stdout=f"worktree {wt_path}\nbranch refs/heads/my-feature\n\n",
+            )
+            result = _worktree_branch(wt_path)
+            self.assertEqual(result, "my-feature")
+
+    @patch("worktree.run_cmd")
+    def test_returns_none_for_detached(self, mock_run: MagicMock) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            wt_path = Path(tmpdir) / "alpha"
+            wt_path.mkdir()
+            mock_run.return_value = MagicMock(
+                stdout=f"worktree {wt_path}\nHEAD abc123\ndetached\n\n",
+            )
+            result = _worktree_branch(wt_path)
+            self.assertIsNone(result)
+
+    @patch("worktree.run_cmd")
+    def test_returns_none_for_unknown(self, mock_run: MagicMock) -> None:
+        mock_run.return_value = MagicMock(
+            stdout="worktree /some/other/path\nbranch refs/heads/main\n\n",
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = _worktree_branch(Path(tmpdir) / "nonexistent")
+            self.assertIsNone(result)
+
+
+class TestIsWorktreeAvailable(unittest.TestCase):
+    """Test _is_worktree_available helper."""
+
+    @patch("worktree.run_cmd")
+    def test_clean_and_merged(self, mock_run: MagicMock) -> None:
+        mock_run.side_effect = [
+            MagicMock(returncode=0),  # merge-base --is-ancestor succeeds
+            MagicMock(stdout=""),  # git status --porcelain is clean
+        ]
+        self.assertTrue(_is_worktree_available(Path("/tmp/wt"), "master"))
+
+    @patch("worktree.run_cmd")
+    def test_dirty_tracked_files(self, mock_run: MagicMock) -> None:
+        mock_run.side_effect = [
+            MagicMock(returncode=0),  # merged
+            MagicMock(stdout=" M some_file.py\n"),  # dirty
+        ]
+        self.assertFalse(_is_worktree_available(Path("/tmp/wt"), "master"))
+
+    @patch("worktree.run_cmd")
+    def test_not_merged(self, mock_run: MagicMock) -> None:
+        mock_run.side_effect = [
+            MagicMock(returncode=1),  # not ancestor
+        ]
+        self.assertFalse(_is_worktree_available(Path("/tmp/wt"), "master"))
+
+    @patch("worktree.run_cmd")
+    def test_untracked_only_is_available(self, mock_run: MagicMock) -> None:
+        mock_run.side_effect = [
+            MagicMock(returncode=0),  # merged
+            MagicMock(stdout="?? untracked_file.txt\n?? another.log\n"),  # untracked only
+        ]
+        self.assertTrue(_is_worktree_available(Path("/tmp/wt"), "master"))
+
+
+class TestCmdClaim(unittest.TestCase):
+    """Test cmd_claim command."""
+
+    def _make_args(self, branch: str = "feat", base: str = "master") -> argparse.Namespace:
+        return argparse.Namespace(branch=branch, base=base)
+
+    @patch("worktree._claim_reuse")
+    @patch("worktree._is_worktree_available")
+    @patch("worktree._worktree_branch")
+    @patch("worktree.get_free_gb", return_value=50.0)
+    @patch("worktree.verify_apfs", return_value=True)
+    @patch("worktree.DEFAULT_WORKTREE_BASE")
+    def test_reuses_available_slot(
+        self,
+        mock_base: MagicMock,
+        mock_apfs: MagicMock,
+        mock_free: MagicMock,
+        mock_branch: MagicMock,
+        mock_available: MagicMock,
+        mock_reuse: MagicMock,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            base_path = Path(tmpdir)
+            alpha_path = base_path / "alpha"
+            alpha_path.mkdir()
+            mock_base.__truediv__ = lambda self, key: base_path / key
+            mock_branch.return_value = "old-branch"
+            mock_available.return_value = True
+
+            with patch("builtins.print") as mock_print:
+                cmd_claim(self._make_args())
+                mock_reuse.assert_called_once_with(alpha_path, "alpha", "feat", "master")
+                mock_print.assert_called_once_with(alpha_path)
+
+    @patch("worktree._claim_create")
+    @patch("worktree._worktree_branch")
+    @patch("worktree.get_free_gb", return_value=50.0)
+    @patch("worktree.verify_apfs", return_value=True)
+    @patch("worktree.DEFAULT_WORKTREE_BASE")
+    def test_creates_new_slot(
+        self,
+        mock_base: MagicMock,
+        mock_apfs: MagicMock,
+        mock_free: MagicMock,
+        mock_branch: MagicMock,
+        mock_create: MagicMock,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            base_path = Path(tmpdir)
+            mock_base.__truediv__ = lambda self, key: base_path / key
+            # No slots exist => all empty
+
+            with patch("builtins.print") as mock_print:
+                cmd_claim(self._make_args())
+                expected_path = base_path / "alpha"
+                mock_create.assert_called_once_with(expected_path, "alpha", "feat", "master")
+                mock_print.assert_called_once_with(expected_path)
+
+    @patch("worktree._is_worktree_available")
+    @patch("worktree._worktree_branch")
+    @patch("worktree.get_free_gb", return_value=50.0)
+    @patch("worktree.verify_apfs", return_value=True)
+    @patch("worktree.DEFAULT_WORKTREE_BASE")
+    def test_all_occupied_error(
+        self,
+        mock_base: MagicMock,
+        mock_apfs: MagicMock,
+        mock_free: MagicMock,
+        mock_branch: MagicMock,
+        mock_available: MagicMock,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            base_path = Path(tmpdir)
+            for slot in POOL_SLOTS:
+                (base_path / slot).mkdir()
+            mock_base.__truediv__ = lambda self, key: base_path / key
+            mock_branch.return_value = "some-branch"
+            mock_available.return_value = False
+
+            with self.assertRaises(SystemExit):
+                cmd_claim(self._make_args())
+
+    @patch("worktree._worktree_branch")
+    @patch("worktree.get_free_gb", return_value=50.0)
+    @patch("worktree.verify_apfs", return_value=True)
+    @patch("worktree.DEFAULT_WORKTREE_BASE")
+    def test_branch_conflict_error(
+        self,
+        mock_base: MagicMock,
+        mock_apfs: MagicMock,
+        mock_free: MagicMock,
+        mock_branch: MagicMock,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            base_path = Path(tmpdir)
+            (base_path / "alpha").mkdir()
+            mock_base.__truediv__ = lambda self, key: base_path / key
+            mock_branch.return_value = "feat"  # Same as requested branch
+
+            with self.assertRaises(SystemExit):
+                cmd_claim(self._make_args(branch="feat"))
+
+
 class TestRegisterSubcommands(unittest.TestCase):
     """Test that subcommands are correctly registered."""
 
@@ -251,6 +428,19 @@ class TestRegisterSubcommands(unittest.TestCase):
         args = parser.parse_args(["worktree", "list"])
         self.assertEqual(args.worktree_command, "list")
 
+    def test_worktree_claim(self) -> None:
+        parser = self._build_parser()
+        args = parser.parse_args(["worktree", "claim", "my-branch"])
+        self.assertEqual(args.worktree_command, "claim")
+        self.assertEqual(args.branch, "my-branch")
+        self.assertEqual(args.base, "master")
+
+    def test_worktree_claim_with_base(self) -> None:
+        parser = self._build_parser()
+        args = parser.parse_args(["worktree", "claim", "my-branch", "--base", "develop"])
+        self.assertEqual(args.branch, "my-branch")
+        self.assertEqual(args.base, "develop")
+
     def test_worktree_no_subcommand_fails(self) -> None:
         parser = self._build_parser()
         with self.assertRaises(SystemExit):
@@ -289,6 +479,12 @@ class TestDispatch(unittest.TestCase):
         args = argparse.Namespace(worktree_command="activate")
         dispatch(args)
         mock_activate.assert_called_once_with(args)
+
+    @patch("worktree.cmd_claim")
+    def test_dispatch_claim(self, mock_claim: MagicMock) -> None:
+        args = argparse.Namespace(worktree_command="claim")
+        dispatch(args)
+        mock_claim.assert_called_once_with(args)
 
 
 class TestExcludeSet(unittest.TestCase):
