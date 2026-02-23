@@ -3564,7 +3564,7 @@ rules-text = """
 {Prevent} a played event which could {dissolve} an ally.
 """
 card-type = "Event"
-is-fast = false
+is-fast = true
 image-number = 1621160806
 rarity = "Common"
 art-owned = true
