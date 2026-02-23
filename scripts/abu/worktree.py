@@ -932,13 +932,15 @@ def _claim_reuse(worktree_path: Path, slot: str, branch: str, base: str) -> None
 
     run_cmd(
         ["git", "checkout", "-B", branch, base],
+        capture=True,
         cwd=worktree_path,
     )
-    run_cmd(["git", "clean", "-fd"], cwd=worktree_path)
+    run_cmd(["git", "clean", "-fd"], capture=True, cwd=worktree_path)
 
     if old_branch and old_branch != branch:
         run_cmd(
             ["git", "branch", "-D", old_branch],
+            capture=True,
             check=False,
             cwd=REPO_ROOT,
         )
