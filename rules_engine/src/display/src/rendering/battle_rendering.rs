@@ -106,8 +106,6 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         &mut token_offset,
     ));
 
-    cards.extend(modal_effect_prompt_rendering::cards(builder, battle));
-
     cards.extend(dreamwell_card_rendering::all_cards(builder, battle));
 
     cards.push(identity_card_rendering::identity_card_view(

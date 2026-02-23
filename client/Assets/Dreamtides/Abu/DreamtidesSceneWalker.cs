@@ -596,11 +596,11 @@ namespace Dreamtides.Abu
     {
       var name = StripRichText(revealed.Name)?.Replace("\n", ", ") ?? "Unknown";
       var cardType = StripRichText(revealed.CardType);
-      var showDetails = zoneContext is "Hand" or "Battlefield" or "Stack";
+      var showDetails = zoneContext is "Hand" or "Battlefield" or "Stack" or "Browser";
 
       var annotations = new List<string>();
 
-      if (zoneContext == "Hand" && !string.IsNullOrEmpty(revealed.Cost))
+      if (zoneContext is "Hand" or "Browser" && !string.IsNullOrEmpty(revealed.Cost))
       {
         annotations.Add($"cost: {StripRichText(revealed.Cost)}");
       }

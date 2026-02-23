@@ -156,13 +156,11 @@ Some history messages can be misleading:
 
 ## Known ABU Limitations
 
-### Modal Cards Cannot Be Played
+### Modal Cards
 
 Modal cards (e.g., "Break the Sequence — Choose One: ...") show "cost: " with an
-empty cost in hand. When played, two large choice cards appear as 3D
-Displayables but the scene walker does not capture them. **Modal cards are
-currently unplayable via ABU.** Use the Undo button to back out if you
-accidentally play one, and avoid modal cards during testing.
+empty cost in hand. When played, choice cards appear in the Browser group. Click
+the desired choice to select it.
 
 ### Opponent Responses and Sundown Surfer Triggers
 
