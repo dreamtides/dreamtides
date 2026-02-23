@@ -56,6 +56,7 @@ namespace Dreamtides.Layout
 
       if (!displayable.ExcludeFromLayout)
       {
+        Errors.CheckNotDefault(GameContext, $"Expected {name} to have a GameContext");
         displayable.GameContext = GameContext;
       }
 
