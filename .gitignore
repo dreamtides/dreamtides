@@ -33,4 +33,5 @@ scripts/test_output/
 .lattice/
 .venv/
 .abu-state.json
+.review-lock
 Logs/

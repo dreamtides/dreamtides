@@ -38,7 +38,7 @@ fi
 # Staging a file makes git status show a non-?? line, which
 # causes _is_worktree_available to return False.
 touch "$WORKTREE/.review-lock"
-git -C "$WORKTREE" add .review-lock
+git -C "$WORKTREE" add -f .review-lock
 cleanup() { git -C "$WORKTREE" reset HEAD .review-lock 2>/dev/null; rm -f "$WORKTREE/.review-lock"; }
 trap cleanup EXIT
 
