@@ -606,6 +606,26 @@ namespace Dreamtides.Abu
         && _registry.CapabilitiesService.CanPlayCards();
 
       var label = BuildCardLabel(revealed, zoneContext, canPlay);
+
+      if (zoneContext == "Stack" && revealed.InfoZoomData?.Icons is { Count: > 0 } icons)
+      {
+        var targetNames = new List<string>();
+        foreach (var icon in icons)
+        {
+          var targetCard = _registry.CardService.GetCardIfExists(icon.CardId);
+          var targetName = StripRichText(targetCard?.CardView.Revealed?.Name)?.Replace("\n", ", ");
+          if (!string.IsNullOrEmpty(targetName))
+          {
+            targetNames.Add(targetName);
+          }
+        }
+
+        if (targetNames.Count > 0)
+        {
+          label += $" (targeting: {string.Join(", ", targetNames)})";
+        }
+      }
+
       var node = new AbuSceneNode
       {
         Role = "button",
