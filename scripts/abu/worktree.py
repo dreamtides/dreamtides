@@ -991,6 +991,62 @@ def _claim_create(worktree_path: Path, slot: str, branch: str, base: str) -> Non
     _eprint(f"  Cloned: {clone_count} items, excluded: {skip_count} items")
 
 
+def cmd_reset(args: argparse.Namespace) -> None:
+    """Remove all worktrees and delete their branches, resetting to a clean state."""
+    worktree_paths: list[Path] = list_worktree_paths()
+
+    if not worktree_paths:
+        print(f"No worktrees found under {DEFAULT_WORKTREE_BASE}")
+        # Still prune and clean up ports in case of stale state
+        run_cmd(["git", "worktree", "prune"], cwd=REPO_ROOT)
+        write_ports({})
+        print("Pruned stale worktree entries and cleared port registry.")
+        return
+
+    print(f"Removing {len(worktree_paths)} worktree(s):\n")
+
+    branches_to_delete: list[str] = []
+
+    for worktree_path in worktree_paths:
+        branch: str | None = _worktree_branch(worktree_path)
+        slot_name: str = worktree_path.name
+        print(f"  Removing {slot_name}" + (f" (branch: {branch})" if branch else ""))
+
+        result = run_cmd(
+            ["git", "worktree", "remove", "--force", str(worktree_path)],
+            check=False,
+            cwd=REPO_ROOT,
+        )
+        if result.returncode != 0:
+            print(f"    git worktree remove failed, falling back to rm -rf")
+            shutil.rmtree(worktree_path, ignore_errors=True)
+
+        if worktree_path.exists():
+            shutil.rmtree(worktree_path, ignore_errors=True)
+
+        if branch and branch != "master" and branch != "main":
+            branches_to_delete.append(branch)
+
+    # Prune stale worktree entries
+    run_cmd(["git", "worktree", "prune"], cwd=REPO_ROOT)
+
+    # Delete branches
+    if branches_to_delete:
+        print(f"\nDeleting {len(branches_to_delete)} branch(es):")
+        for branch in branches_to_delete:
+            print(f"  {branch}")
+            run_cmd(
+                ["git", "branch", "-D", branch],
+                check=False,
+                cwd=REPO_ROOT,
+            )
+
+    # Clear port registry
+    write_ports({})
+
+    print("\nDone! All worktrees removed and ports cleared.")
+
+
 def cmd_list(args: argparse.Namespace) -> None:
     """List worktrees under the default base directory."""
     result = run_cmd(
@@ -1148,6 +1204,7 @@ def register_subcommands(parent_subparsers: argparse._SubParsersAction) -> None:
     )
 
     wt_sub.add_parser("list", help="List worktrees")
+    wt_sub.add_parser("reset", help="Remove all worktrees and delete their branches")
 
     claim_parser = wt_sub.add_parser("claim", help="Claim an available worktree slot")
     claim_parser.add_argument("branch", help="Branch name to create")
@@ -1173,6 +1230,8 @@ def dispatch(args: argparse.Namespace) -> None:
         cmd_list(args)
     elif cmd == "claim":
         cmd_claim(args)
+    elif cmd == "reset":
+        cmd_reset(args)
 
 
 def main() -> None:
@@ -1258,6 +1317,7 @@ def main() -> None:
     )
 
     subparsers.add_parser("list", help="List worktrees")
+    subparsers.add_parser("reset", help="Remove all worktrees and delete their branches")
 
     claim_parser = subparsers.add_parser("claim", help="Claim an available worktree slot")
     claim_parser.add_argument("branch", help="Branch name to create")

@@ -836,3 +836,6 @@ worktree-claim branch *args='':
 
 worktree-list:
     python3 scripts/abu/abu.py worktree list
+
+worktree-reset:
+    python3 scripts/abu/abu.py worktree reset

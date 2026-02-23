@@ -18,6 +18,7 @@ from worktree import (
     _worktree_branch,
     allocate_port,
     cmd_claim,
+    cmd_reset,
     deallocate_port,
     dispatch,
     read_ports,
@@ -345,6 +346,117 @@ class TestCmdClaim(unittest.TestCase):
                 cmd_claim(self._make_args(branch="feat"))
 
 
+class TestCmdReset(unittest.TestCase):
+    """Test cmd_reset command."""
+
+    def _make_args(self) -> argparse.Namespace:
+        return argparse.Namespace()
+
+    @patch("worktree.write_ports")
+    @patch("worktree.run_cmd")
+    @patch("worktree.list_worktree_paths")
+    def test_no_worktrees(
+        self,
+        mock_list: MagicMock,
+        mock_run: MagicMock,
+        mock_write_ports: MagicMock,
+    ) -> None:
+        mock_list.return_value = []
+        mock_run.return_value = MagicMock(returncode=0)
+        cmd_reset(self._make_args())
+        mock_write_ports.assert_called_once_with({})
+
+    @patch("worktree.write_ports")
+    @patch("worktree.run_cmd")
+    @patch("worktree._worktree_branch")
+    @patch("worktree.list_worktree_paths")
+    def test_removes_worktrees_and_branches(
+        self,
+        mock_list: MagicMock,
+        mock_branch: MagicMock,
+        mock_run: MagicMock,
+        mock_write_ports: MagicMock,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            alpha_path = Path(tmpdir) / "alpha"
+            alpha_path.mkdir()
+            beta_path = Path(tmpdir) / "beta"
+            beta_path.mkdir()
+            mock_list.return_value = [alpha_path, beta_path]
+            mock_branch.side_effect = ["feature-1", "feature-2"]
+            mock_run.return_value = MagicMock(returncode=0)
+
+            cmd_reset(self._make_args())
+
+            # Should have called git worktree remove for each, git worktree prune, and branch -D for each
+            remove_calls = [
+                c for c in mock_run.call_args_list
+                if "worktree" in c[0][0] and "remove" in c[0][0]
+            ]
+            self.assertEqual(len(remove_calls), 2)
+
+            branch_calls = [
+                c for c in mock_run.call_args_list
+                if "branch" in c[0][0] and "-D" in c[0][0]
+            ]
+            self.assertEqual(len(branch_calls), 2)
+
+            mock_write_ports.assert_called_once_with({})
+
+    @patch("worktree.write_ports")
+    @patch("worktree.run_cmd")
+    @patch("worktree._worktree_branch")
+    @patch("worktree.list_worktree_paths")
+    def test_skips_master_branch_deletion(
+        self,
+        mock_list: MagicMock,
+        mock_branch: MagicMock,
+        mock_run: MagicMock,
+        mock_write_ports: MagicMock,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            alpha_path = Path(tmpdir) / "alpha"
+            alpha_path.mkdir()
+            mock_list.return_value = [alpha_path]
+            mock_branch.return_value = "master"
+            mock_run.return_value = MagicMock(returncode=0)
+
+            cmd_reset(self._make_args())
+
+            branch_calls = [
+                c for c in mock_run.call_args_list
+                if "branch" in c[0][0] and "-D" in c[0][0]
+            ]
+            self.assertEqual(len(branch_calls), 0)
+
+    @patch("worktree.write_ports")
+    @patch("worktree.run_cmd")
+    @patch("worktree._worktree_branch")
+    @patch("worktree.list_worktree_paths")
+    def test_handles_none_branch(
+        self,
+        mock_list: MagicMock,
+        mock_branch: MagicMock,
+        mock_run: MagicMock,
+        mock_write_ports: MagicMock,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            alpha_path = Path(tmpdir) / "alpha"
+            alpha_path.mkdir()
+            mock_list.return_value = [alpha_path]
+            mock_branch.return_value = None
+            mock_run.return_value = MagicMock(returncode=0)
+
+            cmd_reset(self._make_args())
+
+            branch_calls = [
+                c for c in mock_run.call_args_list
+                if "branch" in c[0][0] and "-D" in c[0][0]
+            ]
+            self.assertEqual(len(branch_calls), 0)
+            mock_write_ports.assert_called_once_with({})
+
+
 class TestRegisterSubcommands(unittest.TestCase):
     """Test that subcommands are correctly registered."""
 
@@ -441,6 +553,11 @@ class TestRegisterSubcommands(unittest.TestCase):
         self.assertEqual(args.branch, "my-branch")
         self.assertEqual(args.base, "develop")
 
+    def test_worktree_reset(self) -> None:
+        parser = self._build_parser()
+        args = parser.parse_args(["worktree", "reset"])
+        self.assertEqual(args.worktree_command, "reset")
+
     def test_worktree_no_subcommand_fails(self) -> None:
         parser = self._build_parser()
         with self.assertRaises(SystemExit):
@@ -485,6 +602,12 @@ class TestDispatch(unittest.TestCase):
         args = argparse.Namespace(worktree_command="claim")
         dispatch(args)
         mock_claim.assert_called_once_with(args)
+
+    @patch("worktree.cmd_reset")
+    def test_dispatch_reset(self, mock_reset: MagicMock) -> None:
+        args = argparse.Namespace(worktree_command="reset")
+        dispatch(args)
+        mock_reset.assert_called_once_with(args)
 
 
 class TestExcludeSet(unittest.TestCase):
