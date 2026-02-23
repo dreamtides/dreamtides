@@ -775,7 +775,18 @@ namespace Dreamtides.Abu
       AddStackObjects(stackGroup, layout.TargetingEnemyStack, refRegistry);
       AddStackObjects(stackGroup, layout.TargetingBothStack, refRegistry);
 
-      return stackGroup.Children.Count > 0 ? stackGroup : null;
+      var count = stackGroup.Children.Count;
+      if (count > 1)
+      {
+        for (var i = 0; i < count; i++)
+        {
+          var child = stackGroup.Children[i];
+          var position = i == count - 1 ? $"{i + 1} of {count}, top" : $"{i + 1} of {count}";
+          child.Label = $"{child.Label} [{position}]";
+        }
+      }
+
+      return count > 0 ? stackGroup : null;
     }
 
     void AddStackObjects(AbuSceneNode parent, ObjectLayout stack, RefRegistry refRegistry)
