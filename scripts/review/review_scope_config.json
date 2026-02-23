@@ -69,13 +69,13 @@
     "tv-check",
     "tv-clippy",
     "tv-test",
-    "unity-test"
+    "local-unity-test"
   ],
   "python_docs_only_skip_steps": [
     "build",
     "clippy",
     "test-core",
-    "unity-test"
+    "local-unity-test"
   ],
   "parser_steps": [
     "parser-test"
@@ -90,6 +90,6 @@
     "pyre-check"
   ],
   "csharp_steps": [
-    "unity-test"
+    "local-unity-test"
   ]
 }

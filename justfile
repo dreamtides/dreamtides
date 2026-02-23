@@ -1,6 +1,6 @@
 set positional-arguments
 
-code-review: check-format build workspace-lints clippy style-validator test unity-tests
+code-review: check-format build workspace-lints clippy style-validator test cli-unity-test
 
 # Run this before pushing
 code-review-rsync: rsync-for-review
@@ -15,7 +15,7 @@ review:
         python3 scripts/review/review_runner.py
     fi
 
-review-direct: check-snapshots check-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test python-test pyre-check unity-test parser-test tv-check tv-clippy tv-test
+review-direct: check-snapshots check-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test python-test pyre-check local-unity-test parser-test tv-check tv-clippy tv-test
 
 review-verbose: check-snapshots check-format-verbose check-docs-format-verbose check-token-limits-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose review-core-test-verbose python-test-verbose pyre-check-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
 
@@ -588,14 +588,14 @@ check-format-verbose:
 check-docs:
     RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links -D rustdoc::private-intra-doc-links -D rustdoc::bare-urls" cargo doc --manifest-path rules_engine/Cargo.toml --all
 
-unity-tests:
+cli-unity-test:
     ./scripts/testing/test_unity.py
 
 # Unity Editor commands via Hammerspoon
 unity command *args:
     python3 scripts/abu/abu.py {{command}} {{args}}
 
-unity-test:
+local-unity-test:
     python3 scripts/abu/abu.py test
 
 unity-check:
@@ -712,8 +712,8 @@ rsync-third-party:
     cp justfile ~/dreamtides_tests/
     echo $'\a'
 
-unity-test-rsync: rsync-for-review
-    cd ~/dreamtides_tests && just unity-tests
+cli-unity-test-rsync: rsync-for-review
+    cd ~/dreamtides_tests && just cli-unity-test
 
 regenerate-test-battles:
     cargo run --bin core_11_battle --manifest-path rules_engine/Cargo.toml -- --output rules_engine/benchmarks/benchmark_battles/src/core_11_battle.json

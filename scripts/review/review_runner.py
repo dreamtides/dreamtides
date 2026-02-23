@@ -183,7 +183,7 @@ def step_specs() -> list[StepSpec]:
                 )
             ],
         ),
-        StepSpec("unity-test", [CommandSpec("unity-test", ["just", "unity-test"])]),
+        StepSpec("local-unity-test", [CommandSpec("local-unity-test", ["just", "local-unity-test"])]),
         StepSpec("parser-test", [CommandSpec("parser-test", ["just", "parser-test"])]),
         StepSpec(
             "tv-check",

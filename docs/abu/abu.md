@@ -466,7 +466,7 @@ instance.
 cd scripts/abu && python3 -m unittest test_abu -v
 
 # C# bridge tests (includes SnapshotFormatterTests, CommandSchemaTests, etc.)
-just unity-tests
+just cli-unity-test
 
 # C# formatting
 just fmt-csharp

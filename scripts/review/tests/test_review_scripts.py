@@ -142,7 +142,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
             "rlf-lint",
             "test-core",
             "python-test",
-            "unity-test",
+            "local-unity-test",
             "parser-test",
             "tv-check",
             "tv-clippy",
@@ -197,18 +197,18 @@ class ReviewScopePlannerTests(unittest.TestCase):
                 "tv-check",
                 "tv-clippy",
                 "tv-test",
-                "unity-test",
+                "local-unity-test",
             ),
             python_docs_only_skip_steps=(
                 "build",
                 "clippy",
                 "test-core",
-                "unity-test",
+                "local-unity-test",
             ),
             parser_steps=("parser-test",),
             tv_steps=("tv-check", "tv-clippy", "tv-test"),
             python_steps=("python-test",),
-            csharp_steps=("unity-test",),
+            csharp_steps=("local-unity-test",),
         )
         self.metadata = review_scope.WorkspaceMetadata(
             crate_roots={

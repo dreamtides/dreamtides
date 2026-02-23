@@ -85,4 +85,4 @@ These are regenerated via Editor menu when scene structure changes.
 3. Use `AssertCardIsOnScreen(viewport, card)` to verify visibility
 4. Use `AssertCardsAreHorizontallyOrdered(viewport, cards)` for ordering
 5. Test multiple card counts (1, 3, 5, 7, 9, 15) to catch scaling issues
-6. Run tests via `just unity-test-rsync` from command line
+6. Run tests via `just cli-unity-test-rsync` from command line
