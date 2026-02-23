@@ -713,29 +713,88 @@ def enter_play_mode() -> None:
         sys.exit(1)
 
 
-def check_log_accessible() -> None:
-    """Verify the Editor log file exists and is readable.
+def ensure_unity_running() -> None:
+    """Ensure Unity is running with an accessible log file.
 
-    When Unity is launched with a per-worktree log file, the log directory
-    can be deleted by git operations (e.g. git clean) because .gitignore
-    contains 'Logs/'. Unity keeps writing to the orphaned file descriptor
-    but abu cannot read the file by path, causing poll loops to hang.
+    For worktrees, automatically launches Unity and waits for readiness
+    if it is not already running or if the log file has become inaccessible
+    (e.g. the Logs/ directory was deleted by git clean).
     """
+    state = read_state_file()
+    unity_alive = False
+    if state:
+        pid = state.get("unityPid", 0)
+        if pid and is_pid_alive(pid):
+            unity_alive = True
+
     log_path = resolve_editor_log()
-    if log_path != EDITOR_LOG and not log_path.exists():
-        print(
-            f"Error: Editor log file not found at {log_path}\n"
-            "The log directory may have been deleted (e.g. by git clean).\n"
-            "Restart Unity for this worktree with 'abu restart' to fix.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    log_ok = log_path.exists()
+
+    if unity_alive and log_ok:
+        return
+
+    wt_name = resolve_worktree_name()
+    if wt_name is None:
+        if not log_ok and log_path != EDITOR_LOG:
+            print(
+                f"Error: Editor log file not found at {log_path}\n"
+                "Restart Unity with 'abu restart' to fix.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        return
+
+    # Kill orphaned Unity if log is inaccessible
+    if unity_alive and not log_ok:
+        old_pid = state["unityPid"]
+        print(f"Log file inaccessible, killing Unity (PID {old_pid})...")
+        os.kill(old_pid, signal.SIGKILL)
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline and is_pid_alive(old_pid):
+            time.sleep(0.2)
+
+    print(f"Launching Unity for worktree '{wt_name}'...")
+    do_open(wt_name)
+    _wait_for_unity_startup(wt_name)
+
+
+def _wait_for_unity_startup(wt_name: str) -> None:
+    """Poll until the worktree Unity has started and the log file exists."""
+    worktree_root = WORKTREE_BASE / wt_name
+    state_path = worktree_root / ".abu-state.json"
+    print("Waiting for Unity Editor to be ready...")
+
+    start = time.monotonic()
+    while time.monotonic() - start < RESTART_TIMEOUT_SECONDS:
+        try:
+            state = json.loads(state_path.read_text())
+        except (OSError, json.JSONDecodeError):
+            time.sleep(POLL_INTERVAL)
+            continue
+
+        pid = state.get("unityPid", 0)
+        if not pid or not is_pid_alive(pid):
+            time.sleep(POLL_INTERVAL)
+            continue
+
+        log_file = state.get("logFile")
+        if log_file and Path(log_file).exists():
+            print("Unity Editor is ready.")
+            return
+
+        time.sleep(POLL_INTERVAL)
+
+    print(
+        f"Warning: Timed out after {RESTART_TIMEOUT_SECONDS}s waiting for "
+        "Unity to start. It may still be loading.",
+        file=sys.stderr,
+    )
 
 
 def do_refresh(play: bool = False) -> None:
     """Execute a refresh and optionally enter play mode."""
     check_log_conflict()
-    check_log_accessible()
+    ensure_unity_running()
     log_offset = get_log_size()
     result_msg = send_refresh()
     print(result_msg)
