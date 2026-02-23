@@ -359,10 +359,28 @@ namespace Dreamtides.Abu
       // Hand
       if (isUser)
       {
+        var realCardCount = 0;
+        var abilityCount = 0;
+        foreach (var obj in handObjects)
+        {
+          if (obj is Card c && c.CardView.Prefab == CardPrefab.Token)
+          {
+            abilityCount++;
+          }
+          else
+          {
+            realCardCount++;
+          }
+        }
+
+        var handLabel = abilityCount > 0
+          ? $"Hand ({realCardCount} cards, {abilityCount} abilities)"
+          : $"Hand ({realCardCount} cards)";
+
         var handGroup = new AbuSceneNode
         {
           Role = "group",
-          Label = $"Hand ({handObjects.Count} cards)",
+          Label = handLabel,
           Interactive = false,
         };
         foreach (var obj in handObjects)
@@ -380,11 +398,29 @@ namespace Dreamtides.Abu
       }
       else if (handObjects.Count > 0)
       {
+        var enemyRealCount = 0;
+        var enemyAbilityCount = 0;
+        foreach (var obj in handObjects)
+        {
+          if (obj is Card c && c.CardView.Prefab == CardPrefab.Token)
+          {
+            enemyAbilityCount++;
+          }
+          else
+          {
+            enemyRealCount++;
+          }
+        }
+
+        var enemyLabel = enemyAbilityCount > 0
+          ? $"Hand: {enemyRealCount} cards, {enemyAbilityCount} abilities"
+          : $"Hand: {enemyRealCount} cards";
+
         group.Children.Add(
           new AbuSceneNode
           {
             Role = "label",
-            Label = $"Hand: {handObjects.Count} cards",
+            Label = enemyLabel,
             Interactive = false,
           }
         );
