@@ -197,21 +197,6 @@ def find_main_repo() -> Path:
     sys.exit(1)
 
 
-def get_dir_size_bytes(path: Path) -> int:
-    """Return total size in bytes of a directory tree."""
-    result = run_cmd(
-        ["du", "-sk", str(path)],
-        capture=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        return 0
-    try:
-        return int(result.stdout.split()[0]) * 1024
-    except (ValueError, IndexError):
-        return 0
-
-
 def cleanup_worktree(worktree_path: Path) -> None:
     """Clean up a partially created worktree."""
     run_cmd(
@@ -385,64 +370,156 @@ def list_worktree_paths() -> list[Path]:
     return paths
 
 
+def sync_tree(source_root: Path, dest_root: Path, dry_run: bool) -> tuple[int, int, int]:
+    """Incrementally sync a directory tree using APFS clones.
+
+    Walks source and dest in parallel. Only replaces files whose
+    mtime or size differs. Returns (cloned, deleted, unchanged) counts.
+    """
+    cloned: int = 0
+    deleted: int = 0
+    unchanged: int = 0
+
+    resolved_source: Path = source_root.resolve()
+    if not resolved_source.is_dir():
+        return cloned, deleted, unchanged
+
+    # Collect dest entries for deletion detection
+    dest_entries: set[str] = set()
+    if dest_root.is_dir():
+        for dirpath_str, dirnames, filenames in os.walk(dest_root):
+            dirpath: Path = Path(dirpath_str)
+            for name in filenames:
+                dest_entries.add(str((dirpath / name).relative_to(dest_root)))
+            for name in dirnames:
+                child: Path = dirpath / name
+                if child.is_symlink():
+                    dest_entries.add(str(child.relative_to(dest_root)))
+
+    source_entries: set[str] = set()
+    for dirpath_str, dirnames, filenames in os.walk(resolved_source):
+        dirpath = Path(dirpath_str)
+        rel_dir: Path = dirpath.relative_to(resolved_source)
+
+        dest_dir: Path = dest_root / rel_dir
+        if not dry_run:
+            dest_dir.mkdir(parents=True, exist_ok=True)
+
+        # Handle symlinked subdirectories (os.walk follows them, but we
+        # want to detect symlinks in the *original* source, not resolved)
+        for name in dirnames:
+            src_child: Path = source_root / rel_dir / name
+            if src_child.is_symlink():
+                rel: str = str(rel_dir / name)
+                source_entries.add(rel)
+                dest_child: Path = dest_root / rel_dir / name
+                link_target: Path = Path(os.readlink(src_child))
+                if dest_child.is_symlink() and Path(os.readlink(dest_child)) == link_target:
+                    unchanged += 1
+                else:
+                    if not dry_run:
+                        if dest_child.exists() or dest_child.is_symlink():
+                            dest_child.unlink()
+                        dest_child.symlink_to(link_target)
+                    cloned += 1
+
+        for name in filenames:
+            src_file: Path = dirpath / name
+            rel: str = str(rel_dir / name)
+            source_entries.add(rel)
+            dest_file: Path = dest_root / rel_dir / name
+
+            if dest_file.exists():
+                try:
+                    src_stat: os.stat_result = src_file.stat()
+                    dst_stat: os.stat_result = dest_file.stat()
+                    if src_stat.st_size == dst_stat.st_size and abs(src_stat.st_mtime - dst_stat.st_mtime) < 0.01:
+                        unchanged += 1
+                        continue
+                except OSError:
+                    pass
+
+            if not dry_run:
+                if dest_file.exists() or dest_file.is_symlink():
+                    dest_file.unlink()
+                run_cmd(["cp", "-c", str(src_file), str(dest_file)], check=False)
+            cloned += 1
+
+    # Delete files in dest that don't exist in source
+    for rel in dest_entries - source_entries:
+        dest_file = dest_root / rel
+        if dest_file.exists() or dest_file.is_symlink():
+            if not dry_run:
+                if dest_file.is_dir() and not dest_file.is_symlink():
+                    shutil.rmtree(dest_file, ignore_errors=True)
+                else:
+                    dest_file.unlink()
+            deleted += 1
+
+    # Delete empty directories in dest that don't exist in source
+    if not dry_run and dest_root.is_dir():
+        for dirpath_str, dirnames, filenames in os.walk(dest_root, topdown=False):
+            dirpath = Path(dirpath_str)
+            if dirpath != dest_root and not any(dirpath.iterdir()):
+                dirpath.rmdir()
+
+    return cloned, deleted, unchanged
+
+
 def refresh_one_worktree(
     worktree_path: Path,
     main_repo: Path,
     items: list[str],
     dry_run: bool,
 ) -> None:
-    """Refresh a single worktree by re-cloning gitignored directories."""
+    """Refresh a single worktree by incrementally syncing gitignored directories."""
     print(f"Refreshing worktree: {worktree_path}")
 
-    refreshed_count: int = 0
-    skip_count: int = 0
-    total_old_bytes: int = 0
+    total_cloned: int = 0
+    total_deleted: int = 0
+    total_unchanged: int = 0
+    dir_count: int = 0
 
     for item in items:
         if should_exclude(item):
-            skip_count += 1
             continue
 
         source: Path = main_repo / item
         dest: Path = worktree_path / item
 
-        if not (dest.exists() or dest.is_symlink()):
-            continue
-
         if not (source.exists() or source.is_symlink()):
             continue
 
-        if source.is_symlink():
+        if source.is_symlink() and not source.resolve().is_dir():
             new_target: Path = Path(os.readlink(source))
             if dest.is_symlink() and Path(os.readlink(dest)) == new_target:
-                continue
-            if dry_run:
-                print(f"  [symlink] {item} -> {new_target}")
-            else:
+                total_unchanged += 1
+            elif not dry_run:
+                dest.parent.mkdir(parents=True, exist_ok=True)
                 if dest.exists() or dest.is_symlink():
                     dest.unlink()
                 dest.symlink_to(new_target)
-            refreshed_count += 1
+                total_cloned += 1
+            else:
+                total_cloned += 1
             continue
 
-        if not source.resolve().is_dir():
+        resolved: Path = source.resolve()
+        if not resolved.is_dir():
             continue
 
-        old_size: int = get_dir_size_bytes(dest)
-        total_old_bytes += old_size
-        size_mb: float = old_size / (1024 * 1024)
+        if not (dest.exists() or dest.is_symlink()):
+            continue
 
-        if dry_run:
-            print(f"  [refresh] {item} ({size_mb:.0f}MB)")
-        else:
-            print(f"  Refreshing {item} ({size_mb:.0f}MB)...")
-            shutil.rmtree(dest, ignore_errors=True)
-            clone_item(source, dest, dry_run=False)
-        refreshed_count += 1
+        cloned, deleted, unchanged = sync_tree(source, dest, dry_run)
+        total_cloned += cloned
+        total_deleted += deleted
+        total_unchanged += unchanged
+        if cloned > 0 or deleted > 0:
+            print(f"  {item}: {cloned} cloned, {deleted} deleted, {unchanged} unchanged")
+        dir_count += 1
 
-    total_old_mb: float = total_old_bytes / (1024 * 1024)
-    print(f"  Refreshed {refreshed_count} items ({total_old_mb:.0f}MB replaced with fresh clones)")
-    print(f"  Skipped: {skip_count} excluded items")
+    print(f"  Synced {dir_count} directories: {total_cloned} cloned, {total_deleted} deleted, {total_unchanged} unchanged")
 
 
 def cmd_refresh(args: argparse.Namespace) -> None:
