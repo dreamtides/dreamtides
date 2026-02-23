@@ -3,6 +3,7 @@ target
 profile.json
 dreamtides.log
 dreamtides.json
+.pyre/
 log.json
 search_graph.dot
 !rules_engine/src/tv/src-tauri/CLAUDE.md
