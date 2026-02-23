@@ -30,7 +30,9 @@ from abu import (
     build_params,
     build_parser,
     check_log_conflict,
+    do_open,
     do_status,
+    find_unity_executable,
     find_unity_process,
     handle_response,
     is_pid_alive,
@@ -1003,6 +1005,98 @@ class TestCheckLogConflict(unittest.TestCase):
             }))
             mock_files.return_value = [state1, state2]
             check_log_conflict()  # Should not raise
+
+
+class TestBuildParserOpen(unittest.TestCase):
+    """Test argparse recognizes the open subcommand."""
+
+    def test_open_command(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["open", "alpha"])
+        self.assertEqual(args.command, "open")
+        self.assertEqual(args.name, "alpha")
+
+    def test_open_missing_name_fails(self) -> None:
+        parser = build_parser()
+        with self.assertRaises(SystemExit):
+            parser.parse_args(["open"])
+
+
+class TestFindUnityExecutable(unittest.TestCase):
+    """Test Unity executable discovery from ProjectVersion.txt."""
+
+    def test_finds_unity_app(self) -> None:
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmpdir:
+            client = Path(tmpdir)
+            settings = client / "ProjectSettings"
+            settings.mkdir()
+            (settings / "ProjectVersion.txt").write_text(
+                "m_EditorVersion: 6000.2.2f1\n"
+                "m_EditorVersionWithRevision: 6000.2.2f1 (ea398eefe1c2)\n"
+            )
+            app_path = Path(f"/Applications/Unity/Hub/Editor/6000.2.2f1/Unity.app")
+            with patch.object(Path, "exists", return_value=True):
+                version, result_path = find_unity_executable(client)
+            self.assertEqual(version, "6000.2.2f1")
+            self.assertEqual(result_path, app_path)
+
+    def test_raises_when_version_file_missing(self) -> None:
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmpdir:
+            client = Path(tmpdir)
+            with self.assertRaises(AbuError) as ctx:
+                find_unity_executable(client)
+            self.assertIn("ProjectVersion.txt not found", str(ctx.exception))
+
+    def test_raises_when_unity_not_installed(self) -> None:
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmpdir:
+            client = Path(tmpdir)
+            settings = client / "ProjectSettings"
+            settings.mkdir()
+            (settings / "ProjectVersion.txt").write_text(
+                "m_EditorVersion: 9999.0.0f1\n"
+            )
+            with self.assertRaises(AbuError) as ctx:
+                find_unity_executable(client)
+            self.assertIn("not found at", str(ctx.exception))
+
+
+class TestDoOpen(unittest.TestCase):
+    """Test do_open worktree validation."""
+
+    @patch("abu.WORKTREE_BASE", Path("/nonexistent/path"))
+    def test_raises_when_worktree_missing(self) -> None:
+        with self.assertRaises(AbuError) as ctx:
+            do_open("nosuch")
+        self.assertIn("not found", str(ctx.exception))
+
+    @patch("abu.subprocess.Popen")
+    @patch("abu.find_unity_executable")
+    @patch("abu.PORTS_FILE")
+    @patch("abu.WORKTREE_BASE")
+    def test_launches_unity(
+        self,
+        mock_base: MagicMock,
+        mock_ports: MagicMock,
+        mock_find: MagicMock,
+        mock_popen: MagicMock,
+    ) -> None:
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmpdir:
+            wt_root = Path(tmpdir) / "alpha"
+            client = wt_root / "client"
+            client.mkdir(parents=True)
+            mock_base.__truediv__ = lambda self, key: Path(tmpdir) / key
+            mock_base.return_value = Path(tmpdir)
+            mock_find.return_value = ("6000.2.2f1", Path("/Applications/Unity/Hub/Editor/6000.2.2f1/Unity.app"))
+            mock_ports.read_text.return_value = json.dumps({"alpha": 10001})
+            do_open("alpha")
+            mock_popen.assert_called_once()
+            call_args = mock_popen.call_args[0][0]
+            self.assertIn("-logFile", call_args)
+            self.assertIn("-projectPath", call_args)
 
 
 if __name__ == "__main__":

@@ -931,6 +931,84 @@ def find_unity_process() -> UnityProcessInfo:
     )
 
 
+def find_unity_executable(client_path: Path) -> tuple[str, Path]:
+    """Find the Unity executable for a given client project directory.
+
+    Reads ProjectVersion.txt to determine the Unity version, then locates
+    the Unity.app bundle in the standard Hub install location. Returns a
+    tuple of (version_string, app_path). Raises AbuError if the version
+    file is missing or the Unity installation is not found.
+    """
+    version_file = client_path / "ProjectSettings" / "ProjectVersion.txt"
+    if not version_file.exists():
+        raise AbuError(f"ProjectVersion.txt not found at {version_file}")
+
+    version: str | None = None
+    for line in version_file.read_text().splitlines():
+        match = re.match(r"m_EditorVersion:\s*(.+)", line)
+        if match:
+            version = match.group(1).strip()
+            break
+
+    if not version:
+        raise AbuError(f"Could not parse m_EditorVersion from {version_file}")
+
+    app_path = Path(f"/Applications/Unity/Hub/Editor/{version}/Unity.app")
+    if not app_path.exists():
+        raise AbuError(
+            f"Unity {version} not found at {app_path}. "
+            "Is this version installed via Unity Hub?"
+        )
+
+    return version, app_path
+
+
+def do_open(name: str) -> None:
+    """Open a worktree project in Unity with a per-worktree log file."""
+    worktree_root = WORKTREE_BASE / name
+    if not worktree_root.is_dir():
+        raise AbuError(
+            f"Worktree '{name}' not found at {worktree_root}. "
+            "Run 'just worktree-create' first."
+        )
+
+    client_path = worktree_root / "client"
+    if not client_path.is_dir():
+        raise AbuError(f"Client directory not found at {client_path}")
+
+    version, app_path = find_unity_executable(client_path)
+
+    log_dir = worktree_root / "Logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = log_dir / "Editor.log"
+
+    # Read the assigned port for this worktree, if any
+    port: int | None = None
+    try:
+        ports: dict[str, int] = json.loads(PORTS_FILE.read_text())
+        port = ports.get(name)
+    except (OSError, json.JSONDecodeError):
+        pass
+
+    launch_args: list[str] = [
+        "open", "-n", "-a", str(app_path), "--args",
+        "-projectPath", str(client_path),
+        "-logFile", str(log_path),
+    ]
+
+    subprocess.Popen(
+        launch_args,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+    print(f"Launching Unity {version} for worktree '{name}'")
+    print(f"  Project: {client_path}")
+    print(f"  Log file: {log_path}")
+    if port is not None:
+        print(f"  ABU port: {port}")
+
+
 def do_restart() -> None:
     """Kill the running Unity Editor and relaunch it with the same project."""
     check_log_conflict()
@@ -1206,6 +1284,12 @@ def build_parser() -> argparse.ArgumentParser:
         "status", help="Show Unity Editor state from abu state file and TCP probe"
     )
 
+    # open
+    open_parser = subparsers.add_parser(
+        "open", help="Open a worktree project in Unity with a per-worktree log file"
+    )
+    open_parser.add_argument("name", help="Worktree name (e.g. alpha)")
+
     # restart
     subparsers.add_parser(
         "restart", help="Kill and relaunch Unity Editor, restoring the active scene"
@@ -1261,6 +1345,14 @@ def main() -> None:
 
     if command == "create-save":
         do_create_save(args)
+        return
+
+    if command == "open":
+        try:
+            do_open(args.name)
+        except AbuError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
         return
 
     editor_commands = {"refresh", "play", "test", "cycle", "restart", "set-mode"}

@@ -821,6 +821,9 @@ worktree-remove branch *args='':
 worktree-refresh *args='':
     python3 scripts/worktrees/apfs_worktree.py refresh {{args}}
 
+unity-open name:
+    python3 scripts/abu/abu.py open {{name}}
+
 worktree-activate branch *args='':
     python3 scripts/worktrees/apfs_worktree.py activate {{branch}} {{args}}
 
