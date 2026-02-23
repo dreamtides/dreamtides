@@ -651,6 +651,11 @@ namespace Dreamtides.Abu
         annotations.Add("can play");
       }
 
+      if (IsSelectionColor(revealed.OutlineColor))
+      {
+        annotations.Add("selected");
+      }
+
       var suffix = annotations.Count > 0 ? $" ({string.Join(", ", annotations)})" : "";
       string label;
       if (!string.IsNullOrEmpty(cardType))
@@ -672,6 +677,22 @@ namespace Dreamtides.Abu
       }
 
       return label;
+    }
+
+    /// <summary>
+    /// Returns true if the given color matches the YELLOW_500 selection color.
+    /// </summary>
+    static bool IsSelectionColor(DisplayColor? color)
+    {
+      if (color == null)
+      {
+        return false;
+      }
+
+      const double epsilon = 0.01;
+      return System.Math.Abs(color.Red - 1.0) < epsilon
+        && System.Math.Abs(color.Green - 0.92) < epsilon
+        && System.Math.Abs(color.Blue - 0.23) < epsilon;
     }
 
     // ── Action buttons ────────────────────────────────────────────────
