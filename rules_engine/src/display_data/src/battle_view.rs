@@ -1,7 +1,7 @@
 use action_data::game_action_data::GameAction;
 use core_data::display_types::Milliseconds;
 use core_data::identifiers::BattleId;
-use core_data::numerics::{Energy, Points, Spark};
+use core_data::numerics::{Energy, Points, Spark, TurnId};
 use masonry::flex_node::FlexNode;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -33,6 +33,9 @@ pub struct BattleView {
     /// Preview of the next state of the battle, used e.g. when confirming
     /// prompt choices.
     pub preview: BattlePreviewState,
+
+    /// Current turn number
+    pub turn_number: TurnId,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

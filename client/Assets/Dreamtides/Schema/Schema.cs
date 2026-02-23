@@ -2225,6 +2225,12 @@ namespace Dreamtides.Schema
         public BattlePreviewState Preview { get; set; }
 
         /// <summary>
+        /// Current turn number
+        /// </summary>
+        [JsonProperty("turn_number", Required = Required.Always)]
+        public long TurnNumber { get; set; }
+
+        /// <summary>
         /// Player who is operating the client
         /// </summary>
         [JsonProperty("user", Required = Required.Always)]
@@ -2608,6 +2614,9 @@ namespace Dreamtides.Schema
 
     public enum TestDeckName { Benchmark1, Core11, StartingFive, Vanilla };
 
+    /// <summary>
+    /// Identifies a predefined list of dreamwell_card_id cards.
+    /// </summary>
     public enum DreamwellCardIdList { DreamwellBasic5, TestDreamwellBasic5, TestDreamwellNoAbilities };
 
     public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, RandomAction, WaitFiveSeconds };

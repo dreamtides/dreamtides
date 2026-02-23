@@ -487,11 +487,13 @@ namespace Dreamtides.Abu
             statusDisplay._rightTurnIndicator != null
             && statusDisplay._rightTurnIndicator.activeSelf
           );
+        var turnNumber = (_registry.BattleLayout.TurnNumber / 2) + 1;
+        var turnOwner = hasTurn ? "yours" : "opponent's";
         group.Children.Add(
           new AbuSceneNode
           {
             Role = "label",
-            Label = hasTurn ? "Turn: yours" : "Turn: opponent's",
+            Label = $"Turn: {turnNumber} ({turnOwner})",
             Interactive = false,
           }
         );

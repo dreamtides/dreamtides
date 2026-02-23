@@ -202,6 +202,11 @@ namespace Dreamtides.Layout
     public ObjectLayout AboveEnemyVoid => Check(_aboveEnemyVoid);
 
     /// <summary>
+    /// Current turn number from the rules engine.
+    /// </summary>
+    public long TurnNumber { get; set; }
+
+    /// <summary>
     /// Returns the Y rotation to use for cards to be displayed in the battle.
     /// </summary>
     public float BattleYRotation() => BattleCamera.transform.eulerAngles.y;

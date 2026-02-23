@@ -606,6 +606,7 @@ namespace Dreamtides.Services
         if (command.UpdateBattle != null)
         {
           Registry.LoggingService.Log("ActionService", "Applying command: UpdateBattle");
+          Registry.BattleLayout.TurnNumber = command.UpdateBattle.Battle.TurnNumber;
           Registry.BattleLayout.UserStatusDisplay.UpdatePlayerView(
             command.UpdateBattle.Battle.User,
             animate

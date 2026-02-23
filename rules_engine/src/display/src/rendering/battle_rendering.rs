@@ -145,6 +145,7 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
             .map(|preview| BattlePreviewState::Active(Box::new(preview)))
             .unwrap_or(BattlePreviewState::None)
         },
+        turn_number: battle.turn.turn_id,
     }
 }
 

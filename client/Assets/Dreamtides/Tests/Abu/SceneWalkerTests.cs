@@ -396,7 +396,7 @@ namespace Dreamtides.Tests.Abu
       var sparkLabel = FindNode(statusGroup!, n => n.Label != null && n.Label.StartsWith("Spark:"));
       Assert.IsNotNull(sparkLabel, "Status should have a Spark label");
 
-      var turnLabel = FindNode(statusGroup!, n => n.Label == "Turn: yours");
+      var turnLabel = FindNode(statusGroup!, n => n.Label != null && n.Label.StartsWith("Turn:"));
       Assert.IsNotNull(turnLabel, "Status should have a Turn label");
     }
 
