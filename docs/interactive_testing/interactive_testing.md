@@ -104,7 +104,7 @@ Submit when done. To keep the default order, just click Submit.
 
 ### Energy Payment (e.g., Dreamscatter)
 
-For variable-cost effects, use the +1/−1 buttons to adjust the amount, then
+For variable-cost effects, use the +1/-1 buttons to adjust the amount, then
 click "Spend N●" to confirm.
 
 ### Stack Interaction
@@ -115,7 +115,11 @@ When cards are on the stack:
 - You can play fast cards in response by dragging them to Play Zone
 - The opponent may also respond (their plays appear in history)
 
-Stack resolves LIFO (last-in, first-out).
+Stack resolves LIFO (last-in, first-out). When the opponent responds, resolving
+their response may trigger further opponent plays before your original card
+resolves. This can lead to deeply nested stacks. Keep clicking Resolve until the
+stack fully empties. Always check the stack in the snapshot -- if a Stack group
+exists, cards are still pending.
 
 ### End of Turn Flow
 
@@ -123,91 +127,92 @@ Stack resolves LIFO (last-in, first-out).
 - **Next Turn**: Acknowledge opponent's turn end, advance to your turn
 - During opponent's turn, you may still play fast cards
 
-## Common Gotchas
-
-- **Chaining abu commands in bash**: When chaining multiple abu.py calls with
-  `&&`, each returns a separate snapshot. Only the last snapshot's refs are
-  valid. Prefer sequential single commands.
-- **Refs change on every action**: Never reuse refs from a previous snapshot.
-  The ref for "End Turn" will be different after each action.
-- **"can play" tag**: Only cards marked "can play" can be played right now.
-  Missing this tag means insufficient energy, wrong phase, or card-specific
-  restrictions.
-- **Activated abilities in hand**: When a character with an activated ability is
-  on the battlefield, the ability appears as a separate card in your hand. Drag
-  it to the Play Zone to activate.
-- **Reclaim abilities**: Cards with Reclaim can be played from the void. They
-  appear as "Reclaim Ability" entries in your hand after the original goes to
-  the void.
-
-## Interpreting History Messages
-
-Some history messages can be misleading:
-
-- **"moved to void"** vs **"moved to banished"**: Reclaimed cards go to banished
-  instead of void when they leave play.
-- **"X removed"**: History entries like "Sundown Surfer removed" appear when
-  triggered abilities modify a card (e.g., adding spark). The card is NOT being
-  removed from play — this message represents an internal state update. Track
-  the actual spark values in the snapshot to see what changed.
-- **"X removed" during reclaim**: When a Reclaim Ability is used, the original
-  card moves from void to stack and the reclaim entry is "removed" from hand.
-  This is normal.
-
-## Known ABU Limitations
-
 ### Modal Cards
 
-Modal cards (e.g., "Break the Sequence — Choose One: ...") show "cost: " with an
-empty cost in hand. When played, choice cards appear in the Browser group. Click
-the desired choice to select it.
-
-### Opponent Responses and Sundown Surfer Triggers
-
-When you play cards during your turn, the AI opponent may respond with fast
-events (Guiding Light, Dreamscatter, Ripple of Defiance, Abolish, Immolate).
-**Each opponent response triggers Sundown Surfer's "When you play a card during
-the opponent's turn" ability**, adding +1 spark per Surfer per response. This
-can dramatically escalate the opponent's spark total. Strategy: avoid playing
-non-essential cards when the opponent has Sundown Surfers and energy to respond.
+Modal cards (e.g., "Break the Sequence -- Choose One: ...") show "cost: " with
+an empty cost in hand. When played, choice cards appear in the Browser group.
+Click the desired choice to select it.
 
 ### Discard Selection
 
 When an effect requires discarding from hand (e.g., Astral Interface's "Draw a
-card. Discard a card."), click the card you want to discard. The snapshot won't
-visually indicate the selection, but a Submit button appears. Click Submit to
-confirm. The hand count stays at 10 until after you submit.
+card. Discard a card."), click the card you want to discard. A Submit button
+appears after selection. Click Submit to confirm. Only real cards (Character,
+Event) are valid discard targets -- virtual entries (Activated Ability, Reclaim
+Ability) cannot be discarded.
 
 ### Ripple of Defiance Payment
 
 When Ripple of Defiance targets your event, you'll see "Spend 2●" and "Decline"
 buttons. Click "Spend 2●" to pay the tax and keep your event, or "Decline" to
 let it be prevented. The opponent can chain multiple Ripples, each requiring a
-separate 2 energy payment.
+separate 2 energy payment. If you cannot afford the 2 energy tax, the system
+automatically declines for you.
 
-**Auto-decline**: If you cannot afford the 2 energy tax when Ripple targets your
-event, the system automatically declines for you — the entire chain resolves
-without prompting. In observed gameplay, this happened silently within a single
-action response (no intermediate "Spend 2●" / "Decline" UI appeared). Be aware
-of your energy AFTER playing an event, not just the play cost — you need 2 spare
-energy to survive a Ripple.
+### Archive of the Forgotten Browser Selection
 
-## Testing Strategy
+When Archive resolves, a Browser group appears showing void contents. Click 1-2
+events to select them, then click Submit.
 
-1. **Play a full game** to test basic card flow, scoring, and victory
-2. **Focus on interactions**: Stack responses, counter-spells, triggered
-   abilities
-3. **Test edge cases**: Hand size limit (10 cards), character limit (8), energy
-   overflow from Dreamwell
-4. **Document bugs immediately**: Stop and write a detailed description when
-   something seems wrong
-5. **Take screenshots** when the snapshot doesn't match expected UI state
+## Abu Usage Tips
 
-## Setup: Restarting a Fresh Game
+### Refs Change on Every Action
 
-After `clear-save`, you need to exit and re-enter play mode to start a new game.
-The `cycle` command may fail with "Assets > Refresh menu item not found".
-Workaround:
+Never reuse refs from a previous snapshot. The ref for "End Turn" will be
+different after each action.
+
+### The "can play" Tag
+
+Only cards marked "can play" can be played right now. Missing this tag means
+insufficient energy, wrong phase, or card-specific restrictions.
+
+### Activated Abilities in Hand
+
+When a character with an activated ability is on the battlefield, the ability
+appears as a separate card in your hand. Drag it to the Play Zone to activate.
+
+### Reclaim Abilities
+
+Cards with Reclaim can be played from the void. They appear as "Reclaim Ability"
+entries in your hand after the original goes to the void. Reclaimed cards go to
+banished (not void) when they leave play.
+
+### Virtual Hand Entries
+
+The hand count displayed in the snapshot (e.g., "Hand (13 cards)") includes
+virtual entries for activated abilities and reclaim abilities. These do NOT
+count toward the 10-card hand limit. To estimate real hand cards, subtract the
+number of activated ability entries and reclaim ability entries.
+
+### Foresee During Dreamwell
+
+When Foresee triggers during dreamwell resolution (e.g., Skypath), the Card
+Order Selector appears and you must Submit before the draw phase proceeds. Click
+Submit to keep the default order if desired.
+
+### Dreamscatter Energy Requirement
+
+Dreamscatter costs 2 energy to play PLUS at least 1 additional energy for the
+draw effect (minimum total 3 energy). The "can play" tag only appears when you
+have enough for both.
+
+### Activated Abilities and the Stack
+
+Activated abilities use the stack and can be responded to by the opponent.
+Energy is deducted immediately, then the effect goes on the stack and the
+opponent gets priority. Activated abilities lose their "can play" tag while any
+card is already on the stack -- use them before putting cards on the stack, or
+after the stack fully clears.
+
+### Abolish Timing
+
+Abolish only shows "can play" when there is a valid target on the stack (a
+played card to prevent). It cannot be played proactively. It activates during
+the opponent's turn when they play cards.
+
+## Restarting a Fresh Game
+
+After `clear-save`, exit and re-enter play mode to start a new game:
 
 ```sh
 python3 scripts/abu/abu.py clear-save
@@ -218,32 +223,46 @@ sleep 5
 python3 scripts/abu/abu.py snapshot --compact
 ```
 
-Check `status` between steps to confirm play mode toggled correctly.
+## Interpreting History Messages
+
+- **"moved to void"** vs **"moved to banished"**: Reclaimed cards go to banished
+  instead of void when they leave play.
+- **"X removed"**: History entries like "Sundown Surfer removed" appear when
+  triggered abilities modify a card (e.g., adding spark). The card is NOT being
+  removed from play -- this represents an internal state update. Track the
+  actual spark values in the snapshot to see what changed.
+- **"X removed" during reclaim**: When a Reclaim Ability is used, the original
+  card moves from void to stack and the reclaim entry is "removed" from hand.
+  This is normal.
+
+## Writing Narrative Files
+
+Write playtest narratives to `/tmp/narrative.md`. Include:
+
+- Game state at key decision points (energy, score, spark, hand)
+- Actions taken and their results
+- Opponent responses and triggered abilities
 
 ## Game Strategy Notes
 
 ### General Principles
 
-- **Hold fast cards until the ending phase.** A common mistake is playing cards
-  as soon as possible during your main phase. Fast cards (events and abilities
+- **Hold fast cards until the ending phase.** Fast cards (events and abilities
   marked fast) can be played during the ending phase after you click End Turn.
   Playing them then denies the opponent a chance to respond with their own fast
-  cards before you pass. If you play fast events during your main phase, the
-  opponent gets priority and can respond — potentially triggering Sundown
-  Surfers or disrupting your plan.
+  cards before you pass.
 - **Minimize stack interactions when the opponent has energy.** Every card you
   put on the stack during your main phase gives the opponent a window to respond
   with fast cards. If the opponent has Sundown Surfers, each response grows
-  their spark. Play characters and essential non-fast cards, then save fast
-  cards for the ending phase.
+  their spark.
 - **Activated abilities go on the stack.** The opponent can respond to them with
   fast cards, triggering Sundown Surfers. Use with caution when the opponent has
   Surfers and energy.
 
 ### Passive vs Proactive Play
 
-Often the correct play is to pass your main phase and End Turn — especially when
-the opponent has Surfers and energy. This denies Surfer triggers, preserves
+Often the correct play is to pass your main phase and End Turn -- especially
+when the opponent has Surfers and energy. This denies Surfer triggers, preserves
 energy for counter-spells, and forces the opponent to act first.
 
 **Be proactive when:** behind on spark, opponent lacks Surfers/energy, early
@@ -252,16 +271,13 @@ game (turns 1-2), or you have Immolate to remove high-value Surfers.
 ### Reading the Opponent
 
 Track what the opponent has played, reclaimed, and lost to removal throughout
-the game. If they played two Abolishes already, a third is less likely — your
-next character is safer. If they have Sundown Surfers on the battlefield and
-haven't used Dreamscatter yet, assume it's in hand and plan around the trigger
-chain. Use the Abu history to review past zone transitions and reconstruct what
-the opponent has committed.
+the game. Use the Abu history to review past zone transitions and reconstruct
+what the opponent has committed.
 
-Also consider the opponent's energy. A tapped-out opponent can't respond to
-anything — that's your window to play characters and use abilities freely. An
-opponent at full energy with cards in hand is dangerous; minimize stack
-interactions and hold counter-spells.
+Consider the opponent's energy. A tapped-out opponent can't respond to anything
+-- that's your window to play characters and use abilities freely. An opponent
+at full energy with cards in hand is dangerous; minimize stack interactions and
+hold counter-spells.
 
 ### Early Game (Turns 1-3)
 
@@ -269,13 +285,13 @@ interactions and hold counter-spells.
   spark 2 is better than Sundown Surfer at spark 1)
 - Guiding Light (cost 1, Foresee + draw) is excellent early tempo
 - Establish board presence before using activated abilities
-- Don't waste Abolish or other counter-spells early — save them for high-value
+- Don't waste Abolish or other counter-spells early -- save them for high-value
   targets later
 
 ### Mid Game (Turns 4-6)
 
 - Hold counter-spells (Abolish, Cragfall, Ripple of Defiance) for the opponent's
-  key plays. These are fast and reactive — they can only be played in response
+  key plays. These are fast and reactive -- they can only be played in response
   to cards on the stack
 - Watch for the opponent deploying Sundown Surfers. If they have even one
   Surfer, be cautious about how many cards you play during your main phase
@@ -285,20 +301,18 @@ interactions and hold counter-spells.
 
 - Scoring accelerates as spark totals grow. A single turn with a large spark gap
   can end the game
-- Immolate becomes the highest-value card — dissolving a 5+ spark Surfer swings
+- Immolate becomes the highest-value card -- dissolving a 5+ spark Surfer swings
   the gap by 5+ in your favor
 - Archive of the Forgotten (cost 4, returns up to 2 events from void) is the key
   recovery tool for getting Immolates back after they've been used
 - If behind on spark, avoid ending your turn unless you can close the gap first
-  — the opponent scores the full difference at Judgment
+  -- the opponent scores the full difference at Judgment
 - **Use Foresee aggressively to filter weak cards.** In the late game, cheap
-  counter-spells like Ripple of Defiance (cost 1, only prevents events if
-  opponent pays 2) are nearly worthless — opponents have plenty of energy to pay
-  the tax. When Foresee reveals a weak late-game card, send it to void instead
-  of keeping it on top. Drawing a dead Ripple instead of an Immolate or
-  character can cost you the game. Prioritize drawing: Immolate, Archive of the
-  Forgotten, characters, Abolish. Void: Ripple of Defiance, Guiding Light (if
-  you already have Reclaim copies), excess Dreamscatter.
+  counter-spells like Ripple of Defiance are nearly worthless -- opponents have
+  plenty of energy to pay the tax. When Foresee reveals a weak late-game card,
+  send it to void instead of keeping it on top. Prioritize drawing: Immolate,
+  Archive of the Forgotten, characters, Abolish. Void: Ripple of Defiance,
+  Guiding Light (if you already have Reclaim copies), excess Dreamscatter.
 
 ### Scoring
 
@@ -311,10 +325,9 @@ interactions and hold counter-spells.
 
 ### The Sundown Surfer Spiral
 
-Sundown Surfer is the most dangerous card in the Core11 mirror match. It gains
-+1 spark each time its owner plays a card during the opponent's turn. With
-multiple Surfers on the battlefield, each fast card the opponent plays during
-your turn triggers ALL of them.
+Sundown Surfer gains +1 spark each time its owner plays a card during the
+opponent's turn. With multiple Surfers on the battlefield, each fast card the
+opponent plays during your turn triggers ALL of them.
 
 **How the spiral works:**
 
@@ -329,19 +342,13 @@ your turn triggers ALL of them.
 
 **Counter-strategies:**
 
-- **Dissolve Surfers early with Immolate.** This is the #1 priority. Don't waste
-  Immolate on Minstrels when Surfers are on the board.
+- **Dissolve Surfers early with Immolate.** This is the #1 priority.
 - **Minimize stack interactions during your main phase** when the opponent has
-  Surfers + energy. Each response triggers the spiral. Note: activated abilities
-  also use the stack and can be responded to.
-- **Save fast cards for the ending phase.** After you click End Turn, you can
-  still play fast cards. The opponent can respond, but you've already committed
-  to ending — minimizing the window for responses.
+  Surfers + energy.
+- **Save fast cards for the ending phase.**
 - **Your own plays during your turn are safe.** Only the opponent's plays during
-  your turn trigger their Surfers. Abolish and other cards you play do NOT
-  trigger them.
-- **Preserve Abolish for the opponent's Surfer plays.** If the opponent tries to
-  play a Surfer, counter it before it reaches the battlefield.
+  your turn trigger their Surfers.
+- **Preserve Abolish for the opponent's Surfer plays.**
 
 ### The Archive-Immolate Loop
 
@@ -352,134 +359,27 @@ In the late game, the most important resource loop is:
 3. Repeat next turn (Archive and Immolate go to void, ready to be Archived
    again)
 
-This loop costs 10 energy per cycle and removes 2 enemy characters. Plan your
-energy budget around it. Note: opponent at 0 energy cannot respond to Archive or
-Immolate, making it safe. If opponent has energy, they may Abolish your Immolate
-— always have counter-spells ready.
+This loop costs 10 energy per cycle and removes 2 enemy characters. An opponent
+at 0 energy cannot respond, making it safe. If the opponent has energy, they may
+Abolish your Immolate -- have counter-spells ready.
 
 ### Key Card Interactions
 
 - **Sundown Surfer**: Gains +1 spark each time its owner plays a card during the
-  opponent's turn. This compounds rapidly. See "The Sundown Surfer Spiral"
-  above.
-- **Break the Sequence**: Returns an enemy character to hand. The opponent loves
-  using this during your turn to bounce your characters while triggering
-  Surfers. History does not log the target's zone transition (known bug).
+  opponent's turn. See "The Sundown Surfer Spiral" above.
+- **Break the Sequence**: Returns an enemy character to hand. The opponent uses
+  this during your turn to bounce your characters while triggering Surfers.
 - **Reclaim abilities**: Appear in hand as separate entries. Cost is the Reclaim
   cost, not the original card cost. Reclaimed cards go to banished (not void)
   when they leave play.
-- **Activated abilities**: Cost energy and DO go on the stack. They appear as
-  hand entries with the ability cost. The opponent can respond with fast cards,
-  triggering Sundown Surfers. Plan ability usage considering opponent energy and
-  Surfer presence.
+- **Activated abilities**: Cost energy and go on the stack. They appear as hand
+  entries with the ability cost. The opponent can respond with fast cards,
+  triggering Sundown Surfers.
 - **Ripple of Defiance**: Forces the opponent to pay 2 energy or have their
   event prevented. When targeting your event, you see "Spend 2●" and "Decline"
   buttons.
 - **Archive of the Forgotten**: Returns up to 2 events from void to hand.
-  Critical for recovering Immolates. Plan the Archive → Immolate sequence when
-  the opponent has high-spark Surfers.
-
-## Known Bugs and History Gaps
-
-### Break the Sequence History Entries
-
-Previously documented as missing zone transitions, but in observed gameplay (Feb
-2026), Break the Sequence correctly logged both "Break the Sequence moved to
-void" and "Sundown Surfer moved from battlefield to hand" in the history. The
-bug may have been fixed. Still verify: compare battlefield character counts
-before and after to confirm the bounce happened.
-
-### Opponent Can Chain Fast Cards During Your Stack Resolution
-
-When you play a card and the opponent responds, resolving their response may
-trigger further opponent plays before your original card resolves. This can lead
-to deeply nested stacks. Be patient and keep clicking Resolve until the stack
-fully empties. Always check the stack in the snapshot — if a Stack group exists,
-cards are still pending.
-
-## Abu Usage Tips for Agents
-
-### Activated Abilities and Virtual Hand Entries
-
-The hand count displayed in the snapshot (e.g., "Hand (13 cards)") includes
-virtual entries for activated abilities and reclaim abilities. These do NOT
-count toward the 10-card hand limit. To estimate real hand cards, subtract the
-number of activated ability entries (one per battlefield character with an
-ability) and reclaim ability entries (one per void card with Reclaim).
-
-### Discard Selection
-
-When selecting cards to discard, clicking virtual entries (Activated Ability,
-Reclaim Ability) does NOT produce a Submit button since they are not valid
-discard targets. Only click real cards (Character, Event) when discarding.
-
-### Foresee Interactions
-
-When Foresee triggers during dreamwell resolution (e.g., Skypath), the Card
-Order Selector appears and you must Submit before the draw phase proceeds. Just
-click Submit to keep the default order if you want to leave cards where they
-are.
-
-### Archive of the Forgotten Browser Selection
-
-When Archive resolves, a Browser group appears showing void contents. Click 1-2
-events to select them, then click Submit. Note: if the opponent responds to the
-Archive being on the stack, the browser may appear before the Archive actually
-resolves — the Archive still needs to go through stack resolution. Be prepared
-for multiple resolve cycles.
-
-### Dreamscatter Energy Requirement
-
-Dreamscatter costs 2 energy to play PLUS at least 1 additional energy for the
-draw effect (minimum total 3 energy). The "can play" tag only appears when you
-have enough for both.
-
-### Activated Abilities Blocked During Stack Resolution
-
-Activated abilities (Minstrel draw, etc.) lose their "can play" tag while any
-card is on the stack. If you play a Dreamscatter and the opponent chains fast
-cards in response, you cannot use activated abilities until the entire stack
-resolves. Plan ability usage BEFORE putting cards on the stack, or after the
-stack fully clears.
-
-### Activated Abilities Use the Stack
-
-Activated abilities DO use the stack and CAN be responded to. Energy is deducted
-immediately, then the effect goes on the stack and the opponent gets priority.
-If the opponent has Sundown Surfers + energy, even activated abilities give them
-a window to trigger the spiral.
-
-### Together Against the Tide Appears Unplayable
-
-In observed gameplay, Together Against the Tide ("Prevent a played event which
-could dissolve an ally") never showed the "can play" tag, even when Immolate
-("Dissolve an enemy") was on the stack. This card was dead weight throughout an
-entire game. Possible causes:
-
-- The card may not be classified as "fast" even though prevent effects are
-  supposed to be fast per the rules
-- The targeting logic may not recognize Immolate as an event "which could
-  dissolve an ally" from the defending player's perspective
-- Some other precondition may not be met
-
-Until this is resolved, treat Together Against the Tide as low priority and
-prefer Abolish or Cragfall for stack interaction. Discard it early via Foresee
-or Astral Interface.
-
-### Abolish Timing
-
-Abolish only shows "can play" when there is a valid target on the stack (a
-played card to prevent). It cannot be played proactively. It activates during
-the opponent's turn when they play cards.
-
-## Writing Narrative Files
-
-Write playtest narratives to `/tmp/narrative.md`. Include:
-
-- Game state at key decision points (energy, score, spark, hand)
-- Actions taken and their results
-- Opponent responses and triggered abilities
-- Any bugs or unexpected behavior encountered
+  Critical for recovering Immolates.
 
 ## Turn Sequencing Advice
 
@@ -489,12 +389,10 @@ A recommended turn structure for playing well:
    Surfer count before making any plays
 2. **Play characters first**: These must go on the stack, so get them out while
    you still have energy to respond if the opponent plays fast cards
-3. **Use activated abilities**: These go on the stack and can be responded to.
-   Use when opponent lacks Surfers/energy to minimize trigger risk
+3. **Use activated abilities**: Use when opponent lacks Surfers/energy to
+   minimize trigger risk
 4. **Click End Turn**: This enters the ending phase
 5. **Play fast cards during the ending phase**: Guiding Light, removal spells,
-   and other fast events are best played here. The opponent can still respond,
-   but the turn is already ending — limiting their window
-6. **Hold counter-spells**: Keep Abolish and Together Against the Tide in hand
-   for the opponent's turn. They'll show "can play" when the opponent puts
-   something on the stack
+   and other fast events are best played here
+6. **Hold counter-spells**: Keep Abolish in hand for the opponent's turn. It
+   will show "can play" when the opponent puts something on the stack
