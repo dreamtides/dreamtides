@@ -37,8 +37,8 @@ fi
 cat >&2 <<'EOF'
 You have uncommitted changes and have not recently run validation. Before stopping, please:
 
-1. Run 'just fmt' to format code
+1. Run 'just fmt' to format code & docs
 2. Run 'just review' to validate changes
-3. Commit your work with git
+3. Commit your work with a detailed git commit message
 EOF
 exit 2
