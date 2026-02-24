@@ -65,9 +65,11 @@ namespace Dreamtides.Tests.Abu
 
       Assert.AreEqual("application", root.Role);
 
-      // Find UIToolkit region
-      var uiToolkitRegion = root.Children.FirstOrDefault(c => c.Label == "UIToolkit");
-      Assert.IsNotNull(uiToolkitRegion, "Should have a UIToolkit region");
+      // Find Quest region, then UIToolkit nested inside it
+      var questRegion = root.Children.FirstOrDefault(c => c.Label == "Quest");
+      Assert.IsNotNull(questRegion, "Should have a Quest region");
+      var uiToolkitRegion = FindNode(questRegion!, n => n.Label == "UIToolkit");
+      Assert.IsNotNull(uiToolkitRegion, "Should have a UIToolkit region inside Quest");
 
       // Find the interactive element somewhere in the tree
       var found = FindNode(uiToolkitRegion!, n => n.Label == "TestButton" && n.Interactive);
@@ -102,8 +104,10 @@ namespace Dreamtides.Tests.Abu
       var refRegistry = new RefRegistry();
       var root = walker.Walk(refRegistry);
 
-      var uiToolkitRegion = root.Children.FirstOrDefault(c => c.Label == "UIToolkit");
-      Assert.IsNotNull(uiToolkitRegion);
+      var questRegion = root.Children.FirstOrDefault(c => c.Label == "Quest");
+      Assert.IsNotNull(questRegion);
+      var uiToolkitRegion = FindNode(questRegion!, n => n.Label == "UIToolkit");
+      Assert.IsNotNull(uiToolkitRegion, "Should have a UIToolkit region inside Quest");
 
       // Find container - should be group
       var containerNode = FindNode(uiToolkitRegion!, n => n.Label == "Container");
@@ -117,14 +121,14 @@ namespace Dreamtides.Tests.Abu
       Assert.AreEqual("button", childNode!.Role);
     }
 
-    // -- Test 3: Displayable discovery (non-battle fallback) --
+    // -- Test 3: Quest mode produces Quest region, not Scene3D --
 
     /// <summary>
-    /// Create an interactive Displayable. Walk in non-battle mode. Verify it
-    /// appears in the output.
+    /// Walk in non-battle mode. Verify quest mode produces a Quest region
+    /// and does not produce a Scene3D region.
     /// </summary>
     [UnityTest]
-    public IEnumerator DisplayableDiscovery_InteractiveDisplayableAppearsInTree()
+    public IEnumerator QuestMode_ProducesQuestRegionNotScene3D()
     {
       yield return Initialize();
       SetUpUIDocument();
@@ -132,36 +136,31 @@ namespace Dreamtides.Tests.Abu
       Registry.BattleLayout.Contents.SetActive(false);
       Registry.DocumentService.HasOpenPanels = false;
 
-      CreateTestDisplayableButton("TestDisplayableBtn");
-
       var walker = CreateWalker();
       var refRegistry = new RefRegistry();
       var root = walker.Walk(refRegistry);
 
-      var scene3dRegion = root.Children.FirstOrDefault(c => c.Label == "Scene3D");
-      Assert.IsNotNull(scene3dRegion, "Should have a Scene3D region");
+      var questRegion = root.Children.FirstOrDefault(c => c.Label == "Quest");
+      Assert.IsNotNull(questRegion, "Should have a Quest region");
 
-      var found = FindNode(scene3dRegion!, n => n.Label == "TestDisplayableBtn" && n.Interactive);
-      Assert.IsNotNull(found, "Interactive DisplayableButton should appear in tree");
-      Assert.AreEqual("button", found!.Role);
+      var scene3dRegion = root.Children.FirstOrDefault(c => c.Label == "Scene3D");
+      Assert.IsNull(scene3dRegion, "Should not have a Scene3D region in quest mode");
     }
 
     // -- Test 4: Occlusion --
 
     /// <summary>
-    /// Set HasOpenPanels = true. Create a Displayable. Walk in non-battle mode.
-    /// Verify Displayable is NOT in output. UI Toolkit elements should still appear.
+    /// Set HasOpenPanels = true. Walk in non-battle mode. Verify quest content
+    /// groups are omitted but Controls and UIToolkit still appear under Quest.
     /// </summary>
     [UnityTest]
-    public IEnumerator Occlusion_DisplayablesOmittedWhenPanelsOpen()
+    public IEnumerator Occlusion_QuestContentOmittedWhenPanelsOpen()
     {
       yield return Initialize();
       SetUpUIDocument();
 
       Registry.BattleLayout.Contents.SetActive(false);
       Registry.DocumentService.HasOpenPanels = true;
-
-      CreateTestDisplayableButton("OccludedButton");
 
       // Add a UI Toolkit element that should still appear
       var uiElement = new NodeVisualElement { name = "StillVisible" };
@@ -172,16 +171,20 @@ namespace Dreamtides.Tests.Abu
       var refRegistry = new RefRegistry();
       var root = walker.Walk(refRegistry);
 
-      var scene3dRegion = root.Children.FirstOrDefault(c => c.Label == "Scene3D");
-      Assert.IsNotNull(scene3dRegion);
+      var questRegion = root.Children.FirstOrDefault(c => c.Label == "Quest");
+      Assert.IsNotNull(questRegion, "Should have a Quest region");
 
-      // Displayable should NOT be in the Scene3D region
-      var occludedNode = FindNode(scene3dRegion!, n => n.Label == "OccludedButton");
-      Assert.IsNull(occludedNode, "Displayable should be omitted when HasOpenPanels is true");
+      // Controls should still be present
+      var controlsGroup = FindNode(questRegion!, n => n.Label == "Controls");
+      Assert.IsNotNull(controlsGroup, "Controls should still be present when panels are open");
 
-      // UI Toolkit element should still be present
-      var uiToolkitRegion = root.Children.FirstOrDefault(c => c.Label == "UIToolkit");
-      Assert.IsNotNull(uiToolkitRegion);
+      // Map, Essence, etc. should NOT be present when panels are open
+      var mapGroup = FindNode(questRegion!, n => n.Label == "Map");
+      Assert.IsNull(mapGroup, "Map should be omitted when HasOpenPanels is true");
+
+      // UI Toolkit element should still be present under Quest
+      var uiToolkitRegion = FindNode(questRegion!, n => n.Label == "UIToolkit");
+      Assert.IsNotNull(uiToolkitRegion, "UIToolkit should still be present when panels are open");
       var visibleNode = FindNode(uiToolkitRegion!, n => n.Label == "StillVisible");
       Assert.IsNotNull(
         visibleNode,
@@ -240,10 +243,10 @@ namespace Dreamtides.Tests.Abu
 
     /// <summary>
     /// Verify the non-battle snapshot tree has the expected structure with
-    /// application root and two region children.
+    /// application root and a Quest region child.
     /// </summary>
     [UnityTest]
-    public IEnumerator TreeStructure_NonBattleHasApplicationRootWithRegions()
+    public IEnumerator TreeStructure_NonBattleHasApplicationRootWithQuestRegion()
     {
       yield return Initialize();
       SetUpUIDocument();
@@ -256,11 +259,9 @@ namespace Dreamtides.Tests.Abu
 
       Assert.AreEqual("application", root.Role);
       Assert.AreEqual("Dreamtides", root.Label);
-      Assert.AreEqual(2, root.Children.Count, "Should have UIToolkit and Scene3D regions");
+      Assert.AreEqual(1, root.Children.Count, "Should have a Quest region");
       Assert.AreEqual("region", root.Children[0].Role);
-      Assert.AreEqual("UIToolkit", root.Children[0].Label);
-      Assert.AreEqual("region", root.Children[1].Role);
-      Assert.AreEqual("Scene3D", root.Children[1].Label);
+      Assert.AreEqual("Quest", root.Children[0].Label);
     }
 
     // -- Test 7: Hover callback registration --
