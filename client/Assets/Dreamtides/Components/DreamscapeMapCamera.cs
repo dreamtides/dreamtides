@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Abu;
 using Dreamtides.Buttons;
 using Dreamtides.Layout;
 using Dreamtides.Schema;
@@ -58,7 +59,7 @@ namespace Dreamtides.Components
     [SerializeField]
     List<AbstractDreamscapeSite> _sites = new();
 
-    readonly Dictionary<AbstractDreamscapeSite, CanvasButton> _siteButtonsBySite = new();
+    internal readonly Dictionary<AbstractDreamscapeSite, CanvasButton> _siteButtonsBySite = new();
     readonly Dictionary<AbstractDreamscapeSite, Vector2> _siteButtonPositions = new();
 
     Coroutine? _transitionRoutine;
@@ -298,44 +299,60 @@ namespace Dreamtides.Components
 
     IEnumerator TransitionToSite(AbstractDreamscapeSite site)
     {
-      var brain = ResolveBrain();
-      var viewport = ResolveViewport();
-      DeactivateOtherSites(site);
-      _activeSite = site;
-      var siteCamera = site.ActivateForViewport(viewport, SitePriority);
-      ApplyBlendSettings(siteCamera);
-      SetMapCameraFocus(site.transform);
-      _camera.Priority = MapPriority;
-      site.OnWillOpenSite();
-      yield return WaitForBlend(brain, siteCamera);
-      site.OnOpenedSite();
-      _transitionRoutine = null;
+      var busyToken = new BusyToken();
+      try
+      {
+        var brain = ResolveBrain();
+        var viewport = ResolveViewport();
+        DeactivateOtherSites(site);
+        _activeSite = site;
+        var siteCamera = site.ActivateForViewport(viewport, SitePriority);
+        ApplyBlendSettings(siteCamera);
+        SetMapCameraFocus(site.transform);
+        _camera.Priority = MapPriority;
+        site.OnWillOpenSite();
+        yield return WaitForBlend(brain, siteCamera);
+        site.OnOpenedSite();
+        _transitionRoutine = null;
+      }
+      finally
+      {
+        busyToken.Dispose();
+      }
     }
 
     IEnumerator TransitionToMap()
     {
-      var brain = ResolveBrain();
-      var activeSite = GetActiveSite();
-      if (activeSite == null)
+      var busyToken = new BusyToken();
+      try
       {
+        var brain = ResolveBrain();
+        var activeSite = GetActiveSite();
+        if (activeSite == null)
+        {
+          RestoreMapCameraFocus();
+          _camera.Priority = MapPriority;
+          ShowSiteButtons();
+          _transitionRoutine = null;
+          yield break;
+        }
+
+        var viewport = ResolveViewport();
+        var siteCamera = activeSite.GetActiveCamera(viewport);
+        ApplyBlendSettings(siteCamera);
+        SetMapCameraFocus(activeSite.transform);
+        _camera.Priority = ReturnMapPriority;
+        yield return WaitForBlend(brain, _camera);
+        DeactivateAllSites();
         RestoreMapCameraFocus();
         _camera.Priority = MapPriority;
         ShowSiteButtons();
         _transitionRoutine = null;
-        yield break;
       }
-
-      var viewport = ResolveViewport();
-      var siteCamera = activeSite.GetActiveCamera(viewport);
-      ApplyBlendSettings(siteCamera);
-      SetMapCameraFocus(activeSite.transform);
-      _camera.Priority = ReturnMapPriority;
-      yield return WaitForBlend(brain, _camera);
-      DeactivateAllSites();
-      RestoreMapCameraFocus();
-      _camera.Priority = MapPriority;
-      ShowSiteButtons();
-      _transitionRoutine = null;
+      finally
+      {
+        busyToken.Dispose();
+      }
     }
 
     CinemachineBrain ResolveBrain()

@@ -241,12 +241,17 @@ The system has two halves: a Python CLI and a set of C# classes inside Unity.
   `AbuCommand`, `AbuResponse`, `SnapshotData`, `ActionSnapshotData`,
   `SnapshotRef`, and the param types.
 - **DreamtidesSceneWalker** (`DreamtidesSceneWalker.cs`) implements
-  `ISceneWalker` and traverses all three Dreamtides UI systems (UI Toolkit, 3D
-  Displayables, CanvasButtons).
+  `ISceneWalker` and dispatches to mode-specific walkers. `Walk()` calls
+  `WalkBattle()` in battle mode or `WalkQuest()` in quest mode. The walker is
+  split across partial classes: `DreamtidesSceneWalker.cs` (dispatch + shared
+  helpers), `DreamtidesSceneWalker.Battle.cs` (battle mode), and
+  `DreamtidesSceneWalker.Quest.cs` (quest mode).
 - **DreamtidesSettledProvider** (`DreamtidesSettledProvider.cs`) implements
-  `ISettledProvider` and waits for `!ActionService.IsProcessingCommands` AND
-  `DOTween.TotalPlayingTweens() == 0` held for 3 consecutive frames (with a 3s
-  timeout fallback).
+  `ISettledProvider` and waits for three conditions:
+  `!ActionService.IsProcessingCommands`, `DOTween.TotalPlayingTweens() == 0`,
+  and `!BusyToken.IsAnyActive` — held for 3 consecutive frames (with a 3s
+  timeout fallback). `BusyToken` wraps async operations like camera transitions
+  to suppress premature settle detection.
 - **HistoryRecorder** (`HistoryRecorder.cs`) implements `IHistoryProvider` and
   observes `ActionService.OnCommandProcessed` to produce per-action history
   entries: game messages (turn begins, victory/defeat), dreamwell activations,
@@ -403,6 +408,25 @@ settles — refs in this snapshot are fresh and supersede any previous snapshot.
       - button "Fire Elemental" [ref=e5]
 ```
 
+**Quest mode example:**
+
+```
+- application "Dreamtides"
+  - region "Quest"
+    - group "Controls"
+      - button "Menu" [ref=e1]
+      - button "Undo" [ref=e2]
+    - group "Map"
+      - button "Battle" [ref=e3]
+      - button "Draft" [ref=e4]
+      - button "Shop" [ref=e5]
+    - label "Essence: 75"
+    - group "Quest Deck (43 cards)"
+      - button "Browse Quest Deck" [ref=e6]
+    - group "Identity"
+      - label "Flame Weaver (3/2)"
+```
+
 Refs (`e1`, `e2`, ...) are monotonically assigned in DFS pre-order per snapshot
 and invalidated by the next snapshot or any action command.
 
@@ -433,10 +457,19 @@ two-frame press/release sequence. Hover calls `displayable.MouseHoverStart()`.
 **Occlusion**: When `DocumentService.HasOpenPanels` is true, the entire Scene3D
 subtree is empty. UI Toolkit elements remain traversable.
 
-In battle mode, the walker covers user/opponent groups
+In battle mode (`WalkBattle()`), the walker covers user/opponent groups
 (status/deck/identity/void/battlefield/hand/dreamwell), stack, game modifiers,
-action buttons, essence label, and thinking indicator. In non-battle mode, it
-traverses UIToolkit overlays and 3D scene elements.
+action buttons, essence label, and thinking indicator.
+
+In quest mode (`WalkQuest()`), the walker produces a semantic tree under a
+`"Quest"` region with these sections: Controls (menu, undo, dev, bug report,
+close buttons), Map (site buttons derived from `DebugClickAction` labels),
+Essence label, Quest Deck summary (via `CardBrowserButton`), Identity card,
+Dreamsigns, Draft Picks, Shop, Tempting Offer (event offers), Start Battle,
+Journey Choices, Quest Deck Browser, Card Order Selector, and filtered UIToolkit
+overlays. When `DocumentService.HasOpenPanels` is true, map/essence/deck/card
+sections are hidden and only Controls, Card Order Selector, and UIToolkit remain
+visible.
 
 ## Conventions
 
@@ -476,9 +509,12 @@ traverses UIToolkit overlays and 3D scene elements.
   `TimeoutError`, `EmptyResponseError`). Print to stderr, exit code 1 on error.
 - **C# glob scope**: scope C# globs to `client/Assets/`, not `client/`. Unity's
   `client/Library/` directory contains package caches that pollute glob results.
-- **Do not modify**: `DreamtidesSceneWalker.cs` and
-  `DreamtidesSettledProvider.cs` are large and working; avoid modifications
-  unless necessary.
+- **Partial class architecture**: `DreamtidesSceneWalker` is split across three
+  files: `DreamtidesSceneWalker.cs` (dispatch + shared helpers),
+  `DreamtidesSceneWalker.Battle.cs` (battle mode), and
+  `DreamtidesSceneWalker.Quest.cs` (quest mode). Add battle features to the
+  Battle partial and quest features to the Quest partial. Shared helpers (e.g.
+  `TryAddCloseButton`) live in the Quest partial or the base file.
 
 ## Common Pitfalls
 

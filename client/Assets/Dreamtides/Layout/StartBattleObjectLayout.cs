@@ -75,7 +75,7 @@ namespace Dreamtides.Layout
     [SerializeField]
     internal float _dreamsignVerticalOffsetLandscape = 0f;
 
-    DisplayableButton? _buttonInstance;
+    internal DisplayableButton? _buttonInstance;
 
     float CardScale => IsLandscape() ? _cardScaleLandscape : _cardScalePortrait;
     float ButtonVerticalOffset =>

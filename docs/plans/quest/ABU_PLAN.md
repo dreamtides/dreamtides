@@ -62,20 +62,20 @@ get `RefCallbacks` with click/hover/drag handlers.
 `DreamscapeLayout` (accessed via `_registry.DreamscapeLayout`) exposes all quest
 zone layouts:
 
-| Property | Type | Contents |
-|---|---|---|
-| `QuestDeck` | `ObjectLayout` | Face-down deck cards |
-| `QuestUserIdentityCard` | `ObjectLayout` | User identity card |
-| `QuestDeckBrowser` | `QuestDeckBrowserObjectLayout` | Deck browser (portrait/landscape) |
-| `EssenceTotal` | `EssenceTotal` | Currency display with `_originalText` |
-| `DraftPickLayout` | `SitePickObjectLayout` | Draft pick choices |
-| `DestroyedQuestCards` | `ObjectLayout` | Cards removed from game |
-| `ShopLayout` | `StandardObjectLayout` | Shop card offerings |
-| `DreamsignDisplay` | `DreamsignDisplayLayout` | Enemy dreamsigns (2-col) |
-| `JourneyChoiceDisplay` | `StandardObjectLayout` | Journey/route choices |
-| `TemptingOfferDisplay` | `TemptingOfferObjectLayout` | Event offer cards |
-| `QuestEffectPosition` | `ObjectLayout` | Animating effect cards |
-| `StartBattleLayout` | `StartBattleObjectLayout` | Pre-battle identity + dreamsigns |
+| Property                | Type                           | Contents                              |
+| ----------------------- | ------------------------------ | ------------------------------------- |
+| `QuestDeck`             | `ObjectLayout`                 | Face-down deck cards                  |
+| `QuestUserIdentityCard` | `ObjectLayout`                 | User identity card                    |
+| `QuestDeckBrowser`      | `QuestDeckBrowserObjectLayout` | Deck browser (portrait/landscape)     |
+| `EssenceTotal`          | `EssenceTotal`                 | Currency display with `_originalText` |
+| `DraftPickLayout`       | `SitePickObjectLayout`         | Draft pick choices                    |
+| `DestroyedQuestCards`   | `ObjectLayout`                 | Cards removed from game               |
+| `ShopLayout`            | `StandardObjectLayout`         | Shop card offerings                   |
+| `DreamsignDisplay`      | `DreamsignDisplayLayout`       | Enemy dreamsigns (2-col)              |
+| `JourneyChoiceDisplay`  | `StandardObjectLayout`         | Journey/route choices                 |
+| `TemptingOfferDisplay`  | `TemptingOfferObjectLayout`    | Event offer cards                     |
+| `QuestEffectPosition`   | `ObjectLayout`                 | Animating effect cards                |
+| `StartBattleLayout`     | `StartBattleObjectLayout`      | Pre-battle identity + dreamsigns      |
 
 ### Site Buttons and Close Buttons
 
@@ -111,9 +111,9 @@ for semantic clarity.
 Clicking a site button fires `PrototypeQuest.OnDebugScenarioAction()` which
 starts a `FocusSiteFlow` coroutine. Camera transitions use Cinemachine blending
 (~2 seconds) which produces zero DOTween tweens.
-`DreamtidesSettledProvider.IsLocalSettled()` only checks
-`IsProcessingCommands` and `DOTween.TotalPlayingTweens()`, so it reports settled
-immediately before the camera finishes moving.
+`DreamtidesSettledProvider.IsLocalSettled()` only checks `IsProcessingCommands`
+and `DOTween.TotalPlayingTweens()`, so it reports settled immediately before the
+camera finishes moving.
 
 `BusyToken` is a ref-counted disposable. `DefaultSettledProvider` already checks
 `BusyToken.IsAnyActive`; `DreamtidesSettledProvider` does not.
@@ -442,8 +442,8 @@ walker handle all card types correctly. They use `zoneContext` to control which
 annotations to show (cost in "Hand"/"Browser", spark in detail zones, etc.).
 
 For quest zone cards, use `"Browser"` as the zoneContext for all quest layouts
-(draft picks, shop, tempting offer, start battle, deck browser). This shows
-cost and spark -- the most useful information for quest decision-making. For
+(draft picks, shop, tempting offer, start battle, deck browser). This shows cost
+and spark -- the most useful information for quest decision-making. For
 dreamsigns and the quest deck (face-down), they won't have revealed data and
 `BuildCardNode` returns `null` for unrevealed cards, which is correct.
 
@@ -457,9 +457,9 @@ true for dreamsigns, so they will be included. Their `zoneContext` should be
 Several helpers should be extracted from `.Battle.cs` to the main
 `DreamtidesSceneWalker.cs` file so both battle and quest walkers can use them:
 
-1. `WalkObjectLayoutGroup(string label, ObjectLayout layout, RefRegistry
-   refRegistry)` -- already in `.Battle.cs` line 808, walks an ObjectLayout's
-   objects as a card group. Move to main file.
+1. `WalkObjectLayoutGroup(string label, ObjectLayout layout, RefRegistry refRegistry)`
+   -- already in `.Battle.cs` line 808, walks an ObjectLayout's objects as a
+   card group. Move to main file.
 
 2. `AddEssenceLabel(AbuSceneNode parent)` -- already in `.Battle.cs` line 608.
    Move to main file. It reads from `_registry.DreamscapeLayout.EssenceTotal`
@@ -469,15 +469,15 @@ Several helpers should be extracted from `.Battle.cs` to the main
    already in `.Battle.cs` line 655. Keep in `.Battle.cs` but call it from quest
    walker too (it's accessible as a partial class method).
 
-4. `TryAddCloseBrowserButton` -- extract the shared version with label
-   parameter to main file.
+4. `TryAddCloseBrowserButton` -- extract the shared version with label parameter
+   to main file.
 
 ### Accessibility for Quest Deck
 
 The quest deck (`layout.QuestDeck`) contains face-down cards. These won't have
 `Revealed` data, so `BuildCardNode` returns `null` for them. The walker should
-not walk individual deck cards -- instead it shows the count and a browse
-button (via `AddQuestDeckSummary`).
+not walk individual deck cards -- instead it shows the count and a browse button
+(via `AddQuestDeckSummary`).
 
 However, if the deck contains any face-up cards (e.g., after a foresee effect),
 they would be walked. This is the correct behavior.
@@ -565,8 +565,9 @@ covered by the 3-frame settle requirement. This does not need a BusyToken.
 The following fields need their visibility changed from `private` to `internal`
 to be accessible by the scene walker (both are in the `Dreamtides` assembly):
 
-1. `TemptingOfferObjectLayout._acceptButtons` -- `readonly
-   List<DisplayableButton>` → `internal readonly List<DisplayableButton>`
+1. `TemptingOfferObjectLayout._acceptButtons` --
+   `readonly List<DisplayableButton>` →
+   `internal readonly List<DisplayableButton>`
 2. `StartBattleObjectLayout._buttonInstance` -- `DisplayableButton?` →
    `internal DisplayableButton?`
 
@@ -600,9 +601,9 @@ is `internal`, `QuestDeckBrowserObjectLayout._closeButton` is `internal`, etc.
 - Automated integration tests for quest-mode snapshots. The quest prototype
   requires a fully initialized Unity scene.
 - Walking site-owned layouts (`DraftSite._siteDeckLayout`,
-  `CharacterSite._characterOwnedObjects`, `BattleSite._battleCardOrigin`).
-  These are animation-intermediate positions; cards are walked via their primary
-  quest layouts.
+  `CharacterSite._characterOwnedObjects`, `BattleSite._battleCardOrigin`). These
+  are animation-intermediate positions; cards are walked via their primary quest
+  layouts.
 - Walking the `QuestDeckBrowserObjectLayout` filter button or scrollbar
   interactions.
 - Walking `QuestEffectPosition` or `DestroyedQuestCards` layouts (these contain

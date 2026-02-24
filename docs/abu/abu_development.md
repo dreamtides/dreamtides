@@ -16,11 +16,12 @@ The Abu development loop has three steps: edit C# code, compile in Unity, and
 validate via CLI snapshots. All three steps can be driven from the terminal
 without touching the Unity Editor GUI.
 
-**Step 1 — Edit the scene walker.** The main file is
-`client/Assets/Dreamtides/Abu/DreamtidesSceneWalker.cs`. The `Walk()` method
-builds a tree of `AbuSceneNode` objects representing the current UI. Battle mode
-is handled in `WalkBattle()`; non-battle mode falls back to `WalkUiToolkit()`
-and `WalkFallbackScene3D()`.
+**Step 1 — Edit the scene walker.** The walker is split across partial classes:
+`DreamtidesSceneWalker.cs` (dispatch + shared helpers),
+`DreamtidesSceneWalker.Battle.cs` (battle mode), and
+`DreamtidesSceneWalker.Quest.cs` (quest mode). The `Walk()` method dispatches to
+`WalkBattle()` or `WalkQuest()` based on the current game mode, each producing a
+tree of `AbuSceneNode` objects representing the current UI.
 
 **Step 2 — Compile.** Run `python3 scripts/abu/abu.py refresh` to trigger asset
 compilation. This drives Unity's Assets > Refresh menu via Hammerspoon and waits
@@ -73,9 +74,10 @@ scene walker. The general pattern:
    returned by `refRegistry.Register()` and look them up in the `OnDrag`
    callback to determine which action to fire.
 
-5. **Place in the walk.** Add your new section at the appropriate point in
-   `WalkBattle()` or the non-battle fallback. Consider whether the feature is
-   always visible, only visible when panels are closed (`!hasOpenPanels`), or
+5. **Place in the walk.** Add your new section in the correct partial class:
+   battle-mode features go in `DreamtidesSceneWalker.Battle.cs`, quest-mode
+   features go in `DreamtidesSceneWalker.Quest.cs`. Consider whether the feature
+   is always visible, only visible when panels are closed (`!hasOpenPanels`), or
    independent of panel state.
 
 **Example:** The CardOrderSelector (Foresee reordering) adds deck position

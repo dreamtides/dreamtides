@@ -181,26 +181,9 @@ namespace Dreamtides.Abu
       TryAddCanvasButton(group, refRegistry, doc.UndoButton, "Undo");
       TryAddCanvasButton(group, refRegistry, doc.DevButton, "Dev");
       TryAddCanvasButton(group, refRegistry, doc.BugButton, "Bug Report");
-      TryAddCloseBrowserButton(group, refRegistry);
+      TryAddCloseButton(group, refRegistry, _registry.BattleLayout.CloseBrowserButton, "Close Browser");
 
       return group;
-    }
-
-    void TryAddCloseBrowserButton(AbuSceneNode parent, RefRegistry refRegistry)
-    {
-      var button = _registry.BattleLayout.CloseBrowserButton;
-      if (!button.gameObject.activeSelf)
-      {
-        return;
-      }
-
-      AddInteractiveNode(
-        parent,
-        refRegistry,
-        "button",
-        "Close Browser",
-        new RefCallbacks { OnClick = () => button.OnClick() }
-      );
     }
 
     // ── Player ────────────────────────────────────────────────────────

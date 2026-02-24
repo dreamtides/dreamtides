@@ -32,7 +32,7 @@ namespace Dreamtides.Layout
     [SerializeField]
     internal DisplayableButton _acceptButtonPrefab = null!;
 
-    readonly List<DisplayableButton> _acceptButtons = new();
+    internal readonly List<DisplayableButton> _acceptButtons = new();
     readonly Dictionary<long, ButtonView> _buttonViewsByOfferNumber = new();
     readonly ButtonView _defaultButtonView = new() { Label = DefaultButtonLabel };
 

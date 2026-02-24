@@ -39,8 +39,7 @@ namespace Dreamtides.Abu
       }
       else
       {
-        root.Children.Add(WalkUiToolkit(refRegistry));
-        root.Children.Add(WalkFallbackScene3D(refRegistry));
+        root.Children.Add(WalkQuest(refRegistry));
       }
 
       return root;

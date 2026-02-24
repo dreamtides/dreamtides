@@ -229,9 +229,11 @@ namespace Dreamtides.Tests.Abu
       var targetNode = FindNode(root, n => n.Label == "ClickTarget" && n.Interactive);
       Assert.IsNotNull(targetNode, "Should find the clickable element");
 
+      var refStr = FindRefForLabel(root, "ClickTarget");
+      Assert.IsNotNull(refStr, "Should find a ref for the clickable element");
       Assert.IsTrue(
-        refRegistry.TryGetCallbacks("e1", out var refCallbacks),
-        "Should have at least one ref registered"
+        refRegistry.TryGetCallbacks(refStr!, out var refCallbacks),
+        "Should have a ref registered for ClickTarget"
       );
 
       refCallbacks.OnClick?.Invoke();
@@ -295,10 +297,12 @@ namespace Dreamtides.Tests.Abu
 
       var walker = CreateWalker();
       var refRegistry = new RefRegistry();
-      walker.Walk(refRegistry);
+      var root = walker.Walk(refRegistry);
 
+      var refStr = FindRefForLabel(root, "HoverTarget");
+      Assert.IsNotNull(refStr, "Should find a ref for the hoverable element");
       Assert.IsTrue(
-        refRegistry.TryGetCallbacks("e1", out var refCallbacks),
+        refRegistry.TryGetCallbacks(refStr!, out var refCallbacks),
         "Should have a ref for the hoverable element"
       );
 
@@ -776,6 +780,39 @@ namespace Dreamtides.Tests.Abu
         if (found != null)
         {
           return found;
+        }
+      }
+
+      return null;
+    }
+
+    /// <summary>
+    /// Walk the tree in DFS pre-order counting interactive nodes to find
+    /// the ref string for a node with the given label.
+    /// </summary>
+    static string? FindRefForLabel(AbuSceneNode node, string label)
+    {
+      var refIndex = 0;
+      return FindRefDfs(node, label, ref refIndex);
+    }
+
+    static string? FindRefDfs(AbuSceneNode node, string label, ref int refIndex)
+    {
+      if (node.Interactive)
+      {
+        refIndex++;
+        if (node.Label == label)
+        {
+          return $"e{refIndex}";
+        }
+      }
+
+      foreach (var child in node.Children)
+      {
+        var result = FindRefDfs(child, label, ref refIndex);
+        if (result != null)
+        {
+          return result;
         }
       }
 
