@@ -2,13 +2,14 @@
 
 ## Goal
 
-Enable the abu snapshot system to navigate and capture quest mode UI in the
-Dreamtides Unity client. Three independent gaps prevent this today: site
-navigation buttons are invisible to the scene walker, the close-site button is
-invisible, and Cinemachine camera transitions are not detected by settled
-detection. Fixing these makes abu able to click site buttons on the quest map,
-wait for the camera to finish moving, observe the resulting site UI, and close
-it -- all using general infrastructure, not site-specific logic.
+Enable the abu snapshot system to produce a high-quality, structured
+accessibility tree for quest mode, following the same site-specific approach
+used by `DreamtidesSceneWalker.Battle.cs`. The quest walker should enumerate
+every quest-mode layout zone (quest deck, shop, draft picks, tempting offers,
+start battle, dreamsigns, etc.) with semantic grouping and card-level detail,
+plus walk site navigation buttons and close buttons. Camera transitions must
+also be detected by settled detection so abu waits for Cinemachine blends to
+complete.
 
 ## Background
 
@@ -24,176 +25,559 @@ snapshot.
 
 The scene walker is a partial class split across four files:
 
-- `client/Assets/Dreamtides/Abu/DreamtidesSceneWalker.cs` -- `Walk()` dispatch,
-  helpers
-- `client/Assets/Dreamtides/Abu/SceneWalker/DreamtidesSceneWalker.Ui.cs` --
-  quest mode walk path (`WalkFallbackScene3D`), canvas button walking
-- `client/Assets/Dreamtides/Abu/SceneWalker/DreamtidesSceneWalker.Battle.cs` --
-  battle mode walk, `TryAddCloseBrowserButton`
-- `client/Assets/Dreamtides/Abu/SceneWalker/DreamtidesSceneWalker.Input.cs` --
-  callback builders
+- `DreamtidesSceneWalker.cs` -- `Walk()` dispatch, helpers
+- `SceneWalker/DreamtidesSceneWalker.Ui.cs` -- fallback walk
+  (`WalkFallbackScene3D`), canvas button walking, UIToolkit walking
+- `SceneWalker/DreamtidesSceneWalker.Battle.cs` -- battle mode walk
+- `SceneWalker/DreamtidesSceneWalker.Input.cs` -- callback builders
 
-The top-level `Walk()` method (line 32) checks
-`_registry.BattleLayout.Contents.activeSelf`. When false (quest mode), it calls
-`WalkUiToolkit()` + `WalkFallbackScene3D()`.
+The top-level `Walk()` method checks
+`_registry.BattleLayout.Contents.activeSelf`. When true, it calls
+`WalkBattle()`. When false (quest mode), it currently calls `WalkUiToolkit()` +
+`WalkFallbackScene3D()`, which produce a flat, unstructured tree.
 
-### Quest Map and Site Buttons
+### Battle Walker as Template
 
-Site CanvasButtons are black circle icons on the quest map. They are dynamically
-created by `DreamscapeService.CreateOpenSiteButton()` and stored in
-`DreamscapeMapCamera._siteButtonsBySite` (a
-`Dictionary<AbstractDreamscapeSite, CanvasButton>`). They are shown/hidden via
-`DreamscapeMapCamera.ShowSiteButtons()` / `HideSiteButtons()`, which toggle
-`gameObject.SetActive()` on each button.
+`DreamtidesSceneWalker.Battle.cs` demonstrates the target quality level. It:
 
-Each button gets a `ButtonView` with `Label = site.ButtonLabel` and an action
-built from `site.DebugClickAction`. Sites with empty `DebugClickAction` get a
-`NoOp` action.
+1. Creates a `"Battle"` region node as root.
+2. Walks **controls** (menu, undo, dev, bug, close browser buttons).
+3. Walks each **player** (user and opponent) with sub-groups: status (energy,
+   score, spark breakdown, turn), browser buttons (deck, identity, void with
+   card counts), battlefield cards (with rules text and annotations), hand cards
+   (with playability info).
+4. Walks the **stack** with position labels like `[2 of 3, top]`.
+5. Walks **game modifiers**, **action buttons**, **playable cards summary**,
+   **essence label**, **play zone** (drag target), **thinking indicator**.
+6. Walks **card order selector** with drag-to-target support.
+7. Walks the **browser** (modal card browser).
+8. Walks **UIToolkit overlays** (filtered for content).
 
-### Close Site Button
+Each card node uses `BuildCardLabel()` which includes name, card type, cost,
+spark, "can play" / "selected" annotations, and rules text. Interactive nodes
+get `RefCallbacks` with click/hover/drag handlers.
 
-`DreamscapeService._closeSiteButton` is a `CanvasGroup` (not a `CanvasButton`)
-with a child `CloseBrowserButton` component. It becomes active when
-`CloseBrowserButton.CloseAction` is set to a non-null value. Various site flows
-set this (e.g., `PrototypeQuestTemptingOfferFlow.ShowTemptingOfferCards()` line
-129, `PrototypeQuestShopFlow`). In battle mode, a different `CloseBrowserButton`
-instance lives on `BattleLayout` and is walked by `TryAddCloseBrowserButton`.
+### Quest Mode Layouts
 
-There is also a `CloseBrowserButton` instance on
-`QuestDeckBrowserObjectLayout._closeButton` (line 32), used when browsing the
-quest deck. This is a second close button that needs walking.
+`DreamscapeLayout` (accessed via `_registry.DreamscapeLayout`) exposes all quest
+zone layouts:
+
+| Property | Type | Contents |
+|---|---|---|
+| `QuestDeck` | `ObjectLayout` | Face-down deck cards |
+| `QuestUserIdentityCard` | `ObjectLayout` | User identity card |
+| `QuestDeckBrowser` | `QuestDeckBrowserObjectLayout` | Deck browser (portrait/landscape) |
+| `EssenceTotal` | `EssenceTotal` | Currency display with `_originalText` |
+| `DraftPickLayout` | `SitePickObjectLayout` | Draft pick choices |
+| `DestroyedQuestCards` | `ObjectLayout` | Cards removed from game |
+| `ShopLayout` | `StandardObjectLayout` | Shop card offerings |
+| `DreamsignDisplay` | `DreamsignDisplayLayout` | Enemy dreamsigns (2-col) |
+| `JourneyChoiceDisplay` | `StandardObjectLayout` | Journey/route choices |
+| `TemptingOfferDisplay` | `TemptingOfferObjectLayout` | Event offer cards |
+| `QuestEffectPosition` | `ObjectLayout` | Animating effect cards |
+| `StartBattleLayout` | `StartBattleObjectLayout` | Pre-battle identity + dreamsigns |
+
+### Site Buttons and Close Buttons
+
+Site `CanvasButton`s live in `DreamscapeMapCamera._siteButtonsBySite` (a
+`Dictionary<AbstractDreamscapeSite, CanvasButton>`). They are shown on the map
+and hidden when navigating to a site.
+
+Two `CloseBrowserButton` instances exist in quest mode:
+
+1. **`DreamscapeService.CloseSiteButton`** -- `CanvasGroup` with a
+   `CloseBrowserButton` component (retrieved via `GetComponent`). Used for
+   shop/tempting offer close.
+2. **`QuestDeckBrowserObjectLayout._closeButton`** -- close button for the quest
+   deck browser.
+
+### Tempting Offer Accept Buttons
+
+`TemptingOfferObjectLayout` dynamically creates `DisplayableButton` instances
+(stored in `_acceptButtons`) that display "Accept" labels. These are positioned
+per-row and are `Displayable` subclasses with `CanHandleMouseEvents() => true`.
+The generic `WalkDisplayables` would pick these up, but in the structured quest
+walker they should be walked explicitly alongside their associated offer cards
+for semantic clarity.
+
+### Start Battle Button
+
+`StartBattleObjectLayout` creates a `DisplayableButton` instance
+(`_buttonInstance`) with a "Start Battle" label. Like accept buttons, this is a
+`Displayable` that should be walked explicitly in the start battle group.
 
 ### Camera Transitions and Settled Detection
 
-Clicking a site button fires `ActionServiceImpl.PerformAction()`, which detects
-`ApplyTestScenarioAction` and calls `PrototypeQuest.OnDebugScenarioAction()`
-directly, returning immediately without setting `IsProcessingCommands = true`
-(line 172-178 of `ActionServiceImpl.cs`). The camera transition runs as a
-fire-and-forget coroutine via `FocusSiteFlow`.
-
-Camera transitions use Cinemachine blending (2-second duration) which produces
-zero DOTween tweens. `DreamtidesSettledProvider.IsLocalSettled()` only checks
+Clicking a site button fires `PrototypeQuest.OnDebugScenarioAction()` which
+starts a `FocusSiteFlow` coroutine. Camera transitions use Cinemachine blending
+(~2 seconds) which produces zero DOTween tweens.
+`DreamtidesSettledProvider.IsLocalSettled()` only checks
 `IsProcessingCommands` and `DOTween.TotalPlayingTweens()`, so it reports settled
 immediately before the camera finishes moving.
 
-`DreamscapeMapCamera.IsTransitioning` (line 79: `_transitionRoutine != null`)
-correctly tracks whether a camera blend is in progress.
-
-### BusyToken
-
-`BusyToken` is a ref-counted disposable. `IsAnyActive` is a static property
-returning true when any token is undisposed. `DefaultSettledProvider` already
-checks `BusyToken.IsAnyActive` (line 48); `DreamtidesSettledProvider` does not.
+`BusyToken` is a ref-counted disposable. `DefaultSettledProvider` already checks
+`BusyToken.IsAnyActive`; `DreamtidesSettledProvider` does not.
 
 ## Design
 
-### Site Button Discovery
+### New File: `DreamtidesSceneWalker.Quest.cs`
 
-`WalkFallbackScene3D` in `DreamtidesSceneWalker.Ui.cs` currently walks only four
-hardcoded `DocumentService` buttons via `WalkCanvasButtons`. It needs to also
-discover and walk the dynamically-created site CanvasButtons.
+Create a new partial class file at
+`client/Assets/Dreamtides/Abu/SceneWalker/DreamtidesSceneWalker.Quest.cs`
+containing the quest mode walker. This follows the established pattern of one
+file per mode (`.Battle.cs`, `.Ui.cs`, `.Input.cs`).
 
-`DreamscapeMapCamera` is not on `Registry`, but the scene walker does not need
-the camera itself -- it needs the collection of site buttons. The site buttons
-are stored in `DreamscapeMapCamera._siteButtonsBySite` (a
-`Dictionary<AbstractDreamscapeSite, CanvasButton>`). The `DreamscapeMapCamera`
-instance can be found via `FindObjectsByType<DreamscapeMapCamera>`, which is the
-established pattern in this codebase for component discovery (see
-`DreamscapeService.FindCharacterSite()`, `FindDraftSite()`, `FindBattleSite()`
-at lines 175-223). The `_siteButtonsBySite` dictionary is an `internal` field,
-accessible from `DreamtidesSceneWalker` since both are in the `Dreamtides`
-assembly. The walker should iterate the dictionary values and pass each
-`CanvasButton` to `TryAddCanvasButton`.
+### Walk() Dispatch Change
 
-The existing `TryAddCanvasButton` method handles visibility filtering correctly
-(checks `activeSelf`, `alpha > 0`, non-empty label) and requires no changes. The
-walker just needs to enumerate the site buttons and pass each to
-`TryAddCanvasButton`.
+Modify `Walk()` in `DreamtidesSceneWalker.cs` to add a quest mode branch:
 
-Site buttons with `NoOp` actions should still be walked if they have a non-empty
-label and are active/visible. `TryAddCanvasButton` already registers
-`BuildCanvasButtonCallbacks` which calls `button.OnClick()`, so clicking them
-will dispatch the NoOp action through normal channels. Filtering out NoOp
-buttons would require the walker to inspect the button's action, coupling it to
-game logic. Let the existing label/visibility filtering suffice.
+```
+if (_registry.BattleLayout.Contents.activeSelf)
+{
+  root.Children.Add(WalkBattle(refRegistry));
+}
+else
+{
+  root.Children.Add(WalkQuest(refRegistry));
+}
+```
 
-### Close Site Button Discovery
+The old fallback path (`WalkUiToolkit()` + `WalkFallbackScene3D()`) is replaced
+by `WalkQuest()`. UIToolkit overlays will be walked as the last child of the
+quest region, using `WalkUiToolkitFiltered()` (the same filtered version battle
+mode uses).
 
-Two `CloseBrowserButton` instances need walking in quest mode:
+### Quest Walker Tree Structure
 
-1. **`DreamscapeService.CloseSiteButton`** -- the primary close button for site
-   views (shop, tempting offering, etc.).
-   `_registry.DreamscapeService.CloseSiteButton` returns a `CanvasGroup`, not a
-   `CloseBrowserButton`. The `CloseBrowserButton` component lives on the same
-   GameObject and must be retrieved via `GetComponent<CloseBrowserButton>()` on
-   the `CanvasGroup`. This is the established pattern used in quest flows (e.g.,
-   `PrototypeQuestShopFlow` line 198, `PrototypeQuestTemptingOfferFlow` line
-   129).
+`WalkQuest()` builds the following tree. Each section is only included when it
+has content (following the battle walker's `count > 0` pattern).
 
-2. **`QuestDeckBrowserObjectLayout._closeButton`** -- the close button for the
-   quest deck browser. Accessible via
-   `_registry.DreamscapeLayout.QuestDeckBrowser._closeButton`.
+```
+region "Quest"
+├── group "Controls"
+│   ├── button "Menu"
+│   ├── button "Undo"
+│   ├── button "Dev"
+│   ├── button "Bug Report"
+│   ├── button "Close Browser"       (if quest deck browser close active)
+│   └── button "Close Site"          (if site close button active)
+│
+├── group "Map"                      (if site buttons visible, i.e. on map)
+│   ├── button "Draft"               (site button labels from ButtonLabel)
+│   ├── button "Shop"
+│   ├── button "Event"
+│   └── ...
+│
+├── label "Essence: 75"
+│
+├── group "Quest Deck (43 cards)"
+│   └── button "Browse Quest Deck"   (interactive, clicks quest deck layout)
+│
+├── group "Identity"
+│   └── button "Card Name, ..."      (user identity card with card details)
+│
+├── group "Dreamsigns"               (if dreamsign display has objects)
+│   ├── button "Hourglass, Dreamsign"
+│   ├── button "Garlic, Dreamsign"
+│   └── ...
+│
+├── group "Draft Picks"              (if draft pick layout has objects)
+│   ├── button "Card A, Character (cost: 3, spark: 2) -- rules text"
+│   ├── button "Card B, ..."
+│   └── ...
+│
+├── group "Shop"                     (if shop layout has objects)
+│   ├── button "Card A, Character (cost: 3) -- rules text"
+│   ├── button "Card B, ..."
+│   └── ...
+│
+├── group "Tempting Offer"           (if tempting offer has objects)
+│   ├── button "Card A, Character -- rules text"
+│   ├── button "Accept"              (accept button for row)
+│   ├── button "Card B, ..."
+│   ├── button "Accept"
+│   └── ...
+│
+├── group "Start Battle"             (if start battle layout has objects)
+│   ├── button "Enemy Identity, ..."
+│   ├── button "Dreamsign A"
+│   ├── button "Start Battle"        (the DisplayableButton)
+│   └── ...
+│
+├── group "Journey Choices"          (if journey choice display has objects)
+│   ├── button "Choice A"
+│   └── ...
+│
+├── group "Quest Deck Browser"       (if quest deck browser has objects)
+│   ├── button "Card A, Character (cost: 3, spark: 2) -- rules text"
+│   ├── button "Card B, ..."
+│   └── ...
+│
+├── group "Card Order Selector"      (reuses battle walker's WalkCardOrderSelector)
+│
+└── region "UIToolkit"               (filtered, only when content exists)
+    └── ...
+```
 
-The battle-mode `TryAddCloseBrowserButton` in `DreamtidesSceneWalker.Battle.cs`
-(line 189) shows the pattern: check `gameObject.activeSelf`, add with "Close
-Browser" label and `OnClick = () => button.OnClick()`.
+### Method Breakdown
 
-The quest mode walk path (`WalkFallbackScene3D`) should apply this same pattern
-for both quest-mode close buttons. The check should be generic: find the
-`CloseBrowserButton` component, check if the GameObject is active, and add it.
-This belongs in `DreamtidesSceneWalker.Ui.cs` as part of the
-`WalkFallbackScene3D` method or a helper called from it.
+**`WalkQuest(RefRegistry refRegistry) → AbuSceneNode`**
 
-Note: `CloseBrowserButton` is a plain `MonoBehaviour`, not a `Displayable` or
-`CanvasButton`, so it cannot be found by `WalkDisplayables` or
-`TryAddCanvasButton`. It needs its own check, identical in spirit to the battle
-mode version.
+Top-level quest walker. Creates a `"Quest"` region, then conditionally adds each
+section:
+
+```csharp
+var region = CreateRegionNode("Quest");
+var layout = _registry.DreamscapeLayout;
+
+// 1. Controls (always)
+region.Children.Add(WalkQuestControls(refRegistry));
+
+// 2. Map site buttons (when visible)
+var mapGroup = WalkMapSiteButtons(refRegistry);
+if (mapGroup != null) region.Children.Add(mapGroup);
+
+// 3. Essence
+AddEssenceLabel(region);
+
+// 4. Quest Deck summary + browse button
+AddQuestDeckSummary(region, layout, refRegistry);
+
+// 5. Identity card
+var identityGroup = WalkObjectLayoutGroup("Identity", layout.QuestUserIdentityCard, refRegistry);
+if (identityGroup != null) region.Children.Add(identityGroup);
+
+// 6. Dreamsigns
+var dreamsignsGroup = WalkObjectLayoutGroup("Dreamsigns", layout.DreamsignDisplay, refRegistry);
+if (dreamsignsGroup != null) region.Children.Add(dreamsignsGroup);
+
+// 7. Draft picks
+var draftGroup = WalkObjectLayoutGroup("Draft Picks", layout.DraftPickLayout, refRegistry);
+if (draftGroup != null) region.Children.Add(draftGroup);
+
+// 8. Shop
+var shopGroup = WalkObjectLayoutGroup("Shop", layout.ShopLayout, refRegistry);
+if (shopGroup != null) region.Children.Add(shopGroup);
+
+// 9. Tempting offer (with accept buttons)
+var offerGroup = WalkTemptingOffer(layout, refRegistry);
+if (offerGroup != null) region.Children.Add(offerGroup);
+
+// 10. Start battle (with start button)
+var battleGroup = WalkStartBattle(layout, refRegistry);
+if (battleGroup != null) region.Children.Add(battleGroup);
+
+// 11. Journey choices
+var journeyGroup = WalkObjectLayoutGroup("Journey Choices", layout.JourneyChoiceDisplay, refRegistry);
+if (journeyGroup != null) region.Children.Add(journeyGroup);
+
+// 12. Quest deck browser
+var browserGroup = WalkObjectLayoutGroup("Quest Deck Browser", layout.QuestDeckBrowser, refRegistry);
+if (browserGroup != null) region.Children.Add(browserGroup);
+
+// 13. Card order selector (reuse from battle walker)
+var cardOrderGroup = WalkCardOrderSelector(_registry.BattleLayout, refRegistry);
+if (cardOrderGroup != null) region.Children.Add(cardOrderGroup);
+
+// 14. UIToolkit overlays (filtered)
+var uiOverlay = WalkUiToolkitFiltered(refRegistry);
+if (uiOverlay != null) region.Children.Add(uiOverlay);
+
+return region;
+```
+
+**`WalkQuestControls(RefRegistry refRegistry) → AbuSceneNode`**
+
+Similar to `WalkControls()` in battle mode. Walks DocumentService buttons plus
+both quest-mode close buttons:
+
+```csharp
+var group = CreateGroupNode("Controls");
+var doc = _registry.DocumentService;
+
+TryAddCanvasButton(group, refRegistry, doc.MenuButton, "Menu");
+TryAddCanvasButton(group, refRegistry, doc.UndoButton, "Undo");
+TryAddCanvasButton(group, refRegistry, doc.DevButton, "Dev");
+TryAddCanvasButton(group, refRegistry, doc.BugButton, "Bug Report");
+
+// Quest deck browser close button
+TryAddCloseBrowserButton(group, refRegistry,
+    _registry.DreamscapeLayout.QuestDeckBrowser._closeButton,
+    "Close Browser");
+
+// Site close button (on DreamscapeService._closeSiteButton CanvasGroup)
+var closeSiteCanvasGroup = _registry.DreamscapeService.CloseSiteButton;
+var closeSiteButton = closeSiteCanvasGroup.GetComponent<CloseBrowserButton>();
+if (closeSiteButton != null)
+{
+    TryAddCloseBrowserButton(group, refRegistry, closeSiteButton, "Close Site");
+}
+
+return group;
+```
+
+The `TryAddCloseBrowserButton` helper is extracted from the existing battle-mode
+version into a shared method with a label parameter:
+
+```csharp
+void TryAddCloseBrowserButton(
+    AbuSceneNode parent, RefRegistry refRegistry,
+    CloseBrowserButton button, string label)
+{
+    if (button == null || !button.gameObject.activeSelf) return;
+    AddInteractiveNode(parent, refRegistry, "button", label,
+        new RefCallbacks { OnClick = () => button.OnClick() });
+}
+```
+
+The existing battle-mode `TryAddCloseBrowserButton` (no parameters beyond
+parent/refRegistry) should be refactored to call this shared version with the
+battle layout's `CloseBrowserButton` and `"Close Browser"` label.
+
+**`WalkMapSiteButtons(RefRegistry refRegistry) → AbuSceneNode?`**
+
+Discovers site buttons from `DreamscapeMapCamera._siteButtonsBySite`:
+
+```csharp
+var camera = Object.FindFirstObjectByType<DreamscapeMapCamera>(
+    FindObjectsInactive.Exclude);
+if (camera == null) return null;
+
+var group = CreateGroupNode("Map");
+foreach (var button in camera._siteButtonsBySite.Values)
+{
+    TryAddCanvasButton(group, refRegistry, button);
+}
+return group.Children.Count > 0 ? group : null;
+```
+
+`TryAddCanvasButton` already handles visibility checks and label extraction.
+Sites with no `ButtonLabel` or inactive buttons are skipped.
+
+**`AddQuestDeckSummary(AbuSceneNode parent, DreamscapeLayout layout, RefRegistry refRegistry)`**
+
+Shows quest deck card count and a browse button:
+
+```csharp
+var deckCount = layout.QuestDeck.Objects.Count;
+if (deckCount == 0) return;
+
+var group = CreateGroupNode($"Quest Deck ({deckCount} cards)");
+AddInteractiveNode(group, refRegistry, "button", "Browse Quest Deck",
+    BuildDisplayableCallbacks(layout.QuestDeck));
+parent.Children.Add(group);
+```
+
+The `BuildDisplayableCallbacks(layout.QuestDeck)` call registers a click that
+simulates clicking the quest deck `Displayable`, which triggers the deck browser
+via the existing prototype quest flow.
+
+**`WalkTemptingOffer(DreamscapeLayout layout, RefRegistry refRegistry) → AbuSceneNode?`**
+
+Walks tempting offer cards plus their per-row accept buttons:
+
+```csharp
+var offerLayout = layout.TemptingOfferDisplay;
+if (offerLayout.Objects.Count == 0) return null;
+
+var group = CreateGroupNode("Tempting Offer");
+foreach (var obj in offerLayout.Objects)
+{
+    var cardNode = BuildCardNode(obj, "Browser", refRegistry);
+    if (cardNode != null) group.Children.Add(cardNode);
+}
+
+// Walk accept buttons (DisplayableButton instances)
+foreach (var button in offerLayout._acceptButtons)
+{
+    if (button == null || !button.gameObject.activeSelf) continue;
+    var label = ToSingleLineText(button._text.text, fallback: "Accept");
+    AddInteractiveNode(group, refRegistry, "button", label,
+        BuildDisplayableCallbacks(button));
+}
+
+return group.Children.Count > 0 ? group : null;
+```
+
+This requires `_acceptButtons` on `TemptingOfferObjectLayout` to be accessible.
+It is currently `readonly List<DisplayableButton>` (private). Change it to
+`internal readonly` to match the codebase convention for fields accessed by the
+scene walker (e.g., `DreamscapeMapCamera._siteButtonsBySite` is `internal`).
+
+**`WalkStartBattle(DreamscapeLayout layout, RefRegistry refRegistry) → AbuSceneNode?`**
+
+Walks start battle cards plus the start button:
+
+```csharp
+var startLayout = layout.StartBattleLayout;
+if (startLayout.Objects.Count == 0) return null;
+
+var group = CreateGroupNode("Start Battle");
+foreach (var obj in startLayout.Objects)
+{
+    var cardNode = BuildCardNode(obj, "Browser", refRegistry);
+    if (cardNode != null) group.Children.Add(cardNode);
+}
+
+// Walk the "Start Battle" button
+if (startLayout._buttonInstance != null
+    && startLayout._buttonInstance.gameObject.activeSelf)
+{
+    var label = ToSingleLineText(startLayout._buttonInstance._text.text,
+        fallback: "Start Battle");
+    AddInteractiveNode(group, refRegistry, "button", label,
+        BuildDisplayableCallbacks(startLayout._buttonInstance));
+}
+
+return group.Children.Count > 0 ? group : null;
+```
+
+This requires `_buttonInstance` on `StartBattleObjectLayout` to be accessible.
+Change it from `DisplayableButton?` (private) to `internal DisplayableButton?`.
+
+### Card Label Reuse
+
+The existing `BuildCardNode()` and `BuildCardLabel()` methods from the battle
+walker handle all card types correctly. They use `zoneContext` to control which
+annotations to show (cost in "Hand"/"Browser", spark in detail zones, etc.).
+
+For quest zone cards, use `"Browser"` as the zoneContext for all quest layouts
+(draft picks, shop, tempting offer, start battle, deck browser). This shows
+cost and spark -- the most useful information for quest decision-making. For
+dreamsigns and the quest deck (face-down), they won't have revealed data and
+`BuildCardNode` returns `null` for unrevealed cards, which is correct.
+
+Actually, dreamsigns DO have revealed data (they have names like "Hourglass").
+The `BuildCardNode` method checks `card.CanHandleMouseEvents()` which returns
+true for dreamsigns, so they will be included. Their `zoneContext` should be
+`"Browser"` to show their name and type.
+
+### Shared Method Extraction
+
+Several helpers should be extracted from `.Battle.cs` to the main
+`DreamtidesSceneWalker.cs` file so both battle and quest walkers can use them:
+
+1. `WalkObjectLayoutGroup(string label, ObjectLayout layout, RefRegistry
+   refRegistry)` -- already in `.Battle.cs` line 808, walks an ObjectLayout's
+   objects as a card group. Move to main file.
+
+2. `AddEssenceLabel(AbuSceneNode parent)` -- already in `.Battle.cs` line 608.
+   Move to main file. It reads from `_registry.DreamscapeLayout.EssenceTotal`
+   which is shared between battle and quest.
+
+3. `WalkCardOrderSelector(BattleLayout layout, RefRegistry refRegistry)` --
+   already in `.Battle.cs` line 655. Keep in `.Battle.cs` but call it from quest
+   walker too (it's accessible as a partial class method).
+
+4. `TryAddCloseBrowserButton` -- extract the shared version with label
+   parameter to main file.
+
+### Accessibility for Quest Deck
+
+The quest deck (`layout.QuestDeck`) contains face-down cards. These won't have
+`Revealed` data, so `BuildCardNode` returns `null` for them. The walker should
+not walk individual deck cards -- instead it shows the count and a browse
+button (via `AddQuestDeckSummary`).
+
+However, if the deck contains any face-up cards (e.g., after a foresee effect),
+they would be walked. This is the correct behavior.
+
+### Site-Owned Layouts
+
+Some layouts live on individual site GameObjects rather than on
+`DreamscapeLayout`:
+
+- `DraftSite._siteDeckLayout` -- cards displayed at the draft site during the
+  pick animation
+- `CharacterSite._characterOwnedObjects` -- cards owned by a character site
+  (merchant's displayed wares)
+- `BattleSite._battleCardOrigin` -- card spawn position for battle transitions
+
+These are auxiliary animation positions. Cards in these layouts are also tracked
+in the main layouts (shop, draft pick, etc.) and will be walked there. Walking
+site-owned layouts separately would produce duplicates. Do not walk them.
 
 ### Settled Detection for Camera Transitions
 
 `DreamtidesSettledProvider.IsLocalSettled()` must be extended to treat
 `BusyToken.IsAnyActive` as a "not settled" signal, following the same pattern
-used by `DefaultSettledProvider` (line 48): when `BusyToken.IsAnyActive` is
-true, reset the frame counter and return false.
+used by `DefaultSettledProvider`: when `BusyToken.IsAnyActive` is true, return
+false.
 
 Camera transitions in `DreamscapeMapCamera` must acquire a `BusyToken` for their
 duration. The token should be acquired inside the camera's transition coroutines
 (`TransitionToSite` and `TransitionToMap`) and disposed when the coroutine
-completes (including on early exit or error). This is the camera-level approach
-rather than caller-level, ensuring all callers of `FocusSite()` and
-`ActivateWithTransition()` are covered without modification.
+completes (including on early exit or error). Use `try/finally` to ensure
+disposal on all exit paths.
 
-The `BusyToken` is the right mechanism because:
+```csharp
+IEnumerator TransitionToSite(AbstractDreamscapeSite site)
+{
+    using var busyToken = new BusyToken();
+    // ... existing body unchanged ...
+}
 
-- It is the established pattern (used by `DefaultSettledProvider`).
-- It is ref-counted and disposable, fitting naturally with coroutine lifecycles.
-- It decouples the camera from abu internals -- the camera only creates/disposes
-  a token; it has no reference to `DreamtidesSettledProvider`.
+IEnumerator TransitionToMap()
+{
+    using var busyToken = new BusyToken();
+    // ... existing body unchanged ...
+}
+```
 
-### Tempting Offer Animation Race
+Note: C# `using var` in IEnumerator does NOT work as expected because
+IEnumerator methods are compiled into state machines. The `using` block's
+`Dispose` would be called when the state machine is garbage collected, not when
+the coroutine completes. Instead, use explicit try/finally:
 
-`HandleTemptingOfferSelection` (line 51 of `PrototypeQuestTemptingOfferFlow.cs`)
-calls `_registry.StartCoroutine(ResolveTemptingOfferSelection(offerNumber))`,
-which runs outside the `FocusSiteFlow` yield chain. The coroutine's animations
-all use DOTween (dissolves, card moves, projectiles), which the settled provider
-already detects. The gap between coroutine start and the first DOTween tween
-creation is covered by the 3-frame settle requirement. This is not a problem in
-practice and does not need a BusyToken.
+```csharp
+IEnumerator TransitionToSite(AbstractDreamscapeSite site)
+{
+    var busyToken = new BusyToken();
+    try
+    {
+        // ... existing body ...
+    }
+    finally
+    {
+        busyToken.Dispose();
+    }
+}
+```
 
 ### Walk Order Consistency
 
 Adding new interactive nodes to the quest walk path changes ref numbering for
 subsequent nodes. This is by design -- `RefRegistry` and `SnapshotFormatter`
 both use depth-first traversal and stay in sync as long as both see the same
-tree. No special synchronization is needed. The coder should verify that the
-snapshot formatter walks the same nodes by taking actual snapshots after
-changes.
+tree. No special synchronization is needed.
+
+### Tempting Offer Animation Race
+
+`HandleTemptingOfferSelection` calls
+`_registry.StartCoroutine(ResolveTemptingOfferSelection(offerNumber))`, which
+runs outside the `FocusSiteFlow` yield chain. The coroutine's animations all use
+DOTween (dissolves, card moves, projectiles), which the settled provider already
+detects. The gap between coroutine start and the first DOTween tween creation is
+covered by the 3-frame settle requirement. This does not need a BusyToken.
+
+## Field Visibility Changes
+
+The following fields need their visibility changed from `private` to `internal`
+to be accessible by the scene walker (both are in the `Dreamtides` assembly):
+
+1. `TemptingOfferObjectLayout._acceptButtons` -- `readonly
+   List<DisplayableButton>` → `internal readonly List<DisplayableButton>`
+2. `StartBattleObjectLayout._buttonInstance` -- `DisplayableButton?` →
+   `internal DisplayableButton?`
+
+This follows the established pattern: `DreamscapeMapCamera._siteButtonsBySite`
+is `internal`, `QuestDeckBrowserObjectLayout._closeButton` is `internal`, etc.
 
 ## Constraints
 
-- **No site-specific logic in the walker.** The walker must discover and walk
-  buttons generically. It must not contain references to specific sites (shop,
-  draft, tempting offer) or specific action strings.
+- **Existing battle mode must not regress.** Battle mode snapshot behavior must
+  remain unchanged. The scene walker changes are gated by the existing
+  battle/non-battle branch in `Walk()`.
 
 - **Real-world QA validation.** Every change must be validated by running the
   Unity editor in quest mode, using `abu snapshot` and `abu screenshot` to
@@ -201,28 +585,28 @@ changes.
   clicking a site button via `abu click` waits for the camera transition to
   complete before returning, (c) the close button appears in the snapshot when
   at a site, (d) clicking close returns to the map and the snapshot shows site
-  buttons again. The quest prototype is stateless -- play mode must be restarted
-  between visiting different sites.
-
-- **Existing battle mode must not regress.** Battle mode snapshot behavior must
-  remain unchanged. The scene walker changes are gated by the existing
-  battle/non-battle branch in `Walk()`.
+  buttons again, (e) quest deck, identity, dreamsigns, shop, draft, tempting
+  offer, and start battle layouts all appear correctly in snapshots.
 
 - **BusyToken lifecycle.** Tokens must be disposed on all exit paths (normal
-  completion, early return, exception). Use `try/finally` or equivalent
-  patterns.
+  completion, early return, exception). Use `try/finally` in coroutines, not
+  `using var`.
+
+- **Card node reuse.** Quest card nodes must use the same `BuildCardNode()` and
+  `BuildCardLabel()` methods as battle mode to ensure consistent formatting.
 
 ## Non-Goals
 
-- Automated integration tests for quest-mode snapshots. The quest prototype is
-  not testable in the existing test harness (it requires a fully initialized
-  Unity scene with Cinemachine cameras, site GameObjects, etc.). QA validation
-  is manual via `abu snapshot` / `abu screenshot`.
-- Walking any UI elements beyond site buttons, close buttons, and existing
-  Displayable/UIToolkit elements. The quest prototype will change; this work
-  provides the general infrastructure.
-- Handling the `QuestDeckBrowserObjectLayout` filter button or scrollbar
+- Automated integration tests for quest-mode snapshots. The quest prototype
+  requires a fully initialized Unity scene.
+- Walking site-owned layouts (`DraftSite._siteDeckLayout`,
+  `CharacterSite._characterOwnedObjects`, `BattleSite._battleCardOrigin`).
+  These are animation-intermediate positions; cards are walked via their primary
+  quest layouts.
+- Walking the `QuestDeckBrowserObjectLayout` filter button or scrollbar
   interactions.
+- Walking `QuestEffectPosition` or `DestroyedQuestCards` layouts (these contain
+  cards in transit during animations and would add noise to snapshots).
 
 ## Open Questions
 
@@ -230,34 +614,32 @@ None.
 
 ## References
 
-- `client/Assets/Dreamtides/Abu/DreamtidesSceneWalker.cs` -- main Walk()
-  dispatch
-- `client/Assets/Dreamtides/Abu/SceneWalker/DreamtidesSceneWalker.Ui.cs` --
-  quest walk path, `WalkFallbackScene3D`, `TryAddCanvasButton`
+- `client/Assets/Dreamtides/Abu/DreamtidesSceneWalker.cs` -- Walk() dispatch,
+  helpers, shared methods destination
 - `client/Assets/Dreamtides/Abu/SceneWalker/DreamtidesSceneWalker.Battle.cs` --
-  `TryAddCloseBrowserButton` pattern
+  battle walker template, methods to extract
+- `client/Assets/Dreamtides/Abu/SceneWalker/DreamtidesSceneWalker.Ui.cs` --
+  current fallback walk (to be replaced), TryAddCanvasButton, UIToolkit walking
 - `client/Assets/Dreamtides/Abu/SceneWalker/DreamtidesSceneWalker.Input.cs` --
-  `BuildCanvasButtonCallbacks`
+  callback builders
 - `client/Assets/Dreamtides/Abu/DreamtidesSettledProvider.cs` -- settled
-  detection
-- `client/Assets/Dreamtides/Abu/DefaultSettledProvider.cs` -- BusyToken pattern
-  (line 48)
+  detection (needs BusyToken check)
 - `client/Assets/Dreamtides/Abu/BusyToken.cs` -- ref-counted busy token
+- `client/Assets/Dreamtides/Layout/DreamscapeLayout.cs` -- all quest zone
+  layouts
+- `client/Assets/Dreamtides/Layout/TemptingOfferObjectLayout.cs` --
+  `_acceptButtons` (needs internal)
+- `client/Assets/Dreamtides/Layout/StartBattleObjectLayout.cs` --
+  `_buttonInstance` (needs internal)
+- `client/Assets/Dreamtides/Layout/QuestDeckBrowserObjectLayout.cs` -- quest
+  deck browser, `_closeButton`
 - `client/Assets/Dreamtides/Components/DreamscapeMapCamera.cs` -- site button
-  dictionary, `IsTransitioning`, transition coroutines
-- `client/Assets/Dreamtides/Services/DreamscapeService.cs` -- `CloseSiteButton`,
-  `CreateOpenSiteButton()`
+  dictionary, transition coroutines (need BusyToken)
+- `client/Assets/Dreamtides/Services/DreamscapeService.cs` -- `CloseSiteButton`
 - `client/Assets/Dreamtides/Buttons/CloseBrowserButton.cs` -- close button
   component
-- `client/Assets/Dreamtides/Layout/QuestDeckBrowserObjectLayout.cs` -- quest
-  deck browser close button
-- `client/Assets/Dreamtides/Services/Registry.cs` -- service access, property
-  patterns
-- `client/Assets/Dreamtides/Services/ActionServiceImpl.cs` --
-  `ApplyTestScenarioAction` early return (line 172)
-- `client/Assets/Dreamtides/Prototype/PrototypeQuest.cs` -- `FocusSiteFlow`,
-  `OnDebugScenarioAction`
-- `client/Assets/Dreamtides/Prototype/PrototypeQuestTemptingOfferFlow.cs` --
-  tempting offer flow
-- `client/Assets/Dreamtides/Abu/SnapshotCommandHandler.cs` -- click dispatch,
-  `NotifyActionDispatched` (line 261)
+- `client/Assets/Dreamtides/Buttons/DisplayableButton.cs` -- accept/start
+  buttons (`_text` field)
+- `client/Assets/Dreamtides/Sites/AbstractDreamscapeSite.cs` -- site base class
+- `client/Assets/Dreamtides/Prototype/PrototypeQuest.cs` -- quest flows,
+  OnDebugScenarioAction
