@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Abu;
 using Dreamtides.Components;
 using Dreamtides.Prototype;
 using Dreamtides.Schema;
@@ -340,24 +341,40 @@ public class PrototypeQuest : Service
 
   IEnumerator CloseShop()
   {
-    EnsureFlowsInitialized();
-    _shopFlow.ClearDisplayedCards();
-    Registry.DreamscapeService.HideCloseSiteButton();
-    Registry.DocumentService.RenderScreenAnchoredNode(
-      new AnchorToScreenPositionCommand() { Node = null }
-    );
-    yield return StartCoroutine(ReturnToMap());
+    var busyToken = new BusyToken();
+    try
+    {
+      EnsureFlowsInitialized();
+      _shopFlow.ClearDisplayedCards();
+      Registry.DreamscapeService.HideCloseSiteButton();
+      Registry.DocumentService.RenderScreenAnchoredNode(
+        new AnchorToScreenPositionCommand() { Node = null }
+      );
+      yield return StartCoroutine(ReturnToMap());
+    }
+    finally
+    {
+      busyToken.Dispose();
+    }
   }
 
   IEnumerator CloseTemptingOffer()
   {
-    EnsureFlowsInitialized();
-    Registry.DreamscapeService.HideCloseSiteButton();
-    Registry.DreamscapeLayout.TemptingOfferDisplay.HideAcceptButtons();
-    Registry.DocumentService.RenderScreenAnchoredNode(
-      new AnchorToScreenPositionCommand() { Node = null }
-    );
-    yield return StartCoroutine(ReturnToMap());
+    var busyToken = new BusyToken();
+    try
+    {
+      EnsureFlowsInitialized();
+      Registry.DreamscapeService.HideCloseSiteButton();
+      Registry.DreamscapeLayout.TemptingOfferDisplay.HideAcceptButtons();
+      Registry.DocumentService.RenderScreenAnchoredNode(
+        new AnchorToScreenPositionCommand() { Node = null }
+      );
+      yield return StartCoroutine(ReturnToMap());
+    }
+    finally
+    {
+      busyToken.Dispose();
+    }
   }
 
   AbstractDreamscapeSite? FindSiteForAction(string action)
@@ -389,34 +406,42 @@ public class PrototypeQuest : Service
 
   IEnumerator FocusSiteFlow(string action, Func<IEnumerator>? prepare, Func<IEnumerator>? onFocused)
   {
-    EnsureFlowsInitialized();
-    var site = FindSiteForAction(action);
-    if (site == null)
+    var busyToken = new BusyToken();
+    try
     {
-      throw new InvalidOperationException($"No site found for action {action}");
-    }
-    if (_mapCamera == null)
-    {
-      throw new InvalidOperationException("Map camera is not assigned.");
-    }
-    if (prepare != null)
-    {
-      var routine = prepare();
-      if (routine == null)
+      EnsureFlowsInitialized();
+      var site = FindSiteForAction(action);
+      if (site == null)
       {
-        throw new InvalidOperationException($"Prepare routine missing for action {action}");
+        throw new InvalidOperationException($"No site found for action {action}");
       }
-      yield return StartCoroutine(routine);
-    }
-    yield return StartCoroutine(_mapCamera.FocusSite(site));
-    if (onFocused != null)
-    {
-      var routine = onFocused();
-      if (routine == null)
+      if (_mapCamera == null)
       {
-        throw new InvalidOperationException($"OnFocused routine missing for action {action}");
+        throw new InvalidOperationException("Map camera is not assigned.");
       }
-      yield return StartCoroutine(routine);
+      if (prepare != null)
+      {
+        var routine = prepare();
+        if (routine == null)
+        {
+          throw new InvalidOperationException($"Prepare routine missing for action {action}");
+        }
+        yield return StartCoroutine(routine);
+      }
+      yield return StartCoroutine(_mapCamera.FocusSite(site));
+      if (onFocused != null)
+      {
+        var routine = onFocused();
+        if (routine == null)
+        {
+          throw new InvalidOperationException($"OnFocused routine missing for action {action}");
+        }
+        yield return StartCoroutine(routine);
+      }
+    }
+    finally
+    {
+      busyToken.Dispose();
     }
   }
 
