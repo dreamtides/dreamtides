@@ -40,7 +40,7 @@ namespace Dreamtides.Abu
         AddQuestDeckSummary(region, layout, refRegistry);
 
         // 5. Identity card
-        var identityGroup = WalkQuestCardGroup("Identity", layout.QuestUserIdentityCard, refRegistry);
+        var identityGroup = WalkQuestCardGroup("Identity", PositionEnum.QuestUserIdentityCard, refRegistry);
         if (identityGroup != null)
         {
           region.Children.Add(identityGroup);
@@ -54,14 +54,14 @@ namespace Dreamtides.Abu
         }
 
         // 7. Draft picks
-        var draftGroup = WalkQuestCardGroup("Draft Picks", layout.DraftPickLayout, refRegistry);
+        var draftGroup = WalkQuestCardGroup("Draft Picks", PositionEnum.DraftPickDisplay, refRegistry);
         if (draftGroup != null)
         {
           region.Children.Add(draftGroup);
         }
 
         // 8. Shop
-        var shopGroup = WalkQuestCardGroup("Shop", layout.ShopLayout, refRegistry);
+        var shopGroup = WalkQuestCardGroup("Shop", PositionEnum.ShopDisplay, refRegistry);
         if (shopGroup != null)
         {
           region.Children.Add(shopGroup);
@@ -82,14 +82,14 @@ namespace Dreamtides.Abu
         }
 
         // 11. Journey choices
-        var journeyGroup = WalkQuestCardGroup("Journey Choices", layout.JourneyChoiceDisplay, refRegistry);
+        var journeyGroup = WalkQuestCardGroup("Journey Choices", PositionEnum.JourneyDisplay, refRegistry);
         if (journeyGroup != null)
         {
           region.Children.Add(journeyGroup);
         }
 
         // 12. Quest deck browser
-        var browserGroup = WalkQuestCardGroup("Quest Deck Browser", layout.QuestDeckBrowser, refRegistry);
+        var browserGroup = WalkQuestCardGroup("Quest Deck Browser", PositionEnum.QuestDeckBrowser, refRegistry);
         if (browserGroup != null)
         {
           region.Children.Add(browserGroup);
@@ -333,9 +333,36 @@ namespace Dreamtides.Abu
 
     // ── Generic quest card group ─────────────────────────────────────
 
-    AbuSceneNode? WalkQuestCardGroup(string label, ObjectLayout layout, RefRegistry refRegistry)
+    /// <summary>
+    /// Finds cards at a given position by scanning all active Card objects.
+    /// Animations may remove cards from their parent layout while keeping
+    /// them active in the scene, so layout.Objects can be empty even when
+    /// cards are visible. This method finds cards by their ObjectPosition
+    /// instead.
+    /// </summary>
+    AbuSceneNode? WalkQuestCardGroup(string label, PositionEnum position, RefRegistry refRegistry)
     {
-      return WalkCardsGroup(label, "Browser", layout.Objects, refRegistry);
+      var group = CreateGroupNode(label);
+      foreach (
+        var card in Object.FindObjectsByType<Card>(
+          FindObjectsInactive.Exclude,
+          FindObjectsSortMode.None
+        )
+      )
+      {
+        if (card.ObjectPosition?.Position.Enum != position)
+        {
+          continue;
+        }
+
+        var cardNode = BuildCardNode(card, "Browser", refRegistry);
+        if (cardNode != null)
+        {
+          group.Children.Add(cardNode);
+        }
+      }
+
+      return group.Children.Count > 0 ? group : null;
     }
   }
 }
