@@ -360,6 +360,23 @@ namespace Dreamtides.Abu
         {
           group.Children.Add(cardNode);
         }
+
+        // Walk button attachment (e.g. shop purchase buttons)
+        var buttonAttachment = card.ButtonAttachment;
+        if (buttonAttachment != null && buttonAttachment.gameObject.activeSelf)
+        {
+          var buttonLabel = ToSingleLineText(buttonAttachment._text.text, fallback: "Buy");
+          var cardName = card.CardView.Revealed != null
+            ? ToSingleLineText(card.CardView.Revealed.Name, fallback: "card")
+            : "card";
+          AddInteractiveNode(
+            group,
+            refRegistry,
+            "button",
+            $"Buy {cardName} (cost: {buttonLabel})",
+            BuildDisplayableCallbacks(buttonAttachment)
+          );
+        }
       }
 
       return group.Children.Count > 0 ? group : null;
