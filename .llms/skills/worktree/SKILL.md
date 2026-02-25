@@ -20,11 +20,14 @@ WORKTREE=$(python3 scripts/abu/abu.py worktree claim <branch-name>)
 
 ## Work in the Worktree
 
-Run all commands with `cwd` set to `$WORKTREE`:
+**All work must happen inside `$WORKTREE`** — not just edits
+and builds, but also file reads, research, and grep/glob
+searches. The main repo may be changing in parallel, so
+reading files from it can give stale or inconsistent results.
 
 ```bash
 cd "$WORKTREE"
-# edit, build, test as normal
+# edit, build, test, AND read/research here
 just check && just review
 ```
 
