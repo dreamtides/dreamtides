@@ -567,6 +567,80 @@ def toggle_play_mode() -> str:
     return send_menu_item(["Edit", "Play Mode", "Play"])
 
 
+def _focus_unity() -> None:
+    """Try to focus the Unity Editor window via Hammerspoon."""
+    try:
+        run_hs(f"""
+        local app = hs.application.find("{UNITY_BUNDLE_ID}")
+        if app then app:activate() end
+        """)
+    except HammerspoonError:
+        pass
+
+
+def send_menu_item_robust(path: list[str]) -> str:
+    """Send a menu item command with retry logic for transient failures.
+
+    Retries up to 6 times with 10s delays. Handles Unity not running
+    (auto-launches) and play mode interference (auto-exits play mode).
+    """
+    menu_label = " > ".join(path)
+    max_attempts = 6
+    delay = 10
+
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return send_menu_item(path)
+        except UnityNotFoundError:
+            if attempt == max_attempts:
+                break
+            print(
+                f"Unity not found (attempt {attempt}/{max_attempts}), "
+                "launching Unity..."
+            )
+            _try_launch_unity()
+            time.sleep(delay)
+            _focus_unity()
+        except HammerspoonError as e:
+            if attempt == max_attempts:
+                break
+            print(
+                f"Menu item '{menu_label}' failed (attempt "
+                f"{attempt}/{max_attempts}): {e}"
+            )
+            if is_play_mode_active():
+                print("Play mode is active, exiting before retry...")
+                try:
+                    toggle_play_mode()
+                except (HammerspoonError, UnityNotFoundError):
+                    pass
+                time.sleep(2)
+            _focus_unity()
+            time.sleep(delay)
+
+    raise HammerspoonError(
+        "\n"
+        + "=" * 60 + "\n"
+        + "  CRITICAL: UNITY MENU COMMAND FAILED\n"
+        + "=" * 60 + "\n"
+        + f"\n"
+        + f"  Failed to send '{menu_label}' after {max_attempts} attempts.\n"
+        + f"\n"
+        + f"  Diagnostics:\n"
+        + f"    - Menu path: {path}\n"
+        + f"    - State file: {ABU_STATE_FILE}\n"
+        + f"    - Play mode active: {is_play_mode_active()}\n"
+        + f"\n"
+        + f"  Remediation steps:\n"
+        + f"    1. Check that Unity is open and not showing a modal dialog\n"
+        + f"    2. Check that Hammerspoon has Accessibility permissions\n"
+        + f"    3. Try: killall Hammerspoon && open -a Hammerspoon\n"
+        + f"    4. Try: abu restart\n"
+        + f"    5. If all else fails, manually open Unity and retry\n"
+        + "=" * 60
+    )
+
+
 def get_log_size(log_path: Path | None = None) -> int:
     """Return the current size of the Unity Editor log."""
     if log_path is None:
@@ -769,6 +843,13 @@ def ensure_unity_running() -> None:
 
     wt_name = resolve_worktree_name()
     if wt_name is None:
+        if not unity_alive:
+            try:
+                find_unity_process()
+            except UnityNotFoundError:
+                print("Unity is not running, launching...")
+                _try_launch_unity()
+                _wait_for_main_unity_accessible()
         if not log_ok and log_path != EDITOR_LOG:
             print(
                 f"Error: Editor log file not found at {log_path}\n"
@@ -825,12 +906,50 @@ def _wait_for_unity_startup(wt_name: str) -> None:
     )
 
 
+def _try_launch_unity() -> None:
+    """Launch Unity for the main project when it's not running."""
+    version, app_path = find_unity_executable(CLIENT_DIR)
+    print(f"Launching Unity {version} for main project...")
+    print(f"  Project: {CLIENT_DIR}")
+    subprocess.Popen(
+        ["open", "-a", str(app_path), "--args", "-projectPath", str(CLIENT_DIR)],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+
+def _wait_for_main_unity_accessible() -> None:
+    """Poll until Unity is accessible via Hammerspoon after a cold start."""
+    print("Waiting for Unity to become accessible (this may take a few minutes)...")
+    start = time.monotonic()
+    timeout = 300  # 5 minutes for cold start
+
+    while time.monotonic() - start < timeout:
+        try:
+            output = run_hs(f"""
+            local app = hs.application.find("{UNITY_BUNDLE_ID}")
+            if app then return "OK" else return "NOT_FOUND" end
+            """)
+            if "OK" in output:
+                print("Unity is accessible.")
+                return
+        except HammerspoonError:
+            pass
+        time.sleep(5)
+
+    print(
+        f"Warning: Timed out after {timeout}s waiting for Unity to become "
+        "accessible. It may still be loading.",
+        file=sys.stderr,
+    )
+
+
 def do_refresh(play: bool = False) -> None:
     """Execute a refresh and optionally enter play mode."""
     check_log_conflict()
     ensure_unity_running()
     log_offset = get_log_size()
-    result_msg = send_refresh()
+    result_msg = send_menu_item_robust(["Assets", "Refresh"])
     print(result_msg)
 
     print("Waiting for asset refresh to complete...")
@@ -867,7 +986,7 @@ def do_test() -> None:
 
     print("\nTriggering test run...")
     log_offset = get_log_size()
-    result_msg = send_run_tests()
+    result_msg = send_menu_item_robust(["Tools", "Run All Tests"])
     print(result_msg)
 
     print("Waiting for tests to complete...")
