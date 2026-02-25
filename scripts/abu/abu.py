@@ -157,18 +157,28 @@ def build_params(args: argparse.Namespace) -> dict[str, Any]:
             params["interactive"] = True
         if args.max_depth is not None:
             params["maxDepth"] = args.max_depth
+        if getattr(args, "effect_logs", False):
+            params["effectLogs"] = True
         return params
 
     if command == "click":
-        return {"ref": strip_ref(args.ref)}
+        params: dict[str, Any] = {"ref": strip_ref(args.ref)}
+        if getattr(args, "effect_logs", False):
+            params["effectLogs"] = True
+        return params
 
     if command == "hover":
-        return {"ref": strip_ref(args.ref)}
+        params: dict[str, Any] = {"ref": strip_ref(args.ref)}
+        if getattr(args, "effect_logs", False):
+            params["effectLogs"] = True
+        return params
 
     if command == "drag":
-        params = {"source": strip_ref(args.source)}
+        params: dict[str, Any] = {"source": strip_ref(args.source)}
         if args.target is not None:
             params["target"] = strip_ref(args.target)
+        if getattr(args, "effect_logs", False):
+            params["effectLogs"] = True
         return params
 
     # screenshot
@@ -217,6 +227,13 @@ def handle_response(
     if history and isinstance(history, list) and len(history) > 0:
         parts.append("--- History ---")
         for entry in history:
+            parts.append(entry)
+        parts.append("---")
+
+    effect_logs = data.get("effectLogs")
+    if effect_logs and isinstance(effect_logs, list) and len(effect_logs) > 0:
+        parts.append("--- Effect Logs ---")
+        for entry in effect_logs:
             parts.append(entry)
         parts.append("---")
 
@@ -1385,19 +1402,31 @@ def build_parser() -> argparse.ArgumentParser:
     snapshot_parser.add_argument(
         "--max-depth", type=int, default=None, help="Maximum tree depth"
     )
+    snapshot_parser.add_argument(
+        "--effect-logs", action="store_true", help="Include visual effect logs in output"
+    )
 
     # click
     click_parser = subparsers.add_parser("click", help="Click a UI element")
     click_parser.add_argument("ref", help="Element ref (e.g. e1 or @e1)")
+    click_parser.add_argument(
+        "--effect-logs", action="store_true", help="Include visual effect logs in output"
+    )
 
     # hover
     hover_parser = subparsers.add_parser("hover", help="Hover over a UI element")
     hover_parser.add_argument("ref", help="Element ref (e.g. e1 or @e1)")
+    hover_parser.add_argument(
+        "--effect-logs", action="store_true", help="Include visual effect logs in output"
+    )
 
     # drag
     drag_parser = subparsers.add_parser("drag", help="Drag from source to target")
     drag_parser.add_argument("source", help="Source element ref")
     drag_parser.add_argument("target", nargs="?", default=None, help="Target element ref")
+    drag_parser.add_argument(
+        "--effect-logs", action="store_true", help="Include visual effect logs in output"
+    )
 
     # screenshot
     subparsers.add_parser("screenshot", help="Capture a screenshot")

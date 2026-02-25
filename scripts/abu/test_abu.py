@@ -67,44 +67,60 @@ class TestBuildParams(unittest.TestCase):
     """Test params construction for each command type."""
 
     def test_snapshot_no_flags(self) -> None:
-        ns = argparse.Namespace(command="snapshot", compact=False, interactive=False, max_depth=None)
+        ns = argparse.Namespace(command="snapshot", compact=False, interactive=False, max_depth=None, effect_logs=False)
         self.assertEqual(build_params(ns), {})
 
     def test_snapshot_compact(self) -> None:
-        ns = argparse.Namespace(command="snapshot", compact=True, interactive=False, max_depth=None)
+        ns = argparse.Namespace(command="snapshot", compact=True, interactive=False, max_depth=None, effect_logs=False)
         self.assertEqual(build_params(ns), {"compact": True})
 
     def test_snapshot_interactive(self) -> None:
-        ns = argparse.Namespace(command="snapshot", compact=False, interactive=True, max_depth=None)
+        ns = argparse.Namespace(command="snapshot", compact=False, interactive=True, max_depth=None, effect_logs=False)
         self.assertEqual(build_params(ns), {"interactive": True})
 
     def test_snapshot_max_depth(self) -> None:
-        ns = argparse.Namespace(command="snapshot", compact=False, interactive=False, max_depth=5)
+        ns = argparse.Namespace(command="snapshot", compact=False, interactive=False, max_depth=5, effect_logs=False)
         self.assertEqual(build_params(ns), {"maxDepth": 5})
 
     def test_snapshot_all_flags(self) -> None:
-        ns = argparse.Namespace(command="snapshot", compact=True, interactive=True, max_depth=3)
+        ns = argparse.Namespace(command="snapshot", compact=True, interactive=True, max_depth=3, effect_logs=False)
         self.assertEqual(build_params(ns), {"compact": True, "interactive": True, "maxDepth": 3})
 
     def test_click_params(self) -> None:
-        ns = argparse.Namespace(command="click", ref="@e1")
+        ns = argparse.Namespace(command="click", ref="@e1", effect_logs=False)
         self.assertEqual(build_params(ns), {"ref": "e1"})
 
     def test_hover_params(self) -> None:
-        ns = argparse.Namespace(command="hover", ref="e2")
+        ns = argparse.Namespace(command="hover", ref="e2", effect_logs=False)
         self.assertEqual(build_params(ns), {"ref": "e2"})
 
     def test_drag_with_target(self) -> None:
-        ns = argparse.Namespace(command="drag", source="@e1", target="@e2")
+        ns = argparse.Namespace(command="drag", source="@e1", target="@e2", effect_logs=False)
         self.assertEqual(build_params(ns), {"source": "e1", "target": "e2"})
 
     def test_drag_without_target(self) -> None:
-        ns = argparse.Namespace(command="drag", source="e1", target=None)
+        ns = argparse.Namespace(command="drag", source="e1", target=None, effect_logs=False)
         self.assertEqual(build_params(ns), {"source": "e1"})
 
     def test_screenshot_params(self) -> None:
         ns = argparse.Namespace(command="screenshot")
         self.assertEqual(build_params(ns), {})
+
+    def test_snapshot_effect_logs(self) -> None:
+        ns = argparse.Namespace(command="snapshot", compact=False, interactive=False, max_depth=None, effect_logs=True)
+        self.assertEqual(build_params(ns), {"effectLogs": True})
+
+    def test_click_effect_logs(self) -> None:
+        ns = argparse.Namespace(command="click", ref="e1", effect_logs=True)
+        self.assertEqual(build_params(ns), {"ref": "e1", "effectLogs": True})
+
+    def test_hover_effect_logs(self) -> None:
+        ns = argparse.Namespace(command="hover", ref="e1", effect_logs=True)
+        self.assertEqual(build_params(ns), {"ref": "e1", "effectLogs": True})
+
+    def test_drag_effect_logs(self) -> None:
+        ns = argparse.Namespace(command="drag", source="e1", target=None, effect_logs=True)
+        self.assertEqual(build_params(ns), {"source": "e1", "effectLogs": True})
 
 
 class TestBuildCommand(unittest.TestCase):
@@ -262,6 +278,79 @@ class TestHandleResponse(unittest.TestCase):
         parsed = json.loads(result)
         self.assertEqual(parsed["history"], ["Your turn begins"])
 
+    def test_response_with_effect_logs(self) -> None:
+        response = {
+            "id": "test-id",
+            "success": True,
+            "data": {
+                "clicked": True,
+                "snapshot": "- app",
+                "refs": {},
+                "effectLogs": [
+                    "DisplayEffect: Sparks on Fireball",
+                    "FireProjectile: FireBolt from Fireball to Golem",
+                ],
+            },
+        }
+        result = handle_response("click", response)
+        lines = result.split("\n")
+        self.assertEqual(lines[0], "--- Effect Logs ---")
+        self.assertEqual(lines[1], "DisplayEffect: Sparks on Fireball")
+        self.assertEqual(lines[2], "FireProjectile: FireBolt from Fireball to Golem")
+        self.assertEqual(lines[3], "---")
+        self.assertEqual(lines[4], "- app")
+
+    def test_response_with_history_and_effect_logs(self) -> None:
+        response = {
+            "id": "test-id",
+            "success": True,
+            "data": {
+                "clicked": True,
+                "snapshot": "- app",
+                "refs": {},
+                "history": ["Your turn begins"],
+                "effectLogs": ["DisplayEffect: Sparks on Fireball"],
+            },
+        }
+        result = handle_response("click", response)
+        lines = result.split("\n")
+        self.assertEqual(lines[0], "--- History ---")
+        self.assertEqual(lines[1], "Your turn begins")
+        self.assertEqual(lines[2], "---")
+        self.assertEqual(lines[3], "--- Effect Logs ---")
+        self.assertEqual(lines[4], "DisplayEffect: Sparks on Fireball")
+        self.assertEqual(lines[5], "---")
+        self.assertEqual(lines[6], "- app")
+
+    def test_response_with_empty_effect_logs(self) -> None:
+        response = {
+            "id": "test-id",
+            "success": True,
+            "data": {
+                "clicked": True,
+                "snapshot": "- app",
+                "refs": {},
+                "effectLogs": [],
+            },
+        }
+        result = handle_response("click", response)
+        self.assertEqual(result, "- app")
+
+    def test_response_with_effect_logs_json_mode(self) -> None:
+        response = {
+            "id": "test-id",
+            "success": True,
+            "data": {
+                "clicked": True,
+                "snapshot": "- app",
+                "refs": {},
+                "effectLogs": ["DisplayEffect: Sparks on Fireball"],
+            },
+        }
+        result = handle_response("click", response, json_output=True)
+        parsed = json.loads(result)
+        self.assertEqual(parsed["effectLogs"], ["DisplayEffect: Sparks on Fireball"])
+
     def test_error_response_raises(self) -> None:
         response = {
             "id": "test-id",
@@ -283,6 +372,7 @@ class TestBuildParser(unittest.TestCase):
         self.assertFalse(args.compact)
         self.assertFalse(args.interactive)
         self.assertIsNone(args.max_depth)
+        self.assertFalse(args.effect_logs)
 
     def test_snapshot_all_flags(self) -> None:
         parser = build_parser()
@@ -290,6 +380,26 @@ class TestBuildParser(unittest.TestCase):
         self.assertTrue(args.compact)
         self.assertTrue(args.interactive)
         self.assertEqual(args.max_depth, 5)
+
+    def test_snapshot_effect_logs_flag(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["snapshot", "--effect-logs"])
+        self.assertTrue(args.effect_logs)
+
+    def test_click_effect_logs_flag(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["click", "e1", "--effect-logs"])
+        self.assertTrue(args.effect_logs)
+
+    def test_hover_effect_logs_flag(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["hover", "e1", "--effect-logs"])
+        self.assertTrue(args.effect_logs)
+
+    def test_drag_effect_logs_flag(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["drag", "e1", "--effect-logs"])
+        self.assertTrue(args.effect_logs)
 
     def test_click_ref(self) -> None:
         parser = build_parser()

@@ -69,6 +69,9 @@ namespace Abu
 
     [JsonProperty("maxDepth")]
     public int? MaxDepth { get; set; }
+
+    [JsonProperty("effectLogs")]
+    public bool? EffectLogs { get; set; }
   }
 
   /// <summary>
@@ -78,6 +81,9 @@ namespace Abu
   {
     [JsonProperty("ref")]
     public string Ref { get; set; } = "";
+
+    [JsonProperty("effectLogs")]
+    public bool? EffectLogs { get; set; }
   }
 
   /// <summary>
@@ -90,6 +96,9 @@ namespace Abu
 
     [JsonProperty("target", NullValueHandling = NullValueHandling.Ignore)]
     public string? Target { get; set; }
+
+    [JsonProperty("effectLogs")]
+    public bool? EffectLogs { get; set; }
   }
 
   /// <summary>
@@ -118,6 +127,9 @@ namespace Abu
 
     [JsonProperty("history", NullValueHandling = NullValueHandling.Ignore)]
     public List<string>? History { get; set; }
+
+    [JsonProperty("effectLogs", NullValueHandling = NullValueHandling.Ignore)]
+    public List<string>? EffectLogs { get; set; }
   }
 
   /// <summary>

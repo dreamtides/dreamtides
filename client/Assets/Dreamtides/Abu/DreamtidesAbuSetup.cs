@@ -29,6 +29,7 @@ namespace Dreamtides.Abu
     Registry? _registry;
 
     HistoryRecorder? _historyRecorder;
+    EffectLogRecorder? _effectLogRecorder;
 
     void Start()
     {
@@ -61,13 +62,25 @@ namespace Dreamtides.Abu
       _historyRecorder = new HistoryRecorder(_registry.CardService);
       _registry.ActionService.OnCommandProcessed += _historyRecorder.OnCommand;
       bridge.SetHistoryProvider(_historyRecorder);
+
+      _effectLogRecorder = new EffectLogRecorder(_registry.CardService);
+      _registry.ActionService.OnCommandProcessed += _effectLogRecorder.OnCommand;
+      bridge.SetEffectLogProvider(_effectLogRecorder);
     }
 
     void OnDestroy()
     {
-      if (_registry != null && _historyRecorder != null)
+      if (_registry != null)
       {
-        _registry.ActionService.OnCommandProcessed -= _historyRecorder.OnCommand;
+        if (_historyRecorder != null)
+        {
+          _registry.ActionService.OnCommandProcessed -= _historyRecorder.OnCommand;
+        }
+
+        if (_effectLogRecorder != null)
+        {
+          _registry.ActionService.OnCommandProcessed -= _effectLogRecorder.OnCommand;
+        }
       }
     }
   }

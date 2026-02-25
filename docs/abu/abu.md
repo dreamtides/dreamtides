@@ -132,8 +132,8 @@ it. The main repo always uses port 9999.
 
 Both the Python CLI and C# bridge auto-detect the worktree context. The Python
 side checks `ABU_PORT` first, then detects if the repo root is under
-`~/dreamtides-worktrees/` and looks up the port. The C# side does the same
-using `Application.dataPath`. No manual port configuration is needed.
+`~/dreamtides-worktrees/` and looks up the port. The C# side does the same using
+`Application.dataPath`. No manual port configuration is needed.
 
 ### Status Display
 
@@ -155,8 +155,8 @@ Unity Editor Status
 
 Worktree Unity editors display a colored strip at the top of the window and a
 `[NAME]` prefix in the title bar so they are visually distinguishable from the
-main editor. Each worktree gets a stable color from a 6-color palette based on
-a hash of the name.
+main editor. Each worktree gets a stable color from a 6-color palette based on a
+hash of the name.
 
 ## Adding DreamtidesAbuSetup to a Scene
 
@@ -214,8 +214,8 @@ always included.
 **Action responses:** Action commands (click/hover/drag) return a post-action
 snapshot after the UI settles — refs in this snapshot are fresh and supersede
 any previous snapshot. History entries (game events that occurred during the
-action) appear before the snapshot when present, separated by
-`--- History ---` / `---` delimiters.
+action) appear before the snapshot when present, separated by `--- History ---`
+/ `---` delimiters.
 
 ## Test Save Generation
 

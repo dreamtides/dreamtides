@@ -159,7 +159,7 @@
   handling, NDJSON wire protocol, the three Dreamtides UI systems the walker
   traverses (UI Toolkit, 3D Displayables, CanvasButtons), worktree internals
   (PID-targeted Hammerspoon, per-editor logs, window tinting), namespace
-  conventions and coding rules (Abu vs Dreamtides.Abu), history lifecycle,
-  the full test suite layout, and the `ISceneWalker`/`ISettledProvider`
-  interfaces for adapting ABU to other games. Read when working on ABU C# code,
-  debugging internal behavior, or porting ABU to a new game.
+  conventions and coding rules (Abu vs Dreamtides.Abu), history lifecycle, the
+  full test suite layout, and the `ISceneWalker`/`ISettledProvider` interfaces
+  for adapting ABU to other games. Read when working on ABU C# code, debugging
+  internal behavior, or porting ABU to a new game.

@@ -23,6 +23,7 @@ namespace Abu
     readonly RefRegistry _refRegistry = new RefRegistry();
     ISettledProvider _settledProvider = new DefaultSettledProvider();
     IHistoryProvider? _historyProvider;
+    IEffectLogProvider? _effectLogProvider;
     SnapshotCommandHandler? _snapshotCommandHandler;
 
     /// <summary>
@@ -64,6 +65,18 @@ namespace Abu
     }
 
     /// <summary>
+    /// Set the effect log provider for recording visual effect commands.
+    /// </summary>
+    public void SetEffectLogProvider(IEffectLogProvider provider)
+    {
+      _effectLogProvider = provider;
+      if (_snapshotCommandHandler != null)
+      {
+        _snapshotCommandHandler.SetEffectLogProvider(provider);
+      }
+    }
+
+    /// <summary>
     /// Access the ref registry for external use (e.g., by walkers during snapshot).
     /// </summary>
     public RefRegistry RefRegistry => _refRegistry;
@@ -79,6 +92,10 @@ namespace Abu
       if (_historyProvider != null)
       {
         _snapshotCommandHandler.SetHistoryProvider(_historyProvider);
+      }
+      if (_effectLogProvider != null)
+      {
+        _snapshotCommandHandler.SetEffectLogProvider(_effectLogProvider);
       }
       _commandHandler = _snapshotCommandHandler;
     }

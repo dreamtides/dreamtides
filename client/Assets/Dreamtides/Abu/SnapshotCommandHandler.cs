@@ -18,6 +18,7 @@ namespace Abu
     readonly RefRegistry _refRegistry;
     ISettledProvider _settledProvider;
     IHistoryProvider? _historyProvider;
+    IEffectLogProvider? _effectLogProvider;
 
     public SnapshotCommandHandler(
       AbuBridge bridge,
@@ -46,6 +47,14 @@ namespace Abu
     public void SetHistoryProvider(IHistoryProvider? provider)
     {
       _historyProvider = provider;
+    }
+
+    /// <summary>
+    /// Set the effect log provider for recording visual effect commands.
+    /// </summary>
+    public void SetEffectLogProvider(IEffectLogProvider? provider)
+    {
+      _effectLogProvider = provider;
     }
 
     public void HandleCommand(AbuCommand command, AbuBridge bridge, Action<AbuResponse> onComplete)
@@ -91,7 +100,13 @@ namespace Abu
       _refRegistry.Clear();
       var snapshotParams = command.Params?.ToObject<SnapshotParams>();
       var compact = snapshotParams?.Compact ?? false;
+      var wantEffectLogs = snapshotParams?.EffectLogs ?? false;
       var snapshotData = BuildSnapshotData(compact);
+
+      if (wantEffectLogs)
+      {
+        snapshotData.EffectLogs = _effectLogProvider?.TakeEffectLogs();
+      }
 
       onComplete(
         new AbuResponse
@@ -125,6 +140,8 @@ namespace Abu
 
     void HandleClick(AbuCommand command, Action<AbuResponse> onComplete)
     {
+      var refParams = command.Params?.ToObject<RefParams>();
+      var wantEffectLogs = refParams?.EffectLogs ?? false;
       DispatchRefAction(
         command,
         onComplete,
@@ -136,12 +153,15 @@ namespace Abu
           cb.OnClick();
           return true;
         },
-        new { clicked = true }
+        new { clicked = true },
+        wantEffectLogs
       );
     }
 
     void HandleHover(AbuCommand command, Action<AbuResponse> onComplete)
     {
+      var refParams = command.Params?.ToObject<RefParams>();
+      var wantEffectLogs = refParams?.EffectLogs ?? false;
       DispatchRefAction(
         command,
         onComplete,
@@ -153,7 +173,8 @@ namespace Abu
           cb.OnHover();
           return true;
         },
-        new { hovered = true }
+        new { hovered = true },
+        wantEffectLogs
       );
     }
 
@@ -173,6 +194,7 @@ namespace Abu
         return;
       }
 
+      var wantEffectLogs = dragParams.EffectLogs ?? false;
       DispatchRefAction(
         command,
         onComplete,
@@ -185,7 +207,8 @@ namespace Abu
           cb.OnDrag(dragParams.Target);
           return true;
         },
-        new { dragged = true }
+        new { dragged = true },
+        wantEffectLogs
       );
     }
 
@@ -198,7 +221,8 @@ namespace Abu
       Action<AbuResponse> onComplete,
       string actionName,
       Func<RefCallbacks, bool> tryInvoke,
-      object responseData
+      object responseData,
+      bool wantEffectLogs
     )
     {
       var refParams = command.Params?.ToObject<RefParams>();
@@ -215,7 +239,15 @@ namespace Abu
         return;
       }
 
-      DispatchRefAction(command, onComplete, actionName, refParams.Ref, tryInvoke, responseData);
+      DispatchRefAction(
+        command,
+        onComplete,
+        actionName,
+        refParams.Ref,
+        tryInvoke,
+        responseData,
+        wantEffectLogs
+      );
     }
 
     /// <summary>
@@ -228,7 +260,8 @@ namespace Abu
       string actionName,
       string refStr,
       Func<RefCallbacks, bool> tryInvoke,
-      object responseData
+      object responseData,
+      bool wantEffectLogs
     )
     {
       if (!_refRegistry.TryGetCallbacks(refStr, out var callbacks))
@@ -258,8 +291,11 @@ namespace Abu
       }
 
       _historyProvider?.ClearHistory();
+      _effectLogProvider?.ClearEffectLogs();
       _settledProvider.NotifyActionDispatched();
-      _bridge.StartCoroutine(WaitForSettledThenRespond(command.Id, responseData, onComplete));
+      _bridge.StartCoroutine(
+        WaitForSettledThenRespond(command.Id, responseData, wantEffectLogs, onComplete)
+      );
     }
 
     void HandleScreenshot(AbuCommand command, Action<AbuResponse> onComplete)
@@ -294,6 +330,7 @@ namespace Abu
     IEnumerator WaitForSettledThenRespond(
       string commandId,
       object data,
+      bool wantEffectLogs,
       Action<AbuResponse> onComplete
     )
     {
@@ -303,6 +340,7 @@ namespace Abu
       }
 
       var history = _historyProvider?.TakeHistory();
+      var effectLogs = wantEffectLogs ? _effectLogProvider?.TakeEffectLogs() : null;
 
       _refRegistry.Clear();
       var snapshotData = BuildSnapshotData(false);
@@ -318,6 +356,7 @@ namespace Abu
             Snapshot = snapshotData.Snapshot,
             Refs = snapshotData.Refs,
             History = history,
+            EffectLogs = effectLogs,
           },
         }
       );
