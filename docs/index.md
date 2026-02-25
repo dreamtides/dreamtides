@@ -144,21 +144,22 @@
   performance regressions, adding new benchmarks, or profiling AI search
   performance.
 
-- [abu.md](abu/abu.md): Complete guide to ABU (Agent-Browser for Unity) — the
-  Python CLI (`scripts/abu/abu.py`) for both Unity Editor control (refresh,
-  play, test, cycle via Hammerspoon) and in-game interaction (snapshot, click,
-  hover, drag, screenshot over TCP), the C# Unity TCP server
-  (`client/Assets/Dreamtides/Abu/`), running ABU with DreamtidesAbuSetup, the
-  NDJSON wire protocol over TCP port 9999, C# transport and command handling
-  internals (TcpServer, AbuBridge, SnapshotCommandHandler, SnapshotFormatter,
-  RefRegistry, CommandSchema), per-action history recording (HistoryRecorder,
-  IHistoryProvider, reset-collect-drain lifecycle), the three Dreamtides UI
-  systems the walker traverses (UI Toolkit, 3D Displayables, CanvasButtons),
-  namespace conventions and coding rules (Abu vs Dreamtides.Abu, C# glob scope
-  to client/Assets/), common pitfalls (stale refs, compact mode, BusyToken,
-  single-client TCP), the `ISceneWalker`, `ISettledProvider`, and
-  `IHistoryProvider` interfaces for adapting ABU to other games, the full test
-  suite layout (including correct Python unittest invocation), and a child doc
-  on developing new Abu features with interactive testing. Read when using the
-  ABU Python CLI, controlling the Unity Editor, working on ABU C# code,
-  debugging connectivity or snapshot accuracy, or porting ABU to a new game.
+- [abu.md](abu/abu.md): User guide for ABU (Agent-Browser for Unity) — the
+  Python CLI (`scripts/abu/abu.py`) for Unity Editor control (refresh, play,
+  test, cycle via Hammerspoon) and in-game interaction (snapshot, click, hover,
+  drag, screenshot over TCP), running ABU with DreamtidesAbuSetup, APFS-backed
+  worktree management, snapshot format and compact mode, test save generation,
+  testing commands, and common pitfalls (stale refs, compact mode, single-client
+  TCP). Read when using the ABU CLI, controlling the Unity Editor, or setting up
+  ABU in a scene.
+
+- [abu_internals.md](abu/abu_internals.md): ABU implementation details —
+  architecture (TcpServer, AbuBridge, SnapshotCommandHandler, SnapshotFormatter,
+  RefRegistry, CommandSchema), Python CLI internals, C# transport and command
+  handling, NDJSON wire protocol, the three Dreamtides UI systems the walker
+  traverses (UI Toolkit, 3D Displayables, CanvasButtons), worktree internals
+  (PID-targeted Hammerspoon, per-editor logs, window tinting), namespace
+  conventions and coding rules (Abu vs Dreamtides.Abu), history lifecycle,
+  the full test suite layout, and the `ISceneWalker`/`ISettledProvider`
+  interfaces for adapting ABU to other games. Read when working on ABU C# code,
+  debugging internal behavior, or porting ABU to a new game.

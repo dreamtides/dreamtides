@@ -1,7 +1,9 @@
 # Abu Development Guide
 
 How to modify the Abu scene walker, add support for new UI features, and
-interactively validate changes against a running Unity game.
+interactively validate changes against a running Unity game. For CLI usage see
+[abu.md](abu.md); for architecture and C# class details see
+[abu_internals.md](abu_internals.md).
 
 ## Table of Contents
 
