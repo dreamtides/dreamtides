@@ -4,7 +4,6 @@
 
 using System;
 using System.Reflection;
-using Dreamtides.Tests.TestUtils;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,56 +29,82 @@ namespace Dreamtides.Editors
     private const string MenuSamsungZFold2 = MenuRoot + "Samsung Z Fold 2 (960x2658)";
     private const string MenuPixel5 = MenuRoot + "Pixel 5 (1080x2340)";
 
+    private static readonly (string menu, int width, int height, int id)[] Resolutions =
+    {
+      (Menu16x9, 1920, 1080, 0),
+      (Menu16x10, 2560, 1600, 1),
+      (Menu21x9, 3440, 1440, 2),
+      (Menu3x2, 1470, 956, 3),
+      (Menu5x4, 1280, 1024, 4),
+      (Menu32x9, 5120, 1440, 5),
+      (MenuIPhone12, 1170, 2532, 6),
+      (MenuIPhoneSE, 750, 1334, 7),
+      (MenuIPadPro12, 2048, 2732, 8),
+      (MenuIPodTouch6, 640, 1136, 9),
+      (MenuSamsungNote20, 1440, 3088, 10),
+      (MenuSamsungZFold2, 960, 2658, 11),
+      (MenuPixel5, 1080, 2340, 12),
+    };
+
     static ResolutionMenu()
     {
       EditorApplication.delayCall += UpdateChecks;
       EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
     }
 
-    private static GameViewResolution Current
+    private static int CurrentId
     {
-      get => (GameViewResolution)EditorPrefs.GetInt(EditorPrefKey, (int)GameViewResolution.Resolution16x9);
-      set => EditorPrefs.SetInt(EditorPrefKey, (int)value);
+      get => EditorPrefs.GetInt(EditorPrefKey, 0);
+      set => EditorPrefs.SetInt(EditorPrefKey, value);
     }
 
     private static void OnPlayModeStateChanged(PlayModeStateChange state)
     {
       if (state == PlayModeStateChange.EnteredPlayMode)
       {
-        ApplyResolution(Current);
+        ApplyCurrentResolution();
       }
     }
 
-    private static void Select(GameViewResolution resolution)
+    private static void Select(int id)
     {
-      Current = resolution;
-      ApplyResolution(resolution);
+      CurrentId = id;
+      ApplyCurrentResolution();
       UpdateChecks();
     }
 
-    private static void ApplyResolution(GameViewResolution resolution)
+    private static void ApplyCurrentResolution()
     {
-      var size = resolution.AsVector();
-      var width = (int)size.x;
-      var height = (int)size.y;
+      var current = CurrentId;
+      foreach (var (_, width, height, id) in Resolutions)
+      {
+        if (id == current)
+        {
+          ApplyResolution(width, height);
+          return;
+        }
+      }
+    }
 
+    private static void ApplyResolution(int width, int height)
+    {
       try
       {
         var gameViewSizesType = typeof(Editor).Assembly.GetType("UnityEditor.GameViewSizes");
         var singletonProperty =
-          gameViewSizesType.GetProperty("instance", BindingFlags.Public | BindingFlags.Static);
+          gameViewSizesType!.GetProperty("instance", BindingFlags.Public | BindingFlags.Static);
         var gameViewSizesInstance = singletonProperty!.GetValue(null);
 
-        var currentGroupType = GetCurrentGroupType(gameViewSizesType, gameViewSizesInstance!);
-        var group = GetGroup(gameViewSizesType, gameViewSizesInstance!, currentGroupType);
+        var currentGroupType = GetCurrentGroupType(gameViewSizesType!, gameViewSizesInstance!);
+        var group = GetGroup(gameViewSizesType!, gameViewSizesInstance!, currentGroupType);
 
-        var index = FindOrAddCustomSize(group, width, height, resolution.ToString());
+        var index = FindOrAddCustomSize(group, width, height);
 
         SetGameViewSize(index);
       }
       catch (Exception e)
       {
-        Debug.LogError($"Failed to apply resolution {resolution}: {e}");
+        Debug.LogError($"Failed to apply resolution {width}x{height}: {e}");
       }
     }
 
@@ -101,7 +126,7 @@ namespace Dreamtides.Editors
       return method!.Invoke(instance, new[] { groupType })!;
     }
 
-    private static int FindOrAddCustomSize(object group, int width, int height, string name)
+    private static int FindOrAddCustomSize(object group, int width, int height)
     {
       var groupType = group.GetType();
       var getTotalCount = groupType.GetMethod("GetTotalCount")!;
@@ -125,8 +150,10 @@ namespace Dreamtides.Editors
 
       var sizeTypeEnum = typeof(Editor).Assembly.GetType("UnityEditor.GameViewSizeType")!;
       var fixedResolution = Enum.Parse(sizeTypeEnum, "FixedResolution");
-      var ctor = gameViewSizeType.GetConstructor(new[] { sizeTypeEnum, typeof(int), typeof(int), typeof(string) })!;
-      var newSize = ctor.Invoke(new[] { fixedResolution, width, height, name });
+      var ctor = gameViewSizeType.GetConstructor(
+        new[] { sizeTypeEnum, typeof(int), typeof(int), typeof(string) }
+      )!;
+      var newSize = ctor.Invoke(new object[] { fixedResolution, width, height, $"{width}x{height}" });
 
       var addCustomSize = groupType.GetMethod("AddCustomSize")!;
       addCustomSize.Invoke(group, new[] { newSize });
@@ -155,152 +182,92 @@ namespace Dreamtides.Editors
 
     private static void UpdateChecks()
     {
-      Menu.SetChecked(Menu16x9, Current == GameViewResolution.Resolution16x9);
-      Menu.SetChecked(Menu16x10, Current == GameViewResolution.Resolution16x10);
-      Menu.SetChecked(Menu21x9, Current == GameViewResolution.Resolution21x9);
-      Menu.SetChecked(Menu3x2, Current == GameViewResolution.Resolution3x2);
-      Menu.SetChecked(Menu5x4, Current == GameViewResolution.Resolution5x4);
-      Menu.SetChecked(Menu32x9, Current == GameViewResolution.Resolution32x9);
-      Menu.SetChecked(MenuIPhone12, Current == GameViewResolution.ResolutionIPhone12);
-      Menu.SetChecked(MenuIPhoneSE, Current == GameViewResolution.ResolutionIPhoneSE);
-      Menu.SetChecked(MenuIPadPro12, Current == GameViewResolution.ResolutionIPadPro12);
-      Menu.SetChecked(MenuIPodTouch6, Current == GameViewResolution.ResolutionIPodTouch6);
-      Menu.SetChecked(MenuSamsungNote20, Current == GameViewResolution.ResolutionSamsungNote20);
-      Menu.SetChecked(MenuSamsungZFold2, Current == GameViewResolution.ResolutionSamsungZFold2);
-      Menu.SetChecked(MenuPixel5, Current == GameViewResolution.ResolutionPixel5);
+      var current = CurrentId;
+      foreach (var (menu, _, _, id) in Resolutions)
+      {
+        Menu.SetChecked(menu, id == current);
+      }
     }
 
     // --- Menu items ---
 
     [MenuItem(Menu16x9)]
-    private static void Set16x9() => Select(GameViewResolution.Resolution16x9);
+    private static void Set16x9() => Select(0);
 
     [MenuItem(Menu16x9, true)]
-    private static bool Validate16x9()
-    {
-      Menu.SetChecked(Menu16x9, Current == GameViewResolution.Resolution16x9);
-      return true;
-    }
+    private static bool Validate16x9() { UpdateChecks(); return true; }
 
     [MenuItem(Menu16x10)]
-    private static void Set16x10() => Select(GameViewResolution.Resolution16x10);
+    private static void Set16x10() => Select(1);
 
     [MenuItem(Menu16x10, true)]
-    private static bool Validate16x10()
-    {
-      Menu.SetChecked(Menu16x10, Current == GameViewResolution.Resolution16x10);
-      return true;
-    }
+    private static bool Validate16x10() { UpdateChecks(); return true; }
 
     [MenuItem(Menu21x9)]
-    private static void Set21x9() => Select(GameViewResolution.Resolution21x9);
+    private static void Set21x9() => Select(2);
 
     [MenuItem(Menu21x9, true)]
-    private static bool Validate21x9()
-    {
-      Menu.SetChecked(Menu21x9, Current == GameViewResolution.Resolution21x9);
-      return true;
-    }
+    private static bool Validate21x9() { UpdateChecks(); return true; }
 
     [MenuItem(Menu3x2)]
-    private static void Set3x2() => Select(GameViewResolution.Resolution3x2);
+    private static void Set3x2() => Select(3);
 
     [MenuItem(Menu3x2, true)]
-    private static bool Validate3x2()
-    {
-      Menu.SetChecked(Menu3x2, Current == GameViewResolution.Resolution3x2);
-      return true;
-    }
+    private static bool Validate3x2() { UpdateChecks(); return true; }
 
     [MenuItem(Menu5x4)]
-    private static void Set5x4() => Select(GameViewResolution.Resolution5x4);
+    private static void Set5x4() => Select(4);
 
     [MenuItem(Menu5x4, true)]
-    private static bool Validate5x4()
-    {
-      Menu.SetChecked(Menu5x4, Current == GameViewResolution.Resolution5x4);
-      return true;
-    }
+    private static bool Validate5x4() { UpdateChecks(); return true; }
 
     [MenuItem(Menu32x9)]
-    private static void Set32x9() => Select(GameViewResolution.Resolution32x9);
+    private static void Set32x9() => Select(5);
 
     [MenuItem(Menu32x9, true)]
-    private static bool Validate32x9()
-    {
-      Menu.SetChecked(Menu32x9, Current == GameViewResolution.Resolution32x9);
-      return true;
-    }
+    private static bool Validate32x9() { UpdateChecks(); return true; }
 
     [MenuItem(MenuIPhone12)]
-    private static void SetIPhone12() => Select(GameViewResolution.ResolutionIPhone12);
+    private static void SetIPhone12() => Select(6);
 
     [MenuItem(MenuIPhone12, true)]
-    private static bool ValidateIPhone12()
-    {
-      Menu.SetChecked(MenuIPhone12, Current == GameViewResolution.ResolutionIPhone12);
-      return true;
-    }
+    private static bool ValidateIPhone12() { UpdateChecks(); return true; }
 
     [MenuItem(MenuIPhoneSE)]
-    private static void SetIPhoneSE() => Select(GameViewResolution.ResolutionIPhoneSE);
+    private static void SetIPhoneSE() => Select(7);
 
     [MenuItem(MenuIPhoneSE, true)]
-    private static bool ValidateIPhoneSE()
-    {
-      Menu.SetChecked(MenuIPhoneSE, Current == GameViewResolution.ResolutionIPhoneSE);
-      return true;
-    }
+    private static bool ValidateIPhoneSE() { UpdateChecks(); return true; }
 
     [MenuItem(MenuIPadPro12)]
-    private static void SetIPadPro12() => Select(GameViewResolution.ResolutionIPadPro12);
+    private static void SetIPadPro12() => Select(8);
 
     [MenuItem(MenuIPadPro12, true)]
-    private static bool ValidateIPadPro12()
-    {
-      Menu.SetChecked(MenuIPadPro12, Current == GameViewResolution.ResolutionIPadPro12);
-      return true;
-    }
+    private static bool ValidateIPadPro12() { UpdateChecks(); return true; }
 
     [MenuItem(MenuIPodTouch6)]
-    private static void SetIPodTouch6() => Select(GameViewResolution.ResolutionIPodTouch6);
+    private static void SetIPodTouch6() => Select(9);
 
     [MenuItem(MenuIPodTouch6, true)]
-    private static bool ValidateIPodTouch6()
-    {
-      Menu.SetChecked(MenuIPodTouch6, Current == GameViewResolution.ResolutionIPodTouch6);
-      return true;
-    }
+    private static bool ValidateIPodTouch6() { UpdateChecks(); return true; }
 
     [MenuItem(MenuSamsungNote20)]
-    private static void SetSamsungNote20() => Select(GameViewResolution.ResolutionSamsungNote20);
+    private static void SetSamsungNote20() => Select(10);
 
     [MenuItem(MenuSamsungNote20, true)]
-    private static bool ValidateSamsungNote20()
-    {
-      Menu.SetChecked(MenuSamsungNote20, Current == GameViewResolution.ResolutionSamsungNote20);
-      return true;
-    }
+    private static bool ValidateSamsungNote20() { UpdateChecks(); return true; }
 
     [MenuItem(MenuSamsungZFold2)]
-    private static void SetSamsungZFold2() => Select(GameViewResolution.ResolutionSamsungZFold2);
+    private static void SetSamsungZFold2() => Select(11);
 
     [MenuItem(MenuSamsungZFold2, true)]
-    private static bool ValidateSamsungZFold2()
-    {
-      Menu.SetChecked(MenuSamsungZFold2, Current == GameViewResolution.ResolutionSamsungZFold2);
-      return true;
-    }
+    private static bool ValidateSamsungZFold2() { UpdateChecks(); return true; }
 
     [MenuItem(MenuPixel5)]
-    private static void SetPixel5() => Select(GameViewResolution.ResolutionPixel5);
+    private static void SetPixel5() => Select(12);
 
     [MenuItem(MenuPixel5, true)]
-    private static bool ValidatePixel5()
-    {
-      Menu.SetChecked(MenuPixel5, Current == GameViewResolution.ResolutionPixel5);
-      return true;
-    }
+    private static bool ValidatePixel5() { UpdateChecks(); return true; }
   }
 }
 #endif
