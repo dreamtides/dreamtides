@@ -90,11 +90,14 @@ abu worktree activate alpha --dry-run             # preview
 
 # List worktrees
 abu worktree list
+
+# Reset all worktrees to latest master (pull + reset --hard + sync)
+abu reset-worktrees
 ```
 
 The justfile provides shorthand aliases: `just worktree-create`,
 `just worktree-remove`, `just worktree-refresh`, `just worktree-activate`,
-`just worktree-list`. These all delegate to `abu worktree`.
+`just worktree-list`, `just reset-worktrees`. These all delegate to `abu`.
 
 **Activate vs Remove+Create:** `abu worktree activate` is much faster than
 removing and recreating a worktree. It uses `git reset --hard` instead of full

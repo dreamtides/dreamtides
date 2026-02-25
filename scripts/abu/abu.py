@@ -1629,6 +1629,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="List all available card names and exit",
     )
 
+    # reset-worktrees
+    subparsers.add_parser(
+        "reset-worktrees", help="Pull latest master and reset all worktrees to it"
+    )
+
     # worktree
     worktree_mod.register_subcommands(subparsers)
 
@@ -1651,6 +1656,10 @@ def main() -> None:
 
     if command == "create-save":
         do_create_save(args)
+        return
+
+    if command == "reset-worktrees":
+        worktree_mod.cmd_reset_worktrees(args)
         return
 
     if command == "worktree":

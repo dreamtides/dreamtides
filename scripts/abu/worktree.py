@@ -1047,6 +1047,60 @@ def cmd_reset(args: argparse.Namespace) -> None:
     print("\nDone! All worktrees removed and ports cleared.")
 
 
+def cmd_reset_worktrees(args: argparse.Namespace) -> None:
+    """Reset all worktrees to latest master and sync gitignored items."""
+    worktree_paths: list[Path] = list_worktree_paths()
+
+    if not worktree_paths:
+        print(f"No worktrees found under {DEFAULT_WORKTREE_BASE}")
+        return
+
+    # Check main repo is clean
+    result = run_cmd(
+        ["git", "status", "--porcelain"],
+        capture=True,
+        cwd=REPO_ROOT,
+    )
+    if result.stdout.strip():
+        print("Error: Main repo has uncommitted changes. Commit or stash first.")
+        sys.exit(1)
+
+    main_repo: Path = find_main_repo().resolve()
+
+    # Pull latest master
+    print("Pulling latest master...")
+    run_cmd(["git", "pull", "--ff-only"], cwd=main_repo)
+
+    print(f"\nResetting {len(worktree_paths)} worktree(s) to master:\n")
+
+    for worktree_path in worktree_paths:
+        slot_name: str = worktree_path.name
+        branch: str | None = _worktree_branch(worktree_path)
+        print(f"--- {slot_name}" + (f" (branch: {branch})" if branch else "") + " ---")
+
+        # Reset tracked files to master
+        print("  Resetting to master...")
+        result = run_cmd(
+            ["git", "reset", "--hard", "master"],
+            check=False,
+            cwd=worktree_path,
+        )
+        if result.returncode != 0:
+            print(f"  Error: git reset --hard master failed for {slot_name}, skipping")
+            continue
+        run_cmd(["git", "clean", "-fd"], cwd=worktree_path)
+
+        # Sync gitignored items
+        _sync_gitignored(worktree_path, main_repo)
+
+        # Ensure port is allocated
+        port: int = allocate_port(slot_name)
+        print(f"  Port: {port}\n")
+
+    print(f"Done! All worktrees reset to master.")
+    print(f"  Free disk: {get_free_gb(main_repo):.1f}GB")
+
+
 def cmd_list(args: argparse.Namespace) -> None:
     """List worktrees under the default base directory."""
     result = run_cmd(

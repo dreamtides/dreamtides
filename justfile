@@ -21,7 +21,7 @@ review:
 
 review-direct: check-snapshots check-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test python-test pyre-check local-unity-test parser-test tv-check tv-clippy tv-test
 
-review-verbose: check-snapshots check-format-verbose check-docs-format-verbose check-token-limits-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose review-core-test-verbose python-test-verbose pyre-check-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
+review-verbose: check-snapshots check-format-verbose check-docs-format-verbose check-token-limits-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose local-unity-test review-core-test-verbose python-test-verbose pyre-check-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
 
 review-scope-plan:
     python3 scripts/review/review_scope.py plan
@@ -839,3 +839,6 @@ worktree-list:
 
 worktree-reset:
     python3 scripts/abu/abu.py worktree reset
+
+reset-worktrees:
+    python3 scripts/abu/abu.py reset-worktrees
