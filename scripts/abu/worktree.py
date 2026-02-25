@@ -957,6 +957,7 @@ def _claim_create(worktree_path: Path, slot: str, branch: str, base: str) -> Non
     worktree_path.parent.mkdir(parents=True, exist_ok=True)
     result = run_cmd(
         ["git", "worktree", "add", "-b", branch, str(worktree_path), base],
+        capture=True,
         check=False,
         cwd=REPO_ROOT,
     )
