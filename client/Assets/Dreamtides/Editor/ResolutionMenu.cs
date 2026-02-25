@@ -86,21 +86,27 @@ namespace Dreamtides.Editors
       }
     }
 
+    private const BindingFlags AllInstance =
+      BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+
+    private const BindingFlags AllStatic =
+      BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy;
+
     private static void ApplyResolution(int width, int height)
     {
       try
       {
-        var gameViewSizesType = typeof(Editor).Assembly.GetType("UnityEditor.GameViewSizes");
-        var singletonProperty =
-          gameViewSizesType!.GetProperty("instance", BindingFlags.Public | BindingFlags.Static);
+        var assembly = typeof(Editor).Assembly;
+        var gameViewSizesType = assembly.GetType("UnityEditor.GameViewSizes");
+        var singletonProperty = gameViewSizesType!.GetProperty("instance", AllStatic);
         var gameViewSizesInstance = singletonProperty!.GetValue(null);
 
         var currentGroupType = GetCurrentGroupType(gameViewSizesType!, gameViewSizesInstance!);
         var group = GetGroup(gameViewSizesType!, gameViewSizesInstance!, currentGroupType);
 
-        var index = FindOrAddCustomSize(group, width, height);
+        var index = FindOrAddCustomSize(assembly, group, width, height);
 
-        SetGameViewSize(index);
+        SetGameViewSize(assembly, index);
       }
       catch (Exception e)
       {
@@ -110,32 +116,26 @@ namespace Dreamtides.Editors
 
     private static object GetCurrentGroupType(Type gameViewSizesType, object instance)
     {
-      var prop = gameViewSizesType.GetProperty(
-        "currentGroupType",
-        BindingFlags.Public | BindingFlags.Instance
-      );
+      var prop = gameViewSizesType.GetProperty("currentGroupType", AllInstance);
       return prop!.GetValue(instance)!;
     }
 
     private static object GetGroup(Type gameViewSizesType, object instance, object groupType)
     {
-      var method = gameViewSizesType.GetMethod(
-        "GetGroup",
-        BindingFlags.Public | BindingFlags.Instance
-      );
+      var method = gameViewSizesType.GetMethod("GetGroup", AllInstance);
       return method!.Invoke(instance, new[] { groupType })!;
     }
 
-    private static int FindOrAddCustomSize(object group, int width, int height)
+    private static int FindOrAddCustomSize(Assembly assembly, object group, int width, int height)
     {
       var groupType = group.GetType();
       var getTotalCount = groupType.GetMethod("GetTotalCount")!;
       var getGameViewSize = groupType.GetMethod("GetGameViewSize")!;
       var totalCount = (int)getTotalCount.Invoke(group, null)!;
 
-      var gameViewSizeType = typeof(Editor).Assembly.GetType("UnityEditor.GameViewSize");
-      var widthProp = gameViewSizeType!.GetProperty("width", BindingFlags.Public | BindingFlags.Instance)!;
-      var heightProp = gameViewSizeType.GetProperty("height", BindingFlags.Public | BindingFlags.Instance)!;
+      var gameViewSizeType = assembly.GetType("UnityEditor.GameViewSize");
+      var widthProp = gameViewSizeType!.GetProperty("width", AllInstance)!;
+      var heightProp = gameViewSizeType.GetProperty("height", AllInstance)!;
 
       for (var i = 0; i < totalCount; i++)
       {
@@ -148,7 +148,7 @@ namespace Dreamtides.Editors
         }
       }
 
-      var sizeTypeEnum = typeof(Editor).Assembly.GetType("UnityEditor.GameViewSizeType")!;
+      var sizeTypeEnum = assembly.GetType("UnityEditor.GameViewSizeType")!;
       var fixedResolution = Enum.Parse(sizeTypeEnum, "FixedResolution");
       var ctor = gameViewSizeType.GetConstructor(
         new[] { sizeTypeEnum, typeof(int), typeof(int), typeof(string) }
@@ -162,21 +162,13 @@ namespace Dreamtides.Editors
       return totalCount - 1;
     }
 
-    private static void SetGameViewSize(int index)
+    private static void SetGameViewSize(Assembly assembly, int index)
     {
-      var gameViewType = typeof(Editor).Assembly.GetType("UnityEditor.GameView")!;
-      var getWindow = typeof(EditorWindow).GetMethod(
-        "GetWindow",
-        BindingFlags.Public | BindingFlags.Static,
-        null,
-        new[] { typeof(Type), typeof(bool) },
-        null
-      )!;
-      var gameView = getWindow.Invoke(null, new object[] { gameViewType, false }) as EditorWindow;
+      var gameViewType = assembly.GetType("UnityEditor.GameView")!;
+      var gameView = EditorWindow.GetWindow(gameViewType, false);
       if (gameView == null) return;
 
-      var selectedSizeIndex =
-        gameViewType.GetProperty("selectedSizeIndex", BindingFlags.Public | BindingFlags.Instance)!;
+      var selectedSizeIndex = gameViewType.GetProperty("selectedSizeIndex", AllInstance)!;
       selectedSizeIndex.SetValue(gameView, index);
     }
 

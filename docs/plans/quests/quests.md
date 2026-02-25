@@ -192,11 +192,12 @@ Icon: "Sparkles"
 At a dreamsign draft site, the user is presented with around three dreamsigns
 and is able to select one to gain. It is again possible to select no dreamsign.
 
-**UI:** The three dreamsigns animate in at full size from the bottom of the screen in a
-stagged animation, positioning themselves in a single row. Purple accept buttons
-are shown below each one. A red close button is shown top left, functioning in a
-similar way to the Shop close button. Accepting a dreamsign animates it to the
-user's dreamsign display area in the bottom right of the screen.
+**UI:** The three dreamsigns animate in at full size from the bottom of the
+screen in a stagged animation, positioning themselves in a single row. Purple
+accept buttons are shown below each one. A red close button is shown top left,
+functioning in a similar way to the Shop close button. Accepting a dreamsign
+animates it to the user's dreamsign display area in the bottom right of the
+screen.
 
 Icon: "Sparkles Alt"
 
@@ -208,7 +209,8 @@ circular cards with unique art. Each card has a description, although the amount
 of information revealed about the effects is variable, and some dream journeys
 have highly random effects which are not disclosed in advance. This is where we
 put the biggest random effects which can structurally change a quest or modify
-the user's entire deck. Dream journeys cannot be rejected.
+the user's entire deck. A close button is displayed in a similar manner to the
+shop screen allowing the user to reject the dream journey options.
 
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
 with some dialog when the camera arrives at this site. The journey cards animate
@@ -220,7 +222,9 @@ small size and vanish. The accepted journey card animates up to appear in screen
 center, then plays a dissolve animation. The effects of the journey are shown
 via a custom animation (e.g. cards might fade in and then be animated to the
 user's quest deck if the journey effect is "add 3 cards to your deck"). Once the
-effect animation completes, the camera pulls back to the map screen.
+effect animation completes, the camera pulls back to the map screen. A dream
+journey is a circular card image which displays its rules text on hover/long
+press.
 
 Icon: "Moon + Star"
 
@@ -231,10 +235,21 @@ options with positive effects, in a simliar manner to the dream journey site.
 This time, however, each dream journey is also associated with a 'cost' card
 with its own card and description, showing some price to be paid to unlock the
 journey effect. The user may select a option to pay its cost and receive the
-benefit.
+benefit. A close button is displayed in a similar manner to the shop screen
+allowing the user to reject the dream journey options.
 
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
-with some dialog when the camera arrives at this site.
+with some dialog when the camera arrives at this site. The journey/cost card
+pairs animation out from the center of the NPC's chest at a small scale in a
+staggered animation (identcial to a Dream Journey). The cards are displayed in
+two rows, with the journey card on the left side of the row and the cost card on
+the right side of the row, and with a purple button displayed under each pair to
+select that option. Picking an option performs the same resolution animation as
+above, with the journey card first animating to a large size in the center of
+the screen, dissolving, and playing a custom effect animation, then the cost
+card animmating to screen center and playing its custom animation. Journey and
+Cost cards will often have associated sound effects and particle effects for
+their abilities.
 
 Icon: "Law"
 
