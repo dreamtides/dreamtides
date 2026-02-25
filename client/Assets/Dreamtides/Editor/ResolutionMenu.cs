@@ -2,8 +2,6 @@
 
 #nullable enable
 
-using System;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -29,21 +27,21 @@ namespace Dreamtides.Editors
     private const string MenuSamsungZFold2 = MenuRoot + "Samsung Z Fold 2 (960x2658)";
     private const string MenuPixel5 = MenuRoot + "Pixel 5 (1080x2340)";
 
-    private static readonly (string menu, int width, int height, int id)[] Resolutions =
+    private static readonly (string menu, int width, int height, bool mobile, int id)[] Resolutions =
     {
-      (Menu16x9, 1920, 1080, 0),
-      (Menu16x10, 2560, 1600, 1),
-      (Menu21x9, 3440, 1440, 2),
-      (Menu3x2, 1470, 956, 3),
-      (Menu5x4, 1280, 1024, 4),
-      (Menu32x9, 5120, 1440, 5),
-      (MenuIPhone12, 1170, 2532, 6),
-      (MenuIPhoneSE, 750, 1334, 7),
-      (MenuIPadPro12, 2048, 2732, 8),
-      (MenuIPodTouch6, 640, 1136, 9),
-      (MenuSamsungNote20, 1440, 3088, 10),
-      (MenuSamsungZFold2, 960, 2658, 11),
-      (MenuPixel5, 1080, 2340, 12),
+      (Menu16x9, 1920, 1080, false, 0),
+      (Menu16x10, 2560, 1600, false, 1),
+      (Menu21x9, 3440, 1440, false, 2),
+      (Menu3x2, 1470, 956, false, 3),
+      (Menu5x4, 1280, 1024, false, 4),
+      (Menu32x9, 5120, 1440, false, 5),
+      (MenuIPhone12, 1170, 2532, true, 6),
+      (MenuIPhoneSE, 750, 1334, true, 7),
+      (MenuIPadPro12, 2048, 2732, true, 8),
+      (MenuIPodTouch6, 640, 1136, true, 9),
+      (MenuSamsungNote20, 1440, 3088, true, 10),
+      (MenuSamsungZFold2, 960, 2658, true, 11),
+      (MenuPixel5, 1080, 2340, true, 12),
     };
 
     static ResolutionMenu()
@@ -75,107 +73,30 @@ namespace Dreamtides.Editors
 
     private static void ApplyCurrentResolution()
     {
-      var current = CurrentId;
-      foreach (var (_, width, height, id) in Resolutions)
+      foreach (var (menu, width, height, mobile, id) in Resolutions)
       {
-        if (id == current)
+        if (id == CurrentId)
         {
-          ApplyResolution(width, height);
+          ApplyResolution(menu, width, height, mobile);
           return;
         }
       }
     }
 
-    private const BindingFlags AllInstance =
-      BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-
-    private const BindingFlags AllStatic =
-      BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy;
-
-    private static void ApplyResolution(int width, int height)
+    private static void ApplyResolution(string name, int width, int height, bool mobile)
     {
-      try
-      {
-        var assembly = typeof(Editor).Assembly;
-        var gameViewSizesType = assembly.GetType("UnityEditor.GameViewSizes");
-        var singletonProperty = gameViewSizesType!.GetProperty("instance", AllStatic);
-        var gameViewSizesInstance = singletonProperty!.GetValue(null);
-
-        var currentGroupType = GetCurrentGroupType(gameViewSizesType!, gameViewSizesInstance!);
-        var group = GetGroup(gameViewSizesType!, gameViewSizesInstance!, currentGroupType);
-
-        var index = FindOrAddCustomSize(assembly, group, width, height);
-
-        SetGameViewSize(assembly, index);
-      }
-      catch (Exception e)
-      {
-        Debug.LogError($"Failed to apply resolution {width}x{height}: {e}");
-      }
-    }
-
-    private static object GetCurrentGroupType(Type gameViewSizesType, object instance)
-    {
-      var prop = gameViewSizesType.GetProperty("currentGroupType", AllInstance);
-      return prop!.GetValue(instance)!;
-    }
-
-    private static object GetGroup(Type gameViewSizesType, object instance, object groupType)
-    {
-      var method = gameViewSizesType.GetMethod("GetGroup", AllInstance);
-      return method!.Invoke(instance, new[] { groupType })!;
-    }
-
-    private static int FindOrAddCustomSize(Assembly assembly, object group, int width, int height)
-    {
-      var groupType = group.GetType();
-      var getTotalCount = groupType.GetMethod("GetTotalCount")!;
-      var getGameViewSize = groupType.GetMethod("GetGameViewSize")!;
-      var totalCount = (int)getTotalCount.Invoke(group, null)!;
-
-      var gameViewSizeType = assembly.GetType("UnityEditor.GameViewSize");
-      var widthProp = gameViewSizeType!.GetProperty("width", AllInstance)!;
-      var heightProp = gameViewSizeType.GetProperty("height", AllInstance)!;
-
-      for (var i = 0; i < totalCount; i++)
-      {
-        var size = getGameViewSize.Invoke(group, new object[] { i })!;
-        var w = (int)widthProp.GetValue(size)!;
-        var h = (int)heightProp.GetValue(size)!;
-        if (w == width && h == height)
-        {
-          return i;
-        }
-      }
-
-      var sizeTypeEnum = assembly.GetType("UnityEditor.GameViewSizeType")!;
-      var fixedResolution = Enum.Parse(sizeTypeEnum, "FixedResolution");
-      var ctor = gameViewSizeType.GetConstructor(
-        new[] { sizeTypeEnum, typeof(int), typeof(int), typeof(string) }
-      )!;
-      var newSize = ctor.Invoke(new object[] { fixedResolution, width, height, $"{width}x{height}" });
-
-      var addCustomSize = groupType.GetMethod("AddCustomSize")!;
-      addCustomSize.Invoke(group, new[] { newSize });
-
-      totalCount = (int)getTotalCount.Invoke(group, null)!;
-      return totalCount - 1;
-    }
-
-    private static void SetGameViewSize(Assembly assembly, int index)
-    {
-      var gameViewType = assembly.GetType("UnityEditor.GameView")!;
-      var gameView = EditorWindow.GetWindow(gameViewType, false);
-      if (gameView == null) return;
-
-      var selectedSizeIndex = gameViewType.GetProperty("selectedSizeIndex", AllInstance)!;
-      selectedSizeIndex.SetValue(gameView, index);
+      PlayModeWindow.SetViewType(
+        mobile
+          ? PlayModeWindow.PlayModeViewTypes.SimulatorView
+          : PlayModeWindow.PlayModeViewTypes.GameView
+      );
+      PlayModeWindow.SetCustomRenderingResolution((uint)width, (uint)height, name);
     }
 
     private static void UpdateChecks()
     {
       var current = CurrentId;
-      foreach (var (menu, _, _, id) in Resolutions)
+      foreach (var (menu, _, _, _, id) in Resolutions)
       {
         Menu.SetChecked(menu, id == current);
       }
