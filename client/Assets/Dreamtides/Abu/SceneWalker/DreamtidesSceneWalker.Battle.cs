@@ -181,7 +181,12 @@ namespace Dreamtides.Abu
       TryAddCanvasButton(group, refRegistry, doc.UndoButton, "Undo");
       TryAddCanvasButton(group, refRegistry, doc.DevButton, "Dev");
       TryAddCanvasButton(group, refRegistry, doc.BugButton, "Bug Report");
-      TryAddCloseButton(group, refRegistry, _registry.BattleLayout.CloseBrowserButton, "Close Browser");
+      TryAddCloseButton(
+        group,
+        refRegistry,
+        _registry.BattleLayout.CloseBrowserButton,
+        "Close Browser"
+      );
 
       return group;
     }
@@ -216,7 +221,12 @@ namespace Dreamtides.Abu
       AddBrowserButton(group, browserButtons, voidType, "Void", refRegistry);
 
       // Battlefield
-      var battlefieldGroup = WalkCardsGroup("Battlefield", "Battlefield", battlefield.Objects, refRegistry);
+      var battlefieldGroup = WalkCardsGroup(
+        "Battlefield",
+        "Battlefield",
+        battlefield.Objects,
+        refRegistry
+      );
       if (battlefieldGroup != null)
       {
         group.Children.Add(battlefieldGroup);
@@ -227,7 +237,12 @@ namespace Dreamtides.Abu
       // Hand
       if (isUser)
       {
-        var handGroup = WalkCardsGroup(BuildUserHandLabel(handCounts), "Hand", handObjects, refRegistry);
+        var handGroup = WalkCardsGroup(
+          BuildUserHandLabel(handCounts),
+          "Hand",
+          handObjects,
+          refRegistry
+        );
         if (handGroup != null)
         {
           group.Children.Add(handGroup);
@@ -330,9 +345,10 @@ namespace Dreamtides.Abu
         if (characterCount > 0 && int.TryParse(sparkText, out var totalSpark))
         {
           var bonus = totalSpark - characterSpark;
-          sparkLabel = bonus != 0
-            ? $"Spark: {sparkText} ({characterSpark} from {characterCount} characters + {bonus} bonus)"
-            : $"Spark: {sparkText} (from {characterCount} characters)";
+          sparkLabel =
+            bonus != 0
+              ? $"Spark: {sparkText} ({characterSpark} from {characterCount} characters + {bonus} bonus)"
+              : $"Spark: {sparkText} (from {characterCount} characters)";
         }
 
         group.Children.Add(CreateLabelNode(sparkLabel));

@@ -37,8 +37,10 @@ namespace Dreamtides.Editors
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         var worktreeBase = Path.Combine(home, "dreamtides-worktrees");
 
-        if (!repoRoot.StartsWith(worktreeBase + Path.DirectorySeparatorChar) &&
-            !repoRoot.StartsWith(worktreeBase + "/"))
+        if (
+          !repoRoot.StartsWith(worktreeBase + Path.DirectorySeparatorChar)
+          && !repoRoot.StartsWith(worktreeBase + "/")
+        )
         {
           return null;
         }

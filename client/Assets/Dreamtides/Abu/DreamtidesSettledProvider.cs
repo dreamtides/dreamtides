@@ -99,7 +99,9 @@ namespace Dreamtides.Abu
 
     bool IsLocalSettled()
     {
-      return !_actionService.IsProcessingCommands && _animationsComplete() && !BusyToken.IsAnyActive;
+      return !_actionService.IsProcessingCommands
+        && _animationsComplete()
+        && !BusyToken.IsAnyActive;
     }
 
     bool IsWaitingForFinalResponse()

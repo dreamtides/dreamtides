@@ -523,7 +523,7 @@ insta:
 
 # Reformats code. Requires nightly because several useful options (e.g. imports_granularity) are
 # nightly-only
-fmt: style-validator-fix rlf-fmt fmt-docs
+fmt: style-validator-fix rlf-fmt fmt-docs fmt-csharp
     #!/usr/bin/env bash
     python3 scripts/llms/llm_symlinks.py > /dev/null
     output=$(cd rules_engine && cargo +nightly fmt 2>&1)

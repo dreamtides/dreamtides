@@ -40,7 +40,11 @@ namespace Dreamtides.Abu
         AddQuestDeckSummary(region, layout, refRegistry);
 
         // 5. Identity card
-        var identityGroup = WalkQuestCardGroup("Identity", PositionEnum.QuestUserIdentityCard, refRegistry);
+        var identityGroup = WalkQuestCardGroup(
+          "Identity",
+          PositionEnum.QuestUserIdentityCard,
+          refRegistry
+        );
         if (identityGroup != null)
         {
           region.Children.Add(identityGroup);
@@ -54,7 +58,11 @@ namespace Dreamtides.Abu
         }
 
         // 7. Draft picks
-        var draftGroup = WalkQuestCardGroup("Draft Picks", PositionEnum.DraftPickDisplay, refRegistry);
+        var draftGroup = WalkQuestCardGroup(
+          "Draft Picks",
+          PositionEnum.DraftPickDisplay,
+          refRegistry
+        );
         if (draftGroup != null)
         {
           region.Children.Add(draftGroup);
@@ -82,14 +90,22 @@ namespace Dreamtides.Abu
         }
 
         // 11. Journey choices
-        var journeyGroup = WalkQuestCardGroup("Journey Choices", PositionEnum.JourneyDisplay, refRegistry);
+        var journeyGroup = WalkQuestCardGroup(
+          "Journey Choices",
+          PositionEnum.JourneyDisplay,
+          refRegistry
+        );
         if (journeyGroup != null)
         {
           region.Children.Add(journeyGroup);
         }
 
         // 12. Quest deck browser
-        var browserGroup = WalkQuestCardGroup("Quest Deck Browser", PositionEnum.QuestDeckBrowser, refRegistry);
+        var browserGroup = WalkQuestCardGroup(
+          "Quest Deck Browser",
+          PositionEnum.QuestDeckBrowser,
+          refRegistry
+        );
         if (browserGroup != null)
         {
           region.Children.Add(browserGroup);
@@ -141,7 +157,12 @@ namespace Dreamtides.Abu
 
     // ── Close button helper (shared) ─────────────────────────────────
 
-    void TryAddCloseButton(AbuSceneNode parent, RefRegistry refRegistry, CloseBrowserButton? button, string label)
+    void TryAddCloseButton(
+      AbuSceneNode parent,
+      RefRegistry refRegistry,
+      CloseBrowserButton? button,
+      string label
+    )
     {
       if (button == null || !button.gameObject.activeSelf)
       {
@@ -324,8 +345,17 @@ namespace Dreamtides.Abu
       // Walk the "Start Battle" button
       if (startLayout._buttonInstance != null && startLayout._buttonInstance.gameObject.activeSelf)
       {
-        var label = ToSingleLineText(startLayout._buttonInstance._text.text, fallback: "Start Battle");
-        AddInteractiveNode(group, refRegistry, "button", label, BuildDisplayableCallbacks(startLayout._buttonInstance));
+        var label = ToSingleLineText(
+          startLayout._buttonInstance._text.text,
+          fallback: "Start Battle"
+        );
+        AddInteractiveNode(
+          group,
+          refRegistry,
+          "button",
+          label,
+          BuildDisplayableCallbacks(startLayout._buttonInstance)
+        );
       }
 
       return group.Children.Count > 0 ? group : null;
@@ -366,9 +396,10 @@ namespace Dreamtides.Abu
         if (buttonAttachment != null && buttonAttachment.gameObject.activeSelf)
         {
           var buttonLabel = ToSingleLineText(buttonAttachment._text.text, fallback: "Buy");
-          var cardName = card.CardView.Revealed != null
-            ? ToSingleLineText(card.CardView.Revealed.Name, fallback: "card")
-            : "card";
+          var cardName =
+            card.CardView.Revealed != null
+              ? ToSingleLineText(card.CardView.Revealed.Name, fallback: "card")
+              : "card";
           AddInteractiveNode(
             group,
             refRegistry,

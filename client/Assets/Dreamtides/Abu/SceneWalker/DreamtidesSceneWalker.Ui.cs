@@ -108,7 +108,9 @@ namespace Dreamtides.Abu
 
     VisualElement? GetRootVisualElement()
     {
-      return _registry.DocumentService._document != null ? _registry.DocumentService.RootVisualElement : null;
+      return _registry.DocumentService._document != null
+        ? _registry.DocumentService.RootVisualElement
+        : null;
     }
 
     static string DetermineRole(VisualElement element)
@@ -181,7 +183,13 @@ namespace Dreamtides.Abu
         }
 
         var label = DetermineDisplayableLabel(displayable);
-        AddInteractiveNode(parent, refRegistry, "button", label, BuildDisplayableCallbacks(displayable));
+        AddInteractiveNode(
+          parent,
+          refRegistry,
+          "button",
+          label,
+          BuildDisplayableCallbacks(displayable)
+        );
       }
     }
 
@@ -194,7 +202,10 @@ namespace Dreamtides.Abu
         case ActionButton actionButton:
           return ToSingleLineText(actionButton._text.text, fallback: displayable.gameObject.name);
         case DisplayableButton displayableButton:
-          return ToSingleLineText(displayableButton._text.text, fallback: displayable.gameObject.name);
+          return ToSingleLineText(
+            displayableButton._text.text,
+            fallback: displayable.gameObject.name
+          );
         case CardBrowserButton:
           return ToSingleLineText(displayable.gameObject.name);
         default:

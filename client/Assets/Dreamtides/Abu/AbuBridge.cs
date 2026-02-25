@@ -92,8 +92,10 @@ namespace Abu
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         var worktreeBase = Path.Combine(home, "dreamtides-worktrees");
 
-        if (!repoRoot.StartsWith(worktreeBase + Path.DirectorySeparatorChar) &&
-            !repoRoot.StartsWith(worktreeBase + "/"))
+        if (
+          !repoRoot.StartsWith(worktreeBase + Path.DirectorySeparatorChar)
+          && !repoRoot.StartsWith(worktreeBase + "/")
+        )
         {
           return DefaultPort;
         }
@@ -106,7 +108,9 @@ namespace Abu
         var portsFile = Path.Combine(worktreeBase, ".ports.json");
         if (!File.Exists(portsFile))
         {
-          Debug.LogWarning($"[Abu] Worktree '{worktreeName}' detected but {portsFile} not found, using default port");
+          Debug.LogWarning(
+            $"[Abu] Worktree '{worktreeName}' detected but {portsFile} not found, using default port"
+          );
           return DefaultPort;
         }
 
@@ -117,7 +121,9 @@ namespace Abu
         var keyIndex = json.IndexOf(searchKey, StringComparison.Ordinal);
         if (keyIndex < 0)
         {
-          Debug.LogWarning($"[Abu] Worktree '{worktreeName}' not found in {portsFile}, using default port");
+          Debug.LogWarning(
+            $"[Abu] Worktree '{worktreeName}' not found in {portsFile}, using default port"
+          );
           return DefaultPort;
         }
 
