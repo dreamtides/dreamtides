@@ -10,6 +10,19 @@ battles will require an equivalent for quests.
 
 This document is the high level "vision" for quests, other documents in this
 directory provide more detailed gameplay & technical breakdowns of the feature.
+The document at [battle_rules](../../battle_rules/battle_rules.md) provides more
+information about the actual rules of the game.
+
+## The Golden Rule: Configuration via TOML
+
+The rest of this document goes into detail about specific game systems. To the
+maximum extent possible, though, Dreamtides gameplay is intended to be
+completely configurable via TOML file changes. If a section in the plan says
+"shops contain 6 items", this is implied to be configured in TOML. Whenever
+reasonable, we should even allow more complex algorithmic changes via data
+(dreamscape generation, draft pool rules, battle rewards, etc). When
+implementing any rules engine feature, we should ask the question "could we make
+this configurable?"
 
 ## Overview
 
@@ -26,27 +39,19 @@ deck and one or more "dreamsigns":
   minor ongoing effects. Generally we try to assign the splashy "build around"
   effects to dreamcallers and secondary effects to dreamsigns.
 
-Quests display a 3D scene called a "dreamscape" from a top-down perspective. A
-series of individual white icons with black circular backgounds are shown on the
-scene called "sites". Each site icon corresponds to some specific quest effect,
-and users can "visit" a site to activate the effect by clicking on the icon.
-This causes the camera to zoom in on that site and then displays the site's
-effect, often with a 3D animated NPC character introducing the site's concept.
-Once all of the sites in a given dreamscape have been visited, the user may
-navigate to the "battle" site to initiate a card battle. After completing a
+Quests display a top-level 3D screen called the [Dream Atlas](#dream-atlas) with
+a series of "dreamscapes" the user can navigate to. Each dreamscape is
+associated with "sites", specific rewards available in that dreamscape.
+
+Dreamscapes show a group of individual white icons with black circular
+backgounds for their sites. Each site icon corresponds to some specific quest
+effect, and users can "visit" a site to activate the effect by clicking on the
+icon. This causes the camera to zoom in on that site and then displays the
+site's effect, often with a 3D animated NPC character introducing the site's
+concept. Once all of the sites in a given dreamscape have been visited, the user
+may navigate to the "battle" site to initiate a card battle. After completing a
 battle, the user is able to select another dreamscape to navigate to, and the
 process repeats.
-
-## The Golden Rule: Configuration via TOML
-
-The rest of this document goes into detail about specific game systems. To the
-maximum extent possible, though, Dreamtides gameplay is intended to be
-completely configurable via TOML file changes. If a section in the plan says
-"shops contain 6 items", this is implied to be configured in TOML. Whenever
-reasonable, we should even allow more complex algorithmic changes via data
-(dreamscape generation, draft pool rules, battle rewards, etc). When
-implementing any rules engine feature, we should ask the question "could we make
-this configurable?"
 
 ## Current Quest Prototype
 
@@ -80,8 +85,8 @@ and cannot be returned to. Dreamscapes always contain a battle site and will
 contain around 3-6 other sites as described below in the
 [Dreamscape Generation](#dreamscape-generation) section.
 
-Many sites have an "enchanced" version with a stronger version of their ability
-which can appear as described in the dreamscape generation rules.
+Many sites have an "enhanced" version with a stronger version of their ability
+which can appear as described in [Enhanced Sited](#enhanced-sites) below.
 
 ### Battle
 
@@ -98,12 +103,20 @@ Site Icon: "Sword"
 ### Draft
 
 The Draft site is the other core component of Dreamtides gameplay, allowing
-users to add cards to their deck. A draft site will display sequences of cards
-to select from, typically 4, and the user must pick a card to add to their deck.
-A draft site will typically offer a sequence of draft picks, so for example a
-user might end up drafting 5 cards to add to their deck over 5 draft picks, out
-of a pool of 20 possible choices. There is no way to "skip" or "reroll" draft
-picks by default, but of course all rules can be broken by specific dreamsigns.
+users to add cards to their deck. A draft site will display groups of cards to
+select from, typically 4, and the user must pick a card to add to their deck. A
+draft site will typically offer a repeated sequence of draft picks, so for
+example a user might end up drafting 5 cards to add to their deck over 5 draft
+picks, out of a pool of 20 possible choices. There is no way to "skip" or
+"reroll" draft picks by default, but of course all rules can be broken by
+specific dreamsigns.
+
+**UI:** 4 cards are shown in a row (landscape mode) or in two rows (portrait
+mode). The cards to draft from are shown in a pile in the 3D scene, then 4 of
+then animate in to be selected. Clicking a card animates it to the quest deck,
+and the others animate a away, then 4 more cards from the pile animate in. After
+all drafts are completed, the camera automatically pulls back to the map view.
+Cards are shown with an orange outline.
 
 Icon: "Rectangle Vertical"
 
@@ -117,9 +130,20 @@ the offered dreamcallers and pick one to lead their deck. Dreamcallers affect
 which cards are offered in future Draft sites, refer to the
 [Resonance](#resonance--draft-pick-generation) section below for more details.
 
+Each dreamcaller comes with a different **essence bonus** gained for selecting
+that option, which serves as a lever for balancing more powerful dreamcallers.
+
 There is a certain element of strategy to *when* the user visits this site, and
 it's intended to not be obvious whether it's better to visit other sites before
 selecting a dreamcaller.
+
+**UI:** Dreamcallers are shown in their full-body "card" representation, with
+ability text displayed alongside their 3D models and essence bonuses . The
+dreamcaller cards animate in from a small size in the center of the size. Each
+dreamcaller does a different humanoid animation within its card frame. A primary
+action button appears below each dreamcaller allowing them to be selected. The
+selected dreamcaller animates to the bottom left of the screen to appear in a
+"square" frame (head only). The other cards animate back to a small size.
 
 Icon: "Crown"
 
@@ -136,12 +160,30 @@ Shop base prices are static, defined in TOML. The shop implements a random
 between 30% and 90% cost reduction. Things like dramsigns or journey effects can
 also modify shop prices.
 
+**UI:** An NPC is shown who performs an animation and displays a speech bubble
+with some dialog when the camera arrives at this site. Two rows of three items
+each are displayed, along with a close button. The items are beside the NPC in
+landscape mode and below the NPC in portrait mode. Each item has a purple button
+under it showing the essence cost to purchase that item. Clicking the button for
+a card or dreamsign animates it to the quest deck or dreamsign display in the
+bottom right corner of the screen. The other items do not move on purchase,
+leaving a gap. One of the items shown may be a "reroll" option. When this is
+selected, the animates do a staggered scale-down animation, then the 6 new
+options perform a scale-up animation in-place. Clicking the close button pulls
+the camera back to the map screen but leaves the items where they are, giving
+the impression they are still available.
+
 Icon: "Store"
 
 ### Dreamsign Offering
 
 At a dreamsign offering site, the user is presented with a single dreamsign to
 gain. The offering may be rejected, but there is no reward for doing so.
+
+**UI:** The dreamsign animates to be displayed from screen center at a small
+scale. A purple accept button and a gray reject button are displayed. The
+dreamsign animates to the bottom right dreamsign display if accepted and
+animates back to a small scale if rejected.
 
 Icon: "Sparkles"
 
@@ -150,16 +192,35 @@ Icon: "Sparkles"
 At a dreamsign draft site, the user is presented with around three dreamsigns
 and is able to select one to gain. It is again possible to select no dreamsign.
 
+**UI:** The three dreamsigns animate in at full size from the bottom of the screen in a
+stagged animation, positioning themselves in a single row. Purple accept buttons
+are shown below each one. A red close button is shown top left, functioning in a
+similar way to the Shop close button. Accepting a dreamsign animates it to the
+user's dreamsign display area in the bottom right of the screen.
+
 Icon: "Sparkles Alt"
 
 ### Dream Journey
 
 A dream journey functions in a manner similar to a random event in other
-roguelike deckbuilding games. The player is offered a selection between around
-two cards with unique art. Each card has a description, although the amount of
-information revealed about the effects is variable, and some dream journeys have
-highly random effects. This is where we put the biggest random effects which can
-structurally change a quest or modify the user's entire deck.
+roguelike deckbuilding games. The user is offered a selection between two
+circular cards with unique art. Each card has a description, although the amount
+of information revealed about the effects is variable, and some dream journeys
+have highly random effects which are not disclosed in advance. This is where we
+put the biggest random effects which can structurally change a quest or modify
+the user's entire deck. Dream journeys cannot be rejected.
+
+**UI:** An NPC is shown who performs an animation and displays a speech bubble
+with some dialog when the camera arrives at this site. The journey cards animate
+from the center of the NPC's chest at a small size and are shown side-by-side in
+a similar layout to the shop screen (next to the NPC landscape, below in
+portrait). A purple button is displayed under each journey card to accept it.
+Clicking this button causes the not-selected journey card to animate down to a
+small size and vanish. The accepted journey card animates up to appear in screen
+center, then plays a dissolve animation. The effects of the journey are shown
+via a custom animation (e.g. cards might fade in and then be animated to the
+user's quest deck if the journey effect is "add 3 cards to your deck"). Once the
+effect animation completes, the camera pulls back to the map screen.
 
 Icon: "Moon + Star"
 
@@ -172,56 +233,255 @@ with its own card and description, showing some price to be paid to unlock the
 journey effect. The user may select a option to pay its cost and receive the
 benefit.
 
+**UI:** An NPC is shown who performs an animation and displays a speech bubble
+with some dialog when the camera arrives at this site.
+
 Icon: "Law"
 
 ### Purge
 
-Text
+A purge site allows the user to remove up to 3 cards from their deck, allowing
+them to remove cards that don't fit with their overall gameplan.
+
+**UI:** An NPC is shown who performs an animation and displays a speech bubble
+with some dialog when the camera arrives at this site.
 
 Icon: "Hot"
 
 ### Essence
 
-Text
+An essence site grants the user a fixed amount of essence, around 300.
 
 Icon: "Diamond"
 
 ### Transfiguration
 
-Text
+A transfiguration site shows the user 4 random cards from their deck, and they
+may select one to apply a transfiguration to, modifying that card's rules text.
+If multiple transfigurations are applicable to a card, a random one is selected
+to suggest.
+
+Transfigurations are named after colors, and cause the card name and any
+modified rules text to display in a different color to indicate the
+transfiguration. Possible transfigurations include:
+
+- Viridian Transfiguration: Reduces the energy cost of the card by 50%, rounded
+  to the nearest whole number (4->2, 3->2, 2->1, 1->0, etc). Not available for
+  cards which cost 0.
+- Golden Transfiguration: Improves the effect of the card by increasing or
+  decreasing a number in its rules text by 1. Only available for cards with
+  numbers in their text.
+- Scarlet Transfiguration: Doubles the base spark of a character, or sets it to
+  1 for characters with 0 spark. Only available for characters.
+- Magenta Transfiguration: Increases the frequency of named card triggers,
+  changing:
+  - A "materialized" trigger to also happen when the card dissolves
+  - A "judgment" trigger to also happen when the card is materialized
+  - A "once per turn" trigger to happen any number of times per turn
+- Azure Transfiguration: Appends "draw a card" to the text of an event card.
+  Only available for events.
+- Bronze Transfiguration: Adds "reclaim" to the text of an event card. Only
+  available for events.
+- Rose Transfiguration: Reduces the cost of an activated ability by 1. Only
+  available for cards with activated abilities that cost energy.
+- Prismatic Transfiguration: Adds all of the above transfigurations to a card
+  which are available. Only available for cards which are eligible for 2 or more
+  transfiguraitons.
+
+**UI:** An NPC is shown who performs an animation and displays a speech bubble
+with some dialog when the camera arrives at this site.
 
 Icon: "Science"
 
 ### Duplication
 
-Text
+A duplication site shows the user 4 random cards from their deck along with a
+proposed random number of copies to create for each card between 1 and 4. The
+user may pick one of the proposed options to add that many duplicates of that
+card to their deck.
+
+**UI:** An NPC is shown who performs an animation and displays a speech bubble
+with some dialog when the camera arrives at this site.
 
 Icon: "Copy"
 
-### Reward
+### Reward Site
 
-Text
+A reward site is a special site for granting the user a fixed reward (a specific
+card, dreamsign, or essence quantity). The distiguishing factor of reward sites
+is that these rewards are *known in advance* before selecting a dreamscape to
+activate on the [Dream Atlas](#dream-atlas).
 
 Icon: "Treasure Chest"
 
 ### Discovery
 
-Text
+An NPC offers the user the ability to select one of four cards which have some
+unifying theme. They may be tagged for some specific deck archetype, such as
+warrior enablers, spirit animals, etc. These are generally the main enablers for
+that archetype. Later in the quest, the NPC attempts to match the offering to
+the user's *current* deck, making this a powerful site to find.
+
+**UI:** An NPC is shown who performs an animation and displays a speech bubble
+with some dialog when the camera arrives at this site.
 
 Icon: "Compass"
 
 ### Cleanse
 
-Text
+A Cleanse site allows the user to remove up to 3 Banes from their deck or
+dreamsigns. A bane is a card or dreamsign with some specific negative effect,
+usually received as part of a dream journey or tempting offer screen.
+
+**UI:** An NPC is shown who performs an animation and displays a speech bubble
+with some dialog when the camera arrives at this site.
 
 Icon: "Snowflake"
 
 ## Victory & Defeat
 
+Initially, a Quest ends in defeat if the user loses a battle. As described in
+the [Meta Progression](meta_progression.md) document, the user eventually
+unlocks the ability to continue in a quest after a first loss.
+
+A Quest ends in victory if the user wins 7 consecutive battles. The 4th battle
+they face is against a miniboss, and the 7th battle is against the final boss of
+Dreamtides. Bosses are dreamcallers that have their own unique abilities,
+dreamsigns, or custom cards in their decks.
+
 ### Battle Rewards
+
+Completing a battle always grants an essence reward, which increases as the user
+completes more dreamscapes. The user also gets a "rare draft" event, selecting
+from four powerful cards to add to their deck. This draft pick cannot be
+skipped.
+
+## Limits
+
+Quest decks can contain a maximum of 50 cards during battles. If this limit is
+exceeded, before the battle starts the user gains the ability to purge cards of
+their choice to get back down under 50 cards.
+
+Quest decks must contain a minimum of 25 cards. If the user has not completed
+enough drafts to reach this threshold, additional copies of their deck are added
+during a battle (for example, a player with 9 cards in their deck will end up
+with 27 cards during a battle).
+
+Users can have a maximum of 12 dreamsigns at any time. If they would receive
+another dreamsign, they must immediately purge a dreamsign from their deck.
+
+Users may have only 1 dreamcaller.
 
 ## Resonance & Draft Pick Generation
 
+A critical component of the drafting system in Dreamtides is "card resonance",
+which performs a similar function something like the color pie in Magic: the
+Gathering. Each card, dreamsign, and dreamcaller has zero or more resonance
+symbols associated with it, drawn from:
+
+- Tide
+- Ember
+- Zephyr
+- Stone
+- Ruin
+
+When generating draft picks, the user's *current* deck is evaluated for its
+resonance score, and the selection of draft cards is weighted against that, i.e.
+a deck the contains a lot of Tide and Stone cards will generally see more Tide
+and Stone cards. As more cards with a given resonance are added, the chances of
+seeing other resonances diminishes. Generally the system converges towards decks
+having 2 main resonances after 5-10 draft picks.
+
+Draft picks are drawn from a "pool" of cards generated at the start of a quest.
+This ensures draft picks are drawing without replacement, meaning the odds of
+seeing cards more than once diminshes over time.
+
+When starting a new quest, the draft pool is weighted based on card rarity, with
+more copies of common cards and fewer copies of rare/legendary cards. There is
+also a slight random starting bias in the pool to make the play experience
+variable, there might for example be 20% more tide cards, 10% more ember cards,
+10% less stone cards, and 20% less ruin cards in the pool.
+
+The exact configuration of the draft pool is all data-driven and managed by TOML
+files.
+
+## Dream Atlas
+
+The Dream Atlas is the screen players see at the start of a quest. It shows a
+map of dreamscapes connected by dotted lines.
+
+Each dreamscape can be in one of three states:
+
+- **Completed**: The player has already visited this dreamscape and finished its
+  battle.
+- **Available**: The player can choose this dreamscape as their next
+  destination.
+- **Unavailable**: The player cannot choose this dreamscape yet.
+
+The player begins at the center of the Dream Atlas, called the **Nexus**. At the
+start, any dreamscapes connected to the Nexus are **Available**.
+
+After the player visits a dreamscape and completes its battle, that dreamscape
+becomes **Completed**. Any dreamscapes directly connected to it then also become
+**Available**.
+
+In other words, a dreamscape is **Available** only if it is connected to the
+Nexus or to at least one **Completed** dreamscape.
+
+Each dreamscape displays a preview of what sites are available in that location.
+This shows 2-3 icons sites present, not including "draft" or "battle" sites,
+allowing the user to make an informed decision about which dreamscape to visit
+next. This is also where [Reward Site](#reward-site) rewards are shown. Visiting
+the 7th dreamscape causes the player to win the quest.
+
 ## Dreamscape Generation
 
-## Transfiguration
+Dreamscapes are generated by drawing sites from a pool, in a similar manner to
+how draft picks are generated (although there is no "resonance" equivalent).
+Sites are selected when the dreamscape becomes available, with the exact
+algorithm configured via TOML. The pool for site generation changes over time,
+with new options being shuffled in. Transfiguration, Purge, and Duplication
+sites are more common later in the Quest, for example.
+
+Draft sites are handled differently. Dreamscapes have a deterministic number of
+draft sites based on progression in the Quest and how many previous dreamscapes
+have been visited:
+
+| Dreamscape Number | Draft Sites | | 1, 2 | 2 | | 3, 4 | 1 | | 5, 6, 7 | 0 |
+
+Battle sites are also distinct: every Dreamscape has exactly one Battle site.
+
+### Enhanced Sites
+
+Each dreamscape is associated with a specific "biome" which dictates the 3D
+environment assets used in generation. Each dreamscape biome has an affinity for
+a specific site, and produces an "enhanced site" of that type when visited. The
+available enhanced sites are:
+
+- **Shop**: The reroll option is free
+- **Dreamsign Offering/Dreamsign Draft**: A dreamsign draft is offered instead,
+  or a draft is offered with an additional option
+- **Dream Journey**: A 3rd dream journey option is provided
+- **Tempting Offer**: 3 tempting offer options are displayed
+- **Purge**: 3 additional cards can be removed from the deck
+- **Essence**: The essence amount given is doubled
+- **Transfiguration**: The player may select which card in their deck receives
+  transfiguration
+- **Duplication**: The player may select which card in their deck is duplicated
+- **Discovery**: The player may select any number of the offered cards to add to
+  their deck.
+
+## Implementation Strategy and QA
+
+The overall implementation strategy for the Quests game mode is to rely heavily
+on both *integration testing* and *manual QA*. The integration testing philsophy
+should follow what we use for the battle game mode, writing tests that operate
+against the real QuestView/Commands interface. Philosophically, dreamtides does
+not employ unit testing.
+
+The manual QA strategy here is based on validating all changes against a running
+instance of the Unity editor using the [abu](../../abu/abu.md) tool. *Every*
+change to the Quest game mode should interact with Unity, perform the required
+user interactions, and take screenshots of the new UI to check for display
+issues. Testing *must* be at minimum performed once on a landscape/desktop
+display resolution and once on a mobile/portrait display resolution.
