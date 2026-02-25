@@ -22,8 +22,10 @@ for slot in alpha beta gamma; do
 done
 
 WORKTREE=""
+REVIEW_BRANCH=""
 for i in 1 2 3; do
     if WORKTREE=$(python3 "$REPO_ROOT/scripts/abu/abu.py" worktree claim "code-review-$i" --base "$BASE"); then
+        REVIEW_BRANCH="code-review-$i"
         break
     fi
     WORKTREE=""
@@ -34,12 +36,20 @@ if [ -z "$WORKTREE" ]; then
     exit 1
 fi
 
+# Install cleanup trap immediately after claiming, BEFORE any operations
+# that might fail. This ensures the worktree is always fully released.
+cleanup() {
+    rm -f "$WORKTREE/.review-lock"
+    git -C "$WORKTREE" reset HEAD .review-lock 2>/dev/null || true
+    git -C "$WORKTREE" checkout --detach 2>/dev/null || true
+    git -C "$REPO_ROOT" branch -D "$REVIEW_BRANCH" 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM HUP
+
 # Mark slot as busy so concurrent `claim` won't steal it.
 # Staging a file makes git status show a non-?? line, which
 # causes _is_worktree_available to return False.
 touch "$WORKTREE/.review-lock"
 git -C "$WORKTREE" add -f .review-lock
-cleanup() { git -C "$WORKTREE" reset HEAD .review-lock 2>/dev/null; rm -f "$WORKTREE/.review-lock"; }
-trap cleanup EXIT
 
 cd "$WORKTREE" && just review-verbose || { osascript -e 'display dialog "Review failed" with icon stop' 2>/dev/null; exit 1; }
