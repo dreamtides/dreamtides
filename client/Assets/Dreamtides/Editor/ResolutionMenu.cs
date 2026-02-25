@@ -2,6 +2,8 @@
 
 #nullable enable
 
+using System;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -44,6 +46,9 @@ namespace Dreamtides.Editors
       (MenuPixel5, 1080, 2340, true, 12),
     };
 
+    private const BindingFlags AllInstance =
+      BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+
     static ResolutionMenu()
     {
       EditorApplication.delayCall += UpdateChecks;
@@ -85,12 +90,124 @@ namespace Dreamtides.Editors
 
     private static void ApplyResolution(string name, int width, int height, bool mobile)
     {
-      PlayModeWindow.SetViewType(
-        mobile
-          ? PlayModeWindow.PlayModeViewTypes.SimulatorView
-          : PlayModeWindow.PlayModeViewTypes.GameView
-      );
-      PlayModeWindow.SetCustomRenderingResolution((uint)width, (uint)height, name);
+      if (mobile)
+      {
+        PlayModeWindow.SetViewType(PlayModeWindow.PlayModeViewTypes.SimulatorView);
+        SelectSimulatorDevice(width, height);
+      }
+      else
+      {
+        PlayModeWindow.SetViewType(PlayModeWindow.PlayModeViewTypes.GameView);
+        PlayModeWindow.SetCustomRenderingResolution((uint)width, (uint)height, name);
+      }
+    }
+
+    private static void SelectSimulatorDevice(int width, int height)
+    {
+      try
+      {
+        Type? windowType = null;
+        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+        {
+          windowType = asm.GetType("UnityEditor.DeviceSimulation.SimulatorWindow");
+          if (windowType != null) break;
+        }
+
+        if (windowType == null)
+        {
+          Debug.LogWarning("SimulatorWindow type not found in any loaded assembly");
+          return;
+        }
+
+        var window = EditorWindow.GetWindow(windowType, false);
+        if (window == null) return;
+
+        var mainField = windowType.GetField("m_Main", AllInstance);
+        if (mainField == null)
+        {
+          Debug.LogWarning("m_Main field not found on SimulatorWindow");
+          return;
+        }
+
+        var main = mainField.GetValue(window);
+        if (main == null)
+        {
+          Debug.LogWarning("m_Main is null on SimulatorWindow");
+          return;
+        }
+
+        var mainType = main.GetType();
+        var devicesProp = mainType.GetProperty("devices", AllInstance);
+        var deviceIndexProp = mainType.GetProperty("deviceIndex", AllInstance);
+        if (devicesProp == null || deviceIndexProp == null)
+        {
+          Debug.LogWarning("devices or deviceIndex property not found on DeviceSimulatorMain");
+          return;
+        }
+
+        var devices = devicesProp.GetValue(main) as Array;
+        if (devices == null || devices.Length == 0) return;
+
+        var deviceInfoAssetType = devices.GetType().GetElementType()!;
+        var deviceInfoField = deviceInfoAssetType.GetField("deviceInfo", AllInstance)
+          ?? deviceInfoAssetType.GetProperty("deviceInfo", AllInstance)?.GetMethod?.Invoke(null, null) as FieldInfo;
+
+        for (var i = 0; i < devices.Length; i++)
+        {
+          var device = devices.GetValue(i);
+          if (device == null) continue;
+
+          if (DeviceMatchesResolution(device, deviceInfoAssetType, width, height))
+          {
+            deviceIndexProp.SetValue(main, i);
+            return;
+          }
+        }
+
+        Debug.LogWarning($"No simulator device found matching {width}x{height}");
+      }
+      catch (Exception e)
+      {
+        Debug.LogError($"Failed to select simulator device: {e}");
+      }
+    }
+
+    private static bool DeviceMatchesResolution(object device, Type assetType, int width, int height)
+    {
+      var deviceInfoField = assetType.GetField("deviceInfo", AllInstance);
+      if (deviceInfoField == null) return false;
+
+      var deviceInfo = deviceInfoField.GetValue(device);
+      if (deviceInfo == null) return false;
+
+      var infoType = deviceInfo.GetType();
+      var screensProp = infoType.GetField("screens", AllInstance)
+        ?? (MemberInfo?)infoType.GetProperty("screens", AllInstance);
+
+      object? screens = null;
+      if (screensProp is FieldInfo fi)
+        screens = fi.GetValue(deviceInfo);
+      else if (screensProp is PropertyInfo pi)
+        screens = pi.GetValue(deviceInfo);
+
+      if (screens is not Array screenArray || screenArray.Length == 0) return false;
+
+      var screen = screenArray.GetValue(0);
+      if (screen == null) return false;
+
+      var screenType = screen.GetType();
+      var widthField = screenType.GetField("width", AllInstance)
+        ?? (MemberInfo?)screenType.GetProperty("width", AllInstance);
+      var heightField = screenType.GetField("height", AllInstance)
+        ?? (MemberInfo?)screenType.GetProperty("height", AllInstance);
+
+      int? w = null, h = null;
+      if (widthField is FieldInfo wf) w = (int)wf.GetValue(screen)!;
+      else if (widthField is PropertyInfo wp) w = (int)wp.GetValue(screen)!;
+      if (heightField is FieldInfo hf) h = (int)hf.GetValue(screen)!;
+      else if (heightField is PropertyInfo hp) h = (int)hp.GetValue(screen)!;
+
+      return (w == width && h == height) || (w == height && h == width);
     }
 
     private static void UpdateChecks()
