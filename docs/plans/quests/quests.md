@@ -499,4 +499,8 @@ instance of the Unity editor using the [abu](../../abu/abu.md) tool. *Every*
 change to the Quest game mode should interact with Unity, perform the required
 user interactions, and take screenshots of the new UI to check for display
 issues. Testing *must* be at minimum performed once on a landscape/desktop
-display resolution and once on a mobile/portrait display resolution.
+display resolution and once on a mobile/portrait display resolution. The device
+can be configured before entering play mode via the `abu set-device` command:
+`abu set-device landscape-16x10` or `abu set-device iphone-se`. We should be
+interactively building a high-quality `DreamtidesSceneWalker.Quest.cs` scene
+`abu` representation during development.

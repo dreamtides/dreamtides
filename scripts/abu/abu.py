@@ -64,6 +64,23 @@ MODE_MAP: dict[str, tuple[str, str]] = {
     "prototype quest": ("Prototype Quest", "PrototypeQuest"),
 }
 
+# Device name mapping: slug → (menu label, slug for log confirmation)
+DEVICE_MAP: dict[str, tuple[str, str]] = {
+    "landscape-16x9": ("Landscape 16:9 (1920x1080)", "landscape-16x9"),
+    "landscape-16x10": ("Landscape 16:10 (2560x1600)", "landscape-16x10"),
+    "landscape-21x9": ("Landscape 21:9 (3440x1440)", "landscape-21x9"),
+    "landscape-3x2": ("Landscape 3:2 (1470x956)", "landscape-3x2"),
+    "landscape-5x4": ("Landscape 5:4 (1280x1024)", "landscape-5x4"),
+    "landscape-32x9": ("Landscape 32:9 (5120x1440)", "landscape-32x9"),
+    "iphone-12": ("iPhone 12 (1170x2532)", "iphone-12"),
+    "iphone-se": ("iPhone SE (750x1334)", "iphone-se"),
+    "ipad-pro-12": ("iPad Pro 12 (2048x2732)", "ipad-pro-12"),
+    "ipod-touch-6": ("iPod Touch 6 (640x1136)", "ipod-touch-6"),
+    "samsung-note-20": ("Samsung Note 20 (1440x3088)", "samsung-note-20"),
+    "samsung-z-fold-2": ("Samsung Z Fold 2 (960x2658)", "samsung-z-fold-2"),
+    "pixel-5": ("Pixel 5 (1080x2340)", "pixel-5"),
+}
+
 
 class AbuError(Exception):
     """Raised when an abu command fails."""
@@ -1256,6 +1273,44 @@ def do_set_mode(mode_name: str) -> None:
     sys.exit(1)
 
 
+def do_set_device(device_name: str) -> None:
+    """Set the Unity device/resolution via the Tools > Device menu.
+
+    Drives the menu item via Hammerspoon and polls Editor.log until the
+    confirmation Debug.Log fires.
+    """
+    normalized = device_name.lower().strip()
+    if normalized not in DEVICE_MAP:
+        valid = ", ".join(sorted(DEVICE_MAP.keys()))
+        print(
+            f"Error: Unknown device '{device_name}'. Valid devices: {valid}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    menu_label, slug = DEVICE_MAP[normalized]
+    expected_log = f"Set device to {slug}"
+
+    log_offset = get_log_size()
+    result_msg = send_menu_item(["Tools", "Device", menu_label])
+    print(result_msg)
+
+    print(f"Waiting for device change to {menu_label}...")
+    start = time.time()
+    while time.time() - start < 30:
+        content = read_new_log(log_offset)
+        if expected_log in content:
+            print(f"Device set to {menu_label}.")
+            return
+        time.sleep(POLL_INTERVAL)
+
+    print(
+        f"Warning: Did not see '{expected_log}' in Editor.log within 30s",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
+
 def do_create_save(args: argparse.Namespace) -> None:
     """Generate a test save file by invoking the test_save_generator binary."""
     project_root = Path(__file__).resolve().parent.parent.parent
@@ -1398,6 +1453,16 @@ def build_parser() -> argparse.ArgumentParser:
         "mode", help="Mode name: Quest, Battle, or PrototypeQuest"
     )
 
+    # set-device
+    set_device_parser = subparsers.add_parser(
+        "set-device",
+        help="Set the device/resolution for Play Mode (e.g. iphone-se, landscape-16x9)",
+    )
+    set_device_parser.add_argument(
+        "device",
+        help="Device slug: " + ", ".join(sorted(DEVICE_MAP.keys())),
+    )
+
     # create-save
     create_save_parser = subparsers.add_parser(
         "create-save",
@@ -1452,7 +1517,7 @@ def main() -> None:
             sys.exit(1)
         return
 
-    editor_commands = {"refresh", "play", "test", "cycle", "restart", "set-mode"}
+    editor_commands = {"refresh", "play", "test", "cycle", "restart", "set-mode", "set-device"}
 
     if command in editor_commands:
         try:
@@ -1477,6 +1542,8 @@ def main() -> None:
                 do_restart()
             elif command == "set-mode":
                 do_set_mode(args.mode)
+            elif command == "set-device":
+                do_set_device(args.device)
 
         except AbuError as e:
             print(f"Error: {e}", file=sys.stderr)

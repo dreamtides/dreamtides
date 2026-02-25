@@ -38,6 +38,7 @@ python3 scripts/abu/abu.py restart                # kill and relaunch Unity, res
 python3 scripts/abu/abu.py status                # show Unity state from state file and TCP probe
 python3 scripts/abu/abu.py clear-save            # delete all Dreamtides save files
 python3 scripts/abu/abu.py set-mode Battle       # set game mode (Quest, Battle, PrototypeQuest)
+python3 scripts/abu/abu.py set-device iphone-se  # set device (switches to Device Simulator for mobile)
 
 # Test save generation (no Unity required)
 python3 scripts/abu/abu.py create-save --energy 99 --card "Break the Sequence"
@@ -287,8 +288,8 @@ and are registered as a subcommand group. Key functions in `abu.py`:
 - `wait_for_tests(log_offset)` — poll Editor log for test run completion
 - `find_unity_process()` — discover running Unity via `ps`
 - `do_refresh()`, `do_test()`, `do_cycle()`, `do_restart()`, `do_status()`,
-  `do_clear_save()`, `do_set_mode()`, `do_create_save()` — high-level editor
-  workflows
+  `do_clear_save()`, `do_set_mode()`, `do_set_device()`, `do_create_save()` —
+  high-level editor workflows
 - `main()` — entry point; dispatches editor or TCP commands
 
 Error handling uses an `AbuError` hierarchy (`ConnectionError`, `TimeoutError`,
