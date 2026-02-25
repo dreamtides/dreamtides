@@ -91,6 +91,8 @@ namespace Dreamtides.Abu
         _target = target;
       }
 
+      public bool IsMobilePlatform => false;
+
       public bool IsPointerPressed() => Phase == ClickPhase.Pressed;
 
       public Vector2 PointerPosition() => Vector2.zero;

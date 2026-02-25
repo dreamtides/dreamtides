@@ -258,20 +258,34 @@ Icon: "Law"
 A purge site allows the user to remove up to 3 cards from their deck, allowing
 them to remove cards that don't fit with their overall gameplan.
 
-**UI:** An NPC is shown who performs an animation and displays a speech bubble
-with some dialog when the camera arrives at this site.
+**UI:** The camera pulls in to see an NPC at the site, who performs a character
+animation and displays a speech bubble. After a pause, the user's quest deck
+opens its browser view, showing cards, and a message instructs the user to
+select cards to purge (0/3). Selected cards get a red outline. A red X close
+button is displayed as in the normal deck browser view. A red "purge 3 cards"
+button appears at the bottom of the screen when any number of cards are
+selected. Clicking this button closed the quest deck browser but causes the
+selected cards to animate to screen center. They then play a dissolve animation
+and fade away. Once this animation completes, the camera pulls back to the map
+screen.
 
 Icon: "Hot"
 
 ### Essence
 
-An essence site grants the user a fixed amount of essence, around 300.
+An essence site grants the user a fixed amount of essence, often around 200-300.
+
+**UI:** Unlike with other sites, the camera does not zoom in to essenece sites.
+Instead the button simply vanishes on click and a purple particle effect
+appears, animating in a winding path to the user's essence total and then plays
+a 'hit' particle effect when it reaches the bottom left essence total and
+updates the quantity of essence shown.
 
 Icon: "Diamond"
 
 ### Transfiguration
 
-A transfiguration site shows the user 4 random cards from their deck, and they
+A transfiguration site shows the user 3 random cards from their deck, and they
 may select one to apply a transfiguration to, modifying that card's rules text.
 If multiple transfigurations are applicable to a card, a random one is selected
 to suggest.
@@ -304,19 +318,29 @@ transfiguration. Possible transfigurations include:
   transfiguraitons.
 
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
-with some dialog when the camera arrives at this site.
+with some dialog when the camera arrives at this site. 3 cards from the quest
+deck animate to appear in a row via a stagged move animation (they flip to be
+face-up). As with other sites, they appear beside the NPC in landscape and below
+the NPC in portrait. Each card is augmented to show the transfigured version
+being offered, with the card name and card text tinted to the new color. Each
+card gets a purple "Transfigure" button to accept that transfiguration. When
+clicked the other cards fall away, and then the selected card animates to screen
+center and displays a visual effect specific to the transfiguration being
+applied, then flips over and returns to the quest deck in the bottom right of
+the screen.
 
 Icon: "Science"
 
 ### Duplication
 
-A duplication site shows the user 4 random cards from their deck along with a
+A duplication site shows the user 3 random cards from their deck along with a
 proposed random number of copies to create for each card between 1 and 4. The
 user may pick one of the proposed options to add that many duplicates of that
 card to their deck.
 
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
-with some dialog when the camera arrives at this site.
+with some dialog when the camera arrives at this site. 3 cards from the quest
+deck animate to appear in a row via a staggered move animation.
 
 Icon: "Copy"
 

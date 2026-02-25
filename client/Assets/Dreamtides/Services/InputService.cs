@@ -31,6 +31,11 @@ namespace Dreamtides.Services
     Vector2 PointerPosition();
 
     Displayable? ObjectAtPointerPosition(MouseEventType eventType);
+
+    /// <summary>
+    /// Returns true if the current platform is a mobile device.
+    /// </summary>
+    bool IsMobilePlatform { get; }
   }
 
   public class UnityInputProvider : IInputProvider
@@ -87,6 +92,8 @@ namespace Dreamtides.Services
     }
 
     public Vector2 PointerPosition() => _tapPositionAction.ReadValue<Vector2>();
+
+    public bool IsMobilePlatform => UnityEngine.Device.Application.isMobilePlatform;
   }
 
   public class InputService : Service
@@ -148,7 +155,7 @@ namespace Dreamtides.Services
 
     void HandleDisplayableHover()
     {
-      if (InputProvider.IsPointerPressed() || UnityEngine.Device.Application.isMobilePlatform)
+      if (InputProvider.IsPointerPressed() || InputProvider.IsMobilePlatform)
       {
         return;
       }

@@ -107,7 +107,7 @@ namespace Dreamtides.Tests.Components
       var buttons = CreateButtons(safeArea, worldPositions.Count, new Vector2(20f, 20f));
 
       var positions = positioner.PositionButtons(worldPositions, buttons, allowedViewportRect);
-      var anchors = GetProjectedAnchors(viewport, canvasRoot, safeArea, worldPositions);
+      var anchors = GetProjectedAnchors(viewport, safeArea, worldPositions);
       var halfSizes = GetHalfSizes(safeArea, buttons);
       for (var i = 0; i < positions.Count; i++)
       {
@@ -336,25 +336,21 @@ namespace Dreamtides.Tests.Components
 
     List<Vector2> GetProjectedAnchors(
       FakeViewport viewport,
-      RectTransform canvasRoot,
       RectTransform safeArea,
       IReadOnlyList<Vector3> worldPositions
     )
     {
       var anchors = new List<Vector2>(worldPositions.Count);
-      var canvasRect = canvasRoot.rect;
       for (var i = 0; i < worldPositions.Count; i++)
       {
-        var viewportPoint = viewport.WorldToViewportPoint(worldPositions[i]);
-        var canvasPosition = new Vector2(
-          Mathf.Lerp(canvasRect.xMin, canvasRect.xMax, viewportPoint.x),
-          Mathf.Lerp(canvasRect.yMin, canvasRect.yMax, viewportPoint.y)
+        var screenPoint = viewport.WorldToScreenPoint(worldPositions[i]);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+          safeArea,
+          new Vector2(screenPoint.x, screenPoint.y),
+          null,
+          out var local
         );
-        var worldOnCanvas = canvasRoot.TransformPoint(
-          new Vector3(canvasPosition.x, canvasPosition.y, 0f)
-        );
-        var safeLocal = safeArea.InverseTransformPoint(worldOnCanvas);
-        anchors.Add(new Vector2(safeLocal.x, safeLocal.y));
+        anchors.Add(local);
       }
       return anchors;
     }

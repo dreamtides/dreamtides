@@ -64,6 +64,8 @@ namespace Dreamtides.Tests.Abu
       public Displayable? MouseUpTarget { get; set; }
       public Displayable? HoverTarget { get; set; }
 
+      public bool IsMobilePlatform => false;
+
       public bool IsPointerPressed() => Pressed;
 
       public Vector2 PointerPosition() => Position;
