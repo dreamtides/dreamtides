@@ -1074,6 +1074,8 @@ def cmd_reset_worktrees(args: argparse.Namespace) -> None:
 
     print(f"\nResetting {len(worktree_paths)} worktree(s) to master:\n")
 
+    branches_to_delete: list[str] = []
+
     for worktree_path in worktree_paths:
         slot_name: str = worktree_path.name
         branch: str | None = _worktree_branch(worktree_path)
@@ -1091,12 +1093,30 @@ def cmd_reset_worktrees(args: argparse.Namespace) -> None:
             continue
         run_cmd(["git", "clean", "-fd"], cwd=worktree_path)
 
+        # Detach HEAD so the old branch can be deleted
+        if branch and branch != "master" and branch != "main":
+            run_cmd(
+                ["git", "checkout", "--detach"],
+                check=False,
+                cwd=worktree_path,
+            )
+            branches_to_delete.append(branch)
+
         # Sync gitignored items
         _sync_gitignored(worktree_path, main_repo)
 
         # Ensure port is allocated
         port: int = allocate_port(slot_name)
         print(f"  Port: {port}\n")
+
+    # Delete old branches now that worktrees are detached
+    if branches_to_delete:
+        for branch in branches_to_delete:
+            run_cmd(
+                ["git", "branch", "-D", branch],
+                check=False,
+                cwd=REPO_ROOT,
+            )
 
     print(f"Done! All worktrees reset to master.")
     print(f"  Free disk: {get_free_gb(main_repo):.1f}GB")
