@@ -88,11 +88,16 @@ The following dreamscape sites are planned for eventual implementation in
 Dreamtides. Sites can generally be visited in any order, with the exception that
 the "Battle" site must be visited last. Each site must be visited exactly once
 and cannot be returned to. Dreamscapes always contain a battle site and will
-contain around 3-6 other sites as described below in the
-[Dreamscape Generation](#dreamscape-generation) section.
+contain around 3-6 other sites as described below in the [Dreamscape
+Generation](#dreamscape-generation) section.
 
 Many sites have an "enhanced" version with a stronger version of their ability
 which can appear as described in [Enhanced Sites](#enhanced-sites) below.
+
+Many sites are associated with an NPC, a 3D humanoid character that can play
+character animations and show a speech bubble. This NPC is always the same for a
+given site (e.g. all shops are the same NPC), and their behavior and dialog are
+configured via TOML.
 
 ### Battle
 
@@ -139,13 +144,13 @@ Icon: "Rectangle Vertical"
 
 ### Dreamcaller Draft
 
-The user activates the Dreamcaller Draft site to select their chosen dreamcaller
-or to pick a new dreamcaller. This displays a selection of around 3
-dreamcallers. Dreamcallers are animated 3D characters, and we'll typically play
-character animations on this screen. The user can read the special abilities of
-the offered dreamcallers and pick one to lead their deck. Dreamcallers affect
-which cards are offered in future Draft sites, refer to the
-[Resonance](#resonance--draft-pick-generation) section below for more details.
+The user activates the Dreamcaller Draft site to select their chosen
+dreamcaller. This displays a selection of around 3 dreamcallers. Dreamcallers
+are animated 3D characters, and we'll typically play character animations on
+this screen. The user can read the special abilities of the offered dreamcallers
+and pick one to lead their deck. Dreamcallers affect which cards are offered in
+future Draft sites, refer to the [Resonance](#resonance--draft-pick-generation)
+section below for more details.
 
 Each dreamcaller comes with a different **essence bonus** gained for selecting
 that option, which serves as a lever for balancing more powerful dreamcallers.
@@ -163,6 +168,16 @@ selected dreamcaller animates to the bottom left of the screen to appear in a
 "square" frame (head only). The other cards animate back to a small size.
 
 Icon: "Crown"
+
+### Discovery Draft
+
+Shows a draft with four cards which have some unifying mechanical theme, for
+example showing warrior cards, removal spells, cards that involve discarding a
+card, rare cards, only dreamsigns, only triggered abilities, etc.
+
+**UI:** This site follows the same interface behavior as the "Draft" site.
+
+Icon: "Compass"
 
 ### Shop
 
@@ -191,6 +206,17 @@ camera back to the map screen but leaves the items where they are, giving the
 impression they are still available.
 
 Icon: "Store"
+
+### Speciality Shop
+
+A speciality shop functions in the same manner as a regular shop, but it shows
+items with a unfying mechanical theme. Speciality shops use the same generation
+algorithm and tagging sytem as [Discovery Draft](#discovery-draft) sites.
+
+**UI:** Identical UI to the regular shop site except that it features a
+different NPC.
+
+Icon: "Store Alt 2"
 
 ### Dreamsign Offering
 
@@ -380,20 +406,6 @@ quest deck, and then the camera pulls back to the map screen.
 
 Icon: "Treasure Chest"
 
-### Discovery
-
-An NPC offers the user the ability to select one of four cards which have some
-unifying theme. They may be tagged for some specific deck archetype, such as
-warrior enablers, spirit animals, etc. These are generally the main enablers for
-that archetype. Later in the quest, the NPC attempts to match the offering to
-the user's *current* deck, making this a powerful site to find.
-
-**UI:** This site follows the same interface behavior as the "Draft" site except
-for the presence of the NPC character, requiring a slightly different camera
-position.
-
-Icon: "Compass"
-
 ### Cleanse
 
 A Cleanse site allows the user to remove up to 3 random Banes from their deck or
@@ -476,6 +488,13 @@ variable, there might for example be 20% more tide cards, 10% more ember cards,
 The exact configuration of the draft pool is all data-driven and managed by TOML
 files.
 
+### Card Tagging
+
+In addition to resonance, cards can have zero or more **tags** defined on them.
+Tags can cover any sort of mechanical theme and generally correspond to possible
+deck archetypes, such as cards that care about discard, cards that support a
+specific tribe like spirit animals, cards that care about reclaim, etc.
+
 ## Dream Atlas
 
 The Dream Atlas is the screen players see at the start of a quest. It shows a
@@ -506,6 +525,14 @@ allowing the user to make an informed decision about which dreamscape to visit
 next. This is also where [Reward Site](#reward-site) rewards are shown. Winning
 the 7th battle causes the player to win the quest.
 
+### Dream Atlas Generation
+
+The dream atlas is generated dynamically throughout the quest, with new
+dreamscapes being added as dreamscapes are completed. The new dreamscapes are
+added as 'unavilable' nodes adjacent to the newly 'available' nodes. Around 2-4
+nodes are randomly generated and placed in this manner each time a dreamscape is
+completed, creating a web of interconnected nodes.
+
 ## Dreamscape Generation
 
 Dreamscapes are generated by drawing sites from a pool, in a similar manner to
@@ -533,6 +560,9 @@ Battle sites are also distinct: Dreamscapes have one Battle site, or zero if
 this has been modified by [meta progression](meta_progression.md). The opponent
 dreamcaller, dreamsigns, and deck for the battle is selected from a pool of
 opponents defined in TOML for a given completion levle.
+
+The Dreamcaller Draft site is distinct and can only appear in the first
+dreamscape visited.
 
 ### Enhanced Sites
 
