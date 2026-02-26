@@ -24,6 +24,10 @@ reasonable, we should even allow more complex algorithmic changes via data
 implementing any rules engine feature, we should ask the question "could we make
 this configurable?"
 
+This rule applies to user interface behavior as well as game design: things like
+particle effects, sound effects, and animations are always configured in TOML
+when possible.
+
 ## Overview
 
 Quests revolve primarily around drafting a deck to bring into future battles,
@@ -44,7 +48,7 @@ a series of "dreamscapes" the user can navigate to. Each dreamscape is
 associated with "sites", specific rewards available in that dreamscape.
 
 Dreamscapes show a group of individual white icons with black circular
-backgounds for their sites. Each site icon corresponds to some specific quest
+backgrounds for their sites. Each site icon corresponds to some specific quest
 effect, and users can "visit" a site to activate the effect by clicking on the
 icon. This causes the camera to zoom in on that site and then displays the
 site's effect, often with a 3D animated NPC character introducing the site's
@@ -86,17 +90,28 @@ contain around 3-6 other sites as described below in the
 [Dreamscape Generation](#dreamscape-generation) section.
 
 Many sites have an "enhanced" version with a stronger version of their ability
-which can appear as described in [Enhanced Sited](#enhanced-sites) below.
+which can appear as described in [Enhanced Sites](#enhanced-sites) below.
 
 ### Battle
 
-The Battle site is the core gameplay element of dreamtides, and it allows users
+The Battle site is the core gameplay element of Dreamtides, and it allows users
 to play a match against an AI opponent. Each battle has an assigned opponent
 dreamcaller with their own deck. Opponent decks are (for now) defined statically
 in TOML. Before the battle begins, the opposing dreamcaller is displayed so the
 user can understand any special abilities they have. Opposing dreamsigns are
 also shown. When the battle completes, the [Victory or Defeat](#victory--defeat)
-screen is shown along witih any associated battle rewards.
+screen is shown along with any associated battle rewards.
+
+**UI:** The camera pans in to the battle scene. The "full body" card
+representation of the enemy dreamcaller animates in from a small size at the
+center of the battle area. The enemy's deck is present in the center of the
+scene. The dreamcaller character within the card performs a humanoid animation.
+The rules text on the enemy dreamcaller is displayed, along with any enemy
+dreamsigns. A "start battle" button is shown. Clicking the start battle button
+causes the enemy dreamcaller to animate to their battle position in the small
+dreamcaller card format (head only, no text). The user dreamcaller and user
+quest deck animate to their starting positions. The enemy quest deck animates to
+its starting position. An opening hand of cards is dealt to both players.
 
 Site Icon: "Sword"
 
@@ -113,8 +128,8 @@ specific dreamsigns.
 
 **UI:** 4 cards are shown in a row (landscape mode) or in two rows (portrait
 mode). The cards to draft from are shown in a pile in the 3D scene, then 4 of
-then animate in to be selected. Clicking a card animates it to the quest deck,
-and the others animate a away, then 4 more cards from the pile animate in. After
+them animate in to be selected. Clicking a card animates it to the quest deck,
+and the others animate away, then 4 more cards from the pile animate in. After
 all drafts are completed, the camera automatically pulls back to the map view.
 Cards are shown with an orange outline.
 
@@ -138,8 +153,8 @@ it's intended to not be obvious whether it's better to visit other sites before
 selecting a dreamcaller.
 
 **UI:** Dreamcallers are shown in their full-body "card" representation, with
-ability text displayed alongside their 3D models and essence bonuses . The
-dreamcaller cards animate in from a small size in the center of the size. Each
+ability text displayed alongside their 3D models and essence bonuses. The
+dreamcaller cards animate in from a small size in the center of the screen. Each
 dreamcaller does a different humanoid animation within its card frame. A primary
 action button appears below each dreamcaller allowing them to be selected. The
 selected dreamcaller animates to the bottom left of the screen to appear in a
@@ -157,8 +172,8 @@ duplicating cards, etc. Shops do offer the ability to spend essence to "reroll"
 
 Shop base prices are static, defined in TOML. The shop implements a random
 "discount" system where one or more items can be displayed as being on sale, for
-between 30% and 90% cost reduction. Things like dramsigns or journey effects can
-also modify shop prices.
+between 30% and 90% cost reduction. Things like dreamsigns or journey effects
+can also modify shop prices.
 
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
 with some dialog when the camera arrives at this site. Two rows of three items
@@ -168,10 +183,10 @@ under it showing the essence cost to purchase that item. Clicking the button for
 a card or dreamsign animates it to the quest deck or dreamsign display in the
 bottom right corner of the screen. The other items do not move on purchase,
 leaving a gap. One of the items shown may be a "reroll" option. When this is
-selected, the animates do a staggered scale-down animation, then the 6 new
-options perform a scale-up animation in-place. Clicking the close button pulls
-the camera back to the map screen but leaves the items where they are, giving
-the impression they are still available.
+selected, the items do a staggered scale-down animation, then the 6 new options
+perform a scale-up animation in-place. Clicking the close button pulls the
+camera back to the map screen but leaves the items where they are, giving the
+impression they are still available.
 
 Icon: "Store"
 
@@ -193,7 +208,7 @@ At a dreamsign draft site, the user is presented with around three dreamsigns
 and is able to select one to gain. It is again possible to select no dreamsign.
 
 **UI:** The three dreamsigns animate in at full size from the bottom of the
-screen in a stagged animation, positioning themselves in a single row. Purple
+screen in a staggered animation, positioning themselves in a single row. Purple
 accept buttons are shown below each one. A red close button is shown top left,
 functioning in a similar way to the Shop close button. Accepting a dreamsign
 animates it to the user's dreamsign display area in the bottom right of the
@@ -231,23 +246,23 @@ Icon: "Moon + Star"
 ### Tempting Offer
 
 A tempting offer is a site where the user is faced with a pair of dream journey
-options with positive effects, in a simliar manner to the dream journey site.
+options with positive effects, in a similar manner to the dream journey site.
 This time, however, each dream journey is also associated with a 'cost' card
 with its own card and description, showing some price to be paid to unlock the
-journey effect. The user may select a option to pay its cost and receive the
+journey effect. The user may select an option to pay its cost and receive the
 benefit. A close button is displayed in a similar manner to the shop screen
 allowing the user to reject the dream journey options.
 
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
 with some dialog when the camera arrives at this site. The journey/cost card
 pairs animation out from the center of the NPC's chest at a small scale in a
-staggered animation (identcial to a Dream Journey). The cards are displayed in
+staggered animation (identical to a Dream Journey). The cards are displayed in
 two rows, with the journey card on the left side of the row and the cost card on
 the right side of the row, and with a purple button displayed under each pair to
 select that option. Picking an option performs the same resolution animation as
 above, with the journey card first animating to a large size in the center of
 the screen, dissolving, and playing a custom effect animation, then the cost
-card animmating to screen center and playing its custom animation. Journey and
+card animating to screen center and playing its custom animation. Journey and
 Cost cards will often have associated sound effects and particle effects for
 their abilities.
 
@@ -264,7 +279,7 @@ opens its browser view, showing cards, and a message instructs the user to
 select cards to purge (0/3). Selected cards get a red outline. A red X close
 button is displayed as in the normal deck browser view. A red "purge 3 cards"
 button appears at the bottom of the screen when any number of cards are
-selected. Clicking this button closed the quest deck browser but causes the
+selected. Clicking this button closes the quest deck browser but causes the
 selected cards to animate to screen center. They then play a dissolve animation
 and fade away. Once this animation completes, the camera pulls back to the map
 screen.
@@ -275,7 +290,7 @@ Icon: "Hot"
 
 An essence site grants the user a fixed amount of essence, often around 200-300.
 
-**UI:** Unlike with other sites, the camera does not zoom in to essenece sites.
+**UI:** Unlike with other sites, the camera does not zoom in to essence sites.
 Instead the button simply vanishes on click and a purple particle effect
 appears, animating in a winding path to the user's essence total and then plays
 a 'hit' particle effect when it reaches the bottom left essence total and
@@ -315,11 +330,11 @@ transfiguration. Possible transfigurations include:
   available for cards with activated abilities that cost energy.
 - Prismatic Transfiguration: Adds all of the above transfigurations to a card
   which are available. Only available for cards which are eligible for 2 or more
-  transfiguraitons.
+  transfigurations.
 
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
 with some dialog when the camera arrives at this site. 3 cards from the quest
-deck animate to appear in a row via a stagged move animation (they flip to be
+deck animate to appear in a row via a staggered move animation (they flip to be
 face-up). As with other sites, they appear beside the NPC in landscape and below
 the NPC in portrait. Each card is augmented to show the transfigured version
 being offered, with the card name and card text tinted to the new color. Each
@@ -327,7 +342,8 @@ card gets a purple "Transfigure" button to accept that transfiguration. When
 clicked the other cards fall away, and then the selected card animates to screen
 center and displays a visual effect specific to the transfiguration being
 applied, then flips over and returns to the quest deck in the bottom right of
-the screen.
+the screen. A close button is displayed to allow the user to decline a
+transfiguration.
 
 Icon: "Science"
 
@@ -340,16 +356,26 @@ card to their deck.
 
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
 with some dialog when the camera arrives at this site. 3 cards from the quest
-deck animate to appear in a row via a staggered move animation.
+deck animate to appear in a row via a staggered move animation. A purple button
+like "Duplicate x3" appears under each one. Clicking this button causes the
+other cards to fall away, and then a particle effect plays and additional copies
+of the card emerge from the selected card. All copies then animate to the quest
+deck, and the camera pulls back to the map screen. A close button is displayed
+to allow the user to decline duplication.
 
 Icon: "Copy"
 
 ### Reward Site
 
 A reward site is a special site for granting the user a fixed reward (a specific
-card, dreamsign, or essence quantity). The distiguishing factor of reward sites
-is that these rewards are *known in advance* before selecting a dreamscape to
-activate on the [Dream Atlas](#dream-atlas).
+card or cards, dreamsign, group of dreamsigns, etc). The distinguishing factor
+of reward sites is that these rewards are *known in advance* before selecting a
+dreamscape to activate on the [Dream Atlas](#dream-atlas).
+
+**UI:** The camera pulls in on a scene showing the reward items in question,
+with a purple "accept" button and a gray "decline" button. Accepting the reward
+plays the standard animation for that item type, for example animating to the
+quest deck, and then the camera pulls back to the map screen.
 
 Icon: "Treasure Chest"
 
@@ -361,19 +387,24 @@ warrior enablers, spirit animals, etc. These are generally the main enablers for
 that archetype. Later in the quest, the NPC attempts to match the offering to
 the user's *current* deck, making this a powerful site to find.
 
-**UI:** An NPC is shown who performs an animation and displays a speech bubble
-with some dialog when the camera arrives at this site.
+**UI:** This site follows the same interface behavior as the "Draft" site except
+for the presence of the NPC character, requiring a slightly different camera
+position.
 
 Icon: "Compass"
 
 ### Cleanse
 
-A Cleanse site allows the user to remove up to 3 Banes from their deck or
+A Cleanse site allows the user to remove up to 3 random Banes from their deck or
 dreamsigns. A bane is a card or dreamsign with some specific negative effect,
 usually received as part of a dream journey or tempting offer screen.
 
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
-with some dialog when the camera arrives at this site.
+with some dialog when the camera arrives at this site. The randomly selected
+cards or dreamsigns to cleanse emerge from the quest deck or dreamsign display.
+A purple "cleanse" button is displayed, along with a gray "decline" button.
+Selecting "cleanse" causes the bane cards to play a dissolve animation, and then
+the camera pulls back to the map screen.
 
 Icon: "Snowflake"
 
@@ -414,9 +445,9 @@ Users may have only 1 dreamcaller.
 ## Resonance & Draft Pick Generation
 
 A critical component of the drafting system in Dreamtides is "card resonance",
-which performs a similar function something like the color pie in Magic: the
-Gathering. Each card, dreamsign, and dreamcaller has zero or more resonance
-symbols associated with it, drawn from:
+which performs a function similar to the color pie in Magic: the Gathering. Each
+card, dreamsign, and dreamcaller has zero or more resonance symbols associated
+with it, drawn from:
 
 - Tide
 - Ember
@@ -432,8 +463,8 @@ seeing other resonances diminishes. Generally the system converges towards decks
 having 2 main resonances after 5-10 draft picks.
 
 Draft picks are drawn from a "pool" of cards generated at the start of a quest.
-This ensures draft picks are drawing without replacement, meaning the odds of
-seeing cards more than once diminshes over time.
+This ensures draft picks are drawn without replacement, meaning the odds of
+seeing cards more than once diminishes over time.
 
 When starting a new quest, the draft pool is weighted based on card rarity, with
 more copies of common cards and fewer copies of rare/legendary cards. There is
@@ -486,7 +517,11 @@ Draft sites are handled differently. Dreamscapes have a deterministic number of
 draft sites based on progression in the Quest and how many previous dreamscapes
 have been visited:
 
-| Dreamscape Number | Draft Sites | | 1, 2 | 2 | | 3, 4 | 1 | | 5, 6, 7 | 0 |
+| Dreamscape Number | Draft Sites |
+| ----------------- | ----------- |
+| 1, 2              | 2           |
+| 3, 4              | 1           |
+| 5, 6, 7           | 0           |
 
 Battle sites are also distinct: every Dreamscape has exactly one Battle site.
 
@@ -513,10 +548,10 @@ available enhanced sites are:
 ## Implementation Strategy and QA
 
 The overall implementation strategy for the Quests game mode is to rely heavily
-on both *integration testing* and *manual QA*. The integration testing philsophy
-should follow what we use for the battle game mode, writing tests that operate
-against the real QuestView/Commands interface. Philosophically, dreamtides does
-not employ unit testing.
+on both *integration testing* and *manual QA*. The integration testing
+philosophy should follow what we use for the battle game mode, writing tests
+that operate against the real QuestView/Commands interface. Philosophically,
+dreamtides does not employ unit testing.
 
 The manual QA strategy here is based on validating all changes against a running
 instance of the Unity editor using the [abu](../../abu/abu.md) tool. *Every*
