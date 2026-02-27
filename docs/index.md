@@ -153,6 +153,14 @@
   TCP). Read when using the ABU CLI, controlling the Unity Editor, or setting up
   ABU in a scene.
 
+- [draft_simulation.md](draft_simulation/draft_simulation.md): Python simulation
+  at `scripts/draft_sim/` that validates the resonance weighting algorithm with
+  synthetic card pools — player strategies (synergy, power_chaser, rigid), four
+  output modes (trace, aggregate, sweep, evolution), key metrics (convergence
+  pick, HHI, archetype distribution, splash rate), CLI flags, module structure,
+  and validated results. Read when tuning resonance algorithm parameters,
+  understanding draft convergence dynamics, or running the simulation.
+
 - [abu_internals.md](abu/abu_internals.md): ABU implementation details —
   architecture (TcpServer, AbuBridge, SnapshotCommandHandler, SnapshotFormatter,
   RefRegistry, CommandSchema), Python CLI internals, C# transport and command
