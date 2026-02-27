@@ -444,7 +444,7 @@ the quest (on defeat).
 A Quest ends in victory if the user wins 7 battles. The 4th battle they face is
 against a miniboss, and the 7th battle is against the final boss of Dreamtides.
 Bosses are dreamcallers that have their own unique abilities, dreamsigns, or
-custom cards in their decks.
+custom cards in their decks. See [Boss Dreamcallers](bosses.md) for details.
 
 ### Battle Rewards
 
