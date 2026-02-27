@@ -87,9 +87,9 @@ rules engine.
 The following dreamscape sites are planned for eventual implementation in
 Dreamtides. Sites can generally be visited in any order, with the exception that
 the "Battle" site must be visited last. Each site must be visited exactly once
-and cannot be returned to. Dreamscapes usually contain a battle site and will
-contain around 3-6 other sites as described below in the [Dreamscape
-Generation](#dreamscape-generation) section.
+and cannot be returned to. Dreamscapes contain between 3 and 6 total sites
+(including battle and draft sites, configured in TOML) as described below in the
+[Dreamscape Generation](#dreamscape-generation) section.
 
 Many sites have an "enhanced" version with a stronger version of their ability
 which can appear as described in [Enhanced Sites](#enhanced-sites) below.
@@ -172,9 +172,9 @@ Icon: "Crown"
 
 ### Discovery Draft
 
-Shows a draft with four cards which have some unifying mechanical theme, for
-example showing warrior cards, removal spells, cards that involve discarding a
-card, rare cards, only dreamsigns, only triggered abilities, etc.
+Shows four cards which have some unifying mechanical theme, for example showing
+warrior cards, removal spells, cards that involve discarding a card, rare cards,
+only dreamsigns, only triggered abilities, etc. The user selects a single card.
 
 **UI:** This site follows the same interface behavior as the "Draft" site.
 
@@ -427,6 +427,12 @@ Initially, a Quest ends in defeat if the user loses a battle. As described in
 the [Meta Progression](meta_progression.md) document, the user eventually
 unlocks the ability to continue in a quest after a first loss.
 
+**UI:** When a battle ends, a particle effect plays alongside a sound effect,
+and the word "Victory" or "Defeat" is displayed at screen center. The text then
+animates upward to reveal a summary panel showing battle rewards earned, quest
+statistics, and a button to continue to the Dream Atlas (on victory) or to end
+the quest (on defeat).
+
 A Quest ends in victory if the user wins 7 consecutive battles. The 4th battle
 they face is against a miniboss, and the 7th battle is against the final boss of
 Dreamtides. Bosses are dreamcallers that have their own unique abilities,
@@ -451,7 +457,8 @@ during a battle until they exceed 25 (for example, a player with 9 cards in
 their deck will end up with 27 cards during a battle).
 
 Users can have a maximum of 12 dreamsigns at any time. If they would receive
-another dreamsign, they must immediately purge a dreamsign.
+another dreamsign, an overlay is shown and they must immediately purge a
+dreamsign.
 
 Users may have only 1 dreamcaller.
 
@@ -542,7 +549,8 @@ The dream atlas is generated dynamically throughout the quest, with new
 dreamscapes being added as dreamscapes are completed. The new dreamscapes are
 added as 'unavailable' nodes adjacent to the newly 'available' nodes. Around 2-4
 nodes are randomly generated and placed in this manner each time a dreamscape is
-completed, creating a web of interconnected nodes.
+completed, creating a web of interconnected nodes. Initial atlas topology is
+configured in TOML.
 
 ## Dreamscape Generation
 
@@ -573,8 +581,8 @@ dreamcaller, dreamsigns, and deck for the battle is selected from a pool of
 opponents defined in TOML for a given completion level. Difficulty scaling is
 configured in TOML.
 
-The Dreamcaller Draft site is distinct and can only appear in the first
-dreamscape visited.
+The Dreamcaller Draft site is distinct and always appears in the first
+dreamscape visited, and only in that dreamscape.
 
 ### Enhanced Sites
 
