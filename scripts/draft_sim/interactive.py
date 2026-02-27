@@ -188,18 +188,29 @@ def render_cards(pick: PickRecord, strat_params: StrategyParams) -> str:
         # Line 4: weight + fit
         line4 = f" wt:{w:5.1f} f:{fit:.0f}"
 
+        # Border colors: dual cards get left=first resonance, right=second
+        sorted_res = sorted(card.resonances, key=lambda r: r.value) if card.resonances else []
+        if len(sorted_res) >= 2:
+            lc = RESONANCE_COLORS[sorted_res[0]]
+            rc = RESONANCE_COLORS[sorted_res[1]]
+        elif len(sorted_res) == 1:
+            lc = rc = RESONANCE_COLORS[sorted_res[0]]
+        else:
+            lc = rc = NEUTRAL_COLOR
+
         # Build border characters
         if is_picked:
-            bc = cc
-            top = f"{bc}\u2554{'\u2550' * inner}\u2557{RESET}"
-            bot = f"{bc}\u255a{'\u2550' * inner}\u255d{RESET}"
-            lbr = f"{bc}\u2551{RESET}"
-            rbr = f"{bc}\u2551{RESET}"
+            half = inner // 2
+            top = f"{lc}\u2554{'\u2550' * half}{RESET}{rc}{'\u2550' * (inner - half)}\u2557{RESET}"
+            bot = f"{lc}\u255a{'\u2550' * half}{RESET}{rc}{'\u2550' * (inner - half)}\u255d{RESET}"
+            lbr = f"{lc}\u2551{RESET}"
+            rbr = f"{rc}\u2551{RESET}"
         else:
-            top = f"\u250c{'\u2500' * inner}\u2510"
-            bot = f"\u2514{'\u2500' * inner}\u2518"
-            lbr = "\u2502"
-            rbr = "\u2502"
+            half = inner // 2
+            top = f"{lc}\u250c{'\u2500' * half}{RESET}{rc}{'\u2500' * (inner - half)}\u2510{RESET}"
+            bot = f"{lc}\u2514{'\u2500' * half}{RESET}{rc}{'\u2500' * (inner - half)}\u2518{RESET}"
+            lbr = f"{lc}\u2502{RESET}"
+            rbr = f"{rc}\u2502{RESET}"
 
         all_lines[0].append(top)
         all_lines[1].append(f"{lbr}{pad_right(line1, inner)}{rbr}")
