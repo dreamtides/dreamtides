@@ -120,7 +120,7 @@ dreamcaller card format (head only, no text). The user dreamcaller and user
 quest deck animate to their starting positions. The enemy quest deck animates to
 its starting position. An opening hand of cards is dealt to both players.
 
-Site Icon: "Sword"
+Icon: "Sword"
 
 ### Draft
 
@@ -341,7 +341,7 @@ transfiguration. Possible transfigurations include:
   cards which cost 0.
 - Golden Transfiguration: Improves the effect of the card by increasing or
   decreasing a number in its rules text by 1. Only available for cards with
-  numbers in their text.
+  numbers in their text. The golden variant of each card is defined in TOML.
 - Scarlet Transfiguration: Doubles the base spark of a character, or sets it to
   1 for characters with 0 spark. Only available for characters.
 - Magenta Transfiguration: Increases the frequency of named card triggers,
@@ -408,9 +408,8 @@ Icon: "Treasure Chest"
 
 ### Cleanse
 
-A Cleanse site allows the user to remove up to 3 random Banes from their deck or
-dreamsigns. A bane is a card or dreamsign with some specific negative effect,
-usually received as part of a dream journey or tempting offer screen.
+A Cleanse site allows the user to remove up to 3 random [Banes](#banes) from
+their deck or dreamsigns.
 
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
 with some dialog when the camera arrives at this site. The randomly selected
@@ -447,15 +446,24 @@ their choice to get back down under 50 cards.
 
 Quest decks must contain a minimum of 25 cards. If the user has not completed
 enough drafts to reach this threshold, additional copies of their deck are added
-during a battle (for example, a player with 9 cards in their deck will end up
-with 27 cards during a battle).
+during a battle until they exceed 25 (for example, a player with 9 cards in
+their deck will end up with 27 cards during a battle).
 
 Users can have a maximum of 12 dreamsigns at any time. If they would receive
 another dreamsign, they must immediately purge a dreamsign from their deck.
 
 Users may have only 1 dreamcaller.
 
-## Resonance & Draft Pick Generation
+## Banes
+
+Certain cards and dreamsigns, called "banes", can be given to the user during a
+quest, typically as a result of a [Tempting Offer](#tempting-offer) choice. Bane
+cards generally have negative effects when drawn, while bane dreamsigns provide
+ongong negative effects on the quest. Bane cards can be [purged](#purge) as
+normal. Bane cards and bane dreamsigns can be removed via the
+[cleanse](#cleanse) site.
+
+## Resonance
 
 A critical component of the drafting system in Dreamtides is "card resonance",
 which performs a function similar to the color pie in Magic: the Gathering. Each
@@ -468,12 +476,13 @@ with it, drawn from:
 - Stone
 - Ruin
 
-When generating draft picks, the user's *current* deck is evaluated for its
-resonance score, and the selection of draft cards is weighted against that, i.e.
-a deck the contains a lot of Tide and Stone cards will generally see more Tide
-and Stone cards. As more cards with a given resonance are added, the chances of
-seeing other resonances diminishes. Generally the system converges towards decks
-having 2 main resonances after 5-10 draft picks.
+When generating draft picks, shop offerings, or dreamsign offerings, the user's
+*current* deck is evaluated for its resonance score, and the selection of draft
+cards is weighted against that, i.e. a deck the contains a lot of Tide and Stone
+cards will generally see more Tide and Stone cards. As more cards with a given
+resonance are added, the chances of seeing other resonances diminishes.
+Generally the system converges towards decks having 2 main resonances after 5-10
+draft picks.
 
 Draft picks are drawn from a "pool" of cards generated at the start of a quest.
 This ensures draft picks are drawn without replacement, meaning the odds of
