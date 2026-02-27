@@ -52,6 +52,13 @@ value.
 with rows at picks 5, 10, 15, 20, 25, 30 showing top-2 share, effective color
 count, HHI, and off-color rate at each stage.
 
+**interactive**: Step-through terminal UI with colored ASCII cards, pausing
+after each pick. Automatically writes a JSONL log to `.logs/` with one JSON
+object per line: a `session_start` event (seed, parameters, dreamcaller, pool
+variance), one `pick` event per pick (offered cards with weights, picked card,
+reason, profile snapshot), and a `session_end` event (final stats). Log path is
+printed at quest completion.
+
 ## Player Strategies
 
 Three strategies test different aspects of the algorithm:
@@ -94,6 +101,8 @@ Three strategies test different aspects of the algorithm:
   rewards), player strategy dispatch, profile tracking.
 - `output.py`: All four output modes, metrics computation, ASCII table
   formatting.
+- `jsonl_log.py`: JSONL session logger for interactive mode. Writes
+  `session_start`, `pick`, and `session_end` events to `.logs/`.
 
 ## Validated Results
 

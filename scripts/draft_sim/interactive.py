@@ -7,7 +7,9 @@ pausing after each pick for the user to press Enter.
 import os
 import re
 import sys
+from typing import Optional
 
+from jsonl_log import SessionLogger
 from models import Rarity, Resonance, ResonanceProfile, QuestResult, PickRecord, StrategyParams
 from output import classify_deck, has_splash, convergence_pick
 
@@ -451,7 +453,12 @@ def wait_for_input():
         sys.exit(0)
 
 
-def run_interactive(result: QuestResult, strategy_name: str, strat_params: StrategyParams):
+def run_interactive(
+    result: QuestResult,
+    strategy_name: str,
+    strat_params: StrategyParams,
+    logger: Optional[SessionLogger] = None,
+):
     """Main orchestrator for interactive mode."""
     if not sys.stdout.isatty():
         print("Error: interactive mode requires a terminal", file=sys.stderr)
@@ -478,6 +485,15 @@ def run_interactive(result: QuestResult, strategy_name: str, strat_params: Strat
         print(render_cards(pick, strat_params))
         print_profile(pick.profile_after)
         print_stats(pick.profile_after)
+
+        if logger:
+            logger.log_pick(pick, ctx)
+
         wait_for_input()
+
+    if logger:
+        logger.log_session_end(result)
+        logger.close()
+        print(f"  {DIM}Log written to {logger.path}{RESET}\n")
 
     print_final_summary(result, strategy_name)

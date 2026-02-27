@@ -9,6 +9,7 @@ import argparse
 import random
 import sys
 
+from jsonl_log import SessionLogger
 from models import AlgorithmParams, PoolParams, QuestParams, Strategy, StrategyParams
 from interactive import run_interactive
 from output import print_aggregate, print_evolution, print_sweep, print_trace
@@ -171,7 +172,9 @@ def mode_interactive(args):
     seed = args.seed if args.seed is not None else random.randint(0, 2**32)
     rng = random.Random(seed)
     result = simulate_quest(algo, pool, quest, strat, rng)
-    run_interactive(result, strat.strategy.value, strat)
+    logger = SessionLogger(seed)
+    logger.log_session_start(seed, result, strat.strategy.value, strat, algo)
+    run_interactive(result, strat.strategy.value, strat, logger=logger)
 
 
 def main():
