@@ -42,7 +42,8 @@ lead their deck and may have some number of "dreamsigns":
   play for both participants in a battle. Each dreamcaller has powerful ongoing
   static, triggered, or activated abilities.
 - **Dreamsigns:** Cards with 2D illustrations of objects, which provide more
-  minor ongoing effects. Generally we try to assign the splashy "build around"
+  minor ongoing effects. Dreamsign effects can apply during battles, on the
+  quest map, or both. Generally we try to assign the splashy "build around"
   effects to dreamcallers and secondary effects to dreamsigns.
 
 Quests display a top-level 3D screen called the [Dream Atlas](#dream-atlas) with
@@ -97,7 +98,9 @@ which can appear as described in [Enhanced Sites](#enhanced-sites) below.
 Many sites are associated with an NPC, a 3D humanoid character that can play
 character animations and show a speech bubble. This NPC is always the same for a
 given site (e.g. all shops are the same NPC), and their behavior and dialog are
-configured via TOML.
+configured via TOML. For sites with an NPC, portrait mode frames the NPC at the
+top of the screen with content below, while landscape mode places the NPC to one
+side with content beside them.
 
 ### Battle
 
@@ -156,9 +159,11 @@ Each dreamcaller comes with a different **essence bonus** gained for selecting
 that option, which serves as a lever for balancing more powerful dreamcallers.
 Bonus amounts are configured in TOML.
 
-There is a certain element of strategy to *when* the user visits this site, and
-it's intended to not be obvious whether it's better to visit other sites before
-selecting a dreamcaller.
+Since all non-battle sites must be visited before entering battle, the
+dreamcaller is always selected before the battle begins. There is a certain
+element of strategy to *when* the user visits this site relative to other sites
+like shops and drafts, and it's intended to not be obvious whether it's better
+to visit other sites before selecting a dreamcaller.
 
 **UI:** Dreamcallers are shown in their full-body "card" representation, with
 ability text displayed alongside their 3D models and essence bonuses. The
@@ -202,9 +207,9 @@ a card or dreamsign animates it to the quest deck or dreamsign display in the
 bottom right corner of the screen. The other items do not move on purchase,
 leaving a gap. One of the items shown may be a "reroll" option. When this is
 selected, the items do a staggered scale-down animation, then the 6 new options
-perform a scale-up animation in-place. Clicking the close button pulls the
-camera back to the map screen but leaves the items where they are, giving the
-impression they are still available.
+perform a scale-up animation in-place. Clicking the close button completes the
+site visit and pulls the camera back to the map screen. The items remain in
+place visually rather than animating away, but the site cannot be revisited.
 
 Icon: "Store"
 
@@ -305,12 +310,14 @@ them to remove cards that don't fit with their overall gameplan.
 **UI:** The camera pulls in to see an NPC at the site, who performs a character
 animation and displays a speech bubble. After a pause, the user's quest deck
 opens its browser view, showing cards, and a message instructs the user to
-select cards to purge (0/3). Selected cards get a red outline. A red X close
-button is displayed as in the normal deck browser view. A red button with e.g.
-"purge 3 cards" appears at the bottom of the screen when cards are selected.
-Clicking this button closes the quest deck browser but causes the selected cards
-to animate to screen center. They then play a dissolve animation and fade away.
-Once this animation completes, the camera pulls back to the map screen.
+select cards to purge (0/3). Selected cards get a red outline. The quest deck
+browser can also be opened outside of sites by clicking the quest deck in the
+bottom right of the screen. A red X close button is displayed as in the normal
+deck browser view. A red button with e.g. "purge 3 cards" appears at the bottom
+of the screen when cards are selected. Clicking this button closes the quest
+deck browser but causes the selected cards to animate to screen center. They
+then play a dissolve animation and fade away. Once this animation completes, the
+camera pulls back to the map screen.
 
 Icon: "Hot"
 
@@ -330,8 +337,9 @@ Icon: "Diamond"
 
 A transfiguration site shows the user 3 random cards from their deck, and they
 may select one to apply a transfiguration to, modifying that card's rules text.
-If multiple transfigurations are applicable to a card, a random one is selected
-to suggest.
+Each card can only receive a single transfiguration; cards that have already
+been transfigured are not eligible. If multiple transfigurations are applicable
+to a card, a random one is selected to suggest.
 
 Transfigurations are named after colors, and cause the card name and any
 modified rules text to display in a different color to indicate the
@@ -433,17 +441,18 @@ animates upward to reveal a summary panel showing battle rewards earned, quest
 statistics, and a button to continue to the Dream Atlas (on victory) or to end
 the quest (on defeat).
 
-A Quest ends in victory if the user wins 7 consecutive battles. The 4th battle
-they face is against a miniboss, and the 7th battle is against the final boss of
-Dreamtides. Bosses are dreamcallers that have their own unique abilities,
-dreamsigns, or custom cards in their decks.
+A Quest ends in victory if the user wins 7 battles. The 4th battle they face is
+against a miniboss, and the 7th battle is against the final boss of Dreamtides.
+Bosses are dreamcallers that have their own unique abilities, dreamsigns, or
+custom cards in their decks.
 
 ### Battle Rewards
 
 Completing a battle always grants an essence reward, which increases as the user
-completes more dreamscapes. The user also gets a "rare draft" event, selecting
-from four powerful cards to add to their deck. This draft pick cannot be
-skipped.
+completes more dreamscapes. The user also gets a "rare draft" pick, functioning
+like a single pick from a normal [Draft](#draft) site but drawing only from rare
+cards in the pool. As with all draft picks, card selection is influenced by
+resonance and tags. This draft pick cannot be skipped.
 
 ## Limits
 
@@ -485,16 +494,19 @@ with it, drawn from:
 - Ruin
 
 When generating draft picks, shop offerings, or dreamsign offerings, the user's
-*current* deck is evaluated for its resonance score, and the selection of draft
-cards is weighted against that, i.e. a deck that contains a lot of Tide and
-Stone cards will generally see more Tide and Stone cards. As more cards with a
-given resonance are added, the chance of seeing other resonances diminishes.
-Generally the system converges towards decks having 2 main resonances after 5-10
-draft picks.
+*current* deck and dreamcaller are evaluated for a combined resonance score, and
+the selection of draft cards is weighted towards that score, i.e. a deck that
+contains a lot of Tide and Stone cards will generally see more Tide and Stone
+cards. As more cards with a given resonance are added, the chance of seeing
+other resonances diminishes. Generally the system converges towards decks having
+2 main resonances after 5-10 draft picks.
 
 Draft picks are drawn from a "pool" of cards generated at the start of a quest.
-This ensures draft picks are drawn without replacement, meaning the odds of
-seeing cards more than once diminish over time.
+When presenting draft options, cards are selected from this pool with
+probability proportional to how well their resonance matches the user's current
+resonance score, so the pool contents are fixed but the likelihood of being
+offered any given card shifts as the deck evolves. Cards are drawn without
+replacement, meaning the odds of seeing cards more than once diminish over time.
 
 When starting a new quest, the draft pool is weighted based on card rarity, with
 more copies of common cards and fewer copies of rare/legendary cards. There is
@@ -510,13 +522,21 @@ all data-driven and managed by TOML files.
 In addition to resonance, cards can have zero or more **tags** defined on them.
 Tags can cover any sort of mechanical theme and generally correspond to possible
 deck archetypes, such as cards that care about discard, cards that support a
-specific tribe like spirit animals, cards that care about reclaim, etc. Tag
-behavior is configured in TOML.
+specific tribe like spirit animals, cards that care about reclaim, etc. Tags
+influence card selection in a similar manner to resonance: as the user drafts
+more cards sharing a tag, subsequent offerings are more likely to include cards
+with that same tag. [Discovery Draft](#discovery-draft) and
+[Specialty Shop](#specialty-shop) sites use tags to generate their thematic
+groupings, selecting a tag and then offering cards that share it. Tag behavior
+is configured in TOML.
 
 ## Dream Atlas
 
-The Dream Atlas is the screen players see at the start of a quest. It shows a
-map of dreamscapes connected by dotted lines.
+The Dream Atlas is the screen players see at the start of a quest. It shows a 3D
+map of dreamscapes represented as circular miniature "worlds," connected by
+dotted lines. The player can hover over or long-press a dreamscape to preview
+its biome and available sites, then click it again to zoom the camera in to that
+dreamscape.
 
 Each dreamscape can be in one of three states:
 
@@ -549,7 +569,9 @@ The dream atlas is generated dynamically throughout the quest, with new
 dreamscapes being added as dreamscapes are completed. The new dreamscapes are
 added as 'unavailable' nodes adjacent to the newly 'available' nodes. Around 2-4
 nodes are randomly generated and placed in this manner each time a dreamscape is
-completed, creating a web of interconnected nodes. Initial atlas topology is
+completed, creating a web of interconnected nodes. The atlas is purely additive
+and is never pruned; the player will visit 7 dreamscapes in a typical quest (or
+8 with the battle-skip meta progression unlock). Initial atlas topology is
 configured in TOML.
 
 ## Dreamscape Generation
@@ -587,10 +609,11 @@ dreamscape visited, and only in that dreamscape.
 ### Enhanced Sites
 
 Each dreamscape is associated with a specific "biome" which dictates the 3D
-environment assets used in generation. Biome configuration and assignment are
-defined in TOML. Each dreamscape biome has an affinity for a specific site, and
-produces an "enhanced site" of that type when visited. The available enhanced
-sites are:
+environment assets used in generation. Biomes are purely visual aside from their
+enhanced site affinity. There is one biome per enhanced site type, and biome
+configuration and assignment are defined in TOML. Each dreamscape biome has an
+affinity for a specific site, and produces an "enhanced site" of that type when
+visited. The available enhanced sites are:
 
 - **Shop**: The reroll option is free
 - **Dreamsign Offering/Dreamsign Draft**: A dreamsign draft is offered instead,
