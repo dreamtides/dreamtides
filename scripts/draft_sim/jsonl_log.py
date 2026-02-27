@@ -60,8 +60,9 @@ class SessionLogger:
         strategy_name: str,
         strat_params: StrategyParams,
         algo_params,
+        quest_params=None,
     ):
-        self._write({
+        event = {
             "event": "session_start",
             "seed": seed,
             "strategy": strategy_name,
@@ -85,7 +86,11 @@ class SessionLogger:
                 )
             },
             "total_picks": len(result.picks),
-        })
+            "shop_count": result.shop_count,
+        }
+        if quest_params is not None:
+            event["shop_chance"] = quest_params.shop_chance
+        self._write(event)
 
     def log_pick(self, pick: PickRecord, ctx: PickContext):
         offered = []

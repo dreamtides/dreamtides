@@ -179,7 +179,7 @@ def mode_interactive(args):
     rng = random.Random(seed)
     result = simulate_quest(algo, pool, quest, strat, rng)
     logger = SessionLogger(seed)
-    logger.log_session_start(seed, result, strat.strategy.value, strat, algo)
+    logger.log_session_start(seed, result, strat.strategy.value, strat, algo, quest)
     run_interactive(result, strat.strategy.value, strat, logger=logger)
 
 
