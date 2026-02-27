@@ -1,5 +1,6 @@
 """Data models for the draft resonance simulation."""
 
+import random
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
@@ -86,8 +87,10 @@ class ResonanceProfile:
         return self.total()
 
     def top_n(self, n: int) -> list[tuple[Resonance, int]]:
-        """Return top-n resonances by count, descending."""
-        return sorted(self.counts.items(), key=lambda x: x[1], reverse=True)[:n]
+        """Return top-n resonances by count, descending. Ties broken randomly."""
+        items = list(self.counts.items())
+        random.shuffle(items)
+        return sorted(items, key=lambda x: x[1], reverse=True)[:n]
 
     def top2_share(self) -> float:
         """Fraction of resonance symbols in the top 2 resonances."""
