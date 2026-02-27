@@ -9,7 +9,7 @@ import os
 import time
 from pathlib import Path
 
-from models import PickRecord, QuestResult, Rarity, Resonance, StrategyParams
+from models import PickContext, PickRecord, QuestResult, Rarity, Resonance, StrategyParams
 
 # Project root is 3 levels up from this file
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -87,22 +87,29 @@ class SessionLogger:
             "total_picks": len(result.picks),
         })
 
-    def log_pick(self, pick: PickRecord, context: dict):
+    def log_pick(self, pick: PickRecord, ctx: PickContext):
         offered = []
         for card, weight in zip(pick.offered, pick.weights):
             offered.append({**_card_dict(card), "weight": round(weight, 4)})
 
-        self._write({
-            "event": "pick",
+        event: dict = {
+            "event": "shop" if ctx.is_shop else "pick",
             "pick_number": pick.pick_number,
-            "dreamscape": context["dreamscape"],
-            "site": context["site"],
-            "is_battle_reward": context["is_battle_reward"],
+            "dreamscape": ctx.dreamscape,
+            "site": ctx.site,
+            "is_battle_reward": ctx.is_battle_reward,
             "offered": offered,
-            "picked": _card_dict(pick.picked),
-            "pick_reason": pick.pick_reason,
             "profile_after": _profile_dict(pick.profile_after),
-        })
+        }
+
+        if ctx.is_shop:
+            event["bought"] = [_card_dict(c) for c in (pick.bought or [])]
+            event["buy_reasons"] = pick.buy_reasons or []
+        else:
+            event["picked"] = _card_dict(pick.picked)
+            event["pick_reason"] = pick.pick_reason
+
+        self._write(event)
 
     def log_session_end(self, result: QuestResult):
         profile = result.final_profile

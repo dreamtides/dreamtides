@@ -4,6 +4,7 @@ import random
 
 from models import (
     AlgorithmParams,
+    PickContext,
     PickRecord,
     PoolParams,
     QuestParams,
@@ -45,6 +46,7 @@ def simulate_quest(
     picks: list[PickRecord] = []
     deck: list[SimCard] = []
     pick_number = 0
+    shop_count = 0
 
     # 7 dreamscapes
     for dreamscape in range(7):
@@ -56,42 +58,99 @@ def simulate_quest(
         else:
             num_draft_sites = 0
 
-        for _ in range(num_draft_sites):
-            # Each draft site: 5 picks of 4 cards
-            for _ in range(5):
-                offered = select_cards(pool, 4, profile, algo_params, rng)
+        for site_idx in range(num_draft_sites):
+            is_shop = rng.random() < quest_params.shop_chance
+
+            if is_shop:
+                shop_count += 1
+                # Shop: offer 6 cards, strategy decides which to buy
+                offered = select_cards(pool, 6, profile, algo_params, rng)
                 if not offered:
                     continue
 
                 pick_number += 1
-                picked_entry, picked_weight = _pick_card(
-                    offered, profile, strat_params, rng
-                )
-                reason = _pick_reason(
-                    picked_entry.card, offered, profile, strat_params
+                bought_entries, buy_reasons = _shop_buy(
+                    offered, profile, strat_params
                 )
 
-                # Update profile
-                for r in picked_entry.card.resonances:
-                    profile.add(r)
+                # Update profile and pool for all bought cards
+                for entry in bought_entries:
+                    for r in entry.card.resonances:
+                        profile.add(r)
+                    _remove_from_pool(pool, entry)
+                    deck.append(entry.card)
 
-                # Update staleness on unpicked cards
+                # Staleness on cards not bought
+                bought_set = set(id(e) for e in bought_entries)
                 for entry, _ in offered:
-                    if entry is not picked_entry:
+                    if id(entry) not in bought_set:
                         entry.staleness += 1
 
-                # Remove picked card from pool
-                _remove_from_pool(pool, picked_entry)
-                deck.append(picked_entry.card)
+                # Use first bought card as primary pick for compatibility
+                primary = bought_entries[0] if bought_entries else offered[0][0]
+                primary_reason = buy_reasons[0] if buy_reasons else "no buy"
 
                 picks.append(PickRecord(
                     pick_number=pick_number,
+                    context=PickContext(
+                        dreamscape=dreamscape,
+                        site=site_idx,
+                        position=None,
+                        is_battle_reward=False,
+                        is_shop=True,
+                    ),
                     offered=[e.card for e, _ in offered],
                     weights=[w for _, w in offered],
-                    picked=picked_entry.card,
-                    pick_reason=reason,
+                    picked=primary.card if bought_entries else offered[0][0].card,
+                    pick_reason=primary_reason,
                     profile_after=profile.snapshot(),
+                    bought=[e.card for e in bought_entries],
+                    buy_reasons=buy_reasons,
                 ))
+
+            else:
+                # Draft site: 5 picks of 4 cards
+                for pos in range(5):
+                    offered = select_cards(pool, 4, profile, algo_params, rng)
+                    if not offered:
+                        continue
+
+                    pick_number += 1
+                    picked_entry, picked_weight = _pick_card(
+                        offered, profile, strat_params, rng
+                    )
+                    reason = _pick_reason(
+                        picked_entry.card, offered, profile, strat_params
+                    )
+
+                    # Update profile
+                    for r in picked_entry.card.resonances:
+                        profile.add(r)
+
+                    # Update staleness on unpicked cards
+                    for entry, _ in offered:
+                        if entry is not picked_entry:
+                            entry.staleness += 1
+
+                    # Remove picked card from pool
+                    _remove_from_pool(pool, picked_entry)
+                    deck.append(picked_entry.card)
+
+                    picks.append(PickRecord(
+                        pick_number=pick_number,
+                        context=PickContext(
+                            dreamscape=dreamscape,
+                            site=site_idx,
+                            position=pos,
+                            is_battle_reward=False,
+                            is_shop=False,
+                        ),
+                        offered=[e.card for e, _ in offered],
+                        weights=[w for _, w in offered],
+                        picked=picked_entry.card,
+                        pick_reason=reason,
+                        profile_after=profile.snapshot(),
+                    ))
 
         # Battle reward: 1 rare+ pick per dreamscape
         rare_offered = select_cards(
@@ -116,6 +175,13 @@ def simulate_quest(
 
             picks.append(PickRecord(
                 pick_number=pick_number,
+                context=PickContext(
+                    dreamscape=dreamscape,
+                    site=None,
+                    position=None,
+                    is_battle_reward=True,
+                    is_shop=False,
+                ),
                 offered=[e.card for e, _ in rare_offered],
                 weights=[w for _, w in rare_offered],
                 picked=picked_entry.card,
@@ -133,7 +199,57 @@ def simulate_quest(
         deck=deck,
         dreamcaller_resonances=dc_res,
         pool_variance=pool_variance,
+        shop_count=shop_count,
     )
+
+
+def _shop_buy(
+    offered: list[tuple[PoolEntry, float]],
+    profile: ResonanceProfile,
+    strat: StrategyParams,
+) -> tuple[list[PoolEntry], list[str]]:
+    """Decide which shop cards to buy based on strategy.
+
+    Returns (bought_entries, buy_reasons).
+    """
+    top2_res = {r for r, c in profile.top_n(2) if c > 0}
+    bought: list[PoolEntry] = []
+    reasons: list[str] = []
+
+    for entry, weight in offered:
+        card = entry.card
+        fit = _resonance_fit(card, top2_res)
+        res_str = "+".join(
+            r.value for r in sorted(card.resonances, key=lambda r: r.value)
+        )
+        if not res_str:
+            res_str = "neutral"
+
+        if strat.strategy == Strategy.POWER_CHASER:
+            # Buy everything
+            bought.append(entry)
+            reasons.append(f"buy power={card.power} ({res_str})")
+
+        elif strat.strategy == Strategy.RIGID:
+            # Buy only fully on-color or neutral
+            if not card.resonances or card.resonances <= top2_res:
+                bought.append(entry)
+                reasons.append(f"buy on-color power={card.power} ({res_str})")
+
+        else:
+            # Synergy: buy if fit >= 0.5 (partial match, full match, or neutral)
+            if fit >= 0.5:
+                score = (
+                    card.power * strat.power_weight
+                    + fit * strat.fit_weight * 10
+                )
+                bought.append(entry)
+                reasons.append(
+                    f"buy score={score:.1f} power={card.power} "
+                    f"fit={fit:.1f} ({res_str})"
+                )
+
+    return bought, reasons
 
 
 def _pick_card(

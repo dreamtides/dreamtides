@@ -10,7 +10,15 @@ import sys
 from typing import Optional
 
 from jsonl_log import SessionLogger
-from models import Rarity, Resonance, ResonanceProfile, QuestResult, PickRecord, StrategyParams
+from models import (
+    PickContext,
+    PickRecord,
+    QuestResult,
+    Rarity,
+    Resonance,
+    ResonanceProfile,
+    StrategyParams,
+)
 from output import classify_deck, has_splash, convergence_pick
 
 # ANSI color codes per resonance
@@ -130,14 +138,80 @@ def weight_bar(weight: float, max_weight: float, width: int = 9) -> str:
     return "\u2588" * filled + "\u2591" * (width - filled)
 
 
+def _build_card_lines(
+    card,
+    weight: float,
+    max_weight: float,
+    is_highlighted: bool,
+    fit: float,
+    card_width: int = 19,
+) -> list[str]:
+    """Build 6 lines for a single card display."""
+    inner = card_width - 2
+    cc = card_color(card.resonances)
+    rar = rarity_label(card.rarity)
+
+    # Line 1: resonance + rarity tag
+    res_display = color_resonances(card.resonances)
+    rar_display = f"[{rar}]"
+    res_vis = visible_len(res_display)
+    rar_vis = visible_len(rar_display)
+    avail = inner - 2 - rar_vis
+    if res_vis > avail:
+        line1 = f" {truncate_visible(res_display, inner - 1 - rar_vis)}{rar_display}"
+    else:
+        space_between = inner - 1 - res_vis - rar_vis
+        line1 = f" {res_display}{' ' * space_between}{rar_display}"
+
+    # Line 2: power
+    line2 = f"  pow: {card.power:2d}"
+
+    # Line 3: weight bar
+    bar = weight_bar(weight, max_weight)
+    line3 = f" {cc}{bar}{RESET}"
+
+    # Line 4: weight + fit
+    line4 = f" wt:{weight:5.1f} f:{fit:.0f}"
+
+    # Border colors
+    sorted_res = sorted(card.resonances, key=lambda r: r.value) if card.resonances else []
+    if len(sorted_res) >= 2:
+        lc = RESONANCE_COLORS[sorted_res[0]]
+        rc = RESONANCE_COLORS[sorted_res[1]]
+    elif len(sorted_res) == 1:
+        lc = rc = RESONANCE_COLORS[sorted_res[0]]
+    else:
+        lc = rc = NEUTRAL_COLOR
+
+    half = inner // 2
+    if is_highlighted:
+        top = f"{lc}\u2554{'\u2550' * half}{RESET}{rc}{'\u2550' * (inner - half)}\u2557{RESET}"
+        bot = f"{lc}\u255a{'\u2550' * half}{RESET}{rc}{'\u2550' * (inner - half)}\u255d{RESET}"
+        lbr = f"{lc}\u2551{RESET}"
+        rbr = f"{rc}\u2551{RESET}"
+    else:
+        top = f"{lc}\u250c{'\u2500' * half}{RESET}{rc}{'\u2500' * (inner - half)}\u2510{RESET}"
+        bot = f"{lc}\u2514{'\u2500' * half}{RESET}{rc}{'\u2500' * (inner - half)}\u2518{RESET}"
+        lbr = f"{lc}\u2502{RESET}"
+        rbr = f"{rc}\u2502{RESET}"
+
+    return [
+        top,
+        f"{lbr}{pad_right(line1, inner)}{rbr}",
+        f"{lbr}{pad_right(line2, inner)}{rbr}",
+        f"{lbr}{pad_right(line3, inner)}{rbr}",
+        f"{lbr}{pad_right(line4, inner)}{rbr}",
+        bot,
+    ]
+
+
 def render_cards(pick: PickRecord, strat_params: StrategyParams) -> str:
-    """Build side-by-side ASCII card art and arrow line."""
+    """Build side-by-side ASCII card art and arrow line for a draft pick."""
     cards = pick.offered
     weights = pick.weights
     picked_id = pick.picked.id
     max_w = max(weights) if weights else 1.0
     card_width = 19
-    inner = card_width - 2  # 17
     gap = "  "
 
     # Compute fit for each card using pre-pick profile
@@ -156,71 +230,16 @@ def render_cards(pick: PickRecord, strat_params: StrategyParams) -> str:
 
     # Build 6 lines per card
     all_lines: list[list[str]] = [[] for _ in range(6)]
-
     picked_idx = None
+
     for i, (card, w) in enumerate(zip(cards, weights)):
         is_picked = card.id == picked_id
         if is_picked:
             picked_idx = i
-        cc = card_color(card.resonances)
         fit = resonance_fit(card.resonances)
-
-        rar = rarity_label(card.rarity)
-
-        # Line 1: resonance + rarity tag — fit into `inner` visible chars
-        res_display = color_resonances(card.resonances)
-        rar_display = f"[{rar}]"
-        res_vis = visible_len(res_display)
-        rar_vis = visible_len(rar_display)
-        # " {res} {tag} " or " {res}{tag} " if tight
-        avail = inner - 2 - rar_vis  # space for leading+trailing space and rarity
-        if res_vis > avail:
-            # Tight: no space between res and tag
-            line1 = f" {truncate_visible(res_display, inner - 1 - rar_vis)}{rar_display}"
-        else:
-            space_between = inner - 1 - res_vis - rar_vis
-            line1 = f" {res_display}{' ' * space_between}{rar_display}"
-
-        # Line 2: power
-        line2 = f"  pow: {card.power:2d}"
-
-        # Line 3: weight bar (colored per resonance)
-        bar = weight_bar(w, max_w)
-        line3 = f" {cc}{bar}{RESET}"
-
-        # Line 4: weight + fit
-        line4 = f" wt:{w:5.1f} f:{fit:.0f}"
-
-        # Border colors: dual cards get left=first resonance, right=second
-        sorted_res = sorted(card.resonances, key=lambda r: r.value) if card.resonances else []
-        if len(sorted_res) >= 2:
-            lc = RESONANCE_COLORS[sorted_res[0]]
-            rc = RESONANCE_COLORS[sorted_res[1]]
-        elif len(sorted_res) == 1:
-            lc = rc = RESONANCE_COLORS[sorted_res[0]]
-        else:
-            lc = rc = NEUTRAL_COLOR
-
-        # Build border characters
-        if is_picked:
-            half = inner // 2
-            top = f"{lc}\u2554{'\u2550' * half}{RESET}{rc}{'\u2550' * (inner - half)}\u2557{RESET}"
-            bot = f"{lc}\u255a{'\u2550' * half}{RESET}{rc}{'\u2550' * (inner - half)}\u255d{RESET}"
-            lbr = f"{lc}\u2551{RESET}"
-            rbr = f"{rc}\u2551{RESET}"
-        else:
-            half = inner // 2
-            top = f"{lc}\u250c{'\u2500' * half}{RESET}{rc}{'\u2500' * (inner - half)}\u2510{RESET}"
-            bot = f"{lc}\u2514{'\u2500' * half}{RESET}{rc}{'\u2500' * (inner - half)}\u2518{RESET}"
-            lbr = f"{lc}\u2502{RESET}"
-            rbr = f"{rc}\u2502{RESET}"
-
-        all_lines[0].append(top)
-        all_lines[1].append(f"{lbr}{pad_right(line1, inner)}{rbr}")
-        all_lines[2].append(f"{lbr}{pad_right(line2, inner)}{rbr}")
-        all_lines[3].append(f"{lbr}{pad_right(line3, inner)}{rbr}")
-        all_lines[4].append(f"{lbr}{pad_right(line4, inner)}{rbr}")
-        all_lines[5].append(bot)
+        lines = _build_card_lines(card, w, max_w, is_picked, fit, card_width)
+        for row_idx, line in enumerate(lines):
+            all_lines[row_idx].append(line)
 
     # Join lines horizontally
     output_lines = []
@@ -234,6 +253,70 @@ def render_cards(pick: PickRecord, strat_params: StrategyParams) -> str:
         output_lines.append(
             " " * card_center + f"\u2514\u2500\u2500 {pick.pick_reason}"
         )
+
+    return "\n".join(output_lines)
+
+
+def render_shop(pick: PickRecord, strat_params: StrategyParams) -> str:
+    """Build 2-row x 3-column shop display with bought cards highlighted."""
+    cards = pick.offered
+    weights = pick.weights
+    bought_ids = {c.id for c in (pick.bought or [])}
+    max_w = max(weights) if weights else 1.0
+    card_width = 19
+    gap = "  "
+
+    # Compute fit using pre-buy profile
+    profile = ResonanceProfile()
+    for r, c in pick.profile_after.items():
+        profile.counts[r] = c
+    # Subtract bought cards to get pre-buy profile
+    for bought_card in (pick.bought or []):
+        for r in bought_card.resonances:
+            profile.counts[r] = max(0, profile.counts.get(r, 0) - 1)
+    top2_res = {r for r, _ in profile.top_n(2)}
+
+    def resonance_fit(card_res: frozenset) -> float:
+        if not card_res:
+            return 0.5
+        return len(card_res & top2_res) / len(card_res)
+
+    output_lines = []
+
+    # Render in 2 rows of 3
+    for row_start in range(0, len(cards), 3):
+        row_cards = list(zip(
+            cards[row_start:row_start + 3],
+            weights[row_start:row_start + 3],
+        ))
+
+        all_lines: list[list[str]] = [[] for _ in range(6)]
+        for card, w in row_cards:
+            is_bought = card.id in bought_ids
+            fit = resonance_fit(card.resonances)
+            lines = _build_card_lines(card, w, max_w, is_bought, fit, card_width)
+            for row_idx, line in enumerate(lines):
+                all_lines[row_idx].append(line)
+
+        for row in all_lines:
+            output_lines.append(gap.join(row))
+
+        # Buy/skip markers under each card
+        markers = []
+        for card, _ in row_cards:
+            if card.id in bought_ids:
+                label = f"  {BOLD}\u2713 BOUGHT{RESET}"
+            else:
+                label = f"  {DIM}  skipped{RESET}"
+            markers.append(pad_right(label, card_width))
+        output_lines.append(gap.join(markers))
+        output_lines.append("")
+
+    # Buy reasons summary
+    if pick.buy_reasons:
+        output_lines.append(f"  Bought {len(pick.bought or [])} of {len(cards)} cards:")
+        for reason in (pick.buy_reasons or []):
+            output_lines.append(f"    {reason}")
 
     return "\n".join(output_lines)
 
@@ -272,49 +355,6 @@ def stats_line(profile_snapshot: dict) -> str:
     return f"  Top-2: {top2:.1%}  |  HHI: {hhi:.3f}  |  Eff.Colors: {eff:.2f}  |  Class: {cls}"
 
 
-def build_pick_context() -> list[dict]:
-    """Build a static context list mapping pick numbers to dreamscape/site/position.
-
-    Quest structure:
-    DS 0-1: 2 sites of 5 picks + 1 battle reward = 11 each (22 total)
-    DS 2-3: 1 site of 5 picks + 1 battle reward = 6 each (12 total)
-    DS 4-6: 1 battle reward each (3 total)
-    Total: 37 picks
-    """
-    contexts = []
-    pick = 0
-    for ds in range(7):
-        if ds <= 1:
-            num_sites = 2
-        elif ds <= 3:
-            num_sites = 1
-        else:
-            num_sites = 0
-
-        for site in range(num_sites):
-            for pos in range(5):
-                pick += 1
-                contexts.append({
-                    "pick": pick,
-                    "dreamscape": ds,
-                    "site": site,
-                    "position": pos,
-                    "is_battle_reward": False,
-                })
-
-        # Battle reward
-        pick += 1
-        contexts.append({
-            "pick": pick,
-            "dreamscape": ds,
-            "site": None,
-            "position": None,
-            "is_battle_reward": True,
-        })
-
-    return contexts
-
-
 def print_quest_banner(result: QuestResult, strategy_name: str, strat_params: StrategyParams):
     """Print the quest start banner."""
     dc = color_resonances(result.dreamcaller_resonances)
@@ -324,7 +364,11 @@ def print_quest_banner(result: QuestResult, strategy_name: str, strat_params: St
         if result.picks:
             first_profile = result.picks[0].profile_after
             bonus = first_profile.get(r, 0)
-            if r in result.picks[0].picked.resonances:
+            if result.picks[0].context.is_shop:
+                for card in (result.picks[0].bought or []):
+                    if r in card.resonances:
+                        bonus -= 1
+            elif r in result.picks[0].picked.resonances:
                 bonus -= 1
             bonus_parts.append(f"{color_resonance(r)}={bonus}")
 
@@ -340,22 +384,24 @@ def print_quest_banner(result: QuestResult, strategy_name: str, strat_params: St
         bias_parts.append(f"{color_resonance(r)} {sign}{pct:.0f}%")
     bias_str = ", ".join(bias_parts)
 
-    draw_box([
+    banner_lines = [
         f"{BOLD}QUEST START{RESET}",
         f"Dreamcaller: {dc}",
         f"Strategy: {strat_detail}",
         f"Starting bonus: {bonus_str}",
         f"Pool bias: {bias_str}",
-    ])
+    ]
+    if result.shop_count > 0:
+        banner_lines.append(f"Shops: {result.shop_count} site(s) replaced drafts")
+    draw_box(banner_lines)
     print()
 
 
-def print_pick_header(ctx: dict, total_picks: int):
+def print_pick_header(ctx: PickContext, pick_num: int, total_picks: int):
     """Print header for a draft site pick."""
-    ds = ctx["dreamscape"]
-    site = ctx["site"]
-    pos = ctx["position"]
-    pick_num = ctx["pick"]
+    ds = ctx.dreamscape
+    site = ctx.site
+    pos = ctx.position
     w = 70
 
     if pos == 0:
@@ -375,10 +421,22 @@ def print_pick_header(ctx: dict, total_picks: int):
         print(f"{'\u2500' * w}")
 
 
-def print_battle_reward_header(ctx: dict, total_picks: int):
+def print_shop_header(ctx: PickContext, pick_num: int, total_picks: int):
+    """Print header for a shop site."""
+    ds = ctx.dreamscape
+    site = ctx.site
+    w = 70
+    print(f"\n{'\u2550' * w}")
+    header = f"  DREAMSCAPE {ds} \u2500\u2500 Shop (Site {site + 1})"
+    pick_tag = f"[Pick {pick_num}/{total_picks}]"
+    spacing = max(1, w - len(header) - len(pick_tag))
+    print(f"{header}{' ' * spacing}{pick_tag}")
+    print(f"{'\u2550' * w}")
+
+
+def print_battle_reward_header(ctx: PickContext, pick_num: int, total_picks: int):
     """Print header for a battle reward pick."""
-    ds = ctx["dreamscape"]
-    pick_num = ctx["pick"]
+    ds = ctx.dreamscape
     w = 70
     print(f"\n{'\u2550' * w}")
     header = f"  DREAMSCAPE {ds} \u2500\u2500 Battle Reward (Rare+)"
@@ -424,6 +482,8 @@ def print_final_summary(result: QuestResult, strategy_name: str):
     print(f"    Eff. Colors:    {eff:.2f}")
     print(f"    Classification: {cls}")
     print(f"    Splash:         {'yes' if splash else 'no'}")
+    if result.shop_count > 0:
+        print(f"    Shops visited:  {result.shop_count}")
     print()
 
     # Rarity breakdown
@@ -464,25 +524,26 @@ def run_interactive(
         print("Error: interactive mode requires a terminal", file=sys.stderr)
         sys.exit(1)
 
-    contexts = build_pick_context()
-    ctx_by_pick = {c["pick"]: c for c in contexts}
     total_picks = len(result.picks)
 
     print_quest_banner(result, strategy_name, strat_params)
     wait_for_input()
 
     for pick in result.picks:
-        ctx = ctx_by_pick.get(pick.pick_number)
-        if ctx is None:
-            continue
+        ctx = pick.context
 
-        if ctx["is_battle_reward"]:
-            print_battle_reward_header(ctx, total_picks)
+        if ctx.is_battle_reward:
+            print_battle_reward_header(ctx, pick.pick_number, total_picks)
+        elif ctx.is_shop:
+            print_shop_header(ctx, pick.pick_number, total_picks)
         else:
-            print_pick_header(ctx, total_picks)
+            print_pick_header(ctx, pick.pick_number, total_picks)
 
         print()
-        print(render_cards(pick, strat_params))
+        if ctx.is_shop:
+            print(render_shop(pick, strat_params))
+        else:
+            print(render_cards(pick, strat_params))
         print_profile(pick.profile_after)
         print_stats(pick.profile_after)
 

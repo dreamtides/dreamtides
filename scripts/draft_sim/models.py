@@ -49,6 +49,7 @@ class PoolParams:
 class QuestParams:
     dreamcaller_bonus: int = 4
     mono_dreamcaller: bool = False
+    shop_chance: float = 0.15
 
 
 @dataclass(frozen=True)
@@ -122,13 +123,25 @@ class ResonanceProfile:
 
 
 @dataclass
+class PickContext:
+    dreamscape: int
+    site: Optional[int]
+    position: Optional[int]
+    is_battle_reward: bool
+    is_shop: bool
+
+
+@dataclass
 class PickRecord:
     pick_number: int
+    context: PickContext
     offered: list[SimCard]
     weights: list[float]
     picked: SimCard
     pick_reason: str
     profile_after: dict[Resonance, int]
+    bought: Optional[list[SimCard]] = None
+    buy_reasons: Optional[list[str]] = None
 
 
 @dataclass
@@ -138,3 +151,4 @@ class QuestResult:
     deck: list[SimCard]
     dreamcaller_resonances: frozenset  # frozenset[Resonance]
     pool_variance: dict  # dict[Resonance, float] — starting bias multipliers
+    shop_count: int = 0

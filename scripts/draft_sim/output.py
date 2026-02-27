@@ -72,8 +72,13 @@ def convergence_pick(result: QuestResult) -> int:
     """First pick where top-2 share of drafted cards (excluding dreamcaller bonus) exceeds 75%."""
     deck_profile = ResonanceProfile()
     for pick in result.picks:
-        for r in pick.picked.resonances:
-            deck_profile.add(r)
+        if pick.bought:
+            for card in pick.bought:
+                for r in card.resonances:
+                    deck_profile.add(r)
+        else:
+            for r in pick.picked.resonances:
+                deck_profile.add(r)
         # Need at least 5 resonance-bearing cards before checking
         if deck_profile.total() >= 5 and deck_profile.top2_share() > 0.75:
             return pick.pick_number
@@ -118,18 +123,30 @@ def print_trace(result: QuestResult):
     print(f"\n=== Quest Trace (Dreamcaller: {dc_str}) ===\n")
 
     for pick in result.picks:
-        print(f"--- Pick {pick.pick_number} ---")
+        is_shop = pick.bought is not None
+        label = "Shop" if is_shop else "Pick"
+        print(f"--- {label} {pick.pick_number} ---")
+
+        bought_ids = {c.id for c in pick.bought} if pick.bought else set()
 
         # Show offered cards with weights
         for i, (card, weight) in enumerate(zip(pick.offered, pick.weights)):
             res = "+".join(r.value for r in sorted(card.resonances, key=lambda r: r.value))
             if not res:
                 res = "neutral"
-            marker = " <--" if card.id == pick.picked.id else ""
+            if is_shop:
+                marker = " <-- bought" if card.id in bought_ids else ""
+            else:
+                marker = " <--" if card.id == pick.picked.id else ""
             rarity_tag = card.rarity.value[0]
             print(f"  [{rarity_tag}] power={card.power:2d}  {res:14s}  w={weight:6.2f}{marker}")
 
-        print(f"  Picked: {pick.pick_reason}")
+        if is_shop:
+            print(f"  Bought {len(pick.bought)} cards")
+            for reason in (pick.buy_reasons or []):
+                print(f"    {reason}")
+        else:
+            print(f"  Picked: {pick.pick_reason}")
 
         # Profile snapshot
         profile_str = ", ".join(
@@ -297,17 +314,30 @@ def print_evolution(results: list[QuestResult]):
             # Re-add dreamcaller bonus
             if result.picks:
                 first = result.picks[0]
+                # Count resonances added by the first pick's cards
+                first_res_counts: dict = {}
+                if first.bought:
+                    for card in first.bought:
+                        for r in card.resonances:
+                            first_res_counts[r] = first_res_counts.get(r, 0) + 1
+                else:
+                    for r in first.picked.resonances:
+                        first_res_counts[r] = first_res_counts.get(r, 0) + 1
                 for r, c in first.profile_after.items():
-                    found_in_pick = 1 if r in first.picked.resonances else 0
-                    dc_bonus = c - found_in_pick
+                    dc_bonus = c - first_res_counts.get(r, 0)
                     if dc_bonus > 0:
                         profile.add(r, dc_bonus)
 
             for pick in result.picks:
                 if pick.pick_number > target_pick:
                     break
-                for r in pick.picked.resonances:
-                    profile.add(r)
+                if pick.bought:
+                    for card in pick.bought:
+                        for r in card.resonances:
+                            profile.add(r)
+                else:
+                    for r in pick.picked.resonances:
+                        profile.add(r)
 
                 # Track off-color at this point
                 top2_res = {r for r, _ in profile.top_n(2)}

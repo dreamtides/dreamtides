@@ -29,8 +29,9 @@ python3 scripts/draft_sim/draft_sim.py [--mode {trace,aggregate,sweep,evolution}
 
 Key flags: `--exponent`, `--floor-weight`, `--neutral-base`,
 `--staleness-factor` for algorithm tuning.
-`--strategy {synergy,power_chaser,rigid}` for player behavior. `--runs N` for
-sample size (default 1000). `--seed` for reproducibility.
+`--strategy {synergy,power_chaser,rigid}` for player behavior.
+`--shop-chance` probability a draft site becomes a shop (default 0.15).
+`--runs N` for sample size (default 1000). `--seed` for reproducibility.
 
 ## Output Modes
 
@@ -55,9 +56,29 @@ count, HHI, and off-color rate at each stage.
 **interactive**: Step-through terminal UI with colored ASCII cards, pausing
 after each pick. Automatically writes a JSONL log to `.logs/` with one JSON
 object per line: a `session_start` event (seed, parameters, dreamcaller, pool
-variance), one `pick` event per pick (offered cards with weights, picked card,
-reason, profile snapshot), and a `session_end` event (final stats). Log path is
-printed at quest completion.
+variance), one `pick` or `shop` event per pick (offered cards with weights,
+picked/bought cards, reasons, profile snapshot), and a `session_end` event
+(final stats). Log path is printed at quest completion.
+
+## Shops
+
+Each draft site has a `--shop-chance` (default 15%) probability of being
+replaced by a shop. Shops offer 6 resonance-weighted cards from the pool and
+the player strategy decides which to buy (essence is ignored — all cards are
+assumed affordable). This models the shop site from the
+[quest design doc](../plans/quests/quests.md).
+
+Shop buy strategies:
+- **synergy**: Buys cards with resonance fit >= 0.5 (on-color, partially
+  matching, or neutral). Skips completely off-color cards.
+- **power_chaser**: Buys all 6 cards.
+- **rigid**: Buys only fully on-color or neutral cards.
+
+A shop replaces an entire draft site (normally 5 picks of 4 cards), so it
+changes deck size: a synergy player typically buys 4-5 of 6 offered cards
+instead of gaining exactly 5. Shops appear in trace output as `Shop N` and in
+interactive mode with a distinct header and 2x3 card grid showing bought/skipped
+status.
 
 ## Player Strategies
 
@@ -66,13 +87,13 @@ Three strategies test different aspects of the algorithm:
 - **synergy** (default): Picks based on a weighted sum of card power and
   resonance fit. Models a skilled player who values both power and staying
   on-color. The `--fit-weight` parameter controls how much they prioritize
-  resonance alignment.
+  resonance alignment. In shops, buys all cards with fit >= 0.5.
 - **power_chaser**: Always picks the highest-power card, ignoring resonance.
   Stress-tests whether the algorithm robustly suppresses off-color offerings
-  even when the player doesn't cooperate.
+  even when the player doesn't cooperate. Buys all shop cards.
 - **rigid**: Only picks cards where all resonances match the player's top-2.
   Prefers neutrals over off-color as fallback. Tests whether mono-resonance is
-  viable when the player commits fully.
+  viable when the player commits fully. Only buys on-color/neutral from shops.
 
 ## Key Metrics
 
@@ -97,8 +118,8 @@ Three strategies test different aspects of the algorithm:
   and per-resonance variance), the weight calculation formula from the design
   doc, staleness penalty, and weighted sampling with resonance diversity and
   rarity guarantee checks.
-- `simulation.py`: Full quest loop (7 dreamscapes with draft sites and battle
-  rewards), player strategy dispatch, profile tracking.
+- `simulation.py`: Full quest loop (7 dreamscapes with draft sites, shops, and
+  battle rewards), player strategy dispatch, shop buy logic, profile tracking.
 - `output.py`: All four output modes, metrics computation, ASCII table
   formatting.
 - `jsonl_log.py`: JSONL session logger for interactive mode. Writes

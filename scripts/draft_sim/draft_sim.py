@@ -23,6 +23,7 @@ DEFAULT_SWEEP_RANGES: dict[str, list[float]] = {
     "dreamcaller_bonus": [2, 3, 4, 5, 6],
     "power_weight": [0.5, 1.0, 1.5, 2.0],
     "fit_weight": [0.5, 1.0, 1.5, 2.0, 2.5],
+    "shop_chance": [0.0, 0.10, 0.15, 0.25, 0.40],
 }
 
 
@@ -56,6 +57,8 @@ def build_parser() -> argparse.ArgumentParser:
     quest = parser.add_argument_group("Quest Structure")
     quest.add_argument("--dreamcaller-bonus", type=int, default=4)
     quest.add_argument("--mono-dreamcaller", action="store_true")
+    quest.add_argument("--shop-chance", type=float, default=0.15,
+                       help="Probability a draft site becomes a shop (default: 0.15)")
 
     sweep = parser.add_argument_group("Sweep Mode")
     sweep.add_argument("--sweep-param", default="exponent")
@@ -80,6 +83,7 @@ def make_params(args: argparse.Namespace):
     quest = QuestParams(
         dreamcaller_bonus=args.dreamcaller_bonus,
         mono_dreamcaller=args.mono_dreamcaller,
+        shop_chance=args.shop_chance,
     )
     strat = StrategyParams(
         strategy=Strategy(args.strategy),
@@ -139,7 +143,9 @@ def mode_sweep(args):
                     param_name: val,
                 })
             elif param_name == "dreamcaller_bonus":
-                quest = QuestParams(dreamcaller_bonus=int(val), mono_dreamcaller=quest.mono_dreamcaller)
+                quest = QuestParams(dreamcaller_bonus=int(val), mono_dreamcaller=quest.mono_dreamcaller, shop_chance=quest.shop_chance)
+            elif param_name == "shop_chance":
+                quest = QuestParams(dreamcaller_bonus=quest.dreamcaller_bonus, mono_dreamcaller=quest.mono_dreamcaller, shop_chance=val)
             elif param_name in ("power_weight", "fit_weight"):
                 strat = StrategyParams(
                     strategy=strat_enum,
