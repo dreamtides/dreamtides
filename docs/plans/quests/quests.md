@@ -36,7 +36,7 @@ various other ways. Players start each quest with 250 essence and no cards in
 their deck.
 
 In addition to deck cards, users during a quest will select a "dreamcaller" to
-lead their deck and one or more "dreamsigns":
+lead their deck and may have some number of "dreamsigns":
 
 - **Dreamcaller:** An animated 3D character who starts each battle already in
   play for both participants in a battle. Each dreamcaller has powerful ongoing
@@ -87,7 +87,7 @@ rules engine.
 The following dreamscape sites are planned for eventual implementation in
 Dreamtides. Sites can generally be visited in any order, with the exception that
 the "Battle" site must be visited last. Each site must be visited exactly once
-and cannot be returned to. Dreamscapes always contain a battle site and will
+and cannot be returned to. Dreamscapes usually contain a battle site and will
 contain around 3-6 other sites as described below in the [Dreamscape
 Generation](#dreamscape-generation) section.
 
@@ -149,11 +149,12 @@ dreamcaller. This displays a selection of around 3 dreamcallers. Dreamcallers
 are animated 3D characters, and we'll typically play character animations on
 this screen. The user can read the special abilities of the offered dreamcallers
 and pick one to lead their deck. Dreamcallers affect which cards are offered in
-future Draft sites, refer to the [Resonance](#resonance--draft-pick-generation)
-section below for more details.
+future Draft sites, refer to the [Resonance](#resonance) section below for more
+details.
 
 Each dreamcaller comes with a different **essence bonus** gained for selecting
 that option, which serves as a lever for balancing more powerful dreamcallers.
+Bonus amounts are configured in TOML.
 
 There is a certain element of strategy to *when* the user visits this site, and
 it's intended to not be obvious whether it's better to visit other sites before
@@ -187,10 +188,10 @@ site options such as purchasing journeys, purging cards, transfiguring cards,
 duplicating cards, etc. Shops do offer the ability to spend essence to "reroll"
 (generate a new set of shop items to buy).
 
-Shop base prices are static, defined in TOML. The shop implements a random
-"discount" system where one or more items can be displayed as being on sale, for
-between 30% and 90% cost reduction. Things like dreamsigns or journey effects
-can also modify shop prices.
+Shop base prices and the overall essence economy are defined in TOML. The shop
+implements a random "discount" system where one or more items can be displayed
+as being on sale, for between 30% and 90% cost reduction. Things like dreamsigns
+or journey effects can also modify shop prices.
 
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
 with some dialog when the camera arrives at this site. Two rows of three items
@@ -207,11 +208,11 @@ impression they are still available.
 
 Icon: "Store"
 
-### Speciality Shop
+### Specialty Shop
 
-A speciality shop functions in the same manner as a regular shop, but it shows
-items with a unfying mechanical theme. Speciality shops use the same generation
-algorithm and tagging sytem as [Discovery Draft](#discovery-draft) sites.
+A specialty shop functions in the same manner as a regular shop, but it shows
+items with a unifying mechanical theme. Specialty shops use the same generation
+algorithm and tagging system as [Discovery Draft](#discovery-draft) sites.
 
 **UI:** Identical UI to the regular shop site except that it features a
 different NPC.
@@ -283,7 +284,7 @@ allowing the user to reject the dream journey options.
 
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
 with some dialog when the camera arrives at this site. The journey/cost card
-pairs animation out from the center of the NPC's chest at a small scale in a
+pairs animate out from the center of the NPC's chest at a small scale in a
 staggered animation (identical to a Dream Journey). The cards are displayed in
 two rows, with the journey card on the left side of the row and the cost card on
 the right side of the row, and with a purple button displayed under each pair to
@@ -450,7 +451,7 @@ during a battle until they exceed 25 (for example, a player with 9 cards in
 their deck will end up with 27 cards during a battle).
 
 Users can have a maximum of 12 dreamsigns at any time. If they would receive
-another dreamsign, they must immediately purge a dreamsign from their deck.
+another dreamsign, they must immediately purge a dreamsign.
 
 Users may have only 1 dreamcaller.
 
@@ -459,7 +460,7 @@ Users may have only 1 dreamcaller.
 Certain cards and dreamsigns, called "banes", can be given to the user during a
 quest, typically as a result of a [Tempting Offer](#tempting-offer) choice. Bane
 cards generally have negative effects when drawn, while bane dreamsigns provide
-ongong negative effects on the quest. Bane cards can be [purged](#purge) as
+ongoing negative effects on the quest. Bane cards can be [purged](#purge) as
 normal. Bane cards and bane dreamsigns can be removed via the
 [cleanse](#cleanse) site.
 
@@ -478,15 +479,15 @@ with it, drawn from:
 
 When generating draft picks, shop offerings, or dreamsign offerings, the user's
 *current* deck is evaluated for its resonance score, and the selection of draft
-cards is weighted against that, i.e. a deck the contains a lot of Tide and Stone
-cards will generally see more Tide and Stone cards. As more cards with a given
-resonance are added, the chances of seeing other resonances diminishes.
+cards is weighted against that, i.e. a deck that contains a lot of Tide and
+Stone cards will generally see more Tide and Stone cards. As more cards with a
+given resonance are added, the chance of seeing other resonances diminishes.
 Generally the system converges towards decks having 2 main resonances after 5-10
 draft picks.
 
 Draft picks are drawn from a "pool" of cards generated at the start of a quest.
 This ensures draft picks are drawn without replacement, meaning the odds of
-seeing cards more than once diminishes over time.
+seeing cards more than once diminish over time.
 
 When starting a new quest, the draft pool is weighted based on card rarity, with
 more copies of common cards and fewer copies of rare/legendary cards. There is
@@ -494,15 +495,16 @@ also a slight random starting bias in the pool to make the play experience
 variable, there might for example be 20% more tide cards, 10% more ember cards,
 10% less stone cards, and 20% less ruin cards in the pool.
 
-The exact configuration of the draft pool is all data-driven and managed by TOML
-files.
+The exact configuration of the draft pool, including weighting algorithms, is
+all data-driven and managed by TOML files.
 
 ### Card Tagging
 
 In addition to resonance, cards can have zero or more **tags** defined on them.
 Tags can cover any sort of mechanical theme and generally correspond to possible
 deck archetypes, such as cards that care about discard, cards that support a
-specific tribe like spirit animals, cards that care about reclaim, etc.
+specific tribe like spirit animals, cards that care about reclaim, etc. Tag
+behavior is configured in TOML.
 
 ## Dream Atlas
 
@@ -529,26 +531,26 @@ In other words, a dreamscape is **Available** only if it is connected to the
 Nexus or to at least one **Completed** dreamscape.
 
 Each dreamscape displays a preview of what sites are available in that location.
-This shows 2-3 icons sites present, not including "draft" or "battle" sites,
-allowing the user to make an informed decision about which dreamscape to visit
-next. This is also where [Reward Site](#reward-site) rewards are shown. Winning
-the 7th battle causes the player to win the quest.
+This shows 2-3 site icons, not including "draft" or "battle" sites, allowing the
+user to make an informed decision about which dreamscape to visit next. This is
+also where [Reward Site](#reward-site) rewards are shown. Winning the 7th battle
+causes the player to win the quest.
 
 ### Dream Atlas Generation
 
 The dream atlas is generated dynamically throughout the quest, with new
 dreamscapes being added as dreamscapes are completed. The new dreamscapes are
-added as 'unavilable' nodes adjacent to the newly 'available' nodes. Around 2-4
+added as 'unavailable' nodes adjacent to the newly 'available' nodes. Around 2-4
 nodes are randomly generated and placed in this manner each time a dreamscape is
 completed, creating a web of interconnected nodes.
 
 ## Dreamscape Generation
 
 Dreamscapes are generated by drawing sites from a pool, in a similar manner to
-how draft picks are generated . Sites are selected when the dreamscape becomes
+how draft picks are generated. Sites are selected when the dreamscape becomes
 available. The pool for site generation changes over time, with new options
 being shuffled in after each dreamscape is completed. Each completed dreamscape
-shuffles in a new set of sites as defined in TOML for that completion level .
+shuffles in a new set of sites as defined in TOML for that completion level.
 Transfiguration, Purge, and Duplication sites are more common later in the
 Quest, for example.
 
@@ -568,7 +570,8 @@ draft sites based on completion level.
 Battle sites are also distinct: Dreamscapes have one Battle site, or zero if
 this has been modified by [meta progression](meta_progression.md). The opponent
 dreamcaller, dreamsigns, and deck for the battle is selected from a pool of
-opponents defined in TOML for a given completion levle.
+opponents defined in TOML for a given completion level. Difficulty scaling is
+configured in TOML.
 
 The Dreamcaller Draft site is distinct and can only appear in the first
 dreamscape visited.
@@ -576,9 +579,10 @@ dreamscape visited.
 ### Enhanced Sites
 
 Each dreamscape is associated with a specific "biome" which dictates the 3D
-environment assets used in generation. Each dreamscape biome has an affinity for
-a specific site, and produces an "enhanced site" of that type when visited. The
-available enhanced sites are:
+environment assets used in generation. Biome configuration and assignment are
+defined in TOML. Each dreamscape biome has an affinity for a specific site, and
+produces an "enhanced site" of that type when visited. The available enhanced
+sites are:
 
 - **Shop**: The reroll option is free
 - **Dreamsign Offering/Dreamsign Draft**: A dreamsign draft is offered instead,
