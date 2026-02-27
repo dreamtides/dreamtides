@@ -499,7 +499,7 @@ seeing cards more than once diminish over time.
 When starting a new quest, the draft pool is weighted based on card rarity, with
 more copies of common cards and fewer copies of rare/legendary cards. There is
 also a slight random starting bias in the pool to make the play experience
-variable, there might for example be 20% more tide cards, 10% more ember cards,
+variable; there might for example be 20% more tide cards, 10% more ember cards,
 10% less stone cards, and 20% less ruin cards in the pool.
 
 The exact configuration of the draft pool, including weighting algorithms, is
@@ -611,7 +611,7 @@ The overall implementation strategy for the Quests game mode is to rely heavily
 on both *integration testing* and *manual QA*. The integration testing
 philosophy should follow what we use for the battle game mode, writing tests
 that operate against the real QuestView/Commands interface. Philosophically,
-dreamtides does not employ unit testing.
+Dreamtides does not employ unit testing.
 
 The manual QA strategy here is based on validating all changes against a running
 instance of the Unity editor using the [abu](../../abu/abu.md) tool. *Every*
