@@ -43,6 +43,21 @@ def pad_right(s: str, width: int) -> str:
     return s + " " * max(0, width - visible_len(s))
 
 
+def draw_box(lines: list[str], width: int = 62):
+    """Draw a double-line box around lines of text.
+
+    Each line can contain ANSI escape sequences. The box is drawn to
+    exactly `width` visible columns (including the border characters).
+    Content is left-aligned with 2-space indent inside the borders.
+    """
+    inner = width - 2  # space between ║ and ║
+    print(f"\u2554{'\u2550' * inner}\u2557")
+    for line in lines:
+        # pad_right uses visible_len internally, so ANSI codes are handled
+        print(f"\u2551  {pad_right(line, inner - 2)}\u2551")
+    print(f"\u255a{'\u2550' * inner}\u255d")
+
+
 def truncate_visible(s: str, max_width: int) -> str:
     """Truncate a string (possibly with ANSI codes) to max visible width."""
     vlen = visible_len(s)
@@ -302,16 +317,12 @@ def print_quest_banner(result: QuestResult, strategy_name: str, strat_params: St
     strat_detail = f"{strategy_name} (pow={strat_params.power_weight}, fit={strat_params.fit_weight})"
     bonus_str = ", ".join(bonus_parts) if bonus_parts else "none"
 
-    w = 62
-    print(f"\u2554{'\u2550' * w}\u2557")
-    line1 = f"{BOLD}QUEST START{RESET}"
-    print(f"\u2551  {pad_right(line1, w - 2 + len(line1) - visible_len(line1))}\u2551")
-    dc_line = f"Dreamcaller: {dc}"
-    print(f"\u2551  {pad_right(dc_line, w - 2 + len(dc_line) - visible_len(dc_line))}\u2551")
-    print(f"\u2551  {pad_right(f'Strategy: {strat_detail}', w - 2)}\u2551")
-    bonus_line = f"Starting bonus: {bonus_str}"
-    print(f"\u2551  {pad_right(bonus_line, w - 2 + len(bonus_line) - visible_len(bonus_line))}\u2551")
-    print(f"\u255a{'\u2550' * w}\u255d")
+    draw_box([
+        f"{BOLD}QUEST START{RESET}",
+        f"Dreamcaller: {dc}",
+        f"Strategy: {strat_detail}",
+        f"Starting bonus: {bonus_str}",
+    ])
     print()
 
 
@@ -367,11 +378,8 @@ def print_stats(profile_snapshot: dict):
 def print_final_summary(result: QuestResult, strategy_name: str):
     """Print end-of-quest summary."""
     total = len(result.picks)
-    w = 62
-    header = f"{BOLD}QUEST COMPLETE{RESET} \u2500\u2500 {total} cards drafted"
-    print(f"\n\u2554{'\u2550' * w}\u2557")
-    print(f"\u2551  {pad_right(header, w - 2 + len(header) - visible_len(header))}\u2551")
-    print(f"\u255a{'\u2550' * w}\u255d")
+    print()
+    draw_box([f"{BOLD}QUEST COMPLETE{RESET} \u2500\u2500 {total} cards drafted"])
 
     # Final resonance profile
     print(f"\n  Final Resonance Profile:")
