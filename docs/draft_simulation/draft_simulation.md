@@ -28,9 +28,9 @@ python3 scripts/draft_sim/draft_sim.py [--mode {trace,aggregate,sweep,evolution}
 ```
 
 Key flags: `--exponent`, `--floor-weight`, `--neutral-base`,
-`--staleness-factor` for algorithm tuning. `--strategy {synergy,power_chaser,rigid}`
-for player behavior. `--runs N` for sample size (default 1000). `--seed` for
-reproducibility.
+`--staleness-factor` for algorithm tuning.
+`--strategy {synergy,power_chaser,rigid}` for player behavior. `--runs N` for
+sample size (default 1000). `--seed` for reproducibility.
 
 ## Output Modes
 
@@ -72,11 +72,11 @@ Three strategies test different aspects of the algorithm:
 - **convergence_pick**: First pick where top-2 resonance share exceeds 75% of
   drafted cards (requires at least 5 resonance-bearing cards).
 - **top2_share**: Fraction of resonance symbols in the dominant two resonances.
-- **HHI**: Herfindahl-Hirschman Index. Approximately 1.0 for mono, 0.5 for
-  dual, 0.2 for scattered.
+- **HHI**: Herfindahl-Hirschman Index. Approximately 1.0 for mono, 0.5 for dual,
+  0.2 for scattered.
 - **pct_mono/dual/tri**: Classification based on share thresholds. Mono requires
-  one color above 85%. Dual requires top-2 above 75% with neither above 85%.
-  Tri requires three colors each above 15%.
+  one color above 85%. Dual requires top-2 above 75% with neither above 85%. Tri
+  requires three colors each above 15%.
 - **splash%**: Runs where the third-highest resonance has 1-3 cards.
 - **off_color_offered%**: How often the algorithm offers cards outside the
   player's top-2 resonances.
