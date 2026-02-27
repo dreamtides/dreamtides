@@ -168,7 +168,7 @@ def mode_evolution(args):
 
 def mode_interactive(args):
     algo, pool, quest, strat = make_params(args)
-    seed = args.seed if args.seed is not None else 42
+    seed = args.seed if args.seed is not None else random.randint(0, 2**32)
     rng = random.Random(seed)
     result = simulate_quest(algo, pool, quest, strat, rng)
     run_interactive(result, strat.strategy.value, strat)
