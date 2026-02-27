@@ -43,17 +43,18 @@ def pad_right(s: str, width: int) -> str:
     return s + " " * max(0, width - visible_len(s))
 
 
-def draw_box(lines: list[str], width: int = 62):
+def draw_box(lines: list[str], min_width: int = 62):
     """Draw a double-line box around lines of text.
 
-    Each line can contain ANSI escape sequences. The box is drawn to
-    exactly `width` visible columns (including the border characters).
-    Content is left-aligned with 2-space indent inside the borders.
+    Each line can contain ANSI escape sequences. The box auto-sizes to
+    fit the longest line (with a minimum of `min_width` visible columns
+    including the border characters). Content is left-aligned with
+    2-space indent inside the borders.
     """
-    inner = width - 2  # space between ║ and ║
+    max_content = max((visible_len(line) for line in lines), default=0)
+    inner = max(min_width - 2, max_content + 4)  # 2-space indent + 2-space padding
     print(f"\u2554{'\u2550' * inner}\u2557")
     for line in lines:
-        # pad_right uses visible_len internally, so ANSI codes are handled
         print(f"\u2551  {pad_right(line, inner - 2)}\u2551")
     print(f"\u255a{'\u2550' * inner}\u255d")
 
@@ -328,11 +329,21 @@ def print_quest_banner(result: QuestResult, strategy_name: str, strat_params: St
     strat_detail = f"{strategy_name} (pow={strat_params.power_weight}, fit={strat_params.fit_weight})"
     bonus_str = ", ".join(bonus_parts) if bonus_parts else "none"
 
+    # Format pool variance as percentage bias per resonance
+    bias_parts = []
+    for r in sorted(result.pool_variance.keys(), key=lambda r: r.value):
+        mult = result.pool_variance[r]
+        pct = (mult - 1.0) * 100
+        sign = "+" if pct >= 0 else ""
+        bias_parts.append(f"{color_resonance(r)} {sign}{pct:.0f}%")
+    bias_str = ", ".join(bias_parts)
+
     draw_box([
         f"{BOLD}QUEST START{RESET}",
         f"Dreamcaller: {dc}",
         f"Strategy: {strat_detail}",
         f"Starting bonus: {bonus_str}",
+        f"Pool bias: {bias_str}",
     ])
     print()
 

@@ -21,8 +21,12 @@ def generate_pool(
     params: PoolParams,
     rng: random.Random,
     num_unique: int = 360,
-) -> list[PoolEntry]:
-    """Generate a pool of cards with rarity-based copy counts and resonance variance."""
+) -> tuple[list[PoolEntry], dict[Resonance, float]]:
+    """Generate a pool of cards with rarity-based copy counts and resonance variance.
+
+    Returns (pool, variance) where variance maps each resonance to its
+    random starting multiplier.
+    """
     resonances = list(Resonance)
     variance = {r: rng.uniform(params.variance_min, params.variance_max) for r in resonances}
 
@@ -83,7 +87,7 @@ def generate_pool(
         for _ in range(copies):
             pool.append(PoolEntry(card))
 
-    return pool
+    return pool, variance
 
 
 def compute_weight(

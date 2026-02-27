@@ -137,3 +137,4 @@ class QuestResult:
     final_profile: ResonanceProfile
     deck: list[SimCard]
     dreamcaller_resonances: frozenset  # frozenset[Resonance]
+    pool_variance: dict  # dict[Resonance, float] — starting bias multipliers

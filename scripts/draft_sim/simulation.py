@@ -40,7 +40,7 @@ def simulate_quest(
         profile.add(r, quest_params.dreamcaller_bonus)
 
     # Generate pool
-    pool = generate_pool(pool_params, rng)
+    pool, pool_variance = generate_pool(pool_params, rng)
 
     picks: list[PickRecord] = []
     deck: list[SimCard] = []
@@ -132,6 +132,7 @@ def simulate_quest(
         final_profile=profile,
         deck=deck,
         dreamcaller_resonances=dc_res,
+        pool_variance=pool_variance,
     )
 
 
