@@ -10,6 +10,7 @@ import random
 import sys
 
 from models import AlgorithmParams, PoolParams, QuestParams, Strategy, StrategyParams
+from interactive import run_interactive
 from output import print_aggregate, print_evolution, print_sweep, print_trace
 from simulation import simulate_quest
 
@@ -31,7 +32,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--mode",
-        choices=["trace", "aggregate", "sweep", "evolution"],
+        choices=["trace", "aggregate", "sweep", "evolution", "interactive"],
         default="aggregate",
         help="Output mode (default: aggregate)",
     )
@@ -165,6 +166,14 @@ def mode_evolution(args):
     print_evolution(results)
 
 
+def mode_interactive(args):
+    algo, pool, quest, strat = make_params(args)
+    seed = args.seed if args.seed is not None else 42
+    rng = random.Random(seed)
+    result = simulate_quest(algo, pool, quest, strat, rng)
+    run_interactive(result, strat.strategy.value, strat)
+
+
 def main():
     parser = build_parser()
     args = parser.parse_args()
@@ -174,6 +183,7 @@ def main():
         "aggregate": mode_aggregate,
         "sweep": mode_sweep,
         "evolution": mode_evolution,
+        "interactive": mode_interactive,
     }
     dispatch[args.mode](args)
 
