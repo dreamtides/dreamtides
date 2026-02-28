@@ -29,9 +29,9 @@ python3 scripts/draft_sim/draft_sim.py [--mode {trace,aggregate,sweep,evolution}
 
 Key flags: `--exponent`, `--floor-weight`, `--neutral-base`,
 `--staleness-factor` for algorithm tuning.
-`--strategy {synergy,power_chaser,rigid}` for player behavior.
-`--shop-chance` probability a draft site becomes a shop (default 0.15).
-`--runs N` for sample size (default 1000). `--seed` for reproducibility.
+`--strategy {synergy,power_chaser,rigid}` for player behavior. `--shop-chance`
+probability a draft site becomes a shop (default 0.15). `--runs N` for sample
+size (default 1000). `--seed` for reproducibility.
 
 ## Output Modes
 
@@ -63,12 +63,13 @@ picked/bought cards, reasons, profile snapshot), and a `session_end` event
 ## Shops
 
 Each draft site has a `--shop-chance` (default 15%) probability of being
-replaced by a shop. Shops offer 6 resonance-weighted cards from the pool and
-the player strategy decides which to buy (essence is ignored — all cards are
-assumed affordable). This models the shop site from the
+replaced by a shop. Shops offer 6 resonance-weighted cards from the pool and the
+player strategy decides which to buy (essence is ignored — all cards are assumed
+affordable). This models the shop site from the
 [quest design doc](../plans/quests/quests.md).
 
 Shop buy strategies:
+
 - **synergy**: Buys cards with resonance fit >= 0.5 (on-color, partially
   matching, or neutral). Skips completely off-color cards.
 - **power_chaser**: Buys all 6 cards.

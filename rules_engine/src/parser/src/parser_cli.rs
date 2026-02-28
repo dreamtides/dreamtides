@@ -12,9 +12,12 @@ use parser::error::{parser_diagnostics, parser_error_suggestions};
 use parser::lexer::lexer_token::Token;
 use parser::lexer::lexer_tokenize;
 use parser::parser::ability_parser;
+use parser::serializer::ability_serializer;
 use parser::variables::parser_bindings::VariableBindings;
 use parser::variables::parser_substitutions::{self, ResolvedToken};
+use regex::Regex;
 use serde::{Deserialize, Serialize};
+use toml::Value;
 
 #[derive(Parser)]
 #[command(
@@ -108,6 +111,14 @@ enum Command {
     Verify {
         input: PathBuf,
     },
+
+    ExportCards {
+        #[arg(short, long)]
+        input: PathBuf,
+
+        #[arg(short, long)]
+        output: PathBuf,
+    },
 }
 
 #[derive(Clone, ValueEnum)]
@@ -149,6 +160,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         }
         Command::Verify { input } => {
             verify_command(&input)?;
+        }
+        Command::ExportCards { input, output } => {
+            export_cards_command(&input, &output)?;
         }
     }
 
@@ -467,4 +481,140 @@ struct CardParseResult {
     rules_text: String,
     variables: Option<String>,
     tokens: Vec<ResolvedToken>,
+}
+
+#[derive(Debug, Deserialize)]
+struct ExportCardsFile {
+    cards: Vec<ExportCard>,
+}
+
+#[derive(Debug, Deserialize)]
+struct ExportCard {
+    name: String,
+    #[serde(rename = "energy-cost")]
+    energy_cost: Value,
+    #[serde(rename = "card-type")]
+    card_type: String,
+    subtype: String,
+    #[serde(rename = "is-fast")]
+    is_fast: bool,
+    spark: Value,
+    rarity: String,
+    #[serde(rename = "card-number")]
+    card_number: u32,
+    #[serde(rename = "rules-text", default)]
+    rules_text: Option<String>,
+    #[serde(default)]
+    variables: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+struct ExportedCard {
+    name: String,
+    card_number: u32,
+    energy_cost: Option<u32>,
+    card_type: String,
+    subtype: Option<String>,
+    is_fast: bool,
+    spark: Option<u32>,
+    rarity: String,
+    rules_text: String,
+}
+
+fn export_cards_command(input: &Path, output: &Path) -> Result<(), Box<dyn std::error::Error>> {
+    let content = fs::read_to_string(input)?;
+    let cards_file: ExportCardsFile = toml::from_str(&content)?;
+    let tag_regex = Regex::new(r"<[^>]+>")?;
+
+    let mut results = Vec::new();
+
+    for card in &cards_file.cards {
+        if card.rarity == "Special" {
+            continue;
+        }
+
+        let energy_cost = match &card.energy_cost {
+            Value::Integer(n) => Some(*n as u32),
+            _ => None,
+        };
+
+        let spark = match &card.spark {
+            Value::Integer(n) => Some(*n as u32),
+            _ => None,
+        };
+
+        let subtype = if card.subtype.is_empty() { None } else { Some(card.subtype.clone()) };
+
+        let rules_text = render_rules_text(card, &tag_regex)?;
+
+        results.push(ExportedCard {
+            name: card.name.clone(),
+            card_number: card.card_number,
+            energy_cost,
+            card_type: card.card_type.clone(),
+            subtype,
+            is_fast: card.is_fast,
+            spark,
+            rarity: card.rarity.clone(),
+            rules_text,
+        });
+    }
+
+    if let Some(parent) = output.parent() {
+        fs::create_dir_all(parent)?;
+    }
+
+    let output_content = serde_json::to_string_pretty(&results)?;
+    fs::write(output, output_content)?;
+
+    println!("Exported {} cards to {}", results.len(), output.display());
+
+    Ok(())
+}
+
+fn render_rules_text(
+    card: &ExportCard,
+    tag_regex: &Regex,
+) -> Result<String, Box<dyn std::error::Error>> {
+    let rules_text = match &card.rules_text {
+        Some(text) if !text.is_empty() => text,
+        _ => return Ok(String::new()),
+    };
+
+    let bindings = if let Some(vars) = &card.variables {
+        if vars.is_empty() {
+            VariableBindings::new()
+        } else {
+            VariableBindings::parse(vars)?
+        }
+    } else {
+        VariableBindings::new()
+    };
+
+    let mut rendered_parts = Vec::new();
+
+    for ability_block in rules_text.split("\n\n") {
+        let ability_block = ability_block.trim();
+        if ability_block.is_empty() {
+            continue;
+        }
+
+        let lex_result = lexer_tokenize::lex(ability_block)
+            .map_err(|e| format!("Lex error for '{}': {:?}", card.name, e))?;
+
+        let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings)
+            .map_err(|e| format!("Resolve error for '{}': {}", card.name, e))?;
+
+        let parser = ability_parser::ability_parser();
+        let ability = parser
+            .parse(&resolved)
+            .into_result()
+            .map_err(|errors| format!("Parse error for '{}': {:?}", card.name, errors))?;
+
+        let serialized = ability_serializer::serialize_ability(&ability);
+        let stripped = tag_regex.replace_all(&serialized.text, "");
+        rendered_parts.push(stripped.into_owned());
+    }
+
+    Ok(rendered_parts.join("\n"))
 }

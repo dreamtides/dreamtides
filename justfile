@@ -427,6 +427,11 @@ parser *args='':
 parser-release *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --release --bin "parser" -- "$@"
 
+export-cards:
+  #!/usr/bin/env bash
+  mkdir -p scripts/quest_simulator/data
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "parser" -- export-cards --input rules_engine/tabula/cards.toml --output scripts/quest_simulator/data/cards.json
+
 parse-abilities:
   cargo run --manifest-path rules_engine/Cargo.toml --bin "parser" -- parse-abilities --directory rules_engine/tabula --output rules_engine/tabula/parsed_abilities.json
 

@@ -18,6 +18,7 @@ strings = { path = "../strings" }
 ariadne = { workspace = true }
 chumsky = { workspace = true }
 clap = { workspace = true, features = ["derive"] }
+regex = { workspace = true }
 rlf = { workspace = true }
 ron = { workspace = true }
 serde = { workspace = true }
