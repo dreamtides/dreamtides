@@ -250,8 +250,7 @@ class TestDiversityCheck:
         profile.add(Resonance.TIDE, 20)  # Heavy Tide bias
         params = _make_params()
 
-        # Run many times -- diversity check should prevent all-Tide in n>=4
-        all_same_count = 0
+        # Run many times -- diversity check should always prevent all-Tide in n>=4
         for seed in range(50):
             rng = random.Random(seed)
             result = select_cards(pool, 4, profile, params, rng)
@@ -260,10 +259,9 @@ class TestDiversityCheck:
             non_tide_exists = any(
                 Resonance.TIDE not in rs for rs in resonance_sets
             )
-            if all_tide and not non_tide_exists:
-                all_same_count += 1
-        # Most runs should have diversity
-        assert all_same_count < 50
+            assert non_tide_exists or not all_tide, (
+                f"Seed {seed}: all 4 cards share Tide, diversity check failed"
+            )
 
     def test_mixed_resonances_not_swapped(self) -> None:
         from algorithm import select_cards
@@ -278,6 +276,7 @@ class TestDiversityCheck:
             for i, r in enumerate(Resonance)
         ]
         pool = [PoolEntry(c) for c in cards]
+        pool_card_names = {c.name for c in cards}
         profile = ResonanceProfile()
         for r in Resonance:
             profile.add(r, 5)
@@ -285,6 +284,14 @@ class TestDiversityCheck:
         rng = random.Random(42)
         result = select_cards(pool, 4, profile, params, rng)
         assert len(result) == 4
+        # All selected cards should come from the original pool (no swap needed)
+        for entry, _ in result:
+            assert entry.card.name in pool_card_names
+        # Selected cards should have diverse resonances (not all the same)
+        resonance_union: set[Resonance] = set()
+        for entry, _ in result:
+            resonance_union.update(entry.card.resonances)
+        assert len(resonance_union) > 1, "Expected diverse resonances in selection"
 
     def test_small_selection_skips_diversity(self) -> None:
         """Selections with fewer than 4 cards skip the diversity check."""
@@ -360,11 +367,17 @@ class TestRarityGuarantee:
             _make_card(name="Common 3", card_number=4, rarity=Rarity.COMMON),
         ]
         pool = [PoolEntry(c) for c in mixed_cards]
+        pool_card_names = {c.name for c in mixed_cards}
         profile = ResonanceProfile()
         params = _make_params()
         rng = random.Random(42)
         result = select_cards(pool, 4, profile, params, rng)
         assert len(result) == 4
+        # All selected cards should be from the original pool (no swap occurred)
+        result_names = {e.card.name for e, _ in result}
+        assert result_names == pool_card_names
+        # The uncommon card should be present (no swap removed it)
+        assert any(e.card.name == "Uncommon" for e, _ in result)
 
     def test_small_selection_skips_rarity_guarantee(self) -> None:
         """Selections with fewer than 4 cards skip rarity guarantee."""

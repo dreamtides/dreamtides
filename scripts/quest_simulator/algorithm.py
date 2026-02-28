@@ -121,6 +121,21 @@ def _diversity_check(
                 best_weight = weights[idx]
                 best_replacement = (entry, weights[idx])
 
+    if not best_replacement:
+        # Fallback: search the full eligible set (excluding already-selected
+        # entries) for a replacement, as if refilling the pool with fresh copies.
+        selected_entries = {id(e) for e, _ in selected}
+        for idx in range(len(eligible)):
+            if idx in remaining_indices:
+                continue  # Already checked above
+            entry = eligible[idx]
+            if id(entry) in selected_entries:
+                continue
+            if shared_res not in entry.card.resonances:
+                if weights[idx] > best_weight:
+                    best_weight = weights[idx]
+                    best_replacement = (entry, weights[idx])
+
     if best_replacement:
         # Replace lowest-weight selected card
         min_idx = min(range(len(selected)), key=lambda i: selected[i][1])
@@ -151,6 +166,21 @@ def _rarity_guarantee(
             if weights[idx] > best_weight:
                 best_weight = weights[idx]
                 best_replacement = (entry, weights[idx])
+
+    if not best_replacement:
+        # Fallback: search the full eligible set (excluding already-selected
+        # entries) for a replacement, as if refilling the pool with fresh copies.
+        selected_entries = {id(e) for e, _ in selected}
+        for idx in range(len(eligible)):
+            if idx in remaining_indices:
+                continue  # Already checked above
+            entry = eligible[idx]
+            if id(entry) in selected_entries:
+                continue
+            if entry.card.rarity in (Rarity.UNCOMMON, Rarity.RARE, Rarity.LEGENDARY):
+                if weights[idx] > best_weight:
+                    best_weight = weights[idx]
+                    best_replacement = (entry, weights[idx])
 
     if best_replacement:
         min_idx = min(range(len(selected)), key=lambda i: selected[i][1])
