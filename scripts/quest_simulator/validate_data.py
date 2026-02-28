@@ -20,6 +20,27 @@ VALID_MECHANICS = frozenset({
 
 VALID_ROLES = frozenset({"finisher", "removal", "engine"})
 
+VALID_EFFECT_TYPES = frozenset({
+    "add_cards", "add_essence", "remove_cards", "add_dreamsign",
+    "gain_resonance",
+})
+
+EFFECT_VALUE_RANGES: dict[str, tuple[int, int]] = {
+    "add_cards": (1, 3),
+    "add_essence": (50, 200),
+    "remove_cards": (1, 3),
+    "add_dreamsign": (1, 1),
+    "gain_resonance": (1, 3),
+}
+
+MIN_EFFECT_TYPE_COUNTS: dict[str, int] = {
+    "add_cards": 3,
+    "add_essence": 3,
+    "remove_cards": 2,
+    "add_dreamsign": 2,
+    "gain_resonance": 2,
+}
+
 
 def validate_tag(tag: str, errors: list[str], context: str) -> None:
     """Validate a tag string has a known prefix and valid value."""
@@ -184,12 +205,98 @@ def validate_dreamcallers() -> list[str]:
     return errors
 
 
+def validate_journeys() -> list[str]:
+    """Validate journeys.toml schema and invariants."""
+    errors: list[str] = []
+    path = DATA_DIR / "journeys.toml"
+
+    if not path.exists():
+        return [f"File not found: {path}"]
+
+    with open(path, "rb") as f:
+        data = tomllib.load(f)
+
+    if "journeys" not in data:
+        return ["Missing top-level 'journeys' key"]
+
+    entries = data["journeys"]
+    if not isinstance(entries, list):
+        return ["'journeys' must be an array of tables"]
+
+    if not (10 <= len(entries) <= 20):
+        errors.append(f"Expected 10-20 journeys, found {len(entries)}")
+
+    required_fields = {
+        "name": str,
+        "description": str,
+        "effect_type": str,
+        "effect_value": int,
+    }
+
+    names: set[str] = set()
+    effect_type_counts: dict[str, int] = {}
+
+    for i, entry in enumerate(entries):
+        ctx = f"journeys[{i}]"
+        name = entry.get("name", f"<unnamed #{i}>")
+
+        for field, expected_type in required_fields.items():
+            if field not in entry:
+                errors.append(f"{ctx} ({name}): missing required field '{field}'")
+            elif not isinstance(entry[field], expected_type):
+                errors.append(
+                    f"{ctx} ({name}): field '{field}' should be "
+                    f"{expected_type.__name__}, got {type(entry[field]).__name__}"
+                )
+
+        if name in names:
+            errors.append(f"{ctx}: duplicate name '{name}'")
+        names.add(name)
+
+        effect_type = entry.get("effect_type", "")
+        if effect_type not in VALID_EFFECT_TYPES:
+            errors.append(
+                f"{ctx} ({name}): unknown effect_type '{effect_type}' "
+                f"(valid: {sorted(VALID_EFFECT_TYPES)})"
+            )
+        else:
+            effect_type_counts[effect_type] = (
+                effect_type_counts.get(effect_type, 0) + 1
+            )
+
+            effect_value = entry.get("effect_value", 0)
+            lo, hi = EFFECT_VALUE_RANGES[effect_type]
+            if not (lo <= effect_value <= hi):
+                errors.append(
+                    f"{ctx} ({name}): effect_value = {effect_value} "
+                    f"for '{effect_type}', expected [{lo}, {hi}]"
+                )
+
+    for etype, min_count in MIN_EFFECT_TYPE_COUNTS.items():
+        actual = effect_type_counts.get(etype, 0)
+        if actual < min_count:
+            errors.append(
+                f"effect_type '{etype}': found {actual}, "
+                f"expected at least {min_count}"
+            )
+
+    return errors
+
+
 def main() -> int:
     """Run all validators and report results."""
     all_errors: list[str] = []
 
     print("Validating dreamcallers.toml...", end=" ")
     errors = validate_dreamcallers()
+    if errors:
+        print(f"FAILED ({len(errors)} errors)")
+        all_errors.extend(errors)
+    else:
+        print("OK")
+
+    print("Validating journeys.toml...", end=" ")
+    errors = validate_journeys()
     if errors:
         print(f"FAILED ({len(errors)} errors)")
         all_errors.extend(errors)
