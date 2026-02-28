@@ -352,6 +352,96 @@ def validate_banes() -> list[str]:
     return errors
 
 
+def validate_bosses() -> list[str]:
+    """Validate bosses.toml schema and invariants."""
+    errors: list[str] = []
+    path = DATA_DIR / "bosses.toml"
+
+    if not path.exists():
+        return [f"File not found: {path}"]
+
+    with open(path, "rb") as f:
+        data = tomllib.load(f)
+
+    if "bosses" not in data:
+        return ["Missing top-level 'bosses' key"]
+
+    entries = data["bosses"]
+    if not isinstance(entries, list):
+        return ["'bosses' must be an array of tables"]
+
+    if len(entries) != 20:
+        errors.append(f"Expected 20 bosses, found {len(entries)}")
+
+    required_fields = {
+        "name": str,
+        "archetype": str,
+        "ability_text": str,
+        "deck_description": str,
+        "is_final": bool,
+        "resonance": list,
+    }
+
+    names: set[str] = set()
+    miniboss_count = 0
+    final_boss_count = 0
+
+    for i, entry in enumerate(entries):
+        ctx = f"bosses[{i}]"
+        name = entry.get("name", f"<unnamed #{i}>")
+
+        for field, expected_type in required_fields.items():
+            if field not in entry:
+                errors.append(f"{ctx} ({name}): missing required field '{field}'")
+            elif not isinstance(entry[field], expected_type):
+                errors.append(
+                    f"{ctx} ({name}): field '{field}' should be "
+                    f"{expected_type.__name__}, got {type(entry[field]).__name__}"
+                )
+
+        if name in names:
+            errors.append(f"{ctx}: duplicate name '{name}'")
+        names.add(name)
+
+        if entry.get("is_final"):
+            final_boss_count += 1
+        else:
+            miniboss_count += 1
+
+        resonance = entry.get("resonance", [])
+        if not (1 <= len(resonance) <= 2):
+            errors.append(
+                f"{ctx} ({name}): resonance must have 1-2 entries, "
+                f"got {len(resonance)}"
+            )
+        for r in resonance:
+            if r not in VALID_RESONANCES:
+                errors.append(
+                    f"{ctx} ({name}): unknown resonance '{r}' "
+                    f"(valid: {sorted(VALID_RESONANCES)})"
+                )
+
+        ability_text = entry.get("ability_text", "")
+        if isinstance(ability_text, str) and not ability_text.strip():
+            errors.append(f"{ctx} ({name}): ability_text must not be empty")
+
+        deck_description = entry.get("deck_description", "")
+        if isinstance(deck_description, str) and not deck_description.strip():
+            errors.append(f"{ctx} ({name}): deck_description must not be empty")
+
+    if miniboss_count != 10:
+        errors.append(
+            f"Expected 10 minibosses (is_final=false), found {miniboss_count}"
+        )
+
+    if final_boss_count != 10:
+        errors.append(
+            f"Expected 10 final bosses (is_final=true), found {final_boss_count}"
+        )
+
+    return errors
+
+
 def main() -> int:
     """Run all validators and report results."""
     all_errors: list[str] = []
@@ -374,6 +464,14 @@ def main() -> int:
 
     print("Validating banes.toml...", end=" ")
     errors = validate_banes()
+    if errors:
+        print(f"FAILED ({len(errors)} errors)")
+        all_errors.extend(errors)
+    else:
+        print("OK")
+
+    print("Validating bosses.toml...", end=" ")
+    errors = validate_bosses()
     if errors:
         print(f"FAILED ({len(errors)} errors)")
         all_errors.extend(errors)
