@@ -58,7 +58,8 @@ class SessionLogger:
     def __init__(self, seed: int) -> None:
         _LOG_DIR.mkdir(parents=True, exist_ok=True)
         timestamp = time.strftime("%Y%m%d_%H%M%S")
-        filename = f"quest_{timestamp}_seed{seed}.jsonl"
+        ns = time.time_ns()
+        filename = f"quest_{timestamp}_{ns}_seed{seed}.jsonl"
         self._path = _LOG_DIR / filename
         self._file = open(self._path, "w")
 
@@ -145,6 +146,11 @@ class SessionLogger:
         profile_snapshot: dict[Resonance, int],
     ) -> None:
         """Log a draft pick with offered cards, weights, and selection."""
+        if len(offered_cards) != len(weights):
+            raise ValueError(
+                f"offered_cards length ({len(offered_cards)}) != "
+                f"weights length ({len(weights)})"
+            )
         offered = []
         for card, weight in zip(offered_cards, weights):
             offered.append({**_card_dict(card), "weight": round(weight, 4)})

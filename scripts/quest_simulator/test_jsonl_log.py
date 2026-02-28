@@ -92,12 +92,13 @@ class TestHelperFunctions(unittest.TestCase):
 
 class TestSessionLogger(unittest.TestCase):
     def setUp(self) -> None:
-        self._tmpdir = tempfile.mkdtemp()
+        self._tmpdir_obj = tempfile.TemporaryDirectory()
         self._orig_log_dir = jsonl_log._LOG_DIR
-        jsonl_log._LOG_DIR = Path(self._tmpdir)
+        jsonl_log._LOG_DIR = Path(self._tmpdir_obj.name)
 
     def tearDown(self) -> None:
         jsonl_log._LOG_DIR = self._orig_log_dir
+        self._tmpdir_obj.cleanup()
 
     def _read_events(self, logger: jsonl_log.SessionLogger) -> list[dict]:
         logger.close()
@@ -214,6 +215,19 @@ class TestSessionLogger(unittest.TestCase):
         self.assertEqual(event["offered"][0]["weight"], 1.5)
         self.assertEqual(event["picked"]["name"], "Card A")
         self.assertEqual(event["profile_after"]["Tide"], 1)
+
+    def test_log_draft_pick_mismatched_lengths(self) -> None:
+        logger = jsonl_log.SessionLogger(seed=1)
+        card_a = _make_card("Card A")
+        profile = {r: 0 for r in Resonance}
+        with self.assertRaises(ValueError):
+            logger.log_draft_pick(
+                offered_cards=[card_a],
+                weights=[1.0, 2.0],
+                picked_card=card_a,
+                profile_snapshot=profile,
+            )
+        logger.close()
 
     def test_log_shop_purchase(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
