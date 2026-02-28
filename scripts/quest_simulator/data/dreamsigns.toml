@@ -1,0 +1,155 @@
+# Dreamsigns -- passive bonus cards collected during a quest.
+# Each dreamsign carries exactly one resonance and provides a display-only
+# effect. Bane dreamsigns have negative effects and enter via Tempting Offers.
+
+# --- Tide dreamsigns (flow, cycles, inevitability) ---
+
+[[dreamsigns]]
+name = "Sigil of Shifting Tides"
+resonance = "Tide"
+tags = ["mechanic:foresee"]
+effect_text = "At the start of each battle, foresee 2."
+is_bane = false
+
+[[dreamsigns]]
+name = "Drowned Compass"
+resonance = "Tide"
+tags = ["mechanic:draw", "role:engine"]
+effect_text = "Whenever you play your third card in a turn, draw a card."
+is_bane = false
+
+[[dreamsigns]]
+name = "Pearl of Deep Currents"
+resonance = "Tide"
+tags = ["mechanic:foresee", "role:utility"]
+effect_text = "Once per battle, you may look at the top 3 cards of your deck and reorder them."
+is_bane = false
+
+# --- Ember dreamsigns (speed, directness, momentum) ---
+
+[[dreamsigns]]
+name = "Candlewick Thorn"
+resonance = "Ember"
+tags = ["mechanic:kindle"]
+effect_text = "Whenever you materialize a character with cost 2 or less, kindle."
+is_bane = false
+
+[[dreamsigns]]
+name = "Cinder Crown"
+resonance = "Ember"
+tags = ["mechanic:kindle", "role:finisher"]
+effect_text = "Your leftmost character enters play with +1 spark."
+is_bane = false
+
+[[dreamsigns]]
+name = "Brand of the First Flame"
+resonance = "Ember"
+tags = ["role:enabler"]
+effect_text = "Your first event each turn costs 1 less energy."
+is_bane = false
+
+# --- Zephyr dreamsigns (surprise, adaptability) ---
+
+[[dreamsigns]]
+name = "Whisper Vane"
+resonance = "Zephyr"
+tags = ["mechanic:fast"]
+effect_text = "Once per battle, you may play a non-fast event as though it were fast."
+is_bane = false
+
+[[dreamsigns]]
+name = "Stormfeather Quill"
+resonance = "Zephyr"
+tags = ["mechanic:copy", "role:utility"]
+effect_text = "The first event you copy each battle costs 0 energy."
+is_bane = false
+
+[[dreamsigns]]
+name = "Gale Prism"
+resonance = "Zephyr"
+tags = ["mechanic:prevent"]
+effect_text = "Once per battle, when an opponent plays an event, you may prevent it."
+is_bane = false
+
+# --- Stone dreamsigns (permanence, growth, weight) ---
+
+[[dreamsigns]]
+name = "Monolith Shard"
+resonance = "Stone"
+tags = ["mechanic:ramp"]
+effect_text = "You start each battle with 1 additional energy."
+is_bane = false
+
+[[dreamsigns]]
+name = "Fossilized Heartstone"
+resonance = "Stone"
+tags = ["tribal:ancient", "role:finisher"]
+effect_text = "Your characters with spark 3 or more gain +1 spark."
+is_bane = false
+
+[[dreamsigns]]
+name = "Geode of Still Waters"
+resonance = "Stone"
+tags = ["role:utility"]
+effect_text = "At the end of each turn, if you have unspent energy, gain 1 spark on a random character."
+is_bane = false
+
+# --- Ruin dreamsigns (entropy, recursion, sacrifice) ---
+
+[[dreamsigns]]
+name = "Frayed Binding"
+resonance = "Ruin"
+tags = ["mechanic:reclaim"]
+effect_text = "Once per battle, you may reclaim a card from your void with cost 3 or less."
+is_bane = false
+
+[[dreamsigns]]
+name = "Ashen Idol"
+resonance = "Ruin"
+tags = ["mechanic:dissolve", "role:removal"]
+effect_text = "When one of your characters is dissolved, deal 1 damage to a random enemy character."
+is_bane = false
+
+[[dreamsigns]]
+name = "Hollow Lantern"
+resonance = "Ruin"
+tags = ["mechanic:discard"]
+effect_text = "Whenever you discard a card, there is a chance it is placed on top of your deck instead."
+is_bane = false
+
+[[dreamsigns]]
+name = "Veil of Fading Echoes"
+resonance = "Ruin"
+tags = ["mechanic:reclaim", "role:engine"]
+effect_text = "Cards you reclaim cost 1 less energy to play."
+is_bane = false
+
+# --- Bane dreamsigns (negative effects, enter via Tempting Offers) ---
+
+[[dreamsigns]]
+name = "Mark of Unraveling"
+resonance = "Ruin"
+tags = []
+effect_text = "At the start of each battle, discard a random card from your hand."
+is_bane = true
+
+[[dreamsigns]]
+name = "Cracked Hourglass"
+resonance = "Tide"
+tags = []
+effect_text = "You draw one fewer card at the start of each battle."
+is_bane = true
+
+[[dreamsigns]]
+name = "Ember Scar"
+resonance = "Ember"
+tags = []
+effect_text = "Your characters enter play with -1 spark."
+is_bane = true
+
+[[dreamsigns]]
+name = "Weight of Forgotten Oaths"
+resonance = "Stone"
+tags = []
+effect_text = "Your first card each turn costs 1 more energy to play."
+is_bane = true
