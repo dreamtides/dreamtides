@@ -90,7 +90,7 @@ def _select_discovery_cards(
         profile=tag_profile,
         rng=rng,
         min_theme_cards=int(tag_config["min_theme_cards"]),
-        tag_scale=tag_config["tag_scale"],
+        tag_scale=tag_config["scale"],
         relevance_boost=tag_config["relevance_boost"],
         depth_factor=tag_config["depth_factor"],
     )
@@ -147,7 +147,7 @@ def _select_specialty_items(
         profile=tag_profile,
         rng=rng,
         min_theme_cards=int(tag_config["min_theme_cards"]),
-        tag_scale=tag_config["tag_scale"],
+        tag_scale=tag_config["scale"],
         relevance_boost=tag_config["relevance_boost"],
         depth_factor=tag_config["depth_factor"],
     )

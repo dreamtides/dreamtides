@@ -75,7 +75,7 @@ def _default_params() -> AlgorithmParams:
 
 def _default_tag_config() -> dict[str, float]:
     return {
-        "tag_scale": 1.5,
+        "scale": 1.5,
         "min_theme_cards": 6,
         "relevance_boost": 2.0,
         "depth_factor": 0.1,
@@ -371,6 +371,67 @@ class TestSpecialtyShopItems:
         items, tag = result
         assert tag == "tribal:warrior"
         assert len(items) <= 6
+
+
+class TestRuntimeTagConfigKeys:
+    """Verify functions work with config keys as produced by site_dispatch.
+
+    The config.toml [tags] section uses 'scale' (not 'tag_scale'), and
+    site_dispatch builds the tag_config dict directly from those keys.
+    """
+
+    def _runtime_tag_config(self) -> dict[str, float]:
+        """Tag config keys as they appear in config.toml and site_dispatch."""
+        return {
+            "scale": 1.5,
+            "min_theme_cards": 6,
+            "relevance_boost": 2.0,
+            "depth_factor": 0.1,
+        }
+
+    def test_select_discovery_cards_with_runtime_keys(self) -> None:
+        """Discovery card selection should work with config.toml key names."""
+        from sites_discovery import _select_discovery_cards
+
+        pool = _make_pool_entries("tribal:warrior", 10, start_number=1)
+        profile = ResonanceProfile()
+        tag_profile = TagProfile()
+        tag_profile.add("tribal:warrior", 5)
+        rng = random.Random(42)
+
+        result = _select_discovery_cards(
+            pool=pool,
+            resonance_profile=profile,
+            tag_profile=tag_profile,
+            params=_default_params(),
+            rng=rng,
+            cards_per_pick=4,
+            tag_config=self._runtime_tag_config(),
+        )
+
+        assert result is not None
+
+    def test_select_specialty_items_with_runtime_keys(self) -> None:
+        """Specialty shop item selection should work with config.toml key names."""
+        from sites_discovery import _select_specialty_items
+
+        pool = _make_pool_entries("tribal:warrior", 10, start_number=1)
+        profile = ResonanceProfile()
+        tag_profile = TagProfile()
+        tag_profile.add("tribal:warrior", 5)
+        rng = random.Random(42)
+
+        result = _select_specialty_items(
+            pool=pool,
+            resonance_profile=profile,
+            tag_profile=tag_profile,
+            params=_default_params(),
+            rng=rng,
+            items_count=6,
+            tag_config=self._runtime_tag_config(),
+        )
+
+        assert result is not None
 
 
 class TestSpecialtyShopPurchasing:
