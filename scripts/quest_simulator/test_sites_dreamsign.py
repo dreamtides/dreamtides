@@ -344,6 +344,60 @@ class TestRunDreamsignOffering:
 
         assert state.dreamsign_count() == 0
 
+    def test_enhanced_skip_with_fewer_than_three_options(self) -> None:
+        from sites_dreamsign import run_dreamsign_offering
+
+        state = _make_quest_state()
+        # Only one non-bane dreamsign available, so enhanced shows 1 + skip
+        all_signs = [
+            _make_dreamsign("Only One", Resonance.TIDE),
+            _make_dreamsign("Bane", Resonance.RUIN, is_bane=True),
+        ]
+
+        # Skip is the last option; with 1 dreamsign offered, skip is index 1
+        with patch(
+            "sites_dreamsign.input_handler.single_select", return_value=1
+        ):
+            run_dreamsign_offering(
+                state=state,
+                all_dreamsigns=all_signs,
+                logger=None,
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                is_enhanced=True,
+            )
+
+        assert state.dreamsign_count() == 0
+
+    def test_logs_on_empty_offering(self) -> None:
+        from sites_dreamsign import run_dreamsign_offering
+
+        state = _make_quest_state()
+        log_calls: list[dict[str, object]] = []
+
+        class FakeLogger:
+            def log_site_visit(self, **kwargs: object) -> None:
+                log_calls.append(kwargs)
+
+        # All banes, so no dreamsigns available
+        all_signs = [
+            _make_dreamsign("Bane 1", Resonance.RUIN, is_bane=True),
+            _make_dreamsign("Bane 2", Resonance.EMBER, is_bane=True),
+        ]
+
+        run_dreamsign_offering(
+            state=state,
+            all_dreamsigns=all_signs,
+            logger=FakeLogger(),  # type: ignore[arg-type]
+            dreamscape_name="Test Dreamscape",
+            dreamscape_number=1,
+        )
+
+        assert len(log_calls) == 1
+        assert log_calls[0]["site_type"] == "DreamsignOffering"
+        assert log_calls[0]["choices"] == []
+        assert log_calls[0]["choice_made"] is None
+
     def test_updates_resonance_profile(self) -> None:
         from sites_dreamsign import run_dreamsign_offering
 
@@ -432,6 +486,59 @@ class TestRunDreamsignDraft:
             )
 
         assert state.dreamsign_count() == 0
+
+    def test_skip_with_fewer_than_three_options(self) -> None:
+        from sites_dreamsign import run_dreamsign_draft
+
+        state = _make_quest_state()
+        # Only one non-bane dreamsign available
+        all_signs = [
+            _make_dreamsign("Only One", Resonance.TIDE),
+            _make_dreamsign("Bane", Resonance.RUIN, is_bane=True),
+        ]
+
+        # Skip is the last option; with 1 dreamsign offered, skip is index 1
+        with patch(
+            "sites_dreamsign.input_handler.single_select", return_value=1
+        ):
+            run_dreamsign_draft(
+                state=state,
+                all_dreamsigns=all_signs,
+                logger=None,
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+            )
+
+        assert state.dreamsign_count() == 0
+
+    def test_logs_on_empty_draft(self) -> None:
+        from sites_dreamsign import run_dreamsign_draft
+
+        state = _make_quest_state()
+        log_calls: list[dict[str, object]] = []
+
+        class FakeLogger:
+            def log_site_visit(self, **kwargs: object) -> None:
+                log_calls.append(kwargs)
+
+        # All banes, so no dreamsigns available
+        all_signs = [
+            _make_dreamsign("Bane 1", Resonance.RUIN, is_bane=True),
+            _make_dreamsign("Bane 2", Resonance.EMBER, is_bane=True),
+        ]
+
+        run_dreamsign_draft(
+            state=state,
+            all_dreamsigns=all_signs,
+            logger=FakeLogger(),  # type: ignore[arg-type]
+            dreamscape_name="Test Dreamscape",
+            dreamscape_number=1,
+        )
+
+        assert len(log_calls) == 1
+        assert log_calls[0]["site_type"] == "DreamsignDraft"
+        assert log_calls[0]["choices"] == []
+        assert log_calls[0]["choice_made"] is None
 
     def test_updates_resonance_profile(self) -> None:
         from sites_dreamsign import run_dreamsign_draft

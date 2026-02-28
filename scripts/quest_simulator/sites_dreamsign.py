@@ -134,6 +134,16 @@ def run_dreamsign_offering(
 
     if not offered:
         print("  No dreamsigns available.")
+        if logger is not None:
+            logger.log_site_visit(
+                site_type="DreamsignOffering",
+                choices=[],
+                choice_made=None,
+                state_changes={
+                    "dreamsign_added": None,
+                    "dreamsign_count": state.dreamsign_count(),
+                },
+            )
         footer = render.resonance_profile_footer(
             counts=state.resonance_profile.snapshot(),
             deck_count=state.deck_count(),
@@ -241,6 +251,16 @@ def run_dreamsign_draft(
 
     if not offered:
         print("  No dreamsigns available for drafting.")
+        if logger is not None:
+            logger.log_site_visit(
+                site_type="DreamsignDraft",
+                choices=[],
+                choice_made=None,
+                state_changes={
+                    "dreamsign_added": None,
+                    "dreamsign_count": state.dreamsign_count(),
+                },
+            )
         footer = render.resonance_profile_footer(
             counts=state.resonance_profile.snapshot(),
             deck_count=state.deck_count(),
