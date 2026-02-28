@@ -238,8 +238,9 @@ class TestRenderAvailableDreamscapes(unittest.TestCase):
 
         nodes = self._make_nodes()
         result = render_available_dreamscapes(nodes, selected_index=0)
+        # Site names appear in the summary (may be truncated if line is long)
         self.assertIn("Shop", result)
-        self.assertIn("Dreamsign Draft", result)
+        self.assertIn("Dreamsign", result)
 
     def test_shows_biome(self) -> None:
         from render_atlas import render_available_dreamscapes
@@ -433,6 +434,282 @@ class TestRenderFullAtlas(unittest.TestCase):
         )
         # Should contain navigation prompt
         self.assertIn("Enter", result)
+
+
+class TestBiomeEnhancementText(unittest.TestCase):
+    """biome_enhancement_text maps each biome to its enhancement effect."""
+
+    def test_verdant_free_reroll(self) -> None:
+        from models import Biome
+        from render_atlas import biome_enhancement_text
+
+        self.assertEqual(biome_enhancement_text(Biome.VERDANT), "free reroll")
+
+    def test_celestial_pick_1_of_3(self) -> None:
+        from models import Biome
+        from render_atlas import biome_enhancement_text
+
+        self.assertEqual(biome_enhancement_text(Biome.CELESTIAL), "pick 1 of 3")
+
+    def test_twilight_3rd_option(self) -> None:
+        from models import Biome
+        from render_atlas import biome_enhancement_text
+
+        self.assertEqual(biome_enhancement_text(Biome.TWILIGHT), "3rd option")
+
+    def test_infernal_3_pairs(self) -> None:
+        from models import Biome
+        from render_atlas import biome_enhancement_text
+
+        self.assertEqual(biome_enhancement_text(Biome.INFERNAL), "3 pairs")
+
+    def test_ashen_purge_up_to_6(self) -> None:
+        from models import Biome
+        from render_atlas import biome_enhancement_text
+
+        self.assertEqual(biome_enhancement_text(Biome.ASHEN), "purge up to 6")
+
+    def test_crystalline_doubled(self) -> None:
+        from models import Biome
+        from render_atlas import biome_enhancement_text
+
+        self.assertEqual(biome_enhancement_text(Biome.CRYSTALLINE), "doubled")
+
+    def test_prismatic_choose_any(self) -> None:
+        from models import Biome
+        from render_atlas import biome_enhancement_text
+
+        self.assertEqual(biome_enhancement_text(Biome.PRISMATIC), "choose any")
+
+    def test_mirrored_choose_any(self) -> None:
+        from models import Biome
+        from render_atlas import biome_enhancement_text
+
+        self.assertEqual(biome_enhancement_text(Biome.MIRRORED), "choose any")
+
+    def test_arcane_pick_any_number(self) -> None:
+        from models import Biome
+        from render_atlas import biome_enhancement_text
+
+        self.assertEqual(biome_enhancement_text(Biome.ARCANE), "pick any number")
+
+    def test_all_biomes_have_text(self) -> None:
+        from models import Biome
+        from render_atlas import biome_enhancement_text
+
+        for biome in Biome:
+            text = biome_enhancement_text(biome)
+            self.assertIsInstance(text, str)
+            self.assertTrue(len(text) > 0, f"Empty text for {biome}")
+
+
+class TestEnhancedSiteDescription(unittest.TestCase):
+    """Enhanced sites show the biome's enhancement description."""
+
+    def test_summary_with_biome_shows_enhancement_text(self) -> None:
+        from models import Biome, Site, SiteType
+        from render_atlas import dreamscape_site_summary
+
+        sites = [
+            Site(site_type=SiteType.SHOP, is_enhanced=True),
+            Site(site_type=SiteType.ESSENCE),
+        ]
+        result = dreamscape_site_summary(sites, biome=Biome.VERDANT)
+        self.assertIn("*free reroll*", result)
+
+    def test_summary_without_biome_uses_star_only(self) -> None:
+        from models import Site, SiteType
+        from render_atlas import dreamscape_site_summary
+
+        sites = [
+            Site(site_type=SiteType.SHOP, is_enhanced=True),
+            Site(site_type=SiteType.ESSENCE),
+        ]
+        result = dreamscape_site_summary(sites)
+        self.assertIn("Shop*", result)
+
+    def test_available_dreamscapes_show_enhancement_text(self) -> None:
+        from models import Biome, DreamscapeNode, NodeState, Site, SiteType
+        from render_atlas import render_available_dreamscapes
+
+        nodes = [
+            DreamscapeNode(
+                node_id=1,
+                name="Verdant Hollow",
+                biome=Biome.VERDANT,
+                sites=[
+                    Site(site_type=SiteType.SHOP, is_enhanced=True),
+                    Site(site_type=SiteType.BATTLE),
+                ],
+                state=NodeState.AVAILABLE,
+                adjacent=[0],
+            ),
+        ]
+        result = render_available_dreamscapes(nodes, selected_index=0)
+        self.assertIn("*free reroll*", result)
+
+    def test_dreamscape_sites_show_enhancement_text(self) -> None:
+        from models import Biome, Site, SiteType
+        from render_atlas import render_dreamscape_sites
+
+        sites = [
+            Site(site_type=SiteType.SHOP, is_enhanced=True),
+            Site(site_type=SiteType.BATTLE),
+        ]
+        result = render_dreamscape_sites(
+            sites, selected_index=0, biome=Biome.VERDANT
+        )
+        self.assertIn("*free reroll*", result)
+
+
+class TestAvailableDreamscapesWidth(unittest.TestCase):
+    """Available dreamscape lines fit within 70 columns."""
+
+    def test_long_summary_truncated(self) -> None:
+        from models import Biome, DreamscapeNode, NodeState, Site, SiteType
+        from render import visible_len
+        from render_atlas import render_available_dreamscapes
+
+        nodes = [
+            DreamscapeNode(
+                node_id=1,
+                name="Moonlit Shore",
+                biome=Biome.CELESTIAL,
+                sites=[
+                    Site(site_type=SiteType.DREAMSIGN_OFFERING, is_enhanced=True),
+                    Site(site_type=SiteType.DRAFT),
+                    Site(site_type=SiteType.ESSENCE),
+                    Site(site_type=SiteType.BATTLE),
+                ],
+                state=NodeState.AVAILABLE,
+                adjacent=[0],
+            ),
+        ]
+        result = render_available_dreamscapes(nodes, selected_index=0)
+        for line in result.split("\n"):
+            self.assertLessEqual(
+                visible_len(line), 70,
+                f"Line too wide: {line!r}",
+            )
+
+
+class TestCompletedTrailWrapping(unittest.TestCase):
+    """Completed trail wraps to multiple lines at 70 columns."""
+
+    def test_short_trail_single_line(self) -> None:
+        from models import Biome, DreamscapeNode, NodeState
+        from render_atlas import render_completed_trail
+
+        nodes = [
+            DreamscapeNode(
+                node_id=0, name="The Nexus", biome=Biome.VERDANT,
+                sites=[], state=NodeState.COMPLETED, adjacent=[1],
+            ),
+            DreamscapeNode(
+                node_id=1, name="Shore", biome=Biome.CELESTIAL,
+                sites=[], state=NodeState.COMPLETED, adjacent=[0],
+            ),
+        ]
+        result = render_completed_trail(nodes)
+        # Trail content should be on a single indented line
+        trail_lines = [
+            l for l in result.split("\n")
+            if "[" in l and "]" in l and "Completed" not in l
+        ]
+        self.assertEqual(len(trail_lines), 1)
+
+    def test_long_trail_wraps(self) -> None:
+        from models import Biome, DreamscapeNode, NodeState
+        from render_atlas import render_completed_trail
+
+        nodes = [
+            DreamscapeNode(
+                node_id=i,
+                name=f"Dreamscape With Long Name {i}",
+                biome=Biome.VERDANT,
+                sites=[],
+                state=NodeState.COMPLETED,
+                adjacent=[],
+            )
+            for i in range(8)
+        ]
+        result = render_completed_trail(nodes)
+        trail_lines = [
+            l for l in result.split("\n")
+            if "[" in l and "]" in l and "Completed" not in l
+        ]
+        self.assertGreater(len(trail_lines), 1)
+
+    def test_wrapped_lines_within_70_columns(self) -> None:
+        from models import Biome, DreamscapeNode, NodeState
+        from render_atlas import render_completed_trail
+
+        nodes = [
+            DreamscapeNode(
+                node_id=i,
+                name=f"Dreamscape With Long Name {i}",
+                biome=Biome.VERDANT,
+                sites=[],
+                state=NodeState.COMPLETED,
+                adjacent=[],
+            )
+            for i in range(8)
+        ]
+        result = render_completed_trail(nodes)
+        for line in result.split("\n"):
+            self.assertLessEqual(len(line), 70, f"Line too long: {line!r}")
+
+
+class TestNodeCount(unittest.TestCase):
+    """Atlas header shows the total dreamscape count."""
+
+    def test_header_shows_node_count(self) -> None:
+        from render_atlas import render_atlas_header
+
+        result = render_atlas_header(
+            essence=100, completion=2, total_battles=7,
+            deck_count=10, dreamsign_count=0,
+            total_nodes=12,
+        )
+        self.assertIn("12 dreamscapes", result)
+
+    def test_full_atlas_shows_node_count(self) -> None:
+        from models import Biome, DreamscapeNode, NodeState, Site, SiteType
+        from render_atlas import render_full_atlas
+
+        nodes = [
+            DreamscapeNode(
+                node_id=i,
+                name=f"Node {i}",
+                biome=Biome.VERDANT,
+                sites=[Site(site_type=SiteType.BATTLE)],
+                state=NodeState.AVAILABLE if i > 0 else NodeState.COMPLETED,
+                adjacent=[],
+            )
+            for i in range(5)
+        ]
+        result = render_full_atlas(
+            available_nodes=[n for n in nodes if n.state == NodeState.AVAILABLE],
+            all_nodes=nodes,
+            selected_index=0,
+            essence=100,
+            completion=1,
+            total_battles=7,
+            deck_count=10,
+            dreamsign_count=0,
+        )
+        self.assertIn("5 dreamscapes", result)
+
+
+class TestBiomeColors(unittest.TestCase):
+    """Biome colors match the specification."""
+
+    def test_biome_color_mapping_complete(self) -> None:
+        from models import Biome
+        from render_atlas import _BIOME_MARKERS
+
+        for biome in Biome:
+            self.assertIn(biome, _BIOME_MARKERS)
 
 
 class TestImportClean(unittest.TestCase):
