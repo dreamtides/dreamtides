@@ -1,0 +1,33 @@
+# Bane cards -- negative cards that enter the player's deck via Tempting
+# Offer costs. They are never available in the draft pool and can only be
+# removed through Cleanse sites.
+
+[[banes]]
+name = "Creeping Dread"
+rules_text = "This card cannot be played. It takes up space in your hand."
+card_type = "Event"
+energy_cost = 99
+
+[[banes]]
+name = "Nightmare Residue"
+rules_text = "When drawn, lose 1 energy."
+card_type = "Event"
+energy_cost = 8
+
+[[banes]]
+name = "Fading Grip"
+rules_text = "When drawn, discard another card at random."
+card_type = "Event"
+energy_cost = 99
+
+[[banes]]
+name = "Hollow Echo"
+rules_text = "When this card is in your hand at end of turn, lose 1 spark from your leftmost character."
+card_type = "Event"
+energy_cost = 7
+
+[[banes]]
+name = "Withered Promise"
+rules_text = "When drawn, your next card costs 2 more energy to play."
+card_type = "Event"
+energy_cost = 10
