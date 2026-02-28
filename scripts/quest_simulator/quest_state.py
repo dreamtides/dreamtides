@@ -72,7 +72,19 @@ class QuestState:
                 self.tag_profile.remove(t)
 
     def set_dreamcaller(self, dreamcaller: Dreamcaller) -> None:
-        """Set the dreamcaller and apply resonance, tag, and essence bonuses."""
+        """Set the dreamcaller and apply resonance, tag, and essence bonuses.
+
+        If a dreamcaller is already set, its bonuses are removed first so that
+        calling this method is idempotent with respect to profile and essence
+        state.
+        """
+        if self.dreamcaller is not None:
+            old = self.dreamcaller
+            for resonance_name, amount in old.resonance_bonus.items():
+                self.resonance_profile.remove(Resonance(resonance_name), amount)
+            for tag, amount in old.tag_bonus.items():
+                self.tag_profile.remove(tag, amount)
+            self.essence -= old.essence_bonus
         self.dreamcaller = dreamcaller
         for resonance_name, amount in dreamcaller.resonance_bonus.items():
             self.resonance_profile.add(Resonance(resonance_name), amount)
@@ -95,10 +107,11 @@ class QuestState:
             self.tag_profile.remove(t)
 
     def spend_essence(self, amount: int) -> None:
-        """Subtract from essence. Asserts balance does not go negative."""
-        assert self.essence >= amount, (
-            f"Cannot spend {amount} essence with only {self.essence} available"
-        )
+        """Subtract from essence. Raises ValueError if balance would go negative."""
+        if self.essence < amount:
+            raise ValueError(
+                f"Cannot spend {amount} essence with only {self.essence} available"
+            )
         self.essence -= amount
 
     def gain_essence(self, amount: int) -> None:
@@ -125,7 +138,7 @@ class QuestState:
         """Duplicate random existing cards until deck reaches minimum size."""
         while len(self.deck) < self.min_deck and len(self.deck) > 0:
             source = self.rng.choice(self.deck)
-            self.deck.append(DeckCard(card=source.card))
+            self.add_card(source.card)
 
     def deck_count(self) -> int:
         """Return the number of cards in the deck."""

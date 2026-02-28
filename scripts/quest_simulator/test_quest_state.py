@@ -324,6 +324,46 @@ class TestSetDreamcaller:
         state.set_dreamcaller(dc)
         assert state.essence == 300
 
+    def test_replacing_dreamcaller_removes_old_bonuses(self) -> None:
+        state = _make_quest_state(essence=100)
+        dc1 = _make_dreamcaller(
+            name="First",
+            resonance_bonus={"Tide": 4},
+            tag_bonus={"tribal:warrior": 2},
+            essence_bonus=50,
+        )
+        state.set_dreamcaller(dc1)
+        assert state.resonance_profile.counts[Resonance.TIDE] == 4
+        assert state.tag_profile.counts["tribal:warrior"] == 2
+        assert state.essence == 150
+
+        dc2 = _make_dreamcaller(
+            name="Second",
+            resonance_bonus={"Ruin": 3},
+            tag_bonus={"mechanic:dissolve": 1},
+            essence_bonus=30,
+        )
+        state.set_dreamcaller(dc2)
+        assert state.dreamcaller is dc2
+        assert state.resonance_profile.counts[Resonance.TIDE] == 0
+        assert state.resonance_profile.counts[Resonance.RUIN] == 3
+        assert "tribal:warrior" not in state.tag_profile.counts
+        assert state.tag_profile.counts["mechanic:dissolve"] == 1
+        assert state.essence == 130
+
+    def test_setting_same_dreamcaller_twice_is_idempotent(self) -> None:
+        state = _make_quest_state(essence=100)
+        dc = _make_dreamcaller(
+            resonance_bonus={"Tide": 4},
+            tag_bonus={"tribal:warrior": 2},
+            essence_bonus=50,
+        )
+        state.set_dreamcaller(dc)
+        state.set_dreamcaller(dc)
+        assert state.resonance_profile.counts[Resonance.TIDE] == 4
+        assert state.tag_profile.counts["tribal:warrior"] == 2
+        assert state.essence == 150
+
 
 class TestAddDreamsign:
     def test_adds_to_list(self) -> None:
@@ -380,12 +420,12 @@ class TestEssence:
         state.spend_essence(100)
         assert state.essence == 0
 
-    def test_spend_essence_assertion(self) -> None:
+    def test_spend_essence_raises_value_error(self) -> None:
         state = _make_quest_state(essence=50)
         try:
             state.spend_essence(100)
-            assert False, "Should have raised AssertionError"
-        except AssertionError:
+            assert False, "Should have raised ValueError"
+        except ValueError:
             pass
 
     def test_gain_essence(self) -> None:
@@ -463,6 +503,22 @@ class TestAutoFillDeck:
         assert len(state.deck) == 4
         for dc in state.deck:
             assert dc.card.name == "Only Card"
+
+    def test_auto_fill_updates_profiles(self) -> None:
+        state = _make_quest_state(min_deck=3)
+        card = _make_card(
+            name="Res Card",
+            card_number=1,
+            resonances=frozenset({Resonance.TIDE}),
+            tags=frozenset({"tribal:warrior"}),
+        )
+        state.add_card(card)
+        assert state.resonance_profile.counts[Resonance.TIDE] == 1
+        assert state.tag_profile.counts["tribal:warrior"] == 1
+        state.auto_fill_deck()
+        assert len(state.deck) == 3
+        assert state.resonance_profile.counts[Resonance.TIDE] == 3
+        assert state.tag_profile.counts["tribal:warrior"] == 3
 
 
 class TestDeckCount:
