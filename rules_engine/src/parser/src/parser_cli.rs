@@ -534,12 +534,18 @@ fn export_cards_command(input: &Path, output: &Path) -> Result<(), Box<dyn std::
         }
 
         let energy_cost = match &card.energy_cost {
-            Value::Integer(n) => Some(*n as u32),
+            Value::Integer(n) => Some(
+                u32::try_from(*n)
+                    .map_err(|_| format!("Invalid energy_cost {} for card '{}'", n, card.name))?,
+            ),
             _ => None,
         };
 
         let spark = match &card.spark {
-            Value::Integer(n) => Some(*n as u32),
+            Value::Integer(n) => Some(
+                u32::try_from(*n)
+                    .map_err(|_| format!("Invalid spark {} for card '{}'", n, card.name))?,
+            ),
             _ => None,
         };
 
