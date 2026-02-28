@@ -1,0 +1,71 @@
+[[dreamcallers]]
+name = "Vesper, Twilight Arbiter"
+resonance = ["Tide", "Ruin"]
+resonance_bonus = { Tide = 4, Ruin = 4 }
+tags = ["mechanic:reclaim", "mechanic:dissolve"]
+tag_bonus = { "mechanic:reclaim" = 2, "mechanic:dissolve" = 1 }
+essence_bonus = 50
+ability_text = "Whenever you dissolve an enemy character, draw a card."
+
+[[dreamcallers]]
+name = "Pyrra, the Smoldering Heart"
+resonance = ["Ember"]
+resonance_bonus = { Ember = 5 }
+tags = ["mechanic:kindle", "role:finisher"]
+tag_bonus = { "mechanic:kindle" = 3, "role:finisher" = 1 }
+essence_bonus = 25
+ability_text = "Whenever you kindle, the kindled character gains an additional spark."
+
+[[dreamcallers]]
+name = "Sylvara, Chorus Weaver"
+resonance = ["Ember", "Stone"]
+resonance_bonus = { Ember = 3, Stone = 4 }
+tags = ["tribal:warrior", "mechanic:kindle"]
+tag_bonus = { "tribal:warrior" = 2, "mechanic:kindle" = 1 }
+essence_bonus = 40
+ability_text = "Your Warriors enter the battlefield with 1 additional spark."
+
+[[dreamcallers]]
+name = "Thornroot, Keeper of the Deep"
+resonance = ["Stone", "Tide"]
+resonance_bonus = { Stone = 4, Tide = 3 }
+tags = ["tribal:spirit-animal", "role:engine"]
+tag_bonus = { "tribal:spirit-animal" = 2, "role:engine" = 1 }
+essence_bonus = 75
+ability_text = "Whenever a Spirit Animal you control survives judgment, gain 1 energy next turn."
+
+[[dreamcallers]]
+name = "Solenne, the Flickering Star"
+resonance = ["Zephyr", "Stone"]
+resonance_bonus = { Zephyr = 4, Stone = 3 }
+tags = ["mechanic:banish", "mechanic:fast"]
+tag_bonus = { "mechanic:banish" = 2, "mechanic:fast" = 1 }
+essence_bonus = 30
+ability_text = "Whenever a character you control is banished, foresee 2 when it returns."
+
+[[dreamcallers]]
+name = "Mara, Whisper of the Lost"
+resonance = ["Zephyr", "Ruin"]
+resonance_bonus = { Zephyr = 3, Ruin = 4 }
+tags = ["mechanic:discard", "mechanic:dissolve", "role:removal"]
+tag_bonus = { "mechanic:discard" = 2, "mechanic:dissolve" = 1, "role:removal" = 1 }
+essence_bonus = 35
+ability_text = "Whenever you discard a card, your opponent discards a card at random."
+
+[[dreamcallers]]
+name = "Ashara, Voice of Currents"
+resonance = ["Tide", "Zephyr"]
+resonance_bonus = { Tide = 4, Zephyr = 4 }
+tags = ["mechanic:draw", "mechanic:foresee"]
+tag_bonus = { "mechanic:draw" = 2, "mechanic:foresee" = 2 }
+essence_bonus = 60
+ability_text = "At the start of each turn, foresee 1. If you have drawn 3 or more cards this turn, draw another."
+
+[[dreamcallers]]
+name = "Kael, the Ashen Pilgrim"
+resonance = ["Ember", "Ruin"]
+resonance_bonus = { Ember = 4, Ruin = 3 }
+tags = ["mechanic:reclaim", "tribal:survivor"]
+tag_bonus = { "mechanic:reclaim" = 2, "tribal:survivor" = 2 }
+essence_bonus = 100
+ability_text = "Whenever a character you control is dissolved, reclaim the cheapest event from your void."
