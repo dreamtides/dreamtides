@@ -10,16 +10,16 @@ from typing import Optional
 
 from models import Biome, DreamscapeNode, NodeState, Site, SiteType
 
-BIOME_ENHANCED_SITE: dict[Biome, SiteType] = {
-    Biome.VERDANT: SiteType.SHOP,
-    Biome.CELESTIAL: SiteType.DREAMSIGN_OFFERING,
-    Biome.TWILIGHT: SiteType.DREAM_JOURNEY,
-    Biome.INFERNAL: SiteType.TEMPTING_OFFER,
-    Biome.ASHEN: SiteType.PURGE,
-    Biome.CRYSTALLINE: SiteType.ESSENCE,
-    Biome.PRISMATIC: SiteType.TRANSFIGURATION,
-    Biome.MIRRORED: SiteType.DUPLICATION,
-    Biome.ARCANE: SiteType.DISCOVERY_DRAFT,
+BIOME_ENHANCED_SITE: dict[Biome, frozenset[SiteType]] = {
+    Biome.VERDANT: frozenset({SiteType.SHOP}),
+    Biome.CELESTIAL: frozenset({SiteType.DREAMSIGN_OFFERING, SiteType.DREAMSIGN_DRAFT}),
+    Biome.TWILIGHT: frozenset({SiteType.DREAM_JOURNEY}),
+    Biome.INFERNAL: frozenset({SiteType.TEMPTING_OFFER}),
+    Biome.ASHEN: frozenset({SiteType.PURGE}),
+    Biome.CRYSTALLINE: frozenset({SiteType.ESSENCE}),
+    Biome.PRISMATIC: frozenset({SiteType.TRANSFIGURATION}),
+    Biome.MIRRORED: frozenset({SiteType.DUPLICATION}),
+    Biome.ARCANE: frozenset({SiteType.DISCOVERY_DRAFT}),
 }
 
 DREAMSCAPE_NAMES: list[str] = [
@@ -235,10 +235,10 @@ def generate_sites(
             added += 1
 
     # Apply biome enhancement
-    enhanced_type = BIOME_ENHANCED_SITE.get(node.biome)
-    if enhanced_type is not None:
+    enhanced_types = BIOME_ENHANCED_SITE.get(node.biome)
+    if enhanced_types is not None:
         for site in sites:
-            if site.site_type == enhanced_type and not site.is_enhanced:
+            if site.site_type in enhanced_types and not site.is_enhanced:
                 site.is_enhanced = True
                 break
 

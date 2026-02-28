@@ -475,11 +475,11 @@ class TestBiomeEnhancementText(unittest.TestCase):
 
         self.assertEqual(biome_enhancement_text(Biome.CRYSTALLINE), "doubled")
 
-    def test_prismatic_choose_any(self) -> None:
+    def test_prismatic_select_target(self) -> None:
         from models import Biome
         from render_atlas import biome_enhancement_text
 
-        self.assertEqual(biome_enhancement_text(Biome.PRISMATIC), "choose any")
+        self.assertEqual(biome_enhancement_text(Biome.PRISMATIC), "select target")
 
     def test_mirrored_choose_any(self) -> None:
         from models import Biome
@@ -735,6 +735,96 @@ class TestImportClean(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, f"stderr: {result.stderr}")
         self.assertIn("OK", result.stdout)
+
+
+class TestAtlasPreviewExcludesDraftAndBattle(unittest.TestCase):
+    """Atlas preview summary excludes draft and battle sites."""
+
+    def test_preview_excludes_battle(self) -> None:
+        from models import Biome, DreamscapeNode, NodeState, Site, SiteType
+        from render_atlas import render_available_dreamscapes
+
+        nodes = [
+            DreamscapeNode(
+                node_id=1,
+                name="Test Node",
+                biome=Biome.VERDANT,
+                sites=[
+                    Site(site_type=SiteType.SHOP),
+                    Site(site_type=SiteType.ESSENCE),
+                    Site(site_type=SiteType.BATTLE),
+                ],
+                state=NodeState.AVAILABLE,
+                adjacent=[0],
+            ),
+        ]
+        result = render_available_dreamscapes(nodes, selected_index=0)
+        self.assertNotIn("Battle", result)
+
+    def test_preview_excludes_draft(self) -> None:
+        from models import Biome, DreamscapeNode, NodeState, Site, SiteType
+        from render_atlas import render_available_dreamscapes
+
+        nodes = [
+            DreamscapeNode(
+                node_id=1,
+                name="Test Node",
+                biome=Biome.VERDANT,
+                sites=[
+                    Site(site_type=SiteType.SHOP),
+                    Site(site_type=SiteType.DRAFT),
+                    Site(site_type=SiteType.BATTLE),
+                ],
+                state=NodeState.AVAILABLE,
+                adjacent=[0],
+            ),
+        ]
+        result = render_available_dreamscapes(nodes, selected_index=0)
+        self.assertNotIn("Draft", result)
+
+    def test_preview_excludes_dreamcaller_draft(self) -> None:
+        from models import Biome, DreamscapeNode, NodeState, Site, SiteType
+        from render_atlas import render_available_dreamscapes
+
+        nodes = [
+            DreamscapeNode(
+                node_id=1,
+                name="Test Node",
+                biome=Biome.VERDANT,
+                sites=[
+                    Site(site_type=SiteType.SHOP),
+                    Site(site_type=SiteType.DREAMCALLER_DRAFT),
+                    Site(site_type=SiteType.BATTLE),
+                ],
+                state=NodeState.AVAILABLE,
+                adjacent=[0],
+            ),
+        ]
+        result = render_available_dreamscapes(nodes, selected_index=0)
+        self.assertNotIn("Dreamcaller Draft", result)
+
+    def test_preview_includes_non_draft_non_battle_sites(self) -> None:
+        from models import Biome, DreamscapeNode, NodeState, Site, SiteType
+        from render_atlas import render_available_dreamscapes
+
+        nodes = [
+            DreamscapeNode(
+                node_id=1,
+                name="Test Node",
+                biome=Biome.VERDANT,
+                sites=[
+                    Site(site_type=SiteType.SHOP),
+                    Site(site_type=SiteType.ESSENCE),
+                    Site(site_type=SiteType.DRAFT),
+                    Site(site_type=SiteType.BATTLE),
+                ],
+                state=NodeState.AVAILABLE,
+                adjacent=[0],
+            ),
+        ]
+        result = render_available_dreamscapes(nodes, selected_index=0)
+        self.assertIn("Shop", result)
+        self.assertIn("Essence", result)
 
 
 if __name__ == "__main__":

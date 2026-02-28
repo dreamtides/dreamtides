@@ -368,6 +368,40 @@ class TestGenerateSites:
                     f"seed {seed}: Verdant run has a Shop but it is not enhanced"
                 )
 
+    def test_celestial_biome_enhances_dreamsign_offering(self) -> None:
+        from atlas import generate_sites
+
+        # Celestial biome: if a Dreamsign Offering site is present, it must be enhanced
+        for seed in range(100):
+            rng = random.Random(seed)
+            node = _make_node(biome=Biome.CELESTIAL)
+            generate_sites(node, completion_level=1, rng=rng, is_first_dreamscape=False)
+            offerings = [s for s in node.sites if s.site_type == SiteType.DREAMSIGN_OFFERING]
+            if offerings:
+                assert offerings[0].is_enhanced, (
+                    f"seed {seed}: Celestial run has a Dreamsign Offering but it is not enhanced"
+                )
+
+    def test_celestial_biome_enhances_dreamsign_draft(self) -> None:
+        from atlas import generate_sites
+
+        # Celestial biome: if a Dreamsign Draft site is present (and no Dreamsign Offering),
+        # the Dreamsign Draft must be enhanced
+        found_enhanced_dreamsign_draft = False
+        for seed in range(200):
+            rng = random.Random(seed)
+            node = _make_node(biome=Biome.CELESTIAL)
+            generate_sites(node, completion_level=2, rng=rng, is_first_dreamscape=False)
+            dreamsign_drafts = [s for s in node.sites if s.site_type == SiteType.DREAMSIGN_DRAFT]
+            dreamsign_offerings = [s for s in node.sites if s.site_type == SiteType.DREAMSIGN_OFFERING]
+            if dreamsign_drafts and not dreamsign_offerings:
+                assert dreamsign_drafts[0].is_enhanced, (
+                    f"seed {seed}: Celestial run has a Dreamsign Draft (no Offering) but it is not enhanced"
+                )
+                found_enhanced_dreamsign_draft = True
+        # Ensure this scenario actually occurred in at least one seed
+        assert found_enhanced_dreamsign_draft, "No seed produced a Celestial node with Dreamsign Draft but no Dreamsign Offering"
+
     def test_at_most_one_enhanced_site(self) -> None:
         from atlas import generate_sites
 
@@ -406,44 +440,49 @@ class TestBiomeEnhancementMapping:
     def test_verdant_enhances_shop(self) -> None:
         from atlas import BIOME_ENHANCED_SITE
 
-        assert BIOME_ENHANCED_SITE[Biome.VERDANT] == SiteType.SHOP
+        assert SiteType.SHOP in BIOME_ENHANCED_SITE[Biome.VERDANT]
 
     def test_celestial_enhances_dreamsign_offering(self) -> None:
         from atlas import BIOME_ENHANCED_SITE
 
-        assert BIOME_ENHANCED_SITE[Biome.CELESTIAL] == SiteType.DREAMSIGN_OFFERING
+        assert SiteType.DREAMSIGN_OFFERING in BIOME_ENHANCED_SITE[Biome.CELESTIAL]
+
+    def test_celestial_enhances_dreamsign_draft(self) -> None:
+        from atlas import BIOME_ENHANCED_SITE
+
+        assert SiteType.DREAMSIGN_DRAFT in BIOME_ENHANCED_SITE[Biome.CELESTIAL]
 
     def test_twilight_enhances_dream_journey(self) -> None:
         from atlas import BIOME_ENHANCED_SITE
 
-        assert BIOME_ENHANCED_SITE[Biome.TWILIGHT] == SiteType.DREAM_JOURNEY
+        assert SiteType.DREAM_JOURNEY in BIOME_ENHANCED_SITE[Biome.TWILIGHT]
 
     def test_infernal_enhances_tempting_offer(self) -> None:
         from atlas import BIOME_ENHANCED_SITE
 
-        assert BIOME_ENHANCED_SITE[Biome.INFERNAL] == SiteType.TEMPTING_OFFER
+        assert SiteType.TEMPTING_OFFER in BIOME_ENHANCED_SITE[Biome.INFERNAL]
 
     def test_ashen_enhances_purge(self) -> None:
         from atlas import BIOME_ENHANCED_SITE
 
-        assert BIOME_ENHANCED_SITE[Biome.ASHEN] == SiteType.PURGE
+        assert SiteType.PURGE in BIOME_ENHANCED_SITE[Biome.ASHEN]
 
     def test_crystalline_enhances_essence(self) -> None:
         from atlas import BIOME_ENHANCED_SITE
 
-        assert BIOME_ENHANCED_SITE[Biome.CRYSTALLINE] == SiteType.ESSENCE
+        assert SiteType.ESSENCE in BIOME_ENHANCED_SITE[Biome.CRYSTALLINE]
 
     def test_prismatic_enhances_transfiguration(self) -> None:
         from atlas import BIOME_ENHANCED_SITE
 
-        assert BIOME_ENHANCED_SITE[Biome.PRISMATIC] == SiteType.TRANSFIGURATION
+        assert SiteType.TRANSFIGURATION in BIOME_ENHANCED_SITE[Biome.PRISMATIC]
 
     def test_mirrored_enhances_duplication(self) -> None:
         from atlas import BIOME_ENHANCED_SITE
 
-        assert BIOME_ENHANCED_SITE[Biome.MIRRORED] == SiteType.DUPLICATION
+        assert SiteType.DUPLICATION in BIOME_ENHANCED_SITE[Biome.MIRRORED]
 
     def test_arcane_enhances_discovery_draft(self) -> None:
         from atlas import BIOME_ENHANCED_SITE
 
-        assert BIOME_ENHANCED_SITE[Biome.ARCANE] == SiteType.DISCOVERY_DRAFT
+        assert SiteType.DISCOVERY_DRAFT in BIOME_ENHANCED_SITE[Biome.ARCANE]

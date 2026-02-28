@@ -40,6 +40,12 @@ _SITE_TYPE_NAMES: dict[SiteType, str] = {
     SiteType.CLEANSE: "Cleanse",
 }
 
+_PREVIEW_EXCLUDED_TYPES: frozenset[SiteType] = frozenset({
+    SiteType.BATTLE,
+    SiteType.DRAFT,
+    SiteType.DREAMCALLER_DRAFT,
+})
+
 _BIOME_MARKERS: dict[Biome, str] = {
     Biome.VERDANT: "\033[92m",
     Biome.CELESTIAL: "\033[94m",
@@ -59,7 +65,7 @@ _BIOME_ENHANCEMENT_TEXT: dict[Biome, str] = {
     Biome.INFERNAL: "3 pairs",
     Biome.ASHEN: "purge up to 6",
     Biome.CRYSTALLINE: "doubled",
-    Biome.PRISMATIC: "choose any",
+    Biome.PRISMATIC: "select target",
     Biome.MIRRORED: "choose any",
     Biome.ARCANE: "pick any number",
 }
@@ -164,7 +170,11 @@ def render_available_dreamscapes(
         biome_color = _BIOME_MARKERS.get(node.biome, "")
         biome_label = f"{biome_color}{node.biome.value}{RESET}"
         prefix = f"  {marker} [{node.name}] ({biome_label})"
-        summary = dreamscape_site_summary(node.sites, biome=node.biome)
+        preview_sites = [
+            s for s in node.sites
+            if s.site_type not in _PREVIEW_EXCLUDED_TYPES
+        ]
+        summary = dreamscape_site_summary(preview_sites, biome=node.biome)
         if summary:
             prefix_vis = visible_len(prefix)
             sep = "  -- "
