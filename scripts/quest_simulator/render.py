@@ -205,17 +205,24 @@ def profile_bar(
 
 
 def quest_start_banner(
-    seed: int, starting_essence: int, pool_size: int
+    seed: int,
+    starting_essence: int,
+    pool_size: int,
+    unique_cards: int = 0,
 ) -> str:
     """Build the quest start banner text."""
     sep = draw_double_separator()
+    if unique_cards > 0:
+        pool_line = f"  Draft pool: {unique_cards} cards ({pool_size} entries)"
+    else:
+        pool_line = f"  Draft pool: {pool_size} entries"
     lines: list[str] = [
         sep,
         f"  {BOLD}DREAMTIDES QUEST{RESET}{' ' * (CONTENT_WIDTH - 18 - len(f'Seed: {seed}') - 2)}Seed: {seed}",
         sep,
         "",
         f"  Starting essence: {starting_essence}",
-        f"  Draft pool: {pool_size} entries",
+        pool_line,
         "",
         f"  {DIM}Press Enter to begin...{RESET}",
         sep,
