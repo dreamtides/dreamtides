@@ -50,8 +50,11 @@ def _save_termios() -> None:
 
 
 def _restore_termios() -> None:
-    """Restore saved terminal state."""
-    global _saved_termios
+    """Restore saved terminal state without clearing it.
+
+    Keeps _saved_termios so that re-entering raw mode and restoring again
+    still works correctly in menu redraw loops.
+    """
     if _HAS_TERMIOS and _saved_termios is not None:
         try:
             termios.tcsetattr(
@@ -59,18 +62,27 @@ def _restore_termios() -> None:
             )
         except termios.error:
             pass
-        _saved_termios = None
+
+
+def _release_termios() -> None:
+    """Restore saved terminal state and clear it.
+
+    Called at the end of an interaction to fully release the saved state.
+    """
+    global _saved_termios
+    _restore_termios()
+    _saved_termios = None
 
 
 def _sigint_handler(signum: int, frame: object) -> None:
     """Handle Ctrl+C by restoring terminal state before exiting."""
-    _restore_termios()
+    _release_termios()
     print()
     sys.exit(130)
 
 
 # Register atexit fallback for terminal restoration
-atexit.register(_restore_termios)
+atexit.register(_release_termios)
 
 
 def _read_key() -> str:
@@ -211,7 +223,7 @@ def single_select(
             elif key == KEY_DOWN:
                 cursor = (cursor + 1) % len(options)
             elif key == KEY_QUIT:
-                _restore_termios()
+                _release_termios()
                 print()
                 sys.exit(130)
             else:
@@ -222,7 +234,7 @@ def single_select(
             line_count = _render_single_menu(options, cursor, render_fn)
             tty.setraw(sys.stdin.fileno())
     finally:
-        _restore_termios()
+        _release_termios()
         signal.signal(signal.SIGINT, prev_handler)
 
     return cursor
@@ -254,6 +266,8 @@ def multi_select(
         return []
 
     if not _is_interactive():
+        if initial_toggled:
+            return sorted(i for i in initial_toggled if 0 <= i < len(options))
         return []
 
     cursor = 0
@@ -279,7 +293,7 @@ def multi_select(
                 elif max_selections is None or len(toggled) < max_selections:
                     toggled.add(cursor)
             elif key == KEY_QUIT:
-                _restore_termios()
+                _release_termios()
                 print()
                 sys.exit(130)
             else:
@@ -292,7 +306,7 @@ def multi_select(
             )
             tty.setraw(sys.stdin.fileno())
     finally:
-        _restore_termios()
+        _release_termios()
         signal.signal(signal.SIGINT, prev_handler)
 
     return sorted(toggled)
@@ -301,10 +315,17 @@ def multi_select(
 def confirm_decline(
     accept_label: str = "Accept",
     decline_label: str = "Decline",
+    render_fn: Optional[Callable[[str, str, bool], str]] = None,
 ) -> bool:
     """Display a confirm/decline prompt and return the choice.
 
     Left/right arrows switch between the two options. Enter confirms.
+
+    Args:
+        accept_label: Label for the accept option.
+        decline_label: Label for the decline option.
+        render_fn: Optional callback(accept_label, decline_label, accepted)
+            -> str for custom rendering. If None, a default format is used.
 
     Returns:
         True if accepted, False if declined.
@@ -316,13 +337,16 @@ def confirm_decline(
     labels = [accept_label, decline_label]
 
     def _print_prompt() -> int:
-        parts: list[str] = []
-        for i, label in enumerate(labels):
-            if i == selected:
-                parts.append(f"[> {label} <]")
-            else:
-                parts.append(f"[  {label}  ]")
-        line = "  " + "    ".join(parts)
+        if render_fn is not None:
+            line = render_fn(accept_label, decline_label, selected == 0)
+        else:
+            parts: list[str] = []
+            for i, label in enumerate(labels):
+                if i == selected:
+                    parts.append(f"[> {label} <]")
+                else:
+                    parts.append(f"[  {label}  ]")
+            line = "  " + "    ".join(parts)
         print(line)
         return 1
 
@@ -342,7 +366,7 @@ def confirm_decline(
             elif key == KEY_RIGHT:
                 selected = 1
             elif key == KEY_QUIT:
-                _restore_termios()
+                _release_termios()
                 print()
                 sys.exit(130)
             else:
@@ -353,18 +377,29 @@ def confirm_decline(
             line_count = _print_prompt()
             tty.setraw(sys.stdin.fileno())
     finally:
-        _restore_termios()
+        _release_termios()
         signal.signal(signal.SIGINT, prev_handler)
 
     return selected == 0
 
 
-def wait_for_continue(prompt: str = "  Press any key to continue...") -> None:
+def wait_for_continue(
+    prompt: str = "  Press any key to continue...",
+    render_fn: Optional[Callable[[], str]] = None,
+) -> None:
     """Display a prompt and wait for any keypress.
 
     Used after information display to pause before proceeding.
+
+    Args:
+        prompt: Default prompt string if render_fn is not provided.
+        render_fn: Optional callback() -> str for custom rendering of the
+            prompt line.
     """
-    print(prompt)
+    if render_fn is not None:
+        print(render_fn())
+    else:
+        print(prompt)
 
     if not _is_interactive():
         return
@@ -376,9 +411,9 @@ def wait_for_continue(prompt: str = "  Press any key to continue...") -> None:
         tty.setraw(sys.stdin.fileno())
         key = _read_key()
         if key == KEY_QUIT:
-            _restore_termios()
+            _release_termios()
             print()
             sys.exit(130)
     finally:
-        _restore_termios()
+        _release_termios()
         signal.signal(signal.SIGINT, prev_handler)
