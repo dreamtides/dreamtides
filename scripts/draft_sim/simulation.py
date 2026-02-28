@@ -2,7 +2,7 @@
 
 import random
 
-from models import (
+from ds_models import (
     AlgorithmParams,
     PickContext,
     PickRecord,
@@ -16,7 +16,7 @@ from models import (
     Strategy,
     StrategyParams,
 )
-from algorithm import generate_pool, select_cards, PoolEntry
+from ds_algorithm import generate_pool, select_cards, PoolEntry
 
 
 def simulate_quest(

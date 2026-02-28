@@ -2,6 +2,7 @@
   "source_directories": ["scripts"],
   "search_path": [
     "scripts/quest_simulator",
+    "scripts/draft_sim",
     "scripts/review",
     "scripts/abu"
   ],

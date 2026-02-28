@@ -9,8 +9,8 @@ import argparse
 import random
 import sys
 
-from jsonl_log import SessionLogger
-from models import AlgorithmParams, PoolParams, QuestParams, Strategy, StrategyParams
+from ds_jsonl_log import SessionLogger
+from ds_models import AlgorithmParams, PoolParams, QuestParams, Strategy, StrategyParams
 from interactive import run_interactive
 from output import print_aggregate, print_evolution, print_sweep, print_trace
 from simulation import simulate_quest

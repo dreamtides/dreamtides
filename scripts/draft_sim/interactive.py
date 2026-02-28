@@ -9,8 +9,8 @@ import re
 import sys
 from typing import Optional
 
-from jsonl_log import SessionLogger
-from models import (
+from ds_jsonl_log import SessionLogger
+from ds_models import (
     PickContext,
     PickRecord,
     QuestResult,
@@ -409,8 +409,8 @@ def print_pick_header(ctx: PickContext, pick_num: int, total_picks: int):
     else:
         print(f"\n{'\u2500' * w}")
 
-    site_label = f"Draft Site {site + 1}"
-    header = f"  DREAMSCAPE {ds} \u2500\u2500 {site_label} \u2500\u2500 Pick {pos + 1}/5"
+    site_label = f"Draft Site {(site or 0) + 1}"
+    header = f"  DREAMSCAPE {ds} \u2500\u2500 {site_label} \u2500\u2500 Pick {(pos or 0) + 1}/5"
     pick_tag = f"[Pick {pick_num}/{total_picks}]"
     spacing = max(1, w - len(header) - len(pick_tag))
     print(f"{header}{' ' * spacing}{pick_tag}")
@@ -427,7 +427,7 @@ def print_shop_header(ctx: PickContext, pick_num: int, total_picks: int):
     site = ctx.site
     w = 70
     print(f"\n{'\u2550' * w}")
-    header = f"  DREAMSCAPE {ds} \u2500\u2500 Shop (Site {site + 1})"
+    header = f"  DREAMSCAPE {ds} \u2500\u2500 Shop (Site {(site or 0) + 1})"
     pick_tag = f"[Pick {pick_num}/{total_picks}]"
     spacing = max(1, w - len(header) - len(pick_tag))
     print(f"{header}{' ' * spacing}{pick_tag}")

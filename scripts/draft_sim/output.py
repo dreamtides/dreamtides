@@ -3,7 +3,7 @@
 import statistics
 from collections import Counter
 
-from models import QuestResult, Resonance, ResonanceProfile
+from ds_models import QuestResult, Resonance, ResonanceProfile
 
 
 def format_table(headers: list[str], rows: list[list[str]], align: str = "") -> str:
@@ -72,8 +72,9 @@ def convergence_pick(result: QuestResult) -> int:
     """First pick where top-2 share of drafted cards (excluding dreamcaller bonus) exceeds 75%."""
     deck_profile = ResonanceProfile()
     for pick in result.picks:
-        if pick.bought:
-            for card in pick.bought:
+        bought = pick.bought
+        if bought:
+            for card in bought:
                 for r in card.resonances:
                     deck_profile.add(r)
         else:
@@ -142,7 +143,7 @@ def print_trace(result: QuestResult):
             print(f"  [{rarity_tag}] power={card.power:2d}  {res:14s}  w={weight:6.2f}{marker}")
 
         if is_shop:
-            print(f"  Bought {len(pick.bought)} cards")
+            print(f"  Bought {len(pick.bought or [])} cards")
             for reason in (pick.buy_reasons or []):
                 print(f"    {reason}")
         else:
@@ -316,8 +317,9 @@ def print_evolution(results: list[QuestResult]):
                 first = result.picks[0]
                 # Count resonances added by the first pick's cards
                 first_res_counts: dict = {}
-                if first.bought:
-                    for card in first.bought:
+                first_bought = first.bought
+                if first_bought:
+                    for card in first_bought:
                         for r in card.resonances:
                             first_res_counts[r] = first_res_counts.get(r, 0) + 1
                 else:
@@ -331,8 +333,9 @@ def print_evolution(results: list[QuestResult]):
             for pick in result.picks:
                 if pick.pick_number > target_pick:
                     break
-                if pick.bought:
-                    for card in pick.bought:
+                bought = pick.bought
+                if bought:
+                    for card in bought:
                         for r in card.resonances:
                             profile.add(r)
                 else:

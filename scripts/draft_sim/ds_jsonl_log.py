@@ -9,7 +9,7 @@ import os
 import time
 from pathlib import Path
 
-from models import PickContext, PickRecord, QuestResult, Rarity, Resonance, StrategyParams
+from ds_models import PickContext, PickRecord, QuestResult, Rarity, Resonance, StrategyParams
 
 # Project root is 3 levels up from this file
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent

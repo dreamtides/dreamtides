@@ -3,7 +3,7 @@
 import math
 import random
 
-from models import (
+from ds_models import (
     AlgorithmParams,
     PoolEntry,
     PoolParams,
