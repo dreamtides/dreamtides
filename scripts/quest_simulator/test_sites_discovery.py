@@ -232,6 +232,32 @@ class TestDiscoveryDraftPicking:
         assert len(picked) == 3
         assert len(unpicked) == 1
 
+    def test_discovery_draft_with_none_logger(self) -> None:
+        """Discovery draft should not crash when logger is None."""
+        from sites_discovery import run_discovery_draft
+
+        pool = _make_pool_entries("tribal:warrior", 10, start_number=1)
+        state = _make_quest_state(pool=pool)
+
+        initial_deck_count = state.deck_count()
+
+        with patch(
+            "sites_discovery.single_select", return_value=0,
+        ):
+            run_discovery_draft(
+                state=state,
+                params=_default_params(),
+                logger=None,
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                is_enhanced=False,
+                cards_per_pick=4,
+                picks_per_site=1,
+                tag_config=_default_tag_config(),
+            )
+
+        assert state.deck_count() > initial_deck_count
+
     def test_enhanced_allows_picking_zero_cards(self) -> None:
         """Enhanced discovery draft should allow picking 0 cards."""
         from sites_discovery import run_discovery_draft
@@ -537,3 +563,27 @@ class TestSpecialtyShopPurchasing:
 
         assert _effective_price(item_no_discount) == 100
         assert _effective_price(item_discounted) == 30
+
+
+class TestSpecialtyShopNoneLogger:
+    def test_specialty_shop_with_none_logger(self) -> None:
+        """Specialty shop should not crash when logger is None."""
+        from sites_discovery import run_specialty_shop
+
+        pool = _make_pool_entries("tribal:warrior", 10, start_number=1)
+        state = _make_quest_state(pool=pool, essence=500)
+
+        # Multi-select returns empty (done without buying)
+        with patch(
+            "sites_discovery.multi_select", return_value=[],
+        ):
+            run_specialty_shop(
+                state=state,
+                params=_default_params(),
+                logger=None,
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                is_enhanced=False,
+                shop_config=_default_shop_config(),
+                tag_config=_default_tag_config(),
+            )

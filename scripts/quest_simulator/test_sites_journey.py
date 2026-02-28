@@ -446,6 +446,25 @@ class TestApplyJourneyEffect:
         # Top resonance was Tide (5), should now be 8
         assert state.resonance_profile.counts[Resonance.TIDE] == 8
 
+    def test_large_essence_effect(self) -> None:
+        from sites_journey import apply_journey_effect
+
+        state = _make_quest_state(essence=100)
+        journey = Journey(
+            name="Large Essence Journey",
+            description="Gain large essence",
+            effect_type=EffectType.LARGE_ESSENCE,
+            effect_value=300,
+        )
+
+        changes = apply_journey_effect(
+            state, journey, _make_algorithm_params(), _make_pool_params(),
+            _make_dreamsigns(),
+        )
+
+        assert state.essence == 400
+        assert changes["essence_delta"] == 300
+
     def test_gain_resonance_with_all_zero_profile(self) -> None:
         from sites_journey import apply_journey_effect
 

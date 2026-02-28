@@ -212,7 +212,7 @@ def _total_cost(items: list[ShopItem], indices: list[int]) -> int:
 def run_discovery_draft(
     state: QuestState,
     params: AlgorithmParams,
-    logger: SessionLogger,
+    logger: Optional[SessionLogger],
     dreamscape_name: str,
     dreamscape_number: int,
     is_enhanced: bool,
@@ -295,29 +295,31 @@ def run_discovery_draft(
         increment_staleness(unpicked)
 
         # Log each picked card
-        offered_cards = [e.card for e, _ in offered]
-        weights = [w for _, w in offered]
-        for entry in picked:
-            logger.log_draft_pick(
-                offered_cards=offered_cards,
-                weights=weights,
-                picked_card=entry.card,
-                profile_snapshot=state.resonance_profile.snapshot(),
-            )
+        if logger is not None:
+            offered_cards = [e.card for e, _ in offered]
+            weights = [w for _, w in offered]
+            for entry in picked:
+                logger.log_draft_pick(
+                    offered_cards=offered_cards,
+                    weights=weights,
+                    picked_card=entry.card,
+                    profile_snapshot=state.resonance_profile.snapshot(),
+                )
 
     # Log the overall site visit
-    logger.log_site_visit(
-        site_type="DiscoveryDraft",
-        dreamscape=dreamscape_name,
-        is_enhanced=is_enhanced,
-        choices=[],
-        choice_made=None,
-        state_changes={
-            "picks_completed": picks_per_site,
-            "deck_size_after": state.deck_count(),
-        },
-        profile_snapshot=state.resonance_profile.snapshot(),
-    )
+    if logger is not None:
+        logger.log_site_visit(
+            site_type="DiscoveryDraft",
+            dreamscape=dreamscape_name,
+            is_enhanced=is_enhanced,
+            choices=[],
+            choice_made=None,
+            state_changes={
+                "picks_completed": picks_per_site,
+                "deck_size_after": state.deck_count(),
+            },
+            profile_snapshot=state.resonance_profile.snapshot(),
+        )
 
     # Show resonance profile footer
     print(
@@ -332,7 +334,7 @@ def run_discovery_draft(
 def run_specialty_shop(
     state: QuestState,
     params: AlgorithmParams,
-    logger: SessionLogger,
+    logger: Optional[SessionLogger],
     dreamscape_name: str,
     dreamscape_number: int,
     is_enhanced: bool,
@@ -452,27 +454,29 @@ def run_specialty_shop(
             state.spend_essence(_effective_price(shop_item))
 
         # Log the shop interaction
-        items_shown = [items[i].entry.card for i in range(len(items))]
-        logger.log_shop_purchase(
-            items_shown=items_shown,
-            items_bought=purchased_cards,
-            essence_spent=total,
-        )
-        logger.log_site_visit(
-            site_type="SpecialtyShop",
-            dreamscape=dreamscape_name,
-            is_enhanced=is_enhanced,
-            choices=[item.entry.card.name for item in items],
-            choice_made=", ".join(c.name for c in purchased_cards)
-            if purchased_cards
-            else None,
-            state_changes={
-                "items_bought": [c.name for c in purchased_cards],
-                "essence_spent": total,
-                "deck_size_after": state.deck_count(),
-            },
-            profile_snapshot=state.resonance_profile.snapshot(),
-        )
+        if logger is not None:
+            if purchased_cards:
+                items_shown = [items[i].entry.card for i in range(len(items))]
+                logger.log_shop_purchase(
+                    items_shown=items_shown,
+                    items_bought=purchased_cards,
+                    essence_spent=total,
+                )
+            logger.log_site_visit(
+                site_type="SpecialtyShop",
+                dreamscape=dreamscape_name,
+                is_enhanced=is_enhanced,
+                choices=[item.entry.card.name for item in items],
+                choice_made=", ".join(c.name for c in purchased_cards)
+                if purchased_cards
+                else None,
+                state_changes={
+                    "items_bought": [c.name for c in purchased_cards],
+                    "essence_spent": total,
+                    "deck_size_after": state.deck_count(),
+                },
+                profile_snapshot=state.resonance_profile.snapshot(),
+            )
         break
 
     # Show resonance profile footer

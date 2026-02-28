@@ -150,6 +150,7 @@ def run_purge(
 def forced_deck_limit_purge(
     state: QuestState,
     logger: Optional[SessionLogger],
+    dreamscape_name: str = "",
 ) -> None:
     """Force the player to remove cards until deck is at or below max_deck.
 
@@ -235,6 +236,7 @@ def forced_deck_limit_purge(
     if logger is not None:
         logger.log_site_visit(
             site_type="ForcedPurge",
+            dreamscape=dreamscape_name,
             choices=[],
             choice_made=None,
             state_changes={

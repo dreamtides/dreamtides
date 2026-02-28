@@ -110,7 +110,6 @@ def visit_site(
         sites_discovery.run_discovery_draft(
             state=quest_state,
             params=data.algorithm_params,
-            # pyre-fixme[6]: run_discovery_draft requires non-optional logger
             logger=logger,
             dreamscape_name=name,
             dreamscape_number=number,
@@ -143,7 +142,6 @@ def visit_site(
         sites_discovery.run_specialty_shop(
             state=quest_state,
             params=data.algorithm_params,
-            # pyre-fixme[6]: run_specialty_shop requires non-optional logger
             logger=logger,
             dreamscape_name=name,
             dreamscape_number=number,

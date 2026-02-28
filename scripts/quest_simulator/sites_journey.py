@@ -205,7 +205,7 @@ def apply_journey_effect(
         )
         changes["cards_added"] = [c.name for c in added]
 
-    elif journey.effect_type == EffectType.ADD_ESSENCE:
+    elif journey.effect_type in (EffectType.ADD_ESSENCE, EffectType.LARGE_ESSENCE):
         state.gain_essence(journey.effect_value)
         changes["essence_delta"] = journey.effect_value
 

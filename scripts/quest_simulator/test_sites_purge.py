@@ -481,3 +481,26 @@ class TestForcedDeckLimitPurge:
             forced_deck_limit_purge(state=state, logger=None)
 
         assert state.deck_count() <= 5
+
+    def test_forced_purge_log_includes_dreamscape(self) -> None:
+        """Forced purge JSONL log should include the dreamscape name."""
+        from sites_purge import forced_deck_limit_purge
+
+        state = _make_quest_state(max_deck=5)
+        _populate_deck(state, 7)
+
+        log_calls: list[dict[str, object]] = []
+
+        class FakeLogger:
+            def log_site_visit(self, **kwargs: object) -> None:
+                log_calls.append(dict(kwargs))
+
+        forced_deck_limit_purge(
+            state=state,
+            logger=FakeLogger(),  # type: ignore[arg-type]
+            dreamscape_name="Twilight Grove",
+        )
+
+        assert state.deck_count() <= 5
+        assert len(log_calls) == 1
+        assert log_calls[0]["dreamscape"] == "Twilight Grove"

@@ -379,11 +379,12 @@ def run_shop(
 
         # Log the interaction
         if logger is not None:
-            logger.log_shop_purchase(
-                items_shown=[item.card for item in items],
-                items_bought=[item.card for item in bought_items],
-                essence_spent=total_cost,
-            )
+            if bought_items:
+                logger.log_shop_purchase(
+                    items_shown=[item.card for item in items],
+                    items_bought=[item.card for item in bought_items],
+                    essence_spent=total_cost,
+                )
             logger.log_site_visit(
                 site_type="Shop",
                 dreamscape=dreamscape_name,

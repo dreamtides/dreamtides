@@ -192,12 +192,31 @@ class TestJsonlLogCompleteness:
         assert len(draft_picks) > 5
         log_path.unlink()
 
-    def test_log_contains_shop_purchases(self) -> None:
+    def test_log_contains_shop_site_visits(self) -> None:
+        """Shop site visits should appear in the log even without purchases."""
+        with patch("builtins.print"):
+            _, log_path = _run_full_quest(42)
+        events = _parse_log(log_path)
+        shop_visits = [
+            e for e in events
+            if e["event"] == "site_visit"
+            and e.get("site_type") in ("Shop", "SpecialtyShop")
+        ]
+        assert len(shop_visits) > 0, (
+            "No Shop or SpecialtyShop site_visit events found in the log"
+        )
+        log_path.unlink()
+
+    def test_shop_purchase_only_logged_when_items_bought(self) -> None:
+        """shop_purchase events should only be emitted when items are bought."""
         with patch("builtins.print"):
             _, log_path = _run_full_quest(42)
         events = _parse_log(log_path)
         shop_events = [e for e in events if e["event"] == "shop_purchase"]
-        assert len(shop_events) > 0
+        for e in shop_events:
+            assert len(e.get("items_bought", [])) > 0, (
+                "shop_purchase event logged with empty items_bought"
+            )
         log_path.unlink()
 
     def test_log_contains_battle_completes(self) -> None:
@@ -215,7 +234,7 @@ class TestJsonlLogCompleteness:
         types = set(e["event"] for e in events)
         required = {
             "session_start", "site_visit", "draft_pick",
-            "shop_purchase", "battle_complete", "session_end",
+            "battle_complete", "session_end",
         }
         missing = required - types
         assert not missing, f"Missing event types: {missing}"
