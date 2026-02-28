@@ -1,0 +1,62 @@
+# Core quest progression parameters
+[quest]
+starting_essence = 250
+max_deck = 50
+min_deck = 25
+max_dreamsigns = 12
+total_battles = 7
+miniboss_battle = 4
+
+# Draft site pick parameters
+[draft]
+cards_per_pick = 4
+picks_per_site = 5
+
+# Rarity-based copy counts and variance range for the draft pool
+[draft_pool]
+copies_common = 4
+copies_uncommon = 3
+copies_rare = 2
+copies_legendary = 1
+variance_min = 0.75
+variance_max = 1.25
+
+# Resonance affinity weighting parameters
+[resonance]
+exponent = 1.4
+floor_weight = 0.5
+neutral_base = 3.0
+
+# Per-card staleness decay factor
+[staleness]
+factor = 0.3
+
+# Tag-based theme selection parameters
+[tags]
+scale = 1.5
+min_theme_cards = 6
+relevance_boost = 2.0
+depth_factor = 0.1
+
+# Shop pricing and configuration
+[shop]
+price_common = 50
+price_uncommon = 80
+price_rare = 120
+price_legendary = 200
+reroll_cost = 50
+discount_min = 30
+discount_max = 90
+items_count = 6
+
+# Essence and card rewards after battles
+[battle_rewards]
+base_essence = 100
+per_level = 25
+rare_pick_count = 3
+
+# Fixed essence amounts at essence sites by completion level
+[essence_sites]
+amount_level_0 = 200
+amount_level_2 = 250
+amount_level_4 = 300
