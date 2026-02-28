@@ -3,23 +3,21 @@
 Presents 3 random dreamcallers for the player to choose from via
 arrow-key single-select. The selected dreamcaller's resonance bonuses,
 tag bonuses, and essence bonus are applied to quest state.
+
+The highlighted option shows full details (resonance, resonance bonus,
+tags, essence bonus, ability text) while non-highlighted options show
+a condensed view (name + resonance only) to reduce visual clutter.
 """
 
 import random
 from typing import Optional
 
+import render
+import render_status
 from input_handler import single_select
 from jsonl_log import SessionLogger
 from models import Dreamcaller, Resonance
 from quest_state import QuestState
-from render import (
-    BOLD,
-    RESET,
-    color_resonance,
-    color_resonances,
-    draw_double_separator,
-    resonance_profile_footer,
-)
 
 DREAMCALLER_COUNT = 3
 
@@ -39,43 +37,106 @@ def format_dreamcaller_option(
 ) -> list[str]:
     """Format a dreamcaller for display in the selection menu.
 
-    Returns a list of display lines showing the dreamcaller's name,
-    resonances, ability text, essence bonus, resonance bonuses, and
-    tag bonuses.
+    When highlighted, returns a detailed multi-line display with
+    resonance, resonance bonus, tags, essence bonus, and ability text.
+    When not highlighted, returns a condensed single-line display with
+    name and resonance only.
     """
     marker = ">" if highlighted else " "
-    res_str = color_resonances(dc.resonances)
+    res_str = render.color_resonances(dc.resonances)
 
-    # Line 1: marker + name + resonance symbols
-    line1 = f"  {marker} {BOLD}{dc.name}{RESET}  {res_str}"
+    if not highlighted:
+        # Condensed view: name + resonance only
+        return [f"  {marker} {dc.name}  ({res_str})"]
 
-    # Line 2: ability text
-    line2 = f"      \"{dc.ability_text}\""
+    # Full detail view for the highlighted option
+    lines: list[str] = []
 
-    # Line 3: essence bonus + resonance bonus values
+    # Line 1: marker + bold name
+    lines.append(f"  {marker} {render.BOLD}{dc.name}{render.RESET}")
+
+    # Line 2: Resonance symbols
+    lines.append(f"      Resonance: {res_str}")
+
+    # Line 3: Resonance bonus values
     res_bonus_parts: list[str] = []
     for res_name, amount in sorted(dc.resonance_bonus.items()):
         try:
             res_enum = Resonance(res_name)
-            res_bonus_parts.append(f"{color_resonance(res_enum)}+{amount}")
+            res_bonus_parts.append(
+                f"{render.color_resonance(res_enum)} +{amount}"
+            )
         except ValueError:
-            res_bonus_parts.append(f"{res_name}+{amount}")
-    res_bonus_str = ", ".join(res_bonus_parts) if res_bonus_parts else "none"
-    line3 = f"      Essence: +{dc.essence_bonus}  |  Resonance: {res_bonus_str}"
+            res_bonus_parts.append(f"{res_name} +{amount}")
+    res_bonus_str = (
+        ", ".join(res_bonus_parts) if res_bonus_parts else "none"
+    )
+    lines.append(f"      Resonance Bonus: {res_bonus_str}")
 
-    # Line 4: tag bonus values
-    tag_parts: list[str] = []
-    for tag, amount in sorted(dc.tag_bonus.items()):
-        tag_parts.append(f"{tag}+{amount}")
+    # Line 4: Tags
+    tag_parts = sorted(dc.tags)
     tag_str = ", ".join(tag_parts) if tag_parts else "none"
-    line4 = f"      Tags: {tag_str}"
+    lines.append(f"      Tags: {tag_str}")
 
-    return [line1, line2, line3, line4]
+    # Line 5: Essence bonus (bold)
+    lines.append(
+        f"      Essence Bonus: {render.BOLD}+{dc.essence_bonus}{render.RESET}"
+    )
+
+    # Line 6: Quoted ability text (dimmed)
+    lines.append(
+        f"      {render.DIM}\"{dc.ability_text}\"{render.RESET}"
+    )
+
+    return lines
 
 
 def apply_dreamcaller(state: QuestState, dc: Dreamcaller) -> None:
     """Apply a dreamcaller's bonuses to quest state."""
     state.set_dreamcaller(dc)
+
+
+def format_confirmation(
+    dc: Dreamcaller,
+    essence_after: int,
+) -> str:
+    """Build the confirmation message after dreamcaller selection.
+
+    Shows the selected dreamcaller name, resonance, applied bonuses
+    (resonance, tag, essence), and resulting essence total.
+    """
+    res_str = render.color_resonances(dc.resonances)
+    lines: list[str] = [
+        f"  {render.BOLD}Selected:{render.RESET} {dc.name} ({res_str})",
+    ]
+
+    # Resonance bonuses applied
+    res_bonus_parts: list[str] = []
+    for res_name, amount in sorted(dc.resonance_bonus.items()):
+        try:
+            res_enum = Resonance(res_name)
+            res_bonus_parts.append(
+                f"{render.color_resonance(res_enum)} +{amount}"
+            )
+        except ValueError:
+            res_bonus_parts.append(f"{res_name} +{amount}")
+    if res_bonus_parts:
+        lines.append(f"  Resonance: {', '.join(res_bonus_parts)}")
+
+    # Tag bonuses applied
+    tag_parts: list[str] = []
+    for tag, amount in sorted(dc.tag_bonus.items()):
+        tag_parts.append(f"{tag} +{amount}")
+    if tag_parts:
+        lines.append(f"  Tags: {', '.join(tag_parts)}")
+
+    # Essence bonus
+    lines.append(
+        f"  Essence: {render.BOLD}+{dc.essence_bonus}{render.RESET}"
+        f" -> {essence_after}"
+    )
+
+    return "\n".join(lines)
 
 
 def run_dreamcaller_draft(
@@ -94,15 +155,13 @@ def run_dreamcaller_draft(
     choices = select_dreamcallers(all_dreamcallers, state.rng)
 
     # Display header
-    sep = draw_double_separator()
-    print(sep)
-    left = f"  {dreamscape_name.upper()} -- Dreamcaller Draft"
-    right = f"[Dreamscape {dreamscape_number}]"
-    gap = max(2, 70 - len(left) - len(right))
-    print(f"{left}{' ' * gap}{right}")
-    print(sep)
+    print(render_status.site_header(
+        dreamscape_name=dreamscape_name,
+        site_type_label="Dreamcaller Draft",
+        dreamscape_number=dreamscape_number,
+    ))
     print()
-    print(f"  {BOLD}Choose your Dreamcaller:{RESET}")
+    print(f"  {render.BOLD}Choose your Dreamcaller:{render.RESET}")
     print()
 
     # Build display lines for each dreamcaller
@@ -119,11 +178,9 @@ def run_dreamcaller_draft(
     # Apply selection
     apply_dreamcaller(state, selected)
 
-    # Display confirmation
+    # Display confirmation with applied bonuses
     print()
-    res_str = color_resonances(selected.resonances)
-    print(f"  {BOLD}Selected:{RESET} {selected.name} ({res_str})")
-    print(f"  Essence: +{selected.essence_bonus} -> {state.essence}")
+    print(format_confirmation(selected, state.essence))
 
     # Log the selection
     if logger is not None:
@@ -141,7 +198,7 @@ def run_dreamcaller_draft(
 
     # Show resonance profile footer
     print()
-    footer = resonance_profile_footer(
+    footer = render_status.resonance_profile_footer(
         counts=state.resonance_profile.snapshot(),
         deck_count=state.deck_count(),
         essence=state.essence,

@@ -170,21 +170,52 @@ class TestSelectDreamcallers:
 class TestFormatDreamcallerOption:
     """Test the display formatting of a dreamcaller option."""
 
-    def test_returns_list_of_strings(self) -> None:
+    def test_highlighted_returns_full_details(self) -> None:
         from sites_dreamcaller import format_dreamcaller_option
 
         dc = _make_dreamcaller(
             name="Vesper, Twilight Arbiter",
             resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
             resonance_bonus={"Tide": 4, "Ruin": 4},
+            tags=frozenset({"mechanic:reclaim", "mechanic:dissolve"}),
+            tag_bonus={"mechanic:reclaim": 2, "mechanic:dissolve": 1},
+            essence_bonus=50,
+            ability_text="Whenever you dissolve an enemy character, draw a card.",
+        )
+        lines = format_dreamcaller_option(dc, highlighted=True)
+        assert isinstance(lines, list)
+        assert all(isinstance(line, str) for line in lines)
+        # Highlighted should have multiple detail lines
+        assert len(lines) >= 5
+        full_text = "\n".join(lines)
+        # Must contain resonance bonus info
+        assert "+4" in full_text
+        # Must contain tags
+        assert "mechanic:reclaim" in full_text or "Tags:" in full_text
+        # Must contain essence bonus
+        assert "+50" in full_text or "Essence" in full_text
+        # Must contain ability text
+        assert "dissolve" in full_text
+
+    def test_non_highlighted_shows_condensed_view(self) -> None:
+        from sites_dreamcaller import format_dreamcaller_option
+
+        dc = _make_dreamcaller(
+            name="Vesper, Twilight Arbiter",
+            resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
+            resonance_bonus={"Tide": 4, "Ruin": 4},
+            tags=frozenset({"mechanic:reclaim", "mechanic:dissolve"}),
             tag_bonus={"mechanic:reclaim": 2, "mechanic:dissolve": 1},
             essence_bonus=50,
             ability_text="Whenever you dissolve an enemy character, draw a card.",
         )
         lines = format_dreamcaller_option(dc, highlighted=False)
-        assert isinstance(lines, list)
-        assert all(isinstance(line, str) for line in lines)
-        assert len(lines) >= 3
+        # Condensed should be fewer lines than highlighted
+        highlighted_lines = format_dreamcaller_option(dc, highlighted=True)
+        assert len(lines) < len(highlighted_lines)
+        # Condensed should still show name
+        full_text = "\n".join(lines)
+        assert "Vesper" in full_text
 
     def test_highlighted_marker(self) -> None:
         from sites_dreamcaller import format_dreamcaller_option
@@ -197,6 +228,112 @@ class TestFormatDreamcallerOption:
         # The non-highlighted version should have '    ' prefix (space marker)
         assert lines_off[0].startswith("    ")
         assert not lines_off[0].startswith("  > ")
+
+    def test_highlighted_shows_resonance_line(self) -> None:
+        from sites_dreamcaller import format_dreamcaller_option
+
+        dc = _make_dreamcaller(
+            name="Test Caller",
+            resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
+        )
+        lines = format_dreamcaller_option(dc, highlighted=True)
+        full_text = "\n".join(lines)
+        assert "Resonance" in full_text
+
+    def test_highlighted_shows_resonance_bonus_line(self) -> None:
+        from sites_dreamcaller import format_dreamcaller_option
+
+        dc = _make_dreamcaller(
+            name="Test Caller",
+            resonance_bonus={"Tide": 4, "Ruin": 4},
+        )
+        lines = format_dreamcaller_option(dc, highlighted=True)
+        full_text = "\n".join(lines)
+        assert "Resonance Bonus" in full_text
+        assert "+4" in full_text
+
+    def test_highlighted_shows_essence_bonus(self) -> None:
+        from sites_dreamcaller import format_dreamcaller_option
+
+        dc = _make_dreamcaller(
+            name="Test Caller",
+            essence_bonus=75,
+        )
+        lines = format_dreamcaller_option(dc, highlighted=True)
+        full_text = "\n".join(lines)
+        assert "Essence Bonus" in full_text
+        assert "+75" in full_text
+
+    def test_highlighted_shows_ability_text_quoted(self) -> None:
+        from sites_dreamcaller import format_dreamcaller_option
+
+        dc = _make_dreamcaller(
+            name="Test Caller",
+            ability_text="Draw two cards when you play an event.",
+        )
+        lines = format_dreamcaller_option(dc, highlighted=True)
+        full_text = "\n".join(lines)
+        assert '"Draw two cards when you play an event."' in full_text
+
+    def test_highlighted_shows_tags(self) -> None:
+        from sites_dreamcaller import format_dreamcaller_option
+
+        dc = _make_dreamcaller(
+            name="Test Caller",
+            tags=frozenset({"mechanic:reclaim", "mechanic:dissolve"}),
+        )
+        lines = format_dreamcaller_option(dc, highlighted=True)
+        full_text = "\n".join(lines)
+        assert "Tags:" in full_text
+        assert "mechanic:reclaim" in full_text
+
+
+class TestFormatConfirmation:
+    """Test the confirmation message after dreamcaller selection."""
+
+    def test_shows_dreamcaller_name(self) -> None:
+        from sites_dreamcaller import format_confirmation
+
+        dc = _make_dreamcaller(name="Vesper, Twilight Arbiter")
+        result = format_confirmation(dc, essence_after=300)
+        assert "Vesper" in result
+
+    def test_shows_resonance_bonuses(self) -> None:
+        from sites_dreamcaller import format_confirmation
+
+        dc = _make_dreamcaller(
+            resonance_bonus={"Tide": 4, "Ruin": 3},
+        )
+        result = format_confirmation(dc, essence_after=300)
+        assert "+4" in result
+        assert "+3" in result
+        assert "Resonance" in result
+
+    def test_shows_tag_bonuses(self) -> None:
+        from sites_dreamcaller import format_confirmation
+
+        dc = _make_dreamcaller(
+            tag_bonus={"mechanic:reclaim": 2, "mechanic:dissolve": 1},
+        )
+        result = format_confirmation(dc, essence_after=300)
+        assert "mechanic:reclaim" in result
+        assert "Tags:" in result
+
+    def test_shows_essence_with_total(self) -> None:
+        from sites_dreamcaller import format_confirmation
+
+        dc = _make_dreamcaller(essence_bonus=50)
+        result = format_confirmation(dc, essence_after=300)
+        assert "+50" in result
+        assert "300" in result
+
+    def test_omits_empty_tag_bonuses(self) -> None:
+        from sites_dreamcaller import format_confirmation
+
+        dc = _make_dreamcaller(tag_bonus={})
+        result = format_confirmation(dc, essence_after=300)
+        # Should not show an empty Tags line
+        assert "Tags:" not in result
 
 
 class TestApplyDreamcaller:
@@ -274,6 +411,37 @@ class TestRunDreamcallerDraft:
         assert "Dreamcaller Draft" in captured.out
         assert "Selected:" in captured.out
         assert "Resonance" in captured.out or "Deck" in captured.out
+
+    def test_confirmation_shows_applied_bonuses(self, capsys: object) -> None:
+        from sites_dreamcaller import run_dreamcaller_draft
+
+        vesper = _make_dreamcaller(
+            name="Vesper, Twilight Arbiter",
+            resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
+            resonance_bonus={"Tide": 4, "Ruin": 4},
+            tags=frozenset({"mechanic:reclaim", "mechanic:dissolve"}),
+            tag_bonus={"mechanic:reclaim": 2, "mechanic:dissolve": 1},
+            essence_bonus=50,
+        )
+        state = _make_quest_state(essence=250)
+        # Only provide the one caller so selection is deterministic
+        all_callers = [vesper]
+        with patch("sites_dreamcaller.single_select", return_value=0):
+            run_dreamcaller_draft(
+                state,
+                all_callers,
+                logger=None,
+                dreamscape_name="Test",
+                dreamscape_number=1,
+            )
+        captured = capsys.readouterr()  # type: ignore[union-attr]
+        # Confirmation should show the selected dreamcaller name
+        assert "Vesper" in captured.out
+        # Should show the resonance bonus amounts applied
+        assert "Tide" in captured.out
+        assert "Ruin" in captured.out
+        # Should show essence bonus applied
+        assert "+50" in captured.out or "300" in captured.out
 
     def test_logs_selection_when_logger_provided(self) -> None:
         from sites_dreamcaller import run_dreamcaller_draft
