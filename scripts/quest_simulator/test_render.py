@@ -4,6 +4,8 @@ import os
 import sys
 import unittest
 
+from models import Card
+
 
 class TestVisibleLen(unittest.TestCase):
     def test_plain_text(self) -> None:
@@ -166,8 +168,8 @@ class TestDrawSeparators(unittest.TestCase):
 
 
 class TestFormatCard(unittest.TestCase):
-    def _make_card(self) -> "Card":
-        from models import Card, CardType, Rarity, Resonance
+    def _make_card(self) -> Card:
+        from models import CardType, Rarity, Resonance
 
         return Card(
             name="Whirlpool Seer",

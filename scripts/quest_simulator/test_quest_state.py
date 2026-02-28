@@ -16,6 +16,7 @@ from models import (
     ResonanceProfile,
     TagProfile,
 )
+from quest_state import QuestState
 
 
 def _make_card(
@@ -86,9 +87,7 @@ def _make_quest_state(
     max_deck: int = 50,
     min_deck: int = 25,
     max_dreamsigns: int = 12,
-) -> "QuestState":
-    from quest_state import QuestState
-
+) -> QuestState:
     cards = [
         _make_card(name=f"Card{i}", card_number=i, rarity=Rarity.COMMON)
         for i in range(5)

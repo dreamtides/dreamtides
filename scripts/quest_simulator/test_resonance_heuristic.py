@@ -15,46 +15,48 @@ from resonance_heuristic import (
 
 class TestScoreResonances:
     def test_subtype_affinity_warrior(self) -> None:
-        card = {"subtype": "Warrior"}
+        card: dict[str, object] = {"subtype": "Warrior"}
         scores = score_resonances(card)
         assert scores["Ember"] > 0
         assert scores["Stone"] > 0
         assert scores["Tide"] == 0
 
     def test_subtype_affinity_mage(self) -> None:
-        card = {"subtype": "Mage"}
+        card: dict[str, object] = {"subtype": "Mage"}
         scores = score_resonances(card)
         assert scores["Tide"] > 0
         assert scores["Ember"] == 0
 
     def test_keyword_matching(self) -> None:
-        card = {"rules_text": "Draw 2 cards and dissolve a character."}
+        card: dict[str, object] = {
+            "rules_text": "Draw 2 cards and dissolve a character.",
+        }
         scores = score_resonances(card)
         assert scores["Tide"] > 0
         assert scores["Ruin"] > 0
 
     def test_keyword_case_insensitive(self) -> None:
-        card = {"rules_text": "FORESEE 3"}
+        card: dict[str, object] = {"rules_text": "FORESEE 3"}
         scores = score_resonances(card)
         assert scores["Tide"] > 0
 
     def test_fast_flag_adds_zephyr(self) -> None:
-        card = {"is_fast": True}
+        card: dict[str, object] = {"is_fast": True}
         scores = score_resonances(card)
         assert scores["Zephyr"] > 0
 
     def test_low_cost_character_adds_ember(self) -> None:
-        card = {"energy_cost": 1, "card_type": "Character"}
+        card: dict[str, object] = {"energy_cost": 1, "card_type": "Character"}
         scores = score_resonances(card)
         assert scores["Ember"] > 0
 
     def test_high_cost_character_adds_stone(self) -> None:
-        card = {"energy_cost": 6, "card_type": "Character"}
+        card: dict[str, object] = {"energy_cost": 6, "card_type": "Character"}
         scores = score_resonances(card)
         assert scores["Stone"] > 0
 
     def test_cost_heuristic_only_for_characters(self) -> None:
-        card = {"energy_cost": 1, "card_type": "Event"}
+        card: dict[str, object] = {"energy_cost": 1, "card_type": "Event"}
         scores = score_resonances(card)
         assert scores["Ember"] == 0
 
@@ -65,7 +67,7 @@ class TestScoreResonances:
             assert scores[r] == 0.0
 
     def test_unknown_subtype_ignored(self) -> None:
-        card = {"subtype": "UnknownType"}
+        card: dict[str, object] = {"subtype": "UnknownType"}
         scores = score_resonances(card)
         for r in RESONANCES:
             assert scores[r] == 0.0
@@ -131,47 +133,47 @@ class TestFindKeywords:
 
 class TestAssignTags:
     def test_tribal_tag_from_subtype(self) -> None:
-        card = {"subtype": "Warrior", "rules_text": ""}
+        card: dict[str, object] = {"subtype": "Warrior", "rules_text": ""}
         tags = assign_tags(card)
         assert "tribal:warrior" in tags
 
     def test_tribal_tag_hyphenated(self) -> None:
-        card = {"subtype": "Spirit Animal", "rules_text": ""}
+        card: dict[str, object] = {"subtype": "Spirit Animal", "rules_text": ""}
         tags = assign_tags(card)
         assert "tribal:spirit-animal" in tags
 
     def test_mechanic_tag_from_rules_text(self) -> None:
-        card = {"rules_text": "Foresee 3."}
+        card: dict[str, object] = {"rules_text": "Foresee 3."}
         tags = assign_tags(card)
         assert "mechanic:foresee" in tags
 
     def test_role_finisher_from_high_spark(self) -> None:
-        card = {"spark": 5, "rules_text": ""}
+        card: dict[str, object] = {"spark": 5, "rules_text": ""}
         tags = assign_tags(card)
         assert "role:finisher" in tags
 
     def test_role_removal_from_dissolve(self) -> None:
-        card = {"rules_text": "Dissolve target character."}
+        card: dict[str, object] = {"rules_text": "Dissolve target character."}
         tags = assign_tags(card)
         assert "role:removal" in tags
 
     def test_role_engine_from_draw(self) -> None:
-        card = {"rules_text": "Draw 2 cards."}
+        card: dict[str, object] = {"rules_text": "Draw 2 cards."}
         tags = assign_tags(card)
         assert "role:engine" in tags
 
     def test_fallback_event_tag(self) -> None:
-        card = {"card_type": "Event", "rules_text": ""}
+        card: dict[str, object] = {"card_type": "Event", "rules_text": ""}
         tags = assign_tags(card)
         assert "mechanic:event" in tags
 
     def test_fallback_general_tag(self) -> None:
-        card = {"card_type": "Character", "rules_text": ""}
+        card: dict[str, object] = {"card_type": "Character", "rules_text": ""}
         tags = assign_tags(card)
         assert "mechanic:general" in tags
 
     def test_max_three_tags(self) -> None:
-        card = {
+        card: dict[str, object] = {
             "subtype": "Warrior",
             "rules_text": "Draw 2, foresee 3, dissolve, reclaim, discard.",
             "spark": 5,
@@ -180,6 +182,6 @@ class TestAssignTags:
         assert len(tags) <= 3
 
     def test_no_duplicate_tags(self) -> None:
-        card = {"subtype": "Mage", "rules_text": "Draw a card."}
+        card: dict[str, object] = {"subtype": "Mage", "rules_text": "Draw a card."}
         tags = assign_tags(card)
         assert len(tags) == len(set(tags))

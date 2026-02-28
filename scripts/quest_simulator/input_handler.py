@@ -9,7 +9,7 @@ import atexit
 import select
 import signal
 import sys
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 # Terminal control is Unix-only; guard imports for type checking on all platforms
 try:
@@ -31,7 +31,7 @@ KEY_QUIT = "quit"
 KEY_UNKNOWN = "unknown"
 
 # Saved terminal state for restoration
-_saved_termios: Optional[list[object]] = None
+_saved_termios: Optional[list[Any]] = None
 
 
 def _is_interactive() -> bool:
@@ -55,10 +55,11 @@ def _restore_termios() -> None:
     Keeps _saved_termios so that re-entering raw mode and restoring again
     still works correctly in menu redraw loops.
     """
-    if _HAS_TERMIOS and _saved_termios is not None:
+    saved = _saved_termios
+    if _HAS_TERMIOS and saved is not None:
         try:
             termios.tcsetattr(
-                sys.stdin.fileno(), termios.TCSADRAIN, _saved_termios
+                sys.stdin.fileno(), termios.TCSADRAIN, saved
             )
         except termios.error:
             pass

@@ -12,6 +12,7 @@ from models import (
     Rarity,
     Resonance,
 )
+from quest_state import QuestState
 
 
 def _make_card(
@@ -66,9 +67,7 @@ def _make_dreamcaller(
 def _make_quest_state(
     essence: int = 250,
     seed: int = 42,
-) -> "QuestState":
-    from quest_state import QuestState
-
+) -> QuestState:
     cards = [
         _make_card(name=f"Card{i}", card_number=i, rarity=Rarity.COMMON)
         for i in range(5)

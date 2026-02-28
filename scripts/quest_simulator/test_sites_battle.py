@@ -301,8 +301,8 @@ class TestRunBattle:
         # 250 + 100 (base) + 25 * 0 (level) = 350
         assert state.essence == 350
 
-    def test_battle_increments_completion(self) -> None:
-        """After battle, completion_level should be incremented by 1."""
+    def test_battle_does_not_increment_completion(self) -> None:
+        """run_battle does not increment completion (flow handles that)."""
         from sites_battle import run_battle
 
         from models import AlgorithmParams
@@ -331,7 +331,7 @@ class TestRunBattle:
                 logger=None,
             )
 
-        assert state.completion_level == 3
+        assert state.completion_level == 2
 
     def test_battle_adds_rare_card_to_deck(self) -> None:
         """After battle, a rare card should be added to the deck."""
@@ -439,8 +439,8 @@ class TestRunBattle:
             )
 
         assert state.deck_count() == 0
-        # Should still increment completion and grant essence
-        assert state.completion_level == 1
+        # Completion is now handled by flow, not run_battle
+        assert state.completion_level == 0
         assert state.essence == 350
 
     def test_battle_fewer_than_3_rares_offers_available(self) -> None:

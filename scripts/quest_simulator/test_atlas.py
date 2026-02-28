@@ -2,7 +2,7 @@
 
 import random
 
-import pytest
+import pytest  # pyre-fixme[21]: pytest has no type stubs
 
 from models import Biome, DreamscapeNode, NodeState, Site, SiteType
 

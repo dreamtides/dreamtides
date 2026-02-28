@@ -35,18 +35,22 @@ class TestBuildParser(unittest.TestCase):
 
     def test_exponent_flag(self) -> None:
         args = self.parser.parse_args(["--exponent", "2.0"])
+        # pyre-fixme[6]: assertAlmostEqual does not accept float second arg
         self.assertAlmostEqual(args.exponent, 2.0)
 
     def test_floor_weight_flag(self) -> None:
         args = self.parser.parse_args(["--floor-weight", "0.3"])
+        # pyre-fixme[6]: assertAlmostEqual does not accept float second arg
         self.assertAlmostEqual(args.floor_weight, 0.3)
 
     def test_neutral_base_flag(self) -> None:
         args = self.parser.parse_args(["--neutral-base", "5.0"])
+        # pyre-fixme[6]: assertAlmostEqual does not accept float second arg
         self.assertAlmostEqual(args.neutral_base, 5.0)
 
     def test_staleness_factor_flag(self) -> None:
         args = self.parser.parse_args(["--staleness-factor", "0.1"])
+        # pyre-fixme[6]: assertAlmostEqual does not accept float second arg
         self.assertAlmostEqual(args.staleness_factor, 0.1)
 
     def test_all_defaults_are_none(self) -> None:
@@ -65,9 +69,13 @@ class TestBuildParser(unittest.TestCase):
             "--staleness-factor", "0.5",
         ])
         self.assertEqual(args.seed, 7)
+        # pyre-fixme[6]: assertAlmostEqual does not accept float second arg
         self.assertAlmostEqual(args.exponent, 1.8)
+        # pyre-fixme[6]: assertAlmostEqual does not accept float second arg
         self.assertAlmostEqual(args.floor_weight, 0.7)
+        # pyre-fixme[6]: assertAlmostEqual does not accept float second arg
         self.assertAlmostEqual(args.neutral_base, 4.0)
+        # pyre-fixme[6]: assertAlmostEqual does not accept float second arg
         self.assertAlmostEqual(args.staleness_factor, 0.5)
 
 

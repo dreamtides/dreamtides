@@ -177,9 +177,6 @@ def run_battle(
         print(f"  {render.DIM}No rare cards available in the pool.{render.RESET}")
         print()
 
-    # Increment completion level
-    state.increment_completion()
-
     # Log the battle
     if logger is not None:
         logger.log_battle_complete(

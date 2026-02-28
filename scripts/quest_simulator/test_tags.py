@@ -192,7 +192,8 @@ class TestSelectTheme:
                 relevance_boost=2.0,
                 depth_factor=0.1,
             )
-            selections.add(result)
+            if result is not None:
+                selections.add(result)
         # All three tags should be selected at least once over 100 seeds
         assert selections == {"tag_a", "tag_b", "tag_c"}
 

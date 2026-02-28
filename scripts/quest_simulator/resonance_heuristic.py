@@ -189,12 +189,20 @@ def run() -> None:
     print_summary(results)
 
 
+def _get_resonance_list(entry: dict[str, object]) -> list[object]:
+    """Extract the resonance list from a result entry, defaulting to empty."""
+    val = entry.get("resonance")
+    if isinstance(val, list):
+        return val
+    return []
+
+
 def print_summary(results: list[dict[str, object]]) -> None:
     """Print distribution summary to stdout."""
     total = len(results)
-    single = sum(1 for r in results if len(r["resonance"]) == 1)
-    dual = sum(1 for r in results if len(r["resonance"]) == 2)
-    neutral = sum(1 for r in results if len(r["resonance"]) == 0)
+    single = sum(1 for r in results if len(_get_resonance_list(r)) == 1)
+    dual = sum(1 for r in results if len(_get_resonance_list(r)) == 2)
+    neutral = sum(1 for r in results if len(_get_resonance_list(r)) == 0)
 
     print(f"Total cards: {total}")
     print(f"Single resonance: {single} ({100 * single / total:.1f}%)")
@@ -203,9 +211,11 @@ def print_summary(results: list[dict[str, object]]) -> None:
 
     resonance_counts: Counter[str] = Counter()
     for r in results:
-        for res in r["resonance"]:
-            if isinstance(res, str):
-                resonance_counts[res] += 1
+        res_list = r["resonance"]
+        if isinstance(res_list, list):
+            for res in res_list:
+                if isinstance(res, str):
+                    resonance_counts[res] += 1
     print("\nResonance distribution:")
     for res in RESONANCES:
         count = resonance_counts[res]
@@ -213,9 +223,11 @@ def print_summary(results: list[dict[str, object]]) -> None:
 
     tag_counts: Counter[str] = Counter()
     for r in results:
-        for tag in r["tags"]:
-            if isinstance(tag, str):
-                tag_counts[tag] += 1
+        tag_list = r["tags"]
+        if isinstance(tag_list, list):
+            for tag in tag_list:
+                if isinstance(tag, str):
+                    tag_counts[tag] += 1
     print(f"\nTag distribution ({len(tag_counts)} unique tags):")
     for tag, count in tag_counts.most_common(20):
         print(f"  {tag:30s}: {count}")
