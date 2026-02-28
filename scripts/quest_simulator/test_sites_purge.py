@@ -371,6 +371,9 @@ class TestForcedDeckLimitPurge:
 
         # Need to remove at least 3 cards (13 - 10 = 3)
         with patch(
+            "sites_purge.input_handler._is_interactive",
+            return_value=True,
+        ), patch(
             "sites_purge.input_handler.multi_select",
             return_value=[0, 1, 2],
         ):
@@ -395,6 +398,9 @@ class TestForcedDeckLimitPurge:
             return [0]  # Remove 1 card each time
 
         with patch(
+            "sites_purge.input_handler._is_interactive",
+            return_value=True,
+        ), patch(
             "sites_purge.input_handler.multi_select",
             side_effect=mock_multi_select,
         ):
@@ -402,6 +408,19 @@ class TestForcedDeckLimitPurge:
 
         assert state.deck_count() <= 10
         assert call_count[0] == 3  # 3 iterations to remove 3 cards
+
+    def test_forced_purge_auto_removes_non_interactive(self) -> None:
+        """In non-interactive mode, forced purge auto-removes excess cards."""
+        from sites_purge import forced_deck_limit_purge
+
+        state = _make_quest_state(max_deck=10)
+        _populate_deck(state, 13)
+        assert state.deck_count() == 13
+
+        # Non-interactive mode (default in tests) should auto-remove
+        forced_deck_limit_purge(state=state, logger=None)
+
+        assert state.deck_count() == 10
 
     def test_forced_purge_updates_profiles(self) -> None:
         """Forced purge should update resonance and tag profiles."""
@@ -423,6 +442,9 @@ class TestForcedDeckLimitPurge:
 
         # Remove 2 to get to limit of 2
         with patch(
+            "sites_purge.input_handler._is_interactive",
+            return_value=True,
+        ), patch(
             "sites_purge.input_handler.multi_select",
             return_value=[0, 1],
         ):
@@ -440,6 +462,9 @@ class TestForcedDeckLimitPurge:
         initial_pool_size = len(state.pool)
 
         with patch(
+            "sites_purge.input_handler._is_interactive",
+            return_value=True,
+        ), patch(
             "sites_purge.input_handler.multi_select",
             return_value=[0, 1, 2],
         ):

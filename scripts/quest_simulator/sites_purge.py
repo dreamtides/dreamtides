@@ -151,10 +151,13 @@ def forced_deck_limit_purge(
     """Force the player to remove cards until deck is at or below max_deck.
 
     Called before battles when the deck exceeds the maximum size. The
-    player must keep removing cards until the limit is satisfied.
+    player must keep removing cards until the limit is satisfied. In
+    non-interactive mode, excess cards are removed automatically.
     """
     if not state.is_over_deck_limit():
         return
+
+    excess = state.deck_count() - state.max_deck
 
     print()
     print(
@@ -162,53 +165,63 @@ def forced_deck_limit_purge(
         f"Your deck has {state.deck_count()} cards "
         f"(maximum {state.max_deck}). "
         f"You must remove at least "
-        f"{state.deck_count() - state.max_deck} card(s)."
+        f"{excess} card(s)."
     )
     print()
 
-    while state.is_over_deck_limit():
-        excess = state.deck_count() - state.max_deck
-        print(
-            f"  {render.DIM}Must remove {excess} more card(s) "
-            f"({state.deck_count()}/{state.max_deck}).{render.RESET}"
-        )
-        print()
-
-        deck_snapshot = list(state.deck)
-        option_labels = [dc.card.name for dc in deck_snapshot]
-
-        def _render_fn(
-            index: int,
-            option: str,
-            is_highlighted: bool,
-            is_checked: bool,
-            _deck: list[DeckCard] = deck_snapshot,
-        ) -> str:
-            return _render_purge_item(
-                index, option, is_highlighted, is_checked, _deck
-            )
-
-        selected_indices = input_handler.multi_select(
-            options=option_labels,
-            render_fn=_render_fn,
-        )
-
-        removed_cards: list[DeckCard] = [
-            deck_snapshot[i] for i in selected_indices
-        ]
-        for dc in removed_cards:
+    # In non-interactive mode, auto-remove random excess cards
+    if not input_handler._is_interactive():
+        to_remove = state.rng.sample(state.deck, excess)
+        for dc in to_remove:
             state.remove_card(dc)
+        print(
+            f"  Auto-removed {len(to_remove)} card(s). "
+            f"Deck: {state.deck_count()}/{state.max_deck}."
+        )
+    else:
+        while state.is_over_deck_limit():
+            current_excess = state.deck_count() - state.max_deck
+            print(
+                f"  {render.DIM}Must remove {current_excess} more card(s) "
+                f"({state.deck_count()}/{state.max_deck}).{render.RESET}"
+            )
+            print()
 
-        if removed_cards:
-            print(
-                f"  Removed {len(removed_cards)} card(s). "
-                f"Deck: {state.deck_count()}/{state.max_deck}."
+            deck_snapshot = list(state.deck)
+            option_labels = [dc.card.name for dc in deck_snapshot]
+
+            def _render_fn(
+                index: int,
+                option: str,
+                is_highlighted: bool,
+                is_checked: bool,
+                _deck: list[DeckCard] = deck_snapshot,
+            ) -> str:
+                return _render_purge_item(
+                    index, option, is_highlighted, is_checked, _deck
+                )
+
+            selected_indices = input_handler.multi_select(
+                options=option_labels,
+                render_fn=_render_fn,
             )
-        else:
-            print(
-                f"  {render.DIM}No cards selected. "
-                f"You must remove cards to continue.{render.RESET}"
-            )
+
+            removed_cards: list[DeckCard] = [
+                deck_snapshot[i] for i in selected_indices
+            ]
+            for dc in removed_cards:
+                state.remove_card(dc)
+
+            if removed_cards:
+                print(
+                    f"  Removed {len(removed_cards)} card(s). "
+                    f"Deck: {state.deck_count()}/{state.max_deck}."
+                )
+            else:
+                print(
+                    f"  {render.DIM}No cards selected. "
+                    f"You must remove cards to continue.{render.RESET}"
+                )
 
     print(
         f"  {render.BOLD}Deck is now within the limit "

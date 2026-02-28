@@ -5,6 +5,9 @@ dreamscape site lists, site summaries, and player status display.
 Imports shared constants and utilities from render.py.
 """
 
+import os
+import sys
+
 from models import Biome, DreamscapeNode, NodeState, Site, SiteType
 from render import (
     BOLD,
@@ -47,6 +50,10 @@ _BIOME_MARKERS: dict[Biome, str] = {
     Biome.MIRRORED: "\033[94m",
     Biome.ARCANE: "\033[35m",
 }
+
+# Disable biome colors when NO_COLOR is set or output is not a terminal
+if os.environ.get("NO_COLOR") or not sys.stdout.isatty():
+    _BIOME_MARKERS = {b: "" for b in Biome}
 
 
 def site_type_name(site_type: SiteType) -> str:
@@ -114,8 +121,9 @@ def render_available_dreamscapes(
         biome_color = _BIOME_MARKERS.get(node.biome, "")
         biome_label = f"{biome_color}{node.biome.value}{RESET}"
         summary = dreamscape_site_summary(node.sites)
+        suffix = f"  -- {summary}" if summary else ""
         lines.append(
-            f"  {marker} [{node.name}] ({biome_label})  -- {summary}"
+            f"  {marker} [{node.name}] ({biome_label}){suffix}"
         )
 
     return "\n".join(lines)
