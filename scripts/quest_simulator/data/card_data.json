@@ -1,0 +1,2145 @@
+[
+  {
+    "card_number": 1,
+    "resonance": [
+      "Ruin",
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient",
+      "mechanic:reclaim",
+      "role:finisher"
+    ]
+  },
+  {
+    "card_number": 2,
+    "resonance": [],
+    "tags": [
+      "mechanic:discover",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 3,
+    "resonance": [],
+    "tags": [
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 4,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "mechanic:discard",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 5,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "mechanic:discard",
+      "mechanic:draw",
+      "mechanic:reclaim"
+    ]
+  },
+  {
+    "card_number": 6,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:explorer",
+      "mechanic:discard"
+    ]
+  },
+  {
+    "card_number": 7,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "mechanic:discard",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 8,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:explorer",
+      "mechanic:discard",
+      "mechanic:reclaim"
+    ]
+  },
+  {
+    "card_number": 9,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:foresee",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 10,
+    "resonance": [
+      "Ruin",
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient",
+      "mechanic:reclaim",
+      "role:finisher"
+    ]
+  },
+  {
+    "card_number": 11,
+    "resonance": [],
+    "tags": [
+      "mechanic:discard"
+    ]
+  },
+  {
+    "card_number": 12,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior"
+    ]
+  },
+  {
+    "card_number": 13,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor"
+    ]
+  },
+  {
+    "card_number": 14,
+    "resonance": [],
+    "tags": [
+      "mechanic:dissolve",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 15,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient"
+    ]
+  },
+  {
+    "card_number": 16,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior",
+      "mechanic:banish",
+      "mechanic:dissolve"
+    ]
+  },
+  {
+    "card_number": 17,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "mechanic:discard",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 18,
+    "resonance": [],
+    "tags": [
+      "mechanic:dissolve",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 19,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "mechanic:discard",
+      "mechanic:kindle"
+    ]
+  },
+  {
+    "card_number": 20,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:visitor",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 21,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:explorer",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 22,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:discard",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 23,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:draw",
+      "mechanic:void",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 24,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:dissolve",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 25,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:discard",
+      "mechanic:dissolve"
+    ]
+  },
+  {
+    "card_number": 26,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:visitor",
+      "mechanic:discard",
+      "mechanic:kindle"
+    ]
+  },
+  {
+    "card_number": 27,
+    "resonance": [
+      "Ruin",
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient",
+      "mechanic:banish",
+      "mechanic:reclaim"
+    ]
+  },
+  {
+    "card_number": 28,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "mechanic:discard",
+      "mechanic:draw",
+      "mechanic:reclaim"
+    ]
+  },
+  {
+    "card_number": 29,
+    "resonance": [
+      "Ruin",
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient",
+      "mechanic:spark",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 30,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior"
+    ]
+  },
+  {
+    "card_number": 31,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient",
+      "mechanic:discover",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 32,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 33,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:synth",
+      "mechanic:dissolve",
+      "mechanic:prevent"
+    ]
+  },
+  {
+    "card_number": 34,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:warrior",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 35,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 36,
+    "resonance": [
+      "Ember",
+      "Stone"
+    ],
+    "tags": [
+      "tribal:warrior",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 37,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:explorer",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 38,
+    "resonance": [],
+    "tags": [
+      "mechanic:banish",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 39,
+    "resonance": [],
+    "tags": [
+      "mechanic:banish",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 40,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:dissolve",
+      "mechanic:spark",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 41,
+    "resonance": [],
+    "tags": [
+      "mechanic:dissolve",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 42,
+    "resonance": [],
+    "tags": [
+      "mechanic:discover",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 43,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior",
+      "mechanic:banish",
+      "mechanic:reclaim"
+    ]
+  },
+  {
+    "card_number": 44,
+    "resonance": [
+      "Ember",
+      "Stone"
+    ],
+    "tags": [
+      "tribal:warrior",
+      "mechanic:draw",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 45,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior"
+    ]
+  },
+  {
+    "card_number": 46,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior"
+    ]
+  },
+  {
+    "card_number": 47,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior"
+    ]
+  },
+  {
+    "card_number": 48,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 49,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior",
+      "mechanic:discard",
+      "mechanic:draw"
+    ]
+  },
+  {
+    "card_number": 50,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior"
+    ]
+  },
+  {
+    "card_number": 51,
+    "resonance": [
+      "Ember",
+      "Stone"
+    ],
+    "tags": [
+      "tribal:warrior",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 52,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior",
+      "mechanic:banish",
+      "mechanic:kindle"
+    ]
+  },
+  {
+    "card_number": 53,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:mage"
+    ]
+  },
+  {
+    "card_number": 54,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior"
+    ]
+  },
+  {
+    "card_number": 55,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 56,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:warrior",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 57,
+    "resonance": [
+      "Ember",
+      "Stone"
+    ],
+    "tags": [
+      "tribal:warrior",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 58,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:mage",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 59,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:mage",
+      "mechanic:reclaim"
+    ]
+  },
+  {
+    "card_number": 60,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:prevent",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 61,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:banish",
+      "mechanic:prevent",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 62,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:prevent",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 63,
+    "resonance": [],
+    "tags": [
+      "mechanic:discard"
+    ]
+  },
+  {
+    "card_number": 64,
+    "resonance": [],
+    "tags": [
+      "mechanic:discard"
+    ]
+  },
+  {
+    "card_number": 65,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:banish",
+      "mechanic:dissolve",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 66,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:dissolve",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 67,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:prevent",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 68,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:draw",
+      "mechanic:foresee",
+      "mechanic:reclaim"
+    ]
+  },
+  {
+    "card_number": 69,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "mechanic:discard",
+      "mechanic:dissolve",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 70,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:synth",
+      "mechanic:prevent",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 71,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient"
+    ]
+  },
+  {
+    "card_number": 72,
+    "resonance": [
+      "Ruin",
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient",
+      "mechanic:dissolve",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 73,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:visitor"
+    ]
+  },
+  {
+    "card_number": 74,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:foresee",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 75,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 76,
+    "resonance": [
+      "Ember",
+      "Tide"
+    ],
+    "tags": [
+      "tribal:musician",
+      "mechanic:draw",
+      "mechanic:fast"
+    ]
+  },
+  {
+    "card_number": 77,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:musician",
+      "mechanic:fast",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 78,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:musician",
+      "mechanic:fast"
+    ]
+  },
+  {
+    "card_number": 79,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 80,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:musician"
+    ]
+  },
+  {
+    "card_number": 81,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:visitor",
+      "mechanic:fast"
+    ]
+  },
+  {
+    "card_number": 82,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:discard",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 83,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:outsider"
+    ]
+  },
+  {
+    "card_number": 84,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:visitor"
+    ]
+  },
+  {
+    "card_number": 85,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:reclaim",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 86,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:draw",
+      "mechanic:reclaim"
+    ]
+  },
+  {
+    "card_number": 87,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 88,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 89,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:visitor",
+      "mechanic:discover",
+      "mechanic:fast"
+    ]
+  },
+  {
+    "card_number": 90,
+    "resonance": [],
+    "tags": [
+      "mechanic:event"
+    ]
+  },
+  {
+    "card_number": 91,
+    "resonance": [],
+    "tags": [
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 92,
+    "resonance": [],
+    "tags": [
+      "mechanic:copy"
+    ]
+  },
+  {
+    "card_number": 93,
+    "resonance": [],
+    "tags": [
+      "mechanic:copy"
+    ]
+  },
+  {
+    "card_number": 94,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:copy",
+      "mechanic:reclaim"
+    ]
+  },
+  {
+    "card_number": 95,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "mechanic:reclaim",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 96,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:discard",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 97,
+    "resonance": [],
+    "tags": [
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 98,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "mechanic:reclaim",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 99,
+    "resonance": [],
+    "tags": [
+      "mechanic:event"
+    ]
+  },
+  {
+    "card_number": 100,
+    "resonance": [],
+    "tags": [
+      "mechanic:event"
+    ]
+  },
+  {
+    "card_number": 101,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:visitor"
+    ]
+  },
+  {
+    "card_number": 102,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:visitor"
+    ]
+  },
+  {
+    "card_number": 103,
+    "resonance": [],
+    "tags": [
+      "mechanic:event"
+    ]
+  },
+  {
+    "card_number": 104,
+    "resonance": [],
+    "tags": [
+      "mechanic:event"
+    ]
+  },
+  {
+    "card_number": 105,
+    "resonance": [],
+    "tags": [
+      "mechanic:event"
+    ]
+  },
+  {
+    "card_number": 106,
+    "resonance": [],
+    "tags": [
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 107,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:discard",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 108,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:outsider",
+      "mechanic:copy"
+    ]
+  },
+  {
+    "card_number": 109,
+    "resonance": [],
+    "tags": [
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 110,
+    "resonance": [],
+    "tags": [
+      "mechanic:event"
+    ]
+  },
+  {
+    "card_number": 111,
+    "resonance": [],
+    "tags": [
+      "mechanic:event"
+    ]
+  },
+  {
+    "card_number": 112,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "mechanic:dissolve",
+      "mechanic:void",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 113,
+    "resonance": [],
+    "tags": [
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 114,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:draw",
+      "mechanic:void",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 115,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:fast",
+      "mechanic:prevent",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 116,
+    "resonance": [],
+    "tags": [
+      "mechanic:discover",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 117,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:discard",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 118,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "mechanic:foresee",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 119,
+    "resonance": [],
+    "tags": [
+      "mechanic:prevent",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 120,
+    "resonance": [
+      "Ruin",
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient",
+      "mechanic:spark",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 121,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:explorer"
+    ]
+  },
+  {
+    "card_number": 122,
+    "resonance": [],
+    "tags": [
+      "mechanic:general"
+    ]
+  },
+  {
+    "card_number": 123,
+    "resonance": [],
+    "tags": [
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 124,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal"
+    ]
+  },
+  {
+    "card_number": 125,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal"
+    ]
+  },
+  {
+    "card_number": 126,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:explorer"
+    ]
+  },
+  {
+    "card_number": 127,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal"
+    ]
+  },
+  {
+    "card_number": 128,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal"
+    ]
+  },
+  {
+    "card_number": 129,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal"
+    ]
+  },
+  {
+    "card_number": 130,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal"
+    ]
+  },
+  {
+    "card_number": 131,
+    "resonance": [],
+    "tags": [
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 132,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal"
+    ]
+  },
+  {
+    "card_number": 133,
+    "resonance": [],
+    "tags": [
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 134,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:visitor",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 135,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 136,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 137,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 138,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:spirit-animal",
+      "mechanic:kindle"
+    ]
+  },
+  {
+    "card_number": 139,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 140,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 141,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal"
+    ]
+  },
+  {
+    "card_number": 142,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal"
+    ]
+  },
+  {
+    "card_number": 143,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal"
+    ]
+  },
+  {
+    "card_number": 144,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:spirit-animal",
+      "mechanic:banish",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 145,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:visitor",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 146,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:spirit-animal",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 147,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:banish",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 148,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:mage",
+      "mechanic:banish",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 149,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:reclaim",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 150,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient",
+      "mechanic:banish",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 151,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:outsider",
+      "mechanic:discard",
+      "mechanic:draw"
+    ]
+  },
+  {
+    "card_number": 152,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 153,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:outsider",
+      "mechanic:banish",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 154,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:banish",
+      "mechanic:reclaim",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 155,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:visitor",
+      "mechanic:fast",
+      "mechanic:prevent"
+    ]
+  },
+  {
+    "card_number": 156,
+    "resonance": [],
+    "tags": [
+      "mechanic:discover",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 157,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:explorer",
+      "mechanic:banish",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 158,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:explorer",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 159,
+    "resonance": [],
+    "tags": [
+      "mechanic:kindle"
+    ]
+  },
+  {
+    "card_number": 160,
+    "resonance": [],
+    "tags": [
+      "mechanic:event"
+    ]
+  },
+  {
+    "card_number": 161,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:prevent",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 162,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "mechanic:dissolve",
+      "mechanic:spark",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 163,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "mechanic:dissolve",
+      "mechanic:reclaim",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 164,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "mechanic:dissolve",
+      "mechanic:spark",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 165,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:explorer",
+      "mechanic:banish",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 166,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:synth",
+      "mechanic:banish",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 167,
+    "resonance": [],
+    "tags": [
+      "mechanic:banish",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 168,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:explorer"
+    ]
+  },
+  {
+    "card_number": 169,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:synth",
+      "mechanic:copy"
+    ]
+  },
+  {
+    "card_number": 170,
+    "resonance": [],
+    "tags": [
+      "mechanic:event"
+    ]
+  },
+  {
+    "card_number": 171,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 172,
+    "resonance": [
+      "Ember",
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:discard",
+      "mechanic:kindle"
+    ]
+  },
+  {
+    "card_number": 173,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 174,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:kindle"
+    ]
+  },
+  {
+    "card_number": 175,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:synth"
+    ]
+  },
+  {
+    "card_number": 176,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 177,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:outsider",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 178,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 179,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor"
+    ]
+  },
+  {
+    "card_number": 180,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:reclaim"
+    ]
+  },
+  {
+    "card_number": 181,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient"
+    ]
+  },
+  {
+    "card_number": 182,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor"
+    ]
+  },
+  {
+    "card_number": 183,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:reclaim",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 184,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 185,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:ancient",
+      "mechanic:void",
+      "role:finisher"
+    ]
+  },
+  {
+    "card_number": 186,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:spark",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 187,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:kindle"
+    ]
+  },
+  {
+    "card_number": 188,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:banish",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 189,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "mechanic:dissolve",
+      "mechanic:reclaim",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 190,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 191,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:reclaim"
+    ]
+  },
+  {
+    "card_number": 192,
+    "resonance": [],
+    "tags": [
+      "mechanic:discover",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 193,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 194,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 195,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "tribal:warrior",
+      "mechanic:dissolve",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 196,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient"
+    ]
+  },
+  {
+    "card_number": 197,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "mechanic:general"
+    ]
+  },
+  {
+    "card_number": 198,
+    "resonance": [],
+    "tags": [
+      "mechanic:kindle"
+    ]
+  },
+  {
+    "card_number": 199,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:survivor",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 200,
+    "resonance": [
+      "Ruin",
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient",
+      "mechanic:dissolve",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 201,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:mage"
+    ]
+  },
+  {
+    "card_number": 202,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:outsider",
+      "mechanic:reclaim"
+    ]
+  },
+  {
+    "card_number": 203,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:musician"
+    ]
+  },
+  {
+    "card_number": 204,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:mage"
+    ]
+  },
+  {
+    "card_number": 205,
+    "resonance": [],
+    "tags": [
+      "mechanic:event"
+    ]
+  },
+  {
+    "card_number": 206,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:visitor"
+    ]
+  },
+  {
+    "card_number": 207,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:synth",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 208,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "tribal:outsider",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 209,
+    "resonance": [],
+    "tags": [
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 210,
+    "resonance": [],
+    "tags": [
+      "mechanic:discover",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 211,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "tribal:synth",
+      "mechanic:reclaim",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 212,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:dissolve",
+      "mechanic:draw",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 213,
+    "resonance": [],
+    "tags": [
+      "mechanic:discard"
+    ]
+  },
+  {
+    "card_number": 214,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "tribal:ancient"
+    ]
+  },
+  {
+    "card_number": 215,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 216,
+    "resonance": [
+      "Ember",
+      "Tide"
+    ],
+    "tags": [
+      "tribal:musician",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 217,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "tribal:visitor",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 218,
+    "resonance": [],
+    "tags": [
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 219,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 220,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "mechanic:dissolve",
+      "mechanic:prevent",
+      "role:removal"
+    ]
+  }
+]
