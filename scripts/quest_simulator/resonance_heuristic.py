@@ -136,6 +136,7 @@ def assign_tags(card: dict[str, object]) -> list[str]:
         tags.append(f"tribal:{tag_value}")
 
     rules_text = card.get("rules_text", "")
+    keywords: set[str] = set()
     if isinstance(rules_text, str):
         keywords = find_keywords(rules_text)
         for keyword in sorted(keywords):
@@ -146,12 +147,10 @@ def assign_tags(card: dict[str, object]) -> list[str]:
     if isinstance(spark, int) and spark >= 4 and len(tags) < 3:
         tags.append("role:finisher")
 
-    if isinstance(rules_text, str):
-        keywords = find_keywords(rules_text)
-        if keywords & REMOVAL_KEYWORDS and len(tags) < 3:
-            tags.append("role:removal")
-        if keywords & ENGINE_KEYWORDS and len(tags) < 3:
-            tags.append("role:engine")
+    if keywords & REMOVAL_KEYWORDS and len(tags) < 3:
+        tags.append("role:removal")
+    if keywords & ENGINE_KEYWORDS and len(tags) < 3:
+        tags.append("role:engine")
 
     if not tags:
         card_type = card.get("card_type")

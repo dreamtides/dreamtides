@@ -16,6 +16,7 @@ VALID_SUBTYPES = frozenset({
 VALID_MECHANICS = frozenset({
     "foresee", "draw", "kindle", "fast", "prevent", "dissolve",
     "reclaim", "discard", "copy", "banish", "discover",
+    "spark", "energy", "point", "void", "event", "general",
 })
 
 VALID_ROLES = frozenset({"finisher", "removal", "engine"})
