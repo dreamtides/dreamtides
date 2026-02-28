@@ -57,7 +57,8 @@ def _enforce_deck_limits(
     """Enforce deck size limits before the battle site becomes available.
 
     If over max_deck, triggers the forced purge interaction.
-    If under min_deck, auto-duplicates random cards to reach minimum.
+    If under min_deck, duplicates the whole deck repeatedly until it
+    exceeds the minimum.
     """
     if state.is_over_deck_limit():
         sites_purge.forced_deck_limit_purge(state, logger)
@@ -66,11 +67,12 @@ def _enforce_deck_limits(
         before = state.deck_count()
         state.auto_fill_deck()
         after = state.deck_count()
+        copies = after // before
         print()
         print(
             f"  {render.BOLD}Auto-fill:{render.RESET} "
             f"Deck had {before} cards (minimum {state.min_deck}). "
-            f"Duplicated {after - before} random card(s) to reach {after}."
+            f"Duplicated to {copies} copies ({after} cards)."
         )
         print()
 

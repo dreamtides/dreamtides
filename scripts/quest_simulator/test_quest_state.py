@@ -477,7 +477,8 @@ class TestDeckLimits:
 
 
 class TestAutoFillDeck:
-    def test_fills_to_min_deck(self) -> None:
+    def test_duplicates_whole_deck_to_exceed_min(self) -> None:
+        """With 2 cards and min_deck=5, whole-deck duplication gives 6 (3 copies)."""
         state = _make_quest_state(min_deck=5)
         card1 = _make_card(name="A", card_number=1)
         card2 = _make_card(name="B", card_number=2)
@@ -485,23 +486,52 @@ class TestAutoFillDeck:
         state.add_card(card2)
         assert len(state.deck) == 2
         state.auto_fill_deck()
-        assert len(state.deck) == 5
+        # 2 * 3 = 6 > 5
+        assert len(state.deck) == 6
 
-    def test_no_fill_when_at_min(self) -> None:
+    def test_nine_cards_become_twenty_seven(self) -> None:
+        """Design doc example: 9 cards should become 27 (3 copies) with min_deck=25."""
+        state = _make_quest_state(min_deck=25)
+        for i in range(9):
+            state.add_card(_make_card(name=f"Card{i}", card_number=i))
+        state.auto_fill_deck()
+        # 9 * 3 = 27 > 25
+        assert len(state.deck) == 27
+
+    def test_no_fill_when_already_exceeds_min(self) -> None:
+        """When deck already exceeds min_deck, no duplication happens."""
         state = _make_quest_state(min_deck=2)
         state.add_card(_make_card(name="A", card_number=1))
         state.add_card(_make_card(name="B", card_number=2))
+        state.add_card(_make_card(name="C", card_number=3))
         state.auto_fill_deck()
-        assert len(state.deck) == 2
+        assert len(state.deck) == 3
 
-    def test_duplicates_existing_cards(self) -> None:
+    def test_single_card_duplicated_whole_deck(self) -> None:
+        """With 1 card and min_deck=4, whole-deck duplication gives copies of the one card."""
         state = _make_quest_state(min_deck=4)
         card = _make_card(name="Only Card", card_number=1)
         state.add_card(card)
         state.auto_fill_deck()
-        assert len(state.deck) == 4
+        # 1 card: 1, 2, 3, 4, 5 -> first exceeding 4 is 5
+        assert len(state.deck) == 5
         for dc in state.deck:
             assert dc.card.name == "Only Card"
+
+    def test_whole_deck_preserves_card_composition(self) -> None:
+        """Each copy of the deck should contain all original cards in order."""
+        state = _make_quest_state(min_deck=7)
+        card_a = _make_card(name="A", card_number=1)
+        card_b = _make_card(name="B", card_number=2)
+        card_c = _make_card(name="C", card_number=3)
+        state.add_card(card_a)
+        state.add_card(card_b)
+        state.add_card(card_c)
+        state.auto_fill_deck()
+        # 3 * 3 = 9 > 7
+        assert len(state.deck) == 9
+        names = [dc.card.name for dc in state.deck]
+        assert names == ["A", "B", "C", "A", "B", "C", "A", "B", "C"]
 
     def test_auto_fill_updates_profiles(self) -> None:
         state = _make_quest_state(min_deck=3)
@@ -515,9 +545,16 @@ class TestAutoFillDeck:
         assert state.resonance_profile.counts[Resonance.TIDE] == 1
         assert state.tag_profile.counts["tribal:warrior"] == 1
         state.auto_fill_deck()
-        assert len(state.deck) == 3
-        assert state.resonance_profile.counts[Resonance.TIDE] == 3
-        assert state.tag_profile.counts["tribal:warrior"] == 3
+        # 1 card, min_deck=3: 1, 2, 3, 4 -> first exceeding 3 is 4
+        assert len(state.deck) == 4
+        assert state.resonance_profile.counts[Resonance.TIDE] == 4
+        assert state.tag_profile.counts["tribal:warrior"] == 4
+
+    def test_empty_deck_no_fill(self) -> None:
+        """An empty deck should not cause infinite loop."""
+        state = _make_quest_state(min_deck=5)
+        state.auto_fill_deck()
+        assert len(state.deck) == 0
 
 
 class TestDeckCount:

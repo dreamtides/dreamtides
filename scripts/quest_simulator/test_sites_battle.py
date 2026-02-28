@@ -405,8 +405,8 @@ class TestRunBattle:
 
         assert len(state.pool) == initial_pool_size - 1
 
-    def test_battle_no_rare_cards_skips_draft(self) -> None:
-        """When pool has no rare+ cards, no card is added to deck."""
+    def test_battle_no_rare_cards_falls_back_to_any_rarity(self) -> None:
+        """When pool has no rare+ cards, falls back to any-rarity pool."""
         from sites_battle import run_battle
 
         from models import AlgorithmParams
@@ -439,10 +439,119 @@ class TestRunBattle:
                 logger=None,
             )
 
-        assert state.deck_count() == 0
-        # Completion is now handled by flow, not run_battle
+        # Should still pick a card from the any-rarity fallback
+        assert state.deck_count() == 1
         assert state.completion_level == 0
         assert state.essence == 350
+
+    def test_battle_empty_pool_skips_draft(self) -> None:
+        """When pool is completely empty, draft is skipped (no cards at all)."""
+        from sites_battle import run_battle
+
+        from models import AlgorithmParams
+
+        state = _make_quest_state([], pool=[], essence=250, completion_level=0)
+        battle_cfg = _battle_config()
+        quest_cfg = _quest_config()
+        algo_params = AlgorithmParams(
+            exponent=1.4,
+            floor_weight=0.5,
+            neutral_base=3.0,
+            staleness_factor=0.3,
+        )
+
+        with patch("sites_battle.input_handler.wait_for_continue"):
+            run_battle(
+                state=state,
+                battle_config=battle_cfg,
+                quest_config=quest_cfg,
+                algorithm_params=algo_params,
+                bosses=[],
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        assert state.deck_count() == 0
+        assert state.essence == 350
+
+    def test_battle_no_rare_cards_fallback_logs_warning(self) -> None:
+        """When falling back to any-rarity pool, a warning is logged."""
+        import logging
+
+        from sites_battle import run_battle
+
+        from models import AlgorithmParams
+
+        common_cards = [
+            _make_card("Common A", 1, Rarity.COMMON, frozenset({Resonance.TIDE})),
+            _make_card("Common B", 2, Rarity.COMMON, frozenset({Resonance.EMBER})),
+        ]
+        pool = _make_pool(common_cards)
+        state = _make_quest_state(common_cards, pool=pool, essence=250, completion_level=0)
+        battle_cfg = _battle_config()
+        quest_cfg = _quest_config()
+        algo_params = AlgorithmParams(
+            exponent=1.4,
+            floor_weight=0.5,
+            neutral_base=3.0,
+            staleness_factor=0.3,
+        )
+
+        with patch("sites_battle.input_handler.wait_for_continue"), \
+             patch("sites_battle.input_handler.single_select", return_value=0), \
+             patch("sites_battle._log") as mock_log:
+            run_battle(
+                state=state,
+                battle_config=battle_cfg,
+                quest_config=quest_cfg,
+                algorithm_params=algo_params,
+                bosses=[],
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        mock_log.warning.assert_called_once()
+        assert "falling back" in mock_log.warning.call_args[0][0].lower()
+
+    def test_battle_no_rare_cards_fallback_removes_from_pool(self) -> None:
+        """Fallback pick from any-rarity pool removes the entry from pool."""
+        from sites_battle import run_battle
+
+        from models import AlgorithmParams
+
+        common_cards = [
+            _make_card("Common A", 1, Rarity.COMMON, frozenset({Resonance.TIDE})),
+            _make_card("Common B", 2, Rarity.COMMON, frozenset({Resonance.EMBER})),
+            _make_card("Common C", 3, Rarity.COMMON, frozenset({Resonance.STONE})),
+        ]
+        pool = _make_pool(common_cards)
+        initial_pool_size = len(pool)
+        state = _make_quest_state(common_cards, pool=pool, essence=250, completion_level=0)
+        battle_cfg = _battle_config()
+        quest_cfg = _quest_config()
+        algo_params = AlgorithmParams(
+            exponent=1.4,
+            floor_weight=0.5,
+            neutral_base=3.0,
+            staleness_factor=0.3,
+        )
+
+        with patch("sites_battle.input_handler.wait_for_continue"), \
+             patch("sites_battle.input_handler.single_select", return_value=0):
+            run_battle(
+                state=state,
+                battle_config=battle_cfg,
+                quest_config=quest_cfg,
+                algorithm_params=algo_params,
+                bosses=[],
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        assert len(state.pool) == initial_pool_size - 1
 
     def test_battle_fewer_than_3_rares_offers_available(self) -> None:
         """When pool has fewer than 3 rare+ cards, offer what's available."""

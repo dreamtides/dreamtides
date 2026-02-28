@@ -7,6 +7,7 @@ for most battles, random miniboss at the miniboss battle, and random
 final boss at the last battle.
 """
 
+import logging
 import random
 from typing import Optional
 
@@ -22,6 +23,8 @@ from models import (
     Card,
 )
 from quest_state import QuestState
+
+_log = logging.getLogger(__name__)
 
 
 def determine_opponent(
@@ -123,6 +126,20 @@ def run_battle(
 
     picked_card: Optional[Card] = None
 
+    # Fall back to any-rarity pool when no rare cards are available
+    if not selections and state.pool:
+        _log.warning(
+            "No rare cards in pool for post-battle draft; falling back to any-rarity pool"
+        )
+        selections = algorithm.select_cards(
+            pool=state.pool,
+            n=rare_pick_count,
+            profile=state.resonance_profile,
+            params=algorithm_params,
+            rng=state.rng,
+            rare_only=False,
+        )
+
     if selections:
         offered_entries = [entry for entry, _ in selections]
         offered_cards = [entry.card for entry in offered_entries]
@@ -165,10 +182,10 @@ def run_battle(
         print(f"  Added {render.BOLD}{picked_card.name}{render.RESET} to your deck.")
         print()
     else:
-        # No rare cards: just show essence reward
+        # Pool is completely empty: no cards available at all
         print(f"  Essence reward: {render.BOLD}+{essence_reward}{render.RESET}")
         print()
-        print(f"  {render.DIM}No rare cards available in the pool.{render.RESET}")
+        print(f"  {render.DIM}No cards available in the pool.{render.RESET}")
         print()
 
     # Show completion progress

@@ -348,7 +348,9 @@ class TestEnforceDeckLimits:
         assert state.deck_count() == 5
 
         _enforce_deck_limits(state, None)
-        assert state.deck_count() == state.min_deck
+        # Whole-deck duplication: 5 * 6 = 30 > 25
+        assert state.deck_count() == 30
+        assert state.deck_count() > state.min_deck
 
     def test_over_limit_triggers_forced_purge(self) -> None:
         from flow import _enforce_deck_limits

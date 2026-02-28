@@ -135,10 +135,13 @@ class QuestState:
         return len(self.dreamsigns) >= self.max_dreamsigns
 
     def auto_fill_deck(self) -> None:
-        """Duplicate random existing cards until deck reaches minimum size."""
-        while len(self.deck) < self.min_deck and len(self.deck) > 0:
-            source = self.rng.choice(self.deck)
-            self.add_card(source.card)
+        """Duplicate the whole deck repeatedly until deck count exceeds minimum."""
+        if not self.deck:
+            return
+        original_cards = [dc.card for dc in self.deck]
+        while len(self.deck) <= self.min_deck:
+            for card in original_cards:
+                self.add_card(card)
 
     def deck_count(self) -> int:
         """Return the number of cards in the deck."""
