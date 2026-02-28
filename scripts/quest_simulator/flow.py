@@ -226,6 +226,7 @@ def _dreamscape_loop(
         chosen_idx = input_handler.single_select(
             options=option_labels,
             render_fn=_render_site_option,
+            initial=1,
         )
 
         if chosen_idx == 0:
