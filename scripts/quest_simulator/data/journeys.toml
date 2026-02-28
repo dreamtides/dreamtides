@@ -1,0 +1,105 @@
+# Dream Journey events -- presented as pairs (pick 1 of 2).
+# Each event has a mechanical effect applied when chosen.
+# Effect types: add_cards, add_essence, remove_cards, add_dreamsign, gain_resonance
+
+# --- add_cards: draw weighted cards from the draft pool into the deck ---
+
+[[journeys]]
+name = "The Sunken Archive"
+description = "You discover a drowned library beneath the reef, its shelves still intact. Luminous fish dart between the pages as you carefully retrieve a volume."
+effect_type = "add_cards"
+effect_value = 1
+
+[[journeys]]
+name = "The Dreamer's Bazaar"
+description = "A marketplace appears at a crossroads between two sleeping minds. Merchants in silver masks offer wares plucked from half-remembered wishes."
+effect_type = "add_cards"
+effect_value = 2
+
+[[journeys]]
+name = "The Shattered Constellation"
+description = "An entire constellation has fallen from the sky, its fragments embedded in the hillside like glowing shards. You gather as many as your arms can hold."
+effect_type = "add_cards"
+effect_value = 3
+
+# --- add_essence: gain essence currency ---
+
+[[journeys]]
+name = "The Amber Wellspring"
+description = "A spring of molten amber bubbles up through cracked stone. Each drop that touches your skin leaves behind a warm residue of pure essence."
+effect_type = "add_essence"
+effect_value = 75
+
+[[journeys]]
+name = "The Forgotten Toll"
+description = "An ancient bridge guardian has been waiting centuries for a traveler. In gratitude for your company, it empties its overflowing toll chest at your feet."
+effect_type = "add_essence"
+effect_value = 100
+
+[[journeys]]
+name = "The Collapsing Treasury"
+description = "A palace sinks into the sand as you stumble upon its treasury. You plunge through cascading walls and seize fistfuls of crystallized essence before the ceiling gives way."
+effect_type = "add_essence"
+effect_value = 200
+
+# --- remove_cards: randomly remove cards from the deck ---
+
+[[journeys]]
+name = "The Winnowing Wind"
+description = "A warm desert wind strips away anything inessential. Cards flutter from your grasp, and what remains feels sharper, more purposeful."
+effect_type = "remove_cards"
+effect_value = 1
+
+[[journeys]]
+name = "The Crucible of Clarity"
+description = "You walk through a corridor of white fire that burns without heat. Weaker ideas cannot survive the passage, dissolving into harmless motes of light."
+effect_type = "remove_cards"
+effect_value = 2
+
+[[journeys]]
+name = "The Unraveler's Garden"
+description = "Vines of living thread ensnare your collection, methodically pulling apart the weakest bindings. The garden keeps what it claims, but your deck emerges leaner and more focused."
+effect_type = "remove_cards"
+effect_value = 3
+
+# --- add_dreamsign: gain a random non-bane dreamsign ---
+
+[[journeys]]
+name = "The Whispering Obelisk"
+description = "A black stone pillar hums with a frequency just below hearing. When you press your palm to its surface, a sigil burns itself into your memory."
+effect_type = "add_dreamsign"
+effect_value = 1
+
+[[journeys]]
+name = "The Moth Congregation"
+description = "Thousands of luminous moths spiral around a single point of darkness. As you step into their center, their patterns coalesce into a sign that settles over your heart."
+effect_type = "add_dreamsign"
+effect_value = 1
+
+# --- gain_resonance: boost the player's top resonance count ---
+
+[[journeys]]
+name = "The Echo Chamber"
+description = "A cavern amplifies every sound into a symphony. The resonance of your strongest affinity reverberates through you, growing deeper and more certain."
+effect_type = "gain_resonance"
+effect_value = 1
+
+[[journeys]]
+name = "The Resonance Spire"
+description = "A crystalline tower vibrates at your approach, matching the dominant frequency of your essence. Climbing to its peak floods you with sympathetic power."
+effect_type = "gain_resonance"
+effect_value = 2
+
+[[journeys]]
+name = "The Harmonic Rift"
+description = "A tear in the dreamscape pulses with raw, untuned energy. You reach into the rift and shape it to your will, but the force of it leaves you breathless."
+effect_type = "gain_resonance"
+effect_value = 3
+
+# --- additional variety ---
+
+[[journeys]]
+name = "The Cartographer's Gift"
+description = "A blind mapmaker offers you a chart drawn from dreams she can no longer visit. The paths it reveals lead to hidden caches of condensed essence."
+effect_type = "add_essence"
+effect_value = 50
