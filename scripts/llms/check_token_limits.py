@@ -63,7 +63,9 @@ def main() -> int:
         if tokens > AGENTS_TOKEN_LIMIT:
             failures.append(f"AGENTS.md: {tokens} tokens (limit {AGENTS_TOKEN_LIMIT})")
 
-    for md_path in sorted(glob.glob("docs/**/*.md", root_dir=REPO_ROOT, recursive=True)):
+    for md_path in sorted(
+        glob.glob("docs/**/*.md", root_dir=REPO_ROOT, recursive=True)
+    ):
         full_path = REPO_ROOT / md_path
         tokens = len(enc.encode(full_path.read_text()))
         if tokens > DOCS_TOKEN_LIMIT:

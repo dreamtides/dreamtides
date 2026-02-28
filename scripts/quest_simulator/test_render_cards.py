@@ -227,7 +227,9 @@ class TestFormatShopCard(unittest.TestCase):
 
         card = _make_card()
         lines = format_shop_card(
-            card, price=80, highlighted=False,
+            card,
+            price=80,
+            highlighted=False,
             original_price=120,
         )
         combined = "\n".join(lines)
@@ -299,7 +301,12 @@ class TestRenderShopGrid(unittest.TestCase):
             ("Stone Titan", Rarity.RARE, frozenset({Resonance.STONE}), 120),
             ("Zephyr Scout", Rarity.COMMON, frozenset({Resonance.ZEPHYR}), 50),
             ("Ruin Walker", Rarity.UNCOMMON, frozenset({Resonance.RUIN}), 80),
-            ("Dual Blade", Rarity.LEGENDARY, frozenset({Resonance.TIDE, Resonance.EMBER}), 200),
+            (
+                "Dual Blade",
+                Rarity.LEGENDARY,
+                frozenset({Resonance.TIDE, Resonance.EMBER}),
+                200,
+            ),
         ]
         items: list[tuple[Card, int, int | None]] = []
         for i in range(min(count, len(cards_data))):
@@ -369,10 +376,7 @@ class TestRenderShopGrid(unittest.TestCase):
         items = self._make_shop_items()
         output = render_shop_grid(items)
         for line in output.split("\n"):
-            self.assertLessEqual(
-                visible_len(line), 70,
-                f"Line too wide: {repr(line)}"
-            )
+            self.assertLessEqual(visible_len(line), 70, f"Line too wide: {repr(line)}")
 
     def test_rules_text_present(self) -> None:
         from render_cards import render_shop_grid
@@ -525,9 +529,7 @@ class TestFormatDraftCard(unittest.TestCase):
         )
         combined = "\n".join(lines).lower()
         self.assertTrue(
-            "match" in combined
-            or "partial" in combined
-            or "off-color" in combined,
+            "match" in combined or "partial" in combined or "off-color" in combined,
         )
 
     def test_within_70_columns(self) -> None:
@@ -544,8 +546,7 @@ class TestFormatDraftCard(unittest.TestCase):
         )
         for line in lines:
             self.assertLessEqual(
-                visible_len(line), 70,
-                f"Line exceeds 70 columns: {repr(line)}"
+                visible_len(line), 70, f"Line exceeds 70 columns: {repr(line)}"
             )
 
     def test_highlighted_has_marker(self) -> None:
@@ -586,7 +587,9 @@ class TestRenderDraftCardList(unittest.TestCase):
         weights = [3.0, 5.0]
         top_res = frozenset({Resonance.TIDE})
         output = render_draft_card_list(
-            cards, selected_index=0, weights=weights,
+            cards,
+            selected_index=0,
+            weights=weights,
             top_resonances=top_res,
         )
         self.assertIn("Card A", output)
@@ -600,7 +603,9 @@ class TestRenderDraftCardList(unittest.TestCase):
         weights = [4.2]
         top_res = frozenset({Resonance.TIDE})
         output = render_draft_card_list(
-            cards, selected_index=0, weights=weights,
+            cards,
+            selected_index=0,
+            weights=weights,
             top_resonances=top_res,
         )
         self.assertIn("wt:", output)
@@ -609,11 +614,12 @@ class TestRenderDraftCardList(unittest.TestCase):
         from render_cards import render_draft_card_list
 
         output = render_draft_card_list(
-            [], selected_index=-1, weights=[],
+            [],
+            selected_index=-1,
+            weights=[],
             top_resonances=frozenset(),
         )
         self.assertEqual(output, "")
-
 
 
 class TestRenderFullDeckView(unittest.TestCase):
@@ -622,34 +628,42 @@ class TestRenderFullDeckView(unittest.TestCase):
     def _make_deck_cards(self) -> list[DeckCard]:
         """Create a small deck with mixed resonances and rarities."""
         return [
-            DeckCard(card=_make_card(
-                name="Tide Runner",
-                rarity=Rarity.COMMON,
-                resonances=frozenset({Resonance.TIDE}),
-                energy_cost=2,
-                spark=1,
-            )),
-            DeckCard(card=_make_card(
-                name="Ember Guard",
-                rarity=Rarity.UNCOMMON,
-                resonances=frozenset({Resonance.EMBER}),
-                energy_cost=3,
-                spark=2,
-            )),
-            DeckCard(card=_make_card(
-                name="Alpha Seer",
-                rarity=Rarity.RARE,
-                resonances=frozenset({Resonance.TIDE}),
-                energy_cost=5,
-                spark=3,
-            )),
-            DeckCard(card=_make_card(
-                name="Neutral Wanderer",
-                rarity=Rarity.COMMON,
-                resonances=frozenset(),
-                energy_cost=1,
-                spark=0,
-            )),
+            DeckCard(
+                card=_make_card(
+                    name="Tide Runner",
+                    rarity=Rarity.COMMON,
+                    resonances=frozenset({Resonance.TIDE}),
+                    energy_cost=2,
+                    spark=1,
+                )
+            ),
+            DeckCard(
+                card=_make_card(
+                    name="Ember Guard",
+                    rarity=Rarity.UNCOMMON,
+                    resonances=frozenset({Resonance.EMBER}),
+                    energy_cost=3,
+                    spark=2,
+                )
+            ),
+            DeckCard(
+                card=_make_card(
+                    name="Alpha Seer",
+                    rarity=Rarity.RARE,
+                    resonances=frozenset({Resonance.TIDE}),
+                    energy_cost=5,
+                    spark=3,
+                )
+            ),
+            DeckCard(
+                card=_make_card(
+                    name="Neutral Wanderer",
+                    rarity=Rarity.COMMON,
+                    resonances=frozenset(),
+                    energy_cost=1,
+                    spark=0,
+                )
+            ),
         ]
 
     def test_contains_deck_header(self) -> None:
@@ -723,7 +737,9 @@ class TestRenderFullDeckView(unittest.TestCase):
 
         deck = [
             DeckCard(
-                card=_make_card(name="Base Card", resonances=frozenset({Resonance.TIDE})),
+                card=_make_card(
+                    name="Base Card", resonances=frozenset({Resonance.TIDE})
+                ),
                 is_transfigured=True,
                 transfig_note="Golden Base Card -- +1 effect",
             ),

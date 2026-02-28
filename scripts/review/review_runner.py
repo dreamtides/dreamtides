@@ -44,7 +44,9 @@ def run_id_now() -> str:
 def git_output(args: list[str]) -> str:
     """Returns trimmed git command output or empty string on failure."""
     try:
-        output = subprocess.check_output(["git", *args], text=True, stderr=subprocess.DEVNULL)
+        output = subprocess.check_output(
+            ["git", *args], text=True, stderr=subprocess.DEVNULL
+        )
     except subprocess.CalledProcessError:
         return ""
     return output.strip()
@@ -52,10 +54,16 @@ def git_output(args: list[str]) -> str:
 
 def git_is_dirty() -> bool:
     """Returns whether the current worktree has local modifications."""
-    result = subprocess.call(["git", "diff", "--quiet"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    result = subprocess.call(
+        ["git", "diff", "--quiet"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
     if result != 0:
         return True
-    cached_result = subprocess.call(["git", "diff", "--cached", "--quiet"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    cached_result = subprocess.call(
+        ["git", "diff", "--cached", "--quiet"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
     return cached_result != 0
 
 
@@ -88,11 +96,16 @@ def print_scope_summary(scope_decision: review_scope.ScopeDecision) -> None:
         f"[scope] mode={scope_decision.mode} source={scope_decision.changed_files_source} changed={len(scope_decision.changed_files)} domains={','.join(scope_decision.domains)}"
     )
     if scope_decision.forced_full and scope_decision.forced_full_reason:
-        print_milestone(f"[scope] full review forced: {scope_decision.forced_full_reason}")
+        print_milestone(
+            f"[scope] full review forced: {scope_decision.forced_full_reason}"
+        )
         return
 
     if scope_decision.skipped_steps:
-        skipped = ", ".join(f"{step} ({reason})" for step, reason in sorted(scope_decision.skipped_steps.items()))
+        skipped = ", ".join(
+            f"{step} ({reason})"
+            for step, reason in sorted(scope_decision.skipped_steps.items())
+        )
         print_milestone(f"[scope] planned skips: {skipped}")
     else:
         print_milestone("[scope] no steps eligible for skip")
@@ -126,7 +139,9 @@ def run_command(
     if mode == "verbose":
         return_code = subprocess.call(command.argv, env=env)
     else:
-        completed = subprocess.run(command.argv, env=env, capture_output=True, text=True)
+        completed = subprocess.run(
+            command.argv, env=env, capture_output=True, text=True
+        )
         return_code = completed.returncode
         if return_code != 0:
             if completed.stdout:
@@ -155,14 +170,31 @@ def run_command(
 def step_specs() -> list[StepSpec]:
     """Returns the review step/command execution graph."""
     return [
-        StepSpec("check-snapshots", [CommandSpec("check-snapshots", ["just", "check-snapshots"])]),
-        StepSpec("check-format", [CommandSpec("check-format", ["just", "check-format"])]),
-        StepSpec("check-docs-format", [CommandSpec("check-docs-format", ["just", "check-docs-format"])]),
-        StepSpec("check-token-limits", [CommandSpec("check-token-limits", ["just", "check-token-limits"])]),
-        StepSpec("review-scope-validate", [CommandSpec("review-scope-validate", ["just", "review-scope-validate"])]),
+        StepSpec(
+            "check-snapshots",
+            [CommandSpec("check-snapshots", ["just", "check-snapshots"])],
+        ),
+        StepSpec(
+            "check-format", [CommandSpec("check-format", ["just", "check-format"])]
+        ),
+        StepSpec(
+            "check-docs-format",
+            [CommandSpec("check-docs-format", ["just", "check-docs-format"])],
+        ),
+        StepSpec(
+            "check-token-limits",
+            [CommandSpec("check-token-limits", ["just", "check-token-limits"])],
+        ),
+        StepSpec(
+            "review-scope-validate",
+            [CommandSpec("review-scope-validate", ["just", "review-scope-validate"])],
+        ),
         StepSpec("build", [CommandSpec("build", ["just", "build"])]),
         StepSpec("clippy", [CommandSpec("clippy", ["just", "clippy"])]),
-        StepSpec("style-validator", [CommandSpec("style-validator", ["just", "style-validator"])]),
+        StepSpec(
+            "style-validator",
+            [CommandSpec("style-validator", ["just", "style-validator"])],
+        ),
         StepSpec("rlf-lint", [CommandSpec("rlf-lint", ["just", "rlf-lint"])]),
         StepSpec("test-core", [CommandSpec("test-core", ["just", "review-core-test"])]),
         StepSpec(
@@ -183,7 +215,10 @@ def step_specs() -> list[StepSpec]:
                 )
             ],
         ),
-        StepSpec("local-unity-test", [CommandSpec("local-unity-test", ["just", "local-unity-test"])]),
+        StepSpec(
+            "local-unity-test",
+            [CommandSpec("local-unity-test", ["just", "local-unity-test"])],
+        ),
         StepSpec("parser-test", [CommandSpec("parser-test", ["just", "parser-test"])]),
         StepSpec(
             "tv-check",
@@ -270,7 +305,9 @@ def run_review() -> int:
                 "message": warning_message,
             },
         )
-        scope_decision = review_scope.fallback_full_scope_decision(step_names, scope_mode, warning_message)
+        scope_decision = review_scope.fallback_full_scope_decision(
+            step_names, scope_mode, warning_message
+        )
 
     emit(
         "scope_plan",
@@ -314,7 +351,9 @@ def run_review() -> int:
         step_failed = False
 
         for command_index, command in enumerate(step.commands, start=1):
-            return_code, elapsed_ms = run_command(run_id, step.name, command_index, command, base_env, mode)
+            return_code, elapsed_ms = run_command(
+                run_id, step.name, command_index, command, base_env, mode
+            )
             command_elapsed_ms += elapsed_ms
             if return_code != 0:
                 failed_step = step.name
@@ -340,9 +379,13 @@ def run_review() -> int:
         )
 
         if step_failed:
-            print_milestone(f"[review {step_index}/{step_count}] {step.name} failed ({step_elapsed_ms / 1000:.1f}s)")
+            print_milestone(
+                f"[review {step_index}/{step_count}] {step.name} failed ({step_elapsed_ms / 1000:.1f}s)"
+            )
         else:
-            print_milestone(f"[review {step_index}/{step_count}] {step.name} ok ({step_elapsed_ms / 1000:.1f}s)")
+            print_milestone(
+                f"[review {step_index}/{step_count}] {step.name} ok ({step_elapsed_ms / 1000:.1f}s)"
+            )
 
         if step_failed:
             break
@@ -378,7 +421,9 @@ def run_review() -> int:
         )
 
     if failed_code:
-        print_milestone(f"[review] failed at {failed_step}/{failed_command} ({total_ms / 1000:.1f}s)")
+        print_milestone(
+            f"[review] failed at {failed_step}/{failed_command} ({total_ms / 1000:.1f}s)"
+        )
     else:
         print_milestone(f"[review] completed successfully ({total_ms / 1000:.1f}s)")
 

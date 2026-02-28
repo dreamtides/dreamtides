@@ -107,8 +107,7 @@ def color_resonances(resonances: frozenset) -> str:
     if not resonances:
         return f"{NEUTRAL_COLOR}Neutral{RESET}"
     return "+".join(
-        color_resonance(r)
-        for r in sorted(resonances, key=lambda r: r.value)
+        color_resonance(r) for r in sorted(resonances, key=lambda r: r.value)
     )
 
 
@@ -174,7 +173,9 @@ def _build_card_lines(
     line4 = f" wt:{weight:5.1f} f:{fit:.0f}"
 
     # Border colors
-    sorted_res = sorted(card.resonances, key=lambda r: r.value) if card.resonances else []
+    sorted_res = (
+        sorted(card.resonances, key=lambda r: r.value) if card.resonances else []
+    )
     if len(sorted_res) >= 2:
         lc = RESONANCE_COLORS[sorted_res[0]]
         rc = RESONANCE_COLORS[sorted_res[1]]
@@ -271,7 +272,7 @@ def render_shop(pick: PickRecord, strat_params: StrategyParams) -> str:
     for r, c in pick.profile_after.items():
         profile.counts[r] = c
     # Subtract bought cards to get pre-buy profile
-    for bought_card in (pick.bought or []):
+    for bought_card in pick.bought or []:
         for r in bought_card.resonances:
             profile.counts[r] = max(0, profile.counts.get(r, 0) - 1)
     top2_res = {r for r, _ in profile.top_n(2)}
@@ -285,10 +286,12 @@ def render_shop(pick: PickRecord, strat_params: StrategyParams) -> str:
 
     # Render in 2 rows of 3
     for row_start in range(0, len(cards), 3):
-        row_cards = list(zip(
-            cards[row_start:row_start + 3],
-            weights[row_start:row_start + 3],
-        ))
+        row_cards = list(
+            zip(
+                cards[row_start : row_start + 3],
+                weights[row_start : row_start + 3],
+            )
+        )
 
         all_lines: list[list[str]] = [[] for _ in range(6)]
         for card, w in row_cards:
@@ -315,7 +318,7 @@ def render_shop(pick: PickRecord, strat_params: StrategyParams) -> str:
     # Buy reasons summary
     if pick.buy_reasons:
         output_lines.append(f"  Bought {len(pick.bought or [])} of {len(cards)} cards:")
-        for reason in (pick.buy_reasons or []):
+        for reason in pick.buy_reasons or []:
             output_lines.append(f"    {reason}")
 
     return "\n".join(output_lines)
@@ -355,7 +358,9 @@ def stats_line(profile_snapshot: dict) -> str:
     return f"  Top-2: {top2:.1%}  |  HHI: {hhi:.3f}  |  Eff.Colors: {eff:.2f}  |  Class: {cls}"
 
 
-def print_quest_banner(result: QuestResult, strategy_name: str, strat_params: StrategyParams):
+def print_quest_banner(
+    result: QuestResult, strategy_name: str, strat_params: StrategyParams
+):
     """Print the quest start banner."""
     dc = color_resonances(result.dreamcaller_resonances)
     # Compute starting bonus from first pick's profile minus picked card
@@ -365,7 +370,7 @@ def print_quest_banner(result: QuestResult, strategy_name: str, strat_params: St
             first_profile = result.picks[0].profile_after
             bonus = first_profile.get(r, 0)
             if result.picks[0].context.is_shop:
-                for card in (result.picks[0].bought or []):
+                for card in result.picks[0].bought or []:
                     if r in card.resonances:
                         bonus -= 1
             elif r in result.picks[0].picked.resonances:

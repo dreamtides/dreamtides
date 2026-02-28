@@ -286,8 +286,9 @@ class TestRunBattle:
             staleness_factor=0.3,
         )
 
-        with patch("sites_battle.input_handler.wait_for_continue"), \
-             patch("sites_battle.input_handler.single_select", return_value=0):
+        with patch("sites_battle.input_handler.wait_for_continue"), patch(
+            "sites_battle.input_handler.single_select", return_value=0
+        ):
             run_battle(
                 state=state,
                 battle_config=battle_cfg,
@@ -319,8 +320,9 @@ class TestRunBattle:
             staleness_factor=0.3,
         )
 
-        with patch("sites_battle.input_handler.wait_for_continue"), \
-             patch("sites_battle.input_handler.single_select", return_value=0):
+        with patch("sites_battle.input_handler.wait_for_continue"), patch(
+            "sites_battle.input_handler.single_select", return_value=0
+        ):
             run_battle(
                 state=state,
                 battle_config=battle_cfg,
@@ -353,8 +355,9 @@ class TestRunBattle:
             staleness_factor=0.3,
         )
 
-        with patch("sites_battle.input_handler.wait_for_continue"), \
-             patch("sites_battle.input_handler.single_select", return_value=0):
+        with patch("sites_battle.input_handler.wait_for_continue"), patch(
+            "sites_battle.input_handler.single_select", return_value=0
+        ):
             run_battle(
                 state=state,
                 battle_config=battle_cfg,
@@ -390,8 +393,9 @@ class TestRunBattle:
             staleness_factor=0.3,
         )
 
-        with patch("sites_battle.input_handler.wait_for_continue"), \
-             patch("sites_battle.input_handler.single_select", return_value=0):
+        with patch("sites_battle.input_handler.wait_for_continue"), patch(
+            "sites_battle.input_handler.single_select", return_value=0
+        ):
             run_battle(
                 state=state,
                 battle_config=battle_cfg,
@@ -416,7 +420,9 @@ class TestRunBattle:
             _make_card("Common B", 2, Rarity.COMMON, frozenset({Resonance.EMBER})),
         ]
         pool = _make_pool(common_cards)
-        state = _make_quest_state(common_cards, pool=pool, essence=250, completion_level=0)
+        state = _make_quest_state(
+            common_cards, pool=pool, essence=250, completion_level=0
+        )
         battle_cfg = _battle_config()
         quest_cfg = _quest_config()
         algo_params = AlgorithmParams(
@@ -426,8 +432,9 @@ class TestRunBattle:
             staleness_factor=0.3,
         )
 
-        with patch("sites_battle.input_handler.wait_for_continue"), \
-             patch("sites_battle.input_handler.single_select", return_value=0):
+        with patch("sites_battle.input_handler.wait_for_continue"), patch(
+            "sites_battle.input_handler.single_select", return_value=0
+        ):
             run_battle(
                 state=state,
                 battle_config=battle_cfg,
@@ -488,7 +495,9 @@ class TestRunBattle:
             _make_card("Common B", 2, Rarity.COMMON, frozenset({Resonance.EMBER})),
         ]
         pool = _make_pool(common_cards)
-        state = _make_quest_state(common_cards, pool=pool, essence=250, completion_level=0)
+        state = _make_quest_state(
+            common_cards, pool=pool, essence=250, completion_level=0
+        )
         battle_cfg = _battle_config()
         quest_cfg = _quest_config()
         algo_params = AlgorithmParams(
@@ -498,9 +507,9 @@ class TestRunBattle:
             staleness_factor=0.3,
         )
 
-        with patch("sites_battle.input_handler.wait_for_continue"), \
-             patch("sites_battle.input_handler.single_select", return_value=0), \
-             patch("sites_battle._log") as mock_log:
+        with patch("sites_battle.input_handler.wait_for_continue"), patch(
+            "sites_battle.input_handler.single_select", return_value=0
+        ), patch("sites_battle._log") as mock_log:
             run_battle(
                 state=state,
                 battle_config=battle_cfg,
@@ -528,7 +537,9 @@ class TestRunBattle:
         ]
         pool = _make_pool(common_cards)
         initial_pool_size = len(pool)
-        state = _make_quest_state(common_cards, pool=pool, essence=250, completion_level=0)
+        state = _make_quest_state(
+            common_cards, pool=pool, essence=250, completion_level=0
+        )
         battle_cfg = _battle_config()
         quest_cfg = _quest_config()
         algo_params = AlgorithmParams(
@@ -538,8 +549,9 @@ class TestRunBattle:
             staleness_factor=0.3,
         )
 
-        with patch("sites_battle.input_handler.wait_for_continue"), \
-             patch("sites_battle.input_handler.single_select", return_value=0):
+        with patch("sites_battle.input_handler.wait_for_continue"), patch(
+            "sites_battle.input_handler.single_select", return_value=0
+        ):
             run_battle(
                 state=state,
                 battle_config=battle_cfg,
@@ -564,7 +576,9 @@ class TestRunBattle:
             _make_card("Common A", 1, Rarity.COMMON, frozenset({Resonance.EMBER})),
         ]
         pool = _make_pool(cards_list)
-        state = _make_quest_state(cards_list, pool=pool, essence=250, completion_level=0)
+        state = _make_quest_state(
+            cards_list, pool=pool, essence=250, completion_level=0
+        )
         battle_cfg = _battle_config()
         quest_cfg = _quest_config()
         algo_params = AlgorithmParams(
@@ -574,8 +588,9 @@ class TestRunBattle:
             staleness_factor=0.3,
         )
 
-        with patch("sites_battle.input_handler.wait_for_continue"), \
-             patch("sites_battle.input_handler.single_select", return_value=0):
+        with patch("sites_battle.input_handler.wait_for_continue"), patch(
+            "sites_battle.input_handler.single_select", return_value=0
+        ):
             run_battle(
                 state=state,
                 battle_config=battle_cfg,
@@ -619,17 +634,20 @@ class TestRunBattle:
                 essence_reward: int,
                 rare_pick: Optional[Card],
             ) -> None:
-                log_calls.append({
-                    "opponent_name": opponent_name,
-                    "essence_reward": essence_reward,
-                    "rare_pick": rare_pick,
-                })
+                log_calls.append(
+                    {
+                        "opponent_name": opponent_name,
+                        "essence_reward": essence_reward,
+                        "rare_pick": rare_pick,
+                    }
+                )
 
             def log_site_visit(self, **kwargs: object) -> None:
                 pass
 
-        with patch("sites_battle.input_handler.wait_for_continue"), \
-             patch("sites_battle.input_handler.single_select", return_value=0):
+        with patch("sites_battle.input_handler.wait_for_continue"), patch(
+            "sites_battle.input_handler.single_select", return_value=0
+        ):
             run_battle(
                 state=state,
                 battle_config=battle_cfg,
@@ -675,17 +693,20 @@ class TestRunBattle:
                 essence_reward: int,
                 rare_pick: Optional[Card],
             ) -> None:
-                log_calls.append({
-                    "opponent_name": opponent_name,
-                    "essence_reward": essence_reward,
-                    "rare_pick": rare_pick,
-                })
+                log_calls.append(
+                    {
+                        "opponent_name": opponent_name,
+                        "essence_reward": essence_reward,
+                        "rare_pick": rare_pick,
+                    }
+                )
 
             def log_site_visit(self, **kwargs: object) -> None:
                 pass
 
-        with patch("sites_battle.input_handler.wait_for_continue"), \
-             patch("sites_battle.input_handler.single_select", return_value=0):
+        with patch("sites_battle.input_handler.wait_for_continue"), patch(
+            "sites_battle.input_handler.single_select", return_value=0
+        ):
             run_battle(
                 state=state,
                 battle_config=battle_cfg,
@@ -722,8 +743,9 @@ class TestRunBattle:
             staleness_factor=0.3,
         )
 
-        with patch("sites_battle.input_handler.wait_for_continue"), \
-             patch("sites_battle.input_handler.single_select", return_value=0):
+        with patch("sites_battle.input_handler.wait_for_continue"), patch(
+            "sites_battle.input_handler.single_select", return_value=0
+        ):
             run_battle(
                 state=state,
                 battle_config=battle_cfg,
@@ -763,7 +785,10 @@ class TestBattleDisplayOutput:
             pool = _make_pool(common_cards)
         cards = _make_mixed_cards()
         state = _make_quest_state(
-            cards, pool=pool, essence=250, completion_level=completion_level,
+            cards,
+            pool=pool,
+            essence=250,
+            completion_level=completion_level,
         )
         battle_cfg = _battle_config()
         quest_cfg = _quest_config()
@@ -775,9 +800,9 @@ class TestBattleDisplayOutput:
         )
 
         buf = io.StringIO()
-        with patch("sites_battle.input_handler.wait_for_continue"), \
-             patch("sites_battle.input_handler.single_select", return_value=0), \
-             patch("sys.stdout", buf):
+        with patch("sites_battle.input_handler.wait_for_continue"), patch(
+            "sites_battle.input_handler.single_select", return_value=0
+        ), patch("sys.stdout", buf):
             run_battle(
                 state=state,
                 battle_config=battle_cfg,

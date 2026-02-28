@@ -94,9 +94,7 @@ def run_purge(
         is_checked: bool,
         _deck: list[DeckCard] = deck_snapshot,
     ) -> str:
-        return _render_purge_item(
-            index, option, is_highlighted, is_checked, _deck
-        )
+        return _render_purge_item(index, option, is_highlighted, is_checked, _deck)
 
     selected_indices = input_handler.multi_select(
         options=option_labels,
@@ -105,9 +103,7 @@ def run_purge(
     )
 
     # Remove selected cards (iterate in reverse to preserve indices)
-    removed_cards: list[DeckCard] = [
-        deck_snapshot[i] for i in selected_indices
-    ]
+    removed_cards: list[DeckCard] = [deck_snapshot[i] for i in selected_indices]
     for dc in removed_cards:
         state.remove_card(dc)
 
@@ -128,9 +124,11 @@ def run_purge(
             dreamscape=dreamscape_name,
             is_enhanced=is_enhanced,
             choices=[dc.card.name for dc in deck_snapshot],
-            choice_made=", ".join(dc.card.name for dc in removed_cards)
-            if removed_cards
-            else None,
+            choice_made=(
+                ", ".join(dc.card.name for dc in removed_cards)
+                if removed_cards
+                else None
+            ),
             state_changes={
                 "cards_removed": [dc.card.name for dc in removed_cards],
                 "deck_size_after": state.deck_count(),
@@ -210,9 +208,7 @@ def forced_deck_limit_purge(
                 render_fn=_render_fn,
             )
 
-            removed_cards: list[DeckCard] = [
-                deck_snapshot[i] for i in selected_indices
-            ]
+            removed_cards: list[DeckCard] = [deck_snapshot[i] for i in selected_indices]
             for dc in removed_cards:
                 state.remove_card(dc)
 

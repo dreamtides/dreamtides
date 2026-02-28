@@ -206,12 +206,12 @@ class TestGenerateShopItems:
 
         # Over 200 runs, we should see at least one run with 0 discounts
         # and at least one run with 2+ discounts
-        assert any(c == 0 for c in discount_counts), (
-            "Expected some shops with 0 discounts"
-        )
-        assert any(c >= 2 for c in discount_counts), (
-            "Expected some shops with 2+ discounts"
-        )
+        assert any(
+            c == 0 for c in discount_counts
+        ), "Expected some shops with 0 discounts"
+        assert any(
+            c >= 2 for c in discount_counts
+        ), "Expected some shops with 2+ discounts"
 
     def test_discounted_price_is_less_than_original(self) -> None:
         from sites_shop import generate_shop_items
@@ -267,9 +267,7 @@ class TestRunShop:
         params = _make_algorithm_params()
 
         # Select index 0 and 1 (first two items)
-        with patch(
-            "sites_shop.input_handler.multi_select", return_value=[0, 1]
-        ):
+        with patch("sites_shop.input_handler.multi_select", return_value=[0, 1]):
             run_shop(
                 state=state,
                 algorithm_params=params,
@@ -293,9 +291,7 @@ class TestRunShop:
         initial_essence = state.essence
 
         # Buy one item
-        with patch(
-            "sites_shop.input_handler.multi_select", return_value=[0]
-        ):
+        with patch("sites_shop.input_handler.multi_select", return_value=[0]):
             run_shop(
                 state=state,
                 algorithm_params=params,
@@ -319,9 +315,7 @@ class TestRunShop:
         initial_essence = state.essence
 
         # Buy nothing
-        with patch(
-            "sites_shop.input_handler.multi_select", return_value=[]
-        ):
+        with patch("sites_shop.input_handler.multi_select", return_value=[]):
             run_shop(
                 state=state,
                 algorithm_params=params,
@@ -345,9 +339,7 @@ class TestRunShop:
         params = _make_algorithm_params()
         initial_pool_size = len(state.pool)
 
-        with patch(
-            "sites_shop.input_handler.multi_select", return_value=[0, 1]
-        ):
+        with patch("sites_shop.input_handler.multi_select", return_value=[0, 1]):
             run_shop(
                 state=state,
                 algorithm_params=params,
@@ -374,9 +366,7 @@ class TestRunShop:
         # Second call: buy nothing (empty selection)
         call_count = [0]
 
-        def mock_multi_select(
-            options: list[str], **kwargs: object
-        ) -> list[int]:
+        def mock_multi_select(options: list[str], **kwargs: object) -> list[int]:
             call_count[0] += 1
             if call_count[0] == 1:
                 # Select reroll option (last option)
@@ -412,9 +402,7 @@ class TestRunShop:
 
         call_count = [0]
 
-        def mock_multi_select(
-            options: list[str], **kwargs: object
-        ) -> list[int]:
+        def mock_multi_select(options: list[str], **kwargs: object) -> list[int]:
             call_count[0] += 1
             if call_count[0] == 1:
                 return [len(options) - 1]  # reroll
@@ -457,18 +445,18 @@ class TestRunShop:
                 items_bought: list[Card],
                 essence_spent: int,
             ) -> None:
-                log_calls.append({
-                    "shown": list(items_shown),
-                    "bought": list(items_bought),
-                    "spent": essence_spent,
-                })
+                log_calls.append(
+                    {
+                        "shown": list(items_shown),
+                        "bought": list(items_bought),
+                        "spent": essence_spent,
+                    }
+                )
 
             def log_site_visit(self, **kwargs: object) -> None:
                 pass
 
-        with patch(
-            "sites_shop.input_handler.multi_select", return_value=[0]
-        ):
+        with patch("sites_shop.input_handler.multi_select", return_value=[0]):
             run_shop(
                 state=state,
                 algorithm_params=params,
@@ -491,9 +479,7 @@ class TestRunShop:
         config = _make_shop_config()
         params = _make_algorithm_params()
 
-        with patch(
-            "sites_shop.input_handler.multi_select", return_value=[]
-        ):
+        with patch("sites_shop.input_handler.multi_select", return_value=[]):
             run_shop(
                 state=state,
                 algorithm_params=params,
@@ -518,9 +504,7 @@ class TestRunShop:
         params = _make_algorithm_params()
 
         # Try to select indices 0 and 1 (two items)
-        with patch(
-            "sites_shop.input_handler.multi_select", return_value=[0, 1]
-        ):
+        with patch("sites_shop.input_handler.multi_select", return_value=[0, 1]):
             run_shop(
                 state=state,
                 algorithm_params=params,
@@ -546,9 +530,7 @@ class TestRunShop:
         params = _make_algorithm_params()
         initial_pool_size = len(state.pool)
 
-        with patch(
-            "sites_shop.input_handler.multi_select", return_value=[0, 1, 2]
-        ):
+        with patch("sites_shop.input_handler.multi_select", return_value=[0, 1, 2]):
             run_shop(
                 state=state,
                 algorithm_params=params,
@@ -576,9 +558,7 @@ class TestRunShop:
 
         call_count = [0]
 
-        def mock_multi_select(
-            options: list[str], **kwargs: object
-        ) -> list[int]:
+        def mock_multi_select(options: list[str], **kwargs: object) -> list[int]:
             call_count[0] += 1
             if call_count[0] == 1:
                 return [len(options) - 1]  # try reroll
@@ -614,9 +594,7 @@ class TestRunShop:
         initial_pool_size = len(state.pool)
 
         # Try to select two items
-        with patch(
-            "sites_shop.input_handler.multi_select", return_value=[0, 1]
-        ):
+        with patch("sites_shop.input_handler.multi_select", return_value=[0, 1]):
             run_shop(
                 state=state,
                 algorithm_params=params,
@@ -647,9 +625,7 @@ class TestShopDisplay:
         config = _make_shop_config()
         params = _make_algorithm_params()
 
-        with patch(
-            "sites_shop.input_handler.multi_select", return_value=[0, 1]
-        ):
+        with patch("sites_shop.input_handler.multi_select", return_value=[0, 1]):
             run_shop(
                 state=state,
                 algorithm_params=params,
@@ -661,6 +637,7 @@ class TestShopDisplay:
             )
 
         import sys
+
         captured = capsys.readouterr()  # type: ignore[union-attr]
         output = captured.out  # type: ignore[union-attr]
         assert "Purchased" in output
@@ -679,9 +656,7 @@ class TestShopDisplay:
         # Capture what labels are passed to multi_select
         captured_options: list[list[str]] = []
 
-        def mock_multi_select(
-            options: list[str], **kwargs: object
-        ) -> list[int]:
+        def mock_multi_select(options: list[str], **kwargs: object) -> list[int]:
             captured_options.append(list(options))
             return []  # buy nothing
 
@@ -715,9 +690,7 @@ class TestShopDisplay:
 
         captured_options: list[list[str]] = []
 
-        def mock_multi_select(
-            options: list[str], **kwargs: object
-        ) -> list[int]:
+        def mock_multi_select(options: list[str], **kwargs: object) -> list[int]:
             captured_options.append(list(options))
             return []
 
@@ -750,9 +723,7 @@ class TestShopDisplay:
         config = _make_shop_config()
         params = _make_algorithm_params()
 
-        with patch(
-            "sites_shop.input_handler.multi_select", return_value=[]
-        ):
+        with patch("sites_shop.input_handler.multi_select", return_value=[]):
             run_shop(
                 state=state,
                 algorithm_params=params,

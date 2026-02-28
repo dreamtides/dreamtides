@@ -57,8 +57,12 @@ def build_parser() -> argparse.ArgumentParser:
     quest = parser.add_argument_group("Quest Structure")
     quest.add_argument("--dreamcaller-bonus", type=int, default=4)
     quest.add_argument("--mono-dreamcaller", action="store_true")
-    quest.add_argument("--shop-chance", type=float, default=0.15,
-                       help="Probability a draft site becomes a shop (default: 0.15)")
+    quest.add_argument(
+        "--shop-chance",
+        type=float,
+        default=0.15,
+        help="Probability a draft site becomes a shop (default: 0.15)",
+    )
 
     sweep = parser.add_argument_group("Sweep Mode")
     sweep.add_argument("--sweep-param", default="exponent")
@@ -118,9 +122,7 @@ def mode_aggregate(args):
 
 def mode_sweep(args):
     param_name = args.sweep_param
-    values = args.sweep_values or DEFAULT_SWEEP_RANGES.get(
-        param_name, [1.0, 1.5, 2.0]
-    )
+    values = args.sweep_values or DEFAULT_SWEEP_RANGES.get(param_name, [1.0, 1.5, 2.0])
     seed = args.seed if args.seed is not None else 0
 
     strategies = (
@@ -137,30 +139,64 @@ def mode_sweep(args):
             algo, pool, quest, strat = make_params(args)
 
             # Apply override to the correct param group
-            if param_name in ("exponent", "floor_weight", "neutral_base", "staleness_factor"):
-                algo = AlgorithmParams(**{
-                    **{f.name: getattr(algo, f.name) for f in algo.__dataclass_fields__.values()},
-                    param_name: val,
-                })
+            if param_name in (
+                "exponent",
+                "floor_weight",
+                "neutral_base",
+                "staleness_factor",
+            ):
+                algo = AlgorithmParams(
+                    **{
+                        **{
+                            f.name: getattr(algo, f.name)
+                            for f in algo.__dataclass_fields__.values()
+                        },
+                        param_name: val,
+                    }
+                )
             elif param_name == "dreamcaller_bonus":
-                quest = QuestParams(dreamcaller_bonus=int(val), mono_dreamcaller=quest.mono_dreamcaller, shop_chance=quest.shop_chance)
+                quest = QuestParams(
+                    dreamcaller_bonus=int(val),
+                    mono_dreamcaller=quest.mono_dreamcaller,
+                    shop_chance=quest.shop_chance,
+                )
             elif param_name == "shop_chance":
-                quest = QuestParams(dreamcaller_bonus=quest.dreamcaller_bonus, mono_dreamcaller=quest.mono_dreamcaller, shop_chance=val)
+                quest = QuestParams(
+                    dreamcaller_bonus=quest.dreamcaller_bonus,
+                    mono_dreamcaller=quest.mono_dreamcaller,
+                    shop_chance=val,
+                )
             elif param_name in ("power_weight", "fit_weight"):
                 strat = StrategyParams(
                     strategy=strat_enum,
-                    power_weight=val if param_name == "power_weight" else strat.power_weight,
+                    power_weight=(
+                        val if param_name == "power_weight" else strat.power_weight
+                    ),
                     fit_weight=val if param_name == "fit_weight" else strat.fit_weight,
                 )
             else:
-                strat = StrategyParams(strategy=strat_enum, power_weight=strat.power_weight, fit_weight=strat.fit_weight)
+                strat = StrategyParams(
+                    strategy=strat_enum,
+                    power_weight=strat.power_weight,
+                    fit_weight=strat.fit_weight,
+                )
 
             if param_name not in ("power_weight", "fit_weight"):
-                strat = StrategyParams(strategy=strat_enum, power_weight=strat.power_weight, fit_weight=strat.fit_weight)
+                strat = StrategyParams(
+                    strategy=strat_enum,
+                    power_weight=strat.power_weight,
+                    fit_weight=strat.fit_weight,
+                )
 
             rng = random.Random(seed)
             results = run_batch(algo, pool, quest, strat, args.runs, rng)
-            sweep_results.append((f"{val:.2f}" if isinstance(val, float) else str(val), strat_enum.value, results))
+            sweep_results.append(
+                (
+                    f"{val:.2f}" if isinstance(val, float) else str(val),
+                    strat_enum.value,
+                    results,
+                )
+            )
 
     print_sweep(sweep_results, param_name)
 

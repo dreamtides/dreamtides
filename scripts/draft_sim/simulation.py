@@ -69,9 +69,7 @@ def simulate_quest(
                     continue
 
                 pick_number += 1
-                bought_entries, buy_reasons = _shop_buy(
-                    offered, profile, strat_params
-                )
+                bought_entries, buy_reasons = _shop_buy(offered, profile, strat_params)
 
                 # Update profile and pool for all bought cards
                 for entry in bought_entries:
@@ -90,23 +88,25 @@ def simulate_quest(
                 primary = bought_entries[0] if bought_entries else offered[0][0]
                 primary_reason = buy_reasons[0] if buy_reasons else "no buy"
 
-                picks.append(PickRecord(
-                    pick_number=pick_number,
-                    context=PickContext(
-                        dreamscape=dreamscape,
-                        site=site_idx,
-                        position=None,
-                        is_battle_reward=False,
-                        is_shop=True,
-                    ),
-                    offered=[e.card for e, _ in offered],
-                    weights=[w for _, w in offered],
-                    picked=primary.card if bought_entries else offered[0][0].card,
-                    pick_reason=primary_reason,
-                    profile_after=profile.snapshot(),
-                    bought=[e.card for e in bought_entries],
-                    buy_reasons=buy_reasons,
-                ))
+                picks.append(
+                    PickRecord(
+                        pick_number=pick_number,
+                        context=PickContext(
+                            dreamscape=dreamscape,
+                            site=site_idx,
+                            position=None,
+                            is_battle_reward=False,
+                            is_shop=True,
+                        ),
+                        offered=[e.card for e, _ in offered],
+                        weights=[w for _, w in offered],
+                        picked=primary.card if bought_entries else offered[0][0].card,
+                        pick_reason=primary_reason,
+                        profile_after=profile.snapshot(),
+                        bought=[e.card for e in bought_entries],
+                        buy_reasons=buy_reasons,
+                    )
+                )
 
             else:
                 # Draft site: 5 picks of 4 cards
@@ -136,26 +136,26 @@ def simulate_quest(
                     _remove_from_pool(pool, picked_entry)
                     deck.append(picked_entry.card)
 
-                    picks.append(PickRecord(
-                        pick_number=pick_number,
-                        context=PickContext(
-                            dreamscape=dreamscape,
-                            site=site_idx,
-                            position=pos,
-                            is_battle_reward=False,
-                            is_shop=False,
-                        ),
-                        offered=[e.card for e, _ in offered],
-                        weights=[w for _, w in offered],
-                        picked=picked_entry.card,
-                        pick_reason=reason,
-                        profile_after=profile.snapshot(),
-                    ))
+                    picks.append(
+                        PickRecord(
+                            pick_number=pick_number,
+                            context=PickContext(
+                                dreamscape=dreamscape,
+                                site=site_idx,
+                                position=pos,
+                                is_battle_reward=False,
+                                is_shop=False,
+                            ),
+                            offered=[e.card for e, _ in offered],
+                            weights=[w for _, w in offered],
+                            picked=picked_entry.card,
+                            pick_reason=reason,
+                            profile_after=profile.snapshot(),
+                        )
+                    )
 
         # Battle reward: 1 rare+ pick per dreamscape
-        rare_offered = select_cards(
-            pool, 3, profile, algo_params, rng, rare_only=True
-        )
+        rare_offered = select_cards(pool, 3, profile, algo_params, rng, rare_only=True)
         if rare_offered:
             pick_number += 1
             picked_entry, picked_weight = _pick_card(
@@ -173,21 +173,23 @@ def simulate_quest(
             _remove_from_pool(pool, picked_entry)
             deck.append(picked_entry.card)
 
-            picks.append(PickRecord(
-                pick_number=pick_number,
-                context=PickContext(
-                    dreamscape=dreamscape,
-                    site=None,
-                    position=None,
-                    is_battle_reward=True,
-                    is_shop=False,
-                ),
-                offered=[e.card for e, _ in rare_offered],
-                weights=[w for _, w in rare_offered],
-                picked=picked_entry.card,
-                pick_reason=reason + " [battle reward]",
-                profile_after=profile.snapshot(),
-            ))
+            picks.append(
+                PickRecord(
+                    pick_number=pick_number,
+                    context=PickContext(
+                        dreamscape=dreamscape,
+                        site=None,
+                        position=None,
+                        is_battle_reward=True,
+                        is_shop=False,
+                    ),
+                    offered=[e.card for e, _ in rare_offered],
+                    weights=[w for _, w in rare_offered],
+                    picked=picked_entry.card,
+                    pick_reason=reason + " [battle reward]",
+                    profile_after=profile.snapshot(),
+                )
+            )
 
         # Decay staleness at end of dreamscape
         for entry in pool:
@@ -239,10 +241,7 @@ def _shop_buy(
         else:
             # Synergy: buy if fit >= 0.5 (partial match, full match, or neutral)
             if fit >= 0.5:
-                score = (
-                    card.power * strat.power_weight
-                    + fit * strat.fit_weight * 10
-                )
+                score = card.power * strat.power_weight + fit * strat.fit_weight * 10
                 bought.append(entry)
                 reasons.append(
                     f"buy score={score:.1f} power={card.power} "
@@ -265,7 +264,8 @@ def _pick_card(
     if strat.strategy == Strategy.RIGID:
         top2_res = {r for r, c in profile.top_n(2) if c > 0}
         on_color = [
-            (e, w) for e, w in offered
+            (e, w)
+            for e, w in offered
             if e.card.resonances and e.card.resonances <= top2_res
         ]
         if on_color:

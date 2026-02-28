@@ -142,7 +142,9 @@ def format_card(card: Card, highlighted: bool = False) -> list[str]:
     res_str = color_resonances(card.resonances)
     badge = rarity_badge(card.rarity)
 
-    cost_str = f"Cost: {card.energy_cost}" if card.energy_cost is not None else "Cost: -"
+    cost_str = (
+        f"Cost: {card.energy_cost}" if card.energy_cost is not None else "Cost: -"
+    )
     spark_str = f"Spark: {card.spark}" if card.spark is not None else ""
 
     # Build the right side: resonance badge cost spark

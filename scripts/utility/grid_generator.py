@@ -1,6 +1,6 @@
 # Example:
 # python3 ./scripts/utility/grid_generator.py --print-legend --min-paths 2
-# --emoji --max-cost 2 --max-reward 3 --allow-backtracking 
+# --emoji --max-cost 2 --max-reward 3 --allow-backtracking
 
 import argparse
 import sys
@@ -18,14 +18,14 @@ def neighbors(r, c, rows, cols):
 
 
 def is_passable(ch):
-    return ch != 'W'
+    return ch != "W"
 
 
 def bfs_min_cost(grid, start, end):
     rows = len(grid)
     cols = len(grid[0])
     dq = deque()
-    inf = 10 ** 12
+    inf = 10**12
     dist = [[inf] * cols for _ in range(rows)]
     sr, sc = start
     er, ec = end
@@ -38,7 +38,7 @@ def bfs_min_cost(grid, start, end):
         for nr, nc in neighbors(r, c, rows, cols):
             if not is_passable(grid[nr][nc]):
                 continue
-            w = 1 if grid[nr][nc] == 'C' else 0
+            w = 1 if grid[nr][nc] == "C" else 0
             nd = dist[r][c] + w
             if nd < dist[nr][nc]:
                 dist[nr][nc] = nd
@@ -161,21 +161,21 @@ def enumerate_walls_between_odd_cells(grid):
     walls = []
     for r in range(1, rows, 2):
         for c in range(1, cols, 2):
-            if r + 2 < rows and grid[r][c] != 'W' and grid[r + 2][c] != 'W':
+            if r + 2 < rows and grid[r][c] != "W" and grid[r + 2][c] != "W":
                 mr = r + 1
                 mc = c
-                if grid[mr][mc] == 'W':
+                if grid[mr][mc] == "W":
                     walls.append((mr, mc))
-            if c + 2 < cols and grid[r][c] != 'W' and grid[r][c + 2] != 'W':
+            if c + 2 < cols and grid[r][c] != "W" and grid[r][c + 2] != "W":
                 mr = r
                 mc = c + 1
-                if grid[mr][mc] == 'W':
+                if grid[mr][mc] == "W":
                     walls.append((mr, mc))
     return walls
 
 
 def carve_maze(rows, cols, rng):
-    grid = [['W' for _ in range(cols)] for _ in range(rows)]
+    grid = [["W" for _ in range(cols)] for _ in range(rows)]
     cells = []
     for r in range(1, rows, 2):
         for c in range(1, cols, 2):
@@ -185,7 +185,7 @@ def carve_maze(rows, cols, rng):
     start = rng.choice(cells)
     stack = [start]
     visited = set([start])
-    grid[start[0]][start[1]] = 'B'
+    grid[start[0]][start[1]] = "B"
     while stack:
         r, c = stack[-1]
         options = []
@@ -196,8 +196,8 @@ def carve_maze(rows, cols, rng):
                 options.append((nr, nc, r + dr // 2, c + dc // 2))
         if options:
             nr, nc, mr, mc = rng.choice(options)
-            grid[mr][mc] = 'B'
-            grid[nr][nc] = 'B'
+            grid[mr][mc] = "B"
+            grid[nr][nc] = "B"
             visited.add((nr, nc))
             stack.append((nr, nc))
         else:
@@ -212,8 +212,8 @@ def open_random_loops(grid, rng, openings):
     for mr, mc in candidates:
         if opened >= openings:
             break
-        if grid[mr][mc] == 'W':
-            grid[mr][mc] = 'B'
+        if grid[mr][mc] == "W":
+            grid[mr][mc] = "B"
             opened += 1
     return opened
 
@@ -223,7 +223,9 @@ def choose_start_end(grid):
     return a, b
 
 
-def assign_costs_and_rewards(grid, start, end, min_cost_required, max_rewards_allowed, max_cost_allowed, rng):
+def assign_costs_and_rewards(
+    grid, start, end, min_cost_required, max_rewards_allowed, max_cost_allowed, rng
+):
     rows = len(grid)
     cols = len(grid[0])
     sr, sc = start
@@ -233,9 +235,9 @@ def assign_costs_and_rewards(grid, start, end, min_cost_required, max_rewards_al
             if (r, c) == (sr, sc) or (r, c) == (er, ec):
                 continue
             if is_passable(grid[r][c]):
-                grid[r][c] = 'C'
-    grid[sr][sc] = 'S'
-    grid[er][ec] = 'E'
+                grid[r][c] = "C"
+    grid[sr][sc] = "S"
+    grid[er][ec] = "E"
     flips = max(1, (rows * cols) // 8)
     attempts = flips * 3
     for _ in range(attempts):
@@ -243,24 +245,34 @@ def assign_costs_and_rewards(grid, start, end, min_cost_required, max_rewards_al
         c = rng.randrange(cols)
         if (r, c) == (sr, sc) or (r, c) == (er, ec):
             continue
-        if grid[r][c] != 'C':
+        if grid[r][c] != "C":
             continue
-        grid[r][c] = 'B'
+        grid[r][c] = "B"
         mc = bfs_min_cost(grid, start, end)
         if mc is None or mc < min_cost_required:
-            grid[r][c] = 'C'
+            grid[r][c] = "C"
     rewards_to_place = max_rewards_allowed
-    reward_candidates_c = [(r, c) for r in range(rows) for c in range(cols) if grid[r][c] == 'C' and (r, c) != (sr, sc) and (r, c) != (er, ec)]
-    reward_candidates_b = [(r, c) for r in range(rows) for c in range(cols) if grid[r][c] == 'B' and (r, c) != (sr, sc) and (r, c) != (er, ec)]
+    reward_candidates_c = [
+        (r, c)
+        for r in range(rows)
+        for c in range(cols)
+        if grid[r][c] == "C" and (r, c) != (sr, sc) and (r, c) != (er, ec)
+    ]
+    reward_candidates_b = [
+        (r, c)
+        for r in range(rows)
+        for c in range(cols)
+        if grid[r][c] == "B" and (r, c) != (sr, sc) and (r, c) != (er, ec)
+    ]
     rng.shuffle(reward_candidates_c)
     rng.shuffle(reward_candidates_b)
     for r, c in reward_candidates_c + reward_candidates_b:
         if rewards_to_place <= 0:
             break
-        if grid[r][c] == 'R':
+        if grid[r][c] == "R":
             continue
         prev = grid[r][c]
-        grid[r][c] = 'R'
+        grid[r][c] = "R"
         mc = bfs_min_cost(grid, start, end)
         if mc is None or mc < min_cost_required:
             grid[r][c] = prev
@@ -268,20 +280,28 @@ def assign_costs_and_rewards(grid, start, end, min_cost_required, max_rewards_al
             rewards_to_place -= 1
 
     if max_cost_allowed is not None:
+
         def count_c():
-            return sum(1 for rr in range(rows) for cc in range(cols) if grid[rr][cc] == 'C')
+            return sum(
+                1 for rr in range(rows) for cc in range(cols) if grid[rr][cc] == "C"
+            )
 
         current_c = count_c()
         if current_c > max_cost_allowed:
-            candidates = [(r, c) for r in range(rows) for c in range(cols) if grid[r][c] == 'C' and (r, c) != (sr, sc) and (r, c) != (er, ec)]
+            candidates = [
+                (r, c)
+                for r in range(rows)
+                for c in range(cols)
+                if grid[r][c] == "C" and (r, c) != (sr, sc) and (r, c) != (er, ec)
+            ]
             rng.shuffle(candidates)
             for r, c in candidates:
                 if current_c <= max_cost_allowed:
                     break
-                grid[r][c] = 'B'
+                grid[r][c] = "B"
                 mc = bfs_min_cost(grid, start, end)
                 if mc is None or mc < min_cost_required:
-                    grid[r][c] = 'C'
+                    grid[r][c] = "C"
                 else:
                     current_c -= 1
             if current_c > max_cost_allowed:
@@ -301,50 +321,61 @@ def grid_to_strings(grid, unicode_border, use_color, use_emoji, cell_space):
 
     def render_tile(ch):
         if use_emoji:
-            if ch == 'S':
-                return colorize('🚩', '92')
-            if ch == 'E':
-                return colorize('🚪', '95')
-            if ch == 'B':
-                return colorize('⬜️', '37')
-            if ch == 'R':
-                return colorize('💎', '93')
-            if ch == 'C':
-                return colorize('⚔️', '91')
-            if ch == 'W':
-                return colorize('🧱', '90')
+            if ch == "S":
+                return colorize("🚩", "92")
+            if ch == "E":
+                return colorize("🚪", "95")
+            if ch == "B":
+                return colorize("⬜️", "37")
+            if ch == "R":
+                return colorize("💎", "93")
+            if ch == "C":
+                return colorize("⚔️", "91")
+            if ch == "W":
+                return colorize("🧱", "90")
             return ch
         else:
-            if ch == 'S':
-                return colorize('S', '92')
-            if ch == 'E':
-                return colorize('E', '95')
-            if ch == 'B':
-                return colorize('B', '37')
-            if ch == 'R':
-                return colorize('R', '93')
-            if ch == 'C':
-                return colorize('C', '91')
-            if ch == 'W':
-                return colorize('W', '90')
+            if ch == "S":
+                return colorize("S", "92")
+            if ch == "E":
+                return colorize("E", "95")
+            if ch == "B":
+                return colorize("B", "37")
+            if ch == "R":
+                return colorize("R", "93")
+            if ch == "C":
+                return colorize("C", "91")
+            if ch == "W":
+                return colorize("W", "90")
             return ch
 
-    sep = ' ' * max(1, cell_space)
-    lines = [sep.join(render_tile(grid[r][c]) for c in range(cols)) for r in range(rows)]
+    sep = " " * max(1, cell_space)
+    lines = [
+        sep.join(render_tile(grid[r][c]) for c in range(cols)) for r in range(rows)
+    ]
     if not unicode_border:
         return lines
     content_width = max((len(line) for line in lines), default=cols)
-    top = '┌' + ('─' * content_width) + '┐'
-    bot = '└' + ('─' * content_width) + '┘'
-    mid = ['│' + line.ljust(content_width) + '│' for line in lines]
+    top = "┌" + ("─" * content_width) + "┐"
+    bot = "└" + ("─" * content_width) + "┘"
+    mid = ["│" + line.ljust(content_width) + "│" for line in lines]
     return [top] + mid + [bot]
 
 
 def count_rewards(grid):
-    return sum(1 for row in grid for ch in row if ch == 'R')
+    return sum(1 for row in grid for ch in row if ch == "R")
 
 
-def try_generate(size, rng, min_paths, min_cost_required, max_rewards_allowed, max_cost_allowed, time_deadline, verbose):
+def try_generate(
+    size,
+    rng,
+    min_paths,
+    min_cost_required,
+    max_rewards_allowed,
+    max_cost_allowed,
+    time_deadline,
+    verbose,
+):
     if time_deadline is not None and time.time() > time_deadline:
         return None
     n = size
@@ -370,7 +401,9 @@ def try_generate(size, rng, min_paths, min_cost_required, max_rewards_allowed, m
             return None
         if not count_paths_at_least(grid, a, b, min_paths):
             return None
-    mc = assign_costs_and_rewards(grid, a, b, min_cost_required, max_rewards_allowed, max_cost_allowed, rng)
+    mc = assign_costs_and_rewards(
+        grid, a, b, min_cost_required, max_rewards_allowed, max_cost_allowed, rng
+    )
     if mc is None or mc < min_cost_required:
         return None
     return grid
@@ -406,22 +439,22 @@ def count_paths_for_report(grid, start, end, cap):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--max-rewards', type=int, default=3)
-    parser.add_argument('--min-cost', type=int, default=2)
-    parser.add_argument('--max-cost', type=int, default=None)
-    parser.add_argument('--min-paths', type=int, default=2)
-    parser.add_argument('--min-size', type=int, default=3)
-    parser.add_argument('--max-size', type=int, default=15)
-    parser.add_argument('--seed', type=int, default=None)
-    parser.add_argument('--iterations', type=int, default=50000)
-    parser.add_argument('--timeout', type=float, default=None)
-    parser.add_argument('--print-legend', action='store_true')
-    parser.add_argument('--unicode', action='store_true')
-    parser.add_argument('--color', action='store_true')
-    parser.add_argument('--emoji', action='store_true')
-    parser.add_argument('--cell-space', type=int, default=1)
-    parser.add_argument('--allow-backtracking', action='store_true')
-    parser.add_argument('--verbose', action='store_true')
+    parser.add_argument("--max-rewards", type=int, default=3)
+    parser.add_argument("--min-cost", type=int, default=2)
+    parser.add_argument("--max-cost", type=int, default=None)
+    parser.add_argument("--min-paths", type=int, default=2)
+    parser.add_argument("--min-size", type=int, default=3)
+    parser.add_argument("--max-size", type=int, default=15)
+    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--iterations", type=int, default=50000)
+    parser.add_argument("--timeout", type=float, default=None)
+    parser.add_argument("--print-legend", action="store_true")
+    parser.add_argument("--unicode", action="store_true")
+    parser.add_argument("--color", action="store_true")
+    parser.add_argument("--emoji", action="store_true")
+    parser.add_argument("--cell-space", type=int, default=1)
+    parser.add_argument("--allow-backtracking", action="store_true")
+    parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
 
     rng = random.Random(args.seed)
@@ -442,14 +475,25 @@ def main():
         for s in range(size, max(args.min_size, args.max_size) + 1):
             if s % 2 == 1 and s >= max(3, args.min_size):
                 remaining_sizes += 1
-        per_size_budget = max(1, (args.iterations - attempts) // max(1, remaining_sizes))
+        per_size_budget = max(
+            1, (args.iterations - attempts) // max(1, remaining_sizes)
+        )
         for _ in range(per_size_budget):
             if args.timeout is not None and time.time() > deadline:
                 break
             if attempts >= args.iterations:
                 break
             attempts += 1
-            grid = try_generate(size, rng, args.min_paths, args.min_cost, args.max_rewards, args.max_cost, deadline, args.verbose)
+            grid = try_generate(
+                size,
+                rng,
+                args.min_paths,
+                args.min_cost,
+                args.max_rewards,
+                args.max_cost,
+                deadline,
+                args.verbose,
+            )
             if grid is not None:
                 success_grid = grid
                 chosen_size = size
@@ -458,7 +502,7 @@ def main():
             break
 
     if success_grid is None:
-        print('Failed to generate a dungeon satisfying constraints', file=sys.stderr)
+        print("Failed to generate a dungeon satisfying constraints", file=sys.stderr)
         sys.exit(1)
 
     rows = len(success_grid)
@@ -468,12 +512,14 @@ def main():
     e = None
     for r in range(rows):
         for c in range(cols):
-            if success_grid[r][c] == 'S':
+            if success_grid[r][c] == "S":
                 s = (r, c)
-            elif success_grid[r][c] == 'E':
+            elif success_grid[r][c] == "E":
                 e = (r, c)
 
-    lines = grid_to_strings(success_grid, args.unicode, args.color, args.emoji, args.cell_space)
+    lines = grid_to_strings(
+        success_grid, args.unicode, args.color, args.emoji, args.cell_space
+    )
     for line in lines:
         print(line)
 
@@ -482,17 +528,15 @@ def main():
         cap = max(100, args.min_paths)
         path_count = count_paths_for_report(success_grid, s, e, cap)
         rewards_total = count_rewards(success_grid)
-        print(f'size: {rows}x{cols}')
-        print(f'assume_backtracking: {args.allow_backtracking}')
+        print(f"size: {rows}x{cols}")
+        print(f"assume_backtracking: {args.allow_backtracking}")
         if path_count >= cap:
-            print(f'paths: >= {cap}')
+            print(f"paths: >= {cap}")
         else:
-            print(f'paths: {path_count} (simple)')
-        print(f'min_cost: {mc}')
-        print(f'rewards_total: {rewards_total}')
+            print(f"paths: {path_count} (simple)")
+        print(f"min_cost: {mc}")
+        print(f"rewards_total: {rewards_total}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-
-

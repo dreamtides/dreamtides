@@ -81,13 +81,16 @@ class TestHelperFunctions(unittest.TestCase):
             Resonance.RUIN: 2,
         }
         result = jsonl_log._profile_dict(snapshot)
-        self.assertEqual(result, {
-            "Ember": 3,
-            "Ruin": 2,
-            "Stone": 1,
-            "Tide": 5,
-            "Zephyr": 0,
-        })
+        self.assertEqual(
+            result,
+            {
+                "Ember": 3,
+                "Ruin": 2,
+                "Stone": 1,
+                "Tide": 5,
+                "Zephyr": 0,
+            },
+        )
 
 
 class TestSessionLogger(unittest.TestCase):
@@ -198,8 +201,12 @@ class TestSessionLogger(unittest.TestCase):
 
     def test_log_draft_pick(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
-        card_a = _make_card("Card A", card_number=1, resonances=frozenset({Resonance.TIDE}))
-        card_b = _make_card("Card B", card_number=2, resonances=frozenset({Resonance.RUIN}))
+        card_a = _make_card(
+            "Card A", card_number=1, resonances=frozenset({Resonance.TIDE})
+        )
+        card_b = _make_card(
+            "Card B", card_number=2, resonances=frozenset({Resonance.RUIN})
+        )
         profile = {r: 0 for r in Resonance}
         profile[Resonance.TIDE] = 1
         logger.log_draft_pick(
@@ -430,6 +437,7 @@ class TestSessionLogger(unittest.TestCase):
         self.assertEqual(event["event"], "error")
         self.assertEqual(event["site_type"], "Essence")
         self.assertIn("something broke", event["error_message"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -46,10 +46,20 @@ KEYWORD_RESONANCE: dict[str, str] = {
     "void": "Ruin",
 }
 
-TRIBAL_SUBTYPES = frozenset({
-    "Survivor", "Warrior", "Spirit Animal", "Ancient", "Visitor",
-    "Explorer", "Synth", "Outsider", "Musician", "Mage",
-})
+TRIBAL_SUBTYPES = frozenset(
+    {
+        "Survivor",
+        "Warrior",
+        "Spirit Animal",
+        "Ancient",
+        "Visitor",
+        "Explorer",
+        "Synth",
+        "Outsider",
+        "Musician",
+        "Mage",
+    }
+)
 
 REMOVAL_KEYWORDS = frozenset({"dissolve", "banish", "prevent"})
 ENGINE_KEYWORDS = frozenset({"draw", "foresee", "discover"})
@@ -176,11 +186,13 @@ def run() -> None:
         scores = score_resonances(card)
         resonance = assign_resonance(scores)
         tags = assign_tags(card)
-        results.append({
-            "card_number": card["card_number"],
-            "resonance": resonance,
-            "tags": tags,
-        })
+        results.append(
+            {
+                "card_number": card["card_number"],
+                "resonance": resonance,
+                "tags": tags,
+            }
+        )
 
     with open(output_path, "w") as f:
         json.dump(results, f, indent=2)

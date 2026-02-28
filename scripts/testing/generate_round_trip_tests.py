@@ -131,18 +131,18 @@ FAILING_TESTS = {
 def sanitize_name(name: str) -> str:
     """Convert card name to a valid Rust function name."""
     # Replace non-alphanumeric with underscore
-    sanitized = re.sub(r'[^a-zA-Z0-9]', '_', name.lower())
+    sanitized = re.sub(r"[^a-zA-Z0-9]", "_", name.lower())
     # Collapse multiple underscores
-    sanitized = re.sub(r'_+', '_', sanitized)
+    sanitized = re.sub(r"_+", "_", sanitized)
     # Strip leading/trailing underscores
-    return sanitized.strip('_')
+    return sanitized.strip("_")
 
 
 def escape_rust_string(s: str) -> str:
     """Escape a string for use in a Rust string literal."""
-    s = s.replace('\\', '\\\\')
+    s = s.replace("\\", "\\\\")
     s = s.replace('"', '\\"')
-    s = s.replace('\n', '\\n')
+    s = s.replace("\n", "\\n")
     return s
 
 
@@ -155,10 +155,14 @@ def generate_test(card_name: str, rules_text: str, variables: str) -> str:
     variables = variables.strip() if variables else ""
 
     # Split rules_text into ability blocks (separated by blank lines)
-    ability_blocks = [block.strip() for block in rules_text.split('\n\n') if block.strip()]
+    ability_blocks = [
+        block.strip() for block in rules_text.split("\n\n") if block.strip()
+    ]
 
     # Check if this test should be ignored
-    ignore_attr = '#[ignore = "Round-trip mismatch"]\n' if fn_name in FAILING_TESTS else ''
+    ignore_attr = (
+        '#[ignore = "Round-trip mismatch"]\n' if fn_name in FAILING_TESTS else ""
+    )
 
     lines = [f"{ignore_attr}#[test]", f"fn {fn_name}() {{"]
 
@@ -169,13 +173,20 @@ def generate_test(card_name: str, rules_text: str, variables: str) -> str:
         lines.append(f'    assert_round_trip("{rules_escaped}", "{vars_escaped}");')
 
     lines.append("}")
-    return '\n'.join(lines)
+    return "\n".join(lines)
 
 
 def main():
     project_root = Path(__file__).parent.parent.parent
     cards_toml_path = project_root / "rules_engine" / "tabula" / "cards.toml"
-    output_dir = project_root / "rules_engine" / "tests" / "parser_tests" / "tests" / "round_trip_tests"
+    output_dir = (
+        project_root
+        / "rules_engine"
+        / "tests"
+        / "parser_tests"
+        / "tests"
+        / "round_trip_tests"
+    )
 
     # Create output directory
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -199,7 +210,7 @@ def main():
         tests.append(test_code)
 
     # Generate the cards test file
-    cards_output = '''//! Per-card round-trip tests for cards.toml.
+    cards_output = """//! Per-card round-trip tests for cards.toml.
 //!
 //! Each test verifies that a card's ability text round-trips
 //! correctly through parse -> serialize.
@@ -209,10 +220,10 @@ def main():
 
 use parser_tests::test_helpers::*;
 
-'''
+"""
 
-    cards_output += '\n\n'.join(tests)
-    cards_output += '\n'
+    cards_output += "\n\n".join(tests)
+    cards_output += "\n"
 
     with open(output_dir / "cards_toml_tests.rs", "w") as f:
         f.write(cards_output)

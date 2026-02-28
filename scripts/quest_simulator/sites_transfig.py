@@ -123,7 +123,7 @@ def eligibility_explanation(card: Card, transfig_type: TransfigType) -> str:
         lower_text = card.rules_text.lower()
         found = [kw for kw in _TRIGGER_KEYWORDS if kw in lower_text]
         if found:
-            return f"has trigger keyword \"{found[0]}\""
+            return f'has trigger keyword "{found[0]}"'
         return "has trigger keywords"
     elif transfig_type == TransfigType.AZURE:
         return "card is an Event"
@@ -145,7 +145,8 @@ def _colored_type_label(transfig_type: TransfigType) -> str:
 
 
 def _build_transfig_note(
-    transfig_type: TransfigType, card_name: str,
+    transfig_type: TransfigType,
+    card_name: str,
 ) -> str:
     """Build the display note for a transfigured card."""
     note = _TRANSFIG_NOTES[transfig_type]
@@ -180,9 +181,7 @@ def _render_transfig_item(
     res_str = render.color_resonances(card.resonances)
     badge = render.rarity_badge(card.rarity)
     cost_str = (
-        f"Cost: {card.energy_cost}"
-        if card.energy_cost is not None
-        else "Cost: -"
+        f"Cost: {card.energy_cost}" if card.energy_cost is not None else "Cost: -"
     )
     spark_str = f"Spark: {card.spark}" if card.spark is not None else ""
 
@@ -256,9 +255,7 @@ def _render_enhanced_item(
     res_str = render.color_resonances(card.resonances)
     badge = render.rarity_badge(card.rarity)
     cost_str = (
-        f"Cost: {card.energy_cost}"
-        if card.energy_cost is not None
-        else "Cost: -"
+        f"Cost: {card.energy_cost}" if card.energy_cost is not None else "Cost: -"
     )
     spark_str = f"Spark: {card.spark}" if card.spark is not None else ""
 
@@ -327,8 +324,7 @@ def run_transfiguration(
 
     if not eligible_deck_cards:
         print(
-            f"  {render.DIM}No cards available for "
-            f"transfiguration.{render.RESET}"
+            f"  {render.DIM}No cards available for " f"transfiguration.{render.RESET}"
         )
         footer = render.resonance_profile_footer(
             counts=state.resonance_profile.snapshot(),
@@ -350,13 +346,19 @@ def run_transfiguration(
 
     if is_enhanced:
         _run_enhanced(
-            state, eligible_deck_cards, logger,
-            dreamscape_name, is_enhanced,
+            state,
+            eligible_deck_cards,
+            logger,
+            dreamscape_name,
+            is_enhanced,
         )
     else:
         _run_normal(
-            state, eligible_deck_cards, logger,
-            dreamscape_name, is_enhanced,
+            state,
+            eligible_deck_cards,
+            logger,
+            dreamscape_name,
+            is_enhanced,
         )
 
     # Show resonance profile footer
@@ -380,7 +382,8 @@ def _run_normal(
     # type, then sample from that filtered list to avoid showing fewer
     # than 3 candidates.
     transfig_eligible = [
-        dc for dc in eligible_deck_cards
+        dc
+        for dc in eligible_deck_cards
         if any(is_eligible(dc.card, t) for t in _BASE_TYPES)
     ]
     sample_size = min(3, len(transfig_eligible))
@@ -411,15 +414,11 @@ def _run_normal(
             )
         return
 
-    print(
-        f"  Choose a card to transfigure, or skip:"
-    )
+    print(f"  Choose a card to transfigure, or skip:")
     print()
 
     # Build option labels
-    option_labels = [
-        f"{t.value} {dc.card.name}" for dc, t in candidates
-    ]
+    option_labels = [f"{t.value} {dc.card.name}" for dc, t in candidates]
     option_labels.append("Skip transfiguration")
 
     def _render_fn(
@@ -429,7 +428,10 @@ def _run_normal(
         _candidates: list[tuple[DeckCard, TransfigType]] = candidates,
     ) -> str:
         return _render_transfig_item(
-            index, option, is_selected, _candidates,
+            index,
+            option,
+            is_selected,
+            _candidates,
         )
 
     chosen_index = input_handler.single_select(
@@ -513,7 +515,11 @@ def _run_enhanced(
         _types: list[TransfigType] = assigned_types,
     ) -> str:
         return _render_enhanced_item(
-            index, option, is_selected, _deck, _types,
+            index,
+            option,
+            is_selected,
+            _deck,
+            _types,
         )
 
     chosen_index = input_handler.single_select(

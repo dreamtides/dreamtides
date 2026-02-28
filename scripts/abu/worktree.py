@@ -157,7 +157,9 @@ def discover_untracked_items(repo: Path) -> list[str]:
         capture=True,
         cwd=repo,
     )
-    ignored: set[str] = set(result.stdout.strip().splitlines()) if result.stdout.strip() else set()
+    ignored: set[str] = (
+        set(result.stdout.strip().splitlines()) if result.stdout.strip() else set()
+    )
 
     result = run_cmd(
         [
@@ -170,7 +172,9 @@ def discover_untracked_items(repo: Path) -> list[str]:
         capture=True,
         cwd=repo,
     )
-    untracked: set[str] = set(result.stdout.strip().splitlines()) if result.stdout.strip() else set()
+    untracked: set[str] = (
+        set(result.stdout.strip().splitlines()) if result.stdout.strip() else set()
+    )
 
     all_items: list[str] = sorted(ignored | untracked)
     return [item.rstrip("/") for item in all_items if item.strip()]
@@ -260,7 +264,9 @@ def cmd_create(args: argparse.Namespace) -> None:
     else:
         worktree_path = DEFAULT_WORKTREE_BASE / branch
 
-    if not verify_apfs(worktree_path.parent if worktree_path.parent.exists() else Path.home()):
+    if not verify_apfs(
+        worktree_path.parent if worktree_path.parent.exists() else Path.home()
+    ):
         print("Error: Filesystem is not APFS. APFS clones require an APFS volume.")
         sys.exit(1)
 
@@ -351,7 +357,10 @@ def cmd_remove(args: argparse.Namespace) -> None:
         )
         lines: list[str] = result.stdout.splitlines()
         for i, line in enumerate(lines):
-            if line.startswith("worktree ") and Path(line.split(" ", 1)[1]).resolve() == target_path:
+            if (
+                line.startswith("worktree ")
+                and Path(line.split(" ", 1)[1]).resolve() == target_path
+            ):
                 for j in range(i + 1, min(i + 5, len(lines))):
                     if lines[j].startswith("branch refs/heads/"):
                         branch_name = lines[j].removeprefix("branch refs/heads/")
@@ -419,7 +428,9 @@ def list_worktree_paths() -> list[Path]:
     return paths
 
 
-def sync_tree(source_root: Path, dest_root: Path, dry_run: bool) -> tuple[int, int, int]:
+def sync_tree(
+    source_root: Path, dest_root: Path, dry_run: bool
+) -> tuple[int, int, int]:
     """Incrementally sync a directory tree using APFS clones.
 
     Walks source and dest in parallel. Only replaces files whose
@@ -463,7 +474,10 @@ def sync_tree(source_root: Path, dest_root: Path, dry_run: bool) -> tuple[int, i
                 source_entries.add(rel)
                 dest_child: Path = dest_root / rel_dir / name
                 link_target: Path = Path(os.readlink(src_child))
-                if dest_child.is_symlink() and Path(os.readlink(dest_child)) == link_target:
+                if (
+                    dest_child.is_symlink()
+                    and Path(os.readlink(dest_child)) == link_target
+                ):
                     unchanged += 1
                 else:
                     if not dry_run:
@@ -482,7 +496,10 @@ def sync_tree(source_root: Path, dest_root: Path, dry_run: bool) -> tuple[int, i
                 try:
                     src_stat: os.stat_result = src_file.stat()
                     dst_stat: os.stat_result = dest_file.stat()
-                    if src_stat.st_size == dst_stat.st_size and abs(src_stat.st_mtime - dst_stat.st_mtime) < 0.01:
+                    if (
+                        src_stat.st_size == dst_stat.st_size
+                        and abs(src_stat.st_mtime - dst_stat.st_mtime) < 0.01
+                    ):
                         unchanged += 1
                         continue
                 except OSError:
@@ -565,10 +582,14 @@ def refresh_one_worktree(
         total_deleted += deleted
         total_unchanged += unchanged
         if cloned > 0 or deleted > 0:
-            print(f"  {item}: {cloned} cloned, {deleted} deleted, {unchanged} unchanged")
+            print(
+                f"  {item}: {cloned} cloned, {deleted} deleted, {unchanged} unchanged"
+            )
         dir_count += 1
 
-    print(f"  Synced {dir_count} directories: {total_cloned} cloned, {total_deleted} deleted, {total_unchanged} unchanged")
+    print(
+        f"  Synced {dir_count} directories: {total_cloned} cloned, {total_deleted} deleted, {total_unchanged} unchanged"
+    )
 
 
 def cmd_refresh(args: argparse.Namespace) -> None:
@@ -595,7 +616,10 @@ def cmd_refresh(args: argparse.Namespace) -> None:
         )
         is_worktree: bool = False
         for line in result.stdout.splitlines():
-            if line.startswith("worktree ") and Path(line.split(" ", 1)[1]).resolve() == wt_path:
+            if (
+                line.startswith("worktree ")
+                and Path(line.split(" ", 1)[1]).resolve() == wt_path
+            ):
                 is_worktree = True
                 break
         if not is_worktree:
@@ -737,7 +761,9 @@ def cmd_activate(args: argparse.Namespace) -> None:
                 total_deleted += deleted_count
                 total_unchanged += unchanged
                 if cloned > 0 or deleted_count > 0:
-                    print(f"  {item}: {cloned} cloned, {deleted_count} deleted, {unchanged} unchanged")
+                    print(
+                        f"  {item}: {cloned} cloned, {deleted_count} deleted, {unchanged} unchanged"
+                    )
             else:
                 # Exists in main only: fresh APFS clone
                 if clone_item(source, dest, dry_run):
@@ -786,7 +812,9 @@ def cmd_activate(args: argparse.Namespace) -> None:
     total_removed: int = total_deleted + removed_count
     print(f"\nDone! Worktree activated at: {worktree_path}")
     print(f"  Branch: {branch} (reset to {base})")
-    print(f"  Synced {dir_count} directories: {total_cloned} cloned, {total_removed} deleted, {total_unchanged} unchanged")
+    print(
+        f"  Synced {dir_count} directories: {total_cloned} cloned, {total_removed} deleted, {total_unchanged} unchanged"
+    )
     if not dry_run:
         print(f"  Free disk: {get_free_gb(worktree_path):.1f}GB")
 
@@ -806,7 +834,10 @@ def _worktree_branch(worktree_path: Path) -> str | None:
     resolved: Path = worktree_path.resolve()
     lines: list[str] = result.stdout.splitlines()
     for i, line in enumerate(lines):
-        if line.startswith("worktree ") and Path(line.split(" ", 1)[1]).resolve() == resolved:
+        if (
+            line.startswith("worktree ")
+            and Path(line.split(" ", 1)[1]).resolve() == resolved
+        ):
             for j in range(i + 1, min(i + 5, len(lines))):
                 if lines[j].startswith("branch refs/heads/"):
                     return lines[j].removeprefix("branch refs/heads/")
@@ -884,7 +915,9 @@ def _sync_gitignored(worktree_path: Path, main_repo: Path) -> None:
                 total_deleted += deleted_count
                 total_unchanged += unchanged
                 if cloned > 0 or deleted_count > 0:
-                    _eprint(f"  {item}: {cloned} cloned, {deleted_count} deleted, {unchanged} unchanged")
+                    _eprint(
+                        f"  {item}: {cloned} cloned, {deleted_count} deleted, {unchanged} unchanged"
+                    )
             else:
                 if clone_item(source, dest, False):
                     total_cloned += 1
@@ -922,7 +955,9 @@ def _sync_gitignored(worktree_path: Path, main_repo: Path) -> None:
                 removed_count += 1
 
     total_removed: int = total_deleted + removed_count
-    _eprint(f"  Synced {dir_count} directories: {total_cloned} cloned, {total_removed} deleted, {total_unchanged} unchanged")
+    _eprint(
+        f"  Synced {dir_count} directories: {total_cloned} cloned, {total_removed} deleted, {total_unchanged} unchanged"
+    )
 
 
 def _claim_reuse(worktree_path: Path, slot: str, branch: str, base: str) -> None:
@@ -1161,7 +1196,9 @@ def cmd_claim(args: argparse.Namespace) -> None:
         if slot_path.exists():
             slot_branch: str | None = _worktree_branch(slot_path)
             if slot_branch == branch:
-                _eprint(f"Error: Branch '{branch}' is already checked out in slot '{slot}'")
+                _eprint(
+                    f"Error: Branch '{branch}' is already checked out in slot '{slot}'"
+                )
                 sys.exit(1)
 
     available: list[tuple[str, Path]] = []
@@ -1392,9 +1429,13 @@ def main() -> None:
     )
 
     subparsers.add_parser("list", help="List worktrees")
-    subparsers.add_parser("reset", help="Remove all worktrees and delete their branches")
+    subparsers.add_parser(
+        "reset", help="Remove all worktrees and delete their branches"
+    )
 
-    claim_parser = subparsers.add_parser("claim", help="Claim an available worktree slot")
+    claim_parser = subparsers.add_parser(
+        "claim", help="Claim an available worktree slot"
+    )
     claim_parser.add_argument("branch", help="Branch name to create")
     claim_parser.add_argument(
         "--base",

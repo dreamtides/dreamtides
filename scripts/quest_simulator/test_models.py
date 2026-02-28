@@ -144,17 +144,25 @@ class TestTagProfile:
 class TestEffectType:
     def test_all_journey_effect_types_exist(self) -> None:
         journey_types = [
-            "add_cards", "add_essence", "remove_cards",
-            "add_dreamsign", "gain_resonance",
+            "add_cards",
+            "add_essence",
+            "remove_cards",
+            "add_dreamsign",
+            "gain_resonance",
         ]
         for et in journey_types:
             assert EffectType(et) is not None
 
     def test_all_offer_effect_types_exist(self) -> None:
         offer_types = [
-            "add_cards", "add_essence", "add_dreamsign",
-            "large_essence", "lose_essence", "add_bane_card",
-            "add_bane_dreamsign", "remove_cards",
+            "add_cards",
+            "add_essence",
+            "add_dreamsign",
+            "large_essence",
+            "lose_essence",
+            "add_bane_card",
+            "add_bane_dreamsign",
+            "remove_cards",
         ]
         for et in offer_types:
             assert EffectType(et) is not None

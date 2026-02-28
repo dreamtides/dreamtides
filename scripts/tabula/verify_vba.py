@@ -31,7 +31,9 @@ def main():
         print("Error: Could not find project root (no justfile found)", file=sys.stderr)
         sys.exit(1)
 
-    default_excel_file = project_root / "client" / "Assets" / "StreamingAssets" / "Tabula.xlsm"
+    default_excel_file = (
+        project_root / "client" / "Assets" / "StreamingAssets" / "Tabula.xlsm"
+    )
     default_vba_dir = project_root / "rules_engine" / "src" / "tabula_cli" / "vba"
 
     parser = argparse.ArgumentParser(
@@ -120,10 +122,7 @@ def parse_olevba_output(output: str) -> Dict[str, Dict[str, str]]:
         ):
             if current_module:
                 content = normalize_vba_content("\n".join(current_content))
-                modules[current_module] = {
-                    "content": content,
-                    "is_events": False
-                }
+                modules[current_module] = {"content": content, "is_events": False}
                 current_content = []
             in_vba_code = False
             current_module = None
@@ -133,15 +132,17 @@ def parse_olevba_output(output: str) -> Dict[str, Dict[str, str]]:
                 module_name_with_ext = parts[2]
                 current_module = module_name_with_ext.rsplit(".", 1)[0]
             in_vba_code = True
-        elif in_vba_code and line and not line.startswith("- - - - -") and not line.startswith("in file:"):
+        elif (
+            in_vba_code
+            and line
+            and not line.startswith("- - - - -")
+            and not line.startswith("in file:")
+        ):
             current_content.append(line)
 
     if current_module:
         content = normalize_vba_content("\n".join(current_content))
-        modules[current_module] = {
-            "content": content,
-            "is_events": False
-        }
+        modules[current_module] = {"content": content, "is_events": False}
 
     if not modules:
         raise RuntimeError("No VBA modules found in Excel file")
@@ -157,10 +158,10 @@ def read_bas_files(vba_dir: Path) -> Dict[str, str]:
         content = bas_file.read_text(encoding="utf-8")
         module_name = extract_module_name(content, bas_file.stem)
         normalized = normalize_vba_content(content)
-        
+
         modules[module_name] = {
             "content": normalized,
-            "is_events": module_name == "TabulaServerEvents"
+            "is_events": module_name == "TabulaServerEvents",
         }
 
     if not modules:
@@ -188,20 +189,24 @@ def normalize_vba_content(content: str) -> str:
     """Normalize VBA content by removing metadata, blank lines, and trailing whitespace."""
     lines = []
     in_analysis_table = False
-    
+
     for line in content.split("\n"):
         stripped = line.rstrip()
-        
+
         if "+----------+--------------------+" in stripped:
             in_analysis_table = True
             continue
-        
+
         if in_analysis_table:
-            if stripped and not stripped.startswith("|") and not stripped.startswith("+"):
+            if (
+                stripped
+                and not stripped.startswith("|")
+                and not stripped.startswith("+")
+            ):
                 in_analysis_table = False
             else:
                 continue
-        
+
         if (
             stripped
             and not stripped.startswith("Attribute VB_")
@@ -212,23 +217,30 @@ def normalize_vba_content(content: str) -> str:
     return "\n".join(lines).strip()
 
 
-def compare_modules(extracted: Dict[str, Dict[str, str]], source: Dict[str, Dict[str, str]]):
+def compare_modules(
+    extracted: Dict[str, Dict[str, str]], source: Dict[str, Dict[str, str]]
+):
     """Compare extracted modules with source files."""
     source_names = set(source.keys())
     has_differences = False
 
     for module_name in sorted(source_names):
         source_info = source[module_name]
-        
+
         if source_info["is_events"]:
-            if not verify_events_in_thisworkbook(extracted, source_info["content"], module_name):
+            if not verify_events_in_thisworkbook(
+                extracted, source_info["content"], module_name
+            ):
                 has_differences = True
         else:
             if module_name not in extracted:
-                print(f"❌ Module '{module_name}' not found in Excel file", file=sys.stderr)
+                print(
+                    f"❌ Module '{module_name}' not found in Excel file",
+                    file=sys.stderr,
+                )
                 has_differences = True
                 continue
-            
+
             extracted_content = extracted[module_name]["content"]
             source_content = source_info["content"]
 
@@ -238,28 +250,43 @@ def compare_modules(extracted: Dict[str, Dict[str, str]], source: Dict[str, Dict
                 has_differences = True
 
     if has_differences:
-        print(f"\nModules found in Excel: {', '.join(sorted(extracted.keys()))}", file=sys.stderr)
+        print(
+            f"\nModules found in Excel: {', '.join(sorted(extracted.keys()))}",
+            file=sys.stderr,
+        )
         raise RuntimeError("Some modules are missing or have content differences")
 
 
-def verify_events_in_thisworkbook(extracted: Dict[str, Dict[str, str]], events_content: str, events_name: str) -> bool:
+def verify_events_in_thisworkbook(
+    extracted: Dict[str, Dict[str, str]], events_content: str, events_name: str
+) -> bool:
     """Verify that event handler code exists within ThisWorkbook module."""
     if "ThisWorkbook" not in extracted:
-        print(f"⚠️  Warning: ThisWorkbook module not found in Excel file (needed for {events_name})")
+        print(
+            f"⚠️  Warning: ThisWorkbook module not found in Excel file (needed for {events_name})"
+        )
         return True
-    
+
     thisworkbook_content = extracted["ThisWorkbook"]["content"]
-    events_lines = [line for line in events_content.split("\n") if line.strip() and not line.strip().startswith("option explicit")]
-    
+    events_lines = [
+        line
+        for line in events_content.split("\n")
+        if line.strip() and not line.strip().startswith("option explicit")
+    ]
+
     missing_lines = []
     for line in events_lines:
         if line.strip() and line not in thisworkbook_content:
             missing_lines.append(line)
-    
+
     if missing_lines:
-        print(f"⚠️  Warning: {events_name} code may not be fully integrated into ThisWorkbook module")
-        print(f"   (This is expected if you haven't manually merged the event handlers yet)")
-    
+        print(
+            f"⚠️  Warning: {events_name} code may not be fully integrated into ThisWorkbook module"
+        )
+        print(
+            f"   (This is expected if you haven't manually merged the event handlers yet)"
+        )
+
     return True
 
 
@@ -282,4 +309,3 @@ def print_diff(source: str, extracted: str):
 
 if __name__ == "__main__":
     main()
-

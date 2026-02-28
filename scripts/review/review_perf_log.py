@@ -13,7 +13,6 @@ from typing import Any
 
 import fcntl
 
-
 KNOWN_EVENTS = {
     "run_start",
     "run_end",
@@ -39,7 +38,11 @@ class ReviewPerfLogError(Exception):
 
 def utc_now_iso() -> str:
     """Returns an ISO-8601 UTC timestamp with millisecond precision."""
-    return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    return (
+        datetime.now(timezone.utc)
+        .isoformat(timespec="milliseconds")
+        .replace("+00:00", "Z")
+    )
 
 
 def resolve_log_path(log_path: str | Path | None = None) -> Path:
@@ -105,7 +108,9 @@ def locked_log(log_path: str | Path | None = None):
             fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
 
 
-def append_events(events: list[dict[str, Any]], log_path: str | Path | None = None) -> int:
+def append_events(
+    events: list[dict[str, Any]], log_path: str | Path | None = None
+) -> int:
     """Appends multiple NDJSON events to the performance log."""
     if not events:
         return 0

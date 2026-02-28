@@ -13,6 +13,7 @@ import threading
 import signal
 import argparse
 
+
 def read_project_unity_version(project_path):
     version_file = project_path / "ProjectSettings" / "ProjectVersion.txt"
     if version_file.exists():
@@ -20,6 +21,7 @@ def read_project_unity_version(project_path):
             if line.startswith("m_EditorVersion:"):
                 return line.split(":")[1].strip()
     return None
+
 
 def get_unity_path():
     project_path = Path.home() / "dreamtides_tests/client"
@@ -45,14 +47,15 @@ def get_unity_path():
     else:
         raise OSError(f"Unsupported operating system: {system}")
 
+
 def print_test_summary(results_path):
     try:
         tree = ET.parse(results_path)
         test_run = tree.getroot()
-        total = int(test_run.get('total', 0))
-        passed = int(test_run.get('passed', 0))
-        failed = int(test_run.get('failed', 0))
-        duration = float(test_run.get('duration', 0))
+        total = int(test_run.get("total", 0))
+        passed = int(test_run.get("passed", 0))
+        failed = int(test_run.get("failed", 0))
+        duration = float(test_run.get("duration", 0))
 
         print("\nTest Results Summary:")
         print(f"Total Tests: {total}")
@@ -63,7 +66,7 @@ def print_test_summary(results_path):
         if failed > 0:
             print("\nFailed Tests:")
             for test_case in test_run.findall('.//test-case[@result="Failed"]'):
-                name = test_case.get('name', 'Unknown')
+                name = test_case.get("name", "Unknown")
                 print(f"- {name}")
             exit(1)
     except ET.ParseError as e:
@@ -72,6 +75,7 @@ def print_test_summary(results_path):
     except FileNotFoundError:
         print("Test results file not found")
         exit(1)
+
 
 def print_detailed_failures(results_path):
     try:
@@ -82,17 +86,17 @@ def print_detailed_failures(results_path):
 
         # Find all failed test cases
         for test_case in test_run.findall('.//test-case[@result="Failed"]'):
-            name = test_case.get('name', 'Unknown')
+            name = test_case.get("name", "Unknown")
             print(f"\n- {name}")
 
             # Extract error message from the failure element
-            failure = test_case.find('./failure/message')
+            failure = test_case.find("./failure/message")
             if failure is not None and failure.text:
                 # Skip the "One or more child tests had errors" generic messages
                 if "One or more child tests had errors" not in failure.text:
                     # Clean up the message - remove CDATA wrapper if present
                     message = failure.text
-                    if message.startswith('<![CDATA[') and message.endswith(']]>'):
+                    if message.startswith("<![CDATA[") and message.endswith("]]>"):
                         message = message[9:-3]
                     print(f"  Error: {message}")
 
@@ -101,35 +105,42 @@ def print_detailed_failures(results_path):
     except FileNotFoundError:
         print("Test results file not found")
 
+
 def read_previous_run_time(test_output_dir):
     run_time_file = test_output_dir / "run_time.txt"
     if run_time_file.exists():
         try:
-            with open(run_time_file, 'r') as f:
+            with open(run_time_file, "r") as f:
                 return float(f.read().strip())
         except (ValueError, IOError):
             pass
     print("Previous run time not found, returning 300 seconds")
     return 300
 
+
 def write_run_time(test_output_dir, run_time):
     run_time_file = test_output_dir / "run_time.txt"
-    with open(run_time_file, 'w') as f:
+    with open(run_time_file, "w") as f:
         f.write(str(run_time))
+
 
 def format_time(seconds):
     minutes = int(seconds // 60)
     seconds = int(seconds % 60)
     return f"{minutes:02d}:{seconds:02d}"
 
+
 def display_countdown(estimated_time, start_time):
     while True:
         elapsed = time.time() - start_time
         remaining = max(0, estimated_time - elapsed)
-        print(f"\rEstimated time remaining: {format_time(remaining)}", end="", flush=True)
+        print(
+            f"\rEstimated time remaining: {format_time(remaining)}", end="", flush=True
+        )
         if remaining <= 0:
             break
         time.sleep(1)
+
 
 def monitor_log_file(log_file_path, estimated_time, start_time):
     """Monitor log file and show countdown with [*] indicator for log changes."""
@@ -150,13 +161,18 @@ def monitor_log_file(log_file_path, estimated_time, start_time):
 
         if current_time - last_update >= 1.0:
             indicator = "[*]" if log_changed else " > "
-            print(f"\r{indicator} Estimated time remaining: {format_time(remaining)}", end="", flush=True)
+            print(
+                f"\r{indicator} Estimated time remaining: {format_time(remaining)}",
+                end="",
+                flush=True,
+            )
             last_update = current_time
 
         time.sleep(0.1)
 
+
 def main():
-    argparse.ArgumentParser(description="Run Unity tests.") 
+    argparse.ArgumentParser(description="Run Unity tests.")
     print("Starting Unity tests...")
 
     script_dir = Path(__file__).parent
@@ -165,7 +181,7 @@ def main():
 
     previous_run_time = 300  # Default to 5 minutes
 
-    previous_run_time = read_previous_run_time(test_output_dir) 
+    previous_run_time = read_previous_run_time(test_output_dir)
     if previous_run_time:
         print(f"Previous test run took {format_time(previous_run_time)}")
 
@@ -181,10 +197,14 @@ def main():
     unity_args = [
         "-runTests",
         "-batchmode",
-        f"-projectPath", str(project_path),
-        f"-testResults", test_results,
-        "-testPlatform", "EditMode",
-        f"-logFile", log_file
+        f"-projectPath",
+        str(project_path),
+        f"-testResults",
+        test_results,
+        "-testPlatform",
+        "EditMode",
+        f"-logFile",
+        log_file,
     ]
 
     try:
@@ -196,7 +216,7 @@ def main():
         monitor_thread = threading.Thread(
             target=monitor_log_file,
             args=(log_file, previous_run_time, start_time),
-            daemon=True
+            daemon=True,
         )
         monitor_thread.start()
 
@@ -204,13 +224,13 @@ def main():
         process = subprocess.Popen(
             executable=unity_path,
             args=unity_args,
-            preexec_fn=os.setsid if os.name != 'nt' else None
+            preexec_fn=os.setsid if os.name != "nt" else None,
         )
 
         # Function to handle termination signals
         def signal_handler(signum, frame):
             print("\nTerminating Unity process...")
-            if os.name == 'nt':
+            if os.name == "nt":
                 process.terminate()
             else:
                 os.killpg(os.getpgid(process.pid), signal.SIGTERM)
@@ -254,6 +274,7 @@ def main():
     except OSError as e:
         print(f"\nError: {e}")
         exit(1)
+
 
 if __name__ == "__main__":
     main()

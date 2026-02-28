@@ -24,7 +24,6 @@ from models import (
 )
 from quest_state import QuestState
 
-
 _RARITY_PRICE_KEYS: dict[Rarity, str] = {
     Rarity.COMMON: "price_common",
     Rarity.UNCOMMON: "price_uncommon",
@@ -95,12 +94,14 @@ def generate_shop_items(
     items: list[ShopItem] = []
     for entry, _weight in selections:
         base_price = get_price(entry.card.rarity, shop_config)
-        items.append(ShopItem(
-            card=entry.card,
-            pool_entry=entry,
-            base_price=base_price,
-            discounted_price=None,
-        ))
+        items.append(
+            ShopItem(
+                card=entry.card,
+                pool_entry=entry,
+                base_price=base_price,
+                discounted_price=None,
+            )
+        )
 
     # Apply per-item discount probability (~30% chance each item is on sale)
     if items:
@@ -183,9 +184,7 @@ def _build_render_fn(
         if index == reroll_index:
             marker = ">" if is_highlighted else " "
             check = "[x]" if is_checked else "[ ]"
-            reroll_affordable = (
-                free_rerolls > 0 or available_essence >= reroll_cost
-            )
+            reroll_affordable = free_rerolls > 0 or available_essence >= reroll_cost
             if not reroll_affordable and not is_checked:
                 check = f"{render.DIM}[-]{render.RESET}"
             if free_rerolls > 0:
@@ -205,12 +204,8 @@ def _build_render_fn(
             return line
 
         item = items[index]
-        affordable = (
-            available_essence - running_total[0] >= item.effective_price
-        )
-        result = _render_shop_item(
-            item, is_highlighted, is_checked, affordable
-        )
+        affordable = available_essence - running_total[0] >= item.effective_price
+        result = _render_shop_item(item, is_highlighted, is_checked, affordable)
 
         # Update running total for checked items
         if is_checked:
@@ -238,7 +233,9 @@ def _count_checked_items(items: list[ShopItem], total: int) -> int:
     return max(1, count) if total > 0 else 0
 
 
-def _print_purchase_summary(bought_items: list[ShopItem], total_cost: int, remaining_essence: int) -> None:
+def _print_purchase_summary(
+    bought_items: list[ShopItem], total_cost: int, remaining_essence: int
+) -> None:
     """Print a summary of the items purchased."""
     print()
     print(f"  {render.BOLD}Purchase Summary:{render.RESET}")
@@ -246,10 +243,7 @@ def _print_purchase_summary(bought_items: list[ShopItem], total_cost: int, remai
         price_str = _format_price(item)
         name_color = render.card_color(item.card.resonances)
         print(f"    {name_color}{item.card.name}{render.RESET}  {price_str}")
-    print(
-        f"\n  Purchased {len(bought_items)} card(s) "
-        f"for {total_cost} essence."
-    )
+    print(f"\n  Purchased {len(bought_items)} card(s) " f"for {total_cost} essence.")
     print(f"  Essence remaining: {remaining_essence}")
 
 
@@ -390,9 +384,11 @@ def run_shop(
                 dreamscape=dreamscape_name,
                 is_enhanced=is_enhanced,
                 choices=[item.card.name for item in items],
-                choice_made=", ".join(item.card.name for item in bought_items)
-                if bought_items
-                else None,
+                choice_made=(
+                    ", ".join(item.card.name for item in bought_items)
+                    if bought_items
+                    else None
+                ),
                 state_changes={
                     "items_bought": [item.card.name for item in bought_items],
                     "essence_spent": total_cost,

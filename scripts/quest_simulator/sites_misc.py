@@ -50,8 +50,7 @@ def select_duplication_candidates(
         candidates = rng.sample(deck, n)
 
     copy_counts = [
-        rng.randint(DUPLICATION_MIN_COPIES, DUPLICATION_MAX_COPIES)
-        for _ in candidates
+        rng.randint(DUPLICATION_MIN_COPIES, DUPLICATION_MAX_COPIES) for _ in candidates
     ]
     return candidates, copy_counts
 
@@ -95,17 +94,13 @@ def run_duplication(
     print()
 
     if is_enhanced:
-        print(
-            f"  {render.BOLD}Mirrored:{render.RESET} Choose any card to duplicate."
-        )
+        print(f"  {render.BOLD}Mirrored:{render.RESET} Choose any card to duplicate.")
     else:
         print("  Select a card to duplicate or skip:")
     print()
 
     # Build option labels with copy counts
-    option_labels = [
-        f"{dc.card.name} x{cc}" for dc, cc in zip(candidates, copy_counts)
-    ]
+    option_labels = [f"{dc.card.name} x{cc}" for dc, cc in zip(candidates, copy_counts)]
     option_labels.append(SKIP_LABEL)
 
     def _render_option(
@@ -125,9 +120,13 @@ def run_duplication(
             formatted_line1 = card_lines[0]
             copy_label = f" x{cc}"
             if is_selected:
-                formatted_line1 = formatted_line1 + f"  {render.BOLD}{copy_label}{render.RESET}"
+                formatted_line1 = (
+                    formatted_line1 + f"  {render.BOLD}{copy_label}{render.RESET}"
+                )
             else:
-                formatted_line1 = formatted_line1 + f"  {render.DIM}{copy_label}{render.RESET}"
+                formatted_line1 = (
+                    formatted_line1 + f"  {render.DIM}{copy_label}{render.RESET}"
+                )
             return "\n".join([formatted_line1, card_lines[1]])
         marker = ">" if is_selected else " "
         return f"  {marker} {render.DIM}{SKIP_LABEL}{render.RESET}"
@@ -165,14 +164,16 @@ def run_duplication(
             dreamscape=dreamscape_name,
             is_enhanced=is_enhanced,
             choices=[dc.card.name for dc in candidates],
-            choice_made=f"{chosen_card.name} x{chosen_copies}"
-            if chosen_card is not None
-            else None,
+            choice_made=(
+                f"{chosen_card.name} x{chosen_copies}"
+                if chosen_card is not None
+                else None
+            ),
             state_changes={
                 "cards_added": chosen_copies,
-                "card_duplicated": chosen_card.name
-                if chosen_card is not None
-                else None,
+                "card_duplicated": (
+                    chosen_card.name if chosen_card is not None else None
+                ),
                 "deck_size_after": state.deck_count(),
             },
             profile_snapshot=state.resonance_profile.snapshot(),
@@ -208,8 +209,7 @@ def generate_reward(
     elif completion_level < REWARD_HIGH_THRESHOLD:
         # Mid level: card (weighted toward rare+)
         rare_plus = [
-            c for c in all_cards
-            if c.rarity in (Rarity.RARE, Rarity.LEGENDARY)
+            c for c in all_cards if c.rarity in (Rarity.RARE, Rarity.LEGENDARY)
         ]
         if rare_plus:
             card = rng.choice(rare_plus)
@@ -288,23 +288,17 @@ def run_reward(
         if reward_type == "essence":
             state.gain_essence(reward["value"])
             print()
-            print(
-                f"  {render.BOLD}Gained {reward['value']} essence!{render.RESET}"
-            )
+            print(f"  {render.BOLD}Gained {reward['value']} essence!{render.RESET}")
         elif reward_type == "card":
             card = reward["card"]
             state.add_card(card)
             print()
-            print(
-                f"  {render.BOLD}Added {card.name} to deck!{render.RESET}"
-            )
+            print(f"  {render.BOLD}Added {card.name} to deck!{render.RESET}")
         elif reward_type == "dreamsign":
             ds = reward["dreamsign"]
             state.add_dreamsign(ds)
             print()
-            print(
-                f"  {render.BOLD}Acquired dreamsign: {ds.name}!{render.RESET}"
-            )
+            print(f"  {render.BOLD}Acquired dreamsign: {ds.name}!{render.RESET}")
     else:
         print()
         print(f"  {render.DIM}Declined.{render.RESET}")

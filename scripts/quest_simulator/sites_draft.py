@@ -85,9 +85,7 @@ def run_draft(
         option_labels = [card.name for card in offered_cards]
         max_weight = max(offered_weights) if offered_weights else 0.0
         top_res_pairs = state.resonance_profile.top_n(2, rng=state.rng)
-        top_res: frozenset[Resonance] = frozenset(
-            r for r, c in top_res_pairs if c > 0
-        )
+        top_res: frozenset[Resonance] = frozenset(r for r, c in top_res_pairs if c > 0)
 
         def _render_card_option(
             index: int,

@@ -60,22 +60,38 @@ class BinaryExecutionResult:
 
 def parse_args() -> argparse.Namespace:
     """Parses CLI arguments."""
-    parser = argparse.ArgumentParser(description="Profile cargo test execution for just review")
+    parser = argparse.ArgumentParser(
+        description="Profile cargo test execution for just review"
+    )
     parser.add_argument("--manifest-path", required=True, help="Cargo manifest path")
-    parser.add_argument("--package", action="append", default=[], help="Cargo package name")
+    parser.add_argument(
+        "--package", action="append", default=[], help="Cargo package name"
+    )
     parser.add_argument("--workspace", action="store_true", help="Run across workspace")
-    parser.add_argument("--exclude", action="append", default=[], help="Excluded packages")
+    parser.add_argument(
+        "--exclude", action="append", default=[], help="Excluded packages"
+    )
     parser.add_argument("--quiet", action="store_true", help="Pass quiet mode")
     parser.add_argument("--test-threads", type=int, help="libtest --test-threads value")
-    parser.add_argument("--detail", choices=["stable", "nightly"], default=os.environ.get("REVIEW_PERF_DETAIL", "stable"))
-    parser.add_argument("--require-match", action="store_true", help="Fail if filters match no tests")
+    parser.add_argument(
+        "--detail",
+        choices=["stable", "nightly"],
+        default=os.environ.get("REVIEW_PERF_DETAIL", "stable"),
+    )
+    parser.add_argument(
+        "--require-match", action="store_true", help="Fail if filters match no tests"
+    )
     parser.add_argument(
         "--include-doc-tests",
         action="store_true",
         default=os.environ.get("REVIEW_PERF_INCLUDE_DOC_TESTS", "0") == "1",
         help="Also execute doc tests (disabled by default to preserve just review behavior)",
     )
-    parser.add_argument("--step-name", default=os.environ.get("REVIEW_PERF_STEP", ""), help="Logical review step name")
+    parser.add_argument(
+        "--step-name",
+        default=os.environ.get("REVIEW_PERF_STEP", ""),
+        help="Logical review step name",
+    )
     parser.add_argument("filters", nargs="*", help="Optional test filters")
     args = parser.parse_args()
 
@@ -125,7 +141,9 @@ def emit_event(event: str, payload: dict[str, Any]) -> None:
     record.update(payload)
     try:
         review_perf_log.append_event(record)
-    except Exception as exc:  # pragma: no cover - logging failures should not fail tests
+    except (
+        Exception
+    ) as exc:  # pragma: no cover - logging failures should not fail tests
         print(f"Warning: failed to append perf event: {exc}", file=sys.stderr)
 
 
@@ -146,7 +164,13 @@ def cargo_scope_args(args: argparse.Namespace) -> list[str]:
 
 def discover_test_binaries(args: argparse.Namespace) -> list[TestBinary]:
     """Compiles tests without running and returns discovered test binaries."""
-    compile_cmd = ["cargo", "test", *cargo_scope_args(args), "--no-run", "--message-format=json"]
+    compile_cmd = [
+        "cargo",
+        "test",
+        *cargo_scope_args(args),
+        "--no-run",
+        "--message-format=json",
+    ]
     emit_event(
         "cargo_compile_start",
         {
@@ -258,7 +282,11 @@ def emit_nightly_test_case_events(lines: list[str]) -> None:
             continue
 
         duration_s = payload.get("exec_time")
-        duration_ms = round(float(duration_s) * 1000, 3) if isinstance(duration_s, (float, int)) else None
+        duration_ms = (
+            round(float(duration_s) * 1000, 3)
+            if isinstance(duration_s, (float, int))
+            else None
+        )
         emit_payload: dict[str, Any] = {
             "status": "ok" if event == "ok" else event,
             "test_name": payload.get("name", ""),
@@ -268,7 +296,9 @@ def emit_nightly_test_case_events(lines: list[str]) -> None:
         emit_event("test_case_end", emit_payload)
 
 
-def run_binary(binary: TestBinary, args: argparse.Namespace, use_nightly_json: bool) -> BinaryExecutionResult:
+def run_binary(
+    binary: TestBinary, args: argparse.Namespace, use_nightly_json: bool
+) -> BinaryExecutionResult:
     """Runs a single discovered test binary."""
     command = [binary.executable]
     if use_nightly_json:
@@ -291,7 +321,13 @@ def run_binary(binary: TestBinary, args: argparse.Namespace, use_nightly_json: b
     )
 
     started = time.monotonic()
-    process = subprocess.Popen(command, cwd=binary.manifest_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    process = subprocess.Popen(
+        command,
+        cwd=binary.manifest_dir,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
     output, error_output = process.communicate()
     elapsed_ms = round((time.monotonic() - started) * 1000, 3)
 
@@ -303,7 +339,9 @@ def run_binary(binary: TestBinary, args: argparse.Namespace, use_nightly_json: b
     if use_nightly_json:
         emit_nightly_test_case_events(output.splitlines())
 
-    passed, failed, ignored, measured, filtered = parse_test_result_counts(f"{output}\n{error_output}")
+    passed, failed, ignored, measured, filtered = parse_test_result_counts(
+        f"{output}\n{error_output}"
+    )
 
     emit_event(
         "test_binary_end",
@@ -405,7 +443,10 @@ def main() -> int:
             return doc_result
 
     if args.require_match and args.filters and total_executed == 0:
-        print(f"Error: No tests matched filters: {' '.join(args.filters)}", file=sys.stderr)
+        print(
+            f"Error: No tests matched filters: {' '.join(args.filters)}",
+            file=sys.stderr,
+        )
         return 1
 
     print("Success")

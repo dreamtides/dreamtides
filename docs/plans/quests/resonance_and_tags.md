@@ -65,9 +65,9 @@ resonance = ["Stone", "Ruin"]
 
 **Distribution guidelines:**
 
-- ~70% of cards carry exactly 1 resonance symbol
+- ~80% of cards carry exactly 1 resonance symbol
 - ~10% carry exactly 2 (more common at uncommon/rare)
-- ~20% carry 0 (neutral)
+- ~10% carry 0 (neutral)
 - Each resonance appears on roughly equal numbers of cards
 - Dreamcallers always carry 1-2 resonance symbols (never neutral)
 - Dreamsigns always carry exactly 1 resonance symbol

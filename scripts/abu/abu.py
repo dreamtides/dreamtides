@@ -45,13 +45,7 @@ ABU_STATE_FILE = Path(__file__).resolve().parent.parent.parent / ".abu-state.jso
 WORKTREE_BASE = Path.home() / "dreamtides-worktrees"
 PORTS_FILE = WORKTREE_BASE / ".ports.json"
 MAIN_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-SAVE_DIR = (
-    Path.home()
-    / "Library"
-    / "Application Support"
-    / "Dreamtides"
-    / "Dreamtides"
-)
+SAVE_DIR = Path.home() / "Library" / "Application Support" / "Dreamtides" / "Dreamtides"
 RESTART_TIMEOUT_SECONDS = 180
 UNITY_EXECUTABLE_PATTERN = "/Unity.app/Contents/MacOS/Unity"
 CLIENT_DIR = Path(__file__).resolve().parent.parent.parent / "client"
@@ -282,9 +276,7 @@ def send_command(command: str, params: dict[str, Any], port: int) -> dict[str, A
                 break
 
         if not buf.strip():
-            raise EmptyResponseError(
-                "Connection closed without response from Unity"
-            )
+            raise EmptyResponseError("Connection closed without response from Unity")
 
         line = buf.split(b"\n", 1)[0]
         return json.loads(line.decode("utf-8"))
@@ -410,7 +402,9 @@ def is_worktree() -> bool:
     try:
         result = subprocess.run(
             ["git", "rev-parse", "--git-dir", "--git-common-dir"],
-            capture_output=True, text=True, check=True,
+            capture_output=True,
+            text=True,
+            check=True,
         )
         lines = result.stdout.strip().splitlines()
         if len(lines) != 2:
@@ -620,9 +614,11 @@ def send_menu_item_robust(path: list[str]) -> str:
 
     raise HammerspoonError(
         "\n"
-        + "=" * 60 + "\n"
+        + "=" * 60
+        + "\n"
         + "  CRITICAL: UNITY MENU COMMAND FAILED\n"
-        + "=" * 60 + "\n"
+        + "=" * 60
+        + "\n"
         + f"\n"
         + f"  Failed to send '{menu_label}' after {max_attempts} attempts.\n"
         + f"\n"
@@ -762,8 +758,7 @@ def wait_for_tests(log_offset: int) -> TestResult:
                             failures.append(log_line[idx:].strip())
 
                 match = re.search(
-                    r"(\d+) passed, (\d+) failed, (\d+) skipped "
-                    r"\(total: (\d+)\)",
+                    r"(\d+) passed, (\d+) failed, (\d+) skipped " r"\(total: (\d+)\)",
                     line,
                 )
                 if match:
@@ -1103,7 +1098,9 @@ def find_unity_process() -> UnityProcessInfo:
     try:
         result = subprocess.run(
             ["ps", "-eo", "pid,comm"],
-            capture_output=True, text=True, check=True,
+            capture_output=True,
+            text=True,
+            check=True,
         )
     except subprocess.CalledProcessError as e:
         raise AbuError(f"Failed to list processes: {e}")
@@ -1120,8 +1117,7 @@ def find_unity_process() -> UnityProcessInfo:
 
     if not candidates:
         raise UnityNotFoundError(
-            "No running Unity Editor process found. "
-            "Is Unity open?"
+            "No running Unity Editor process found. " "Is Unity open?"
         )
 
     # Find the main editor process (not a -batchMode worker).
@@ -1134,7 +1130,9 @@ def find_unity_process() -> UnityProcessInfo:
         try:
             args_result = subprocess.run(
                 ["ps", "-p", str(pid), "-o", "args="],
-                capture_output=True, text=True, check=True,
+                capture_output=True,
+                text=True,
+                check=True,
             )
         except subprocess.CalledProcessError:
             continue
@@ -1149,7 +1147,9 @@ def find_unity_process() -> UnityProcessInfo:
             project_path = match.group(1)
 
         info = UnityProcessInfo(
-            pid=pid, executable=executable, project_path=project_path,
+            pid=pid,
+            executable=executable,
+            project_path=project_path,
         )
 
         if first_non_batch is None:
@@ -1169,7 +1169,9 @@ def find_unity_process() -> UnityProcessInfo:
     # All candidates were batch-mode workers; use the first one as fallback
     pid, executable = candidates[0]
     return UnityProcessInfo(
-        pid=pid, executable=executable, project_path=str(CLIENT_DIR),
+        pid=pid,
+        executable=executable,
+        project_path=str(CLIENT_DIR),
     )
 
 
@@ -1234,9 +1236,15 @@ def do_open(name: str) -> None:
         pass
 
     launch_args: list[str] = [
-        "open", "-n", "-a", str(app_path), "--args",
-        "-projectPath", str(client_path),
-        "-logFile", str(log_path),
+        "open",
+        "-n",
+        "-a",
+        str(app_path),
+        "--args",
+        "-projectPath",
+        str(client_path),
+        "-logFile",
+        str(log_path),
     ]
 
     subprocess.Popen(
@@ -1297,12 +1305,17 @@ def do_restart() -> None:
     # Relaunch Unity via 'open' for proper macOS app activation.
     # Extract the .app bundle path from the executable path.
     app_idx = info.executable.find(".app/")
-    app_path = info.executable[:app_idx + 4] if app_idx >= 0 else info.executable
+    app_path = info.executable[: app_idx + 4] if app_idx >= 0 else info.executable
     print(f"Relaunching Unity ({app_path})...")
 
     launch_args: list[str] = [
-        "open", "-n", "-a", app_path, "--args",
-        "-projectPath", info.project_path,
+        "open",
+        "-n",
+        "-a",
+        app_path,
+        "--args",
+        "-projectPath",
+        info.project_path,
     ]
 
     # For worktree editors, assign a per-worktree log file
@@ -1464,9 +1477,7 @@ def do_create_save(args: argparse.Namespace) -> None:
         print(f"Build failed:\n{build_result.stderr}", file=sys.stderr)
         sys.exit(1)
 
-    binary_path = (
-        project_root / "rules_engine" / "target" / "release" / binary
-    )
+    binary_path = project_root / "rules_engine" / "target" / "release" / binary
 
     cmd: list[str] = [str(binary_path)]
     cmd.extend(["--save-dir", str(SAVE_DIR)])
@@ -1522,29 +1533,39 @@ def build_parser() -> argparse.ArgumentParser:
         "--max-depth", type=int, default=None, help="Maximum tree depth"
     )
     snapshot_parser.add_argument(
-        "--effect-logs", action="store_true", help="Include visual effect logs in output"
+        "--effect-logs",
+        action="store_true",
+        help="Include visual effect logs in output",
     )
 
     # click
     click_parser = subparsers.add_parser("click", help="Click a UI element")
     click_parser.add_argument("ref", help="Element ref (e.g. e1 or @e1)")
     click_parser.add_argument(
-        "--effect-logs", action="store_true", help="Include visual effect logs in output"
+        "--effect-logs",
+        action="store_true",
+        help="Include visual effect logs in output",
     )
 
     # hover
     hover_parser = subparsers.add_parser("hover", help="Hover over a UI element")
     hover_parser.add_argument("ref", help="Element ref (e.g. e1 or @e1)")
     hover_parser.add_argument(
-        "--effect-logs", action="store_true", help="Include visual effect logs in output"
+        "--effect-logs",
+        action="store_true",
+        help="Include visual effect logs in output",
     )
 
     # drag
     drag_parser = subparsers.add_parser("drag", help="Drag from source to target")
     drag_parser.add_argument("source", help="Source element ref")
-    drag_parser.add_argument("target", nargs="?", default=None, help="Target element ref")
     drag_parser.add_argument(
-        "--effect-logs", action="store_true", help="Include visual effect logs in output"
+        "target", nargs="?", default=None, help="Target element ref"
+    )
+    drag_parser.add_argument(
+        "--effect-logs",
+        action="store_true",
+        help="Include visual effect logs in output",
     )
 
     # screenshot
@@ -1555,7 +1576,8 @@ def build_parser() -> argparse.ArgumentParser:
         "refresh", help="Trigger asset refresh and wait for completion"
     )
     refresh_parser.add_argument(
-        "--play", action="store_true",
+        "--play",
+        action="store_true",
         help="Enter play mode after successful refresh",
     )
 
@@ -1563,9 +1585,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("play", help="Toggle play mode")
 
     # test
-    subparsers.add_parser(
-        "test", help="Refresh then run all Edit Mode tests"
-    )
+    subparsers.add_parser("test", help="Refresh then run all Edit Mode tests")
 
     # cycle
     subparsers.add_parser(
@@ -1589,13 +1609,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     # clear-save
-    subparsers.add_parser(
-        "clear-save", help="Delete all Dreamtides save files"
-    )
+    subparsers.add_parser("clear-save", help="Delete all Dreamtides save files")
 
     # set-mode
     set_mode_parser = subparsers.add_parser(
-        "set-mode", help="Set the game mode for play mode (Quest, Battle, PrototypeQuest)"
+        "set-mode",
+        help="Set the game mode for play mode (Quest, Battle, PrototypeQuest)",
     )
     set_mode_parser.add_argument(
         "mode", help="Mode name: Quest, Battle, or PrototypeQuest"
@@ -1617,15 +1636,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="Generate a test save file with custom battle parameters",
     )
     create_save_parser.add_argument(
-        "--energy", type=int, default=None,
+        "--energy",
+        type=int,
+        default=None,
         help="Set player energy to this value",
     )
     create_save_parser.add_argument(
-        "--card", action="append", default=None, dest="cards",
+        "--card",
+        action="append",
+        default=None,
+        dest="cards",
         help="Add a card to player's hand by name (can be repeated)",
     )
     create_save_parser.add_argument(
-        "--list-cards", action="store_true",
+        "--list-cards",
+        action="store_true",
         help="List all available card names and exit",
     )
 
@@ -1674,7 +1699,15 @@ def main() -> None:
             sys.exit(1)
         return
 
-    editor_commands = {"refresh", "play", "test", "cycle", "restart", "set-mode", "set-device"}
+    editor_commands = {
+        "refresh",
+        "play",
+        "test",
+        "cycle",
+        "restart",
+        "set-mode",
+        "set-device",
+    }
 
     if command in editor_commands:
         try:

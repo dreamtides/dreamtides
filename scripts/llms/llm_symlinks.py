@@ -28,7 +28,9 @@ def main() -> None:
         sys.exit(1)
 
     skills = sorted(
-        p.name for p in source_dir.iterdir() if p.is_dir() and not p.name.startswith(".")
+        p.name
+        for p in source_dir.iterdir()
+        if p.is_dir() and not p.name.startswith(".")
     )
 
     for target_dir in targets:
@@ -40,7 +42,10 @@ def main() -> None:
             if not entry.is_symlink():
                 continue
             link_target = os.readlink(entry)
-            if link_target.startswith(LLMS_SKILLS_PREFIX) and not entry.resolve().exists():
+            if (
+                link_target.startswith(LLMS_SKILLS_PREFIX)
+                and not entry.resolve().exists()
+            ):
                 entry.unlink()
 
         # Create symlinks for current skills.

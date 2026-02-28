@@ -198,7 +198,10 @@ class TestSelectDraftDreamsigns:
         all_signs = _make_all_dreamsigns()
         rng = random.Random(42)
         result = select_draft_dreamsigns(
-            all_signs, held=[], rng=rng, count=DRAFT_ENHANCED_COUNT,
+            all_signs,
+            held=[],
+            rng=rng,
+            count=DRAFT_ENHANCED_COUNT,
         )
         assert len(result) == 4
         assert all(not ds.is_bane for ds in result)
@@ -211,7 +214,8 @@ class TestFormatDreamsignOption:
         from sites_dreamsign import format_dreamsign_option
 
         ds = _make_dreamsign(
-            "Sigil of Shifting Tides", Resonance.TIDE,
+            "Sigil of Shifting Tides",
+            Resonance.TIDE,
             effect_text="At the start of each battle, foresee 2.",
         )
         lines = format_dreamsign_option(ds, highlighted=False)
@@ -238,16 +242,12 @@ class TestDreamsignPurge:
         state = _make_quest_state()
         # Fill dreamsigns to the limit
         for i in range(12):
-            state.add_dreamsign(
-                _make_dreamsign(f"Existing {i}", Resonance.TIDE)
-            )
+            state.add_dreamsign(_make_dreamsign(f"Existing {i}", Resonance.TIDE))
         assert state.is_over_dreamsign_limit()
 
         new_sign = _make_dreamsign("New Sign", Resonance.EMBER)
         # Mock single_select to remove index 0 (first dreamsign)
-        with patch(
-            "sites_dreamsign.input_handler.single_select", return_value=0
-        ):
+        with patch("sites_dreamsign.input_handler.single_select", return_value=0):
             handle_dreamsign_purge(state, new_sign)
 
         # Should have removed one and added the new one, net same count
@@ -279,9 +279,7 @@ class TestRunDreamsignOffering:
         all_signs = _make_all_dreamsigns()
         assert state.dreamsign_count() == 0
 
-        with patch(
-            "sites_dreamsign.input_handler.confirm_decline", return_value=True
-        ):
+        with patch("sites_dreamsign.input_handler.confirm_decline", return_value=True):
             run_dreamsign_offering(
                 state=state,
                 all_dreamsigns=all_signs,
@@ -300,9 +298,7 @@ class TestRunDreamsignOffering:
         state = _make_quest_state()
         all_signs = _make_all_dreamsigns()
 
-        with patch(
-            "sites_dreamsign.input_handler.confirm_decline", return_value=False
-        ):
+        with patch("sites_dreamsign.input_handler.confirm_decline", return_value=False):
             run_dreamsign_offering(
                 state=state,
                 all_dreamsigns=all_signs,
@@ -320,9 +316,7 @@ class TestRunDreamsignOffering:
         all_signs = _make_all_dreamsigns()
 
         # Pick the first option (not the skip option which is last)
-        with patch(
-            "sites_dreamsign.input_handler.single_select", return_value=0
-        ):
+        with patch("sites_dreamsign.input_handler.single_select", return_value=0):
             run_dreamsign_offering(
                 state=state,
                 all_dreamsigns=all_signs,
@@ -341,9 +335,7 @@ class TestRunDreamsignOffering:
         all_signs = _make_all_dreamsigns()
 
         # Pick the last option (skip) -- 3 dreamsigns + skip = index 3
-        with patch(
-            "sites_dreamsign.input_handler.single_select", return_value=3
-        ):
+        with patch("sites_dreamsign.input_handler.single_select", return_value=3):
             run_dreamsign_offering(
                 state=state,
                 all_dreamsigns=all_signs,
@@ -366,9 +358,7 @@ class TestRunDreamsignOffering:
         ]
 
         # Skip is the last option; with 1 dreamsign offered, skip is index 1
-        with patch(
-            "sites_dreamsign.input_handler.single_select", return_value=1
-        ):
+        with patch("sites_dreamsign.input_handler.single_select", return_value=1):
             run_dreamsign_offering(
                 state=state,
                 all_dreamsigns=all_signs,
@@ -415,9 +405,7 @@ class TestRunDreamsignOffering:
         state = _make_quest_state()
         all_signs = [_make_dreamsign("Only Tide", Resonance.TIDE)]
 
-        with patch(
-            "sites_dreamsign.input_handler.confirm_decline", return_value=True
-        ):
+        with patch("sites_dreamsign.input_handler.confirm_decline", return_value=True):
             run_dreamsign_offering(
                 state=state,
                 all_dreamsigns=all_signs,
@@ -439,9 +427,7 @@ class TestRunDreamsignOffering:
             def log_site_visit(self, **kwargs: object) -> None:
                 log_calls.append(kwargs)
 
-        with patch(
-            "sites_dreamsign.input_handler.confirm_decline", return_value=True
-        ):
+        with patch("sites_dreamsign.input_handler.confirm_decline", return_value=True):
             run_dreamsign_offering(
                 state=state,
                 all_dreamsigns=all_signs,
@@ -464,9 +450,7 @@ class TestRunDreamsignDraft:
         all_signs = _make_all_dreamsigns()
 
         # Pick first option (not skip)
-        with patch(
-            "sites_dreamsign.input_handler.single_select", return_value=0
-        ):
+        with patch("sites_dreamsign.input_handler.single_select", return_value=0):
             run_dreamsign_draft(
                 state=state,
                 all_dreamsigns=all_signs,
@@ -485,9 +469,7 @@ class TestRunDreamsignDraft:
         all_signs = _make_all_dreamsigns()
 
         # Pick the last option (skip) -- 3 dreamsigns + skip = index 3
-        with patch(
-            "sites_dreamsign.input_handler.single_select", return_value=3
-        ):
+        with patch("sites_dreamsign.input_handler.single_select", return_value=3):
             run_dreamsign_draft(
                 state=state,
                 all_dreamsigns=all_signs,
@@ -509,9 +491,7 @@ class TestRunDreamsignDraft:
         ]
 
         # Skip is the last option; with 1 dreamsign offered, skip is index 1
-        with patch(
-            "sites_dreamsign.input_handler.single_select", return_value=1
-        ):
+        with patch("sites_dreamsign.input_handler.single_select", return_value=1):
             run_dreamsign_draft(
                 state=state,
                 all_dreamsigns=all_signs,
@@ -557,9 +537,7 @@ class TestRunDreamsignDraft:
         state = _make_quest_state()
         all_signs = _make_all_dreamsigns()
 
-        with patch(
-            "sites_dreamsign.input_handler.single_select", return_value=0
-        ):
+        with patch("sites_dreamsign.input_handler.single_select", return_value=0):
             run_dreamsign_draft(
                 state=state,
                 all_dreamsigns=all_signs,
@@ -581,9 +559,7 @@ class TestRunDreamsignDraft:
             def log_site_visit(self, **kwargs: object) -> None:
                 log_calls.append(kwargs)
 
-        with patch(
-            "sites_dreamsign.input_handler.single_select", return_value=0
-        ):
+        with patch("sites_dreamsign.input_handler.single_select", return_value=0):
             run_dreamsign_draft(
                 state=state,
                 all_dreamsigns=all_signs,
@@ -601,9 +577,7 @@ class TestRunDreamsignDraft:
         state = _make_quest_state()
         # Fill to the limit
         for i in range(12):
-            state.add_dreamsign(
-                _make_dreamsign(f"Existing {i}", Resonance.TIDE)
-            )
+            state.add_dreamsign(_make_dreamsign(f"Existing {i}", Resonance.TIDE))
 
         all_signs = _make_all_dreamsigns()
 
@@ -645,7 +619,9 @@ class TestRunDreamsignDraft:
 
         # Verify that 5 options were presented (4 dreamsigns + Skip)
         call_args = mock_select.call_args
-        options = call_args[1]["options"] if "options" in call_args[1] else call_args[0][0]
+        options = (
+            call_args[1]["options"] if "options" in call_args[1] else call_args[0][0]
+        )
         assert len(options) == 5
         # Player skipped, so no dreamsign added
         assert state.dreamsign_count() == 0
@@ -657,9 +633,7 @@ class TestRunDreamsignDraft:
         all_signs = _make_all_dreamsigns()
 
         # Pick first option in enhanced draft
-        with patch(
-            "sites_dreamsign.input_handler.single_select", return_value=0
-        ):
+        with patch("sites_dreamsign.input_handler.single_select", return_value=0):
             run_dreamsign_draft(
                 state=state,
                 all_dreamsigns=all_signs,
@@ -683,9 +657,7 @@ class TestRunDreamsignDraft:
             def log_site_visit(self, **kwargs: object) -> None:
                 log_calls.append(kwargs)
 
-        with patch(
-            "sites_dreamsign.input_handler.single_select", return_value=0
-        ):
+        with patch("sites_dreamsign.input_handler.single_select", return_value=0):
             run_dreamsign_draft(
                 state=state,
                 all_dreamsigns=all_signs,

@@ -256,12 +256,10 @@ def visit_site(
 
     elif site_type == SiteType.BATTLE:
         battle_config: dict[str, int] = {
-            k: int(v)
-            for k, v in data.config.get("battle_rewards", {}).items()
+            k: int(v) for k, v in data.config.get("battle_rewards", {}).items()
         }
         quest_config: dict[str, int] = {
-            k: int(v)
-            for k, v in data.config.get("quest", {}).items()
+            k: int(v) for k, v in data.config.get("quest", {}).items()
         }
         sites_battle.run_battle(
             state=quest_state,

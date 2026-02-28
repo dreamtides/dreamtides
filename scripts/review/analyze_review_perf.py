@@ -45,14 +45,41 @@ class AnalysisError(Exception):
 def parse_args() -> argparse.Namespace:
     """Parses analyzer CLI arguments."""
     parser = argparse.ArgumentParser(description="Analyze just review performance logs")
-    parser.add_argument("--log-path", default=os.environ.get("REVIEW_PERF_LOG_PATH", ".logs/review.jsonl"))
-    parser.add_argument("--runs", type=int, default=25, help="Number of recent runs for trend table")
-    parser.add_argument("--window", type=int, default=10, help="Window size for regression deltas")
-    parser.add_argument("--top-binaries", type=int, default=10, help="Count of slowest binaries to display")
-    parser.add_argument("--include-backfill", action="store_true", help="Include backfill runs in summaries")
-    parser.add_argument("--backfill-commits", type=int, default=0, help="Run sampled historical backfill before analysis")
-    parser.add_argument("--sample-every", type=int, default=10, help="Backfill sampling interval")
-    parser.add_argument("--backfill-command", default="just review", help="Command to execute for each backfill sample")
+    parser.add_argument(
+        "--log-path",
+        default=os.environ.get("REVIEW_PERF_LOG_PATH", ".logs/review.jsonl"),
+    )
+    parser.add_argument(
+        "--runs", type=int, default=25, help="Number of recent runs for trend table"
+    )
+    parser.add_argument(
+        "--window", type=int, default=10, help="Window size for regression deltas"
+    )
+    parser.add_argument(
+        "--top-binaries",
+        type=int,
+        default=10,
+        help="Count of slowest binaries to display",
+    )
+    parser.add_argument(
+        "--include-backfill",
+        action="store_true",
+        help="Include backfill runs in summaries",
+    )
+    parser.add_argument(
+        "--backfill-commits",
+        type=int,
+        default=0,
+        help="Run sampled historical backfill before analysis",
+    )
+    parser.add_argument(
+        "--sample-every", type=int, default=10, help="Backfill sampling interval"
+    )
+    parser.add_argument(
+        "--backfill-command",
+        default="just review",
+        help="Command to execute for each backfill sample",
+    )
     return parser.parse_args()
 
 
@@ -77,7 +104,9 @@ def read_events(log_path: Path) -> list[dict[str, Any]]:
     return events
 
 
-def aggregate_runs(events: list[dict[str, Any]], include_backfill: bool) -> list[RunSummary]:
+def aggregate_runs(
+    events: list[dict[str, Any]], include_backfill: bool
+) -> list[RunSummary]:
     """Aggregates per-run metrics from raw events."""
     runs: dict[str, RunSummary] = {}
 
@@ -91,7 +120,11 @@ def aggregate_runs(events: list[dict[str, Any]], include_backfill: bool) -> list
 
         if event_name == "run_start":
             run.ts_start = str(event.get("ts", ""))
-            run.run_seq = event.get("run_seq") if isinstance(event.get("run_seq"), int) else run.run_seq
+            run.run_seq = (
+                event.get("run_seq")
+                if isinstance(event.get("run_seq"), int)
+                else run.run_seq
+            )
             run.source = str(event.get("source", run.source))
             run.git_commit = str(event.get("git_commit", run.git_commit))
             run.git_branch = str(event.get("git_branch", run.git_branch))
@@ -149,12 +182,16 @@ def print_latest_run(run: RunSummary, top_binaries: int) -> None:
 
     if run.step_ms:
         print("\nTop slow steps:")
-        for step_name, duration in sorted(run.step_ms.items(), key=lambda item: item[1], reverse=True)[:8]:
+        for step_name, duration in sorted(
+            run.step_ms.items(), key=lambda item: item[1], reverse=True
+        )[:8]:
             print(f"  {step_name:<18} {format_ms(duration)}")
 
     if run.test_binary_ms:
         print("\nTop slow test binaries:")
-        top = sorted(run.test_binary_ms, key=lambda item: item[1], reverse=True)[:top_binaries]
+        top = sorted(run.test_binary_ms, key=lambda item: item[1], reverse=True)[
+            :top_binaries
+        ]
         for binary, duration, step_name in top:
             short_name = os.path.basename(binary)
             step_label = f" [{step_name}]" if step_name else ""
@@ -214,7 +251,9 @@ def print_regression_window(runs: list[RunSummary], window: int) -> None:
 
     if step_deltas:
         print("\nLargest step regressions:")
-        for step_name, step_delta, step_pct, recent_step_mean in sorted(step_deltas, key=lambda item: item[1], reverse=True)[:6]:
+        for step_name, step_delta, step_pct, recent_step_mean in sorted(
+            step_deltas, key=lambda item: item[1], reverse=True
+        )[:6]:
             if step_delta <= 0:
                 continue
             print(
@@ -229,18 +268,27 @@ def print_recent_table(runs: list[RunSummary], count: int) -> None:
     for run in runs[-count:]:
         seq = str(run.run_seq) if run.run_seq is not None else "-"
         commit = run.git_commit[:10] if run.git_commit else "-"
-        print(f"  {seq:<8} {run.status:<7} {format_ms(run.total_ms):<10} {commit:<12} {run.source}")
+        print(
+            f"  {seq:<8} {run.status:<7} {format_ms(run.total_ms):<10} {commit:<12} {run.source}"
+        )
 
 
-def run_backfill(log_path: Path, commit_count: int, sample_every: int, command: str) -> None:
+def run_backfill(
+    log_path: Path, commit_count: int, sample_every: int, command: str
+) -> None:
     """Runs sampled backfill review executions across historical commits."""
     if commit_count <= 0:
         return
 
     rev_list = subprocess.check_output(
-        ["git", "rev-list", "--first-parent", f"--max-count={commit_count}", "HEAD"], text=True
+        ["git", "rev-list", "--first-parent", f"--max-count={commit_count}", "HEAD"],
+        text=True,
     ).splitlines()
-    sampled = [commit for index, commit in enumerate(rev_list) if index % max(sample_every, 1) == 0]
+    sampled = [
+        commit
+        for index, commit in enumerate(rev_list)
+        if index % max(sample_every, 1) == 0
+    ]
     if rev_list and rev_list[-1] not in sampled:
         sampled.append(rev_list[-1])
 
@@ -251,19 +299,29 @@ def run_backfill(log_path: Path, commit_count: int, sample_every: int, command: 
         temp_root = Path(temp_dir)
         for index, commit in enumerate(sampled, start=1):
             worktree_dir = temp_root / commit[:12]
-            subprocess.check_call(["git", "worktree", "add", "--detach", str(worktree_dir), commit])
+            subprocess.check_call(
+                ["git", "worktree", "add", "--detach", str(worktree_dir), commit]
+            )
             try:
                 env = dict(os.environ)
                 env["REVIEW_PERF"] = "1"
                 env["REVIEW_PERF_SOURCE"] = "backfill"
                 env["REVIEW_PERF_LOG_PATH"] = str(log_path)
-                env["REVIEW_PERF_RETAIN_RUNS"] = os.environ.get("REVIEW_PERF_RETAIN_RUNS", "1000")
-                print(f"  [{index}/{len(sampled)}] {commit[:12]} -> {' '.join(command_args)}")
+                env["REVIEW_PERF_RETAIN_RUNS"] = os.environ.get(
+                    "REVIEW_PERF_RETAIN_RUNS", "1000"
+                )
+                print(
+                    f"  [{index}/{len(sampled)}] {commit[:12]} -> {' '.join(command_args)}"
+                )
                 subprocess.check_call(command_args, cwd=worktree_dir, env=env)
             except subprocess.CalledProcessError as exc:
-                print(f"    backfill run failed at {commit[:12]} (exit {exc.returncode})")
+                print(
+                    f"    backfill run failed at {commit[:12]} (exit {exc.returncode})"
+                )
             finally:
-                subprocess.check_call(["git", "worktree", "remove", "--force", str(worktree_dir)])
+                subprocess.check_call(
+                    ["git", "worktree", "remove", "--force", str(worktree_dir)]
+                )
 
 
 def main() -> int:
@@ -272,7 +330,9 @@ def main() -> int:
     log_path = Path(args.log_path).resolve()
 
     if args.backfill_commits > 0:
-        run_backfill(log_path, args.backfill_commits, args.sample_every, args.backfill_command)
+        run_backfill(
+            log_path, args.backfill_commits, args.sample_every, args.backfill_command
+        )
 
     events = read_events(log_path)
     runs = aggregate_runs(events, include_backfill=args.include_backfill)

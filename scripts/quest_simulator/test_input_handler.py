@@ -106,41 +106,31 @@ class TestReadKey:
     def test_arrow_up(self) -> None:
         stdin = self._make_stdin("\x1b[A")
         with patch("input_handler.sys.stdin", stdin):
-            with patch(
-                "input_handler.select.select", return_value=([stdin], [], [])
-            ):
+            with patch("input_handler.select.select", return_value=([stdin], [], [])):
                 assert _read_key() == KEY_UP
 
     def test_arrow_down(self) -> None:
         stdin = self._make_stdin("\x1b[B")
         with patch("input_handler.sys.stdin", stdin):
-            with patch(
-                "input_handler.select.select", return_value=([stdin], [], [])
-            ):
+            with patch("input_handler.select.select", return_value=([stdin], [], [])):
                 assert _read_key() == KEY_DOWN
 
     def test_arrow_right(self) -> None:
         stdin = self._make_stdin("\x1b[C")
         with patch("input_handler.sys.stdin", stdin):
-            with patch(
-                "input_handler.select.select", return_value=([stdin], [], [])
-            ):
+            with patch("input_handler.select.select", return_value=([stdin], [], [])):
                 assert _read_key() == KEY_RIGHT
 
     def test_arrow_left(self) -> None:
         stdin = self._make_stdin("\x1b[D")
         with patch("input_handler.sys.stdin", stdin):
-            with patch(
-                "input_handler.select.select", return_value=([stdin], [], [])
-            ):
+            with patch("input_handler.select.select", return_value=([stdin], [], [])):
                 assert _read_key() == KEY_LEFT
 
     def test_bare_escape(self) -> None:
         stdin = self._make_stdin("\x1b")
         with patch("input_handler.sys.stdin", stdin):
-            with patch(
-                "input_handler.select.select", return_value=([], [], [])
-            ):
+            with patch("input_handler.select.select", return_value=([], [], [])):
                 assert _read_key() == KEY_QUIT
 
 
@@ -294,15 +284,11 @@ class TestSigtstpHandler:
                 with patch("input_handler.termios") as mock_termios:
                     with patch("input_handler.os.kill") as mock_kill:
                         with patch("input_handler.os.getpid", return_value=123):
-                            input_handler._sigtstp_handler(
-                                signal.SIGTSTP, None
-                            )
+                            input_handler._sigtstp_handler(signal.SIGTSTP, None)
                             # Should have restored terminal
                             mock_termios.tcsetattr.assert_called()
                             # Should have sent SIGSTOP to self
-                            mock_kill.assert_called_with(
-                                123, signal.SIGSTOP
-                            )
+                            mock_kill.assert_called_with(123, signal.SIGSTOP)
 
         input_handler._saved_termios = None
 
@@ -315,9 +301,5 @@ class TestSigtstpHandler:
             with patch("input_handler.os.kill"):
                 with patch("input_handler.os.getpid", return_value=1):
                     with patch("input_handler.signal.signal") as mock_signal:
-                        input_handler._sigtstp_handler(
-                            signal.SIGTSTP, None
-                        )
-                        mock_signal.assert_called_with(
-                            signal.SIGTSTP, signal.SIG_DFL
-                        )
+                        input_handler._sigtstp_handler(signal.SIGTSTP, None)
+                        mock_signal.assert_called_with(signal.SIGTSTP, signal.SIG_DFL)

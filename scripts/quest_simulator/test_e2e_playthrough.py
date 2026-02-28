@@ -198,13 +198,14 @@ class TestJsonlLogCompleteness:
             _, log_path = _run_full_quest(42)
         events = _parse_log(log_path)
         shop_visits = [
-            e for e in events
+            e
+            for e in events
             if e["event"] == "site_visit"
             and e.get("site_type") in ("Shop", "SpecialtyShop")
         ]
-        assert len(shop_visits) > 0, (
-            "No Shop or SpecialtyShop site_visit events found in the log"
-        )
+        assert (
+            len(shop_visits) > 0
+        ), "No Shop or SpecialtyShop site_visit events found in the log"
         log_path.unlink()
 
     def test_shop_purchase_only_logged_when_items_bought(self) -> None:
@@ -214,9 +215,9 @@ class TestJsonlLogCompleteness:
         events = _parse_log(log_path)
         shop_events = [e for e in events if e["event"] == "shop_purchase"]
         for e in shop_events:
-            assert len(e.get("items_bought", [])) > 0, (
-                "shop_purchase event logged with empty items_bought"
-            )
+            assert (
+                len(e.get("items_bought", [])) > 0
+            ), "shop_purchase event logged with empty items_bought"
         log_path.unlink()
 
     def test_log_contains_battle_completes(self) -> None:
@@ -233,8 +234,11 @@ class TestJsonlLogCompleteness:
         events = _parse_log(log_path)
         types = set(e["event"] for e in events)
         required = {
-            "session_start", "site_visit", "draft_pick",
-            "battle_complete", "session_end",
+            "session_start",
+            "site_visit",
+            "draft_pick",
+            "battle_complete",
+            "session_end",
         }
         missing = required - types
         assert not missing, f"Missing event types: {missing}"
@@ -267,8 +271,12 @@ class TestDeterminism:
         assert types1 == types2
 
         # Dreamscape names should match
-        ds1 = [e["dreamscape_name"] for e in events1 if e["event"] == "dreamscape_enter"]
-        ds2 = [e["dreamscape_name"] for e in events2 if e["event"] == "dreamscape_enter"]
+        ds1 = [
+            e["dreamscape_name"] for e in events1 if e["event"] == "dreamscape_enter"
+        ]
+        ds2 = [
+            e["dreamscape_name"] for e in events2 if e["event"] == "dreamscape_enter"
+        ]
         assert ds1 == ds2
 
         log1_path.unlink()
@@ -284,8 +292,12 @@ class TestDeterminism:
         events1 = _parse_log(log1_path)
         events2 = _parse_log(log2_path)
 
-        ds1 = [e["dreamscape_name"] for e in events1 if e["event"] == "dreamscape_enter"]
-        ds2 = [e["dreamscape_name"] for e in events2 if e["event"] == "dreamscape_enter"]
+        ds1 = [
+            e["dreamscape_name"] for e in events1 if e["event"] == "dreamscape_enter"
+        ]
+        ds2 = [
+            e["dreamscape_name"] for e in events2 if e["event"] == "dreamscape_enter"
+        ]
         assert ds1 != ds2
 
         log1_path.unlink()
@@ -389,11 +401,22 @@ class TestSiteTypeCoverage:
             log_path.unlink()
 
         required = {
-            "DreamcallerDraft", "Draft", "Shop", "DiscoveryDraft",
-            "SpecialtyShop", "DreamsignOffering", "DreamsignDraft",
-            "DreamJourney", "TemptingOffer", "Purge", "Essence",
-            "Transfiguration", "Duplication", "RewardSite",
-            "Cleanse", "Battle",
+            "DreamcallerDraft",
+            "Draft",
+            "Shop",
+            "DiscoveryDraft",
+            "SpecialtyShop",
+            "DreamsignOffering",
+            "DreamsignDraft",
+            "DreamJourney",
+            "TemptingOffer",
+            "Purge",
+            "Essence",
+            "Transfiguration",
+            "Duplication",
+            "RewardSite",
+            "Cleanse",
+            "Battle",
         }
         missing = required - all_site_types
         assert not missing, f"Missing site types: {missing}"

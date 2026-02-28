@@ -63,14 +63,10 @@ def format_dreamcaller_option(
     for res_name, amount in sorted(dc.resonance_bonus.items()):
         try:
             res_enum = Resonance(res_name)
-            res_bonus_parts.append(
-                f"{render.color_resonance(res_enum)} +{amount}"
-            )
+            res_bonus_parts.append(f"{render.color_resonance(res_enum)} +{amount}")
         except ValueError:
             res_bonus_parts.append(f"{res_name} +{amount}")
-    res_bonus_str = (
-        ", ".join(res_bonus_parts) if res_bonus_parts else "none"
-    )
+    res_bonus_str = ", ".join(res_bonus_parts) if res_bonus_parts else "none"
     lines.append(f"      Resonance Bonus: {res_bonus_str}")
 
     # Line 4: Tags
@@ -79,14 +75,10 @@ def format_dreamcaller_option(
     lines.append(f"      Tags: {tag_str}")
 
     # Line 5: Essence bonus (bold)
-    lines.append(
-        f"      Essence Bonus: {render.BOLD}+{dc.essence_bonus}{render.RESET}"
-    )
+    lines.append(f"      Essence Bonus: {render.BOLD}+{dc.essence_bonus}{render.RESET}")
 
     # Line 6: Quoted ability text (dimmed)
-    lines.append(
-        f"      {render.DIM}\"{dc.ability_text}\"{render.RESET}"
-    )
+    lines.append(f'      {render.DIM}"{dc.ability_text}"{render.RESET}')
 
     return lines
 
@@ -115,9 +107,7 @@ def format_confirmation(
     for res_name, amount in sorted(dc.resonance_bonus.items()):
         try:
             res_enum = Resonance(res_name)
-            res_bonus_parts.append(
-                f"{render.color_resonance(res_enum)} +{amount}"
-            )
+            res_bonus_parts.append(f"{render.color_resonance(res_enum)} +{amount}")
         except ValueError:
             res_bonus_parts.append(f"{res_name} +{amount}")
     if res_bonus_parts:
@@ -155,11 +145,13 @@ def run_dreamcaller_draft(
     choices = select_dreamcallers(all_dreamcallers, state.rng)
 
     # Display header
-    print(render_status.site_header(
-        dreamscape_name=dreamscape_name,
-        site_type_label="Dreamcaller Draft",
-        dreamscape_number=dreamscape_number,
-    ))
+    print(
+        render_status.site_header(
+            dreamscape_name=dreamscape_name,
+            site_type_label="Dreamcaller Draft",
+            dreamscape_number=dreamscape_number,
+        )
+    )
     print()
     print(f"  {render.BOLD}Choose your Dreamcaller:{render.RESET}")
     print()

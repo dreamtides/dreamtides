@@ -111,18 +111,14 @@ def _show_victory(
         state.dreamcaller.name if state.dreamcaller is not None else "None"
     )
     dreamcaller_resonances: frozenset[Resonance] = (
-        state.dreamcaller.resonances
-        if state.dreamcaller is not None
-        else frozenset()
+        state.dreamcaller.resonances if state.dreamcaller is not None else frozenset()
     )
 
     rarity_counts = state.deck_by_rarity()
     resonance_counts = state.resonance_profile.snapshot()
 
     # Count neutral cards (cards with no resonances)
-    neutral_count = sum(
-        1 for dc in state.deck if not dc.card.resonances
-    )
+    neutral_count = sum(1 for dc in state.deck if not dc.card.resonances)
 
     screen = render_status.victory_screen(
         battles_won=state.completion_level,
@@ -191,10 +187,7 @@ def _dreamscape_loop(
             break
 
         # Check if we are about to unlock battle (only battle left)
-        if (
-            len(selectable) == 1
-            and selectable[0].site_type == SiteType.BATTLE
-        ):
+        if len(selectable) == 1 and selectable[0].site_type == SiteType.BATTLE:
             _enforce_deck_limits(state, logger)
 
         # Display site list
@@ -205,8 +198,7 @@ def _dreamscape_loop(
 
         # Build selection options: View Deck first, then selectable sites
         option_labels = [_VIEW_DECK_LABEL] + [
-            render_atlas.site_type_name(s.site_type)
-            + ("*" if s.is_enhanced else "")
+            render_atlas.site_type_name(s.site_type) + ("*" if s.is_enhanced else "")
             for s in selectable
         ]
 

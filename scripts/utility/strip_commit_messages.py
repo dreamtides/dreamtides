@@ -13,11 +13,7 @@ import argparse
 def run_command(cmd, check=True, capture_output=True):
     """Run a shell command and return the result."""
     result = subprocess.run(
-        cmd,
-        shell=True,
-        capture_output=capture_output,
-        text=True,
-        check=False
+        cmd, shell=True, capture_output=capture_output, text=True, check=False
     )
     if check and result.returncode != 0:
         print(f"Command failed: {cmd}", file=sys.stderr)
@@ -28,7 +24,9 @@ def run_command(cmd, check=True, capture_output=True):
 
 def get_upstream_branch():
     """Get the upstream branch for the current branch."""
-    result = run_command("git rev-parse --abbrev-ref --symbolic-full-name @{u}", check=False)
+    result = run_command(
+        "git rev-parse --abbrev-ref --symbolic-full-name @{u}", check=False
+    )
     if result.returncode == 0:
         return result.stdout.strip()
 
@@ -53,14 +51,14 @@ def get_unpushed_commits():
         result = run_command("git rev-list HEAD", check=False)
         if result.returncode != 0:
             return []
-        commits = result.stdout.strip().split('\n')
+        commits = result.stdout.strip().split("\n")
         return [c for c in commits if c]
 
     result = run_command(f"git rev-list {upstream}..HEAD", check=False)
     if result.returncode != 0:
         return []
 
-    commits = result.stdout.strip().split('\n')
+    commits = result.stdout.strip().split("\n")
     return [c for c in commits if c]
 
 
@@ -72,23 +70,23 @@ def get_commit_message(commit_hash):
 
 def should_strip_message(message):
     """Check if a commit message contains lines that should be stripped."""
-    lines = message.split('\n')
+    lines = message.split("\n")
     for line in lines:
         stripped = line.strip()
-        if 'Generated with' in stripped or stripped.startswith('Co-Authored-By:'):
+        if "Generated with" in stripped or stripped.startswith("Co-Authored-By:"):
             return True
     return False
 
 
 def strip_message(message):
     """Remove lines containing 'Generated with' or 'Co-Authored-By' from message."""
-    lines = message.split('\n')
+    lines = message.split("\n")
     filtered_lines = []
 
     for line in lines:
         stripped = line.strip()
         # Skip lines containing 'Generated with' or starting with 'Co-Authored-By:'
-        if 'Generated with' in line or stripped.startswith('Co-Authored-By:'):
+        if "Generated with" in line or stripped.startswith("Co-Authored-By:"):
             continue
         filtered_lines.append(line)
 
@@ -96,7 +94,7 @@ def strip_message(message):
     while filtered_lines and not filtered_lines[-1].strip():
         filtered_lines.pop()
 
-    return '\n'.join(filtered_lines)
+    return "\n".join(filtered_lines)
 
 
 def check_commits(verbose=False):
@@ -112,7 +110,9 @@ def check_commits(verbose=False):
             found_issues = True
             short_hash = run_command(f"git log -1 --format=%h {commit}").stdout.strip()
             subject = run_command(f"git log -1 --format=%s {commit}").stdout.strip()
-            print(f"Commit {short_hash} contains 'Generated with' or 'Co-Authored-By' lines: {subject}")
+            print(
+                f"Commit {short_hash} contains 'Generated with' or 'Co-Authored-By' lines: {subject}"
+            )
 
     return not found_issues
 
@@ -146,7 +146,7 @@ def strip_commits():
     # Create a script for git filter-branch or use rebase
     # Using rebase with --exec is safer
     # Use a temporary script to amend commits during rebase
-    script_content = '''#!/bin/bash
+    script_content = """#!/bin/bash
 COMMIT_MSG=$(git log -1 --format=%B)
 if echo "$COMMIT_MSG" | grep -q "Generated with\\|Co-Authored-By:"; then
     NEW_MSG=$(echo "$COMMIT_MSG" | grep -v "Generated with" | grep -v "Co-Authored-By:")
@@ -154,10 +154,10 @@ if echo "$COMMIT_MSG" | grep -q "Generated with\\|Co-Authored-By:"; then
     NEW_MSG=$(echo "$NEW_MSG" | sed -e :a -e '/^\\s*$/d;N;ba')
     git commit --amend -m "$NEW_MSG"
 fi
-'''
+"""
 
     # Write the script
-    with open('/tmp/git-strip-commit-msg.sh', 'w') as f:
+    with open("/tmp/git-strip-commit-msg.sh", "w") as f:
         f.write(script_content)
 
     run_command("chmod +x /tmp/git-strip-commit-msg.sh", capture_output=False)
@@ -166,11 +166,14 @@ fi
     result = run_command(
         f"GIT_SEQUENCE_EDITOR=true git rebase -i --exec /tmp/git-strip-commit-msg.sh {base}",
         check=False,
-        capture_output=False
+        capture_output=False,
     )
 
     if result.returncode != 0:
-        print("\nRebase failed. You may need to resolve conflicts manually.", file=sys.stderr)
+        print(
+            "\nRebase failed. You may need to resolve conflicts manually.",
+            file=sys.stderr,
+        )
         print("Run 'git rebase --abort' to cancel the operation.", file=sys.stderr)
         sys.exit(1)
 
@@ -180,15 +183,11 @@ def main():
         description="Strip 'Generated with' and 'Co-Authored-By' lines from unpushed git commits"
     )
     parser.add_argument(
-        '--check',
-        action='store_true',
-        help='Check if commits contain unwanted lines (returns non-zero exit code if found)'
+        "--check",
+        action="store_true",
+        help="Check if commits contain unwanted lines (returns non-zero exit code if found)",
     )
-    parser.add_argument(
-        '--verbose',
-        action='store_true',
-        help='Print verbose output'
-    )
+    parser.add_argument("--verbose", action="store_true", help="Print verbose output")
 
     args = parser.parse_args()
 
@@ -199,5 +198,5 @@ def main():
         strip_commits()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -19,9 +19,9 @@ review:
         python3 scripts/review/review_runner.py
     fi
 
-review-direct: check-snapshots check-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test python-test pyre-check local-unity-test parser-test tv-check tv-clippy tv-test
+review-direct: check-snapshots check-format check-python-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test python-test pyre-check local-unity-test parser-test tv-check tv-clippy tv-test
 
-review-verbose: check-snapshots check-format-verbose check-docs-format-verbose check-token-limits-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose local-unity-test review-core-test-verbose python-test-verbose pyre-check-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
+review-verbose: check-snapshots check-format-verbose check-python-format-verbose check-docs-format-verbose check-token-limits-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose local-unity-test review-core-test-verbose python-test-verbose pyre-check-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
 
 review-scope-plan:
     python3 scripts/review/review_scope.py plan
@@ -528,7 +528,7 @@ insta:
 
 # Reformats code. Requires nightly because several useful options (e.g. imports_granularity) are
 # nightly-only
-fmt: style-validator-fix rlf-fmt fmt-docs fmt-csharp
+fmt: style-validator-fix rlf-fmt fmt-docs fmt-csharp fmt-python
     #!/usr/bin/env bash
     python3 scripts/llms/llm_symlinks.py > /dev/null
     output=$(cd rules_engine && cargo +nightly fmt 2>&1)
@@ -593,6 +593,29 @@ check-format:
 
 check-format-verbose:
     cd rules_engine && cargo +nightly fmt -- --check
+
+fmt-python:
+    #!/usr/bin/env bash
+    output=$(uvx black scripts/ --exclude '\.venv' 2>&1)
+    if [ $? -eq 0 ]; then
+        echo "Python formatted"
+    else
+        echo "$output"
+        exit 1
+    fi
+
+check-python-format:
+    #!/usr/bin/env bash
+    output=$(uvx black --check scripts/ --exclude '\.venv' 2>&1)
+    if [ $? -eq 0 ]; then
+        echo "Python format OK"
+    else
+        echo "$output"
+        exit 1
+    fi
+
+check-python-format-verbose:
+    uvx black --check scripts/ --exclude '\.venv'
 
 check-docs:
     RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links -D rustdoc::private-intra-doc-links -D rustdoc::bare-urls" cargo doc --manifest-path rules_engine/Cargo.toml --all

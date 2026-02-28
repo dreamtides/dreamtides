@@ -31,19 +31,36 @@ class ReviewPerfLogTests(unittest.TestCase):
             review_perf_log.ensure_event_schema({"event": "bogus", "run_id": "x"})
 
     def test_schema_accepts_scope_plan(self) -> None:
-        event = review_perf_log.ensure_event_schema({"event": "scope_plan", "run_id": "run-1"})
+        event = review_perf_log.ensure_event_schema(
+            {"event": "scope_plan", "run_id": "run-1"}
+        )
         self.assertEqual(event["event"], "scope_plan")
 
     def test_append_and_prune_runs(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             log_path = Path(temp_dir) / "review.jsonl"
 
-            review_perf_log.append_event({"event": "run_start", "run_id": "r1", "run_seq": 1}, log_path)
-            review_perf_log.append_event({"event": "run_end", "run_id": "r1", "duration_ms": 10, "status": "ok"}, log_path)
-            review_perf_log.append_event({"event": "run_start", "run_id": "r2", "run_seq": 2}, log_path)
-            review_perf_log.append_event({"event": "run_end", "run_id": "r2", "duration_ms": 11, "status": "ok"}, log_path)
-            review_perf_log.append_event({"event": "run_start", "run_id": "r3", "run_seq": 3}, log_path)
-            review_perf_log.append_event({"event": "run_end", "run_id": "r3", "duration_ms": 12, "status": "ok"}, log_path)
+            review_perf_log.append_event(
+                {"event": "run_start", "run_id": "r1", "run_seq": 1}, log_path
+            )
+            review_perf_log.append_event(
+                {"event": "run_end", "run_id": "r1", "duration_ms": 10, "status": "ok"},
+                log_path,
+            )
+            review_perf_log.append_event(
+                {"event": "run_start", "run_id": "r2", "run_seq": 2}, log_path
+            )
+            review_perf_log.append_event(
+                {"event": "run_end", "run_id": "r2", "duration_ms": 11, "status": "ok"},
+                log_path,
+            )
+            review_perf_log.append_event(
+                {"event": "run_start", "run_id": "r3", "run_seq": 3}, log_path
+            )
+            review_perf_log.append_event(
+                {"event": "run_end", "run_id": "r3", "duration_ms": 12, "status": "ok"},
+                log_path,
+            )
 
             removed = review_perf_log.prune_to_max_runs(2, log_path)
             self.assertEqual(removed, 1)
@@ -70,7 +87,10 @@ class ReviewPerfLogTests(unittest.TestCase):
                         log_path,
                     )
 
-            threads = [threading.Thread(target=worker, args=(worker_id,)) for worker_id in range(4)]
+            threads = [
+                threading.Thread(target=worker, args=(worker_id,))
+                for worker_id in range(4)
+            ]
             for thread in threads:
                 thread.start()
             for thread in threads:
@@ -89,11 +109,35 @@ class AnalyzeReviewPerfTests(unittest.TestCase):
 
     def test_aggregate_runs(self) -> None:
         events = [
-            {"event": "run_start", "run_id": "r1", "run_seq": 1, "ts": "2026-01-01T00:00:00Z", "source": "default", "git_commit": "abc"},
-            {"event": "step_end", "run_id": "r1", "step_name": "test", "duration_ms": 2000},
+            {
+                "event": "run_start",
+                "run_id": "r1",
+                "run_seq": 1,
+                "ts": "2026-01-01T00:00:00Z",
+                "source": "default",
+                "git_commit": "abc",
+            },
+            {
+                "event": "step_end",
+                "run_id": "r1",
+                "step_name": "test",
+                "duration_ms": 2000,
+            },
             {"event": "cargo_compile_end", "run_id": "r1", "duration_ms": 250},
-            {"event": "test_binary_end", "run_id": "r1", "binary": "/tmp/bin1", "duration_ms": 1000, "step_name": "test"},
-            {"event": "run_end", "run_id": "r1", "status": "ok", "duration_ms": 5000, "ts": "2026-01-01T00:01:00Z"},
+            {
+                "event": "test_binary_end",
+                "run_id": "r1",
+                "binary": "/tmp/bin1",
+                "duration_ms": 1000,
+                "step_name": "test",
+            },
+            {
+                "event": "run_end",
+                "run_id": "r1",
+                "status": "ok",
+                "duration_ms": 5000,
+                "ts": "2026-01-01T00:01:00Z",
+            },
         ]
 
         runs = analyze_review_perf.aggregate_runs(events, include_backfill=False)
@@ -110,7 +154,9 @@ class ProfileCargoTestHelpersTests(unittest.TestCase):
 
     def test_parse_test_result_counts(self) -> None:
         sample = "test result: ok. 12 passed; 1 failed; 2 ignored; 0 measured; 3 filtered out"
-        self.assertEqual(profile_cargo_test.parse_test_result_counts(sample), (12, 1, 2, 0, 3))
+        self.assertEqual(
+            profile_cargo_test.parse_test_result_counts(sample), (12, 1, 2, 0, 3)
+        )
 
     def test_nightly_fallback_detection(self) -> None:
         result = profile_cargo_test.BinaryExecutionResult(
@@ -236,7 +282,9 @@ class ReviewScopePlannerTests(unittest.TestCase):
         }
 
         def fail_if_called(_: list[str], __: Path) -> tuple[int, str, str]:
-            raise AssertionError("git commands should not run when REVIEW_SCOPE_CHANGED_FILES is set")
+            raise AssertionError(
+                "git commands should not run when REVIEW_SCOPE_CHANGED_FILES is set"
+            )
 
         decision = review_scope.plan_review_scope(
             self.step_names,
@@ -247,8 +295,12 @@ class ReviewScopePlannerTests(unittest.TestCase):
             command_runner=fail_if_called,
         )
 
-        self.assertEqual(decision.changed_files_source, "env:REVIEW_SCOPE_CHANGED_FILES")
-        self.assertEqual(decision.changed_files, ["rules_engine/src/core_data/src/lib.rs"])
+        self.assertEqual(
+            decision.changed_files_source, "env:REVIEW_SCOPE_CHANGED_FILES"
+        )
+        self.assertEqual(
+            decision.changed_files, ["rules_engine/src/core_data/src/lib.rs"]
+        )
 
     def test_default_local_strategy_uses_only_head_changes(self) -> None:
         env = {"REVIEW_SCOPE_MODE": "enforce"}
@@ -264,7 +316,9 @@ class ReviewScopePlannerTests(unittest.TestCase):
                 return (0, "scratch/new_file.txt\n", "")
             raise AssertionError(f"unexpected command: {args}")
 
-        changed = review_scope.resolve_changed_files(env, Path.cwd(), command_runner=command_runner)
+        changed = review_scope.resolve_changed_files(
+            env, Path.cwd(), command_runner=command_runner
+        )
         self.assertEqual(changed.source, "local-head-dirty")
         self.assertEqual(
             changed.changed_files,
@@ -328,7 +382,9 @@ class ReviewScopePlannerTests(unittest.TestCase):
                 return (0, "rules_engine/src/parser/src/lib.rs\n", "")
             raise AssertionError(f"unexpected command: {args}")
 
-        changed = review_scope.resolve_changed_files(env, Path.cwd(), command_runner=command_runner)
+        changed = review_scope.resolve_changed_files(
+            env, Path.cwd(), command_runner=command_runner
+        )
         self.assertEqual(changed.source, "local-merge-base-union")
         self.assertEqual(
             changed.changed_files,
@@ -539,7 +595,9 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.assertIn("python-test", decision.selected_steps)
         self.assertEqual(decision.skipped_steps["build"], "python/docs-only changes")
         self.assertEqual(decision.skipped_steps["clippy"], "python/docs-only changes")
-        self.assertEqual(decision.skipped_steps["test-core"], "python/docs-only changes")
+        self.assertEqual(
+            decision.skipped_steps["test-core"], "python/docs-only changes"
+        )
         self.assertNotIn("python-test", decision.skipped_steps)
 
     def test_shell_script_change_is_core_not_unmapped(self) -> None:
@@ -603,7 +661,9 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.assertIn("python-test", decision.selected_steps)
         self.assertEqual(decision.skipped_steps["build"], "python/docs-only changes")
         self.assertEqual(decision.skipped_steps["clippy"], "python/docs-only changes")
-        self.assertEqual(decision.skipped_steps["test-core"], "python/docs-only changes")
+        self.assertEqual(
+            decision.skipped_steps["test-core"], "python/docs-only changes"
+        )
 
     def test_scope_validator_passes_repo_config(self) -> None:
         repo_root = Path(__file__).resolve().parents[3]
@@ -615,10 +675,16 @@ class ReviewScopePlannerTests(unittest.TestCase):
     def test_scope_validator_fails_missing_required_trigger(self) -> None:
         broken = replace(
             self.config,
-            global_full_triggers=tuple(trigger for trigger in self.config.global_full_triggers if trigger != ".github/"),
+            global_full_triggers=tuple(
+                trigger
+                for trigger in self.config.global_full_triggers
+                if trigger != ".github/"
+            ),
         )
         errors = review_scope.validate_scope_configuration(broken, self.metadata)
-        self.assertTrue(any("missing required global full triggers" in error for error in errors))
+        self.assertTrue(
+            any("missing required global full triggers" in error for error in errors)
+        )
 
 
 if __name__ == "__main__":

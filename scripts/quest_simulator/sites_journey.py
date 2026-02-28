@@ -201,7 +201,10 @@ def apply_journey_effect(
 
     if journey.effect_type == EffectType.ADD_CARDS:
         added = _add_cards_from_pool(
-            state, journey.effect_value, algorithm_params, pool_params,
+            state,
+            journey.effect_value,
+            algorithm_params,
+            pool_params,
         )
         changes["cards_added"] = [c.name for c in added]
 
@@ -294,13 +297,14 @@ def _format_journey_option(
     """Format a journey for display in the selection menu."""
     marker = ">" if highlighted else " "
     effect_label = _EFFECT_TYPE_LABELS.get(
-        journey.effect_type, journey.effect_type.value,
+        journey.effect_type,
+        journey.effect_type.value,
     )
     line1 = (
         f"  {marker} {render.BOLD}{journey.name}{render.RESET}"
         f"  ({effect_label}: {journey.effect_value})"
     )
-    line2 = f"      \"{journey.description}\""
+    line2 = f'      "{journey.description}"'
     return [line1, line2]
 
 
@@ -311,23 +315,25 @@ def _format_offer_option(
     """Format an offer for display in the selection menu."""
     marker = ">" if highlighted else " "
     reward_label = _EFFECT_TYPE_LABELS.get(
-        offer.reward_effect_type, offer.reward_effect_type.value,
+        offer.reward_effect_type,
+        offer.reward_effect_type.value,
     )
     cost_label = _EFFECT_TYPE_LABELS.get(
-        offer.cost_effect_type, offer.cost_effect_type.value,
+        offer.cost_effect_type,
+        offer.cost_effect_type.value,
     )
 
     line1 = (
         f"  {marker} {render.BOLD}Reward:{render.RESET} {offer.reward_name}"
         f"  ({reward_label}: {offer.reward_value})"
     )
-    line2 = f"      \"{offer.reward_description}\""
+    line2 = f'      "{offer.reward_description}"'
     sep = f"      {render.DIM}{'- ' * 20}{render.RESET}"
     line3 = (
         f"      {render.BOLD}Cost:{render.RESET} {offer.cost_name}"
         f"  ({cost_label}: {offer.cost_value})"
     )
-    line4 = f"      \"{offer.cost_description}\""
+    line4 = f'      "{offer.cost_description}"'
     return [line1, line2, sep, line3, line4]
 
 
@@ -386,12 +392,17 @@ def run_dream_journey(
         choice_made = selected.name
 
         state_changes = apply_journey_effect(
-            state, selected, algorithm_params, pool_params, all_dreamsigns,
+            state,
+            selected,
+            algorithm_params,
+            pool_params,
+            all_dreamsigns,
         )
 
         print()
         effect_label = _EFFECT_TYPE_LABELS.get(
-            selected.effect_type, selected.effect_type.value,
+            selected.effect_type,
+            selected.effect_type.value,
         )
         print(
             f"  {render.BOLD}Selected:{render.RESET} {selected.name}"
@@ -480,37 +491,38 @@ def run_tempting_offer(
 
         # Apply reward first, then cost
         reward_changes = apply_reward_effect(
-            state, selected.reward_effect_type, selected.reward_value,
-            algorithm_params, pool_params, all_dreamsigns,
+            state,
+            selected.reward_effect_type,
+            selected.reward_value,
+            algorithm_params,
+            pool_params,
+            all_dreamsigns,
         )
         cost_changes = apply_cost_effect(
-            state, selected.cost_effect_type, selected.cost_value,
-            all_banes, all_dreamsigns,
+            state,
+            selected.cost_effect_type,
+            selected.cost_value,
+            all_banes,
+            all_dreamsigns,
         )
 
         state_changes = {**reward_changes, **cost_changes}
 
         print()
         reward_label = _EFFECT_TYPE_LABELS.get(
-            selected.reward_effect_type, selected.reward_effect_type.value,
+            selected.reward_effect_type,
+            selected.reward_effect_type.value,
         )
         cost_label = _EFFECT_TYPE_LABELS.get(
-            selected.cost_effect_type, selected.cost_effect_type.value,
+            selected.cost_effect_type,
+            selected.cost_effect_type.value,
         )
-        print(
-            f"  {render.BOLD}Selected:{render.RESET} {selected.reward_name}"
-        )
-        print(
-            f"    Reward: {reward_label}: {selected.reward_value}"
-        )
-        print(
-            f"    Cost: {cost_label}: {selected.cost_value}"
-        )
+        print(f"  {render.BOLD}Selected:{render.RESET} {selected.reward_name}")
+        print(f"    Reward: {reward_label}: {selected.reward_value}")
+        print(f"    Cost: {cost_label}: {selected.cost_value}")
     else:
         print()
-        print(
-            f"  {render.DIM}Declined all offers.{render.RESET}"
-        )
+        print(f"  {render.DIM}Declined all offers.{render.RESET}")
 
     # Log the interaction
     if logger is not None:

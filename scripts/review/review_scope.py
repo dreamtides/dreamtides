@@ -115,9 +115,18 @@ class ScopedDomain:
 
 def parse_args() -> argparse.Namespace:
     """Parses CLI arguments for scope planning and validation."""
-    parser = argparse.ArgumentParser(description="Plan and validate scoped review execution")
-    parser.add_argument("command", choices=["plan", "validate"], nargs="?", default="plan")
-    parser.add_argument("--config-path", default=os.environ.get("REVIEW_SCOPE_CONFIG_PATH", str(DEFAULT_SCOPE_CONFIG_PATH)))
+    parser = argparse.ArgumentParser(
+        description="Plan and validate scoped review execution"
+    )
+    parser.add_argument(
+        "command", choices=["plan", "validate"], nargs="?", default="plan"
+    )
+    parser.add_argument(
+        "--config-path",
+        default=os.environ.get(
+            "REVIEW_SCOPE_CONFIG_PATH", str(DEFAULT_SCOPE_CONFIG_PATH)
+        ),
+    )
     return parser.parse_args()
 
 
@@ -197,9 +206,15 @@ def parse_changed_files_override(raw_value: str) -> list[str]:
         try:
             payload = json.loads(stripped)
         except json.JSONDecodeError as exc:
-            raise ScopePlannerError(f"invalid REVIEW_SCOPE_CHANGED_FILES JSON: {exc}") from exc
-        if not isinstance(payload, list) or not all(isinstance(item, str) for item in payload):
-            raise ScopePlannerError("REVIEW_SCOPE_CHANGED_FILES JSON must be an array of strings")
+            raise ScopePlannerError(
+                f"invalid REVIEW_SCOPE_CHANGED_FILES JSON: {exc}"
+            ) from exc
+        if not isinstance(payload, list) or not all(
+            isinstance(item, str) for item in payload
+        ):
+            raise ScopePlannerError(
+                "REVIEW_SCOPE_CHANGED_FILES JSON must be an array of strings"
+            )
         values = [normalize_repo_path(item) for item in payload]
     else:
         values = [normalize_repo_path(line) for line in stripped.splitlines()]
@@ -207,7 +222,9 @@ def parse_changed_files_override(raw_value: str) -> list[str]:
     return dedupe_keep_order([value for value in values if value])
 
 
-def run_git_lines(command_runner: CommandRunner, repo_root: Path, args: list[str]) -> list[str]:
+def run_git_lines(
+    command_runner: CommandRunner, repo_root: Path, args: list[str]
+) -> list[str]:
     """Runs a git command and returns normalized path lines."""
     code, stdout, stderr = command_runner(args, repo_root)
     if code != 0:
@@ -218,7 +235,9 @@ def run_git_lines(command_runner: CommandRunner, repo_root: Path, args: list[str
     return dedupe_keep_order([line for line in lines if line])
 
 
-def run_git_single(command_runner: CommandRunner, repo_root: Path, args: list[str]) -> str:
+def run_git_single(
+    command_runner: CommandRunner, repo_root: Path, args: list[str]
+) -> str:
     """Runs a git command expected to return a single value."""
     code, stdout, stderr = command_runner(args, repo_root)
     if code != 0:
@@ -231,35 +250,69 @@ def run_git_single(command_runner: CommandRunner, repo_root: Path, args: list[st
     return value
 
 
-def resolve_changed_files(env: Mapping[str, str], repo_root: Path, command_runner: CommandRunner = run_command) -> ChangedFilesResult:
+def resolve_changed_files(
+    env: Mapping[str, str], repo_root: Path, command_runner: CommandRunner = run_command
+) -> ChangedFilesResult:
     """Resolves changed files using deterministic source precedence."""
     override = env.get("REVIEW_SCOPE_CHANGED_FILES", "")
     if override.strip():
         changed_files = parse_changed_files_override(override)
-        return ChangedFilesResult(changed_files=changed_files, source="env:REVIEW_SCOPE_CHANGED_FILES")
+        return ChangedFilesResult(
+            changed_files=changed_files, source="env:REVIEW_SCOPE_CHANGED_FILES"
+        )
 
     base_ref = env.get("REVIEW_SCOPE_BASE_REF", "").strip()
     head_ref = env.get("REVIEW_SCOPE_HEAD_REF", "").strip()
     if base_ref and head_ref:
-        changed_files = run_git_lines(command_runner, repo_root, ["git", "diff", "--name-only", f"{base_ref}...{head_ref}"])
-        return ChangedFilesResult(changed_files=changed_files, source=f"git:{base_ref}...{head_ref}")
+        changed_files = run_git_lines(
+            command_runner,
+            repo_root,
+            ["git", "diff", "--name-only", f"{base_ref}...{head_ref}"],
+        )
+        return ChangedFilesResult(
+            changed_files=changed_files, source=f"git:{base_ref}...{head_ref}"
+        )
 
     if is_truthy(env.get("CI")):
-        merge_base = run_git_single(command_runner, repo_root, ["git", "merge-base", DEFAULT_BASE_BRANCH, "HEAD"])
-        changed_files = run_git_lines(command_runner, repo_root, ["git", "diff", "--name-only", f"{merge_base}...HEAD"])
-        return ChangedFilesResult(changed_files=changed_files, source=f"ci-merge-base:{DEFAULT_BASE_BRANCH}")
+        merge_base = run_git_single(
+            command_runner,
+            repo_root,
+            ["git", "merge-base", DEFAULT_BASE_BRANCH, "HEAD"],
+        )
+        changed_files = run_git_lines(
+            command_runner,
+            repo_root,
+            ["git", "diff", "--name-only", f"{merge_base}...HEAD"],
+        )
+        return ChangedFilesResult(
+            changed_files=changed_files, source=f"ci-merge-base:{DEFAULT_BASE_BRANCH}"
+        )
 
-    local_strategy = normalize_local_scope_strategy(env.get("REVIEW_SCOPE_LOCAL_STRATEGY"))
-    staged_diff = run_git_lines(command_runner, repo_root, ["git", "diff", "--name-only", "--cached", "HEAD"])
-    unstaged_diff = run_git_lines(command_runner, repo_root, ["git", "diff", "--name-only"])
-    untracked = run_git_lines(command_runner, repo_root, ["git", "ls-files", "--others", "--exclude-standard"])
+    local_strategy = normalize_local_scope_strategy(
+        env.get("REVIEW_SCOPE_LOCAL_STRATEGY")
+    )
+    staged_diff = run_git_lines(
+        command_runner, repo_root, ["git", "diff", "--name-only", "--cached", "HEAD"]
+    )
+    unstaged_diff = run_git_lines(
+        command_runner, repo_root, ["git", "diff", "--name-only"]
+    )
+    untracked = run_git_lines(
+        command_runner, repo_root, ["git", "ls-files", "--others", "--exclude-standard"]
+    )
     local_changes = dedupe_keep_order([*staged_diff, *unstaged_diff, *untracked])
     if local_strategy == "head-if-dirty":
         source = "local-head-dirty" if local_changes else "local-clean"
         return ChangedFilesResult(changed_files=local_changes, source=source)
 
-    merge_base = run_git_single(command_runner, repo_root, ["git", "merge-base", DEFAULT_BASE_BRANCH, "HEAD"])
-    branch_diff = run_git_lines(command_runner, repo_root, ["git", "diff", "--name-only", f"{merge_base}...HEAD"])
+    merge_base = run_git_single(
+        command_runner, repo_root, ["git", "merge-base", DEFAULT_BASE_BRANCH, "HEAD"]
+    )
+    branch_diff = run_git_lines(
+        command_runner,
+        repo_root,
+        ["git", "diff", "--name-only", f"{merge_base}...HEAD"],
+    )
     union = dedupe_keep_order([*branch_diff, *local_changes])
     return ChangedFilesResult(changed_files=union, source="local-merge-base-union")
 
@@ -290,30 +343,58 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
         raise ScopePlannerError("scope config 'csharp' must be an object")
 
     def read_rules(value: Any, field_name: str) -> tuple[str, ...]:
-        if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
-            raise ScopePlannerError(f"scope config '{field_name}' must be an array of strings")
+        if not isinstance(value, list) or not all(
+            isinstance(item, str) for item in value
+        ):
+            raise ScopePlannerError(
+                f"scope config '{field_name}' must be an array of strings"
+            )
         normalized = [normalize_rule_path(item) for item in value]
         return tuple(item for item in normalized if item)
 
     def read_names(value: Any, field_name: str) -> tuple[str, ...]:
-        if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
-            raise ScopePlannerError(f"scope config '{field_name}' must be an array of strings")
+        if not isinstance(value, list) or not all(
+            isinstance(item, str) for item in value
+        ):
+            raise ScopePlannerError(
+                f"scope config '{field_name}' must be an array of strings"
+            )
         normalized = [item.strip() for item in value]
         return tuple(item for item in normalized if item)
 
     return ScopeConfig(
-        required_global_full_triggers=read_rules(payload.get("required_global_full_triggers", []), "required_global_full_triggers"),
-        global_full_triggers=read_rules(payload.get("global_full_triggers", []), "global_full_triggers"),
-        parser_crate_seeds=read_names(parser_section.get("crate_seeds", []), "parser.crate_seeds"),
-        parser_path_prefixes=read_rules(parser_section.get("path_prefixes", []), "parser.path_prefixes"),
+        required_global_full_triggers=read_rules(
+            payload.get("required_global_full_triggers", []),
+            "required_global_full_triggers",
+        ),
+        global_full_triggers=read_rules(
+            payload.get("global_full_triggers", []), "global_full_triggers"
+        ),
+        parser_crate_seeds=read_names(
+            parser_section.get("crate_seeds", []), "parser.crate_seeds"
+        ),
+        parser_path_prefixes=read_rules(
+            parser_section.get("path_prefixes", []), "parser.path_prefixes"
+        ),
         tv_crate_seeds=read_names(tv_section.get("crate_seeds", []), "tv.crate_seeds"),
-        tv_path_prefixes=read_rules(tv_section.get("path_prefixes", []), "tv.path_prefixes"),
-        csharp_crate_seeds=read_names(csharp_section.get("crate_seeds", []), "csharp.crate_seeds"),
-        csharp_path_prefixes=read_rules(csharp_section.get("path_prefixes", []), "csharp.path_prefixes"),
-        always_run_steps=read_names(payload.get("always_run_steps", []), "always_run_steps"),
-        markdown_only_skip_steps=read_names(payload.get("markdown_only_skip_steps", []), "markdown_only_skip_steps"),
+        tv_path_prefixes=read_rules(
+            tv_section.get("path_prefixes", []), "tv.path_prefixes"
+        ),
+        csharp_crate_seeds=read_names(
+            csharp_section.get("crate_seeds", []), "csharp.crate_seeds"
+        ),
+        csharp_path_prefixes=read_rules(
+            csharp_section.get("path_prefixes", []), "csharp.path_prefixes"
+        ),
+        always_run_steps=read_names(
+            payload.get("always_run_steps", []), "always_run_steps"
+        ),
+        markdown_only_skip_steps=read_names(
+            payload.get("markdown_only_skip_steps", []), "markdown_only_skip_steps"
+        ),
         python_docs_only_skip_steps=read_names(
-            payload.get("python_docs_only_skip_steps", []), "python_docs_only_skip_steps"
+            payload.get("python_docs_only_skip_steps", []),
+            "python_docs_only_skip_steps",
         ),
         parser_steps=read_names(payload.get("parser_steps", []), "parser_steps"),
         tv_steps=read_names(payload.get("tv_steps", []), "tv_steps"),
@@ -322,7 +403,9 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
     )
 
 
-def load_workspace_metadata(repo_root: Path, command_runner: CommandRunner = run_command) -> WorkspaceMetadata:
+def load_workspace_metadata(
+    repo_root: Path, command_runner: CommandRunner = run_command
+) -> WorkspaceMetadata:
     """Loads workspace crate roots and reverse dependency edges from Cargo metadata."""
     command = [
         "cargo",
@@ -341,7 +424,9 @@ def load_workspace_metadata(repo_root: Path, command_runner: CommandRunner = run
     try:
         payload = json.loads(stdout)
     except json.JSONDecodeError as exc:
-        raise ScopePlannerError(f"failed to parse cargo metadata output: {exc}") from exc
+        raise ScopePlannerError(
+            f"failed to parse cargo metadata output: {exc}"
+        ) from exc
 
     packages = payload.get("packages", [])
     workspace_members = set(payload.get("workspace_members", []))
@@ -350,7 +435,9 @@ def load_workspace_metadata(repo_root: Path, command_runner: CommandRunner = run
         raise ScopePlannerError("cargo metadata payload missing packages list")
 
     workspace_packages = [
-        package for package in packages if not workspace_members or package.get("id") in workspace_members
+        package
+        for package in packages
+        if not workspace_members or package.get("id") in workspace_members
     ]
 
     crate_roots: dict[str, str] = {}
@@ -373,7 +460,9 @@ def load_workspace_metadata(repo_root: Path, command_runner: CommandRunner = run
         try:
             relative_root = manifest_dir.relative_to(repo_root_resolved)
         except ValueError as exc:
-            raise ScopePlannerError(f"workspace crate root is outside repository: {manifest_dir}") from exc
+            raise ScopePlannerError(
+                f"workspace crate root is outside repository: {manifest_dir}"
+            ) from exc
 
         normalized_root = normalize_repo_path(relative_root.as_posix())
         crate_roots[name] = normalized_root
@@ -394,12 +483,16 @@ def load_workspace_metadata(repo_root: Path, command_runner: CommandRunner = run
             if not isinstance(dependency_path, str) or not dependency_path:
                 continue
 
-            dependency_name = manifest_dir_to_name.get(str(Path(dependency_path).resolve()))
+            dependency_name = manifest_dir_to_name.get(
+                str(Path(dependency_path).resolve())
+            )
             if dependency_name is None:
                 continue
             reverse_dependencies.setdefault(dependency_name, set()).add(name)
 
-    return WorkspaceMetadata(crate_roots=crate_roots, reverse_dependencies=reverse_dependencies)
+    return WorkspaceMetadata(
+        crate_roots=crate_roots, reverse_dependencies=reverse_dependencies
+    )
 
 
 def scoped_domains(config: ScopeConfig) -> tuple[ScopedDomain, ...]:
@@ -478,7 +571,9 @@ def crates_for_path(path: str, crate_roots: dict[str, str]) -> list[str]:
     return matched
 
 
-def expand_impacted_crates(direct_crates: set[str], reverse_dependencies: dict[str, set[str]]) -> list[str]:
+def expand_impacted_crates(
+    direct_crates: set[str], reverse_dependencies: dict[str, set[str]]
+) -> list[str]:
     """Computes reverse dependency closure for directly touched crates."""
     impacted = set(direct_crates)
     stack = list(direct_crates)
@@ -505,7 +600,9 @@ def select_steps(
         return (list(step_names), {})
 
     docs_only = impacted_domains == {"docs"}
-    python_docs_only = bool(impacted_domains) and impacted_domains.issubset({"docs", "python"})
+    python_docs_only = bool(impacted_domains) and impacted_domains.issubset(
+        {"docs", "python"}
+    )
     always_steps = set(config.always_run_steps)
     docs_skip_steps = set(config.markdown_only_skip_steps)
     python_docs_skip_steps = set(config.python_docs_only_skip_steps)
@@ -572,11 +669,21 @@ def plan_review_scope(
             unmapped_paths=[],
         )
 
-    scope_config = config or load_scope_config(Path(effective_env.get("REVIEW_SCOPE_CONFIG_PATH", str(DEFAULT_SCOPE_CONFIG_PATH))))
-    changed_files_result = resolve_changed_files(effective_env, effective_repo_root, command_runner)
+    scope_config = config or load_scope_config(
+        Path(
+            effective_env.get(
+                "REVIEW_SCOPE_CONFIG_PATH", str(DEFAULT_SCOPE_CONFIG_PATH)
+            )
+        )
+    )
+    changed_files_result = resolve_changed_files(
+        effective_env, effective_repo_root, command_runner
+    )
 
     force_full_by_env = is_truthy(effective_env.get("REVIEW_SCOPE_FORCE_FULL"))
-    forced_full_reason = "forced by REVIEW_SCOPE_FORCE_FULL" if force_full_by_env else ""
+    forced_full_reason = (
+        "forced by REVIEW_SCOPE_FORCE_FULL" if force_full_by_env else ""
+    )
 
     if changed_files_result.error and not forced_full_reason:
         forced_full_reason = changed_files_result.error
@@ -585,21 +692,27 @@ def plan_review_scope(
     if not changed_files and not forced_full_reason:
         forced_full_reason = "no changed files detected"
 
-    markdown_only = bool(changed_files) and all(is_markdown_path(changed_path) for changed_path in changed_files)
+    markdown_only = bool(changed_files) and all(
+        is_markdown_path(changed_path) for changed_path in changed_files
+    )
     domain_rules = scoped_domains(scope_config)
     impacted_domains: set[str] = {"docs"} if markdown_only else set()
     impacted_crates: list[str] = []
     unmapped_paths: list[str] = []
 
     if not forced_full_reason and changed_files and not markdown_only:
-        workspace_metadata = metadata or load_workspace_metadata(effective_repo_root, command_runner)
+        workspace_metadata = metadata or load_workspace_metadata(
+            effective_repo_root, command_runner
+        )
 
         direct_crates: set[str] = set()
         docs_path_impact = False
         path_impacts: dict[str, bool] = {domain.name: False for domain in domain_rules}
 
         for changed_path in changed_files:
-            full_trigger_match = first_matching_rule(changed_path, scope_config.global_full_triggers)
+            full_trigger_match = first_matching_rule(
+                changed_path, scope_config.global_full_triggers
+            )
             changed_path_is_markdown = is_markdown_path(changed_path)
             changed_path_is_shell = path_has_extension(changed_path, SHELL_EXTENSIONS)
             domain_matches = {
@@ -609,10 +722,14 @@ def plan_review_scope(
                 )
                 for domain in domain_rules
             }
-            mapped_crates = crates_for_path(changed_path, workspace_metadata.crate_roots)
+            mapped_crates = crates_for_path(
+                changed_path, workspace_metadata.crate_roots
+            )
 
             if full_trigger_match and not forced_full_reason:
-                forced_full_reason = f"matched global full trigger '{full_trigger_match}'"
+                forced_full_reason = (
+                    f"matched global full trigger '{full_trigger_match}'"
+                )
 
             for domain_name, matched in domain_matches.items():
                 if matched:
@@ -623,14 +740,20 @@ def plan_review_scope(
             if mapped_crates:
                 direct_crates.update(mapped_crates)
 
-            has_domain_match = changed_path_is_markdown or changed_path_is_shell or any(domain_matches.values())
+            has_domain_match = (
+                changed_path_is_markdown
+                or changed_path_is_shell
+                or any(domain_matches.values())
+            )
             if not full_trigger_match and not has_domain_match and not mapped_crates:
                 unmapped_paths.append(changed_path)
 
         if unmapped_paths and not forced_full_reason:
             forced_full_reason = f"unmapped changed path '{unmapped_paths[0]}'"
 
-        impacted_crates = expand_impacted_crates(direct_crates, workspace_metadata.reverse_dependencies)
+        impacted_crates = expand_impacted_crates(
+            direct_crates, workspace_metadata.reverse_dependencies
+        )
         impacted_crates_set = set(impacted_crates)
         if docs_path_impact:
             impacted_domains.add("docs")
@@ -673,7 +796,9 @@ def plan_review_scope(
     )
 
 
-def fallback_full_scope_decision(step_names: list[str], mode: str, reason: str) -> ScopeDecision:
+def fallback_full_scope_decision(
+    step_names: list[str], mode: str, reason: str
+) -> ScopeDecision:
     """Builds a fail-closed full-run scope decision used on planner errors."""
     return ScopeDecision(
         mode=mode,
@@ -703,7 +828,9 @@ def find_duplicates(values: tuple[str, ...]) -> list[str]:
     return sorted(duplicates)
 
 
-def validate_scope_configuration(config: ScopeConfig, metadata: WorkspaceMetadata) -> list[str]:
+def validate_scope_configuration(
+    config: ScopeConfig, metadata: WorkspaceMetadata
+) -> list[str]:
     """Validates scope config coverage and rule consistency."""
     errors: list[str] = []
     domain_rules = scoped_domains(config)
@@ -712,7 +839,9 @@ def validate_scope_configuration(config: ScopeConfig, metadata: WorkspaceMetadat
     configured = set(config.global_full_triggers)
     missing_required = sorted(required - configured)
     if missing_required:
-        errors.append(f"missing required global full triggers: {', '.join(missing_required)}")
+        errors.append(
+            f"missing required global full triggers: {', '.join(missing_required)}"
+        )
 
     duplicate_checks: list[tuple[str, tuple[str, ...]]] = [
         ("global_full_triggers", config.global_full_triggers),
@@ -727,7 +856,9 @@ def validate_scope_configuration(config: ScopeConfig, metadata: WorkspaceMetadat
     for field_name, values in duplicate_checks:
         duplicates = find_duplicates(values)
         if duplicates:
-            errors.append(f"{field_name} contains duplicate entries: {', '.join(duplicates)}")
+            errors.append(
+                f"{field_name} contains duplicate entries: {', '.join(duplicates)}"
+            )
 
     full_rules = set(config.global_full_triggers)
     always_step_set = set(config.always_run_steps)
@@ -741,43 +872,65 @@ def validate_scope_configuration(config: ScopeConfig, metadata: WorkspaceMetadat
 
     unknown_markdown_steps = sorted(markdown_step_set - known_steps)
     if unknown_markdown_steps:
-        errors.append(f"markdown-only skip steps are unknown: {', '.join(unknown_markdown_steps)}")
+        errors.append(
+            f"markdown-only skip steps are unknown: {', '.join(unknown_markdown_steps)}"
+        )
     unknown_python_docs_steps = sorted(python_docs_step_set - known_steps)
     if unknown_python_docs_steps:
-        errors.append(f"python/docs-only skip steps are unknown: {', '.join(unknown_python_docs_steps)}")
+        errors.append(
+            f"python/docs-only skip steps are unknown: {', '.join(unknown_python_docs_steps)}"
+        )
 
     for domain in domain_rules:
         rule_set = set(domain.path_prefixes)
         full_overlap = sorted(rule_set & full_rules)
         if full_overlap:
-            errors.append(f"{domain.name} path rules conflict with full-run rules: {', '.join(full_overlap)}")
+            errors.append(
+                f"{domain.name} path rules conflict with full-run rules: {', '.join(full_overlap)}"
+            )
 
         always_overlap = sorted(always_step_set & domain_step_sets[domain.name])
         if always_overlap:
-            errors.append(f"always-run and {domain.name} step sets overlap: {', '.join(always_overlap)}")
+            errors.append(
+                f"always-run and {domain.name} step sets overlap: {', '.join(always_overlap)}"
+            )
 
     for index, left_domain in enumerate(domain_rules):
         for right_domain in domain_rules[index + 1 :]:
-            path_overlap = sorted(set(left_domain.path_prefixes) & set(right_domain.path_prefixes))
+            path_overlap = sorted(
+                set(left_domain.path_prefixes) & set(right_domain.path_prefixes)
+            )
             if path_overlap:
                 errors.append(
                     f"{left_domain.name} and {right_domain.name} path rules overlap exactly: {', '.join(path_overlap)}"
                 )
 
-            step_overlap = sorted(domain_step_sets[left_domain.name] & domain_step_sets[right_domain.name])
+            step_overlap = sorted(
+                domain_step_sets[left_domain.name] & domain_step_sets[right_domain.name]
+            )
             if step_overlap:
                 errors.append(
                     f"{left_domain.name} and {right_domain.name} step sets overlap: {', '.join(step_overlap)}"
                 )
 
-            seed_overlap = sorted(domain_seed_sets[left_domain.name] & domain_seed_sets[right_domain.name])
+            seed_overlap = sorted(
+                domain_seed_sets[left_domain.name] & domain_seed_sets[right_domain.name]
+            )
             if seed_overlap:
-                errors.append(f"crate seeds appear in multiple domains: {', '.join(seed_overlap)}")
+                errors.append(
+                    f"crate seeds appear in multiple domains: {', '.join(seed_overlap)}"
+                )
 
     for crate_name in sorted(metadata.crate_roots):
-        matching_domains = [domain.name for domain in domain_rules if crate_name in domain_seed_sets[domain.name]]
+        matching_domains = [
+            domain.name
+            for domain in domain_rules
+            if crate_name in domain_seed_sets[domain.name]
+        ]
         if len(matching_domains) > 1:
-            errors.append(f"crate '{crate_name}' is classifiable into multiple domains: {', '.join(matching_domains)}")
+            errors.append(
+                f"crate '{crate_name}' is classifiable into multiple domains: {', '.join(matching_domains)}"
+            )
 
     return errors
 

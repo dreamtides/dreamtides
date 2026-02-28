@@ -50,16 +50,61 @@ def _make_card(
 def _make_test_cards() -> list[Card]:
     """Create a set of test cards spanning rarities and resonances."""
     return [
-        _make_card("Tide Card A", 1, rarity=Rarity.COMMON, resonances=frozenset({Resonance.TIDE})),
-        _make_card("Tide Card B", 2, rarity=Rarity.COMMON, resonances=frozenset({Resonance.TIDE})),
-        _make_card("Ember Card A", 3, rarity=Rarity.UNCOMMON, resonances=frozenset({Resonance.EMBER})),
-        _make_card("Ember Card B", 4, rarity=Rarity.UNCOMMON, resonances=frozenset({Resonance.EMBER})),
-        _make_card("Stone Card A", 5, rarity=Rarity.RARE, resonances=frozenset({Resonance.STONE})),
-        _make_card("Zephyr Card A", 6, rarity=Rarity.COMMON, resonances=frozenset({Resonance.ZEPHYR})),
-        _make_card("Ruin Card A", 7, rarity=Rarity.COMMON, resonances=frozenset({Resonance.RUIN})),
+        _make_card(
+            "Tide Card A",
+            1,
+            rarity=Rarity.COMMON,
+            resonances=frozenset({Resonance.TIDE}),
+        ),
+        _make_card(
+            "Tide Card B",
+            2,
+            rarity=Rarity.COMMON,
+            resonances=frozenset({Resonance.TIDE}),
+        ),
+        _make_card(
+            "Ember Card A",
+            3,
+            rarity=Rarity.UNCOMMON,
+            resonances=frozenset({Resonance.EMBER}),
+        ),
+        _make_card(
+            "Ember Card B",
+            4,
+            rarity=Rarity.UNCOMMON,
+            resonances=frozenset({Resonance.EMBER}),
+        ),
+        _make_card(
+            "Stone Card A",
+            5,
+            rarity=Rarity.RARE,
+            resonances=frozenset({Resonance.STONE}),
+        ),
+        _make_card(
+            "Zephyr Card A",
+            6,
+            rarity=Rarity.COMMON,
+            resonances=frozenset({Resonance.ZEPHYR}),
+        ),
+        _make_card(
+            "Ruin Card A",
+            7,
+            rarity=Rarity.COMMON,
+            resonances=frozenset({Resonance.RUIN}),
+        ),
         _make_card("Neutral Card A", 8, rarity=Rarity.COMMON, resonances=frozenset()),
-        _make_card("Dual Card A", 9, rarity=Rarity.LEGENDARY, resonances=frozenset({Resonance.TIDE, Resonance.RUIN})),
-        _make_card("Stone Card B", 10, rarity=Rarity.UNCOMMON, resonances=frozenset({Resonance.STONE})),
+        _make_card(
+            "Dual Card A",
+            9,
+            rarity=Rarity.LEGENDARY,
+            resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
+        ),
+        _make_card(
+            "Stone Card B",
+            10,
+            rarity=Rarity.UNCOMMON,
+            resonances=frozenset({Resonance.STONE}),
+        ),
     ]
 
 
@@ -298,7 +343,10 @@ class TestApplyJourneyEffect:
         initial_pool = len(state.pool)
 
         apply_journey_effect(
-            state, journey, _make_algorithm_params(), _make_pool_params(),
+            state,
+            journey,
+            _make_algorithm_params(),
+            _make_pool_params(),
             _make_dreamsigns(),
         )
 
@@ -317,7 +365,10 @@ class TestApplyJourneyEffect:
         )
 
         apply_journey_effect(
-            state, journey, _make_algorithm_params(), _make_pool_params(),
+            state,
+            journey,
+            _make_algorithm_params(),
+            _make_pool_params(),
             _make_dreamsigns(),
         )
 
@@ -341,7 +392,10 @@ class TestApplyJourneyEffect:
         )
 
         apply_journey_effect(
-            state, journey, _make_algorithm_params(), _make_pool_params(),
+            state,
+            journey,
+            _make_algorithm_params(),
+            _make_pool_params(),
             _make_dreamsigns(),
         )
 
@@ -362,7 +416,10 @@ class TestApplyJourneyEffect:
         )
 
         apply_journey_effect(
-            state, journey, _make_algorithm_params(), _make_pool_params(),
+            state,
+            journey,
+            _make_algorithm_params(),
+            _make_pool_params(),
             _make_dreamsigns(),
         )
 
@@ -381,7 +438,10 @@ class TestApplyJourneyEffect:
         )
 
         apply_journey_effect(
-            state, journey, _make_algorithm_params(), _make_pool_params(),
+            state,
+            journey,
+            _make_algorithm_params(),
+            _make_pool_params(),
             dreamsigns,
         )
 
@@ -396,13 +456,15 @@ class TestApplyJourneyEffect:
         dreamsigns = _make_dreamsigns()
         # Fill to limit
         for i in range(state.max_dreamsigns):
-            state.add_dreamsign(Dreamsign(
-                name=f"Sign {i}",
-                resonance=Resonance.TIDE,
-                tags=frozenset(),
-                effect_text="",
-                is_bane=False,
-            ))
+            state.add_dreamsign(
+                Dreamsign(
+                    name=f"Sign {i}",
+                    resonance=Resonance.TIDE,
+                    tags=frozenset(),
+                    effect_text="",
+                    is_bane=False,
+                )
+            )
 
         journey = Journey(
             name="Excess Dreamsign",
@@ -413,7 +475,10 @@ class TestApplyJourneyEffect:
 
         # In non-interactive mode, auto-purge should handle the limit
         apply_journey_effect(
-            state, journey, _make_algorithm_params(), _make_pool_params(),
+            state,
+            journey,
+            _make_algorithm_params(),
+            _make_pool_params(),
             dreamsigns,
         )
 
@@ -439,7 +504,10 @@ class TestApplyJourneyEffect:
         )
 
         apply_journey_effect(
-            state, journey, _make_algorithm_params(), _make_pool_params(),
+            state,
+            journey,
+            _make_algorithm_params(),
+            _make_pool_params(),
             _make_dreamsigns(),
         )
 
@@ -458,7 +526,10 @@ class TestApplyJourneyEffect:
         )
 
         changes = apply_journey_effect(
-            state, journey, _make_algorithm_params(), _make_pool_params(),
+            state,
+            journey,
+            _make_algorithm_params(),
+            _make_pool_params(),
             _make_dreamsigns(),
         )
 
@@ -478,7 +549,10 @@ class TestApplyJourneyEffect:
         )
 
         apply_journey_effect(
-            state, journey, _make_algorithm_params(), _make_pool_params(),
+            state,
+            journey,
+            _make_algorithm_params(),
+            _make_pool_params(),
             _make_dreamsigns(),
         )
 
@@ -543,7 +617,9 @@ class TestRunDreamJourney:
         state = _make_quest_state(essence=100)
         journeys = _make_journeys()
         # Enhanced: 3 options + 1 close = 4, so close is at index 3
-        with patch("sites_journey.input_handler.single_select", return_value=3) as mock_select:
+        with patch(
+            "sites_journey.input_handler.single_select", return_value=3
+        ) as mock_select:
             run_dream_journey(
                 state=state,
                 all_journeys=journeys,
@@ -558,7 +634,11 @@ class TestRunDreamJourney:
 
         # Verify that 4 options were presented (3 journeys + Close)
         call_args = mock_select.call_args
-        assert len(call_args[1]["options"]) == 4 if "options" in call_args[1] else len(call_args[0][0]) == 4
+        assert (
+            len(call_args[1]["options"]) == 4
+            if "options" in call_args[1]
+            else len(call_args[0][0]) == 4
+        )
 
     def test_logs_interaction(self) -> None:
         from sites_journey import run_dream_journey
@@ -634,8 +714,12 @@ class TestApplyRewardEffect:
         initial_deck = state.deck_count()
 
         apply_reward_effect(
-            state, EffectType.ADD_CARDS, 2,
-            _make_algorithm_params(), _make_pool_params(), _make_dreamsigns(),
+            state,
+            EffectType.ADD_CARDS,
+            2,
+            _make_algorithm_params(),
+            _make_pool_params(),
+            _make_dreamsigns(),
         )
 
         assert state.deck_count() == initial_deck + 2
@@ -646,8 +730,12 @@ class TestApplyRewardEffect:
         state = _make_quest_state(essence=100)
 
         apply_reward_effect(
-            state, EffectType.ADD_ESSENCE, 150,
-            _make_algorithm_params(), _make_pool_params(), _make_dreamsigns(),
+            state,
+            EffectType.ADD_ESSENCE,
+            150,
+            _make_algorithm_params(),
+            _make_pool_params(),
+            _make_dreamsigns(),
         )
 
         assert state.essence == 250
@@ -658,8 +746,12 @@ class TestApplyRewardEffect:
         state = _make_quest_state(essence=100)
 
         apply_reward_effect(
-            state, EffectType.LARGE_ESSENCE, 300,
-            _make_algorithm_params(), _make_pool_params(), _make_dreamsigns(),
+            state,
+            EffectType.LARGE_ESSENCE,
+            300,
+            _make_algorithm_params(),
+            _make_pool_params(),
+            _make_dreamsigns(),
         )
 
         assert state.essence == 400
@@ -670,8 +762,12 @@ class TestApplyRewardEffect:
         state = _make_quest_state()
 
         apply_reward_effect(
-            state, EffectType.ADD_DREAMSIGN, 1,
-            _make_algorithm_params(), _make_pool_params(), _make_dreamsigns(),
+            state,
+            EffectType.ADD_DREAMSIGN,
+            1,
+            _make_algorithm_params(),
+            _make_pool_params(),
+            _make_dreamsigns(),
         )
 
         assert state.dreamsign_count() == 1
@@ -684,17 +780,23 @@ class TestApplyRewardEffect:
         dreamsigns = _make_dreamsigns()
         # Fill to limit
         for i in range(state.max_dreamsigns):
-            state.add_dreamsign(Dreamsign(
-                name=f"Sign {i}",
-                resonance=Resonance.TIDE,
-                tags=frozenset(),
-                effect_text="",
-                is_bane=False,
-            ))
+            state.add_dreamsign(
+                Dreamsign(
+                    name=f"Sign {i}",
+                    resonance=Resonance.TIDE,
+                    tags=frozenset(),
+                    effect_text="",
+                    is_bane=False,
+                )
+            )
 
         apply_reward_effect(
-            state, EffectType.ADD_DREAMSIGN, 1,
-            _make_algorithm_params(), _make_pool_params(), dreamsigns,
+            state,
+            EffectType.ADD_DREAMSIGN,
+            1,
+            _make_algorithm_params(),
+            _make_pool_params(),
+            dreamsigns,
         )
 
         # Should not exceed limit
@@ -713,8 +815,11 @@ class TestApplyCostEffect:
         state = _make_quest_state(essence=200)
 
         apply_cost_effect(
-            state, EffectType.LOSE_ESSENCE, 50,
-            _make_bane_cards(), _make_dreamsigns(),
+            state,
+            EffectType.LOSE_ESSENCE,
+            50,
+            _make_bane_cards(),
+            _make_dreamsigns(),
         )
 
         assert state.essence == 150
@@ -725,8 +830,11 @@ class TestApplyCostEffect:
         state = _make_quest_state(essence=30)
 
         apply_cost_effect(
-            state, EffectType.LOSE_ESSENCE, 50,
-            _make_bane_cards(), _make_dreamsigns(),
+            state,
+            EffectType.LOSE_ESSENCE,
+            50,
+            _make_bane_cards(),
+            _make_dreamsigns(),
         )
 
         assert state.essence == 0
@@ -738,8 +846,11 @@ class TestApplyCostEffect:
         banes = _make_bane_cards()
 
         apply_cost_effect(
-            state, EffectType.ADD_BANE_CARD, 1,
-            banes, _make_dreamsigns(),
+            state,
+            EffectType.ADD_BANE_CARD,
+            1,
+            banes,
+            _make_dreamsigns(),
         )
 
         assert state.deck_count() == 1
@@ -752,8 +863,11 @@ class TestApplyCostEffect:
         dreamsigns = _make_dreamsigns()
 
         apply_cost_effect(
-            state, EffectType.ADD_BANE_DREAMSIGN, 1,
-            _make_bane_cards(), dreamsigns,
+            state,
+            EffectType.ADD_BANE_DREAMSIGN,
+            1,
+            _make_bane_cards(),
+            dreamsigns,
         )
 
         assert state.dreamsign_count() == 1
@@ -766,17 +880,22 @@ class TestApplyCostEffect:
         dreamsigns = _make_dreamsigns()
         # Fill to limit with non-bane dreamsigns
         for i in range(state.max_dreamsigns):
-            state.add_dreamsign(Dreamsign(
-                name=f"Sign {i}",
-                resonance=Resonance.TIDE,
-                tags=frozenset(),
-                effect_text="",
-                is_bane=False,
-            ))
+            state.add_dreamsign(
+                Dreamsign(
+                    name=f"Sign {i}",
+                    resonance=Resonance.TIDE,
+                    tags=frozenset(),
+                    effect_text="",
+                    is_bane=False,
+                )
+            )
 
         apply_cost_effect(
-            state, EffectType.ADD_BANE_DREAMSIGN, 1,
-            _make_bane_cards(), dreamsigns,
+            state,
+            EffectType.ADD_BANE_DREAMSIGN,
+            1,
+            _make_bane_cards(),
+            dreamsigns,
         )
 
         # Should not exceed limit
@@ -794,8 +913,11 @@ class TestApplyCostEffect:
         assert state.deck_count() == 4
 
         apply_cost_effect(
-            state, EffectType.REMOVE_CARDS, 2,
-            _make_bane_cards(), _make_dreamsigns(),
+            state,
+            EffectType.REMOVE_CARDS,
+            2,
+            _make_bane_cards(),
+            _make_dreamsigns(),
         )
 
         assert state.deck_count() == 2
@@ -879,7 +1001,9 @@ class TestRunTemptingOffer:
         offers = _make_offers()
 
         # Enhanced: 3 offers + 1 decline = 4 options. Decline at index 3.
-        with patch("sites_journey.input_handler.single_select", return_value=3) as mock_select:
+        with patch(
+            "sites_journey.input_handler.single_select", return_value=3
+        ) as mock_select:
             run_tempting_offer(
                 state=state,
                 all_offers=offers,
@@ -894,7 +1018,11 @@ class TestRunTemptingOffer:
             )
 
         call_args = mock_select.call_args
-        assert len(call_args[1]["options"]) == 4 if "options" in call_args[1] else len(call_args[0][0]) == 4
+        assert (
+            len(call_args[1]["options"]) == 4
+            if "options" in call_args[1]
+            else len(call_args[0][0]) == 4
+        )
 
     def test_logs_interaction(self) -> None:
         from sites_journey import run_tempting_offer

@@ -48,26 +48,30 @@ def build_im_args(in_path, out_path, width, threshold, smooth):
     ]
     if threshold is not None:
         args.extend(["-threshold", f"{threshold}%"])
-    args.extend([
-        "-morphology",
-        "Dilate",
-        f"Disk:{width}",
-    ])
+    args.extend(
+        [
+            "-morphology",
+            "Dilate",
+            f"Disk:{width}",
+        ]
+    )
     if smooth is not None and smooth > 0:
         args.extend(["-blur", f"0x{smooth}"])
-    args.extend([
-        "-alpha",
-        "copy",
-        "-fill",
-        "black",
-        "-colorize",
-        "100",
-        ")",
-        "-compose",
-        "DstOver",
-        "-composite",
-        out_path,
-    ])
+    args.extend(
+        [
+            "-alpha",
+            "copy",
+            "-fill",
+            "black",
+            "-colorize",
+            "100",
+            ")",
+            "-compose",
+            "DstOver",
+            "-composite",
+            out_path,
+        ]
+    )
     return args
 
 
@@ -77,7 +81,9 @@ def run_im(args):
         return subprocess.run(cmdline, shell=False, capture_output=True, text=True)
     else:
         cmd_str = " ".join(shlex.quote(a) for a in args)
-        return subprocess.run(shlex.split(cmd_str), shell=False, capture_output=True, text=True)
+        return subprocess.run(
+            shlex.split(cmd_str), shell=False, capture_output=True, text=True
+        )
 
 
 def process_file(path, width, threshold, smooth, new_files):
@@ -90,10 +96,18 @@ def process_file(path, width, threshold, smooth, new_files):
             out_path = os.path.join(d, f"outline_{base}")
         try:
             if os.path.abspath(out_path) == os.path.abspath(path):
-                fd, tmp_path = tempfile.mkstemp(prefix=base + ".outlined.", suffix=".png", dir=d)
+                fd, tmp_path = tempfile.mkstemp(
+                    prefix=base + ".outlined.", suffix=".png", dir=d
+                )
                 os.close(fd)
                 try:
-                    im_args = build_im_args(os.path.abspath(path), os.path.abspath(tmp_path), width, threshold, smooth)
+                    im_args = build_im_args(
+                        os.path.abspath(path),
+                        os.path.abspath(tmp_path),
+                        width,
+                        threshold,
+                        smooth,
+                    )
                     result = run_im(im_args)
                     if result.returncode != 0:
                         if os.path.exists(tmp_path):
@@ -111,7 +125,13 @@ def process_file(path, width, threshold, smooth, new_files):
                         except Exception:
                             pass
                     return False, str(e), ""
-            im_args = build_im_args(os.path.abspath(path), os.path.abspath(out_path), width, threshold, smooth)
+            im_args = build_im_args(
+                os.path.abspath(path),
+                os.path.abspath(out_path),
+                width,
+                threshold,
+                smooth,
+            )
             result = run_im(im_args)
             if result.returncode != 0:
                 return False, result.stderr.strip() or result.stdout.strip(), ""
@@ -121,7 +141,9 @@ def process_file(path, width, threshold, smooth, new_files):
     fd, tmp_path = tempfile.mkstemp(prefix=base + ".outlined.", suffix=".png", dir=d)
     os.close(fd)
     try:
-        im_args = build_im_args(os.path.abspath(path), os.path.abspath(tmp_path), width, threshold, smooth)
+        im_args = build_im_args(
+            os.path.abspath(path), os.path.abspath(tmp_path), width, threshold, smooth
+        )
         result = run_im(im_args)
         if result.returncode != 0:
             if os.path.exists(tmp_path):
@@ -160,7 +182,9 @@ def main():
         sys.exit(2)
     files = list(iter_pngs(root, args.recursive))
     if args.new_files:
-        files = [p for p in files if not os.path.basename(p).lower().startswith("outline_")]
+        files = [
+            p for p in files if not os.path.basename(p).lower().startswith("outline_")
+        ]
     if not files:
         print("No PNG files found.")
         sys.exit(0)
@@ -182,5 +206,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-

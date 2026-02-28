@@ -33,7 +33,10 @@ def format_table(headers: list[str], rows: list[list[str]], align: str = "") -> 
                 parts.append(cell.ljust(w))
         return "  ".join(parts)
 
-    lines = [fmt_row(headers), fmt_row(["-" * col_widths[i] for i in range(len(headers))])]
+    lines = [
+        fmt_row(headers),
+        fmt_row(["-" * col_widths[i] for i in range(len(headers))]),
+    ]
     for row in rows:
         lines.append(fmt_row(row))
     return "\n".join(lines)
@@ -120,7 +123,9 @@ def off_color_offered_pct(result: QuestResult) -> float:
 
 def print_trace(result: QuestResult):
     """Print pick-by-pick detail for a single quest."""
-    dc_str = "+".join(r.value for r in sorted(result.dreamcaller_resonances, key=lambda r: r.value))
+    dc_str = "+".join(
+        r.value for r in sorted(result.dreamcaller_resonances, key=lambda r: r.value)
+    )
     print(f"\n=== Quest Trace (Dreamcaller: {dc_str}) ===\n")
 
     for pick in result.picks:
@@ -132,7 +137,9 @@ def print_trace(result: QuestResult):
 
         # Show offered cards with weights
         for i, (card, weight) in enumerate(zip(pick.offered, pick.weights)):
-            res = "+".join(r.value for r in sorted(card.resonances, key=lambda r: r.value))
+            res = "+".join(
+                r.value for r in sorted(card.resonances, key=lambda r: r.value)
+            )
             if not res:
                 res = "neutral"
             if is_shop:
@@ -140,18 +147,22 @@ def print_trace(result: QuestResult):
             else:
                 marker = " <--" if card.id == pick.picked.id else ""
             rarity_tag = card.rarity.value[0]
-            print(f"  [{rarity_tag}] power={card.power:2d}  {res:14s}  w={weight:6.2f}{marker}")
+            print(
+                f"  [{rarity_tag}] power={card.power:2d}  {res:14s}  w={weight:6.2f}{marker}"
+            )
 
         if is_shop:
             print(f"  Bought {len(pick.bought or [])} cards")
-            for reason in (pick.buy_reasons or []):
+            for reason in pick.buy_reasons or []:
                 print(f"    {reason}")
         else:
             print(f"  Picked: {pick.pick_reason}")
 
         # Profile snapshot
         profile_str = ", ".join(
-            f"{r.value}:{c}" for r, c in sorted(pick.profile_after.items(), key=lambda x: x[0].value) if c > 0
+            f"{r.value}:{c}"
+            for r, c in sorted(pick.profile_after.items(), key=lambda x: x[0].value)
+            if c > 0
         )
         print(f"  Profile: {profile_str}")
         print()
@@ -257,18 +268,20 @@ def print_sweep(
         splash = sum(1 for r in results if has_splash(r.final_profile)) / n
         off_color = statistics.mean([off_color_offered_pct(r) for r in results])
 
-        rows.append([
-            val_str,
-            strat_name,
-            f"{conv:.1f}",
-            f"{top2:.1%}",
-            f"{hhi:.3f}",
-            f"{classes.get('mono', 0) / n:.0%}",
-            f"{classes.get('dual', 0) / n:.0%}",
-            f"{classes.get('tri', 0) / n:.0%}",
-            f"{splash:.0%}",
-            f"{off_color:.1%}",
-        ])
+        rows.append(
+            [
+                val_str,
+                strat_name,
+                f"{conv:.1f}",
+                f"{top2:.1%}",
+                f"{hhi:.3f}",
+                f"{classes.get('mono', 0) / n:.0%}",
+                f"{classes.get('dual', 0) / n:.0%}",
+                f"{classes.get('tri', 0) / n:.0%}",
+                f"{splash:.0%}",
+                f"{off_color:.1%}",
+            ]
+        )
 
     print(format_table(headers, rows, "llrrrrrrrr"))
 
@@ -357,12 +370,18 @@ def print_evolution(results: list[QuestResult]):
                 off_color_vals.append(off_count / off_total)
 
         if top2_vals:
-            rows.append([
-                str(target_pick),
-                f"{statistics.mean(top2_vals):.1%}",
-                f"{statistics.mean(eff_colors):.2f}",
-                f"{statistics.mean(hhi_vals):.3f}",
-                f"{statistics.mean(off_color_vals):.1%}" if off_color_vals else "N/A",
-            ])
+            rows.append(
+                [
+                    str(target_pick),
+                    f"{statistics.mean(top2_vals):.1%}",
+                    f"{statistics.mean(eff_colors):.2f}",
+                    f"{statistics.mean(hhi_vals):.3f}",
+                    (
+                        f"{statistics.mean(off_color_vals):.1%}"
+                        if off_color_vals
+                        else "N/A"
+                    ),
+                ]
+            )
 
     print(format_table(headers, rows, "rrrrr"))

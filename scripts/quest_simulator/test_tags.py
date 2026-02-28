@@ -35,9 +35,7 @@ def _make_card(
     )
 
 
-def _make_pool_entries(
-    tag: str, count: int, start_number: int = 1
-) -> list[PoolEntry]:
+def _make_pool_entries(tag: str, count: int, start_number: int = 1) -> list[PoolEntry]:
     """Create pool entries whose cards all have the given tag."""
     return [
         PoolEntry(
@@ -103,10 +101,9 @@ class TestSelectTheme:
         from tags import select_theme
 
         # Create pool with two tags, each with enough cards
-        pool = (
-            _make_pool_entries("tribal:warrior", 8, start_number=1)
-            + _make_pool_entries("mechanic:reclaim", 8, start_number=100)
-        )
+        pool = _make_pool_entries(
+            "tribal:warrior", 8, start_number=1
+        ) + _make_pool_entries("mechanic:reclaim", 8, start_number=100)
         profile = TagProfile()
         profile.add("tribal:warrior", 5)
         profile.add("mechanic:reclaim", 3)
@@ -127,10 +124,9 @@ class TestSelectTheme:
         from tags import select_theme
 
         # "tribal:warrior" has 8 cards (eligible), "mechanic:reclaim" has 3 (not eligible)
-        pool = (
-            _make_pool_entries("tribal:warrior", 8, start_number=1)
-            + _make_pool_entries("mechanic:reclaim", 3, start_number=100)
-        )
+        pool = _make_pool_entries(
+            "tribal:warrior", 8, start_number=1
+        ) + _make_pool_entries("mechanic:reclaim", 3, start_number=100)
         profile = TagProfile()
         profile.add("tribal:warrior", 5)
         profile.add("mechanic:reclaim", 10)  # High affinity but not enough cards
@@ -151,10 +147,9 @@ class TestSelectTheme:
         """When all tag counts are 0, falls back to uniform random."""
         from tags import select_theme
 
-        pool = (
-            _make_pool_entries("tribal:warrior", 8, start_number=1)
-            + _make_pool_entries("mechanic:reclaim", 8, start_number=100)
-        )
+        pool = _make_pool_entries(
+            "tribal:warrior", 8, start_number=1
+        ) + _make_pool_entries("mechanic:reclaim", 8, start_number=100)
         profile = TagProfile()  # Empty -- no counts
         rng = random.Random(42)
 
@@ -201,10 +196,9 @@ class TestSelectTheme:
         from tags import select_theme
 
         # All tags have fewer than 6 cards
-        pool = (
-            _make_pool_entries("tribal:warrior", 3, start_number=1)
-            + _make_pool_entries("mechanic:reclaim", 2, start_number=100)
-        )
+        pool = _make_pool_entries(
+            "tribal:warrior", 3, start_number=1
+        ) + _make_pool_entries("mechanic:reclaim", 2, start_number=100)
         profile = TagProfile()
         profile.add("tribal:warrior", 5)
         rng = random.Random(42)
@@ -241,10 +235,9 @@ class TestSelectTheme:
         """Tags with higher affinity should be selected more often."""
         from tags import select_theme
 
-        pool = (
-            _make_pool_entries("high_affinity", 10, start_number=1)
-            + _make_pool_entries("low_affinity", 10, start_number=100)
-        )
+        pool = _make_pool_entries(
+            "high_affinity", 10, start_number=1
+        ) + _make_pool_entries("low_affinity", 10, start_number=100)
         profile = TagProfile()
         profile.add("high_affinity", 20)
         profile.add("low_affinity", 1)
@@ -355,7 +348,9 @@ class TestSelectTheme:
                 _make_card(
                     name=f"Multi {i}",
                     card_number=i,
-                    tags=frozenset({"tribal:warrior", "mechanic:reclaim", "role:finisher"}),
+                    tags=frozenset(
+                        {"tribal:warrior", "mechanic:reclaim", "role:finisher"}
+                    ),
                 )
             )
             for i in range(10)
@@ -386,9 +381,8 @@ class TestSelectTheme:
         """When all scores are zero, falls back to uniform random."""
         from tags import select_theme
 
-        pool = (
-            _make_pool_entries("tag_a", 8, start_number=1)
-            + _make_pool_entries("tag_b", 8, start_number=100)
+        pool = _make_pool_entries("tag_a", 8, start_number=1) + _make_pool_entries(
+            "tag_b", 8, start_number=100
         )
         profile = TagProfile()
         profile.add("tag_a", 1)  # Non-zero so has_affinity is True

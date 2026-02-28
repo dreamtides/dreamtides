@@ -59,7 +59,9 @@ def _make_test_cards() -> list[Card]:
         _make_card("Card F", 6, Rarity.COMMON, frozenset({Resonance.ZEPHYR})),
         _make_card("Card G", 7, Rarity.COMMON, frozenset({Resonance.RUIN})),
         _make_card("Card H", 8, Rarity.COMMON, frozenset()),
-        _make_card("Card I", 9, Rarity.LEGENDARY, frozenset({Resonance.TIDE, Resonance.RUIN})),
+        _make_card(
+            "Card I", 9, Rarity.LEGENDARY, frozenset({Resonance.TIDE, Resonance.RUIN})
+        ),
         _make_card("Card J", 10, Rarity.UNCOMMON, frozenset({Resonance.STONE})),
     ]
 

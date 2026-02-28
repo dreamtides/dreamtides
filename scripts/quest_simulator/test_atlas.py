@@ -165,7 +165,10 @@ class TestCompleteNode:
         for node in nodes:
             if node.state == NodeState.UNAVAILABLE:
                 for adj_id in node.adjacent:
-                    assert adj_id not in completed_ids or node.state != NodeState.UNAVAILABLE
+                    assert (
+                        adj_id not in completed_ids
+                        or node.state != NodeState.UNAVAILABLE
+                    )
 
     def test_new_nodes_are_adjacent_to_completed_node(self) -> None:
         from atlas import complete_node, initialize_atlas
@@ -213,9 +216,7 @@ class TestCompleteNode:
         for node in nodes:
             if node.state == NodeState.UNAVAILABLE:
                 # None of its adjacents should be completed
-                adjacent_completed = any(
-                    aid in completed_ids for aid in node.adjacent
-                )
+                adjacent_completed = any(aid in completed_ids for aid in node.adjacent)
                 assert not adjacent_completed
 
     def test_repeated_completion_does_not_expand(self) -> None:
@@ -332,9 +333,7 @@ class TestGenerateSites:
             rng = random.Random(seed)
             node = _make_node()
             generate_sites(node, completion_level=1, rng=rng, is_first_dreamscape=False)
-            assert 3 <= len(node.sites) <= 6, (
-                f"seed {seed}: {len(node.sites)} sites"
-            )
+            assert 3 <= len(node.sites) <= 6, f"seed {seed}: {len(node.sites)} sites"
 
     def test_max_one_of_each_site_type_except_draft_and_essence(self) -> None:
         from atlas import generate_sites
@@ -364,7 +363,9 @@ class TestGenerateSites:
             generate_sites(node, completion_level=0, rng=rng, is_first_dreamscape=False)
             shops = [s for s in node.sites if s.site_type == SiteType.SHOP]
             if shops:
-                assert shops[0].is_enhanced, (
+                assert shops[
+                    0
+                ].is_enhanced, (
                     f"seed {seed}: Verdant run has a Shop but it is not enhanced"
                 )
 
@@ -376,11 +377,13 @@ class TestGenerateSites:
             rng = random.Random(seed)
             node = _make_node(biome=Biome.CELESTIAL)
             generate_sites(node, completion_level=1, rng=rng, is_first_dreamscape=False)
-            offerings = [s for s in node.sites if s.site_type == SiteType.DREAMSIGN_OFFERING]
+            offerings = [
+                s for s in node.sites if s.site_type == SiteType.DREAMSIGN_OFFERING
+            ]
             if offerings:
-                assert offerings[0].is_enhanced, (
-                    f"seed {seed}: Celestial run has a Dreamsign Offering but it is not enhanced"
-                )
+                assert offerings[
+                    0
+                ].is_enhanced, f"seed {seed}: Celestial run has a Dreamsign Offering but it is not enhanced"
 
     def test_celestial_biome_enhances_dreamsign_draft(self) -> None:
         from atlas import generate_sites
@@ -392,15 +395,21 @@ class TestGenerateSites:
             rng = random.Random(seed)
             node = _make_node(biome=Biome.CELESTIAL)
             generate_sites(node, completion_level=2, rng=rng, is_first_dreamscape=False)
-            dreamsign_drafts = [s for s in node.sites if s.site_type == SiteType.DREAMSIGN_DRAFT]
-            dreamsign_offerings = [s for s in node.sites if s.site_type == SiteType.DREAMSIGN_OFFERING]
+            dreamsign_drafts = [
+                s for s in node.sites if s.site_type == SiteType.DREAMSIGN_DRAFT
+            ]
+            dreamsign_offerings = [
+                s for s in node.sites if s.site_type == SiteType.DREAMSIGN_OFFERING
+            ]
             if dreamsign_drafts and not dreamsign_offerings:
-                assert dreamsign_drafts[0].is_enhanced, (
-                    f"seed {seed}: Celestial run has a Dreamsign Draft (no Offering) but it is not enhanced"
-                )
+                assert dreamsign_drafts[
+                    0
+                ].is_enhanced, f"seed {seed}: Celestial run has a Dreamsign Draft (no Offering) but it is not enhanced"
                 found_enhanced_dreamsign_draft = True
         # Ensure this scenario actually occurred in at least one seed
-        assert found_enhanced_dreamsign_draft, "No seed produced a Celestial node with Dreamsign Draft but no Dreamsign Offering"
+        assert (
+            found_enhanced_dreamsign_draft
+        ), "No seed produced a Celestial node with Dreamsign Draft but no Dreamsign Offering"
 
     def test_at_most_one_enhanced_site(self) -> None:
         from atlas import generate_sites
@@ -417,17 +426,20 @@ class TestGenerateSites:
 
         # At level 0, "other" sites can only be Essence or Shop
         allowed_other = {
-            SiteType.BATTLE, SiteType.DRAFT, SiteType.DREAMCALLER_DRAFT,
-            SiteType.ESSENCE, SiteType.SHOP,
+            SiteType.BATTLE,
+            SiteType.DRAFT,
+            SiteType.DREAMCALLER_DRAFT,
+            SiteType.ESSENCE,
+            SiteType.SHOP,
         }
         for seed in range(50):
             rng = random.Random(seed)
             node = _make_node()
             generate_sites(node, completion_level=0, rng=rng, is_first_dreamscape=False)
             for s in node.sites:
-                assert s.site_type in allowed_other, (
-                    f"seed {seed}: unexpected {s.site_type} at level 0"
-                )
+                assert (
+                    s.site_type in allowed_other
+                ), f"seed {seed}: unexpected {s.site_type} at level 0"
 
 
 class TestBiomeEnhancementMapping:

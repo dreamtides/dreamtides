@@ -7,7 +7,9 @@ import sys
 
 
 def main():
-    project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    project_dir = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    )
     counts_file = os.path.join(project_dir, ".claude", "doc-read-counts.json")
 
     if not os.path.exists(counts_file):

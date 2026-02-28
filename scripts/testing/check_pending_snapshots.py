@@ -43,7 +43,10 @@ def main():
             # Print path relative to project root
             rel_path = snapshot.relative_to(project_root)
             print(f"  - {rel_path}", file=sys.stderr)
-        print("\nPlease review and accept/reject snapshots with 'cargo insta review'", file=sys.stderr)
+        print(
+            "\nPlease review and accept/reject snapshots with 'cargo insta review'",
+            file=sys.stderr,
+        )
         print("or 'just insta' before committing.", file=sys.stderr)
         sys.exit(1)
     else:

@@ -62,13 +62,20 @@ class TestBuildParser(unittest.TestCase):
         self.assertIsNone(args.staleness_factor)
 
     def test_all_flags_together(self) -> None:
-        args = self.parser.parse_args([
-            "--seed", "7",
-            "--exponent", "1.8",
-            "--floor-weight", "0.7",
-            "--neutral-base", "4.0",
-            "--staleness-factor", "0.5",
-        ])
+        args = self.parser.parse_args(
+            [
+                "--seed",
+                "7",
+                "--exponent",
+                "1.8",
+                "--floor-weight",
+                "0.7",
+                "--neutral-base",
+                "4.0",
+                "--staleness-factor",
+                "0.5",
+            ]
+        )
         self.assertEqual(args.seed, 7)
         # pyre-fixme[6]: assertAlmostEqual does not accept float second arg
         self.assertAlmostEqual(args.exponent, 1.8)
@@ -215,9 +222,12 @@ class TestExceptionHandling(unittest.TestCase):
         from unittest.mock import MagicMock, patch
 
         with patch("quest_sim.main", side_effect=KeyboardInterrupt):
-            with patch("quest_sim.input_handler.ensure_terminal_restored") as mock_restore:
+            with patch(
+                "quest_sim.input_handler.ensure_terminal_restored"
+            ) as mock_restore:
                 with self.assertRaises(SystemExit) as ctx:
                     import quest_sim
+
                     quest_sim._run_with_error_handling()
                 mock_restore.assert_called_once()
 
@@ -226,9 +236,12 @@ class TestExceptionHandling(unittest.TestCase):
         from unittest.mock import MagicMock, patch
 
         with patch("quest_sim.main", side_effect=RuntimeError("boom")):
-            with patch("quest_sim.input_handler.ensure_terminal_restored") as mock_restore:
+            with patch(
+                "quest_sim.input_handler.ensure_terminal_restored"
+            ) as mock_restore:
                 with self.assertRaises(SystemExit):
                     import quest_sim
+
                     quest_sim._run_with_error_handling()
                 mock_restore.assert_called()
 

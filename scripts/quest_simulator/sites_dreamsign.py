@@ -52,9 +52,7 @@ def select_draft_dreamsigns(
     """
     held_names = {ds.name for ds in held}
     available = [
-        ds
-        for ds in all_dreamsigns
-        if not ds.is_bane and ds.name not in held_names
+        ds for ds in all_dreamsigns if not ds.is_bane and ds.name not in held_names
     ]
     n = min(count, len(available))
     if n == 0:
@@ -75,7 +73,7 @@ def format_dreamsign_option(
     res_str = render.color_resonance(ds.resonance)
     name_color = render.RESONANCE_COLORS.get(ds.resonance, render.NEUTRAL_COLOR)
     line1 = f"  {marker} {name_color}{ds.name}{render.RESET}  {res_str}"
-    line2 = f"      \"{ds.effect_text}\""
+    line2 = f'      "{ds.effect_text}"'
     return [line1, line2]
 
 
@@ -257,7 +255,10 @@ def run_dreamsign_draft(
     """
     count = DRAFT_ENHANCED_COUNT if is_enhanced else DRAFT_COUNT
     offered = select_draft_dreamsigns(
-        all_dreamsigns, held=state.dreamsigns, rng=state.rng, count=count,
+        all_dreamsigns,
+        held=state.dreamsigns,
+        rng=state.rng,
+        count=count,
     )
 
     if not offered:
@@ -304,9 +305,7 @@ def run_dreamsign_draft(
         _offered: list[Dreamsign] = offered,
     ) -> str:
         if index < len(_offered):
-            lines = format_dreamsign_option(
-                _offered[index], highlighted=is_selected
-            )
+            lines = format_dreamsign_option(_offered[index], highlighted=is_selected)
             return "\n".join(lines)
         marker = ">" if is_selected else " "
         return f"  {marker} {render.DIM}{SKIP_LABEL}{render.RESET}"

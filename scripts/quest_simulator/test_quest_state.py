@@ -164,9 +164,7 @@ class TestAddCard:
 
     def test_updates_resonance_profile(self) -> None:
         state = _make_quest_state()
-        card = _make_card(
-            resonances=frozenset({Resonance.TIDE, Resonance.RUIN})
-        )
+        card = _make_card(resonances=frozenset({Resonance.TIDE, Resonance.RUIN}))
         state.add_card(card)
         assert state.resonance_profile.counts[Resonance.TIDE] == 1
         assert state.resonance_profile.counts[Resonance.RUIN] == 1
@@ -234,9 +232,7 @@ class TestRemoveCard:
 
     def test_updates_resonance_profile_on_remove(self) -> None:
         state = _make_quest_state()
-        card = _make_card(
-            resonances=frozenset({Resonance.TIDE, Resonance.RUIN})
-        )
+        card = _make_card(resonances=frozenset({Resonance.TIDE, Resonance.RUIN}))
         state.add_card(card)
         dc = state.deck[0]
         state.remove_card(dc)

@@ -28,7 +28,9 @@ def generate_pool(
     random starting multiplier.
     """
     resonances = list(Resonance)
-    variance = {r: rng.uniform(params.variance_min, params.variance_max) for r in resonances}
+    variance = {
+        r: rng.uniform(params.variance_min, params.variance_max) for r in resonances
+    }
 
     cards: list[SimCard] = []
     card_id = 0
@@ -99,9 +101,7 @@ def compute_weight(
     if not card.resonances:
         return params.neutral_base
 
-    affinity_sum = sum(
-        profile.counts[r] ** params.exponent for r in card.resonances
-    )
+    affinity_sum = sum(profile.counts[r] ** params.exponent for r in card.resonances)
     return params.floor_weight + affinity_sum
 
 
@@ -122,9 +122,11 @@ def select_cards(
 
     Returns list of (entry, weight) tuples for the selected cards.
     """
-    eligible = pool if not rare_only else [
-        e for e in pool if e.card.rarity in (Rarity.RARE, Rarity.LEGENDARY)
-    ]
+    eligible = (
+        pool
+        if not rare_only
+        else [e for e in pool if e.card.rarity in (Rarity.RARE, Rarity.LEGENDARY)]
+    )
 
     if not eligible:
         return []

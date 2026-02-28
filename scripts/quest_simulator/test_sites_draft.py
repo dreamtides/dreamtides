@@ -51,7 +51,12 @@ def _make_test_cards() -> list[Card]:
         _make_card("Zephyr Card A", 6, Rarity.COMMON, frozenset({Resonance.ZEPHYR})),
         _make_card("Ruin Card A", 7, Rarity.COMMON, frozenset({Resonance.RUIN})),
         _make_card("Neutral Card A", 8, Rarity.COMMON, frozenset()),
-        _make_card("Dual Card A", 9, Rarity.LEGENDARY, frozenset({Resonance.TIDE, Resonance.RUIN})),
+        _make_card(
+            "Dual Card A",
+            9,
+            Rarity.LEGENDARY,
+            frozenset({Resonance.TIDE, Resonance.RUIN}),
+        ),
         _make_card("Stone Card B", 10, Rarity.UNCOMMON, frozenset({Resonance.STONE})),
     ]
 
@@ -277,12 +282,14 @@ class TestRunDraft:
                 picked_card: Card,
                 profile_snapshot: dict[Resonance, int],
             ) -> None:
-                log_calls.append({
-                    "offered": list(offered_cards),
-                    "weights": list(weights),
-                    "picked": picked_card,
-                    "profile": dict(profile_snapshot),
-                })
+                log_calls.append(
+                    {
+                        "offered": list(offered_cards),
+                        "weights": list(weights),
+                        "picked": picked_card,
+                        "profile": dict(profile_snapshot),
+                    }
+                )
 
             def log_site_visit(self, **kwargs: object) -> None:
                 pass

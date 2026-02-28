@@ -51,9 +51,7 @@ def format_card_display(
     badge = render.rarity_badge(card.rarity)
 
     cost_str = (
-        f"Cost: {card.energy_cost}"
-        if card.energy_cost is not None
-        else "Cost: -"
+        f"Cost: {card.energy_cost}" if card.energy_cost is not None else "Cost: -"
     )
     spark_str = f"Spark: {card.spark}" if card.spark is not None else ""
 
@@ -330,7 +328,6 @@ def render_draft_card_list(
     return "\n".join(result_lines)
 
 
-
 def format_deck_summary(deck_cards: list[DeckCard]) -> str:
     """Produce a compact deck summary with card count and rarity breakdown.
 
@@ -442,7 +439,9 @@ def render_full_deck_view(
         else:
             filled = round(count / max_count * bar_width) if max_count > 0 else 0
             filled = max(1, min(bar_width, filled))
-            bar = f"{color}{'\u2588' * filled}{render.RESET}{' ' * (bar_width - filled)}"
+            bar = (
+                f"{color}{'\u2588' * filled}{render.RESET}{' ' * (bar_width - filled)}"
+            )
             pct = count / total_res * 100 if total_res > 0 else 0
             pct_str = f"{count:3d}  ({pct:4.1f}%)"
         name = f"{color}{res.value:8s}{render.RESET}"
@@ -460,9 +459,7 @@ def render_full_deck_view(
     if dreamsigns:
         lines.append("")
         lines.append(single_sep)
-        lines.append(
-            f"  {render.BOLD}Dreamsigns{render.RESET} ({len(dreamsigns)})"
-        )
+        lines.append(f"  {render.BOLD}Dreamsigns{render.RESET} ({len(dreamsigns)})")
         for ds in dreamsigns:
             res_color = render.RESONANCE_COLORS.get(ds.resonance, render.NEUTRAL_COLOR)
             res_label = f"{res_color}{ds.resonance.value}{render.RESET}"

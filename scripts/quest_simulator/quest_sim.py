@@ -31,7 +31,8 @@ def build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        "--seed", "-s",
+        "--seed",
+        "-s",
         type=int,
         default=None,
         help="Random seed (default: random)",
@@ -90,9 +91,7 @@ def main() -> None:
     # Override algorithm params with CLI args if provided
     algorithm_params = AlgorithmParams(
         exponent=(
-            args.exponent
-            if args.exponent is not None
-            else algorithm_params.exponent
+            args.exponent if args.exponent is not None else algorithm_params.exponent
         ),
         floor_weight=(
             args.floor_weight

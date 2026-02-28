@@ -9,7 +9,14 @@ import os
 import time
 from pathlib import Path
 
-from ds_models import PickContext, PickRecord, QuestResult, Rarity, Resonance, StrategyParams
+from ds_models import (
+    PickContext,
+    PickRecord,
+    QuestResult,
+    Rarity,
+    Resonance,
+    StrategyParams,
+)
 
 # Project root is 3 levels up from this file
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -34,9 +41,10 @@ def _card_dict(card) -> dict:
 
 
 def _profile_dict(profile_snapshot: dict[Resonance, int]) -> dict[str, int]:
-    return {_resonance_name(r): c for r, c in sorted(
-        profile_snapshot.items(), key=lambda x: x[0].value
-    )}
+    return {
+        _resonance_name(r): c
+        for r, c in sorted(profile_snapshot.items(), key=lambda x: x[0].value)
+    }
 
 
 class SessionLogger:
@@ -76,9 +84,7 @@ class SessionLogger:
                 "neutral_base": algo_params.neutral_base,
                 "staleness_factor": algo_params.staleness_factor,
             },
-            "dreamcaller_resonances": _resonances_list(
-                result.dreamcaller_resonances
-            ),
+            "dreamcaller_resonances": _resonances_list(result.dreamcaller_resonances),
             "pool_variance": {
                 _resonance_name(r): round(m, 4)
                 for r, m in sorted(
@@ -122,15 +128,17 @@ class SessionLogger:
         for card in result.deck:
             rarity_counts[card.rarity.value] += 1
 
-        self._write({
-            "event": "session_end",
-            "total_cards": len(result.deck),
-            "final_profile": _profile_dict(result.final_profile.snapshot()),
-            "top2_share": round(profile.top2_share(), 4),
-            "hhi": round(profile.hhi(), 4),
-            "effective_colors": round(profile.effective_colors(), 4),
-            "rarity_breakdown": rarity_counts,
-        })
+        self._write(
+            {
+                "event": "session_end",
+                "total_cards": len(result.deck),
+                "final_profile": _profile_dict(result.final_profile.snapshot()),
+                "top2_share": round(profile.top2_share(), 4),
+                "hhi": round(profile.hhi(), 4),
+                "effective_colors": round(profile.effective_colors(), 4),
+                "rarity_breakdown": rarity_counts,
+            }
+        )
 
     def close(self):
         self._file.close()

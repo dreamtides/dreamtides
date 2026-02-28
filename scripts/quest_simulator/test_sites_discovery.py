@@ -151,9 +151,8 @@ class TestDiscoveryDraftThemeSelection:
         from sites_discovery import _select_discovery_cards
 
         # Each tag has only 3 cards -- below min_theme_cards of 6
-        pool = (
-            _make_pool_entries("tag_a", 3, start_number=1)
-            + _make_pool_entries("tag_b", 3, start_number=100)
+        pool = _make_pool_entries("tag_a", 3, start_number=1) + _make_pool_entries(
+            "tag_b", 3, start_number=100
         )
         profile = ResonanceProfile()
         tag_profile = TagProfile()
@@ -242,7 +241,8 @@ class TestDiscoveryDraftPicking:
         initial_deck_count = state.deck_count()
 
         with patch(
-            "sites_discovery.single_select", return_value=0,
+            "sites_discovery.single_select",
+            return_value=0,
         ):
             run_discovery_draft(
                 state=state,
@@ -276,7 +276,8 @@ class TestDiscoveryDraftPicking:
 
         # Mock multi_select to return empty (player picks nothing)
         with patch(
-            "sites_discovery.multi_select", return_value=[],
+            "sites_discovery.multi_select",
+            return_value=[],
         ):
             run_discovery_draft(
                 state=state,
@@ -362,9 +363,8 @@ class TestSpecialtyShopItems:
         from sites_discovery import _select_specialty_items
 
         # Too few cards per tag
-        pool = (
-            _make_pool_entries("tag_a", 3, start_number=1)
-            + _make_pool_entries("tag_b", 3, start_number=100)
+        pool = _make_pool_entries("tag_a", 3, start_number=1) + _make_pool_entries(
+            "tag_b", 3, start_number=100
         )
         profile = ResonanceProfile()
         tag_profile = TagProfile()
@@ -529,12 +529,12 @@ class TestSpecialtyShopPurchasing:
 
         # Over 200 runs, should see at least one with 0 discounts
         # and at least one with 2+ discounts
-        assert any(c == 0 for c in discount_counts), (
-            "Expected some shops with 0 discounts"
-        )
-        assert any(c >= 2 for c in discount_counts), (
-            "Expected some shops with 2+ discounts"
-        )
+        assert any(
+            c == 0 for c in discount_counts
+        ), "Expected some shops with 0 discounts"
+        assert any(
+            c >= 2 for c in discount_counts
+        ), "Expected some shops with 2+ discounts"
 
     def test_total_cost_calculation(self) -> None:
         """Total cost should sum the effective prices of selected items."""
@@ -575,7 +575,8 @@ class TestSpecialtyShopNoneLogger:
 
         # Multi-select returns empty (done without buying)
         with patch(
-            "sites_discovery.multi_select", return_value=[],
+            "sites_discovery.multi_select",
+            return_value=[],
         ):
             run_specialty_shop(
                 state=state,

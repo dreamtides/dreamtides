@@ -90,26 +90,28 @@ def load_cards() -> list[Card]:
         card_number: int = raw["card_number"]
         extra = card_data_by_number.get(card_number, {})
 
-        cards.append(Card(
-            name=raw["name"],
-            card_number=card_number,
-            energy_cost=raw.get("energy_cost"),
-            card_type=_parse_card_type(raw["card_type"]),
-            subtype=raw.get("subtype"),
-            is_fast=raw["is_fast"],
-            spark=raw.get("spark"),
-            rarity=_parse_rarity(raw["rarity"]),
-            rules_text=raw["rules_text"],
-            resonances=_parse_resonances(extra.get("resonance", [])),
-            tags=frozenset(extra.get("tags", [])),
-        ))
+        cards.append(
+            Card(
+                name=raw["name"],
+                card_number=card_number,
+                energy_cost=raw.get("energy_cost"),
+                card_type=_parse_card_type(raw["card_type"]),
+                subtype=raw.get("subtype"),
+                is_fast=raw["is_fast"],
+                spark=raw.get("spark"),
+                rarity=_parse_rarity(raw["rarity"]),
+                rules_text=raw["rules_text"],
+                resonances=_parse_resonances(extra.get("resonance", [])),
+                tags=frozenset(extra.get("tags", [])),
+            )
+        )
 
     return cards
 
 
-def load_config() -> tuple[
-    AlgorithmParams, DraftParams, PoolParams, dict[str, dict[str, Any]]
-]:
+def load_config() -> (
+    tuple[AlgorithmParams, DraftParams, PoolParams, dict[str, dict[str, Any]]]
+):
     """Load config.toml and return typed parameter objects.
 
     Returns a tuple of (AlgorithmParams, DraftParams, PoolParams, extra_config)
@@ -144,7 +146,8 @@ def load_config() -> tuple[
     )
 
     extra_sections = {
-        k: v for k, v in raw.items()
+        k: v
+        for k, v in raw.items()
         if k not in ("resonance", "staleness", "draft", "draft_pool")
         and isinstance(v, dict)
     }

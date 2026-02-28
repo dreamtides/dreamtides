@@ -40,11 +40,13 @@ _SITE_TYPE_NAMES: dict[SiteType, str] = {
     SiteType.CLEANSE: "Cleanse",
 }
 
-_PREVIEW_EXCLUDED_TYPES: frozenset[SiteType] = frozenset({
-    SiteType.BATTLE,
-    SiteType.DRAFT,
-    SiteType.DREAMCALLER_DRAFT,
-})
+_PREVIEW_EXCLUDED_TYPES: frozenset[SiteType] = frozenset(
+    {
+        SiteType.BATTLE,
+        SiteType.DRAFT,
+        SiteType.DREAMCALLER_DRAFT,
+    }
+)
 
 _BIOME_MARKERS: dict[Biome, str] = {
     Biome.VERDANT: "\033[92m",
@@ -171,8 +173,7 @@ def render_available_dreamscapes(
         biome_label = f"{biome_color}{node.biome.value}{RESET}"
         prefix = f"  {marker} [{node.name}] ({biome_label})"
         preview_sites = [
-            s for s in node.sites
-            if s.site_type not in _PREVIEW_EXCLUDED_TYPES
+            s for s in node.sites if s.site_type not in _PREVIEW_EXCLUDED_TYPES
         ]
         summary = dreamscape_site_summary(preview_sites, biome=node.biome)
         if summary:
@@ -223,9 +224,7 @@ def render_completed_trail(all_nodes: list[DreamscapeNode]) -> str:
     Shows completed nodes in order of their node_id, joined by '->'.
     Wraps to multiple lines if the trail exceeds 70 columns.
     """
-    completed = [
-        n for n in all_nodes if n.state == NodeState.COMPLETED
-    ]
+    completed = [n for n in all_nodes if n.state == NodeState.COMPLETED]
     completed.sort(key=lambda n: n.node_id)
 
     if not completed:

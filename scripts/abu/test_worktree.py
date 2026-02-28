@@ -90,6 +90,7 @@ class TestPortAllocation(unittest.TestCase):
 
     def tearDown(self) -> None:
         import shutil
+
         shutil.rmtree(self.tmpdir, ignore_errors=True)
 
     @patch("worktree.PORTS_FILE")
@@ -109,7 +110,9 @@ class TestPortAllocation(unittest.TestCase):
 
     @patch("worktree.write_ports")
     @patch("worktree.read_ports")
-    def test_allocate_port_new(self, mock_read: MagicMock, mock_write: MagicMock) -> None:
+    def test_allocate_port_new(
+        self, mock_read: MagicMock, mock_write: MagicMock
+    ) -> None:
         mock_read.return_value = {}
         port = allocate_port("alpha")
         self.assertEqual(port, FIRST_WORKTREE_PORT)
@@ -117,7 +120,9 @@ class TestPortAllocation(unittest.TestCase):
 
     @patch("worktree.write_ports")
     @patch("worktree.read_ports")
-    def test_allocate_port_existing(self, mock_read: MagicMock, mock_write: MagicMock) -> None:
+    def test_allocate_port_existing(
+        self, mock_read: MagicMock, mock_write: MagicMock
+    ) -> None:
         mock_read.return_value = {"alpha": 10005}
         port = allocate_port("alpha")
         self.assertEqual(port, 10005)
@@ -125,7 +130,9 @@ class TestPortAllocation(unittest.TestCase):
 
     @patch("worktree.write_ports")
     @patch("worktree.read_ports")
-    def test_allocate_port_skips_used(self, mock_read: MagicMock, mock_write: MagicMock) -> None:
+    def test_allocate_port_skips_used(
+        self, mock_read: MagicMock, mock_write: MagicMock
+    ) -> None:
         mock_read.return_value = {"alpha": 10000, "beta": 10001}
         port = allocate_port("gamma")
         self.assertEqual(port, 10002)
@@ -133,14 +140,18 @@ class TestPortAllocation(unittest.TestCase):
 
     @patch("worktree.write_ports")
     @patch("worktree.read_ports")
-    def test_deallocate_port_exists(self, mock_read: MagicMock, mock_write: MagicMock) -> None:
+    def test_deallocate_port_exists(
+        self, mock_read: MagicMock, mock_write: MagicMock
+    ) -> None:
         mock_read.return_value = {"alpha": 10000, "beta": 10001}
         deallocate_port("alpha")
         mock_write.assert_called_once_with({"beta": 10001})
 
     @patch("worktree.write_ports")
     @patch("worktree.read_ports")
-    def test_deallocate_port_not_found(self, mock_read: MagicMock, mock_write: MagicMock) -> None:
+    def test_deallocate_port_not_found(
+        self, mock_read: MagicMock, mock_write: MagicMock
+    ) -> None:
         mock_read.return_value = {"alpha": 10000}
         deallocate_port("gamma")
         mock_write.assert_not_called()
@@ -238,7 +249,9 @@ class TestIsWorktreeAvailable(unittest.TestCase):
     def test_untracked_only_is_available(self, mock_run: MagicMock) -> None:
         mock_run.side_effect = [
             MagicMock(returncode=0),  # merged
-            MagicMock(stdout="?? untracked_file.txt\n?? another.log\n"),  # untracked only
+            MagicMock(
+                stdout="?? untracked_file.txt\n?? another.log\n"
+            ),  # untracked only
         ]
         self.assertTrue(_is_worktree_available(Path("/tmp/wt"), "master"))
 
@@ -246,7 +259,9 @@ class TestIsWorktreeAvailable(unittest.TestCase):
 class TestCmdClaim(unittest.TestCase):
     """Test cmd_claim command."""
 
-    def _make_args(self, branch: str = "feat", base: str = "master") -> argparse.Namespace:
+    def _make_args(
+        self, branch: str = "feat", base: str = "master"
+    ) -> argparse.Namespace:
         return argparse.Namespace(branch=branch, base=base)
 
     @patch("worktree._claim_reuse")
@@ -274,7 +289,9 @@ class TestCmdClaim(unittest.TestCase):
 
             with patch("builtins.print") as mock_print:
                 cmd_claim(self._make_args())
-                mock_reuse.assert_called_once_with(alpha_path, "alpha", "feat", "master")
+                mock_reuse.assert_called_once_with(
+                    alpha_path, "alpha", "feat", "master"
+                )
                 mock_print.assert_called_once_with(alpha_path)
 
     @patch("worktree._claim_create")
@@ -298,7 +315,9 @@ class TestCmdClaim(unittest.TestCase):
             with patch("builtins.print") as mock_print:
                 cmd_claim(self._make_args())
                 expected_path = base_path / "alpha"
-                mock_create.assert_called_once_with(expected_path, "alpha", "feat", "master")
+                mock_create.assert_called_once_with(
+                    expected_path, "alpha", "feat", "master"
+                )
                 mock_print.assert_called_once_with(expected_path)
 
     @patch("worktree._is_worktree_available")
@@ -390,13 +409,15 @@ class TestCmdReset(unittest.TestCase):
 
             # Should have called git worktree remove for each, git worktree prune, and branch -D for each
             remove_calls = [
-                c for c in mock_run.call_args_list
+                c
+                for c in mock_run.call_args_list
                 if "worktree" in c[0][0] and "remove" in c[0][0]
             ]
             self.assertEqual(len(remove_calls), 2)
 
             branch_calls = [
-                c for c in mock_run.call_args_list
+                c
+                for c in mock_run.call_args_list
                 if "branch" in c[0][0] and "-D" in c[0][0]
             ]
             self.assertEqual(len(branch_calls), 2)
@@ -424,7 +445,8 @@ class TestCmdReset(unittest.TestCase):
             cmd_reset(self._make_args())
 
             branch_calls = [
-                c for c in mock_run.call_args_list
+                c
+                for c in mock_run.call_args_list
                 if "branch" in c[0][0] and "-D" in c[0][0]
             ]
             self.assertEqual(len(branch_calls), 0)
@@ -450,7 +472,8 @@ class TestCmdReset(unittest.TestCase):
             cmd_reset(self._make_args())
 
             branch_calls = [
-                c for c in mock_run.call_args_list
+                c
+                for c in mock_run.call_args_list
                 if "branch" in c[0][0] and "-D" in c[0][0]
             ]
             self.assertEqual(len(branch_calls), 0)
@@ -479,10 +502,19 @@ class TestRegisterSubcommands(unittest.TestCase):
 
     def test_worktree_create_with_flags(self) -> None:
         parser = self._build_parser()
-        args = parser.parse_args([
-            "worktree", "create", "feat", "--existing", "--base", "develop",
-            "--dest", "/tmp/wt", "--dry-run",
-        ])
+        args = parser.parse_args(
+            [
+                "worktree",
+                "create",
+                "feat",
+                "--existing",
+                "--base",
+                "develop",
+                "--dest",
+                "/tmp/wt",
+                "--dry-run",
+            ]
+        )
         self.assertTrue(args.existing)
         self.assertEqual(args.base, "develop")
         self.assertEqual(args.dest, "/tmp/wt")
@@ -511,7 +543,9 @@ class TestRegisterSubcommands(unittest.TestCase):
 
     def test_worktree_refresh_with_target(self) -> None:
         parser = self._build_parser()
-        args = parser.parse_args(["worktree", "refresh", "alpha", "--build", "--dry-run"])
+        args = parser.parse_args(
+            ["worktree", "refresh", "alpha", "--build", "--dry-run"]
+        )
         self.assertEqual(args.target, "alpha")
         self.assertTrue(args.build)
         self.assertTrue(args.dry_run)
@@ -531,7 +565,9 @@ class TestRegisterSubcommands(unittest.TestCase):
 
     def test_worktree_activate_with_flags(self) -> None:
         parser = self._build_parser()
-        args = parser.parse_args(["worktree", "activate", "alpha", "--base", "develop", "--dry-run"])
+        args = parser.parse_args(
+            ["worktree", "activate", "alpha", "--base", "develop", "--dry-run"]
+        )
         self.assertEqual(args.base, "develop")
         self.assertTrue(args.dry_run)
 
@@ -549,7 +585,9 @@ class TestRegisterSubcommands(unittest.TestCase):
 
     def test_worktree_claim_with_base(self) -> None:
         parser = self._build_parser()
-        args = parser.parse_args(["worktree", "claim", "my-branch", "--base", "develop"])
+        args = parser.parse_args(
+            ["worktree", "claim", "my-branch", "--base", "develop"]
+        )
         self.assertEqual(args.branch, "my-branch")
         self.assertEqual(args.base, "develop")
 

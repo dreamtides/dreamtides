@@ -123,12 +123,13 @@ class TestTransfigurationEligibility:
 
         for keyword in ["judgment", "whenever", "at the start", "at the end", "when"]:
             card = _make_card(
-                "Test Card", 1,
+                "Test Card",
+                1,
                 rules_text=f"Some text {keyword} something happens.",
             )
-            assert is_eligible(card, TransfigType.MAGENTA), (
-                f"Expected Magenta eligible for keyword '{keyword}'"
-            )
+            assert is_eligible(
+                card, TransfigType.MAGENTA
+            ), f"Expected Magenta eligible for keyword '{keyword}'"
 
     def test_magenta_ineligible_without_triggers(self) -> None:
         """Magenta requires trigger keywords; none should fail."""
@@ -142,7 +143,10 @@ class TestTransfigurationEligibility:
         from sites_transfig import is_eligible, TransfigType
 
         card = _make_card(
-            "Test Card", 1, card_type=CardType.EVENT, spark=None,
+            "Test Card",
+            1,
+            card_type=CardType.EVENT,
+            spark=None,
         )
         assert is_eligible(card, TransfigType.AZURE)
 
@@ -158,7 +162,10 @@ class TestTransfigurationEligibility:
         from sites_transfig import is_eligible, TransfigType
 
         card = _make_card(
-            "Test Card", 1, card_type=CardType.EVENT, spark=None,
+            "Test Card",
+            1,
+            card_type=CardType.EVENT,
+            spark=None,
         )
         assert is_eligible(card, TransfigType.BRONZE)
 
@@ -174,7 +181,8 @@ class TestTransfigurationEligibility:
         from sites_transfig import is_eligible, TransfigType
 
         card = _make_card(
-            "Test Card", 1,
+            "Test Card",
+            1,
             rules_text="Pay 2 energy: Draw a card.",
         )
         assert is_eligible(card, TransfigType.ROSE)
@@ -192,7 +200,8 @@ class TestTransfigurationEligibility:
 
         # Character with cost > 0 and digits in text -> Viridian + Golden + Scarlet
         card = _make_card(
-            "Test Card", 1,
+            "Test Card",
+            1,
             energy_cost=3,
             card_type=CardType.CHARACTER,
             rules_text="Deal 5 damage.",
@@ -207,7 +216,8 @@ class TestTransfigurationEligibility:
         # Actually that's 2, let me make one that only qualifies for 1
         # Character with cost 0, no digits, no trigger -> only Scarlet
         card = _make_card(
-            "Test Card", 1,
+            "Test Card",
+            1,
             energy_cost=0,
             card_type=CardType.CHARACTER,
             rules_text="Draw a card.",
@@ -223,7 +233,8 @@ class TestGetApplicableTypes:
         from sites_transfig import get_applicable_types, TransfigType
 
         card = _make_card(
-            "Test Card", 1,
+            "Test Card",
+            1,
             energy_cost=3,
             card_type=CardType.CHARACTER,
             rules_text="Deal 5 damage.",
@@ -240,7 +251,8 @@ class TestGetApplicableTypes:
         from sites_transfig import get_applicable_types, TransfigType
 
         card = _make_card(
-            "Test Card", 1,
+            "Test Card",
+            1,
             card_type=CardType.EVENT,
             spark=None,
             rules_text="Draw a card.",
@@ -256,7 +268,8 @@ class TestGetApplicableTypes:
         from sites_transfig import get_applicable_types
 
         card = _make_card(
-            "Test Card", 1,
+            "Test Card",
+            1,
             energy_cost=0,
             card_type=CardType.CHARACTER,
             rules_text="Draw a card.",
@@ -277,7 +290,8 @@ class TestNormalTransfiguration:
         # Add 10 cards
         for i in range(10):
             card = _make_card(
-                f"Card {i}", i,
+                f"Card {i}",
+                i,
                 energy_cost=i + 1,
                 rules_text=f"Deal {i + 1} damage.",
             )
@@ -286,7 +300,8 @@ class TestNormalTransfiguration:
         captured_options: list[list[str]] = []
 
         def mock_single_select(
-            options: list[str], **kwargs: object,
+            options: list[str],
+            **kwargs: object,
         ) -> int:
             captured_options.append(list(options))
             return len(options) - 1  # Select Skip
@@ -314,7 +329,8 @@ class TestNormalTransfiguration:
         # Add 4 cards, mark 3 as transfigured
         for i in range(4):
             card = _make_card(
-                f"Card {i}", i,
+                f"Card {i}",
+                i,
                 energy_cost=i + 1,
                 rules_text=f"Deal {i + 1} damage.",
             )
@@ -325,7 +341,8 @@ class TestNormalTransfiguration:
         captured_options: list[list[str]] = []
 
         def mock_single_select(
-            options: list[str], **kwargs: object,
+            options: list[str],
+            **kwargs: object,
         ) -> int:
             captured_options.append(list(options))
             return len(options) - 1  # Skip
@@ -352,7 +369,8 @@ class TestNormalTransfiguration:
         state = _make_quest_state(seed=42)
         for i in range(5):
             card = _make_card(
-                f"Card {i}", i,
+                f"Card {i}",
+                i,
                 energy_cost=i + 1,
                 rules_text=f"Deal {i + 1} damage.",
             )
@@ -382,7 +400,8 @@ class TestNormalTransfiguration:
         state = _make_quest_state(seed=42)
         for i in range(5):
             card = _make_card(
-                f"Card {i}", i,
+                f"Card {i}",
+                i,
                 energy_cost=i + 1,
                 rules_text=f"Deal {i + 1} damage.",
             )
@@ -391,7 +410,8 @@ class TestNormalTransfiguration:
         captured_options: list[list[str]] = []
 
         def mock_single_select(
-            options: list[str], **kwargs: object,
+            options: list[str],
+            **kwargs: object,
         ) -> int:
             captured_options.append(list(options))
             return len(options) - 1  # Skip is the last option
@@ -425,7 +445,6 @@ class TestNormalTransfiguration:
         )
         assert state.deck_count() == 0
 
-
     def test_normal_never_drops_cards_after_sampling(self) -> None:
         """Normal mode should pre-filter eligible cards rather than
         sampling first and then silently dropping ineligible ones.
@@ -440,7 +459,8 @@ class TestNormalTransfiguration:
         # Add 10 cards
         for i in range(10):
             card = _make_card(
-                f"Card {i}", i,
+                f"Card {i}",
+                i,
                 energy_cost=i + 1,
                 rules_text=f"Deal {i + 1} damage.",
             )
@@ -462,7 +482,8 @@ class TestNormalTransfiguration:
         captured_options: list[list[str]] = []
 
         def mock_single_select(
-            options: list[str], **kwargs: object,
+            options: list[str],
+            **kwargs: object,
         ) -> int:
             captured_options.append(list(options))
             return len(options) - 1  # Skip
@@ -492,7 +513,8 @@ class TestNormalTransfiguration:
         state = _make_quest_state(seed=42)
         for i in range(10):
             card = _make_card(
-                f"Card {i}", i,
+                f"Card {i}",
+                i,
                 energy_cost=i + 1,
                 rules_text=f"Deal {i + 1} damage.",
             )
@@ -512,7 +534,8 @@ class TestNormalTransfiguration:
         captured_options: list[list[str]] = []
 
         def mock_single_select(
-            options: list[str], **kwargs: object,
+            options: list[str],
+            **kwargs: object,
         ) -> int:
             captured_options.append(list(options))
             return len(options) - 1  # Skip
@@ -541,7 +564,8 @@ class TestEnhancedTransfiguration:
         state = _make_quest_state(seed=42)
         for i in range(8):
             card = _make_card(
-                f"Card {i}", i,
+                f"Card {i}",
+                i,
                 energy_cost=i + 1,
                 rules_text=f"Deal {i + 1} damage.",
             )
@@ -553,7 +577,8 @@ class TestEnhancedTransfiguration:
         captured_options: list[list[str]] = []
 
         def mock_single_select(
-            options: list[str], **kwargs: object,
+            options: list[str],
+            **kwargs: object,
         ) -> int:
             captured_options.append(list(options))
             return 0  # Select first
@@ -581,7 +606,8 @@ class TestEnhancedTransfiguration:
         state = _make_quest_state(seed=42)
         # Card that qualifies for Viridian + Golden + Scarlet -> Prismatic
         card = _make_card(
-            "Multi Card", 1,
+            "Multi Card",
+            1,
             energy_cost=3,
             card_type=CardType.CHARACTER,
             rules_text="Deal 5 damage.",
@@ -613,7 +639,8 @@ class TestEnhancedTransfiguration:
         state = _make_quest_state(seed=42)
         # Character with cost=0, no digits, no triggers -> only Scarlet
         card = _make_card(
-            "Simple Card", 1,
+            "Simple Card",
+            1,
             energy_cost=0,
             card_type=CardType.CHARACTER,
             rules_text="Draw a card.",
@@ -648,7 +675,8 @@ class TestTransfigNote:
 
         state = _make_quest_state(seed=42)
         card = _make_card(
-            "Whirlpool Seer", 1,
+            "Whirlpool Seer",
+            1,
             energy_cost=3,
             card_type=CardType.CHARACTER,
             rules_text="Draw a card.",
@@ -708,7 +736,8 @@ class TestEligibilityExplanation:
         from sites_transfig import eligibility_explanation, TransfigType
 
         card = _make_card(
-            "Test Card", 1,
+            "Test Card",
+            1,
             rules_text="Judgment: deal damage.",
         )
         explanation = eligibility_explanation(card, TransfigType.MAGENTA)
@@ -719,7 +748,10 @@ class TestEligibilityExplanation:
         from sites_transfig import eligibility_explanation, TransfigType
 
         card = _make_card(
-            "Test Card", 1, card_type=CardType.EVENT, spark=None,
+            "Test Card",
+            1,
+            card_type=CardType.EVENT,
+            spark=None,
         )
         explanation = eligibility_explanation(card, TransfigType.AZURE)
         assert "event" in explanation.lower()
@@ -729,7 +761,10 @@ class TestEligibilityExplanation:
         from sites_transfig import eligibility_explanation, TransfigType
 
         card = _make_card(
-            "Test Card", 1, card_type=CardType.EVENT, spark=None,
+            "Test Card",
+            1,
+            card_type=CardType.EVENT,
+            spark=None,
         )
         explanation = eligibility_explanation(card, TransfigType.BRONZE)
         assert "event" in explanation.lower()
@@ -739,7 +774,8 @@ class TestEligibilityExplanation:
         from sites_transfig import eligibility_explanation, TransfigType
 
         card = _make_card(
-            "Test Card", 1,
+            "Test Card",
+            1,
             rules_text="Pay 2 energy: Draw a card.",
         )
         explanation = eligibility_explanation(card, TransfigType.ROSE)
@@ -750,7 +786,8 @@ class TestEligibilityExplanation:
         from sites_transfig import eligibility_explanation, TransfigType
 
         card = _make_card(
-            "Test Card", 1,
+            "Test Card",
+            1,
             energy_cost=3,
             card_type=CardType.CHARACTER,
             rules_text="Deal 5 damage.",
@@ -803,7 +840,8 @@ class TestRenderTransfigPreview:
         from sites_transfig import _render_transfig_item, TransfigType
 
         card = _make_card(
-            "Whirlpool Seer", 1,
+            "Whirlpool Seer",
+            1,
             energy_cost=3,
             spark=2,
             rarity=Rarity.UNCOMMON,
@@ -823,7 +861,8 @@ class TestRenderTransfigPreview:
         from sites_transfig import _render_transfig_item, TransfigType
 
         card = _make_card(
-            "Whirlpool Seer", 1,
+            "Whirlpool Seer",
+            1,
             energy_cost=3,
             spark=2,
             rules_text="Judgment: Foresee 2.",
@@ -844,7 +883,10 @@ class TestRenderTransfigPreview:
         candidates = [(dc, TransfigType.VIRIDIAN)]
 
         rendered = _render_transfig_item(
-            1, "Skip transfiguration", True, candidates,
+            1,
+            "Skip transfiguration",
+            True,
+            candidates,
         )
         assert "Skip" in rendered
 
@@ -859,7 +901,8 @@ class TestTransfigurationLogging:
         state = _make_quest_state(seed=42)
         for i in range(5):
             card = _make_card(
-                f"Card {i}", i,
+                f"Card {i}",
+                i,
                 energy_cost=i + 1,
                 rules_text=f"Deal {i + 1} damage.",
             )
@@ -892,7 +935,8 @@ class TestTransfigurationLogging:
         state = _make_quest_state(seed=42)
         for i in range(5):
             card = _make_card(
-                f"Card {i}", i,
+                f"Card {i}",
+                i,
                 energy_cost=i + 1,
                 rules_text=f"Deal {i + 1} damage.",
             )
@@ -907,7 +951,8 @@ class TestTransfigurationLogging:
         captured_options: list[list[str]] = []
 
         def mock_single_select(
-            options: list[str], **kwargs: object,
+            options: list[str],
+            **kwargs: object,
         ) -> int:
             captured_options.append(list(options))
             return len(options) - 1  # Skip

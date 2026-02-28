@@ -90,9 +90,7 @@ class TestSelectDreamcallers:
     def test_selects_three_dreamcallers(self) -> None:
         from sites_dreamcaller import select_dreamcallers
 
-        all_callers = [
-            _make_dreamcaller(name=f"Caller {i}") for i in range(8)
-        ]
+        all_callers = [_make_dreamcaller(name=f"Caller {i}") for i in range(8)]
         rng = random.Random(42)
         result = select_dreamcallers(all_callers, rng)
         assert len(result) == 3
@@ -100,9 +98,7 @@ class TestSelectDreamcallers:
     def test_all_selected_from_pool(self) -> None:
         from sites_dreamcaller import select_dreamcallers
 
-        all_callers = [
-            _make_dreamcaller(name=f"Caller {i}") for i in range(8)
-        ]
+        all_callers = [_make_dreamcaller(name=f"Caller {i}") for i in range(8)]
         rng = random.Random(42)
         result = select_dreamcallers(all_callers, rng)
         for dc in result:
@@ -111,9 +107,7 @@ class TestSelectDreamcallers:
     def test_no_duplicates(self) -> None:
         from sites_dreamcaller import select_dreamcallers
 
-        all_callers = [
-            _make_dreamcaller(name=f"Caller {i}") for i in range(8)
-        ]
+        all_callers = [_make_dreamcaller(name=f"Caller {i}") for i in range(8)]
         rng = random.Random(42)
         result = select_dreamcallers(all_callers, rng)
         assert len(set(id(dc) for dc in result)) == 3
@@ -121,9 +115,7 @@ class TestSelectDreamcallers:
     def test_deterministic_with_same_seed(self) -> None:
         from sites_dreamcaller import select_dreamcallers
 
-        all_callers = [
-            _make_dreamcaller(name=f"Caller {i}") for i in range(8)
-        ]
+        all_callers = [_make_dreamcaller(name=f"Caller {i}") for i in range(8)]
         rng1 = random.Random(99)
         rng2 = random.Random(99)
         result1 = select_dreamcallers(all_callers, rng1)
@@ -133,9 +125,7 @@ class TestSelectDreamcallers:
     def test_handles_exactly_three(self) -> None:
         from sites_dreamcaller import select_dreamcallers
 
-        all_callers = [
-            _make_dreamcaller(name=f"Caller {i}") for i in range(3)
-        ]
+        all_callers = [_make_dreamcaller(name=f"Caller {i}") for i in range(3)]
         rng = random.Random(42)
         result = select_dreamcallers(all_callers, rng)
         assert len(result) == 3
@@ -143,9 +133,7 @@ class TestSelectDreamcallers:
     def test_handles_fewer_than_three(self) -> None:
         from sites_dreamcaller import select_dreamcallers
 
-        all_callers = [
-            _make_dreamcaller(name=f"Caller {i}") for i in range(2)
-        ]
+        all_callers = [_make_dreamcaller(name=f"Caller {i}") for i in range(2)]
         rng = random.Random(42)
         result = select_dreamcallers(all_callers, rng)
         assert len(result) == 2
@@ -447,9 +435,7 @@ class TestRunDreamcallerDraft:
         from sites_dreamcaller import run_dreamcaller_draft
 
         state = _make_quest_state(essence=250)
-        all_callers = [
-            _make_dreamcaller(name=f"Caller {i}") for i in range(5)
-        ]
+        all_callers = [_make_dreamcaller(name=f"Caller {i}") for i in range(5)]
         log_calls: list[dict[str, object]] = []
 
         class FakeLogger:

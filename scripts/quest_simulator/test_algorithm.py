@@ -256,12 +256,10 @@ class TestDiversityCheck:
             result = select_cards(pool, 4, profile, params, rng)
             resonance_sets = [e.card.resonances for e, _ in result]
             all_tide = all(Resonance.TIDE in rs for rs in resonance_sets)
-            non_tide_exists = any(
-                Resonance.TIDE not in rs for rs in resonance_sets
-            )
-            assert non_tide_exists or not all_tide, (
-                f"Seed {seed}: all 4 cards share Tide, diversity check failed"
-            )
+            non_tide_exists = any(Resonance.TIDE not in rs for rs in resonance_sets)
+            assert (
+                non_tide_exists or not all_tide
+            ), f"Seed {seed}: all 4 cards share Tide, diversity check failed"
 
     def test_mixed_resonances_not_swapped(self) -> None:
         from algorithm import select_cards

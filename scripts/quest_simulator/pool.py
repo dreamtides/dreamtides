@@ -10,15 +10,13 @@ from models import (
     Resonance,
 )
 
+
 def generate_variance(
     rng: random.Random,
     params: PoolParams,
 ) -> dict[Resonance, float]:
     """Generate a per-resonance variance multiplier for pool construction."""
-    return {
-        r: rng.uniform(params.variance_min, params.variance_max)
-        for r in Resonance
-    }
+    return {r: rng.uniform(params.variance_min, params.variance_max) for r in Resonance}
 
 
 def build_pool(

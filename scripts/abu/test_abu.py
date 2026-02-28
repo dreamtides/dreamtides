@@ -67,24 +67,56 @@ class TestBuildParams(unittest.TestCase):
     """Test params construction for each command type."""
 
     def test_snapshot_no_flags(self) -> None:
-        ns = argparse.Namespace(command="snapshot", compact=False, interactive=False, max_depth=None, effect_logs=False)
+        ns = argparse.Namespace(
+            command="snapshot",
+            compact=False,
+            interactive=False,
+            max_depth=None,
+            effect_logs=False,
+        )
         self.assertEqual(build_params(ns), {})
 
     def test_snapshot_compact(self) -> None:
-        ns = argparse.Namespace(command="snapshot", compact=True, interactive=False, max_depth=None, effect_logs=False)
+        ns = argparse.Namespace(
+            command="snapshot",
+            compact=True,
+            interactive=False,
+            max_depth=None,
+            effect_logs=False,
+        )
         self.assertEqual(build_params(ns), {"compact": True})
 
     def test_snapshot_interactive(self) -> None:
-        ns = argparse.Namespace(command="snapshot", compact=False, interactive=True, max_depth=None, effect_logs=False)
+        ns = argparse.Namespace(
+            command="snapshot",
+            compact=False,
+            interactive=True,
+            max_depth=None,
+            effect_logs=False,
+        )
         self.assertEqual(build_params(ns), {"interactive": True})
 
     def test_snapshot_max_depth(self) -> None:
-        ns = argparse.Namespace(command="snapshot", compact=False, interactive=False, max_depth=5, effect_logs=False)
+        ns = argparse.Namespace(
+            command="snapshot",
+            compact=False,
+            interactive=False,
+            max_depth=5,
+            effect_logs=False,
+        )
         self.assertEqual(build_params(ns), {"maxDepth": 5})
 
     def test_snapshot_all_flags(self) -> None:
-        ns = argparse.Namespace(command="snapshot", compact=True, interactive=True, max_depth=3, effect_logs=False)
-        self.assertEqual(build_params(ns), {"compact": True, "interactive": True, "maxDepth": 3})
+        ns = argparse.Namespace(
+            command="snapshot",
+            compact=True,
+            interactive=True,
+            max_depth=3,
+            effect_logs=False,
+        )
+        self.assertEqual(
+            build_params(ns), {"compact": True, "interactive": True, "maxDepth": 3}
+        )
 
     def test_click_params(self) -> None:
         ns = argparse.Namespace(command="click", ref="@e1", effect_logs=False)
@@ -95,11 +127,15 @@ class TestBuildParams(unittest.TestCase):
         self.assertEqual(build_params(ns), {"ref": "e2"})
 
     def test_drag_with_target(self) -> None:
-        ns = argparse.Namespace(command="drag", source="@e1", target="@e2", effect_logs=False)
+        ns = argparse.Namespace(
+            command="drag", source="@e1", target="@e2", effect_logs=False
+        )
         self.assertEqual(build_params(ns), {"source": "e1", "target": "e2"})
 
     def test_drag_without_target(self) -> None:
-        ns = argparse.Namespace(command="drag", source="e1", target=None, effect_logs=False)
+        ns = argparse.Namespace(
+            command="drag", source="e1", target=None, effect_logs=False
+        )
         self.assertEqual(build_params(ns), {"source": "e1"})
 
     def test_screenshot_params(self) -> None:
@@ -107,7 +143,13 @@ class TestBuildParams(unittest.TestCase):
         self.assertEqual(build_params(ns), {})
 
     def test_snapshot_effect_logs(self) -> None:
-        ns = argparse.Namespace(command="snapshot", compact=False, interactive=False, max_depth=None, effect_logs=True)
+        ns = argparse.Namespace(
+            command="snapshot",
+            compact=False,
+            interactive=False,
+            max_depth=None,
+            effect_logs=True,
+        )
         self.assertEqual(build_params(ns), {"effectLogs": True})
 
     def test_click_effect_logs(self) -> None:
@@ -119,7 +161,9 @@ class TestBuildParams(unittest.TestCase):
         self.assertEqual(build_params(ns), {"ref": "e1", "effectLogs": True})
 
     def test_drag_effect_logs(self) -> None:
-        ns = argparse.Namespace(command="drag", source="e1", target=None, effect_logs=True)
+        ns = argparse.Namespace(
+            command="drag", source="e1", target=None, effect_logs=True
+        )
         self.assertEqual(build_params(ns), {"source": "e1", "effectLogs": True})
 
 
@@ -149,25 +193,25 @@ class TestHandleResponse(unittest.TestCase):
             "id": "test-id",
             "success": True,
             "data": {
-                "snapshot": "- application \"Dreamtides\"",
+                "snapshot": '- application "Dreamtides"',
                 "refs": {"e1": {"role": "button", "name": "End Turn"}},
             },
         }
         result = handle_response("snapshot", response)
-        self.assertEqual(result, "- application \"Dreamtides\"")
+        self.assertEqual(result, '- application "Dreamtides"')
 
     def test_snapshot_response_json_mode(self) -> None:
         response = {
             "id": "test-id",
             "success": True,
             "data": {
-                "snapshot": "- application \"Dreamtides\"",
+                "snapshot": '- application "Dreamtides"',
                 "refs": {"e1": {"role": "button", "name": "End Turn"}},
             },
         }
         result = handle_response("snapshot", response, json_output=True)
         parsed = json.loads(result)
-        self.assertEqual(parsed["snapshot"], "- application \"Dreamtides\"")
+        self.assertEqual(parsed["snapshot"], '- application "Dreamtides"')
         self.assertIn("e1", parsed["refs"])
 
     def test_click_response(self) -> None:
@@ -376,7 +420,9 @@ class TestBuildParser(unittest.TestCase):
 
     def test_snapshot_all_flags(self) -> None:
         parser = build_parser()
-        args = parser.parse_args(["snapshot", "--compact", "--interactive", "--max-depth", "5"])
+        args = parser.parse_args(
+            ["snapshot", "--compact", "--interactive", "--max-depth", "5"]
+        )
         self.assertTrue(args.compact)
         self.assertTrue(args.interactive)
         self.assertEqual(args.max_depth, 5)
@@ -546,21 +592,27 @@ class TestIsWorktree(unittest.TestCase):
     @patch("abu.subprocess.run")
     def test_subdirectory_not_worktree(self, mock_run: MagicMock) -> None:
         mock_run.return_value = subprocess.CompletedProcess(
-            args=[], returncode=0,
-            stdout="/Users/me/project/.git\n../../.git\n", stderr=""
+            args=[],
+            returncode=0,
+            stdout="/Users/me/project/.git\n../../.git\n",
+            stderr="",
         )
-        with patch("abu.os.path.realpath", side_effect=[
-            "/Users/me/project/.git",
-            "/Users/me/project/.git",
-        ]):
+        with patch(
+            "abu.os.path.realpath",
+            side_effect=[
+                "/Users/me/project/.git",
+                "/Users/me/project/.git",
+            ],
+        ):
             self.assertFalse(is_worktree())
 
     @patch("abu.subprocess.run")
     def test_worktree_detected(self, mock_run: MagicMock) -> None:
         mock_run.return_value = subprocess.CompletedProcess(
-            args=[], returncode=0,
+            args=[],
+            returncode=0,
             stdout="/Users/me/project/.git/worktrees/branch\n/Users/me/project/.git\n",
-            stderr=""
+            stderr="",
         )
         self.assertTrue(is_worktree())
 
@@ -574,10 +626,7 @@ class TestReportResult(unittest.TestCase):
     """Test log parsing and RefreshResult construction."""
 
     def test_no_errors(self) -> None:
-        content = (
-            "Some log line\n"
-            "Asset Pipeline Refresh (id=abc): Total: 1.234s\n"
-        )
+        content = "Some log line\n" "Asset Pipeline Refresh (id=abc): Total: 1.234s\n"
         result = _report_result(content)
         self.assertTrue(result.finished)
         self.assertTrue(result.success)
@@ -800,6 +849,7 @@ class TestDoStatus(unittest.TestCase):
     def test_no_state_file(self, _mock_read: MagicMock, _mock_tcp: MagicMock) -> None:
         import io
         from contextlib import redirect_stdout
+
         buf = io.StringIO()
         with redirect_stdout(buf):
             do_status()
@@ -810,18 +860,25 @@ class TestDoStatus(unittest.TestCase):
 
     @patch("abu.is_play_mode_active", return_value=True)
     @patch("abu.is_pid_alive", return_value=True)
-    @patch("abu.read_state_file", return_value={
-        "version": 1,
-        "playModeState": "EnteredPlayMode",
-        "gameMode": "Battle",
-        "unityPid": 12345,
-        "timestampUtc": "2026-02-22T12:34:56Z",
-    })
+    @patch(
+        "abu.read_state_file",
+        return_value={
+            "version": 1,
+            "playModeState": "EnteredPlayMode",
+            "gameMode": "Battle",
+            "unityPid": 12345,
+            "timestampUtc": "2026-02-22T12:34:56Z",
+        },
+    )
     def test_active_play_mode(
-        self, _mock_read: MagicMock, _mock_pid: MagicMock, _mock_tcp: MagicMock,
+        self,
+        _mock_read: MagicMock,
+        _mock_pid: MagicMock,
+        _mock_tcp: MagicMock,
     ) -> None:
         import io
         from contextlib import redirect_stdout
+
         buf = io.StringIO()
         with redirect_stdout(buf):
             do_status()
@@ -834,18 +891,25 @@ class TestDoStatus(unittest.TestCase):
 
     @patch("abu.is_play_mode_active", return_value=False)
     @patch("abu.is_pid_alive", return_value=False)
-    @patch("abu.read_state_file", return_value={
-        "version": 1,
-        "playModeState": "EnteredPlayMode",
-        "gameMode": "Quest",
-        "unityPid": 99999,
-        "timestampUtc": "2026-02-22T12:00:00Z",
-    })
+    @patch(
+        "abu.read_state_file",
+        return_value={
+            "version": 1,
+            "playModeState": "EnteredPlayMode",
+            "gameMode": "Quest",
+            "unityPid": 99999,
+            "timestampUtc": "2026-02-22T12:00:00Z",
+        },
+    )
     def test_stale_pid(
-        self, _mock_read: MagicMock, _mock_pid: MagicMock, _mock_tcp: MagicMock,
+        self,
+        _mock_read: MagicMock,
+        _mock_pid: MagicMock,
+        _mock_tcp: MagicMock,
     ) -> None:
         import io
         from contextlib import redirect_stdout
+
         buf = io.StringIO()
         with redirect_stdout(buf):
             do_status()
@@ -870,7 +934,8 @@ class TestFindUnityProcess(unittest.TestCase):
     @patch("abu.subprocess.run")
     def test_finds_unity_process(self, mock_run: MagicMock) -> None:
         ps_list = subprocess.CompletedProcess(
-            args=[], returncode=0,
+            args=[],
+            returncode=0,
             stdout=(
                 "  PID COMM\n"
                 "  123 /Applications/Unity/Hub/Editor/6000.1.3f1"
@@ -879,7 +944,8 @@ class TestFindUnityProcess(unittest.TestCase):
             stderr="",
         )
         ps_args = subprocess.CompletedProcess(
-            args=[], returncode=0,
+            args=[],
+            returncode=0,
             stdout=(
                 "/Applications/Unity/Hub/Editor/6000.1.3f1"
                 "/Unity.app/Contents/MacOS/Unity"
@@ -896,7 +962,8 @@ class TestFindUnityProcess(unittest.TestCase):
     @patch("abu.subprocess.run")
     def test_finds_unity_with_lowercase_projectpath(self, mock_run: MagicMock) -> None:
         ps_list = subprocess.CompletedProcess(
-            args=[], returncode=0,
+            args=[],
+            returncode=0,
             stdout=(
                 "  PID COMM\n"
                 "  123 /Applications/Unity/Hub/Editor/6000.2.2f1"
@@ -905,7 +972,8 @@ class TestFindUnityProcess(unittest.TestCase):
             stderr="",
         )
         ps_args = subprocess.CompletedProcess(
-            args=[], returncode=0,
+            args=[],
+            returncode=0,
             stdout=(
                 "/Applications/Unity/Hub/Editor/6000.2.2f1"
                 "/Unity.app/Contents/MacOS/Unity"
@@ -920,7 +988,8 @@ class TestFindUnityProcess(unittest.TestCase):
     @patch("abu.subprocess.run")
     def test_skips_batch_mode_workers(self, mock_run: MagicMock) -> None:
         ps_list = subprocess.CompletedProcess(
-            args=[], returncode=0,
+            args=[],
+            returncode=0,
             stdout=(
                 "  PID COMM\n"
                 "  100 /Applications/Unity/Hub/Editor/6000.2.2f1"
@@ -932,7 +1001,8 @@ class TestFindUnityProcess(unittest.TestCase):
         )
         # First candidate is a batchMode worker
         ps_args_worker = subprocess.CompletedProcess(
-            args=[], returncode=0,
+            args=[],
+            returncode=0,
             stdout=(
                 "/Applications/Unity/Hub/Editor/6000.2.2f1"
                 "/Unity.app/Contents/MacOS/Unity"
@@ -943,7 +1013,8 @@ class TestFindUnityProcess(unittest.TestCase):
         )
         # Second candidate is the main editor
         ps_args_main = subprocess.CompletedProcess(
-            args=[], returncode=0,
+            args=[],
+            returncode=0,
             stdout=(
                 "/Applications/Unity/Hub/Editor/6000.2.2f1"
                 "/Unity.app/Contents/MacOS/Unity"
@@ -958,7 +1029,8 @@ class TestFindUnityProcess(unittest.TestCase):
     @patch("abu.subprocess.run")
     def test_raises_when_no_unity(self, mock_run: MagicMock) -> None:
         ps_list = subprocess.CompletedProcess(
-            args=[], returncode=0,
+            args=[],
+            returncode=0,
             stdout="  PID COMM\n  456 /usr/bin/python3\n",
             stderr="",
         )
@@ -970,7 +1042,8 @@ class TestFindUnityProcess(unittest.TestCase):
     @patch("abu.subprocess.run")
     def test_falls_back_to_client_dir(self, mock_run: MagicMock) -> None:
         ps_list = subprocess.CompletedProcess(
-            args=[], returncode=0,
+            args=[],
+            returncode=0,
             stdout=(
                 "  PID COMM\n"
                 "  789 /Applications/Unity/Hub/Editor/6000.1.3f1"
@@ -979,7 +1052,8 @@ class TestFindUnityProcess(unittest.TestCase):
             stderr="",
         )
         ps_args = subprocess.CompletedProcess(
-            args=[], returncode=0,
+            args=[],
+            returncode=0,
             stdout=(
                 "/Applications/Unity/Hub/Editor/6000.1.3f1"
                 "/Unity.app/Contents/MacOS/Unity\n"
@@ -1026,7 +1100,9 @@ class TestResolvePort(unittest.TestCase):
 
     @patch("abu.PORTS_FILE")
     @patch("abu.resolve_worktree_name", return_value="alpha")
-    def test_worktree_reads_ports_file(self, _mock_name: MagicMock, mock_ports_file: MagicMock) -> None:
+    def test_worktree_reads_ports_file(
+        self, _mock_name: MagicMock, mock_ports_file: MagicMock
+    ) -> None:
         mock_ports_file.read_text.return_value = json.dumps({"alpha": 10000})
         with patch.dict(os.environ, {}, clear=True):
             self.assertEqual(resolve_port(), 10000)
@@ -1039,7 +1115,10 @@ class TestSendMenuItemPidTargeted(unittest.TestCase):
     @patch("abu.is_pid_alive", return_value=True)
     @patch("abu.read_state_file", return_value={"unityPid": 123})
     def test_valid_pid_uses_application_for_pid(
-        self, _mock_state: MagicMock, _mock_alive: MagicMock, mock_hs: MagicMock,
+        self,
+        _mock_state: MagicMock,
+        _mock_alive: MagicMock,
+        mock_hs: MagicMock,
     ) -> None:
         result = send_menu_item(["Assets", "Refresh"])
         self.assertIn("OK", result)
@@ -1049,7 +1128,9 @@ class TestSendMenuItemPidTargeted(unittest.TestCase):
     @patch("abu.run_hs", return_value="OK: Selected Assets > Refresh (pid 456)")
     @patch("abu.read_state_file", return_value=None)
     def test_missing_state_falls_back_to_bundle_id(
-        self, _mock_state: MagicMock, mock_hs: MagicMock,
+        self,
+        _mock_state: MagicMock,
+        mock_hs: MagicMock,
     ) -> None:
         result = send_menu_item(["Assets", "Refresh"])
         self.assertIn("OK", result)
@@ -1060,7 +1141,10 @@ class TestSendMenuItemPidTargeted(unittest.TestCase):
     @patch("abu.is_pid_alive", return_value=False)
     @patch("abu.read_state_file", return_value={"unityPid": 999})
     def test_stale_pid_falls_back_to_bundle_id(
-        self, _mock_state: MagicMock, _mock_alive: MagicMock, mock_hs: MagicMock,
+        self,
+        _mock_state: MagicMock,
+        _mock_alive: MagicMock,
+        mock_hs: MagicMock,
     ) -> None:
         result = send_menu_item(["Assets", "Refresh"])
         self.assertIn("OK", result)
@@ -1074,22 +1158,33 @@ class TestCheckLogConflict(unittest.TestCase):
     @patch("abu.is_pid_alive", return_value=True)
     @patch("abu.all_state_files")
     def test_detects_shared_log_file(
-        self, mock_files: MagicMock, _mock_alive: MagicMock,
+        self,
+        mock_files: MagicMock,
+        _mock_alive: MagicMock,
     ) -> None:
         import tempfile
+
         with tempfile.TemporaryDirectory() as tmpdir:
             state1 = Path(tmpdir) / "main" / ".abu-state.json"
             state2 = Path(tmpdir) / "wt" / ".abu-state.json"
             state1.parent.mkdir()
             state2.parent.mkdir()
-            state1.write_text(json.dumps({
-                "unityPid": 100,
-                "logFile": "/shared/Editor.log",
-            }))
-            state2.write_text(json.dumps({
-                "unityPid": 200,
-                "logFile": "/shared/Editor.log",
-            }))
+            state1.write_text(
+                json.dumps(
+                    {
+                        "unityPid": 100,
+                        "logFile": "/shared/Editor.log",
+                    }
+                )
+            )
+            state2.write_text(
+                json.dumps(
+                    {
+                        "unityPid": 200,
+                        "logFile": "/shared/Editor.log",
+                    }
+                )
+            )
             mock_files.return_value = [state1, state2]
             with self.assertRaises(SystemExit):
                 check_log_conflict()
@@ -1097,22 +1192,33 @@ class TestCheckLogConflict(unittest.TestCase):
     @patch("abu.is_pid_alive", return_value=True)
     @patch("abu.all_state_files")
     def test_passes_with_distinct_logs(
-        self, mock_files: MagicMock, _mock_alive: MagicMock,
+        self,
+        mock_files: MagicMock,
+        _mock_alive: MagicMock,
     ) -> None:
         import tempfile
+
         with tempfile.TemporaryDirectory() as tmpdir:
             state1 = Path(tmpdir) / "main" / ".abu-state.json"
             state2 = Path(tmpdir) / "wt" / ".abu-state.json"
             state1.parent.mkdir()
             state2.parent.mkdir()
-            state1.write_text(json.dumps({
-                "unityPid": 100,
-                "logFile": "/main/Editor.log",
-            }))
-            state2.write_text(json.dumps({
-                "unityPid": 200,
-                "logFile": "/wt/Editor.log",
-            }))
+            state1.write_text(
+                json.dumps(
+                    {
+                        "unityPid": 100,
+                        "logFile": "/main/Editor.log",
+                    }
+                )
+            )
+            state2.write_text(
+                json.dumps(
+                    {
+                        "unityPid": 200,
+                        "logFile": "/wt/Editor.log",
+                    }
+                )
+            )
             mock_files.return_value = [state1, state2]
             check_log_conflict()  # Should not raise
 
@@ -1137,6 +1243,7 @@ class TestFindUnityExecutable(unittest.TestCase):
 
     def test_finds_unity_app(self) -> None:
         import tempfile
+
         with tempfile.TemporaryDirectory() as tmpdir:
             client = Path(tmpdir)
             settings = client / "ProjectSettings"
@@ -1153,6 +1260,7 @@ class TestFindUnityExecutable(unittest.TestCase):
 
     def test_raises_when_version_file_missing(self) -> None:
         import tempfile
+
         with tempfile.TemporaryDirectory() as tmpdir:
             client = Path(tmpdir)
             with self.assertRaises(AbuError) as ctx:
@@ -1161,6 +1269,7 @@ class TestFindUnityExecutable(unittest.TestCase):
 
     def test_raises_when_unity_not_installed(self) -> None:
         import tempfile
+
         with tempfile.TemporaryDirectory() as tmpdir:
             client = Path(tmpdir)
             settings = client / "ProjectSettings"
@@ -1194,13 +1303,17 @@ class TestDoOpen(unittest.TestCase):
         mock_popen: MagicMock,
     ) -> None:
         import tempfile
+
         with tempfile.TemporaryDirectory() as tmpdir:
             wt_root = Path(tmpdir) / "alpha"
             client = wt_root / "client"
             client.mkdir(parents=True)
             mock_base.__truediv__ = lambda self, key: Path(tmpdir) / key
             mock_base.return_value = Path(tmpdir)
-            mock_find.return_value = ("6000.2.2f1", Path("/Applications/Unity/Hub/Editor/6000.2.2f1/Unity.app"))
+            mock_find.return_value = (
+                "6000.2.2f1",
+                Path("/Applications/Unity/Hub/Editor/6000.2.2f1/Unity.app"),
+            )
             mock_ports.read_text.return_value = json.dumps({"alpha": 10001})
             do_open("alpha")
             mock_popen.assert_called_once()

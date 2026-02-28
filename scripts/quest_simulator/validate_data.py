@@ -8,23 +8,54 @@ DATA_DIR = Path(__file__).parent / "data"
 
 VALID_RESONANCES = frozenset({"Tide", "Ember", "Zephyr", "Stone", "Ruin"})
 
-VALID_SUBTYPES = frozenset({
-    "Survivor", "Warrior", "Spirit Animal", "Ancient", "Visitor",
-    "Explorer", "Synth", "Outsider", "Musician", "Mage",
-})
+VALID_SUBTYPES = frozenset(
+    {
+        "Survivor",
+        "Warrior",
+        "Spirit Animal",
+        "Ancient",
+        "Visitor",
+        "Explorer",
+        "Synth",
+        "Outsider",
+        "Musician",
+        "Mage",
+    }
+)
 
-VALID_MECHANICS = frozenset({
-    "foresee", "draw", "kindle", "fast", "prevent", "dissolve",
-    "reclaim", "discard", "copy", "banish", "discover",
-    "spark", "energy", "point", "void", "event", "general",
-})
+VALID_MECHANICS = frozenset(
+    {
+        "foresee",
+        "draw",
+        "kindle",
+        "fast",
+        "prevent",
+        "dissolve",
+        "reclaim",
+        "discard",
+        "copy",
+        "banish",
+        "discover",
+        "spark",
+        "energy",
+        "point",
+        "void",
+        "event",
+        "general",
+    }
+)
 
 VALID_ROLES = frozenset({"finisher", "removal", "engine"})
 
-VALID_EFFECT_TYPES = frozenset({
-    "add_cards", "add_essence", "remove_cards", "add_dreamsign",
-    "gain_resonance",
-})
+VALID_EFFECT_TYPES = frozenset(
+    {
+        "add_cards",
+        "add_essence",
+        "remove_cards",
+        "add_dreamsign",
+        "gain_resonance",
+    }
+)
 
 EFFECT_VALUE_RANGES: dict[str, tuple[int, int]] = {
     "add_cards": (1, 3),
@@ -67,8 +98,7 @@ def validate_tag(tag: str, errors: list[str], context: str) -> None:
     elif prefix == "role":
         if value not in VALID_ROLES:
             errors.append(
-                f"{context}: unknown role '{value}' "
-                f"(valid: {sorted(VALID_ROLES)})"
+                f"{context}: unknown role '{value}' " f"(valid: {sorted(VALID_ROLES)})"
             )
     else:
         errors.append(f"{context}: unknown tag prefix '{prefix}'")
@@ -170,9 +200,7 @@ def validate_dreamcallers() -> list[str]:
         tag_bonus = entry.get("tag_bonus", {})
         for tag, val in tag_bonus.items():
             if tag not in tags:
-                errors.append(
-                    f"{ctx} ({name}): tag_bonus key '{tag}' not in tags list"
-                )
+                errors.append(f"{ctx} ({name}): tag_bonus key '{tag}' not in tags list")
             if not isinstance(val, int) or not (1 <= val <= 3):
                 errors.append(
                     f"{ctx} ({name}): tag_bonus['{tag}'] = {val}, "
@@ -263,9 +291,7 @@ def validate_journeys() -> list[str]:
                 f"(valid: {sorted(VALID_EFFECT_TYPES)})"
             )
         else:
-            effect_type_counts[effect_type] = (
-                effect_type_counts.get(effect_type, 0) + 1
-            )
+            effect_type_counts[effect_type] = effect_type_counts.get(effect_type, 0) + 1
 
             effect_value = entry.get("effect_value", 0)
             lo, hi = EFFECT_VALUE_RANGES[effect_type]
@@ -342,9 +368,7 @@ def validate_banes() -> list[str]:
 
         energy_cost = entry.get("energy_cost", 0)
         if isinstance(energy_cost, int) and energy_cost < 0:
-            errors.append(
-                f"{ctx} ({name}): energy_cost = {energy_cost}, must be >= 0"
-            )
+            errors.append(f"{ctx} ({name}): energy_cost = {energy_cost}, must be >= 0")
 
         rules_text = entry.get("rules_text", "")
         if isinstance(rules_text, str) and not rules_text.strip():

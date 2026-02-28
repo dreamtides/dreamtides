@@ -56,9 +56,7 @@ def _make_test_cards() -> list[Card]:
             Rarity.LEGENDARY,
             frozenset({Resonance.TIDE, Resonance.RUIN}),
         ),
-        _make_card(
-            "Stone Card B", 10, Rarity.UNCOMMON, frozenset({Resonance.STONE})
-        ),
+        _make_card("Stone Card B", 10, Rarity.UNCOMMON, frozenset({Resonance.STONE})),
     ]
 
 
@@ -108,9 +106,7 @@ class TestRunPurge:
         initial_deck_size = state.deck_count()
 
         # Select first two cards for purging (indices 0 and 1)
-        with patch(
-            "sites_purge.input_handler.multi_select", return_value=[0, 1]
-        ):
+        with patch("sites_purge.input_handler.multi_select", return_value=[0, 1]):
             run_purge(
                 state=state,
                 dreamscape_name="Test Dreamscape",
@@ -125,18 +121,14 @@ class TestRunPurge:
         from sites_purge import run_purge
 
         cards = [
-            _make_card(
-                "Tide Card", 1, Rarity.COMMON, frozenset({Resonance.TIDE})
-            ),
+            _make_card("Tide Card", 1, Rarity.COMMON, frozenset({Resonance.TIDE})),
         ]
         state = _make_quest_state(cards)
         state.add_card(cards[0])
         assert state.resonance_profile.counts[Resonance.TIDE] == 1
 
         # Select index 0 to purge
-        with patch(
-            "sites_purge.input_handler.multi_select", return_value=[0]
-        ):
+        with patch("sites_purge.input_handler.multi_select", return_value=[0]):
             run_purge(
                 state=state,
                 dreamscape_name="Test Dreamscape",
@@ -163,9 +155,7 @@ class TestRunPurge:
         state.add_card(cards[0])
         assert state.tag_profile.counts.get("warrior", 0) == 1
 
-        with patch(
-            "sites_purge.input_handler.multi_select", return_value=[0]
-        ):
+        with patch("sites_purge.input_handler.multi_select", return_value=[0]):
             run_purge(
                 state=state,
                 dreamscape_name="Test Dreamscape",
@@ -189,9 +179,7 @@ class TestRunPurge:
 
         original_multi_select = None
 
-        def mock_multi_select(
-            options: list[str], **kwargs: object
-        ) -> list[int]:
+        def mock_multi_select(options: list[str], **kwargs: object) -> list[int]:
             captured_kwargs.append(kwargs)
             return [0, 1, 2]
 
@@ -220,9 +208,7 @@ class TestRunPurge:
 
         captured_kwargs: list[dict[str, object]] = []
 
-        def mock_multi_select(
-            options: list[str], **kwargs: object
-        ) -> list[int]:
+        def mock_multi_select(options: list[str], **kwargs: object) -> list[int]:
             captured_kwargs.append(kwargs)
             return [0, 1, 2, 3, 4, 5]
 
@@ -250,9 +236,7 @@ class TestRunPurge:
         initial_deck_size = state.deck_count()
 
         # Select nothing (empty list)
-        with patch(
-            "sites_purge.input_handler.multi_select", return_value=[]
-        ):
+        with patch("sites_purge.input_handler.multi_select", return_value=[]):
             run_purge(
                 state=state,
                 dreamscape_name="Test Dreamscape",
@@ -270,9 +254,7 @@ class TestRunPurge:
         _populate_deck(state, 10)
         initial_pool_size = len(state.pool)
 
-        with patch(
-            "sites_purge.input_handler.multi_select", return_value=[0, 1]
-        ):
+        with patch("sites_purge.input_handler.multi_select", return_value=[0, 1]):
             run_purge(
                 state=state,
                 dreamscape_name="Test Dreamscape",
@@ -290,9 +272,7 @@ class TestRunPurge:
         state = _make_quest_state()
         assert state.deck_count() == 0
 
-        with patch(
-            "sites_purge.input_handler.multi_select", return_value=[]
-        ):
+        with patch("sites_purge.input_handler.multi_select", return_value=[]):
             run_purge(
                 state=state,
                 dreamscape_name="Test Dreamscape",
@@ -315,9 +295,7 @@ class TestRunPurge:
             def log_site_visit(self, **kwargs: object) -> None:
                 log_calls.append(dict(kwargs))
 
-        with patch(
-            "sites_purge.input_handler.multi_select", return_value=[0, 1]
-        ):
+        with patch("sites_purge.input_handler.multi_select", return_value=[0, 1]):
             run_purge(
                 state=state,
                 dreamscape_name="Test Dreamscape",
@@ -380,9 +358,7 @@ class TestForcedDeckLimitPurge:
 
         call_count = [0]
 
-        def mock_multi_select(
-            options: list[str], **kwargs: object
-        ) -> list[int]:
+        def mock_multi_select(options: list[str], **kwargs: object) -> list[int]:
             call_count[0] += 1
             return [0]  # Remove 1 card each time
 

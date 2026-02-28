@@ -618,10 +618,15 @@ class TestAutoFillMessage:
 
         # Should have printed something about auto-filling
         printed_text = " ".join(
-            str(c) for c in mock_print.call_args_list
+            str(c)
+            for c in mock_print.call_args_list
             for c in (c.args if c.args else [])
         )
-        assert "25" in printed_text or "auto" in printed_text.lower() or "duplicate" in printed_text.lower()
+        assert (
+            "25" in printed_text
+            or "auto" in printed_text.lower()
+            or "duplicate" in printed_text.lower()
+        )
 
 
 class TestViewDeckOption:

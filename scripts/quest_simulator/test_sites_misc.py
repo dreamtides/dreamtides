@@ -186,9 +186,7 @@ class TestRunDuplication:
         initial_deck_size = state.deck_count()
 
         # Mock: select first candidate (index 0)
-        with patch(
-            "sites_misc.input_handler.single_select", return_value=0
-        ), patch(
+        with patch("sites_misc.input_handler.single_select", return_value=0), patch(
             "sites_misc.select_duplication_candidates",
             return_value=([state.deck[0]], [3]),
         ):
@@ -210,9 +208,7 @@ class TestRunDuplication:
         initial_deck_size = state.deck_count()
 
         # Mock: select Skip option (last index = 3, since 3 candidates + 1 skip)
-        with patch(
-            "sites_misc.input_handler.single_select", return_value=3
-        ):
+        with patch("sites_misc.input_handler.single_select", return_value=3):
             run_duplication(
                 state=state,
                 dreamscape_name="Test Dreamscape",
@@ -227,17 +223,13 @@ class TestRunDuplication:
         from sites_misc import run_duplication
 
         cards = [
-            _make_card(
-                "Tide Card", 1, Rarity.COMMON, frozenset({Resonance.TIDE})
-            ),
+            _make_card("Tide Card", 1, Rarity.COMMON, frozenset({Resonance.TIDE})),
         ]
         state = _make_quest_state(cards)
         state.add_card(cards[0])
         assert state.resonance_profile.counts[Resonance.TIDE] == 1
 
-        with patch(
-            "sites_misc.input_handler.single_select", return_value=0
-        ), patch(
+        with patch("sites_misc.input_handler.single_select", return_value=0), patch(
             "sites_misc.select_duplication_candidates",
             return_value=([state.deck[0]], [2]),
         ):
@@ -263,9 +255,7 @@ class TestRunDuplication:
             def log_site_visit(self, **kwargs: object) -> None:
                 log_calls.append(dict(kwargs))
 
-        with patch(
-            "sites_misc.input_handler.single_select", return_value=0
-        ):
+        with patch("sites_misc.input_handler.single_select", return_value=0):
             run_duplication(
                 state=state,
                 dreamscape_name="Test Dreamscape",
@@ -508,9 +498,7 @@ class TestRunCleanse:
         state.deck.append(DeckCard(card=bane_card, is_bane=True))
         initial_deck_size = state.deck_count()
 
-        with patch(
-            "sites_misc.input_handler.confirm_decline", return_value=True
-        ):
+        with patch("sites_misc.input_handler.confirm_decline", return_value=True):
             run_cleanse(
                 state=state,
                 dreamscape_name="Test Dreamscape",
@@ -530,9 +518,7 @@ class TestRunCleanse:
         bane_ds = _make_bane_dreamsign()
         state.dreamsigns.append(bane_ds)
 
-        with patch(
-            "sites_misc.input_handler.confirm_decline", return_value=True
-        ):
+        with patch("sites_misc.input_handler.confirm_decline", return_value=True):
             run_cleanse(
                 state=state,
                 dreamscape_name="Test Dreamscape",
@@ -552,9 +538,7 @@ class TestRunCleanse:
         bane_ds = _make_bane_dreamsign()
         state.dreamsigns.append(bane_ds)
 
-        with patch(
-            "sites_misc.input_handler.confirm_decline", return_value=False
-        ):
+        with patch("sites_misc.input_handler.confirm_decline", return_value=False):
             run_cleanse(
                 state=state,
                 dreamscape_name="Test Dreamscape",
@@ -575,9 +559,7 @@ class TestRunCleanse:
             bane_card = _make_card(f"Bane Card {i}", 90 + i, Rarity.COMMON)
             state.deck.append(DeckCard(card=bane_card, is_bane=True))
 
-        with patch(
-            "sites_misc.input_handler.confirm_decline", return_value=True
-        ):
+        with patch("sites_misc.input_handler.confirm_decline", return_value=True):
             run_cleanse(
                 state=state,
                 dreamscape_name="Test Dreamscape",
@@ -603,9 +585,7 @@ class TestRunCleanse:
             def log_site_visit(self, **kwargs: object) -> None:
                 log_calls.append(dict(kwargs))
 
-        with patch(
-            "sites_misc.input_handler.confirm_decline", return_value=True
-        ):
+        with patch("sites_misc.input_handler.confirm_decline", return_value=True):
             run_cleanse(
                 state=state,
                 dreamscape_name="Test Dreamscape",

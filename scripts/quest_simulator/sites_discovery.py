@@ -154,9 +154,7 @@ def _select_specialty_items(
 
     if theme is not None:
         filtered = filter_pool_by_tag(pool, theme)
-        selected = select_cards(
-            filtered, items_count, resonance_profile, params, rng
-        )
+        selected = select_cards(filtered, items_count, resonance_profile, params, rng)
         if selected:
             return (selected, theme)
 
@@ -177,11 +175,13 @@ def _prepare_shop_items(
     items: list[ShopItem] = []
     for entry, _weight in selected:
         base_price = _compute_price(entry.card.rarity, shop_config)
-        items.append(ShopItem(
-            entry=entry,
-            base_price=base_price,
-            discounted_price=None,
-        ))
+        items.append(
+            ShopItem(
+                entry=entry,
+                base_price=base_price,
+                discounted_price=None,
+            )
+        )
 
     if items:
         discount_chance = shop_config.get("discount_chance", 30) / 100.0
@@ -246,9 +246,7 @@ def run_discovery_draft(
         theme_label = f" [{theme_tag}]" if theme_tag else ""
         label = f"Discovery Draft{theme_label}"
         pick_info = f"Pick {pick_num}/{picks_per_site}"
-        header = site_visit_header(
-            dreamscape_name, label, pick_info, dreamscape_number
-        )
+        header = site_visit_header(dreamscape_name, label, pick_info, dreamscape_number)
         print(header)
         print()
 
@@ -274,9 +272,7 @@ def run_discovery_draft(
             selected_indices = multi_select(card_names, render_fn=_render_multi)
         else:
             # Normal: single-select pick 1
-            def _render_single(
-                idx: int, option: str, highlighted: bool
-            ) -> str:
+            def _render_single(idx: int, option: str, highlighted: bool) -> str:
                 entry, _ = offered[idx]
                 lines = format_card(entry.card, highlighted=highlighted)
                 return "\n".join(lines)
@@ -369,9 +365,7 @@ def run_specialty_shop(
         # Build header
         theme_label = f" [{theme_tag}]" if theme_tag else ""
         label = f"Specialty Shop{theme_label}"
-        header = site_visit_header(
-            dreamscape_name, label, "Browse", dreamscape_number
-        )
+        header = site_visit_header(dreamscape_name, label, "Browse", dreamscape_number)
         print(header)
         print()
 
@@ -398,9 +392,7 @@ def run_specialty_shop(
         ) -> str:
             if idx < len(items):
                 shop_item = items[idx]
-                lines = format_card(
-                    shop_item.entry.card, highlighted=highlighted
-                )
+                lines = format_card(shop_item.entry.card, highlighted=highlighted)
                 check = "[x]" if checked else "[ ]"
                 marker = ">" if highlighted else " "
 
@@ -467,9 +459,11 @@ def run_specialty_shop(
                 dreamscape=dreamscape_name,
                 is_enhanced=is_enhanced,
                 choices=[item.entry.card.name for item in items],
-                choice_made=", ".join(c.name for c in purchased_cards)
-                if purchased_cards
-                else None,
+                choice_made=(
+                    ", ".join(c.name for c in purchased_cards)
+                    if purchased_cards
+                    else None
+                ),
                 state_changes={
                     "items_bought": [c.name for c in purchased_cards],
                     "essence_spent": total,

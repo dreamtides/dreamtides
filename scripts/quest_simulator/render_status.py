@@ -138,11 +138,13 @@ def battle_header(
 def battle_victory_message() -> str:
     """Build a visually distinct victory message with box-drawing flourish."""
     sep = draw_double_separator()
-    return "\n".join([
-        sep,
-        f"  {BOLD}VICTORY!{RESET}",
-        sep,
-    ])
+    return "\n".join(
+        [
+            sep,
+            f"  {BOLD}VICTORY!{RESET}",
+            sep,
+        ]
+    )
 
 
 def battle_reward_summary(

@@ -261,9 +261,7 @@ class TestVictoryScreen(unittest.TestCase):
             total_battles=7,
             dreamscapes_visited=7,
             dreamcaller_name="Vesper, Twilight Arbiter",
-            dreamcaller_resonances=frozenset(
-                {Resonance.TIDE, Resonance.RUIN}
-            ),
+            dreamcaller_resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
             deck_size=34,
             rarity_counts=rarity_counts,
             resonance_counts=resonance_counts,
@@ -350,6 +348,7 @@ class TestVictoryScreen(unittest.TestCase):
         # "    Common:     12 (35.3%)" vs "    Legendary:   1 (2.9%)"
         # The digit(s) before '(' should end at the same column
         import re as re_mod
+
         positions = []
         for line in rarity_lines:
             # Find the position of the opening parenthesis
@@ -397,9 +396,7 @@ class TestBattleHeader(unittest.TestCase):
             is_final=False,
             resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
         )
-        result = battle_header(
-            battle_number=4, total_battles=7, boss_info=boss
-        )
+        result = battle_header(battle_number=4, total_battles=7, boss_info=boss)
         self.assertIn("BATTLE 4", result)
 
     def test_boss_header_contains_miniboss_label(self) -> None:
@@ -414,9 +411,7 @@ class TestBattleHeader(unittest.TestCase):
             is_final=False,
             resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
         )
-        result = battle_header(
-            battle_number=4, total_battles=7, boss_info=boss
-        )
+        result = battle_header(battle_number=4, total_battles=7, boss_info=boss)
         self.assertIn("MINIBOSS ENCOUNTER", result)
 
     def test_boss_header_contains_final_boss_label(self) -> None:
@@ -431,9 +426,7 @@ class TestBattleHeader(unittest.TestCase):
             is_final=True,
             resonances=frozenset({Resonance.ZEPHYR, Resonance.RUIN}),
         )
-        result = battle_header(
-            battle_number=7, total_battles=7, boss_info=boss
-        )
+        result = battle_header(battle_number=7, total_battles=7, boss_info=boss)
         self.assertIn("FINAL BOSS", result)
 
     def test_boss_header_contains_opponent_name(self) -> None:
@@ -448,9 +441,7 @@ class TestBattleHeader(unittest.TestCase):
             is_final=False,
             resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
         )
-        result = battle_header(
-            battle_number=4, total_battles=7, boss_info=boss
-        )
+        result = battle_header(battle_number=4, total_battles=7, boss_info=boss)
         self.assertIn("Vesper, Twilight Arbiter", result)
 
     def test_boss_header_contains_archetype(self) -> None:
@@ -465,9 +456,7 @@ class TestBattleHeader(unittest.TestCase):
             is_final=False,
             resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
         )
-        result = battle_header(
-            battle_number=4, total_battles=7, boss_info=boss
-        )
+        result = battle_header(battle_number=4, total_battles=7, boss_info=boss)
         self.assertIn("Archetype: Graveyard Control", result)
 
     def test_boss_header_contains_ability_text(self) -> None:
@@ -482,9 +471,7 @@ class TestBattleHeader(unittest.TestCase):
             is_final=False,
             resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
         )
-        result = battle_header(
-            battle_number=4, total_battles=7, boss_info=boss
-        )
+        result = battle_header(battle_number=4, total_battles=7, boss_info=boss)
         self.assertIn("Whenever a card is dissolved, draw a card.", result)
 
     def test_boss_header_has_double_separators(self) -> None:
@@ -499,9 +486,7 @@ class TestBattleHeader(unittest.TestCase):
             is_final=False,
             resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
         )
-        result = battle_header(
-            battle_number=4, total_battles=7, boss_info=boss
-        )
+        result = battle_header(battle_number=4, total_battles=7, boss_info=boss)
         lines = result.split("\n")
         # Should have double separators at top, after title, and at bottom
         self.assertTrue(all(c == "\u2550" for c in lines[0]))
@@ -510,34 +495,26 @@ class TestBattleHeader(unittest.TestCase):
     def test_guardian_header_contains_battle_number(self) -> None:
         from render_status import battle_header
 
-        result = battle_header(
-            battle_number=1, total_battles=7, boss_info=None
-        )
+        result = battle_header(battle_number=1, total_battles=7, boss_info=None)
         self.assertIn("BATTLE 1", result)
 
     def test_guardian_header_contains_guardian_name(self) -> None:
         from render_status import battle_header
 
-        result = battle_header(
-            battle_number=2, total_battles=7, boss_info=None
-        )
+        result = battle_header(battle_number=2, total_battles=7, boss_info=None)
         self.assertIn("Dream Guardian", result)
 
     def test_guardian_header_no_archetype(self) -> None:
         from render_status import battle_header
 
-        result = battle_header(
-            battle_number=1, total_battles=7, boss_info=None
-        )
+        result = battle_header(battle_number=1, total_battles=7, boss_info=None)
         self.assertNotIn("Archetype", result)
 
     def test_guardian_header_shorter_than_boss(self) -> None:
         from models import Boss, Resonance
         from render_status import battle_header
 
-        guardian = battle_header(
-            battle_number=1, total_battles=7, boss_info=None
-        )
+        guardian = battle_header(battle_number=1, total_battles=7, boss_info=None)
         boss = Boss(
             name="Vesper, Twilight Arbiter",
             archetype="Graveyard Control",
@@ -546,9 +523,7 @@ class TestBattleHeader(unittest.TestCase):
             is_final=False,
             resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
         )
-        boss_header = battle_header(
-            battle_number=4, total_battles=7, boss_info=boss
-        )
+        boss_header = battle_header(battle_number=4, total_battles=7, boss_info=boss)
         self.assertLess(len(guardian.split("\n")), len(boss_header.split("\n")))
 
 
@@ -601,25 +576,19 @@ class TestBattleCompletionProgress(unittest.TestCase):
     def test_contains_completion_count(self) -> None:
         from render_status import battle_completion_progress
 
-        result = battle_completion_progress(
-            new_completion=4, total_battles=7
-        )
+        result = battle_completion_progress(new_completion=4, total_battles=7)
         self.assertIn("4/7", result)
 
     def test_contains_completion_label(self) -> None:
         from render_status import battle_completion_progress
 
-        result = battle_completion_progress(
-            new_completion=4, total_battles=7
-        )
+        result = battle_completion_progress(new_completion=4, total_battles=7)
         self.assertIn("Completion", result)
 
     def test_different_values(self) -> None:
         from render_status import battle_completion_progress
 
-        result = battle_completion_progress(
-            new_completion=1, total_battles=7
-        )
+        result = battle_completion_progress(new_completion=1, total_battles=7)
         self.assertIn("1/7", result)
 
 

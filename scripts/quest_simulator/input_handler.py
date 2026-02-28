@@ -59,9 +59,7 @@ def _restore_termios() -> None:
     saved = _saved_termios
     if _HAS_TERMIOS and saved is not None:
         try:
-            termios.tcsetattr(
-                sys.stdin.fileno(), termios.TCSADRAIN, saved
-            )
+            termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, saved)
         except termios.error:
             pass
 
@@ -336,9 +334,7 @@ def multi_select(
 
             _restore_termios()
             _clear_menu(line_count)
-            line_count = _render_multi_menu(
-                options, cursor, toggled, render_fn
-            )
+            line_count = _render_multi_menu(options, cursor, toggled, render_fn)
             tty.setraw(sys.stdin.fileno())
     finally:
         _release_termios()

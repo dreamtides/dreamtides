@@ -24,7 +24,9 @@ class TestSiteTypeName(unittest.TestCase):
         from models import SiteType
         from render_atlas import site_type_name
 
-        self.assertEqual(site_type_name(SiteType.DREAMCALLER_DRAFT), "Dreamcaller Draft")
+        self.assertEqual(
+            site_type_name(SiteType.DREAMCALLER_DRAFT), "Dreamcaller Draft"
+        )
 
     def test_discovery_draft(self) -> None:
         from models import SiteType
@@ -42,7 +44,9 @@ class TestSiteTypeName(unittest.TestCase):
         from models import SiteType
         from render_atlas import site_type_name
 
-        self.assertEqual(site_type_name(SiteType.DREAMSIGN_OFFERING), "Dreamsign Offering")
+        self.assertEqual(
+            site_type_name(SiteType.DREAMSIGN_OFFERING), "Dreamsign Offering"
+        )
 
     def test_dreamsign_draft(self) -> None:
         from models import SiteType
@@ -125,8 +129,11 @@ class TestRenderAtlasHeader(unittest.TestCase):
         from render_atlas import render_atlas_header
 
         result = render_atlas_header(
-            essence=450, completion=2, total_battles=7,
-            deck_count=12, dreamsign_count=2,
+            essence=450,
+            completion=2,
+            total_battles=7,
+            deck_count=12,
+            dreamsign_count=2,
         )
         self.assertIn("DREAM ATLAS", result)
 
@@ -134,8 +141,11 @@ class TestRenderAtlasHeader(unittest.TestCase):
         from render_atlas import render_atlas_header
 
         result = render_atlas_header(
-            essence=450, completion=2, total_battles=7,
-            deck_count=12, dreamsign_count=2,
+            essence=450,
+            completion=2,
+            total_battles=7,
+            deck_count=12,
+            dreamsign_count=2,
         )
         self.assertIn("Essence: 450", result)
 
@@ -143,8 +153,11 @@ class TestRenderAtlasHeader(unittest.TestCase):
         from render_atlas import render_atlas_header
 
         result = render_atlas_header(
-            essence=450, completion=2, total_battles=7,
-            deck_count=12, dreamsign_count=2,
+            essence=450,
+            completion=2,
+            total_battles=7,
+            deck_count=12,
+            dreamsign_count=2,
         )
         self.assertIn("2/7", result)
 
@@ -152,8 +165,11 @@ class TestRenderAtlasHeader(unittest.TestCase):
         from render_atlas import render_atlas_header
 
         result = render_atlas_header(
-            essence=100, completion=0, total_battles=7,
-            deck_count=25, dreamsign_count=1,
+            essence=100,
+            completion=0,
+            total_battles=7,
+            deck_count=25,
+            dreamsign_count=1,
         )
         self.assertIn("Deck: 25 cards", result)
 
@@ -161,8 +177,11 @@ class TestRenderAtlasHeader(unittest.TestCase):
         from render_atlas import render_atlas_header
 
         result = render_atlas_header(
-            essence=100, completion=0, total_battles=7,
-            deck_count=25, dreamsign_count=3,
+            essence=100,
+            completion=0,
+            total_battles=7,
+            deck_count=25,
+            dreamsign_count=3,
         )
         self.assertIn("Dreamsigns: 3", result)
 
@@ -170,8 +189,11 @@ class TestRenderAtlasHeader(unittest.TestCase):
         from render_atlas import render_atlas_header
 
         result = render_atlas_header(
-            essence=100, completion=0, total_battles=7,
-            deck_count=10, dreamsign_count=0,
+            essence=100,
+            completion=0,
+            total_battles=7,
+            deck_count=10,
+            dreamsign_count=0,
         )
         # Should contain double-line separator characters
         self.assertIn("\u2550", result)
@@ -266,8 +288,12 @@ class TestRenderCompletedTrail(unittest.TestCase):
 
         nodes = [
             DreamscapeNode(
-                node_id=0, name="The Nexus", biome=Biome.VERDANT,
-                sites=[], state=NodeState.COMPLETED, adjacent=[1],
+                node_id=0,
+                name="The Nexus",
+                biome=Biome.VERDANT,
+                sites=[],
+                state=NodeState.COMPLETED,
+                adjacent=[1],
             ),
         ]
         result = render_completed_trail(nodes)
@@ -280,16 +306,28 @@ class TestRenderCompletedTrail(unittest.TestCase):
 
         nodes = [
             DreamscapeNode(
-                node_id=0, name="The Nexus", biome=Biome.VERDANT,
-                sites=[], state=NodeState.COMPLETED, adjacent=[1],
+                node_id=0,
+                name="The Nexus",
+                biome=Biome.VERDANT,
+                sites=[],
+                state=NodeState.COMPLETED,
+                adjacent=[1],
             ),
             DreamscapeNode(
-                node_id=1, name="Whispering Depths", biome=Biome.TWILIGHT,
-                sites=[], state=NodeState.COMPLETED, adjacent=[0, 2],
+                node_id=1,
+                name="Whispering Depths",
+                biome=Biome.TWILIGHT,
+                sites=[],
+                state=NodeState.COMPLETED,
+                adjacent=[0, 2],
             ),
             DreamscapeNode(
-                node_id=2, name="Moonlit Shore", biome=Biome.CELESTIAL,
-                sites=[], state=NodeState.COMPLETED, adjacent=[1],
+                node_id=2,
+                name="Moonlit Shore",
+                biome=Biome.CELESTIAL,
+                sites=[],
+                state=NodeState.COMPLETED,
+                adjacent=[1],
             ),
         ]
         result = render_completed_trail(nodes)
@@ -324,7 +362,9 @@ class TestRenderDreamscapeSites(unittest.TestCase):
         sites = self._make_sites()
         result = render_dreamscape_sites(sites, selected_index=1)
         # Draft was visited, should have checkmark
-        draft_lines = [l for l in result.split("\n") if "Draft" in l and "Dreamsign" not in l]
+        draft_lines = [
+            l for l in result.split("\n") if "Draft" in l and "Dreamsign" not in l
+        ]
         self.assertTrue(any("\u2713" in l for l in draft_lines))
 
     def test_selected_site_has_marker(self) -> None:
@@ -382,18 +422,25 @@ class TestRenderFullAtlas(unittest.TestCase):
 
         completed = [
             DreamscapeNode(
-                node_id=0, name="The Nexus", biome=Biome.VERDANT,
-                sites=[], state=NodeState.COMPLETED, adjacent=[1],
+                node_id=0,
+                name="The Nexus",
+                biome=Biome.VERDANT,
+                sites=[],
+                state=NodeState.COMPLETED,
+                adjacent=[1],
             ),
         ]
         available = [
             DreamscapeNode(
-                node_id=1, name="Twilight Grove", biome=Biome.VERDANT,
+                node_id=1,
+                name="Twilight Grove",
+                biome=Biome.VERDANT,
                 sites=[
                     Site(site_type=SiteType.SHOP),
                     Site(site_type=SiteType.BATTLE),
                 ],
-                state=NodeState.AVAILABLE, adjacent=[0],
+                state=NodeState.AVAILABLE,
+                adjacent=[0],
             ),
         ]
         result = render_full_atlas(
@@ -417,9 +464,12 @@ class TestRenderFullAtlas(unittest.TestCase):
 
         available = [
             DreamscapeNode(
-                node_id=1, name="Crystal Spire", biome=Biome.ASHEN,
+                node_id=1,
+                name="Crystal Spire",
+                biome=Biome.ASHEN,
                 sites=[Site(site_type=SiteType.BATTLE)],
-                state=NodeState.AVAILABLE, adjacent=[0],
+                state=NodeState.AVAILABLE,
+                adjacent=[0],
             ),
         ]
         result = render_full_atlas(
@@ -556,9 +606,7 @@ class TestEnhancedSiteDescription(unittest.TestCase):
             Site(site_type=SiteType.SHOP, is_enhanced=True),
             Site(site_type=SiteType.BATTLE),
         ]
-        result = render_dreamscape_sites(
-            sites, selected_index=0, biome=Biome.VERDANT
-        )
+        result = render_dreamscape_sites(sites, selected_index=0, biome=Biome.VERDANT)
         self.assertIn("*free reroll*", result)
 
 
@@ -588,7 +636,8 @@ class TestAvailableDreamscapesWidth(unittest.TestCase):
         result = render_available_dreamscapes(nodes, selected_index=0)
         for line in result.split("\n"):
             self.assertLessEqual(
-                visible_len(line), 70,
+                visible_len(line),
+                70,
                 f"Line too wide: {line!r}",
             )
 
@@ -602,18 +651,27 @@ class TestCompletedTrailWrapping(unittest.TestCase):
 
         nodes = [
             DreamscapeNode(
-                node_id=0, name="The Nexus", biome=Biome.VERDANT,
-                sites=[], state=NodeState.COMPLETED, adjacent=[1],
+                node_id=0,
+                name="The Nexus",
+                biome=Biome.VERDANT,
+                sites=[],
+                state=NodeState.COMPLETED,
+                adjacent=[1],
             ),
             DreamscapeNode(
-                node_id=1, name="Shore", biome=Biome.CELESTIAL,
-                sites=[], state=NodeState.COMPLETED, adjacent=[0],
+                node_id=1,
+                name="Shore",
+                biome=Biome.CELESTIAL,
+                sites=[],
+                state=NodeState.COMPLETED,
+                adjacent=[0],
             ),
         ]
         result = render_completed_trail(nodes)
         # Trail content should be on a single indented line
         trail_lines = [
-            l for l in result.split("\n")
+            l
+            for l in result.split("\n")
             if "[" in l and "]" in l and "Completed" not in l
         ]
         self.assertEqual(len(trail_lines), 1)
@@ -635,7 +693,8 @@ class TestCompletedTrailWrapping(unittest.TestCase):
         ]
         result = render_completed_trail(nodes)
         trail_lines = [
-            l for l in result.split("\n")
+            l
+            for l in result.split("\n")
             if "[" in l and "]" in l and "Completed" not in l
         ]
         self.assertGreater(len(trail_lines), 1)
@@ -667,8 +726,11 @@ class TestNodeCount(unittest.TestCase):
         from render_atlas import render_atlas_header
 
         result = render_atlas_header(
-            essence=100, completion=2, total_battles=7,
-            deck_count=10, dreamsign_count=0,
+            essence=100,
+            completion=2,
+            total_battles=7,
+            deck_count=10,
+            dreamsign_count=0,
             total_nodes=12,
         )
         self.assertIn("12 dreamscapes", result)
