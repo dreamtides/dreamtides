@@ -2,7 +2,27 @@
 
 import random
 
+import pytest
+
 from models import Biome, DreamscapeNode, NodeState, Site, SiteType
+
+
+def _make_node(
+    node_id: int = 1,
+    name: str = "Test",
+    biome: Biome = Biome.VERDANT,
+    state: NodeState = NodeState.AVAILABLE,
+    adjacent: list[int] | None = None,
+) -> DreamscapeNode:
+    """Create a DreamscapeNode with sensible defaults for testing."""
+    return DreamscapeNode(
+        node_id=node_id,
+        name=name,
+        biome=biome,
+        sites=[],
+        state=state,
+        adjacent=adjacent if adjacent is not None else [0],
+    )
 
 
 class TestInitializeAtlas:
@@ -198,6 +218,26 @@ class TestCompleteNode:
                 )
                 assert not adjacent_completed
 
+    def test_repeated_completion_does_not_expand(self) -> None:
+        from atlas import complete_node, initialize_atlas
+
+        rng = random.Random(42)
+        nodes = initialize_atlas(rng)
+        target_id = nodes[1].node_id
+        complete_node(nodes, target_id, rng)
+        count_after_first = len(nodes)
+        # Completing the same node again should be a no-op
+        complete_node(nodes, target_id, rng)
+        assert len(nodes) == count_after_first
+
+    def test_unknown_node_id_raises_value_error(self) -> None:
+        from atlas import complete_node, initialize_atlas
+
+        rng = random.Random(42)
+        nodes = initialize_atlas(rng)
+        with pytest.raises(ValueError, match="No node with id 999"):
+            complete_node(nodes, 999, rng)
+
 
 class TestGetAvailableNodes:
     def test_get_available_returns_only_available(self) -> None:
@@ -235,10 +275,7 @@ class TestGenerateSites:
         from atlas import generate_sites
 
         rng = random.Random(42)
-        node = DreamscapeNode(
-            node_id=1, name="Test", biome=Biome.VERDANT,
-            sites=[], state=NodeState.AVAILABLE, adjacent=[0],
-        )
+        node = _make_node()
         generate_sites(node, completion_level=0, rng=rng, is_first_dreamscape=False)
         battle_sites = [s for s in node.sites if s.site_type == SiteType.BATTLE]
         assert len(battle_sites) == 1
@@ -247,10 +284,7 @@ class TestGenerateSites:
         from atlas import generate_sites
 
         rng = random.Random(42)
-        node = DreamscapeNode(
-            node_id=1, name="Test", biome=Biome.VERDANT,
-            sites=[], state=NodeState.AVAILABLE, adjacent=[0],
-        )
+        node = _make_node()
         generate_sites(node, completion_level=0, rng=rng, is_first_dreamscape=True)
         dc_sites = [s for s in node.sites if s.site_type == SiteType.DREAMCALLER_DRAFT]
         assert len(dc_sites) == 1
@@ -259,10 +293,7 @@ class TestGenerateSites:
         from atlas import generate_sites
 
         rng = random.Random(42)
-        node = DreamscapeNode(
-            node_id=1, name="Test", biome=Biome.VERDANT,
-            sites=[], state=NodeState.AVAILABLE, adjacent=[0],
-        )
+        node = _make_node()
         generate_sites(node, completion_level=0, rng=rng, is_first_dreamscape=False)
         dc_sites = [s for s in node.sites if s.site_type == SiteType.DREAMCALLER_DRAFT]
         assert len(dc_sites) == 0
@@ -271,10 +302,7 @@ class TestGenerateSites:
         from atlas import generate_sites
 
         rng = random.Random(42)
-        node = DreamscapeNode(
-            node_id=1, name="Test", biome=Biome.VERDANT,
-            sites=[], state=NodeState.AVAILABLE, adjacent=[0],
-        )
+        node = _make_node()
         generate_sites(node, completion_level=0, rng=rng, is_first_dreamscape=False)
         draft_sites = [s for s in node.sites if s.site_type == SiteType.DRAFT]
         assert len(draft_sites) == 2
@@ -283,10 +311,7 @@ class TestGenerateSites:
         from atlas import generate_sites
 
         rng = random.Random(42)
-        node = DreamscapeNode(
-            node_id=1, name="Test", biome=Biome.VERDANT,
-            sites=[], state=NodeState.AVAILABLE, adjacent=[0],
-        )
+        node = _make_node()
         generate_sites(node, completion_level=2, rng=rng, is_first_dreamscape=False)
         draft_sites = [s for s in node.sites if s.site_type == SiteType.DRAFT]
         assert len(draft_sites) == 1
@@ -295,10 +320,7 @@ class TestGenerateSites:
         from atlas import generate_sites
 
         rng = random.Random(42)
-        node = DreamscapeNode(
-            node_id=1, name="Test", biome=Biome.VERDANT,
-            sites=[], state=NodeState.AVAILABLE, adjacent=[0],
-        )
+        node = _make_node()
         generate_sites(node, completion_level=4, rng=rng, is_first_dreamscape=False)
         draft_sites = [s for s in node.sites if s.site_type == SiteType.DRAFT]
         assert len(draft_sites) == 0
@@ -308,10 +330,7 @@ class TestGenerateSites:
 
         for seed in range(50):
             rng = random.Random(seed)
-            node = DreamscapeNode(
-                node_id=1, name="Test", biome=Biome.VERDANT,
-                sites=[], state=NodeState.AVAILABLE, adjacent=[0],
-            )
+            node = _make_node()
             generate_sites(node, completion_level=1, rng=rng, is_first_dreamscape=False)
             assert 3 <= len(node.sites) <= 6, (
                 f"seed {seed}: {len(node.sites)} sites"
@@ -322,10 +341,7 @@ class TestGenerateSites:
 
         for seed in range(50):
             rng = random.Random(seed)
-            node = DreamscapeNode(
-                node_id=1, name="Test", biome=Biome.ARCANE,
-                sites=[], state=NodeState.AVAILABLE, adjacent=[0],
-            )
+            node = _make_node(biome=Biome.ARCANE)
             generate_sites(node, completion_level=3, rng=rng, is_first_dreamscape=False)
             type_counts: dict[SiteType, int] = {}
             for s in node.sites:
@@ -341,32 +357,23 @@ class TestGenerateSites:
     def test_biome_enhancement_applies(self) -> None:
         from atlas import generate_sites
 
-        # Verdant biome should enhance a Shop site if present
-        enhanced_found = False
+        # Verdant biome: if a Shop site is present, it must be enhanced
         for seed in range(100):
             rng = random.Random(seed)
-            node = DreamscapeNode(
-                node_id=1, name="Test", biome=Biome.VERDANT,
-                sites=[], state=NodeState.AVAILABLE, adjacent=[0],
-            )
+            node = _make_node(biome=Biome.VERDANT)
             generate_sites(node, completion_level=0, rng=rng, is_first_dreamscape=False)
-            for s in node.sites:
-                if s.site_type == SiteType.SHOP and s.is_enhanced:
-                    enhanced_found = True
-                    break
-            if enhanced_found:
-                break
-        assert enhanced_found, "Never found an enhanced shop for Verdant biome"
+            shops = [s for s in node.sites if s.site_type == SiteType.SHOP]
+            if shops:
+                assert shops[0].is_enhanced, (
+                    f"seed {seed}: Verdant run has a Shop but it is not enhanced"
+                )
 
     def test_at_most_one_enhanced_site(self) -> None:
         from atlas import generate_sites
 
         for seed in range(50):
             rng = random.Random(seed)
-            node = DreamscapeNode(
-                node_id=1, name="Test", biome=Biome.CRYSTALLINE,
-                sites=[], state=NodeState.AVAILABLE, adjacent=[0],
-            )
+            node = _make_node(biome=Biome.CRYSTALLINE)
             generate_sites(node, completion_level=2, rng=rng, is_first_dreamscape=False)
             enhanced_count = sum(1 for s in node.sites if s.is_enhanced)
             assert enhanced_count <= 1, f"seed {seed}: {enhanced_count} enhanced"
@@ -381,10 +388,7 @@ class TestGenerateSites:
         }
         for seed in range(50):
             rng = random.Random(seed)
-            node = DreamscapeNode(
-                node_id=1, name="Test", biome=Biome.VERDANT,
-                sites=[], state=NodeState.AVAILABLE, adjacent=[0],
-            )
+            node = _make_node()
             generate_sites(node, completion_level=0, rng=rng, is_first_dreamscape=False)
             for s in node.sites:
                 assert s.site_type in allowed_other, (

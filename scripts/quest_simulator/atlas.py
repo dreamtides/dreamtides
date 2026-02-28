@@ -135,6 +135,8 @@ def complete_node(
     """
     target = get_node_by_id(nodes, node_id)
     if target is None:
+        raise ValueError(f"No node with id {node_id} exists in the atlas")
+    if target.state == NodeState.COMPLETED:
         return
     target.state = NodeState.COMPLETED
 
