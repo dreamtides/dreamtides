@@ -25,6 +25,7 @@ RESONANCE_COLORS: dict[Resonance, str] = {
 NEUTRAL_COLOR = "\033[90m"
 BOLD = "\033[1m"
 DIM = "\033[2m"
+STRIKETHROUGH = "\033[9m"
 RESET = "\033[0m"
 
 # Disable colors when NO_COLOR is set or output is not a terminal
@@ -33,6 +34,7 @@ if os.environ.get("NO_COLOR") or not sys.stdout.isatty():
     NEUTRAL_COLOR = ""
     BOLD = ""
     DIM = ""
+    STRIKETHROUGH = ""
     RESET = ""
 
 

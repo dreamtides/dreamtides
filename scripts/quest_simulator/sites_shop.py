@@ -122,7 +122,8 @@ def _format_price(item: ShopItem) -> str:
     """Format a shop item's price display."""
     if item.discounted_price is not None:
         return (
-            f"{render.DIM}{item.base_price}e{render.RESET} "
+            f"{render.DIM}{render.STRIKETHROUGH}{item.base_price}e"
+            f"{render.RESET} "
             f"{render.BOLD}{item.discounted_price}e{render.RESET}"
         )
     return f"{item.base_price}e"
@@ -208,7 +209,8 @@ def run_shop(
         print(f"  Essence: {state.essence}")
         print()
 
-        # Track running total for the render callback
+        # Track running total for the render callback; reset at each
+        # render pass (index 0) and accumulate for checked items.
         running_total = [0]
 
         def _render_fn(
@@ -220,16 +222,39 @@ def run_shop(
             _reroll_idx: int = reroll_index,
             _running: list[int] = running_total,
         ) -> str:
+            # Reset running total at the start of each render pass
+            if index == 0:
+                _running[0] = 0
+
             if index == _reroll_idx:
                 marker = ">" if is_highlighted else " "
                 check = "[x]" if is_checked else "[ ]"
-                return f"  {marker} {check} {option}"
+                reroll_affordable = (
+                    free_rerolls > 0 or state.essence >= reroll_cost
+                )
+                if not reroll_affordable and not is_checked:
+                    check = f"{render.DIM}[-]{render.RESET}"
+                line = f"  {marker} {check} {option}"
+                # Show running total on the last line
+                if _running[0] > 0:
+                    line += (
+                        f"\n         {render.BOLD}"
+                        f"Total: {_running[0]}e{render.RESET}"
+                        f"  (Remaining: {state.essence - _running[0]}e)"
+                    )
+                return line
 
             item = _items[index]
-            affordable = state.essence - _running[0] >= item.effective_price
+            affordable = (
+                state.essence - _running[0] >= item.effective_price
+            )
             result = _render_shop_item(
                 item, is_highlighted, is_checked, affordable
             )
+
+            # Update running total for checked items
+            if is_checked:
+                _running[0] += item.effective_price
 
             # Add row separator after every 3rd item
             if index == 2 and len(_items) > 3:
@@ -242,12 +267,35 @@ def run_shop(
             render_fn=_render_fn,
         )
 
+        # Filter out unaffordable selections: ensure total cost of
+        # selected items does not exceed available essence.
+        affordable_indices: list[int] = []
+        remaining_essence = state.essence
+        for i in selected_indices:
+            if i == reroll_index:
+                affordable_indices.append(i)
+                continue
+            if i < len(items):
+                cost = items[i].effective_price
+                if remaining_essence >= cost:
+                    remaining_essence -= cost
+                    affordable_indices.append(i)
+        selected_indices = affordable_indices
+
         # Check if reroll was selected
         if reroll_index in selected_indices:
             if free_rerolls > 0:
                 free_rerolls -= 1
-            else:
+            elif state.essence >= reroll_cost:
                 state.spend_essence(reroll_cost)
+            else:
+                print()
+                print(
+                    f"  {render.DIM}Not enough essence to reroll "
+                    f"({reroll_cost} needed, {state.essence} available)."
+                    f"{render.RESET}"
+                )
+                continue
             print()
             print(f"  {render.BOLD}Rerolling shop...{render.RESET}")
             print()
@@ -260,12 +308,14 @@ def run_shop(
 
         total_cost = sum(item.effective_price for item in bought_items)
 
+        # Spend essence first to ensure atomicity -- if the player cannot
+        # afford the total, no state mutations occur.
+        if total_cost > 0:
+            state.spend_essence(total_cost)
+
         for item in bought_items:
             state.add_card(item.card)
             pool_module.remove_entry(state.pool, item.pool_entry)
-
-        if total_cost > 0:
-            state.spend_essence(total_cost)
 
         # Log the interaction
         if logger is not None:

@@ -163,16 +163,14 @@ class TestApplyDiscount:
     def test_discount_minimum_is_ten(self) -> None:
         from sites_shop import apply_discount
 
-        # 90% of 50 = 45 discount -> price 5, round to 10
-        result = apply_discount(50, 90)
-        assert result >= 10
+        # 90% of 50 = 45 discount -> price 5, clamp to 10
+        assert apply_discount(50, 90) == 10
 
-    def test_full_discount_clamps_to_ten(self) -> None:
+    def test_large_discount_on_cheap_item(self) -> None:
         from sites_shop import apply_discount
 
-        # Even 90% off shouldn't go below 10
-        result = apply_discount(50, 90)
-        assert result >= 10
+        # 80% of 50 = 40 discount -> price 10, round to 10
+        assert apply_discount(50, 80) == 10
 
 
 class TestGenerateShopItems:
@@ -492,3 +490,130 @@ class TestRunShop:
             )
 
         assert state.deck_count() == 0
+
+    def test_low_essence_purchase_filters_unaffordable(self) -> None:
+        """Selecting items that exceed available essence should be filtered."""
+        from sites_shop import run_shop
+
+        cards = _make_test_cards()
+        pool = _make_pool(cards)
+        # Only 60 essence -- can afford at most 1 common (50e)
+        state = _make_quest_state(cards, pool, essence=60)
+        config = _make_shop_config()
+        params = _make_algorithm_params()
+
+        # Try to select indices 0 and 1 (two items)
+        with patch(
+            "sites_shop.input_handler.multi_select", return_value=[0, 1]
+        ):
+            run_shop(
+                state=state,
+                algorithm_params=params,
+                pool_params=_make_pool_params(),
+                shop_config=config,
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        # Only one item should be purchased (the affordable one)
+        assert state.deck_count() <= 1
+        assert state.essence >= 0
+
+    def test_zero_essence_purchase_buys_nothing(self) -> None:
+        """With zero essence, no purchases should go through."""
+        from sites_shop import run_shop
+
+        cards = _make_test_cards()
+        pool = _make_pool(cards)
+        state = _make_quest_state(cards, pool, essence=0)
+        config = _make_shop_config()
+        params = _make_algorithm_params()
+        initial_pool_size = len(state.pool)
+
+        with patch(
+            "sites_shop.input_handler.multi_select", return_value=[0, 1, 2]
+        ):
+            run_shop(
+                state=state,
+                algorithm_params=params,
+                pool_params=_make_pool_params(),
+                shop_config=config,
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        assert state.deck_count() == 0
+        assert state.essence == 0
+        assert len(state.pool) == initial_pool_size
+
+    def test_low_essence_reroll_does_not_crash(self) -> None:
+        """Reroll with insufficient essence should not raise."""
+        from sites_shop import run_shop
+
+        cards = _make_test_cards()
+        pool = _make_pool(cards)
+        # Not enough for a 50e reroll
+        state = _make_quest_state(cards, pool, essence=30)
+        config = _make_shop_config()
+        params = _make_algorithm_params()
+
+        call_count = [0]
+
+        def mock_multi_select(
+            options: list[str], **kwargs: object
+        ) -> list[int]:
+            call_count[0] += 1
+            if call_count[0] == 1:
+                return [len(options) - 1]  # try reroll
+            return []  # buy nothing on second pass
+
+        with patch(
+            "sites_shop.input_handler.multi_select",
+            side_effect=mock_multi_select,
+        ):
+            run_shop(
+                state=state,
+                algorithm_params=params,
+                pool_params=_make_pool_params(),
+                shop_config=config,
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        # Essence should be unchanged (reroll was not affordable)
+        assert state.essence == 30
+
+    def test_purchase_atomicity_on_overspend(self) -> None:
+        """Essence is spent before deck/pool mutations for atomicity."""
+        from sites_shop import run_shop
+
+        cards = _make_test_cards()
+        pool = _make_pool(cards)
+        # Exactly enough for one common (50e) but not two
+        state = _make_quest_state(cards, pool, essence=50)
+        config = _make_shop_config()
+        params = _make_algorithm_params()
+        initial_pool_size = len(state.pool)
+
+        # Try to select two items
+        with patch(
+            "sites_shop.input_handler.multi_select", return_value=[0, 1]
+        ):
+            run_shop(
+                state=state,
+                algorithm_params=params,
+                pool_params=_make_pool_params(),
+                shop_config=config,
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        # At most 1 card purchased, state should be consistent
+        assert state.deck_count() <= 1
+        assert state.essence >= 0
+        # Pool should have lost at most 1 entry
+        assert len(state.pool) >= initial_pool_size - 1
