@@ -45,12 +45,12 @@ def select_theme(
     """
     tag_depths: dict[str, int] = {}
     for entry in pool:
-        for tag in entry.card.tags:
+        for tag in sorted(entry.card.tags):
             tag_depths[tag] = tag_depths.get(tag, 0) + 1
 
-    eligible_tags = [
+    eligible_tags = sorted(
         tag for tag, depth in tag_depths.items() if depth >= min_theme_cards
-    ]
+    )
 
     if not eligible_tags:
         return None
@@ -71,6 +71,9 @@ def select_theme(
         )
         for tag in eligible_tags
     ]
+
+    if sum(scores) <= 0:
+        return rng.choice(eligible_tags)
 
     selected = rng.choices(eligible_tags, weights=scores, k=1)
     return selected[0]

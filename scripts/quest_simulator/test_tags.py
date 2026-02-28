@@ -341,3 +341,66 @@ class TestSelectTheme:
             depth_factor=0.1,
         )
         assert result == "tribal:warrior"
+
+    def test_multi_tag_cards_produce_deterministic_results(self) -> None:
+        """Cards with multiple tags should produce deterministic selection."""
+        from tags import select_theme
+
+        # Cards with multiple tags -- frozenset iteration order is
+        # hash-seed dependent, so this test verifies that select_theme
+        # produces deterministic results regardless of set iteration order.
+        multi_tag_cards = [
+            PoolEntry(
+                _make_card(
+                    name=f"Multi {i}",
+                    card_number=i,
+                    tags=frozenset({"tribal:warrior", "mechanic:reclaim", "role:finisher"}),
+                )
+            )
+            for i in range(10)
+        ]
+        pool = multi_tag_cards
+        profile = TagProfile()
+        profile.add("tribal:warrior", 5)
+        profile.add("mechanic:reclaim", 3)
+        profile.add("role:finisher", 1)
+
+        # Run multiple times with the same seed and verify identical results
+        results = []
+        for _ in range(10):
+            rng = random.Random(42)
+            result = select_theme(
+                pool=pool,
+                profile=profile,
+                rng=rng,
+                min_theme_cards=6,
+                tag_scale=1.5,
+                relevance_boost=2.0,
+                depth_factor=0.1,
+            )
+            results.append(result)
+        assert len(set(results)) == 1, f"Non-deterministic results: {results}"
+
+    def test_zero_weight_fallback_to_uniform(self) -> None:
+        """When all scores are zero, falls back to uniform random."""
+        from tags import select_theme
+
+        pool = (
+            _make_pool_entries("tag_a", 8, start_number=1)
+            + _make_pool_entries("tag_b", 8, start_number=100)
+        )
+        profile = TagProfile()
+        profile.add("tag_a", 1)  # Non-zero so has_affinity is True
+
+        rng = random.Random(42)
+        # With tag_scale=0, relevance_boost=0, depth_factor=0 all scores are 0
+        result = select_theme(
+            pool=pool,
+            profile=profile,
+            rng=rng,
+            min_theme_cards=6,
+            tag_scale=0.0,
+            relevance_boost=0.0,
+            depth_factor=0.0,
+        )
+        assert result in ("tag_a", "tag_b")
