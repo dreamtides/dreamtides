@@ -14,14 +14,11 @@ from models import Dreamcaller, Resonance
 from quest_state import QuestState
 from render import (
     BOLD,
-    DIM,
     RESET,
     color_resonance,
     color_resonances,
     draw_double_separator,
-    draw_separator,
     resonance_profile_footer,
-    visible_len,
 )
 
 DREAMCALLER_COUNT = 3
@@ -31,8 +28,9 @@ def select_dreamcallers(
     all_dreamcallers: list[Dreamcaller],
     rng: random.Random,
 ) -> list[Dreamcaller]:
-    """Select 3 random dreamcallers from the full list."""
-    return rng.sample(all_dreamcallers, DREAMCALLER_COUNT)
+    """Select up to 3 random dreamcallers from the full list."""
+    count = min(DREAMCALLER_COUNT, len(all_dreamcallers))
+    return rng.sample(all_dreamcallers, count)
 
 
 def format_dreamcaller_option(

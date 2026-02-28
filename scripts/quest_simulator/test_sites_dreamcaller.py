@@ -2,6 +2,7 @@
 
 import random
 from types import MappingProxyType
+from unittest.mock import patch
 
 from models import (
     Card,
@@ -140,6 +141,32 @@ class TestSelectDreamcallers:
         result = select_dreamcallers(all_callers, rng)
         assert len(result) == 3
 
+    def test_handles_fewer_than_three(self) -> None:
+        from sites_dreamcaller import select_dreamcallers
+
+        all_callers = [
+            _make_dreamcaller(name=f"Caller {i}") for i in range(2)
+        ]
+        rng = random.Random(42)
+        result = select_dreamcallers(all_callers, rng)
+        assert len(result) == 2
+
+    def test_handles_single_dreamcaller(self) -> None:
+        from sites_dreamcaller import select_dreamcallers
+
+        all_callers = [_make_dreamcaller(name="Solo Caller")]
+        rng = random.Random(42)
+        result = select_dreamcallers(all_callers, rng)
+        assert len(result) == 1
+        assert result[0].name == "Solo Caller"
+
+    def test_handles_empty_list(self) -> None:
+        from sites_dreamcaller import select_dreamcallers
+
+        rng = random.Random(42)
+        result = select_dreamcallers([], rng)
+        assert len(result) == 0
+
 
 class TestFormatDreamcallerOption:
     """Test the display formatting of a dreamcaller option."""
@@ -166,12 +193,11 @@ class TestFormatDreamcallerOption:
         dc = _make_dreamcaller(name="Test Caller")
         lines_on = format_dreamcaller_option(dc, highlighted=True)
         lines_off = format_dreamcaller_option(dc, highlighted=False)
-        # The highlighted version should have '>' marker, non-highlighted ' '
-        assert any(">" in line for line in lines_on)
-        # The non-highlighted version should NOT have '>' marker in the name line
-        first_line_off = lines_off[0]
-        # The name line for non-highlighted starts with spaces, not '>'
-        assert first_line_off.lstrip().startswith(" ") or not first_line_off.lstrip().startswith(">")
+        # The highlighted version should have '  > ' prefix on the name line
+        assert lines_on[0].startswith("  > ")
+        # The non-highlighted version should have '    ' prefix (space marker)
+        assert lines_off[0].startswith("    ")
+        assert not lines_off[0].startswith("  > ")
 
 
 class TestApplyDreamcaller:
@@ -214,3 +240,63 @@ class TestApplyDreamcaller:
         )
         apply_dreamcaller(state, dc)
         assert state.tag_profile.counts["mechanic:reclaim"] == 2
+
+
+class TestRunDreamcallerDraft:
+    """Integration test for the full draft flow with mocked interactive input."""
+
+    def test_applies_selection_and_prints_output(self, capsys: object) -> None:
+        from sites_dreamcaller import run_dreamcaller_draft
+
+        state = _make_quest_state(essence=250)
+        all_callers = [
+            _make_dreamcaller(
+                name=f"Caller {i}",
+                resonance_bonus={"Tide": i + 1},
+                tag_bonus={"tribal:warrior": i},
+                essence_bonus=10 * (i + 1),
+            )
+            for i in range(5)
+        ]
+        # Mock single_select to return index 1 (second option)
+        with patch("sites_dreamcaller.single_select", return_value=1):
+            run_dreamcaller_draft(
+                state,
+                all_callers,
+                logger=None,
+                dreamscape_name="Twilight Reach",
+                dreamscape_number=1,
+            )
+        # The selected dreamcaller should be applied to state
+        assert state.dreamcaller is not None
+        assert state.essence > 250
+        # Check printed output contains header and confirmation
+        captured = capsys.readouterr()  # type: ignore[union-attr]
+        assert "Dreamcaller Draft" in captured.out
+        assert "Selected:" in captured.out
+        assert "Resonance" in captured.out or "Deck" in captured.out
+
+    def test_logs_selection_when_logger_provided(self) -> None:
+        from sites_dreamcaller import run_dreamcaller_draft
+
+        state = _make_quest_state(essence=250)
+        all_callers = [
+            _make_dreamcaller(name=f"Caller {i}") for i in range(5)
+        ]
+        log_calls: list[dict[str, object]] = []
+
+        class FakeLogger:
+            def log_site_visit(self, **kwargs: object) -> None:
+                log_calls.append(kwargs)
+
+        with patch("sites_dreamcaller.single_select", return_value=0):
+            run_dreamcaller_draft(
+                state,
+                all_callers,
+                logger=FakeLogger(),  # type: ignore[arg-type]
+                dreamscape_name="Test",
+                dreamscape_number=1,
+            )
+        assert len(log_calls) == 1
+        assert log_calls[0]["site_type"] == "DreamcallerDraft"
+        assert "choice_made" in log_calls[0]

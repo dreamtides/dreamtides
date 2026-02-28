@@ -141,6 +141,7 @@ def _render_single_menu(
 
     If render_fn is provided, it is called as render_fn(index, option, selected)
     and its return value is printed. Otherwise a default format is used.
+    Counts actual terminal lines (including newlines within render_fn output).
     """
     line_count = 0
     for i, option in enumerate(options):
@@ -166,6 +167,7 @@ def _render_multi_menu(
     If render_fn is provided, it is called as
     render_fn(index, option, is_highlighted, is_checked) and its return value
     is printed. Otherwise a default format is used.
+    Counts actual terminal lines (including newlines within render_fn output).
     """
     line_count = 0
     for i, option in enumerate(options):
