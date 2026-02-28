@@ -383,6 +383,239 @@ class TestRenderShopGrid(unittest.TestCase):
         self.assertIn("Judgment", output)
 
 
+class TestWeightBar(unittest.TestCase):
+    """Tests for the weight_bar function."""
+
+    def test_full_bar_at_max_weight(self) -> None:
+        from render_cards import weight_bar
+
+        bar = weight_bar(5.0, 5.0, width=10)
+        # At max weight, bar should be all filled blocks
+        self.assertEqual(bar, "\u2588" * 10)
+
+    def test_empty_bar_at_zero_weight(self) -> None:
+        from render_cards import weight_bar
+
+        bar = weight_bar(0.0, 5.0, width=10)
+        # At zero weight, bar should be all empty blocks
+        self.assertEqual(bar, "\u2591" * 10)
+
+    def test_half_bar(self) -> None:
+        from render_cards import weight_bar
+
+        bar = weight_bar(2.5, 5.0, width=10)
+        self.assertEqual(len(bar), 10)
+        filled = bar.count("\u2588")
+        empty = bar.count("\u2591")
+        self.assertEqual(filled, 5)
+        self.assertEqual(empty, 5)
+
+    def test_proportional_scaling(self) -> None:
+        from render_cards import weight_bar
+
+        bar_low = weight_bar(1.0, 10.0, width=10)
+        bar_high = weight_bar(8.0, 10.0, width=10)
+        filled_low = bar_low.count("\u2588")
+        filled_high = bar_high.count("\u2588")
+        self.assertGreater(filled_high, filled_low)
+
+    def test_zero_max_weight(self) -> None:
+        from render_cards import weight_bar
+
+        bar = weight_bar(0.0, 0.0, width=10)
+        self.assertEqual(bar, "\u2591" * 10)
+
+    def test_default_width(self) -> None:
+        from render_cards import weight_bar
+
+        bar = weight_bar(5.0, 5.0)
+        self.assertEqual(len(bar), 10)
+
+
+class TestResonanceMatchIndicator(unittest.TestCase):
+    """Tests for the resonance_match_indicator function."""
+
+    def test_match_when_card_resonance_in_top(self) -> None:
+        from render_cards import resonance_match_indicator
+
+        top_resonances = frozenset({Resonance.TIDE, Resonance.RUIN})
+        card_resonances = frozenset({Resonance.TIDE})
+        result = resonance_match_indicator(card_resonances, top_resonances)
+        self.assertIn("match", result.lower())
+        self.assertNotIn("partial", result.lower())
+        self.assertNotIn("off-color", result.lower())
+
+    def test_partial_when_some_overlap(self) -> None:
+        from render_cards import resonance_match_indicator
+
+        top_resonances = frozenset({Resonance.TIDE, Resonance.RUIN})
+        card_resonances = frozenset({Resonance.TIDE, Resonance.EMBER})
+        result = resonance_match_indicator(card_resonances, top_resonances)
+        self.assertIn("partial", result.lower())
+
+    def test_off_color_when_no_overlap(self) -> None:
+        from render_cards import resonance_match_indicator
+
+        top_resonances = frozenset({Resonance.TIDE, Resonance.RUIN})
+        card_resonances = frozenset({Resonance.EMBER})
+        result = resonance_match_indicator(card_resonances, top_resonances)
+        self.assertIn("off-color", result.lower())
+
+    def test_neutral_card_is_off_color(self) -> None:
+        from render_cards import resonance_match_indicator
+
+        top_resonances = frozenset({Resonance.TIDE, Resonance.RUIN})
+        card_resonances: frozenset[Resonance] = frozenset()
+        result = resonance_match_indicator(card_resonances, top_resonances)
+        self.assertIn("off-color", result.lower())
+
+    def test_empty_top_resonances(self) -> None:
+        from render_cards import resonance_match_indicator
+
+        top_resonances: frozenset[Resonance] = frozenset()
+        card_resonances = frozenset({Resonance.TIDE})
+        result = resonance_match_indicator(card_resonances, top_resonances)
+        # With no top resonances, everything is off-color
+        self.assertIn("off-color", result.lower())
+
+
+class TestFormatDraftCard(unittest.TestCase):
+    """Tests for the format_draft_card function."""
+
+    def test_includes_weight_bar(self) -> None:
+        from render_cards import format_draft_card
+
+        card = _make_card()
+        lines = format_draft_card(
+            card,
+            weight=3.5,
+            max_weight=5.0,
+            highlighted=False,
+            top_resonances=frozenset({Resonance.TIDE}),
+        )
+        combined = "\n".join(lines)
+        # Should contain filled block characters
+        self.assertIn("\u2588", combined)
+
+    def test_includes_numeric_weight(self) -> None:
+        from render_cards import format_draft_card
+
+        card = _make_card()
+        lines = format_draft_card(
+            card,
+            weight=4.2,
+            max_weight=5.0,
+            highlighted=False,
+            top_resonances=frozenset({Resonance.TIDE}),
+        )
+        combined = "\n".join(lines)
+        self.assertIn("wt:", combined)
+        self.assertIn("4.2", combined)
+
+    def test_includes_match_indicator(self) -> None:
+        from render_cards import format_draft_card
+
+        card = _make_card(resonances=frozenset({Resonance.TIDE}))
+        lines = format_draft_card(
+            card,
+            weight=3.0,
+            max_weight=5.0,
+            highlighted=False,
+            top_resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
+        )
+        combined = "\n".join(lines).lower()
+        self.assertTrue(
+            "match" in combined
+            or "partial" in combined
+            or "off-color" in combined,
+        )
+
+    def test_within_70_columns(self) -> None:
+        from render import visible_len
+        from render_cards import format_draft_card
+
+        card = _make_card()
+        lines = format_draft_card(
+            card,
+            weight=4.2,
+            max_weight=5.0,
+            highlighted=False,
+            top_resonances=frozenset({Resonance.TIDE}),
+        )
+        for line in lines:
+            self.assertLessEqual(
+                visible_len(line), 70,
+                f"Line exceeds 70 columns: {repr(line)}"
+            )
+
+    def test_highlighted_has_marker(self) -> None:
+        from render_cards import format_draft_card
+
+        card = _make_card()
+        lines = format_draft_card(
+            card,
+            weight=3.0,
+            max_weight=5.0,
+            highlighted=True,
+            top_resonances=frozenset({Resonance.TIDE}),
+        )
+        self.assertIn(">", lines[0])
+
+    def test_has_more_lines_than_basic(self) -> None:
+        from render_cards import format_card_display, format_draft_card
+
+        card = _make_card()
+        basic = format_card_display(card, highlighted=False)
+        draft = format_draft_card(
+            card,
+            weight=3.0,
+            max_weight=5.0,
+            highlighted=False,
+            top_resonances=frozenset({Resonance.TIDE}),
+        )
+        self.assertGreater(len(draft), len(basic))
+
+
+class TestRenderDraftCardList(unittest.TestCase):
+    """Tests for the render_draft_card_list function."""
+
+    def test_renders_with_weight_bars(self) -> None:
+        from render_cards import render_draft_card_list
+
+        cards = [_make_card(name="Card A"), _make_card(name="Card B")]
+        weights = [3.0, 5.0]
+        top_res = frozenset({Resonance.TIDE})
+        output = render_draft_card_list(
+            cards, selected_index=0, weights=weights,
+            top_resonances=top_res,
+        )
+        self.assertIn("Card A", output)
+        self.assertIn("Card B", output)
+        self.assertIn("\u2588", output)
+
+    def test_weight_values_shown(self) -> None:
+        from render_cards import render_draft_card_list
+
+        cards = [_make_card(name="Card A")]
+        weights = [4.2]
+        top_res = frozenset({Resonance.TIDE})
+        output = render_draft_card_list(
+            cards, selected_index=0, weights=weights,
+            top_resonances=top_res,
+        )
+        self.assertIn("wt:", output)
+
+    def test_empty_list(self) -> None:
+        from render_cards import render_draft_card_list
+
+        output = render_draft_card_list(
+            [], selected_index=-1, weights=[],
+            top_resonances=frozenset(),
+        )
+        self.assertEqual(output, "")
+
+
+
 class TestImport(unittest.TestCase):
     """Test that the module can be imported cleanly."""
 
@@ -394,6 +627,10 @@ class TestImport(unittest.TestCase):
         self.assertTrue(hasattr(render_cards, "format_shop_card"))
         self.assertTrue(hasattr(render_cards, "format_deck_summary"))
         self.assertTrue(hasattr(render_cards, "render_shop_grid"))
+        self.assertTrue(hasattr(render_cards, "weight_bar"))
+        self.assertTrue(hasattr(render_cards, "resonance_match_indicator"))
+        self.assertTrue(hasattr(render_cards, "format_draft_card"))
+        self.assertTrue(hasattr(render_cards, "render_draft_card_list"))
 
 
 if __name__ == "__main__":

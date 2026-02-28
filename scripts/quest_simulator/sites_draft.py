@@ -12,12 +12,14 @@ import algorithm
 import input_handler
 import pool as pool_module
 import render
+import render_cards
 from jsonl_log import SessionLogger
 from models import (
     AlgorithmParams,
     Card,
     DraftParams,
     PoolParams,
+    Resonance,
 )
 from quest_state import QuestState
 
@@ -81,15 +83,30 @@ def run_draft(
 
         # Build display options and render function for single_select
         option_labels = [card.name for card in offered_cards]
+        max_weight = max(offered_weights) if offered_weights else 0.0
+        top_res_pairs = state.resonance_profile.top_n(2, rng=state.rng)
+        top_res: frozenset[Resonance] = frozenset(
+            r for r, c in top_res_pairs if c > 0
+        )
 
         def _render_card_option(
             index: int,
             option: str,
             is_selected: bool,
             _cards: list[Card] = offered_cards,
+            _weights: list[float] = offered_weights,
+            _max_weight: float = max_weight,
+            _top_res: frozenset[Resonance] = top_res,
         ) -> str:
             card = _cards[index]
-            lines = render.format_card(card, highlighted=is_selected)
+            w = _weights[index] if index < len(_weights) else 0.0
+            lines = render_cards.format_draft_card(
+                card,
+                weight=w,
+                max_weight=_max_weight,
+                highlighted=is_selected,
+                top_resonances=_top_res,
+            )
             return "\n".join(lines)
 
         # Player selection via arrow-key single select

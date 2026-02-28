@@ -1,8 +1,9 @@
 """Card display formatting for the quest simulator.
 
 Provides the standard 2-line card display format, card list rendering,
-shop card display with pricing, and deck summary display. Used by all
-site types that display cards (drafts, shops, rewards, purge,
+shop card display with pricing, deck summary display, and draft-specific
+card display with weight bars and resonance match indicators. Used by
+all site types that display cards (drafts, shops, rewards, purge,
 duplication, transfiguration).
 """
 
@@ -11,6 +12,15 @@ from typing import Optional, Union
 from models import Card, DeckCard, Rarity, Resonance
 
 import render
+
+MATCH_COLOR = "\033[92m"
+PARTIAL_COLOR = "\033[93m"
+OFF_COLOR_DIM = "\033[2m"
+
+if render.RESET == "":
+    MATCH_COLOR = ""
+    PARTIAL_COLOR = ""
+    OFF_COLOR_DIM = ""
 
 
 def format_card_display(
@@ -229,6 +239,96 @@ def render_shop_grid(
             output_lines.append("")
 
     return "\n".join(output_lines)
+
+
+def weight_bar(weight: float, max_weight: float, width: int = 10) -> str:
+    """Proportional bar of filled/empty block characters."""
+    if max_weight <= 0:
+        filled = 0
+    else:
+        filled = round(weight / max_weight * width)
+    filled = max(0, min(width, filled))
+    return "\u2588" * filled + "\u2591" * (width - filled)
+
+
+def resonance_match_indicator(
+    card_resonances: frozenset[Resonance],
+    top_resonances: frozenset[Resonance],
+) -> str:
+    """Return a colored match label based on resonance overlap.
+
+    Returns "match" (green) if all card resonances are in the player's
+    top resonances, "partial" (yellow) if some overlap, or "off-color"
+    (dim) if no overlap or the card is neutral.
+    """
+    if not card_resonances or not top_resonances:
+        return f"{OFF_COLOR_DIM}off-color{render.RESET}"
+
+    overlap = card_resonances & top_resonances
+    if overlap == card_resonances:
+        return f"{MATCH_COLOR}match{render.RESET}"
+    elif overlap:
+        return f"{PARTIAL_COLOR}partial{render.RESET}"
+    else:
+        return f"{OFF_COLOR_DIM}off-color{render.RESET}"
+
+
+def format_draft_card(
+    card: Card,
+    weight: float,
+    max_weight: float,
+    highlighted: bool,
+    top_resonances: frozenset[Resonance],
+    max_width: int = render.CONTENT_WIDTH,
+) -> list[str]:
+    """Format a card for draft display with weight bar and match indicator.
+
+    Extends the standard 2-line card display with a third line showing
+    a resonance-colored weight bar, numeric weight value, and match
+    indicator.
+    """
+    lines = format_card_display(card, highlighted=highlighted, max_width=max_width)
+
+    bar = weight_bar(weight, max_weight)
+    bar_color = render.card_color(card.resonances)
+    match_label = resonance_match_indicator(card.resonances, top_resonances)
+
+    weight_line = f"    {bar_color}{bar}{render.RESET}  wt: {weight:.1f}  {match_label}"
+    lines.append(weight_line)
+
+    return lines
+
+
+def render_draft_card_list(
+    cards: list[Card],
+    selected_index: int,
+    weights: list[float],
+    top_resonances: frozenset[Resonance],
+) -> str:
+    """Render a list of draft cards with weight bars and match indicators.
+
+    Each card is rendered using format_draft_card. Returns a single
+    string with all cards separated by newlines.
+    """
+    if not cards:
+        return ""
+
+    max_weight = max(weights) if weights else 0.0
+    result_lines: list[str] = []
+    for i, card in enumerate(cards):
+        is_highlighted = i == selected_index
+        w = weights[i] if i < len(weights) else 0.0
+        card_lines = format_draft_card(
+            card,
+            weight=w,
+            max_weight=max_weight,
+            highlighted=is_highlighted,
+            top_resonances=top_resonances,
+        )
+        result_lines.extend(card_lines)
+
+    return "\n".join(result_lines)
+
 
 
 def format_deck_summary(deck_cards: list[DeckCard]) -> str:
