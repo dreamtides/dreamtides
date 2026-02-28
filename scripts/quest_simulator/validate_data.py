@@ -41,6 +41,8 @@ MIN_EFFECT_TYPE_COUNTS: dict[str, int] = {
     "gain_resonance": 2,
 }
 
+VALID_BANE_CARD_TYPES = frozenset({"Event"})
+
 
 def validate_tag(tag: str, errors: list[str], context: str) -> None:
     """Validate a tag string has a known prefix and valid value."""
@@ -283,6 +285,73 @@ def validate_journeys() -> list[str]:
     return errors
 
 
+def validate_banes() -> list[str]:
+    """Validate banes.toml schema and invariants."""
+    errors: list[str] = []
+    path = DATA_DIR / "banes.toml"
+
+    if not path.exists():
+        return [f"File not found: {path}"]
+
+    with open(path, "rb") as f:
+        data = tomllib.load(f)
+
+    if "banes" not in data:
+        return ["Missing top-level 'banes' key"]
+
+    entries = data["banes"]
+    if not isinstance(entries, list):
+        return ["'banes' must be an array of tables"]
+
+    if not (3 <= len(entries) <= 10):
+        errors.append(f"Expected 3-10 banes, found {len(entries)}")
+
+    required_fields = {
+        "name": str,
+        "rules_text": str,
+        "card_type": str,
+        "energy_cost": int,
+    }
+
+    names: set[str] = set()
+
+    for i, entry in enumerate(entries):
+        ctx = f"banes[{i}]"
+        name = entry.get("name", f"<unnamed #{i}>")
+
+        for field, expected_type in required_fields.items():
+            if field not in entry:
+                errors.append(f"{ctx} ({name}): missing required field '{field}'")
+            elif not isinstance(entry[field], expected_type):
+                errors.append(
+                    f"{ctx} ({name}): field '{field}' should be "
+                    f"{expected_type.__name__}, got {type(entry[field]).__name__}"
+                )
+
+        if name in names:
+            errors.append(f"{ctx}: duplicate name '{name}'")
+        names.add(name)
+
+        card_type = entry.get("card_type", "")
+        if card_type and card_type not in VALID_BANE_CARD_TYPES:
+            errors.append(
+                f"{ctx} ({name}): unknown card_type '{card_type}' "
+                f"(valid: {sorted(VALID_BANE_CARD_TYPES)})"
+            )
+
+        energy_cost = entry.get("energy_cost", 0)
+        if isinstance(energy_cost, int) and energy_cost < 0:
+            errors.append(
+                f"{ctx} ({name}): energy_cost = {energy_cost}, must be >= 0"
+            )
+
+        rules_text = entry.get("rules_text", "")
+        if isinstance(rules_text, str) and not rules_text.strip():
+            errors.append(f"{ctx} ({name}): rules_text must not be empty")
+
+    return errors
+
+
 def main() -> int:
     """Run all validators and report results."""
     all_errors: list[str] = []
@@ -297,6 +366,14 @@ def main() -> int:
 
     print("Validating journeys.toml...", end=" ")
     errors = validate_journeys()
+    if errors:
+        print(f"FAILED ({len(errors)} errors)")
+        all_errors.extend(errors)
+    else:
+        print("OK")
+
+    print("Validating banes.toml...", end=" ")
+    errors = validate_banes()
     if errors:
         print(f"FAILED ({len(errors)} errors)")
         all_errors.extend(errors)

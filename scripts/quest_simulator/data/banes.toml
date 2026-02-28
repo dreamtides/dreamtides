@@ -1,6 +1,6 @@
 # Bane cards -- negative cards that enter the player's deck via Tempting
-# Offer costs. They are never available in the draft pool and can only be
-# removed through Cleanse sites.
+# Offer costs. They are never available in the draft pool. Bane cards can
+# be purged normally or removed via Cleanse sites.
 
 [[banes]]
 name = "Creeping Dread"
