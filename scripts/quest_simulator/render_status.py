@@ -43,22 +43,29 @@ def resonance_profile_footer(
 
 
 def profile_bar(
-    profile_snapshot: dict[Resonance, int], bar_width: int = 20
+    profile_snapshot: dict[Resonance, int],
+    bar_width: int = 20,
+    neutral_count: int = 0,
 ) -> str:
-    """Colored bar chart for all 5 resonances, sorted by count descending."""
+    """Colored bar chart for all 5 resonances, sorted by count descending.
+
+    When neutral_count is provided, it is included in the percentage
+    denominator so that resonance percentages and the neutral percentage
+    together sum to 100%.
+    """
     items = sorted(profile_snapshot.items(), key=lambda x: x[1], reverse=True)
-    total = sum(c for _, c in items)
+    total = sum(c for _, c in items) + neutral_count
     max_count = max((c for _, c in items), default=1)
     lines: list[str] = []
     for res, count in items:
         color = RESONANCE_COLORS.get(res, NEUTRAL_COLOR)
         if count == 0:
-            bar = f"{DIM}{'\u2591' * bar_width}{RESET}"
+            bar = " " * bar_width
             pct_str = f"{DIM}  0   (0.0%){RESET}"
         else:
             filled = round(count / max_count * bar_width) if max_count > 0 else 0
             filled = max(1, min(bar_width, filled))
-            bar = f"{color}{'\u2588' * filled}{'\u2591' * (bar_width - filled)}{RESET}"
+            bar = f"{color}{'\u2588' * filled}{RESET}{' ' * (bar_width - filled)}"
             pct = count / total * 100 if total > 0 else 0
             pct_str = f"{count:3d}  ({pct:4.1f}%)"
         name = f"{color}{res.value:8s}{RESET}"
@@ -189,21 +196,25 @@ def victory_screen(
         f"  Final Deck: {deck_size} cards",
     ]
 
+    # Rarity breakdown with colons and aligned columns
+    # Format: "    Common:     12 (35.3%)"
+    # The label+colon is left-padded, count is right-aligned
     for rarity in [Rarity.COMMON, Rarity.UNCOMMON, Rarity.RARE, Rarity.LEGENDARY]:
         c = rarity_counts.get(rarity, 0)
         pct = c / deck_size * 100 if deck_size > 0 else 0
-        lines.append(f"    {rarity.value:12s} {c:2d} ({pct:4.1f}%)")
+        label = f"{rarity.value}:"
+        lines.append(f"    {label:12s} {c:2d} ({pct:4.1f}%)")
 
     lines.append("")
     lines.append("  Resonance Profile:")
-    lines.append(profile_bar(resonance_counts))
+    lines.append(profile_bar(resonance_counts, neutral_count=neutral_count))
 
     total_res = sum(resonance_counts.values()) + neutral_count
     neutral_pct = neutral_count / total_res * 100 if total_res > 0 else 0
     neutral_label = f"{NEUTRAL_COLOR}{'Neutral':8s}{RESET}"
-    neutral_bar = f"{DIM}{'\u2591' * 20}{RESET}"
+    neutral_space = " " * 20
     lines.append(
-        f"    {neutral_label} {neutral_bar}  {neutral_count:3d}  ({neutral_pct:4.1f}%)"
+        f"    {neutral_label} {neutral_space}  {neutral_count:3d}  ({neutral_pct:4.1f}%)"
     )
 
     lines.append("")

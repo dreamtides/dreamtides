@@ -106,14 +106,16 @@ class TestProfileBar(unittest.TestCase):
         self.assertIn("Tide", lines[0])
         self.assertIn("Ruin", lines[1])
 
-    def test_zero_counts_use_dim_bars(self) -> None:
+    def test_zero_counts_show_dim_percentage(self) -> None:
         from models import Resonance
         from render_status import profile_bar
 
         snapshot: dict[Resonance, int] = {r: 0 for r in Resonance}
         result = profile_bar(snapshot)
         self.assertIn("0.0%", result)
-        self.assertIn("\u2591", result)  # light shade block for empty
+        # Zero-count resonances use spaces instead of bar blocks
+        self.assertNotIn("\u2591", result)
+        self.assertNotIn("\u2588", result)
 
     def test_max_count_gets_full_bar(self) -> None:
         from models import Resonance
@@ -131,6 +133,40 @@ class TestProfileBar(unittest.TestCase):
         lines = result.strip().split("\n")
         # First line (Tide with 10) should have 20 filled blocks
         self.assertIn("\u2588" * 20, lines[0])
+
+    def test_percentages_include_neutral_in_total(self) -> None:
+        from models import Resonance
+        from render_status import profile_bar
+
+        snapshot: dict[Resonance, int] = {
+            Resonance.TIDE: 12,
+            Resonance.EMBER: 2,
+            Resonance.ZEPHYR: 2,
+            Resonance.STONE: 3,
+            Resonance.RUIN: 11,
+        }
+        result = profile_bar(snapshot, neutral_count=5)
+        # total = 30 + 5 = 35, Tide = 12/35 = 34.3%
+        self.assertIn("34.3%", result)
+
+    def test_bars_use_spaces_not_shade_for_unfilled(self) -> None:
+        from models import Resonance
+        from render_status import profile_bar
+
+        snapshot: dict[Resonance, int] = {
+            Resonance.TIDE: 10,
+            Resonance.EMBER: 5,
+            Resonance.ZEPHYR: 0,
+            Resonance.STONE: 0,
+            Resonance.RUIN: 0,
+        }
+        result = profile_bar(snapshot, bar_width=20)
+        # Non-zero lines should not have shade blocks
+        lines = result.strip().split("\n")
+        tide_line = [l for l in lines if "Tide" in l][0]
+        self.assertNotIn("\u2591", tide_line)
+        ember_line = [l for l in lines if "Ember" in l][0]
+        self.assertNotIn("\u2591", ember_line)
 
 
 class TestSiteHeader(unittest.TestCase):
@@ -296,6 +332,54 @@ class TestVictoryScreen(unittest.TestCase):
         lines = result.split("\n")
         self.assertTrue(all(c == "\u2550" for c in lines[0]))
         self.assertTrue(all(c == "\u2550" for c in lines[-1]))
+
+    def test_rarity_names_have_colons(self) -> None:
+        result = self._build_victory()
+        self.assertIn("Common:", result)
+        self.assertIn("Uncommon:", result)
+        self.assertIn("Rare:", result)
+        self.assertIn("Legendary:", result)
+
+    def test_rarity_counts_right_aligned(self) -> None:
+        result = self._build_victory()
+        # Common: 12 and Legendary: 1 should align their count columns
+        lines = result.split("\n")
+        rarity_lines = [l for l in lines if "Common:" in l or "Legendary:" in l]
+        self.assertEqual(len(rarity_lines), 2)
+        # Both lines should have the count at the same column position
+        # "    Common:     12 (35.3%)" vs "    Legendary:   1 (2.9%)"
+        # The digit(s) before '(' should end at the same column
+        import re as re_mod
+        positions = []
+        for line in rarity_lines:
+            # Find the position of the opening parenthesis
+            paren_pos = line.index("(")
+            positions.append(paren_pos)
+        self.assertEqual(positions[0], positions[1])
+
+    def test_resonance_percentages_include_neutral(self) -> None:
+        result = self._build_victory()
+        # With neutral=5, total is 12+11+3+2+2+5=35
+        # Tide: 12/35 = 34.3%, not 40.0% (which would be 12/30)
+        self.assertIn("34.3%", result)
+        self.assertNotIn("40.0%", result)
+
+    def test_neutral_line_has_no_bar_blocks(self) -> None:
+        result = self._build_victory()
+        lines = result.split("\n")
+        neutral_line = [l for l in lines if "Neutral" in l][0]
+        # Should not contain shade blocks
+        self.assertNotIn("\u2591", neutral_line)
+        # Should not contain filled blocks
+        self.assertNotIn("\u2588", neutral_line)
+
+    def test_resonance_bars_use_spaces_not_shade(self) -> None:
+        result = self._build_victory()
+        lines = result.split("\n")
+        resonance_lines = [l for l in lines if "Ruin" in l and "%" in l]
+        self.assertTrue(len(resonance_lines) > 0)
+        # Ruin line should not have shade blocks for unfilled area
+        self.assertNotIn("\u2591", resonance_lines[0])
 
 
 class TestBattleHeader(unittest.TestCase):
