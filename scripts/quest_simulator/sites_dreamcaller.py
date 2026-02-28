@@ -186,6 +186,8 @@ def run_dreamcaller_draft(
     if logger is not None:
         logger.log_site_visit(
             site_type="DreamcallerDraft",
+            dreamscape=dreamscape_name,
+            is_enhanced=False,
             choices=[dc.name for dc in choices],
             choice_made=selected.name,
             state_changes={
@@ -194,6 +196,7 @@ def run_dreamcaller_draft(
                 "resonance_bonus": dict(selected.resonance_bonus),
                 "tag_bonus": dict(selected.tag_bonus),
             },
+            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
     # Show resonance profile footer

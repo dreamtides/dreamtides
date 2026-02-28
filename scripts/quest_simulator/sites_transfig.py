@@ -351,10 +351,12 @@ def run_transfiguration(
     if is_enhanced:
         _run_enhanced(
             state, eligible_deck_cards, logger,
+            dreamscape_name, is_enhanced,
         )
     else:
         _run_normal(
             state, eligible_deck_cards, logger,
+            dreamscape_name, is_enhanced,
         )
 
     # Show resonance profile footer
@@ -370,6 +372,8 @@ def _run_normal(
     state: QuestState,
     eligible_deck_cards: list[DeckCard],
     logger: Optional[SessionLogger],
+    dreamscape_name: str = "",
+    is_enhanced: bool = False,
 ) -> None:
     """Normal transfiguration: pick from 3 random cards."""
     # Select up to 3 random non-transfigured cards
@@ -392,9 +396,12 @@ def _run_normal(
         if logger is not None:
             logger.log_site_visit(
                 site_type="Transfiguration",
+                dreamscape=dreamscape_name,
+                is_enhanced=is_enhanced,
                 choices=[],
                 choice_made=None,
                 state_changes={},
+                profile_snapshot=state.resonance_profile.snapshot(),
             )
         return
 
@@ -448,11 +455,14 @@ def _run_normal(
     if logger is not None:
         logger.log_site_visit(
             site_type="Transfiguration",
+            dreamscape=dreamscape_name,
+            is_enhanced=is_enhanced,
             choices=[f"{t.value} {dc.card.name}" for dc, t in candidates],
             choice_made=choice_name,
             state_changes={
                 "transfigured_card": choice_name,
             },
+            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
 
@@ -460,6 +470,8 @@ def _run_enhanced(
     state: QuestState,
     eligible_deck_cards: list[DeckCard],
     logger: Optional[SessionLogger],
+    dreamscape_name: str = "",
+    is_enhanced: bool = True,
 ) -> None:
     """Enhanced transfiguration: choose any card from the full deck."""
     print(
@@ -518,9 +530,12 @@ def _run_enhanced(
             if logger is not None:
                 logger.log_site_visit(
                     site_type="Transfiguration",
+                    dreamscape=dreamscape_name,
+                    is_enhanced=is_enhanced,
                     choices=[dc.card.name for dc in eligible_deck_cards],
                     choice_made=None,
                     state_changes={},
+                    profile_snapshot=state.resonance_profile.snapshot(),
                 )
             return
 
@@ -545,9 +560,12 @@ def _run_enhanced(
     if logger is not None:
         logger.log_site_visit(
             site_type="Transfiguration",
+            dreamscape=dreamscape_name,
+            is_enhanced=is_enhanced,
             choices=[dc.card.name for dc in eligible_deck_cards],
             choice_made=choice_name,
             state_changes={
                 "transfigured_card": choice_name,
             },
+            profile_snapshot=state.resonance_profile.snapshot(),
         )

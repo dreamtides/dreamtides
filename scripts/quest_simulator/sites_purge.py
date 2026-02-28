@@ -125,6 +125,8 @@ def run_purge(
     if logger is not None:
         logger.log_site_visit(
             site_type="Purge",
+            dreamscape=dreamscape_name,
+            is_enhanced=is_enhanced,
             choices=[dc.card.name for dc in deck_snapshot],
             choice_made=", ".join(dc.card.name for dc in removed_cards)
             if removed_cards
@@ -133,6 +135,7 @@ def run_purge(
                 "cards_removed": [dc.card.name for dc in removed_cards],
                 "deck_size_after": state.deck_count(),
             },
+            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
     # Show resonance profile footer
@@ -237,6 +240,7 @@ def forced_deck_limit_purge(
             state_changes={
                 "deck_size_after": state.deck_count(),
             },
+            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
     # Show resonance profile footer

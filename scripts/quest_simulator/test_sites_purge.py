@@ -312,19 +312,8 @@ class TestRunPurge:
         log_calls: list[dict[str, object]] = []
 
         class FakeLogger:
-            def log_site_visit(
-                self,
-                site_type: str,
-                choices: list[str],
-                choice_made: object,
-                state_changes: dict[str, object],
-            ) -> None:
-                log_calls.append({
-                    "site_type": site_type,
-                    "choices": list(choices),
-                    "choice_made": choice_made,
-                    "state_changes": dict(state_changes),
-                })
+            def log_site_visit(self, **kwargs: object) -> None:
+                log_calls.append(dict(kwargs))
 
         with patch(
             "sites_purge.input_handler.multi_select", return_value=[0, 1]
@@ -482,19 +471,8 @@ class TestForcedDeckLimitPurge:
         log_calls: list[dict[str, object]] = []
 
         class FakeLogger:
-            def log_site_visit(
-                self,
-                site_type: str,
-                choices: list[str],
-                choice_made: object,
-                state_changes: dict[str, object],
-            ) -> None:
-                log_calls.append({
-                    "site_type": site_type,
-                    "choices": list(choices),
-                    "choice_made": choice_made,
-                    "state_changes": dict(state_changes),
-                })
+            def log_site_visit(self, **kwargs: object) -> None:
+                log_calls.append(dict(kwargs))
 
         with patch(
             "sites_purge.input_handler.multi_select",

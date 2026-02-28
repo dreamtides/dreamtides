@@ -217,19 +217,8 @@ class TestRunEssence:
         log_calls: list[dict[str, object]] = []
 
         class FakeLogger:
-            def log_site_visit(
-                self,
-                site_type: str,
-                choices: list[str],
-                choice_made: Optional[str],
-                state_changes: dict[str, object],
-            ) -> None:
-                log_calls.append({
-                    "site_type": site_type,
-                    "choices": list(choices),
-                    "choice_made": choice_made,
-                    "state_changes": dict(state_changes),
-                })
+            def log_site_visit(self, **kwargs: object) -> None:
+                log_calls.append(dict(kwargs))
 
         with patch("sites_essence.input_handler.wait_for_continue"):
             run_essence(
@@ -245,7 +234,7 @@ class TestRunEssence:
         assert log_calls[0]["site_type"] == "Essence"
         changes = log_calls[0]["state_changes"]
         assert changes["essence_gained"] == 200  # type: ignore[comparison-overlap]
-        assert changes["enhanced"] is False  # type: ignore[comparison-overlap]
+        assert log_calls[0]["is_enhanced"] is False
 
     def test_essence_no_logger_does_not_crash(self) -> None:
         """Running with no logger should not raise."""

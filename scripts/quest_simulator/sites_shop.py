@@ -381,6 +381,21 @@ def run_shop(
                 items_bought=[item.card for item in bought_items],
                 essence_spent=total_cost,
             )
+            logger.log_site_visit(
+                site_type="Shop",
+                dreamscape=dreamscape_name,
+                is_enhanced=is_enhanced,
+                choices=[item.card.name for item in items],
+                choice_made=", ".join(item.card.name for item in bought_items)
+                if bought_items
+                else None,
+                state_changes={
+                    "items_bought": [item.card.name for item in bought_items],
+                    "essence_spent": total_cost,
+                    "deck_size_after": state.deck_count(),
+                },
+                profile_snapshot=state.resonance_profile.snapshot(),
+            )
 
         if bought_items:
             _print_purchase_summary(bought_items, total_cost, state.essence)

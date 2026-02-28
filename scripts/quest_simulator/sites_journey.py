@@ -397,9 +397,12 @@ def run_dream_journey(
     if logger is not None:
         logger.log_site_visit(
             site_type="DreamJourney",
+            dreamscape=dreamscape_name,
+            is_enhanced=is_enhanced,
             choices=[j.name for j in choices],
             choice_made=choice_made,
             state_changes=state_changes,
+            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
     # Show resonance profile footer
@@ -505,9 +508,12 @@ def run_tempting_offer(
     if logger is not None:
         logger.log_site_visit(
             site_type="TemptingOffer",
+            dreamscape=dreamscape_name,
+            is_enhanced=is_enhanced,
             choices=[o.reward_name for o in choices],
             choice_made=choice_made,
             state_changes=state_changes,
+            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
     # Show resonance profile footer

@@ -138,6 +138,21 @@ def run_draft(
                 profile_snapshot=state.resonance_profile.snapshot(),
             )
 
+    # Log the overall site visit
+    if logger is not None:
+        logger.log_site_visit(
+            site_type="Draft",
+            dreamscape=dreamscape_name,
+            is_enhanced=is_enhanced,
+            choices=[],
+            choice_made=None,
+            state_changes={
+                "picks_completed": draft_params.picks_per_site,
+                "deck_size_after": state.deck_count(),
+            },
+            profile_snapshot=state.resonance_profile.snapshot(),
+        )
+
     # After all picks, show the resonance profile footer
     footer = render.resonance_profile_footer(
         counts=state.resonance_profile.snapshot(),

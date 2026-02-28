@@ -187,6 +187,19 @@ def run_battle(
             essence_reward=essence_reward,
             rare_pick=picked_card,
         )
+        logger.log_site_visit(
+            site_type="Battle",
+            dreamscape=dreamscape_name,
+            choices=[opponent_name],
+            choice_made=picked_card.name if picked_card is not None else None,
+            state_changes={
+                "opponent": opponent_name,
+                "essence_reward": essence_reward,
+                "rare_pick": picked_card.name if picked_card is not None else None,
+                "deck_size_after": state.deck_count(),
+            },
+            profile_snapshot=state.resonance_profile.snapshot(),
+        )
 
     # Show resonance profile footer
     footer = render.resonance_profile_footer(

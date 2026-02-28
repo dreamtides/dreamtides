@@ -162,6 +162,8 @@ def run_duplication(
     if logger is not None:
         logger.log_site_visit(
             site_type="Duplication",
+            dreamscape=dreamscape_name,
+            is_enhanced=is_enhanced,
             choices=[dc.card.name for dc in candidates],
             choice_made=f"{chosen_card.name} x{chosen_copies}"
             if chosen_card is not None
@@ -172,8 +174,8 @@ def run_duplication(
                 if chosen_card is not None
                 else None,
                 "deck_size_after": state.deck_count(),
-                "enhanced": is_enhanced,
             },
+            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
     # Show resonance profile footer
@@ -320,6 +322,7 @@ def run_reward(
 
         logger.log_site_visit(
             site_type="RewardSite",
+            dreamscape=dreamscape_name,
             choices=[_format_reward_description(reward)],
             choice_made=choice_str,
             state_changes={
@@ -328,6 +331,7 @@ def run_reward(
                 "essence_after": state.essence,
                 "deck_size_after": state.deck_count(),
             },
+            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
     # Show resonance profile footer
@@ -384,12 +388,14 @@ def run_cleanse(
         if logger is not None:
             logger.log_site_visit(
                 site_type="Cleanse",
+                dreamscape=dreamscape_name,
                 choices=[],
                 choice_made=None,
                 state_changes={
                     "banes_removed": 0,
                     "deck_size_after": state.deck_count(),
                 },
+                profile_snapshot=state.resonance_profile.snapshot(),
             )
 
         footer = render.resonance_profile_footer(
@@ -446,6 +452,7 @@ def run_cleanse(
     if logger is not None:
         logger.log_site_visit(
             site_type="Cleanse",
+            dreamscape=dreamscape_name,
             choices=[label for label, _, _ in shown_items],
             choice_made=", ".join(removed_names) if removed_names else None,
             state_changes={
@@ -454,6 +461,7 @@ def run_cleanse(
                 "deck_size_after": state.deck_count(),
                 "dreamsign_count_after": state.dreamsign_count(),
             },
+            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
     # Show resonance profile footer

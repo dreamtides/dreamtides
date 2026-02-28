@@ -337,6 +337,88 @@ class TestSessionLogger(unittest.TestCase):
         self.assertEqual(len(events), 3)
         self.assertEqual([e["event"] for e in events], ["a", "b", "c"])
 
+    def test_log_site_visit_includes_dreamscape(self) -> None:
+        """site_visit events must include dreamscape name."""
+        logger = jsonl_log.SessionLogger(seed=1)
+        profile = {r: 0 for r in Resonance}
+        profile[Resonance.TIDE] = 3
+        logger.log_site_visit(
+            site_type="Essence",
+            dreamscape="Twilight Grove",
+            is_enhanced=False,
+            choices=[],
+            choice_made=None,
+            state_changes={"essence_gained": 200},
+            profile_snapshot=profile,
+        )
+        events = self._read_events(logger)
+        event = events[0]
+        self.assertEqual(event["event"], "site_visit")
+        self.assertEqual(event["dreamscape"], "Twilight Grove")
+
+    def test_log_site_visit_includes_is_enhanced(self) -> None:
+        """site_visit events must include is_enhanced flag."""
+        logger = jsonl_log.SessionLogger(seed=1)
+        profile = {r: 0 for r in Resonance}
+        logger.log_site_visit(
+            site_type="Essence",
+            dreamscape="Crystal Spire",
+            is_enhanced=True,
+            choices=[],
+            choice_made=None,
+            state_changes={"essence_gained": 400},
+            profile_snapshot=profile,
+        )
+        events = self._read_events(logger)
+        event = events[0]
+        self.assertTrue(event["is_enhanced"])
+
+    def test_log_site_visit_includes_profile_snapshot(self) -> None:
+        """site_visit events must include profile_snapshot."""
+        logger = jsonl_log.SessionLogger(seed=1)
+        profile = {
+            Resonance.TIDE: 5,
+            Resonance.EMBER: 3,
+            Resonance.ZEPHYR: 0,
+            Resonance.STONE: 1,
+            Resonance.RUIN: 2,
+        }
+        logger.log_site_visit(
+            site_type="Purge",
+            dreamscape="Ashen Depths",
+            is_enhanced=True,
+            choices=["Card A", "Card B"],
+            choice_made="Card A",
+            state_changes={"cards_removed": ["Card A"]},
+            profile_snapshot=profile,
+        )
+        events = self._read_events(logger)
+        event = events[0]
+        self.assertIn("profile_snapshot", event)
+        self.assertEqual(event["profile_snapshot"]["Tide"], 5)
+        self.assertEqual(event["profile_snapshot"]["Ember"], 3)
+        self.assertEqual(event["profile_snapshot"]["Zephyr"], 0)
+        self.assertEqual(event["profile_snapshot"]["Stone"], 1)
+        self.assertEqual(event["profile_snapshot"]["Ruin"], 2)
+
+    def test_log_site_visit_choices_offered_key(self) -> None:
+        """site_visit events must use choices_offered key."""
+        logger = jsonl_log.SessionLogger(seed=1)
+        profile = {r: 0 for r in Resonance}
+        logger.log_site_visit(
+            site_type="DreamJourney",
+            dreamscape="Twilight Grove",
+            is_enhanced=False,
+            choices=["Journey A", "Journey B"],
+            choice_made="Journey A",
+            state_changes={"effect_type": "add_essence"},
+            profile_snapshot=profile,
+        )
+        events = self._read_events(logger)
+        event = events[0]
+        self.assertIn("choices_offered", event)
+        self.assertEqual(event["choices_offered"], ["Journey A", "Journey B"])
+
 
 if __name__ == "__main__":
     unittest.main()

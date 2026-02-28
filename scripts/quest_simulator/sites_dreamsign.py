@@ -137,12 +137,15 @@ def run_dreamsign_offering(
         if logger is not None:
             logger.log_site_visit(
                 site_type="DreamsignOffering",
+                dreamscape=dreamscape_name,
+                is_enhanced=is_enhanced,
                 choices=[],
                 choice_made=None,
                 state_changes={
                     "dreamsign_added": None,
                     "dreamsign_count": state.dreamsign_count(),
                 },
+                profile_snapshot=state.resonance_profile.snapshot(),
             )
         footer = render.resonance_profile_footer(
             counts=state.resonance_profile.snapshot(),
@@ -214,12 +217,15 @@ def run_dreamsign_offering(
     if logger is not None:
         logger.log_site_visit(
             site_type="DreamsignOffering",
+            dreamscape=dreamscape_name,
+            is_enhanced=is_enhanced,
             choices=[ds.name for ds in offered],
             choice_made=chosen.name if chosen is not None else None,
             state_changes={
                 "dreamsign_added": chosen.name if chosen is not None else None,
                 "dreamsign_count": state.dreamsign_count(),
             },
+            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
     # Show resonance profile footer
@@ -254,12 +260,15 @@ def run_dreamsign_draft(
         if logger is not None:
             logger.log_site_visit(
                 site_type="DreamsignDraft",
+                dreamscape=dreamscape_name,
+                is_enhanced=False,
                 choices=[],
                 choice_made=None,
                 state_changes={
                     "dreamsign_added": None,
                     "dreamsign_count": state.dreamsign_count(),
                 },
+                profile_snapshot=state.resonance_profile.snapshot(),
             )
         footer = render.resonance_profile_footer(
             counts=state.resonance_profile.snapshot(),
@@ -316,12 +325,15 @@ def run_dreamsign_draft(
     if logger is not None:
         logger.log_site_visit(
             site_type="DreamsignDraft",
+            dreamscape=dreamscape_name,
+            is_enhanced=False,
             choices=[ds.name for ds in offered],
             choice_made=chosen.name if chosen is not None else None,
             state_changes={
                 "dreamsign_added": chosen.name if chosen is not None else None,
                 "dreamsign_count": state.dreamsign_count(),
             },
+            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
     # Show resonance profile footer

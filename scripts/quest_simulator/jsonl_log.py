@@ -126,17 +126,23 @@ class SessionLogger:
         choices: list[str],
         choice_made: Optional[str],
         state_changes: dict[str, object],
+        dreamscape: str = "",
+        is_enhanced: bool = False,
+        profile_snapshot: Optional[dict[Resonance, int]] = None,
     ) -> None:
-        """Log a site visit with choices and state deltas."""
-        self._write(
-            {
-                "event": "site_visit",
-                "site_type": site_type,
-                "choices": choices,
-                "choice_made": choice_made,
-                "state_changes": state_changes,
-            }
-        )
+        """Log a site visit with choices, state deltas, and context."""
+        event: dict[str, object] = {
+            "event": "site_visit",
+            "site_type": site_type,
+            "dreamscape": dreamscape,
+            "is_enhanced": is_enhanced,
+            "choices_offered": choices,
+            "choice_made": choice_made,
+            "state_changes": state_changes,
+        }
+        if profile_snapshot is not None:
+            event["profile_snapshot"] = _profile_dict(profile_snapshot)
+        self._write(event)
 
     def log_draft_pick(
         self,

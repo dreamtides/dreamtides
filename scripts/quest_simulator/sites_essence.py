@@ -81,12 +81,14 @@ def run_essence(
     if logger is not None:
         logger.log_site_visit(
             site_type="Essence",
+            dreamscape=dreamscape_name,
+            is_enhanced=is_enhanced,
             choices=[],
             choice_made=None,
             state_changes={
                 "essence_gained": amount,
-                "enhanced": is_enhanced,
             },
+            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
     # Show resonance profile footer

@@ -306,6 +306,20 @@ def run_discovery_draft(
                 profile_snapshot=state.resonance_profile.snapshot(),
             )
 
+    # Log the overall site visit
+    logger.log_site_visit(
+        site_type="DiscoveryDraft",
+        dreamscape=dreamscape_name,
+        is_enhanced=is_enhanced,
+        choices=[],
+        choice_made=None,
+        state_changes={
+            "picks_completed": picks_per_site,
+            "deck_size_after": state.deck_count(),
+        },
+        profile_snapshot=state.resonance_profile.snapshot(),
+    )
+
     # Show resonance profile footer
     print(
         resonance_profile_footer(
@@ -444,6 +458,21 @@ def run_specialty_shop(
             items_shown=items_shown,
             items_bought=purchased_cards,
             essence_spent=total,
+        )
+        logger.log_site_visit(
+            site_type="SpecialtyShop",
+            dreamscape=dreamscape_name,
+            is_enhanced=is_enhanced,
+            choices=[item.entry.card.name for item in items],
+            choice_made=", ".join(c.name for c in purchased_cards)
+            if purchased_cards
+            else None,
+            state_changes={
+                "items_bought": [c.name for c in purchased_cards],
+                "essence_spent": total,
+                "deck_size_after": state.deck_count(),
+            },
+            profile_snapshot=state.resonance_profile.snapshot(),
         )
         break
 

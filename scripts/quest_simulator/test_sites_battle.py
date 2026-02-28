@@ -516,6 +516,9 @@ class TestRunBattle:
                     "rare_pick": rare_pick,
                 })
 
+            def log_site_visit(self, **kwargs: object) -> None:
+                pass
+
         with patch("sites_battle.input_handler.wait_for_continue"), \
              patch("sites_battle.input_handler.single_select", return_value=0):
             run_battle(
@@ -568,6 +571,9 @@ class TestRunBattle:
                     "essence_reward": essence_reward,
                     "rare_pick": rare_pick,
                 })
+
+            def log_site_visit(self, **kwargs: object) -> None:
+                pass
 
         with patch("sites_battle.input_handler.wait_for_continue"), \
              patch("sites_battle.input_handler.single_select", return_value=0):

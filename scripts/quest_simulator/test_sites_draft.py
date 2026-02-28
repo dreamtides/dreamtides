@@ -284,6 +284,9 @@ class TestRunDraft:
                     "profile": dict(profile_snapshot),
                 })
 
+            def log_site_visit(self, **kwargs: object) -> None:
+                pass
+
         with patch("sites_draft.input_handler.single_select", return_value=0):
             run_draft(
                 state=state,

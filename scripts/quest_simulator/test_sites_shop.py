@@ -451,6 +451,9 @@ class TestRunShop:
                     "spent": essence_spent,
                 })
 
+            def log_site_visit(self, **kwargs: object) -> None:
+                pass
+
         with patch(
             "sites_shop.input_handler.multi_select", return_value=[0]
         ):
