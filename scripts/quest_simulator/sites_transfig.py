@@ -376,9 +376,15 @@ def _run_normal(
     is_enhanced: bool = False,
 ) -> None:
     """Normal transfiguration: pick from 3 random cards."""
-    # Select up to 3 random non-transfigured cards
-    sample_size = min(3, len(eligible_deck_cards))
-    sampled = state.rng.sample(eligible_deck_cards, sample_size)
+    # Pre-filter to cards that have at least one applicable transfiguration
+    # type, then sample from that filtered list to avoid showing fewer
+    # than 3 candidates.
+    transfig_eligible = [
+        dc for dc in eligible_deck_cards
+        if any(is_eligible(dc.card, t) for t in _BASE_TYPES)
+    ]
+    sample_size = min(3, len(transfig_eligible))
+    sampled = state.rng.sample(transfig_eligible, sample_size)
 
     # For each sampled card, pick a random applicable transfiguration type
     candidates: list[tuple[DeckCard, TransfigType]] = []

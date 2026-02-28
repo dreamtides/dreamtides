@@ -47,6 +47,7 @@ price_legendary = 200
 reroll_cost = 50
 discount_min = 30
 discount_max = 90
+discount_chance = 30
 items_count = 6
 
 # Essence and card rewards after battles

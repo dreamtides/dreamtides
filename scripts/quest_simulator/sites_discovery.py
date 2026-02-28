@@ -5,7 +5,7 @@ to cards matching that tag, and offers 4 cards to pick from. Enhanced
 (Arcane biome) allows picking any number of offered cards.
 
 Specialty Shop is the same as a regular Shop but items are filtered to
-a tag-selected theme. One item gets a random discount.
+a tag-selected theme. Each item has an independent chance of being discounted.
 """
 
 import random
@@ -173,7 +173,7 @@ def _prepare_shop_items(
     rng: random.Random,
     shop_config: dict[str, int],
 ) -> list[ShopItem]:
-    """Prepare shop items with prices and apply one random discount."""
+    """Prepare shop items with prices and per-item discount probability."""
     items: list[ShopItem] = []
     for entry, _weight in selected:
         base_price = _compute_price(entry.card.rarity, shop_config)
@@ -184,14 +184,15 @@ def _prepare_shop_items(
         ))
 
     if items:
-        discount_idx = rng.randrange(len(items))
-        item = items[discount_idx]
-        item.discounted_price = _apply_discount(
-            item.base_price,
-            rng,
-            shop_config["discount_min"],
-            shop_config["discount_max"],
-        )
+        discount_chance = shop_config.get("discount_chance", 30) / 100.0
+        for item in items:
+            if rng.random() < discount_chance:
+                item.discounted_price = _apply_discount(
+                    item.base_price,
+                    rng,
+                    shop_config["discount_min"],
+                    shop_config["discount_max"],
+                )
 
     return items
 
@@ -271,8 +272,6 @@ def run_discovery_draft(
                 return "\n".join(lines)
 
             selected_indices = multi_select(card_names, render_fn=_render_multi)
-            if not selected_indices:
-                selected_indices = [0]  # Must pick at least 1
         else:
             # Normal: single-select pick 1
             def _render_single(
@@ -343,8 +342,8 @@ def run_specialty_shop(
     """Run a Specialty Shop site interaction.
 
     Selects a theme tag, filters pool to matching cards, displays items
-    with rarity-based prices and one random discount. Player buys via
-    multi-select. Reroll costs 50 essence.
+    with rarity-based prices and per-item discount probability. Player
+    buys via multi-select. Reroll costs 50 essence.
     """
     while True:
         items_count = shop_config["items_count"]

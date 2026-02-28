@@ -188,18 +188,30 @@ class TestGenerateShopItems:
         items = generate_shop_items(state, params, config)
         assert len(items) == 6
 
-    def test_exactly_one_discount(self) -> None:
+    def test_can_have_multiple_discounts(self) -> None:
+        """Shop should allow multiple items to be discounted via per-item probability."""
         from sites_shop import generate_shop_items
 
         cards = _make_test_cards()
-        pool = _make_pool(cards)
-        state = _make_quest_state(cards, pool)
-        config = _make_shop_config()
         params = _make_algorithm_params()
+        config = _make_shop_config()
 
-        items = generate_shop_items(state, params, config)
-        discounted = [item for item in items if item.discounted_price is not None]
-        assert len(discounted) == 1
+        discount_counts: list[int] = []
+        for seed in range(200):
+            pool = _make_pool(cards)
+            state = _make_quest_state(cards, pool, seed=seed)
+            items = generate_shop_items(state, params, config)
+            count = sum(1 for item in items if item.discounted_price is not None)
+            discount_counts.append(count)
+
+        # Over 200 runs, we should see at least one run with 0 discounts
+        # and at least one run with 2+ discounts
+        assert any(c == 0 for c in discount_counts), (
+            "Expected some shops with 0 discounts"
+        )
+        assert any(c >= 2 for c in discount_counts), (
+            "Expected some shops with 2+ discounts"
+        )
 
     def test_discounted_price_is_less_than_original(self) -> None:
         from sites_shop import generate_shop_items

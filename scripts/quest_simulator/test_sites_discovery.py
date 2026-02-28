@@ -2,6 +2,7 @@
 
 import random
 from typing import Optional
+from unittest.mock import patch
 
 from models import (
     AlgorithmParams,
@@ -231,6 +232,41 @@ class TestDiscoveryDraftPicking:
         assert len(picked) == 3
         assert len(unpicked) == 1
 
+    def test_enhanced_allows_picking_zero_cards(self) -> None:
+        """Enhanced discovery draft should allow picking 0 cards."""
+        from sites_discovery import run_discovery_draft
+
+        pool = _make_pool_entries("tribal:warrior", 10, start_number=1)
+        state = _make_quest_state(pool=pool)
+
+        class FakeLogger:
+            def log_draft_pick(self, **kwargs: object) -> None:
+                pass
+
+            def log_site_visit(self, **kwargs: object) -> None:
+                pass
+
+        initial_deck_count = state.deck_count()
+
+        # Mock multi_select to return empty (player picks nothing)
+        with patch(
+            "sites_discovery.multi_select", return_value=[],
+        ):
+            run_discovery_draft(
+                state=state,
+                params=_default_params(),
+                logger=FakeLogger(),  # type: ignore[arg-type]
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                is_enhanced=True,
+                cards_per_pick=4,
+                picks_per_site=1,
+                tag_config=_default_tag_config(),
+            )
+
+        # No cards should have been added when player picks nothing
+        assert state.deck_count() == initial_deck_count
+
 
 class TestShopPricing:
     def test_price_by_rarity(self) -> None:
@@ -435,35 +471,44 @@ class TestRuntimeTagConfigKeys:
 
 
 class TestSpecialtyShopPurchasing:
-    def test_compute_shop_items_with_discount(self) -> None:
-        """One item should have a discount applied."""
+    def test_compute_shop_items_with_discounts(self) -> None:
+        """Shop items should have per-item discount probability, allowing 0, 1, or more."""
         from sites_discovery import ShopItem, _prepare_shop_items
 
-        cards = [
-            _make_card(
-                name=f"Card {i}",
-                card_number=i,
-                rarity=Rarity.COMMON,
-                tags=frozenset({"tag_a"}),
-            )
-            for i in range(6)
-        ]
-        entries = [PoolEntry(c) for c in cards]
-        paired = [(e, 1.0) for e in entries]
-        rng = random.Random(42)
         config = _default_shop_config()
+        discount_counts: list[int] = []
 
-        items = _prepare_shop_items(paired, rng, config)
+        for seed in range(200):
+            cards = [
+                _make_card(
+                    name=f"Card {i}",
+                    card_number=i,
+                    rarity=Rarity.COMMON,
+                    tags=frozenset({"tag_a"}),
+                )
+                for i in range(6)
+            ]
+            entries = [PoolEntry(c) for c in cards]
+            paired = [(e, 1.0) for e in entries]
+            rng = random.Random(seed)
 
-        assert len(items) == 6
-        discount_count = sum(
-            1 for item in items if item.discounted_price is not None
+            items = _prepare_shop_items(paired, rng, config)
+            assert len(items) == 6
+            for item in items:
+                assert isinstance(item, ShopItem)
+                assert item.base_price > 0
+
+            count = sum(1 for item in items if item.discounted_price is not None)
+            discount_counts.append(count)
+
+        # Over 200 runs, should see at least one with 0 discounts
+        # and at least one with 2+ discounts
+        assert any(c == 0 for c in discount_counts), (
+            "Expected some shops with 0 discounts"
         )
-        assert discount_count == 1
-
-        for item in items:
-            assert isinstance(item, ShopItem)
-            assert item.base_price > 0
+        assert any(c >= 2 for c in discount_counts), (
+            "Expected some shops with 2+ discounts"
+        )
 
     def test_total_cost_calculation(self) -> None:
         """Total cost should sum the effective prices of selected items."""

@@ -426,6 +426,111 @@ class TestNormalTransfiguration:
         assert state.deck_count() == 0
 
 
+    def test_normal_never_drops_cards_after_sampling(self) -> None:
+        """Normal mode should pre-filter eligible cards rather than
+        sampling first and then silently dropping ineligible ones.
+
+        When some cards have no applicable transfiguration types, those
+        cards should be excluded before sampling, so the player always
+        sees up to 3 eligible candidates.
+        """
+        from sites_transfig import _run_normal, _BASE_TYPES, TransfigType
+
+        state = _make_quest_state(seed=42)
+        # Add 10 cards
+        for i in range(10):
+            card = _make_card(
+                f"Card {i}", i,
+                energy_cost=i + 1,
+                rules_text=f"Deal {i + 1} damage.",
+            )
+            state.add_card(card)
+
+        eligible_deck_cards = [dc for dc in state.deck if not dc.is_transfigured]
+
+        # Mock is_eligible so that only cards 0-3 are eligible for any type,
+        # and cards 4-9 are ineligible for all types. This simulates a
+        # situation where some cards have no applicable transfiguration.
+        eligible_names = {f"Card {i}" for i in range(4)}
+        original_is_eligible = __import__("sites_transfig").is_eligible
+
+        def mock_is_eligible(card: Card, transfig_type: TransfigType) -> bool:
+            if card.name not in eligible_names:
+                return False
+            return original_is_eligible(card, transfig_type)
+
+        captured_options: list[list[str]] = []
+
+        def mock_single_select(
+            options: list[str], **kwargs: object,
+        ) -> int:
+            captured_options.append(list(options))
+            return len(options) - 1  # Skip
+
+        with patch(
+            "sites_transfig.is_eligible",
+            side_effect=mock_is_eligible,
+        ), patch(
+            "sites_transfig.input_handler.single_select",
+            side_effect=mock_single_select,
+        ):
+            _run_normal(state, eligible_deck_cards, None)
+
+        # Should show 3 candidates + Skip = 4 options
+        # The old code could show fewer because it sampled from all 10
+        # and then dropped the 6 ineligible ones.
+        assert len(captured_options) == 1
+        assert len(captured_options[0]) == 4, (
+            f"Expected 4 options (3 eligible cards + Skip), got "
+            f"{len(captured_options[0])}: {captured_options[0]}"
+        )
+
+    def test_normal_fewer_than_three_eligible_shows_all(self) -> None:
+        """When fewer than 3 cards are eligible, show all eligible cards."""
+        from sites_transfig import _run_normal, TransfigType
+
+        state = _make_quest_state(seed=42)
+        for i in range(10):
+            card = _make_card(
+                f"Card {i}", i,
+                energy_cost=i + 1,
+                rules_text=f"Deal {i + 1} damage.",
+            )
+            state.add_card(card)
+
+        eligible_deck_cards = [dc for dc in state.deck if not dc.is_transfigured]
+
+        # Only 2 cards are eligible
+        eligible_names = {f"Card {0}", f"Card {1}"}
+        original_is_eligible = __import__("sites_transfig").is_eligible
+
+        def mock_is_eligible(card: Card, transfig_type: TransfigType) -> bool:
+            if card.name not in eligible_names:
+                return False
+            return original_is_eligible(card, transfig_type)
+
+        captured_options: list[list[str]] = []
+
+        def mock_single_select(
+            options: list[str], **kwargs: object,
+        ) -> int:
+            captured_options.append(list(options))
+            return len(options) - 1  # Skip
+
+        with patch(
+            "sites_transfig.is_eligible",
+            side_effect=mock_is_eligible,
+        ), patch(
+            "sites_transfig.input_handler.single_select",
+            side_effect=mock_single_select,
+        ):
+            _run_normal(state, eligible_deck_cards, None)
+
+        # 2 eligible cards + Skip = 3 options
+        assert len(captured_options) == 1
+        assert len(captured_options[0]) == 3
+
+
 class TestEnhancedTransfiguration:
     """Tests for enhanced (Prismatic biome) transfiguration flow."""
 

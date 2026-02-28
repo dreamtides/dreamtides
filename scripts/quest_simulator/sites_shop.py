@@ -1,8 +1,8 @@
 """Shop site interaction for the quest simulator.
 
-Implements the Shop site: 6 items with rarity-based prices, one random
-discount, multi-select purchasing, and reroll support. Items are
-selected from the draft pool via resonance-weighted selection.
+Implements the Shop site: 6 items with rarity-based prices, per-item
+discount probability, multi-select purchasing, and reroll support.
+Items are selected from the draft pool via resonance-weighted selection.
 """
 
 from dataclasses import dataclass
@@ -76,7 +76,8 @@ def generate_shop_items(
     """Select items for the shop from the draft pool.
 
     Selects up to items_count cards via resonance-weighted selection,
-    assigns rarity-based prices, and gives one random item a discount.
+    assigns rarity-based prices, and gives each item an independent
+    chance of being discounted (~30% by default).
     """
     items_count: int = shop_config["items_count"]
 
@@ -101,20 +102,21 @@ def generate_shop_items(
             discounted_price=None,
         ))
 
-    # Apply a random discount to one item
+    # Apply per-item discount probability (~30% chance each item is on sale)
     if items:
         discount_min: int = shop_config["discount_min"]
         discount_max: int = shop_config["discount_max"]
-        discount_index = state.rng.randrange(len(items))
-        discount_percent = state.rng.randint(discount_min, discount_max)
-        old_item = items[discount_index]
-        discounted = apply_discount(old_item.base_price, discount_percent)
-        items[discount_index] = ShopItem(
-            card=old_item.card,
-            pool_entry=old_item.pool_entry,
-            base_price=old_item.base_price,
-            discounted_price=discounted,
-        )
+        discount_chance = shop_config.get("discount_chance", 30) / 100.0
+        for i, old_item in enumerate(items):
+            if state.rng.random() < discount_chance:
+                discount_percent = state.rng.randint(discount_min, discount_max)
+                discounted = apply_discount(old_item.base_price, discount_percent)
+                items[i] = ShopItem(
+                    card=old_item.card,
+                    pool_entry=old_item.pool_entry,
+                    base_price=old_item.base_price,
+                    discounted_price=discounted,
+                )
 
     return items
 
@@ -263,9 +265,10 @@ def run_shop(
 ) -> None:
     """Run a Shop site interaction.
 
-    Displays 6 items with rarity-based prices, one with a random discount.
-    The player can multi-select items to purchase or reroll the shop.
-    Enhanced shops (Verdant biome) get the first reroll free.
+    Displays 6 items with rarity-based prices, each with an independent
+    chance of being discounted. The player can multi-select items to
+    purchase or reroll the shop. Enhanced shops (Verdant biome) get the
+    first reroll free.
     """
     reroll_cost: int = shop_config["reroll_cost"]
     free_rerolls = 1 if is_enhanced else 0
