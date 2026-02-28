@@ -12,6 +12,7 @@ import algorithm
 import input_handler
 import pool as pool_module
 import render
+import sites_dreamsign
 from jsonl_log import SessionLogger
 from models import (
     AlgorithmParams,
@@ -111,16 +112,18 @@ def _add_random_non_bane_dreamsign(
     state: QuestState,
     all_dreamsigns: list[Dreamsign],
 ) -> Optional[Dreamsign]:
-    """Add a random non-bane dreamsign. Returns the added dreamsign or None."""
-    if state.is_over_dreamsign_limit():
-        return None
+    """Add a random non-bane dreamsign. Returns the added dreamsign or None.
 
+    If the player is at the dreamsign limit, adds the new dreamsign and
+    triggers a purge prompt (or auto-purge in non-interactive mode) to
+    stay within the limit.
+    """
     non_bane = [ds for ds in all_dreamsigns if not ds.is_bane]
     if not non_bane:
         return None
 
     chosen = state.rng.choice(non_bane)
-    state.add_dreamsign(chosen)
+    sites_dreamsign.handle_dreamsign_purge(state, chosen)
     return chosen
 
 
@@ -128,13 +131,18 @@ def _add_random_bane_dreamsign(
     state: QuestState,
     all_dreamsigns: list[Dreamsign],
 ) -> Optional[Dreamsign]:
-    """Add a random bane dreamsign. Returns the added dreamsign or None."""
+    """Add a random bane dreamsign. Returns the added dreamsign or None.
+
+    If the player is at the dreamsign limit, adds the bane dreamsign and
+    triggers a purge prompt (or auto-purge in non-interactive mode) to
+    stay within the limit.
+    """
     bane = [ds for ds in all_dreamsigns if ds.is_bane]
     if not bane:
         return None
 
     chosen = state.rng.choice(bane)
-    state.add_dreamsign(chosen)
+    sites_dreamsign.handle_dreamsign_purge(state, chosen)
     return chosen
 
 

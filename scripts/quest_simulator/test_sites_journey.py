@@ -389,7 +389,7 @@ class TestApplyJourneyEffect:
         # Should be a non-bane dreamsign
         assert not state.dreamsigns[0].is_bane
 
-    def test_add_dreamsign_skips_when_at_limit(self) -> None:
+    def test_add_dreamsign_at_limit_triggers_purge(self) -> None:
         from sites_journey import apply_journey_effect
 
         state = _make_quest_state()
@@ -411,13 +411,17 @@ class TestApplyJourneyEffect:
             effect_value=1,
         )
 
+        # In non-interactive mode, auto-purge should handle the limit
         apply_journey_effect(
             state, journey, _make_algorithm_params(), _make_pool_params(),
             dreamsigns,
         )
 
-        # Should not exceed limit
+        # Should still be at limit (added one, purged one)
         assert state.dreamsign_count() == state.max_dreamsigns
+        # The new dreamsign should have been added (not silently dropped)
+        non_filler = [ds for ds in state.dreamsigns if not ds.name.startswith("Sign ")]
+        assert len(non_filler) == 1
 
     def test_gain_resonance_effect(self) -> None:
         from sites_journey import apply_journey_effect
@@ -654,6 +658,32 @@ class TestApplyRewardEffect:
         assert state.dreamsign_count() == 1
         assert not state.dreamsigns[0].is_bane
 
+    def test_add_dreamsign_reward_at_limit_triggers_purge(self) -> None:
+        from sites_journey import apply_reward_effect
+
+        state = _make_quest_state()
+        dreamsigns = _make_dreamsigns()
+        # Fill to limit
+        for i in range(state.max_dreamsigns):
+            state.add_dreamsign(Dreamsign(
+                name=f"Sign {i}",
+                resonance=Resonance.TIDE,
+                tags=frozenset(),
+                effect_text="",
+                is_bane=False,
+            ))
+
+        apply_reward_effect(
+            state, EffectType.ADD_DREAMSIGN, 1,
+            _make_algorithm_params(), _make_pool_params(), dreamsigns,
+        )
+
+        # Should not exceed limit
+        assert state.dreamsign_count() == state.max_dreamsigns
+        # New dreamsign should have been added (not dropped)
+        non_filler = [ds for ds in state.dreamsigns if not ds.name.startswith("Sign ")]
+        assert len(non_filler) == 1
+
 
 class TestApplyCostEffect:
     """Test that each cost effect type is applied correctly."""
@@ -709,6 +739,32 @@ class TestApplyCostEffect:
 
         assert state.dreamsign_count() == 1
         assert state.dreamsigns[0].is_bane
+
+    def test_add_bane_dreamsign_at_limit_triggers_purge(self) -> None:
+        from sites_journey import apply_cost_effect
+
+        state = _make_quest_state()
+        dreamsigns = _make_dreamsigns()
+        # Fill to limit with non-bane dreamsigns
+        for i in range(state.max_dreamsigns):
+            state.add_dreamsign(Dreamsign(
+                name=f"Sign {i}",
+                resonance=Resonance.TIDE,
+                tags=frozenset(),
+                effect_text="",
+                is_bane=False,
+            ))
+
+        apply_cost_effect(
+            state, EffectType.ADD_BANE_DREAMSIGN, 1,
+            _make_bane_cards(), dreamsigns,
+        )
+
+        # Should not exceed limit
+        assert state.dreamsign_count() == state.max_dreamsigns
+        # The bane dreamsign should have been added
+        bane_signs = [ds for ds in state.dreamsigns if ds.is_bane]
+        assert len(bane_signs) == 1
 
     def test_remove_cards_cost(self) -> None:
         from sites_journey import apply_cost_effect

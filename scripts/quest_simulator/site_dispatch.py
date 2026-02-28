@@ -169,6 +169,7 @@ def visit_site(
             logger=logger,
             dreamscape_name=name,
             dreamscape_number=number,
+            is_enhanced=enhanced,
         )
 
     elif site_type == SiteType.DREAM_JOURNEY:

@@ -2,8 +2,9 @@
 
 Implements two dreamsign acquisition sites: Dreamsign Offering
 (accept/decline 1, or pick-1-of-3 when enhanced) and Dreamsign Draft
-(pick 1 of 3 or skip). Enforces the dreamsign limit of 12 with a
-purge prompt when the player would exceed it.
+(pick 1 of 3, or 1 of 4 when enhanced, or skip). Enforces the
+dreamsign limit of 12 with a purge prompt when the player would
+exceed it.
 """
 
 import random
@@ -16,6 +17,7 @@ from models import Dreamsign, Resonance
 from quest_state import QuestState
 
 DRAFT_COUNT = 3
+DRAFT_ENHANCED_COUNT = 4
 SKIP_LABEL = "Skip"
 
 
@@ -41,10 +43,11 @@ def select_draft_dreamsigns(
     all_dreamsigns: list[Dreamsign],
     held: list[Dreamsign],
     rng: random.Random,
+    count: int = DRAFT_COUNT,
 ) -> list[Dreamsign]:
-    """Select 3 random non-bane dreamsigns excluding already-held ones.
+    """Select random non-bane dreamsigns excluding already-held ones.
 
-    Returns up to 3 dreamsigns that are neither banes nor already
+    Returns up to `count` dreamsigns that are neither banes nor already
     held by the player.
     """
     held_names = {ds.name for ds in held}
@@ -53,7 +56,7 @@ def select_draft_dreamsigns(
         for ds in all_dreamsigns
         if not ds.is_bane and ds.name not in held_names
     ]
-    n = min(DRAFT_COUNT, len(available))
+    n = min(count, len(available))
     if n == 0:
         return []
     return rng.sample(available, n)
@@ -244,15 +247,17 @@ def run_dreamsign_draft(
     logger: Optional[SessionLogger],
     dreamscape_name: str = "",
     dreamscape_number: int = 1,
+    is_enhanced: bool = False,
 ) -> None:
     """Run a Dreamsign Draft site interaction.
 
-    Shows 3 non-bane dreamsigns (excluding already-held), lets the
-    player pick 1 or skip. If at dreamsign limit, triggers a purge
-    prompt before adding.
+    Shows 3 non-bane dreamsigns (or 4 when enhanced) excluding
+    already-held ones, lets the player pick 1 or skip. If at dreamsign
+    limit, triggers a purge prompt before adding.
     """
+    count = DRAFT_ENHANCED_COUNT if is_enhanced else DRAFT_COUNT
     offered = select_draft_dreamsigns(
-        all_dreamsigns, held=state.dreamsigns, rng=state.rng
+        all_dreamsigns, held=state.dreamsigns, rng=state.rng, count=count,
     )
 
     if not offered:
@@ -261,7 +266,7 @@ def run_dreamsign_draft(
             logger.log_site_visit(
                 site_type="DreamsignDraft",
                 dreamscape=dreamscape_name,
-                is_enhanced=False,
+                is_enhanced=is_enhanced,
                 choices=[],
                 choice_made=None,
                 state_changes={
@@ -279,9 +284,10 @@ def run_dreamsign_draft(
         return
 
     # Display header
+    label = "Dreamsign Draft (Enhanced)" if is_enhanced else "Dreamsign Draft"
     header = render.site_visit_header(
         dreamscape_name=dreamscape_name,
-        site_type_label="Dreamsign Draft",
+        site_type_label=label,
         pick_info="Pick 1 or skip",
         dreamscape_number=dreamscape_number,
     )
@@ -326,7 +332,7 @@ def run_dreamsign_draft(
         logger.log_site_visit(
             site_type="DreamsignDraft",
             dreamscape=dreamscape_name,
-            is_enhanced=False,
+            is_enhanced=is_enhanced,
             choices=[ds.name for ds in offered],
             choice_made=chosen.name if chosen is not None else None,
             state_changes={

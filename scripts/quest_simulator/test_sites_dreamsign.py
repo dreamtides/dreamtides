@@ -192,6 +192,17 @@ class TestSelectDraftDreamsigns:
         result = select_draft_dreamsigns(signs, held=[], rng=rng)
         assert len(result) == 1
 
+    def test_selects_four_when_enhanced(self) -> None:
+        from sites_dreamsign import DRAFT_ENHANCED_COUNT, select_draft_dreamsigns
+
+        all_signs = _make_all_dreamsigns()
+        rng = random.Random(42)
+        result = select_draft_dreamsigns(
+            all_signs, held=[], rng=rng, count=DRAFT_ENHANCED_COUNT,
+        )
+        assert len(result) == 4
+        assert all(not ds.is_bane for ds in result)
+
 
 class TestFormatDreamsignOption:
     """Test dreamsign display formatting."""
@@ -612,3 +623,77 @@ class TestRunDreamsignDraft:
 
         # Should still have 12 (removed one, added one)
         assert state.dreamsign_count() == 12
+
+    def test_enhanced_offers_additional_option(self) -> None:
+        from sites_dreamsign import run_dreamsign_draft
+
+        state = _make_quest_state()
+        all_signs = _make_all_dreamsigns()
+
+        # Enhanced draft: 4 dreamsigns + skip = 5 options, skip is index 4
+        with patch(
+            "sites_dreamsign.input_handler.single_select", return_value=4
+        ) as mock_select:
+            run_dreamsign_draft(
+                state=state,
+                all_dreamsigns=all_signs,
+                logger=None,
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                is_enhanced=True,
+            )
+
+        # Verify that 5 options were presented (4 dreamsigns + Skip)
+        call_args = mock_select.call_args
+        options = call_args[1]["options"] if "options" in call_args[1] else call_args[0][0]
+        assert len(options) == 5
+        # Player skipped, so no dreamsign added
+        assert state.dreamsign_count() == 0
+
+    def test_enhanced_pick_adds_dreamsign(self) -> None:
+        from sites_dreamsign import run_dreamsign_draft
+
+        state = _make_quest_state()
+        all_signs = _make_all_dreamsigns()
+
+        # Pick first option in enhanced draft
+        with patch(
+            "sites_dreamsign.input_handler.single_select", return_value=0
+        ):
+            run_dreamsign_draft(
+                state=state,
+                all_dreamsigns=all_signs,
+                logger=None,
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                is_enhanced=True,
+            )
+
+        assert state.dreamsign_count() == 1
+        assert not state.dreamsigns[0].is_bane
+
+    def test_enhanced_logs_is_enhanced_true(self) -> None:
+        from sites_dreamsign import run_dreamsign_draft
+
+        state = _make_quest_state()
+        all_signs = _make_all_dreamsigns()
+        log_calls: list[dict[str, object]] = []
+
+        class FakeLogger:
+            def log_site_visit(self, **kwargs: object) -> None:
+                log_calls.append(kwargs)
+
+        with patch(
+            "sites_dreamsign.input_handler.single_select", return_value=0
+        ):
+            run_dreamsign_draft(
+                state=state,
+                all_dreamsigns=all_signs,
+                logger=FakeLogger(),  # type: ignore[arg-type]
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                is_enhanced=True,
+            )
+
+        assert len(log_calls) == 1
+        assert log_calls[0]["is_enhanced"] is True
