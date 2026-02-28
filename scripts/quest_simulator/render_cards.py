@@ -144,6 +144,93 @@ def format_shop_card(
     return lines
 
 
+def _format_grid_cell(
+    card: Card,
+    price: int,
+    original_price: Optional[int],
+    col_width: int,
+) -> list[str]:
+    """Format a single card for the shop grid.
+
+    Returns a fixed number of lines (4) for vertical alignment:
+    Line 1: name (colored by resonance, truncated)
+    Line 2: resonance display + rarity badge
+    Line 3: price (with discount if applicable)
+    Line 4: truncated rules text
+    """
+    name_color = render.card_color(card.resonances)
+    max_name = col_width
+    name = card.name
+    if len(name) > max_name:
+        name = name[: max_name - 1] + "\u2026"
+    colored_name = f"{name_color}{name}{render.RESET}"
+    line1 = render.pad_right(colored_name, col_width)
+
+    res_str = render.color_resonances(card.resonances)
+    badge = render.rarity_badge(card.rarity)
+    res_badge = f"{res_str} {badge}"
+    line2 = render.pad_right(res_badge, col_width)
+
+    if original_price is not None and original_price != price:
+        price_str = (
+            f"{render.DIM}{render.STRIKETHROUGH}{original_price}e"
+            f"{render.RESET} "
+            f"{render.BOLD}{price}e{render.RESET}"
+        )
+    else:
+        price_str = f"{price}e"
+    line3 = render.pad_right(price_str, col_width)
+
+    # Truncated rules text
+    rules = card.rules_text
+    if len(rules) > col_width:
+        rules = rules[: col_width - 3] + "..."
+    line4 = render.pad_right(f"{render.DIM}{rules}{render.RESET}", col_width)
+
+    return [line1, line2, line3, line4]
+
+
+def render_shop_grid(
+    items: list[tuple[Card, int, Optional[int]]],
+    col_width: int = 21,
+    gap: str = "  ",
+) -> str:
+    """Render shop items in a 2x3 grid layout.
+
+    Each item is a tuple of (card, effective_price, original_price_or_None).
+    Items are arranged in rows of 3. Each cell shows the card name (colored
+    by resonance), rarity badge, resonance display, price (with discount
+    highlighting), and truncated rules text.
+
+    Returns a single string with newlines.
+    """
+    if not items:
+        return ""
+
+    lines_per_cell = 4
+    output_lines: list[str] = []
+
+    for row_start in range(0, len(items), 3):
+        row_items = items[row_start : row_start + 3]
+        cells: list[list[str]] = []
+        for card, price, original_price in row_items:
+            cells.append(_format_grid_cell(card, price, original_price, col_width))
+
+        # Pad rows with fewer than 3 items
+        while len(cells) < 3:
+            cells.append([render.pad_right("", col_width)] * lines_per_cell)
+
+        for line_idx in range(lines_per_cell):
+            joined = gap.join(cells[col][line_idx] for col in range(len(cells)))
+            output_lines.append(joined)
+
+        # Blank line between rows
+        if row_start + 3 < len(items):
+            output_lines.append("")
+
+    return "\n".join(output_lines)
+
+
 def format_deck_summary(deck_cards: list[DeckCard]) -> str:
     """Produce a compact deck summary with card count and rarity breakdown.
 

@@ -286,6 +286,103 @@ class TestDeckSummary(unittest.TestCase):
         self.assertIn("3", output)  # total
 
 
+class TestRenderShopGrid(unittest.TestCase):
+    """Tests for the render_shop_grid function."""
+
+    def _make_shop_items(
+        self, count: int = 6, discount_index: int = 2
+    ) -> list[tuple[Card, int, int | None]]:
+        """Create shop items as (card, price, original_price_or_none) tuples."""
+        cards_data = [
+            ("Tide Runner", Rarity.COMMON, frozenset({Resonance.TIDE}), 50),
+            ("Ember Guard", Rarity.UNCOMMON, frozenset({Resonance.EMBER}), 80),
+            ("Stone Titan", Rarity.RARE, frozenset({Resonance.STONE}), 120),
+            ("Zephyr Scout", Rarity.COMMON, frozenset({Resonance.ZEPHYR}), 50),
+            ("Ruin Walker", Rarity.UNCOMMON, frozenset({Resonance.RUIN}), 80),
+            ("Dual Blade", Rarity.LEGENDARY, frozenset({Resonance.TIDE, Resonance.EMBER}), 200),
+        ]
+        items: list[tuple[Card, int, int | None]] = []
+        for i in range(min(count, len(cards_data))):
+            name, rarity, resonances, price = cards_data[i]
+            card = _make_card(name=name, rarity=rarity, resonances=resonances)
+            if i == discount_index:
+                items.append((card, 60, price))  # discounted from original
+            else:
+                items.append((card, price, None))
+        return items
+
+    def test_grid_has_two_rows(self) -> None:
+        from render_cards import render_shop_grid
+
+        items = self._make_shop_items()
+        output = render_shop_grid(items)
+        # With 6 items in 2 rows of 3, there should be content from all 6
+        self.assertIn("Tide Runner", output)
+        self.assertIn("Zephyr Scout", output)
+
+    def test_all_items_present(self) -> None:
+        from render_cards import render_shop_grid
+
+        items = self._make_shop_items()
+        output = render_shop_grid(items)
+        for card, _price, _orig in items:
+            self.assertIn(card.name, output)
+
+    def test_prices_displayed(self) -> None:
+        from render_cards import render_shop_grid
+
+        items = self._make_shop_items()
+        output = render_shop_grid(items)
+        # Non-discounted common price
+        self.assertIn("50e", output)
+
+    def test_discount_shows_both_prices(self) -> None:
+        from render_cards import render_shop_grid
+
+        items = self._make_shop_items(discount_index=2)
+        output = render_shop_grid(items)
+        # Original price of the discounted item (120) and discounted (60)
+        self.assertIn("120", output)
+        self.assertIn("60e", output)
+
+    def test_rarity_badges_present(self) -> None:
+        from render_cards import render_shop_grid
+
+        items = self._make_shop_items()
+        output = render_shop_grid(items)
+        self.assertIn("[C]", output)
+        self.assertIn("[U]", output)
+        self.assertIn("[R]", output)
+
+    def test_fewer_than_six_items(self) -> None:
+        from render_cards import render_shop_grid
+
+        items = self._make_shop_items(count=3)
+        output = render_shop_grid(items)
+        self.assertIn("Tide Runner", output)
+        self.assertIn("Stone Titan", output)
+
+    def test_column_width_constraint(self) -> None:
+        from render import visible_len
+        from render_cards import render_shop_grid
+
+        items = self._make_shop_items()
+        output = render_shop_grid(items)
+        for line in output.split("\n"):
+            self.assertLessEqual(
+                visible_len(line), 70,
+                f"Line too wide: {repr(line)}"
+            )
+
+    def test_rules_text_present(self) -> None:
+        from render_cards import render_shop_grid
+
+        items = self._make_shop_items()
+        output = render_shop_grid(items)
+        # Rules text should appear (may be truncated)
+        self.assertIn("Judgment", output)
+
+
 class TestImport(unittest.TestCase):
     """Test that the module can be imported cleanly."""
 
@@ -296,6 +393,7 @@ class TestImport(unittest.TestCase):
         self.assertTrue(hasattr(render_cards, "render_card_list"))
         self.assertTrue(hasattr(render_cards, "format_shop_card"))
         self.assertTrue(hasattr(render_cards, "format_deck_summary"))
+        self.assertTrue(hasattr(render_cards, "render_shop_grid"))
 
 
 if __name__ == "__main__":

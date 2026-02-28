@@ -6,12 +6,13 @@ selected from the draft pool via resonance-weighted selection.
 """
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 import algorithm
 import input_handler
 import pool as pool_module
 import render
+import render_cards
 from jsonl_log import SessionLogger
 from models import (
     AlgorithmParams,
@@ -153,6 +154,103 @@ def _render_shop_item(
     return "\n".join([line1, card_lines[1], price_line])
 
 
+def _build_render_fn(
+    items: list[ShopItem],
+    available_essence: int,
+    reroll_cost: int,
+    free_rerolls: int,
+) -> Callable[[int, str, bool, bool], str]:
+    """Build the render callback for the shop multi-select menu.
+
+    Returns a function compatible with input_handler.multi_select's render_fn
+    parameter. Tracks a running total across items and shows selection status.
+    """
+    running_total = [0]
+    reroll_index = len(items)
+
+    def _render_fn(
+        index: int,
+        option: str,
+        is_highlighted: bool,
+        is_checked: bool,
+    ) -> str:
+        # Reset running total at the start of each render pass
+        if index == 0:
+            running_total[0] = 0
+
+        if index == reroll_index:
+            marker = ">" if is_highlighted else " "
+            check = "[x]" if is_checked else "[ ]"
+            reroll_affordable = (
+                free_rerolls > 0 or available_essence >= reroll_cost
+            )
+            if not reroll_affordable and not is_checked:
+                check = f"{render.DIM}[-]{render.RESET}"
+            if free_rerolls > 0:
+                label = f"Reroll ({render.BOLD}FREE{render.RESET})"
+            else:
+                label = f"Reroll ({reroll_cost} essence)"
+            line = f"  {marker} {check} {label}"
+            # Show running total summary below the reroll option
+            if running_total[0] > 0:
+                remaining = available_essence - running_total[0]
+                count = _count_checked_items(items, running_total[0])
+                line += (
+                    f"\n\n  {render.BOLD}Selected: {count} item(s)"
+                    f" | Cost: {running_total[0]}"
+                    f" | Remaining: {remaining}{render.RESET}"
+                )
+            return line
+
+        item = items[index]
+        affordable = (
+            available_essence - running_total[0] >= item.effective_price
+        )
+        result = _render_shop_item(
+            item, is_highlighted, is_checked, affordable
+        )
+
+        # Update running total for checked items
+        if is_checked:
+            running_total[0] += item.effective_price
+
+        # Add row separator after every 3rd item
+        if index == 2 and len(items) > 3:
+            result += "\n"
+
+        return result
+
+    return _render_fn
+
+
+def _count_checked_items(items: list[ShopItem], total: int) -> int:
+    """Estimate the number of checked items from the running total."""
+    count = 0
+    remaining = total
+    for item in items:
+        if remaining >= item.effective_price:
+            remaining -= item.effective_price
+            count += 1
+        if remaining <= 0:
+            break
+    return max(1, count) if total > 0 else 0
+
+
+def _print_purchase_summary(bought_items: list[ShopItem], total_cost: int, remaining_essence: int) -> None:
+    """Print a summary of the items purchased."""
+    print()
+    print(f"  {render.BOLD}Purchase Summary:{render.RESET}")
+    for item in bought_items:
+        price_str = _format_price(item)
+        name_color = render.card_color(item.card.resonances)
+        print(f"    {name_color}{item.card.name}{render.RESET}  {price_str}")
+    print(
+        f"\n  Purchased {len(bought_items)} card(s) "
+        f"for {total_cost} essence."
+    )
+    print(f"  Essence remaining: {remaining_essence}")
+
+
 def run_shop(
     state: QuestState,
     algorithm_params: AlgorithmParams,
@@ -193,78 +291,37 @@ def run_shop(
             print(f"  {render.DIM}No items available.{render.RESET}")
             break
 
+        # Display the 2x3 grid preview
+        grid_items: list[tuple[Card, int, Optional[int]]] = [
+            (
+                item.card,
+                item.effective_price,
+                item.base_price if item.discounted_price is not None else None,
+            )
+            for item in items
+        ]
+        print(f"  {render.BOLD}Shop Items:{render.RESET}")
+        print(f"  Essence: {state.essence}")
+        print()
+        print(render_cards.render_shop_grid(grid_items))
+        print()
+
         # Build the options list: items + reroll
         option_labels: list[str] = [item.card.name for item in items]
 
         # Add reroll option
         if free_rerolls > 0:
-            reroll_label = f"Reroll (free - {free_rerolls} remaining)"
+            reroll_label = f"Reroll (FREE)"
         else:
             reroll_label = f"Reroll ({reroll_cost} essence)"
         option_labels.append(reroll_label)
         reroll_index = len(option_labels) - 1
 
-        # Display items in 2 rows of 3
-        print(f"  {render.BOLD}Shop Items:{render.RESET}")
-        print(f"  Essence: {state.essence}")
-        print()
-
-        # Track running total for the render callback; reset at each
-        # render pass (index 0) and accumulate for checked items.
-        running_total = [0]
-
-        def _render_fn(
-            index: int,
-            option: str,
-            is_highlighted: bool,
-            is_checked: bool,
-            _items: list[ShopItem] = items,
-            _reroll_idx: int = reroll_index,
-            _running: list[int] = running_total,
-        ) -> str:
-            # Reset running total at the start of each render pass
-            if index == 0:
-                _running[0] = 0
-
-            if index == _reroll_idx:
-                marker = ">" if is_highlighted else " "
-                check = "[x]" if is_checked else "[ ]"
-                reroll_affordable = (
-                    free_rerolls > 0 or state.essence >= reroll_cost
-                )
-                if not reroll_affordable and not is_checked:
-                    check = f"{render.DIM}[-]{render.RESET}"
-                line = f"  {marker} {check} {option}"
-                # Show running total on the last line
-                if _running[0] > 0:
-                    line += (
-                        f"\n         {render.BOLD}"
-                        f"Total: {_running[0]}e{render.RESET}"
-                        f"  (Remaining: {state.essence - _running[0]}e)"
-                    )
-                return line
-
-            item = _items[index]
-            affordable = (
-                state.essence - _running[0] >= item.effective_price
-            )
-            result = _render_shop_item(
-                item, is_highlighted, is_checked, affordable
-            )
-
-            # Update running total for checked items
-            if is_checked:
-                _running[0] += item.effective_price
-
-            # Add row separator after every 3rd item
-            if index == 2 and len(_items) > 3:
-                result += "\n"
-
-            return result
+        render_fn = _build_render_fn(items, state.essence, reroll_cost, free_rerolls)
 
         selected_indices = input_handler.multi_select(
             options=option_labels,
-            render_fn=_render_fn,
+            render_fn=render_fn,
         )
 
         # Filter out unaffordable selections: ensure total cost of
@@ -326,12 +383,10 @@ def run_shop(
             )
 
         if bought_items:
+            _print_purchase_summary(bought_items, total_cost, state.essence)
+        else:
             print()
-            print(
-                f"  Purchased {len(bought_items)} card(s) "
-                f"for {total_cost} essence."
-            )
-            print(f"  Essence remaining: {state.essence}")
+            print(f"  {render.DIM}No items purchased.{render.RESET}")
 
         break
 

@@ -617,3 +617,178 @@ class TestRunShop:
         assert state.essence >= 0
         # Pool should have lost at most 1 entry
         assert len(state.pool) >= initial_pool_size - 1
+
+
+class TestShopDisplay:
+    """Tests for shop display polish: grid layout, running totals, reroll text."""
+
+    def test_purchase_summary_printed(self, capsys: object) -> None:
+        """After buying, a summary of purchased items and essence is shown."""
+        from sites_shop import run_shop
+
+        cards = _make_test_cards()
+        pool = _make_pool(cards)
+        state = _make_quest_state(cards, pool, essence=500)
+        config = _make_shop_config()
+        params = _make_algorithm_params()
+
+        with patch(
+            "sites_shop.input_handler.multi_select", return_value=[0, 1]
+        ):
+            run_shop(
+                state=state,
+                algorithm_params=params,
+                pool_params=_make_pool_params(),
+                shop_config=config,
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        import sys
+        captured = capsys.readouterr()  # type: ignore[union-attr]
+        output = captured.out  # type: ignore[union-attr]
+        assert "Purchased" in output
+        assert "essence" in output.lower()
+
+    def test_reroll_label_shows_cost(self, capsys: object) -> None:
+        """Reroll option text shows the cost in essence."""
+        from sites_shop import run_shop
+
+        cards = _make_test_cards()
+        pool = _make_pool(cards)
+        state = _make_quest_state(cards, pool, essence=500)
+        config = _make_shop_config()
+        params = _make_algorithm_params()
+
+        # Capture what labels are passed to multi_select
+        captured_options: list[list[str]] = []
+
+        def mock_multi_select(
+            options: list[str], **kwargs: object
+        ) -> list[int]:
+            captured_options.append(list(options))
+            return []  # buy nothing
+
+        with patch(
+            "sites_shop.input_handler.multi_select",
+            side_effect=mock_multi_select,
+        ):
+            run_shop(
+                state=state,
+                algorithm_params=params,
+                pool_params=_make_pool_params(),
+                shop_config=config,
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        assert len(captured_options) >= 1
+        reroll_label = captured_options[0][-1]
+        assert "50" in reroll_label
+
+    def test_reroll_label_shows_free_when_enhanced(self) -> None:
+        """Enhanced shop shows FREE for the reroll option."""
+        from sites_shop import run_shop
+
+        cards = _make_test_cards()
+        pool = _make_pool(cards)
+        state = _make_quest_state(cards, pool, essence=500)
+        config = _make_shop_config()
+        params = _make_algorithm_params()
+
+        captured_options: list[list[str]] = []
+
+        def mock_multi_select(
+            options: list[str], **kwargs: object
+        ) -> list[int]:
+            captured_options.append(list(options))
+            return []
+
+        with patch(
+            "sites_shop.input_handler.multi_select",
+            side_effect=mock_multi_select,
+        ):
+            run_shop(
+                state=state,
+                algorithm_params=params,
+                pool_params=_make_pool_params(),
+                shop_config=config,
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                logger=None,
+                is_enhanced=True,
+            )
+
+        assert len(captured_options) >= 1
+        reroll_label = captured_options[0][-1]
+        assert "FREE" in reroll_label.upper() or "free" in reroll_label.lower()
+
+    def test_shop_header_shows_essence(self, capsys: object) -> None:
+        """Shop header display includes current essence amount."""
+        from sites_shop import run_shop
+
+        cards = _make_test_cards()
+        pool = _make_pool(cards)
+        state = _make_quest_state(cards, pool, essence=350)
+        config = _make_shop_config()
+        params = _make_algorithm_params()
+
+        with patch(
+            "sites_shop.input_handler.multi_select", return_value=[]
+        ):
+            run_shop(
+                state=state,
+                algorithm_params=params,
+                pool_params=_make_pool_params(),
+                shop_config=config,
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        captured = capsys.readouterr()  # type: ignore[union-attr]
+        output = captured.out  # type: ignore[union-attr]
+        assert "350" in output
+
+    def test_render_fn_shows_running_total(self) -> None:
+        """The render callback accumulates a running total for checked items."""
+        from sites_shop import generate_shop_items, _build_render_fn
+
+        cards = _make_test_cards()
+        pool = _make_pool(cards)
+        state = _make_quest_state(cards, pool, essence=500)
+        config = _make_shop_config()
+        params = _make_algorithm_params()
+
+        items = generate_shop_items(state, params, config)
+        render_fn = _build_render_fn(items, state.essence, 50, 0)
+
+        # Render item 0 as checked -- should contain 'Selected'
+        # and item 1 as not checked
+        output0 = render_fn(0, items[0].card.name, False, True)
+        assert "Selected" in output0 or "Cost:" in output0
+
+    def test_render_fn_reroll_shows_correct_label(self) -> None:
+        """The render callback formats the reroll option label."""
+        from sites_shop import generate_shop_items, _build_render_fn
+
+        cards = _make_test_cards()
+        pool = _make_pool(cards)
+        state = _make_quest_state(cards, pool, essence=500)
+        config = _make_shop_config()
+        params = _make_algorithm_params()
+
+        items = generate_shop_items(state, params, config)
+        reroll_index = len(items)
+
+        # Non-enhanced: cost 50
+        render_fn = _build_render_fn(items, 500, 50, 0)
+        output = render_fn(reroll_index, "Reroll", False, False)
+        assert "50" in output
+
+        # Enhanced: free
+        render_fn_free = _build_render_fn(items, 500, 50, 1)
+        output_free = render_fn_free(reroll_index, "Reroll", False, False)
+        assert "FREE" in output_free.upper() or "free" in output_free.lower()
