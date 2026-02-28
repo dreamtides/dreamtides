@@ -1,0 +1,159 @@
+[[bosses]]
+name = "Pyrra, Ember Dancer"
+archetype = "Aggro/Burn"
+ability_text = "Whenever you play a character that costs 2 or less energy, kindle 1."
+deck_description = "Floods the board with cheap low-cost characters and events that directly grant victory points, aiming to win before the opponent stabilizes."
+is_final = false
+resonance = ["Ember"]
+
+[[bosses]]
+name = "Sylvara, Chorus Weaver"
+archetype = "Go Wide"
+ability_text = "Whenever you materialize a non-figment character, materialize a Celestial figment."
+deck_description = "Low-cost characters and events that grant spark to all characters simultaneously, quickly overwhelming with board-wide pressure."
+is_final = false
+resonance = ["Ember", "Stone"]
+
+[[bosses]]
+name = "Thornroot, Grove-Warden"
+archetype = "Spirit Animal Tribal"
+ability_text = "Each Spirit Animal you control increases your energy production by 1."
+deck_description = "Cheap Spirit Animal characters that generate energy, ramping into expensive high-spark threats far earlier than normal."
+is_final = false
+resonance = ["Stone"]
+
+[[bosses]]
+name = "Arakos, the Iron Banner"
+archetype = "Warrior Tribal"
+ability_text = "Your Warrior characters have +2 spark."
+deck_description = "Warriors at every cost with tribal synergy effects, creating a board where each individual warrior is a meaningful threat."
+is_final = false
+resonance = ["Stone", "Ember"]
+
+[[bosses]]
+name = "Vesper, Twilight Arbiter"
+archetype = "Midrange"
+ability_text = "Whenever you dissolve an enemy character, draw a card."
+deck_description = "Efficient mid-cost characters backed by removal events and effects that force the opponent to discard, grinding out card advantage."
+is_final = false
+resonance = ["Tide", "Ruin"]
+
+[[bosses]]
+name = "Mara, Whisper of the Lost"
+archetype = "Self-Discard"
+ability_text = "Whenever you discard a card from your hand, materialize a Shadow figment."
+deck_description = "Cards with discard costs, effects that force self-discard, and payoffs for having few cards in hand, converting card disadvantage into board presence."
+is_final = false
+resonance = ["Ruin"]
+
+[[bosses]]
+name = "Lord Ashworth, the Pale Collector"
+archetype = "Aristocrats"
+ability_text = "Whenever you abandon a character, gain 1 point."
+deck_description = "Cheap characters with materialized triggers and cards that require abandoning as a cost, turning a stream of disposable characters into victory points."
+is_final = false
+resonance = ["Ruin", "Ember"]
+
+[[bosses]]
+name = "Luminos, Dream Sculptor"
+archetype = "Figments"
+ability_text = "Your figments have +2 spark."
+deck_description = "Cards that create multiple figments of all types and events that buff all characters, turning normally modest figment tokens into serious threats."
+is_final = false
+resonance = ["Tide"]
+
+[[bosses]]
+name = "Solenne, the Flickering Star"
+archetype = "Blink"
+ability_text = "1 energy: Banish target character you control until your next main phase."
+deck_description = "Characters with powerful materialized triggers and judgment abilities that benefit from repeated re-entry to the battlefield."
+is_final = false
+resonance = ["Zephyr"]
+
+[[bosses]]
+name = "Aegis, the Bastion"
+archetype = "Tap-out Control"
+ability_text = "Characters you control with spark 4 or more cannot be dissolved."
+deck_description = "Expensive high-spark characters with protective static abilities and energy ramp, building an impenetrable wall of unkillable threats."
+is_final = false
+resonance = ["Stone"]
+
+[[bosses]]
+name = "Nihil, the Silence Between"
+archetype = "Draw-Go Control"
+ability_text = "Whenever your opponent plays a card, draw a card."
+deck_description = "Prevent effects, sweeper events that dissolve all characters, spot removal, and a handful of high-cost finisher characters that close the game once the opponent is out of resources."
+is_final = true
+resonance = ["Zephyr", "Ruin"]
+
+[[bosses]]
+name = "Keth, the Binding Dark"
+archetype = "Prison"
+ability_text = "Your opponent's cards cost 1 more energy to play."
+deck_description = "Cards that further restrict the opponent's energy production, hand size, and available actions, slowly strangling the opponent while chipping away at victory points."
+is_final = true
+resonance = ["Ruin"]
+
+[[bosses]]
+name = "Yune, Weaver of Ends"
+archetype = "Combo-Control"
+ability_text = "At the start of your turn, foresee 3."
+deck_description = "Reactive removal, prevention, and card draw to stall the game while digging through the deck for three specific combo characters that win the game when all three are on the battlefield simultaneously."
+is_final = true
+resonance = ["Tide"]
+
+[[bosses]]
+name = "Zephyra, Tempest Unbound"
+archetype = "Spellslinger/Storm"
+ability_text = "Whenever you play an event, gain 1 energy."
+deck_description = "Cheap events that draw cards and generate resources, building toward explosive turns where dozens of events chain together, each refunding its own cost."
+is_final = true
+resonance = ["Zephyr", "Ember"]
+
+[[bosses]]
+name = "Morwen, the Pale Dreamer"
+archetype = "Reanimator"
+ability_text = "At the start of your turn, materialize the character in your void with the highest spark."
+deck_description = "Massive high-spark characters, self-discard and self-mill effects to fill the void, and removal to stall until the reanimation engine takes over."
+is_final = true
+resonance = ["Ruin", "Stone"]
+
+[[bosses]]
+name = "Dusk, Veil-Render"
+archetype = "Cheat-into-Play"
+ability_text = "Characters you play cost 3 less energy (minimum 1)."
+deck_description = "Overpowered high-cost characters with devastating abilities that are normally balanced by their steep energy cost, deployed multiple turns ahead of schedule."
+is_final = true
+resonance = ["Stone", "Ruin"]
+
+[[bosses]]
+name = "Echomaw, Memory Devourer"
+archetype = "Self-Mill"
+ability_text = "Judgment: Gain 1 point for every 5 cards in your void."
+deck_description = "Self-mill effects via foresee, cards that move directly from deck to void, and void-matters payoffs that grow stronger as the void fills up."
+is_final = true
+resonance = ["Ruin", "Tide"]
+
+[[bosses]]
+name = "Nyx, the Midnight Whisper"
+archetype = "Flash"
+ability_text = "Whenever you play a fast card during your opponent's turn, draw a card."
+deck_description = "Fast characters that can be materialized at instant speed, fast events with disruptive effects, and payoffs for controlling the tempo of the opponent's turn."
+is_final = true
+resonance = ["Zephyr"]
+
+[[bosses]]
+name = "Ashara, the Relentless Tide"
+archetype = "Tempo"
+ability_text = "Whenever you play an event that targets an enemy character, materialize a Radiant figment."
+deck_description = "Efficient threats with self-protection, bounce and removal events that simultaneously answer the opponent's board while developing your own."
+is_final = true
+resonance = ["Tide", "Zephyr"]
+
+[[bosses]]
+name = "Titanus, the Living Monolith"
+archetype = "Voltron/Go Tall"
+ability_text = "Your leftmost character has +5 spark and cannot be dissolved."
+deck_description = "Buff events that add spark to a single target, protection effects, and cards that ensure one towering character survives to dominate every judgment phase."
+is_final = true
+resonance = ["Stone", "Ember"]
