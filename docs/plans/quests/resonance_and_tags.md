@@ -26,32 +26,24 @@ groupings. Tags never influence normal drafting or shop selection.
 ### The Five Resonances
 
 Each card carries 0-2 resonance symbols from: **Tide**, **Ember**, **Zephyr**,
-**Stone**, **Ruin**. Each resonance has a mechanical identity:
-
-| Resonance | Theme                         | Primary Keywords                                | Playstyle                     |
-| --------- | ----------------------------- | ----------------------------------------------- | ----------------------------- |
-| Tide      | Flow, cycles, inevitability   | Foresee, Discover, draw                         | Patient, information-oriented |
-| Ember     | Speed, directness, momentum   | Kindle, low costs, point gain                   | Aggressive, high-velocity     |
-| Zephyr    | Surprise, adaptability        | Fast, Prevent, Copy, banish-until               | Reactive, timing-dependent    |
-| Stone     | Permanence, growth, weight    | High spark, energy production, static abilities | Board-centric, midrange       |
-| Ruin      | Entropy, recursion, sacrifice | Dissolve, Abandon, Reclaim, discard             | Attrition, recursive          |
+**Stone**, **Ruin**.
 
 ### Resonance Pairs
 
 The ten two-resonance combinations define natural deck archetypes:
 
-| Pair           | Name     | Strategy                                                              |
-| -------------- | -------- | --------------------------------------------------------------------- |
-| Tide + Ember   | Tempest  | Spellslinger -- chain cheap spells, draw into more                    |
-| Tide + Zephyr  | Mirage   | Draw-go control -- react with fast spells, win through card selection |
-| Tide + Stone   | Depths   | Ramp and value -- draw into expensive threats                         |
-| Tide + Ruin    | Undertow | Recursion -- fill the void, reclaim the best cards                    |
-| Ember + Zephyr | Gale     | Tempo -- cheap threats with fast disruption                           |
-| Ember + Stone  | Crucible | Go wide -- flood the board, tribal pump effects                       |
-| Ember + Ruin   | Cinder   | Aristocrats -- sacrifice cheap characters for value                   |
-| Zephyr + Stone | Basalt   | Blink -- re-trigger materialized abilities                            |
-| Zephyr + Ruin  | Eclipse  | Discard control -- deny resources, profit from the void               |
-| Stone + Ruin   | Bedrock  | Reanimator -- get big things in void, bring them back                 |
+| Pair           | Name     |
+| -------------- | -------- |
+| Tide + Ember   | Tempest  |
+| Tide + Zephyr  | Mirage   |
+| Tide + Stone   | Depths   |
+| Tide + Ruin    | Undertow |
+| Ember + Zephyr | Gale     |
+| Ember + Stone  | Crucible |
+| Ember + Ruin   | Cinder   |
+| Zephyr + Stone | Basalt   |
+| Zephyr + Ruin  | Eclipse  |
+| Stone + Ruin   | Bedrock  |
 
 ### Resonance on Cards
 
