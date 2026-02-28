@@ -136,7 +136,6 @@ def format_card(card: Card, highlighted: bool = False) -> list[str]:
     """
     marker = ">" if highlighted else " "
     name_color = card_color(card.resonances)
-    colored_name = f"{name_color}{card.name}{RESET}"
 
     res_str = color_resonances(card.resonances)
     badge = rarity_badge(card.rarity)
@@ -150,11 +149,19 @@ def format_card(card: Card, highlighted: bool = False) -> list[str]:
         right_parts.append(spark_str)
     right_side = "   ".join(right_parts)
 
-    line1 = f"  {marker} {colored_name}"
-    # Compute spacing between name and right side
-    vis_line1 = visible_len(line1)
+    prefix = f"  {marker} "
     vis_right = visible_len(right_side)
-    # Ensure total visible width fits within CONTENT_WIDTH
+    # Maximum visible width available for the name (2 gap minimum)
+    max_name_width = CONTENT_WIDTH - len(prefix) - 2 - vis_right
+    if max_name_width < 1:
+        max_name_width = 1
+    display_name = card.name
+    if len(display_name) > max_name_width:
+        display_name = display_name[: max_name_width - 1] + "\u2026"
+    colored_name = f"{name_color}{display_name}{RESET}"
+
+    line1 = f"{prefix}{colored_name}"
+    vis_line1 = visible_len(line1)
     gap = max(2, CONTENT_WIDTH - vis_line1 - vis_right)
     line1 = f"{line1}{' ' * gap}{right_side}"
 

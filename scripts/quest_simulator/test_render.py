@@ -248,6 +248,32 @@ class TestFormatCard(unittest.TestCase):
         lines = format_card(card, highlighted=False)
         self.assertIn("Cost: -", lines[0])
 
+    def test_format_card_line1_within_content_width(self) -> None:
+        from models import Card, CardType, Rarity, Resonance
+        from render import CONTENT_WIDTH, format_card, visible_len
+
+        long_name_card = Card(
+            name="A" * 80,
+            card_number=200,
+            energy_cost=5,
+            card_type=CardType.CHARACTER,
+            subtype=None,
+            is_fast=False,
+            spark=3,
+            rarity=Rarity.UNCOMMON,
+            rules_text="Some text.",
+            resonances=frozenset({Resonance.TIDE, Resonance.EMBER}),
+            tags=frozenset(),
+        )
+        lines = format_card(long_name_card, highlighted=False)
+        self.assertLessEqual(
+            visible_len(lines[0]),
+            CONTENT_WIDTH,
+            f"Line 1 visible width {visible_len(lines[0])} exceeds CONTENT_WIDTH {CONTENT_WIDTH}",
+        )
+        # Name should be truncated
+        self.assertIn("\u2026", lines[0])
+
     def test_format_card_truncated_rules(self) -> None:
         from models import Card, CardType, Rarity, Resonance
         from render import format_card, visible_len
@@ -399,19 +425,28 @@ class TestHeaderTemplates(unittest.TestCase):
 class TestNoColor(unittest.TestCase):
     def test_no_color_env(self) -> None:
         """When NO_COLOR is set, all color constants should be empty strings."""
-        # We can't easily test this without reimporting the module,
-        # but we verify the pattern is correct by checking that the
-        # module-level check exists.
-        import render
+        import subprocess
 
-        # If NO_COLOR was set (it is in test environments typically),
-        # verify colors are empty OR if it wasn't, verify they have values.
-        # The key test is that the module loads without error.
-        self.assertTrue(hasattr(render, "RESONANCE_COLORS"))
-        self.assertTrue(hasattr(render, "NEUTRAL_COLOR"))
-        self.assertTrue(hasattr(render, "BOLD"))
-        self.assertTrue(hasattr(render, "DIM"))
-        self.assertTrue(hasattr(render, "RESET"))
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys; sys.path.insert(0, 'scripts/quest_simulator');"
+                    "import render;"
+                    "colors = [render.NEUTRAL_COLOR, render.BOLD, render.DIM, render.RESET];"
+                    "colors.extend(render.RESONANCE_COLORS.values());"
+                    "assert all(c == '' for c in colors), f'Expected empty but got {colors}';"
+                    "print('OK')"
+                ),
+            ],
+            capture_output=True,
+            text=True,
+            env={**os.environ, "NO_COLOR": "1"},
+            cwd=os.path.join(os.path.dirname(__file__), "..", ".."),
+        )
+        self.assertEqual(result.returncode, 0, f"stderr: {result.stderr}")
+        self.assertIn("OK", result.stdout)
 
 
 if __name__ == "__main__":
