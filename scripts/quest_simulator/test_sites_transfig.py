@@ -570,6 +570,180 @@ class TestTransfigNote:
         assert " -- " in dc.transfig_note
 
 
+class TestEligibilityExplanation:
+    """Tests for eligibility explanation strings."""
+
+    def test_viridian_explains_cost(self) -> None:
+        """Viridian explanation should mention energy cost value."""
+        from sites_transfig import eligibility_explanation, TransfigType
+
+        card = _make_card("Test Card", 1, energy_cost=3)
+        explanation = eligibility_explanation(card, TransfigType.VIRIDIAN)
+        assert "3" in explanation
+        assert "cost" in explanation.lower()
+
+    def test_golden_explains_numbers_in_text(self) -> None:
+        """Golden explanation should mention rules text numbers."""
+        from sites_transfig import eligibility_explanation, TransfigType
+
+        card = _make_card("Test Card", 1, rules_text="Deal 5 damage.")
+        explanation = eligibility_explanation(card, TransfigType.GOLDEN)
+        assert "number" in explanation.lower() or "digit" in explanation.lower()
+
+    def test_scarlet_explains_character_type(self) -> None:
+        """Scarlet explanation should mention character type."""
+        from sites_transfig import eligibility_explanation, TransfigType
+
+        card = _make_card("Test Card", 1, card_type=CardType.CHARACTER)
+        explanation = eligibility_explanation(card, TransfigType.SCARLET)
+        assert "character" in explanation.lower()
+
+    def test_magenta_explains_trigger(self) -> None:
+        """Magenta explanation should mention the trigger keyword found."""
+        from sites_transfig import eligibility_explanation, TransfigType
+
+        card = _make_card(
+            "Test Card", 1,
+            rules_text="Judgment: deal damage.",
+        )
+        explanation = eligibility_explanation(card, TransfigType.MAGENTA)
+        assert "trigger" in explanation.lower() or "judgment" in explanation.lower()
+
+    def test_azure_explains_event_type(self) -> None:
+        """Azure explanation should mention event type."""
+        from sites_transfig import eligibility_explanation, TransfigType
+
+        card = _make_card(
+            "Test Card", 1, card_type=CardType.EVENT, spark=None,
+        )
+        explanation = eligibility_explanation(card, TransfigType.AZURE)
+        assert "event" in explanation.lower()
+
+    def test_bronze_explains_event_type(self) -> None:
+        """Bronze explanation should mention event type."""
+        from sites_transfig import eligibility_explanation, TransfigType
+
+        card = _make_card(
+            "Test Card", 1, card_type=CardType.EVENT, spark=None,
+        )
+        explanation = eligibility_explanation(card, TransfigType.BRONZE)
+        assert "event" in explanation.lower()
+
+    def test_rose_explains_energy_ability(self) -> None:
+        """Rose explanation should mention activated ability."""
+        from sites_transfig import eligibility_explanation, TransfigType
+
+        card = _make_card(
+            "Test Card", 1,
+            rules_text="Pay 2 energy: Draw a card.",
+        )
+        explanation = eligibility_explanation(card, TransfigType.ROSE)
+        assert "activated" in explanation.lower() or "ability" in explanation.lower()
+
+    def test_prismatic_lists_applicable_types(self) -> None:
+        """Prismatic explanation should list all applicable sub-types."""
+        from sites_transfig import eligibility_explanation, TransfigType
+
+        card = _make_card(
+            "Test Card", 1,
+            energy_cost=3,
+            card_type=CardType.CHARACTER,
+            rules_text="Deal 5 damage.",
+        )
+        explanation = eligibility_explanation(card, TransfigType.PRISMATIC)
+        assert "Viridian" in explanation
+        assert "Golden" in explanation
+        assert "Scarlet" in explanation
+
+
+class TestTransfigTypeColor:
+    """Tests for transfiguration type color mapping."""
+
+    def test_viridian_returns_green(self) -> None:
+        """Viridian should have green color code."""
+        from sites_transfig import transfig_type_color, TransfigType
+
+        color = transfig_type_color(TransfigType.VIRIDIAN)
+        # Green ANSI code contains 32 or 92
+        assert "32" in color or "92" in color or color == ""
+
+    def test_golden_returns_yellow(self) -> None:
+        """Golden should have yellow color code."""
+        from sites_transfig import transfig_type_color, TransfigType
+
+        color = transfig_type_color(TransfigType.GOLDEN)
+        assert "33" in color or "93" in color or color == ""
+
+    def test_scarlet_returns_red(self) -> None:
+        """Scarlet should have red color code."""
+        from sites_transfig import transfig_type_color, TransfigType
+
+        color = transfig_type_color(TransfigType.SCARLET)
+        assert "31" in color or "91" in color or color == ""
+
+    def test_all_types_have_colors(self) -> None:
+        """Every TransfigType should have a color entry."""
+        from sites_transfig import transfig_type_color, TransfigType
+
+        for t in TransfigType:
+            color = transfig_type_color(t)
+            assert isinstance(color, str)
+
+
+class TestRenderTransfigPreview:
+    """Tests for the polished transfiguration card preview rendering."""
+
+    def test_preview_shows_transformed_name(self) -> None:
+        """Card preview should show 'Name -> TransfigType Name'."""
+        from sites_transfig import _render_transfig_item, TransfigType
+
+        card = _make_card(
+            "Whirlpool Seer", 1,
+            energy_cost=3,
+            spark=2,
+            rarity=Rarity.UNCOMMON,
+            resonances=frozenset({Resonance.TIDE}),
+            rules_text="Judgment: Foresee 2.",
+        )
+        dc = DeckCard(card=card)
+        candidates = [(dc, TransfigType.VIRIDIAN)]
+
+        rendered = _render_transfig_item(0, "Test", True, candidates)
+        # Should include the transformed name somewhere
+        assert "Viridian" in rendered
+        assert "Whirlpool Seer" in rendered
+
+    def test_preview_shows_eligibility_reason(self) -> None:
+        """Card preview should include an eligibility explanation."""
+        from sites_transfig import _render_transfig_item, TransfigType
+
+        card = _make_card(
+            "Whirlpool Seer", 1,
+            energy_cost=3,
+            spark=2,
+            rules_text="Judgment: Foresee 2.",
+        )
+        dc = DeckCard(card=card)
+        candidates = [(dc, TransfigType.VIRIDIAN)]
+
+        rendered = _render_transfig_item(0, "Test", True, candidates)
+        # Should include "Eligible" and cost info
+        assert "Eligible" in rendered or "eligible" in rendered
+
+    def test_skip_option_labeled(self) -> None:
+        """Skip option should be clearly visible."""
+        from sites_transfig import _render_transfig_item, TransfigType
+
+        card = _make_card("Test", 1)
+        dc = DeckCard(card=card)
+        candidates = [(dc, TransfigType.VIRIDIAN)]
+
+        rendered = _render_transfig_item(
+            1, "Skip transfiguration", True, candidates,
+        )
+        assert "Skip" in rendered
+
+
 class TestTransfigurationLogging:
     """Tests for logging in transfiguration interactions."""
 
