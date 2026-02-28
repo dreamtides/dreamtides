@@ -8,6 +8,7 @@ all other modules import from. Stdlib-only, no external dependencies.
 import random
 from dataclasses import dataclass, field
 from enum import Enum
+from types import MappingProxyType
 from typing import Optional
 
 
@@ -68,6 +69,18 @@ class SiteType(Enum):
     CLEANSE = "Cleanse"
 
 
+class EffectType(Enum):
+    ADD_CARDS = "add_cards"
+    ADD_ESSENCE = "add_essence"
+    REMOVE_CARDS = "remove_cards"
+    ADD_DREAMSIGN = "add_dreamsign"
+    GAIN_RESONANCE = "gain_resonance"
+    LARGE_ESSENCE = "large_essence"
+    LOSE_ESSENCE = "lose_essence"
+    ADD_BANE_CARD = "add_bane_card"
+    ADD_BANE_DREAMSIGN = "add_bane_dreamsign"
+
+
 @dataclass(frozen=True)
 class Card:
     name: str
@@ -111,9 +124,9 @@ class PoolParams:
 class Dreamcaller:
     name: str
     resonances: frozenset[Resonance]
-    resonance_bonus: dict[str, int]
+    resonance_bonus: MappingProxyType[str, int]
     tags: frozenset[str]
-    tag_bonus: dict[str, int]
+    tag_bonus: MappingProxyType[str, int]
     essence_bonus: int
     ability_text: str
 
@@ -131,7 +144,7 @@ class Dreamsign:
 class Journey:
     name: str
     description: str
-    effect_type: str
+    effect_type: EffectType
     effect_value: int
 
 
@@ -139,11 +152,11 @@ class Journey:
 class TemptingOffer:
     reward_name: str
     reward_description: str
-    reward_effect_type: str
+    reward_effect_type: EffectType
     reward_value: int
     cost_name: str
     cost_description: str
-    cost_effect_type: str
+    cost_effect_type: EffectType
     cost_value: int
 
 
@@ -151,7 +164,7 @@ class TemptingOffer:
 class BaneCard:
     name: str
     rules_text: str
-    card_type: str
+    card_type: CardType
     energy_cost: int
 
 
@@ -211,10 +224,12 @@ class ResonanceProfile:
     def total(self) -> int:
         return sum(self.counts.values())
 
-    def top_n(self, n: int) -> list[tuple[Resonance, int]]:
+    def top_n(
+        self, n: int, rng: Optional[random.Random] = None
+    ) -> list[tuple[Resonance, int]]:
         """Return top-n resonances by count, descending. Ties broken randomly."""
         items = list(self.counts.items())
-        random.shuffle(items)
+        (rng or random).shuffle(items)
         return sorted(items, key=lambda x: x[1], reverse=True)[:n]
 
     def snapshot(self) -> dict[Resonance, int]:
