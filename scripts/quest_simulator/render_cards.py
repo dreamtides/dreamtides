@@ -9,7 +9,7 @@ duplication, transfiguration).
 
 from typing import Optional, Union
 
-from models import Card, DeckCard, Rarity, Resonance
+from models import Card, DeckCard, Dreamcaller, Dreamsign, Rarity, Resonance
 
 import render
 
@@ -349,5 +349,136 @@ def format_deck_summary(deck_cards: list[DeckCard]) -> str:
         count = rarity_counts.get(rarity, 0)
         pct = count / total * 100 if total > 0 else 0
         lines.append(f"    {rarity.value:12s} {count:2d} ({pct:4.1f}%)")
+
+    return "\n".join(lines)
+
+
+def _deck_card_sort_key(dc: DeckCard) -> tuple[str, str]:
+    """Sort key for deck cards: primary resonance name, then card name.
+
+    Neutral cards (no resonances) sort last by using a high sort key.
+    """
+    if dc.card.resonances:
+        primary = min(dc.card.resonances, key=lambda r: r.value)
+        return (primary.value, dc.card.name)
+    return ("\xff", dc.card.name)
+
+
+def render_full_deck_view(
+    deck_cards: list[DeckCard],
+    dreamsigns: Optional[list[Dreamsign]] = None,
+    dreamcaller: Optional[Dreamcaller] = None,
+    essence: Optional[int] = None,
+) -> str:
+    """Render a full deck viewer display.
+
+    Shows all cards sorted by resonance then name, with rarity breakdown,
+    resonance profile bar chart, dreamsigns, dreamcaller info, and essence.
+    """
+    sep = render.draw_double_separator()
+    single_sep = render.draw_separator()
+    total = len(deck_cards)
+    lines: list[str] = [sep]
+
+    # Header
+    header_left = f"  {render.BOLD}DECK VIEWER{render.RESET}"
+    header_right = f"Deck: {total} cards"
+    vis_left = render.visible_len(header_left)
+    gap = max(2, render.CONTENT_WIDTH - vis_left - len(header_right))
+    lines.append(f"{header_left}{' ' * gap}{header_right}")
+
+    if essence is not None:
+        lines.append(f"  Essence: {essence}")
+
+    lines.append(sep)
+    lines.append("")
+
+    # Card list sorted by resonance then name
+    sorted_deck = sorted(deck_cards, key=_deck_card_sort_key)
+
+    for dc in sorted_deck:
+        card_lines = format_card_display(dc, highlighted=False)
+        if dc.is_bane:
+            card_lines[0] = card_lines[0] + f"  {render.BOLD}[BANE]{render.RESET}"
+        lines.extend(card_lines)
+
+    lines.append("")
+    lines.append(single_sep)
+
+    # Rarity breakdown
+    rarity_counts: dict[Rarity, int] = {r: 0 for r in Rarity}
+    for dc in deck_cards:
+        rarity_counts[dc.card.rarity] = rarity_counts.get(dc.card.rarity, 0) + 1
+
+    lines.append(f"  {render.BOLD}Rarity Breakdown{render.RESET}")
+    for rarity in [Rarity.COMMON, Rarity.UNCOMMON, Rarity.RARE, Rarity.LEGENDARY]:
+        count = rarity_counts.get(rarity, 0)
+        pct = count / total * 100 if total > 0 else 0
+        lines.append(f"    {rarity.value:12s} {count:2d} ({pct:4.1f}%)")
+
+    lines.append("")
+
+    # Resonance profile bar chart
+    res_counts: dict[Resonance, int] = {r: 0 for r in Resonance}
+    neutral_count = 0
+    for dc in deck_cards:
+        if dc.card.resonances:
+            for r in dc.card.resonances:
+                res_counts[r] += 1
+        else:
+            neutral_count += 1
+
+    lines.append(f"  {render.BOLD}Resonance Profile{render.RESET}")
+    items = sorted(res_counts.items(), key=lambda x: x[1], reverse=True)
+    max_count = max((c for _, c in items), default=1)
+    total_res = sum(c for _, c in items) + neutral_count
+    bar_width = 20
+
+    for res, count in items:
+        color = render.RESONANCE_COLORS.get(res, render.NEUTRAL_COLOR)
+        if count == 0:
+            bar = " " * bar_width
+            pct_str = f"{render.DIM}  0   (0.0%){render.RESET}"
+        else:
+            filled = round(count / max_count * bar_width) if max_count > 0 else 0
+            filled = max(1, min(bar_width, filled))
+            bar = f"{color}{'\u2588' * filled}{render.RESET}{' ' * (bar_width - filled)}"
+            pct = count / total_res * 100 if total_res > 0 else 0
+            pct_str = f"{count:3d}  ({pct:4.1f}%)"
+        name = f"{color}{res.value:8s}{render.RESET}"
+        lines.append(f"    {name} {bar}  {pct_str}")
+
+    if neutral_count > 0:
+        neutral_pct = neutral_count / total_res * 100 if total_res > 0 else 0
+        neutral_label = f"{render.NEUTRAL_COLOR}{'Neutral':8s}{render.RESET}"
+        neutral_space = " " * bar_width
+        lines.append(
+            f"    {neutral_label} {neutral_space}  {neutral_count:3d}  ({neutral_pct:4.1f}%)"
+        )
+
+    # Dreamsigns section
+    if dreamsigns:
+        lines.append("")
+        lines.append(single_sep)
+        lines.append(
+            f"  {render.BOLD}Dreamsigns{render.RESET} ({len(dreamsigns)})"
+        )
+        for ds in dreamsigns:
+            res_color = render.RESONANCE_COLORS.get(ds.resonance, render.NEUTRAL_COLOR)
+            res_label = f"{res_color}{ds.resonance.value}{render.RESET}"
+            bane_label = f" {render.BOLD}[BANE]{render.RESET}" if ds.is_bane else ""
+            lines.append(f"    {ds.name}  ({res_label}){bane_label}")
+
+    # Dreamcaller section
+    if dreamcaller is not None:
+        lines.append("")
+        lines.append(single_sep)
+        lines.append(f"  {render.BOLD}Dreamcaller{render.RESET}")
+        res_str = render.color_resonances(dreamcaller.resonances)
+        lines.append(f"    {dreamcaller.name}  ({res_str})")
+        lines.append(f'    "{dreamcaller.ability_text}"')
+
+    lines.append("")
+    lines.append(sep)
 
     return "\n".join(lines)

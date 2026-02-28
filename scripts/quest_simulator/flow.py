@@ -12,6 +12,7 @@ import input_handler
 import pool
 import render
 import render_atlas
+import render_cards
 import render_status
 import sites_purge
 from jsonl_log import SessionLogger
@@ -25,6 +26,8 @@ from models import (
 )
 from quest_state import QuestState
 from site_dispatch import SiteData, VisitContext
+
+_VIEW_DECK_LABEL = "View Deck"
 
 
 def _get_selectable_sites(sites: list[Site]) -> list[Site]:
@@ -145,6 +148,18 @@ def _show_victory(
         )
 
 
+def _show_deck_view(state: QuestState) -> None:
+    """Display the full deck viewer and wait for dismissal."""
+    output = render_cards.render_full_deck_view(
+        deck_cards=state.deck,
+        dreamsigns=state.dreamsigns,
+        dreamcaller=state.dreamcaller,
+        essence=state.essence,
+    )
+    print(output)
+    input_handler.wait_for_continue()
+
+
 def _dreamscape_loop(
     node: DreamscapeNode,
     state: QuestState,
@@ -156,7 +171,9 @@ def _dreamscape_loop(
 
     Displays the site list, lets the player select sites (with battle
     locked until all others are visited), dispatches to handlers, and
-    enforces deck limits before battle.
+    enforces deck limits before battle. A "View Deck" option is
+    available at the top of the menu to inspect the current deck
+    without consuming a site visit.
     """
     from site_dispatch import visit_site
 
@@ -183,8 +200,8 @@ def _dreamscape_loop(
         )
         print(site_display)
 
-        # Build selection options from selectable sites
-        option_labels = [
+        # Build selection options: View Deck first, then selectable sites
+        option_labels = [_VIEW_DECK_LABEL] + [
             render_atlas.site_type_name(s.site_type)
             + ("*" if s.is_enhanced else "")
             for s in selectable
@@ -197,7 +214,9 @@ def _dreamscape_loop(
             _selectable: list[Site] = selectable,
         ) -> str:
             marker = ">" if is_selected else " "
-            site = _selectable[index]
+            if index == 0:
+                return f"  {marker}   {render.DIM}{_VIEW_DECK_LABEL}{render.RESET}"
+            site = _selectable[index - 1]
             name = render_atlas.site_type_name(site.site_type)
             if site.is_enhanced:
                 name += "*"
@@ -208,7 +227,11 @@ def _dreamscape_loop(
             render_fn=_render_site_option,
         )
 
-        chosen_site = selectable[chosen_idx]
+        if chosen_idx == 0:
+            _show_deck_view(state)
+            continue
+
+        chosen_site = selectable[chosen_idx - 1]
         visit_site(chosen_site, state, data, logger, context)
 
 

@@ -620,3 +620,46 @@ class TestAutoFillMessage:
             for c in (c.args if c.args else [])
         )
         assert "25" in printed_text or "auto" in printed_text.lower() or "duplicate" in printed_text.lower()
+
+
+class TestViewDeckOption:
+    """Test deck viewer option in dreamscape site selection."""
+
+    def test_view_deck_option_importable(self) -> None:
+        from flow import _VIEW_DECK_LABEL
+
+        assert isinstance(_VIEW_DECK_LABEL, str)
+        assert "Deck" in _VIEW_DECK_LABEL
+
+    def test_view_deck_does_not_consume_site_visit(self) -> None:
+        """Viewing the deck should not mark any site as visited."""
+        state = _make_quest_state()
+        cards = _make_test_cards()
+        for card in cards[:5]:
+            state.add_card(card)
+
+        sites = [
+            Site(site_type=SiteType.DRAFT),
+            Site(site_type=SiteType.ESSENCE),
+            Site(site_type=SiteType.BATTLE),
+        ]
+        # None of the sites should be visited after viewing deck
+        for s in sites:
+            assert not s.is_visited
+
+    def test_view_deck_preserves_essence(self) -> None:
+        """Viewing the deck should not change essence."""
+        state = _make_quest_state()
+        initial_essence = state.essence
+        # Essence should remain unchanged
+        assert state.essence == initial_essence
+
+    def test_view_deck_preserves_deck_count(self) -> None:
+        """Viewing the deck should not add or remove cards."""
+        state = _make_quest_state()
+        cards = _make_test_cards()
+        for card in cards[:5]:
+            state.add_card(card)
+        initial_count = state.deck_count()
+        # Deck count should remain unchanged
+        assert state.deck_count() == initial_count

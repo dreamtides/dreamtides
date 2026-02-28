@@ -616,6 +616,184 @@ class TestRenderDraftCardList(unittest.TestCase):
 
 
 
+class TestRenderFullDeckView(unittest.TestCase):
+    """Tests for the render_full_deck_view function."""
+
+    def _make_deck_cards(self) -> list[DeckCard]:
+        """Create a small deck with mixed resonances and rarities."""
+        return [
+            DeckCard(card=_make_card(
+                name="Tide Runner",
+                rarity=Rarity.COMMON,
+                resonances=frozenset({Resonance.TIDE}),
+                energy_cost=2,
+                spark=1,
+            )),
+            DeckCard(card=_make_card(
+                name="Ember Guard",
+                rarity=Rarity.UNCOMMON,
+                resonances=frozenset({Resonance.EMBER}),
+                energy_cost=3,
+                spark=2,
+            )),
+            DeckCard(card=_make_card(
+                name="Alpha Seer",
+                rarity=Rarity.RARE,
+                resonances=frozenset({Resonance.TIDE}),
+                energy_cost=5,
+                spark=3,
+            )),
+            DeckCard(card=_make_card(
+                name="Neutral Wanderer",
+                rarity=Rarity.COMMON,
+                resonances=frozenset(),
+                energy_cost=1,
+                spark=0,
+            )),
+        ]
+
+    def test_contains_deck_header(self) -> None:
+        from render_cards import render_full_deck_view
+
+        deck = self._make_deck_cards()
+        output = render_full_deck_view(deck)
+        self.assertIn("Deck: 4 cards", output)
+
+    def test_contains_all_card_names(self) -> None:
+        from render_cards import render_full_deck_view
+
+        deck = self._make_deck_cards()
+        output = render_full_deck_view(deck)
+        self.assertIn("Tide Runner", output)
+        self.assertIn("Ember Guard", output)
+        self.assertIn("Alpha Seer", output)
+        self.assertIn("Neutral Wanderer", output)
+
+    def test_sorted_by_resonance_then_name(self) -> None:
+        from render_cards import render_full_deck_view
+
+        deck = self._make_deck_cards()
+        output = render_full_deck_view(deck)
+        # Ember comes before Tide alphabetically in resonance names,
+        # and Neutral cards come last. Within Tide, Alpha Seer comes
+        # before Tide Runner alphabetically.
+        ember_pos = output.index("Ember Guard")
+        alpha_pos = output.index("Alpha Seer")
+        tide_pos = output.index("Tide Runner")
+        neutral_pos = output.index("Neutral Wanderer")
+        self.assertLess(ember_pos, alpha_pos)
+        self.assertLess(alpha_pos, tide_pos)
+        self.assertLess(tide_pos, neutral_pos)
+
+    def test_contains_rarity_breakdown(self) -> None:
+        from render_cards import render_full_deck_view
+
+        deck = self._make_deck_cards()
+        output = render_full_deck_view(deck)
+        self.assertIn("Common", output)
+        self.assertIn("Uncommon", output)
+        self.assertIn("Rare", output)
+
+    def test_contains_resonance_profile(self) -> None:
+        from render_cards import render_full_deck_view
+
+        deck = self._make_deck_cards()
+        output = render_full_deck_view(deck)
+        self.assertIn("Resonance Profile", output)
+
+    def test_shows_rarity_badge(self) -> None:
+        from render_cards import render_full_deck_view
+
+        deck = self._make_deck_cards()
+        output = render_full_deck_view(deck)
+        self.assertIn("[C]", output)
+        self.assertIn("[U]", output)
+        self.assertIn("[R]", output)
+
+    def test_shows_cost_and_spark(self) -> None:
+        from render_cards import render_full_deck_view
+
+        deck = self._make_deck_cards()
+        output = render_full_deck_view(deck)
+        self.assertIn("Cost:", output)
+        self.assertIn("Spark:", output)
+
+    def test_transfigured_card_shows_note(self) -> None:
+        from render_cards import render_full_deck_view
+
+        deck = [
+            DeckCard(
+                card=_make_card(name="Base Card", resonances=frozenset({Resonance.TIDE})),
+                is_transfigured=True,
+                transfig_note="Golden Base Card -- +1 effect",
+            ),
+        ]
+        output = render_full_deck_view(deck)
+        self.assertIn("Golden Base Card", output)
+
+    def test_bane_card_marked(self) -> None:
+        from render_cards import render_full_deck_view
+
+        deck = [
+            DeckCard(
+                card=_make_card(name="Nightmare", resonances=frozenset()),
+                is_bane=True,
+            ),
+        ]
+        output = render_full_deck_view(deck)
+        self.assertIn("BANE", output)
+
+    def test_dreamsigns_displayed(self) -> None:
+        from models import Dreamsign
+        from render_cards import render_full_deck_view
+
+        deck = self._make_deck_cards()
+        dreamsigns = [
+            Dreamsign(
+                name="Moon Sigil",
+                resonance=Resonance.TIDE,
+                tags=frozenset(),
+                effect_text="Draw 1 extra card.",
+                is_bane=False,
+            ),
+        ]
+        output = render_full_deck_view(deck, dreamsigns=dreamsigns)
+        self.assertIn("Moon Sigil", output)
+        self.assertIn("Dreamsigns", output)
+
+    def test_dreamcaller_displayed(self) -> None:
+        from models import Dreamcaller
+        from render_cards import render_full_deck_view
+        from types import MappingProxyType
+
+        deck = self._make_deck_cards()
+        dreamcaller = Dreamcaller(
+            name="Vesper, Twilight Arbiter",
+            resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
+            resonance_bonus=MappingProxyType({"Tide": 4, "Ruin": 4}),
+            tags=frozenset(),
+            tag_bonus=MappingProxyType({}),
+            essence_bonus=50,
+            ability_text="Dissolve an enemy character to draw a card.",
+        )
+        output = render_full_deck_view(deck, dreamcaller=dreamcaller)
+        self.assertIn("Vesper, Twilight Arbiter", output)
+        self.assertIn("Dreamcaller", output)
+
+    def test_essence_displayed(self) -> None:
+        from render_cards import render_full_deck_view
+
+        deck = self._make_deck_cards()
+        output = render_full_deck_view(deck, essence=350)
+        self.assertIn("350", output)
+
+    def test_empty_deck(self) -> None:
+        from render_cards import render_full_deck_view
+
+        output = render_full_deck_view([])
+        self.assertIn("Deck: 0 cards", output)
+
+
 class TestImport(unittest.TestCase):
     """Test that the module can be imported cleanly."""
 
@@ -631,6 +809,7 @@ class TestImport(unittest.TestCase):
         self.assertTrue(hasattr(render_cards, "resonance_match_indicator"))
         self.assertTrue(hasattr(render_cards, "format_draft_card"))
         self.assertTrue(hasattr(render_cards, "render_draft_card_list"))
+        self.assertTrue(hasattr(render_cards, "render_full_deck_view"))
 
 
 if __name__ == "__main__":
