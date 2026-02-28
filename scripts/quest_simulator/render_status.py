@@ -1,13 +1,13 @@
 """Status display functions for the quest simulator.
 
 Provides the resonance profile footer, resonance bar chart, victory
-screen, and site header. Imports shared ANSI constants and box-drawing
-utilities from render.py.
+screen, site header, and battle-specific display formatting. Imports
+shared ANSI constants and box-drawing utilities from render.py.
 """
 
 from typing import Optional
 
-from models import Rarity, Resonance
+from models import Boss, Rarity, Resonance
 from render import (
     BOLD,
     CONTENT_WIDTH,
@@ -81,6 +81,82 @@ def site_header(
     right = f"[Dreamscape {dreamscape_number}]"
     gap = max(2, CONTENT_WIDTH - len(left) - len(right))
     return "\n".join([sep, f"{left}{' ' * gap}{right}", sep])
+
+
+def battle_header(
+    battle_number: int,
+    total_battles: int,
+    boss_info: Optional[Boss],
+) -> str:
+    """Build a dramatic battle header display.
+
+    For boss encounters (miniboss or final boss), shows a full dramatic
+    introduction with name, archetype, and ability text inside a
+    double-line separator box. For Dream Guardian battles, shows a
+    shorter display with just the name and level indicator.
+    """
+    sep = draw_double_separator()
+
+    if boss_info is not None:
+        if boss_info.is_final:
+            encounter_label = "FINAL BOSS"
+        else:
+            encounter_label = "MINIBOSS ENCOUNTER"
+        title = f"  {BOLD}BATTLE {battle_number} -- {encounter_label}{RESET}"
+        res_str = color_resonances(boss_info.resonances)
+        lines: list[str] = [
+            sep,
+            title,
+            sep,
+            "",
+            f"    {BOLD}>> {boss_info.name} <<{RESET}",
+            f"    Archetype: {boss_info.archetype}  ({res_str})",
+            f'    "{boss_info.ability_text}"',
+            "",
+            sep,
+        ]
+    else:
+        title = f"  {BOLD}BATTLE {battle_number}/{total_battles}{RESET}"
+        lines = [
+            sep,
+            title,
+            "",
+            f"    Dream Guardian  (Level {battle_number})",
+            sep,
+        ]
+
+    return "\n".join(lines)
+
+
+def battle_victory_message() -> str:
+    """Build a visually distinct victory message with box-drawing flourish."""
+    sep = draw_double_separator()
+    return "\n".join([
+        sep,
+        f"  {BOLD}VICTORY!{RESET}",
+        sep,
+    ])
+
+
+def battle_reward_summary(
+    essence_reward: int,
+    rare_pick_count: int,
+) -> str:
+    """Build the reward summary display showing essence gained and rare pick framing."""
+    lines: list[str] = [
+        f"  Essence reward: {BOLD}+{essence_reward}{RESET}",
+        "",
+        f"  {BOLD}Battle Reward{RESET} -- Choose a rare card:",
+    ]
+    return "\n".join(lines)
+
+
+def battle_completion_progress(
+    new_completion: int,
+    total_battles: int,
+) -> str:
+    """Build the completion progress display shown after battle."""
+    return f"  {BOLD}Completion: {new_completion}/{total_battles}{RESET}"
 
 
 def victory_screen(

@@ -14,6 +14,7 @@ import algorithm
 import input_handler
 import pool as pool_module
 import render
+import render_status
 from jsonl_log import SessionLogger
 from models import (
     AlgorithmParams,
@@ -84,39 +85,27 @@ def run_battle(
         state.completion_level, bosses, state.rng, quest_config
     )
 
-    # Display battle header
+    # Display dramatic battle header
     battle_number = state.completion_level + 1
     total = quest_config["total_battles"]
-    header = render.site_visit_header(
-        dreamscape_name=dreamscape_name,
-        site_type_label="Battle",
-        pick_info=f"Battle {battle_number}/{total}",
-        dreamscape_number=dreamscape_number,
+    header = render_status.battle_header(
+        battle_number=battle_number,
+        total_battles=total,
+        boss_info=boss_info,
     )
     print(header)
     print()
 
-    # Display opponent details
-    if boss_info is not None:
-        res_str = render.color_resonances(boss_info.resonances)
-        print(f"  {render.BOLD}Opponent: {opponent_name}{render.RESET}")
-        print(f"  Archetype: {boss_info.archetype}  ({res_str})")
-        print(f"  Ability: {boss_info.ability_text}")
-    else:
-        print(f"  {render.BOLD}Opponent: {opponent_name}{render.RESET}")
-    print()
+    # Wait for player to continue after battle introduction
+    input_handler.wait_for_continue()
 
-    # Auto-win message
-    print(f"  {render.BOLD}Victory!{render.RESET}")
+    # Auto-win: show visually distinct victory message
+    victory_msg = render_status.battle_victory_message()
+    print(victory_msg)
     print()
 
     # Essence reward
     essence_reward = compute_essence_reward(state.completion_level, battle_config)
-    print(f"  You gain {render.BOLD}{essence_reward}{render.RESET} essence!")
-    print()
-
-    # Wait for player to continue after battle display
-    input_handler.wait_for_continue()
 
     # Apply essence reward
     state.gain_essence(essence_reward)
@@ -138,9 +127,12 @@ def run_battle(
         offered_entries = [entry for entry, _ in selections]
         offered_cards = [entry.card for entry in offered_entries]
 
-        # Display rare draft pick header
-        print()
-        print(f"  {render.BOLD}Rare Draft Pick{render.RESET} -- Choose 1 card:")
+        # Display reward summary with essence and rare pick framing
+        reward_summary = render_status.battle_reward_summary(
+            essence_reward=essence_reward,
+            rare_pick_count=len(offered_cards),
+        )
+        print(reward_summary)
         print()
 
         option_labels = [card.name for card in offered_cards]
@@ -173,9 +165,20 @@ def run_battle(
         print(f"  Added {render.BOLD}{picked_card.name}{render.RESET} to your deck.")
         print()
     else:
+        # No rare cards: just show essence reward
+        print(f"  Essence reward: {render.BOLD}+{essence_reward}{render.RESET}")
         print()
         print(f"  {render.DIM}No rare cards available in the pool.{render.RESET}")
         print()
+
+    # Show completion progress
+    new_completion = state.completion_level + 1
+    progress = render_status.battle_completion_progress(
+        new_completion=new_completion,
+        total_battles=total,
+    )
+    print(progress)
+    print()
 
     # Log the battle
     if logger is not None:

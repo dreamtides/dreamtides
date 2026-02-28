@@ -1,5 +1,6 @@
 """Tests for sites_battle module."""
 
+import io
 import random
 from typing import Optional
 from unittest.mock import patch
@@ -621,3 +622,131 @@ class TestRunBattle:
 
         # 0 + 100 + 25 * 5 = 225
         assert state.essence == 225
+
+
+class TestBattleDisplayOutput:
+    """Tests for the visual display output of run_battle."""
+
+    def _run_and_capture(
+        self,
+        completion_level: int = 0,
+        bosses: Optional[list[Boss]] = None,
+        with_rare_pool: bool = True,
+    ) -> str:
+        """Run a battle and return captured stdout."""
+        from sites_battle import run_battle
+
+        from models import AlgorithmParams
+
+        if with_rare_pool:
+            rare_cards = _make_rare_cards()
+            pool = _make_pool(rare_cards)
+        else:
+            common_cards = [
+                _make_card("Common A", 1, Rarity.COMMON, frozenset({Resonance.TIDE})),
+            ]
+            pool = _make_pool(common_cards)
+        cards = _make_mixed_cards()
+        state = _make_quest_state(
+            cards, pool=pool, essence=250, completion_level=completion_level,
+        )
+        battle_cfg = _battle_config()
+        quest_cfg = _quest_config()
+        algo_params = AlgorithmParams(
+            exponent=1.4,
+            floor_weight=0.5,
+            neutral_base=3.0,
+            staleness_factor=0.3,
+        )
+
+        buf = io.StringIO()
+        with patch("sites_battle.input_handler.wait_for_continue"), \
+             patch("sites_battle.input_handler.single_select", return_value=0), \
+             patch("sys.stdout", buf):
+            run_battle(
+                state=state,
+                battle_config=battle_cfg,
+                quest_config=quest_cfg,
+                algorithm_params=algo_params,
+                bosses=bosses or [],
+                dreamscape_name="Test Dreamscape",
+                dreamscape_number=1,
+                logger=None,
+            )
+        return buf.getvalue()
+
+    def test_boss_battle_shows_dramatic_header(self) -> None:
+        """Boss battles should show dramatic intro with name and archetype."""
+        bosses = _make_bosses()
+        output = self._run_and_capture(completion_level=3, bosses=bosses)
+        assert "BATTLE 4" in output
+        assert "MINIBOSS" in output
+
+    def test_boss_battle_shows_archetype(self) -> None:
+        """Boss battles should show the archetype."""
+        bosses = _make_bosses()
+        output = self._run_and_capture(completion_level=3, bosses=bosses)
+        assert "Archetype:" in output
+
+    def test_boss_battle_shows_ability(self) -> None:
+        """Boss battles should show the ability text."""
+        bosses = _make_bosses()
+        output = self._run_and_capture(completion_level=3, bosses=bosses)
+        # The boss ability should appear somewhere in the output
+        miniboss_abilities = [b.ability_text for b in bosses if not b.is_final]
+        assert any(ab in output for ab in miniboss_abilities)
+
+    def test_guardian_battle_shows_guardian_name(self) -> None:
+        """Dream Guardian battles should show the guardian name."""
+        output = self._run_and_capture(completion_level=0)
+        assert "Dream Guardian" in output
+
+    def test_guardian_battle_shorter_display(self) -> None:
+        """Dream Guardian battles should have a shorter display than bosses."""
+        guardian_output = self._run_and_capture(completion_level=0)
+        bosses = _make_bosses()
+        boss_output = self._run_and_capture(completion_level=3, bosses=bosses)
+        # The guardian output should be shorter
+        guardian_lines = guardian_output.strip().split("\n")
+        boss_lines = boss_output.strip().split("\n")
+        assert len(guardian_lines) < len(boss_lines)
+
+    def test_victory_message_visible(self) -> None:
+        """Victory message should be visually distinct with VICTORY text."""
+        output = self._run_and_capture(completion_level=0)
+        assert "VICTORY" in output
+
+    def test_essence_reward_shown(self) -> None:
+        """Essence reward amount should appear in the output."""
+        output = self._run_and_capture(completion_level=0)
+        assert "Essence reward" in output
+        assert "+100" in output
+
+    def test_essence_reward_scales_display(self) -> None:
+        """Essence reward at level 3 should show scaled amount."""
+        bosses = _make_bosses()
+        output = self._run_and_capture(completion_level=3, bosses=bosses)
+        assert "+175" in output
+
+    def test_battle_reward_label(self) -> None:
+        """Rare pick should be labeled as Battle Reward."""
+        output = self._run_and_capture(completion_level=0)
+        assert "Battle Reward" in output
+        assert "rare" in output.lower()
+
+    def test_completion_progress_shown(self) -> None:
+        """After battle, completion progress should be displayed."""
+        output = self._run_and_capture(completion_level=2)
+        assert "Completion:" in output
+        assert "3/7" in output
+
+    def test_completion_progress_after_level_0(self) -> None:
+        """After first battle, should show 1/7."""
+        output = self._run_and_capture(completion_level=0)
+        assert "Completion:" in output
+        assert "1/7" in output
+
+    def test_double_line_separators_present(self) -> None:
+        """Output should contain double-line separators for dramatic framing."""
+        output = self._run_and_capture(completion_level=0)
+        assert "\u2550" in output
