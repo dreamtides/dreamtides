@@ -1,0 +1,103 @@
+# Tempting Offers -- reward/cost pairs presented at Tempting Offer sites.
+# The player is shown 2 pairs (3 if enhanced) and picks one or declines all.
+# Each pair has a reward (positive effect) and a cost (negative consequence).
+
+[[offers]]
+reward_name = "Echoes of a Thousand Dreams"
+reward_description = "Fragments of forgotten dreamscapes coalesce into tangible power, drawn to your resonance like moths to a lantern."
+reward_effect_type = "add_cards"
+reward_value = 3
+cost_name = "The Price of Memory"
+cost_description = "Each fragment carries a splinter of nightmare. A dark sigil etches itself into your dreamsign collection."
+cost_effect_type = "add_bane_dreamsign"
+cost_value = 1
+
+[[offers]]
+reward_name = "The Merchant's Bargain"
+reward_description = "A spectral trader materializes, offering a pouch heavy with crystallized essence -- no questions asked."
+reward_effect_type = "large_essence"
+reward_value = 300
+cost_name = "Collateral"
+cost_description = "The trader's grin widens as cards dissolve from your deck, payment for a deal you cannot undo."
+cost_effect_type = "remove_cards"
+cost_value = 3
+
+[[offers]]
+reward_name = "Whisper of the Deep"
+reward_description = "A dreamsign surfaces from the depths of the atlas, glowing with uncharted resonance."
+reward_effect_type = "add_dreamsign"
+reward_value = 1
+cost_name = "Tidal Toll"
+cost_description = "The currents that carried the sign pull essence from your reserves as they recede."
+cost_effect_type = "lose_essence"
+cost_value = 100
+
+[[offers]]
+reward_name = "Surge of Starfire"
+reward_description = "Pure essence erupts from a fissure in the dreamscape, yours for the taking."
+reward_effect_type = "add_essence"
+reward_value = 150
+cost_name = "Starfire's Shadow"
+cost_description = "The fissure leaves behind a cursed card that lodges itself stubbornly in your deck."
+cost_effect_type = "add_bane_card"
+cost_value = 1
+
+[[offers]]
+reward_name = "The Cartographer's Gift"
+reward_description = "An ancient map reveals hidden cards perfectly suited to your journey so far."
+reward_effect_type = "add_cards"
+reward_value = 2
+cost_name = "Fading Ink"
+cost_description = "The map's ink seeps into your reserves, draining essence to fuel its revelation."
+cost_effect_type = "lose_essence"
+cost_value = 100
+
+[[offers]]
+reward_name = "Vault of the Forgotten King"
+reward_description = "A sealed vault cracks open, spilling a fortune in condensed dream-essence across the floor."
+reward_effect_type = "large_essence"
+reward_value = 400
+cost_name = "The King's Curse"
+cost_description = "A bane dreamsign brands itself onto your collection -- the vault was sealed for a reason."
+cost_effect_type = "add_bane_dreamsign"
+cost_value = 1
+
+[[offers]]
+reward_name = "Thread of Fate"
+reward_description = "A single luminous card drifts toward you, perfectly attuned to your resonance."
+reward_effect_type = "add_cards"
+reward_value = 1
+cost_name = "Severed Threads"
+cost_description = "Accepting the thread of fate means another must be cut. A card vanishes from your deck."
+cost_effect_type = "remove_cards"
+cost_value = 1
+
+[[offers]]
+reward_name = "The Alchemist's Crucible"
+reward_description = "A bubbling crucible transmutes raw dreamstuff into a modest but reliable flow of essence."
+reward_effect_type = "add_essence"
+reward_value = 75
+cost_name = "Residual Corruption"
+cost_description = "The transmutation is imperfect. A corrupted bane card precipitates into your deck."
+cost_effect_type = "add_bane_card"
+cost_value = 1
+
+[[offers]]
+reward_name = "Resonance Bloom"
+reward_description = "A dreamsign crystallizes from the ambient resonance of the dreamscape, humming with latent power."
+reward_effect_type = "add_dreamsign"
+reward_value = 1
+cost_name = "Withered Roots"
+cost_description = "The bloom draws its strength from your deck. Cards wither and dissolve to feed its growth."
+cost_effect_type = "remove_cards"
+cost_value = 2
+
+[[offers]]
+reward_name = "Plunder of the Shattered Gate"
+reward_description = "Beyond a crumbling gate lies a trove of essence, glittering in the half-light of a dying dreamscape."
+reward_effect_type = "large_essence"
+reward_value = 250
+cost_name = "Gatewarden's Toll"
+cost_description = "The gate's warden exacts a toll in essence even as you claim the trove -- the net gain is uncertain."
+cost_effect_type = "lose_essence"
+cost_value = 75
