@@ -419,6 +419,17 @@ class TestSessionLogger(unittest.TestCase):
         self.assertIn("choices_offered", event)
         self.assertEqual(event["choices_offered"], ["Journey A", "Journey B"])
 
+    def test_log_error(self) -> None:
+        logger = jsonl_log.SessionLogger(seed=1)
+        logger.log_error(
+            site_type="Essence",
+            error_message="RuntimeError: something broke\n  ...",
+        )
+        events = self._read_events(logger)
+        event = events[0]
+        self.assertEqual(event["event"], "error")
+        self.assertEqual(event["site_type"], "Essence")
+        self.assertIn("something broke", event["error_message"])
 
 if __name__ == "__main__":
     unittest.main()

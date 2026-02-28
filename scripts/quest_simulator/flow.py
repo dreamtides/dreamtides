@@ -5,6 +5,7 @@ atlas display, dreamscape selection, site visit loop, battle completion,
 deck limit enforcement, staleness decay, and victory detection.
 """
 
+import traceback
 from typing import Optional
 
 import atlas
@@ -232,7 +233,25 @@ def _dreamscape_loop(
             continue
 
         chosen_site = selectable[chosen_idx - 1]
-        visit_site(chosen_site, state, data, logger, context)
+        try:
+            visit_site(chosen_site, state, data, logger, context)
+        except KeyboardInterrupt:
+            raise
+        except Exception:
+            error_msg = traceback.format_exc()
+            site_name = chosen_site.site_type.value
+            print()
+            print(
+                f"  {render.BOLD}Error:{render.RESET} "
+                f"Site '{site_name}' encountered an error and was skipped."
+            )
+            print()
+            if logger is not None:
+                logger.log_error(
+                    site_type=site_name,
+                    error_message=error_msg,
+                )
+            chosen_site.is_visited = True
 
 
 def _atlas_loop(

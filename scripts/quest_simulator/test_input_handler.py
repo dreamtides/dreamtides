@@ -1,6 +1,7 @@
 """Tests for raw terminal input handler."""
 
 import io
+import signal
 import sys
 from typing import Optional
 from unittest.mock import MagicMock, patch
@@ -16,6 +17,7 @@ from input_handler import (
     KEY_UP,
     _read_key,
     confirm_decline,
+    ensure_terminal_restored,
     multi_select,
     single_select,
     wait_for_continue,
@@ -219,3 +221,103 @@ class TestRenderCallbacks:
             return "Continue..."
 
         wait_for_continue(render_fn=render)
+
+
+class TestEnsureTerminalRestored:
+    """Public API for external callers to force terminal restoration."""
+
+    def test_ensure_terminal_restored_calls_release(self) -> None:
+        import input_handler
+
+        original = object()
+        input_handler._saved_termios = [original]  # type: ignore[list-item]
+        with patch("input_handler._HAS_TERMIOS", True):
+            mock_fd = MagicMock(return_value=0)
+            with patch("input_handler.sys.stdin") as mock_stdin:
+                mock_stdin.fileno = mock_fd
+                with patch("input_handler.termios"):
+                    ensure_terminal_restored()
+                    assert input_handler._saved_termios is None
+
+    def test_ensure_terminal_restored_noop_when_no_state(self) -> None:
+        import input_handler
+
+        input_handler._saved_termios = None
+        ensure_terminal_restored()
+        assert input_handler._saved_termios is None
+
+
+class TestSigintHandlerMessage:
+    """SIGINT handler should print quest abandoned message."""
+
+    def test_sigint_handler_exits_with_130(self) -> None:
+        import input_handler
+
+        input_handler._saved_termios = None
+        with patch("input_handler._HAS_TERMIOS", True):
+            with patch("builtins.print") as mock_print:
+                try:
+                    input_handler._sigint_handler(signal.SIGINT, None)
+                except SystemExit as e:
+                    assert e.code == 130
+                else:
+                    assert False, "Expected SystemExit"
+
+    def test_sigint_handler_prints_abandoned_message(self) -> None:
+        import input_handler
+
+        input_handler._saved_termios = None
+        with patch("input_handler._HAS_TERMIOS", True):
+            with patch("builtins.print") as mock_print:
+                try:
+                    input_handler._sigint_handler(signal.SIGINT, None)
+                except SystemExit:
+                    pass
+                printed = " ".join(
+                    str(a) for c in mock_print.call_args_list for a in c.args
+                )
+                assert "Quest abandoned" in printed
+
+
+class TestSigtstpHandler:
+    """SIGTSTP (Ctrl+Z) should restore terminal before suspending."""
+
+    def test_sigtstp_handler_restores_terminal(self) -> None:
+        import input_handler
+
+        original = [object()]
+        input_handler._saved_termios = original  # type: ignore[list-item]
+        with patch("input_handler._HAS_TERMIOS", True):
+            mock_fd = MagicMock(return_value=0)
+            with patch("input_handler.sys.stdin") as mock_stdin:
+                mock_stdin.fileno = mock_fd
+                with patch("input_handler.termios") as mock_termios:
+                    with patch("input_handler.os.kill") as mock_kill:
+                        with patch("input_handler.os.getpid", return_value=123):
+                            input_handler._sigtstp_handler(
+                                signal.SIGTSTP, None
+                            )
+                            # Should have restored terminal
+                            mock_termios.tcsetattr.assert_called()
+                            # Should have sent SIGSTOP to self
+                            mock_kill.assert_called_with(
+                                123, signal.SIGSTOP
+                            )
+
+        input_handler._saved_termios = None
+
+    def test_sigtstp_handler_resets_default_handler(self) -> None:
+        """After restoring, SIGTSTP should be reset to SIG_DFL so the OS can suspend."""
+        import input_handler
+
+        input_handler._saved_termios = None
+        with patch("input_handler._HAS_TERMIOS", True):
+            with patch("input_handler.os.kill"):
+                with patch("input_handler.os.getpid", return_value=1):
+                    with patch("input_handler.signal.signal") as mock_signal:
+                        input_handler._sigtstp_handler(
+                            signal.SIGTSTP, None
+                        )
+                        mock_signal.assert_called_with(
+                            signal.SIGTSTP, signal.SIG_DFL
+                        )

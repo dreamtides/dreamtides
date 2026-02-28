@@ -136,5 +136,31 @@ class TestModuleImport(unittest.TestCase):
         self.assertTrue(callable(build_parser))
 
 
+class TestExceptionHandling(unittest.TestCase):
+    """Tests for top-level exception handling in quest_sim."""
+
+    def test_keyboard_interrupt_restores_terminal(self) -> None:
+        """KeyboardInterrupt should restore terminal and exit cleanly."""
+        from unittest.mock import MagicMock, patch
+
+        with patch("quest_sim.main", side_effect=KeyboardInterrupt):
+            with patch("quest_sim.input_handler.ensure_terminal_restored") as mock_restore:
+                with self.assertRaises(SystemExit) as ctx:
+                    import quest_sim
+                    quest_sim._run_with_error_handling()
+                mock_restore.assert_called_once()
+
+    def test_generic_exception_restores_terminal(self) -> None:
+        """Unhandled exceptions should restore terminal before re-raising."""
+        from unittest.mock import MagicMock, patch
+
+        with patch("quest_sim.main", side_effect=RuntimeError("boom")):
+            with patch("quest_sim.input_handler.ensure_terminal_restored") as mock_restore:
+                with self.assertRaises(SystemExit):
+                    import quest_sim
+                    quest_sim._run_with_error_handling()
+                mock_restore.assert_called()
+
+
 if __name__ == "__main__":
     unittest.main()

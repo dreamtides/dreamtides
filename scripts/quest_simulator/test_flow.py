@@ -663,3 +663,93 @@ class TestViewDeckOption:
         initial_count = state.deck_count()
         # Deck count should remain unchanged
         assert state.deck_count() == initial_count
+
+
+class TestSiteVisitErrorHandling:
+    """Test graceful error handling when a site handler raises."""
+
+    def test_site_handler_exception_is_caught(self) -> None:
+        """If a site handler raises, the loop continues and marks the site visited."""
+        from flow import _dreamscape_loop
+
+        state = _make_quest_state()
+        data = _make_site_data()
+        logger = MagicMock()
+
+        # Create a node with two sites: one that will fail, one battle
+        node = DreamscapeNode(
+            node_id=1,
+            name="Test Node",
+            biome=__import__("models").Biome.VERDANT,
+            sites=[
+                Site(site_type=SiteType.ESSENCE),
+                Site(site_type=SiteType.BATTLE),
+            ],
+            state=NodeState.AVAILABLE,
+            adjacent=[0],
+        )
+
+        # Mock visit_site to raise on first call, succeed (marking visited) on second
+        call_count = 0
+
+        def mock_visit(site: Site, *args: object, **kwargs: object) -> None:
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                raise RuntimeError("Simulated site failure")
+            # Second call (battle) succeeds -- mark visited as normal dispatch would
+            site.is_visited = True
+
+        # Index 1 selects the first actual site (index 0 is "View Deck")
+        with patch("site_dispatch.visit_site", side_effect=mock_visit):
+            with patch("input_handler.single_select", return_value=1):
+                with patch("render_atlas.render_dreamscape_sites", return_value=""):
+                    with patch("render_atlas.site_type_name", return_value="Test"):
+                        with patch("builtins.print"):
+                            _dreamscape_loop(node, state, data, logger, 1)
+
+        # Both sites should have been visited (error caught, loop continued)
+        assert node.sites[0].is_visited
+        assert node.sites[1].is_visited
+
+    def test_site_handler_exception_logs_error(self) -> None:
+        """If a site handler raises, the error is logged to JSONL."""
+        from flow import _dreamscape_loop
+
+        state = _make_quest_state()
+        data = _make_site_data()
+        logger = MagicMock()
+
+        node = DreamscapeNode(
+            node_id=1,
+            name="Test Node",
+            biome=__import__("models").Biome.VERDANT,
+            sites=[
+                Site(site_type=SiteType.ESSENCE),
+                Site(site_type=SiteType.BATTLE),
+            ],
+            state=NodeState.AVAILABLE,
+            adjacent=[0],
+        )
+
+        call_count = 0
+
+        def mock_visit(site: Site, *args: object, **kwargs: object) -> None:
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                raise RuntimeError("Simulated site failure")
+            site.is_visited = True
+
+        # Index 1 selects the first actual site (index 0 is "View Deck")
+        with patch("site_dispatch.visit_site", side_effect=mock_visit):
+            with patch("input_handler.single_select", return_value=1):
+                with patch("render_atlas.render_dreamscape_sites", return_value=""):
+                    with patch("render_atlas.site_type_name", return_value="Test"):
+                        with patch("builtins.print"):
+                            _dreamscape_loop(node, state, data, logger, 1)
+
+        # Should have logged an error event
+        logger.log_error.assert_called_once()
+        error_call = logger.log_error.call_args
+        assert "Simulated site failure" in str(error_call)

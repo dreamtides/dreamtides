@@ -231,6 +231,20 @@ class SessionLogger:
             }
         )
 
+    def log_error(
+        self,
+        site_type: str,
+        error_message: str,
+    ) -> None:
+        """Log an error that occurred during a site visit."""
+        self._write(
+            {
+                "event": "error",
+                "site_type": site_type,
+                "error_message": error_message,
+            }
+        )
+
     def close(self) -> None:
         self._file.close()
 

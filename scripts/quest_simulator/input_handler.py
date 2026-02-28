@@ -6,6 +6,7 @@ robust terminal state restoration.
 """
 
 import atexit
+import os
 import select
 import signal
 import sys
@@ -79,7 +80,28 @@ def _sigint_handler(signum: int, frame: object) -> None:
     """Handle Ctrl+C by restoring terminal state before exiting."""
     _release_termios()
     print()
+    print("  Quest abandoned.")
     sys.exit(130)
+
+
+def _sigtstp_handler(signum: int, frame: object) -> None:
+    """Handle Ctrl+Z by restoring terminal before suspending.
+
+    Restores terminal state so the shell is usable while suspended,
+    then sends SIGSTOP to actually suspend the process.
+    """
+    _restore_termios()
+    signal.signal(signal.SIGTSTP, signal.SIG_DFL)
+    os.kill(os.getpid(), signal.SIGSTOP)
+
+
+def ensure_terminal_restored() -> None:
+    """Public API to force terminal state restoration.
+
+    Called by external modules (e.g. quest_sim.py) as a safety net
+    in exception handlers and cleanup paths.
+    """
+    _release_termios()
 
 
 # Register atexit fallback for terminal restoration
@@ -213,8 +235,10 @@ def single_select(
     line_count = _render_single_menu(options, cursor, render_fn)
 
     _save_termios()
-    prev_handler = signal.getsignal(signal.SIGINT)
+    prev_int = signal.getsignal(signal.SIGINT)
+    prev_tstp = signal.getsignal(signal.SIGTSTP)
     signal.signal(signal.SIGINT, _sigint_handler)
+    signal.signal(signal.SIGTSTP, _sigtstp_handler)
     try:
         tty.setraw(sys.stdin.fileno())
         while True:
@@ -238,7 +262,8 @@ def single_select(
             tty.setraw(sys.stdin.fileno())
     finally:
         _release_termios()
-        signal.signal(signal.SIGINT, prev_handler)
+        signal.signal(signal.SIGINT, prev_int)
+        signal.signal(signal.SIGTSTP, prev_tstp)
 
     return cursor
 
@@ -278,8 +303,10 @@ def multi_select(
     line_count = _render_multi_menu(options, cursor, toggled, render_fn)
 
     _save_termios()
-    prev_handler = signal.getsignal(signal.SIGINT)
+    prev_int = signal.getsignal(signal.SIGINT)
+    prev_tstp = signal.getsignal(signal.SIGTSTP)
     signal.signal(signal.SIGINT, _sigint_handler)
+    signal.signal(signal.SIGTSTP, _sigtstp_handler)
     try:
         tty.setraw(sys.stdin.fileno())
         while True:
@@ -310,7 +337,8 @@ def multi_select(
             tty.setraw(sys.stdin.fileno())
     finally:
         _release_termios()
-        signal.signal(signal.SIGINT, prev_handler)
+        signal.signal(signal.SIGINT, prev_int)
+        signal.signal(signal.SIGTSTP, prev_tstp)
 
     return sorted(toggled)
 
@@ -356,8 +384,10 @@ def confirm_decline(
     line_count = _print_prompt()
 
     _save_termios()
-    prev_handler = signal.getsignal(signal.SIGINT)
+    prev_int = signal.getsignal(signal.SIGINT)
+    prev_tstp = signal.getsignal(signal.SIGTSTP)
     signal.signal(signal.SIGINT, _sigint_handler)
+    signal.signal(signal.SIGTSTP, _sigtstp_handler)
     try:
         tty.setraw(sys.stdin.fileno())
         while True:
@@ -381,7 +411,8 @@ def confirm_decline(
             tty.setraw(sys.stdin.fileno())
     finally:
         _release_termios()
-        signal.signal(signal.SIGINT, prev_handler)
+        signal.signal(signal.SIGINT, prev_int)
+        signal.signal(signal.SIGTSTP, prev_tstp)
 
     return selected == 0
 
@@ -408,8 +439,10 @@ def wait_for_continue(
         return
 
     _save_termios()
-    prev_handler = signal.getsignal(signal.SIGINT)
+    prev_int = signal.getsignal(signal.SIGINT)
+    prev_tstp = signal.getsignal(signal.SIGTSTP)
     signal.signal(signal.SIGINT, _sigint_handler)
+    signal.signal(signal.SIGTSTP, _sigtstp_handler)
     try:
         tty.setraw(sys.stdin.fileno())
         key = _read_key()
@@ -419,4 +452,5 @@ def wait_for_continue(
             sys.exit(130)
     finally:
         _release_termios()
-        signal.signal(signal.SIGINT, prev_handler)
+        signal.signal(signal.SIGINT, prev_int)
+        signal.signal(signal.SIGTSTP, prev_tstp)

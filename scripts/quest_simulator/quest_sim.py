@@ -8,6 +8,7 @@ creates the dream atlas, and launches the main quest flow.
 import argparse
 import random
 import sys
+import traceback
 from typing import Any
 
 import atlas
@@ -178,9 +179,22 @@ def main() -> None:
         logger.close()
 
 
-if __name__ == "__main__":
+def _run_with_error_handling() -> None:
+    """Run main() with terminal restoration in all exit paths."""
     try:
         main()
     except KeyboardInterrupt:
+        input_handler.ensure_terminal_restored()
         print("\n  Quest abandoned.")
         sys.exit(0)
+    except SystemExit:
+        input_handler.ensure_terminal_restored()
+        raise
+    except Exception:
+        input_handler.ensure_terminal_restored()
+        traceback.print_exc()
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    _run_with_error_handling()
