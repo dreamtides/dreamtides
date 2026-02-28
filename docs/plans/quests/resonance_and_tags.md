@@ -224,7 +224,7 @@ Dreamcallers influence selection through resonance seeding only -- contributing
 a large resonance bonus (3-5 per symbol) that biases early offerings.
 
 ```toml
-[[dreamcaller]]
+[[dreamcallers]]
 name = "Vesper, Twilight Arbiter"
 resonance = ["Tide", "Ruin"]
 resonance_bonus = { Tide = 4, Ruin = 4 }
