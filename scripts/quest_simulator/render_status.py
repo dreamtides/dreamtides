@@ -7,7 +7,7 @@ shared ANSI constants and box-drawing utilities from render.py.
 
 from typing import Optional
 
-from models import Boss, Rarity, Resonance
+from models import AlgorithmParams, Boss, Rarity, Resonance
 from render import (
     BOLD,
     CONTENT_WIDTH,
@@ -227,3 +227,65 @@ def victory_screen(
 
     lines.append(sep)
     return "\n".join(lines)
+
+
+def pool_bias_line(variance: dict[Resonance, float]) -> str:
+    """Format per-resonance pool variance as a percentage bias line.
+
+    Each resonance is colored appropriately. Positive biases show a '+'
+    prefix, negative show '-'. The variance multiplier of 1.0 corresponds
+    to 0% bias.
+    """
+    bias_parts: list[str] = []
+    for r in sorted(variance.keys(), key=lambda r: r.value):
+        mult = variance[r]
+        pct = (mult - 1.0) * 100
+        sign = "+" if pct >= 0 else ""
+        bias_parts.append(f"{color_resonance(r)} {sign}{pct:.0f}%")
+    bias_str = ", ".join(bias_parts)
+    return f"  Pool bias: {bias_str}"
+
+
+def pool_composition_summary(
+    unique_cards: int,
+    total_entries: int,
+    rarity_entries: dict[Rarity, int],
+) -> str:
+    """Format a pool composition breakdown by rarity.
+
+    Shows the header line with unique card count and total entries,
+    followed by per-rarity entry counts and percentages.
+    """
+    lines: list[str] = [
+        f"  Draft pool: {unique_cards} cards ({total_entries} entries)",
+    ]
+    for rarity in [Rarity.COMMON, Rarity.UNCOMMON, Rarity.RARE, Rarity.LEGENDARY]:
+        count = rarity_entries.get(rarity, 0)
+        pct = count / total_entries * 100 if total_entries > 0 else 0
+        label = f"{rarity.value}:"
+        lines.append(f"    {label:12s} {count:3d} entries ({pct:4.1f}%)")
+    return "\n".join(lines)
+
+
+def algorithm_params_line(
+    active: AlgorithmParams,
+    defaults: AlgorithmParams,
+) -> Optional[str]:
+    """Format algorithm parameters when any differ from config defaults.
+
+    Returns None if all parameters match the defaults, otherwise returns
+    a formatted line showing all four parameter values.
+    """
+    if (
+        active.exponent == defaults.exponent
+        and active.floor_weight == defaults.floor_weight
+        and active.neutral_base == defaults.neutral_base
+        and active.staleness_factor == defaults.staleness_factor
+    ):
+        return None
+    return (
+        f"  Algorithm: exponent={active.exponent},"
+        f" floor={active.floor_weight},"
+        f" neutral={active.neutral_base},"
+        f" staleness={active.staleness_factor}"
+    )

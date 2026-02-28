@@ -8,6 +8,7 @@ import argparse
 import os
 import sys
 import unittest
+from typing import Any, Optional
 
 # Ensure the quest_simulator directory is on sys.path
 sys.path.insert(0, os.path.dirname(__file__))
@@ -119,6 +120,76 @@ class TestQuestStartBannerWithCards(unittest.TestCase):
         from render import quest_start_banner
 
         result = quest_start_banner(seed=1, starting_essence=250, pool_size=500)
+        self.assertIn("Press Enter to begin", result)
+
+
+class TestQuestStartBannerPoolStats(unittest.TestCase):
+    """Tests for pool statistics in the quest start banner."""
+
+    def _make_banner(
+        self,
+        variance: Optional[dict[Any, float]] = None,
+        rarity_entries: Optional[dict[Any, int]] = None,
+        algorithm_params_str: Optional[str] = None,
+    ) -> str:
+        from models import Rarity, Resonance
+        from render import quest_start_banner
+
+        v: Optional[dict[Resonance, float]] = variance or {
+            Resonance.TIDE: 1.12,
+            Resonance.EMBER: 0.92,
+            Resonance.ZEPHYR: 1.03,
+            Resonance.STONE: 0.85,
+            Resonance.RUIN: 1.18,
+        }
+        re: Optional[dict[Rarity, int]] = rarity_entries or {
+            Rarity.COMMON: 308,
+            Rarity.UNCOMMON: 261,
+            Rarity.RARE: 78,
+            Rarity.LEGENDARY: 13,
+        }
+        return quest_start_banner(
+            seed=42,
+            starting_essence=250,
+            pool_size=660,
+            unique_cards=220,
+            pool_variance=v,
+            rarity_entries=re,
+            algorithm_params_str=algorithm_params_str,
+        )
+
+    def test_banner_contains_pool_bias(self) -> None:
+        result = self._make_banner()
+        self.assertIn("Pool bias:", result)
+
+    def test_banner_contains_resonance_bias_values(self) -> None:
+        result = self._make_banner()
+        self.assertIn("+12%", result)
+        self.assertIn("-8%", result)
+
+    def test_banner_contains_composition_breakdown(self) -> None:
+        result = self._make_banner()
+        self.assertIn("Common:", result)
+        self.assertIn("Uncommon:", result)
+
+    def test_banner_contains_rarity_percentages(self) -> None:
+        result = self._make_banner()
+        self.assertIn("46.7%", result)
+
+    def test_banner_shows_algorithm_params_when_provided(self) -> None:
+        result = self._make_banner(
+            algorithm_params_str="  Algorithm: exponent=2.0, floor=0.5, neutral=3.0, staleness=0.3"
+        )
+        self.assertIn("Algorithm:", result)
+        self.assertIn("exponent=2.0", result)
+
+    def test_banner_omits_algorithm_params_when_none(self) -> None:
+        result = self._make_banner(algorithm_params_str=None)
+        self.assertNotIn("Algorithm:", result)
+
+    def test_banner_still_contains_header_and_footer(self) -> None:
+        result = self._make_banner()
+        self.assertIn("DREAMTIDES QUEST", result)
         self.assertIn("Press Enter to begin", result)
 
 

@@ -623,6 +623,219 @@ class TestBattleCompletionProgress(unittest.TestCase):
         self.assertIn("1/7", result)
 
 
+class TestPoolBiasLine(unittest.TestCase):
+    """Tests for the pool_bias_line formatting function."""
+
+    def test_contains_pool_bias_label(self) -> None:
+        from models import Resonance
+        from render_status import pool_bias_line
+
+        variance: dict[Resonance, float] = {
+            Resonance.TIDE: 1.12,
+            Resonance.EMBER: 0.92,
+            Resonance.ZEPHYR: 1.03,
+            Resonance.STONE: 0.85,
+            Resonance.RUIN: 1.18,
+        }
+        result = pool_bias_line(variance)
+        self.assertIn("Pool bias:", result)
+
+    def test_positive_bias_has_plus_sign(self) -> None:
+        from models import Resonance
+        from render_status import pool_bias_line
+
+        variance: dict[Resonance, float] = {
+            Resonance.TIDE: 1.12,
+            Resonance.EMBER: 0.92,
+            Resonance.ZEPHYR: 1.03,
+            Resonance.STONE: 0.85,
+            Resonance.RUIN: 1.18,
+        }
+        result = pool_bias_line(variance)
+        self.assertIn("+12%", result)
+        self.assertIn("+18%", result)
+
+    def test_negative_bias_has_minus_sign(self) -> None:
+        from models import Resonance
+        from render_status import pool_bias_line
+
+        variance: dict[Resonance, float] = {
+            Resonance.TIDE: 1.12,
+            Resonance.EMBER: 0.92,
+            Resonance.ZEPHYR: 1.03,
+            Resonance.STONE: 0.85,
+            Resonance.RUIN: 1.18,
+        }
+        result = pool_bias_line(variance)
+        self.assertIn("-8%", result)
+        self.assertIn("-15%", result)
+
+    def test_contains_all_resonance_names(self) -> None:
+        from models import Resonance
+        from render_status import pool_bias_line
+
+        variance: dict[Resonance, float] = {
+            Resonance.TIDE: 1.00,
+            Resonance.EMBER: 1.00,
+            Resonance.ZEPHYR: 1.00,
+            Resonance.STONE: 1.00,
+            Resonance.RUIN: 1.00,
+        }
+        result = pool_bias_line(variance)
+        for r in Resonance:
+            self.assertIn(r.value, result)
+
+    def test_zero_bias_shows_plus_zero(self) -> None:
+        from models import Resonance
+        from render_status import pool_bias_line
+
+        variance: dict[Resonance, float] = {r: 1.0 for r in Resonance}
+        result = pool_bias_line(variance)
+        self.assertIn("+0%", result)
+
+
+class TestPoolCompositionSummary(unittest.TestCase):
+    """Tests for the pool_composition_summary formatting function."""
+
+    def test_contains_header_with_card_and_entry_counts(self) -> None:
+        from models import Rarity
+        from render_status import pool_composition_summary
+
+        rarity_entries: dict[Rarity, int] = {
+            Rarity.COMMON: 308,
+            Rarity.UNCOMMON: 261,
+            Rarity.RARE: 78,
+            Rarity.LEGENDARY: 13,
+        }
+        result = pool_composition_summary(
+            unique_cards=220, total_entries=660, rarity_entries=rarity_entries
+        )
+        self.assertIn("220 cards", result)
+        self.assertIn("660 entries", result)
+
+    def test_contains_all_rarity_labels(self) -> None:
+        from models import Rarity
+        from render_status import pool_composition_summary
+
+        rarity_entries: dict[Rarity, int] = {
+            Rarity.COMMON: 308,
+            Rarity.UNCOMMON: 261,
+            Rarity.RARE: 78,
+            Rarity.LEGENDARY: 13,
+        }
+        result = pool_composition_summary(
+            unique_cards=220, total_entries=660, rarity_entries=rarity_entries
+        )
+        self.assertIn("Common:", result)
+        self.assertIn("Uncommon:", result)
+        self.assertIn("Rare:", result)
+        self.assertIn("Legendary:", result)
+
+    def test_contains_entry_counts(self) -> None:
+        from models import Rarity
+        from render_status import pool_composition_summary
+
+        rarity_entries: dict[Rarity, int] = {
+            Rarity.COMMON: 308,
+            Rarity.UNCOMMON: 261,
+            Rarity.RARE: 78,
+            Rarity.LEGENDARY: 13,
+        }
+        result = pool_composition_summary(
+            unique_cards=220, total_entries=660, rarity_entries=rarity_entries
+        )
+        self.assertIn("308 entries", result)
+        self.assertIn("261 entries", result)
+        self.assertIn("78 entries", result)
+        self.assertIn("13 entries", result)
+
+    def test_contains_percentages(self) -> None:
+        from models import Rarity
+        from render_status import pool_composition_summary
+
+        rarity_entries: dict[Rarity, int] = {
+            Rarity.COMMON: 308,
+            Rarity.UNCOMMON: 261,
+            Rarity.RARE: 78,
+            Rarity.LEGENDARY: 13,
+        }
+        result = pool_composition_summary(
+            unique_cards=220, total_entries=660, rarity_entries=rarity_entries
+        )
+        self.assertIn("46.7%", result)
+        self.assertIn("39.5%", result)
+        self.assertIn("11.8%", result)
+        self.assertIn("2.0%", result)
+
+
+class TestAlgorithmParamsLine(unittest.TestCase):
+    """Tests for the algorithm_params_line formatting function."""
+
+    def test_returns_none_when_no_overrides(self) -> None:
+        from models import AlgorithmParams
+        from render_status import algorithm_params_line
+
+        defaults = AlgorithmParams(
+            exponent=1.4,
+            floor_weight=0.5,
+            neutral_base=3.0,
+            staleness_factor=0.3,
+        )
+        active = AlgorithmParams(
+            exponent=1.4,
+            floor_weight=0.5,
+            neutral_base=3.0,
+            staleness_factor=0.3,
+        )
+        result = algorithm_params_line(active, defaults)
+        self.assertIsNone(result)
+
+    def test_returns_string_when_exponent_differs(self) -> None:
+        from models import AlgorithmParams
+        from render_status import algorithm_params_line
+
+        defaults = AlgorithmParams(
+            exponent=1.4,
+            floor_weight=0.5,
+            neutral_base=3.0,
+            staleness_factor=0.3,
+        )
+        active = AlgorithmParams(
+            exponent=2.0,
+            floor_weight=0.5,
+            neutral_base=3.0,
+            staleness_factor=0.3,
+        )
+        result = algorithm_params_line(active, defaults)
+        self.assertIsNotNone(result)
+        self.assertIn("Algorithm:", result)
+        self.assertIn("exponent=2.0", result)
+
+    def test_shows_all_params_when_any_differs(self) -> None:
+        from models import AlgorithmParams
+        from render_status import algorithm_params_line
+
+        defaults = AlgorithmParams(
+            exponent=1.4,
+            floor_weight=0.5,
+            neutral_base=3.0,
+            staleness_factor=0.3,
+        )
+        active = AlgorithmParams(
+            exponent=1.4,
+            floor_weight=0.5,
+            neutral_base=3.0,
+            staleness_factor=0.5,
+        )
+        result = algorithm_params_line(active, defaults)
+        self.assertIsNotNone(result)
+        assert result is not None
+        self.assertIn("exponent=1.4", result)
+        self.assertIn("floor=0.5", result)
+        self.assertIn("neutral=3.0", result)
+        self.assertIn("staleness=0.5", result)
+
+
 class TestImportability(unittest.TestCase):
     def test_wildcard_import(self) -> None:
         """Verify the module can be imported with wildcard syntax."""

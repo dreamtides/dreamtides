@@ -17,8 +17,9 @@ import flow
 import input_handler
 import pool
 import render
+import render_status
 from jsonl_log import SessionLogger
-from models import AlgorithmParams
+from models import AlgorithmParams, Rarity
 from quest_state import QuestState
 from site_dispatch import SiteData
 
@@ -82,6 +83,9 @@ def main() -> None:
     offers = data_loader.load_offers()
     banes = data_loader.load_banes()
     bosses = data_loader.load_bosses()
+
+    # Save config defaults before applying CLI overrides
+    config_defaults = algorithm_params
 
     # Override algorithm params with CLI args if provided
     algorithm_params = AlgorithmParams(
@@ -154,12 +158,22 @@ def main() -> None:
     # Log session start
     logger.log_session_start(seed, algorithm_params, nodes)
 
+    # Compute pool composition by rarity
+    rarity_entries: dict[Rarity, int] = {r: 0 for r in Rarity}
+    for entry in draft_pool:
+        rarity_entries[entry.card.rarity] += 1
+
     # Display quest start banner
     banner = render.quest_start_banner(
         seed=seed,
         starting_essence=starting_essence,
         pool_size=len(draft_pool),
         unique_cards=len(all_cards),
+        pool_variance=variance,
+        rarity_entries=rarity_entries,
+        algorithm_params_str=render_status.algorithm_params_line(
+            algorithm_params, config_defaults
+        ),
     )
     print(banner)
 

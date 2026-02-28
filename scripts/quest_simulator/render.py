@@ -216,24 +216,48 @@ def quest_start_banner(
     starting_essence: int,
     pool_size: int,
     unique_cards: int = 0,
+    pool_variance: Optional[dict[Resonance, float]] = None,
+    rarity_entries: Optional[dict[Rarity, int]] = None,
+    algorithm_params_str: Optional[str] = None,
 ) -> str:
-    """Build the quest start banner text."""
+    """Build the quest start banner text.
+
+    When pool_variance and rarity_entries are provided, shows pool bias
+    per resonance and composition breakdown by rarity. When
+    algorithm_params_str is provided, shows the active algorithm
+    parameters (for CLI override visibility).
+    """
+    from render_status import pool_bias_line, pool_composition_summary
+
     sep = draw_double_separator()
-    if unique_cards > 0:
-        pool_line = f"  Draft pool: {unique_cards} cards ({pool_size} entries)"
-    else:
-        pool_line = f"  Draft pool: {pool_size} entries"
     lines: list[str] = [
         sep,
         f"  {BOLD}DREAMTIDES QUEST{RESET}{' ' * (CONTENT_WIDTH - 18 - len(f'Seed: {seed}') - 2)}Seed: {seed}",
         sep,
         "",
         f"  Starting essence: {starting_essence}",
-        pool_line,
-        "",
-        f"  {DIM}Press Enter to begin...{RESET}",
-        sep,
     ]
+
+    if pool_variance is not None and rarity_entries is not None:
+        lines.append(
+            pool_composition_summary(
+                unique_cards=unique_cards,
+                total_entries=pool_size,
+                rarity_entries=rarity_entries,
+            )
+        )
+        lines.append(pool_bias_line(pool_variance))
+    elif unique_cards > 0:
+        lines.append(f"  Draft pool: {unique_cards} cards ({pool_size} entries)")
+    else:
+        lines.append(f"  Draft pool: {pool_size} entries")
+
+    if algorithm_params_str is not None:
+        lines.append(algorithm_params_str)
+
+    lines.append("")
+    lines.append(f"  {DIM}Press Enter to begin...{RESET}")
+    lines.append(sep)
     return "\n".join(lines)
 
 
