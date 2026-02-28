@@ -111,36 +111,41 @@ atexit.register(_release_termios)
 def _read_key() -> str:
     """Read a single keypress and return a semantic key name.
 
-    Detects arrow escape sequences using select() with a 50ms timeout
-    to distinguish bare Escape from the start of an arrow sequence.
+    Uses os.read() on the raw file descriptor to bypass Python's buffered
+    TextIOWrapper. This is critical because select() checks the fd level,
+    and Python's buffer can consume all bytes of an escape sequence at once,
+    causing select() to report no data available for the remaining bytes.
     """
-    ch = sys.stdin.read(1)
-    if not ch:
+    fd = sys.stdin.fileno()
+    raw = os.read(fd, 1)
+    if not raw:
         return KEY_QUIT
 
-    if ch == "\x03":
+    ch = raw[0]
+
+    if ch == 0x03:  # Ctrl+C
         return KEY_QUIT
 
-    if ch in ("\r", "\n"):
+    if ch in (0x0D, 0x0A):  # \r, \n
         return KEY_ENTER
 
-    if ch == " ":
+    if ch == 0x20:  # space
         return KEY_SPACE
 
-    if ch == "\x1b":
+    if ch == 0x1B:  # Escape
         # Check if more bytes are available (arrow sequence)
-        ready, _, _ = select.select([sys.stdin], [], [], 0.05)
+        ready, _, _ = select.select([fd], [], [], 0.05)
         if ready:
-            seq = sys.stdin.read(1)
-            if seq == "[":
-                code = sys.stdin.read(1)
-                if code == "A":
+            seq = os.read(fd, 1)
+            if seq == b"[":
+                code = os.read(fd, 1)
+                if code == b"A":
                     return KEY_UP
-                elif code == "B":
+                elif code == b"B":
                     return KEY_DOWN
-                elif code == "C":
+                elif code == b"C":
                     return KEY_RIGHT
-                elif code == "D":
+                elif code == b"D":
                     return KEY_LEFT
         return KEY_QUIT
 
