@@ -26,15 +26,21 @@ def run_draft(
     state: QuestState,
     algorithm_params: AlgorithmParams,
     draft_params: DraftParams,
+    pool_params: PoolParams,
     dreamscape_name: str,
     dreamscape_number: int,
     logger: Optional[SessionLogger],
+    is_enhanced: bool = False,
 ) -> None:
     """Run a Draft site interaction.
 
     Performs picks_per_site sequential picks. Each pick selects
     cards_per_pick cards from the pool via resonance-weighted
     selection, presents them to the player, and processes the choice.
+
+    The is_enhanced flag is accepted for site context completeness.
+    Regular Draft is not affected by biome enhancement (Arcane enhances
+    Discovery Draft, not regular Draft).
     """
     for pick_index in range(draft_params.picks_per_site):
         # If pool is empty, attempt a refill
@@ -42,7 +48,7 @@ def run_draft(
             pool_module.refill_pool(
                 state.pool,
                 state.all_cards,
-                _pool_params_from_state(state),
+                pool_params,
             )
 
         # Select cards from pool
@@ -122,19 +128,3 @@ def run_draft(
         essence=state.essence,
     )
     print(footer)
-
-
-def _pool_params_from_state(state: QuestState) -> PoolParams:
-    """Extract pool params from quest state for refill operations.
-
-    Uses default copy counts; these could be made configurable via
-    QuestState if needed.
-    """
-    return PoolParams(
-        copies_common=4,
-        copies_uncommon=3,
-        copies_rare=2,
-        copies_legendary=1,
-        variance_min=0.75,
-        variance_max=1.25,
-    )

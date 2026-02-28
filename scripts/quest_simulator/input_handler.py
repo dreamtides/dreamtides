@@ -151,7 +151,7 @@ def _render_single_menu(
             marker = ">" if is_selected else " "
             line = f"  {marker} {option}"
         print(line)
-        line_count += 1
+        line_count += line.count("\n") + 1
     return line_count
 
 
@@ -178,7 +178,7 @@ def _render_multi_menu(
             check = "[x]" if is_checked else "[ ]"
             line = f"  {marker} {check} {option}"
         print(line)
-        line_count += 1
+        line_count += line.count("\n") + 1
     return line_count
 
 

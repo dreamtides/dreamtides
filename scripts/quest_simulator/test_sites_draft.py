@@ -14,7 +14,6 @@ from models import (
     Rarity,
     Resonance,
 )
-from pool import build_pool, generate_variance
 from quest_state import QuestState
 
 
@@ -78,6 +77,17 @@ def _make_draft_params(picks: int = 5, cards: int = 4) -> DraftParams:
     )
 
 
+def _make_pool_params() -> PoolParams:
+    return PoolParams(
+        copies_common=4,
+        copies_uncommon=3,
+        copies_rare=2,
+        copies_legendary=1,
+        variance_min=0.75,
+        variance_max=1.25,
+    )
+
+
 def _make_quest_state(
     cards: Optional[list[Card]] = None,
     pool: Optional[list[PoolEntry]] = None,
@@ -115,6 +125,7 @@ class TestRunDraft:
                 state=state,
                 algorithm_params=params,
                 draft_params=draft_params,
+                pool_params=_make_pool_params(),
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
                 logger=None,
@@ -139,6 +150,7 @@ class TestRunDraft:
                 state=state,
                 algorithm_params=params,
                 draft_params=draft_params,
+                pool_params=_make_pool_params(),
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
                 logger=None,
@@ -156,14 +168,12 @@ class TestRunDraft:
         params = _make_algorithm_params()
         draft_params = _make_draft_params(picks=1, cards=4)
 
-        # Track which entries existed before
-        entries_before = set(id(e) for e in state.pool)
-
         with patch("sites_draft.input_handler.single_select", return_value=0):
             run_draft(
                 state=state,
                 algorithm_params=params,
                 draft_params=draft_params,
+                pool_params=_make_pool_params(),
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
                 logger=None,
@@ -187,6 +197,7 @@ class TestRunDraft:
                 state=state,
                 algorithm_params=params,
                 draft_params=draft_params,
+                pool_params=_make_pool_params(),
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
                 logger=None,
@@ -209,6 +220,7 @@ class TestRunDraft:
                 state=state,
                 algorithm_params=params,
                 draft_params=draft_params,
+                pool_params=_make_pool_params(),
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
                 logger=None,
@@ -238,6 +250,7 @@ class TestRunDraft:
                 state=state,
                 algorithm_params=params,
                 draft_params=draft_params,
+                pool_params=_make_pool_params(),
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
                 logger=None,
@@ -276,6 +289,7 @@ class TestRunDraft:
                 state=state,
                 algorithm_params=params,
                 draft_params=draft_params,
+                pool_params=_make_pool_params(),
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
                 logger=FakeLogger(),  # type: ignore[arg-type]
@@ -302,6 +316,7 @@ class TestRunDraft:
                 state=state,
                 algorithm_params=params,
                 draft_params=draft_params,
+                pool_params=_make_pool_params(),
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
                 logger=None,
