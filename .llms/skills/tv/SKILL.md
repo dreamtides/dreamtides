@@ -1,167 +1,142 @@
 ---
 name: tv
-description: Work with the TV (TOML Viewer) desktop application for editing TOML files in a spreadsheet format. Use when implementing features for TV, understanding the TV architecture, working with Tauri commands, or debugging TV issues.
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep
-user-invocable: false
+description: Use when working with the TV (TOML Viewer) desktop application for editing TOML files in a spreadsheet format. Use when implementing features for TV, understanding the TV architecture, working with Tauri commands, or debugging TV issues.
 ---
 
-# TV (TOML Viewer) Desktop Application
+# TV (TOML Viewer) Development Guide
 
-TV is a Tauri V2 desktop application for viewing and editing TOML files in a spreadsheet format using the Univer library. It replaces an Excel-based workflow, making TOML files the sole source of truth for game data.
+Desktop app for viewing/editing TOML files as spreadsheets. Built with
+Tauri V2 (Rust backend) + React/Univer (TypeScript frontend).
 
-## Quick Reference
+## Build Commands
 
-```bash
-# Run in development mode
-cd rules_engine/src/tv && pnpm tauri dev
+Always use `just`, never raw `cargo` or `pnpm` directly.
 
-# Run with specific file
-cd rules_engine/src/tv && pnpm tauri dev -- -- path/to/file.toml
+| Command | Purpose |
+|---------|---------|
+| `just tv-dev` | Start dev server (kills stale processes first) |
+| `just tv-cards` | Dev with cards.toml loaded |
+| `just tv-check` | Rust check + TypeScript tsc + ESLint |
+| `just tv-clippy` | Rust clippy with `-D warnings` |
+| `just tv-test NAME` | Run specific integration test |
+| `just tv-build` | Production build |
+| `just fmt` | Format all code (run first to auto-fix) |
+| `just review` | Full gate (includes tv-check, tv-clippy, tv-test) |
 
-# Run with directory (opens all TOML files as sheets)
-cd rules_engine/src/tv && pnpm tauri dev -- -- path/to/directory/
+## Architecture (3 Layers)
 
-# Build for production
-cd rules_engine/src/tv && pnpm tauri build
+**Layer 1 - TOML (Rust):** File I/O via `toml_edit` for structure
+preservation. Atomic writes via temp files + rename.
+
+**Layer 2 - Application (Rust):** Independent state managers
+(sort, filter, derived columns, images, sync, permissions).
+Managers never communicate directly; frontend coordinates.
+
+**Layer 3 - UI (TypeScript):** React + Univer spreadsheet.
+Debounced cell edits (500ms), IPC via Tauri commands/events.
+
+## Key Files to Read First
+
+**Rust backend** (`rules_engine/src/tv/src-tauri/src/`):
+- `lib.rs` — Tauri builder, all 47 command registrations, state setup
+- `commands/` — One module per command group (load, save, sort, etc.)
+- `toml/document_loader.rs` — TOML parsing into spreadsheet data
+- `toml/document_writer.rs` — Atomic writes, cell-level updates
+- `toml/metadata/` — 7 submodules parsing metadata categories
+- `error/error_types.rs` — `TvError` enum (all failure modes)
+- `CLAUDE.md` — Backend-specific AI guidance
+
+**TypeScript frontend** (`rules_engine/src/tv/src/`):
+- `ipc_bridge.ts` — All Tauri command/event type definitions
+- `UniverSpreadsheet.tsx` — Main Univer wrapper (largest file)
+- `app_root.tsx` — Root component, data loading, sync handling
+- `univer_config.ts` — Univer plugin initialization order
+- `image_cell_renderer.ts` — Image rendering workaround
+
+**Configuration:**
+- `rules_engine/src/tv/src-tauri/tauri.conf.json` — Tauri app config
+- `rules_engine/src/tv/vite.config.ts` — Vite + RxJS recursion fix
+- `rules_engine/src/tv/eslint.config.js` — Strict TypeScript lint rules
+
+**Design docs** (`rules_engine/src/tv/docs/`):
+- `tv_design_document.md` — Full architecture reference
+- `appendix_d_univer_integration.md` — Univer pitfalls and workarounds
+
+## Adding a New Tauri Command
+
+1. Create handler in `commands/<group>_command.rs`:
+```rust
+#[tauri::command]
+pub fn my_command(
+    app_handle: AppHandle,
+    param: String,
+) -> Result<ResponseType, TvError> {
+    // Implementation — never panic, always return Result
+}
 ```
-
-## Source Code Location
-
-All TV source code is in `rules_engine/src/tv/`:
-
-```
-rules_engine/src/tv/
-├── src/                          # TypeScript frontend
-│   ├── main.tsx                  # React entry point
-│   ├── app_root.tsx              # Main app component, state management
-│   ├── spreadsheet_view.tsx      # Univer spreadsheet wrapper
-│   ├── error_banner.tsx          # Error display component
-│   ├── status_indicator.tsx      # Save/sync status display
-│   ├── UniverSpreadsheet.tsx     # Core Univer integration
-│   └── ipc_bridge.ts             # Tauri command wrappers
-├── src-tauri/                    # Rust backend
-│   ├── src/
-│   │   ├── main.rs               # Binary entry point
-│   │   ├── lib.rs                # Library with Tauri setup
-│   │   ├── cli.rs                # CLI argument parsing
-│   │   ├── commands/             # Tauri command implementations
-│   │   ├── toml/                 # TOML loading/writing
-│   │   ├── sync/                 # File watching, state machine
-│   │   ├── derived/              # Derived column computation
-│   │   ├── validation/           # Data validation rules
-│   │   ├── images/               # Image caching
-│   │   ├── uuid/                 # UUID generation
-│   │   ├── logging/              # JSONL logging
-│   │   └── error/                # Error types
-│   ├── Cargo.toml                # Rust dependencies
-│   └── tauri.conf.json           # Tauri configuration
-└── docs/                         # Design documentation
-```
-
-## Architecture Overview
-
-TV follows a three-layer architecture:
-
-1. **TOML Layer** (Rust): File I/O, parsing, structure preservation with `toml_edit`
-2. **Application Layer** (Rust): State management, derived columns, validation, caching
-3. **UI Layer** (TypeScript): Univer spreadsheet rendering, user interaction
-
-### Key Concepts
-
-- **Array-of-Tables Format**: TOML files use `[[table_name]]` format where each entry becomes a row
-- **Structure Preservation**: All writes use `toml_edit` to preserve comments and formatting
-- **Bidirectional Sync**: Changes sync UI-to-file and file-to-UI via file watching
-- **Derived Columns**: Columns computed asynchronously from row data (e.g., rules text preview)
-- **Multi-Sheet Support**: Each TOML file becomes a separate sheet tab
-
-## Tauri Commands
-
-Available IPC commands (defined in `src-tauri/src/commands/`):
-
-| Command | File | Description |
-|---------|------|-------------|
-| `load_toml_table` | load_command.rs:9 | Load TOML file as spreadsheet data |
-| `save_toml_table` | save_command.rs:9 | Save entire spreadsheet to TOML |
-| `save_cell` | save_command.rs:26 | Save single cell update |
-| `save_batch` | save_command.rs:45 | Save multiple cell updates atomically |
-| `start_file_watcher` | watch_command.rs | Start watching file for external changes |
-| `stop_file_watcher` | watch_command.rs | Stop watching a file |
-| `get_app_paths` | lib.rs:28 | Get list of TOML files to display |
-
-## Key Modules
-
-### TOML Module (`src-tauri/src/toml/`)
-- **document_loader.rs**: Parse TOML files into `TomlTableData` for frontend
-- **document_writer.rs**: Write changes back preserving structure
-- **value_converter.rs**: Convert between JSON and TOML value types
-
-### Sync Module (`src-tauri/src/sync/`)
-- **file_watcher.rs**: File change detection with debouncing
-- **state_machine.rs**: Sync state transitions (Idle, Loading, Saving)
-- **Events**: `file_changed`, `sync_state_changed`, `sync_conflict`
-
-### Derived Module (`src-tauri/src/derived/`)
-- **derived_types.rs**: Types for derived column definitions
-- **rich_text_converter.rs**: Convert styled text to Univer rich text format
-- **card_lookup.rs**: Cross-reference card data from other tables
-
-## Data Flow
-
-```
-User Edit → Univer Event → ipc_bridge.ts → Tauri Command
-    → document_writer.rs → TOML File → file_watcher.rs
-    → Event to Frontend → Reload (if external change)
-```
+2. Register in `lib.rs` `invoke_handler` macro
+3. Add IPC wrapper in `src/ipc_bridge.ts`
+4. Use tracing: `tracing::debug!(component = "tv.commands.my_cmd", ...)`
 
 ## Testing
 
-Tests are in `rules_engine/tests/tv_tests/`:
+Tests live in `rules_engine/tests/tv_tests/` as integration tests.
+**Never** write inline `mod tests {}`. Test against the public API.
 
-```bash
-# Run TV tests
-just test -p tv_tests
-
-# Run specific test
-just test -p tv_tests -- test_name
+**`_with_fs` pattern:** Functions doing file I/O have two variants:
+```rust
+pub fn load(path: &str) -> Result<Data, TvError> {
+    load_with_fs(&RealFileSystem, path)
+}
+pub fn load_with_fs(fs: &dyn FileSystem, path: &str) -> Result<Data, TvError> {
+    // tests inject FakeFileSystem here
+}
 ```
 
-## Documentation
+Test utilities: `rules_engine/tests/tv_tests/src/test_utils/` has
+`mock_filesystem.rs`, `mock_clock.rs`, `harness.rs`, `fixture_loader.rs`.
 
-Detailed documentation in `rules_engine/src/tv/docs/`:
-- [tv_design_document.md](../rules_engine/src/tv/docs/tv_design_document.md) - Main design doc
-- [appendix_a_metadata_schema.md](../rules_engine/src/tv/docs/appendix_a_metadata_schema.md) - Metadata format
-- [appendix_b_derived_functions.md](../rules_engine/src/tv/docs/appendix_b_derived_functions.md) - Derived columns
-- [appendix_c_sync_protocol.md](../rules_engine/src/tv/docs/appendix_c_sync_protocol.md) - Sync behavior
-- [appendix_d_univer_integration.md](../rules_engine/src/tv/docs/appendix_d_univer_integration.md) - Univer setup
-- [appendix_f_file_layout.md](../rules_engine/src/tv/docs/appendix_f_file_layout.md) - File structure
-- [appendix_g_rules_text_preview.md](../rules_engine/src/tv/docs/appendix_g_rules_text_preview.md) - Rules text rendering
-- [appendix_h_implementation_plan.md](../rules_engine/src/tv/docs/appendix_h_implementation_plan.md) - Implementation tasks
+## TypeScript Code Quality
 
-## Additional Reference
+ESLint enforces strict TypeScript safety — **no `any` allowed**:
+- `@typescript-eslint/no-explicit-any`: error
+- `@typescript-eslint/no-unsafe-assignment`: error
+- `@typescript-eslint/no-unsafe-member-access`: error
+- `@typescript-eslint/no-unsafe-call`: error
+- `@typescript-eslint/no-unsafe-return`: error
+- Unused vars allowed only with `_` prefix
 
-For detailed reference, see:
-- [COMMANDS.md](COMMANDS.md) - Detailed Tauri command reference with types and usage
-- [ARCHITECTURE.md](ARCHITECTURE.md) - In-depth module architecture and data flow
+## Univer Pitfalls
 
-## Related Skills
+Read [appendix_d_univer_integration.md](../../rules_engine/src/tv/docs/appendix_d_univer_integration.md) before working on Univer code.
 
-- **tauri-v2**: Tauri V2 patterns for commands, events, plugins
-- **univer**: Univer spreadsheet API for cells, styling, images, validation
+**Version pinning:** All `@univerjs/*` packages must be the same exact
+version (currently 0.15.3). Mismatched versions break everything.
 
-## Common Tasks
+**Facade API is broken under Vite:** `insertImage()` and similar facade
+methods fail due to class prototype duplication from Vite pre-bundling.
+Use direct command execution instead:
+```typescript
+univerAPI.executeCommand("sheet.command.insert-sheet-image", { ... });
+```
 
-### Adding a New Tauri Command
+**RxJS recursion bug:** `bufferWhen` causes infinite recursion with
+Univer's lifecycle system. Fixed by a Vite plugin in `vite.config.ts`
+that patches RxJS at build time. Do not remove this.
 
-1. Create command in `src-tauri/src/commands/`
-2. Register in `lib.rs` via `tauri::generate_handler![]`
-3. Add TypeScript wrapper in `src/ipc_bridge.ts`
+**Plugin load order matters.** See `univer_config.ts` for the required
+sequence (render engine first, then formula, then UI, then sheets...).
 
-### Adding a Derived Column Function
+## Rust Error Handling
 
-1. Implement function in `src-tauri/src/derived/`
-2. Register in the function registry
-3. Define column in TOML metadata section
+Always return `Result<T, TvError>`. Never `unwrap()` or `expect()` in
+command handlers. Use helpers:
+- `map_io_error_for_read(error, path)` for reads
+- `map_io_error_for_write(error, path)` for writes
 
-### Modifying TOML Structure
+## Acceptance Checklist
 
-Always use `toml_edit::DocumentMut` to preserve comments and formatting. See `document_writer.rs` for patterns.
+After every TV task:
+1. `just fmt` (auto-fixes style)
+2. `just review` (runs tv-check + tv-clippy + tv-test)
+3. Commit with detailed description
