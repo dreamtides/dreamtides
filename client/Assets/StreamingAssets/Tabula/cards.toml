@@ -44,7 +44,7 @@ image-number = 2269064817
 rarity = "Rare"
 art-owned = true
 card-number = 3
-resonance = ["Ruin"]
+resonance = ["Ruin", "Tide"]
 variables = ""
 
 [[cards]]
@@ -3873,3 +3873,7 @@ width = 200
 [[metadata.columns]]
 key = "rarity"
 width = 125
+
+[[metadata.columns]]
+key = "resonance"
+width = 150

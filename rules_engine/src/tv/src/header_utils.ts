@@ -24,6 +24,33 @@ export function formatHeaderForDisplay(key: string): string {
     .join(" ");
 }
 
+/**
+ * Finds all header indices that match a column config key.
+ *
+ * If the key matches a header exactly, returns that single index.
+ * Otherwise, checks if any headers are array expansions of the key
+ * (e.g., key "resonance" matches "resonance[0]", "resonance[1]", etc.).
+ */
+export function findMatchingHeaderIndices(
+  headers: string[],
+  configKey: string,
+): number[] {
+  const exactIndex = headers.indexOf(configKey);
+  if (exactIndex !== -1) {
+    return [exactIndex];
+  }
+
+  // Check for array column matches: configKey "resonance" matches "resonance[N]"
+  const prefix = configKey + "[";
+  const indices: number[] = [];
+  for (let i = 0; i < headers.length; i++) {
+    if (headers[i].startsWith(prefix) && headers[i].endsWith("]")) {
+      indices.push(i);
+    }
+  }
+  return indices;
+}
+
 export function getColumnLetter(index: number): string {
   let result = "";
   let n = index;

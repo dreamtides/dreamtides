@@ -12,7 +12,10 @@ import type {
   ColumnConfig,
 } from "./ipc_bridge";
 import type { MultiSheetData } from "./spreadsheet_types";
-import { formatHeaderForDisplay } from "./header_utils";
+import {
+  formatHeaderForDisplay,
+  findMatchingHeaderIndices,
+} from "./header_utils";
 import { buildColumnMapping, type ColumnMapping } from "./derived_column_utils";
 import { stringToDocumentData } from "./sheet_data_utils";
 import { createLogger } from "./logger_frontend";
@@ -128,9 +131,11 @@ export function buildMultiSheetWorkbook(
     if (sheetColumnConfigs) {
       for (const colConfig of sheetColumnConfigs) {
         if (colConfig.bold) {
-          const headerIndex = sheetData.data.headers.indexOf(colConfig.key);
-          if (headerIndex !== -1) {
-            boldColumnIndices.add(headerIndex);
+          for (const idx of findMatchingHeaderIndices(
+            sheetData.data.headers,
+            colConfig.key,
+          )) {
+            boldColumnIndices.add(idx);
           }
         }
       }
@@ -190,11 +195,15 @@ export function buildMultiSheetWorkbook(
     // Apply persisted column widths from metadata
     if (sheetColumnConfigs) {
       for (const colConfig of sheetColumnConfigs) {
-        const headerIndex = sheetData.data.headers.indexOf(colConfig.key);
-        if (headerIndex !== -1 && colConfig.width && colConfig.width !== 100) {
-          columnData[mapping.dataToVisual[headerIndex]] = {
-            w: colConfig.width,
-          };
+        if (colConfig.width && colConfig.width !== 100) {
+          for (const headerIndex of findMatchingHeaderIndices(
+            sheetData.data.headers,
+            colConfig.key,
+          )) {
+            columnData[mapping.dataToVisual[headerIndex]] = {
+              w: colConfig.width,
+            };
+          }
         }
       }
     }
@@ -245,8 +254,10 @@ export function buildMultiSheetWorkbook(
     if (sheetColumnConfigs) {
       for (const colConfig of sheetColumnConfigs) {
         if (colConfig.frozen) {
-          const headerIndex = sheetData.data.headers.indexOf(colConfig.key);
-          if (headerIndex !== -1) {
+          for (const headerIndex of findMatchingHeaderIndices(
+            sheetData.data.headers,
+            colConfig.key,
+          )) {
             frozenColumns = Math.max(
               frozenColumns,
               mapping.dataToVisual[headerIndex] + 1,
