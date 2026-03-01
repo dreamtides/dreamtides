@@ -2,10 +2,10 @@
   {
     "card_number": 1,
     "resonance": [
-      "Ruin",
-      "Stone"
+      "Ruin"
     ],
     "tags": [
+      "archetype:bedrock",
       "tribal:ancient",
       "mechanic:reclaim",
       "role:finisher"
@@ -21,17 +21,22 @@
   },
   {
     "card_number": 3,
-    "resonance": [],
+    "resonance": [
+      "Ruin"
+    ],
     "tags": [
+      "archetype:bedrock",
+      "archetype:eclipse",
       "mechanic:void"
     ]
   },
   {
     "card_number": 4,
     "resonance": [
-      "Ember"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:eclipse",
       "mechanic:discard",
       "mechanic:draw",
       "role:engine"
@@ -39,21 +44,21 @@
   },
   {
     "card_number": 5,
-    "resonance": [
-      "Ruin"
-    ],
+    "resonance": [],
     "tags": [
       "mechanic:discard",
       "mechanic:draw",
-      "mechanic:reclaim"
+      "mechanic:reclaim",
+      "role:engine"
     ]
   },
   {
     "card_number": 6,
     "resonance": [
-      "Tide"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:eclipse",
       "tribal:explorer",
       "mechanic:discard"
     ]
@@ -61,9 +66,10 @@
   {
     "card_number": 7,
     "resonance": [
-      "Ember"
+      "Ruin"
     ],
     "tags": [
+      "archetype:eclipse",
       "mechanic:discard",
       "mechanic:draw",
       "role:engine"
@@ -72,9 +78,11 @@
   {
     "card_number": 8,
     "resonance": [
-      "Tide"
+      "Ruin"
     ],
     "tags": [
+      "archetype:eclipse",
+      "archetype:bedrock",
       "tribal:explorer",
       "mechanic:discard",
       "mechanic:reclaim"
@@ -83,9 +91,10 @@
   {
     "card_number": 9,
     "resonance": [
-      "Tide"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:gale",
       "mechanic:foresee",
       "role:engine"
     ]
@@ -93,10 +102,11 @@
   {
     "card_number": 10,
     "resonance": [
-      "Ruin",
-      "Stone"
+      "Ruin"
     ],
     "tags": [
+      "archetype:bedrock",
+      "archetype:cinder",
       "tribal:ancient",
       "mechanic:reclaim",
       "role:finisher"
@@ -104,33 +114,38 @@
   },
   {
     "card_number": 11,
-    "resonance": [],
+    "resonance": [
+      "Ruin"
+    ],
     "tags": [
+      "archetype:eclipse",
       "mechanic:discard"
     ]
   },
   {
     "card_number": 12,
     "resonance": [
-      "Ember"
+      "Stone"
     ],
     "tags": [
+      "archetype:crucible",
       "tribal:warrior"
     ]
   },
   {
     "card_number": 13,
-    "resonance": [
-      "Ruin"
-    ],
+    "resonance": [],
     "tags": [
       "tribal:survivor"
     ]
   },
   {
     "card_number": 14,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
+      "archetype:tempest",
       "mechanic:dissolve",
       "role:removal"
     ]
@@ -138,9 +153,11 @@
   {
     "card_number": 15,
     "resonance": [
-      "Stone"
+      "Ruin"
     ],
     "tags": [
+      "archetype:eclipse",
+      "archetype:bedrock",
       "tribal:ancient"
     ]
   },
@@ -150,17 +167,21 @@
       "Ember"
     ],
     "tags": [
+      "archetype:cinder",
       "tribal:warrior",
       "mechanic:banish",
-      "mechanic:dissolve"
+      "mechanic:dissolve",
+      "mechanic:void",
+      "role:removal"
     ]
   },
   {
     "card_number": 17,
     "resonance": [
-      "Ember"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:eclipse",
       "mechanic:discard",
       "mechanic:draw",
       "role:engine"
@@ -168,8 +189,12 @@
   },
   {
     "card_number": 18,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
+      "archetype:cinder",
+      "archetype:depths",
       "mechanic:dissolve",
       "role:removal"
     ]
@@ -177,9 +202,10 @@
   {
     "card_number": 19,
     "resonance": [
-      "Ember"
+      "Ruin"
     ],
     "tags": [
+      "archetype:eclipse",
       "mechanic:discard",
       "mechanic:kindle"
     ]
@@ -187,9 +213,10 @@
   {
     "card_number": 20,
     "resonance": [
-      "Zephyr"
+      "Tide"
     ],
     "tags": [
+      "archetype:tempest",
       "tribal:visitor",
       "mechanic:draw",
       "role:engine"
@@ -198,9 +225,10 @@
   {
     "card_number": 21,
     "resonance": [
-      "Tide"
+      "Ruin"
     ],
     "tags": [
+      "archetype:bedrock",
       "tribal:explorer",
       "mechanic:void"
     ]
@@ -208,9 +236,10 @@
   {
     "card_number": 22,
     "resonance": [
-      "Tide"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:eclipse",
       "mechanic:discard",
       "mechanic:draw",
       "role:engine"
@@ -222,6 +251,8 @@
       "Tide"
     ],
     "tags": [
+      "archetype:undertow",
+      "archetype:bedrock",
       "mechanic:draw",
       "mechanic:void",
       "role:engine"
@@ -230,9 +261,10 @@
   {
     "card_number": 24,
     "resonance": [
-      "Zephyr"
+      "Ember"
     ],
     "tags": [
+      "archetype:gale",
       "mechanic:dissolve",
       "role:removal"
     ]
@@ -243,17 +275,21 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:eclipse",
       "tribal:survivor",
       "mechanic:discard",
-      "mechanic:dissolve"
+      "mechanic:dissolve",
+      "mechanic:spark",
+      "role:removal"
     ]
   },
   {
     "card_number": 26,
     "resonance": [
-      "Zephyr"
+      "Ruin"
     ],
     "tags": [
+      "archetype:eclipse",
       "tribal:visitor",
       "mechanic:discard",
       "mechanic:kindle"
@@ -262,33 +298,37 @@
   {
     "card_number": 27,
     "resonance": [
-      "Ruin",
-      "Stone"
+      "Ruin"
     ],
     "tags": [
+      "archetype:bedrock",
       "tribal:ancient",
       "mechanic:banish",
-      "mechanic:reclaim"
+      "mechanic:reclaim",
+      "mechanic:void",
+      "role:finisher"
     ]
   },
   {
     "card_number": 28,
     "resonance": [
-      "Ruin"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:eclipse",
       "mechanic:discard",
       "mechanic:draw",
-      "mechanic:reclaim"
+      "mechanic:reclaim",
+      "role:engine"
     ]
   },
   {
     "card_number": 29,
     "resonance": [
-      "Ruin",
-      "Stone"
+      "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
       "tribal:ancient",
       "mechanic:spark",
       "mechanic:void"
@@ -296,9 +336,7 @@
   },
   {
     "card_number": 30,
-    "resonance": [
-      "Ember"
-    ],
+    "resonance": [],
     "tags": [
       "tribal:warrior"
     ]
@@ -306,9 +344,11 @@
   {
     "card_number": 31,
     "resonance": [
-      "Stone"
+      "Ember"
     ],
     "tags": [
+      "archetype:crucible",
+      "archetype:cinder",
       "tribal:ancient",
       "mechanic:discover",
       "role:engine"
@@ -317,9 +357,10 @@
   {
     "card_number": 32,
     "resonance": [
-      "Ember"
+      "Tide"
     ],
     "tags": [
+      "archetype:mirage",
       "tribal:warrior",
       "mechanic:draw",
       "role:engine"
@@ -328,12 +369,14 @@
   {
     "card_number": 33,
     "resonance": [
-      "Zephyr"
+      "Tide"
     ],
     "tags": [
+      "archetype:depths",
       "tribal:synth",
       "mechanic:dissolve",
-      "mechanic:prevent"
+      "mechanic:prevent",
+      "role:removal"
     ]
   },
   {
@@ -342,6 +385,7 @@
       "Stone"
     ],
     "tags": [
+      "archetype:crucible",
       "tribal:warrior",
       "mechanic:spark"
     ]
@@ -349,19 +393,20 @@
   {
     "card_number": 35,
     "resonance": [
-      "Zephyr"
+      "Ember"
     ],
     "tags": [
+      "archetype:crucible",
       "mechanic:spark"
     ]
   },
   {
     "card_number": 36,
     "resonance": [
-      "Ember",
       "Stone"
     ],
     "tags": [
+      "archetype:crucible",
       "tribal:warrior",
       "mechanic:spark"
     ]
@@ -369,9 +414,11 @@
   {
     "card_number": 37,
     "resonance": [
-      "Tide"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:mirage",
+      "archetype:basalt",
       "tribal:explorer",
       "mechanic:draw",
       "role:engine"
@@ -387,8 +434,11 @@
   },
   {
     "card_number": 39,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
+      "archetype:crucible",
       "mechanic:banish",
       "role:removal"
     ]
@@ -396,9 +446,10 @@
   {
     "card_number": 40,
     "resonance": [
-      "Zephyr"
+      "Ember"
     ],
     "tags": [
+      "archetype:gale",
       "mechanic:dissolve",
       "mechanic:spark",
       "role:removal"
@@ -406,16 +457,22 @@
   },
   {
     "card_number": 41,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
+      "archetype:crucible",
       "mechanic:dissolve",
       "role:removal"
     ]
   },
   {
     "card_number": 42,
-    "resonance": [],
+    "resonance": [
+      "Stone"
+    ],
     "tags": [
+      "archetype:crucible",
       "mechanic:discover",
       "role:engine"
     ]
@@ -423,59 +480,70 @@
   {
     "card_number": 43,
     "resonance": [
-      "Ember"
+      "Ruin"
     ],
     "tags": [
+      "archetype:bedrock",
+      "archetype:crucible",
       "tribal:warrior",
       "mechanic:banish",
-      "mechanic:reclaim"
+      "mechanic:reclaim",
+      "mechanic:void"
     ]
   },
   {
     "card_number": 44,
     "resonance": [
-      "Ember",
-      "Stone"
+      "Ember"
     ],
     "tags": [
+      "archetype:crucible",
+      "archetype:cinder",
       "tribal:warrior",
       "mechanic:draw",
-      "mechanic:spark"
+      "mechanic:spark",
+      "role:engine"
     ]
   },
   {
     "card_number": 45,
     "resonance": [
-      "Ember"
+      "Stone"
     ],
     "tags": [
+      "archetype:crucible",
       "tribal:warrior"
     ]
   },
   {
     "card_number": 46,
     "resonance": [
-      "Ember"
+      "Stone"
     ],
     "tags": [
+      "archetype:crucible",
+      "archetype:basalt",
       "tribal:warrior"
     ]
   },
   {
     "card_number": 47,
     "resonance": [
-      "Ember"
+      "Stone"
     ],
     "tags": [
+      "archetype:crucible",
+      "archetype:basalt",
       "tribal:warrior"
     ]
   },
   {
     "card_number": 48,
     "resonance": [
-      "Ember"
+      "Stone"
     ],
     "tags": [
+      "archetype:crucible",
       "tribal:warrior",
       "mechanic:draw",
       "role:engine"
@@ -487,27 +555,30 @@
       "Ember"
     ],
     "tags": [
+      "archetype:cinder",
       "tribal:warrior",
       "mechanic:discard",
-      "mechanic:draw"
+      "mechanic:draw",
+      "role:engine"
     ]
   },
   {
     "card_number": 50,
     "resonance": [
-      "Ember"
+      "Tide"
     ],
     "tags": [
+      "archetype:depths",
       "tribal:warrior"
     ]
   },
   {
     "card_number": 51,
     "resonance": [
-      "Ember",
       "Stone"
     ],
     "tags": [
+      "archetype:crucible",
       "tribal:warrior",
       "mechanic:spark"
     ]
@@ -515,38 +586,46 @@
   {
     "card_number": 52,
     "resonance": [
-      "Ember"
+      "Stone"
     ],
     "tags": [
+      "archetype:crucible",
       "tribal:warrior",
       "mechanic:banish",
-      "mechanic:kindle"
+      "mechanic:kindle",
+      "mechanic:void",
+      "role:removal"
     ]
   },
   {
     "card_number": 53,
     "resonance": [
-      "Tide"
+      "Stone"
     ],
     "tags": [
+      "archetype:depths",
       "tribal:mage"
     ]
   },
   {
     "card_number": 54,
     "resonance": [
-      "Ember"
+      "Stone"
     ],
     "tags": [
+      "archetype:crucible",
+      "archetype:depths",
       "tribal:warrior"
     ]
   },
   {
     "card_number": 55,
     "resonance": [
-      "Ember"
+      "Tide"
     ],
     "tags": [
+      "archetype:mirage",
+      "archetype:crucible",
       "tribal:warrior",
       "mechanic:draw",
       "role:engine"
@@ -555,9 +634,11 @@
   {
     "card_number": 56,
     "resonance": [
-      "Stone"
+      "Ember"
     ],
     "tags": [
+      "archetype:crucible",
+      "archetype:cinder",
       "tribal:warrior",
       "mechanic:spark"
     ]
@@ -565,10 +646,10 @@
   {
     "card_number": 57,
     "resonance": [
-      "Ember",
       "Stone"
     ],
     "tags": [
+      "archetype:crucible",
       "tribal:warrior",
       "mechanic:spark"
     ]
@@ -576,9 +657,10 @@
   {
     "card_number": 58,
     "resonance": [
-      "Tide"
+      "Stone"
     ],
     "tags": [
+      "archetype:crucible",
       "tribal:mage",
       "mechanic:draw",
       "role:engine"
@@ -587,9 +669,11 @@
   {
     "card_number": 59,
     "resonance": [
-      "Tide"
+      "Stone"
     ],
     "tags": [
+      "archetype:crucible",
+      "archetype:bedrock",
       "tribal:mage",
       "mechanic:reclaim"
     ]
@@ -597,9 +681,10 @@
   {
     "card_number": 60,
     "resonance": [
-      "Zephyr"
+      "Tide"
     ],
     "tags": [
+      "archetype:depths",
       "mechanic:prevent",
       "role:removal"
     ]
@@ -607,9 +692,10 @@
   {
     "card_number": 61,
     "resonance": [
-      "Zephyr"
+      "Tide"
     ],
     "tags": [
+      "archetype:depths",
       "mechanic:banish",
       "mechanic:prevent",
       "role:removal"
@@ -618,33 +704,42 @@
   {
     "card_number": 62,
     "resonance": [
-      "Zephyr"
+      "Tide"
     ],
     "tags": [
+      "archetype:depths",
       "mechanic:prevent",
       "role:removal"
     ]
   },
   {
     "card_number": 63,
-    "resonance": [],
+    "resonance": [
+      "Stone"
+    ],
     "tags": [
+      "archetype:depths",
       "mechanic:discard"
     ]
   },
   {
     "card_number": 64,
-    "resonance": [],
+    "resonance": [
+      "Stone"
+    ],
     "tags": [
+      "archetype:depths",
       "mechanic:discard"
     ]
   },
   {
     "card_number": 65,
     "resonance": [
-      "Zephyr"
+      "Ember"
     ],
     "tags": [
+      "archetype:gale",
+      "archetype:depths",
       "mechanic:banish",
       "mechanic:dissolve",
       "role:removal"
@@ -653,9 +748,10 @@
   {
     "card_number": 66,
     "resonance": [
-      "Zephyr"
+      "Ember"
     ],
     "tags": [
+      "archetype:gale",
       "mechanic:dissolve",
       "role:removal"
     ]
@@ -663,9 +759,11 @@
   {
     "card_number": 67,
     "resonance": [
-      "Zephyr"
+      "Tide"
     ],
     "tags": [
+      "archetype:depths",
+      "archetype:gale",
       "mechanic:prevent",
       "role:removal"
     ]
@@ -676,17 +774,22 @@
       "Tide"
     ],
     "tags": [
+      "archetype:tempest",
+      "archetype:undertow",
       "mechanic:draw",
       "mechanic:foresee",
-      "mechanic:reclaim"
+      "mechanic:reclaim",
+      "role:engine"
     ]
   },
   {
     "card_number": 69,
     "resonance": [
-      "Ruin"
+      "Ember"
     ],
     "tags": [
+      "archetype:gale",
+      "archetype:cinder",
       "mechanic:discard",
       "mechanic:dissolve",
       "role:removal"
@@ -695,9 +798,10 @@
   {
     "card_number": 70,
     "resonance": [
-      "Zephyr"
+      "Tide"
     ],
     "tags": [
+      "archetype:depths",
       "tribal:synth",
       "mechanic:prevent",
       "role:removal"
@@ -706,19 +810,21 @@
   {
     "card_number": 71,
     "resonance": [
-      "Stone"
+      "Tide"
     ],
     "tags": [
+      "archetype:mirage",
+      "archetype:depths",
       "tribal:ancient"
     ]
   },
   {
     "card_number": 72,
     "resonance": [
-      "Ruin",
-      "Stone"
+      "Ember"
     ],
     "tags": [
+      "archetype:cinder",
       "tribal:ancient",
       "mechanic:dissolve",
       "role:removal"
@@ -730,24 +836,25 @@
       "Zephyr"
     ],
     "tags": [
+      "archetype:gale",
       "tribal:visitor"
     ]
   },
   {
     "card_number": 74,
     "resonance": [
-      "Tide"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:mirage",
+      "archetype:gale",
       "mechanic:foresee",
       "role:engine"
     ]
   },
   {
     "card_number": 75,
-    "resonance": [
-      "Ember"
-    ],
+    "resonance": [],
     "tags": [
       "mechanic:draw",
       "role:engine"
@@ -756,21 +863,23 @@
   {
     "card_number": 76,
     "resonance": [
-      "Ember",
-      "Tide"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:gale",
       "tribal:musician",
       "mechanic:draw",
-      "mechanic:fast"
+      "mechanic:fast",
+      "role:engine"
     ]
   },
   {
     "card_number": 77,
     "resonance": [
-      "Tide"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:gale",
       "tribal:musician",
       "mechanic:fast",
       "mechanic:spark"
@@ -779,9 +888,10 @@
   {
     "card_number": 78,
     "resonance": [
-      "Tide"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:gale",
       "tribal:musician",
       "mechanic:fast"
     ]
@@ -792,6 +902,8 @@
       "Stone"
     ],
     "tags": [
+      "archetype:depths",
+      "archetype:bedrock",
       "tribal:ancient",
       "mechanic:draw",
       "role:engine"
@@ -800,9 +912,11 @@
   {
     "card_number": 80,
     "resonance": [
-      "Ember"
+      "Stone"
     ],
     "tags": [
+      "archetype:depths",
+      "archetype:bedrock",
       "tribal:musician"
     ]
   },
@@ -812,6 +926,8 @@
       "Zephyr"
     ],
     "tags": [
+      "archetype:gale",
+      "archetype:mirage",
       "tribal:visitor",
       "mechanic:fast"
     ]
@@ -819,9 +935,11 @@
   {
     "card_number": 82,
     "resonance": [
-      "Tide"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:gale",
+      "archetype:eclipse",
       "mechanic:discard",
       "mechanic:draw",
       "role:engine"
@@ -830,17 +948,16 @@
   {
     "card_number": 83,
     "resonance": [
-      "Ruin"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:gale",
       "tribal:outsider"
     ]
   },
   {
     "card_number": 84,
-    "resonance": [
-      "Zephyr"
-    ],
+    "resonance": [],
     "tags": [
       "tribal:visitor"
     ]
@@ -851,6 +968,7 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
       "tribal:survivor",
       "mechanic:reclaim",
       "mechanic:void"
@@ -862,9 +980,12 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
       "tribal:survivor",
       "mechanic:draw",
-      "mechanic:reclaim"
+      "mechanic:reclaim",
+      "mechanic:void",
+      "role:engine"
     ]
   },
   {
@@ -873,15 +994,15 @@
       "Tide"
     ],
     "tags": [
+      "archetype:tempest",
+      "archetype:mirage",
       "mechanic:draw",
       "role:engine"
     ]
   },
   {
     "card_number": 88,
-    "resonance": [
-      "Tide"
-    ],
+    "resonance": [],
     "tags": [
       "mechanic:draw",
       "role:engine"
@@ -893,46 +1014,60 @@
       "Zephyr"
     ],
     "tags": [
+      "archetype:gale",
       "tribal:visitor",
       "mechanic:discover",
-      "mechanic:fast"
+      "mechanic:fast",
+      "role:engine"
     ]
   },
   {
     "card_number": 90,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
-      "mechanic:event"
+      "archetype:tempest"
     ]
   },
   {
     "card_number": 91,
-    "resonance": [],
+    "resonance": [
+      "Tide"
+    ],
     "tags": [
+      "archetype:tempest",
       "mechanic:draw",
       "role:engine"
     ]
   },
   {
     "card_number": 92,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
+      "archetype:tempest",
       "mechanic:copy"
     ]
   },
   {
     "card_number": 93,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
+      "archetype:tempest",
       "mechanic:copy"
     ]
   },
   {
     "card_number": 94,
     "resonance": [
-      "Zephyr"
+      "Ember"
     ],
     "tags": [
+      "archetype:tempest",
       "mechanic:copy",
       "mechanic:reclaim"
     ]
@@ -943,6 +1078,9 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
+      "archetype:eclipse",
+      "archetype:bedrock",
       "mechanic:reclaim",
       "mechanic:void"
     ]
@@ -950,9 +1088,10 @@
   {
     "card_number": 96,
     "resonance": [
-      "Tide"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:eclipse",
       "mechanic:discard",
       "mechanic:draw",
       "role:engine"
@@ -960,8 +1099,11 @@
   },
   {
     "card_number": 97,
-    "resonance": [],
+    "resonance": [
+      "Tide"
+    ],
     "tags": [
+      "archetype:tempest",
       "mechanic:draw",
       "role:engine"
     ]
@@ -969,79 +1111,99 @@
   {
     "card_number": 98,
     "resonance": [
-      "Ruin"
+      "Tide"
     ],
     "tags": [
+      "archetype:tempest",
+      "archetype:bedrock",
       "mechanic:reclaim",
       "mechanic:void"
     ]
   },
   {
     "card_number": 99,
-    "resonance": [],
+    "resonance": [
+      "Stone"
+    ],
     "tags": [
-      "mechanic:event"
+      "archetype:crucible",
+      "archetype:basalt"
     ]
   },
   {
     "card_number": 100,
-    "resonance": [],
+    "resonance": [
+      "Tide"
+    ],
     "tags": [
-      "mechanic:event"
+      "archetype:tempest"
     ]
   },
   {
     "card_number": 101,
     "resonance": [
-      "Zephyr"
+      "Tide"
     ],
     "tags": [
+      "archetype:tempest",
       "tribal:visitor"
     ]
   },
   {
     "card_number": 102,
     "resonance": [
-      "Zephyr"
+      "Stone"
     ],
     "tags": [
+      "archetype:depths",
+      "archetype:basalt",
       "tribal:visitor"
     ]
   },
   {
     "card_number": 103,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
-      "mechanic:event"
+      "archetype:tempest"
     ]
   },
   {
     "card_number": 104,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
-      "mechanic:event"
+      "archetype:tempest"
     ]
   },
   {
     "card_number": 105,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
-      "mechanic:event"
+      "archetype:tempest"
     ]
   },
   {
     "card_number": 106,
-    "resonance": [],
+    "resonance": [
+      "Tide"
+    ],
     "tags": [
+      "archetype:tempest",
+      "archetype:mirage",
+      "archetype:undertow",
+      "archetype:depths",
       "mechanic:draw",
       "role:engine"
     ]
   },
   {
     "card_number": 107,
-    "resonance": [
-      "Tide"
-    ],
+    "resonance": [],
     "tags": [
       "mechanic:discard",
       "mechanic:draw",
@@ -1051,9 +1213,10 @@
   {
     "card_number": 108,
     "resonance": [
-      "Ruin"
+      "Ember"
     ],
     "tags": [
+      "archetype:tempest",
       "tribal:outsider",
       "mechanic:copy"
     ]
@@ -1074,9 +1237,11 @@
   },
   {
     "card_number": 111,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
-      "mechanic:event"
+      "archetype:cinder"
     ]
   },
   {
@@ -1085,6 +1250,7 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
       "mechanic:dissolve",
       "mechanic:void",
       "role:removal"
@@ -1104,6 +1270,8 @@
       "Tide"
     ],
     "tags": [
+      "archetype:undertow",
+      "archetype:tempest",
       "mechanic:draw",
       "mechanic:void",
       "role:engine"
@@ -1112,9 +1280,10 @@
   {
     "card_number": 115,
     "resonance": [
-      "Zephyr"
+      "Tide"
     ],
     "tags": [
+      "archetype:depths",
       "mechanic:fast",
       "mechanic:prevent",
       "role:removal"
@@ -1122,8 +1291,11 @@
   },
   {
     "card_number": 116,
-    "resonance": [],
+    "resonance": [
+      "Tide"
+    ],
     "tags": [
+      "archetype:tempest",
       "mechanic:discover",
       "role:engine"
     ]
@@ -1131,9 +1303,10 @@
   {
     "card_number": 117,
     "resonance": [
-      "Tide"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:eclipse",
       "mechanic:discard",
       "mechanic:draw",
       "role:engine"
@@ -1142,17 +1315,21 @@
   {
     "card_number": 118,
     "resonance": [
-      "Ember"
+      "Tide"
     ],
     "tags": [
+      "archetype:tempest",
       "mechanic:foresee",
       "role:engine"
     ]
   },
   {
     "card_number": 119,
-    "resonance": [],
+    "resonance": [
+      "Tide"
+    ],
     "tags": [
+      "archetype:depths",
       "mechanic:prevent",
       "role:removal"
     ]
@@ -1160,10 +1337,10 @@
   {
     "card_number": 120,
     "resonance": [
-      "Ruin",
-      "Stone"
+      "Ember"
     ],
     "tags": [
+      "archetype:tempest",
       "tribal:ancient",
       "mechanic:spark",
       "mechanic:void"
@@ -1172,23 +1349,32 @@
   {
     "card_number": 121,
     "resonance": [
-      "Tide"
+      "Stone"
     ],
     "tags": [
+      "archetype:depths",
+      "archetype:basalt",
+      "archetype:bedrock",
       "tribal:explorer"
     ]
   },
   {
     "card_number": 122,
-    "resonance": [],
+    "resonance": [
+      "Zephyr"
+    ],
     "tags": [
-      "mechanic:general"
+      "archetype:basalt"
     ]
   },
   {
     "card_number": 123,
-    "resonance": [],
+    "resonance": [
+      "Tide"
+    ],
     "tags": [
+      "archetype:tempest",
+      "archetype:mirage",
       "mechanic:draw",
       "role:engine"
     ]
@@ -1199,6 +1385,7 @@
       "Stone"
     ],
     "tags": [
+      "archetype:basalt",
       "tribal:spirit-animal"
     ]
   },
@@ -1208,6 +1395,8 @@
       "Stone"
     ],
     "tags": [
+      "archetype:basalt",
+      "archetype:mirage",
       "tribal:spirit-animal"
     ]
   },
@@ -1217,15 +1406,18 @@
       "Zephyr"
     ],
     "tags": [
+      "archetype:mirage",
+      "archetype:gale",
       "tribal:explorer"
     ]
   },
   {
     "card_number": 127,
     "resonance": [
-      "Stone"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:basalt",
       "tribal:spirit-animal"
     ]
   },
@@ -1235,6 +1427,7 @@
       "Stone"
     ],
     "tags": [
+      "archetype:basalt",
       "tribal:spirit-animal"
     ]
   },
@@ -1244,6 +1437,7 @@
       "Stone"
     ],
     "tags": [
+      "archetype:basalt",
       "tribal:spirit-animal"
     ]
   },
@@ -1253,29 +1447,37 @@
       "Stone"
     ],
     "tags": [
+      "archetype:basalt",
       "tribal:spirit-animal"
     ]
   },
   {
     "card_number": 131,
-    "resonance": [],
+    "resonance": [
+      "Zephyr"
+    ],
     "tags": [
+      "archetype:basalt",
       "mechanic:spark"
     ]
   },
   {
     "card_number": 132,
     "resonance": [
-      "Stone"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:basalt",
       "tribal:spirit-animal"
     ]
   },
   {
     "card_number": 133,
-    "resonance": [],
+    "resonance": [
+      "Zephyr"
+    ],
     "tags": [
+      "archetype:mirage",
       "mechanic:draw",
       "role:engine"
     ]
@@ -1286,6 +1488,8 @@
       "Zephyr"
     ],
     "tags": [
+      "archetype:mirage",
+      "archetype:basalt",
       "tribal:visitor",
       "mechanic:spark"
     ]
@@ -1293,9 +1497,10 @@
   {
     "card_number": 135,
     "resonance": [
-      "Stone"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:basalt",
       "tribal:spirit-animal",
       "mechanic:draw",
       "role:engine"
@@ -1304,9 +1509,10 @@
   {
     "card_number": 136,
     "resonance": [
-      "Stone"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:basalt",
       "tribal:spirit-animal",
       "mechanic:spark"
     ]
@@ -1314,9 +1520,10 @@
   {
     "card_number": 137,
     "resonance": [
-      "Stone"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:basalt",
       "tribal:spirit-animal",
       "mechanic:spark"
     ]
@@ -1324,9 +1531,10 @@
   {
     "card_number": 138,
     "resonance": [
-      "Ember"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:basalt",
       "tribal:spirit-animal",
       "mechanic:kindle"
     ]
@@ -1334,9 +1542,11 @@
   {
     "card_number": 139,
     "resonance": [
-      "Stone"
+      "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
+      "archetype:bedrock",
       "tribal:spirit-animal",
       "mechanic:void"
     ]
@@ -1344,9 +1554,11 @@
   {
     "card_number": 140,
     "resonance": [
-      "Stone"
+      "Tide"
     ],
     "tags": [
+      "archetype:basalt",
+      "archetype:mirage",
       "tribal:spirit-animal",
       "mechanic:draw",
       "role:engine"
@@ -1358,6 +1570,7 @@
       "Stone"
     ],
     "tags": [
+      "archetype:basalt",
       "tribal:spirit-animal"
     ]
   },
@@ -1367,15 +1580,18 @@
       "Stone"
     ],
     "tags": [
+      "archetype:basalt",
+      "archetype:depths",
       "tribal:spirit-animal"
     ]
   },
   {
     "card_number": 143,
     "resonance": [
-      "Stone"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:basalt",
       "tribal:spirit-animal"
     ]
   },
@@ -1385,9 +1601,11 @@
       "Zephyr"
     ],
     "tags": [
+      "archetype:gale",
       "tribal:spirit-animal",
       "mechanic:banish",
-      "mechanic:void"
+      "mechanic:void",
+      "role:removal"
     ]
   },
   {
@@ -1396,6 +1614,7 @@
       "Zephyr"
     ],
     "tags": [
+      "archetype:basalt",
       "tribal:visitor",
       "mechanic:draw",
       "role:engine"
@@ -1404,9 +1623,10 @@
   {
     "card_number": 146,
     "resonance": [
-      "Stone"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:basalt",
       "tribal:spirit-animal",
       "mechanic:spark"
     ]
@@ -1417,6 +1637,7 @@
       "Zephyr"
     ],
     "tags": [
+      "archetype:mirage",
       "mechanic:banish",
       "role:removal"
     ]
@@ -1424,12 +1645,14 @@
   {
     "card_number": 148,
     "resonance": [
-      "Tide"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:mirage",
       "tribal:mage",
       "mechanic:banish",
-      "mechanic:spark"
+      "mechanic:spark",
+      "role:removal"
     ]
   },
   {
@@ -1438,6 +1661,8 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
+      "archetype:bedrock",
       "tribal:survivor",
       "mechanic:reclaim",
       "mechanic:void"
@@ -1446,9 +1671,10 @@
   {
     "card_number": 150,
     "resonance": [
-      "Stone"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:mirage",
       "tribal:ancient",
       "mechanic:banish",
       "role:removal"
@@ -1457,20 +1683,25 @@
   {
     "card_number": 151,
     "resonance": [
-      "Ruin"
+      "Tide"
     ],
     "tags": [
+      "archetype:depths",
+      "archetype:mirage",
       "tribal:outsider",
       "mechanic:discard",
-      "mechanic:draw"
+      "mechanic:draw",
+      "role:engine"
     ]
   },
   {
     "card_number": 152,
     "resonance": [
-      "Stone"
+      "Tide"
     ],
     "tags": [
+      "archetype:depths",
+      "archetype:mirage",
       "tribal:ancient",
       "mechanic:draw",
       "role:engine"
@@ -1479,9 +1710,10 @@
   {
     "card_number": 153,
     "resonance": [
-      "Ruin"
+      "Stone"
     ],
     "tags": [
+      "archetype:depths",
       "tribal:outsider",
       "mechanic:banish",
       "role:removal"
@@ -1493,6 +1725,7 @@
       "Zephyr"
     ],
     "tags": [
+      "archetype:mirage",
       "mechanic:banish",
       "mechanic:reclaim",
       "role:removal"
@@ -1501,18 +1734,24 @@
   {
     "card_number": 155,
     "resonance": [
-      "Zephyr"
+      "Ember"
     ],
     "tags": [
+      "archetype:gale",
+      "archetype:cinder",
       "tribal:visitor",
       "mechanic:fast",
-      "mechanic:prevent"
+      "mechanic:prevent",
+      "role:removal"
     ]
   },
   {
     "card_number": 156,
-    "resonance": [],
+    "resonance": [
+      "Tide"
+    ],
     "tags": [
+      "archetype:mirage",
       "mechanic:discover",
       "role:engine"
     ]
@@ -1523,6 +1762,7 @@
       "Zephyr"
     ],
     "tags": [
+      "archetype:mirage",
       "tribal:explorer",
       "mechanic:banish",
       "role:removal"
@@ -1534,39 +1774,45 @@
       "Tide"
     ],
     "tags": [
+      "archetype:mirage",
       "tribal:explorer",
       "mechanic:spark"
     ]
   },
   {
     "card_number": 159,
-    "resonance": [],
+    "resonance": [
+      "Stone"
+    ],
     "tags": [
+      "archetype:crucible",
+      "archetype:mirage",
       "mechanic:kindle"
     ]
   },
   {
     "card_number": 160,
-    "resonance": [],
+    "resonance": [
+      "Zephyr"
+    ],
     "tags": [
-      "mechanic:event"
+      "archetype:basalt"
     ]
   },
   {
     "card_number": 161,
     "resonance": [
-      "Zephyr"
+      "Tide"
     ],
     "tags": [
+      "archetype:depths",
       "mechanic:prevent",
       "role:removal"
     ]
   },
   {
     "card_number": 162,
-    "resonance": [
-      "Stone"
-    ],
+    "resonance": [],
     "tags": [
       "mechanic:dissolve",
       "mechanic:spark",
@@ -1575,9 +1821,7 @@
   },
   {
     "card_number": 163,
-    "resonance": [
-      "Ruin"
-    ],
+    "resonance": [],
     "tags": [
       "mechanic:dissolve",
       "mechanic:reclaim",
@@ -1586,9 +1830,7 @@
   },
   {
     "card_number": 164,
-    "resonance": [
-      "Stone"
-    ],
+    "resonance": [],
     "tags": [
       "mechanic:dissolve",
       "mechanic:spark",
@@ -1601,6 +1843,7 @@
       "Zephyr"
     ],
     "tags": [
+      "archetype:mirage",
       "tribal:explorer",
       "mechanic:banish",
       "role:removal"
@@ -1609,9 +1852,10 @@
   {
     "card_number": 166,
     "resonance": [
-      "Zephyr"
+      "Stone"
     ],
     "tags": [
+      "archetype:depths",
       "tribal:synth",
       "mechanic:banish",
       "role:removal"
@@ -1619,8 +1863,11 @@
   },
   {
     "card_number": 167,
-    "resonance": [],
+    "resonance": [
+      "Tide"
+    ],
     "tags": [
+      "archetype:mirage",
       "mechanic:banish",
       "role:removal"
     ]
@@ -1631,6 +1878,7 @@
       "Tide"
     ],
     "tags": [
+      "archetype:mirage",
       "tribal:explorer"
     ]
   },
@@ -1640,15 +1888,19 @@
       "Zephyr"
     ],
     "tags": [
+      "archetype:mirage",
+      "archetype:basalt",
       "tribal:synth",
       "mechanic:copy"
     ]
   },
   {
     "card_number": 170,
-    "resonance": [],
+    "resonance": [
+      "Tide"
+    ],
     "tags": [
-      "mechanic:event"
+      "archetype:mirage"
     ]
   },
   {
@@ -1657,6 +1909,7 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
       "tribal:survivor",
       "mechanic:void"
     ]
@@ -1664,10 +1917,10 @@
   {
     "card_number": 172,
     "resonance": [
-      "Ember",
       "Ruin"
     ],
     "tags": [
+      "archetype:eclipse",
       "tribal:survivor",
       "mechanic:discard",
       "mechanic:kindle"
@@ -1679,6 +1932,7 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
       "tribal:survivor",
       "mechanic:draw",
       "role:engine"
@@ -1690,6 +1944,7 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
       "tribal:survivor",
       "mechanic:kindle"
     ]
@@ -1697,9 +1952,10 @@
   {
     "card_number": 175,
     "resonance": [
-      "Tide"
+      "Ember"
     ],
     "tags": [
+      "archetype:cinder",
       "tribal:synth"
     ]
   },
@@ -1709,6 +1965,7 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
       "tribal:survivor",
       "mechanic:draw",
       "role:engine"
@@ -1720,6 +1977,8 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
+      "archetype:bedrock",
       "tribal:outsider",
       "mechanic:void"
     ]
@@ -1730,6 +1989,8 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:cinder",
+      "archetype:undertow",
       "tribal:survivor",
       "mechanic:draw",
       "role:engine"
@@ -1738,9 +1999,11 @@
   {
     "card_number": 179,
     "resonance": [
-      "Ruin"
+      "Zephyr"
     ],
     "tags": [
+      "archetype:gale",
+      "archetype:eclipse",
       "tribal:survivor"
     ]
   },
@@ -1750,6 +2013,8 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:cinder",
+      "archetype:undertow",
       "tribal:survivor",
       "mechanic:reclaim"
     ]
@@ -1757,9 +2022,10 @@
   {
     "card_number": 181,
     "resonance": [
-      "Stone"
+      "Ruin"
     ],
     "tags": [
+      "archetype:cinder",
       "tribal:ancient"
     ]
   },
@@ -1769,6 +2035,8 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
+      "archetype:cinder",
       "tribal:survivor"
     ]
   },
@@ -1778,6 +2046,7 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
       "tribal:survivor",
       "mechanic:reclaim",
       "mechanic:void"
@@ -1789,6 +2058,7 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
       "tribal:survivor",
       "mechanic:void"
     ]
@@ -1799,6 +2069,7 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:bedrock",
       "tribal:ancient",
       "mechanic:void",
       "role:finisher"
@@ -1810,6 +2081,7 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
       "tribal:survivor",
       "mechanic:spark",
       "mechanic:void"
@@ -1818,30 +2090,31 @@
   {
     "card_number": 187,
     "resonance": [
-      "Ruin"
+      "Ember"
     ],
     "tags": [
+      "archetype:cinder",
       "tribal:survivor",
       "mechanic:kindle"
     ]
   },
   {
     "card_number": 188,
-    "resonance": [
-      "Ruin"
-    ],
+    "resonance": [],
     "tags": [
       "tribal:survivor",
       "mechanic:banish",
-      "mechanic:void"
+      "mechanic:void",
+      "role:removal"
     ]
   },
   {
     "card_number": 189,
     "resonance": [
-      "Ruin"
+      "Ember"
     ],
     "tags": [
+      "archetype:cinder",
       "mechanic:dissolve",
       "mechanic:reclaim",
       "role:removal"
@@ -1853,6 +2126,7 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
       "tribal:survivor",
       "mechanic:void"
     ]
@@ -1863,14 +2137,18 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
       "tribal:survivor",
       "mechanic:reclaim"
     ]
   },
   {
     "card_number": 192,
-    "resonance": [],
+    "resonance": [
+      "Ruin"
+    ],
     "tags": [
+      "archetype:undertow",
       "mechanic:discover",
       "role:engine"
     ]
@@ -1881,6 +2159,7 @@
       "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
       "tribal:survivor",
       "mechanic:void"
     ]
@@ -1888,9 +2167,10 @@
   {
     "card_number": 194,
     "resonance": [
-      "Stone"
+      "Ember"
     ],
     "tags": [
+      "archetype:cinder",
       "tribal:ancient",
       "mechanic:spark"
     ]
@@ -1901,6 +2181,8 @@
       "Ember"
     ],
     "tags": [
+      "archetype:cinder",
+      "archetype:crucible",
       "tribal:warrior",
       "mechanic:dissolve",
       "role:removal"
@@ -1909,9 +2191,10 @@
   {
     "card_number": 196,
     "resonance": [
-      "Stone"
+      "Ember"
     ],
     "tags": [
+      "archetype:cinder",
       "tribal:ancient"
     ]
   },
@@ -1921,22 +2204,26 @@
       "Ember"
     ],
     "tags": [
-      "mechanic:general"
+      "archetype:cinder"
     ]
   },
   {
     "card_number": 198,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
+      "archetype:cinder",
       "mechanic:kindle"
     ]
   },
   {
     "card_number": 199,
     "resonance": [
-      "Ruin"
+      "Ember"
     ],
     "tags": [
+      "archetype:cinder",
       "tribal:survivor",
       "mechanic:void"
     ]
@@ -1944,30 +2231,34 @@
   {
     "card_number": 200,
     "resonance": [
-      "Ruin",
-      "Stone"
+      "Ember"
     ],
     "tags": [
+      "archetype:cinder",
       "tribal:ancient",
       "mechanic:dissolve",
-      "mechanic:spark"
+      "mechanic:spark",
+      "role:removal"
     ]
   },
   {
     "card_number": 201,
     "resonance": [
-      "Tide"
+      "Ruin"
     ],
     "tags": [
+      "archetype:cinder",
       "tribal:mage"
     ]
   },
   {
     "card_number": 202,
     "resonance": [
-      "Ruin"
+      "Ember"
     ],
     "tags": [
+      "archetype:cinder",
+      "archetype:crucible",
       "tribal:outsider",
       "mechanic:reclaim"
     ]
@@ -1975,9 +2266,11 @@
   {
     "card_number": 203,
     "resonance": [
-      "Tide"
+      "Stone"
     ],
     "tags": [
+      "archetype:basalt",
+      "archetype:mirage",
       "tribal:musician"
     ]
   },
@@ -1987,6 +2280,7 @@
       "Tide"
     ],
     "tags": [
+      "archetype:tempest",
       "tribal:mage"
     ]
   },
@@ -1999,9 +2293,7 @@
   },
   {
     "card_number": 206,
-    "resonance": [
-      "Zephyr"
-    ],
+    "resonance": [],
     "tags": [
       "tribal:visitor"
     ]
@@ -2009,9 +2301,10 @@
   {
     "card_number": 207,
     "resonance": [
-      "Tide"
+      "Ruin"
     ],
     "tags": [
+      "archetype:cinder",
       "tribal:synth",
       "mechanic:draw",
       "role:engine"
@@ -2020,9 +2313,10 @@
   {
     "card_number": 208,
     "resonance": [
-      "Ruin"
+      "Ember"
     ],
     "tags": [
+      "archetype:cinder",
       "tribal:outsider",
       "mechanic:draw",
       "role:engine"
@@ -2030,16 +2324,22 @@
   },
   {
     "card_number": 209,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
+      "archetype:cinder",
       "mechanic:draw",
       "role:engine"
     ]
   },
   {
     "card_number": 210,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
+      "archetype:cinder",
       "mechanic:discover",
       "role:engine"
     ]
@@ -2047,9 +2347,12 @@
   {
     "card_number": 211,
     "resonance": [
-      "Tide"
+      "Ruin"
     ],
     "tags": [
+      "archetype:undertow",
+      "archetype:eclipse",
+      "archetype:bedrock",
       "tribal:synth",
       "mechanic:reclaim",
       "mechanic:void"
@@ -2058,35 +2361,40 @@
   {
     "card_number": 212,
     "resonance": [
-      "Tide"
+      "Ember"
     ],
     "tags": [
+      "archetype:cinder",
       "mechanic:dissolve",
       "mechanic:draw",
-      "role:removal"
+      "role:removal",
+      "role:engine"
     ]
   },
   {
     "card_number": 213,
-    "resonance": [],
+    "resonance": [
+      "Ember"
+    ],
     "tags": [
+      "archetype:cinder",
+      "archetype:tempest",
       "mechanic:discard"
     ]
   },
   {
     "card_number": 214,
     "resonance": [
-      "Stone"
+      "Ruin"
     ],
     "tags": [
+      "archetype:cinder",
       "tribal:ancient"
     ]
   },
   {
     "card_number": 215,
-    "resonance": [
-      "Tide"
-    ],
+    "resonance": [],
     "tags": [
       "mechanic:draw",
       "role:engine"
@@ -2094,10 +2402,7 @@
   },
   {
     "card_number": 216,
-    "resonance": [
-      "Ember",
-      "Tide"
-    ],
+    "resonance": [],
     "tags": [
       "tribal:musician",
       "mechanic:draw",
@@ -2110,22 +2415,24 @@
       "Zephyr"
     ],
     "tags": [
+      "archetype:gale",
       "tribal:visitor",
       "mechanic:spark"
     ]
   },
   {
     "card_number": 218,
-    "resonance": [],
+    "resonance": [
+      "Tide"
+    ],
     "tags": [
+      "archetype:tempest",
       "mechanic:void"
     ]
   },
   {
     "card_number": 219,
-    "resonance": [
-      "Tide"
-    ],
+    "resonance": [],
     "tags": [
       "mechanic:draw",
       "role:engine"
@@ -2134,12 +2441,376 @@
   {
     "card_number": 220,
     "resonance": [
-      "Zephyr"
+      "Tide"
     ],
     "tags": [
+      "archetype:depths",
       "mechanic:dissolve",
       "mechanic:prevent",
       "role:removal"
+    ]
+  },
+  {
+    "card_number": 221,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "archetype:tempest",
+      "archetype:mirage",
+      "archetype:undertow",
+      "tribal:mage",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 222,
+    "resonance": [
+      "Tide"
+    ],
+    "tags": [
+      "archetype:depths",
+      "archetype:tempest",
+      "tribal:outsider",
+      "mechanic:prevent",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 223,
+    "resonance": [
+      "Zephyr"
+    ],
+    "tags": [
+      "archetype:gale",
+      "archetype:eclipse",
+      "archetype:mirage",
+      "tribal:explorer",
+      "mechanic:draw",
+      "mechanic:foresee"
+    ]
+  },
+  {
+    "card_number": 224,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "archetype:crucible",
+      "archetype:basalt",
+      "tribal:ancient",
+      "mechanic:point"
+    ]
+  },
+  {
+    "card_number": 225,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "archetype:crucible",
+      "archetype:basalt",
+      "tribal:warrior",
+      "mechanic:energy",
+      "mechanic:kindle"
+    ]
+  },
+  {
+    "card_number": 226,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "archetype:crucible",
+      "archetype:basalt",
+      "tribal:mage",
+      "mechanic:draw",
+      "mechanic:energy",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 227,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "archetype:bedrock",
+      "archetype:crucible",
+      "tribal:explorer",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 228,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "archetype:depths",
+      "archetype:crucible",
+      "tribal:ancient",
+      "mechanic:kindle"
+    ]
+  },
+  {
+    "card_number": 229,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "archetype:crucible",
+      "archetype:depths",
+      "tribal:ancient",
+      "mechanic:dissolve",
+      "mechanic:kindle",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 230,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "archetype:crucible",
+      "archetype:depths",
+      "tribal:ancient",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 231,
+    "resonance": [
+      "Stone"
+    ],
+    "tags": [
+      "archetype:bedrock",
+      "archetype:depths",
+      "tribal:ancient",
+      "mechanic:energy",
+      "mechanic:kindle",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 232,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "archetype:mirage",
+      "archetype:cinder",
+      "tribal:outsider",
+      "mechanic:energy",
+      "mechanic:kindle"
+    ]
+  },
+  {
+    "card_number": 233,
+    "resonance": [
+      "Ember"
+    ],
+    "tags": [
+      "archetype:cinder",
+      "archetype:gale",
+      "tribal:survivor",
+      "mechanic:kindle"
+    ]
+  },
+  {
+    "card_number": 234,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "archetype:depths",
+      "archetype:cinder",
+      "tribal:survivor",
+      "mechanic:prevent",
+      "mechanic:void",
+      "role:removal"
+    ]
+  },
+  {
+    "card_number": 235,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "archetype:crucible",
+      "archetype:bedrock",
+      "archetype:cinder",
+      "tribal:warrior",
+      "mechanic:reclaim",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 236,
+    "resonance": [
+      "Ruin"
+    ],
+    "tags": [
+      "archetype:undertow",
+      "archetype:cinder",
+      "archetype:eclipse",
+      "tribal:ancient",
+      "mechanic:kindle",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 237,
+    "resonance": [],
+    "tags": [
+      "tribal:ancient",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 238,
+    "resonance": [
+      "Tide",
+      "Zephyr"
+    ],
+    "tags": [
+      "archetype:mirage",
+      "tribal:visitor",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 239,
+    "resonance": [
+      "Tide",
+      "Ruin"
+    ],
+    "tags": [
+      "archetype:undertow",
+      "tribal:survivor",
+      "mechanic:void"
+    ]
+  },
+  {
+    "card_number": 240,
+    "resonance": [
+      "Zephyr",
+      "Stone"
+    ],
+    "tags": [
+      "archetype:basalt",
+      "tribal:spirit-animal",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 241,
+    "resonance": [
+      "Stone",
+      "Ember"
+    ],
+    "tags": [
+      "archetype:crucible",
+      "tribal:warrior",
+      "mechanic:kindle",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 242,
+    "resonance": [
+      "Ember",
+      "Ruin"
+    ],
+    "tags": [
+      "archetype:cinder",
+      "tribal:outsider",
+      "mechanic:kindle",
+      "mechanic:reclaim"
+    ]
+  },
+  {
+    "card_number": 243,
+    "resonance": [
+      "Tide",
+      "Ember"
+    ],
+    "tags": [
+      "archetype:tempest",
+      "tribal:ancient",
+      "mechanic:foresee",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 244,
+    "resonance": [
+      "Tide",
+      "Stone"
+    ],
+    "tags": [
+      "archetype:depths",
+      "tribal:ancient",
+      "mechanic:kindle"
+    ]
+  },
+  {
+    "card_number": 245,
+    "resonance": [
+      "Zephyr",
+      "Ember"
+    ],
+    "tags": [
+      "archetype:gale",
+      "tribal:visitor",
+      "mechanic:fast",
+      "mechanic:spark"
+    ]
+  },
+  {
+    "card_number": 246,
+    "resonance": [
+      "Zephyr",
+      "Ruin"
+    ],
+    "tags": [
+      "archetype:eclipse",
+      "tribal:explorer",
+      "mechanic:discard",
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 247,
+    "resonance": [
+      "Stone",
+      "Ruin"
+    ],
+    "tags": [
+      "archetype:bedrock",
+      "tribal:survivor",
+      "mechanic:draw",
+      "mechanic:energy",
+      "mechanic:void",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 248,
+    "resonance": [],
+    "tags": [
+      "mechanic:draw",
+      "role:engine"
+    ]
+  },
+  {
+    "card_number": 249,
+    "resonance": [],
+    "tags": [
+      "mechanic:event"
     ]
   }
 ]

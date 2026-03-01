@@ -19,7 +19,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Discover a card with cost 2●."
+    "rules_text": "Discover a card with cost 2\u25cf."
   },
   {
     "name": "Scrap Reclaimer",
@@ -30,7 +30,7 @@
     "is_fast": false,
     "spark": 0,
     "rarity": "Rare",
-    "rules_text": "▸ Judgment: Return this character from your void to your hand."
+    "rules_text": "\u25b8 Judgment: Return this character from your void to your hand."
   },
   {
     "name": "Evacuation Enforcer",
@@ -41,7 +41,7 @@
     "is_fast": false,
     "spark": 0,
     "rarity": "Rare",
-    "rules_text": "▸ Judgment: You may draw 2 cards, then discard 3 cards."
+    "rules_text": "\u25b8 Judgment: You may draw 2 cards, then discard 3 cards."
   },
   {
     "name": "Moonlit Voyage",
@@ -52,7 +52,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Common",
-    "rules_text": "Draw 2 cards. Discard 2 cards.\nReclaim 2●"
+    "rules_text": "Draw 2 cards. Discard 2 cards.\nReclaim 2\u25cf"
   },
   {
     "name": "Ridge Vortex Explorer",
@@ -74,7 +74,7 @@
     "is_fast": false,
     "spark": 0,
     "rarity": "Uncommon",
-    "rules_text": "▸ Judgment: You may discard a card to draw a card and gain 1⍏."
+    "rules_text": "\u25b8 Judgment: You may discard a card to draw a card and gain 1\u234f."
   },
   {
     "name": "Ashmaze Guide",
@@ -96,7 +96,7 @@
     "is_fast": true,
     "spark": 2,
     "rarity": "Common",
-    "rules_text": "▸ Judgment: Foresee 1."
+    "rules_text": "\u25b8 Judgment: Foresee 1."
   },
   {
     "name": "The Rising God",
@@ -118,7 +118,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Rare",
-    "rules_text": "When you discard a card, gain 1⍏."
+    "rules_text": "When you discard a card, gain 1\u234f."
   },
   {
     "name": "Ethereal Trailblazer",
@@ -129,7 +129,7 @@
     "is_fast": false,
     "spark": 0,
     "rarity": "Common",
-    "rules_text": "▸ Judgment: Gain 1●."
+    "rules_text": "\u25b8 Judgment: Gain 1\u25cf."
   },
   {
     "name": "Glimpse of Infinity",
@@ -140,7 +140,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Legendary",
-    "rules_text": "Gain 3●."
+    "rules_text": "Gain 3\u25cf."
   },
   {
     "name": "Unleash Ruin",
@@ -151,7 +151,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Dissolve an enemy. You lose 4⍏."
+    "rules_text": "Dissolve an enemy. You lose 4\u234f."
   },
   {
     "name": "Forgotten Titan",
@@ -162,7 +162,7 @@
     "is_fast": false,
     "spark": 3,
     "rarity": "Common",
-    "rules_text": "This character costs 1● if you have discarded a card this turn."
+    "rules_text": "This character costs 1\u25cf if you have discarded a card this turn."
   },
   {
     "name": "Eclipse Herald",
@@ -173,7 +173,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Judgment: You may banish 3 cards from your void to dissolve an enemy with cost 2● or less."
+    "rules_text": "\u25b8 Judgment: You may banish 3 cards from your void to dissolve an enemy with cost 2\u25cf or less."
   },
   {
     "name": "Chronicle Reclaimer",
@@ -184,7 +184,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "▸ Judgment: Draw a card, then discard a card."
+    "rules_text": "\u25b8 Judgment: Draw a card, then discard a card."
   },
   {
     "name": "Apocalypse",
@@ -217,7 +217,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Rare",
-    "rules_text": "▸ Judgment: Draw a card, then the opponent gains 2⍏."
+    "rules_text": "\u25b8 Judgment: Draw a card, then the opponent gains 2\u234f."
   },
   {
     "name": "Starsea Traveler",
@@ -228,7 +228,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Rare",
-    "rules_text": "Once per turn, you may play a character with cost 2● or less from your void."
+    "rules_text": "Once per turn, you may play a character with cost 2\u25cf or less from your void."
   },
   {
     "name": "Urban Cipher",
@@ -239,7 +239,7 @@
     "is_fast": false,
     "spark": 3,
     "rarity": "Common",
-    "rules_text": "▸ Materialized: Discard 2 cards, then draw 2 cards."
+    "rules_text": "\u25b8 Materialized: Discard 2 cards, then draw 2 cards."
   },
   {
     "name": "Reunion",
@@ -272,7 +272,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Rare",
-    "rules_text": "▸ Judgment: You may discard a card to dissolve an enemy with spark 1 or less."
+    "rules_text": "\u25b8 Judgment: You may discard a card to dissolve an enemy with spark 1 or less."
   },
   {
     "name": "Torchbearer of the Abyss",
@@ -283,7 +283,7 @@
     "is_fast": false,
     "spark": 3,
     "rarity": "Uncommon",
-    "rules_text": "Once per turn, when you discard a card, gain 1●, then kindle 2."
+    "rules_text": "Once per turn, when you discard a card, gain 1\u25cf, then kindle 2."
   },
   {
     "name": "The Devourer",
@@ -305,7 +305,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Common",
-    "rules_text": "▸ Materialized: Draw a card, then discard a card.\nReclaim 3●"
+    "rules_text": "\u25b8 Materialized: Draw a card, then discard a card.\nReclaim 3\u25cf"
   },
   {
     "name": "Abomination of Memory",
@@ -338,7 +338,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Rare",
-    "rules_text": "▸ Judgment: You may abandon a Warrior to discover a Warrior with cost 1● higher and materialize it."
+    "rules_text": "\u25b8 Judgment: You may abandon a Warrior to discover a Warrior with cost 1\u25cf higher and materialize it."
   },
   {
     "name": "Tranquil Duelist",
@@ -349,7 +349,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "▸ Materialized, Dissolved: Draw a card."
+    "rules_text": "\u25b8 Materialized, Dissolved: Draw a card."
   },
   {
     "name": "Voidshield Guardian",
@@ -371,7 +371,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Uncommon",
-    "rules_text": "4●: This character gains +1 spark for each allied Warrior."
+    "rules_text": "4\u25cf: This character gains +1 spark for each allied Warrior."
   },
   {
     "name": "Ride of the Vanguard",
@@ -404,7 +404,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Rare",
-    "rules_text": "Once per turn, when you materialize a character with cost 2● or less, draw a card."
+    "rules_text": "Once per turn, when you materialize a character with cost 2\u25cf or less, draw a card."
   },
   {
     "name": "Veil Shatter",
@@ -415,7 +415,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Banish an enemy with cost 2● or less."
+    "rules_text": "Banish an enemy with cost 2\u25cf or less."
   },
   {
     "name": "Judgment of the Blade",
@@ -470,7 +470,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "2●, Banish another card in your void: Reclaim this character."
+    "rules_text": "2\u25cf, Banish another card in your void: Reclaim this character."
   },
   {
     "name": "Dreadcall Warden",
@@ -481,7 +481,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Rare",
-    "rules_text": "2●, Abandon an ally with spark 1 or less: Draw 2 cards."
+    "rules_text": "2\u25cf, Abandon an ally with spark 1 or less: Draw 2 cards."
   },
   {
     "name": "Wolfbond Chieftain",
@@ -492,7 +492,7 @@
     "is_fast": false,
     "spark": 0,
     "rarity": "Common",
-    "rules_text": "▸ Materialized, Judgment: With 2 allied Warriors, gain 1●."
+    "rules_text": "\u25b8 Materialized, Judgment: With 2 allied Warriors, gain 1\u25cf."
   },
   {
     "name": "Dawnblade Wanderer",
@@ -503,7 +503,7 @@
     "is_fast": false,
     "spark": 0,
     "rarity": "Legendary",
-    "rules_text": "▸ Materialized, Judgment: Gain 2●."
+    "rules_text": "\u25b8 Materialized, Judgment: Gain 2\u25cf."
   },
   {
     "name": "Bloomweaver",
@@ -514,7 +514,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "Once per turn, when you materialize a character, gain 1●."
+    "rules_text": "Once per turn, when you materialize a character, gain 1\u25cf."
   },
   {
     "name": "Seeker for the Way",
@@ -525,7 +525,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Common",
-    "rules_text": "▸ Materialized: Draw a Warrior from your deck."
+    "rules_text": "\u25b8 Materialized: Draw a Warrior from your deck."
   },
   {
     "name": "Rebirth Ritualist",
@@ -536,7 +536,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Rare",
-    "rules_text": "2●, Abandon a character, Discard your hand: Draw 3 cards."
+    "rules_text": "2\u25cf, Abandon a character, Discard your hand: Draw 3 cards."
   },
   {
     "name": "Pallid Arbiter",
@@ -547,7 +547,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Uncommon",
-    "rules_text": "Disable the ▸ Materialized: abilities of enemies."
+    "rules_text": "Disable the \u25b8 Materialized: abilities of enemies."
   },
   {
     "name": "Skyflame Commander",
@@ -569,7 +569,7 @@
     "is_fast": false,
     "spark": 0,
     "rarity": "Uncommon",
-    "rules_text": "▸ Judgment: You may pay 1● to kindle 1 and banish a card from the opponent's void."
+    "rules_text": "\u25b8 Judgment: You may pay 1\u25cf to kindle 1 and banish a card from the opponent's void."
   },
   {
     "name": "Cloaked Sentinel",
@@ -580,7 +580,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Uncommon",
-    "rules_text": "The opponent's events cost 1● more."
+    "rules_text": "The opponent's events cost 1\u25cf more."
   },
   {
     "name": "Twilight Suppressor",
@@ -591,7 +591,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Uncommon",
-    "rules_text": "▸ Materialized: Disable the activated abilities of an enemy while this character is in play."
+    "rules_text": "\u25b8 Materialized: Disable the activated abilities of an enemy while this character is in play."
   },
   {
     "name": "Frost Visionary",
@@ -602,7 +602,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Common",
-    "rules_text": "▸ Materialized: Draw a card."
+    "rules_text": "\u25b8 Materialized: Draw a card."
   },
   {
     "name": "Forsworn Champion",
@@ -646,7 +646,7 @@
     "is_fast": false,
     "spark": 3,
     "rarity": "Rare",
-    "rules_text": "When you play a Warrior, reclaim a random character with cost 3● or less."
+    "rules_text": "When you play a Warrior, reclaim a random character with cost 3\u25cf or less."
   },
   {
     "name": "Infernal Rest",
@@ -657,7 +657,7 @@
     "is_fast": true,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Lose 1 maximum ●: Play this event for 0●.\nPrevent a played card."
+    "rules_text": "Lose 1 maximum \u25cf: Play this event for 0\u25cf.\nPrevent a played card."
   },
   {
     "name": "Echoing Denial",
@@ -668,7 +668,7 @@
     "is_fast": true,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Banish a card from hand: Play this event for 0●.\nPrevent a played card."
+    "rules_text": "Banish a card from hand: Play this event for 0\u25cf.\nPrevent a played card."
   },
   {
     "name": "Ripple of Defiance",
@@ -679,7 +679,7 @@
     "is_fast": true,
     "spark": null,
     "rarity": "Common",
-    "rules_text": "Prevent a played event unless the opponent pays 2●."
+    "rules_text": "Prevent a played event unless the opponent pays 2\u25cf."
   },
   {
     "name": "Break the Veil",
@@ -690,7 +690,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Discard a chosen card with cost 3● or less from the opponent's hand."
+    "rules_text": "Discard a chosen card with cost 3\u25cf or less from the opponent's hand."
   },
   {
     "name": "Lurking Dread",
@@ -712,7 +712,7 @@
     "is_fast": true,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Banish a card from hand: Play this event for 0●.\nDissolve an enemy."
+    "rules_text": "Banish a card from hand: Play this event for 0\u25cf.\nDissolve an enemy."
   },
   {
     "name": "Shattering Gambit",
@@ -723,7 +723,7 @@
     "is_fast": true,
     "spark": null,
     "rarity": "Rare",
-    "rules_text": "Dissolve an enemy. The opponent gains 3⍏."
+    "rules_text": "Dissolve an enemy. The opponent gains 3\u234f."
   },
   {
     "name": "Abolish",
@@ -745,7 +745,7 @@
     "is_fast": true,
     "spark": null,
     "rarity": "Common",
-    "rules_text": "Foresee 1. Draw a card.\nReclaim 3●"
+    "rules_text": "Foresee 1. Draw a card.\nReclaim 3\u25cf"
   },
   {
     "name": "Pyrokinetic Surge",
@@ -767,7 +767,7 @@
     "is_fast": true,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Materialized: Prevent a played card with cost 2● or less."
+    "rules_text": "\u25b8 Materialized: Prevent a played card with cost 2\u25cf or less."
   },
   {
     "name": "Cosmic Puppeteer",
@@ -778,7 +778,7 @@
     "is_fast": true,
     "spark": 2,
     "rarity": "Rare",
-    "rules_text": "▸ Materialized: Gain control of an enemy with cost 2● or less."
+    "rules_text": "\u25b8 Materialized: Gain control of an enemy with cost 2\u25cf or less."
   },
   {
     "name": "Obliterator of Worlds",
@@ -789,7 +789,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Rare",
-    "rules_text": "Abandon an ally: Play this character for 0●, then abandon it.\n▸ Materialized: Dissolve an enemy."
+    "rules_text": "Abandon an ally: Play this character for 0\u25cf, then abandon it.\n\u25b8 Materialized: Dissolve an enemy."
   },
   {
     "name": "Horizon Follower",
@@ -800,7 +800,7 @@
     "is_fast": true,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Judgment: Gain 1⍏."
+    "rules_text": "\u25b8 Judgment: Gain 1\u234f."
   },
   {
     "name": "Astral Navigators",
@@ -811,7 +811,7 @@
     "is_fast": true,
     "spark": 2,
     "rarity": "Common",
-    "rules_text": "▸ Materialized: Foresee 2."
+    "rules_text": "\u25b8 Materialized: Foresee 2."
   },
   {
     "name": "Boundless Wanderer",
@@ -822,7 +822,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Common",
-    "rules_text": "Has all character types.\n▸ Judgment: With 3 allies that share a character type, draw a card."
+    "rules_text": "Has all character types.\n\u25b8 Judgment: With 3 allies that share a character type, draw a card."
   },
   {
     "name": "Sage of the Prelude",
@@ -833,7 +833,7 @@
     "is_fast": true,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "Once per turn, when you play a ↯fast card, draw a card."
+    "rules_text": "Once per turn, when you play a \u21affast card, draw a card."
   },
   {
     "name": "Intermezzo Balladeer",
@@ -844,7 +844,7 @@
     "is_fast": true,
     "spark": 2,
     "rarity": "Common",
-    "rules_text": "When you play a ↯fast card, this character gains +2 spark."
+    "rules_text": "When you play a \u21affast card, this character gains +2 spark."
   },
   {
     "name": "Melodist of the Finale",
@@ -855,7 +855,7 @@
     "is_fast": true,
     "spark": 2,
     "rarity": "Rare",
-    "rules_text": "When you play a ↯fast card, gain 1⍏."
+    "rules_text": "When you play a \u21affast card, gain 1\u234f."
   },
   {
     "name": "The Waking Titan",
@@ -866,7 +866,7 @@
     "is_fast": false,
     "spark": 3,
     "rarity": "Rare",
-    "rules_text": "To play this card, return an ally with cost 3● or more to hand.\n▸ Judgment: Draw a card."
+    "rules_text": "To play this card, return an ally with cost 3\u25cf or more to hand.\n\u25b8 Judgment: Draw a card."
   },
   {
     "name": "Virtuoso of Harmony",
@@ -877,7 +877,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Common",
-    "rules_text": "At the end of your turn, gain 2●."
+    "rules_text": "At the end of your turn, gain 2\u25cf."
   },
   {
     "name": "Moonlit Dancer",
@@ -888,7 +888,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Rare",
-    "rules_text": "Characters in your hand have ↯fast.\nOnce per turn, when you play a ↯fast character, gain 1●."
+    "rules_text": "Characters in your hand have \u21affast.\nOnce per turn, when you play a \u21affast character, gain 1\u25cf."
   },
   {
     "name": "Secrets of the Deep",
@@ -899,7 +899,7 @@
     "is_fast": true,
     "spark": null,
     "rarity": "Common",
-    "rules_text": "Pay 1 or more ●: Draw a card for each ● spent, then discard 2 cards."
+    "rules_text": "Pay 1 or more \u25cf: Draw a card for each \u25cf spent, then discard 2 cards."
   },
   {
     "name": "Abyssal Enforcer",
@@ -910,7 +910,7 @@
     "is_fast": true,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "▸ Materialized: Return an enemy to hand."
+    "rules_text": "\u25b8 Materialized: Return an enemy to hand."
   },
   {
     "name": "Lantern Keeper",
@@ -921,7 +921,7 @@
     "is_fast": true,
     "spark": 0,
     "rarity": "Common",
-    "rules_text": "▸ Judgment: Gain 2⍏."
+    "rules_text": "\u25b8 Judgment: Gain 2\u234f."
   },
   {
     "name": "Ashlight Caller",
@@ -932,7 +932,7 @@
     "is_fast": true,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Materialized: An event in your void gains reclaim equal to its cost this turn."
+    "rules_text": "\u25b8 Materialized: An event in your void gains reclaim equal to its cost this turn."
   },
   {
     "name": "Eternal Sentry",
@@ -943,7 +943,7 @@
     "is_fast": true,
     "spark": 2,
     "rarity": "Uncommon",
-    "rules_text": "When you draw 2 cards in a turn, if this card is in your void, it gains reclaim 1● this turn."
+    "rules_text": "When you draw 2 cards in a turn, if this card is in your void, it gains reclaim 1\u25cf this turn."
   },
   {
     "name": "Epiphany Unfolded",
@@ -976,7 +976,7 @@
     "is_fast": true,
     "spark": 1,
     "rarity": "Rare",
-    "rules_text": "▸ Materialized: Discover a ↯fast event."
+    "rules_text": "\u25b8 Materialized: Discover a \u21affast event."
   },
   {
     "name": "Illumination of Glory",
@@ -987,7 +987,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Rare",
-    "rules_text": "Gain 1⍏ for each card you have played this turn."
+    "rules_text": "Gain 1\u234f for each card you have played this turn."
   },
   {
     "name": "Echoes of the Journey",
@@ -1009,7 +1009,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Uncommon",
-    "rules_text": "Events cost you 2● more.\nWhen you play an event from your hand, copy it."
+    "rules_text": "Events cost you 2\u25cf more.\nWhen you play an event from your hand, copy it."
   },
   {
     "name": "Cascade of Reflections",
@@ -1031,7 +1031,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Common",
-    "rules_text": "Copy the next event you play this turn three times.\nReclaim 2●"
+    "rules_text": "Copy the next event you play this turn three times.\nReclaim 2\u25cf"
   },
   {
     "name": "Path to Redemption",
@@ -1075,7 +1075,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Common",
-    "rules_text": "An event in your void gains reclaim 0● this turn."
+    "rules_text": "An event in your void gains reclaim 0\u25cf this turn."
   },
   {
     "name": "Surge of Fury",
@@ -1108,7 +1108,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "Events cost you 1● less."
+    "rules_text": "Events cost you 1\u25cf less."
   },
   {
     "name": "Starcatcher",
@@ -1119,7 +1119,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Uncommon",
-    "rules_text": "When you play an event, gain 1●."
+    "rules_text": "When you play an event, gain 1\u25cf."
   },
   {
     "name": "Flash of Power",
@@ -1130,7 +1130,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Gain 6●."
+    "rules_text": "Gain 6\u25cf."
   },
   {
     "name": "Genesis Burst",
@@ -1141,7 +1141,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Double the amount of ● you have."
+    "rules_text": "Double the amount of \u25cf you have."
   },
   {
     "name": "Catalyst Ignition",
@@ -1152,7 +1152,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Double the amount of ● you gain from card effects this turn."
+    "rules_text": "Double the amount of \u25cf you gain from card effects this turn."
   },
   {
     "name": "Data Pulse",
@@ -1163,10 +1163,10 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Common",
-    "rules_text": "Gain 2●. Draw a card."
+    "rules_text": "Gain 2\u25cf. Draw a card."
   },
   {
-    "name": "A New Advenure",
+    "name": "A New Adventure",
     "card_number": 107,
     "energy_cost": 3,
     "card_type": "Event",
@@ -1174,7 +1174,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Common",
-    "rules_text": "Draw 2 cards. Discard 2 cards. Gain 2●."
+    "rules_text": "Draw 2 cards. Discard 2 cards. Gain 2\u25cf."
   },
   {
     "name": "The Ringleader",
@@ -1185,7 +1185,7 @@
     "is_fast": false,
     "spark": 3,
     "rarity": "Rare",
-    "rules_text": "▸ Materialized: Copy the next event you play this turn three times."
+    "rules_text": "\u25b8 Materialized: Copy the next event you play this turn three times."
   },
   {
     "name": "Wheel of the Heavens",
@@ -1207,7 +1207,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Common",
-    "rules_text": "Gain 4●."
+    "rules_text": "Gain 4\u25cf."
   },
   {
     "name": "Spirit Reaping",
@@ -1218,7 +1218,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Abandon an ally: Gain ● equal to that character's cost."
+    "rules_text": "Abandon an ally: Gain \u25cf equal to that character's cost."
   },
   {
     "name": "Weight of Memory",
@@ -1262,7 +1262,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Prevent a played ↯fast card."
+    "rules_text": "Prevent a played \u21affast card."
   },
   {
     "name": "Door to Possibility",
@@ -1328,7 +1328,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Rare",
-    "rules_text": "Characters cost you 2● less."
+    "rules_text": "Characters cost you 2\u25cf less."
   },
   {
     "name": "Conduit of Resonance",
@@ -1339,7 +1339,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Rare",
-    "rules_text": "When you materialize a character, trigger the ▸ Judgment: ability of each ally."
+    "rules_text": "When you materialize a character, trigger the \u25b8 Judgment: ability of each ally."
   },
   {
     "name": "Celestial Reverie",
@@ -1361,7 +1361,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "▸ Judgment: Gain 1● for each allied Spirit Animal."
+    "rules_text": "\u25b8 Judgment: Gain 1\u25cf for each allied Spirit Animal."
   },
   {
     "name": "Ethereal Courser",
@@ -1372,7 +1372,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "▸ Materialized: You may return an ally to hand."
+    "rules_text": "\u25b8 Materialized: You may return an ally to hand."
   },
   {
     "name": "Nomad of Endless Paths",
@@ -1383,7 +1383,7 @@
     "is_fast": true,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Materialized: Return an ally to hand."
+    "rules_text": "\u25b8 Materialized: Return an ally to hand."
   },
   {
     "name": "Blazing Emberwing",
@@ -1394,7 +1394,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Rare",
-    "rules_text": "The '▸ Judgment:' ability of allies triggers when you materialize them."
+    "rules_text": "The '\u25b8 Judgment:' ability of allies triggers when you materialize them."
   },
   {
     "name": "Dawnprowler Panther",
@@ -1405,7 +1405,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "When you materialize an allied Spirit Animal, gain 1●."
+    "rules_text": "When you materialize an allied Spirit Animal, gain 1\u25cf."
   },
   {
     "name": "Luminwings",
@@ -1416,7 +1416,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "▸ Judgment: With 2 allied Spirit Animals, gain 2●."
+    "rules_text": "\u25b8 Judgment: With 2 allied Spirit Animals, gain 2\u25cf."
   },
   {
     "name": "Spirit of the Greenwood",
@@ -1427,7 +1427,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Judgment: Gain 1● for each allied character."
+    "rules_text": "\u25b8 Judgment: Gain 1\u25cf for each allied character."
   },
   {
     "name": "Spirit Bond",
@@ -1493,7 +1493,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Judgment: You may pay 4● to have each allied Spirit Animal gain +2 spark."
+    "rules_text": "\u25b8 Judgment: You may pay 4\u25cf to have each allied Spirit Animal gain +2 spark."
   },
   {
     "name": "Sunshadow Eagle",
@@ -1515,7 +1515,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "▸ Materialized, Judgment: Kindle 1."
+    "rules_text": "\u25b8 Materialized, Judgment: Kindle 1."
   },
   {
     "name": "Shadowpaw",
@@ -1526,7 +1526,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Materialized: Return a character from your void to your hand."
+    "rules_text": "\u25b8 Materialized: Return a character from your void to your hand."
   },
   {
     "name": "Looming Oracle",
@@ -1537,7 +1537,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "▸ Materialized: Draw a card."
+    "rules_text": "\u25b8 Materialized: Draw a card."
   },
   {
     "name": "Driftcaller Sovereign",
@@ -1548,7 +1548,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "▸ Materialized, Judgment: Gain 1●."
+    "rules_text": "\u25b8 Materialized, Judgment: Gain 1\u25cf."
   },
   {
     "name": "Emerald Guardian",
@@ -1559,7 +1559,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "▸ Judgment: Gain 2●."
+    "rules_text": "\u25b8 Judgment: Gain 2\u25cf."
   },
   {
     "name": "Dreamborne Leviathan",
@@ -1581,7 +1581,7 @@
     "is_fast": true,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Materialized: Banish the opponent's void."
+    "rules_text": "\u25b8 Materialized: Banish the opponent's void."
   },
   {
     "name": "Seeker of the Radiant Wilds",
@@ -1592,7 +1592,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Materialized: Draw a card for each allied Spirit Animal."
+    "rules_text": "\u25b8 Materialized: Draw a card for each allied Spirit Animal."
   },
   {
     "name": "Mystic Runefish",
@@ -1603,7 +1603,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "3●: The spark of each allied Spirit Animal becomes 5."
+    "rules_text": "3\u25cf: The spark of each allied Spirit Animal becomes 5."
   },
   {
     "name": "Starlight Guide",
@@ -1614,7 +1614,7 @@
     "is_fast": true,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Materialized: You may banish an ally, then materialize it."
+    "rules_text": "\u25b8 Materialized: You may banish an ally, then materialize it."
   },
   {
     "name": "Flickerveil Adept",
@@ -1625,7 +1625,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "▸ Materialized, Judgment: Banish an ally with spark 2 or less, then materialize it."
+    "rules_text": "\u25b8 Materialized, Judgment: Banish an ally with spark 2 or less, then materialize it."
   },
   {
     "name": "Reclaimer of Lost Paths",
@@ -1636,7 +1636,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Materialized: A card with cost 3● or less in your void gains reclaim 0●."
+    "rules_text": "\u25b8 Materialized: A card with cost 3\u25cf or less in your void gains reclaim 0\u25cf."
   },
   {
     "name": "Aurora Rider",
@@ -1647,7 +1647,7 @@
     "is_fast": false,
     "spark": 3,
     "rarity": "Rare",
-    "rules_text": "▸ Materialized: Banish any number of allies, then materialize them."
+    "rules_text": "\u25b8 Materialized: Banish any number of allies, then materialize them."
   },
   {
     "name": "Wraith of Twisting Shadows",
@@ -1658,7 +1658,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Rare",
-    "rules_text": "▸ Materialized: Discard a chosen card from the opponent's hand. They draw a card."
+    "rules_text": "\u25b8 Materialized: Discard a chosen card from the opponent's hand. They draw a card."
   },
   {
     "name": "Keeper of Forgotten Light",
@@ -1669,7 +1669,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Uncommon",
-    "rules_text": "▸ Materialized: Draw 2 cards."
+    "rules_text": "\u25b8 Materialized: Draw 2 cards."
   },
   {
     "name": "Paradox Enforcer",
@@ -1680,7 +1680,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Uncommon",
-    "rules_text": "▸ Materialized: Banish an enemy until this character leaves play."
+    "rules_text": "\u25b8 Materialized: Banish an enemy until this character leaves play."
   },
   {
     "name": "Passage Through Oblivion",
@@ -1691,7 +1691,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Common",
-    "rules_text": "Banish an ally. Materialize it at end of turn.\nReclaim 1●"
+    "rules_text": "Banish an ally. Materialize it at end of turn.\nReclaim 1\u25cf"
   },
   {
     "name": "Herald of the Last Light",
@@ -1702,7 +1702,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "↯fast -- Abandon this character: Prevent a played event."
+    "rules_text": "\u21affast -- Abandon this character: Prevent a played event."
   },
   {
     "name": "Call to the Unknown",
@@ -1713,7 +1713,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Rare",
-    "rules_text": "Discover a character with a ▸ Materialized: ability."
+    "rules_text": "Discover a character with a \u25b8 Materialized: ability."
   },
   {
     "name": "Blooming Path Wanderer",
@@ -1724,7 +1724,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Judgment: You may banish an ally, then materialize it."
+    "rules_text": "\u25b8 Judgment: You may banish an ally, then materialize it."
   },
   {
     "name": "Tideborne Voyager",
@@ -1757,7 +1757,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Rare",
-    "rules_text": "Materialize two random characters with cost 3● or less from your deck."
+    "rules_text": "Materialize two random characters with cost 3\u25cf or less from your deck."
   },
   {
     "name": "Cragfall",
@@ -1790,7 +1790,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Rare",
-    "rules_text": "Dissolve an enemy with cost 3● or more.\nReclaim 2●"
+    "rules_text": "Dissolve an enemy with cost 3\u25cf or more.\nReclaim 2\u25cf"
   },
   {
     "name": "Burst of Obliteration",
@@ -1801,7 +1801,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Pay 1 or more ●: Dissolve all characters with spark less than the amount of ● paid."
+    "rules_text": "Pay 1 or more \u25cf: Dissolve all characters with spark less than the amount of \u25cf paid."
   },
   {
     "name": "Dimensional Pathfinder",
@@ -1812,7 +1812,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Uncommon",
-    "rules_text": "▸ Judgment: You may pay 3● to banish up to 2 allies, then materialize them."
+    "rules_text": "\u25b8 Judgment: You may pay 3\u25cf to banish up to 2 allies, then materialize them."
   },
   {
     "name": "Riftwalker",
@@ -1823,7 +1823,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Rare",
-    "rules_text": "▸ Materialized: Banish an enemy until your next main phase."
+    "rules_text": "\u25b8 Materialized: Banish an enemy until your next main phase."
   },
   {
     "name": "Portal of Twin Paths",
@@ -1845,7 +1845,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "▸ Materialized: Gain 3●."
+    "rules_text": "\u25b8 Materialized: Gain 3\u25cf."
   },
   {
     "name": "Mirrorlight Architect",
@@ -1856,7 +1856,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Rare",
-    "rules_text": "4●: Materialize a copy of an ally."
+    "rules_text": "4\u25cf: Materialize a copy of an ally."
   },
   {
     "name": "Starlit Cascade",
@@ -1867,7 +1867,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Common",
-    "rules_text": "Until end of turn, when an ally leaves play, gain 2●."
+    "rules_text": "Until end of turn, when an ally leaves play, gain 2\u25cf."
   },
   {
     "name": "Kindred Sparks",
@@ -1878,7 +1878,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Common",
-    "rules_text": "With an allied Survivor, you may play this card from your hand or void for 1●."
+    "rules_text": "With an allied Survivor, you may play this card from your hand or void for 1\u25cf."
   },
   {
     "name": "Emberwatch Veteran",
@@ -1889,7 +1889,7 @@
     "is_fast": false,
     "spark": 0,
     "rarity": "Common",
-    "rules_text": "1●, Discard a card: Kindle 2."
+    "rules_text": "1\u25cf, Discard a card: Kindle 2."
   },
   {
     "name": "Hope's Vanguard",
@@ -1900,7 +1900,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "▸ Materialized, Judgment: With 2 allied Survivors, draw a card."
+    "rules_text": "\u25b8 Materialized, Judgment: With 2 allied Survivors, draw a card."
   },
   {
     "name": "Silent Avenger",
@@ -1911,7 +1911,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Uncommon",
-    "rules_text": "▸ Dissolved: Kindle 2.\nWhen an allied Survivor is ▸ Dissolved:, kindle 2."
+    "rules_text": "\u25b8 Dissolved: Kindle 2.\nWhen an allied Survivor is \u25b8 Dissolved:, kindle 2."
   },
   {
     "name": "Soulbinder",
@@ -1922,7 +1922,7 @@
     "is_fast": false,
     "spark": 0,
     "rarity": "Uncommon",
-    "rules_text": "Abandon an ally: Gain 1●."
+    "rules_text": "Abandon an ally: Gain 1\u25cf."
   },
   {
     "name": "Seer of the Fallen",
@@ -1933,7 +1933,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Dissolved: Draw a card.\nWhen an allied Survivor is ▸ Dissolved:, draw a card."
+    "rules_text": "\u25b8 Dissolved: Draw a card.\nWhen an allied Survivor is \u25b8 Dissolved:, draw a card."
   },
   {
     "name": "Ashborn Necromancer",
@@ -1955,7 +1955,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "When an ally is ▸ Dissolved:, draw a card."
+    "rules_text": "When an ally is \u25b8 Dissolved:, draw a card."
   },
   {
     "name": "Wasteland Arbitrator",
@@ -1966,7 +1966,7 @@
     "is_fast": true,
     "spark": 1,
     "rarity": "Rare",
-    "rules_text": "▸ Materialized: Each player discards a card."
+    "rules_text": "\u25b8 Materialized: Each player discards a card."
   },
   {
     "name": "Dustborn Veteran",
@@ -1977,7 +1977,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "When an ally is ▸ Dissolved:, this card gains reclaim 1● this turn."
+    "rules_text": "When an ally is \u25b8 Dissolved:, this card gains reclaim 1\u25cf this turn."
   },
   {
     "name": "Avatar of Cosmic Reckoning",
@@ -1988,7 +1988,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Rare",
-    "rules_text": "When an ally is ▸ Dissolved:, gain 1⍏."
+    "rules_text": "When an ally is \u25b8 Dissolved:, gain 1\u234f."
   },
   {
     "name": "Resilient Wanderer",
@@ -1999,7 +1999,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Dissolved: You may pay 1● to return this character to your hand."
+    "rules_text": "\u25b8 Dissolved: You may pay 1\u25cf to return this character to your hand."
   },
   {
     "name": "Twilight Reclaimer",
@@ -2010,7 +2010,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Rare",
-    "rules_text": "▸ Dissolved: A Survivor in your void gains reclaim equal to its cost."
+    "rules_text": "\u25b8 Dissolved: A Survivor in your void gains reclaim equal to its cost."
   },
   {
     "name": "Wreckheap Survivor",
@@ -2021,7 +2021,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Judgment: You may pay 1● to return this character from your void to your hand."
+    "rules_text": "\u25b8 Judgment: You may pay 1\u25cf to return this character from your void to your hand."
   },
   {
     "name": "Revenant of the Lost",
@@ -2065,7 +2065,7 @@
     "is_fast": false,
     "spark": 0,
     "rarity": "Uncommon",
-    "rules_text": "▸ Judgment: You may banish a card from the opponent's void to gain 1●."
+    "rules_text": "\u25b8 Judgment: You may banish a card from the opponent's void to gain 1\u25cf."
   },
   {
     "name": "Unleashed Destruction",
@@ -2076,7 +2076,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Rare",
-    "rules_text": "Dissolve an enemy with cost 2● or less.\nReclaim -- Abandon an ally"
+    "rules_text": "Dissolve an enemy with cost 2\u25cf or less.\nReclaim -- Abandon an ally"
   },
   {
     "name": "Searcher in the Mists",
@@ -2087,7 +2087,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Common",
-    "rules_text": "▸ Materialized, Dissolved: Put the top 4 cards of your deck into your void."
+    "rules_text": "\u25b8 Materialized, Dissolved: Put the top 4 cards of your deck into your void."
   },
   {
     "name": "Veil of the Wastes",
@@ -2153,7 +2153,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Rare",
-    "rules_text": "When you abandon a character, gain 1⍏."
+    "rules_text": "When you abandon a character, gain 1\u234f."
   },
   {
     "name": "The Forsaker",
@@ -2164,7 +2164,7 @@
     "is_fast": true,
     "spark": 1,
     "rarity": "Rare",
-    "rules_text": "Abandon an ally, once per turn: Gain 1⍏."
+    "rules_text": "Abandon an ally, once per turn: Gain 1\u234f."
   },
   {
     "name": "Infernal Ascendant",
@@ -2208,7 +2208,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Common",
-    "rules_text": "When an ally is ▸ Dissolved:, gain 1●."
+    "rules_text": "When an ally is \u25b8 Dissolved:, gain 1\u25cf."
   },
   {
     "name": "Grim Reclaimer",
@@ -2230,7 +2230,7 @@
     "is_fast": false,
     "spark": 3,
     "rarity": "Uncommon",
-    "rules_text": "When you materialize an ally, gain 1●."
+    "rules_text": "When you materialize an ally, gain 1\u25cf."
   },
   {
     "name": "Packcaller of Shadows",
@@ -2274,7 +2274,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Materialized: Draw a card for each ally abandoned this turn."
+    "rules_text": "\u25b8 Materialized: Draw a card for each ally abandoned this turn."
   },
   {
     "name": "Specter of Silent Snow",
@@ -2329,7 +2329,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Rare",
-    "rules_text": "Dissolve an enemy. Draw a card.\nThis event costs 1● if a character dissolved this turn."
+    "rules_text": "Dissolve an enemy. Draw a card.\nThis event costs 1\u25cf if a character dissolved this turn."
   },
   {
     "name": "Pulse of Sacrifice",
@@ -2340,7 +2340,7 @@
     "is_fast": false,
     "spark": null,
     "rarity": "Rare",
-    "rules_text": "Abandon a character, Discard your hand: Gain 5●."
+    "rules_text": "Abandon a character, Discard your hand: Gain 5\u25cf."
   },
   {
     "name": "Nightmare Manifest",
@@ -2351,7 +2351,7 @@
     "is_fast": false,
     "spark": 1,
     "rarity": "Uncommon",
-    "rules_text": "▸ Judgment: Each player abandons a character."
+    "rules_text": "\u25b8 Judgment: Each player abandons a character."
   },
   {
     "name": "Dreamscatter",
@@ -2362,7 +2362,7 @@
     "is_fast": true,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Pay 1 or more ●: Draw a card for each ● spent."
+    "rules_text": "Pay 1 or more \u25cf: Draw a card for each \u25cf spent."
   },
   {
     "name": "Minstrel of Falling Light",
@@ -2373,7 +2373,7 @@
     "is_fast": false,
     "spark": 2,
     "rarity": "Common",
-    "rules_text": "3●: Draw a card."
+    "rules_text": "3\u25cf: Draw a card."
   },
   {
     "name": "Sundown Surfer",
@@ -2387,7 +2387,7 @@
     "rules_text": "When you play a card during the opponent's turn, this character gains +1 spark."
   },
   {
-    "name": "Archive of the Forgotten ",
+    "name": "Archive of the Forgotten",
     "card_number": 218,
     "energy_cost": 4,
     "card_type": "Event",
@@ -2406,7 +2406,7 @@
     "is_fast": true,
     "spark": null,
     "rarity": "Uncommon",
-    "rules_text": "Choose One:\n• 2●: Return an enemy to hand.\n• 3●: Draw 2 cards."
+    "rules_text": "Choose One:\n\u2022 2\u25cf: Return an enemy to hand.\n\u2022 3\u25cf: Draw 2 cards."
   },
   {
     "name": "Together Against the Tide",
@@ -2418,5 +2418,324 @@
     "spark": null,
     "rarity": "Common",
     "rules_text": "Prevent a played event which could dissolve an ally."
+  },
+  {
+    "name": "Archivist of Vanished Names",
+    "card_number": 221,
+    "energy_cost": 3,
+    "card_type": "Character",
+    "subtype": "Mage",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Rare",
+    "rules_text": "Materialized: Name a card type (Character or Event). Reveal cards from the top of your deck until you reveal a card of that type. Put the revealed card into your hand and the rest into your void."
+  },
+  {
+    "name": "Duskwatch Vigil",
+    "card_number": 222,
+    "energy_cost": 2,
+    "card_type": "Character",
+    "subtype": "Outsider",
+    "is_fast": false,
+    "spark": 2,
+    "rarity": "Uncommon",
+    "rules_text": "When you prevent a card, your next event this turn costs 2 less."
+  },
+  {
+    "name": "Dreamtide Cartographer",
+    "card_number": 223,
+    "energy_cost": 3,
+    "card_type": "Character",
+    "subtype": "Explorer",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Uncommon",
+    "rules_text": "Judgment: Foresee 2, then draw a card."
+  },
+  {
+    "name": "Ironveil Watcher",
+    "card_number": 224,
+    "energy_cost": 2,
+    "card_type": "Character",
+    "subtype": "Ancient",
+    "is_fast": false,
+    "spark": 0,
+    "rarity": "Uncommon",
+    "rules_text": "Judgment: Gain 1 point for each other Judgment ability that triggered this phase, up to 3."
+  },
+  {
+    "name": "Stoneheart Veteran",
+    "card_number": 225,
+    "energy_cost": 3,
+    "card_type": "Character",
+    "subtype": "Warrior",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Uncommon",
+    "rules_text": "Judgment: You may pay 3 energy to kindle 2."
+  },
+  {
+    "name": "Vanguard of the Summit",
+    "card_number": 226,
+    "energy_cost": 4,
+    "card_type": "Character",
+    "subtype": "Mage",
+    "is_fast": false,
+    "spark": 2,
+    "rarity": "Rare",
+    "rules_text": "When you play your third character this turn, draw 2 and gain 2 energy."
+  },
+  {
+    "name": "Deepvault Keeper",
+    "card_number": 227,
+    "energy_cost": 3,
+    "card_type": "Character",
+    "subtype": "Explorer",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Uncommon",
+    "rules_text": "Characters you play from your void cost 1 less."
+  },
+  {
+    "name": "Everhold Protector",
+    "card_number": 228,
+    "energy_cost": 2,
+    "card_type": "Character",
+    "subtype": "Ancient",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Common",
+    "rules_text": "At the start of your turn, if this character has been on the battlefield since your last turn, kindle 1."
+  },
+  {
+    "name": "Kindlespark Harvester",
+    "card_number": 229,
+    "energy_cost": 3,
+    "card_type": "Character",
+    "subtype": "Ancient",
+    "is_fast": false,
+    "spark": 0,
+    "rarity": "Rare",
+    "rules_text": "Judgment: You may remove 3 spark from your leftmost ally to dissolve an enemy with cost 3 or less. If you do, kindle 2."
+  },
+  {
+    "name": "Ironbark Warden",
+    "card_number": 230,
+    "energy_cost": 4,
+    "card_type": "Character",
+    "subtype": "Ancient",
+    "is_fast": false,
+    "spark": 2,
+    "rarity": "Rare",
+    "rules_text": "Judgment: Each ally that has been on the battlefield since your last turn gains +1 spark until end of turn."
+  },
+  {
+    "name": "Vaultstone Harbinger",
+    "card_number": 231,
+    "energy_cost": 3,
+    "card_type": "Character",
+    "subtype": "Ancient",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Uncommon",
+    "rules_text": "When you materialize a character from your void, gain 2 energy. Judgment: If a card entered your void this turn, kindle 1."
+  },
+  {
+    "name": "Ashen Threshold",
+    "card_number": 232,
+    "energy_cost": 3,
+    "card_type": "Character",
+    "subtype": "Outsider",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Uncommon",
+    "rules_text": "When an ally leaves play, gain 1 energy and kindle 1."
+  },
+  {
+    "name": "Smolder Sprite",
+    "card_number": 233,
+    "energy_cost": 1,
+    "card_type": "Character",
+    "subtype": "Survivor",
+    "is_fast": false,
+    "spark": 0,
+    "rarity": "Common",
+    "rules_text": "Materialized: Materialize a figment. Abandon this character: Kindle 1."
+  },
+  {
+    "name": "Voidthorn Protector",
+    "card_number": 234,
+    "energy_cost": 2,
+    "card_type": "Character",
+    "subtype": "Survivor",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Uncommon",
+    "rules_text": "Abandon this character: Prevent a played character. Put the top 2 cards of your deck into your void."
+  },
+  {
+    "name": "Risen Champion",
+    "card_number": 235,
+    "energy_cost": 4,
+    "card_type": "Character",
+    "subtype": "Warrior",
+    "is_fast": false,
+    "spark": 2,
+    "rarity": "Uncommon",
+    "rules_text": "You may only play this character from your void. Dissolved: Reclaim a different Warrior from your void."
+  },
+  {
+    "name": "Tidechannel Observer",
+    "card_number": 236,
+    "energy_cost": 3,
+    "card_type": "Character",
+    "subtype": "Ancient",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Uncommon",
+    "rules_text": "Judgment: If 3 or more cards entered your void this turn, gain 2 points and kindle 1."
+  },
+  {
+    "name": "Nexus of Passing",
+    "card_number": 237,
+    "energy_cost": 4,
+    "card_type": "Character",
+    "subtype": "Ancient",
+    "is_fast": false,
+    "spark": null,
+    "rarity": "Rare",
+    "rules_text": "This character's spark is equal to the number of other allied characters."
+  },
+  {
+    "name": "Tideweaver Adept",
+    "card_number": 238,
+    "energy_cost": 4,
+    "card_type": "Character",
+    "subtype": "Visitor",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Uncommon",
+    "rules_text": "Materialized: Draw a card for each other ally that was materialized this turn."
+  },
+  {
+    "name": "Abyssal Reclaimer",
+    "card_number": 239,
+    "energy_cost": 3,
+    "card_type": "Character",
+    "subtype": "Survivor",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Uncommon",
+    "rules_text": "Materialized: Put the top 3 cards of your deck into your void. Return a Survivor from your void to your hand."
+  },
+  {
+    "name": "Stoneveil Guardian",
+    "card_number": 240,
+    "energy_cost": 3,
+    "card_type": "Character",
+    "subtype": "Spirit Animal",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Uncommon",
+    "rules_text": "Judgment: Each allied Spirit Animal gains +1 spark until end of turn."
+  },
+  {
+    "name": "Forgeborn Martyr",
+    "card_number": 241,
+    "energy_cost": 3,
+    "card_type": "Character",
+    "subtype": "Warrior",
+    "is_fast": false,
+    "spark": 2,
+    "rarity": "Rare",
+    "rules_text": "Judgment: You may abandon an allied Warrior. If you do, each other allied Warrior gains +2 spark until end of turn. Otherwise, kindle 1."
+  },
+  {
+    "name": "Ashfire Ritualist",
+    "card_number": 242,
+    "energy_cost": 3,
+    "card_type": "Character",
+    "subtype": "Outsider",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Rare",
+    "rules_text": "When you abandon an ally, kindle 1 and reclaim that character."
+  },
+  {
+    "name": "Stormtide Oracle",
+    "card_number": 243,
+    "energy_cost": 4,
+    "card_type": "Character",
+    "subtype": "Ancient",
+    "is_fast": false,
+    "spark": 2,
+    "rarity": "Rare",
+    "rules_text": "Whenever you play an event, foresee 2."
+  },
+  {
+    "name": "Watcher of the Fathoms",
+    "card_number": 244,
+    "energy_cost": 4,
+    "card_type": "Character",
+    "subtype": "Ancient",
+    "is_fast": false,
+    "spark": 0,
+    "rarity": "Rare",
+    "rules_text": "Judgment: Kindle 1 for each card in your hand above 3."
+  },
+  {
+    "name": "Windstride Runner",
+    "card_number": 245,
+    "energy_cost": 2,
+    "card_type": "Character",
+    "subtype": "Visitor",
+    "is_fast": true,
+    "spark": 1,
+    "rarity": "Uncommon",
+    "rules_text": "When you play a fast card, this character gains +1 spark until end of turn."
+  },
+  {
+    "name": "Voidthread Weaver",
+    "card_number": 246,
+    "energy_cost": 3,
+    "card_type": "Character",
+    "subtype": "Explorer",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Rare",
+    "rules_text": "When you discard a card, draw a card."
+  },
+  {
+    "name": "Roothold Keeper",
+    "card_number": 247,
+    "energy_cost": 2,
+    "card_type": "Character",
+    "subtype": "Survivor",
+    "is_fast": false,
+    "spark": 1,
+    "rarity": "Uncommon",
+    "rules_text": "You may only play this character from your void. When you materialize this character from your void, gain 1 energy and draw 1."
+  },
+  {
+    "name": "Nightmare",
+    "card_number": 248,
+    "energy_cost": 2,
+    "card_type": "Event",
+    "subtype": null,
+    "is_fast": false,
+    "spark": null,
+    "rarity": "Common",
+    "rules_text": "Draw 1."
+  },
+  {
+    "name": "Void Indicator Card",
+    "card_number": 249,
+    "energy_cost": 0,
+    "card_type": "Event",
+    "subtype": null,
+    "is_fast": false,
+    "spark": null,
+    "rarity": "Common",
+    "rules_text": ""
   }
 ]

@@ -1,15 +1,18 @@
 """Generate resonance and tag assignments for quest simulator cards.
 
 Reads data/cards.json (produced by the Rust card exporter) and writes
-data/card_data.json with heuristic resonance and tag assignments for
-each card. This is a standalone one-time generator, not imported at
-runtime by the simulator.
+data/card_data.json with resonance and tag assignments for each card.
+
+Uses curated resonance assignments from data/card_allocations.toml as
+the primary source, falling back to heuristic scoring for any cards
+not found in the allocations file.
 
 Usage: python3 resonance_heuristic.py
 """
 
 import json
 import re
+import tomllib
 from collections import Counter
 from pathlib import Path
 
@@ -74,6 +77,24 @@ DUAL_THRESHOLD = 2.5
 CONFIDENCE_THRESHOLD = 2.0
 
 
+def load_allocations(path: Path) -> dict[str, dict[str, list[str]]]:
+    """Load curated resonance allocations from TOML file.
+
+    Returns a dict mapping card name to {"resonance": [...], "archetypes": [...]}.
+    """
+    with open(path, "rb") as f:
+        data = tomllib.load(f)
+
+    result: dict[str, dict[str, list[str]]] = {}
+    for entry in data.get("cards", []):
+        name = entry["name"]
+        result[name] = {
+            "resonance": entry.get("resonance", []),
+            "archetypes": entry.get("archetypes", []),
+        }
+    return result
+
+
 def score_resonances(card: dict[str, object]) -> dict[str, float]:
     """Compute a resonance score for each of the 5 resonances."""
     scores: dict[str, float] = {r: 0.0 for r in RESONANCES}
@@ -136,9 +157,17 @@ def find_keywords(rules_text: str) -> set[str]:
     return found
 
 
-def assign_tags(card: dict[str, object]) -> list[str]:
-    """Assign 1-3 tags to a card based on its attributes."""
+def assign_tags(
+    card: dict[str, object],
+    archetypes: list[str] | None = None,
+) -> list[str]:
+    """Assign tags to a card based on its attributes and archetypes."""
     tags: list[str] = []
+
+    # Add archetype tags first (from curated allocations)
+    if archetypes:
+        for archetype in archetypes:
+            tags.append(f"archetype:{archetype.lower()}")
 
     subtype = card.get("subtype")
     if isinstance(subtype, str) and subtype in TRIBAL_SUBTYPES:
@@ -150,16 +179,16 @@ def assign_tags(card: dict[str, object]) -> list[str]:
     if isinstance(rules_text, str):
         keywords = find_keywords(rules_text)
         for keyword in sorted(keywords):
-            if len(tags) < 3:
+            if len(tags) < 6:
                 tags.append(f"mechanic:{keyword}")
 
     spark = card.get("spark")
-    if isinstance(spark, int) and spark >= 4 and len(tags) < 3:
+    if isinstance(spark, int) and spark >= 4 and len(tags) < 6:
         tags.append("role:finisher")
 
-    if keywords & REMOVAL_KEYWORDS and len(tags) < 3:
+    if keywords & REMOVAL_KEYWORDS and len(tags) < 6:
         tags.append("role:removal")
-    if keywords & ENGINE_KEYWORDS and len(tags) < 3:
+    if keywords & ENGINE_KEYWORDS and len(tags) < 6:
         tags.append("role:engine")
 
     if not tags:
@@ -169,23 +198,40 @@ def assign_tags(card: dict[str, object]) -> list[str]:
         else:
             tags.append("mechanic:general")
 
-    return tags[:3]
+    return tags
 
 
 def run() -> None:
-    """Read cards, assign resonances and tags, write output."""
+    """Read cards and allocations, assign resonances and tags, write output."""
     script_dir = Path(__file__).parent
     input_path = script_dir / "data" / "cards.json"
     output_path = script_dir / "data" / "card_data.json"
+    allocations_path = script_dir / "data" / "card_allocations.toml"
 
     with open(input_path) as f:
         cards = json.load(f)
 
+    allocations = load_allocations(allocations_path)
+
     results: list[dict[str, object]] = []
+    curated_count = 0
+    heuristic_count = 0
+
     for card in cards:
-        scores = score_resonances(card)
-        resonance = assign_resonance(scores)
-        tags = assign_tags(card)
+        card_name = card.get("name", "")
+        allocation = allocations.get(card_name) if isinstance(card_name, str) else None
+
+        if allocation is not None:
+            resonance = list(allocation["resonance"])
+            archetypes = list(allocation["archetypes"])
+            curated_count += 1
+        else:
+            scores = score_resonances(card)
+            resonance = assign_resonance(scores)
+            archetypes = []
+            heuristic_count += 1
+
+        tags = assign_tags(card, archetypes)
         results.append(
             {
                 "card_number": card["card_number"],
@@ -198,6 +244,8 @@ def run() -> None:
         json.dump(results, f, indent=2)
         f.write("\n")
 
+    print(f"Curated allocations: {curated_count}")
+    print(f"Heuristic fallback:  {heuristic_count}")
     print_summary(results)
 
 
@@ -241,7 +289,7 @@ def print_summary(results: list[dict[str, object]]) -> None:
                 if isinstance(tag, str):
                     tag_counts[tag] += 1
     print(f"\nTag distribution ({len(tag_counts)} unique tags):")
-    for tag, count in tag_counts.most_common(20):
+    for tag, count in tag_counts.most_common(30):
         print(f"  {tag:30s}: {count}")
 
 

@@ -1,5 +1,7 @@
 """Tests for resonance heuristic scoring, assignment, and tagging."""
 
+from pathlib import Path
+
 from resonance_heuristic import (
     CONFIDENCE_THRESHOLD,
     DUAL_THRESHOLD,
@@ -9,6 +11,7 @@ from resonance_heuristic import (
     assign_resonance,
     assign_tags,
     find_keywords,
+    load_allocations,
     score_resonances,
 )
 
@@ -172,16 +175,65 @@ class TestAssignTags:
         tags = assign_tags(card)
         assert "mechanic:general" in tags
 
-    def test_max_three_tags(self) -> None:
-        card: dict[str, object] = {
-            "subtype": "Warrior",
-            "rules_text": "Draw 2, foresee 3, dissolve, reclaim, discard.",
-            "spark": 5,
-        }
-        tags = assign_tags(card)
-        assert len(tags) <= 3
-
     def test_no_duplicate_tags(self) -> None:
         card: dict[str, object] = {"subtype": "Mage", "rules_text": "Draw a card."}
         tags = assign_tags(card)
         assert len(tags) == len(set(tags))
+
+    def test_archetype_tags_included(self) -> None:
+        card: dict[str, object] = {"rules_text": "Draw a card."}
+        tags = assign_tags(card, archetypes=["Tempest", "Mirage"])
+        assert "archetype:tempest" in tags
+        assert "archetype:mirage" in tags
+
+    def test_archetype_tags_come_first(self) -> None:
+        card: dict[str, object] = {"subtype": "Warrior", "rules_text": "Draw 2."}
+        tags = assign_tags(card, archetypes=["Crucible"])
+        assert tags[0] == "archetype:crucible"
+
+    def test_no_archetypes_produces_standard_tags(self) -> None:
+        card: dict[str, object] = {"subtype": "Warrior", "rules_text": ""}
+        tags = assign_tags(card)
+        assert "tribal:warrior" in tags
+        assert not any(t.startswith("archetype:") for t in tags)
+
+
+class TestLoadAllocations:
+    def test_loads_real_allocations_file(self) -> None:
+        path = Path(__file__).parent / "data" / "card_allocations.toml"
+        allocations = load_allocations(path)
+        assert len(allocations) == 249
+
+    def test_mono_resonance_card(self) -> None:
+        path = Path(__file__).parent / "data" / "card_allocations.toml"
+        allocations = load_allocations(path)
+        entry = allocations["The Calling Night"]
+        assert entry["resonance"] == ["Tide"]
+        assert entry["archetypes"] == ["Tempest"]
+
+    def test_dual_resonance_card(self) -> None:
+        path = Path(__file__).parent / "data" / "card_allocations.toml"
+        allocations = load_allocations(path)
+        entry = allocations["Tideweaver Adept"]
+        assert entry["resonance"] == ["Tide", "Zephyr"]
+        assert entry["archetypes"] == ["Mirage"]
+
+    def test_neutral_card(self) -> None:
+        path = Path(__file__).parent / "data" / "card_allocations.toml"
+        allocations = load_allocations(path)
+        entry = allocations["Nexus of Passing"]
+        assert entry["resonance"] == []
+        assert entry["archetypes"] == []
+
+    def test_curated_overrides_heuristic(self) -> None:
+        """Data Pulse was Ember by heuristic but Tide by curation."""
+        path = Path(__file__).parent / "data" / "card_allocations.toml"
+        allocations = load_allocations(path)
+        entry = allocations["Data Pulse"]
+        assert entry["resonance"] == ["Tide"]
+
+    def test_dreamtide_cartographer_moved_to_zephyr(self) -> None:
+        path = Path(__file__).parent / "data" / "card_allocations.toml"
+        allocations = load_allocations(path)
+        entry = allocations["Dreamtide Cartographer"]
+        assert entry["resonance"] == ["Zephyr"]
