@@ -427,6 +427,9 @@ parser *args='':
 parser-release *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --release --bin "parser" -- "$@"
 
+quest-sim:
+  cd scripts/quest_simulator && python3 quest_sim.py
+
 export-cards:
   #!/usr/bin/env bash
   mkdir -p scripts/quest_simulator/data
