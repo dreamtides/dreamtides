@@ -190,11 +190,21 @@ def _dreamscape_loop(
         if len(selectable) == 1 and selectable[0].site_type == SiteType.BATTLE:
             _enforce_deck_limits(state, logger)
 
-        # Display site list
-        site_display = render_atlas.render_dreamscape_sites(
-            node.sites, selected_index=0
+        # Show visited/locked sites as non-interactive header
+        all_non_battle_visited = all(
+            s.is_visited for s in node.sites if s.site_type != SiteType.BATTLE
         )
-        print(site_display)
+        header_lines: list[str] = []
+        for site in node.sites:
+            name = render_atlas.site_type_name(site.site_type)
+            if site.is_enhanced:
+                name += "*"
+            if site.is_visited:
+                header_lines.append(f"  {render.DIM}\u2713 {name}{render.RESET}")
+            elif site.site_type == SiteType.BATTLE and not all_non_battle_visited:
+                header_lines.append(f"      {name} [locked]")
+        if header_lines:
+            print("\n".join(header_lines))
 
         # Build selection options: View Deck first, then selectable sites
         option_labels = [_VIEW_DECK_LABEL] + [
