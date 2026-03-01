@@ -770,6 +770,7 @@ export async function setDerivedColumnWidth(
 export interface EnumValidationInfo {
   column: string;
   allowed_values: string[];
+  colors?: string[];
 }
 
 export async function getEnumValidationRules(

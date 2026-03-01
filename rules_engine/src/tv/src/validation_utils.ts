@@ -1,3 +1,4 @@
+import { DataValidationRenderMode } from "@univerjs/core";
 import { FUniver } from "@univerjs/core/facade";
 import { FWorksheet } from "@univerjs/sheets/facade";
 
@@ -130,7 +131,17 @@ export function applyDropdownValidation(
             error: `Value must be one of: ${rule.allowed_values.join(", ")}`,
           })
           .build();
+
+        if (rule.colors && rule.colors.length > 0) {
+          validationRule.rule.formula2 = rule.colors.join(",");
+          validationRule.rule.renderMode = DataValidationRenderMode.CUSTOM;
+        }
+
         range.setDataValidation(validationRule);
+
+        if (rule.colors && rule.colors.length > 0) {
+          range.setFontColor("#000000");
+        }
 
         range.setVerticalAlignment("middle");
         range.setWrap(true);

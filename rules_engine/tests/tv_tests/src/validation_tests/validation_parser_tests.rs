@@ -22,7 +22,7 @@ enum = ["Character", "Event", "Artifact"]
     assert_eq!(rules.len(), 1);
 
     match &rules[0] {
-        ValidationRule::Enum { column, allowed_values, message } => {
+        ValidationRule::Enum { column, allowed_values, message, .. } => {
             assert_eq!(column, "card_type");
             assert_eq!(allowed_values, &vec![
                 "Character".to_string(),

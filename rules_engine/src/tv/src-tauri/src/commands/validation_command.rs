@@ -35,8 +35,8 @@ pub fn get_enum_validation_rules(file_path: String) -> Result<Vec<EnumValidation
     let enum_rules: Vec<EnumValidationInfo> = rules
         .into_iter()
         .filter_map(|rule| {
-            if let ValidationRule::Enum { column, allowed_values, .. } = rule {
-                Some(EnumValidationInfo { column, allowed_values })
+            if let ValidationRule::Enum { column, allowed_values, colors, .. } = rule {
+                Some(EnumValidationInfo { column, allowed_values, colors })
             } else {
                 None
             }
@@ -57,4 +57,6 @@ pub fn get_enum_validation_rules(file_path: String) -> Result<Vec<EnumValidation
 pub struct EnumValidationInfo {
     pub column: String,
     pub allowed_values: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub colors: Option<Vec<String>>,
 }

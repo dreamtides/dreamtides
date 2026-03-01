@@ -7,6 +7,7 @@ fn test_enum_validation_pass() {
     let rule = ValidationRule::Enum {
         column: "card_type".to_string(),
         allowed_values: vec!["Character".to_string(), "Event".to_string()],
+        colors: None,
         message: None,
     };
 
@@ -20,6 +21,7 @@ fn test_enum_validation_fail() {
     let rule = ValidationRule::Enum {
         column: "card_type".to_string(),
         allowed_values: vec!["Character".to_string(), "Event".to_string()],
+        colors: None,
         message: None,
     };
 
@@ -34,6 +36,7 @@ fn test_enum_validation_null_passes() {
     let rule = ValidationRule::Enum {
         column: "card_type".to_string(),
         allowed_values: vec!["Character".to_string(), "Event".to_string()],
+        colors: None,
         message: None,
     };
 
@@ -46,6 +49,7 @@ fn test_enum_validation_custom_message() {
     let rule = ValidationRule::Enum {
         column: "card_type".to_string(),
         allowed_values: vec!["Character".to_string()],
+        colors: None,
         message: Some("Please select a valid card type".to_string()),
     };
 
@@ -522,6 +526,7 @@ fn test_validation_result_has_correct_metadata() {
     let rule = ValidationRule::Enum {
         column: "card_type".to_string(),
         allowed_values: vec!["Character".to_string()],
+        colors: None,
         message: None,
     };
 
@@ -532,8 +537,12 @@ fn test_validation_result_has_correct_metadata() {
 
 #[test]
 fn test_rule_type_name_enum() {
-    let rule =
-        ValidationRule::Enum { column: "col".to_string(), allowed_values: vec![], message: None };
+    let rule = ValidationRule::Enum {
+        column: "col".to_string(),
+        allowed_values: vec![],
+        colors: None,
+        message: None,
+    };
     assert_eq!(rule.rule_type_name(), "enum");
 }
 
@@ -575,6 +584,7 @@ fn test_describe_enum() {
     let rule = ValidationRule::Enum {
         column: "card_type".to_string(),
         allowed_values: vec!["Character".to_string(), "Event".to_string()],
+        colors: None,
         message: None,
     };
     assert_eq!(rule.describe(), "Must be one of: Character, Event");
@@ -652,6 +662,7 @@ fn test_display_validation_rule_enum() {
     let rule = ValidationRule::Enum {
         column: "card_type".to_string(),
         allowed_values: vec!["Character".to_string(), "Event".to_string()],
+        colors: None,
         message: None,
     };
     assert_eq!(format!("{rule}"), "enum(card_type: [Character, Event])");

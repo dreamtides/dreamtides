@@ -179,6 +179,7 @@ fn test_enum_validation_allowed_value_pass() {
     let rule = ValidationRule::Enum {
         column: "card_type".to_string(),
         allowed_values: vec!["Character".to_string(), "Event".to_string(), "Artifact".to_string()],
+        colors: None,
         message: None,
     };
 
@@ -197,6 +198,7 @@ fn test_enum_validation_disallowed_value_fail() {
     let rule = ValidationRule::Enum {
         column: "card_type".to_string(),
         allowed_values: vec!["Character".to_string(), "Event".to_string()],
+        colors: None,
         message: None,
     };
 
@@ -213,6 +215,7 @@ fn test_enum_case_sensitive() {
     let rule = ValidationRule::Enum {
         column: "card_type".to_string(),
         allowed_values: vec!["Character".to_string(), "Event".to_string()],
+        colors: None,
         message: None,
     };
 

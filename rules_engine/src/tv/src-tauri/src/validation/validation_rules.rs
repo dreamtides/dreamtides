@@ -9,6 +9,8 @@ pub enum ValidationRule {
         column: String,
         #[serde(rename = "enum")]
         allowed_values: Vec<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        colors: Option<Vec<String>>,
         #[serde(default)]
         message: Option<String>,
     },

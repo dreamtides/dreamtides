@@ -114,6 +114,7 @@ fn test_save_metadata_validation_rules() {
     metadata.validation_rules.push(ValidationRule::Enum {
         column: "card_type".to_string(),
         allowed_values: vec!["Character".to_string(), "Event".to_string()],
+        colors: None,
         message: Some("Invalid card type".to_string()),
     });
     metadata.validation_rules.push(ValidationRule::Range {

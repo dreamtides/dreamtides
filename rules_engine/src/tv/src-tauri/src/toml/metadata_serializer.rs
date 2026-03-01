@@ -516,10 +516,13 @@ fn serialize_validation_rules(rules: &[ValidationRule]) -> ArrayOfTables {
 fn serialize_single_validation_rule(rule: &ValidationRule) -> Table {
     let mut table = Table::new();
     match rule {
-        ValidationRule::Enum { column, allowed_values, message } => {
+        ValidationRule::Enum { column, allowed_values, colors, message } => {
             table.insert("column", value(column));
             table.insert("type", value("enum"));
             table.insert("enum", Item::Value(serialize_string_array(allowed_values)));
+            if let Some(c) = colors {
+                table.insert("colors", Item::Value(serialize_string_array(c)));
+            }
             if let Some(msg) = message {
                 table.insert("message", value(msg));
             }

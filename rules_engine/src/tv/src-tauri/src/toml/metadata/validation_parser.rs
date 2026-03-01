@@ -109,7 +109,11 @@ fn parse_single_rule(
                 .and_then(|v| v.as_array())
                 .map(|arr| arr.iter().filter_map(|v| v.as_str().map(String::from)).collect())
                 .unwrap_or_default();
-            Ok(ValidationRule::Enum { column, allowed_values, message })
+            let colors = table
+                .get("colors")
+                .and_then(|v| v.as_array())
+                .map(|arr| arr.iter().filter_map(|v| v.as_str().map(String::from)).collect());
+            Ok(ValidationRule::Enum { column, allowed_values, colors, message })
         }
         "range" => {
             let min = table.get("min").and_then(|v| v.as_float().or_else(|| v.as_integer().map(|i| i as f64)));
