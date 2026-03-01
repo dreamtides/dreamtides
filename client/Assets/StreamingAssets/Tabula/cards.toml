@@ -12,6 +12,7 @@ image-number = 2521694543
 rarity = "Rare"
 art-owned = true
 card-number = 1
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Beacon of Tomorrow"
@@ -43,6 +44,7 @@ image-number = 2269064817
 rarity = "Rare"
 art-owned = true
 card-number = 3
+resonance = ["Ruin"]
 variables = ""
 
 [[cards]]
@@ -63,6 +65,7 @@ image-number = 2269064809
 rarity = "Rare"
 art-owned = true
 card-number = 4
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Moonlit Voyage"
@@ -100,6 +103,7 @@ image-number = 2364396771
 rarity = "Common"
 art-owned = true
 card-number = 6
+resonance = ["Zephyr"]
 variables = ""
 
 [[cards]]
@@ -119,6 +123,7 @@ image-number = 2415692463
 rarity = "Uncommon"
 art-owned = true
 card-number = 7
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Ashmaze Guide"
@@ -133,6 +138,7 @@ image-number = 1185684772
 rarity = "Rare"
 art-owned = true
 card-number = 8
+resonance = ["Ruin"]
 variables = ""
 
 [[cards]]
@@ -149,6 +155,7 @@ image-number = 1246321000
 rarity = "Common"
 art-owned = true
 card-number = 9
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "The Rising God"
@@ -164,6 +171,7 @@ image-number = 2290648801
 rarity = "Uncommon"
 art-owned = true
 card-number = 10
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Apocalypse Vigilante"
@@ -180,6 +188,7 @@ image-number = 1347487814
 rarity = "Rare"
 art-owned = true
 card-number = 11
+resonance = ["Ruin"]
 subtype = ""
 
 [[cards]]
@@ -196,6 +205,7 @@ image-number = 1047769090
 rarity = "Common"
 art-owned = true
 card-number = 12
+resonance = ["Stone"]
 
 [[cards]]
 name = "Glimpse of Infinity"
@@ -226,6 +236,7 @@ image-number = 1798514908
 rarity = "Uncommon"
 art-owned = true
 card-number = 14
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -243,6 +254,7 @@ image-number = 2424248089
 rarity = "Common"
 art-owned = true
 card-number = 15
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Eclipse Herald"
@@ -260,6 +272,7 @@ image-number = 2295991863
 rarity = "Uncommon"
 art-owned = true
 card-number = 16
+resonance = ["Ember"]
 
 [[cards]]
 name = "Chronicle Reclaimer"
@@ -279,6 +292,7 @@ image-number = 1633431265
 rarity = "Common"
 art-owned = true
 card-number = 17
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Apocalypse"
@@ -293,6 +307,7 @@ image-number = 1200949222
 rarity = "Rare"
 art-owned = true
 card-number = 18
+resonance = ["Ember"]
 variables = ""
 subtype = ""
 spark = ""
@@ -311,6 +326,7 @@ image-number = 1486924802
 rarity = "Uncommon"
 art-owned = true
 card-number = 19
+resonance = ["Ruin"]
 
 [[cards]]
 name = "The Calling Night"
@@ -328,6 +344,7 @@ image-number = 1074377570
 rarity = "Rare"
 art-owned = true
 card-number = 20
+resonance = ["Tide"]
 
 [[cards]]
 name = "Starsea Traveler"
@@ -345,6 +362,7 @@ image-number = 1084620233
 rarity = "Rare"
 art-owned = true
 card-number = 21
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Urban Cipher"
@@ -364,6 +382,7 @@ image-number = 2216124455
 rarity = "Common"
 art-owned = true
 card-number = 22
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Reunion"
@@ -377,6 +396,7 @@ image-number = 2278837661
 rarity = "Common"
 art-owned = true
 card-number = 23
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -393,6 +413,7 @@ image-number = 1907487244
 rarity = "Common"
 art-owned = true
 card-number = 24
+resonance = ["Ember"]
 variables = ""
 subtype = ""
 spark = ""
@@ -413,6 +434,7 @@ image-number = 1639942840
 rarity = "Rare"
 art-owned = true
 card-number = 25
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Torchbearer of the Abyss"
@@ -430,6 +452,7 @@ image-number = 695511787
 rarity = "Uncommon"
 art-owned = true
 card-number = 26
+resonance = ["Ruin"]
 
 [[cards]]
 name = "The Devourer"
@@ -445,6 +468,7 @@ image-number = 700254508
 rarity = "Rare"
 art-owned = true
 card-number = 27
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Nocturne"
@@ -466,6 +490,7 @@ image-number = 2290648807
 rarity = "Common"
 art-owned = true
 card-number = 28
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Abomination of Memory"
@@ -480,6 +505,7 @@ image-number = 1577968036
 rarity = "Uncommon"
 art-owned = true
 card-number = 29
+resonance = ["Ruin"]
 variables = ""
 
 [[cards]]
@@ -513,6 +539,7 @@ image-number = 2427491215
 rarity = "Rare"
 art-owned = true
 card-number = 31
+resonance = ["Ember"]
 
 [[cards]]
 name = "Tranquil Duelist"
@@ -528,6 +555,7 @@ image-number = 1794244549
 rarity = "Common"
 art-owned = true
 card-number = 32
+resonance = ["Tide"]
 
 [[cards]]
 name = "Voidshield Guardian"
@@ -542,6 +570,7 @@ image-number = 2186149279
 rarity = "Uncommon"
 art-owned = true
 card-number = 33
+resonance = ["Tide"]
 variables = ""
 
 [[cards]]
@@ -561,6 +590,7 @@ image-number = 1897537156
 rarity = "Uncommon"
 art-owned = true
 card-number = 34
+resonance = ["Stone"]
 
 [[cards]]
 name = "Ride of the Vanguard"
@@ -576,6 +606,7 @@ image-number = 1788833078
 rarity = "Uncommon"
 art-owned = true
 card-number = 35
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -597,6 +628,7 @@ image-number = 1798382140
 rarity = "Common"
 art-owned = true
 card-number = 36
+resonance = ["Stone"]
 
 [[cards]]
 name = "Lumin-Gate Seer"
@@ -616,6 +648,7 @@ image-number = 2127752120
 rarity = "Rare"
 art-owned = true
 card-number = 37
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Veil Shatter"
@@ -644,6 +677,7 @@ image-number = 1708315387
 rarity = "Uncommon"
 art-owned = true
 card-number = 39
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -659,6 +693,7 @@ image-number = 2521694541
 rarity = "Common"
 art-owned = true
 card-number = 40
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -674,6 +709,7 @@ image-number = 2303852059
 rarity = "Common"
 art-owned = true
 card-number = 41
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -689,6 +725,7 @@ image-number = 1570031575
 rarity = "Uncommon"
 art-owned = true
 card-number = 42
+resonance = ["Stone"]
 subtype = ""
 spark = ""
 
@@ -706,6 +743,7 @@ image-number = 1798514896
 rarity = "Common"
 art-owned = true
 card-number = 43
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Dreadcall Warden"
@@ -724,6 +762,7 @@ image-number = 2521694547
 rarity = "Rare"
 art-owned = true
 card-number = 44
+resonance = ["Ember"]
 
 [[cards]]
 name = "Wolfbond Chieftain"
@@ -742,6 +781,7 @@ image-number = 2216124451
 rarity = "Common"
 art-owned = true
 card-number = 45
+resonance = ["Stone"]
 
 [[cards]]
 name = "Dawnblade Wanderer"
@@ -757,6 +797,7 @@ image-number = 1104412877
 rarity = "Legendary"
 art-owned = true
 card-number = 46
+resonance = ["Stone"]
 
 [[cards]]
 name = "Bloomweaver"
@@ -774,6 +815,7 @@ image-number = 1790126246
 rarity = "Common"
 art-owned = true
 card-number = 47
+resonance = ["Stone"]
 
 [[cards]]
 name = "Seeker for the Way"
@@ -789,6 +831,7 @@ image-number = 1913887483
 rarity = "Common"
 art-owned = true
 card-number = 48
+resonance = ["Stone"]
 
 [[cards]]
 name = "Rebirth Ritualist"
@@ -806,6 +849,7 @@ image-number = 2131591275
 rarity = "Rare"
 art-owned = true
 card-number = 49
+resonance = ["Ember"]
 
 [[cards]]
 name = "Pallid Arbiter"
@@ -822,6 +866,7 @@ image-number = 1289324164
 rarity = "Uncommon"
 art-owned = true
 card-number = 50
+resonance = ["Tide"]
 variables = ""
 
 [[cards]]
@@ -840,6 +885,7 @@ image-number = 1785274670
 rarity = "Common"
 art-owned = true
 card-number = 51
+resonance = ["Stone"]
 
 [[cards]]
 name = "Spirit Field Reclaimer"
@@ -858,6 +904,7 @@ image-number = 2287054239
 rarity = "Uncommon"
 art-owned = true
 card-number = 52
+resonance = ["Stone"]
 
 [[cards]]
 name = "Cloaked Sentinel"
@@ -873,6 +920,7 @@ image-number = 1295291155
 rarity = "Uncommon"
 art-owned = true
 card-number = 53
+resonance = ["Stone"]
 
 [[cards]]
 name = "Twilight Suppressor"
@@ -887,6 +935,7 @@ image-number = 2293194529
 rarity = "Uncommon"
 art-owned = true
 card-number = 54
+resonance = ["Stone"]
 variables = ""
 
 [[cards]]
@@ -903,6 +952,7 @@ image-number = 2218612343
 rarity = "Common"
 art-owned = true
 card-number = 55
+resonance = ["Tide"]
 
 [[cards]]
 name = "Forsworn Champion"
@@ -918,6 +968,7 @@ image-number = 1794244543
 rarity = "Common"
 art-owned = true
 card-number = 56
+resonance = ["Ember"]
 
 [[cards]]
 name = "Blade of Unity"
@@ -933,6 +984,7 @@ image-number = 1891048570
 rarity = "Common"
 art-owned = true
 card-number = 57
+resonance = ["Stone"]
 
 [[cards]]
 name = "Invoker of Myths"
@@ -950,6 +1002,7 @@ image-number = 1289324101
 rarity = "Uncommon"
 art-owned = true
 card-number = 58
+resonance = ["Stone"]
 
 [[cards]]
 name = "Speaker for the Forgotten"
@@ -967,6 +1020,7 @@ image-number = 2278837663
 rarity = "Rare"
 art-owned = true
 card-number = 59
+resonance = ["Stone"]
 
 [[cards]]
 name = "Infernal Rest"
@@ -985,6 +1039,7 @@ image-number = 1164289078
 rarity = "Uncommon"
 art-owned = true
 card-number = 60
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -1003,6 +1058,7 @@ image-number = 2258761881
 rarity = "Uncommon"
 art-owned = true
 card-number = 61
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -1020,6 +1076,7 @@ image-number = 2123360837
 rarity = "Common"
 art-owned = true
 card-number = 62
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -1035,6 +1092,7 @@ image-number = 2221518875
 rarity = "Uncommon"
 art-owned = true
 card-number = 63
+resonance = ["Stone"]
 subtype = ""
 spark = ""
 
@@ -1049,6 +1107,7 @@ image-number = 2030910791
 rarity = "Uncommon"
 art-owned = true
 card-number = 64
+resonance = ["Stone"]
 variables = ""
 subtype = ""
 spark = ""
@@ -1068,6 +1127,7 @@ image-number = 2027158295
 rarity = "Uncommon"
 art-owned = true
 card-number = 65
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -1083,6 +1143,7 @@ image-number = 1463121788
 rarity = "Rare"
 art-owned = true
 card-number = 66
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -1097,6 +1158,7 @@ image-number = 1282908322
 rarity = "Common"
 art-owned = true
 card-number = 67
+resonance = ["Tide"]
 variables = ""
 subtype = ""
 spark = ""
@@ -1119,6 +1181,7 @@ image-number = 1328168243
 rarity = "Common"
 art-owned = true
 card-number = 68
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -1134,6 +1197,7 @@ image-number = 2023111787
 rarity = "Uncommon"
 art-owned = false
 card-number = 69
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -1153,6 +1217,7 @@ image-number = 1794244546
 rarity = "Uncommon"
 art-owned = false
 card-number = 70
+resonance = ["Tide"]
 
 [[cards]]
 name = "Cosmic Puppeteer"
@@ -1168,6 +1233,7 @@ image-number = 316023560
 rarity = "Rare"
 art-owned = false
 card-number = 71
+resonance = ["Tide"]
 
 [[cards]]
 name = "Obliterator of Worlds"
@@ -1186,6 +1252,7 @@ image-number = 443761822
 rarity = "Rare"
 art-owned = false
 card-number = 72
+resonance = ["Ember"]
 
 [[cards]]
 name = "Horizon Follower"
@@ -1203,6 +1270,7 @@ image-number = 2275146333
 rarity = "Uncommon"
 art-owned = false
 card-number = 73
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Astral Navigators"
@@ -1218,6 +1286,7 @@ image-number = 2278837659
 rarity = "Common"
 art-owned = false
 card-number = 74
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Boundless Wanderer"
@@ -1253,6 +1322,7 @@ image-number = 1084620026
 rarity = "Common"
 art-owned = false
 card-number = 76
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Intermezzo Balladeer"
@@ -1268,6 +1338,7 @@ image-number = 1005938032
 rarity = "Common"
 art-owned = false
 card-number = 77
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Melodist of the Finale"
@@ -1283,6 +1354,7 @@ image-number = 1074373424
 rarity = "Rare"
 art-owned = false
 card-number = 78
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "The Waking Titan"
@@ -1303,6 +1375,7 @@ image-number = 2320845229
 rarity = "Rare"
 art-owned = false
 card-number = 79
+resonance = ["Stone"]
 
 [[cards]]
 name = "Virtuoso of Harmony"
@@ -1318,6 +1391,7 @@ image-number = 744309595
 rarity = "Common"
 art-owned = false
 card-number = 80
+resonance = ["Stone"]
 
 [[cards]]
 name = "Moonlit Dancer"
@@ -1336,6 +1410,7 @@ image-number = 1790126252
 rarity = "Rare"
 art-owned = false
 card-number = 81
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Secrets of the Deep"
@@ -1351,6 +1426,7 @@ image-number = 2131591273
 rarity = "Common"
 art-owned = false
 card-number = 82
+resonance = ["Zephyr"]
 subtype = ""
 spark = ""
 
@@ -1367,6 +1443,7 @@ image-number = 2212744819
 rarity = "Common"
 art-owned = false
 card-number = 83
+resonance = ["Zephyr"]
 variables = ""
 
 [[cards]]
@@ -1397,6 +1474,7 @@ image-number = 1044240499
 rarity = "Uncommon"
 art-owned = false
 card-number = 85
+resonance = ["Ruin"]
 variables = ""
 
 [[cards]]
@@ -1415,6 +1493,7 @@ image-number = 1725212353
 rarity = "Uncommon"
 art-owned = false
 card-number = 86
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Epiphany Unfolded"
@@ -1428,6 +1507,7 @@ image-number = 1021646686
 rarity = "Legendary"
 art-owned = false
 card-number = 87
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -1461,6 +1541,7 @@ image-number = 1016596177
 rarity = "Rare"
 art-owned = false
 card-number = 89
+resonance = ["Zephyr"]
 variables = ""
 
 [[cards]]
@@ -1475,6 +1556,7 @@ image-number = 2430444889
 rarity = "Rare"
 art-owned = false
 card-number = 90
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -1490,6 +1572,7 @@ image-number = 1798514905
 rarity = "Uncommon"
 art-owned = false
 card-number = 91
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -1510,6 +1593,7 @@ image-number = 2027158298
 rarity = "Uncommon"
 art-owned = false
 card-number = 92
+resonance = ["Ember"]
 
 [[cards]]
 name = "Cascade of Reflections"
@@ -1524,6 +1608,7 @@ image-number = 1739438657
 rarity = "Uncommon"
 art-owned = false
 card-number = 93
+resonance = ["Ember"]
 variables = ""
 subtype = ""
 spark = ""
@@ -1545,6 +1630,7 @@ image-number = 1196004052
 rarity = "Common"
 art-owned = false
 card-number = 94
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -1559,6 +1645,7 @@ image-number = 1005938023
 rarity = "Rare"
 art-owned = false
 card-number = 95
+resonance = ["Ruin"]
 variables = ""
 subtype = ""
 spark = ""
@@ -1577,6 +1664,7 @@ image-number = 670293475
 rarity = "Common"
 art-owned = false
 card-number = 96
+resonance = ["Zephyr"]
 subtype = ""
 spark = ""
 
@@ -1592,6 +1680,7 @@ image-number = 717263302
 rarity = "Uncommon"
 art-owned = false
 card-number = 97
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -1607,6 +1696,7 @@ image-number = 2186149269
 rarity = "Common"
 art-owned = false
 card-number = 98
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -1621,6 +1711,7 @@ image-number = 1968259702
 rarity = "Uncommon"
 art-owned = false
 card-number = 99
+resonance = ["Stone"]
 variables = ""
 subtype = ""
 spark = ""
@@ -1638,6 +1729,7 @@ image-number = 758082493
 rarity = "Legendary"
 art-owned = false
 card-number = 100
+resonance = ["Tide"]
 variables = ""
 subtype = ""
 spark = ""
@@ -1656,6 +1748,7 @@ image-number = 2251144881
 rarity = "Common"
 art-owned = false
 card-number = 101
+resonance = ["Tide"]
 
 [[cards]]
 name = "Starcatcher"
@@ -1671,6 +1764,7 @@ image-number = 2221822101
 rarity = "Uncommon"
 art-owned = false
 card-number = 102
+resonance = ["Stone"]
 
 [[cards]]
 name = "Flash of Power"
@@ -1686,6 +1780,7 @@ image-number = 1063277315
 rarity = "Uncommon"
 art-owned = false
 card-number = 103
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -1701,6 +1796,7 @@ image-number = 1314287447
 rarity = "Uncommon"
 art-owned = false
 card-number = 104
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -1716,6 +1812,7 @@ image-number = 1529898278
 rarity = "Uncommon"
 art-owned = false
 card-number = 105
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -1735,6 +1832,7 @@ image-number = 1084619579
 rarity = "Common"
 art-owned = false
 card-number = 106
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -1772,6 +1870,7 @@ image-number = 1005938035
 rarity = "Rare"
 art-owned = false
 card-number = 108
+resonance = ["Ember"]
 
 [[cards]]
 name = "Wheel of the Heavens"
@@ -1816,6 +1915,7 @@ image-number = 2155438703
 rarity = "Uncommon"
 art-owned = false
 card-number = 111
+resonance = ["Ember"]
 variables = ""
 subtype = ""
 spark = ""
@@ -1831,6 +1931,7 @@ image-number = 2018053223
 rarity = "Uncommon"
 art-owned = false
 card-number = 112
+resonance = ["Ruin"]
 variables = ""
 subtype = ""
 spark = ""
@@ -1866,6 +1967,7 @@ image-number = 1739438660
 rarity = "Common"
 art-owned = false
 card-number = 114
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -1880,6 +1982,7 @@ image-number = 1042405558
 rarity = "Uncommon"
 art-owned = false
 card-number = 115
+resonance = ["Tide"]
 variables = ""
 subtype = ""
 spark = ""
@@ -1895,6 +1998,7 @@ image-number = 1798382125
 rarity = "Uncommon"
 art-owned = false
 card-number = 116
+resonance = ["Tide"]
 variables = ""
 subtype = ""
 spark = ""
@@ -1913,6 +2017,7 @@ image-number = 1924168811
 rarity = "Common"
 art-owned = false
 card-number = 117
+resonance = ["Zephyr"]
 subtype = ""
 spark = ""
 
@@ -1932,6 +2037,7 @@ image-number = 1963305277
 rarity = "Common"
 art-owned = false
 card-number = 118
+resonance = ["Tide"]
 
 [[cards]]
 name = "Ripple Through Reality"
@@ -1944,6 +2050,7 @@ image-number = 1058321690
 rarity = "Uncommon"
 art-owned = false
 card-number = 119
+resonance = ["Tide"]
 variables = ""
 subtype = ""
 spark = ""
@@ -1962,6 +2069,7 @@ image-number = 2023111784
 rarity = "Uncommon"
 art-owned = false
 card-number = 120
+resonance = ["Ember"]
 
 [[cards]]
 name = "Nexus Wayfinder"
@@ -1977,6 +2085,7 @@ image-number = 2419795159
 rarity = "Rare"
 art-owned = false
 card-number = 121
+resonance = ["Stone"]
 
 [[cards]]
 name = "Conduit of Resonance"
@@ -1991,6 +2100,7 @@ image-number = 1734025934
 rarity = "Rare"
 art-owned = false
 card-number = 122
+resonance = ["Zephyr"]
 variables = ""
 
 [[cards]]
@@ -2005,6 +2115,7 @@ image-number = 2293194521
 rarity = "Uncommon"
 art-owned = false
 card-number = 123
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -2026,6 +2137,7 @@ image-number = 2127752129
 rarity = "Common"
 art-owned = false
 card-number = 124
+resonance = ["Stone"]
 
 [[cards]]
 name = "Ethereal Courser"
@@ -2040,6 +2152,7 @@ image-number = 2127752123
 rarity = "Common"
 art-owned = false
 card-number = 125
+resonance = ["Stone"]
 variables = ""
 
 [[cards]]
@@ -2055,6 +2168,7 @@ image-number = 1529898275
 rarity = "Uncommon"
 art-owned = false
 card-number = 126
+resonance = ["Zephyr"]
 variables = ""
 
 [[cards]]
@@ -2070,6 +2184,7 @@ image-number = 2123360855
 rarity = "Rare"
 art-owned = false
 card-number = 127
+resonance = ["Zephyr"]
 variables = ""
 
 [[cards]]
@@ -2088,6 +2203,7 @@ image-number = 2221822105
 rarity = "Common"
 art-owned = false
 card-number = 128
+resonance = ["Stone"]
 
 [[cards]]
 name = "Luminwings"
@@ -2106,6 +2222,7 @@ image-number = 529374502
 rarity = "Common"
 art-owned = false
 card-number = 129
+resonance = ["Stone"]
 
 [[cards]]
 name = "Spirit of the Greenwood"
@@ -2121,6 +2238,7 @@ image-number = 2303852065
 rarity = "Uncommon"
 art-owned = false
 card-number = 130
+resonance = ["Stone"]
 
 [[cards]]
 name = "Spirit Bond"
@@ -2134,6 +2252,7 @@ image-number = 1913887486
 rarity = "Rare"
 art-owned = false
 card-number = 131
+resonance = ["Zephyr"]
 subtype = ""
 spark = ""
 
@@ -2150,6 +2269,7 @@ image-number = 2027158304
 rarity = "Rare"
 art-owned = false
 card-number = 132
+resonance = ["Zephyr"]
 variables = ""
 
 [[cards]]
@@ -2164,6 +2284,7 @@ image-number = 1037215606
 rarity = "Uncommon"
 art-owned = false
 card-number = 133
+resonance = ["Zephyr"]
 subtype = ""
 spark = ""
 
@@ -2181,6 +2302,7 @@ image-number = 1134692546
 rarity = "Common"
 art-owned = false
 card-number = 134
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Eternal Stag"
@@ -2200,6 +2322,7 @@ image-number = 1543022372
 rarity = "Uncommon"
 art-owned = false
 card-number = 135
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Spiritbound Alpha"
@@ -2218,6 +2341,7 @@ image-number = 1727859040
 rarity = "Uncommon"
 art-owned = false
 card-number = 136
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Sunshadow Eagle"
@@ -2237,6 +2361,7 @@ image-number = 2303852061
 rarity = "Common"
 art-owned = false
 card-number = 137
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Ebonwing"
@@ -2254,6 +2379,7 @@ image-number = 1047769120
 rarity = "Common"
 art-owned = false
 card-number = 138
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Shadowpaw"
@@ -2270,6 +2396,7 @@ image-number = 410444914
 rarity = "Uncommon"
 art-owned = false
 card-number = 139
+resonance = ["Ruin"]
 variables = ""
 
 [[cards]]
@@ -2286,6 +2413,7 @@ image-number = 717263287
 rarity = "Common"
 art-owned = false
 card-number = 140
+resonance = ["Tide"]
 
 [[cards]]
 name = "Driftcaller Sovereign"
@@ -2301,6 +2429,7 @@ image-number = 447372529
 rarity = "Common"
 art-owned = false
 card-number = 141
+resonance = ["Stone"]
 
 [[cards]]
 name = "Emerald Guardian"
@@ -2316,6 +2445,7 @@ image-number = 1169640025
 rarity = "Common"
 art-owned = false
 card-number = 142
+resonance = ["Stone"]
 
 [[cards]]
 name = "Dreamborne Leviathan"
@@ -2333,6 +2463,7 @@ image-number = 1723965970
 rarity = "Uncommon"
 art-owned = false
 card-number = 143
+resonance = ["Zephyr"]
 variables = ""
 
 [[cards]]
@@ -2350,6 +2481,7 @@ image-number = 2278837667
 rarity = "Uncommon"
 art-owned = false
 card-number = 144
+resonance = ["Zephyr"]
 variables = ""
 
 [[cards]]
@@ -2368,6 +2500,7 @@ image-number = 2022594416
 rarity = "Uncommon"
 art-owned = false
 card-number = 145
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Mystic Runefish"
@@ -2386,6 +2519,7 @@ image-number = 726444853
 rarity = "Uncommon"
 art-owned = false
 card-number = 146
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Starlight Guide"
@@ -2400,6 +2534,7 @@ image-number = 2022594419
 rarity = "Uncommon"
 art-owned = false
 card-number = 147
+resonance = ["Zephyr"]
 variables = ""
 
 [[cards]]
@@ -2416,6 +2551,7 @@ image-number = 2285036623
 rarity = "Common"
 art-owned = false
 card-number = 148
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Reclaimer of Lost Paths"
@@ -2433,6 +2569,7 @@ image-number = 2287436067
 rarity = "Uncommon"
 art-owned = false
 card-number = 149
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Aurora Rider"
@@ -2447,6 +2584,7 @@ image-number = 2256745747
 rarity = "Rare"
 art-owned = false
 card-number = 150
+resonance = ["Zephyr"]
 variables = ""
 
 [[cards]]
@@ -2463,6 +2601,7 @@ image-number = 2025883232
 rarity = "Rare"
 art-owned = false
 card-number = 151
+resonance = ["Tide"]
 
 [[cards]]
 name = "Keeper of Forgotten Light"
@@ -2478,6 +2617,7 @@ image-number = 2155438705
 rarity = "Uncommon"
 art-owned = false
 card-number = 152
+resonance = ["Tide"]
 
 [[cards]]
 name = "Paradox Enforcer"
@@ -2494,6 +2634,7 @@ image-number = 1726923523
 rarity = "Uncommon"
 art-owned = false
 card-number = 153
+resonance = ["Stone"]
 variables = ""
 
 [[cards]]
@@ -2511,6 +2652,7 @@ image-number = 2212744813
 rarity = "Common"
 art-owned = false
 card-number = 154
+resonance = ["Zephyr"]
 subtype = ""
 spark = ""
 
@@ -2527,6 +2669,7 @@ image-number = 1727859046
 rarity = "Uncommon"
 art-owned = false
 card-number = 155
+resonance = ["Ember"]
 variables = ""
 
 [[cards]]
@@ -2540,6 +2683,7 @@ image-number = 1991802455
 rarity = "Rare"
 art-owned = false
 card-number = 156
+resonance = ["Tide"]
 variables = ""
 subtype = ""
 spark = ""
@@ -2559,6 +2703,7 @@ image-number = 1037215528
 rarity = "Uncommon"
 art-owned = false
 card-number = 157
+resonance = ["Zephyr"]
 variables = ""
 
 [[cards]]
@@ -2575,6 +2720,7 @@ image-number = 753489193
 rarity = "Uncommon"
 art-owned = false
 card-number = 158
+resonance = ["Tide"]
 
 [[cards]]
 name = "Pyrestone Avatar"
@@ -2592,6 +2738,7 @@ image-number = 1109402492
 rarity = "Common"
 art-owned = false
 card-number = 159
+resonance = ["Stone"]
 
 [[cards]]
 name = "Light of Emergence"
@@ -2607,6 +2754,7 @@ image-number = 618071684
 rarity = "Rare"
 art-owned = false
 card-number = 160
+resonance = ["Zephyr"]
 subtype = ""
 spark = ""
 
@@ -2621,6 +2769,7 @@ image-number = 1239919309
 rarity = "Uncommon"
 art-owned = true
 card-number = 161
+resonance = ["Tide"]
 variables = ""
 subtype = ""
 spark = ""
@@ -2691,6 +2840,7 @@ image-number = 712713373
 rarity = "Uncommon"
 art-owned = false
 card-number = 165
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Riftwalker"
@@ -2705,6 +2855,7 @@ image-number = 1793552422
 rarity = "Rare"
 art-owned = false
 card-number = 166
+resonance = ["Stone"]
 variables = ""
 
 [[cards]]
@@ -2719,6 +2870,7 @@ image-number = 2285036625
 rarity = "Uncommon"
 art-owned = false
 card-number = 167
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -2736,6 +2888,7 @@ image-number = 2287054241
 rarity = "Common"
 art-owned = false
 card-number = 168
+resonance = ["Tide"]
 
 [[cards]]
 name = "Mirrorlight Architect"
@@ -2753,6 +2906,7 @@ image-number = 2216124449
 rarity = "Rare"
 art-owned = false
 card-number = 169
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Starlit Cascade"
@@ -2766,6 +2920,7 @@ image-number = 1798382143
 rarity = "Common"
 art-owned = false
 card-number = 170
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -2785,6 +2940,7 @@ image-number = 2216124453
 rarity = "Common"
 art-owned = false
 card-number = 171
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Emberwatch Veteran"
@@ -2803,6 +2959,7 @@ image-number = 2258761879
 rarity = "Common"
 art-owned = false
 card-number = 172
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Hope's Vanguard"
@@ -2821,6 +2978,7 @@ image-number = 2123360834
 rarity = "Common"
 art-owned = false
 card-number = 173
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Silent Avenger"
@@ -2841,6 +2999,7 @@ image-number = 2025883229
 rarity = "Uncommon"
 art-owned = false
 card-number = 174
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Soulbinder"
@@ -2856,6 +3015,7 @@ image-number = 2438838891
 rarity = "Uncommon"
 art-owned = false
 card-number = 175
+resonance = ["Ember"]
 
 [[cards]]
 name = "Seer of the Fallen"
@@ -2876,6 +3036,7 @@ image-number = 1913887480
 rarity = "Uncommon"
 art-owned = false
 card-number = 176
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Ashborn Necromancer"
@@ -2891,6 +3052,7 @@ image-number = 2303852063
 rarity = "Common"
 art-owned = false
 card-number = 177
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Sunset Chronicler"
@@ -2906,6 +3068,7 @@ image-number = 691496698
 rarity = "Uncommon"
 art-owned = false
 card-number = 178
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Wasteland Arbitrator"
@@ -2921,6 +3084,7 @@ image-number = 1727859043
 rarity = "Rare"
 art-owned = false
 card-number = 179
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Dustborn Veteran"
@@ -2936,6 +3100,7 @@ image-number = 2258761883
 rarity = "Uncommon"
 art-owned = false
 card-number = 180
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Avatar of Cosmic Reckoning"
@@ -2951,6 +3116,7 @@ image-number = 2287054243
 rarity = "Rare"
 art-owned = false
 card-number = 181
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Resilient Wanderer"
@@ -2966,6 +3132,7 @@ image-number = 1252796545
 rarity = "Uncommon"
 art-owned = false
 card-number = 182
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Twilight Reclaimer"
@@ -2981,6 +3148,7 @@ image-number = 1104412604
 rarity = "Rare"
 art-owned = false
 card-number = 183
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Wreckheap Survivor"
@@ -2996,6 +3164,7 @@ image-number = 1114007978
 rarity = "Uncommon"
 art-owned = false
 card-number = 184
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Revenant of the Lost"
@@ -3010,6 +3179,7 @@ image-number = 2123360843
 rarity = "Uncommon"
 art-owned = false
 card-number = 185
+resonance = ["Ruin"]
 variables = ""
 
 [[cards]]
@@ -3028,6 +3198,7 @@ image-number = 512756368
 rarity = "Uncommon"
 art-owned = false
 card-number = 186
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Exiles of the Last Light"
@@ -3043,6 +3214,7 @@ image-number = 457875892
 rarity = "Common"
 art-owned = false
 card-number = 187
+resonance = ["Ember"]
 
 [[cards]]
 name = "Ruin Scavenger"
@@ -3076,6 +3248,7 @@ image-number = 2155438695
 rarity = "Rare"
 art-owned = false
 card-number = 189
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -3095,6 +3268,7 @@ image-number = 1971751580
 rarity = "Common"
 art-owned = false
 card-number = 190
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Veil of the Wastes"
@@ -3110,6 +3284,7 @@ image-number = 789291004
 rarity = "Rare"
 art-owned = false
 card-number = 191
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Through the Rift"
@@ -3123,6 +3298,7 @@ image-number = 1790126243
 rarity = "Rare"
 art-owned = false
 card-number = 192
+resonance = ["Ruin"]
 subtype = ""
 spark = ""
 
@@ -3142,6 +3318,7 @@ image-number = 2197688373
 rarity = "Common"
 art-owned = false
 card-number = 193
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Harvester of Despair"
@@ -3157,6 +3334,7 @@ image-number = 1557999812
 rarity = "Common"
 art-owned = false
 card-number = 194
+resonance = ["Ember"]
 
 [[cards]]
 name = "Blade of Oblivion"
@@ -3172,6 +3350,7 @@ image-number = 1798382134
 rarity = "Uncommon"
 art-owned = false
 card-number = 195
+resonance = ["Ember"]
 
 [[cards]]
 name = "Fathomless Maw"
@@ -3187,6 +3366,7 @@ image-number = 2131591277
 rarity = "Rare"
 art-owned = false
 card-number = 196
+resonance = ["Ember"]
 
 [[cards]]
 name = "The Forsaker"
@@ -3202,6 +3382,7 @@ image-number = 1626794383
 rarity = "Rare"
 art-owned = false
 card-number = 197
+resonance = ["Ember"]
 
 [[cards]]
 name = "Infernal Ascendant"
@@ -3219,6 +3400,7 @@ image-number = 1633431256
 rarity = "Common"
 art-owned = false
 card-number = 198
+resonance = ["Ember"]
 
 [[cards]]
 name = "Ashen Remnant"
@@ -3233,6 +3415,7 @@ image-number = 1639942843
 rarity = "Common"
 art-owned = false
 card-number = 199
+resonance = ["Ember"]
 variables = ""
 
 [[cards]]
@@ -3248,6 +3431,7 @@ image-number = 1180104511
 rarity = "Rare"
 art-owned = false
 card-number = 200
+resonance = ["Ember"]
 variables = ""
 
 [[cards]]
@@ -3266,6 +3450,7 @@ image-number = 2290648803
 rarity = "Common"
 art-owned = false
 card-number = 201
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Grim Reclaimer"
@@ -3281,6 +3466,7 @@ image-number = 1740270992
 rarity = "Uncommon"
 art-owned = false
 card-number = 202
+resonance = ["Ember"]
 
 [[cards]]
 name = "Angel of the Eclipse"
@@ -3296,6 +3482,7 @@ image-number = 753489184
 rarity = "Uncommon"
 art-owned = false
 card-number = 203
+resonance = ["Stone"]
 
 [[cards]]
 name = "Packcaller of Shadows"
@@ -3311,6 +3498,7 @@ image-number = 2123360849
 rarity = "Uncommon"
 art-owned = false
 card-number = 204
+resonance = ["Tide"]
 
 [[cards]]
 name = "Radiant Trio"
@@ -3358,6 +3546,7 @@ image-number = 1991802452
 rarity = "Uncommon"
 art-owned = false
 card-number = 207
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Specter of Silent Snow"
@@ -3373,6 +3562,7 @@ image-number = 529374445
 rarity = "Common"
 art-owned = false
 card-number = 208
+resonance = ["Ember"]
 
 [[cards]]
 name = "Desperation"
@@ -3386,6 +3576,7 @@ image-number = 1470059006
 rarity = "Common"
 art-owned = false
 card-number = 209
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -3402,6 +3593,7 @@ image-number = 439817032
 rarity = "Rare"
 art-owned = false
 card-number = 210
+resonance = ["Ember"]
 variables = ""
 subtype = ""
 spark = ""
@@ -3420,6 +3612,7 @@ image-number = 678431950
 rarity = "Rare"
 art-owned = false
 card-number = 211
+resonance = ["Ruin"]
 
 [[cards]]
 name = "Momentum of the Fallen"
@@ -3438,6 +3631,7 @@ image-number = 454095982
 rarity = "Rare"
 art-owned = false
 card-number = 212
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -3453,6 +3647,7 @@ image-number = 708313726
 rarity = "Rare"
 art-owned = false
 card-number = 213
+resonance = ["Ember"]
 subtype = ""
 spark = ""
 
@@ -3469,6 +3664,7 @@ image-number = 1026869440
 rarity = "Uncommon"
 art-owned = false
 card-number = 214
+resonance = ["Ruin"]
 variables = ""
 
 [[cards]]
@@ -3517,6 +3713,7 @@ image-number = 403770319
 rarity = "Uncommon"
 art-owned = true
 card-number = 217
+resonance = ["Zephyr"]
 
 [[cards]]
 name = "Archive of the Forgotten "
@@ -3532,6 +3729,7 @@ image-number = 644603677
 rarity = "Rare"
 art-owned = true
 card-number = 218
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -3569,6 +3767,7 @@ image-number = 1621160806
 rarity = "Common"
 art-owned = true
 card-number = 220
+resonance = ["Tide"]
 variables = ""
 subtype = ""
 spark = ""
@@ -3582,6 +3781,7 @@ image-number = 313783940
 rarity = "Special"
 art-owned = true
 card-number = 221
+resonance = ["Tide"]
 rules-text = ""
 variables = ""
 card-type = "Event"
@@ -3600,6 +3800,7 @@ image-number = 1486924805
 rarity = "Special"
 art-owned = true
 card-number = 222
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 
