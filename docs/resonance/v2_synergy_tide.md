@@ -9,7 +9,7 @@ proposes the mechanical templates of connector cards that would exploit them.
 Every synergy vector identified here must bridge Tide to at least one non-Tide
 resonance.
 
----
+______________________________________________________________________
 
 ## 1. Side Effect Inventory
 
@@ -52,10 +52,10 @@ act of preventing -- no "when you prevent a card" trigger exists in the pool.
 
 Tide plays characters like Frost Visionary, Keeper of Forgotten Light, and
 Looming Oracle primarily for their entry effects. But those bodies remain on the
-battlefield afterward with 1-2 spark each. A Tide player with 3-4 low-spark
-draw bodies in play has a surprisingly wide board, just not a tall one. These
-bodies are currently dead weight after their entry -- no Tide card cares about
-board WIDTH.
+battlefield afterward with 1-2 spark each. A Tide player with 3-4 low-spark draw
+bodies in play has a surprisingly wide board, just not a tall one. These bodies
+are currently dead weight after their entry -- no Tide card cares about board
+WIDTH.
 
 **Current exploitation:** Minimal. Mirage flickers them (but that re-exploits
 the Materialized trigger, not the board presence). Judgment triggers on those
@@ -64,19 +64,19 @@ abilities.
 
 ### 1e. High Event Density in Void
 
-Tide plays many events (Foresee spells, Prevents, draw spells). These events
-go to the void after resolution. By mid-game, a Tide player's void is
-disproportionately event-heavy compared to other resonances. Spirit of Smoldering
-Echoes (+1 spark per event entering void) cares about this, but it is coded as
-Ember/Tempest.
+Tide plays many events (Foresee spells, Prevents, draw spells). These events go
+to the void after resolution. By mid-game, a Tide player's void is
+disproportionately event-heavy compared to other resonances. Spirit of
+Smoldering Echoes (+1 spark per event entering void) cares about this, but it is
+coded as Ember/Tempest.
 
 **Current exploitation:** Tempest uses event recovery (Whisper of the Past,
 Archive of the Forgotten), but these retrieve events, they do not count them.
 
 ### 1f. Deck Thinning from Draw
 
-Heavy draw reduces deck size. A Tide player who has drawn 10+ extra cards has
-a significantly thinner deck, making future draws more consistently powerful.
+Heavy draw reduces deck size. A Tide player who has drawn 10+ extra cards has a
+significantly thinner deck, making future draws more consistently powerful.
 Lumineth ("no cards in deck: you win") exists but is a niche alt-win, not a
 systematic exploitation of deck thinning.
 
@@ -91,8 +91,8 @@ the pool rewards KNOWING what your top card is. Dreamborne Leviathan ("play
 characters from top of deck") is the closest, but it is Zephyr-coded Spirit
 Animal infrastructure.
 
-**Current exploitation:** Dreamborne Leviathan partially, but it is not a
-Tide card.
+**Current exploitation:** Dreamborne Leviathan partially, but it is not a Tide
+card.
 
 ### 1h. Energy Unspent from Holding Up Prevent
 
@@ -108,15 +108,15 @@ phase" or converts unspent Prevent energy into value at end of turn.
 Prevented cards go to the opponent's void (unless Ripple Through Reality puts
 them on top of deck). But the opponent's void grows slowly because their cards
 keep getting countered before they resolve. This means the opponent cannot
-leverage their OWN void for Ruin strategies. This is a negative side effect
-for opponent Ruin decks -- but no Tide card currently leverages the
-"opponent's void is small" condition.
+leverage their OWN void for Ruin strategies. This is a negative side effect for
+opponent Ruin decks -- but no Tide card currently leverages the "opponent's void
+is small" condition.
 
-**Current exploitation:** Soulflame Predator (banish opponent's void) works
-in the opposite direction. Ruin Scavenger profits from opponent void cards. No
-card punishes a SMALL opponent void.
+**Current exploitation:** Soulflame Predator (banish opponent's void) works in
+the opposite direction. Ruin Scavenger profits from opponent void cards. No card
+punishes a SMALL opponent void.
 
----
+______________________________________________________________________
 
 ## 2. Cross-Resonance Bridge Opportunities
 
@@ -125,18 +125,18 @@ Tide archetypes with the right connector card:
 
 ### 2a. Spirit of Smoldering Echoes (Ember, 4 cost, spark = events in void)
 
-Currently Tempest-coded. But a pure Tide deck that plays 6-8 events and
-Foresees aggressively can have 10+ events in void without ever trying to
-"storm." This Ancient gains spark passively in Tide. The bridge: if a card
-existed that let you COUNT events in void for a non-damage effect (e.g., draw
-cards equal to events in void / 3), Spirit of Smoldering Echoes would become
-a Depths finisher -- a control body that grows while you Prevent and draw.
+Currently Tempest-coded. But a pure Tide deck that plays 6-8 events and Foresees
+aggressively can have 10+ events in void without ever trying to "storm." This
+Ancient gains spark passively in Tide. The bridge: if a card existed that let
+you COUNT events in void for a non-damage effect (e.g., draw cards equal to
+events in void / 3), Spirit of Smoldering Echoes would become a Depths finisher
+-- a control body that grows while you Prevent and draw.
 
-**Surprising interaction:** Depths (Tide+Stone) currently lacks a finisher
-whose spark scales with the control game plan. Abomination of Memory
-(Ruin-coded, spark = total void count) does this for Undertow. Spirit of
-Smoldering Echoes does it for event-heavy control but is Ember-coded, making
-it a Tempest/Depths bridge that nobody has identified.
+**Surprising interaction:** Depths (Tide+Stone) currently lacks a finisher whose
+spark scales with the control game plan. Abomination of Memory (Ruin-coded,
+spark = total void count) does this for Undertow. Spirit of Smoldering Echoes
+does it for event-heavy control but is Ember-coded, making it a Tempest/Depths
+bridge that nobody has identified.
 
 ### 2b. Starcatcher (Ember, 4 cost, "when you play an event, gain 1 energy")
 
@@ -152,22 +152,23 @@ completely eliminate the core tension of the archetype (reactive vs. proactive).
 This is a sleeper bridge card.
 
 ### 2c. Conduit of Resonance (Zephyr, 5 cost, "when you materialize a character,
+
 trigger the Judgment ability of each ally")
 
 Currently Basalt core. But Tide has characters with Judgment: Draw triggers (The
 Calling Night, The Waking Titan, Hope's Vanguard). If Tide assembled a board of
 draw-on-Judgment characters and then flickered one ally with a Mirage enabler,
 Conduit of Resonance would trigger ALL of their Judgment abilities. This turns
-Mirage from "flicker one target for its Materialized" to "flicker one target
-to trigger every Judgment ability on the board."
+Mirage from "flicker one target for its Materialized" to "flicker one target to
+trigger every Judgment ability on the board."
 
-**Surprising interaction:** Mirage + Conduit creates a mass-Judgment engine
-that no current Mirage build exploits. The Calling Night becomes "Materialize
-any ally: Draw 1, opponent gains 2 points" -- which is absurd value when
-flickered repeatedly, especially since the point cost is offset by the card
-avalanche.
+**Surprising interaction:** Mirage + Conduit creates a mass-Judgment engine that
+no current Mirage build exploits. The Calling Night becomes "Materialize any
+ally: Draw 1, opponent gains 2 points" -- which is absurd value when flickered
+repeatedly, especially since the point cost is offset by the card avalanche.
 
 ### 2d. Volcanic Channeler (Ember, 4 cost, "when an ally is dissolved, gain 1
+
 energy")
 
 Classified as Cinder. But Tide's Prevent suite includes Together Against the
@@ -183,27 +184,29 @@ against decks that overwhelm the Prevent suite. Not a sacrifice engine, but an
 insurance policy.
 
 ### 2e. Bloomweaver (Warrior, 1 cost, "once per turn, when you materialize a
+
 character, gain 1 energy")
 
 Currently Basalt/Crucible. But Mirage flickers characters repeatedly, meaning
-Bloomweaver produces 1 energy per flicker cycle. At 1 cost, Bloomweaver
-competes with Angel of the Eclipse (4 cost, same effect) for the "energy per
-materialize" slot in Mirage. Bloomweaver is dramatically cheaper and comes
-online faster. The Warrior subtype is irrelevant in Mirage -- it is the
-cheapest materialize-to-energy converter in the pool.
+Bloomweaver produces 1 energy per flicker cycle. At 1 cost, Bloomweaver competes
+with Angel of the Eclipse (4 cost, same effect) for the "energy per materialize"
+slot in Mirage. Bloomweaver is dramatically cheaper and comes online faster. The
+Warrior subtype is irrelevant in Mirage -- it is the cheapest
+materialize-to-energy converter in the pool.
 
 **Surprising interaction:** Mirage drafters should be picking Bloomweaver over
 Angel of the Eclipse in most builds. The Warrior subtype creates a false draft
 signal (looks like Crucible, plays like Mirage).
 
 ### 2f. Moonlit Dancer (Visitor, 3 cost, "characters in hand have fast; when you
+
 play a fast character, gain 1 energy")
 
 Classified as Gale core. But Tide holds the most characters in hand (large hand
 size from draw). Moonlit Dancer converts ALL of those held characters to fast,
 meaning Tide can deploy its entire hand at instant speed. This transforms Tide
-from "reactive control" to "reactive deployment" -- hold up Prevent mana, and
-if the opponent plays nothing worth preventing, flash in a Keeper of Forgotten
+from "reactive control" to "reactive deployment" -- hold up Prevent mana, and if
+the opponent plays nothing worth preventing, flash in a Keeper of Forgotten
 Light for Materialized: Draw 2 at end of opponent's turn.
 
 **Surprising interaction:** Depths (Tide+Stone) with Moonlit Dancer becomes a
@@ -213,18 +216,18 @@ Gale aggression package.
 
 ### 2g. Surge of Fury (Event, 1 cost, "trigger additional Judgment phase")
 
-Classified as Crucible/Basalt. But the Depths control deck with persistent
-ramp bodies (Virtuoso of Harmony: gain 2 energy EOT, Dawnblade Wanderer:
-Judgment gain 2 energy) gets doubled value from an extra Judgment phase. An
-extra Judgment on a board with The Calling Night, Flickerveil Adept, and
-Virtuoso of Harmony means: Draw 1, flicker a target, gain 2 energy. That is
-enormous value for 1 energy.
+Classified as Crucible/Basalt. But the Depths control deck with persistent ramp
+bodies (Virtuoso of Harmony: gain 2 energy EOT, Dawnblade Wanderer: Judgment
+gain 2 energy) gets doubled value from an extra Judgment phase. An extra
+Judgment on a board with The Calling Night, Flickerveil Adept, and Virtuoso of
+Harmony means: Draw 1, flicker a target, gain 2 energy. That is enormous value
+for 1 energy.
 
 **Surprising interaction:** Surge of Fury in Depths as a value amplifier rather
-than an aggression tool. The card reads as "attack again" but plays as
-"compound your engine."
+than an aggression tool. The card reads as "attack again" but plays as "compound
+your engine."
 
----
+______________________________________________________________________
 
 ## 3. Hidden Synergy Vectors (12 vectors)
 
@@ -236,19 +239,18 @@ than an aggression tool. The card reads as "attack again" but plays as
 
 **Mechanical template:** A card that provides scaling benefit based on hand
 size. Examples: "Characters you play cost 1 less if you have 5+ cards in hand"
-(Depths ramp amplifier), or "At end of turn, gain 1 energy for every 2 cards
-in your hand" (Stone-coded card that rewards Tide's hoarding), or "+1 spark
-for each card in your hand beyond 4" (a finisher body).
+(Depths ramp amplifier), or "At end of turn, gain 1 energy for every 2 cards in
+your hand" (Stone-coded card that rewards Tide's hoarding), or "+1 spark for
+each card in your hand beyond 4" (a finisher body).
 
 **Why non-obvious:** Other card games have hand-size-matters, but Dreamtides
-currently has zero such effects. A drafter would not intuit that Tide's draw
-is building toward a hand-size threshold because no card in the pool rewards
-it.
+currently has zero such effects. A drafter would not intuit that Tide's draw is
+building toward a hand-size threshold because no card in the pool rewards it.
 
-**Non-obviousness rating: 8/10** -- requires awareness that no current card
-uses this axis.
+**Non-obviousness rating: 8/10** -- requires awareness that no current card uses
+this axis.
 
----
+______________________________________________________________________
 
 ### Vector 2: Prevent-Trigger Payoffs
 
@@ -272,7 +274,7 @@ Depths' play pattern.
 so the concept is known, but Dreamtides' lack of any such card makes it
 invisible in-system.
 
----
+______________________________________________________________________
 
 ### Vector 3: Board-Width-from-Low-Spark-Bodies
 
@@ -288,24 +290,24 @@ board width), "Draw 1 for each ally, then discard 2" (mass refuel proportional
 to board width).
 
 **Why non-obvious:** Tide's characters look weak individually (1-2 spark). A
-drafter sees them as "play for the Materialized, ignore the body." But 4
-bodies at 1 spark each = 4 Judgment spark, which is NOT nothing. A card that
-converts width into value would retroactively make every Materialized-draw body
-a two-for-one: the draw AND the persistent board contribution.
+drafter sees them as "play for the Materialized, ignore the body." But 4 bodies
+at 1 spark each = 4 Judgment spark, which is NOT nothing. A card that converts
+width into value would retroactively make every Materialized-draw body a
+two-for-one: the draw AND the persistent board contribution.
 
 **Non-obviousness rating: 6/10** -- "go wide" strategies exist but are
 associated with tribal (Crucible Warriors, Basalt Spirit Animals), not with
 Tide's generic low-spark bodies.
 
----
+______________________________________________________________________
 
 ### Vector 4: Foresee-to-Top-of-Deck Pipeline
 
 **Condition:** After Foresee, Tide knows the top card of the deck and has
 curated it to be the best available option.
 
-**Bridges:** Tide to Zephyr (Basalt via Dreamborne Leviathan), Tide to
-Stone (Depths)
+**Bridges:** Tide to Zephyr (Basalt via Dreamborne Leviathan), Tide to Stone
+(Depths)
 
 **Mechanical template:** A card that does something with the top card of your
 deck. Examples: "Reveal the top card of your deck; if it's an event, you may
@@ -324,7 +326,7 @@ its cost is 3 or less" would create a Foresee-into-deploy pipeline.
 consumed by the draw, making the intermediate "known top card" state invisible
 to most players.
 
----
+______________________________________________________________________
 
 ### Vector 5: Unspent-Energy-at-End-of-Turn
 
@@ -337,72 +339,72 @@ around it. That energy evaporates.
 of turn. Examples: "At end of turn, if you have 2+ energy, draw 1" (rewards
 passing with Prevent up), "At end of turn, gain 1 energy next turn for each
 unspent energy" (energy banking -- Stone-coded), or Minstrel of Falling Light's
-activated ability (3 energy: draw 1) already partially fills this role as a
-mana sink.
+activated ability (3 energy: draw 1) already partially fills this role as a mana
+sink.
 
 **Why non-obvious:** The "Prevent or develop" tension is treated as a
 fundamental cost of the Depths archetype. Eliminating it feels like it would
-make Depths too good. But a CONDITIONAL end-of-turn payoff (only if you did
-NOT spend the energy on Prevent) creates a new decision: opponent must decide
+make Depths too good. But a CONDITIONAL end-of-turn payoff (only if you did NOT
+spend the energy on Prevent) creates a new decision: opponent must decide
 whether to play into the Prevent or let you draw the card. This is a genuine
 mind game, not a free bonus.
 
 **Non-obviousness rating: 7/10** -- the condition is obvious to control players
-from other games, but the absence of any such card in Dreamtides makes it a
-gap rather than a known axis.
+from other games, but the absence of any such card in Dreamtides makes it a gap
+rather than a known axis.
 
----
+______________________________________________________________________
 
 ### Vector 6: Event-Count-in-Void
 
-**Condition:** Tide's void becomes disproportionately event-heavy (70-80%
-events vs. 40-50% for other resonances).
+**Condition:** Tide's void becomes disproportionately event-heavy (70-80% events
+vs. 40-50% for other resonances).
 
 **Bridges:** Tide to Ember (Tempest), Tide to Ruin (Undertow)
 
 **Mechanical template:** A card that counts events specifically in the void.
-Examples: "Draw 1 for every 3 events in your void" (Tide-coded void payoff
-that does not step on Ruin's generic void-size-matters), "Gain energy equal to
-events in your void" (the proposed Leyline Detonation from Tempest new cards),
-"Spark equal to events in void" (a parallel to Abomination of Memory but
-event-specific and Tide-coded).
+Examples: "Draw 1 for every 3 events in your void" (Tide-coded void payoff that
+does not step on Ruin's generic void-size-matters), "Gain energy equal to events
+in your void" (the proposed Leyline Detonation from Tempest new cards), "Spark
+equal to events in void" (a parallel to Abomination of Memory but event-specific
+and Tide-coded).
 
 **Why non-obvious:** Void-size-matters is Ruin territory. But EVENT-count-in-
 void is mechanically distinct -- it rewards playing events (Tide) rather than
 milling generically (Ruin). A Tide player reaches 6+ events in void through
 normal play. A Ruin player reaches a large void through mill but may have only
-2-3 events. This creates a payoff axis that Tide reaches naturally but Ruin
-does not, avoiding the "Ruin does void stuff" objection.
+2-3 events. This creates a payoff axis that Tide reaches naturally but Ruin does
+not, avoiding the "Ruin does void stuff" objection.
 
 **Non-obviousness rating: 9/10** -- even the design documents conflate "void
 count" with Ruin. Differentiating event-void-count as a Tide axis requires
 challenging a core assumption.
 
----
+______________________________________________________________________
 
 ### Vector 7: Opponent's Hand Depletion
 
-**Condition:** Tide's hand disruption (Break the Veil, Lurking Dread, Wraith
-of Twisting Shadows) plus Prevent can leave the opponent with very few cards
-in hand.
+**Condition:** Tide's hand disruption (Break the Veil, Lurking Dread, Wraith of
+Twisting Shadows) plus Prevent can leave the opponent with very few cards in
+hand.
 
 **Bridges:** Tide to Stone (Depths), Tide to Ember (Tempest)
 
-**Mechanical template:** A card that rewards having more cards in hand than
-the opponent. Examples: "If you have more cards in hand than the opponent,
-your events cost 1 less" (asymmetric advantage from disruption), "Draw cards
-equal to the difference between your hand size and the opponent's" (a one-shot
-refuel that scales with successful disruption).
+**Mechanical template:** A card that rewards having more cards in hand than the
+opponent. Examples: "If you have more cards in hand than the opponent, your
+events cost 1 less" (asymmetric advantage from disruption), "Draw cards equal to
+the difference between your hand size and the opponent's" (a one-shot refuel
+that scales with successful disruption).
 
-**Why non-obvious:** Hand disruption is framed as "remove their best card."
-The secondary effect -- the opponent's hand size shrinks while yours grows --
+**Why non-obvious:** Hand disruption is framed as "remove their best card." The
+secondary effect -- the opponent's hand size shrinks while yours grows --
 creates a SIZE differential that no card currently exploits. Other card games
 have "hand advantage matters" effects; Dreamtides does not.
 
 **Non-obviousness rating: 8/10** -- requires noticing the hand-size-differential
 rather than treating disruption as purely card-quality-based.
 
----
+______________________________________________________________________
 
 ### Vector 8: Prevent as Void Fuel
 
@@ -412,22 +414,21 @@ own Prevent events go to YOUR void after resolution.
 **Bridges:** Tide to Ruin (Undertow)
 
 **Mechanical template:** A card that cares about events entering YOUR void (not
-total void size). Examples: Spirit of Smoldering Echoes already does this
-(+1 spark per event entering void), but a Tide-coded version would be: "When
-an event you own enters the void, Foresee 1" (cycles through your deck faster
-as you play events), or "When you play a Prevent event, put the top card of
-your deck into your void" (Prevent as self-mill trigger for Undertow).
+total void size). Examples: Spirit of Smoldering Echoes already does this (+1
+spark per event entering void), but a Tide-coded version would be: "When an
+event you own enters the void, Foresee 1" (cycles through your deck faster as
+you play events), or "When you play a Prevent event, put the top card of your
+deck into your void" (Prevent as self-mill trigger for Undertow).
 
-**Why non-obvious:** Prevent is the most reactive, "anti-void" mechanic in
-Tide. Treating Prevent events as void fuel inverts their identity. A player
-would never think "my Abolish is also a mill card" unless a connector
-explicitly linked the two. This creates a bizarre but functional
-Depths-Undertow hybrid where you are simultaneously countering the opponent
-and filling your own void.
+**Why non-obvious:** Prevent is the most reactive, "anti-void" mechanic in Tide.
+Treating Prevent events as void fuel inverts their identity. A player would
+never think "my Abolish is also a mill card" unless a connector explicitly
+linked the two. This creates a bizarre but functional Depths-Undertow hybrid
+where you are simultaneously countering the opponent and filling your own void.
 
 **Non-obviousness rating: 10/10** -- conceptually paradoxical.
 
----
+______________________________________________________________________
 
 ### Vector 9: Draw Triggers for Non-Tide Payoffs
 
@@ -443,21 +444,21 @@ The template extends to: "When you draw your second card each turn, kindle 1"
 (Stone-coded incremental growth triggered by Tide's draw), "When you draw 3+
 cards in a turn, gain 1 energy" (Stone-coded ramp triggered by draw volume).
 
-**Why non-obvious:** Draw is treated as its own reward (you drew the card,
-that IS the value). But making draw a TRIGGER condition opens a second axis
-of value. Eternal Sentry is the proof of concept, but it is the only card in
-the pool with a draw-trigger. Expanding this axis would make every Tide draw
-spell secretly a trigger enabler for cross-resonance payoffs.
+**Why non-obvious:** Draw is treated as its own reward (you drew the card, that
+IS the value). But making draw a TRIGGER condition opens a second axis of value.
+Eternal Sentry is the proof of concept, but it is the only card in the pool with
+a draw-trigger. Expanding this axis would make every Tide draw spell secretly a
+trigger enabler for cross-resonance payoffs.
 
-**Non-obviousness rating: 7/10** -- Eternal Sentry shows the pattern, but
-only one card uses it, making it look like an anomaly rather than an axis.
+**Non-obviousness rating: 7/10** -- Eternal Sentry shows the pattern, but only
+one card uses it, making it look like an anomaly rather than an axis.
 
----
+______________________________________________________________________
 
 ### Vector 10: Materialized Bodies as Sacrifice Fodder
 
-**Condition:** Tide plays low-spark bodies for their Materialized triggers,
-then those bodies sit on the battlefield contributing little.
+**Condition:** Tide plays low-spark bodies for their Materialized triggers, then
+those bodies sit on the battlefield contributing little.
 
 **Bridges:** Tide to Ember (Cinder via sacrifice), Tide to Ruin (Cinder/
 Eclipse)
@@ -477,10 +478,10 @@ pattern. The Materialized-draw body is not worth keeping alive AFTER it has
 drawn -- it is a 2-cost 2-spark body with no further text. Sacrificing it is
 objectively correct once the draw has resolved.
 
-**Non-obviousness rating: 8/10** -- violates Tide's stated identity, which
-makes drafters instinctively avoid the line.
+**Non-obviousness rating: 8/10** -- violates Tide's stated identity, which makes
+drafters instinctively avoid the line.
 
----
+______________________________________________________________________
 
 ### Vector 11: Information Asymmetry from Opponent Hand Knowledge
 
@@ -500,38 +501,39 @@ they discard it; if not, you draw 1" (information test).
 game-state condition that persists. But in Dreamtides' digital format, the game
 could track "you have seen the opponent's hand this turn" as a state flag. A
 card that conditionally checks this flag would make Wraith of Twisting Shadows
-(and its flicker repetition) into a setup card for a powerful conditional effect.
+(and its flicker repetition) into a setup card for a powerful conditional
+effect.
 
 **Non-obviousness rating: 9/10** -- information as a game-state condition is
 unusual in deckbuilders.
 
----
+______________________________________________________________________
 
 ### Vector 12: Deck Size Differential
 
 **Condition:** Tide draws aggressively, so Tide's deck is significantly smaller
-than the opponent's. This means Tide is closer to decking out BUT also closer
-to seeing every card they drafted.
+than the opponent's. This means Tide is closer to decking out BUT also closer to
+seeing every card they drafted.
 
 **Bridges:** Tide to Zephyr (Mirage/Basalt via Lumineth), Tide to Ruin
 (Undertow)
 
 **Mechanical template:** A card that rewards a small remaining deck. Examples:
 "Draw until you have as many cards in hand as cards in your deck" (refuel that
-gets better as deck shrinks), "Gain 1 energy for each card fewer than 10 in
-your deck" (scaling ramp from deck thinning), "If your deck has 5 or fewer
-cards, characters you play cost 2 less" (endgame cost reduction).
+gets better as deck shrinks), "Gain 1 energy for each card fewer than 10 in your
+deck" (scaling ramp from deck thinning), "If your deck has 5 or fewer cards,
+characters you play cost 2 less" (endgame cost reduction).
 
 **Why non-obvious:** Deck depletion is framed as a risk (you lose when you
-cannot draw). Lumineth is the only card that treats it as a win condition.
-But there is a spectrum between "full deck" and "empty deck" that no card
-currently occupies. A deck-size-matters axis would make Tide's aggressive draw
-a resource investment rather than just card accumulation.
+cannot draw). Lumineth is the only card that treats it as a win condition. But
+there is a spectrum between "full deck" and "empty deck" that no card currently
+occupies. A deck-size-matters axis would make Tide's aggressive draw a resource
+investment rather than just card accumulation.
 
 **Non-obviousness rating: 7/10** -- alternate win conditions based on library
 size exist in other games, but continuous deck-size-scaling effects are rarer.
 
----
+______________________________________________________________________
 
 ## 4. Anti-Synergy Awareness -- What Tide MUST NOT Do
 
@@ -553,14 +555,14 @@ destroying the need for partner resonances.
 
 Hand-size-matters and board-width-from-bodies can provide finishing power, but
 they must not resemble Ember's aggressive spark scaling. A Tide finisher should
-reach 5-7 spark through accumulated game-state conditions, not through
-"whenever you attack, +2 spark" or abandon-for-spark. The scaling should be
-slow and proportional to game length, not explosive.
+reach 5-7 spark through accumulated game-state conditions, not through "whenever
+you attack, +2 spark" or abandon-for-spark. The scaling should be slow and
+proportional to game length, not explosive.
 
 **Violation example:** A 2-cost body that gains +1 spark every time you draw a
-card would grow to 10+ spark by mid-game, faster than any Ember aggro card.
-This turns Tide's draw engine into the best aggro strategy, which contradicts
-Tide's identity as patient and reactive.
+card would grow to 10+ spark by mid-game, faster than any Ember aggro card. This
+turns Tide's draw engine into the best aggro strategy, which contradicts Tide's
+identity as patient and reactive.
 
 ### 4c. Tide Must Not Do Mass Recursion
 
@@ -571,24 +573,24 @@ would be Ruin's territory (Path to Redemption is mono-Ruin for exactly this
 reason). Bridge cards should exploit void state without performing mass
 recursion.
 
-**Violation example:** "Events in your void gain Reclaim 0" would be a Tide
-card by event focus but a Ruin card by mass-recursion output.
+**Violation example:** "Events in your void gain Reclaim 0" would be a Tide card
+by event focus but a Ruin card by mass-recursion output.
 
 ### 4d. Tide Must Not Replace Tribal Infrastructure
 
 Tide has no subtype-matters payoffs. A bridge card that says "for each Warrior
 in play, draw 1" or "Survivors you control have Prevent" would be mechanically
 insane and identity-incoherent. Tide may CONTAIN Warrior bodies (Frost
-Visionary) and Survivor bodies (Ashlight Caller), but it must never provide
-the tribal payoff layer. Those belong to Stone (Warriors), Ruin (Survivors),
-and Zephyr (Spirit Animals).
+Visionary) and Survivor bodies (Ashlight Caller), but it must never provide the
+tribal payoff layer. Those belong to Stone (Warriors), Ruin (Survivors), and
+Zephyr (Spirit Animals).
 
 ### 4e. Tide Must Not Own Sacrifice Outlets
 
 Even though Vector 10 identifies that Materialized bodies are good sacrifice
-fodder, the SACRIFICE OUTLET itself must never be Tide-coded. The connector
-card should be Ember-coded or dual Tide+Ember, with the sacrifice being the
-Ember half of the bridge. Tide supplies the fodder; Ember supplies the knife.
+fodder, the SACRIFICE OUTLET itself must never be Tide-coded. The connector card
+should be Ember-coded or dual Tide+Ember, with the sacrifice being the Ember
+half of the bridge. Tide supplies the fodder; Ember supplies the knife.
 
 ### 4f. Tide Must Not Bypass the Draw-or-Deploy Tension
 
@@ -599,7 +601,7 @@ that says "you may play characters as though they were fast events" would
 destroy the tension entirely and collapse Tide into Zephyr's fast-deployment
 space.
 
----
+______________________________________________________________________
 
 ## 5. Priority Recommendations
 
@@ -613,9 +615,9 @@ If the design team creates connector cards, the highest-value vectors are:
    void, creates a Tide-specific payoff axis, and has partial proof-of-concept
    in Spirit of Smoldering Echoes.
 
-3. **Vector 4 (Foresee-to-Top-of-Deck Pipeline)** -- Exploits the most
-   invisible side effect (the curated top card) and has an existing connector
-   in Dreamborne Leviathan.
+3. **Vector 4 (Foresee-to-Top-of-Deck Pipeline)** -- Exploits the most invisible
+   side effect (the curated top card) and has an existing connector in
+   Dreamborne Leviathan.
 
 4. **Vector 2 (Prevent-Trigger Payoffs)** -- Would transform Depths from
    "reactive by necessity" to "reactive by choice," making the archetype more
