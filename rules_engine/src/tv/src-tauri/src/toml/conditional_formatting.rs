@@ -1,6 +1,7 @@
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
+use crate::toml::array_columns;
 use crate::toml::metadata_types::{ConditionalFormatRule, FormatCondition, FormatStyle};
 
 /// Result of evaluating conditional formatting rules for a single cell.
@@ -25,25 +26,29 @@ pub fn evaluate_rules(
     let mut results: Vec<CellFormatResult> = Vec::new();
 
     for rule in rules {
-        let Some(col_index) = headers.iter().position(|h| h == &rule.column) else {
+        let col_indices = find_matching_column_indices(headers, &rule.column);
+        if col_indices.is_empty() {
             continue;
-        };
+        }
 
-        for (row_index, row) in rows.iter().enumerate() {
-            let cell_value = row.get(col_index).cloned().unwrap_or(serde_json::Value::Null);
+        for col_index in col_indices {
+            for (row_index, row) in rows.iter().enumerate() {
+                let cell_value =
+                    row.get(col_index).cloned().unwrap_or(serde_json::Value::Null);
 
-            if evaluate_condition(&rule.condition, &cell_value) {
-                if let Some(existing) =
-                    results.iter_mut().find(|r| r.row == row_index && r.col_index == col_index)
-                {
-                    merge_styles(&mut existing.style, &rule.style);
-                } else {
-                    results.push(CellFormatResult {
-                        row: row_index,
-                        column: rule.column.clone(),
-                        col_index,
-                        style: rule.style.clone(),
-                    });
+                if evaluate_condition(&rule.condition, &cell_value) {
+                    if let Some(existing) =
+                        results.iter_mut().find(|r| r.row == row_index && r.col_index == col_index)
+                    {
+                        merge_styles(&mut existing.style, &rule.style);
+                    } else {
+                        results.push(CellFormatResult {
+                            row: row_index,
+                            column: headers[col_index].clone(),
+                            col_index,
+                            style: rule.style.clone(),
+                        });
+                    }
                 }
             }
         }
@@ -125,6 +130,33 @@ fn is_empty(value: &serde_json::Value) -> bool {
         serde_json::Value::String(s) => s.is_empty(),
         _ => false,
     }
+}
+
+/// Finds all header indices matching a rule's column name.
+///
+/// First checks for an exact match. If none is found, checks for expanded
+/// array column matches (e.g., column `"resonance"` matches headers
+/// `"resonance[0]"`, `"resonance[1]"`, etc.).
+fn find_matching_column_indices(headers: &[String], column: &str) -> Vec<usize> {
+    if let Some(exact) = headers.iter().position(|h| h == column) {
+        return vec![exact];
+    }
+
+    let prefix = format!("{column}[");
+    headers
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, h)| {
+            if h.starts_with(&prefix)
+                && h.ends_with(']')
+                && array_columns::parse_array_column_key(h).is_some()
+            {
+                Some(idx)
+            } else {
+                None
+            }
+        })
+        .collect()
 }
 
 /// Merges a new style into an existing style, with new values overriding existing ones.

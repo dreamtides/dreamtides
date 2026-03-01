@@ -2,7 +2,7 @@ import { FUniver } from "@univerjs/core/facade";
 import { FWorksheet } from "@univerjs/sheets/facade";
 
 import type { TomlTableData, EnumValidationInfo } from "./ipc_bridge";
-import { getColumnLetter } from "./header_utils";
+import { getColumnLetter, findMatchingHeaderIndices } from "./header_utils";
 import { createLogger } from "./logger_frontend";
 import type { ColumnMapping } from "./derived_column_utils";
 
@@ -98,8 +98,11 @@ export function applyDropdownValidation(
   }
 
   for (const rule of enumRules) {
-    const colIdx = data.headers.indexOf(rule.column);
-    if (colIdx === -1) {
+    const matchingIndices = findMatchingHeaderIndices(
+      data.headers,
+      rule.column,
+    );
+    if (matchingIndices.length === 0) {
       logger.debug(
         "Enum column not found in headers, skipping dropdown validation",
         {
@@ -109,33 +112,36 @@ export function applyDropdownValidation(
       continue;
     }
 
-    const visualCol = mapping.dataToVisual[colIdx];
-    if (visualCol === undefined) continue;
-    const colLetter = getColumnLetter(visualCol);
-    const startRow = 2;
-    const endRow = data.rows.length + 1;
-    const rangeAddress = `${colLetter}${startRow}:${colLetter}${endRow}`;
-    const range = sheet.getRange(rangeAddress);
+    for (const colIdx of matchingIndices) {
+      const visualCol = mapping.dataToVisual[colIdx];
+      if (visualCol === undefined) continue;
+      const colLetter = getColumnLetter(visualCol);
+      const startRow = 2;
+      const endRow = data.rows.length + 1;
+      const rangeAddress = `${colLetter}${startRow}:${colLetter}${endRow}`;
+      const range = sheet.getRange(rangeAddress);
 
-    if (range) {
-      const validationRule = univerAPI
-        .newDataValidation()
-        .requireValueInList(rule.allowed_values, false)
-        .setOptions({
-          showErrorMessage: true,
-          error: `Value must be one of: ${rule.allowed_values.join(", ")}`,
-        })
-        .build();
-      range.setDataValidation(validationRule);
+      if (range) {
+        const validationRule = univerAPI
+          .newDataValidation()
+          .requireValueInList(rule.allowed_values, false)
+          .setOptions({
+            showErrorMessage: true,
+            error: `Value must be one of: ${rule.allowed_values.join(", ")}`,
+          })
+          .build();
+        range.setDataValidation(validationRule);
 
-      range.setVerticalAlignment("middle");
-      range.setWrap(true);
+        range.setVerticalAlignment("middle");
+        range.setWrap(true);
 
-      logger.debug("Applied dropdown validation to column", {
-        column: rule.column,
-        range: rangeAddress,
-        allowedValues: rule.allowed_values,
-      });
+        logger.debug("Applied dropdown validation to column", {
+          column: data.headers[colIdx],
+          rule: rule.column,
+          range: rangeAddress,
+          allowedValues: rule.allowed_values,
+        });
+      }
     }
   }
 }

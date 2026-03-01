@@ -3825,6 +3825,51 @@ column = "subtype"
 type = "enum"
 enum = ["Agent", "Ancient", "Avatar", "Child", "Detective", "Enigma", "Explorer", "Guide", "Hacker", "Mage", "Monster", "Musician", "Outsider", "Renegade", "Robot", "Spirit Animal", "Super", "Survivor", "Synth", "Tinkerer", "Trooper", "Visionary", "Visitor", "Warrior"]
 
+[[metadata.validation_rules]]
+column = "resonance"
+type = "enum"
+enum = ["Ruin", "Tide", "Stone", "Ember", "Zephyr"]
+
+[[metadata.conditional_formatting]]
+column = "resonance"
+[metadata.conditional_formatting.condition]
+equals = "Ruin"
+[metadata.conditional_formatting.style]
+background_color = "#E8D0F0"
+font_color = "#6B21A8"
+
+[[metadata.conditional_formatting]]
+column = "resonance"
+[metadata.conditional_formatting.condition]
+equals = "Tide"
+[metadata.conditional_formatting.style]
+background_color = "#D0E4F5"
+font_color = "#1E40AF"
+
+[[metadata.conditional_formatting]]
+column = "resonance"
+[metadata.conditional_formatting.condition]
+equals = "Stone"
+[metadata.conditional_formatting.style]
+background_color = "#D5F0D0"
+font_color = "#166534"
+
+[[metadata.conditional_formatting]]
+column = "resonance"
+[metadata.conditional_formatting.condition]
+equals = "Ember"
+[metadata.conditional_formatting.style]
+background_color = "#F5D0D0"
+font_color = "#991B1B"
+
+[[metadata.conditional_formatting]]
+column = "resonance"
+[metadata.conditional_formatting.condition]
+equals = "Zephyr"
+[metadata.conditional_formatting.style]
+background_color = "#F5EED0"
+font_color = "#854D0E"
+
 [[metadata.derived_columns]]
 name = "image"
 function = "image_derived"
