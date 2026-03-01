@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::io::ErrorKind;
 use std::path::Path;
 use std::time::Instant;
@@ -6,7 +6,7 @@ use std::time::Instant;
 use serde::{Deserialize, Serialize};
 
 use crate::error::error_types::TvError;
-use crate::toml::value_converter;
+use crate::toml::{array_columns, value_converter};
 use crate::traits::TvConfig;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -108,25 +108,59 @@ pub fn load_toml_document(
         return Err(TvError::NotAnArrayOfTables { table_name: table_name.to_string() });
     }
 
+    // Phase 1: Discover keys in first-seen order and detect inline scalar arrays.
     let mut seen = HashSet::new();
-    let mut headers = Vec::new();
-    for item in array {
+    let mut raw_keys = Vec::new();
+    let mut array_max_len: HashMap<String, usize> = HashMap::new();
+    for item in array.iter() {
         if let Some(tbl) = item.as_table() {
             for key in tbl.keys() {
                 if seen.insert(key.clone()) {
-                    headers.push(key.clone());
+                    raw_keys.push(key.clone());
+                }
+                if let Some(toml::Value::Array(arr)) = tbl.get(key) {
+                    if is_scalar_array(arr) {
+                        let entry = array_max_len.entry(key.clone()).or_insert(0);
+                        *entry = (*entry).max(arr.len());
+                    }
                 }
             }
         }
     }
+
+    // Phase 2: Build expanded headers and rows.
+    let mut headers = Vec::new();
+    for key in &raw_keys {
+        if let Some(&max_len) = array_max_len.get(key) {
+            for i in 0..max_len {
+                headers.push(array_columns::make_array_column_key(key, i));
+            }
+        } else {
+            headers.push(key.clone());
+        }
+    }
+
     let mut rows = Vec::new();
     for item in array {
         let mut row = Vec::new();
         if let Some(tbl) = item.as_table() {
-            for header in &headers {
-                let val =
-                    tbl.get(header).map_or(serde_json::Value::Null, value_converter::toml_to_json);
-                row.push(val);
+            for key in &raw_keys {
+                if let Some(&max_len) = array_max_len.get(key) {
+                    let arr = tbl
+                        .get(key)
+                        .and_then(|v| v.as_array());
+                    for i in 0..max_len {
+                        let val = arr
+                            .and_then(|a| a.get(i))
+                            .map_or(serde_json::Value::Null, value_converter::toml_to_json);
+                        row.push(val);
+                    }
+                } else {
+                    let val = tbl
+                        .get(key)
+                        .map_or(serde_json::Value::Null, value_converter::toml_to_json);
+                    row.push(val);
+                }
             }
         }
         rows.push(row);
@@ -142,4 +176,10 @@ pub fn load_toml_document(
     );
 
     Ok(TomlTableData { headers, rows })
+}
+
+/// Returns `true` if the array contains only scalar values (strings, integers,
+/// floats, booleans), not tables or nested arrays.
+fn is_scalar_array(arr: &[toml::Value]) -> bool {
+    arr.iter().all(|v| matches!(v, toml::Value::String(_) | toml::Value::Integer(_) | toml::Value::Float(_) | toml::Value::Boolean(_)))
 }

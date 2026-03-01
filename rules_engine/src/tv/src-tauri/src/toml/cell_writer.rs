@@ -2,8 +2,9 @@ use std::path::Path;
 use std::time::Instant;
 
 use crate::error::error_types::{map_io_error_for_read, TvError};
-use crate::toml::{metadata, value_converter};
+use crate::toml::array_columns;
 use crate::toml::writer_types::{CellUpdate, SaveCellResult};
+use crate::toml::{metadata, value_converter};
 use crate::traits::{AtomicWriteError, TvConfig};
 use crate::validation::validation_rules::ValidationRule;
 use crate::validation::validators;
@@ -44,8 +45,10 @@ pub fn save_cell_with_rules(
             .unwrap_or_default(),
     };
 
+    let validation_column = array_columns::parse_array_column_key(&update.column_key)
+        .map_or(update.column_key.as_str(), |(base, _)| base);
     if let Some(error) =
-        validate_cell_value(&validation_rules, &update.column_key, &update.value, update.row_index)
+        validate_cell_value(&validation_rules, validation_column, &update.value, update.row_index)
     {
         return Err(error);
     }
@@ -84,7 +87,9 @@ pub fn save_cell_with_rules(
         TvError::RowNotFound { table_name: table_name.to_string(), row_index: update.row_index }
     })?;
 
-    if let Some(existing) = table.get(&update.column_key) {
+    if let Some((base_key, array_idx)) = array_columns::parse_array_column_key(&update.column_key) {
+        apply_array_element_update(table, base_key, array_idx, &update.value);
+    } else if let Some(existing) = table.get(&update.column_key) {
         if let Some(new_value) =
             value_converter::json_to_toml_edit_preserving_type(&update.value, existing)
         {
@@ -137,6 +142,45 @@ fn validate_cell_value(
         });
     }
     None
+}
+
+/// Updates a single element within an inline TOML array on a table row.
+///
+/// If the value is non-null, the array is extended with empty strings as needed
+/// and the element at `array_idx` is replaced. Trailing null/empty values are
+/// trimmed. If the resulting array is empty, the key is removed entirely.
+pub(crate) fn apply_array_element_update(
+    table: &mut toml_edit::Table,
+    base_key: &str,
+    array_idx: usize,
+    value: &serde_json::Value,
+) {
+    let mut arr = table
+        .get(base_key)
+        .and_then(|item| item.as_array())
+        .cloned()
+        .unwrap_or_default();
+
+    if value.is_null() {
+        if array_idx < arr.len() {
+            arr.remove(array_idx);
+        }
+    } else if let Some(toml_edit::Item::Value(v)) = value_converter::json_to_toml_edit(value) {
+        // Extend array if index is past the end
+        while arr.len() <= array_idx {
+            arr.push("");
+        }
+        arr.replace(array_idx, v);
+    }
+
+    if arr.is_empty() {
+        table.remove(base_key);
+    } else {
+        table.insert(
+            base_key,
+            toml_edit::Item::Value(toml_edit::Value::Array(arr)),
+        );
+    }
 }
 
 pub(crate) fn map_atomic_write_error(error: AtomicWriteError, file_path: &str) -> TvError {

@@ -7,6 +7,13 @@ const HEADER_ACRONYMS = new Set(["id", "fx", "url", "uuid", "hp", "ui"]);
  * and fully uppercases known acronyms.
  */
 export function formatHeaderForDisplay(key: string): string {
+  // Handle expanded array column keys like "resonance[0]" → "Resonance 1"
+  const arrayMatch = key.match(/^(.+)\[(\d+)\]$/);
+  if (arrayMatch) {
+    const baseFormatted = formatHeaderForDisplay(arrayMatch[1]);
+    return `${baseFormatted} ${parseInt(arrayMatch[2], 10) + 1}`;
+  }
+
   return key
     .split(/[-_]/)
     .map((word) =>

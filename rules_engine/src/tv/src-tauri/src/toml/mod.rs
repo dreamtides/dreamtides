@@ -1,3 +1,4 @@
+pub mod array_columns;
 pub mod batch_writer;
 pub mod cell_writer;
 pub mod color_schemes;

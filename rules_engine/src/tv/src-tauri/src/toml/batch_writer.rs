@@ -2,7 +2,8 @@ use std::path::Path;
 use std::time::Instant;
 
 use crate::error::error_types::{map_io_error_for_read, TvError};
-use crate::toml::cell_writer::map_atomic_write_error;
+use crate::toml::array_columns;
+use crate::toml::cell_writer::{apply_array_element_update, map_atomic_write_error};
 use crate::toml::writer_types::{CellUpdate, FailedUpdate, SaveBatchResult};
 use crate::toml::{metadata, value_converter};
 use crate::traits::TvConfig;
@@ -105,8 +106,10 @@ pub fn save_batch_with_rules(
                 reason: "Unsupported value type".to_string(),
             });
         } else {
+            let validation_column = array_columns::parse_array_column_key(&update.column_key)
+                .map_or(update.column_key.as_str(), |(base, _)| base);
             let results =
-                validators::validate_all(&validation_rules, &update.column_key, &update.value);
+                validators::validate_all(&validation_rules, validation_column, &update.value);
             if let Some(error) = validators::first_error(&results) {
                 tracing::warn!(
                     component = "tv.toml.validation",
@@ -153,7 +156,11 @@ pub fn save_batch_with_rules(
         let table = array.get_mut(update.row_index).unwrap_or_else(|| {
             panic!("Row index {} should be valid after validation", update.row_index)
         });
-        if let Some(existing) = table.get(&update.column_key) {
+        if let Some((base_key, array_idx)) =
+            array_columns::parse_array_column_key(&update.column_key)
+        {
+            apply_array_element_update(table, base_key, array_idx, &update.value);
+        } else if let Some(existing) = table.get(&update.column_key) {
             if let Some(new_value) =
                 value_converter::json_to_toml_edit_preserving_type(&update.value, existing)
             {

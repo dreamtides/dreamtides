@@ -4,7 +4,10 @@ use serde_json::json;
 use crate::test_utils::harness::TvTestHarness;
 
 fn valid_key() -> impl Strategy<Value = String> {
-    "[a-z][a-z0-9_]{0,15}".prop_map(|s| s.to_string())
+    // Exclude keys that could collide with UUID auto-generation (e.g. "id")
+    "[a-z][a-z0-9_]{0,15}"
+        .prop_filter("key must not be 'id' (triggers UUID generation)", |s| s != "id")
+        .prop_map(|s| s.to_string())
 }
 
 fn simple_toml_value() -> impl Strategy<Value = serde_json::Value> {
@@ -333,16 +336,15 @@ tags = ["alpha", "beta", "gamma"]
 
     harness.save_cell(&path, "items", 0, "id", json!("modified")).unwrap();
 
+    // Inline scalar arrays are now expanded into separate columns
     let table = harness.load_table(&path, "items").expect("Should load");
-    let tags_idx = table.headers.iter().position(|h| h == "tags").unwrap();
-    let tags = &table.rows[0][tags_idx];
+    let idx0 = table.headers.iter().position(|h| h == "tags[0]").unwrap();
+    let idx1 = table.headers.iter().position(|h| h == "tags[1]").unwrap();
+    let idx2 = table.headers.iter().position(|h| h == "tags[2]").unwrap();
 
-    assert!(tags.is_array(), "Tags should still be an array");
-    let arr = tags.as_array().unwrap();
-    assert_eq!(arr.len(), 3, "Array should have 3 elements");
-    assert_eq!(arr[0].as_str(), Some("alpha"));
-    assert_eq!(arr[1].as_str(), Some("beta"));
-    assert_eq!(arr[2].as_str(), Some("gamma"));
+    assert_eq!(table.rows[0][idx0].as_str(), Some("alpha"));
+    assert_eq!(table.rows[0][idx1].as_str(), Some("beta"));
+    assert_eq!(table.rows[0][idx2].as_str(), Some("gamma"));
 }
 
 #[test]

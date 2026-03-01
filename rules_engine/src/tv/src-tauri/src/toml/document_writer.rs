@@ -11,6 +11,7 @@ use std::path::Path;
 use std::time::Instant;
 
 use crate::error::error_types::{map_io_error_for_read, TvError};
+use crate::toml::array_columns;
 use crate::toml::cell_writer::map_atomic_write_error;
 use crate::toml::document_loader::TomlTableData;
 use crate::toml::value_converter;
@@ -73,6 +74,7 @@ pub fn save_toml_document(
         })?;
 
     let existing_len = array.len();
+    let header_groups = array_columns::group_array_headers(&data.headers);
 
     for (row_idx, row) in data.rows.iter().enumerate() {
         if row_idx < existing_len {
@@ -80,13 +82,13 @@ pub fn save_toml_document(
                 break;
             };
 
-            for (col_idx, header) in data.headers.iter().enumerate() {
+            // Handle regular (non-array) headers
+            for &col_idx in &header_groups.regular_indices {
+                let header = &data.headers[col_idx];
                 if let Some(json_val) = row.get(col_idx) {
                     if json_val.is_null() {
                         table.remove(header);
                     } else if let Some(existing) = table.get_mut(header) {
-                        // Use type-preserving conversion to maintain boolean types when the
-                        // spreadsheet library returns 0/1 instead of false/true
                         if let Some(new_val) =
                             value_converter::json_to_toml_edit_preserving_type(json_val, existing)
                         {
@@ -97,9 +99,16 @@ pub fn save_toml_document(
                     }
                 }
             }
+
+            // Reassemble array groups
+            for group in &header_groups.array_groups {
+                write_array_group_to_table(table, group, row);
+            }
         } else {
             let mut new_table = toml_edit::Table::new();
-            for (col_idx, header) in data.headers.iter().enumerate() {
+
+            for &col_idx in &header_groups.regular_indices {
+                let header = &data.headers[col_idx];
                 if let Some(json_val) = row.get(col_idx) {
                     if !json_val.is_null() {
                         if let Some(toml_val) = value_converter::json_to_toml_edit(json_val) {
@@ -108,6 +117,11 @@ pub fn save_toml_document(
                     }
                 }
             }
+
+            for group in &header_groups.array_groups {
+                write_array_group_to_table(&mut new_table, group, row);
+            }
+
             array.push(new_table);
             tracing::debug!(
                 component = "tv.toml",
@@ -187,4 +201,27 @@ pub fn save_toml_document(
     );
 
     Ok(SaveTableResult { uuids_generated })
+}
+
+/// Collects non-null values from an array group's columns and writes the
+/// reassembled TOML array back into the table row.
+fn write_array_group_to_table(
+    table: &mut toml_edit::Table,
+    group: &array_columns::ArrayGroup,
+    row: &[serde_json::Value],
+) {
+    let values: Vec<&serde_json::Value> = group
+        .entries
+        .iter()
+        .filter_map(|&(col_idx, _)| row.get(col_idx).filter(|v| !v.is_null()))
+        .collect();
+
+    if values.is_empty() {
+        table.remove(&group.base_key);
+    } else {
+        let json_arr = serde_json::Value::Array(values.into_iter().cloned().collect());
+        if let Some(toml_val) = value_converter::json_to_toml_edit(&json_arr) {
+            table.insert(&group.base_key, toml_val);
+        }
+    }
 }

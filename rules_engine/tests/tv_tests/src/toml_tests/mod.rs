@@ -1,3 +1,4 @@
+mod array_column_tests;
 mod boolean_preservation_tests;
 mod color_scheme_tests;
 mod conditional_formatting_tests;
