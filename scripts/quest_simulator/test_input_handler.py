@@ -1,9 +1,8 @@
 """Tests for raw terminal input handler."""
 
-import io
+import os
 import signal
 import sys
-from typing import Optional
 from unittest.mock import MagicMock, patch
 
 from input_handler import (
@@ -70,68 +69,102 @@ class TestNonInteractiveFallbacks:
 class TestReadKey:
     """Key parsing from raw stdin bytes."""
 
-    def _make_stdin(self, data: str) -> io.StringIO:
-        return io.StringIO(data)
+    def _pipe_stdin(self, data: bytes) -> tuple[int, MagicMock]:
+        """Create a pipe fd with data and a mock stdin pointing to it."""
+        r_fd, w_fd = os.pipe()
+        os.write(w_fd, data)
+        os.close(w_fd)
+        mock = MagicMock()
+        mock.fileno.return_value = r_fd
+        return r_fd, mock
 
-    @patch("input_handler.select.select", return_value=([], [], []))
-    def test_enter_cr(self, _sel: object) -> None:
-        with patch("input_handler.sys.stdin", self._make_stdin("\r")):
-            assert _read_key() == KEY_ENTER
+    def test_enter_cr(self) -> None:
+        r_fd, mock_stdin = self._pipe_stdin(b"\r")
+        try:
+            with patch("input_handler.sys.stdin", mock_stdin):
+                assert _read_key() == KEY_ENTER
+        finally:
+            os.close(r_fd)
 
-    @patch("input_handler.select.select", return_value=([], [], []))
-    def test_enter_lf(self, _sel: object) -> None:
-        with patch("input_handler.sys.stdin", self._make_stdin("\n")):
-            assert _read_key() == KEY_ENTER
+    def test_enter_lf(self) -> None:
+        r_fd, mock_stdin = self._pipe_stdin(b"\n")
+        try:
+            with patch("input_handler.sys.stdin", mock_stdin):
+                assert _read_key() == KEY_ENTER
+        finally:
+            os.close(r_fd)
 
-    @patch("input_handler.select.select", return_value=([], [], []))
-    def test_space(self, _sel: object) -> None:
-        with patch("input_handler.sys.stdin", self._make_stdin(" ")):
-            assert _read_key() == KEY_SPACE
+    def test_space(self) -> None:
+        r_fd, mock_stdin = self._pipe_stdin(b" ")
+        try:
+            with patch("input_handler.sys.stdin", mock_stdin):
+                assert _read_key() == KEY_SPACE
+        finally:
+            os.close(r_fd)
 
-    @patch("input_handler.select.select", return_value=([], [], []))
-    def test_ctrl_c(self, _sel: object) -> None:
-        with patch("input_handler.sys.stdin", self._make_stdin("\x03")):
-            assert _read_key() == KEY_QUIT
+    def test_ctrl_c(self) -> None:
+        r_fd, mock_stdin = self._pipe_stdin(b"\x03")
+        try:
+            with patch("input_handler.sys.stdin", mock_stdin):
+                assert _read_key() == KEY_QUIT
+        finally:
+            os.close(r_fd)
 
-    @patch("input_handler.select.select", return_value=([], [], []))
-    def test_eof(self, _sel: object) -> None:
-        with patch("input_handler.sys.stdin", self._make_stdin("")):
-            assert _read_key() == KEY_QUIT
+    def test_eof(self) -> None:
+        r_fd, mock_stdin = self._pipe_stdin(b"")
+        try:
+            with patch("input_handler.sys.stdin", mock_stdin):
+                assert _read_key() == KEY_QUIT
+        finally:
+            os.close(r_fd)
 
-    @patch("input_handler.select.select", return_value=([], [], []))
-    def test_unknown_char(self, _sel: object) -> None:
-        with patch("input_handler.sys.stdin", self._make_stdin("x")):
-            assert _read_key() == KEY_UNKNOWN
+    def test_unknown_char(self) -> None:
+        r_fd, mock_stdin = self._pipe_stdin(b"x")
+        try:
+            with patch("input_handler.sys.stdin", mock_stdin):
+                assert _read_key() == KEY_UNKNOWN
+        finally:
+            os.close(r_fd)
 
     def test_arrow_up(self) -> None:
-        stdin = self._make_stdin("\x1b[A")
-        with patch("input_handler.sys.stdin", stdin):
-            with patch("input_handler.select.select", return_value=([stdin], [], [])):
+        r_fd, mock_stdin = self._pipe_stdin(b"\x1b[A")
+        try:
+            with patch("input_handler.sys.stdin", mock_stdin):
                 assert _read_key() == KEY_UP
+        finally:
+            os.close(r_fd)
 
     def test_arrow_down(self) -> None:
-        stdin = self._make_stdin("\x1b[B")
-        with patch("input_handler.sys.stdin", stdin):
-            with patch("input_handler.select.select", return_value=([stdin], [], [])):
+        r_fd, mock_stdin = self._pipe_stdin(b"\x1b[B")
+        try:
+            with patch("input_handler.sys.stdin", mock_stdin):
                 assert _read_key() == KEY_DOWN
+        finally:
+            os.close(r_fd)
 
     def test_arrow_right(self) -> None:
-        stdin = self._make_stdin("\x1b[C")
-        with patch("input_handler.sys.stdin", stdin):
-            with patch("input_handler.select.select", return_value=([stdin], [], [])):
+        r_fd, mock_stdin = self._pipe_stdin(b"\x1b[C")
+        try:
+            with patch("input_handler.sys.stdin", mock_stdin):
                 assert _read_key() == KEY_RIGHT
+        finally:
+            os.close(r_fd)
 
     def test_arrow_left(self) -> None:
-        stdin = self._make_stdin("\x1b[D")
-        with patch("input_handler.sys.stdin", stdin):
-            with patch("input_handler.select.select", return_value=([stdin], [], [])):
+        r_fd, mock_stdin = self._pipe_stdin(b"\x1b[D")
+        try:
+            with patch("input_handler.sys.stdin", mock_stdin):
                 assert _read_key() == KEY_LEFT
+        finally:
+            os.close(r_fd)
 
     def test_bare_escape(self) -> None:
-        stdin = self._make_stdin("\x1b")
-        with patch("input_handler.sys.stdin", stdin):
-            with patch("input_handler.select.select", return_value=([], [], [])):
+        r_fd, mock_stdin = self._pipe_stdin(b"\x1b")
+        try:
+            with patch("input_handler.sys.stdin", mock_stdin):
                 assert _read_key() == KEY_QUIT
+        finally:
+            os.close(r_fd)
 
 
 class TestTermiosStateManagement:
