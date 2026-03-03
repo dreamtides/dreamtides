@@ -156,7 +156,7 @@ Not a variable.
 7. Warriors/Midrange — Tide primary, Zephyr secondary
 8. Ramp/Spirit Animals — Zephyr primary, Tide secondary
 
-### Metrics: M1-M10 (Fixed, All at Archetype Level)
+### Metrics: M1-M11 (Fixed, All at Archetype Level)
 
 | ID | Metric | Target |
 |----|--------|--------|
@@ -170,6 +170,7 @@ Not a variable.
 | M8 | Archetype frequency across runs | No archetype > 20% or < 5% |
 | M9 | StdDev of S/A cards per pack (picks 6+) | >= 0.8 |
 | M10 | Max consecutive packs below 1.5 S/A (picks 6+) | <= 2 |
+| M11 | Picks 15+: S/A cards for committed archetype per pack | >= 3.0 of 4 avg |
 
 ### Player Strategies (Fixed)
 
@@ -278,7 +279,7 @@ Ranked by priority.
 9. **Splashable.** ~1 off-archetype card in most packs.
 10. **Open-ended early.** Picks 1-5 show variety.
 
-### V9-Specific Evaluation Criteria (Beyond M1-M10)
+### V9-Specific Evaluation Criteria (Beyond M1-M11)
 
 In addition to the standard metrics, V9 algorithms must report:
 
@@ -417,7 +418,7 @@ Each explores a different approach to the hidden/visible information split.
 
 1. Key findings (5-7 bullets)
 2. Three algorithm proposals: name, one-sentence visible description,
-   technical description, hidden metadata requirements, predicted M3/M10/M6
+   technical description, hidden metadata requirements, predicted M3/M10/M11/M6
    under Graduated Realistic
 3. Champion selection with justification
 4. Champion deep-dive: how it works, what the player sees vs. what the
@@ -569,7 +570,7 @@ revisions), all research documents, this plan.
 - 1000 drafts x 30 picks x 3 player strategies
 - Fitness: Graduated Realistic (primary), Pessimistic (secondary)
 - Pool: 360 cards, ~10% visible dual-res, hidden metadata per agent's design
-- All 10 metrics (M1-M10) at archetype level
+- All 11 metrics (M1-M11) at archetype level
 - All 4 V9 criteria (V1-V4)
 
 **Required outputs per agent:**
@@ -578,7 +579,7 @@ revisions), all research documents, this plan.
 2. Results: `docs/resonance/v9/results_{1..6}.md` (max 1000 words)
 
 Results must include:
-- Scorecard (all metrics at Graduated Realistic; M3/M10 at Pessimistic)
+- Scorecard (all metrics at Graduated Realistic; M3/M10/M11 at Pessimistic)
 - V1-V4 measurements
 - Per-archetype M3 table (8 rows)
 - Pack quality distribution (p10/p25/p50/p75/p90 for picks 6+)
@@ -678,7 +679,7 @@ All files in `docs/resonance/v9/`.
    should feel the game is fair, not deceptive.
 4. **Graduated Realistic fitness is fixed.** Do not re-explore fitness models.
    Use the V8-calibrated per-pair rates.
-5. **Report V1-V4 alongside M1-M10.** The information design metrics are
+5. **Report V1-V4 alongside M1-M11.** The information design metrics are
    as important as the performance metrics.
 6. **Build on V8, don't repeat it.** V8 established that pair-matching +
    pool contraction works. V9 asks how to implement it honestly with
