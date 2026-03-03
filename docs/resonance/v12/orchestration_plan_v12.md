@@ -4,9 +4,10 @@
 
 V12 introduces **public-information-reactive AI avoidance** — AIs that
 rationally avoid the player's draft archetype by reading the same pool
-information available to the player. Combined with **weighted pack
-construction** as a new design variable, this creates concentration through
-reduced competition rather than pool contraction.
+information available to the player. Combined with **oversampled pack
+construction** (draw N cards from the pool, show the best 4), this creates
+concentration through reduced competition and curated presentation rather than
+pool contraction.
 
 **Player-facing explanation:** "You're drafting at a table with AI opponents.
 Everyone can see what's popular — and smart drafters avoid competing for the
@@ -49,19 +50,34 @@ adjust. An AI that sees "Blink cards are disappearing fast" and concludes
 human opponent would. The information is symmetric — the player can also observe
 that "Storm cards are disappearing fast" and conclude an AI is drafting Storm.
 
-**Lever 2: Weighted Pack Construction.** V11 proved that uniform random
-sampling from a 100-130 card pool cannot achieve M3 >= 2.0 with 4-card packs.
-But pack construction is a design variable. If packs are constructed with
-weights favoring the player's emerging archetype (or, equivalently, if the
-pool's effective sampling distribution is shaped), per-pack archetype density
-can exceed the uniform baseline.
+**Lever 2: Oversampled Pack Construction (Draw N, Show Best 4).** V11 proved
+that drawing 4 cards uniformly from a 100-130 card pool cannot achieve M3 >=
+2.0. But the game doesn't have to show all N cards it draws — it can draw more
+and present the best subset.
 
-Pack construction weighting is the mechanism that converts pool-level AI
+The mechanism: the system draws N cards from the pool (where N > 4), ranks them
+by fitness for the player's emerging archetype, and shows the top 4. The player
+sees 4 cards as usual but doesn't know (or need to know) that more were drawn.
+This is transparent, tunable, and has a single parameter: N.
+
+The narrative framing is honest and natural: "the market has many cards; you see
+the ones most relevant to your interests." Or it can be invisible — the player
+just sees 4 cards and the selection feels like the draft naturally offering
+good options. Unlike V9's invisible contraction (which removed cards from the
+pool), oversampling doesn't change the pool at all — it just curates what the
+player sees from what's available.
+
+**The math:** With ~5 S/A cards for the player's archetype in a 120-card pool,
+M3 ≈ N × 5/120 = N/24. For M3 = 2.0, N ≈ 48. For M3 = 1.5, N ≈ 36. This
+holds when S/A supply is maintained in the pool — which is exactly what AI
+avoidance provides (AIs don't take from the player's archetype, so S/A count
+stays stable throughout the draft).
+
+Oversampled pack construction is the mechanism that converts pool-level AI
 avoidance into pack-level card quality. Without it, even perfect AI avoidance
-only produces a modest pool-level gradient (player's archetype accumulates in
-the pool while AI archetypes deplete). With it, the pack preferentially samples
-from the player's accumulated archetype, amplifying the gradient into M3-
-relevant per-pack density.
+only produces a modest pool-level gradient. With it, the larger draw naturally
+includes more on-archetype cards, and the "show best 4" filter ensures the
+player sees them.
 
 ### What Previous Versions Established (Carried Forward)
 
@@ -205,35 +221,65 @@ Key design questions:
   resonance symbol pair?
 - What happens when the player pivots? How quickly do AIs re-read the table?
 
-### Variable 2: Pack Construction Method
+### Variable 2: Oversample Size (N)
 
-How are the 4 cards in each pack selected from the pool?
+How many cards does the system draw from the pool before showing the best 4?
 
-| Method | Description | Archetype Density | Level |
-|--------|-------------|:-----------------:|:---:|
-| A: Uniform Random | 4 cards drawn uniformly from pool | ~6% (4/120 × 15) | 0 |
-| B: Symbol-Weighted | Weight toward player's visible resonance signature | 15-30% | 1 |
-| C: Affinity-Weighted | Weight toward player's inferred archetype pair-affinity | 25-45% | 2 |
-| D: Floor + Random | 1 guaranteed on-archetype card + 3 random | 25%+ base | 2 |
-| E: Hybrid Floor + Weighted | 1 floor slot + 3 symbol-weighted random | 30-50% | 2 |
+| Config | N Drawn | Show | Expected S/A (5 S/A in 120 pool) | M3 Estimate |
+|--------|:-------:|:----:|:---:|:---:|
+| A: No Oversample | 4 | 4 | 0.17 | 0.17 |
+| B: Light Oversample | 16 | Best 4 | 0.67 | 0.67 |
+| C: Moderate Oversample | 32 | Best 4 | 1.33 | 1.33 |
+| D: Standard Oversample | 48 | Best 4 | 2.00 | 2.00 |
+| E: Heavy Oversample | 64 | Best 4 | 2.67 | 2.67 |
 
-This is the critical variable. V11 proved that uniform random (Method A) from a
-100-130 card pool cannot achieve M3 >= 2.0 with 4-card packs. Methods B-E
-introduce weighting that increases per-pack archetype density.
+This is the critical variable. N controls how much the system curates the
+player's options. At N = 4, the player sees a uniform random sample (V11
+baseline — proven insufficient). At N = 48, the system draws 40% of the pool
+and shows the 4 cards with highest fitness for the player's archetype, yielding
+M3 ≈ 2.0.
 
-**The narrative question:** Can pack construction weighting be explained
-honestly? V9's virtual contraction was invisible. Weighted pack construction
-could be framed as: "The cards you see are influenced by your interests — the
-market shows you what's relevant." Or it could be hidden entirely (the player
-just sees 4 cards and doesn't know how they were selected). Neither framing
-requires revealing the mechanic.
+**"Best 4" ranking:** Cards drawn are ranked by fitness for the player's
+inferred archetype. S/A cards for the player's archetype rank highest (~0.9
+fitness), followed by sibling-archetype S/A (~0.5-0.7), on-archetype C/F
+(~0.3-0.5), and off-archetype cards (~0.0-0.2). The top 4 by this ranking
+are shown. This means any S/A card for the player's archetype that appears in
+the N drawn will be in the shown 4 (as long as fewer than 4 are drawn, which
+is almost always true).
 
-**Math baseline:** With 4-card packs, M3 = 2.0 requires that on average 2 of 4
-cards are S/A for the player's committed archetype. With 36% weighted-average
-sibling A-tier rate, this requires ~5.6 on-archetype cards per 4-card pack
-(before fitness filtering), or ~56% of each pack being the player's archetype.
-This is a high bar. Even Method D (floor + random) only guarantees 25% base
-density before the random slots contribute.
+**The late-draft problem:** The M3 estimates above assume 5 S/A cards remain
+in the pool. As the player drafts S/A cards, fewer remain. After taking 3 S/A
+(~pick 15), only 2 remain, and M3 ≈ N × 2/115. For N = 48, late-draft M3 ≈
+0.83. This is where AI avoidance is critical: if AIs avoid the player's
+archetype, S/A cards stay in the pool because no AI is taking them. The player
+is the only one depleting their own S/A supply. With AI avoidance, the S/A
+count stays at ~5 until the player takes them, keeping N ≈ 48 sufficient
+throughout the draft.
+
+**The narrative framing:** Oversampling is naturally honest. Possible framings:
+- Invisible: player just sees 4 cards, doesn't know N exists
+- "Your advisor scouts the market and presents the best options"
+- "The market has many cards; these are the ones that caught your eye"
+- Explicit: "Draw 48, show best 4" as a stated game rule
+
+All framings are defensible because the pool is real, the draw is real, and the
+filter criterion (fitness for the player's demonstrated preferences) is
+derivable from public information (the player's own picks).
+
+**Interaction with AI avoidance:** Oversampling and avoidance are complementary,
+not redundant. Avoidance maintains S/A supply in the pool (demand side);
+oversampling ensures S/A cards reach the player's packs (supply side). Without
+avoidance, late-draft S/A depletion forces N to grow impractically large
+(N > 100). Without oversampling, even perfect avoidance only produces M3 ≈
+0.25 with uniform 4-card packs (V11's pack-sampling bottleneck).
+
+**Can oversampling reduce the need for Design 5 information?** Partially. For
+committed drafting (picks 6+), oversampled packs self-signal — the player sees
+good cards for their archetype and infers "my lane is open." But for
+exploration (picks 1-5), the player hasn't committed yet and the "best 4"
+can't be targeted to any archetype. Design 5's bars and trends remain valuable
+for the initial lane-selection decision. Agents should explore whether
+oversampled packs make some Design 5 elements redundant.
 
 ### Variable 3: Pool Structure
 
@@ -247,12 +293,12 @@ How is the card pool organized and does it change during the draft?
 | D: V9-Style Virtual | 360 cards, virtual contraction | 360→17 |
 
 V11 conclusively showed that multi-round refills (B) and continuous markets (C)
-cannot achieve M3 >= 2.0 alone. However, when combined with AI avoidance
-(Variable 1) and weighted pack construction (Variable 2), the pool structure
-becomes a secondary variable — the primary concentration mechanism is pack
-construction, not pool manipulation.
+cannot achieve M3 >= 2.0 with uniform pack sampling. However, when combined
+with AI avoidance (Variable 1) and oversampled pack construction (Variable 2),
+the pool structure becomes a secondary variable — the primary concentration
+mechanism is oversampling, not pool manipulation.
 
-The interesting question is whether AI avoidance + weighted packs can work with
+The interesting question is whether AI avoidance + oversampling can work with
 a simple static pool (A), eliminating the need for V9-style virtual contraction
 entirely.
 
@@ -277,30 +323,35 @@ strongest possible demand-side concentration.
 
 ## Metrics
 
-### Recalibrated M3 for 4-Card Packs
+### Recalibrated M3 for Oversampled 4-Card Packs
 
-With 4-card packs (show 4, pick 1), the expected S/A cards per pack for a
-committed archetype depends on pack construction method:
+With oversampled pack construction (draw N, show best 4), M3 depends on N and
+the number of S/A cards for the player's archetype remaining in the pool:
 
-| Pack Method | Expected On-Archetype per Pack | Expected S/A per Pack | M3 Target Feasibility |
-|-------------|:---:|:---:|:---:|
-| Uniform (120-card pool) | 0.50 | 0.18 | Impossible |
-| Symbol-weighted (2x) | 1.00 | 0.36 | Impossible |
-| Symbol-weighted (4x) | 2.00 | 0.72 | Insufficient |
-| Affinity-weighted (8x) | 3.00 | 1.08 | Marginal |
-| Floor(1) + 3 random | 1.38 | 0.61 | Insufficient |
-| Floor(1) + 3 weighted(4x) | 2.50 | 0.97 | Marginal |
+| N Drawn | S/A in Pool = 5 | S/A in Pool = 4 | S/A in Pool = 3 | S/A in Pool = 2 |
+|:-------:|:---:|:---:|:---:|:---:|
+| 4 (uniform) | 0.17 | 0.13 | 0.10 | 0.07 |
+| 16 | 0.67 | 0.53 | 0.40 | 0.27 |
+| 24 | 1.00 | 0.80 | 0.60 | 0.40 |
+| 36 | 1.50 | 1.20 | 0.90 | 0.60 |
+| 48 | 2.00 | 1.60 | 1.20 | 0.80 |
+| 64 | 2.67 | 2.13 | 1.60 | 1.07 |
 
-**Important recalibration note:** M3 = 2.0 with 4-card packs is extremely
-aggressive. V9 achieved M3 = 2.70 with 4-card packs (3 random + 1 floor), but
-only because virtual contraction reduced the effective pool to ~17 cards by pick
-30, achieving 60%+ archetype density in the surviving pool.
+**The critical interaction:** Without AI avoidance, S/A depletes as AIs take
+on-archetype cards. By mid-draft, S/A in pool may drop to 2-3, requiring
+N = 80-100 for M3 = 2.0. With AI avoidance, S/A stays at ~5 throughout (only
+the player depletes their own lane), keeping N ≈ 48 sufficient.
 
-V12 should explore whether M3 targets need adjustment for the AI-avoidance
+**Important recalibration note:** M3 = 2.0 with 4-card packs requires N ≈ 48
+(drawing 40% of the pool each pick). V9 achieved M3 = 2.70 with 4-card packs
+(3 random + 1 floor) by contracting the pool to ~17 cards — effectively drawing
+from a tiny pool where archetype density was 60%+.
+
+V12 should explore whether M3 targets need adjustment for the oversampling
 paradigm. The relevant question is: does the player's draft *feel* good? A
-lower M3 might be acceptable if the player consistently faces meaningful
-archetype choices (2-3 S/A cards from their archetype available somewhere in
-every few packs, rather than 2+ in every single pack).
+lower M3 (e.g., 1.5, achievable at N ≈ 36) might be acceptable if the player
+consistently faces meaningful archetype choices. Agents should test multiple N
+values and evaluate the qualitative experience, not just the metric.
 
 ### Full Metric Table
 
@@ -347,10 +398,11 @@ class AIDrafter:
     avoidance_start_pick: int          # when avoidance kicks in
 
 class PackConstructor:
-    method: str                        # "uniform", "symbol_weighted", "affinity_weighted", "floor_random", "hybrid"
-    weight_multiplier: float           # how much to weight toward player's archetype
-    floor_count: int                   # guaranteed on-archetype slots (0-1)
-    player_signature: list[float]      # current resonance signature for weighting
+    oversample_n: int                  # N cards drawn from pool (4 = uniform, 48 = standard)
+    show_count: int                    # always 4 (show best 4 of N drawn)
+    ranking_method: str                # "archetype_fitness", "symbol_match", "power"
+    player_signature: list[float]      # current resonance signature for ranking
+    inferred_archetype: str            # player's inferred archetype for fitness ranking
 
 class DraftState:
     pool: list[SimCard]                # current available pool
@@ -389,51 +441,63 @@ Explore:
 
 **Output:** `docs/resonance/v12/research_ai_avoidance.md` (max 2000 words)
 
-### Research Agent B: Pack Construction Methods
+### Research Agent B: Oversampled Pack Construction
 
-**Question:** How do existing card games construct the cards presented to
-players, and what methods can convert pool-level composition into pack-level
-archetype density?
+**Question:** How do existing card games use oversampling or curated presentation
+to improve card offerings, and what are the design tradeoffs of "draw N, show
+best K"?
 
 Explore:
-- How does MTG construct booster packs? (Collation, print runs, rarity
-  distribution.) How do digital CCGs (Hearthstone arena, Legends of Runeterra
-  expedition) construct draft picks?
-- What is "weighted sampling" in the context of card games? How do roguelike
-  deckbuilders (Slay the Spire, Monster Train) weight card offerings toward
-  player synergies?
-- Given a pool of 120 cards with 15 per archetype and 4-card packs: what
-  weighting schemes achieve 25%, 40%, 50% per-pack archetype density? What are
-  the mathematical tradeoffs?
-- How does pack construction interact with player perception of fairness? When
-  do players notice that offerings are "suspiciously good" vs "naturally lucky"?
-- Can pack construction weighting be framed as a natural feature of the draft
-  format rather than a hidden manipulation?
+- How do roguelike deckbuilders (Slay the Spire, Monster Train, Inscryption)
+  curate card offerings toward player synergies? Do any use explicit
+  oversampling (draw more than shown, filter)?
+- How do digital CCGs (Hearthstone arena, Legends of Runeterra expedition)
+  construct draft picks? Is there evidence of hidden oversampling or filtering?
+- What does "best" mean in "show best 4"? Options: highest archetype fitness,
+  highest power, highest resonance symbol match, composite score. How does the
+  ranking criterion affect the skill axis?
+- How does oversampling interact with player perception? At what N does the
+  player notice that offerings are "suspiciously good"? Is there a perceptual
+  threshold where packs feel curated rather than random?
+- What is the exploration-exploitation tradeoff? High N makes committed-
+  archetype packs excellent but reduces off-archetype discovery (the best 4
+  are all on-archetype). How does this affect picks 1-5 (exploration phase)?
+- Should N be constant throughout the draft, or should it increase as the
+  player commits? (Low N early for exploration, high N late for execution.)
+- Can oversampling be framed as an explicit game rule ("the market scouts 48
+  cards for you") or is it better left invisible?
 
 **Output:** `docs/resonance/v12/research_pack_construction.md` (max 2000 words)
 
-### Research Agent C: Concentration Math for AI Avoidance + Weighted Packs
+### Research Agent C: Concentration Math for AI Avoidance + Oversampling
 
-**Question:** What combinations of AI avoidance strength and pack construction
-weighting produce M3 >= 2.0 with 4-card packs from a pool?
+**Question:** What combinations of AI avoidance strength and oversample size N
+produce M3 >= 2.0 with "draw N, show best 4" packs from a pool?
 
 Analyze:
 - **Baseline:** With 120 cards, 8 archetypes, 15 per archetype, 36% sibling
-  A-tier, uniform 4-card packs: what is M3? (Expected: ~0.18)
-- **AI avoidance only (uniform packs):** If 5 AIs avoid the player's archetype,
-  the player's archetype accumulates in the pool. After 30 picks, how many
-  cards remain per archetype? What is the resulting M3 with uniform sampling?
-- **Pack weighting only (no avoidance):** What weight multiplier on the player's
-  primary resonance symbol achieves M3 >= 2.0? What multiplier on the player's
-  specific archetype (using pair-affinity)?
-- **Combined:** AI avoidance + pack weighting. Model the interaction: avoidance
-  enriches the pool, weighting amplifies the enrichment into packs. What
-  combination achieves M3 >= 2.0?
-- **4-card pack constraint:** V9 used 3 random + 1 floor = 4 cards. Can V12
-  use the same floor mechanism? What floor definition works with AI avoidance?
-- **Comparison to V9:** V9 contracted the pool from 360 to 17 cards.
-  V12 maintains a 120-card pool but weights pack construction. At what
-  weighting does V12 match V9's per-pack archetype density?
+  A-tier, N = 4 (uniform): what is M3? (Expected: ~0.17)
+- **AI avoidance only (N = 4):** If 5 AIs avoid the player's archetype, the
+  player's archetype accumulates in the pool. Model the S/A trajectory over 30
+  picks. What M3 does avoidance alone produce with uniform packs?
+- **Oversampling only (no avoidance):** What N achieves M3 >= 2.0 at draft
+  start (5 S/A in pool)? How does N need to grow as S/A depletes through the
+  draft? Model the N required at picks 1, 10, 20, 30.
+- **Combined:** AI avoidance + oversampling. Avoidance maintains S/A count at
+  ~5; oversampling at N = 48 yields M3 ≈ 2.0. Verify this interaction
+  mathematically. What is the sensitivity — what happens at N = 36? N = 64?
+- **Late-draft analysis:** With avoidance, only the player depletes their own
+  S/A. After taking 3 S/A by pick 15, 2 remain. What is M3 at N = 48? Does
+  the draft need multi-round refills to maintain S/A supply, or does avoidance
+  alone suffice?
+- **Comparison to V9:** V9 contracted the pool from 360 to 17 cards, achieving
+  60%+ archetype density. "Draw 48, show best 4" from a 120-card pool with 5
+  S/A achieves M3 ≈ 2.0 without contraction. At what N does V12 match V9's
+  M3 = 2.70?
+- **Exploration phase (picks 1-5):** Before the player commits, the system
+  cannot rank by archetype fitness (no archetype inferred yet). What should
+  "best 4" mean during exploration? Options: rank by power, rank by diversity,
+  uniform random, or N = 4 (no oversampling during exploration).
 
 **Reads:** This plan, V11 final report, V11 algorithm overview, V9 algorithm
 overview.
@@ -456,7 +520,8 @@ algorithm overview. Each explores a different region of the V12 design space.
 - All V10 and V11 structural findings available
 - AIs must use public-information-based avoidance of the player's archetype
   somewhere in the design (the strength, timing, and mechanism vary by agent)
-- Pack construction method is a design variable (not fixed at uniform random)
+- Pack construction uses "draw N, show best 4" oversampling (N is a design
+  variable; N = 4 means uniform random baseline)
 
 **Output format (all agents):**
 
@@ -467,69 +532,78 @@ algorithm overview. Each explores a different region of the V12 design space.
 4. Champion deep-dive: pick-by-pick walkthrough showing when AI avoidance kicks
    in, how pack construction changes, what the player sees, pool composition
    evolution, failure modes
-5. Complete specification (pool size, pack method, AI count, AI avoidance
-   model, AI inference mechanism, AI pick logic, player information)
+5. Complete specification (pool size, oversample N, "best 4" ranking criterion,
+   AI count, AI avoidance model, AI inference mechanism, AI pick logic, player
+   information)
 
 Max 1500 words per agent.
 
-### Agent 1: Minimal Avoidance + Uniform Packs (Isolation Test)
+### Agent 1: Minimal Avoidance + No Oversampling (Isolation Test)
 
-**Starting point:** Test AI avoidance alone, with NO pack weighting. Uniform
-random 4-card packs. This isolates the contribution of avoidance behavior.
+**Starting point:** Test AI avoidance alone, with N = 4 (no oversampling).
+Uniform random 4-card packs. This isolates the contribution of avoidance
+behavior.
 
 **Question:** How much M3 improvement does AI avoidance alone produce over a
-Level 0 baseline, when packs are constructed uniformly?
+Level 0 baseline, when packs are not oversampled?
 
 Explore:
-- With 5 Level 0 AIs (no avoidance), M3 should be ~0.18-0.25 (V11 SIM-1
+- With 5 Level 0 AIs (no avoidance), M3 should be ~0.17-0.25 (V11 SIM-1
   baseline). What does M3 become when AIs avoid the player's detected
   archetype?
 - How much pool-level archetype accumulation does avoidance create? If 5 AIs
   stop taking Blink cards after pick 6, how does Blink's count in the pool
   grow?
-- Is the avoidance effect large enough to be meaningful without pack weighting?
+- Is the avoidance effect large enough to be meaningful without oversampling?
 - What is the sensitivity to avoidance timing (pick 5 vs pick 8 vs pick 12)?
 - How does the player's archetype inference accuracy affect the mechanism?
 
-### Agent 2: Symbol-Weighted Packs + Gradual Avoidance
+### Agent 2: Moderate Oversampling + Gradual Avoidance
 
-**Starting point:** Combine graduated AI avoidance with symbol-weighted pack
-construction. Packs favor the player's visible resonance signature.
+**Starting point:** Combine graduated AI avoidance with moderate oversampling
+(N = 24-36). Test whether a lower N with avoidance can achieve M3 >= 1.5-2.0.
 
-**Question:** Can symbol-level pack weighting (using visible resonance symbols
-only, no hidden pair-affinity) achieve M3 >= 2.0 when combined with gradual AI
-avoidance?
-
-Explore:
-- What symbol weight multiplier produces packs with 2+ on-archetype cards?
-- Symbol weighting helps both archetypes sharing a resonance (e.g., Blink and
-  Storm both have Ember). How does this affect M3 vs archetype-specific
-  weighting?
-- Is symbol weighting honest? The player sees their own symbol preferences;
-  weighting toward those symbols is consistent with "the market shows you
-  relevant cards."
-- How does symbol weighting interact with dual-symbol cards?
-
-### Agent 3: Affinity-Weighted Packs + Delayed Avoidance
-
-**Starting point:** Use pair-affinity scores (hidden 8-bit metadata from V9) to
-weight pack construction toward the player's inferred archetype. AIs begin
-avoidance after pick 8 (delayed).
-
-**Question:** Can affinity-based pack weighting — the most targeted mechanism —
-achieve M3 >= 2.0 with moderate AI avoidance?
+**Question:** What is the minimum N that produces acceptable M3 when combined
+with gradual AI avoidance?
 
 Explore:
-- Affinity weighting targets the specific archetype, not just the resonance
-  symbol. What weight multiplier is needed?
-- Is affinity weighting V9 contraction by another name? V9 used pair-affinity
-  to remove low-relevance cards; affinity-weighted packs use pair-affinity to
-  boost high-relevance cards in packs. The mechanism direction is opposite
-  (inclusion vs exclusion) but the effect is similar. Evaluate honestly.
+- Test N = 24, 32, 36 with gradual avoidance (ramp from pick 3 to pick 15).
+  What M3 does each achieve?
+- How does the "best 4" ranking work during exploration (picks 1-5) before
+  archetype inference is confident? Options: rank by power, rank by symbol
+  diversity, or use low N during exploration.
+- Should N increase over the draft? (N = 8 for picks 1-5, N = 36 for picks
+  6-15, N = 48 for picks 16+.) This mirrors V9's increasing contraction.
+- At what N does the player start to notice that packs are "too good" — always
+  containing on-archetype cards? Is there a perceptual sweet spot?
+- How does moderate N interact with off-archetype variety (M4)? If best-4
+  always includes on-archetype cards, are the remaining slots diverse enough?
+
+### Agent 3: Heavy Oversampling + Delayed Avoidance
+
+**Starting point:** Use high N (48-64) with delayed AI avoidance (pick 8+).
+The "best 4" ranking uses pair-affinity scores (hidden 8-bit metadata from V9)
+for maximum targeting precision.
+
+**Question:** Can heavy oversampling with archetype-specific fitness ranking
+achieve M3 >= 2.0 even with delayed avoidance?
+
+Explore:
+- Test N = 48 and N = 64 with delayed avoidance (pick 8+). What M3 does each
+  achieve? Does high N compensate for delayed avoidance?
+- How does the ranking criterion affect results? Compare: ranking by archetype
+  fitness (pair-affinity) vs ranking by visible symbol match only. Is hidden
+  metadata necessary for effective oversampling, or do visible symbols suffice?
 - Delayed avoidance (pick 8+) means the first 7 picks have zero avoidance
-  benefit. Is this too late? Or does it prevent premature AI commitment?
-- What is the floor needed? V9's floor slot guaranteed 1 top-quartile card.
-  Can this be adapted?
+  benefit — AIs may take S/A from the player's archetype early. How much S/A
+  is lost in picks 1-7, and can high N compensate?
+- Is oversampling with pair-affinity ranking V9 contraction by another name?
+  V9 removed low-relevance cards; oversampling includes high-relevance cards.
+  The direction is opposite (inclusion vs exclusion) but the effect is similar.
+  Evaluate honestly.
+- Can a floor slot be added within the oversampling framework? E.g., "draw N,
+  guarantee 1 S/A in the top 4, fill remaining 3 from best of N." How does
+  this interact with the oversampling math?
 
 ### Agent 4: V9 Engine + AI Avoidance Narrative
 
@@ -558,45 +632,53 @@ Explore:
 ### Agent 5: High-AI-Count + Avoidance (7 AIs, 1 Open Lane)
 
 **Starting point:** 7 AIs, only 1 open lane per game. All 7 AIs avoid the
-player's archetype once detected. Combined with moderate pack weighting.
+player's archetype once detected. Combined with moderate oversampling (N =
+24-36).
 
 **Question:** Does maximizing AI count and minimizing open lanes, combined with
-universal avoidance, create the strongest demand-side concentration?
+universal avoidance, allow lower N for the same M3?
 
 Explore:
 - With 7 AIs avoiding the player's archetype, the player faces zero
-  competition. But with only 1 open lane, there's no "choosing the right lane"
-  skill — the open lane is whatever the player picks.
-- Does 7-AI avoidance create enough pool-level concentration that moderate pack
-  weighting (2-3x) suffices for M3 >= 2.0?
+  competition and S/A supply is maximally preserved. Does this allow lower N
+  (24-32) to achieve M3 >= 2.0?
+- But with only 1 open lane, there's no "choosing the right lane" skill — the
+  open lane is whatever the player picks. Is this acceptable?
 - What happens to game-to-game variety? C(8,7) = 8 compositions vs
   C(8,5) = 56. Is 8 enough variety?
 - The 1-open-lane structure eliminates M12 (signal reading) as a skill axis.
   Is this acceptable? What does it replace it with?
+- Does 7-AI avoidance create enough pool-level concentration that the
+  oversampled "best 4 of N" consistently contains 2+ S/A at moderate N?
 
 ### Agent 6: Hybrid Approaches + Novel Mechanisms
 
-**Starting point:** Free exploration. Combine AI avoidance with pack
-construction in novel ways, or propose entirely new mechanisms.
+**Starting point:** Free exploration. Combine AI avoidance with oversampling
+in novel ways, or propose entirely new mechanisms.
 
 Explore freely. Some starting ideas:
-- **Progressive revelation packs:** Pack construction starts uniform, becomes
-  increasingly weighted as the draft progresses. Early packs are exploratory;
-  late packs are focused. Mirrors V9's contraction trajectory.
-- **AI avoidance with multi-round refills:** V11's 3-round structure with
-  open-lane biased refills, plus AI avoidance within each round. Does the
-  combination of refill bias + avoidance + pack weighting finally cross M3 >=
-  2.0?
-- **Symmetric information with asymmetric packs:** All drafters see the same
-  pool state (Design 5 information), but the player's packs are weighted while
-  AI "packs" (their selections from the pool) are not. Is this fair?
+- **Progressive N:** N starts low (4-8 for picks 1-5, exploration) and ramps
+  up as the player commits (N = 48 by pick 10). This mirrors V9's contraction
+  trajectory — early packs are diverse, late packs are focused. The player
+  experiences natural concentration without any pool manipulation.
+- **AI avoidance with multi-round refills + oversampling:** V11's 3-round
+  structure with open-lane biased refills, plus AI avoidance within each round,
+  plus moderate oversampling. Does the combination of refill bias + avoidance +
+  oversampling finally cross M3 >= 2.0 at lower N?
+- **Oversampling without hidden metadata:** Can "best 4 of N" ranking work
+  using only visible resonance symbols (no pair-affinity encoding), making the
+  entire mechanism transparent? The player's visible resonance signature
+  determines "best" — this is derivable from purely public information.
 - **Avoidance cascade:** When the player commits to archetype X, AIs avoid X.
   This pushes AIs toward the remaining 7 archetypes, creating secondary
-  avoidance effects. Some AIs may compete with each other more intensely,
-  potentially creating interesting dynamics.
-- **Pack construction without hidden metadata:** Can pack weighting work using
-  only visible resonance symbols (no pair-affinity encoding), making the entire
-  mechanism transparent?
+  avoidance effects. Combined with oversampling, the enriched pool makes N
+  more efficient.
+- **Split oversampling:** Draw N cards, but show 2 "best for your archetype" +
+  2 "highest power regardless of archetype." Maintains exploration tension
+  even in late draft — the player must choose between synergy and raw power.
+- **Explicit N as game rule:** What if the player knows N? "The market scouts
+  48 cards and shows you the 4 best matches." Does transparency change the
+  player experience? Does it create a different skill axis?
 
 ---
 
@@ -607,18 +689,20 @@ A single critic reads all 6 design proposals, all research, and this plan.
 **Task:**
 
 1. Rank all proposals on: M3/M11' potential, player experience, simplicity,
-   signal reading quality, AI avoidance narrative quality, pack construction
-   honesty.
+   signal reading quality, AI avoidance narrative quality, oversampling honesty.
 2. Evaluate whether AI avoidance is genuinely "public information" behavior or
    a dressed-up Level 2+ mechanism. Where is the line?
-3. Assess pack construction methods: which are honest, which are V9 contraction
-   in disguise, which are somewhere in between?
+3. Assess oversampling configurations: is "draw N, show best 4" honest? At
+   what N does it feel curated vs natural? Is it V9 contraction in disguise?
 4. Evaluate the M3 target: is M3 >= 2.0 with 4-card packs a reasonable target
-   for the AI-avoidance paradigm, or should it be recalibrated?
-5. Evaluate the interaction between AI avoidance and pack weighting: are they
-   complementary, redundant, or in tension?
-6. Propose 1-2 hybrid designs combining the best elements.
-7. Recommend 4-6 algorithms for simulation.
+   for the oversampling paradigm, or should it be recalibrated?
+5. Evaluate the interaction between AI avoidance and oversampling N: are they
+   complementary, redundant, or in tension? What is the minimum viable N with
+   avoidance vs without?
+6. Evaluate whether progressive N (low early, high late) is better than
+   constant N for player experience and metric performance.
+7. Propose 1-2 hybrid designs combining the best elements.
+8. Recommend 4-6 algorithms for simulation.
 
 **Output:** `docs/resonance/v12/critic_review.md` (max 2500 words)
 
@@ -636,7 +720,8 @@ Each agent implements and simulates their champion as modified by the critic.
 - Fitness: Graduated Realistic (primary), Pessimistic (secondary)
 - All 14 metrics (M1-M11', M12, M13, M14)
 - Must implement AI avoidance logic (inference + behavior change)
-- Must implement pack construction method as specified
+- Must implement oversampled pack construction (draw N, rank by fitness, show
+  best 4) with specified N value
 - Must track AI inference accuracy (how often does AI correctly identify the
   player's archetype, and at what pick?)
 
@@ -651,8 +736,10 @@ Results must include:
 - Per-archetype M3 table (8 rows)
 - **AI avoidance timeline:** At what pick does each AI begin avoiding the
   player's archetype? How accurate is the inference?
-- **Pack construction analysis:** What is the actual per-pack archetype density
-  achieved? How does it compare to the uniform baseline?
+- **Oversampling analysis:** What is the actual per-pack archetype density
+  achieved at the specified N? How does it compare to N = 4 (uniform baseline)?
+  Track S/A count remaining in pool over the draft to verify avoidance
+  maintains supply.
 - Pack quality distribution (p10/p25/p50/p75/p90 for picks 6+)
 - Consecutive bad pack analysis
 - **Pool composition trajectory:** Show how archetype distribution evolves
@@ -660,7 +747,7 @@ Results must include:
 - 2 draft traces (committed player, signal reader) — including AI avoidance
   moments
 - Comparison to V9 baseline and V11 results
-- Self-assessment: Is AI avoidance + pack weighting a viable replacement for
+- Self-assessment: Is AI avoidance + oversampling a viable replacement for
   V9 contraction, or is it a complement?
 
 ---
@@ -672,18 +759,19 @@ Results must include:
 ### File 1: `docs/resonance/v12/final_report.md` (max 4000 words)
 
 1. Unified comparison table (all V12 algorithms + V9/V10/V11 baselines)
-2. The key question: **Can AI avoidance + weighted pack construction replace
+2. The key question: **Can AI avoidance + oversampled pack construction replace
    V9's virtual contraction?**
 3. AI avoidance analysis: which models work and which are surveillance?
-4. Pack construction analysis: which methods achieve M3 targets honestly?
-5. The interaction: how much does avoidance contribute vs pack weighting?
+4. Oversampling analysis: what N values achieve M3 targets? Is "draw N, show
+   best 4" honest? How does the ranking criterion affect results?
+5. The interaction: how much does avoidance contribute vs oversampling N?
 6. Per-archetype convergence for top 3 algorithms
 7. V12 vs V9 vs V10 vs V11 comparison
 8. Recommendation tiers:
-   - **Pure AI Avoidance:** Best design using only AI avoidance behavior (no
-     pack weighting). Establishes the demand-side contribution.
-   - **Standard:** Best overall design combining AI avoidance + pack
-     construction. May include moderate weighting.
+   - **Pure AI Avoidance:** Best design using only AI avoidance behavior (N = 4,
+     no oversampling). Establishes the demand-side contribution.
+   - **Standard:** Best overall design combining AI avoidance + oversampling.
+     Specifies the optimal N value.
    - **V9 Enhanced:** V9's engine with AI avoidance as a narrative layer. The
      fallback if V12's mechanisms don't achieve M3 >= 2.0 independently.
 9. Complete specification for the recommended algorithm
@@ -696,7 +784,7 @@ Catalog of all algorithms ordered by preference:
 1. Recommended (1-2 algorithms)
 2. Viable alternatives
 3. Eliminated algorithms organized by failure mode
-4. Structural findings about AI avoidance and pack construction
+4. Structural findings about AI avoidance and oversampling
 
 ---
 
@@ -733,11 +821,12 @@ All files in `docs/resonance/v12/`.
    AIs that detect and avoid the player's draft archetype using publicly
    available information. The strength, timing, and inference method vary, but
    the avoidance behavior is the central thesis.
-2. **Pack construction is the supply-side amplifier.** V11 proved that uniform
-   4-card packs from a 120-card pool cannot achieve M3 >= 2.0. Pack
-   construction weighting is how V12 bridges the pack-sampling bottleneck.
-   Whether this uses visible symbols only or hidden pair-affinity is a design
-   variable.
+2. **Oversampling is the supply-side amplifier.** V11 proved that uniform
+   4-card packs (N = 4) from a 120-card pool cannot achieve M3 >= 2.0.
+   Oversampling (draw N > 4, show best 4) is how V12 bridges the pack-sampling
+   bottleneck. N is the primary tuning parameter. The "best 4" ranking
+   criterion (visible symbols only vs hidden pair-affinity) is a secondary
+   design variable.
 3. **Public information is the honesty criterion.** AI avoidance must use only
    information available to all players. The player's visible resonance
    signature (computed from their drafted cards' symbols) is public. The
@@ -754,15 +843,15 @@ All files in `docs/resonance/v12/`.
    as rational opponent behavior, not as the game manipulating outcomes. "They
    noticed I'm drafting Storm and backed off" should feel like a competitive
    dynamic, not a designed safety net.
-7. **M3 target may need recalibration.** M3 = 2.0 with 4-card packs requires
-   50% archetype density per pack. This is extremely aggressive. Agents should
-   evaluate whether a lower M3 target (e.g., 1.5) produces acceptable player
+7. **M3 target may need recalibration.** M3 = 2.0 requires N ≈ 48 with AI
+   avoidance maintaining S/A supply. Agents should evaluate whether a lower M3
+   target (e.g., 1.5, achievable at N ≈ 36) produces acceptable player
    experience, and what the minimum M3 is for the draft to "feel good."
-8. **Separate avoidance from weighting.** Agent 1 explicitly tests avoidance
-   alone (uniform packs) to isolate its contribution. This is essential
-   calibration. If avoidance alone produces M3 = 0.5, and weighting alone
-   produces M3 = 1.5, but the combination produces M3 = 2.5, the interaction
-   effect is clear.
+8. **Separate avoidance from oversampling.** Agent 1 explicitly tests avoidance
+   alone (N = 4) to isolate its contribution. This is essential calibration.
+   If avoidance alone produces M3 = 0.5, and oversampling alone (N = 48, no
+   avoidance) produces M3 = 1.5, but the combination produces M3 = 2.5, the
+   interaction effect is clear.
 9. **Transparency over stealth.** The AI avoidance mechanism should be visible
    to the player through Design 5's information system. When AIs start avoiding
    the player's archetype, the depletion trend arrows should show it. The
