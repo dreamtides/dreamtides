@@ -1014,7 +1014,8 @@ All files in `docs/resonance/v12/`.
    as rational opponent behavior, not as the game manipulating outcomes. "They
    noticed I'm drafting Storm and backed off" should feel like a competitive
    dynamic, not a designed safety net.
-7. **M3 target may need recalibration.** M3 = 2.0 requires N ≈ 48 with AI
+7. **M3 target may need recalibration.** M3 = 2.0 requires an oversample size
+   of N ≈ 48 (drawing 48 cards from the pool, showing best 4) with AI
    avoidance maintaining S/A supply. Agents should evaluate whether a lower M3
    target (e.g., 1.5, achievable at N ≈ 36) produces acceptable player
    experience, and what the minimum M3 is for the draft to "feel good."
