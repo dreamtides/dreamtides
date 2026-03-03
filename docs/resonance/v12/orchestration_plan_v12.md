@@ -12,13 +12,20 @@ their deck through skillful card evaluation and strategic commitment.
 
 ### How the Draft Works
 
-The player picks cards one at a time. Each turn, they see 4 cards and pick 1
-(show 4, pick 1). Over 30 picks, they build their deck. The key strategic
-decision is **archetype commitment**: the game has 8 archetypes, each built
-around synergistic card combinations. A deck focused on one archetype is
-stronger than a deck scattered across many. The player must identify which
-archetype is "open" (available with good cards) and commit to it early enough
-to draft enough synergy pieces.
+The player drafts at a table with AI opponents, all sharing a single **face-up
+card pool**. The player can browse the full pool at any time — every card is
+visible. When it's time to pick, the system presents 4 cards from the pool and
+the player picks 1 (show 4, pick 1). Between the player's picks, AI opponents
+also take cards from the pool. The player can see that cards are disappearing
+from the pool, but **which cards were taken by which drafter is secret** — the
+player must infer who is drafting what by observing patterns in what remains.
+
+Over 30 picks, the player builds a 30-card deck. The key strategic decision is
+**archetype commitment**: the game has 8 archetypes, each built around
+synergistic card combinations. A deck focused on one archetype is stronger than
+a deck scattered across many. The player must identify which archetype is
+"open" (available with good cards) and commit to it early enough to draft
+enough synergy pieces.
 
 ### Archetypes and Resonance
 
@@ -142,10 +149,10 @@ pack is ~0.18-0.36. M3 >= 2.0 requires 50% archetype density in the pack,
 which is impossible without pool contraction or pack-level manipulation.
 
 V11's positive contributions:
-- **Design 5 information system:** Archetype availability bars (quantity, not
-  quality), round-start snapshots with progressive dimming, and depletion
-  trend arrows. This three-layer system creates genuine signal-reading skill
-  without trivializing decisions.
+- **Design 5 information system:** Archetype availability bars, round-start
+  snapshots, and depletion trend arrows. V12's face-up pool may supersede this
+  (the player can browse the pool directly), but Design 5's UI concepts may
+  still be valuable as overlays on the face-up pool.
 - **Pack-sampling bottleneck identification:** The definitive finding that
   pool-level composition does not translate to pack-level quality with uniform
   sampling. This is the constraint V12 must address.
@@ -153,73 +160,80 @@ V11's positive contributions:
 ### Where V12 Picks Up
 
 V12 starts from V11's conclusion: uniform pack sampling cannot achieve M3 >=
-2.0 regardless of pool manipulation. Two mechanisms remain unexplored:
+2.0 regardless of pool manipulation. V12 introduces a new draft structure —
+the **face-up shared pool** — and two mechanisms that operate within it:
 
 1. **AI avoidance:** V10 and V11 used Level 0 (static) AIs that ignore the
-   player's behavior. But real drafters read the table and avoid competing for
-   contested archetypes. If AIs actively avoid the player's archetype, the
-   player's S/A cards stay in the pool (no AI is taking them). This was
+   player's behavior. But with a face-up pool, all drafters can observe
+   depletion patterns and rationally avoid contested archetypes. If AIs avoid
+   the player's archetype, the player's S/A cards stay in the pool. This was
    raised during V11 but not explored — V12 makes it the central thesis.
 
-2. **Pack construction:** V9-V11 all used uniform random sampling (or nearly
-   so — V9 added a floor slot). But the game shows 4 cards out of a 120-card
-   pool. How those 4 are selected is a design variable. "Draw N, show best 4"
-   is a transparent, tunable mechanism that bridges the pack-sampling
-   bottleneck without touching the pool.
+2. **Oversampled pack construction:** V9-V11 all used uniform random sampling
+   (or nearly so — V9 added a floor slot). But with a face-up pool, the
+   player can see all 120 cards. The system's role is to curate a manageable
+   pick from what's visible: "draw N from the pool, show the best 4." This
+   bridges the pack-sampling bottleneck without manipulating the pool.
 
 ---
 
 ## The Central Idea
 
-V12 introduces **public-information-reactive AI avoidance** — AIs that
-rationally avoid the player's draft archetype by reading the same pool
-information available to the player. Combined with **oversampled pack
-construction** (draw N cards from the pool, show the best 4), this creates
-concentration through reduced competition and curated presentation rather than
-pool contraction.
+V12 introduces a **face-up shared pool** — the player can browse all cards in
+the pool at any time. AI opponents draft from the same pool. The pool is fully
+visible; who took what is secret. Two mechanisms produce concentration:
+
+1. **Public-information-reactive AI avoidance:** AIs observe the same face-up
+   pool the player sees. They infer what the player is drafting from depletion
+   patterns and rationally avoid competing for those cards.
+2. **Oversampled pack construction:** When it's time to pick, the system draws
+   N cards from the pool and presents the best 4. The player can see the full
+   pool, so oversampling is just the system curating a manageable selection
+   from what's visibly available.
 
 **Player-facing explanation:** "You're drafting at a table with AI opponents.
-Everyone can see what's popular — and smart drafters avoid competing for the
-same cards. Find the open lane and you'll have it to yourself."
+The card pool is face-up — browse it anytime to see what's available. When you
+pick, the system shows you 4 strong options from the pool. Watch what
+disappears to figure out what your opponents are drafting, and find the lane
+nobody is contesting."
 
-V12 attacks the problem from a different direction than V9-V11: **demand-side
-concentration** (AI avoidance reduces competition for the player's lane) plus
-**supply-side curation** (oversampled packs ensure the player sees what's
-available). Neither mechanism manipulates the pool itself — the pool is honest
-and untouched.
+V12 attacks the problem differently from V9-V11: **demand-side concentration**
+(AI avoidance reduces competition for the player's lane) plus **supply-side
+curation** (oversampled packs ensure the player sees what's available). The
+pool is never manipulated — it's face-up, honest, and shared. Concentration
+emerges from rational drafting behavior by all participants.
 
 ### The Two Design Levers
 
-**Lever 1: AI Avoidance Behavior.** AIs observe the same pool information the
-player sees (archetype counts, depletion trends) and rationally infer which
-archetype the player is drafting. Once they identify the player's lane, they
-avoid it — taking cards from other archetypes instead. This creates a de facto
-"open lane" for the player without requiring the system to know or encode the
-player's preference.
+**Lever 1: AI Avoidance Behavior.** AIs see the same face-up pool as the
+player. They observe which archetypes are depleting fastest and infer that
+another drafter is contesting those cards. They then rationally avoid
+competing for those archetypes — the same behavior a skilled human opponent
+would exhibit at a real draft table.
 
-The key insight: avoidance using public information is realistic drafting
-behavior. In a real draft, all players observe what others are taking and
-adjust. An AI that sees "Blink cards are disappearing fast" and concludes
-"someone is drafting Blink, I should avoid it" is behaving exactly as a skilled
-human opponent would. The information is symmetric — the player can also observe
-that "Storm cards are disappearing fast" and conclude an AI is drafting Storm.
+The key insight: the face-up pool makes avoidance natural. No one needs to
+observe individual picks (those are secret). AIs just watch the pool change
+and draw the same inferences a player would: "Blink cards are disappearing —
+someone is drafting Blink, I'll focus elsewhere." The information is fully
+symmetric — the player reads the pool the same way.
 
 **Lever 2: Oversampled Pack Construction (Draw N, Show Best 4).** V11 proved
 that drawing 4 cards uniformly from a 100-130 card pool cannot achieve M3 >=
-2.0. But the game doesn't have to show all N cards it draws — it can draw more
-and present the best subset.
+2.0. But the pool is face-up — the player can already see all 120 cards. The
+system's job is to curate a manageable selection for the pick.
 
-The mechanism: the system draws N cards from the pool (where N > 4), ranks them
-by fitness for the player's emerging archetype, and shows the top 4. The player
-sees 4 cards as usual but doesn't know (or need to know) that more were drawn.
-This is transparent, tunable, and has a single parameter: N.
+The mechanism: the system draws N cards from the face-up pool (where N > 4),
+ranks them by fitness for the player's emerging archetype, and presents the
+top 4 as the pick options. The player knows the full pool exists (they can
+browse it) — the 4 shown cards are the system's curated recommendation from
+what's available.
 
-The narrative framing is honest and natural: "the market has many cards; you see
-the ones most relevant to your interests." Or it can be invisible — the player
-just sees 4 cards and the selection feels like the draft naturally offering
-good options. Unlike V9's invisible contraction (which removed cards from the
-pool), oversampling doesn't change the pool at all — it just curates what the
-player sees from what's available.
+The narrative framing is natural and honest because the pool is face-up: the
+player can verify that the 4 shown cards actually exist in the pool. The
+system isn't hiding anything — it's filtering. This is fundamentally different
+from V9's invisible contraction (which secretly removed cards). Here, the pool
+is untouched; the system just selects which 4 of 120 visible cards to present
+for this pick.
 
 **The math:** With ~5 S/A cards for the player's archetype in a 120-card pool,
 M3 ≈ N × 5/120 = N/24. For M3 = 2.0, N ≈ 48. For M3 = 1.5, N ≈ 36. This
@@ -235,53 +249,64 @@ player sees them.
 
 ---
 
-## The Public Information Framework
+## The Face-Up Pool and Information Model
 
-### What Counts as "Public Information"
+### The Pool Is Face-Up
 
-In a real draft, certain information is public — visible to all players at the
-table:
-- What cards are currently available in the pool
-- Which cards were taken from the pool (by observation)
-- Aggregate patterns (which archetypes are depleting)
-- Who is taking what type of card (table-reading)
+The card pool is fully visible to all drafters (player and AIs) at all times.
+The player can browse every card in the pool — scrolling, filtering by
+archetype or resonance, reading card text. This is the foundation of V12's
+information model: the pool itself is the information.
 
-V12 treats all pool-state information as public. Both the player and AIs have
-access to:
-- Current archetype card counts in the pool
-- Depletion rates (which archetypes are shrinking fastest)
-- Their own draft history (what they've taken)
-- General awareness of what other drafters are taking (via pool observation)
+This replaces V11's Design 5 information system (bars, trends, snapshots) with
+something simpler and more direct: the player just *looks at the pool*. They
+can see that Blink has 14 cards remaining while Storm has only 6. They can see
+which specific cards are still available. The information is complete,
+unmediated, and always current.
 
-### What Remains Private
+### What Is Public (Visible to All Drafters)
 
-- The specific fitness scores of cards (AIs know these; the player evaluates
-  card quality by reading card text)
-- The player's internal strategy and commitment level
-- The AI's internal archetype assignment (prior to observable behavior)
-- Individual card identities in the pool (the player sees their pack, not the
-  full pool)
+- **The full pool:** Every card currently in the pool, face-up. Both the player
+  and AIs can see all cards, their resonance symbols, and their text.
+- **Pool changes over time:** Cards disappear from the pool as drafters take
+  them. Everyone can see what's gone — the pool is a shared, shrinking
+  resource.
+- **Aggregate depletion patterns:** "Tide cards are disappearing faster than
+  Ember cards" is visible to anyone watching the pool.
 
-### The Avoidance Mechanism
+### What Is Secret
 
-AIs observe the pool state after each pick cycle. When the player's picks
-establish a visible pattern (e.g., consistently taking Ember-symbol cards), AIs
-infer the player's likely archetype. AIs then actively avoid that archetype in
-their own picks — not because they're told to, but because rational drafters
-avoid competition.
+- **Who took what:** Individual draft picks are secret. The player sees cards
+  leave the pool but does not see which AI (or whether an AI at all) took a
+  specific card. This is the signal-reading skill axis: the player must infer
+  "someone is aggressively drafting Sacrifice" from the pattern of Tide-symbol
+  cards disappearing, without knowing which opponent is responsible.
+- **The player's picks (from AIs' perspective):** AIs can see that cards leave
+  the pool, but they don't directly observe the player's picks either. They
+  infer the player's archetype from the same depletion patterns — exactly as
+  the player infers AI behavior. The information is symmetric.
+- **Internal strategy:** No drafter's commitment level, future plans, or
+  fitness evaluations are visible. Only the pool state and its changes over
+  time.
 
-The inference uses only public information:
-- After pick N, look at the player's drafted cards' visible resonance symbols
-- Compute the player's apparent resonance signature (same method the player
-  would use to read an AI's preferences)
-- Identify the 1-2 archetypes most consistent with the player's picks
-- Reduce priority for those archetypes in AI pick selection
+### How AIs Read the Table
 
-This is Level 1.5 reactivity: AIs react to publicly observable player behavior
-(not private player state), using the same information framework available to
-all participants. It is more reactive than Level 0 (static) but less than
-Level 2+ (private surveillance). The key distinction: a human opponent watching
-the draft would make the same inference.
+AIs infer what the player is drafting using only pool-observable information:
+- After each pick cycle, compare the current pool to the previous state
+- Identify which archetypes lost cards (depletion patterns)
+- Attribute depletion to "some drafter is taking those" without knowing who
+- Build a probabilistic model: "Ember cards are depleting disproportionately
+  fast — likely one drafter is focused on an Ember archetype"
+- Reduce priority for archetypes that appear contested
+
+This is symmetric: the player uses the same process. "Storm cards keep
+disappearing — someone is drafting Storm, I should avoid it." Both player and
+AIs are reading the same face-up pool and drawing the same inferences.
+
+Note that AIs cannot observe the player's picks directly. They infer the
+player's archetype from depletion patterns, which are confounded by other AIs'
+picks. This imprecision is realistic and intentional — it mirrors the
+uncertainty a real drafter faces when reading the table.
 
 ---
 
@@ -319,14 +344,18 @@ How do AIs infer the player's archetype and how aggressively do they avoid it?
 | E: Symmetric Avoidance | All AIs avoid each other AND the player | Moderate (50% mutual) | Level 1 |
 
 Key design questions:
-- How many picks does the AI need to confidently infer the player's archetype?
-  (The player commits around pick 5-6; can the AI detect this by pick 4-5 using
-  public symbol patterns?)
+- How many picks before depletion patterns are strong enough for AIs to infer
+  the player's archetype? (Remember: AIs don't see individual picks — they
+  only see the pool shrinking. With 6 drafters, each pick cycle removes 6
+  cards. AIs must disentangle the player's signal from other AIs' picks.)
 - Should avoidance be binary (avoid/don't avoid) or graduated (reduce
   priority)?
 - Should AIs avoid only the player's specific archetype, or also the player's
   resonance symbol pair?
-- What happens when the player pivots? How quickly do AIs re-read the table?
+- What happens when the player pivots? How quickly do AIs re-read the pool?
+- How does inference accuracy degrade when multiple AIs draft the same
+  archetype? (Confounding: AIs can't distinguish player depletion from
+  other-AI depletion.)
 
 ### Variable 2: Oversample Size (N)
 
@@ -363,15 +392,14 @@ is the only one depleting their own S/A supply. With AI avoidance, the S/A
 count stays at ~5 until the player takes them, keeping N ≈ 48 sufficient
 throughout the draft.
 
-**The narrative framing:** Oversampling is naturally honest. Possible framings:
-- Invisible: player just sees 4 cards, doesn't know N exists
-- "Your advisor scouts the market and presents the best options"
-- "The market has many cards; these are the ones that caught your eye"
-- Explicit: "Draw 48, show best 4" as a stated game rule
-
-All framings are defensible because the pool is real, the draw is real, and the
-filter criterion (fitness for the player's demonstrated preferences) is
-derivable from public information (the player's own picks).
+**The narrative framing:** Oversampling is naturally honest because the pool is
+face-up. The player can see all 120 cards. The system says: "here are 4 good
+options from the pool." The player can verify these cards exist. This is
+curation, not deception. Possible framings:
+- "Your advisor scans the market and recommends 4 cards"
+- "Here are 4 strong picks from the pool"
+- Just show 4 cards without explanation — the player knows the pool is
+  face-up and can browse it before/after picking
 
 **Interaction with AI avoidance:** Oversampling and avoidance are complementary,
 not redundant. Avoidance maintains S/A supply in the pool (demand side);
@@ -380,34 +408,37 @@ avoidance, late-draft S/A depletion forces N to grow impractically large
 (N > 100). Without oversampling, even perfect avoidance only produces M3 ≈
 0.25 with uniform 4-card packs (V11's pack-sampling bottleneck).
 
-**Can oversampling reduce the need for Design 5 information?** Partially. For
-committed drafting (picks 6+), oversampled packs self-signal — the player sees
-good cards for their archetype and infers "my lane is open." But for
-exploration (picks 1-5), the player hasn't committed yet and the "best 4"
-can't be targeted to any archetype. Design 5's bars and trends remain valuable
-for the initial lane-selection decision. Agents should explore whether
-oversampled packs make some Design 5 elements redundant.
+**The face-up pool replaces Design 5 information.** With the pool visible, the
+player doesn't need archetype bars or trend arrows — they can browse the pool
+directly and see exactly what's available. Design 5's UI concepts (grouping
+by archetype, visual indicators of quantity) may still be useful as overlays
+on the pool browser, but the underlying information is complete and
+unmediated. The exploration phase (picks 1-5) is served by the pool browser
+rather than by the pack contents — the player browses the pool to decide
+which archetype to target, then receives oversampled packs once committed.
 
 ### Variable 3: Pool Structure
 
-How is the card pool organized and does it change during the draft?
+The pool is always face-up. The question is whether it changes during the draft.
 
 | Structure | Description | Pool Size |
 |-----------|-------------|:---------:|
-| A: Static Pool | Fixed pool, no refills | 120-360 |
-| B: Multi-Round Refills | 3 rounds with refill between (V11 style) | 120 + refills |
-| C: Continuous Market | Cards replaced as drafted (Design 6 style) | 120 + reserve |
-| D: V9-Style Virtual | 360 cards, virtual contraction | 360→17 |
+| A: Static Pool | Fixed pool, cards leave as drafted, no refills | 120-360 |
+| B: Multi-Round Refills | 3 rounds, new cards added face-up between rounds | 120 + refills |
+| C: Continuous Market | Drafted cards replaced face-up from a reserve | 120 + reserve |
 
-V11 conclusively showed that multi-round refills (B) and continuous markets (C)
-cannot achieve M3 >= 2.0 with uniform pack sampling. However, when combined
-with AI avoidance (Variable 1) and oversampled pack construction (Variable 2),
-the pool structure becomes a secondary variable — the primary concentration
-mechanism is oversampling, not pool manipulation.
+V11 showed that refills (B) and continuous markets (C) cannot achieve M3 >= 2.0
+with uniform sampling. But with oversampling, pool structure becomes secondary —
+the primary concentration mechanism is the "draw N, show best 4" curation, not
+pool manipulation.
 
-The interesting question is whether AI avoidance + oversampling can work with
-a simple static pool (A), eliminating the need for V9-style virtual contraction
-entirely.
+The baseline design is a **static face-up pool** (A): all cards are visible
+from the start, cards leave as they're drafted, nothing is added. The pool
+shrinks naturally over 30 picks (6 cards leave per pick cycle: 5 AIs + 1
+player). Starting pool of 120 → ~120 remaining (cards leave the pool only
+when drafted, and only 30 player picks + ~150 AI picks happen... the pool
+needs to be sized appropriately). Agents should determine the right starting
+pool size.
 
 ### Variable 4: AI Count and Lane Structure
 
@@ -512,11 +543,11 @@ class PackConstructor:
     inferred_archetype: str            # player's inferred archetype for fitness ranking
 
 class DraftState:
-    pool: list[SimCard]                # current available pool
+    pool: list[SimCard]                # face-up pool (visible to all drafters)
     pick_number: int
-    player_picks: list[SimCard]        # player's drafted cards
-    ai_picks: dict[int, list[SimCard]] # each AI's drafted cards
-    public_pool_info: dict             # archetype counts, trends (visible to all)
+    player_picks: list[SimCard]        # player's drafted cards (secret from AIs)
+    ai_picks: dict[int, list[SimCard]] # each AI's drafted cards (secret from player)
+    pool_history: list[list[SimCard]]  # pool state at each pick (for depletion inference)
 ```
 
 ---
@@ -531,15 +562,21 @@ design space.
 **Question:** How do human drafters read opponents and adjust strategy in
 competitive draft formats, and how can AI drafters replicate this behavior?
 
+**Context:** In V12, the card pool is face-up (all cards visible to all
+drafters), but individual picks are secret. Drafters infer opponents' strategies
+by watching which cards disappear from the pool, not by seeing picks directly.
+
 Explore:
-- In MTG drafts, how do skilled players read signals from passed packs? What
-  information do they use to detect what neighbors are drafting?
-- In shared-pool drafts (7 Wonders, Sushi Go), how do players observe and
-  respond to opponents' picks? Is active avoidance of contested archetypes a
-  documented strategy?
-- What is the minimum number of picks required to reliably identify an
-  opponent's draft direction? How confident can inference be at pick 3 vs
-  pick 5 vs pick 8?
+- In shared-pool games (7 Wonders, Sushi Go, Ascension-style markets), how do
+  players observe and respond to opponents' picks? Is active avoidance of
+  contested archetypes a documented strategy?
+- In MTG drafts, how do skilled players read signals from passed packs? How
+  does this translate to a face-up pool where you see the full supply but not
+  who's buying?
+- With a face-up pool and secret picks, how many pick cycles are needed to
+  reliably infer another drafter's archetype from depletion patterns? How does
+  the number of drafters (5-7 AIs) affect inference confidence? (More drafters
+  = more confounding depletion.)
 - How does avoidance timing affect draft dynamics? Early avoidance (pick 3-5)
   vs late avoidance (pick 8-10) — which produces better outcomes for all
   drafters?
@@ -557,6 +594,11 @@ V11 final report (`docs/resonance/v11/final_report.md`).
 to improve card offerings, and what are the design tradeoffs of "draw N, show
 best K"?
 
+**Context:** In V12, the pool is face-up — the player can browse all cards. When
+it's time to pick, the system draws N cards from the visible pool and presents
+the best 4. The player knows the full pool exists and can verify the shown
+cards are real. This is curation of a visible resource, not hidden manipulation.
+
 Explore:
 - How do roguelike deckbuilders (Slay the Spire, Monster Train, Inscryption)
   curate card offerings toward player synergies? Do any use explicit
@@ -566,16 +608,18 @@ Explore:
 - What does "best" mean in "show best 4"? Options: highest archetype fitness,
   highest power, highest resonance symbol match, composite score. How does the
   ranking criterion affect the skill axis?
-- How does oversampling interact with player perception? At what N does the
-  player notice that offerings are "suspiciously good"? Is there a perceptual
-  threshold where packs feel curated rather than random?
+- With a face-up pool, the player can see what's available before picking.
+  Does this change the perception of oversampling? (The player knows good
+  cards exist in the pool — seeing them in their pack feels natural rather
+  than suspicious.)
 - What is the exploration-exploitation tradeoff? High N makes committed-
   archetype packs excellent but reduces off-archetype discovery (the best 4
   are all on-archetype). How does this affect picks 1-5 (exploration phase)?
 - Should N be constant throughout the draft, or should it increase as the
   player commits? (Low N early for exploration, high N late for execution.)
-- Can oversampling be framed as an explicit game rule ("the market scouts 48
-  cards for you") or is it better left invisible?
+- How does the player's ability to browse the pool interact with oversampling?
+  If the player can see a great card in the pool, should they expect it to
+  appear in their pack? What N makes this likely?
 
 **Reads:** This plan, V11 final report (`docs/resonance/v11/final_report.md`),
 V11 algorithm overview (`docs/resonance/v11/algorithm_overview.md`).
@@ -722,12 +766,19 @@ Explore:
   guarantee 1 S/A in the top 4, fill remaining 3 from best of N." How does
   this interact with the oversampling math?
 
-### Agent 4: V9 Engine + AI Avoidance Narrative
+### Agent 4: V9 Engine + AI Avoidance Narrative (Non-Face-Up Fallback)
 
-**Starting point:** V9 Hybrid B's contraction engine runs unchanged. AI
-avoidance is layered on top as a narrative enhancement — AIs appear to avoid
-the player's archetype because the contraction engine removes non-relevant
-cards and attributes removals to AIs.
+**Starting point:** V9 Hybrid B's contraction engine runs unchanged. This is
+the **non-face-up fallback** — if V12's face-up pool mechanisms don't achieve
+M3 >= 2.0, V9's invisible contraction remains the proven engine. AI avoidance
+is layered on top as a narrative enhancement — AIs appear to avoid the
+player's archetype because the contraction engine removes non-relevant cards
+and attributes removals to AIs.
+
+**Important:** V9's invisible contraction is incompatible with a face-up pool
+(you can't silently remove cards from a visible pool). This agent evaluates
+the V9 engine in its native non-face-up context, enhanced with AI avoidance
+narrative. It serves as the performance ceiling and fallback comparison.
 
 **Question:** Does adding visible AI avoidance behavior to V9's engine improve
 player experience (M12, M5) without degrading M3?
@@ -745,6 +796,9 @@ Explore:
 - Is this design dishonest? The avoidance is presentational, not mechanical.
   The AI isn't really avoiding — the engine is just removing irrelevant cards.
   Evaluate the narrative integrity.
+- How does the non-face-up V9 experience compare to V12's face-up designs in
+  terms of player agency and information access? What does the player lose
+  by not being able to browse the pool?
 
 ### Agent 5: High-AI-Count + Avoidance (7 AIs, 1 Open Lane)
 
@@ -949,11 +1003,11 @@ All files in `docs/resonance/v12/`.
    signature (computed from their drafted cards' symbols) is public. The
    player's internal strategy, commitment level, and card-by-card evaluation
    are private. AIs must not use private information.
-4. **V9 is the fallback, not the enemy.** If no V12 mechanism achieves M3 >=
-   2.0 independently, the recommendation should be V9's engine enhanced with
-   AI avoidance narrative and Design 5 information. V12's contribution would
-   then be the improved AI narrative (avoidance behavior makes AIs feel smarter
-   and more realistic).
+4. **V9 is the fallback, not the enemy.** If no V12 face-up pool mechanism
+   achieves M3 >= 2.0 independently, the recommendation should be V9's engine
+   (non-face-up) enhanced with AI avoidance narrative. V12's contribution
+   would then be the improved AI narrative (avoidance behavior makes AIs feel
+   smarter and more realistic). Agent 4 explicitly tests this fallback.
 5. **4-card packs are fixed.** The game uses "show 4, pick 1." Pack size is not
    a variable. Pack construction method is.
 6. **AI avoidance must feel natural.** The player should perceive AI avoidance
@@ -969,10 +1023,11 @@ All files in `docs/resonance/v12/`.
    If avoidance alone produces M3 = 0.5, and oversampling alone (N = 48, no
    avoidance) produces M3 = 1.5, but the combination produces M3 = 2.5, the
    interaction effect is clear.
-9. **Transparency over stealth.** The AI avoidance mechanism should be visible
-   to the player through Design 5's information system. When AIs start avoiding
-   the player's archetype, the depletion trend arrows should show it. The
-   player should be able to observe and exploit this behavior.
+9. **Transparency over stealth.** The face-up pool makes AI avoidance
+   naturally visible — the player can browse the pool and see that their
+   archetype's cards are persisting while other archetypes deplete. When AIs
+   start avoiding the player's archetype, the effect is directly observable
+   in the pool. The player should be able to observe and exploit this behavior.
 
 ## Recovery
 
