@@ -1,5 +1,174 @@
 # Resonance Draft System V12 — Orchestration Plan
 
+## Background: The Problem We're Solving
+
+### What Is Dreamtides?
+
+Dreamtides is a roguelike deckbuilding game. Before each battle run, the player
+drafts a 30-card deck from a shared card pool. The draft is the core
+progression system — a good draft produces a powerful, synergistic deck; a bad
+draft produces an incoherent pile. The draft must feel like the player *earned*
+their deck through skillful card evaluation and strategic commitment.
+
+### How the Draft Works
+
+The player picks cards one at a time. Each turn, they see 4 cards and pick 1
+(show 4, pick 1). Over 30 picks, they build their deck. The key strategic
+decision is **archetype commitment**: the game has 8 archetypes, each built
+around synergistic card combinations. A deck focused on one archetype is
+stronger than a deck scattered across many. The player must identify which
+archetype is "open" (available with good cards) and commit to it early enough
+to draft enough synergy pieces.
+
+### Archetypes and Resonance
+
+Each archetype has a primary and secondary **resonance symbol** (Tide, Stone,
+Ember, Zephyr). Cards display 0-2 visible resonance symbols. The 8 archetypes
+form a circle where adjacent archetypes share a resonance symbol:
+
+| Archetype | Primary | Secondary |
+|-----------|---------|-----------|
+| Flash/Tempo | Zephyr | Ember |
+| Blink/Flicker | Ember | Zephyr |
+| Storm/Spellslinger | Ember | Stone |
+| Self-Discard | Stone | Ember |
+| Self-Mill/Reanimator | Stone | Tide |
+| Sacrifice/Abandon | Tide | Stone |
+| Warriors/Midrange | Tide | Zephyr |
+| Ramp/Spirit Animals | Zephyr | Tide |
+
+Each card has a hidden **pair-affinity score** — how well it fits each
+archetype pair. A card might display an Ember symbol but actually be much
+better for Blink than for Storm. The player discovers this by reading the
+card's text; the system knows it from the pair-affinity metadata (8 bits per
+card).
+
+### Card Quality Tiers
+
+Cards are rated by **fitness** for each archetype:
+- **S-tier / A-tier (S/A):** High-synergy cards that are strong in a specific
+  archetype. These are what the player wants.
+- **C-tier / F-tier (C/F):** Generic or low-synergy cards. Filler.
+
+The **sibling A-tier rate** varies by archetype pair:
+
+| Pair | Sibling A-Tier Rate |
+|------|:---:|
+| Warriors / Sacrifice (Tide) | 50% |
+| Self-Discard / Self-Mill (Stone) | 40% |
+| Blink / Storm (Ember) | 30% |
+| Flash / Ramp (Zephyr) | 25% |
+| **Weighted Average** | **~36%** |
+
+This means roughly 36% of cards in a given archetype are S/A tier — the cards
+the player wants to see in their packs.
+
+### The Core Design Challenge
+
+The draft must achieve two goals simultaneously:
+
+1. **Concentration:** After the player commits to an archetype (around pick
+   5-6), their packs should contain good cards for that archetype. The key
+   metric is **M3: average S/A cards for the committed archetype per pack,
+   picks 6+.** Target: >= 2.0. This means the player should see at least 2
+   cards worth taking for their archetype in a typical pack of 4.
+
+2. **Signal reading:** The player should be able to *figure out* which
+   archetype is open by reading signals from the draft. This creates a skill
+   axis — better players read signals faster, commit earlier, and get better
+   decks. The metric is **M12: signal-reader M3 minus committed-player M3.**
+   Target: >= 0.3.
+
+The fundamental tension: concentration requires that packs are biased toward
+the player's archetype. But signal reading requires that the bias comes from
+the *state of the draft*, not from the system cheating on the player's behalf.
+The player should earn concentration through correct reading, not receive it
+automatically.
+
+### What We've Tried (V9-V11)
+
+**V9: Virtual Pool Contraction (M3 = 2.70 — the gold standard)**
+
+V9's approach: maintain a pool of 360 cards. Each pick, silently remove the
+bottom 12% of cards by relevance to the player's emerging archetype. The pool
+shrinks from 360 to ~17 cards by pick 30. By late draft, the surviving cards
+are 60%+ the player's archetype — producing excellent packs.
+
+V9 works mathematically but has a narrative problem: the player never sees
+*why* the pool is concentrating. Cards just silently disappear. There are no
+opponents, no competition, no table to read. The contraction is invisible and
+the draft feels like a slot machine that gradually gets nicer.
+
+V9 uses 4-card packs: 3 random from the surviving pool + 1 guaranteed
+top-quartile "floor slot" from pick 3 onward.
+
+**V10: AI Drafters (M3 = 0.84 — structural failure)**
+
+V10's approach: introduce 5 AI opponents who physically take cards from the
+shared pool. Each AI is assigned one of 8 archetypes and takes good cards for
+its archetype. The 3 archetypes not assigned to any AI are "open lanes" — the
+player should draft one of these.
+
+V10 proved the **AI drafter narrative** is valuable: "other players took those
+cards" explains why certain archetypes are scarce. Signal reading becomes
+natural — the player observes which archetypes are being depleted by AIs and
+picks the one nobody is contesting.
+
+But V10 failed structurally. Three root causes:
+1. **Pool exhaustion:** AIs remove 20-35 cards per round, exhausting the
+   360-card pool by pick 12-15.
+2. **S/A preferential depletion:** AIs take the best cards first, draining
+   quality from the pool. V9 removed low-relevance cards (enriching quality);
+   V10's AIs remove high-relevance cards (depleting quality).
+3. **Targeting dilution:** The player's archetype is 1 of 3 open lanes. AIs
+   concentrate the pool toward open lanes generally, but the player's specific
+   archetype only gets ~1.7x concentration vs V9's 5-7x.
+
+**V11: Multi-Round Refills (best M3 = 0.89 — structural failure)**
+
+V11's approach: keep the AI drafters from V10, but replenish the pool between
+rounds (like opening new packs in a booster draft). This fixes pool exhaustion
+(root cause 1) and partially addresses S/A depletion (root cause 2).
+
+V11 explored the complete parameter space: balanced refills, biased refills,
+declining refills, asymmetric replacement, 3/4/5-round structures. Six
+simulations spanning the plausible design space. All failed M3 by wide margins.
+
+V11 identified the **pack-sampling bottleneck** as the binding constraint: with
+a pool of 100-130 cards and 8 archetypes, the player's committed archetype is
+12-21% of the pool. Drawing 4 cards uniformly from this pool yields ~0.5-1.0
+on-archetype cards per pack. With 36% sibling A-tier rate, expected S/A per
+pack is ~0.18-0.36. M3 >= 2.0 requires 50% archetype density in the pack,
+which is impossible without pool contraction or pack-level manipulation.
+
+V11's positive contributions:
+- **Design 5 information system:** Archetype availability bars (quantity, not
+  quality), round-start snapshots with progressive dimming, and depletion
+  trend arrows. This three-layer system creates genuine signal-reading skill
+  without trivializing decisions.
+- **Pack-sampling bottleneck identification:** The definitive finding that
+  pool-level composition does not translate to pack-level quality with uniform
+  sampling. This is the constraint V12 must address.
+
+### Where V12 Picks Up
+
+V12 starts from V11's conclusion: uniform pack sampling cannot achieve M3 >=
+2.0 regardless of pool manipulation. Two mechanisms remain unexplored:
+
+1. **AI avoidance:** V10 and V11 used Level 0 (static) AIs that ignore the
+   player's behavior. But real drafters read the table and avoid competing for
+   contested archetypes. If AIs actively avoid the player's archetype, the
+   player's S/A cards stay in the pool (no AI is taking them). This was
+   raised during V11 but not explored — V12 makes it the central thesis.
+
+2. **Pack construction:** V9-V11 all used uniform random sampling (or nearly
+   so — V9 added a floor slot). But the game shows 4 cards out of a 120-card
+   pool. How those 4 are selected is a design variable. "Draw N, show best 4"
+   is a transparent, tunable mechanism that bridges the pack-sampling
+   bottleneck without touching the pool.
+
+---
+
 ## The Central Idea
 
 V12 introduces **public-information-reactive AI avoidance** — AIs that
@@ -13,26 +182,11 @@ pool contraction.
 Everyone can see what's popular — and smart drafters avoid competing for the
 same cards. Find the open lane and you'll have it to yourself."
 
-### Why This Is Different From V9-V11
-
-V9 achieved M3 = 2.70 through invisible virtual contraction — the system
-silently removed low-relevance cards from the pool. The player never saw this
-happen. V10 tried physical removal by AI drafters but failed because physical
-depletion exhausts the pool (M3 = 0.84). V11 tried multi-round refills but
-failed because the pack-sampling bottleneck caps per-pack archetype density at
-12-21% regardless of pool-level composition (best M3 = 0.89).
-
-V12 attacks the problem from a different direction: **demand-side
-concentration**. Instead of manipulating the supply of cards (contraction,
-depletion, refills), V12 manipulates the demand. When AIs actively avoid the
-player's archetype, the player faces zero competition for their lane's cards.
-This doesn't change pool composition — it changes who takes what from the pool.
-
-The mechanism is honest and visible: all drafters (player and AI) have access
-to the same public pool state information. AIs use this information to avoid
-contested archetypes, just as a skilled human drafter would. The player sees AI
-avoidance behavior and can reason about it. This is not surveillance of the
-player's private strategy — it is table-reading using shared information.
+V12 attacks the problem from a different direction than V9-V11: **demand-side
+concentration** (AI avoidance reduces competition for the player's lane) plus
+**supply-side curation** (oversampled packs ensure the player sees what's
+available). Neither mechanism manipulates the pool itself — the pool is honest
+and untouched.
 
 ### The Two Design Levers
 
@@ -78,22 +232,6 @@ avoidance into pack-level card quality. Without it, even perfect AI avoidance
 only produces a modest pool-level gradient. With it, the larger draw naturally
 includes more on-archetype cards, and the "show best 4" filter ensures the
 player sees them.
-
-### What Previous Versions Established (Carried Forward)
-
-- **V9:** Virtual contraction achieves M3 = 2.70. Pair-affinity encoding (8
-  bits/card) is minimum sufficient hidden metadata. Visible symbols do 85% of
-  targeting work. Floor slot (1 guaranteed top-quartile card) prevents
-  consecutive bad packs.
-- **V10:** AI drafter narrative is a genuine contribution to player experience.
-  Level 0 (static) AIs provide signal-reading skill. 5-AI / 3-open-lane
-  structure works for game-to-game variety. Physical AI removal cannot replace
-  virtual contraction.
-- **V11:** Pack-sampling bottleneck is the binding constraint for uniform
-  sampling. Design 5 information system (bars + trends + snapshots) is the
-  strongest signal-reading architecture. Open-lane-biased refills are genuinely
-  Level 0. Multi-round refills solve pool exhaustion but cannot produce M3 >=
-  2.0. 3-round structure is optimal among multi-round designs.
 
 ---
 
@@ -149,49 +287,18 @@ the draft would make the same inference.
 
 ## Fixed Assumptions (Not Variables in V12)
 
-### Fitness Model: Graduated Realistic (Fixed)
+The following are constant across all V12 designs. See the Background section
+for detailed explanations.
 
-| Pair | Sibling A-Tier Rate |
-|------|:---:|
-| Warriors / Sacrifice (Tide) | 50% |
-| Self-Discard / Self-Mill (Stone) | 40% |
-| Blink / Storm (Ember) | 30% |
-| Flash / Ramp (Zephyr) | 25% |
-| **Weighted Average** | **~36%** |
-
-### Total Draft: 30 Picks (Fixed)
-
-### Pack Size: 4 Cards (Show 4, Pick 1) (Fixed)
-
-The player sees 4 cards and picks 1 each turn. How those 4 cards are selected
-from the pool is a design variable (see Variable 2 below).
-
-### Archetypes: 8 on a Circle (Fixed)
-
-1. Flash/Tempo — Zephyr primary, Ember secondary
-2. Blink/Flicker — Ember primary, Zephyr secondary
-3. Storm/Spellslinger — Ember primary, Stone secondary
-4. Self-Discard — Stone primary, Ember secondary
-5. Self-Mill/Reanimator — Stone primary, Tide secondary
-6. Sacrifice/Abandon — Tide primary, Stone secondary
-7. Warriors/Midrange — Tide primary, Zephyr secondary
-8. Ramp/Spirit Animals — Zephyr primary, Tide secondary
-
-### Visible Symbol Distribution (Fixed from V9)
-
-| Symbol Count | Cards | % |
-|:---:|:---:|:---:|
-| 0 (generic) | ~11% of pool | 11% |
-| 1 visible symbol | ~79% of pool | 79% |
-| 2 visible symbols | ~10% of pool | 10% |
-
-### Player Strategies (Fixed)
-
-- **Archetype-committed:** Picks highest fitness for strongest archetype.
-  Commits around pick 5-6.
-- **Power-chaser:** Picks highest raw power regardless of archetype.
-- **Signal-reader:** Evaluates which archetype seems most available and drafts
-  toward it.
+- **Fitness model:** Graduated Realistic (~36% weighted-average sibling A-tier)
+- **Total draft:** 30 picks
+- **Pack size:** 4 cards shown (show 4, pick 1). How those 4 are selected from
+  the pool IS a design variable (see Variable 2)
+- **Archetypes:** 8 on a circle, each with primary/secondary resonance symbol
+- **Visible symbol distribution:** ~11% generic, ~79% single-symbol, ~10%
+  dual-symbol
+- **Player strategies for simulation:** Archetype-committed (commits pick 5-6),
+  Power-chaser (ignores archetype), Signal-reader (reads pool state)
 
 ---
 
@@ -439,6 +546,9 @@ Explore:
 - What is the boundary between "reading the table" (acceptable) and
   "surveillance" (unacceptable) in terms of player perception?
 
+**Reads:** This plan, V10 final report (`docs/resonance/v10/final_report.md`),
+V11 final report (`docs/resonance/v11/final_report.md`).
+
 **Output:** `docs/resonance/v12/research_ai_avoidance.md` (max 2000 words)
 
 ### Research Agent B: Oversampled Pack Construction
@@ -466,6 +576,9 @@ Explore:
   player commits? (Low N early for exploration, high N late for execution.)
 - Can oversampling be framed as an explicit game rule ("the market scouts 48
   cards for you") or is it better left invisible?
+
+**Reads:** This plan, V11 final report (`docs/resonance/v11/final_report.md`),
+V11 algorithm overview (`docs/resonance/v11/algorithm_overview.md`).
 
 **Output:** `docs/resonance/v12/research_pack_construction.md` (max 2000 words)
 
@@ -499,8 +612,9 @@ Analyze:
   "best 4" mean during exploration? Options: rank by power, rank by diversity,
   uniform random, or N = 4 (no oversampling during exploration).
 
-**Reads:** This plan, V11 final report, V11 algorithm overview, V9 algorithm
-overview.
+**Reads:** This plan, V11 final report (`docs/resonance/v11/final_report.md`),
+V11 algorithm overview (`docs/resonance/v11/algorithm_overview.md`), V9
+algorithm overview (`docs/resonance/v9/algorithm_overview.md`).
 
 **Output:** `docs/resonance/v12/research_concentration_math.md` (max 2000 words)
 
@@ -508,8 +622,11 @@ overview.
 
 ## Round 2: Algorithm Design (6 parallel agents)
 
-Each agent reads all Round 1 research plus this plan, V11 final report, and V11
-algorithm overview. Each explores a different region of the V12 design space.
+Each agent reads all Round 1 research (`research_ai_avoidance.md`,
+`research_pack_construction.md`, `research_concentration_math.md`) plus this
+plan, V11 final report (`docs/resonance/v11/final_report.md`), and V11
+algorithm overview (`docs/resonance/v11/algorithm_overview.md`). Each explores
+a different region of the V12 design space.
 
 **Fixed for all agents:**
 - Fitness: Graduated Realistic
