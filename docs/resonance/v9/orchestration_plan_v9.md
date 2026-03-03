@@ -37,7 +37,7 @@ The key design constraints:
    manipulation is "cheating" to some degree — it's the algorithm making
    decisions the player thinks are random. The less we need, the better the
    design integrity. V9 should find the **minimum hidden information** needed
-   to reach M3 >= 2.0.
+   to reach M3 >= 2.0 and M11 >= 3.0.
 
 4. **No player decisions beyond card selection.** Non-negotiable.
 
@@ -271,9 +271,10 @@ From most honest to most "cheating":
    with hidden data. Maximum performance, minimum design integrity.
 
 **V9 should explore levels 1-4 and identify the sweet spot: the minimum
-hidden information that reaches M3 >= 2.0 while keeping the visible resonance
-system feeling important. The hidden information need not be resonance-based
-at all — the best solution may use a completely different kind of metadata.**
+hidden information that reaches M3 >= 2.0 and M11 >= 3.0 while keeping the
+visible resonance system feeling important. The hidden information need not
+be resonance-based at all — the best solution may use a completely different
+kind of metadata.**
 
 ---
 
@@ -386,7 +387,8 @@ Analyze mathematically (no simulation — pure analysis):
   V8's visible 40% dual-res pool?
 - If we add archetype affinity scores (8 floats per card), what's the ceiling?
 - What is the minimum hidden information per card needed to reach M3 = 2.0
-  under Graduated Realistic fitness?
+  and M11 = 3.0 (late-draft density, picks 15+) under Graduated Realistic
+  fitness?
 - How does the V1 metric (visible symbol influence %) change across these
   levels?
 
@@ -454,9 +456,10 @@ above 2.0 on V7's 15% dual-res pool, using only visible symbols. This is the
 proven visible-only ceiling.
 
 **Question:** What is the smallest hidden enhancement that pushes this family
-of algorithms from M3 = 2.24 to M3 >= 2.0 with better M10? Can a simple
-3-bit archetype tag (the minimum possible hidden metadata) close the gap on
-the metrics SF+Bias fails (M10 = 8)?
+of algorithms from M3 = 2.24 to M3 >= 2.0 (and M11 >= 3.0 for late-draft
+density) with better M10? Can a simple 3-bit archetype tag (the minimum
+possible hidden metadata) close the gap on the metrics SF+Bias fails
+(M10 = 8)?
 
 Explore the design space between "pure visible" and "minimally hidden." The
 goal is the least hidden information that fixes SF+Bias's weaknesses.
@@ -546,8 +549,8 @@ Explore:
 - Can the rare visible dual-resonance cards (~10%) serve as high-value
   "anchor" cards that the contraction algorithm weights heavily, making the
   player feel like "finding a (Tide, Zephyr) card really focused my packs"?
-- What contraction rate and metadata scheme achieves M3 >= 2.0 while keeping
-  V1 >= 50%?
+- What contraction rate and metadata scheme achieves M3 >= 2.0 and
+  M11 >= 3.0 while keeping V1 >= 50%?
 
 ---
 
@@ -629,20 +632,20 @@ critic review, all simulation results, V8 final report, V8 algorithm overview.
 
 1. Unified comparison table of all algorithms (metrics + V1-V4)
 2. The key question: **What is the minimum hidden manipulation needed to
-   reach M3 >= 2.0 while keeping visible resonance as the primary drafting
-   signal?**
+   reach M3 >= 2.0 and M11 >= 3.0 while keeping visible resonance as the
+   primary drafting signal?**
 3. The design integrity question: where on the spectrum (no hidden info →
    full hidden manipulation) is the sweet spot?
 4. Per-archetype convergence table for the top 3 algorithms
 5. V9 vs V8 comparison: what did we gain and lose by moving to hidden
    metadata?
 6. Honest assessment: is V1 >= 50% (visible symbols doing most of the work)
-   achievable alongside M3 >= 2.0?
+   achievable alongside M3 >= 2.0 and M11 >= 3.0?
 7. Recommendation tiers:
    - **Minimal hidden info:** Best algorithm with <= 3 bits of hidden
      metadata per card. What M3 does this achieve?
    - **Moderate hidden info:** Best algorithm with hidden archetype tag +
-     limited affinity data. Target M3 >= 2.0.
+     limited affinity data. Target M3 >= 2.0, M11 >= 3.0.
    - **Full hidden support:** Best algorithm with whatever hidden metadata
      is needed. V8's equivalent but with rare visible dual-res.
 8. Complete Set Design Specification for the recommended algorithm (pool
