@@ -5,21 +5,21 @@
 All results on 10% visible dual-res pool (36 cards), Graduated Realistic
 fitness, committed player strategy, 1000 drafts.
 
-| Algorithm | M3 | M11 | M10 | M6 | M5 | M9 | Spread | V1 | V2 (bits) | V3 | V4 gap | Pass |
-|-----------|---:|----:|----:|---:|---:|---:|-------:|---:|----------:|---:|-------:|-----:|
-| Hybrid B (2+5) | **2.70** | **3.25** | 3.8 | 86% | 9.6 | 1.08 | 0.25 | 84.8% | 8 | 9/10 | 2.08 | **8/10** |
-| Hybrid A (4+6) | 2.62 | 2.83 | 5.26 | 79% | 9.4 | 0.69 | 0.48 | 77.0% | 3 | 8/10 | 1.97 | 5/10 |
-| Design 4 (Layered Salience) | 2.36 | 2.40 | 2.13 | 87% | 7.8 | 0.80 | 0.37 | 76.3% | 3 | 8/10 | 1.80 | 7/10 |
-| Design 2 (Tag-Gravity) | 2.37 | 2.81 | 4.4 | 83% | 10.2 | 1.07 | 0.18 | 98.1% | 3 | 8/10 | 1.79 | 7/10 |
-| Design 5 (AWNG) | 2.32 | 2.71 | 2.9 | 89% | 8.9 | 1.04 | 0.88 | 99.3% | ~32 | 9/10 | -- | 6/10 |
-| Design 6 (Anchor Contraction) | 2.00 | 2.21 | 7.44 | 72% | 11.5 | 0.84 | 1.42 | paradox | 3 | 8/10 | 1.32 | 3/10 |
+| Algorithm                     |       M3 |      M11 |  M10 |  M6 |   M5 |   M9 | Spread |      V1 | V2 (bits) |   V3 | V4 gap |     Pass |
+| ----------------------------- | -------: | -------: | ---: | --: | ---: | ---: | -----: | ------: | --------: | ---: | -----: | -------: |
+| Hybrid B (2+5)                | **2.70** | **3.25** |  3.8 | 86% |  9.6 | 1.08 |   0.25 |   84.8% |         8 | 9/10 |   2.08 | **8/10** |
+| Hybrid A (4+6)                |     2.62 |     2.83 | 5.26 | 79% |  9.4 | 0.69 |   0.48 |   77.0% |         3 | 8/10 |   1.97 |     5/10 |
+| Design 4 (Layered Salience)   |     2.36 |     2.40 | 2.13 | 87% |  7.8 | 0.80 |   0.37 |   76.3% |         3 | 8/10 |   1.80 |     7/10 |
+| Design 2 (Tag-Gravity)        |     2.37 |     2.81 |  4.4 | 83% | 10.2 | 1.07 |   0.18 |   98.1% |         3 | 8/10 |   1.79 |     7/10 |
+| Design 5 (AWNG)               |     2.32 |     2.71 |  2.9 | 89% |  8.9 | 1.04 |   0.88 |   99.3% |       ~32 | 9/10 |     -- |     6/10 |
+| Design 6 (Anchor Contraction) |     2.00 |     2.21 | 7.44 | 72% | 11.5 | 0.84 |   1.42 | paradox |         3 | 8/10 |   1.32 |     3/10 |
 
 **Key:** Pass counts M1-M11 metrics meeting targets. V4 gap = committed vs.
 power-chaser M3 difference (target >= 0.4).
 
----
+______________________________________________________________________
 
-## 2. The Key Question: Minimum Hidden Information for M3 >= 2.0 and M11 >=  3.0
+## 2. The Key Question: Minimum Hidden Information for M3 >= 2.0 and M11 >= 3.0
 
 **Answer: 8 bits per card (two 4-bit pair-affinity floats) with pool contraction
 at 12% per pick.**
@@ -60,7 +60,7 @@ affinity floats per card (8 bits total), encoding the card's relative value for
 each archetype sharing its primary resonance symbol, combined with pool
 contraction at 12% per pick.**
 
----
+______________________________________________________________________
 
 ## 3. The Design Integrity Question
 
@@ -97,22 +97,22 @@ primary), scores V3 = 9/10 (maximally honest hidden information), and requires
 only 2.7x the hidden information of a 3-bit tag for a meaningful improvement in
 both M11 and design integrity.
 
----
+______________________________________________________________________
 
 ## 4. Per-Archetype Convergence: Top 3 Algorithms
 
-| Archetype | Fitness | Hybrid B M3 | Hybrid A M3 | Design 4 M3 |
-|-----------|:-------:|------------:|------------:|------------:|
-| Flash | 25% | 2.58 | 2.41 | 2.26 |
-| Blink | 30% | 2.63 | 2.73 | 2.32 |
-| Storm | 30% | 2.66 | 2.61 | 2.30 |
-| Self-Discard | 40% | 2.76 | 2.68 | 2.35 |
-| Self-Mill | 40% | 2.82 | 2.74 | 2.44 |
-| Sacrifice | 50% | 2.75 | 2.39 | 2.54 |
-| Warriors | 50% | 2.78 | 2.87 | 2.48 |
-| Ramp | 25% | 2.66 | 2.50 | 2.16 |
-| **Worst** | | **2.58** | **2.39** | **2.16** |
-| **Spread** | | **0.25** | **0.48** | **0.37** |
+| Archetype    | Fitness | Hybrid B M3 | Hybrid A M3 | Design 4 M3 |
+| ------------ | :-----: | ----------: | ----------: | ----------: |
+| Flash        |   25%   |        2.58 |        2.41 |        2.26 |
+| Blink        |   30%   |        2.63 |        2.73 |        2.32 |
+| Storm        |   30%   |        2.66 |        2.61 |        2.30 |
+| Self-Discard |   40%   |        2.76 |        2.68 |        2.35 |
+| Self-Mill    |   40%   |        2.82 |        2.74 |        2.44 |
+| Sacrifice    |   50%   |        2.75 |        2.39 |        2.54 |
+| Warriors     |   50%   |        2.78 |        2.87 |        2.48 |
+| Ramp         |   25%   |        2.66 |        2.50 |        2.16 |
+| **Worst**    |         |    **2.58** |    **2.39** |    **2.16** |
+| **Spread**   |         |    **0.25** |    **0.48** |    **0.37** |
 
 Hybrid B has the best per-archetype equity (spread 0.25) with the highest floor
 (Flash at 2.58). All three algorithms pass the per-archetype M3 >= 2.0 floor for
@@ -120,24 +120,25 @@ every archetype. Hybrid B's pair-affinity encoding eliminates the forced-tag
 misclassification that drags Flash/Ramp below their natural ceiling in tag-only
 algorithms.
 
----
+______________________________________________________________________
 
 ## 5. V9 vs V8: What Did We Gain and Lose?
 
-| Dimension | V8 (Narrative Gravity, 40% pool) | V9 (Hybrid B, 10% visible) | Change |
-|-----------|:---:|:---:|---|
-| M3 | 2.75 | 2.70 | -0.05 (negligible) |
-| M11 | ~2.8 (estimated) | 3.25 | +0.45 (major improvement) |
-| M10 | 3.3 | 3.8 | +0.5 (slight degradation) |
-| M6 | 85% | 86% | Comparable |
-| Worst archetype | 2.40 (Flash) | 2.58 (Flash) | +0.18 (improvement) |
-| Archetype spread | 0.73 | 0.25 | -0.48 (major improvement) |
-| Visible dual-res | 37% (132 cards) | 10% (36 cards) | -27 points |
-| Hidden info/card | 0 bits | 8 bits | +8 bits |
-| V1 (visible influence) | ~35% | 84.8% | +50 points (major improvement) |
-| Player experience | 7.9/10 | Comparable | Same mechanism family |
+| Dimension              | V8 (Narrative Gravity, 40% pool) | V9 (Hybrid B, 10% visible) | Change                         |
+| ---------------------- | :------------------------------: | :------------------------: | ------------------------------ |
+| M3                     |               2.75               |            2.70            | -0.05 (negligible)             |
+| M11                    |         ~2.8 (estimated)         |            3.25            | +0.45 (major improvement)      |
+| M10                    |               3.3                |            3.8             | +0.5 (slight degradation)      |
+| M6                     |               85%                |            86%             | Comparable                     |
+| Worst archetype        |           2.40 (Flash)           |        2.58 (Flash)        | +0.18 (improvement)            |
+| Archetype spread       |               0.73               |            0.25            | -0.48 (major improvement)      |
+| Visible dual-res       |         37% (132 cards)          |       10% (36 cards)       | -27 points                     |
+| Hidden info/card       |              0 bits              |           8 bits           | +8 bits                        |
+| V1 (visible influence) |               ~35%               |           84.8%            | +50 points (major improvement) |
+| Player experience      |              7.9/10              |         Comparable         | Same mechanism family          |
 
 **What V9 gained:**
+
 - **Dramatically reduced visible dual-resonance** (37% to 10%), restoring
   decision texture. Players encounter dual-res cards as noteworthy signposts,
   not as the default.
@@ -150,12 +151,13 @@ algorithms.
   of heavy dual-res pools.
 
 **What V9 lost:**
+
 - **Design integrity cost of hidden metadata.** 8 bits per card of information
   the player cannot see. The metadata is honestly derived and a player who
   discovered it would endorse it as fair (V3 = 9/10), but it is still
   information the game knows that the player does not.
 - **Slight M10 degradation** (3.3 to 3.8). The transition zone problem persists.
-  Neither V8 nor V9 achieves M10 <= 2 without CSCT's M6 = 99% concentration.
+  Neither V8 nor V9 achieves M10 \<= 2 without CSCT's M6 = 99% concentration.
 - **Implementation complexity.** V8's Narrative Gravity used only visible
   symbols. V9 adds pair-affinity computation and archetype inference logic.
 
@@ -164,7 +166,7 @@ M10 and implementation complexity. The 8-bit hidden metadata cost is justified
 by the dramatic reduction in visible dual-resonance requirements and the
 per-archetype equity gains.
 
----
+______________________________________________________________________
 
 ## 6. Honest Assessment: Is V1 >= 50% Achievable Alongside M3 >= 2.0 and M11 >= 3.0?
 
@@ -189,11 +191,11 @@ Warriors-affinity cards. This correlation is what makes the system feel honest:
 the player's visible strategy and the algorithm's hidden targeting point in the
 same direction.
 
----
+______________________________________________________________________
 
 ## 7. Recommendation Tiers
 
-### Tier 1: Minimal Hidden Info (<= 3 bits per card)
+### Tier 1: Minimal Hidden Info (\<= 3 bits per card)
 
 **Algorithm:** Design 4, Layered Salience (Two-Stage Filter).
 
@@ -243,18 +245,18 @@ aggressiveness.
 tier. Simulation proved they add no measurable targeting precision over 8-bit
 pair affinity.
 
----
+______________________________________________________________________
 
 ## 8. Complete Set Design Specification: Hybrid B (Recommended)
 
 ### Pool Breakdown
 
-| Category | Cards | % | Hidden Metadata |
-|----------|:-----:|--:|-----------------|
-| Generic (0 symbols) | 40 | 11% | No affinity data (protected at 0.5 baseline) |
-| Single-symbol | 284 | 79% | Two 4-bit floats: affinity for each archetype sharing this symbol |
-| Dual-symbol (signpost) | 36 | 10% | Two 4-bit floats (typically 0.9+ for the signpost archetype) |
-| **Total** | **360** | | |
+| Category               |  Cards  |   % | Hidden Metadata                                                   |
+| ---------------------- | :-----: | --: | ----------------------------------------------------------------- |
+| Generic (0 symbols)    |   40    | 11% | No affinity data (protected at 0.5 baseline)                      |
+| Single-symbol          |   284   | 79% | Two 4-bit floats: affinity for each archetype sharing this symbol |
+| Dual-symbol (signpost) |   36    | 10% | Two 4-bit floats (typically 0.9+ for the signpost archetype)      |
+| **Total**              | **360** |     |                                                                   |
 
 ### Visible Symbol Distribution
 
@@ -286,16 +288,16 @@ Warriors card that also has moderate Sacrifice value.
 
 ### Per-Archetype Hidden Metadata Targets
 
-| Archetype | Primary Symbol | Target Home Cards (affinity >= 0.7) | Target Bridge Cards (affinity 0.4-0.6 for both) |
-|-----------|:-:|:---:|:---:|
-| Flash (Ze/Em) | Zephyr | ~30-35 | ~5-10 |
-| Blink (Em/Ze) | Ember | ~30-35 | ~5-10 |
-| Storm (Em/St) | Ember | ~30-35 | ~5-10 |
-| Self-Discard (St/Em) | Stone | ~30-35 | ~5-10 |
-| Self-Mill (St/Ti) | Stone | ~30-35 | ~5-10 |
-| Sacrifice (Ti/St) | Tide | ~30-35 | ~5-10 |
-| Warriors (Ti/Ze) | Tide | ~30-35 | ~5-10 |
-| Ramp (Ze/Ti) | Zephyr | ~30-35 | ~5-10 |
+| Archetype            | Primary Symbol | Target Home Cards (affinity >= 0.7) | Target Bridge Cards (affinity 0.4-0.6 for both) |
+| -------------------- | :------------: | :---------------------------------: | :---------------------------------------------: |
+| Flash (Ze/Em)        |     Zephyr     |               ~30-35                |                      ~5-10                      |
+| Blink (Em/Ze)        |     Ember      |               ~30-35                |                      ~5-10                      |
+| Storm (Em/St)        |     Ember      |               ~30-35                |                      ~5-10                      |
+| Self-Discard (St/Em) |     Stone      |               ~30-35                |                      ~5-10                      |
+| Self-Mill (St/Ti)    |     Stone      |               ~30-35                |                      ~5-10                      |
+| Sacrifice (Ti/St)    |      Tide      |               ~30-35                |                      ~5-10                      |
+| Warriors (Ti/Ze)     |      Tide      |               ~30-35                |                      ~5-10                      |
+| Ramp (Ze/Ti)         |     Zephyr     |               ~30-35                |                      ~5-10                      |
 
 ### Cross-Archetype Requirements
 
@@ -304,12 +306,12 @@ resonance -- are the key innovation of Hybrid B over tag-only algorithms. These
 cards survive pool contraction longer and provide organic splash opportunities.
 Target: 5-10 bridge cards per resonance pair.
 
-| Resonance Pair | Archetypes | Natural Bridge Overlap | Bridge Card Target |
-|----------------|-----------|:---:|:---:|
-| Tide | Warriors / Sacrifice | High (50% fitness) | 8-10 cards with affinity >= 0.4 for both |
-| Stone | Self-Mill / Self-Discard | Medium (40%) | 7-8 bridge cards |
-| Ember | Blink / Storm | Low (30%) | 5-6 bridge cards (requires intentional design) |
-| Zephyr | Flash / Ramp | Very Low (25%) | 5-6 bridge cards (requires intentional design) |
+| Resonance Pair | Archetypes               | Natural Bridge Overlap |               Bridge Card Target               |
+| -------------- | ------------------------ | :--------------------: | :--------------------------------------------: |
+| Tide           | Warriors / Sacrifice     |   High (50% fitness)   |    8-10 cards with affinity >= 0.4 for both    |
+| Stone          | Self-Mill / Self-Discard |      Medium (40%)      |                7-8 bridge cards                |
+| Ember          | Blink / Storm            |       Low (30%)        | 5-6 bridge cards (requires intentional design) |
+| Zephyr         | Flash / Ramp             |     Very Low (25%)     | 5-6 bridge cards (requires intentional design) |
 
 ### Worked Example: Warriors (Tide/Zephyr)
 
@@ -340,18 +342,18 @@ visible resonance symbol.
 
 ### Algorithm Parameters
 
-| Parameter | Value |
-|-----------|-------|
-| Contraction start | Pick 4 |
-| Contraction rate | 12% per pick |
-| Relevance blend | 40% visible dot-product + 60% pair-affinity score |
-| Floor slot | 1 top-quartile slot from pick 3 |
-| Generic protection | 0.5 baseline relevance |
-| Signature weights | +2 primary, +1 secondary |
-| Pool minimum | 17 cards (stop contraction) |
+| Parameter           | Value                                                                             |
+| ------------------- | --------------------------------------------------------------------------------- |
+| Contraction start   | Pick 4                                                                            |
+| Contraction rate    | 12% per pick                                                                      |
+| Relevance blend     | 40% visible dot-product + 60% pair-affinity score                                 |
+| Floor slot          | 1 top-quartile slot from pick 3                                                   |
+| Generic protection  | 0.5 baseline relevance                                                            |
+| Signature weights   | +2 primary, +1 secondary                                                          |
+| Pool minimum        | 17 cards (stop contraction)                                                       |
 | Archetype inference | Mode of inferred archetype from drafted cards' higher-affinity label, from pick 5 |
 
----
+______________________________________________________________________
 
 ## 9. Card Designer's Brief: What to Do Differently from V8
 
@@ -394,12 +396,12 @@ to 36), but 284 pair-affinity assignments to make. The net effort is comparable
 -- affinity assignment is faster than dual-res card creation because it requires
 no new card design, only evaluation of existing cards.
 
----
+______________________________________________________________________
 
 ## 10. Open Questions for Playtesting
 
 1. **M10 transition zone.** Hybrid B averages 3.8 consecutive bad packs (target
-   <= 2). The transition zone (picks 6-10) remains structurally weak while
+   \<= 2). The transition zone (picks 6-10) remains structurally weak while
    archetype inference stabilizes. Test whether increasing contraction rate to
    14-15% in picks 5-8 reduces M10 without degrading M6.
 

@@ -5,7 +5,7 @@ strength. V9's defining contribution over V8 is the hidden/visible information
 split: keeping V8's mathematical gains (M3 >= 2.0, M11 >= 3.0) while reducing
 visible dual-resonance from 40% to 10% of the pool.
 
----
+______________________________________________________________________
 
 ## Recommended: Hybrid B -- Affinity-Tagged Gravity
 
@@ -30,9 +30,10 @@ Tide card carries (warriors_affinity, sacrifice_affinity). Derived from card
 mechanics using published rules. V3 = 9/10.
 
 **Draft algorithm:**
+
 1. Maintain a 4-element resonance signature (+2 primary, +1 secondary per pick).
 2. From pick 4, compute relevance per pool card: 0.4 * visible_dot_product + 0.6
-   * affinity_score[committed_archetype].
+   - affinity_score[committed_archetype].
 3. Remove bottom 12% of pool per pick. Generics protected at 0.5 baseline.
 4. Pack construction: 1 top-quartile floor slot from pick 3; 3 random slots from
    surviving pool.
@@ -42,33 +43,33 @@ mechanics using published rules. V3 = 9/10.
 ### Full Metrics
 
 | Metric | Graduated Realistic | Pessimistic | Target | Status |
-|--------|:---:|:---:|--------|--------|
-| M3 | 2.70 | 2.60 | >= 2.0 | PASS |
-| M11 | 3.25 | 3.17 | >= 3.0 | PASS |
-| M10 | 3.8 | 4.5 | <= 2 | FAIL |
-| M6 | 86% | 83% | 60-90% | PASS |
-| M5 | 9.6 | -- | 5-8 | FAIL |
-| M9 | 1.08 | -- | >= 0.8 | PASS |
+| ------ | :-----------------: | :---------: | ------ | ------ |
+| M3     |        2.70         |    2.60     | >= 2.0 | PASS   |
+| M11    |        3.25         |    3.17     | >= 3.0 | PASS   |
+| M10    |         3.8         |     4.5     | \<= 2  | FAIL   |
+| M6     |         86%         |     83%     | 60-90% | PASS   |
+| M5     |         9.6         |     --      | 5-8    | FAIL   |
+| M9     |        1.08         |     --      | >= 0.8 | PASS   |
 
-| V-Metric | Value | Assessment |
-|----------|:-----:|------------|
-| V1 | 84.8% | Visible symbols are doing 85% of the targeting work |
-| V2 | 8 bits/card | 2.7x more than a 3-bit tag; 4x less than full affinity |
-| V3 | 9/10 | Affinities derived from card mechanics; no forced misclassification |
-| V4 gap | 2.08 | Committed players dramatically outperform power-chasers |
+| V-Metric |    Value    | Assessment                                                          |
+| -------- | :---------: | ------------------------------------------------------------------- |
+| V1       |    84.8%    | Visible symbols are doing 85% of the targeting work                 |
+| V2       | 8 bits/card | 2.7x more than a 3-bit tag; 4x less than full affinity              |
+| V3       |    9/10     | Affinities derived from card mechanics; no forced misclassification |
+| V4 gap   |    2.08     | Committed players dramatically outperform power-chasers             |
 
 ### Per-Archetype M3
 
-| Archetype | M3 | M11 |
-|-----------|---:|----:|
-| Flash | 2.58 | 3.12 |
-| Blink | 2.63 | 3.19 |
-| Storm | 2.66 | 3.21 |
+| Archetype    |   M3 |  M11 |
+| ------------ | ---: | ---: |
+| Flash        | 2.58 | 3.12 |
+| Blink        | 2.63 | 3.19 |
+| Storm        | 2.66 | 3.21 |
 | Self-Discard | 2.76 | 3.31 |
-| Self-Mill | 2.82 | 3.38 |
-| Sacrifice | 2.75 | 3.26 |
-| Warriors | 2.78 | 3.30 |
-| Ramp | 2.66 | 3.22 |
+| Self-Mill    | 2.82 | 3.38 |
+| Sacrifice    | 2.75 | 3.26 |
+| Warriors     | 2.78 | 3.30 |
+| Ramp         | 2.66 | 3.22 |
 
 All 8 archetypes pass M3 >= 2.0 and M11 >= 3.0. Spread = 0.25 (best equity of
 any V9 algorithm).
@@ -83,7 +84,7 @@ archetypes should receive moderate scores for both (0.4-0.6 each). Design 5-10
 bridge cards per resonance pair intentionally. Design 4-5 visible dual-res
 signpost cards per archetype as mechanical hinges.
 
----
+______________________________________________________________________
 
 ## Viable Alternative: Design 4 -- Layered Salience (Two-Stage Filter)
 
@@ -103,13 +104,13 @@ from pick 12 at 8% per pick.
 
 ### Key Metrics
 
-| Metric | Value | Status |
-|--------|------:|--------|
-| M3 | 2.36 | PASS |
-| M11 | 2.40 | FAIL |
-| M10 | 2.13 | MARGINAL FAIL |
-| V1 | 76.3% | Best among all algorithms |
-| V3 | 8/10 | Honest tag assignment |
+| Metric | Value | Status                    |
+| ------ | ----: | ------------------------- |
+| M3     |  2.36 | PASS                      |
+| M11    |  2.40 | FAIL                      |
+| M10    |  2.13 | MARGINAL FAIL             |
+| V1     | 76.3% | Best among all algorithms |
+| V3     |  8/10 | Honest tag assignment     |
 
 **Why viable:** The layered architecture provides the strongest structural
 guarantee that visible symbols do primary work. Stage 1 (R1 filtering) cannot
@@ -124,7 +125,7 @@ design predicted M11 = 3.0-3.1; simulation showed the prediction was optimistic.
 minimum hidden metadata with the highest visible-influence guarantee. Also
 serves as the V9 integrity benchmark for evaluating other algorithms.
 
----
+______________________________________________________________________
 
 ## Viable Alternative: Design 2 -- Tag-Gravity (60/40 Blend)
 
@@ -144,14 +145,14 @@ pick 4. Floor slot from pick 3.
 
 ### Key Metrics
 
-| Metric | Value | Status |
-|--------|------:|--------|
-| M3 | 2.37 | PASS |
-| M11 | 2.81 | FAIL |
-| M10 | 4.4 | FAIL |
-| V1 | 98.1% | Unexpectedly high |
-| V3 | 8/10 | Honest tag assignment |
-| Spread | 0.18 | Best among tag-only algorithms |
+| Metric | Value | Status                         |
+| ------ | ----: | ------------------------------ |
+| M3     |  2.37 | PASS                           |
+| M11    |  2.81 | FAIL                           |
+| M10    |   4.4 | FAIL                           |
+| V1     | 98.1% | Unexpectedly high              |
+| V3     |  8/10 | Honest tag assignment          |
+| Spread |  0.18 | Best among tag-only algorithms |
 
 **Surprising V1 finding:** V1 = 98.1% means the hidden tag adds only +0.04 M3
 over visible-only contraction. The visible resonance symbol dominates
@@ -167,7 +168,7 @@ family.
 finding raises the question of whether the 3-bit tag adds enough value to
 justify its existence for this algorithm specifically.
 
----
+______________________________________________________________________
 
 ## Viable Alternative: Hybrid A -- Visible-First Anchor Gravity
 
@@ -186,13 +187,13 @@ visible/hidden blend.
 
 ### Key Metrics
 
-| Metric | Value | Status |
-|--------|------:|--------|
-| M3 | 2.62 | PASS (highest among tag-only) |
-| M11 | 2.83 | FAIL |
-| M10 | 5.26 | FAIL |
-| V1 | 77.0% | Strong |
-| V4 gap | 1.97 | Strongest |
+| Metric | Value | Status                        |
+| ------ | ----: | ----------------------------- |
+| M3     |  2.62 | PASS (highest among tag-only) |
+| M11    |  2.83 | FAIL                          |
+| M10    |  5.26 | FAIL                          |
+| V1     | 77.0% | Strong                        |
+| V4 gap |  1.97 | Strongest                     |
 
 **Why viable:** Highest M3 (2.62) of any 3-bit algorithm. Strong V1 (77%) from
 layered architecture. The anchor mechanic creates visible cause-and-effect:
@@ -202,7 +203,7 @@ dual-res picks trigger 18% contraction, producing a felt quality burst.
 contraction rates contract too slowly in the first 15 picks to achieve M11 >=
 3.0. Only Warriors reaches M11 >= 3.0 individually (3.09).
 
----
+______________________________________________________________________
 
 ## Eliminated: Design 5 -- AWNG (Affinity-Weighted Narrative Gravity)
 
@@ -231,7 +232,7 @@ the primary resonance signal. The correct abstraction is a direct pair-level
 distinction (Hybrid B's two-float approach), not a bottom-up derivation from
 mechanical features.
 
----
+______________________________________________________________________
 
 ## Eliminated: Design 6 -- Anchor-Scaled Contraction
 
@@ -262,7 +263,7 @@ unreliable archetype inference. The anchor mechanic survives as a component of
 Hybrid A, where it is paired with Design 4's layered R1 filtering that provides
 a more robust inference foundation.
 
----
+______________________________________________________________________
 
 ## Eliminated: Designs 1 and 3
 
@@ -281,7 +282,7 @@ alternatives. The V1 accounting was identified as overstated. Its core insight
 determine pack quality -- is a genuine design property that no other V9
 algorithm tests, and may be worth revisiting in a future version.
 
----
+______________________________________________________________________
 
 ## Structural Findings
 
@@ -322,8 +323,8 @@ algorithms.
 
 ### 5. The M3-M10-M6 triangle persists from V8
 
-No V9 algorithm achieves M10 <= 2 alongside M3 >= 2.0 and M6 in 60-90%. Design 4
-comes closest (M10 = 2.13) but at the cost of M11 failure. The transition zone
+No V9 algorithm achieves M10 \<= 2 alongside M3 >= 2.0 and M6 in 60-90%. Design
+4 comes closest (M10 = 2.13) but at the cost of M11 failure. The transition zone
 (picks 6-10), where archetype inference is stabilizing and pool contraction has
 not yet concentrated the pool, remains structurally resistant to M10
 improvement. This is the same finding as V8, now confirmed across a different

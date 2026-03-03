@@ -2,12 +2,12 @@
 
 **Resonance Algorithm Redesign — Hybrid Proposal**
 
----
+______________________________________________________________________
 
 ## Overview
 
-Seeded Ramp with Structural Splash is a drafting algorithm that gives every
-pack of four cards a clear job to do. Three of the four cards are drawn using a
+Seeded Ramp with Structural Splash is a drafting algorithm that gives every pack
+of four cards a clear job to do. Three of the four cards are drawn using a
 profile-based weighting formula that starts open and gradually tightens toward
 your chosen resonances — the further into a draft you are, the more the system
 emphasizes cards that match what you have already built. The fourth card is
@@ -18,7 +18,7 @@ multipliers called lane seeds, which ensure that the optimal resonance mix
 varies from run to run. The player never sees any of this machinery; they just
 see four cards, shuffled, and make a pick.
 
----
+______________________________________________________________________
 
 ## How It Works
 
@@ -35,8 +35,8 @@ assembled in two stages:
 - **Three convergence cards** are drawn using a formula that grows stronger as
   your profile deepens. These are the cards that reward your choices.
 - **One wild card** is drawn using a separate formula specifically tuned to
-  remain nearly flat even when your profile is deep. This is the card that
-  keeps surprising you.
+  remain nearly flat even when your profile is deep. This is the card that keeps
+  surprising you.
 
 The pack is then shuffled before you see it. You do not know which card was the
 wild card. You just see four options.
@@ -61,10 +61,10 @@ Where:
 **What the exponent ramp means in practice:** At exponent 0.5, the math is
 sub-linear — doubling your profile count does not double a card's weight. A
 resonance with profile 10 has weight 10^0.5 + 0.5 = 3.66. A resonance with
-profile 0 has weight 0.5. The ratio is about 7:1 — tilted toward your colors
-but genuinely open. By pick 8, at exponent 1.4, the same resonance has weight
-10^1.4 + 0.5 = 25.6 versus 0.5 for an unchosen color. The ratio is now 51:1.
-The system has become strongly focused.
+profile 0 has weight 0.5. The ratio is about 7:1 — tilted toward your colors but
+genuinely open. By pick 8, at exponent 1.4, the same resonance has weight 10^1.4
+\+ 0.5 = 25.6 versus 0.5 for an unchosen color. The ratio is now 51:1. The system
+has become strongly focused.
 
 **The profile cap:** Profile counts are capped at 10 for the purposes of weight
 calculation, even if you have drafted more. Without this cap, a profile of 25
@@ -72,10 +72,10 @@ would produce weight ratios over 134:1 late in a draft, making off-color cards
 effectively invisible even in the wild slot. The cap keeps weight ratios in a
 meaningful range.
 
-**Concrete example:** You are at pick 10 with Tide profile 8 and Ruin profile
-6. A Tide card has weight 8^1.4 + 0.5 = 18.5. A Ruin card has weight 6^1.4 +
-0.5 = 12.3. A Zephyr card (profile 0) has weight 0.5. The system strongly
-favors Tide and Ruin, but Zephyr is not impossible in this slot.
+**Concrete example:** You are at pick 10 with Tide profile 8 and Ruin profile 6.
+A Tide card has weight 8^1.4 + 0.5 = 18.5. A Ruin card has weight 6^1.4 + 0.5 =
+12.3. A Zephyr card (profile 0) has weight 0.5. The system strongly favors Tide
+and Ruin, but Zephyr is not impossible in this slot.
 
 ### The Wild Card Formula (One of Four Cards)
 
@@ -96,8 +96,8 @@ wild slot roughly 40-50% of the time, regardless of where you are in the draft.
 
 This is the structural guarantee. No matter how deep your Tide+Ruin commitment
 is by pick 15, the wild slot still has close to even odds of showing you
-something from Ember, Stone, or Zephyr. The convergence formula cannot do this
-— at exponent 1.4, the weight ratio becomes prohibitive.
+something from Ember, Stone, or Zephyr. The convergence formula cannot do this —
+at exponent 1.4, the weight ratio becomes prohibitive.
 
 ### The 3+1 Pack Structure
 
@@ -105,35 +105,35 @@ Picks 1 through 5 use a **2+2 split** — two convergence cards and two wild
 cards. This wider-open early phase is designed to maximize the variety of
 resonances you see while your profile is still forming.
 
-Starting at pick 6, the pack shifts to **3+1** — three convergence cards and
-one wild card. This is the main convergence signal: as you move from exploration
+Starting at pick 6, the pack shifts to **3+1** — three convergence cards and one
+wild card. This is the main convergence signal: as you move from exploration
 into commitment, the packs tilt noticeably toward what you've been building.
 
-The split at pick 6 is a hard boundary. A pack at pick 5 feels genuinely open;
-a pack at pick 6 feels more focused. This is intentional — it mirrors the
-moment when a drafter should be crystallizing their identity.
+The split at pick 6 is a hard boundary. A pack at pick 5 feels genuinely open; a
+pack at pick 6 feels more focused. This is intentional — it mirrors the moment
+when a drafter should be crystallizing their identity.
 
 ### Lane Seeds: Making Each Run Distinct
 
 Before a quest begins, the system rolls a random multiplier for each resonance,
 drawn uniformly between 0.60 and 1.40. These are called **lane seeds**.
 
-A resonance with lane seed 1.30 effectively has 30% more cards in the pool.
-A resonance with lane seed 0.70 has 30% fewer. Every card in the pool has its
+A resonance with lane seed 1.30 effectively has 30% more cards in the pool. A
+resonance with lane seed 0.70 has 30% fewer. Every card in the pool has its
 effective copy count scaled by its primary resonance's lane seed.
 
-**What this does for play:** In one run, Stone might be the deepest resonance
-in the pool and Ember the shallowest — even before a single card is picked.
-This means the optimal archetype genuinely changes from quest to quest. A player
-who learns to read which resonances are appearing frequently can exploit this
+**What this does for play:** In one run, Stone might be the deepest resonance in
+the pool and Ember the shallowest — even before a single card is picked. This
+means the optimal archetype genuinely changes from quest to quest. A player who
+learns to read which resonances are appearing frequently can exploit this
 signal. It also means that even with the same dreamcaller, different runs
 produce structurally different decks.
 
 **Draft Story 2** (from the simulation) illustrates this well: a player with an
 Ember+Tide dreamcaller found that Ember had the lowest lane seed (0.62) in that
-run. Despite the dreamcaller's identity, the pool had fewer Ember cards than
-any other resonance. The player's eventual deck was Tide-primary, not Ember,
-because the signals pointing toward Tide were stronger.
+run. Despite the dreamcaller's identity, the pool had fewer Ember cards than any
+other resonance. The player's eventual deck was Tide-primary, not Ember, because
+the signals pointing toward Tide were stronger.
 
 ### The Dreamcaller Bonus
 
@@ -143,9 +143,9 @@ direction — your dreamcaller's colors appear roughly twice as often as unchose
 colors in pick 1 — without locking in an archetype before you've seen a single
 card.
 
-At the initial profile of 2 with exponent 0.5, an on-color card has weight
-0.5 + 2^0.5 = 1.91. An off-color card has weight 0.5. The ratio is 3.8:1 —
-tilted but genuinely open.
+At the initial profile of 2 with exponent 0.5, an on-color card has weight 0.5 +
+2^0.5 = 1.91. An off-color card has weight 0.5. The ratio is 3.8:1 — tilted but
+genuinely open.
 
 ### Battle Rewards and Shops
 
@@ -157,28 +157,29 @@ Shops also do not use the wild card structure. Shop cards use the committed-
 phase exponent (1.4) and standard weighting. Shops feel curated, not
 exploratory.
 
----
+______________________________________________________________________
 
 ## Key Parameters
 
-| Parameter | Default | Controls | Higher values | Lower values |
-|-----------|---------|----------|---------------|--------------|
-| `lane_seed_min` | 0.60 | Minimum pool copy-count multiplier per resonance | Narrower run-to-run variety | Wider variety, more lopsided runs |
-| `lane_seed_max` | 1.40 | Maximum pool copy-count multiplier per resonance | Wider run-to-run variety | More uniform pools across runs |
-| `dreamcaller_bonus` | 2 | Profile points added per DC resonance at start | Earlier convergence, less variety early | More open early picks, weaker DC identity |
-| `base_exp` | 0.5 | Exponent at pick 1 (convergence cards) | More on-color tilt early | More variety early |
-| `max_exp` | 1.4 | Exponent at pick 8+ (convergence cards) | Stronger late convergence | Weaker late convergence, more late splash |
-| `convergence_picks` | 8 | How many picks to reach `max_exp` | Slower ramp | Faster ramp to full convergence |
-| `floor_weight` | 0.5 | Minimum weight for unchosen resonances in convergence cards | Slightly more off-color in convergence slots | Less effect (floor already low) |
-| `neutral_base` | 3.0 | Weight of neutral cards in convergence slots | Fewer on-color convergence cards | More on-color convergence cards |
-| `profile_cap` | 10 | Maximum profile count used in weight calculations | Stronger convergence, less splash late | Weaker convergence, more variety late |
-| `wild_floor` | 5.0 | Minimum weight for any resonance in the wild slot | More off-color in wild slot | Less off-color, wild slot becomes more on-color biased |
-| `wild_exp` | 0.3 | Exponent for wild slot (controls how much profile matters) | Wild slot favors on-color more | Wild slot becomes flatter, more off-color |
-| `open_phase_max_pick` | 5 | Last pick using the 2+2 (two wild) partition | Longer open phase | Shorter open phase, faster commitment |
+| Parameter             | Default | Controls                                                    | Higher values                                | Lower values                                           |
+| --------------------- | ------- | ----------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------ |
+| `lane_seed_min`       | 0.60    | Minimum pool copy-count multiplier per resonance            | Narrower run-to-run variety                  | Wider variety, more lopsided runs                      |
+| `lane_seed_max`       | 1.40    | Maximum pool copy-count multiplier per resonance            | Wider run-to-run variety                     | More uniform pools across runs                         |
+| `dreamcaller_bonus`   | 2       | Profile points added per DC resonance at start              | Earlier convergence, less variety early      | More open early picks, weaker DC identity              |
+| `base_exp`            | 0.5     | Exponent at pick 1 (convergence cards)                      | More on-color tilt early                     | More variety early                                     |
+| `max_exp`             | 1.4     | Exponent at pick 8+ (convergence cards)                     | Stronger late convergence                    | Weaker late convergence, more late splash              |
+| `convergence_picks`   | 8       | How many picks to reach `max_exp`                           | Slower ramp                                  | Faster ramp to full convergence                        |
+| `floor_weight`        | 0.5     | Minimum weight for unchosen resonances in convergence cards | Slightly more off-color in convergence slots | Less effect (floor already low)                        |
+| `neutral_base`        | 3.0     | Weight of neutral cards in convergence slots                | Fewer on-color convergence cards             | More on-color convergence cards                        |
+| `profile_cap`         | 10      | Maximum profile count used in weight calculations           | Stronger convergence, less splash late       | Weaker convergence, more variety late                  |
+| `wild_floor`          | 5.0     | Minimum weight for any resonance in the wild slot           | More off-color in wild slot                  | Less off-color, wild slot becomes more on-color biased |
+| `wild_exp`            | 0.3     | Exponent for wild slot (controls how much profile matters)  | Wild slot favors on-color more               | Wild slot becomes flatter, more off-color              |
+| `open_phase_max_pick` | 5       | Last pick using the 2+2 (two wild) partition                | Longer open phase                            | Shorter open phase, faster commitment                  |
 
 ### Which Parameters Matter Most
 
 **High sensitivity — tune carefully:**
+
 - `wild_floor` is the primary lever for off-color visibility. The simulation
   sweep showed that moving from 3.0 to 7.0 changes late off-color from 0.64 to
   0.73 cards per pack. Values below 3.0 risk failing the off-color target.
@@ -188,24 +189,26 @@ exploratory.
   share simultaneously. It is as much a design question as a tuning question.
 
 **Moderate sensitivity — set thoughtfully:**
+
 - `base_exp`, `profile_cap`, and `wild_exp` each move metrics by a meaningful
   but not dramatic amount. They are good second-order adjustments once the high-
   sensitivity parameters are locked.
 
 **Low sensitivity — set and forget:**
+
 - `convergence_picks`, `floor_weight`, `neutral_base`, `staleness_factor`, and
   the lane seed range are all robust across a wide range of values. The
-  simulation sweep showed near-zero sensitivity for staleness in particular;
-  it could be eliminated entirely without affecting outcomes.
+  simulation sweep showed near-zero sensitivity for staleness in particular; it
+  could be eliminated entirely without affecting outcomes.
 
----
+______________________________________________________________________
 
 ## What Changed from the Original Strategy
 
 The original Strategy 2 (Structured Pack Composition) was a different beast. It
 used three named slot types — Focus, Flex, and Wild — with separate weight
-functions for each, and a three-phase system (Open, Commit, Refine) that
-changed slot counts and exponents at two boundaries.
+functions for each, and a three-phase system (Open, Commit, Refine) that changed
+slot counts and exponents at two boundaries.
 
 ### What the Original Strategy Did
 
@@ -226,16 +229,16 @@ The original had 17 tunable parameters and three explicit phase boundaries.
 
 **The Focus death spiral.** When a resonance has a low lane seed and the player
 has drafted many cards from it, the Focus slot begins drawing from a small,
-stale subset of that resonance's cards. Repeated draws from the same handful
-of cards create staleness pile-up, and the Focus slot gradually stops feeling
+stale subset of that resonance's cards. Repeated draws from the same handful of
+cards create staleness pile-up, and the Focus slot gradually stops feeling
 useful. Single-distribution approaches degrade gracefully; the slot structure
 creates isolated sub-pools that can fail individually.
 
 **The Flex slot was expendable.** The bridge formula in the Flex slot was
 conceptually interesting but negligible in practice. The parameter sweep showed
-bridge_bonus had sensitivity of only 0.01 on late off-color. The mechanism
-could be preserved as a weight modifier applied globally, but a dedicated slot
-was not needed.
+bridge_bonus had sensitivity of only 0.01 on late off-color. The mechanism could
+be preserved as a weight modifier applied globally, but a dedicated slot was not
+needed.
 
 **The Wild floor was the only parameter that mattered for off-color.** After
 testing many configurations, the simulation showed that only `wild_floor` and
@@ -251,31 +254,31 @@ ratio at pick 1, pushing synergy top-2 share above 95% and convergence pick
 below 5 — failures that persisted regardless of algorithm choice. Reducing the
 bonus to 2 was the most impactful single change.
 
-**The phase system created abrupt transitions.** The jump from 1 Focus slot to
-2 Focus slots at pick 6 was noticeable and could not be smoothed within an
+**The phase system created abrupt transitions.** The jump from 1 Focus slot to 2
+Focus slots at pick 6 was noticeable and could not be smoothed within an
 integer-valued slot system. The continuous exponent ramp from Strategy 1
 (CRESCENDO) achieves the same convergence effect with a smoother experience.
 
 ### What Was Kept, Dropped, and Added
 
-| Element | Decision | Reason |
-|---------|----------|--------|
-| Slot type labels (Focus/Flex/Wild) | Dropped | Invisible wild card replaces visible slot categories |
-| Three-phase system | Simplified | One 2+2 to 3+1 transition replaces three phase boundaries |
-| Flex slot | Dropped | Bridge formula negligible; dedicated slot not worth complexity |
-| Wild slot (high floor) | Kept, retuned | Floor raised from 0.8 to 5.0 — the key insight from the sweep |
-| Wild exponent | Kept, lowered | Lowered from 0.7 to 0.3 to complement higher floor |
-| Continuous exponent ramp | Added from S1 | Cleaner convergence than per-phase constant exponents |
-| Lane seeds | Added from S3 | Per-resonance copy-count multipliers for run-to-run variety |
-| Dreamcaller bonus | Halved (4 to 2) | Single largest lever for early variety and convergence timing |
-| Profile cap | Added | Prevents astronomical weight ratios at high profile counts |
-| Bridge formula | Dropped | Negligible effect confirmed by sensitivity analysis |
-| Staleness | Kept | Negligible sensitivity but harmless to keep |
+| Element                            | Decision        | Reason                                                         |
+| ---------------------------------- | --------------- | -------------------------------------------------------------- |
+| Slot type labels (Focus/Flex/Wild) | Dropped         | Invisible wild card replaces visible slot categories           |
+| Three-phase system                 | Simplified      | One 2+2 to 3+1 transition replaces three phase boundaries      |
+| Flex slot                          | Dropped         | Bridge formula negligible; dedicated slot not worth complexity |
+| Wild slot (high floor)             | Kept, retuned   | Floor raised from 0.8 to 5.0 — the key insight from the sweep  |
+| Wild exponent                      | Kept, lowered   | Lowered from 0.7 to 0.3 to complement higher floor             |
+| Continuous exponent ramp           | Added from S1   | Cleaner convergence than per-phase constant exponents          |
+| Lane seeds                         | Added from S3   | Per-resonance copy-count multipliers for run-to-run variety    |
+| Dreamcaller bonus                  | Halved (4 to 2) | Single largest lever for early variety and convergence timing  |
+| Profile cap                        | Added           | Prevents astronomical weight ratios at high profile counts     |
+| Bridge formula                     | Dropped         | Negligible effect confirmed by sensitivity analysis            |
+| Staleness                          | Kept            | Negligible sensitivity but harmless to keep                    |
 
 The resulting design has **11 tunable parameters** compared to 17 in the
 original and 15+ in the adaptive strategy.
 
----
+______________________________________________________________________
 
 ## Simulation Results
 
@@ -283,17 +286,17 @@ Results from 1,000 simulated quests per player type.
 
 ### Target Checklist
 
-| Metric | Target | Synergy | Power Chaser | Rigid | Pass? |
-|--------|--------|---------|--------------|-------|-------|
-| Picks 1-5: unique resonances per pack | >= 3.0 | 2.78 | 2.81 | 2.77 | **FAIL** |
-| Picks 1-5: on-color cards per pack | <= 2.0 | 1.99 | 1.88 | 1.99 | **PASS** |
-| Picks 6+: on-color cards per pack | >= 2.0 | 2.98 | 2.47 | 3.01 | **PASS** |
-| Picks 6+: off-color cards per pack | >= 0.5 | 0.70 | 1.23 | 0.66 | **PASS** |
-| Convergence pick (mean) | 5-8 | 4.8 | 13.4 | 5.0 | **FAIL** |
-| Archetype pair max frequency | <= 15% | 11.3% | 12.0% | 11.2% | **PASS** |
-| Archetype pair min frequency | >= 5% | 8.9% | 7.8% | 8.9% | **PASS** |
-| Final top-2 share (synergy) | 75-90% | 96.7% | -- | -- | **FAIL** |
-| Final top-2 share (power chaser) | 60-85% | -- | 65.4% | -- | **PASS** |
+| Metric                                | Target  | Synergy | Power Chaser | Rigid | Pass?    |
+| ------------------------------------- | ------- | ------- | ------------ | ----- | -------- |
+| Picks 1-5: unique resonances per pack | >= 3.0  | 2.78    | 2.81         | 2.77  | **FAIL** |
+| Picks 1-5: on-color cards per pack    | \<= 2.0 | 1.99    | 1.88         | 1.99  | **PASS** |
+| Picks 6+: on-color cards per pack     | >= 2.0  | 2.98    | 2.47         | 3.01  | **PASS** |
+| Picks 6+: off-color cards per pack    | >= 0.5  | 0.70    | 1.23         | 0.66  | **PASS** |
+| Convergence pick (mean)               | 5-8     | 4.8     | 13.4         | 5.0   | **FAIL** |
+| Archetype pair max frequency          | \<= 15% | 11.3%   | 12.0%        | 11.2% | **PASS** |
+| Archetype pair min frequency          | >= 5%   | 8.9%    | 7.8%         | 8.9%  | **PASS** |
+| Final top-2 share (synergy)           | 75-90%  | 96.7%   | --           | --    | **FAIL** |
+| Final top-2 share (power chaser)      | 60-85%  | --      | 65.4%        | --    | **PASS** |
 
 **Overall pass rate: 18/24 (75%)**, up from 50% in the original S2 proposal.
 
@@ -301,44 +304,44 @@ Results from 1,000 simulated quests per player type.
 
 **Synergy player** (always picks the highest-fit on-color option):
 
-| Metric | Value |
-|--------|-------|
-| Early unique resonances per pack | 2.78 |
-| Early on-color per pack | 1.99 |
-| Late on-color per pack | 2.98 |
-| Late off-color per pack | 0.70 |
-| Top-2 share | 96.7% (std 3.2%) |
-| Convergence pick (mean) | 4.8 (median 5.0) |
-| Deck overlap (Jaccard) | 0.059 |
-| Dual-color decks | 99.8% |
-| Tri-color decks | 0.0% |
+| Metric                           | Value            |
+| -------------------------------- | ---------------- |
+| Early unique resonances per pack | 2.78             |
+| Early on-color per pack          | 1.99             |
+| Late on-color per pack           | 2.98             |
+| Late off-color per pack          | 0.70             |
+| Top-2 share                      | 96.7% (std 3.2%) |
+| Convergence pick (mean)          | 4.8 (median 5.0) |
+| Deck overlap (Jaccard)           | 0.059            |
+| Dual-color decks                 | 99.8%            |
+| Tri-color decks                  | 0.0%             |
 
 **Power chaser** (always picks highest raw power regardless of resonance):
 
-| Metric | Value |
-|--------|-------|
-| Early unique resonances per pack | 2.81 |
-| Early on-color per pack | 1.88 |
-| Late on-color per pack | 2.47 |
-| Late off-color per pack | 1.23 |
-| Top-2 share | 65.4% (std 8.5%) |
-| Convergence pick (mean) | 13.4 (median 6.0) |
-| Deck overlap (Jaccard) | 0.055 |
-| Dual-color decks | 31.2% |
-| Tri-color decks | 68.8% |
+| Metric                           | Value             |
+| -------------------------------- | ----------------- |
+| Early unique resonances per pack | 2.81              |
+| Early on-color per pack          | 1.88              |
+| Late on-color per pack           | 2.47              |
+| Late off-color per pack          | 1.23              |
+| Top-2 share                      | 65.4% (std 8.5%)  |
+| Convergence pick (mean)          | 13.4 (median 6.0) |
+| Deck overlap (Jaccard)           | 0.055             |
+| Dual-color decks                 | 31.2%             |
+| Tri-color decks                  | 68.8%             |
 
 **Rigid player** (always picks on-color, even low-power):
 
-| Metric | Value |
-|--------|-------|
-| Early unique resonances per pack | 2.77 |
-| Early on-color per pack | 1.99 |
-| Late on-color per pack | 3.01 |
-| Late off-color per pack | 0.66 |
-| Top-2 share | 99.1% (std 1.7%) |
-| Convergence pick (mean) | 5.0 |
-| Dual-color decks | 99.2% |
-| Tri-color decks | 0.0% |
+| Metric                           | Value            |
+| -------------------------------- | ---------------- |
+| Early unique resonances per pack | 2.77             |
+| Early on-color per pack          | 1.99             |
+| Late on-color per pack           | 3.01             |
+| Late off-color per pack          | 0.66             |
+| Top-2 share                      | 99.1% (std 1.7%) |
+| Convergence pick (mean)          | 5.0              |
+| Dual-color decks                 | 99.2%            |
+| Tri-color decks                  | 0.0%             |
 
 ### Where the Failures Come From
 
@@ -346,12 +349,12 @@ Results from 1,000 simulated quests per player type.
 ceiling of a 4-card pack with 5 resonances. With dual-resonance cards
 representing about 10% of the pool, reaching 3.0 unique resonances per 4-card
 pack requires more consistent color spread than the 2+2 partition can reliably
-deliver. The hybrid came closer than any previous configuration (the original
-S2 default reached only 2.42), but the last 0.22 may require a design
-intervention beyond parameter tuning.
+deliver. The hybrid came closer than any previous configuration (the original S2
+default reached only 2.42), but the last 0.22 may require a design intervention
+beyond parameter tuning.
 
-**Synergy convergence pick (4.8 vs target of 5-8):** Even with dreamcaller
-bonus reduced to 2, the synergy player picks so aggressively on-color that they
+**Synergy convergence pick (4.8 vs target of 5-8):** Even with dreamcaller bonus
+reduced to 2, the synergy player picks so aggressively on-color that they
 establish top-2 dominance very early. The dc_bonus sweep showed this barely
 changes even at dc_bonus=1 (4.8) vs dc_bonus=4 (4.7). The failure is driven by
 player behavior, not the algorithm.
@@ -364,39 +367,39 @@ acknowledge that highly focused drafters will produce highly focused decks.
 
 ### Comparison to Original S2 Proposal
 
-| Metric | Original S2 (Synergy) | Hybrid (Synergy) | Change |
-|--------|----------------------|------------------|--------|
-| Early unique res per pack | 2.42 | 2.78 | +0.36 |
-| Early on-color per pack | 2.51 | 1.99 | -0.52 (fixed) |
-| Late on-color per pack | 3.07 | 2.98 | -0.09 (minor regression) |
-| Late off-color per pack | 0.19 | 0.70 | +0.51 (3.7x improvement) |
-| Top-2 share | 97.6% | 96.7% | Marginal improvement |
-| Convergence pick | 4.1 | 4.8 | +0.7 (improved) |
-| Overall pass rate | 12/24 (50%) | 18/24 (75%) | +6 checks |
+| Metric                    | Original S2 (Synergy) | Hybrid (Synergy) | Change                   |
+| ------------------------- | --------------------- | ---------------- | ------------------------ |
+| Early unique res per pack | 2.42                  | 2.78             | +0.36                    |
+| Early on-color per pack   | 2.51                  | 1.99             | -0.52 (fixed)            |
+| Late on-color per pack    | 3.07                  | 2.98             | -0.09 (minor regression) |
+| Late off-color per pack   | 0.19                  | 0.70             | +0.51 (3.7x improvement) |
+| Top-2 share               | 97.6%                 | 96.7%            | Marginal improvement     |
+| Convergence pick          | 4.1                   | 4.8              | +0.7 (improved)          |
+| Overall pass rate         | 12/24 (50%)           | 18/24 (75%)      | +6 checks                |
 
----
+______________________________________________________________________
 
 ## Design Goal Scorecard
 
 Scores from the post-simulation analysis, rated 1-10.
 
-| Goal | Score | Justification |
-|------|-------|---------------|
-| **1. Simple** (explainable in one sentence) | 7/10 | No visible slot types, no phase labels, no player-facing complexity. One sentence: "your deck shapes what you see, and every pack has one wild card." Slightly more complex than pure CRESCENDO because the wild card is an invisible structural mechanism, but the player experience is nearly identical. |
-| **2. Not on rails** (real choices per pack) | 7/10 | Early on-color of 1.99 passes the <= 2.0 target. Late off-color of 0.70 means every pack reliably contains off-color options. Wild card structurally guarantees variety in a way that pure weighting cannot. Lane seeds create genuine tension between synergistic and pool-signal picks. |
-| **3. No forced decks** | 8/10 | Lane seeds create pool shapes that vary per quest. Archetype pair frequency range of 8.9%-11.3% is well within the 5%-15% target. Jaccard deck overlap of 0.059 is low. Each quest has a genuinely different optimal resonance path. |
-| **4. Flexible archetypes** | 5/10 | Power chasers build tri-color 68.8% of the time (massive improvement from 2.3% in original S2). But synergy players produce 0% tri-color and 96.7% top-2 share — the algorithm offers off-color but the player ignores it. Score limited by the synergy player model's behavior. |
-| **5. Convergent** | 6/10 | Late on-color of 2.98 easily clears the 2.0 target. But convergence pick of 4.8 falls just outside the 5-8 target, and it barely moved from the 4.1 of the original despite a halved dreamcaller bonus. The metric is more sensitive to player behavior than to algorithm design. |
-| **6. Splashable** | 9/10 | Late off-color of 0.70 comfortably exceeds the 0.5 target. The wild card with floor=5.0 is the structural guarantee — the S2 sweep confirmed that wild_floor=5.0 with exp=0.3 reliably delivers 0.51-0.66 off-color per pack. This is the proposal's signature strength. |
-| **7. Open early** | 4/10 | Early on-color of 1.99 passes the <= 2.0 target (barely). But early unique resonances of 2.78 falls below the 3.0 target. The 2+2 partition in picks 1-5 helped significantly (from 2.42 in original S2), but closing the last gap may require deeper structural changes. |
-| **8. Signal reading** | 6/10 | Lane seeds create visible resonance asymmetries — a player who notices "more Tide cards than usual" in early packs is reading a real signal. But the three convergence cards in each pack still dominate pack composition based on profile, partially drowning the pool signal. |
+| Goal                                        | Score | Justification                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. Simple** (explainable in one sentence) | 7/10  | No visible slot types, no phase labels, no player-facing complexity. One sentence: "your deck shapes what you see, and every pack has one wild card." Slightly more complex than pure CRESCENDO because the wild card is an invisible structural mechanism, but the player experience is nearly identical. |
+| **2. Not on rails** (real choices per pack) | 7/10  | Early on-color of 1.99 passes the \<= 2.0 target. Late off-color of 0.70 means every pack reliably contains off-color options. Wild card structurally guarantees variety in a way that pure weighting cannot. Lane seeds create genuine tension between synergistic and pool-signal picks.                 |
+| **3. No forced decks**                      | 8/10  | Lane seeds create pool shapes that vary per quest. Archetype pair frequency range of 8.9%-11.3% is well within the 5%-15% target. Jaccard deck overlap of 0.059 is low. Each quest has a genuinely different optimal resonance path.                                                                       |
+| **4. Flexible archetypes**                  | 5/10  | Power chasers build tri-color 68.8% of the time (massive improvement from 2.3% in original S2). But synergy players produce 0% tri-color and 96.7% top-2 share — the algorithm offers off-color but the player ignores it. Score limited by the synergy player model's behavior.                           |
+| **5. Convergent**                           | 6/10  | Late on-color of 2.98 easily clears the 2.0 target. But convergence pick of 4.8 falls just outside the 5-8 target, and it barely moved from the 4.1 of the original despite a halved dreamcaller bonus. The metric is more sensitive to player behavior than to algorithm design.                          |
+| **6. Splashable**                           | 9/10  | Late off-color of 0.70 comfortably exceeds the 0.5 target. The wild card with floor=5.0 is the structural guarantee — the S2 sweep confirmed that wild_floor=5.0 with exp=0.3 reliably delivers 0.51-0.66 off-color per pack. This is the proposal's signature strength.                                   |
+| **7. Open early**                           | 4/10  | Early on-color of 1.99 passes the \<= 2.0 target (barely). But early unique resonances of 2.78 falls below the 3.0 target. The 2+2 partition in picks 1-5 helped significantly (from 2.42 in original S2), but closing the last gap may require deeper structural changes.                                 |
+| **8. Signal reading**                       | 6/10  | Lane seeds create visible resonance asymmetries — a player who notices "more Tide cards than usual" in early packs is reading a real signal. But the three convergence cards in each pack still dominate pack composition based on profile, partially drowning the pool signal.                            |
 
 **Total: 52/80**
 
 For reference, the original S2 strategy scored approximately 34/80 using the
 same 8-goal framework across all strategies in Round 3.
 
----
+______________________________________________________________________
 
 ## Strengths
 
@@ -420,9 +423,9 @@ the target. The original S2 produced 2.51 early on-color, a clear failure.
 **Run-to-run variety is real.** The archetype pair frequency range (8.9%-11.3%)
 is evenly distributed, and lane seeds create pool shapes that shift which
 archetype is optimal. Draft Story 2 from the simulation showed lane seeds
-directly causing a player to build Tide-primary despite an Ember+Tide dreamcaller
-— the pool was signaling Tide, and the player who noticed that signal was
-rewarded.
+directly causing a player to build Tide-primary despite an Ember+Tide
+dreamcaller — the pool was signaling Tide, and the player who noticed that
+signal was rewarded.
 
 **Dramatically improved over the original S2 on every metric that failed.** Late
 off-color improved 3.7x (0.19 to 0.70). Early on-color moved from fail to pass.
@@ -432,22 +435,22 @@ Pass rate went from 50% to 75%.
 compared to 17 in original S2 and 15+ in the adaptive strategy, with most
 parameters being low-sensitivity (set and forget).
 
----
+______________________________________________________________________
 
 ## Weaknesses
 
 **Early variety still falls short.** Early unique resonances of 2.78 falls 0.22
 below the 3.0 target. The wild card sweep showed this metric barely moves with
-wild_floor changes (sensitivity 0.02-0.04 across the tested range). This may
-be a ceiling imposed by the 4-card pack size with 5 resonances, not a parameter
+wild_floor changes (sensitivity 0.02-0.04 across the tested range). This may be
+a ceiling imposed by the 4-card pack size with 5 resonances, not a parameter
 tuning problem.
 
 **Synergy convergence pick remains too fast.** The mean of 4.8 falls just
 outside the 5-8 target. Crucially, the dc_bonus sweep showed this metric barely
 moves: dc_bonus=1 produces convergence pick 4.8, dc_bonus=4 produces 4.7. The
-synergy player establishes top-2 dominance so quickly through aggressive on-color
-picking that the algorithm cannot delay it without fundamentally changing the
-weighting structure.
+synergy player establishes top-2 dominance so quickly through aggressive
+on-color picking that the algorithm cannot delay it without fundamentally
+changing the weighting structure.
 
 **Synergy top-2 share is stuck at 96.7%.** The 75-90% target was not achieved by
 any strategy for synergy players. The algorithm offers off-color via the wild
@@ -455,8 +458,9 @@ card, but the synergy player never takes it. Whether this represents a design
 target calibration problem or a real usability gap is an open question.
 
 **Synergy players still build almost exclusively dual-color.** 99.8% dual, 0%
-tri-color for synergy players. The wild card appears but is ignored. The proposal
-supports flexible archetypes through availability, not through incentive.
+tri-color for synergy players. The wild card appears but is ignored. The
+proposal supports flexible archetypes through availability, not through
+incentive.
 
 **The 2+2 to 3+1 transition is a hard boundary.** Pick 5 feels open; pick 6
 feels committed. This is intentional, but it lacks the smoothness of a
@@ -464,14 +468,14 @@ continuous exponent ramp applied to all four cards. A designer who finds the
 boundary jarring could fall back to fixed 3+1 throughout with base_exp lowered
 to 0.3, at the cost of weaker early variety.
 
----
+______________________________________________________________________
 
 ## Draft Story Examples
 
 ### Story 1: Early Committer (Synergy, Ember-high lane seed)
 
-**Dreamcaller:** Ember + Stone
-**Lane seeds:** Ember=1.22, Stone=1.19, Zephyr=1.16, Ruin=0.95, Tide=0.96
+**Dreamcaller:** Ember + Stone **Lane seeds:** Ember=1.22, Stone=1.19,
+Zephyr=1.16, Ruin=0.95, Tide=0.96
 
 This quest had two of the highest lane seeds on the dreamcaller's colors. The
 synergy player found strong Ember cards immediately.
@@ -487,22 +491,22 @@ synergy player found strong Ember cards immediately.
 - **Pick 10:** Two Ruin cards appeared in the pack (one convergence, one wild).
   The wild slot successfully surfaced off-color at pick 10.
 
-**Final deck:** Ember=24, Stone=19, Zephyr=1. Top-2 share 97.7%.
-Convergence pick 4. Classic early committer — the algorithm offered variety
-throughout, the player chose convergence.
+**Final deck:** Ember=24, Stone=19, Zephyr=1. Top-2 share 97.7%. Convergence
+pick 4. Classic early committer — the algorithm offered variety throughout, the
+player chose convergence.
 
 ### Story 2: Lane-Signal Reader (Synergy, Ember-low lane seed)
 
-**Dreamcaller:** Ember + Tide
-**Lane seeds:** Ember=0.62 (lowest), Ruin=1.33, Stone=1.24, Tide=1.19, Zephyr=1.09
+**Dreamcaller:** Ember + Tide **Lane seeds:** Ember=0.62 (lowest), Ruin=1.33,
+Stone=1.24, Tide=1.19, Zephyr=1.09
 
 This run created genuine tension: the dreamcaller pointed toward Ember and Tide,
 but the pool had significantly fewer Ember cards than normal (lane seed 0.62).
 
 - **Picks 1-3:** Neutral picks and one Ember. The 2+2 open phase showed Ruin,
   Zephyr, and Stone cards in wild slots — resonances with high lane seeds.
-- **Pick 7:** Synergy player took an Ember+Zephyr bridge dual at partial fit —
-  a splash pick that expanded the archetype slightly.
+- **Pick 7:** Synergy player took an Ember+Zephyr bridge dual at partial fit — a
+  splash pick that expanded the archetype slightly.
 - **Picks 8-10:** Tide began dominating convergence slots because Tide had both
   a high lane seed (1.19) and a growing profile. By pick 10 the profile was
   Tide=6, Ember=6, Zephyr=1, Ruin=1.
@@ -515,24 +519,24 @@ coming.
 
 ### Story 3: Power Chaser (Ruin+Zephyr dreamcaller, mixed lane seeds)
 
-**Dreamcaller:** Ruin + Zephyr
-**Lane seeds:** Stone=1.26, Ruin=0.94, Zephyr=0.88, Tide=0.88, Ember=0.60
+**Dreamcaller:** Ruin + Zephyr **Lane seeds:** Stone=1.26, Ruin=0.94,
+Zephyr=0.88, Tide=0.88, Ember=0.60
 
-- **Pick 1:** Took a Ruin+Zephyr card (power=10) from a wild slot — happened
-  to be on-color, but power was the reason.
+- **Pick 1:** Took a Ruin+Zephyr card (power=10) from a wild slot — happened to
+  be on-color, but power was the reason.
 - **Picks 2-3:** Took two Ruin+Tide cards (power=10) — already drifting toward
   Tide despite it being off-color.
 - **Pick 4:** Took Stone (power=9) — completely off the dreamcaller archetype.
-- **Picks 6-10:** Mixed Ruin, Tide, Stone, and Zephyr picks driven by power.
-  The wild card frequently surfaced off-color high-power options, and the power
+- **Picks 6-10:** Mixed Ruin, Tide, Stone, and Zephyr picks driven by power. The
+  wild card frequently surfaced off-color high-power options, and the power
   chaser took them whenever power was high enough.
 
-**Final deck:** Tide=15, Ruin=15, Stone=9, Zephyr=8, Ember=2. Top-2 share
-61.2%. A genuine four-color deck. The combination of wild cards, lane seeds,
-and reduced dreamcaller bonus successfully supported a flexible, off-archetype
-build without the player ever feeling pushed away from options they wanted.
+**Final deck:** Tide=15, Ruin=15, Stone=9, Zephyr=8, Ember=2. Top-2 share 61.2%.
+A genuine four-color deck. The combination of wild cards, lane seeds, and
+reduced dreamcaller bonus successfully supported a flexible, off-archetype build
+without the player ever feeling pushed away from options they wanted.
 
----
+______________________________________________________________________
 
 ## Comparison to the Other Hybrid Proposals
 
@@ -548,10 +552,10 @@ supplementary diversity check — a procedural rule that fires when no off-color
 card appears — to guarantee splash. This is less clean than a structural wild
 card: the check is a reactive correction rather than a proactive guarantee.
 
-**Choose Hybrid 1 if:** You want maximum simplicity and minimal code change.
-The exponent ramp is the most elegant mechanism, and adding a diversity check
-is straightforward. Accept that splash comes from a fallback, not from a
-designed slot.
+**Choose Hybrid 1 if:** You want maximum simplicity and minimal code change. The
+exponent ramp is the most elegant mechanism, and adding a diversity check is
+straightforward. Accept that splash comes from a fallback, not from a designed
+slot.
 
 **Choose Hybrid 2 over Hybrid 1 if:** You want off-color to appear organically
 and reliably throughout the draft, not just when the procedural check fires.
@@ -614,17 +618,17 @@ same and relies on structural guarantees rather than behavioral modeling.
 
 ### Summary Table
 
-| Property | Hybrid 2 | Hybrid 1 | Hybrid 3 | Hybrid 4 | Hybrid 5 |
-|----------|----------|----------|----------|----------|----------|
-| Core convergence mechanism | Exponent ramp (0.5-1.4) | Exponent ramp + check | Lane pools + profile | Exponent ramp (0.5-2.0) | Adaptive exponent |
-| Splash mechanism | Structural wild card | Diversity check | Lane depth | Splash slot | Structural wild card |
-| Run-to-run variety | Lane seeds | Pool variance | Lane seeds + depletion | Pool variance | Pool variance |
-| Implementation complexity | Medium | Low | High | Medium | High |
-| Synergy late off-color | 0.70 | Lower | Higher | Lower | Lower |
-| Power chaser tri-color | 68.8% | Lower | Higher | Moderate | Moderate |
-| Open questions | Early variety ceiling | Splash reliability | Convergence ceiling | Late determinism | False signal problem |
+| Property                   | Hybrid 2                | Hybrid 1              | Hybrid 3               | Hybrid 4                | Hybrid 5             |
+| -------------------------- | ----------------------- | --------------------- | ---------------------- | ----------------------- | -------------------- |
+| Core convergence mechanism | Exponent ramp (0.5-1.4) | Exponent ramp + check | Lane pools + profile   | Exponent ramp (0.5-2.0) | Adaptive exponent    |
+| Splash mechanism           | Structural wild card    | Diversity check       | Lane depth             | Splash slot             | Structural wild card |
+| Run-to-run variety         | Lane seeds              | Pool variance         | Lane seeds + depletion | Pool variance           | Pool variance        |
+| Implementation complexity  | Medium                  | Low                   | High                   | Medium                  | High                 |
+| Synergy late off-color     | 0.70                    | Lower                 | Higher                 | Lower                   | Lower                |
+| Power chaser tri-color     | 68.8%                   | Lower                 | Higher                 | Moderate                | Moderate             |
+| Open questions             | Early variety ceiling   | Splash reliability    | Convergence ceiling    | Late determinism        | False signal problem |
 
----
+______________________________________________________________________
 
 *Document based on simulation data from 1,000 quests per player type (synergy,
 power_chaser, rigid) under hybrid v2 parameters. Parameter sweep data from 200

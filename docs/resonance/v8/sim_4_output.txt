@@ -1,0 +1,442 @@
+======================================================================
+GPE-45 GRADUATED PAIR-ESCALATION SIMULATION
+======================================================================
+
+## MAIN RESULTS: Committed Strategy
+------------------------------------------------------------
+--- V7_15pct / Optimistic ---
+  M1  (early variety):      3.29
+  M2  (early S/A):          1.26
+  M3  (late S/A avg):        2.60
+  M4  (off-arch/pack):       1.33
+  M5  (convergence pick):    11.9
+  M6  (deck concentration):  70.0%
+  M7  (run overlap):         11.4%
+  M8  (arch freq max/min):   14.1%/11.6%
+  M9  (S/A stddev):          0.48
+  M10 (consec <1.5):         7.8 avg, 25 worst
+  Pack quality (10/25/50/75/90): 0/0/4/4/4
+  Consec bad avg/max:        7.8/25
+  Per-archetype M3:
+    Flash          : 2.79
+    Blink          : 2.31
+    Storm          : 2.26
+    SelfDiscard    : 2.75
+    SelfMill       : 2.70
+    Sacrifice      : 2.51
+    Warriors       : 2.66
+    Ramp           : 2.87
+
+--- V7_15pct / GraduatedRealistic ---
+  M1  (early variety):      3.18
+  M2  (early S/A):          0.93
+  M3  (late S/A avg):        2.01
+  M4  (off-arch/pack):       1.31
+  M5  (convergence pick):    13.9
+  M6  (deck concentration):  66.3%
+  M7  (run overlap):         11.6%
+  M8  (arch freq max/min):   15.3%/11.1%
+  M9  (S/A stddev):          0.73
+  M10 (consec <1.5):         8.7 avg, 25 worst
+  Pack quality (10/25/50/75/90): 0/0/2/4/4
+  Consec bad avg/max:        8.7/25
+  Per-archetype M3:
+    Flash          : 2.00
+    Blink          : 1.93
+    Storm          : 1.83
+    SelfDiscard    : 2.07
+    SelfMill       : 2.14
+    Sacrifice      : 2.18
+    Warriors       : 2.01
+    Ramp           : 2.00
+
+--- V7_15pct / Pessimistic ---
+  M1  (early variety):      3.14
+  M2  (early S/A):          0.78
+  M3  (late S/A avg):        1.77
+  M4  (off-arch/pack):       1.45
+  M5  (convergence pick):    15.7
+  M6  (deck concentration):  60.4%
+  M7  (run overlap):         10.6%
+  M8  (arch freq max/min):   14.4%/10.9%
+  M9  (S/A stddev):          0.70
+  M10 (consec <1.5):         10.0 avg, 25 worst
+  Pack quality (10/25/50/75/90): 0/0/2/3/4
+  Consec bad avg/max:        10.0/25
+  Per-archetype M3:
+    Flash          : 1.59
+    Blink          : 1.50
+    Storm          : 1.67
+    SelfDiscard    : 2.04
+    SelfMill       : 1.85
+    Sacrifice      : 1.98
+    Warriors       : 1.95
+    Ramp           : 1.59
+
+--- V7_15pct / Hostile ---
+  M1  (early variety):      3.10
+  M2  (early S/A):          0.73
+  M3  (late S/A avg):        1.64
+  M4  (off-arch/pack):       1.45
+  M5  (convergence pick):    16.3
+  M6  (deck concentration):  58.4%
+  M7  (run overlap):         10.5%
+  M8  (arch freq max/min):   14.3%/10.9%
+  M9  (S/A stddev):          0.70
+  M10 (consec <1.5):         10.6 avg, 25 worst
+  Pack quality (10/25/50/75/90): 0/0/1/3/4
+  Consec bad avg/max:        10.6/25
+  Per-archetype M3:
+    Flash          : 1.39
+    Blink          : 1.59
+    Storm          : 1.47
+    SelfDiscard    : 1.54
+    SelfMill       : 1.85
+    Sacrifice      : 1.70
+    Warriors       : 1.85
+    Ramp           : 1.66
+
+--- Enriched_40pct / Optimistic ---
+  M1  (early variety):      2.86
+  M2  (early S/A):          1.72
+  M3  (late S/A avg):        2.73
+  M4  (off-arch/pack):       1.27
+  M5  (convergence pick):    11.9
+  M6  (deck concentration):  68.3%
+  M7  (run overlap):         17.4%
+  M8  (arch freq max/min):   14.5%/11.1%
+  M9  (S/A stddev):          0.09
+  M10 (consec <1.5):         7.9 avg, 25 worst
+  Pack quality (10/25/50/75/90): 0/0/4/4/4
+  Consec bad avg/max:        7.9/25
+  Per-archetype M3:
+    Flash          : 2.87
+    Blink          : 2.67
+    Storm          : 2.83
+    SelfDiscard    : 2.69
+    SelfMill       : 2.73
+    Sacrifice      : 2.62
+    Warriors       : 2.78
+    Ramp           : 2.59
+
+--- Enriched_40pct / GraduatedRealistic ---
+  M1  (early variety):      2.78
+  M2  (early S/A):          1.21
+  M3  (late S/A avg):        2.25
+  M4  (off-arch/pack):       1.23
+  M5  (convergence pick):    12.5
+  M6  (deck concentration):  66.7%
+  M7  (run overlap):         17.4%
+  M8  (arch freq max/min):   13.9%/10.9%
+  M9  (S/A stddev):          0.51
+  M10 (consec <1.5):         8.2 avg, 25 worst
+  Pack quality (10/25/50/75/90): 0/0/3/4/4
+  Consec bad avg/max:        8.2/25
+  Per-archetype M3:
+    Flash          : 1.92
+    Blink          : 2.25
+    Storm          : 2.45
+    SelfDiscard    : 2.25
+    SelfMill       : 2.34
+    Sacrifice      : 2.41
+    Warriors       : 2.46
+    Ramp           : 1.94
+
+--- Enriched_40pct / Pessimistic ---
+  M1  (early variety):      2.78
+  M2  (early S/A):          1.08
+  M3  (late S/A avg):        2.21
+  M4  (off-arch/pack):       1.19
+  M5  (convergence pick):    12.7
+  M6  (deck concentration):  66.6%
+  M7  (run overlap):         17.8%
+  M8  (arch freq max/min):   14.3%/11.0%
+  M9  (S/A stddev):          0.56
+  M10 (consec <1.5):         8.0 avg, 25 worst
+  Pack quality (10/25/50/75/90): 0/0/3/4/4
+  Consec bad avg/max:        8.0/25
+  Per-archetype M3:
+    Flash          : 2.22
+    Blink          : 2.33
+    Storm          : 2.31
+    SelfDiscard    : 1.74
+    SelfMill       : 2.24
+    Sacrifice      : 2.14
+    Warriors       : 2.44
+    Ramp           : 2.22
+
+--- Enriched_40pct / Hostile ---
+  M1  (early variety):      2.72
+  M2  (early S/A):          1.01
+  M3  (late S/A avg):        2.05
+  M4  (off-arch/pack):       1.28
+  M5  (convergence pick):    13.5
+  M6  (deck concentration):  63.7%
+  M7  (run overlap):         18.0%
+  M8  (arch freq max/min):   14.1%/11.3%
+  M9  (S/A stddev):          0.56
+  M10 (consec <1.5):         8.9 avg, 25 worst
+  Pack quality (10/25/50/75/90): 0/0/3/4/4
+  Consec bad avg/max:        8.9/25
+  Per-archetype M3:
+    Flash          : 1.88
+    Blink          : 2.16
+    Storm          : 2.00
+    SelfDiscard    : 2.10
+    SelfMill       : 2.03
+    Sacrifice      : 2.16
+    Warriors       : 2.12
+    Ramp           : 1.97
+
+
+## STRATEGY COMPARISON (Enriched 40%, Graduated Realistic)
+------------------------------------------------------------
+--- Strategy: committed ---
+  M1  (early variety):      2.77
+  M2  (early S/A):          1.21
+  M3  (late S/A avg):        2.24
+  M4  (off-arch/pack):       1.26
+  M5  (convergence pick):    12.5
+  M6  (deck concentration):  66.2%
+  M7  (run overlap):         17.4%
+  M8  (arch freq max/min):   14.2%/11.0%
+  M9  (S/A stddev):          0.50
+  M10 (consec <1.5):         8.3 avg, 25 worst
+  Pack quality (10/25/50/75/90): 0/0/3/4/4
+  Consec bad avg/max:        8.3/25
+  Per-archetype M3:
+    Flash          : 2.39
+    Blink          : 1.81
+    Storm          : 2.23
+    SelfDiscard    : 2.17
+    SelfMill       : 2.31
+    Sacrifice      : 2.59
+    Warriors       : 2.29
+    Ramp           : 2.09
+
+--- Strategy: power ---
+  M1  (early variety):      2.78
+  M2  (early S/A):          0.61
+  M3  (late S/A avg):        0.60
+  M4  (off-arch/pack):       3.10
+  M5  (convergence pick):    24.2
+  M6  (deck concentration):  14.9%
+  M7  (run overlap):         7.1%
+  M8  (arch freq max/min):   15.0%/10.8%
+  M9  (S/A stddev):          0.19
+  M10 (consec <1.5):         19.7 avg, 25 worst
+  Pack quality (10/25/50/75/90): 0/0/0/0/3
+  Consec bad avg/max:        19.7/25
+  Per-archetype M3:
+    Flash          : 0.63
+    Blink          : 0.52
+    Storm          : 0.28
+    SelfDiscard    : 0.55
+    SelfMill       : 0.61
+    Sacrifice      : 1.00
+    Warriors       : 0.54
+    Ramp           : 0.72
+
+--- Strategy: signal ---
+  M1  (early variety):      2.47
+  M2  (early S/A):          0.63
+  M3  (late S/A avg):        0.67
+  M4  (off-arch/pack):       3.01
+  M5  (convergence pick):    23.5
+  M6  (deck concentration):  16.6%
+  M7  (run overlap):         7.8%
+  M8  (arch freq max/min):   13.2%/11.1%
+  M9  (S/A stddev):          0.19
+  M10 (consec <1.5):         19.2 avg, 25 worst
+  Pack quality (10/25/50/75/90): 0/0/0/0/3
+  Consec bad avg/max:        19.2/25
+  Per-archetype M3:
+    Flash          : 0.43
+    Blink          : 0.75
+    Storm          : 0.57
+    SelfDiscard    : 0.62
+    SelfMill       : 0.77
+    Sacrifice      : 0.83
+    Warriors       : 0.93
+    Ramp           : 0.47
+
+
+## PARAMETER SENSITIVITY
+------------------------------------------------------------
+
+  === Sweep: GraduatedRealistic ===
+  Conservative   : M3=2.07, M5=13.6, M6=62.4%, M9=0.48, M10=9.3/25, worst=1.75
+  Champion       : M3=2.31, M5=11.9, M6=68.3%, M9=0.52, M10=7.8/25, worst=1.93
+  Aggressive     : M3=2.24, M5=12.8, M6=65.2%, M9=0.48, M10=8.5/25, worst=1.53
+
+  === Sweep: Pessimistic ===
+  Conservative   : M3=2.13, M5=13.1, M6=64.6%, M9=0.55, M10=8.5/25, worst=1.76
+  Champion       : M3=2.17, M5=12.8, M6=65.4%, M9=0.54, M10=8.3/25, worst=1.82
+  Aggressive     : M3=2.10, M5=13.2, M6=64.1%, M9=0.53, M10=8.8/25, worst=1.80
+
+
+## R1 FALLBACK ABLATION (Enriched 40%, Graduated Realistic)
+------------------------------------------------------------
+--- R1 fallback OFF ---
+  M1  (early variety):      3.34
+  M2  (early S/A):          0.86
+  M3  (late S/A avg):        1.52
+  M4  (off-arch/pack):       1.76
+  M5  (convergence pick):    15.2
+  M6  (deck concentration):  66.6%
+  M7  (run overlap):         14.5%
+  M8  (arch freq max/min):   13.8%/11.2%
+  M9  (S/A stddev):          0.75
+  M10 (consec <1.5):         9.3 avg, 25 worst
+  Pack quality (10/25/50/75/90): 0/0/1/3/3
+  Consec bad avg/max:        9.3/25
+  Per-archetype M3:
+    Flash          : 1.41
+    Blink          : 1.75
+    Storm          : 1.52
+    SelfDiscard    : 1.52
+    SelfMill       : 1.36
+    Sacrifice      : 1.63
+    Warriors       : 1.49
+    Ramp           : 1.42
+
+--- R1 fallback ON ---
+  M1  (early variety):      2.82
+  M2  (early S/A):          1.21
+  M3  (late S/A avg):        2.27
+  M4  (off-arch/pack):       1.22
+  M5  (convergence pick):    12.3
+  M6  (deck concentration):  67.0%
+  M7  (run overlap):         19.3%
+  M8  (arch freq max/min):   15.8%/10.4%
+  M9  (S/A stddev):          0.51
+  M10 (consec <1.5):         8.1 avg, 25 worst
+  Pack quality (10/25/50/75/90): 0/0/3/4/4
+  Consec bad avg/max:        8.1/25
+  Per-archetype M3:
+    Flash          : 2.28
+    Blink          : 2.32
+    Storm          : 2.20
+    SelfDiscard    : 2.04
+    SelfMill       : 2.37
+    Sacrifice      : 2.58
+    Warriors       : 1.89
+    Ramp           : 2.42
+
+
+## DRAFT TRACES
+------------------------------------------------------------
+
+=== Trace 1: Early Committer (Storm) ===
+  Pick  1: S/A=1 [Ember,Zephyr] (Blink A) pair=('Ember', 'Zephyr') cnt=1
+  Pick  2: S/A=0 [gen] (Generic B) pair=('Ember', 'Zephyr') cnt=1
+  Pick  3: S/A=4 [Ember] (Storm S) pair=('Ember', 'Zephyr') cnt=1
+  Pick  4: S/A=2 [Ember] (Storm S) pair=('Ember', 'Zephyr') cnt=1
+  Pick  5: S/A=1 [Ember,Stone] (Storm S) pair=('Ember', 'Zephyr') cnt=1
+  Pick  6: S/A=2 [Ember] (Storm S) pair=('Ember', 'Zephyr') cnt=1
+  Pick  7: S/A=2 [Ember] (Storm S) pair=('Ember', 'Zephyr') cnt=1
+  Pick  8: S/A=3 [Ember] (Storm S) pair=('Ember', 'Zephyr') cnt=1
+  Pick  9: S/A=1 [Ember] (Storm S) pair=('Ember', 'Zephyr') cnt=1
+  Pick 10: S/A=2 [Ember] (Storm S) pair=('Ember', 'Zephyr') cnt=1
+  Pick 11: S/A=1 [Ember,Zephyr] (Blink A) pair=('Ember', 'Zephyr') cnt=2
+  Pick 12: S/A=2 [Ember,Stone] (Storm S) pair=('Ember', 'Zephyr') cnt=2
+  Pick 13: S/A=2 [Ember] (Blink A) pair=('Ember', 'Zephyr') cnt=2
+  Pick 14: S/A=3 [Ember] (Storm S) pair=('Ember', 'Zephyr') cnt=2
+  Pick 15: S/A=1 [Ember,Zephyr] (Blink B) pair=('Ember', 'Zephyr') cnt=3
+  Pick 16: S/A=3 [Ember,Zephyr] (Blink A) pair=('Ember', 'Zephyr') cnt=4
+  Pick 17: S/A=3 [Ember,Stone] (Storm S) pair=('Ember', 'Zephyr') cnt=4
+  Pick 18: S/A=3 [Ember,Zephyr] (Blink A) pair=('Ember', 'Zephyr') cnt=5
+  Pick 19: S/A=0 [Ember,Zephyr] (Blink B) pair=('Ember', 'Zephyr') cnt=6
+  Pick 20: S/A=0 [Ember,Zephyr] (Blink B) pair=('Ember', 'Zephyr') cnt=7
+  Pick 21: S/A=2 [Ember] (Blink A) pair=('Ember', 'Zephyr') cnt=7
+  Pick 22: S/A=2 [Ember,Stone] (Storm S) pair=('Ember', 'Zephyr') cnt=7
+  Pick 23: S/A=1 [Ember] (Storm S) pair=('Ember', 'Zephyr') cnt=7
+  Pick 24: S/A=2 [Ember] (Storm S) pair=('Ember', 'Zephyr') cnt=7
+  Pick 25: S/A=0 [Ember,Zephyr] (Blink B) pair=('Ember', 'Zephyr') cnt=8
+  Pick 26: S/A=4 [Ember] (Storm S) pair=('Ember', 'Zephyr') cnt=8
+  Pick 27: S/A=1 [Ember] (Storm S) pair=('Ember', 'Zephyr') cnt=8
+  Pick 28: S/A=3 [Ember] (Storm S) pair=('Ember', 'Zephyr') cnt=8
+  Pick 29: S/A=2 [Ember] (Storm S) pair=('Ember', 'Zephyr') cnt=8
+  Pick 30: S/A=2 [Ember,Stone] (Storm S) pair=('Ember', 'Zephyr') cnt=8
+  Final M3: 1.88
+
+=== Trace 2: Signal Reader (Flash) ===
+  Pick  1: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=1
+  Pick  2: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=2
+  Pick  3: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=3
+  Pick  4: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=4
+  Pick  5: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=5
+  Pick  6: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=6
+  Pick  7: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=7
+  Pick  8: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=8
+  Pick  9: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=9
+  Pick 10: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=10
+  Pick 11: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=11
+  Pick 12: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=12
+  Pick 13: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=13
+  Pick 14: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=14
+  Pick 15: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=15
+  Pick 16: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=16
+  Pick 17: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=17
+  Pick 18: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=18
+  Pick 19: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=19
+  Pick 20: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=20
+  Pick 21: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=21
+  Pick 22: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=22
+  Pick 23: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=23
+  Pick 24: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=24
+  Pick 25: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=25
+  Pick 26: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=26
+  Pick 27: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=27
+  Pick 28: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=28
+  Pick 29: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=29
+  Pick 30: S/A=0 [Tide,Stone] (Sacrifice F) pair=('Tide', 'Stone') cnt=30
+  Final M3: 0.00
+
+=== Trace 3: Committed (diff seed) (Sacrifice) ===
+  Pick  1: S/A=1 [Tide] (Sacrifice S) pair=('?', '?') cnt=0
+  Pick  2: S/A=1 [Tide] (Sacrifice S) pair=('?', '?') cnt=0
+  Pick  3: S/A=1 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=1
+  Pick  4: S/A=2 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=2
+  Pick  5: S/A=3 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=3
+  Pick  6: S/A=4 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=4
+  Pick  7: S/A=2 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=5
+  Pick  8: S/A=4 [Tide] (Sacrifice S) pair=('Tide', 'Stone') cnt=5
+  Pick  9: S/A=3 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=6
+  Pick 10: S/A=4 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=7
+  Pick 11: S/A=3 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=8
+  Pick 12: S/A=3 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=9
+  Pick 13: S/A=3 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=10
+  Pick 14: S/A=3 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=11
+  Pick 15: S/A=3 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=12
+  Pick 16: S/A=4 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=13
+  Pick 17: S/A=4 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=14
+  Pick 18: S/A=4 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=15
+  Pick 19: S/A=4 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=16
+  Pick 20: S/A=4 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=17
+  Pick 21: S/A=4 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=18
+  Pick 22: S/A=4 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=19
+  Pick 23: S/A=3 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=20
+  Pick 24: S/A=4 [Tide] (Sacrifice S) pair=('Tide', 'Stone') cnt=20
+  Pick 25: S/A=4 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=21
+  Pick 26: S/A=4 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=22
+  Pick 27: S/A=4 [Tide] (Sacrifice S) pair=('Tide', 'Stone') cnt=22
+  Pick 28: S/A=3 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=23
+  Pick 29: S/A=3 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=24
+  Pick 30: S/A=4 [Tide,Stone] (Sacrifice S) pair=('Tide', 'Stone') cnt=25
+  Final M3: 3.56
+
+
+## FITNESS DEGRADATION CURVE (Enriched 40%)
+------------------------------------------------------------
+  Fitness                       M3    M5      M6    M9   M10  WorstM3
+  Optimistic                  2.73  11.9  68.3%  0.09   7.9     2.59
+  GraduatedRealistic          2.25  12.5  66.7%  0.51   8.2     1.92
+  Pessimistic                 2.21  12.7  66.6%  0.56   8.0     1.74
+  Hostile                     2.05  13.5  63.7%  0.56   8.9     1.88
+
+  Fitness                       M3    M5      M6    M9   M10  WorstM3
+  Optimistic                  2.60  11.9  70.0%  0.48   7.8     2.26
+  GraduatedRealistic          2.01  13.9  66.3%  0.73   8.7     1.83
+  Pessimistic                 1.77  15.7  60.4%  0.70  10.0     1.50
+  Hostile                     1.64  16.3  58.4%  0.70  10.6     1.39

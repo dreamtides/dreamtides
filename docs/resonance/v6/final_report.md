@@ -18,36 +18,36 @@ experience.
 All results from `sim_final.py`: 1000 drafts, 30 picks, 3 strategies (committed,
 power-chaser, signal-reader), identical 360-card pool (54 dual-type at 15%).
 
-| Algorithm | M1 | M2 | M3 | M4 | M5 | M6 | M7 | M8 | M9 | Pass |
-|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| 1. Lane Locking (3/8) | 5.1 P | 1.69 P | 2.22 P | 0.59 P | 3.3 **F** | 96.1% **F** | 37.1% P | 6-18% P | 0.50 **F** | 6/9 |
-| 2. Threshold Auto-Spend (C4/B2) | 5.4 P | 1.11 P | 1.50 **F** | 1.37 P | 10.4 **F** | 82.6% P | 25.6% P | 7-23% **F** | 0.97 P | 6/9 |
-| 3. Soft Locks (3/6/9, 75%) | 5.0 P | 1.61 P | 1.75 **F** | 0.85 P | 5.5 P | 90.8% **F** | 29.8% P | 6-20% **F** | 0.81 P | 6/9 |
-| 4. Pool Sculpting (18/pick) | 5.2 P | 1.14 P | 1.99 **F** | 0.45 **F** | 10.4 **F** | 86.0% P | 9.3% P | 9-19% P | 1.09 P | 6/9 |
-| 5a. Double Enhance (T=2/B=2) | 5.1 P | 1.15 P | 1.32 **F** | 1.35 P | 13.4 **F** | 63.5% P | 18.2% P | 8-17% P | 1.57 P | 7/9 |
-| **5b. Double Enhance (T=1/B=2)** | 5.1 P | 1.13 P | **2.13 P** | 1.35 P | **7.4 P** | 63.4% P | 24.0% P | 8-16% P | **1.71 P** | **9/9** |
-| 6a. Ratcheting Slots (3/6/10) | 5.0 P | 1.84 P | 2.08 P | 0.65 P | 2.8 **F** | 94.9% **F** | 34.5% P | 7-19% P | 0.60 **F** | 6/9 |
-| 6b. Ratcheting Slots (2/4/7) | 4.9 P | 1.93 P | 2.11 P | 0.68 P | 2.4 **F** | 95.8% **F** | 35.8% P | 6-19% P | 0.58 **F** | 6/9 |
-| **7. Surge Packs (T=4/S=3)** | 4.5 P | 1.90 P | **2.05 P** | 0.69 P | **5.9 P** | 76.5% P | 26.6% P | 7-18% P | **1.42 P** | **9/9** |
-| 8. Auto-Spend PW (C3/B1) | 5.5 P | 1.09 P | 1.76 **F** | 1.37 P | 8.2 **F** | 91.3% **F** | 30.8% P | 7-18% P | 0.91 P | 6/9 |
+| Algorithm                        |  M1   |   M2   |     M3     |     M4     |     M5     |     M6      |   M7    |     M8      |     M9     |  Pass   |
+| -------------------------------- | :---: | :----: | :--------: | :--------: | :--------: | :---------: | :-----: | :---------: | :--------: | :-----: |
+| 1. Lane Locking (3/8)            | 5.1 P | 1.69 P |   2.22 P   |   0.59 P   | 3.3 **F**  | 96.1% **F** | 37.1% P |   6-18% P   | 0.50 **F** |   6/9   |
+| 2. Threshold Auto-Spend (C4/B2)  | 5.4 P | 1.11 P | 1.50 **F** |   1.37 P   | 10.4 **F** |   82.6% P   | 25.6% P | 7-23% **F** |   0.97 P   |   6/9   |
+| 3. Soft Locks (3/6/9, 75%)       | 5.0 P | 1.61 P | 1.75 **F** |   0.85 P   |   5.5 P    | 90.8% **F** | 29.8% P | 6-20% **F** |   0.81 P   |   6/9   |
+| 4. Pool Sculpting (18/pick)      | 5.2 P | 1.14 P | 1.99 **F** | 0.45 **F** | 10.4 **F** |   86.0% P   | 9.3% P  |   9-19% P   |   1.09 P   |   6/9   |
+| 5a. Double Enhance (T=2/B=2)     | 5.1 P | 1.15 P | 1.32 **F** |   1.35 P   | 13.4 **F** |   63.5% P   | 18.2% P |   8-17% P   |   1.57 P   |   7/9   |
+| **5b. Double Enhance (T=1/B=2)** | 5.1 P | 1.13 P | **2.13 P** |   1.35 P   | **7.4 P**  |   63.4% P   | 24.0% P |   8-16% P   | **1.71 P** | **9/9** |
+| 6a. Ratcheting Slots (3/6/10)    | 5.0 P | 1.84 P |   2.08 P   |   0.65 P   | 2.8 **F**  | 94.9% **F** | 34.5% P |   7-19% P   | 0.60 **F** |   6/9   |
+| 6b. Ratcheting Slots (2/4/7)     | 4.9 P | 1.93 P |   2.11 P   |   0.68 P   | 2.4 **F**  | 95.8% **F** | 35.8% P |   6-19% P   | 0.58 **F** |   6/9   |
+| **7. Surge Packs (T=4/S=3)**     | 4.5 P | 1.90 P | **2.05 P** |   0.69 P   | **5.9 P**  |   76.5% P   | 26.6% P |   7-18% P   | **1.42 P** | **9/9** |
+| 8. Auto-Spend PW (C3/B1)         | 5.5 P | 1.09 P | 1.76 **F** |   1.37 P   | 8.2 **F**  | 91.3% **F** | 30.8% P |   7-18% P   |   0.91 P   |   6/9   |
 
-**Metric targets:** M1 >= 3 unique archs, M2 <= 2 S/A early, M3 >= 2.0 S/A late,
-M4 >= 0.5 off-arch, M5 convergence pick 5-8, M6 deck concentration 60-90%, M7
-card overlap < 40%, M8 arch frequency 5-20%, M9 S/A stddev >= 0.8.
+**Metric targets:** M1 >= 3 unique archs, M2 \<= 2 S/A early, M3 >= 2.0 S/A
+late, M4 >= 0.5 off-arch, M5 convergence pick 5-8, M6 deck concentration 60-90%,
+M7 card overlap < 40%, M8 arch frequency 5-20%, M9 S/A stddev >= 0.8.
 
 ## Ranking
 
-| Rank | Algorithm | Pass | S/A Late | Conv Pick | StdDev | Rationale |
-|:-:|---|:-:|:-:|:-:|:-:|---|
-| 1 | Surge Packs (T=4/S=3) | 9/9 | 2.05 | 5.9 | 1.42 | Best all-around; rhythmic surge/normal cycle |
-| 2 | Double Enhancement (T=1/B=2) | 9/9 | 2.13 | 7.4 | 1.71 | Highest S/A and variance; conditional trigger fires 63% |
-| 3 | Ratcheting Slots (3/6/10) | 6/9 | 2.08 | 2.8 | 0.60 | Strong convergence but too fast, too deterministic |
-| 4 | Lane Locking (3/8) | 6/9 | 2.22 | 3.3 | 0.50 | Highest raw S/A; baseline reference |
-| 5 | Soft Locks (3/6/9, 75%) | 6/9 | 1.75 | 5.5 | 0.81 | Good convergence timing; S/A insufficient |
-| 6 | Pool Sculpting (18/pick) | 6/9 | 1.99 | 10.4 | 1.09 | Confirms structural ceiling at ~2.0 |
-| 7 | Auto-Spend PW (C3/B1) | 6/9 | 1.76 | 8.2 | 0.91 | Decision-free PW loses 1.6 S/A vs. V4's 3.35 |
-| 8 | Threshold Auto-Spend (C4/B2) | 6/9 | 1.50 | 10.4 | 0.97 | Token system too diluted under unified pool |
-| 9 | Double Enhancement (T=2/B=2) | 7/9 | 1.32 | 13.4 | 1.57 | Trigger fires too rarely at threshold 2 |
+| Rank | Algorithm                    | Pass | S/A Late | Conv Pick | StdDev | Rationale                                               |
+| :--: | ---------------------------- | :--: | :------: | :-------: | :----: | ------------------------------------------------------- |
+|  1   | Surge Packs (T=4/S=3)        | 9/9  |   2.05   |    5.9    |  1.42  | Best all-around; rhythmic surge/normal cycle            |
+|  2   | Double Enhancement (T=1/B=2) | 9/9  |   2.13   |    7.4    |  1.71  | Highest S/A and variance; conditional trigger fires 63% |
+|  3   | Ratcheting Slots (3/6/10)    | 6/9  |   2.08   |    2.8    |  0.60  | Strong convergence but too fast, too deterministic      |
+|  4   | Lane Locking (3/8)           | 6/9  |   2.22   |    3.3    |  0.50  | Highest raw S/A; baseline reference                     |
+|  5   | Soft Locks (3/6/9, 75%)      | 6/9  |   1.75   |    5.5    |  0.81  | Good convergence timing; S/A insufficient               |
+|  6   | Pool Sculpting (18/pick)     | 6/9  |   1.99   |   10.4    |  1.09  | Confirms structural ceiling at ~2.0                     |
+|  7   | Auto-Spend PW (C3/B1)        | 6/9  |   1.76   |    8.2    |  0.91  | Decision-free PW loses 1.6 S/A vs. V4's 3.35            |
+|  8   | Threshold Auto-Spend (C4/B2) | 6/9  |   1.50   |   10.4    |  0.97  | Token system too diluted under unified pool             |
+|  9   | Double Enhancement (T=2/B=2) | 7/9  |   1.32   |   13.4    |  1.57  | Trigger fires too rarely at threshold 2                 |
 
 Surge Packs ranks above Double Enhancement despite lower raw S/A because: (a)
 Surge has better convergence timing (5.9 vs. 7.4), (b) Surge's mechanism is
@@ -57,16 +57,16 @@ DE's 63.4%.
 
 ## Per-Archetype Convergence (Surge Packs)
 
-| Archetype | Avg Conv Pick | N Converged (of ~660) |
-|---|:-:|:-:|
-| Flash | 6.6 | 117 |
-| Blink | 6.1 | 87 |
-| Storm | 5.3 | 97 |
-| Self-Discard | 5.2 | 73 |
-| Self-Mill | 6.6 | 50 |
-| Sacrifice | 5.6 | 99 |
-| Warriors | 6.1 | 82 |
-| Ramp | 5.6 | 56 |
+| Archetype    | Avg Conv Pick | N Converged (of ~660) |
+| ------------ | :-----------: | :-------------------: |
+| Flash        |      6.6      |          117          |
+| Blink        |      6.1      |          87           |
+| Storm        |      5.3      |          97           |
+| Self-Discard |      5.2      |          73           |
+| Self-Mill    |      6.6      |          50           |
+| Sacrifice    |      5.6      |          99           |
+| Warriors     |      6.1      |          82           |
+| Ramp         |      5.6      |          56           |
 
 All archetypes converge within the 5-8 pick target window. The range (5.2 to
 6.6) shows uniform convergence across the archetype circle -- no archetype is
@@ -99,6 +99,7 @@ any counter reaches 4, spend 4 and fill 3 of the next pack's 4 slots with random
 cards of that resonance, fourth slot random."
 
 Implementation check:
+
 - Token earning from drafted card symbols: concrete, unambiguous
 - Primary symbol = +2, others = +1: standard weighted counting
 - Threshold 4, auto-spend: one comparison, one subtraction
@@ -126,6 +127,7 @@ multiple counters tie at or above 4, the highest fires (ties broken randomly).
 **Parameters:** Threshold = 4, Surge Slots = 3.
 
 **Key properties:**
+
 - Non-permanent state: surge tracks the current highest counter, not a locked
   resonance. If the player pivots, surges follow.
 - Rhythmic pacing: committed players surge approximately every 1.3 picks,
@@ -138,21 +140,22 @@ multiple counters tie at or above 4, the highest fires (ties broken randomly).
 
 ### Simulation Results (Unified)
 
-| Metric | Value | Target | Result |
-|---|:-:|:-:|:-:|
-| M1 Unique archs early | 4.5 | >= 3 | PASS |
-| M2 S/A early | 1.90 | <= 2 | PASS |
-| M3 S/A committed late | 2.05 | >= 2.0 | PASS |
-| M4 Off-arch late | 0.69 | >= 0.5 | PASS |
-| M5 Convergence pick | 5.9 | 5-8 | PASS |
-| M6 Deck concentration | 76.5% | 60-90% | PASS |
-| M7 Card overlap | 26.6% | < 40% | PASS |
-| M8 Arch frequency | 7.5-17.5% | 5-20% | PASS |
-| M9 S/A stddev | 1.42 | >= 0.8 | PASS |
+| Metric                |   Value   | Target | Result |
+| --------------------- | :-------: | :----: | :----: |
+| M1 Unique archs early |    4.5    |  >= 3  |  PASS  |
+| M2 S/A early          |   1.90    | \<= 2  |  PASS  |
+| M3 S/A committed late |   2.05    | >= 2.0 |  PASS  |
+| M4 Off-arch late      |   0.69    | >= 0.5 |  PASS  |
+| M5 Convergence pick   |    5.9    |  5-8   |  PASS  |
+| M6 Deck concentration |   76.5%   | 60-90% |  PASS  |
+| M7 Card overlap       |   26.6%   | < 40%  |  PASS  |
+| M8 Arch frequency     | 7.5-17.5% | 5-20%  |  PASS  |
+| M9 S/A stddev         |   1.42    | >= 0.8 |  PASS  |
 
 ## V6 vs. V3 vs. V4: Deep Comparison
 
 ### V3 Recommendation: Lane Locking + Pool Asymmetry
+
 V3 recommended Lane Locking with thresholds 3/8 and a pool asymmetry supplement.
 Key results: 2.72 S/A at archetype level (measured differently -- V3 counted
 archetype-specific fitness, not resonance-level), convergence pick 6.1, deck
@@ -161,6 +164,7 @@ resonance slots deliver high S/A precision because adjacent archetypes sharing a
 primary resonance are mutually S/A.
 
 ### V4 Recommendation: Pack Widening v3 (cost 3, bonus 1)
+
 V4 recommended Pack Widening with player spending decisions. Pack Widening v2
 achieved 3.35 S/A but required a "spend or save" decision each turn. V4
 established that only ADD or PLACE mechanisms cross 2.0; probabilistic
@@ -168,6 +172,7 @@ approaches cap at approximately 1.7. V4's Pack Widening v3 (auto-spend variant)
 projected 2.3-2.5 S/A but was not tested under V6's unified constraints.
 
 ### V6 Contribution
+
 V6's core contribution is answering the question: "What is the best
 zero-decision draft algorithm?" The investigation confirmed V4's structural
 finding about the probabilistic ceiling, proved that non-permanent mechanisms
@@ -175,15 +180,15 @@ finding about the probabilistic ceiling, proved that non-permanent mechanisms
 that the alternating surge/normal rhythm provides superior variance to any
 steady-state approach.
 
-| Dimension | V3 (Lane Locking) | V4 (Pack Widening) | V6 (Surge Packs) |
-|---|:-:|:-:|:-:|
-| S/A Late | 2.22 | 3.35 (with decisions) | 2.05 |
-| Convergence Pick | 3.3 | ~6-7 | 5.9 |
-| Deck Concentration | 96% | ~80-88% | 76.5% |
-| S/A StdDev | 0.50 | ~0.94 | 1.42 |
-| Player Decisions | 0 | 1 per turn (spend/save) | 0 |
-| Pivoting | Impossible (permanent locks) | Possible (via spending) | Natural (tracks current top) |
-| Metrics Passed | 6/9 | ~7/9 (estimated) | 9/9 |
+| Dimension          |      V3 (Lane Locking)       |   V4 (Pack Widening)    |       V6 (Surge Packs)       |
+| ------------------ | :--------------------------: | :---------------------: | :--------------------------: |
+| S/A Late           |             2.22             |  3.35 (with decisions)  |             2.05             |
+| Convergence Pick   |             3.3              |          ~6-7           |             5.9              |
+| Deck Concentration |             96%              |         ~80-88%         |            76.5%             |
+| S/A StdDev         |             0.50             |          ~0.94          |             1.42             |
+| Player Decisions   |              0               | 1 per turn (spend/save) |              0               |
+| Pivoting           | Impossible (permanent locks) | Possible (via spending) | Natural (tracks current top) |
+| Metrics Passed     |             6/9              |    ~7/9 (estimated)     |             9/9              |
 
 V6's Surge Packs sacrifices approximately 0.17 S/A compared to Lane Locking and
 approximately 1.30 compared to Pack Widening, but passes every metric and

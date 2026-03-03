@@ -8,6 +8,7 @@ was championed or rejected.
 ## Baselines (from V3/V4)
 
 ### Lane Locking (Agent 1 baseline)
+
 **One-sentence:** "Your pack has 4 slots; when your weighted symbol count in a
 resonance first reaches 3, one open slot locks to that resonance and always
 shows a card with that primary resonance; a second slot locks at 8."
@@ -23,6 +24,7 @@ resonance slots deliver approximately 75-100% S/A because adjacent archetypes
 sharing a primary resonance are mutually S/A.
 
 ### Auto-Spend Pack Widening (Agent 1 baseline)
+
 **One-sentence:** "Each symbol you draft adds tokens (+2 primary, +1 each
 secondary/tertiary); when any resonance reaches 3 tokens, 3 are auto-spent and 1
 bonus card of that primary resonance is added to the pack."
@@ -44,6 +46,7 @@ comparison.
 ## Agent 2: Auto-Widening Domain
 
 ### Proposal 1: Threshold Auto-Spend Highest (CHAMPION)
+
 **One-sentence:** "Each drafted symbol earns matching tokens (+2 primary, +1
 others); when any counter reaches 4, auto-spend 4 tokens from the highest
 counter and add 2 bonus resonance-matched cards to the pack."
@@ -59,6 +62,7 @@ under standardized conditions. The token dilution problem: earning tokens across
 power-chaser and signal-reader strategies.
 
 ### Proposal 2: Round-Robin Auto-Spend
+
 **One-sentence:** "Spend tokens on each resonance in rotating order, adding 1
 bonus card of each resonance in sequence."
 
@@ -66,12 +70,14 @@ bonus card of each resonance in sequence."
 convergence. No simulation.
 
 ### Proposal 3: Overflow Auto-Spend
+
 **One-sentence:** "When any resonance exceeds a threshold, overflow tokens
 convert to bonus cards of the second-highest resonance."
 
 **Status:** Rejected in Round 1. Complexity without convergence benefit.
 
 ### Proposal 4: Momentum Auto-Spend
+
 **One-sentence:** "Consecutive same-resonance picks earn escalating bonus cards
 (1 for 2 in a row, 2 for 3 in a row)."
 
@@ -80,6 +86,7 @@ dismissed idea. The streak mechanic directly addresses the "barely crossing 2.0"
 problem. Not simulated as a standalone.
 
 ### Proposal 5: Drip Auto-Spend
+
 **One-sentence:** "Fractional tokens (0.5 per symbol) accumulate slowly;
 auto-spend at 2 for 1 weak bonus card."
 
@@ -88,6 +95,7 @@ auto-spend at 2 for 1 weak bonus card."
 ## Agent 3: Soft Slot Targeting Domain
 
 ### Proposal 1: Sigmoid Saturation
+
 **One-sentence:** "Each slot's probability of showing a resonance-matched card
 follows a sigmoid curve based on your weighted symbol count, approaching 90%
 asymptotically."
@@ -96,6 +104,7 @@ asymptotically."
 Estimated S/A approximately 1.6-1.8.
 
 ### Proposal 2: Dual-Resonance Cascade
+
 **One-sentence:** "Track top two resonances; lock slots to each independently
 when thresholds are crossed."
 
@@ -103,6 +112,7 @@ when thresholds are crossed."
 scattered decks.
 
 ### Proposal 3: Aggressive Multi-Slot Replacement
+
 **One-sentence:** "At threshold 5, replace 3 of 4 slots with resonance-matched
 cards at 100% probability."
 
@@ -110,6 +120,7 @@ cards at 100% probability."
 Locking.
 
 ### Proposal 4: Split-Resonance Slot Pairs
+
 **One-sentence:** "Lock slot pairs: first pair to top resonance, second pair to
 secondary resonance."
 
@@ -118,6 +129,7 @@ targeting BOTH top resonances narrows archetype ambiguity from 4 to 1-2. The
 split-resonance concept was adopted by Agents 3, 6 into their final champions.
 
 ### Proposal 5: Threshold-Triggered Soft Locks (CHAMPION)
+
 **One-sentence:** "When your top resonance crosses 3, 6, and 9, lock one more
 slot to show a resonance-matched card 75% of the time (first two target top
 resonance, third targets second-highest)."
@@ -134,24 +146,28 @@ precision would have been stronger.
 ## Agent 4: Pool Evolution Domain
 
 ### Proposal 1: Flood and Drain
+
 **One-sentence:** "Add 20 resonance-matched cards to the pool per pick, then
 remove 10 random off-resonance cards."
 
 **Status:** Rejected. Pool size grows unboundedly; implementation complexity.
 
 ### Proposal 2: Shrinking Focused Pool
+
 **One-sentence:** "Remove off-resonance cards from the pool each pick until only
 target-resonance cards remain."
 
 **Status:** Rejected. Converges too fast; deck concentration exceeds 99%.
 
 ### Proposal 3: Resonance Cascade
+
 **One-sentence:** "Each drafted resonance symbol increases the draw weight of
 matching cards by 5%, compounding."
 
 **Status:** Rejected. Purely probabilistic; hits the 50% dilution ceiling.
 
 ### Proposal 4: Pool Replacement
+
 **One-sentence:** "After each pick, replace 12 off-resonance cards in the pool
 with resonance-matched cards from a reserve."
 
@@ -159,6 +175,7 @@ with resonance-matched cards from a reserve."
 split.
 
 ### Proposal 5: Dual-Resonance Pool Sculpting (CHAMPION)
+
 **One-sentence:** "After each pick (from pick 3+), replace 18 off-resonance
 cards in the pool with cards matching your top two resonances (67% top, 33%
 secondary) drawn from an enriched reserve."
@@ -175,6 +192,7 @@ should be a supplementary layer, not a standalone algorithm. Best card overlap
 ## Agent 5: Conditional Pack Enhancement Domain
 
 ### Proposal 1: Resonance Cluster Add
+
 **One-sentence:** "Draw 4 random cards; if 2+ share a primary resonance with
 your top resonance, add 1 random card of that resonance."
 
@@ -182,6 +200,7 @@ your top resonance, add 1 random card of that resonance."
 approximately 0.23 S/A. Total approximately 1.73, below 2.0.
 
 ### Proposal 2: Dual-Type Precision Bonus
+
 **One-sentence:** "Draw 4 random; if 2+ match your top resonance, add 1 card
 from the dual-type pool matching your top two resonances."
 
@@ -189,6 +208,7 @@ from the dual-type pool matching your top two resonances."
 approximately 1.98, borderline.
 
 ### Proposal 3: Double Enhancement (FINAL CHAMPION)
+
 **One-sentence:** "Draw 4 random cards; if 2 or more share a primary resonance
 with your top resonance, add 2 cards of that resonance to the pack."
 
@@ -209,6 +229,7 @@ packs stay random. Weakness: 63% fire rate means the "conditional" aspect is
 marginal; this is closer to "add 2 bonus cards most of the time."
 
 ### Proposal 4: Replace-Worst Enhancement
+
 **One-sentence:** "Draw 4 random; if 2+ match your top resonance, replace the
 worst-fitting card with a resonance-matched card."
 
@@ -216,6 +237,7 @@ worst-fitting card with a resonance-matched card."
 Also removes splash candidates.
 
 ### Proposal 5: Cascading Resonance Enhancement (ORIGINAL CHAMPION, DROPPED)
+
 **One-sentence:** "Draw 4 random; for each card whose primary resonance matches
 your top, roll 40% to add 1 bonus card from your top two resonances' dual-type
 pool."
@@ -228,6 +250,7 @@ roll, dual-type pool) plus hidden rules (activation threshold, bonus cap). Agent
 ## Agent 6: Escalating Influence Domain
 
 ### Proposal 1: Graduated Slot Locking
+
 **One-sentence:** "Each slot independently shows a resonance-matched card with
 probability equal to your top resonance count divided by 16, capped at 75%."
 
@@ -235,6 +258,7 @@ probability equal to your top resonance count divided by 16, capped at 75%."
 best.
 
 ### Proposal 2: Escalating Additive Injection
+
 **One-sentence:** "Earn resonance tokens; auto-spend 4 of highest to inject 1
 bonus card per spend, repeating until under threshold."
 
@@ -242,6 +266,7 @@ bonus card per spend, repeating until under threshold."
 S/A, total approximately 1.73.
 
 ### Proposal 3: Threshold-Gated Escalation
+
 **One-sentence:** "Slots escalate probabilistically, plus one hard lock at
 threshold 6."
 
@@ -249,6 +274,7 @@ threshold 6."
 Estimated approximately 1.75 S/A.
 
 ### Proposal 4: Escalating Dual-Signal Injection
+
 **One-sentence:** "Auto-spend 3 tokens to inject 1 card, preferring dual-type
 cards matching your top two resonances."
 
@@ -256,6 +282,7 @@ cards matching your top two resonances."
 approximately 1.97.
 
 ### Proposal 5: Ratcheting Slot Commitment (CHAMPION)
+
 **One-sentence:** "When your top resonance count reaches 3, 6, and 10, lock one
 more pack slot: first two to top resonance, third to second-highest; fourth slot
 stays random."
@@ -277,6 +304,7 @@ fast (pick 2.4-2.8, far below the 5-8 target).
 ## Agent 7: Open Exploration Domain
 
 ### Proposal 1: Momentum Injection
+
 **One-sentence:** "If your current pick shares a primary resonance with your
 previous pick, one slot in the next pack shows a resonance-matched card."
 
@@ -284,6 +312,7 @@ previous pick, one slot in the next pack shows a resonance-matched card."
 approximately 0.5 S/A; total approximately 1.25.
 
 ### Proposal 2: Echo Accumulator
+
 **One-sentence:** "Earn resonance points; at 5, reset to 0 and inject one
 resonance-matched slot into the next pack."
 
@@ -291,6 +320,7 @@ resonance-matched slot into the next pack."
 S/A.
 
 ### Proposal 3: Resonance Gravity
+
 **One-sentence:** "Each slot draws from a weighted pool: 3x for top resonance,
 2x for second, with anti-monotony rerolls."
 
@@ -298,6 +328,7 @@ S/A.
 approximately 1.6-1.8. The anti-monotony reroll further reduces convergence.
 
 ### Proposal 4: Surge Packs (CHAMPION)
+
 **One-sentence:** "Each drafted symbol adds tokens (+2 primary, +1 others); when
 any counter reaches 4, spend 4 and fill 3 of the next pack's 4 slots with random
 cards of that resonance, fourth slot random."
@@ -312,6 +343,7 @@ genuine pivoting. Constant pack size of 4 (unlike additive approaches that
 create variable-size packs).
 
 ### Proposal 5: Draft Imprint
+
 **One-sentence:** "After pick 5, lock 1 slot to your top resonance; after pick
 10, lock a second slot to your top pair, both tracking the current leader
 (non-permanent)."
@@ -322,14 +354,14 @@ approximately 1.65.
 
 ## Mechanism Class Summary
 
-| Class | Algorithms | Best S/A | Ceiling | Why |
-|---|---|:-:|---|---|
-| Deterministic Placement | Lane Locking, Ratcheting | 2.22 | Unlimited (add more locks) | Guaranteed precision per slot |
-| Additive Injection | Auto-Spend, TAS, Double Enhance | 2.13 | ~2.5 (with frequent triggers) | Extra cards bypass pack limit |
-| Slot-Filling Surge | Surge Packs | 2.05 | ~2.5 (with more surge slots) | Replaces random slots with targeted |
-| Probabilistic Soft Lock | Soft Locks | 1.75 | ~2.2 (at 100% = hard lock) | Probability reduces expected S/A |
-| Pool Manipulation | Pool Sculpting | 1.99 | ~2.0 (confirmed ceiling) | Random draws from modified pool |
-| Conditional Enhancement | Double Enhance (T=2) | 1.32 | ~2.1 (at T=1) | Fire rate limits expected value |
+| Class                   | Algorithms                      | Best S/A | Ceiling                       | Why                                 |
+| ----------------------- | ------------------------------- | :------: | ----------------------------- | ----------------------------------- |
+| Deterministic Placement | Lane Locking, Ratcheting        |   2.22   | Unlimited (add more locks)    | Guaranteed precision per slot       |
+| Additive Injection      | Auto-Spend, TAS, Double Enhance |   2.13   | ~2.5 (with frequent triggers) | Extra cards bypass pack limit       |
+| Slot-Filling Surge      | Surge Packs                     |   2.05   | ~2.5 (with more surge slots)  | Replaces random slots with targeted |
+| Probabilistic Soft Lock | Soft Locks                      |   1.75   | ~2.2 (at 100% = hard lock)    | Probability reduces expected S/A    |
+| Pool Manipulation       | Pool Sculpting                  |   1.99   | ~2.0 (confirmed ceiling)      | Random draws from modified pool     |
+| Conditional Enhancement | Double Enhance (T=2)            |   1.32   | ~2.1 (at T=1)                 | Fire rate limits expected value     |
 
 The investigation confirms V4's hierarchy: deterministic placement delivers the
 highest raw S/A, followed by additive injection, then slot-filling surges.
