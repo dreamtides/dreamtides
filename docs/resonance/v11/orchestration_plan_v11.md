@@ -48,8 +48,9 @@ progressive concentration.
 - **Level 0 (static) AIs** are optimal for signal reading and fairness narrative
 - **5-AI / 3-open-lane structure** was V10's best-performing configuration, but
   the AI count and open-lane ratio are negotiable in V11's multi-round context
-- **Pair-affinity pick logic** (8-bit) is needed for same-resonance sibling
-  discrimination
+- **Per-archetype fitness scores** on each card are needed so AIs (and the
+  system) can distinguish between cards that share a resonance symbol but fit
+  different archetypes
 - **Deckbuilding-aware saturation** is the best AI pick refinement
 - **The AI drafter narrative** is a genuine contribution to player experience
 
@@ -68,8 +69,8 @@ Hybrid X (M3 = 0.84, M11 = 0.69) — 69-79% below V9 targets.
 3. Level 0 targeting dilution (AIs concentrate generally, not toward player's
    specific archetype)
 
-**V10 also validated:** Level 0 reactivity, 5-AI/3-lane structure, pair-affinity
-pick logic, saturation mechanic, AI drafter narrative value.
+**V10 also validated:** Level 0 reactivity, 5-AI/3-lane structure, per-archetype
+fitness scores, saturation mechanic, AI drafter narrative value.
 
 ### V10 → V11 Hypothesis
 
@@ -279,9 +280,8 @@ class SimCard:
     id: int
     visible_symbols: list[Resonance]   # what the player sees (0-2 symbols)
     archetype: str                     # primary archetype (for evaluation)
-    archetype_fitness: dict            # archetype_id -> tier
+    archetype_fitness: dict            # archetype_id -> fitness score (0.0-1.0)
     power: float                       # raw card strength (0-10)
-    pair_affinity: dict                # {archetype_a: float, archetype_b: float}
 
 class AIDrafter:
     archetype_preference: str          # the lane this AI drafts
