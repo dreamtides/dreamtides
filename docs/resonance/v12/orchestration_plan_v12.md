@@ -160,20 +160,26 @@ V11's positive contributions:
 ### Where V12 Picks Up
 
 V12 starts from V11's conclusion: uniform pack sampling cannot achieve M3 >=
-2.0 regardless of pool manipulation. V12 introduces a new draft structure —
-the **face-up shared pool** — and two mechanisms that operate within it:
+2.0 from a large pool. But V11 only tested Level 0 (static) AIs. V12
+introduces a **face-up shared pool** and three mechanisms that work together:
 
-1. **AI avoidance:** V10 and V11 used Level 0 (static) AIs that ignore the
-   player's behavior. But with a face-up pool, all drafters can observe
-   depletion patterns and rationally avoid contested archetypes. If AIs avoid
-   the player's archetype, the player's S/A cards stay in the pool. This was
+1. **AI avoidance:** V10 and V11 used Level 0 AIs that ignore the player's
+   behavior. But with a face-up pool, all drafters can observe depletion
+   patterns and rationally avoid contested archetypes. If AIs avoid the
+   player's archetype, the player's S/A cards stay in the pool. This was
    raised during V11 but not explored — V12 makes it the central thesis.
 
-2. **Oversampled pack construction:** V9-V11 all used uniform random sampling
-   (or nearly so — V9 added a floor slot). But with a face-up pool, the
-   player can see all 120 cards. The system's role is to curate a manageable
-   pick from what's visible: "draw N from the pool, show the best 4." This
-   bridges the pack-sampling bottleneck without manipulating the pool.
+2. **Physical pool contraction:** V11 tested declining refills with Level 0
+   AIs → M3 = 0.83. But with AI avoidance, declining refills produce a
+   fundamentally different result: AIs physically take non-player cards, the
+   pool shrinks (refills don't fully replenish), and what remains is
+   concentrated toward the player's archetype. This is V9's contraction
+   achieved transparently through actual drafting behavior.
+
+3. **Modest oversampling:** With a contracted pool (20-30 cards late-draft,
+   concentrated toward the player's archetype), the system draws 8-12 cards
+   and shows the best 4. This is a modest supplement, not the primary
+   mechanism — pool contraction does the heavy lifting.
 
 ---
 
@@ -181,15 +187,18 @@ the **face-up shared pool** — and two mechanisms that operate within it:
 
 V12 introduces a **face-up shared pool** — the player can browse all cards in
 the pool at any time. AI opponents draft from the same pool. The pool is fully
-visible; who took what is secret. Two mechanisms produce concentration:
+visible; who took what is secret. Three mechanisms produce concentration:
 
 1. **Public-information-reactive AI avoidance:** AIs observe the same face-up
    pool the player sees. They infer what the player is drafting from depletion
    patterns and rationally avoid competing for those cards.
-2. **Oversampled pack construction:** When it's time to pick, the system draws
-   N cards from the pool and presents the best 4. The player can see the full
-   pool, so oversampling is just the system curating a manageable selection
-   from what's visibly available.
+2. **Physical pool contraction:** AIs physically take non-player-archetype
+   cards. Declining refills mean the pool shrinks over the draft. What remains
+   is concentrated toward the player's archetype — the same effect as V9's
+   contraction, but achieved transparently through actual drafting.
+3. **Modest oversampling:** When it's time to pick, the system draws 8-12
+   cards from the (now-concentrated) pool and presents the best 4. This is a
+   light supplement, not the primary driver.
 
 **Player-facing explanation:** "You're drafting at a table with AI opponents.
 The card pool is face-up — browse it anytime to see what's available. When you
@@ -197,13 +206,15 @@ pick, the system shows you 4 strong options from the pool. Watch what
 disappears to figure out what your opponents are drafting, and find the lane
 nobody is contesting."
 
-V12 attacks the problem differently from V9-V11: **demand-side concentration**
-(AI avoidance reduces competition for the player's lane) plus **supply-side
-curation** (oversampled packs ensure the player sees what's available). The
-pool is never manipulated — it's face-up, honest, and shared. Concentration
-emerges from rational drafting behavior by all participants.
+V12 attacks the problem differently from V9-V11: AI avoidance preserves the
+player's S/A supply (demand side), declining refills shrink the pool so the
+player's archetype dominates what remains (supply concentration), and modest
+oversampling ensures the player sees those cards in their packs (supply
+curation). The pool is face-up, honest, and shared. Concentration emerges
+from rational drafting behavior by all participants, amplified by natural
+pool shrinkage.
 
-### The Two Design Levers
+### The Three Design Levers
 
 **Lever 1: AI Avoidance Behavior.** AIs see the same face-up pool as the
 player. They observe which archetypes are depleting fastest and infer that
@@ -217,35 +228,49 @@ and draw the same inferences a player would: "Blink cards are disappearing —
 someone is drafting Blink, I'll focus elsewhere." The information is fully
 symmetric — the player reads the pool the same way.
 
-**Lever 2: Oversampled Pack Construction (Draw N, Show Best 4).** V11 proved
-that drawing 4 cards uniformly from a 100-130 card pool cannot achieve M3 >=
-2.0. But the pool is face-up — the player can already see all 120 cards. The
-system's job is to curate a manageable selection for the pick.
+**Lever 2: Physical Pool Contraction (Declining Refills).** This is the
+primary concentration mechanism. AIs physically take cards from non-player
+archetypes. Between rounds, the pool is partially replenished — but each
+refill is smaller than the last (declining refills). The pool shrinks over
+the draft, and because AIs avoid the player's archetype, the player's cards
+accumulate as a larger fraction of what remains.
 
-The mechanism: the system draws N cards from the face-up pool (where N > 4),
-ranks them by fitness for the player's emerging archetype, and presents the
-top 4 as the pick options. The player knows the full pool exists (they can
-browse it) — the 4 shown cards are the system's curated recommendation from
-what's available.
+V11 tested declining refills with Level 0 AIs (no avoidance) → M3 = 0.83.
+The refills reset the concentration gradient because balanced refills
+restored all archetypes equally. With AI avoidance, the dynamic changes
+fundamentally: AIs deplete non-player archetypes faster than refills restore
+them, while the player's archetype is only depleted by the player's own
+picks. The pool contracts AND concentrates.
 
-The narrative framing is natural and honest because the pool is face-up: the
-player can verify that the 4 shown cards actually exist in the pool. The
-system isn't hiding anything — it's filtering. This is fundamentally different
-from V9's invisible contraction (which secretly removed cards). Here, the pool
-is untouched; the system just selects which 4 of 120 visible cards to present
-for this pick.
+**The math:** Starting pool 120 cards. Each pick cycle removes 6 cards (5 AIs
++ 1 player). With declining refills (e.g., 60/36/0 across 3 rounds), the
+pool shrinks from 120 to ~20-30 by late draft. If AIs avoid the player's
+archetype, the player's ~15 starting cards minus ~10 player picks = ~5
+remaining, but refills add more. The key question for simulation: at what
+pool size and archetype density does M3 reach 2.0 with modest oversampling?
 
-**The math:** With ~5 S/A cards for the player's archetype in a 120-card pool,
-M3 ≈ N × 5/120 = N/24. For M3 = 2.0, N ≈ 48. For M3 = 1.5, N ≈ 36. This
-holds when S/A supply is maintained in the pool — which is exactly what AI
-avoidance provides (AIs don't take from the player's archetype, so S/A count
-stays stable throughout the draft).
+Example late-draft scenario (pool = 25 cards, player's archetype = 50% of
+pool = ~12 cards, ~5 S/A among them):
+- Draw 8: expected S/A = 8 × 5/25 = 1.6
+- Draw 12: expected S/A = 12 × 5/25 = 2.4
+- Show best 4 of those → M3 ≈ 1.6-2.4
 
-Oversampled pack construction is the mechanism that converts pool-level AI
-avoidance into pack-level card quality. Without it, even perfect AI avoidance
-only produces a modest pool-level gradient. With it, the larger draw naturally
-includes more on-archetype cards, and the "show best 4" filter ensures the
-player sees them.
+This is V9's contraction achieved through transparent physical drafting. V9
+silently removed low-relevance cards; V12's AIs physically take cards from
+other archetypes. The pool shrinks the same way, but the player can see it
+happening and understand why.
+
+**Lever 3: Modest Oversampling (Draw 8-12, Show Best 4).** With pool
+contraction doing the heavy lifting, oversampling is a light supplement. The
+system draws 8-12 cards from the face-up pool and shows the best 4 by fitness
+for the player's emerging archetype. This is modest curation — not the
+dramatic "draw 48 from 120" that would feel like hidden manipulation.
+
+The narrative framing is natural: the player can see the pool, the system
+picks a handful and recommends the best options. At N = 8-12 from a pool of
+25-30 cards, the player is seeing roughly a third to half of what's
+available — comparable to a real draft where you see a pack of cards, not the
+entire card pool.
 
 ---
 
@@ -360,53 +385,32 @@ Key design questions:
 ### Variable 2: Oversample Size (N)
 
 How many cards does the system draw from the pool before showing the best 4?
+Oversampling is a modest supplement to pool contraction, not the primary
+mechanism. N is limited to the 4-12 range.
 
-| Config | N Drawn | Show | Expected S/A (5 S/A in 120 pool) | M3 Estimate |
-|--------|:-------:|:----:|:---:|:---:|
-| A: No Oversample | 4 | 4 | 0.17 | 0.17 |
-| B: Light Oversample | 16 | Best 4 | 0.67 | 0.67 |
-| C: Moderate Oversample | 32 | Best 4 | 1.33 | 1.33 |
-| D: Standard Oversample | 48 | Best 4 | 2.00 | 2.00 |
-| E: Heavy Oversample | 64 | Best 4 | 2.67 | 2.67 |
+| Config | N Drawn | Show | Notes |
+|--------|:-------:|:----:|-------|
+| A: No Oversample | 4 | 4 | Uniform random baseline — isolates pool contraction |
+| B: Light Oversample | 8 | Best 4 | Draw 8, show best 4 — light curation |
+| C: Moderate Oversample | 10 | Best 4 | Draw 10, show best 4 |
+| D: Standard Oversample | 12 | Best 4 | Draw 12, show best 4 — upper bound |
 
-This is the critical variable. N controls how much the system curates the
-player's options. At N = 4, the player sees a uniform random sample (V11
-baseline — proven insufficient). At N = 48, the system draws 40% of the pool
-and shows the 4 cards with highest fitness for the player's archetype, yielding
-M3 ≈ 2.0.
+At N = 4 (uniform), M3 depends entirely on pool contraction. At N = 8-12
+from a contracted pool of 25 cards with 5 S/A, expected S/A = N × 5/25 =
+1.0-2.4. The oversampling provides a meaningful but modest boost — the
+difference between "usually 1 S/A" and "usually 2 S/A" in a pack.
 
 **"Best 4" ranking:** Cards drawn are ranked by fitness for the player's
 inferred archetype. S/A cards for the player's archetype rank highest (~0.9
 fitness), followed by sibling-archetype S/A (~0.5-0.7), on-archetype C/F
 (~0.3-0.5), and off-archetype cards (~0.0-0.2). The top 4 by this ranking
-are shown. This means any S/A card for the player's archetype that appears in
-the N drawn will be in the shown 4 (as long as fewer than 4 are drawn, which
-is almost always true).
+are shown.
 
-**The late-draft problem:** The M3 estimates above assume 5 S/A cards remain
-in the pool. As the player drafts S/A cards, fewer remain. After taking 3 S/A
-(~pick 15), only 2 remain, and M3 ≈ N × 2/115. For N = 48, late-draft M3 ≈
-0.83. This is where AI avoidance is critical: if AIs avoid the player's
-archetype, S/A cards stay in the pool because no AI is taking them. The player
-is the only one depleting their own S/A supply. With AI avoidance, the S/A
-count stays at ~5 until the player takes them, keeping N ≈ 48 sufficient
-throughout the draft.
-
-**The narrative framing:** Oversampling is naturally honest because the pool is
-face-up. The player can see all 120 cards. The system says: "here are 4 good
-options from the pool." The player can verify these cards exist. This is
-curation, not deception. Possible framings:
-- "Your advisor scans the market and recommends 4 cards"
-- "Here are 4 strong picks from the pool"
-- Just show 4 cards without explanation — the player knows the pool is
-  face-up and can browse it before/after picking
-
-**Interaction with AI avoidance:** Oversampling and avoidance are complementary,
-not redundant. Avoidance maintains S/A supply in the pool (demand side);
-oversampling ensures S/A cards reach the player's packs (supply side). Without
-avoidance, late-draft S/A depletion forces N to grow impractically large
-(N > 100). Without oversampling, even perfect avoidance only produces M3 ≈
-0.25 with uniform 4-card packs (V11's pack-sampling bottleneck).
+**The narrative framing:** At N = 8-12, oversampling feels natural — the
+system draws a handful of cards and shows the best options. The player can
+browse the face-up pool and verify these cards exist. At this modest scale,
+it doesn't feel like hidden manipulation — it feels like the system picking
+a few cards from the market and recommending the best ones.
 
 **The face-up pool replaces Design 5 information.** With the pool visible, the
 player doesn't need archetype bars or trend arrows — they can browse the pool
@@ -415,30 +419,44 @@ by archetype, visual indicators of quantity) may still be useful as overlays
 on the pool browser, but the underlying information is complete and
 unmediated. The exploration phase (picks 1-5) is served by the pool browser
 rather than by the pack contents — the player browses the pool to decide
-which archetype to target, then receives oversampled packs once committed.
+which archetype to target, then receives modestly oversampled packs once
+committed.
 
-### Variable 3: Pool Structure
+### Variable 3: Pool Structure and Refill Schedule
 
-The pool is always face-up. The question is whether it changes during the draft.
+The pool is always face-up. Pool contraction via declining refills is the
+primary concentration mechanism. The key design question is the refill
+schedule — how much is replenished between rounds, and how fast does the pool
+shrink?
 
-| Structure | Description | Pool Size |
+| Structure | Description | Late-Draft Pool |
 |-----------|-------------|:---------:|
-| A: Static Pool | Fixed pool, cards leave as drafted, no refills | 120-360 |
-| B: Multi-Round Refills | 3 rounds, new cards added face-up between rounds | 120 + refills |
-| C: Continuous Market | Drafted cards replaced face-up from a reserve | 120 + reserve |
+| A: Static Pool | No refills, pool shrinks from drafting alone | Very small (~0-20) |
+| B: Steep Decline (60/30/0) | 3 rounds, aggressively declining refills | Small (~20-30) |
+| C: Moderate Decline (60/36/0) | 3 rounds, moderately declining refills | Medium (~25-40) |
+| D: Gradual Decline (48/36/21/0) | 4 rounds, gently declining refills | Medium (~30-50) |
+| E: Continuous Market | Drafted cards partially replaced face-up | Stable (~60-80) |
 
-V11 showed that refills (B) and continuous markets (C) cannot achieve M3 >= 2.0
-with uniform sampling. But with oversampling, pool structure becomes secondary —
-the primary concentration mechanism is the "draw N, show best 4" curation, not
-pool manipulation.
+V11 tested declining refills with Level 0 AIs: best M3 = 0.83 (SIM-4).
+The refills reset the concentration gradient because AIs didn't avoid the
+player's archetype. With AI avoidance, the same refill schedules should
+produce fundamentally different results — AIs deplete non-player archetypes
+while refills partially restore all archetypes, but the net effect is
+concentration toward the player's lane.
 
-The baseline design is a **static face-up pool** (A): all cards are visible
-from the start, cards leave as they're drafted, nothing is added. The pool
-shrinks naturally over 30 picks (6 cards leave per pick cycle: 5 AIs + 1
-player). Starting pool of 120 → ~120 remaining (cards leave the pool only
-when drafted, and only 30 player picks + ~150 AI picks happen... the pool
-needs to be sized appropriately). Agents should determine the right starting
-pool size.
+The critical interaction: pool contraction rate determines how much
+oversampling is needed. A pool contracted to 25 cards with 50% player
+archetype density needs only N = 8-12 for M3 ≈ 2.0. A pool that stays at 60
+cards with 25% density would need much higher N. Agents should find the
+refill schedule that contracts the pool enough for modest oversampling to
+work.
+
+**Pool sizing:** With 5 AIs + 1 player, each pick cycle removes 6 cards.
+Over 30 picks = 180 total removals. Starting pool of 120 would exhaust
+without refills by pick 20. The refill schedule must balance: enough cards
+to sustain 30 picks, but declining enough that the pool contracts to 20-30
+cards by late draft. Agents should determine the right starting pool size
+and refill schedule.
 
 ### Variable 4: AI Count and Lane Structure
 
@@ -461,35 +479,37 @@ strongest possible demand-side concentration.
 
 ## Metrics
 
-### Recalibrated M3 for Oversampled 4-Card Packs
+### M3 Depends on Pool Contraction + Modest Oversampling
 
-With oversampled pack construction (draw N, show best 4), M3 depends on N and
-the number of S/A cards for the player's archetype remaining in the pool:
+With pool contraction as the primary mechanism and oversampling at N = 8-12,
+M3 depends on the late-draft pool size, archetype density, and N:
 
-| N Drawn | S/A in Pool = 5 | S/A in Pool = 4 | S/A in Pool = 3 | S/A in Pool = 2 |
-|:-------:|:---:|:---:|:---:|:---:|
-| 4 (uniform) | 0.17 | 0.13 | 0.10 | 0.07 |
-| 16 | 0.67 | 0.53 | 0.40 | 0.27 |
-| 24 | 1.00 | 0.80 | 0.60 | 0.40 |
-| 36 | 1.50 | 1.20 | 0.90 | 0.60 |
-| 48 | 2.00 | 1.60 | 1.20 | 0.80 |
-| 64 | 2.67 | 2.13 | 1.60 | 1.07 |
+| Pool Size | Archetype % | S/A in Pool | N = 4 (uniform) | N = 8 | N = 12 |
+|:---------:|:-----------:|:-----------:|:---:|:---:|:---:|
+| 120 (no contraction) | 12% | 5 | 0.17 | 0.33 | 0.50 |
+| 60 | 25% | 5 | 0.33 | 0.67 | 1.00 |
+| 40 | 35% | 5 | 0.50 | 1.00 | 1.50 |
+| 30 | 45% | 5 | 0.67 | 1.33 | 2.00 |
+| 25 | 50% | 5 | 0.80 | 1.60 | 2.40 |
+| 20 | 55% | 5 | 1.00 | 2.00 | 3.00 |
 
-**The critical interaction:** Without AI avoidance, S/A depletes as AIs take
-on-archetype cards. By mid-draft, S/A in pool may drop to 2-3, requiring
-N = 80-100 for M3 = 2.0. With AI avoidance, S/A stays at ~5 throughout (only
-the player depletes their own lane), keeping N ≈ 48 sufficient.
+**The critical insight:** Pool contraction and oversampling are substitutes.
+A large pool (120) needs high N (48+) for M3 = 2.0 — impractical. A
+contracted pool (20-30) needs only N = 8-12 — natural and honest. V12's
+strategy: use AI avoidance + declining refills to contract the pool, then
+use modest oversampling as a light supplement.
 
-**Important recalibration note:** M3 = 2.0 with 4-card packs requires N ≈ 48
-(drawing 40% of the pool each pick). V9 achieved M3 = 2.70 with 4-card packs
-(3 random + 1 floor) by contracting the pool to ~17 cards — effectively drawing
-from a tiny pool where archetype density was 60%+.
+**Target pool trajectory:** For M3 ≈ 2.0 at N = 8, the pool needs to
+contract to ~20 cards with ~5 S/A remaining. For M3 ≈ 2.0 at N = 12, the
+pool needs ~30 cards with ~5 S/A. AI avoidance is critical for maintaining
+the S/A count — without it, AIs take S/A cards and late-draft S/A drops to
+1-2, collapsing M3 regardless of pool size.
 
-V12 should explore whether M3 targets need adjustment for the oversampling
-paradigm. The relevant question is: does the player's draft *feel* good? A
-lower M3 (e.g., 1.5, achievable at N ≈ 36) might be acceptable if the player
-consistently faces meaningful archetype choices. Agents should test multiple N
-values and evaluate the qualitative experience, not just the metric.
+**Comparison to V9:** V9 contracted the pool from 360 to ~17 cards with 60%+
+archetype density and a floor slot, achieving M3 = 2.70. V12 aims to contract
+from 120 to ~20-30 cards with 45-55% archetype density and N = 8-12
+oversampling. If the contraction trajectory is right, V12 should approach V9's
+M3 through transparent physical mechanisms rather than invisible removal.
 
 ### Full Metric Table
 
@@ -536,11 +556,17 @@ class AIDrafter:
     avoidance_start_pick: int          # when avoidance kicks in
 
 class PackConstructor:
-    oversample_n: int                  # N cards drawn from pool (4 = uniform, 48 = standard)
+    oversample_n: int                  # N cards drawn from pool (4 = uniform, 8-12 = standard)
     show_count: int                    # always 4 (show best 4 of N drawn)
     ranking_method: str                # "archetype_fitness", "symbol_match", "power"
     player_signature: list[float]      # current resonance signature for ranking
     inferred_archetype: str            # player's inferred archetype for fitness ranking
+
+class RefillSchedule:
+    rounds: int                        # number of rounds (3-4)
+    picks_per_round: list[int]         # picks in each round (e.g., [10, 10, 10])
+    refill_amounts: list[int]          # cards added between rounds (e.g., [60, 36, 0])
+    refill_bias: str                   # "balanced", "open_lane", "underrepresented"
 
 class DraftState:
     pool: list[SimCard]                # face-up pool (visible to all drafters)
@@ -554,8 +580,8 @@ class DraftState:
 
 ## Round 1: Research (3 parallel agents)
 
-Pure research — no algorithm design. Map the AI avoidance + pack construction
-design space.
+Pure research — no algorithm design. Map the AI avoidance + pool contraction +
+pack construction design space.
 
 ### Research Agent A: AI Avoidance in Competitive Drafting
 
@@ -588,77 +614,88 @@ V11 final report (`docs/resonance/v11/final_report.md`).
 
 **Output:** `docs/resonance/v12/research_ai_avoidance.md` (max 2000 words)
 
-### Research Agent B: Oversampled Pack Construction
+### Research Agent B: Pool Contraction via Physical AI Drafting
 
-**Question:** How do existing card games use oversampling or curated presentation
-to improve card offerings, and what are the design tradeoffs of "draw N, show
-best K"?
+**Question:** How does AI avoidance + declining refills produce pool
+contraction, and what contraction trajectories achieve M3 >= 2.0 with modest
+oversampling (N = 8-12)?
 
-**Context:** In V12, the pool is face-up — the player can browse all cards. When
-it's time to pick, the system draws N cards from the visible pool and presents
-the best 4. The player knows the full pool exists and can verify the shown
-cards are real. This is curation of a visible resource, not hidden manipulation.
+**Context:** V12's primary concentration mechanism is physical pool
+contraction. AIs take non-player cards, declining refills don't fully
+replenish, and the pool shrinks. With AI avoidance, the player's archetype
+accumulates as a larger fraction of the shrinking pool. V11 tested declining
+refills with Level 0 AIs (M3 = 0.83, SIM-4). V12 adds AI avoidance to the
+same mechanism. Oversampling is limited to N = 8-12 (draw 8-12, show best 4).
 
 Explore:
-- How do roguelike deckbuilders (Slay the Spire, Monster Train, Inscryption)
-  curate card offerings toward player synergies? Do any use explicit
-  oversampling (draw more than shown, filter)?
-- How do digital CCGs (Hearthstone arena, Legends of Runeterra expedition)
-  construct draft picks? Is there evidence of hidden oversampling or filtering?
-- What does "best" mean in "show best 4"? Options: highest archetype fitness,
-  highest power, highest resonance symbol match, composite score. How does the
-  ranking criterion affect the skill axis?
-- With a face-up pool, the player can see what's available before picking.
-  Does this change the perception of oversampling? (The player knows good
-  cards exist in the pool — seeing them in their pack feels natural rather
-  than suspicious.)
-- What is the exploration-exploitation tradeoff? High N makes committed-
-  archetype packs excellent but reduces off-archetype discovery (the best 4
-  are all on-archetype). How does this affect picks 1-5 (exploration phase)?
-- Should N be constant throughout the draft, or should it increase as the
-  player commits? (Low N early for exploration, high N late for execution.)
-- How does the player's ability to browse the pool interact with oversampling?
-  If the player can see a great card in the pool, should they expect it to
-  appear in their pack? What N makes this likely?
+- **V11 declining refill results:** V11 SIM-4 used 4 rounds (8/8/7/7 picks)
+  with declining balanced refills (48/36/21/0) and Level 0 AIs → M3 = 0.83.
+  What specific pool composition trajectory did SIM-4 produce? Where did
+  concentration fail — at the pool level or the pack level?
+- **Adding avoidance to V11's refill schedules:** If SIM-4's AIs had avoided
+  the player's archetype, how would the pool trajectory change? Model the
+  archetype density at each round boundary.
+- **Contraction targets:** For M3 ≈ 2.0 at N = 8, the pool needs ~20 cards
+  with ~5 S/A. For N = 12, ~30 cards with ~5 S/A. What refill schedule
+  achieves these targets?
+- **Pool exhaustion risk:** With 6 removals per pick cycle and declining
+  refills, at what point does the pool run out of cards? What is the minimum
+  safe pool size?
+- **Refill bias:** Should refills be balanced (equal per archetype) or biased
+  (more open-lane cards)? V11 found biased refills are Level 0 (determined by
+  pre-draft AI configuration). Does bias help or hurt with AI avoidance?
+- **Starting pool size:** Is 120 right, or should V12 use a different starting
+  pool? Larger pools (180, 240) take longer to contract but provide more card
+  variety. Smaller pools (80, 100) contract faster but may feel thin.
+- **Round structure:** 3 rounds vs 4 rounds. More rounds = more refill events
+  (each partially resets gradient). Fewer rounds = fewer resets but steeper
+  per-boundary decline.
+- **How do existing draft formats handle pool shrinkage?** MTG Rochester draft
+  (face-up), Ascension market rows, 7 Wonders card passing. Which create
+  natural late-game concentration?
 
 **Reads:** This plan, V11 final report (`docs/resonance/v11/final_report.md`),
-V11 algorithm overview (`docs/resonance/v11/algorithm_overview.md`).
+V11 algorithm overview (`docs/resonance/v11/algorithm_overview.md`), V11
+Design 3 (`docs/resonance/v11/design_3.md`).
 
-**Output:** `docs/resonance/v12/research_pack_construction.md` (max 2000 words)
+**Output:** `docs/resonance/v12/research_pool_contraction.md` (max 2000 words)
 
-### Research Agent C: Concentration Math for AI Avoidance + Oversampling
+### Research Agent C: Concentration Math for Pool Contraction + Oversampling
 
-**Question:** What combinations of AI avoidance strength and oversample size N
-produce M3 >= 2.0 with "draw N, show best 4" packs from a pool?
+**Question:** What pool contraction trajectories produce M3 >= 2.0 with modest
+oversampling (N = 8-12)?
 
 Analyze:
-- **Baseline:** With 120 cards, 8 archetypes, 15 per archetype, 36% sibling
-  A-tier, N = 4 (uniform): what is M3? (Expected: ~0.17)
-- **AI avoidance only (N = 4):** If 5 AIs avoid the player's archetype, the
-  player's archetype accumulates in the pool. Model the S/A trajectory over 30
-  picks. What M3 does avoidance alone produce with uniform packs?
-- **Oversampling only (no avoidance):** What N achieves M3 >= 2.0 at draft
-  start (5 S/A in pool)? How does N need to grow as S/A depletes through the
-  draft? Model the N required at picks 1, 10, 20, 30.
-- **Combined:** AI avoidance + oversampling. Avoidance maintains S/A count at
-  ~5; oversampling at N = 48 yields M3 ≈ 2.0. Verify this interaction
-  mathematically. What is the sensitivity — what happens at N = 36? N = 64?
-- **Late-draft analysis:** With avoidance, only the player depletes their own
-  S/A. After taking 3 S/A by pick 15, 2 remain. What is M3 at N = 48? Does
-  the draft need multi-round refills to maintain S/A supply, or does avoidance
-  alone suffice?
-- **Comparison to V9:** V9 contracted the pool from 360 to 17 cards, achieving
-  60%+ archetype density. "Draw 48, show best 4" from a 120-card pool with 5
-  S/A achieves M3 ≈ 2.0 without contraction. At what N does V12 match V9's
-  M3 = 2.70?
-- **Exploration phase (picks 1-5):** Before the player commits, the system
-  cannot rank by archetype fitness (no archetype inferred yet). What should
-  "best 4" mean during exploration? Options: rank by power, rank by diversity,
-  uniform random, or N = 4 (no oversampling during exploration).
+- **Baseline (no contraction, no avoidance, N = 4):** 120 cards, 8 archetypes,
+  15 per archetype, 36% sibling A-tier. M3 ≈ 0.17. This is the floor.
+- **Avoidance only (no contraction, N = 4):** Static 120-card pool, 5 AIs
+  avoid player's archetype. Player's archetype accumulates but pool stays
+  large. Model archetype density and M3 over 30 picks. Expected: modest
+  improvement, far below 2.0.
+- **Contraction only (declining refills, no avoidance, N = 4):** V11 SIM-4
+  result (M3 = 0.83). What does the pool trajectory look like?
+- **Avoidance + contraction (N = 4):** The key combination. Model: 5 AIs with
+  avoidance from pick 6, declining refills (e.g., 60/36/0). Track pool size,
+  archetype density, and S/A count at each pick. What M3 does this achieve
+  with uniform 4-card packs (no oversampling)?
+- **Avoidance + contraction + oversampling (N = 8 and N = 12):** Add modest
+  oversampling to the above. What M3 does each N achieve? Is the pool
+  contraction sufficient that N = 8 reaches M3 ≈ 2.0?
+- **S/A trajectory:** With avoidance, only the player takes their own S/A.
+  Starting S/A: ~5 per archetype. Refills add more S/A. By pick 20, how many
+  S/A remain? Is the player at risk of exhausting their own S/A supply?
+- **Pool size sensitivity:** What if the pool contracts to 40 instead of 25?
+  To 15? Plot M3 vs final pool size at N = 8 and N = 12.
+- **Comparison to V9:** V9 achieved M3 = 2.70 with pool contraction from 360
+  to 17 + floor slot. V12 aims for pool contraction from 120 to 20-30 +
+  N = 8-12. Are these structurally equivalent?
+- **Exploration phase (picks 1-5):** Before commitment, should N = 4 (uniform)
+  or should the pool browser serve exploration entirely?
 
 **Reads:** This plan, V11 final report (`docs/resonance/v11/final_report.md`),
 V11 algorithm overview (`docs/resonance/v11/algorithm_overview.md`), V9
-algorithm overview (`docs/resonance/v9/algorithm_overview.md`).
+algorithm overview (`docs/resonance/v9/algorithm_overview.md`), V11 Design 3
+(`docs/resonance/v11/design_3.md`).
 
 **Output:** `docs/resonance/v12/research_concentration_math.md` (max 2000 words)
 
@@ -667,7 +704,7 @@ algorithm overview (`docs/resonance/v9/algorithm_overview.md`).
 ## Round 2: Algorithm Design (6 parallel agents)
 
 Each agent reads all Round 1 research (`research_ai_avoidance.md`,
-`research_pack_construction.md`, `research_concentration_math.md`) plus this
+`research_pool_contraction.md`, `research_concentration_math.md`) plus this
 plan, V11 final report (`docs/resonance/v11/final_report.md`), and V11
 algorithm overview (`docs/resonance/v11/algorithm_overview.md`). Each explores
 a different region of the V12 design space.
@@ -681,8 +718,10 @@ a different region of the V12 design space.
 - All V10 and V11 structural findings available
 - AIs must use public-information-based avoidance of the player's archetype
   somewhere in the design (the strength, timing, and mechanism vary by agent)
-- Pack construction uses "draw N, show best 4" oversampling (N is a design
-  variable; N = 4 means uniform random baseline)
+- Pool contraction via declining refills is the primary concentration
+  mechanism. Agents must specify a refill schedule.
+- Pack construction uses "draw N, show best 4" oversampling with N in the
+  range 4-12 (N = 4 means uniform random baseline)
 
 **Output format (all agents):**
 
@@ -693,78 +732,80 @@ a different region of the V12 design space.
 4. Champion deep-dive: pick-by-pick walkthrough showing when AI avoidance kicks
    in, how pack construction changes, what the player sees, pool composition
    evolution, failure modes
-5. Complete specification (pool size, oversample N, "best 4" ranking criterion,
-   AI count, AI avoidance model, AI inference mechanism, AI pick logic, player
-   information)
+5. Complete specification (starting pool size, refill schedule, oversample N
+   (4-12), "best 4" ranking criterion, AI count, AI avoidance model, AI
+   inference mechanism, AI pick logic, player information)
 
 Max 1500 words per agent.
 
-### Agent 1: Minimal Avoidance + No Oversampling (Isolation Test)
+### Agent 1: Avoidance + Contraction, No Oversampling (Isolation Test)
 
-**Starting point:** Test AI avoidance alone, with N = 4 (no oversampling).
-Uniform random 4-card packs. This isolates the contribution of avoidance
-behavior.
+**Starting point:** Test AI avoidance + declining refills with N = 4 (no
+oversampling). Uniform random 4-card packs. This isolates the contribution
+of pool contraction + avoidance without any pack curation.
 
-**Question:** How much M3 improvement does AI avoidance alone produce over a
-Level 0 baseline, when packs are not oversampled?
-
-Explore:
-- With 5 Level 0 AIs (no avoidance), M3 should be ~0.17-0.25 (V11 SIM-1
-  baseline). What does M3 become when AIs avoid the player's detected
-  archetype?
-- How much pool-level archetype accumulation does avoidance create? If 5 AIs
-  stop taking Blink cards after pick 6, how does Blink's count in the pool
-  grow?
-- Is the avoidance effect large enough to be meaningful without oversampling?
-- What is the sensitivity to avoidance timing (pick 5 vs pick 8 vs pick 12)?
-- How does the player's archetype inference accuracy affect the mechanism?
-
-### Agent 2: Moderate Oversampling + Gradual Avoidance
-
-**Starting point:** Combine graduated AI avoidance with moderate oversampling
-(N = 24-36). Test whether a lower N with avoidance can achieve M3 >= 1.5-2.0.
-
-**Question:** What is the minimum N that produces acceptable M3 when combined
-with gradual AI avoidance?
+**Question:** How much M3 does AI avoidance + pool contraction produce with
+uniform 4-card packs? This is the baseline — if contraction alone gets close
+to M3 = 2.0, only light oversampling is needed.
 
 Explore:
-- Test N = 24, 32, 36 with gradual avoidance (ramp from pick 3 to pick 15).
-  What M3 does each achieve?
+- V11 SIM-4 (declining refills, Level 0 AIs) → M3 = 0.83. What happens when
+  you add AI avoidance to the same refill schedule (48/36/21/0, 4 rounds)?
+- Track pool composition at each round boundary: how many of the player's
+  archetype cards remain? What is archetype density?
+- How does avoidance timing affect the contraction trajectory? (Avoidance
+  from pick 5 vs pick 8 — earlier avoidance preserves more S/A.)
+- What pool size does the draft reach by picks 20, 25, 30? Is the
+  contraction sufficient for M3 ≈ 1.5+ even without oversampling?
+- What is the sensitivity to refill schedule? Test 60/36/0 (3 rounds) vs
+  48/36/21/0 (4 rounds) vs 60/0/0 (aggressive 3-round).
+
+### Agent 2: Steep Contraction + Light Oversampling (N = 8)
+
+**Starting point:** Aggressive declining refills (steep contraction) with
+gradual AI avoidance and light oversampling (N = 8).
+
+**Question:** Can aggressive pool contraction with N = 8 achieve M3 >= 2.0?
+
+Explore:
+- Test steep refill schedules: 60/30/0 (3 rounds), 60/20/0 (3 rounds),
+  48/24/0/0 (4 rounds). Which contracts the pool to ~20-25 cards by pick 25?
+- With gradual avoidance (ramp from pick 3 to pick 15), how does archetype
+  density evolve? At what pick does the player's archetype become 40%+ of
+  the pool?
+- At N = 8 from a contracted pool of 20-25 cards, what M3 is achieved?
 - How does the "best 4" ranking work during exploration (picks 1-5) before
   archetype inference is confident? Options: rank by power, rank by symbol
-  diversity, or use low N during exploration.
-- Should N increase over the draft? (N = 8 for picks 1-5, N = 36 for picks
-  6-15, N = 48 for picks 16+.) This mirrors V9's increasing contraction.
-- At what N does the player start to notice that packs are "too good" — always
-  containing on-archetype cards? Is there a perceptual sweet spot?
-- How does moderate N interact with off-archetype variety (M4)? If best-4
-  always includes on-archetype cards, are the remaining slots diverse enough?
+  diversity, or use N = 4 during exploration.
+- Pool exhaustion risk: with steep decline, does the pool run out of cards
+  before pick 30? What AI saturation threshold prevents this?
+- How does N = 8 interact with off-archetype variety (M4)? From a 25-card
+  pool, drawing 8 is a third of the pool — does this leave enough variety?
 
-### Agent 3: Heavy Oversampling + Delayed Avoidance
+### Agent 3: Moderate Contraction + Standard Oversampling (N = 12)
 
-**Starting point:** Use high N (48-64) with delayed AI avoidance (pick 8+).
-The "best 4" ranking uses pair-affinity scores (hidden 8-bit metadata from V9)
-for maximum targeting precision.
+**Starting point:** Moderate declining refills with delayed AI avoidance
+(pick 8+) and standard oversampling (N = 12). The "best 4" ranking uses
+pair-affinity scores (hidden 8-bit metadata from V9) for targeting precision.
 
-**Question:** Can heavy oversampling with archetype-specific fitness ranking
-achieve M3 >= 2.0 even with delayed avoidance?
+**Question:** Can moderate pool contraction with N = 12 achieve M3 >= 2.0
+even with delayed avoidance?
 
 Explore:
-- Test N = 48 and N = 64 with delayed avoidance (pick 8+). What M3 does each
-  achieve? Does high N compensate for delayed avoidance?
-- How does the ranking criterion affect results? Compare: ranking by archetype
-  fitness (pair-affinity) vs ranking by visible symbol match only. Is hidden
-  metadata necessary for effective oversampling, or do visible symbols suffice?
-- Delayed avoidance (pick 8+) means the first 7 picks have zero avoidance
-  benefit — AIs may take S/A from the player's archetype early. How much S/A
-  is lost in picks 1-7, and can high N compensate?
-- Is oversampling with pair-affinity ranking V9 contraction by another name?
-  V9 removed low-relevance cards; oversampling includes high-relevance cards.
-  The direction is opposite (inclusion vs exclusion) but the effect is similar.
-  Evaluate honestly.
-- Can a floor slot be added within the oversampling framework? E.g., "draw N,
-  guarantee 1 S/A in the top 4, fill remaining 3 from best of N." How does
-  this interact with the oversampling math?
+- Test moderate refill schedules: 60/36/0 (3 rounds), 48/36/21/0 (4 rounds).
+  Which contracts the pool to ~30-40 cards by pick 25?
+- Delayed avoidance (pick 8+) means 7 picks of AIs potentially taking the
+  player's S/A. How much S/A is lost in picks 1-7? Does moderate contraction
+  compensate?
+- At N = 12 from a pool of 30-40 cards, what M3 is achieved? Compare ranking
+  by archetype fitness (pair-affinity) vs visible symbol match only.
+- Can a floor slot be added within the oversampling framework? E.g., "draw 12,
+  guarantee 1 S/A in the top 4, fill remaining 3 from best of 12." How does
+  this interact with the contraction math?
+- How does the contraction trajectory compare to V9? V9 contracted from 360
+  to 17 with invisible removal. V12 Agent 3 contracts from 120 to 30-40 with
+  physical drafting. Is the density at 30-40 cards sufficient, or does the
+  pool need to contract further?
 
 ### Agent 4: V9 Engine + AI Avoidance Narrative (Non-Face-Up Fallback)
 
@@ -803,53 +844,55 @@ Explore:
 ### Agent 5: High-AI-Count + Avoidance (7 AIs, 1 Open Lane)
 
 **Starting point:** 7 AIs, only 1 open lane per game. All 7 AIs avoid the
-player's archetype once detected. Combined with moderate oversampling (N =
-24-36).
+player's archetype once detected. Combined with declining refills and light
+oversampling (N = 8).
 
-**Question:** Does maximizing AI count and minimizing open lanes, combined with
-universal avoidance, allow lower N for the same M3?
+**Question:** Does maximizing AI count accelerate pool contraction enough to
+achieve M3 >= 2.0 with light oversampling?
 
 Explore:
-- With 7 AIs avoiding the player's archetype, the player faces zero
-  competition and S/A supply is maximally preserved. Does this allow lower N
-  (24-32) to achieve M3 >= 2.0?
+- With 7 AIs (8 cards removed per pick cycle instead of 6), the pool
+  contracts faster. What refill schedule keeps the pool viable for 30 picks?
+- 7 AIs avoiding the player's archetype = zero competition + faster
+  contraction of non-player cards. Does this reach 50%+ archetype density
+  earlier than 5-AI designs?
 - But with only 1 open lane, there's no "choosing the right lane" skill — the
   open lane is whatever the player picks. Is this acceptable?
 - What happens to game-to-game variety? C(8,7) = 8 compositions vs
   C(8,5) = 56. Is 8 enough variety?
 - The 1-open-lane structure eliminates M12 (signal reading) as a skill axis.
   Is this acceptable? What does it replace it with?
-- Does 7-AI avoidance create enough pool-level concentration that the
-  oversampled "best 4 of N" consistently contains 2+ S/A at moderate N?
+- Does 7-AI contraction achieve M3 >= 2.0 at N = 8? At N = 4 (uniform)?
 
 ### Agent 6: Hybrid Approaches + Novel Mechanisms
 
-**Starting point:** Free exploration. Combine AI avoidance with oversampling
-in novel ways, or propose entirely new mechanisms.
+**Starting point:** Free exploration. Combine AI avoidance, pool contraction,
+and modest oversampling in novel ways, or propose entirely new mechanisms.
 
 Explore freely. Some starting ideas:
-- **Progressive N:** N starts low (4-8 for picks 1-5, exploration) and ramps
-  up as the player commits (N = 48 by pick 10). This mirrors V9's contraction
-  trajectory — early packs are diverse, late packs are focused. The player
-  experiences natural concentration without any pool manipulation.
-- **AI avoidance with multi-round refills + oversampling:** V11's 3-round
-  structure with open-lane biased refills, plus AI avoidance within each round,
-  plus moderate oversampling. Does the combination of refill bias + avoidance +
-  oversampling finally cross M3 >= 2.0 at lower N?
+- **Progressive N:** N starts at 4 (picks 1-5, exploration) and ramps to
+  8-12 as the player commits. Combined with pool contraction, early packs are
+  diverse (large pool, low N), late packs are focused (small pool, higher N).
+- **Biased refills + avoidance:** V11's open-lane biased refills combined
+  with AI avoidance. Biased refills add more cards for the player's archetype
+  while avoidance prevents AIs from taking them. Does this compound the
+  contraction effect enough to reduce N further (to 4-8)?
 - **Oversampling without hidden metadata:** Can "best 4 of N" ranking work
-  using only visible resonance symbols (no pair-affinity encoding), making the
-  entire mechanism transparent? The player's visible resonance signature
-  determines "best" — this is derivable from purely public information.
+  using only visible resonance symbols (no pair-affinity encoding), making
+  the entire mechanism transparent?
 - **Avoidance cascade:** When the player commits to archetype X, AIs avoid X.
-  This pushes AIs toward the remaining 7 archetypes, creating secondary
-  avoidance effects. Combined with oversampling, the enriched pool makes N
-  more efficient.
+  This pushes AIs toward the remaining archetypes, creating secondary
+  concentration effects in the pool.
 - **Split oversampling:** Draw N cards, but show 2 "best for your archetype" +
   2 "highest power regardless of archetype." Maintains exploration tension
-  even in late draft — the player must choose between synergy and raw power.
-- **Explicit N as game rule:** What if the player knows N? "The market scouts
-  48 cards and shows you the 4 best matches." Does transparency change the
-  player experience? Does it create a different skill axis?
+  even in late draft.
+- **Continuous market with avoidance:** Instead of declining refills, use a
+  continuous market (drafted cards partially replaced). AIs cycle their
+  archetypes through the market while the player's archetype accumulates.
+  Does this achieve contraction through a different path?
+- **Variable AI count by round:** Start with 3 AIs (slow contraction) and
+  add 2 more in later rounds (fast contraction). Fewer AIs early = more
+  exploration; more AIs late = faster concentration.
 
 ---
 
@@ -860,18 +903,19 @@ A single critic reads all 6 design proposals, all research, and this plan.
 **Task:**
 
 1. Rank all proposals on: M3/M11' potential, player experience, simplicity,
-   signal reading quality, AI avoidance narrative quality, oversampling honesty.
+   signal reading quality, AI avoidance narrative quality, contraction
+   trajectory, pool exhaustion risk.
 2. Evaluate whether AI avoidance is genuinely "public information" behavior or
    a dressed-up Level 2+ mechanism. Where is the line?
-3. Assess oversampling configurations: is "draw N, show best 4" honest? At
-   what N does it feel curated vs natural? Is it V9 contraction in disguise?
-4. Evaluate the M3 target: is M3 >= 2.0 with 4-card packs a reasonable target
-   for the oversampling paradigm, or should it be recalibrated?
-5. Evaluate the interaction between AI avoidance and oversampling N: are they
-   complementary, redundant, or in tension? What is the minimum viable N with
-   avoidance vs without?
-6. Evaluate whether progressive N (low early, high late) is better than
-   constant N for player experience and metric performance.
+3. Assess pool contraction trajectories: which refill schedules produce the
+   right late-draft pool size? Is pool exhaustion a risk?
+4. Assess oversampling at N = 8-12: does it feel natural? Is it necessary if
+   contraction is aggressive enough? Could N = 4 (uniform) suffice?
+5. Evaluate the interaction between AI avoidance, pool contraction, and
+   oversampling: which combination achieves M3 >= 2.0 most naturally?
+6. Evaluate whether the pool contraction approach is structurally equivalent
+   to V9's invisible contraction. Is it more honest? Does it preserve the
+   same concentration quality?
 7. Propose 1-2 hybrid designs combining the best elements.
 8. Recommend 4-6 algorithms for simulation.
 
@@ -891,8 +935,9 @@ Each agent implements and simulates their champion as modified by the critic.
 - Fitness: Graduated Realistic (primary), Pessimistic (secondary)
 - All 14 metrics (M1-M11', M12, M13, M14)
 - Must implement AI avoidance logic (inference + behavior change)
+- Must implement declining refills per the specified schedule
 - Must implement oversampled pack construction (draw N, rank by fitness, show
-  best 4) with specified N value
+  best 4) with specified N value (4-12)
 - Must track AI inference accuracy (how often does AI correctly identify the
   player's archetype, and at what pick?)
 
@@ -907,10 +952,12 @@ Results must include:
 - Per-archetype M3 table (8 rows)
 - **AI avoidance timeline:** At what pick does each AI begin avoiding the
   player's archetype? How accurate is the inference?
+- **Pool contraction trajectory:** Track pool size, archetype density, and
+  S/A count at each pick. Show the contraction curve. At what pick does the
+  player's archetype become 40%+ of the pool?
 - **Oversampling analysis:** What is the actual per-pack archetype density
-  achieved at the specified N? How does it compare to N = 4 (uniform baseline)?
-  Track S/A count remaining in pool over the draft to verify avoidance
-  maintains supply.
+  achieved at the specified N (4-12)? How does it compare to N = 4 (uniform)?
+  Track S/A count remaining in pool to verify avoidance maintains supply.
 - Pack quality distribution (p10/p25/p50/p75/p90 for picks 6+)
 - Consecutive bad pack analysis
 - **Pool composition trajectory:** Show how archetype distribution evolves
@@ -918,8 +965,8 @@ Results must include:
 - 2 draft traces (committed player, signal reader) — including AI avoidance
   moments
 - Comparison to V9 baseline and V11 results
-- Self-assessment: Is AI avoidance + oversampling a viable replacement for
-  V9 contraction, or is it a complement?
+- Self-assessment: Is AI avoidance + physical pool contraction + modest
+  oversampling a viable replacement for V9's invisible contraction?
 
 ---
 
@@ -930,19 +977,20 @@ Results must include:
 ### File 1: `docs/resonance/v12/final_report.md` (max 4000 words)
 
 1. Unified comparison table (all V12 algorithms + V9/V10/V11 baselines)
-2. The key question: **Can AI avoidance + oversampled pack construction replace
-   V9's virtual contraction?**
+2. The key question: **Can AI avoidance + physical pool contraction + modest
+   oversampling replace V9's virtual contraction?**
 3. AI avoidance analysis: which models work and which are surveillance?
-4. Oversampling analysis: what N values achieve M3 targets? Is "draw N, show
-   best 4" honest? How does the ranking criterion affect results?
-5. The interaction: how much does avoidance contribute vs oversampling N?
+4. Pool contraction analysis: which refill schedules produce the right
+   trajectory? How does physical contraction compare to V9's invisible version?
+5. Oversampling analysis: is N = 8 sufficient, or is N = 12 needed? Can
+   N = 4 (uniform) work if contraction is aggressive enough?
 6. Per-archetype convergence for top 3 algorithms
 7. V12 vs V9 vs V10 vs V11 comparison
 8. Recommendation tiers:
-   - **Pure AI Avoidance:** Best design using only AI avoidance behavior (N = 4,
-     no oversampling). Establishes the demand-side contribution.
-   - **Standard:** Best overall design combining AI avoidance + oversampling.
-     Specifies the optimal N value.
+   - **Contraction Only:** Best design using AI avoidance + pool contraction
+     with N = 4 (uniform packs). Establishes the physical contraction baseline.
+   - **Standard:** Best overall design combining AI avoidance + pool contraction
+     + modest oversampling (N = 8-12).
    - **V9 Enhanced:** V9's engine with AI avoidance as a narrative layer. The
      fallback if V12's mechanisms don't achieve M3 >= 2.0 independently.
 9. Complete specification for the recommended algorithm
@@ -955,7 +1003,7 @@ Catalog of all algorithms ordered by preference:
 1. Recommended (1-2 algorithms)
 2. Viable alternatives
 3. Eliminated algorithms organized by failure mode
-4. Structural findings about AI avoidance and oversampling
+4. Structural findings about AI avoidance, pool contraction, and oversampling
 
 ---
 
@@ -963,7 +1011,7 @@ Catalog of all algorithms ordered by preference:
 
 | Round | Agents | Type | Description |
 |-------|--------|------|-------------|
-| 1 | 3 | Parallel | Research: avoidance, pack construction, math |
+| 1 | 3 | Parallel | Research: avoidance, pool contraction, math |
 | 2 | 6 | Parallel | Algorithm design |
 | 3 | 1 + 6 responses | Sequential | Critic review + designer responses |
 | 4 | 6 | Parallel | Simulation |
@@ -975,8 +1023,8 @@ Catalog of all algorithms ordered by preference:
 | File | Round | Description |
 |------|-------|-------------|
 | `research_ai_avoidance.md` | 1 | AI avoidance in competitive drafting |
-| `research_pack_construction.md` | 1 | Pack construction methods |
-| `research_concentration_math.md` | 1 | Math for avoidance + packs |
+| `research_pool_contraction.md` | 1 | Pool contraction via physical AI drafting |
+| `research_concentration_math.md` | 1 | Math for contraction + avoidance + oversampling |
 | `design_{1..6}.md` (x6) | 2 | Algorithm proposals |
 | `critic_review.md` | 3 | Cross-proposal analysis |
 | `sim_{1..6}.py` (x6) | 4 | Simulation code |
@@ -988,47 +1036,45 @@ All files in `docs/resonance/v12/`.
 
 ## Key Principles
 
-1. **AI avoidance is the core demand-side mechanism.** Every design must include
+1. **AI avoidance is the demand-side mechanism.** Every design must include
    AIs that detect and avoid the player's draft archetype using publicly
    available information. The strength, timing, and inference method vary, but
-   the avoidance behavior is the central thesis.
-2. **Oversampling is the supply-side amplifier.** V11 proved that uniform
-   4-card packs (N = 4) from a 120-card pool cannot achieve M3 >= 2.0.
-   Oversampling (draw N > 4, show best 4) is how V12 bridges the pack-sampling
-   bottleneck. N is the primary tuning parameter. The "best 4" ranking
-   criterion (visible symbols only vs hidden pair-affinity) is a secondary
-   design variable.
-3. **Public information is the honesty criterion.** AI avoidance must use only
+   the avoidance behavior is a central thesis. Avoidance preserves the
+   player's S/A supply in the pool.
+2. **Physical pool contraction is the primary concentration mechanism.** AIs
+   physically take non-player cards. Declining refills mean the pool shrinks.
+   With avoidance, the player's archetype accumulates as a larger fraction of
+   the shrinking pool. This is V9's contraction achieved transparently through
+   actual drafting. The refill schedule is the primary tuning parameter.
+3. **Oversampling is a modest supplement (N = 8-12).** With pool contraction
+   doing the heavy lifting, oversampling provides a light boost — drawing
+   8-12 cards from a contracted pool and showing the best 4. This feels
+   natural (a third to half of a 25-card pool) and honest (the player can
+   browse the pool). N is NOT the primary mechanism.
+4. **Public information is the honesty criterion.** AI avoidance must use only
    information available to all players. The player's visible resonance
    signature (computed from their drafted cards' symbols) is public. The
    player's internal strategy, commitment level, and card-by-card evaluation
    are private. AIs must not use private information.
-4. **V9 is the fallback, not the enemy.** If no V12 face-up pool mechanism
+5. **V9 is the fallback, not the enemy.** If no V12 face-up pool mechanism
    achieves M3 >= 2.0 independently, the recommendation should be V9's engine
    (non-face-up) enhanced with AI avoidance narrative. V12's contribution
    would then be the improved AI narrative (avoidance behavior makes AIs feel
    smarter and more realistic). Agent 4 explicitly tests this fallback.
-5. **4-card packs are fixed.** The game uses "show 4, pick 1." Pack size is not
+6. **4-card packs are fixed.** The game uses "show 4, pick 1." Pack size is not
    a variable. Pack construction method is.
-6. **AI avoidance must feel natural.** The player should perceive AI avoidance
+7. **AI avoidance must feel natural.** The player should perceive AI avoidance
    as rational opponent behavior, not as the game manipulating outcomes. "They
    noticed I'm drafting Storm and backed off" should feel like a competitive
    dynamic, not a designed safety net.
-7. **M3 target may need recalibration.** M3 = 2.0 requires an oversample size
-   of N ≈ 48 (drawing 48 cards from the pool, showing best 4) with AI
-   avoidance maintaining S/A supply. Agents should evaluate whether a lower M3
-   target (e.g., 1.5, achievable at N ≈ 36) produces acceptable player
-   experience, and what the minimum M3 is for the draft to "feel good."
-8. **Separate avoidance from oversampling.** Agent 1 explicitly tests avoidance
-   alone (N = 4) to isolate its contribution. This is essential calibration.
-   If avoidance alone produces M3 = 0.5, and oversampling alone (N = 48, no
-   avoidance) produces M3 = 1.5, but the combination produces M3 = 2.5, the
-   interaction effect is clear.
-9. **Transparency over stealth.** The face-up pool makes AI avoidance
-   naturally visible — the player can browse the pool and see that their
-   archetype's cards are persisting while other archetypes deplete. When AIs
-   start avoiding the player's archetype, the effect is directly observable
-   in the pool. The player should be able to observe and exploit this behavior.
+8. **Isolate the three mechanisms.** Agent 1 tests avoidance + contraction
+   with N = 4 (no oversampling) to establish the pool-contraction baseline.
+   Comparing Agent 1 (N = 4) to agents with N = 8 or N = 12 isolates the
+   oversampling contribution. This calibration is essential.
+9. **Transparency over stealth.** The face-up pool makes AI avoidance and pool
+   contraction naturally visible — the player can browse the pool and see
+   their archetype's cards persisting while other archetypes deplete and the
+   pool shrinks. The player should be able to observe and exploit this.
 
 ## Recovery
 
