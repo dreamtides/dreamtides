@@ -184,8 +184,7 @@ Not a variable.
 
 ## The Information Design Space
 
-This is V9's novel contribution. Every card has two layers of resonance
-information:
+This is V9's novel contribution. Every card has two layers of information:
 
 ### Layer 1: Visible Resonance (Player-Facing)
 
@@ -206,27 +205,46 @@ The visible symbols must feel meaningful:
 ### Layer 2: Hidden Metadata (Algorithm-Only)
 
 What the algorithm knows but the player doesn't see. This is assigned during
-card design and used by the pack construction algorithm.
-
-**Possible hidden metadata (agents should explore):**
+card design and used by the pack construction algorithm. **Hidden metadata
+is not limited to resonance-style symbols — agents should explore any form
+of per-card data that helps the algorithm build better packs.** Examples
+include but are not limited to:
 
 - **Archetype tag:** Each card is tagged with its "best" archetype. A card
   showing (Tide) might be tagged "Warriors" or "Sacrifice" based on its
-  mechanical design. This is the simplest form of hidden metadata.
+  mechanical design. This is the simplest form of hidden metadata (~3 bits
+  for 8 archetypes).
 
 - **Archetype affinity scores:** Each card has a score (0-1) for each
   archetype, representing how well it plays in that archetype. More
   information than a tag, but more honest — the scores reflect real
   mechanical fit.
 
-- **Hidden secondary resonance:** Each card has a hidden second (or third)
-  symbol used for algorithmic pair-matching but not shown to the player.
-  Equivalent to V8's dual-resonance pool but invisible.
+- **Mechanical keyword tags:** Cards are tagged with gameplay-relevant
+  properties (e.g., "removal," "card-draw," "creature," "graveyard-matters")
+  that the algorithm uses to ensure pack diversity or archetype coherence
+  without referencing resonance at all.
+
+- **Synergy graph edges:** Cards carry hidden links to other cards they
+  synergize with, and the algorithm biases packs toward cards that connect
+  to the player's existing draft. No resonance information needed.
 
 - **Archetype cluster membership:** Cards are grouped into overlapping
   clusters by mechanical theme (e.g., "creature-matters," "spell-matters,"
   "graveyard-matters") and the algorithm uses cluster overlap to identify
   cross-archetype cards.
+
+- **Hidden secondary resonance:** Each card has a hidden second (or third)
+  resonance symbol used for algorithmic pair-matching but not shown to the
+  player. Equivalent to V8's dual-resonance pool but invisible. This is
+  only one option among many — not the default assumption.
+
+- **Power-curve metadata:** Cards carry hidden indicators of their draft
+  timing (early pick vs. late pick value) that the algorithm uses to shape
+  pack quality progression.
+
+Agents should feel free to propose hidden metadata schemes not listed here.
+The key constraint is design integrity (V3 metric), not the form of the data.
 
 ### The Design Integrity Spectrum
 
@@ -235,26 +253,27 @@ From most honest to most "cheating":
 1. **No hidden info (V7 baseline):** Algorithm uses only visible symbols.
    Limited to M3 ~ 2.24 (SF+Bias R1) on the low-dual-res pool.
 
-2. **Hidden archetype affinity scores based on real mechanical fit:** Each
-   card gets an honest assessment of which archetypes it serves. The
-   algorithm uses this to build better packs. Defensible because the scores
-   reflect reality.
+2. **Hidden metadata derived from real card properties:** Archetype affinity
+   scores, mechanical keyword tags, synergy relationships — data that
+   reflects genuine properties of the card. A player who looked it up would
+   agree the metadata is accurate. Defensible because it reflects reality.
 
 3. **Hidden archetype tag (best-fit assignment):** Each card gets one
    archetype label. Simple but loses nuance — a card that's B-tier in two
-   archetypes gets assigned to only one.
+   archetypes gets assigned to only one. Still honest, but a simplification.
 
-4. **Hidden pair-matching symbols:** Equivalent to V8's 40% dual-res pool
-   but invisible. The player sees (Tide); the algorithm sees (Tide, Zephyr).
-   Mathematically powerful but the "hidden symbol" doesn't always correspond
-   to the card's real mechanical fit.
+4. **Hidden algorithmic labels disconnected from card mechanics:** Tags
+   assigned purely to optimize algorithm performance, regardless of whether
+   they reflect the card's actual mechanical fit. Mathematically powerful
+   but players who discover the system may feel it's arbitrary.
 
 5. **Arbitrary hidden manipulation:** The algorithm can do anything it wants
    with hidden data. Maximum performance, minimum design integrity.
 
 **V9 should explore levels 1-4 and identify the sweet spot: the minimum
 hidden information that reaches M3 >= 2.0 while keeping the visible resonance
-system feeling important.**
+system feeling important. The hidden information need not be resonance-based
+at all — the best solution may use a completely different kind of metadata.**
 
 ---
 
@@ -452,11 +471,14 @@ dual-res pool but only M3 = 2.38 on the V7 15% pool (with Flash at 1.47).
 metadata instead of visible pair symbols?
 
 The player sees: "my packs are getting better as I commit to Tide."
-The algorithm does: contraction using hidden archetype tags or affinity scores,
-producing the same quality ramp but without requiring visible dual-res.
+The algorithm does: contraction using hidden metadata — which could be
+archetype tags, affinity scores, mechanical keyword tags, synergy graph
+edges, or any other per-card data — producing the same quality ramp but
+without requiring visible dual-res.
 
-How much hidden metadata does Narrative Gravity need? Is a simple archetype
-tag sufficient, or does it need full affinity scores?
+What kind of hidden metadata does Narrative Gravity need? Is a simple
+archetype tag sufficient? Would mechanical keywords or synergy data work
+better? Does the form of hidden data change the player experience?
 
 ### Agent 3: CSCT Detuned with Visible Emphasis
 
@@ -469,9 +491,10 @@ multiplier) to fix M6/M9 while using hidden metadata for the pair-matching
 and visible resonance for the player experience?
 
 CSCT has massive M3 headroom (2.92 vs. 2.0 target). Trading 0.5+ M3 for
-better M6, M9, and M10 should be feasible. The detuned version needs hidden
-metadata for pair-identification but the player experiences the visible
-resonance as the guiding signal.
+better M6, M9, and M10 should be feasible. The detuned version needs some
+form of hidden metadata (archetype tags, mechanical keywords, affinity
+scores, or other per-card data) for targeting precision, but the player
+experiences the visible resonance as the guiding signal.
 
 ### Agent 4: Layered Salience
 
