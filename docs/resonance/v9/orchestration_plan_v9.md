@@ -699,7 +699,7 @@ All files in `docs/resonance/v9/`.
 
 1. **Visible resonance is the primary signal.** If hidden manipulation makes
    visible symbols decorative, the design fails regardless of M3.
-2. **Minimum hidden information wins.** Between two algorithms with equal M3,
+2. **Minimum hidden information wins.** Between two algorithms with equal M3,c
    prefer the one with less hidden metadata.
 3. **Design integrity matters.** A player who discovers the hidden system
    should feel the game is fair, not deceptive.
