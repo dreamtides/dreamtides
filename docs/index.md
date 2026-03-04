@@ -154,17 +154,17 @@
   ABU in a scene.
 
 - [draft_simulation.md](draft_simulation/draft_simulation.md): The draft
-  simulator at `scripts/draft_simulator/` — how to run each mode (single,
-  trace, sweep, demo), all CLI flags, the 17-module layout and dependency
-  order, the 10-section `SimulatorConfig` tree and dot-notation overrides, the
-  five pick policies (greedy, archetype_loyal, force, adaptive,
-  signal_ignorant), commitment detection (concentration-based and
-  entropy-based) and its calibration pitfalls, the six metric families
-  (choice richness, forceability, signal benefit, convergence, splashability,
-  early openness), sweep CSV output and validation checks, and Python/Pyre
-  conventions including the flat-namespace naming constraint. Read when running
-  the draft simulator, tuning parameters, interpreting metrics, adding new
-  modules, or debugging commitment detection.
+  simulator at `scripts/draft_simulator/` — how to run each mode (single, trace,
+  sweep, demo), all CLI flags, the 17-module layout and dependency order, the
+  10-section `SimulatorConfig` tree and dot-notation overrides, the five pick
+  policies (greedy, archetype_loyal, force, adaptive, signal_ignorant),
+  commitment detection (concentration-based and entropy-based) and its
+  calibration pitfalls, the six metric families (choice richness, forceability,
+  signal benefit, convergence, splashability, early openness), sweep CSV output
+  and validation checks, and Python/Pyre conventions including the
+  flat-namespace naming constraint. Read when running the draft simulator,
+  tuning parameters, interpreting metrics, adding new modules, or debugging
+  commitment detection.
 
 - [abu_internals.md](abu/abu_internals.md): ABU implementation details —
   architecture (TcpServer, AbuBridge, SnapshotCommandHandler, SnapshotFormatter,
