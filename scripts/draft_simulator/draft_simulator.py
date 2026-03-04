@@ -107,6 +107,13 @@ def build_parser() -> argparse.ArgumentParser:
         default=False,
         help="Print a summary of the card pool before draft results",
     )
+    parser.add_argument(
+        "--quiet",
+        "-q",
+        action="store_true",
+        default=False,
+        help="Suppress incremental progress bars",
+    )
     return parser
 
 
@@ -141,7 +148,12 @@ def main() -> None:
     if mode == "single":
         runs = args.runs if args.runs is not None else 1
         _run_single(
-            cfg, seed, describe_pool=args.describe_pool, runs=runs, preset=args.preset
+            cfg,
+            seed,
+            describe_pool=args.describe_pool,
+            runs=runs,
+            preset=args.preset,
+            quiet=args.quiet,
         )
     elif mode == "trace":
         _run_trace(cfg, seed, output_dir)
@@ -192,6 +204,7 @@ def _run_single(
     describe_pool: bool = False,
     runs: int = 1,
     preset: str | None = None,
+    quiet: bool = False,
 ) -> None:
     """Run one or more drafts and print per-seat results with metrics."""
     _print_header(cfg, seed, runs, preset)
@@ -199,7 +212,7 @@ def _run_single(
     if runs == 1:
         _run_single_once(cfg, seed, describe_pool)
     else:
-        _run_single_multi(cfg, seed, runs, describe_pool)
+        _run_single_multi(cfg, seed, runs, describe_pool, quiet)
 
 
 def _run_single_once(
@@ -263,6 +276,7 @@ def _run_single_multi(
     base_seed: int,
     runs: int,
     describe_pool: bool,
+    quiet: bool = False,
 ) -> None:
     """Run multiple drafts and print averaged results."""
     seat_count = cfg.draft.seat_count
@@ -300,19 +314,20 @@ def _run_single_multi(
 
         all_metrics.append(metrics.compute_metrics(result, cfg))
 
-        # Progress bar on stderr
-        done = run_i + 1
-        print(
-            colors.format_progress_bar(done, runs, use_color=sys.stderr.isatty()),
-            end="",
-            file=sys.stderr,
-        )
+        if not quiet:
+            done = run_i + 1
+            print(
+                colors.format_progress_bar(done, runs, use_color=sys.stderr.isatty()),
+                end="",
+                file=sys.stderr,
+            )
 
-    print(file=sys.stderr)  # newline after progress bar
+    if not quiet:
+        print(file=sys.stderr)  # newline after progress bar
 
     # Run comparison drafts for forceability and signal benefit
     signal_benefit_val, forceability_val, forceability_arch, forceability_per_arch = (
-        _run_comparison_drafts(cfg, base_seed, runs, adaptive_all_dvs)
+        _run_comparison_drafts(cfg, base_seed, runs, adaptive_all_dvs, quiet)
     )
 
     # Per-seat summary
@@ -370,6 +385,7 @@ def _run_comparison_drafts(
     base_seed: int,
     runs: int,
     adaptive_all_dvs: list[float],
+    quiet: bool = False,
 ) -> tuple[float | None, float | None, int | None, dict[int, float] | None]:
     """Run signal-ignorant and force-policy drafts for cross-run metrics.
 
@@ -392,27 +408,7 @@ def _run_comparison_drafts(
         ignorant_result = draft_runner.run_draft(ignorant_cfg, run_seed)
         ignorant_all_dvs.extend(sr.deck_value for sr in ignorant_result.seat_results)
         comparison_done += 1
-        print(
-            colors.format_progress_bar(
-                comparison_done,
-                comparison_total,
-                use_color=sys.stderr.isatty(),
-                label="comparison runs",
-            ),
-            end="",
-            file=sys.stderr,
-        )
-
-        # Force comparisons per archetype
-        for arch in range(archetype_count):
-            force_cfg = config.clone_config(cfg)
-            force_cfg.agents.policy = "force"
-            force_cfg.agents.force_archetype = arch
-            force_result = draft_runner.run_draft(force_cfg, run_seed)
-            force_all_dvs[arch].extend(
-                sr.deck_value for sr in force_result.seat_results
-            )
-            comparison_done += 1
+        if not quiet:
             print(
                 colors.format_progress_bar(
                     comparison_done,
@@ -424,7 +420,30 @@ def _run_comparison_drafts(
                 file=sys.stderr,
             )
 
-    print(file=sys.stderr)  # newline after comparison progress
+        # Force comparisons per archetype
+        for arch in range(archetype_count):
+            force_cfg = config.clone_config(cfg)
+            force_cfg.agents.policy = "force"
+            force_cfg.agents.force_archetype = arch
+            force_result = draft_runner.run_draft(force_cfg, run_seed)
+            force_all_dvs[arch].extend(
+                sr.deck_value for sr in force_result.seat_results
+            )
+            comparison_done += 1
+            if not quiet:
+                print(
+                    colors.format_progress_bar(
+                        comparison_done,
+                        comparison_total,
+                        use_color=sys.stderr.isatty(),
+                        label="comparison runs",
+                    ),
+                    end="",
+                    file=sys.stderr,
+                )
+
+    if not quiet:
+        print(file=sys.stderr)  # newline after comparison progress
 
     mean_adaptive = (
         sum(adaptive_all_dvs) / len(adaptive_all_dvs) if adaptive_all_dvs else 0.0
