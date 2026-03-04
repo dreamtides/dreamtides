@@ -98,6 +98,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Override a config parameter (repeatable, KEY=VALUE)",
     )
+    parser.add_argument(
+        "--describe-pool",
+        action="store_true",
+        default=False,
+        help="Print a summary of the card pool before draft results",
+    )
     return parser
 
 
@@ -130,7 +136,7 @@ def main() -> None:
     output_dir: str = args.output_dir
 
     if mode == "single":
-        _run_single(cfg, seed)
+        _run_single(cfg, seed, describe_pool=args.describe_pool)
     elif mode == "trace":
         _run_trace(cfg, seed, output_dir)
     elif mode == "demo":
@@ -143,6 +149,7 @@ def main() -> None:
 def _run_single(
     cfg: SimulatorConfig,
     seed: int,
+    describe_pool: bool = False,
 ) -> None:
     """Run a single draft and print per-seat results with metrics."""
     print(
@@ -154,17 +161,19 @@ def _run_single(
 
     result = draft_runner.run_draft(cfg, seed)
 
-    # Describe the card pool used for this draft
-    designs = _unique_designs(result.card_pool)
-    source_label = (
-        f"file ({cfg.cards.file_path})" if cfg.cards.source == "file" else "synthetic"
-    )
-    print()
-    print(
-        card_generator.describe_card_pool(
-            designs, cfg.cards.archetype_count, source_label
+    if describe_pool:
+        designs = _unique_designs(result.card_pool)
+        source_label = (
+            f"file ({cfg.cards.file_path})"
+            if cfg.cards.source == "file"
+            else "synthetic"
         )
-    )
+        print()
+        print(
+            card_generator.describe_card_pool(
+                designs, cfg.cards.archetype_count, source_label
+            )
+        )
 
     print()
     for seat_idx, sr in enumerate(result.seat_results):
