@@ -69,7 +69,8 @@ def compute_constrained_weights(
         fitness_norm = _l2_norm(fitness)
         similarity = dot / (fitness_norm * signal_norm + eps)
         weight = (1.0 - fidelity) + fidelity * similarity
-        weight *= (1.0 - commit_bias) + commit_bias * inst.design.commit
+        if fidelity > 0.0:
+            weight *= (1.0 - commit_bias) + commit_bias * inst.design.commit
         weights.append(max(weight, 0.001))
 
     return weights

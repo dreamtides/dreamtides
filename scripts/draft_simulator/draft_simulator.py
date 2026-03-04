@@ -277,6 +277,12 @@ def _demo_commitment_detection(
     print(f"    Entropy commitment pick: {uniform_result.entropy_commitment_pick}")
 
 
+def _print_pack_composition(label: str, pack: Pack) -> None:
+    """Print the card names in a pack for QA inspection."""
+    names = [c.design.name for c in pack.cards]
+    print(f"  {label} ({len(names)} cards): {', '.join(names)}")
+
+
 def _demo_refill_strategies(
     cards: list[CardDesign],
     cfg: SimulatorConfig,
@@ -286,42 +292,55 @@ def _demo_refill_strategies(
     """Demonstrate each refill strategy on a sample pack."""
     print("\n=== Refill Strategy Demonstrations ===")
 
-    # Generate a base pack from a fresh cube
-    demo_cube = cube_manager.CubeManager(
-        designs=cards,
-        copies_per_card=cfg.cube.copies_per_card,
-        consumption_mode=consumption_mode,
-    )
-    base_pack = pack_generator.generate_pack("uniform", demo_cube, cfg, rng)
+    # Generate three independent base packs (one per strategy demo) from
+    # independent cubes so the demonstrations are isolated.
+    def _fresh_pack() -> tuple[cube_manager.CubeManager, Pack]:
+        c = cube_manager.CubeManager(
+            designs=cards,
+            copies_per_card=cfg.cube.copies_per_card,
+            consumption_mode=consumption_mode,
+        )
+        p = pack_generator.generate_pack("uniform", c, cfg, rng)
+        return c, p
 
     # --- NoRefill ---
     print("\n--- NoRefill ---")
-    pack_before = len(base_pack.cards)
+    _, no_refill_pack = _fresh_pack()
+    _print_pack_composition("Pack before", no_refill_pack)
     result = refill.no_refill()
-    print(f"  Pack size before: {pack_before}")
     print(f"  Refill card: None (no card added)")
-    print(f"  Pack size after:  {pack_before}")
+    _print_pack_composition("Pack after", no_refill_pack)
+    print(f"  Pack size before: {len(no_refill_pack.cards)}")
+    print(f"  Pack size after:  {len(no_refill_pack.cards)}")
 
     # --- UniformRefill ---
     print("\n--- UniformRefill ---")
-    uniform_cube = cube_manager.CubeManager(
-        designs=cards,
-        copies_per_card=cfg.cube.copies_per_card,
-        consumption_mode=consumption_mode,
-    )
+    uniform_cube, uniform_pack = _fresh_pack()
+    _print_pack_composition("Pack before", uniform_pack)
+    size_before = len(uniform_pack.cards)
     uniform_card = refill.uniform_refill(uniform_cube, rng)
-    print(f"  Pack size before: {pack_before}")
+    uniform_pack.cards.append(uniform_card)
     print(f"  Refill card: {uniform_card.design.name}")
-    print(f"  Pack size after:  {pack_before + 1}")
+    _print_pack_composition("Pack after", uniform_pack)
+    print(f"  Pack size before: {size_before}")
+    print(f"  Pack size after:  {len(uniform_pack.cards)}")
 
-    # --- ConstrainedRefill ---
+    # --- ConstrainedRefill (pack_origin) ---
     print("\n--- ConstrainedRefill ---")
-    constrained_cube = cube_manager.CubeManager(
-        designs=cards,
-        copies_per_card=cfg.cube.copies_per_card,
-        consumption_mode=consumption_mode,
-    )
-    signal = base_pack.archetype_profile
+    constrained_cube, constrained_pack = _fresh_pack()
+    _print_pack_composition("Pack before", constrained_pack)
+    size_before = len(constrained_pack.cards)
+
+    # Select signal based on fingerprint_source config
+    if cfg.refill.fingerprint_source == "round_environment":
+        # Compute round environment from all packs generated this round
+        all_packs = [constrained_pack]
+        signal = refill.compute_round_environment_profile(all_packs)
+        print(f"  Fingerprint source: round_environment")
+    else:
+        signal = constrained_pack.archetype_profile
+        print(f"  Fingerprint source: pack_origin")
+
     signal_str = ", ".join(f"{v:.4f}" for v in signal)
     print(f"  Signal vector: [{signal_str}]")
 
@@ -332,11 +351,20 @@ def _demo_refill_strategies(
         commit_bias=cfg.refill.commit_bias,
         rng=rng,
     )
+    constrained_pack.cards.append(constrained_card)
     similarity = refill.cosine_similarity(constrained_card.design.fitness, signal)
-    print(f"  Pack size before: {pack_before}")
     print(f"  Refill card: {constrained_card.design.name}")
     print(f"  Cosine similarity to signal: {similarity:.4f}")
-    print(f"  Pack size after:  {pack_before + 1}")
+    _print_pack_composition("Pack after", constrained_pack)
+    print(f"  Pack size before: {size_before}")
+    print(f"  Pack size after:  {len(constrained_pack.cards)}")
+
+    # Also demonstrate round_environment signal computation
+    print("\n  Round environment profile (across all demo packs):")
+    demo_packs = [uniform_pack, constrained_pack]
+    round_env = refill.compute_round_environment_profile(demo_packs)
+    env_str = ", ".join(f"{v:.4f}" for v in round_env)
+    print(f"    [{env_str}]")
 
 
 def _run_with_error_handling() -> None:

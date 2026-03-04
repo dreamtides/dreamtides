@@ -1,9 +1,14 @@
-"""Tests for refill strategies."""
+"""Tests for refill strategies.
+
+Covers all three refill strategies (no_refill, uniform_refill,
+constrained_refill), cosine similarity, round environment profile
+computation, commit bias, and empty-signal edge cases. Stdlib-only,
+no external dependencies.
+"""
 
 import math
 import random
-import sys
-from typing import Callable
+import unittest
 
 import card_generator
 import config
@@ -36,7 +41,6 @@ def _make_pack(
     cube: cube_manager.CubeManager, rng: random.Random, pack_size: int = 10
 ) -> Pack:
     cards = cube.draw(pack_size, rng)
-    # Compute a simple archetype profile
     archetype_count = len(cards[0].design.fitness)
     profile = [0.0] * archetype_count
     for c in cards:
@@ -47,223 +51,225 @@ def _make_pack(
     return Pack(pack_id="test_pack", cards=list(cards), archetype_profile=profile)
 
 
-def test_no_refill_returns_none() -> None:
-    """NoRefill should return None and not modify the pack."""
-    designs = _make_test_designs()
-    cube = _make_cube(designs)
-    rng = random.Random(42)
-    pack = _make_pack(cube, rng)
-    original_size = len(pack.cards)
+class TestRefillStrategies(unittest.TestCase):
+    """Tests for refill strategy functions."""
 
-    result = refill.no_refill()
-    assert result is None, f"Expected None, got {result}"
-    # Pack should be unchanged
-    assert len(pack.cards) == original_size
-    print("  PASS: test_no_refill_returns_none")
+    def test_no_refill_returns_none(self) -> None:
+        """NoRefill should return None and not modify the pack."""
+        designs = _make_test_designs()
+        cube = _make_cube(designs)
+        rng = random.Random(42)
+        pack = _make_pack(cube, rng)
+        original_size = len(pack.cards)
 
+        result = refill.no_refill()
+        self.assertIsNone(result)
+        self.assertEqual(len(pack.cards), original_size)
 
-def test_uniform_refill_returns_one_card() -> None:
-    """UniformRefill should return exactly one CardInstance."""
-    designs = _make_test_designs()
-    cube = _make_cube(designs)
-    rng = random.Random(42)
+    def test_uniform_refill_returns_one_card(self) -> None:
+        """UniformRefill should return exactly one CardInstance."""
+        designs = _make_test_designs()
+        cube = _make_cube(designs)
+        rng = random.Random(42)
 
-    result = refill.uniform_refill(cube, rng)
-    assert isinstance(
-        result, CardInstance
-    ), f"Expected CardInstance, got {type(result)}"
-    print("  PASS: test_uniform_refill_returns_one_card")
+        result = refill.uniform_refill(cube, rng)
+        self.assertIsInstance(result, CardInstance)
 
+    def test_constrained_refill_returns_one_card(self) -> None:
+        """ConstrainedRefill should return exactly one CardInstance."""
+        designs = _make_test_designs()
+        cube = _make_cube(designs)
+        rng = random.Random(42)
+        signal = [0.5] * 8
 
-def test_constrained_refill_returns_one_card() -> None:
-    """ConstrainedRefill should return exactly one CardInstance."""
-    designs = _make_test_designs()
-    cube = _make_cube(designs)
-    rng = random.Random(42)
-    signal = [0.5] * 8
+        result = refill.constrained_refill(
+            cube=cube,
+            signal=signal,
+            fidelity=0.7,
+            commit_bias=0.3,
+            rng=rng,
+        )
+        self.assertIsInstance(result, CardInstance)
 
-    result = refill.constrained_refill(
-        cube=cube,
-        signal=signal,
-        fidelity=0.7,
-        commit_bias=0.3,
-        rng=rng,
-    )
-    assert isinstance(
-        result, CardInstance
-    ), f"Expected CardInstance, got {type(result)}"
-    print("  PASS: test_constrained_refill_returns_one_card")
+    def test_constrained_refill_fidelity_zero_is_uniform(self) -> None:
+        """At fidelity=0.0, all weights should be equal regardless of commit_bias."""
+        designs = _make_test_designs()
+        cube = _make_cube(designs)
 
+        signal = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-def test_constrained_refill_fidelity_zero_is_uniform() -> None:
-    """At fidelity=0.0, all weights should be equal (no cosine influence)."""
-    designs = _make_test_designs()
-    cube = _make_cube(designs)
+        # With commit_bias=0.0
+        weights = refill.compute_constrained_weights(
+            cube.supply, signal, fidelity=0.0, commit_bias=0.0
+        )
+        for i, w in enumerate(weights):
+            self.assertAlmostEqual(
+                w, 1.0, places=6, msg=f"Weight at index {i} should be 1.0"
+            )
 
-    signal = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        # With commit_bias=0.3 (default), fidelity=0 should still be uniform
+        weights_with_bias = refill.compute_constrained_weights(
+            cube.supply, signal, fidelity=0.0, commit_bias=0.3
+        )
+        for i, w in enumerate(weights_with_bias):
+            self.assertAlmostEqual(
+                w,
+                1.0,
+                places=6,
+                msg=f"Weight at index {i} should be 1.0 even with commit_bias=0.3",
+            )
 
-    weights = refill.compute_constrained_weights(
-        cube.supply, signal, fidelity=0.0, commit_bias=0.0
-    )
-    # All weights should be 1.0 (since (1 - 0) + 0 * sim = 1.0, then * (1 - 0) + 0 * c = 1.0)
-    for i, w in enumerate(weights):
-        assert (
-            abs(w - 1.0) < 1e-6
-        ), f"Weight at index {i} should be 1.0 at fidelity=0, got {w}"
-    print("  PASS: test_constrained_refill_fidelity_zero_is_uniform")
+    def test_constrained_refill_fidelity_one_favors_similar(self) -> None:
+        """At fidelity=1.0, weights should be dominated by cosine similarity."""
+        similar = CardDesign(
+            card_id="sim",
+            name="Similar",
+            fitness=[0.9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            power=0.5,
+            commit=0.5,
+            flex=0.5,
+        )
+        dissimilar = CardDesign(
+            card_id="dis",
+            name="Dissimilar",
+            fitness=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.9],
+            power=0.5,
+            commit=0.5,
+            flex=0.5,
+        )
+        instances = [
+            CardInstance(instance_id=0, design=similar),
+            CardInstance(instance_id=1, design=dissimilar),
+        ]
+        signal = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
+        weights = refill.compute_constrained_weights(
+            instances, signal, fidelity=1.0, commit_bias=0.0
+        )
+        self.assertGreater(weights[0], weights[1])
 
-def test_constrained_refill_fidelity_one_favors_similar() -> None:
-    """At fidelity=1.0, weights should be dominated by cosine similarity."""
-    # Create cards with known fitness: one very similar, one dissimilar
-    similar = CardDesign(
-        card_id="sim",
-        name="Similar",
-        fitness=[0.9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        power=0.5,
-        commit=0.5,
-        flex=0.5,
-    )
-    dissimilar = CardDesign(
-        card_id="dis",
-        name="Dissimilar",
-        fitness=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.9],
-        power=0.5,
-        commit=0.5,
-        flex=0.5,
-    )
-    instances = [
-        CardInstance(instance_id=0, design=similar),
-        CardInstance(instance_id=1, design=dissimilar),
-    ]
-    signal = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    def test_cosine_similarity_function(self) -> None:
+        """Test the cosine similarity calculation directly."""
+        a = [1.0, 0.0, 0.0]
+        b = [1.0, 0.0, 0.0]
+        sim = refill.cosine_similarity(a, b)
+        self.assertAlmostEqual(sim, 1.0, places=6)
 
-    weights = refill.compute_constrained_weights(
-        instances, signal, fidelity=1.0, commit_bias=0.0
-    )
-    # The similar card should have much higher weight
-    assert (
-        weights[0] > weights[1]
-    ), f"Similar card weight ({weights[0]}) should be > dissimilar ({weights[1]})"
-    print("  PASS: test_constrained_refill_fidelity_one_favors_similar")
+        a = [1.0, 0.0, 0.0]
+        b = [0.0, 1.0, 0.0]
+        sim = refill.cosine_similarity(a, b)
+        self.assertAlmostEqual(sim, 0.0, places=6)
 
+        a = [1.0, 1.0, 0.0]
+        b = [1.0, 0.0, 0.0]
+        sim = refill.cosine_similarity(a, b)
+        expected = 1.0 / math.sqrt(2.0)
+        self.assertAlmostEqual(sim, expected, places=6)
 
-def test_cosine_similarity_function() -> None:
-    """Test the cosine similarity calculation directly."""
-    a = [1.0, 0.0, 0.0]
-    b = [1.0, 0.0, 0.0]
-    sim = refill.cosine_similarity(a, b)
-    assert abs(sim - 1.0) < 1e-6, f"Identical vectors should give sim=1.0, got {sim}"
+    def test_compute_round_environment_profile(self) -> None:
+        """Test round environment profile is mean of all pack profiles."""
+        packs = [
+            Pack(
+                pack_id="p1",
+                cards=[],
+                archetype_profile=[1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            ),
+            Pack(
+                pack_id="p2",
+                cards=[],
+                archetype_profile=[0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            ),
+        ]
+        profile = refill.compute_round_environment_profile(packs)
+        self.assertAlmostEqual(profile[0], 0.5, places=6)
+        self.assertAlmostEqual(profile[1], 0.5, places=6)
+        for i in range(2, 8):
+            self.assertAlmostEqual(profile[i], 0.0, places=6)
 
-    a = [1.0, 0.0, 0.0]
-    b = [0.0, 1.0, 0.0]
-    sim = refill.cosine_similarity(a, b)
-    assert abs(sim - 0.0) < 1e-6, f"Orthogonal vectors should give sim=0.0, got {sim}"
+    def test_commit_bias_increases_weight_for_high_commit(self) -> None:
+        """With commit_bias > 0, high-commit cards should get higher weights."""
+        high_commit = CardDesign(
+            card_id="hc",
+            name="HighCommit",
+            fitness=[0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            power=0.5,
+            commit=0.9,
+            flex=0.5,
+        )
+        low_commit = CardDesign(
+            card_id="lc",
+            name="LowCommit",
+            fitness=[0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            power=0.5,
+            commit=0.1,
+            flex=0.5,
+        )
+        instances = [
+            CardInstance(instance_id=0, design=high_commit),
+            CardInstance(instance_id=1, design=low_commit),
+        ]
+        signal = [0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-    a = [1.0, 1.0, 0.0]
-    b = [1.0, 0.0, 0.0]
-    sim = refill.cosine_similarity(a, b)
-    expected = 1.0 / math.sqrt(2.0)
-    assert abs(sim - expected) < 1e-6, f"Expected {expected}, got {sim}"
-    print("  PASS: test_cosine_similarity_function")
+        weights = refill.compute_constrained_weights(
+            instances, signal, fidelity=0.5, commit_bias=0.8
+        )
+        self.assertGreater(weights[0], weights[1])
 
+    def test_empty_round_environment_profile(self) -> None:
+        """Empty pack list should return empty profile."""
+        profile = refill.compute_round_environment_profile([])
+        self.assertEqual(profile, [])
 
-def test_compute_round_environment_profile() -> None:
-    """Test round environment profile is mean of all pack profiles."""
-    packs = [
-        Pack(
-            pack_id="p1",
-            cards=[],
-            archetype_profile=[1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        ),
-        Pack(
-            pack_id="p2",
-            cards=[],
-            archetype_profile=[0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        ),
-    ]
-    profile = refill.compute_round_environment_profile(packs)
-    assert abs(profile[0] - 0.5) < 1e-6, f"Expected 0.5, got {profile[0]}"
-    assert abs(profile[1] - 0.5) < 1e-6, f"Expected 0.5, got {profile[1]}"
-    for i in range(2, 8):
-        assert abs(profile[i] - 0.0) < 1e-6, f"Expected 0.0, got {profile[i]}"
-    print("  PASS: test_compute_round_environment_profile")
+    def test_constrained_refill_with_empty_signal_uses_floor_weights(self) -> None:
+        """An empty signal vector should produce floor-weight sampling."""
+        designs = _make_test_designs()
+        cube = _make_cube(designs)
 
+        weights = refill.compute_constrained_weights(
+            cube.supply, signal=[], fidelity=0.7, commit_bias=0.0
+        )
+        for w in weights:
+            self.assertGreater(w, 0.0, "All weights should be positive")
 
-def test_commit_bias_increases_weight_for_high_commit() -> None:
-    """With commit_bias > 0, high-commit cards should get higher weights."""
-    high_commit = CardDesign(
-        card_id="hc",
-        name="HighCommit",
-        fitness=[0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        power=0.5,
-        commit=0.9,
-        flex=0.5,
-    )
-    low_commit = CardDesign(
-        card_id="lc",
-        name="LowCommit",
-        fitness=[0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        power=0.5,
-        commit=0.1,
-        flex=0.5,
-    )
-    instances = [
-        CardInstance(instance_id=0, design=high_commit),
-        CardInstance(instance_id=1, design=low_commit),
-    ]
-    signal = [0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    def test_refill_adds_card_to_pack(self) -> None:
+        """Uniform refill card should be appendable to a pack's card list."""
+        designs = _make_test_designs()
+        cube = _make_cube(designs)
+        rng = random.Random(42)
+        pack = _make_pack(cube, rng)
+        original_size = len(pack.cards)
 
-    weights = refill.compute_constrained_weights(
-        instances, signal, fidelity=0.5, commit_bias=0.8
-    )
-    assert (
-        weights[0] > weights[1]
-    ), f"High commit weight ({weights[0]}) should be > low commit ({weights[1]})"
-    print("  PASS: test_commit_bias_increases_weight_for_high_commit")
+        card = refill.uniform_refill(cube, rng)
+        pack.cards.append(card)
+        self.assertEqual(len(pack.cards), original_size + 1)
 
+    def test_constrained_refill_respects_fingerprint_source(self) -> None:
+        """Constrained refill should accept either pack_origin or round_environment signal."""
+        designs = _make_test_designs()
+        cube = _make_cube(designs)
+        rng = random.Random(42)
+        pack = _make_pack(cube, rng)
 
-def run_all_tests() -> None:
-    """Run all tests and report results."""
-    tests: list[tuple[str, Callable[[], None]]] = [
-        ("test_no_refill_returns_none", test_no_refill_returns_none),
-        ("test_uniform_refill_returns_one_card", test_uniform_refill_returns_one_card),
-        (
-            "test_constrained_refill_returns_one_card",
-            test_constrained_refill_returns_one_card,
-        ),
-        (
-            "test_constrained_refill_fidelity_zero_is_uniform",
-            test_constrained_refill_fidelity_zero_is_uniform,
-        ),
-        (
-            "test_constrained_refill_fidelity_one_favors_similar",
-            test_constrained_refill_fidelity_one_favors_similar,
-        ),
-        ("test_cosine_similarity_function", test_cosine_similarity_function),
-        (
-            "test_compute_round_environment_profile",
-            test_compute_round_environment_profile,
-        ),
-        (
-            "test_commit_bias_increases_weight_for_high_commit",
-            test_commit_bias_increases_weight_for_high_commit,
-        ),
-    ]
-    passed = 0
-    failed = 0
-    for name, test_fn in tests:
-        try:
-            test_fn()
-            passed += 1
-        except Exception as e:
-            print(f"  FAIL: {name}: {e}")
-            failed += 1
+        pack_signal = pack.archetype_profile
+        card_pack = refill.constrained_refill(
+            cube=cube,
+            signal=pack_signal,
+            fidelity=0.7,
+            commit_bias=0.3,
+            rng=rng,
+        )
+        self.assertIsInstance(card_pack, CardInstance)
 
-    print(f"\n{passed}/{passed + failed} tests passed")
-    if failed > 0:
-        sys.exit(1)
+        round_signal = refill.compute_round_environment_profile([pack])
+        card_round = refill.constrained_refill(
+            cube=cube,
+            signal=round_signal,
+            fidelity=0.7,
+            commit_bias=0.3,
+            rng=rng,
+        )
+        self.assertIsInstance(card_round, CardInstance)
 
 
 if __name__ == "__main__":
-    run_all_tests()
+    unittest.main()
