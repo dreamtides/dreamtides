@@ -136,18 +136,18 @@ import from `config`, `draft_models`, and `utils` freely. No circular imports.
 
 `SimulatorConfig` is a tree of frozen dataclasses with ten sections:
 
-| Section           | Key Parameters                                                             |
-| ----------------- | -------------------------------------------------------------------------- |
-| `draft`           | `seat_count`, `round_count`, `picks_per_round`, `pack_size`, `human_seats` |
-| `cube`            | `distinct_cards`, `copies_per_card`, `consumption_mode`                    |
-| `pack_generation` | `strategy`, `archetype_target_count`, `primary_density`                    |
-| `refill`          | `strategy`, `fingerprint_source`, `fidelity`, `commit_bias`                |
-| `cards`           | `source`, `archetype_count`, `cards_per_archetype`, `bridge_fraction`      |
-| `agents`          | `policy`, `show_n`, `show_n_strategy`, `ai_optimality`, `learning_rate`    |
-| `scoring`         | `weight_power`, `weight_coherence`, `weight_focus`                         |
-| `commitment`      | `commitment_threshold`, `stability_window`, `entropy_threshold`            |
-| `metrics`         | `richness_gap`, `tau`, `on_plan_threshold`, `splash_power_threshold`       |
-| `sweep`           | `runs_per_point`, `base_seed`, `axes`                                      |
+| Section           | Key Parameters                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------------ |
+| `draft`           | `seat_count`, `round_count`, `picks_per_round`, `pack_size`, `human_seats`                                   |
+| `cube`            | `distinct_cards`, `copies_per_card`, `consumption_mode`                                                      |
+| `pack_generation` | `strategy`, `archetype_target_count`, `primary_density`                                                      |
+| `refill`          | `strategy`, `fingerprint_source`, `fidelity`, `commit_bias`                                                  |
+| `cards`           | `source`, `archetype_count`, `cards_per_archetype`, `bridge_fraction`                                        |
+| `agents`          | `policy`, `show_n`, `show_n_strategy`, `ai_optimality`, `ai_power_weight`, `ai_pref_weight`, `learning_rate` |
+| `scoring`         | `weight_power`, `weight_coherence`, `weight_focus`                                                           |
+| `commitment`      | `commitment_threshold`, `stability_window`, `entropy_threshold`                                              |
+| `metrics`         | `richness_gap`, `tau`, `on_plan_threshold`, `splash_power_threshold`                                         |
+| `sweep`           | `runs_per_point`, `base_seed`, `axes`                                                                        |
 
 Load order: defaults → config file → `--param` overrides → `--preset`. CLI
 `--seed` overwrites `sweep.base_seed` after loading.
@@ -181,10 +181,12 @@ random):
 - **force**: highest fitness for a fixed `force_archetype` index; ignores `w`
   entirely; requires `agents.force_archetype` to be set
 - **adaptive**:
-  `0.3*power + 0.5*dot(fitness, normalize(w)) + ai_signal_weight *dot(fitness, openness)`;
-  balances power, preference, and supply signal
+  `ai_power_weight*power + ai_pref_weight*dot(fitness, normalize(w)) + ai_signal_weight*dot(fitness, openness)`;
+  balances power, preference, and supply signal. Default weights:
+  `ai_power_weight=0.2`, `ai_pref_weight=0.6`, `ai_signal_weight=0.2`.
 - **signal_ignorant**: adaptive formula with uniform openness instead of actual
-  supply signal; used as baseline for signal benefit measurement
+  supply signal; uses the same configurable weights; used as baseline for signal
+  benefit measurement
 
 Default policy is `adaptive`. The `force` policy requires
 `agents.force_archetype` set explicitly (or `--param agents.force_archetype=N`).
@@ -208,6 +210,27 @@ human.
 AIs pick near-optimally and read signals, creating heavy archetype contention
 where the human must also read signals to draft well.
 
+## Show-N Strategies
+
+Five strategies control which N cards from a pack are shown to the human seat:
+
+- **uniform**: N cards selected uniformly at random. No intelligence.
+- **power_biased**: weighted by card power. Higher-power cards are more likely
+  to appear.
+- **curated**: guarantees at least 1 on-plan card (fitness >= 0.6 for best
+  archetype) and 1 off-plan strong card (fitness < 0.3, power >= 0.5) when
+  available; remaining slots filled by power-weighted sampling. Falls back to
+  power-biased without `w`.
+- **signal_rich**: weighted by `commit * 2 + power`. Biases toward
+  archetype-defining cards.
+- **top_scored** (default): scores each card as
+  `0.3 * power + 0.7 * dot(fitness, normalize(w)) + gauss(0, 0.05)`, returns top
+  N. Falls back to power-biased without `w`. Heavy preference weighting ensures
+  on-plan cards appear; Gaussian noise prevents perfectly deterministic
+  selection.
+
+Default strategy is `top_scored`.
+
 ## Commitment Detection
 
 Commitment is detected per-seat from the history of preference vectors `w`. Two
@@ -221,16 +244,15 @@ same `argmax(w)` for the next `stability_window` picks.
 `shannon_entropy(normalized_w) < entropy_threshold` as the trigger condition.
 
 Default `commitment_threshold` is `0.35`, `stability_window` is `3`. With
-default parameters and `adaptive` policy, real commit picks cluster in picks
-4-8. If you observe zero or near-zero commitment rates, the threshold is too
-high relative to how fast `w` concentrates under your card pool and learning
-rate.
+default parameters (`learning_rate=3.0`, `ai_pref_weight=0.6`) and `adaptive`
+policy, real commit picks cluster in picks 4-8. If you observe zero or near-zero
+commitment rates, the threshold is too high relative to how fast `w`
+concentrates under your card pool and learning rate.
 
-**Calibration warning**: default parameters produce low commitment rates with
-purely uniform synthetic cards. To verify calibration, run `sweep` mode and
-check the validation output — the commitment timing check targets mean pick in
-[4, 8] and uncommitted rate below 10%. If the check fails, lower
-`commitment_threshold` (try 0.25) or increase `agents.learning_rate`.
+**Calibration warning**: if commitment rates are low, run `sweep` mode and check
+the validation output — the commitment timing check targets mean pick in [4, 8]
+and uncommitted rate below 10%. If the check fails, lower `commitment_threshold`
+(try 0.25) or increase `agents.learning_rate`.
 
 ## Metrics
 

@@ -124,10 +124,8 @@ def score_card_adaptive(
     Score = alpha * power + beta * dot(fitness, normalize(w))
           + gamma * dot(fitness, openness).
     """
-    alpha = agents_cfg.ai_signal_weight  # noqa: used below differently
-    # Defaults: alpha=0.3, beta=0.5, gamma=ai_signal_weight
-    power_weight = 0.3
-    pref_weight = 0.5
+    power_weight = agents_cfg.ai_power_weight
+    pref_weight = agents_cfg.ai_pref_weight
     signal_weight = agents_cfg.ai_signal_weight
 
     fitness = card.design.fitness
@@ -150,8 +148,8 @@ def score_card_signal_ignorant(
     Identical to Adaptive but uses a uniform openness vector instead
     of the agent's actual openness estimate.
     """
-    power_weight = 0.3
-    pref_weight = 0.5
+    power_weight = agents_cfg.ai_power_weight
+    pref_weight = agents_cfg.ai_pref_weight
     signal_weight = agents_cfg.ai_signal_weight
 
     fitness = card.design.fitness

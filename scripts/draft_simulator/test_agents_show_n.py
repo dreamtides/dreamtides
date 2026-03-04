@@ -253,7 +253,9 @@ class TestPickPolicies(unittest.TestCase):
         agent.w = [2.0, 1.0]
         agent.openness = [0.6, 0.4]
         card = _make_instance(0, [0.8, 0.2], power=0.5)
-        cfg = AgentsConfig(ai_signal_weight=0.2)
+        cfg = AgentsConfig(
+            ai_signal_weight=0.2, ai_power_weight=0.3, ai_pref_weight=0.5
+        )
         score = agents.score_card_adaptive(card, agent, cfg)
         # power_weight=0.3, pref_weight=0.5, signal_weight=0.2
         # w_norm = [2/3, 1/3]
@@ -268,7 +270,9 @@ class TestPickPolicies(unittest.TestCase):
         agent.w = [2.0, 1.0]
         agent.openness = [0.9, 0.1]  # Skewed openness, should be ignored
         card = _make_instance(0, [0.8, 0.2], power=0.5)
-        cfg = AgentsConfig(ai_signal_weight=0.2)
+        cfg = AgentsConfig(
+            ai_signal_weight=0.2, ai_power_weight=0.3, ai_pref_weight=0.5
+        )
 
         score_ignorant = agents.score_card_signal_ignorant(card, agent, cfg)
 
@@ -283,7 +287,9 @@ class TestPickPolicies(unittest.TestCase):
         agent = agents.create_agent(2)
         agent.w = [1.0, 1.0]
         card = _make_instance(0, [0.5, 0.5], power=0.5)
-        cfg = AgentsConfig(ai_signal_weight=0.2)
+        cfg = AgentsConfig(
+            ai_signal_weight=0.2, ai_power_weight=0.3, ai_pref_weight=0.5
+        )
 
         agent.openness = [0.1, 0.9]
         score1 = agents.score_card_signal_ignorant(card, agent, cfg)
@@ -392,8 +398,8 @@ class TestShowN(unittest.TestCase):
     def test_no_duplicate_instance_ids(self) -> None:
         pack = self._make_pack(15)
         rng = random.Random(42)
-        for strategy in ["uniform", "power_biased", "signal_rich"]:
-            result = show_n.select_cards(pack, 4, strategy, rng)
+        for strategy in ["uniform", "power_biased", "signal_rich", "top_scored"]:
+            result = show_n.select_cards(pack, 4, strategy, rng, human_w=[1.0] * 8)
             ids = [c.instance_id for c in result]
             self.assertEqual(len(ids), len(set(ids)), f"Duplicates in {strategy}")
 
@@ -478,6 +484,47 @@ class TestShowN(unittest.TestCase):
         rng = random.Random(42)
         result = show_n.select_cards(pack, 1, "curated", rng, human_w=w)
         self.assertEqual(len(result), 1)
+
+    def test_top_scored_returns_n_cards(self) -> None:
+        pack = self._make_pack(10)
+        rng = random.Random(42)
+        w = [3.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        result = show_n.select_cards(pack, 4, "top_scored", rng, human_w=w)
+        self.assertEqual(len(result), 4)
+
+    def test_top_scored_no_duplicates(self) -> None:
+        pack = self._make_pack(15)
+        rng = random.Random(42)
+        w = [5.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        result = show_n.select_cards(pack, 4, "top_scored", rng, human_w=w)
+        ids = [c.instance_id for c in result]
+        self.assertEqual(len(ids), len(set(ids)))
+
+    def test_top_scored_includes_on_plan_when_concentrated(self) -> None:
+        """Top-scored should include on-plan cards when w is concentrated."""
+        on_plan = _make_instance(0, [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5)
+        off_plan_cards = [
+            _make_instance(
+                i + 1,
+                [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                power=0.5,
+                card_id=f"off_{i}",
+            )
+            for i in range(9)
+        ]
+        pack = [on_plan] + off_plan_cards
+        w = [5.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        rng = random.Random(42)
+        result = show_n.select_cards(pack, 4, "top_scored", rng, human_w=w)
+        result_ids = {c.instance_id for c in result}
+        self.assertIn(on_plan.instance_id, result_ids)
+
+    def test_top_scored_falls_back_without_w(self) -> None:
+        """Top-scored without human_w should fall back to power-biased."""
+        pack = self._make_pack(10)
+        rng = random.Random(42)
+        result = show_n.select_cards(pack, 4, "top_scored", rng, human_w=None)
+        self.assertEqual(len(result), 4)
 
     def test_curated_n2_with_both_guarantees(self) -> None:
         """Curated with n=2 returns exactly 2 when both guarantees apply."""

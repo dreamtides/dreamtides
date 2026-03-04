@@ -71,11 +71,13 @@ class AgentsConfig:
 
     policy: str = "adaptive"
     show_n: int = 4
-    show_n_strategy: str = "uniform"
+    show_n_strategy: str = "top_scored"
     ai_optimality: float = 0.8
     ai_signal_weight: float = 0.2
+    ai_power_weight: float = 0.2
+    ai_pref_weight: float = 0.6
     openness_window: int = 3
-    learning_rate: float = 1.0
+    learning_rate: float = 3.0
     force_archetype: Optional[int] = None
 
 
@@ -338,6 +340,8 @@ def validate_config(cfg: SimulatorConfig) -> None:
         errors, "agents.ai_signal_weight", cfg.agents.ai_signal_weight, 0.0, 1.0
     )
     _check_range(errors, "agents.learning_rate", cfg.agents.learning_rate, 0.0, 10.0)
+    _check_range(errors, "agents.ai_power_weight", cfg.agents.ai_power_weight, 0.0, 1.0)
+    _check_range(errors, "agents.ai_pref_weight", cfg.agents.ai_pref_weight, 0.0, 1.0)
     _check_range(errors, "scoring.weight_power", cfg.scoring.weight_power, 0.0, 1.0)
     _check_range(
         errors, "scoring.weight_coherence", cfg.scoring.weight_coherence, 0.0, 1.0

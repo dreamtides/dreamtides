@@ -34,6 +34,8 @@ def select_cards(
         return _select_curated(pack_cards, n, rng, human_w)
     elif strategy == "signal_rich":
         return _select_signal_rich(pack_cards, n, rng)
+    elif strategy == "top_scored":
+        return _select_top_scored(pack_cards, n, rng, human_w)
     else:
         raise ValueError(f"Unknown Show-N strategy: {strategy!r}")
 
@@ -120,6 +122,44 @@ def _select_signal_rich(
     """Select N cards with probability proportional to commit * 2 + power."""
     weights = [max(c.design.commit * 2.0 + c.design.power, 0.001) for c in cards]
     return _weighted_sample(cards, weights, n, rng)
+
+
+def _select_top_scored(
+    cards: list[CardInstance],
+    n: int,
+    rng: random.Random,
+    human_w: list[float] | None,
+) -> list[CardInstance]:
+    """Select top N cards by combined power and preference score.
+
+    Score = 0.3 * power + 0.7 * dot(fitness, normalize(w)) + gauss(0, 0.05).
+    Falls back to power-biased when w is None or empty.
+    """
+    if human_w is None or not human_w:
+        return _select_power_biased(cards, n, rng)
+
+    w_norm = _ts_normalize(human_w)
+    scored: list[tuple[float, int, CardInstance]] = []
+    for idx, card in enumerate(cards):
+        pref = _ts_dot(card.design.fitness, w_norm)
+        score = 0.3 * card.design.power + 0.7 * pref + rng.gauss(0.0, 0.05)
+        scored.append((score, idx, card))
+
+    scored.sort(key=lambda t: t[0], reverse=True)
+    return [t[2] for t in scored[:n]]
+
+
+def _ts_normalize(w: list[float]) -> list[float]:
+    """Normalize a vector so its elements sum to 1.0."""
+    total = sum(w)
+    if total <= 0.0:
+        return [1.0 / len(w)] * len(w) if w else []
+    return [v / total for v in w]
+
+
+def _ts_dot(a: list[float], b: list[float]) -> float:
+    """Compute the dot product of two vectors of equal length."""
+    return sum(x * y for x, y in zip(a, b))
 
 
 def _weighted_sample(
