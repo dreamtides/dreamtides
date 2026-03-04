@@ -109,7 +109,8 @@ def main() -> None:
 
     cube_manager.validate_supply(cfg, cube.total_size)
 
-    # Generate one pack using each strategy and print contents
+    # Generate one pack using each strategy and print contents.
+    # Each strategy gets a fresh cube so draws are independent.
     strategies = ["uniform", "rarity_weighted", "seeded_themed"]
     strategy_labels = {
         "uniform": "Uniform",
@@ -118,12 +119,10 @@ def main() -> None:
     }
 
     for strategy in strategies:
-        # Use with_replacement mode for QA demo so each strategy draws
-        # from the full supply independently
         demo_cube = cube_manager.CubeManager(
             designs=cards,
             copies_per_card=cfg.cube.copies_per_card,
-            consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
+            consumption_mode=consumption_mode,
         )
         pack = pack_generator.generate_pack(strategy, demo_cube, cfg, rng)
         _print_pack(pack, strategy_labels[strategy], cfg.cards.archetype_count)

@@ -139,6 +139,13 @@ def _select_target_archetypes(
     if sum(availability) == 0:
         return rng.sample(range(archetype_count), target_count)
 
+    # At variance=0, return the top-N archetypes deterministically
+    if variance == 0.0:
+        ranked = sorted(
+            range(archetype_count), key=lambda a: availability[a], reverse=True
+        )
+        return ranked[:target_count]
+
     # Blend between deterministic (sorted by availability) and random
     weights: list[float] = []
     for a in range(archetype_count):
@@ -148,11 +155,25 @@ def _select_target_archetypes(
         weights.append(max(blended, 0.001))
 
     # Weighted sampling without replacement for target archetypes
+    selected = _weighted_select_without_replacement(
+        list(range(archetype_count)), weights, target_count, rng
+    )
+
+    return selected
+
+
+def _weighted_select_without_replacement(
+    items: list[int],
+    weights: list[float],
+    n: int,
+    rng: random.Random,
+) -> list[int]:
+    """Select n items via weighted sampling without replacement."""
     selected: list[int] = []
-    indices = list(range(archetype_count))
+    indices = list(range(len(items)))
     remaining_weights = list(weights)
 
-    for _ in range(min(target_count, archetype_count)):
+    for _ in range(min(n, len(items))):
         total = sum(remaining_weights[i] for i in indices)
         if total <= 0:
             break
@@ -165,7 +186,7 @@ def _select_target_archetypes(
                 chosen_pos = pos
                 break
         chosen_idx = indices[chosen_pos]
-        selected.append(chosen_idx)
+        selected.append(items[chosen_idx])
         indices.pop(chosen_pos)
 
     return selected
@@ -177,7 +198,7 @@ def _compute_archetype_availability(
 ) -> list[float]:
     """Compute per-archetype card availability from the cube supply."""
     availability = [0.0] * archetype_count
-    for inst in cube._supply:
+    for inst in cube.supply:
         top_arch = _top_archetype(inst, archetype_count)
         if top_arch >= 0:
             availability[top_arch] += 1.0
@@ -209,10 +230,11 @@ def _draw_primary_cards(
 ) -> list[CardInstance]:
     """Draw cards whose top fitness aligns with primary archetypes."""
     target_set = set(target_archetypes)
-    archetype_count = len(cube._supply[0].design.fitness) if cube._supply else 8
+    current_supply = cube.supply
+    archetype_count = len(current_supply[0].design.fitness) if current_supply else 8
 
     weights: list[float] = []
-    for inst in cube._supply:
+    for inst in current_supply:
         if inst.instance_id in used_ids:
             weights.append(0.0)
             continue
@@ -239,9 +261,10 @@ def _draw_bridge_cards(
 ) -> list[CardInstance]:
     """Draw bridge cards with fitness > 0.5 in 2+ selected archetypes."""
     target_set = set(target_archetypes)
+    current_supply = cube.supply
 
     weights: list[float] = []
-    for inst in cube._supply:
+    for inst in current_supply:
         if inst.instance_id in used_ids:
             weights.append(0.0)
             continue
@@ -270,8 +293,9 @@ def _draw_remaining_cards(
     rng: random.Random,
 ) -> list[CardInstance]:
     """Draw remaining cards uniformly, avoiding already-used instances."""
+    current_supply = cube.supply
     weights: list[float] = []
-    for inst in cube._supply:
+    for inst in current_supply:
         if inst.instance_id in used_ids:
             weights.append(0.0)
         else:
@@ -290,8 +314,9 @@ def _build_rarity_weight_vector(
     rarity_weights: dict[str, float],
 ) -> list[float]:
     """Build a weight vector parallel to the cube supply."""
+    current_supply = cube.supply
     weights: list[float] = []
-    for inst in cube._supply:
+    for inst in current_supply:
         w = rarity_weights.get(inst.design.card_id, 1.0)
         weights.append(max(w, 0.001))
     return weights

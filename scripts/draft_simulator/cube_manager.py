@@ -27,7 +27,7 @@ class CubeManager:
     def __init__(
         self,
         designs: list[CardDesign],
-        copies_per_card: int,
+        copies_per_card: int | dict[str, int],
         consumption_mode: CubeConsumptionMode,
     ) -> None:
         self._consumption_mode: CubeConsumptionMode = consumption_mode
@@ -35,6 +35,11 @@ class CubeManager:
             designs, copies_per_card
         )
         self._supply: list[CardInstance] = list(self._all_instances)
+
+    @property
+    def supply(self) -> list[CardInstance]:
+        """Read-only snapshot of the current supply for external queries."""
+        return list(self._supply)
 
     @property
     def remaining(self) -> int:
@@ -129,13 +134,22 @@ def validate_supply(cfg: config.SimulatorConfig, cube_size: int) -> None:
 
 
 def _create_instances(
-    designs: list[CardDesign], copies_per_card: int
+    designs: list[CardDesign], copies_per_card: int | dict[str, int]
 ) -> list[CardInstance]:
-    """Create CardInstance objects with unique instance_ids."""
+    """Create CardInstance objects with unique instance_ids.
+
+    When copies_per_card is an int, every design gets that many copies.
+    When it is a dict mapping card_id to int, each design gets its
+    per-card count (defaulting to 1 for designs not in the map).
+    """
     instances: list[CardInstance] = []
     instance_id = 0
     for design in designs:
-        for _ in range(copies_per_card):
+        if isinstance(copies_per_card, dict):
+            count = copies_per_card.get(design.card_id, 1)
+        else:
+            count = copies_per_card
+        for _ in range(count):
             instances.append(CardInstance(instance_id=instance_id, design=design))
             instance_id += 1
     return instances
