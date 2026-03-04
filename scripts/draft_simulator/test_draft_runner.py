@@ -56,10 +56,12 @@ class TestRunDraft(unittest.TestCase):
             self.assertGreaterEqual(sr.deck_value, 0.0)
             self.assertLessEqual(sr.deck_value, 1.0)
 
-    def test_no_traces_when_disabled(self) -> None:
+    def test_traces_always_populated(self) -> None:
+        """Traces are always recorded for metrics, even with trace_enabled=False."""
         cfg = self._default_cfg()
         result = draft_runner.run_draft(cfg, seed=42, trace_enabled=False)
-        self.assertEqual(len(result.traces), 0)
+        expected_picks = sum(cfg.draft.picks_per_round) * cfg.draft.seat_count
+        self.assertEqual(len(result.traces), expected_picks)
 
     def test_traces_emitted_when_enabled(self) -> None:
         cfg = self._default_cfg()

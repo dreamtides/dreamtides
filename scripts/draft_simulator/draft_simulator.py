@@ -135,8 +135,7 @@ def _run_single(
         f"| pack_size={cfg.draft.pack_size}"
     )
 
-    # Always enable tracing so per-pick data is available for metrics
-    result = draft_runner.run_draft(cfg, seed, trace_enabled=True)
+    result = draft_runner.run_draft(cfg, seed, trace_enabled=trace_enabled)
 
     print()
     for seat_idx, sr in enumerate(result.seat_results):

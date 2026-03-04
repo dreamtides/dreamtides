@@ -144,6 +144,9 @@ def test_forceability_computation() -> None:
     assert m.forceability is not None
     assert abs(m.forceability - 0.75 / 0.85) < 1e-6
     assert m.forceability_archetype == 0
+    assert m.forceability_per_archetype is not None
+    assert abs(m.forceability_per_archetype[0] - 0.75 / 0.85) < 1e-6
+    assert abs(m.forceability_per_archetype[1] - 0.55 / 0.85) < 1e-6
 
 
 def test_signal_benefit_computation() -> None:
@@ -249,6 +252,50 @@ def test_format_metrics_with_sweep_data() -> None:
     assert "Forceability:" in text
 
 
+def test_signal_ignorant_scoring_path() -> None:
+    """Metrics with signal_ignorant policy should use the correct scorer."""
+    import config
+    import draft_runner
+
+    cfg = config.SimulatorConfig()
+    cfg.agents.policy = "signal_ignorant"
+    result = draft_runner.run_draft(cfg, seed=42, trace_enabled=True)
+
+    m_ignorant = metrics.compute_metrics(result, cfg)
+
+    # Reset to adaptive for comparison
+    cfg_adaptive = config.SimulatorConfig()
+    result_adaptive = draft_runner.run_draft(cfg_adaptive, seed=42, trace_enabled=True)
+    m_adaptive = metrics.compute_metrics(result_adaptive, cfg_adaptive)
+
+    # The choice richness metrics should differ between policies because
+    # signal_ignorant uses uniform openness while adaptive uses actual openness.
+    # At minimum the overall near-optimal counts should be valid.
+    assert m_ignorant.choice_richness_shown.near_optimal.overall >= 1.0
+    assert m_ignorant.choice_richness_shown.choice_entropy.overall >= 0.0
+
+
+def test_metrics_with_tracing_off() -> None:
+    """Metrics should produce valid results even when trace_enabled=False."""
+    import config
+    import draft_runner
+
+    cfg = config.SimulatorConfig()
+    result = draft_runner.run_draft(cfg, seed=42, trace_enabled=False)
+    m = metrics.compute_metrics(result, cfg)
+
+    # Traces should still be populated for metrics computation
+    assert len(result.traces) > 0
+
+    # Choice richness should produce non-trivial values
+    assert m.choice_richness_shown.near_optimal.overall >= 1.0
+    assert m.choice_richness_shown.choice_entropy.overall > 0.0
+
+    # Early openness should be meaningful
+    assert m.early_openness_shown.archetypes_exposed > 0.0
+    assert m.early_openness_shown.preference_entropy > 0.0
+
+
 if __name__ == "__main__":
     test_softmax_basic()
     test_softmax_temperature()
@@ -270,4 +317,6 @@ if __name__ == "__main__":
     test_signal_benefit_none_without_data()
     test_full_draft_metrics()
     test_format_metrics_with_sweep_data()
+    test_signal_ignorant_scoring_path()
+    test_metrics_with_tracing_off()
     print("All metrics tests passed!")

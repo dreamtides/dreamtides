@@ -175,6 +175,7 @@ class DraftMetrics:
     early_openness_shown: EarlyOpennessMetrics
     forceability: Optional[float] = None
     forceability_archetype: Optional[int] = None
+    forceability_per_archetype: Optional[dict[int, float]] = None
     signal_benefit: Optional[float] = None
 
 
@@ -189,6 +190,7 @@ def _score_cards_for_seat(
     pick_index: int,
     policy: str,
     cfg: config.SimulatorConfig,
+    openness_snapshot: list[float],
 ) -> list[float]:
     """Score a set of cards using the agent's state at a given pick.
 
@@ -196,7 +198,7 @@ def _score_cards_for_seat(
     and drafted pool at the given pick index. The w_history stores the
     preference vector *after* each pick, so for scoring at pick i we use
     w_history[i-1] (the w state going into pick i) or the initial uniform
-    w for pick 0.
+    w for pick 0. The openness snapshot comes from the trace record.
     """
     archetype_count = cfg.cards.archetype_count
     if pick_index == 0:
@@ -209,14 +211,19 @@ def _score_cards_for_seat(
     agent_snapshot = agents.AgentState(
         w=w_before,
         drafted=list(seat_result.drafted[:pick_index]),
+        openness=list(openness_snapshot),
     )
 
     scores: list[float] = []
     for card in cards:
         if policy == "greedy":
             scores.append(agents.score_card_greedy(card, agent_snapshot, cfg.scoring))
-        elif policy in ("adaptive", "signal_ignorant"):
+        elif policy == "adaptive":
             scores.append(agents.score_card_adaptive(card, agent_snapshot, cfg.agents))
+        elif policy == "signal_ignorant":
+            scores.append(
+                agents.score_card_signal_ignorant(card, agent_snapshot, cfg.agents)
+            )
         elif policy == "archetype_loyal":
             best_arch = argmax(agent_snapshot.w)
             scores.append(card.design.fitness[best_arch])
@@ -330,7 +337,12 @@ def _compute_choice_richness(
 
         seat_result = result.seat_results[trace.seat_index]
         scores = _score_cards_for_seat(
-            cards, seat_result, trace.pick_index, cfg.agents.policy, cfg
+            cards,
+            seat_result,
+            trace.pick_index,
+            cfg.agents.policy,
+            cfg,
+            trace.agent_openness_snapshot,
         )
 
         near_opt = near_optimal_count(scores, richness_gap)
@@ -609,18 +621,22 @@ def compute_metrics(
     # Forceability (requires cross-run data)
     forceability_val: Optional[float] = None
     forceability_arch: Optional[int] = None
+    forceability_per_arch: Optional[dict[int, float]] = None
     if force_deck_values is not None and adaptive_deck_values is not None:
         adaptive_mean = _mean(adaptive_deck_values)
         if adaptive_mean > 0:
+            per_arch: dict[int, float] = {}
             max_fi = 0.0
             max_arch = 0
             for arch, dvs in force_deck_values.items():
                 fi = _mean(dvs) / adaptive_mean
+                per_arch[arch] = fi
                 if fi > max_fi:
                     max_fi = fi
                     max_arch = arch
             forceability_val = max_fi
             forceability_arch = max_arch
+            forceability_per_arch = per_arch
 
     # Signal benefit (requires cross-run data)
     signal_benefit_val: Optional[float] = None
@@ -641,6 +657,7 @@ def compute_metrics(
         early_openness_shown=early_openness_shown,
         forceability=forceability_val,
         forceability_archetype=forceability_arch,
+        forceability_per_archetype=forceability_per_arch,
         signal_benefit=signal_benefit_val,
     )
 

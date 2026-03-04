@@ -38,6 +38,7 @@ class PickTrace:
     chosen_card_id: int
     agent_w_snapshot: list[float]
     card_score: float
+    agent_openness_snapshot: list[float] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -72,7 +73,9 @@ def run_draft(
 
     Generates or loads the card pool, creates a cube, initializes agents,
     executes all rounds, computes per-seat deck_value and commitment
-    detection, and returns a DraftResult.
+    detection, and returns a DraftResult. Per-pick trace records are
+    always included in the result for metrics computation; the
+    trace_enabled parameter is retained for API compatibility.
     """
     rng = random.Random(seed)
 
@@ -151,20 +154,20 @@ def run_draft(
                     force_archetype=cfg.agents.force_archetype,
                 )
 
-                if trace_enabled:
-                    score = _compute_trace_score(chosen, agent, cfg.agents.policy, cfg)
-                    trace = PickTrace(
-                        round_index=round_idx,
-                        pick_index=global_pick_index,
-                        seat_index=seat_idx,
-                        pack_id=pack.pack_id,
-                        pack_card_ids=[c.instance_id for c in pack.cards],
-                        shown_card_ids=[c.instance_id for c in shown],
-                        chosen_card_id=chosen.instance_id,
-                        agent_w_snapshot=list(agent.w),
-                        card_score=score,
-                    )
-                    all_traces.append(trace)
+                score = _compute_trace_score(chosen, agent, cfg.agents.policy, cfg)
+                trace = PickTrace(
+                    round_index=round_idx,
+                    pick_index=global_pick_index,
+                    seat_index=seat_idx,
+                    pack_id=pack.pack_id,
+                    pack_card_ids=[c.instance_id for c in pack.cards],
+                    shown_card_ids=[c.instance_id for c in shown],
+                    chosen_card_id=chosen.instance_id,
+                    agent_w_snapshot=list(agent.w),
+                    card_score=score,
+                    agent_openness_snapshot=list(agent.openness),
+                )
+                all_traces.append(trace)
 
                 pack.cards.remove(chosen)
 
