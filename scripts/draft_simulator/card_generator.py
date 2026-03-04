@@ -50,13 +50,27 @@ def _load_cards_from_file(path: str, archetype_count: int) -> list[CardDesign]:
 def _generate_synthetic_cards(
     cfg: SimulatorConfig, rng: random.Random
 ) -> list[CardDesign]:
-    """Generate synthetic card designs satisfying distribution invariants."""
+    """Generate synthetic card designs satisfying distribution invariants.
+
+    Targets per archetype: roughly `cards_per_archetype` cards with fitness
+    above 0.5, and roughly 30 additional cards with fitness in [0.3, 0.5).
+    Bridge cards (fraction `bridge_fraction` of total) have fitness above
+    0.5 in two or more archetypes.
+    """
     archetype_count = cfg.cards.archetype_count
     distinct_cards = cfg.cube.distinct_cards
     bridge_fraction = cfg.cards.bridge_fraction
+    cards_per_archetype = cfg.cards.cards_per_archetype
 
     bridge_count = int(distinct_cards * bridge_fraction)
     primary_count = distinct_cards - bridge_count
+
+    # Estimate bridge contributions per archetype to calibrate strong ratio
+    avg_bridge_archs = 2.25
+    bridge_per_arch = bridge_count * avg_bridge_archs / max(archetype_count, 1)
+    primaries_per_arch = primary_count / max(archetype_count, 1)
+    strong_target = max(0.0, cards_per_archetype - bridge_per_arch)
+    strong_ratio = min(1.0, strong_target / max(primaries_per_arch, 1.0))
 
     cards: list[CardDesign] = []
 
@@ -79,14 +93,16 @@ def _generate_synthetic_cards(
 
     # Generate primary cards (high fitness in exactly one archetype)
     # Distribute evenly across archetypes to meet per-archetype targets
-    primaries_per_archetype = primary_count // archetype_count
+    primaries_per_archetype_int = primary_count // archetype_count
     remainder = primary_count % archetype_count
 
     card_index = 0
     for arch in range(archetype_count):
-        count = primaries_per_archetype + (1 if arch < remainder else 0)
+        count = primaries_per_archetype_int + (1 if arch < remainder else 0)
         for _ in range(count):
-            fitness = _generate_primary_fitness(arch, archetype_count, rng)
+            fitness = _generate_primary_fitness(
+                arch, archetype_count, strong_ratio, rng
+            )
             power = rng.uniform(0.2, 0.9)
             commit = _sample_beta(2.0, 3.0, rng)
             flex = _compute_flex(fitness)
@@ -108,7 +124,7 @@ def _generate_synthetic_cards(
 def _generate_bridge_fitness(archetype_count: int, rng: random.Random) -> list[float]:
     """Generate a fitness vector with high fitness in 2-3 archetypes."""
     fitness = [0.0] * archetype_count
-    bridge_arch_count = rng.choice([2, 2, 2, 3])
+    bridge_arch_count = min(rng.choice([2, 2, 2, 3]), archetype_count)
     bridge_archetypes = rng.sample(range(archetype_count), bridge_arch_count)
 
     for arch in bridge_archetypes:
@@ -123,26 +139,33 @@ def _generate_bridge_fitness(archetype_count: int, rng: random.Random) -> list[f
 
 
 def _generate_primary_fitness(
-    primary_arch: int, archetype_count: int, rng: random.Random
+    primary_arch: int,
+    archetype_count: int,
+    strong_ratio: float,
+    rng: random.Random,
 ) -> list[float]:
     """Generate a fitness vector with high fitness in one archetype.
 
     Produces a mix of strong primaries (fitness > 0.5) and moderate
     supporters (fitness in [0.3, 0.5)) to satisfy distribution
-    invariants.
+    invariants. Non-primary archetypes have a chance of receiving
+    moderate fitness values to meet the ~30 moderate cards target.
     """
     fitness = [0.0] * archetype_count
 
-    # Roughly 80% strong primary (fitness > 0.5), 20% moderate supporter
-    if rng.random() < 0.80:
+    if rng.random() < strong_ratio:
         fitness[primary_arch] = rng.uniform(0.55, 0.95)
     else:
         fitness[primary_arch] = rng.uniform(0.30, 0.49)
 
-    # Fill remaining with low values
+    # Fill non-primary slots: ~10% chance of moderate [0.3, 0.5),
+    # remainder low [0.0, 0.20]
     for i in range(archetype_count):
         if i != primary_arch:
-            fitness[i] = rng.uniform(0.0, 0.20)
+            if rng.random() < 0.10:
+                fitness[i] = rng.uniform(0.30, 0.49)
+            else:
+                fitness[i] = rng.uniform(0.0, 0.20)
 
     return fitness
 

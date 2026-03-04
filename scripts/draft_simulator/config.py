@@ -327,6 +327,39 @@ def validate_config(cfg: SimulatorConfig) -> None:
         errors, "pack_generation.variance", cfg.pack_generation.variance, 0.0, 1.0
     )
     _check_range(errors, "cards.bridge_fraction", cfg.cards.bridge_fraction, 0.0, 1.0)
+    _check_range(
+        errors,
+        "commitment.entropy_threshold",
+        cfg.commitment.entropy_threshold,
+        0.0,
+        10.0,
+    )
+    _check_range(errors, "metrics.richness_gap", cfg.metrics.richness_gap, 0.0, 1.0)
+    _check_range(errors, "metrics.tau", cfg.metrics.tau, 0.0, 10.0)
+    _check_range(
+        errors, "metrics.on_plan_threshold", cfg.metrics.on_plan_threshold, 0.0, 1.0
+    )
+    _check_range(
+        errors,
+        "metrics.splash_power_threshold",
+        cfg.metrics.splash_power_threshold,
+        0.0,
+        1.0,
+    )
+    _check_range(
+        errors,
+        "metrics.splash_flex_threshold",
+        cfg.metrics.splash_flex_threshold,
+        0.0,
+        1.0,
+    )
+    _check_range(
+        errors,
+        "metrics.exposure_threshold",
+        cfg.metrics.exposure_threshold,
+        0.0,
+        1.0,
+    )
 
     # Positive integer checks
     if cfg.draft.seat_count < 2:

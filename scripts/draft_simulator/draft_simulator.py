@@ -23,13 +23,6 @@ def build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        "mode",
-        nargs="?",
-        default="single",
-        choices=["single", "sweep", "trace"],
-        help="Simulation mode (default: single)",
-    )
-    parser.add_argument(
         "--seed",
         "-s",
         type=int,
@@ -42,13 +35,6 @@ def build_parser() -> argparse.ArgumentParser:
         type=str,
         default=None,
         help="Path to TOML or JSON config file",
-    )
-    parser.add_argument(
-        "--runs",
-        "-n",
-        type=int,
-        default=None,
-        help="Number of runs (default: 1000 for sweep, 1 for single)",
     )
     parser.add_argument(
         "--output-dir",
