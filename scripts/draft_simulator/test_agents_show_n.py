@@ -398,7 +398,7 @@ class TestShowN(unittest.TestCase):
     def test_no_duplicate_instance_ids(self) -> None:
         pack = self._make_pack(15)
         rng = random.Random(42)
-        for strategy in ["uniform", "power_biased", "signal_rich", "top_scored"]:
+        for strategy in ["uniform", "power_biased", "signal_rich", "top_scored", "sharpened_preference"]:
             result = show_n.select_cards(pack, 4, strategy, rng, human_w=[1.0] * 8)
             ids = [c.instance_id for c in result]
             self.assertEqual(len(ids), len(set(ids)), f"Duplicates in {strategy}")
@@ -562,6 +562,86 @@ class TestShowN(unittest.TestCase):
             agents.pick_card(
                 [card], agent, "force", cfg, scoring, rng, force_archetype=-1
             )
+
+    def test_sharpened_preference_returns_n_cards(self) -> None:
+        pack = self._make_pack(10)
+        rng = random.Random(42)
+        w = [3.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        result = show_n.select_cards(pack, 4, "sharpened_preference", rng, human_w=w)
+        self.assertEqual(len(result), 4)
+
+    def test_sharpened_preference_no_duplicates(self) -> None:
+        pack = self._make_pack(15)
+        rng = random.Random(42)
+        w = [5.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        result = show_n.select_cards(pack, 4, "sharpened_preference", rng, human_w=w)
+        ids = [c.instance_id for c in result]
+        self.assertEqual(len(ids), len(set(ids)))
+
+    def test_sharpened_preference_falls_back_without_w(self) -> None:
+        """Sharpened preference without human_w should fall back to power-biased."""
+        pack = self._make_pack(10)
+        rng = random.Random(42)
+        result = show_n.select_cards(pack, 4, "sharpened_preference", rng, human_w=None)
+        self.assertEqual(len(result), 4)
+
+    def test_sharpened_preference_falls_back_with_empty_w(self) -> None:
+        """Sharpened preference with empty human_w should fall back to power-biased."""
+        pack = self._make_pack(10)
+        rng = random.Random(42)
+        result = show_n.select_cards(pack, 4, "sharpened_preference", rng, human_w=[])
+        self.assertEqual(len(result), 4)
+
+    def test_sharpened_preference_favors_on_plan(self) -> None:
+        """Sharpened preference should include on-plan cards when w is concentrated."""
+        on_plan = _make_instance(0, [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5)
+        off_plan_cards = [
+            _make_instance(
+                i + 1,
+                [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                power=0.5,
+                card_id=f"off_{i}",
+            )
+            for i in range(9)
+        ]
+        pack = [on_plan] + off_plan_cards
+        w = [5.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        rng = random.Random(42)
+        result = show_n.select_cards(pack, 4, "sharpened_preference", rng, human_w=w)
+        result_ids = {c.instance_id for c in result}
+        self.assertIn(on_plan.instance_id, result_ids)
+
+    def test_sharpened_preference_sharpens_weights(self) -> None:
+        """Sharpened preference should amplify dominant weight components.
+
+        With w=[2.0, 1.0], sharpening to exponent 4 gives [16.0, 1.0],
+        normalized to [16/17, 1/17]. This heavily favors archetype 0.
+        """
+        # Card strongly aligned with arch 0
+        card_a = _make_instance(0, [0.9, 0.1], power=0.5)
+        # Card strongly aligned with arch 1
+        card_b = _make_instance(1, [0.1, 0.9], power=0.5)
+        # Neutral cards as filler
+        fillers = [
+            _make_instance(i + 2, [0.5, 0.5], power=0.5, card_id=f"filler_{i}")
+            for i in range(8)
+        ]
+        pack = [card_a, card_b] + fillers
+        w = [2.0, 1.0]
+        # Run many times: card_a should appear far more often than card_b
+        a_count = 0
+        b_count = 0
+        trials = 100
+        for seed in range(trials):
+            rng = random.Random(seed)
+            result = show_n.select_cards(pack, 4, "sharpened_preference", rng, human_w=w)
+            result_ids = {c.instance_id for c in result}
+            if card_a.instance_id in result_ids:
+                a_count += 1
+            if card_b.instance_id in result_ids:
+                b_count += 1
+        # Card A (on-plan) should appear much more often than card B (off-plan)
+        self.assertGreater(a_count, b_count)
 
     def test_unknown_strategy_raises(self) -> None:
         pack = self._make_pack(5)

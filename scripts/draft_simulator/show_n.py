@@ -1,9 +1,9 @@
 """Show-N card selection strategies for the draft simulator.
 
 Selects a subset of N cards from a pack to present to the human seat.
-Four strategies: Uniform, Power-biased, Curated, and Signal-rich. All
-strategies use explicit rng parameter and weighted sampling without
-replacement. Stdlib-only, no external dependencies.
+Six strategies: Uniform, Power-biased, Curated, Signal-rich, Top-scored,
+and Sharpened-preference. All strategies use explicit rng parameter and
+weighted sampling without replacement. Stdlib-only, no external dependencies.
 """
 
 import random
@@ -36,6 +36,8 @@ def select_cards(
         return _select_signal_rich(pack_cards, n, rng)
     elif strategy == "top_scored":
         return _select_top_scored(pack_cards, n, rng, human_w)
+    elif strategy == "sharpened_preference":
+        return _select_sharpened_preference(pack_cards, n, rng, human_w)
     else:
         raise ValueError(f"Unknown Show-N strategy: {strategy!r}")
 
@@ -139,6 +141,34 @@ def _select_top_scored(
         return _select_power_biased(cards, n, rng)
 
     w_norm = _ts_normalize(human_w)
+    scored: list[tuple[float, int, CardInstance]] = []
+    for idx, card in enumerate(cards):
+        pref = _ts_dot(card.design.fitness, w_norm)
+        score = 0.3 * card.design.power + 0.7 * pref + rng.gauss(0.0, 0.05)
+        scored.append((score, idx, card))
+
+    scored.sort(key=lambda t: t[0], reverse=True)
+    return [t[2] for t in scored[:n]]
+
+
+def _select_sharpened_preference(
+    cards: list[CardInstance],
+    n: int,
+    rng: random.Random,
+    human_w: list[float] | None,
+) -> list[CardInstance]:
+    """Select top N cards by combined power and sharpened preference score.
+
+    Sharpens the preference vector by raising each component to the 4th power
+    before normalizing, which amplifies dominant archetype preferences.
+    Score = 0.3 * power + 0.7 * dot(fitness, normalize(sharpen(w))) + gauss(0, 0.05).
+    Falls back to power-biased when w is None or empty.
+    """
+    if human_w is None or not human_w:
+        return _select_power_biased(cards, n, rng)
+
+    w_sharp = [v ** 4.0 for v in human_w]
+    w_norm = _ts_normalize(w_sharp)
     scored: list[tuple[float, int, CardInstance]] = []
     for idx, card in enumerate(cards):
         pref = _ts_dot(card.design.fitness, w_norm)
