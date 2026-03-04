@@ -1,5 +1,29 @@
 # Draft Simulator Metrics Reference
 
+## Goal Metrics
+
+Six key metrics define a healthy Dreamtides draft. These are the primary targets
+when tuning draft parameters — if these pass, the draft experience is on track.
+
+1. **Convergence (shown-N, post-commitment): On-plan density (mid) mean >= 2.0**
+   — After committing to an archetype, the draft should trend toward delivering
+   on-plan cards through the mid phase.
+2. **Convergence (shown-N, post-commitment): On-plan density (late) mean >=
+   2.0** — On-plan delivery should sustain through the end of the draft.
+3. **Choice Richness (shown-N): Near-optimal count overall >= 1.5** — Multiple
+   cards should be competitive at each pick. Near 1.0 means only one real
+   choice.
+4. **Forceability: max < 0.95 (hard preset)** — No archetype should be blindly
+   forceable to a comparable deck value as adaptive play.
+5. **Splashability (shown-N): splash_fraction >= 0.40** — At least 40% of
+   post-commitment picks should offer a viable off-plan card worth taking for
+   raw strength or flexibility.
+6. **Early Openness (shown-N): archetypes exposed >= 5.0** — The first 5 picks
+   should expose the player to at least 5 distinct archetypes before requiring
+   commitment.
+
+## Metric Details
+
 Detailed reference for the six metric families computed by `metrics.py`. Each
 metric evaluates draft experience quality on two evaluation surfaces:
 
