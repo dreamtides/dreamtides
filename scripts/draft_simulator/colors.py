@@ -89,7 +89,11 @@ def card(text: object) -> str:
 
 
 def format_progress_bar(
-    done: int, total: int, width: int = 40, use_color: bool | None = None
+    done: int,
+    total: int,
+    width: int = 40,
+    use_color: bool | None = None,
+    label: str = "runs complete",
 ) -> str:
     """Return a formatted progress bar string."""
     color = _USE_COLOR if use_color is None else use_color
@@ -104,4 +108,4 @@ def format_progress_bar(
     else:
         fill_s = fill
         empty_s = empty
-    return f"\r[{fill_s}{empty_s}] {done}/{total} runs complete"
+    return f"\r[{fill_s}{empty_s}] {done}/{total} {label}"

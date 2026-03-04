@@ -745,7 +745,7 @@ def format_goal_metrics(m: DraftMetrics) -> str:
         lines.append(
             f"  {colors.dim('[N/A]')}  "
             f"{colors.label('Forceability:')}"
-            f"     {colors.dim('requires sweep')}"
+            f"     {colors.dim('requires --runs N')}"
         )
 
     # 5. Splashability >= 0.40 (yellow at 0.30)
@@ -765,6 +765,22 @@ def format_goal_metrics(m: DraftMetrics) -> str:
         f"   {colors.num(f'{openness:.1f}')} "
         f"{colors.dim('archetypes (target: >= 5.0)')}"
     )
+
+    # 7. Signal benefit >= 2% (yellow at 0%)
+    sig_val = m.signal_benefit
+    if sig_val is not None:
+        lines.append(
+            f"  {_status(sig_val, 2.0, 0.0)}  "
+            f"{colors.label('Signal benefit:')}"
+            f"   {colors.num(f'{sig_val:+.1f}%')} "
+            f"{colors.dim('(target: >= 2%)')}"
+        )
+    else:
+        lines.append(
+            f"  {colors.dim('[N/A]')}  "
+            f"{colors.label('Signal benefit:')}"
+            f"   {colors.dim('requires --runs N')}"
+        )
 
     return "\n".join(lines)
 
