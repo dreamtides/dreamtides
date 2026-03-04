@@ -5,9 +5,10 @@ document, TOML/JSON file loading, dot-notation CLI overrides, and
 validation. Stdlib-only, no external dependencies.
 """
 
+import copy
 import json
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from typing import Any, Optional
 
 
@@ -138,6 +139,19 @@ class SimulatorConfig:
     sweep: SweepConfig = field(default_factory=SweepConfig)
 
 
+SECTION_NAMES: list[str] = [
+    "draft",
+    "cube",
+    "pack_generation",
+    "refill",
+    "cards",
+    "agents",
+    "scoring",
+    "commitment",
+    "metrics",
+    "sweep",
+]
+
 _SECTION_CLASSES: dict[str, type] = {
     "draft": DraftConfig,
     "cube": CubeConfig,
@@ -150,6 +164,33 @@ _SECTION_CLASSES: dict[str, type] = {
     "metrics": MetricsConfig,
     "sweep": SweepConfig,
 }
+
+
+def clone_config(cfg: "SimulatorConfig") -> "SimulatorConfig":
+    """Create a deep copy of a SimulatorConfig with all sub-sections copied."""
+    return copy.deepcopy(cfg)
+
+
+def config_to_sorted_pairs(
+    cfg: "SimulatorConfig",
+    exclude_sections: Optional[set[str]] = None,
+) -> list[str]:
+    """Serialize all config parameters as sorted "section.param=value" strings.
+
+    Iterates over all sections and their dataclass fields using introspection.
+    Optionally excludes named sections (e.g., "sweep").
+    """
+    excluded = exclude_sections or set()
+    pairs: list[str] = []
+    for section_name in SECTION_NAMES:
+        if section_name in excluded:
+            continue
+        section_obj = getattr(cfg, section_name)
+        for f in sorted(fields(section_obj), key=lambda x: x.name):
+            value = getattr(section_obj, f.name)
+            pairs.append(f"{section_name}.{f.name}={value}")
+    pairs.sort()
+    return pairs
 
 
 def _coerce_value(current: Any, raw: str) -> Any:

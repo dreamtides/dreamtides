@@ -17,6 +17,7 @@ import config
 import draft_runner
 import metrics
 import output
+import validation
 
 
 @dataclass(frozen=True)
@@ -42,28 +43,10 @@ def compute_config_hash(cfg: config.SimulatorConfig) -> str:
     """Compute a deterministic SHA-256 hash of all parameter values.
 
     Sorts parameter keys alphabetically, serializes as "key=value"
-    pairs joined by "|", and returns the hex digest.
+    pairs joined by "|", and returns the hex digest. Excludes sweep
+    section since sweep parameters are meta-configuration.
     """
-    pairs: list[str] = []
-    sections = [
-        ("draft", cfg.draft),
-        ("cube", cfg.cube),
-        ("pack_generation", cfg.pack_generation),
-        ("refill", cfg.refill),
-        ("cards", cfg.cards),
-        ("agents", cfg.agents),
-        ("scoring", cfg.scoring),
-        ("commitment", cfg.commitment),
-        ("metrics", cfg.metrics),
-    ]
-    for section_name, section_obj in sections:
-        for f in sorted(
-            config._SECTION_CLASSES[section_name].__dataclass_fields__.keys()
-        ):
-            value = getattr(section_obj, f)
-            pairs.append(f"{section_name}.{f}={value}")
-
-    pairs.sort()
+    pairs = config.config_to_sorted_pairs(cfg, exclude_sections={"sweep"})
     data = "|".join(pairs)
     return hashlib.sha256(data.encode()).hexdigest()
 
@@ -77,10 +60,11 @@ def compute_seed(
     """Derive a per-run seed from the base seed and run index.
 
     Sequential: seed = base_seed + run_index.
-    Hashed: seed = hash((base_seed, config_hash, run_index)) % 2**32.
+    Hashed: deterministic SHA-256 of (base_seed, config_hash, run_index) % 2**32.
     """
     if seeding_policy == "hashed":
-        h = hash((base_seed, config_hash, run_index))
+        payload = f"{base_seed}|{config_hash}|{run_index}"
+        h = int(hashlib.sha256(payload.encode()).hexdigest(), 16)
         return h % (2**32)
     return base_seed + run_index
 
@@ -118,7 +102,7 @@ def apply_overrides(
     Overrides use dot notation (e.g., "draft.seat_count").
     Returns a modified copy of the config.
     """
-    cfg = _shallow_copy_config(base_cfg)
+    cfg = config.clone_config(base_cfg)
 
     for key, value in overrides.items():
         parts = key.split(".")
@@ -171,12 +155,30 @@ def run_sweep(
 
         point_run_records: list[dict[str, Any]] = []
         point_metric_values: dict[str, list[float]] = {}
+        adaptive_deck_values: list[float] = []
+        seeds_used: list[int] = []
 
         for run_i in range(runs_per_point):
             seed = compute_seed(base_seed, run_i, cfg_hash, cfg.sweep.seeding_policy)
+            seeds_used.append(seed)
 
             result = draft_runner.run_draft(point_cfg, seed)
-            draft_metrics = metrics.compute_metrics(result, point_cfg)
+
+            # Collect adaptive deck values for cross-run comparisons
+            for sr in result.seat_results:
+                adaptive_deck_values.append(sr.deck_value)
+
+            # Run comparison drafts for forceability and signal benefit
+            force_dvs, ignorant_dvs, aware_dvs = _run_comparison_drafts(point_cfg, seed)
+
+            draft_metrics = metrics.compute_metrics(
+                result,
+                point_cfg,
+                force_deck_values=force_dvs,
+                adaptive_deck_values=adaptive_deck_values[-len(result.seat_results) :],
+                aware_deck_values=aware_dvs,
+                ignorant_deck_values=ignorant_dvs,
+            )
 
             run_record = output.build_run_record(
                 run_id=completed,
@@ -194,8 +196,19 @@ def run_sweep(
             completed += 1
             _print_progress(completed, total_runs)
 
+        # Run per-point validation to get pass/fail flags for aggregate
+        point_report = validation.run_validation([], point_run_records)
+        val_flags: dict[str, bool] = {}
+        for check in point_report.checks:
+            val_flags[check.name] = check.passed
+
         agg_record = _build_aggregate_record(
-            point, point_cfg, cfg_hash, runs_per_point, point_metric_values
+            point,
+            point_cfg,
+            cfg_hash,
+            runs_per_point,
+            point_metric_values,
+            validation_flags=val_flags,
         )
         all_aggregate_records.append(agg_record)
 
@@ -203,47 +216,66 @@ def run_sweep(
     return all_run_records, all_aggregate_records
 
 
+def _run_comparison_drafts(
+    point_cfg: config.SimulatorConfig,
+    seed: int,
+) -> tuple[
+    dict[int, list[float]] | None,
+    list[float] | None,
+    list[float] | None,
+]:
+    """Run comparison drafts for forceability and signal benefit.
+
+    Returns (force_deck_values, ignorant_deck_values, aware_deck_values).
+    Force deck values maps archetype index to list of per-seat deck values.
+    Ignorant/aware deck values are lists of per-seat deck values.
+    """
+    archetype_count = point_cfg.cards.archetype_count
+
+    # Signal-ignorant comparison: run with signal_ignorant policy
+    ignorant_cfg = config.clone_config(point_cfg)
+    ignorant_cfg.agents.policy = "signal_ignorant"
+    ignorant_result = draft_runner.run_draft(ignorant_cfg, seed)
+    ignorant_dvs = [sr.deck_value for sr in ignorant_result.seat_results]
+
+    # Signal-aware (adaptive) comparison values
+    aware_result = draft_runner.run_draft(point_cfg, seed)
+    aware_dvs = [sr.deck_value for sr in aware_result.seat_results]
+
+    # Forceability: run with force policy for each archetype
+    force_dvs: dict[int, list[float]] = {}
+    for arch in range(archetype_count):
+        force_cfg = config.clone_config(point_cfg)
+        force_cfg.agents.policy = "force"
+        force_cfg.agents.force_archetype = arch
+        force_result = draft_runner.run_draft(force_cfg, seed)
+        force_dvs[arch] = [sr.deck_value for sr in force_result.seat_results]
+
+    return force_dvs, ignorant_dvs, aware_dvs
+
+
 def _accumulate_metric_values(
     accumulator: dict[str, list[float]],
     run_record: dict[str, Any],
 ) -> None:
-    """Extract numeric metric values from a run record into an accumulator."""
-    metric_keys = [
-        "cr_shown_near_opt_overall",
-        "cr_shown_score_gap_overall",
-        "cr_shown_entropy_overall",
-        "cr_full_near_opt_overall",
-        "conv_shown_late_mean",
-        "conv_shown_late_p3",
-        "splash_shown",
-        "splash_full",
-        "openness_shown_archetypes",
-        "openness_shown_entropy",
-    ]
-    for key in metric_keys:
-        val = run_record.get(key, "")
-        if val != "" and val is not None:
-            if key not in accumulator:
-                accumulator[key] = []
-            accumulator[key].append(float(val))
+    """Extract numeric metric values from a run record into an accumulator.
 
-    # Also accumulate per-seat deck values
-    for col_key, col_val in run_record.items():
-        if col_key.endswith("_deck_value") and col_val != "" and col_val is not None:
-            if col_key not in accumulator:
-                accumulator[col_key] = []
-            accumulator[col_key].append(float(col_val))
-
-    # Commitment picks for validation
-    for col_key, col_val in run_record.items():
-        if (
-            col_key.endswith("_commitment_pick")
-            and col_val != ""
-            and col_val is not None
-        ):
-            if col_key not in accumulator:
-                accumulator[col_key] = []
-            accumulator[col_key].append(float(col_val))
+    Accumulates all numeric columns except identifiers (run_id, config_hash,
+    seed) into the accumulator for aggregation.
+    """
+    skip_keys = {"run_id", "config_hash", "seed"}
+    for key, val in run_record.items():
+        if key in skip_keys:
+            continue
+        if val == "" or val is None:
+            continue
+        try:
+            float_val = float(val)
+        except (ValueError, TypeError):
+            continue
+        if key not in accumulator:
+            accumulator[key] = []
+        accumulator[key].append(float_val)
 
 
 def _build_aggregate_record(
@@ -252,9 +284,19 @@ def _build_aggregate_record(
     cfg_hash: str,
     num_runs: int,
     metric_values: dict[str, list[float]],
+    validation_flags: dict[str, bool] | None = None,
 ) -> dict[str, Any]:
     """Build an aggregate record for one parameter combination."""
     record: dict[str, Any] = {}
+
+    # Fixed parameter values (all non-swept config params)
+    swept_keys = set(point.overrides.keys())
+    for pair in config.config_to_sorted_pairs(point_cfg, exclude_sections={"sweep"}):
+        eq_idx = pair.index("=")
+        param_key = pair[:eq_idx]
+        param_val = pair[eq_idx + 1 :]
+        if param_key not in swept_keys:
+            record[f"fixed_{param_key}"] = param_val
 
     # Swept parameter values
     for key, val in sorted(point.overrides.items()):
@@ -274,6 +316,11 @@ def _build_aggregate_record(
         record[f"{metric_key}_p50"] = round(_percentile(values, 50), 6)
         record[f"{metric_key}_p75"] = round(_percentile(values, 75), 6)
         record[f"{metric_key}_p95"] = round(_percentile(values, 95), 6)
+
+    # Validation pass/fail flags
+    if validation_flags:
+        for check_name, passed in sorted(validation_flags.items()):
+            record[f"validation_{check_name}"] = "PASS" if passed else "FAIL"
 
     return record
 
@@ -315,82 +362,3 @@ def _percentile(values: list[float], p: float) -> float:
     if f == c:
         return s[int(k)]
     return s[f] * (c - k) + s[c] * (k - f)
-
-
-def _shallow_copy_config(
-    cfg: config.SimulatorConfig,
-) -> config.SimulatorConfig:
-    """Create a shallow copy of SimulatorConfig with copied sub-sections."""
-    new_cfg = config.SimulatorConfig()
-    new_cfg.draft = config.DraftConfig(
-        seat_count=cfg.draft.seat_count,
-        round_count=cfg.draft.round_count,
-        picks_per_round=list(cfg.draft.picks_per_round),
-        pack_size=cfg.draft.pack_size,
-        alternate_direction=cfg.draft.alternate_direction,
-        human_seats=cfg.draft.human_seats,
-    )
-    new_cfg.cube = config.CubeConfig(
-        distinct_cards=cfg.cube.distinct_cards,
-        copies_per_card=cfg.cube.copies_per_card,
-        consumption_mode=cfg.cube.consumption_mode,
-    )
-    new_cfg.pack_generation = config.PackGenerationConfig(
-        strategy=cfg.pack_generation.strategy,
-        archetype_target_count=cfg.pack_generation.archetype_target_count,
-        primary_density=cfg.pack_generation.primary_density,
-        bridge_density=cfg.pack_generation.bridge_density,
-        variance=cfg.pack_generation.variance,
-    )
-    new_cfg.refill = config.RefillConfig(
-        strategy=cfg.refill.strategy,
-        fingerprint_source=cfg.refill.fingerprint_source,
-        fidelity=cfg.refill.fidelity,
-        commit_bias=cfg.refill.commit_bias,
-    )
-    new_cfg.cards = config.CardsConfig(
-        source=cfg.cards.source,
-        file_path=cfg.cards.file_path,
-        archetype_count=cfg.cards.archetype_count,
-        cards_per_archetype=cfg.cards.cards_per_archetype,
-        bridge_fraction=cfg.cards.bridge_fraction,
-    )
-    new_cfg.agents = config.AgentsConfig(
-        policy=cfg.agents.policy,
-        show_n=cfg.agents.show_n,
-        show_n_strategy=cfg.agents.show_n_strategy,
-        ai_optimality=cfg.agents.ai_optimality,
-        ai_signal_weight=cfg.agents.ai_signal_weight,
-        openness_window=cfg.agents.openness_window,
-        learning_rate=cfg.agents.learning_rate,
-        force_archetype=cfg.agents.force_archetype,
-    )
-    new_cfg.scoring = config.ScoringConfig(
-        weight_power=cfg.scoring.weight_power,
-        weight_coherence=cfg.scoring.weight_coherence,
-        weight_focus=cfg.scoring.weight_focus,
-        secondary_weight=cfg.scoring.secondary_weight,
-        focus_threshold=cfg.scoring.focus_threshold,
-        focus_saturation=cfg.scoring.focus_saturation,
-    )
-    new_cfg.commitment = config.CommitmentConfig(
-        commitment_threshold=cfg.commitment.commitment_threshold,
-        stability_window=cfg.commitment.stability_window,
-        entropy_threshold=cfg.commitment.entropy_threshold,
-    )
-    new_cfg.metrics = config.MetricsConfig(
-        richness_gap=cfg.metrics.richness_gap,
-        tau=cfg.metrics.tau,
-        on_plan_threshold=cfg.metrics.on_plan_threshold,
-        splash_power_threshold=cfg.metrics.splash_power_threshold,
-        splash_flex_threshold=cfg.metrics.splash_flex_threshold,
-        exposure_threshold=cfg.metrics.exposure_threshold,
-    )
-    new_cfg.sweep = config.SweepConfig(
-        runs_per_point=cfg.sweep.runs_per_point,
-        base_seed=cfg.sweep.base_seed,
-        seeding_policy=cfg.sweep.seeding_policy,
-        trace_enabled=cfg.sweep.trace_enabled,
-        axes=dict(cfg.sweep.axes),
-    )
-    return new_cfg

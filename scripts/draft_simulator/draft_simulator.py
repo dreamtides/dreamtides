@@ -95,13 +95,15 @@ def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
 
-    seed: int = args.seed
-
     # Load configuration
     cfg = config.load_config(
         config_path=args.config,
         overrides=args.param,
     )
+
+    # CLI --seed overrides config base_seed; write back so metadata is accurate
+    seed: int = args.seed
+    cfg.sweep.base_seed = seed
 
     # Apply difficulty preset (overrides config values)
     if args.preset == "easy":

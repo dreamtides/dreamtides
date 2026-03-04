@@ -14,6 +14,7 @@ from typing import Any
 import config
 import draft_runner
 import metrics
+from utils import argmax
 
 VERSION = "0.1.0"
 
@@ -161,42 +162,70 @@ def build_run_record(
         "seed": seed,
     }
 
-    # Choice richness shown
+    # Choice richness shown (all phase-specific values)
     cr = draft_metrics.choice_richness_shown
     record["cr_shown_near_opt_early"] = round(cr.near_optimal.early, 4)
     record["cr_shown_near_opt_mid"] = round(cr.near_optimal.mid, 4)
     record["cr_shown_near_opt_late"] = round(cr.near_optimal.late, 4)
     record["cr_shown_near_opt_overall"] = round(cr.near_optimal.overall, 4)
+    record["cr_shown_score_gap_early"] = round(cr.score_gap_mean.early, 4)
+    record["cr_shown_score_gap_mid"] = round(cr.score_gap_mean.mid, 4)
+    record["cr_shown_score_gap_late"] = round(cr.score_gap_mean.late, 4)
     record["cr_shown_score_gap_overall"] = round(cr.score_gap_mean.overall, 4)
+    record["cr_shown_entropy_early"] = round(cr.choice_entropy.early, 4)
+    record["cr_shown_entropy_mid"] = round(cr.choice_entropy.mid, 4)
+    record["cr_shown_entropy_late"] = round(cr.choice_entropy.late, 4)
     record["cr_shown_entropy_overall"] = round(cr.choice_entropy.overall, 4)
 
-    # Choice richness full
+    # Choice richness full (all phase-specific values)
     crf = draft_metrics.choice_richness_full
+    record["cr_full_near_opt_early"] = round(crf.near_optimal.early, 4)
+    record["cr_full_near_opt_mid"] = round(crf.near_optimal.mid, 4)
+    record["cr_full_near_opt_late"] = round(crf.near_optimal.late, 4)
     record["cr_full_near_opt_overall"] = round(crf.near_optimal.overall, 4)
+    record["cr_full_score_gap_early"] = round(crf.score_gap_mean.early, 4)
+    record["cr_full_score_gap_mid"] = round(crf.score_gap_mean.mid, 4)
+    record["cr_full_score_gap_late"] = round(crf.score_gap_mean.late, 4)
     record["cr_full_score_gap_overall"] = round(crf.score_gap_mean.overall, 4)
+    record["cr_full_entropy_early"] = round(crf.choice_entropy.early, 4)
+    record["cr_full_entropy_mid"] = round(crf.choice_entropy.mid, 4)
+    record["cr_full_entropy_late"] = round(crf.choice_entropy.late, 4)
     record["cr_full_entropy_overall"] = round(crf.choice_entropy.overall, 4)
 
-    # Convergence
+    # Convergence shown
     record["conv_shown_late_mean"] = round(
         draft_metrics.convergence_shown.on_plan_density_late_mean, 4
     )
     record["conv_shown_late_p3"] = round(
         draft_metrics.convergence_shown.on_plan_prob_gte_3_late, 4
     )
+
+    # Convergence full
     record["conv_full_late_mean"] = round(
         draft_metrics.convergence_full.on_plan_density_late_mean, 4
+    )
+    record["conv_full_late_p3"] = round(
+        draft_metrics.convergence_full.on_plan_prob_gte_3_late, 4
     )
 
     # Splashability
     record["splash_shown"] = round(draft_metrics.splashability_shown.splash_fraction, 4)
     record["splash_full"] = round(draft_metrics.splashability_full.splash_fraction, 4)
 
-    # Early openness
+    # Early openness shown
     record["openness_shown_archetypes"] = round(
         draft_metrics.early_openness_shown.archetypes_exposed, 4
     )
     record["openness_shown_entropy"] = round(
         draft_metrics.early_openness_shown.preference_entropy, 4
+    )
+
+    # Early openness full
+    record["openness_full_archetypes"] = round(
+        draft_metrics.early_openness_full.archetypes_exposed, 4
+    )
+    record["openness_full_entropy"] = round(
+        draft_metrics.early_openness_full.preference_entropy, 4
     )
 
     # Signal benefit and forceability
@@ -217,9 +246,13 @@ def build_run_record(
         record[f"seat{seat_idx}_commitment_pick"] = (
             sr.commitment_pick if sr.commitment_pick is not None else ""
         )
-        record[f"seat{seat_idx}_archetype"] = (
-            sr.committed_archetype if sr.committed_archetype is not None else ""
-        )
+        # final_archetype: committed archetype if committed, else derived from
+        # the final preference vector
+        if sr.committed_archetype is not None:
+            final_arch = sr.committed_archetype
+        else:
+            final_arch = argmax(sr.final_w) if sr.final_w else ""
+        record[f"seat{seat_idx}_archetype"] = final_arch
 
     return record
 
