@@ -41,7 +41,7 @@ def run_validation(
     checks: list[CheckResult] = []
 
     checks.extend(_check_commitment_timing(run_records))
-    checks.extend(_check_choice_richness_baseline(run_records))
+    checks.extend(_check_goal_metrics(run_records))
     checks.extend(_check_archetype_density(run_records))
     checks.extend(_check_metric_stability(aggregate_records))
     checks.extend(_check_tail_percentile_stability(aggregate_records))
@@ -160,40 +160,69 @@ def _check_commitment_timing(
     return checks
 
 
-def _check_choice_richness_baseline(
+def _check_goal_metrics(
     run_records: list[dict[str, Any]],
 ) -> list[CheckResult]:
-    """Check that mean near-optimal count (shown-N) is at least 1.5."""
+    """Check the 7 goal metrics against their green thresholds."""
     checks: list[CheckResult] = []
 
-    near_opt_values: list[float] = []
-    for record in run_records:
-        val = record.get("cr_shown_near_opt_overall", "")
-        if val != "" and val is not None:
-            near_opt_values.append(float(val))
+    goal_specs: list[tuple[str, str, float, str]] = [
+        ("Goal: Convergence (mid)", "conv_shown_mid_mean", 2.0, "gte"),
+        ("Goal: Convergence (late)", "conv_shown_late_mean", 2.0, "gte"),
+        ("Goal: Choice richness", "cr_shown_near_opt_overall", 1.5, "gte"),
+        ("Goal: Forceability", "forceability_max", 0.95, "lt"),
+        ("Goal: Splashability", "splash_shown", 0.40, "gte"),
+        ("Goal: Early openness", "openness_shown_archetypes", 5.0, "gte"),
+        ("Goal: Signal benefit", "signal_benefit", 2.0, "gte"),
+    ]
 
-    if not near_opt_values:
-        checks.append(
-            CheckResult(
-                name="Choice richness baseline",
-                passed=False,
-                message="No choice richness data available",
+    optional_keys = {"forceability_max", "signal_benefit"}
+
+    for name, key, threshold, direction in goal_specs:
+        values: list[float] = []
+        for record in run_records:
+            val = record.get(key, "")
+            if val != "" and val is not None:
+                values.append(float(val))
+
+        if not values:
+            if key in optional_keys:
+                checks.append(
+                    CheckResult(
+                        name=name,
+                        passed=True,
+                        message="N/A (requires comparison drafts)",
+                    )
+                )
+            else:
+                checks.append(
+                    CheckResult(
+                        name=name,
+                        passed=False,
+                        message=f"No data for {key}",
+                    )
+                )
+            continue
+
+        mean_val = sum(values) / len(values)
+        if direction == "lt":
+            ok = mean_val < threshold
+            checks.append(
+                CheckResult(
+                    name=name,
+                    passed=ok,
+                    message=f"Mean = {mean_val:.2f} (target: < {threshold})",
+                )
             )
-        )
-        return checks
-
-    mean_near_opt = sum(near_opt_values) / len(near_opt_values)
-    ok = mean_near_opt >= 1.5
-    checks.append(
-        CheckResult(
-            name="Choice richness baseline",
-            passed=ok,
-            message=(
-                f"Mean near-optimal count (shown-N) = {mean_near_opt:.2f} "
-                f"(target: >= 1.5)"
-            ),
-        )
-    )
+        else:
+            ok = mean_val >= threshold
+            checks.append(
+                CheckResult(
+                    name=name,
+                    passed=ok,
+                    message=f"Mean = {mean_val:.2f} (target: >= {threshold})",
+                )
+            )
 
     return checks
 
