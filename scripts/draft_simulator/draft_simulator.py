@@ -11,6 +11,7 @@ import random
 import sys
 import traceback
 
+import agents
 import card_generator
 import commitment
 import config
@@ -18,6 +19,7 @@ import cube_manager
 import deck_scorer
 import pack_generator
 import refill
+import show_n
 from config import SimulatorConfig
 from draft_models import CardDesign, CardInstance, CubeConsumptionMode, Pack
 from utils import argmax
@@ -140,6 +142,12 @@ def main() -> None:
 
     # Demonstrate refill strategies
     _demo_refill_strategies(cards, cfg, consumption_mode, rng)
+
+    # Demonstrate pick policies
+    _demo_pick_policies(cards, cfg, consumption_mode, rng)
+
+    # Demonstrate Show-N strategies
+    _demo_show_n_strategies(cards, cfg, consumption_mode, rng)
 
 
 def _print_pack(pack: Pack, label: str, archetype_count: int) -> None:
@@ -365,6 +373,147 @@ def _demo_refill_strategies(
     round_env = refill.compute_round_environment_profile(demo_packs)
     env_str = ", ".join(f"{v:.4f}" for v in round_env)
     print(f"    [{env_str}]")
+
+
+def _demo_pick_policies(
+    cards: list[CardDesign],
+    cfg: SimulatorConfig,
+    consumption_mode: CubeConsumptionMode,
+    rng: random.Random,
+) -> None:
+    """Demonstrate each pick policy selecting a card from a sample pack."""
+    demo_cube = cube_manager.CubeManager(
+        designs=cards,
+        copies_per_card=cfg.cube.copies_per_card,
+        consumption_mode=consumption_mode,
+    )
+    pack = pack_generator.generate_pack("uniform", demo_cube, cfg, rng)
+
+    print(f"\n--- Pick Policy Demonstrations (pack_id={pack.pack_id}) ---")
+    print(f"  Pack contains {len(pack.cards)} cards")
+
+    policies = [
+        ("greedy", "Greedy"),
+        ("archetype_loyal", "Archetype-loyal"),
+        ("force", "Force (target archetype=0)"),
+        ("adaptive", "Adaptive"),
+        ("signal_ignorant", "Signal-ignorant"),
+    ]
+
+    for policy_key, policy_label in policies:
+        agent = agents.create_agent(cfg.cards.archetype_count)
+        policy_rng = random.Random(rng.randint(0, 2**32))
+        force_arch = 0 if policy_key == "force" else None
+
+        pick = agents.pick_card(
+            pack.cards,
+            agent,
+            policy_key,
+            cfg.agents,
+            cfg.scoring,
+            policy_rng,
+            force_archetype=force_arch,
+        )
+
+        score = _policy_score(pick, agent, policy_key, cfg, force_arch)
+        top_arch = argmax(pick.design.fitness)
+        top_fit = pick.design.fitness[top_arch]
+
+        print(
+            f"\n  {policy_label}:"
+            f"\n    Selected: {pick.design.name}"
+            f"  (power={pick.design.power:.3f}, "
+            f"top_fitness[{top_arch}]={top_fit:.3f})"
+            f"\n    Score: {score:.4f}"
+        )
+
+        if policy_key == "force" and force_arch is not None:
+            print(
+                f"    Force archetype {force_arch} fitness: "
+                f"{pick.design.fitness[force_arch]:.3f}"
+            )
+
+
+def _policy_score(
+    card: CardInstance,
+    agent: agents.AgentState,
+    policy: str,
+    cfg: SimulatorConfig,
+    force_arch: int | None,
+) -> float:
+    """Compute the policy-specific score for the selected card."""
+    if policy == "greedy":
+        return agents.score_card_greedy(card, agent, cfg.scoring)
+    elif policy == "archetype_loyal":
+        best = argmax(agent.w)
+        return card.design.fitness[best]
+    elif policy == "force":
+        arch = force_arch if force_arch is not None else 0
+        return card.design.fitness[arch]
+    elif policy == "adaptive":
+        return agents.score_card_adaptive(card, agent, cfg.agents)
+    elif policy == "signal_ignorant":
+        return agents.score_card_signal_ignorant(card, agent, cfg.agents)
+    return 0.0
+
+
+def _demo_show_n_strategies(
+    cards: list[CardDesign],
+    cfg: SimulatorConfig,
+    consumption_mode: CubeConsumptionMode,
+    rng: random.Random,
+) -> None:
+    """Demonstrate each Show-N strategy selecting cards from a pack."""
+    demo_cube = cube_manager.CubeManager(
+        designs=cards,
+        copies_per_card=cfg.cube.copies_per_card,
+        consumption_mode=consumption_mode,
+    )
+    pack = pack_generator.generate_pack("uniform", demo_cube, cfg, rng)
+
+    # Create a plausible human preference vector
+    human_w = commitment.initial_preference_vector(cfg.cards.archetype_count)
+    # Bias toward archetype 0 to make curated strategy interesting
+    human_w[0] = 2.0
+
+    print(f"\n--- Show-N Strategy Demonstrations (pack_id={pack.pack_id}) ---")
+    print(f"  Pack contains {len(pack.cards)} cards, show_n={cfg.agents.show_n}")
+    print(f"  Human best archetype: {argmax(human_w)}")
+
+    strategy_labels = {
+        "uniform": "Uniform",
+        "power_biased": "Power-biased",
+        "curated": "Curated",
+        "signal_rich": "Signal-rich",
+    }
+
+    for strategy_key, strategy_label in strategy_labels.items():
+        strategy_rng = random.Random(rng.randint(0, 2**32))
+        selected = show_n.select_cards(
+            pack.cards,
+            cfg.agents.show_n,
+            strategy_key,
+            strategy_rng,
+            human_w=human_w,
+        )
+
+        print(f"\n  {strategy_label} ({len(selected)} cards):")
+
+        for card in selected:
+            top_arch = argmax(card.design.fitness)
+            fitness_for_best = card.design.fitness[argmax(human_w)]
+            label = ""
+            if strategy_key == "curated":
+                if fitness_for_best >= 0.6:
+                    label = " [on-plan]"
+                elif fitness_for_best < 0.3 and card.design.power >= 0.5:
+                    label = " [off-plan strong]"
+            print(
+                f"    {card.design.name:<30s} "
+                f"power={card.design.power:.3f}  "
+                f"fitness[{argmax(human_w)}]={fitness_for_best:.3f}"
+                f"{label}"
+            )
 
 
 def _run_with_error_handling() -> None:
