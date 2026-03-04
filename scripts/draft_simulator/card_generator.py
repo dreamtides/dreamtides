@@ -288,8 +288,179 @@ def print_card_pool_stats(cards: list[CardDesign], archetype_count: int) -> None
     )
 
 
+def describe_card_pool(
+    cards: list[CardDesign], archetype_count: int, source: str = "synthetic"
+) -> str:
+    """Return a 30-60 line summary describing the card pool.
+
+    Covers composition, per-archetype coverage, fitness/power/commit/flex
+    distributions with histograms and percentiles, cross-archetype diversity,
+    and the strongest cards.
+    """
+    lines: list[str] = []
+
+    # --- Header ---
+    lines.append("=" * 60)
+    lines.append("CARD POOL SUMMARY")
+    lines.append("=" * 60)
+    lines.append(
+        f"Source: {source}  |  {len(cards)} distinct designs  |  "
+        f"{archetype_count} archetypes"
+    )
+    lines.append("")
+
+    # --- Composition ---
+    bridge_cards = [c for c in cards if sum(1 for f in c.fitness if f > 0.5) >= 2]
+    primary_cards = [c for c in cards if sum(1 for f in c.fitness if f > 0.5) < 2]
+    lines.append("--- Composition ---")
+    lines.append(
+        f"  Primary cards (single archetype): "
+        f"{len(primary_cards):>4d}  ({100*len(primary_cards)/len(cards):.1f}%)"
+    )
+    lines.append(
+        f"  Bridge cards  (2+ archetypes):     "
+        f"{len(bridge_cards):>4d}  ({100*len(bridge_cards)/len(cards):.1f}%)"
+    )
+    lines.append("")
+
+    # --- Per-Archetype Coverage ---
+    lines.append("--- Per-Archetype Coverage ---")
+    header = (
+        f"  {'Arch':>4s}  {'Strong(>0.5)':>12s}  {'Moderate':>12s}  {'Weak(<0.3)':>10s}"
+    )
+    lines.append(header)
+    for arch in range(archetype_count):
+        strong = sum(1 for c in cards if c.fitness[arch] > 0.5)
+        moderate = sum(1 for c in cards if 0.3 <= c.fitness[arch] <= 0.5)
+        weak = sum(1 for c in cards if c.fitness[arch] < 0.3)
+        lines.append(f"  {arch:>4d}  {strong:>12d}  {moderate:>12d}  {weak:>10d}")
+    lines.append("")
+
+    # --- Fitness Distribution ---
+    all_fitness = [f for c in cards for f in c.fitness]
+    top_fitness = [max(c.fitness) for c in cards]
+    lines.append("--- Fitness Distribution ---")
+    lines.append(
+        f"  All values:     mean={_mean(all_fitness):.3f}  "
+        f"median={_percentile(all_fitness, 50):.3f}  "
+        f"std={_std(all_fitness):.3f}"
+    )
+    lines.append(
+        f"  Top per card:   mean={_mean(top_fitness):.3f}  "
+        f"median={_percentile(top_fitness, 50):.3f}  "
+        f"std={_std(top_fitness):.3f}"
+    )
+    lines.append("")
+
+    # --- Power Distribution ---
+    powers = [c.power for c in cards]
+    lines.append("--- Power Distribution ---")
+    lines.append(
+        f"  min={min(powers):.3f}  p25={_percentile(powers, 25):.3f}  "
+        f"median={_percentile(powers, 50):.3f}  "
+        f"p75={_percentile(powers, 75):.3f}  max={max(powers):.3f}"
+    )
+    lines.append(_histogram(powers, "  ", bins=6, lo=0.0, hi=1.0))
+    lines.append("")
+
+    # --- Commit Distribution ---
+    commits = [c.commit for c in cards]
+    lines.append("--- Commit Distribution ---")
+    lines.append(
+        f"  min={min(commits):.3f}  p25={_percentile(commits, 25):.3f}  "
+        f"median={_percentile(commits, 50):.3f}  "
+        f"p75={_percentile(commits, 75):.3f}  max={max(commits):.3f}"
+    )
+    lines.append(_histogram(commits, "  ", bins=6, lo=0.0, hi=1.0))
+    lines.append("")
+
+    # --- Flex Distribution ---
+    flexes = [c.flex for c in cards]
+    lines.append("--- Flex Distribution ---")
+    lines.append(
+        f"  min={min(flexes):.3f}  p25={_percentile(flexes, 25):.3f}  "
+        f"median={_percentile(flexes, 50):.3f}  "
+        f"p75={_percentile(flexes, 75):.3f}  max={max(flexes):.3f}"
+    )
+    lines.append(_histogram(flexes, "  ", bins=6, lo=0.0, hi=1.0))
+    lines.append("")
+
+    # --- Cross-Archetype Diversity ---
+    lines.append("--- Cross-Archetype Diversity ---")
+    diversity_buckets: dict[int, int] = {}
+    for c in cards:
+        n_strong = sum(1 for f in c.fitness if f > 0.5)
+        diversity_buckets[n_strong] = diversity_buckets.get(n_strong, 0) + 1
+    for n_strong in sorted(diversity_buckets.keys()):
+        count = diversity_buckets[n_strong]
+        label = f"{n_strong} archetype" if n_strong == 1 else f"{n_strong} archetypes"
+        if n_strong == 0:
+            label = "no archetype"
+        lines.append(
+            f"  Fitness > 0.5 in {label + ':':<16s} "
+            f"{count:>4d}  ({100*count/len(cards):.1f}%)"
+        )
+    lines.append("")
+
+    # --- Strongest Cards ---
+    sorted_by_power = sorted(cards, key=lambda c: c.power, reverse=True)
+    lines.append("--- Strongest Cards (top 5 by power) ---")
+    lines.append(f"  {'Name':<30s}  {'Power':>5s}  {'TopArch':>7s}  {'Fitness':>7s}")
+    for c in sorted_by_power[:5]:
+        top_arch = max(range(len(c.fitness)), key=lambda i: c.fitness[i])
+        lines.append(
+            f"  {c.name:<30s}  {c.power:>5.3f}  {top_arch:>7d}  "
+            f"{c.fitness[top_arch]:>7.3f}"
+        )
+
+    lines.append("=" * 60)
+    return "\n".join(lines)
+
+
 def _mean(values: list[float]) -> float:
     """Compute the arithmetic mean of a list of floats."""
     if not values:
         return 0.0
     return sum(values) / len(values)
+
+
+def _percentile(values: list[float], pct: float) -> float:
+    """Compute a percentile using linear interpolation."""
+    if not values:
+        return 0.0
+    s = sorted(values)
+    k = (pct / 100.0) * (len(s) - 1)
+    lo = int(k)
+    hi = min(lo + 1, len(s) - 1)
+    frac = k - lo
+    return s[lo] + frac * (s[hi] - s[lo])
+
+
+def _std(values: list[float]) -> float:
+    """Compute population standard deviation."""
+    if len(values) < 2:
+        return 0.0
+    m = _mean(values)
+    return (sum((v - m) ** 2 for v in values) / len(values)) ** 0.5
+
+
+def _histogram(
+    values: list[float], indent: str, bins: int = 5, lo: float = 0.0, hi: float = 1.0
+) -> str:
+    """Render a multi-line histogram with bin counts and bars."""
+    width = (hi - lo) / bins
+    counts = [0] * bins
+    for v in values:
+        idx = min(int((v - lo) / width), bins - 1)
+        idx = max(0, idx)
+        counts[idx] += 1
+    max_count = max(counts) if counts else 1
+    lines: list[str] = []
+    for i, count in enumerate(counts):
+        if count == 0:
+            continue
+        edge = lo + i * width
+        bar_len = max(1, round(count / max_count * 20))
+        bar = "\u2588" * bar_len
+        lines.append(f"{indent}[{edge:.2f}-{edge + width:.2f}] {bar} {count}")
+    return "\n".join(lines)

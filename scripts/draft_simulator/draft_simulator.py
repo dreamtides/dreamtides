@@ -35,6 +35,17 @@ from utils import argmax
 VERSION = "0.1.0"
 
 
+def _unique_designs(card_pool: dict[int, CardInstance]) -> list[CardDesign]:
+    """Extract unique CardDesign objects from a card pool."""
+    seen: set[str] = set()
+    designs: list[CardDesign] = []
+    for inst in card_pool.values():
+        if inst.design.card_id not in seen:
+            seen.add(inst.design.card_id)
+            designs.append(inst.design)
+    return designs
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser for the draft simulator CLI."""
     parser = argparse.ArgumentParser(
@@ -142,6 +153,18 @@ def _run_single(
     )
 
     result = draft_runner.run_draft(cfg, seed)
+
+    # Describe the card pool used for this draft
+    designs = _unique_designs(result.card_pool)
+    source_label = (
+        f"file ({cfg.cards.file_path})" if cfg.cards.source == "file" else "synthetic"
+    )
+    print()
+    print(
+        card_generator.describe_card_pool(
+            designs, cfg.cards.archetype_count, source_label
+        )
+    )
 
     print()
     for seat_idx, sr in enumerate(result.seat_results):
