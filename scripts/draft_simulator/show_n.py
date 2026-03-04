@@ -1,14 +1,16 @@
 """Show-N card selection strategies for the draft simulator.
 
 Selects a subset of N cards from a pack to present to the human seat.
-Seven strategies: Uniform, Power-biased, Curated, Signal-rich, Top-scored,
-Sharpened-preference, and Plan-plus-power. All strategies use explicit rng
-parameter and weighted sampling without replacement. Stdlib-only, no
-external dependencies.
+Eight strategies: Uniform, Power-biased, Curated, Signal-rich, Top-scored,
+Sharpened-preference, Plan-plus-power, and Deck-value-greedy. All strategies
+use explicit rng parameter and weighted sampling without replacement.
+Stdlib-only, no external dependencies.
 """
 
 import random
 
+import deck_scorer
+from config import ScoringConfig
 from draft_models import CardInstance
 from utils import argmax
 
@@ -19,6 +21,8 @@ def select_cards(
     strategy: str,
     rng: random.Random,
     human_w: list[float] | None = None,
+    human_drafted: list[CardInstance] | None = None,
+    scoring_cfg: ScoringConfig | None = None,
 ) -> list[CardInstance]:
     """Select N cards from the pack using the specified strategy.
 
@@ -41,6 +45,10 @@ def select_cards(
         return _select_sharpened_preference(pack_cards, n, rng, human_w)
     elif strategy == "plan_plus_power":
         return _select_plan_plus_power(pack_cards, n, rng, human_w)
+    elif strategy == "deck_value_greedy":
+        return _select_deck_value_greedy(
+            pack_cards, n, rng, human_w, human_drafted, scoring_cfg,
+        )
     else:
         raise ValueError(f"Unknown Show-N strategy: {strategy!r}")
 
@@ -233,6 +241,34 @@ def _select_plan_plus_power(
         selected += remaining_on[: n - len(selected)]
 
     return selected
+
+
+def _select_deck_value_greedy(
+    cards: list[CardInstance],
+    n: int,
+    rng: random.Random,
+    human_w: list[float] | None,
+    human_drafted: list[CardInstance] | None,
+    scoring_cfg: ScoringConfig | None,
+) -> list[CardInstance]:
+    """Select top N cards by marginal deck_value improvement.
+
+    For each card in the pack, computes deck_value(human_drafted + [card])
+    using the human's preference vector and scoring config. Returns the
+    top N cards by that score. Falls back to power-biased when any
+    required input is missing.
+    """
+    if human_w is None or not human_w or human_drafted is None or scoring_cfg is None:
+        return _select_power_biased(cards, n, rng)
+
+    scored: list[tuple[float, int, CardInstance]] = []
+    for idx, card in enumerate(cards):
+        trial_pool: list[CardInstance] = list(human_drafted) + [card]
+        value = deck_scorer.deck_value(trial_pool, human_w, scoring_cfg)
+        scored.append((value, idx, card))
+
+    scored.sort(key=lambda t: t[0], reverse=True)
+    return [t[2] for t in scored[:n]]
 
 
 

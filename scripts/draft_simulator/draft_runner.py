@@ -137,6 +137,8 @@ def run_draft(
                         cfg.agents.show_n_strategy,
                         random.Random(pick_rng.randint(0, 2**32)),
                         human_w=agent.w,
+                        human_drafted=agent.drafted,
+                        scoring_cfg=cfg.scoring,
                     )
                     candidates = shown
                 else:

@@ -789,6 +789,135 @@ class TestShowN(unittest.TestCase):
         with self.assertRaises(ValueError):
             show_n.select_cards(pack, 4, "nonexistent", rng)
 
+    def test_deck_value_greedy_returns_n_cards(self) -> None:
+        """deck_value_greedy should return exactly N cards."""
+        pack = self._make_pack(10)
+        rng = random.Random(42)
+        w = [3.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        scoring = ScoringConfig()
+        drafted: list[CardInstance] = []
+        result = show_n.select_cards(
+            pack, 4, "deck_value_greedy", rng,
+            human_w=w, human_drafted=drafted, scoring_cfg=scoring,
+        )
+        self.assertEqual(len(result), 4)
+
+    def test_deck_value_greedy_no_duplicates(self) -> None:
+        """deck_value_greedy should not return duplicate instance IDs."""
+        pack = self._make_pack(15)
+        rng = random.Random(42)
+        w = [5.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        scoring = ScoringConfig()
+        drafted: list[CardInstance] = []
+        result = show_n.select_cards(
+            pack, 4, "deck_value_greedy", rng,
+            human_w=w, human_drafted=drafted, scoring_cfg=scoring,
+        )
+        ids = [c.instance_id for c in result]
+        self.assertEqual(len(ids), len(set(ids)))
+
+    def test_deck_value_greedy_prefers_on_plan(self) -> None:
+        """deck_value_greedy should prefer cards matching the human's plan."""
+        on_plan = _make_instance(
+            0, [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5,
+        )
+        off_plan_cards = [
+            _make_instance(
+                i + 1,
+                [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                power=0.5,
+                card_id=f"off_{i}",
+            )
+            for i in range(9)
+        ]
+        pack = [on_plan] + off_plan_cards
+        w = [5.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        scoring = ScoringConfig()
+        drafted: list[CardInstance] = []
+        rng = random.Random(42)
+        result = show_n.select_cards(
+            pack, 4, "deck_value_greedy", rng,
+            human_w=w, human_drafted=drafted, scoring_cfg=scoring,
+        )
+        result_ids = {c.instance_id for c in result}
+        self.assertIn(on_plan.instance_id, result_ids)
+
+    def test_deck_value_greedy_falls_back_without_w(self) -> None:
+        """deck_value_greedy should fall back to power_biased when w is None."""
+        pack = self._make_pack(10)
+        rng = random.Random(42)
+        scoring = ScoringConfig()
+        result = show_n.select_cards(
+            pack, 4, "deck_value_greedy", rng,
+            human_w=None, human_drafted=[], scoring_cfg=scoring,
+        )
+        self.assertEqual(len(result), 4)
+
+    def test_deck_value_greedy_falls_back_without_drafted(self) -> None:
+        """deck_value_greedy should fall back when human_drafted is None."""
+        pack = self._make_pack(10)
+        rng = random.Random(42)
+        w = [3.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        scoring = ScoringConfig()
+        result = show_n.select_cards(
+            pack, 4, "deck_value_greedy", rng,
+            human_w=w, human_drafted=None, scoring_cfg=scoring,
+        )
+        self.assertEqual(len(result), 4)
+
+    def test_deck_value_greedy_falls_back_without_scoring(self) -> None:
+        """deck_value_greedy should fall back when scoring_cfg is None."""
+        pack = self._make_pack(10)
+        rng = random.Random(42)
+        w = [3.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        result = show_n.select_cards(
+            pack, 4, "deck_value_greedy", rng,
+            human_w=w, human_drafted=[], scoring_cfg=None,
+        )
+        self.assertEqual(len(result), 4)
+
+    def test_deck_value_greedy_considers_existing_pool(self) -> None:
+        """deck_value_greedy uses the human's existing pool to evaluate cards."""
+        # Set up an existing pool committed to archetype 0
+        existing = [
+            _make_instance(
+                100 + i,
+                [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                power=0.6,
+                card_id=f"existing_{i}",
+            )
+            for i in range(5)
+        ]
+        # Two candidate cards: one on-plan, one off-plan
+        on_plan = _make_instance(
+            0, [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5,
+        )
+        off_plan = _make_instance(
+            1, [0.1, 0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5,
+            card_id="off",
+        )
+        # Fillers
+        fillers = [
+            _make_instance(
+                i + 2,
+                [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                power=0.3,
+                card_id=f"filler_{i}",
+            )
+            for i in range(8)
+        ]
+        pack = [off_plan, on_plan] + fillers
+        w = [5.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        scoring = ScoringConfig()
+        rng = random.Random(42)
+        result = show_n.select_cards(
+            pack, 4, "deck_value_greedy", rng,
+            human_w=w, human_drafted=existing, scoring_cfg=scoring,
+        )
+        result_ids = {c.instance_id for c in result}
+        # The on-plan card should rank higher with the existing pool
+        self.assertIn(on_plan.instance_id, result_ids)
+
 
 if __name__ == "__main__":
     unittest.main()

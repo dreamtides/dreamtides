@@ -21,6 +21,7 @@ state.json
 .logs
 scripts/test_output/
 notes/
+.claude/worktrees
 
 # Local Cargo config (contains [patch] overrides for local dev)
 .cargo/
