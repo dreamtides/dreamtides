@@ -2,7 +2,8 @@
 """Entry point for the draft simulator.
 
 Parses CLI arguments, loads configuration, generates or loads the card
-pool, and prints summary statistics. Stdlib-only, no external dependencies.
+pool, creates a cube, generates packs using each strategy, and prints
+summary statistics. Stdlib-only, no external dependencies.
 """
 
 import argparse
@@ -12,6 +13,9 @@ import traceback
 
 import card_generator
 import config
+import cube_manager
+import pack_generator
+from draft_models import CubeConsumptionMode, Pack
 
 VERSION = "0.1.0"
 
@@ -91,11 +95,66 @@ def main() -> None:
     # Print card pool statistics
     card_generator.print_card_pool_stats(cards, cfg.cards.archetype_count)
 
+    # Create cube and validate supply
+    consumption_mode = (
+        CubeConsumptionMode.WITH_REPLACEMENT
+        if cfg.cube.consumption_mode == "with_replacement"
+        else CubeConsumptionMode.WITHOUT_REPLACEMENT
+    )
+    cube = cube_manager.CubeManager(
+        designs=cards,
+        copies_per_card=cfg.cube.copies_per_card,
+        consumption_mode=consumption_mode,
+    )
+
+    cube_manager.validate_supply(cfg, cube.total_size)
+
+    # Generate one pack using each strategy and print contents
+    strategies = ["uniform", "rarity_weighted", "seeded_themed"]
+    strategy_labels = {
+        "uniform": "Uniform",
+        "rarity_weighted": "Rarity-weighted",
+        "seeded_themed": "Seeded/Themed",
+    }
+
+    for strategy in strategies:
+        # Use with_replacement mode for QA demo so each strategy draws
+        # from the full supply independently
+        demo_cube = cube_manager.CubeManager(
+            designs=cards,
+            copies_per_card=cfg.cube.copies_per_card,
+            consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
+        )
+        pack = pack_generator.generate_pack(strategy, demo_cube, cfg, rng)
+        _print_pack(pack, strategy_labels[strategy], cfg.cards.archetype_count)
+
+
+def _print_pack(pack: Pack, label: str, archetype_count: int) -> None:
+    """Print pack contents for QA inspection."""
+    print(f"\n--- {label} Pack (id={pack.pack_id}) ---")
+    print(f"  Cards ({len(pack.cards)}):")
+    for card in pack.cards:
+        top_arch = 0
+        top_val = card.design.fitness[0] if card.design.fitness else 0.0
+        for i in range(1, min(len(card.design.fitness), archetype_count)):
+            if card.design.fitness[i] > top_val:
+                top_val = card.design.fitness[i]
+                top_arch = i
+        print(
+            f"    {card.design.name:<30s} "
+            f"top_arch={top_arch}  power={card.design.power:.3f}"
+        )
+    profile_str = ", ".join(f"{v:.3f}" for v in pack.archetype_profile)
+    print(f"  Archetype profile: [{profile_str}]")
+
 
 def _run_with_error_handling() -> None:
     """Run main() with clean error handling for all exit paths."""
     try:
         main()
+    except cube_manager.CubeSupplyError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
     except KeyboardInterrupt:
         print("\n  Simulation interrupted.")
         sys.exit(0)
