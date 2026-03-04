@@ -59,7 +59,7 @@ def build_parser() -> argparse.ArgumentParser:
         "mode",
         nargs="?",
         default="single",
-        choices=["single", "sweep", "trace", "demo"],
+        choices=["single", "sweep", "trace", "demo", "explain"],
         help="Simulation mode (default: single)",
     )
     parser.add_argument(
@@ -159,6 +159,8 @@ def main() -> None:
         _run_trace(cfg, seed, output_dir)
     elif mode == "demo":
         _run_demo(cfg, seed)
+    elif mode == "explain":
+        _run_explain()
     elif mode == "sweep":
         runs = args.runs if args.runs is not None else cfg.sweep.runs_per_point
         _run_sweep(cfg, seed, runs, output_dir)
@@ -196,6 +198,404 @@ def _print_header(
         f"{colors.label('refill')}={colors.c(cfg.refill.strategy, 'special')}, "
         f"{colors.label('archetypes')}={colors.num(cfg.cards.archetype_count)}"
     )
+
+
+def _run_explain() -> None:
+    """Print plain-language explanations of all parameters and goal metrics."""
+    print(colors.header(f"Draft Simulator v{VERSION} — Parameter & Metric Reference"))
+
+    print(f"\n{colors.section('=== Configuration Parameters ===')}")
+
+    _explain_section(
+        "draft",
+        "Draft Structure",
+        [
+            (
+                "seat_count",
+                "Number of players in the draft. More seats means more "
+                "competition for cards.",
+            ),
+            (
+                "round_count",
+                "Number of rounds. Each round generates a fresh pack " "per seat.",
+            ),
+            (
+                "picks_per_round",
+                "Cards picked per round (list, one entry per "
+                "round). Must sum to 30.",
+            ),
+            ("pack_size", "Number of cards in each newly generated pack."),
+            (
+                "alternate_direction",
+                "Whether pack-passing direction alternates "
+                "between rounds (left, right, left...).",
+            ),
+            (
+                "human_seats",
+                "Number of seats modeled as human (with show-N "
+                "filtering). Usually 1.",
+            ),
+        ],
+    )
+
+    _explain_section(
+        "cube",
+        "Cube Construction",
+        [
+            ("distinct_cards", "Total number of unique card designs in the cube."),
+            ("copies_per_card", "How many copies of each design exist in the " "cube."),
+            (
+                "consumption_mode",
+                '"without_replacement" removes drawn cards from '
+                'the cube; "with_replacement" allows redrawing.',
+            ),
+        ],
+    )
+
+    _explain_section(
+        "pack_generation",
+        "Pack Generation",
+        [
+            (
+                "strategy",
+                'Algorithm for building packs: "uniform" (random), '
+                '"rarity_weighted", or "seeded_themed" (themed around specific '
+                "archetypes).",
+            ),
+            (
+                "archetype_target_count",
+                "For seeded_themed: number of archetypes " "to emphasize per pack.",
+            ),
+            (
+                "primary_density",
+                "For seeded_themed: fraction of pack filled with "
+                "primary-archetype cards.",
+            ),
+            (
+                "bridge_density",
+                "For seeded_themed: fraction of pack filled with "
+                "bridge cards (cards that span two+ archetypes).",
+            ),
+            (
+                "variance",
+                "For seeded_themed: randomness in archetype emphasis " "across packs.",
+            ),
+        ],
+    )
+
+    _explain_section(
+        "refill",
+        "Pack Refill",
+        [
+            (
+                "strategy",
+                "How packs are replenished after each pick: "
+                '"no_refill", "uniform_refill" (random card added), or '
+                '"constrained_refill" (signal-preserving card added).',
+            ),
+            (
+                "fingerprint_source",
+                "Signal source for constrained refill: "
+                '"pack_origin" uses the pack\'s own archetype profile; '
+                '"round_environment" aggregates across all packs in the round.',
+            ),
+            (
+                "fidelity",
+                "How closely a constrained refill card matches the "
+                "signal. 0 = random, 1 = perfect match.",
+            ),
+            (
+                "commit_bias",
+                "Bias toward high-commit (archetype-defining) cards "
+                "in constrained refill selection.",
+            ),
+        ],
+    )
+
+    _explain_section(
+        "cards",
+        "Card Pool",
+        [
+            (
+                "source",
+                'Where card designs come from: "synthetic" (procedurally '
+                'generated) or "file" (loaded from a data file).',
+            ),
+            ("file_path", 'Path to card data file when source="file".'),
+            (
+                "archetype_count",
+                "Number of distinct draft archetypes in the card " "pool.",
+            ),
+            (
+                "cards_per_archetype",
+                "Cards that are primary members of each "
+                "archetype (synthetic mode only).",
+            ),
+            (
+                "bridge_fraction",
+                "Fraction of the card pool that bridges two or "
+                "more archetypes (synthetic mode only).",
+            ),
+        ],
+    )
+
+    _explain_section(
+        "agents",
+        "Agent Behavior",
+        [
+            (
+                "policy",
+                'Card selection strategy for AI seats: "adaptive" '
+                '(balances power, preference, and signals), "greedy" (maximizes '
+                'deck value), "archetype_loyal" (follows best archetype), '
+                '"force" (locks onto one archetype), or "signal_ignorant" '
+                "(adaptive without signal reading).",
+            ),
+            ("show_n", "Number of cards revealed to the human seat per pick."),
+            (
+                "show_n_strategy",
+                'How the N shown cards are selected: "uniform" '
+                '(random), "power_biased" (favors strong cards), "curated" '
+                '(guarantees on-plan + off-plan strong), "signal_rich" (favors '
+                'archetype-defining cards), or "sharpened_preference" (heavily '
+                "weights preference alignment).",
+            ),
+            (
+                "ai_optimality",
+                "Probability of making the best pick. 0 = fully "
+                "random, 1 = always optimal. Controls AI difficulty.",
+            ),
+            (
+                "ai_signal_weight",
+                "Weight of supply-signal reading in the adaptive "
+                "scoring formula. 0 = ignores signals, higher = reads signals more.",
+            ),
+            ("ai_power_weight", "Weight of raw card power in adaptive scoring."),
+            (
+                "ai_pref_weight",
+                "Weight of archetype-preference alignment in " "adaptive scoring.",
+            ),
+            (
+                "openness_window",
+                "Number of recent packs used to estimate which "
+                "archetypes are open (underdrafted).",
+            ),
+            (
+                "learning_rate",
+                "How quickly the preference vector updates after "
+                "each pick. Higher = faster archetype commitment.",
+            ),
+            (
+                "force_archetype",
+                "Which archetype index to force when "
+                'policy="force". Required for that policy.',
+            ),
+        ],
+    )
+
+    _explain_section(
+        "scoring",
+        "Deck Value Scoring",
+        [
+            ("weight_power", "Weight of raw card power in the deck value " "formula."),
+            (
+                "weight_coherence",
+                "Weight of archetype coherence (how well cards "
+                "fit the chosen archetype) in deck value.",
+            ),
+            (
+                "weight_focus",
+                "Weight of focus bonus (reward for high on-plan "
+                "density) in deck value.",
+            ),
+            (
+                "secondary_weight",
+                "How much the second-best archetype contributes "
+                "to coherence scoring.",
+            ),
+            (
+                "focus_threshold",
+                "Minimum fraction of on-plan cards needed to "
+                "start earning focus bonus.",
+            ),
+            (
+                "focus_saturation",
+                "Fraction of on-plan cards at which focus bonus "
+                "reaches its maximum.",
+            ),
+        ],
+    )
+
+    _explain_section(
+        "commitment",
+        "Commitment Detection",
+        [
+            (
+                "commitment_threshold",
+                "Minimum concentration ratio "
+                "(max(w)/sum(w)) to trigger archetype commitment.",
+            ),
+            (
+                "stability_window",
+                "Number of consecutive picks that must favor "
+                "the same archetype to confirm commitment.",
+            ),
+            (
+                "entropy_threshold",
+                "Shannon entropy threshold (in bits) for the "
+                "secondary entropy-based commitment detector.",
+            ),
+        ],
+    )
+
+    _explain_section(
+        "metrics",
+        "Metrics Engine",
+        [
+            (
+                "richness_gap",
+                "Score tolerance for counting near-optimal cards. "
+                'Cards scoring within this gap of the best are "near-optimal".',
+            ),
+            (
+                "tau",
+                "Softmax temperature for choice entropy. Lower = sharper "
+                "probability distribution, more sensitive to score differences.",
+            ),
+            (
+                "on_plan_threshold",
+                "Minimum fitness for a card to count as "
+                '"on-plan" when measuring convergence.',
+            ),
+            (
+                "splash_power_threshold",
+                "Minimum power for an off-plan card to " "be considered splashable.",
+            ),
+            (
+                "splash_flex_threshold",
+                "Minimum flex score for an off-plan card "
+                "to be considered splashable.",
+            ),
+            (
+                "exposure_threshold",
+                "Minimum fitness for a card to count as "
+                '"exposing" an archetype in early openness measurement.',
+            ),
+        ],
+    )
+
+    _explain_section(
+        "sweep",
+        "Sweep Execution",
+        [
+            (
+                "runs_per_point",
+                "Number of draft simulations per parameter "
+                "combination in sweep mode.",
+            ),
+            ("base_seed", "Starting RNG seed for reproducible runs."),
+            (
+                "seeding_policy",
+                "How seeds are assigned across runs: "
+                '"sequential" means seed = base_seed + run_index.',
+            ),
+            (
+                "trace_enabled",
+                "Whether to collect per-pick trace data during " "sweep runs.",
+            ),
+            (
+                "axes",
+                "Dict of parameter paths to sweep over. Each key is a "
+                "dot-notation parameter, each value is a list of values. Sweep "
+                "runs the Cartesian product of all axes.",
+            ),
+        ],
+    )
+
+    print(f"\n{colors.section('=== Goal Metrics ===')}")
+    print()
+
+    _explain_metric(
+        "Convergence (mid)",
+        "Mean number of on-plan cards shown to the human per pick during the "
+        "mid phase (picks 6-19), measured only after the human commits to an "
+        "archetype. Answers: does the draft keep delivering relevant cards "
+        "mid-draft?",
+        ">= 2.0",
+    )
+    _explain_metric(
+        "Convergence (late)",
+        "Same as convergence (mid) but for the late phase (picks 20-29). "
+        "Ensures archetype supply holds up through the end of the draft.",
+        ">= 2.0",
+    )
+    _explain_metric(
+        "Choice richness",
+        "Mean count of near-optimal cards per pick across all picks (shown-N "
+        "surface). A near-optimal card scores within 'richness_gap' of the "
+        "best. Answers: does the drafter face meaningful decisions, or is "
+        "each pick obvious?",
+        ">= 1.5",
+    )
+    _explain_metric(
+        "Forceability",
+        "Ratio of forced-archetype deck value to adaptive deck value, taking "
+        "the worst (highest) archetype. A value near 1.0 means forcing one "
+        "archetype is as good as drafting adaptively. Requires multi-run "
+        "data (--runs N).",
+        "< 0.95",
+    )
+    _explain_metric(
+        "Splashability",
+        "Fraction of post-commitment picks that offer at least one viable "
+        "off-plan card (high power or flex, low on-plan fitness). Answers: "
+        "after committing, can the drafter still pick up generically strong "
+        "cards?",
+        ">= 0.40",
+    )
+    _explain_metric(
+        "Early openness",
+        "Number of distinct archetypes exposed in the first 5 picks via shown "
+        "cards with fitness above the exposure threshold. Answers: do early "
+        "packs let the drafter explore multiple paths before committing?",
+        ">= 5.0",
+    )
+    _explain_metric(
+        "Signal benefit",
+        "Percentage improvement in deck value from reading supply signals "
+        "(adaptive policy vs signal-ignorant policy, averaged across runs). "
+        "Answers: is paying attention to what's being passed rewarded? "
+        "Requires multi-run data (--runs N).",
+        ">= 2%",
+    )
+
+
+def _explain_section(
+    section_key: str,
+    section_title: str,
+    params: list[tuple[str, str]],
+) -> None:
+    """Print parameter explanations for one config section."""
+    defaults = SimulatorConfig()
+    section_obj = getattr(defaults, section_key)
+    print(f"\n{colors.section(f'--- {section_title} ({section_key}.*) ---')}")
+    for param_name, description in params:
+        default_val = getattr(section_obj, param_name)
+        print(
+            f"  {colors.label(f'{section_key}.{param_name}')} "
+            f"{colors.dim(f'(default: {default_val})')}\n"
+            f"    {description}"
+        )
+
+
+def _explain_metric(name: str, description: str, target: str) -> None:
+    """Print a goal metric explanation."""
+    print(
+        f"  {colors.label(name)}\n"
+        f"    {description}\n"
+        f"    {colors.dim(f'Target: {target}')}"
+    )
+    print()
 
 
 def _run_single(
