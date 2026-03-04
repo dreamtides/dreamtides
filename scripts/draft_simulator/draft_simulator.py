@@ -64,8 +64,8 @@ def build_parser() -> argparse.ArgumentParser:
         "--seed",
         "-s",
         type=int,
-        default=42,
-        help="Base RNG seed (default: 42)",
+        default=None,
+        help="Base RNG seed (default: random)",
     )
     parser.add_argument(
         "--config",
@@ -119,8 +119,8 @@ def main() -> None:
         overrides=args.param,
     )
 
-    # CLI --seed overrides config base_seed; write back so metadata is accurate
-    seed: int = args.seed
+    # Resolve seed: use CLI flag if provided, otherwise random
+    seed: int = args.seed if args.seed is not None else random.randint(0, 2**32 - 1)
     cfg.sweep.base_seed = seed
 
     # Apply difficulty preset (overrides config values)
