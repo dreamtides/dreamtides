@@ -20,6 +20,7 @@ import config
 import cube_manager
 import deck_scorer
 import draft_runner
+import metrics
 import pack_generator
 import refill
 import show_n
@@ -126,7 +127,7 @@ def _run_single(
     seed: int,
     trace_enabled: bool = False,
 ) -> None:
-    """Run a single draft and print per-seat results."""
+    """Run a single draft and print per-seat results with metrics."""
     print(
         f"Draft Simulator v{VERSION} | seed={seed} "
         f"| seats={cfg.draft.seat_count} "
@@ -134,7 +135,8 @@ def _run_single(
         f"| pack_size={cfg.draft.pack_size}"
     )
 
-    result = draft_runner.run_draft(cfg, seed, trace_enabled=trace_enabled)
+    # Always enable tracing so per-pick data is available for metrics
+    result = draft_runner.run_draft(cfg, seed, trace_enabled=True)
 
     print()
     for seat_idx, sr in enumerate(result.seat_results):
@@ -158,6 +160,11 @@ def _run_single(
             f"{label:<35s} deck_value={sr.deck_value:.3f}, "
             f"archetype={archetype}, committed={commit_str}"
         )
+
+    # Compute and print metrics
+    draft_metrics = metrics.compute_metrics(result, cfg)
+    print()
+    print(metrics.format_metrics(draft_metrics))
 
     if trace_enabled and result.traces:
         print(f"\nTraces ({len(result.traces)} picks):")

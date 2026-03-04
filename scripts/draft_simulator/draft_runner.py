@@ -9,7 +9,7 @@ per-pick trace records. Stdlib-only, no external dependencies.
 
 import random
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 import agents
@@ -60,6 +60,7 @@ class DraftResult:
     seat_results: list[SeatResult]
     traces: list[PickTrace]
     seed: int
+    card_pool: dict[int, CardInstance] = field(default_factory=dict)
 
 
 def run_draft(
@@ -88,6 +89,10 @@ def run_draft(
         consumption_mode=consumption_mode,
     )
     cube_manager.validate_supply(cfg, cube.total_size)
+
+    card_pool: dict[int, CardInstance] = {
+        inst.instance_id: inst for inst in cube.supply
+    }
 
     seat_count = cfg.draft.seat_count
     archetype_count = cfg.cards.archetype_count
@@ -193,6 +198,7 @@ def run_draft(
         seat_results=seat_results,
         traces=all_traces,
         seed=seed,
+        card_pool=card_pool,
     )
 
 
