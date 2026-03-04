@@ -19,7 +19,7 @@ class DraftConfig:
     seat_count: int = 6
     round_count: int = 3
     picks_per_round: list[int] = field(default_factory=lambda: [10, 10, 10])
-    pack_size: int = 15
+    pack_size: int = 20
     alternate_direction: bool = False
     human_seats: int = 1
 
@@ -28,7 +28,7 @@ class DraftConfig:
 class CubeConfig:
     """Cube construction parameters."""
 
-    distinct_cards: int = 360
+    distinct_cards: int = 540
     copies_per_card: int = 1
     consumption_mode: str = "without_replacement"
 
@@ -48,7 +48,7 @@ class PackGenerationConfig:
 class RefillConfig:
     """Pack refill strategy parameters."""
 
-    strategy: str = "no_refill"
+    strategy: str = "uniform_refill"
     fingerprint_source: str = "pack_origin"
     fidelity: float = 0.7
     commit_bias: float = 0.3
@@ -61,7 +61,7 @@ class CardsConfig:
     source: str = "synthetic"
     file_path: Optional[str] = None
     archetype_count: int = 8
-    cards_per_archetype: int = 55
+    cards_per_archetype: int = 82
     bridge_fraction: float = 0.15
 
 
