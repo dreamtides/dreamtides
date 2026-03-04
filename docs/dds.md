@@ -13,7 +13,7 @@ openness, splashability, and difficulty-dependent signal-reading impact.
 ### 1.2 Technology
 
 The simulator is implemented in Python, type-checked with Pyre. No test suite is
-included.
+included. Code under scripts/draft_simulator/. High quality, modular.
 
 ### 1.3 Non-Goals
 
@@ -42,7 +42,14 @@ ______________________________________________________________________
 | `human_seats` | Number of human-modeled seats | 1       |
 
 Seats are arranged in a fixed circular order. Packs pass to the left (seat index
-\+ 1, wrapping around). The human seat is always seat index 0.
+\+ 1, wrapping around) by default. The human seat is always seat index 0.
+
+| Parameter             | Description                        | Default |
+| --------------------- | ---------------------------------- | ------- |
+| `alternate_direction` | Alternate pass direction per round | false   |
+
+When `alternate_direction` is true, odd-numbered rounds (1, 3, ...) pass to the
+right (seat index - 1, wrapping). When false, all rounds pass left.
 
 ### 2.2 Total Picks
 
@@ -107,13 +114,16 @@ The cube is the master card pool from which all packs and refills draw. It is
 constructed from a set of distinct card designs, each with a configurable copy
 count that encodes rarity through multiplicity.
 
-| Parameter         | Description                              | Default |
-| ----------------- | ---------------------------------------- | ------- |
-| `distinct_cards`  | Number of unique card designs            | 360     |
-| `copies_per_card` | Per-card copy count (map or uniform int) | 1       |
+| Parameter         | Description                                       | Default |
+| ----------------- | ------------------------------------------------- | ------- |
+| `distinct_cards`  | Number of unique card designs                     | 360     |
+| `copies_per_card` | Per-card copy count (uniform int or per-card map) | 1       |
 
-The physical cube size is `sum(copies_per_card[c] for all cards c)`. A flat cube
-(1 copy each) has size equal to `distinct_cards`.
+When specified as an integer, every card design receives that many copies. When
+specified as a map (`{card_id: count}`), each card receives its own copy count;
+cards not present in the map default to 1. The physical cube size is
+`sum(copies_per_card[c] for all cards c)`. A flat cube (1 copy each) has size
+equal to `distinct_cards`.
 
 ### 3.2 Cube Consumption Modes
 
@@ -165,10 +175,22 @@ archetype profile.
 | `bridge_density`         | Fraction of pack for multi-archetype cards | 0.15    |
 | `variance`               | Randomness in archetype selection (0-1)    | 0.3     |
 
-Expected properties: each generated pack should have a coherent archetype
-"fingerprint" such that a signal-reading agent can infer which archetypes are
-well-represented. The remaining pack fraction (after primary and bridge) is
-filled by uniform sampling.
+Algorithm outline (implementation may refine details):
+
+1. Select `archetype_target_count` archetypes for this pack. Selection is
+   weighted by cube availability; `variance` controls how much randomness is
+   added (0 = deterministic top-N by supply, 1 = fully random).
+2. Designate the first 1-2 selected archetypes as primary. Fill
+   `floor(pack_size * primary_density)` slots with cards whose highest fitness
+   aligns with a primary archetype, preferring higher fitness values.
+3. Fill `floor(pack_size * bridge_density)` slots with bridge cards (fitness
+   above 0.5 in at least two of the selected archetypes).
+4. Fill remaining slots by uniform sampling from the cube.
+
+The implementation agent may choose the exact weighting and tie-breaking
+mechanics. The key invariant is that each generated pack has a coherent
+archetype "fingerprint" such that a signal-reading agent can infer which
+archetypes are well-represented.
 
 New pack generation strategies are added by implementing the pack generator
 interface (section 10) without modifying the core simulator.
@@ -205,14 +227,22 @@ random refills.
 - `round_environment`: condition on the round's global archetype distribution
   across all generated packs.
 
-The sampling distribution over candidate cards is the cube distribution
-reweighted by the similarity between each candidate card's archetype fitness
-vector and the conditioning signal. The `fidelity` parameter controls the
-strength of reweighting: 0.0 produces uniform sampling (equivalent to the
-uniform refill strategy); 1.0 produces strict matching where only highly similar
-cards have meaningful sampling probability. `commit_bias` tilts the refill
-toward high-commit (narrow signpost) cards when high, or toward low-commit
-(flexible) cards when low.
+The sampling weight for each candidate card `c` is computed as:
+
+```
+similarity = dot(c.fitness, signal) / (norm(c.fitness) * norm(signal) + eps)
+weight = (1 - fidelity) + fidelity * similarity
+weight *= (1 - commit_bias) + commit_bias * c.commit
+```
+
+where `signal` is the conditioning vector (pack origin profile or round
+environment profile depending on `fingerprint_source`). At `fidelity=0.0` all
+candidates are equally weighted (uniform refill); at `fidelity=1.0` weight is
+dominated by cosine similarity to the conditioning signal. `commit_bias` tilts
+the refill toward high-commit cards when high, or toward low-commit cards when
+low. The implementation agent may substitute an alternative similarity function
+if cosine similarity proves inadequate, provided the `fidelity` 0-to-1
+interpolation semantics are preserved.
 
 ______________________________________________________________________
 
@@ -359,29 +389,55 @@ Each agent (AI or human model) maintains:
 - `pick_history`: ordered list of (pick_index, round_index, card_id, pack_id)
   tuples.
 
-### 5.5 AI Policies
+### 5.5 Pick Policies
 
-AI agents select one card from the full pack according to their policy. Multiple
-policies are supported and configurable per seat.
+All seats (AI and human-modeled) select one card per pick according to their
+assigned policy. AI seats choose from the full pack; human-modeled seats choose
+from the shown-N subset only. Any policy may be assigned to any seat type; the
+only difference is the candidate card set provided to the policy.
 
-**Policy: Greedy** Pick the card that maximizes the immediate improvement to
-`deck_value` of the current pool (recomputing deck_value for each candidate card
-added to the pool, selecting the maximum).
+**Policy: Greedy** Pick the card that maximizes immediate improvement to
+`deck_value`. For each candidate card, compute `deck_value` of
+`(current_pool + [candidate])` using the agent's current `w` as the preference
+vector (not the final `w`, which is unknown mid-draft). Select the candidate
+with the highest `deck_value`. This is O(N) `deck_value` evaluations per pick
+where N is the candidate set size.
 
 **Policy: Archetype-loyal** Pick the card with the highest fitness for the
 agent's current top archetype (`argmax(w)`), breaking ties by `power`. The agent
 commits early and stays loyal.
 
-**Policy: Adaptive** Pick using a weighted scoring function that combines raw
-power, archetype alignment with the agent's preference vector, and an openness
-estimate. The openness estimate is a per-archetype running signal updated based
-on the frequency and quality of archetype-aligned cards seen in recent packs (a
-configurable moving window). When many good cards for an archetype appear, the
-openness estimate for that archetype increases; when few appear, it decreases
-(suggesting contention from other seats).
+**Policy: Force** A variant of archetype-loyal used for forceability measurement
+(section 8.4). The agent is assigned a target archetype at initialization and
+always picks to maximize fitness for that archetype, breaking ties by `power`.
+Unlike archetype-loyal, the target never changes regardless of `w` updates.
 
-Configurable per-agent weights control the relative importance of power,
-archetype alignment, and openness signal.
+**Policy: Adaptive** Pick using a weighted scoring function:
+
+```
+score(card) = α * card.power
+            + β * dot(card.fitness, normalize(w))
+            + γ * dot(card.fitness, openness)
+```
+
+where `α`, `β`, `γ` are configurable per-agent weights (defaults: `α=0.3`,
+`β=0.5`, `γ=0.2`). The `γ` weight corresponds to `ai_signal_weight` from section
+5.6.
+
+**Openness estimate**: a per-archetype running signal maintained by each agent.
+For each archetype `a`, after each pick the agent updates:
+
+```
+openness[a] = mean(supply_signal[a] over last W packs seen)
+```
+
+where `supply_signal[a]` for a pack is the mean fitness-for-archetype-`a` of all
+cards in the pack (or shown cards, for human seats), and `W` is the
+`openness_window` parameter (default: 3). All `openness[a]` values are
+initialized to `1.0 / archetype_count`. The implementation agent may refine the
+exact update formula (e.g., exponential moving average instead of simple window
+mean) provided the directional semantics are preserved: more high-fitness cards
+seen for an archetype increases its openness estimate.
 
 **Policy: Signal-ignorant** Identical to adaptive but the openness estimate is
 held constant at its initial value (uniform). This policy ignores all signal
@@ -393,11 +449,12 @@ metrics.
 Difficulty is controlled by continuous parameters, not a single enum. The
 following knobs are independently configurable:
 
-| Parameter          | Range  | Effect                                                                |
-| ------------------ | ------ | --------------------------------------------------------------------- |
-| `ai_optimality`    | [0, 1] | 0=random picks; 1=optimal. Controls noise injected into card scoring. |
-| `ai_signal_weight` | [0, 1] | Weight of openness estimate in adaptive policy. 0=signal-ignorant.    |
-| `seat_count`       | int    | More seats = more contention.                                         |
+| Parameter          | Range  | Effect                                                                           |
+| ------------------ | ------ | -------------------------------------------------------------------------------- |
+| `ai_optimality`    | [0, 1] | 0=random picks; 1=optimal. Controls noise injected into card scoring.            |
+| `ai_signal_weight` | [0, 1] | Weight of openness estimate in adaptive policy (maps to `γ`). 0=signal-ignorant. |
+| `openness_window`  | int    | Number of recent packs used for openness estimate. Default: 3.                   |
+| `seat_count`       | int    | More seats = more contention.                                                    |
 
 **Easy preset**: `ai_optimality=0.4`, `ai_signal_weight=0.0`, `seat_count=5`.
 AIs pick semi-randomly and ignore signals, leaving ample good cards for the
@@ -719,7 +776,7 @@ simulator validates against the schema before execution. A default config ships
 with the simulator containing all defaults from this document; experiments
 override specific values.
 
-### 9.4 Output Schema
+### 9.3 Output Schema
 
 Each experiment produces the following outputs:
 
@@ -752,7 +809,7 @@ Each experiment produces the following outputs:
 - JSON: for per-pick traces (human-readable, nested structure).
 - CSV: optional export target for run-level and aggregate data.
 
-### 9.5 Reproducibility Guarantees
+### 9.4 Reproducibility Guarantees
 
 1. The combination of configuration and base_seed fully determines all
    simulation outputs.
@@ -798,7 +855,7 @@ DraftResult (per-seat pools, traces, metrics).
 **Agent** (policy interface): Selects one card per pick. Input: observation
 (full pack or shown cards + metadata), agent state. Internal state: `w`,
 `drafted`, `pick_history`, `openness_estimates`. Implementations: Greedy,
-ArchetypeLoyal, Adaptive, SignalIgnorant.
+ArchetypeLoyal, Force, Adaptive, SignalIgnorant.
 
 **ShowNStrategy** (strategy interface): Selects N cards from pack for the human
 seat. Input: pack contents, human state, show_n, RNG. Implementations: Uniform,
