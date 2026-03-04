@@ -252,6 +252,8 @@ def _run_single_once(
 
     draft_metrics = metrics.compute_metrics(result, cfg)
     print()
+    print(metrics.format_goal_metrics(draft_metrics))
+    print()
     print(metrics.format_metrics(draft_metrics))
 
 
@@ -342,6 +344,8 @@ def _run_single_multi(
         )
 
     averaged = metrics.average_metrics(all_metrics)
+    print()
+    print(metrics.format_goal_metrics(averaged))
     print()
     print(metrics.format_metrics(averaged))
 

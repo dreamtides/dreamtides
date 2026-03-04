@@ -68,6 +68,11 @@ def fail(text: object) -> str:
     return c(text, "error", bold=True)
 
 
+def warn(text: object) -> str:
+    """Warning orange — WARN status."""
+    return c(text, "warning", bold=True)
+
+
 def filepath(text: object) -> str:
     """String green — file paths."""
     return c(text, "string")

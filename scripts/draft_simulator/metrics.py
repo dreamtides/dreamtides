@@ -674,6 +674,101 @@ def compute_metrics(
 # ---------------------------------------------------------------------------
 
 
+def format_goal_metrics(m: DraftMetrics) -> str:
+    """Format the six goal metrics with red/yellow/green status indicators."""
+    lines: list[str] = []
+    lines.append(colors.section("Goal Metrics:"))
+
+    def _status(
+        value: float | None,
+        green_thresh: float,
+        yellow_thresh: float,
+        direction: str = "gte",
+    ) -> str:
+        """Return a colored status badge.
+
+        direction='gte': green if value >= green_thresh, yellow if >= yellow_thresh
+        direction='lt': green if value < green_thresh, yellow if < yellow_thresh
+        """
+        if value is None:
+            return colors.dim("[N/A]")
+        if direction == "gte":
+            if value >= green_thresh:
+                return colors.ok("[PASS]")
+            if value >= yellow_thresh:
+                return colors.warn("[WARN]")
+            return colors.fail("[FAIL]")
+        else:
+            if value < green_thresh:
+                return colors.ok("[PASS]")
+            if value < yellow_thresh:
+                return colors.warn("[WARN]")
+            return colors.fail("[FAIL]")
+
+    # 1. Convergence mid mean >= 2.0 (yellow at 1.5)
+    conv_mid = m.convergence_shown.on_plan_density_mid_mean
+    lines.append(
+        f"  {_status(conv_mid, 2.0, 1.5)}  "
+        f"{colors.label('Convergence (mid):')}"
+        f"  {colors.num(f'{conv_mid:.1f}')} "
+        f"{colors.dim('(target: >= 2.0)')}"
+    )
+
+    # 2. Convergence late mean >= 2.0 (yellow at 1.5)
+    conv_late = m.convergence_shown.on_plan_density_late_mean
+    lines.append(
+        f"  {_status(conv_late, 2.0, 1.5)}  "
+        f"{colors.label('Convergence (late):')}"
+        f" {colors.num(f'{conv_late:.1f}')} "
+        f"{colors.dim('(target: >= 2.0)')}"
+    )
+
+    # 3. Choice richness near-optimal overall >= 1.5 (yellow at 1.2)
+    near_opt = m.choice_richness_shown.near_optimal.overall
+    lines.append(
+        f"  {_status(near_opt, 1.5, 1.2)}  "
+        f"{colors.label('Choice richness:')}"
+        f"  {colors.num(f'{near_opt:.1f}')} "
+        f"{colors.dim('near-optimal (target: >= 1.5)')}"
+    )
+
+    # 4. Forceability max < 0.95 (yellow at < 1.0)
+    force_val = m.forceability
+    if force_val is not None:
+        lines.append(
+            f"  {_status(force_val, 0.95, 1.0, direction='lt')}  "
+            f"{colors.label('Forceability:')}"
+            f"     {colors.num(f'{force_val:.2f}')} "
+            f"{colors.dim('(target: < 0.95)')}"
+        )
+    else:
+        lines.append(
+            f"  {colors.dim('[N/A]')}  "
+            f"{colors.label('Forceability:')}"
+            f"     {colors.dim('requires sweep')}"
+        )
+
+    # 5. Splashability >= 0.40 (yellow at 0.30)
+    splash = m.splashability_shown.splash_fraction
+    lines.append(
+        f"  {_status(splash, 0.40, 0.30)}  "
+        f"{colors.label('Splashability:')}"
+        f"    {colors.num(f'{splash:.2f}')} "
+        f"{colors.dim('(target: >= 0.40)')}"
+    )
+
+    # 6. Early openness archetypes >= 5.0 (yellow at 4.0)
+    openness = m.early_openness_shown.archetypes_exposed
+    lines.append(
+        f"  {_status(openness, 5.0, 4.0)}  "
+        f"{colors.label('Early openness:')}"
+        f"   {colors.num(f'{openness:.1f}')} "
+        f"{colors.dim('archetypes (target: >= 5.0)')}"
+    )
+
+    return "\n".join(lines)
+
+
 def format_metrics(m: DraftMetrics) -> str:
     """Format metrics as a human-readable text summary."""
     lines: list[str] = []
