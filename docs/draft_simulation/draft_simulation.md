@@ -142,7 +142,7 @@ import from `config`, `draft_models`, and `utils` freely. No circular imports.
 | `cube`            | `distinct_cards`, `copies_per_card`, `consumption_mode`                                                      |
 | `pack_generation` | `strategy`, `archetype_target_count`, `primary_density`                                                      |
 | `refill`          | `strategy`, `fingerprint_source`, `fidelity`, `commit_bias`                                                  |
-| `cards`           | `source`, `archetype_count`, `cards_per_archetype`, `bridge_fraction`                                        |
+| `cards`           | `source`, `archetype_count`, `bridge_fraction`                                                               |
 | `agents`          | `policy`, `show_n`, `show_n_strategy`, `ai_optimality`, `ai_power_weight`, `ai_pref_weight`, `learning_rate` |
 | `scoring`         | `weight_power`, `weight_coherence`, `weight_focus`                                                           |
 | `commitment`      | `commitment_threshold`, `stability_window`, `entropy_threshold`                                              |

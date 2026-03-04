@@ -61,7 +61,6 @@ class CardsConfig:
     source: str = "synthetic"
     file_path: Optional[str] = None
     archetype_count: int = 8
-    cards_per_archetype: int = 82
     bridge_fraction: float = 0.15
 
 

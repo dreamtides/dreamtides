@@ -327,11 +327,6 @@ def _run_explain() -> None:
                 "Number of distinct draft archetypes in the card " "pool.",
             ),
             (
-                "cards_per_archetype",
-                "Cards that are primary members of each "
-                "archetype (synthetic mode only).",
-            ),
-            (
                 "bridge_fraction",
                 "Fraction of the card pool that bridges two or "
                 "more archetypes (synthetic mode only).",
