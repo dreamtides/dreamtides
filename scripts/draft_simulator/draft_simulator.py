@@ -17,8 +17,9 @@ import config
 import cube_manager
 import deck_scorer
 import pack_generator
+import refill
 from config import SimulatorConfig
-from draft_models import CardDesign, CubeConsumptionMode, Pack
+from draft_models import CardDesign, CardInstance, CubeConsumptionMode, Pack
 from utils import argmax
 
 VERSION = "0.1.0"
@@ -136,6 +137,9 @@ def main() -> None:
 
     # Demonstrate commitment detection
     _demo_commitment_detection(cards, cfg, rng)
+
+    # Demonstrate refill strategies
+    _demo_refill_strategies(cards, cfg, consumption_mode, rng)
 
 
 def _print_pack(pack: Pack, label: str, archetype_count: int) -> None:
@@ -271,6 +275,68 @@ def _demo_commitment_detection(
     uniform_result = commitment.detect_commitment(uniform_history, cfg.commitment)
     print(f"    Commitment pick: {uniform_result.commitment_pick}")
     print(f"    Entropy commitment pick: {uniform_result.entropy_commitment_pick}")
+
+
+def _demo_refill_strategies(
+    cards: list[CardDesign],
+    cfg: SimulatorConfig,
+    consumption_mode: CubeConsumptionMode,
+    rng: random.Random,
+) -> None:
+    """Demonstrate each refill strategy on a sample pack."""
+    print("\n=== Refill Strategy Demonstrations ===")
+
+    # Generate a base pack from a fresh cube
+    demo_cube = cube_manager.CubeManager(
+        designs=cards,
+        copies_per_card=cfg.cube.copies_per_card,
+        consumption_mode=consumption_mode,
+    )
+    base_pack = pack_generator.generate_pack("uniform", demo_cube, cfg, rng)
+
+    # --- NoRefill ---
+    print("\n--- NoRefill ---")
+    pack_before = len(base_pack.cards)
+    result = refill.no_refill()
+    print(f"  Pack size before: {pack_before}")
+    print(f"  Refill card: None (no card added)")
+    print(f"  Pack size after:  {pack_before}")
+
+    # --- UniformRefill ---
+    print("\n--- UniformRefill ---")
+    uniform_cube = cube_manager.CubeManager(
+        designs=cards,
+        copies_per_card=cfg.cube.copies_per_card,
+        consumption_mode=consumption_mode,
+    )
+    uniform_card = refill.uniform_refill(uniform_cube, rng)
+    print(f"  Pack size before: {pack_before}")
+    print(f"  Refill card: {uniform_card.design.name}")
+    print(f"  Pack size after:  {pack_before + 1}")
+
+    # --- ConstrainedRefill ---
+    print("\n--- ConstrainedRefill ---")
+    constrained_cube = cube_manager.CubeManager(
+        designs=cards,
+        copies_per_card=cfg.cube.copies_per_card,
+        consumption_mode=consumption_mode,
+    )
+    signal = base_pack.archetype_profile
+    signal_str = ", ".join(f"{v:.4f}" for v in signal)
+    print(f"  Signal vector: [{signal_str}]")
+
+    constrained_card = refill.constrained_refill(
+        cube=constrained_cube,
+        signal=signal,
+        fidelity=cfg.refill.fidelity,
+        commit_bias=cfg.refill.commit_bias,
+        rng=rng,
+    )
+    similarity = refill.cosine_similarity(constrained_card.design.fitness, signal)
+    print(f"  Pack size before: {pack_before}")
+    print(f"  Refill card: {constrained_card.design.name}")
+    print(f"  Cosine similarity to signal: {similarity:.4f}")
+    print(f"  Pack size after:  {pack_before + 1}")
 
 
 def _run_with_error_handling() -> None:
