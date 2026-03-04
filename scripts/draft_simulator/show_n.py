@@ -47,7 +47,12 @@ def select_cards(
         return _select_plan_plus_power(pack_cards, n, rng, human_w)
     elif strategy == "deck_value_greedy":
         return _select_deck_value_greedy(
-            pack_cards, n, rng, human_w, human_drafted, scoring_cfg,
+            pack_cards,
+            n,
+            rng,
+            human_w,
+            human_drafted,
+            scoring_cfg,
         )
     else:
         raise ValueError(f"Unknown Show-N strategy: {strategy!r}")
@@ -178,7 +183,7 @@ def _select_sharpened_preference(
     if human_w is None or not human_w:
         return _select_power_biased(cards, n, rng)
 
-    w_sharp = [v ** 4.0 for v in human_w]
+    w_sharp = [v**4.0 for v in human_w]
     w_norm = _ts_normalize(w_sharp)
     scored: list[tuple[float, int, CardInstance]] = []
     for idx, card in enumerate(cards):
@@ -225,7 +230,9 @@ def _select_plan_plus_power(
     off_plan = [c for c in cards if c.design.fitness[best_arch] < on_plan_threshold]
 
     # Sort on-plan by fitness desc, then power desc for tie-breaking
-    on_plan.sort(key=lambda c: (c.design.fitness[best_arch], c.design.power), reverse=True)
+    on_plan.sort(
+        key=lambda c: (c.design.fitness[best_arch], c.design.power), reverse=True
+    )
 
     # Take up to max_on_plan_slots best on-plan cards
     selected = on_plan[: min(max_on_plan_slots, len(on_plan))]
@@ -269,7 +276,6 @@ def _select_deck_value_greedy(
 
     scored.sort(key=lambda t: t[0], reverse=True)
     return [t[2] for t in scored[:n]]
-
 
 
 def _ts_normalize(w: list[float]) -> list[float]:

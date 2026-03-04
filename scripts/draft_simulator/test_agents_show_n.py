@@ -774,7 +774,9 @@ class TestShowN(unittest.TestCase):
         trials = 100
         for seed in range(trials):
             rng = random.Random(seed)
-            result = show_n.select_cards(pack, 4, "sharpened_preference", rng, human_w=w)
+            result = show_n.select_cards(
+                pack, 4, "sharpened_preference", rng, human_w=w
+            )
             result_ids = {c.instance_id for c in result}
             if card_a.instance_id in result_ids:
                 a_count += 1
@@ -797,8 +799,13 @@ class TestShowN(unittest.TestCase):
         scoring = ScoringConfig()
         drafted: list[CardInstance] = []
         result = show_n.select_cards(
-            pack, 4, "deck_value_greedy", rng,
-            human_w=w, human_drafted=drafted, scoring_cfg=scoring,
+            pack,
+            4,
+            "deck_value_greedy",
+            rng,
+            human_w=w,
+            human_drafted=drafted,
+            scoring_cfg=scoring,
         )
         self.assertEqual(len(result), 4)
 
@@ -810,8 +817,13 @@ class TestShowN(unittest.TestCase):
         scoring = ScoringConfig()
         drafted: list[CardInstance] = []
         result = show_n.select_cards(
-            pack, 4, "deck_value_greedy", rng,
-            human_w=w, human_drafted=drafted, scoring_cfg=scoring,
+            pack,
+            4,
+            "deck_value_greedy",
+            rng,
+            human_w=w,
+            human_drafted=drafted,
+            scoring_cfg=scoring,
         )
         ids = [c.instance_id for c in result]
         self.assertEqual(len(ids), len(set(ids)))
@@ -819,7 +831,9 @@ class TestShowN(unittest.TestCase):
     def test_deck_value_greedy_prefers_on_plan(self) -> None:
         """deck_value_greedy should prefer cards matching the human's plan."""
         on_plan = _make_instance(
-            0, [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5,
+            0,
+            [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+            power=0.5,
         )
         off_plan_cards = [
             _make_instance(
@@ -836,8 +850,13 @@ class TestShowN(unittest.TestCase):
         drafted: list[CardInstance] = []
         rng = random.Random(42)
         result = show_n.select_cards(
-            pack, 4, "deck_value_greedy", rng,
-            human_w=w, human_drafted=drafted, scoring_cfg=scoring,
+            pack,
+            4,
+            "deck_value_greedy",
+            rng,
+            human_w=w,
+            human_drafted=drafted,
+            scoring_cfg=scoring,
         )
         result_ids = {c.instance_id for c in result}
         self.assertIn(on_plan.instance_id, result_ids)
@@ -848,8 +867,13 @@ class TestShowN(unittest.TestCase):
         rng = random.Random(42)
         scoring = ScoringConfig()
         result = show_n.select_cards(
-            pack, 4, "deck_value_greedy", rng,
-            human_w=None, human_drafted=[], scoring_cfg=scoring,
+            pack,
+            4,
+            "deck_value_greedy",
+            rng,
+            human_w=None,
+            human_drafted=[],
+            scoring_cfg=scoring,
         )
         self.assertEqual(len(result), 4)
 
@@ -860,8 +884,13 @@ class TestShowN(unittest.TestCase):
         w = [3.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
         scoring = ScoringConfig()
         result = show_n.select_cards(
-            pack, 4, "deck_value_greedy", rng,
-            human_w=w, human_drafted=None, scoring_cfg=scoring,
+            pack,
+            4,
+            "deck_value_greedy",
+            rng,
+            human_w=w,
+            human_drafted=None,
+            scoring_cfg=scoring,
         )
         self.assertEqual(len(result), 4)
 
@@ -871,8 +900,13 @@ class TestShowN(unittest.TestCase):
         rng = random.Random(42)
         w = [3.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
         result = show_n.select_cards(
-            pack, 4, "deck_value_greedy", rng,
-            human_w=w, human_drafted=[], scoring_cfg=None,
+            pack,
+            4,
+            "deck_value_greedy",
+            rng,
+            human_w=w,
+            human_drafted=[],
+            scoring_cfg=None,
         )
         self.assertEqual(len(result), 4)
 
@@ -890,10 +924,14 @@ class TestShowN(unittest.TestCase):
         ]
         # Two candidate cards: one on-plan, one off-plan
         on_plan = _make_instance(
-            0, [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5,
+            0,
+            [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+            power=0.5,
         )
         off_plan = _make_instance(
-            1, [0.1, 0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5,
+            1,
+            [0.1, 0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+            power=0.5,
             card_id="off",
         )
         # Fillers
@@ -911,8 +949,13 @@ class TestShowN(unittest.TestCase):
         scoring = ScoringConfig()
         rng = random.Random(42)
         result = show_n.select_cards(
-            pack, 4, "deck_value_greedy", rng,
-            human_w=w, human_drafted=existing, scoring_cfg=scoring,
+            pack,
+            4,
+            "deck_value_greedy",
+            rng,
+            human_w=w,
+            human_drafted=existing,
+            scoring_cfg=scoring,
         )
         result_ids = {c.instance_id for c in result}
         # The on-plan card should rank higher with the existing pool

@@ -71,7 +71,7 @@ class AgentsConfig:
 
     policy: str = "adaptive"
     show_n: int = 4
-    show_n_strategy: str = "top_scored"
+    show_n_strategy: str = "sharpened_preference"
     ai_optimality: float = 0.8
     ai_signal_weight: float = 0.2
     ai_power_weight: float = 0.2
