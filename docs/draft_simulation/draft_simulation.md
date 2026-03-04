@@ -277,9 +277,10 @@ Requires cross-run data; only available in `sweep` mode.
 comparing adaptive vs signal-ignorant policy deck values across runs. Target:
 below 2% at easy difficulty, 5-15% at hard difficulty. Requires sweep.
 
-**Convergence**: on-plan card density in late picks after commitment. Measures
-whether the pack continues delivering archetype-appropriate cards once a drafter
-commits. Target: mean on-plan count >= 2.0 in shown-N during late phase.
+**Convergence**: on-plan card density in mid and late picks after commitment.
+Measures whether the pack continues delivering archetype-appropriate cards once
+a drafter commits. Target: mean on-plan count >= 2.0 in shown-N during late
+phase.
 
 **Splashability**: fraction of post-commitment picks containing a viable
 off-plan card (high power or flex score, low on-plan fitness). Target: at least
@@ -350,6 +351,12 @@ simulator module will cause a type error. The draft simulator uses the prefix
 `draft_` on its model file (`draft_models.py`) to avoid collision with
 `quest_simulator/models.py`. Any new module added to `draft_simulator/` should
 use a unique name or the `draft_` prefix if the name is generic.
+
+## Further Reading
+
+- [metrics.md](metrics.md) — detailed reference for all six metric families,
+  including calculation steps, formulas, configurable parameters, validation
+  targets, CSV column mappings, and diagnostic guidance.
 
 ## Glossary
 

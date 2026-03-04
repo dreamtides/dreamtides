@@ -142,6 +142,8 @@ class ChoiceRichnessMetrics:
 class ConvergenceMetrics:
     """Convergence metric family results."""
 
+    on_plan_density_mid_mean: float
+    on_plan_prob_gte_3_mid: float
     on_plan_density_late_mean: float
     on_plan_prob_gte_3_late: float
 
@@ -409,23 +411,25 @@ def _compute_convergence(
     on_plan_threshold = cfg.metrics.on_plan_threshold
     human_seat = 0
 
+    empty = ConvergenceMetrics(
+        on_plan_density_mid_mean=0.0,
+        on_plan_prob_gte_3_mid=0.0,
+        on_plan_density_late_mean=0.0,
+        on_plan_prob_gte_3_late=0.0,
+    )
+
     if not result.seat_results:
-        return ConvergenceMetrics(
-            on_plan_density_late_mean=0.0,
-            on_plan_prob_gte_3_late=0.0,
-        )
+        return empty
 
     sr = result.seat_results[human_seat]
 
     if sr.commitment_pick is None or sr.committed_archetype is None:
-        return ConvergenceMetrics(
-            on_plan_density_late_mean=0.0,
-            on_plan_prob_gte_3_late=0.0,
-        )
+        return empty
 
     commitment_pick = sr.commitment_pick
     committed_arch = sr.committed_archetype
 
+    mid_on_plan_counts: list[float] = []
     late_on_plan_counts: list[float] = []
 
     for trace in result.traces:
@@ -445,23 +449,25 @@ def _compute_convergence(
             1 for c in cards if c.design.fitness[committed_arch] >= on_plan_threshold
         )
 
-        if pick_phase(trace.pick_index) == "late":
+        phase = pick_phase(trace.pick_index)
+        if phase == "mid":
+            mid_on_plan_counts.append(float(on_plan_count))
+        elif phase == "late":
             late_on_plan_counts.append(float(on_plan_count))
 
-    if not late_on_plan_counts:
-        return ConvergenceMetrics(
-            on_plan_density_late_mean=0.0,
-            on_plan_prob_gte_3_late=0.0,
-        )
+    if not mid_on_plan_counts and not late_on_plan_counts:
+        return empty
 
-    mean_density = _mean(late_on_plan_counts)
-    prob_gte_3 = sum(1 for c in late_on_plan_counts if c >= 3.0) / len(
-        late_on_plan_counts
-    )
+    def _prob_gte_3(counts: list[float]) -> float:
+        if not counts:
+            return 0.0
+        return sum(1 for c in counts if c >= 3.0) / len(counts)
 
     return ConvergenceMetrics(
-        on_plan_density_late_mean=mean_density,
-        on_plan_prob_gte_3_late=prob_gte_3,
+        on_plan_density_mid_mean=_mean(mid_on_plan_counts),
+        on_plan_prob_gte_3_mid=_prob_gte_3(mid_on_plan_counts),
+        on_plan_density_late_mean=_mean(late_on_plan_counts),
+        on_plan_prob_gte_3_late=_prob_gte_3(late_on_plan_counts),
     )
 
 
@@ -726,6 +732,11 @@ def format_metrics(m: DraftMetrics) -> str:
     lines.append("")
     lines.append("Convergence (shown-N, post-commitment):")
     lines.append(
+        f"  On-plan density (mid):  "
+        f"mean={m.convergence_shown.on_plan_density_mid_mean:.1f}, "
+        f"P(>=3)={m.convergence_shown.on_plan_prob_gte_3_mid:.2f}"
+    )
+    lines.append(
         f"  On-plan density (late): "
         f"mean={m.convergence_shown.on_plan_density_late_mean:.1f}, "
         f"P(>=3)={m.convergence_shown.on_plan_prob_gte_3_late:.2f}"
@@ -734,6 +745,11 @@ def format_metrics(m: DraftMetrics) -> str:
     # Convergence (full-pack)
     lines.append("")
     lines.append("Convergence (full-pack, post-commitment):")
+    lines.append(
+        f"  On-plan density (mid):  "
+        f"mean={m.convergence_full.on_plan_density_mid_mean:.1f}, "
+        f"P(>=3)={m.convergence_full.on_plan_prob_gte_3_mid:.2f}"
+    )
     lines.append(
         f"  On-plan density (late): "
         f"mean={m.convergence_full.on_plan_density_late_mean:.1f}, "

@@ -193,6 +193,12 @@ def build_run_record(
     record["cr_full_entropy_overall"] = round(crf.choice_entropy.overall, 4)
 
     # Convergence shown
+    record["conv_shown_mid_mean"] = round(
+        draft_metrics.convergence_shown.on_plan_density_mid_mean, 4
+    )
+    record["conv_shown_mid_p3"] = round(
+        draft_metrics.convergence_shown.on_plan_prob_gte_3_mid, 4
+    )
     record["conv_shown_late_mean"] = round(
         draft_metrics.convergence_shown.on_plan_density_late_mean, 4
     )
@@ -201,6 +207,12 @@ def build_run_record(
     )
 
     # Convergence full
+    record["conv_full_mid_mean"] = round(
+        draft_metrics.convergence_full.on_plan_density_mid_mean, 4
+    )
+    record["conv_full_mid_p3"] = round(
+        draft_metrics.convergence_full.on_plan_prob_gte_3_mid, 4
+    )
     record["conv_full_late_mean"] = round(
         draft_metrics.convergence_full.on_plan_density_late_mean, 4
     )
