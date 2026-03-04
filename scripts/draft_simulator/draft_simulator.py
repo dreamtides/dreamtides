@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Entry point for the draft simulator.
 
-Parses CLI arguments, loads configuration, generates or loads the card
-pool, creates a cube, generates packs using each strategy, and prints
-summary statistics. Stdlib-only, no external dependencies.
+Parses CLI arguments, loads configuration, and dispatches to the selected
+mode: single (default) runs one complete draft and prints per-seat results,
+demo runs the component demonstrations from earlier tasks. Stdlib-only, no
+external dependencies.
 """
 
 import argparse
@@ -17,6 +18,7 @@ import commitment
 import config
 import cube_manager
 import deck_scorer
+import draft_runner
 import pack_generator
 import refill
 import show_n
@@ -34,6 +36,13 @@ def build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
+        "mode",
+        nargs="?",
+        default="single",
+        choices=["single", "sweep", "trace", "demo"],
+        help="Simulation mode (default: single)",
+    )
+    parser.add_argument(
         "--seed",
         "-s",
         type=int,
@@ -46,6 +55,12 @@ def build_parser() -> argparse.ArgumentParser:
         type=str,
         default=None,
         help="Path to TOML or JSON config file",
+    )
+    parser.add_argument(
+        "--runs",
+        type=int,
+        default=None,
+        help="Number of runs (default: 1000 for sweep, 1 for single)",
     )
     parser.add_argument(
         "--output-dir",
@@ -75,7 +90,6 @@ def main() -> None:
     args = parser.parse_args()
 
     seed: int = args.seed
-    rng = random.Random(seed)
 
     # Load configuration
     cfg = config.load_config(
@@ -93,7 +107,25 @@ def main() -> None:
         cfg.agents.ai_signal_weight = 0.8
         cfg.draft.seat_count = 8
 
-    # Print banner
+    mode: str = args.mode
+
+    if mode == "single":
+        _run_single(cfg, seed)
+    elif mode == "trace":
+        _run_single(cfg, seed, trace_enabled=True)
+    elif mode == "demo":
+        _run_demo(cfg, seed)
+    elif mode == "sweep":
+        print("Sweep mode is not yet implemented.", file=sys.stderr)
+        sys.exit(1)
+
+
+def _run_single(
+    cfg: SimulatorConfig,
+    seed: int,
+    trace_enabled: bool = False,
+) -> None:
+    """Run a single draft and print per-seat results."""
     print(
         f"Draft Simulator v{VERSION} | seed={seed} "
         f"| seats={cfg.draft.seat_count} "
@@ -101,7 +133,43 @@ def main() -> None:
         f"| pack_size={cfg.draft.pack_size}"
     )
 
-    # Generate or load card pool
+    result = draft_runner.run_draft(cfg, seed, trace_enabled=trace_enabled)
+
+    print()
+    for seat_idx, sr in enumerate(result.seat_results):
+        is_human = seat_idx < cfg.draft.human_seats
+        seat_type = "human" if is_human else "ai"
+        policy = cfg.agents.policy
+
+        if sr.commitment_pick is not None:
+            commit_str = f"pick {sr.commitment_pick}"
+        else:
+            commit_str = "uncommitted"
+
+        archetype = (
+            sr.committed_archetype
+            if sr.committed_archetype is not None
+            else argmax(sr.final_w)
+        )
+
+        label = f"Seat {seat_idx} ({seat_type}, {policy}):"
+        print(
+            f"{label:<35s} deck_value={sr.deck_value:.3f}, "
+            f"archetype={archetype}, committed={commit_str}"
+        )
+
+
+def _run_demo(cfg: SimulatorConfig, seed: int) -> None:
+    """Run the component demonstration mode (legacy)."""
+    rng = random.Random(seed)
+
+    print(
+        f"Draft Simulator v{VERSION} | seed={seed} "
+        f"| seats={cfg.draft.seat_count} "
+        f"| rounds={cfg.draft.round_count} "
+        f"| pack_size={cfg.draft.pack_size}"
+    )
+
     cards = card_generator.generate_cards(cfg, rng)
 
     source_label = (
@@ -109,10 +177,8 @@ def main() -> None:
     )
     print(f"\nCard source: {source_label}")
 
-    # Print card pool statistics
     card_generator.print_card_pool_stats(cards, cfg.cards.archetype_count)
 
-    # Create cube and validate supply
     consumption_mode = (
         CubeConsumptionMode.WITH_REPLACEMENT
         if cfg.cube.consumption_mode == "with_replacement"
@@ -126,8 +192,6 @@ def main() -> None:
 
     cube_manager.validate_supply(cfg, cube.total_size)
 
-    # Generate one pack using each strategy and print contents.
-    # Each strategy gets a fresh cube so draws are independent.
     strategies = ["uniform", "rarity_weighted", "seeded_themed"]
     strategy_labels = {
         "uniform": "Uniform",
@@ -144,19 +208,10 @@ def main() -> None:
         pack = pack_generator.generate_pack(strategy, demo_cube, cfg, rng)
         _print_pack(pack, strategy_labels[strategy], cfg.cards.archetype_count)
 
-    # Demonstrate deck value scoring
     _demo_deck_scoring(cards, cfg, rng)
-
-    # Demonstrate commitment detection
     _demo_commitment_detection(cards, cfg, rng)
-
-    # Demonstrate refill strategies
     _demo_refill_strategies(cards, cfg, consumption_mode, rng)
-
-    # Demonstrate pick policies
     _demo_pick_policies(cards, cfg, consumption_mode, rng)
-
-    # Demonstrate Show-N strategies
     _demo_show_n_strategies(cards, cfg, consumption_mode, rng)
 
 
@@ -188,7 +243,6 @@ def _demo_deck_scoring(
     pool_size = 30
     pool = rng.sample(cards, min(pool_size, len(cards)))
 
-    # Build a plausible preference vector by simulating picks
     w = commitment.initial_preference_vector(cfg.cards.archetype_count)
     for card in pool:
         w = commitment.update_preference_vector(
@@ -207,7 +261,6 @@ def _demo_deck_scoring(
     print(f"  Focus bonus:          {focus:.4f}")
     print(f"  Final score:          {final:.4f}")
 
-    # Verify weighted sum
     weighted = (
         cfg.scoring.weight_power * raw
         + cfg.scoring.weight_coherence * coherence
@@ -225,16 +278,9 @@ def _demo_commitment_detection(
     cfg: SimulatorConfig,
     rng: random.Random,
 ) -> None:
-    """Simulate a sequence of picks and run commitment detection.
-
-    Uses an archetype-biased pick strategy to demonstrate commitment:
-    picks cards with higher fitness for the agent's best archetype,
-    similar to how a real agent would draft. The w_history contains
-    one snapshot per pick (the post-pick vector).
-    """
+    """Simulate a sequence of picks and run commitment detection."""
     pool_size = 30
 
-    # Build w history by simulating biased picks from the card pool
     w = commitment.initial_preference_vector(cfg.cards.archetype_count)
     w_history: list[list[float]] = []
     available = list(cards)
@@ -243,11 +289,9 @@ def _demo_commitment_detection(
     for _ in range(pool_size):
         if not available:
             break
-        # Score candidates by fitness for current best archetype + power
         best_arch = argmax(w)
         scored = [(c.fitness[best_arch] + 0.3 * c.power, c) for c in available]
         scored.sort(key=lambda x: x[0], reverse=True)
-        # Pick from top candidates with some randomness
         top_k = min(5, len(scored))
         pick_idx = rng.randint(0, top_k - 1)
         card = scored[pick_idx][1]
@@ -284,7 +328,6 @@ def _demo_commitment_detection(
     else:
         print("    Entropy commitment pick: None (uncommitted)")
 
-    # Also demonstrate None case with uniform w history
     print("\n  Uniform w test (should be uncommitted):")
     uniform_history = [
         commitment.initial_preference_vector(cfg.cards.archetype_count)
@@ -310,8 +353,6 @@ def _demo_refill_strategies(
     """Demonstrate each refill strategy on a sample pack."""
     print("\n=== Refill Strategy Demonstrations ===")
 
-    # Generate three independent base packs (one per strategy demo) from
-    # independent cubes so the demonstrations are isolated.
     def _fresh_pack() -> tuple[cube_manager.CubeManager, Pack]:
         c = cube_manager.CubeManager(
             designs=cards,
@@ -321,7 +362,6 @@ def _demo_refill_strategies(
         p = pack_generator.generate_pack("uniform", c, cfg, rng)
         return c, p
 
-    # --- NoRefill ---
     print("\n--- NoRefill ---")
     _, no_refill_pack = _fresh_pack()
     _print_pack_composition("Pack before", no_refill_pack)
@@ -331,7 +371,6 @@ def _demo_refill_strategies(
     print(f"  Pack size before: {len(no_refill_pack.cards)}")
     print(f"  Pack size after:  {len(no_refill_pack.cards)}")
 
-    # --- UniformRefill ---
     print("\n--- UniformRefill ---")
     uniform_cube, uniform_pack = _fresh_pack()
     _print_pack_composition("Pack before", uniform_pack)
@@ -343,15 +382,12 @@ def _demo_refill_strategies(
     print(f"  Pack size before: {size_before}")
     print(f"  Pack size after:  {len(uniform_pack.cards)}")
 
-    # --- ConstrainedRefill (pack_origin) ---
     print("\n--- ConstrainedRefill ---")
     constrained_cube, constrained_pack = _fresh_pack()
     _print_pack_composition("Pack before", constrained_pack)
     size_before = len(constrained_pack.cards)
 
-    # Select signal based on fingerprint_source config
     if cfg.refill.fingerprint_source == "round_environment":
-        # Compute round environment from all packs generated this round
         all_packs = [constrained_pack]
         signal = refill.compute_round_environment_profile(all_packs)
         print(f"  Fingerprint source: round_environment")
@@ -377,7 +413,6 @@ def _demo_refill_strategies(
     print(f"  Pack size before: {size_before}")
     print(f"  Pack size after:  {len(constrained_pack.cards)}")
 
-    # Also demonstrate round_environment signal computation
     print("\n  Round environment profile (across all demo packs):")
     demo_packs = [uniform_pack, constrained_pack]
     round_env = refill.compute_round_environment_profile(demo_packs)
@@ -481,9 +516,7 @@ def _demo_show_n_strategies(
     )
     pack = pack_generator.generate_pack("uniform", demo_cube, cfg, rng)
 
-    # Create a plausible human preference vector
     human_w = commitment.initial_preference_vector(cfg.cards.archetype_count)
-    # Bias toward archetype 0 to make curated strategy interesting
     human_w[0] = 2.0
 
     print(f"\n--- Show-N Strategy Demonstrations (pack_id={pack.pack_id}) ---")
