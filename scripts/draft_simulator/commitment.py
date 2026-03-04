@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from config import CommitmentConfig
+from utils import argmax
 
 
 @dataclass(frozen=True)
@@ -60,7 +61,14 @@ def update_preference_vector(
     Adds learning_rate * fitness[a] to w[a] for each archetype a.
     The vector is NOT renormalized. Returns a new list (does not
     mutate the input).
+
+    Raises ValueError if w and card_fitness have different lengths.
     """
+    if len(w) != len(card_fitness):
+        raise ValueError(
+            f"Preference vector length ({len(w)}) does not match "
+            f"card fitness vector length ({len(card_fitness)})"
+        )
     return [w[a] + learning_rate * card_fitness[a] for a in range(len(w))]
 
 
@@ -111,7 +119,7 @@ def _detect_concentration_commitment(
         if concentration(w) < threshold:
             continue
 
-        arch = _argmax(w)
+        arch = argmax(w)
         stable = True
 
         for j in range(1, stability_window + 1):
@@ -122,7 +130,7 @@ def _detect_concentration_commitment(
             if concentration(w_next) < threshold:
                 stable = False
                 break
-            if _argmax(w_next) != arch:
+            if argmax(w_next) != arch:
                 stable = False
                 break
 
@@ -152,7 +160,7 @@ def _detect_entropy_commitment(
         if shannon_entropy(w) >= entropy_threshold:
             continue
 
-        arch = _argmax(w)
+        arch = argmax(w)
         stable = True
 
         for j in range(1, stability_window + 1):
@@ -163,7 +171,7 @@ def _detect_entropy_commitment(
             if shannon_entropy(w_next) >= entropy_threshold:
                 stable = False
                 break
-            if _argmax(w_next) != arch:
+            if argmax(w_next) != arch:
                 stable = False
                 break
 
@@ -171,14 +179,3 @@ def _detect_entropy_commitment(
             return (i, arch)
 
     return (None, None)
-
-
-def _argmax(values: list[float]) -> int:
-    """Return the index of the maximum value."""
-    best_index = 0
-    best_value = values[0]
-    for i in range(1, len(values)):
-        if values[i] > best_value:
-            best_value = values[i]
-            best_index = i
-    return best_index

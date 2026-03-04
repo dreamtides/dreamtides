@@ -6,27 +6,32 @@ component is normalized to [0, 1] and the final score is clamped to
 [0, 1]. Stdlib-only, no external dependencies.
 """
 
+from typing import Sequence, Union
+
 from config import ScoringConfig
 from draft_models import CardDesign, CardInstance
+from utils import argmax
 
 
 def deck_value(
-    pool: list[CardDesign],
+    pool: Sequence[Union[CardDesign, CardInstance]],
     w: list[float],
     scoring: ScoringConfig,
 ) -> float:
     """Score a card pool as a float in [0, 1].
 
-    Takes drafted cards (as CardDesign objects) and the agent's
-    preference vector w. Returns a deterministic score for any
-    pool size (including partial pools during draft).
+    Takes drafted cards (as CardDesign or CardInstance objects) and
+    the agent's preference vector w. Returns a deterministic score
+    for any pool size (including partial pools during draft).
     """
     if not pool or not w:
         return 0.0
 
-    raw = raw_power(pool)
-    coherence = archetype_coherence(pool, w, scoring.secondary_weight)
-    focus = focus_bonus(pool, w, scoring.focus_threshold, scoring.focus_saturation)
+    designs = _to_designs(pool)
+
+    raw = raw_power(designs)
+    coherence = archetype_coherence(designs, w, scoring.secondary_weight)
+    focus = focus_bonus(designs, w, scoring.focus_threshold, scoring.focus_saturation)
 
     score = (
         scoring.weight_power * raw
@@ -37,7 +42,7 @@ def deck_value(
 
 
 def deck_value_breakdown(
-    pool: list[CardDesign],
+    pool: Sequence[Union[CardDesign, CardInstance]],
     w: list[float],
     scoring: ScoringConfig,
 ) -> tuple[float, float, float, float]:
@@ -45,9 +50,11 @@ def deck_value_breakdown(
     if not pool or not w:
         return (0.0, 0.0, 0.0, 0.0)
 
-    raw = raw_power(pool)
-    coherence = archetype_coherence(pool, w, scoring.secondary_weight)
-    focus = focus_bonus(pool, w, scoring.focus_threshold, scoring.focus_saturation)
+    designs = _to_designs(pool)
+
+    raw = raw_power(designs)
+    coherence = archetype_coherence(designs, w, scoring.secondary_weight)
+    focus = focus_bonus(designs, w, scoring.focus_threshold, scoring.focus_saturation)
 
     score = (
         scoring.weight_power * raw
@@ -75,17 +82,19 @@ def archetype_coherence(
     The effective archetype is argmax(w). Primary coherence is the mean
     fitness for that archetype across all cards. Secondary coherence
     uses the second-highest archetype in w, discounted by secondary_weight.
+    Result is clamped to [0, 1].
     """
     if not pool or not w:
         return 0.0
 
-    primary_arch = _argmax(w)
+    primary_arch = argmax(w)
     secondary_arch = _second_argmax(w)
 
     primary_coherence = sum(c.fitness[primary_arch] for c in pool) / len(pool)
     secondary_coherence = sum(c.fitness[secondary_arch] for c in pool) / len(pool)
 
-    return primary_coherence + secondary_weight * secondary_coherence
+    raw = primary_coherence + secondary_weight * secondary_coherence
+    return max(0.0, min(1.0, raw))
 
 
 def focus_bonus(
@@ -104,7 +113,7 @@ def focus_bonus(
     if not pool or not w:
         return 0.0
 
-    primary_arch = _argmax(w)
+    primary_arch = argmax(w)
     on_plan_count = sum(1 for c in pool if c.fitness[primary_arch] >= threshold)
     fraction = on_plan_count / len(pool)
 
@@ -118,15 +127,17 @@ def pool_from_instances(instances: list[CardInstance]) -> list[CardDesign]:
     return [inst.design for inst in instances]
 
 
-def _argmax(values: list[float]) -> int:
-    """Return the index of the maximum value."""
-    best_index = 0
-    best_value = values[0]
-    for i in range(1, len(values)):
-        if values[i] > best_value:
-            best_value = values[i]
-            best_index = i
-    return best_index
+def _to_designs(
+    pool: Sequence[Union[CardDesign, CardInstance]],
+) -> list[CardDesign]:
+    """Normalize a mixed pool to a list of CardDesign objects."""
+    result: list[CardDesign] = []
+    for item in pool:
+        if isinstance(item, CardInstance):
+            result.append(item.design)
+        else:
+            result.append(item)
+    return result
 
 
 def _second_argmax(values: list[float]) -> int:
@@ -134,7 +145,7 @@ def _second_argmax(values: list[float]) -> int:
     if len(values) < 2:
         return 0
 
-    first_index = _argmax(values)
+    first_index = argmax(values)
     second_index = 0 if first_index != 0 else 1
     second_value = values[second_index]
 

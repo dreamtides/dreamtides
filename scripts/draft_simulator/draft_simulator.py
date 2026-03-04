@@ -19,6 +19,7 @@ import deck_scorer
 import pack_generator
 from config import SimulatorConfig
 from draft_models import CardDesign, CubeConsumptionMode, Pack
+from utils import argmax
 
 VERSION = "0.1.0"
 
@@ -178,7 +179,7 @@ def _demo_deck_scoring(
 
     print("\n--- Deck Value Scoring ---")
     print(f"  Pool size: {len(pool)}")
-    print(f"  Effective archetype: {_argmax(w)}")
+    print(f"  Effective archetype: {argmax(w)}")
     print(f"  Raw power:            {raw:.4f}")
     print(f"  Archetype coherence:  {coherence:.4f}")
     print(f"  Focus bonus:          {focus:.4f}")
@@ -206,13 +207,14 @@ def _demo_commitment_detection(
 
     Uses an archetype-biased pick strategy to demonstrate commitment:
     picks cards with higher fitness for the agent's best archetype,
-    similar to how a real agent would draft.
+    similar to how a real agent would draft. The w_history contains
+    one snapshot per pick (the post-pick vector).
     """
     pool_size = 30
 
     # Build w history by simulating biased picks from the card pool
     w = commitment.initial_preference_vector(cfg.cards.archetype_count)
-    w_history: list[list[float]] = [list(w)]
+    w_history: list[list[float]] = []
     available = list(cards)
     picked: list[CardDesign] = []
 
@@ -220,7 +222,7 @@ def _demo_commitment_detection(
         if not available:
             break
         # Score candidates by fitness for current best archetype + power
-        best_arch = _argmax(w)
+        best_arch = argmax(w)
         scored = [(c.fitness[best_arch] + 0.3 * c.power, c) for c in available]
         scored.sort(key=lambda x: x[0], reverse=True)
         # Pick from top candidates with some randomness
@@ -264,22 +266,11 @@ def _demo_commitment_detection(
     print("\n  Uniform w test (should be uncommitted):")
     uniform_history = [
         commitment.initial_preference_vector(cfg.cards.archetype_count)
-        for _ in range(pool_size + 1)
+        for _ in range(pool_size)
     ]
     uniform_result = commitment.detect_commitment(uniform_history, cfg.commitment)
     print(f"    Commitment pick: {uniform_result.commitment_pick}")
     print(f"    Entropy commitment pick: {uniform_result.entropy_commitment_pick}")
-
-
-def _argmax(values: list[float]) -> int:
-    """Return the index of the maximum value."""
-    best_index = 0
-    best_value = values[0]
-    for i in range(1, len(values)):
-        if values[i] > best_value:
-            best_value = values[i]
-            best_index = i
-    return best_index
 
 
 def _run_with_error_handling() -> None:
