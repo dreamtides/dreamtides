@@ -3,8 +3,9 @@
 
 Parses CLI arguments, loads configuration, and dispatches to the selected
 mode: single (default) runs one complete draft and prints per-seat results,
-demo runs the component demonstrations from earlier tasks. Stdlib-only, no
-external dependencies.
+sweep runs batch parameter experiments, trace writes per-pick JSON output,
+and demo runs the component demonstrations from earlier tasks. Stdlib-only,
+no external dependencies.
 """
 
 import argparse
@@ -21,9 +22,12 @@ import cube_manager
 import deck_scorer
 import draft_runner
 import metrics
+import output
 import pack_generator
 import refill
 import show_n
+import sweep
+import validation
 from config import SimulatorConfig
 from draft_models import CardDesign, CardInstance, CubeConsumptionMode, Pack
 from utils import argmax
@@ -110,22 +114,22 @@ def main() -> None:
         cfg.draft.seat_count = 8
 
     mode: str = args.mode
+    output_dir: str = args.output_dir
 
     if mode == "single":
         _run_single(cfg, seed)
     elif mode == "trace":
-        _run_single(cfg, seed, trace_enabled=True)
+        _run_trace(cfg, seed, output_dir)
     elif mode == "demo":
         _run_demo(cfg, seed)
     elif mode == "sweep":
-        print("Sweep mode is not yet implemented.", file=sys.stderr)
-        sys.exit(1)
+        runs = args.runs if args.runs is not None else cfg.sweep.runs_per_point
+        _run_sweep(cfg, seed, runs, output_dir)
 
 
 def _run_single(
     cfg: SimulatorConfig,
     seed: int,
-    trace_enabled: bool = False,
 ) -> None:
     """Run a single draft and print per-seat results with metrics."""
     print(
@@ -135,7 +139,7 @@ def _run_single(
         f"| pack_size={cfg.draft.pack_size}"
     )
 
-    result = draft_runner.run_draft(cfg, seed, trace_enabled=trace_enabled)
+    result = draft_runner.run_draft(cfg, seed)
 
     print()
     for seat_idx, sr in enumerate(result.seat_results):
@@ -160,26 +164,49 @@ def _run_single(
             f"archetype={archetype}, committed={commit_str}"
         )
 
-    # Compute and print metrics
     draft_metrics = metrics.compute_metrics(result, cfg)
     print()
     print(metrics.format_metrics(draft_metrics))
 
-    if trace_enabled and result.traces:
-        print(f"\nTraces ({len(result.traces)} picks):")
-        for trace in result.traces:
-            trace_dict = {
-                "round": trace.round_index,
-                "pick": trace.pick_index,
-                "seat": trace.seat_index,
-                "pack_id": trace.pack_id,
-                "pack_card_ids": trace.pack_card_ids,
-                "shown_card_ids": trace.shown_card_ids,
-                "chosen_card_id": trace.chosen_card_id,
-                "agent_w": [round(v, 4) for v in trace.agent_w_snapshot],
-                "card_score": round(trace.card_score, 4),
-            }
-            print(json.dumps(trace_dict))
+
+def _run_trace(
+    cfg: SimulatorConfig,
+    seed: int,
+    output_dir: str,
+) -> None:
+    """Run a single draft with per-pick trace output to JSON file."""
+    output.ensure_output_dir(output_dir)
+
+    result = draft_runner.run_draft(cfg, seed, trace_enabled=True)
+
+    trace_path = output.write_trace_json(output_dir, result.traces, seed)
+    print(f"Per-pick trace written to: {trace_path}")
+
+
+def _run_sweep(
+    cfg: SimulatorConfig,
+    base_seed: int,
+    runs_per_point: int,
+    output_dir: str,
+) -> None:
+    """Run a parameter sweep experiment with output serialization."""
+    output.ensure_output_dir(output_dir)
+
+    run_records, aggregate_records = sweep.run_sweep(
+        cfg, base_seed, runs_per_point, output_dir
+    )
+
+    run_path = output.write_run_level_csv(output_dir, run_records)
+    agg_path = output.write_aggregate_csv(output_dir, aggregate_records)
+    meta_path = output.write_config_metadata(output_dir, cfg)
+
+    print(f"\nResults written to:")
+    print(f"  {run_path:<40s} ({len(run_records)} rows)")
+    print(f"  {agg_path:<40s} ({len(aggregate_records)} rows)")
+    print(f"  {meta_path}")
+
+    report = validation.run_validation(aggregate_records, run_records)
+    print(validation.format_validation_report(report))
 
 
 def _run_demo(cfg: SimulatorConfig, seed: int) -> None:
