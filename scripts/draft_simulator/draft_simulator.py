@@ -9,6 +9,7 @@ no external dependencies.
 """
 
 import argparse
+import collections
 import json
 import random
 import sys
@@ -77,7 +78,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--runs",
         type=int,
         default=None,
-        help="Number of runs (default: 1000 for sweep, 1 for single)",
+        help="Number of simulation runs (default: 1 for single, 1000 for sweep)",
     )
     parser.add_argument(
         "--output-dir",
@@ -136,7 +137,10 @@ def main() -> None:
     output_dir: str = args.output_dir
 
     if mode == "single":
-        _run_single(cfg, seed, describe_pool=args.describe_pool)
+        runs = args.runs if args.runs is not None else 1
+        _run_single(
+            cfg, seed, describe_pool=args.describe_pool, runs=runs, preset=args.preset
+        )
     elif mode == "trace":
         _run_trace(cfg, seed, output_dir)
     elif mode == "demo":
@@ -146,19 +150,55 @@ def main() -> None:
         _run_sweep(cfg, seed, runs, output_dir)
 
 
+def _print_header(
+    cfg: SimulatorConfig,
+    seed: int,
+    runs: int = 1,
+    preset: str | None = None,
+) -> None:
+    """Print the richer header with configuration info."""
+    line1 = f"Draft Simulator v{VERSION} | seed={seed}"
+    if runs > 1:
+        line1 += f" | runs={runs}"
+    print(line1)
+    print(
+        f"  seats={cfg.draft.seat_count}, rounds={cfg.draft.round_count}, "
+        f"pack_size={cfg.draft.pack_size}, show_n={cfg.agents.show_n}"
+    )
+    print(
+        f"  policy={cfg.agents.policy}, "
+        f"show_n_strategy={cfg.agents.show_n_strategy}, "
+        f"ai_optimality={cfg.agents.ai_optimality:.2f}"
+    )
+    preset_str = preset if preset is not None else "none"
+    print(
+        f"  preset={preset_str}, refill={cfg.refill.strategy}, "
+        f"archetypes={cfg.cards.archetype_count}"
+    )
+
+
 def _run_single(
     cfg: SimulatorConfig,
     seed: int,
     describe_pool: bool = False,
+    runs: int = 1,
+    preset: str | None = None,
 ) -> None:
-    """Run a single draft and print per-seat results with metrics."""
-    print(
-        f"Draft Simulator v{VERSION} | seed={seed} "
-        f"| seats={cfg.draft.seat_count} "
-        f"| rounds={cfg.draft.round_count} "
-        f"| pack_size={cfg.draft.pack_size}"
-    )
+    """Run one or more drafts and print per-seat results with metrics."""
+    _print_header(cfg, seed, runs, preset)
 
+    if runs == 1:
+        _run_single_once(cfg, seed, describe_pool)
+    else:
+        _run_single_multi(cfg, seed, runs, describe_pool)
+
+
+def _run_single_once(
+    cfg: SimulatorConfig,
+    seed: int,
+    describe_pool: bool,
+) -> None:
+    """Run a single draft and print results (original behavior)."""
     result = draft_runner.run_draft(cfg, seed)
 
     if describe_pool:
@@ -201,6 +241,95 @@ def _run_single(
     draft_metrics = metrics.compute_metrics(result, cfg)
     print()
     print(metrics.format_metrics(draft_metrics))
+
+
+def _run_single_multi(
+    cfg: SimulatorConfig,
+    base_seed: int,
+    runs: int,
+    describe_pool: bool,
+) -> None:
+    """Run multiple drafts and print averaged results."""
+    seat_count = cfg.draft.seat_count
+    all_metrics: list[metrics.DraftMetrics] = []
+    seat_deck_values: list[list[float]] = [[] for _ in range(seat_count)]
+    seat_archetypes: list[list[int | None]] = [[] for _ in range(seat_count)]
+    seat_commitment_picks: list[list[int | None]] = [[] for _ in range(seat_count)]
+    described = False
+
+    for run_i in range(runs):
+        run_seed = base_seed + run_i
+        result = draft_runner.run_draft(cfg, run_seed)
+
+        if describe_pool and not described:
+            designs = _unique_designs(result.card_pool)
+            source_label = (
+                f"file ({cfg.cards.file_path})"
+                if cfg.cards.source == "file"
+                else "synthetic"
+            )
+            print()
+            print(
+                card_generator.describe_card_pool(
+                    designs, cfg.cards.archetype_count, source_label
+                )
+            )
+            described = True
+
+        for seat_idx, sr in enumerate(result.seat_results):
+            seat_deck_values[seat_idx].append(sr.deck_value)
+            seat_archetypes[seat_idx].append(sr.committed_archetype)
+            seat_commitment_picks[seat_idx].append(sr.commitment_pick)
+
+        all_metrics.append(metrics.compute_metrics(result, cfg))
+
+        # Progress bar on stderr
+        done = run_i + 1
+        bar_width = 40
+        filled = int(bar_width * done / runs)
+        bar = "=" * filled + " " * (bar_width - filled)
+        print(
+            f"\r[{bar}] {done}/{runs} runs complete",
+            end="",
+            file=sys.stderr,
+        )
+
+    print(file=sys.stderr)  # newline after progress bar
+
+    # Per-seat summary
+    print()
+    for seat_idx in range(seat_count):
+        is_human = seat_idx < cfg.draft.human_seats
+        seat_type = "human" if is_human else "ai"
+        policy = cfg.agents.policy
+
+        mean_dv = sum(seat_deck_values[seat_idx]) / runs
+
+        # Most common committed archetype
+        arch_counts: collections.Counter[int | None] = collections.Counter(
+            seat_archetypes[seat_idx]
+        )
+        most_common_arch = arch_counts.most_common(1)[0][0]
+        uncommitted_count = arch_counts.get(None, 0)
+
+        if uncommitted_count > runs / 2:
+            commit_str = "uncommitted"
+        else:
+            valid_picks = [p for p in seat_commitment_picks[seat_idx] if p is not None]
+            mean_pick = sum(valid_picks) / len(valid_picks) if valid_picks else 0
+            commit_str = f"pick {mean_pick:.1f}"
+
+        archetype = most_common_arch if most_common_arch is not None else "?"
+
+        label = f"Seat {seat_idx} ({seat_type}, {policy}):"
+        print(
+            f"{label:<35s} deck_value={mean_dv:.3f}, "
+            f"archetype={archetype}, committed={commit_str}"
+        )
+
+    averaged = metrics.average_metrics(all_metrics)
+    print()
+    print(metrics.format_metrics(averaged))
 
 
 def _run_trace(

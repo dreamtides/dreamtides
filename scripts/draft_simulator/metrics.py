@@ -786,3 +786,104 @@ def format_metrics(m: DraftMetrics) -> str:
     )
 
     return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Multi-run averaging
+# ---------------------------------------------------------------------------
+
+
+def _average_phase_stats(items: list[PhaseStats]) -> PhaseStats:
+    """Mean of each field across a list of PhaseStats."""
+    n = len(items)
+    return PhaseStats(
+        early=sum(ps.early for ps in items) / n,
+        mid=sum(ps.mid for ps in items) / n,
+        late=sum(ps.late for ps in items) / n,
+        overall=sum(ps.overall for ps in items) / n,
+    )
+
+
+def _average_choice_richness(
+    items: list[ChoiceRichnessMetrics],
+) -> ChoiceRichnessMetrics:
+    """Field-wise mean of ChoiceRichnessMetrics."""
+    return ChoiceRichnessMetrics(
+        near_optimal=_average_phase_stats([m.near_optimal for m in items]),
+        score_gap_mean=_average_phase_stats([m.score_gap_mean for m in items]),
+        score_gap_median=_average_phase_stats([m.score_gap_median for m in items]),
+        score_gap_p90=_average_phase_stats([m.score_gap_p90 for m in items]),
+        choice_entropy=_average_phase_stats([m.choice_entropy for m in items]),
+    )
+
+
+def _average_convergence(items: list[ConvergenceMetrics]) -> ConvergenceMetrics:
+    """Field-wise mean of ConvergenceMetrics."""
+    n = len(items)
+    return ConvergenceMetrics(
+        on_plan_density_mid_mean=sum(m.on_plan_density_mid_mean for m in items) / n,
+        on_plan_prob_gte_3_mid=sum(m.on_plan_prob_gte_3_mid for m in items) / n,
+        on_plan_density_late_mean=sum(m.on_plan_density_late_mean for m in items) / n,
+        on_plan_prob_gte_3_late=sum(m.on_plan_prob_gte_3_late for m in items) / n,
+    )
+
+
+def _average_splashability(items: list[SplashabilityMetrics]) -> SplashabilityMetrics:
+    """Field-wise mean of SplashabilityMetrics."""
+    n = len(items)
+    return SplashabilityMetrics(
+        splash_fraction=sum(m.splash_fraction for m in items) / n,
+    )
+
+
+def _average_early_openness(items: list[EarlyOpennessMetrics]) -> EarlyOpennessMetrics:
+    """Field-wise mean of EarlyOpennessMetrics."""
+    n = len(items)
+    return EarlyOpennessMetrics(
+        archetypes_exposed=sum(m.archetypes_exposed for m in items) / n,
+        preference_entropy=sum(m.preference_entropy for m in items) / n,
+    )
+
+
+def average_metrics(metrics_list: list[DraftMetrics]) -> DraftMetrics:
+    """Average a list of DraftMetrics into a single DraftMetrics."""
+    n = len(metrics_list)
+    if n == 0:
+        raise ValueError("Cannot average an empty metrics list")
+    if n == 1:
+        return metrics_list[0]
+
+    # Average optional float fields over non-None values
+    force_vals = [m.forceability for m in metrics_list if m.forceability is not None]
+    signal_vals = [
+        m.signal_benefit for m in metrics_list if m.signal_benefit is not None
+    ]
+
+    return DraftMetrics(
+        choice_richness_full=_average_choice_richness(
+            [m.choice_richness_full for m in metrics_list]
+        ),
+        choice_richness_shown=_average_choice_richness(
+            [m.choice_richness_shown for m in metrics_list]
+        ),
+        convergence_full=_average_convergence(
+            [m.convergence_full for m in metrics_list]
+        ),
+        convergence_shown=_average_convergence(
+            [m.convergence_shown for m in metrics_list]
+        ),
+        splashability_full=_average_splashability(
+            [m.splashability_full for m in metrics_list]
+        ),
+        splashability_shown=_average_splashability(
+            [m.splashability_shown for m in metrics_list]
+        ),
+        early_openness_full=_average_early_openness(
+            [m.early_openness_full for m in metrics_list]
+        ),
+        early_openness_shown=_average_early_openness(
+            [m.early_openness_shown for m in metrics_list]
+        ),
+        forceability=_mean(force_vals) if force_vals else None,
+        signal_benefit=_mean(signal_vals) if signal_vals else None,
+    )
