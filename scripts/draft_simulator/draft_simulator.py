@@ -726,9 +726,14 @@ def _run_single_multi(
         print(file=sys.stderr)  # newline after progress bar
 
     # Run comparison drafts for forceability and signal benefit
-    signal_benefit_val, forceability_val, forceability_arch, forceability_per_arch = (
-        _run_comparison_drafts(cfg, base_seed, runs, adaptive_all_dvs, quiet)
-    )
+    (
+        signal_benefit_val,
+        forceability_val,
+        forceability_arch,
+        forceability_per_arch,
+        per_run_signal_benefits,
+        per_run_forceabilities,
+    ) = _run_comparison_drafts(cfg, base_seed, runs, adaptive_all_dvs, quiet)
 
     # Per-seat summary
     print()
@@ -774,8 +779,11 @@ def _run_single_multi(
         forceability_per_archetype=forceability_per_arch,
         signal_benefit=signal_benefit_val,
     )
+    cis = metrics.compute_goal_cis(
+        all_metrics, per_run_signal_benefits, per_run_forceabilities
+    )
     print()
-    print(metrics.format_goal_metrics(averaged))
+    print(metrics.format_goal_metrics(averaged, cis=cis))
     print()
     print(metrics.format_metrics(averaged))
 
@@ -786,11 +794,19 @@ def _run_comparison_drafts(
     runs: int,
     adaptive_all_dvs: list[float],
     quiet: bool = False,
-) -> tuple[float | None, float | None, int | None, dict[int, float] | None]:
+) -> tuple[
+    float | None,
+    float | None,
+    int | None,
+    dict[int, float] | None,
+    list[float],
+    list[float],
+]:
     """Run signal-ignorant and force-policy drafts for cross-run metrics.
 
     Returns (signal_benefit, forceability_max, forceability_archetype,
-    forceability_per_archetype).
+    forceability_per_archetype, per_run_signal_benefits,
+    per_run_forceabilities).
     """
     archetype_count = cfg.cards.archetype_count
     comparison_total = (1 + archetype_count) * runs
@@ -798,6 +814,7 @@ def _run_comparison_drafts(
 
     ignorant_all_dvs: list[float] = []
     force_all_dvs: dict[int, list[float]] = {a: [] for a in range(archetype_count)}
+    force_per_run: dict[int, list[float]] = {a: [] for a in range(archetype_count)}
 
     for run_i in range(runs):
         run_seed = base_seed + run_i
@@ -826,8 +843,10 @@ def _run_comparison_drafts(
             force_cfg.agents.policy = "force"
             force_cfg.agents.force_archetype = arch
             force_result = draft_runner.run_draft(force_cfg, run_seed)
-            force_all_dvs[arch].extend(
-                sr.deck_value for sr in force_result.seat_results
+            seat_dvs = [sr.deck_value for sr in force_result.seat_results]
+            force_all_dvs[arch].extend(seat_dvs)
+            force_per_run[arch].append(
+                sum(seat_dvs) / len(seat_dvs) if seat_dvs else 0.0
             )
             comparison_done += 1
             if not quiet:
@@ -876,11 +895,33 @@ def _run_comparison_drafts(
         forceability_arch = max_arch
         forceability_per_arch = per_arch
 
+    # Per-run signal benefit for CI computation
+    per_run_signal_benefits: list[float] = []
+    for run_i in range(runs):
+        if ignorant_all_dvs[run_i] > 0:
+            sb = (
+                (adaptive_all_dvs[run_i] - ignorant_all_dvs[run_i])
+                / ignorant_all_dvs[run_i]
+            ) * 100.0
+            per_run_signal_benefits.append(sb)
+
+    # Per-run forceability for CI computation
+    per_run_forceabilities: list[float] = []
+    for run_i in range(runs):
+        if adaptive_all_dvs[run_i] > 0:
+            max_fi = max(
+                force_per_run[arch][run_i] / adaptive_all_dvs[run_i]
+                for arch in range(archetype_count)
+            )
+            per_run_forceabilities.append(max_fi)
+
     return (
         signal_benefit_val,
         forceability_val,
         forceability_arch,
         forceability_per_arch,
+        per_run_signal_benefits,
+        per_run_forceabilities,
     )
 
 

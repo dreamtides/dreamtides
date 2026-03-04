@@ -182,6 +182,19 @@ class DraftMetrics:
     signal_benefit: Optional[float] = None
 
 
+@dataclass(frozen=True)
+class GoalMetricCIs:
+    """95% confidence interval half-widths for goal metrics."""
+
+    convergence_mid: Optional[float] = None
+    convergence_late: Optional[float] = None
+    choice_richness: Optional[float] = None
+    forceability: Optional[float] = None
+    splashability: Optional[float] = None
+    early_openness: Optional[float] = None
+    signal_benefit: Optional[float] = None
+
+
 # ---------------------------------------------------------------------------
 # Per-pick scoring helpers
 # ---------------------------------------------------------------------------
@@ -277,6 +290,23 @@ def _percentile(values: list[float], p: float) -> float:
     if f == c:
         return s[int(k)]
     return s[f] * (c - k) + s[c] * (k - f)
+
+
+def _std(values: list[float]) -> float:
+    """Population standard deviation."""
+    if len(values) < 2:
+        return 0.0
+    m = _mean(values)
+    variance = sum((v - m) ** 2 for v in values) / len(values)
+    return math.sqrt(variance)
+
+
+def _ci_95(values: list[float]) -> float:
+    """95% confidence interval half-width for the mean."""
+    n = len(values)
+    if n < 2:
+        return 0.0
+    return 1.96 * _std(values) / math.sqrt(n)
 
 
 def _bucket_by_phase(
@@ -674,10 +704,15 @@ def compute_metrics(
 # ---------------------------------------------------------------------------
 
 
-def format_goal_metrics(m: DraftMetrics) -> str:
+def format_goal_metrics(m: DraftMetrics, cis: Optional[GoalMetricCIs] = None) -> str:
     """Format the six goal metrics with red/yellow/green status indicators."""
     lines: list[str] = []
     lines.append(colors.section("Goal Metrics:"))
+
+    def _ci_fmt(ci_val: Optional[float], fmt: str = ".1f", suffix: str = "") -> str:
+        if ci_val is None:
+            return ""
+        return f" {colors.dim(f'± {ci_val:{fmt}}{suffix}')}"
 
     def _status(
         value: float | None,
@@ -707,38 +742,42 @@ def format_goal_metrics(m: DraftMetrics) -> str:
 
     # 1. Convergence mid mean >= 2.0 (yellow at 1.5)
     conv_mid = m.convergence_shown.on_plan_density_mid_mean
+    ci_conv_mid = _ci_fmt(cis.convergence_mid if cis else None)
     lines.append(
         f"  {_status(conv_mid, 2.0, 1.5)}  "
         f"{colors.label('Convergence (mid):')}"
-        f"  {colors.num(f'{conv_mid:.1f}')} "
+        f"  {colors.num(f'{conv_mid:.1f}')}{ci_conv_mid} "
         f"{colors.dim('(target: >= 2.0)')}"
     )
 
     # 2. Convergence late mean >= 2.0 (yellow at 1.5)
     conv_late = m.convergence_shown.on_plan_density_late_mean
+    ci_conv_late = _ci_fmt(cis.convergence_late if cis else None)
     lines.append(
         f"  {_status(conv_late, 2.0, 1.5)}  "
         f"{colors.label('Convergence (late):')}"
-        f" {colors.num(f'{conv_late:.1f}')} "
+        f" {colors.num(f'{conv_late:.1f}')}{ci_conv_late} "
         f"{colors.dim('(target: >= 2.0)')}"
     )
 
     # 3. Choice richness near-optimal overall >= 1.5 (yellow at 1.2)
     near_opt = m.choice_richness_shown.near_optimal.overall
+    ci_near_opt = _ci_fmt(cis.choice_richness if cis else None)
     lines.append(
         f"  {_status(near_opt, 1.5, 1.2)}  "
         f"{colors.label('Choice richness:')}"
-        f"  {colors.num(f'{near_opt:.1f}')} "
+        f"  {colors.num(f'{near_opt:.1f}')}{ci_near_opt} "
         f"{colors.dim('near-optimal (target: >= 1.5)')}"
     )
 
     # 4. Forceability max < 0.95 (yellow at < 1.0)
     force_val = m.forceability
+    ci_force = _ci_fmt(cis.forceability if cis else None, ".2f")
     if force_val is not None:
         lines.append(
             f"  {_status(force_val, 0.95, 1.0, direction='lt')}  "
             f"{colors.label('Forceability:')}"
-            f"     {colors.num(f'{force_val:.2f}')} "
+            f"     {colors.num(f'{force_val:.2f}')}{ci_force} "
             f"{colors.dim('(target: < 0.95)')}"
         )
     else:
@@ -750,29 +789,32 @@ def format_goal_metrics(m: DraftMetrics) -> str:
 
     # 5. Splashability >= 0.40 (yellow at 0.30)
     splash = m.splashability_shown.splash_fraction
+    ci_splash = _ci_fmt(cis.splashability if cis else None, ".2f")
     lines.append(
         f"  {_status(splash, 0.40, 0.30)}  "
         f"{colors.label('Splashability:')}"
-        f"    {colors.num(f'{splash:.2f}')} "
+        f"    {colors.num(f'{splash:.2f}')}{ci_splash} "
         f"{colors.dim('(target: >= 0.40)')}"
     )
 
     # 6. Early openness archetypes >= 5.0 (yellow at 4.0)
     openness = m.early_openness_shown.archetypes_exposed
+    ci_openness = _ci_fmt(cis.early_openness if cis else None)
     lines.append(
         f"  {_status(openness, 5.0, 4.0)}  "
         f"{colors.label('Early openness:')}"
-        f"   {colors.num(f'{openness:.1f}')} "
+        f"   {colors.num(f'{openness:.1f}')}{ci_openness} "
         f"{colors.dim('archetypes (target: >= 5.0)')}"
     )
 
     # 7. Signal benefit >= 2% (yellow at 0%)
     sig_val = m.signal_benefit
+    ci_sig = _ci_fmt(cis.signal_benefit if cis else None, ".1f", "%")
     if sig_val is not None:
         lines.append(
             f"  {_status(sig_val, 2.0, 0.0)}  "
             f"{colors.label('Signal benefit:')}"
-            f"   {colors.num(f'{sig_val:+.1f}%')} "
+            f"   {colors.num(f'{sig_val:+.1f}%')}{ci_sig} "
             f"{colors.dim('(target: >= 2%)')}"
         )
     else:
@@ -983,4 +1025,40 @@ def average_metrics(metrics_list: list[DraftMetrics]) -> DraftMetrics:
         ),
         forceability=_mean(force_vals) if force_vals else None,
         signal_benefit=_mean(signal_vals) if signal_vals else None,
+    )
+
+
+def compute_goal_cis(
+    metrics_list: list[DraftMetrics],
+    per_run_signal_benefits: Optional[list[float]] = None,
+    per_run_forceabilities: Optional[list[float]] = None,
+) -> GoalMetricCIs:
+    """Compute 95% CI half-widths for each goal metric from per-run values."""
+    if len(metrics_list) < 2:
+        return GoalMetricCIs()
+
+    conv_mid_vals = [m.convergence_shown.on_plan_density_mid_mean for m in metrics_list]
+    conv_late_vals = [
+        m.convergence_shown.on_plan_density_late_mean for m in metrics_list
+    ]
+    near_opt_vals = [m.choice_richness_shown.near_optimal.overall for m in metrics_list]
+    splash_vals = [m.splashability_shown.splash_fraction for m in metrics_list]
+    openness_vals = [m.early_openness_shown.archetypes_exposed for m in metrics_list]
+
+    return GoalMetricCIs(
+        convergence_mid=_ci_95(conv_mid_vals),
+        convergence_late=_ci_95(conv_late_vals),
+        choice_richness=_ci_95(near_opt_vals),
+        forceability=(
+            _ci_95(per_run_forceabilities)
+            if per_run_forceabilities and len(per_run_forceabilities) >= 2
+            else None
+        ),
+        splashability=_ci_95(splash_vals),
+        early_openness=_ci_95(openness_vals),
+        signal_benefit=(
+            _ci_95(per_run_signal_benefits)
+            if per_run_signal_benefits and len(per_run_signal_benefits) >= 2
+            else None
+        ),
     )
