@@ -460,9 +460,7 @@ class TestShowN(unittest.TestCase):
 
     def test_curated_small_n_does_not_exceed(self) -> None:
         """Curated with n=1 must not return more than 1 card."""
-        on_plan = _make_instance(
-            0, [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5
-        )
+        on_plan = _make_instance(0, [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5)
         off_plan_strong = _make_instance(
             1, [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.8
         )
@@ -483,9 +481,7 @@ class TestShowN(unittest.TestCase):
 
     def test_curated_n2_with_both_guarantees(self) -> None:
         """Curated with n=2 returns exactly 2 when both guarantees apply."""
-        on_plan = _make_instance(
-            0, [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5
-        )
+        on_plan = _make_instance(0, [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5)
         off_plan_strong = _make_instance(
             1, [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.8
         )

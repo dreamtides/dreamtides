@@ -221,8 +221,7 @@ def _pick_force(
     archetype_count = len(candidates[0].design.fitness)
     if force_archetype < 0 or force_archetype >= archetype_count:
         raise ValueError(
-            f"force_archetype={force_archetype} out of range "
-            f"[0, {archetype_count})"
+            f"force_archetype={force_archetype} out of range " f"[0, {archetype_count})"
         )
 
     best_card = candidates[0]
