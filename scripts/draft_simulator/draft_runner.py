@@ -68,6 +68,7 @@ def run_draft(
     cfg: config.SimulatorConfig,
     seed: int,
     trace_enabled: bool = False,
+    human_seat_policy: Optional[str] = None,
 ) -> DraftResult:
     """Execute a full multi-seat draft and return the result.
 
@@ -145,18 +146,22 @@ def run_draft(
                     candidates = list(pack.cards)
                     shown = candidates
 
+                seat_policy = cfg.agents.policy
+                if is_human and human_seat_policy is not None:
+                    seat_policy = human_seat_policy
+
                 seat_rng = random.Random(pick_rng.randint(0, 2**32))
                 chosen = agents.pick_card(
                     candidates,
                     agent,
-                    cfg.agents.policy,
+                    seat_policy,
                     cfg.agents,
                     cfg.scoring,
                     seat_rng,
                     force_archetype=cfg.agents.force_archetype,
                 )
 
-                score = _compute_trace_score(chosen, agent, cfg.agents.policy, cfg)
+                score = _compute_trace_score(chosen, agent, seat_policy, cfg)
                 trace = PickTrace(
                     round_index=round_idx,
                     pick_index=global_pick_index,

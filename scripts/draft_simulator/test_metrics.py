@@ -296,6 +296,26 @@ def test_metrics_with_tracing_off() -> None:
     assert m.early_openness_shown.preference_entropy > 0.0
 
 
+def test_signal_benefit_human_seat_only() -> None:
+    """Signal benefit uses human_seat_policy to compare seat 0 only."""
+    import config
+    import draft_runner
+
+    cfg = config.SimulatorConfig()
+    seed = 42
+    adaptive_result = draft_runner.run_draft(cfg, seed)
+    ignorant_result = draft_runner.run_draft(
+        cfg, seed, human_seat_policy="signal_ignorant"
+    )
+    m = metrics.compute_metrics(
+        adaptive_result,
+        cfg,
+        aware_deck_values=[adaptive_result.seat_results[0].deck_value],
+        ignorant_deck_values=[ignorant_result.seat_results[0].deck_value],
+    )
+    assert m.signal_benefit is not None
+
+
 if __name__ == "__main__":
     test_softmax_basic()
     test_softmax_temperature()
@@ -319,4 +339,5 @@ if __name__ == "__main__":
     test_format_metrics_with_sweep_data()
     test_signal_ignorant_scoring_path()
     test_metrics_with_tracing_off()
+    test_signal_benefit_human_seat_only()
     print("All metrics tests passed!")

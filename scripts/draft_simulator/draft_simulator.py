@@ -706,11 +706,11 @@ def _run_single_multi(
             )
             described = True
 
+        adaptive_all_dvs.append(result.seat_results[0].deck_value)
         for seat_idx, sr in enumerate(result.seat_results):
             seat_deck_values[seat_idx].append(sr.deck_value)
             seat_archetypes[seat_idx].append(sr.committed_archetype)
             seat_commitment_picks[seat_idx].append(sr.commitment_pick)
-            adaptive_all_dvs.append(sr.deck_value)
 
         all_metrics.append(metrics.compute_metrics(result, cfg))
 
@@ -802,11 +802,11 @@ def _run_comparison_drafts(
     for run_i in range(runs):
         run_seed = base_seed + run_i
 
-        # Signal-ignorant comparison
-        ignorant_cfg = config.clone_config(cfg)
-        ignorant_cfg.agents.policy = "signal_ignorant"
-        ignorant_result = draft_runner.run_draft(ignorant_cfg, run_seed)
-        ignorant_all_dvs.extend(sr.deck_value for sr in ignorant_result.seat_results)
+        # Signal-ignorant comparison: only human seat switches policy
+        ignorant_result = draft_runner.run_draft(
+            cfg, run_seed, human_seat_policy="signal_ignorant"
+        )
+        ignorant_all_dvs.append(ignorant_result.seat_results[0].deck_value)
         comparison_done += 1
         if not quiet:
             print(

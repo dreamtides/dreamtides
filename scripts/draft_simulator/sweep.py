@@ -229,19 +229,19 @@ def _run_comparison_drafts(
 
     Returns (force_deck_values, ignorant_deck_values, aware_deck_values).
     Force deck values maps archetype index to list of per-seat deck values.
-    Ignorant/aware deck values are lists of per-seat deck values.
+    Ignorant/aware deck values are seat 0 only (human seat) deck values.
     """
     archetype_count = point_cfg.cards.archetype_count
 
-    # Signal-ignorant comparison: run with signal_ignorant policy
-    ignorant_cfg = config.clone_config(point_cfg)
-    ignorant_cfg.agents.policy = "signal_ignorant"
-    ignorant_result = draft_runner.run_draft(ignorant_cfg, seed)
-    ignorant_dvs = [sr.deck_value for sr in ignorant_result.seat_results]
+    # Signal-ignorant comparison: only human seat switches policy
+    ignorant_result = draft_runner.run_draft(
+        point_cfg, seed, human_seat_policy="signal_ignorant"
+    )
+    ignorant_dvs = [ignorant_result.seat_results[0].deck_value]
 
-    # Signal-aware (adaptive) comparison values
+    # Signal-aware (adaptive) comparison: collect seat 0 only
     aware_result = draft_runner.run_draft(point_cfg, seed)
-    aware_dvs = [sr.deck_value for sr in aware_result.seat_results]
+    aware_dvs = [aware_result.seat_results[0].deck_value]
 
     # Forceability: run with force policy for each archetype
     force_dvs: dict[int, list[float]] = {}
