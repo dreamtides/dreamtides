@@ -12,10 +12,13 @@ import sys
 import traceback
 
 import card_generator
+import commitment
 import config
 import cube_manager
+import deck_scorer
 import pack_generator
-from draft_models import CubeConsumptionMode, Pack
+from config import SimulatorConfig
+from draft_models import CardDesign, CubeConsumptionMode, Pack
 
 VERSION = "0.1.0"
 
@@ -127,6 +130,12 @@ def main() -> None:
         pack = pack_generator.generate_pack(strategy, demo_cube, cfg, rng)
         _print_pack(pack, strategy_labels[strategy], cfg.cards.archetype_count)
 
+    # Demonstrate deck value scoring
+    _demo_deck_scoring(cards, cfg, rng)
+
+    # Demonstrate commitment detection
+    _demo_commitment_detection(cards, cfg, rng)
+
 
 def _print_pack(pack: Pack, label: str, archetype_count: int) -> None:
     """Print pack contents for QA inspection."""
@@ -145,6 +154,132 @@ def _print_pack(pack: Pack, label: str, archetype_count: int) -> None:
         )
     profile_str = ", ".join(f"{v:.3f}" for v in pack.archetype_profile)
     print(f"  Archetype profile: [{profile_str}]")
+
+
+def _demo_deck_scoring(
+    cards: list[CardDesign],
+    cfg: SimulatorConfig,
+    rng: random.Random,
+) -> None:
+    """Generate a synthetic pool, build a preference vector, and print scoring."""
+    pool_size = 30
+    pool = rng.sample(cards, min(pool_size, len(cards)))
+
+    # Build a plausible preference vector by simulating picks
+    w = commitment.initial_preference_vector(cfg.cards.archetype_count)
+    for card in pool:
+        w = commitment.update_preference_vector(
+            w, card.fitness, cfg.agents.learning_rate
+        )
+
+    raw, coherence, focus, final = deck_scorer.deck_value_breakdown(
+        pool, w, cfg.scoring
+    )
+
+    print("\n--- Deck Value Scoring ---")
+    print(f"  Pool size: {len(pool)}")
+    print(f"  Effective archetype: {_argmax(w)}")
+    print(f"  Raw power:            {raw:.4f}")
+    print(f"  Archetype coherence:  {coherence:.4f}")
+    print(f"  Focus bonus:          {focus:.4f}")
+    print(f"  Final score:          {final:.4f}")
+
+    # Verify weighted sum
+    weighted = (
+        cfg.scoring.weight_power * raw
+        + cfg.scoring.weight_coherence * coherence
+        + cfg.scoring.weight_focus * focus
+    )
+    print(
+        f"  Weighted sum (before clamp): {weighted:.4f} "
+        f"(weights: {cfg.scoring.weight_power}/{cfg.scoring.weight_coherence}"
+        f"/{cfg.scoring.weight_focus})"
+    )
+
+
+def _demo_commitment_detection(
+    cards: list[CardDesign],
+    cfg: SimulatorConfig,
+    rng: random.Random,
+) -> None:
+    """Simulate a sequence of picks and run commitment detection.
+
+    Uses an archetype-biased pick strategy to demonstrate commitment:
+    picks cards with higher fitness for the agent's best archetype,
+    similar to how a real agent would draft.
+    """
+    pool_size = 30
+
+    # Build w history by simulating biased picks from the card pool
+    w = commitment.initial_preference_vector(cfg.cards.archetype_count)
+    w_history: list[list[float]] = [list(w)]
+    available = list(cards)
+    picked: list[CardDesign] = []
+
+    for _ in range(pool_size):
+        if not available:
+            break
+        # Score candidates by fitness for current best archetype + power
+        best_arch = _argmax(w)
+        scored = [(c.fitness[best_arch] + 0.3 * c.power, c) for c in available]
+        scored.sort(key=lambda x: x[0], reverse=True)
+        # Pick from top candidates with some randomness
+        top_k = min(5, len(scored))
+        pick_idx = rng.randint(0, top_k - 1)
+        card = scored[pick_idx][1]
+        picked.append(card)
+        available.remove(card)
+        w = commitment.update_preference_vector(
+            w, card.fitness, cfg.agents.learning_rate
+        )
+        w_history.append(list(w))
+
+    result = commitment.detect_commitment(w_history, cfg.commitment)
+
+    print("\n--- Commitment Detection ---")
+    print(f"  Picks simulated: {len(picked)}")
+    print(f"  Threshold: {cfg.commitment.commitment_threshold}")
+    print(f"  Stability window: {cfg.commitment.stability_window}")
+
+    print(f"\n  Primary (concentration-based):")
+    if result.commitment_pick is not None:
+        print(f"    Commitment pick: {result.commitment_pick}")
+        print(f"    Committed archetype: {result.committed_archetype}")
+        w_at_pick = w_history[result.commitment_pick]
+        print(f"    Concentration at pick: {commitment.concentration(w_at_pick):.4f}")
+    else:
+        print("    Commitment pick: None (uncommitted)")
+
+    print(f"\n  Secondary (entropy-based):")
+    print(f"    Entropy threshold: {cfg.commitment.entropy_threshold} bits")
+    if result.entropy_commitment_pick is not None:
+        print(f"    Entropy commitment pick: {result.entropy_commitment_pick}")
+        print(f"    Entropy committed archetype: {result.entropy_committed_archetype}")
+        w_at_pick = w_history[result.entropy_commitment_pick]
+        print(f"    Entropy at pick: {commitment.shannon_entropy(w_at_pick):.4f} bits")
+    else:
+        print("    Entropy commitment pick: None (uncommitted)")
+
+    # Also demonstrate None case with uniform w history
+    print("\n  Uniform w test (should be uncommitted):")
+    uniform_history = [
+        commitment.initial_preference_vector(cfg.cards.archetype_count)
+        for _ in range(pool_size + 1)
+    ]
+    uniform_result = commitment.detect_commitment(uniform_history, cfg.commitment)
+    print(f"    Commitment pick: {uniform_result.commitment_pick}")
+    print(f"    Entropy commitment pick: {uniform_result.entropy_commitment_pick}")
+
+
+def _argmax(values: list[float]) -> int:
+    """Return the index of the maximum value."""
+    best_index = 0
+    best_value = values[0]
+    for i in range(1, len(values)):
+        if values[i] > best_value:
+            best_value = values[i]
+            best_index = i
+    return best_index
 
 
 def _run_with_error_handling() -> None:
