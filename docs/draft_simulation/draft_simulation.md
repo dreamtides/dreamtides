@@ -243,16 +243,17 @@ same `argmax(w)` for the next `stability_window` picks.
 **Entropy-based (secondary)**: same structure, using
 `shannon_entropy(normalized_w) < entropy_threshold` as the trigger condition.
 
-Default `commitment_threshold` is `0.35`, `stability_window` is `3`. With
-default parameters (`learning_rate=3.0`, `ai_pref_weight=0.6`) and `adaptive`
-policy, real commit picks cluster in picks 4-8. If you observe zero or near-zero
-commitment rates, the threshold is too high relative to how fast `w`
-concentrates under your card pool and learning rate.
+Default `commitment_threshold` is `0.15`, `stability_window` is `7`. The
+threshold of 0.15 is trivially exceeded after any pick (initial concentration =
+0.125), so `stability_window` is the primary timing control: commitment fires
+when 8 consecutive picks favor the same archetype. With default parameters
+(`learning_rate=3.0`, `ai_pref_weight=0.6`) and `adaptive` policy, real commit
+picks cluster in picks 4-8 with ~5% uncommitted rate.
 
 **Calibration warning**: if commitment rates are low, run `sweep` mode and check
 the validation output — the commitment timing check targets mean pick in [4, 8]
-and uncommitted rate below 10%. If the check fails, lower `commitment_threshold`
-(try 0.25) or increase `agents.learning_rate`.
+and uncommitted rate below 10%. If the check fails, lower `stability_window` or
+increase `agents.learning_rate`.
 
 ## Metrics
 

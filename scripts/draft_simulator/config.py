@@ -61,7 +61,7 @@ class CardsConfig:
     source: str = "synthetic"
     file_path: Optional[str] = None
     archetype_count: int = 8
-    cards_per_archetype: int = 45
+    cards_per_archetype: int = 55
     bridge_fraction: float = 0.15
 
 
@@ -97,8 +97,8 @@ class ScoringConfig:
 class CommitmentConfig:
     """Commitment detection parameters."""
 
-    commitment_threshold: float = 0.35
-    stability_window: int = 3
+    commitment_threshold: float = 0.15
+    stability_window: int = 7
     entropy_threshold: float = 2.0
 
 
@@ -108,7 +108,7 @@ class MetricsConfig:
 
     richness_gap: float = 0.1
     tau: float = 1.0
-    on_plan_threshold: float = 0.5
+    on_plan_threshold: float = 0.3
     splash_power_threshold: float = 0.5
     splash_flex_threshold: float = 0.6
     exposure_threshold: float = 0.5
