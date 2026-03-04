@@ -8,6 +8,7 @@ external dependencies.
 """
 
 import argparse
+import json
 import random
 import sys
 import traceback
@@ -157,6 +158,22 @@ def _run_single(
             f"{label:<35s} deck_value={sr.deck_value:.3f}, "
             f"archetype={archetype}, committed={commit_str}"
         )
+
+    if trace_enabled and result.traces:
+        print(f"\nTraces ({len(result.traces)} picks):")
+        for trace in result.traces:
+            trace_dict = {
+                "round": trace.round_index,
+                "pick": trace.pick_index,
+                "seat": trace.seat_index,
+                "pack_id": trace.pack_id,
+                "pack_card_ids": trace.pack_card_ids,
+                "shown_card_ids": trace.shown_card_ids,
+                "chosen_card_id": trace.chosen_card_id,
+                "agent_w": [round(v, 4) for v in trace.agent_w_snapshot],
+                "card_score": round(trace.card_score, 4),
+            }
+            print(json.dumps(trace_dict))
 
 
 def _run_demo(cfg: SimulatorConfig, seed: int) -> None:

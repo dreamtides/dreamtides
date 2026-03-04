@@ -75,6 +75,7 @@ class AgentsConfig:
     ai_signal_weight: float = 0.2
     openness_window: int = 3
     learning_rate: float = 1.0
+    force_archetype: Optional[int] = None
 
 
 @dataclass
@@ -164,6 +165,16 @@ def _coerce_value(current: Any, raw: str) -> Any:
     if isinstance(current, dict):
         return json.loads(raw)
     if current is None:
+        if raw.lower() in ("none", "null"):
+            return None
+        try:
+            return int(raw)
+        except ValueError:
+            pass
+        try:
+            return float(raw)
+        except ValueError:
+            pass
         return raw
     return raw
 
@@ -360,6 +371,10 @@ def validate_config(cfg: SimulatorConfig) -> None:
         0.0,
         1.0,
     )
+
+    # Force policy requires force_archetype
+    if cfg.agents.policy == "force" and cfg.agents.force_archetype is None:
+        errors.append("agents.policy='force' requires agents.force_archetype to be set")
 
     # Positive integer checks
     if cfg.draft.seat_count < 2:

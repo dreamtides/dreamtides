@@ -143,6 +143,7 @@ def run_draft(
                     cfg.agents,
                     cfg.scoring,
                     seat_rng,
+                    force_archetype=cfg.agents.force_archetype,
                 )
 
                 if trace_enabled:
@@ -162,10 +163,15 @@ def run_draft(
 
                 pack.cards.remove(chosen)
 
+                # Use the cards the seat actually saw (minus the chosen
+                # card) for the openness update: shown subset for the
+                # human seat, full pack for AI seats.
+                visible_remaining = [c for c in shown if c is not chosen]
+
                 agents.update_agent_after_pick(
                     agent,
                     chosen,
-                    pack.cards,
+                    visible_remaining,
                     global_pick_index,
                     round_idx,
                     pack.pack_id,
@@ -292,7 +298,10 @@ def _compute_trace_score(
         best = argmax(agent.w)
         return card.design.fitness[best]
     elif policy == "force":
-        return card.design.fitness[0]
+        arch = (
+            cfg.agents.force_archetype if cfg.agents.force_archetype is not None else 0
+        )
+        return card.design.fitness[arch]
     return 0.0
 
 
