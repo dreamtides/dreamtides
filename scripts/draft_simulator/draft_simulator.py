@@ -17,6 +17,7 @@ import traceback
 
 import agents
 import card_generator
+import colors
 import commitment
 import config
 import cube_manager
@@ -157,23 +158,30 @@ def _print_header(
     preset: str | None = None,
 ) -> None:
     """Print the richer header with configuration info."""
-    line1 = f"Draft Simulator v{VERSION} | seed={seed}"
+    line1 = (
+        f"{colors.header(f'Draft Simulator v{VERSION}')} | "
+        f"{colors.label('seed')}={colors.num(seed)}"
+    )
     if runs > 1:
-        line1 += f" | runs={runs}"
+        line1 += f" | {colors.label('runs')}={colors.num(runs)}"
     print(line1)
     print(
-        f"  seats={cfg.draft.seat_count}, rounds={cfg.draft.round_count}, "
-        f"pack_size={cfg.draft.pack_size}, show_n={cfg.agents.show_n}"
+        f"  {colors.label('seats')}={colors.num(cfg.draft.seat_count)}, "
+        f"{colors.label('rounds')}={colors.num(cfg.draft.round_count)}, "
+        f"{colors.label('pack_size')}={colors.num(cfg.draft.pack_size)}, "
+        f"{colors.label('show_n')}={colors.num(cfg.agents.show_n)}"
     )
     print(
-        f"  policy={cfg.agents.policy}, "
-        f"show_n_strategy={cfg.agents.show_n_strategy}, "
-        f"ai_optimality={cfg.agents.ai_optimality:.2f}"
+        f"  {colors.label('policy')}={colors.c(cfg.agents.policy, 'special')}, "
+        f"{colors.label('show_n_strategy')}="
+        f"{colors.c(cfg.agents.show_n_strategy, 'special')}, "
+        f"{colors.label('ai_optimality')}={colors.num(f'{cfg.agents.ai_optimality:.2f}')}"
     )
     preset_str = preset if preset is not None else "none"
     print(
-        f"  preset={preset_str}, refill={cfg.refill.strategy}, "
-        f"archetypes={cfg.cards.archetype_count}"
+        f"  {colors.label('preset')}={colors.c(preset_str, 'special')}, "
+        f"{colors.label('refill')}={colors.c(cfg.refill.strategy, 'special')}, "
+        f"{colors.label('archetypes')}={colors.num(cfg.cards.archetype_count)}"
     )
 
 
@@ -222,9 +230,9 @@ def _run_single_once(
         policy = cfg.agents.policy
 
         if sr.commitment_pick is not None:
-            commit_str = f"pick {sr.commitment_pick}"
+            commit_str = f"pick {colors.num(sr.commitment_pick)}"
         else:
-            commit_str = "uncommitted"
+            commit_str = colors.dim("uncommitted")
 
         archetype = (
             sr.committed_archetype
@@ -232,10 +240,14 @@ def _run_single_once(
             else argmax(sr.final_w)
         )
 
-        label = f"Seat {seat_idx} ({seat_type}, {policy}):"
+        seat_type_str = (
+            colors.c(seat_type, "tag") if is_human else colors.dim(seat_type)
+        )
+        label = f"Seat {colors.num(seat_idx)} ({seat_type_str}, {policy}):"
         print(
-            f"{label:<35s} deck_value={sr.deck_value:.3f}, "
-            f"archetype={archetype}, committed={commit_str}"
+            f"{label:<35s} {colors.label('deck_value')}={colors.num(f'{sr.deck_value:.3f}')}, "
+            f"{colors.label('archetype')}={colors.c(archetype, 'operator')}, "
+            f"{colors.label('committed')}={commit_str}"
         )
 
     draft_metrics = metrics.compute_metrics(result, cfg)
@@ -285,11 +297,8 @@ def _run_single_multi(
 
         # Progress bar on stderr
         done = run_i + 1
-        bar_width = 40
-        filled = int(bar_width * done / runs)
-        bar = "=" * filled + " " * (bar_width - filled)
         print(
-            f"\r[{bar}] {done}/{runs} runs complete",
+            colors.format_progress_bar(done, runs, use_color=sys.stderr.isatty()),
             end="",
             file=sys.stderr,
         )
@@ -313,18 +322,23 @@ def _run_single_multi(
         uncommitted_count = arch_counts.get(None, 0)
 
         if uncommitted_count > runs / 2:
-            commit_str = "uncommitted"
+            commit_str = colors.dim("uncommitted")
         else:
             valid_picks = [p for p in seat_commitment_picks[seat_idx] if p is not None]
             mean_pick = sum(valid_picks) / len(valid_picks) if valid_picks else 0
-            commit_str = f"pick {mean_pick:.1f}"
+            commit_str = f"pick {colors.num(f'{mean_pick:.1f}')}"
 
         archetype = most_common_arch if most_common_arch is not None else "?"
 
-        label = f"Seat {seat_idx} ({seat_type}, {policy}):"
+        seat_type_str = (
+            colors.c(seat_type, "tag") if is_human else colors.dim(seat_type)
+        )
+        seat_label = f"Seat {colors.num(seat_idx)} ({seat_type_str}, {policy}):"
         print(
-            f"{label:<35s} deck_value={mean_dv:.3f}, "
-            f"archetype={archetype}, committed={commit_str}"
+            f"{seat_label:<35s} {colors.label('deck_value')}="
+            f"{colors.num(f'{mean_dv:.3f}')}, "
+            f"{colors.label('archetype')}={colors.c(archetype, 'operator')}, "
+            f"{colors.label('committed')}={commit_str}"
         )
 
     averaged = metrics.average_metrics(all_metrics)
@@ -343,7 +357,7 @@ def _run_trace(
     result = draft_runner.run_draft(cfg, seed, trace_enabled=True)
 
     trace_path = output.write_trace_json(output_dir, result.traces, seed)
-    print(f"Per-pick trace written to: {trace_path}")
+    print(f"{colors.label('Per-pick trace written to:')} {colors.filepath(trace_path)}")
 
 
 def _run_sweep(
@@ -363,10 +377,15 @@ def _run_sweep(
     agg_path = output.write_aggregate_csv(output_dir, aggregate_records)
     meta_path = output.write_config_metadata(output_dir, cfg)
 
-    print(f"\nResults written to:")
-    print(f"  {run_path:<40s} ({len(run_records)} rows)")
-    print(f"  {agg_path:<40s} ({len(aggregate_records)} rows)")
-    print(f"  {meta_path}")
+    print(f"\n{colors.section('Results written to:')}")
+    print(
+        f"  {colors.filepath(f'{run_path:<40s}')} ({colors.num(len(run_records))} rows)"
+    )
+    print(
+        f"  {colors.filepath(f'{agg_path:<40s}')} "
+        f"({colors.num(len(aggregate_records))} rows)"
+    )
+    print(f"  {colors.filepath(meta_path)}")
 
     report = validation.run_validation(aggregate_records, run_records)
     print(validation.format_validation_report(report))
@@ -377,10 +396,11 @@ def _run_demo(cfg: SimulatorConfig, seed: int) -> None:
     rng = random.Random(seed)
 
     print(
-        f"Draft Simulator v{VERSION} | seed={seed} "
-        f"| seats={cfg.draft.seat_count} "
-        f"| rounds={cfg.draft.round_count} "
-        f"| pack_size={cfg.draft.pack_size}"
+        f"{colors.header(f'Draft Simulator v{VERSION}')} | "
+        f"{colors.label('seed')}={colors.num(seed)} "
+        f"| {colors.label('seats')}={colors.num(cfg.draft.seat_count)} "
+        f"| {colors.label('rounds')}={colors.num(cfg.draft.round_count)} "
+        f"| {colors.label('pack_size')}={colors.num(cfg.draft.pack_size)}"
     )
 
     cards = card_generator.generate_cards(cfg, rng)
@@ -388,7 +408,7 @@ def _run_demo(cfg: SimulatorConfig, seed: int) -> None:
     source_label = (
         f"file ({cfg.cards.file_path})" if cfg.cards.source == "file" else "synthetic"
     )
-    print(f"\nCard source: {source_label}")
+    print(f"\n{colors.label('Card source:')} {colors.c(source_label, 'special')}")
 
     card_generator.print_card_pool_stats(cards, cfg.cards.archetype_count)
 
@@ -428,23 +448,27 @@ def _run_demo(cfg: SimulatorConfig, seed: int) -> None:
     _demo_show_n_strategies(cards, cfg, consumption_mode, rng)
 
 
-def _print_pack(pack: Pack, label: str, archetype_count: int) -> None:
+def _print_pack(pack: Pack, pack_label: str, archetype_count: int) -> None:
     """Print pack contents for QA inspection."""
-    print(f"\n--- {label} Pack (id={pack.pack_id}) ---")
-    print(f"  Cards ({len(pack.cards)}):")
-    for card in pack.cards:
+    print(
+        f"\n{colors.section(f'--- {pack_label} Pack')} "
+        f"({colors.label('id')}={colors.num(pack.pack_id)}) ---"
+    )
+    print(f"  {colors.label('Cards')} ({colors.num(len(pack.cards))}):")
+    for card_inst in pack.cards:
         top_arch = 0
-        top_val = card.design.fitness[0] if card.design.fitness else 0.0
-        for i in range(1, min(len(card.design.fitness), archetype_count)):
-            if card.design.fitness[i] > top_val:
-                top_val = card.design.fitness[i]
+        top_val = card_inst.design.fitness[0] if card_inst.design.fitness else 0.0
+        for i in range(1, min(len(card_inst.design.fitness), archetype_count)):
+            if card_inst.design.fitness[i] > top_val:
+                top_val = card_inst.design.fitness[i]
                 top_arch = i
         print(
-            f"    {card.design.name:<30s} "
-            f"top_arch={top_arch}  power={card.design.power:.3f}"
+            f"    {colors.card(f'{card_inst.design.name:<30s}')} "
+            f"{colors.label('top_arch')}={colors.c(top_arch, 'operator')}  "
+            f"{colors.label('power')}={colors.num(f'{card_inst.design.power:.3f}')}"
         )
-    profile_str = ", ".join(f"{v:.3f}" for v in pack.archetype_profile)
-    print(f"  Archetype profile: [{profile_str}]")
+    profile_str = ", ".join(f"{colors.num(f'{v:.3f}')}" for v in pack.archetype_profile)
+    print(f"  {colors.label('Archetype profile:')} [{profile_str}]")
 
 
 def _demo_deck_scoring(
@@ -466,13 +490,13 @@ def _demo_deck_scoring(
         pool, w, cfg.scoring
     )
 
-    print("\n--- Deck Value Scoring ---")
-    print(f"  Pool size: {len(pool)}")
-    print(f"  Effective archetype: {argmax(w)}")
-    print(f"  Raw power:            {raw:.4f}")
-    print(f"  Archetype coherence:  {coherence:.4f}")
-    print(f"  Focus bonus:          {focus:.4f}")
-    print(f"  Final score:          {final:.4f}")
+    print(f"\n{colors.section('--- Deck Value Scoring ---')}")
+    print(f"  {colors.label('Pool size:')} {colors.num(len(pool))}")
+    print(f"  {colors.label('Effective archetype:')} {colors.c(argmax(w), 'operator')}")
+    print(f"  {colors.label('Raw power:')}            {colors.num(f'{raw:.4f}')}")
+    print(f"  {colors.label('Archetype coherence:')}  {colors.num(f'{coherence:.4f}')}")
+    print(f"  {colors.label('Focus bonus:')}          {colors.num(f'{focus:.4f}')}")
+    print(f"  {colors.label('Final score:')}          {colors.num(f'{final:.4f}')}")
 
     weighted = (
         cfg.scoring.weight_power * raw
@@ -480,9 +504,12 @@ def _demo_deck_scoring(
         + cfg.scoring.weight_focus * focus
     )
     print(
-        f"  Weighted sum (before clamp): {weighted:.4f} "
-        f"(weights: {cfg.scoring.weight_power}/{cfg.scoring.weight_coherence}"
-        f"/{cfg.scoring.weight_focus})"
+        f"  {colors.label('Weighted sum (before clamp):')} "
+        f"{colors.num(f'{weighted:.4f}')} "
+        f"({colors.label('weights:')} "
+        f"{colors.num(cfg.scoring.weight_power)}/"
+        f"{colors.num(cfg.scoring.weight_coherence)}/"
+        f"{colors.num(cfg.scoring.weight_focus)})"
     )
 
 
@@ -517,44 +544,85 @@ def _demo_commitment_detection(
 
     result = commitment.detect_commitment(w_history, cfg.commitment)
 
-    print("\n--- Commitment Detection ---")
-    print(f"  Picks simulated: {len(picked)}")
-    print(f"  Threshold: {cfg.commitment.commitment_threshold}")
-    print(f"  Stability window: {cfg.commitment.stability_window}")
+    print(f"\n{colors.section('--- Commitment Detection ---')}")
+    print(f"  {colors.label('Picks simulated:')} {colors.num(len(picked))}")
+    print(
+        f"  {colors.label('Threshold:')} "
+        f"{colors.num(cfg.commitment.commitment_threshold)}"
+    )
+    print(
+        f"  {colors.label('Stability window:')} "
+        f"{colors.num(cfg.commitment.stability_window)}"
+    )
 
-    print(f"\n  Primary (concentration-based):")
+    print(f"\n  {colors.label('Primary (concentration-based):')}")
     if result.commitment_pick is not None:
-        print(f"    Commitment pick: {result.commitment_pick}")
-        print(f"    Committed archetype: {result.committed_archetype}")
+        print(
+            f"    {colors.label('Commitment pick:')} "
+            f"{colors.num(result.commitment_pick)}"
+        )
+        print(
+            f"    {colors.label('Committed archetype:')} "
+            f"{colors.c(result.committed_archetype, 'operator')}"
+        )
         w_at_pick = w_history[result.commitment_pick]
-        print(f"    Concentration at pick: {commitment.concentration(w_at_pick):.4f}")
+        print(
+            f"    {colors.label('Concentration at pick:')} "
+            f"{colors.num(f'{commitment.concentration(w_at_pick):.4f}')}"
+        )
     else:
-        print("    Commitment pick: None (uncommitted)")
+        print(
+            f"    {colors.label('Commitment pick:')} {colors.dim('None (uncommitted)')}"
+        )
 
-    print(f"\n  Secondary (entropy-based):")
-    print(f"    Entropy threshold: {cfg.commitment.entropy_threshold} bits")
+    print(f"\n  {colors.label('Secondary (entropy-based):')}")
+    print(
+        f"    {colors.label('Entropy threshold:')} "
+        f"{colors.num(f'{cfg.commitment.entropy_threshold} bits')}"
+    )
     if result.entropy_commitment_pick is not None:
-        print(f"    Entropy commitment pick: {result.entropy_commitment_pick}")
-        print(f"    Entropy committed archetype: {result.entropy_committed_archetype}")
+        print(
+            f"    {colors.label('Entropy commitment pick:')} "
+            f"{colors.num(result.entropy_commitment_pick)}"
+        )
+        print(
+            f"    {colors.label('Entropy committed archetype:')} "
+            f"{colors.c(result.entropy_committed_archetype, 'operator')}"
+        )
         w_at_pick = w_history[result.entropy_commitment_pick]
-        print(f"    Entropy at pick: {commitment.shannon_entropy(w_at_pick):.4f} bits")
+        print(
+            f"    {colors.label('Entropy at pick:')} "
+            f"{colors.num(f'{commitment.shannon_entropy(w_at_pick):.4f} bits')}"
+        )
     else:
-        print("    Entropy commitment pick: None (uncommitted)")
+        print(
+            f"    {colors.label('Entropy commitment pick:')} "
+            f"{colors.dim('None (uncommitted)')}"
+        )
 
-    print("\n  Uniform w test (should be uncommitted):")
+    print(f"\n  {colors.label('Uniform w test (should be uncommitted):')}")
     uniform_history = [
         commitment.initial_preference_vector(cfg.cards.archetype_count)
         for _ in range(pool_size)
     ]
     uniform_result = commitment.detect_commitment(uniform_history, cfg.commitment)
-    print(f"    Commitment pick: {uniform_result.commitment_pick}")
-    print(f"    Entropy commitment pick: {uniform_result.entropy_commitment_pick}")
+    print(
+        f"    {colors.label('Commitment pick:')} "
+        f"{colors.num(uniform_result.commitment_pick)}"
+    )
+    print(
+        f"    {colors.label('Entropy commitment pick:')} "
+        f"{colors.num(uniform_result.entropy_commitment_pick)}"
+    )
 
 
-def _print_pack_composition(label: str, pack: Pack) -> None:
+def _print_pack_composition(comp_label: str, pack: Pack) -> None:
     """Print the card names in a pack for QA inspection."""
-    names = [c.design.name for c in pack.cards]
-    print(f"  {label} ({len(names)} cards): {', '.join(names)}")
+    names = [colors.card(inst.design.name) for inst in pack.cards]
+    print(
+        f"  {colors.label(comp_label)} ({colors.num(len(pack.cards))} cards): "
+        f"{', '.join(names)}"
+    )
 
 
 def _demo_refill_strategies(
@@ -564,7 +632,7 @@ def _demo_refill_strategies(
     rng: random.Random,
 ) -> None:
     """Demonstrate each refill strategy on a sample pack."""
-    print("\n=== Refill Strategy Demonstrations ===")
+    print(f"\n{colors.section('=== Refill Strategy Demonstrations ===')}")
 
     def _fresh_pack() -> tuple[cube_manager.CubeManager, Pack]:
         c = cube_manager.CubeManager(
@@ -575,27 +643,33 @@ def _demo_refill_strategies(
         p = pack_generator.generate_pack("uniform", c, cfg, rng)
         return c, p
 
-    print("\n--- NoRefill ---")
+    print(f"\n{colors.section('--- NoRefill ---')}")
     _, no_refill_pack = _fresh_pack()
     _print_pack_composition("Pack before", no_refill_pack)
     result = refill.no_refill()
-    print(f"  Refill card: None (no card added)")
+    print(f"  {colors.label('Refill card:')} {colors.dim('None (no card added)')}")
     _print_pack_composition("Pack after", no_refill_pack)
-    print(f"  Pack size before: {len(no_refill_pack.cards)}")
-    print(f"  Pack size after:  {len(no_refill_pack.cards)}")
+    print(
+        f"  {colors.label('Pack size before:')} {colors.num(len(no_refill_pack.cards))}"
+    )
+    print(
+        f"  {colors.label('Pack size after:')}  {colors.num(len(no_refill_pack.cards))}"
+    )
 
-    print("\n--- UniformRefill ---")
+    print(f"\n{colors.section('--- UniformRefill ---')}")
     uniform_cube, uniform_pack = _fresh_pack()
     _print_pack_composition("Pack before", uniform_pack)
     size_before = len(uniform_pack.cards)
     uniform_card = refill.uniform_refill(uniform_cube, rng)
     uniform_pack.cards.append(uniform_card)
-    print(f"  Refill card: {uniform_card.design.name}")
+    print(f"  {colors.label('Refill card:')} {colors.card(uniform_card.design.name)}")
     _print_pack_composition("Pack after", uniform_pack)
-    print(f"  Pack size before: {size_before}")
-    print(f"  Pack size after:  {len(uniform_pack.cards)}")
+    print(f"  {colors.label('Pack size before:')} {colors.num(size_before)}")
+    print(
+        f"  {colors.label('Pack size after:')}  {colors.num(len(uniform_pack.cards))}"
+    )
 
-    print("\n--- ConstrainedRefill ---")
+    print(f"\n{colors.section('--- ConstrainedRefill ---')}")
     constrained_cube, constrained_pack = _fresh_pack()
     _print_pack_composition("Pack before", constrained_pack)
     size_before = len(constrained_pack.cards)
@@ -603,13 +677,19 @@ def _demo_refill_strategies(
     if cfg.refill.fingerprint_source == "round_environment":
         all_packs = [constrained_pack]
         signal = refill.compute_round_environment_profile(all_packs)
-        print(f"  Fingerprint source: round_environment")
+        print(
+            f"  {colors.label('Fingerprint source:')} "
+            f"{colors.c('round_environment', 'special')}"
+        )
     else:
         signal = constrained_pack.archetype_profile
-        print(f"  Fingerprint source: pack_origin")
+        print(
+            f"  {colors.label('Fingerprint source:')} "
+            f"{colors.c('pack_origin', 'special')}"
+        )
 
-    signal_str = ", ".join(f"{v:.4f}" for v in signal)
-    print(f"  Signal vector: [{signal_str}]")
+    signal_str = ", ".join(f"{colors.num(f'{v:.4f}')}" for v in signal)
+    print(f"  {colors.label('Signal vector:')} [{signal_str}]")
 
     constrained_card = refill.constrained_refill(
         cube=constrained_cube,
@@ -620,16 +700,25 @@ def _demo_refill_strategies(
     )
     constrained_pack.cards.append(constrained_card)
     similarity = refill.cosine_similarity(constrained_card.design.fitness, signal)
-    print(f"  Refill card: {constrained_card.design.name}")
-    print(f"  Cosine similarity to signal: {similarity:.4f}")
+    print(
+        f"  {colors.label('Refill card:')} "
+        f"{colors.card(constrained_card.design.name)}"
+    )
+    print(
+        f"  {colors.label('Cosine similarity to signal:')} "
+        f"{colors.num(f'{similarity:.4f}')}"
+    )
     _print_pack_composition("Pack after", constrained_pack)
-    print(f"  Pack size before: {size_before}")
-    print(f"  Pack size after:  {len(constrained_pack.cards)}")
+    print(f"  {colors.label('Pack size before:')} {colors.num(size_before)}")
+    print(
+        f"  {colors.label('Pack size after:')}  "
+        f"{colors.num(len(constrained_pack.cards))}"
+    )
 
-    print("\n  Round environment profile (across all demo packs):")
+    print(f"\n  {colors.label('Round environment profile (across all demo packs):')}")
     demo_packs = [uniform_pack, constrained_pack]
     round_env = refill.compute_round_environment_profile(demo_packs)
-    env_str = ", ".join(f"{v:.4f}" for v in round_env)
+    env_str = ", ".join(f"{colors.num(f'{v:.4f}')}" for v in round_env)
     print(f"    [{env_str}]")
 
 
@@ -647,8 +736,11 @@ def _demo_pick_policies(
     )
     pack = pack_generator.generate_pack("uniform", demo_cube, cfg, rng)
 
-    print(f"\n--- Pick Policy Demonstrations (pack_id={pack.pack_id}) ---")
-    print(f"  Pack contains {len(pack.cards)} cards")
+    print(
+        f"\n{colors.section('--- Pick Policy Demonstrations')} "
+        f"({colors.label('pack_id')}={colors.num(pack.pack_id)}) ---"
+    )
+    print(f"  {colors.label('Pack contains')} {colors.num(len(pack.cards))} cards")
 
     policies = [
         ("greedy", "Greedy"),
@@ -678,17 +770,18 @@ def _demo_pick_policies(
         top_fit = pick.design.fitness[top_arch]
 
         print(
-            f"\n  {policy_label}:"
-            f"\n    Selected: {pick.design.name}"
-            f"  (power={pick.design.power:.3f}, "
-            f"top_fitness[{top_arch}]={top_fit:.3f})"
-            f"\n    Score: {score:.4f}"
+            f"\n  {colors.label(f'{policy_label}:')}"
+            f"\n    {colors.label('Selected:')} {colors.card(pick.design.name)}"
+            f"  ({colors.label('power')}={colors.num(f'{pick.design.power:.3f}')}, "
+            f"{colors.label(f'top_fitness[{top_arch}]')}="
+            f"{colors.num(f'{top_fit:.3f}')})"
+            f"\n    {colors.label('Score:')} {colors.num(f'{score:.4f}')}"
         )
 
         if policy_key == "force" and force_arch is not None:
             print(
-                f"    Force archetype {force_arch} fitness: "
-                f"{pick.design.fitness[force_arch]:.3f}"
+                f"    {colors.label(f'Force archetype {force_arch} fitness:')} "
+                f"{colors.num(f'{pick.design.fitness[force_arch]:.3f}')}"
             )
 
 
@@ -732,9 +825,18 @@ def _demo_show_n_strategies(
     human_w = commitment.initial_preference_vector(cfg.cards.archetype_count)
     human_w[0] = 2.0
 
-    print(f"\n--- Show-N Strategy Demonstrations (pack_id={pack.pack_id}) ---")
-    print(f"  Pack contains {len(pack.cards)} cards, show_n={cfg.agents.show_n}")
-    print(f"  Human best archetype: {argmax(human_w)}")
+    print(
+        f"\n{colors.section('--- Show-N Strategy Demonstrations')} "
+        f"({colors.label('pack_id')}={colors.num(pack.pack_id)}) ---"
+    )
+    print(
+        f"  {colors.label('Pack contains')} {colors.num(len(pack.cards))} cards, "
+        f"{colors.label('show_n')}={colors.num(cfg.agents.show_n)}"
+    )
+    print(
+        f"  {colors.label('Human best archetype:')} "
+        f"{colors.c(argmax(human_w), 'operator')}"
+    )
 
     strategy_labels = {
         "uniform": "Uniform",
@@ -753,22 +855,27 @@ def _demo_show_n_strategies(
             human_w=human_w,
         )
 
-        print(f"\n  {strategy_label} ({len(selected)} cards):")
+        print(
+            f"\n  {colors.label(f'{strategy_label}')} "
+            f"({colors.num(len(selected))} cards):"
+        )
 
-        for card in selected:
-            top_arch = argmax(card.design.fitness)
-            fitness_for_best = card.design.fitness[argmax(human_w)]
-            label = ""
+        for card_item in selected:
+            top_arch = argmax(card_item.design.fitness)
+            fitness_for_best = card_item.design.fitness[argmax(human_w)]
+            tag = ""
             if strategy_key == "curated":
                 if fitness_for_best >= 0.6:
-                    label = " [on-plan]"
-                elif fitness_for_best < 0.3 and card.design.power >= 0.5:
-                    label = " [off-plan strong]"
+                    tag = f" {colors.ok('[on-plan]')}"
+                elif fitness_for_best < 0.3 and card_item.design.power >= 0.5:
+                    tag = f" {colors.c('[off-plan strong]', 'warning')}"
             print(
-                f"    {card.design.name:<30s} "
-                f"power={card.design.power:.3f}  "
-                f"fitness[{argmax(human_w)}]={fitness_for_best:.3f}"
-                f"{label}"
+                f"    {colors.card(f'{card_item.design.name:<30s}')} "
+                f"{colors.label('power')}="
+                f"{colors.num(f'{card_item.design.power:.3f}')}  "
+                f"{colors.label(f'fitness[{argmax(human_w)}]')}="
+                f"{colors.num(f'{fitness_for_best:.3f}')}"
+                f"{tag}"
             )
 
 

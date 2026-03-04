@@ -10,6 +10,7 @@ import json
 import random
 import sys
 
+import colors
 from config import SimulatorConfig
 from draft_models import CardDesign
 
@@ -253,38 +254,50 @@ def _validate_cards(cards: list[CardDesign], archetype_count: int) -> None:
 
 def print_card_pool_stats(cards: list[CardDesign], archetype_count: int) -> None:
     """Print summary statistics for a card pool."""
-    print(f"\nCard Pool Statistics:")
-    print(f"  Total cards: {len(cards)}")
+    print(f"\n{colors.section('Card Pool Statistics:')}")
+    print(f"  {colors.label('Total cards:')} {colors.num(len(cards))}")
 
     # Per-archetype cards with fitness > 0.5
-    print(f"\n  Cards with fitness > 0.5 per archetype:")
+    print(f"\n  {colors.label('Cards with fitness > 0.5 per archetype:')}")
     for arch in range(archetype_count):
         count = sum(1 for c in cards if c.fitness[arch] > 0.5)
-        print(f"    Archetype {arch}: {count}")
+        print(
+            f"    {colors.label('Archetype')} {colors.c(arch, 'operator')}: "
+            f"{colors.num(count)}"
+        )
 
     # Bridge card count
     bridge_count = sum(1 for c in cards if sum(1 for f in c.fitness if f > 0.5) >= 2)
-    print(f"\n  Bridge cards (fitness > 0.5 in 2+ archetypes): {bridge_count}")
+    print(
+        f"\n  {colors.label('Bridge cards (fitness > 0.5 in 2+ archetypes):')} "
+        f"{colors.num(bridge_count)}"
+    )
 
     # Power distribution
     powers = [c.power for c in cards]
     print(
-        f"\n  Power:  mean={_mean(powers):.3f}  "
-        f"min={min(powers):.3f}  max={max(powers):.3f}"
+        f"\n  {colors.label('Power:')}  "
+        f"{colors.dim('mean=')}{colors.num(f'{_mean(powers):.3f}')}  "
+        f"{colors.dim('min=')}{colors.num(f'{min(powers):.3f}')}  "
+        f"{colors.dim('max=')}{colors.num(f'{max(powers):.3f}')}"
     )
 
     # Commit distribution
     commits = [c.commit for c in cards]
     print(
-        f"  Commit: mean={_mean(commits):.3f}  "
-        f"min={min(commits):.3f}  max={max(commits):.3f}"
+        f"  {colors.label('Commit:')} "
+        f"{colors.dim('mean=')}{colors.num(f'{_mean(commits):.3f}')}  "
+        f"{colors.dim('min=')}{colors.num(f'{min(commits):.3f}')}  "
+        f"{colors.dim('max=')}{colors.num(f'{max(commits):.3f}')}"
     )
 
     # Flex distribution
     flexes = [c.flex for c in cards]
     print(
-        f"  Flex:   mean={_mean(flexes):.3f}  "
-        f"min={min(flexes):.3f}  max={max(flexes):.3f}"
+        f"  {colors.label('Flex:')}   "
+        f"{colors.dim('mean=')}{colors.num(f'{_mean(flexes):.3f}')}  "
+        f"{colors.dim('min=')}{colors.num(f'{min(flexes):.3f}')}  "
+        f"{colors.dim('max=')}{colors.num(f'{max(flexes):.3f}')}"
     )
 
 
@@ -300,120 +313,149 @@ def describe_card_pool(
     lines: list[str] = []
 
     # --- Header ---
-    lines.append("=" * 60)
-    lines.append("CARD POOL SUMMARY")
-    lines.append("=" * 60)
+    lines.append(colors.c("=" * 60, "ui"))
+    lines.append(colors.header("CARD POOL SUMMARY"))
+    lines.append(colors.c("=" * 60, "ui"))
     lines.append(
-        f"Source: {source}  |  {len(cards)} distinct designs  |  "
-        f"{archetype_count} archetypes"
+        f"{colors.label('Source:')} {colors.c(source, 'special')}  |  "
+        f"{colors.num(len(cards))} distinct designs  |  "
+        f"{colors.num(archetype_count)} archetypes"
     )
     lines.append("")
 
     # --- Composition ---
     bridge_cards = [c for c in cards if sum(1 for f in c.fitness if f > 0.5) >= 2]
     primary_cards = [c for c in cards if sum(1 for f in c.fitness if f > 0.5) < 2]
-    lines.append("--- Composition ---")
+    lines.append(colors.section("--- Composition ---"))
     lines.append(
-        f"  Primary cards (single archetype): "
-        f"{len(primary_cards):>4d}  ({100*len(primary_cards)/len(cards):.1f}%)"
+        f"  {colors.label('Primary cards (single archetype):')} "
+        f"{colors.num(f'{len(primary_cards):>4d}')}  "
+        f"({colors.num(f'{100*len(primary_cards)/len(cards):.1f}')}%)"
     )
     lines.append(
-        f"  Bridge cards  (2+ archetypes):     "
-        f"{len(bridge_cards):>4d}  ({100*len(bridge_cards)/len(cards):.1f}%)"
+        f"  {colors.label('Bridge cards  (2+ archetypes):')}     "
+        f"{colors.num(f'{len(bridge_cards):>4d}')}  "
+        f"({colors.num(f'{100*len(bridge_cards)/len(cards):.1f}')}%)"
     )
     lines.append("")
 
     # --- Per-Archetype Coverage ---
-    lines.append("--- Per-Archetype Coverage ---")
-    header = (
-        f"  {'Arch':>4s}  {'Strong(>0.5)':>12s}  {'Moderate':>12s}  {'Weak(<0.3)':>10s}"
+    lines.append(colors.section("--- Per-Archetype Coverage ---"))
+    cov_header = (
+        f"  {colors.label(f'{'Arch':>4s}')}  "
+        f"{colors.label(f'{'Strong(>0.5)':>12s}')}  "
+        f"{colors.label(f'{'Moderate':>12s}')}  "
+        f"{colors.label(f'{'Weak(<0.3)':>10s}')}"
     )
-    lines.append(header)
+    lines.append(cov_header)
     for arch in range(archetype_count):
         strong = sum(1 for c in cards if c.fitness[arch] > 0.5)
         moderate = sum(1 for c in cards if 0.3 <= c.fitness[arch] <= 0.5)
         weak = sum(1 for c in cards if c.fitness[arch] < 0.3)
-        lines.append(f"  {arch:>4d}  {strong:>12d}  {moderate:>12d}  {weak:>10d}")
+        lines.append(
+            f"  {colors.c(f'{arch:>4d}', 'operator')}  "
+            f"{colors.num(f'{strong:>12d}')}  "
+            f"{colors.num(f'{moderate:>12d}')}  "
+            f"{colors.num(f'{weak:>10d}')}"
+        )
     lines.append("")
 
     # --- Fitness Distribution ---
     all_fitness = [f for c in cards for f in c.fitness]
     top_fitness = [max(c.fitness) for c in cards]
-    lines.append("--- Fitness Distribution ---")
+    lines.append(colors.section("--- Fitness Distribution ---"))
     lines.append(
-        f"  All values:     mean={_mean(all_fitness):.3f}  "
-        f"median={_percentile(all_fitness, 50):.3f}  "
-        f"std={_std(all_fitness):.3f}"
+        f"  {colors.label('All values:')}     "
+        f"{colors.dim('mean=')}{colors.num(f'{_mean(all_fitness):.3f}')}  "
+        f"{colors.dim('median=')}{colors.num(f'{_percentile(all_fitness, 50):.3f}')}  "
+        f"{colors.dim('std=')}{colors.num(f'{_std(all_fitness):.3f}')}"
     )
     lines.append(
-        f"  Top per card:   mean={_mean(top_fitness):.3f}  "
-        f"median={_percentile(top_fitness, 50):.3f}  "
-        f"std={_std(top_fitness):.3f}"
+        f"  {colors.label('Top per card:')}   "
+        f"{colors.dim('mean=')}{colors.num(f'{_mean(top_fitness):.3f}')}  "
+        f"{colors.dim('median=')}{colors.num(f'{_percentile(top_fitness, 50):.3f}')}  "
+        f"{colors.dim('std=')}{colors.num(f'{_std(top_fitness):.3f}')}"
     )
     lines.append("")
 
     # --- Power Distribution ---
     powers = [c.power for c in cards]
-    lines.append("--- Power Distribution ---")
+    lines.append(colors.section("--- Power Distribution ---"))
     lines.append(
-        f"  min={min(powers):.3f}  p25={_percentile(powers, 25):.3f}  "
-        f"median={_percentile(powers, 50):.3f}  "
-        f"p75={_percentile(powers, 75):.3f}  max={max(powers):.3f}"
+        f"  {colors.dim('min=')}{colors.num(f'{min(powers):.3f}')}  "
+        f"{colors.dim('p25=')}{colors.num(f'{_percentile(powers, 25):.3f}')}  "
+        f"{colors.dim('median=')}{colors.num(f'{_percentile(powers, 50):.3f}')}  "
+        f"{colors.dim('p75=')}{colors.num(f'{_percentile(powers, 75):.3f}')}  "
+        f"{colors.dim('max=')}{colors.num(f'{max(powers):.3f}')}"
     )
     lines.append(_histogram(powers, "  ", bins=6, lo=0.0, hi=1.0))
     lines.append("")
 
     # --- Commit Distribution ---
     commits = [c.commit for c in cards]
-    lines.append("--- Commit Distribution ---")
+    lines.append(colors.section("--- Commit Distribution ---"))
     lines.append(
-        f"  min={min(commits):.3f}  p25={_percentile(commits, 25):.3f}  "
-        f"median={_percentile(commits, 50):.3f}  "
-        f"p75={_percentile(commits, 75):.3f}  max={max(commits):.3f}"
+        f"  {colors.dim('min=')}{colors.num(f'{min(commits):.3f}')}  "
+        f"{colors.dim('p25=')}{colors.num(f'{_percentile(commits, 25):.3f}')}  "
+        f"{colors.dim('median=')}{colors.num(f'{_percentile(commits, 50):.3f}')}  "
+        f"{colors.dim('p75=')}{colors.num(f'{_percentile(commits, 75):.3f}')}  "
+        f"{colors.dim('max=')}{colors.num(f'{max(commits):.3f}')}"
     )
     lines.append(_histogram(commits, "  ", bins=6, lo=0.0, hi=1.0))
     lines.append("")
 
     # --- Flex Distribution ---
     flexes = [c.flex for c in cards]
-    lines.append("--- Flex Distribution ---")
+    lines.append(colors.section("--- Flex Distribution ---"))
     lines.append(
-        f"  min={min(flexes):.3f}  p25={_percentile(flexes, 25):.3f}  "
-        f"median={_percentile(flexes, 50):.3f}  "
-        f"p75={_percentile(flexes, 75):.3f}  max={max(flexes):.3f}"
+        f"  {colors.dim('min=')}{colors.num(f'{min(flexes):.3f}')}  "
+        f"{colors.dim('p25=')}{colors.num(f'{_percentile(flexes, 25):.3f}')}  "
+        f"{colors.dim('median=')}{colors.num(f'{_percentile(flexes, 50):.3f}')}  "
+        f"{colors.dim('p75=')}{colors.num(f'{_percentile(flexes, 75):.3f}')}  "
+        f"{colors.dim('max=')}{colors.num(f'{max(flexes):.3f}')}"
     )
     lines.append(_histogram(flexes, "  ", bins=6, lo=0.0, hi=1.0))
     lines.append("")
 
     # --- Cross-Archetype Diversity ---
-    lines.append("--- Cross-Archetype Diversity ---")
+    lines.append(colors.section("--- Cross-Archetype Diversity ---"))
     diversity_buckets: dict[int, int] = {}
     for c in cards:
         n_strong = sum(1 for f in c.fitness if f > 0.5)
         diversity_buckets[n_strong] = diversity_buckets.get(n_strong, 0) + 1
     for n_strong in sorted(diversity_buckets.keys()):
         count = diversity_buckets[n_strong]
-        label = f"{n_strong} archetype" if n_strong == 1 else f"{n_strong} archetypes"
+        bucket_label = (
+            f"{n_strong} archetype" if n_strong == 1 else f"{n_strong} archetypes"
+        )
         if n_strong == 0:
-            label = "no archetype"
+            bucket_label = "no archetype"
         lines.append(
-            f"  Fitness > 0.5 in {label + ':':<16s} "
-            f"{count:>4d}  ({100*count/len(cards):.1f}%)"
+            f"  {colors.label(f'Fitness > 0.5 in {bucket_label + ":":<16s}')} "
+            f"{colors.num(f'{count:>4d}')}  "
+            f"({colors.num(f'{100*count/len(cards):.1f}')}%)"
         )
     lines.append("")
 
     # --- Strongest Cards ---
     sorted_by_power = sorted(cards, key=lambda c: c.power, reverse=True)
-    lines.append("--- Strongest Cards (top 5 by power) ---")
-    lines.append(f"  {'Name':<30s}  {'Power':>5s}  {'TopArch':>7s}  {'Fitness':>7s}")
+    lines.append(colors.section("--- Strongest Cards (top 5 by power) ---"))
+    lines.append(
+        f"  {colors.label(f'{'Name':<30s}')}  "
+        f"{colors.label(f'{'Power':>5s}')}  "
+        f"{colors.label(f'{'TopArch':>7s}')}  "
+        f"{colors.label(f'{'Fitness':>7s}')}"
+    )
     for c in sorted_by_power[:5]:
         top_arch = max(range(len(c.fitness)), key=lambda i: c.fitness[i])
         lines.append(
-            f"  {c.name:<30s}  {c.power:>5.3f}  {top_arch:>7d}  "
-            f"{c.fitness[top_arch]:>7.3f}"
+            f"  {colors.card(f'{c.name:<30s}')}  "
+            f"{colors.num(f'{c.power:>5.3f}')}  "
+            f"{colors.c(f'{top_arch:>7d}', 'operator')}  "
+            f"{colors.num(f'{c.fitness[top_arch]:>7.3f}')}"
         )
 
-    lines.append("=" * 60)
+    lines.append(colors.c("=" * 60, "ui"))
     return "\n".join(lines)
 
 
@@ -462,5 +504,8 @@ def _histogram(
         edge = lo + i * width
         bar_len = max(1, round(count / max_count * 20))
         bar = "\u2588" * bar_len
-        lines.append(f"{indent}[{edge:.2f}-{edge + width:.2f}] {bar} {count}")
+        lines.append(
+            f"{indent}[{edge:.2f}-{edge + width:.2f}] "
+            f"{colors.c(bar, 'accent')} {colors.num(count)}"
+        )
     return "\n".join(lines)

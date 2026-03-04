@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 import agents
+import colors
 import config
 import draft_runner
 from draft_models import CardInstance
@@ -677,112 +678,97 @@ def format_metrics(m: DraftMetrics) -> str:
     """Format metrics as a human-readable text summary."""
     lines: list[str] = []
 
+    def _phase_vals(label: str, ps: PhaseStats, fmt: str = ".1f") -> str:
+        return (
+            f"  {colors.label(label)}  "
+            f"{colors.dim('early=')}{ colors.num(f'{ps.early:{fmt}}')}  "
+            f"{colors.dim('mid=')}{ colors.num(f'{ps.mid:{fmt}}')}  "
+            f"{colors.dim('late=')}{ colors.num(f'{ps.late:{fmt}}')}  "
+            f"{colors.dim('overall=')}{ colors.num(f'{ps.overall:{fmt}}')}"
+        )
+
     # Choice Richness (shown-N)
     cr = m.choice_richness_shown
-    lines.append("Choice Richness (shown-N):")
-    lines.append(
-        f"  Near-optimal count:  "
-        f"early={cr.near_optimal.early:.1f}  "
-        f"mid={cr.near_optimal.mid:.1f}  "
-        f"late={cr.near_optimal.late:.1f}  "
-        f"overall={cr.near_optimal.overall:.1f}"
-    )
-    lines.append(
-        f"  Score gap:           "
-        f"early={cr.score_gap_mean.early:.2f} "
-        f"mid={cr.score_gap_mean.mid:.2f} "
-        f"late={cr.score_gap_mean.late:.2f} "
-        f"overall={cr.score_gap_mean.overall:.2f}"
-    )
-    lines.append(
-        f"  Choice entropy:      "
-        f"early={cr.choice_entropy.early:.2f} "
-        f"mid={cr.choice_entropy.mid:.2f} "
-        f"late={cr.choice_entropy.late:.2f} "
-        f"overall={cr.choice_entropy.overall:.2f}"
-    )
+    lines.append(colors.section("Choice Richness (shown-N):"))
+    lines.append(_phase_vals("Near-optimal count:", cr.near_optimal, ".1f"))
+    lines.append(_phase_vals("Score gap:          ", cr.score_gap_mean, ".2f"))
+    lines.append(_phase_vals("Choice entropy:     ", cr.choice_entropy, ".2f"))
 
     # Choice Richness (full-pack)
     crf = m.choice_richness_full
     lines.append("")
-    lines.append("Choice Richness (full-pack):")
-    lines.append(
-        f"  Near-optimal count:  "
-        f"early={crf.near_optimal.early:.1f}  "
-        f"mid={crf.near_optimal.mid:.1f}  "
-        f"late={crf.near_optimal.late:.1f}  "
-        f"overall={crf.near_optimal.overall:.1f}"
-    )
-    lines.append(
-        f"  Score gap:           "
-        f"early={crf.score_gap_mean.early:.2f} "
-        f"mid={crf.score_gap_mean.mid:.2f} "
-        f"late={crf.score_gap_mean.late:.2f} "
-        f"overall={crf.score_gap_mean.overall:.2f}"
-    )
-    lines.append(
-        f"  Choice entropy:      "
-        f"early={crf.choice_entropy.early:.2f} "
-        f"mid={crf.choice_entropy.mid:.2f} "
-        f"late={crf.choice_entropy.late:.2f} "
-        f"overall={crf.choice_entropy.overall:.2f}"
-    )
+    lines.append(colors.section("Choice Richness (full-pack):"))
+    lines.append(_phase_vals("Near-optimal count:", crf.near_optimal, ".1f"))
+    lines.append(_phase_vals("Score gap:          ", crf.score_gap_mean, ".2f"))
+    lines.append(_phase_vals("Choice entropy:     ", crf.choice_entropy, ".2f"))
 
     # Convergence (shown-N)
     lines.append("")
-    lines.append("Convergence (shown-N, post-commitment):")
+    lines.append(colors.section("Convergence (shown-N, post-commitment):"))
     lines.append(
-        f"  On-plan density (mid):  "
-        f"mean={m.convergence_shown.on_plan_density_mid_mean:.1f}, "
-        f"P(>=3)={m.convergence_shown.on_plan_prob_gte_3_mid:.2f}"
+        f"  {colors.label('On-plan density (mid):')}  "
+        f"{colors.dim('mean=')}{colors.num(f'{m.convergence_shown.on_plan_density_mid_mean:.1f}')}, "
+        f"{colors.dim('P(>=3)=')}{colors.num(f'{m.convergence_shown.on_plan_prob_gte_3_mid:.2f}')}"
     )
     lines.append(
-        f"  On-plan density (late): "
-        f"mean={m.convergence_shown.on_plan_density_late_mean:.1f}, "
-        f"P(>=3)={m.convergence_shown.on_plan_prob_gte_3_late:.2f}"
+        f"  {colors.label('On-plan density (late):')} "
+        f"{colors.dim('mean=')}{colors.num(f'{m.convergence_shown.on_plan_density_late_mean:.1f}')}, "
+        f"{colors.dim('P(>=3)=')}{colors.num(f'{m.convergence_shown.on_plan_prob_gte_3_late:.2f}')}"
     )
 
     # Convergence (full-pack)
     lines.append("")
-    lines.append("Convergence (full-pack, post-commitment):")
+    lines.append(colors.section("Convergence (full-pack, post-commitment):"))
     lines.append(
-        f"  On-plan density (mid):  "
-        f"mean={m.convergence_full.on_plan_density_mid_mean:.1f}, "
-        f"P(>=3)={m.convergence_full.on_plan_prob_gte_3_mid:.2f}"
+        f"  {colors.label('On-plan density (mid):')}  "
+        f"{colors.dim('mean=')}{colors.num(f'{m.convergence_full.on_plan_density_mid_mean:.1f}')}, "
+        f"{colors.dim('P(>=3)=')}{colors.num(f'{m.convergence_full.on_plan_prob_gte_3_mid:.2f}')}"
     )
     lines.append(
-        f"  On-plan density (late): "
-        f"mean={m.convergence_full.on_plan_density_late_mean:.1f}, "
-        f"P(>=3)={m.convergence_full.on_plan_prob_gte_3_late:.2f}"
+        f"  {colors.label('On-plan density (late):')} "
+        f"{colors.dim('mean=')}{colors.num(f'{m.convergence_full.on_plan_density_late_mean:.1f}')}, "
+        f"{colors.dim('P(>=3)=')}{colors.num(f'{m.convergence_full.on_plan_prob_gte_3_late:.2f}')}"
     )
 
     # Signal Benefit
     lines.append("")
     if m.signal_benefit is not None:
         lines.append(
-            f"Signal Benefit: {m.signal_benefit:+.1f}% "
-            f"(adaptive vs signal-ignorant)"
+            f"{colors.label('Signal Benefit:')} "
+            f"{colors.num(f'{m.signal_benefit:+.1f}%')} "
+            f"{colors.dim('(adaptive vs signal-ignorant)')}"
         )
     else:
-        lines.append("Signal Benefit: N/A (requires sweep)")
+        lines.append(
+            f"{colors.label('Signal Benefit:')} {colors.dim('N/A (requires sweep)')}"
+        )
 
     # Forceability
     if m.forceability is not None and m.forceability_archetype is not None:
         lines.append(
-            f"Forceability: max={m.forceability:.2f} "
-            f"(archetype {m.forceability_archetype})"
+            f"{colors.label('Forceability:')} "
+            f"{colors.dim('max=')}{colors.num(f'{m.forceability:.2f}')} "
+            f"{colors.dim(f'(archetype {m.forceability_archetype})')}"
         )
     else:
-        lines.append("Forceability: N/A (requires sweep)")
+        lines.append(
+            f"{colors.label('Forceability:')} {colors.dim('N/A (requires sweep)')}"
+        )
 
     # Splashability
-    lines.append(f"Splashability: {m.splashability_shown.splash_fraction:.2f}")
+    lines.append(
+        f"{colors.label('Splashability:')} "
+        f"{colors.num(f'{m.splashability_shown.splash_fraction:.2f}')}"
+    )
 
     # Early Openness
     eo = m.early_openness_shown
     lines.append(
-        f"Early Openness: {eo.archetypes_exposed:.1f} archetypes exposed, "
-        f"preference entropy={eo.preference_entropy:.2f}"
+        f"{colors.label('Early Openness:')} "
+        f"{colors.num(f'{eo.archetypes_exposed:.1f}')} "
+        f"{colors.dim('archetypes exposed,')} "
+        f"{colors.dim('preference entropy=')}"
+        f"{colors.num(f'{eo.preference_entropy:.2f}')}"
     )
 
     return "\n".join(lines)

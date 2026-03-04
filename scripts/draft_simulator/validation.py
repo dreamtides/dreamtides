@@ -10,6 +10,8 @@ import math
 from dataclasses import dataclass
 from typing import Any
 
+import colors
+
 
 @dataclass(frozen=True)
 class CheckResult:
@@ -53,9 +55,9 @@ def format_validation_report(report: ValidationReport) -> str:
     """Format a validation report for printing to stdout."""
     lines: list[str] = []
     lines.append("")
-    lines.append("=" * 60)
-    lines.append("Validation Results")
-    lines.append("=" * 60)
+    lines.append(colors.c("=" * 60, "ui"))
+    lines.append(colors.header("Validation Results"))
+    lines.append(colors.c("=" * 60, "ui"))
 
     if not report.checks:
         lines.append("  No validation checks were run.")
@@ -63,15 +65,15 @@ def format_validation_report(report: ValidationReport) -> str:
 
     passed = sum(1 for c in report.checks if c.passed)
     total = len(report.checks)
-    lines.append(f"  {passed}/{total} checks passed")
+    lines.append(f"  {colors.num(passed)}/{colors.num(total)} checks passed")
     lines.append("")
 
     for check in report.checks:
-        status = "PASS" if check.passed else "FAIL"
-        lines.append(f"  [{status}] {check.name}")
+        status = colors.ok("[PASS]") if check.passed else colors.fail("[FAIL]")
+        lines.append(f"  {status} {colors.label(check.name)}")
         lines.append(f"         {check.message}")
 
-    lines.append("=" * 60)
+    lines.append(colors.c("=" * 60, "ui"))
     return "\n".join(lines)
 
 

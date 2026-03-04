@@ -13,6 +13,7 @@ import sys
 from dataclasses import dataclass, field
 from typing import Any
 
+import colors
 import config
 import draft_runner
 import metrics
@@ -140,9 +141,9 @@ def run_sweep(
     total_runs = num_combinations * runs_per_point
 
     print(
-        f"Sweep: {len(cfg.sweep.axes)} axes, "
-        f"{num_combinations} combinations, "
-        f"{runs_per_point} runs each"
+        f"{colors.section('Sweep:')} {colors.num(len(cfg.sweep.axes))} axes, "
+        f"{colors.num(num_combinations)} combinations, "
+        f"{colors.num(runs_per_point)} runs each"
     )
 
     all_run_records: list[dict[str, Any]] = []
