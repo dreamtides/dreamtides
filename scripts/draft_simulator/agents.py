@@ -218,6 +218,13 @@ def _pick_force(
     if force_archetype is None:
         raise ValueError("Force policy requires a target archetype index")
 
+    archetype_count = len(candidates[0].design.fitness)
+    if force_archetype < 0 or force_archetype >= archetype_count:
+        raise ValueError(
+            f"force_archetype={force_archetype} out of range "
+            f"[0, {archetype_count})"
+        )
+
     best_card = candidates[0]
     best_fitness = candidates[0].design.fitness[force_archetype]
     best_power = candidates[0].design.power

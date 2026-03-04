@@ -83,6 +83,16 @@ def main() -> None:
         overrides=args.param,
     )
 
+    # Apply difficulty preset (overrides config values)
+    if args.preset == "easy":
+        cfg.agents.ai_optimality = 0.4
+        cfg.agents.ai_signal_weight = 0.0
+        cfg.draft.seat_count = 5
+    elif args.preset == "hard":
+        cfg.agents.ai_optimality = 0.9
+        cfg.agents.ai_signal_weight = 0.8
+        cfg.draft.seat_count = 8
+
     # Print banner
     print(
         f"Draft Simulator v{VERSION} | seed={seed} "

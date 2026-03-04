@@ -458,6 +458,68 @@ class TestShowN(unittest.TestCase):
         result = show_n.select_cards(pack, 4, "curated", rng, human_w=None)
         self.assertEqual(len(result), 4)
 
+    def test_curated_small_n_does_not_exceed(self) -> None:
+        """Curated with n=1 must not return more than 1 card."""
+        on_plan = _make_instance(
+            0, [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5
+        )
+        off_plan_strong = _make_instance(
+            1, [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.8
+        )
+        filler = [
+            _make_instance(
+                i + 2,
+                [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3],
+                power=0.4,
+                card_id=f"fill_{i}",
+            )
+            for i in range(8)
+        ]
+        pack = [on_plan, off_plan_strong] + filler
+        w = [5.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        rng = random.Random(42)
+        result = show_n.select_cards(pack, 1, "curated", rng, human_w=w)
+        self.assertEqual(len(result), 1)
+
+    def test_curated_n2_with_both_guarantees(self) -> None:
+        """Curated with n=2 returns exactly 2 when both guarantees apply."""
+        on_plan = _make_instance(
+            0, [0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5
+        )
+        off_plan_strong = _make_instance(
+            1, [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.8
+        )
+        filler = [
+            _make_instance(
+                i + 2,
+                [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3],
+                power=0.4,
+                card_id=f"fill_{i}",
+            )
+            for i in range(8)
+        ]
+        pack = [on_plan, off_plan_strong] + filler
+        w = [5.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        rng = random.Random(42)
+        result = show_n.select_cards(pack, 2, "curated", rng, human_w=w)
+        self.assertEqual(len(result), 2)
+
+    def test_force_out_of_range_raises(self) -> None:
+        """Force policy with out-of-range archetype should raise ValueError."""
+        agent = agents.create_agent(2)
+        card = _make_instance(0, [0.5, 0.5])
+        cfg = AgentsConfig(ai_optimality=1.0)
+        scoring = ScoringConfig()
+        rng = random.Random(42)
+        with self.assertRaises(ValueError):
+            agents.pick_card(
+                [card], agent, "force", cfg, scoring, rng, force_archetype=99
+            )
+        with self.assertRaises(ValueError):
+            agents.pick_card(
+                [card], agent, "force", cfg, scoring, rng, force_archetype=-1
+            )
+
     def test_unknown_strategy_raises(self) -> None:
         pack = self._make_pack(5)
         rng = random.Random(42)

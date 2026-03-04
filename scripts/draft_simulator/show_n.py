@@ -84,20 +84,21 @@ def _select_curated(
     selected: list[CardInstance] = []
     used_ids: set[int] = set()
 
-    # Guarantee at least 1 on-plan card if available
-    if on_plan_candidates:
+    # Guarantee at least 1 on-plan card if available and slots remain
+    if on_plan_candidates and len(selected) < n:
         pick = on_plan_candidates[rng.randrange(len(on_plan_candidates))]
         selected.append(pick)
         used_ids.add(pick.instance_id)
 
-    # Guarantee at least 1 off-plan strong card if available
-    off_plan_remaining = [
-        c for c in off_plan_candidates if c.instance_id not in used_ids
-    ]
-    if off_plan_remaining:
-        pick = off_plan_remaining[rng.randrange(len(off_plan_remaining))]
-        selected.append(pick)
-        used_ids.add(pick.instance_id)
+    # Guarantee at least 1 off-plan strong card if available and slots remain
+    if len(selected) < n:
+        off_plan_remaining = [
+            c for c in off_plan_candidates if c.instance_id not in used_ids
+        ]
+        if off_plan_remaining:
+            pick = off_plan_remaining[rng.randrange(len(off_plan_remaining))]
+            selected.append(pick)
+            used_ids.add(pick.instance_id)
 
     # Fill remaining slots by power-weighted sampling
     remaining_needed = n - len(selected)
