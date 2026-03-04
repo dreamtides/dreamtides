@@ -1,9 +1,10 @@
 """Show-N card selection strategies for the draft simulator.
 
 Selects a subset of N cards from a pack to present to the human seat.
-Six strategies: Uniform, Power-biased, Curated, Signal-rich, Top-scored,
-and Sharpened-preference. All strategies use explicit rng parameter and
-weighted sampling without replacement. Stdlib-only, no external dependencies.
+Seven strategies: Uniform, Power-biased, Curated, Signal-rich, Top-scored,
+Sharpened-preference, and Plan-plus-power. All strategies use explicit rng
+parameter and weighted sampling without replacement. Stdlib-only, no
+external dependencies.
 """
 
 import random
@@ -38,6 +39,8 @@ def select_cards(
         return _select_top_scored(pack_cards, n, rng, human_w)
     elif strategy == "sharpened_preference":
         return _select_sharpened_preference(pack_cards, n, rng, human_w)
+    elif strategy == "plan_plus_power":
+        return _select_plan_plus_power(pack_cards, n, rng, human_w)
     else:
         raise ValueError(f"Unknown Show-N strategy: {strategy!r}")
 
@@ -177,6 +180,60 @@ def _select_sharpened_preference(
 
     scored.sort(key=lambda t: t[0], reverse=True)
     return [t[2] for t in scored[:n]]
+
+
+def _select_plan_plus_power(
+    cards: list[CardInstance],
+    n: int,
+    rng: random.Random,
+    human_w: list[float] | None,
+) -> list[CardInstance]:
+    """Reserve slots for on-plan cards, fill the rest by power.
+
+    Reserves up to 3 slots for cards whose fitness for the best archetype
+    meets the on-plan threshold (0.3). Remaining slots are filled by
+    off-plan cards sorted by power descending. Falls back to power-biased
+    when human_w is None/empty or when concentration (max(w)/sum(w)) is
+    below 0.15.
+    """
+    on_plan_threshold = 0.3
+    concentration_threshold = 0.15
+    max_on_plan_slots = 3
+
+    if human_w is None or not human_w:
+        return _select_power_biased(cards, n, rng)
+
+    w_sum = sum(human_w)
+    if w_sum <= 0.0:
+        return _select_power_biased(cards, n, rng)
+
+    concentration = max(human_w) / w_sum
+    if concentration < concentration_threshold:
+        return _select_power_biased(cards, n, rng)
+
+    best_arch = argmax(human_w)
+
+    on_plan = [c for c in cards if c.design.fitness[best_arch] >= on_plan_threshold]
+    off_plan = [c for c in cards if c.design.fitness[best_arch] < on_plan_threshold]
+
+    # Sort on-plan by fitness desc, then power desc for tie-breaking
+    on_plan.sort(key=lambda c: (c.design.fitness[best_arch], c.design.power), reverse=True)
+
+    # Take up to max_on_plan_slots best on-plan cards
+    selected = on_plan[: min(max_on_plan_slots, len(on_plan))]
+
+    # Sort off-plan by power desc and fill remaining slots
+    off_plan.sort(key=lambda c: c.design.power, reverse=True)
+    remaining_needed = n - len(selected)
+    selected += off_plan[:remaining_needed]
+
+    # If we still need more (not enough off-plan), take more on-plan
+    if len(selected) < n:
+        remaining_on = on_plan[min(max_on_plan_slots, len(on_plan)) :]
+        selected += remaining_on[: n - len(selected)]
+
+    return selected
+
 
 
 def _ts_normalize(w: list[float]) -> list[float]:

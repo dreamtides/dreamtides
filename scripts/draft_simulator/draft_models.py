@@ -27,6 +27,7 @@ class ShowNStrategy(Enum):
     CURATED = "Curated"
     SIGNAL_RICH = "Signal Rich"
     TOP_SCORED = "Top Scored"
+    PLAN_PLUS_POWER = "Plan Plus Power"
 
 
 class PickPolicy(Enum):

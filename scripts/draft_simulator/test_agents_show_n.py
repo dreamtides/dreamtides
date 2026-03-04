@@ -398,7 +398,14 @@ class TestShowN(unittest.TestCase):
     def test_no_duplicate_instance_ids(self) -> None:
         pack = self._make_pack(15)
         rng = random.Random(42)
-        for strategy in ["uniform", "power_biased", "signal_rich", "top_scored", "sharpened_preference"]:
+        for strategy in [
+            "uniform",
+            "power_biased",
+            "signal_rich",
+            "top_scored",
+            "sharpened_preference",
+            "plan_plus_power",
+        ]:
             result = show_n.select_cards(pack, 4, strategy, rng, human_w=[1.0] * 8)
             ids = [c.instance_id for c in result]
             self.assertEqual(len(ids), len(set(ids)), f"Duplicates in {strategy}")
@@ -546,6 +553,139 @@ class TestShowN(unittest.TestCase):
         rng = random.Random(42)
         result = show_n.select_cards(pack, 2, "curated", rng, human_w=w)
         self.assertEqual(len(result), 2)
+
+    def test_plan_plus_power_returns_n_cards(self) -> None:
+        pack = self._make_pack(10)
+        rng = random.Random(42)
+        w = [3.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        result = show_n.select_cards(pack, 4, "plan_plus_power", rng, human_w=w)
+        self.assertEqual(len(result), 4)
+
+    def test_plan_plus_power_no_duplicates(self) -> None:
+        pack = self._make_pack(15)
+        rng = random.Random(42)
+        w = [5.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        result = show_n.select_cards(pack, 4, "plan_plus_power", rng, human_w=w)
+        ids = [c.instance_id for c in result]
+        self.assertEqual(len(ids), len(set(ids)))
+
+    def test_plan_plus_power_falls_back_without_w(self) -> None:
+        """plan_plus_power without human_w should fall back to power-biased."""
+        pack = self._make_pack(10)
+        rng = random.Random(42)
+        result = show_n.select_cards(pack, 4, "plan_plus_power", rng, human_w=None)
+        self.assertEqual(len(result), 4)
+
+    def test_plan_plus_power_falls_back_low_concentration(self) -> None:
+        """plan_plus_power with uniform w should fall back to power-biased."""
+        pack = self._make_pack(10)
+        rng = random.Random(42)
+        # Uniform w across 8 archetypes => concentration = 0.125/1.0 = 0.125 < 0.15
+        w = [0.125] * 8
+        result = show_n.select_cards(pack, 4, "plan_plus_power", rng, human_w=w)
+        self.assertEqual(len(result), 4)
+
+    def test_plan_plus_power_reserves_on_plan_slots(self) -> None:
+        """On-plan cards (fitness >= 0.3 for best arch) should be prioritized."""
+        # 2 on-plan cards (fitness[0] >= 0.3) with different fitness levels
+        on_plan_a = _make_instance(
+            0, [0.9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], power=0.3, card_id="on_a"
+        )
+        on_plan_b = _make_instance(
+            1, [0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], power=0.4, card_id="on_b"
+        )
+        # 8 off-plan cards with high power
+        off_plan_cards = [
+            _make_instance(
+                i + 2,
+                [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                power=0.8 + i * 0.01,
+                card_id=f"off_{i}",
+            )
+            for i in range(8)
+        ]
+        pack = [on_plan_a, on_plan_b] + off_plan_cards
+        # Concentrated w favoring archetype 0
+        w = [5.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        rng = random.Random(42)
+        result = show_n.select_cards(pack, 4, "plan_plus_power", rng, human_w=w)
+        result_ids = {c.instance_id for c in result}
+        # Both on-plan cards should appear (only 2, and up to 3 slots reserved)
+        self.assertIn(on_plan_a.instance_id, result_ids)
+        self.assertIn(on_plan_b.instance_id, result_ids)
+
+    def test_plan_plus_power_fills_remaining_by_power(self) -> None:
+        """Remaining slots after on-plan should be filled by highest power."""
+        # 1 on-plan card
+        on_plan = _make_instance(
+            0, [0.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], power=0.3, card_id="on"
+        )
+        # Off-plan cards with clear power ordering
+        low_power = _make_instance(
+            1, [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.1, card_id="low"
+        )
+        mid_power = _make_instance(
+            2, [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.5, card_id="mid"
+        )
+        high_power = _make_instance(
+            3, [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=0.9, card_id="high"
+        )
+        very_high_power = _make_instance(
+            4, [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], power=1.0, card_id="vhigh"
+        )
+        pack = [on_plan, low_power, mid_power, high_power, very_high_power]
+        w = [5.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        rng = random.Random(42)
+        result = show_n.select_cards(pack, 4, "plan_plus_power", rng, human_w=w)
+        result_ids = {c.instance_id for c in result}
+        # Should include on_plan + top 3 by power (very_high, high, mid)
+        self.assertIn(on_plan.instance_id, result_ids)
+        self.assertIn(very_high_power.instance_id, result_ids)
+        self.assertIn(high_power.instance_id, result_ids)
+        self.assertIn(mid_power.instance_id, result_ids)
+        # Low power card should NOT be included
+        self.assertNotIn(low_power.instance_id, result_ids)
+
+    def test_plan_plus_power_caps_on_plan_at_3(self) -> None:
+        """At most 3 on-plan slots should be reserved."""
+        # 5 on-plan cards
+        on_plan_cards = [
+            _make_instance(
+                i,
+                [0.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                power=0.1 + i * 0.01,
+                card_id=f"on_{i}",
+            )
+            for i in range(5)
+        ]
+        # 5 off-plan cards with very high power
+        off_plan_cards = [
+            _make_instance(
+                i + 5,
+                [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                power=0.9 + i * 0.01,
+                card_id=f"off_{i}",
+            )
+            for i in range(5)
+        ]
+        pack = on_plan_cards + off_plan_cards
+        w = [5.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        rng = random.Random(42)
+        result = show_n.select_cards(pack, 4, "plan_plus_power", rng, human_w=w)
+        result_ids = {c.instance_id for c in result}
+        # Should have 3 on-plan and 1 off-plan (highest power off-plan)
+        on_plan_in_result = sum(1 for c in result if c.design.fitness[0] >= 0.3)
+        off_plan_in_result = sum(1 for c in result if c.design.fitness[0] < 0.3)
+        self.assertLessEqual(on_plan_in_result, 3)
+        self.assertGreaterEqual(off_plan_in_result, 1)
+
+    def test_plan_plus_power_small_pack_returns_all(self) -> None:
+        """When pack size <= n, all cards should be returned."""
+        pack = self._make_pack(3)
+        rng = random.Random(42)
+        w = [5.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        result = show_n.select_cards(pack, 4, "plan_plus_power", rng, human_w=w)
+        self.assertEqual(len(result), 3)
 
     def test_force_out_of_range_raises(self) -> None:
         """Force policy with out-of-range archetype should raise ValueError."""
