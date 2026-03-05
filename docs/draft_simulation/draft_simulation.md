@@ -52,10 +52,14 @@ python3 draft_simulator.py [mode] [options]
 
 Modes:
 
-- `single` (default): one draft, per-seat summary and metrics printed to stdout
+- `single` (default): runs one or more drafts with per-seat summary and metrics
+  printed to stdout. With `--runs N`, runs N independent drafts and reports
+  averaged metrics with 95% confidence intervals.
 - `trace`: one draft with per-pick JSON output to `--output-dir`
 - `sweep`: batch parameter experiment across a Cartesian product of values,
   writes CSV files to `--output-dir`
+- `explain`: prints plain-language documentation of all parameters and goal
+  metrics; no simulation executed
 - `demo`: component demonstrations for each subsystem (legacy)
 
 Common options:
@@ -64,7 +68,7 @@ Common options:
 - `--config PATH` / `-c PATH`: TOML or JSON config file
 - `--param KEY=VALUE`: dot-notation override, repeatable (example:
   `--param draft.seat_count=8 --param agents.policy=greedy`)
-- `--runs N`: number of runs for sweep mode (default: 1000)
+- `--runs N`: number of runs (default: 1 for single, 1000 for sweep)
 - `--output-dir PATH`: output directory (default: `./draft_output/`)
 - `--preset easy|hard`: difficulty preset
 
@@ -107,7 +111,7 @@ preferences, or picks.
 
 ## Module Layout
 
-Seventeen modules with clear ownership boundaries:
+Eighteen modules with clear ownership boundaries:
 
 | Module               | Role                                                                        |
 | -------------------- | --------------------------------------------------------------------------- |
@@ -119,7 +123,7 @@ Seventeen modules with clear ownership boundaries:
 | `pack_generator.py`  | Pack generation strategies: uniform, rarity_weighted, seeded_themed         |
 | `refill.py`          | Pack refill strategies: no_refill, uniform_refill, constrained_refill       |
 | `agents.py`          | `AgentState`; five pick policies; openness estimation                       |
-| `show_n.py`          | Show-N selection strategies for the human seat                              |
+| `show_n.py`          | Eight Show-N selection strategies for the human seat                        |
 | `commitment.py`      | Commitment detection: concentration-based and entropy-based                 |
 | `deck_scorer.py`     | `deck_value()`: power + coherence + focus bonus                             |
 | `draft_runner.py`    | `run_draft()`: main simulation loop; produces `DraftResult`                 |
@@ -127,6 +131,7 @@ Seventeen modules with clear ownership boundaries:
 | `sweep.py`           | Parameter sweep orchestration; Cartesian product; CSV output                |
 | `output.py`          | File writing: trace JSON, run-level CSV, aggregate CSV, config metadata     |
 | `validation.py`      | Post-sweep calibration checks with numeric pass/fail bounds                 |
+| `colors.py`          | 24-bit ANSI terminal color support (AYU Mirage palette)                     |
 | `utils.py`           | Shared utilities (argmax, etc.)                                             |
 
 Module dependency direction: `draft_simulator.py` → all others. Internal modules
@@ -134,20 +139,20 @@ import from `config`, `draft_models`, and `utils` freely. No circular imports.
 
 ## Configuration System
 
-`SimulatorConfig` is a tree of frozen dataclasses with ten sections:
+`SimulatorConfig` is a tree of mutable dataclasses with ten sections:
 
-| Section           | Key Parameters                                                                                               |
-| ----------------- | ------------------------------------------------------------------------------------------------------------ |
-| `draft`           | `seat_count`, `round_count`, `picks_per_round`, `pack_size`, `human_seats`                                   |
-| `cube`            | `distinct_cards`, `copies_per_card`, `consumption_mode`                                                      |
-| `pack_generation` | `strategy`, `archetype_target_count`, `primary_density`                                                      |
-| `refill`          | `strategy`, `fingerprint_source`, `fidelity`, `commit_bias`                                                  |
-| `cards`           | `source`, `archetype_count`, `bridge_fraction`                                                               |
-| `agents`          | `policy`, `show_n`, `show_n_strategy`, `ai_optimality`, `ai_power_weight`, `ai_pref_weight`, `learning_rate` |
-| `scoring`         | `weight_power`, `weight_coherence`, `weight_focus`                                                           |
-| `commitment`      | `commitment_threshold`, `stability_window`, `entropy_threshold`                                              |
-| `metrics`         | `richness_gap`, `tau`, `on_plan_threshold`, `splash_power_threshold`                                         |
-| `sweep`           | `runs_per_point`, `base_seed`, `axes`                                                                        |
+| Section           | Key Parameters                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `draft`           | `seat_count`, `round_count`, `picks_per_round`, `pack_size`, `human_seats`                                          |
+| `cube`            | `distinct_cards`, `copies_per_card`, `consumption_mode`                                                             |
+| `pack_generation` | `strategy`, `archetype_target_count`, `primary_density`, `bridge_density`, `variance`                               |
+| `refill`          | `strategy`, `fingerprint_source`, `fidelity`, `commit_bias`                                                         |
+| `cards`           | `source`, `archetype_count`, `bridge_fraction`                                                                      |
+| `agents`          | `policy`, `show_n`, `show_n_strategy`, `ai_optimality`, `ai_power_weight`, `ai_pref_weight`, `learning_rate`        |
+| `scoring`         | `weight_power`, `weight_coherence`, `weight_focus`, `secondary_weight`, `focus_threshold`, `focus_saturation`       |
+| `commitment`      | `commitment_threshold`, `stability_window`, `entropy_threshold`                                                     |
+| `metrics`         | `richness_gap`, `tau`, `on_plan_threshold`, `splash_power_threshold`, `splash_flex_threshold`, `exposure_threshold` |
+| `sweep`           | `runs_per_point`, `base_seed`, `seeding_policy`, `trace_enabled`, `axes`                                            |
 
 Load order: defaults → config file → `--param` overrides → `--preset`. CLI
 `--seed` overwrites `sweep.base_seed` after loading.
@@ -212,7 +217,7 @@ where the human must also read signals to draft well.
 
 ## Show-N Strategies
 
-Five strategies control which N cards from a pack are shown to the human seat:
+Eight strategies control which N cards from a pack are shown to the human seat:
 
 - **uniform**: N cards selected uniformly at random. No intelligence.
 - **power_biased**: weighted by card power. Higher-power cards are more likely
@@ -223,13 +228,23 @@ Five strategies control which N cards from a pack are shown to the human seat:
   power-biased without `w`.
 - **signal_rich**: weighted by `commit * 2 + power`. Biases toward
   archetype-defining cards.
-- **top_scored** (default): scores each card as
+- **top_scored**: scores each card as
   `0.3 * power + 0.7 * dot(fitness, normalize(w)) + gauss(0, 0.05)`, returns top
   N. Falls back to power-biased without `w`. Heavy preference weighting ensures
   on-plan cards appear; Gaussian noise prevents perfectly deterministic
   selection.
+- **sharpened_preference** (default): like `top_scored` but raises each
+  component of `w` to the 4th power before normalizing, amplifying dominant
+  archetype preferences. Same scoring formula and Gaussian noise.
+- **plan_plus_power**: reserves up to 3 slots for on-plan cards (fitness >= 0.3
+  for best archetype), fills remaining slots with off-plan cards sorted by power
+  descending. Falls back to power-biased before commitment (concentration \<
+  0.15).
+- **deck_value_greedy**: scores each card by marginal `deck_value` improvement
+  (`deck_value(drafted + [card])`), returns top N. Falls back to power-biased
+  without `w`, drafted pool, or scoring config.
 
-Default strategy is `top_scored`.
+Default strategy is `sharpened_preference`.
 
 ## Commitment Detection
 
@@ -272,11 +287,12 @@ pick. Measures whether drafters have multiple viable options or are "on rails."
 **Forceability**: `mean(force_deck_value[arch]) / mean(adaptive_deck_value)`
 across runs, per archetype. Values near or above 1.0 indicate an archetype is
 trivially forceable. Target: no archetype above 0.95 under the hard preset.
-Requires cross-run data; only available in `sweep` mode.
+Requires cross-run data (`--runs N` in single mode or sweep mode).
 
 **Signal benefit**: `(mean_aware - mean_ignorant) / mean_ignorant * 100%`
-comparing adaptive vs signal-ignorant policy deck values across runs. Target:
-below 2% at easy difficulty, 5-15% at hard difficulty. Requires sweep.
+comparing adaptive vs signal-ignorant policy deck values for the human seat
+across runs. Target: below 2% at easy difficulty, 5-15% at hard difficulty.
+Requires multi-run data (`--runs N` in single mode or sweep mode).
 
 **Convergence**: on-plan card density in mid and late picks after commitment.
 Measures whether the pack continues delivering archetype-appropriate cards once
@@ -292,12 +308,11 @@ off-plan card (high power or flex score, low on-plan fitness). Target: at least
 
 ## Sweep Output
 
-Sweep mode writes three files to `--output-dir`:
+Sweep mode writes two CSV files to `--output-dir`:
 
-- `runs_<timestamp>.csv`: one row per draft run with all per-seat metrics
-- `aggregate_<timestamp>.csv`: one row per parameter combination with mean, std,
-  p5, p95 for each metric
-- `config_<timestamp>.json`: full config metadata and sweep axes
+- `run_level.csv`: one row per draft run with all per-seat metrics
+- `aggregate.csv`: one row per parameter combination with mean, std, p5, p95 for
+  each metric
 
 After writing CSVs, sweep automatically runs `validation.run_validation()` and
 prints a calibration report. The report includes commitment timing, choice
