@@ -1,11 +1,15 @@
+use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use ability_data::variable_value::VariableValue;
 use ariadne::{Color, Label, Report, ReportKind, Source};
 use chumsky::error::Rich;
 use chumsky::span::{SimpleSpan, Span};
 use chumsky::Parser as ChumskyParser;
 use clap::{Parser, Subcommand, ValueEnum};
+use core_data::card_types::CardSubtype;
+use core_data::figment_type::FigmentType;
 use parser::ability_directory_parser;
 use parser::error::parser_errors::ParserError;
 use parser::error::{parser_diagnostics, parser_error_suggestions};
@@ -16,8 +20,13 @@ use parser::serializer::ability_serializer;
 use parser::variables::parser_bindings::VariableBindings;
 use parser::variables::parser_substitutions::{self, ResolvedToken};
 use regex::Regex;
+use rlf::{Phrase, Value as RlfValue};
 use serde::{Deserialize, Serialize};
-use toml::Value;
+use strings::strings;
+use toml::Value as TomlValue;
+use toml_edit::DocumentMut;
+
+const CARDS_TOML_PATH: &str = "rules_engine/tabula/cards.toml";
 
 #[derive(Parser)]
 #[command(
@@ -119,6 +128,14 @@ enum Command {
         #[arg(short, long)]
         output: PathBuf,
     },
+
+    RenderCardsToml {
+        #[arg(short, long)]
+        output: PathBuf,
+
+        #[arg(long, action = clap::ArgAction::Set, default_value_t = true)]
+        strip_html: bool,
+    },
 }
 
 #[derive(Clone, ValueEnum)]
@@ -163,6 +180,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         }
         Command::ExportCards { input, output } => {
             export_cards_command(&input, &output)?;
+        }
+        Command::RenderCardsToml { output, strip_html } => {
+            render_cards_toml_command(&output, strip_html)?;
         }
     }
 
@@ -370,6 +390,119 @@ fn verify_command(input: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
     }
 }
 
+fn render_cards_toml_command(
+    output: &PathBuf,
+    strip_html: bool,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let input = Path::new(CARDS_TOML_PATH);
+    let content = fs::read_to_string(input)?;
+    let mut document: DocumentMut = content.parse()?;
+    let tag_regex = if strip_html { Some(Regex::new(r"<[^>]+>")?) } else { None };
+
+    strings::register_source_phrases();
+
+    let card_count = {
+        let cards = document
+            .as_table_mut()
+            .get_mut("cards")
+            .and_then(|item| item.as_array_of_tables_mut())
+            .ok_or_else(|| format!("Missing [[cards]] array in {}", input.display()))?;
+
+        for card in cards.iter_mut() {
+            let card_name =
+                card.get("name").and_then(toml_edit::Item::as_str).unwrap_or("<unknown>");
+            let rules_text = card.get("rules-text").and_then(toml_edit::Item::as_str).unwrap_or("");
+            let bindings = match card.get("variables").and_then(toml_edit::Item::as_str) {
+                Some(vars) if !vars.trim().is_empty() => VariableBindings::parse(vars)
+                    .map_err(|e| format!("Failed to parse variables for '{card_name}': {e}"))?,
+                _ => VariableBindings::new(),
+            };
+            let rendered_text = render_with_rlf(rules_text, &bindings)
+                .map_err(|e| format!("Failed to render rules text for '{card_name}': {e}"))?;
+            let rendered_text = if let Some(regex) = &tag_regex {
+                regex.replace_all(&rendered_text, "").into_owned()
+            } else {
+                rendered_text
+            };
+
+            card.remove("rules-text");
+            card.remove("variables");
+            card.insert("rendered text", toml_edit::value(rendered_text));
+        }
+
+        cards.len()
+    };
+
+    if let Some(parent) = output.parent() {
+        fs::create_dir_all(parent)?;
+    }
+
+    fs::write(output, document.to_string())?;
+    println!("Rendered {} cards from {} to {}", card_count, input.display(), output.display());
+    Ok(())
+}
+
+fn render_with_rlf(template: &str, bindings: &VariableBindings) -> Result<String, String> {
+    let params = build_params(bindings);
+    rlf::with_locale(|locale| {
+        locale
+            .eval_str(template, params)
+            .map(|phrase| phrase.to_string())
+            .map_err(|e| e.to_string())
+    })
+}
+
+fn build_params(bindings: &VariableBindings) -> HashMap<String, RlfValue> {
+    let mut params = HashMap::new();
+    for (name, value) in bindings.iter() {
+        let rlf_value = match value {
+            VariableValue::Integer(n) => RlfValue::Number(i64::from(*n)),
+            VariableValue::Subtype(subtype) => RlfValue::Phrase(subtype_phrase(*subtype)),
+            VariableValue::Figment(figment) => RlfValue::Phrase(figment_phrase(*figment)),
+        };
+        params.insert(name.clone(), rlf_value);
+    }
+    params
+}
+
+fn subtype_phrase(subtype: CardSubtype) -> Phrase {
+    match subtype {
+        CardSubtype::Agent => strings::agent(),
+        CardSubtype::Ancient => strings::ancient(),
+        CardSubtype::Avatar => strings::avatar(),
+        CardSubtype::Child => strings::child(),
+        CardSubtype::Detective => strings::detective(),
+        CardSubtype::Enigma => strings::enigma(),
+        CardSubtype::Explorer => strings::explorer(),
+        CardSubtype::Guide => strings::guide(),
+        CardSubtype::Hacker => strings::hacker(),
+        CardSubtype::Mage => strings::mage(),
+        CardSubtype::Monster => strings::monster(),
+        CardSubtype::Musician => strings::musician(),
+        CardSubtype::Outsider => strings::outsider(),
+        CardSubtype::Renegade => strings::renegade(),
+        CardSubtype::Robot => strings::robot(),
+        CardSubtype::SpiritAnimal => strings::spirit_animal(),
+        CardSubtype::Super => strings::super_(),
+        CardSubtype::Survivor => strings::survivor(),
+        CardSubtype::Synth => strings::synth(),
+        CardSubtype::Tinkerer => strings::tinkerer(),
+        CardSubtype::Trooper => strings::trooper(),
+        CardSubtype::Visionary => strings::visionary(),
+        CardSubtype::Visitor => strings::visitor(),
+        CardSubtype::Warrior => strings::warrior(),
+    }
+}
+
+fn figment_phrase(figment: FigmentType) -> Phrase {
+    match figment {
+        FigmentType::Celestial => strings::celestial(),
+        FigmentType::Halcyon => strings::halcyon(),
+        FigmentType::Radiant => strings::radiant(),
+        FigmentType::Shadow => strings::shadow(),
+    }
+}
+
 fn output_format<T: serde::Serialize + std::fmt::Debug>(value: &T, format: OutputFormat) {
     match format {
         OutputFormat::Json => {
@@ -492,13 +625,13 @@ struct ExportCardsFile {
 struct ExportCard {
     name: String,
     #[serde(rename = "energy-cost")]
-    energy_cost: Value,
+    energy_cost: TomlValue,
     #[serde(rename = "card-type")]
     card_type: String,
     subtype: String,
     #[serde(rename = "is-fast")]
     is_fast: bool,
-    spark: Value,
+    spark: TomlValue,
     rarity: String,
     #[serde(rename = "card-number")]
     card_number: u32,
@@ -534,7 +667,7 @@ fn export_cards_command(input: &Path, output: &Path) -> Result<(), Box<dyn std::
         }
 
         let energy_cost = match &card.energy_cost {
-            Value::Integer(n) => Some(
+            TomlValue::Integer(n) => Some(
                 u32::try_from(*n)
                     .map_err(|_| format!("Invalid energy_cost {} for card '{}'", n, card.name))?,
             ),
@@ -542,7 +675,7 @@ fn export_cards_command(input: &Path, output: &Path) -> Result<(), Box<dyn std::
         };
 
         let spark = match &card.spark {
-            Value::Integer(n) => Some(
+            TomlValue::Integer(n) => Some(
                 u32::try_from(*n)
                     .map_err(|_| format!("Invalid spark {} for card '{}'", n, card.name))?,
             ),

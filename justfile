@@ -424,6 +424,9 @@ style-validator-fix:
 parser *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --bin "parser" -- "$@"
 
+render-cards-toml output strip_html='true':
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "parser" -- render-cards-toml --output "{{output}}" --strip-html "{{strip_html}}"
+
 parser-release *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --release --bin "parser" -- "$@"
 
