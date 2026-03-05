@@ -37,7 +37,7 @@ class CubeConfig:
 class PackGenerationConfig:
     """Pack generation strategy parameters."""
 
-    strategy: str = "uniform"
+    strategy: str = "seeded_themed"
     archetype_target_count: int = 4
     primary_density: float = 0.5
     bridge_density: float = 0.15
