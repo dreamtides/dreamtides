@@ -48,7 +48,7 @@ class PackGenerationConfig:
 class RefillConfig:
     """Pack refill strategy parameters."""
 
-    strategy: str = "uniform_refill"
+    strategy: str = "no_refill"
     fingerprint_source: str = "pack_origin"
     fidelity: float = 0.7
     commit_bias: float = 0.3
