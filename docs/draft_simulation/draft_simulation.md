@@ -374,6 +374,11 @@ use a unique name or the `draft_` prefix if the name is generic.
   including calculation steps, formulas, configurable parameters, validation
   targets, CSV column mappings, and diagnostic guidance.
 
+- [quest_simulator.md](../quest_simulator/quest_simulator.md) — the quest
+  simulator imports this simulator's modules and runs the identical 6-seat
+  draft loop from `draft_runner.py`. Read when working on either simulator to
+  understand how they share the card model, pick policies, and round execution.
+
 ## Glossary
 
 | Term            | Definition                                      |

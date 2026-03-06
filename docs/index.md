@@ -166,6 +166,17 @@
   tuning parameters, interpreting metrics, adding new modules, or debugging
   commitment detection.
 
+- [quest_simulator.md](quest_simulator/quest_simulator.md): The quest simulator
+  at `scripts/quest_simulator/` — the core invariant that quest mode runs the
+  identical 6-seat draft loop from `draft_runner.py` with sites as hooks at the
+  human seat, the full execution model (round/pick/seat/rotation), module layout,
+  cross-simulator import via `sys.path`, `QuestState` draft-engine fields,
+  `round_manager.py` API (`advance_to_human_pick`, `complete_human_pick`,
+  `advance_pick_no_card`), how each site type interacts with (or bypasses) the
+  draft loop, draft configuration values, and how to run and test the simulator.
+  Read before any work on the quest simulator, and before any work that involves
+  replicating or extending the draft loop.
+
 - [abu_internals.md](abu/abu_internals.md): ABU implementation details —
   architecture (TcpServer, AbuBridge, SnapshotCommandHandler, SnapshotFormatter,
   RefRegistry, CommandSchema), Python CLI internals, C# transport and command
