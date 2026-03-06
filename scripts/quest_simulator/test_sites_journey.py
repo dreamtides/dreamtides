@@ -278,8 +278,10 @@ class TestApplyJourneyEffect:
         changes = apply_journey_effect(state, journey, _make_dreamsigns())
 
         assert "cards_added" in changes
-        assert len(changes["cards_added"]) == 1
-        assert isinstance(changes["cards_added"][0], str)
+        cards_added = changes["cards_added"]
+        assert isinstance(cards_added, list)
+        assert len(cards_added) == 1
+        assert isinstance(cards_added[0], str)
 
     def test_add_essence_effect(self) -> None:
         from sites_journey import apply_journey_effect

@@ -89,8 +89,10 @@ class TestDeckCardDict(unittest.TestCase):
         design = _make_design(fitness=[0.9, 0.8, 0.7, 0.6, 0.5])
         dc = DeckCard(instance=_make_instance(design))
         d = jsonl_log._deck_card_dict(dc)
-        self.assertEqual(len(d["top_fitness"]), 3)
-        self.assertEqual(d["top_fitness"], [0.9, 0.8, 0.7])
+        top_fitness = d["top_fitness"]
+        assert isinstance(top_fitness, list)
+        self.assertEqual(len(top_fitness), 3)
+        self.assertEqual(top_fitness, [0.9, 0.8, 0.7])
 
 
 class TestSessionLogger(unittest.TestCase):
@@ -172,7 +174,7 @@ class TestSessionLogger(unittest.TestCase):
                 adjacent=[],
             ),
         ]
-        draft_cfg = {
+        draft_cfg: dict[str, object] = {
             "seat_count": 6,
             "pack_size": 20,
             "archetype_count": 8,

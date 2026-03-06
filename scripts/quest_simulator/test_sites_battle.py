@@ -54,7 +54,7 @@ def _make_draft_cfg() -> SimulatorConfig:
         cube=CubeConfig(
             distinct_cards=540,
             copies_per_card=1,
-            consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
+            consumption_mode="with_replacement",
         ),
         refill=RefillConfig(strategy="no_refill"),
         pack_generation=PackGenerationConfig(strategy="seeded_themed"),
@@ -76,7 +76,7 @@ def _make_quest_state(
     cube = cube_manager.CubeManager(
         designs,
         copies_per_card=cfg.cube.copies_per_card,
-        consumption_mode=cfg.cube.consumption_mode,
+        consumption_mode=CubeConsumptionMode(cfg.cube.consumption_mode),
     )
     human_agent = agents.create_agent(cfg.cards.archetype_count)
     ai_agents_list = [agents.create_agent(cfg.cards.archetype_count) for _ in range(5)]
