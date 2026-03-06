@@ -7,36 +7,9 @@ max_dreamsigns = 12
 total_battles = 7
 miniboss_battle = 4
 
-# Draft site pick parameters
+# Draft integration parameters
 [draft]
-cards_per_pick = 4
-picks_per_site = 5
-
-# Rarity-based copy counts and variance range for the draft pool
-[draft_pool]
-copies_common = 4
-copies_uncommon = 3
-copies_rare = 2
-copies_legendary = 1
-variance_min = 0.75
-variance_max = 1.25
-
-# Resonance affinity weighting parameters
-[resonance]
-exponent = 1.4
-floor_weight = 0.5
-neutral_base = 3.0
-
-# Per-card staleness decay factor
-[staleness]
-factor = 0.3
-
-# Tag-based theme selection parameters
-[tags]
-scale = 1.5
-min_theme_cards = 6
-relevance_boost = 2.0
-depth_factor = 0.1
+picks_per_round = 10
 
 # Shop pricing and configuration
 [shop]

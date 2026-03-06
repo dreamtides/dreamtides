@@ -1,68 +1,27 @@
 """Load all data files and construct typed model objects.
 
-Reads cards.json, card_data.json, config.toml, and all TOML data files
-from the data/ subdirectory. Called once at startup to produce the full
-set of typed model objects for the quest simulator.
+Reads config.toml and all TOML data files from the data/ subdirectory.
+Called once at startup to produce the full set of typed model objects
+for the quest simulator.
 """
 
-import json
 import tomllib
 from pathlib import Path
-from types import MappingProxyType
 from typing import Any
 
 from models import (
-    AlgorithmParams,
     BaneCard,
     Boss,
-    Card,
-    CardType,
-    DraftParams,
     Dreamcaller,
     Dreamsign,
     EffectType,
     Journey,
-    PoolParams,
-    Rarity,
-    Resonance,
     TemptingOffer,
 )
 
 DATA_DIR: Path = Path(__file__).resolve().parent / "data"
 
-_RESONANCE_MAP: dict[str, Resonance] = {r.value: r for r in Resonance}
-_CARD_TYPE_MAP: dict[str, CardType] = {ct.value: ct for ct in CardType}
-_RARITY_MAP: dict[str, Rarity] = {r.value: r for r in Rarity}
 _EFFECT_TYPE_MAP: dict[str, EffectType] = {et.value: et for et in EffectType}
-
-
-def _parse_resonance(value: str) -> Resonance:
-    """Convert a resonance string to the Resonance enum."""
-    result = _RESONANCE_MAP.get(value)
-    if result is None:
-        raise ValueError(f"Unknown resonance: {value!r}")
-    return result
-
-
-def _parse_resonances(values: list[str]) -> frozenset[Resonance]:
-    """Convert a list of resonance strings to a frozenset of Resonance enums."""
-    return frozenset(_parse_resonance(v) for v in values)
-
-
-def _parse_card_type(value: str) -> CardType:
-    """Convert a card type string to the CardType enum."""
-    result = _CARD_TYPE_MAP.get(value)
-    if result is None:
-        raise ValueError(f"Unknown card type: {value!r}")
-    return result
-
-
-def _parse_rarity(value: str) -> Rarity:
-    """Convert a rarity string to the Rarity enum."""
-    result = _RARITY_MAP.get(value)
-    if result is None:
-        raise ValueError(f"Unknown rarity: {value!r}")
-    return result
 
 
 def _parse_effect_type(value: str) -> EffectType:
@@ -73,86 +32,19 @@ def _parse_effect_type(value: str) -> EffectType:
     return result
 
 
-def load_cards() -> list[Card]:
-    """Load and merge cards.json with card_data.json into Card objects."""
-    with open(DATA_DIR / "cards.json") as f:
-        raw_cards: list[dict[str, Any]] = json.load(f)
+def load_config() -> dict[str, dict[str, Any]]:
+    """Load config.toml and return a dict of config sections.
 
-    with open(DATA_DIR / "card_data.json") as f:
-        raw_card_data: list[dict[str, Any]] = json.load(f)
-
-    card_data_by_number: dict[int, dict[str, Any]] = {
-        entry["card_number"]: entry for entry in raw_card_data
-    }
-
-    cards: list[Card] = []
-    for raw in raw_cards:
-        card_number: int = raw["card_number"]
-        extra = card_data_by_number.get(card_number, {})
-
-        cards.append(
-            Card(
-                name=raw["name"],
-                card_number=card_number,
-                energy_cost=raw.get("energy_cost"),
-                card_type=_parse_card_type(raw["card_type"]),
-                subtype=raw.get("subtype"),
-                is_fast=raw["is_fast"],
-                spark=raw.get("spark"),
-                rarity=_parse_rarity(raw["rarity"]),
-                rules_text=raw["rules_text"],
-                resonances=_parse_resonances(extra.get("resonance", [])),
-                tags=frozenset(extra.get("tags", [])),
-            )
-        )
-
-    return cards
-
-
-def load_config() -> (
-    tuple[AlgorithmParams, DraftParams, PoolParams, dict[str, dict[str, Any]]]
-):
-    """Load config.toml and return typed parameter objects.
-
-    Returns a tuple of (AlgorithmParams, DraftParams, PoolParams, extra_config)
-    where extra_config is a dict of remaining config sections.
+    Returns a dict mapping section names to their key-value pairs.
     """
     with open(DATA_DIR / "config.toml", "rb") as f:
         raw: dict[str, Any] = tomllib.load(f)
 
-    resonance_cfg = raw["resonance"]
-    staleness_cfg = raw["staleness"]
-    algorithm_params = AlgorithmParams(
-        exponent=float(resonance_cfg["exponent"]),
-        floor_weight=float(resonance_cfg["floor_weight"]),
-        neutral_base=float(resonance_cfg["neutral_base"]),
-        staleness_factor=float(staleness_cfg["factor"]),
-    )
-
-    draft_cfg = raw["draft"]
-    draft_params = DraftParams(
-        cards_per_pick=draft_cfg["cards_per_pick"],
-        picks_per_site=draft_cfg["picks_per_site"],
-    )
-
-    pool_cfg = raw["draft_pool"]
-    pool_params = PoolParams(
-        copies_common=pool_cfg["copies_common"],
-        copies_uncommon=pool_cfg["copies_uncommon"],
-        copies_rare=pool_cfg["copies_rare"],
-        copies_legendary=pool_cfg["copies_legendary"],
-        variance_min=float(pool_cfg["variance_min"]),
-        variance_max=float(pool_cfg["variance_max"]),
-    )
-
-    extra_sections = {
+    return {
         k: v
         for k, v in raw.items()
-        if k not in ("resonance", "staleness", "draft", "draft_pool")
-        and isinstance(v, dict)
+        if isinstance(v, dict)
     }
-
-    return algorithm_params, draft_params, pool_params, extra_sections
 
 
 def load_dreamcallers() -> list[Dreamcaller]:
@@ -163,10 +55,6 @@ def load_dreamcallers() -> list[Dreamcaller]:
     return [
         Dreamcaller(
             name=entry["name"],
-            resonances=_parse_resonances(entry["resonance"]),
-            resonance_bonus=MappingProxyType(dict(entry["resonance_bonus"])),
-            tags=frozenset(entry["tags"]),
-            tag_bonus=MappingProxyType(dict(entry["tag_bonus"])),
             essence_bonus=entry["essence_bonus"],
             ability_text=entry["ability_text"],
         )
@@ -182,8 +70,6 @@ def load_dreamsigns() -> list[Dreamsign]:
     return [
         Dreamsign(
             name=entry["name"],
-            resonance=_parse_resonance(entry["resonance"]),
-            tags=frozenset(entry["tags"]),
             effect_text=entry["effect_text"],
             is_bane=entry.get("is_bane", False),
         )
@@ -236,7 +122,7 @@ def load_banes() -> list[BaneCard]:
         BaneCard(
             name=entry["name"],
             rules_text=entry["rules_text"],
-            card_type=_parse_card_type(entry["card_type"]),
+            card_type=entry["card_type"],
             energy_cost=entry["energy_cost"],
         )
         for entry in raw["banes"]
@@ -255,7 +141,6 @@ def load_bosses() -> list[Boss]:
             ability_text=entry["ability_text"],
             deck_description=entry["deck_description"],
             is_final=entry["is_final"],
-            resonances=_parse_resonances(entry["resonance"]),
         )
         for entry in raw["bosses"]
     ]

@@ -1,23 +1,17 @@
 """Mutable quest state management.
 
-Tracks the player's deck, dreamsigns, dreamcaller, essence, resonance
-and tag profiles, draft pool, and completion level. All site interactions
-mutate state through this module's methods.
+Tracks the player's deck, dreamsigns, dreamcaller, essence, and
+draft engine state. All site interactions mutate state through this
+module's methods.
 """
 
 import random
-from typing import Optional
+from typing import Any, Optional
 
 from models import (
-    Card,
     DeckCard,
     Dreamcaller,
     Dreamsign,
-    PoolEntry,
-    Rarity,
-    Resonance,
-    ResonanceProfile,
-    TagProfile,
 )
 
 
@@ -27,10 +21,15 @@ class QuestState:
     def __init__(
         self,
         essence: int,
-        pool: list[PoolEntry],
         rng: random.Random,
-        all_cards: list[Card],
-        pool_variance: dict[Resonance, float],
+        human_agent: Any,
+        ai_agents: list[Any],
+        cube: Any,
+        draft_cfg: Any,
+        packs: list[Any],
+        round_pick_count: int = 0,
+        round_index: int = 0,
+        global_pick_index: int = 0,
         max_deck: int = 50,
         min_deck: int = 25,
         max_dreamsigns: int = 12,
@@ -39,72 +38,50 @@ class QuestState:
         self.dreamsigns: list[Dreamsign] = []
         self.dreamcaller: Optional[Dreamcaller] = None
         self.essence: int = essence
-        self.resonance_profile: ResonanceProfile = ResonanceProfile()
-        self.tag_profile: TagProfile = TagProfile()
-        self.pool: list[PoolEntry] = pool
         self.completion_level: int = 0
         self.rng: random.Random = rng
-        self.all_cards: list[Card] = all_cards
-        self.pool_variance: dict[Resonance, float] = pool_variance
+        self.human_agent: Any = human_agent
+        self.ai_agents: list[Any] = ai_agents
+        self.cube: Any = cube
+        self.draft_cfg: Any = draft_cfg
+        self.packs: list[Any] = packs
+        self.round_pick_count: int = round_pick_count
+        self.round_index: int = round_index
+        self.global_pick_index: int = global_pick_index
         self.max_deck: int = max_deck
         self.min_deck: int = min_deck
         self.max_dreamsigns: int = max_dreamsigns
 
-    def add_card(self, card: Card) -> None:
-        """Add a card to the deck and update resonance and tag profiles."""
-        self.deck.append(DeckCard(card=card))
-        for r in card.resonances:
-            self.resonance_profile.add(r)
-        for t in card.tags:
-            self.tag_profile.add(t)
+    def add_card(self, card_instance: Any) -> None:
+        """Add a card to the deck from a draft CardInstance."""
+        self.deck.append(DeckCard(instance=card_instance))
 
-    def add_bane_card(self, card: Card) -> None:
-        """Add a bane card to the deck. Bane cards do not affect profiles."""
-        self.deck.append(DeckCard(card=card, is_bane=True))
+    def add_bane_card(self, card_instance: Any) -> None:
+        """Add a bane card to the deck."""
+        self.deck.append(DeckCard(instance=card_instance, is_bane=True))
 
     def remove_card(self, deck_card: DeckCard) -> None:
-        """Remove a card from the deck and update resonance and tag profiles."""
+        """Remove a card from the deck."""
         self.deck.remove(deck_card)
-        if not deck_card.is_bane:
-            for r in deck_card.card.resonances:
-                self.resonance_profile.remove(r)
-            for t in deck_card.card.tags:
-                self.tag_profile.remove(t)
 
     def set_dreamcaller(self, dreamcaller: Dreamcaller) -> None:
-        """Set the dreamcaller and apply resonance, tag, and essence bonuses.
+        """Set the dreamcaller and apply essence bonus.
 
-        If a dreamcaller is already set, its bonuses are removed first so that
-        calling this method is idempotent with respect to profile and essence
-        state.
+        If a dreamcaller is already set, its essence bonus is removed first
+        so that calling this method is idempotent with respect to essence.
         """
         if self.dreamcaller is not None:
-            old = self.dreamcaller
-            for resonance_name, amount in old.resonance_bonus.items():
-                self.resonance_profile.remove(Resonance(resonance_name), amount)
-            for tag, amount in old.tag_bonus.items():
-                self.tag_profile.remove(tag, amount)
-            self.essence -= old.essence_bonus
+            self.essence -= self.dreamcaller.essence_bonus
         self.dreamcaller = dreamcaller
-        for resonance_name, amount in dreamcaller.resonance_bonus.items():
-            self.resonance_profile.add(Resonance(resonance_name), amount)
-        for tag, amount in dreamcaller.tag_bonus.items():
-            self.tag_profile.add(tag, amount)
         self.essence += dreamcaller.essence_bonus
 
     def add_dreamsign(self, dreamsign: Dreamsign) -> None:
-        """Add a dreamsign and update resonance and tag profiles."""
+        """Add a dreamsign."""
         self.dreamsigns.append(dreamsign)
-        self.resonance_profile.add(dreamsign.resonance)
-        for t in dreamsign.tags:
-            self.tag_profile.add(t)
 
     def remove_dreamsign(self, dreamsign: Dreamsign) -> None:
-        """Remove a dreamsign and update resonance and tag profiles."""
+        """Remove a dreamsign."""
         self.dreamsigns.remove(dreamsign)
-        self.resonance_profile.remove(dreamsign.resonance)
-        for t in dreamsign.tags:
-            self.tag_profile.remove(t)
 
     def spend_essence(self, amount: int) -> None:
         """Subtract from essence. Raises ValueError if balance would go negative."""
@@ -138,10 +115,10 @@ class QuestState:
         """Duplicate the whole deck repeatedly until deck count exceeds minimum."""
         if not self.deck:
             return
-        original_cards = [dc.card for dc in self.deck]
+        original_instances = [dc.instance for dc in self.deck]
         while len(self.deck) <= self.min_deck:
-            for card in original_cards:
-                self.add_card(card)
+            for inst in original_instances:
+                self.deck.append(DeckCard(instance=inst))
 
     def deck_count(self) -> int:
         """Return the number of cards in the deck."""
@@ -150,10 +127,3 @@ class QuestState:
     def dreamsign_count(self) -> int:
         """Return the number of active dreamsigns."""
         return len(self.dreamsigns)
-
-    def deck_by_rarity(self) -> dict[Rarity, int]:
-        """Return a count of cards per rarity in the deck."""
-        counts: dict[Rarity, int] = {r: 0 for r in Rarity}
-        for dc in self.deck:
-            counts[dc.card.rarity] += 1
-        return counts

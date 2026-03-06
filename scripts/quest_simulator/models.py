@@ -1,35 +1,13 @@
 """Data models for the quest simulator.
 
-Defines all enums, frozen and mutable dataclasses, and profile classes
-used throughout the quest simulator. This is the leaf dependency that
-all other modules import from. Stdlib-only, no external dependencies.
+Defines all enums, frozen and mutable dataclasses used throughout the
+quest simulator. This is the leaf dependency that all other modules
+import from. Stdlib-only, no external dependencies.
 """
 
-import random
 from dataclasses import dataclass, field
 from enum import Enum
-from types import MappingProxyType
-from typing import Optional
-
-
-class Resonance(Enum):
-    TIDE = "Tide"
-    EMBER = "Ember"
-    ZEPHYR = "Zephyr"
-    STONE = "Stone"
-    RUIN = "Ruin"
-
-
-class Rarity(Enum):
-    COMMON = "Common"
-    UNCOMMON = "Uncommon"
-    RARE = "Rare"
-    LEGENDARY = "Legendary"
-
-
-class CardType(Enum):
-    CHARACTER = "Character"
-    EVENT = "Event"
+from typing import Any, Optional
 
 
 class Biome(Enum):
@@ -74,7 +52,6 @@ class EffectType(Enum):
     ADD_ESSENCE = "add_essence"
     REMOVE_CARDS = "remove_cards"
     ADD_DREAMSIGN = "add_dreamsign"
-    GAIN_RESONANCE = "gain_resonance"
     LARGE_ESSENCE = "large_essence"
     LOSE_ESSENCE = "lose_essence"
     ADD_BANE_CARD = "add_bane_card"
@@ -82,51 +59,8 @@ class EffectType(Enum):
 
 
 @dataclass(frozen=True)
-class Card:
-    name: str
-    card_number: int
-    energy_cost: Optional[int]
-    card_type: CardType
-    subtype: Optional[str]
-    is_fast: bool
-    spark: Optional[int]
-    rarity: Rarity
-    rules_text: str
-    resonances: frozenset[Resonance]
-    tags: frozenset[str]
-
-
-@dataclass(frozen=True)
-class AlgorithmParams:
-    exponent: float
-    floor_weight: float
-    neutral_base: float
-    staleness_factor: float
-
-
-@dataclass(frozen=True)
-class DraftParams:
-    cards_per_pick: int
-    picks_per_site: int
-
-
-@dataclass(frozen=True)
-class PoolParams:
-    copies_common: int
-    copies_uncommon: int
-    copies_rare: int
-    copies_legendary: int
-    variance_min: float
-    variance_max: float
-
-
-@dataclass(frozen=True)
 class Dreamcaller:
     name: str
-    resonances: frozenset[Resonance]
-    resonance_bonus: MappingProxyType[str, int]
-    tags: frozenset[str]
-    tag_bonus: MappingProxyType[str, int]
     essence_bonus: int
     ability_text: str
 
@@ -134,8 +68,6 @@ class Dreamcaller:
 @dataclass(frozen=True)
 class Dreamsign:
     name: str
-    resonance: Resonance
-    tags: frozenset[str]
     effect_text: str
     is_bane: bool
 
@@ -164,7 +96,7 @@ class TemptingOffer:
 class BaneCard:
     name: str
     rules_text: str
-    card_type: CardType
+    card_type: str
     energy_cost: int
 
 
@@ -175,21 +107,16 @@ class Boss:
     ability_text: str
     deck_description: str
     is_final: bool
-    resonances: frozenset[Resonance]
 
 
 @dataclass
 class DeckCard:
-    card: Card
+    """A card in the player's deck, wrapping a draft CardInstance."""
+
+    instance: Any
     is_transfigured: bool = False
     is_bane: bool = False
     transfig_note: Optional[str] = None
-
-
-@dataclass
-class PoolEntry:
-    card: Card
-    staleness: int = 0
 
 
 @dataclass
@@ -207,61 +134,3 @@ class DreamscapeNode:
     sites: list[Site]
     state: NodeState
     adjacent: list[int]
-
-
-class ResonanceProfile:
-    """Tracks counts per resonance across the player's collection."""
-
-    def __init__(self) -> None:
-        self.counts: dict[Resonance, int] = {r: 0 for r in Resonance}
-
-    def add(self, resonance: Resonance, amount: int = 1) -> None:
-        self.counts[resonance] += amount
-
-    def remove(self, resonance: Resonance, amount: int = 1) -> None:
-        self.counts[resonance] = max(0, self.counts[resonance] - amount)
-
-    def total(self) -> int:
-        return sum(self.counts.values())
-
-    def top_n(
-        self, n: int, rng: Optional[random.Random] = None
-    ) -> list[tuple[Resonance, int]]:
-        """Return top-n resonances by count, descending. Ties broken randomly."""
-        items = list(self.counts.items())
-        (rng or random).shuffle(items)
-        return sorted(items, key=lambda x: x[1], reverse=True)[:n]
-
-    def snapshot(self) -> dict[Resonance, int]:
-        return dict(self.counts)
-
-    def copy(self) -> "ResonanceProfile":
-        p = ResonanceProfile()
-        p.counts = dict(self.counts)
-        return p
-
-
-class TagProfile:
-    """Tracks counts per tag string across the player's collection."""
-
-    def __init__(self) -> None:
-        self.counts: dict[str, int] = {}
-
-    def add(self, tag: str, amount: int = 1) -> None:
-        self.counts[tag] = self.counts.get(tag, 0) + amount
-
-    def remove(self, tag: str, amount: int = 1) -> None:
-        current = self.counts.get(tag, 0)
-        new_val = max(0, current - amount)
-        if new_val == 0:
-            self.counts.pop(tag, None)
-        else:
-            self.counts[tag] = new_val
-
-    def snapshot(self) -> dict[str, int]:
-        return dict(self.counts)
-
-    def copy(self) -> "TagProfile":
-        p = TagProfile()
-        p.counts = dict(self.counts)
-        return p

@@ -1,67 +1,10 @@
 """Validate quest simulator TOML data files against schema invariants."""
 
-import json
 import sys
 import tomllib
 from pathlib import Path
 
 DATA_DIR = Path(__file__).parent / "data"
-
-VALID_RESONANCES = frozenset({"Tide", "Ember", "Zephyr", "Stone", "Ruin"})
-
-VALID_SUBTYPES = frozenset(
-    {
-        "Survivor",
-        "Warrior",
-        "Spirit Animal",
-        "Ancient",
-        "Visitor",
-        "Explorer",
-        "Synth",
-        "Outsider",
-        "Musician",
-        "Mage",
-    }
-)
-
-VALID_MECHANICS = frozenset(
-    {
-        "foresee",
-        "draw",
-        "kindle",
-        "fast",
-        "prevent",
-        "dissolve",
-        "reclaim",
-        "discard",
-        "copy",
-        "banish",
-        "discover",
-        "spark",
-        "energy",
-        "point",
-        "void",
-        "event",
-        "general",
-    }
-)
-
-VALID_ROLES = frozenset({"finisher", "removal", "engine"})
-
-VALID_ARCHETYPES = frozenset(
-    {
-        "tempest",
-        "mirage",
-        "undertow",
-        "depths",
-        "gale",
-        "eclipse",
-        "basalt",
-        "crucible",
-        "cinder",
-        "bedrock",
-    }
-)
 
 VALID_EFFECT_TYPES = frozenset(
     {
@@ -69,7 +12,6 @@ VALID_EFFECT_TYPES = frozenset(
         "add_essence",
         "remove_cards",
         "add_dreamsign",
-        "gain_resonance",
     }
 )
 
@@ -78,7 +20,6 @@ EFFECT_VALUE_RANGES: dict[str, tuple[int, int]] = {
     "add_essence": (50, 200),
     "remove_cards": (1, 3),
     "add_dreamsign": (1, 1),
-    "gain_resonance": (1, 3),
 }
 
 MIN_EFFECT_TYPE_COUNTS: dict[str, int] = {
@@ -86,44 +27,9 @@ MIN_EFFECT_TYPE_COUNTS: dict[str, int] = {
     "add_essence": 3,
     "remove_cards": 2,
     "add_dreamsign": 2,
-    "gain_resonance": 2,
 }
 
 VALID_BANE_CARD_TYPES = frozenset({"Event"})
-
-
-def validate_tag(tag: str, errors: list[str], context: str) -> None:
-    """Validate a tag string has a known prefix and valid value."""
-    if ":" not in tag:
-        errors.append(f"{context}: tag '{tag}' missing ':' separator")
-        return
-    prefix, value = tag.split(":", 1)
-    if prefix == "tribal":
-        normalized = value.replace("-", " ").title()
-        if normalized not in VALID_SUBTYPES:
-            errors.append(
-                f"{context}: unknown tribal subtype '{value}' "
-                f"(valid: {sorted(VALID_SUBTYPES)})"
-            )
-    elif prefix == "mechanic":
-        if value not in VALID_MECHANICS:
-            errors.append(
-                f"{context}: unknown mechanic '{value}' "
-                f"(valid: {sorted(VALID_MECHANICS)})"
-            )
-    elif prefix == "role":
-        if value not in VALID_ROLES:
-            errors.append(
-                f"{context}: unknown role '{value}' " f"(valid: {sorted(VALID_ROLES)})"
-            )
-    elif prefix == "archetype":
-        if value not in VALID_ARCHETYPES:
-            errors.append(
-                f"{context}: unknown archetype '{value}' "
-                f"(valid: {sorted(VALID_ARCHETYPES)})"
-            )
-    else:
-        errors.append(f"{context}: unknown tag prefix '{prefix}'")
 
 
 def validate_dreamcallers() -> list[str]:
@@ -149,16 +55,11 @@ def validate_dreamcallers() -> list[str]:
 
     required_fields = {
         "name": str,
-        "resonance": list,
-        "resonance_bonus": dict,
-        "tags": list,
-        "tag_bonus": dict,
         "essence_bonus": int,
         "ability_text": str,
     }
 
     names: set[str] = set()
-    resonance_combos: set[frozenset[str]] = set()
 
     for i, entry in enumerate(entries):
         ctx = f"dreamcallers[{i}]"
@@ -177,74 +78,12 @@ def validate_dreamcallers() -> list[str]:
             errors.append(f"{ctx}: duplicate name '{name}'")
         names.add(name)
 
-        resonance = entry.get("resonance", [])
-        if not (1 <= len(resonance) <= 2):
-            errors.append(
-                f"{ctx} ({name}): resonance must have 1-2 entries, "
-                f"got {len(resonance)}"
-            )
-        for r in resonance:
-            if r not in VALID_RESONANCES:
-                errors.append(
-                    f"{ctx} ({name}): unknown resonance '{r}' "
-                    f"(valid: {sorted(VALID_RESONANCES)})"
-                )
-        resonance_combos.add(frozenset(resonance))
-
-        resonance_bonus = entry.get("resonance_bonus", {})
-        for r, val in resonance_bonus.items():
-            if r not in VALID_RESONANCES:
-                errors.append(
-                    f"{ctx} ({name}): resonance_bonus key '{r}' "
-                    f"is not a valid resonance"
-                )
-            if not isinstance(val, int) or not (3 <= val <= 5):
-                errors.append(
-                    f"{ctx} ({name}): resonance_bonus['{r}'] = {val}, "
-                    f"expected int in [3, 5]"
-                )
-        bonus_keys = set(resonance_bonus.keys())
-        resonance_set = set(resonance)
-        if bonus_keys != resonance_set:
-            errors.append(
-                f"{ctx} ({name}): resonance_bonus keys {bonus_keys} "
-                f"don't match resonance {resonance_set}"
-            )
-
-        tags = entry.get("tags", [])
-        if not (1 <= len(tags) <= 3):
-            errors.append(
-                f"{ctx} ({name}): tags must have 1-3 entries, got {len(tags)}"
-            )
-        for tag in tags:
-            validate_tag(tag, errors, f"{ctx} ({name})")
-
-        tag_bonus = entry.get("tag_bonus", {})
-        for tag, val in tag_bonus.items():
-            if tag not in tags:
-                errors.append(f"{ctx} ({name}): tag_bonus key '{tag}' not in tags list")
-            if not isinstance(val, int) or not (1 <= val <= 3):
-                errors.append(
-                    f"{ctx} ({name}): tag_bonus['{tag}'] = {val}, "
-                    f"expected int in [1, 3]"
-                )
-
         essence = entry.get("essence_bonus", 0)
         if not (0 <= essence <= 100):
             errors.append(
                 f"{ctx} ({name}): essence_bonus = {essence}, "
                 f"expected int in [0, 100]"
             )
-
-    if len(resonance_combos) < 6:
-        errors.append(
-            f"Only {len(resonance_combos)} distinct resonance combinations, "
-            f"expected at least 6"
-        )
-
-    has_mono = any(len(c) == 1 for c in resonance_combos)
-    if not has_mono:
-        errors.append("No mono-resonance dreamcaller found (at least 1 required)")
 
     essence_values = [e.get("essence_bonus", 0) for e in entries]
     if len(essence_values) >= 2:
@@ -426,7 +265,6 @@ def validate_bosses() -> list[str]:
         "ability_text": str,
         "deck_description": str,
         "is_final": bool,
-        "resonance": list,
     }
 
     names: set[str] = set()
@@ -455,19 +293,6 @@ def validate_bosses() -> list[str]:
         else:
             miniboss_count += 1
 
-        resonance = entry.get("resonance", [])
-        if not (1 <= len(resonance) <= 2):
-            errors.append(
-                f"{ctx} ({name}): resonance must have 1-2 entries, "
-                f"got {len(resonance)}"
-            )
-        for r in resonance:
-            if r not in VALID_RESONANCES:
-                errors.append(
-                    f"{ctx} ({name}): unknown resonance '{r}' "
-                    f"(valid: {sorted(VALID_RESONANCES)})"
-                )
-
         ability_text = entry.get("ability_text", "")
         if isinstance(ability_text, str) and not ability_text.strip():
             errors.append(f"{ctx} ({name}): ability_text must not be empty")
@@ -485,142 +310,6 @@ def validate_bosses() -> list[str]:
         errors.append(
             f"Expected 10 final bosses (is_final=true), found {final_boss_count}"
         )
-
-    return errors
-
-
-def validate_card_allocations() -> list[str]:
-    """Validate card_allocations.toml schema and invariants."""
-    errors: list[str] = []
-    path = DATA_DIR / "card_allocations.toml"
-
-    if not path.exists():
-        return [f"File not found: {path}"]
-
-    with open(path, "rb") as f:
-        data = tomllib.load(f)
-
-    if "cards" not in data:
-        return ["Missing top-level 'cards' key"]
-
-    entries = data["cards"]
-    if not isinstance(entries, list):
-        return ["'cards' must be an array of tables"]
-
-    names: set[str] = set()
-    mono_counts: dict[str, int] = {r: 0 for r in VALID_RESONANCES}
-    dual_count = 0
-    neutral_count = 0
-
-    for i, entry in enumerate(entries):
-        ctx = f"cards[{i}]"
-        name = entry.get("name", f"<unnamed #{i}>")
-
-        if "name" not in entry:
-            errors.append(f"{ctx}: missing required field 'name'")
-        if "resonance" not in entry:
-            errors.append(f"{ctx} ({name}): missing required field 'resonance'")
-        if "archetypes" not in entry:
-            errors.append(f"{ctx} ({name}): missing required field 'archetypes'")
-
-        if name in names:
-            errors.append(f"{ctx}: duplicate name '{name}'")
-        names.add(name)
-
-        resonance = entry.get("resonance", [])
-        if not isinstance(resonance, list):
-            errors.append(f"{ctx} ({name}): resonance must be a list")
-        elif len(resonance) > 2:
-            errors.append(
-                f"{ctx} ({name}): resonance must have 0-2 entries, "
-                f"got {len(resonance)}"
-            )
-        else:
-            for r in resonance:
-                if r not in VALID_RESONANCES:
-                    errors.append(
-                        f"{ctx} ({name}): unknown resonance '{r}' "
-                        f"(valid: {sorted(VALID_RESONANCES)})"
-                    )
-            if len(resonance) == 0:
-                neutral_count += 1
-            elif len(resonance) == 1:
-                mono_counts[resonance[0]] = mono_counts.get(resonance[0], 0) + 1
-            elif len(resonance) == 2:
-                dual_count += 1
-
-        archetypes = entry.get("archetypes", [])
-        if not isinstance(archetypes, list):
-            errors.append(f"{ctx} ({name}): archetypes must be a list")
-        else:
-            for arch in archetypes:
-                if arch.lower() not in VALID_ARCHETYPES:
-                    errors.append(
-                        f"{ctx} ({name}): unknown archetype '{arch}' "
-                        f"(valid: {sorted(VALID_ARCHETYPES)})"
-                    )
-
-    if len(entries) != 249:
-        errors.append(f"Expected 249 cards, found {len(entries)}")
-
-    if dual_count != 10:
-        errors.append(f"Expected 10 dual-resonance cards, found {dual_count}")
-
-    if neutral_count != 24:
-        errors.append(f"Expected 24 neutral cards, found {neutral_count}")
-
-    return errors
-
-
-def validate_card_data() -> list[str]:
-    """Cross-validate card_data.json against cards.json."""
-    errors: list[str] = []
-    cards_path = DATA_DIR / "cards.json"
-    card_data_path = DATA_DIR / "card_data.json"
-
-    if not cards_path.exists():
-        return [f"File not found: {cards_path}"]
-    if not card_data_path.exists():
-        return [f"File not found: {card_data_path}"]
-
-    with open(cards_path) as f:
-        cards = json.load(f)
-    with open(card_data_path) as f:
-        card_data = json.load(f)
-
-    card_numbers = {c["card_number"] for c in cards}
-    data_numbers = {d["card_number"] for d in card_data}
-
-    missing_from_data = card_numbers - data_numbers
-    if missing_from_data:
-        errors.append(
-            f"card_data.json missing card_numbers present in cards.json: "
-            f"{sorted(missing_from_data)}"
-        )
-
-    extra_in_data = data_numbers - card_numbers
-    if extra_in_data:
-        errors.append(
-            f"card_data.json has card_numbers not in cards.json: "
-            f"{sorted(extra_in_data)}"
-        )
-
-    for entry in card_data:
-        ctx = f"card_data[{entry.get('card_number', '?')}]"
-        resonance = entry.get("resonance", [])
-        if not isinstance(resonance, list):
-            errors.append(f"{ctx}: resonance must be a list")
-        else:
-            for r in resonance:
-                if r not in VALID_RESONANCES:
-                    errors.append(f"{ctx}: unknown resonance '{r}'")
-
-        tags = entry.get("tags", [])
-        if not isinstance(tags, list):
-            errors.append(f"{ctx}: tags must be a list")
-        else:
-            for tag in tags:
-                validate_tag(tag, errors, ctx)
 
     return errors
 
@@ -655,22 +344,6 @@ def main() -> int:
 
     print("Validating bosses.toml...", end=" ")
     errors = validate_bosses()
-    if errors:
-        print(f"FAILED ({len(errors)} errors)")
-        all_errors.extend(errors)
-    else:
-        print("OK")
-
-    print("Validating card_allocations.toml...", end=" ")
-    errors = validate_card_allocations()
-    if errors:
-        print(f"FAILED ({len(errors)} errors)")
-        all_errors.extend(errors)
-    else:
-        print("OK")
-
-    print("Validating card_data.json...", end=" ")
-    errors = validate_card_data()
     if errors:
         print(f"FAILED ({len(errors)} errors)")
         all_errors.extend(errors)

@@ -1,8 +1,8 @@
 # Dream Journey events -- presented as pairs (pick 1 of 2).
 # Each event has a mechanical effect applied when chosen.
-# Effect types: add_cards, add_essence, remove_cards, add_dreamsign, gain_resonance
+# Effect types: add_cards, add_essence, remove_cards, add_dreamsign
 
-# --- add_cards: draw weighted cards from the draft pool into the deck ---
+# --- add_cards: draw cards from the draft into the deck ---
 
 [[journeys]]
 name = "The Sunken Archive"
@@ -76,25 +76,25 @@ description = "Thousands of luminous moths spiral around a single point of darkn
 effect_type = "add_dreamsign"
 effect_value = 1
 
-# --- gain_resonance: boost the player's top resonance count ---
+# --- add_essence: boost the player's essence reserves ---
 
 [[journeys]]
 name = "The Echo Chamber"
 description = "A cavern amplifies every sound into a symphony. The resonance of your strongest affinity reverberates through you, growing deeper and more certain."
-effect_type = "gain_resonance"
-effect_value = 1
+effect_type = "add_essence"
+effect_value = 50
 
 [[journeys]]
 name = "The Resonance Spire"
 description = "A crystalline tower vibrates at your approach, matching the dominant frequency of your essence. Climbing to its peak floods you with sympathetic power."
-effect_type = "gain_resonance"
-effect_value = 2
+effect_type = "add_essence"
+effect_value = 100
 
 [[journeys]]
 name = "The Harmonic Rift"
 description = "A tear in the dreamscape pulses with raw, untuned energy. You reach into the rift and shape it to your will, but the force of it leaves you breathless."
-effect_type = "gain_resonance"
-effect_value = 3
+effect_type = "add_essence"
+effect_value = 150
 
 # --- additional variety ---
 
