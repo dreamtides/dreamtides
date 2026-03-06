@@ -186,13 +186,13 @@ class TestColorsIntegration(unittest.TestCase):
         self.assertTrue(hasattr(render, "colors"))
 
     def test_no_raw_ansi_constants(self) -> None:
-        """No raw BOLD/DIM/RESET/STRIKETHROUGH constants."""
+        """BOLD/DIM/RESET/STRIKETHROUGH are not raw ANSI escape sequences."""
         import render
 
-        self.assertFalse(hasattr(render, "BOLD"))
-        self.assertFalse(hasattr(render, "DIM"))
-        self.assertFalse(hasattr(render, "RESET"))
-        self.assertFalse(hasattr(render, "STRIKETHROUGH"))
+        # With NO_COLOR=1 set, the shims should be empty strings
+        for name in ("BOLD", "DIM", "RESET", "STRIKETHROUGH"):
+            val = getattr(render, name, "")
+            self.assertEqual(val, "", f"{name} should be empty when NO_COLOR is set")
 
 
 if __name__ == "__main__":

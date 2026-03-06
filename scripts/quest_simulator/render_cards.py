@@ -11,9 +11,7 @@ from models import DeckCard, Dreamcaller, Dreamsign
 
 import render
 
-ARCHETYPE_NAMES: list[str] = [
-    "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7",
-]
+ARCHETYPE_NAMES = render.ARCHETYPE_NAMES
 
 
 def _top_archetype(fitness: list[float]) -> str:

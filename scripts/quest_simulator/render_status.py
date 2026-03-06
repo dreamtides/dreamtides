@@ -10,15 +10,12 @@ from typing import Optional
 import colors
 from models import Boss
 from render import (
+    ARCHETYPE_NAMES,
     CONTENT_WIDTH,
     draw_double_separator,
     draw_separator,
     visible_len,
 )
-
-ARCHETYPE_NAMES: list[str] = [
-    "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7",
-]
 
 
 def site_header(
@@ -96,9 +93,8 @@ def battle_victory_message() -> str:
 
 def battle_reward_summary(
     essence_reward: int,
-    rare_pick_count: int,
 ) -> str:
-    """Build the reward summary display showing essence gained and rare pick framing."""
+    """Build the reward summary display showing essence gained."""
     lines: list[str] = [
         f"  Essence reward: {colors.c(f'+{essence_reward}', 'accent', bold=True)}",
         "",

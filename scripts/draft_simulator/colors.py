@@ -28,6 +28,11 @@ PALETTE: dict[str, tuple[int, int, int]] = {
 }
 
 
+def reset() -> str:
+    """Return an ANSI reset sequence, or empty string when color is disabled."""
+    return "\033[0m" if _USE_COLOR else ""
+
+
 def c(text: object, role: str, bold: bool = False) -> str:
     """Wrap text in ANSI escape for the given palette role."""
     s = str(text)

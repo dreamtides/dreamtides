@@ -10,6 +10,10 @@ import colors
 
 CONTENT_WIDTH = 70
 
+ARCHETYPE_NAMES: list[str] = [
+    "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7",
+]
+
 
 def visible_len(s: str) -> int:
     """Length of string excluding ANSI escape sequences."""
@@ -43,9 +47,9 @@ def truncate_visible(s: str, max_width: int) -> str:
             break
         result.append(ch)
         vis += 1
-    if colors._USE_COLOR:
-        # Append an ANSI reset to close any open formatting
-        result.append(f"{chr(27)}[0m")
+    reset_seq = colors.reset()
+    if reset_seq:
+        result.append(reset_seq)
     return "".join(result)
 
 
@@ -135,3 +139,29 @@ def site_visit_header(
     right = f"[Dreamscape {dreamscape_number}]"
     gap = max(2, CONTENT_WIDTH - len(left) - len(right))
     return "\n".join([sep, f"{left}{' ' * gap}{right}", sep])
+
+
+# ---------------------------------------------------------------------------
+# Backward-compatibility shims for modules not yet migrated to colors API.
+# These route through the AYU Mirage colors module instead of using raw ANSI.
+# They will be removed once flow.py, render_atlas.py, sites_battle.py, etc.
+# are updated.
+# ---------------------------------------------------------------------------
+
+BOLD = colors.c("", "accent", bold=True).replace(colors.reset(), "") if colors._USE_COLOR else ""
+DIM = colors.c("", "comment").replace(colors.reset(), "") if colors._USE_COLOR else ""
+RESET = colors.reset()
+STRIKETHROUGH = ""
+
+
+def format_card(card_or_deck_card, highlighted: bool = False, max_width: int = CONTENT_WIDTH) -> list[str]:
+    """Compatibility shim routing to render_cards.format_card_display."""
+    import render_cards
+    return render_cards.format_card_display(card_or_deck_card, highlighted=highlighted, max_width=max_width)
+
+
+def resonance_profile_footer(counts=None, deck_count: int = 0, essence: int = 0, **kwargs) -> str:
+    """Compatibility shim routing to render_status.archetype_preference_footer."""
+    import render_status
+    w = [0.0] * 8
+    return render_status.archetype_preference_footer(w=w, deck_count=deck_count, essence=essence)

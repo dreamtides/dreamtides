@@ -7,6 +7,7 @@ quest flow.
 """
 
 import argparse
+import os
 import random
 import sys
 import traceback
@@ -163,7 +164,7 @@ def main() -> None:
     banner = render.quest_start_banner(
         seed=seed,
         starting_essence=starting_essence,
-        pool_size=len(cards),
+        card_count=len(cards),
     )
     print(banner)
 

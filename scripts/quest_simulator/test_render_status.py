@@ -154,6 +154,7 @@ class TestVictoryScreen(unittest.TestCase):
 
     def test_contains_dreamscapes_visited(self) -> None:
         result = self._build_victory()
+        self.assertIn("Dreamscapes visited", result)
         self.assertIn("7", result)
 
     def test_contains_dreamcaller_name(self) -> None:
@@ -162,6 +163,7 @@ class TestVictoryScreen(unittest.TestCase):
 
     def test_contains_deck_size(self) -> None:
         result = self._build_victory()
+        self.assertIn("Final Deck", result)
         self.assertIn("34", result)
 
     def test_contains_archetype_preferences(self) -> None:
@@ -171,7 +173,9 @@ class TestVictoryScreen(unittest.TestCase):
 
     def test_contains_dreamsigns_and_essence(self) -> None:
         result = self._build_victory()
+        self.assertIn("Dreamsigns", result)
         self.assertIn("4", result)
+        self.assertIn("Essence remaining", result)
         self.assertIn("175", result)
 
     def test_contains_log_path(self) -> None:
@@ -369,19 +373,19 @@ class TestBattleRewardSummary(unittest.TestCase):
     def test_contains_essence_reward(self) -> None:
         from render_status import battle_reward_summary
 
-        result = battle_reward_summary(essence_reward=175, rare_pick_count=3)
+        result = battle_reward_summary(essence_reward=175)
         self.assertIn("175", result)
 
     def test_contains_essence_label(self) -> None:
         from render_status import battle_reward_summary
 
-        result = battle_reward_summary(essence_reward=100, rare_pick_count=3)
+        result = battle_reward_summary(essence_reward=100)
         self.assertIn("Essence reward", result)
 
     def test_contains_battle_reward_label(self) -> None:
         from render_status import battle_reward_summary
 
-        result = battle_reward_summary(essence_reward=100, rare_pick_count=3)
+        result = battle_reward_summary(essence_reward=100)
         self.assertIn("Battle Reward", result)
 
 
