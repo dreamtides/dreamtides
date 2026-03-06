@@ -126,6 +126,7 @@ def visit_site(
             dreamscape_number=number,
             is_enhanced=enhanced,
             shop_config=shop_config_ss,
+            all_dreamsigns=data.dreamsigns,
         )
 
     elif site_type == SiteType.DREAMSIGN_OFFERING:

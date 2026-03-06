@@ -17,6 +17,7 @@ import agents
 from draft_models import CardInstance
 from input_handler import multi_select, single_select
 from jsonl_log import SessionLogger
+from models import Dreamsign
 from quest_state import QuestState
 from render import (
     format_card,
@@ -95,7 +96,12 @@ def draw_and_filter(
     are found, relaxes the threshold or returns what is available.
     """
     top_archs = _top_archetypes(state.human_agent.w)
-    drawn = state.cube.draw(batch_size, state.rng)
+    available = state.cube.remaining
+    first_draw = min(batch_size, available)
+    if first_draw <= 0:
+        return []
+
+    drawn = state.cube.draw(first_draw, state.rng)
 
     # Filter to high-fitness cards
     filtered = [
@@ -107,7 +113,10 @@ def draw_and_filter(
         return filtered[:count]
 
     # Not enough: try drawing more
-    extra = state.cube.draw(batch_size, state.rng)
+    second_draw = min(batch_size, state.cube.remaining)
+    extra: list[CardInstance] = []
+    if second_draw > 0:
+        extra = state.cube.draw(second_draw, state.rng)
     for card in extra:
         if _has_high_fitness(card, top_archs, _FITNESS_THRESHOLD):
             filtered.append(card)
@@ -143,10 +152,14 @@ def _apply_discount(
     discount_min: int,
     discount_max: int,
 ) -> int:
-    """Apply a random discount percentage and round to nearest 10."""
+    """Apply a random discount percentage and round to nearest 10.
+
+    The result is clamped so it never exceeds the base price.
+    """
     discount_pct = rng.randint(discount_min, discount_max)
     discounted = base_price * (100 - discount_pct) / 100
-    return max(10, round(discounted / 10) * 10)
+    rounded = max(_MIN_PRICE, round(discounted / 10) * 10)
+    return min(rounded, base_price)
 
 
 def prepare_shop_items(
@@ -261,14 +274,27 @@ def run_discovery_draft(
 
         # Log picks
         if logger is not None:
-            for idx in selected_indices:
-                card = offered[idx]
+            if selected_indices:
+                for idx in selected_indices:
+                    card = offered[idx]
+                    logger.log_site_visit(
+                        site_type="DiscoveryDraft",
+                        dreamscape=dreamscape_name,
+                        is_enhanced=is_enhanced,
+                        choices=[inst.design.name for inst in offered],
+                        choice_made=card.design.name,
+                        state_changes={
+                            "pick_num": pick_num,
+                            "deck_size_after": state.deck_count(),
+                        },
+                    )
+            else:
                 logger.log_site_visit(
                     site_type="DiscoveryDraft",
                     dreamscape=dreamscape_name,
                     is_enhanced=is_enhanced,
                     choices=[inst.design.name for inst in offered],
-                    choice_made=card.design.name,
+                    choice_made=None,
                     state_changes={
                         "pick_num": pick_num,
                         "deck_size_after": state.deck_count(),
@@ -292,15 +318,24 @@ def run_specialty_shop(
     dreamscape_number: int,
     is_enhanced: bool,
     shop_config: dict[str, int],
+    all_dreamsigns: Optional[list[Dreamsign]] = None,
 ) -> None:
     """Run a Specialty Shop site interaction.
 
     Draws from the CubeManager, filters by archetype fitness, displays
-    items with power-based prices. Does NOT advance the draft pick
-    counter. Reroll re-draws from the cube.
+    items with power-based prices. Includes a dreamsign offering if
+    dreamsigns are available. Does NOT advance the draft pick counter.
+    Reroll re-draws from the cube.
     """
     items_count = shop_config.get("items_count", 4)
     reroll_cost = shop_config.get("reroll_cost", 50)
+
+    # Select a dreamsign offering if dreamsigns are available
+    dreamsign_offer: Optional[Dreamsign] = None
+    if all_dreamsigns:
+        non_bane = [ds for ds in all_dreamsigns if not ds.is_bane]
+        if non_bane:
+            dreamsign_offer = state.rng.choice(non_bane)
 
     while True:
         drawn = draw_and_filter(state, count=items_count)
@@ -326,7 +361,16 @@ def run_specialty_shop(
                 price_str = f"{item.base_price}e"
             option_names.append(f"{item.instance.design.name} -- {price_str}")
 
+        # Add dreamsign offering if available
+        dreamsign_idx: Optional[int] = None
+        if dreamsign_offer is not None:
+            dreamsign_idx = len(option_names)
+            option_names.append(
+                f"Dreamsign: {dreamsign_offer.name} (free)"
+            )
+
         # Add reroll option
+        reroll_idx = len(option_names)
         can_afford_reroll = state.essence >= reroll_cost
         reroll_label = f"Reroll ({reroll_cost}e)"
         if not can_afford_reroll:
@@ -335,10 +379,13 @@ def run_specialty_shop(
 
         # Multi-select for purchasing
         def _render_shop(
-            idx: int, option: str, highlighted: bool, checked: bool
+            idx: int, option: str, highlighted: bool, checked: bool,
+            _items: list[ShopItem] = items,
+            _dreamsign_idx: Optional[int] = dreamsign_idx,
+            _dreamsign_offer: Optional[Dreamsign] = dreamsign_offer,
         ) -> str:
-            if idx < len(items):
-                shop_item = items[idx]
+            if idx < len(_items):
+                shop_item = _items[idx]
                 lines = format_card(shop_item.instance, highlighted=highlighted)
                 check = "[x]" if checked else "[ ]"
                 marker = ">" if highlighted else " "
@@ -357,6 +404,14 @@ def run_specialty_shop(
                     1,
                 )
                 return "\n".join(lines) + f"\n    {price_line}"
+            elif _dreamsign_idx is not None and idx == _dreamsign_idx:
+                marker = ">" if highlighted else " "
+                check = "[x]" if checked else "[ ]"
+                ds_name = _dreamsign_offer.name if _dreamsign_offer else ""
+                line1 = f"  {marker} {check} {BOLD}Dreamsign:{RESET} {ds_name}"
+                line2 = f'      "{_dreamsign_offer.effect_text}"' if _dreamsign_offer else ""
+                line3 = f"      {DIM}(free){RESET}"
+                return "\n".join([line1, line2, line3])
             else:
                 marker = ">" if highlighted else " "
                 return f"\n  {marker} {option}"
@@ -364,13 +419,18 @@ def run_specialty_shop(
         toggled = multi_select(option_names, render_fn=_render_shop)
 
         # Check if reroll was selected
-        reroll_idx = len(items)
         if reroll_idx in toggled:
             if can_afford_reroll:
                 state.spend_essence(reroll_cost)
                 continue
             else:
                 toggled = [i for i in toggled if i != reroll_idx]
+
+        # Handle dreamsign selection
+        acquired_dreamsign: Optional[Dreamsign] = None
+        if dreamsign_idx is not None and dreamsign_idx in toggled:
+            acquired_dreamsign = dreamsign_offer
+            toggled = [i for i in toggled if i != dreamsign_idx]
 
         # Filter to item indices only
         purchase_indices = [i for i in toggled if i < len(items)]
@@ -392,6 +452,10 @@ def run_specialty_shop(
             purchased.append(shop_item.instance)
             state.spend_essence(shop_item.effective_price)
 
+        # Apply dreamsign acquisition
+        if acquired_dreamsign is not None:
+            state.add_dreamsign(acquired_dreamsign)
+
         # Log the shop interaction
         if logger is not None:
             logger.log_site_visit(
@@ -408,6 +472,11 @@ def run_specialty_shop(
                     "items_bought": [c.design.name for c in purchased],
                     "essence_spent": total,
                     "deck_size_after": state.deck_count(),
+                    "dreamsign_acquired": (
+                        acquired_dreamsign.name
+                        if acquired_dreamsign is not None
+                        else None
+                    ),
                 },
             )
         break

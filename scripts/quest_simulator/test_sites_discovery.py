@@ -433,6 +433,262 @@ class TestSpecialtyShopReroll:
         assert state.global_pick_index == initial_pick_index
 
 
+class TestDiscountNeverExceedsBase:
+    """Test that discounted price never exceeds the base price."""
+
+    def test_discount_never_increases_low_price(self) -> None:
+        """A discounted price should never be higher than the base price."""
+        from sites_discovery import _apply_discount
+
+        rng = random.Random(42)
+        for base_price in [5, 6, 7, 8, 9, 10]:
+            discounted = _apply_discount(base_price, rng, 10, 50)
+            assert discounted <= base_price, (
+                f"Discounted {discounted} > base {base_price}"
+            )
+
+    def test_discount_on_minimum_price(self) -> None:
+        """Discounting the minimum price (5) should return at most 5."""
+        from sites_discovery import _apply_discount
+
+        rng = random.Random(99)
+        result = _apply_discount(5, rng, 10, 90)
+        assert result <= 5
+
+
+class TestDrawAndFilterSmallCube:
+    """Test draw_and_filter behavior with small cubes."""
+
+    def test_small_cube_does_not_raise(self) -> None:
+        """draw_and_filter should not raise when cube has fewer cards than batch_size."""
+        import sys
+        from pathlib import Path
+
+        draft_dir = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+        if draft_dir not in sys.path:
+            sys.path.insert(0, draft_dir)
+
+        import agents
+        import cube_manager
+        from config import SimulatorConfig
+        from draft_models import CubeConsumptionMode
+
+        from sites_discovery import draw_and_filter
+
+        # Only 5 cards in the cube (far fewer than batch_size=30)
+        designs = [
+            _make_design(
+                name=f"Small {i}",
+                card_id=f"small_{i}",
+                fitness=[0.9] * 8,
+            )
+            for i in range(5)
+        ]
+        cube = cube_manager.CubeManager(
+            designs=designs,
+            copies_per_card=1,
+            consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
+        )
+        cfg = SimulatorConfig()
+        cfg.draft.seat_count = 6
+        cfg.agents.learning_rate = 3.0
+        cfg.agents.openness_window = 3
+
+        human = agents.create_agent(archetype_count=8)
+        human.w[0] = 5.0
+
+        state = QuestState(
+            essence=500,
+            rng=random.Random(42),
+            human_agent=human,
+            ai_agents=[],
+            cube=cube,
+            draft_cfg=cfg,
+        )
+
+        cards = draw_and_filter(state, count=4)
+        assert len(cards) > 0
+
+    def test_empty_cube_returns_empty(self) -> None:
+        """draw_and_filter should return empty list when cube is exhausted."""
+        import sys
+        from pathlib import Path
+
+        draft_dir = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+        if draft_dir not in sys.path:
+            sys.path.insert(0, draft_dir)
+
+        import agents
+        import cube_manager
+        from config import SimulatorConfig
+        from draft_models import CubeConsumptionMode
+
+        from sites_discovery import draw_and_filter
+
+        # Create a cube with 1 card in WITHOUT_REPLACEMENT mode, draw it first
+        designs = [
+            _make_design(name="Only", card_id="only_0", fitness=[0.9] * 8)
+        ]
+        cube = cube_manager.CubeManager(
+            designs=designs,
+            copies_per_card=1,
+            consumption_mode=CubeConsumptionMode.WITHOUT_REPLACEMENT,
+        )
+        cfg = SimulatorConfig()
+        cfg.draft.seat_count = 6
+        cfg.agents.learning_rate = 3.0
+        cfg.agents.openness_window = 3
+
+        rng = random.Random(42)
+        human = agents.create_agent(archetype_count=8)
+        human.w[0] = 5.0
+
+        # Exhaust the cube
+        cube.draw(1, rng)
+
+        state = QuestState(
+            essence=500,
+            rng=rng,
+            human_agent=human,
+            ai_agents=[],
+            cube=cube,
+            draft_cfg=cfg,
+        )
+
+        cards = draw_and_filter(state, count=4)
+        assert cards == []
+
+
+class TestDiscoveryLoggingZeroPicks:
+    """Test that logging occurs even when no cards are selected."""
+
+    def test_enhanced_zero_picks_logs_visit(self) -> None:
+        """Enhanced discovery with zero picks should still log the visit."""
+        from sites_discovery import run_discovery_draft
+
+        state = _make_quest_state()
+
+        log_calls: list[dict] = []
+
+        class MockLogger:
+            def log_site_visit(self, **kwargs: object) -> None:
+                log_calls.append(kwargs)
+
+        with patch("sites_discovery.multi_select", return_value=[]):
+            run_discovery_draft(
+                state=state,
+                logger=MockLogger(),  # type: ignore[arg-type]
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                is_enhanced=True,
+            )
+
+        assert len(log_calls) > 0
+        assert log_calls[0]["choice_made"] is None
+
+
+class TestSpecialtyShopDreamsignOffering:
+    """Test that Specialty Shop includes dreamsign offerings."""
+
+    def test_dreamsign_offered_in_shop(self) -> None:
+        """Specialty Shop should include a dreamsign option when dreamsigns are provided."""
+        from sites_discovery import run_specialty_shop
+
+        from models import Dreamsign
+
+        state = _make_quest_state(essence=500)
+        dreamsigns = [
+            Dreamsign(name="Test Sign", effect_text="Test effect", is_bane=False),
+        ]
+
+        option_names_seen: list[list[str]] = []
+
+        def mock_multi_select(options: list[str], render_fn: object = None) -> list[int]:
+            option_names_seen.append(list(options))
+            return []  # Buy nothing
+
+        with patch("sites_discovery.multi_select", side_effect=mock_multi_select):
+            run_specialty_shop(
+                state=state,
+                logger=None,
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                is_enhanced=False,
+                shop_config={"reroll_cost": 50, "items_count": 4,
+                             "discount_min": 30, "discount_max": 90},
+                all_dreamsigns=dreamsigns,
+            )
+
+        assert len(option_names_seen) == 1
+        # Should have card items + dreamsign + reroll
+        found_dreamsign = any("Dreamsign" in opt for opt in option_names_seen[0])
+        assert found_dreamsign, (
+            f"Expected dreamsign option in: {option_names_seen[0]}"
+        )
+
+    def test_dreamsign_acquired_when_selected(self) -> None:
+        """Selecting the dreamsign option should add it to the state."""
+        from sites_discovery import run_specialty_shop
+
+        from models import Dreamsign
+
+        state = _make_quest_state(essence=500)
+        dreamsigns = [
+            Dreamsign(name="Acquired Sign", effect_text="Effect", is_bane=False),
+        ]
+
+        assert state.dreamsign_count() == 0
+
+        def mock_multi_select(options: list[str], render_fn: object = None) -> list[int]:
+            # Find the dreamsign option index
+            for i, opt in enumerate(options):
+                if "Dreamsign" in opt:
+                    return [i]
+            return []
+
+        with patch("sites_discovery.multi_select", side_effect=mock_multi_select):
+            run_specialty_shop(
+                state=state,
+                logger=None,
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                is_enhanced=False,
+                shop_config={"reroll_cost": 50, "items_count": 4,
+                             "discount_min": 30, "discount_max": 90},
+                all_dreamsigns=dreamsigns,
+            )
+
+        assert state.dreamsign_count() == 1
+        assert state.dreamsigns[0].name == "Acquired Sign"
+
+    def test_no_dreamsign_without_dreamsigns_list(self) -> None:
+        """Specialty Shop should work without dreamsigns (backwards compatible)."""
+        from sites_discovery import run_specialty_shop
+
+        state = _make_quest_state(essence=500)
+
+        option_names_seen: list[list[str]] = []
+
+        def mock_multi_select(options: list[str], render_fn: object = None) -> list[int]:
+            option_names_seen.append(list(options))
+            return []
+
+        with patch("sites_discovery.multi_select", side_effect=mock_multi_select):
+            run_specialty_shop(
+                state=state,
+                logger=None,
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                is_enhanced=False,
+                shop_config={"reroll_cost": 50, "items_count": 4,
+                             "discount_min": 30, "discount_max": 90},
+            )
+
+        assert len(option_names_seen) == 1
+        found_dreamsign = any("Dreamsign" in opt for opt in option_names_seen[0])
+        assert not found_dreamsign
+
+
 class TestNoOldImports:
     """Test that old imports are removed."""
 
