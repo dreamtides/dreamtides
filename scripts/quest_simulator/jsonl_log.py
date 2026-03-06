@@ -22,18 +22,29 @@ _LOG_DIR = _PROJECT_ROOT / ".logs"
 
 
 def _deck_card_dict(dc: DeckCard) -> dict[str, object]:
-    """Serialize a DeckCard to a dict."""
+    """Serialize a DeckCard to a dict with CardDesign/CardInstance fields."""
     instance = dc.instance
     result: dict[str, object] = {
         "is_bane": dc.is_bane,
         "is_transfigured": dc.is_transfigured,
     }
-    if hasattr(instance, "design") and hasattr(instance.design, "name"):
-        result["name"] = instance.design.name
-    elif hasattr(instance, "name"):
-        result["name"] = instance.name
     if hasattr(instance, "instance_id"):
         result["instance_id"] = instance.instance_id
+    design = getattr(instance, "design", instance)
+    if hasattr(design, "name"):
+        result["name"] = design.name
+    if hasattr(design, "card_id"):
+        result["card_id"] = design.card_id
+    if hasattr(design, "power"):
+        result["power"] = round(design.power, 4)
+    if hasattr(design, "commit"):
+        result["commit"] = round(design.commit, 4)
+    if hasattr(design, "flex"):
+        result["flex"] = round(design.flex, 4)
+    if hasattr(design, "fitness"):
+        fitness = design.fitness
+        top = sorted(fitness, reverse=True)[:3] if fitness else []
+        result["top_fitness"] = [round(v, 4) for v in top]
     return result
 
 
@@ -56,8 +67,9 @@ class SessionLogger:
         self,
         seed: int,
         atlas_topology: list[DreamscapeNode],
+        draft_config: Optional[dict[str, object]] = None,
     ) -> None:
-        """Log the start of a quest session."""
+        """Log the start of a quest session with draft configuration."""
         nodes = []
         for node in atlas_topology:
             nodes.append(
@@ -68,13 +80,14 @@ class SessionLogger:
                     "adjacent": node.adjacent,
                 }
             )
-        self._write(
-            {
-                "event": "session_start",
-                "seed": seed,
-                "atlas_nodes": nodes,
-            }
-        )
+        event: dict[str, object] = {
+            "event": "session_start",
+            "seed": seed,
+            "atlas_nodes": nodes,
+        }
+        if draft_config is not None:
+            event["draft_config"] = draft_config
+        self._write(event)
 
     def log_dreamscape_enter(
         self,
@@ -134,17 +147,31 @@ class SessionLogger:
         offered = []
         for card, weight in zip(offered_cards, weights):
             entry: dict[str, object] = {"weight": round(weight, 4)}
-            if hasattr(card, "design") and hasattr(card.design, "name"):
-                entry["name"] = card.design.name
-            elif hasattr(card, "name"):
-                entry["name"] = card.name
+            design = getattr(card, "design", card)
+            if hasattr(design, "name"):
+                entry["name"] = design.name
+            if hasattr(design, "card_id"):
+                entry["card_id"] = design.card_id
+            if hasattr(design, "power"):
+                entry["power"] = round(design.power, 4)
+            if hasattr(design, "commit"):
+                entry["commit"] = round(design.commit, 4)
+            if hasattr(design, "flex"):
+                entry["flex"] = round(design.flex, 4)
             offered.append(entry)
 
         picked: dict[str, object] = {}
-        if hasattr(picked_card, "design") and hasattr(picked_card.design, "name"):
-            picked["name"] = picked_card.design.name
-        elif hasattr(picked_card, "name"):
-            picked["name"] = picked_card.name
+        picked_design = getattr(picked_card, "design", picked_card)
+        if hasattr(picked_design, "name"):
+            picked["name"] = picked_design.name
+        if hasattr(picked_design, "card_id"):
+            picked["card_id"] = picked_design.card_id
+        if hasattr(picked_design, "power"):
+            picked["power"] = round(picked_design.power, 4)
+        if hasattr(picked_design, "commit"):
+            picked["commit"] = round(picked_design.commit, 4)
+        if hasattr(picked_design, "flex"):
+            picked["flex"] = round(picked_design.flex, 4)
 
         self._write(
             {
@@ -161,18 +188,26 @@ class SessionLogger:
         essence_spent: int,
     ) -> None:
         """Log a shop interaction with items shown, bought, and cost."""
-        def _card_name(card: Any) -> str:
-            if hasattr(card, "design") and hasattr(card.design, "name"):
-                return card.design.name
-            if hasattr(card, "name"):
-                return card.name
-            return str(card)
+        def _card_dict(card: Any) -> dict[str, object]:
+            design = getattr(card, "design", card)
+            result: dict[str, object] = {}
+            if hasattr(design, "name"):
+                result["name"] = design.name
+            if hasattr(design, "card_id"):
+                result["card_id"] = design.card_id
+            if hasattr(design, "power"):
+                result["power"] = round(design.power, 4)
+            if hasattr(design, "commit"):
+                result["commit"] = round(design.commit, 4)
+            if hasattr(design, "flex"):
+                result["flex"] = round(design.flex, 4)
+            return result
 
         self._write(
             {
                 "event": "shop_purchase",
-                "items_shown": [_card_name(c) for c in items_shown],
-                "items_bought": [_card_name(c) for c in items_bought],
+                "items_shown": [_card_dict(c) for c in items_shown],
+                "items_bought": [_card_dict(c) for c in items_bought],
                 "essence_spent": essence_spent,
             }
         )
@@ -206,22 +241,24 @@ class SessionLogger:
         completion_level: int,
         dreamsigns: list[Dreamsign],
         dreamcaller: Optional[Dreamcaller],
+        preference_vector: Optional[list[float]] = None,
     ) -> None:
-        """Log the end of a quest session with final state."""
-        self._write(
-            {
-                "event": "session_end",
-                "total_cards": len(deck),
-                "deck": [_deck_card_dict(dc) for dc in deck],
-                "essence": essence,
-                "completion_level": completion_level,
-                "dreamsigns": [
-                    {"name": ds.name}
-                    for ds in dreamsigns
-                ],
-                "dreamcaller": dreamcaller.name if dreamcaller is not None else None,
-            }
-        )
+        """Log the end of a quest session with final state and preference vector."""
+        event: dict[str, object] = {
+            "event": "session_end",
+            "total_cards": len(deck),
+            "deck": [_deck_card_dict(dc) for dc in deck],
+            "essence": essence,
+            "completion_level": completion_level,
+            "dreamsigns": [
+                {"name": ds.name}
+                for ds in dreamsigns
+            ],
+            "dreamcaller": dreamcaller.name if dreamcaller is not None else None,
+        }
+        if preference_vector is not None:
+            event["preference_vector"] = [round(v, 4) for v in preference_vector]
+        self._write(event)
 
     def log_error(
         self,

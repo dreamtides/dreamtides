@@ -157,8 +157,19 @@ def main() -> None:
     # Create JSONL logger
     logger = SessionLogger(seed)
 
-    # Log session start
-    logger.log_session_start(seed, nodes)
+    # Log session start with draft config summary
+    logger.log_session_start(
+        seed,
+        nodes,
+        draft_config={
+            "seat_count": cfg.draft.seat_count,
+            "pack_size": cfg.draft.pack_size,
+            "human_seats": cfg.draft.human_seats,
+            "archetype_count": cfg.cards.archetype_count,
+            "distinct_cards": cfg.cube.distinct_cards,
+            "consumption_mode": cfg.cube.consumption_mode,
+        },
+    )
 
     # Display quest start banner
     banner = render.quest_start_banner(

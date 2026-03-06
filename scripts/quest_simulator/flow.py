@@ -126,6 +126,7 @@ def _show_victory(
             completion_level=state.completion_level,
             dreamsigns=state.dreamsigns,
             dreamcaller=state.dreamcaller,
+            preference_vector=state.human_agent.w,
         )
 
 

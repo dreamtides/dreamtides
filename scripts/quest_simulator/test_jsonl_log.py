@@ -1,96 +1,96 @@
 """Tests for JSONL session logging."""
 
 import json
-import os
+import sys
 import tempfile
-import time
 import unittest
 from pathlib import Path
-from types import MappingProxyType
-from unittest.mock import patch
 
+_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+if _DRAFT_SIM_DIR not in sys.path:
+    sys.path.insert(0, _DRAFT_SIM_DIR)
+
+from draft_models import CardDesign, CardInstance
 from models import (
-    AlgorithmParams,
     Biome,
-    Card,
-    CardType,
     DeckCard,
     Dreamcaller,
     DreamscapeNode,
     Dreamsign,
     NodeState,
-    Rarity,
-    Resonance,
-    ResonanceProfile,
     Site,
     SiteType,
 )
 
-# Patch _LOG_DIR before importing SessionLogger
 import jsonl_log
 
+_NEXT_ID = 0
 
-def _make_card(
+
+def _make_design(
     name: str = "Test Card",
-    card_number: int = 1,
-    energy_cost: int = 3,
-    rarity: Rarity = Rarity.COMMON,
-    resonances: frozenset[Resonance] = frozenset(),
-) -> Card:
-    return Card(
+    card_id: str = "test_001",
+    power: float = 0.5,
+    commit: float = 0.3,
+    flex: float = 0.4,
+    fitness: list[float] | None = None,
+) -> CardDesign:
+    return CardDesign(
+        card_id=card_id,
         name=name,
-        card_number=card_number,
-        energy_cost=energy_cost,
-        card_type=CardType.CHARACTER,
-        subtype=None,
-        is_fast=False,
-        spark=2,
-        rarity=rarity,
-        rules_text="Test rules",
-        resonances=resonances,
-        tags=frozenset(),
+        fitness=fitness if fitness is not None else [0.8, 0.2, 0.1],
+        power=power,
+        commit=commit,
+        flex=flex,
     )
 
 
-class TestHelperFunctions(unittest.TestCase):
-    def test_resonance_name(self) -> None:
-        self.assertEqual(jsonl_log._resonance_name(Resonance.TIDE), "Tide")
-        self.assertEqual(jsonl_log._resonance_name(Resonance.RUIN), "Ruin")
+def _make_instance(design: CardDesign) -> CardInstance:
+    global _NEXT_ID
+    _NEXT_ID += 1
+    return CardInstance(instance_id=_NEXT_ID, design=design)
 
-    def test_resonances_list_sorted(self) -> None:
-        rs = frozenset({Resonance.RUIN, Resonance.TIDE})
-        result = jsonl_log._resonances_list(rs)
-        self.assertEqual(result, ["Ruin", "Tide"])
 
-    def test_card_dict(self) -> None:
-        card = _make_card(resonances=frozenset({Resonance.TIDE}))
-        d = jsonl_log._card_dict(card)
-        self.assertEqual(d["name"], "Test Card")
-        self.assertEqual(d["card_number"], 1)
-        self.assertEqual(d["resonances"], ["Tide"])
-        self.assertEqual(d["rarity"], "Common")
-        self.assertEqual(d["energy_cost"], 3)
-        self.assertEqual(d["spark"], 2)
-
-    def test_profile_dict(self) -> None:
-        snapshot = {
-            Resonance.TIDE: 5,
-            Resonance.EMBER: 3,
-            Resonance.ZEPHYR: 0,
-            Resonance.STONE: 1,
-            Resonance.RUIN: 2,
-        }
-        result = jsonl_log._profile_dict(snapshot)
-        self.assertEqual(
-            result,
-            {
-                "Ember": 3,
-                "Ruin": 2,
-                "Stone": 1,
-                "Tide": 5,
-                "Zephyr": 0,
-            },
+class TestDeckCardDict(unittest.TestCase):
+    def test_serializes_card_design_fields(self) -> None:
+        design = _make_design(
+            name="Test Card",
+            card_id="test_001",
+            power=0.5,
+            commit=0.3,
+            flex=0.4,
+            fitness=[0.9, 0.2],
         )
+        dc = DeckCard(instance=_make_instance(design))
+        d = jsonl_log._deck_card_dict(dc)
+        self.assertEqual(d["name"], "Test Card")
+        self.assertEqual(d["card_id"], "test_001")
+        self.assertEqual(d["power"], 0.5)
+        self.assertEqual(d["commit"], 0.3)
+        self.assertEqual(d["flex"], 0.4)
+        self.assertEqual(d["top_fitness"], [0.9, 0.2])
+        self.assertFalse(d["is_bane"])
+        self.assertFalse(d["is_transfigured"])
+
+    def test_includes_instance_id(self) -> None:
+        design = _make_design()
+        instance = _make_instance(design)
+        dc = DeckCard(instance=instance)
+        d = jsonl_log._deck_card_dict(dc)
+        self.assertEqual(d["instance_id"], instance.instance_id)
+
+    def test_bane_flag(self) -> None:
+        design = _make_design()
+        dc = DeckCard(instance=_make_instance(design), is_bane=True)
+        d = jsonl_log._deck_card_dict(dc)
+        self.assertTrue(d["is_bane"])
+
+    def test_top_fitness_limited_to_three(self) -> None:
+        design = _make_design(fitness=[0.9, 0.8, 0.7, 0.6, 0.5])
+        dc = DeckCard(instance=_make_instance(design))
+        d = jsonl_log._deck_card_dict(dc)
+        self.assertEqual(len(d["top_fitness"]), 3)
+        self.assertEqual(d["top_fitness"], [0.9, 0.8, 0.7])
 
 
 class TestSessionLogger(unittest.TestCase):
@@ -118,7 +118,6 @@ class TestSessionLogger(unittest.TestCase):
     def test_write_flushes_immediately(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
         logger._write({"event": "test"})
-        # Read the file while still open
         content = logger.path.read_text()
         self.assertIn('"event":"test"', content)
         logger.close()
@@ -127,19 +126,12 @@ class TestSessionLogger(unittest.TestCase):
         logger = jsonl_log.SessionLogger(seed=1)
         logger._write({"key": "value", "num": 42})
         content = logger.path.read_text().strip()
-        # No spaces after colons or commas
         self.assertNotIn(": ", content)
         self.assertNotIn(", ", content)
         logger.close()
 
     def test_log_session_start(self) -> None:
         logger = jsonl_log.SessionLogger(seed=42)
-        params = AlgorithmParams(
-            exponent=1.4,
-            floor_weight=0.5,
-            neutral_base=3.0,
-            staleness_factor=0.3,
-        )
         nodes = [
             DreamscapeNode(
                 node_id=0,
@@ -158,16 +150,38 @@ class TestSessionLogger(unittest.TestCase):
                 adjacent=[0],
             ),
         ]
-        logger.log_session_start(seed=42, params=params, atlas_topology=nodes)
+        logger.log_session_start(seed=42, atlas_topology=nodes)
         events = self._read_events(logger)
         self.assertEqual(len(events), 1)
         event = events[0]
         self.assertEqual(event["event"], "session_start")
         self.assertEqual(event["seed"], 42)
-        self.assertEqual(event["algorithm_params"]["exponent"], 1.4)
         self.assertEqual(len(event["atlas_nodes"]), 2)
         self.assertEqual(event["atlas_nodes"][0]["name"], "Nexus")
         self.assertEqual(event["atlas_nodes"][0]["state"], "Completed")
+
+    def test_log_session_start_with_draft_config(self) -> None:
+        logger = jsonl_log.SessionLogger(seed=42)
+        nodes = [
+            DreamscapeNode(
+                node_id=0,
+                name="Nexus",
+                biome=Biome.VERDANT,
+                sites=[],
+                state=NodeState.AVAILABLE,
+                adjacent=[],
+            ),
+        ]
+        draft_cfg = {
+            "seat_count": 6,
+            "pack_size": 20,
+            "archetype_count": 8,
+        }
+        logger.log_session_start(seed=42, atlas_topology=nodes, draft_config=draft_cfg)
+        events = self._read_events(logger)
+        event = events[0]
+        self.assertEqual(event["draft_config"]["seat_count"], 6)
+        self.assertEqual(event["draft_config"]["pack_size"], 20)
 
     def test_log_dreamscape_enter(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
@@ -201,67 +215,72 @@ class TestSessionLogger(unittest.TestCase):
 
     def test_log_draft_pick(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
-        card_a = _make_card(
-            "Card A", card_number=1, resonances=frozenset({Resonance.TIDE})
+        inst_a = _make_instance(
+            _make_design("Card A", card_id="a_001", power=0.6, commit=0.3, flex=0.2)
         )
-        card_b = _make_card(
-            "Card B", card_number=2, resonances=frozenset({Resonance.RUIN})
+        inst_b = _make_instance(
+            _make_design("Card B", card_id="b_001", power=0.4, commit=0.5, flex=0.3)
         )
-        profile = {r: 0 for r in Resonance}
-        profile[Resonance.TIDE] = 1
         logger.log_draft_pick(
-            offered_cards=[card_a, card_b],
+            offered_cards=[inst_a, inst_b],
             weights=[1.5, 0.8],
-            picked_card=card_a,
-            profile_snapshot=profile,
+            picked_card=inst_a,
         )
         events = self._read_events(logger)
         event = events[0]
         self.assertEqual(event["event"], "draft_pick")
         self.assertEqual(len(event["offered"]), 2)
         self.assertEqual(event["offered"][0]["weight"], 1.5)
+        self.assertEqual(event["offered"][0]["name"], "Card A")
+        self.assertEqual(event["offered"][0]["card_id"], "a_001")
+        self.assertEqual(event["offered"][0]["power"], 0.6)
         self.assertEqual(event["picked"]["name"], "Card A")
-        self.assertEqual(event["profile_after"]["Tide"], 1)
+        self.assertEqual(event["picked"]["card_id"], "a_001")
 
     def test_log_draft_pick_mismatched_lengths(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
-        card_a = _make_card("Card A")
-        profile = {r: 0 for r in Resonance}
+        inst = _make_instance(_make_design("Card A"))
         with self.assertRaises(ValueError):
             logger.log_draft_pick(
-                offered_cards=[card_a],
+                offered_cards=[inst],
                 weights=[1.0, 2.0],
-                picked_card=card_a,
-                profile_snapshot=profile,
+                picked_card=inst,
             )
         logger.close()
 
     def test_log_shop_purchase(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
-        card_a = _make_card("Card A")
-        card_b = _make_card("Card B")
+        inst_a = _make_instance(
+            _make_design("Card A", card_id="a_001", power=0.5, commit=0.3, flex=0.4)
+        )
+        inst_b = _make_instance(
+            _make_design("Card B", card_id="b_001", power=0.6, commit=0.4, flex=0.2)
+        )
         logger.log_shop_purchase(
-            items_shown=[card_a, card_b],
-            items_bought=[card_a],
+            items_shown=[inst_a, inst_b],
+            items_bought=[inst_a],
             essence_spent=50,
         )
         events = self._read_events(logger)
         event = events[0]
         self.assertEqual(event["event"], "shop_purchase")
         self.assertEqual(len(event["items_shown"]), 2)
+        self.assertEqual(event["items_shown"][0]["name"], "Card A")
+        self.assertEqual(event["items_shown"][0]["card_id"], "a_001")
+        self.assertEqual(event["items_shown"][0]["power"], 0.5)
         self.assertEqual(len(event["items_bought"]), 1)
         self.assertEqual(event["essence_spent"], 50)
 
     def test_log_battle_complete(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
-        card = _make_card("Rare Reward", rarity=Rarity.RARE)
-        logger.log_battle_complete("Dream Guardian", 125, card)
+        inst = _make_instance(_make_design("Rare Reward", card_id="rare_001"))
+        logger.log_battle_complete("Dream Guardian", 125, inst)
         events = self._read_events(logger)
         event = events[0]
         self.assertEqual(event["event"], "battle_complete")
         self.assertEqual(event["opponent_name"], "Dream Guardian")
         self.assertEqual(event["essence_reward"], 125)
-        self.assertEqual(event["rare_pick"]["name"], "Rare Reward")
+        self.assertEqual(event["rare_pick"], "Rare Reward")
 
     def test_log_battle_complete_no_rare_pick(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
@@ -273,54 +292,45 @@ class TestSessionLogger(unittest.TestCase):
     def test_log_session_end(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
         deck = [
-            DeckCard(card=_make_card("A", rarity=Rarity.COMMON)),
-            DeckCard(card=_make_card("B", rarity=Rarity.RARE)),
+            DeckCard(instance=_make_instance(_make_design("A", card_id="a_001"))),
+            DeckCard(instance=_make_instance(_make_design("B", card_id="b_001"))),
         ]
-        profile = ResonanceProfile()
-        profile.add(Resonance.TIDE, 3)
         dreamsigns = [
-            Dreamsign(
-                name="Sign A",
-                resonance=Resonance.TIDE,
-                tags=frozenset(),
-                effect_text="Test",
-                is_bane=False,
-            ),
+            Dreamsign(name="Sign A", effect_text="Test", is_bane=False),
         ]
         dreamcaller = Dreamcaller(
             name="Vesper, Twilight Arbiter",
-            resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
-            resonance_bonus=MappingProxyType({"Tide": 4, "Ruin": 4}),
-            tags=frozenset({"mechanic:reclaim"}),
-            tag_bonus=MappingProxyType({"mechanic:reclaim": 2}),
             essence_bonus=50,
             ability_text="Test ability",
         )
         logger.log_session_end(
             deck=deck,
-            resonance_profile=profile,
             essence=175,
             completion_level=7,
             dreamsigns=dreamsigns,
             dreamcaller=dreamcaller,
+            preference_vector=[0.3, 0.2, 0.1, 0.4],
         )
         events = self._read_events(logger)
         event = events[0]
         self.assertEqual(event["event"], "session_end")
         self.assertEqual(event["total_cards"], 2)
-        self.assertEqual(event["rarity_breakdown"]["Common"], 1)
-        self.assertEqual(event["rarity_breakdown"]["Rare"], 1)
+        self.assertEqual(len(event["deck"]), 2)
+        self.assertEqual(event["deck"][0]["name"], "A")
+        self.assertEqual(event["deck"][0]["card_id"], "a_001")
+        self.assertIn("power", event["deck"][0])
+        self.assertIn("top_fitness", event["deck"][0])
         self.assertEqual(event["essence"], 175)
         self.assertEqual(event["completion_level"], 7)
         self.assertEqual(len(event["dreamsigns"]), 1)
         self.assertEqual(event["dreamsigns"][0]["name"], "Sign A")
         self.assertEqual(event["dreamcaller"], "Vesper, Twilight Arbiter")
+        self.assertEqual(event["preference_vector"], [0.3, 0.2, 0.1, 0.4])
 
     def test_log_session_end_no_dreamcaller(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
         logger.log_session_end(
             deck=[],
-            resonance_profile=ResonanceProfile(),
             essence=0,
             completion_level=0,
             dreamsigns=[],
@@ -328,6 +338,18 @@ class TestSessionLogger(unittest.TestCase):
         )
         events = self._read_events(logger)
         self.assertIsNone(events[0]["dreamcaller"])
+
+    def test_log_session_end_no_preference_vector(self) -> None:
+        logger = jsonl_log.SessionLogger(seed=1)
+        logger.log_session_end(
+            deck=[],
+            essence=0,
+            completion_level=0,
+            dreamsigns=[],
+            dreamcaller=None,
+        )
+        events = self._read_events(logger)
+        self.assertNotIn("preference_vector", events[0])
 
     def test_path_property(self) -> None:
         logger = jsonl_log.SessionLogger(seed=99)
@@ -347,8 +369,6 @@ class TestSessionLogger(unittest.TestCase):
     def test_log_site_visit_includes_dreamscape(self) -> None:
         """site_visit events must include dreamscape name."""
         logger = jsonl_log.SessionLogger(seed=1)
-        profile = {r: 0 for r in Resonance}
-        profile[Resonance.TIDE] = 3
         logger.log_site_visit(
             site_type="Essence",
             dreamscape="Twilight Grove",
@@ -356,7 +376,6 @@ class TestSessionLogger(unittest.TestCase):
             choices=[],
             choice_made=None,
             state_changes={"essence_gained": 200},
-            profile_snapshot=profile,
         )
         events = self._read_events(logger)
         event = events[0]
@@ -366,7 +385,6 @@ class TestSessionLogger(unittest.TestCase):
     def test_log_site_visit_includes_is_enhanced(self) -> None:
         """site_visit events must include is_enhanced flag."""
         logger = jsonl_log.SessionLogger(seed=1)
-        profile = {r: 0 for r in Resonance}
         logger.log_site_visit(
             site_type="Essence",
             dreamscape="Crystal Spire",
@@ -374,44 +392,14 @@ class TestSessionLogger(unittest.TestCase):
             choices=[],
             choice_made=None,
             state_changes={"essence_gained": 400},
-            profile_snapshot=profile,
         )
         events = self._read_events(logger)
         event = events[0]
         self.assertTrue(event["is_enhanced"])
 
-    def test_log_site_visit_includes_profile_snapshot(self) -> None:
-        """site_visit events must include profile_snapshot."""
-        logger = jsonl_log.SessionLogger(seed=1)
-        profile = {
-            Resonance.TIDE: 5,
-            Resonance.EMBER: 3,
-            Resonance.ZEPHYR: 0,
-            Resonance.STONE: 1,
-            Resonance.RUIN: 2,
-        }
-        logger.log_site_visit(
-            site_type="Purge",
-            dreamscape="Ashen Depths",
-            is_enhanced=True,
-            choices=["Card A", "Card B"],
-            choice_made="Card A",
-            state_changes={"cards_removed": ["Card A"]},
-            profile_snapshot=profile,
-        )
-        events = self._read_events(logger)
-        event = events[0]
-        self.assertIn("profile_snapshot", event)
-        self.assertEqual(event["profile_snapshot"]["Tide"], 5)
-        self.assertEqual(event["profile_snapshot"]["Ember"], 3)
-        self.assertEqual(event["profile_snapshot"]["Zephyr"], 0)
-        self.assertEqual(event["profile_snapshot"]["Stone"], 1)
-        self.assertEqual(event["profile_snapshot"]["Ruin"], 2)
-
     def test_log_site_visit_choices_offered_key(self) -> None:
         """site_visit events must use choices_offered key."""
         logger = jsonl_log.SessionLogger(seed=1)
-        profile = {r: 0 for r in Resonance}
         logger.log_site_visit(
             site_type="DreamJourney",
             dreamscape="Twilight Grove",
@@ -419,7 +407,6 @@ class TestSessionLogger(unittest.TestCase):
             choices=["Journey A", "Journey B"],
             choice_made="Journey A",
             state_changes={"effect_type": "add_essence"},
-            profile_snapshot=profile,
         )
         events = self._read_events(logger)
         event = events[0]

@@ -1,282 +1,254 @@
 """Tests for sites_transfig module."""
 
 import random
-import re
+import sys
+from pathlib import Path
 from typing import Optional
 from unittest.mock import patch
 
-from models import (
-    Card,
-    CardType,
-    DeckCard,
-    PoolEntry,
-    Rarity,
-    Resonance,
-)
+# Ensure draft_simulator is importable
+_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+if _DRAFT_SIM_DIR not in sys.path:
+    sys.path.insert(0, _DRAFT_SIM_DIR)
+
+from draft_models import CardDesign, CardInstance
+from models import DeckCard
 from quest_state import QuestState
 
+_NEXT_INSTANCE_ID = 0
 
-def _make_card(
-    name: str,
-    card_number: int,
-    rarity: Rarity = Rarity.COMMON,
-    resonances: Optional[frozenset[Resonance]] = None,
-    energy_cost: Optional[int] = 2,
-    spark: Optional[int] = 1,
-    card_type: CardType = CardType.CHARACTER,
-    rules_text: Optional[str] = None,
-    tags: Optional[frozenset[str]] = None,
-) -> Card:
-    return Card(
+
+def _make_design(
+    name: str = "Test Card",
+    card_id: str = "test_001",
+    power: float = 0.0,
+    commit: float = 0.0,
+    flex: float = 0.0,
+    fitness: Optional[list[float]] = None,
+) -> CardDesign:
+    return CardDesign(
+        card_id=card_id,
         name=name,
-        card_number=card_number,
-        energy_cost=energy_cost,
-        card_type=card_type,
-        subtype=None,
-        is_fast=False,
-        spark=spark,
-        rarity=rarity,
-        rules_text=rules_text or f"Rules for {name}.",
-        resonances=resonances or frozenset(),
-        tags=tags or frozenset(),
+        fitness=fitness if fitness is not None else [],
+        power=power,
+        commit=commit,
+        flex=flex,
     )
 
 
-def _make_pool(cards: list[Card]) -> list[PoolEntry]:
-    return [PoolEntry(card) for card in cards]
+def _make_instance(design: CardDesign) -> CardInstance:
+    global _NEXT_INSTANCE_ID
+    _NEXT_INSTANCE_ID += 1
+    return CardInstance(instance_id=_NEXT_INSTANCE_ID, design=design)
 
 
 def _make_quest_state(
-    cards: Optional[list[Card]] = None,
-    pool: Optional[list[PoolEntry]] = None,
     seed: int = 42,
     essence: int = 250,
 ) -> QuestState:
-    test_cards = cards or []
-    test_pool = pool or _make_pool(test_cards)
     rng = random.Random(seed)
-    variance = {r: 1.0 for r in Resonance}
+
+    import agents
+
+    human_agent = agents.create_agent(archetype_count=8)
+    ai_agents = [agents.create_agent(archetype_count=8) for _ in range(5)]
+
+    import card_generator
+    import cube_manager
+    from config import SimulatorConfig
+    from draft_models import CubeConsumptionMode
+
+    cfg = SimulatorConfig()
+    cfg.draft.seat_count = 6
+    cfg.draft.pack_size = 20
+    cfg.cards.archetype_count = 8
+    cfg.cards.source = "synthetic"
+    cfg.cube.distinct_cards = 10
+    cfg.cube.copies_per_card = 1
+    cfg.cube.consumption_mode = "with_replacement"
+    cfg.refill.strategy = "no_refill"
+    cfg.pack_generation.strategy = "seeded_themed"
+
+    cards = card_generator.generate_cards(cfg, rng)
+    cube = cube_manager.CubeManager(
+        designs=cards,
+        copies_per_card=1,
+        consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
+    )
+
     return QuestState(
         essence=essence,
-        pool=test_pool,
         rng=rng,
-        all_cards=test_cards,
-        pool_variance=variance,
+        human_agent=human_agent,
+        ai_agents=ai_agents,
+        cube=cube,
+        draft_cfg=cfg,
     )
 
 
 class TestTransfigurationEligibility:
     """Tests for transfiguration type eligibility checking."""
 
-    def test_viridian_eligible_when_cost_positive(self) -> None:
-        """Viridian requires energy_cost > 0."""
+    def test_viridian_eligible_when_power_high(self) -> None:
+        """Viridian requires power > 0.3."""
         from sites_transfig import is_eligible, TransfigType
 
-        card = _make_card("Test Card", 1, energy_cost=3)
-        assert is_eligible(card, TransfigType.VIRIDIAN)
+        design = _make_design(power=0.5)
+        assert is_eligible(design, TransfigType.VIRIDIAN)
 
-    def test_viridian_ineligible_when_cost_zero(self) -> None:
-        """Viridian requires energy_cost > 0; cost 0 should fail."""
+    def test_viridian_ineligible_when_power_low(self) -> None:
+        """Viridian requires power > 0.3; low power should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        card = _make_card("Test Card", 1, energy_cost=0)
-        assert not is_eligible(card, TransfigType.VIRIDIAN)
+        design = _make_design(power=0.1)
+        assert not is_eligible(design, TransfigType.VIRIDIAN)
 
-    def test_viridian_ineligible_when_cost_none(self) -> None:
-        """Viridian requires energy_cost > 0; None cost should fail."""
+    def test_viridian_ineligible_when_power_zero(self) -> None:
+        """Viridian requires power > 0.3; zero power should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        card = _make_card("Test Card", 1, energy_cost=None)
-        assert not is_eligible(card, TransfigType.VIRIDIAN)
+        design = _make_design(power=0.0)
+        assert not is_eligible(design, TransfigType.VIRIDIAN)
 
-    def test_golden_eligible_when_rules_has_digits(self) -> None:
-        """Golden requires digits in rules_text."""
+    def test_golden_eligible_when_flex_high(self) -> None:
+        """Golden requires flex > 0.3."""
         from sites_transfig import is_eligible, TransfigType
 
-        card = _make_card("Test Card", 1, rules_text="Deal 3 damage.")
-        assert is_eligible(card, TransfigType.GOLDEN)
+        design = _make_design(flex=0.5)
+        assert is_eligible(design, TransfigType.GOLDEN)
 
-    def test_golden_ineligible_when_no_digits(self) -> None:
-        """Golden requires digits in rules_text; no digits should fail."""
+    def test_golden_ineligible_when_flex_low(self) -> None:
+        """Golden requires flex > 0.3; low flex should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        card = _make_card("Test Card", 1, rules_text="Draw a card.")
-        assert not is_eligible(card, TransfigType.GOLDEN)
+        design = _make_design(flex=0.1)
+        assert not is_eligible(design, TransfigType.GOLDEN)
 
-    def test_scarlet_eligible_for_character(self) -> None:
-        """Scarlet requires Character card type."""
+    def test_scarlet_eligible_when_commit_high(self) -> None:
+        """Scarlet requires commit > 0.5."""
         from sites_transfig import is_eligible, TransfigType
 
-        card = _make_card("Test Card", 1, card_type=CardType.CHARACTER)
-        assert is_eligible(card, TransfigType.SCARLET)
+        design = _make_design(commit=0.7)
+        assert is_eligible(design, TransfigType.SCARLET)
 
-    def test_scarlet_ineligible_for_event(self) -> None:
-        """Scarlet requires Character; Event should fail."""
+    def test_scarlet_ineligible_when_commit_low(self) -> None:
+        """Scarlet requires commit > 0.5; low commit should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        card = _make_card("Test Card", 1, card_type=CardType.EVENT, spark=None)
-        assert not is_eligible(card, TransfigType.SCARLET)
+        design = _make_design(commit=0.3)
+        assert not is_eligible(design, TransfigType.SCARLET)
 
-    def test_magenta_eligible_with_trigger_keyword(self) -> None:
-        """Magenta requires trigger keywords in rules_text."""
+    def test_magenta_eligible_with_high_fitness(self) -> None:
+        """Magenta requires top fitness > 0.7."""
         from sites_transfig import is_eligible, TransfigType
 
-        for keyword in ["judgment", "whenever", "at the start", "at the end", "when"]:
-            card = _make_card(
-                "Test Card",
-                1,
-                rules_text=f"Some text {keyword} something happens.",
-            )
-            assert is_eligible(
-                card, TransfigType.MAGENTA
-            ), f"Expected Magenta eligible for keyword '{keyword}'"
+        design = _make_design(fitness=[0.8, 0.2, 0.1])
+        assert is_eligible(design, TransfigType.MAGENTA)
 
-    def test_magenta_ineligible_without_triggers(self) -> None:
-        """Magenta requires trigger keywords; none should fail."""
+    def test_magenta_ineligible_with_low_fitness(self) -> None:
+        """Magenta requires top fitness > 0.7; all low should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        card = _make_card("Test Card", 1, rules_text="Deal 3 damage.")
-        assert not is_eligible(card, TransfigType.MAGENTA)
+        design = _make_design(fitness=[0.5, 0.3, 0.2])
+        assert not is_eligible(design, TransfigType.MAGENTA)
 
-    def test_azure_eligible_for_event(self) -> None:
-        """Azure requires Event card type."""
+    def test_magenta_ineligible_with_empty_fitness(self) -> None:
+        """Magenta requires fitness; empty should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        card = _make_card(
-            "Test Card",
-            1,
-            card_type=CardType.EVENT,
-            spark=None,
-        )
-        assert is_eligible(card, TransfigType.AZURE)
+        design = _make_design(fitness=[])
+        assert not is_eligible(design, TransfigType.MAGENTA)
 
-    def test_azure_ineligible_for_character(self) -> None:
-        """Azure requires Event; Character should fail."""
+    def test_azure_eligible_when_power_very_high(self) -> None:
+        """Azure requires power > 0.5."""
         from sites_transfig import is_eligible, TransfigType
 
-        card = _make_card("Test Card", 1, card_type=CardType.CHARACTER)
-        assert not is_eligible(card, TransfigType.AZURE)
+        design = _make_design(power=0.7)
+        assert is_eligible(design, TransfigType.AZURE)
 
-    def test_bronze_eligible_for_event(self) -> None:
-        """Bronze requires Event card type."""
+    def test_azure_ineligible_when_power_moderate(self) -> None:
+        """Azure requires power > 0.5; moderate power should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        card = _make_card(
-            "Test Card",
-            1,
-            card_type=CardType.EVENT,
-            spark=None,
-        )
-        assert is_eligible(card, TransfigType.BRONZE)
+        design = _make_design(power=0.4)
+        assert not is_eligible(design, TransfigType.AZURE)
 
-    def test_bronze_ineligible_for_character(self) -> None:
-        """Bronze requires Event; Character should fail."""
+    def test_bronze_eligible_when_flex_very_high(self) -> None:
+        """Bronze requires flex > 0.5."""
         from sites_transfig import is_eligible, TransfigType
 
-        card = _make_card("Test Card", 1, card_type=CardType.CHARACTER)
-        assert not is_eligible(card, TransfigType.BRONZE)
+        design = _make_design(flex=0.7)
+        assert is_eligible(design, TransfigType.BRONZE)
 
-    def test_rose_eligible_with_energy_cost_pattern(self) -> None:
-        """Rose requires an energy cost pattern in rules_text."""
+    def test_bronze_ineligible_when_flex_moderate(self) -> None:
+        """Bronze requires flex > 0.5; moderate flex should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        card = _make_card(
-            "Test Card",
-            1,
-            rules_text="Pay 2 energy: Draw a card.",
-        )
-        assert is_eligible(card, TransfigType.ROSE)
+        design = _make_design(flex=0.4)
+        assert not is_eligible(design, TransfigType.BRONZE)
 
-    def test_rose_ineligible_without_cost_pattern(self) -> None:
-        """Rose requires energy cost pattern; plain text should fail."""
+    def test_rose_eligible_when_commit_and_flex_both_above_threshold(self) -> None:
+        """Rose requires commit > 0.3 and flex > 0.3."""
         from sites_transfig import is_eligible, TransfigType
 
-        card = _make_card("Test Card", 1, rules_text="Draw a card.")
-        assert not is_eligible(card, TransfigType.ROSE)
+        design = _make_design(commit=0.5, flex=0.5)
+        assert is_eligible(design, TransfigType.ROSE)
+
+    def test_rose_ineligible_when_only_commit_high(self) -> None:
+        """Rose requires both commit > 0.3 and flex > 0.3."""
+        from sites_transfig import is_eligible, TransfigType
+
+        design = _make_design(commit=0.5, flex=0.1)
+        assert not is_eligible(design, TransfigType.ROSE)
 
     def test_prismatic_eligible_for_multiple_types(self) -> None:
         """Prismatic requires eligibility for 2+ other types."""
         from sites_transfig import is_eligible, TransfigType
 
-        # Character with cost > 0 and digits in text -> Viridian + Golden + Scarlet
-        card = _make_card(
-            "Test Card",
-            1,
-            energy_cost=3,
-            card_type=CardType.CHARACTER,
-            rules_text="Deal 5 damage.",
-        )
-        assert is_eligible(card, TransfigType.PRISMATIC)
+        # High power -> Viridian + Azure, high flex -> Golden + Bronze
+        design = _make_design(power=0.8, flex=0.8)
+        assert is_eligible(design, TransfigType.PRISMATIC)
 
     def test_prismatic_ineligible_for_single_type(self) -> None:
         """Prismatic requires 2+ other types; only 1 should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        # Event with no special text -> only Azure and Bronze
-        # Actually that's 2, let me make one that only qualifies for 1
-        # Character with cost 0, no digits, no trigger -> only Scarlet
-        card = _make_card(
-            "Test Card",
-            1,
-            energy_cost=0,
-            card_type=CardType.CHARACTER,
-            rules_text="Draw a card.",
-        )
-        assert not is_eligible(card, TransfigType.PRISMATIC)
+        # Only power > 0.3 (Viridian), nothing else
+        design = _make_design(power=0.4, commit=0.0, flex=0.0)
+        assert not is_eligible(design, TransfigType.PRISMATIC)
 
 
 class TestGetApplicableTypes:
     """Tests for finding all applicable transfiguration types."""
 
-    def test_character_with_cost_and_digits(self) -> None:
-        """A character with cost > 0 and digits should match multiple types."""
+    def test_high_power_and_flex_card(self) -> None:
+        """A card with high power and flex should match multiple types."""
         from sites_transfig import get_applicable_types, TransfigType
 
-        card = _make_card(
-            "Test Card",
-            1,
-            energy_cost=3,
-            card_type=CardType.CHARACTER,
-            rules_text="Deal 5 damage.",
-        )
-        types = get_applicable_types(card)
+        design = _make_design(power=0.8, flex=0.8)
+        types = get_applicable_types(design)
         assert TransfigType.VIRIDIAN in types
         assert TransfigType.GOLDEN in types
-        assert TransfigType.SCARLET in types
-        # Should also have Prismatic since 3 types qualify
-        assert TransfigType.PRISMATIC in types
-
-    def test_event_only_types(self) -> None:
-        """An event card should match Azure and Bronze."""
-        from sites_transfig import get_applicable_types, TransfigType
-
-        card = _make_card(
-            "Test Card",
-            1,
-            card_type=CardType.EVENT,
-            spark=None,
-            rules_text="Draw a card.",
-        )
-        types = get_applicable_types(card)
         assert TransfigType.AZURE in types
         assert TransfigType.BRONZE in types
-        # 2 types -> Prismatic
         assert TransfigType.PRISMATIC in types
 
+    def test_single_qualifying_type(self) -> None:
+        """A card with only moderate power should match only Viridian."""
+        from sites_transfig import get_applicable_types, TransfigType
+
+        design = _make_design(power=0.4, commit=0.0, flex=0.0)
+        types = get_applicable_types(design)
+        assert TransfigType.VIRIDIAN in types
+        assert len(types) == 1  # No Prismatic since < 2 types
+
     def test_no_applicable_types(self) -> None:
-        """A card with cost=0, no digits, and Character type with no triggers."""
+        """A card with all low stats should match nothing."""
         from sites_transfig import get_applicable_types
 
-        card = _make_card(
-            "Test Card",
-            1,
-            energy_cost=0,
-            card_type=CardType.CHARACTER,
-            rules_text="Draw a card.",
-        )
-        types = get_applicable_types(card)
-        # Only Scarlet (Character type), so no Prismatic
-        assert len(types) == 1
+        design = _make_design(power=0.0, commit=0.0, flex=0.0, fitness=[])
+        types = get_applicable_types(design)
+        assert len(types) == 0
 
 
 class TestNormalTransfiguration:
@@ -287,15 +259,14 @@ class TestNormalTransfiguration:
         from sites_transfig import run_transfiguration
 
         state = _make_quest_state(seed=42)
-        # Add 10 cards
         for i in range(10):
-            card = _make_card(
-                f"Card {i}",
-                i,
-                energy_cost=i + 1,
-                rules_text=f"Deal {i + 1} damage.",
+            design = _make_design(
+                name=f"Card {i}",
+                card_id=f"card_{i}",
+                power=0.5 + i * 0.01,
+                flex=0.5,
             )
-            state.add_card(card)
+            state.add_card(_make_instance(design))
 
         captured_options: list[list[str]] = []
 
@@ -326,15 +297,14 @@ class TestNormalTransfiguration:
         from sites_transfig import run_transfiguration
 
         state = _make_quest_state(seed=42)
-        # Add 4 cards, mark 3 as transfigured
         for i in range(4):
-            card = _make_card(
-                f"Card {i}",
-                i,
-                energy_cost=i + 1,
-                rules_text=f"Deal {i + 1} damage.",
+            design = _make_design(
+                name=f"Card {i}",
+                card_id=f"card_{i}",
+                power=0.5,
+                flex=0.5,
             )
-            state.add_card(card)
+            state.add_card(_make_instance(design))
             if i < 3:
                 state.deck[i].is_transfigured = True
 
@@ -368,13 +338,13 @@ class TestNormalTransfiguration:
 
         state = _make_quest_state(seed=42)
         for i in range(5):
-            card = _make_card(
-                f"Card {i}",
-                i,
-                energy_cost=i + 1,
-                rules_text=f"Deal {i + 1} damage.",
+            design = _make_design(
+                name=f"Card {i}",
+                card_id=f"card_{i}",
+                power=0.5,
+                flex=0.5,
             )
-            state.add_card(card)
+            state.add_card(_make_instance(design))
 
         # Select first offered card (index 0)
         with patch(
@@ -399,13 +369,13 @@ class TestNormalTransfiguration:
 
         state = _make_quest_state(seed=42)
         for i in range(5):
-            card = _make_card(
-                f"Card {i}",
-                i,
-                energy_cost=i + 1,
-                rules_text=f"Deal {i + 1} damage.",
+            design = _make_design(
+                name=f"Card {i}",
+                card_id=f"card_{i}",
+                power=0.5,
+                flex=0.5,
             )
-            state.add_card(card)
+            state.add_card(_make_instance(design))
 
         captured_options: list[list[str]] = []
 
@@ -448,36 +418,31 @@ class TestNormalTransfiguration:
     def test_normal_never_drops_cards_after_sampling(self) -> None:
         """Normal mode should pre-filter eligible cards rather than
         sampling first and then silently dropping ineligible ones.
-
-        When some cards have no applicable transfiguration types, those
-        cards should be excluded before sampling, so the player always
-        sees up to 3 eligible candidates.
         """
-        from sites_transfig import _run_normal, _BASE_TYPES, TransfigType
+        from sites_transfig import _run_normal, TransfigType
 
         state = _make_quest_state(seed=42)
-        # Add 10 cards
         for i in range(10):
-            card = _make_card(
-                f"Card {i}",
-                i,
-                energy_cost=i + 1,
-                rules_text=f"Deal {i + 1} damage.",
+            design = _make_design(
+                name=f"Card {i}",
+                card_id=f"card_{i}",
+                power=0.5 if i < 4 else 0.0,
+                commit=0.0,
+                flex=0.5 if i < 4 else 0.0,
             )
-            state.add_card(card)
+            state.add_card(_make_instance(design))
 
         eligible_deck_cards = [dc for dc in state.deck if not dc.is_transfigured]
 
-        # Mock is_eligible so that only cards 0-3 are eligible for any type,
-        # and cards 4-9 are ineligible for all types. This simulates a
-        # situation where some cards have no applicable transfiguration.
+        # Mock is_eligible so that only cards 0-3 are eligible for any type
         eligible_names = {f"Card {i}" for i in range(4)}
         original_is_eligible = __import__("sites_transfig").is_eligible
 
-        def mock_is_eligible(card: Card, transfig_type: TransfigType) -> bool:
-            if card.name not in eligible_names:
+        def mock_is_eligible(design_obj, transfig_type: TransfigType) -> bool:
+            name = getattr(design_obj, "name", "")
+            if name not in eligible_names:
                 return False
-            return original_is_eligible(card, transfig_type)
+            return original_is_eligible(design_obj, transfig_type)
 
         captured_options: list[list[str]] = []
 
@@ -498,8 +463,6 @@ class TestNormalTransfiguration:
             _run_normal(state, eligible_deck_cards, None)
 
         # Should show 3 candidates + Skip = 4 options
-        # The old code could show fewer because it sampled from all 10
-        # and then dropped the 6 ineligible ones.
         assert len(captured_options) == 1
         assert len(captured_options[0]) == 4, (
             f"Expected 4 options (3 eligible cards + Skip), got "
@@ -512,24 +475,26 @@ class TestNormalTransfiguration:
 
         state = _make_quest_state(seed=42)
         for i in range(10):
-            card = _make_card(
-                f"Card {i}",
-                i,
-                energy_cost=i + 1,
-                rules_text=f"Deal {i + 1} damage.",
+            design = _make_design(
+                name=f"Card {i}",
+                card_id=f"card_{i}",
+                power=0.5 if i < 2 else 0.0,
+                commit=0.0,
+                flex=0.5 if i < 2 else 0.0,
             )
-            state.add_card(card)
+            state.add_card(_make_instance(design))
 
         eligible_deck_cards = [dc for dc in state.deck if not dc.is_transfigured]
 
         # Only 2 cards are eligible
-        eligible_names = {f"Card {0}", f"Card {1}"}
+        eligible_names = {"Card 0", "Card 1"}
         original_is_eligible = __import__("sites_transfig").is_eligible
 
-        def mock_is_eligible(card: Card, transfig_type: TransfigType) -> bool:
-            if card.name not in eligible_names:
+        def mock_is_eligible(design_obj, transfig_type: TransfigType) -> bool:
+            name = getattr(design_obj, "name", "")
+            if name not in eligible_names:
                 return False
-            return original_is_eligible(card, transfig_type)
+            return original_is_eligible(design_obj, transfig_type)
 
         captured_options: list[list[str]] = []
 
@@ -563,13 +528,13 @@ class TestEnhancedTransfiguration:
 
         state = _make_quest_state(seed=42)
         for i in range(8):
-            card = _make_card(
-                f"Card {i}",
-                i,
-                energy_cost=i + 1,
-                rules_text=f"Deal {i + 1} damage.",
+            design = _make_design(
+                name=f"Card {i}",
+                card_id=f"card_{i}",
+                power=0.5,
+                flex=0.5,
             )
-            state.add_card(card)
+            state.add_card(_make_instance(design))
         # Mark 2 as transfigured
         state.deck[0].is_transfigured = True
         state.deck[1].is_transfigured = True
@@ -604,15 +569,14 @@ class TestEnhancedTransfiguration:
         from sites_transfig import run_transfiguration
 
         state = _make_quest_state(seed=42)
-        # Card that qualifies for Viridian + Golden + Scarlet -> Prismatic
-        card = _make_card(
-            "Multi Card",
-            1,
-            energy_cost=3,
-            card_type=CardType.CHARACTER,
-            rules_text="Deal 5 damage.",
+        # Card with high power + high flex -> Viridian + Golden + Azure + Bronze -> Prismatic
+        design = _make_design(
+            name="Multi Card",
+            card_id="multi_001",
+            power=0.8,
+            flex=0.8,
         )
-        state.add_card(card)
+        state.add_card(_make_instance(design))
 
         with patch(
             "sites_transfig.input_handler.single_select",
@@ -637,15 +601,15 @@ class TestEnhancedTransfiguration:
         from sites_transfig import run_transfiguration
 
         state = _make_quest_state(seed=42)
-        # Character with cost=0, no digits, no triggers -> only Scarlet
-        card = _make_card(
-            "Simple Card",
-            1,
-            energy_cost=0,
-            card_type=CardType.CHARACTER,
-            rules_text="Draw a card.",
+        # Only power > 0.3 (Viridian), nothing else
+        design = _make_design(
+            name="Simple Card",
+            card_id="simple_001",
+            power=0.4,
+            commit=0.0,
+            flex=0.0,
         )
-        state.add_card(card)
+        state.add_card(_make_instance(design))
 
         with patch(
             "sites_transfig.input_handler.single_select",
@@ -662,8 +626,8 @@ class TestEnhancedTransfiguration:
         dc = state.deck[0]
         assert dc.is_transfigured
         assert dc.transfig_note is not None
-        assert "Scarlet" in dc.transfig_note
-        assert "doubled spark" in dc.transfig_note
+        assert "Viridian" in dc.transfig_note
+        assert "halved cost" in dc.transfig_note
 
 
 class TestTransfigNote:
@@ -674,14 +638,13 @@ class TestTransfigNote:
         from sites_transfig import run_transfiguration
 
         state = _make_quest_state(seed=42)
-        card = _make_card(
-            "Whirlpool Seer",
-            1,
-            energy_cost=3,
-            card_type=CardType.CHARACTER,
-            rules_text="Draw a card.",
+        design = _make_design(
+            name="Whirlpool Seer",
+            card_id="whirlpool_001",
+            power=0.5,
+            flex=0.5,
         )
-        state.add_card(card)
+        state.add_card(_make_instance(design))
 
         with patch(
             "sites_transfig.input_handler.single_select",
@@ -706,96 +669,79 @@ class TestTransfigNote:
 class TestEligibilityExplanation:
     """Tests for eligibility explanation strings."""
 
-    def test_viridian_explains_cost(self) -> None:
-        """Viridian explanation should mention energy cost value."""
+    def test_viridian_explains_power(self) -> None:
+        """Viridian explanation should mention power value."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        card = _make_card("Test Card", 1, energy_cost=3)
-        explanation = eligibility_explanation(card, TransfigType.VIRIDIAN)
-        assert "3" in explanation
-        assert "cost" in explanation.lower()
+        design = _make_design(power=0.5)
+        explanation = eligibility_explanation(design, TransfigType.VIRIDIAN)
+        assert "0.50" in explanation
+        assert "power" in explanation.lower()
 
-    def test_golden_explains_numbers_in_text(self) -> None:
-        """Golden explanation should mention rules text numbers."""
+    def test_golden_explains_flex(self) -> None:
+        """Golden explanation should mention flex value."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        card = _make_card("Test Card", 1, rules_text="Deal 5 damage.")
-        explanation = eligibility_explanation(card, TransfigType.GOLDEN)
-        assert "number" in explanation.lower() or "digit" in explanation.lower()
+        design = _make_design(flex=0.5)
+        explanation = eligibility_explanation(design, TransfigType.GOLDEN)
+        assert "0.50" in explanation
+        assert "flex" in explanation.lower()
 
-    def test_scarlet_explains_character_type(self) -> None:
-        """Scarlet explanation should mention character type."""
+    def test_scarlet_explains_commit(self) -> None:
+        """Scarlet explanation should mention commit value."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        card = _make_card("Test Card", 1, card_type=CardType.CHARACTER)
-        explanation = eligibility_explanation(card, TransfigType.SCARLET)
-        assert "character" in explanation.lower()
+        design = _make_design(commit=0.7)
+        explanation = eligibility_explanation(design, TransfigType.SCARLET)
+        assert "0.70" in explanation
+        assert "commit" in explanation.lower()
 
-    def test_magenta_explains_trigger(self) -> None:
-        """Magenta explanation should mention the trigger keyword found."""
+    def test_magenta_explains_fitness(self) -> None:
+        """Magenta explanation should mention top fitness value."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        card = _make_card(
-            "Test Card",
-            1,
-            rules_text="Judgment: deal damage.",
-        )
-        explanation = eligibility_explanation(card, TransfigType.MAGENTA)
-        assert "trigger" in explanation.lower() or "judgment" in explanation.lower()
+        design = _make_design(fitness=[0.9, 0.2, 0.1])
+        explanation = eligibility_explanation(design, TransfigType.MAGENTA)
+        assert "0.90" in explanation
+        assert "fitness" in explanation.lower()
 
-    def test_azure_explains_event_type(self) -> None:
-        """Azure explanation should mention event type."""
+    def test_azure_explains_power(self) -> None:
+        """Azure explanation should mention power value."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        card = _make_card(
-            "Test Card",
-            1,
-            card_type=CardType.EVENT,
-            spark=None,
-        )
-        explanation = eligibility_explanation(card, TransfigType.AZURE)
-        assert "event" in explanation.lower()
+        design = _make_design(power=0.7)
+        explanation = eligibility_explanation(design, TransfigType.AZURE)
+        assert "0.70" in explanation
+        assert "power" in explanation.lower()
 
-    def test_bronze_explains_event_type(self) -> None:
-        """Bronze explanation should mention event type."""
+    def test_bronze_explains_flex(self) -> None:
+        """Bronze explanation should mention flex value."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        card = _make_card(
-            "Test Card",
-            1,
-            card_type=CardType.EVENT,
-            spark=None,
-        )
-        explanation = eligibility_explanation(card, TransfigType.BRONZE)
-        assert "event" in explanation.lower()
+        design = _make_design(flex=0.7)
+        explanation = eligibility_explanation(design, TransfigType.BRONZE)
+        assert "0.70" in explanation
+        assert "flex" in explanation.lower()
 
-    def test_rose_explains_energy_ability(self) -> None:
-        """Rose explanation should mention activated ability."""
+    def test_rose_explains_commit_and_flex(self) -> None:
+        """Rose explanation should mention both commit and flex."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        card = _make_card(
-            "Test Card",
-            1,
-            rules_text="Pay 2 energy: Draw a card.",
-        )
-        explanation = eligibility_explanation(card, TransfigType.ROSE)
-        assert "activated" in explanation.lower() or "ability" in explanation.lower()
+        design = _make_design(commit=0.5, flex=0.5)
+        explanation = eligibility_explanation(design, TransfigType.ROSE)
+        assert "commit" in explanation.lower()
+        assert "flex" in explanation.lower()
 
     def test_prismatic_lists_applicable_types(self) -> None:
         """Prismatic explanation should list all applicable sub-types."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        card = _make_card(
-            "Test Card",
-            1,
-            energy_cost=3,
-            card_type=CardType.CHARACTER,
-            rules_text="Deal 5 damage.",
-        )
-        explanation = eligibility_explanation(card, TransfigType.PRISMATIC)
+        design = _make_design(power=0.8, flex=0.8)
+        explanation = eligibility_explanation(design, TransfigType.PRISMATIC)
         assert "Viridian" in explanation
         assert "Golden" in explanation
-        assert "Scarlet" in explanation
+        assert "Azure" in explanation
+        assert "Bronze" in explanation
 
 
 class TestTransfigTypeColor:
@@ -836,23 +782,20 @@ class TestRenderTransfigPreview:
     """Tests for the polished transfiguration card preview rendering."""
 
     def test_preview_shows_transformed_name(self) -> None:
-        """Card preview should show 'Name -> TransfigType Name'."""
+        """Card preview should show 'TransfigType Name'."""
         from sites_transfig import _render_transfig_item, TransfigType
 
-        card = _make_card(
-            "Whirlpool Seer",
-            1,
-            energy_cost=3,
-            spark=2,
-            rarity=Rarity.UNCOMMON,
-            resonances=frozenset({Resonance.TIDE}),
-            rules_text="Judgment: Foresee 2.",
+        design = _make_design(
+            name="Whirlpool Seer",
+            card_id="whirlpool_001",
+            power=0.5,
+            commit=0.3,
+            flex=0.4,
         )
-        dc = DeckCard(card=card)
+        dc = DeckCard(instance=_make_instance(design))
         candidates = [(dc, TransfigType.VIRIDIAN)]
 
         rendered = _render_transfig_item(0, "Test", True, candidates)
-        # Should include the transformed name somewhere
         assert "Viridian" in rendered
         assert "Whirlpool Seer" in rendered
 
@@ -860,26 +803,23 @@ class TestRenderTransfigPreview:
         """Card preview should include an eligibility explanation."""
         from sites_transfig import _render_transfig_item, TransfigType
 
-        card = _make_card(
-            "Whirlpool Seer",
-            1,
-            energy_cost=3,
-            spark=2,
-            rules_text="Judgment: Foresee 2.",
+        design = _make_design(
+            name="Whirlpool Seer",
+            card_id="whirlpool_001",
+            power=0.5,
         )
-        dc = DeckCard(card=card)
+        dc = DeckCard(instance=_make_instance(design))
         candidates = [(dc, TransfigType.VIRIDIAN)]
 
         rendered = _render_transfig_item(0, "Test", True, candidates)
-        # Should include "Eligible" and cost info
         assert "Eligible" in rendered or "eligible" in rendered
 
     def test_skip_option_labeled(self) -> None:
         """Skip option should be clearly visible."""
         from sites_transfig import _render_transfig_item, TransfigType
 
-        card = _make_card("Test", 1)
-        dc = DeckCard(card=card)
+        design = _make_design(name="Test", card_id="test_001", power=0.5)
+        dc = DeckCard(instance=_make_instance(design))
         candidates = [(dc, TransfigType.VIRIDIAN)]
 
         rendered = _render_transfig_item(
@@ -900,13 +840,13 @@ class TestTransfigurationLogging:
 
         state = _make_quest_state(seed=42)
         for i in range(5):
-            card = _make_card(
-                f"Card {i}",
-                i,
-                energy_cost=i + 1,
-                rules_text=f"Deal {i + 1} damage.",
+            design = _make_design(
+                name=f"Card {i}",
+                card_id=f"card_{i}",
+                power=0.5,
+                flex=0.5,
             )
-            state.add_card(card)
+            state.add_card(_make_instance(design))
 
         log_calls: list[dict[str, object]] = []
 
@@ -934,13 +874,13 @@ class TestTransfigurationLogging:
 
         state = _make_quest_state(seed=42)
         for i in range(5):
-            card = _make_card(
-                f"Card {i}",
-                i,
-                energy_cost=i + 1,
-                rules_text=f"Deal {i + 1} damage.",
+            design = _make_design(
+                name=f"Card {i}",
+                card_id=f"card_{i}",
+                power=0.5,
+                flex=0.5,
             )
-            state.add_card(card)
+            state.add_card(_make_instance(design))
 
         log_calls: list[dict[str, object]] = []
 
