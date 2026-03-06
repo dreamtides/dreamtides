@@ -87,9 +87,15 @@ def run_draft(
         if cfg.cube.consumption_mode == "with_replacement"
         else CubeConsumptionMode.WITHOUT_REPLACEMENT
     )
+    if cfg.rarity.enabled:
+        copies_per_card: int | dict[str, int] = cube_manager.build_copies_map(
+            cards, cfg.rarity
+        )
+    else:
+        copies_per_card = cfg.cube.copies_per_card
     cube = cube_manager.CubeManager(
         designs=cards,
-        copies_per_card=cfg.cube.copies_per_card,
+        copies_per_card=copies_per_card,
         consumption_mode=consumption_mode,
     )
     cube_manager.validate_supply(cfg, cube.total_size)

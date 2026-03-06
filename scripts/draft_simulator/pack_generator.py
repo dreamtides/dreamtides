@@ -33,6 +33,8 @@ def generate_pack(
         cards = _generate_uniform(cube, pack_size, rng)
     elif strategy == "rarity_weighted":
         cards = _generate_rarity_weighted(cube, pack_size, rng, rarity_weights or {})
+    elif strategy == "seeded_themed" and cfg.rarity.enabled:
+        cards = _generate_rarity_seeded_themed(cube, pack_size, cfg, rng)
     elif strategy == "seeded_themed":
         cards = _generate_seeded_themed(cube, pack_size, cfg, rng)
     else:
@@ -320,6 +322,226 @@ def _build_rarity_weight_vector(
         w = rarity_weights.get(inst.design.card_id, 1.0)
         weights.append(max(w, 0.001))
     return weights
+
+
+def _generate_rarity_seeded_themed(
+    cube: cube_manager.CubeManager,
+    pack_size: int,
+    cfg: config.SimulatorConfig,
+    rng: random.Random,
+) -> list[CardInstance]:
+    """Generate a collated pack with rarity-tier slot allocation.
+
+    Selects target archetypes, then fills each rarity tier's allocated
+    slots using primary/bridge/filler logic. Tracks both instance IDs
+    and card IDs to prevent the same design appearing twice in a pack.
+    """
+    archetype_count = cfg.cards.archetype_count
+    target_count = min(cfg.pack_generation.archetype_target_count, archetype_count)
+    variance = cfg.pack_generation.variance
+    primary_density = cfg.pack_generation.primary_density
+    bridge_density = cfg.pack_generation.bridge_density
+    rarity_cfg = cfg.rarity
+
+    target_archetypes = _select_target_archetypes(
+        cube, archetype_count, target_count, variance, rng
+    )
+
+    cards: list[CardInstance] = []
+    used_instance_ids: set[int] = set()
+    used_card_ids: set[str] = set()
+
+    for tier_idx, tier_name in enumerate(rarity_cfg.tiers):
+        tier_slots = rarity_cfg.pack_tier_slots[tier_idx]
+        primary_slots = int(tier_slots * primary_density)
+        bridge_slots = int(tier_slots * bridge_density)
+
+        # Fill primary slots for this tier
+        primary_cards = _draw_primary_cards_for_tier(
+            cube,
+            primary_slots,
+            target_archetypes,
+            tier_name,
+            used_instance_ids,
+            used_card_ids,
+            rng,
+        )
+        cards.extend(primary_cards)
+        for c in primary_cards:
+            used_instance_ids.add(c.instance_id)
+            used_card_ids.add(c.design.card_id)
+
+        # Fill bridge slots for this tier
+        bridge_cards = _draw_bridge_cards_for_tier(
+            cube,
+            bridge_slots,
+            target_archetypes,
+            tier_name,
+            used_instance_ids,
+            used_card_ids,
+            rng,
+        )
+        cards.extend(bridge_cards)
+        for c in bridge_cards:
+            used_instance_ids.add(c.instance_id)
+            used_card_ids.add(c.design.card_id)
+
+        # Fill remaining tier slots
+        remaining_needed = tier_slots - len(
+            [c for c in cards if c.design.rarity == tier_name]
+        )
+        if remaining_needed > 0:
+            fill_cards = _draw_remaining_cards_for_tier(
+                cube,
+                remaining_needed,
+                tier_name,
+                used_instance_ids,
+                used_card_ids,
+                rng,
+            )
+            cards.extend(fill_cards)
+            for c in fill_cards:
+                used_instance_ids.add(c.instance_id)
+                used_card_ids.add(c.design.card_id)
+
+    # Any-tier backfill if still underfilled
+    remaining_needed = pack_size - len(cards)
+    if remaining_needed > 0:
+        fill_cards = _draw_remaining_cards_deduped(
+            cube, remaining_needed, used_instance_ids, used_card_ids, rng
+        )
+        cards.extend(fill_cards)
+
+    return cards
+
+
+def _draw_primary_cards_for_tier(
+    cube: cube_manager.CubeManager,
+    count: int,
+    target_archetypes: list[int],
+    tier_name: str,
+    used_instance_ids: set[int],
+    used_card_ids: set[str],
+    rng: random.Random,
+) -> list[CardInstance]:
+    """Draw primary cards filtered by rarity tier with design-level dedup."""
+    target_set = set(target_archetypes)
+    current_supply = cube.supply
+    archetype_count = len(current_supply[0].design.fitness) if current_supply else 8
+
+    weights: list[float] = []
+    for inst in current_supply:
+        if (
+            inst.instance_id in used_instance_ids
+            or inst.design.card_id in used_card_ids
+            or inst.design.rarity != tier_name
+        ):
+            weights.append(0.0)
+            continue
+        top = _top_archetype(inst, archetype_count)
+        if top in target_set:
+            weights.append(max(inst.design.fitness[top], 0.001))
+        else:
+            weights.append(0.0)
+
+    available_count = sum(1 for w in weights if w > 0)
+    draw_count = min(count, available_count)
+    if draw_count <= 0:
+        return []
+    return cube.draw(draw_count, rng, weights=weights)
+
+
+def _draw_bridge_cards_for_tier(
+    cube: cube_manager.CubeManager,
+    count: int,
+    target_archetypes: list[int],
+    tier_name: str,
+    used_instance_ids: set[int],
+    used_card_ids: set[str],
+    rng: random.Random,
+) -> list[CardInstance]:
+    """Draw bridge cards filtered by rarity tier with design-level dedup."""
+    target_set = set(target_archetypes)
+    current_supply = cube.supply
+
+    weights: list[float] = []
+    for inst in current_supply:
+        if (
+            inst.instance_id in used_instance_ids
+            or inst.design.card_id in used_card_ids
+            or inst.design.rarity != tier_name
+        ):
+            weights.append(0.0)
+            continue
+        high_count = sum(
+            1
+            for a in target_set
+            if a < len(inst.design.fitness) and inst.design.fitness[a] > 0.5
+        )
+        if high_count >= 2:
+            weights.append(1.0)
+        else:
+            weights.append(0.0)
+
+    available_count = sum(1 for w in weights if w > 0)
+    draw_count = min(count, available_count)
+    if draw_count <= 0:
+        return []
+    return cube.draw(draw_count, rng, weights=weights)
+
+
+def _draw_remaining_cards_for_tier(
+    cube: cube_manager.CubeManager,
+    count: int,
+    tier_name: str,
+    used_instance_ids: set[int],
+    used_card_ids: set[str],
+    rng: random.Random,
+) -> list[CardInstance]:
+    """Draw remaining cards from a specific tier with design-level dedup."""
+    current_supply = cube.supply
+    weights: list[float] = []
+    for inst in current_supply:
+        if (
+            inst.instance_id in used_instance_ids
+            or inst.design.card_id in used_card_ids
+            or inst.design.rarity != tier_name
+        ):
+            weights.append(0.0)
+        else:
+            weights.append(1.0)
+
+    available_count = sum(1 for w in weights if w > 0)
+    draw_count = min(count, available_count)
+    if draw_count <= 0:
+        return []
+    return cube.draw(draw_count, rng, weights=weights)
+
+
+def _draw_remaining_cards_deduped(
+    cube: cube_manager.CubeManager,
+    count: int,
+    used_instance_ids: set[int],
+    used_card_ids: set[str],
+    rng: random.Random,
+) -> list[CardInstance]:
+    """Draw remaining cards from any tier with design-level dedup."""
+    current_supply = cube.supply
+    weights: list[float] = []
+    for inst in current_supply:
+        if (
+            inst.instance_id in used_instance_ids
+            or inst.design.card_id in used_card_ids
+        ):
+            weights.append(0.0)
+        else:
+            weights.append(1.0)
+
+    available_count = sum(1 for w in weights if w > 0)
+    draw_count = min(count, available_count)
+    if draw_count <= 0:
+        return []
+    return cube.draw(draw_count, rng, weights=weights)
 
 
 def _compute_archetype_profile(

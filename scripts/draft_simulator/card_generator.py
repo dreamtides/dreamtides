@@ -21,6 +21,8 @@ def generate_cards(cfg: SimulatorConfig, rng: random.Random) -> list[CardDesign]
         if cfg.cards.file_path is None:
             raise ValueError("cards.source is 'file' but cards.file_path is not set")
         cards = _load_cards_from_file(cfg.cards.file_path, cfg.cards.archetype_count)
+    elif cfg.rarity.enabled:
+        cards = _generate_rarity_cards(cfg, rng)
     else:
         cards = _generate_synthetic_cards(cfg, rng)
 
@@ -43,6 +45,7 @@ def _load_cards_from_file(path: str, archetype_count: int) -> list[CardDesign]:
                 power=float(entry["power"]),
                 commit=float(entry["commit"]),
                 flex=float(entry["flex"]),
+                rarity=entry.get("rarity", ""),
             )
         )
     return cards
@@ -107,6 +110,72 @@ def _generate_synthetic_cards(
                 )
             )
             card_index += 1
+
+    return cards
+
+
+def _generate_rarity_cards(
+    cfg: SimulatorConfig, rng: random.Random
+) -> list[CardDesign]:
+    """Generate synthetic cards with rarity tiers.
+
+    For each tier, splits into bridge and primary cards, samples power
+    from the tier's configured range, and tags each card with its rarity.
+    """
+    archetype_count = cfg.cards.archetype_count
+    bridge_fraction = cfg.cards.bridge_fraction
+    rarity_cfg = cfg.rarity
+
+    cards: list[CardDesign] = []
+
+    for tier_idx, tier_name in enumerate(rarity_cfg.tiers):
+        tier_count = rarity_cfg.tier_design_counts[tier_idx]
+        power_low, power_high = rarity_cfg.tier_power_ranges[tier_idx]
+
+        bridge_count = int(tier_count * bridge_fraction)
+        primary_count = tier_count - bridge_count
+
+        # Generate bridge cards for this tier
+        for i in range(bridge_count):
+            fitness = _generate_bridge_fitness(archetype_count, rng)
+            power = rng.uniform(power_low, power_high)
+            commit = _sample_beta(2.0, 3.0, rng)
+            flex = _compute_flex(fitness)
+            cards.append(
+                CardDesign(
+                    card_id=f"{tier_name}_bridge_{i:04d}",
+                    name=f"{tier_name.title()} Bridge {i}",
+                    fitness=fitness,
+                    power=power,
+                    commit=commit,
+                    flex=flex,
+                    rarity=tier_name,
+                )
+            )
+
+        # Generate primary cards distributed across archetypes
+        primaries_per_arch = primary_count // archetype_count
+        remainder = primary_count % archetype_count
+        card_index = 0
+        for arch in range(archetype_count):
+            count = primaries_per_arch + (1 if arch < remainder else 0)
+            for _ in range(count):
+                fitness = _generate_primary_fitness(arch, archetype_count, rng)
+                power = rng.uniform(power_low, power_high)
+                commit = _sample_beta(2.0, 3.0, rng)
+                flex = _compute_flex(fitness)
+                cards.append(
+                    CardDesign(
+                        card_id=f"{tier_name}_primary_{arch}_{card_index:04d}",
+                        name=f"{tier_name.title()} Arch {arch} Card {card_index}",
+                        fitness=fitness,
+                        power=power,
+                        commit=commit,
+                        flex=flex,
+                        rarity=tier_name,
+                    )
+                )
+                card_index += 1
 
     return cards
 
@@ -300,6 +369,21 @@ def describe_card_pool(
         f"{colors.num(archetype_count)} archetypes"
     )
     lines.append("")
+
+    # --- Rarity Distribution (if present) ---
+    rarity_counts: dict[str, int] = {}
+    for c in cards:
+        if c.rarity:
+            rarity_counts[c.rarity] = rarity_counts.get(c.rarity, 0) + 1
+    if rarity_counts:
+        lines.append(colors.section("--- Rarity Distribution ---"))
+        for tier, count in sorted(rarity_counts.items(), key=lambda x: -x[1]):
+            lines.append(
+                f"  {colors.label(f'{tier.title() + ":":<12s}')} "
+                f"{colors.num(f'{count:>4d}')}  "
+                f"({colors.num(f'{100*count/len(cards):.1f}')}%)"
+            )
+        lines.append("")
 
     # --- Composition ---
     bridge_cards = [c for c in cards if sum(1 for f in c.fitness if f > 0.5) >= 2]

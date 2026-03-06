@@ -97,6 +97,21 @@ class CubeManager:
         return drawn
 
 
+def build_copies_map(
+    designs: list[CardDesign],
+    rarity_cfg: "config.RarityConfig",
+) -> dict[str, int]:
+    """Build a card_id → copy count map from rarity tier configuration."""
+    tier_to_copies: dict[str, int] = {}
+    for tier_name, copies in zip(rarity_cfg.tiers, rarity_cfg.tier_copies):
+        tier_to_copies[tier_name] = copies
+
+    result: dict[str, int] = {}
+    for design in designs:
+        result[design.card_id] = tier_to_copies.get(design.rarity, 1)
+    return result
+
+
 def validate_supply(cfg: config.SimulatorConfig, cube_size: int) -> None:
     """Pre-validate that cube supply is sufficient for the draft's demand.
 

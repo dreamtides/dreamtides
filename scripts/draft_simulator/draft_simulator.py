@@ -38,6 +38,15 @@ from utils import argmax
 VERSION = "0.1.0"
 
 
+def _resolve_copies_per_card(
+    cards: list[CardDesign], cfg: SimulatorConfig
+) -> int | dict[str, int]:
+    """Return the copies_per_card value, using rarity map when enabled."""
+    if cfg.rarity.enabled:
+        return cube_manager.build_copies_map(cards, cfg.rarity)
+    return cfg.cube.copies_per_card
+
+
 def _unique_designs(card_pool: dict[int, CardInstance]) -> list[CardDesign]:
     """Extract unique CardDesign objects from a card pool."""
     seen: set[str] = set()
@@ -991,9 +1000,10 @@ def _run_demo(cfg: SimulatorConfig, seed: int) -> None:
         if cfg.cube.consumption_mode == "with_replacement"
         else CubeConsumptionMode.WITHOUT_REPLACEMENT
     )
+    copies = _resolve_copies_per_card(cards, cfg)
     cube = cube_manager.CubeManager(
         designs=cards,
-        copies_per_card=cfg.cube.copies_per_card,
+        copies_per_card=copies,
         consumption_mode=consumption_mode,
     )
 
@@ -1009,7 +1019,7 @@ def _run_demo(cfg: SimulatorConfig, seed: int) -> None:
     for strategy in strategies:
         demo_cube = cube_manager.CubeManager(
             designs=cards,
-            copies_per_card=cfg.cube.copies_per_card,
+            copies_per_card=copies,
             consumption_mode=consumption_mode,
         )
         pack = pack_generator.generate_pack(strategy, demo_cube, cfg, rng)
@@ -1208,10 +1218,12 @@ def _demo_refill_strategies(
     """Demonstrate each refill strategy on a sample pack."""
     print(f"\n{colors.section('=== Refill Strategy Demonstrations ===')}")
 
+    copies = _resolve_copies_per_card(cards, cfg)
+
     def _fresh_pack() -> tuple[cube_manager.CubeManager, Pack]:
         c = cube_manager.CubeManager(
             designs=cards,
-            copies_per_card=cfg.cube.copies_per_card,
+            copies_per_card=copies,
             consumption_mode=consumption_mode,
         )
         p = pack_generator.generate_pack("uniform", c, cfg, rng)
@@ -1305,7 +1317,7 @@ def _demo_pick_policies(
     """Demonstrate each pick policy selecting a card from a sample pack."""
     demo_cube = cube_manager.CubeManager(
         designs=cards,
-        copies_per_card=cfg.cube.copies_per_card,
+        copies_per_card=_resolve_copies_per_card(cards, cfg),
         consumption_mode=consumption_mode,
     )
     pack = pack_generator.generate_pack("uniform", demo_cube, cfg, rng)
@@ -1391,7 +1403,7 @@ def _demo_show_n_strategies(
     """Demonstrate each Show-N strategy selecting cards from a pack."""
     demo_cube = cube_manager.CubeManager(
         designs=cards,
-        copies_per_card=cfg.cube.copies_per_card,
+        copies_per_card=_resolve_copies_per_card(cards, cfg),
         consumption_mode=consumption_mode,
     )
     pack = pack_generator.generate_pack("uniform", demo_cube, cfg, rng)

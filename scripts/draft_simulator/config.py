@@ -114,6 +114,20 @@ class MetricsConfig:
 
 
 @dataclass
+class RarityConfig:
+    """Rarity tier system parameters."""
+
+    enabled: bool = False
+    tiers: list[str] = field(default_factory=lambda: ["common", "uncommon", "rare"])
+    tier_design_counts: list[int] = field(default_factory=lambda: [180, 120, 60])
+    tier_copies: list[int] = field(default_factory=lambda: [3, 2, 1])
+    tier_power_ranges: list[list[float]] = field(
+        default_factory=lambda: [[0.2, 0.6], [0.4, 0.7], [0.6, 0.9]]
+    )
+    pack_tier_slots: list[int] = field(default_factory=lambda: [12, 5, 3])
+
+
+@dataclass
 class SweepConfig:
     """Sweep execution parameters."""
 
@@ -137,6 +151,7 @@ class SimulatorConfig:
     scoring: ScoringConfig = field(default_factory=ScoringConfig)
     commitment: CommitmentConfig = field(default_factory=CommitmentConfig)
     metrics: MetricsConfig = field(default_factory=MetricsConfig)
+    rarity: RarityConfig = field(default_factory=RarityConfig)
     sweep: SweepConfig = field(default_factory=SweepConfig)
 
 
@@ -150,6 +165,7 @@ SECTION_NAMES: list[str] = [
     "scoring",
     "commitment",
     "metrics",
+    "rarity",
     "sweep",
 ]
 
@@ -163,6 +179,7 @@ _SECTION_CLASSES: dict[str, type] = {
     "scoring": ScoringConfig,
     "commitment": CommitmentConfig,
     "metrics": MetricsConfig,
+    "rarity": RarityConfig,
     "sweep": SweepConfig,
 }
 
@@ -415,6 +432,47 @@ def validate_config(cfg: SimulatorConfig) -> None:
         0.0,
         1.0,
     )
+
+    # Rarity config validation
+    if cfg.rarity.enabled:
+        r = cfg.rarity
+        n_tiers = len(r.tiers)
+        if len(r.tier_design_counts) != n_tiers:
+            errors.append(
+                f"rarity.tier_design_counts length {len(r.tier_design_counts)} "
+                f"!= tiers length {n_tiers}"
+            )
+        if len(r.tier_copies) != n_tiers:
+            errors.append(
+                f"rarity.tier_copies length {len(r.tier_copies)} "
+                f"!= tiers length {n_tiers}"
+            )
+        if len(r.tier_power_ranges) != n_tiers:
+            errors.append(
+                f"rarity.tier_power_ranges length {len(r.tier_power_ranges)} "
+                f"!= tiers length {n_tiers}"
+            )
+        if len(r.pack_tier_slots) != n_tiers:
+            errors.append(
+                f"rarity.pack_tier_slots length {len(r.pack_tier_slots)} "
+                f"!= tiers length {n_tiers}"
+            )
+        if sum(r.tier_design_counts) != cfg.cube.distinct_cards:
+            errors.append(
+                f"sum(rarity.tier_design_counts)={sum(r.tier_design_counts)} "
+                f"!= cube.distinct_cards={cfg.cube.distinct_cards}"
+            )
+        if sum(r.pack_tier_slots) != cfg.draft.pack_size:
+            errors.append(
+                f"sum(rarity.pack_tier_slots)={sum(r.pack_tier_slots)} "
+                f"!= draft.pack_size={cfg.draft.pack_size}"
+            )
+        for i, pr in enumerate(r.tier_power_ranges):
+            if len(pr) != 2 or pr[0] < 0 or pr[1] > 1 or pr[0] > pr[1]:
+                errors.append(
+                    f"rarity.tier_power_ranges[{i}]={pr} invalid "
+                    f"(need [low, high] in [0, 1] with low <= high)"
+                )
 
     # Force policy requires force_archetype
     if cfg.agents.policy == "force" and cfg.agents.force_archetype is None:

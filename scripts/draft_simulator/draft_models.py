@@ -63,6 +63,7 @@ class CardDesign:
     power: float
     commit: float
     flex: float
+    rarity: str = ""
 
 
 @dataclass(frozen=True)
