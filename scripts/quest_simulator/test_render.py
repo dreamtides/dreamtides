@@ -4,7 +4,12 @@ import os
 import sys
 import unittest
 
-from models import Card
+# Ensure NO_COLOR is set before importing render modules so ANSI codes
+# are empty strings, making assertions on visible content straightforward.
+os.environ["NO_COLOR"] = "1"
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "draft_simulator"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 
 
 class TestVisibleLen(unittest.TestCase):
@@ -28,6 +33,11 @@ class TestVisibleLen(unittest.TestCase):
 
         self.assertEqual(visible_len("\033[1m\033[94mhello\033[0m"), 5)
 
+    def test_24bit_ansi_codes(self) -> None:
+        from render import visible_len
+
+        self.assertEqual(visible_len("\033[38;2;255;204;102mtext\033[0m"), 4)
+
 
 class TestPadRight(unittest.TestCase):
     def test_plain_padding(self) -> None:
@@ -50,67 +60,18 @@ class TestPadRight(unittest.TestCase):
         self.assertEqual(result, "hello world")
 
 
-class TestRarityBadge(unittest.TestCase):
-    def test_common(self) -> None:
-        from models import Rarity
-        from render import rarity_badge
+class TestTruncateVisible(unittest.TestCase):
+    def test_short_string_unchanged(self) -> None:
+        from render import truncate_visible
 
-        result = rarity_badge(Rarity.COMMON)
-        self.assertEqual(result, "[C]")
+        result = truncate_visible("hello", 10)
+        self.assertEqual(result, "hello")
 
-    def test_uncommon(self) -> None:
-        from models import Rarity
-        from render import rarity_badge
+    def test_truncates_long_string(self) -> None:
+        from render import truncate_visible, visible_len
 
-        result = rarity_badge(Rarity.UNCOMMON)
-        self.assertEqual(result, "[U]")
-
-    def test_rare_bold(self) -> None:
-        from models import Rarity
-        from render import BOLD, RESET, rarity_badge
-
-        result = rarity_badge(Rarity.RARE)
-        self.assertIn(BOLD, result)
-        self.assertIn("[R]", result)
-
-    def test_legendary_bold(self) -> None:
-        from models import Rarity
-        from render import BOLD, RESET, rarity_badge
-
-        result = rarity_badge(Rarity.LEGENDARY)
-        self.assertIn(BOLD, result)
-        self.assertIn("[L]", result)
-
-
-class TestColorResonance(unittest.TestCase):
-    def test_single_resonance(self) -> None:
-        from models import Resonance
-        from render import RESET, RESONANCE_COLORS, color_resonance
-
-        result = color_resonance(Resonance.TIDE)
-        self.assertIn("Tide", result)
-
-    def test_color_resonances_empty(self) -> None:
-        from render import color_resonances
-
-        result = color_resonances(frozenset())
-        self.assertIn("Neutral", result)
-
-    def test_color_resonances_single(self) -> None:
-        from models import Resonance
-        from render import color_resonances
-
-        result = color_resonances(frozenset({Resonance.EMBER}))
-        self.assertIn("Ember", result)
-
-    def test_color_resonances_dual(self) -> None:
-        from models import Resonance
-        from render import color_resonances
-
-        result = color_resonances(frozenset({Resonance.TIDE, Resonance.RUIN}))
-        self.assertIn("+", result)
-        self.assertIn("Tide", result)
-        self.assertIn("Ruin", result)
+        result = truncate_visible("hello world this is long", 10)
+        self.assertLessEqual(visible_len(result), 10)
 
 
 class TestDrawBox(unittest.TestCase):
@@ -145,7 +106,6 @@ class TestDrawBox(unittest.TestCase):
         finally:
             sys.stdout = old_stdout
         lines = captured.getvalue().strip().split("\n")
-        # The top line should be at least 70 chars visible
         from render import visible_len
 
         self.assertGreaterEqual(visible_len(lines[0]), 70)
@@ -167,177 +127,28 @@ class TestDrawSeparators(unittest.TestCase):
         self.assertTrue(all(c == "\u2550" for c in result))
 
 
-class TestFormatCard(unittest.TestCase):
-    def _make_card(self) -> Card:
-        from models import CardType, Rarity, Resonance
-
-        return Card(
-            name="Whirlpool Seer",
-            card_number=42,
-            energy_cost=3,
-            card_type=CardType.CHARACTER,
-            subtype="Mage",
-            is_fast=False,
-            spark=2,
-            rarity=Rarity.UNCOMMON,
-            rules_text="Judgment: Foresee 2.",
-            resonances=frozenset({Resonance.TIDE}),
-            tags=frozenset({"mechanic:foresee"}),
-        )
-
-    def test_format_card_highlighted(self) -> None:
-        from render import format_card, visible_len
-
-        card = self._make_card()
-        lines = format_card(card, highlighted=True)
-        self.assertEqual(len(lines), 2)
-        # Line 1 starts with >
-        self.assertTrue(lines[0].lstrip().startswith(">"))
-        self.assertIn("Whirlpool Seer", lines[0])
-        self.assertIn("Cost: 3", lines[0])
-        self.assertIn("Spark: 2", lines[0])
-        # Line 2 has quoted rules text
-        self.assertIn('"Judgment: Foresee 2."', lines[1])
-
-    def test_format_card_not_highlighted(self) -> None:
-        from render import format_card
-
-        card = self._make_card()
-        lines = format_card(card, highlighted=False)
-        self.assertEqual(len(lines), 2)
-        # No > prefix when not highlighted
-        stripped = lines[0].lstrip()
-        self.assertFalse(stripped.startswith(">"))
-
-    def test_format_card_no_spark(self) -> None:
-        from models import Card, CardType, Rarity, Resonance
-        from render import format_card
-
-        card = Card(
-            name="Lightning Bolt",
-            card_number=99,
-            energy_cost=2,
-            card_type=CardType.EVENT,
-            subtype=None,
-            is_fast=True,
-            spark=None,
-            rarity=Rarity.COMMON,
-            rules_text="Deal damage.",
-            resonances=frozenset({Resonance.EMBER}),
-            tags=frozenset(),
-        )
-        lines = format_card(card, highlighted=False)
-        self.assertNotIn("Spark:", lines[0])
-        self.assertIn("Cost: 2", lines[0])
-
-    def test_format_card_no_cost(self) -> None:
-        from models import Card, CardType, Rarity, Resonance
-        from render import format_card
-
-        card = Card(
-            name="Strange Card",
-            card_number=100,
-            energy_cost=None,
-            card_type=CardType.EVENT,
-            subtype=None,
-            is_fast=False,
-            spark=None,
-            rarity=Rarity.COMMON,
-            rules_text="Do something.",
-            resonances=frozenset(),
-            tags=frozenset(),
-        )
-        lines = format_card(card, highlighted=False)
-        self.assertIn("Cost: -", lines[0])
-
-    def test_format_card_line1_within_content_width(self) -> None:
-        from models import Card, CardType, Rarity, Resonance
-        from render import CONTENT_WIDTH, format_card, visible_len
-
-        long_name_card = Card(
-            name="A" * 80,
-            card_number=200,
-            energy_cost=5,
-            card_type=CardType.CHARACTER,
-            subtype=None,
-            is_fast=False,
-            spark=3,
-            rarity=Rarity.UNCOMMON,
-            rules_text="Some text.",
-            resonances=frozenset({Resonance.TIDE, Resonance.EMBER}),
-            tags=frozenset(),
-        )
-        lines = format_card(long_name_card, highlighted=False)
-        self.assertLessEqual(
-            visible_len(lines[0]),
-            CONTENT_WIDTH,
-            f"Line 1 visible width {visible_len(lines[0])} exceeds CONTENT_WIDTH {CONTENT_WIDTH}",
-        )
-        # Name should be truncated
-        self.assertIn("\u2026", lines[0])
-
-    def test_format_card_truncated_rules(self) -> None:
-        from models import Card, CardType, Rarity, Resonance
-        from render import format_card, visible_len
-
-        long_text = "This is a very long rules text that should be truncated when the card is not highlighted because it exceeds the maximum line width."
-        card = Card(
-            name="Verbose Card",
-            card_number=101,
-            energy_cost=1,
-            card_type=CardType.CHARACTER,
-            subtype=None,
-            is_fast=False,
-            spark=1,
-            rarity=Rarity.COMMON,
-            rules_text=long_text,
-            resonances=frozenset({Resonance.STONE}),
-            tags=frozenset(),
-        )
-        lines_not_hl = format_card(card, highlighted=False)
-        # Not highlighted: rules text should be truncated
-        self.assertLessEqual(visible_len(lines_not_hl[1]), 70)
-
-        lines_hl = format_card(card, highlighted=True)
-        # Highlighted: full rules text
-        self.assertIn(long_text, lines_hl[1])
-
-
-class TestProfileBar(unittest.TestCase):
-    def test_bar_chart(self) -> None:
-        from models import Resonance
-        from render import profile_bar
-
-        snapshot: dict[Resonance, int] = {
-            Resonance.TIDE: 12,
-            Resonance.EMBER: 2,
-            Resonance.ZEPHYR: 2,
-            Resonance.STONE: 3,
-            Resonance.RUIN: 11,
-        }
-        result = profile_bar(snapshot)
-        self.assertIn("Tide", result)
-        self.assertIn("Ruin", result)
-        self.assertIn("\u2588", result)  # filled block
-        self.assertIn("%", result)
-
-    def test_bar_chart_zero(self) -> None:
-        from models import Resonance
-        from render import profile_bar
-
-        snapshot: dict[Resonance, int] = {r: 0 for r in Resonance}
-        result = profile_bar(snapshot)
-        self.assertIn("0.0%", result)
-
-
 class TestHeaderTemplates(unittest.TestCase):
     def test_quest_start_banner(self) -> None:
         from render import quest_start_banner
 
-        result = quest_start_banner(seed=42, starting_essence=250, pool_size=660)
+        result = quest_start_banner(seed=42, starting_essence=250)
         self.assertIn("42", result)
         self.assertIn("250", result)
-        self.assertIn("660", result)
+        self.assertIn("540", result)
+
+    def test_quest_start_banner_custom_count(self) -> None:
+        from render import quest_start_banner
+
+        result = quest_start_banner(seed=42, starting_essence=250, card_count=100)
+        self.assertIn("100", result)
+
+    def test_quest_start_banner_no_pool_variance(self) -> None:
+        from render import quest_start_banner
+
+        result = quest_start_banner(seed=42, starting_essence=250)
+        self.assertNotIn("variance", result.lower())
+        self.assertNotIn("rarity", result.lower())
+        self.assertNotIn("algorithm", result.lower())
 
     def test_atlas_header(self) -> None:
         from render import atlas_header
@@ -366,89 +177,22 @@ class TestHeaderTemplates(unittest.TestCase):
         self.assertIn("Draft Site 1", result)
         self.assertIn("Pick 1/5", result)
 
-    def test_resonance_profile_footer(self) -> None:
-        from models import Resonance
-        from render import resonance_profile_footer
 
-        counts: dict[Resonance, int] = {
-            Resonance.TIDE: 7,
-            Resonance.EMBER: 0,
-            Resonance.ZEPHYR: 0,
-            Resonance.STONE: 1,
-            Resonance.RUIN: 6,
-        }
-        result = resonance_profile_footer(
-            counts=counts,
-            deck_count=8,
-            essence=300,
-        )
-        self.assertIn("Tide 7", result)
-        self.assertIn("Ruin 6", result)
-        self.assertIn("8 cards", result)
-        self.assertIn("300", result)
+class TestColorsIntegration(unittest.TestCase):
+    def test_uses_colors_module(self) -> None:
+        """Render module imports and uses the colors module."""
+        import render
 
-    def test_victory_screen(self) -> None:
-        from models import Rarity, Resonance
-        from render import victory_screen
+        self.assertTrue(hasattr(render, "colors"))
 
-        resonance_counts: dict[Resonance, int] = {
-            Resonance.TIDE: 12,
-            Resonance.EMBER: 2,
-            Resonance.ZEPHYR: 2,
-            Resonance.STONE: 3,
-            Resonance.RUIN: 11,
-        }
-        rarity_counts: dict[Rarity, int] = {
-            Rarity.COMMON: 12,
-            Rarity.UNCOMMON: 13,
-            Rarity.RARE: 8,
-            Rarity.LEGENDARY: 1,
-        }
-        result = victory_screen(
-            battles_won=7,
-            total_battles=7,
-            dreamscapes_visited=7,
-            dreamcaller_name="Vesper, Twilight Arbiter",
-            dreamcaller_resonances=frozenset({Resonance.TIDE, Resonance.RUIN}),
-            deck_size=34,
-            rarity_counts=rarity_counts,
-            resonance_counts=resonance_counts,
-            neutral_count=5,
-            dreamsign_count=4,
-            essence=175,
-            log_path=".logs/quest_20260227_143022_seed42.jsonl",
-        )
-        self.assertIn("QUEST COMPLETE", result)
-        self.assertIn("7/7", result)
-        self.assertIn("Vesper, Twilight Arbiter", result)
-        self.assertIn("175", result)
+    def test_no_raw_ansi_constants(self) -> None:
+        """No raw BOLD/DIM/RESET/STRIKETHROUGH constants."""
+        import render
 
-
-class TestNoColor(unittest.TestCase):
-    def test_no_color_env(self) -> None:
-        """When NO_COLOR is set, all color constants should be empty strings."""
-        import subprocess
-
-        result = subprocess.run(
-            [
-                sys.executable,
-                "-c",
-                (
-                    "import sys; sys.path.insert(0, 'scripts/quest_simulator');"
-                    "import render;"
-                    "colors = [render.NEUTRAL_COLOR, render.BOLD, render.DIM, render.RESET];"
-                    "colors.extend(render.RESONANCE_COLORS.values());"
-                    "assert all(c == '' for c in colors), f'Expected empty but got {colors}';"
-                    "print('OK')"
-                ),
-            ],
-            capture_output=True,
-            text=True,
-            env={**os.environ, "NO_COLOR": "1"},
-            cwd=os.path.join(os.path.dirname(__file__), "..", ".."),
-        )
-        self.assertEqual(result.returncode, 0, f"stderr: {result.stderr}")
-        self.assertIn("OK", result.stdout)
+        self.assertFalse(hasattr(render, "BOLD"))
+        self.assertFalse(hasattr(render, "DIM"))
+        self.assertFalse(hasattr(render, "RESET"))
+        self.assertFalse(hasattr(render, "STRIKETHROUGH"))
 
 
 if __name__ == "__main__":

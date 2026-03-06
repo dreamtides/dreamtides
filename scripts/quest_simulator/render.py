@@ -1,27 +1,14 @@
 """Terminal display formatting for the quest simulator.
 
-Provides ANSI color constants, box-drawing utilities, and
-header/footer/banner templates.
+Provides color wrappers (via AYU Mirage palette from the draft simulator),
+box-drawing utilities, and header/footer/banner templates.
 """
 
-import os
 import re
-import sys
-from typing import Optional
+
+import colors
 
 CONTENT_WIDTH = 70
-
-BOLD = "\033[1m"
-DIM = "\033[2m"
-STRIKETHROUGH = "\033[9m"
-RESET = "\033[0m"
-
-# Disable colors when NO_COLOR is set or output is not a terminal
-if os.environ.get("NO_COLOR") or not sys.stdout.isatty():
-    BOLD = ""
-    DIM = ""
-    STRIKETHROUGH = ""
-    RESET = ""
 
 
 def visible_len(s: str) -> int:
@@ -56,7 +43,9 @@ def truncate_visible(s: str, max_width: int) -> str:
             break
         result.append(ch)
         vis += 1
-    result.append(RESET)
+    if colors._USE_COLOR:
+        # Append an ANSI reset to close any open formatting
+        result.append(f"{chr(27)}[0m")
     return "".join(result)
 
 
@@ -89,27 +78,25 @@ def draw_double_separator() -> str:
 def quest_start_banner(
     seed: int,
     starting_essence: int,
-    pool_size: int,
-    unique_cards: int = 0,
+    card_count: int = 540,
 ) -> str:
     """Build the quest start banner text."""
     sep = draw_double_separator()
+    title = colors.header("DREAMTIDES QUEST")
+    seed_label = f"Seed: {seed}"
+    title_vis = visible_len(title)
+    gap = max(2, CONTENT_WIDTH - 2 - title_vis - len(seed_label) - 2)
     lines: list[str] = [
         sep,
-        f"  {BOLD}DREAMTIDES QUEST{RESET}{' ' * (CONTENT_WIDTH - 18 - len(f'Seed: {seed}') - 2)}Seed: {seed}",
+        f"  {title}{' ' * gap}{seed_label}",
         sep,
         "",
-        f"  Starting essence: {starting_essence}",
+        f"  Starting essence: {colors.num(starting_essence)}",
+        f"  Card pool: {colors.num(card_count)} synthetic cards",
+        "",
+        f"  {colors.dim('Press Enter to begin...')}",
+        sep,
     ]
-
-    if unique_cards > 0:
-        lines.append(f"  Draft pool: {unique_cards} cards ({pool_size} entries)")
-    elif pool_size > 0:
-        lines.append(f"  Draft pool: {pool_size} entries")
-
-    lines.append("")
-    lines.append(f"  {DIM}Press Enter to begin...{RESET}")
-    lines.append(sep)
     return "\n".join(lines)
 
 
@@ -122,7 +109,7 @@ def atlas_header(
 ) -> str:
     """Build the atlas header text."""
     sep = draw_double_separator()
-    left1 = f"  {BOLD}DREAM ATLAS{RESET}"
+    left1 = f"  {colors.header('DREAM ATLAS')}"
     right1 = f"Essence: {essence}"
     vis_left1 = visible_len(left1)
     gap1 = max(2, CONTENT_WIDTH - vis_left1 - len(right1))

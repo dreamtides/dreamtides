@@ -1,21 +1,24 @@
 """Status display functions for the quest simulator.
 
-Provides site header, battle-specific display formatting, and
-victory screen. Imports shared ANSI constants and box-drawing
-utilities from render.py.
+Provides site header, battle-specific display formatting, archetype
+preference footer, and victory screen. Uses AYU Mirage palette colors
+from the draft simulator.
 """
 
 from typing import Optional
 
+import colors
 from models import Boss
 from render import (
-    BOLD,
     CONTENT_WIDTH,
-    DIM,
-    RESET,
     draw_double_separator,
     draw_separator,
+    visible_len,
 )
+
+ARCHETYPE_NAMES: list[str] = [
+    "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7",
+]
 
 
 def site_header(
@@ -54,20 +57,20 @@ def battle_header(
             encounter_label = "FINAL BOSS"
         else:
             encounter_label = "MINIBOSS ENCOUNTER"
-        title = f"  {BOLD}BATTLE {battle_number} -- {encounter_label}{RESET}"
+        title = f"  {colors.header(f'BATTLE {battle_number} -- {encounter_label}')}"
         lines: list[str] = [
             sep,
             title,
             sep,
             "",
-            f"    {BOLD}>> {boss_info.name} <<{RESET}",
+            f"    {colors.c(f'>> {boss_info.name} <<', 'accent', bold=True)}",
             f"    Archetype: {boss_info.archetype}",
             f'    "{boss_info.ability_text}"',
             "",
             sep,
         ]
     else:
-        title = f"  {BOLD}BATTLE {battle_number}/{total_battles}{RESET}"
+        title = f"  {colors.header(f'BATTLE {battle_number}/{total_battles}')}"
         lines = [
             sep,
             title,
@@ -85,7 +88,7 @@ def battle_victory_message() -> str:
     return "\n".join(
         [
             sep,
-            f"  {BOLD}VICTORY!{RESET}",
+            f"  {colors.header('VICTORY!')}",
             sep,
         ]
     )
@@ -97,9 +100,9 @@ def battle_reward_summary(
 ) -> str:
     """Build the reward summary display showing essence gained and rare pick framing."""
     lines: list[str] = [
-        f"  Essence reward: {BOLD}+{essence_reward}{RESET}",
+        f"  Essence reward: {colors.c(f'+{essence_reward}', 'accent', bold=True)}",
         "",
-        f"  {BOLD}Battle Reward{RESET} -- Choose a rare card:",
+        f"  {colors.section('Battle Reward')} -- Choose a card:",
     ]
     return "\n".join(lines)
 
@@ -109,7 +112,52 @@ def battle_completion_progress(
     total_battles: int,
 ) -> str:
     """Build the completion progress display shown after battle."""
-    return f"  {BOLD}Completion: {new_completion}/{total_battles}{RESET}"
+    return f"  {colors.header(f'Completion: {new_completion}/{total_battles}')}"
+
+
+def archetype_preference_footer(
+    w: list[float],
+    deck_count: int,
+    essence: int,
+) -> str:
+    """Build the archetype preference footer.
+
+    Shows the top 2-3 archetype preferences by weight, deck count,
+    and essence. Called from site modules after each interaction.
+    """
+    sep = draw_separator()
+
+    # Find top 3 archetypes by weight
+    indexed = sorted(enumerate(w), key=lambda x: x[1], reverse=True)
+    top_n = min(3, len(indexed))
+    top = indexed[:top_n]
+
+    total = sum(w)
+    lines: list[str] = [sep]
+
+    pref_parts: list[str] = []
+    for idx, weight in top:
+        name = ARCHETYPE_NAMES[idx] if idx < len(ARCHETYPE_NAMES) else f"A{idx}"
+        if total > 0:
+            pct = weight / total * 100
+            bar_len = int(pct / 5)
+            bar = "\u2588" * bar_len
+            pref_parts.append(
+                f"    {colors.label(name)}: {colors.num(f'{pct:.0f}%')} {colors.c(bar, 'accent')}"
+            )
+        else:
+            pref_parts.append(f"    {colors.label(name)}: {colors.num('0%')}")
+
+    lines.append(f"  {colors.section('Archetype Preferences')}")
+    lines.extend(pref_parts)
+
+    status = (
+        f"  Deck: {colors.num(deck_count)} cards  |  "
+        f"Essence: {colors.num(essence)}"
+    )
+    lines.append(status)
+    lines.append(sep)
+    return "\n".join(lines)
 
 
 def victory_screen(
@@ -120,29 +168,51 @@ def victory_screen(
     deck_size: int,
     dreamsign_count: int,
     essence: int,
+    w: Optional[list[float]] = None,
     log_path: Optional[str] = None,
 ) -> str:
-    """Build the victory screen text."""
+    """Build the victory screen text.
+
+    Shows quest completion stats and archetype preference visualization.
+    """
     sep = draw_double_separator()
 
     lines: list[str] = [
         sep,
-        f"  {BOLD}QUEST COMPLETE -- VICTORY!{RESET}",
+        f"  {colors.header('QUEST COMPLETE -- VICTORY!')}",
         sep,
         "",
-        f"  Battles won: {battles_won}/{total_battles}",
-        f"  Dreamscapes visited: {dreamscapes_visited}",
+        f"  Battles won: {colors.num(f'{battles_won}/{total_battles}')}",
+        f"  Dreamscapes visited: {colors.num(dreamscapes_visited)}",
         f"  Dreamcaller: {dreamcaller_name}",
         "",
-        f"  Final Deck: {deck_size} cards",
+        f"  Final Deck: {colors.num(deck_size)} cards",
         "",
-        f"  Dreamsigns: {dreamsign_count}",
-        f"  Essence remaining: {essence}",
+        f"  Dreamsigns: {colors.num(dreamsign_count)}",
+        f"  Essence remaining: {colors.num(essence)}",
     ]
+
+    # Archetype preference visualization
+    if w is not None:
+        lines.append("")
+        lines.append(f"  {colors.section('Archetype Preferences')}")
+        total = sum(w)
+        indexed = sorted(enumerate(w), key=lambda x: x[1], reverse=True)
+        for idx, weight in indexed:
+            if weight <= 0:
+                continue
+            name = ARCHETYPE_NAMES[idx] if idx < len(ARCHETYPE_NAMES) else f"A{idx}"
+            if total > 0:
+                pct = weight / total * 100
+                bar_len = int(pct / 5)
+                bar = "\u2588" * bar_len
+                lines.append(
+                    f"    {colors.label(name)}: {colors.num(f'{pct:.0f}%')} {colors.c(bar, 'accent')}"
+                )
 
     if log_path is not None:
         lines.append("")
-        lines.append(f"  {DIM}Log written to {log_path}{RESET}")
+        lines.append(f"  {colors.dim(f'Log written to {log_path}')}")
 
     lines.append(sep)
     return "\n".join(lines)

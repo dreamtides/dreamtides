@@ -1,42 +1,79 @@
 """Card display formatting for the quest simulator.
 
 Provides card display formatting for DeckCards and the full deck
-viewer. Used by all site types that display cards.
+viewer. Uses AYU Mirage palette colors from the draft simulator.
 """
 
 from typing import Optional
 
+import colors
 from models import DeckCard, Dreamcaller, Dreamsign
 
 import render
 
+ARCHETYPE_NAMES: list[str] = [
+    "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7",
+]
+
+
+def _top_archetype(fitness: list[float]) -> str:
+    """Return a label for the card's top archetype fitness value."""
+    if not fitness:
+        return ""
+    best_idx = 0
+    best_val = fitness[0]
+    for i, v in enumerate(fitness):
+        if v > best_val:
+            best_val = v
+            best_idx = i
+    name = ARCHETYPE_NAMES[best_idx] if best_idx < len(ARCHETYPE_NAMES) else f"A{best_idx}"
+    return f"{name}={best_val:.2f}"
+
 
 def format_card_display(
-    deck_card: DeckCard,
+    card_or_deck_card,
     highlighted: bool = False,
     max_width: int = render.CONTENT_WIDTH,
 ) -> list[str]:
-    """Format a DeckCard as 2 display lines.
+    """Format a card as 2 display lines.
 
-    Line 1: marker + card name
-    Line 2: card details (if available from the instance)
+    Accepts a DeckCard, CardInstance, or CardDesign. Shows the card
+    name (colored), power, commit, flex, and top archetype fitness.
 
-    If the card is a DeckCard with a transfig_note, the note is shown
-    after the name on line 1.
+    Line 1: marker + colored card name (with transfig/bane markers)
+    Line 2: power/commit/flex + top archetype
     """
     marker = ">" if highlighted else " "
-    instance = deck_card.instance
 
-    # Extract name from instance if available
-    if hasattr(instance, "design") and hasattr(instance.design, "name"):
-        card_name = instance.design.name
-    elif hasattr(instance, "name"):
-        card_name = instance.name
+    # Unwrap to get the design and deck-card metadata
+    is_bane = False
+    transfig_note = None
+    design = None
+
+    if isinstance(card_or_deck_card, DeckCard):
+        is_bane = card_or_deck_card.is_bane
+        transfig_note = card_or_deck_card.transfig_note
+        instance = card_or_deck_card.instance
+        if hasattr(instance, "design"):
+            design = instance.design
+        else:
+            design = instance
+    elif hasattr(card_or_deck_card, "design"):
+        # CardInstance
+        design = card_or_deck_card.design
     else:
-        card_name = str(instance) if instance is not None else "<unknown>"
+        # CardDesign directly
+        design = card_or_deck_card
 
-    if deck_card.transfig_note is not None:
-        display_name = deck_card.transfig_note
+    # Extract name
+    if design is not None and hasattr(design, "name"):
+        card_name = design.name
+    else:
+        card_name = str(card_or_deck_card)
+
+    # Build display name
+    if transfig_note is not None:
+        display_name = transfig_note
     else:
         display_name = card_name
 
@@ -47,16 +84,24 @@ def format_card_display(
     if len(display_name) > max_name_width:
         display_name = display_name[: max_name_width - 1] + "\u2026"
 
-    line1 = f"{prefix}{display_name}"
+    colored_name = colors.card(display_name)
+    bane_marker = f"  {colors.c('[BANE]', 'error', bold=True)}" if is_bane else ""
+    line1 = f"{prefix}{colored_name}{bane_marker}"
 
-    # Line 2: card details
+    # Line 2: card details from CardDesign
     details_parts: list[str] = []
-    if hasattr(instance, "design"):
-        design = instance.design
+    if design is not None:
         if hasattr(design, "power"):
-            details_parts.append(f"Power: {design.power}")
+            details_parts.append(f"Power: {colors.num(f'{design.power:.2f}')}")
         if hasattr(design, "commit"):
-            details_parts.append(f"Commit: {design.commit}")
+            details_parts.append(f"Commit: {colors.num(f'{design.commit:.2f}')}")
+        if hasattr(design, "flex"):
+            details_parts.append(f"Flex: {colors.num(f'{design.flex:.2f}')}")
+        if hasattr(design, "fitness"):
+            arch = _top_archetype(design.fitness)
+            if arch:
+                details_parts.append(colors.dim(arch))
+
     detail_str = "  ".join(details_parts) if details_parts else ""
     line2 = f"    {detail_str}" if detail_str else "    "
 
@@ -90,14 +135,14 @@ def render_full_deck_view(
     lines: list[str] = [sep]
 
     # Header
-    header_left = f"  {render.BOLD}DECK VIEWER{render.RESET}"
+    header_left = f"  {colors.header('DECK VIEWER')}"
     header_right = f"Deck: {total} cards"
     vis_left = render.visible_len(header_left)
     gap = max(2, render.CONTENT_WIDTH - vis_left - len(header_right))
     lines.append(f"{header_left}{' ' * gap}{header_right}")
 
     if essence is not None:
-        lines.append(f"  Essence: {essence}")
+        lines.append(f"  Essence: {colors.num(essence)}")
 
     lines.append(sep)
     lines.append("")
@@ -107,8 +152,6 @@ def render_full_deck_view(
 
     for dc in sorted_deck:
         card_lines = format_card_display(dc, highlighted=False)
-        if dc.is_bane:
-            card_lines[0] = card_lines[0] + f"  {render.BOLD}[BANE]{render.RESET}"
         lines.extend(card_lines)
 
     lines.append("")
@@ -117,16 +160,16 @@ def render_full_deck_view(
     # Dreamsigns section
     if dreamsigns:
         lines.append("")
-        lines.append(f"  {render.BOLD}Dreamsigns{render.RESET} ({len(dreamsigns)})")
+        lines.append(f"  {colors.section('Dreamsigns')} ({len(dreamsigns)})")
         for ds in dreamsigns:
-            bane_label = f" {render.BOLD}[BANE]{render.RESET}" if ds.is_bane else ""
+            bane_label = f" {colors.c('[BANE]', 'error', bold=True)}" if ds.is_bane else ""
             lines.append(f"    {ds.name}{bane_label}")
 
     # Dreamcaller section
     if dreamcaller is not None:
         lines.append("")
         lines.append(single_sep)
-        lines.append(f"  {render.BOLD}Dreamcaller{render.RESET}")
+        lines.append(f"  {colors.section('Dreamcaller')}")
         lines.append(f"    {dreamcaller.name}")
         lines.append(f'    "{dreamcaller.ability_text}"')
 
