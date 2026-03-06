@@ -27,6 +27,7 @@ import draft_runner
 import metrics
 import output
 import pack_generator
+import pool_analyzer
 import refill
 import show_n
 import sweep
@@ -68,7 +69,7 @@ def build_parser() -> argparse.ArgumentParser:
         "mode",
         nargs="?",
         default="single",
-        choices=["single", "sweep", "trace", "demo", "explain"],
+        choices=["single", "sweep", "trace", "demo", "explain", "analyze"],
         help="Simulation mode (default: single)",
     )
     parser.add_argument(
@@ -123,6 +124,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=False,
         help="Suppress incremental progress bars",
     )
+    parser.add_argument(
+        "--toml-path",
+        type=str,
+        default=None,
+        help="Path to card-metadata TOML file (for analyze mode)",
+    )
     return parser
 
 
@@ -170,6 +177,8 @@ def main() -> None:
         _run_demo(cfg, seed)
     elif mode == "explain":
         _run_explain()
+    elif mode == "analyze":
+        pool_analyzer.run_analyze(cfg, args.toml_path)
     elif mode == "sweep":
         runs = args.runs if args.runs is not None else cfg.sweep.runs_per_point
         _run_sweep(cfg, seed, runs, output_dir)
