@@ -145,10 +145,12 @@ def run_shop(
     print(header)
     print()
 
-    while True:
-        # Get the pack at seat 0 (AI picks at seats 1-5 run first)
-        pack = round_manager.advance_to_human_pick(state)
+    # Get the initial pack at seat 0 (AI picks at seats 1-5 run first).
+    # This is called once before the menu loop. Only rerolls (which
+    # consume a pick step) trigger a fresh advance_to_human_pick.
+    pack = round_manager.advance_to_human_pick(state)
 
+    while True:
         # Filter to SHOP_SHOW_N cards
         shown_cards = show_n.select_cards(
             pack.cards,
@@ -242,43 +244,57 @@ def run_shop(
                 card_name = colors.card(item.card_instance.design.name)
                 print(f"  Purchased {card_name} for {item.price} essence.")
                 print(f"  Essence remaining: {colors.num(state.essence)}")
+
+                if logger is not None:
+                    logger.log_site_visit(
+                        site_type="Shop",
+                        dreamscape=dreamscape_name,
+                        is_enhanced=is_enhanced,
+                        choices=[c.design.name for c in shown_cards],
+                        choice_made=item.card_instance.design.name,
+                        state_changes={
+                            "essence_spent": item.price,
+                            "deck_size_after": state.deck_count(),
+                        },
+                    )
             else:
                 print()
                 print(f"  {colors.dim('Not enough essence.')}")
                 round_manager.advance_pick_no_card(state)
 
-            if logger is not None:
-                logger.log_site_visit(
-                    site_type="Shop",
-                    dreamscape=dreamscape_name,
-                    is_enhanced=is_enhanced,
-                    choices=[c.design.name for c in shown_cards],
-                    choice_made=item.card_instance.design.name,
-                    state_changes={
-                        "essence_spent": item.price,
-                        "deck_size_after": state.deck_count(),
-                    },
-                )
+                if logger is not None:
+                    logger.log_site_visit(
+                        site_type="Shop",
+                        dreamscape=dreamscape_name,
+                        is_enhanced=is_enhanced,
+                        choices=[c.design.name for c in shown_cards],
+                        choice_made=None,
+                        state_changes={
+                            "essence_spent": 0,
+                            "deck_size_after": state.deck_count(),
+                        },
+                    )
             break
 
         elif chosen_index < card_count + ds_count:
-            # Buy a dreamsign (does NOT consume a draft pick)
+            # Buy a dreamsign (does NOT consume a draft pick).
+            # The player is returned to the shop menu to pick a card
+            # or leave. No new advance_to_human_pick is needed because
+            # the same pack is still pending resolution.
             ds = dreamsign_offerings[chosen_index - card_count]
             state.add_dreamsign(ds)
 
             print()
             print(f"  Acquired dreamsign: {colors.c(ds.name, 'accent')}")
-
-            # Dreamsign purchase does not consume a pick step,
-            # but the shop still needs to resolve the draft pick.
-            # The player is returned to the shop to pick a card or leave.
             continue
 
         elif chosen_index == reroll_index:
             # Reroll: advance 1 pick step (no card taken)
+            reroll_essence_cost = 0
             if free_rerolls > 0:
                 free_rerolls -= 1
             elif state.essence >= reroll_cost:
+                reroll_essence_cost = reroll_cost
                 state.spend_essence(reroll_cost)
             else:
                 print()
@@ -292,8 +308,23 @@ def run_shop(
             print(f"  {colors.c('Rerolling shop...', 'accent', bold=True)}")
             print()
 
-            # Consume 1 pick step for the reroll
+            # Consume 1 pick step for the reroll, then get the new pack
             round_manager.advance_pick_no_card(state)
+
+            if logger is not None:
+                logger.log_site_visit(
+                    site_type="Shop",
+                    dreamscape=dreamscape_name,
+                    is_enhanced=is_enhanced,
+                    choices=[c.design.name for c in shown_cards],
+                    choice_made="reroll",
+                    state_changes={
+                        "essence_spent": reroll_essence_cost,
+                        "deck_size_after": state.deck_count(),
+                    },
+                )
+
+            pack = round_manager.advance_to_human_pick(state)
             continue
 
         else:
@@ -301,6 +332,19 @@ def run_shop(
             round_manager.advance_pick_no_card(state)
             print()
             print(f"  {colors.dim('No items purchased.')}")
+
+            if logger is not None:
+                logger.log_site_visit(
+                    site_type="Shop",
+                    dreamscape=dreamscape_name,
+                    is_enhanced=is_enhanced,
+                    choices=[c.design.name for c in shown_cards],
+                    choice_made=None,
+                    state_changes={
+                        "essence_spent": 0,
+                        "deck_size_after": state.deck_count(),
+                    },
+                )
             break
 
     # Show the archetype preference footer

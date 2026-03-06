@@ -381,19 +381,9 @@ class TestRunShop:
 
         state = _make_state(essence=1)  # Not enough to buy anything
 
-        # Try to buy first card
-        call_count = [0]
-
-        def mock_select(options, **kwargs):
-            call_count[0] += 1
-            if call_count[0] == 1:
-                return 0  # try to buy card
-            # Should loop back because card was unaffordable
-            return 4  # leave
-
-        # When essence is too low, shop prints a message but card purchase fails
-        # The implementation handles this by checking essence before purchase
-        with patch("sites_shop.input_handler.single_select", return_value=4):
+        # Try to buy first card (index 0), which should fail due to
+        # insufficient essence and exit the shop with no card added.
+        with patch("sites_shop.input_handler.single_select", return_value=0):
             run_shop(
                 state=state,
                 shop_config={"reroll_cost": 50},
@@ -403,6 +393,8 @@ class TestRunShop:
             )
 
         assert state.deck_count() == 0
+        assert state.essence == 1
+        assert state.global_pick_index == 1
 
     def test_no_imports_of_old_modules(self) -> None:
         """Verify sites_shop no longer imports algorithm, pool, or old model types."""
