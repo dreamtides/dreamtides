@@ -1,55 +1,26 @@
 """Tests for the dreamsign site interactions."""
 
 import random
-from typing import Optional
 from unittest.mock import patch
 
-from models import (
-    Card,
-    CardType,
-    Dreamsign,
-    PoolEntry,
-    Rarity,
-    Resonance,
-)
+from models import Dreamsign
 from quest_state import QuestState
 
 
-def _make_card(
-    name: str = "Test Card",
-    card_number: int = 1,
-    energy_cost: int = 3,
-    resonances: frozenset[Resonance] = frozenset(),
-    tags: frozenset[str] = frozenset(),
-    rarity: Rarity = Rarity.COMMON,
-    spark: int = 2,
-) -> Card:
-    return Card(
-        name=name,
-        card_number=card_number,
-        energy_cost=energy_cost,
-        card_type=CardType.CHARACTER,
-        subtype=None,
-        is_fast=False,
-        spark=spark,
-        rarity=rarity,
-        rules_text="Test rules",
-        resonances=resonances,
-        tags=tags,
-    )
+class _MockAgent:
+    """Minimal agent stand-in for tests that don't need full draft logic."""
+
+    def __init__(self) -> None:
+        self.w: list[float] = [0.1] * 8
 
 
 def _make_dreamsign(
     name: str = "Test Sign",
-    resonance: Resonance = Resonance.TIDE,
-    tags: frozenset[str] = frozenset(),
     effect_text: str = "Test effect",
     is_bane: bool = False,
 ) -> Dreamsign:
     return Dreamsign(
         name=name,
-        resonance=resonance,
-        tags=tags,
         effect_text=effect_text,
         is_bane=is_bane,
     )
@@ -58,14 +29,14 @@ def _make_dreamsign(
 def _make_all_dreamsigns() -> list[Dreamsign]:
     """Create a diverse set of dreamsigns for testing."""
     return [
-        _make_dreamsign("Sign A", Resonance.TIDE),
-        _make_dreamsign("Sign B", Resonance.EMBER),
-        _make_dreamsign("Sign C", Resonance.ZEPHYR),
-        _make_dreamsign("Sign D", Resonance.STONE),
-        _make_dreamsign("Sign E", Resonance.RUIN),
-        _make_dreamsign("Sign F", Resonance.TIDE),
-        _make_dreamsign("Sign G", Resonance.EMBER),
-        _make_dreamsign("Bane Sign", Resonance.RUIN, is_bane=True),
+        _make_dreamsign("Sign A"),
+        _make_dreamsign("Sign B"),
+        _make_dreamsign("Sign C"),
+        _make_dreamsign("Sign D"),
+        _make_dreamsign("Sign E"),
+        _make_dreamsign("Sign F"),
+        _make_dreamsign("Sign G"),
+        _make_dreamsign("Bane Sign", is_bane=True),
     ]
 
 
@@ -73,19 +44,15 @@ def _make_quest_state(
     essence: int = 250,
     seed: int = 42,
 ) -> QuestState:
-    cards = [
-        _make_card(name=f"Card{i}", card_number=i, rarity=Rarity.COMMON)
-        for i in range(5)
-    ]
-    pool = [PoolEntry(c) for c in cards]
     rng = random.Random(seed)
-    variance = {r: 1.0 for r in Resonance}
     return QuestState(
         essence=essence,
-        pool=pool,
         rng=rng,
-        all_cards=cards,
-        pool_variance=variance,
+        human_agent=_MockAgent(),
+        ai_agents=[],
+        cube=None,
+        draft_cfg=None,
+        packs=[],
     )
 
 
@@ -133,9 +100,9 @@ class TestSelectOfferingDreamsigns:
         from sites_dreamsign import select_offering_dreamsigns
 
         signs = [
-            _make_dreamsign("Only Good", Resonance.TIDE),
-            _make_dreamsign("Bane 1", Resonance.RUIN, is_bane=True),
-            _make_dreamsign("Bane 2", Resonance.EMBER, is_bane=True),
+            _make_dreamsign("Only Good"),
+            _make_dreamsign("Bane 1", is_bane=True),
+            _make_dreamsign("Bane 2", is_bane=True),
         ]
         rng = random.Random(42)
         result = select_offering_dreamsigns(signs, rng, count=3)
@@ -185,8 +152,8 @@ class TestSelectDraftDreamsigns:
         from sites_dreamsign import select_draft_dreamsigns
 
         signs = [
-            _make_dreamsign("Only One", Resonance.TIDE),
-            _make_dreamsign("Bane", Resonance.RUIN, is_bane=True),
+            _make_dreamsign("Only One"),
+            _make_dreamsign("Bane", is_bane=True),
         ]
         rng = random.Random(42)
         result = select_draft_dreamsigns(signs, held=[], rng=rng)
@@ -215,7 +182,6 @@ class TestFormatDreamsignOption:
 
         ds = _make_dreamsign(
             "Sigil of Shifting Tides",
-            Resonance.TIDE,
             effect_text="At the start of each battle, foresee 2.",
         )
         lines = format_dreamsign_option(ds, highlighted=False)
@@ -226,7 +192,7 @@ class TestFormatDreamsignOption:
     def test_highlighted_marker(self) -> None:
         from sites_dreamsign import format_dreamsign_option
 
-        ds = _make_dreamsign("Test Sign", Resonance.TIDE)
+        ds = _make_dreamsign("Test Sign")
         lines_on = format_dreamsign_option(ds, highlighted=True)
         lines_off = format_dreamsign_option(ds, highlighted=False)
         assert ">" in lines_on[0]
@@ -242,10 +208,10 @@ class TestDreamsignPurge:
         state = _make_quest_state()
         # Fill dreamsigns to the limit
         for i in range(12):
-            state.add_dreamsign(_make_dreamsign(f"Existing {i}", Resonance.TIDE))
+            state.add_dreamsign(_make_dreamsign(f"Existing {i}"))
         assert state.is_over_dreamsign_limit()
 
-        new_sign = _make_dreamsign("New Sign", Resonance.EMBER)
+        new_sign = _make_dreamsign("New Sign")
         # Mock single_select to remove index 0 (first dreamsign)
         with patch("sites_dreamsign.input_handler.single_select", return_value=0):
             handle_dreamsign_purge(state, new_sign)
@@ -259,8 +225,8 @@ class TestDreamsignPurge:
         from sites_dreamsign import handle_dreamsign_purge
 
         state = _make_quest_state()
-        state.add_dreamsign(_make_dreamsign("Existing", Resonance.TIDE))
-        new_sign = _make_dreamsign("New Sign", Resonance.EMBER)
+        state.add_dreamsign(_make_dreamsign("Existing"))
+        new_sign = _make_dreamsign("New Sign")
 
         # Should add without prompting
         handle_dreamsign_purge(state, new_sign)
@@ -353,8 +319,8 @@ class TestRunDreamsignOffering:
         state = _make_quest_state()
         # Only one non-bane dreamsign available, so enhanced shows 1 + skip
         all_signs = [
-            _make_dreamsign("Only One", Resonance.TIDE),
-            _make_dreamsign("Bane", Resonance.RUIN, is_bane=True),
+            _make_dreamsign("Only One"),
+            _make_dreamsign("Bane", is_bane=True),
         ]
 
         # Skip is the last option; with 1 dreamsign offered, skip is index 1
@@ -382,8 +348,8 @@ class TestRunDreamsignOffering:
 
         # All banes, so no dreamsigns available
         all_signs = [
-            _make_dreamsign("Bane 1", Resonance.RUIN, is_bane=True),
-            _make_dreamsign("Bane 2", Resonance.EMBER, is_bane=True),
+            _make_dreamsign("Bane 1", is_bane=True),
+            _make_dreamsign("Bane 2", is_bane=True),
         ]
 
         run_dreamsign_offering(
@@ -398,23 +364,6 @@ class TestRunDreamsignOffering:
         assert log_calls[0]["site_type"] == "DreamsignOffering"
         assert log_calls[0]["choices"] == []
         assert log_calls[0]["choice_made"] is None
-
-    def test_updates_resonance_profile(self) -> None:
-        from sites_dreamsign import run_dreamsign_offering
-
-        state = _make_quest_state()
-        all_signs = [_make_dreamsign("Only Tide", Resonance.TIDE)]
-
-        with patch("sites_dreamsign.input_handler.confirm_decline", return_value=True):
-            run_dreamsign_offering(
-                state=state,
-                all_dreamsigns=all_signs,
-                logger=None,
-                dreamscape_name="Test Dreamscape",
-                dreamscape_number=1,
-            )
-
-        assert state.resonance_profile.counts[Resonance.TIDE] == 1
 
     def test_logs_when_logger_provided(self) -> None:
         from sites_dreamsign import run_dreamsign_offering
@@ -486,8 +435,8 @@ class TestRunDreamsignDraft:
         state = _make_quest_state()
         # Only one non-bane dreamsign available
         all_signs = [
-            _make_dreamsign("Only One", Resonance.TIDE),
-            _make_dreamsign("Bane", Resonance.RUIN, is_bane=True),
+            _make_dreamsign("Only One"),
+            _make_dreamsign("Bane", is_bane=True),
         ]
 
         # Skip is the last option; with 1 dreamsign offered, skip is index 1
@@ -514,8 +463,8 @@ class TestRunDreamsignDraft:
 
         # All banes, so no dreamsigns available
         all_signs = [
-            _make_dreamsign("Bane 1", Resonance.RUIN, is_bane=True),
-            _make_dreamsign("Bane 2", Resonance.EMBER, is_bane=True),
+            _make_dreamsign("Bane 1", is_bane=True),
+            _make_dreamsign("Bane 2", is_bane=True),
         ]
 
         run_dreamsign_draft(
@@ -530,23 +479,6 @@ class TestRunDreamsignDraft:
         assert log_calls[0]["site_type"] == "DreamsignDraft"
         assert log_calls[0]["choices"] == []
         assert log_calls[0]["choice_made"] is None
-
-    def test_updates_resonance_profile(self) -> None:
-        from sites_dreamsign import run_dreamsign_draft
-
-        state = _make_quest_state()
-        all_signs = _make_all_dreamsigns()
-
-        with patch("sites_dreamsign.input_handler.single_select", return_value=0):
-            run_dreamsign_draft(
-                state=state,
-                all_dreamsigns=all_signs,
-                logger=None,
-                dreamscape_name="Test Dreamscape",
-                dreamscape_number=1,
-            )
-
-        assert state.resonance_profile.total() > 0
 
     def test_logs_when_logger_provided(self) -> None:
         from sites_dreamsign import run_dreamsign_draft
@@ -577,7 +509,7 @@ class TestRunDreamsignDraft:
         state = _make_quest_state()
         # Fill to the limit
         for i in range(12):
-            state.add_dreamsign(_make_dreamsign(f"Existing {i}", Resonance.TIDE))
+            state.add_dreamsign(_make_dreamsign(f"Existing {i}"))
 
         all_signs = _make_all_dreamsigns()
 

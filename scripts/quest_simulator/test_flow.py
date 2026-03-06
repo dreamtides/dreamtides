@@ -1,28 +1,19 @@
 """Tests for the main quest flow module."""
 
 import random
-from types import MappingProxyType
 from typing import Any, Optional
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, patch
 
 from models import (
-    AlgorithmParams,
     BaneCard,
     Boss,
-    Card,
-    CardType,
     DeckCard,
-    DraftParams,
     Dreamcaller,
     DreamscapeNode,
     Dreamsign,
     EffectType,
     Journey,
     NodeState,
-    PoolEntry,
-    PoolParams,
-    Rarity,
-    Resonance,
     Site,
     SiteType,
     TemptingOffer,
@@ -31,86 +22,16 @@ from quest_state import QuestState
 from site_dispatch import SiteData, VisitContext
 
 
-def _make_card(
-    name: str = "Test Card",
-    card_number: int = 1,
-    rarity: Rarity = Rarity.COMMON,
-    resonances: Optional[frozenset[Resonance]] = None,
-) -> Card:
-    return Card(
-        name=name,
-        card_number=card_number,
-        energy_cost=2,
-        card_type=CardType.CHARACTER,
-        subtype=None,
-        is_fast=False,
-        spark=1,
-        rarity=rarity,
-        rules_text=f"Rules for {name}.",
-        resonances=resonances or frozenset(),
-        tags=frozenset(),
-    )
-
-
-def _make_test_cards() -> list[Card]:
-    return [
-        _make_card("Card A", 1, Rarity.COMMON, frozenset({Resonance.TIDE})),
-        _make_card("Card B", 2, Rarity.COMMON, frozenset({Resonance.TIDE})),
-        _make_card("Card C", 3, Rarity.UNCOMMON, frozenset({Resonance.EMBER})),
-        _make_card("Card D", 4, Rarity.UNCOMMON, frozenset({Resonance.EMBER})),
-        _make_card("Card E", 5, Rarity.RARE, frozenset({Resonance.STONE})),
-        _make_card("Card F", 6, Rarity.COMMON, frozenset({Resonance.ZEPHYR})),
-        _make_card("Card G", 7, Rarity.COMMON, frozenset({Resonance.RUIN})),
-        _make_card("Card H", 8, Rarity.COMMON, frozenset()),
-        _make_card(
-            "Card I",
-            9,
-            Rarity.LEGENDARY,
-            frozenset({Resonance.TIDE, Resonance.RUIN}),
-        ),
-        _make_card("Card J", 10, Rarity.UNCOMMON, frozenset({Resonance.STONE})),
-    ]
-
-
-def _make_pool(cards: list[Card]) -> list[PoolEntry]:
-    return [PoolEntry(card) for card in cards]
-
-
-def _make_algorithm_params() -> AlgorithmParams:
-    return AlgorithmParams(
-        exponent=1.4,
-        floor_weight=0.5,
-        neutral_base=3.0,
-        staleness_factor=0.3,
-    )
-
-
-def _make_draft_params() -> DraftParams:
-    return DraftParams(cards_per_pick=4, picks_per_site=5)
-
-
-def _make_pool_params() -> PoolParams:
-    return PoolParams(
-        copies_common=4,
-        copies_uncommon=3,
-        copies_rare=2,
-        copies_legendary=1,
-        variance_min=0.75,
-        variance_max=1.25,
-    )
-
-
 def _make_quest_state(seed: int = 42) -> QuestState:
-    cards = _make_test_cards()
-    pool = _make_pool(cards)
     rng = random.Random(seed)
-    variance = {r: 1.0 for r in Resonance}
     return QuestState(
         essence=250,
-        pool=pool,
         rng=rng,
-        all_cards=cards,
-        pool_variance=variance,
+        human_agent=None,
+        ai_agents=[],
+        cube=None,
+        draft_cfg=None,
+        packs=[],
     )
 
 
@@ -125,14 +46,10 @@ def _make_config() -> dict[str, dict[str, Any]]:
             "miniboss_battle": 4,
         },
         "shop": {
-            "price_common": 50,
-            "price_uncommon": 80,
-            "price_rare": 120,
-            "price_legendary": 200,
             "reroll_cost": 50,
+            "items_count": 6,
             "discount_min": 30,
             "discount_max": 90,
-            "items_count": 6,
         },
         "battle_rewards": {
             "base_essence": 100,
@@ -144,12 +61,6 @@ def _make_config() -> dict[str, dict[str, Any]]:
             "amount_level_2": 250,
             "amount_level_4": 300,
         },
-        "tags": {
-            "scale": 1.5,
-            "min_theme_cards": 6,
-            "relevance_boost": 2.0,
-            "depth_factor": 0.1,
-        },
     }
 
 
@@ -157,10 +68,6 @@ def _make_dreamcallers() -> list[Dreamcaller]:
     return [
         Dreamcaller(
             name="Test Caller",
-            resonances=frozenset({Resonance.TIDE}),
-            resonance_bonus=MappingProxyType({"Tide": 3}),
-            tags=frozenset({"mechanic:draw"}),
-            tag_bonus=MappingProxyType({"mechanic:draw": 1}),
             essence_bonus=50,
             ability_text="Test ability.",
         ),
@@ -171,8 +78,6 @@ def _make_dreamsigns() -> list[Dreamsign]:
     return [
         Dreamsign(
             name="Test Sign",
-            resonance=Resonance.TIDE,
-            tags=frozenset(),
             effect_text="Test effect.",
             is_bane=False,
         ),
@@ -210,7 +115,7 @@ def _make_banes() -> list[BaneCard]:
         BaneCard(
             name="Test Bane",
             rules_text="Bad things happen.",
-            card_type=CardType.EVENT,
+            card_type="Event",
             energy_cost=0,
         ),
     ]
@@ -224,7 +129,6 @@ def _make_bosses() -> list[Boss]:
             ability_text="Test boss ability.",
             deck_description="A test deck.",
             is_final=False,
-            resonances=frozenset({Resonance.EMBER}),
         ),
     ]
 
@@ -237,9 +141,6 @@ def _make_site_data() -> SiteData:
         offers=_make_offers(),
         banes=_make_banes(),
         bosses=_make_bosses(),
-        algorithm_params=_make_algorithm_params(),
-        draft_params=_make_draft_params(),
-        pool_params=_make_pool_params(),
         config=_make_config(),
     )
 
@@ -341,14 +242,11 @@ class TestEnforceDeckLimits:
         from flow import _enforce_deck_limits
 
         state = _make_quest_state()
-        cards = _make_test_cards()
-        # Add only 5 cards, well under min_deck of 25
-        for card in cards[:5]:
-            state.add_card(card)
+        for i in range(5):
+            state.add_card(f"inst_{i}")
         assert state.deck_count() == 5
 
         _enforce_deck_limits(state, None)
-        # Whole-deck duplication: 5 * 6 = 30 > 25
         assert state.deck_count() == 30
         assert state.deck_count() > state.min_deck
 
@@ -356,13 +254,11 @@ class TestEnforceDeckLimits:
         from flow import _enforce_deck_limits
 
         state = _make_quest_state()
-        cards = _make_test_cards()
-        # Add 55 cards, over max_deck of 50
         for i in range(55):
-            state.add_card(cards[i % len(cards)])
+            state.add_card(f"inst_{i}")
         assert state.deck_count() == 55
 
-        with patch("flow.sites_purge.forced_deck_limit_purge") as mock_purge:
+        with patch("sites_purge.forced_deck_limit_purge") as mock_purge:
             _enforce_deck_limits(state, None)
 
         mock_purge.assert_called_once_with(state, None)
@@ -371,12 +267,11 @@ class TestEnforceDeckLimits:
         from flow import _enforce_deck_limits
 
         state = _make_quest_state()
-        cards = _make_test_cards()
         for i in range(30):
-            state.add_card(cards[i % len(cards)])
+            state.add_card(f"inst_{i}")
         assert 25 <= state.deck_count() <= 50
 
-        with patch("flow.sites_purge.forced_deck_limit_purge") as mock_purge:
+        with patch("sites_purge.forced_deck_limit_purge") as mock_purge:
             _enforce_deck_limits(state, None)
 
         mock_purge.assert_not_called()
@@ -384,17 +279,19 @@ class TestEnforceDeckLimits:
 
 
 class TestHandlePostBattle:
-    """Test post-battle actions: node completion, staleness decay, victory check."""
+    """Test post-battle actions: node completion, victory check."""
 
     def test_increments_completion_level(self) -> None:
         from flow import _handle_post_battle
+
+        from models import Biome
 
         state = _make_quest_state()
         nodes = [
             DreamscapeNode(
                 node_id=0,
                 name="Nexus",
-                biome=random.choice(list(__import__("models").Biome)),
+                biome=Biome.VERDANT,
                 sites=[],
                 state=NodeState.COMPLETED,
                 adjacent=[1],
@@ -402,7 +299,7 @@ class TestHandlePostBattle:
             DreamscapeNode(
                 node_id=1,
                 name="Test Node",
-                biome=random.choice(list(__import__("models").Biome)),
+                biome=Biome.VERDANT,
                 sites=[],
                 state=NodeState.AVAILABLE,
                 adjacent=[0],
@@ -471,46 +368,12 @@ class TestHandlePostBattle:
         _handle_post_battle(state, nodes, 1, 7, None)
         assert len(nodes) > initial_count
 
-    def test_decays_staleness(self) -> None:
-        from flow import _handle_post_battle
-
-        from models import Biome
-
-        state = _make_quest_state()
-        # Set staleness on some pool entries
-        for entry in state.pool[:3]:
-            entry.staleness = 2
-
-        nodes = [
-            DreamscapeNode(
-                node_id=0,
-                name="Nexus",
-                biome=Biome.VERDANT,
-                sites=[],
-                state=NodeState.COMPLETED,
-                adjacent=[1],
-            ),
-            DreamscapeNode(
-                node_id=1,
-                name="Test Node",
-                biome=Biome.VERDANT,
-                sites=[],
-                state=NodeState.AVAILABLE,
-                adjacent=[0],
-            ),
-        ]
-
-        _handle_post_battle(state, nodes, 1, 7, None)
-        for entry in state.pool[:3]:
-            assert entry.staleness == 1
-
     def test_returns_true_on_victory(self) -> None:
         from flow import _handle_post_battle
 
         from models import Biome
 
         state = _make_quest_state()
-        # Set completion to 6, so after increment it will be 7 (== total_battles)
         state.completion_level = 6
 
         nodes = [
@@ -573,25 +436,32 @@ class TestShowVictory:
         from flow import _show_victory
 
         state = _make_quest_state()
-        # Add some cards for a realistic state
-        cards = _make_test_cards()
-        for card in cards:
-            state.add_card(card)
+        for i in range(10):
+            state.add_card(f"inst_{i}")
+
+        # Provide a mock human_agent with a w vector
+        class MockAgent:
+            w = [0.1] * 8
+
+        state.human_agent = MockAgent()
         state.dreamcaller = _make_dreamcallers()[0]
 
         with patch("builtins.print") as mock_print:
             _show_victory(state, 7, 5, None)
 
-        # Victory screen should have been printed
         assert mock_print.call_count >= 1
 
     def test_show_victory_logs_session_end(self) -> None:
         from flow import _show_victory
 
         state = _make_quest_state()
-        cards = _make_test_cards()
-        for card in cards:
-            state.add_card(card)
+        for i in range(10):
+            state.add_card(f"inst_{i}")
+
+        class MockAgent:
+            w = [0.1] * 8
+
+        state.human_agent = MockAgent()
         state.dreamcaller = _make_dreamcallers()[0]
 
         logger = MagicMock()
@@ -609,14 +479,12 @@ class TestAutoFillMessage:
         from flow import _enforce_deck_limits
 
         state = _make_quest_state()
-        cards = _make_test_cards()
-        for card in cards[:5]:
-            state.add_card(card)
+        for i in range(5):
+            state.add_card(f"inst_{i}")
 
         with patch("builtins.print") as mock_print:
             _enforce_deck_limits(state, None)
 
-        # Should have printed something about auto-filling
         printed_text = " ".join(
             str(c)
             for c in mock_print.call_args_list
@@ -641,16 +509,14 @@ class TestViewDeckOption:
     def test_view_deck_does_not_consume_site_visit(self) -> None:
         """Viewing the deck should not mark any site as visited."""
         state = _make_quest_state()
-        cards = _make_test_cards()
-        for card in cards[:5]:
-            state.add_card(card)
+        for i in range(5):
+            state.add_card(f"inst_{i}")
 
         sites = [
             Site(site_type=SiteType.DRAFT),
             Site(site_type=SiteType.ESSENCE),
             Site(site_type=SiteType.BATTLE),
         ]
-        # None of the sites should be visited after viewing deck
         for s in sites:
             assert not s.is_visited
 
@@ -658,17 +524,14 @@ class TestViewDeckOption:
         """Viewing the deck should not change essence."""
         state = _make_quest_state()
         initial_essence = state.essence
-        # Essence should remain unchanged
         assert state.essence == initial_essence
 
     def test_view_deck_preserves_deck_count(self) -> None:
         """Viewing the deck should not add or remove cards."""
         state = _make_quest_state()
-        cards = _make_test_cards()
-        for card in cards[:5]:
-            state.add_card(card)
+        for i in range(5):
+            state.add_card(f"inst_{i}")
         initial_count = state.deck_count()
-        # Deck count should remain unchanged
         assert state.deck_count() == initial_count
 
 
@@ -683,7 +546,6 @@ class TestSiteVisitErrorHandling:
         data = _make_site_data()
         logger = MagicMock()
 
-        # Create a node with two sites: one that will fail, one battle
         node = DreamscapeNode(
             node_id=1,
             name="Test Node",
@@ -696,7 +558,6 @@ class TestSiteVisitErrorHandling:
             adjacent=[0],
         )
 
-        # Mock visit_site to raise on first call, succeed (marking visited) on second
         call_count = 0
 
         def mock_visit(site: Site, *args: object, **kwargs: object) -> None:
@@ -704,10 +565,8 @@ class TestSiteVisitErrorHandling:
             call_count += 1
             if call_count == 1:
                 raise RuntimeError("Simulated site failure")
-            # Second call (battle) succeeds -- mark visited as normal dispatch would
             site.is_visited = True
 
-        # Index 1 selects the first actual site (index 0 is "View Deck")
         with patch("site_dispatch.visit_site", side_effect=mock_visit):
             with patch("input_handler.single_select", return_value=1):
                 with patch("render_atlas.render_dreamscape_sites", return_value=""):
@@ -715,7 +574,6 @@ class TestSiteVisitErrorHandling:
                         with patch("builtins.print"):
                             _dreamscape_loop(node, state, data, logger, 1)
 
-        # Both sites should have been visited (error caught, loop continued)
         assert node.sites[0].is_visited
         assert node.sites[1].is_visited
 
@@ -748,7 +606,6 @@ class TestSiteVisitErrorHandling:
                 raise RuntimeError("Simulated site failure")
             site.is_visited = True
 
-        # Index 1 selects the first actual site (index 0 is "View Deck")
         with patch("site_dispatch.visit_site", side_effect=mock_visit):
             with patch("input_handler.single_select", return_value=1):
                 with patch("render_atlas.render_dreamscape_sites", return_value=""):
@@ -756,7 +613,6 @@ class TestSiteVisitErrorHandling:
                         with patch("builtins.print"):
                             _dreamscape_loop(node, state, data, logger, 1)
 
-        # Should have logged an error event
         logger.log_error.assert_called_once()
         error_call = logger.log_error.call_args
         assert "Simulated site failure" in str(error_call)

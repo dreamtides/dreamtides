@@ -6,24 +6,53 @@ demonstrates deterministic behavior when the same seed is used.
 """
 
 import json
-import os
 import random
 import sys
 from pathlib import Path
 from typing import Any
 from unittest.mock import patch
 
-sys.path.insert(0, os.path.dirname(__file__))
-
 import atlas
 import data_loader
 import flow
-import pool
 import render_status
 from jsonl_log import SessionLogger
-from models import AlgorithmParams, Rarity, Resonance
 from quest_state import QuestState
 from site_dispatch import SiteData
+
+# Ensure draft_simulator is importable
+_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+if _DRAFT_SIM_DIR not in sys.path:
+    sys.path.insert(0, _DRAFT_SIM_DIR)
+
+import agents
+import card_generator
+import cube_manager
+from config import SimulatorConfig
+from draft_models import CubeConsumptionMode
+
+
+def _build_draft_config() -> SimulatorConfig:
+    """Construct the standard quest-mode draft config."""
+    cfg = SimulatorConfig()
+    cfg.draft.seat_count = 6
+    cfg.draft.pack_size = 20
+    cfg.draft.human_seats = 1
+    cfg.draft.alternate_direction = False
+    cfg.agents.show_n = 4
+    cfg.agents.show_n_strategy = "sharpened_preference"
+    cfg.agents.policy = "adaptive"
+    cfg.agents.ai_optimality = 0.80
+    cfg.agents.learning_rate = 3.0
+    cfg.agents.openness_window = 3
+    cfg.cards.archetype_count = 8
+    cfg.cards.source = "synthetic"
+    cfg.cube.distinct_cards = 540
+    cfg.cube.copies_per_card = 1
+    cfg.cube.consumption_mode = "with_replacement"
+    cfg.refill.strategy = "no_refill"
+    cfg.pack_generation.strategy = "seeded_themed"
+    return cfg
 
 
 def _run_full_quest(seed: int) -> tuple[QuestState, Path]:
@@ -34,10 +63,22 @@ def _run_full_quest(seed: int) -> tuple[QuestState, Path]:
     """
     rng = random.Random(seed)
 
-    all_cards = data_loader.load_cards()
-    algorithm_params, draft_params, pool_params, extra_config = (
-        data_loader.load_config()
+    # Build draft engine
+    cfg = _build_draft_config()
+    cards = card_generator.generate_cards(cfg, rng)
+    cube = cube_manager.CubeManager(
+        designs=cards,
+        copies_per_card=1,
+        consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
     )
+    human_agent = agents.create_agent(archetype_count=cfg.cards.archetype_count)
+    ai_agents = [
+        agents.create_agent(archetype_count=cfg.cards.archetype_count)
+        for _ in range(cfg.draft.seat_count - 1)
+    ]
+
+    # Load quest data
+    config = data_loader.load_config()
     dreamcallers = data_loader.load_dreamcallers()
     dreamsigns = data_loader.load_dreamsigns()
     journeys = data_loader.load_journeys()
@@ -45,10 +86,7 @@ def _run_full_quest(seed: int) -> tuple[QuestState, Path]:
     banes = data_loader.load_banes()
     bosses = data_loader.load_bosses()
 
-    variance = pool.generate_variance(rng, pool_params)
-    draft_pool = pool.build_pool(all_cards, pool_params, variance)
-
-    quest_config: dict[str, Any] = extra_config.get("quest", {})
+    quest_config: dict[str, Any] = config.get("quest", {})
     starting_essence: int = int(quest_config.get("starting_essence", 250))
     max_deck: int = int(quest_config.get("max_deck", 50))
     min_deck: int = int(quest_config.get("min_deck", 25))
@@ -57,10 +95,12 @@ def _run_full_quest(seed: int) -> tuple[QuestState, Path]:
 
     state = QuestState(
         essence=starting_essence,
-        pool=draft_pool,
         rng=rng,
-        all_cards=all_cards,
-        pool_variance=variance,
+        human_agent=human_agent,
+        ai_agents=ai_agents,
+        cube=cube,
+        draft_cfg=cfg,
+        packs=None,
         max_deck=max_deck,
         min_deck=min_deck,
         max_dreamsigns=max_dreamsigns,
@@ -73,16 +113,24 @@ def _run_full_quest(seed: int) -> tuple[QuestState, Path]:
         offers=offers,
         banes=banes,
         bosses=bosses,
-        algorithm_params=algorithm_params,
-        draft_params=draft_params,
-        pool_params=pool_params,
-        config=extra_config,
+        config=config,
     )
 
     nodes = atlas.initialize_atlas(rng)
 
     logger = SessionLogger(seed)
-    logger.log_session_start(seed, algorithm_params, nodes)
+    logger.log_session_start(
+        seed,
+        nodes,
+        draft_config={
+            "seat_count": cfg.draft.seat_count,
+            "pack_size": cfg.draft.pack_size,
+            "human_seats": cfg.draft.human_seats,
+            "archetype_count": cfg.cards.archetype_count,
+            "distinct_cards": cfg.cube.distinct_cards,
+            "consumption_mode": cfg.cube.consumption_mode,
+        },
+    )
 
     flow.run_quest(
         state=state,
@@ -310,8 +358,15 @@ class TestDeterminism:
         with patch("builtins.print"):
             state2, log2_path = _run_full_quest(42)
 
-        deck1_names = sorted(dc.card.name for dc in state1.deck)
-        deck2_names = sorted(dc.card.name for dc in state2.deck)
+        # Extract deck card names from DeckCard instances
+        deck1_names = sorted(
+            dc.instance.design.name if hasattr(dc.instance, "design") else str(dc.instance)
+            for dc in state1.deck
+        )
+        deck2_names = sorted(
+            dc.instance.design.name if hasattr(dc.instance, "design") else str(dc.instance)
+            for dc in state2.deck
+        )
         assert deck1_names == deck2_names
 
         assert state1.essence == state2.essence
@@ -343,24 +398,6 @@ class TestVictoryScreen:
             state, log_path = _run_full_quest(42)
         output = _collect_printed_text(mock_print)
         assert "Dreamcaller:" in output
-        log_path.unlink()
-
-    def test_victory_screen_has_deck_stats(self) -> None:
-        with patch("builtins.print") as mock_print:
-            state, log_path = _run_full_quest(42)
-        output = _collect_printed_text(mock_print)
-        assert "Final Deck:" in output
-        assert "Common:" in output
-        assert "Uncommon:" in output
-        assert "Rare:" in output
-        assert "Legendary:" in output
-        log_path.unlink()
-
-    def test_victory_screen_has_resonance_profile(self) -> None:
-        with patch("builtins.print") as mock_print:
-            state, log_path = _run_full_quest(42)
-        output = _collect_printed_text(mock_print)
-        assert "Resonance Profile:" in output
         log_path.unlink()
 
     def test_victory_screen_has_dreamsigns(self) -> None:

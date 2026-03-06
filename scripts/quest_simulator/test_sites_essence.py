@@ -1,45 +1,16 @@
 """Tests for sites_essence module."""
 
 import random
-from typing import Optional
 from unittest.mock import patch
 
-from models import (
-    Card,
-    CardType,
-    PoolEntry,
-    Rarity,
-    Resonance,
-)
 from quest_state import QuestState
 
 
-def _make_card(
-    name: str,
-    card_number: int,
-    rarity: Rarity = Rarity.COMMON,
-    resonances: Optional[frozenset[Resonance]] = None,
-) -> Card:
-    return Card(
-        name=name,
-        card_number=card_number,
-        energy_cost=2,
-        card_type=CardType.CHARACTER,
-        subtype=None,
-        is_fast=False,
-        spark=1,
-        rarity=rarity,
-        rules_text=f"Rules for {name}.",
-        resonances=resonances or frozenset(),
-        tags=frozenset(),
-    )
+class _MockAgent:
+    """Minimal agent stand-in for tests that don't need full draft logic."""
 
-
-def _make_test_cards() -> list[Card]:
-    return [
-        _make_card("Card A", 1, Rarity.COMMON, frozenset({Resonance.TIDE})),
-        _make_card("Card B", 2, Rarity.UNCOMMON, frozenset({Resonance.EMBER})),
-    ]
+    def __init__(self) -> None:
+        self.w: list[float] = [0.1] * 8
 
 
 def _make_quest_state(
@@ -47,16 +18,15 @@ def _make_quest_state(
     essence: int = 250,
     completion_level: int = 0,
 ) -> QuestState:
-    cards = _make_test_cards()
-    pool = [PoolEntry(card) for card in cards]
     rng = random.Random(seed)
-    variance = {r: 1.0 for r in Resonance}
     state = QuestState(
         essence=essence,
-        pool=pool,
         rng=rng,
-        all_cards=cards,
-        pool_variance=variance,
+        human_agent=_MockAgent(),
+        ai_agents=[],
+        cube=None,
+        draft_cfg=None,
+        packs=[],
     )
     state.completion_level = completion_level
     return state

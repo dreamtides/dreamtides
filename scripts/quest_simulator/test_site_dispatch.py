@@ -1,26 +1,16 @@
 """Tests for site_dispatch module."""
 
 import random
-from dataclasses import dataclass
-from types import MappingProxyType
 from typing import Any, Optional
 from unittest.mock import patch
 
 from models import (
-    AlgorithmParams,
     BaneCard,
     Boss,
-    Card,
-    CardType,
-    DraftParams,
     Dreamcaller,
     Dreamsign,
     EffectType,
     Journey,
-    PoolEntry,
-    PoolParams,
-    Rarity,
-    Resonance,
     Site,
     SiteType,
     TemptingOffer,
@@ -28,83 +18,16 @@ from models import (
 from quest_state import QuestState
 
 
-def _make_card(
-    name: str = "Test Card",
-    card_number: int = 1,
-    rarity: Rarity = Rarity.COMMON,
-    resonances: Optional[frozenset[Resonance]] = None,
-) -> Card:
-    return Card(
-        name=name,
-        card_number=card_number,
-        energy_cost=2,
-        card_type=CardType.CHARACTER,
-        subtype=None,
-        is_fast=False,
-        spark=1,
-        rarity=rarity,
-        rules_text=f"Rules for {name}.",
-        resonances=resonances or frozenset(),
-        tags=frozenset(),
-    )
-
-
-def _make_test_cards() -> list[Card]:
-    return [
-        _make_card("Card A", 1, Rarity.COMMON, frozenset({Resonance.TIDE})),
-        _make_card("Card B", 2, Rarity.COMMON, frozenset({Resonance.TIDE})),
-        _make_card("Card C", 3, Rarity.UNCOMMON, frozenset({Resonance.EMBER})),
-        _make_card("Card D", 4, Rarity.UNCOMMON, frozenset({Resonance.EMBER})),
-        _make_card("Card E", 5, Rarity.RARE, frozenset({Resonance.STONE})),
-        _make_card("Card F", 6, Rarity.COMMON, frozenset({Resonance.ZEPHYR})),
-        _make_card("Card G", 7, Rarity.COMMON, frozenset({Resonance.RUIN})),
-        _make_card("Card H", 8, Rarity.COMMON, frozenset()),
-        _make_card(
-            "Card I", 9, Rarity.LEGENDARY, frozenset({Resonance.TIDE, Resonance.RUIN})
-        ),
-        _make_card("Card J", 10, Rarity.UNCOMMON, frozenset({Resonance.STONE})),
-    ]
-
-
-def _make_pool(cards: list[Card]) -> list[PoolEntry]:
-    return [PoolEntry(card) for card in cards]
-
-
-def _make_algorithm_params() -> AlgorithmParams:
-    return AlgorithmParams(
-        exponent=1.4,
-        floor_weight=0.5,
-        neutral_base=3.0,
-        staleness_factor=0.3,
-    )
-
-
-def _make_draft_params() -> DraftParams:
-    return DraftParams(cards_per_pick=4, picks_per_site=5)
-
-
-def _make_pool_params() -> PoolParams:
-    return PoolParams(
-        copies_common=4,
-        copies_uncommon=3,
-        copies_rare=2,
-        copies_legendary=1,
-        variance_min=0.75,
-        variance_max=1.25,
-    )
-
-
 def _make_quest_state(seed: int = 42) -> QuestState:
-    cards = _make_test_cards()
-    pool = _make_pool(cards)
     rng = random.Random(seed)
-    variance = {r: 1.0 for r in Resonance}
     return QuestState(
         essence=250,
-        pool=pool,
         rng=rng,
-        all_cards=cards,
-        pool_variance=variance,
+        human_agent=None,
+        ai_agents=[],
+        cube=None,
+        draft_cfg=None,
+        packs=[],
     )
 
 
@@ -119,14 +42,10 @@ def _make_config() -> dict[str, dict[str, Any]]:
             "miniboss_battle": 4,
         },
         "shop": {
-            "price_common": 50,
-            "price_uncommon": 80,
-            "price_rare": 120,
-            "price_legendary": 200,
             "reroll_cost": 50,
+            "items_count": 6,
             "discount_min": 30,
             "discount_max": 90,
-            "items_count": 6,
         },
         "battle_rewards": {
             "base_essence": 100,
@@ -138,12 +57,6 @@ def _make_config() -> dict[str, dict[str, Any]]:
             "amount_level_2": 250,
             "amount_level_4": 300,
         },
-        "tags": {
-            "scale": 1.5,
-            "min_theme_cards": 6,
-            "relevance_boost": 2.0,
-            "depth_factor": 0.1,
-        },
     }
 
 
@@ -151,10 +64,6 @@ def _make_dreamcallers() -> list[Dreamcaller]:
     return [
         Dreamcaller(
             name="Test Caller",
-            resonances=frozenset({Resonance.TIDE}),
-            resonance_bonus=MappingProxyType({"Tide": 3}),
-            tags=frozenset({"mechanic:draw"}),
-            tag_bonus=MappingProxyType({"mechanic:draw": 1}),
             essence_bonus=50,
             ability_text="Test ability.",
         ),
@@ -165,8 +74,6 @@ def _make_dreamsigns() -> list[Dreamsign]:
     return [
         Dreamsign(
             name="Test Sign",
-            resonance=Resonance.TIDE,
-            tags=frozenset(),
             effect_text="Test effect.",
             is_bane=False,
         ),
@@ -204,7 +111,7 @@ def _make_banes() -> list[BaneCard]:
         BaneCard(
             name="Test Bane",
             rules_text="Bad things happen.",
-            card_type=CardType.EVENT,
+            card_type="Event",
             energy_cost=0,
         ),
     ]
@@ -218,9 +125,22 @@ def _make_bosses() -> list[Boss]:
             ability_text="Test boss ability.",
             deck_description="A test deck.",
             is_final=False,
-            resonances=frozenset({Resonance.EMBER}),
         ),
     ]
+
+
+def _make_site_data():
+    from site_dispatch import SiteData
+
+    return SiteData(
+        dreamcallers=_make_dreamcallers(),
+        dreamsigns=_make_dreamsigns(),
+        journeys=_make_journeys(),
+        offers=_make_offers(),
+        banes=_make_banes(),
+        bosses=_make_bosses(),
+        config=_make_config(),
+    )
 
 
 class TestVisitSiteExists:
@@ -246,53 +166,29 @@ class TestVisitSiteMarksVisited:
     """Test that visit_site marks the site as visited after dispatch."""
 
     def test_marks_site_visited_for_essence(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
+        from site_dispatch import VisitContext, visit_site
 
         state = _make_quest_state()
         site = Site(site_type=SiteType.ESSENCE, is_enhanced=False, is_visited=False)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
+        data = _make_site_data()
         ctx = VisitContext(dreamscape_name="Test Scape", dreamscape_number=1)
 
         assert not site.is_visited
 
-        with patch(
-            "site_dispatch.sites_essence.run_essence",
-        ):
+        with patch("sites_essence.run_essence"):
             visit_site(site, state, data, None, ctx)
 
         assert site.is_visited
 
     def test_marks_site_visited_for_purge(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
+        from site_dispatch import VisitContext, visit_site
 
         state = _make_quest_state()
         site = Site(site_type=SiteType.PURGE, is_enhanced=False, is_visited=False)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
+        data = _make_site_data()
         ctx = VisitContext(dreamscape_name="Test Scape", dreamscape_number=1)
 
-        with patch("site_dispatch.sites_purge.run_purge"):
+        with patch("sites_purge.run_purge"):
             visit_site(site, state, data, None, ctx)
 
         assert site.is_visited
@@ -301,464 +197,107 @@ class TestVisitSiteMarksVisited:
 class TestDispatchRouting:
     """Test that visit_site dispatches to the correct handler."""
 
-    def test_dispatches_draft(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
+    def _dispatch(self, site_type: SiteType, mock_path: str) -> None:
+        from site_dispatch import VisitContext, visit_site
 
         state = _make_quest_state()
-        site = Site(site_type=SiteType.DRAFT, is_enhanced=False)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
+        site = Site(site_type=site_type, is_enhanced=False)
+        data = _make_site_data()
         ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
 
-        with patch("site_dispatch.sites_draft.run_draft") as mock:
+        with patch(mock_path) as mock:
             visit_site(site, state, data, None, ctx)
-
         mock.assert_called_once()
+
+    def test_dispatches_draft(self) -> None:
+        self._dispatch(SiteType.DRAFT, "sites_draft.run_draft")
 
     def test_dispatches_dreamcaller_draft(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.DREAMCALLER_DRAFT)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_dreamcaller.run_dreamcaller_draft") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.DREAMCALLER_DRAFT, "sites_dreamcaller.run_dreamcaller_draft")
 
     def test_dispatches_discovery_draft(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.DISCOVERY_DRAFT)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_discovery.run_discovery_draft") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.DISCOVERY_DRAFT, "sites_discovery.run_discovery_draft")
 
     def test_dispatches_shop(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.SHOP)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_shop.run_shop") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.SHOP, "sites_shop.run_shop")
 
     def test_dispatches_specialty_shop(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.SPECIALTY_SHOP)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_discovery.run_specialty_shop") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.SPECIALTY_SHOP, "sites_discovery.run_specialty_shop")
 
     def test_dispatches_dreamsign_offering(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.DREAMSIGN_OFFERING)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_dreamsign.run_dreamsign_offering") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.DREAMSIGN_OFFERING, "sites_dreamsign.run_dreamsign_offering")
 
     def test_dispatches_dreamsign_draft(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.DREAMSIGN_DRAFT)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_dreamsign.run_dreamsign_draft") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.DREAMSIGN_DRAFT, "sites_dreamsign.run_dreamsign_draft")
 
     def test_dispatches_dream_journey(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.DREAM_JOURNEY)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_journey.run_dream_journey") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.DREAM_JOURNEY, "sites_journey.run_dream_journey")
 
     def test_dispatches_tempting_offer(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.TEMPTING_OFFER)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_journey.run_tempting_offer") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.TEMPTING_OFFER, "sites_journey.run_tempting_offer")
 
     def test_dispatches_purge(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.PURGE)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_purge.run_purge") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.PURGE, "sites_purge.run_purge")
 
     def test_dispatches_essence(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.ESSENCE)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_essence.run_essence") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.ESSENCE, "sites_essence.run_essence")
 
     def test_dispatches_transfiguration(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.TRANSFIGURATION)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_transfig.run_transfiguration") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.TRANSFIGURATION, "sites_transfig.run_transfiguration")
 
     def test_dispatches_duplication(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.DUPLICATION)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_misc.run_duplication") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.DUPLICATION, "sites_misc.run_duplication")
 
     def test_dispatches_reward_site(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.REWARD_SITE)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_misc.run_reward") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.REWARD_SITE, "sites_misc.run_reward")
 
     def test_dispatches_cleanse(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.CLEANSE)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_misc.run_cleanse") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.CLEANSE, "sites_misc.run_cleanse")
 
     def test_dispatches_battle(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
-
-        state = _make_quest_state()
-        site = Site(site_type=SiteType.BATTLE)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
-        ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
-
-        with patch("site_dispatch.sites_battle.run_battle") as mock:
-            visit_site(site, state, data, None, ctx)
-
-        mock.assert_called_once()
+        self._dispatch(SiteType.BATTLE, "sites_battle.run_battle")
 
 
 class TestEnhancedFlag:
     """Test that the enhanced flag is passed through to handlers."""
 
     def test_enhanced_flag_passed_to_draft(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
+        from site_dispatch import VisitContext, visit_site
 
         state = _make_quest_state()
         site = Site(site_type=SiteType.DRAFT, is_enhanced=True)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
+        data = _make_site_data()
         ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
 
-        with patch("site_dispatch.sites_draft.run_draft") as mock:
+        with patch("sites_draft.run_draft") as mock:
             visit_site(site, state, data, None, ctx)
 
         _, kwargs = mock.call_args
         assert kwargs.get("is_enhanced") is True
 
     def test_enhanced_flag_passed_to_essence(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
+        from site_dispatch import VisitContext, visit_site
 
         state = _make_quest_state()
         site = Site(site_type=SiteType.ESSENCE, is_enhanced=True)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
+        data = _make_site_data()
         ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
 
-        with patch("site_dispatch.sites_essence.run_essence") as mock:
+        with patch("sites_essence.run_essence") as mock:
             visit_site(site, state, data, None, ctx)
 
         _, kwargs = mock.call_args
         assert kwargs.get("is_enhanced") is True
 
     def test_not_enhanced_by_default(self) -> None:
-        from site_dispatch import SiteData, VisitContext, visit_site
+        from site_dispatch import VisitContext, visit_site
 
         state = _make_quest_state()
         site = Site(site_type=SiteType.PURGE, is_enhanced=False)
-        data = SiteData(
-            dreamcallers=_make_dreamcallers(),
-            dreamsigns=_make_dreamsigns(),
-            journeys=_make_journeys(),
-            offers=_make_offers(),
-            banes=_make_banes(),
-            bosses=_make_bosses(),
-            algorithm_params=_make_algorithm_params(),
-            draft_params=_make_draft_params(),
-            pool_params=_make_pool_params(),
-            config=_make_config(),
-        )
+        data = _make_site_data()
         ctx = VisitContext(dreamscape_name="Test", dreamscape_number=1)
 
-        with patch("site_dispatch.sites_purge.run_purge") as mock:
+        with patch("sites_purge.run_purge") as mock:
             visit_site(site, state, data, None, ctx)
 
         _, kwargs = mock.call_args
