@@ -138,9 +138,7 @@ class TestCompleteHumanPick:
         assert state.packs is not None
         packs = state.packs
         original_pack_ids = [p.pack_id for p in packs]
-        round_manager.complete_human_pick(
-            state, packs[0].cards[0], packs[0].cards[:4]
-        )
+        round_manager.complete_human_pick(state, packs[0].cards[0], packs[0].cards[:4])
         assert state.packs is not None
         rotated_ids = [p.pack_id for p in state.packs]
         assert rotated_ids[0] == original_pack_ids[-1]
