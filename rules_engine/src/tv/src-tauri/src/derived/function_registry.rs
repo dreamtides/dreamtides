@@ -7,6 +7,7 @@ use crate::derived::image_derived::ImageDerivedFunction;
 use crate::derived::image_lookup::ImageLookupFunction;
 use crate::derived::image_url::ImageUrlFunction;
 use crate::derived::rules_preview::RulesPreviewFunction;
+use crate::derived::rules_text_lookup::RulesTextLookupFunction;
 use crate::images::image_cache::ImageCache;
 
 /// Global function registry storing all registered derived functions.
@@ -80,6 +81,7 @@ pub fn initialize_global_registry() {
         registry.register(Box::new(CardLookupFunction::new()));
         registry.register(Box::new(ImageUrlFunction::new()));
         registry.register(Box::new(RulesPreviewFunction::new()));
+        registry.register(Box::new(RulesTextLookupFunction::new()));
         tracing::info!(
             component = "tv.derived.registry",
             function_count = registry.list_functions().len(),

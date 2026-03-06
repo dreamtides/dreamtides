@@ -10,4 +10,5 @@ pub mod image_url;
 pub mod result_cache;
 pub mod rich_text_converter;
 pub mod rules_preview;
+pub mod rules_text_lookup;
 pub mod style_tag_parser;

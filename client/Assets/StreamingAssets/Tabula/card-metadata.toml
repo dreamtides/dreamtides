@@ -106,15 +106,15 @@ flex = 0.25
 card-id = "c9531521-b8ae-4ce0-8857-474e60aa814a"
 flash = 0.8
 awaken = 0.15
-flicker = 0.7
+flicker = 0.3
 ignite = 0
 shatter = 0
 endure = 0.7
-submerge = 0
+submerge = 0.5
 surge = 0
 power = 0.6
 commit = 0.35
-flex = 0.55
+flex = 0.7
 [[card-metadata]]
 card-id = "fb2661ee-387c-4a8f-965e-dd89be65cfe0"
 flash = 0
@@ -2909,6 +2909,13 @@ name = "card-name"
 function = "card_lookup"
 position = 1
 width = 180
+inputs = ["card_id"]
+
+[[metadata.derived_columns]]
+name = "rules-text"
+function = "rules_text_lookup"
+position = 2
+width = 300
 inputs = ["card_id"]
 
 [[metadata.columns]]
