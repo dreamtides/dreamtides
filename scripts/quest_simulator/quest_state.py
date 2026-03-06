@@ -26,7 +26,7 @@ class QuestState:
         ai_agents: list[Any],
         cube: Any,
         draft_cfg: Any,
-        packs: list[Any],
+        packs: Optional[list[Any]] = None,
         round_pick_count: int = 0,
         round_index: int = 0,
         global_pick_index: int = 0,
@@ -44,7 +44,7 @@ class QuestState:
         self.ai_agents: list[Any] = ai_agents
         self.cube: Any = cube
         self.draft_cfg: Any = draft_cfg
-        self.packs: list[Any] = packs
+        self.packs: Optional[list[Any]] = packs
         self.round_pick_count: int = round_pick_count
         self.round_index: int = round_index
         self.global_pick_index: int = global_pick_index

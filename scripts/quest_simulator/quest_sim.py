@@ -1,15 +1,28 @@
 #!/usr/bin/env python3
 """Entry point for the interactive quest simulator.
 
-Parses CLI arguments, loads all data files, initializes quest state,
-creates the dream atlas, and launches the main quest flow.
+Parses CLI arguments, initializes the draft engine with synthetic cards,
+creates agents and cube, loads quest data files, and launches the main
+quest flow.
 """
 
 import argparse
 import random
 import sys
 import traceback
+from pathlib import Path
 from typing import Any
+
+# Add draft_simulator to sys.path for cross-module imports
+_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+if _DRAFT_SIM_DIR not in sys.path:
+    sys.path.insert(0, _DRAFT_SIM_DIR)
+
+import agents
+import card_generator
+import cube_manager
+from config import SimulatorConfig
+from draft_models import CubeConsumptionMode
 
 import atlas
 import data_loader
@@ -37,6 +50,29 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _build_draft_config() -> SimulatorConfig:
+    """Construct a SimulatorConfig for quest mode without validation."""
+    cfg = SimulatorConfig()
+    cfg.draft.seat_count = 6
+    cfg.draft.pack_size = 20
+    cfg.draft.human_seats = 1
+    cfg.draft.alternate_direction = False
+    cfg.agents.show_n = 4
+    cfg.agents.show_n_strategy = "sharpened_preference"
+    cfg.agents.policy = "adaptive"
+    cfg.agents.ai_optimality = 0.80
+    cfg.agents.learning_rate = 3.0
+    cfg.agents.openness_window = 3
+    cfg.cards.archetype_count = 8
+    cfg.cards.source = "synthetic"
+    cfg.cube.distinct_cards = 540
+    cfg.cube.copies_per_card = 1
+    cfg.cube.consumption_mode = "with_replacement"
+    cfg.refill.strategy = "no_refill"
+    cfg.pack_generation.strategy = "seeded_themed"
+    return cfg
+
+
 def main() -> None:
     """Run the quest simulator."""
     parser = build_parser()
@@ -46,7 +82,33 @@ def main() -> None:
     seed: int = args.seed if args.seed is not None else random.randint(0, 2**32)
     rng = random.Random(seed)
 
-    # Load all data
+    # Build draft engine configuration
+    cfg = _build_draft_config()
+
+    # Generate synthetic card pool
+    cards = card_generator.generate_cards(cfg, rng)
+
+    # Create cube with replacement mode
+    cube = cube_manager.CubeManager(
+        designs=cards,
+        copies_per_card=1,
+        consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
+    )
+
+    # Create agents: 1 human (seat 0) + 5 AI
+    human_agent = agents.create_agent(archetype_count=cfg.cards.archetype_count)
+    ai_agents = [
+        agents.create_agent(archetype_count=cfg.cards.archetype_count)
+        for _ in range(cfg.draft.seat_count - 1)
+    ]
+
+    print(
+        f"  Draft engine initialized: {len(cards)} cards generated, "
+        f"cube size {cube.total_size}, "
+        f"{1 + len(ai_agents)} agents created"
+    )
+
+    # Load all quest data
     config = data_loader.load_config()
     dreamcallers = data_loader.load_dreamcallers()
     dreamsigns = data_loader.load_dreamsigns()
@@ -63,16 +125,15 @@ def main() -> None:
     max_dreamsigns: int = int(quest_config.get("max_dreamsigns", 12))
     total_battles: int = int(quest_config.get("total_battles", 7))
 
-    # Initialize quest state with placeholder draft fields
-    # (full draft integration will be added in subsequent tasks)
+    # Initialize quest state with draft engine fields
     state = QuestState(
         essence=starting_essence,
         rng=rng,
-        human_agent=None,
-        ai_agents=[],
-        cube=None,
-        draft_cfg=None,
-        packs=[],
+        human_agent=human_agent,
+        ai_agents=ai_agents,
+        cube=cube,
+        draft_cfg=cfg,
+        packs=None,
         max_deck=max_deck,
         min_deck=min_deck,
         max_dreamsigns=max_dreamsigns,
@@ -102,7 +163,7 @@ def main() -> None:
     banner = render.quest_start_banner(
         seed=seed,
         starting_essence=starting_essence,
-        pool_size=0,
+        pool_size=len(cards),
     )
     print(banner)
 
