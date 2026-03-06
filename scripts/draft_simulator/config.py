@@ -28,7 +28,7 @@ class DraftConfig:
 class CubeConfig:
     """Cube construction parameters."""
 
-    distinct_cards: int = 540
+    distinct_cards: int = 360
     copies_per_card: int = 1
     consumption_mode: str = "without_replacement"
 
@@ -117,7 +117,7 @@ class MetricsConfig:
 class RarityConfig:
     """Rarity tier system parameters."""
 
-    enabled: bool = False
+    enabled: bool = True
     tiers: list[str] = field(default_factory=lambda: ["common", "uncommon", "rare"])
     tier_design_counts: list[int] = field(default_factory=lambda: [180, 120, 60])
     tier_copies: list[int] = field(default_factory=lambda: [3, 2, 1])
