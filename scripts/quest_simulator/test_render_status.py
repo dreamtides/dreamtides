@@ -19,7 +19,7 @@ class TestArchetypePreferenceFooter(unittest.TestCase):
 
         w = [0.1, 0.05, 0.8, 0.03, 0.01, 0.0, 0.005, 0.005]
         result = archetype_preference_footer(w=w, deck_count=8, essence=300)
-        self.assertIn("A2", result)  # top archetype by weight
+        self.assertIn("Flicker", result)  # top archetype by weight
 
     def test_contains_deck_and_essence(self) -> None:
         from render_status import archetype_preference_footer
@@ -169,7 +169,7 @@ class TestVictoryScreen(unittest.TestCase):
     def test_contains_archetype_preferences(self) -> None:
         result = self._build_victory()
         self.assertIn("Archetype Preferences", result)
-        self.assertIn("A2", result)  # highest weight archetype
+        self.assertIn("Flicker", result)  # highest weight archetype
 
     def test_contains_dreamsigns_and_essence(self) -> None:
         result = self._build_victory()

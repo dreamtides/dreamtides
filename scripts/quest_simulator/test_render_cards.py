@@ -117,7 +117,7 @@ class TestFormatCardDisplay(unittest.TestCase):
 
         dc = _make_deck_card()
         lines = format_card_display(dc, highlighted=False)
-        self.assertIn("A0=0.90", lines[1])
+        self.assertIn("Flash=0.90", lines[1])
 
     def test_no_resonance_in_output(self) -> None:
         from render_cards import format_card_display
@@ -178,6 +178,91 @@ class TestFormatCardDisplay(unittest.TestCase):
         lines = format_card_display(design, highlighted=False)
         self.assertEqual(len(lines), 2)
         self.assertIn("Whirlpool Seer", lines[0])
+
+
+class TestRealCardDisplay(unittest.TestCase):
+    """Tests for format_card_display with real (TOML-loaded) cards."""
+
+    def _make_real_design(self) -> CardDesign:
+        return CardDesign(
+            card_id="real_001",
+            name="Titan of Forgotten Echoes",
+            fitness=[0.0, 0.15, 0.0, 0.0, 0.0, 0.85, 0.7, 0.3],
+            power=0.65,
+            commit=0.60,
+            flex=0.40,
+            rarity="rare",
+            rules_text="When you play 2 cards in a turn, reclaim this character.",
+            energy_cost=6,
+            card_type="Character",
+            subtype="Ancient",
+            spark=4,
+            is_fast=False,
+            is_real=True,
+        )
+
+    def test_real_card_has_more_than_2_lines(self) -> None:
+        from render_cards import format_card_display
+
+        design = self._make_real_design()
+        lines = format_card_display(design, highlighted=False)
+        self.assertGreater(len(lines), 2)
+
+    def test_real_card_shows_type_line(self) -> None:
+        from render_cards import format_card_display
+
+        design = self._make_real_design()
+        lines = format_card_display(design, highlighted=False)
+        combined = "\n".join(lines)
+        self.assertIn("6E", combined)
+        self.assertIn("Character", combined)
+        self.assertIn("Ancient", combined)
+        self.assertIn("Rare", combined)
+
+    def test_real_card_shows_rules_text(self) -> None:
+        from render_cards import format_card_display
+
+        design = self._make_real_design()
+        lines = format_card_display(design, highlighted=False)
+        combined = "\n".join(lines)
+        self.assertIn("reclaim this character", combined)
+
+    def test_real_card_shows_stats(self) -> None:
+        from render_cards import format_card_display
+
+        design = self._make_real_design()
+        lines = format_card_display(design, highlighted=False)
+        last_line = lines[-1]
+        self.assertIn("0.65", last_line)
+
+    def test_synthetic_card_still_2_lines(self) -> None:
+        from render_cards import format_card_display
+
+        design = _make_design()
+        lines = format_card_display(design, highlighted=False)
+        self.assertEqual(len(lines), 2)
+
+    def test_real_card_no_rules_text_still_shows_type(self) -> None:
+        from render_cards import format_card_display
+
+        design = CardDesign(
+            card_id="real_002",
+            name="Vanilla Creature",
+            fitness=[0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            power=0.3,
+            commit=0.2,
+            flex=0.1,
+            rarity="common",
+            rules_text="",
+            energy_cost=2,
+            card_type="Character",
+            subtype="",
+            is_real=True,
+        )
+        lines = format_card_display(design, highlighted=False)
+        combined = "\n".join(lines)
+        self.assertIn("2E", combined)
+        self.assertIn("Character", combined)
 
 
 class TestRenderFullDeckView(unittest.TestCase):

@@ -60,6 +60,8 @@ class CardsConfig:
 
     source: str = "synthetic"
     file_path: Optional[str] = None
+    rendered_toml_path: Optional[str] = None
+    metadata_toml_path: Optional[str] = None
     archetype_count: int = 8
     bridge_fraction: float = 0.15
 

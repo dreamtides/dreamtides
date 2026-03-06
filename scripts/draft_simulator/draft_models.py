@@ -64,6 +64,13 @@ class CardDesign:
     commit: float
     flex: float
     rarity: str = ""
+    rules_text: str = ""
+    energy_cost: int | None = None
+    card_type: str = ""
+    subtype: str = ""
+    spark: int | None = None
+    is_fast: bool = False
+    is_real: bool = False
 
 
 @dataclass(frozen=True)

@@ -48,10 +48,16 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Random seed (default: random)",
     )
+    parser.add_argument(
+        "--synthetic",
+        action="store_true",
+        default=False,
+        help="Use synthetic cards instead of real TOML cards",
+    )
     return parser
 
 
-def _build_draft_config() -> SimulatorConfig:
+def _build_draft_config(synthetic: bool = False) -> SimulatorConfig:
     """Construct a SimulatorConfig for quest mode without validation."""
     cfg = SimulatorConfig()
     cfg.draft.seat_count = 6
@@ -65,13 +71,25 @@ def _build_draft_config() -> SimulatorConfig:
     cfg.agents.learning_rate = 3.0
     cfg.agents.openness_window = 3
     cfg.cards.archetype_count = 8
-    cfg.cards.source = "synthetic"
     cfg.cube.distinct_cards = 360
     cfg.cube.copies_per_card = 1
     cfg.cube.consumption_mode = "with_replacement"
     cfg.rarity.enabled = True
     cfg.refill.strategy = "no_refill"
     cfg.pack_generation.strategy = "seeded_themed"
+
+    if synthetic:
+        cfg.cards.source = "synthetic"
+    else:
+        cfg.cards.source = "toml"
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        cfg.cards.rendered_toml_path = os.path.join(
+            script_dir, "data", "rendered-cards.toml"
+        )
+        cfg.cards.metadata_toml_path = os.path.join(
+            script_dir, "..", "..", "rules_engine", "tabula", "card-metadata.toml"
+        )
+
     return cfg
 
 
@@ -97,9 +115,9 @@ def main() -> None:
     rng = random.Random(seed)
 
     # Build draft engine configuration
-    cfg = _build_draft_config()
+    cfg = _build_draft_config(synthetic=args.synthetic)
 
-    # Generate synthetic card pool
+    # Generate card pool
     cards = card_generator.generate_cards(cfg, rng)
 
     # Create cube with rarity-based copy counts and replacement mode
@@ -119,11 +137,21 @@ def main() -> None:
         for _ in range(cfg.draft.seat_count - 1)
     ]
 
-    print(
-        f"  Draft engine initialized: {len(cards)} cards generated, "
-        f"cube size {cube.total_size}, "
-        f"{1 + len(ai_agents)} agents created"
-    )
+    real_count = sum(1 for c in cards if c.is_real)
+    synth_count = len(cards) - real_count
+    if real_count > 0:
+        print(
+            f"  Draft engine initialized: {real_count} real + "
+            f"{synth_count} synthetic cards, "
+            f"cube size {cube.total_size}, "
+            f"{1 + len(ai_agents)} agents created"
+        )
+    else:
+        print(
+            f"  Draft engine initialized: {len(cards)} cards generated, "
+            f"cube size {cube.total_size}, "
+            f"{1 + len(ai_agents)} agents created"
+        )
 
     # Load all quest data
     config = data_loader.load_config()
@@ -185,6 +213,7 @@ def main() -> None:
         seed=seed,
         starting_essence=starting_essence,
         card_count=len(cards),
+        real_card_count=real_count,
     )
     print(banner)
 

@@ -9,6 +9,7 @@ Stdlib-only, no external dependencies.
 import json
 import random
 import sys
+from typing import Optional
 
 import colors
 from config import SimulatorConfig
@@ -17,7 +18,20 @@ from draft_models import CardDesign
 
 def generate_cards(cfg: SimulatorConfig, rng: random.Random) -> list[CardDesign]:
     """Generate or load card designs based on configuration."""
-    if cfg.cards.source == "file":
+    if cfg.cards.source == "toml":
+        if cfg.cards.rendered_toml_path is None:
+            raise ValueError(
+                "cards.source is 'toml' but cards.rendered_toml_path is not set"
+            )
+        if cfg.cards.metadata_toml_path is None:
+            raise ValueError(
+                "cards.source is 'toml' but cards.metadata_toml_path is not set"
+            )
+        real_cards = load_real_cards(
+            cfg.cards.rendered_toml_path, cfg.cards.metadata_toml_path
+        )
+        cards = fill_card_pool_gaps(real_cards, cfg, rng)
+    elif cfg.cards.source == "file":
         if cfg.cards.file_path is None:
             raise ValueError("cards.source is 'file' but cards.file_path is not set")
         cards = _load_cards_from_file(cfg.cards.file_path, cfg.cards.archetype_count)
@@ -28,6 +42,194 @@ def generate_cards(cfg: SimulatorConfig, rng: random.Random) -> list[CardDesign]
 
     _validate_cards(cards, cfg.cards.archetype_count)
     return cards
+
+
+def load_real_cards(
+    rendered_toml_path: str, metadata_toml_path: str
+) -> list[CardDesign]:
+    """Load real card designs from rendered TOML and metadata TOML files."""
+    import tomllib
+
+    import pool_analyzer
+
+    with open(rendered_toml_path, "rb") as f:
+        rendered_data = tomllib.load(f)
+    with open(metadata_toml_path, "rb") as f:
+        metadata_data = tomllib.load(f)
+
+    # Build metadata lookup by card-id
+    metadata_by_id: dict[str, dict] = {}
+    for entry in metadata_data.get("card-metadata", []):
+        metadata_by_id[entry["card-id"]] = entry
+
+    cards: list[CardDesign] = []
+    for card in rendered_data.get("cards", []):
+        raw_rarity = card.get("rarity", "")
+        if raw_rarity == "Special":
+            continue
+
+        card_id = card.get("id", "")
+        meta = metadata_by_id.get(card_id)
+        if meta is None:
+            continue
+
+        # Map rarity
+        if raw_rarity == "Legendary":
+            rarity = "rare"
+        else:
+            rarity = raw_rarity.lower()
+
+        # Build fitness vector from archetype names
+        fitness = [float(meta.get(name, 0.0)) for name in pool_analyzer.ARCHETYPE_NAMES]
+
+        # Handle spark/energy-cost which can be empty string or non-numeric
+        raw_spark = card.get("spark", "")
+        spark = _parse_optional_int(raw_spark)
+        raw_energy = card.get("energy-cost", "")
+        energy_cost = _parse_optional_int(raw_energy)
+
+        cards.append(
+            CardDesign(
+                card_id=card_id,
+                name=card.get("name", ""),
+                fitness=fitness,
+                power=float(meta.get("power", 0.0)),
+                commit=float(meta.get("commit", 0.0)),
+                flex=float(meta.get("flex", 0.0)),
+                rarity=rarity,
+                rules_text=card.get("rendered text", ""),
+                energy_cost=energy_cost,
+                card_type=card.get("card-type", ""),
+                subtype=card.get("subtype", ""),
+                spark=spark,
+                is_fast=card.get("is-fast", False),
+                is_real=True,
+            )
+        )
+
+    return cards
+
+
+def fill_card_pool_gaps(
+    real_cards: list[CardDesign],
+    cfg: SimulatorConfig,
+    rng: random.Random,
+) -> list[CardDesign]:
+    """Fill the gap between real cards and the target pool size with synthetics."""
+    import pool_analyzer
+
+    gap = cfg.cube.distinct_cards - len(real_cards)
+    if gap <= 0:
+        return real_cards
+
+    # Analyze the real pool to find coverage gaps
+    analysis = pool_analyzer.analyze_pool(real_cards, cfg)
+    targets = pool_analyzer.compute_ideal_targets(cfg)
+    gaps = pool_analyzer.compute_gaps(analysis, targets, cfg)
+
+    # Determine per-rarity needs
+    rarity_needs: dict[str, int] = {}
+    if cfg.rarity.enabled and gaps.per_rarity_needed:
+        total_rarity_need = sum(gaps.per_rarity_needed.values())
+        if total_rarity_need > 0:
+            for tier_name, need in gaps.per_rarity_needed.items():
+                rarity_needs[tier_name] = round(need * gap / total_rarity_need)
+            # Adjust rounding errors
+            diff = gap - sum(rarity_needs.values())
+            if diff != 0:
+                # Add/subtract from the tier with the largest allocation
+                largest_tier = max(rarity_needs, key=lambda t: rarity_needs[t])
+                rarity_needs[largest_tier] += diff
+        else:
+            # Distribute proportionally to tier_design_counts
+            for ti, tier_name in enumerate(cfg.rarity.tiers):
+                rarity_needs[tier_name] = round(
+                    cfg.rarity.tier_design_counts[ti] * gap / cfg.cube.distinct_cards
+                )
+            diff = gap - sum(rarity_needs.values())
+            if diff != 0:
+                largest_tier = max(rarity_needs, key=lambda t: rarity_needs[t])
+                rarity_needs[largest_tier] += diff
+    else:
+        rarity_needs["common"] = gap
+
+    # Generate synthetic cards per rarity tier
+    archetype_count = cfg.cards.archetype_count
+    bridge_fraction = cfg.cards.bridge_fraction
+    coverage_needed = gaps.per_archetype_coverage_needed
+    total_coverage_need = sum(coverage_needed)
+
+    synthetic_cards: list[CardDesign] = []
+    card_index = 0
+
+    for tier_name, tier_count in rarity_needs.items():
+        if tier_count <= 0:
+            continue
+
+        # Look up power range for this tier
+        power_lo, power_hi = 0.2, 0.9
+        if cfg.rarity.enabled:
+            for ti, tn in enumerate(cfg.rarity.tiers):
+                if tn == tier_name:
+                    power_lo, power_hi = cfg.rarity.tier_power_ranges[ti]
+                    break
+
+        bridge_count = int(tier_count * bridge_fraction)
+        primary_count = tier_count - bridge_count
+
+        # Generate bridge cards
+        for i in range(bridge_count):
+            fitness = _generate_bridge_fitness(archetype_count, rng)
+            power = rng.uniform(power_lo, power_hi)
+            commit = _sample_beta(2.0, 3.0, rng)
+            flex = _compute_flex(fitness)
+            synthetic_cards.append(
+                CardDesign(
+                    card_id=f"synth_{tier_name}_bridge_{card_index:04d}",
+                    name=f"Synthetic {tier_name.title()} #{card_index + 1:03d}",
+                    fitness=fitness,
+                    power=power,
+                    commit=commit,
+                    flex=flex,
+                    rarity=tier_name,
+                )
+            )
+            card_index += 1
+
+        # Distribute primaries across archetypes weighted by coverage needs
+        if total_coverage_need > 0:
+            weights = [max(1, n) for n in coverage_needed]
+        else:
+            weights = [1] * archetype_count
+        weight_sum = sum(weights)
+
+        primaries_per_arch = [round(primary_count * w / weight_sum) for w in weights]
+        # Fix rounding
+        diff = primary_count - sum(primaries_per_arch)
+        if diff != 0:
+            best_arch = max(range(archetype_count), key=lambda a: weights[a])
+            primaries_per_arch[best_arch] += diff
+
+        for arch in range(archetype_count):
+            for _ in range(primaries_per_arch[arch]):
+                fitness = _generate_primary_fitness(arch, archetype_count, rng)
+                power = rng.uniform(power_lo, power_hi)
+                commit = _sample_beta(2.0, 3.0, rng)
+                flex = _compute_flex(fitness)
+                synthetic_cards.append(
+                    CardDesign(
+                        card_id=f"synth_{tier_name}_primary_{card_index:04d}",
+                        name=f"Synthetic {tier_name.title()} #{card_index + 1:03d}",
+                        fitness=fitness,
+                        power=power,
+                        commit=commit,
+                        flex=flex,
+                        rarity=tier_name,
+                    )
+                )
+                card_index += 1
+
+    return list(real_cards) + synthetic_cards
 
 
 def _load_cards_from_file(path: str, archetype_count: int) -> list[CardDesign]:
@@ -180,6 +382,18 @@ def _generate_rarity_cards(
     return cards
 
 
+def _parse_optional_int(value: object) -> Optional[int]:
+    """Parse a value that may be an int, empty string, or non-numeric string."""
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str) and value != "":
+        try:
+            return int(value)
+        except ValueError:
+            return None
+    return None
+
+
 def _generate_bridge_fitness(archetype_count: int, rng: random.Random) -> list[float]:
     """Generate a fitness vector with high fitness in 2-3 archetypes."""
     fitness = [0.0] * archetype_count
@@ -279,8 +493,8 @@ def _validate_cards(cards: list[CardDesign], archetype_count: int) -> None:
         if card.flex < 0.0 or card.flex > 1.0:
             raise ValueError(f"Card {card.card_id!r}: flex={card.flex} not in [0, 1]")
 
-        # No all-zero fitness
-        if all(f == 0.0 for f in card.fitness):
+        # No all-zero fitness (skip for real cards which may be flex/neutral)
+        if all(f == 0.0 for f in card.fitness) and not card.is_real:
             raise ValueError(f"Card {card.card_id!r}: fitness vector is all zeros")
 
         # Warnings (not errors)

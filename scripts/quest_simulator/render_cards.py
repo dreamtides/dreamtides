@@ -4,6 +4,7 @@ Provides card display formatting for DeckCards and the full deck
 viewer. Uses AYU Mirage palette colors from the draft simulator.
 """
 
+import textwrap
 from typing import Optional
 
 import colors
@@ -35,13 +36,17 @@ def format_card_display(
     highlighted: bool = False,
     max_width: int = render.CONTENT_WIDTH,
 ) -> list[str]:
-    """Format a card as 2 display lines.
+    """Format a card as display lines.
 
     Accepts a DeckCard, CardInstance, or CardDesign. Shows the card
     name (colored), power, commit, flex, and top archetype fitness.
 
-    Line 1: marker + colored card name (with transfig/bane markers)
-    Line 2: power/commit/flex + top archetype
+    For real cards (is_real=True), returns up to 4+ lines:
+      Line 1: marker + colored card name (with transfig/bane markers)
+      Line 2: energy cost + card type + subtype + rarity
+      Line 3+: rules text (word-wrapped)
+      Last:   power/commit/flex + top archetype
+    For synthetic cards, returns 2 lines (name + stats).
     """
     marker = ">" if highlighted else " "
 
@@ -88,7 +93,37 @@ def format_card_display(
     bane_marker = f"  {colors.c('[BANE]', 'error', bold=True)}" if is_bane else ""
     line1 = f"{prefix}{colored_name}{bane_marker}"
 
-    # Line 2: card details from CardDesign
+    lines = [line1]
+
+    # For real cards, add type line and rules text
+    is_real = getattr(design, "is_real", False) if design else False
+    if is_real and design is not None:
+        # Line 2: energy cost + card type + subtype + rarity
+        type_parts: list[str] = []
+        energy = getattr(design, "energy_cost", None)
+        if energy is not None:
+            type_parts.append(f"{energy}E")
+        ct = getattr(design, "card_type", "")
+        if ct:
+            type_parts.append(ct)
+        sub = getattr(design, "subtype", "")
+        if sub:
+            type_parts.append(f"- {sub}")
+        rarity = getattr(design, "rarity", "")
+        if rarity:
+            type_parts.append(f" ({rarity.title()})")
+        type_line = " ".join(type_parts)
+        lines.append(f"    {colors.dim(type_line)}")
+
+        # Line 3+: rules text
+        rules = getattr(design, "rules_text", "")
+        if rules:
+            wrap_width = max_width - 4
+            wrapped = textwrap.wrap(rules, width=wrap_width)
+            for wline in wrapped:
+                lines.append(f"    {wline}")
+
+    # Stats line: power/commit/flex + top archetype
     details_parts: list[str] = []
     if design is not None:
         if hasattr(design, "power"):
@@ -103,9 +138,9 @@ def format_card_display(
                 details_parts.append(colors.dim(arch))
 
     detail_str = "  ".join(details_parts) if details_parts else ""
-    line2 = f"    {detail_str}" if detail_str else "    "
+    lines.append(f"    {detail_str}" if detail_str else "    ")
 
-    return [line1, line2]
+    return lines
 
 
 def card_name(card) -> str:

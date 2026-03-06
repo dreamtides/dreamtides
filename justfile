@@ -430,6 +430,9 @@ render-cards-toml output strip_html='true':
 parser-release *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --release --bin "parser" -- "$@"
 
+render-quest-cards:
+  just render-cards-toml scripts/quest_simulator/data/rendered-cards.toml 'true'
+
 quest-sim:
   cd scripts/quest_simulator && python3 quest_sim.py
 
