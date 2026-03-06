@@ -4,587 +4,457 @@ import random
 from typing import Optional
 from unittest.mock import patch
 
-from models import (
-    AlgorithmParams,
-    Card,
-    CardType,
-    DraftParams,
-    PoolEntry,
-    Rarity,
-    Resonance,
-    ResonanceProfile,
-    TagProfile,
-)
+from draft_models import CardDesign, CardInstance
 from quest_state import QuestState
 
 
-def _make_card(
+def _make_design(
     name: str = "Test Card",
-    card_number: int = 1,
-    tags: frozenset[str] = frozenset(),
-    rarity: Rarity = Rarity.COMMON,
-    resonances: frozenset[Resonance] = frozenset(),
-    energy_cost: Optional[int] = 3,
-    spark: Optional[int] = 2,
-    rules_text: str = "Test rules",
-) -> Card:
-    return Card(
+    card_id: str = "test_001",
+    fitness: Optional[list[float]] = None,
+    power: float = 0.5,
+    commit: float = 0.3,
+    flex: float = 0.2,
+) -> CardDesign:
+    """Create a CardDesign for testing."""
+    if fitness is None:
+        fitness = [0.1] * 8
+    return CardDesign(
+        card_id=card_id,
         name=name,
-        card_number=card_number,
-        energy_cost=energy_cost,
-        card_type=CardType.CHARACTER,
-        subtype=None,
-        is_fast=False,
-        spark=spark,
-        rarity=rarity,
-        rules_text=rules_text,
-        resonances=resonances,
-        tags=tags,
+        fitness=fitness,
+        power=power,
+        commit=commit,
+        flex=flex,
     )
 
 
-def _make_pool_entries(
-    tag: str,
+def _make_instance(
+    instance_id: int = 0,
+    name: str = "Test Card",
+    card_id: str = "test_001",
+    fitness: Optional[list[float]] = None,
+    power: float = 0.5,
+) -> CardInstance:
+    """Create a CardInstance for testing."""
+    design = _make_design(name=name, card_id=card_id, fitness=fitness, power=power)
+    return CardInstance(instance_id=instance_id, design=design)
+
+
+def _make_high_fitness_instances(
+    archetype_index: int,
     count: int,
-    start_number: int = 1,
-    rarity: Rarity = Rarity.COMMON,
-    resonances: frozenset[Resonance] = frozenset(),
-) -> list[PoolEntry]:
-    """Create pool entries whose cards all have the given tag."""
-    return [
-        PoolEntry(
-            _make_card(
-                name=f"{tag} Card {i}",
-                card_number=start_number + i,
-                tags=frozenset({tag}),
-                rarity=rarity,
-                resonances=resonances,
-            )
+    start_id: int = 0,
+    fitness_value: float = 0.9,
+    power: float = 0.5,
+) -> list[CardInstance]:
+    """Create instances with high fitness for a specific archetype."""
+    instances = []
+    for i in range(count):
+        fitness = [0.1] * 8
+        fitness[archetype_index] = fitness_value
+        design = _make_design(
+            name=f"High A{archetype_index} Card {i}",
+            card_id=f"high_a{archetype_index}_{i}",
+            fitness=fitness,
+            power=power,
         )
-        for i in range(count)
-    ]
-
-
-def _default_params() -> AlgorithmParams:
-    return AlgorithmParams(
-        exponent=1.4,
-        floor_weight=0.5,
-        neutral_base=3.0,
-        staleness_factor=0.3,
-    )
-
-
-def _default_tag_config() -> dict[str, float]:
-    return {
-        "scale": 1.5,
-        "min_theme_cards": 6,
-        "relevance_boost": 2.0,
-        "depth_factor": 0.1,
-    }
-
-
-def _default_shop_config() -> dict[str, int]:
-    return {
-        "price_common": 50,
-        "price_uncommon": 80,
-        "price_rare": 120,
-        "price_legendary": 200,
-        "reroll_cost": 50,
-        "discount_min": 30,
-        "discount_max": 90,
-        "items_count": 6,
-    }
+        instances.append(CardInstance(instance_id=start_id + i, design=design))
+    return instances
 
 
 def _make_quest_state(
     essence: int = 500,
     seed: int = 42,
-    pool: Optional[list[PoolEntry]] = None,
-    all_cards: Optional[list[Card]] = None,
+    high_fitness_archetype: int = 0,
+    card_count: int = 100,
 ) -> QuestState:
+    """Create a QuestState with a cube containing cards for testing.
+
+    Creates a mix of high-fitness and low-fitness cards. The human
+    agent preference vector is biased toward the given archetype.
+    """
+    import sys
+    from pathlib import Path
+
+    draft_dir = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+    if draft_dir not in sys.path:
+        sys.path.insert(0, draft_dir)
+
+    import agents
+    import cube_manager
+    from config import SimulatorConfig
+    from draft_models import CubeConsumptionMode
+
     rng = random.Random(seed)
-    if pool is None:
-        pool = []
-    if all_cards is None:
-        all_cards = [e.card for e in pool]
-    variance = {r: 1.0 for r in Resonance}
+
+    # Build designs: half high-fitness, half low-fitness
+    designs: list[CardDesign] = []
+    half = card_count // 2
+    for i in range(half):
+        fitness = [0.1] * 8
+        fitness[high_fitness_archetype] = 0.9
+        designs.append(
+            _make_design(
+                name=f"HighFit Card {i}",
+                card_id=f"highfit_{i}",
+                fitness=fitness,
+                power=0.3 + (i % 10) * 0.1,
+            )
+        )
+    for i in range(half, card_count):
+        fitness = [0.1] * 8  # All low fitness
+        designs.append(
+            _make_design(
+                name=f"LowFit Card {i}",
+                card_id=f"lowfit_{i}",
+                fitness=fitness,
+                power=0.3 + (i % 10) * 0.1,
+            )
+        )
+
+    cube = cube_manager.CubeManager(
+        designs=designs,
+        copies_per_card=1,
+        consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
+    )
+
+    cfg = SimulatorConfig()
+    cfg.draft.seat_count = 6
+    cfg.agents.learning_rate = 3.0
+    cfg.agents.openness_window = 3
+    cfg.cards.archetype_count = 8
+
+    human_agent = agents.create_agent(archetype_count=8)
+    # Bias the preference vector toward the target archetype
+    human_agent.w[high_fitness_archetype] = 5.0
+
+    ai_agents = [agents.create_agent(archetype_count=8) for _ in range(5)]
+
     return QuestState(
         essence=essence,
-        pool=pool,
         rng=rng,
-        all_cards=all_cards,
-        pool_variance=variance,
+        human_agent=human_agent,
+        ai_agents=ai_agents,
+        cube=cube,
+        draft_cfg=cfg,
     )
 
 
-class TestDiscoveryDraftThemeSelection:
-    def test_selects_themed_cards_from_pool(self) -> None:
-        """Discovery draft should filter pool by the selected theme tag."""
-        from sites_discovery import _select_discovery_cards
+class TestDrawAndFilter:
+    """Test the archetype-based card drawing and filtering."""
 
-        themed = _make_pool_entries("tribal:warrior", 10, start_number=1)
-        other = _make_pool_entries("tribal:mage", 10, start_number=100)
-        pool = themed + other
+    def test_draw_and_filter_returns_high_fitness_cards(self) -> None:
+        """Cards returned should have high fitness for the player's top archetype."""
+        from sites_discovery import draw_and_filter
 
-        profile = ResonanceProfile()
-        tag_profile = TagProfile()
-        tag_profile.add("tribal:warrior", 5)
-        rng = random.Random(42)
+        state = _make_quest_state(high_fitness_archetype=2)
+        cards = draw_and_filter(state, count=4)
 
-        result = _select_discovery_cards(
-            pool=pool,
-            resonance_profile=profile,
-            tag_profile=tag_profile,
-            params=_default_params(),
-            rng=rng,
-            cards_per_pick=4,
-            tag_config=_default_tag_config(),
-        )
+        assert len(cards) > 0
+        assert len(cards) <= 4
+        # All returned cards should have fitness >= 0.7 for archetype 2
+        for card in cards:
+            assert card.design.fitness[2] >= 0.7
 
-        assert result is not None
-        selected_entries, tag = result
-        assert len(selected_entries) <= 4
-        assert tag is not None
+    def test_draw_and_filter_with_no_matching_cards_relaxes_threshold(self) -> None:
+        """When no cards meet the fitness threshold, should still return cards."""
+        import sys
+        from pathlib import Path
 
-    def test_falls_back_to_unthemed_when_no_eligible_tags(self) -> None:
-        """When no tag has enough cards, falls back to unthemed selection."""
-        from sites_discovery import _select_discovery_cards
+        draft_dir = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+        if draft_dir not in sys.path:
+            sys.path.insert(0, draft_dir)
 
-        # Each tag has only 3 cards -- below min_theme_cards of 6
-        pool = _make_pool_entries("tag_a", 3, start_number=1) + _make_pool_entries(
-            "tag_b", 3, start_number=100
-        )
-        profile = ResonanceProfile()
-        tag_profile = TagProfile()
-        rng = random.Random(42)
+        import agents
+        import cube_manager
+        from config import SimulatorConfig
+        from draft_models import CubeConsumptionMode
 
-        result = _select_discovery_cards(
-            pool=pool,
-            resonance_profile=profile,
-            tag_profile=tag_profile,
-            params=_default_params(),
-            rng=rng,
-            cards_per_pick=4,
-            tag_config=_default_tag_config(),
-        )
+        from sites_discovery import draw_and_filter
 
-        assert result is not None
-        selected_entries, tag = result
-        assert tag is None  # Unthemed fallback
-        assert len(selected_entries) <= 4
-
-    def test_returns_none_for_empty_pool(self) -> None:
-        """Empty pool returns None."""
-        from sites_discovery import _select_discovery_cards
-
-        profile = ResonanceProfile()
-        tag_profile = TagProfile()
-        rng = random.Random(42)
-
-        result = _select_discovery_cards(
-            pool=[],
-            resonance_profile=profile,
-            tag_profile=tag_profile,
-            params=_default_params(),
-            rng=rng,
-            cards_per_pick=4,
-            tag_config=_default_tag_config(),
-        )
-
-        assert result is None
-
-
-class TestDiscoveryDraftPicking:
-    def test_normal_picks_one_card(self) -> None:
-        """Normal (non-enhanced) discovery draft should pick 1 card."""
-        from sites_discovery import _apply_discovery_pick
-
-        cards = [
-            _make_card(name=f"Card {i}", card_number=i, tags=frozenset({"tag_a"}))
-            for i in range(4)
+        # All cards have low fitness everywhere
+        designs = [
+            _make_design(
+                name=f"LowFit {i}",
+                card_id=f"low_{i}",
+                fitness=[0.2] * 8,
+            )
+            for i in range(50)
         ]
-        entries = [PoolEntry(c) for c in cards]
-        paired = [(e, 1.0) for e in entries]
+        cube = cube_manager.CubeManager(
+            designs=designs,
+            copies_per_card=1,
+            consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
+        )
+        cfg = SimulatorConfig()
+        cfg.draft.seat_count = 6
+        cfg.agents.learning_rate = 3.0
+        cfg.agents.openness_window = 3
 
-        # Simulate picking index 1
-        picked_indices = [1]
-        result = _apply_discovery_pick(paired, picked_indices)
-        picked, unpicked = result
-        assert len(picked) == 1
-        assert picked[0] is entries[1]
-        assert len(unpicked) == 3
+        human = agents.create_agent(archetype_count=8)
+        human.w[0] = 5.0
 
-    def test_enhanced_picks_multiple_cards(self) -> None:
-        """Enhanced discovery draft should allow picking multiple cards."""
-        from sites_discovery import _apply_discovery_pick
+        state = QuestState(
+            essence=500,
+            rng=random.Random(42),
+            human_agent=human,
+            ai_agents=[],
+            cube=cube,
+            draft_cfg=cfg,
+        )
 
-        cards = [
-            _make_card(name=f"Card {i}", card_number=i, tags=frozenset({"tag_a"}))
-            for i in range(4)
-        ]
-        entries = [PoolEntry(c) for c in cards]
-        paired = [(e, 1.0) for e in entries]
+        cards = draw_and_filter(state, count=4)
+        # Should still return some cards even without high-fitness matches
+        assert len(cards) > 0
 
-        picked_indices = [0, 2, 3]
-        result = _apply_discovery_pick(paired, picked_indices)
-        picked, unpicked = result
-        assert len(picked) == 3
-        assert len(unpicked) == 1
 
-    def test_discovery_draft_with_none_logger(self) -> None:
-        """Discovery draft should not crash when logger is None."""
+class TestPowerBasedPricing:
+    """Test the power-based pricing formula for specialty shop."""
+
+    def test_price_formula(self) -> None:
+        """Price should be round(power * 25) clamped to [5, 100]."""
+        from sites_discovery import compute_power_price
+
+        assert compute_power_price(0.0) == 5  # Clamped to min
+        assert compute_power_price(0.2) == 5  # round(5) = 5
+        assert compute_power_price(0.5) == 12  # round(12.5) = 12 (banker's rounding)
+        assert compute_power_price(1.0) == 25
+        assert compute_power_price(2.0) == 50
+        assert compute_power_price(4.0) == 100  # round(100) = 100
+        assert compute_power_price(5.0) == 100  # Clamped to max
+
+    def test_price_never_below_minimum(self) -> None:
+        """Price should never be below 5."""
+        from sites_discovery import compute_power_price
+
+        for p in [0.0, 0.01, 0.05, 0.1]:
+            assert compute_power_price(p) >= 5
+
+    def test_price_never_above_maximum(self) -> None:
+        """Price should never exceed 100."""
+        from sites_discovery import compute_power_price
+
+        for p in [10.0, 20.0, 50.0]:
+            assert compute_power_price(p) <= 100
+
+
+class TestShopItemCreation:
+    """Test shop item creation with CardInstance and power-based pricing."""
+
+    def test_shop_item_has_card_instance(self) -> None:
+        """ShopItem should reference a CardInstance, not PoolEntry."""
+        from sites_discovery import ShopItem
+
+        inst = _make_instance(power=1.0)
+        item = ShopItem(instance=inst, base_price=25, discounted_price=None)
+        assert item.instance is inst
+        assert item.base_price == 25
+
+    def test_effective_price_without_discount(self) -> None:
+        """Effective price should be base_price when no discount."""
+        from sites_discovery import ShopItem
+
+        inst = _make_instance(power=1.0)
+        item = ShopItem(instance=inst, base_price=50, discounted_price=None)
+        assert item.effective_price == 50
+
+    def test_effective_price_with_discount(self) -> None:
+        """Effective price should be discounted_price when set."""
+        from sites_discovery import ShopItem
+
+        inst = _make_instance(power=1.0)
+        item = ShopItem(instance=inst, base_price=50, discounted_price=30)
+        assert item.effective_price == 30
+
+
+class TestDiscoveryDraftDoesNotAdvanceDraft:
+    """Test that Discovery Draft does not consume draft picks."""
+
+    def test_global_pick_index_unchanged(self) -> None:
+        """Discovery Draft should not increment global_pick_index."""
         from sites_discovery import run_discovery_draft
 
-        pool = _make_pool_entries("tribal:warrior", 10, start_number=1)
-        state = _make_quest_state(pool=pool)
+        state = _make_quest_state()
+        initial_pick_index = state.global_pick_index
 
-        initial_deck_count = state.deck_count()
-
-        with patch(
-            "sites_discovery.single_select",
-            return_value=0,
-        ):
+        with patch("sites_discovery.single_select", return_value=0):
             run_discovery_draft(
                 state=state,
-                params=_default_params(),
                 logger=None,
                 dreamscape_name="Test",
                 dreamscape_number=1,
                 is_enhanced=False,
-                cards_per_pick=4,
-                picks_per_site=1,
-                tag_config=_default_tag_config(),
             )
 
-        assert state.deck_count() > initial_deck_count
+        assert state.global_pick_index == initial_pick_index
 
-    def test_enhanced_allows_picking_zero_cards(self) -> None:
-        """Enhanced discovery draft should allow picking 0 cards."""
+    def test_round_pick_count_unchanged(self) -> None:
+        """Discovery Draft should not increment round_pick_count."""
         from sites_discovery import run_discovery_draft
 
-        pool = _make_pool_entries("tribal:warrior", 10, start_number=1)
-        state = _make_quest_state(pool=pool)
+        state = _make_quest_state()
+        initial_round_pick = state.round_pick_count
 
-        class FakeLogger:
-            def log_draft_pick(self, **kwargs: object) -> None:
-                pass
-
-            def log_site_visit(self, **kwargs: object) -> None:
-                pass
-
-        initial_deck_count = state.deck_count()
-
-        # Mock multi_select to return empty (player picks nothing)
-        with patch(
-            "sites_discovery.multi_select",
-            return_value=[],
-        ):
+        with patch("sites_discovery.single_select", return_value=0):
             run_discovery_draft(
                 state=state,
-                params=_default_params(),
-                logger=FakeLogger(),  # type: ignore[arg-type]
+                logger=None,
                 dreamscape_name="Test",
                 dreamscape_number=1,
-                is_enhanced=True,
-                cards_per_pick=4,
-                picks_per_site=1,
-                tag_config=_default_tag_config(),
+                is_enhanced=False,
             )
 
-        # No cards should have been added when player picks nothing
-        assert state.deck_count() == initial_deck_count
+        assert state.round_pick_count == initial_round_pick
 
 
-class TestShopPricing:
-    def test_price_by_rarity(self) -> None:
-        """Shop prices should match rarity-based pricing."""
-        from sites_discovery import _compute_price
+class TestDiscoveryDraftUpdatesAgent:
+    """Test that update_agent_after_pick is called for each card taken."""
 
-        config = _default_shop_config()
-        assert _compute_price(Rarity.COMMON, config) == 50
-        assert _compute_price(Rarity.UNCOMMON, config) == 80
-        assert _compute_price(Rarity.RARE, config) == 120
-        assert _compute_price(Rarity.LEGENDARY, config) == 200
+    def test_agent_preference_updated_after_pick(self) -> None:
+        """Human agent w vector should change after a discovery draft pick."""
+        from sites_discovery import run_discovery_draft
 
-    def test_discount_in_range(self) -> None:
-        """Discount should be between 30% and 90%, rounded to nearest 10."""
-        from sites_discovery import _apply_discount
+        state = _make_quest_state(high_fitness_archetype=0)
+        initial_w = list(state.human_agent.w)
 
-        rng = random.Random(42)
-        for _ in range(100):
-            base_price = 100
-            discounted = _apply_discount(base_price, rng, 30, 90)
-            # Price should be between 10 and 70 (100 * 0.1 to 100 * 0.7)
-            assert 10 <= discounted <= 70
-            assert discounted % 10 == 0
+        with patch("sites_discovery.single_select", return_value=0):
+            run_discovery_draft(
+                state=state,
+                logger=None,
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                is_enhanced=False,
+            )
 
-    def test_discount_rounds_to_nearest_ten(self) -> None:
-        """Discounted price should always be a multiple of 10."""
-        from sites_discovery import _apply_discount
+        # The agent's preference vector should have been updated
+        assert state.human_agent.w != initial_w
 
-        for seed in range(50):
-            rng = random.Random(seed)
-            result = _apply_discount(120, rng, 30, 90)
-            assert result % 10 == 0
-            assert result > 0
+    def test_card_added_to_deck_after_pick(self) -> None:
+        """A card should be added to the deck after each pick."""
+        from sites_discovery import run_discovery_draft
 
+        state = _make_quest_state()
+        initial_deck = state.deck_count()
 
-class TestSpecialtyShopItems:
-    def test_selects_themed_items(self) -> None:
-        """Specialty shop should filter items by theme tag."""
-        from sites_discovery import _select_specialty_items
+        with patch("sites_discovery.single_select", return_value=0):
+            run_discovery_draft(
+                state=state,
+                logger=None,
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                is_enhanced=False,
+            )
 
-        themed = _make_pool_entries("tribal:warrior", 10, start_number=1)
-        other = _make_pool_entries("tribal:mage", 10, start_number=100)
-        pool = themed + other
-
-        profile = ResonanceProfile()
-        tag_profile = TagProfile()
-        tag_profile.add("tribal:warrior", 5)
-        rng = random.Random(42)
-
-        result = _select_specialty_items(
-            pool=pool,
-            resonance_profile=profile,
-            tag_profile=tag_profile,
-            params=_default_params(),
-            rng=rng,
-            items_count=6,
-            tag_config=_default_tag_config(),
-        )
-
-        assert result is not None
-        items, tag = result
-        assert len(items) <= 6
-        assert tag is not None
-
-    def test_falls_back_when_no_eligible_tags(self) -> None:
-        """When no tag qualifies, falls back to unthemed selection."""
-        from sites_discovery import _select_specialty_items
-
-        # Too few cards per tag
-        pool = _make_pool_entries("tag_a", 3, start_number=1) + _make_pool_entries(
-            "tag_b", 3, start_number=100
-        )
-        profile = ResonanceProfile()
-        tag_profile = TagProfile()
-        rng = random.Random(42)
-
-        result = _select_specialty_items(
-            pool=pool,
-            resonance_profile=profile,
-            tag_profile=tag_profile,
-            params=_default_params(),
-            rng=rng,
-            items_count=6,
-            tag_config=_default_tag_config(),
-        )
-
-        assert result is not None
-        items, tag = result
-        assert tag is None
-        assert len(items) <= 6
-
-    def test_returns_none_for_empty_pool(self) -> None:
-        """Empty pool returns None."""
-        from sites_discovery import _select_specialty_items
-
-        profile = ResonanceProfile()
-        tag_profile = TagProfile()
-        rng = random.Random(42)
-
-        result = _select_specialty_items(
-            pool=[],
-            resonance_profile=profile,
-            tag_profile=tag_profile,
-            params=_default_params(),
-            rng=rng,
-            items_count=6,
-            tag_config=_default_tag_config(),
-        )
-
-        assert result is None
-
-    def test_fewer_items_when_not_enough_themed_cards(self) -> None:
-        """If filtered pool has fewer cards than items_count, offer what's available."""
-        from sites_discovery import _select_specialty_items
-
-        # Only 4 cards with this tag -- items_count is 6
-        pool = _make_pool_entries("tribal:warrior", 4, start_number=1)
-        # Add extras so the tag is eligible (need at least 6 for min_theme_cards)
-        pool += _make_pool_entries("tribal:warrior", 4, start_number=100)
-
-        profile = ResonanceProfile()
-        tag_profile = TagProfile()
-        tag_profile.add("tribal:warrior", 5)
-        rng = random.Random(42)
-
-        result = _select_specialty_items(
-            pool=pool,
-            resonance_profile=profile,
-            tag_profile=tag_profile,
-            params=_default_params(),
-            rng=rng,
-            items_count=6,
-            tag_config=_default_tag_config(),
-        )
-
-        assert result is not None
-        items, tag = result
-        assert tag == "tribal:warrior"
-        assert len(items) <= 6
+        assert state.deck_count() > initial_deck
 
 
-class TestRuntimeTagConfigKeys:
-    """Verify functions work with config keys as produced by site_dispatch.
+class TestSpecialtyShopDoesNotAdvanceDraft:
+    """Test that Specialty Shop does not consume draft picks."""
 
-    The config.toml [tags] section uses 'scale' (not 'tag_scale'), and
-    site_dispatch builds the tag_config dict directly from those keys.
-    """
-
-    def _runtime_tag_config(self) -> dict[str, float]:
-        """Tag config keys as they appear in config.toml and site_dispatch."""
-        return {
-            "scale": 1.5,
-            "min_theme_cards": 6,
-            "relevance_boost": 2.0,
-            "depth_factor": 0.1,
-        }
-
-    def test_select_discovery_cards_with_runtime_keys(self) -> None:
-        """Discovery card selection should work with config.toml key names."""
-        from sites_discovery import _select_discovery_cards
-
-        pool = _make_pool_entries("tribal:warrior", 10, start_number=1)
-        profile = ResonanceProfile()
-        tag_profile = TagProfile()
-        tag_profile.add("tribal:warrior", 5)
-        rng = random.Random(42)
-
-        result = _select_discovery_cards(
-            pool=pool,
-            resonance_profile=profile,
-            tag_profile=tag_profile,
-            params=_default_params(),
-            rng=rng,
-            cards_per_pick=4,
-            tag_config=self._runtime_tag_config(),
-        )
-
-        assert result is not None
-
-    def test_select_specialty_items_with_runtime_keys(self) -> None:
-        """Specialty shop item selection should work with config.toml key names."""
-        from sites_discovery import _select_specialty_items
-
-        pool = _make_pool_entries("tribal:warrior", 10, start_number=1)
-        profile = ResonanceProfile()
-        tag_profile = TagProfile()
-        tag_profile.add("tribal:warrior", 5)
-        rng = random.Random(42)
-
-        result = _select_specialty_items(
-            pool=pool,
-            resonance_profile=profile,
-            tag_profile=tag_profile,
-            params=_default_params(),
-            rng=rng,
-            items_count=6,
-            tag_config=self._runtime_tag_config(),
-        )
-
-        assert result is not None
-
-
-class TestSpecialtyShopPurchasing:
-    def test_compute_shop_items_with_discounts(self) -> None:
-        """Shop items should have per-item discount probability, allowing 0, 1, or more."""
-        from sites_discovery import ShopItem, _prepare_shop_items
-
-        config = _default_shop_config()
-        discount_counts: list[int] = []
-
-        for seed in range(200):
-            cards = [
-                _make_card(
-                    name=f"Card {i}",
-                    card_number=i,
-                    rarity=Rarity.COMMON,
-                    tags=frozenset({"tag_a"}),
-                )
-                for i in range(6)
-            ]
-            entries = [PoolEntry(c) for c in cards]
-            paired = [(e, 1.0) for e in entries]
-            rng = random.Random(seed)
-
-            items = _prepare_shop_items(paired, rng, config)
-            assert len(items) == 6
-            for item in items:
-                assert isinstance(item, ShopItem)
-                assert item.base_price > 0
-
-            count = sum(1 for item in items if item.discounted_price is not None)
-            discount_counts.append(count)
-
-        # Over 200 runs, should see at least one with 0 discounts
-        # and at least one with 2+ discounts
-        assert any(
-            c == 0 for c in discount_counts
-        ), "Expected some shops with 0 discounts"
-        assert any(
-            c >= 2 for c in discount_counts
-        ), "Expected some shops with 2+ discounts"
-
-    def test_total_cost_calculation(self) -> None:
-        """Total cost should sum the effective prices of selected items."""
-        from sites_discovery import ShopItem, _total_cost
-
-        entry = PoolEntry(_make_card())
-        items = [
-            ShopItem(entry=entry, base_price=50, discounted_price=None),
-            ShopItem(entry=entry, base_price=80, discounted_price=30),
-            ShopItem(entry=entry, base_price=120, discounted_price=None),
-        ]
-        # Select items 0 and 1
-        assert _total_cost(items, [0, 1]) == 80  # 50 + 30
-        # Select all
-        assert _total_cost(items, [0, 1, 2]) == 200  # 50 + 30 + 120
-        # Select none
-        assert _total_cost(items, []) == 0
-
-    def test_effective_price_uses_discount_when_available(self) -> None:
-        """Effective price should use discounted_price when set."""
-        from sites_discovery import ShopItem, _effective_price
-
-        entry = PoolEntry(_make_card())
-        item_no_discount = ShopItem(entry=entry, base_price=100, discounted_price=None)
-        item_discounted = ShopItem(entry=entry, base_price=100, discounted_price=30)
-
-        assert _effective_price(item_no_discount) == 100
-        assert _effective_price(item_discounted) == 30
-
-
-class TestSpecialtyShopNoneLogger:
-    def test_specialty_shop_with_none_logger(self) -> None:
-        """Specialty shop should not crash when logger is None."""
+    def test_global_pick_index_unchanged(self) -> None:
+        """Specialty Shop should not increment global_pick_index."""
         from sites_discovery import run_specialty_shop
 
-        pool = _make_pool_entries("tribal:warrior", 10, start_number=1)
-        state = _make_quest_state(pool=pool, essence=500)
+        state = _make_quest_state(essence=500)
+        initial_pick_index = state.global_pick_index
 
-        # Multi-select returns empty (done without buying)
-        with patch(
-            "sites_discovery.multi_select",
-            return_value=[],
-        ):
+        # Select first item (index 0) to buy
+        with patch("sites_discovery.multi_select", return_value=[0]):
             run_specialty_shop(
                 state=state,
-                params=_default_params(),
                 logger=None,
                 dreamscape_name="Test",
                 dreamscape_number=1,
                 is_enhanced=False,
-                shop_config=_default_shop_config(),
-                tag_config=_default_tag_config(),
+                shop_config={"reroll_cost": 50, "items_count": 4,
+                             "discount_min": 30, "discount_max": 90},
             )
+
+        assert state.global_pick_index == initial_pick_index
+
+
+class TestSpecialtyShopPricing:
+    """Test that Specialty Shop uses power-based pricing."""
+
+    def test_shop_uses_power_pricing(self) -> None:
+        """Specialty Shop items should be priced based on power, not rarity."""
+        from sites_discovery import compute_power_price, prepare_shop_items
+
+        instances = [
+            _make_instance(instance_id=i, name=f"Card {i}", power=1.0 + i * 0.5)
+            for i in range(4)
+        ]
+        rng = random.Random(42)
+        shop_config = {
+            "reroll_cost": 50,
+            "items_count": 4,
+            "discount_min": 30,
+            "discount_max": 90,
+        }
+
+        items = prepare_shop_items(instances, rng, shop_config)
+
+        for i, item in enumerate(items):
+            expected_base = compute_power_price(instances[i].design.power)
+            assert item.base_price == expected_base
+
+
+class TestSpecialtyShopReroll:
+    """Test that reroll re-draws from cube without advancing draft."""
+
+    def test_reroll_does_not_advance_draft(self) -> None:
+        """Rerolling in Specialty Shop should not advance the draft."""
+        from sites_discovery import run_specialty_shop
+
+        state = _make_quest_state(essence=500)
+        initial_pick_index = state.global_pick_index
+
+        # First call: select reroll (last index = items_count = 4)
+        # Second call: select nothing (empty list to exit)
+        call_count = [0]
+        def mock_multi_select(options, render_fn=None):
+            call_count[0] += 1
+            if call_count[0] == 1:
+                return [len(options) - 1]  # Select reroll
+            return []  # Buy nothing
+
+        with patch("sites_discovery.multi_select", side_effect=mock_multi_select):
+            run_specialty_shop(
+                state=state,
+                logger=None,
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                is_enhanced=False,
+                shop_config={"reroll_cost": 50, "items_count": 4,
+                             "discount_min": 30, "discount_max": 90},
+            )
+
+        assert state.global_pick_index == initial_pick_index
+
+
+class TestNoOldImports:
+    """Test that old imports are removed."""
+
+    def test_no_algorithm_import(self) -> None:
+        """sites_discovery should not import algorithm."""
+        import importlib
+        import sites_discovery
+        importlib.reload(sites_discovery)
+        assert not hasattr(sites_discovery, "select_cards")
+
+    def test_no_pool_import(self) -> None:
+        """sites_discovery should not import pool."""
+        import importlib
+        import sites_discovery
+        importlib.reload(sites_discovery)
+        assert not hasattr(sites_discovery, "increment_staleness")
+        assert not hasattr(sites_discovery, "remove_entry")
+
+    def test_no_tags_import(self) -> None:
+        """sites_discovery should not import tags."""
+        import importlib
+        import sites_discovery
+        importlib.reload(sites_discovery)
+        assert not hasattr(sites_discovery, "select_theme")
+        assert not hasattr(sites_discovery, "filter_pool_by_tag")

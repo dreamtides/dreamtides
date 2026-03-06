@@ -1,59 +1,140 @@
 """Discovery Draft and Specialty Shop site interactions.
 
-Discovery Draft uses the tag system to select a theme, filters the pool
-to cards matching that tag, and offers 4 cards to pick from. Enhanced
-(Arcane biome) allows picking any number of offered cards.
+Discovery Draft draws cards from the CubeManager, filters by archetype
+fitness for the player's top archetype(s), and offers 4 cards to pick
+from. Enhanced (Arcane biome) allows picking any number of offered
+cards. Neither site advances the draft pick counter.
 
-Specialty Shop is the same as a regular Shop but items are filtered to
-a tag-selected theme. Each item has an independent chance of being discounted.
+Specialty Shop draws from the CubeManager, filters by archetype
+fitness, and uses power-based pricing. Reroll re-draws from the cube.
 """
 
 import random
 from dataclasses import dataclass
 from typing import Optional
 
-from algorithm import select_cards
+import agents
+from draft_models import CardInstance
 from input_handler import multi_select, single_select
 from jsonl_log import SessionLogger
-from models import (
-    AlgorithmParams,
-    Card,
-    PoolEntry,
-    Rarity,
-    ResonanceProfile,
-    TagProfile,
-)
-from pool import increment_staleness, remove_entry
 from quest_state import QuestState
 from render import (
     format_card,
-    resonance_profile_footer,
     site_visit_header,
     BOLD,
     DIM,
     RESET,
 )
-from tags import filter_pool_by_tag, select_theme
+import render_status
+
+_FITNESS_THRESHOLD = 0.7
+_DRAW_BATCH_SIZE = 30
+_CARDS_PER_PICK = 4
+_PICKS_PER_SITE = 2
+_MIN_PRICE = 5
+_MAX_PRICE = 100
 
 
 @dataclass
 class ShopItem:
     """A single item in a shop display with pricing."""
 
-    entry: PoolEntry
+    instance: CardInstance
     base_price: int
     discounted_price: Optional[int]
 
+    @property
+    def effective_price(self) -> int:
+        """Return the effective price (discounted if applicable)."""
+        if self.discounted_price is not None:
+            return self.discounted_price
+        return self.base_price
 
-def _compute_price(rarity: Rarity, shop_config: dict[str, int]) -> int:
-    """Return the base price for a card of the given rarity."""
-    price_map: dict[Rarity, int] = {
-        Rarity.COMMON: shop_config["price_common"],
-        Rarity.UNCOMMON: shop_config["price_uncommon"],
-        Rarity.RARE: shop_config["price_rare"],
-        Rarity.LEGENDARY: shop_config["price_legendary"],
-    }
-    return price_map[rarity]
+
+def _top_archetypes(w: list[float], max_count: int = 2) -> list[int]:
+    """Return indices of the top archetype(s) from the preference vector.
+
+    Always returns the top archetype. Includes the second-best if it
+    is within 50% of the top weight.
+    """
+    if not w:
+        return []
+    indexed = sorted(range(len(w)), key=lambda i: w[i], reverse=True)
+    result = [indexed[0]]
+    if max_count >= 2 and len(indexed) >= 2:
+        top_val = w[indexed[0]]
+        second_val = w[indexed[1]]
+        if top_val > 0 and second_val >= top_val * 0.5:
+            result.append(indexed[1])
+    return result
+
+
+def _has_high_fitness(
+    card: CardInstance,
+    archetype_indices: list[int],
+    threshold: float,
+) -> bool:
+    """Return True if card has fitness >= threshold for any of the given archetypes."""
+    fitness = card.design.fitness
+    for idx in archetype_indices:
+        if idx < len(fitness) and fitness[idx] >= threshold:
+            return True
+    return False
+
+
+def draw_and_filter(
+    state: QuestState,
+    count: int,
+    batch_size: int = _DRAW_BATCH_SIZE,
+) -> list[CardInstance]:
+    """Draw cards from the cube and filter by archetype fitness.
+
+    Draws a batch from the CubeManager, filters to cards with
+    fitness >= 0.7 for the player's top archetype(s), and returns
+    up to `count` filtered cards. If not enough high-fitness cards
+    are found, relaxes the threshold or returns what is available.
+    """
+    top_archs = _top_archetypes(state.human_agent.w)
+    drawn = state.cube.draw(batch_size, state.rng)
+
+    # Filter to high-fitness cards
+    filtered = [
+        card for card in drawn
+        if _has_high_fitness(card, top_archs, _FITNESS_THRESHOLD)
+    ]
+
+    if len(filtered) >= count:
+        return filtered[:count]
+
+    # Not enough: try drawing more
+    extra = state.cube.draw(batch_size, state.rng)
+    for card in extra:
+        if _has_high_fitness(card, top_archs, _FITNESS_THRESHOLD):
+            filtered.append(card)
+        if len(filtered) >= count:
+            break
+
+    if len(filtered) >= count:
+        return filtered[:count]
+
+    # Still not enough: relax threshold to 0.4
+    relaxed_threshold = 0.4
+    relaxed = [
+        card for card in drawn + extra
+        if _has_high_fitness(card, top_archs, relaxed_threshold)
+    ]
+
+    if relaxed:
+        return relaxed[:count]
+
+    # Last resort: return whatever was drawn
+    return (drawn + extra)[:count]
+
+
+def compute_power_price(power: float) -> int:
+    """Compute price based on card power: round(power * 25) clamped to [5, 100]."""
+    raw = round(power * 25)
+    return max(_MIN_PRICE, min(_MAX_PRICE, raw))
 
 
 def _apply_discount(
@@ -68,116 +149,18 @@ def _apply_discount(
     return max(10, round(discounted / 10) * 10)
 
 
-def _select_discovery_cards(
-    pool: list[PoolEntry],
-    resonance_profile: ResonanceProfile,
-    tag_profile: TagProfile,
-    params: AlgorithmParams,
-    rng: random.Random,
-    cards_per_pick: int,
-    tag_config: dict[str, float],
-) -> Optional[tuple[list[tuple[PoolEntry, float]], Optional[str]]]:
-    """Select cards for a discovery draft pick.
-
-    Returns (selected_entries_with_weights, theme_tag) or None if pool
-    is empty. Theme tag is None when falling back to unthemed selection.
-    """
-    if not pool:
-        return None
-
-    theme = select_theme(
-        pool=pool,
-        profile=tag_profile,
-        rng=rng,
-        min_theme_cards=int(tag_config["min_theme_cards"]),
-        tag_scale=tag_config["scale"],
-        relevance_boost=tag_config["relevance_boost"],
-        depth_factor=tag_config["depth_factor"],
-    )
-
-    if theme is not None:
-        filtered = filter_pool_by_tag(pool, theme)
-        selected = select_cards(
-            filtered, cards_per_pick, resonance_profile, params, rng
-        )
-        if selected:
-            return (selected, theme)
-
-    # Fallback to unthemed selection
-    selected = select_cards(pool, cards_per_pick, resonance_profile, params, rng)
-    if selected:
-        return (selected, None)
-
-    return None
-
-
-def _apply_discovery_pick(
-    offered: list[tuple[PoolEntry, float]],
-    picked_indices: list[int],
-) -> tuple[list[PoolEntry], list[PoolEntry]]:
-    """Split offered entries into picked and unpicked based on indices.
-
-    Returns (picked_entries, unpicked_entries).
-    """
-    picked_set = set(picked_indices)
-    picked = [offered[i][0] for i in range(len(offered)) if i in picked_set]
-    unpicked = [offered[i][0] for i in range(len(offered)) if i not in picked_set]
-    return (picked, unpicked)
-
-
-def _select_specialty_items(
-    pool: list[PoolEntry],
-    resonance_profile: ResonanceProfile,
-    tag_profile: TagProfile,
-    params: AlgorithmParams,
-    rng: random.Random,
-    items_count: int,
-    tag_config: dict[str, float],
-) -> Optional[tuple[list[tuple[PoolEntry, float]], Optional[str]]]:
-    """Select items for a specialty shop.
-
-    Returns (selected_entries_with_weights, theme_tag) or None if pool
-    is empty. Theme tag is None when falling back to unthemed selection.
-    """
-    if not pool:
-        return None
-
-    theme = select_theme(
-        pool=pool,
-        profile=tag_profile,
-        rng=rng,
-        min_theme_cards=int(tag_config["min_theme_cards"]),
-        tag_scale=tag_config["scale"],
-        relevance_boost=tag_config["relevance_boost"],
-        depth_factor=tag_config["depth_factor"],
-    )
-
-    if theme is not None:
-        filtered = filter_pool_by_tag(pool, theme)
-        selected = select_cards(filtered, items_count, resonance_profile, params, rng)
-        if selected:
-            return (selected, theme)
-
-    # Fallback to unthemed selection
-    selected = select_cards(pool, items_count, resonance_profile, params, rng)
-    if selected:
-        return (selected, None)
-
-    return None
-
-
-def _prepare_shop_items(
-    selected: list[tuple[PoolEntry, float]],
+def prepare_shop_items(
+    instances: list[CardInstance],
     rng: random.Random,
     shop_config: dict[str, int],
 ) -> list[ShopItem]:
-    """Prepare shop items with prices and per-item discount probability."""
+    """Prepare shop items with power-based prices and per-item discount chance."""
     items: list[ShopItem] = []
-    for entry, _weight in selected:
-        base_price = _compute_price(entry.card.rarity, shop_config)
+    for inst in instances:
+        base_price = compute_power_price(inst.design.power)
         items.append(
             ShopItem(
-                entry=entry,
+                instance=inst,
                 base_price=base_price,
                 discounted_price=None,
             )
@@ -197,69 +180,61 @@ def _prepare_shop_items(
     return items
 
 
-def _effective_price(item: ShopItem) -> int:
-    """Return the effective price for a shop item (discounted if applicable)."""
-    if item.discounted_price is not None:
-        return item.discounted_price
-    return item.base_price
+def _update_human_agent(state: QuestState, card: CardInstance) -> None:
+    """Update the human agent after picking a card.
 
-
-def _total_cost(items: list[ShopItem], indices: list[int]) -> int:
-    """Compute total cost for the selected item indices."""
-    return sum(_effective_price(items[i]) for i in indices)
+    Calls update_agent_after_pick with a synthetic pack context since
+    Discovery Draft and Specialty Shop operate outside the draft loop.
+    """
+    cfg = state.draft_cfg
+    agents.update_agent_after_pick(
+        state.human_agent,
+        card,
+        [],  # No visible remaining cards from a pack
+        state.global_pick_index,
+        state.round_index,
+        "discovery",  # Synthetic pack_id
+        cfg.agents.learning_rate,
+        cfg.agents.openness_window,
+    )
 
 
 def run_discovery_draft(
     state: QuestState,
-    params: AlgorithmParams,
     logger: Optional[SessionLogger],
     dreamscape_name: str,
     dreamscape_number: int,
     is_enhanced: bool,
-    cards_per_pick: int,
-    picks_per_site: int,
-    tag_config: dict[str, float],
+    picks_per_site: int = _PICKS_PER_SITE,
+    cards_per_pick: int = _CARDS_PER_PICK,
 ) -> None:
     """Run a Discovery Draft site interaction.
 
-    Selects a theme tag, filters pool to matching cards, offers 4 per pick.
-    Normal: pick 1. Enhanced (Arcane): pick any number.
+    Draws cards from the CubeManager, filters by archetype fitness,
+    and offers cards to pick from. Does NOT advance the draft pick
+    counter. Normal: pick 1. Enhanced (Arcane): pick any number.
     """
     for pick_num in range(1, picks_per_site + 1):
-        result = _select_discovery_cards(
-            pool=state.pool,
-            resonance_profile=state.resonance_profile,
-            tag_profile=state.tag_profile,
-            params=params,
-            rng=state.rng,
-            cards_per_pick=cards_per_pick,
-            tag_config=tag_config,
-        )
+        offered = draw_and_filter(state, count=cards_per_pick)
 
-        if result is None:
-            print(f"  {DIM}No cards available in pool.{RESET}")
+        if not offered:
+            print(f"  {DIM}No cards available.{RESET}")
             break
 
-        offered, theme_tag = result
-
         # Build header
-        theme_label = f" [{theme_tag}]" if theme_tag else ""
-        label = f"Discovery Draft{theme_label}"
+        label = "Discovery Draft"
         pick_info = f"Pick {pick_num}/{picks_per_site}"
         header = site_visit_header(dreamscape_name, label, pick_info, dreamscape_number)
         print(header)
         print()
 
-        # Display offered cards
-        card_names = [entry.card.name for entry, _ in offered]
+        card_names = [inst.design.name for inst in offered]
 
         if is_enhanced:
-            # Enhanced: multi-select any number
             def _render_multi(
                 idx: int, option: str, highlighted: bool, checked: bool
             ) -> str:
-                entry, _ = offered[idx]
-                lines = format_card(entry.card, highlighted=highlighted)
+                lines = format_card(offered[idx], highlighted=highlighted)
                 check = "[x]" if checked else "[ ]"
                 marker = ">" if highlighted else " "
                 lines[0] = lines[0].replace(
@@ -271,100 +246,73 @@ def run_discovery_draft(
 
             selected_indices = multi_select(card_names, render_fn=_render_multi)
         else:
-            # Normal: single-select pick 1
             def _render_single(idx: int, option: str, highlighted: bool) -> str:
-                entry, _ = offered[idx]
-                lines = format_card(entry.card, highlighted=highlighted)
+                lines = format_card(offered[idx], highlighted=highlighted)
                 return "\n".join(lines)
 
             selected_idx = single_select(card_names, render_fn=_render_single)
             selected_indices = [selected_idx]
 
-        picked, unpicked = _apply_discovery_pick(offered, selected_indices)
+        # Process picks
+        for idx in selected_indices:
+            card = offered[idx]
+            state.add_card(card)
+            _update_human_agent(state, card)
 
-        # Add picked cards to deck and remove from pool
-        for entry in picked:
-            state.add_card(entry.card)
-            remove_entry(state.pool, entry)
-
-        # Increment staleness on unpicked
-        increment_staleness(unpicked)
-
-        # Log each picked card
+        # Log picks
         if logger is not None:
-            offered_cards = [e.card for e, _ in offered]
-            weights = [w for _, w in offered]
-            for entry in picked:
-                logger.log_draft_pick(
-                    offered_cards=offered_cards,
-                    weights=weights,
-                    picked_card=entry.card,
-                    profile_snapshot=state.resonance_profile.snapshot(),
+            for idx in selected_indices:
+                card = offered[idx]
+                logger.log_site_visit(
+                    site_type="DiscoveryDraft",
+                    dreamscape=dreamscape_name,
+                    is_enhanced=is_enhanced,
+                    choices=[inst.design.name for inst in offered],
+                    choice_made=card.design.name,
+                    state_changes={
+                        "pick_num": pick_num,
+                        "deck_size_after": state.deck_count(),
+                    },
                 )
 
-    # Log the overall site visit
-    if logger is not None:
-        logger.log_site_visit(
-            site_type="DiscoveryDraft",
-            dreamscape=dreamscape_name,
-            is_enhanced=is_enhanced,
-            choices=[],
-            choice_made=None,
-            state_changes={
-                "picks_completed": picks_per_site,
-                "deck_size_after": state.deck_count(),
-            },
-            profile_snapshot=state.resonance_profile.snapshot(),
-        )
-
-    # Show resonance profile footer
+    # Show archetype preference footer
     print(
-        resonance_profile_footer(
-            state.resonance_profile.snapshot(),
-            state.deck_count(),
-            state.essence,
+        render_status.archetype_preference_footer(
+            w=state.human_agent.w,
+            deck_count=state.deck_count(),
+            essence=state.essence,
         )
     )
 
 
 def run_specialty_shop(
     state: QuestState,
-    params: AlgorithmParams,
     logger: Optional[SessionLogger],
     dreamscape_name: str,
     dreamscape_number: int,
     is_enhanced: bool,
     shop_config: dict[str, int],
-    tag_config: dict[str, float],
 ) -> None:
     """Run a Specialty Shop site interaction.
 
-    Selects a theme tag, filters pool to matching cards, displays items
-    with rarity-based prices and per-item discount probability. Player
-    buys via multi-select. Reroll costs 50 essence.
+    Draws from the CubeManager, filters by archetype fitness, displays
+    items with power-based prices. Does NOT advance the draft pick
+    counter. Reroll re-draws from the cube.
     """
-    while True:
-        items_count = shop_config["items_count"]
-        result = _select_specialty_items(
-            pool=state.pool,
-            resonance_profile=state.resonance_profile,
-            tag_profile=state.tag_profile,
-            params=params,
-            rng=state.rng,
-            items_count=items_count,
-            tag_config=tag_config,
-        )
+    items_count = shop_config.get("items_count", 4)
+    reroll_cost = shop_config.get("reroll_cost", 50)
 
-        if result is None:
+    while True:
+        drawn = draw_and_filter(state, count=items_count)
+
+        if not drawn:
             print(f"  {DIM}No items available.{RESET}")
             break
 
-        selected, theme_tag = result
-        items = _prepare_shop_items(selected, state.rng, shop_config)
+        items = prepare_shop_items(drawn, state.rng, shop_config)
 
         # Build header
-        theme_label = f" [{theme_tag}]" if theme_tag else ""
-        label = f"Specialty Shop{theme_label}"
+        label = "Specialty Shop"
         header = site_visit_header(dreamscape_name, label, "Browse", dreamscape_number)
         print(header)
         print()
@@ -376,10 +324,9 @@ def run_specialty_shop(
                 price_str = f"{item.discounted_price}e (was {item.base_price}e)"
             else:
                 price_str = f"{item.base_price}e"
-            option_names.append(f"{item.entry.card.name} -- {price_str}")
+            option_names.append(f"{item.instance.design.name} -- {price_str}")
 
         # Add reroll option
-        reroll_cost = shop_config["reroll_cost"]
         can_afford_reroll = state.essence >= reroll_cost
         reroll_label = f"Reroll ({reroll_cost}e)"
         if not can_afford_reroll:
@@ -392,7 +339,7 @@ def run_specialty_shop(
         ) -> str:
             if idx < len(items):
                 shop_item = items[idx]
-                lines = format_card(shop_item.entry.card, highlighted=highlighted)
+                lines = format_card(shop_item.instance, highlighted=highlighted)
                 check = "[x]" if checked else "[ ]"
                 marker = ">" if highlighted else " "
 
@@ -429,7 +376,7 @@ def run_specialty_shop(
         purchase_indices = [i for i in toggled if i < len(items)]
 
         # Compute total cost
-        total = _total_cost(items, purchase_indices)
+        total = sum(items[i].effective_price for i in purchase_indices)
 
         # Check affordability
         if total > state.essence:
@@ -437,47 +384,39 @@ def run_specialty_shop(
             continue
 
         # Apply purchases
-        purchased_cards: list[Card] = []
+        purchased: list[CardInstance] = []
         for idx in purchase_indices:
             shop_item = items[idx]
-            state.add_card(shop_item.entry.card)
-            remove_entry(state.pool, shop_item.entry)
-            purchased_cards.append(shop_item.entry.card)
-            state.spend_essence(_effective_price(shop_item))
+            state.add_card(shop_item.instance)
+            _update_human_agent(state, shop_item.instance)
+            purchased.append(shop_item.instance)
+            state.spend_essence(shop_item.effective_price)
 
         # Log the shop interaction
         if logger is not None:
-            if purchased_cards:
-                items_shown = [items[i].entry.card for i in range(len(items))]
-                logger.log_shop_purchase(
-                    items_shown=items_shown,
-                    items_bought=purchased_cards,
-                    essence_spent=total,
-                )
             logger.log_site_visit(
                 site_type="SpecialtyShop",
                 dreamscape=dreamscape_name,
                 is_enhanced=is_enhanced,
-                choices=[item.entry.card.name for item in items],
+                choices=[item.instance.design.name for item in items],
                 choice_made=(
-                    ", ".join(c.name for c in purchased_cards)
-                    if purchased_cards
+                    ", ".join(c.design.name for c in purchased)
+                    if purchased
                     else None
                 ),
                 state_changes={
-                    "items_bought": [c.name for c in purchased_cards],
+                    "items_bought": [c.design.name for c in purchased],
                     "essence_spent": total,
                     "deck_size_after": state.deck_count(),
                 },
-                profile_snapshot=state.resonance_profile.snapshot(),
             )
         break
 
-    # Show resonance profile footer
+    # Show archetype preference footer
     print(
-        resonance_profile_footer(
-            state.resonance_profile.snapshot(),
-            state.deck_count(),
-            state.essence,
+        render_status.archetype_preference_footer(
+            w=state.human_agent.w,
+            deck_count=state.deck_count(),
+            essence=state.essence,
         )
     )
