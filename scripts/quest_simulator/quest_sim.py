@@ -66,9 +66,10 @@ def _build_draft_config() -> SimulatorConfig:
     cfg.agents.openness_window = 3
     cfg.cards.archetype_count = 8
     cfg.cards.source = "synthetic"
-    cfg.cube.distinct_cards = 540
+    cfg.cube.distinct_cards = 360
     cfg.cube.copies_per_card = 1
     cfg.cube.consumption_mode = "with_replacement"
+    cfg.rarity.enabled = True
     cfg.refill.strategy = "no_refill"
     cfg.pack_generation.strategy = "seeded_themed"
     return cfg
@@ -101,10 +102,13 @@ def main() -> None:
     # Generate synthetic card pool
     cards = card_generator.generate_cards(cfg, rng)
 
-    # Create cube with replacement mode
+    # Create cube with rarity-based copy counts and replacement mode
+    copies_per_card: int | dict[str, int] = cube_manager.build_copies_map(
+        cards, cfg.rarity
+    )
     cube = cube_manager.CubeManager(
         designs=cards,
-        copies_per_card=1,
+        copies_per_card=copies_per_card,
         consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
     )
 
