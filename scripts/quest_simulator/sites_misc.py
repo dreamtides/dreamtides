@@ -157,9 +157,9 @@ def run_duplication(
         chosen_name = _deck_card_name(chosen_dc)
         chosen_copies = copy_counts[selected_index]
 
-        # Add copies to deck (duplicate the same instance reference)
+        # Add copies to deck preserving all metadata flags
         for _ in range(chosen_copies):
-            state.deck.append(DeckCard(instance=chosen_dc.instance))
+            state.duplicate_card(chosen_dc)
 
         print()
         print(

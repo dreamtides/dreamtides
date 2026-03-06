@@ -146,7 +146,6 @@ def run_dreamsign_offering(
                     "dreamsign_added": None,
                     "dreamsign_count": state.dreamsign_count(),
                 },
-                profile_snapshot=None,
             )
         footer = render_status.archetype_preference_footer(
             w=state.human_agent.w,
@@ -225,7 +224,6 @@ def run_dreamsign_offering(
                 "dreamsign_added": chosen.name if chosen is not None else None,
                 "dreamsign_count": state.dreamsign_count(),
             },
-            profile_snapshot=None,
         )
 
     # Show archetype preference footer
@@ -273,7 +271,6 @@ def run_dreamsign_draft(
                     "dreamsign_added": None,
                     "dreamsign_count": state.dreamsign_count(),
                 },
-                profile_snapshot=None,
             )
         footer = render_status.archetype_preference_footer(
             w=state.human_agent.w,
@@ -336,7 +333,6 @@ def run_dreamsign_draft(
                 "dreamsign_added": chosen.name if chosen is not None else None,
                 "dreamsign_count": state.dreamsign_count(),
             },
-            profile_snapshot=None,
         )
 
     # Show archetype preference footer

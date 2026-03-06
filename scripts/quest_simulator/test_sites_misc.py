@@ -4,7 +4,7 @@ import random
 import sys
 from pathlib import Path
 from typing import Optional
-from unittest.mock import patch
+from unittest.mock import create_autospec, patch
 
 _DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
 if _DRAFT_SIM_DIR not in sys.path:
@@ -202,28 +202,26 @@ class TestRunDuplication:
         assert state.deck_count() == initial_deck_size
 
     def test_duplication_with_logger(self) -> None:
-        """Duplication should log the interaction."""
+        """Duplication should log the interaction with correct signature."""
+        from jsonl_log import SessionLogger
         from sites_misc import run_duplication
 
         state = _make_quest_state()
         _populate_deck(state, 5)
 
-        log_calls: list[dict[str, object]] = []
-
-        class FakeLogger:
-            def log_site_visit(self, **kwargs: object) -> None:
-                log_calls.append(dict(kwargs))
+        mock_logger = create_autospec(SessionLogger, instance=True)
 
         with patch("sites_misc.input_handler.single_select", return_value=0):
             run_duplication(
                 state=state,
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
-                logger=FakeLogger(),  # type: ignore[arg-type]
+                logger=mock_logger,
             )
 
-        assert len(log_calls) == 1
-        assert log_calls[0]["site_type"] == "Duplication"
+        mock_logger.log_site_visit.assert_called_once()
+        call_kwargs = mock_logger.log_site_visit.call_args[1]
+        assert call_kwargs["site_type"] == "Duplication"
 
     def test_duplication_empty_deck(self) -> None:
         """Duplication with an empty deck should handle gracefully."""
@@ -262,6 +260,29 @@ class TestRunDuplication:
 
         assert state.deck_count() == 2
         assert state.deck[0].instance is state.deck[1].instance
+
+    def test_duplication_preserves_bane_flag(self) -> None:
+        """Duplicating a bane card should preserve the is_bane flag."""
+        from sites_misc import run_duplication
+
+        state = _make_quest_state()
+        bane_instance = _make_card_instance("Bane Card", 99)
+        state.deck.append(DeckCard(instance=bane_instance, is_bane=True))
+
+        with patch("sites_misc.input_handler.single_select", return_value=0), patch(
+            "sites_misc.select_duplication_candidates",
+            return_value=([state.deck[0]], [1]),
+        ):
+            run_duplication(
+                state=state,
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        assert state.deck_count() == 2
+        assert state.deck[1].is_bane is True
+        assert state.deck[1].instance is state.deck[0].instance
 
 
 # --- Reward Site Tests ---
@@ -354,16 +375,13 @@ class TestRunReward:
         assert state.essence == 100
 
     def test_reward_with_logger(self) -> None:
-        """Reward site should log the interaction."""
+        """Reward site should log the interaction with correct signature."""
+        from jsonl_log import SessionLogger
         from sites_misc import run_reward
 
         state = _make_quest_state(essence=100, completion_level=0)
 
-        log_calls: list[dict[str, object]] = []
-
-        class FakeLogger:
-            def log_site_visit(self, **kwargs: object) -> None:
-                log_calls.append(dict(kwargs))
+        mock_logger = create_autospec(SessionLogger, instance=True)
 
         with patch(
             "sites_misc.input_handler.confirm_decline", return_value=True
@@ -375,12 +393,13 @@ class TestRunReward:
                 state=state,
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
-                logger=FakeLogger(),  # type: ignore[arg-type]
+                logger=mock_logger,
                 all_dreamsigns=[],
             )
 
-        assert len(log_calls) == 1
-        assert log_calls[0]["site_type"] == "RewardSite"
+        mock_logger.log_site_visit.assert_called_once()
+        call_kwargs = mock_logger.log_site_visit.call_args[1]
+        assert call_kwargs["site_type"] == "RewardSite"
 
 
 # --- Cleanse Tests ---
@@ -531,26 +550,24 @@ class TestRunCleanse:
         assert len(remaining_banes) == 2  # 5 - 3 = 2
 
     def test_cleanse_with_logger(self) -> None:
-        """Cleanse should log the interaction."""
+        """Cleanse should log the interaction with correct signature."""
+        from jsonl_log import SessionLogger
         from sites_misc import run_cleanse
 
         state = _make_quest_state()
         bane_instance = _make_card_instance("Bane Card", 99)
         state.deck.append(DeckCard(instance=bane_instance, is_bane=True))
 
-        log_calls: list[dict[str, object]] = []
-
-        class FakeLogger:
-            def log_site_visit(self, **kwargs: object) -> None:
-                log_calls.append(dict(kwargs))
+        mock_logger = create_autospec(SessionLogger, instance=True)
 
         with patch("sites_misc.input_handler.confirm_decline", return_value=True):
             run_cleanse(
                 state=state,
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
-                logger=FakeLogger(),  # type: ignore[arg-type]
+                logger=mock_logger,
             )
 
-        assert len(log_calls) == 1
-        assert log_calls[0]["site_type"] == "Cleanse"
+        mock_logger.log_site_visit.assert_called_once()
+        call_kwargs = mock_logger.log_site_visit.call_args[1]
+        assert call_kwargs["site_type"] == "Cleanse"

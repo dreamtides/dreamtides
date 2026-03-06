@@ -44,9 +44,6 @@ _EFFECT_TYPE_LABELS: dict[EffectType, str] = {
     EffectType.ADD_BANE_DREAMSIGN: "Gain bane dreamsign",
 }
 
-_bane_instance_counter: int = 0
-
-
 def select_journeys(
     all_journeys: list[Journey],
     rng: random.Random,
@@ -165,8 +162,6 @@ def _add_random_bane_card(
 
     Returns the bane card name or None.
     """
-    global _bane_instance_counter
-
     if not all_banes:
         return None
 
@@ -181,9 +176,9 @@ def _add_random_bane_card(
         flex=0.0,
     )
 
-    _bane_instance_counter += 1
+    state.bane_instance_counter += 1
     instance = CardInstance(
-        instance_id=BANE_INSTANCE_ID_OFFSET + _bane_instance_counter,
+        instance_id=BANE_INSTANCE_ID_OFFSET + state.bane_instance_counter,
         design=design,
     )
 

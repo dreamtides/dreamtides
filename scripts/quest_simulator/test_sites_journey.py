@@ -4,7 +4,7 @@ import random
 import sys
 from pathlib import Path
 from typing import Optional
-from unittest.mock import patch
+from unittest.mock import create_autospec, patch
 
 _DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
 if _DRAFT_SIM_DIR not in sys.path:
@@ -441,6 +441,7 @@ class TestRunDreamJourney:
         )
 
     def test_logs_interaction(self) -> None:
+        from jsonl_log import SessionLogger
         from sites_journey import run_dream_journey
 
         state = _make_quest_state(essence=100)
@@ -448,11 +449,8 @@ class TestRunDreamJourney:
             Journey("Essence A", "Add 75", EffectType.ADD_ESSENCE, 75),
             Journey("Essence B", "Add 100", EffectType.ADD_ESSENCE, 100),
         ]
-        log_calls: list[dict[str, object]] = []
 
-        class FakeLogger:
-            def log_site_visit(self, **kwargs: object) -> None:
-                log_calls.append(kwargs)
+        mock_logger = create_autospec(SessionLogger, instance=True)
 
         with patch("sites_journey.input_handler.single_select", return_value=0):
             run_dream_journey(
@@ -461,11 +459,12 @@ class TestRunDreamJourney:
                 all_dreamsigns=_make_dreamsigns(),
                 dreamscape_name="Test",
                 dreamscape_number=1,
-                logger=FakeLogger(),  # type: ignore[arg-type]
+                logger=mock_logger,
             )
 
-        assert len(log_calls) == 1
-        assert log_calls[0]["site_type"] == "DreamJourney"
+        mock_logger.log_site_visit.assert_called_once()
+        call_kwargs = mock_logger.log_site_visit.call_args[1]
+        assert call_kwargs["site_type"] == "DreamJourney"
 
 
 # ===========================================================================
@@ -784,6 +783,7 @@ class TestRunTemptingOffer:
         )
 
     def test_logs_interaction(self) -> None:
+        from jsonl_log import SessionLogger
         from sites_journey import run_tempting_offer
 
         state = _make_quest_state(essence=200)
@@ -809,11 +809,8 @@ class TestRunTemptingOffer:
                 cost_value=25,
             ),
         ]
-        log_calls: list[dict[str, object]] = []
 
-        class FakeLogger:
-            def log_site_visit(self, **kwargs: object) -> None:
-                log_calls.append(kwargs)
+        mock_logger = create_autospec(SessionLogger, instance=True)
 
         with patch("sites_journey.input_handler.single_select", return_value=0):
             run_tempting_offer(
@@ -823,8 +820,9 @@ class TestRunTemptingOffer:
                 all_dreamsigns=_make_dreamsigns(),
                 dreamscape_name="Test",
                 dreamscape_number=1,
-                logger=FakeLogger(),  # type: ignore[arg-type]
+                logger=mock_logger,
             )
 
-        assert len(log_calls) == 1
-        assert log_calls[0]["site_type"] == "TemptingOffer"
+        mock_logger.log_site_visit.assert_called_once()
+        call_kwargs = mock_logger.log_site_visit.call_args[1]
+        assert call_kwargs["site_type"] == "TemptingOffer"
