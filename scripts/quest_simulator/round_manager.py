@@ -2,13 +2,20 @@
 
 Advances the 6-seat draft loop one human pick at a time. Generates
 packs at round boundaries, runs AI picks at seats 1-5, and rotates
-packs after each completed pick step. Mirrors the structure of
-draft_runner.py's main loop using the same sub-functions.
+packs after each completed pick step.
+
+This module mirrors the round/pick/seat structure of
+draft_runner.run_draft() (lines 112-203) but operates incrementally
+rather than in batch. It delegates to the same sub-functions
+(pack_generator.generate_pack, agents.pick_card,
+agents.update_agent_after_pick, draft_runner._rotate_packs) to
+ensure behavioral parity with the canonical draft loop.
 """
 
 import random
 
 import agents
+import draft_runner
 import pack_generator
 from draft_models import CardInstance, Pack
 
@@ -97,16 +104,7 @@ def complete_human_pick(state, chosen_card, shown_cards):
         cfg.agents.openness_window,
     )
 
-    # Rotate packs left: [packs[-1]] + packs[:-1]
-    state.packs = [state.packs[-1]] + state.packs[:-1]
-
-    state.round_pick_count += 1
-    state.global_pick_index += 1
-
-    if state.round_pick_count >= PICKS_PER_ROUND:
-        state.round_pick_count = 0
-        state.round_index += 1
-        state.packs = None
+    _rotate_and_advance(state)
 
 
 def advance_pick_no_card(state):
@@ -116,8 +114,17 @@ def advance_pick_no_card(state):
     from the pack, but packs still rotate and counters increment.
     The human agent is not updated since no card was selected.
     """
-    # Rotate packs left
-    state.packs = [state.packs[-1]] + state.packs[:-1]
+    _rotate_and_advance(state)
+
+
+def _rotate_and_advance(state):
+    """Rotate packs and increment pick counters.
+
+    Uses draft_runner._rotate_packs() for rotation to stay in sync
+    with the canonical draft loop. Always passes left since the quest
+    uses alternate_direction=False.
+    """
+    state.packs = draft_runner._rotate_packs(state.packs, pass_left=True)
 
     state.round_pick_count += 1
     state.global_pick_index += 1
