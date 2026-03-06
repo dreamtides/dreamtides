@@ -1,76 +1,21 @@
 """Status display functions for the quest simulator.
 
-Provides the resonance profile footer, resonance bar chart, victory
-screen, site header, and battle-specific display formatting. Imports
-shared ANSI constants and box-drawing utilities from render.py.
+Provides site header, battle-specific display formatting, and
+victory screen. Imports shared ANSI constants and box-drawing
+utilities from render.py.
 """
 
 from typing import Optional
 
-from models import AlgorithmParams, Boss, Rarity, Resonance
+from models import Boss
 from render import (
     BOLD,
     CONTENT_WIDTH,
     DIM,
-    NEUTRAL_COLOR,
     RESET,
-    RESONANCE_COLORS,
-    color_resonance,
-    color_resonances,
     draw_double_separator,
     draw_separator,
 )
-
-
-def resonance_profile_footer(
-    counts: dict[Resonance, int],
-    deck_count: int,
-    essence: int,
-) -> str:
-    """Build the resonance profile footer shown after each site interaction."""
-    single_sep = draw_separator()
-    double_sep = draw_double_separator()
-
-    res_parts: list[str] = []
-    for r in Resonance:
-        c = counts.get(r, 0)
-        colored = f"{color_resonance(r)} {c}"
-        res_parts.append(colored)
-    res_line = f"  Resonance: {' | '.join(res_parts)}"
-    deck_line = f"  Deck: {deck_count} cards | Essence: {essence}"
-
-    return "\n".join([single_sep, res_line, deck_line, double_sep])
-
-
-def profile_bar(
-    profile_snapshot: dict[Resonance, int],
-    bar_width: int = 20,
-    neutral_count: int = 0,
-) -> str:
-    """Colored bar chart for all 5 resonances, sorted by count descending.
-
-    When neutral_count is provided, it is included in the percentage
-    denominator so that resonance percentages and the neutral percentage
-    together sum to 100%.
-    """
-    items = sorted(profile_snapshot.items(), key=lambda x: x[1], reverse=True)
-    total = sum(c for _, c in items) + neutral_count
-    max_count = max((c for _, c in items), default=1)
-    lines: list[str] = []
-    for res, count in items:
-        color = RESONANCE_COLORS.get(res, NEUTRAL_COLOR)
-        if count == 0:
-            bar = " " * bar_width
-            pct_str = f"{DIM}  0   (0.0%){RESET}"
-        else:
-            filled = round(count / max_count * bar_width) if max_count > 0 else 0
-            filled = max(1, min(bar_width, filled))
-            bar = f"{color}{'\u2588' * filled}{RESET}{' ' * (bar_width - filled)}"
-            pct = count / total * 100 if total > 0 else 0
-            pct_str = f"{count:3d}  ({pct:4.1f}%)"
-        name = f"{color}{res.value:8s}{RESET}"
-        lines.append(f"    {name} {bar}  {pct_str}")
-    return "\n".join(lines)
 
 
 def site_header(
@@ -110,14 +55,13 @@ def battle_header(
         else:
             encounter_label = "MINIBOSS ENCOUNTER"
         title = f"  {BOLD}BATTLE {battle_number} -- {encounter_label}{RESET}"
-        res_str = color_resonances(boss_info.resonances)
         lines: list[str] = [
             sep,
             title,
             sep,
             "",
             f"    {BOLD}>> {boss_info.name} <<{RESET}",
-            f"    Archetype: {boss_info.archetype}  ({res_str})",
+            f"    Archetype: {boss_info.archetype}",
             f'    "{boss_info.ability_text}"',
             "",
             sep,
@@ -173,18 +117,13 @@ def victory_screen(
     total_battles: int,
     dreamscapes_visited: int,
     dreamcaller_name: str,
-    dreamcaller_resonances: frozenset[Resonance],
     deck_size: int,
-    rarity_counts: dict[Rarity, int],
-    resonance_counts: dict[Resonance, int],
-    neutral_count: int,
     dreamsign_count: int,
     essence: int,
     log_path: Optional[str] = None,
 ) -> str:
     """Build the victory screen text."""
     sep = draw_double_separator()
-    dc_res = color_resonances(dreamcaller_resonances)
 
     lines: list[str] = [
         sep,
@@ -193,35 +132,13 @@ def victory_screen(
         "",
         f"  Battles won: {battles_won}/{total_battles}",
         f"  Dreamscapes visited: {dreamscapes_visited}",
-        f"  Dreamcaller: {dreamcaller_name} ({dc_res})",
+        f"  Dreamcaller: {dreamcaller_name}",
         "",
         f"  Final Deck: {deck_size} cards",
+        "",
+        f"  Dreamsigns: {dreamsign_count}",
+        f"  Essence remaining: {essence}",
     ]
-
-    # Rarity breakdown with colons and aligned columns
-    # Format: "    Common:     12 (35.3%)"
-    # The label+colon is left-padded, count is right-aligned
-    for rarity in [Rarity.COMMON, Rarity.UNCOMMON, Rarity.RARE, Rarity.LEGENDARY]:
-        c = rarity_counts.get(rarity, 0)
-        pct = c / deck_size * 100 if deck_size > 0 else 0
-        label = f"{rarity.value}:"
-        lines.append(f"    {label:12s} {c:2d} ({pct:4.1f}%)")
-
-    lines.append("")
-    lines.append("  Resonance Profile:")
-    lines.append(profile_bar(resonance_counts, neutral_count=neutral_count))
-
-    total_res = sum(resonance_counts.values()) + neutral_count
-    neutral_pct = neutral_count / total_res * 100 if total_res > 0 else 0
-    neutral_label = f"{NEUTRAL_COLOR}{'Neutral':8s}{RESET}"
-    neutral_space = " " * 20
-    lines.append(
-        f"    {neutral_label} {neutral_space}  {neutral_count:3d}  ({neutral_pct:4.1f}%)"
-    )
-
-    lines.append("")
-    lines.append(f"  Dreamsigns: {dreamsign_count}")
-    lines.append(f"  Essence remaining: {essence}")
 
     if log_path is not None:
         lines.append("")
@@ -229,65 +146,3 @@ def victory_screen(
 
     lines.append(sep)
     return "\n".join(lines)
-
-
-def pool_bias_line(variance: dict[Resonance, float]) -> str:
-    """Format per-resonance pool variance as a percentage bias line.
-
-    Each resonance is colored appropriately. Positive biases show a '+'
-    prefix, negative show '-'. The variance multiplier of 1.0 corresponds
-    to 0% bias.
-    """
-    bias_parts: list[str] = []
-    for r in sorted(variance.keys(), key=lambda r: r.value):
-        mult = variance[r]
-        pct = (mult - 1.0) * 100
-        sign = "+" if pct >= 0 else ""
-        bias_parts.append(f"{color_resonance(r)} {sign}{pct:.0f}%")
-    bias_str = ", ".join(bias_parts)
-    return f"  Pool bias: {bias_str}"
-
-
-def pool_composition_summary(
-    unique_cards: int,
-    total_entries: int,
-    rarity_entries: dict[Rarity, int],
-) -> str:
-    """Format a pool composition breakdown by rarity.
-
-    Shows the header line with unique card count and total entries,
-    followed by per-rarity entry counts and percentages.
-    """
-    lines: list[str] = [
-        f"  Draft pool: {unique_cards} cards ({total_entries} entries)",
-    ]
-    for rarity in [Rarity.COMMON, Rarity.UNCOMMON, Rarity.RARE, Rarity.LEGENDARY]:
-        count = rarity_entries.get(rarity, 0)
-        pct = count / total_entries * 100 if total_entries > 0 else 0
-        label = f"{rarity.value}:"
-        lines.append(f"    {label:12s} {count:3d} entries ({pct:4.1f}%)")
-    return "\n".join(lines)
-
-
-def algorithm_params_line(
-    active: AlgorithmParams,
-    defaults: AlgorithmParams,
-) -> Optional[str]:
-    """Format algorithm parameters when any differ from config defaults.
-
-    Returns None if all parameters match the defaults, otherwise returns
-    a formatted line showing all four parameter values.
-    """
-    if (
-        active.exponent == defaults.exponent
-        and active.floor_weight == defaults.floor_weight
-        and active.neutral_base == defaults.neutral_base
-        and active.staleness_factor == defaults.staleness_factor
-    ):
-        return None
-    return (
-        f"  Algorithm: exponent={active.exponent},"
-        f" floor={active.floor_weight},"
-        f" neutral={active.neutral_base},"
-        f" staleness={active.staleness_factor}"
-    )

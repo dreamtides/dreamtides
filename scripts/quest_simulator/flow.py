@@ -2,7 +2,7 @@
 
 Orchestrates the entire quest from atlas initialization through victory:
 atlas display, dreamscape selection, site visit loop, battle completion,
-deck limit enforcement, staleness decay, and victory detection.
+deck limit enforcement, and victory detection.
 """
 
 import traceback
@@ -10,18 +10,13 @@ from typing import Optional
 
 import atlas
 import input_handler
-import pool
 import render
 import render_atlas
-import render_cards
 import render_status
-import sites_purge
 from jsonl_log import SessionLogger
 from models import (
     DreamscapeNode,
     NodeState,
-    Rarity,
-    Resonance,
     Site,
     SiteType,
 )
@@ -60,6 +55,8 @@ def _enforce_deck_limits(
     If under min_deck, duplicates the whole deck repeatedly until it
     exceeds the minimum.
     """
+    import sites_purge
+
     if state.is_over_deck_limit():
         sites_purge.forced_deck_limit_purge(state, logger)
 
@@ -87,14 +84,12 @@ def _handle_post_battle(
     """Handle post-battle bookkeeping.
 
     Marks the dreamscape as completed, generates new atlas nodes,
-    increments completion level, decays staleness, and checks for
-    victory.
+    increments completion level, and checks for victory.
 
     Returns True if the quest is won.
     """
     state.increment_completion()
     atlas.complete_node(nodes, node_id, state.rng)
-    pool.decay_staleness(state.pool)
 
     return state.completion_level >= total_battles
 
@@ -110,26 +105,13 @@ def _show_victory(
     dreamcaller_name = (
         state.dreamcaller.name if state.dreamcaller is not None else "None"
     )
-    dreamcaller_resonances: frozenset[Resonance] = (
-        state.dreamcaller.resonances if state.dreamcaller is not None else frozenset()
-    )
-
-    rarity_counts = state.deck_by_rarity()
-    resonance_counts = state.resonance_profile.snapshot()
-
-    # Count neutral cards (cards with no resonances)
-    neutral_count = sum(1 for dc in state.deck if not dc.card.resonances)
 
     screen = render_status.victory_screen(
         battles_won=state.completion_level,
         total_battles=total_battles,
         dreamscapes_visited=dreamscapes_visited,
         dreamcaller_name=dreamcaller_name,
-        dreamcaller_resonances=dreamcaller_resonances,
         deck_size=state.deck_count(),
-        rarity_counts=rarity_counts,
-        resonance_counts=resonance_counts,
-        neutral_count=neutral_count,
         dreamsign_count=state.dreamsign_count(),
         essence=state.essence,
         log_path=log_path,
@@ -139,7 +121,6 @@ def _show_victory(
     if logger is not None:
         logger.log_session_end(
             deck=state.deck,
-            resonance_profile=state.resonance_profile,
             essence=state.essence,
             completion_level=state.completion_level,
             dreamsigns=state.dreamsigns,
@@ -149,6 +130,8 @@ def _show_victory(
 
 def _show_deck_view(state: QuestState) -> None:
     """Display the full deck viewer and wait for dismissal."""
+    import render_cards
+
     output = render_cards.render_full_deck_view(
         deck_cards=state.deck,
         dreamsigns=state.dreamsigns,

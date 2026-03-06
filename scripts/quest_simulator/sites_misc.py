@@ -12,7 +12,7 @@ from typing import Any, Optional
 import input_handler
 import render
 from jsonl_log import SessionLogger
-from models import Card, DeckCard, Dreamsign, Rarity, Resonance
+from models import DeckCard, Dreamsign
 from quest_state import QuestState
 
 SKIP_LABEL = "Skip"

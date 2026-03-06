@@ -7,18 +7,13 @@ quest playthroughs.
 import json
 import time
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from models import (
-    AlgorithmParams,
-    Card,
     DeckCard,
     Dreamcaller,
     DreamscapeNode,
     Dreamsign,
-    Rarity,
-    Resonance,
-    ResonanceProfile,
     Site,
 )
 
@@ -26,30 +21,20 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 _LOG_DIR = _PROJECT_ROOT / ".logs"
 
 
-def _resonance_name(r: Resonance) -> str:
-    return r.value
-
-
-def _resonances_list(rs: frozenset[Resonance]) -> list[str]:
-    return sorted(_resonance_name(r) for r in rs)
-
-
-def _card_dict(card: Card) -> dict[str, object]:
-    return {
-        "name": card.name,
-        "card_number": card.card_number,
-        "resonances": _resonances_list(card.resonances),
-        "rarity": card.rarity.value,
-        "energy_cost": card.energy_cost,
-        "spark": card.spark,
+def _deck_card_dict(dc: DeckCard) -> dict[str, object]:
+    """Serialize a DeckCard to a dict."""
+    instance = dc.instance
+    result: dict[str, object] = {
+        "is_bane": dc.is_bane,
+        "is_transfigured": dc.is_transfigured,
     }
-
-
-def _profile_dict(profile_snapshot: dict[Resonance, int]) -> dict[str, int]:
-    return {
-        _resonance_name(r): c
-        for r, c in sorted(profile_snapshot.items(), key=lambda x: x[0].value)
-    }
+    if hasattr(instance, "design") and hasattr(instance.design, "name"):
+        result["name"] = instance.design.name
+    elif hasattr(instance, "name"):
+        result["name"] = instance.name
+    if hasattr(instance, "instance_id"):
+        result["instance_id"] = instance.instance_id
+    return result
 
 
 class SessionLogger:
@@ -70,7 +55,6 @@ class SessionLogger:
     def log_session_start(
         self,
         seed: int,
-        params: AlgorithmParams,
         atlas_topology: list[DreamscapeNode],
     ) -> None:
         """Log the start of a quest session."""
@@ -88,12 +72,6 @@ class SessionLogger:
             {
                 "event": "session_start",
                 "seed": seed,
-                "algorithm_params": {
-                    "exponent": params.exponent,
-                    "floor_weight": params.floor_weight,
-                    "neutral_base": params.neutral_base,
-                    "staleness_factor": params.staleness_factor,
-                },
                 "atlas_nodes": nodes,
             }
         )
@@ -128,7 +106,6 @@ class SessionLogger:
         state_changes: dict[str, object],
         dreamscape: str = "",
         is_enhanced: bool = False,
-        profile_snapshot: Optional[dict[Resonance, int]] = None,
     ) -> None:
         """Log a site visit with choices, state deltas, and context."""
         event: dict[str, object] = {
@@ -140,16 +117,13 @@ class SessionLogger:
             "choice_made": choice_made,
             "state_changes": state_changes,
         }
-        if profile_snapshot is not None:
-            event["profile_snapshot"] = _profile_dict(profile_snapshot)
         self._write(event)
 
     def log_draft_pick(
         self,
-        offered_cards: list[Card],
+        offered_cards: list[Any],
         weights: list[float],
-        picked_card: Card,
-        profile_snapshot: dict[Resonance, int],
+        picked_card: Any,
     ) -> None:
         """Log a draft pick with offered cards, weights, and selection."""
         if len(offered_cards) != len(weights):
@@ -159,28 +133,46 @@ class SessionLogger:
             )
         offered = []
         for card, weight in zip(offered_cards, weights):
-            offered.append({**_card_dict(card), "weight": round(weight, 4)})
+            entry: dict[str, object] = {"weight": round(weight, 4)}
+            if hasattr(card, "design") and hasattr(card.design, "name"):
+                entry["name"] = card.design.name
+            elif hasattr(card, "name"):
+                entry["name"] = card.name
+            offered.append(entry)
+
+        picked: dict[str, object] = {}
+        if hasattr(picked_card, "design") and hasattr(picked_card.design, "name"):
+            picked["name"] = picked_card.design.name
+        elif hasattr(picked_card, "name"):
+            picked["name"] = picked_card.name
+
         self._write(
             {
                 "event": "draft_pick",
                 "offered": offered,
-                "picked": _card_dict(picked_card),
-                "profile_after": _profile_dict(profile_snapshot),
+                "picked": picked,
             }
         )
 
     def log_shop_purchase(
         self,
-        items_shown: list[Card],
-        items_bought: list[Card],
+        items_shown: list[Any],
+        items_bought: list[Any],
         essence_spent: int,
     ) -> None:
         """Log a shop interaction with items shown, bought, and cost."""
+        def _card_name(card: Any) -> str:
+            if hasattr(card, "design") and hasattr(card.design, "name"):
+                return card.design.name
+            if hasattr(card, "name"):
+                return card.name
+            return str(card)
+
         self._write(
             {
                 "event": "shop_purchase",
-                "items_shown": [_card_dict(c) for c in items_shown],
-                "items_bought": [_card_dict(c) for c in items_bought],
+                "items_shown": [_card_name(c) for c in items_shown],
+                "items_bought": [_card_name(c) for c in items_bought],
                 "essence_spent": essence_spent,
             }
         )
@@ -189,42 +181,42 @@ class SessionLogger:
         self,
         opponent_name: str,
         essence_reward: int,
-        rare_pick: Optional[Card],
+        rare_pick: Optional[Any],
     ) -> None:
         """Log battle completion with reward details."""
+        pick_name: Optional[str] = None
+        if rare_pick is not None:
+            if hasattr(rare_pick, "design") and hasattr(rare_pick.design, "name"):
+                pick_name = rare_pick.design.name
+            elif hasattr(rare_pick, "name"):
+                pick_name = rare_pick.name
         self._write(
             {
                 "event": "battle_complete",
                 "opponent_name": opponent_name,
                 "essence_reward": essence_reward,
-                "rare_pick": _card_dict(rare_pick) if rare_pick is not None else None,
+                "rare_pick": pick_name,
             }
         )
 
     def log_session_end(
         self,
         deck: list[DeckCard],
-        resonance_profile: ResonanceProfile,
         essence: int,
         completion_level: int,
         dreamsigns: list[Dreamsign],
         dreamcaller: Optional[Dreamcaller],
     ) -> None:
         """Log the end of a quest session with final state."""
-        rarity_counts: dict[str, int] = {r.value: 0 for r in Rarity}
-        for dc in deck:
-            rarity_counts[dc.card.rarity.value] += 1
-
         self._write(
             {
                 "event": "session_end",
                 "total_cards": len(deck),
-                "final_profile": _profile_dict(resonance_profile.snapshot()),
-                "rarity_breakdown": rarity_counts,
+                "deck": [_deck_card_dict(dc) for dc in deck],
                 "essence": essence,
                 "completion_level": completion_level,
                 "dreamsigns": [
-                    {"name": ds.name, "resonance": ds.resonance.value}
+                    {"name": ds.name}
                     for ds in dreamsigns
                 ],
                 "dreamcaller": dreamcaller.name if dreamcaller is not None else None,
