@@ -213,7 +213,9 @@ class TestDispatchRouting:
         self._dispatch(SiteType.DRAFT, "sites_draft.run_draft")
 
     def test_dispatches_dreamcaller_draft(self) -> None:
-        self._dispatch(SiteType.DREAMCALLER_DRAFT, "sites_dreamcaller.run_dreamcaller_draft")
+        self._dispatch(
+            SiteType.DREAMCALLER_DRAFT, "sites_dreamcaller.run_dreamcaller_draft"
+        )
 
     def test_dispatches_discovery_draft(self) -> None:
         self._dispatch(SiteType.DISCOVERY_DRAFT, "sites_discovery.run_discovery_draft")
@@ -225,7 +227,9 @@ class TestDispatchRouting:
         self._dispatch(SiteType.SPECIALTY_SHOP, "sites_discovery.run_specialty_shop")
 
     def test_dispatches_dreamsign_offering(self) -> None:
-        self._dispatch(SiteType.DREAMSIGN_OFFERING, "sites_dreamsign.run_dreamsign_offering")
+        self._dispatch(
+            SiteType.DREAMSIGN_OFFERING, "sites_dreamsign.run_dreamsign_offering"
+        )
 
     def test_dispatches_dreamsign_draft(self) -> None:
         self._dispatch(SiteType.DREAMSIGN_DRAFT, "sites_dreamsign.run_dreamsign_draft")

@@ -39,7 +39,9 @@ def _make_instance(
     instance_id: int = 1001,
     **kwargs,
 ) -> CardInstance:
-    return CardInstance(instance_id=instance_id, design=_make_design(name=name, **kwargs))
+    return CardInstance(
+        instance_id=instance_id, design=_make_design(name=name, **kwargs)
+    )
 
 
 def _make_deck_card(
@@ -240,7 +242,9 @@ class TestRenderFullDeckView(unittest.TestCase):
 
         deck = self._make_deck_cards()
         dreamsigns = [
-            Dreamsign(name="Moon Sigil", effect_text="Draw 1 extra card.", is_bane=False),
+            Dreamsign(
+                name="Moon Sigil", effect_text="Draw 1 extra card.", is_bane=False
+            ),
         ]
         output = render_full_deck_view(deck, dreamsigns=dreamsigns)
         self.assertIn("Moon Sigil", output)

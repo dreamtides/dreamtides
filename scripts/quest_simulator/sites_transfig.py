@@ -435,10 +435,7 @@ def _run_normal(
         choice_name = note
         type_label = _colored_type_label(transfig_type)
         print()
-        print(
-            f"  {render.BOLD}{name}{render.RESET} transfigured "
-            f"to {type_label}!"
-        )
+        print(f"  {render.BOLD}{name}{render.RESET} transfigured " f"to {type_label}!")
         print(
             f"  {render.DIM}Now: {transfig_type.value} {name} "
             f"-- {_TRANSFIG_NOTES[transfig_type]}{render.RESET}"
@@ -545,10 +542,7 @@ def _run_enhanced(
         choice_name = note
         type_label = _colored_type_label(best_type)
         print()
-        print(
-            f"  {render.BOLD}{name}{render.RESET} transfigured "
-            f"to {type_label}!"
-        )
+        print(f"  {render.BOLD}{name}{render.RESET} transfigured " f"to {type_label}!")
         print(
             f"  {render.DIM}Now: {best_type.value} {name} "
             f"-- {_TRANSFIG_NOTES[best_type]}{render.RESET}"

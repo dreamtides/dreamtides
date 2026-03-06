@@ -171,7 +171,9 @@ def run_shop(
         dreamsign_offerings = _select_dreamsigns(dreamsigns_pool, 2, state)
 
         # Display shop contents
-        print(f"  {colors.section('Shop Items')}  |  Essence: {colors.num(state.essence)}")
+        print(
+            f"  {colors.section('Shop Items')}  |  Essence: {colors.num(state.essence)}"
+        )
         print()
 
         for item in items:
@@ -185,7 +187,9 @@ def run_shop(
         if dreamsign_offerings:
             print(f"  {colors.section('Dreamsign Offerings')}")
             for ds in dreamsign_offerings:
-                bane_label = f" {colors.c('[BANE]', 'error', bold=True)}" if ds.is_bane else ""
+                bane_label = (
+                    f" {colors.c('[BANE]', 'error', bold=True)}" if ds.is_bane else ""
+                )
                 print(f"    {colors.c(ds.name, 'accent')}{bane_label}")
                 print(f"      {colors.dim(ds.effect_text)}")
             print()
@@ -194,7 +198,9 @@ def run_shop(
         # [card0, card1, card2, dreamsign0, dreamsign1, reroll, leave]
         option_labels: list[str] = []
         for item in items:
-            option_labels.append(f"Buy {item.card_instance.design.name} ({item.price}e)")
+            option_labels.append(
+                f"Buy {item.card_instance.design.name} ({item.price}e)"
+            )
         for ds in dreamsign_offerings:
             option_labels.append(f"Buy dreamsign: {ds.name}")
         if free_rerolls > 0:
@@ -217,13 +223,24 @@ def run_shop(
         ):
             def _fn(index: int, option: str, is_selected: bool) -> str:
                 return _render_option(
-                    index, option, is_selected,
-                    _items, _ds, _essence, _reroll_cost, _free_rerolls,
+                    index,
+                    option,
+                    is_selected,
+                    _items,
+                    _ds,
+                    _essence,
+                    _reroll_cost,
+                    _free_rerolls,
                 )
+
             return _fn
 
         render_fn = _make_render_fn(
-            items, dreamsign_offerings, state.essence, reroll_cost, free_rerolls,
+            items,
+            dreamsign_offerings,
+            state.essence,
+            reroll_cost,
+            free_rerolls,
         )
 
         chosen_index = input_handler.single_select(
@@ -238,7 +255,9 @@ def run_shop(
             if state.essence >= item.price:
                 state.spend_essence(item.price)
                 state.add_card(item.card_instance)
-                round_manager.complete_human_pick(state, item.card_instance, shown_cards)
+                round_manager.complete_human_pick(
+                    state, item.card_instance, shown_cards
+                )
 
                 print()
                 card_name = colors.card(item.card_instance.design.name)
@@ -298,10 +317,8 @@ def run_shop(
                 state.spend_essence(reroll_cost)
             else:
                 print()
-                print(
-                    f"  {colors.dim(f'Not enough essence to reroll '
-                    f'({reroll_cost} needed, {state.essence} available).')}"
-                )
+                print(f"  {colors.dim(f'Not enough essence to reroll '
+                    f'({reroll_cost} needed, {state.essence} available).')}")
                 continue
 
             print()

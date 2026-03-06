@@ -188,6 +188,7 @@ class SessionLogger:
         essence_spent: int,
     ) -> None:
         """Log a shop interaction with items shown, bought, and cost."""
+
         def _card_dict(card: Any) -> dict[str, object]:
             design = getattr(card, "design", card)
             result: dict[str, object] = {}
@@ -250,10 +251,7 @@ class SessionLogger:
             "deck": [_deck_card_dict(dc) for dc in deck],
             "essence": essence,
             "completion_level": completion_level,
-            "dreamsigns": [
-                {"name": ds.name}
-                for ds in dreamsigns
-            ],
+            "dreamsigns": [{"name": ds.name} for ds in dreamsigns],
             "dreamcaller": dreamcaller.name if dreamcaller is not None else None,
         }
         if preference_vector is not None:

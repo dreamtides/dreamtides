@@ -330,11 +330,19 @@ class TestDeterminism:
 
         # Extract deck card names from DeckCard instances
         deck1_names = sorted(
-            dc.instance.design.name if hasattr(dc.instance, "design") else str(dc.instance)
+            (
+                dc.instance.design.name
+                if hasattr(dc.instance, "design")
+                else str(dc.instance)
+            )
             for dc in state1.deck
         )
         deck2_names = sorted(
-            dc.instance.design.name if hasattr(dc.instance, "design") else str(dc.instance)
+            (
+                dc.instance.design.name
+                if hasattr(dc.instance, "design")
+                else str(dc.instance)
+            )
             for dc in state2.deck
         )
         assert deck1_names == deck2_names

@@ -24,7 +24,9 @@ def _top_archetype(fitness: list[float]) -> str:
         if v > best_val:
             best_val = v
             best_idx = i
-    name = ARCHETYPE_NAMES[best_idx] if best_idx < len(ARCHETYPE_NAMES) else f"A{best_idx}"
+    name = (
+        ARCHETYPE_NAMES[best_idx] if best_idx < len(ARCHETYPE_NAMES) else f"A{best_idx}"
+    )
     return f"{name}={best_val:.2f}"
 
 
@@ -169,7 +171,9 @@ def render_full_deck_view(
         lines.append("")
         lines.append(f"  {colors.section('Dreamsigns')} ({len(dreamsigns)})")
         for ds in dreamsigns:
-            bane_label = f" {colors.c('[BANE]', 'error', bold=True)}" if ds.is_bane else ""
+            bane_label = (
+                f" {colors.c('[BANE]', 'error', bold=True)}" if ds.is_bane else ""
+            )
             lines.append(f"    {ds.name}{bane_label}")
 
     # Dreamcaller section

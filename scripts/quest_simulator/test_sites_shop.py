@@ -116,8 +116,12 @@ class TestBuildShopItems:
         from sites_shop import _build_shop_items
 
         design = CardDesign(
-            card_id="c1", name="Test Card", fitness=[0.5] * 8,
-            power=2.0, commit=0.5, flex=0.3,
+            card_id="c1",
+            name="Test Card",
+            fitness=[0.5] * 8,
+            power=2.0,
+            commit=0.5,
+            flex=0.3,
         )
         cards = [CardInstance(instance_id=i, design=design) for i in range(3)]
         items = _build_shop_items(cards)
@@ -127,8 +131,12 @@ class TestBuildShopItems:
         from sites_shop import _build_shop_items
 
         design = CardDesign(
-            card_id="c1", name="Test Card", fitness=[0.5] * 8,
-            power=2.0, commit=0.5, flex=0.3,
+            card_id="c1",
+            name="Test Card",
+            fitness=[0.5] * 8,
+            power=2.0,
+            commit=0.5,
+            flex=0.3,
         )
         cards = [CardInstance(instance_id=1, design=design)]
         items = _build_shop_items(cards)
@@ -138,8 +146,12 @@ class TestBuildShopItems:
         from sites_shop import _build_shop_items
 
         design = CardDesign(
-            card_id="c1", name="Test Card", fitness=[0.5] * 8,
-            power=1.0, commit=0.5, flex=0.3,
+            card_id="c1",
+            name="Test Card",
+            fitness=[0.5] * 8,
+            power=1.0,
+            commit=0.5,
+            flex=0.3,
         )
         card = CardInstance(instance_id=42, design=design)
         items = _build_shop_items([card])
@@ -405,7 +417,8 @@ class TestRunShop:
         # Build forbidden strings via join to avoid tripping the reference scanner.
         old_imports = ["".join(["import ", m]) for m in ["algorithm", "pool"]]
         old_types = [
-            "".join(p) for p in [
+            "".join(p)
+            for p in [
                 ["Algorithm", "Params"],
                 ["Pool", "Params"],
                 ["Pool", "Entry"],

@@ -11,7 +11,14 @@ import colors
 CONTENT_WIDTH = 70
 
 ARCHETYPE_NAMES: list[str] = [
-    "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7",
+    "A0",
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "A5",
+    "A6",
+    "A7",
 ]
 
 
@@ -148,20 +155,34 @@ def site_visit_header(
 # are updated.
 # ---------------------------------------------------------------------------
 
-BOLD = colors.c("", "accent", bold=True).replace(colors.reset(), "") if colors._USE_COLOR else ""
+BOLD = (
+    colors.c("", "accent", bold=True).replace(colors.reset(), "")
+    if colors._USE_COLOR
+    else ""
+)
 DIM = colors.c("", "comment").replace(colors.reset(), "") if colors._USE_COLOR else ""
 RESET = colors.reset()
 STRIKETHROUGH = ""
 
 
-def format_card(card_or_deck_card, highlighted: bool = False, max_width: int = CONTENT_WIDTH) -> list[str]:
+def format_card(
+    card_or_deck_card, highlighted: bool = False, max_width: int = CONTENT_WIDTH
+) -> list[str]:
     """Compatibility shim routing to render_cards.format_card_display."""
     import render_cards
-    return render_cards.format_card_display(card_or_deck_card, highlighted=highlighted, max_width=max_width)
+
+    return render_cards.format_card_display(
+        card_or_deck_card, highlighted=highlighted, max_width=max_width
+    )
 
 
-def resonance_profile_footer(counts=None, deck_count: int = 0, essence: int = 0, **kwargs) -> str:
+def resonance_profile_footer(
+    counts=None, deck_count: int = 0, essence: int = 0, **kwargs
+) -> str:
     """Compatibility shim routing to render_status.archetype_preference_footer."""
     import render_status
+
     w = [0.0] * 8
-    return render_status.archetype_preference_footer(w=w, deck_count=deck_count, essence=essence)
+    return render_status.archetype_preference_footer(
+        w=w, deck_count=deck_count, essence=essence
+    )

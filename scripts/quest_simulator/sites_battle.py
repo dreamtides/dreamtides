@@ -162,13 +162,17 @@ def run_battle(
         state.add_card(picked_card)
 
         print()
-        print(f"  Added {colors.card(render_cards.card_name(picked_card))} to your deck.")
+        print(
+            f"  Added {colors.card(render_cards.card_name(picked_card))} to your deck."
+        )
         print()
     else:
         # No cards available in the pack; still advance draft state
         round_manager.advance_pick_no_card(state)
 
-        print(f"  Essence reward: {colors.c(f'+{essence_reward}', 'accent', bold=True)}")
+        print(
+            f"  Essence reward: {colors.c(f'+{essence_reward}', 'accent', bold=True)}"
+        )
         print()
         print(f"  {colors.dim('No cards available in the pack.')}")
         print()
@@ -193,11 +197,17 @@ def run_battle(
             site_type="Battle",
             dreamscape=dreamscape_name,
             choices=[opponent_name],
-            choice_made=render_cards.card_name(picked_card) if picked_card is not None else None,
+            choice_made=(
+                render_cards.card_name(picked_card) if picked_card is not None else None
+            ),
             state_changes={
                 "opponent": opponent_name,
                 "essence_reward": essence_reward,
-                "rare_pick": render_cards.card_name(picked_card) if picked_card is not None else None,
+                "rare_pick": (
+                    render_cards.card_name(picked_card)
+                    if picked_card is not None
+                    else None
+                ),
                 "deck_size_after": state.deck_count(),
             },
         )

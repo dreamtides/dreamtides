@@ -40,11 +40,7 @@ def load_config() -> dict[str, dict[str, Any]]:
     with open(DATA_DIR / "config.toml", "rb") as f:
         raw: dict[str, Any] = tomllib.load(f)
 
-    return {
-        k: v
-        for k, v in raw.items()
-        if isinstance(v, dict)
-    }
+    return {k: v for k, v in raw.items() if isinstance(v, dict)}
 
 
 def load_dreamcallers() -> list[Dreamcaller]:

@@ -367,8 +367,12 @@ class TestSpecialtyShopDoesNotAdvanceDraft:
                 dreamscape_name="Test",
                 dreamscape_number=1,
                 is_enhanced=False,
-                shop_config={"reroll_cost": 50, "items_count": 4,
-                             "discount_min": 30, "discount_max": 90},
+                shop_config={
+                    "reroll_cost": 50,
+                    "items_count": 4,
+                    "discount_min": 30,
+                    "discount_max": 90,
+                },
             )
 
         assert state.global_pick_index == initial_pick_index
@@ -413,6 +417,7 @@ class TestSpecialtyShopReroll:
         # First call: select reroll (last index = items_count = 4)
         # Second call: select nothing (empty list to exit)
         call_count = [0]
+
         def mock_multi_select(options, render_fn=None):
             call_count[0] += 1
             if call_count[0] == 1:
@@ -426,8 +431,12 @@ class TestSpecialtyShopReroll:
                 dreamscape_name="Test",
                 dreamscape_number=1,
                 is_enhanced=False,
-                shop_config={"reroll_cost": 50, "items_count": 4,
-                             "discount_min": 30, "discount_max": 90},
+                shop_config={
+                    "reroll_cost": 50,
+                    "items_count": 4,
+                    "discount_min": 30,
+                    "discount_max": 90,
+                },
             )
 
         assert state.global_pick_index == initial_pick_index
@@ -443,9 +452,9 @@ class TestDiscountNeverExceedsBase:
         rng = random.Random(42)
         for base_price in [5, 6, 7, 8, 9, 10]:
             discounted = _apply_discount(base_price, rng, 10, 50)
-            assert discounted <= base_price, (
-                f"Discounted {discounted} > base {base_price}"
-            )
+            assert (
+                discounted <= base_price
+            ), f"Discounted {discounted} > base {base_price}"
 
     def test_discount_on_minimum_price(self) -> None:
         """Discounting the minimum price (5) should return at most 5."""
@@ -526,9 +535,7 @@ class TestDrawAndFilterSmallCube:
         from sites_discovery import draw_and_filter
 
         # Create a cube with 1 card in WITHOUT_REPLACEMENT mode, draw it first
-        designs = [
-            _make_design(name="Only", card_id="only_0", fitness=[0.9] * 8)
-        ]
+        designs = [_make_design(name="Only", card_id="only_0", fitness=[0.9] * 8)]
         cube = cube_manager.CubeManager(
             designs=designs,
             copies_per_card=1,
@@ -603,7 +610,9 @@ class TestSpecialtyShopDreamsignOffering:
 
         option_names_seen: list[list[str]] = []
 
-        def mock_multi_select(options: list[str], render_fn: object = None) -> list[int]:
+        def mock_multi_select(
+            options: list[str], render_fn: object = None
+        ) -> list[int]:
             option_names_seen.append(list(options))
             return []  # Buy nothing
 
@@ -614,17 +623,19 @@ class TestSpecialtyShopDreamsignOffering:
                 dreamscape_name="Test",
                 dreamscape_number=1,
                 is_enhanced=False,
-                shop_config={"reroll_cost": 50, "items_count": 4,
-                             "discount_min": 30, "discount_max": 90},
+                shop_config={
+                    "reroll_cost": 50,
+                    "items_count": 4,
+                    "discount_min": 30,
+                    "discount_max": 90,
+                },
                 all_dreamsigns=dreamsigns,
             )
 
         assert len(option_names_seen) == 1
         # Should have card items + dreamsign + reroll
         found_dreamsign = any("Dreamsign" in opt for opt in option_names_seen[0])
-        assert found_dreamsign, (
-            f"Expected dreamsign option in: {option_names_seen[0]}"
-        )
+        assert found_dreamsign, f"Expected dreamsign option in: {option_names_seen[0]}"
 
     def test_dreamsign_acquired_when_selected(self) -> None:
         """Selecting the dreamsign option should add it to the state."""
@@ -639,7 +650,9 @@ class TestSpecialtyShopDreamsignOffering:
 
         assert state.dreamsign_count() == 0
 
-        def mock_multi_select(options: list[str], render_fn: object = None) -> list[int]:
+        def mock_multi_select(
+            options: list[str], render_fn: object = None
+        ) -> list[int]:
             # Find the dreamsign option index
             for i, opt in enumerate(options):
                 if "Dreamsign" in opt:
@@ -653,8 +666,12 @@ class TestSpecialtyShopDreamsignOffering:
                 dreamscape_name="Test",
                 dreamscape_number=1,
                 is_enhanced=False,
-                shop_config={"reroll_cost": 50, "items_count": 4,
-                             "discount_min": 30, "discount_max": 90},
+                shop_config={
+                    "reroll_cost": 50,
+                    "items_count": 4,
+                    "discount_min": 30,
+                    "discount_max": 90,
+                },
                 all_dreamsigns=dreamsigns,
             )
 
@@ -669,7 +686,9 @@ class TestSpecialtyShopDreamsignOffering:
 
         option_names_seen: list[list[str]] = []
 
-        def mock_multi_select(options: list[str], render_fn: object = None) -> list[int]:
+        def mock_multi_select(
+            options: list[str], render_fn: object = None
+        ) -> list[int]:
             option_names_seen.append(list(options))
             return []
 
@@ -680,8 +699,12 @@ class TestSpecialtyShopDreamsignOffering:
                 dreamscape_name="Test",
                 dreamscape_number=1,
                 is_enhanced=False,
-                shop_config={"reroll_cost": 50, "items_count": 4,
-                             "discount_min": 30, "discount_max": 90},
+                shop_config={
+                    "reroll_cost": 50,
+                    "items_count": 4,
+                    "discount_min": 30,
+                    "discount_max": 90,
+                },
             )
 
         assert len(option_names_seen) == 1
@@ -696,6 +719,7 @@ class TestNoOldImports:
         """sites_discovery should not expose old card-selection functions."""
         import importlib
         import sites_discovery
+
         importlib.reload(sites_discovery)
         assert not hasattr(sites_discovery, "select_cards")
 
@@ -703,6 +727,7 @@ class TestNoOldImports:
         """sites_discovery should not expose old staleness/removal functions."""
         import importlib
         import sites_discovery
+
         importlib.reload(sites_discovery)
         assert not hasattr(sites_discovery, "increment_staleness")
         assert not hasattr(sites_discovery, "remove_entry")
@@ -711,6 +736,7 @@ class TestNoOldImports:
         """sites_discovery should not expose old theme/filter functions."""
         import importlib
         import sites_discovery
+
         importlib.reload(sites_discovery)
         assert not hasattr(sites_discovery, "select_theme")
         assert not hasattr(sites_discovery, "filter_pool_by_tag")

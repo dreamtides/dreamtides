@@ -105,8 +105,7 @@ def draw_and_filter(
 
     # Filter to high-fitness cards
     filtered = [
-        card for card in drawn
-        if _has_high_fitness(card, top_archs, _FITNESS_THRESHOLD)
+        card for card in drawn if _has_high_fitness(card, top_archs, _FITNESS_THRESHOLD)
     ]
 
     if len(filtered) >= count:
@@ -129,7 +128,8 @@ def draw_and_filter(
     # Still not enough: relax threshold to 0.4
     relaxed_threshold = 0.4
     relaxed = [
-        card for card in drawn + extra
+        card
+        for card in drawn + extra
         if _has_high_fitness(card, top_archs, relaxed_threshold)
     ]
 
@@ -244,6 +244,7 @@ def run_discovery_draft(
         card_names = [inst.design.name for inst in offered]
 
         if is_enhanced:
+
             def _render_multi(
                 idx: int, option: str, highlighted: bool, checked: bool
             ) -> str:
@@ -259,6 +260,7 @@ def run_discovery_draft(
 
             selected_indices = multi_select(card_names, render_fn=_render_multi)
         else:
+
             def _render_single(idx: int, option: str, highlighted: bool) -> str:
                 lines = format_card(offered[idx], highlighted=highlighted)
                 return "\n".join(lines)
@@ -365,9 +367,7 @@ def run_specialty_shop(
         dreamsign_idx: Optional[int] = None
         if dreamsign_offer is not None:
             dreamsign_idx = len(option_names)
-            option_names.append(
-                f"Dreamsign: {dreamsign_offer.name} (free)"
-            )
+            option_names.append(f"Dreamsign: {dreamsign_offer.name} (free)")
 
         # Add reroll option
         reroll_idx = len(option_names)
@@ -379,7 +379,10 @@ def run_specialty_shop(
 
         # Multi-select for purchasing
         def _render_shop(
-            idx: int, option: str, highlighted: bool, checked: bool,
+            idx: int,
+            option: str,
+            highlighted: bool,
+            checked: bool,
             _items: list[ShopItem] = items,
             _dreamsign_idx: Optional[int] = dreamsign_idx,
             _dreamsign_offer: Optional[Dreamsign] = dreamsign_offer,
@@ -409,7 +412,11 @@ def run_specialty_shop(
                 check = "[x]" if checked else "[ ]"
                 ds_name = _dreamsign_offer.name if _dreamsign_offer else ""
                 line1 = f"  {marker} {check} {BOLD}Dreamsign:{RESET} {ds_name}"
-                line2 = f'      "{_dreamsign_offer.effect_text}"' if _dreamsign_offer else ""
+                line2 = (
+                    f'      "{_dreamsign_offer.effect_text}"'
+                    if _dreamsign_offer
+                    else ""
+                )
                 line3 = f"      {DIM}(free){RESET}"
                 return "\n".join([line1, line2, line3])
             else:
@@ -464,9 +471,7 @@ def run_specialty_shop(
                 is_enhanced=is_enhanced,
                 choices=[item.instance.design.name for item in items],
                 choice_made=(
-                    ", ".join(c.design.name for c in purchased)
-                    if purchased
-                    else None
+                    ", ".join(c.design.name for c in purchased) if purchased else None
                 ),
                 state_changes={
                     "items_bought": [c.design.name for c in purchased],

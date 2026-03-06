@@ -44,6 +44,7 @@ _EFFECT_TYPE_LABELS: dict[EffectType, str] = {
     EffectType.ADD_BANE_DREAMSIGN: "Gain bane dreamsign",
 }
 
+
 def select_journeys(
     all_journeys: list[Journey],
     rng: random.Random,

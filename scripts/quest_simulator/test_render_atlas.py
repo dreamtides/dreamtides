@@ -786,6 +786,7 @@ class TestImportClean(unittest.TestCase):
                 "-c",
                 (
                     "import sys; sys.path.insert(0, 'scripts/quest_simulator');"
+                    "sys.path.insert(0, 'scripts/draft_simulator');"
                     "from render_atlas import *;"
                     "print('OK')"
                 ),

@@ -148,8 +148,7 @@ def archetype_preference_footer(
     lines.extend(pref_parts)
 
     status = (
-        f"  Deck: {colors.num(deck_count)} cards  |  "
-        f"Essence: {colors.num(essence)}"
+        f"  Deck: {colors.num(deck_count)} cards  |  " f"Essence: {colors.num(essence)}"
     )
     lines.append(status)
     lines.append(sep)

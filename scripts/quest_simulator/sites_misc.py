@@ -116,7 +116,9 @@ def run_duplication(
     print()
 
     # Build option labels with copy counts
-    option_labels = [f"{_deck_card_name(dc)} x{cc}" for dc, cc in zip(candidates, copy_counts)]
+    option_labels = [
+        f"{_deck_card_name(dc)} x{cc}" for dc, cc in zip(candidates, copy_counts)
+    ]
     option_labels.append(SKIP_LABEL)
 
     def _render_option(
@@ -178,9 +180,7 @@ def run_duplication(
             is_enhanced=is_enhanced,
             choices=[_deck_card_name(dc) for dc in candidates],
             choice_made=(
-                f"{chosen_name} x{chosen_copies}"
-                if chosen_name is not None
-                else None
+                f"{chosen_name} x{chosen_copies}" if chosen_name is not None else None
             ),
             state_changes={
                 "cards_added": chosen_copies,
@@ -370,16 +370,12 @@ def run_reward(
             if reward_type == "essence":
                 state.gain_essence(reward["value"])
                 print()
-                print(
-                    f"  {render.BOLD}Gained {reward['value']} essence!{render.RESET}"
-                )
+                print(f"  {render.BOLD}Gained {reward['value']} essence!{render.RESET}")
             elif reward_type == "dreamsign":
                 ds = reward["dreamsign"]
                 state.add_dreamsign(ds)
                 print()
-                print(
-                    f"  {render.BOLD}Acquired dreamsign: {ds.name}!{render.RESET}"
-                )
+                print(f"  {render.BOLD}Acquired dreamsign: {ds.name}!{render.RESET}")
         else:
             print()
             print(f"  {render.DIM}Declined.{render.RESET}")

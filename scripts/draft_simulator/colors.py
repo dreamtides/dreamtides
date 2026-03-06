@@ -7,9 +7,8 @@ and NO_COLOR convention support. Stdlib-only, no external dependencies.
 import os
 import sys
 
-_USE_COLOR = (
-    os.environ.get("FORCE_COLOR") is not None
-    or (sys.stdout.isatty() and os.environ.get("NO_COLOR") is None)
+_USE_COLOR = os.environ.get("FORCE_COLOR") is not None or (
+    sys.stdout.isatty() and os.environ.get("NO_COLOR") is None
 )
 
 PALETTE: dict[str, tuple[int, int, int]] = {
