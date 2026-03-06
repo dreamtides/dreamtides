@@ -1,271 +1,139 @@
 """Shop site interaction for the quest simulator.
 
-Implements the Shop site: 6 items with rarity-based prices, per-item
-discount probability, multi-select purchasing, and reroll support.
-Items are selected from the draft pool via resonance-weighted selection.
+Implements the Shop site: 3 priced cards from the draft pack at seat 0,
+2 random dreamsign offerings, and a reroll option. Cards are priced based
+on power value. Each shop visit consumes at least 1 pick step from the
+draft loop; rerolls cost 1 additional pick step each.
 """
 
 from dataclasses import dataclass
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
-import algorithm
+import colors
 import input_handler
-import pool as pool_module
 import render
 import render_cards
+import render_status
+import round_manager
+import show_n
+from draft_models import CardInstance
 from jsonl_log import SessionLogger
-from models import (
-    AlgorithmParams,
-    Card,
-    PoolEntry,
-    PoolParams,
-    Rarity,
-    Resonance,
-)
+from models import Dreamsign
 from quest_state import QuestState
 
-_RARITY_PRICE_KEYS: dict[Rarity, str] = {
-    Rarity.COMMON: "price_common",
-    Rarity.UNCOMMON: "price_uncommon",
-    Rarity.RARE: "price_rare",
-    Rarity.LEGENDARY: "price_legendary",
-}
+SHOP_SHOW_N = 3
 
 
 @dataclass(frozen=True)
 class ShopItem:
     """A card offered for sale in the shop."""
 
-    card: Card
-    pool_entry: PoolEntry
-    base_price: int
-    discounted_price: Optional[int]
-
-    @property
-    def effective_price(self) -> int:
-        """The actual price the player pays."""
-        if self.discounted_price is not None:
-            return self.discounted_price
-        return self.base_price
+    card_instance: CardInstance
+    price: int
 
 
-def get_price(rarity: Rarity, shop_config: dict[str, Any]) -> int:
-    """Return the base essence price for a card of the given rarity."""
-    key = _RARITY_PRICE_KEYS[rarity]
-    result: int = shop_config[key]
-    return result
+def compute_price(power: float) -> int:
+    """Compute the shop price for a card based on its power value.
 
-
-def apply_discount(base_price: int, discount_percent: int) -> int:
-    """Apply a percentage discount to a base price, rounded to nearest 10.
-
-    The result is clamped to a minimum of 10 essence.
+    Price is ``round(power * 25)``, clamped to the range [5, 100].
     """
-    discount_amount = base_price * discount_percent / 100
-    discounted = base_price - discount_amount
-    rounded = max(10, round(discounted / 10) * 10)
-    return rounded
+    return max(5, min(100, round(power * 25)))
 
 
-def generate_shop_items(
+def _select_dreamsigns(
+    all_dreamsigns: list[Dreamsign],
+    count: int,
     state: QuestState,
-    params: AlgorithmParams,
-    shop_config: dict[str, Any],
-) -> list[ShopItem]:
-    """Select items for the shop from the draft pool.
-
-    Selects up to items_count cards via resonance-weighted selection,
-    assigns rarity-based prices, and gives each item an independent
-    chance of being discounted (~30% by default).
-    """
-    items_count: int = shop_config["items_count"]
-
-    selections = algorithm.select_cards(
-        pool=state.pool,
-        n=items_count,
-        profile=state.resonance_profile,
-        params=params,
-        rng=state.rng,
-    )
-
-    if not selections:
+) -> list[Dreamsign]:
+    """Select random dreamsign offerings from the available pool."""
+    if not all_dreamsigns or count <= 0:
         return []
+    n = min(count, len(all_dreamsigns))
+    indices = list(range(len(all_dreamsigns)))
+    state.rng.shuffle(indices)
+    return [all_dreamsigns[i] for i in indices[:n]]
 
-    items: list[ShopItem] = []
-    for entry, _weight in selections:
-        base_price = get_price(entry.card.rarity, shop_config)
-        items.append(
-            ShopItem(
-                card=entry.card,
-                pool_entry=entry,
-                base_price=base_price,
-                discounted_price=None,
-            )
+
+def _build_shop_items(shown_cards: list[CardInstance]) -> list[ShopItem]:
+    """Build priced shop items from the filtered card list."""
+    return [
+        ShopItem(
+            card_instance=card,
+            price=compute_price(card.design.power),
         )
-
-    # Apply per-item discount probability (~30% chance each item is on sale)
-    if items:
-        discount_min: int = shop_config["discount_min"]
-        discount_max: int = shop_config["discount_max"]
-        discount_chance = shop_config.get("discount_chance", 30) / 100.0
-        for i, old_item in enumerate(items):
-            if state.rng.random() < discount_chance:
-                discount_percent = state.rng.randint(discount_min, discount_max)
-                discounted = apply_discount(old_item.base_price, discount_percent)
-                items[i] = ShopItem(
-                    card=old_item.card,
-                    pool_entry=old_item.pool_entry,
-                    base_price=old_item.base_price,
-                    discounted_price=discounted,
-                )
-
-    return items
+        for card in shown_cards
+    ]
 
 
-def _format_price(item: ShopItem) -> str:
-    """Format a shop item's price display."""
-    if item.discounted_price is not None:
-        return (
-            f"{render.DIM}{render.STRIKETHROUGH}{item.base_price}e"
-            f"{render.RESET} "
-            f"{render.BOLD}{item.discounted_price}e{render.RESET}"
-        )
-    return f"{item.base_price}e"
-
-
-def _render_shop_item(
-    item: ShopItem,
-    highlighted: bool,
-    checked: bool,
-    affordable: bool,
-) -> str:
-    """Render a single shop item as display lines."""
-    card_lines = render.format_card(item.card, highlighted=highlighted)
-    price_str = _format_price(item)
-    check = "[x]" if checked else "[ ]"
-    if not affordable and not checked:
-        check = f"{render.DIM}[-]{render.RESET}"
-
-    # Replace the default marker with our check marker
-    line1 = card_lines[0]
-    if highlighted:
-        line1 = f"  > {check} " + line1.lstrip(" >")
-    else:
-        line1 = f"    {check} " + line1.lstrip(" ")
-
-    price_line = f"         Price: {price_str}"
-    return "\n".join([line1, card_lines[1], price_line])
-
-
-def _build_render_fn(
+def _render_option(
+    index: int,
+    option: str,
+    is_selected: bool,
     items: list[ShopItem],
+    dreamsign_offerings: list[Dreamsign],
     available_essence: int,
     reroll_cost: int,
     free_rerolls: int,
-) -> Callable[[int, str, bool, bool], str]:
-    """Build the render callback for the shop multi-select menu.
+) -> str:
+    """Render a single shop menu option."""
+    marker = ">" if is_selected else " "
+    card_count = len(items)
+    dreamsign_count = len(dreamsign_offerings)
 
-    Returns a function compatible with input_handler.multi_select's render_fn
-    parameter. Tracks a running total across items and shows selection status.
-    """
-    running_total = [0]
-    reroll_index = len(items)
-
-    def _render_fn(
-        index: int,
-        option: str,
-        is_highlighted: bool,
-        is_checked: bool,
-    ) -> str:
-        # Reset running total at the start of each render pass
-        if index == 0:
-            running_total[0] = 0
-
-        if index == reroll_index:
-            marker = ">" if is_highlighted else " "
-            check = "[x]" if is_checked else "[ ]"
-            reroll_affordable = free_rerolls > 0 or available_essence >= reroll_cost
-            if not reroll_affordable and not is_checked:
-                check = f"{render.DIM}[-]{render.RESET}"
-            if free_rerolls > 0:
-                label = f"Reroll ({render.BOLD}FREE{render.RESET})"
-            else:
-                label = f"Reroll ({reroll_cost} essence)"
-            line = f"  {marker} {check} {label}"
-            # Show running total summary below the reroll option
-            if running_total[0] > 0:
-                remaining = available_essence - running_total[0]
-                count = _count_checked_items(items, running_total[0])
-                line += (
-                    f"\n\n  {render.BOLD}Selected: {count} item(s)"
-                    f" | Cost: {running_total[0]}"
-                    f" | Remaining: {remaining}{render.RESET}"
-                )
-            return line
-
+    if index < card_count:
         item = items[index]
-        affordable = available_essence - running_total[0] >= item.effective_price
-        result = _render_shop_item(item, is_highlighted, is_checked, affordable)
+        card_lines = render_cards.format_card_display(
+            item.card_instance, highlighted=is_selected
+        )
+        affordable = available_essence >= item.price
+        price_color = "accent" if affordable else "comment"
+        price_str = colors.c(f"{item.price}e", price_color, bold=affordable)
+        price_line = f"         Price: {price_str}"
+        return "\n".join(card_lines + [price_line])
 
-        # Update running total for checked items
-        if is_checked:
-            running_total[0] += item.effective_price
+    dreamsign_start = card_count
+    if index < dreamsign_start + dreamsign_count:
+        ds = dreamsign_offerings[index - dreamsign_start]
+        bane_label = f" {colors.c('[BANE]', 'error', bold=True)}" if ds.is_bane else ""
+        name_line = f"  {marker} {colors.c(ds.name, 'accent')}{bane_label}"
+        detail_line = f"      {colors.dim(ds.effect_text)}"
+        price_line = f"      Price: {colors.c('FREE', 'accent', bold=True)}"
+        return "\n".join([name_line, detail_line, price_line])
 
-        # Add row separator after every 3rd item
-        if index == 2 and len(items) > 3:
-            result += "\n"
+    reroll_idx = dreamsign_start + dreamsign_count
+    if index == reroll_idx:
+        if free_rerolls > 0:
+            label = f"Reroll ({colors.c('FREE', 'accent', bold=True)})"
+        else:
+            reroll_affordable = available_essence >= reroll_cost
+            cost_color = "accent" if reroll_affordable else "comment"
+            label = f"Reroll ({colors.c(f'{reroll_cost} essence', cost_color)})"
+        return f"  {marker} {label}"
 
-        return result
-
-    return _render_fn
-
-
-def _count_checked_items(items: list[ShopItem], total: int) -> int:
-    """Estimate the number of checked items from the running total."""
-    count = 0
-    remaining = total
-    for item in items:
-        if remaining >= item.effective_price:
-            remaining -= item.effective_price
-            count += 1
-        if remaining <= 0:
-            break
-    return max(1, count) if total > 0 else 0
-
-
-def _print_purchase_summary(
-    bought_items: list[ShopItem], total_cost: int, remaining_essence: int
-) -> None:
-    """Print a summary of the items purchased."""
-    print()
-    print(f"  {render.BOLD}Purchase Summary:{render.RESET}")
-    for item in bought_items:
-        price_str = _format_price(item)
-        name_color = render.card_color(item.card.resonances)
-        print(f"    {name_color}{item.card.name}{render.RESET}  {price_str}")
-    print(f"\n  Purchased {len(bought_items)} card(s) " f"for {total_cost} essence.")
-    print(f"  Essence remaining: {remaining_essence}")
+    # Leave option
+    return f"  {marker} {colors.dim('Leave shop')}"
 
 
 def run_shop(
     state: QuestState,
-    algorithm_params: AlgorithmParams,
-    pool_params: PoolParams,
     shop_config: dict[str, Any],
     dreamscape_name: str,
     dreamscape_number: int,
     logger: Optional[SessionLogger],
     is_enhanced: bool = False,
+    all_dreamsigns: Optional[list[Dreamsign]] = None,
 ) -> None:
     """Run a Shop site interaction.
 
-    Displays 6 items with rarity-based prices, each with an independent
-    chance of being discounted. The player can multi-select items to
-    purchase or reroll the shop. Enhanced shops (Verdant biome) get the
-    first reroll free.
+    Displays 3 cards from the draft pack at seat 0 (filtered via
+    show_n=3), priced by power value, plus 2 dreamsign offerings and
+    a reroll option. Each visit consumes at least 1 draft pick step.
+    Rerolls advance the draft by 1 additional pick step each.
+    Enhanced shops (Verdant biome) get the first reroll free.
     """
-    reroll_cost: int = shop_config["reroll_cost"]
+    reroll_cost: int = shop_config.get("reroll_cost", 50)
     free_rerolls = 1 if is_enhanced else 0
+    dreamsigns_pool = all_dreamsigns or []
 
     # Display header
     header = render.site_visit_header(
@@ -278,66 +146,136 @@ def run_shop(
     print()
 
     while True:
-        # Attempt pool refill if empty
-        if not state.pool:
-            pool_module.refill_pool(state.pool, state.all_cards, pool_params)
+        # Get the pack at seat 0 (AI picks at seats 1-5 run first)
+        pack = round_manager.advance_to_human_pick(state)
 
-        items = generate_shop_items(state, algorithm_params, shop_config)
+        # Filter to SHOP_SHOW_N cards
+        shown_cards = show_n.select_cards(
+            pack.cards,
+            SHOP_SHOW_N,
+            "sharpened_preference",
+            state.rng,
+            human_w=state.human_agent.w,
+            human_drafted=state.human_agent.drafted,
+            scoring_cfg=state.draft_cfg.scoring,
+        )
 
-        if not items:
-            print(f"  {render.DIM}No items available.{render.RESET}")
+        if not shown_cards:
+            print(f"  {colors.dim('No cards available.')}")
+            round_manager.advance_pick_no_card(state)
             break
 
-        # Display the 2x3 grid preview
-        grid_items: list[tuple[Card, int, Optional[int]]] = [
-            (
-                item.card,
-                item.effective_price,
-                item.base_price if item.discounted_price is not None else None,
-            )
-            for item in items
-        ]
-        print(f"  {render.BOLD}Shop Items:{render.RESET}")
-        print(f"  Essence: {state.essence}")
-        print()
-        print(render_cards.render_shop_grid(grid_items))
+        items = _build_shop_items(shown_cards)
+        dreamsign_offerings = _select_dreamsigns(dreamsigns_pool, 2, state)
+
+        # Display shop contents
+        print(f"  {colors.section('Shop Items')}  |  Essence: {colors.num(state.essence)}")
         print()
 
-        # Build the options list: items + reroll
-        option_labels: list[str] = [item.card.name for item in items]
+        for item in items:
+            card_lines = render_cards.format_card_display(item.card_instance)
+            for line in card_lines:
+                print(line)
+            price_str = colors.c(f"{item.price}e", "accent", bold=True)
+            print(f"         Price: {price_str}")
+            print()
 
-        # Add reroll option
+        if dreamsign_offerings:
+            print(f"  {colors.section('Dreamsign Offerings')}")
+            for ds in dreamsign_offerings:
+                bane_label = f" {colors.c('[BANE]', 'error', bold=True)}" if ds.is_bane else ""
+                print(f"    {colors.c(ds.name, 'accent')}{bane_label}")
+                print(f"      {colors.dim(ds.effect_text)}")
+            print()
+
+        # Build single-select options:
+        # [card0, card1, card2, dreamsign0, dreamsign1, reroll, leave]
+        option_labels: list[str] = []
+        for item in items:
+            option_labels.append(f"Buy {item.card_instance.design.name} ({item.price}e)")
+        for ds in dreamsign_offerings:
+            option_labels.append(f"Buy dreamsign: {ds.name}")
         if free_rerolls > 0:
-            reroll_label = f"Reroll (FREE)"
+            option_labels.append("Reroll (FREE)")
         else:
-            reroll_label = f"Reroll ({reroll_cost} essence)"
-        option_labels.append(reroll_label)
-        reroll_index = len(option_labels) - 1
+            option_labels.append(f"Reroll ({reroll_cost} essence)")
+        option_labels.append("Leave shop")
 
-        render_fn = _build_render_fn(items, state.essence, reroll_cost, free_rerolls)
+        card_count = len(items)
+        ds_count = len(dreamsign_offerings)
+        reroll_index = card_count + ds_count
+        leave_index = reroll_index + 1
 
-        selected_indices = input_handler.multi_select(
+        def _make_render_fn(
+            _items: list[ShopItem],
+            _ds: list[Dreamsign],
+            _essence: int,
+            _reroll_cost: int,
+            _free_rerolls: int,
+        ):
+            def _fn(index: int, option: str, is_selected: bool) -> str:
+                return _render_option(
+                    index, option, is_selected,
+                    _items, _ds, _essence, _reroll_cost, _free_rerolls,
+                )
+            return _fn
+
+        render_fn = _make_render_fn(
+            items, dreamsign_offerings, state.essence, reroll_cost, free_rerolls,
+        )
+
+        chosen_index = input_handler.single_select(
             options=option_labels,
             render_fn=render_fn,
         )
 
-        # Filter out unaffordable selections: ensure total cost of
-        # selected items does not exceed available essence.
-        affordable_indices: list[int] = []
-        remaining_essence = state.essence
-        for i in selected_indices:
-            if i == reroll_index:
-                affordable_indices.append(i)
-                continue
-            if i < len(items):
-                cost = items[i].effective_price
-                if remaining_essence >= cost:
-                    remaining_essence -= cost
-                    affordable_indices.append(i)
-        selected_indices = affordable_indices
+        # Handle the choice
+        if chosen_index < card_count:
+            # Buy a card
+            item = items[chosen_index]
+            if state.essence >= item.price:
+                state.spend_essence(item.price)
+                state.add_card(item.card_instance)
+                round_manager.complete_human_pick(state, item.card_instance, shown_cards)
 
-        # Check if reroll was selected
-        if reroll_index in selected_indices:
+                print()
+                card_name = colors.card(item.card_instance.design.name)
+                print(f"  Purchased {card_name} for {item.price} essence.")
+                print(f"  Essence remaining: {colors.num(state.essence)}")
+            else:
+                print()
+                print(f"  {colors.dim('Not enough essence.')}")
+                round_manager.advance_pick_no_card(state)
+
+            if logger is not None:
+                logger.log_site_visit(
+                    site_type="Shop",
+                    dreamscape=dreamscape_name,
+                    is_enhanced=is_enhanced,
+                    choices=[c.design.name for c in shown_cards],
+                    choice_made=item.card_instance.design.name,
+                    state_changes={
+                        "essence_spent": item.price,
+                        "deck_size_after": state.deck_count(),
+                    },
+                )
+            break
+
+        elif chosen_index < card_count + ds_count:
+            # Buy a dreamsign (does NOT consume a draft pick)
+            ds = dreamsign_offerings[chosen_index - card_count]
+            state.add_dreamsign(ds)
+
+            print()
+            print(f"  Acquired dreamsign: {colors.c(ds.name, 'accent')}")
+
+            # Dreamsign purchase does not consume a pick step,
+            # but the shop still needs to resolve the draft pick.
+            # The player is returned to the shop to pick a card or leave.
+            continue
+
+        elif chosen_index == reroll_index:
+            # Reroll: advance 1 pick step (no card taken)
             if free_rerolls > 0:
                 free_rerolls -= 1
             elif state.essence >= reroll_cost:
@@ -345,69 +283,29 @@ def run_shop(
             else:
                 print()
                 print(
-                    f"  {render.DIM}Not enough essence to reroll "
-                    f"({reroll_cost} needed, {state.essence} available)."
-                    f"{render.RESET}"
+                    f"  {colors.dim(f'Not enough essence to reroll '
+                    f'({reroll_cost} needed, {state.essence} available).')}"
                 )
                 continue
+
             print()
-            print(f"  {render.BOLD}Rerolling shop...{render.RESET}")
+            print(f"  {colors.c('Rerolling shop...', 'accent', bold=True)}")
             print()
+
+            # Consume 1 pick step for the reroll
+            round_manager.advance_pick_no_card(state)
             continue
 
-        # Process purchases
-        bought_items: list[ShopItem] = [
-            items[i] for i in selected_indices if i < len(items)
-        ]
-
-        total_cost = sum(item.effective_price for item in bought_items)
-
-        # Spend essence first to ensure atomicity -- if the player cannot
-        # afford the total, no state mutations occur.
-        if total_cost > 0:
-            state.spend_essence(total_cost)
-
-        for item in bought_items:
-            state.add_card(item.card)
-            pool_module.remove_entry(state.pool, item.pool_entry)
-
-        # Log the interaction
-        if logger is not None:
-            if bought_items:
-                logger.log_shop_purchase(
-                    items_shown=[item.card for item in items],
-                    items_bought=[item.card for item in bought_items],
-                    essence_spent=total_cost,
-                )
-            logger.log_site_visit(
-                site_type="Shop",
-                dreamscape=dreamscape_name,
-                is_enhanced=is_enhanced,
-                choices=[item.card.name for item in items],
-                choice_made=(
-                    ", ".join(item.card.name for item in bought_items)
-                    if bought_items
-                    else None
-                ),
-                state_changes={
-                    "items_bought": [item.card.name for item in bought_items],
-                    "essence_spent": total_cost,
-                    "deck_size_after": state.deck_count(),
-                },
-                profile_snapshot=state.resonance_profile.snapshot(),
-            )
-
-        if bought_items:
-            _print_purchase_summary(bought_items, total_cost, state.essence)
         else:
+            # Leave shop (buy nothing) -- consumes 1 pick step
+            round_manager.advance_pick_no_card(state)
             print()
-            print(f"  {render.DIM}No items purchased.{render.RESET}")
+            print(f"  {colors.dim('No items purchased.')}")
+            break
 
-        break
-
-    # Show resonance profile footer
-    footer = render.resonance_profile_footer(
-        counts=state.resonance_profile.snapshot(),
+    # Show the archetype preference footer
+    footer = render_status.archetype_preference_footer(
+        w=state.human_agent.w,
         deck_count=state.deck_count(),
         essence=state.essence,
     )

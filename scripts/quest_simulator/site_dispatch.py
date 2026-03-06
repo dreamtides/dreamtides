@@ -110,6 +110,7 @@ def visit_site(
             dreamscape_number=number,
             logger=logger,
             is_enhanced=enhanced,
+            all_dreamsigns=data.dreamsigns,
         )
 
     elif site_type == SiteType.SPECIALTY_SHOP:
