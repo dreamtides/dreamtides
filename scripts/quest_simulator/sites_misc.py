@@ -11,6 +11,11 @@ from typing import Any, Optional
 
 import input_handler
 import render
+import render_cards
+import render_status
+import round_manager
+import show_n
+from draft_models import CardInstance
 from jsonl_log import SessionLogger
 from models import DeckCard, Dreamsign
 from quest_state import QuestState
@@ -24,6 +29,17 @@ REWARD_ESSENCE_MIN = 150
 REWARD_ESSENCE_MAX = 250
 REWARD_LOW_THRESHOLD = 2
 REWARD_HIGH_THRESHOLD = 5
+REWARD_SHOW_N = 3
+
+
+def _deck_card_name(dc: DeckCard) -> str:
+    """Extract the display name from a DeckCard."""
+    instance = dc.instance
+    if hasattr(instance, "design") and hasattr(instance.design, "name"):
+        return instance.design.name
+    if hasattr(instance, "name"):
+        return instance.name
+    return str(instance)
 
 
 def select_duplication_candidates(
@@ -70,8 +86,8 @@ def run_duplication(
     """
     if not state.deck:
         print(f"  {render.DIM}Deck is empty -- nothing to duplicate.{render.RESET}")
-        footer = render.resonance_profile_footer(
-            counts=state.resonance_profile.snapshot(),
+        footer = render_status.archetype_preference_footer(
+            w=state.human_agent.w,
             deck_count=state.deck_count(),
             essence=state.essence,
         )
@@ -100,7 +116,7 @@ def run_duplication(
     print()
 
     # Build option labels with copy counts
-    option_labels = [f"{dc.card.name} x{cc}" for dc, cc in zip(candidates, copy_counts)]
+    option_labels = [f"{_deck_card_name(dc)} x{cc}" for dc, cc in zip(candidates, copy_counts)]
     option_labels.append(SKIP_LABEL)
 
     def _render_option(
@@ -113,10 +129,7 @@ def run_duplication(
         if index < len(_candidates):
             dc = _candidates[index]
             cc = _copy_counts[index]
-            card_lines = render.format_card(dc.card, highlighted=is_selected)
-            marker = ">" if is_selected else " "
-            line1 = f"  {marker} {dc.card.name} x{cc}"
-            # Replace the first line with the card format but add copy info
+            card_lines = render.format_card(dc, highlighted=is_selected)
             formatted_line1 = card_lines[0]
             copy_label = f" x{cc}"
             if is_selected:
@@ -136,21 +149,21 @@ def run_duplication(
         render_fn=_render_option,
     )
 
-    chosen_card: Optional[Card] = None
+    chosen_name: Optional[str] = None
     chosen_copies: int = 0
 
     if selected_index < len(candidates):
         chosen_dc = candidates[selected_index]
-        chosen_card = chosen_dc.card
+        chosen_name = _deck_card_name(chosen_dc)
         chosen_copies = copy_counts[selected_index]
 
-        # Add copies to deck
+        # Add copies to deck (duplicate the same instance reference)
         for _ in range(chosen_copies):
-            state.add_card(chosen_card)
+            state.deck.append(DeckCard(instance=chosen_dc.instance))
 
         print()
         print(
-            f"  {render.BOLD}Duplicated:{render.RESET} {chosen_card.name} "
+            f"  {render.BOLD}Duplicated:{render.RESET} {chosen_name} "
             f"x{chosen_copies} added to deck."
         )
     else:
@@ -163,25 +176,22 @@ def run_duplication(
             site_type="Duplication",
             dreamscape=dreamscape_name,
             is_enhanced=is_enhanced,
-            choices=[dc.card.name for dc in candidates],
+            choices=[_deck_card_name(dc) for dc in candidates],
             choice_made=(
-                f"{chosen_card.name} x{chosen_copies}"
-                if chosen_card is not None
+                f"{chosen_name} x{chosen_copies}"
+                if chosen_name is not None
                 else None
             ),
             state_changes={
                 "cards_added": chosen_copies,
-                "card_duplicated": (
-                    chosen_card.name if chosen_card is not None else None
-                ),
+                "card_duplicated": chosen_name,
                 "deck_size_after": state.deck_count(),
             },
-            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
-    # Show resonance profile footer
-    footer = render.resonance_profile_footer(
-        counts=state.resonance_profile.snapshot(),
+    # Show archetype preference footer
+    footer = render_status.archetype_preference_footer(
+        w=state.human_agent.w,
         deck_count=state.deck_count(),
         essence=state.essence,
     )
@@ -189,34 +199,41 @@ def run_duplication(
 
 
 def generate_reward(
+    state: QuestState,
     completion_level: int,
     rng: random.Random,
-    all_cards: list[Card],
     all_dreamsigns: Optional[list[Dreamsign]] = None,
 ) -> dict[str, Any]:
     """Generate a pre-determined reward based on completion level.
 
     Low levels (0-1): essence reward (150-250).
-    Mid levels (2-4): card reward (weighted rare+ from pool).
+    Mid levels (2-4): card reward from the draft pack via round manager.
     High levels (5+): dreamsign reward (random non-bane).
 
-    Returns a dict with 'type', 'value', and optionally 'card' or 'dreamsign'.
+    Returns a dict with 'type', 'value', and optionally 'shown_cards'
+    or 'dreamsign'.
     """
     if completion_level < REWARD_LOW_THRESHOLD:
         # Low level: essence
         amount = rng.randint(REWARD_ESSENCE_MIN, REWARD_ESSENCE_MAX)
         return {"type": "essence", "value": amount}
     elif completion_level < REWARD_HIGH_THRESHOLD:
-        # Mid level: card (weighted toward rare+)
-        rare_plus = [
-            c for c in all_cards if c.rarity in (Rarity.RARE, Rarity.LEGENDARY)
-        ]
-        if rare_plus:
-            card = rng.choice(rare_plus)
-            return {"type": "card", "value": 0, "card": card}
-        # Fallback to essence if no rare+ cards available
-        amount = rng.randint(REWARD_ESSENCE_MIN, REWARD_ESSENCE_MAX)
-        return {"type": "essence", "value": amount}
+        # Mid level: card from draft pack via round manager
+        pack = round_manager.advance_to_human_pick(state)
+        if not pack.cards:
+            # Fallback to essence if pack is empty
+            amount = rng.randint(REWARD_ESSENCE_MIN, REWARD_ESSENCE_MAX)
+            round_manager.advance_pick_no_card(state)
+            return {"type": "essence", "value": amount}
+
+        shown = show_n.select_cards(
+            pack_cards=pack.cards,
+            n=REWARD_SHOW_N,
+            strategy=state.draft_cfg.agents.show_n_strategy,
+            rng=random.Random(rng.randint(0, 2**32)),
+            human_w=state.human_agent.w,
+        )
+        return {"type": "card", "value": 0, "shown_cards": shown}
     else:
         # High level: dreamsign
         available = all_dreamsigns or []
@@ -235,14 +252,14 @@ def _format_reward_description(reward: dict[str, Any]) -> str:
     if reward_type == "essence":
         return f"{render.BOLD}{reward['value']}{render.RESET} essence"
     elif reward_type == "card":
-        card: Card = reward["card"]
-        res_str = render.color_resonances(card.resonances)
-        badge = render.rarity_badge(card.rarity)
-        return f"{card.name} {res_str} {badge}"
+        shown: list[CardInstance] = reward.get("shown_cards", [])
+        if shown:
+            names = [c.design.name for c in shown]
+            return f"Choose from: {', '.join(names)}"
+        return "Card reward"
     elif reward_type == "dreamsign":
         ds: Dreamsign = reward["dreamsign"]
-        res_str = render.color_resonance(ds.resonance)
-        return f"{ds.name} ({res_str})"
+        return f"{ds.name}"
     return "Unknown reward"
 
 
@@ -257,11 +274,12 @@ def run_reward(
 
     Generates a pre-determined reward based on completion level.
     Displays the reward and lets the player accept or decline.
+    For card rewards, shows 3 cards and lets the player pick one.
     """
     reward = generate_reward(
+        state=state,
         completion_level=state.completion_level,
         rng=state.rng,
-        all_cards=state.all_cards,
         all_dreamsigns=all_dreamsigns,
     )
 
@@ -275,62 +293,122 @@ def run_reward(
     print(header)
     print()
 
-    # Display the reward
-    description = _format_reward_description(reward)
-    print(f"  Reward: {description}")
-    print()
+    reward_type = reward["type"]
 
-    # Confirm/decline
-    accepted = input_handler.confirm_decline()
+    if reward_type == "card":
+        shown_cards: list[CardInstance] = reward.get("shown_cards", [])
+        if shown_cards:
+            print("  Choose a card reward:")
+            print()
 
-    if accepted:
-        reward_type = reward["type"]
-        if reward_type == "essence":
-            state.gain_essence(reward["value"])
-            print()
-            print(f"  {render.BOLD}Gained {reward['value']} essence!{render.RESET}")
-        elif reward_type == "card":
-            card = reward["card"]
-            state.add_card(card)
-            print()
-            print(f"  {render.BOLD}Added {card.name} to deck!{render.RESET}")
-        elif reward_type == "dreamsign":
-            ds = reward["dreamsign"]
-            state.add_dreamsign(ds)
-            print()
-            print(f"  {render.BOLD}Acquired dreamsign: {ds.name}!{render.RESET}")
+            option_labels = [c.design.name for c in shown_cards] + ["Decline"]
+            decline_index = len(shown_cards)
+
+            def _render_card(
+                index: int,
+                option: str,
+                is_selected: bool,
+                _shown: list[CardInstance] = shown_cards,
+            ) -> str:
+                if index < len(_shown):
+                    card = _shown[index]
+                    card_lines = render_cards.format_card_display(
+                        card, highlighted=is_selected
+                    )
+                    return "\n".join(card_lines)
+                marker = ">" if is_selected else " "
+                return f"  {marker} {render.DIM}Decline{render.RESET}"
+
+            selected_index = input_handler.single_select(
+                options=option_labels,
+                render_fn=_render_card,
+            )
+
+            if selected_index < decline_index:
+                chosen = shown_cards[selected_index]
+                state.add_card(chosen)
+                round_manager.complete_human_pick(state, chosen, shown_cards)
+                print()
+                print(
+                    f"  {render.BOLD}Added {chosen.design.name} to deck!{render.RESET}"
+                )
+            else:
+                round_manager.advance_pick_no_card(state)
+                print()
+                print(f"  {render.DIM}Declined.{render.RESET}")
+
+            if logger is not None:
+                choice_str = (
+                    shown_cards[selected_index].design.name
+                    if selected_index < decline_index
+                    else None
+                )
+                logger.log_site_visit(
+                    site_type="RewardSite",
+                    dreamscape=dreamscape_name,
+                    choices=[c.design.name for c in shown_cards],
+                    choice_made=choice_str,
+                    state_changes={
+                        "reward_type": "card",
+                        "accepted": selected_index < decline_index,
+                        "essence_after": state.essence,
+                        "deck_size_after": state.deck_count(),
+                    },
+                )
+        else:
+            print(f"  {render.DIM}No cards available.{render.RESET}")
     else:
+        # Essence or dreamsign reward
+        description = _format_reward_description(reward)
+        print(f"  Reward: {description}")
         print()
-        print(f"  {render.DIM}Declined.{render.RESET}")
 
-    # Log the interaction
-    if logger is not None:
-        choice_str = None
+        # Confirm/decline
+        accepted = input_handler.confirm_decline()
+
         if accepted:
-            if reward["type"] == "essence":
-                choice_str = f"essence:{reward['value']}"
-            elif reward["type"] == "card":
-                choice_str = reward["card"].name
-            elif reward["type"] == "dreamsign":
-                choice_str = reward["dreamsign"].name
+            if reward_type == "essence":
+                state.gain_essence(reward["value"])
+                print()
+                print(
+                    f"  {render.BOLD}Gained {reward['value']} essence!{render.RESET}"
+                )
+            elif reward_type == "dreamsign":
+                ds = reward["dreamsign"]
+                state.add_dreamsign(ds)
+                print()
+                print(
+                    f"  {render.BOLD}Acquired dreamsign: {ds.name}!{render.RESET}"
+                )
+        else:
+            print()
+            print(f"  {render.DIM}Declined.{render.RESET}")
 
-        logger.log_site_visit(
-            site_type="RewardSite",
-            dreamscape=dreamscape_name,
-            choices=[_format_reward_description(reward)],
-            choice_made=choice_str,
-            state_changes={
-                "reward_type": reward["type"],
-                "accepted": accepted,
-                "essence_after": state.essence,
-                "deck_size_after": state.deck_count(),
-            },
-            profile_snapshot=state.resonance_profile.snapshot(),
-        )
+        # Log the interaction
+        if logger is not None:
+            choice_str = None
+            if accepted:
+                if reward_type == "essence":
+                    choice_str = f"essence:{reward['value']}"
+                elif reward_type == "dreamsign":
+                    choice_str = reward["dreamsign"].name
 
-    # Show resonance profile footer
-    footer = render.resonance_profile_footer(
-        counts=state.resonance_profile.snapshot(),
+            logger.log_site_visit(
+                site_type="RewardSite",
+                dreamscape=dreamscape_name,
+                choices=[_format_reward_description(reward)],
+                choice_made=choice_str,
+                state_changes={
+                    "reward_type": reward_type,
+                    "accepted": accepted,
+                    "essence_after": state.essence,
+                    "deck_size_after": state.deck_count(),
+                },
+            )
+
+    # Show archetype preference footer
+    footer = render_status.archetype_preference_footer(
+        w=state.human_agent.w,
         deck_count=state.deck_count(),
         essence=state.essence,
     )
@@ -389,11 +467,10 @@ def run_cleanse(
                     "banes_removed": 0,
                     "deck_size_after": state.deck_count(),
                 },
-                profile_snapshot=state.resonance_profile.snapshot(),
             )
 
-        footer = render.resonance_profile_footer(
-            counts=state.resonance_profile.snapshot(),
+        footer = render_status.archetype_preference_footer(
+            w=state.human_agent.w,
             deck_count=state.deck_count(),
             essence=state.essence,
         )
@@ -403,7 +480,7 @@ def run_cleanse(
     # Combine all bane items and limit to 3
     all_bane_items: list[tuple[str, DeckCard | None, Dreamsign | None]] = []
     for dc in bane_cards:
-        all_bane_items.append((f"Card: {dc.card.name}", dc, None))
+        all_bane_items.append((f"Card: {_deck_card_name(dc)}", dc, None))
     for ds in bane_dreamsigns:
         all_bane_items.append((f"Dreamsign: {ds.name}", None, ds))
 
@@ -429,7 +506,7 @@ def run_cleanse(
         for label, dc, ds in shown_items:
             if dc is not None:
                 state.remove_card(dc)
-                removed_names.append(dc.card.name)
+                removed_names.append(_deck_card_name(dc))
             if ds is not None:
                 state.remove_dreamsign(ds)
                 removed_names.append(ds.name)
@@ -455,12 +532,11 @@ def run_cleanse(
                 "deck_size_after": state.deck_count(),
                 "dreamsign_count_after": state.dreamsign_count(),
             },
-            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
-    # Show resonance profile footer
-    footer = render.resonance_profile_footer(
-        counts=state.resonance_profile.snapshot(),
+    # Show archetype preference footer
+    footer = render_status.archetype_preference_footer(
+        w=state.human_agent.w,
         deck_count=state.deck_count(),
         essence=state.essence,
     )

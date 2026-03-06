@@ -12,8 +12,9 @@ from typing import Optional
 
 import input_handler
 import render
+import render_status
 from jsonl_log import SessionLogger
-from models import Dreamsign, Resonance
+from models import Dreamsign
 from quest_state import QuestState
 
 DRAFT_COUNT = 3
@@ -70,9 +71,8 @@ def format_dreamsign_option(
     effect text on the next line.
     """
     marker = ">" if highlighted else " "
-    res_str = render.color_resonance(ds.resonance)
-    name_color = render.RESONANCE_COLORS.get(ds.resonance, render.NEUTRAL_COLOR)
-    line1 = f"  {marker} {name_color}{ds.name}{render.RESET}  {res_str}"
+    bane_marker = f"  {render.BOLD}[BANE]{render.RESET}" if ds.is_bane else ""
+    line1 = f"  {marker} {render.BOLD}{ds.name}{render.RESET}{bane_marker}"
     line2 = f'      "{ds.effect_text}"'
     return [line1, line2]
 
@@ -146,10 +146,10 @@ def run_dreamsign_offering(
                     "dreamsign_added": None,
                     "dreamsign_count": state.dreamsign_count(),
                 },
-                profile_snapshot=state.resonance_profile.snapshot(),
+                profile_snapshot=None,
             )
-        footer = render.resonance_profile_footer(
-            counts=state.resonance_profile.snapshot(),
+        footer = render_status.archetype_preference_footer(
+            w=state.human_agent.w,
             deck_count=state.deck_count(),
             essence=state.essence,
         )
@@ -208,8 +208,7 @@ def run_dreamsign_offering(
     if chosen is not None:
         handle_dreamsign_purge(state, chosen)
         print()
-        res_str = render.color_resonance(chosen.resonance)
-        print(f"  {render.BOLD}Acquired:{render.RESET} {chosen.name} ({res_str})")
+        print(f"  {render.BOLD}Acquired:{render.RESET} {chosen.name}")
     else:
         print()
         print(f"  {render.DIM}Declined.{render.RESET}")
@@ -226,13 +225,13 @@ def run_dreamsign_offering(
                 "dreamsign_added": chosen.name if chosen is not None else None,
                 "dreamsign_count": state.dreamsign_count(),
             },
-            profile_snapshot=state.resonance_profile.snapshot(),
+            profile_snapshot=None,
         )
 
-    # Show resonance profile footer
+    # Show archetype preference footer
     print()
-    footer = render.resonance_profile_footer(
-        counts=state.resonance_profile.snapshot(),
+    footer = render_status.archetype_preference_footer(
+        w=state.human_agent.w,
         deck_count=state.deck_count(),
         essence=state.essence,
     )
@@ -274,10 +273,10 @@ def run_dreamsign_draft(
                     "dreamsign_added": None,
                     "dreamsign_count": state.dreamsign_count(),
                 },
-                profile_snapshot=state.resonance_profile.snapshot(),
+                profile_snapshot=None,
             )
-        footer = render.resonance_profile_footer(
-            counts=state.resonance_profile.snapshot(),
+        footer = render_status.archetype_preference_footer(
+            w=state.human_agent.w,
             deck_count=state.deck_count(),
             essence=state.essence,
         )
@@ -320,8 +319,7 @@ def run_dreamsign_draft(
         chosen = offered[selected_index]
         handle_dreamsign_purge(state, chosen)
         print()
-        res_str = render.color_resonance(chosen.resonance)
-        print(f"  {render.BOLD}Acquired:{render.RESET} {chosen.name} ({res_str})")
+        print(f"  {render.BOLD}Acquired:{render.RESET} {chosen.name}")
     else:
         print()
         print(f"  {render.DIM}Skipped.{render.RESET}")
@@ -338,13 +336,13 @@ def run_dreamsign_draft(
                 "dreamsign_added": chosen.name if chosen is not None else None,
                 "dreamsign_count": state.dreamsign_count(),
             },
-            profile_snapshot=state.resonance_profile.snapshot(),
+            profile_snapshot=None,
         )
 
-    # Show resonance profile footer
+    # Show archetype preference footer
     print()
-    footer = render.resonance_profile_footer(
-        counts=state.resonance_profile.snapshot(),
+    footer = render_status.archetype_preference_footer(
+        w=state.human_agent.w,
         deck_count=state.deck_count(),
         essence=state.essence,
     )

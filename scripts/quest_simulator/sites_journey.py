@@ -8,22 +8,20 @@ reward/cost pairs. Both use single-select with a skip option.
 import random
 from typing import Optional
 
-import algorithm
 import input_handler
-import pool as pool_module
 import render
+import render_status
+import round_manager
+import show_n
 import sites_dreamsign
+from draft_models import CardDesign, CardInstance
 from jsonl_log import SessionLogger
 from models import (
-    AlgorithmParams,
     BaneCard,
-    Card,
+    DeckCard,
     Dreamsign,
     EffectType,
     Journey,
-    PoolParams,
-    Rarity,
-    Resonance,
     TemptingOffer,
 )
 from quest_state import QuestState
@@ -33,17 +31,20 @@ JOURNEY_ENHANCED_COUNT = 3
 OFFER_DEFAULT_COUNT = 2
 OFFER_ENHANCED_COUNT = 3
 
+BANE_INSTANCE_ID_OFFSET = 1_000_000
+
 _EFFECT_TYPE_LABELS: dict[EffectType, str] = {
     EffectType.ADD_CARDS: "Add cards",
     EffectType.ADD_ESSENCE: "Gain essence",
     EffectType.REMOVE_CARDS: "Remove cards",
     EffectType.ADD_DREAMSIGN: "Gain dreamsign",
-    EffectType.GAIN_RESONANCE: "Boost resonance",
     EffectType.LARGE_ESSENCE: "Gain essence",
     EffectType.LOSE_ESSENCE: "Lose essence",
     EffectType.ADD_BANE_CARD: "Gain bane card",
     EffectType.ADD_BANE_DREAMSIGN: "Gain bane dreamsign",
 }
+
+_bane_instance_counter: int = 0
 
 
 def select_journeys(
@@ -68,29 +69,39 @@ def select_offers(
     return rng.sample(all_offers, count)
 
 
-def _add_cards_from_pool(
+def _add_cards_via_draft(
     state: QuestState,
     count: int,
-    algorithm_params: AlgorithmParams,
-    pool_params: PoolParams,
-) -> list[Card]:
-    """Draw weighted cards from pool and add to deck. Returns added cards."""
-    if not state.pool:
-        pool_module.refill_pool(state.pool, state.all_cards, pool_params)
+) -> list[CardInstance]:
+    """Auto-add cards from the draft by consuming human-seat picks.
 
-    selections = algorithm.select_cards(
-        pool=state.pool,
-        n=count,
-        profile=state.resonance_profile,
-        params=algorithm_params,
-        rng=state.rng,
-    )
+    For each pick, advances AI seats, returns the pack at seat 0,
+    selects the top card via show_n with n=1, and adds it to the deck.
+    Returns the list of added CardInstance objects.
+    """
+    added: list[CardInstance] = []
+    for _ in range(count):
+        pack = round_manager.advance_to_human_pick(state)
+        if not pack.cards:
+            continue
 
-    added: list[Card] = []
-    for entry, _weight in selections:
-        state.add_card(entry.card)
-        pool_module.remove_entry(state.pool, entry)
-        added.append(entry.card)
+        shown = show_n.select_cards(
+            pack_cards=pack.cards,
+            n=1,
+            strategy=state.draft_cfg.agents.show_n_strategy,
+            rng=random.Random(state.rng.randint(0, 2**32)),
+            human_w=state.human_agent.w,
+        )
+
+        if not shown:
+            round_manager.advance_pick_no_card(state)
+            continue
+
+        chosen = shown[0]
+        state.add_card(chosen)
+        round_manager.complete_human_pick(state, chosen, shown)
+        added.append(chosen)
+
     return added
 
 
@@ -103,7 +114,7 @@ def _remove_random_cards(state: QuestState, count: int) -> list[str]:
     to_remove = state.rng.sample(state.deck, n)
     removed_names: list[str] = []
     for dc in to_remove:
-        removed_names.append(dc.card.name)
+        removed_names.append(dc.instance.design.name)
         state.remove_card(dc)
     return removed_names
 
@@ -150,47 +161,39 @@ def _add_random_bane_card(
     state: QuestState,
     all_banes: list[BaneCard],
 ) -> Optional[str]:
-    """Add a random bane card to deck. Returns the bane card name or None."""
+    """Add a random bane card to deck as a synthetic CardDesign/CardInstance.
+
+    Returns the bane card name or None.
+    """
+    global _bane_instance_counter
+
     if not all_banes:
         return None
 
     chosen = state.rng.choice(all_banes)
-    bane_as_card = Card(
+
+    design = CardDesign(
+        card_id=chosen.name,
         name=chosen.name,
-        card_number=-1,
-        energy_cost=chosen.energy_cost,
-        card_type=chosen.card_type,
-        subtype=None,
-        is_fast=False,
-        spark=None,
-        rarity=Rarity.COMMON,
-        rules_text=chosen.rules_text,
-        resonances=frozenset(),
-        tags=frozenset(),
+        fitness=[0.0] * 8,
+        power=0.0,
+        commit=0.0,
+        flex=0.0,
     )
-    state.add_bane_card(bane_as_card)
+
+    _bane_instance_counter += 1
+    instance = CardInstance(
+        instance_id=BANE_INSTANCE_ID_OFFSET + _bane_instance_counter,
+        design=design,
+    )
+
+    state.add_bane_card(instance)
     return chosen.name
-
-
-def _gain_resonance(state: QuestState, amount: int) -> Optional[Resonance]:
-    """Add amount to the player's top resonance. Returns the resonance or None."""
-    top = state.resonance_profile.top_n(1, rng=state.rng)
-    if not top:
-        # All zeros, pick a random resonance
-        chosen = state.rng.choice(list(Resonance))
-        state.resonance_profile.add(chosen, amount)
-        return chosen
-
-    resonance, _count = top[0]
-    state.resonance_profile.add(resonance, amount)
-    return resonance
 
 
 def apply_journey_effect(
     state: QuestState,
     journey: Journey,
-    algorithm_params: AlgorithmParams,
-    pool_params: PoolParams,
     all_dreamsigns: list[Dreamsign],
 ) -> dict[str, object]:
     """Apply a journey's effect to state. Returns a dict of state changes."""
@@ -200,13 +203,8 @@ def apply_journey_effect(
     }
 
     if journey.effect_type == EffectType.ADD_CARDS:
-        added = _add_cards_from_pool(
-            state,
-            journey.effect_value,
-            algorithm_params,
-            pool_params,
-        )
-        changes["cards_added"] = [c.name for c in added]
+        added = _add_cards_via_draft(state, journey.effect_value)
+        changes["cards_added"] = [c.design.name for c in added]
 
     elif journey.effect_type in (EffectType.ADD_ESSENCE, EffectType.LARGE_ESSENCE):
         state.gain_essence(journey.effect_value)
@@ -220,11 +218,6 @@ def apply_journey_effect(
         ds = _add_random_non_bane_dreamsign(state, all_dreamsigns)
         changes["dreamsign_added"] = ds.name if ds is not None else None
 
-    elif journey.effect_type == EffectType.GAIN_RESONANCE:
-        res = _gain_resonance(state, journey.effect_value)
-        changes["resonance_boosted"] = res.value if res is not None else None
-        changes["resonance_amount"] = journey.effect_value
-
     return changes
 
 
@@ -232,8 +225,6 @@ def apply_reward_effect(
     state: QuestState,
     effect_type: EffectType,
     value: int,
-    algorithm_params: AlgorithmParams,
-    pool_params: PoolParams,
     all_dreamsigns: list[Dreamsign],
 ) -> dict[str, object]:
     """Apply a reward effect to state. Returns a dict of state changes."""
@@ -243,8 +234,8 @@ def apply_reward_effect(
     }
 
     if effect_type == EffectType.ADD_CARDS:
-        added = _add_cards_from_pool(state, value, algorithm_params, pool_params)
-        changes["cards_added"] = [c.name for c in added]
+        added = _add_cards_via_draft(state, value)
+        changes["cards_added"] = [c.design.name for c in added]
 
     elif effect_type in (EffectType.ADD_ESSENCE, EffectType.LARGE_ESSENCE):
         state.gain_essence(value)
@@ -341,8 +332,6 @@ def run_dream_journey(
     state: QuestState,
     all_journeys: list[Journey],
     all_dreamsigns: list[Dreamsign],
-    algorithm_params: AlgorithmParams,
-    pool_params: PoolParams,
     dreamscape_name: str,
     dreamscape_number: int,
     logger: Optional[SessionLogger],
@@ -352,8 +341,8 @@ def run_dream_journey(
 
     Selects 2 (or 3 if enhanced) random journeys, displays them for the
     player to choose via arrow-key navigation, applies the selected
-    journey's effect, logs the selection, and shows the resonance profile
-    footer.
+    journey's effect, logs the selection, and shows the archetype
+    preference footer.
     """
     choices = select_journeys(all_journeys, state.rng, is_enhanced)
 
@@ -394,8 +383,6 @@ def run_dream_journey(
         state_changes = apply_journey_effect(
             state,
             selected,
-            algorithm_params,
-            pool_params,
             all_dreamsigns,
         )
 
@@ -421,13 +408,12 @@ def run_dream_journey(
             choices=[j.name for j in choices],
             choice_made=choice_made,
             state_changes=state_changes,
-            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
-    # Show resonance profile footer
+    # Show archetype preference footer
     print()
-    footer = render.resonance_profile_footer(
-        counts=state.resonance_profile.snapshot(),
+    footer = render_status.archetype_preference_footer(
+        w=state.human_agent.w,
         deck_count=state.deck_count(),
         essence=state.essence,
     )
@@ -439,8 +425,6 @@ def run_tempting_offer(
     all_offers: list[TemptingOffer],
     all_banes: list[BaneCard],
     all_dreamsigns: list[Dreamsign],
-    algorithm_params: AlgorithmParams,
-    pool_params: PoolParams,
     dreamscape_name: str,
     dreamscape_number: int,
     logger: Optional[SessionLogger],
@@ -451,7 +435,7 @@ def run_tempting_offer(
     Selects 2 (or 3 if enhanced) random offer pairs, displays them for
     the player to choose via arrow-key navigation. If selected, applies
     the reward first then the cost, logs the interaction, and shows the
-    resonance profile footer.
+    archetype preference footer.
     """
     choices = select_offers(all_offers, state.rng, is_enhanced)
 
@@ -494,8 +478,6 @@ def run_tempting_offer(
             state,
             selected.reward_effect_type,
             selected.reward_value,
-            algorithm_params,
-            pool_params,
             all_dreamsigns,
         )
         cost_changes = apply_cost_effect(
@@ -533,13 +515,12 @@ def run_tempting_offer(
             choices=[o.reward_name for o in choices],
             choice_made=choice_made,
             state_changes=state_changes,
-            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
-    # Show resonance profile footer
+    # Show archetype preference footer
     print()
-    footer = render.resonance_profile_footer(
-        counts=state.resonance_profile.snapshot(),
+    footer = render_status.archetype_preference_footer(
+        w=state.human_agent.w,
         deck_count=state.deck_count(),
         essence=state.essence,
     )
