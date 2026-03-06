@@ -1,34 +1,31 @@
 """Draft site interaction for the quest simulator.
 
 Implements the Draft site: 5 sequential picks of 4 cards each,
-using resonance-weighted selection from the draft pool. Picked cards
-are added to the deck and removed from the pool; unpicked cards
-receive +1 staleness.
+using the round manager to advance the 6-seat draft loop. Each
+pick filters the pack at seat 0 via show_n with sharpened_preference
+strategy, presents the cards to the player, and signals the round
+manager on completion.
 """
 
+import random
 from typing import Optional
 
-import algorithm
+import colors
 import input_handler
-import pool as pool_module
 import render
 import render_cards
+import render_status
+import round_manager
+import show_n
 from jsonl_log import SessionLogger
-from models import (
-    AlgorithmParams,
-    Card,
-    DraftParams,
-    PoolParams,
-    Resonance,
-)
 from quest_state import QuestState
+
+PICKS_PER_DRAFT_SITE = 5
+SHOW_N_CARDS = 4
 
 
 def run_draft(
     state: QuestState,
-    algorithm_params: AlgorithmParams,
-    draft_params: DraftParams,
-    pool_params: PoolParams,
     dreamscape_name: str,
     dreamscape_number: int,
     logger: Optional[SessionLogger],
@@ -36,42 +33,30 @@ def run_draft(
 ) -> None:
     """Run a Draft site interaction.
 
-    Performs picks_per_site sequential picks. Each pick selects
-    cards_per_pick cards from the pool via resonance-weighted
-    selection, presents them to the player, and processes the choice.
-
-    The is_enhanced flag is accepted for site context completeness.
-    Regular Draft is not affected by biome enhancement (Arcane enhances
-    Discovery Draft, not regular Draft).
+    Consumes 5 consecutive human-seat picks from the draft loop.
+    Each pick advances the round manager (AI seats pick, round
+    starts if needed), filters the pack at seat 0 to 4 cards via
+    sharpened_preference, and lets the player choose one.
     """
-    for pick_index in range(draft_params.picks_per_site):
-        # If pool is empty, attempt a refill
-        if not state.pool:
-            pool_module.refill_pool(
-                state.pool,
-                state.all_cards,
-                pool_params,
-            )
+    for pick_index in range(PICKS_PER_DRAFT_SITE):
+        pack = round_manager.advance_to_human_pick(state)
 
-        # Select cards from pool
-        selections = algorithm.select_cards(
-            pool=state.pool,
-            n=draft_params.cards_per_pick,
-            profile=state.resonance_profile,
-            params=algorithm_params,
-            rng=state.rng,
+        pick_rng = random.Random(state.rng.randint(0, 2**32))
+        shown_cards = show_n.select_cards(
+            pack.cards,
+            SHOW_N_CARDS,
+            "sharpened_preference",
+            pick_rng,
+            human_w=state.human_agent.w,
+            human_drafted=state.human_agent.drafted,
+            scoring_cfg=state.draft_cfg.scoring,
         )
 
-        if not selections:
-            # No cards available even after refill; skip this pick
+        if not shown_cards:
             continue
 
-        offered_entries = [entry for entry, _ in selections]
-        offered_weights = [weight for _, weight in selections]
-        offered_cards = [entry.card for entry in offered_entries]
-
         # Display header
-        pick_label = f"Pick {pick_index + 1}/{draft_params.picks_per_site}"
+        pick_label = f"Pick {pick_index + 1}/{PICKS_PER_DRAFT_SITE}"
         header = render.site_visit_header(
             dreamscape_name=dreamscape_name,
             site_type_label="Draft",
@@ -81,59 +66,41 @@ def run_draft(
         print(header)
         print()
 
-        # Build display options and render function for single_select
-        option_labels = [card.name for card in offered_cards]
-        max_weight = max(offered_weights) if offered_weights else 0.0
-        top_res_pairs = state.resonance_profile.top_n(2, rng=state.rng)
-        top_res: frozenset[Resonance] = frozenset(r for r, c in top_res_pairs if c > 0)
+        # Build display options
+        option_labels = [_card_name(card) for card in shown_cards]
 
         def _render_card_option(
             index: int,
             option: str,
             is_selected: bool,
-            _cards: list[Card] = offered_cards,
-            _weights: list[float] = offered_weights,
-            _max_weight: float = max_weight,
-            _top_res: frozenset[Resonance] = top_res,
+            _cards=shown_cards,
         ) -> str:
             card = _cards[index]
-            w = _weights[index] if index < len(_weights) else 0.0
-            lines = render_cards.format_draft_card(
+            lines = render_cards.format_card_display(
                 card,
-                weight=w,
-                max_weight=_max_weight,
                 highlighted=is_selected,
-                top_resonances=_top_res,
             )
             return "\n".join(lines)
 
-        # Player selection via arrow-key single select
         chosen_index = input_handler.single_select(
             options=option_labels,
             render_fn=_render_card_option,
         )
 
-        # Process the pick
-        picked_entry = offered_entries[chosen_index]
-        picked_card = picked_entry.card
+        chosen_card = shown_cards[chosen_index]
 
-        # Add picked card to deck
-        state.add_card(picked_card)
+        # Signal the round manager
+        round_manager.complete_human_pick(state, chosen_card, shown_cards)
 
-        # Remove picked entry from pool
-        pool_module.remove_entry(state.pool, picked_entry)
-
-        # Increment staleness on unpicked entries
-        unpicked = [e for i, e in enumerate(offered_entries) if i != chosen_index]
-        pool_module.increment_staleness(unpicked)
+        # Add to the player's deck
+        state.add_card(chosen_card)
 
         # Log the pick
         if logger is not None:
             logger.log_draft_pick(
-                offered_cards=offered_cards,
-                weights=offered_weights,
-                picked_card=picked_card,
-                profile_snapshot=state.resonance_profile.snapshot(),
+                offered_cards=shown_cards,
+                weights=[1.0] * len(shown_cards),
+                picked_card=chosen_card,
             )
 
     # Log the overall site visit
@@ -145,16 +112,24 @@ def run_draft(
             choices=[],
             choice_made=None,
             state_changes={
-                "picks_completed": draft_params.picks_per_site,
+                "picks_completed": PICKS_PER_DRAFT_SITE,
                 "deck_size_after": state.deck_count(),
             },
-            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
-    # After all picks, show the resonance profile footer
-    footer = render.resonance_profile_footer(
-        counts=state.resonance_profile.snapshot(),
-        deck_count=state.deck_count(),
+    # Show the archetype preference footer
+    footer = render_status.archetype_preference_footer(
+        w=state.human_agent.w,
+        deck_count=len(state.deck),
         essence=state.essence,
     )
     print(footer)
+
+
+def _card_name(card) -> str:
+    """Extract the display name from a CardInstance or CardDesign."""
+    if hasattr(card, "design") and hasattr(card.design, "name"):
+        return card.design.name
+    if hasattr(card, "name"):
+        return card.name
+    return str(card)

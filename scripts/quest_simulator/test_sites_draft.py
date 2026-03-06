@@ -1,333 +1,219 @@
-"""Tests for sites_draft module."""
+"""Tests for sites_draft module.
+
+Tests the Draft site interaction using the round manager and draft
+engine types (CardInstance, CardDesign, AgentState).
+"""
 
 import random
-from typing import Optional
 from unittest.mock import patch
 
-from models import (
-    AlgorithmParams,
-    Card,
-    CardType,
-    DraftParams,
-    PoolEntry,
-    PoolParams,
-    Rarity,
-    Resonance,
+import agents
+import card_generator
+import cube_manager
+import pack_generator
+from config import (
+    AgentsConfig,
+    CardsConfig,
+    CubeConfig,
+    DraftConfig,
+    PackGenerationConfig,
+    RefillConfig,
+    ScoringConfig,
+    SimulatorConfig,
 )
+from draft_models import CubeConsumptionMode
 from quest_state import QuestState
 
 
-def _make_card(
-    name: str,
-    card_number: int,
-    rarity: Rarity = Rarity.COMMON,
-    resonances: Optional[frozenset[Resonance]] = None,
-    energy_cost: int = 2,
-    spark: Optional[int] = 1,
-) -> Card:
-    return Card(
-        name=name,
-        card_number=card_number,
-        energy_cost=energy_cost,
-        card_type=CardType.CHARACTER,
-        subtype=None,
-        is_fast=False,
-        spark=spark,
-        rarity=rarity,
-        rules_text=f"Rules for {name}.",
-        resonances=resonances or frozenset(),
-        tags=frozenset(),
-    )
-
-
-def _make_test_cards() -> list[Card]:
-    """Create a set of test cards spanning rarities and resonances."""
-    return [
-        _make_card("Tide Card A", 1, Rarity.COMMON, frozenset({Resonance.TIDE})),
-        _make_card("Tide Card B", 2, Rarity.COMMON, frozenset({Resonance.TIDE})),
-        _make_card("Ember Card A", 3, Rarity.UNCOMMON, frozenset({Resonance.EMBER})),
-        _make_card("Ember Card B", 4, Rarity.UNCOMMON, frozenset({Resonance.EMBER})),
-        _make_card("Stone Card A", 5, Rarity.RARE, frozenset({Resonance.STONE})),
-        _make_card("Zephyr Card A", 6, Rarity.COMMON, frozenset({Resonance.ZEPHYR})),
-        _make_card("Ruin Card A", 7, Rarity.COMMON, frozenset({Resonance.RUIN})),
-        _make_card("Neutral Card A", 8, Rarity.COMMON, frozenset()),
-        _make_card(
-            "Dual Card A",
-            9,
-            Rarity.LEGENDARY,
-            frozenset({Resonance.TIDE, Resonance.RUIN}),
+def _make_draft_cfg() -> SimulatorConfig:
+    """Create a minimal SimulatorConfig for testing."""
+    return SimulatorConfig(
+        draft=DraftConfig(
+            seat_count=6,
+            pack_size=20,
+            human_seats=1,
+            picks_per_round=[10],
+            round_count=1,
+            alternate_direction=False,
         ),
-        _make_card("Stone Card B", 10, Rarity.UNCOMMON, frozenset({Resonance.STONE})),
-    ]
-
-
-def _make_pool(cards: list[Card]) -> list[PoolEntry]:
-    """Create a simple pool with 1 entry per card."""
-    return [PoolEntry(card) for card in cards]
-
-
-def _make_algorithm_params() -> AlgorithmParams:
-    return AlgorithmParams(
-        exponent=1.4,
-        floor_weight=0.5,
-        neutral_base=3.0,
-        staleness_factor=0.3,
+        agents=AgentsConfig(
+            show_n=4,
+            show_n_strategy="sharpened_preference",
+            policy="adaptive",
+            ai_optimality=0.80,
+            learning_rate=3.0,
+            openness_window=3,
+        ),
+        cards=CardsConfig(
+            archetype_count=8,
+            source="synthetic",
+        ),
+        cube=CubeConfig(
+            distinct_cards=540,
+            copies_per_card=1,
+            consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
+        ),
+        refill=RefillConfig(strategy="no_refill"),
+        pack_generation=PackGenerationConfig(strategy="seeded_themed"),
+        scoring=ScoringConfig(),
     )
 
 
-def _make_draft_params(picks: int = 5, cards: int = 4) -> DraftParams:
-    return DraftParams(
-        cards_per_pick=cards,
-        picks_per_site=picks,
-    )
-
-
-def _make_pool_params() -> PoolParams:
-    return PoolParams(
-        copies_common=4,
-        copies_uncommon=3,
-        copies_rare=2,
-        copies_legendary=1,
-        variance_min=0.75,
-        variance_max=1.25,
-    )
-
-
-def _make_quest_state(
-    cards: Optional[list[Card]] = None,
-    pool: Optional[list[PoolEntry]] = None,
-    seed: int = 42,
-) -> QuestState:
-    test_cards = cards or _make_test_cards()
-    test_pool = pool or _make_pool(test_cards)
+def _make_quest_state(seed: int = 42) -> QuestState:
+    """Create a QuestState with a full draft engine for testing."""
     rng = random.Random(seed)
-    variance = {r: 1.0 for r in Resonance}
+    cfg = _make_draft_cfg()
+    designs = card_generator.generate_cards(cfg, rng)
+    cube = cube_manager.CubeManager(
+        designs,
+        copies_per_card=cfg.cube.copies_per_card,
+        consumption_mode=cfg.cube.consumption_mode,
+    )
+    human_agent = agents.create_agent(cfg.cards.archetype_count)
+    ai_agents_list = [agents.create_agent(cfg.cards.archetype_count) for _ in range(5)]
+
     return QuestState(
         essence=250,
-        pool=test_pool,
         rng=rng,
-        all_cards=test_cards,
-        pool_variance=variance,
+        human_agent=human_agent,
+        ai_agents=ai_agents_list,
+        cube=cube,
+        draft_cfg=cfg,
     )
 
 
 class TestRunDraft:
-    """Tests for run_draft function."""
+    """Tests for run_draft function using the round manager."""
 
-    def test_draft_adds_cards_to_deck(self) -> None:
-        """After a 2-pick draft, 2 cards should be in the deck."""
+    def test_draft_adds_5_cards_to_deck(self) -> None:
+        """A full draft site (5 picks) should add 5 cards to the deck."""
         from sites_draft import run_draft
 
-        cards = _make_test_cards()
-        state = _make_quest_state(cards)
-        initial_pool_size = len(state.pool)
-        params = _make_algorithm_params()
-        draft_params = _make_draft_params(picks=2, cards=4)
+        state = _make_quest_state()
 
-        # Mock single_select to always pick index 0
         with patch("sites_draft.input_handler.single_select", return_value=0):
             run_draft(
                 state=state,
-                algorithm_params=params,
-                draft_params=draft_params,
-                pool_params=_make_pool_params(),
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
                 logger=None,
             )
 
-        assert state.deck_count() == 2
-        # Pool should have shrunk by 2 (one per pick)
-        assert len(state.pool) == initial_pool_size - 2
+        assert state.deck_count() == 5
 
-    def test_draft_removes_picked_entry_from_pool(self) -> None:
-        """The picked entry should be removed from the pool."""
+    def test_draft_advances_global_pick_index(self) -> None:
+        """After 5 picks, the global pick index should be 5."""
         from sites_draft import run_draft
 
-        cards = _make_test_cards()
-        state = _make_quest_state(cards)
-        params = _make_algorithm_params()
-        draft_params = _make_draft_params(picks=1, cards=4)
-        pool_before = list(state.pool)
+        state = _make_quest_state()
+        initial_pick = state.global_pick_index
 
         with patch("sites_draft.input_handler.single_select", return_value=0):
             run_draft(
                 state=state,
-                algorithm_params=params,
-                draft_params=draft_params,
-                pool_params=_make_pool_params(),
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
                 logger=None,
             )
 
-        assert len(state.pool) == len(pool_before) - 1
+        assert state.global_pick_index == initial_pick + 5
 
-    def test_draft_increments_staleness_on_unpicked(self) -> None:
-        """Unpicked cards should have their pool entry staleness incremented."""
+    def test_draft_updates_human_agent(self) -> None:
+        """After picks, the human agent's drafted list should grow."""
         from sites_draft import run_draft
 
-        cards = _make_test_cards()
-        pool = _make_pool(cards)
-        state = _make_quest_state(cards, pool)
-        params = _make_algorithm_params()
-        draft_params = _make_draft_params(picks=1, cards=4)
+        state = _make_quest_state()
+        assert len(state.human_agent.drafted) == 0
 
         with patch("sites_draft.input_handler.single_select", return_value=0):
             run_draft(
                 state=state,
-                algorithm_params=params,
-                draft_params=draft_params,
-                pool_params=_make_pool_params(),
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
                 logger=None,
             )
 
-        # Some entries that were offered but not picked should have staleness > 0
-        stale_entries = [e for e in state.pool if e.staleness > 0]
-        assert len(stale_entries) > 0
-
-    def test_draft_respects_picks_per_site(self) -> None:
-        """The number of picks should match draft_params.picks_per_site."""
-        from sites_draft import run_draft
-
-        cards = _make_test_cards()
-        state = _make_quest_state(cards)
-        params = _make_algorithm_params()
-        draft_params = _make_draft_params(picks=3, cards=4)
-
-        with patch("sites_draft.input_handler.single_select", return_value=0):
-            run_draft(
-                state=state,
-                algorithm_params=params,
-                draft_params=draft_params,
-                pool_params=_make_pool_params(),
-                dreamscape_name="Test Dreamscape",
-                dreamscape_number=1,
-                logger=None,
-            )
-
-        assert state.deck_count() == 3
-
-    def test_draft_handles_small_pool(self) -> None:
-        """When pool has fewer than cards_per_pick, offer what's available."""
-        from sites_draft import run_draft
-
-        cards = _make_test_cards()[:2]
-        pool = _make_pool(cards)  # Only 2 entries
-        state = _make_quest_state(cards, pool)
-        params = _make_algorithm_params()
-        draft_params = _make_draft_params(picks=1, cards=4)
-
-        with patch("sites_draft.input_handler.single_select", return_value=0):
-            run_draft(
-                state=state,
-                algorithm_params=params,
-                draft_params=draft_params,
-                pool_params=_make_pool_params(),
-                dreamscape_name="Test Dreamscape",
-                dreamscape_number=1,
-                logger=None,
-            )
-
-        assert state.deck_count() == 1
-
-    def test_draft_updates_resonance_profile(self) -> None:
-        """Picking a card should update the resonance profile."""
-        from sites_draft import run_draft
-
-        cards = [
-            _make_card("Tide Card", 1, Rarity.COMMON, frozenset({Resonance.TIDE})),
-            _make_card("Ember Card", 2, Rarity.UNCOMMON, frozenset({Resonance.EMBER})),
-            _make_card("Stone Card", 3, Rarity.RARE, frozenset({Resonance.STONE})),
-            _make_card("Ruin Card", 4, Rarity.COMMON, frozenset({Resonance.RUIN})),
-        ]
-        pool = _make_pool(cards)
-        state = _make_quest_state(cards, pool)
-        params = _make_algorithm_params()
-        draft_params = _make_draft_params(picks=1, cards=4)
-
-        assert state.resonance_profile.total() == 0
-
-        with patch("sites_draft.input_handler.single_select", return_value=0):
-            run_draft(
-                state=state,
-                algorithm_params=params,
-                draft_params=draft_params,
-                pool_params=_make_pool_params(),
-                dreamscape_name="Test Dreamscape",
-                dreamscape_number=1,
-                logger=None,
-            )
-
-        assert state.resonance_profile.total() > 0
+        assert len(state.human_agent.drafted) == 5
 
     def test_draft_with_logger(self) -> None:
         """Draft should call log_draft_pick on the logger when provided."""
         from sites_draft import run_draft
 
-        cards = _make_test_cards()
-        state = _make_quest_state(cards)
-        params = _make_algorithm_params()
-        draft_params = _make_draft_params(picks=2, cards=4)
-
         log_calls: list[dict[str, object]] = []
 
         class FakeLogger:
-            def log_draft_pick(
-                self,
-                offered_cards: list[Card],
-                weights: list[float],
-                picked_card: Card,
-                profile_snapshot: dict[Resonance, int],
-            ) -> None:
+            def log_draft_pick(self, offered_cards, weights, picked_card):
                 log_calls.append(
                     {
                         "offered": list(offered_cards),
                         "weights": list(weights),
                         "picked": picked_card,
-                        "profile": dict(profile_snapshot),
                     }
                 )
 
-            def log_site_visit(self, **kwargs: object) -> None:
+            def log_site_visit(self, **kwargs):
                 pass
+
+        state = _make_quest_state()
 
         with patch("sites_draft.input_handler.single_select", return_value=0):
             run_draft(
                 state=state,
-                algorithm_params=params,
-                draft_params=draft_params,
-                pool_params=_make_pool_params(),
                 dreamscape_name="Test Dreamscape",
                 dreamscape_number=1,
                 logger=FakeLogger(),  # type: ignore[arg-type]
             )
 
-        assert len(log_calls) == 2
+        assert len(log_calls) == 5
         for call in log_calls:
             assert len(call["offered"]) > 0  # type: ignore[arg-type]
-            assert len(call["weights"]) > 0  # type: ignore[arg-type]
             assert call["picked"] is not None
 
-    def test_draft_empty_pool_skips_gracefully(self) -> None:
-        """When pool is completely empty, draft should handle gracefully."""
+    def test_draft_different_picks(self) -> None:
+        """Picking different indices should yield different cards."""
         from sites_draft import run_draft
 
-        cards = _make_test_cards()
-        state = _make_quest_state(cards, pool=[])
-        params = _make_algorithm_params()
-        draft_params = _make_draft_params(picks=1, cards=4)
+        state1 = _make_quest_state(seed=42)
+        state2 = _make_quest_state(seed=42)
 
-        # Should not raise
         with patch("sites_draft.input_handler.single_select", return_value=0):
             run_draft(
-                state=state,
-                algorithm_params=params,
-                draft_params=draft_params,
-                pool_params=_make_pool_params(),
-                dreamscape_name="Test Dreamscape",
+                state=state1,
+                dreamscape_name="Test",
                 dreamscape_number=1,
                 logger=None,
             )
+
+        with patch("sites_draft.input_handler.single_select", return_value=1):
+            run_draft(
+                state=state2,
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        # Decks should differ when different indices are picked
+        names1 = {dc.instance.design.name for dc in state1.deck}
+        names2 = {dc.instance.design.name for dc in state2.deck}
+        assert names1 != names2
+
+    def test_draft_cards_come_from_pack(self) -> None:
+        """Each picked card should be a valid CardInstance with a design."""
+        from sites_draft import run_draft
+
+        state = _make_quest_state()
+
+        with patch("sites_draft.input_handler.single_select", return_value=0):
+            run_draft(
+                state=state,
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        for dc in state.deck:
+            assert hasattr(dc.instance, "design")
+            assert hasattr(dc.instance.design, "name")
+            assert hasattr(dc.instance.design, "power")
+            assert hasattr(dc.instance.design, "commit")
+            assert hasattr(dc.instance.design, "flex")

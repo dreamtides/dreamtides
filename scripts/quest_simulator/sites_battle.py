@@ -1,30 +1,30 @@
 """Battle site interaction for the quest simulator.
 
 Implements the Battle site: auto-win combat, essence reward scaled by
-completion level, and post-battle rare draft pick (1 of 3 rare+ cards
-from the pool). Opponent type varies by completion level: Dream Guardian
-for most battles, random miniboss at the miniboss battle, and random
-final boss at the last battle.
+completion level, and post-battle card pick (1 of 3 cards from the
+draft pack via the round manager). Opponent type varies by completion
+level: Dream Guardian for most battles, random miniboss at the
+miniboss battle, and random final boss at the last battle.
 """
 
 import logging
 import random
 from typing import Optional
 
-import algorithm
+import colors
 import input_handler
-import pool as pool_module
 import render
+import render_cards
 import render_status
+import round_manager
+import show_n
 from jsonl_log import SessionLogger
-from models import (
-    AlgorithmParams,
-    Boss,
-    Card,
-)
+from models import Boss
 from quest_state import QuestState
 
 _log = logging.getLogger(__name__)
+
+BATTLE_SHOW_N = 3
 
 
 def determine_opponent(
@@ -71,7 +71,6 @@ def run_battle(
     state: QuestState,
     battle_config: dict[str, int],
     quest_config: dict[str, int],
-    algorithm_params: AlgorithmParams,
     bosses: list[Boss],
     dreamscape_name: str,
     dreamscape_number: int,
@@ -80,8 +79,8 @@ def run_battle(
     """Run a Battle site interaction.
 
     Determines the opponent, displays the battle, auto-wins, awards
-    essence, offers a rare draft pick, increments completion level,
-    and logs the result.
+    essence, offers a post-battle card pick via the round manager,
+    increments completion level, and logs the result.
     """
     # Determine opponent
     opponent_name, boss_info = determine_opponent(
@@ -113,55 +112,43 @@ def run_battle(
     # Apply essence reward
     state.gain_essence(essence_reward)
 
-    # Post-battle rare draft pick
-    rare_pick_count = battle_config["rare_pick_count"]
-    selections = algorithm.select_cards(
-        pool=state.pool,
-        n=rare_pick_count,
-        profile=state.resonance_profile,
-        params=algorithm_params,
-        rng=state.rng,
-        rare_only=True,
+    # Post-battle card pick via round manager
+    pack = round_manager.advance_to_human_pick(state)
+
+    pick_rng = random.Random(state.rng.randint(0, 2**32))
+    shown_cards = show_n.select_cards(
+        pack.cards,
+        BATTLE_SHOW_N,
+        "sharpened_preference",
+        pick_rng,
+        human_w=state.human_agent.w,
+        human_drafted=state.human_agent.drafted,
+        scoring_cfg=state.draft_cfg.scoring,
     )
 
-    picked_card: Optional[Card] = None
+    picked_card = None
 
-    # Fall back to any-rarity pool when no rare cards are available
-    if not selections and state.pool:
-        _log.warning(
-            "No rare cards in pool for post-battle draft; falling back to any-rarity pool"
-        )
-        selections = algorithm.select_cards(
-            pool=state.pool,
-            n=rare_pick_count,
-            profile=state.resonance_profile,
-            params=algorithm_params,
-            rng=state.rng,
-            rare_only=False,
-        )
-
-    if selections:
-        offered_entries = [entry for entry, _ in selections]
-        offered_cards = [entry.card for entry in offered_entries]
-
-        # Display reward summary with essence and rare pick framing
+    if shown_cards:
+        # Display reward summary with essence
         reward_summary = render_status.battle_reward_summary(
             essence_reward=essence_reward,
-            rare_pick_count=len(offered_cards),
         )
         print(reward_summary)
         print()
 
-        option_labels = [card.name for card in offered_cards]
+        option_labels = [_card_name(card) for card in shown_cards]
 
         def _render_card_option(
             index: int,
             option: str,
             is_selected: bool,
-            _cards: list[Card] = offered_cards,
+            _cards=shown_cards,
         ) -> str:
             card = _cards[index]
-            lines = render.format_card(card, highlighted=is_selected)
+            lines = render_cards.format_card_display(
+                card,
+                highlighted=is_selected,
+            )
             return "\n".join(lines)
 
         chosen_index = input_handler.single_select(
@@ -169,23 +156,22 @@ def run_battle(
             render_fn=_render_card_option,
         )
 
-        picked_entry = offered_entries[chosen_index]
-        picked_card = picked_entry.card
+        picked_card = shown_cards[chosen_index]
+
+        # Signal the round manager
+        round_manager.complete_human_pick(state, picked_card, shown_cards)
 
         # Add picked card to deck
         state.add_card(picked_card)
 
-        # Remove picked entry from pool
-        pool_module.remove_entry(state.pool, picked_entry)
-
         print()
-        print(f"  Added {render.BOLD}{picked_card.name}{render.RESET} to your deck.")
+        print(f"  Added {colors.card(_card_name(picked_card))} to your deck.")
         print()
     else:
-        # Pool is completely empty: no cards available at all
-        print(f"  Essence reward: {render.BOLD}+{essence_reward}{render.RESET}")
+        # No cards available in the pack
+        print(f"  Essence reward: {colors.c(f'+{essence_reward}', 'accent', bold=True)}")
         print()
-        print(f"  {render.DIM}No cards available in the pool.{render.RESET}")
+        print(f"  {colors.dim('No cards available in the pack.')}")
         print()
 
     # Show completion progress
@@ -208,20 +194,28 @@ def run_battle(
             site_type="Battle",
             dreamscape=dreamscape_name,
             choices=[opponent_name],
-            choice_made=picked_card.name if picked_card is not None else None,
+            choice_made=_card_name(picked_card) if picked_card is not None else None,
             state_changes={
                 "opponent": opponent_name,
                 "essence_reward": essence_reward,
-                "rare_pick": picked_card.name if picked_card is not None else None,
+                "rare_pick": _card_name(picked_card) if picked_card is not None else None,
                 "deck_size_after": state.deck_count(),
             },
-            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
-    # Show resonance profile footer
-    footer = render.resonance_profile_footer(
-        counts=state.resonance_profile.snapshot(),
-        deck_count=state.deck_count(),
+    # Show archetype preference footer
+    footer = render_status.archetype_preference_footer(
+        w=state.human_agent.w,
+        deck_count=len(state.deck),
         essence=state.essence,
     )
     print(footer)
+
+
+def _card_name(card) -> str:
+    """Extract the display name from a CardInstance or CardDesign."""
+    if hasattr(card, "design") and hasattr(card.design, "name"):
+        return card.design.name
+    if hasattr(card, "name"):
+        return card.name
+    return str(card)
