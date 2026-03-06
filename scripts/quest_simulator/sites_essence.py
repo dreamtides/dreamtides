@@ -8,6 +8,7 @@ from typing import Optional
 
 import input_handler
 import render
+import render_status
 from jsonl_log import SessionLogger
 from quest_state import QuestState
 
@@ -47,7 +48,7 @@ def run_essence(
 
     Computes the essence gain based on completion level and enhancement,
     displays the result, waits for the player to continue, adds essence
-    to quest state, logs the interaction, and shows the resonance footer.
+    to quest state, logs the interaction, and shows the archetype footer.
     """
     amount = compute_essence_amount(
         state.completion_level, essence_config, enhanced=is_enhanced
@@ -88,12 +89,11 @@ def run_essence(
             state_changes={
                 "essence_gained": amount,
             },
-            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
-    # Show resonance profile footer
-    footer = render.resonance_profile_footer(
-        counts=state.resonance_profile.snapshot(),
+    # Show archetype preference footer
+    footer = render_status.archetype_preference_footer(
+        w=state.human_agent.w,
         deck_count=state.deck_count(),
         essence=state.essence,
     )

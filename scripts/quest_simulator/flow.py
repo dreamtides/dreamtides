@@ -114,6 +114,7 @@ def _show_victory(
         deck_size=state.deck_count(),
         dreamsign_count=state.dreamsign_count(),
         essence=state.essence,
+        w=state.human_agent.w,
         log_path=log_path,
     )
     print(screen)

@@ -67,8 +67,7 @@ def format_dreamsign_option(
 ) -> list[str]:
     """Format a dreamsign for display in a selection menu.
 
-    Returns a list of display lines: name with resonance, and
-    effect text on the next line.
+    Returns a list of display lines: name and effect text.
     """
     marker = ">" if highlighted else " "
     bane_marker = f"  {render.BOLD}[BANE]{render.RESET}" if ds.is_bane else ""

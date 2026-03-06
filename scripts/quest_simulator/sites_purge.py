@@ -10,9 +10,16 @@ from typing import Optional
 
 import input_handler
 import render
+import render_cards
+import render_status
 from jsonl_log import SessionLogger
 from models import DeckCard
 from quest_state import QuestState
+
+
+def _deck_card_name(dc: DeckCard) -> str:
+    """Extract a display name from a DeckCard."""
+    return render_cards.card_name(dc.instance)
 
 
 def _render_purge_item(
@@ -29,8 +36,7 @@ def _render_purge_item(
         check = "[x]" if is_checked else "[ ]"
         return f"  {marker} {check} {option}"
 
-    card = deck[index].card
-    card_lines = render.format_card(card, highlighted=is_highlighted)
+    card_lines = render.format_card(deck[index], highlighted=is_highlighted)
     check = "[x]" if is_checked else "[ ]"
 
     line1 = card_lines[0]
@@ -59,8 +65,8 @@ def run_purge(
 
     if not state.deck:
         print(f"  {render.DIM}Deck is empty -- nothing to purge.{render.RESET}")
-        footer = render.resonance_profile_footer(
-            counts=state.resonance_profile.snapshot(),
+        footer = render_status.archetype_preference_footer(
+            w=state.human_agent.w,
             deck_count=state.deck_count(),
             essence=state.essence,
         )
@@ -85,7 +91,7 @@ def run_purge(
 
     # Build option labels from the current deck
     deck_snapshot = list(state.deck)
-    option_labels = [dc.card.name for dc in deck_snapshot]
+    option_labels = [_deck_card_name(dc) for dc in deck_snapshot]
 
     def _render_fn(
         index: int,
@@ -123,22 +129,21 @@ def run_purge(
             site_type="Purge",
             dreamscape=dreamscape_name,
             is_enhanced=is_enhanced,
-            choices=[dc.card.name for dc in deck_snapshot],
+            choices=[_deck_card_name(dc) for dc in deck_snapshot],
             choice_made=(
-                ", ".join(dc.card.name for dc in removed_cards)
+                ", ".join(_deck_card_name(dc) for dc in removed_cards)
                 if removed_cards
                 else None
             ),
             state_changes={
-                "cards_removed": [dc.card.name for dc in removed_cards],
+                "cards_removed": [_deck_card_name(dc) for dc in removed_cards],
                 "deck_size_after": state.deck_count(),
             },
-            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
-    # Show resonance profile footer
-    footer = render.resonance_profile_footer(
-        counts=state.resonance_profile.snapshot(),
+    # Show archetype preference footer
+    footer = render_status.archetype_preference_footer(
+        w=state.human_agent.w,
         deck_count=state.deck_count(),
         essence=state.essence,
     )
@@ -190,7 +195,7 @@ def forced_deck_limit_purge(
             print()
 
             deck_snapshot = list(state.deck)
-            option_labels = [dc.card.name for dc in deck_snapshot]
+            option_labels = [_deck_card_name(dc) for dc in deck_snapshot]
 
             def _render_fn(
                 index: int,
@@ -238,12 +243,11 @@ def forced_deck_limit_purge(
             state_changes={
                 "deck_size_after": state.deck_count(),
             },
-            profile_snapshot=state.resonance_profile.snapshot(),
         )
 
-    # Show resonance profile footer
-    footer = render.resonance_profile_footer(
-        counts=state.resonance_profile.snapshot(),
+    # Show archetype preference footer
+    footer = render_status.archetype_preference_footer(
+        w=state.human_agent.w,
         deck_count=state.deck_count(),
         essence=state.essence,
     )
