@@ -39,6 +39,7 @@ class PoolAnalysis:
     bridge_count: int
     neutral_count: int
     per_archetype_primaries: list[int]
+    per_archetype_coverage: list[int]
     bridge_pairs: dict[tuple[int, int], int]
     rarity_counts: dict[str, int]
     powers: list[float]
@@ -53,6 +54,7 @@ class IdealTargets:
     bridge_count: int
     primary_count: int
     primaries_per_archetype: int
+    coverage_per_archetype: int
     per_tier_total: dict[str, int]
     per_tier_bridge: dict[str, int]
     per_tier_primary: dict[str, int]
@@ -64,7 +66,7 @@ class GapAnalysis:
     """What's missing between current pool and ideal targets."""
 
     remaining_total: int
-    per_archetype_needed: list[int]
+    per_archetype_coverage_needed: list[int]
     bridge_pairs_needed: dict[tuple[int, int], int]
     per_rarity_needed: dict[str, int]
     per_rarity_power_range: dict[str, tuple[float, float]]
@@ -191,6 +193,7 @@ def analyze_pool(cards: list[CardDesign], cfg: SimulatorConfig) -> PoolAnalysis:
     bridge_count = 0
     neutral_count = 0
     per_archetype_primaries = [0] * archetype_count
+    per_archetype_coverage = [0] * archetype_count
     bridge_pairs: dict[tuple[int, int], int] = {}
 
     for card in cards:
@@ -206,6 +209,10 @@ def analyze_pool(cards: list[CardDesign], cfg: SimulatorConfig) -> PoolAnalysis:
                     bridge_pairs[pair] = bridge_pairs.get(pair, 0) + 1
         else:
             neutral_count += 1
+        # Coverage: every archetype where fitness > 0.5
+        for i in range(min(archetype_count, len(card.fitness))):
+            if card.fitness[i] > 0.5:
+                per_archetype_coverage[i] += 1
 
     rarity_counts: dict[str, int] = {}
     power_per_rarity: dict[str, list[float]] = {}
@@ -220,6 +227,7 @@ def analyze_pool(cards: list[CardDesign], cfg: SimulatorConfig) -> PoolAnalysis:
         bridge_count=bridge_count,
         neutral_count=neutral_count,
         per_archetype_primaries=per_archetype_primaries,
+        per_archetype_coverage=per_archetype_coverage,
         bridge_pairs=bridge_pairs,
         rarity_counts=rarity_counts,
         powers=[c.power for c in cards],
@@ -233,12 +241,23 @@ def analyze_pool(cards: list[CardDesign], cfg: SimulatorConfig) -> PoolAnalysis:
 
 
 def compute_ideal_targets(cfg: SimulatorConfig) -> IdealTargets:
-    """Compute ideal pool composition from config (pure arithmetic)."""
+    """Compute ideal pool composition from config (pure arithmetic).
+
+    Coverage target: in the simulator, each primary covers 1 archetype and
+    each bridge covers ~2.3 on average. Total archetype-slots =
+    primary_count + bridge_count * 2.3, divided evenly across archetypes.
+    """
     pool_size = cfg.cube.distinct_cards
     archetype_count = cfg.cards.archetype_count
     bridge_count = int(pool_size * cfg.cards.bridge_fraction)
     primary_count = pool_size - bridge_count
     primaries_per_archetype = primary_count // archetype_count
+
+    # Coverage: each card with fitness > 0.5 in an archetype counts.
+    # Bridges average ~2.3 archetypes, primaries 1, neutrals 0.
+    avg_bridge_archetypes = 2.3
+    total_coverage_slots = primary_count + bridge_count * avg_bridge_archetypes
+    coverage_per_archetype = round(total_coverage_slots / archetype_count)
 
     per_tier_total: dict[str, int] = {}
     per_tier_bridge: dict[str, int] = {}
@@ -262,6 +281,7 @@ def compute_ideal_targets(cfg: SimulatorConfig) -> IdealTargets:
         bridge_count=bridge_count,
         primary_count=primary_count,
         primaries_per_archetype=primaries_per_archetype,
+        coverage_per_archetype=coverage_per_archetype,
         per_tier_total=per_tier_total,
         per_tier_bridge=per_tier_bridge,
         per_tier_primary=per_tier_primary,
@@ -277,35 +297,35 @@ def compute_ideal_targets(cfg: SimulatorConfig) -> IdealTargets:
 def compute_gaps(
     analysis: PoolAnalysis, targets: IdealTargets, cfg: SimulatorConfig
 ) -> GapAnalysis:
-    """Compute what's missing between current pool and ideal."""
+    """Compute what's missing between current pool and ideal.
+
+    Uses coverage-based targets: scales the ideal coverage_per_archetype
+    proportionally to the current pool size, so the gap reflects what's
+    needed at the current scale, not only at the full 360-card target.
+    """
     card_count = len(analysis.cards)
     remaining_total = max(0, targets.pool_size - card_count)
     archetype_count = cfg.cards.archetype_count
 
-    per_archetype_needed = [
-        max(0, targets.primaries_per_archetype - analysis.per_archetype_primaries[i])
+    # Coverage gap against full target — shows where to focus remaining cards
+    per_archetype_coverage_needed = [
+        max(0, targets.coverage_per_archetype - analysis.per_archetype_coverage[i])
         for i in range(archetype_count)
     ]
 
-    # Bridge pair needs
-    num_pairs = archetype_count * (archetype_count - 1) // 2
-    bridge_per_pair = (
-        math.ceil(targets.bridge_count / num_pairs) if num_pairs > 0 else 0
-    )
+    # Bridge pair needs — only show uncovered pairs, don't enforce counts
     bridge_pairs_needed: dict[tuple[int, int], int] = {}
     for i in range(archetype_count):
         for j in range(i + 1, archetype_count):
             pair = (i, j)
             current = analysis.bridge_pairs.get(pair, 0)
-            need = max(0, bridge_per_pair - current)
-            if need > 0:
-                bridge_pairs_needed[pair] = need
+            if current == 0:
+                bridge_pairs_needed[pair] = 1
 
     # Per-rarity needs scaled to remaining slots
     per_rarity_needed: dict[str, int] = {}
     per_rarity_power_range: dict[str, tuple[float, float]] = {}
     if cfg.rarity.enabled and remaining_total > 0:
-        total_design = sum(cfg.rarity.tier_design_counts)
         for ti, tier_name in enumerate(cfg.rarity.tiers):
             tier_target = cfg.rarity.tier_design_counts[ti]
             current_tier = analysis.rarity_counts.get(tier_name, 0)
@@ -315,7 +335,7 @@ def compute_gaps(
 
     return GapAnalysis(
         remaining_total=remaining_total,
-        per_archetype_needed=per_archetype_needed,
+        per_archetype_coverage_needed=per_archetype_coverage_needed,
         bridge_pairs_needed=bridge_pairs_needed,
         per_rarity_needed=per_rarity_needed,
         per_rarity_power_range=per_rarity_power_range,
@@ -437,13 +457,16 @@ def format_analysis(
             f"({colors.num(f'{pct:.1f}')}%)"
         )
 
-    # Per-archetype primary counts
-    lines.append(f"\n  {colors.label('Primary cards per archetype:')}")
+    # Per-archetype coverage (all cards with fitness > 0.5)
+    lines.append(f"\n  {colors.label('Archetype coverage (fitness > 0.5):')}")
     for i, name in enumerate(arch_names):
-        count = analysis.per_archetype_primaries[i]
+        cov = analysis.per_archetype_coverage[i]
+        pri = analysis.per_archetype_primaries[i]
+        bridge_contrib = cov - pri
         lines.append(
             f"    {colors.label(f'{name.title() + ':':<12s}')} "
-            f"{colors.num(f'{count:>4d}')}"
+            f"{colors.num(f'{cov:>4d}')}  "
+            f"{colors.dim(f'({pri} primary + {bridge_contrib} bridge)')}"
         )
 
     # Power distribution
@@ -484,12 +507,18 @@ def format_analysis(
         )
 
     lines.append(_row("Total cards", card_count, targets.pool_size))
-    lines.append(_row("Bridge cards", analysis.bridge_count, targets.bridge_count))
-    lines.append(_row("Primary cards", analysis.primary_count, targets.primary_count))
+    lines.append("")
+    lines.append(
+        f"  {colors.label('Composition:')}  "
+        f"{colors.num(analysis.primary_count)} primary  "
+        f"{colors.num(analysis.bridge_count)} bridge  "
+        f"{colors.num(analysis.neutral_count)} neutral  "
+        f"{colors.dim(f'(sim default: {cfg.cards.bridge_fraction:.0%} bridge)')}"
+    )
     lines.append("")
 
-    # Per-archetype primaries
-    lines.append(f"  {colors.label('Per-archetype primary counts:')}")
+    # Per-archetype coverage
+    lines.append(f"  {colors.label('Per-archetype coverage (fitness > 0.5):')}")
     lines.append(
         f"  {colors.label(f'{'Archetype':<12s}')}  "
         f"{colors.label(f'{'Current':>8s}')}  "
@@ -501,8 +530,8 @@ def format_analysis(
         lines.append(
             _row(
                 f"  {name.title()}",
-                analysis.per_archetype_primaries[i],
-                targets.primaries_per_archetype,
+                analysis.per_archetype_coverage[i],
+                targets.coverage_per_archetype,
             )
         )
     lines.append("")
@@ -533,30 +562,31 @@ def format_analysis(
     )
     lines.append("")
 
-    # Per-archetype needs (sorted by need descending)
-    lines.append(f"  {colors.label('Primary cards needed per archetype:')}")
+    # Per-archetype coverage needs (sorted by need descending)
+    lines.append(f"  {colors.label('Coverage needed per archetype:')}")
     arch_needs = sorted(
-        [(arch_names[i], gaps.per_archetype_needed[i]) for i in range(archetype_count)],
+        [
+            (arch_names[i], gaps.per_archetype_coverage_needed[i])
+            for i in range(archetype_count)
+        ],
         key=lambda x: -x[1],
     )
     max_need = max(n for _, n in arch_needs) if arch_needs else 1
-    for name, need in arch_needs:
-        lines.append(_bar_chart(name.title(), need, max_need))
+    if max_need > 0:
+        for name, need in arch_needs:
+            lines.append(_bar_chart(name.title(), need, max_need))
+    else:
+        lines.append(f"    {colors.ok('All archetypes at or above coverage target')}")
     lines.append("")
 
-    # Bridge pair needs
+    # Uncovered archetype pairs (no bridge card linking them)
     if gaps.bridge_pairs_needed:
-        lines.append(f"  {colors.label('Bridge cards needed (top pairs):')}")
-        sorted_pairs = sorted(gaps.bridge_pairs_needed.items(), key=lambda x: -x[1])[
-            :10
-        ]
-        for (a, b), need in sorted_pairs:
+        lines.append(f"  {colors.label('Uncovered archetype pairs (no bridge):')}")
+        sorted_pairs = sorted(gaps.bridge_pairs_needed.items(), key=lambda x: x[0])
+        for (a, b), _need in sorted_pairs:
             a_name = arch_names[a].title() if a < len(arch_names) else str(a)
             b_name = arch_names[b].title() if b < len(arch_names) else str(b)
-            pair_label = f"{a_name}-{b_name}:"
-            lines.append(
-                f"    {colors.dim(f'{pair_label:<24s}')} " f"{colors.num(need)}"
-            )
+            lines.append(f"    {colors.dim(f'{a_name} — {b_name}')}")
         lines.append("")
 
     # Rarity gap
