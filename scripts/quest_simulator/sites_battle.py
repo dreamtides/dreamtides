@@ -1,19 +1,17 @@
 """Battle site interaction for the quest simulator.
 
 Implements the Battle site: auto-win combat, essence reward scaled by
-completion level, and post-battle card pick (1 of 3 cards from the
-draft pack via the round manager). Opponent type varies by completion
-level: Dream Guardian for most battles, random miniboss at the
-miniboss battle, and random final boss at the last battle.
+completion level, and post-battle card pick from the draft pack via the
+round manager. Opponent type varies by completion level: Dream Guardian
+for most battles, random miniboss at the miniboss battle, and random
+final boss at the last battle.
 """
 
-import logging
 import random
 from typing import Optional
 
 import colors
 import input_handler
-import render
 import render_cards
 import render_status
 import round_manager
@@ -21,10 +19,6 @@ import show_n
 from jsonl_log import SessionLogger
 from models import Boss
 from quest_state import QuestState
-
-_log = logging.getLogger(__name__)
-
-BATTLE_SHOW_N = 3
 
 
 def determine_opponent(
@@ -113,13 +107,16 @@ def run_battle(
     state.gain_essence(essence_reward)
 
     # Post-battle card pick via round manager
+    rare_pick_count = battle_config["rare_pick_count"]
+    show_n_strategy = state.draft_cfg.agents.show_n_strategy
+
     pack = round_manager.advance_to_human_pick(state)
 
     pick_rng = random.Random(state.rng.randint(0, 2**32))
     shown_cards = show_n.select_cards(
         pack.cards,
-        BATTLE_SHOW_N,
-        "sharpened_preference",
+        rare_pick_count,
+        show_n_strategy,
         pick_rng,
         human_w=state.human_agent.w,
         human_drafted=state.human_agent.drafted,
@@ -136,7 +133,7 @@ def run_battle(
         print(reward_summary)
         print()
 
-        option_labels = [_card_name(card) for card in shown_cards]
+        option_labels = [render_cards.card_name(card) for card in shown_cards]
 
         def _render_card_option(
             index: int,
@@ -165,10 +162,12 @@ def run_battle(
         state.add_card(picked_card)
 
         print()
-        print(f"  Added {colors.card(_card_name(picked_card))} to your deck.")
+        print(f"  Added {colors.card(render_cards.card_name(picked_card))} to your deck.")
         print()
     else:
-        # No cards available in the pack
+        # No cards available in the pack; still advance draft state
+        round_manager.advance_pick_no_card(state)
+
         print(f"  Essence reward: {colors.c(f'+{essence_reward}', 'accent', bold=True)}")
         print()
         print(f"  {colors.dim('No cards available in the pack.')}")
@@ -194,11 +193,11 @@ def run_battle(
             site_type="Battle",
             dreamscape=dreamscape_name,
             choices=[opponent_name],
-            choice_made=_card_name(picked_card) if picked_card is not None else None,
+            choice_made=render_cards.card_name(picked_card) if picked_card is not None else None,
             state_changes={
                 "opponent": opponent_name,
                 "essence_reward": essence_reward,
-                "rare_pick": _card_name(picked_card) if picked_card is not None else None,
+                "rare_pick": render_cards.card_name(picked_card) if picked_card is not None else None,
                 "deck_size_after": state.deck_count(),
             },
         )
@@ -210,12 +209,3 @@ def run_battle(
         essence=state.essence,
     )
     print(footer)
-
-
-def _card_name(card) -> str:
-    """Extract the display name from a CardInstance or CardDesign."""
-    if hasattr(card, "design") and hasattr(card.design, "name"):
-        return card.design.name
-    if hasattr(card, "name"):
-        return card.name
-    return str(card)

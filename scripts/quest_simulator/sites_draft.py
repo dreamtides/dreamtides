@@ -1,16 +1,14 @@
 """Draft site interaction for the quest simulator.
 
-Implements the Draft site: 5 sequential picks of 4 cards each,
-using the round manager to advance the 6-seat draft loop. Each
-pick filters the pack at seat 0 via show_n with sharpened_preference
-strategy, presents the cards to the player, and signals the round
-manager on completion.
+Implements the Draft site: 5 sequential picks using the round manager
+to advance the 6-seat draft loop. Each pick filters the pack at seat 0
+via show_n using the configured show_n count and strategy, presents the
+cards to the player, and signals the round manager on completion.
 """
 
 import random
 from typing import Optional
 
-import colors
 import input_handler
 import render
 import render_cards
@@ -21,7 +19,6 @@ from jsonl_log import SessionLogger
 from quest_state import QuestState
 
 PICKS_PER_DRAFT_SITE = 5
-SHOW_N_CARDS = 4
 
 
 def run_draft(
@@ -35,17 +32,21 @@ def run_draft(
 
     Consumes 5 consecutive human-seat picks from the draft loop.
     Each pick advances the round manager (AI seats pick, round
-    starts if needed), filters the pack at seat 0 to 4 cards via
-    sharpened_preference, and lets the player choose one.
+    starts if needed), filters the pack at seat 0 using the
+    configured show_n count and strategy, and lets the player
+    choose one.
     """
+    show_n_count = state.draft_cfg.agents.show_n
+    show_n_strategy = state.draft_cfg.agents.show_n_strategy
+
     for pick_index in range(PICKS_PER_DRAFT_SITE):
         pack = round_manager.advance_to_human_pick(state)
 
         pick_rng = random.Random(state.rng.randint(0, 2**32))
         shown_cards = show_n.select_cards(
             pack.cards,
-            SHOW_N_CARDS,
-            "sharpened_preference",
+            show_n_count,
+            show_n_strategy,
             pick_rng,
             human_w=state.human_agent.w,
             human_drafted=state.human_agent.drafted,
@@ -53,6 +54,7 @@ def run_draft(
         )
 
         if not shown_cards:
+            round_manager.advance_pick_no_card(state)
             continue
 
         # Display header
@@ -67,7 +69,7 @@ def run_draft(
         print()
 
         # Build display options
-        option_labels = [_card_name(card) for card in shown_cards]
+        option_labels = [render_cards.card_name(card) for card in shown_cards]
 
         def _render_card_option(
             index: int,
@@ -124,12 +126,3 @@ def run_draft(
         essence=state.essence,
     )
     print(footer)
-
-
-def _card_name(card) -> str:
-    """Extract the display name from a CardInstance or CardDesign."""
-    if hasattr(card, "design") and hasattr(card.design, "name"):
-        return card.design.name
-    if hasattr(card, "name"):
-        return card.name
-    return str(card)

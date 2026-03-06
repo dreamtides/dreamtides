@@ -12,6 +12,7 @@ from unittest.mock import patch
 import agents
 import card_generator
 import cube_manager
+import show_n
 from config import (
     AgentsConfig,
     CardsConfig,
@@ -65,10 +66,12 @@ def _make_quest_state(
     seed: int = 42,
     essence: int = 250,
     completion_level: int = 0,
+    cfg: SimulatorConfig | None = None,
 ) -> QuestState:
     """Create a QuestState with a full draft engine for testing."""
     rng = random.Random(seed)
-    cfg = _make_draft_cfg()
+    if cfg is None:
+        cfg = _make_draft_cfg()
     designs = card_generator.generate_cards(cfg, rng)
     cube = cube_manager.CubeManager(
         designs,
@@ -490,3 +493,64 @@ class TestBattleDisplayOutput:
         # Check that no resonance types appear in the output
         for term in ["Tide", "Ember", "Zephyr", "Stone", "Ruin"]:
             assert term not in output, f"Found old resonance term '{term}' in output"
+
+
+class TestBattleConfigDriven:
+    """Tests that battle card pick honors configuration values."""
+
+    def test_battle_respects_rare_pick_count(self) -> None:
+        """Battle should offer rare_pick_count cards from config, not a hardcoded count."""
+        from sites_battle import run_battle
+
+        state = _make_quest_state(essence=250, completion_level=0)
+
+        select_calls: list[int] = []
+        original_select = show_n.select_cards
+
+        def _tracking_select(pack_cards, n, strategy, rng, **kwargs):
+            select_calls.append(n)
+            return original_select(pack_cards, n, strategy, rng, **kwargs)
+
+        battle_cfg = _battle_config()
+        battle_cfg["rare_pick_count"] = 1
+
+        with patch("sites_battle.input_handler.wait_for_continue"), patch(
+            "sites_battle.input_handler.single_select", return_value=0
+        ), patch("sites_battle.show_n.select_cards", side_effect=_tracking_select):
+            run_battle(
+                state=state,
+                battle_config=battle_cfg,
+                quest_config=_quest_config(),
+                bosses=[],
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        assert len(select_calls) == 1
+        assert select_calls[0] == 1
+
+    def test_battle_empty_offer_advances_pick(self) -> None:
+        """When show_n returns empty, the pick should still advance."""
+        from sites_battle import run_battle
+
+        state = _make_quest_state(essence=250, completion_level=0)
+        initial_pick = state.global_pick_index
+
+        with patch("sites_battle.input_handler.wait_for_continue"), patch(
+            "sites_battle.show_n.select_cards", return_value=[]
+        ):
+            run_battle(
+                state=state,
+                battle_config=_battle_config(),
+                quest_config=_quest_config(),
+                bosses=[],
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        # Pick should still advance even with empty offer
+        assert state.global_pick_index == initial_pick + 1
+        # No card should be added
+        assert state.deck_count() == 0

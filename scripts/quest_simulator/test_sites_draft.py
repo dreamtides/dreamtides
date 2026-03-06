@@ -10,7 +10,7 @@ from unittest.mock import patch
 import agents
 import card_generator
 import cube_manager
-import pack_generator
+import show_n
 from config import (
     AgentsConfig,
     CardsConfig,
@@ -59,10 +59,11 @@ def _make_draft_cfg() -> SimulatorConfig:
     )
 
 
-def _make_quest_state(seed: int = 42) -> QuestState:
+def _make_quest_state(seed: int = 42, cfg: SimulatorConfig | None = None) -> QuestState:
     """Create a QuestState with a full draft engine for testing."""
     rng = random.Random(seed)
-    cfg = _make_draft_cfg()
+    if cfg is None:
+        cfg = _make_draft_cfg()
     designs = card_generator.generate_cards(cfg, rng)
     cube = cube_manager.CubeManager(
         designs,
@@ -217,3 +218,56 @@ class TestRunDraft:
             assert hasattr(dc.instance.design, "power")
             assert hasattr(dc.instance.design, "commit")
             assert hasattr(dc.instance.design, "flex")
+
+    def test_draft_respects_config_show_n(self) -> None:
+        """Draft should offer show_n cards from config, not a hardcoded count."""
+        from sites_draft import run_draft
+
+        cfg = _make_draft_cfg()
+        cfg.agents.show_n = 2
+        cfg.agents.show_n_strategy = "uniform"
+        state = _make_quest_state(cfg=cfg)
+
+        select_calls: list[int] = []
+        original_select = show_n.select_cards
+
+        def _tracking_select(pack_cards, n, strategy, rng, **kwargs):
+            select_calls.append(n)
+            return original_select(pack_cards, n, strategy, rng, **kwargs)
+
+        with patch("sites_draft.input_handler.single_select", return_value=0), patch(
+            "sites_draft.show_n.select_cards", side_effect=_tracking_select
+        ):
+            run_draft(
+                state=state,
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        # Every call should have used show_n=2, not the old hardcoded 4
+        assert len(select_calls) == 5
+        for n in select_calls:
+            assert n == 2
+
+    def test_draft_empty_offer_advances_pick(self) -> None:
+        """When show_n returns empty, the pick should still advance."""
+        from sites_draft import run_draft
+
+        state = _make_quest_state()
+        initial_pick = state.global_pick_index
+
+        with patch("sites_draft.input_handler.single_select", return_value=0), patch(
+            "sites_draft.show_n.select_cards", return_value=[]
+        ):
+            run_draft(
+                state=state,
+                dreamscape_name="Test",
+                dreamscape_number=1,
+                logger=None,
+            )
+
+        # All 5 picks should advance even though offers were empty
+        assert state.global_pick_index == initial_pick + 5
+        # No cards should be added to the deck
+        assert state.deck_count() == 0

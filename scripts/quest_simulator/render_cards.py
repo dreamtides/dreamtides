@@ -106,6 +106,15 @@ def format_card_display(
     return [line1, line2]
 
 
+def card_name(card) -> str:
+    """Extract the display name from a CardInstance or CardDesign."""
+    if hasattr(card, "design") and hasattr(card.design, "name"):
+        return card.design.name
+    if hasattr(card, "name"):
+        return card.name
+    return str(card)
+
+
 def _deck_card_sort_key(dc: DeckCard) -> tuple[str, str]:
     """Sort key for deck cards: card name."""
     instance = dc.instance
