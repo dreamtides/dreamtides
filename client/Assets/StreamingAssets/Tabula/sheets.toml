@@ -2,8 +2,8 @@ order = [
     "cards",
     "dreamwell",
     "card-fx",
+    "card-metadata",
     "card-lists",
-    "strings",
     "test-cards",
     "test-dreamwell",
 ]
