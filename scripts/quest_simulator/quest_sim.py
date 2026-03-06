@@ -74,6 +74,18 @@ def _build_draft_config() -> SimulatorConfig:
     return cfg
 
 
+def draft_config_summary(cfg: SimulatorConfig) -> dict[str, object]:
+    """Return a JSON-serializable summary of the draft config for logging."""
+    return {
+        "seat_count": cfg.draft.seat_count,
+        "pack_size": cfg.draft.pack_size,
+        "human_seats": cfg.draft.human_seats,
+        "archetype_count": cfg.cards.archetype_count,
+        "distinct_cards": cfg.cube.distinct_cards,
+        "consumption_mode": cfg.cube.consumption_mode,
+    }
+
+
 def main() -> None:
     """Run the quest simulator."""
     parser = build_parser()
@@ -161,14 +173,7 @@ def main() -> None:
     logger.log_session_start(
         seed,
         nodes,
-        draft_config={
-            "seat_count": cfg.draft.seat_count,
-            "pack_size": cfg.draft.pack_size,
-            "human_seats": cfg.draft.human_seats,
-            "archetype_count": cfg.cards.archetype_count,
-            "distinct_cards": cfg.cube.distinct_cards,
-            "consumption_mode": cfg.cube.consumption_mode,
-        },
+        draft_config=draft_config_summary(cfg),
     )
 
     # Display quest start banner

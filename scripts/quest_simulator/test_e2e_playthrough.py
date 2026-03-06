@@ -28,31 +28,8 @@ if _DRAFT_SIM_DIR not in sys.path:
 import agents
 import card_generator
 import cube_manager
-from config import SimulatorConfig
 from draft_models import CubeConsumptionMode
-
-
-def _build_draft_config() -> SimulatorConfig:
-    """Construct the standard quest-mode draft config."""
-    cfg = SimulatorConfig()
-    cfg.draft.seat_count = 6
-    cfg.draft.pack_size = 20
-    cfg.draft.human_seats = 1
-    cfg.draft.alternate_direction = False
-    cfg.agents.show_n = 4
-    cfg.agents.show_n_strategy = "sharpened_preference"
-    cfg.agents.policy = "adaptive"
-    cfg.agents.ai_optimality = 0.80
-    cfg.agents.learning_rate = 3.0
-    cfg.agents.openness_window = 3
-    cfg.cards.archetype_count = 8
-    cfg.cards.source = "synthetic"
-    cfg.cube.distinct_cards = 540
-    cfg.cube.copies_per_card = 1
-    cfg.cube.consumption_mode = "with_replacement"
-    cfg.refill.strategy = "no_refill"
-    cfg.pack_generation.strategy = "seeded_themed"
-    return cfg
+from quest_sim import _build_draft_config, draft_config_summary
 
 
 def _run_full_quest(seed: int) -> tuple[QuestState, Path]:
@@ -122,14 +99,7 @@ def _run_full_quest(seed: int) -> tuple[QuestState, Path]:
     logger.log_session_start(
         seed,
         nodes,
-        draft_config={
-            "seat_count": cfg.draft.seat_count,
-            "pack_size": cfg.draft.pack_size,
-            "human_seats": cfg.draft.human_seats,
-            "archetype_count": cfg.cards.archetype_count,
-            "distinct_cards": cfg.cube.distinct_cards,
-            "consumption_mode": cfg.cube.consumption_mode,
-        },
+        draft_config=draft_config_summary(cfg),
     )
 
     flow.run_quest(

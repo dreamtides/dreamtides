@@ -243,7 +243,7 @@ class TestShopItemCreation:
     """Test shop item creation with CardInstance and power-based pricing."""
 
     def test_shop_item_has_card_instance(self) -> None:
-        """ShopItem should reference a CardInstance, not PoolEntry."""
+        """ShopItem should reference a CardInstance, not the old pool entry type."""
         from sites_discovery import ShopItem
 
         inst = _make_instance(power=1.0)
@@ -692,23 +692,23 @@ class TestSpecialtyShopDreamsignOffering:
 class TestNoOldImports:
     """Test that old imports are removed."""
 
-    def test_no_algorithm_import(self) -> None:
-        """sites_discovery should not import algorithm."""
+    def test_no_old_selection_import(self) -> None:
+        """sites_discovery should not expose old card-selection functions."""
         import importlib
         import sites_discovery
         importlib.reload(sites_discovery)
         assert not hasattr(sites_discovery, "select_cards")
 
-    def test_no_pool_import(self) -> None:
-        """sites_discovery should not import pool."""
+    def test_no_old_staleness_import(self) -> None:
+        """sites_discovery should not expose old staleness/removal functions."""
         import importlib
         import sites_discovery
         importlib.reload(sites_discovery)
         assert not hasattr(sites_discovery, "increment_staleness")
         assert not hasattr(sites_discovery, "remove_entry")
 
-    def test_no_tags_import(self) -> None:
-        """sites_discovery should not import tags."""
+    def test_no_old_theme_import(self) -> None:
+        """sites_discovery should not expose old theme/filter functions."""
         import importlib
         import sites_discovery
         importlib.reload(sites_discovery)

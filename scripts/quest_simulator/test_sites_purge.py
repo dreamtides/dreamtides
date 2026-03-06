@@ -253,8 +253,8 @@ class TestForcedDeckLimitPurge:
         _populate_deck(state, 13)
         assert state.deck_count() == 13
 
-        # Non-interactive mode (default in tests) should auto-remove
-        forced_deck_limit_purge(state=state, logger=None)
+        with patch("sites_purge.input_handler._is_interactive", return_value=False):
+            forced_deck_limit_purge(state=state, logger=None)
 
         assert state.deck_count() == 10
 
@@ -271,7 +271,8 @@ class TestForcedDeckLimitPurge:
             def log_site_visit(self, **kwargs: object) -> None:
                 log_calls.append(dict(kwargs))
 
-        forced_deck_limit_purge(state=state, logger=FakeLogger())  # type: ignore[arg-type]
+        with patch("sites_purge.input_handler._is_interactive", return_value=False):
+            forced_deck_limit_purge(state=state, logger=FakeLogger())  # type: ignore[arg-type]
 
         assert state.deck_count() <= 5
         assert len(log_calls) == 1
@@ -289,11 +290,12 @@ class TestForcedDeckLimitPurge:
             def log_site_visit(self, **kwargs: object) -> None:
                 log_calls.append(dict(kwargs))
 
-        forced_deck_limit_purge(
-            state=state,
-            logger=FakeLogger(),  # type: ignore[arg-type]
-            dreamscape_name="Twilight Grove",
-        )
+        with patch("sites_purge.input_handler._is_interactive", return_value=False):
+            forced_deck_limit_purge(
+                state=state,
+                logger=FakeLogger(),  # type: ignore[arg-type]
+                dreamscape_name="Twilight Grove",
+            )
 
         assert state.deck_count() <= 5
         assert len(log_calls) == 1
