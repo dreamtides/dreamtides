@@ -130,6 +130,18 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Path to card-metadata TOML file (for analyze mode)",
     )
+    parser.add_argument(
+        "--real-cards",
+        action="store_true",
+        default=False,
+        help="Use real TOML cards (with synthetic fill) instead of pure synthetic",
+    )
+    parser.add_argument(
+        "--real-only",
+        action="store_true",
+        default=False,
+        help="Use real TOML cards with duplication fill (no synthetics)",
+    )
     return parser
 
 
@@ -147,6 +159,20 @@ def main() -> None:
     # Resolve seed: use CLI flag if provided, otherwise random
     seed: int = args.seed if args.seed is not None else random.randint(0, 2**32 - 1)
     cfg.sweep.base_seed = seed
+
+    # Apply real-cards or real-only mode
+    if args.real_cards or args.real_only:
+        import os
+
+        cfg.cards.source = "toml"
+        cfg.cards.real_only = args.real_only
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        cfg.cards.rendered_toml_path = os.path.join(
+            script_dir, "..", "quest_simulator", "data", "rendered-cards.toml"
+        )
+        cfg.cards.metadata_toml_path = os.path.join(
+            script_dir, "..", "..", "rules_engine", "tabula", "card-metadata.toml"
+        )
 
     # Apply difficulty preset (overrides config values)
     if args.preset == "easy":
