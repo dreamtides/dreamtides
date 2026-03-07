@@ -177,7 +177,9 @@ def run_shop(
         print()
 
         for item in items:
-            card_lines = render_cards.format_card_display(item.card_instance)
+            card_lines = render_cards.format_card_display(
+                item.card_instance, show_images=True
+            )
             for line in card_lines:
                 print(line)
             price_str = colors.c(f"{item.price}e", "accent", bold=True)

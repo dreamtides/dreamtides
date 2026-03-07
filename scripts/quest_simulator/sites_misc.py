@@ -301,6 +301,15 @@ def run_reward(
             print("  Choose a card reward:")
             print()
 
+            # Show card images once (static, above the interactive selector)
+            for card in shown_cards:
+                img_lines = render_cards.format_card_display(
+                    card, highlighted=False, show_images=True
+                )
+                for line in img_lines:
+                    print(line)
+            print()
+
             option_labels = [c.design.name for c in shown_cards] + ["Decline"]
             decline_index = len(shown_cards)
 

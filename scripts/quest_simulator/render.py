@@ -175,13 +175,19 @@ STRIKETHROUGH = ""
 
 
 def format_card(
-    card_or_deck_card, highlighted: bool = False, max_width: int = CONTENT_WIDTH
+    card_or_deck_card,
+    highlighted: bool = False,
+    max_width: int = CONTENT_WIDTH,
+    show_images: bool = False,
 ) -> list[str]:
     """Compatibility shim routing to render_cards.format_card_display."""
     import render_cards
 
     return render_cards.format_card_display(
-        card_or_deck_card, highlighted=highlighted, max_width=max_width
+        card_or_deck_card,
+        highlighted=highlighted,
+        max_width=max_width,
+        show_images=show_images,
     )
 
 

@@ -68,6 +68,15 @@ def run_draft(
         print(header)
         print()
 
+        # Show card images once (static, above the interactive selector)
+        for card in shown_cards:
+            img_lines = render_cards.format_card_display(
+                card, highlighted=False, show_images=True
+            )
+            for line in img_lines:
+                print(line)
+        print()
+
         # Build display options
         option_labels = [render_cards.card_name(card) for card in shown_cards]
 

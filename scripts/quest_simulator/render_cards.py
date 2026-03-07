@@ -60,6 +60,7 @@ def format_card_display(
     card_or_deck_card,
     highlighted: bool = False,
     max_width: int = render.CONTENT_WIDTH,
+    show_images: bool = False,
 ) -> list[str]:
     """Format a card as display lines.
 
@@ -140,12 +141,13 @@ def format_card_display(
         type_line = " ".join(type_parts)
         lines.append(f"    {colors.dim(type_line)}")
 
-        # Inline image (only when imgcat is available)
-        img_num = getattr(design, "image_number", None)
-        if img_num is not None:
-            img_line = _render_image_line(img_num)
-            if img_line is not None:
-                lines.append(img_line)
+        # Inline image (only in non-interactive contexts)
+        if show_images:
+            img_num = getattr(design, "image_number", None)
+            if img_num is not None:
+                img_line = _render_image_line(img_num)
+                if img_line is not None:
+                    lines.append(img_line)
 
         # Line 3+: rules text
         rules = getattr(design, "rules_text", "")
@@ -227,7 +229,7 @@ def render_full_deck_view(
     sorted_deck = sorted(deck_cards, key=_deck_card_sort_key)
 
     for dc in sorted_deck:
-        card_lines = format_card_display(dc, highlighted=False)
+        card_lines = format_card_display(dc, highlighted=False, show_images=True)
         lines.extend(card_lines)
 
     lines.append("")
