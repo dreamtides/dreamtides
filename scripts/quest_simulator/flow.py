@@ -24,7 +24,6 @@ from quest_state import QuestState
 from site_dispatch import SiteData, VisitContext
 
 _VIEW_DECK_LABEL = "View Deck"
-_DEBUG_LABEL = "Debug"
 
 
 def _get_selectable_sites(sites: list[Site]) -> list[Site]:
@@ -192,12 +191,8 @@ def _dreamscape_loop(
         if header_lines:
             print("\n".join(header_lines))
 
-        # Build selection options: View Deck (+ Debug if enabled), then sites
-        menu_labels = [_VIEW_DECK_LABEL]
-        if state.debug:
-            menu_labels.append(_DEBUG_LABEL)
-        menu_count = len(menu_labels)
-        option_labels = menu_labels + [
+        # Build selection options: View Deck first, then selectable sites
+        option_labels = [_VIEW_DECK_LABEL] + [
             render_atlas.site_type_name(s.site_type) + ("*" if s.is_enhanced else "")
             for s in selectable
         ]
@@ -207,13 +202,11 @@ def _dreamscape_loop(
             option: str,
             is_selected: bool,
             _selectable: list[Site] = selectable,
-            _menu_count: int = menu_count,
-            _menu_labels: list[str] = menu_labels,
         ) -> str:
             marker = ">" if is_selected else " "
-            if index < _menu_count:
-                return f"  {marker}   {render.DIM}{_menu_labels[index]}{render.RESET}"
-            site = _selectable[index - _menu_count]
+            if index == 0:
+                return f"  {marker}   {render.DIM}{_VIEW_DECK_LABEL}{render.RESET}"
+            site = _selectable[index - 1]
             name = render_atlas.site_type_name(site.site_type)
             if site.is_enhanced:
                 name += "*"
@@ -222,21 +215,14 @@ def _dreamscape_loop(
         chosen_idx = input_handler.single_select(
             options=option_labels,
             render_fn=_render_site_option,
-            initial=menu_count,
+            initial=1,
         )
 
         if chosen_idx == 0:
             _show_deck_view(state)
             continue
 
-        if state.debug and chosen_idx == 1:
-            import debug_panel
-
-            print(debug_panel.render_debug_panel(state))
-            input_handler.wait_for_continue()
-            continue
-
-        chosen_site = selectable[chosen_idx - menu_count]
+        chosen_site = selectable[chosen_idx - 1]
         try:
             visit_site(chosen_site, state, data, logger, context)
         except KeyboardInterrupt:

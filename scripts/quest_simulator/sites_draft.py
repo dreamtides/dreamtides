@@ -73,10 +73,27 @@ def run_draft(
         print(render.draw_separator())
 
         option_labels = [render_cards.card_name(card) for card in shown_cards]
+        if state.debug:
+            option_labels.append("Debug")
 
-        chosen_index = input_handler.single_select(
-            options=option_labels,
-        )
+        while True:
+            chosen_index = input_handler.single_select(
+                options=option_labels,
+            )
+
+            if state.debug and chosen_index == len(shown_cards):
+                import debug_panel
+
+                print(debug_panel.render_debug_panel(state))
+                input_handler.wait_for_continue()
+                # Re-display header and cards before re-prompting
+                print(header)
+                print()
+                render_cards.render_card_columns(shown_cards)
+                print(render.draw_separator())
+                continue
+
+            break
 
         chosen_card = shown_cards[chosen_index]
 
