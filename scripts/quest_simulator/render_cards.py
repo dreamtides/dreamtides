@@ -5,8 +5,6 @@ viewer. Uses AYU Mirage palette colors from the draft simulator.
 """
 
 import base64
-import io
-import os
 import sys
 import textwrap
 from typing import Optional
@@ -19,26 +17,29 @@ import render
 
 ARCHETYPE_NAMES = render.ARCHETYPE_NAMES
 
-try:
-    from imgcat import imgcat as _imgcat
-
-    _IMGCAT_AVAILABLE = True
-except ImportError:
-    _IMGCAT_AVAILABLE = False
+_IMAGES_ENABLED = sys.stdout.isatty()
 
 
 def _render_image_line(image_number: int) -> str | None:
-    """Return an imgcat escape sequence for the given image number."""
-    if not _IMGCAT_AVAILABLE:
-        return None
+    """Return an iTerm2 inline image escape sequence for the given image number.
+
+    Builds the escape sequence directly instead of using imgcat, which
+    reads the TMUX env var and may produce tmux passthrough escapes
+    that don't work in a plain iTerm2 window.
+    """
     path = image_cache.get_image_path(image_number)
     if path is None:
         return None
     try:
-        buf = io.BytesIO()
         with open(path, "rb") as f:
-            _imgcat(f.read(), width=20, height=8, fp=buf)
-        return buf.getvalue().decode("utf-8", errors="replace")
+            img_data = f.read()
+        img_b64 = base64.b64encode(img_data).decode("ascii")
+        return (
+            f"\033]1337;File=inline=1"
+            f";size={len(img_data)}"
+            f";height=8;width=20"
+            f":{img_b64}\a"
+        )
     except Exception:
         return None
 
@@ -205,68 +206,58 @@ _IMG_WIDTH = 15
 _IMG_HEIGHT = 6
 
 
-def _overlay_image(card, lines_printed: int) -> None:
-    """Overlay an image at the left of the current card block.
+def _generate_image_escape(card) -> str | None:
+    """Pre-generate an iTerm2 inline image escape string for a card.
 
-    After text lines have been printed, saves cursor position, moves
-    up, renders the image via imgcat, then restores cursor.
-
-    All writes go through sys.stdout (text mode) to avoid interleaving
-    issues between sys.stdout and sys.stdout.buffer which can cause
-    the terminal to silently drop escape sequences.
+    Returns the escape string if the image is cached and imgcat
+    succeeds, or None otherwise. Forces non-tmux imgcat output
+    because the TMUX env var may be inherited from a parent process
+    (e.g. Claude Code) even when the user's terminal is plain iTerm2.
     """
+    if not _IMAGES_ENABLED:
+        return None
     design = _get_design(card)
     img_num = getattr(design, "image_number", None) if design else None
     if img_num is None:
-        return
+        return None
     path = image_cache.get_image_path(img_num)
     if path is None:
-        return
+        return None
     try:
         with open(path, "rb") as f:
             img_data = f.read()
     except Exception:
-        return
+        return None
 
-    is_tmux = "TMUX" in os.environ and "tmux" in os.environ.get("TMUX", "")
-
-    if is_tmux:
-        # Tmux: must use binary passthrough, flush text stream first
-        sys.stdout.flush()
-        fp = sys.stdout.buffer
-        CSI = b"\033["
-        OSC = b"\033]"
-        ST = b"\a"
-        fp.write(b"\0337")
-        fp.write(CSI + str(lines_printed).encode() + b"F")
-        fp.write(b"\033Ptmux;\033")
-        fp.write(OSC + b"1337;File=inline=1")
-        fp.write(b";size=" + str(len(img_data)).encode())
-        fp.write(b";height=" + str(_IMG_HEIGHT).encode())
-        fp.write(b";width=" + str(_IMG_WIDTH).encode())
-        fp.write(b":")
-        fp.write(base64.b64encode(img_data))
-        fp.write(ST)
-        fp.write(b"\033\\")
-        fp.write(b"\0338")
-        fp.flush()
-    else:
-        # Non-tmux: generate image via imgcat, write everything through
-        # sys.stdout (text mode) so cursor controls and image data share
-        # the same buffered stream as print() output.
-        img_buf = io.BytesIO()
-        _imgcat(img_data, width=_IMG_WIDTH, height=_IMG_HEIGHT, fp=img_buf)
-        img_str = img_buf.getvalue().decode("utf-8", errors="replace")
-        sys.stdout.write(f"\0337\033[{lines_printed}F")
-        sys.stdout.write(img_str)
-        sys.stdout.write("\0338")
-        sys.stdout.flush()
+    # Build the iTerm2 escape sequence directly (non-tmux format)
+    # instead of using imgcat, which reads TMUX from the environment
+    # and may produce tmux passthrough escapes that don't work when
+    # the quest simulator runs in a plain iTerm2 window.
+    img_b64 = base64.b64encode(img_data)
+    esc = (
+        f"\033]1337;File=inline=1"
+        f";size={len(img_data)}"
+        f";height={_IMG_HEIGHT}"
+        f";width={_IMG_WIDTH}"
+        f":{img_b64.decode('ascii')}\a\n"
+    )
+    return esc
 
 
 def _render_card_block(card) -> None:
-    """Render a single card with image on the left and text on the right."""
+    """Render a single card with image on the left and text on the right.
+
+    Pre-generates the image escape sequence to determine layout: if
+    the image is available, text is indented to the right of it.
+    Otherwise the card uses full-width text layout.
+    """
     design = _get_design(card)
-    text_col = _IMG_WIDTH + 2
+    img_escape = _generate_image_escape(card)
+
+    if img_escape:
+        text_col = _IMG_WIDTH + 2
+    else:
+        text_col = 2
     text_width = render.CONTENT_WIDTH - text_col
 
     # Build text lines
@@ -296,18 +287,22 @@ def _render_card_block(card) -> None:
             wrapped = textwrap.wrap(rules, width=text_width)
             text_lines.extend(wrapped)
 
-    # Ensure at least img_height lines so image area is fully allocated
-    while len(text_lines) < _IMG_HEIGHT:
-        text_lines.append("")
+    # Pad to image height only when showing an image
+    if img_escape:
+        while len(text_lines) < _IMG_HEIGHT:
+            text_lines.append("")
 
-    # Print text with left padding to leave space for image
+    # Print text
     padding = " " * text_col
     for line in text_lines:
         print(f"{padding}{line}")
 
     # Overlay image on the left
-    if _IMGCAT_AVAILABLE:
-        _overlay_image(card, len(text_lines))
+    if img_escape:
+        sys.stdout.write(f"\0337\033[{len(text_lines)}F")
+        sys.stdout.write(img_escape)
+        sys.stdout.write("\0338")
+        sys.stdout.flush()
 
 
 def render_card_columns(cards) -> None:
