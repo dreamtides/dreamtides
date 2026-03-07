@@ -56,9 +56,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--real-only",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Fill pool by duplicating real cards (default: True; use --no-real-only for synthetics)",
+    )
+    parser.add_argument(
+        "--debug",
         action="store_true",
         default=False,
-        help="Fill pool to 360 by duplicating real cards instead of adding synthetics",
+        help="Show AI draft bot debug panel in dreamscape site-selection menu",
     )
     return parser
 
@@ -191,6 +197,7 @@ def main() -> None:
         max_deck=max_deck,
         min_deck=min_deck,
         max_dreamsigns=max_dreamsigns,
+        debug=args.debug,
     )
 
     # Assemble data bundle for site dispatch

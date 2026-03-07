@@ -33,6 +33,7 @@ class QuestState:
         max_deck: int = 50,
         min_deck: int = 25,
         max_dreamsigns: int = 12,
+        debug: bool = False,
     ) -> None:
         self.deck: list[DeckCard] = []
         self.dreamsigns: list[Dreamsign] = []
@@ -51,6 +52,7 @@ class QuestState:
         self.max_deck: int = max_deck
         self.min_deck: int = min_deck
         self.max_dreamsigns: int = max_dreamsigns
+        self.debug: bool = debug
         self.bane_instance_counter: int = 0
 
     def add_card(self, card_instance: Any) -> None:
