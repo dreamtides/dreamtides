@@ -208,9 +208,9 @@ _IMG_HEIGHT = 6
 def _overlay_image(card, lines_printed: int) -> None:
     """Overlay an image at the left of the current card block.
 
-    After text lines have been printed, moves the cursor back up
-    and renders the image at column 1, then returns the cursor to
-    its original position.
+    After text lines have been printed, saves cursor position, moves
+    up, renders the image via imgcat (non-tmux) or raw escapes (tmux),
+    then restores cursor to its original position.
     """
     design = _get_design(card)
     img_num = getattr(design, "image_number", None) if design else None
@@ -231,33 +231,33 @@ def _overlay_image(card, lines_printed: int) -> None:
 
     is_tmux = "TMUX" in os.environ and "tmux" in os.environ.get("TMUX", "")
     CSI = b"\033["
-    OSC = b"\033]"
-    ST = b"\a"
 
-    # Hide cursor and move up to top of block
-    fp.write(CSI + b"?25l")
+    # Save cursor position, move up to top of text block
+    fp.write(b"\0337")
     fp.write(CSI + str(lines_printed).encode() + b"F")
 
-    # Tmux passthrough start
     if is_tmux:
+        # Tmux passthrough: raw escape codes, no trailing newline
+        OSC = b"\033]"
+        ST = b"\a"
         fp.write(b"\033Ptmux;\033")
-
-    # iTerm2 inline image protocol
-    fp.write(OSC + b"1337;File=inline=1")
-    fp.write(b";size=" + str(len(img_data)).encode())
-    fp.write(b";height=" + str(_IMG_HEIGHT).encode())
-    fp.write(b";width=" + str(_IMG_WIDTH).encode())
-    fp.write(b":")
-    fp.write(base64.b64encode(img_data))
-    fp.write(ST)
-
-    # Tmux passthrough end
-    if is_tmux:
+        fp.write(OSC + b"1337;File=inline=1")
+        fp.write(b";size=" + str(len(img_data)).encode())
+        fp.write(b";height=" + str(_IMG_HEIGHT).encode())
+        fp.write(b";width=" + str(_IMG_WIDTH).encode())
+        fp.write(b":")
+        fp.write(base64.b64encode(img_data))
+        fp.write(ST)
         fp.write(b"\033\\")
+    else:
+        # Non-tmux: use imgcat which handles the protocol correctly
+        # (including the trailing newline iTerm2 requires)
+        img_buf = io.BytesIO()
+        _imgcat(img_data, width=_IMG_WIDTH, height=_IMG_HEIGHT, fp=img_buf)
+        fp.write(img_buf.getvalue())
 
-    # Move cursor back down and show it
-    fp.write(CSI + str(lines_printed).encode() + b"E")
-    fp.write(CSI + b"?25h")
+    # Restore cursor to original position
+    fp.write(b"\0338")
     fp.flush()
 
 
@@ -287,9 +287,6 @@ def _render_card_block(card) -> None:
         sub = getattr(design, "subtype", "")
         if sub:
             type_parts.append(f"- {sub}")
-        rarity = getattr(design, "rarity", "")
-        if rarity:
-            type_parts.append(f"({rarity.title()})")
         text_lines.append(colors.dim(" ".join(type_parts)))
 
         rules = getattr(design, "rules_text", "")
