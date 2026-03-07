@@ -84,6 +84,74 @@ def set_web_mode(
     _web_state_callback = state_callback
 
 
+def _parse_options_data(
+    context: str, options: list[str]
+) -> Optional[list[Optional[dict]]]:
+    """Extract structured card data from captured context text.
+
+    Looks for card blocks in the printed output where each block starts with
+    a line matching an option name, followed by a cost/type line of the form
+    ``NE Type`` and optional rules text lines.  Returns None if no card blocks
+    are found, otherwise a parallel list with one entry per option (None for
+    non-card options such as "Debug").
+    """
+    cost_re = re.compile(r"^(\d+)E\s+(.+)$")
+    sep_re = re.compile(r"^[─━═\-]{3,}")
+    stripped = [line.strip() for line in context.split("\n")]
+    option_set = set(options)
+
+    # Use the last occurrence of each name in case the same card appeared
+    # in a previous round that is still visible in the context stream.
+    name_to_idx: dict[str, int] = {}
+    for i, s in enumerate(stripped):
+        if s in option_set:
+            name_to_idx[s] = i
+
+    if not name_to_idx:
+        return None
+
+    result: list[Optional[dict]] = []
+    for option in options:
+        idx = name_to_idx.get(option)
+        if idx is None:
+            result.append(None)
+            continue
+
+        energy_cost = None
+        card_type = ""
+        rules_lines: list[str] = []
+
+        j = idx + 1
+        if j < len(stripped):
+            m = cost_re.match(stripped[j])
+            if m:
+                energy_cost = int(m.group(1))
+                card_type = m.group(2).strip()
+                j += 1
+
+        while j < len(stripped):
+            line = stripped[j]
+            if not line:
+                j += 1
+                continue
+            if line in option_set or sep_re.match(line):
+                break
+            rules_lines.append(line)
+            j += 1
+
+        result.append(
+            {
+                "name": option,
+                "energy_cost": energy_cost,
+                "card_type": card_type,
+                "rules_text": " ".join(rules_lines),
+                "image_hash": None,
+            }
+        )
+
+    return result if any(r is not None for r in result) else None
+
+
 def _web_send_prompt(
     prompt_type: str,
     options: list[str],
@@ -95,6 +163,7 @@ def _web_send_prompt(
     prompt = {
         "type": prompt_type,
         "options": options,
+        "options_data": _parse_options_data(context, options),
         "context": context,
         "max_selections": max_selections,
         "state": state,
