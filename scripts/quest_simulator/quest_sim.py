@@ -75,6 +75,18 @@ def build_parser() -> argparse.ArgumentParser:
         default=False,
         help="Enable AI turn protocol mode for sub-agent play-testing",
     )
+    parser.add_argument(
+        "--web",
+        action="store_true",
+        default=False,
+        help="Launch a localhost web UI instead of the terminal interface",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8080,
+        help="Port for the web UI server (default: 8080)",
+    )
     return parser
 
 
@@ -133,6 +145,13 @@ def main() -> None:
     """Run the quest simulator."""
     parser = build_parser()
     args = parser.parse_args()
+
+    # Launch web UI if requested
+    if args.web:
+        from web.server import run_web_server
+
+        run_web_server(args)
+        return
 
     # Set up AI mode if requested
     if args.ai:

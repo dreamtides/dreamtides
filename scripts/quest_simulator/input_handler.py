@@ -13,6 +13,7 @@ import atexit
 import io
 import json
 import os
+import queue
 import re
 import select
 import signal
@@ -61,6 +62,47 @@ def set_ai_mode(enabled: bool) -> None:
 def get_ai_mode() -> bool:
     """Return whether AI mode is active."""
     return _ai_mode
+
+
+# --- Web mode state ---
+_web_mode: bool = False
+_web_prompt_queue: Optional[queue.Queue] = None
+_web_response_queue: Optional[queue.Queue] = None
+_web_state_callback: Optional[Callable[[], dict]] = None
+
+
+def set_web_mode(
+    prompt_queue: queue.Queue,
+    response_queue: queue.Queue,
+    state_callback: Callable[[], dict],
+) -> None:
+    """Enable web mode with the given queues and state callback."""
+    global _web_mode, _web_prompt_queue, _web_response_queue, _web_state_callback
+    _web_mode = True
+    _web_prompt_queue = prompt_queue
+    _web_response_queue = response_queue
+    _web_state_callback = state_callback
+
+
+def _web_send_prompt(
+    prompt_type: str,
+    options: list[str],
+    max_selections: Optional[int] = None,
+) -> Any:
+    """Send a web prompt and block until the browser responds."""
+    context = _output_capture.flush_buffer() if _output_capture else ""
+    state = _web_state_callback() if _web_state_callback else {}
+    prompt = {
+        "type": prompt_type,
+        "options": options,
+        "context": context,
+        "max_selections": max_selections,
+        "state": state,
+    }
+    assert _web_prompt_queue is not None
+    assert _web_response_queue is not None
+    _web_prompt_queue.put(prompt)
+    return _web_response_queue.get()
 
 
 class _OutputCapture(io.TextIOWrapper):
@@ -354,6 +396,10 @@ def single_select(
     if not options:
         return 0
 
+    if _web_mode:
+        choice = _web_send_prompt("single_select", options)
+        return max(0, min(int(choice), len(options) - 1))
+
     if _ai_mode:
         _write_ai_prompt("single_select", options)
         choice = _read_ai_response()
@@ -423,6 +469,13 @@ def multi_select(
     """
     if not options:
         return []
+
+    if _web_mode:
+        choice = _web_send_prompt("multi_select", options, max_selections=max_selections)
+        indices = [int(i) for i in choice if 0 <= int(i) < len(options)]
+        if max_selections is not None:
+            indices = indices[:max_selections]
+        return sorted(set(indices))
 
     if _ai_mode:
         _write_ai_prompt("multi_select", options, max_selections=max_selections)
@@ -498,6 +551,9 @@ def confirm_decline(
     Returns:
         True if accepted, False if declined.
     """
+    if _web_mode:
+        return bool(_web_send_prompt("confirm_decline", [accept_label, decline_label]))
+
     if _ai_mode:
         _write_ai_prompt("confirm_decline", [accept_label, decline_label])
         return bool(_read_ai_response())
@@ -575,6 +631,10 @@ def wait_for_continue(
         print(render_fn())
     else:
         print(prompt)
+
+    if _web_mode:
+        _web_send_prompt("wait_for_continue", [])
+        return
 
     if _ai_mode:
         return

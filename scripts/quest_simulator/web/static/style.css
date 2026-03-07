@@ -1,0 +1,272 @@
+/* AYU Mirage dark theme */
+:root {
+  --bg:      #1f2430;
+  --bg2:     #242936;
+  --fg:      #cccac2;
+  --accent:  #ffcc66;
+  --entity:  #73d0ff;
+  --error:   #ff6666;
+  --keyword: #ffad66;
+  --comment: #6c7a8b;
+  --added:   #87d96c;
+  --border:  #2d3444;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Menlo', 'Consolas', 'Monaco', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Status bar */
+#status-bar {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+#status-bar span { color: var(--fg); }
+#status-essence  { color: var(--accent); font-weight: bold; }
+#status-completion { color: var(--entity); }
+#status-dreamcaller { color: var(--keyword); margin-left: auto; }
+
+/* Main layout */
+#main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+#left-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 12px 16px;
+  gap: 12px;
+}
+
+/* Context output */
+#context {
+  flex: 1;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--fg);
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+  padding-right: 8px;
+}
+
+/* Options area */
+#options-wrapper {
+  flex-shrink: 0;
+  max-height: 45vh;
+  overflow-y: auto;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+#options {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#options li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+#options li:hover,
+#options li.focused {
+  background: var(--bg2);
+  border-color: var(--border);
+}
+
+#options li.selected {
+  background: rgba(255, 204, 102, 0.12);
+  border-color: var(--accent);
+}
+
+#options li .option-text { flex: 1; }
+#options li .option-index {
+  color: var(--comment);
+  min-width: 1.8em;
+  text-align: right;
+  font-size: 12px;
+  padding-top: 2px;
+}
+
+/* Card image inside option */
+#options li .card-img,
+#deck-list li .card-img {
+  width: 60px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+  background: var(--border);
+}
+
+/* Checkbox option */
+#options li input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+/* Action bar (confirm/continue buttons) */
+#action-bar {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  background: var(--bg2);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 7px 18px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+
+button:hover, button:focus {
+  background: rgba(255, 204, 102, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+  outline: none;
+}
+
+button.primary {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+button.danger {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+/* Deck toggle button */
+#deck-toggle {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  padding: 12px 6px;
+  border-radius: 4px 0 0 4px;
+  border-right: none;
+  z-index: 10;
+}
+
+/* Deck sidebar */
+#deck-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg2);
+}
+
+#deck-sidebar.hidden { display: none; }
+
+#sidebar-header {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--entity);
+  font-weight: bold;
+}
+
+#deck-list {
+  list-style: none;
+  overflow-y: auto;
+  flex: 1;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#deck-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+
+#deck-list li .card-info { flex: 1; min-width: 0; }
+#deck-list li .card-name {
+  color: var(--entity);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+}
+#deck-list li .card-meta { color: var(--comment); font-size: 11px; }
+#deck-list li .card-rules {
+  color: var(--fg);
+  font-size: 11px;
+  margin-top: 2px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Game over screen */
+#game-over {
+  position: fixed;
+  inset: 0;
+  background: rgba(31, 36, 48, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 100;
+}
+
+#game-over.hidden { display: none; }
+#game-over h2 { color: var(--accent); font-size: 28px; }
+#game-over p  { color: var(--fg); font-size: 16px; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--comment); }
