@@ -209,8 +209,8 @@ _IMG_HEIGHT = 6
 def _generate_image_escape(card) -> str | None:
     """Pre-generate an iTerm2 inline image escape string for a card.
 
-    Returns the escape string if the image is cached and imgcat
-    succeeds, or None otherwise. Forces non-tmux imgcat output
+    Returns the escape string if the image is cached, or None
+    otherwise. Builds the escape sequence directly (non-tmux format)
     because the TMUX env var may be inherited from a parent process
     (e.g. Claude Code) even when the user's terminal is plain iTerm2.
     """
@@ -222,7 +222,6 @@ def _generate_image_escape(card) -> str | None:
         return None
     path = image_cache.get_image_path(img_num)
     if path is None:
-        print(f"[IMG] no cache path for img_num={img_num}", file=sys.stderr)
         return None
     try:
         with open(path, "rb") as f:
