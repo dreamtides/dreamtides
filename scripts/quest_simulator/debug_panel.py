@@ -33,7 +33,7 @@ def render_debug_panel(state: QuestState) -> str:
     )
 
     if state.packs is not None and len(state.packs) > 0:
-        seat0_pack_size = len(state.packs[0])
+        seat0_pack_size = len(state.packs[0].cards)
         status += f"  Pack[0]: {colors.num(seat0_pack_size)} cards"
 
     pool_size = state.cube.total_size

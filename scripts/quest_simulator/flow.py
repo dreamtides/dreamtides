@@ -236,6 +236,8 @@ def _dreamscape_loop(
                 f"Site '{site_name}' encountered an error and was skipped."
             )
             print()
+            print(error_msg)
+            print()
             if logger is not None:
                 logger.log_error(
                     site_type=site_name,

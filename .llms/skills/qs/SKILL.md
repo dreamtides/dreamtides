@@ -14,6 +14,10 @@ Read the documentation before making changes:
 - `just fmt` — format code. Run first before other checks.
 - `just review` — full lint/test gate (~5 min, keep polling).
 
+## Debugging
+
+- **Session logs**: `.logs/quest_*.jsonl` — JSONL event logs written per session. Errors during site visits (including tracebacks) are logged here via `SessionLogger.log_error()`. Check the most recent file with `ls -t .logs/quest_* | head -1`.
+
 ## Acceptance Criteria
 
 - **Manual testing is CRITICAL.** After every change, run the simulator manually
