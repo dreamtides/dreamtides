@@ -209,8 +209,11 @@ def _overlay_image(card, lines_printed: int) -> None:
     """Overlay an image at the left of the current card block.
 
     After text lines have been printed, saves cursor position, moves
-    up, renders the image via imgcat (non-tmux) or raw escapes (tmux),
-    then restores cursor to its original position.
+    up, renders the image via imgcat, then restores cursor.
+
+    All writes go through sys.stdout (text mode) to avoid interleaving
+    issues between sys.stdout and sys.stdout.buffer which can cause
+    the terminal to silently drop escape sequences.
     """
     design = _get_design(card)
     img_num = getattr(design, "image_number", None) if design else None
@@ -225,21 +228,17 @@ def _overlay_image(card, lines_printed: int) -> None:
     except Exception:
         return
 
-    fp = getattr(sys.stdout, "buffer", None)
-    if fp is None:
-        return
-
     is_tmux = "TMUX" in os.environ and "tmux" in os.environ.get("TMUX", "")
-    CSI = b"\033["
-
-    # Save cursor position, move up to top of text block
-    fp.write(b"\0337")
-    fp.write(CSI + str(lines_printed).encode() + b"F")
 
     if is_tmux:
-        # Tmux passthrough: raw escape codes, no trailing newline
+        # Tmux: must use binary passthrough, flush text stream first
+        sys.stdout.flush()
+        fp = sys.stdout.buffer
+        CSI = b"\033["
         OSC = b"\033]"
         ST = b"\a"
+        fp.write(b"\0337")
+        fp.write(CSI + str(lines_printed).encode() + b"F")
         fp.write(b"\033Ptmux;\033")
         fp.write(OSC + b"1337;File=inline=1")
         fp.write(b";size=" + str(len(img_data)).encode())
@@ -249,16 +248,19 @@ def _overlay_image(card, lines_printed: int) -> None:
         fp.write(base64.b64encode(img_data))
         fp.write(ST)
         fp.write(b"\033\\")
+        fp.write(b"\0338")
+        fp.flush()
     else:
-        # Non-tmux: use imgcat which handles the protocol correctly
-        # (including the trailing newline iTerm2 requires)
+        # Non-tmux: generate image via imgcat, write everything through
+        # sys.stdout (text mode) so cursor controls and image data share
+        # the same buffered stream as print() output.
         img_buf = io.BytesIO()
         _imgcat(img_data, width=_IMG_WIDTH, height=_IMG_HEIGHT, fp=img_buf)
-        fp.write(img_buf.getvalue())
-
-    # Restore cursor to original position
-    fp.write(b"\0338")
-    fp.flush()
+        img_str = img_buf.getvalue().decode("utf-8", errors="replace")
+        sys.stdout.write(f"\0337\033[{lines_printed}F")
+        sys.stdout.write(img_str)
+        sys.stdout.write("\0338")
+        sys.stdout.flush()
 
 
 def _render_card_block(card) -> None:
@@ -302,9 +304,6 @@ def _render_card_block(card) -> None:
     padding = " " * text_col
     for line in text_lines:
         print(f"{padding}{line}")
-
-    # Flush text before writing binary escape codes
-    sys.stdout.flush()
 
     # Overlay image on the left
     if _IMGCAT_AVAILABLE:
