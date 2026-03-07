@@ -105,6 +105,7 @@ function cardImageHash(optionText) {
 // ── Render prompt ──────────────────────────────────────────────────────────
 
 function renderPrompt(data) {
+  window._renderGen = (window._renderGen || 0) + 1;
   currentPrompt = data;
   focusIndex = 0;
   checkedIndices = new Set();
@@ -151,6 +152,7 @@ function renderSingleSelect(data) {
 }
 
 function renderMultiSelect(data) {
+  window._currentMaxSelections = data.max_selections;
   data.options.forEach((opt, i) => {
     const li = document.createElement("li");
     li.setAttribute("role", "option");
