@@ -230,7 +230,7 @@ function renderConfirmDecline(data) {
 
 function renderWaitForContinue(_data) {
   const btn = document.createElement("button");
-  btn.className = "primary";
+  btn.className = "primary solo";
   btn.textContent = "Continue";
   btn.addEventListener("click", () => submitChoice(null));
   elActionBar.appendChild(btn);

@@ -62,7 +62,7 @@ def _make_handler(
     response_q: queue.Queue,
     game_thread: threading.Thread,
     total_battles: int,
-) -> type:
+) -> type[http.server.BaseHTTPRequestHandler]:
     """Return a request handler class closed over the shared state.
 
     The current prompt is held in `_pending` (a one-element list used as a
@@ -80,12 +80,12 @@ def _make_handler(
             if self.path in ("/", "/index.html"):
                 self._serve_file(_STATIC_DIR / "index.html", "text/html")
             elif self.path.startswith("/static/"):
-                rel = self.path[len("/static/"):]
+                rel = self.path[len("/static/") :]
                 self._serve_file(_STATIC_DIR / rel)
             elif self.path == "/api/prompt":
                 self._handle_prompt()
             elif self.path.startswith("/api/images/"):
-                hash_key = self.path[len("/api/images/"):]
+                hash_key = self.path[len("/api/images/") :]
                 self._serve_image(hash_key)
             else:
                 self.send_response(404)
@@ -136,7 +136,9 @@ def _make_handler(
                             self._json(_pending[0])
                             return
                     if not game_thread.is_alive():
-                        self._json({"type": "game_over", "total_battles": total_battles})
+                        self._json(
+                            {"type": "game_over", "total_battles": total_battles}
+                        )
                         return
             self._json({"type": "waiting"})
 
@@ -187,7 +189,9 @@ def run_web_server(args: Any) -> None:
     cfg = _build_draft_config(synthetic=args.synthetic, real_only=args.real_only)
 
     cards = card_generator.generate_cards(cfg, rng)
-    copies_per_card: int | dict[str, int] = cube_manager.build_copies_map(cards, cfg.rarity)
+    copies_per_card: int | dict[str, int] = cube_manager.build_copies_map(
+        cards, cfg.rarity
+    )
     cube = cube_manager.CubeManager(
         designs=cards,
         copies_per_card=copies_per_card,

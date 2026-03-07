@@ -99,10 +99,12 @@ def _web_send_prompt(
         "max_selections": max_selections,
         "state": state,
     }
-    assert _web_prompt_queue is not None
-    assert _web_response_queue is not None
-    _web_prompt_queue.put(prompt)
-    return _web_response_queue.get()
+    pq = _web_prompt_queue
+    rq = _web_response_queue
+    assert pq is not None
+    assert rq is not None
+    pq.put(prompt)
+    return rq.get()
 
 
 class _OutputCapture(io.TextIOWrapper):
@@ -471,7 +473,9 @@ def multi_select(
         return []
 
     if _web_mode:
-        choice = _web_send_prompt("multi_select", options, max_selections=max_selections)
+        choice = _web_send_prompt(
+            "multi_select", options, max_selections=max_selections
+        )
         indices = [int(i) for i in choice if 0 <= int(i) < len(options)]
         if max_selections is not None:
             indices = indices[:max_selections]

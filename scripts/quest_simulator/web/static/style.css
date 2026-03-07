@@ -2,6 +2,7 @@
 :root {
   --bg:      #1f2430;
   --bg2:     #242936;
+  --bg3:     #1a1f2e;
   --fg:      #cccac2;
   --accent:  #ffcc66;
   --entity:  #73d0ff;
@@ -10,6 +11,7 @@
   --comment: #6c7a8b;
   --added:   #87d96c;
   --border:  #2d3444;
+  --border2: #353d52;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,15 +28,18 @@ body {
   overflow: hidden;
 }
 
-/* Status bar */
+/* ── Status bar ─────────────────────────────────────────────────────────── */
+
 #status-bar {
   display: flex;
-  gap: 24px;
+  gap: 20px;
   align-items: center;
-  padding: 8px 16px;
+  padding: 10px 20px;
   background: var(--bg2);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border2);
   flex-shrink: 0;
+  font-size: 13px;
+  letter-spacing: 0.01em;
 }
 
 #status-bar span { color: var(--fg); }
@@ -42,7 +47,8 @@ body {
 #status-completion { color: var(--entity); }
 #status-dreamcaller { color: var(--keyword); margin-left: auto; }
 
-/* Main layout */
+/* ── Main layout ────────────────────────────────────────────────────────── */
+
 #main {
   display: flex;
   flex: 1;
@@ -55,30 +61,33 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding: 12px 16px;
-  gap: 12px;
+  padding: 14px 20px;
+  gap: 0;
 }
 
-/* Context output */
+/* ── Context output ─────────────────────────────────────────────────────── */
+
 #context {
   flex: 1;
   overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-word;
-  color: var(--fg);
+  color: rgba(204, 202, 194, 0.75);
   background: transparent;
   font-family: inherit;
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 12.5px;
+  line-height: 1.65;
   padding-right: 8px;
+  padding-bottom: 8px;
 }
 
-/* Options area */
+/* ── Options area ───────────────────────────────────────────────────────── */
+
 #options-wrapper {
   flex-shrink: 0;
-  max-height: 45vh;
+  max-height: 48vh;
   overflow-y: auto;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border2);
   padding-top: 10px;
 }
 
@@ -86,89 +95,112 @@ body {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
+  margin-bottom: 2px;
 }
 
 #options li {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
-  padding: 7px 10px;
-  border-radius: 4px;
+  padding: 9px 14px 9px 11px;
+  border-radius: 6px;
   cursor: pointer;
   border: 1px solid transparent;
+  border-left: 3px solid transparent;
   transition: background 0.1s, border-color 0.1s;
 }
 
 #options li:hover,
 #options li.focused {
   background: var(--bg2);
-  border-color: var(--border);
+  border-color: var(--border2);
+  border-left-color: var(--accent);
 }
 
 #options li.selected {
-  background: rgba(255, 204, 102, 0.12);
-  border-color: var(--accent);
+  background: rgba(255, 204, 102, 0.09);
+  border-color: rgba(255, 204, 102, 0.22);
+  border-left-color: var(--accent);
 }
 
 #options li .option-text { flex: 1; }
+
 #options li .option-index {
   color: var(--comment);
-  min-width: 1.8em;
-  text-align: right;
-  font-size: 12px;
-  padding-top: 2px;
+  font-size: 11px;
+  padding: 1px 6px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  flex-shrink: 0;
+  line-height: 1.5;
 }
 
-/* Card image inside option */
+/* ── Card image inside option ───────────────────────────────────────────── */
+
 #options li .card-img,
 #deck-list li .card-img {
   width: 60px;
   height: 45px;
   object-fit: cover;
-  border-radius: 3px;
+  border-radius: 4px;
   flex-shrink: 0;
   background: var(--border);
 }
 
-/* Checkbox option */
+/* ── Checkbox option (multi_select) ─────────────────────────────────────── */
+
 #options li input[type="checkbox"] {
   accent-color: var(--accent);
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   flex-shrink: 0;
-  margin-top: 3px;
+  cursor: pointer;
 }
 
-/* Action bar (confirm/continue buttons) */
+/* ── Action bar ─────────────────────────────────────────────────────────── */
+
 #action-bar {
-  margin-top: 10px;
   display: flex;
   gap: 10px;
+  margin-top: 10px;
+  padding-bottom: 4px;
 }
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
 
 button {
   background: var(--bg2);
   color: var(--fg);
-  border: 1px solid var(--border);
-  padding: 7px 18px;
-  border-radius: 4px;
+  border: 1px solid var(--border2);
+  padding: 8px 20px;
+  border-radius: 5px;
   font-family: inherit;
   font-size: 13px;
+  min-width: 80px;
   cursor: pointer;
-  transition: background 0.1s, border-color 0.1s, color 0.1s;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 
 button:hover, button:focus {
-  background: rgba(255, 204, 102, 0.1);
+  background: rgba(255, 204, 102, 0.08);
   border-color: var(--accent);
   color: var(--accent);
   outline: none;
 }
 
 button.primary {
+  background: rgba(255, 204, 102, 0.08);
   border-color: var(--accent);
   color: var(--accent);
+}
+
+button.primary:hover, button.primary:focus {
+  background: rgba(255, 204, 102, 0.18);
+  border-color: var(--accent);
+  color: var(--accent);
+  outline: none;
 }
 
 button.danger {
@@ -176,24 +208,44 @@ button.danger {
   color: var(--error);
 }
 
-/* Deck toggle button */
+button.danger:hover, button.danger:focus {
+  background: rgba(255, 102, 102, 0.1);
+  border-color: var(--error);
+  color: var(--error);
+  outline: none;
+}
+
+/* Continue button gets extra presence when it's the sole action */
+button.solo {
+  min-width: 140px;
+  padding: 9px 32px;
+  letter-spacing: 0.03em;
+}
+
+/* ── Deck toggle button ─────────────────────────────────────────────────── */
+
 #deck-toggle {
   position: fixed;
   right: 0;
   top: 50%;
   transform: translateY(-50%);
   writing-mode: vertical-rl;
-  padding: 12px 6px;
-  border-radius: 4px 0 0 4px;
+  padding: 14px 7px;
+  border-radius: 5px 0 0 5px;
   border-right: none;
+  background: var(--bg2);
+  border-color: var(--border2);
+  font-size: 11px;
+  letter-spacing: 0.06em;
   z-index: 10;
 }
 
-/* Deck sidebar */
+/* ── Deck sidebar ───────────────────────────────────────────────────────── */
+
 #deck-sidebar {
   width: 260px;
   flex-shrink: 0;
-  border-left: 1px solid var(--border);
+  border-left: 1px solid var(--border2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -203,10 +255,13 @@ button.danger {
 #deck-sidebar.hidden { display: none; }
 
 #sidebar-header {
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--border);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border2);
   color: var(--entity);
   font-weight: bold;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 #deck-list {
@@ -223,8 +278,8 @@ button.danger {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  padding: 6px;
-  border-radius: 4px;
+  padding: 8px;
+  border-radius: 5px;
   border: 1px solid var(--border);
   background: var(--bg);
 }
@@ -237,18 +292,19 @@ button.danger {
   text-overflow: ellipsis;
   font-size: 12px;
 }
-#deck-list li .card-meta { color: var(--comment); font-size: 11px; }
+#deck-list li .card-meta { color: var(--comment); font-size: 11px; margin-top: 1px; }
 #deck-list li .card-rules {
-  color: var(--fg);
+  color: rgba(204, 202, 194, 0.7);
   font-size: 11px;
-  margin-top: 2px;
+  margin-top: 3px;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
-/* Game over screen */
+/* ── Game over screen ───────────────────────────────────────────────────── */
+
 #game-over {
   position: fixed;
   inset: 0;
@@ -262,11 +318,22 @@ button.danger {
 }
 
 #game-over.hidden { display: none; }
-#game-over h2 { color: var(--accent); font-size: 28px; }
-#game-over p  { color: var(--fg); font-size: 16px; }
 
-/* Scrollbar styling */
-::-webkit-scrollbar { width: 6px; }
+#game-over h2 {
+  color: var(--accent);
+  font-size: 28px;
+  letter-spacing: 0.04em;
+}
+
+#game-over p {
+  color: var(--fg);
+  font-size: 15px;
+  opacity: 0.8;
+}
+
+/* ── Scrollbar styling ──────────────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--comment); }
