@@ -8,6 +8,7 @@ Stdlib-only, no external dependencies.
 
 import random
 import uuid
+from collections.abc import Callable
 
 import config
 import cube_manager
@@ -100,26 +101,28 @@ def _generate_seeded_themed(
 
     cards: list[CardInstance] = []
     used_ids: set[int] = set()
+    used_names: set[str] = set()
 
     # Fill primary slots: cards whose top fitness aligns with target archetypes
-    primary_cards = _draw_primary_cards(
-        cube, primary_slots, target_archetypes, used_ids, rng
+    cards.extend(
+        _draw_primary_cards(
+            cube, primary_slots, target_archetypes, used_ids, used_names, rng
+        )
     )
-    cards.extend(primary_cards)
-    used_ids.update(c.instance_id for c in primary_cards)
 
     # Fill bridge slots: cards with fitness > 0.5 in 2+ selected archetypes
-    bridge_cards = _draw_bridge_cards(
-        cube, bridge_slots, target_archetypes, used_ids, rng
+    cards.extend(
+        _draw_bridge_cards(
+            cube, bridge_slots, target_archetypes, used_ids, used_names, rng
+        )
     )
-    cards.extend(bridge_cards)
-    used_ids.update(c.instance_id for c in bridge_cards)
 
     # Fill remaining slots by uniform sampling
     remaining_needed = pack_size - len(cards)
     if remaining_needed > 0:
-        fill_cards = _draw_remaining_cards(cube, remaining_needed, used_ids, rng)
-        cards.extend(fill_cards)
+        cards.extend(
+            _draw_remaining_cards(cube, remaining_needed, used_ids, used_names, rng)
+        )
 
     return cards
 
@@ -223,35 +226,64 @@ def _top_archetype(inst: CardInstance, archetype_count: int) -> int:
     return best_idx
 
 
+def _draw_deduped(
+    cube: cube_manager.CubeManager,
+    count: int,
+    used_ids: set[int],
+    used_names: set[str],
+    weight_fn: Callable[[CardInstance], float],
+    rng: random.Random,
+) -> list[CardInstance]:
+    """Draw cards one at a time, deduplicating by card name within a pack.
+
+    After each draw, zero out weights for all instances sharing the
+    drawn card's name so that no two copies of the same card design
+    appear in one pack.
+    """
+    result: list[CardInstance] = []
+
+    for _ in range(count):
+        current_supply = cube.supply
+        weights: list[float] = []
+        for inst in current_supply:
+            if inst.instance_id in used_ids or inst.design.name in used_names:
+                weights.append(0.0)
+            else:
+                weights.append(weight_fn(inst))
+
+        if not any(w > 0 for w in weights):
+            break
+
+        drawn = cube.draw(1, rng, weights=weights)
+        if not drawn:
+            break
+        card = drawn[0]
+        result.append(card)
+        used_ids.add(card.instance_id)
+        used_names.add(card.design.name)
+
+    return result
+
+
 def _draw_primary_cards(
     cube: cube_manager.CubeManager,
     count: int,
     target_archetypes: list[int],
     used_ids: set[int],
+    used_names: set[str],
     rng: random.Random,
 ) -> list[CardInstance]:
     """Draw cards whose top fitness aligns with primary archetypes."""
     target_set = set(target_archetypes)
-    current_supply = cube.supply
-    archetype_count = len(current_supply[0].design.fitness) if current_supply else 8
+    archetype_count = len(cube.supply[0].design.fitness) if cube.supply else 8
 
-    weights: list[float] = []
-    for inst in current_supply:
-        if inst.instance_id in used_ids:
-            weights.append(0.0)
-            continue
+    def weight_fn(inst: CardInstance) -> float:
         top = _top_archetype(inst, archetype_count)
         if top in target_set:
-            weights.append(max(inst.design.fitness[top], 0.001))
-        else:
-            weights.append(0.0)
+            return max(inst.design.fitness[top], 0.001)
+        return 0.0
 
-    available_count = sum(1 for w in weights if w > 0)
-    draw_count = min(count, available_count)
-    if draw_count <= 0:
-        return []
-
-    return cube.draw(draw_count, rng, weights=weights)
+    return _draw_deduped(cube, count, used_ids, used_names, weight_fn, rng)
 
 
 def _draw_bridge_cards(
@@ -259,56 +291,36 @@ def _draw_bridge_cards(
     count: int,
     target_archetypes: list[int],
     used_ids: set[int],
+    used_names: set[str],
     rng: random.Random,
 ) -> list[CardInstance]:
     """Draw bridge cards with fitness > 0.5 in 2+ selected archetypes."""
     target_set = set(target_archetypes)
-    current_supply = cube.supply
 
-    weights: list[float] = []
-    for inst in current_supply:
-        if inst.instance_id in used_ids:
-            weights.append(0.0)
-            continue
+    def weight_fn(inst: CardInstance) -> float:
         high_count = sum(
             1
             for a in target_set
             if a < len(inst.design.fitness) and inst.design.fitness[a] > 0.5
         )
-        if high_count >= 2:
-            weights.append(1.0)
-        else:
-            weights.append(0.0)
+        return 1.0 if high_count >= 2 else 0.0
 
-    available_count = sum(1 for w in weights if w > 0)
-    draw_count = min(count, available_count)
-    if draw_count <= 0:
-        return []
-
-    return cube.draw(draw_count, rng, weights=weights)
+    return _draw_deduped(cube, count, used_ids, used_names, weight_fn, rng)
 
 
 def _draw_remaining_cards(
     cube: cube_manager.CubeManager,
     count: int,
     used_ids: set[int],
+    used_names: set[str],
     rng: random.Random,
 ) -> list[CardInstance]:
     """Draw remaining cards uniformly, avoiding already-used instances."""
-    current_supply = cube.supply
-    weights: list[float] = []
-    for inst in current_supply:
-        if inst.instance_id in used_ids:
-            weights.append(0.0)
-        else:
-            weights.append(1.0)
 
-    available_count = sum(1 for w in weights if w > 0)
-    draw_count = min(count, available_count)
-    if draw_count <= 0:
-        return []
+    def weight_fn(inst: CardInstance) -> float:
+        return 1.0
 
-    return cube.draw(draw_count, rng, weights=weights)
+    return _draw_deduped(cube, count, used_ids, used_names, weight_fn, rng)
 
 
 def _build_rarity_weight_vector(
@@ -334,7 +346,7 @@ def _generate_rarity_seeded_themed(
 
     Selects target archetypes, then fills each rarity tier's allocated
     slots using primary/bridge/filler logic. Tracks both instance IDs
-    and card IDs to prevent the same design appearing twice in a pack.
+    and card names to prevent the same design appearing twice in a pack.
     """
     archetype_count = cfg.cards.archetype_count
     target_count = min(cfg.pack_generation.archetype_target_count, archetype_count)
@@ -349,7 +361,7 @@ def _generate_rarity_seeded_themed(
 
     cards: list[CardInstance] = []
     used_instance_ids: set[int] = set()
-    used_card_ids: set[str] = set()
+    used_card_names: set[str] = set()
 
     for tier_idx, tier_name in enumerate(rarity_cfg.tiers):
         tier_slots = rarity_cfg.pack_tier_slots[tier_idx]
@@ -357,58 +369,52 @@ def _generate_rarity_seeded_themed(
         bridge_slots = int(tier_slots * bridge_density)
 
         # Fill primary slots for this tier
-        primary_cards = _draw_primary_cards_for_tier(
-            cube,
-            primary_slots,
-            target_archetypes,
-            tier_name,
-            used_instance_ids,
-            used_card_ids,
-            rng,
+        cards.extend(
+            _draw_primary_cards_for_tier(
+                cube,
+                primary_slots,
+                target_archetypes,
+                tier_name,
+                used_instance_ids,
+                used_card_names,
+                rng,
+            )
         )
-        cards.extend(primary_cards)
-        for c in primary_cards:
-            used_instance_ids.add(c.instance_id)
-            used_card_ids.add(c.design.card_id)
 
         # Fill bridge slots for this tier
-        bridge_cards = _draw_bridge_cards_for_tier(
-            cube,
-            bridge_slots,
-            target_archetypes,
-            tier_name,
-            used_instance_ids,
-            used_card_ids,
-            rng,
+        cards.extend(
+            _draw_bridge_cards_for_tier(
+                cube,
+                bridge_slots,
+                target_archetypes,
+                tier_name,
+                used_instance_ids,
+                used_card_names,
+                rng,
+            )
         )
-        cards.extend(bridge_cards)
-        for c in bridge_cards:
-            used_instance_ids.add(c.instance_id)
-            used_card_ids.add(c.design.card_id)
 
         # Fill remaining tier slots
         remaining_needed = tier_slots - len(
             [c for c in cards if c.design.rarity == tier_name]
         )
         if remaining_needed > 0:
-            fill_cards = _draw_remaining_cards_for_tier(
-                cube,
-                remaining_needed,
-                tier_name,
-                used_instance_ids,
-                used_card_ids,
-                rng,
+            cards.extend(
+                _draw_remaining_cards_for_tier(
+                    cube,
+                    remaining_needed,
+                    tier_name,
+                    used_instance_ids,
+                    used_card_names,
+                    rng,
+                )
             )
-            cards.extend(fill_cards)
-            for c in fill_cards:
-                used_instance_ids.add(c.instance_id)
-                used_card_ids.add(c.design.card_id)
 
     # Any-tier backfill if still underfilled
     remaining_needed = pack_size - len(cards)
     if remaining_needed > 0:
         fill_cards = _draw_remaining_cards_deduped(
-            cube, remaining_needed, used_instance_ids, used_card_ids, rng
+            cube, remaining_needed, used_instance_ids, used_card_names, rng
         )
         cards.extend(fill_cards)
 
@@ -421,34 +427,24 @@ def _draw_primary_cards_for_tier(
     target_archetypes: list[int],
     tier_name: str,
     used_instance_ids: set[int],
-    used_card_ids: set[str],
+    used_card_names: set[str],
     rng: random.Random,
 ) -> list[CardInstance]:
     """Draw primary cards filtered by rarity tier with design-level dedup."""
     target_set = set(target_archetypes)
-    current_supply = cube.supply
-    archetype_count = len(current_supply[0].design.fitness) if current_supply else 8
+    archetype_count = len(cube.supply[0].design.fitness) if cube.supply else 8
 
-    weights: list[float] = []
-    for inst in current_supply:
-        if (
-            inst.instance_id in used_instance_ids
-            or inst.design.card_id in used_card_ids
-            or inst.design.rarity != tier_name
-        ):
-            weights.append(0.0)
-            continue
+    def weight_fn(inst: CardInstance) -> float:
+        if inst.design.rarity != tier_name:
+            return 0.0
         top = _top_archetype(inst, archetype_count)
         if top in target_set:
-            weights.append(max(inst.design.fitness[top], 0.001))
-        else:
-            weights.append(0.0)
+            return max(inst.design.fitness[top], 0.001)
+        return 0.0
 
-    available_count = sum(1 for w in weights if w > 0)
-    draw_count = min(count, available_count)
-    if draw_count <= 0:
-        return []
-    return cube.draw(draw_count, rng, weights=weights)
+    return _draw_deduped(
+        cube, count, used_instance_ids, used_card_names, weight_fn, rng
+    )
 
 
 def _draw_bridge_cards_for_tier(
@@ -457,37 +453,25 @@ def _draw_bridge_cards_for_tier(
     target_archetypes: list[int],
     tier_name: str,
     used_instance_ids: set[int],
-    used_card_ids: set[str],
+    used_card_names: set[str],
     rng: random.Random,
 ) -> list[CardInstance]:
     """Draw bridge cards filtered by rarity tier with design-level dedup."""
     target_set = set(target_archetypes)
-    current_supply = cube.supply
 
-    weights: list[float] = []
-    for inst in current_supply:
-        if (
-            inst.instance_id in used_instance_ids
-            or inst.design.card_id in used_card_ids
-            or inst.design.rarity != tier_name
-        ):
-            weights.append(0.0)
-            continue
+    def weight_fn(inst: CardInstance) -> float:
+        if inst.design.rarity != tier_name:
+            return 0.0
         high_count = sum(
             1
             for a in target_set
             if a < len(inst.design.fitness) and inst.design.fitness[a] > 0.5
         )
-        if high_count >= 2:
-            weights.append(1.0)
-        else:
-            weights.append(0.0)
+        return 1.0 if high_count >= 2 else 0.0
 
-    available_count = sum(1 for w in weights if w > 0)
-    draw_count = min(count, available_count)
-    if draw_count <= 0:
-        return []
-    return cube.draw(draw_count, rng, weights=weights)
+    return _draw_deduped(
+        cube, count, used_instance_ids, used_card_names, weight_fn, rng
+    )
 
 
 def _draw_remaining_cards_for_tier(
@@ -495,53 +479,34 @@ def _draw_remaining_cards_for_tier(
     count: int,
     tier_name: str,
     used_instance_ids: set[int],
-    used_card_ids: set[str],
+    used_card_names: set[str],
     rng: random.Random,
 ) -> list[CardInstance]:
     """Draw remaining cards from a specific tier with design-level dedup."""
-    current_supply = cube.supply
-    weights: list[float] = []
-    for inst in current_supply:
-        if (
-            inst.instance_id in used_instance_ids
-            or inst.design.card_id in used_card_ids
-            or inst.design.rarity != tier_name
-        ):
-            weights.append(0.0)
-        else:
-            weights.append(1.0)
 
-    available_count = sum(1 for w in weights if w > 0)
-    draw_count = min(count, available_count)
-    if draw_count <= 0:
-        return []
-    return cube.draw(draw_count, rng, weights=weights)
+    def weight_fn(inst: CardInstance) -> float:
+        return 1.0 if inst.design.rarity == tier_name else 0.0
+
+    return _draw_deduped(
+        cube, count, used_instance_ids, used_card_names, weight_fn, rng
+    )
 
 
 def _draw_remaining_cards_deduped(
     cube: cube_manager.CubeManager,
     count: int,
     used_instance_ids: set[int],
-    used_card_ids: set[str],
+    used_card_names: set[str],
     rng: random.Random,
 ) -> list[CardInstance]:
     """Draw remaining cards from any tier with design-level dedup."""
-    current_supply = cube.supply
-    weights: list[float] = []
-    for inst in current_supply:
-        if (
-            inst.instance_id in used_instance_ids
-            or inst.design.card_id in used_card_ids
-        ):
-            weights.append(0.0)
-        else:
-            weights.append(1.0)
 
-    available_count = sum(1 for w in weights if w > 0)
-    draw_count = min(count, available_count)
-    if draw_count <= 0:
-        return []
-    return cube.draw(draw_count, rng, weights=weights)
+    def weight_fn(inst: CardInstance) -> float:
+        return 1.0
+
+    return _draw_deduped(
+        cube, count, used_instance_ids, used_card_names, weight_fn, rng
+    )
 
 
 def _compute_archetype_profile(
