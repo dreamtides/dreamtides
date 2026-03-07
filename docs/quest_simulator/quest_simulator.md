@@ -65,11 +65,12 @@ Entry point: `quest_sim.py` — CLI parsing, draft engine init, quest flow launc
 | `data_loader.py`   | TOML data loading: config, dreamcallers, dreamsigns, etc.    |
 | `models.py`        | Quest-specific types: `DeckCard`, `Dreamsign`, `Dreamcaller` |
 | `render.py`        | Terminal rendering utilities and color palette shims         |
-| `render_cards.py`  | Card display formatting                                      |
+| `render_cards.py`  | Card display formatting with inline image support            |
 | `render_status.py` | Victory screen, archetype preference footer                  |
 | `render_atlas.py`  | Atlas/dreamscape map display                                 |
 | `input_handler.py` | Terminal input and keyboard handling                         |
 | `jsonl_log.py`     | Session logging to JSONL format                              |
+| `image_cache.py`   | Resolves card image numbers to local paths via TV app cache  |
 | `validate_data.py` | Data file validation at startup                              |
 
 **Card-offering site handlers**: `sites_draft.py`, `sites_shop.py`,
@@ -97,14 +98,22 @@ Draft-engine fields on `QuestState` (initialized in `quest_sim.py`):
 - `human_agent: AgentState` — the human seat's agent, persists across the quest.
   Created via `agents.create_agent(archetype_count=8)`.
 - `ai_agents: list[AgentState]` — 5 AI seat agents.
-- `cube: CubeManager` — shared card supply. 540 distinct synthetic cards,
-  `WITH_REPLACEMENT` mode so cards are never exhausted.
+- `cube: CubeManager` — shared card supply. 360 cards (real TOML cards by
+  default, synthetic if `--synthetic`), `WITH_REPLACEMENT` mode so cards are
+  never exhausted.
 - `draft_cfg: SimulatorConfig` — config reference (see below).
 - `packs: list[Pack] | None` — the 6 current packs. `None` when no round is
   active (triggers new round on next advance).
 - `round_pick_count: int` — picks completed in the current round.
 - `round_index: int` — current round number.
 - `global_pick_index: int` — total pick steps completed across the quest.
+- `max_deck: int` — maximum deck size (default 50). Over-limit triggers forced
+  purge before battle.
+- `min_deck: int` — minimum deck size (default 25). Under-limit triggers
+  auto-fill by duplicating the entire deck.
+- `max_dreamsigns: int` — maximum dreamsign count (default 12).
+- `bane_instance_counter: int` — monotonic counter for generating unique bane
+  card instance IDs.
 
 ## Round Manager API
 
@@ -166,16 +175,22 @@ Key values:
 - `agents.show_n = 4`, `agents.show_n_strategy = "sharpened_preference"`
 - `agents.policy = "adaptive"`, `agents.ai_optimality = 0.80`
 - `agents.learning_rate = 3.0`, `agents.openness_window = 3`
-- `cards.archetype_count = 8`, `cards.source = "synthetic"`
-- `cube.distinct_cards = 540`, `cube.consumption_mode = "with_replacement"`
+- `cards.archetype_count = 8`, `cards.source = "toml"` (default; `"synthetic"`
+  with `--synthetic` flag)
+- `cube.distinct_cards = 360`, `cube.consumption_mode = "with_replacement"`
 - `refill.strategy = "no_refill"`
 - `pack_generation.strategy = "seeded_themed"`
 
 ## Running the Quest Simulator
 
 ```
-python3 scripts/quest_simulator/quest_sim.py [--seed N]
+python3 scripts/quest_simulator/quest_sim.py [--seed N] [--synthetic] [--real-only]
 ```
+
+- `--seed N` / `-s N` — fixed random seed for reproducibility.
+- `--synthetic` — use synthetic cards instead of real TOML cards.
+- `--real-only` — fill the 360-card pool by duplicating real cards instead of
+  padding with synthetics.
 
 The simulator is interactive — it reads from stdin and renders to the terminal.
 For non-interactive smoke testing:
@@ -206,10 +221,12 @@ Quest content lives under `scripts/quest_simulator/data/`:
   shop pricing, pick counts). Separate from draft config.
 - `dreamcallers.toml`, `dreamsigns.toml`, `bosses.toml` — quest content.
 - `journeys.toml`, `offers.toml`, `banes.toml` — event and offer tables.
+- `rendered-cards.toml` — pre-rendered real card data (77 KB). Used as the
+  default card source; the draft simulator's `card_generator.py` loads these and
+  pads with synthetics to reach 360.
 
-Card data is synthetic (generated at runtime by the draft simulator's
-`card_generator.py`). There are no card JSON files — those were removed in the
-draft integration rewrite.
+By default the quest uses real TOML cards from `rendered-cards.toml`. Pass
+`--synthetic` to use fully synthetic cards generated at runtime instead.
 
 ## Further Reading
 

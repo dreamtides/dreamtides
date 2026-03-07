@@ -63,7 +63,9 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _build_draft_config(synthetic: bool = False, real_only: bool = False) -> SimulatorConfig:
+def _build_draft_config(
+    synthetic: bool = False, real_only: bool = False
+) -> SimulatorConfig:
     """Construct a SimulatorConfig for quest mode without validation."""
     cfg = SimulatorConfig()
     cfg.draft.seat_count = 6
