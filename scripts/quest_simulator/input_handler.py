@@ -3,13 +3,22 @@
 Provides four input modes for site interactions: single select, multi select,
 confirm/decline, and continue. Uses stdlib tty/termios for raw mode with
 robust terminal state restoration.
+
+When AI mode is enabled, decision points use a file-based turn protocol
+instead of terminal I/O: a JSON prompt file is written, then the handler
+polls for a JSON response file before continuing.
 """
 
 import atexit
+import io
+import json
 import os
+import re
 import select
 import signal
 import sys
+import time
+from pathlib import Path
 from typing import Any, Callable, Optional
 
 # Terminal control is Unix-only; guard imports for type checking on all platforms
@@ -33,6 +42,120 @@ KEY_UNKNOWN = "unknown"
 
 # Saved terminal state for restoration
 _saved_termios: Optional[list[Any]] = None
+
+# --- AI mode state ---
+_ai_mode: bool = False
+_prompt_counter: int = 0
+_PROMPT_PATH = Path(".logs/quest_ai_prompt.json")
+_RESPONSE_PATH = Path(".logs/quest_ai_response.json")
+_AI_POLL_INTERVAL = 0.3
+_AI_TIMEOUT = 300  # 5 minutes
+
+
+def set_ai_mode(enabled: bool) -> None:
+    """Enable or disable AI turn protocol mode."""
+    global _ai_mode
+    _ai_mode = enabled
+
+
+def get_ai_mode() -> bool:
+    """Return whether AI mode is active."""
+    return _ai_mode
+
+
+class _OutputCapture(io.TextIOWrapper):
+    """Wraps stdout to capture plain text while passing writes through."""
+
+    def __init__(self, real_stdout: Any) -> None:
+        self._real_stdout = real_stdout
+        self._buffer: list[str] = []
+        self._ansi_re = re.compile(r"\x1b\[[0-9;]*[A-Za-z]|\x1b\].*?\x07")
+
+    def write(self, s: str) -> int:
+        self._buffer.append(self._ansi_re.sub("", s))
+        return self._real_stdout.write(s)
+
+    def flush(self) -> None:
+        self._real_stdout.flush()
+
+    def flush_buffer(self) -> str:
+        """Retrieve and clear all captured plain text."""
+        text = "".join(self._buffer)
+        self._buffer.clear()
+        return text
+
+    def isatty(self) -> bool:
+        return False
+
+    def fileno(self) -> int:
+        return self._real_stdout.fileno()
+
+    @property
+    def encoding(self) -> str:
+        return self._real_stdout.encoding
+
+    @property
+    def errors(self) -> Optional[str]:
+        return self._real_stdout.errors
+
+
+_output_capture: Optional[_OutputCapture] = None
+
+
+def install_output_capture() -> None:
+    """Install the output capture wrapper on sys.stdout."""
+    global _output_capture
+    _output_capture = _OutputCapture(sys.stdout)
+    sys.stdout = _output_capture  # type: ignore[assignment]
+
+
+def _write_ai_prompt(
+    prompt_type: str,
+    options: list[str],
+    max_selections: Optional[int] = None,
+) -> None:
+    """Write a JSON prompt file for the AI sub-agent."""
+    global _prompt_counter
+    _prompt_counter += 1
+    context = _output_capture.flush_buffer() if _output_capture else ""
+    prompt = {
+        "type": prompt_type,
+        "prompt_id": _prompt_counter,
+        "context": context,
+        "options": options,
+        "max_selections": max_selections,
+    }
+    _PROMPT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = _PROMPT_PATH.with_suffix(".tmp")
+    tmp_path.write_text(json.dumps(prompt, indent=2))
+    tmp_path.rename(_PROMPT_PATH)
+
+
+def _read_ai_response() -> Any:
+    """Poll for and read the AI response file, then clean up."""
+    deadline = time.monotonic() + _AI_TIMEOUT
+    while time.monotonic() < deadline:
+        if _RESPONSE_PATH.exists():
+            try:
+                data = json.loads(_RESPONSE_PATH.read_text())
+            except (json.JSONDecodeError, OSError):
+                time.sleep(_AI_POLL_INTERVAL)
+                continue
+            if data.get("prompt_id") != _prompt_counter:
+                time.sleep(_AI_POLL_INTERVAL)
+                continue
+            # Clean up files
+            try:
+                _RESPONSE_PATH.unlink()
+            except OSError:
+                pass
+            try:
+                _PROMPT_PATH.unlink()
+            except OSError:
+                pass
+            return data["choice"]
+        time.sleep(_AI_POLL_INTERVAL)
+    raise TimeoutError("AI response timed out after 5 minutes")
 
 
 def _is_interactive() -> bool:
@@ -231,6 +354,11 @@ def single_select(
     if not options:
         return 0
 
+    if _ai_mode:
+        _write_ai_prompt("single_select", options)
+        choice = _read_ai_response()
+        return max(0, min(int(choice), len(options) - 1))
+
     if not _is_interactive():
         return min(initial, len(options) - 1)
 
@@ -295,6 +423,14 @@ def multi_select(
     """
     if not options:
         return []
+
+    if _ai_mode:
+        _write_ai_prompt("multi_select", options, max_selections=max_selections)
+        choice = _read_ai_response()
+        indices = [int(i) for i in choice if 0 <= int(i) < len(options)]
+        if max_selections is not None:
+            indices = indices[:max_selections]
+        return sorted(set(indices))
 
     if not _is_interactive():
         if initial_toggled:
@@ -362,6 +498,10 @@ def confirm_decline(
     Returns:
         True if accepted, False if declined.
     """
+    if _ai_mode:
+        _write_ai_prompt("confirm_decline", [accept_label, decline_label])
+        return bool(_read_ai_response())
+
     if not _is_interactive():
         return True
 
@@ -435,6 +575,9 @@ def wait_for_continue(
         print(render_fn())
     else:
         print(prompt)
+
+    if _ai_mode:
+        return
 
     if not _is_interactive():
         return

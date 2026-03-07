@@ -14,6 +14,9 @@ import traceback
 from pathlib import Path
 from typing import Any
 
+_PROMPT_PATH = Path(".logs/quest_ai_prompt.json")
+_RESPONSE_PATH = Path(".logs/quest_ai_response.json")
+
 # Add draft_simulator to sys.path for cross-module imports
 _DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
 if _DRAFT_SIM_DIR not in sys.path:
@@ -65,6 +68,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         default=False,
         help="Show AI draft bot debug panel in dreamscape site-selection menu",
+    )
+    parser.add_argument(
+        "--ai",
+        action="store_true",
+        default=False,
+        help="Enable AI turn protocol mode for sub-agent play-testing",
     )
     return parser
 
@@ -124,6 +133,17 @@ def main() -> None:
     """Run the quest simulator."""
     parser = build_parser()
     args = parser.parse_args()
+
+    # Set up AI mode if requested
+    if args.ai:
+        input_handler.set_ai_mode(True)
+        input_handler.install_output_capture()
+        # Clean up stale files from previous runs
+        for stale in (_PROMPT_PATH, _RESPONSE_PATH):
+            try:
+                stale.unlink()
+            except OSError:
+                pass
 
     # Determine seed
     seed: int = args.seed if args.seed is not None else random.randint(0, 2**32)
