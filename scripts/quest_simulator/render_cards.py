@@ -34,7 +34,7 @@ def _render_image_line(image_number: int) -> str | None:
     try:
         buf = io.BytesIO()
         with open(path, "rb") as f:
-            _imgcat(f.read(), width=40, height=40, fp=buf)
+            _imgcat(f.read(), width=20, height=8, fp=buf)
         return buf.getvalue().decode("utf-8", errors="replace")
     except Exception:
         return None
