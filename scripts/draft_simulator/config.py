@@ -64,6 +64,7 @@ class CardsConfig:
     metadata_toml_path: Optional[str] = None
     archetype_count: int = 8
     bridge_fraction: float = 0.15
+    real_only: bool = False
 
 
 @dataclass

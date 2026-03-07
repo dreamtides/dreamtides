@@ -54,10 +54,16 @@ def build_parser() -> argparse.ArgumentParser:
         default=False,
         help="Use synthetic cards instead of real TOML cards",
     )
+    parser.add_argument(
+        "--real-only",
+        action="store_true",
+        default=False,
+        help="Fill pool to 360 by duplicating real cards instead of adding synthetics",
+    )
     return parser
 
 
-def _build_draft_config(synthetic: bool = False) -> SimulatorConfig:
+def _build_draft_config(synthetic: bool = False, real_only: bool = False) -> SimulatorConfig:
     """Construct a SimulatorConfig for quest mode without validation."""
     cfg = SimulatorConfig()
     cfg.draft.seat_count = 6
@@ -82,6 +88,7 @@ def _build_draft_config(synthetic: bool = False) -> SimulatorConfig:
         cfg.cards.source = "synthetic"
     else:
         cfg.cards.source = "toml"
+        cfg.cards.real_only = real_only
         script_dir = os.path.dirname(os.path.abspath(__file__))
         cfg.cards.rendered_toml_path = os.path.join(
             script_dir, "data", "rendered-cards.toml"
@@ -115,7 +122,7 @@ def main() -> None:
     rng = random.Random(seed)
 
     # Build draft engine configuration
-    cfg = _build_draft_config(synthetic=args.synthetic)
+    cfg = _build_draft_config(synthetic=args.synthetic, real_only=args.real_only)
 
     # Generate card pool
     cards = card_generator.generate_cards(cfg, rng)

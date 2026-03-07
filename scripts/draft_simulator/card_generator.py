@@ -30,7 +30,10 @@ def generate_cards(cfg: SimulatorConfig, rng: random.Random) -> list[CardDesign]
         real_cards = load_real_cards(
             cfg.cards.rendered_toml_path, cfg.cards.metadata_toml_path
         )
-        cards = fill_card_pool_gaps(real_cards, cfg, rng)
+        if cfg.cards.real_only:
+            cards = duplicate_real_cards(real_cards, cfg, rng)
+        else:
+            cards = fill_card_pool_gaps(real_cards, cfg, rng)
     elif cfg.cards.source == "file":
         if cfg.cards.file_path is None:
             raise ValueError("cards.source is 'file' but cards.file_path is not set")
@@ -230,6 +233,124 @@ def fill_card_pool_gaps(
                 card_index += 1
 
     return list(real_cards) + synthetic_cards
+
+
+def duplicate_real_cards(
+    real_cards: list[CardDesign],
+    cfg: SimulatorConfig,
+    rng: random.Random,
+) -> list[CardDesign]:
+    """Fill the gap to the target pool size by duplicating real cards.
+
+    Uses the same pool analysis as fill_card_pool_gaps to determine
+    per-rarity budgets, then samples real cards with replacement weighted
+    by archetype coverage need.
+    """
+    import pool_analyzer
+
+    gap = cfg.cube.distinct_cards - len(real_cards)
+    if gap <= 0:
+        return list(real_cards)
+
+    # Analyze the real pool to find coverage gaps
+    analysis = pool_analyzer.analyze_pool(real_cards, cfg)
+    targets = pool_analyzer.compute_ideal_targets(cfg)
+    gaps = pool_analyzer.compute_gaps(analysis, targets, cfg)
+
+    # Determine per-rarity budgets (same logic as fill_card_pool_gaps)
+    rarity_needs: dict[str, int] = {}
+    if cfg.rarity.enabled and gaps.per_rarity_needed:
+        total_rarity_need = sum(gaps.per_rarity_needed.values())
+        if total_rarity_need > 0:
+            for tier_name, need in gaps.per_rarity_needed.items():
+                rarity_needs[tier_name] = round(need * gap / total_rarity_need)
+            diff = gap - sum(rarity_needs.values())
+            if diff != 0:
+                largest_tier = max(rarity_needs, key=lambda t: rarity_needs[t])
+                rarity_needs[largest_tier] += diff
+        else:
+            for ti, tier_name in enumerate(cfg.rarity.tiers):
+                rarity_needs[tier_name] = round(
+                    cfg.rarity.tier_design_counts[ti] * gap / cfg.cube.distinct_cards
+                )
+            diff = gap - sum(rarity_needs.values())
+            if diff != 0:
+                largest_tier = max(rarity_needs, key=lambda t: rarity_needs[t])
+                rarity_needs[largest_tier] += diff
+    else:
+        rarity_needs["common"] = gap
+
+    # Group real cards by rarity tier
+    cards_by_rarity: dict[str, list[CardDesign]] = {}
+    for card in real_cards:
+        tier = card.rarity if card.rarity else "common"
+        cards_by_rarity.setdefault(tier, []).append(card)
+
+    coverage_needed = gaps.per_archetype_coverage_needed
+    duplicates: list[CardDesign] = []
+    counter = 0
+
+    for tier_name, tier_count in rarity_needs.items():
+        if tier_count <= 0:
+            continue
+
+        pool = cards_by_rarity.get(tier_name, [])
+        if not pool:
+            # Fall back to all real cards if no cards in this tier
+            pool = real_cards
+
+        weights = _compute_duplication_weights(pool, coverage_needed)
+        for _ in range(tier_count):
+            source = _weighted_choice(pool, weights, rng)
+            duplicates.append(
+                CardDesign(
+                    card_id=f"{source.card_id}_dup_{counter:04d}",
+                    name=source.name,
+                    fitness=list(source.fitness),
+                    power=source.power,
+                    commit=source.commit,
+                    flex=source.flex,
+                    rarity=source.rarity,
+                    rules_text=source.rules_text,
+                    energy_cost=source.energy_cost,
+                    card_type=source.card_type,
+                    subtype=source.subtype,
+                    spark=source.spark,
+                    is_fast=source.is_fast,
+                    is_real=True,
+                )
+            )
+            counter += 1
+
+    return list(real_cards) + duplicates
+
+
+def _compute_duplication_weights(
+    pool: list[CardDesign], coverage_needed: list[int]
+) -> list[float]:
+    """Compute per-card weights for duplication sampling."""
+    weights: list[float] = []
+    for card in pool:
+        w = sum(
+            max(0, coverage_needed[i]) * card.fitness[i]
+            for i in range(len(coverage_needed))
+        )
+        weights.append(max(0.1, w))
+    return weights
+
+
+def _weighted_choice(
+    pool: list[CardDesign], weights: list[float], rng: random.Random
+) -> CardDesign:
+    """Choose a card from pool weighted by the given weights."""
+    total = sum(weights)
+    r = rng.random() * total
+    cumulative = 0.0
+    for i, w in enumerate(weights):
+        cumulative += w
+        if r <= cumulative:
+            return pool[i]
+    return pool[-1]
 
 
 def _load_cards_from_file(path: str, archetype_count: int) -> list[CardDesign]:

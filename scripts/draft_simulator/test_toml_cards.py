@@ -10,7 +10,7 @@ os.environ["NO_COLOR"] = "1"
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from card_generator import fill_card_pool_gaps, load_real_cards
+from card_generator import duplicate_real_cards, fill_card_pool_gaps, load_real_cards
 from config import SimulatorConfig
 from draft_models import CardDesign
 
@@ -260,6 +260,60 @@ class TestFillCardPoolGaps(unittest.TestCase):
         synthetic = [c for c in result if not c.is_real]
         for c in synthetic:
             self.assertIn(c.rarity, ["common", "uncommon", "rare"])
+
+
+class TestDuplicateRealCards(unittest.TestCase):
+    """Tests for duplicate_real_cards()."""
+
+    def _make_real_cards(self, count: int) -> list[CardDesign]:
+        cards = []
+        for i in range(count):
+            arch = i % 8
+            fitness = [0.0] * 8
+            fitness[arch] = 0.7
+            cards.append(
+                CardDesign(
+                    card_id=f"real_{i:04d}",
+                    name=f"Real Card {i}",
+                    fitness=fitness,
+                    power=0.5,
+                    commit=0.4,
+                    flex=0.3,
+                    rarity="common",
+                    is_real=True,
+                )
+            )
+        return cards
+
+    def test_fills_to_target_count(self) -> None:
+        cfg = SimulatorConfig()
+        cfg.cube.distinct_cards = 360
+        real_cards = self._make_real_cards(220)
+        result = duplicate_real_cards(real_cards, cfg, random.Random(42))
+        self.assertEqual(len(result), 360)
+
+    def test_all_cards_are_real(self) -> None:
+        cfg = SimulatorConfig()
+        cfg.cube.distinct_cards = 360
+        real_cards = self._make_real_cards(220)
+        result = duplicate_real_cards(real_cards, cfg, random.Random(42))
+        for c in result:
+            self.assertTrue(c.is_real)
+
+    def test_unique_card_ids(self) -> None:
+        cfg = SimulatorConfig()
+        cfg.cube.distinct_cards = 360
+        real_cards = self._make_real_cards(220)
+        result = duplicate_real_cards(real_cards, cfg, random.Random(42))
+        ids = [c.card_id for c in result]
+        self.assertEqual(len(ids), len(set(ids)))
+
+    def test_no_gap_returns_original(self) -> None:
+        cfg = SimulatorConfig()
+        cfg.cube.distinct_cards = 100
+        real_cards = self._make_real_cards(100)
+        result = duplicate_real_cards(real_cards, cfg, random.Random(42))
+        self.assertEqual(len(result), 100)
 
 
 if __name__ == "__main__":
