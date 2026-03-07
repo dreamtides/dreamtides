@@ -332,6 +332,7 @@ def duplicate_real_cards(
                     spark=source.spark,
                     is_fast=source.is_fast,
                     is_real=True,
+                    image_number=source.image_number,
                 )
             )
             counter += 1

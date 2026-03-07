@@ -222,6 +222,7 @@ def _generate_image_escape(card) -> str | None:
         return None
     path = image_cache.get_image_path(img_num)
     if path is None:
+        print(f"[IMG] no cache path for img_num={img_num}", file=sys.stderr)
         return None
     try:
         with open(path, "rb") as f:
