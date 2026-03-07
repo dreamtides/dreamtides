@@ -239,12 +239,14 @@ def duplicate_real_cards(
     real_cards: list[CardDesign],
     cfg: SimulatorConfig,
     rng: random.Random,
+    max_copies: int = 2,
 ) -> list[CardDesign]:
     """Fill the gap to the target pool size by duplicating real cards.
 
     Uses the same pool analysis as fill_card_pool_gaps to determine
-    per-rarity budgets, then samples real cards with replacement weighted
-    by archetype coverage need.
+    per-rarity budgets, then samples real cards weighted by archetype
+    coverage need. Each card can be duplicated at most max_copies times
+    to keep the pool diverse.
     """
     import pool_analyzer
 
@@ -296,12 +298,23 @@ def duplicate_real_cards(
 
         pool = cards_by_rarity.get(tier_name, [])
         if not pool:
-            # Fall back to all real cards if no cards in this tier
             pool = real_cards
 
-        weights = _compute_duplication_weights(pool, coverage_needed)
+        base_weights = _compute_duplication_weights(pool, coverage_needed)
+        dup_counts = [0] * len(pool)
+
         for _ in range(tier_count):
-            source = _weighted_choice(pool, weights, rng)
+            # Zero out weights for cards that hit the cap
+            weights = [
+                base_weights[i] if dup_counts[i] < max_copies else 0.0
+                for i in range(len(pool))
+            ]
+            # If all cards are capped, allow another round
+            if sum(weights) == 0.0:
+                weights = list(base_weights)
+            idx = _weighted_choice_idx(pool, weights, rng)
+            source = pool[idx]
+            dup_counts[idx] += 1
             duplicates.append(
                 CardDesign(
                     card_id=f"{source.card_id}_dup_{counter:04d}",
@@ -339,18 +352,25 @@ def _compute_duplication_weights(
     return weights
 
 
-def _weighted_choice(
+def _weighted_choice_idx(
     pool: list[CardDesign], weights: list[float], rng: random.Random
-) -> CardDesign:
-    """Choose a card from pool weighted by the given weights."""
+) -> int:
+    """Return the index of a card chosen by weighted sampling."""
     total = sum(weights)
     r = rng.random() * total
     cumulative = 0.0
     for i, w in enumerate(weights):
         cumulative += w
         if r <= cumulative:
-            return pool[i]
-    return pool[-1]
+            return i
+    return len(pool) - 1
+
+
+def _weighted_choice(
+    pool: list[CardDesign], weights: list[float], rng: random.Random
+) -> CardDesign:
+    """Choose a card from pool weighted by the given weights."""
+    return pool[_weighted_choice_idx(pool, weights, rng)]
 
 
 def _load_cards_from_file(path: str, archetype_count: int) -> list[CardDesign]:
