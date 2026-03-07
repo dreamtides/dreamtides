@@ -63,7 +63,14 @@ def _make_handler(
     game_thread: threading.Thread,
     total_battles: int,
 ) -> type:
-    """Return a request handler class closed over the shared state."""
+    """Return a request handler class closed over the shared state.
+
+    The current prompt is held in `_pending` (a one-element list used as a
+    mutable cell) so that multiple concurrent poll requests all see it, and
+    the game thread only advances once a choice is submitted.
+    """
+    _pending: list[Any] = [None]  # _pending[0] = current prompt dict or None
+    _lock = threading.Lock()
 
     class Handler(http.server.BaseHTTPRequestHandler):
         def log_message(self, format: str, *args: Any) -> None:
@@ -108,13 +115,26 @@ def _make_handler(
             self.wfile.write(data)
 
         def _handle_prompt(self) -> None:
+            # Return the pending prompt immediately if the game is waiting for a choice.
+            with _lock:
+                if _pending[0] is not None:
+                    self._json(_pending[0])
+                    return
+
+            # Otherwise long-poll up to 30 s for the next prompt.
             deadline = time.monotonic() + 30
             while time.monotonic() < deadline:
                 try:
                     prompt = prompt_q.get(timeout=0.5)
+                    with _lock:
+                        _pending[0] = prompt
                     self._json(prompt)
                     return
                 except queue.Empty:
+                    with _lock:
+                        if _pending[0] is not None:
+                            self._json(_pending[0])
+                            return
                     if not game_thread.is_alive():
                         self._json({"type": "game_over", "total_battles": total_battles})
                         return
@@ -130,6 +150,8 @@ def _make_handler(
                 self.send_response(400)
                 self.end_headers()
                 return
+            with _lock:
+                _pending[0] = None
             response_q.put(choice)
             self._json({"ok": True})
 
