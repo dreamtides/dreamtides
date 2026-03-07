@@ -137,16 +137,56 @@ body {
   line-height: 1.5;
 }
 
-/* ── Card image inside option ───────────────────────────────────────────── */
+/* ── Card-grid option layout (single/multi_select with card images) ─────── */
 
-#options li .card-img,
-#deck-list li .card-img {
-  width: 60px;
-  height: 45px;
-  object-fit: cover;
-  border-radius: 4px;
-  flex-shrink: 0;
-  background: var(--border);
+#options.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+#options.card-grid li {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  border-radius: 7px;
+  border: 1px solid var(--border2);
+  border-left: 3px solid transparent;
+  background: linear-gradient(170deg, #252e42 0%, #1e2638 100%);
+  overflow: hidden;
+  position: relative;
+}
+
+#options.card-grid li:hover,
+#options.card-grid li.focused {
+  border-color: var(--border2);
+  border-left-color: var(--accent);
+  background: linear-gradient(170deg, #2d3650 0%, #232c3e 100%);
+}
+
+#options.card-grid li.selected {
+  border-color: var(--accent);
+  border-left-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+
+#options.card-grid li .option-index {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(31, 36, 48, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* card-grid checkbox lives in art zone (top-left) */
+#options.card-grid input[type="checkbox"] {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 16px;
+  height: 16px;
+  z-index: 2;
+  margin: 0;
 }
 
 /* ── Checkbox option (multi_select) ─────────────────────────────────────── */
@@ -269,38 +309,101 @@ button.solo {
   overflow-y: auto;
   flex: 1;
   padding: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-content: start;
+}
+
+/* ── TCG card frame (deck sidebar + card-grid options) ─────────────────── */
+
+#deck-list li,
+#options.card-grid li {
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 
-#deck-list li {
+.tcg-art {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: repeating-linear-gradient(
+    -45deg,
+    #1a1f2e 0px,
+    #1a1f2e 4px,
+    #1e2436 4px,
+    #1e2436 10px
+  );
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.tcg-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.tcg-cost {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #1a1f2e;
+  font-size: 11px;
+  font-weight: bold;
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 8px;
-  border-radius: 5px;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  z-index: 1;
 }
 
-#deck-list li .card-info { flex: 1; min-width: 0; }
-#deck-list li .card-name {
-  color: var(--entity);
+.tcg-name {
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--fg);
+  padding: 4px 7px 1px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 12px;
 }
-#deck-list li .card-meta { color: var(--comment); font-size: 11px; margin-top: 1px; }
-#deck-list li .card-rules {
-  color: rgba(204, 202, 194, 0.7);
-  font-size: 11px;
-  margin-top: 3px;
+
+.tcg-type {
+  font-size: 9px;
+  color: var(--entity);
+  padding: 0 7px 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tcg-rules {
+  font-size: 9px;
+  color: rgba(204, 202, 194, 0.6);
+  padding: 3px 7px 5px;
+  border-top: 1px solid var(--border);
+  line-height: 1.45;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
+}
+
+/* Deck sidebar card frame */
+#deck-list li {
+  border-radius: 7px;
+  border: 1px solid #3d4b6a;
+  background: linear-gradient(170deg, #252e42 0%, #1e2638 100%);
+  overflow: hidden;
+}
+
+#deck-list li .tcg-art {
+  border-radius: 0;
 }
 
 /* ── Game over screen ───────────────────────────────────────────────────── */

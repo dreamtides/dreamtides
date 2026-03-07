@@ -48,36 +48,43 @@ function renderDeckSidebar(state) {
   for (const card of state.deck) {
     const li = document.createElement("li");
 
+    // Art zone
+    const art = document.createElement("div");
+    art.className = "tcg-art";
     if (card.image_hash) {
       const img = document.createElement("img");
       img.src = `/api/images/${card.image_hash}`;
-      img.className = "card-img";
       img.alt = card.name;
-      li.appendChild(img);
+      art.appendChild(img);
     }
+    if (card.energy_cost !== null) {
+      const badge = document.createElement("span");
+      badge.className = "tcg-cost";
+      badge.textContent = card.energy_cost;
+      art.appendChild(badge);
+    }
+    li.appendChild(art);
 
-    const info = document.createElement("div");
-    info.className = "card-info";
-
+    // Name
     const name = document.createElement("div");
-    name.className = "card-name";
+    name.className = "tcg-name";
     name.textContent = card.name;
-    info.appendChild(name);
+    li.appendChild(name);
 
-    const meta = document.createElement("div");
-    meta.className = "card-meta";
-    const cost = card.energy_cost !== null ? `${card.energy_cost}` : "—";
-    meta.textContent = `${card.card_type} · Cost ${cost}`;
-    info.appendChild(meta);
+    // Type line
+    const type = document.createElement("div");
+    type.className = "tcg-type";
+    type.textContent = card.card_type;
+    li.appendChild(type);
 
+    // Rules text
     if (card.rules_text) {
       const rules = document.createElement("div");
-      rules.className = "card-rules";
+      rules.className = "tcg-rules";
       rules.textContent = card.rules_text;
-      info.appendChild(rules);
+      li.appendChild(rules);
     }
 
-    li.appendChild(info);
     elDeckList.appendChild(li);
   }
 }
@@ -120,6 +127,7 @@ function renderPrompt(data) {
   _buildCardImageMap(data.state);
   renderDeckSidebar(data.state);
   elOptions.innerHTML = "";
+  elOptions.classList.remove("card-grid");
   elActionBar.innerHTML = "";
 
   switch (data.type) {
@@ -143,6 +151,7 @@ function renderPrompt(data) {
 }
 
 function renderSingleSelect(data) {
+  if (data.options.some(opt => cardImageHash(opt))) elOptions.classList.add("card-grid");
   data.options.forEach((opt, i) => {
     const li = createOptionLi(opt, i);
     li.setAttribute("role", "option");
@@ -153,6 +162,8 @@ function renderSingleSelect(data) {
 
 function renderMultiSelect(data) {
   window._currentMaxSelections = data.max_selections;
+  const hasImages = data.options.some(opt => cardImageHash(opt));
+  if (hasImages) elOptions.classList.add("card-grid");
   data.options.forEach((opt, i) => {
     const li = document.createElement("li");
     li.setAttribute("role", "option");
@@ -174,26 +185,40 @@ function renderMultiSelect(data) {
     });
 
     const hash = cardImageHash(opt);
-    if (hash) {
-      const img = document.createElement("img");
-      img.src = `/api/images/${hash}`;
-      img.className = "card-img";
-      img.alt = opt;
-      li.appendChild(img);
+    if (hasImages) {
+      // Card-grid mode: portrait card with checkbox in art zone
+      const art = document.createElement("div");
+      art.className = "tcg-art";
+      if (hash) {
+        const img = document.createElement("img");
+        img.src = `/api/images/${hash}`;
+        img.alt = opt;
+        art.appendChild(img);
+      }
+      art.appendChild(cb);
+      li.appendChild(art);
+      const name = document.createElement("div");
+      name.className = "tcg-name";
+      name.textContent = opt;
+      li.appendChild(name);
+      const idx = document.createElement("span");
+      idx.className = "option-index";
+      idx.textContent = i + 1;
+      li.appendChild(idx);
+    } else {
+      // List mode: checkbox + label + index
+      const label = document.createElement("label");
+      label.htmlFor = `cb-${i}`;
+      label.className = "option-text";
+      label.textContent = opt;
+      const idx = document.createElement("span");
+      idx.className = "option-index";
+      idx.textContent = i + 1;
+      li.appendChild(cb);
+      li.appendChild(label);
+      li.appendChild(idx);
     }
 
-    const label = document.createElement("label");
-    label.htmlFor = `cb-${i}`;
-    label.className = "option-text";
-    label.textContent = opt;
-
-    const idx = document.createElement("span");
-    idx.className = "option-index";
-    idx.textContent = i + 1;
-
-    li.appendChild(cb);
-    li.appendChild(label);
-    li.appendChild(idx);
     li.addEventListener("click", (e) => {
       if (e.target !== cb) cb.click();
       focusIndex = i;
@@ -239,25 +264,31 @@ function renderWaitForContinue(_data) {
 
 function createOptionLi(text, index) {
   const li = document.createElement("li");
-
   const hash = cardImageHash(text);
+
   if (hash) {
+    // Portrait card layout
+    const art = document.createElement("div");
+    art.className = "tcg-art";
     const img = document.createElement("img");
     img.src = `/api/images/${hash}`;
-    img.className = "card-img";
     img.alt = text;
-    li.appendChild(img);
+    art.appendChild(img);
+    li.appendChild(art);
+    const name = document.createElement("div");
+    name.className = "tcg-name";
+    name.textContent = text;
+    li.appendChild(name);
+  } else {
+    const span = document.createElement("span");
+    span.className = "option-text";
+    span.textContent = text;
+    li.appendChild(span);
   }
-
-  const span = document.createElement("span");
-  span.className = "option-text";
-  span.textContent = text;
 
   const idx = document.createElement("span");
   idx.className = "option-index";
   idx.textContent = index + 1;
-
-  li.appendChild(span);
   li.appendChild(idx);
   return li;
 }
