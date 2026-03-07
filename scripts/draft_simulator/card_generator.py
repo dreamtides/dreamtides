@@ -641,13 +641,6 @@ def _validate_cards(cards: list[CardDesign], archetype_count: int) -> None:
             raise ValueError(f"Card {card.card_id!r}: fitness vector is all zeros")
 
         # Warnings (not errors)
-        if max(card.fitness) < 0.3:
-            print(
-                f"WARNING: Card {card.card_id!r} has max fitness "
-                f"{max(card.fitness):.3f} < 0.3",
-                file=sys.stderr,
-            )
-
         if card.power < 0.1 and card.commit > 0.7:
             print(
                 f"WARNING: Card {card.card_id!r} has low power "
