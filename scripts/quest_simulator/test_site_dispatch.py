@@ -64,6 +64,7 @@ def _make_dreamcallers() -> list[Dreamcaller]:
     return [
         Dreamcaller(
             name="Test Caller",
+            archetype="Flash",
             essence_bonus=50,
             ability_text="Test ability.",
         ),

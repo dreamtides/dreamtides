@@ -55,6 +55,7 @@ def validate_dreamcallers() -> list[str]:
 
     required_fields = {
         "name": str,
+        "archetype": str,
         "essence_bonus": int,
         "ability_text": str,
     }

@@ -1,39 +1,47 @@
 [[dreamcallers]]
-name = "Vesper, Twilight Arbiter"
+name = "Flash Archetype Dreamcaller"
+archetype = "Flash"
+essence_bonus = 50
+ability_text = "Your Flash cards cost 1 less energy to play."
+
+[[dreamcallers]]
+name = "Awaken Archetype Dreamcaller"
+archetype = "Awaken"
+essence_bonus = 50
+ability_text = "Whenever you awaken a character, it gains 1 additional spark."
+
+[[dreamcallers]]
+name = "Flicker Archetype Dreamcaller"
+archetype = "Flicker"
+essence_bonus = 50
+ability_text = "Whenever a character you control is banished, foresee 2."
+
+[[dreamcallers]]
+name = "Ignite Archetype Dreamcaller"
+archetype = "Ignite"
+essence_bonus = 50
+ability_text = "Whenever you kindle, the kindled character gains 1 additional spark."
+
+[[dreamcallers]]
+name = "Shatter Archetype Dreamcaller"
+archetype = "Shatter"
 essence_bonus = 50
 ability_text = "Whenever you dissolve an enemy character, draw a card."
 
 [[dreamcallers]]
-name = "Pyrra, the Smoldering Heart"
-essence_bonus = 25
-ability_text = "Whenever you kindle, the kindled character gains an additional spark."
+name = "Endure Archetype Dreamcaller"
+archetype = "Endure"
+essence_bonus = 50
+ability_text = "Whenever a character you control survives judgment, gain 1 energy next turn."
 
 [[dreamcallers]]
-name = "Sylvara, Chorus Weaver"
-essence_bonus = 40
-ability_text = "Your Warriors enter the battlefield with 1 additional spark."
+name = "Submerge Archetype Dreamcaller"
+archetype = "Submerge"
+essence_bonus = 50
+ability_text = "Whenever you discard a card, foresee 1."
 
 [[dreamcallers]]
-name = "Thornroot, Keeper of the Deep"
-essence_bonus = 75
-ability_text = "Whenever a Spirit Animal you control survives judgment, gain 1 energy next turn."
-
-[[dreamcallers]]
-name = "Solenne, the Flickering Star"
-essence_bonus = 30
-ability_text = "Whenever a character you control is banished, foresee 2 when it returns."
-
-[[dreamcallers]]
-name = "Mara, Whisper of the Lost"
-essence_bonus = 35
-ability_text = "Whenever you discard a card, your opponent discards a card at random."
-
-[[dreamcallers]]
-name = "Ashara, Voice of Currents"
-essence_bonus = 60
-ability_text = "At the start of each turn, foresee 1. If you have drawn 3 or more cards this turn, draw another."
-
-[[dreamcallers]]
-name = "Kael, the Ashen Pilgrim"
-essence_bonus = 100
-ability_text = "Whenever a character you control is dissolved, reclaim the cheapest event from your void."
+name = "Surge Archetype Dreamcaller"
+archetype = "Surge"
+essence_bonus = 50
+ability_text = "At the start of each turn, if you have drawn 3 or more cards this turn, draw another."

@@ -340,12 +340,13 @@ class TestRenderFullDeckView(unittest.TestCase):
 
         deck = self._make_deck_cards()
         dreamcaller = Dreamcaller(
-            name="Vesper, Twilight Arbiter",
+            name="Shatter Archetype Dreamcaller",
+            archetype="Shatter",
             essence_bonus=50,
             ability_text="Dissolve an enemy character to draw a card.",
         )
         output = render_full_deck_view(deck, dreamcaller=dreamcaller)
-        self.assertIn("Vesper, Twilight Arbiter", output)
+        self.assertIn("Shatter Archetype Dreamcaller", output)
         self.assertIn("Dreamcaller", output)
 
     def test_essence_displayed(self) -> None:

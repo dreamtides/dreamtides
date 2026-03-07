@@ -26,6 +26,7 @@ def _make_dreamcaller(
 ) -> Dreamcaller:
     return Dreamcaller(
         name=name,
+        archetype="Flash",
         essence_bonus=essence_bonus,
         ability_text="Test ability",
     )

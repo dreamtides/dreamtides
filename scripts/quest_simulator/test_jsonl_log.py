@@ -301,7 +301,8 @@ class TestSessionLogger(unittest.TestCase):
             Dreamsign(name="Sign A", effect_text="Test", is_bane=False),
         ]
         dreamcaller = Dreamcaller(
-            name="Vesper, Twilight Arbiter",
+            name="Shatter Archetype Dreamcaller",
+            archetype="Shatter",
             essence_bonus=50,
             ability_text="Test ability",
         )
@@ -326,7 +327,7 @@ class TestSessionLogger(unittest.TestCase):
         self.assertEqual(event["completion_level"], 7)
         self.assertEqual(len(event["dreamsigns"]), 1)
         self.assertEqual(event["dreamsigns"][0]["name"], "Sign A")
-        self.assertEqual(event["dreamcaller"], "Vesper, Twilight Arbiter")
+        self.assertEqual(event["dreamcaller"], "Shatter Archetype Dreamcaller")
         self.assertEqual(event["preference_vector"], [0.3, 0.2, 0.1, 0.4])
 
     def test_log_session_end_no_dreamcaller(self) -> None:

@@ -51,6 +51,7 @@ def load_dreamcallers() -> list[Dreamcaller]:
     return [
         Dreamcaller(
             name=entry["name"],
+            archetype=entry["archetype"],
             essence_bonus=entry["essence_bonus"],
             ability_text=entry["ability_text"],
         )

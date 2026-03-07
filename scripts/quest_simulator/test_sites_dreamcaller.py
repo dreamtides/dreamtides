@@ -16,11 +16,13 @@ class _MockAgent:
 
 def _make_dreamcaller(
     name: str = "Test Caller",
+    archetype: str = "Flash",
     essence_bonus: int = 50,
     ability_text: str = "Test ability",
 ) -> Dreamcaller:
     return Dreamcaller(
         name=name,
+        archetype=archetype,
         essence_bonus=essence_bonus,
         ability_text=ability_text,
     )
@@ -120,7 +122,7 @@ class TestFormatDreamcallerOption:
         from sites_dreamcaller import format_dreamcaller_option
 
         dc = _make_dreamcaller(
-            name="Vesper, Twilight Arbiter",
+            name="Shatter Archetype Dreamcaller",
             essence_bonus=50,
             ability_text="Whenever you dissolve an enemy character, draw a card.",
         )
@@ -139,7 +141,7 @@ class TestFormatDreamcallerOption:
         from sites_dreamcaller import format_dreamcaller_option
 
         dc = _make_dreamcaller(
-            name="Vesper, Twilight Arbiter",
+            name="Shatter Archetype Dreamcaller",
             essence_bonus=50,
             ability_text="Whenever you dissolve an enemy character, draw a card.",
         )
@@ -149,7 +151,7 @@ class TestFormatDreamcallerOption:
         assert len(lines) < len(highlighted_lines)
         # Condensed should still show name
         full_text = "\n".join(lines)
-        assert "Vesper" in full_text
+        assert "Shatter" in full_text
 
     def test_highlighted_marker(self) -> None:
         from sites_dreamcaller import format_dreamcaller_option
@@ -192,9 +194,9 @@ class TestFormatConfirmation:
     def test_shows_dreamcaller_name(self) -> None:
         from sites_dreamcaller import format_confirmation
 
-        dc = _make_dreamcaller(name="Vesper, Twilight Arbiter")
+        dc = _make_dreamcaller(name="Shatter Archetype Dreamcaller")
         result = format_confirmation(dc, essence_after=300)
-        assert "Vesper" in result
+        assert "Shatter" in result
 
     def test_shows_essence_with_total(self) -> None:
         from sites_dreamcaller import format_confirmation
@@ -212,7 +214,7 @@ class TestApplyDreamcaller:
         from sites_dreamcaller import apply_dreamcaller
 
         state = _make_quest_state()
-        dc = _make_dreamcaller(name="Vesper")
+        dc = _make_dreamcaller(name="Shatter Archetype Dreamcaller")
         apply_dreamcaller(state, dc)
         assert state.dreamcaller is dc
 

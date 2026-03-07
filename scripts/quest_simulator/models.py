@@ -61,6 +61,7 @@ class EffectType(Enum):
 @dataclass(frozen=True)
 class Dreamcaller:
     name: str
+    archetype: str
     essence_bonus: int
     ability_text: str
 

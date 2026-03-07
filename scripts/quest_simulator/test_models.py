@@ -58,10 +58,12 @@ class TestDreamcaller:
     def test_dreamcaller_fields(self) -> None:
         dc = Dreamcaller(
             name="Test",
+            archetype="Flash",
             essence_bonus=50,
             ability_text="Test ability",
         )
         assert dc.name == "Test"
+        assert dc.archetype == "Flash"
         assert dc.essence_bonus == 50
         assert dc.ability_text == "Test ability"
 

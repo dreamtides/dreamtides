@@ -134,7 +134,7 @@ class TestVictoryScreen(unittest.TestCase):
             battles_won=7,
             total_battles=7,
             dreamscapes_visited=7,
-            dreamcaller_name="Vesper, Twilight Arbiter",
+            dreamcaller_name="Shatter Archetype Dreamcaller",
             deck_size=34,
             dreamsign_count=4,
             essence=175,
@@ -159,7 +159,7 @@ class TestVictoryScreen(unittest.TestCase):
 
     def test_contains_dreamcaller_name(self) -> None:
         result = self._build_victory()
-        self.assertIn("Vesper, Twilight Arbiter", result)
+        self.assertIn("Shatter Archetype Dreamcaller", result)
 
     def test_contains_deck_size(self) -> None:
         result = self._build_victory()
