@@ -428,6 +428,169 @@ class TestSessionLogger(unittest.TestCase):
         self.assertEqual(event["site_type"], "Essence")
         self.assertIn("something broke", event["error_message"])
 
+    def test_log_round_start(self) -> None:
+        logger = jsonl_log.SessionLogger(seed=1)
+        logger.log_round_start(
+            round_index=2,
+            global_pick_index=20,
+            pack_card_count=20,
+            seat_count=6,
+        )
+        events = self._read_events(logger)
+        event = events[0]
+        self.assertEqual(event["event"], "round_start")
+        self.assertEqual(event["round_index"], 2)
+        self.assertEqual(event["global_pick_index"], 20)
+        self.assertEqual(event["pack_card_count"], 20)
+        self.assertEqual(event["seat_count"], 6)
+
+    def test_log_ai_pick(self) -> None:
+        logger = jsonl_log.SessionLogger(seed=1)
+        inst = _make_instance(
+            _make_design("AI Card", card_id="ai_001", power=0.7, commit=0.4, flex=0.3)
+        )
+        alt: dict[str, object] = {"name": "Alt Card", "score": 0.65}
+        logger.log_ai_pick(
+            seat_index=3,
+            round_index=1,
+            global_pick_index=15,
+            chosen=inst,
+            chosen_score=0.72,
+            candidates_count=18,
+            top_alternatives=[alt],
+            was_random=False,
+            agent_w_top3=[(2, 0.35), (5, 0.20), (0, 0.15)],
+        )
+        events = self._read_events(logger)
+        event = events[0]
+        self.assertEqual(event["event"], "ai_pick")
+        self.assertEqual(event["seat_index"], 3)
+        self.assertEqual(event["round_index"], 1)
+        self.assertEqual(event["global_pick_index"], 15)
+        self.assertEqual(event["chosen"]["name"], "AI Card")
+        self.assertEqual(event["chosen"]["card_id"], "ai_001")
+        self.assertEqual(event["chosen_score"], 0.72)
+        self.assertEqual(event["candidates_count"], 18)
+        self.assertEqual(len(event["top_alternatives"]), 1)
+        self.assertFalse(event["was_random"])
+        self.assertEqual(len(event["agent_w_top3"]), 3)
+        self.assertEqual(event["agent_w_top3"][0]["archetype"], 2)
+        self.assertEqual(event["agent_w_top3"][0]["value"], 0.35)
+
+    def test_log_ai_pick_was_random(self) -> None:
+        logger = jsonl_log.SessionLogger(seed=1)
+        inst = _make_instance(_make_design("Random Pick"))
+        logger.log_ai_pick(
+            seat_index=1,
+            round_index=0,
+            global_pick_index=0,
+            chosen=inst,
+            chosen_score=0.3,
+            candidates_count=20,
+            top_alternatives=[],
+            was_random=True,
+            agent_w_top3=[(0, 0.125)],
+        )
+        events = self._read_events(logger)
+        self.assertTrue(events[0]["was_random"])
+
+    def test_log_show_n_filter(self) -> None:
+        logger = jsonl_log.SessionLogger(seed=1)
+        shown: list[dict[str, object]] = [
+            {"name": "Card A", "score": 0.8},
+            {"name": "Card B", "score": 0.7},
+        ]
+        filtered: list[dict[str, object]] = [{"name": "Card C", "score": 0.3}]
+        logger.log_show_n_filter(
+            strategy="sharpened_preference",
+            pack_size=20,
+            shown_count=2,
+            shown_cards_with_scores=shown,
+            filtered_out_top3=filtered,
+            context="draft",
+            global_pick_index=5,
+            round_index=0,
+        )
+        events = self._read_events(logger)
+        event = events[0]
+        self.assertEqual(event["event"], "show_n_filter")
+        self.assertEqual(event["strategy"], "sharpened_preference")
+        self.assertEqual(event["pack_size"], 20)
+        self.assertEqual(event["shown_count"], 2)
+        self.assertEqual(len(event["shown_cards_with_scores"]), 2)
+        self.assertEqual(event["shown_cards_with_scores"][0]["name"], "Card A")
+        self.assertEqual(len(event["filtered_out_top3"]), 1)
+        self.assertEqual(event["context"], "draft")
+        self.assertEqual(event["global_pick_index"], 5)
+        self.assertEqual(event["round_index"], 0)
+
+    def test_log_preference_snapshot(self) -> None:
+        logger = jsonl_log.SessionLogger(seed=1)
+        logger.log_preference_snapshot(
+            global_pick_index=10,
+            preference_vector=[0.3, 0.2, 0.1, 0.4],
+            top_archetype_index=3,
+            concentration=0.4,
+        )
+        events = self._read_events(logger)
+        event = events[0]
+        self.assertEqual(event["event"], "preference_snapshot")
+        self.assertEqual(event["global_pick_index"], 10)
+        self.assertEqual(event["preference_vector"], [0.3, 0.2, 0.1, 0.4])
+        self.assertEqual(event["top_archetype_index"], 3)
+        self.assertEqual(event["concentration"], 0.4)
+
+    def test_log_draft_pick_enriched(self) -> None:
+        """log_draft_pick with optional enrichment kwargs."""
+        logger = jsonl_log.SessionLogger(seed=1)
+        inst_a = _make_instance(
+            _make_design("Card A", card_id="a_001", power=0.6, commit=0.3, flex=0.2)
+        )
+        inst_b = _make_instance(
+            _make_design("Card B", card_id="b_001", power=0.4, commit=0.5, flex=0.3)
+        )
+        logger.log_draft_pick(
+            offered_cards=[inst_a, inst_b],
+            weights=[0.85, 0.65],
+            picked_card=inst_a,
+            global_pick_index=7,
+            round_index=0,
+            round_pick_count=3,
+            human_w_top3=[(2, 0.35), (5, 0.20), (0, 0.15)],
+            context="draft",
+        )
+        events = self._read_events(logger)
+        event = events[0]
+        self.assertEqual(event["event"], "draft_pick")
+        self.assertEqual(event["global_pick_index"], 7)
+        self.assertEqual(event["round_index"], 0)
+        self.assertEqual(event["round_pick_count"], 3)
+        self.assertEqual(event["context"], "draft")
+        self.assertEqual(len(event["human_w_top3"]), 3)
+        self.assertEqual(event["human_w_top3"][0]["archetype"], 2)
+        self.assertEqual(event["human_w_top3"][0]["value"], 0.35)
+        # Weights should use real scores, not 1.0
+        self.assertEqual(event["offered"][0]["weight"], 0.85)
+        self.assertEqual(event["offered"][1]["weight"], 0.65)
+
+    def test_log_draft_pick_without_enrichment(self) -> None:
+        """log_draft_pick without optional kwargs should omit enrichment fields."""
+        logger = jsonl_log.SessionLogger(seed=1)
+        inst = _make_instance(_make_design("Card A"))
+        logger.log_draft_pick(
+            offered_cards=[inst],
+            weights=[1.0],
+            picked_card=inst,
+        )
+        events = self._read_events(logger)
+        event = events[0]
+        self.assertEqual(event["event"], "draft_pick")
+        self.assertNotIn("global_pick_index", event)
+        self.assertNotIn("round_index", event)
+        self.assertNotIn("round_pick_count", event)
+        self.assertNotIn("human_w_top3", event)
+        self.assertNotIn("context", event)
+
 
 if __name__ == "__main__":
     unittest.main()

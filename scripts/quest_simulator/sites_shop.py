@@ -11,6 +11,7 @@ from typing import Any, Optional
 
 import colors
 import input_handler
+import log_helpers
 import render
 import render_cards
 import render_status
@@ -148,7 +149,7 @@ def run_shop(
     # Get the initial pack at seat 0 (AI picks at seats 1-5 run first).
     # This is called once before the menu loop. Only rerolls (which
     # consume a pick step) trigger a fresh advance_to_human_pick.
-    pack = round_manager.advance_to_human_pick(state)
+    pack = round_manager.advance_to_human_pick(state, logger=logger)
 
     while True:
         # Filter to SHOP_SHOW_N cards
@@ -161,6 +162,40 @@ def run_shop(
             human_drafted=state.human_agent.drafted,
             scoring_cfg=state.draft_cfg.scoring,
         )
+
+        # Log show-N filtering
+        if logger is not None and shown_cards:
+            scores = log_helpers.compute_show_n_scores(
+                shown_cards, state.human_agent.w, "sharpened_preference"
+            )
+            shown_with_scores = []
+            for card, score in zip(shown_cards, scores):
+                entry = log_helpers.card_instance_dict(card)
+                entry["score"] = score
+                shown_with_scores.append(entry)
+
+            filtered_out = [c for c in pack.cards if c not in shown_cards]
+            filtered_scores = log_helpers.compute_show_n_scores(
+                filtered_out, state.human_agent.w, "sharpened_preference"
+            )
+            filtered_top3 = []
+            paired = list(zip(filtered_out, filtered_scores))
+            paired.sort(key=lambda t: t[1], reverse=True)
+            for card, score in paired[:3]:
+                entry = log_helpers.card_instance_dict(card)
+                entry["score"] = score
+                filtered_top3.append(entry)
+
+            logger.log_show_n_filter(
+                strategy="sharpened_preference",
+                pack_size=len(pack.cards),
+                shown_count=len(shown_cards),
+                shown_cards_with_scores=shown_with_scores,
+                filtered_out_top3=filtered_top3,
+                context="shop",
+                global_pick_index=state.global_pick_index,
+                round_index=state.round_index,
+            )
 
         if not shown_cards:
             print(f"  {colors.dim('No cards available.')}")
@@ -261,6 +296,17 @@ def run_shop(
                     state, item.card_instance, shown_cards
                 )
 
+                # Log preference snapshot after shop purchase
+                if logger is not None:
+                    logger.log_preference_snapshot(
+                        global_pick_index=state.global_pick_index,
+                        preference_vector=state.human_agent.w,
+                        top_archetype_index=log_helpers.top_n_w(state.human_agent.w, 1)[
+                            0
+                        ][0],
+                        concentration=log_helpers.w_concentration(state.human_agent.w),
+                    )
+
                 print()
                 card_name = colors.card(item.card_instance.design.name)
                 print(f"  Purchased {card_name} for {item.price} essence.")
@@ -343,7 +389,7 @@ def run_shop(
                     },
                 )
 
-            pack = round_manager.advance_to_human_pick(state)
+            pack = round_manager.advance_to_human_pick(state, logger=logger)
             continue
 
         else:

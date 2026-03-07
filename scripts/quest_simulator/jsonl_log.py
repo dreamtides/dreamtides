@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 from typing import Any, Optional
 
+import log_helpers
 from models import (
     DeckCard,
     Dreamcaller,
@@ -137,6 +138,11 @@ class SessionLogger:
         offered_cards: list[Any],
         weights: list[float],
         picked_card: Any,
+        global_pick_index: Optional[int] = None,
+        round_index: Optional[int] = None,
+        round_pick_count: Optional[int] = None,
+        human_w_top3: Optional[list[tuple[int, float]]] = None,
+        context: Optional[str] = None,
     ) -> None:
         """Log a draft pick with offered cards, weights, and selection."""
         if len(offered_cards) != len(weights):
@@ -173,11 +179,112 @@ class SessionLogger:
         if hasattr(picked_design, "flex"):
             picked["flex"] = round(picked_design.flex, 4)
 
+        event: dict[str, object] = {
+            "event": "draft_pick",
+            "offered": offered,
+            "picked": picked,
+        }
+        if global_pick_index is not None:
+            event["global_pick_index"] = global_pick_index
+        if round_index is not None:
+            event["round_index"] = round_index
+        if round_pick_count is not None:
+            event["round_pick_count"] = round_pick_count
+        if human_w_top3 is not None:
+            event["human_w_top3"] = [
+                {"archetype": i, "value": v} for i, v in human_w_top3
+            ]
+        if context is not None:
+            event["context"] = context
+        self._write(event)
+
+    def log_round_start(
+        self,
+        round_index: int,
+        global_pick_index: int,
+        pack_card_count: int,
+        seat_count: int,
+    ) -> None:
+        """Log the start of a new draft round with fresh packs."""
         self._write(
             {
-                "event": "draft_pick",
-                "offered": offered,
-                "picked": picked,
+                "event": "round_start",
+                "round_index": round_index,
+                "global_pick_index": global_pick_index,
+                "pack_card_count": pack_card_count,
+                "seat_count": seat_count,
+            }
+        )
+
+    def log_ai_pick(
+        self,
+        seat_index: int,
+        round_index: int,
+        global_pick_index: int,
+        chosen: Any,
+        chosen_score: float,
+        candidates_count: int,
+        top_alternatives: list[dict[str, object]],
+        was_random: bool,
+        agent_w_top3: list[tuple[int, float]],
+    ) -> None:
+        """Log an AI seat's pick with scoring details."""
+        self._write(
+            {
+                "event": "ai_pick",
+                "seat_index": seat_index,
+                "round_index": round_index,
+                "global_pick_index": global_pick_index,
+                "chosen": log_helpers.card_instance_dict(chosen),
+                "chosen_score": round(chosen_score, 4),
+                "candidates_count": candidates_count,
+                "top_alternatives": top_alternatives,
+                "was_random": was_random,
+                "agent_w_top3": [{"archetype": i, "value": v} for i, v in agent_w_top3],
+            }
+        )
+
+    def log_show_n_filter(
+        self,
+        strategy: str,
+        pack_size: int,
+        shown_count: int,
+        shown_cards_with_scores: list[dict[str, object]],
+        filtered_out_top3: list[dict[str, object]],
+        context: str,
+        global_pick_index: int,
+        round_index: int,
+    ) -> None:
+        """Log show-N filtering details."""
+        self._write(
+            {
+                "event": "show_n_filter",
+                "strategy": strategy,
+                "pack_size": pack_size,
+                "shown_count": shown_count,
+                "shown_cards_with_scores": shown_cards_with_scores,
+                "filtered_out_top3": filtered_out_top3,
+                "context": context,
+                "global_pick_index": global_pick_index,
+                "round_index": round_index,
+            }
+        )
+
+    def log_preference_snapshot(
+        self,
+        global_pick_index: int,
+        preference_vector: list[float],
+        top_archetype_index: int,
+        concentration: float,
+    ) -> None:
+        """Log preference vector evolution at a pick point."""
+        self._write(
+            {
+                "event": "preference_snapshot",
+                "global_pick_index": global_pick_index,
+                "preference_vector": [round(v, 4) for v in preference_vector],
+                "top_archetype_index": top_archetype_index,
+                "concentration": round(concentration, 4),
             }
         )
 

@@ -10,6 +10,7 @@ import random
 from typing import Optional
 
 import input_handler
+import log_helpers
 import render
 import render_cards
 import render_status
@@ -40,7 +41,7 @@ def run_draft(
     show_n_strategy = state.draft_cfg.agents.show_n_strategy
 
     for pick_index in range(PICKS_PER_DRAFT_SITE):
-        pack = round_manager.advance_to_human_pick(state)
+        pack = round_manager.advance_to_human_pick(state, logger=logger)
 
         pick_rng = random.Random(state.rng.randint(0, 2**32))
         shown_cards = show_n.select_cards(
@@ -52,6 +53,40 @@ def run_draft(
             human_drafted=state.human_agent.drafted,
             scoring_cfg=state.draft_cfg.scoring,
         )
+
+        # Log show-N filtering
+        if logger is not None and shown_cards:
+            scores = log_helpers.compute_show_n_scores(
+                shown_cards, state.human_agent.w, show_n_strategy
+            )
+            shown_with_scores = []
+            for card, score in zip(shown_cards, scores):
+                entry = log_helpers.card_instance_dict(card)
+                entry["score"] = score
+                shown_with_scores.append(entry)
+
+            filtered_out = [c for c in pack.cards if c not in shown_cards]
+            filtered_scores = log_helpers.compute_show_n_scores(
+                filtered_out, state.human_agent.w, show_n_strategy
+            )
+            filtered_top3 = []
+            paired = list(zip(filtered_out, filtered_scores))
+            paired.sort(key=lambda t: t[1], reverse=True)
+            for card, score in paired[:3]:
+                entry = log_helpers.card_instance_dict(card)
+                entry["score"] = score
+                filtered_top3.append(entry)
+
+            logger.log_show_n_filter(
+                strategy=show_n_strategy,
+                pack_size=len(pack.cards),
+                shown_count=len(shown_cards),
+                shown_cards_with_scores=shown_with_scores,
+                filtered_out_top3=filtered_top3,
+                context="draft",
+                global_pick_index=state.global_pick_index,
+                round_index=state.round_index,
+            )
 
         if not shown_cards:
             round_manager.advance_pick_no_card(state)
@@ -105,10 +140,24 @@ def run_draft(
 
         # Log the pick
         if logger is not None:
+            scores = log_helpers.compute_show_n_scores(
+                shown_cards, state.human_agent.w, show_n_strategy
+            )
             logger.log_draft_pick(
                 offered_cards=shown_cards,
-                weights=[1.0] * len(shown_cards),
+                weights=scores,
                 picked_card=chosen_card,
+                global_pick_index=state.global_pick_index,
+                round_index=state.round_index,
+                round_pick_count=state.round_pick_count,
+                human_w_top3=log_helpers.top_n_w(state.human_agent.w),
+                context="draft",
+            )
+            logger.log_preference_snapshot(
+                global_pick_index=state.global_pick_index,
+                preference_vector=state.human_agent.w,
+                top_archetype_index=log_helpers.top_n_w(state.human_agent.w, 1)[0][0],
+                concentration=log_helpers.w_concentration(state.human_agent.w),
             )
 
     # Log the overall site visit

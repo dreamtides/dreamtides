@@ -13,16 +13,39 @@ ensure behavioral parity with the canonical draft loop.
 """
 
 import random
+from typing import Optional
 
 import agents
 import draft_runner
+import log_helpers
 import pack_generator
+from config import AgentsConfig, ScoringConfig
 from draft_models import CardInstance, Pack
+from jsonl_log import SessionLogger
 
 PICKS_PER_ROUND = 10
 
 
-def advance_to_human_pick(state):
+def _score_card_for_policy(
+    card: CardInstance,
+    ai_agent: agents.AgentState,
+    policy: str,
+    agents_cfg: AgentsConfig,
+    scoring_cfg: ScoringConfig,
+) -> float:
+    """Score a card using the same formula as the AI policy."""
+    if policy == "greedy":
+        return agents.score_card_greedy(card, ai_agent, scoring_cfg)
+    elif policy == "adaptive":
+        return agents.score_card_adaptive(card, ai_agent, agents_cfg)
+    elif policy == "signal_ignorant":
+        return agents.score_card_signal_ignorant(card, ai_agent, agents_cfg)
+    else:
+        design = getattr(card, "design", card)
+        return getattr(design, "power", 0.0)
+
+
+def advance_to_human_pick(state, logger: Optional[SessionLogger] = None):
     """Ensure packs exist and run AI picks, returning the pack at seat 0.
 
     If no round is active (state.packs is None or empty), generates
@@ -42,6 +65,14 @@ def advance_to_human_pick(state):
             for _ in range(cfg.draft.seat_count)
         ]
 
+        if logger is not None:
+            logger.log_round_start(
+                round_index=state.round_index,
+                global_pick_index=state.global_pick_index,
+                pack_card_count=len(state.packs[0].cards),
+                seat_count=cfg.draft.seat_count,
+            )
+
     pick_rng = random.Random(state.rng.randint(0, 2**32))
 
     # Run AI picks for seats 1-5
@@ -60,6 +91,41 @@ def advance_to_human_pick(state):
             seat_rng,
             force_archetype=None,
         )
+
+        # Log AI pick details
+        if logger is not None and candidates:
+            scores = [
+                (
+                    c,
+                    _score_card_for_policy(
+                        c, ai_agent, cfg.agents.policy, cfg.agents, cfg.scoring
+                    ),
+                )
+                for c in candidates
+            ]
+            scores.sort(key=lambda t: t[1], reverse=True)
+            policy_optimal = scores[0][0]
+            was_random = chosen is not policy_optimal
+            chosen_score = next(s for c, s in scores if c is chosen)
+
+            top_alts = []
+            for alt_card, alt_score in scores[:3]:
+                if alt_card is not chosen:
+                    entry = log_helpers.card_instance_dict(alt_card)
+                    entry["score"] = round(alt_score, 4)
+                    top_alts.append(entry)
+
+            logger.log_ai_pick(
+                seat_index=seat_idx,
+                round_index=state.round_index,
+                global_pick_index=state.global_pick_index,
+                chosen=chosen,
+                chosen_score=chosen_score,
+                candidates_count=len(candidates),
+                top_alternatives=top_alts,
+                was_random=was_random,
+                agent_w_top3=log_helpers.top_n_w(ai_agent.w),
+            )
 
         pack.cards.remove(chosen)
 
