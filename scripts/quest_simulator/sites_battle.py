@@ -12,6 +12,7 @@ from typing import Optional
 
 import colors
 import input_handler
+import render
 import render_cards
 import render_status
 import round_manager
@@ -133,33 +134,14 @@ def run_battle(
         print(reward_summary)
         print()
 
-        # Show card images once (static, above the interactive selector)
-        for card in shown_cards:
-            img_lines = render_cards.format_card_display(
-                card, highlighted=False, show_images=True
-            )
-            for line in img_lines:
-                print(line)
-        print()
+        # Show card columns (images + text) above interactive selector
+        render_cards.render_card_columns(shown_cards)
+        print(render.draw_separator())
 
         option_labels = [render_cards.card_name(card) for card in shown_cards]
 
-        def _render_card_option(
-            index: int,
-            option: str,
-            is_selected: bool,
-            _cards=shown_cards,
-        ) -> str:
-            card = _cards[index]
-            lines = render_cards.format_card_display(
-                card,
-                highlighted=is_selected,
-            )
-            return "\n".join(lines)
-
         chosen_index = input_handler.single_select(
             options=option_labels,
-            render_fn=_render_card_option,
         )
 
         picked_card = shown_cards[chosen_index]

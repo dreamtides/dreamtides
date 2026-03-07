@@ -301,14 +301,9 @@ def run_reward(
             print("  Choose a card reward:")
             print()
 
-            # Show card images once (static, above the interactive selector)
-            for card in shown_cards:
-                img_lines = render_cards.format_card_display(
-                    card, highlighted=False, show_images=True
-                )
-                for line in img_lines:
-                    print(line)
-            print()
+            # Show card columns (images + text) above interactive selector
+            render_cards.render_card_columns(shown_cards)
+            print(render.draw_separator())
 
             option_labels = [c.design.name for c in shown_cards] + ["Decline"]
             decline_index = len(shown_cards)
@@ -317,16 +312,12 @@ def run_reward(
                 index: int,
                 option: str,
                 is_selected: bool,
-                _shown: list[CardInstance] = shown_cards,
+                _decline: int = decline_index,
             ) -> str:
-                if index < len(_shown):
-                    card = _shown[index]
-                    card_lines = render_cards.format_card_display(
-                        card, highlighted=is_selected
-                    )
-                    return "\n".join(card_lines)
                 marker = ">" if is_selected else " "
-                return f"  {marker} {render.DIM}Decline{render.RESET}"
+                if index >= _decline:
+                    return f"  {marker} {render.DIM}Decline{render.RESET}"
+                return f"  {marker} {option}"
 
             selected_index = input_handler.single_select(
                 options=option_labels,
