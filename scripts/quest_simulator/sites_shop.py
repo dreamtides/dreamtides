@@ -280,9 +280,24 @@ def run_shop(
             free_rerolls,
         )
 
+        # Build structured card data for web UI (card options show TCG images;
+        # dreamsign/reroll/leave remain plain-text).
+        web_options_data: list[dict | None] = [
+            input_handler.make_card_option_data(
+                name=item.card_instance.design.name,
+                energy_cost=item.card_instance.design.energy_cost,
+                card_type=item.card_instance.design.card_type,
+                rules_text=item.card_instance.design.rules_text,
+                spark=item.card_instance.design.spark,
+                price=item.price,
+            )
+            for item in items
+        ] + [None] * (ds_count + 2)
+
         chosen_index = input_handler.single_select(
             options=option_labels,
             render_fn=render_fn,
+            options_data=web_options_data,
         )
 
         # Handle the choice
@@ -324,6 +339,10 @@ def run_shop(
                             "deck_size_after": state.deck_count(),
                         },
                     )
+
+                # Advance draft and continue shopping with fresh cards.
+                pack = round_manager.advance_to_human_pick(state, logger=logger)
+                continue
             else:
                 print()
                 print(f"  {colors.dim('Not enough essence.')}")
@@ -341,7 +360,7 @@ def run_shop(
                             "deck_size_after": state.deck_count(),
                         },
                     )
-            break
+                break
 
         elif chosen_index < card_count + ds_count:
             # Buy a dreamsign (does NOT consume a draft pick).

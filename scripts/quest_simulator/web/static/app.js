@@ -63,6 +63,12 @@ function renderDeckSidebar(state) {
       badge.textContent = card.energy_cost;
       art.appendChild(badge);
     }
+    if (card.spark != null) {
+      const spark = document.createElement("span");
+      spark.className = "tcg-spark";
+      spark.textContent = card.spark;
+      art.appendChild(spark);
+    }
     li.appendChild(art);
 
     // Name
@@ -87,6 +93,7 @@ function renderDeckSidebar(state) {
 
     elDeckList.appendChild(li);
   }
+  autoShrinkRulesText();
 }
 
 // ── Image lookup ───────────────────────────────────────────────────────────
@@ -147,6 +154,7 @@ function renderPrompt(data) {
       break;
   }
 
+  autoShrinkRulesText();
   updateFocus();
 }
 
@@ -208,11 +216,17 @@ function renderMultiSelect(data) {
         badge.textContent = od.energy_cost;
         art.appendChild(badge);
       }
+      if (od?.spark != null) {
+        const spark = document.createElement("span");
+        spark.className = "tcg-spark";
+        spark.textContent = od.spark;
+        art.appendChild(spark);
+      }
       art.appendChild(cb);
       li.appendChild(art);
       const name = document.createElement("div");
       name.className = "tcg-name";
-      name.textContent = opt;
+      name.textContent = od?.name || opt;
       li.appendChild(name);
       if (od?.card_type) {
         const type = document.createElement("div");
@@ -225,6 +239,12 @@ function renderMultiSelect(data) {
         rules.className = "tcg-rules";
         rules.textContent = od.rules_text;
         li.appendChild(rules);
+      }
+      if (od?.price != null) {
+        const price = document.createElement("div");
+        price.className = "tcg-price";
+        price.textContent = `${od.price}e`;
+        li.appendChild(price);
       }
       const idx = document.createElement("span");
       idx.className = "option-index";
@@ -305,11 +325,17 @@ function createCardDataOptionLi(text, index, cardData) {
     badge.textContent = cardData.energy_cost;
     art.appendChild(badge);
   }
+  if (cardData?.spark != null) {
+    const spark = document.createElement("span");
+    spark.className = "tcg-spark";
+    spark.textContent = cardData.spark;
+    art.appendChild(spark);
+  }
   li.appendChild(art);
 
   const name = document.createElement("div");
   name.className = "tcg-name";
-  name.textContent = text;
+  name.textContent = cardData?.name || text;
   li.appendChild(name);
 
   if (cardData?.card_type) {
@@ -323,6 +349,12 @@ function createCardDataOptionLi(text, index, cardData) {
     rules.className = "tcg-rules";
     rules.textContent = cardData.rules_text;
     li.appendChild(rules);
+  }
+  if (cardData?.price != null) {
+    const price = document.createElement("div");
+    price.className = "tcg-price";
+    price.textContent = `${cardData.price}e`;
+    li.appendChild(price);
   }
 
   const idx = document.createElement("span");
@@ -412,14 +444,24 @@ document.addEventListener("keydown", (e) => {
     e.preventDefault();
     const cb = items[focusIndex]?.querySelector("input[type='checkbox']");
     if (cb) cb.click();
-  } else if (e.key === "ArrowLeft" && type === "confirm_decline") {
+  } else if (e.key === "ArrowLeft") {
     e.preventDefault();
-    focusIndex = 0;
-    updateFocus();
-  } else if (e.key === "ArrowRight" && type === "confirm_decline") {
+    if (type === "confirm_decline") {
+      focusIndex = 0;
+      updateFocus();
+    } else if (items.length > 0) {
+      focusIndex = (focusIndex - 1 + items.length) % items.length;
+      updateFocus();
+    }
+  } else if (e.key === "ArrowRight") {
     e.preventDefault();
-    focusIndex = 1;
-    updateFocus();
+    if (type === "confirm_decline") {
+      focusIndex = 1;
+      updateFocus();
+    } else if (items.length > 0) {
+      focusIndex = (focusIndex + 1) % items.length;
+      updateFocus();
+    }
   }
 });
 
@@ -437,6 +479,20 @@ async function submitChoice(choice) {
     // ignore network errors; pollForPrompt will handle recovery
   }
   pollForPrompt();
+}
+
+// ── Auto-shrink rules text ─────────────────────────────────────────────────
+
+function autoShrinkRulesText() {
+  for (const el of document.querySelectorAll(".tcg-rules")) {
+    el.style.fontSize = "";
+    let size = parseFloat(getComputedStyle(el).fontSize);
+    const minSize = 6.5;
+    while (el.scrollHeight > el.clientHeight + 1 && size > minSize) {
+      size = Math.max(minSize, size - 0.5);
+      el.style.fontSize = size + "px";
+    }
+  }
 }
 
 // ── Polling loop ───────────────────────────────────────────────────────────

@@ -70,12 +70,39 @@ _web_prompt_queue: Optional[queue.Queue] = None
 _web_response_queue: Optional[queue.Queue] = None
 _web_state_callback: Optional[Callable[[], dict]] = None
 _card_name_image_map: dict[str, Optional[str]] = {}
+_card_name_spark_map: dict[str, Optional[int]] = {}
 
 
 def set_card_name_image_map(mapping: dict[str, Optional[str]]) -> None:
     """Register a card name → image cache key mapping for web mode prompts."""
     global _card_name_image_map
     _card_name_image_map = mapping
+
+
+def set_card_name_spark_map(mapping: dict[str, Optional[int]]) -> None:
+    """Register a card name → spark value mapping for web mode prompts."""
+    global _card_name_spark_map
+    _card_name_spark_map = mapping
+
+
+def make_card_option_data(
+    name: str,
+    energy_cost: Optional[int],
+    card_type: str,
+    rules_text: str,
+    spark: Optional[int] = None,
+    price: Optional[int] = None,
+) -> dict:
+    """Build a card options_data entry for web UI display."""
+    return {
+        "name": name,
+        "energy_cost": energy_cost,
+        "card_type": card_type,
+        "rules_text": rules_text,
+        "image_hash": _card_name_image_map.get(name),
+        "spark": spark,
+        "price": price,
+    }
 
 
 def set_web_mode(
@@ -153,6 +180,7 @@ def _parse_options_data(
                 "card_type": card_type,
                 "rules_text": " ".join(rules_lines),
                 "image_hash": _card_name_image_map.get(option),
+                "spark": _card_name_spark_map.get(option),
             }
         )
 
@@ -163,14 +191,20 @@ def _web_send_prompt(
     prompt_type: str,
     options: list[str],
     max_selections: Optional[int] = None,
+    options_data_override: Optional[list[Optional[dict]]] = None,
 ) -> Any:
     """Send a web prompt and block until the browser responds."""
     context = _output_capture.flush_buffer() if _output_capture else ""
     state = _web_state_callback() if _web_state_callback else {}
+    od = (
+        options_data_override
+        if options_data_override is not None
+        else _parse_options_data(context, options)
+    )
     prompt = {
         "type": prompt_type,
         "options": options,
-        "options_data": _parse_options_data(context, options),
+        "options_data": od,
         "context": context,
         "max_selections": max_selections,
         "state": state,
@@ -457,6 +491,7 @@ def single_select(
     options: list[str],
     render_fn: Optional[Callable[[int, str, bool], str]] = None,
     initial: int = 0,
+    options_data: Optional[list[Optional[dict]]] = None,
 ) -> int:
     """Display a single-select menu and return the chosen index.
 
@@ -467,6 +502,8 @@ def single_select(
         render_fn: Optional callback(index, option, is_selected) -> str
             for custom rendering of each line.
         initial: Initial cursor position.
+        options_data: Optional structured card data for web UI display.
+            If provided, overrides context-parsed card data.
 
     Returns:
         The selected index (0-based).
@@ -475,7 +512,9 @@ def single_select(
         return 0
 
     if _web_mode:
-        choice = _web_send_prompt("single_select", options)
+        choice = _web_send_prompt(
+            "single_select", options, options_data_override=options_data
+        )
         return max(0, min(int(choice), len(options) - 1))
 
     if _ai_mode:

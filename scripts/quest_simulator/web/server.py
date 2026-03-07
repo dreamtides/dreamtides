@@ -54,6 +54,7 @@ def _serialize_deck_card(dc: Any) -> dict:
         "energy_cost": design.energy_cost,
         "card_type": design.card_type,
         "rules_text": design.rules_text,
+        "spark": design.spark,
     }
 
 
@@ -269,7 +270,9 @@ def run_web_server(args: Any) -> None:
         )
         for d in cards
     }
+    card_spark_map: dict[str, int | None] = {d.name: d.spark for d in cards}
     input_handler.set_card_name_image_map(card_image_map)
+    input_handler.set_card_name_spark_map(card_spark_map)
 
     def _prefetch_images() -> None:
         for d in cards:
