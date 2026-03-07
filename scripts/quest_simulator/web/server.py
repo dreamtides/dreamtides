@@ -260,6 +260,26 @@ def run_web_server(args: Any) -> None:
             "deck_count": state.deck_count(),
         }
 
+    # Build card name → image hash map and prefetch missing images in background.
+    card_image_map: dict[str, str | None] = {
+        d.name: (
+            image_cache.get_image_cache_key(d.image_number)
+            if d.image_number is not None
+            else None
+        )
+        for d in cards
+    }
+    input_handler.set_card_name_image_map(card_image_map)
+
+    def _prefetch_images() -> None:
+        for d in cards:
+            if d.image_number is not None and card_image_map.get(d.name) is None:
+                result = image_cache.ensure_image_cached(d.image_number)
+                if result:
+                    card_image_map[d.name] = result
+
+    threading.Thread(target=_prefetch_images, daemon=True).start()
+
     input_handler.install_output_capture()
     input_handler.set_web_mode(prompt_q, response_q, state_callback)
 

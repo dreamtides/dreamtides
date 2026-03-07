@@ -69,6 +69,13 @@ _web_mode: bool = False
 _web_prompt_queue: Optional[queue.Queue] = None
 _web_response_queue: Optional[queue.Queue] = None
 _web_state_callback: Optional[Callable[[], dict]] = None
+_card_name_image_map: dict[str, Optional[str]] = {}
+
+
+def set_card_name_image_map(mapping: dict[str, Optional[str]]) -> None:
+    """Register a card name → image cache key mapping for web mode prompts."""
+    global _card_name_image_map
+    _card_name_image_map = mapping
 
 
 def set_web_mode(
@@ -145,7 +152,7 @@ def _parse_options_data(
                 "energy_cost": energy_cost,
                 "card_type": card_type,
                 "rules_text": " ".join(rules_lines),
-                "image_hash": None,
+                "image_hash": _card_name_image_map.get(option),
             }
         )
 

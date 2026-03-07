@@ -334,6 +334,7 @@ function createCardDataOptionLi(text, index, cardData) {
 
 function createOptionLi(text, index) {
   const li = document.createElement("li");
+  li.classList.add("plain-option");
   const hash = cardImageHash(text);
 
   if (hash) {
