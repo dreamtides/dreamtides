@@ -71,6 +71,7 @@ class CardDesign:
     spark: int | None = None
     is_fast: bool = False
     is_real: bool = False
+    image_number: int | None = None
 
 
 @dataclass(frozen=True)

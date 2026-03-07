@@ -4,15 +4,40 @@ Provides card display formatting for DeckCards and the full deck
 viewer. Uses AYU Mirage palette colors from the draft simulator.
 """
 
+import io
 import textwrap
 from typing import Optional
 
 import colors
 from models import DeckCard, Dreamcaller, Dreamsign
 
+import image_cache
 import render
 
 ARCHETYPE_NAMES = render.ARCHETYPE_NAMES
+
+try:
+    from imgcat import imgcat as _imgcat
+
+    _IMGCAT_AVAILABLE = True
+except ImportError:
+    _IMGCAT_AVAILABLE = False
+
+
+def _render_image_line(image_number: int) -> str | None:
+    """Return an imgcat escape sequence for the given image number."""
+    if not _IMGCAT_AVAILABLE:
+        return None
+    path = image_cache.get_image_path(image_number)
+    if path is None:
+        return None
+    try:
+        buf = io.BytesIO()
+        with open(path, "rb") as f:
+            _imgcat(f.read(), width=40, height=40, fp=buf)
+        return buf.getvalue().decode("utf-8", errors="replace")
+    except Exception:
+        return None
 
 
 def _top_archetype(fitness: list[float]) -> str:
@@ -114,6 +139,13 @@ def format_card_display(
             type_parts.append(f" ({rarity.title()})")
         type_line = " ".join(type_parts)
         lines.append(f"    {colors.dim(type_line)}")
+
+        # Inline image (only when imgcat is available)
+        img_num = getattr(design, "image_number", None)
+        if img_num is not None:
+            img_line = _render_image_line(img_num)
+            if img_line is not None:
+                lines.append(img_line)
 
         # Line 3+: rules text
         rules = getattr(design, "rules_text", "")

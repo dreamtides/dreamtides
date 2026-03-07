@@ -107,6 +107,7 @@ def load_real_cards(
                 spark=spark,
                 is_fast=card.get("is-fast", False),
                 is_real=True,
+                image_number=_parse_optional_int(card.get("image-number", "")),
             )
         )
 
