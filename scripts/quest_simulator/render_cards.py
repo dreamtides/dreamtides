@@ -201,145 +201,131 @@ def _get_design(card):
     return card
 
 
-def _render_side_by_side_images(cards, col_width: int, img_height: int) -> None:
-    """Render card images side by side using raw iTerm2 escape codes."""
-    image_data_list: list[bytes | None] = []
-    for card in cards:
-        design = _get_design(card)
-        img_num = getattr(design, "image_number", None) if design else None
-        img_data = None
-        if img_num is not None:
-            path = image_cache.get_image_path(img_num)
-            if path is not None:
-                try:
-                    with open(path, "rb") as f:
-                        img_data = f.read()
-                except Exception:
-                    pass
-        image_data_list.append(img_data)
+_IMG_WIDTH = 15
+_IMG_HEIGHT = 6
 
-    if not any(image_data_list):
+
+def _overlay_image(card, lines_printed: int) -> None:
+    """Overlay an image at the left of the current card block.
+
+    After text lines have been printed, moves the cursor back up
+    and renders the image at column 1, then returns the cursor to
+    its original position.
+    """
+    design = _get_design(card)
+    img_num = getattr(design, "image_number", None) if design else None
+    if img_num is None:
+        return
+    path = image_cache.get_image_path(img_num)
+    if path is None:
+        return
+    try:
+        with open(path, "rb") as f:
+            img_data = f.read()
+    except Exception:
         return
 
-    is_tmux = "TMUX" in os.environ and "tmux" in os.environ.get("TMUX", "")
     fp = getattr(sys.stdout, "buffer", None)
     if fp is None:
         return
 
+    is_tmux = "TMUX" in os.environ and "tmux" in os.environ.get("TMUX", "")
     CSI = b"\033["
     OSC = b"\033]"
     ST = b"\a"
 
-    # Allocate vertical space and position cursor at top
-    fp.write(b"\n" * img_height)
-    fp.write(CSI + b"?25l")  # hide cursor
-    fp.write(CSI + str(img_height).encode() + b"F")  # move up
+    # Hide cursor and move up to top of block
+    fp.write(CSI + b"?25l")
+    fp.write(CSI + str(lines_printed).encode() + b"F")
 
-    for i, img_data in enumerate(image_data_list):
-        if img_data is None:
-            continue
+    # Tmux passthrough start
+    if is_tmux:
+        fp.write(b"\033Ptmux;\033")
 
-        # Position cursor at this card's column
-        col_pos = i * col_width + 1
-        fp.write(CSI + str(col_pos).encode() + b"G")
+    # iTerm2 inline image protocol
+    fp.write(OSC + b"1337;File=inline=1")
+    fp.write(b";size=" + str(len(img_data)).encode())
+    fp.write(b";height=" + str(_IMG_HEIGHT).encode())
+    fp.write(b";width=" + str(_IMG_WIDTH).encode())
+    fp.write(b":")
+    fp.write(base64.b64encode(img_data))
+    fp.write(ST)
 
-        # Tmux passthrough start
-        if is_tmux:
-            fp.write(b"\033Ptmux;\033")
-
-        # iTerm2 inline image protocol
-        fp.write(OSC + b"1337;File=inline=1")
-        fp.write(b";size=" + str(len(img_data)).encode())
-        fp.write(b";height=" + str(img_height).encode())
-        fp.write(b";width=" + str(col_width).encode())
-        fp.write(b":")
-        fp.write(base64.b64encode(img_data))
-        fp.write(ST)
-
-        # Tmux passthrough end
-        if is_tmux:
-            fp.write(b"\033\\")
+    # Tmux passthrough end
+    if is_tmux:
+        fp.write(b"\033\\")
 
     # Move cursor back down and show it
-    fp.write(CSI + str(img_height).encode() + b"E")
+    fp.write(CSI + str(lines_printed).encode() + b"E")
     fp.write(CSI + b"?25h")
     fp.flush()
 
 
-def _render_text_columns(cards, col_width: int) -> None:
-    """Render card info as side-by-side text columns."""
-    all_columns: list[list[str]] = []
-    text_width = max(col_width - 2, 8)
+def _render_card_block(card) -> None:
+    """Render a single card with image on the left and text on the right."""
+    design = _get_design(card)
+    text_col = _IMG_WIDTH + 2
+    text_width = render.CONTENT_WIDTH - text_col
 
-    for card in cards:
-        design = _get_design(card)
-        lines: list[str] = []
+    # Build text lines
+    text_lines: list[str] = []
 
-        # Card name
-        name = card_name(card)
-        if len(name) > text_width:
-            name = name[: text_width - 1] + "\u2026"
-        lines.append(colors.card(name))
+    name = card_name(card)
+    if len(name) > text_width:
+        name = name[: text_width - 1] + "\u2026"
+    text_lines.append(colors.card(name))
 
-        # Type line and rules text for real cards
-        is_real = getattr(design, "is_real", False) if design else False
-        if is_real and design is not None:
-            type_parts: list[str] = []
-            energy = getattr(design, "energy_cost", None)
-            if energy is not None:
-                type_parts.append(f"{energy}E")
-            ct = getattr(design, "card_type", "")
-            if ct:
-                type_parts.append(ct)
-            sub = getattr(design, "subtype", "")
-            if sub:
-                type_parts.append(f"- {sub}")
-            rarity = getattr(design, "rarity", "")
-            if rarity:
-                type_parts.append(f"({rarity.title()})")
-            lines.append(colors.dim(" ".join(type_parts)))
+    is_real = getattr(design, "is_real", False) if design else False
+    if is_real and design is not None:
+        type_parts: list[str] = []
+        energy = getattr(design, "energy_cost", None)
+        if energy is not None:
+            type_parts.append(f"{energy}E")
+        ct = getattr(design, "card_type", "")
+        if ct:
+            type_parts.append(ct)
+        sub = getattr(design, "subtype", "")
+        if sub:
+            type_parts.append(f"- {sub}")
+        rarity = getattr(design, "rarity", "")
+        if rarity:
+            type_parts.append(f"({rarity.title()})")
+        text_lines.append(colors.dim(" ".join(type_parts)))
 
-            rules = getattr(design, "rules_text", "")
-            if rules:
-                wrapped = textwrap.wrap(rules, width=text_width)
-                lines.extend(wrapped)
+        rules = getattr(design, "rules_text", "")
+        if rules:
+            wrapped = textwrap.wrap(rules, width=text_width)
+            text_lines.extend(wrapped)
 
-        all_columns.append(lines)
+    # Ensure at least img_height lines so image area is fully allocated
+    while len(text_lines) < _IMG_HEIGHT:
+        text_lines.append("")
 
-    # Pad all columns to the same height
-    max_lines = max((len(col) for col in all_columns), default=0)
-    for col in all_columns:
-        while len(col) < max_lines:
-            col.append("")
+    # Print text with left padding to leave space for image
+    padding = " " * text_col
+    for line in text_lines:
+        print(f"{padding}{line}")
 
-    # Print row by row
-    for row in range(max_lines):
-        parts: list[str] = []
-        for col in all_columns:
-            parts.append(render.pad_right(col[row], col_width))
-        print("".join(parts))
+    # Flush text before writing binary escape codes
+    sys.stdout.flush()
+
+    # Overlay image on the left
+    if _IMGCAT_AVAILABLE:
+        _overlay_image(card, len(text_lines))
 
 
 def render_card_columns(cards) -> None:
-    """Render cards side by side in columns with images and text.
+    """Render cards with image on the left and text on the right.
 
-    Prints directly to stdout. Shows card images side by side using
-    raw iTerm2 escape codes, followed by text columns with card
-    name, type, and rules text.
+    Each card is displayed as a block: image at columns 1-15, card
+    info (name, type, rules text) at columns 17+. Prints directly
+    to stdout.
     """
     if not cards:
         return
 
-    col_count = len(cards)
-    col_width = render.CONTENT_WIDTH // col_count
-    img_height = 6
-
-    # Side-by-side images (when imgcat is available)
-    if _IMGCAT_AVAILABLE:
-        _render_side_by_side_images(cards, col_width, img_height)
-
-    # Text columns
-    _render_text_columns(cards, col_width)
+    for card in cards:
+        _render_card_block(card)
 
 
 def _deck_card_sort_key(dc: DeckCard) -> tuple[str, str]:
