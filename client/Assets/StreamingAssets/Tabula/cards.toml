@@ -28,7 +28,6 @@ art-owned = true
 card-number = 2
 subtype = ""
 spark = ""
-resonance = ["Tide"]
 
 [[cards]]
 name = "Scrap Reclaimer"
@@ -157,7 +156,6 @@ image-number = 1246321000
 rarity = "Common"
 art-owned = true
 card-number = 9
-resonance = ["Thunder"]
 
 [[cards]]
 name = "The Rising God"
@@ -207,7 +205,6 @@ image-number = 1047769090
 rarity = "Common"
 art-owned = true
 card-number = 12
-resonance = ["Stone"]
 
 [[cards]]
 name = "Glimpse of Infinity"
@@ -225,7 +222,6 @@ rarity = "Legendary"
 art-owned = true
 card-number = 13
 spark = ""
-resonance = ["Stone"]
 
 [[cards]]
 name = "Unleash Ruin"
@@ -239,7 +235,6 @@ image-number = 1798514908
 rarity = "Uncommon"
 art-owned = true
 card-number = 14
-resonance = ["Thunder"]
 subtype = ""
 spark = ""
 
@@ -310,7 +305,6 @@ image-number = 1200949222
 rarity = "Rare"
 art-owned = true
 card-number = 18
-resonance = ["Flame"]
 variables = ""
 subtype = ""
 spark = ""
@@ -347,7 +341,6 @@ image-number = 1074377570
 rarity = "Rare"
 art-owned = true
 card-number = 20
-resonance = ["Tide"]
 
 [[cards]]
 name = "Starsea Traveler"
@@ -416,7 +409,6 @@ image-number = 1907487244
 rarity = "Common"
 art-owned = true
 card-number = 24
-resonance = ["Thunder"]
 variables = ""
 subtype = ""
 spark = ""
@@ -802,7 +794,6 @@ image-number = 1104412877
 rarity = "Legendary"
 art-owned = true
 card-number = 46
-resonance = ["Stone"]
 
 [[cards]]
 name = "Bloomweaver"
@@ -1186,7 +1177,6 @@ image-number = 1328168243
 rarity = "Common"
 art-owned = true
 card-number = 68
-resonance = ["Thunder"]
 subtype = ""
 spark = ""
 
@@ -1275,7 +1265,6 @@ image-number = 2275146333
 rarity = "Uncommon"
 art-owned = false
 card-number = 73
-resonance = ["Thunder"]
 
 [[cards]]
 name = "Astral Navigators"
@@ -1291,7 +1280,6 @@ image-number = 2278837659
 rarity = "Common"
 art-owned = false
 card-number = 74
-resonance = ["Flame"]
 
 [[cards]]
 name = "Boundless Wanderer"
@@ -1312,7 +1300,6 @@ image-number = 2191235661
 rarity = "Common"
 art-owned = false
 card-number = 75
-resonance = ["Stone"]
 
 [[cards]]
 name = "Sage of the Prelude"
@@ -1514,7 +1501,6 @@ image-number = 1021646686
 rarity = "Legendary"
 art-owned = false
 card-number = 87
-resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -1737,7 +1723,6 @@ image-number = 758082493
 rarity = "Legendary"
 art-owned = false
 card-number = 100
-resonance = ["Tide"]
 variables = ""
 subtype = ""
 spark = ""
@@ -1840,7 +1825,6 @@ image-number = 1084619579
 rarity = "Common"
 art-owned = false
 card-number = 106
-resonance = ["Tide"]
 subtype = ""
 spark = ""
 
@@ -1895,7 +1879,6 @@ art-owned = false
 card-number = 109
 subtype = ""
 spark = ""
-resonance = ["Tide"]
 
 [[cards]]
 name = "Arc Gate Opening"
@@ -2800,7 +2783,6 @@ art-owned = false
 card-number = 162
 subtype = ""
 spark = ""
-resonance = ["Thunder"]
 
 [[cards]]
 name = "Abyssal Plunge"
@@ -2837,7 +2819,6 @@ card-number = 164
 variables = ""
 subtype = ""
 spark = ""
-resonance = ["Thunder"]
 
 [[cards]]
 name = "Dimensional Pathfinder"
@@ -3699,7 +3680,6 @@ art-owned = true
 card-number = 215
 subtype = ""
 spark = ""
-resonance = ["Tide"]
 
 [[cards]]
 name = "Minstrel of Falling Light"
@@ -3717,7 +3697,6 @@ image-number = 1794244540
 rarity = "Common"
 art-owned = true
 card-number = 216
-resonance = ["Tide"]
 
 [[cards]]
 name = "Sundown Surfer"
@@ -3821,7 +3800,6 @@ image-number = 1486924805
 rarity = "Special"
 art-owned = true
 card-number = 222
-resonance = ["Tide"]
 subtype = ""
 spark = ""
 
