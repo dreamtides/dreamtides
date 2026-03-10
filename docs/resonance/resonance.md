@@ -27,7 +27,7 @@ accessible.
 
 **Favored Character Type**: Survivors
 
-## Endure
+## Endure: [Stone, Tide]
 
 The Endure archetype is all about the void. It is centered around the “Survivor”
 character type: characters that specialize in interacting with the void and the
@@ -45,7 +45,7 @@ Endure wants things in the void, Shatter puts them there. Endure is also great
 at repeatedly bringing back characters to serve as fuel for Shatter’s abandon
 engine.
 
-## Shatter
+## Shatter: [Stone, Flame]
 
 The Shatter archetype centers around the abandon mechanic, dissolving its own
 characters for value. It is also the home of “cheat into play” abilities,
@@ -72,7 +72,7 @@ running out of resources if pressure stalls.
 
 **Favored Character Type:** Warriors
 
-## Ignite
+## Ignite: [Flame, Stone]
 
 Ignite is the premier “go wide” aggro archetype. It specializes in producing
 lots of characters and then pumping them up for value. The “Warrior” card type
@@ -88,7 +88,7 @@ Ignite is allied with Flicker because it gets value from repeating its
 “materialized” triggers to support the go-wide strategy, with an engine based on
 repeating cards that create figments or pump up warriors.
 
-## Flicker
+## Flicker: [Flame, Thunder]
 
 Flicker is the “value” archetype with characters that create card advantage over
 time. Its central strategy is the “banish and then materialize” loop, which
@@ -119,7 +119,7 @@ is tempo loss when early setup is disrupted.
 
 **Favored Character Type:** Spirit Animals
 
-## Awaken
+## Awaken: [Thunder, Flame]
 
 Thunder is all about “ramp”: getting more energy than the opponent and winning
 through sheer size. It is the home of the “Spirit Animal” tribe. Its characters
@@ -137,7 +137,7 @@ strategy. Many of Awaken’s characters can be played at fast speed, and Awaken
 supports the idea of investing resources into a single character and then
 protecting it.
 
-## Flash
+## Flash: [Thunder, Tide]
 
 Flash is the “tempo” archetype that cares about playing a cheap threat and then
 protecting it. It has payoffs for playing “fast” speed cards, as well as a “go
@@ -168,7 +168,7 @@ setup demands that make it fragile to early pressure.
 
 **Favored Character Type:** Musicians
 
-## Surge
+## Surge: [Tide, Thunder]
 
 Surge is the preeminent “events matter” archetype, and it tends to be the most
 combo-focused of the primary 8. The Surge game plan is all about a “storm” win
@@ -192,7 +192,7 @@ archetype also plays a lot of powerful event cards, and can often get value from
 things like the event doubling and one-shot energy generation that makes Surge
 so powerful.
 
-## Submerge
+## Submerge: [Tide, Stone]
 
 Submerge is the “discard matters” archetype. The primary plan here is discarding
 your own cards for value, either through filling up your void or more directly

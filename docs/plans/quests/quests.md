@@ -485,21 +485,26 @@ normal. Bane cards and bane dreamsigns can be removed via the
 A critical component of the drafting system in Dreamtides is "card resonance",
 which performs a function similar to the color pie in Magic: the Gathering. Each
 card, dreamsign, and dreamcaller has zero or more resonance symbols associated
-with it, drawn from:
+with it, drawn from four resonances arranged in a circle:
 
-- Tide
-- Ember
-- Zephyr
 - Stone
-- Ruin
+- Flame
+- Thunder
+- Tide
+
+Each resonance has two archetypes, which together form a second circle. Adjacent
+archetypes share an "alliance", meaning cards designed for one archetype should
+also be playable in the allied archetype. See
+[Resonance](../../resonance/resonance.md) for the full resonance design
+including archetype descriptions and alliances.
 
 When generating draft picks, shop offerings, or dreamsign offerings, the user's
 *current* deck and dreamcaller are evaluated for a combined resonance score, and
 the selection of draft cards is weighted towards that score, i.e. a deck that
-contains a lot of Tide and Stone cards will generally see more Tide and Stone
+contains a lot of Stone and Tide cards will generally see more Stone and Tide
 cards. As more cards with a given resonance are added, the chance of seeing
-other resonances diminishes. Generally the system converges towards decks having
-2 main resonances after 5-10 draft picks.
+other resonances diminishes. Generally the system converges towards decks built
+around a single resonance after 5-10 draft picks.
 
 Draft picks are drawn from a "pool" of cards generated at the start of a quest.
 When presenting draft options, cards are selected from this pool with
@@ -511,8 +516,8 @@ replacement, meaning the odds of seeing cards more than once diminish over time.
 When starting a new quest, the draft pool is weighted based on card rarity, with
 more copies of common cards and fewer copies of rare/legendary cards. There is
 also a slight random starting bias in the pool to make the play experience
-variable; there might for example be 20% more tide cards, 10% more ember cards,
-10% less stone cards, and 20% less ruin cards in the pool.
+variable; there might for example be 20% more stone cards, 10% more flame cards,
+10% less thunder cards, and 20% less tide cards in the pool.
 
 The exact configuration of the draft pool, including weighting algorithms, is
 all data-driven and managed by TOML files.
