@@ -12,22 +12,22 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import patch
 
+# Ensure draft_simulator is importable before importing quest modules
+# that depend on it (e.g. flow -> render -> colors).
+_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+if _DRAFT_SIM_DIR not in sys.path:
+    sys.path.insert(0, _DRAFT_SIM_DIR)
+
+import agents
 import atlas
+import card_generator
+import cube_manager
 import data_loader
 import flow
 import render_status
 from jsonl_log import SessionLogger
 from quest_state import QuestState
 from site_dispatch import SiteData
-
-# Ensure draft_simulator is importable
-_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
-if _DRAFT_SIM_DIR not in sys.path:
-    sys.path.insert(0, _DRAFT_SIM_DIR)
-
-import agents
-import card_generator
-import cube_manager
 from draft_models import CubeConsumptionMode
 from quest_sim import _build_draft_config, draft_config_summary
 
