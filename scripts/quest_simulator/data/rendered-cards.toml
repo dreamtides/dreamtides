@@ -10,7 +10,7 @@ image-number = 2521694543
 rarity = "Rare"
 art-owned = true
 card-number = 1
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "When you play 2 cards in a turn, reclaim this character."
 
 [[cards]]
@@ -39,7 +39,7 @@ image-number = 2269064817
 rarity = "Rare"
 art-owned = true
 card-number = 3
-resonance = ["Ruin", "Tide"]
+resonance = ["Stone"]
 "rendered text" = """
 ▸ Judgment: Return this character from your void to your hand.
 """
@@ -56,7 +56,7 @@ image-number = 2269064809
 rarity = "Rare"
 art-owned = true
 card-number = 4
-resonance = ["Zephyr"]
+resonance = ["Tide", "Stone"]
 "rendered text" = """
 ▸ Judgment: You may draw 2 cards, then discard 3 cards.
 """
@@ -77,6 +77,7 @@ spark = ""
 Draw 2 cards. Discard 2 cards.
 
 Reclaim 2●"""
+resonance = ["Tide"]
 
 [[cards]]
 name = "Ridge Vortex Explorer"
@@ -90,7 +91,7 @@ image-number = 2364396771
 rarity = "Common"
 art-owned = true
 card-number = 6
-resonance = ["Zephyr"]
+resonance = ["Tide", "Stone"]
 "rendered text" = """
 When you discard this character, materialize it.
 """
@@ -107,7 +108,7 @@ image-number = 2415692463
 rarity = "Uncommon"
 art-owned = true
 card-number = 7
-resonance = ["Ruin"]
+resonance = ["Tide"]
 "rendered text" = "▸ Judgment: You may discard a card to draw a card and gain 1⍏."
 
 [[cards]]
@@ -122,7 +123,7 @@ image-number = 1185684772
 rarity = "Rare"
 art-owned = true
 card-number = 8
-resonance = ["Ruin"]
+resonance = ["Tide"]
 "rendered text" = "When you discard a card, it gains reclaim equal to its cost this turn."
 
 [[cards]]
@@ -137,7 +138,6 @@ image-number = 1246321000
 rarity = "Common"
 art-owned = true
 card-number = 9
-resonance = ["Zephyr"]
 "rendered text" = "▸ Judgment: Foresee 1."
 
 [[cards]]
@@ -152,7 +152,7 @@ image-number = 2290648801
 rarity = "Uncommon"
 art-owned = true
 card-number = 10
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "Abandon 2 allies: Reclaim this character."
 
 [[cards]]
@@ -166,7 +166,7 @@ image-number = 1347487814
 rarity = "Rare"
 art-owned = true
 card-number = 11
-resonance = ["Ruin"]
+resonance = ["Tide", "Stone"]
 subtype = ""
 "rendered text" = """
 When you discard a card, gain 1⍏.
@@ -184,7 +184,6 @@ image-number = 1047769090
 rarity = "Common"
 art-owned = true
 card-number = 12
-resonance = ["Stone"]
 "rendered text" = "▸ Judgment: Gain 1●."
 
 [[cards]]
@@ -213,7 +212,6 @@ image-number = 1798514908
 rarity = "Uncommon"
 art-owned = true
 card-number = 14
-resonance = ["Ember"]
 subtype = ""
 spark = ""
 "rendered text" = "Dissolve an enemy. You lose 4⍏."
@@ -230,7 +228,7 @@ image-number = 2424248089
 rarity = "Common"
 art-owned = true
 card-number = 15
-resonance = ["Ruin"]
+resonance = ["Tide", "Stone"]
 "rendered text" = "This character costs 1● if you have discarded a card this turn."
 
 [[cards]]
@@ -242,10 +240,10 @@ subtype = "Warrior"
 is-fast = false
 spark = 1
 image-number = 2295991863
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = true
 card-number = 16
-resonance = ["Ember"]
+resonance = ["Stone"]
 "rendered text" = "▸ Judgment: You may banish 3 cards from your void to dissolve an enemy with cost 2● or less. "
 
 [[cards]]
@@ -260,7 +258,7 @@ image-number = 1633431265
 rarity = "Common"
 art-owned = true
 card-number = 17
-resonance = ["Zephyr"]
+resonance = ["Tide"]
 "rendered text" = """
 ▸ Judgment: Draw a card, then discard a card.
 """
@@ -275,7 +273,6 @@ image-number = 1200949222
 rarity = "Rare"
 art-owned = true
 card-number = 18
-resonance = ["Ember"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -294,7 +291,7 @@ image-number = 1486924802
 rarity = "Uncommon"
 art-owned = true
 card-number = 19
-resonance = ["Ruin"]
+resonance = ["Tide"]
 "rendered text" = "When you discard a card, kindle 1."
 
 [[cards]]
@@ -309,7 +306,6 @@ image-number = 1074377570
 rarity = "Rare"
 art-owned = true
 card-number = 20
-resonance = ["Tide"]
 "rendered text" = "▸ Judgment: Draw a card, then the opponent gains 2⍏."
 
 [[cards]]
@@ -324,7 +320,7 @@ image-number = 1084620233
 rarity = "Rare"
 art-owned = true
 card-number = 21
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = """
 Once per turn, you may play a character with cost 2● or less from your void.
 """
@@ -341,7 +337,7 @@ image-number = 2216124455
 rarity = "Common"
 art-owned = true
 card-number = 22
-resonance = ["Zephyr"]
+resonance = ["Flame"]
 "rendered text" = """
 ▸ Materialized: Discard 2 cards, then draw 2 cards.
 """
@@ -356,7 +352,7 @@ image-number = 2278837661
 rarity = "Common"
 art-owned = true
 card-number = 23
-resonance = ["Tide"]
+resonance = ["Stone"]
 subtype = ""
 spark = ""
 "rendered text" = "You may return a character from your void to your hand, then draw a card."
@@ -371,7 +367,6 @@ image-number = 1907487244
 rarity = "Common"
 art-owned = true
 card-number = 24
-resonance = ["Ember"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -390,7 +385,7 @@ image-number = 1639942840
 rarity = "Rare"
 art-owned = true
 card-number = 25
-resonance = ["Ruin"]
+resonance = ["Tide"]
 "rendered text" = "▸ Judgment: You may discard a card to dissolve an enemy with spark 1 or less."
 
 [[cards]]
@@ -405,7 +400,7 @@ image-number = 695511787
 rarity = "Uncommon"
 art-owned = true
 card-number = 26
-resonance = ["Ruin"]
+resonance = ["Tide"]
 "rendered text" = "Once per turn, when you discard a card, gain 1●, then kindle 2."
 
 [[cards]]
@@ -420,7 +415,7 @@ image-number = 700254508
 rarity = "Rare"
 art-owned = true
 card-number = 27
-resonance = ["Ruin"]
+resonance = ["Stone", "Tide"]
 "rendered text" = "Banish your void with 8 or more cards: Reclaim this character."
 
 [[cards]]
@@ -435,7 +430,7 @@ image-number = 2290648807
 rarity = "Common"
 art-owned = true
 card-number = 28
-resonance = ["Zephyr"]
+resonance = ["Tide"]
 "rendered text" = """
 ▸ Materialized: Draw a card, then discard a card.
 
@@ -453,7 +448,7 @@ image-number = 1577968036
 rarity = "Uncommon"
 art-owned = true
 card-number = 29
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "This character's spark is equal to the number of cards in your void."
 
 [[cards]]
@@ -469,6 +464,7 @@ rarity = "Common"
 art-owned = true
 card-number = 30
 "rendered text" = ""
+resonance = ["Flame"]
 
 [[cards]]
 name = "The Dread Sovereign"
@@ -482,7 +478,7 @@ image-number = 2427491215
 rarity = "Rare"
 art-owned = true
 card-number = 31
-resonance = ["Ember"]
+resonance = ["Flame"]
 "rendered text" = "▸ Judgment: You may abandon a Warrior to discover a Warrior with cost 1● higher and materialize it."
 
 [[cards]]
@@ -497,7 +493,7 @@ image-number = 1794244549
 rarity = "Common"
 art-owned = true
 card-number = 32
-resonance = ["Tide"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized, Dissolved: Draw a card."
 
 [[cards]]
@@ -509,10 +505,10 @@ subtype = "Synth"
 is-fast = false
 spark = 1
 image-number = 2186149279
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = true
 card-number = 33
-resonance = ["Tide"]
+resonance = ["Thunder"]
 "rendered text" = "When the opponent plays an event which could dissolve an ally, prevent that card."
 
 [[cards]]
@@ -527,7 +523,7 @@ image-number = 1897537156
 rarity = "Uncommon"
 art-owned = true
 card-number = 34
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = "4●: This character gains +1 spark for each allied Warrior."
 
 [[cards]]
@@ -540,7 +536,7 @@ image-number = 1788833078
 rarity = "Uncommon"
 art-owned = true
 card-number = 35
-resonance = ["Ember"]
+resonance = ["Flame"]
 subtype = ""
 spark = ""
 "rendered text" = "An ally gains +1 spark for each allied Warrior."
@@ -557,7 +553,7 @@ image-number = 1798382140
 rarity = "Common"
 art-owned = true
 card-number = 36
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = """
 When you materialize an allied Warrior, this character gains +1 spark.
 """
@@ -574,7 +570,7 @@ image-number = 2127752120
 rarity = "Rare"
 art-owned = true
 card-number = 37
-resonance = ["Zephyr"]
+resonance = ["Flame"]
 "rendered text" = """
 Once per turn, when you materialize a character with cost 2● or less, draw a card.
 """
@@ -592,6 +588,7 @@ card-number = 38
 subtype = ""
 spark = ""
 "rendered text" = "Banish an enemy with cost 2● or less."
+resonance = ["Thunder"]
 
 [[cards]]
 name = "Judgment of the Blade"
@@ -603,7 +600,7 @@ image-number = 1708315387
 rarity = "Uncommon"
 art-owned = true
 card-number = 39
-resonance = ["Ember"]
+resonance = ["Flame"]
 subtype = ""
 spark = ""
 "rendered text" = "Banish a non-Warrior enemy."
@@ -618,7 +615,7 @@ image-number = 2521694541
 rarity = "Common"
 art-owned = true
 card-number = 40
-resonance = ["Ember"]
+resonance = ["Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = "Dissolve an enemy with spark 1 or less."
@@ -633,7 +630,7 @@ image-number = 2303852059
 rarity = "Common"
 art-owned = true
 card-number = 41
-resonance = ["Ember"]
+resonance = ["Flame", "Stone"]
 subtype = ""
 spark = ""
 "rendered text" = "Dissolve an enemy with cost less than the number of allied Warriors."
@@ -648,7 +645,7 @@ image-number = 1570031575
 rarity = "Uncommon"
 art-owned = true
 card-number = 42
-resonance = ["Stone"]
+resonance = ["Flame"]
 subtype = ""
 spark = ""
 "rendered text" = "Discover a Warrior."
@@ -665,7 +662,7 @@ image-number = 1798514896
 rarity = "Common"
 art-owned = true
 card-number = 43
-resonance = ["Ruin"]
+resonance = ["Flame"]
 "rendered text" = "2●, Banish another card in your void: Reclaim this character."
 
 [[cards]]
@@ -680,7 +677,7 @@ image-number = 2521694547
 rarity = "Rare"
 art-owned = true
 card-number = 44
-resonance = ["Ember"]
+resonance = ["Tide"]
 "rendered text" = "2●, Abandon an ally with spark 1 or less: Draw 2 cards."
 
 [[cards]]
@@ -695,7 +692,7 @@ image-number = 2216124451
 rarity = "Common"
 art-owned = true
 card-number = 45
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized, Judgment: With 2 allied Warriors, gain 1●. "
 
 [[cards]]
@@ -710,7 +707,6 @@ image-number = 1104412877
 rarity = "Legendary"
 art-owned = true
 card-number = 46
-resonance = ["Stone"]
 "rendered text" = "▸ Materialized, Judgment: Gain 2●."
 
 [[cards]]
@@ -725,7 +721,7 @@ image-number = 1790126246
 rarity = "Common"
 art-owned = true
 card-number = 47
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = """
 Once per turn, when you materialize a character, gain 1●.
 """
@@ -742,7 +738,7 @@ image-number = 1913887483
 rarity = "Common"
 art-owned = true
 card-number = 48
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized: Draw a Warrior from your deck."
 
 [[cards]]
@@ -757,7 +753,7 @@ image-number = 2131591275
 rarity = "Rare"
 art-owned = true
 card-number = 49
-resonance = ["Ember"]
+resonance = ["Stone"]
 "rendered text" = "2●, Abandon a character, Discard your hand: Draw 3 cards."
 
 [[cards]]
@@ -772,7 +768,7 @@ image-number = 1289324164
 rarity = "Uncommon"
 art-owned = true
 card-number = 50
-resonance = ["Tide"]
+resonance = ["Flame"]
 "rendered text" = """
 Disable the ▸ Materialized: abilities of enemies.
 """
@@ -789,7 +785,7 @@ image-number = 1785274670
 rarity = "Common"
 art-owned = true
 card-number = 51
-resonance = ["Stone"]
+resonance = ["Flame", "Stone"]
 "rendered text" = "Allied Warriors have +1 spark."
 
 [[cards]]
@@ -801,10 +797,10 @@ subtype = "Warrior"
 is-fast = false
 spark = 0
 image-number = 2287054239
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = true
 card-number = 52
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = "▸ Judgment: You may pay 1● to kindle 1 and banish a card from the opponent's void."
 
 [[cards]]
@@ -819,7 +815,7 @@ image-number = 1295291155
 rarity = "Uncommon"
 art-owned = true
 card-number = 53
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = "The opponent's events cost 1● more."
 
 [[cards]]
@@ -834,7 +830,7 @@ image-number = 2293194529
 rarity = "Uncommon"
 art-owned = true
 card-number = 54
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized: Disable the activated abilities of an enemy while this character is in play."
 
 [[cards]]
@@ -849,7 +845,7 @@ image-number = 2218612343
 rarity = "Common"
 art-owned = true
 card-number = 55
-resonance = ["Tide"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized: Draw a card."
 
 [[cards]]
@@ -864,7 +860,7 @@ image-number = 1794244543
 rarity = "Common"
 art-owned = true
 card-number = 56
-resonance = ["Ember"]
+resonance = ["Stone"]
 "rendered text" = "Abandon an ally: This character gains +1 spark."
 
 [[cards]]
@@ -879,7 +875,7 @@ image-number = 1891048570
 rarity = "Common"
 art-owned = true
 card-number = 57
-resonance = ["Stone"]
+resonance = ["Flame", "Stone"]
 "rendered text" = "This character's spark is equal to the number of allied Warriors."
 
 [[cards]]
@@ -894,7 +890,7 @@ image-number = 1289324101
 rarity = "Uncommon"
 art-owned = true
 card-number = 58
-resonance = ["Stone"]
+resonance = ["Flame", "Stone"]
 "rendered text" = "Once per turn, when you materialize a Warrior, draw a card."
 
 [[cards]]
@@ -909,7 +905,7 @@ image-number = 2278837663
 rarity = "Rare"
 art-owned = true
 card-number = 59
-resonance = ["Stone"]
+resonance = ["Flame", "Stone"]
 "rendered text" = "When you play a Warrior, reclaim a random character with cost 3● or less."
 
 [[cards]]
@@ -922,7 +918,7 @@ image-number = 1164289078
 rarity = "Uncommon"
 art-owned = true
 card-number = 60
-resonance = ["Tide"]
+resonance = ["Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -940,7 +936,7 @@ image-number = 2258761881
 rarity = "Uncommon"
 art-owned = true
 card-number = 61
-resonance = ["Tide"]
+resonance = ["Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -958,7 +954,7 @@ image-number = 2123360837
 rarity = "Common"
 art-owned = true
 card-number = 62
-resonance = ["Tide"]
+resonance = ["Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -975,7 +971,7 @@ image-number = 2221518875
 rarity = "Uncommon"
 art-owned = true
 card-number = 63
-resonance = ["Stone"]
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 "rendered text" = "Discard a chosen card with cost 3● or less from the opponent's hand."
@@ -990,7 +986,7 @@ image-number = 2030910791
 rarity = "Uncommon"
 art-owned = true
 card-number = 64
-resonance = ["Stone"]
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 "rendered text" = "Discard a chosen character from the opponent's hand."
@@ -1005,7 +1001,7 @@ image-number = 2027158295
 rarity = "Uncommon"
 art-owned = true
 card-number = 65
-resonance = ["Ember"]
+resonance = ["Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -1023,7 +1019,7 @@ image-number = 1463121788
 rarity = "Rare"
 art-owned = true
 card-number = 66
-resonance = ["Ember"]
+resonance = ["Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = "Dissolve an enemy. The opponent gains 3⍏."
@@ -1038,7 +1034,7 @@ image-number = 1282908322
 rarity = "Common"
 art-owned = true
 card-number = 67
-resonance = ["Tide"]
+resonance = ["Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = "Prevent a played card."
@@ -1053,7 +1049,6 @@ image-number = 1328168243
 rarity = "Common"
 art-owned = true
 card-number = 68
-resonance = ["Tide"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -1071,7 +1066,7 @@ image-number = 2023111787
 rarity = "Uncommon"
 art-owned = false
 card-number = 69
-resonance = ["Ember"]
+resonance = ["Stone"]
 subtype = ""
 spark = ""
 "rendered text" = "Abandon an ally or discard a card: Dissolve an enemy."
@@ -1088,7 +1083,7 @@ image-number = 1794244546
 rarity = "Uncommon"
 art-owned = false
 card-number = 70
-resonance = ["Tide"]
+resonance = ["Thunder"]
 "rendered text" = """
 ▸ Materialized: Prevent a played card with cost 2● or less.
 """
@@ -1105,7 +1100,7 @@ image-number = 316023560
 rarity = "Rare"
 art-owned = false
 card-number = 71
-resonance = ["Tide"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized: Gain control of an enemy with cost 2● or less."
 
 [[cards]]
@@ -1120,7 +1115,7 @@ image-number = 443761822
 rarity = "Rare"
 art-owned = false
 card-number = 72
-resonance = ["Ember"]
+resonance = ["Stone", "Flame"]
 "rendered text" = """
 Abandon an ally: Play this character for 0●, then abandon it.
 
@@ -1138,7 +1133,6 @@ image-number = 2275146333
 rarity = "Uncommon"
 art-owned = false
 card-number = 73
-resonance = ["Zephyr"]
 "rendered text" = """
 ▸ Judgment: Gain 1⍏.
 """
@@ -1155,7 +1149,6 @@ image-number = 2278837659
 rarity = "Common"
 art-owned = false
 card-number = 74
-resonance = ["Zephyr"]
 "rendered text" = "▸ Materialized: Foresee 2."
 
 [[cards]]
@@ -1187,7 +1180,7 @@ image-number = 1084620026
 rarity = "Common"
 art-owned = false
 card-number = 76
-resonance = ["Zephyr"]
+resonance = ["Thunder"]
 "rendered text" = "Once per turn, when you play a ↯fast card, draw a card."
 
 [[cards]]
@@ -1202,7 +1195,7 @@ image-number = 1005938032
 rarity = "Common"
 art-owned = false
 card-number = 77
-resonance = ["Zephyr"]
+resonance = ["Thunder"]
 "rendered text" = "When you play a ↯fast card, this character gains +2 spark."
 
 [[cards]]
@@ -1217,7 +1210,7 @@ image-number = 1074373424
 rarity = "Rare"
 art-owned = false
 card-number = 78
-resonance = ["Zephyr"]
+resonance = ["Thunder", "Tide"]
 "rendered text" = "When you play a ↯fast card, gain 1⍏."
 
 [[cards]]
@@ -1232,7 +1225,7 @@ image-number = 2320845229
 rarity = "Rare"
 art-owned = false
 card-number = 79
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = """
 To play this card, return an ally with cost 3● or more to hand.
 
@@ -1250,7 +1243,7 @@ image-number = 744309595
 rarity = "Common"
 art-owned = false
 card-number = 80
-resonance = ["Stone"]
+resonance = ["Thunder"]
 "rendered text" = "At the end of your turn, gain 2●."
 
 [[cards]]
@@ -1265,7 +1258,7 @@ image-number = 1790126252
 rarity = "Rare"
 art-owned = false
 card-number = 81
-resonance = ["Zephyr"]
+resonance = ["Thunder"]
 "rendered text" = """
 Characters in your hand have ↯fast.
 
@@ -1281,7 +1274,7 @@ image-number = 2131591273
 rarity = "Common"
 art-owned = false
 card-number = 82
-resonance = ["Zephyr"]
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 "rendered text" = "Pay 1 or more ●: Draw a card for each ● spent, then discard 2 cards."
@@ -1298,7 +1291,7 @@ image-number = 2212744819
 rarity = "Common"
 art-owned = false
 card-number = 83
-resonance = ["Zephyr"]
+resonance = ["Thunder"]
 "rendered text" = "▸ Materialized: Return an enemy to hand."
 
 [[cards]]
@@ -1314,6 +1307,7 @@ rarity = "Common"
 art-owned = false
 card-number = 84
 "rendered text" = "▸ Judgment: Gain 2⍏."
+resonance = ["Thunder"]
 
 [[cards]]
 name = "Ashlight Caller"
@@ -1327,7 +1321,7 @@ image-number = 1044240499
 rarity = "Uncommon"
 art-owned = false
 card-number = 85
-resonance = ["Ruin"]
+resonance = ["Tide"]
 "rendered text" = "▸ Materialized: An event in your void gains reclaim equal to its cost this turn."
 
 [[cards]]
@@ -1342,7 +1336,7 @@ image-number = 1725212353
 rarity = "Uncommon"
 art-owned = false
 card-number = 86
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "When you draw 2 cards in a turn, if this card is in your void, it gains reclaim 1● this turn."
 
 [[cards]]
@@ -1355,7 +1349,6 @@ image-number = 1021646686
 rarity = "Legendary"
 art-owned = false
 card-number = 87
-resonance = ["Tide"]
 subtype = ""
 spark = ""
 "rendered text" = "Draw 3 cards."
@@ -1375,6 +1368,7 @@ spark = ""
 "rendered text" = """
 Return an enemy or ally to hand. Draw a card.
 """
+resonance = ["Thunder"]
 
 [[cards]]
 name = "Keeper of the Tides"
@@ -1388,7 +1382,7 @@ image-number = 1016596177
 rarity = "Rare"
 art-owned = false
 card-number = 89
-resonance = ["Zephyr"]
+resonance = ["Thunder"]
 "rendered text" = "▸ Materialized: Discover a ↯fast event."
 
 [[cards]]
@@ -1401,7 +1395,7 @@ image-number = 2430444889
 rarity = "Rare"
 art-owned = false
 card-number = 90
-resonance = ["Ember"]
+resonance = ["Tide", "Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = "Gain 1⍏ for each card you have played this turn."
@@ -1433,7 +1427,7 @@ image-number = 2027158298
 rarity = "Uncommon"
 art-owned = false
 card-number = 92
-resonance = ["Ember"]
+resonance = ["Tide", "Thunder"]
 "rendered text" = """
 Events cost you 2● more.
 
@@ -1449,7 +1443,7 @@ image-number = 1739438657
 rarity = "Uncommon"
 art-owned = false
 card-number = 93
-resonance = ["Ember"]
+resonance = ["Tide", "Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -1466,7 +1460,7 @@ image-number = 1196004052
 rarity = "Common"
 art-owned = false
 card-number = 94
-resonance = ["Ember"]
+resonance = ["Tide", "Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -1484,7 +1478,7 @@ image-number = 1005938023
 rarity = "Rare"
 art-owned = false
 card-number = 95
-resonance = ["Ruin"]
+resonance = ["Stone", "Tide"]
 subtype = ""
 spark = ""
 "rendered text" = "All cards currently in your void gain reclaim equal to their cost this turn."
@@ -1499,7 +1493,7 @@ image-number = 670293475
 rarity = "Common"
 art-owned = false
 card-number = 96
-resonance = ["Zephyr"]
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 "rendered text" = "Discard a card. Draw 2 cards."
@@ -1529,7 +1523,7 @@ image-number = 2186149269
 rarity = "Common"
 art-owned = false
 card-number = 98
-resonance = ["Tide"]
+resonance = ["Stone"]
 subtype = ""
 spark = ""
 "rendered text" = "An event in your void gains reclaim 0● this turn."
@@ -1544,7 +1538,7 @@ image-number = 1968259702
 rarity = "Uncommon"
 art-owned = false
 card-number = 99
-resonance = ["Stone"]
+resonance = ["Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = "At the end of this turn, trigger an additional Judgment phase."
@@ -1559,7 +1553,6 @@ image-number = 758082493
 rarity = "Legendary"
 art-owned = false
 card-number = 100
-resonance = ["Tide"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -1593,7 +1586,7 @@ image-number = 2221822101
 rarity = "Uncommon"
 art-owned = false
 card-number = 102
-resonance = ["Stone"]
+resonance = ["Tide"]
 "rendered text" = "When you play an event, gain 1●."
 
 [[cards]]
@@ -1606,7 +1599,7 @@ image-number = 1063277315
 rarity = "Uncommon"
 art-owned = false
 card-number = 103
-resonance = ["Ember"]
+resonance = ["Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -1623,7 +1616,7 @@ image-number = 1314287447
 rarity = "Uncommon"
 art-owned = false
 card-number = 104
-resonance = ["Ember"]
+resonance = ["Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = "Double the amount of ● you have."
@@ -1638,7 +1631,7 @@ image-number = 1529898278
 rarity = "Uncommon"
 art-owned = false
 card-number = 105
-resonance = ["Ember"]
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 "rendered text" = "Double the amount of ● you gain from card effects this turn."
@@ -1653,7 +1646,6 @@ image-number = 1084619579
 rarity = "Common"
 art-owned = false
 card-number = 106
-resonance = ["Tide"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -1675,6 +1667,7 @@ spark = ""
 "rendered text" = """
 Draw 2 cards. Discard 2 cards. Gain 2●.
 """
+resonance = ["Tide"]
 
 [[cards]]
 name = "The Ringleader"
@@ -1688,7 +1681,7 @@ image-number = 1005938035
 rarity = "Rare"
 art-owned = false
 card-number = 108
-resonance = ["Ember"]
+resonance = ["Tide", "Thunder"]
 "rendered text" = "▸ Materialized: Copy the next event you play this turn three times."
 
 [[cards]]
@@ -1720,6 +1713,7 @@ spark = ""
 "rendered text" = """
 Gain 4●.
 """
+resonance = ["Thunder"]
 
 [[cards]]
 name = "Spirit Reaping"
@@ -1731,7 +1725,7 @@ image-number = 2155438703
 rarity = "Uncommon"
 art-owned = false
 card-number = 111
-resonance = ["Ember"]
+resonance = ["Stone"]
 subtype = ""
 spark = ""
 "rendered text" = "Abandon an ally: Gain ● equal to that character's cost."
@@ -1746,7 +1740,7 @@ image-number = 2018053223
 rarity = "Uncommon"
 art-owned = false
 card-number = 112
-resonance = ["Ruin"]
+resonance = ["Stone"]
 subtype = ""
 spark = ""
 "rendered text" = "Dissolve an enemy with cost less than the number of cards in your void."
@@ -1764,6 +1758,7 @@ card-number = 113
 subtype = ""
 spark = ""
 "rendered text" = "Draw 3 cards."
+resonance = ["Stone"]
 
 [[cards]]
 name = "Harvest the Forgotten"
@@ -1775,7 +1770,7 @@ image-number = 1739438660
 rarity = "Common"
 art-owned = false
 card-number = 114
-resonance = ["Tide"]
+resonance = ["Stone"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -1792,7 +1787,7 @@ image-number = 1042405558
 rarity = "Uncommon"
 art-owned = false
 card-number = 115
-resonance = ["Tide"]
+resonance = ["Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = "Prevent a played ↯fast card."
@@ -1822,7 +1817,7 @@ image-number = 1924168811
 rarity = "Common"
 art-owned = false
 card-number = 117
-resonance = ["Zephyr"]
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 "rendered text" = "Draw 3 cards. Discard 2 cards."
@@ -1854,7 +1849,7 @@ image-number = 1058321690
 rarity = "Uncommon"
 art-owned = false
 card-number = 119
-resonance = ["Tide"]
+resonance = ["Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = "Prevent a played card. Put it on top of the opponent's deck."
@@ -1871,7 +1866,7 @@ image-number = 2023111784
 rarity = "Uncommon"
 art-owned = false
 card-number = 120
-resonance = ["Ember"]
+resonance = ["Tide", "Thunder"]
 "rendered text" = "When an event is put into your void, this character gains +1 spark."
 
 [[cards]]
@@ -1886,7 +1881,7 @@ image-number = 2419795159
 rarity = "Rare"
 art-owned = false
 card-number = 121
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = "Characters cost you 2● less."
 
 [[cards]]
@@ -1901,7 +1896,7 @@ image-number = 1734025934
 rarity = "Rare"
 art-owned = false
 card-number = 122
-resonance = ["Zephyr"]
+resonance = ["Thunder", "Flame"]
 "rendered text" = "When you materialize a character, trigger the ▸ Judgment: ability of each ally."
 
 [[cards]]
@@ -1914,7 +1909,7 @@ image-number = 2293194521
 rarity = "Uncommon"
 art-owned = false
 card-number = 123
-resonance = ["Tide"]
+resonance = ["Flame"]
 subtype = ""
 spark = ""
 "rendered text" = "Until end of turn, when you play a character, draw a card."
@@ -1931,7 +1926,7 @@ image-number = 2127752129
 rarity = "Common"
 art-owned = false
 card-number = 124
-resonance = ["Stone"]
+resonance = ["Thunder"]
 "rendered text" = """
 ▸ Judgment: Gain 1● for each allied Spirit Animal.
 """
@@ -1948,7 +1943,7 @@ image-number = 2127752123
 rarity = "Common"
 art-owned = false
 card-number = 125
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized: You may return an ally to hand."
 
 [[cards]]
@@ -1963,7 +1958,7 @@ image-number = 1529898275
 rarity = "Uncommon"
 art-owned = false
 card-number = 126
-resonance = ["Zephyr"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized: Return an ally to hand."
 
 [[cards]]
@@ -1978,7 +1973,7 @@ image-number = 2123360855
 rarity = "Rare"
 art-owned = false
 card-number = 127
-resonance = ["Zephyr"]
+resonance = ["Thunder", "Flame"]
 "rendered text" = "The '▸ Judgment:' ability of allies triggers when you materialize them."
 
 [[cards]]
@@ -1993,7 +1988,7 @@ image-number = 2221822105
 rarity = "Common"
 art-owned = false
 card-number = 128
-resonance = ["Stone"]
+resonance = ["Thunder"]
 "rendered text" = "When you materialize an allied Spirit Animal, gain 1●."
 
 [[cards]]
@@ -2008,7 +2003,7 @@ image-number = 529374502
 rarity = "Common"
 art-owned = false
 card-number = 129
-resonance = ["Stone"]
+resonance = ["Thunder"]
 "rendered text" = "▸ Judgment: With 2 allied Spirit Animals, gain 2●."
 
 [[cards]]
@@ -2023,7 +2018,7 @@ image-number = 2303852065
 rarity = "Uncommon"
 art-owned = false
 card-number = 130
-resonance = ["Stone"]
+resonance = ["Thunder"]
 "rendered text" = "▸ Judgment: Gain 1● for each allied character."
 
 [[cards]]
@@ -2036,7 +2031,7 @@ image-number = 1913887486
 rarity = "Rare"
 art-owned = false
 card-number = 131
-resonance = ["Zephyr"]
+resonance = ["Thunder", "Flame"]
 subtype = ""
 spark = ""
 "rendered text" = "Each allied Spirit Animal gains spark equal to the number of allied Spirit Animals. "
@@ -2053,7 +2048,7 @@ image-number = 2027158304
 rarity = "Rare"
 art-owned = false
 card-number = 132
-resonance = ["Zephyr"]
+resonance = ["Thunder"]
 "rendered text" = "When you have no cards in your deck, you win the game."
 
 [[cards]]
@@ -2066,7 +2061,7 @@ image-number = 1037215606
 rarity = "Uncommon"
 art-owned = false
 card-number = 133
-resonance = ["Zephyr"]
+resonance = ["Flame"]
 subtype = ""
 spark = ""
 "rendered text" = "Return all but one ally to hand: Draw a card for each ally returned."
@@ -2083,7 +2078,7 @@ image-number = 1134692546
 rarity = "Common"
 art-owned = false
 card-number = 134
-resonance = ["Zephyr"]
+resonance = ["Flame"]
 "rendered text" = "When you materialize a character, this character gains +1 spark."
 
 [[cards]]
@@ -2098,7 +2093,7 @@ image-number = 1543022372
 rarity = "Uncommon"
 art-owned = false
 card-number = 135
-resonance = ["Zephyr"]
+resonance = ["Thunder"]
 "rendered text" = """
 When you play a Spirit Animal, draw a card.
 """
@@ -2115,7 +2110,7 @@ image-number = 1727859040
 rarity = "Uncommon"
 art-owned = false
 card-number = 136
-resonance = ["Zephyr"]
+resonance = ["Thunder", "Flame"]
 "rendered text" = "▸ Judgment: You may pay 4● to have each allied Spirit Animal gain +2 spark."
 
 [[cards]]
@@ -2130,7 +2125,7 @@ image-number = 2303852061
 rarity = "Common"
 art-owned = false
 card-number = 137
-resonance = ["Zephyr"]
+resonance = ["Thunder"]
 "rendered text" = """
 When you materialize an allied Spirit Animal, that character gains +1 spark.
 """
@@ -2147,7 +2142,7 @@ image-number = 1047769120
 rarity = "Common"
 art-owned = false
 card-number = 138
-resonance = ["Zephyr"]
+resonance = ["Thunder"]
 "rendered text" = """
 ▸ Materialized, Judgment: Kindle 1.
 """
@@ -2164,7 +2159,7 @@ image-number = 410444914
 rarity = "Uncommon"
 art-owned = false
 card-number = 139
-resonance = ["Ruin"]
+resonance = ["Tide"]
 "rendered text" = """
 ▸ Materialized: Return a character from your void to your hand.
 """
@@ -2181,7 +2176,7 @@ image-number = 717263287
 rarity = "Common"
 art-owned = false
 card-number = 140
-resonance = ["Tide"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized: Draw a card."
 
 [[cards]]
@@ -2196,7 +2191,7 @@ image-number = 447372529
 rarity = "Common"
 art-owned = false
 card-number = 141
-resonance = ["Stone"]
+resonance = ["Thunder"]
 "rendered text" = "▸ Materialized, Judgment: Gain 1●."
 
 [[cards]]
@@ -2211,7 +2206,7 @@ image-number = 1169640025
 rarity = "Common"
 art-owned = false
 card-number = 142
-resonance = ["Stone"]
+resonance = ["Thunder"]
 "rendered text" = "▸ Judgment: Gain 2●."
 
 [[cards]]
@@ -2226,7 +2221,7 @@ image-number = 1723965970
 rarity = "Uncommon"
 art-owned = false
 card-number = 143
-resonance = ["Zephyr"]
+resonance = ["Thunder"]
 "rendered text" = """
 Reveal the top card of your deck.
 
@@ -2244,7 +2239,7 @@ image-number = 2278837667
 rarity = "Uncommon"
 art-owned = false
 card-number = 144
-resonance = ["Zephyr"]
+resonance = ["Thunder"]
 "rendered text" = """
 ▸ Materialized: Banish the opponent's void.
 """
@@ -2261,7 +2256,7 @@ image-number = 2022594416
 rarity = "Uncommon"
 art-owned = false
 card-number = 145
-resonance = ["Zephyr"]
+resonance = ["Thunder"]
 "rendered text" = "▸ Materialized: Draw a card for each allied Spirit Animal."
 
 [[cards]]
@@ -2276,7 +2271,7 @@ image-number = 726444853
 rarity = "Uncommon"
 art-owned = false
 card-number = 146
-resonance = ["Zephyr"]
+resonance = ["Thunder"]
 "rendered text" = "3●: The spark of each allied Spirit Animal becomes 5."
 
 [[cards]]
@@ -2291,7 +2286,7 @@ image-number = 2022594419
 rarity = "Uncommon"
 art-owned = false
 card-number = 147
-resonance = ["Zephyr"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized: You may banish an ally, then materialize it."
 
 [[cards]]
@@ -2303,10 +2298,10 @@ subtype = "Mage"
 is-fast = false
 spark = 1
 image-number = 2285036623
-rarity = "Common"
+rarity = "Rare"
 art-owned = false
 card-number = 148
-resonance = ["Zephyr"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized, Judgment: Banish an ally with spark 2 or less, then materialize it."
 
 [[cards]]
@@ -2321,7 +2316,7 @@ image-number = 2287436067
 rarity = "Uncommon"
 art-owned = false
 card-number = 149
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "▸ Materialized: A card with cost 3● or less in your void gains reclaim 0●."
 
 [[cards]]
@@ -2336,7 +2331,7 @@ image-number = 2256745747
 rarity = "Rare"
 art-owned = false
 card-number = 150
-resonance = ["Zephyr"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized: Banish any number of allies, then materialize them."
 
 [[cards]]
@@ -2351,7 +2346,7 @@ image-number = 2025883232
 rarity = "Rare"
 art-owned = false
 card-number = 151
-resonance = ["Tide"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized: Discard a chosen card from the opponent's hand. They draw a card."
 
 [[cards]]
@@ -2366,7 +2361,7 @@ image-number = 2155438705
 rarity = "Uncommon"
 art-owned = false
 card-number = 152
-resonance = ["Tide"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized: Draw 2 cards."
 
 [[cards]]
@@ -2381,7 +2376,7 @@ image-number = 1726923523
 rarity = "Uncommon"
 art-owned = false
 card-number = 153
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = """
 ▸ Materialized: Banish an enemy until this character leaves play.
 """
@@ -2396,7 +2391,7 @@ image-number = 2212744813
 rarity = "Common"
 art-owned = false
 card-number = 154
-resonance = ["Zephyr"]
+resonance = ["Flame"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -2416,7 +2411,7 @@ image-number = 1727859046
 rarity = "Uncommon"
 art-owned = false
 card-number = 155
-resonance = ["Ember"]
+resonance = ["Thunder"]
 "rendered text" = "↯fast -- Abandon this character: Prevent a played event."
 
 [[cards]]
@@ -2429,7 +2424,7 @@ image-number = 1991802455
 rarity = "Rare"
 art-owned = false
 card-number = 156
-resonance = ["Tide"]
+resonance = ["Flame"]
 subtype = ""
 spark = ""
 "rendered text" = "Discover a character with a ▸ Materialized: ability."
@@ -2446,7 +2441,7 @@ image-number = 1037215528
 rarity = "Uncommon"
 art-owned = false
 card-number = 157
-resonance = ["Zephyr"]
+resonance = ["Flame"]
 "rendered text" = """
 ▸ Judgment: You may banish an ally, then materialize it.
 """
@@ -2463,7 +2458,7 @@ image-number = 753489193
 rarity = "Uncommon"
 art-owned = false
 card-number = 158
-resonance = ["Tide"]
+resonance = ["Flame", "Thunder"]
 "rendered text" = "When an ally is banished, this character gains +1 spark."
 
 [[cards]]
@@ -2478,7 +2473,7 @@ image-number = 1109402492
 rarity = "Common"
 art-owned = false
 card-number = 159
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = """
 When an ally is banished, kindle 1.
 """
@@ -2493,7 +2488,7 @@ image-number = 618071684
 rarity = "Rare"
 art-owned = false
 card-number = 160
-resonance = ["Zephyr"]
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 "rendered text" = "Materialize two random characters with cost 3● or less from your deck."
@@ -2508,7 +2503,7 @@ image-number = 1239919309
 rarity = "Uncommon"
 art-owned = true
 card-number = 161
-resonance = ["Tide"]
+resonance = ["Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = "Prevent a played character."
@@ -2543,6 +2538,7 @@ spark = ""
 Dissolve an enemy with cost 3● or more.
 
 Reclaim 2●"""
+resonance = ["Tide"]
 
 [[cards]]
 name = "Burst of Obliteration"
@@ -2570,7 +2566,7 @@ image-number = 712713373
 rarity = "Uncommon"
 art-owned = false
 card-number = 165
-resonance = ["Zephyr"]
+resonance = ["Flame"]
 "rendered text" = "▸ Judgment: You may pay 3● to banish up to 2 allies, then materialize them."
 
 [[cards]]
@@ -2585,7 +2581,7 @@ image-number = 1793552422
 rarity = "Rare"
 art-owned = false
 card-number = 166
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized: Banish an enemy until your next main phase."
 
 [[cards]]
@@ -2598,7 +2594,7 @@ image-number = 2285036625
 rarity = "Uncommon"
 art-owned = false
 card-number = 167
-resonance = ["Tide"]
+resonance = ["Flame", "Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = "Banish up to 2 allies, then materialize them."
@@ -2615,7 +2611,7 @@ image-number = 2287054241
 rarity = "Common"
 art-owned = false
 card-number = 168
-resonance = ["Tide"]
+resonance = ["Flame"]
 "rendered text" = "▸ Materialized: Gain 3●."
 
 [[cards]]
@@ -2630,7 +2626,7 @@ image-number = 2216124449
 rarity = "Rare"
 art-owned = false
 card-number = 169
-resonance = ["Zephyr"]
+resonance = ["Flame"]
 "rendered text" = """
 4●: Materialize a copy of an ally.
 """
@@ -2662,7 +2658,7 @@ image-number = 2216124453
 rarity = "Common"
 art-owned = false
 card-number = 171
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "With an allied Survivor, you may play this card from your hand or void for 1●."
 
 [[cards]]
@@ -2677,7 +2673,7 @@ image-number = 2258761879
 rarity = "Common"
 art-owned = false
 card-number = 172
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "1●, Discard a card: Kindle 2."
 
 [[cards]]
@@ -2692,7 +2688,7 @@ image-number = 2123360834
 rarity = "Common"
 art-owned = false
 card-number = 173
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "▸ Materialized, Judgment: With 2 allied Survivors, draw a card. "
 
 [[cards]]
@@ -2704,10 +2700,10 @@ subtype = "Survivor"
 is-fast = false
 spark = 2
 image-number = 2025883229
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = false
 card-number = 174
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = """
 ▸ Dissolved: Kindle 2.
 
@@ -2725,7 +2721,7 @@ image-number = 2438838891
 rarity = "Uncommon"
 art-owned = false
 card-number = 175
-resonance = ["Ember"]
+resonance = ["Stone"]
 "rendered text" = "Abandon an ally: Gain 1●."
 
 [[cards]]
@@ -2740,7 +2736,7 @@ image-number = 1913887480
 rarity = "Uncommon"
 art-owned = false
 card-number = 176
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = """
 ▸ Dissolved: Draw a card.
 
@@ -2758,7 +2754,7 @@ image-number = 2303852063
 rarity = "Common"
 art-owned = false
 card-number = 177
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "Abandon an ally: Put the top 2 cards of your deck into your void."
 
 [[cards]]
@@ -2773,7 +2769,7 @@ image-number = 691496698
 rarity = "Uncommon"
 art-owned = false
 card-number = 178
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "When an ally is ▸ Dissolved:, draw a card."
 
 [[cards]]
@@ -2788,7 +2784,7 @@ image-number = 1727859043
 rarity = "Rare"
 art-owned = false
 card-number = 179
-resonance = ["Zephyr"]
+resonance = ["Stone"]
 "rendered text" = "▸ Materialized: Each player discards a card."
 
 [[cards]]
@@ -2803,7 +2799,7 @@ image-number = 2258761883
 rarity = "Uncommon"
 art-owned = false
 card-number = 180
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "When an ally is ▸ Dissolved:, this card gains reclaim 1● this turn."
 
 [[cards]]
@@ -2818,7 +2814,7 @@ image-number = 2287054243
 rarity = "Rare"
 art-owned = false
 card-number = 181
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "When an ally is ▸ Dissolved:, gain 1⍏."
 
 [[cards]]
@@ -2833,7 +2829,7 @@ image-number = 1252796545
 rarity = "Uncommon"
 art-owned = false
 card-number = 182
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "▸ Dissolved: You may pay 1● to return this character to your hand."
 
 [[cards]]
@@ -2848,7 +2844,7 @@ image-number = 1104412604
 rarity = "Rare"
 art-owned = false
 card-number = 183
-resonance = ["Ruin"]
+resonance = ["Stone", "Tide"]
 "rendered text" = "▸ Dissolved: A Survivor in your void gains reclaim equal to its cost."
 
 [[cards]]
@@ -2863,7 +2859,7 @@ image-number = 1114007978
 rarity = "Uncommon"
 art-owned = false
 card-number = 184
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "▸ Judgment: You may pay 1● to return this character from your void to your hand."
 
 [[cards]]
@@ -2878,7 +2874,7 @@ image-number = 2123360843
 rarity = "Uncommon"
 art-owned = false
 card-number = 185
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "You may only play this character from your void."
 
 [[cards]]
@@ -2893,7 +2889,7 @@ image-number = 512756368
 rarity = "Uncommon"
 art-owned = false
 card-number = 186
-resonance = ["Ruin"]
+resonance = ["Stone", "Tide"]
 "rendered text" = "If this card is in your void, allied Survivors have +2 spark."
 
 [[cards]]
@@ -2908,7 +2904,7 @@ image-number = 457875892
 rarity = "Common"
 art-owned = false
 card-number = 187
-resonance = ["Ember"]
+resonance = ["Stone"]
 "rendered text" = "Abandon an ally: Kindle 1."
 
 [[cards]]
@@ -2924,6 +2920,7 @@ rarity = "Uncommon"
 art-owned = false
 card-number = 188
 "rendered text" = "▸ Judgment: You may banish a card from the opponent's void to gain 1●."
+resonance = ["Stone"]
 
 [[cards]]
 name = "Unleashed Destruction"
@@ -2935,7 +2932,7 @@ image-number = 2155438695
 rarity = "Rare"
 art-owned = false
 card-number = 189
-resonance = ["Ember"]
+resonance = ["Stone"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -2952,10 +2949,10 @@ subtype = "Survivor"
 is-fast = false
 spark = 1
 image-number = 1971751580
-rarity = "Common"
+rarity = "Rare"
 art-owned = false
 card-number = 190
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = """
 ▸ Materialized, Dissolved: Put the top 4 cards of your deck into your void.
 """
@@ -2972,7 +2969,7 @@ image-number = 789291004
 rarity = "Rare"
 art-owned = false
 card-number = 191
-resonance = ["Ruin"]
+resonance = ["Stone", "Tide"]
 "rendered text" = "When you materialize a Survivor, reclaim this character."
 
 [[cards]]
@@ -2985,7 +2982,7 @@ image-number = 1790126243
 rarity = "Rare"
 art-owned = false
 card-number = 192
-resonance = ["Ruin"]
+resonance = ["Stone"]
 subtype = ""
 spark = ""
 "rendered text" = "Discover a Survivor."
@@ -3002,7 +2999,7 @@ image-number = 2197688373
 rarity = "Common"
 art-owned = false
 card-number = 193
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "When you play a Survivor, put the top 2 cards of your deck into your void."
 
 [[cards]]
@@ -3017,7 +3014,7 @@ image-number = 1557999812
 rarity = "Common"
 art-owned = false
 card-number = 194
-resonance = ["Ember"]
+resonance = ["Stone"]
 "rendered text" = "When you abandon an ally, this character gains +1 spark."
 
 [[cards]]
@@ -3032,7 +3029,7 @@ image-number = 1798382134
 rarity = "Uncommon"
 art-owned = false
 card-number = 195
-resonance = ["Ember"]
+resonance = ["Stone"]
 "rendered text" = "When you abandon 2 allies in a turn, dissolve an enemy."
 
 [[cards]]
@@ -3047,7 +3044,7 @@ image-number = 2131591277
 rarity = "Rare"
 art-owned = false
 card-number = 196
-resonance = ["Ember"]
+resonance = ["Stone", "Flame"]
 "rendered text" = "When you abandon a character, gain 1⍏."
 
 [[cards]]
@@ -3062,7 +3059,7 @@ image-number = 1626794383
 rarity = "Rare"
 art-owned = false
 card-number = 197
-resonance = ["Ember"]
+resonance = ["Stone"]
 "rendered text" = "Abandon an ally, once per turn: Gain 1⍏."
 
 [[cards]]
@@ -3077,7 +3074,7 @@ image-number = 1633431256
 rarity = "Common"
 art-owned = false
 card-number = 198
-resonance = ["Ember"]
+resonance = ["Stone"]
 "rendered text" = """
 When you abandon an ally, kindle 2.
 """
@@ -3094,7 +3091,7 @@ image-number = 1639942843
 rarity = "Common"
 art-owned = false
 card-number = 199
-resonance = ["Ember"]
+resonance = ["Stone"]
 "rendered text" = "Abandon an ally: You may put a character from your void on top of your deck."
 
 [[cards]]
@@ -3109,7 +3106,7 @@ image-number = 1180104511
 rarity = "Rare"
 art-owned = false
 card-number = 200
-resonance = ["Ember"]
+resonance = ["Stone", "Flame"]
 "rendered text" = "Abandon an ally: You may dissolve an enemy with spark less than that ally's spark."
 
 [[cards]]
@@ -3124,7 +3121,7 @@ image-number = 2290648803
 rarity = "Common"
 art-owned = false
 card-number = 201
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = """
 When an ally is ▸ Dissolved:, gain 1●.
 """
@@ -3141,7 +3138,7 @@ image-number = 1740270992
 rarity = "Uncommon"
 art-owned = false
 card-number = 202
-resonance = ["Ember"]
+resonance = ["Stone"]
 "rendered text" = "Abandon an ally, once per turn: Reclaim a Warrior."
 
 [[cards]]
@@ -3156,7 +3153,7 @@ image-number = 753489184
 rarity = "Uncommon"
 art-owned = false
 card-number = 203
-resonance = ["Stone"]
+resonance = ["Flame"]
 "rendered text" = "When you materialize an ally, gain 1●."
 
 [[cards]]
@@ -3171,7 +3168,7 @@ image-number = 2123360849
 rarity = "Uncommon"
 art-owned = false
 card-number = 204
-resonance = ["Tide"]
+resonance = ["Flame"]
 "rendered text" = "Materialize a Celestial Figment for each card you have played this turn."
 
 [[cards]]
@@ -3187,6 +3184,7 @@ card-number = 205
 subtype = ""
 spark = ""
 "rendered text" = "Materialize three Radiant Figments."
+resonance = ["Flame"]
 
 [[cards]]
 name = "Endless Projection"
@@ -3201,6 +3199,7 @@ rarity = "Uncommon"
 art-owned = false
 card-number = 206
 "rendered text" = "When you play a character, materialize a Halcyon Figment."
+resonance = ["Flame"]
 
 [[cards]]
 name = "Prophet of the Consumed"
@@ -3214,7 +3213,7 @@ image-number = 1991802452
 rarity = "Uncommon"
 art-owned = false
 card-number = 207
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "▸ Materialized: Draw a card for each ally abandoned this turn."
 
 [[cards]]
@@ -3229,7 +3228,7 @@ image-number = 529374445
 rarity = "Common"
 art-owned = false
 card-number = 208
-resonance = ["Ember"]
+resonance = ["Stone", "Flame"]
 "rendered text" = "When you abandon a character, draw a card."
 
 [[cards]]
@@ -3242,7 +3241,7 @@ image-number = 1470059006
 rarity = "Common"
 art-owned = false
 card-number = 209
-resonance = ["Ember"]
+resonance = ["Stone", "Flame"]
 subtype = ""
 spark = ""
 "rendered text" = "Abandon any number of allies: Draw a card for each ally abandoned."
@@ -3257,7 +3256,7 @@ image-number = 439817032
 rarity = "Rare"
 art-owned = false
 card-number = 210
-resonance = ["Ember"]
+resonance = ["Stone"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -3276,7 +3275,7 @@ image-number = 678431950
 rarity = "Rare"
 art-owned = false
 card-number = 211
-resonance = ["Ruin"]
+resonance = ["Stone", "Tide"]
 "rendered text" = "While you have 7 or more cards in your void, they have reclaim equal to their cost."
 
 [[cards]]
@@ -3289,7 +3288,7 @@ image-number = 454095982
 rarity = "Rare"
 art-owned = false
 card-number = 212
-resonance = ["Ember"]
+resonance = ["Stone"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -3307,7 +3306,7 @@ image-number = 708313726
 rarity = "Rare"
 art-owned = false
 card-number = 213
-resonance = ["Ember"]
+resonance = ["Tide"]
 subtype = ""
 spark = ""
 "rendered text" = "Abandon a character, Discard your hand: Gain 5●."
@@ -3324,7 +3323,7 @@ image-number = 1026869440
 rarity = "Uncommon"
 art-owned = false
 card-number = 214
-resonance = ["Ruin"]
+resonance = ["Stone"]
 "rendered text" = "▸ Judgment: Each player abandons a character."
 
 [[cards]]
@@ -3367,7 +3366,7 @@ image-number = 403770319
 rarity = "Uncommon"
 art-owned = true
 card-number = 217
-resonance = ["Zephyr"]
+resonance = ["Thunder"]
 "rendered text" = "When you play a card during the opponent's turn, this character gains +1 spark."
 
 [[cards]]
@@ -3403,6 +3402,7 @@ spark = ""
 Choose One:
 • 2●: Return an enemy to hand.
 • 3●: Draw 2 cards."""
+resonance = ["Thunder"]
 
 [[cards]]
 name = "Together Against the Tide"
@@ -3414,7 +3414,7 @@ image-number = 1621160806
 rarity = "Common"
 art-owned = true
 card-number = 220
-resonance = ["Tide"]
+resonance = ["Thunder"]
 subtype = ""
 spark = ""
 "rendered text" = """
@@ -3430,7 +3430,7 @@ image-number = 313783940
 rarity = "Special"
 art-owned = true
 card-number = 221
-resonance = ["Tide"]
+resonance = ["Stone"]
 card-type = "Event"
 subtype = ""
 spark = ""
@@ -3446,7 +3446,6 @@ image-number = 1486924805
 rarity = "Special"
 art-owned = true
 card-number = 222
-resonance = ["Tide"]
 subtype = ""
 spark = ""
 "rendered text" = "Draw a card."
@@ -3508,7 +3507,7 @@ subtype = "Mage"
 is-fast = true
 spark = 1
 image-number = 1958682846
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = false
 card-number = 226
 resonance = ["Tide"]
@@ -3583,7 +3582,7 @@ image-number = 1127978094
 rarity = "Rare"
 art-owned = false
 card-number = 230
-resonance = ["Stone"]
+resonance = ["Tide"]
 "rendered text" = """
 ▸ Materialized: Banish an enemy until this character leaves play.
 
@@ -3643,7 +3642,7 @@ subtype = "Visionary"
 is-fast = false
 spark = 0
 image-number = 6037168737
-rarity = "Common"
+rarity = "Rare"
 art-owned = false
 card-number = 234
 resonance = ["Thunder"]
@@ -3691,7 +3690,7 @@ subtype = "Survivor"
 is-fast = false
 spark = 0
 image-number = 2974765273
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = false
 card-number = 237
 resonance = ["Stone"]
@@ -3723,7 +3722,7 @@ subtype = "Monster"
 is-fast = false
 spark = 1
 image-number = 2822678889
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = false
 card-number = 239
 resonance = ["Tide"]
@@ -3870,7 +3869,7 @@ image-number = 1420724004
 rarity = "Common"
 art-owned = false
 card-number = 248
-resonance = ["Stone"]
+resonance = ["Tide"]
 "rendered text" = "When you play an event, reclaim a character with cost 3● or less."
 
 [[cards]]
@@ -3885,7 +3884,7 @@ image-number = 1315213771
 rarity = "Rare"
 art-owned = false
 card-number = 249
-resonance = ["Stone"]
+resonance = ["Tide"]
 "rendered text" = """
 ▸ Materialized: Kindle 1.
 ▸ Judgment: Reclaim a character with cost up to this character's spark ●."""
@@ -4056,7 +4055,7 @@ art-owned = false
 card-number = 260
 subtype = ""
 spark = ""
-resonance = ["Stone"]
+resonance = ["Tide"]
 "rendered text" = "Reclaim a character from your void. Lose 1 maximum ●."
 
 [[cards]]
@@ -4277,7 +4276,7 @@ subtype = "Outsider"
 is-fast = false
 spark = 1
 image-number = 1120178036
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = false
 card-number = 275
 resonance = ["Stone"]
@@ -4498,7 +4497,7 @@ image-number = 1133764762
 rarity = "Common"
 art-owned = false
 card-number = 289
-resonance = ["Stone"]
+resonance = ["Tide"]
 "rendered text" = "2●, Banish a card from your void: Materialize a Shadow Figment."
 
 [[cards]]
@@ -5074,7 +5073,7 @@ subtype = "Mage"
 is-fast = false
 spark = 1
 image-number = 3159710548
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = false
 card-number = 327
 resonance = ["Stone", "Tide"]
@@ -5464,7 +5463,7 @@ subtype = "Mage"
 is-fast = false
 spark = 1
 image-number = 8408945727
-rarity = "Common"
+rarity = "Rare"
 art-owned = false
 card-number = 353
 resonance = ["Flame"]
@@ -5572,7 +5571,7 @@ image-number = 4024216750
 rarity = "Rare"
 art-owned = false
 card-number = 360
-resonance = ["Stone"]
+resonance = ["Tide"]
 "rendered text" = "When you materialize a Spirit Animal, gain 1●. When you materialize 2 Spirit Animals in a turn, discover a Spirit Animal."
 
 [[cards]]
@@ -5913,7 +5912,7 @@ subtype = "Spirit Animal"
 is-fast = false
 spark = 1
 image-number = 8226392963
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = false
 card-number = 383
 resonance = ["Flame", "Thunder"]
@@ -5946,7 +5945,7 @@ subtype = "Renegade"
 is-fast = false
 spark = 1
 image-number = 4335175023
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = false
 card-number = 385
 resonance = ["Stone", "Flame"]
@@ -6022,7 +6021,7 @@ energy-cost = 3
 card-type = "Event"
 is-fast = true
 image-number = 9109137523
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = false
 card-number = 390
 subtype = ""
@@ -6191,7 +6190,7 @@ subtype = "Survivor"
 is-fast = false
 spark = 2
 image-number = 2394622312
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = false
 card-number = 401
 resonance = ["Stone"]
@@ -6212,7 +6211,7 @@ image-number = 1689745079
 rarity = "Uncommon"
 art-owned = false
 card-number = 402
-resonance = ["Stone"]
+resonance = ["Tide"]
 "rendered text" = "▸ Materialized: Dissolve an enemy."
 
 [[cards]]
@@ -6467,7 +6466,7 @@ subtype = "Ancient"
 is-fast = false
 spark = 2
 image-number = 4379062512
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = false
 card-number = 419
 resonance = ["Flame"]
@@ -6577,7 +6576,7 @@ subtype = "Warrior"
 is-fast = false
 spark = 1
 image-number = 1169345251
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = false
 card-number = 426
 resonance = ["Stone"]
@@ -6822,7 +6821,7 @@ subtype = "Guide"
 is-fast = false
 spark = 1
 image-number = 1643809683
-rarity = "Common"
+rarity = "Rare"
 art-owned = false
 card-number = 442
 resonance = ["Flame", "Thunder"]
@@ -7352,7 +7351,7 @@ image-number = 7385898882
 rarity = "Rare"
 art-owned = false
 card-number = 476
-resonance = ["Stone"]
+resonance = ["Tide"]
 "rendered text" = "▸ Materialized: Draw a card. ▸ Dissolved: Discover a character with cost 3● or less."
 
 [[cards]]
@@ -7622,7 +7621,7 @@ image-number = 9896409236
 rarity = "Rare"
 art-owned = false
 card-number = 494
-resonance = ["Stone"]
+resonance = ["Tide"]
 "rendered text" = "▸ Materialized: Draw up to 3 characters from the top 7 cards of your deck."
 
 [[cards]]
@@ -7652,7 +7651,7 @@ image-number = 8340059501
 rarity = "Rare"
 art-owned = false
 card-number = 496
-resonance = ["Stone"]
+resonance = ["Tide"]
 "rendered text" = """
 ▸ Judgment: Materialize a Shadow Figment, then put the top card of your deck into your void.
 """
