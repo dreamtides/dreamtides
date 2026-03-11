@@ -7,16 +7,27 @@ using UnityEngine;
 
 public static class RunAllTestsCommand
 {
+  static TestRunnerApi? _api;
+  static TestCallbacks? _callbacks;
+
   [MenuItem("Tools/Run All Tests")]
   public static void RunAllTests()
   {
+    // Unregister any previously registered callbacks to prevent count
+    // accumulation across multiple test runs in the same editor session.
+    if (_api != null && _callbacks != null)
+    {
+      _api.UnregisterCallbacks(_callbacks);
+    }
+
     Debug.Log("[TestRunner] Run started");
 
-    var api = ScriptableObject.CreateInstance<TestRunnerApi>();
-    api.RegisterCallbacks(new TestCallbacks());
+    _api = ScriptableObject.CreateInstance<TestRunnerApi>();
+    _callbacks = new TestCallbacks();
+    _api.RegisterCallbacks(_callbacks);
 
     var filter = new Filter { testMode = TestMode.EditMode };
-    api.Execute(new ExecutionSettings(filter));
+    _api.Execute(new ExecutionSettings(filter));
   }
 
   class TestCallbacks : ICallbacks
