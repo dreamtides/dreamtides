@@ -206,6 +206,7 @@ def _web_send_prompt(
     options: list[str],
     max_selections: Optional[int] = None,
     options_data_override: Optional[list[Optional[dict]]] = None,
+    extra_data: Optional[dict] = None,
 ) -> Any:
     """Send a web prompt and block until the browser responds."""
     context = _output_capture.flush_buffer() if _output_capture else ""
@@ -222,6 +223,7 @@ def _web_send_prompt(
         "context": context,
         "max_selections": max_selections,
         "state": state,
+        "extra": extra_data,
     }
     pq = _web_prompt_queue
     rq = _web_response_queue
@@ -506,6 +508,7 @@ def single_select(
     render_fn: Optional[Callable[[int, str, bool], str]] = None,
     initial: int = 0,
     options_data: Optional[list[Optional[dict]]] = None,
+    extra_data: Optional[dict] = None,
 ) -> int:
     """Display a single-select menu and return the chosen index.
 
@@ -518,6 +521,7 @@ def single_select(
         initial: Initial cursor position.
         options_data: Optional structured card data for web UI display.
             If provided, overrides context-parsed card data.
+        extra_data: Optional additional data passed to the web UI.
 
     Returns:
         The selected index (0-based).
@@ -527,7 +531,10 @@ def single_select(
 
     if _web_mode:
         choice = _web_send_prompt(
-            "single_select", options, options_data_override=options_data
+            "single_select",
+            options,
+            options_data_override=options_data,
+            extra_data=extra_data,
         )
         return max(0, min(int(choice), len(options) - 1))
 

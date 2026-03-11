@@ -115,9 +115,27 @@ def run_draft(
         if state.debug:
             option_labels.append("Debug")
 
+        # Build remaining cards data for web UI display
+        remaining = [c for c in eligible if c not in shown_cards]
+        remaining_data = None
+        if remaining:
+            remaining_data = {
+                "remaining_cards": [
+                    input_handler.make_card_option_data(
+                        name=render_cards.card_name(c),
+                        energy_cost=c.design.energy_cost,
+                        card_type=c.design.card_type,
+                        rules_text=c.design.rules_text,
+                        spark=c.design.spark,
+                    )
+                    for c in remaining
+                ]
+            }
+
         while True:
             chosen_index = input_handler.single_select(
                 options=option_labels,
+                extra_data=remaining_data,
             )
 
             if state.debug and chosen_index == len(shown_cards):

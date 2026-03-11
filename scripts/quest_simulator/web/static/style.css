@@ -190,6 +190,88 @@ body {
   margin: 0;
 }
 
+/* ── Remaining cards (50% size, non-interactive) ────────────────────────── */
+
+.remaining-header {
+  text-align: center;
+  color: var(--comment);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 10px 0 6px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.remaining-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 5px;
+}
+
+.remaining-grid li {
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: linear-gradient(170deg, #252e42 0%, #1e2638 100%);
+  overflow: hidden;
+  opacity: 0.55;
+  transition: opacity 0.15s;
+}
+
+.remaining-grid li:hover {
+  opacity: 0.8;
+}
+
+.remaining-grid .tcg-cost {
+  width: 14px;
+  height: 14px;
+  font-size: 7px;
+  top: 2px;
+  left: 2px;
+  border-width: 1px;
+}
+
+.remaining-grid .tcg-spark {
+  width: 14px;
+  height: 14px;
+  font-size: 7px;
+  bottom: 2px;
+  right: 2px;
+  border-width: 1px;
+}
+
+.remaining-grid .tcg-name {
+  font-size: 7px;
+  padding: 2px 4px 0;
+}
+
+.remaining-grid .tcg-type {
+  font-size: 6px;
+  padding: 0 4px 1px;
+}
+
+.remaining-grid .tcg-rules {
+  font-size: 6px;
+  padding: 2px 4px 3px;
+  max-height: 28px;
+}
+
+.remaining-grid .tcg-resonance {
+  font-size: 9px;
+  padding: 1px 4px 2px;
+}
+
+.remaining-grid .tcg-resonance .res-primary {
+  font-size: 9px;
+}
+
+.remaining-grid .tcg-resonance .res-secondary {
+  font-size: 6px;
+}
+
 /* ── Plain (non-card) options inside a card-grid ────────────────────────── */
 
 #options.card-grid li.plain-option {

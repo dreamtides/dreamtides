@@ -18,6 +18,7 @@ const elStatusCaller= document.getElementById("status-dreamcaller");
 const elDeckSidebar = document.getElementById("deck-sidebar");
 const elDeckList    = document.getElementById("deck-list");
 const elDeckToggle  = document.getElementById("deck-toggle");
+const elRemainingCards = document.getElementById("remaining-cards");
 const elGameOver    = document.getElementById("game-over");
 const elGameOverMsg = document.getElementById("game-over-message");
 
@@ -210,6 +211,7 @@ function renderPrompt(data) {
   renderDeckSidebar(data.state);
   elOptions.innerHTML = "";
   elOptions.classList.remove("card-grid");
+  elRemainingCards.innerHTML = "";
   elActionBar.innerHTML = "";
 
   switch (data.type) {
@@ -246,6 +248,12 @@ function renderSingleSelect(data) {
     li.addEventListener("click", () => submitChoice(i));
     elOptions.appendChild(li);
   });
+
+  // Render remaining (non-shown) cards at smaller size in a separate container
+  const remaining = data.extra?.remaining_cards;
+  if (remaining && remaining.length > 0) {
+    renderRemainingCards(remaining);
+  }
 }
 
 function renderMultiSelect(data) {
@@ -382,6 +390,67 @@ function renderWaitForContinue(_data) {
   btn.addEventListener("click", () => submitChoice(null));
   elActionBar.appendChild(btn);
   btn.focus();
+}
+
+function renderRemainingCards(cards) {
+  const header = document.createElement("div");
+  header.className = "remaining-header";
+  header.textContent = `${cards.length} other cards in pack`;
+  elRemainingCards.appendChild(header);
+
+  const grid = document.createElement("ul");
+  grid.className = "remaining-grid";
+
+  for (const card of cards) {
+    const li = document.createElement("li");
+
+    const art = document.createElement("div");
+    art.className = "tcg-art";
+    if (card.image_hash) {
+      const img = document.createElement("img");
+      img.src = `/api/images/${card.image_hash}`;
+      img.alt = card.name;
+      art.appendChild(img);
+    }
+    if (card.energy_cost != null) {
+      const badge = document.createElement("span");
+      badge.className = "tcg-cost";
+      badge.textContent = card.energy_cost;
+      art.appendChild(badge);
+    }
+    if (card.spark != null) {
+      const spark = document.createElement("span");
+      spark.className = "tcg-spark";
+      spark.textContent = card.spark;
+      art.appendChild(spark);
+    }
+    li.appendChild(art);
+
+    const name = document.createElement("div");
+    name.className = "tcg-name";
+    name.textContent = card.name;
+    li.appendChild(name);
+
+    if (card.card_type) {
+      const type = document.createElement("div");
+      type.className = "tcg-type";
+      type.textContent = card.card_type;
+      li.appendChild(type);
+    }
+    if (card.rules_text) {
+      const rules = document.createElement("div");
+      rules.className = "tcg-rules";
+      rules.textContent = card.rules_text;
+      li.appendChild(rules);
+    }
+
+    const resTag = renderResonanceTag(card.resonance);
+    if (resTag) li.appendChild(resTag);
+
+    grid.appendChild(li);
+  }
+
+  elRemainingCards.appendChild(grid);
 }
 
 function createCardDataOptionLi(text, index, cardData) {
