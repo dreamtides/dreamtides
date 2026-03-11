@@ -6,11 +6,11 @@ from unittest.mock import patch
 from quest_state import QuestState
 
 
-class _MockAgent:
-    """Minimal agent stand-in for tests that don't need full draft logic."""
+class _MockStrategy:
+    """Minimal draft strategy stand-in for tests that only need preference_vector."""
 
     def __init__(self) -> None:
-        self.w: list[float] = [0.1] * 8
+        self.preference_vector: list[float] = [1.0] * 8
 
 
 def _make_quest_state(
@@ -19,16 +19,13 @@ def _make_quest_state(
     max_deck: int = 50,
 ) -> QuestState:
     rng = random.Random(seed)
-    return QuestState(
+    state = QuestState(
         essence=essence,
         rng=rng,
-        human_agent=_MockAgent(),
-        ai_agents=[],
-        cube=None,
-        draft_cfg=None,
-        packs=[],
         max_deck=max_deck,
     )
+    state.draft_strategy = _MockStrategy()  # type: ignore[assignment]
+    return state
 
 
 def _populate_deck(state: QuestState, count: int) -> None:

@@ -18,17 +18,21 @@ from models import (
 from quest_state import QuestState
 
 
+class _MockStrategy:
+    """Minimal draft strategy stand-in for tests that only need preference_vector."""
+
+    def __init__(self) -> None:
+        self.preference_vector: list[float] = [1.0] * 8
+
+
 def _make_quest_state(seed: int = 42) -> QuestState:
     rng = random.Random(seed)
-    return QuestState(
+    state = QuestState(
         essence=250,
         rng=rng,
-        human_agent=None,
-        ai_agents=[],
-        cube=None,
-        draft_cfg=None,
-        packs=[],
     )
+    state.draft_strategy = _MockStrategy()  # type: ignore[assignment]
+    return state
 
 
 def _make_config() -> dict[str, dict[str, Any]]:

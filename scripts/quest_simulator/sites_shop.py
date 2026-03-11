@@ -15,9 +15,6 @@ import log_helpers
 import render
 import render_cards
 import render_status
-import resonance_filter
-import round_manager
-import show_n
 from draft_models import CardInstance
 from jsonl_log import SessionLogger
 from models import Dreamsign
@@ -133,6 +130,7 @@ def run_shop(
     Rerolls advance the draft by 1 additional pick step each.
     Enhanced shops (Verdant biome) get the first reroll free.
     """
+    strategy = state.draft_strategy
     reroll_cost: int = shop_config.get("reroll_cost", 50)
     free_rerolls = 1 if is_enhanced else 0
     dreamsigns_pool = all_dreamsigns or []
@@ -147,63 +145,15 @@ def run_shop(
     print(header)
     print()
 
-    # Get the initial pack at seat 0 (AI picks at seats 1-5 run first).
-    # This is called once before the menu loop. Only rerolls (which
-    # consume a pick step) trigger a fresh advance_to_human_pick.
-    pack = round_manager.advance_to_human_pick(state, logger=logger)
-
-    human_res = resonance_filter.human_resonance_pair(state)
+    # Generate the initial pick result
+    result = strategy.generate_pick(n=SHOP_SHOW_N, logger=logger, context="shop")
 
     while True:
-        # Filter to SHOP_SHOW_N cards
-        eligible = resonance_filter.filter_off_resonance_duals(pack.cards, human_res)
-        shown_cards = show_n.select_cards(
-            eligible,
-            SHOP_SHOW_N,
-            "sharpened_preference",
-            state.rng,
-            human_w=state.human_agent.w,
-            human_drafted=state.human_agent.drafted,
-            scoring_cfg=state.draft_cfg.scoring,
-        )
-
-        # Log show-N filtering
-        if logger is not None and shown_cards:
-            scores = log_helpers.compute_show_n_scores(
-                shown_cards, state.human_agent.w, "sharpened_preference"
-            )
-            shown_with_scores = []
-            for card, score in zip(shown_cards, scores):
-                entry = log_helpers.card_instance_dict(card)
-                entry["score"] = score
-                shown_with_scores.append(entry)
-
-            filtered_out = [c for c in pack.cards if c not in shown_cards]
-            filtered_scores = log_helpers.compute_show_n_scores(
-                filtered_out, state.human_agent.w, "sharpened_preference"
-            )
-            filtered_top3 = []
-            paired = list(zip(filtered_out, filtered_scores))
-            paired.sort(key=lambda t: t[1], reverse=True)
-            for card, score in paired[:3]:
-                entry = log_helpers.card_instance_dict(card)
-                entry["score"] = score
-                filtered_top3.append(entry)
-
-            logger.log_show_n_filter(
-                strategy="sharpened_preference",
-                pack_size=len(pack.cards),
-                shown_count=len(shown_cards),
-                shown_cards_with_scores=shown_with_scores,
-                filtered_out_top3=filtered_top3,
-                context="shop",
-                global_pick_index=state.global_pick_index,
-                round_index=state.round_index,
-            )
+        shown_cards = result.shown_cards
 
         if not shown_cards:
             print(f"  {colors.dim('No cards available.')}")
-            round_manager.advance_pick_no_card(state)
+            strategy.skip_pick()
             break
 
         items = _build_shop_items(shown_cards)
@@ -311,19 +261,19 @@ def run_shop(
             if state.essence >= item.price:
                 state.spend_essence(item.price)
                 state.add_card(item.card_instance)
-                round_manager.complete_human_pick(
-                    state, item.card_instance, shown_cards
-                )
+                strategy.complete_pick(item.card_instance, shown_cards)
 
                 # Log preference snapshot after shop purchase
                 if logger is not None:
                     logger.log_preference_snapshot(
-                        global_pick_index=state.global_pick_index,
-                        preference_vector=state.human_agent.w,
-                        top_archetype_index=log_helpers.top_n_w(state.human_agent.w, 1)[
-                            0
-                        ][0],
-                        concentration=log_helpers.w_concentration(state.human_agent.w),
+                        global_pick_index=strategy.pick_index,
+                        preference_vector=strategy.preference_vector,
+                        top_archetype_index=log_helpers.top_n_w(
+                            strategy.preference_vector, 1
+                        )[0][0],
+                        concentration=log_helpers.w_concentration(
+                            strategy.preference_vector
+                        ),
                     )
 
                 print()
@@ -345,12 +295,14 @@ def run_shop(
                     )
 
                 # Advance draft and continue shopping with fresh cards.
-                pack = round_manager.advance_to_human_pick(state, logger=logger)
+                result = strategy.generate_pick(
+                    n=SHOP_SHOW_N, logger=logger, context="shop"
+                )
                 continue
             else:
                 print()
                 print(f"  {colors.dim('Not enough essence.')}")
-                round_manager.advance_pick_no_card(state)
+                strategy.skip_pick()
 
                 if logger is not None:
                     logger.log_site_visit(
@@ -368,9 +320,6 @@ def run_shop(
 
         elif chosen_index < card_count + ds_count:
             # Buy a dreamsign (does NOT consume a draft pick).
-            # The player is returned to the shop menu to pick a card
-            # or leave. No new advance_to_human_pick is needed because
-            # the same pack is still pending resolution.
             ds = dreamsign_offerings[chosen_index - card_count]
             state.add_dreamsign(ds)
 
@@ -397,7 +346,7 @@ def run_shop(
             print()
 
             # Consume 1 pick step for the reroll, then get the new pack
-            round_manager.advance_pick_no_card(state)
+            strategy.skip_pick()
 
             if logger is not None:
                 logger.log_site_visit(
@@ -412,12 +361,14 @@ def run_shop(
                     },
                 )
 
-            pack = round_manager.advance_to_human_pick(state, logger=logger)
+            result = strategy.generate_pick(
+                n=SHOP_SHOW_N, logger=logger, context="shop"
+            )
             continue
 
         else:
             # Leave shop (buy nothing) -- consumes 1 pick step
-            round_manager.advance_pick_no_card(state)
+            strategy.skip_pick()
             print()
             print(f"  {colors.dim('No items purchased.')}")
 
@@ -437,7 +388,7 @@ def run_shop(
 
     # Show the archetype preference footer
     footer = render_status.archetype_preference_footer(
-        w=state.human_agent.w,
+        w=strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
     )

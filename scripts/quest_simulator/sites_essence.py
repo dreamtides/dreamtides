@@ -93,7 +93,7 @@ def run_essence(
 
     # Show archetype preference footer
     footer = render_status.archetype_preference_footer(
-        w=state.human_agent.w,
+        w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
     )

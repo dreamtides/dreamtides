@@ -13,9 +13,6 @@ import input_handler
 import render
 import render_cards
 import render_status
-import resonance_filter
-import round_manager
-import show_n
 from draft_models import CardInstance
 from jsonl_log import SessionLogger
 from models import DeckCard, Dreamsign
@@ -88,7 +85,7 @@ def run_duplication(
     if not state.deck:
         print(f"  {render.DIM}Deck is empty -- nothing to duplicate.{render.RESET}")
         footer = render_status.archetype_preference_footer(
-            w=state.human_agent.w,
+            w=state.draft_strategy.preference_vector,
             deck_count=state.deck_count(),
             essence=state.essence,
         )
@@ -192,7 +189,7 @@ def run_duplication(
 
     # Show archetype preference footer
     footer = render_status.archetype_preference_footer(
-        w=state.human_agent.w,
+        w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
     )
@@ -219,24 +216,15 @@ def generate_reward(
         amount = rng.randint(REWARD_ESSENCE_MIN, REWARD_ESSENCE_MAX)
         return {"type": "essence", "value": amount}
     elif completion_level < REWARD_HIGH_THRESHOLD:
-        # Mid level: card from draft pack via round manager
-        pack = round_manager.advance_to_human_pick(state)
-        if not pack.cards:
-            # Fallback to essence if pack is empty
+        # Mid level: card from draft pack via draft strategy
+        strategy = state.draft_strategy
+        result = strategy.generate_pick(n=REWARD_SHOW_N, context="reward")
+        if not result.shown_cards:
+            # Fallback to essence if no cards available
             amount = rng.randint(REWARD_ESSENCE_MIN, REWARD_ESSENCE_MAX)
-            round_manager.advance_pick_no_card(state)
+            strategy.skip_pick()
             return {"type": "essence", "value": amount}
-
-        human_res = resonance_filter.human_resonance_pair(state)
-        eligible = resonance_filter.filter_off_resonance_duals(pack.cards, human_res)
-        shown = show_n.select_cards(
-            pack_cards=eligible,
-            n=REWARD_SHOW_N,
-            strategy=state.draft_cfg.agents.show_n_strategy,
-            rng=random.Random(rng.randint(0, 2**32)),
-            human_w=state.human_agent.w,
-        )
-        return {"type": "card", "value": 0, "shown_cards": shown}
+        return {"type": "card", "value": 0, "shown_cards": result.shown_cards}
     else:
         # High level: dreamsign
         available = all_dreamsigns or []
@@ -330,13 +318,13 @@ def run_reward(
             if selected_index < decline_index:
                 chosen = shown_cards[selected_index]
                 state.add_card(chosen)
-                round_manager.complete_human_pick(state, chosen, shown_cards)
+                state.draft_strategy.complete_pick(chosen, shown_cards)
                 print()
                 print(
                     f"  {render.BOLD}Added {chosen.design.name} to deck!{render.RESET}"
                 )
             else:
-                round_manager.advance_pick_no_card(state)
+                state.draft_strategy.skip_pick()
                 print()
                 print(f"  {render.DIM}Declined.{render.RESET}")
 
@@ -407,7 +395,7 @@ def run_reward(
 
     # Show archetype preference footer
     footer = render_status.archetype_preference_footer(
-        w=state.human_agent.w,
+        w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
     )
@@ -469,7 +457,7 @@ def run_cleanse(
             )
 
         footer = render_status.archetype_preference_footer(
-            w=state.human_agent.w,
+            w=state.draft_strategy.preference_vector,
             deck_count=state.deck_count(),
             essence=state.essence,
         )
@@ -535,7 +523,7 @@ def run_cleanse(
 
     # Show archetype preference footer
     footer = render_status.archetype_preference_footer(
-        w=state.human_agent.w,
+        w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
     )

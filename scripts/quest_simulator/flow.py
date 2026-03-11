@@ -114,7 +114,7 @@ def _show_victory(
         deck_size=state.deck_count(),
         dreamsign_count=state.dreamsign_count(),
         essence=state.essence,
-        w=state.human_agent.w,
+        w=state.draft_strategy.preference_vector,
         log_path=log_path,
     )
     print(screen)
@@ -126,7 +126,7 @@ def _show_victory(
             completion_level=state.completion_level,
             dreamsigns=state.dreamsigns,
             dreamcaller=state.dreamcaller,
-            preference_vector=state.human_agent.w,
+            preference_vector=state.draft_strategy.preference_vector,
         )
 
 

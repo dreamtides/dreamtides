@@ -25,11 +25,13 @@ import cube_manager
 import data_loader
 import flow
 import render_status
+import resonance_filter
+from draft_models import CubeConsumptionMode
+from draft_strategy import SixSeatDraftStrategy
 from jsonl_log import SessionLogger
 from quest_state import QuestState
-from site_dispatch import SiteData
-from draft_models import CubeConsumptionMode
 from quest_sim import _build_draft_config, draft_config_summary
+from site_dispatch import SiteData
 
 
 def _run_full_quest(seed: int) -> tuple[QuestState, Path]:
@@ -73,15 +75,20 @@ def _run_full_quest(seed: int) -> tuple[QuestState, Path]:
     state = QuestState(
         essence=starting_essence,
         rng=rng,
-        human_agent=human_agent,
-        ai_agents=ai_agents,
-        cube=cube,
-        draft_cfg=cfg,
-        packs=None,
         max_deck=max_deck,
         min_deck=min_deck,
         max_dreamsigns=max_dreamsigns,
     )
+
+    strategy = SixSeatDraftStrategy(
+        rng=rng,
+        human_agent=human_agent,
+        ai_agents=ai_agents,
+        cube=cube,
+        draft_cfg=cfg,
+        resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
+    )
+    state.draft_strategy = strategy
 
     data = SiteData(
         dreamcallers=dreamcallers,

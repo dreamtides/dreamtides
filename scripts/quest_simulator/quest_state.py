@@ -1,18 +1,21 @@
 """Mutable quest state management.
 
 Tracks the player's deck, dreamsigns, dreamcaller, essence, and
-draft engine state. All site interactions mutate state through this
-module's methods.
+a reference to the draft strategy. All site interactions mutate
+state through this module's methods.
 """
 
 import random
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from models import (
     DeckCard,
     Dreamcaller,
     Dreamsign,
 )
+
+if TYPE_CHECKING:
+    from draft_strategy import DraftStrategy
 
 
 class QuestState:
@@ -22,14 +25,6 @@ class QuestState:
         self,
         essence: int,
         rng: random.Random,
-        human_agent: Any,
-        ai_agents: list[Any],
-        cube: Any,
-        draft_cfg: Any,
-        packs: Optional[list[Any]] = None,
-        round_pick_count: int = 0,
-        round_index: int = 0,
-        global_pick_index: int = 0,
         max_deck: int = 50,
         min_deck: int = 25,
         max_dreamsigns: int = 12,
@@ -41,14 +36,8 @@ class QuestState:
         self.essence: int = essence
         self.completion_level: int = 0
         self.rng: random.Random = rng
-        self.human_agent: Any = human_agent
-        self.ai_agents: list[Any] = ai_agents
-        self.cube: Any = cube
-        self.draft_cfg: Any = draft_cfg
-        self.packs: Optional[list[Any]] = packs
-        self.round_pick_count: int = round_pick_count
-        self.round_index: int = round_index
-        self.global_pick_index: int = global_pick_index
+        # pyre-ignore[8]: Two-phase init; set immediately after construction.
+        self.draft_strategy: DraftStrategy = None  # type: ignore[assignment]
         self.max_deck: int = max_deck
         self.min_deck: int = min_deck
         self.max_dreamsigns: int = max_dreamsigns

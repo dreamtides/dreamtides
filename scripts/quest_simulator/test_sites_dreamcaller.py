@@ -7,11 +7,11 @@ from models import Dreamcaller
 from quest_state import QuestState
 
 
-class _MockAgent:
-    """Minimal agent stand-in for tests that don't need full draft logic."""
+class _MockStrategy:
+    """Minimal draft strategy stand-in for tests that only need preference_vector."""
 
     def __init__(self) -> None:
-        self.w: list[float] = [0.1] * 8
+        self.preference_vector: list[float] = [1.0] * 8
 
 
 def _make_dreamcaller(
@@ -33,15 +33,12 @@ def _make_quest_state(
     seed: int = 42,
 ) -> QuestState:
     rng = random.Random(seed)
-    return QuestState(
+    state = QuestState(
         essence=essence,
         rng=rng,
-        human_agent=_MockAgent(),
-        ai_agents=[],
-        cube=None,
-        draft_cfg=None,
-        packs=[],
     )
+    state.draft_strategy = _MockStrategy()  # type: ignore[assignment]
+    return state
 
 
 class TestSelectDreamcallers:

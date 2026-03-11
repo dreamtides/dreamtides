@@ -10,6 +10,7 @@ from unittest.mock import patch
 import agents
 import card_generator
 import cube_manager
+import resonance_filter
 import show_n
 from config import (
     AgentsConfig,
@@ -22,6 +23,7 @@ from config import (
     SimulatorConfig,
 )
 from draft_models import CubeConsumptionMode
+from draft_strategy import SixSeatDraftStrategy
 from quest_state import QuestState
 
 
@@ -68,19 +70,25 @@ def _make_quest_state(seed: int = 42, cfg: SimulatorConfig | None = None) -> Que
     cube = cube_manager.CubeManager(
         designs,
         copies_per_card=cfg.cube.copies_per_card,
-        consumption_mode=CubeConsumptionMode(cfg.cube.consumption_mode),
+        consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
     )
     human_agent = agents.create_agent(cfg.cards.archetype_count)
     ai_agents_list = [agents.create_agent(cfg.cards.archetype_count) for _ in range(5)]
 
-    return QuestState(
+    state = QuestState(
         essence=250,
+        rng=rng,
+    )
+    strategy = SixSeatDraftStrategy(
         rng=rng,
         human_agent=human_agent,
         ai_agents=ai_agents_list,
         cube=cube,
         draft_cfg=cfg,
+        resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
     )
+    state.draft_strategy = strategy
+    return state
 
 
 class TestRunDraft:
@@ -107,7 +115,7 @@ class TestRunDraft:
         from sites_draft import run_draft
 
         state = _make_quest_state()
-        initial_pick = state.global_pick_index
+        initial_pick = state.draft_strategy.pick_index
 
         with patch("sites_draft.input_handler.single_select", return_value=0):
             run_draft(
@@ -117,14 +125,14 @@ class TestRunDraft:
                 logger=None,
             )
 
-        assert state.global_pick_index == initial_pick + 5
+        assert state.draft_strategy.pick_index == initial_pick + 5
 
     def test_draft_updates_human_agent(self) -> None:
         """After picks, the human agent's drafted list should grow."""
         from sites_draft import run_draft
 
         state = _make_quest_state()
-        assert len(state.human_agent.drafted) == 0
+        assert len(state.draft_strategy.drafted_cards) == 0
 
         with patch("sites_draft.input_handler.single_select", return_value=0):
             run_draft(
@@ -134,7 +142,7 @@ class TestRunDraft:
                 logger=None,
             )
 
-        assert len(state.human_agent.drafted) == 5
+        assert len(state.draft_strategy.drafted_cards) == 5
 
     def test_draft_with_logger(self) -> None:
         """Draft should call log_draft_pick on the logger when provided."""
@@ -143,7 +151,7 @@ class TestRunDraft:
         log_calls: list[dict[str, object]] = []
 
         class FakeLogger:
-            def log_draft_pick(self, offered_cards, weights, picked_card):
+            def log_draft_pick(self, offered_cards, weights, picked_card, **kwargs):
                 log_calls.append(
                     {
                         "offered": list(offered_cards),
@@ -152,8 +160,11 @@ class TestRunDraft:
                     }
                 )
 
-            def log_site_visit(self, **kwargs):
-                pass
+            def __getattr__(self, name):
+                def noop(*args, **kwargs):
+                    pass
+
+                return noop
 
         state = _make_quest_state()
 
@@ -236,7 +247,7 @@ class TestRunDraft:
             return original_select(pack_cards, n, strategy, rng, **kwargs)
 
         with patch("sites_draft.input_handler.single_select", return_value=0), patch(
-            "sites_draft.show_n.select_cards", side_effect=_tracking_select
+            "draft_strategy.show_n.select_cards", side_effect=_tracking_select
         ):
             run_draft(
                 state=state,
@@ -255,10 +266,10 @@ class TestRunDraft:
         from sites_draft import run_draft
 
         state = _make_quest_state()
-        initial_pick = state.global_pick_index
+        initial_pick = state.draft_strategy.pick_index
 
         with patch("sites_draft.input_handler.single_select", return_value=0), patch(
-            "sites_draft.show_n.select_cards", return_value=[]
+            "draft_strategy.show_n.select_cards", return_value=[]
         ):
             run_draft(
                 state=state,
@@ -268,6 +279,6 @@ class TestRunDraft:
             )
 
         # All 5 picks should advance even though offers were empty
-        assert state.global_pick_index == initial_pick + 5
+        assert state.draft_strategy.pick_index == initial_pick + 5
         # No cards should be added to the deck
         assert state.deck_count() == 0

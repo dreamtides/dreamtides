@@ -224,16 +224,24 @@ def run_web_server(args: Any) -> None:
     state = QuestState(
         essence=starting_essence,
         rng=rng,
-        human_agent=human_agent,
-        ai_agents=ai_agents,
-        cube=cube,
-        draft_cfg=cfg,
-        packs=None,
         max_deck=max_deck,
         min_deck=min_deck,
         max_dreamsigns=max_dreamsigns,
         debug=args.debug,
     )
+
+    import resonance_filter
+    from draft_strategy import SixSeatDraftStrategy
+
+    strategy = SixSeatDraftStrategy(
+        rng=rng,
+        human_agent=human_agent,
+        ai_agents=ai_agents,
+        cube=cube,
+        draft_cfg=cfg,
+        resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
+    )
+    state.draft_strategy = strategy
 
     data = SiteData(
         dreamcallers=dreamcallers,

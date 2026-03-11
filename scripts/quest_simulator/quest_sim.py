@@ -33,6 +33,8 @@ import data_loader
 import flow
 import input_handler
 import render
+import resonance_filter
+from draft_strategy import SixSeatDraftStrategy
 from jsonl_log import SessionLogger
 from quest_state import QuestState
 from site_dispatch import SiteData
@@ -224,20 +226,26 @@ def main() -> None:
     max_dreamsigns: int = int(quest_config.get("max_dreamsigns", 12))
     total_battles: int = int(quest_config.get("total_battles", 7))
 
-    # Initialize quest state with draft engine fields
+    # Initialize quest state
     state = QuestState(
         essence=starting_essence,
         rng=rng,
-        human_agent=human_agent,
-        ai_agents=ai_agents,
-        cube=cube,
-        draft_cfg=cfg,
-        packs=None,
         max_deck=max_deck,
         min_deck=min_deck,
         max_dreamsigns=max_dreamsigns,
         debug=args.debug,
     )
+
+    # Wire up the draft strategy
+    strategy = SixSeatDraftStrategy(
+        rng=rng,
+        human_agent=human_agent,
+        ai_agents=ai_agents,
+        cube=cube,
+        draft_cfg=cfg,
+        resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
+    )
+    state.draft_strategy = strategy
 
     # Assemble data bundle for site dispatch
     data = SiteData(

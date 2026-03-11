@@ -11,9 +11,6 @@ from typing import Optional
 import input_handler
 import render
 import render_status
-import resonance_filter
-import round_manager
-import show_n
 import sites_dreamsign
 from draft_models import CardDesign, CardInstance
 from jsonl_log import SessionLogger
@@ -74,33 +71,22 @@ def _add_cards_via_draft(
 ) -> list[CardInstance]:
     """Auto-add cards from the draft by consuming human-seat picks.
 
-    For each pick, advances AI seats, returns the pack at seat 0,
-    selects the top card via show_n with n=1, and adds it to the deck.
+    For each pick, generates a pick result with n=1, and adds the
+    top card to the deck.
     Returns the list of added CardInstance objects.
     """
+    strategy = state.draft_strategy
     added: list[CardInstance] = []
     for _ in range(count):
-        pack = round_manager.advance_to_human_pick(state)
-        if not pack.cards:
+        result = strategy.generate_pick(n=1, context="journey")
+
+        if not result.shown_cards:
+            strategy.skip_pick()
             continue
 
-        human_res = resonance_filter.human_resonance_pair(state)
-        eligible = resonance_filter.filter_off_resonance_duals(pack.cards, human_res)
-        shown = show_n.select_cards(
-            pack_cards=eligible,
-            n=1,
-            strategy=state.draft_cfg.agents.show_n_strategy,
-            rng=random.Random(state.rng.randint(0, 2**32)),
-            human_w=state.human_agent.w,
-        )
-
-        if not shown:
-            round_manager.advance_pick_no_card(state)
-            continue
-
-        chosen = shown[0]
+        chosen = result.shown_cards[0]
         state.add_card(chosen)
-        round_manager.complete_human_pick(state, chosen, shown)
+        strategy.complete_pick(chosen, result.shown_cards)
         added.append(chosen)
 
     return added
@@ -412,7 +398,7 @@ def run_dream_journey(
     # Show archetype preference footer
     print()
     footer = render_status.archetype_preference_footer(
-        w=state.human_agent.w,
+        w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
     )
@@ -519,7 +505,7 @@ def run_tempting_offer(
     # Show archetype preference footer
     print()
     footer = render_status.archetype_preference_footer(
-        w=state.human_agent.w,
+        w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
     )

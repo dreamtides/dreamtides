@@ -42,48 +42,24 @@ def _make_instance(design: CardDesign) -> CardInstance:
     return CardInstance(instance_id=_NEXT_INSTANCE_ID, design=design)
 
 
+class _MockStrategy:
+    """Minimal draft strategy stand-in for tests that only need preference_vector."""
+
+    def __init__(self) -> None:
+        self.preference_vector: list[float] = [1.0] * 8
+
+
 def _make_quest_state(
     seed: int = 42,
     essence: int = 250,
 ) -> QuestState:
     rng = random.Random(seed)
-
-    import agents
-
-    human_agent = agents.create_agent(archetype_count=8)
-    ai_agents = [agents.create_agent(archetype_count=8) for _ in range(5)]
-
-    import card_generator
-    import cube_manager
-    from config import SimulatorConfig
-    from draft_models import CubeConsumptionMode
-
-    cfg = SimulatorConfig()
-    cfg.draft.seat_count = 6
-    cfg.draft.pack_size = 20
-    cfg.cards.archetype_count = 8
-    cfg.cards.source = "synthetic"
-    cfg.cube.distinct_cards = 10
-    cfg.cube.copies_per_card = 1
-    cfg.cube.consumption_mode = "with_replacement"
-    cfg.refill.strategy = "no_refill"
-    cfg.pack_generation.strategy = "seeded_themed"
-
-    cards = card_generator.generate_cards(cfg, rng)
-    cube = cube_manager.CubeManager(
-        designs=cards,
-        copies_per_card=1,
-        consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
-    )
-
-    return QuestState(
+    state = QuestState(
         essence=essence,
         rng=rng,
-        human_agent=human_agent,
-        ai_agents=ai_agents,
-        cube=cube,
-        draft_cfg=cfg,
     )
+    state.draft_strategy = _MockStrategy()  # type: ignore[assignment]
+    return state
 
 
 class TestTransfigurationEligibility:

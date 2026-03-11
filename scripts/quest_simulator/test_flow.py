@@ -22,16 +22,16 @@ from quest_state import QuestState
 from site_dispatch import SiteData, VisitContext
 
 
+class MockStrategy:
+    def __init__(self) -> None:
+        self.preference_vector = [1.0] * 8
+
+
 def _make_quest_state(seed: int = 42) -> QuestState:
     rng = random.Random(seed)
     return QuestState(
         essence=250,
         rng=rng,
-        human_agent=None,
-        ai_agents=[],
-        cube=None,
-        draft_cfg=None,
-        packs=[],
     )
 
 
@@ -440,11 +440,7 @@ class TestShowVictory:
         for i in range(10):
             state.add_card(f"inst_{i}")
 
-        # Provide a mock human_agent with a w vector
-        class MockAgent:
-            w = [0.1] * 8
-
-        state.human_agent = MockAgent()
+        state.draft_strategy = MockStrategy()  # type: ignore[assignment]
         state.dreamcaller = _make_dreamcallers()[0]
 
         with patch("builtins.print") as mock_print:
@@ -459,10 +455,7 @@ class TestShowVictory:
         for i in range(10):
             state.add_card(f"inst_{i}")
 
-        class MockAgent:
-            w = [0.1] * 8
-
-        state.human_agent = MockAgent()
+        state.draft_strategy = MockStrategy()  # type: ignore[assignment]
         state.dreamcaller = _make_dreamcallers()[0]
 
         logger = MagicMock()

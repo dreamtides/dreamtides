@@ -13,8 +13,10 @@ if _DRAFT_SIM_DIR not in sys.path:
 import agents
 import card_generator
 import cube_manager
+import resonance_filter
 from config import SimulatorConfig
 from draft_models import CardDesign, CardInstance, CubeConsumptionMode
+from draft_strategy import SixSeatDraftStrategy
 
 from models import DeckCard, Dreamsign
 from quest_state import QuestState
@@ -66,14 +68,21 @@ def _make_quest_state(
     cfg = _build_cfg()
     cards = card_generator.generate_cards(cfg, rng)
     cube = cube_manager.CubeManager(cards, 1, CubeConsumptionMode.WITH_REPLACEMENT)
+    human_agent = agents.create_agent(8)
+    ai_agents = [agents.create_agent(8) for _ in range(5)]
     state = QuestState(
         essence=essence,
         rng=rng,
-        human_agent=agents.create_agent(8),
-        ai_agents=[agents.create_agent(8) for _ in range(5)],
+    )
+    strategy = SixSeatDraftStrategy(
+        rng=rng,
+        human_agent=human_agent,
+        ai_agents=ai_agents,
         cube=cube,
         draft_cfg=cfg,
+        resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
     )
+    state.draft_strategy = strategy
     state.completion_level = completion_level
     return state
 

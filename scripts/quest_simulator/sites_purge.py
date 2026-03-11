@@ -66,7 +66,7 @@ def run_purge(
     if not state.deck:
         print(f"  {render.DIM}Deck is empty -- nothing to purge.{render.RESET}")
         footer = render_status.archetype_preference_footer(
-            w=state.human_agent.w,
+            w=state.draft_strategy.preference_vector,
             deck_count=state.deck_count(),
             essence=state.essence,
         )
@@ -143,7 +143,7 @@ def run_purge(
 
     # Show archetype preference footer
     footer = render_status.archetype_preference_footer(
-        w=state.human_agent.w,
+        w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
     )
@@ -247,7 +247,7 @@ def forced_deck_limit_purge(
 
     # Show archetype preference footer
     footer = render_status.archetype_preference_footer(
-        w=state.human_agent.w,
+        w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
     )

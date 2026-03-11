@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 from draft_models import CardDesign, CardInstance
 from quest_state import QuestState
+from draft_strategy import SixSeatDraftStrategy
 
 
 def _make_design(
@@ -83,6 +84,7 @@ def _make_quest_state(
 
     import agents
     import cube_manager
+    import resonance_filter
     from config import SimulatorConfig
     from draft_models import CubeConsumptionMode
 
@@ -131,14 +133,22 @@ def _make_quest_state(
 
     ai_agents = [agents.create_agent(archetype_count=8) for _ in range(5)]
 
-    return QuestState(
+    state = QuestState(
         essence=essence,
+        rng=rng,
+    )
+
+    strategy = SixSeatDraftStrategy(
         rng=rng,
         human_agent=human_agent,
         ai_agents=ai_agents,
         cube=cube,
         draft_cfg=cfg,
+        resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
     )
+    state.draft_strategy = strategy
+
+    return state
 
 
 class TestDrawAndFilter:
@@ -168,6 +178,7 @@ class TestDrawAndFilter:
 
         import agents
         import cube_manager
+        import resonance_filter
         from config import SimulatorConfig
         from draft_models import CubeConsumptionMode
 
@@ -195,14 +206,21 @@ class TestDrawAndFilter:
         human = agents.create_agent(archetype_count=8)
         human.w[0] = 5.0
 
+        rng = random.Random(42)
         state = QuestState(
             essence=500,
-            rng=random.Random(42),
+            rng=rng,
+        )
+
+        strategy = SixSeatDraftStrategy(
+            rng=rng,
             human_agent=human,
             ai_agents=[],
             cube=cube,
             draft_cfg=cfg,
+            resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
         )
+        state.draft_strategy = strategy
 
         cards = draw_and_filter(state, count=4)
         # Should still return some cards even without high-fitness matches
@@ -276,7 +294,7 @@ class TestDiscoveryDraftDoesNotAdvanceDraft:
         from sites_discovery import run_discovery_draft
 
         state = _make_quest_state()
-        initial_pick_index = state.global_pick_index
+        initial_pick_index = state.draft_strategy.pick_index
 
         with patch("sites_discovery.single_select", return_value=0):
             run_discovery_draft(
@@ -287,14 +305,14 @@ class TestDiscoveryDraftDoesNotAdvanceDraft:
                 is_enhanced=False,
             )
 
-        assert state.global_pick_index == initial_pick_index
+        assert state.draft_strategy.pick_index == initial_pick_index
 
     def test_round_pick_count_unchanged(self) -> None:
         """Discovery Draft should not increment round_pick_count."""
         from sites_discovery import run_discovery_draft
 
         state = _make_quest_state()
-        initial_round_pick = state.round_pick_count
+        initial_round_pick = state.draft_strategy.round_pick_count
 
         with patch("sites_discovery.single_select", return_value=0):
             run_discovery_draft(
@@ -305,7 +323,7 @@ class TestDiscoveryDraftDoesNotAdvanceDraft:
                 is_enhanced=False,
             )
 
-        assert state.round_pick_count == initial_round_pick
+        assert state.draft_strategy.round_pick_count == initial_round_pick
 
 
 class TestDiscoveryDraftUpdatesAgent:
@@ -316,7 +334,7 @@ class TestDiscoveryDraftUpdatesAgent:
         from sites_discovery import run_discovery_draft
 
         state = _make_quest_state(high_fitness_archetype=0)
-        initial_w = list(state.human_agent.w)
+        initial_w = list(state.draft_strategy.preference_vector)
 
         with patch("sites_discovery.single_select", return_value=0):
             run_discovery_draft(
@@ -328,7 +346,7 @@ class TestDiscoveryDraftUpdatesAgent:
             )
 
         # The agent's preference vector should have been updated
-        assert state.human_agent.w != initial_w
+        assert state.draft_strategy.preference_vector != initial_w
 
     def test_card_added_to_deck_after_pick(self) -> None:
         """A card should be added to the deck after each pick."""
@@ -357,7 +375,7 @@ class TestSpecialtyShopDoesNotAdvanceDraft:
         from sites_discovery import run_specialty_shop
 
         state = _make_quest_state(essence=500)
-        initial_pick_index = state.global_pick_index
+        initial_pick_index = state.draft_strategy.pick_index
 
         # Select first item (index 0) to buy
         with patch("sites_discovery.multi_select", return_value=[0]):
@@ -375,7 +393,7 @@ class TestSpecialtyShopDoesNotAdvanceDraft:
                 },
             )
 
-        assert state.global_pick_index == initial_pick_index
+        assert state.draft_strategy.pick_index == initial_pick_index
 
 
 class TestSpecialtyShopPricing:
@@ -412,7 +430,7 @@ class TestSpecialtyShopReroll:
         from sites_discovery import run_specialty_shop
 
         state = _make_quest_state(essence=500)
-        initial_pick_index = state.global_pick_index
+        initial_pick_index = state.draft_strategy.pick_index
 
         # First call: select reroll (last index = items_count = 4)
         # Second call: select nothing (empty list to exit)
@@ -439,7 +457,7 @@ class TestSpecialtyShopReroll:
                 },
             )
 
-        assert state.global_pick_index == initial_pick_index
+        assert state.draft_strategy.pick_index == initial_pick_index
 
 
 class TestDiscountNeverExceedsBase:
@@ -479,6 +497,7 @@ class TestDrawAndFilterSmallCube:
 
         import agents
         import cube_manager
+        import resonance_filter
         from config import SimulatorConfig
         from draft_models import CubeConsumptionMode
 
@@ -506,14 +525,21 @@ class TestDrawAndFilterSmallCube:
         human = agents.create_agent(archetype_count=8)
         human.w[0] = 5.0
 
+        rng = random.Random(42)
         state = QuestState(
             essence=500,
-            rng=random.Random(42),
+            rng=rng,
+        )
+
+        strategy = SixSeatDraftStrategy(
+            rng=rng,
             human_agent=human,
             ai_agents=[],
             cube=cube,
             draft_cfg=cfg,
+            resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
         )
+        state.draft_strategy = strategy
 
         cards = draw_and_filter(state, count=4)
         assert len(cards) > 0
@@ -529,6 +555,7 @@ class TestDrawAndFilterSmallCube:
 
         import agents
         import cube_manager
+        import resonance_filter
         from config import SimulatorConfig
         from draft_models import CubeConsumptionMode
 
@@ -556,11 +583,17 @@ class TestDrawAndFilterSmallCube:
         state = QuestState(
             essence=500,
             rng=rng,
+        )
+
+        strategy = SixSeatDraftStrategy(
+            rng=rng,
             human_agent=human,
             ai_agents=[],
             cube=cube,
             draft_cfg=cfg,
+            resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
         )
+        state.draft_strategy = strategy
 
         cards = draw_and_filter(state, count=4)
         assert cards == []

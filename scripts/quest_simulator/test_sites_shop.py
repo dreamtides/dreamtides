@@ -13,10 +13,11 @@ if _DRAFT_SIM_DIR not in sys.path:
 import agents
 import card_generator
 import cube_manager
+import resonance_filter
 from config import SimulatorConfig
 from draft_models import CardDesign, CardInstance, CubeConsumptionMode
+from draft_strategy import SixSeatDraftStrategy
 
-import round_manager
 from models import Dreamsign
 from quest_state import QuestState
 
@@ -48,14 +49,20 @@ def _make_state(seed: int = 42, essence: int = 500) -> QuestState:
     cfg = _build_cfg()
     cards = card_generator.generate_cards(cfg, rng)
     cube = cube_manager.CubeManager(cards, 1, CubeConsumptionMode.WITH_REPLACEMENT)
-    return QuestState(
+    state = QuestState(
         essence=essence,
+        rng=rng,
+    )
+    strategy = SixSeatDraftStrategy(
         rng=rng,
         human_agent=agents.create_agent(8),
         ai_agents=[agents.create_agent(8) for _ in range(5)],
         cube=cube,
         draft_cfg=cfg,
+        resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
     )
+    state.draft_strategy = strategy
+    return state
 
 
 def _make_dreamsigns(count: int = 5) -> list[Dreamsign]:
@@ -167,8 +174,12 @@ class TestRunShop:
         state = _make_state(essence=500)
         dreamsigns = _make_dreamsigns()
 
-        # Select index 0 (first card)
-        with patch("sites_shop.input_handler.single_select", return_value=0):
+        # Buy first card (0), then leave (6: 3 cards + 2 ds + reroll + leave)
+        calls = iter([0, 6])
+        with patch(
+            "sites_shop.input_handler.single_select",
+            side_effect=lambda *a, **k: next(calls),
+        ):
             run_shop(
                 state=state,
                 shop_config={"reroll_cost": 50},
@@ -186,7 +197,12 @@ class TestRunShop:
         state = _make_state(essence=500)
         initial_essence = state.essence
 
-        with patch("sites_shop.input_handler.single_select", return_value=0):
+        # Buy first card (0), then leave (4: 3 cards + reroll + leave)
+        calls = iter([0, 4])
+        with patch(
+            "sites_shop.input_handler.single_select",
+            side_effect=lambda *a, **k: next(calls),
+        ):
             run_shop(
                 state=state,
                 shop_config={"reroll_cost": 50},
@@ -197,12 +213,17 @@ class TestRunShop:
 
         assert state.essence < initial_essence
 
-    def test_buying_card_consumes_one_pick_step(self) -> None:
+    def test_buying_card_consumes_pick_steps(self) -> None:
         from sites_shop import run_shop
 
         state = _make_state(essence=500)
 
-        with patch("sites_shop.input_handler.single_select", return_value=0):
+        # Buy first card (0), then leave (4: 3 cards + reroll + leave)
+        calls = iter([0, 4])
+        with patch(
+            "sites_shop.input_handler.single_select",
+            side_effect=lambda *a, **k: next(calls),
+        ):
             run_shop(
                 state=state,
                 shop_config={"reroll_cost": 50},
@@ -211,8 +232,9 @@ class TestRunShop:
                 logger=None,
             )
 
-        assert state.global_pick_index == 1
-        assert state.round_pick_count == 1
+        # Buy consumes 1 pick step, leave consumes 1 pick step = 2 total
+        assert state.draft_strategy.pick_index == 2
+        assert state.draft_strategy.round_pick_count == 2
 
     def test_leave_shop_consumes_one_pick_step(self) -> None:
         from sites_shop import run_shop
@@ -233,7 +255,7 @@ class TestRunShop:
             )
 
         assert state.deck_count() == 0
-        assert state.global_pick_index == 1
+        assert state.draft_strategy.pick_index == 1
 
     def test_leave_preserves_essence(self) -> None:
         from sites_shop import run_shop
@@ -280,7 +302,7 @@ class TestRunShop:
             )
 
         # Reroll = 1 pick + leave = 1 pick = 2 total
-        assert state.global_pick_index == 2
+        assert state.draft_strategy.pick_index == 2
         assert state.essence == 450  # 500 - 50 reroll cost
 
     def test_reroll_free_when_enhanced(self) -> None:
@@ -368,7 +390,7 @@ class TestRunShop:
 
         assert state.dreamsign_count() == 1
         # Only the leave consumed a pick step
-        assert state.global_pick_index == 1
+        assert state.draft_strategy.pick_index == 1
 
     def test_displays_archetype_footer(self, capsys) -> None:
         from sites_shop import run_shop
@@ -406,7 +428,7 @@ class TestRunShop:
 
         assert state.deck_count() == 0
         assert state.essence == 1
-        assert state.global_pick_index == 1
+        assert state.draft_strategy.pick_index == 1
 
     def test_no_imports_of_old_modules(self) -> None:
         """Verify sites_shop no longer references removed modules or types."""

@@ -3479,8 +3479,6 @@ art-owned = false
 card-number = 224
 resonance = ["Tide"]
 "rendered text" = """
-When you play 4 events, this character gains +6 spark.
-
 ▸ Dissolved: Return all enemies to hand."""
 
 [[cards]]

@@ -150,7 +150,7 @@ def run_dreamcaller_draft(
     # Show archetype preference footer
     print()
     footer = render_status.archetype_preference_footer(
-        w=state.human_agent.w,
+        w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
     )

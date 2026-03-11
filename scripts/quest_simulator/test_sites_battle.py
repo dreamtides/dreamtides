@@ -12,6 +12,7 @@ from unittest.mock import patch
 import agents
 import card_generator
 import cube_manager
+import resonance_filter
 import show_n
 from config import (
     AgentsConfig,
@@ -24,6 +25,7 @@ from config import (
     SimulatorConfig,
 )
 from draft_models import CubeConsumptionMode
+from draft_strategy import SixSeatDraftStrategy
 from models import Boss
 from quest_state import QuestState
 
@@ -76,7 +78,7 @@ def _make_quest_state(
     cube = cube_manager.CubeManager(
         designs,
         copies_per_card=cfg.cube.copies_per_card,
-        consumption_mode=CubeConsumptionMode(cfg.cube.consumption_mode),
+        consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
     )
     human_agent = agents.create_agent(cfg.cards.archetype_count)
     ai_agents_list = [agents.create_agent(cfg.cards.archetype_count) for _ in range(5)]
@@ -84,11 +86,16 @@ def _make_quest_state(
     state = QuestState(
         essence=essence,
         rng=rng,
+    )
+    strategy = SixSeatDraftStrategy(
+        rng=rng,
         human_agent=human_agent,
         ai_agents=ai_agents_list,
         cube=cube,
         draft_cfg=cfg,
+        resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
     )
+    state.draft_strategy = strategy
     state.completion_level = completion_level
     return state
 
@@ -310,7 +317,7 @@ class TestRunBattle:
         from sites_battle import run_battle
 
         state = _make_quest_state(essence=250, completion_level=0)
-        initial_pick = state.global_pick_index
+        initial_pick = state.draft_strategy.pick_index
 
         with patch("sites_battle.input_handler.wait_for_continue"), patch(
             "sites_battle.input_handler.single_select", return_value=0
@@ -325,14 +332,14 @@ class TestRunBattle:
                 logger=None,
             )
 
-        assert state.global_pick_index == initial_pick + 1
+        assert state.draft_strategy.pick_index == initial_pick + 1
 
     def test_battle_updates_human_agent(self) -> None:
         """After battle pick, human agent's drafted list should grow by 1."""
         from sites_battle import run_battle
 
         state = _make_quest_state(essence=250, completion_level=0)
-        assert len(state.human_agent.drafted) == 0
+        assert len(state.draft_strategy.drafted_cards) == 0
 
         with patch("sites_battle.input_handler.wait_for_continue"), patch(
             "sites_battle.input_handler.single_select", return_value=0
@@ -347,7 +354,7 @@ class TestRunBattle:
                 logger=None,
             )
 
-        assert len(state.human_agent.drafted) == 1
+        assert len(state.draft_strategy.drafted_cards) == 1
 
     def test_battle_with_logger(self) -> None:
         """Battle should call log_battle_complete when logger provided."""
@@ -365,8 +372,11 @@ class TestRunBattle:
                     }
                 )
 
-            def log_site_visit(self, **kwargs):
-                pass
+            def __getattr__(self, name):
+                def noop(*args, **kwargs):
+                    pass
+
+                return noop
 
         state = _make_quest_state(essence=250, completion_level=0)
 
@@ -516,7 +526,7 @@ class TestBattleConfigDriven:
 
         with patch("sites_battle.input_handler.wait_for_continue"), patch(
             "sites_battle.input_handler.single_select", return_value=0
-        ), patch("sites_battle.show_n.select_cards", side_effect=_tracking_select):
+        ), patch("draft_strategy.show_n.select_cards", side_effect=_tracking_select):
             run_battle(
                 state=state,
                 battle_config=battle_cfg,
@@ -535,10 +545,10 @@ class TestBattleConfigDriven:
         from sites_battle import run_battle
 
         state = _make_quest_state(essence=250, completion_level=0)
-        initial_pick = state.global_pick_index
+        initial_pick = state.draft_strategy.pick_index
 
         with patch("sites_battle.input_handler.wait_for_continue"), patch(
-            "sites_battle.show_n.select_cards", return_value=[]
+            "draft_strategy.show_n.select_cards", return_value=[]
         ):
             run_battle(
                 state=state,
@@ -551,6 +561,6 @@ class TestBattleConfigDriven:
             )
 
         # Pick should still advance even with empty offer
-        assert state.global_pick_index == initial_pick + 1
+        assert state.draft_strategy.pick_index == initial_pick + 1
         # No card should be added
         assert state.deck_count() == 0

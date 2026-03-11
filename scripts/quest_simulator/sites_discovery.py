@@ -13,7 +13,6 @@ import random
 from dataclasses import dataclass
 from typing import Optional
 
-import agents
 from draft_models import CardInstance
 from input_handler import multi_select, single_select
 from jsonl_log import SessionLogger
@@ -95,13 +94,13 @@ def draw_and_filter(
     up to `count` filtered cards. If not enough high-fitness cards
     are found, relaxes the threshold or returns what is available.
     """
-    top_archs = _top_archetypes(state.human_agent.w)
-    available = state.cube.remaining
+    top_archs = _top_archetypes(state.draft_strategy.preference_vector)
+    available = state.draft_strategy.cube.remaining
     first_draw = min(batch_size, available)
     if first_draw <= 0:
         return []
 
-    drawn = state.cube.draw(first_draw, state.rng)
+    drawn = state.draft_strategy.cube.draw(first_draw, state.rng)
 
     # Filter to high-fitness cards
     filtered = [
@@ -112,10 +111,10 @@ def draw_and_filter(
         return filtered[:count]
 
     # Not enough: try drawing more
-    second_draw = min(batch_size, state.cube.remaining)
+    second_draw = min(batch_size, state.draft_strategy.cube.remaining)
     extra: list[CardInstance] = []
     if second_draw > 0:
-        extra = state.cube.draw(second_draw, state.rng)
+        extra = state.draft_strategy.cube.draw(second_draw, state.rng)
     for card in extra:
         if _has_high_fitness(card, top_archs, _FITNESS_THRESHOLD):
             filtered.append(card)
@@ -193,25 +192,6 @@ def prepare_shop_items(
     return items
 
 
-def _update_human_agent(state: QuestState, card: CardInstance) -> None:
-    """Update the human agent after picking a card.
-
-    Calls update_agent_after_pick with a synthetic pack context since
-    Discovery Draft and Specialty Shop operate outside the draft loop.
-    """
-    cfg = state.draft_cfg
-    agents.update_agent_after_pick(
-        state.human_agent,
-        card,
-        [],  # No visible remaining cards from a pack
-        state.global_pick_index,
-        state.round_index,
-        "discovery",  # Synthetic pack_id
-        cfg.agents.learning_rate,
-        cfg.agents.openness_window,
-    )
-
-
 def run_discovery_draft(
     state: QuestState,
     logger: Optional[SessionLogger],
@@ -272,7 +252,7 @@ def run_discovery_draft(
         for idx in selected_indices:
             card = offered[idx]
             state.add_card(card)
-            _update_human_agent(state, card)
+            state.draft_strategy.update_after_external_pick(card)
 
         # Log picks
         if logger is not None:
@@ -306,7 +286,7 @@ def run_discovery_draft(
     # Show archetype preference footer
     print(
         render_status.archetype_preference_footer(
-            w=state.human_agent.w,
+            w=state.draft_strategy.preference_vector,
             deck_count=state.deck_count(),
             essence=state.essence,
         )
@@ -455,7 +435,7 @@ def run_specialty_shop(
         for idx in purchase_indices:
             shop_item = items[idx]
             state.add_card(shop_item.instance)
-            _update_human_agent(state, shop_item.instance)
+            state.draft_strategy.update_after_external_pick(shop_item.instance)
             purchased.append(shop_item.instance)
             state.spend_essence(shop_item.effective_price)
 
@@ -489,7 +469,7 @@ def run_specialty_shop(
     # Show archetype preference footer
     print(
         render_status.archetype_preference_footer(
-            w=state.human_agent.w,
+            w=state.draft_strategy.preference_vector,
             deck_count=state.deck_count(),
             essence=state.essence,
         )

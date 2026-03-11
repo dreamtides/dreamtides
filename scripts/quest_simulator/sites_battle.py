@@ -2,7 +2,7 @@
 
 Implements the Battle site: auto-win combat, essence reward scaled by
 completion level, and post-battle card pick from the draft pack via the
-round manager. Opponent type varies by completion level: Dream Guardian
+draft strategy. Opponent type varies by completion level: Dream Guardian
 for most battles, random miniboss at the miniboss battle, and random
 final boss at the last battle.
 """
@@ -16,9 +16,6 @@ import log_helpers
 import render
 import render_cards
 import render_status
-import resonance_filter
-import round_manager
-import show_n
 from jsonl_log import SessionLogger
 from models import Boss
 from quest_state import QuestState
@@ -76,9 +73,11 @@ def run_battle(
     """Run a Battle site interaction.
 
     Determines the opponent, displays the battle, auto-wins, awards
-    essence, offers a post-battle card pick via the round manager,
+    essence, offers a post-battle card pick via the draft strategy,
     increments completion level, and logs the result.
     """
+    strategy = state.draft_strategy
+
     # Determine opponent
     opponent_name, boss_info = determine_opponent(
         state.completion_level, bosses, state.rng, quest_config
@@ -109,59 +108,11 @@ def run_battle(
     # Apply essence reward
     state.gain_essence(essence_reward)
 
-    # Post-battle card pick via round manager
+    # Post-battle card pick via draft strategy
     rare_pick_count = battle_config["rare_pick_count"]
-    show_n_strategy = state.draft_cfg.agents.show_n_strategy
 
-    pack = round_manager.advance_to_human_pick(state, logger=logger)
-
-    human_res = resonance_filter.human_resonance_pair(state)
-    eligible = resonance_filter.filter_off_resonance_duals(pack.cards, human_res)
-
-    pick_rng = random.Random(state.rng.randint(0, 2**32))
-    shown_cards = show_n.select_cards(
-        eligible,
-        rare_pick_count,
-        show_n_strategy,
-        pick_rng,
-        human_w=state.human_agent.w,
-        human_drafted=state.human_agent.drafted,
-        scoring_cfg=state.draft_cfg.scoring,
-    )
-
-    # Log show-N filtering
-    if logger is not None and shown_cards:
-        scores = log_helpers.compute_show_n_scores(
-            shown_cards, state.human_agent.w, show_n_strategy
-        )
-        shown_with_scores = []
-        for card, score in zip(shown_cards, scores):
-            entry = log_helpers.card_instance_dict(card)
-            entry["score"] = score
-            shown_with_scores.append(entry)
-
-        filtered_out = [c for c in pack.cards if c not in shown_cards]
-        filtered_scores = log_helpers.compute_show_n_scores(
-            filtered_out, state.human_agent.w, show_n_strategy
-        )
-        filtered_top3 = []
-        paired = list(zip(filtered_out, filtered_scores))
-        paired.sort(key=lambda t: t[1], reverse=True)
-        for card, score in paired[:3]:
-            entry = log_helpers.card_instance_dict(card)
-            entry["score"] = score
-            filtered_top3.append(entry)
-
-        logger.log_show_n_filter(
-            strategy=show_n_strategy,
-            pack_size=len(pack.cards),
-            shown_count=len(shown_cards),
-            shown_cards_with_scores=shown_with_scores,
-            filtered_out_top3=filtered_top3,
-            context="battle",
-            global_pick_index=state.global_pick_index,
-            round_index=state.round_index,
-        )
+    result = strategy.generate_pick(n=rare_pick_count, logger=logger, context="battle")
+    shown_cards = result.shown_cards
 
     picked_card = None
 
@@ -185,8 +136,8 @@ def run_battle(
 
         picked_card = shown_cards[chosen_index]
 
-        # Signal the round manager
-        round_manager.complete_human_pick(state, picked_card, shown_cards)
+        # Signal the draft strategy
+        strategy.complete_pick(picked_card, shown_cards)
 
         # Add picked card to deck
         state.add_card(picked_card)
@@ -194,10 +145,12 @@ def run_battle(
         # Log preference snapshot after battle pick
         if logger is not None:
             logger.log_preference_snapshot(
-                global_pick_index=state.global_pick_index,
-                preference_vector=state.human_agent.w,
-                top_archetype_index=log_helpers.top_n_w(state.human_agent.w, 1)[0][0],
-                concentration=log_helpers.w_concentration(state.human_agent.w),
+                global_pick_index=strategy.pick_index,
+                preference_vector=strategy.preference_vector,
+                top_archetype_index=log_helpers.top_n_w(strategy.preference_vector, 1)[
+                    0
+                ][0],
+                concentration=log_helpers.w_concentration(strategy.preference_vector),
             )
 
         print()
@@ -207,7 +160,7 @@ def run_battle(
         print()
     else:
         # No cards available in the pack; still advance draft state
-        round_manager.advance_pick_no_card(state)
+        strategy.skip_pick()
 
         print(
             f"  Essence reward: {colors.c(f'+{essence_reward}', 'accent', bold=True)}"
@@ -253,7 +206,7 @@ def run_battle(
 
     # Show archetype preference footer
     footer = render_status.archetype_preference_footer(
-        w=state.human_agent.w,
+        w=strategy.preference_vector,
         deck_count=len(state.deck),
         essence=state.essence,
     )

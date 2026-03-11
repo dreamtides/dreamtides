@@ -3,7 +3,6 @@
 import random
 
 from models import (
-    DeckCard,
     Dreamcaller,
     Dreamsign,
 )
@@ -43,11 +42,6 @@ def _make_quest_state(
     return QuestState(
         essence=essence,
         rng=rng,
-        human_agent=None,
-        ai_agents=[],
-        cube=None,
-        draft_cfg=None,
-        packs=[],
         max_deck=max_deck,
         min_deck=min_deck,
         max_dreamsigns=max_dreamsigns,
@@ -60,11 +54,6 @@ class TestQuestStateInit:
         state = QuestState(
             essence=250,
             rng=rng,
-            human_agent=None,
-            ai_agents=[],
-            cube=None,
-            draft_cfg=None,
-            packs=[],
         )
         assert state.essence == 250
         assert state.deck == []
@@ -72,14 +61,7 @@ class TestQuestStateInit:
         assert state.dreamcaller is None
         assert state.completion_level == 0
         assert state.rng is rng
-        assert state.human_agent is None
-        assert state.ai_agents == []
-        assert state.cube is None
-        assert state.draft_cfg is None
-        assert state.packs == []
-        assert state.round_pick_count == 0
-        assert state.round_index == 0
-        assert state.global_pick_index == 0
+        assert state.draft_strategy is None
         assert state.max_deck == 50
         assert state.min_deck == 25
         assert state.max_dreamsigns == 12
