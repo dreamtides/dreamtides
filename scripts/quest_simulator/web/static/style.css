@@ -45,6 +45,7 @@ body {
 #status-bar span { color: var(--fg); }
 #status-essence  { color: var(--accent); font-weight: bold; }
 #status-completion { color: var(--entity); }
+#status-resonance   { font-size: 12px; letter-spacing: 0.04em; }
 #status-dreamcaller { color: var(--keyword); margin-left: auto; }
 
 /* ── Main layout ────────────────────────────────────────────────────────── */
@@ -437,6 +438,22 @@ button.solo {
   color: var(--accent);
   padding: 2px 7px 4px;
   border-top: 1px solid var(--border);
+}
+
+.tcg-resonance {
+  text-align: center;
+  padding: 2px 7px 4px;
+  background: rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.tcg-resonance .res-primary {
+  font-size: 14px;
+}
+
+.tcg-resonance .res-secondary {
+  font-size: 9px;
 }
 
 /* Deck sidebar card frame */

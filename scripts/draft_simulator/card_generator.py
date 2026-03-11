@@ -108,6 +108,7 @@ def load_real_cards(
                 is_fast=card.get("is-fast", False),
                 is_real=True,
                 image_number=_parse_optional_int(card.get("image-number", "")),
+                resonance=tuple(card.get("resonance", [])),
             )
         )
 
@@ -333,6 +334,7 @@ def duplicate_real_cards(
                     is_fast=source.is_fast,
                     is_real=True,
                     image_number=source.image_number,
+                    resonance=source.resonance,
                 )
             )
             counter += 1

@@ -71,6 +71,7 @@ _web_response_queue: Optional[queue.Queue] = None
 _web_state_callback: Optional[Callable[[], dict]] = None
 _card_name_image_map: dict[str, Optional[str]] = {}
 _card_name_spark_map: dict[str, Optional[int]] = {}
+_card_name_resonance_map: dict[str, tuple[str, ...]] = {}
 
 
 def set_card_name_image_map(mapping: dict[str, Optional[str]]) -> None:
@@ -85,6 +86,12 @@ def set_card_name_spark_map(mapping: dict[str, Optional[int]]) -> None:
     _card_name_spark_map = mapping
 
 
+def set_card_name_resonance_map(mapping: dict[str, tuple[str, ...]]) -> None:
+    """Register a card name → resonance tuple mapping for web mode prompts."""
+    global _card_name_resonance_map
+    _card_name_resonance_map = mapping
+
+
 def make_card_option_data(
     name: str,
     energy_cost: Optional[int],
@@ -92,6 +99,7 @@ def make_card_option_data(
     rules_text: str,
     spark: Optional[int] = None,
     price: Optional[int] = None,
+    resonance: Optional[list[str]] = None,
 ) -> dict:
     """Build a card options_data entry for web UI display."""
     return {
@@ -102,6 +110,11 @@ def make_card_option_data(
         "image_hash": _card_name_image_map.get(name),
         "spark": spark,
         "price": price,
+        "resonance": (
+            resonance
+            if resonance is not None
+            else list(_card_name_resonance_map.get(name, ()))
+        ),
     }
 
 
@@ -181,6 +194,7 @@ def _parse_options_data(
                 "rules_text": " ".join(rules_lines),
                 "image_hash": _card_name_image_map.get(option),
                 "spark": _card_name_spark_map.get(option),
+                "resonance": list(_card_name_resonance_map.get(option, ())),
             }
         )
 

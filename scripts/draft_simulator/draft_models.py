@@ -72,6 +72,7 @@ class CardDesign:
     is_fast: bool = False
     is_real: bool = False
     image_number: int | None = None
+    resonance: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

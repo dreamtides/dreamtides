@@ -21,6 +21,51 @@ const elDeckToggle  = document.getElementById("deck-toggle");
 const elGameOver    = document.getElementById("game-over");
 const elGameOverMsg = document.getElementById("game-over-message");
 
+const elStatusRes   = document.getElementById("status-resonance");
+
+// ── Resonance helpers ─────────────────────────────────────────────────────
+
+const RESONANCE_EMOJI = {
+  Flame: "\u{1F525}",
+  Thunder: "\u{1F329}\uFE0F",
+  Stone: "\u{1FAA8}",
+  Tide: "\u{1F30A}",
+};
+
+const ARCHETYPE_RESONANCE = {
+  Endure:   ["Stone", "Tide"],
+  Shatter:  ["Stone", "Flame"],
+  Ignite:   ["Flame", "Stone"],
+  Flicker:  ["Flame", "Thunder"],
+  Awaken:   ["Thunder", "Flame"],
+  Flash:    ["Thunder", "Tide"],
+  Surge:    ["Tide", "Thunder"],
+  Submerge: ["Tide", "Stone"],
+};
+
+function resonanceEmoji(name) {
+  return RESONANCE_EMOJI[name] || "";
+}
+
+function renderResonanceTag(resonanceList) {
+  if (!resonanceList || resonanceList.length === 0) return null;
+  const div = document.createElement("div");
+  div.className = "tcg-resonance";
+  if (resonanceList.length === 1) {
+    div.textContent = resonanceEmoji(resonanceList[0]);
+  } else {
+    const primary = document.createElement("span");
+    primary.className = "res-primary";
+    primary.textContent = resonanceEmoji(resonanceList[0]);
+    const secondary = document.createElement("span");
+    secondary.className = "res-secondary";
+    secondary.textContent = resonanceEmoji(resonanceList[1]);
+    div.appendChild(primary);
+    div.appendChild(secondary);
+  }
+  return div;
+}
+
 // ── Deck sidebar toggle ────────────────────────────────────────────────────
 
 let sidebarOpen = false;
@@ -37,7 +82,33 @@ function updateStatus(state) {
   elStatusEss.textContent  = `Essence: ${state.essence}`;
   elStatusComp.textContent = `Completion: ${state.completion_level}/${state.total_battles}`;
   elStatusDeck.textContent = `Deck: ${state.deck_count}`;
-  elStatusCaller.textContent = state.dreamcaller ? `☆ ${state.dreamcaller}` : "";
+
+  // Dreamcaller with resonance emoji
+  if (state.dreamcaller) {
+    const arch = state.dreamcaller_archetype;
+    const res = arch && ARCHETYPE_RESONANCE[arch];
+    const resText = res ? ` ${resonanceEmoji(res[0])}${resonanceEmoji(res[1])}` : "";
+    elStatusCaller.textContent = `☆ ${state.dreamcaller}${resText}`;
+  } else {
+    elStatusCaller.textContent = "";
+  }
+
+  // Deck resonance composition
+  const counts = {};
+  if (state.deck) {
+    for (const card of state.deck) {
+      if (card.resonance) {
+        for (const r of card.resonance) {
+          counts[r] = (counts[r] || 0) + 1;
+        }
+      }
+    }
+  }
+  const parts = [];
+  for (const name of ["Flame", "Thunder", "Stone", "Tide"]) {
+    if (counts[name]) parts.push(`${resonanceEmoji(name)}${counts[name]}`);
+  }
+  elStatusRes.textContent = parts.join(" ");
 }
 
 // ── Deck sidebar ───────────────────────────────────────────────────────────
@@ -90,6 +161,10 @@ function renderDeckSidebar(state) {
       rules.textContent = card.rules_text;
       li.appendChild(rules);
     }
+
+    // Resonance
+    const resTag = renderResonanceTag(card.resonance);
+    if (resTag) li.appendChild(resTag);
 
     elDeckList.appendChild(li);
   }
@@ -246,6 +321,8 @@ function renderMultiSelect(data) {
         price.textContent = `${od.price}e`;
         li.appendChild(price);
       }
+      const resTag = renderResonanceTag(od?.resonance);
+      if (resTag) li.appendChild(resTag);
       const idx = document.createElement("span");
       idx.className = "option-index";
       idx.textContent = i + 1;
@@ -356,6 +433,9 @@ function createCardDataOptionLi(text, index, cardData) {
     price.textContent = `${cardData.price}e`;
     li.appendChild(price);
   }
+
+  const resTag = renderResonanceTag(cardData?.resonance);
+  if (resTag) li.appendChild(resTag);
 
   const idx = document.createElement("span");
   idx.className = "option-index";

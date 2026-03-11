@@ -55,6 +55,7 @@ def _serialize_deck_card(dc: Any) -> dict:
         "card_type": design.card_type,
         "rules_text": design.rules_text,
         "spark": design.spark,
+        "resonance": list(design.resonance),
     }
 
 
@@ -258,6 +259,9 @@ def run_web_server(args: Any) -> None:
             "deck": [_serialize_deck_card(dc) for dc in state.deck],
             "dreamsigns": [ds.name for ds in state.dreamsigns],
             "dreamcaller": state.dreamcaller.name if state.dreamcaller else None,
+            "dreamcaller_archetype": (
+                state.dreamcaller.archetype if state.dreamcaller else None
+            ),
             "deck_count": state.deck_count(),
         }
 
@@ -271,8 +275,12 @@ def run_web_server(args: Any) -> None:
         for d in cards
     }
     card_spark_map: dict[str, int | None] = {d.name: d.spark for d in cards}
+    card_resonance_map: dict[str, tuple[str, ...]] = {
+        d.name: d.resonance for d in cards
+    }
     input_handler.set_card_name_image_map(card_image_map)
     input_handler.set_card_name_spark_map(card_spark_map)
+    input_handler.set_card_name_resonance_map(card_resonance_map)
 
     def _prefetch_images() -> None:
         for d in cards:
