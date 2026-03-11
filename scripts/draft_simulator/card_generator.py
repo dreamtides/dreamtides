@@ -109,6 +109,7 @@ def load_real_cards(
                 is_real=True,
                 image_number=_parse_optional_int(card.get("image-number", "")),
                 resonance=tuple(card.get("resonance", [])),
+                original_rarity=raw_rarity,
             )
         )
 

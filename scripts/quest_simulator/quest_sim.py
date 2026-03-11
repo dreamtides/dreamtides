@@ -34,7 +34,7 @@ import flow
 import input_handler
 import render
 import resonance_filter
-from draft_strategy import SixSeatDraftStrategy
+from draft_strategy import ArchetypeDraftStrategy, SixSeatDraftStrategy
 from jsonl_log import SessionLogger
 from quest_state import QuestState
 from site_dispatch import SiteData
@@ -88,6 +88,18 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=8080,
         help="Port for the web UI server (default: 8080)",
+    )
+    parser.add_argument(
+        "--archetype-draft",
+        action="store_true",
+        default=False,
+        help="Use simple archetype-based draft instead of 6-seat AI draft",
+    )
+    parser.add_argument(
+        "--num-archetypes",
+        type=int,
+        default=3,
+        help="Number of archetypes to include in archetype draft (default: 3)",
     )
     return parser
 
@@ -176,38 +188,7 @@ def main() -> None:
     # Generate card pool
     cards = card_generator.generate_cards(cfg, rng)
 
-    # Create cube with rarity-based copy counts and replacement mode
-    copies_per_card: int | dict[str, int] = cube_manager.build_copies_map(
-        cards, cfg.rarity
-    )
-    cube = cube_manager.CubeManager(
-        designs=cards,
-        copies_per_card=copies_per_card,
-        consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
-    )
-
-    # Create agents: 1 human (seat 0) + 5 AI
-    human_agent = agents.create_agent(archetype_count=cfg.cards.archetype_count)
-    ai_agents = [
-        agents.create_agent(archetype_count=cfg.cards.archetype_count)
-        for _ in range(cfg.draft.seat_count - 1)
-    ]
-
     real_count = sum(1 for c in cards if c.is_real)
-    synth_count = len(cards) - real_count
-    if real_count > 0:
-        print(
-            f"  Draft engine initialized: {real_count} real + "
-            f"{synth_count} synthetic cards, "
-            f"cube size {cube.total_size}, "
-            f"{1 + len(ai_agents)} agents created"
-        )
-    else:
-        print(
-            f"  Draft engine initialized: {len(cards)} cards generated, "
-            f"cube size {cube.total_size}, "
-            f"{1 + len(ai_agents)} agents created"
-        )
 
     # Load all quest data
     config = data_loader.load_config()
@@ -237,15 +218,59 @@ def main() -> None:
     )
 
     # Wire up the draft strategy
-    strategy = SixSeatDraftStrategy(
-        rng=rng,
-        human_agent=human_agent,
-        ai_agents=ai_agents,
-        cube=cube,
-        draft_cfg=cfg,
-        resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
-    )
-    state.draft_strategy = strategy
+    if args.archetype_draft:
+        archetype_strategy = ArchetypeDraftStrategy(
+            rng=rng,
+            all_cards=cards,
+            num_archetypes=args.num_archetypes,
+        )
+        print(
+            f"  Archetype draft initialized: archetypes {archetype_strategy.selected_archetypes}, "
+            f"pool size {archetype_strategy.pool_size} instances "
+            f"from {len(cards)} card designs"
+        )
+        state.draft_strategy = archetype_strategy
+    else:
+        # Create cube with rarity-based copy counts and replacement mode
+        copies_per_card: int | dict[str, int] = cube_manager.build_copies_map(
+            cards, cfg.rarity
+        )
+        cube = cube_manager.CubeManager(
+            designs=cards,
+            copies_per_card=copies_per_card,
+            consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
+        )
+
+        # Create agents: 1 human (seat 0) + 5 AI
+        human_agent = agents.create_agent(archetype_count=cfg.cards.archetype_count)
+        ai_agents = [
+            agents.create_agent(archetype_count=cfg.cards.archetype_count)
+            for _ in range(cfg.draft.seat_count - 1)
+        ]
+
+        synth_count = len(cards) - real_count
+        if real_count > 0:
+            print(
+                f"  Draft engine initialized: {real_count} real + "
+                f"{synth_count} synthetic cards, "
+                f"cube size {cube.total_size}, "
+                f"{1 + len(ai_agents)} agents created"
+            )
+        else:
+            print(
+                f"  Draft engine initialized: {len(cards)} cards generated, "
+                f"cube size {cube.total_size}, "
+                f"{1 + len(ai_agents)} agents created"
+            )
+
+        state.draft_strategy = SixSeatDraftStrategy(
+            rng=rng,
+            human_agent=human_agent,
+            ai_agents=ai_agents,
+            cube=cube,
+            draft_cfg=cfg,
+            resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
+        )
 
     # Assemble data bundle for site dispatch
     data = SiteData(

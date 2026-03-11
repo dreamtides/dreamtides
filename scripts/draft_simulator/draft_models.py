@@ -73,6 +73,7 @@ class CardDesign:
     is_real: bool = False
     image_number: int | None = None
     resonance: tuple[str, ...] = ()
+    original_rarity: str = ""
 
 
 @dataclass(frozen=True)

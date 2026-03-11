@@ -20,7 +20,7 @@ import render
 import resonance_filter
 import show_n
 from config import AgentsConfig, ScoringConfig, SimulatorConfig
-from draft_models import CardInstance, Pack
+from draft_models import CardDesign, CardInstance, Pack
 from jsonl_log import SessionLogger
 
 PICKS_PER_ROUND = 10
@@ -527,3 +527,181 @@ class SixSeatDraftStrategy(DraftStrategy):
             self._round_pick_count = 0
             self._round_index += 1
             self._packs = None
+
+
+class _PoolAdapter:
+    """Thin wrapper around a card list exposing the CubeManager interface."""
+
+    def __init__(self, pool: list[CardInstance]) -> None:
+        self._pool = pool
+
+    @property
+    def remaining(self) -> int:
+        return len(self._pool)
+
+    @property
+    def total_size(self) -> int:
+        return len(self._pool)
+
+    def draw(
+        self,
+        n: int,
+        rng: random.Random,
+        weights: list[float] | None = None,
+    ) -> list[CardInstance]:
+        """Sample and remove n cards from the pool."""
+        actual = min(n, len(self._pool))
+        if actual <= 0:
+            return []
+        drawn = rng.sample(self._pool, actual)
+        for card in drawn:
+            self._pool.remove(card)
+        return drawn
+
+
+class ArchetypeDraftStrategy(DraftStrategy):
+    """Simple archetype-based draft strategy.
+
+    Builds a card pool from randomly-selected archetypes and offers
+    uniform random picks with no AI involvement.
+    """
+
+    _COPIES_BY_RARITY: dict[str, int] = {
+        "Common": 5,
+        "Uncommon": 4,
+        "Rare": 3,
+        "Legendary": 2,
+    }
+
+    def __init__(
+        self,
+        rng: random.Random,
+        all_cards: list[CardDesign],
+        num_archetypes: int = 3,
+    ) -> None:
+        self._rng = rng
+        self._draft_cfg = SimulatorConfig()
+        self._drafted: list[CardInstance] = []
+        self._round_pick_count: int = 0
+        self._round_index: int = 0
+        self._global_pick_index: int = 0
+
+        # Select random archetypes
+        self._selected_archetypes: list[int] = rng.sample(range(8), num_archetypes)
+
+        # Build preference vector: 1.0 for selected, 0.0 for others, normalized
+        raw = [1.0 if i in self._selected_archetypes else 0.0 for i in range(8)]
+        total = sum(raw)
+        self._preference_vector = [v / total for v in raw] if total > 0 else raw
+
+        # Filter cards: archetype members, neutrals, and legendaries
+        selected_set = set(self._selected_archetypes)
+        pool_designs: dict[str, CardDesign] = {}
+        for card in all_cards:
+            if card.card_id in pool_designs:
+                continue
+            is_member = any(
+                card.fitness[i] >= 0.5 for i in selected_set if i < len(card.fitness)
+            )
+            is_neutral = all(f < 0.5 for f in card.fitness)
+            is_legendary = card.original_rarity == "Legendary"
+            if is_member or is_neutral or is_legendary:
+                pool_designs[card.card_id] = card
+
+        # Build card instances with rarity-based copies
+        self._pool: list[CardInstance] = []
+        instance_id = 0
+        for design in pool_designs.values():
+            rarity_key = design.original_rarity if design.original_rarity else "Common"
+            copies = self._COPIES_BY_RARITY.get(rarity_key, 3)
+            for _ in range(copies):
+                self._pool.append(CardInstance(instance_id=instance_id, design=design))
+                instance_id += 1
+
+        self._pool_adapter = _PoolAdapter(self._pool)
+
+    @property
+    def selected_archetypes(self) -> list[int]:
+        """The archetype indices selected for this draft."""
+        return list(self._selected_archetypes)
+
+    @property
+    def pool_size(self) -> int:
+        """Number of card instances in the pool."""
+        return len(self._pool)
+
+    def generate_pick(
+        self,
+        n: int,
+        logger: Optional[SessionLogger] = None,
+        context: str = "draft",
+    ) -> PickResult:
+        """Sample n cards from the pool without removing them."""
+        actual = min(n, len(self._pool))
+        if actual <= 0:
+            return PickResult(shown_cards=[], all_eligible=[])
+        shown = self._rng.sample(self._pool, actual)
+        return PickResult(shown_cards=shown, all_eligible=shown)
+
+    def complete_pick(self, chosen: CardInstance, shown: list[CardInstance]) -> None:
+        """Remove chosen card from pool and track it."""
+        self._pool = [c for c in self._pool if c.instance_id != chosen.instance_id]
+        self._pool_adapter._pool = self._pool
+        self._drafted.append(chosen)
+        self._global_pick_index += 1
+        self._round_pick_count += 1
+        if self._round_pick_count >= PICKS_PER_ROUND:
+            self._round_pick_count = 0
+            self._round_index += 1
+
+    def skip_pick(self) -> None:
+        """Advance counters without taking a card."""
+        self._global_pick_index += 1
+        self._round_pick_count += 1
+        if self._round_pick_count >= PICKS_PER_ROUND:
+            self._round_pick_count = 0
+            self._round_index += 1
+
+    def update_after_external_pick(self, card: CardInstance) -> None:
+        """Track an externally-picked card."""
+        self._drafted.append(card)
+
+    @property
+    def preference_vector(self) -> list[float]:
+        return self._preference_vector
+
+    @property
+    def drafted_cards(self) -> list[CardInstance]:
+        return self._drafted
+
+    @property
+    def pick_index(self) -> int:
+        return self._global_pick_index
+
+    @property
+    def round_index(self) -> int:
+        return self._round_index
+
+    @property
+    def round_pick_count(self) -> int:
+        return self._round_pick_count
+
+    @property
+    def show_n_count(self) -> int:
+        return 4
+
+    @property
+    def show_n_strategy(self) -> str:
+        return "uniform"
+
+    @property
+    def scoring_cfg(self) -> Any:
+        return ScoringConfig()
+
+    @property
+    def cube(self) -> Any:
+        return self._pool_adapter
+
+    @property
+    def draft_cfg(self) -> Any:
+        return self._draft_cfg

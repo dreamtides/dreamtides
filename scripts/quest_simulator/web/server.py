@@ -191,20 +191,6 @@ def run_web_server(args: Any) -> None:
     cfg = _build_draft_config(synthetic=args.synthetic, real_only=args.real_only)
 
     cards = card_generator.generate_cards(cfg, rng)
-    copies_per_card: int | dict[str, int] = cube_manager.build_copies_map(
-        cards, cfg.rarity
-    )
-    cube = cube_manager.CubeManager(
-        designs=cards,
-        copies_per_card=copies_per_card,
-        consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
-    )
-
-    human_agent = agents.create_agent(archetype_count=cfg.cards.archetype_count)
-    ai_agents = [
-        agents.create_agent(archetype_count=cfg.cards.archetype_count)
-        for _ in range(cfg.draft.seat_count - 1)
-    ]
 
     config = data_loader.load_config()
     dreamcallers = data_loader.load_dreamcallers()
@@ -231,16 +217,40 @@ def run_web_server(args: Any) -> None:
     )
 
     import resonance_filter
-    from draft_strategy import SixSeatDraftStrategy
+    from draft_strategy import ArchetypeDraftStrategy, SixSeatDraftStrategy
 
-    strategy = SixSeatDraftStrategy(
-        rng=rng,
-        human_agent=human_agent,
-        ai_agents=ai_agents,
-        cube=cube,
-        draft_cfg=cfg,
-        resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
-    )
+    if getattr(args, "archetype_draft", False):
+        strategy = ArchetypeDraftStrategy(
+            rng=rng,
+            all_cards=cards,
+            num_archetypes=getattr(args, "num_archetypes", 3),
+        )
+        print(
+            f"  Archetype draft initialized: archetypes {strategy.selected_archetypes}, "
+            f"pool size {strategy.pool_size} instances"
+        )
+    else:
+        copies_per_card: int | dict[str, int] = cube_manager.build_copies_map(
+            cards, cfg.rarity
+        )
+        cube = cube_manager.CubeManager(
+            designs=cards,
+            copies_per_card=copies_per_card,
+            consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT,
+        )
+        human_agent = agents.create_agent(archetype_count=cfg.cards.archetype_count)
+        ai_agents = [
+            agents.create_agent(archetype_count=cfg.cards.archetype_count)
+            for _ in range(cfg.draft.seat_count - 1)
+        ]
+        strategy = SixSeatDraftStrategy(
+            rng=rng,
+            human_agent=human_agent,
+            ai_agents=ai_agents,
+            cube=cube,
+            draft_cfg=cfg,
+            resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
+        )
     state.draft_strategy = strategy
 
     data = SiteData(
