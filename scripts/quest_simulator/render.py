@@ -21,6 +21,17 @@ ARCHETYPE_NAMES: list[str] = [
     "Surge",
 ]
 
+ARCHETYPE_RESONANCE: dict[str, tuple[str, str]] = {
+    "Flash": ("Thunder", "Tide"),
+    "Awaken": ("Thunder", "Flame"),
+    "Flicker": ("Flame", "Thunder"),
+    "Ignite": ("Flame", "Stone"),
+    "Shatter": ("Stone", "Flame"),
+    "Endure": ("Stone", "Tide"),
+    "Submerge": ("Tide", "Stone"),
+    "Surge": ("Tide", "Thunder"),
+}
+
 
 def visible_len(s: str) -> int:
     """Length of string excluding ANSI escape sequences."""

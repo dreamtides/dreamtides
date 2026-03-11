@@ -15,6 +15,7 @@ import log_helpers
 import render
 import render_cards
 import render_status
+import resonance_filter
 import round_manager
 import show_n
 from draft_models import CardInstance
@@ -151,10 +152,13 @@ def run_shop(
     # consume a pick step) trigger a fresh advance_to_human_pick.
     pack = round_manager.advance_to_human_pick(state, logger=logger)
 
+    human_res = resonance_filter.human_resonance_pair(state)
+
     while True:
         # Filter to SHOP_SHOW_N cards
+        eligible = resonance_filter.filter_off_resonance_duals(pack.cards, human_res)
         shown_cards = show_n.select_cards(
-            pack.cards,
+            eligible,
             SHOP_SHOW_N,
             "sharpened_preference",
             state.rng,

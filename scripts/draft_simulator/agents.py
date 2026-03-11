@@ -26,6 +26,7 @@ class AgentState:
     pick_history: list[tuple[int, int, str, str]] = field(default_factory=list)
     openness: list[float] = field(default_factory=list)
     openness_window: list[list[float]] = field(default_factory=list)
+    committed_resonance: Optional[tuple[str, str]] = None
 
 
 def create_agent(archetype_count: int) -> AgentState:

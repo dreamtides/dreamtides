@@ -81,6 +81,7 @@ class AgentsConfig:
     openness_window: int = 3
     learning_rate: float = 3.0
     force_archetype: Optional[int] = None
+    ai_resonance_commit_pick: int = 5
 
 
 @dataclass
@@ -476,6 +477,13 @@ def validate_config(cfg: SimulatorConfig) -> None:
                     f"rarity.tier_power_ranges[{i}]={pr} invalid "
                     f"(need [low, high] in [0, 1] with low <= high)"
                 )
+
+    # ai_resonance_commit_pick must be non-negative
+    if cfg.agents.ai_resonance_commit_pick < 0:
+        errors.append(
+            f"agents.ai_resonance_commit_pick="
+            f"{cfg.agents.ai_resonance_commit_pick} must be >= 0"
+        )
 
     # Force policy requires force_archetype
     if cfg.agents.policy == "force" and cfg.agents.force_archetype is None:

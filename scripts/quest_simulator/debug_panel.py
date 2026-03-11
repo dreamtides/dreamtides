@@ -95,12 +95,20 @@ def render_debug_panel(state: QuestState) -> str:
         else:
             commit_str = colors.dim("Exploring")
 
+        # Resonance commitment
+        if agent.committed_resonance is not None:
+            p, s = agent.committed_resonance
+            res_str = colors.c(f"{p}/{s}", "tag")
+        else:
+            res_str = colors.dim("undecided")
+
         # Cards drafted count
         drafted = len(agent.drafted)
 
         lines.append(f"  {bot_name}  <- {position}")
         lines.append(
-            f"    {pref_str}  |  {commit_str}  |  " f"{colors.num(drafted)} drafted"
+            f"    {pref_str}  |  {commit_str}  |  "
+            f"Res: {res_str}  |  {colors.num(drafted)} drafted"
         )
 
     lines.append("")

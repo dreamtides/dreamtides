@@ -11,6 +11,7 @@ from typing import Optional
 import input_handler
 import render
 import render_status
+import resonance_filter
 import round_manager
 import show_n
 import sites_dreamsign
@@ -83,8 +84,10 @@ def _add_cards_via_draft(
         if not pack.cards:
             continue
 
+        human_res = resonance_filter.human_resonance_pair(state)
+        eligible = resonance_filter.filter_off_resonance_duals(pack.cards, human_res)
         shown = show_n.select_cards(
-            pack_cards=pack.cards,
+            pack_cards=eligible,
             n=1,
             strategy=state.draft_cfg.agents.show_n_strategy,
             rng=random.Random(state.rng.randint(0, 2**32)),

@@ -19,6 +19,8 @@ import agents
 import draft_runner
 import log_helpers
 import pack_generator
+import render
+import resonance_filter
 from config import AgentsConfig, ScoringConfig
 from draft_models import CardInstance, Pack
 from jsonl_log import SessionLogger
@@ -80,6 +82,22 @@ def advance_to_human_pick(state, logger: Optional[SessionLogger] = None):
         pack = state.packs[seat_idx]
         ai_agent = state.ai_agents[seat_idx - 1]
         candidates = list(pack.cards)
+
+        # Commit AI resonance pair once enough cards are drafted
+        if (
+            ai_agent.committed_resonance is None
+            and len(ai_agent.drafted) >= cfg.agents.ai_resonance_commit_pick
+        ):
+            top_arch = max(range(len(ai_agent.w)), key=lambda i: ai_agent.w[i])
+            arch_name = render.ARCHETYPE_NAMES[top_arch]
+            ai_agent.committed_resonance = render.ARCHETYPE_RESONANCE.get(arch_name)
+
+        # Filter out off-resonance dual cards
+        filtered = resonance_filter.filter_off_resonance_duals(
+            candidates, ai_agent.committed_resonance
+        )
+        if filtered:
+            candidates = filtered
 
         seat_rng = random.Random(pick_rng.randint(0, 2**32))
         chosen = agents.pick_card(

@@ -14,6 +14,7 @@ import log_helpers
 import render
 import render_cards
 import render_status
+import resonance_filter
 import round_manager
 import show_n
 from jsonl_log import SessionLogger
@@ -43,9 +44,12 @@ def run_draft(
     for pick_index in range(PICKS_PER_DRAFT_SITE):
         pack = round_manager.advance_to_human_pick(state, logger=logger)
 
+        human_res = resonance_filter.human_resonance_pair(state)
+        eligible = resonance_filter.filter_off_resonance_duals(pack.cards, human_res)
+
         pick_rng = random.Random(state.rng.randint(0, 2**32))
         shown_cards = show_n.select_cards(
-            pack.cards,
+            eligible,
             show_n_count,
             show_n_strategy,
             pick_rng,

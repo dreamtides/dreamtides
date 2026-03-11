@@ -13,6 +13,7 @@ import input_handler
 import render
 import render_cards
 import render_status
+import resonance_filter
 import round_manager
 import show_n
 from draft_models import CardInstance
@@ -226,8 +227,10 @@ def generate_reward(
             round_manager.advance_pick_no_card(state)
             return {"type": "essence", "value": amount}
 
+        human_res = resonance_filter.human_resonance_pair(state)
+        eligible = resonance_filter.filter_off_resonance_duals(pack.cards, human_res)
         shown = show_n.select_cards(
-            pack_cards=pack.cards,
+            pack_cards=eligible,
             n=REWARD_SHOW_N,
             strategy=state.draft_cfg.agents.show_n_strategy,
             rng=random.Random(rng.randint(0, 2**32)),
