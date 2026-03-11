@@ -446,6 +446,7 @@ button.solo {
   background: rgba(0, 0, 0, 0.3);
   font-size: 14px;
   line-height: 1.2;
+  margin-top: auto;
 }
 
 .tcg-resonance .res-primary {
