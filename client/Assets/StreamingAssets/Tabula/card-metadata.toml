@@ -2885,6 +2885,3941 @@ power = 0.2
 commit = 0.1
 flex = 0.25
 
+
+[[card-metadata]]
+card-id = "4bf0723b-ff81-4748-8253-a6b3540110e2"
+flash = 0
+awaken = 0
+flicker = 0.8
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.2
+surge = 0
+power = 0.5
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "a9d5a6b0-e6fe-4f34-b955-4e5129c1ab0f"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.4
+surge = 0.85
+power = 0.7
+commit = 0.8
+flex = 0.2
+
+[[card-metadata]]
+card-id = "5bfed3c9-cd1b-4fe7-a40b-dcec654db206"
+flash = 0.7
+awaken = 0
+flicker = 0.6
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.3
+surge = 0
+power = 0.5
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "a2a3c102-4dc9-4dc2-9058-412e877c958e"
+flash = 0.3
+awaken = 0
+flicker = 0.8
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "78e2c238-58c7-4bd7-b8f2-5415eda2f6cb"
+flash = 0.5
+awaken = 0
+flicker = 0.7
+ignite = 0
+shatter = 0.3
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.3
+flex = 0.6
+
+[[card-metadata]]
+card-id = "c9862d86-5a1f-46c1-b45a-0c2549eb5b25"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.2
+endure = 0.5
+submerge = 0.8
+surge = 0
+power = 0.6
+commit = 0.4
+flex = 0.5
+
+[[card-metadata]]
+card-id = "25ee7d34-d1b0-4164-b0c2-e07e15c8d4cd"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0.8
+endure = 0
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.4
+flex = 0.5
+
+[[card-metadata]]
+card-id = "af53173c-e091-4064-a7a7-854cecfe4820"
+flash = 0
+awaken = 0
+flicker = 0.7
+ignite = 0
+shatter = 0
+endure = 0.5
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "1a25ed29-5681-4d13-9752-aeb3628c190c"
+flash = 0.7
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.3
+endure = 0
+submerge = 0
+surge = 0.5
+power = 0.3
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "a370f303-8fe2-4748-9b0b-f24fcde9b1a9"
+flash = 0.6
+awaken = 0.5
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.3
+commit = 0.2
+flex = 0.8
+
+[[card-metadata]]
+card-id = "e6ad4cf5-b8dd-4eb0-b713-2a9db71c866e"
+flash = 0.7
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.5
+power = 0.2
+commit = 0.3
+flex = 0.8
+
+[[card-metadata]]
+card-id = "91709429-7457-4897-bde1-f9fa9d39a568"
+flash = 0
+awaken = 0.7
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.5
+surge = 0
+power = 0.2
+commit = 0.4
+flex = 0.7
+
+[[card-metadata]]
+card-id = "3a80421b-735a-4a15-bbe0-ff82bdb6d7fc"
+flash = 0
+awaken = 0
+flicker = 0.5
+ignite = 0.8
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "5a596f0b-8bb8-4d00-bf41-1d2fd272b86e"
+flash = 0
+awaken = 0
+flicker = 0.5
+ignite = 0.8
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "3f721176-1c77-43e3-a2f3-9e6d93a5a20a"
+flash = 0.7
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.5
+submerge = 0
+surge = 0
+power = 0.4
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "8c16cd05-1925-4df1-ac08-86c3d84c45ee"
+flash = 0
+awaken = 0.4
+flicker = 0
+ignite = 0.8
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "43a98fa2-a4e6-4e89-ae69-6fa794970aa4"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0
+endure = 0
+submerge = 0.8
+surge = 0
+power = 0.7
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "cab4266f-6671-4170-8ef3-6aea5054c452"
+flash = 0
+awaken = 0.6
+flicker = 0
+ignite = 0.5
+shatter = 0.4
+endure = 0.45
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.7
+flex = 0.2
+
+[[card-metadata]]
+card-id = "c8ad42f8-39d4-4bd4-9100-d9afeb31c11c"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.7
+shatter = 0.5
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "987aaa03-962d-4549-8149-8dbeccfc9911"
+flash = 0
+awaken = 0.3
+flicker = 0.7
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.5
+power = 0.5
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "8792daa1-a31e-4fd2-a1f3-7493a3d6be41"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.8
+shatter = 0.6
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "04de0d16-6ff1-45c1-8590-88a5923935ff"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.8
+shatter = 0.5
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "6e6fc45d-3505-4119-af15-bbed67fa059a"
+flash = 0
+awaken = 0
+flicker = 0.2
+ignite = 0.7
+shatter = 0.2
+endure = 0.4
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.6
+
+[[card-metadata]]
+card-id = "a27275ba-252f-41ba-a98b-be23c0b28cba"
+flash = 0
+awaken = 0
+flicker = 0.2
+ignite = 0.7
+shatter = 0.5
+endure = 0.2
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.5
+flex = 0.6
+
+[[card-metadata]]
+card-id = "0fde6cd3-4879-41c9-8ec0-3b3bb178b0b3"
+flash = 0.7
+awaken = 0
+flicker = 0
+ignite = 0.1
+shatter = 0.5
+endure = 0
+submerge = 0
+surge = 0
+power = 0.3
+commit = 0.4
+flex = 0.7
+
+[[card-metadata]]
+card-id = "4136f5f0-478b-45a7-aeae-4dd0b001f1c9"
+flash = 0
+awaken = 0
+flicker = 0.7
+ignite = 0
+shatter = 0.2
+endure = 0.45
+submerge = 0
+surge = 0.5
+power = 0.8
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "226addd8-f09a-4237-ba75-c40635fbdb3b"
+flash = 0
+awaken = 0
+flicker = 0.7
+ignite = 0.4
+shatter = 0.2
+endure = 0.45
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "ac9dbb02-de06-4977-a2eb-0ac839ab4c90"
+flash = 0.8
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.4
+power = 0.3
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "9daf5b3e-76e4-4e7e-aa74-1b4b9f5d9e3e"
+flash = 0.8
+awaken = 0
+flicker = 0.4
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.2
+power = 0.3
+commit = 0.3
+flex = 0.8
+
+[[card-metadata]]
+card-id = "c038e4b2-ae16-4981-bc63-c13e6276b034"
+flash = 0.7
+awaken = 0
+flicker = 0.5
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.2
+power = 0.4
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "a9d7abc1-c290-49c6-8153-83f097942b45"
+flash = 0.7
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.3
+flex = 0.5
+
+[[card-metadata]]
+card-id = "77b5e881-9a2c-47d8-9058-c9c2597385be"
+flash = 0.5
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.2
+flex = 0.5
+
+[[card-metadata]]
+card-id = "a0fd3b74-ae21-4a07-8306-7df3645c28d9"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.4
+shatter = 0.7
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "795a060f-ef43-42e3-96b7-b5bdb7266434"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.9
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "c20722ae-5d81-4677-bcf8-7c0ec0e95b93"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.4
+shatter = 0.7
+endure = 0.6
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "3df2dd36-dd51-4355-87f2-b5ae197bb4dc"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "44a4ab1a-ed1f-418a-8866-3c4b5642492f"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.7
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "98db4d6d-842c-401f-8037-699a518f96d5"
+flash = 0
+awaken = 0.6
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.5
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "d7129a27-7edd-404a-86a7-08b893140e94"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.5
+surge = 0.7
+power = 0.6
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "0242717d-a6ba-42b6-9bf5-325191a1a2da"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.3
+endure = 0.9
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.8
+flex = 0.3
+
+[[card-metadata]]
+card-id = "564ef717-7898-4623-9c94-e3fc986701e4"
+flash = 0.4
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.2
+submerge = 0.8
+surge = 0
+power = 0.5
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "37422a69-3f8c-4953-abe9-bf6742eb6e2e"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.5
+submerge = 0.8
+surge = 0.3
+power = 0.4
+commit = 0.5
+flex = 0.6
+
+[[card-metadata]]
+card-id = "b3c35d35-8410-42c7-86b7-a310a2557383"
+flash = 0
+awaken = 0
+flicker = 0.2
+ignite = 0.5
+shatter = 0
+endure = 0
+submerge = 0.5
+surge = 0.2
+power = 0.5
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "f04e32b3-d897-4c24-9999-3f0557482ba1"
+flash = 0.5
+awaken = 0.2
+flicker = 0.5
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "238a405b-1eb9-4f0e-9904-4da39a7c810e"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.5
+surge = 0.85
+power = 0.7
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "5ffd3613-af5a-4546-9129-9fbfd38cb86a"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.7
+surge = 0.5
+power = 0.5
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "8751e259-6e46-4b1d-a6a0-0df5421e1054"
+flash = 0.5
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.3
+surge = 0.5
+power = 0.4
+commit = 0.2
+flex = 0.8
+
+[[card-metadata]]
+card-id = "37711e14-b1b6-47e4-8f40-4293c1a49429"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.2
+surge = 0.5
+power = 0.4
+commit = 0.2
+flex = 0.8
+
+[[card-metadata]]
+card-id = "79cdd40b-26d0-457d-9af2-bd15bfa88806"
+flash = 0.8
+awaken = 0
+flicker = 0.4
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.3
+power = 0.5
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "435a6ac4-58a6-4d63-acc7-17377496acf4"
+flash = 0.8
+awaken = 0
+flicker = 0.2
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.5
+power = 0.5
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "6d5d0f3c-e993-44f8-86b2-502bd63e7846"
+flash = 0.8
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.2
+surge = 0.4
+power = 0.6
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "6014454b-9fdc-4f6a-9dcf-20f908bc90f9"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.4
+submerge = 0.5
+surge = 0.85
+power = 0.5
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "885a7b29-82de-400b-b961-aff3df3c6ee0"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.85
+submerge = 0.3
+surge = 0
+power = 0.5
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "e1e7c403-251e-4db1-bd3b-5ee03124e681"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.2
+shatter = 0.7
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "5fc8b425-5170-4281-bcef-230d82af20f9"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.45
+submerge = 0.7
+surge = 0
+power = 0.3
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "ffbc62c3-4445-4b16-8829-3e7dca99ab21"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.5
+submerge = 0.7
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "fec40d51-abbe-49b2-bed3-ad4f7f8069a1"
+flash = 0
+awaken = 0.4
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.45
+submerge = 0.65
+surge = 0
+power = 0.6
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "fba9d90d-3e44-417e-bf25-1d1d4a2e81ce"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.5
+submerge = 0.7
+surge = 0
+power = 0.7
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "38147bfd-8410-4293-a952-e348258c0542"
+flash = 0.8
+awaken = 0.4
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.4
+power = 0.7
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "31d222f7-40c8-480d-82b0-d235f57d53c2"
+flash = 0.75
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.4
+surge = 0
+power = 0.5
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "5b2c6dca-8bb0-412e-87ef-d98ad31ad986"
+flash = 0.8
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.2
+surge = 0.5
+power = 0.6
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "9e15951e-c144-45de-9347-c054c58a74d1"
+flash = 0
+awaken = 0.3
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.6
+surge = 0.8
+power = 0.5
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "fdb9bb58-df8b-47ac-9d53-89d2ba4d0969"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.3
+submerge = 0.8
+surge = 0.5
+power = 0.5
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "97466d3a-452c-4991-8d6a-5ee3dae64d3e"
+flash = 0.2
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.4
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "d52909bf-0278-4e8a-b869-34399501c442"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.4
+commit = 0.7
+flex = 0.4
+
+[[card-metadata]]
+card-id = "2280b92e-4444-4655-b398-f5bfa458dc62"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.3
+endure = 0.5
+submerge = 0.8
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "1980e1bb-0c85-4e5f-8cac-66bd27d76499"
+flash = 0
+awaken = 0.6
+flicker = 0
+ignite = 0.5
+shatter = 0.45
+endure = 0.3
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "7e4ecad0-7688-4144-aef3-abf9adc0d2e6"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.6
+shatter = 0.8
+endure = 0.3
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "dd75b7d9-0861-4fa8-a882-8d0b4e104111"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.7
+shatter = 0.8
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "f2b7ec1f-8878-4658-a4ca-1277e02f01a5"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.6
+shatter = 0.7
+endure = 0
+submerge = 0
+surge = 0
+power = 0.4
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "0cce3648-d2a8-481c-8521-8565853f664a"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.45
+endure = 0.5
+submerge = 0.65
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "50e33ac4-d626-4094-89cb-555a2510a207"
+flash = 0
+awaken = 0
+flicker = 0.2
+ignite = 0.8
+shatter = 0.3
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "11294825-2521-4cd7-a95d-2c7843f73302"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.8
+endure = 0.7
+submerge = 0
+surge = 0
+power = 0.9
+commit = 0.3
+flex = 0.2
+
+[[card-metadata]]
+card-id = "5fe5a1ea-a98d-4332-9eaf-eabc627bc8e8"
+flash = 0.2
+awaken = 0.3
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.2
+surge = 0.8
+power = 0.4
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "eb47dd55-748f-44f8-9edc-3476182c4396"
+flash = 0
+awaken = 0.2
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.7
+submerge = 0.2
+surge = 0.7
+power = 0.5
+commit = 0.3
+flex = 0.5
+
+[[card-metadata]]
+card-id = "1f600865-4f4d-4d3a-82ed-b4b37a8bedb6"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.4
+shatter = 0.7
+endure = 0.4
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "12aedbb7-c14d-4a89-a9d9-ca4d7c557676"
+flash = 0.2
+awaken = 0.6
+flicker = 0
+ignite = 0.4
+shatter = 0.45
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.5
+flex = 0.6
+
+[[card-metadata]]
+card-id = "b696de0b-420a-4e2b-b1e7-adf9644a18e6"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.2
+shatter = 0.7
+endure = 0.5
+submerge = 0
+surge = 0
+power = 0.3
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "634c3afc-64f5-4203-8b53-4316dcc42bc0"
+flash = 0.5
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.8
+surge = 0
+power = 0.7
+commit = 0.4
+flex = 0.4
+
+[[card-metadata]]
+card-id = "a62ff9de-81ca-43b4-a37f-1b2b558e1cfb"
+flash = 0
+awaken = 0
+flicker = 0.2
+ignite = 0
+shatter = 0
+endure = 0.45
+submerge = 0.7
+surge = 0.5
+power = 0.5
+commit = 0.7
+flex = 0.4
+
+[[card-metadata]]
+card-id = "44f4ee06-8dbd-414e-b985-4a6434975e23"
+flash = 0.3
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.5
+submerge = 0.5
+surge = 0.8
+power = 0.5
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "2a446c01-a791-4a4a-9d19-5b84dd6d9582"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.8
+surge = 0.6
+power = 0.5
+commit = 0.3
+flex = 0.6
+
+[[card-metadata]]
+card-id = "2cf1bea9-6136-4626-a76e-39481978283a"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.8
+shatter = 0.3
+endure = 0
+submerge = 0
+surge = 0.5
+power = 0.6
+commit = 0.7
+flex = 0.4
+
+[[card-metadata]]
+card-id = "102c3047-58d9-4b2b-bea9-10739e84b9cd"
+flash = 0.5
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.5
+power = 0.4
+commit = 0.2
+flex = 0.8
+
+[[card-metadata]]
+card-id = "528ac63c-9928-4c8e-bfea-610b33c8b0d7"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.45
+endure = 0
+submerge = 0.7
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "62c9493d-6810-4cff-bd9d-2f8c65473ec7"
+flash = 0
+awaken = 0.85
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.4
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "e06f42fb-b7ec-401f-b374-76c889f697f2"
+flash = 0.3
+awaken = 0.8
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "4413a3c5-ef54-4253-b6fa-e8da64baf63f"
+flash = 0
+awaken = 0.7
+flicker = 0.6
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.4
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "ee0aa963-6b13-4dbe-adb4-314390c5c9b5"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.8
+shatter = 0.5
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "ceb89002-9bc0-4ec0-b719-2547fea597de"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.85
+shatter = 0.5
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "45914018-3210-4b1b-81a5-0a819e04df1a"
+flash = 0.2
+awaken = 0.8
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.5
+flex = 0.6
+
+[[card-metadata]]
+card-id = "65bebce3-fc49-4b89-833a-b6615cb43010"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "ec5a996e-6d43-48ca-adba-01fee6a64d4d"
+flash = 0.5
+awaken = 0.8
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.6
+
+[[card-metadata]]
+card-id = "f0079658-f08f-4d85-979c-63c9f75cffa1"
+flash = 0.8
+awaken = 0
+flicker = 0.4
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.4
+flex = 0.5
+
+[[card-metadata]]
+card-id = "d2306c6b-45de-4f67-8a47-ae13de98293e"
+flash = 0
+awaken = 0
+flicker = 0.8
+ignite = 0.5
+shatter = 0.5
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "77820028-b9be-4348-bb48-5052c3e0c2b9"
+flash = 0
+awaken = 0
+flicker = 0.8
+ignite = 0.5
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "c23462ee-cbc8-4c19-8013-b3bbef5beffb"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.8
+surge = 0
+power = 0.7
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "e264a35e-7c8a-4c67-9a63-b23f3416c196"
+flash = 0.2
+awaken = 0.9
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "766c488b-039c-4177-a8f7-135836e3294c"
+flash = 0.7
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.5
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "4e5101e3-4366-4a75-a89e-abf57266c868"
+flash = 0.7
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.4
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "640d798d-3100-49f7-bbe2-6c18d4b818f9"
+flash = 0.3
+awaken = 0
+flicker = 0.2
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.8
+power = 0.8
+commit = 0.3
+flex = 0.5
+
+[[card-metadata]]
+card-id = "c77ead7a-e7a4-4c92-819c-558bc26773f3"
+flash = 0
+awaken = 0.8
+flicker = 0
+ignite = 0.5
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "2f932c14-02cb-4c93-be06-03e067496cb6"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.6
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "cc5e770a-210d-4737-8aa7-6be7328b0dbd"
+flash = 0
+awaken = 0
+flicker = 0.5
+ignite = 0.7
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "45f33982-1994-47f1-a29c-8bc329f1fe2e"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.45
+submerge = 0.7
+surge = 0
+power = 0.6
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "ad9a9b5c-6dc9-4a89-b709-786b04988d3e"
+flash = 0
+awaken = 0.7
+flicker = 0
+ignite = 0.5
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "56f1e5d2-f15e-40e4-85de-f18607f4de4e"
+flash = 0.2
+awaken = 0
+flicker = 0.7
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.3
+surge = 0.5
+power = 0.7
+commit = 0.3
+flex = 0.6
+
+[[card-metadata]]
+card-id = "4c8e736b-312f-4196-9106-1f8983ee9fff"
+flash = 0
+awaken = 0.5
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.8
+power = 0.9
+commit = 0.2
+flex = 0.4
+
+[[card-metadata]]
+card-id = "71473ab1-a9c7-4d42-a5a7-163e9b31b0f5"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.7
+shatter = 0
+endure = 0
+submerge = 0.3
+surge = 0.5
+power = 0.6
+commit = 0.4
+flex = 0.5
+
+[[card-metadata]]
+card-id = "cb77c2ab-e325-4c6c-90c1-4bc8f03a6e66"
+flash = 0.2
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.6
+surge = 0.3
+power = 0.4
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "5a90acb3-a769-4369-8ef5-2cdc3ebc7c2d"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.5
+surge = 0.8
+power = 0.6
+commit = 0.5
+flex = 0.6
+
+[[card-metadata]]
+card-id = "80495b0d-de40-4ed5-b731-530b9b38b91e"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.45
+submerge = 0.7
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "efc06a7e-08ec-483f-a8ab-368c8b44fc43"
+flash = 0.4
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.9
+power = 0.9
+commit = 0.8
+flex = 0.2
+
+[[card-metadata]]
+card-id = "cd0d7da1-d3bc-4978-860d-42ce4bd38772"
+flash = 0.5
+awaken = 0
+flicker = 0
+ignite = 0.3
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.4
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "e55f98a9-2be2-4760-b527-d7edf1d8b585"
+flash = 0.2
+awaken = 0
+flicker = 0
+ignite = 0.8
+shatter = 0.4
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "029e7b87-fa96-4c0c-abdd-1c8b532f0477"
+flash = 0.6
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0.45
+endure = 0.2
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "d593a1be-dfb4-407c-8196-fabeff1782b7"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.2
+endure = 0.9
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "69303728-9443-4864-86bf-4f748959fa63"
+flash = 0.2
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.2
+submerge = 0.5
+surge = 0
+power = 0.7
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "a99a5101-0fe3-43cd-a63b-44f6aba62682"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.3
+shatter = 0.7
+endure = 0
+submerge = 0
+surge = 0.5
+power = 0.8
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "bdc25d3c-46d9-4452-85b8-866842fe45a4"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.7
+surge = 0.5
+power = 0.5
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "521f2592-3539-47fc-b0c9-f236ad06b29c"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.2
+shatter = 0.7
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "678733f0-1685-40fe-84c4-629bb07fcb55"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0.45
+endure = 0
+submerge = 0
+surge = 0.6
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "cdc462cd-4760-4d15-bc88-a7d4fa7b2368"
+flash = 0.5
+awaken = 0
+flicker = 0
+ignite = 0.3
+shatter = 0.7
+endure = 0.7
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "f99b3bed-a138-46a9-9ab2-d3fe009e1fdf"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "7e99eb50-6019-4dd7-8d9c-439a88a52465"
+flash = 0.3
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0
+endure = 0
+submerge = 0.7
+surge = 0
+power = 0.5
+commit = 0.5
+flex = 0.6
+
+[[card-metadata]]
+card-id = "d2068cd9-e8d8-43c2-86b8-20d052e81252"
+flash = 0.7
+awaken = 0
+flicker = 0
+ignite = 0.3
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.5
+power = 0.7
+commit = 0.4
+flex = 0.7
+
+[[card-metadata]]
+card-id = "1105e04f-a048-4ac3-a144-632995663865"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.4
+submerge = 0.7
+surge = 0.3
+power = 0.5
+commit = 0.4
+flex = 0.7
+
+[[card-metadata]]
+card-id = "378061fa-6376-48d9-afd7-1463a8305194"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.3
+submerge = 0.5
+surge = 0.8
+power = 0.8
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "b7f308e2-d674-4e8b-9e01-e6efb15f0ca2"
+flash = 0
+awaken = 0
+flicker = 0.3
+ignite = 0.5
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.9
+power = 0.8
+commit = 0.7
+flex = 0.2
+
+[[card-metadata]]
+card-id = "1824049c-8af9-4dc3-94e6-09ac90c1ee85"
+flash = 0
+awaken = 0.3
+flicker = 0.8
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.5
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "38497b91-779d-4ad5-b773-6ce53326549c"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.3
+endure = 0.5
+submerge = 0.8
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "b2ae8947-1fca-47b7-9b93-4454584fead3"
+flash = 0
+awaken = 0.8
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "d610b91d-61c3-494f-8cf5-ab37847fa171"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "018c304f-90b1-4365-8568-8f527279b703"
+flash = 0
+awaken = 0.7
+flicker = 0
+ignite = 0
+shatter = 0.7
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "c2a48aa4-c818-4551-af44-f29b865f5d1c"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.5
+submerge = 0.7
+surge = 0.3
+power = 0.7
+commit = 0.4
+flex = 0.5
+
+[[card-metadata]]
+card-id = "cc0151d5-916c-417f-be4e-38e0659d0e2f"
+flash = 0
+awaken = 0.7
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.5
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "e0c31872-0a57-4805-96a9-9c46a3addb5e"
+flash = 0.2
+awaken = 0.7
+flicker = 0.3
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "82f87087-9da1-401d-aab1-8c5fcda03338"
+flash = 0
+awaken = 0.8
+flicker = 0.5
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "cb30a53c-fce2-4048-b808-6ef106c9e054"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0.7
+endure = 0
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "a3f91057-ef7a-44e7-8183-d3a06d5e2884"
+flash = 0
+awaken = 0.8
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "4b39e1f0-418d-45f7-923d-3ea629e55e11"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.6
+shatter = 0.8
+endure = 0
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "0ec9bbca-a3de-43b0-b64a-4b94c4b14e2c"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.7
+submerge = 0.6
+surge = 0
+power = 0.6
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "44cb7de5-4d8a-479e-af0e-b88e47f60cee"
+flash = 0.5
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.45
+endure = 0
+submerge = 0
+surge = 0.6
+power = 0.7
+commit = 0.4
+flex = 0.5
+
+[[card-metadata]]
+card-id = "41b097e9-44b5-4c61-8977-6a05a8e61dee"
+flash = 0
+awaken = 0.6
+flicker = 0
+ignite = 0
+shatter = 0.8
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "9e88669a-c0a7-4d5c-b871-d7dd1aac072f"
+flash = 0
+awaken = 0.3
+flicker = 0
+ignite = 0.7
+shatter = 0
+endure = 0.3
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.7
+flex = 0.4
+
+[[card-metadata]]
+card-id = "865e8aa9-4e20-469e-9ef6-c5329896fd53"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.7
+endure = 0.5
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "8c2de60e-1e06-4563-acf9-beb76a2620c2"
+flash = 0
+awaken = 0.4
+flicker = 0
+ignite = 0.8
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.8
+flex = 0.3
+
+[[card-metadata]]
+card-id = "46736de7-6b44-4d3e-90a7-c7c9146c521f"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "bd2b91a1-2bb1-4ec2-8254-3a22a438bc66"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.2
+shatter = 0.7
+endure = 0.7
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "c5785c16-b3bf-4b85-af06-5b719c6d9891"
+flash = 0
+awaken = 0
+flicker = 0.7
+ignite = 0
+shatter = 0.45
+endure = 0
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.4
+flex = 0.5
+
+[[card-metadata]]
+card-id = "57e41821-b153-4a0a-9b25-3c77e773fede"
+flash = 0
+awaken = 0.5
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.7
+power = 0.3
+commit = 0.3
+flex = 0.8
+
+[[card-metadata]]
+card-id = "fe663f4c-593d-42a2-9fa2-a2bf3560eb46"
+flash = 0
+awaken = 0.8
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.5
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "2d90a022-7149-43b8-8b19-3cb3842b5bfe"
+flash = 0
+awaken = 0.5
+flicker = 0.6
+ignite = 0
+shatter = 0.4
+endure = 0.5
+submerge = 0
+surge = 0
+power = 0.3
+commit = 0.6
+flex = 0.6
+
+[[card-metadata]]
+card-id = "e71ac2d1-8d45-479d-81db-3127860ba498"
+flash = 0
+awaken = 0.8
+flicker = 0.2
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.5
+power = 0.7
+commit = 0.4
+flex = 0.4
+
+[[card-metadata]]
+card-id = "daa30155-1b40-42ff-b5b6-0745ad9d4277"
+flash = 0
+awaken = 0.5
+flicker = 0
+ignite = 0
+shatter = 0.7
+endure = 0.2
+submerge = 0
+surge = 0
+power = 0.4
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "0bf69801-fab9-4459-9eef-4c57eae90b02"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.7
+endure = 0.7
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "b3908e49-4a7a-4034-8a25-5e592246c5e5"
+flash = 0
+awaken = 0
+flicker = 0.4
+ignite = 0.7
+shatter = 0.2
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "38a48538-dab4-41dd-951e-2b88e938f046"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.7
+shatter = 0.5
+endure = 0
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.5
+flex = 0.3
+
+[[card-metadata]]
+card-id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+flash = 0
+awaken = 0
+flicker = 0.2
+ignite = 0.8
+shatter = 0.4
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "5aad0a6c-81d2-417a-8442-9490191b526e"
+flash = 0.5
+awaken = 0
+flicker = 0.6
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "98a49295-1ad6-4c6a-bb78-659bfedeec21"
+flash = 0
+awaken = 0.5
+flicker = 0.85
+ignite = 0.2
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "9065b009-6ae3-4138-b5a0-1204a69abc00"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.2
+submerge = 0.7
+surge = 0
+power = 0.7
+commit = 0.3
+flex = 0.5
+
+[[card-metadata]]
+card-id = "9c9892a6-b472-497c-83b8-fe3460349743"
+flash = 0.6
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0.45
+endure = 0.2
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "e4196e79-c4f1-406c-8b9e-90a7323ae85e"
+flash = 0.2
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.45
+submerge = 0.7
+surge = 0
+power = 0.4
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "9b592dd0-8f54-4177-baf7-3743e1eef3d2"
+flash = 0
+awaken = 0
+flicker = 0.7
+ignite = 0.2
+shatter = 0.45
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.4
+flex = 0.5
+
+[[card-metadata]]
+card-id = "a374adac-d42d-4635-b68b-d2e55e65df3c"
+flash = 0
+awaken = 0
+flicker = 0.5
+ignite = 0.7
+shatter = 0.2
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "d09f9ec0-02e0-4ce3-9281-b6d833e208c5"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.6
+shatter = 0.7
+endure = 0.2
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "9e29bb8c-2faf-4964-be86-006883c8d539"
+flash = 0.7
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.2
+endure = 0.45
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "c9ec2950-f87e-4041-a50d-cd0fb85217f0"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.2
+endure = 0.45
+submerge = 0.7
+surge = 0
+power = 0.8
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "05b21b36-09ff-461f-94a8-009b5140ee80"
+flash = 0.6
+awaken = 0.7
+flicker = 0.3
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "e2a9fa5d-20c8-4aee-992c-d956e18c1e41"
+flash = 0
+awaken = 0.4
+flicker = 0.5
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.7
+power = 0.7
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "57bbd496-8674-4931-a5b3-15899a0846e1"
+flash = 0
+awaken = 0.5
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.45
+submerge = 0
+surge = 0.6
+power = 0.3
+commit = 0.3
+flex = 0.8
+
+[[card-metadata]]
+card-id = "94dd55b1-2fea-4656-a834-25079e252d04"
+flash = 0
+awaken = 0
+flicker = 0.3
+ignite = 0.8
+shatter = 0.4
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "c9154c8a-1538-47a6-94d6-a3638a24d58c"
+flash = 0.3
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0.8
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "f1e4afd2-cb16-454a-a11b-f2e5ede8d46b"
+flash = 0
+awaken = 0
+flicker = 0.8
+ignite = 0.3
+shatter = 0.5
+endure = 0
+submerge = 0
+surge = 0
+power = 0.4
+commit = 0.3
+flex = 0.8
+
+[[card-metadata]]
+card-id = "e8555cdd-6c83-472c-a269-3317005e5703"
+flash = 0
+awaken = 0.5
+flicker = 0
+ignite = 0.6
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.4
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "4c1b4afa-6ae8-4966-b9c2-66f483485245"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.85
+endure = 0.4
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.7
+flex = 0.2
+
+[[card-metadata]]
+card-id = "2e61277e-9bf6-4ced-a137-8248b5f341fc"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.7
+shatter = 0.4
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "16771c40-46a9-4122-b5e1-a80f3912d99e"
+flash = 0.6
+awaken = 0
+flicker = 0
+ignite = 0.3
+shatter = 0.5
+endure = 0.45
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "ac839892-f6bc-44c3-8306-a7f02db08679"
+flash = 0
+awaken = 0
+flicker = 0.8
+ignite = 0
+shatter = 0.4
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "45eaba8d-8f3e-4f65-9c31-30565988e804"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.6
+shatter = 0.8
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "cc30f664-bf0a-48ea-9b91-6308b442fdec"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.7
+flex = 0.4
+
+[[card-metadata]]
+card-id = "ebfd5a60-8a65-4450-9759-c102ff678069"
+flash = 0.6
+awaken = 0
+flicker = 0
+ignite = 0.4
+shatter = 0.45
+endure = 0
+submerge = 0
+surge = 0.4
+power = 0.6
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "12bdc762-59ec-481a-9936-8c5327ae7c09"
+flash = 0.6
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0.45
+endure = 0
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "000dc7ca-546e-489c-b0ea-8bfcdd92bf75"
+flash = 0.7
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.6
+power = 0.8
+commit = 0.3
+flex = 0.5
+
+[[card-metadata]]
+card-id = "c996cacb-1d18-4281-b695-42cee67278a8"
+flash = 0.8
+awaken = 0.5
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.6
+
+[[card-metadata]]
+card-id = "2555ec68-c322-42f6-9fba-27a09e59c7c9"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.7
+endure = 0.6
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "86abaf83-6880-4d33-bb2f-e3a9867cf9de"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.4
+surge = 0.6
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "b964cd06-967a-4f65-95ea-46fd698713f4"
+flash = 0
+awaken = 0
+flicker = 0.65
+ignite = 0
+shatter = 0.45
+endure = 0.6
+submerge = 0
+surge = 0
+power = 0.4
+commit = 0.5
+flex = 0.6
+
+[[card-metadata]]
+card-id = "47c59376-dc4b-46d7-ba97-44db55e9d523"
+flash = 0.5
+awaken = 0
+flicker = 0.6
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "fa780152-23dd-4138-8ff7-3083e46fc2bb"
+flash = 0.2
+awaken = 0.5
+flicker = 0.7
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.4
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "c0f7a075-a5a5-4383-8487-07f9788a623c"
+flash = 0
+awaken = 0
+flicker = 0.8
+ignite = 0
+shatter = 0
+endure = 0.2
+submerge = 0.4
+surge = 0
+power = 0.5
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "b98869d1-3498-4c00-a140-1c305ad86b5f"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.3
+endure = 0.85
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "6c44da89-75f8-48a7-a1be-d4a6cc3fd66e"
+flash = 0.5
+awaken = 0.7
+flicker = 0.3
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "19aac5e2-357c-4a50-8ef1-f40aa880a4c4"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.45
+submerge = 0
+surge = 0.6
+power = 0.7
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "e1853b83-8b3f-4f90-96aa-19cc45f696fe"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.6
+endure = 0.7
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "801864d7-de84-44ee-b225-ded9ac7c6233"
+flash = 0.6
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0.45
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "a1df8763-d714-4cfe-8290-a63dbe2c6871"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.6
+shatter = 0.7
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "72b9b786-c098-4e96-95f2-e9eabfd010a0"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.5
+submerge = 0.7
+surge = 0
+power = 0.5
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "f6ccb2d8-663e-4c9b-830b-79b2ddc89f79"
+flash = 0
+awaken = 0
+flicker = 0.5
+ignite = 0.8
+shatter = 0.2
+endure = 0
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "72d3cda9-1140-4427-8e16-093226f7ac1b"
+flash = 0.2
+awaken = 0.7
+flicker = 0.6
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "7a6c19ca-bbc0-4393-ac88-8f6003d33da7"
+flash = 0.7
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.2
+submerge = 0
+surge = 0.5
+power = 0.3
+commit = 0.7
+flex = 0.4
+
+[[card-metadata]]
+card-id = "aba94351-4486-4710-ac3d-ae9e29279ac0"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.8
+endure = 0.7
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.3
+flex = 0.3
+
+[[card-metadata]]
+card-id = "a9c4db29-be96-467a-9b4b-b0bb0f779def"
+flash = 0
+awaken = 0
+flicker = 0.2
+ignite = 0.8
+shatter = 0.5
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "e4087594-d3b3-42eb-9db3-07274f767eda"
+flash = 0.8
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.2
+power = 0.6
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "6bdf06f6-b6aa-48b2-9a8a-b29bc3a56aeb"
+flash = 0
+awaken = 0.5
+flicker = 0
+ignite = 0.8
+shatter = 0.3
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "6c405dbe-5eed-48a7-99ed-1425fa7b8d33"
+flash = 0.3
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.6
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "e70d155c-c561-4d0f-aff6-fc219e221017"
+flash = 0
+awaken = 0.3
+flicker = 0.8
+ignite = 0.2
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.6
+
+[[card-metadata]]
+card-id = "22a259a2-c721-4d98-94c0-5a9de3d7afe3"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.8
+shatter = 0.5
+endure = 0
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.4
+flex = 0.3
+
+[[card-metadata]]
+card-id = "77bae5b0-ad0a-4b51-b211-141e95b3862a"
+flash = 0.7
+awaken = 0
+flicker = 0.6
+ignite = 0.4
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.7
+
+[[card-metadata]]
+card-id = "91a34bf7-a856-498d-ba6a-c866494176ce"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.8
+shatter = 0.5
+endure = 0
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "ecd53ca5-f250-4402-a686-c51148e1e3b8"
+flash = 0.7
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.5
+power = 0.6
+commit = 0.3
+flex = 0.6
+
+[[card-metadata]]
+card-id = "aa399f47-2025-4539-ac69-a6bca90e2786"
+flash = 0
+awaken = 0
+flicker = 0.6
+ignite = 0
+shatter = 0.45
+endure = 0.5
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.4
+flex = 0.5
+
+[[card-metadata]]
+card-id = "27474cc8-5c37-453e-aa2d-b03e1931a74b"
+flash = 0
+awaken = 0
+flicker = 0.5
+ignite = 0
+shatter = 0.3
+endure = 0
+submerge = 0
+surge = 0
+power = 0.9
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "063190f6-7723-44f3-bdb4-59f4037faea3"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.4
+endure = 0
+submerge = 0
+surge = 0.4
+power = 0.8
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "4c45be08-290c-4129-9238-897cd73b7279"
+flash = 0.3
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.5
+surge = 0.7
+power = 0.6
+commit = 0.3
+flex = 0.6
+
+[[card-metadata]]
+card-id = "a81e4891-9545-4263-a5cf-29d44cb08dd3"
+flash = 0.7
+awaken = 0
+flicker = 0.3
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.6
+power = 0.8
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "eef822ee-7226-4b70-85ce-d0d61780e186"
+flash = 0.4
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.3
+surge = 0.7
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "90e97e94-2d89-4c25-b4ab-23d469b9a723"
+flash = 0.8
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.4
+flex = 0.5
+
+[[card-metadata]]
+card-id = "36eb38d7-c57f-4c60-8b7a-21d4e955728e"
+flash = 0
+awaken = 0
+flicker = 0.8
+ignite = 0.5
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.2
+power = 0.7
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "c235b54e-e55b-4868-92b6-1473e77f3f7c"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.45
+submerge = 0.7
+surge = 0.4
+power = 0.9
+commit = 0.7
+flex = 0.2
+
+[[card-metadata]]
+card-id = "e0889e66-ab8c-4851-a909-b2bf9fc8ae55"
+flash = 0.4
+awaken = 0.5
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.5
+power = 0.6
+commit = 0.3
+flex = 0.6
+
+[[card-metadata]]
+card-id = "1cf26e51-dd11-4ad0-85d9-42c324a65e2e"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.7
+endure = 0.7
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.7
+flex = 0.2
+
+[[card-metadata]]
+card-id = "c589cabf-bc08-4527-9ab8-d9d9a622ad8c"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.5
+surge = 0.4
+power = 0.6
+commit = 0.3
+flex = 0.6
+
+[[card-metadata]]
+card-id = "17c95d25-fdc4-477c-ac98-92b2b2c1829b"
+flash = 0.5
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.2
+flex = 0.5
+
+[[card-metadata]]
+card-id = "13f442b2-2bf2-4305-87a3-9dcd141cf578"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.2
+surge = 0.7
+power = 0.7
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "f4205a7a-16db-4886-a094-06f974a01111"
+flash = 0.4
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "ef905bc3-6602-4b61-83bd-1b223cd5c5a2"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.7
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.4
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "05b4c64a-8eb3-4a09-a37f-5c205d734850"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.45
+endure = 0
+submerge = 0.7
+surge = 0
+power = 0.8
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "4bb1b10b-c1a5-48b0-909a-a405e241443e"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.45
+submerge = 0.7
+surge = 0
+power = 0.7
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "801e53f1-fa99-4ed9-abc9-2c02e07acb1e"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.8
+endure = 0.5
+submerge = 0
+surge = 0
+power = 0.9
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "2eefb602-7236-4256-b2c8-5be725c0c2a0"
+flash = 0.5
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.8
+power = 0.9
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "b461e967-7ff3-4f99-898e-67c33ad1e723"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "e4c24242-619c-4dd1-862f-edf988e1d6cc"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.7
+surge = 0.5
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "3002b466-fe0e-4237-b686-bd1c98235fad"
+flash = 0.5
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.7
+power = 0.7
+commit = 0.4
+flex = 0.5
+
+[[card-metadata]]
+card-id = "29229288-b647-4ca8-b866-f42c983269cc"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.7
+surge = 0.3
+power = 0.5
+commit = 0.3
+flex = 0.7
+
+[[card-metadata]]
+card-id = "c84bf4e3-7cb5-4825-927a-3b87fcc5e92a"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.6
+surge = 0.8
+power = 0.8
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "a1a7dbe9-a5b7-42cc-ab4f-615fa4edcbff"
+flash = 0
+awaken = 0.7
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.4
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "2fe66e67-6d99-472b-9edf-982bda562df7"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.8
+surge = 0.4
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "945a1ebb-4e22-462c-8db4-a3fe445dcc8d"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.7
+surge = 0.5
+power = 0.6
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "ac83cf04-f3c8-4c0d-aa05-98c142d2c322"
+flash = 0.6
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.5
+surge = 0.7
+power = 0.7
+commit = 0.4
+flex = 0.5
+
+[[card-metadata]]
+card-id = "d701aad1-2ecd-4b08-a4b7-962022907ae2"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0.45
+endure = 0
+submerge = 0
+surge = 0.6
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "9ae541d8-2c1b-4a29-8193-d5e6d0b7fb5d"
+flash = 0.7
+awaken = 0
+flicker = 0.5
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.3
+flex = 0.5
+
+[[card-metadata]]
+card-id = "b4877df2-cbc8-41ea-b021-c778b0c3c55a"
+flash = 0.6
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.8
+power = 0.9
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "6a23256e-8dff-4b37-a8bd-6e6b744c74a9"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.5
+shatter = 0.6
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.3
+flex = 0.6
+
+[[card-metadata]]
+card-id = "d8d6cd28-141d-4bab-b0cb-bac4d7423e4a"
+flash = 0.5
+awaken = 0.8
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.4
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "e1a60439-1741-4f27-971f-986a16130bf7"
+flash = 0
+awaken = 0.5
+flicker = 0
+ignite = 0.7
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.7
+flex = 0.4
+
+[[card-metadata]]
+card-id = "4737eeb2-c564-4ae3-a409-ae3472f9fc11"
+flash = 0
+awaken = 0.8
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.4
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "d0396d8f-e880-4176-be09-c3c7434f3c02"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.8
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "ba4c4948-efa4-4388-8567-d329538f1594"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.7
+submerge = 0.6
+surge = 0
+power = 0.5
+commit = 0.5
+flex = 0.6
+
+[[card-metadata]]
+card-id = "73d0d323-bf47-4d73-9c17-6bebe8b3622e"
+flash = 0
+awaken = 0.8
+flicker = 0
+ignite = 0
+shatter = 0.2
+endure = 0.5
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.3
+flex = 0.3
+
+[[card-metadata]]
+card-id = "c7840f3b-3297-4409-b124-4309ed93e542"
+flash = 0
+awaken = 0.5
+flicker = 0
+ignite = 0.8
+shatter = 0
+endure = 0.2
+submerge = 0
+surge = 0
+power = 0.9
+commit = 0.7
+flex = 0.2
+
+[[card-metadata]]
+card-id = "9c02bbbb-8c55-486a-9742-4d3a14f90545"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.7
+shatter = 0.3
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "c8554288-6676-4738-a27e-d58180d5d4db"
+flash = 0
+awaken = 0
+flicker = 0.7
+ignite = 0
+shatter = 0.2
+endure = 0.45
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.5
+flex = 0.7
+
+[[card-metadata]]
+card-id = "11f31879-cc52-44ee-bbdf-74fb2d830dab"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0.8
+shatter = 0.6
+endure = 0.3
+submerge = 0
+surge = 0
+power = 0.9
+commit = 0.5
+flex = 0.2
+
+[[card-metadata]]
+card-id = "53b9b423-156b-4e70-888b-107fe7ecce5b"
+flash = 0
+awaken = 0.9
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.4
+submerge = 0.3
+surge = 0.6
+power = 0.8
+commit = 0.3
+flex = 0.3
+
+[[card-metadata]]
+card-id = "0382ee13-69bc-4e2a-b9da-e85d2f124779"
+flash = 0
+awaken = 0.6
+flicker = 0
+ignite = 0.3
+shatter = 0.8
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "b0b4de61-336a-4cb1-94f0-4ce558df5bd5"
+flash = 0
+awaken = 0.3
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.9
+commit = 0.6
+flex = 0.2
+
+[[card-metadata]]
+card-id = "5f0cd400-31d7-4321-aae2-dd970758c99a"
+flash = 0.3
+awaken = 0.9
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.9
+commit = 0.5
+flex = 0.1
+
+[[card-metadata]]
+card-id = "c3c85607-f0fb-4c66-ab98-6dbdc7c8d5ef"
+flash = 0.5
+awaken = 0.8
+flicker = 0.3
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.3
+commit = 0.2
+flex = 0.8
+
+[[card-metadata]]
+card-id = "a3850a56-0159-4205-8035-3a3f26b561d1"
+flash = 0.8
+awaken = 0.5
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "cf62737a-9bee-44f4-8e26-8c7d0387f39b"
+flash = 0.5
+awaken = 0.8
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.4
+commit = 0.5
+flex = 0.7
+
+[[card-metadata]]
+card-id = "084cfbdf-1263-4be2-b56a-ff5dbc801ba0"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0.3
+submerge = 0.7
+surge = 0.7
+power = 0.6
+commit = 0.5
+flex = 0.5
+
+[[card-metadata]]
+card-id = "396882b8-7e8c-4759-8b56-d3e15de8f07e"
+flash = 0.5
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.3
+power = 0.6
+commit = 0.4
+flex = 0.8
+
+[[card-metadata]]
+card-id = "70306c8a-a77c-4d07-a4f8-abb51704be8c"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.4
+surge = 0.8
+power = 0.7
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "18b1d155-a89a-4f37-87c4-644ff83c16ef"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.7
+endure = 0.8
+submerge = 0
+surge = 0
+power = 0.9
+commit = 0.7
+flex = 0.3
+
+[[card-metadata]]
+card-id = "29a1b50f-2dce-480b-841f-528a6817b462"
+flash = 0.8
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.4
+power = 0.7
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "3d9919e3-de73-43a9-9168-573be50a7479"
+flash = 0.5
+awaken = 0
+flicker = 0.7
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.4
+flex = 0.6
+
+[[card-metadata]]
+card-id = "b6864d2c-b922-4aa3-ad55-643ca4b88d9e"
+flash = 0
+awaken = 0.5
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.8
+surge = 0
+power = 0.7
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "3a7a69c5-eb6d-4874-a016-97a9a618ee03"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0.4
+endure = 0.5
+submerge = 0
+surge = 0.6
+power = 0.5
+commit = 0.7
+flex = 0.4
+
+[[card-metadata]]
+card-id = "3382a698-67f8-4642-9428-2547a3e03931"
+flash = 0
+awaken = 0
+flicker = 0.7
+ignite = 0.5
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.3
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "bb4990d2-7fc4-492a-88b3-12022292e0df"
+flash = 0
+awaken = 0
+flicker = 0.7
+ignite = 0.5
+shatter = 0
+endure = 0.3
+submerge = 0
+surge = 0
+power = 0.8
+commit = 0.6
+flex = 0.3
+
+[[card-metadata]]
+card-id = "a6e4bc2e-8f67-411f-9c21-94b625156af1"
+flash = 0
+awaken = 0.2
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.6
+
+[[card-metadata]]
+card-id = "6a96b4ba-892c-4ee7-86d3-83bccb8dd66d"
+flash = 0
+awaken = 0
+flicker = 0.65
+ignite = 0.5
+shatter = 0
+endure = 0.45
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.7
+flex = 0.4
+
+[[card-metadata]]
+card-id = "67cc1fd0-e41d-44d8-9d62-1150ba0e6148"
+flash = 0.4
+awaken = 0.3
+flicker = 0
+ignite = 0.7
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.7
+flex = 0.4
+
+[[card-metadata]]
+card-id = "97eaacbe-bd52-4ef1-b7d2-b553a06db48b"
+flash = 0.5
+awaken = 0.7
+flicker = 0.4
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0.3
+power = 0.8
+commit = 0.4
+flex = 0.5
+
+[[card-metadata]]
+card-id = "c18a231f-7e84-4569-a492-11b6a58ebf25"
+flash = 0.3
+awaken = 0.7
+flicker = 0.5
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.6
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "0fc24a42-0ab3-4da0-a6bf-ff0a18203f35"
+flash = 0
+awaken = 0
+flicker = 0.8
+ignite = 0
+shatter = 0
+endure = 0.4
+submerge = 0
+surge = 0.3
+power = 0.7
+commit = 0.6
+flex = 0.4
+
+[[card-metadata]]
+card-id = "c4d6affd-7608-415d-8a22-d0ccf86681d6"
+flash = 0
+awaken = 0.8
+flicker = 0
+ignite = 0
+shatter = 0.5
+endure = 0
+submerge = 0
+surge = 0
+power = 0.7
+commit = 0.5
+flex = 0.4
+
+[[card-metadata]]
+card-id = "91b9b0ad-af62-439f-9b68-15eaa0221fe9"
+flash = 0
+awaken = 0
+flicker = 0
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0.5
+surge = 0.7
+power = 0.5
+commit = 0.6
+flex = 0.5
+
+[[card-metadata]]
+card-id = "963064ca-b422-49c5-b2af-56a8429b4a63"
+flash = 0
+awaken = 0.8
+flicker = 0.7
+ignite = 0
+shatter = 0
+endure = 0
+submerge = 0
+surge = 0
+power = 0.5
+commit = 0.7
+flex = 0.4
+
 [metadata]
 schema_version = 1
 

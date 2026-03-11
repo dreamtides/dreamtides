@@ -3451,6 +3451,4319 @@ subtype = ""
 spark = ""
 "rendered text" = "Draw a card."
 
+[[cards]]
+name = "Veil of the Unbound"
+id = "4bf0723b-ff81-4748-8253-a6b3540110e2"
+energy-cost = 3
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 2
+image-number = 3746317213
+rarity = "Uncommon"
+art-owned = false
+card-number = 223
+resonance = ["Tide"]
+"rendered text" = "▸ Materialized: Banish an enemy with cost 3● or less until this character leaves play."
+
+[[cards]]
+name = "Dread Beneath the Ice"
+id = "a9d5a6b0-e6fe-4f34-b955-4e5129c1ab0f"
+energy-cost = 2
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 0
+image-number = 9697354961
+rarity = "Rare"
+art-owned = false
+card-number = 224
+resonance = ["Tide"]
+"rendered text" = """
+When you play 4 events, this character gains +6 spark.
+
+▸ Dissolved: Return all enemies to hand."""
+
+[[cards]]
+name = "Whisper of the Bound Dark"
+id = "5bfed3c9-cd1b-4fe7-a40b-dcec654db206"
+energy-cost = 2
+card-type = "Character"
+subtype = "Visitor"
+is-fast = false
+spark = 1
+image-number = 2181241943
+rarity = "Uncommon"
+art-owned = false
+card-number = 225
+resonance = ["Tide"]
+"rendered text" = "▸ Materialized: Banish a chosen card from the opponent's hand until this character leaves play."
+
+[[cards]]
+name = "Glacial Warden"
+id = "a2a3c102-4dc9-4dc2-9058-412e877c958e"
+energy-cost = 3
+card-type = "Character"
+subtype = "Mage"
+is-fast = true
+spark = 1
+image-number = 1958682846
+rarity = "Uncommon"
+art-owned = false
+card-number = 226
+resonance = ["Tide"]
+"rendered text" = """
+▸ Materialized: Banish an enemy until this character leaves play.
+
+Abandon this character: Foresee 2."""
+
+[[cards]]
+name = "Veil of Unmaking"
+id = "78e2c238-58c7-4bd7-b8f2-5415eda2f6cb"
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+is-fast = true
+spark = 2
+image-number = 4163119785
+rarity = "Rare"
+art-owned = false
+card-number = 227
+resonance = ["Tide"]
+"rendered text" = """
+Banish a card from hand: Play this character for 0●, then abandon it.
+
+▸ Materialized: Return an enemy to hand."""
+
+[[cards]]
+name = "Elegy of the Torn Mind"
+id = "c9862d86-5a1f-46c1-b45a-0c2549eb5b25"
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 3
+image-number = 9963334018
+rarity = "Rare"
+art-owned = false
+card-number = 228
+resonance = ["Tide"]
+"rendered text" = """
+Banish a card from hand: Play this character for 0●, then abandon it.
+
+▸ Materialized: Discard a chosen card from the opponent's hand."""
+
+[[cards]]
+name = "Tempest Incarnate"
+id = "25ee7d34-d1b0-4164-b0c2-e07e15c8d4cd"
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 3
+image-number = 2812140441
+rarity = "Rare"
+art-owned = false
+card-number = 229
+resonance = ["Flame"]
+"rendered text" = """
+Banish a card from hand: Play this character for 0●, then abandon it.
+
+▸ Materialized: Dissolve an enemy with spark 2 or less."""
+
+[[cards]]
+name = "Worldshaker"
+id = "af53173c-e091-4064-a7a7-854cecfe4820"
+energy-cost = 8
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 5
+image-number = 1127978094
+rarity = "Rare"
+art-owned = false
+card-number = 230
+resonance = ["Stone"]
+"rendered text" = """
+▸ Materialized: Banish an enemy until this character leaves play.
+
+▸ Dissolved: Reclaim this character."""
+
+[[cards]]
+name = "Shroudweaver of Still Water"
+id = "1a25ed29-5681-4d13-9752-aeb3628c190c"
+energy-cost = 1
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 0
+image-number = 1939042955
+rarity = "Uncommon"
+art-owned = false
+card-number = 231
+resonance = ["Tide"]
+"rendered text" = "↯fast -- Abandon an ally: Prevent a played event which could dissolve an ally."
+
+[[cards]]
+name = "Lantern of Patient Hours"
+id = "a370f303-8fe2-4748-9b0b-f24fcde9b1a9"
+energy-cost = 1
+card-type = "Character"
+subtype = "Detective"
+is-fast = false
+spark = 1
+image-number = 9703905715
+rarity = "Common"
+art-owned = false
+card-number = 232
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: You may pay 2● to draw a card."
+
+[[cards]]
+name = "Watcher of the Next Wave"
+id = "e6ad4cf5-b8dd-4eb0-b713-2a9db71c866e"
+energy-cost = 1
+card-type = "Character"
+subtype = "Visionary"
+is-fast = false
+spark = 1
+image-number = 8448060707
+rarity = "Common"
+art-owned = false
+card-number = 233
+resonance = ["Tide"]
+"rendered text" = "▸ Materialized, Judgment: Foresee 1."
+
+[[cards]]
+name = "Murmur of the Shallows"
+id = "91709429-7457-4897-bde1-f9fa9d39a568"
+energy-cost = 1
+card-type = "Character"
+subtype = "Visionary"
+is-fast = false
+spark = 0
+image-number = 6037168737
+rarity = "Common"
+art-owned = false
+card-number = 234
+resonance = ["Thunder"]
+"rendered text" = """
+▸ Materialized: Foresee 1.
+
+▸ Judgment: Gain 1●."""
+
+[[cards]]
+name = "Weaver of Rising Stars"
+id = "3a80421b-735a-4a15-bbe0-ff82bdb6d7fc"
+energy-cost = 2
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 1
+image-number = 1808308511
+rarity = "Common"
+art-owned = false
+card-number = 235
+resonance = ["Thunder"]
+"rendered text" = "When you materialize an ally, kindle 1."
+
+[[cards]]
+name = "Dawnsong Matriarch"
+id = "5a596f0b-8bb8-4d00-bf41-1d2fd272b86e"
+energy-cost = 3
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 2
+image-number = 7771803321
+rarity = "Common"
+art-owned = false
+card-number = 236
+resonance = ["Stone"]
+"rendered text" = "When you materialize an ally, that ally gains +1 spark."
+
+[[cards]]
+name = "Tomb-Warden of Broken Things"
+id = "3f721176-1c77-43e3-a2f3-9e6d93a5a20a"
+energy-cost = 2
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 0
+image-number = 2974765273
+rarity = "Uncommon"
+art-owned = false
+card-number = 237
+resonance = ["Stone"]
+"rendered text" = """
+▸ Judgment: You may banish a card from the opponent's void. If it was a character, this character gains +1 spark.
+"""
+
+[[cards]]
+name = "Ember of the First Dawn"
+id = "8c16cd05-1925-4df1-ac08-86c3d84c45ee"
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 1
+image-number = 7821958180
+rarity = "Common"
+art-owned = false
+card-number = 238
+resonance = ["Stone"]
+"rendered text" = "▸ Judgment: Kindle 1."
+
+[[cards]]
+name = "Ember of Discarded Fury"
+id = "43a98fa2-a4e6-4e89-ae69-6fa794970aa4"
+energy-cost = 1
+card-type = "Character"
+subtype = "Monster"
+is-fast = false
+spark = 1
+image-number = 2822678889
+rarity = "Uncommon"
+art-owned = false
+card-number = 239
+resonance = ["Tide"]
+"rendered text" = """
+When you discard this character, materialize it.
+
+▸ Judgment: Kindle 2."""
+
+[[cards]]
+name = "Fury of the Void-Touched"
+id = "cab4266f-6671-4170-8ef3-6aea5054c452"
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 2
+image-number = 1712953984
+rarity = "Rare"
+art-owned = false
+card-number = 240
+resonance = ["Stone", "Flame"]
+"rendered text" = """
+▸ Judgment: This character gains +1 spark.
+
+When a card leaves your void, kindle 2."""
+
+[[cards]]
+name = "Warlord's Edict"
+id = "c8ad42f8-39d4-4bd4-9100-d9afeb31c11c"
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 2
+image-number = 9525389053
+rarity = "Common"
+art-owned = false
+card-number = 241
+resonance = ["Stone"]
+"rendered text" = "Allied Warriors cost you 1● less."
+
+[[cards]]
+name = "Thought Weave Construct"
+id = "987aaa03-962d-4549-8149-8dbeccfc9911"
+energy-cost = 5
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 2
+image-number = 8045918266
+rarity = "Rare"
+art-owned = false
+card-number = 242
+resonance = ["Tide"]
+"rendered text" = """
+Characters cost you 1● less.
+
+▸ Materialized: Draw 2 cards."""
+
+[[cards]]
+name = "Fabrication Overseer"
+id = "8792daa1-a31e-4fd2-a1f3-7493a3d6be41"
+energy-cost = 3
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 1
+image-number = 7188189135
+rarity = "Uncommon"
+art-owned = false
+card-number = 243
+resonance = ["Flame"]
+"rendered text" = "▸ Materialized: Materialize a Figment. Allied Synths have +1 spark."
+
+[[cards]]
+name = "Fabrication Overseer"
+id = "04de0d16-6ff1-45c1-8590-88a5923935ff"
+energy-cost = 3
+card-type = "Character"
+subtype = "Robot"
+is-fast = false
+spark = 2
+image-number = 7896547965
+rarity = "Common"
+art-owned = false
+card-number = 244
+resonance = ["Flame"]
+"rendered text" = "When you materialize a Warrior, materialize a Halcyon Figment."
+
+[[cards]]
+name = "Summoner's Vanguard"
+id = "6e6fc45d-3505-4119-af15-bbed67fa059a"
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 3
+image-number = 3799727783
+rarity = "Common"
+art-owned = false
+card-number = 245
+resonance = ["Thunder"]
+"rendered text" = "▸ Materialized: Discover a character with cost 1● or less."
+
+[[cards]]
+name = "Emissary of the Unseen"
+id = "a27275ba-252f-41ba-a98b-be23c0b28cba"
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 2
+image-number = 9203368219
+rarity = "Common"
+art-owned = false
+card-number = 246
+resonance = ["Thunder"]
+"rendered text" = "▸ Materialized: Discover a character with spark 2 or less."
+
+[[cards]]
+name = "Edict of Stillness"
+id = "0fde6cd3-4879-41c9-8ec0-3b3bb178b0b3"
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+is-fast = true
+spark = 2
+image-number = 3510871897
+rarity = "Uncommon"
+art-owned = false
+card-number = 247
+resonance = ["Stone"]
+"rendered text" = "↯fast -- Abandon this character: The opponent can't play events this turn."
+
+[[cards]]
+name = "Archivist of the Undying"
+id = "4136f5f0-478b-45a7-aeae-4dd0b001f1c9"
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 2
+image-number = 1420724004
+rarity = "Common"
+art-owned = false
+card-number = 248
+resonance = ["Stone"]
+"rendered text" = "When you play an event, reclaim a character with cost 3● or less."
+
+[[cards]]
+name = "Heralds of the Last Sky"
+id = "226addd8-f09a-4237-ba75-c40635fbdb3b"
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 3
+image-number = 1315213771
+rarity = "Rare"
+art-owned = false
+card-number = 249
+resonance = ["Stone"]
+"rendered text" = """
+▸ Materialized: Kindle 1.
+▸ Judgment: Reclaim a character with cost up to this character's spark ●."""
+
+[[cards]]
+name = "Tide's Refusal"
+id = "ac9dbb02-de06-4977-a2eb-0ac839ab4c90"
+energy-cost = 2
+card-type = "Event"
+is-fast = true
+image-number = 2313446643
+rarity = "Common"
+art-owned = false
+card-number = 250
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Prevent a played character. Draw a card."
+
+[[cards]]
+name = "Moment's Delay"
+id = "9daf5b3e-76e4-4e7e-aa74-1b4b9f5d9e3e"
+energy-cost = 1
+card-type = "Event"
+is-fast = true
+image-number = 6488114710
+rarity = "Uncommon"
+art-owned = false
+card-number = 251
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Return an ally to hand: Play this event for 0●. Prevent a played card unless the opponent pays 2●."
+
+[[cards]]
+name = "Beacon of Unraveling"
+id = "c038e4b2-ae16-4981-bc63-c13e6276b034"
+energy-cost = 3
+card-type = "Event"
+is-fast = true
+image-number = 9140094280
+rarity = "Uncommon"
+art-owned = false
+card-number = 252
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Banish a card from hand: Play this event for 0●. Banish an enemy with cost 3● or less."
+
+[[cards]]
+name = "Passage of Severance"
+id = "a9d7abc1-c290-49c6-8153-83f097942b45"
+energy-cost = 1
+card-type = "Event"
+is-fast = true
+image-number = 2872495746
+rarity = "Common"
+art-owned = false
+card-number = 253
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Banish an enemy. The opponent gains 2● next turn."
+
+[[cards]]
+name = "Radiant Banishment"
+id = "77b5e881-9a2c-47d8-9058-c9c2597385be"
+energy-cost = 1
+card-type = "Event"
+is-fast = true
+image-number = 6747655075
+rarity = "Common"
+art-owned = false
+card-number = 254
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Banish an enemy. The opponent gains 2⍏."
+
+[[cards]]
+name = "Tide of the Ancestors"
+id = "a0fd3b74-ae21-4a07-8306-7df3645c28d9"
+energy-cost = 4
+card-type = "Event"
+is-fast = false
+image-number = 6331121414
+rarity = "Rare"
+art-owned = false
+card-number = 255
+subtype = ""
+spark = ""
+resonance = ["Stone"]
+"rendered text" = """
+Reclaim all characters with cost 3● or less. At end of your next turn, abandon all reclaimed characters."""
+
+[[cards]]
+name = "Convergence of the Fallen"
+id = "795a060f-ef43-42e3-96b7-b5bdb7266434"
+energy-cost = 4
+card-type = "Event"
+is-fast = false
+image-number = 3251308168
+rarity = "Rare"
+art-owned = false
+card-number = 256
+subtype = ""
+spark = ""
+resonance = ["Stone"]
+"rendered text" = "Reclaim up to 3 characters with cost 2● or less from your void."
+
+[[cards]]
+name = "Twilight Conscription"
+id = "c20722ae-5d81-4677-bcf8-7c0ec0e95b93"
+energy-cost = 4
+card-type = "Event"
+is-fast = true
+image-number = 4394005692
+rarity = "Rare"
+art-owned = false
+card-number = 257
+subtype = ""
+spark = ""
+resonance = ["Stone"]
+"rendered text" = "Reclaim up to 3 characters with cost 2● or less. Abandon them at end of turn."
+
+[[cards]]
+name = "Echoes of Sacrifice"
+id = "3df2dd36-dd51-4355-87f2-b5ae197bb4dc"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 4961067979
+rarity = "Uncommon"
+art-owned = false
+card-number = 258
+subtype = ""
+spark = ""
+resonance = ["Stone"]
+"rendered text" = """
+Reclaim a character with cost 3● or less.
+
+Reclaim 3●"""
+
+[[cards]]
+name = "Moment of Surfacing"
+id = "44a4ab1a-ed1f-418a-8866-3c4b5642492f"
+energy-cost = 2
+card-type = "Event"
+is-fast = true
+image-number = 9977379103
+rarity = "Uncommon"
+art-owned = false
+card-number = 259
+subtype = ""
+spark = ""
+resonance = ["Stone"]
+"rendered text" = "Reclaim a character from your void. Banish it at end of turn."
+
+[[cards]]
+name = "Dreamer's Call"
+id = "98db4d6d-842c-401f-8037-699a518f96d5"
+energy-cost = 1
+card-type = "Event"
+is-fast = false
+image-number = 2943138965
+rarity = "Common"
+art-owned = false
+card-number = 260
+subtype = ""
+spark = ""
+resonance = ["Stone"]
+"rendered text" = "Reclaim a character from your void. Lose 1 maximum ●."
+
+[[cards]]
+name = "Nascent Chronicle"
+id = "d7129a27-7edd-404a-86a7-08b893140e94"
+energy-cost = 2
+card-type = "Character"
+subtype = "Visionary"
+is-fast = false
+spark = 1
+image-number = 6163726409
+rarity = "Uncommon"
+art-owned = false
+card-number = 261
+resonance = ["Thunder"]
+"rendered text" = "▸ Materialized: This character gains +1 spark for each event in your void."
+
+[[cards]]
+name = "Covenant of the Returned"
+id = "0242717d-a6ba-42b6-9bf5-325191a1a2da"
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 0
+image-number = 9847567401
+rarity = "Common"
+art-owned = false
+card-number = 262
+resonance = ["Stone"]
+"rendered text" = "When you reclaim a character, it gains +2 spark. Draw a card."
+
+[[cards]]
+name = "Thornveil Seeker"
+id = "564ef717-7898-4623-9c94-e3fc986701e4"
+energy-cost = 3
+card-type = "Character"
+subtype = "Explorer"
+is-fast = false
+spark = 1
+image-number = 2849099179
+rarity = "Common"
+art-owned = false
+card-number = 263
+resonance = ["Tide"]
+"rendered text" = "▸ Materialized: Discard a card to discover a character."
+
+[[cards]]
+name = "Chronicler of Shifting Tides"
+id = "37422a69-3f8c-4953-abe9-bf6742eb6e2e"
+energy-cost = 2
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 1
+image-number = 9968073567
+rarity = "Uncommon"
+art-owned = false
+card-number = 264
+resonance = ["Stone", "Tide"]
+"rendered text" = "▸ Judgment: Draw a card, then discard a card. With 5 cards in your void, draw 2 instead."
+
+[[cards]]
+name = "Phantom of the Shifting Hour"
+id = "b3c35d35-8410-42c7-86b7-a310a2557383"
+energy-cost = 3
+card-type = "Character"
+subtype = "Visitor"
+is-fast = false
+spark = 1
+image-number = 9490409853
+rarity = "Uncommon"
+art-owned = false
+card-number = 265
+resonance = ["Thunder"]
+"rendered text" = """
+▸ Judgment: Draw a card, then discard a card. 2●: Materialize a Shadow Figment."""
+
+[[cards]]
+name = "Whisper of the Midnight Tide"
+id = "f04e32b3-d897-4c24-9999-3f0557482ba1"
+energy-cost = 3
+card-type = "Character"
+subtype = "Outsider"
+is-fast = false
+spark = 2
+image-number = 7024173532
+rarity = "Common"
+art-owned = false
+card-number = 266
+"rendered text" = "▸ Judgment: Draw a card."
+
+[[cards]]
+name = "Mirror Flame"
+id = "238a405b-1eb9-4f0e-9904-4da39a7c810e"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 5523805526
+rarity = "Rare"
+art-owned = false
+card-number = 267
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = """
+Copy the next event you play this turn.
+
+Reclaim 3● -- Copy the next event you play this turn twice instead."""
+
+[[cards]]
+name = "Vault of Clarity"
+id = "5ffd3613-af5a-4546-9129-9fbfd38cb86a"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 6290771400
+rarity = "Common"
+art-owned = false
+card-number = 268
+subtype = ""
+spark = ""
+"rendered text" = "Draw 3 cards. Discard 2 cards unless you discard an event."
+
+[[cards]]
+name = "Cascade of Prescience"
+id = "8751e259-6e46-4b1d-a6a0-0df5421e1054"
+energy-cost = 1
+card-type = "Event"
+is-fast = true
+image-number = 5333968587
+rarity = "Common"
+art-owned = false
+card-number = 269
+subtype = ""
+spark = ""
+"rendered text" = "Foresee 3. Draw a card."
+
+[[cards]]
+name = "Ripple Sight"
+id = "37711e14-b1b6-47e4-8f40-4293c1a49429"
+energy-cost = 1
+card-type = "Event"
+is-fast = false
+image-number = 7774454289
+rarity = "Common"
+art-owned = false
+card-number = 270
+subtype = ""
+spark = ""
+"rendered text" = "Draw a card. Foresee 2."
+
+[[cards]]
+name = "Crest of Unraveling"
+id = "79cdd40b-26d0-457d-9af2-bd15bfa88806"
+energy-cost = 2
+card-type = "Event"
+is-fast = true
+image-number = 1813583869
+rarity = "Common"
+art-owned = false
+card-number = 271
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Return an enemy with cost 2● or less to hand. Draw a card."
+
+[[cards]]
+name = "Tidebreak"
+id = "435a6ac4-58a6-4d63-acc7-17377496acf4"
+energy-cost = 2
+card-type = "Event"
+is-fast = true
+image-number = 3561563311
+rarity = "Common"
+art-owned = false
+card-number = 272
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Return an enemy to hand. Gain 2●."
+
+[[cards]]
+name = "Soporific Reversal"
+id = "6d5d0f3c-e993-44f8-86b2-502bd63e7846"
+energy-cost = 3
+card-type = "Event"
+is-fast = true
+image-number = 5825726238
+rarity = "Common"
+art-owned = false
+card-number = 273
+subtype = ""
+spark = ""
+"rendered text" = "Return an enemy or a played card to hand."
+
+[[cards]]
+name = "Echoes in the Deep"
+id = "6014454b-9fdc-4f6a-9dcf-20f908bc90f9"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 7581011049
+rarity = "Uncommon"
+art-owned = false
+card-number = 274
+subtype = ""
+spark = ""
+resonance = ["Stone", "Tide"]
+"rendered text" = "Put the top 3 cards of your deck into your void, plus 1 more for each card you have played this turn."
+
+[[cards]]
+name = "Grave-Handed Curator"
+id = "885a7b29-82de-400b-b961-aff3df3c6ee0"
+energy-cost = 2
+card-type = "Character"
+subtype = "Outsider"
+is-fast = false
+spark = 1
+image-number = 1120178036
+rarity = "Uncommon"
+art-owned = false
+card-number = 275
+resonance = ["Stone"]
+"rendered text" = """
+▸ Materialized: Put the top 3 cards of your deck into your void.
+
+▸ Dissolved: Return a character from your void to your hand."""
+
+[[cards]]
+name = "Wrecker of the Hidden Archive"
+id = "e1e7c403-251e-4db1-bd3b-5ee03124e681"
+energy-cost = 2
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 1
+image-number = 6202759527
+rarity = "Rare"
+art-owned = false
+card-number = 276
+resonance = ["Stone", "Flame"]
+"rendered text" = """
+▸ Materialized: Put the top 3 cards of your deck into your void.
+2●, Abandon an ally: Reclaim a character with cost 3● or less."""
+
+[[cards]]
+name = "Seeker of Hidden Seams"
+id = "5fc8b425-5170-4281-bcef-230d82af20f9"
+energy-cost = 2
+card-type = "Character"
+subtype = "Explorer"
+is-fast = false
+spark = 1
+image-number = 7853618331
+rarity = "Common"
+art-owned = false
+card-number = 277
+resonance = ["Stone"]
+"rendered text" = "▸ Materialized: Put the top 3 cards of your deck into your void."
+
+[[cards]]
+name = "Voice of Remembrance"
+id = "ffbc62c3-4445-4b16-8829-3e7dca99ab21"
+energy-cost = 3
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 1
+image-number = 9317852220
+rarity = "Uncommon"
+art-owned = false
+card-number = 278
+resonance = ["Stone"]
+"rendered text" = "▸ Materialized: Return a card from your void to your hand."
+
+[[cards]]
+name = "Rootsinger of the Eternal Return"
+id = "fec40d51-abbe-49b2-bed3-ad4f7f8069a1"
+energy-cost = 3
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 2
+image-number = 9180207985
+rarity = "Uncommon"
+art-owned = false
+card-number = 279
+resonance = ["Stone", "Tide"]
+"rendered text" = "▸ Judgment: Put the top 2 cards of your deck into your void. You may return a character from your void to your hand."
+
+[[cards]]
+name = "Dredge of Forgotten Memories"
+id = "fba9d90d-3e44-417e-bf25-1d1d4a2e81ce"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 7803598874
+rarity = "Rare"
+art-owned = false
+card-number = 280
+subtype = ""
+spark = ""
+resonance = ["Stone", "Tide"]
+"rendered text" = """
+Return up to 2 characters from your void to your hand.
+
+Reclaim -- Put the top 3 cards of your deck into your void."""
+
+[[cards]]
+name = "Siphon of Wills"
+id = "38147bfd-8410-4293-a952-e348258c0542"
+energy-cost = 3
+card-type = "Event"
+is-fast = true
+image-number = 5160812687
+rarity = "Common"
+art-owned = false
+card-number = 281
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Prevent a played card. Gain ● equal to that card's cost."
+
+[[cards]]
+name = "Waking Interruption"
+id = "31d222f7-40c8-480d-82b0-d235f57d53c2"
+energy-cost = 2
+card-type = "Event"
+is-fast = true
+image-number = 7813331041
+rarity = "Uncommon"
+art-owned = false
+card-number = 282
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Prevent a played card. The opponent draws a card, then discards a card."
+
+[[cards]]
+name = "Calculated Concession"
+id = "5b2c6dca-8bb0-412e-87ef-d98ad31ad986"
+energy-cost = 2
+card-type = "Event"
+is-fast = true
+image-number = 9485752219
+rarity = "Common"
+art-owned = false
+card-number = 283
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Prevent a played card. The opponent draws 2 cards."
+
+[[cards]]
+name = "Frantic Channeling"
+id = "9e15951e-c144-45de-9347-c054c58a74d1"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 5822334343
+rarity = "Common"
+art-owned = false
+card-number = 284
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Draw 2 cards. Discard 2 cards. Gain 3●."
+
+[[cards]]
+name = "Torrent of Remembrance"
+id = "fdb9bb58-df8b-47ac-9d53-89d2ba4d0969"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 2170094753
+rarity = "Common"
+art-owned = false
+card-number = 285
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Discard 2 cards: Draw 3 cards."
+
+[[cards]]
+name = "Revenant Sprinter"
+id = "97466d3a-452c-4991-8d6a-5ee3dae64d3e"
+energy-cost = 2
+card-type = "Character"
+subtype = "Survivor"
+is-fast = true
+spark = 1
+image-number = 5702810453
+rarity = "Uncommon"
+art-owned = false
+card-number = 286
+resonance = ["Stone", "Tide"]
+"rendered text" = "▸ Dissolved: You may pay 1●. If you do, reclaim this character."
+
+[[cards]]
+name = "Unbroken Wanderer"
+id = "d52909bf-0278-4e8a-b869-34399501c442"
+energy-cost = 2
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 2
+image-number = 3850977936
+rarity = "Common"
+art-owned = false
+card-number = 287
+resonance = ["Stone"]
+"rendered text" = "▸ Dissolved: Return this character to your hand."
+
+[[cards]]
+name = "Hungering Effigy"
+id = "2280b92e-4444-4655-b398-f5bfa458dc62"
+energy-cost = 2
+card-type = "Character"
+subtype = "Outsider"
+is-fast = false
+spark = 1
+image-number = 9044268365
+rarity = "Common"
+art-owned = false
+card-number = 288
+resonance = ["Tide"]
+"rendered text" = "Discard 2 cards: Materialize a Shadow Figment."
+
+[[cards]]
+name = "Gravecaller Marshal"
+id = "1980e1bb-0c85-4e5f-8cac-66bd27d76499"
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 2
+image-number = 1133764762
+rarity = "Common"
+art-owned = false
+card-number = 289
+resonance = ["Stone"]
+"rendered text" = "2●, Banish a card from your void: Materialize a Shadow Figment."
+
+[[cards]]
+name = "Hollowing Emergence"
+id = "7e4ecad0-7688-4144-aef3-abf9adc0d2e6"
+energy-cost = 1
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 1
+image-number = 7393819837
+rarity = "Uncommon"
+art-owned = false
+card-number = 290
+resonance = ["Thunder"]
+"rendered text" = "▸ Dissolved: Materialize a Shadow Figment for each spark this character has."
+
+[[cards]]
+name = "Stormblood Harbinger"
+id = "dd75b7d9-0861-4fa8-a882-8d0b4e104111"
+energy-cost = 2
+card-type = "Character"
+subtype = "Outsider"
+is-fast = false
+spark = 1
+image-number = 1113635016
+rarity = "Rare"
+art-owned = false
+card-number = 291
+resonance = ["Flame"]
+"rendered text" = """
+When an ally is ▸ Dissolved:, materialize a Shadow Figment.
+
+▸ Judgment: With 5 or more Shadow Figments, each gains +2 spark."""
+
+[[cards]]
+name = "Hollow Remnant"
+id = "f2b7ec1f-8878-4658-a4ca-1277e02f01a5"
+energy-cost = 2
+card-type = "Character"
+subtype = "Robot"
+is-fast = false
+spark = 1
+image-number = 5261084929
+rarity = "Common"
+art-owned = false
+card-number = 292
+resonance = ["Flame"]
+"rendered text" = "▸ Dissolved: Materialize a Shadow Figment."
+
+[[cards]]
+name = "Oracle of Scattered Flesh"
+id = "0cce3648-d2a8-481c-8521-8565853f664a"
+energy-cost = 1
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 1
+image-number = 5169790325
+rarity = "Common"
+art-owned = false
+card-number = 293
+resonance = ["Stone"]
+"rendered text" = "Abandon an ally: Foresee 2."
+
+[[cards]]
+name = "Architect of Slow Ruin"
+id = "50e33ac4-d626-4094-89cb-555a2510a207"
+energy-cost = 2
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 1
+image-number = 4977101085
+rarity = "Uncommon"
+art-owned = false
+card-number = 294
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: If you have no Figments in play, materialize a Shadow Figment."
+
+[[cards]]
+name = "The Risen Colossus"
+id = "11294825-2521-4cd7-a95d-2c7843f73302"
+energy-cost = 8
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 6
+image-number = 2481659971
+rarity = "Rare"
+art-owned = false
+card-number = 295
+resonance = ["Stone", "Flame"]
+"rendered text" = "You may not spend ● to play this card. Abandon 2 allies: Reclaim this character."
+
+[[cards]]
+name = "Wellspring Surge"
+id = "5fe5a1ea-a98d-4332-9eaf-eabc627bc8e8"
+energy-cost = 1
+card-type = "Event"
+is-fast = false
+image-number = 1303540138
+rarity = "Common"
+art-owned = false
+card-number = 296
+subtype = ""
+spark = ""
+resonance = ["Thunder"]
+"rendered text" = "Gain 3●. If you have played another event this turn, draw a card."
+
+[[cards]]
+name = "Surge of the Abyss"
+id = "eb47dd55-748f-44f8-9edc-3476182c4396"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 5824190641
+rarity = "Common"
+art-owned = false
+card-number = 297
+subtype = ""
+spark = ""
+resonance = ["Stone"]
+"rendered text" = "Gain 3●. If you have 7 or more cards in your void, gain 5● instead."
+
+[[cards]]
+name = "Pact of Blood"
+id = "1f600865-4f4d-4d3a-82ed-b4b37a8bedb6"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 8423031519
+rarity = "Common"
+art-owned = false
+card-number = 298
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = "Abandon an ally: Discover a character."
+
+[[cards]]
+name = "Sacrificial Pivot"
+id = "12aedbb7-c14d-4a89-a9d9-ca4d7c557676"
+energy-cost = 1
+card-type = "Event"
+is-fast = true
+image-number = 4295217372
+rarity = "Uncommon"
+art-owned = false
+card-number = 299
+subtype = ""
+spark = ""
+resonance = ["Stone"]
+"rendered text" = "Abandon an ally: Discover a character with cost equal to that ally's cost."
+
+[[cards]]
+name = "Embers of the Feast"
+id = "b696de0b-420a-4e2b-b1e7-adf9644a18e6"
+energy-cost = 1
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 0
+image-number = 9844145996
+rarity = "Common"
+art-owned = false
+card-number = 300
+resonance = ["Stone", "Flame"]
+"rendered text" = "Abandon an ally: Draw a card."
+
+[[cards]]
+name = "Razorwing Duo"
+id = "634c3afc-64f5-4203-8b53-4316dcc42bc0"
+energy-cost = 2
+card-type = "Character"
+subtype = "Renegade"
+is-fast = true
+spark = 1
+image-number = 1980865376
+rarity = "Common"
+art-owned = false
+card-number = 301
+resonance = ["Tide"]
+"rendered text" = "When you discard a card, this character gains +2 spark."
+
+[[cards]]
+name = "Architect of Echoed Words"
+id = "a62ff9de-81ca-43b4-a37f-1b2b558e1cfb"
+energy-cost = 2
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 1
+image-number = 5787496181
+rarity = "Rare"
+art-owned = false
+card-number = 302
+resonance = ["Stone", "Tide"]
+"rendered text" = "▸ Judgment: You may reclaim an event from your void with cost up to this character's spark."
+
+[[cards]]
+name = "Pinnacle Aspiranta"
+id = "44f4ee06-8dbd-414e-b985-4a6434975e23"
+energy-cost = 4
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 2
+image-number = 8024009179
+rarity = "Uncommon"
+art-owned = false
+card-number = 303
+resonance = ["Tide"]
+"rendered text" = "▸ Materialized: Return an event with cost 3● or less from your void to your hand."
+
+[[cards]]
+name = "Wrathbound Revenant"
+id = "2a446c01-a791-4a4a-9d19-5b84dd6d9582"
+energy-cost = 3
+card-type = "Character"
+subtype = "Monster"
+is-fast = false
+spark = 2
+image-number = 3315090391
+rarity = "Uncommon"
+art-owned = false
+card-number = 304
+resonance = ["Thunder", "Tide"]
+"rendered text" = "▸ Judgment: Discard your hand, then draw 3 cards."
+
+[[cards]]
+name = "Spark-Caller"
+id = "2cf1bea9-6136-4626-a76e-39481978283a"
+energy-cost = 2
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 1
+image-number = 2197495503
+rarity = "Common"
+art-owned = false
+card-number = 305
+resonance = ["Flame"]
+"rendered text" = "When you play an event, materialize a Radiant Figment."
+
+[[cards]]
+name = "Bolt of the Waking Shore"
+id = "102c3047-58d9-4b2b-bea9-10739e84b9cd"
+energy-cost = 1
+card-type = "Event"
+is-fast = true
+image-number = 8792665508
+rarity = "Common"
+art-owned = false
+card-number = 306
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = "Dissolve an enemy with spark 3 or less."
+
+[[cards]]
+name = "Ashen Deluge"
+id = "528ac63c-9928-4c8e-bfea-610b33c8b0d7"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 9450976013
+rarity = "Rare"
+art-owned = false
+card-number = 307
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = """
+Dissolve all enemies with spark 2 or less.
+
+Reclaim -- Discard 3 cards: Dissolve all enemies."""
+
+[[cards]]
+name = "Wellspring Adept"
+id = "62c9493d-6810-4cff-bd9d-2f8c65473ec7"
+energy-cost = 1
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 1
+image-number = 6126662737
+rarity = "Uncommon"
+art-owned = false
+card-number = 308
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: Gain 1●. 4●: Gain 1 maximum ●."
+
+[[cards]]
+name = "Bitterspring Wellkeeper"
+id = "e06f42fb-b7ec-401f-b374-76c889f697f2"
+energy-cost = 2
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 1
+image-number = 8237594329
+rarity = "Uncommon"
+art-owned = false
+card-number = 309
+resonance = ["Thunder"]
+"rendered text" = "▸ Materialized, Judgment: Gain 2●. The opponent gains 1⍏."
+
+[[cards]]
+name = "Amber Symbiote"
+id = "4413a3c5-ef54-4253-b6fa-e8da64baf63f"
+energy-cost = 1
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 1
+image-number = 5012808706
+rarity = "Uncommon"
+art-owned = false
+card-number = 310
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: You may return a Spirit Animal to hand to gain 2●."
+
+[[cards]]
+name = "Emberclan Warden"
+id = "ee0aa963-6b13-4dbe-adb4-314390c5c9b5"
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 2
+image-number = 3967065675
+rarity = "Uncommon"
+art-owned = false
+card-number = 311
+resonance = ["Stone"]
+"rendered text" = "Once per turn, when you materialize an allied Warrior, materialize a Radiant Figment."
+
+[[cards]]
+name = "General of Endless Swarms"
+id = "ceb89002-9bc0-4ec0-b719-2547fea597de"
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 2
+image-number = 6945307994
+rarity = "Rare"
+art-owned = false
+card-number = 312
+resonance = ["Flame"]
+"rendered text" = "When you materialize a Figment, materialize another Figment of the same type."
+
+[[cards]]
+name = "Wandering Leyline"
+id = "45914018-3210-4b1b-81a5-0a819e04df1a"
+energy-cost = 2
+card-type = "Character"
+subtype = "Explorer"
+is-fast = false
+spark = 1
+image-number = 6582036868
+rarity = "Common"
+art-owned = false
+card-number = 313
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: Gain 1 maximum ●."
+
+[[cards]]
+name = "Salvager of the Deep"
+id = "65bebce3-fc49-4b89-833a-b6615cb43010"
+energy-cost = 3
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 1
+image-number = 3520711700
+rarity = "Uncommon"
+art-owned = false
+card-number = 314
+resonance = ["Stone"]
+"rendered text" = "▸ Dissolved: Return a Tinkerer from your void to your hand."
+
+[[cards]]
+name = "Cliffside Excavation"
+id = "ec5a996e-6d43-48ca-adba-01fee6a64d4d"
+energy-cost = 1
+card-type = "Event"
+is-fast = false
+image-number = 9782832998
+rarity = "Common"
+art-owned = false
+card-number = 315
+subtype = ""
+spark = ""
+resonance = ["Thunder"]
+"rendered text" = "Foresee 3. Gain 1 maximum ●."
+
+[[cards]]
+name = "Chains of Starlight"
+id = "f0079658-f08f-4d85-979c-63c9f75cffa1"
+energy-cost = 5
+card-type = "Event"
+is-fast = true
+image-number = 8965974976
+rarity = "Common"
+art-owned = false
+card-number = 316
+subtype = ""
+spark = ""
+"rendered text" = "Banish an enemy until your next main phase."
+
+[[cards]]
+name = "Vessel of Borrowed Light"
+id = "d2306c6b-45de-4f67-8a47-ae13de98293e"
+energy-cost = 2
+card-type = "Character"
+subtype = "Visitor"
+is-fast = false
+spark = 0
+image-number = 5378342421
+rarity = "Rare"
+art-owned = false
+card-number = 317
+resonance = ["Flame", "Thunder"]
+"rendered text" = "▸ Materialized: Materialize a copy of an ally. Abandon this character."
+
+[[cards]]
+name = "Vessel of Endless Forms"
+id = "77820028-b9be-4348-bb48-5052c3e0c2b9"
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 0
+image-number = 6075510376
+rarity = "Uncommon"
+art-owned = false
+card-number = 318
+resonance = ["Flame", "Thunder"]
+"rendered text" = "▸ Materialized: Materialize a copy of an ally."
+
+[[cards]]
+name = "Torrent of Silence"
+id = "c23462ee-cbc8-4c19-8013-b3bbef5beffb"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 5150202799
+rarity = "Common"
+art-owned = false
+card-number = 319
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "The opponent discards 3 cards at random."
+
+[[cards]]
+name = "Earthshaper Cub"
+id = "e264a35e-7c8a-4c67-9a63-b23f3416c196"
+energy-cost = 2
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 2
+image-number = 1940151419
+rarity = "Uncommon"
+art-owned = false
+card-number = 320
+resonance = ["Thunder"]
+"rendered text" = "▸ Materialized: Gain 1 maximum ●. ▸ Judgment: Gain 1●."
+
+[[cards]]
+name = "Watcher of Unspoken Words"
+id = "766c488b-039c-4177-a8f7-135836e3294c"
+energy-cost = 1
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 1
+image-number = 4092190103
+rarity = "Common"
+art-owned = false
+card-number = 321
+resonance = ["Thunder", "Tide"]
+"rendered text" = "When the opponent plays an event, draw a card."
+
+[[cards]]
+name = "Stillness of the Woven Sky"
+id = "4e5101e3-4366-4a75-a89e-abf57266c868"
+energy-cost = 2
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 2
+image-number = 8653183226
+rarity = "Common"
+art-owned = false
+card-number = 322
+resonance = ["Thunder", "Tide"]
+"rendered text" = "Players can only play one event per turn."
+
+[[cards]]
+name = "Artificer's Intuition"
+id = "640d798d-3100-49f7-bbe2-6c18d4b818f9"
+energy-cost = 2
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 1
+image-number = 3881788504
+rarity = "Rare"
+art-owned = false
+card-number = 323
+resonance = ["Tide"]
+"rendered text" = """
+▸ Materialized: Discover an event. 2●: Play an event from your hand for 0●.
+"""
+
+[[cards]]
+name = "Form of the Infinite"
+id = "c77ead7a-e7a4-4c92-819c-558bc26773f3"
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 1
+image-number = 8187089618
+rarity = "Rare"
+art-owned = false
+card-number = 324
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: You may pay N● to have each ally gain +N spark."
+
+[[cards]]
+name = "Tide of Returning"
+id = "2f932c14-02cb-4c93-be06-03e067496cb6"
+energy-cost = 4
+card-type = "Event"
+is-fast = false
+image-number = 9241849197
+rarity = "Uncommon"
+art-owned = false
+card-number = 325
+subtype = ""
+spark = ""
+resonance = ["Stone"]
+"rendered text" = "Reclaim each character dissolved or abandoned this turn."
+
+[[cards]]
+name = "Chronicler of Small Miracles"
+id = "cc5e770a-210d-4737-8aa7-6be7328b0dbd"
+energy-cost = 3
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 1
+image-number = 6795526381
+rarity = "Rare"
+art-owned = false
+card-number = 326
+resonance = ["Flame", "Thunder"]
+"rendered text" = """
+▸ Materialized: Materialize a Celestial Figment. When you materialize a Figment, draw a card.
+"""
+
+[[cards]]
+name = "Tidecaller of Lost Arts"
+id = "45f33982-1994-47f1-a29c-8bc329f1fe2e"
+energy-cost = 3
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 1
+image-number = 3159710548
+rarity = "Uncommon"
+art-owned = false
+card-number = 327
+resonance = ["Stone", "Tide"]
+"rendered text" = """
+▸ Materialized: Put the top 4 cards of your deck into your void.
+▸ Judgment: Reclaim an event from your void.
+"""
+
+[[cards]]
+name = "Artificer Eternal"
+id = "ad9a9b5c-6dc9-4a89-b709-786b04988d3e"
+energy-cost = 5
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 2
+image-number = 4886783451
+rarity = "Rare"
+art-owned = false
+card-number = 328
+resonance = ["Thunder"]
+"rendered text" = "▸ Materialized: Materialize a Halcyon Figment. ▸ Judgment: Gain 1● for each allied Figment."
+
+[[cards]]
+name = "Receding Horizon"
+id = "56f1e5d2-f15e-40e4-85de-f18607f4de4e"
+energy-cost = 4
+card-type = "Event"
+is-fast = true
+image-number = 2435835107
+rarity = "Common"
+art-owned = false
+card-number = 329
+subtype = ""
+spark = ""
+"rendered text" = "Return 2 allies to hand: Play this event for 0●. Draw 2 cards."
+
+[[cards]]
+name = "Flood of the Dreaming Sea"
+id = "4c8e736b-312f-4196-9106-1f8983ee9fff"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 3985658135
+rarity = "Common"
+art-owned = false
+card-number = 330
+subtype = ""
+spark = ""
+resonance = ["Thunder", "Tide"]
+"rendered text" = "Until end of turn, gain 2● whenever you play a card."
+
+[[cards]]
+name = "Surge of Many Colors"
+id = "71473ab1-a9c7-4d42-a5a7-163e9b31b0f5"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 3183847236
+rarity = "Uncommon"
+art-owned = false
+card-number = 331
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = "Draw 3 cards, then discard 3 cards. Materialize a Figment for each character discarded this way."
+
+[[cards]]
+name = "Glimpse Ahead"
+id = "cb77c2ab-e325-4c6c-90c1-4bc8f03a6e66"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 9033271537
+rarity = "Common"
+art-owned = false
+card-number = 332
+subtype = ""
+spark = ""
+resonance = ["Thunder"]
+"rendered text" = "Look at the top four cards of your deck. Put one of them into your hand and the rest into your void."
+
+[[cards]]
+name = "Headwinds"
+id = "5a90acb3-a769-4369-8ef5-2cdc3ebc7c2d"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 5441640070
+rarity = "Common"
+art-owned = false
+card-number = 333
+subtype = ""
+spark = ""
+"rendered text" = "Draw 2 cards. If you played no characters this turn, discard a card."
+
+[[cards]]
+name = "Immersive Study"
+id = "80495b0d-de40-4ed5-b731-530b9b38b91e"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 9422816874
+rarity = "Uncommon"
+art-owned = false
+card-number = 334
+resonance = ["Stone"]
+subtype = ""
+spark = ""
+"rendered text" = """
+Draw 2 cards.
+
+Reclaim -- Lose 1 maximum ●"""
+
+[[cards]]
+name = "Storm of a Thousand Desires"
+id = "efc06a7e-08ec-483f-a8ab-368c8b44fc43"
+energy-cost = 6
+card-type = "Event"
+is-fast = false
+image-number = 6773134594
+rarity = "Rare"
+art-owned = false
+card-number = 335
+resonance = ["Flame"]
+subtype = ""
+spark = ""
+"rendered text" = "Copy the next event you play this turn once for each card you have played this turn."
+
+[[cards]]
+name = "Affinity Specter"
+id = "cd0d7da1-d3bc-4978-860d-42ce4bd38772"
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 2
+image-number = 5373233678
+rarity = "Common"
+art-owned = false
+card-number = 336
+"rendered text" = "This character costs 1● less for each ally in play."
+
+[[cards]]
+name = "Faerie of Bitter Hours"
+id = "e55f98a9-2be2-4760-b527-d7edf1d8b585"
+energy-cost = 2
+card-type = "Character"
+subtype = "Visitor"
+is-fast = true
+spark = 1
+image-number = 9876388415
+rarity = "Rare"
+art-owned = false
+card-number = 337
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: Lose 1⍏. Materialize a Shadow Figment."
+
+[[cards]]
+name = "Rite of the Hollow Throne"
+id = "029e7b87-fa96-4c0c-abdd-1c8b532f0477"
+energy-cost = 3
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 1
+image-number = 2636492291
+rarity = "Rare"
+art-owned = false
+card-number = 338
+resonance = ["Stone", "Flame"]
+"rendered text" = "▸ Judgment: You may abandon 2 allies to gain 2●, draw a card, and the opponent abandons a character."
+
+[[cards]]
+name = "Echoes of the Abandoned"
+id = "d593a1be-dfb4-407c-8196-fabeff1782b7"
+energy-cost = 3
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 2
+image-number = 1019998344
+rarity = "Common"
+art-owned = false
+card-number = 339
+resonance = ["Stone", "Tide"]
+"rendered text" = "When you play a card from your void, reclaim this character."
+
+[[cards]]
+name = "Toll of the Forsaken"
+id = "69303728-9443-4864-86bf-4f748959fa63"
+energy-cost = 2
+card-type = "Event"
+is-fast = true
+image-number = 5071988449
+rarity = "Common"
+art-owned = false
+card-number = 340
+resonance = ["Flame"]
+subtype = ""
+spark = ""
+"rendered text" = "Discard a card or lose 1 maximum ●: Dissolve an enemy."
+
+[[cards]]
+name = "Rite of Shared Ruin"
+id = "a99a5101-0fe3-43cd-a63b-44f6aba62682"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 1352160043
+rarity = "Common"
+art-owned = false
+card-number = 341
+resonance = ["Flame"]
+subtype = ""
+spark = ""
+"rendered text" = "Costs 1● less for each ally. Dissolve an enemy. Draw a card."
+
+[[cards]]
+name = "Toll of the Deep"
+id = "bdc25d3c-46d9-4452-85b8-866842fe45a4"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 3981958029
+rarity = "Common"
+art-owned = false
+card-number = 342
+subtype = ""
+spark = ""
+"rendered text" = "Draw 2 cards. The opponent gains 2⍏."
+
+[[cards]]
+name = "Warden of the Consuming Dark"
+id = "521f2592-3539-47fc-b0c9-f236ad06b29c"
+energy-cost = 3
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 0
+image-number = 3247415481
+rarity = "Rare"
+art-owned = false
+card-number = 343
+resonance = ["Stone", "Flame"]
+"rendered text" = "If this card is in your void, when you abandon an ally, materialize a Shadow Figment."
+
+[[cards]]
+name = "Cascade of Reckoning"
+id = "678733f0-1685-40fe-84c4-629bb07fcb55"
+energy-cost = 4
+card-type = "Event"
+is-fast = false
+image-number = 5432101132
+rarity = "Common"
+art-owned = false
+card-number = 344
+subtype = ""
+spark = ""
+resonance = ["Thunder"]
+"rendered text" = "When an ally is abandoned this turn, gain 1⍏."
+
+[[cards]]
+name = "Fervor of the Fallen"
+id = "cdc462cd-4760-4d15-bc88-a7d4fa7b2368"
+energy-cost = 4
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 2
+image-number = 1013652868
+rarity = "Common"
+art-owned = false
+card-number = 345
+resonance = ["Stone"]
+"rendered text" = "If this card is in your void, allied characters have ↯fast."
+
+[[cards]]
+name = "Salvage Broker"
+id = "f99b3bed-a138-46a9-9ab2-d3fe009e1fdf"
+energy-cost = 1
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 0
+image-number = 9817055945
+rarity = "Uncommon"
+art-owned = false
+card-number = 346
+resonance = ["Stone", "Flame"]
+"rendered text" = "▸ Judgment: You may abandon an ally to reclaim a character with cost 2● or less."
+
+[[cards]]
+name = "Ember of the Discarded Path"
+id = "7e99eb50-6019-4dd7-8d9c-439a88a52465"
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 1
+image-number = 6167685098
+rarity = "Uncommon"
+art-owned = false
+card-number = 347
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: You may discard a card to discover a character."
+
+[[cards]]
+name = "Splinter of Will"
+id = "d2068cd9-e8d8-43c2-86b8-20d052e81252"
+energy-cost = 2
+card-type = "Event"
+is-fast = true
+image-number = 4101774785
+rarity = "Uncommon"
+art-owned = false
+card-number = 348
+subtype = ""
+spark = ""
+"rendered text" = "Choose one: Dissolve an enemy with spark 3 or less. / Return an enemy to hand."
+
+[[cards]]
+name = "The Price of Knowing"
+id = "1105e04f-a048-4ac3-a144-632995663865"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 1675742665
+rarity = "Common"
+art-owned = false
+card-number = 349
+subtype = ""
+spark = ""
+"rendered text" = "Discard a card or abandon an ally: Draw 2 cards."
+
+[[cards]]
+name = "Confluence of Echoes"
+id = "378061fa-6376-48d9-afd7-1463a8305194"
+energy-cost = 6
+card-type = "Event"
+is-fast = false
+image-number = 9918581854
+rarity = "Common"
+art-owned = false
+card-number = 350
+subtype = ""
+spark = ""
+resonance = ["Stone", "Tide"]
+"rendered text" = "Reclaim up to 2 events from your void for 0●."
+
+[[cards]]
+name = "Surge of the Multitude"
+id = "b7f308e2-d674-4e8b-9e01-e6efb15f0ca2"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 7606901357
+rarity = "Uncommon"
+art-owned = false
+card-number = 351
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = "Materialize a Radiant Figment for each card you have played this turn."
+
+[[cards]]
+name = "Prism Engine"
+id = "1824049c-8af9-4dc3-94e6-09ac90c1ee85"
+energy-cost = 1
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 0
+image-number = 7631108909
+rarity = "Rare"
+art-owned = false
+card-number = 352
+resonance = ["Flame"]
+"rendered text" = "▸ Materialized: You may play cards from the top of your deck this turn."
+
+[[cards]]
+name = "Voice of the Burning Tide"
+id = "38497b91-779d-4ad5-b773-6ce53326549c"
+energy-cost = 1
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 1
+image-number = 8408945727
+rarity = "Common"
+art-owned = false
+card-number = 353
+resonance = ["Flame"]
+"rendered text" = "▸ Judgment: You may discard a card to dissolve an enemy with spark 2 or less."
+
+[[cards]]
+name = "Grazer of Waking Paths"
+id = "b2ae8947-1fca-47b7-9b93-4454584fead3"
+energy-cost = 1
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 0
+image-number = 3824372003
+rarity = "Uncommon"
+art-owned = false
+card-number = 354
+resonance = ["Thunder"]
+"rendered text" = "▸ Materialized: Gain 1 maximum ●."
+
+[[cards]]
+name = "Thornwarden Initiate"
+id = "d610b91d-61c3-494f-8cf5-ab37847fa171"
+energy-cost = 1
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 1
+image-number = 3876358712
+rarity = "Uncommon"
+art-owned = false
+card-number = 355
+resonance = ["Stone"]
+"rendered text" = "▸ Judgment: With 3 cards in your void, this character gains +2 spark."
+
+[[cards]]
+name = "Wellspring Excavator"
+id = "018c304f-90b1-4365-8568-8f527279b703"
+energy-cost = 4
+card-type = "Event"
+is-fast = false
+image-number = 6032297857
+rarity = "Common"
+art-owned = false
+card-number = 356
+subtype = ""
+spark = ""
+resonance = ["Thunder"]
+"rendered text" = "Abandon an ally: Gain 1 maximum ●."
+
+[[cards]]
+name = "Whisper of the Living Archive"
+id = "c2a48aa4-c818-4551-af44-f29b865f5d1c"
+energy-cost = 2
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 2
+image-number = 1676025875
+rarity = "Uncommon"
+art-owned = false
+card-number = 357
+resonance = ["Tide"]
+"rendered text" = "▸ Judgment: You may discard a card to discover a character."
+
+[[cards]]
+name = "Veilsift Wanderer"
+id = "cc0151d5-916c-417f-be4e-38e0659d0e2f"
+energy-cost = 2
+card-type = "Character"
+subtype = "Explorer"
+is-fast = false
+spark = 1
+image-number = 2988560830
+rarity = "Uncommon"
+art-owned = false
+card-number = 358
+resonance = ["Thunder"]
+"rendered text" = "▸ Materialized: Foresee 4. Gain 1 maximum ●."
+
+[[cards]]
+name = "Duskbloom Archivist"
+id = "e0c31872-0a57-4805-96a9-9c46a3addb5e"
+energy-cost = 3
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 1
+image-number = 8516872584
+rarity = "Common"
+art-owned = false
+card-number = 359
+resonance = ["Thunder"]
+"rendered text" = "▸ Materialized: Draw a card. ▸ Judgment: Gain 1●."
+
+[[cards]]
+name = "Animist's Convergence"
+id = "82f87087-9da1-401d-aab1-8c5fcda03338"
+energy-cost = 3
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 2
+image-number = 4024216750
+rarity = "Rare"
+art-owned = false
+card-number = 360
+resonance = ["Stone"]
+"rendered text" = "When you materialize a Spirit Animal, gain 1●. When you materialize 2 Spirit Animals in a turn, discover a Spirit Animal."
+
+[[cards]]
+name = "Bramblehide Colossus"
+id = "cb30a53c-fce2-4048-b808-6ef106c9e054"
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 5
+image-number = 5371966859
+rarity = "Rare"
+art-owned = false
+card-number = 361
+resonance = ["Stone", "Flame"]
+"rendered text" = "▸ Materialized: Abandon an ally to materialize a Shadow Figment."
+
+[[cards]]
+name = "Zenith Invocation"
+id = "a3f91057-ef7a-44e7-8183-d3a06d5e2884"
+energy-cost = "*"
+card-type = "Event"
+is-fast = false
+image-number = 1415966027
+rarity = "Uncommon"
+art-owned = false
+card-number = 362
+subtype = ""
+spark = ""
+resonance = ["Thunder"]
+"rendered text" = "Pay X●: Discover a Spirit Animal with cost X● or less and materialize it."
+
+[[cards]]
+name = "Swarm and Ruin"
+id = "4b39e1f0-418d-45f7-923d-3ea629e55e11"
+energy-cost = 4
+card-type = "Event"
+is-fast = false
+image-number = 4423540821
+rarity = "Rare"
+art-owned = false
+card-number = 363
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = "Dissolve up to 2 enemies. Materialize a Shadow Figment for each enemy dissolved."
+
+[[cards]]
+name = "Crucible of Becoming"
+id = "0ec9bbca-a3de-43b0-b64a-4b94c4b14e2c"
+energy-cost = 3
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 1
+image-number = 9128284711
+rarity = "Rare"
+art-owned = false
+card-number = 364
+"rendered text" = "▸ Judgment: You may discard a character to discover a character with cost 1● higher."
+
+[[cards]]
+name = "Siphon Wraith"
+id = "44cb7de5-4d8a-479e-af0e-b88e47f60cee"
+energy-cost = 1
+card-type = "Character"
+subtype = "Outsider"
+is-fast = false
+spark = 3
+image-number = 9648534386
+rarity = "Common"
+art-owned = false
+card-number = 365
+resonance = ["Thunder"]
+"rendered text" = "To play this character, lose 1 maximum ●."
+
+[[cards]]
+name = "Crystalline Predator"
+id = "41b097e9-44b5-4c61-8977-6a05a8e61dee"
+energy-cost = 2
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 2
+image-number = 7883187151
+rarity = "Uncommon"
+art-owned = false
+card-number = 366
+resonance = ["Flame", "Thunder"]
+"rendered text" = "▸ Judgment: You may abandon this character to gain 4●."
+
+[[cards]]
+name = "Echoing Presence"
+id = "9e88669a-c0a7-4d5c-b871-d7dd1aac072f"
+energy-cost = 2
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 1
+image-number = 5297005440
+rarity = "Rare"
+art-owned = false
+card-number = 367
+"rendered text" = "▸ Materialized: Choose a character type. Allied characters of that type gain +1 spark."
+
+[[cards]]
+name = "Condemned Echo"
+id = "865e8aa9-4e20-469e-9ef6-c5329896fd53"
+energy-cost = 2
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 1
+image-number = 9206617621
+rarity = "Common"
+art-owned = false
+card-number = 368
+resonance = ["Flame"]
+"rendered text" = "▸ Dissolved: Dissolve an enemy with spark 1 or less."
+
+[[cards]]
+name = "Forgemaster of the Veil"
+id = "8c2de60e-1e06-4563-acf9-beb76a2620c2"
+energy-cost = 2
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 0
+image-number = 4143389504
+rarity = "Rare"
+art-owned = false
+card-number = 369
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: Each ally gains +1 spark."
+
+[[cards]]
+name = "Salvage Oracle"
+id = "46736de7-6b44-4d3e-90a7-c7c9146c521f"
+energy-cost = 3
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 2
+image-number = 9655627648
+rarity = "Uncommon"
+art-owned = false
+card-number = 370
+resonance = ["Stone"]
+"rendered text" = "▸ Dissolved: Return a character with cost 2● or less from your void to your hand."
+
+[[cards]]
+name = "Modular Inheritor"
+id = "bd2b91a1-2bb1-4ec2-8254-3a22a438bc66"
+energy-cost = 3
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 2
+image-number = 3567560213
+rarity = "Uncommon"
+art-owned = false
+card-number = 371
+resonance = ["Stone"]
+"rendered text" = "▸ Dissolved: An ally gains +2 spark."
+
+[[cards]]
+name = "Calibrated Detonator"
+id = "c5785c16-b3bf-4b85-af06-5b719c6d9891"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 3314838647
+rarity = "Uncommon"
+art-owned = false
+card-number = 372
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = "Choose a number: Dissolve all enemies with cost equal to that number."
+
+[[cards]]
+name = "Quickbloom"
+id = "57e41821-b153-4a0a-9b25-3c77e773fede"
+energy-cost = 0
+card-type = "Event"
+is-fast = false
+image-number = 4435088900
+rarity = "Common"
+art-owned = false
+card-number = 373
+subtype = ""
+spark = ""
+"rendered text" = "Gain 1●."
+
+[[cards]]
+name = "Reckless Engine"
+id = "fe663f4c-593d-42a2-9fa2-a2bf3560eb46"
+energy-cost = 0
+card-type = "Character"
+subtype = "Robot"
+is-fast = false
+spark = 0
+image-number = 3468798936
+rarity = "Rare"
+art-owned = false
+card-number = 374
+resonance = ["Thunder"]
+"rendered text" = "▸ Materialized, Judgment: Gain 2●. The opponent gains 2⍏."
+
+[[cards]]
+name = "Dissolution Engine"
+id = "2d90a022-7149-43b8-8b19-3cb3842b5bfe"
+energy-cost = 1
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 0
+image-number = 9176934539
+rarity = "Common"
+art-owned = false
+card-number = 375
+resonance = ["Thunder"]
+"rendered text" = "▸ Dissolved: Draw a card. ▸ Judgment: Gain 1●."
+
+[[cards]]
+name = "Surge Capacitor"
+id = "e71ac2d1-8d45-479d-81db-3127860ba498"
+energy-cost = 1
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 0
+image-number = 7982711613
+rarity = "Uncommon"
+art-owned = false
+card-number = 376
+resonance = ["Thunder"]
+"rendered text" = "▸ Materialized: Gain 3●. ▸ Judgment: Lose 1●."
+
+[[cards]]
+name = "Drumbeat of the Waking"
+id = "daa30155-1b40-42ff-b5b6-0745ad9d4277"
+energy-cost = 1
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 0
+image-number = 1024319272
+rarity = "Uncommon"
+art-owned = false
+card-number = 377
+resonance = ["Stone", "Flame"]
+"rendered text" = "▸ Judgment: You may abandon an ally to gain 2●."
+
+[[cards]]
+name = "Altar of Dissolution"
+id = "0bf69801-fab9-4459-9eef-4c57eae90b02"
+energy-cost = 2
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 1
+image-number = 4300878601
+rarity = "Rare"
+art-owned = false
+card-number = 378
+resonance = ["Stone", "Flame"]
+"rendered text" = "▸ Judgment: Abandon an ally to put cards equal to that ally's cost into your void."
+
+[[cards]]
+name = "The Spawning Ground"
+id = "b3908e49-4a7a-4034-8a25-5e592246c5e5"
+energy-cost = 2
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 0
+image-number = 1192541303
+rarity = "Rare"
+art-owned = false
+card-number = 379
+resonance = ["Flame", "Stone"]
+"rendered text" = "When the opponent materializes a character, materialize a Celestial Figment."
+
+[[cards]]
+name = "Bonds of Ruin"
+id = "38a48538-dab4-41dd-951e-2b88e938f046"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 3548863728
+rarity = "Uncommon"
+art-owned = false
+card-number = 380
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = "An ally gains +3 spark. ▸ Dissolved: Abandon an ally."
+
+[[cards]]
+name = "Spine of the Swarm"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 0
+image-number = 7966119229
+rarity = "Rare"
+art-owned = false
+card-number = 381
+resonance = ["Flame"]
+"rendered text" = """
+▸ Materialized: Materialize a Shadow Figment.
+This character's spark equals the number of allied Figments."""
+
+[[cards]]
+name = "Mirage Thief"
+id = "5aad0a6c-81d2-417a-8442-9490191b526e"
+energy-cost = 2
+card-type = "Character"
+subtype = "Agent"
+is-fast = false
+spark = 2
+image-number = 7881850159
+rarity = "Rare"
+art-owned = false
+card-number = 382
+resonance = ["Tide"]
+"rendered text" = "▸ Materialized: Disable an enemy's activated abilities. This character gains those activated abilities."
+
+[[cards]]
+name = "Threshold of Returning"
+id = "98a49295-1ad6-4c6a-bb78-659bfedeec21"
+energy-cost = 3
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 1
+image-number = 8226392963
+rarity = "Uncommon"
+art-owned = false
+card-number = 383
+resonance = ["Flame", "Thunder"]
+"rendered text" = """
+When an ally is banished, this gains +1 spark.
+
+▸ Judgment: Banish an ally, then materialize it."""
+
+[[cards]]
+name = "Hunger Given Form"
+id = "9065b009-6ae3-4138-b5a0-1204a69abc00"
+energy-cost = 2
+card-type = "Character"
+subtype = "Monster"
+is-fast = false
+spark = 2
+image-number = 2521703728
+rarity = "Rare"
+art-owned = false
+card-number = 384
+resonance = ["Stone"]
+"rendered text" = "Costs 0● if you discarded a card this turn. ▸ Materialized: Dissolve an enemy with spark 3 or less."
+
+[[cards]]
+name = "Performer of Final Acts"
+id = "9c9892a6-b472-497c-83b8-fe3460349743"
+energy-cost = 2
+card-type = "Character"
+subtype = "Renegade"
+is-fast = false
+spark = 1
+image-number = 4335175023
+rarity = "Uncommon"
+art-owned = false
+card-number = 385
+resonance = ["Stone", "Flame"]
+"rendered text" = "When you abandon an ally, this character gains +1 spark. ▸ Dissolved: Kindle 3."
+
+[[cards]]
+name = "Echoes of the Fallen Command"
+id = "e4196e79-c4f1-406c-8b9e-90a7323ae85e"
+energy-cost = 2
+card-type = "Event"
+is-fast = true
+image-number = 6402381373
+rarity = "Uncommon"
+art-owned = false
+card-number = 386
+subtype = ""
+spark = ""
+resonance = ["Stone", "Tide"]
+"rendered text" = "Return a character from your void to your hand. The opponent discards a card."
+
+[[cards]]
+name = "Blade of the Bitter End"
+id = "9b592dd0-8f54-4177-baf7-3743e1eef3d2"
+energy-cost = 4
+card-type = "Character"
+subtype = "Outsider"
+is-fast = false
+spark = 2
+image-number = 4332722915
+rarity = "Rare"
+art-owned = false
+card-number = 387
+resonance = ["Flame"]
+"rendered text" = "▸ Materialized: Dissolve an enemy with spark 2 or less. ▸ Dissolved: Return this character to your hand."
+
+[[cards]]
+name = "Chorus of Many Returns"
+id = "a374adac-d42d-4635-b68b-d2e55e65df3c"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 7330120624
+rarity = "Rare"
+art-owned = false
+card-number = 388
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = """
+Until end of turn, when you materialize a character, that character gains +1 spark.
+
+Reclaim 3●"""
+
+[[cards]]
+name = "Phantom Quartermaster"
+id = "d09f9ec0-02e0-4ce3-9281-b6d833e208c5"
+energy-cost = 2
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 1
+image-number = 4789536697
+rarity = "Uncommon"
+art-owned = false
+card-number = 389
+resonance = ["Flame"]
+"rendered text" = "At the end of your turn, if an ally left play this turn, materialize a Radiant Figment."
+
+[[cards]]
+name = "Dissolution Without Recourse"
+id = "9e29bb8c-2faf-4964-be86-006883c8d539"
+energy-cost = 3
+card-type = "Event"
+is-fast = true
+image-number = 9109137523
+rarity = "Uncommon"
+art-owned = false
+card-number = 390
+subtype = ""
+spark = ""
+resonance = ["Stone"]
+"rendered text" = """
+Dissolve an enemy with cost 3● or less.
+
+Reclaim -- Banish a card from hand."""
+
+[[cards]]
+name = "The Hungering Deep"
+id = "c9ec2950-f87e-4041-a50d-cd0fb85217f0"
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 4
+image-number = 6263937343
+rarity = "Rare"
+art-owned = false
+card-number = 391
+resonance = ["Stone"]
+"rendered text" = "▸ Judgment: Draw a card, then put the top 2 cards of your deck into your void. ▸ Dissolved: Draw 2 cards."
+
+[[cards]]
+name = "Viper's Flash"
+id = "05b21b36-09ff-461f-94a8-009b5140ee80"
+energy-cost = 2
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = true
+spark = 1
+image-number = 5013220699
+rarity = "Rare"
+art-owned = false
+card-number = 392
+resonance = ["Flame", "Thunder"]
+"rendered text" = "▸ Materialized: Draw a card. With 3 allied Spirit Animals, dissolve an enemy with spark 2 or less."
+
+[[cards]]
+name = "Cascade Wanderer"
+id = "e2a9fa5d-20c8-4aee-992c-d956e18c1e41"
+energy-cost = 3
+card-type = "Character"
+subtype = "Explorer"
+is-fast = false
+spark = 2
+image-number = 7989792853
+rarity = "Rare"
+art-owned = false
+card-number = 393
+resonance = ["Tide"]
+"rendered text" = "▸ Materialized: Discover a card with cost 2● or less and play it for 0●."
+
+[[cards]]
+name = "Wellspring of Ash and Stone"
+id = "57bbd496-8674-4931-a5b3-15899a0846e1"
+energy-cost = 1
+card-type = "Event"
+is-fast = false
+image-number = 7765648373
+rarity = "Common"
+art-owned = false
+card-number = 394
+subtype = ""
+spark = ""
+resonance = ["Thunder"]
+"rendered text" = "Put the top 2 cards of your deck into your void. Gain 2●."
+
+[[cards]]
+name = "The Dreaming Necropolis"
+id = "94dd55b1-2fea-4656-a834-25079e252d04"
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 1
+image-number = 3347392197
+rarity = "Rare"
+art-owned = false
+card-number = 395
+resonance = ["Flame"]
+"rendered text" = "▸ Judgment: With 5 or more differently-named allies, materialize a Shadow Figment."
+
+[[cards]]
+name = "Reliquary Construct"
+id = "c9154c8a-1538-47a6-94d6-a3638a24d58c"
+energy-cost = 2
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 2
+image-number = 9148831211
+rarity = "Uncommon"
+art-owned = false
+card-number = 396
+resonance = ["Flame"]
+"rendered text" = "▸ Dissolved: An ally gains +2 spark."
+
+[[cards]]
+name = "Tide of Retreat"
+id = "f1e4afd2-cb16-454a-a11b-f2e5ede8d46b"
+energy-cost = 2
+card-type = "Event"
+is-fast = true
+image-number = 7805121011
+rarity = "Common"
+art-owned = false
+card-number = 397
+subtype = ""
+spark = ""
+"rendered text" = "Abandon an ally: Return any number of allies to hand."
+
+[[cards]]
+name = "Wellspring Watcher"
+id = "e8555cdd-6c83-472c-a269-3317005e5703"
+energy-cost = 3
+card-type = "Character"
+subtype = "Visionary"
+is-fast = false
+spark = 1
+image-number = 7933851807
+rarity = "Uncommon"
+art-owned = false
+card-number = 398
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: Kindle 1. You may pay 3● to materialize a Radiant Figment."
+
+[[cards]]
+name = "Pact of Shared Ruin"
+id = "4c1b4afa-6ae8-4966-b9c2-66f483485245"
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 2
+image-number = 4941315410
+rarity = "Common"
+art-owned = false
+card-number = 399
+resonance = ["Flame"]
+"rendered text" = "When an ally is abandoned, the opponent abandons a character."
+
+[[cards]]
+name = "Hollow Vanguard"
+id = "2e61277e-9bf6-4ced-a137-8248b5f341fc"
+energy-cost = 1
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 2
+image-number = 3153508267
+rarity = "Common"
+art-owned = false
+card-number = 400
+resonance = ["Thunder"]
+"rendered text" = "▸ Materialized: The opponent gains 1⍏."
+
+[[cards]]
+name = "Wanderer's Toll"
+id = "16771c40-46a9-4122-b5e1-a80f3912d99e"
+energy-cost = 3
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 2
+image-number = 2394622312
+rarity = "Uncommon"
+art-owned = false
+card-number = 401
+resonance = ["Stone"]
+"rendered text" = """
+▸ Materialized: Materialize a Halcyon Figment. Abandon an ally: Foresee 1.
+
+Reclaim 4●"""
+
+[[cards]]
+name = "Revenant Sovereign"
+id = "ac839892-f6bc-44c3-8306-a7f02db08679"
+energy-cost = 4
+card-type = "Character"
+subtype = "Monster"
+is-fast = false
+spark = 1
+image-number = 1689745079
+rarity = "Uncommon"
+art-owned = false
+card-number = 402
+resonance = ["Stone"]
+"rendered text" = "▸ Materialized: Dissolve an enemy."
+
+[[cards]]
+name = "Doom of the Bonded Host"
+id = "45eaba8d-8f3e-4f65-9c31-30565988e804"
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 1
+image-number = 9717370270
+rarity = "Rare"
+art-owned = false
+card-number = 403
+resonance = ["Flame"]
+"rendered text" = """
+▸ Judgment: Materialize two Shadow Figments.
+
+Abandon an ally: Draw 2 cards."""
+
+[[cards]]
+name = "Tether of Broken Kin"
+id = "cc30f664-bf0a-48ea-9b91-6308b442fdec"
+energy-cost = 1
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 0
+image-number = 4028704019
+rarity = "Uncommon"
+art-owned = false
+card-number = 404
+resonance = ["Stone"]
+"rendered text" = "▸ Judgment: You may pay 2● to return a character from your void to your hand."
+
+[[cards]]
+name = "Scattered Ruin"
+id = "ebfd5a60-8a65-4450-9759-c102ff678069"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 4964603965
+rarity = "Uncommon"
+art-owned = false
+card-number = 405
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = "Dissolve enemies with total spark 3 or less, divided among one, two, or three enemies."
+
+[[cards]]
+name = "Vessel of Unbroken Will"
+id = "12bdc762-59ec-481a-9936-8c5327ae7c09"
+energy-cost = 7
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 5
+image-number = 5841537589
+rarity = "Rare"
+art-owned = false
+card-number = 406
+resonance = ["Flame"]
+"rendered text" = "▸ Dissolved: Materialize up to 3 characters from your deck with total cost 6● or less."
+
+[[cards]]
+name = "Gambit of the Dreaming Hour"
+id = "000dc7ca-546e-489c-b0ea-8bfcdd92bf75"
+energy-cost = 0
+card-type = "Event"
+is-fast = true
+image-number = 8710806857
+rarity = "Rare"
+art-owned = false
+card-number = 407
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = """
+↯fast -- Discover a character and materialize it. At the start of your next turn, pay that character's cost or the opponent gains 6⍏."""
+
+[[cards]]
+name = "Tide of Waking"
+id = "c996cacb-1d18-4281-b695-42cee67278a8"
+energy-cost = 2
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 0
+image-number = 7091144108
+rarity = "Common"
+art-owned = false
+card-number = 408
+resonance = ["Thunder"]
+"rendered text" = "All cards have ↯fast."
+
+[[cards]]
+name = "Remnant Reclaimer"
+id = "2555ec68-c322-42f6-9fba-27a09e59c7c9"
+energy-cost = 3
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 1
+image-number = 1369113103
+rarity = "Uncommon"
+art-owned = false
+card-number = 409
+resonance = ["Stone", "Flame"]
+"rendered text" = "Abandon this character: Return a character dissolved this turn from your void to play."
+
+[[cards]]
+name = "Well of Aching Sight"
+id = "86abaf83-6880-4d33-bb2f-e3a9867cf9de"
+energy-cost = 2
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 0
+image-number = 7469408116
+rarity = "Rare"
+art-owned = false
+card-number = 410
+resonance = ["Tide"]
+"rendered text" = "▸ Materialized, Judgment: You may pay 2●. If you do, draw 2 cards. The opponent gains 2⍏."
+
+[[cards]]
+name = "Echo of Worth"
+id = "b964cd06-967a-4f65-95ea-46fd698713f4"
+energy-cost = 2
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 0
+image-number = 5973921161
+rarity = "Uncommon"
+art-owned = false
+card-number = 411
+resonance = ["Stone", "Flame"]
+"rendered text" = "▸ Materialized, Dissolved: Gain 2●."
+
+[[cards]]
+name = "Arbiter of Last Resort"
+id = "47c59376-dc4b-46d7-ba97-44db55e9d523"
+energy-cost = 3
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 2
+image-number = 6276301747
+rarity = "Rare"
+art-owned = false
+card-number = 412
+resonance = ["Tide"]
+"rendered text" = "▸ Judgment: Dissolve an enemy or ally with the lowest spark."
+
+[[cards]]
+name = "Mirror of Shifting Forms"
+id = "fa780152-23dd-4138-8ff7-3083e46fc2bb"
+energy-cost = 4
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 0
+image-number = 5245842585
+rarity = "Uncommon"
+art-owned = false
+card-number = 413
+"rendered text" = "3●: Until end of turn, this character becomes a copy of an ally or enemy."
+
+[[cards]]
+name = "Architect of Returning Tides"
+id = "c0f7a075-a5a5-4383-8487-07f9788a623c"
+energy-cost = 4
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 2
+image-number = 8514001718
+rarity = "Common"
+art-owned = false
+card-number = 414
+resonance = ["Tide"]
+"rendered text" = "Once per turn, when you return an ally to hand, draw a card."
+
+[[cards]]
+name = "Hungering Revenant"
+id = "b98869d1-3498-4c00-a140-1c305ad86b5f"
+energy-cost = 3
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 3
+image-number = 6250615537
+rarity = "Uncommon"
+art-owned = false
+card-number = 415
+resonance = ["Stone"]
+"rendered text" = "When you reclaim a character, if this card is in your void, reclaim this character."
+
+[[cards]]
+name = "The Machinist's Eye"
+id = "6c44da89-75f8-48a7-a1be-d4a6cc3fd66e"
+energy-cost = 4
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 2
+image-number = 2272468435
+rarity = "Rare"
+art-owned = false
+card-number = 416
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: Foresee 3. You may put a found character into your hand."
+
+[[cards]]
+name = "Gravecaller Sovereign"
+id = "19aac5e2-357c-4a50-8ef1-f40aa880a4c4"
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 2
+image-number = 1508293535
+rarity = "Rare"
+art-owned = false
+card-number = 417
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: You may pay 1● to materialize a character from the opponent's void."
+
+[[cards]]
+name = "Wraith of Persistent Will"
+id = "e1853b83-8b3f-4f90-96aa-19cc45f696fe"
+energy-cost = 3
+card-type = "Character"
+subtype = "Outsider"
+is-fast = false
+spark = 2
+image-number = 7915180396
+rarity = "Rare"
+art-owned = false
+card-number = 418
+resonance = ["Stone"]
+"rendered text" = "▸ Dissolved: You may pay 3● to return this character to the battlefield with +3 spark."
+
+[[cards]]
+name = "Vessel of Twin Rites"
+id = "801864d7-de84-44ee-b225-ded9ac7c6233"
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 2
+image-number = 4379062512
+rarity = "Uncommon"
+art-owned = false
+card-number = 419
+resonance = ["Flame"]
+"rendered text" = """
+▸ Dissolved: Materialize a Shadow Figment.
+
+When you abandon a Figment, kindle 2."""
+
+[[cards]]
+name = "Seedsower of the Abyss"
+id = "a1df8763-d714-4cfe-8290-a63dbe2c6871"
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 2
+image-number = 2573155077
+rarity = "Uncommon"
+art-owned = false
+card-number = 420
+resonance = ["Flame"]
+"rendered text" = """
+▸ Judgment: Each player materializes a Shadow Figment.
+
+When you abandon a Figment, gain 1⍏."""
+
+[[cards]]
+name = "Hollowing Bloom"
+id = "72b9b786-c098-4e96-95f2-e9eabfd010a0"
+energy-cost = 3
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 0
+image-number = 5238307424
+rarity = "Common"
+art-owned = false
+card-number = 421
+resonance = ["Stone"]
+"rendered text" = "Discard a card: Gain 2●."
+
+[[cards]]
+name = "Omen of the Open Gate"
+id = "f6ccb2d8-663e-4c9b-830b-79b2ddc89f79"
+energy-cost = 5
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 3
+image-number = 4296487485
+rarity = "Rare"
+art-owned = false
+card-number = 422
+resonance = ["Flame"]
+"rendered text" = "▸ Judgment: With a non-Warrior ally, discover a Warrior and materialize it."
+
+[[cards]]
+name = "Resonance Unlocker"
+id = "72d3cda9-1140-4427-8e16-093226f7ac1b"
+energy-cost = 2
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 1
+image-number = 4390401457
+rarity = "Uncommon"
+art-owned = false
+card-number = 423
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: You may pay 1● to trigger the ▸ Judgment: ability of an ally."
+
+[[cards]]
+name = "Suspended Sanctuary"
+id = "7a6c19ca-bbc0-4393-ac88-8f6003d33da7"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 4540982679
+rarity = "Rare"
+art-owned = false
+card-number = 424
+subtype = ""
+spark = ""
+"rendered text" = "Prevent all ⍏ the opponent would score until your next turn. Lose 1 maximum ●."
+
+[[cards]]
+name = "Throne of the Dark Tide"
+id = "aba94351-4486-4710-ac3d-ae9e29279ac0"
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 5
+image-number = 1629106800
+rarity = "Rare"
+art-owned = false
+card-number = 425
+resonance = ["Stone"]
+"rendered text" = "To play this card, abandon all allies. ▸ Dissolved: Reclaim this character."
+
+[[cards]]
+name = "Sovereign of the Exiled Pride"
+id = "a9c4db29-be96-467a-9b4b-b0bb0f779def"
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 1
+image-number = 1169345251
+rarity = "Uncommon"
+art-owned = false
+card-number = 426
+resonance = ["Stone"]
+"rendered text" = "▸ Materialized: Materialize a Halcyon Figment. ▸ Judgment: Kindle 1 for each allied Warrior."
+
+[[cards]]
+name = "Sealer of Paths"
+id = "e4087594-d3b3-42eb-9db3-07274f767eda"
+energy-cost = 2
+card-type = "Character"
+subtype = "Synth"
+is-fast = true
+spark = 2
+image-number = 5332961773
+rarity = "Common"
+art-owned = false
+card-number = 427
+resonance = ["Tide"]
+"rendered text" = "Enemies may not be played from the void."
+
+[[cards]]
+name = "Pack of the Sprinting Wild"
+id = "6bdf06f6-b6aa-48b2-9a8a-b29bc3a56aeb"
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 2
+image-number = 1894969314
+rarity = "Uncommon"
+art-owned = false
+card-number = 428
+resonance = ["Stone"]
+"rendered text" = "▸ Judgment: Materialize a Halcyon Figment for each 2 spark this character has."
+
+[[cards]]
+name = "Stouthearted Scout"
+id = "6c405dbe-5eed-48a7-99ed-1425fa7b8d33"
+energy-cost = 2
+card-type = "Character"
+subtype = "Survivor"
+is-fast = true
+spark = 1
+image-number = 1154942953
+rarity = "Uncommon"
+art-owned = false
+card-number = 429
+resonance = ["Stone"]
+"rendered text" = "▸ Materialized: Return a character dissolved this turn from your void to your hand."
+
+[[cards]]
+name = "Rift-Wing Harbinger"
+id = "e70d155c-c561-4d0f-aff6-fc219e221017"
+energy-cost = 3
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 2
+image-number = 8242379223
+rarity = "Uncommon"
+art-owned = false
+card-number = 430
+resonance = ["Flame", "Thunder"]
+"rendered text" = "▸ Materialized: Banish an ally or enemy until your next main phase."
+
+[[cards]]
+name = "The Unending Swarm"
+id = "22a259a2-c721-4d98-94c0-5a9de3d7afe3"
+energy-cost = 7
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 4
+image-number = 7387821907
+rarity = "Rare"
+art-owned = false
+card-number = 431
+resonance = ["Flame"]
+"rendered text" = "▸ Materialized, Judgment: Materialize two Celestial Figments."
+
+[[cards]]
+name = "Voice of the Passing Storm"
+id = "77bae5b0-ad0a-4b51-b211-141e95b3862a"
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+is-fast = true
+spark = 1
+image-number = 3153230184
+rarity = "Rare"
+art-owned = false
+card-number = 432
+resonance = ["Flame", "Thunder"]
+"rendered text" = """
+▸ Materialized: Choose one:
+• Kindle 2.
+• Materialize a Celestial Figment.
+• Banish an enemy with spark 2 or less."""
+
+[[cards]]
+name = "Architect of Living Light"
+id = "91a34bf7-a856-498d-ba6a-c866494176ce"
+energy-cost = 6
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 3
+image-number = 5176360995
+rarity = "Common"
+art-owned = false
+card-number = 433
+resonance = ["Flame"]
+"rendered text" = "When you materialize a Figment, materialize an additional Figment."
+
+[[cards]]
+name = "Descent Into the Archive"
+id = "ecd53ca5-f250-4402-a686-c51148e1e3b8"
+energy-cost = 3
+card-type = "Event"
+is-fast = true
+image-number = 5862729874
+rarity = "Uncommon"
+art-owned = false
+card-number = 434
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Return an enemy to hand. The opponent puts it on top or bottom of their deck."
+
+[[cards]]
+name = "Equinox Reckoning"
+id = "aa399f47-2025-4539-ac69-a6bca90e2786"
+energy-cost = 4
+card-type = "Event"
+is-fast = false
+image-number = 2843908769
+rarity = "Rare"
+art-owned = false
+card-number = 435
+subtype = ""
+spark = ""
+"rendered text" = "Each player abandons characters until they have as many as the player with fewer."
+
+[[cards]]
+name = "Voice of the Gale"
+id = "27474cc8-5c37-453e-aa2d-b03e1931a74b"
+energy-cost = 7
+card-type = "Event"
+is-fast = false
+image-number = 4330542180
+rarity = "Rare"
+art-owned = false
+card-number = 436
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = "Banish all characters. The opponent gains 1 maximum ● for each enemy banished."
+
+[[cards]]
+name = "Radiant Expulsion"
+id = "063190f6-7723-44f3-bdb4-59f4037faea3"
+energy-cost = 6
+card-type = "Event"
+is-fast = false
+image-number = 8449715039
+rarity = "Common"
+art-owned = false
+card-number = 437
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = "Dissolve all characters. Gain 1● for each enemy dissolved this way."
+
+[[cards]]
+name = "Archivist of Distant Shores"
+id = "4c45be08-290c-4129-9238-897cd73b7279"
+energy-cost = 2
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 1
+image-number = 5704000830
+rarity = "Uncommon"
+art-owned = false
+card-number = 438
+resonance = ["Tide"]
+"rendered text" = "▸ Materialized: Foresee 3, then draw a card."
+
+[[cards]]
+name = "Sage of Infinite Pages"
+id = "a81e4891-9545-4263-a5cf-29d44cb08dd3"
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+is-fast = true
+spark = 2
+image-number = 8238857689
+rarity = "Rare"
+art-owned = false
+card-number = 439
+resonance = ["Tide"]
+"rendered text" = """
+▸ Materialized: Draw 2 cards. This character gains +1 spark for each card drawn this turn."""
+
+[[cards]]
+name = "Inquiry Engine"
+id = "eef822ee-7226-4b70-85ce-d0d61780e186"
+energy-cost = 3
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 1
+image-number = 1980339245
+rarity = "Uncommon"
+art-owned = false
+card-number = 440
+resonance = ["Tide"]
+"rendered text" = "▸ Judgment: You may pay 2● to foresee 2 and draw a card."
+
+[[cards]]
+name = "Stillborn Insight"
+id = "90e97e94-2d89-4c25-b4ab-23d469b9a723"
+energy-cost = 3
+card-type = "Character"
+subtype = "Mage"
+is-fast = true
+spark = 2
+image-number = 1588225114
+rarity = "Rare"
+art-owned = false
+card-number = 441
+resonance = ["Tide"]
+"rendered text" = """
+▸ Materialized: Disable an enemy's activated and Judgment abilities while this character is in play."""
+
+[[cards]]
+name = "Flicker of the Curious Path"
+id = "36eb38d7-c57f-4c60-8b7a-21d4e955728e"
+energy-cost = 4
+card-type = "Character"
+subtype = "Guide"
+is-fast = false
+spark = 1
+image-number = 1643809683
+rarity = "Common"
+art-owned = false
+card-number = 442
+resonance = ["Flame", "Thunder"]
+"rendered text" = "When you play an event, you may banish an ally, then materialize it."
+
+[[cards]]
+name = "Watcher Between Waves"
+id = "c235b54e-e55b-4868-92b6-1473e77f3f7c"
+energy-cost = 4
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 2
+image-number = 3223465535
+rarity = "Rare"
+art-owned = false
+card-number = 443
+resonance = ["Tide"]
+"rendered text" = """
+When you have no cards in your deck, you win the game.
+▸ Judgment: Put the top 3 cards of your deck into your void.
+"""
+
+[[cards]]
+name = "Reading of the Ebb Tide"
+id = "e0889e66-ab8c-4851-a909-b2bf9fc8ae55"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 8582434361
+rarity = "Common"
+art-owned = false
+card-number = 444
+subtype = ""
+spark = ""
+"rendered text" = "Foresee X, where X is your current energy. Draw a card."
+
+[[cards]]
+name = "Pact of Open Skies"
+id = "1cf26e51-dd11-4ad0-85d9-42c324a65e2e"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 7376902442
+rarity = "Common"
+art-owned = false
+card-number = 445
+subtype = ""
+spark = ""
+"rendered text" = "Each player may materialize a character from their hand for 0●."
+
+[[cards]]
+name = "Visions of the Deep"
+id = "c589cabf-bc08-4527-9ab8-d9d9a622ad8c"
+energy-cost = 3
+card-type = "Event"
+is-fast = false
+image-number = 5337559611
+rarity = "Common"
+art-owned = false
+card-number = 446
+subtype = ""
+spark = ""
+"rendered text" = "Foresee 5. Draw 2 cards."
+
+[[cards]]
+name = "Sundering Tide"
+id = "17c95d25-fdc4-477c-ac98-92b2b2c1829b"
+energy-cost = 6
+card-type = "Event"
+is-fast = false
+image-number = 5418211655
+rarity = "Common"
+art-owned = false
+card-number = 447
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Return all characters to their owners' hands."
+
+[[cards]]
+name = "Cipher of Cascading Sparks"
+id = "13f442b2-2bf2-4305-87a3-9dcd141cf578"
+energy-cost = 2
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 1
+image-number = 7709400082
+rarity = "Uncommon"
+art-owned = false
+card-number = 448
+resonance = ["Thunder", "Tide"]
+"rendered text" = "When you play an event, this character gains +1 spark. ▸ Judgment: With 5 or more spark, draw a card."
+
+[[cards]]
+name = "Knight of Fading Light"
+id = "f4205a7a-16db-4886-a094-06f974a01111"
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 2
+image-number = 3875741104
+rarity = "Uncommon"
+art-owned = false
+card-number = 449
+"rendered text" = "▸ Judgment: If you have fewer ⍏ than the opponent, this character gains +2 spark."
+
+[[cards]]
+name = "Twins of the Schism"
+id = "ef905bc3-6602-4b61-83bd-1b223cd5c5a2"
+energy-cost = 3
+card-type = "Character"
+subtype = "Visitor"
+is-fast = false
+spark = 2
+image-number = 1531791802
+rarity = "Rare"
+art-owned = false
+card-number = 450
+resonance = ["Flame"]
+"rendered text" = "▸ Judgment: If the opponent has more ⍏ than you, materialize a Radiant Figment and draw a card."
+
+[[cards]]
+name = "Wraith of Withered Crowns"
+id = "05b4c64a-8eb3-4a09-a37f-5c205d734850"
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 3
+image-number = 4906771494
+rarity = "Rare"
+art-owned = false
+card-number = 451
+resonance = ["Flame"]
+"rendered text" = """
+▸ Materialized: Each enemy loses 2 spark.
+Discard this card: Dissolve an enemy with spark 2 or less.
+"""
+
+[[cards]]
+name = "Tide-Warden of the Abyss"
+id = "4bb1b10b-c1a5-48b0-909a-a405e241443e"
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 3
+image-number = 1470918256
+rarity = "Rare"
+art-owned = false
+card-number = 452
+resonance = ["Stone", "Tide"]
+"rendered text" = """
+▸ Materialized, Judgment: Put the top 3 cards of your deck into your void, then return a character from your void to your hand.
+"""
+
+[[cards]]
+name = "Sovereign of Shattered Worlds"
+id = "801e53f1-fa99-4ed9-abc9-2c02e07acb1e"
+energy-cost = 8
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 4
+image-number = 3976596041
+rarity = "Rare"
+art-owned = false
+card-number = 453
+resonance = ["Flame"]
+"rendered text" = "▸ Materialized, Judgment: The opponent abandons an enemy. Draw a card."
+
+[[cards]]
+name = "The Devouring Hymn"
+id = "2eefb602-7236-4256-b2c8-5be725c0c2a0"
+energy-cost = 8
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 5
+image-number = 9976375103
+rarity = "Common"
+art-owned = false
+card-number = 454
+resonance = ["Tide"]
+"rendered text" = "7●: Draw 7 cards."
+
+[[cards]]
+name = "Vault of Second Lives"
+id = "b461e967-7ff3-4f99-898e-67c33ad1e723"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 8690843666
+rarity = "Common"
+art-owned = false
+card-number = 455
+subtype = ""
+spark = ""
+"rendered text" = "Each player reclaims a character with the lowest cost in their void."
+
+[[cards]]
+name = "Spark-Welder"
+id = "e4c24242-619c-4dd1-862f-edf988e1d6cc"
+energy-cost = 1
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 1
+image-number = 6109096234
+rarity = "Uncommon"
+art-owned = false
+card-number = 456
+resonance = ["Tide"]
+"rendered text" = "▸ Judgment: You may discard up to 2 cards, then draw that many cards. This character gains +1 spark."
+
+[[cards]]
+name = "Nimble Plunderer"
+id = "3002b466-fe0e-4237-b686-bd1c98235fad"
+energy-cost = 2
+card-type = "Character"
+subtype = "Visitor"
+is-fast = true
+spark = 2
+image-number = 2214455113
+rarity = "Rare"
+art-owned = false
+card-number = 457
+resonance = ["Thunder", "Tide"]
+"rendered text" = "▸ Judgment: Discover a card from the top of the opponent's deck and you may play it this turn."
+
+[[cards]]
+name = "Crimson Reveler"
+id = "29229288-b647-4ca8-b866-f42c983269cc"
+energy-cost = 1
+card-type = "Character"
+subtype = "Visitor"
+is-fast = false
+spark = 1
+image-number = 5536314381
+rarity = "Common"
+art-owned = false
+card-number = 458
+resonance = ["Tide"]
+"rendered text" = "▸ Materialized: The opponent discards a card. Draw a card."
+
+[[cards]]
+name = "Dread Revenant"
+id = "c84bf4e3-7cb5-4825-927a-3b87fcc5e92a"
+energy-cost = 3
+card-type = "Character"
+subtype = "Monster"
+is-fast = false
+spark = 2
+image-number = 1264916982
+rarity = "Rare"
+art-owned = false
+card-number = 459
+resonance = ["Tide"]
+"rendered text" = "▸ Judgment: With 4+ cards in your void, trigger an additional Judgment phase."
+
+[[cards]]
+name = "Vault Raider"
+id = "a1a7dbe9-a5b7-42cc-ab4f-615fa4edcbff"
+energy-cost = 2
+card-type = "Character"
+subtype = "Renegade"
+is-fast = false
+spark = 2
+image-number = 4206901401
+rarity = "Uncommon"
+art-owned = false
+card-number = 460
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: Gain 1●. The opponent gains 1●."
+
+[[cards]]
+name = "Scarlet Heiress"
+id = "2fe66e67-6d99-472b-9edf-982bda562df7"
+energy-cost = 2
+card-type = "Character"
+subtype = "Renegade"
+is-fast = false
+spark = 1
+image-number = 8686366422
+rarity = "Uncommon"
+art-owned = false
+card-number = 461
+resonance = ["Thunder", "Tide"]
+"rendered text" = """
+▸ Materialized: Draw a card. Discard a card.
+When you discard a card, this character gains +1 spark."""
+
+[[cards]]
+name = "Dream-Theft Adept"
+id = "945a1ebb-4e22-462c-8db4-a3fe445dcc8d"
+energy-cost = 2
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 1
+image-number = 8126737625
+rarity = "Uncommon"
+art-owned = false
+card-number = 462
+resonance = ["Tide"]
+"rendered text" = "▸ Judgment: You may discard a card. If you do, discover a card from the top 2 cards of your deck and play it this turn."
+
+[[cards]]
+name = "Hood of the Wandering Blade"
+id = "ac83cf04-f3c8-4c0d-aa05-98c142d2c322"
+energy-cost = 2
+card-type = "Character"
+subtype = "Renegade"
+is-fast = true
+spark = 2
+image-number = 3606537474
+rarity = "Rare"
+art-owned = false
+card-number = 463
+resonance = ["Tide"]
+"rendered text" = """
+▸ Judgment: If the opponent has more cards in hand, discover from their deck and play it.
+"""
+
+[[cards]]
+name = "Torch of the Reckless"
+id = "d701aad1-2ecd-4b08-a4b7-962022907ae2"
+energy-cost = 3
+card-type = "Character"
+subtype = "Renegade"
+is-fast = false
+spark = 2
+image-number = 3363256686
+rarity = "Uncommon"
+art-owned = false
+card-number = 464
+resonance = ["Flame"]
+"rendered text" = """
+▸ Judgment: Abandon an ally to dissolve an enemy with spark equal to that ally's spark.
+"""
+
+[[cards]]
+name = "Reveler of the Stolen Stage"
+id = "9ae541d8-2c1b-4a29-8193-d5e6d0b7fb5d"
+energy-cost = 4
+card-type = "Character"
+subtype = "Outsider"
+is-fast = true
+spark = 2
+image-number = 5874938300
+rarity = "Rare"
+art-owned = false
+card-number = 465
+resonance = ["Flame", "Thunder"]
+"rendered text" = """
+▸ Materialized: Disable the ▸ Materialized: abilities of enemies until your next main phase.
+"""
+
+[[cards]]
+name = "Sovereign of Stolen Fates"
+id = "b4877df2-cbc8-41ea-b021-c778b0c3c55a"
+energy-cost = 7
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 5
+image-number = 1018369884
+rarity = "Rare"
+art-owned = false
+card-number = 466
+resonance = ["Tide"]
+"rendered text" = """
+▸ Materialized: Discover a card from your deck and one from the opponent's. Play them for 0●.
+"""
+
+[[cards]]
+name = "Scrapwarden Extruder"
+id = "6a23256e-8dff-4b37-a8bd-6e6b744c74a9"
+energy-cost = 2
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 0
+image-number = 8466061770
+rarity = "Common"
+art-owned = false
+card-number = 467
+resonance = ["Flame"]
+"rendered text" = "▸ Materialized: Dissolve an enemy with spark 2 or less."
+
+[[cards]]
+name = "Dreaming Halfwarden"
+id = "d8d6cd28-141d-4bab-b0cb-bac4d7423e4a"
+energy-cost = 1
+card-type = "Character"
+subtype = "Visitor"
+is-fast = false
+spark = 1
+image-number = 7401098009
+rarity = "Uncommon"
+art-owned = false
+card-number = 468
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: Gain 1●. Characters with cost 5● or more cost you 1● less."
+
+[[cards]]
+name = "Sower of Endless Growth"
+id = "e1a60439-1741-4f27-971f-986a16130bf7"
+energy-cost = 2
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 1
+image-number = 4082004622
+rarity = "Rare"
+art-owned = false
+card-number = 469
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: Kindle 1. 5●: Each allied character gains +1 spark."
+
+[[cards]]
+name = "Ferocious Coilbeast"
+id = "4737eeb2-c564-4ae3-a409-ae3472f9fc11"
+energy-cost = 2
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 1
+image-number = 5017172815
+rarity = "Uncommon"
+art-owned = false
+card-number = 470
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: Gain 1●. With an ally with spark 4 or more, gain 3● instead."
+
+[[cards]]
+name = "Tidebreaker"
+id = "d0396d8f-e880-4176-be09-c3c7434f3c02"
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 1
+image-number = 5905558725
+rarity = "Uncommon"
+art-owned = false
+card-number = 471
+resonance = ["Flame"]
+"rendered text" = "▸ Judgment: This character gains +2 spark."
+
+[[cards]]
+name = "Verdant Arrival"
+id = "ba4c4948-efa4-4388-8567-d329538f1594"
+energy-cost = 2
+card-type = "Character"
+subtype = "Explorer"
+is-fast = false
+spark = 1
+image-number = 6549908889
+rarity = "Uncommon"
+art-owned = false
+card-number = 472
+resonance = ["Tide"]
+"rendered text" = """
+▸ Materialized: Put the top 4 cards of your deck into your void. Return a character from among them to hand.
+"""
+
+[[cards]]
+name = "Tide-Sculpted Colossus"
+id = "73d0d323-bf47-4d73-9c17-6bebe8b3622e"
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = "*"
+image-number = 3169093486
+rarity = "Rare"
+art-owned = false
+card-number = 473
+resonance = ["Thunder"]
+"rendered text" = """
+This character's spark is equal to your maximum ●.
+▸ Judgment: You may pay 5● to reclaim this character."""
+
+[[cards]]
+name = "Propagating Verdant"
+id = "c7840f3b-3297-4409-b124-4309ed93e542"
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 1
+image-number = 9730620078
+rarity = "Rare"
+art-owned = false
+card-number = 474
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: Each ally gains spark equal to this character's spark."
+
+[[cards]]
+name = "Verdant Mother"
+id = "9c02bbbb-8c55-486a-9742-4d3a14f90545"
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 3
+image-number = 7698845562
+rarity = "Uncommon"
+art-owned = false
+card-number = 475
+resonance = ["Flame"]
+"rendered text" = "When a non-Figment ally is dissolved, materialize a Radiant Figment."
+
+[[cards]]
+name = "Wanderer's Last Blessing"
+id = "c8554288-6676-4738-a27e-d58180d5d4db"
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 3
+image-number = 7385898882
+rarity = "Rare"
+art-owned = false
+card-number = 476
+resonance = ["Stone"]
+"rendered text" = "▸ Materialized: Draw a card. ▸ Dissolved: Discover a character with cost 3● or less."
+
+[[cards]]
+name = "Titan of the Endless Deep"
+id = "11f31879-cc52-44ee-bbdf-74fb2d830dab"
+energy-cost = 10
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 8
+image-number = 3150610217
+rarity = "Rare"
+art-owned = false
+card-number = 477
+resonance = ["Flame"]
+"rendered text" = "▸ Dissolved: Materialize three Shadow Figments."
+
+[[cards]]
+name = "Torrent of the Abyss"
+id = "53b9b423-156b-4e70-888b-107fe7ecce5b"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 9004762185
+rarity = "Common"
+art-owned = false
+card-number = 478
+subtype = ""
+spark = ""
+resonance = ["Thunder"]
+"rendered text" = "Gain N maximum ●, where N is the number of cards in your void."
+
+[[cards]]
+name = "Rite of Binding Sacrifice"
+id = "0382ee13-69bc-4e2a-b9da-e85d2f124779"
+energy-cost = 4
+card-type = "Event"
+is-fast = false
+image-number = 8743872436
+rarity = "Rare"
+art-owned = false
+card-number = 479
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = "▸ Judgment: You may abandon a character to materialize a random character from your deck."
+
+[[cards]]
+name = "Colossus of Unbreaking"
+id = "b0b4de61-336a-4cb1-94f0-4ce558df5bd5"
+energy-cost = 10
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 8
+image-number = 8575798854
+rarity = "Rare"
+art-owned = false
+card-number = 480
+resonance = ["Stone"]
+"rendered text" = "▸ Dissolved: Return this character to your hand."
+
+[[cards]]
+name = "The Dreamless Horizon"
+id = "5f0cd400-31d7-4321-aae2-dd970758c99a"
+energy-cost = 13
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 10
+image-number = 6050025559
+rarity = "Uncommon"
+art-owned = false
+card-number = 481
+resonance = ["Thunder"]
+"rendered text" = "When you play this card from hand, take an extra turn after this one."
+
+[[cards]]
+name = "Cartographer's Compass"
+id = "c3c85607-f0fb-4c66-ab98-6dbdc7c8d5ef"
+energy-cost = 1
+card-type = "Event"
+is-fast = false
+image-number = 8665424382
+rarity = "Common"
+art-owned = false
+card-number = 482
+subtype = ""
+spark = ""
+"rendered text" = "Gain 1 maximum ●."
+
+[[cards]]
+name = "Stormforged Gauntlet"
+id = "a3850a56-0159-4205-8035-3a3f26b561d1"
+energy-cost = 2
+card-type = "Event"
+is-fast = true
+image-number = 2194074591
+rarity = "Uncommon"
+art-owned = false
+card-number = 483
+subtype = ""
+spark = ""
+"rendered text" = "↯fast -- An ally gains +1 spark. Prevent the next event that could dissolve it."
+
+[[cards]]
+name = "Reliquary of Two Tides"
+id = "cf62737a-9bee-44f4-8e26-8c7d0387f39b"
+energy-cost = 3
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 1
+image-number = 3649477319
+rarity = "Uncommon"
+art-owned = false
+card-number = 484
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: Choose — gain 1● or gain 1 maximum ●."
+
+[[cards]]
+name = "Echo of Sealed Memory"
+id = "084cfbdf-1263-4be2-b56a-ff5dbc801ba0"
+energy-cost = 5
+card-type = "Event"
+is-fast = false
+image-number = 3207771166
+rarity = "Rare"
+art-owned = false
+card-number = 485
+subtype = ""
+spark = ""
+"rendered text" = "Each player shuffles their hand into their deck, draws 5 cards, then discards 2 cards."
+
+[[cards]]
+name = "Shards of Dual Purpose"
+id = "396882b8-7e8c-4759-8b56-d3e15de8f07e"
+energy-cost = 4
+card-type = "Event"
+is-fast = false
+image-number = 9709556084
+rarity = "Rare"
+art-owned = false
+card-number = 486
+subtype = ""
+spark = ""
+"rendered text" = "Choose one: Draw 2 cards. OR Dissolve an enemy with spark 3 or less."
+
+[[cards]]
+name = "Tome Without End"
+id = "70306c8a-a77c-4d07-a4f8-abb51704be8c"
+energy-cost = 7
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 2
+image-number = 7243612024
+rarity = "Common"
+art-owned = false
+card-number = 487
+resonance = ["Tide"]
+"rendered text" = "When you play a card, draw a card."
+
+[[cards]]
+name = "Gate of Devouring Tides"
+id = "18b1d155-a89a-4f37-87c4-644ff83c16ef"
+energy-cost = 9
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 4
+image-number = 3112758663
+rarity = "Rare"
+art-owned = false
+card-number = 488
+resonance = ["Stone"]
+"rendered text" = """
+▸ Materialized: The opponent abandons 3 allies. ▸ Judgment: Reclaim a character from your void.
+"""
+
+[[cards]]
+name = "Architect of Stillness"
+id = "29a1b50f-2dce-480b-841f-528a6817b462"
+energy-cost = 3
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 2
+image-number = 1078239957
+rarity = "Common"
+art-owned = false
+card-number = 489
+resonance = ["Thunder", "Tide"]
+"rendered text" = "The opponent cannot play fast cards on your turn."
+
+[[cards]]
+name = "Undying Reflection"
+id = "3d9919e3-de73-43a9-9168-573be50a7479"
+energy-cost = 6
+card-type = "Event"
+is-fast = false
+image-number = 1709503330
+rarity = "Common"
+art-owned = false
+card-number = 490
+subtype = ""
+spark = ""
+resonance = ["Tide"]
+"rendered text" = "Banish an enemy. Materialize a copy of it."
+
+[[cards]]
+name = "Depths Predator"
+id = "b6864d2c-b922-4aa3-ad55-643ca4b88d9e"
+energy-cost = 2
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 1
+image-number = 8379160256
+rarity = "Common"
+art-owned = false
+card-number = 491
+resonance = ["Thunder"]
+"rendered text" = "Discard a card: This character gains +2 spark."
+
+[[cards]]
+name = "Thorn of Returning"
+id = "3a7a69c5-eb6d-4874-a016-97a9a618ee03"
+energy-cost = 2
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 1
+image-number = 3547293121
+rarity = "Uncommon"
+art-owned = false
+card-number = 492
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: Return a character from your void to your hand."
+
+[[cards]]
+name = "Gearhulk Excavator"
+id = "3382a698-67f8-4642-9428-2547a3e03931"
+energy-cost = 4
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 3
+image-number = 3227397502
+rarity = "Rare"
+art-owned = false
+card-number = 493
+resonance = ["Thunder"]
+"rendered text" = """
+▸ Materialized: Play two random events with cost 3● or less from your deck, with targets chosen randomly.
+"""
+
+[[cards]]
+name = "The Founding Behemoth"
+id = "bb4990d2-7fc4-492a-88b3-12022292e0df"
+energy-cost = 7
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 5
+image-number = 9896409236
+rarity = "Rare"
+art-owned = false
+card-number = 494
+resonance = ["Stone"]
+"rendered text" = "▸ Materialized: Draw up to 3 characters from the top 7 cards of your deck."
+
+[[cards]]
+name = "Dissolution Acolyte"
+id = "a6e4bc2e-8f67-411f-9c21-94b625156af1"
+energy-cost = 2
+card-type = "Event"
+is-fast = false
+image-number = 2100409601
+rarity = "Common"
+art-owned = false
+card-number = 495
+subtype = ""
+spark = ""
+resonance = ["Flame"]
+"rendered text" = "Lose 2 maximum ●: Dissolve an enemy."
+
+[[cards]]
+name = "Swarmcaller of the Hungry Dark"
+id = "6a96b4ba-892c-4ee7-86d3-83bccb8dd66d"
+energy-cost = 3
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 1
+image-number = 8340059501
+rarity = "Rare"
+art-owned = false
+card-number = 496
+resonance = ["Stone"]
+"rendered text" = """
+▸ Judgment: Materialize a Shadow Figment, then put the top card of your deck into your void.
+"""
+
+[[cards]]
+name = "Ember of Aspiration"
+id = "67cc1fd0-e41d-44d8-9d62-1150ba0e6148"
+energy-cost = 1
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 1
+image-number = 4619503294
+rarity = "Common"
+art-owned = false
+card-number = 497
+resonance = ["Flame"]
+"rendered text" = "2●: This character gains +1 spark."
+
+[[cards]]
+name = "Pathfinder of Endless Wilds"
+id = "97eaacbe-bd52-4ef1-b7d2-b553a06db48b"
+energy-cost = 5
+card-type = "Character"
+subtype = "Explorer"
+is-fast = true
+spark = 3
+image-number = 9380724314
+rarity = "Rare"
+art-owned = false
+card-number = 498
+resonance = ["Thunder"]
+"rendered text" = "▸ Materialized: Gain 3●. Draw 3 cards. Dissolve an enemy with spark 2 or less."
+
+[[cards]]
+name = "Prism of Four Fates"
+id = "c18a231f-7e84-4569-a492-11b6a58ebf25"
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 3
+image-number = 8105603563
+rarity = "Rare"
+art-owned = false
+card-number = 499
+resonance = ["Thunder"]
+"rendered text" = "▸ Materialized: Draw a card. ▸ Judgment: Gain 4●."
+
+[[cards]]
+name = "Unifier of All Knowing"
+id = "0fc24a42-0ab3-4da0-a6bf-ff0a18203f35"
+energy-cost = 7
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 4
+image-number = 2506881676
+rarity = "Rare"
+art-owned = false
+card-number = 500
+resonance = ["Tide"]
+"rendered text" = "▸ Materialized: Draw a character and an event from your deck."
+
+[[cards]]
+name = "Throne of Borrowed Time"
+id = "c4d6affd-7608-415d-8a22-d0ccf86681d6"
+energy-cost = 0
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 0
+image-number = 6479162220
+rarity = "Rare"
+art-owned = false
+card-number = 501
+resonance = ["Thunder"]
+"rendered text" = "▸ Judgment: Gain 3●. When you materialize another character, abandon this one."
+
+[[cards]]
+name = "Archivist of Perfect Hours"
+id = "91b9b0ad-af62-439f-9b68-15eaa0221fe9"
+energy-cost = 3
+card-type = "Character"
+subtype = "Visionary"
+is-fast = false
+spark = 1
+image-number = 2321631882
+rarity = "Rare"
+art-owned = false
+card-number = 502
+resonance = ["Tide"]
+"rendered text" = "▸ Judgment: With exactly 5 cards in your hand, draw a card."
+
+[[cards]]
+name = "Mirror of the Dreaming Stage"
+id = "963064ca-b422-49c5-b2af-56a8429b4a63"
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 1
+image-number = 6967829227
+rarity = "Rare"
+art-owned = false
+card-number = 503
+resonance = ["Thunder"]
+"rendered text" = """
+\u25b8 Materialized: Gain the \u25b8 Judgment: ability of a chosen ally.
+"""
+
 [metadata]
 schema_version = 1
 
