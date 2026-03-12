@@ -1,5 +1,6 @@
 order = [
     "cards",
+    "rendered-cards",
     "dreamwell",
     "card-fx",
     "card-metadata",

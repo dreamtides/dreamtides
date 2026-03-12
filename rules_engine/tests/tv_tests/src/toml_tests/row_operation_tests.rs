@@ -187,10 +187,14 @@ id = "temp"
 #[test]
 fn test_add_row_table_not_found() {
     let harness = TvTestHarness::new();
+    // Use multiple array keys so the single-key fallback does not apply.
     let path = harness.create_toml_file(
         "wrong_table.toml",
         r#"[[items]]
 id = "item-1"
+
+[[widgets]]
+id = "widget-1"
 "#,
     );
 
@@ -321,10 +325,14 @@ id = "card-1"
 #[test]
 fn test_delete_row_table_not_found() {
     let harness = TvTestHarness::new();
+    // Use multiple array keys so the single-key fallback does not apply.
     let path = harness.create_toml_file(
         "wrong.toml",
         r#"[[items]]
 id = "item-1"
+
+[[widgets]]
+id = "widget-1"
 "#,
     );
 

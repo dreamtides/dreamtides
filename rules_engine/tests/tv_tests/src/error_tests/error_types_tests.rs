@@ -744,11 +744,15 @@ fn test_load_invalid_toml_returns_parse_error() {
 #[test]
 fn test_load_missing_table_returns_table_not_found() {
     let harness = crate::test_utils::harness::TvTestHarness::new();
+    // Use multiple array keys so the single-key fallback does not apply.
     let path = harness.create_toml_file(
         "valid.toml",
         r#"
 [[characters]]
 name = "Test"
+
+[[items]]
+name = "Other"
 "#,
     );
 

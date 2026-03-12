@@ -78,6 +78,17 @@ pub fn load_toml_document(
     let table = value
         .get(table_name)
         .or_else(|| value.get(&resolved_name))
+        .or_else(|| {
+            // Fall back to the sole array key in the file when there is
+            // exactly one. This handles files where the TOML key doesn't
+            // match the filename (e.g. rendered-cards.toml containing
+            // [[cards]]).
+            value.as_table().and_then(|t| {
+                let mut arrays = t.iter().filter(|(_, v)| v.is_array());
+                let first = arrays.next();
+                if arrays.next().is_none() { first.map(|(_, v)| v) } else { None }
+            })
+        })
         .ok_or_else(|| {
             tracing::warn!(
                 component = "tv.toml",

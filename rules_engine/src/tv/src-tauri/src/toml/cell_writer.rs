@@ -4,7 +4,7 @@ use std::time::Instant;
 use crate::error::error_types::{map_io_error_for_read, TvError};
 use crate::toml::array_columns;
 use crate::toml::writer_types::{CellUpdate, SaveCellResult};
-use crate::toml::{metadata, value_converter};
+use crate::toml::{metadata, table_key, value_converter};
 use crate::traits::{AtomicWriteError, TvConfig};
 use crate::validation::validation_rules::ValidationRule;
 use crate::validation::validators;
@@ -63,17 +63,11 @@ pub fn save_cell_with_rules(
         TvError::TomlParseError { path: file_path.to_string(), line: None, message: e.to_string() }
     })?;
 
-    let array =
-        doc.get_mut(table_name).and_then(|v| v.as_array_of_tables_mut()).ok_or_else(|| {
-            tracing::error!(
-                component = "tv.toml",
-                file_path = %file_path,
-                table_name = %table_name,
-                error = "Table not found or not an array of tables",
-                "Cell save failed"
-            );
-            TvError::TableNotFound { table_name: table_name.to_string() }
-        })?;
+    let key = table_key::resolve_key_name(&doc, table_name, file_path, "Cell save failed")?;
+    let array = doc
+        .get_mut(&key)
+        .and_then(|v| v.as_array_of_tables_mut())
+        .ok_or_else(|| TvError::TableNotFound { table_name: table_name.to_string() })?;
 
     let table = array.get_mut(update.row_index).ok_or_else(|| {
         tracing::error!(

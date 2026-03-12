@@ -150,11 +150,15 @@ description = "Описание карты 🎴"
 #[test]
 fn test_load_table_not_found() {
     let harness = TvTestHarness::new();
+    // Use multiple array keys so the single-key fallback does not apply.
     let path = harness.create_toml_file(
         "wrong_table.toml",
         r#"
 [[items]]
 id = "abc"
+
+[[widgets]]
+id = "def"
 "#,
     );
 

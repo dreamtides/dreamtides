@@ -5,7 +5,7 @@ use crate::error::error_types::{map_io_error_for_read, TvError};
 use crate::toml::array_columns;
 use crate::toml::cell_writer::{apply_array_element_update, map_atomic_write_error};
 use crate::toml::writer_types::{CellUpdate, FailedUpdate, SaveBatchResult};
-use crate::toml::{metadata, value_converter};
+use crate::toml::{metadata, table_key, value_converter};
 use crate::traits::TvConfig;
 use crate::validation::validation_rules::ValidationRule;
 use crate::validation::validators;
@@ -72,17 +72,11 @@ pub fn save_batch_with_rules(
         TvError::TomlParseError { path: file_path.to_string(), line: None, message: e.to_string() }
     })?;
 
-    let array =
-        doc.get_mut(table_name).and_then(|v| v.as_array_of_tables_mut()).ok_or_else(|| {
-            tracing::error!(
-                component = "tv.toml",
-                file_path = %file_path,
-                table_name = %table_name,
-                error = "Table not found or not an array of tables",
-                "Batch save failed"
-            );
-            TvError::TableNotFound { table_name: table_name.to_string() }
-        })?;
+    let key = table_key::resolve_key_name(&doc, table_name, file_path, "Batch save failed")?;
+    let array = doc
+        .get_mut(&key)
+        .and_then(|v| v.as_array_of_tables_mut())
+        .ok_or_else(|| TvError::TableNotFound { table_name: table_name.to_string() })?;
 
     let array_len = array.len();
     let mut failed_updates = Vec::new();

@@ -9,6 +9,7 @@ pub mod metadata;
 pub mod metadata_serializer;
 pub mod metadata_types;
 pub mod row_operations;
+pub mod table_key;
 pub mod temp_cleanup;
 pub mod value_converter;
 pub mod writer_types;

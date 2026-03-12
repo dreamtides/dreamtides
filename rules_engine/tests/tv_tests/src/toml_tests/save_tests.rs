@@ -182,10 +182,14 @@ id = "abc"
 #[test]
 fn test_save_cell_table_not_found() {
     let harness = TvTestHarness::new();
+    // Use multiple array keys so the single-key fallback does not apply.
     let path = harness.create_toml_file(
         "wrong.toml",
         r#"[[items]]
 id = "abc"
+
+[[widgets]]
+id = "def"
 "#,
     );
 
@@ -405,10 +409,14 @@ name = "First"
 #[test]
 fn test_save_batch_table_not_found() {
     let harness = TvTestHarness::new();
+    // Use multiple array keys so the single-key fallback does not apply.
     let path = harness.create_toml_file(
         "wrong_table.toml",
         r#"[[items]]
 id = "item-1"
+
+[[widgets]]
+id = "widget-1"
 "#,
     );
 
@@ -579,10 +587,14 @@ name = "First"
 #[test]
 fn test_save_table_table_not_found() {
     let harness = TvTestHarness::new();
+    // Use multiple array keys so the single-key fallback does not apply.
     let path = harness.create_toml_file(
         "wrong.toml",
         r#"[[items]]
 id = "item-1"
+
+[[widgets]]
+id = "widget-1"
 "#,
     );
 

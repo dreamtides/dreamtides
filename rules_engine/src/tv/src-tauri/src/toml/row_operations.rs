@@ -3,6 +3,7 @@ use std::time::Instant;
 
 use crate::error::error_types::{map_io_error_for_read, TvError};
 use crate::toml::cell_writer::map_atomic_write_error;
+use crate::toml::table_key;
 use crate::toml::value_converter;
 use crate::toml::writer_types::{AddRowResult, DeleteRowResult};
 use crate::traits::TvConfig;
@@ -38,17 +39,11 @@ pub fn add_row(
         TvError::TomlParseError { path: file_path.to_string(), line: None, message: e.to_string() }
     })?;
 
-    let array =
-        doc.get_mut(table_name).and_then(|v| v.as_array_of_tables_mut()).ok_or_else(|| {
-            tracing::error!(
-                component = "tv.toml",
-                file_path = %file_path,
-                table_name = %table_name,
-                error = "Table not found or not an array of tables",
-                "Add row failed"
-            );
-            TvError::TableNotFound { table_name: table_name.to_string() }
-        })?;
+    let key = table_key::resolve_key_name(&doc, table_name, file_path, "Add row failed")?;
+    let array = doc
+        .get_mut(&key)
+        .and_then(|v| v.as_array_of_tables_mut())
+        .ok_or_else(|| TvError::TableNotFound { table_name: table_name.to_string() })?;
 
     let array_len = array.len();
     let insert_index = position.unwrap_or(array_len);
@@ -141,17 +136,11 @@ pub fn delete_row(
         TvError::TomlParseError { path: file_path.to_string(), line: None, message: e.to_string() }
     })?;
 
-    let array =
-        doc.get_mut(table_name).and_then(|v| v.as_array_of_tables_mut()).ok_or_else(|| {
-            tracing::error!(
-                component = "tv.toml",
-                file_path = %file_path,
-                table_name = %table_name,
-                error = "Table not found or not an array of tables",
-                "Delete row failed"
-            );
-            TvError::TableNotFound { table_name: table_name.to_string() }
-        })?;
+    let key = table_key::resolve_key_name(&doc, table_name, file_path, "Delete row failed")?;
+    let array = doc
+        .get_mut(&key)
+        .and_then(|v| v.as_array_of_tables_mut())
+        .ok_or_else(|| TvError::TableNotFound { table_name: table_name.to_string() })?;
 
     let array_len = array.len();
 

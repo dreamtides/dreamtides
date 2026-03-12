@@ -14,6 +14,7 @@ use crate::error::error_types::{map_io_error_for_read, TvError};
 use crate::toml::array_columns;
 use crate::toml::cell_writer::map_atomic_write_error;
 use crate::toml::document_loader::TomlTableData;
+use crate::toml::table_key;
 use crate::toml::value_converter;
 use crate::traits::TvConfig;
 use crate::uuid::uuid_generator;
@@ -61,17 +62,11 @@ pub fn save_toml_document(
     })?;
     let parse_duration_ms = parse_start.elapsed().as_millis();
 
-    let array =
-        doc.get_mut(table_name).and_then(|v| v.as_array_of_tables_mut()).ok_or_else(|| {
-            tracing::error!(
-                component = "tv.toml",
-                file_path = %file_path,
-                table_name = %table_name,
-                error = "Table not found or not an array of tables",
-                "Save failed"
-            );
-            TvError::TableNotFound { table_name: table_name.to_string() }
-        })?;
+    let key = table_key::resolve_key_name(&doc, table_name, file_path, "Save failed")?;
+    let array = doc
+        .get_mut(&key)
+        .and_then(|v| v.as_array_of_tables_mut())
+        .ok_or_else(|| TvError::TableNotFound { table_name: table_name.to_string() })?;
 
     let existing_len = array.len();
     let header_groups = array_columns::group_array_headers(&data.headers);
@@ -171,11 +166,11 @@ pub fn save_toml_document(
                 new_array.push(table.clone());
             }
         }
-        doc[table_name] = toml_edit::Item::ArrayOfTables(new_array);
+        doc[&key] = toml_edit::Item::ArrayOfTables(new_array);
     }
 
     let uuids_generated = doc
-        .get_mut(table_name)
+        .get_mut(&key)
         .and_then(|v| v.as_array_of_tables_mut())
         .is_some_and(|array| uuid_generator::ensure_uuids(array, &data.headers));
 
