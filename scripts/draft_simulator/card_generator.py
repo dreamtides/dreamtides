@@ -116,6 +116,75 @@ def load_real_cards(
     return cards
 
 
+def load_cards_for_archetype_draft(rendered_toml_path: str) -> list[CardDesign]:
+    """Load card designs using only rendered-cards.toml for archetype draft.
+
+    Builds fitness vectors from the `archetypes` array in the TOML file
+    (1.0 for listed archetypes, 0.0 for others). Does not require
+    card-metadata.toml.
+    """
+    import tomllib
+
+    ARCHETYPE_NAMES = [
+        "Flash",
+        "Awaken",
+        "Flicker",
+        "Ignite",
+        "Shatter",
+        "Endure",
+        "Submerge",
+        "Surge",
+    ]
+
+    with open(rendered_toml_path, "rb") as f:
+        rendered_data = tomllib.load(f)
+
+    cards: list[CardDesign] = []
+    for card in rendered_data.get("cards", []):
+        raw_rarity = card.get("rarity", "")
+        if raw_rarity == "Special":
+            continue
+
+        card_id = card.get("id", "")
+        card_archetypes = card.get("archetypes", [])
+        archetype_set = set(card_archetypes)
+        fitness = [1.0 if name in archetype_set else 0.0 for name in ARCHETYPE_NAMES]
+
+        if raw_rarity == "Legendary":
+            rarity = "rare"
+        else:
+            rarity = raw_rarity.lower()
+
+        raw_spark = card.get("spark", "")
+        spark = _parse_optional_int(raw_spark)
+        raw_energy = card.get("energy-cost", "")
+        energy_cost = _parse_optional_int(raw_energy)
+
+        cards.append(
+            CardDesign(
+                card_id=card_id,
+                name=card.get("name", ""),
+                fitness=fitness,
+                power=0.0,
+                commit=0.0,
+                flex=0.0,
+                rarity=rarity,
+                rules_text=card.get("rendered text", ""),
+                energy_cost=energy_cost,
+                card_type=card.get("card-type", ""),
+                subtype=card.get("subtype", ""),
+                spark=spark,
+                is_fast=card.get("is-fast", False),
+                is_real=True,
+                image_number=_parse_optional_int(card.get("image-number", "")),
+                resonance=tuple(card.get("resonance", [])),
+                original_rarity=raw_rarity,
+            )
+        )
+
+    return cards
+
+
 def fill_card_pool_gaps(
     real_cards: list[CardDesign],
     cfg: SimulatorConfig,

@@ -190,7 +190,16 @@ def run_web_server(args: Any) -> None:
 
     cfg = _build_draft_config(synthetic=args.synthetic, real_only=args.real_only)
 
-    cards = card_generator.generate_cards(cfg, rng)
+    if getattr(args, "archetype_draft", False):
+        if cfg.cards.rendered_toml_path is None:
+            raise ValueError(
+                "--archetype-draft requires cards.rendered_toml_path to be set"
+            )
+        cards = card_generator.load_cards_for_archetype_draft(
+            cfg.cards.rendered_toml_path
+        )
+    else:
+        cards = card_generator.generate_cards(cfg, rng)
 
     config = data_loader.load_config()
     dreamcallers = data_loader.load_dreamcallers()

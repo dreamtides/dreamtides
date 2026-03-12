@@ -134,7 +134,7 @@ def _build_draft_config(
         cfg.cards.real_only = real_only
         script_dir = os.path.dirname(os.path.abspath(__file__))
         cfg.cards.rendered_toml_path = os.path.join(
-            script_dir, "data", "rendered-cards.toml"
+            script_dir, "..", "..", "rules_engine", "tabula", "rendered-cards.toml"
         )
         cfg.cards.metadata_toml_path = os.path.join(
             script_dir, "..", "..", "rules_engine", "tabula", "card-metadata.toml"
@@ -186,7 +186,16 @@ def main() -> None:
     cfg = _build_draft_config(synthetic=args.synthetic, real_only=args.real_only)
 
     # Generate card pool
-    cards = card_generator.generate_cards(cfg, rng)
+    if args.archetype_draft:
+        if cfg.cards.rendered_toml_path is None:
+            raise ValueError(
+                "--archetype-draft requires cards.rendered_toml_path to be set"
+            )
+        cards = card_generator.load_cards_for_archetype_draft(
+            cfg.cards.rendered_toml_path
+        )
+    else:
+        cards = card_generator.generate_cards(cfg, rng)
 
     real_count = sum(1 for c in cards if c.is_real)
 
