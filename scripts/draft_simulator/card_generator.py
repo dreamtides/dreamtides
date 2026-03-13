@@ -100,7 +100,7 @@ def load_real_cards(
                 commit=float(meta.get("commit", 0.0)),
                 flex=float(meta.get("flex", 0.0)),
                 rarity=rarity,
-                rules_text=card.get("rendered text", ""),
+                rules_text=card.get("rendered-text", ""),
                 energy_cost=energy_cost,
                 card_type=card.get("card-type", ""),
                 subtype=card.get("subtype", ""),
@@ -119,21 +119,20 @@ def load_real_cards(
 def load_cards_for_archetype_draft(rendered_toml_path: str) -> list[CardDesign]:
     """Load card designs using only rendered-cards.toml for archetype draft.
 
-    Builds fitness vectors from the `archetypes` array in the TOML file
-    (1.0 for listed archetypes, 0.0 for others). Does not require
-    card-metadata.toml.
+    Builds fitness vectors from boolean archetype tags in the TOML file
+    (e.g. ``shatter = true``). Does not require card-metadata.toml.
     """
     import tomllib
 
-    ARCHETYPE_NAMES = [
-        "Flash",
-        "Awaken",
-        "Flicker",
-        "Ignite",
-        "Shatter",
-        "Endure",
-        "Submerge",
-        "Surge",
+    ARCHETYPE_KEYS = [
+        "flash",
+        "awaken",
+        "flicker",
+        "ignite",
+        "shatter",
+        "endure",
+        "submerge",
+        "surge",
     ]
 
     with open(rendered_toml_path, "rb") as f:
@@ -146,9 +145,7 @@ def load_cards_for_archetype_draft(rendered_toml_path: str) -> list[CardDesign]:
             continue
 
         card_id = card.get("id", "")
-        card_archetypes = card.get("archetypes", [])
-        archetype_set = set(card_archetypes)
-        fitness = [1.0 if name in archetype_set else 0.0 for name in ARCHETYPE_NAMES]
+        fitness = [1.0 if card.get(key, False) else 0.0 for key in ARCHETYPE_KEYS]
 
         if raw_rarity == "Legendary":
             rarity = "rare"
@@ -169,7 +166,7 @@ def load_cards_for_archetype_draft(rendered_toml_path: str) -> list[CardDesign]:
                 commit=0.0,
                 flex=0.0,
                 rarity=rarity,
-                rules_text=card.get("rendered text", ""),
+                rules_text=card.get("rendered-text", ""),
                 energy_cost=energy_cost,
                 card_type=card.get("card-type", ""),
                 subtype=card.get("subtype", ""),

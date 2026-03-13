@@ -33,7 +33,7 @@ subtype = ""
 is-fast = false
 spark = ""
 rarity = "Common"
-"rendered text" = "Draw a card."
+rendered-text = "Draw a card."
 
 [[cards]]
 name = "Test Rare Card"
@@ -44,7 +44,7 @@ subtype = "Ancient"
 is-fast = false
 spark = 3
 rarity = "Rare"
-"rendered text" = "When you play this, gain 2 energy."
+rendered-text = "When you play this, gain 2 energy."
 
 [[cards]]
 name = "Test Legendary"
@@ -55,7 +55,7 @@ subtype = "Dragon"
 is-fast = true
 spark = 5
 rarity = "Legendary"
-"rendered text" = "Dissolve all enemies."
+rendered-text = "Dissolve all enemies."
 
 [[cards]]
 name = "Special Token"
@@ -66,7 +66,7 @@ subtype = ""
 is-fast = false
 spark = ""
 rarity = "Special"
-"rendered text" = "This is a token."
+rendered-text = "This is a token."
 """)
 
     with open(metadata_toml, "w") as f:

@@ -427,7 +427,7 @@ fn render_cards_toml_command(
 
             card.remove("rules-text");
             card.remove("variables");
-            card.insert("rendered text", toml_edit::value(rendered_text));
+            card.insert("rendered-text", toml_edit::value(rendered_text));
         }
 
         cards.len()

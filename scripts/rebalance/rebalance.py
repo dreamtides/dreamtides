@@ -545,7 +545,7 @@ def phase3_rarity_rebalancing():
 
     # Score cards by complexity (text length as proxy)
     def complexity_score(card):
-        text = card.get("rendered text", "")
+        text = card.get("rendered-text", "")
         score = len(text)
         # Bonus for triggers/keywords
         keywords = [
