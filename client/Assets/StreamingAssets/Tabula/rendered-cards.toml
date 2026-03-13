@@ -17,7 +17,6 @@ resonance = ["Stone"]
 [[cards]]
 name = "Beacon of Tomorrow"
 id = "6d7969d2-9d18-4a38-8c26-c900aca5f1d4"
-archetypes = []
 energy-cost = 2
 card-type = "Event"
 is-fast = false
@@ -186,7 +185,6 @@ When you discard a card, gain 1⍏.
 [[cards]]
 name = "Ethereal Trailblazer"
 id = "2c037f79-f049-4f19-b73a-50231ad7e751"
-archetypes = []
 energy-cost = 0
 card-type = "Character"
 subtype = "Warrior"
@@ -201,7 +199,6 @@ card-number = 12
 [[cards]]
 name = "Glimpse of Infinity"
 id = "a23df796-03d2-4082-9c30-fe6958e65ffe"
-archetypes = []
 energy-cost = 0
 card-type = "Event"
 subtype = "Survivor"
@@ -218,7 +215,6 @@ Gain 3●.
 [[cards]]
 name = "Unleash Ruin"
 id = "187870b3-165c-41ea-8126-abb096f5d6ab"
-archetypes = []
 energy-cost = 2
 card-type = "Event"
 is-fast = false
@@ -283,7 +279,6 @@ resonance = ["Tide"]
 [[cards]]
 name = "Apocalypse"
 id = "d122f4a5-c8a9-49bf-9c8a-a16b8d9567a6"
-archetypes = []
 energy-cost = 6
 card-type = "Event"
 is-fast = false
@@ -316,7 +311,6 @@ resonance = ["Tide"]
 [[cards]]
 name = "The Calling Night"
 id = "be97e5e0-eebb-4b90-a676-fcf909b35600"
-archetypes = []
 energy-cost = 2
 card-type = "Character"
 subtype = "Visitor"
@@ -743,7 +737,6 @@ resonance = ["Flame"]
 [[cards]]
 name = "Dawnblade Wanderer"
 id = "d8f9abc2-a864-47b9-96e6-2ced9f9ba208"
-archetypes = []
 energy-cost = 1
 card-type = "Character"
 subtype = "Warrior"
@@ -1795,7 +1788,6 @@ resonance = ["Tide", "Thunder"]
 [[cards]]
 name = "Wheel of the Heavens"
 id = "4950a8cd-85d5-402a-8a2d-efdd250764b7"
-archetypes = []
 energy-cost = 4
 card-type = "Event"
 is-fast = false
@@ -3558,7 +3550,6 @@ spark = ""
 [[cards]]
 name = "Minstrel of Falling Light"
 id = "7285732f-7460-4544-8c74-9300a078a337"
-archetypes = []
 energy-cost = 2
 card-type = "Character"
 subtype = "Musician"
@@ -3644,7 +3635,6 @@ Prevent a played event which could dissolve an ally.
 [[cards]]
 name = "Void Indicator Card"
 id = "c0ae09e9-e4c7-423f-9f23-35a5c927d8c0"
-archetypes = []
 energy-cost = 0
 is-fast = false
 image-number = 313783940
@@ -3660,7 +3650,6 @@ spark = ""
 [[cards]]
 name = "Nightmare"
 id = "b4fd32f8-fbb0-42c9-a794-f0949d4062c5"
-archetypes = []
 energy-cost = 2
 card-type = "Event"
 is-fast = false
@@ -3702,8 +3691,7 @@ rarity = "Rare"
 art-owned = false
 card-number = 224
 resonance = ["Tide"]
-"rendered text" = """
-▸ Dissolved: Return all enemies to hand."""
+"rendered text" = "▸ Dissolved: Return all enemies to hand."
 
 [[cards]]
 name = "Winged Void Rider"
@@ -4230,8 +4218,7 @@ card-number = 255
 subtype = ""
 spark = ""
 resonance = ["Stone"]
-"rendered text" = """
-Reclaim all characters with cost 3● or less. At end of your next turn, abandon all reclaimed characters."""
+"rendered text" = "Reclaim all characters with cost 3● or less. At end of your next turn, abandon all reclaimed characters."
 
 [[cards]]
 name = "Grasping Cabinet"
@@ -4394,8 +4381,7 @@ rarity = "Uncommon"
 art-owned = false
 card-number = 265
 resonance = ["Thunder"]
-"rendered text" = """
-▸ Judgment: Draw a card, then discard a card. 2●: Materialize a Shadow Figment."""
+"rendered text" = "▸ Judgment: Draw a card, then discard a card. 2●: Materialize a Shadow Figment."
 
 [[cards]]
 name = "Birdcaller in Radiance"
@@ -6695,8 +6681,7 @@ card-number = 407
 subtype = ""
 spark = ""
 resonance = ["Tide"]
-"rendered text" = """
-↯fast -- Discover a character and materialize it. At the start of your next turn, pay that character's cost or the opponent gains 6⍏."""
+"rendered text" = "↯fast -- Discover a character and materialize it. At the start of your next turn, pay that character's cost or the opponent gains 6⍏."
 
 [[cards]]
 name = "Autumn Nightfall Warden"
@@ -7172,7 +7157,6 @@ resonance = ["Flame"]
 [[cards]]
 name = "Fallen Moon's Reflection"
 id = "063190f6-7723-44f3-bdb4-59f4037faea3"
-archetypes = []
 energy-cost = 6
 card-type = "Event"
 is-fast = false
@@ -7215,8 +7199,7 @@ rarity = "Rare"
 art-owned = false
 card-number = 439
 resonance = ["Tide"]
-"rendered text" = """
-▸ Materialized: Draw 2 cards. This character gains +1 spark for each card drawn this turn."""
+"rendered text" = "▸ Materialized: Draw 2 cards. This character gains +1 spark for each card drawn this turn."
 
 [[cards]]
 name = "Ruins of Tomorrow"
@@ -7248,8 +7231,7 @@ rarity = "Rare"
 art-owned = false
 card-number = 441
 resonance = ["Tide"]
-"rendered text" = """
-▸ Materialized: Disable an enemy's activated and Judgment abilities while this character is in play."""
+"rendered text" = "▸ Materialized: Disable an enemy's activated and Judgment abilities while this character is in play."
 
 [[cards]]
 name = "Lantern Drift Maiden"
@@ -8261,7 +8243,7 @@ art-owned = false
 card-number = 503
 resonance = ["Thunder"]
 "rendered text" = """
-\u25b8 Materialized: Gain the \u25b8 Judgment: ability of a chosen ally.
+▸ Materialized: Gain the ▸ Judgment: ability of a chosen ally.
 """
 
 [metadata]
