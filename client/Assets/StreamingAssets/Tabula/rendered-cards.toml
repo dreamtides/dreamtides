@@ -11762,7 +11762,7 @@ rendered-text = """
 """
 flash = false
 awaken = true
-flicker = true
+flicker = false
 ignite = false
 shatter = false
 endure = false
@@ -11815,13 +11815,6 @@ inputs = ["image_number"]
 url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_number}.jpg"
 frozen = true
 
-[[metadata.derived_columns]]
-name = ""
-function = "rules_preview"
-position = 6
-width = 300
-inputs = ["rules-text", "variables"]
-
 [metadata.rows]
 default_height = 100
 frozen_rows = 1
@@ -11832,16 +11825,8 @@ width = 200
 bold = true
 
 [[metadata.columns]]
-key = "rules-text"
-width = 275
-
-[[metadata.columns]]
 key = "id"
 width = 140
-
-[[metadata.columns]]
-key = "preview"
-width = 250
 
 [[metadata.columns]]
 key = "card-type"
@@ -11862,3 +11847,7 @@ width = 150
 [[metadata.columns]]
 key = "rendered-text"
 width = 320
+
+[[metadata.columns]]
+key = "submerge"
+width = 96
