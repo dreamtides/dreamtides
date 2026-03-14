@@ -3,6 +3,7 @@
   "search_path": [
     "scripts/quest_simulator",
     "scripts/draft_simulator",
+    "scripts/draft_simulator_v2",
     "scripts/review",
     "scripts/abu"
   ],
