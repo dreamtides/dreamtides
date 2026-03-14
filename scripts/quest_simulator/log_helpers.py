@@ -65,7 +65,8 @@ def w_concentration(w: list[float]) -> float:
 def card_instance_dict(card: Any) -> dict[str, object]:
     """Serialize a CardInstance for logging.
 
-    Includes name, card_id, rarity_value, tag_count, and top 3 fitness values.
+    Includes name, card_id, rarity_value, tag_count, top 3 fitness values,
+    full fitness vector, resonance, energy_cost, card_type, and spark.
     """
     design = getattr(card, "design", card)
     result: dict[str, object] = {}
@@ -80,6 +81,17 @@ def card_instance_dict(card: Any) -> dict[str, object]:
         result["tag_count"] = sum(1 for f in fitness if f >= 0.5)
         top = sorted(fitness, reverse=True)[:3] if fitness else []
         result["top_fitness"] = [round(v, 4) for v in top]
+        result["fitness"] = [round(v, 4) for v in fitness]
+    if hasattr(design, "resonance") and design.resonance:
+        result["resonance"] = list(design.resonance)
+    if hasattr(design, "energy_cost") and design.energy_cost is not None:
+        result["energy_cost"] = design.energy_cost
+    if hasattr(design, "card_type") and design.card_type:
+        result["card_type"] = design.card_type
+    if hasattr(design, "spark") and design.spark is not None:
+        result["spark"] = design.spark
+    if hasattr(design, "original_rarity") and design.original_rarity:
+        result["rarity"] = design.original_rarity
     return result
 
 

@@ -216,22 +216,31 @@ class SessionLogger:
         top_alternatives: list[dict[str, object]],
         was_random: bool,
         agent_w_top3: list[tuple[int, float]],
+        agent_w: Optional[list[float]] = None,
+        committed_resonance: Optional[tuple[str, str]] = None,
+        drafted_count: int = 0,
+        concentration: float = 0.0,
     ) -> None:
         """Log an AI seat's pick with scoring details."""
-        self._write(
-            {
-                "event": "ai_pick",
-                "seat_index": seat_index,
-                "round_index": round_index,
-                "global_pick_index": global_pick_index,
-                "chosen": log_helpers.card_instance_dict(chosen),
-                "chosen_score": round(chosen_score, 4),
-                "candidates_count": candidates_count,
-                "top_alternatives": top_alternatives,
-                "was_random": was_random,
-                "agent_w_top3": [{"archetype": i, "value": v} for i, v in agent_w_top3],
-            }
-        )
+        event: dict[str, object] = {
+            "event": "ai_pick",
+            "seat_index": seat_index,
+            "round_index": round_index,
+            "global_pick_index": global_pick_index,
+            "chosen": log_helpers.card_instance_dict(chosen),
+            "chosen_score": round(chosen_score, 4),
+            "candidates_count": candidates_count,
+            "top_alternatives": top_alternatives,
+            "was_random": was_random,
+            "agent_w_top3": [{"archetype": i, "value": v} for i, v in agent_w_top3],
+            "drafted_count": drafted_count,
+            "concentration": round(concentration, 4),
+        }
+        if agent_w is not None:
+            event["agent_w"] = [round(v, 4) for v in agent_w]
+        if committed_resonance is not None:
+            event["committed_resonance"] = list(committed_resonance)
+        self._write(event)
 
     def log_show_n_filter(
         self,

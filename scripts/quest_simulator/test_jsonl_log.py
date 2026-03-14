@@ -442,6 +442,7 @@ class TestSessionLogger(unittest.TestCase):
             _make_design("AI Card", card_id="ai_001", rarity_value=0.7)
         )
         alt: dict[str, object] = {"name": "Alt Card", "score": 0.65}
+        w = [0.15, 0.10, 0.35, 0.05, 0.05, 0.20, 0.05, 0.05]
         logger.log_ai_pick(
             seat_index=3,
             round_index=1,
@@ -452,6 +453,10 @@ class TestSessionLogger(unittest.TestCase):
             top_alternatives=[alt],
             was_random=False,
             agent_w_top3=[(2, 0.35), (5, 0.20), (0, 0.15)],
+            agent_w=w,
+            committed_resonance=("Tide", "Thunder"),
+            drafted_count=9,
+            concentration=0.35,
         )
         events = self._read_events(logger)
         event = events[0]
@@ -468,6 +473,12 @@ class TestSessionLogger(unittest.TestCase):
         self.assertEqual(len(event["agent_w_top3"]), 3)
         self.assertEqual(event["agent_w_top3"][0]["archetype"], 2)
         self.assertEqual(event["agent_w_top3"][0]["value"], 0.35)
+        self.assertEqual(
+            event["agent_w"], [0.15, 0.1, 0.35, 0.05, 0.05, 0.2, 0.05, 0.05]
+        )
+        self.assertEqual(event["committed_resonance"], ["Tide", "Thunder"])
+        self.assertEqual(event["drafted_count"], 9)
+        self.assertEqual(event["concentration"], 0.35)
 
     def test_log_ai_pick_was_random(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
@@ -484,7 +495,11 @@ class TestSessionLogger(unittest.TestCase):
             agent_w_top3=[(0, 0.125)],
         )
         events = self._read_events(logger)
-        self.assertTrue(events[0]["was_random"])
+        event = events[0]
+        self.assertTrue(event["was_random"])
+        self.assertEqual(event["drafted_count"], 0)
+        self.assertNotIn("committed_resonance", event)
+        self.assertNotIn("agent_w", event)
 
     def test_log_show_n_filter(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)

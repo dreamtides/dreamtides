@@ -25,13 +25,32 @@ Read the JSONL file. Each line is a JSON object with an `"event"` field. Key eve
 |-------|-----------|---------|
 | `session_start` | `seed`, `draft_config` | Session parameters |
 | `round_start` | `round_index`, `global_pick_index`, `pack_card_count` | Draft round boundaries |
-| `ai_pick` | `seat_index`, `global_pick_index`, `chosen`, `chosen_score`, `agent_w_top3`, `was_random` | AI bot decisions |
+| `ai_pick` | `seat_index`, `global_pick_index`, `chosen`, `chosen_score`, `agent_w_top3`, `agent_w`, `was_random`, `committed_resonance`, `drafted_count`, `concentration` | AI bot decisions |
 | `show_n_filter` | `shown_cards_with_scores`, `filtered_out_top3`, `strategy` | What human was shown vs filtered |
 | `draft_pick` | `offered`, `picked`, `human_w_top3`, `global_pick_index` | Human picks |
 | `preference_snapshot` | `preference_vector`, `top_archetype_index`, `concentration` | Human archetype evolution |
 | `site_visit` | `site_type`, `choices_offered`, `choice_made` | Non-draft site interactions |
 | `battle_complete` | `opponent_name`, `essence_reward`, `rare_pick` | Battle outcomes |
 | `session_end` | `deck`, `preference_vector`, `completion_level` | Final deck and state |
+
+### Card Data Fields (in `chosen`, `top_alternatives`, `offered`, etc.)
+
+Cards are serialized with: `name`, `card_id`, `rarity_value`, `rarity` (original rarity string), `tag_count`, `top_fitness` (top 3), `fitness` (full 8-element archetype fitness vector), `resonance` (list of resonance names), `energy_cost`, `card_type`, `spark`.
+
+### AI Pick Fields Detail
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `chosen` | card dict | The card picked, with full card data fields above |
+| `chosen_score` | float | Policy score for the chosen card |
+| `candidates_count` | int | Number of cards available after resonance filtering |
+| `top_alternatives` | list[card dict + score] | Top 3 scored alternatives the bot didn't pick |
+| `was_random` | bool | True if the bot made a random pick instead of policy-optimal |
+| `agent_w_top3` | list[{archetype, value}] | Top 3 archetype preferences |
+| `agent_w` | list[float] | Full 8-element preference vector |
+| `committed_resonance` | [str, str] or absent | Resonance pair if committed, absent if not yet |
+| `drafted_count` | int | Number of cards drafted so far (before this pick) |
+| `concentration` | float | max(w)/sum(w), measuring archetype commitment strength |
 
 ## Step 3: Archetype Index Mapping
 
@@ -57,8 +76,9 @@ Only a subset of archetypes are active per session. Check `session_start.draft_c
 AI agents commit to an archetype after picking `ai_resonance_commit_pick` cards (default ~9). To find when agent N committed:
 
 1. Filter `ai_pick` events where `seat_index == N`
-2. Track `agent_w_top3` across picks — the top archetype stabilizing indicates commitment
-3. The commit happens at the pick where `len(drafted) >= ai_resonance_commit_pick`
+2. The `committed_resonance` field appears once the bot commits — the first pick where it's present is the commitment point
+3. Track `concentration` to see how strongly the bot is committed (higher = more focused)
+4. Use `agent_w` (full vector) to see exact archetype weights, or `agent_w_top3` for a summary
 
 ### Human Drafter Behavior
 
@@ -70,6 +90,34 @@ Track via `draft_pick` events:
 ### Draft Flow Reconstruction
 
 Use `round_start` events to segment picks into rounds. Within each round, `ai_pick` events for each seat precede the `draft_pick` (human pick). The `global_pick_index` links all events to a unified timeline.
+
+### Bot Pick-by-Pick Breakdown
+
+When asked to explain what a bot did and why, produce a pick-by-pick analysis with this structure:
+
+1. **Identify the seat.** Seat 5 passes directly to the human (seat 0). Seat 1 is farthest upstream.
+2. **For each pick, explain the decision.** Use this template per pick:
+
+```
+Pick N (round R, global G): CARD_NAME
+  Score: X.XXX | Random: yes/no | Candidates: N
+  Fitness: [archetype breakdown showing which archetypes this card fits]
+  Resonance: [card's resonance tags]
+  Energy: N | Type: X | Spark: N
+  Top archetype: NAME (X.XX) | Concentration: X.XX
+  Committed: yes/no (resonance pair if yes)
+  Why: [1-sentence explanation based on fitness alignment with top archetype + score vs alternatives]
+```
+
+3. **Highlight key inflection points:**
+   - When the bot's top archetype changed
+   - When `committed_resonance` first appeared (hard commitment)
+   - Random picks that pulled the bot in an unexpected direction
+   - Picks where the bot took a card that would have been good for the human
+
+4. **Compare with the human's trajectory** using `draft_pick` events to show where both converged on the same archetype.
+
+Use `chosen.fitness[archetype_index]` to check if a card fits a specific archetype (>= 0.5 means it fits). Cross-reference with the archetype index table to explain WHY the bot's preferences shifted.
 
 ## Analysis Script
 
@@ -90,10 +138,12 @@ for p in ai_picks:
 ## Common Questions
 
 - **"What did AI agent N pick?"** — Filter `ai_pick` where `seat_index == N`, list `chosen.name` fields
-- **"When did agent N commit?"** — Find the `ai_pick` for seat N where `agent_w_top3[0]` stabilizes and pick count crosses commit threshold
+- **"When did agent N commit?"** — Find the first `ai_pick` for seat N where `committed_resonance` is present
 - **"What was filtered from the human?"** — Check `show_n_filter` events, compare `shown_cards_with_scores` vs `filtered_out_top3`
 - **"What archetype did the human end up in?"** — Check `session_end.preference_vector` or last `preference_snapshot`
 - **"What was the final deck?"** — Read `session_end.deck` array
+- **"Why did the bot pick card X?"** — Find the `ai_pick` with that card, check `chosen_score` vs `top_alternatives` scores, look at `chosen.fitness` alignment with the bot's `agent_w`, and note if `was_random`
+- **"Which bot competes with me?"** — Compare each seat's final `agent_w_top3` top archetype with the human's top archetype from `preference_snapshot`
 
 ## When Logs Cannot Answer the Question
 

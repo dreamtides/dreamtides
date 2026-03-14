@@ -1711,9 +1711,6 @@ id = "214169c7-dc03-487f-bd85-d560f68031a1"
 rendered-text = """
 Take an extra turn after this one.
 """
-flash = true
-awaken = true
-surge = true
 energy-cost = 3
 card-type = "Event"
 is-fast = false

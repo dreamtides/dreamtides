@@ -496,6 +496,10 @@ class SixSeatDraftStrategy(DraftStrategy):
                     top_alternatives=top_alts,
                     was_random=was_random,
                     agent_w_top3=log_helpers.top_n_w(ai_agent.w),
+                    agent_w=ai_agent.w,
+                    committed_resonance=ai_agent.committed_resonance,
+                    drafted_count=len(ai_agent.drafted),
+                    concentration=log_helpers.w_concentration(ai_agent.w),
                 )
 
             pack.cards.remove(chosen)
