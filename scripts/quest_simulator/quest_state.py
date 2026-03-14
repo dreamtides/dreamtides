@@ -42,6 +42,7 @@ class QuestState:
         self.min_deck: int = min_deck
         self.max_dreamsigns: int = max_dreamsigns
         self.debug: bool = debug
+        self.archetype_draft: bool = False
         self.bane_instance_counter: int = 0
 
     def add_card(self, card_instance: Any) -> None:

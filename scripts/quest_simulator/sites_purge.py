@@ -69,6 +69,7 @@ def run_purge(
             w=state.draft_strategy.preference_vector,
             deck_count=state.deck_count(),
             essence=state.essence,
+            archetype_draft=state.archetype_draft,
         )
         print(footer)
         return
@@ -146,6 +147,7 @@ def run_purge(
         w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
+        archetype_draft=state.archetype_draft,
     )
     print(footer)
 
@@ -250,5 +252,6 @@ def forced_deck_limit_purge(
         w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
+        archetype_draft=state.archetype_draft,
     )
     print(footer)

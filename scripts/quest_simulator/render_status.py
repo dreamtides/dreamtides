@@ -115,37 +115,40 @@ def archetype_preference_footer(
     w: list[float],
     deck_count: int,
     essence: int,
+    archetype_draft: bool = False,
 ) -> str:
     """Build the archetype preference footer.
 
     Shows the top 2-3 archetype preferences by weight, deck count,
     and essence. Called from site modules after each interaction.
+    In archetype draft mode, only the deck/essence status line is shown.
     """
     sep = draw_separator()
-
-    # Find top 3 archetypes by weight
-    indexed = sorted(enumerate(w), key=lambda x: x[1], reverse=True)
-    top_n = min(3, len(indexed))
-    top = indexed[:top_n]
-
-    total = sum(w)
     lines: list[str] = [sep]
 
-    pref_parts: list[str] = []
-    for idx, weight in top:
-        name = ARCHETYPE_NAMES[idx] if idx < len(ARCHETYPE_NAMES) else f"A{idx}"
-        if total > 0:
-            pct = weight / total * 100
-            bar_len = int(pct / 5)
-            bar = "\u2588" * bar_len
-            pref_parts.append(
-                f"    {colors.label(name)}: {colors.num(f'{pct:.0f}%')} {colors.c(bar, 'accent')}"
-            )
-        else:
-            pref_parts.append(f"    {colors.label(name)}: {colors.num('0%')}")
+    if not archetype_draft:
+        # Find top 3 archetypes by weight
+        indexed = sorted(enumerate(w), key=lambda x: x[1], reverse=True)
+        top_n = min(3, len(indexed))
+        top = indexed[:top_n]
 
-    lines.append(f"  {colors.section('Archetype Preferences')}")
-    lines.extend(pref_parts)
+        total = sum(w)
+
+        pref_parts: list[str] = []
+        for idx, weight in top:
+            name = ARCHETYPE_NAMES[idx] if idx < len(ARCHETYPE_NAMES) else f"A{idx}"
+            if total > 0:
+                pct = weight / total * 100
+                bar_len = int(pct / 5)
+                bar = "\u2588" * bar_len
+                pref_parts.append(
+                    f"    {colors.label(name)}: {colors.num(f'{pct:.0f}%')} {colors.c(bar, 'accent')}"
+                )
+            else:
+                pref_parts.append(f"    {colors.label(name)}: {colors.num('0%')}")
+
+        lines.append(f"  {colors.section('Archetype Preferences')}")
+        lines.extend(pref_parts)
 
     status = (
         f"  Deck: {colors.num(deck_count)} cards  |  " f"Essence: {colors.num(essence)}"
@@ -165,10 +168,12 @@ def victory_screen(
     essence: int,
     w: Optional[list[float]] = None,
     log_path: Optional[str] = None,
+    archetype_draft: bool = False,
 ) -> str:
     """Build the victory screen text.
 
     Shows quest completion stats and archetype preference visualization.
+    In archetype draft mode, the archetype preferences section is omitted.
     """
     sep = draw_double_separator()
 
@@ -187,8 +192,8 @@ def victory_screen(
         f"  Essence remaining: {colors.num(essence)}",
     ]
 
-    # Archetype preference visualization
-    if w is not None:
+    # Archetype preference visualization (skip in archetype draft mode)
+    if w is not None and not archetype_draft:
         lines.append("")
         lines.append(f"  {colors.section('Archetype Preferences')}")
         total = sum(w)

@@ -234,14 +234,18 @@ def main() -> None:
 
     # Wire up the draft strategy
     if args.archetype_draft:
+        state.archetype_draft = True
         archetype_strategy = ArchetypeDraftStrategy(
             rng=rng,
             all_cards=cards,
             num_archetypes=args.num_archetypes,
             no_rarity=args.no_rarity,
         )
+        archetype_names = [
+            render.ARCHETYPE_NAMES[i] for i in archetype_strategy.selected_archetypes
+        ]
         print(
-            f"  Archetype draft initialized: archetypes {archetype_strategy.selected_archetypes}, "
+            f"  Archetype draft initialized: {', '.join(archetype_names)}, "
             f"pool size {archetype_strategy.pool_size} instances "
             f"from {len(cards)} card designs"
         )

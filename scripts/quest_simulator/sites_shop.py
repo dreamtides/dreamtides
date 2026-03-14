@@ -391,5 +391,6 @@ def run_shop(
         w=strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
+        archetype_draft=state.archetype_draft,
     )
     print(footer)

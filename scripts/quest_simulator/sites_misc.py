@@ -88,6 +88,7 @@ def run_duplication(
             w=state.draft_strategy.preference_vector,
             deck_count=state.deck_count(),
             essence=state.essence,
+            archetype_draft=state.archetype_draft,
         )
         print(footer)
         return
@@ -192,6 +193,7 @@ def run_duplication(
         w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
+        archetype_draft=state.archetype_draft,
     )
     print(footer)
 
@@ -398,6 +400,7 @@ def run_reward(
         w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
+        archetype_draft=state.archetype_draft,
     )
     print(footer)
 
@@ -460,6 +463,7 @@ def run_cleanse(
             w=state.draft_strategy.preference_vector,
             deck_count=state.deck_count(),
             essence=state.essence,
+            archetype_draft=state.archetype_draft,
         )
         print(footer)
         return
@@ -526,5 +530,6 @@ def run_cleanse(
         w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
+        archetype_draft=state.archetype_draft,
     )
     print(footer)

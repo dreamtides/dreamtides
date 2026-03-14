@@ -233,13 +233,19 @@ def run_web_server(args: Any) -> None:
     if getattr(args, "archetype_draft", False):
         global _archetype_draft_mode
         _archetype_draft_mode = True
+        state.archetype_draft = True
         strategy = ArchetypeDraftStrategy(
             rng=rng,
             all_cards=cards,
             num_archetypes=getattr(args, "num_archetypes", 3),
         )
+        import render
+
+        archetype_names = [
+            render.ARCHETYPE_NAMES[i] for i in strategy.selected_archetypes
+        ]
         print(
-            f"  Archetype draft initialized: archetypes {strategy.selected_archetypes}, "
+            f"  Archetype draft initialized: {', '.join(archetype_names)}, "
             f"pool size {strategy.pool_size} instances"
         )
     else:

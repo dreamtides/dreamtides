@@ -289,6 +289,7 @@ def run_discovery_draft(
             w=state.draft_strategy.preference_vector,
             deck_count=state.deck_count(),
             essence=state.essence,
+            archetype_draft=state.archetype_draft,
         )
     )
 
@@ -472,5 +473,6 @@ def run_specialty_shop(
             w=state.draft_strategy.preference_vector,
             deck_count=state.deck_count(),
             essence=state.essence,
+            archetype_draft=state.archetype_draft,
         )
     )
