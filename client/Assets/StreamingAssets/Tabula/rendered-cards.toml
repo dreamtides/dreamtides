@@ -5849,22 +5849,6 @@ card-number = 339
 resonance = ["Stone", "Tide"]
 
 [[cards]]
-name = "Tome of Living Tides"
-id = "69303728-9443-4864-86bf-4f748959fa63"
-rendered-text = "Discard a card or lose 1 maximum ●: Dissolve an enemy."
-submerge = true
-energy-cost = 2
-card-type = "Event"
-is-fast = true
-image-number = 1077958697
-rarity = "Common"
-art-owned = false
-card-number = 340
-resonance = ["Flame"]
-subtype = ""
-spark = ""
-
-[[cards]]
 name = "Starlit Wreckage"
 id = "a99a5101-0fe3-43cd-a63b-44f6aba62682"
 rendered-text = "Costs 1● less for each ally. Dissolve an enemy. Draw a card."
@@ -5881,27 +5865,10 @@ subtype = ""
 spark = ""
 
 [[cards]]
-name = "Stardust Collapse"
-id = "bdc25d3c-46d9-4452-85b8-866842fe45a4"
-rendered-text = "Draw 2 cards, then discard a card."
-submerge = true
-surge = true
-energy-cost = 1
-card-type = "Event"
-is-fast = false
-image-number = 551337382
-rarity = "Common"
-art-owned = false
-card-number = 342
-subtype = ""
-spark = ""
-
-[[cards]]
 name = "Blighted Road Watcher"
 id = "521f2592-3539-47fc-b0c9-f236ad06b29c"
 rendered-text = "If this card is in your void, when you abandon an ally, materialize a Shadow Figment."
 shatter = true
-endure = true
 energy-cost = 3
 card-type = "Character"
 subtype = "Ancient"
@@ -5930,76 +5897,12 @@ spark = ""
 resonance = ["Stone", "Flame"]
 
 [[cards]]
-name = "Skyborne Jellyfish"
-id = "cdc462cd-4760-4d15-bc88-a7d4fa7b2368"
-rendered-text = "If this card is in your void, allied characters have ↯fast."
-flash = true
-endure = true
-energy-cost = 4
-card-type = "Character"
-subtype = "Spirit Animal"
-is-fast = false
-spark = 2
-image-number = 674166508
-rarity = "Common"
-art-owned = false
-card-number = 345
-resonance = ["Stone"]
-
-[[cards]]
-name = "Derelict Factory Mender"
-id = "f99b3bed-a138-46a9-9ab2-d3fe009e1fdf"
-rendered-text = "▸ Judgment: You may abandon an ally to reclaim a character with cost 2● or less."
-shatter = true
-endure = true
-energy-cost = 1
-card-type = "Character"
-subtype = "Tinkerer"
-is-fast = false
-spark = 0
-image-number = 1470059003
-rarity = "Uncommon"
-art-owned = false
-card-number = 346
-resonance = ["Stone", "Flame"]
-
-[[cards]]
-name = "Lantern Wolf Sorcerer"
-id = "7e99eb50-6019-4dd7-8d9c-439a88a52465"
-rendered-text = "▸ Judgment: You may discard a card to discover a character."
-submerge = true
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-is-fast = false
-spark = 1
-image-number = 2186149275
-rarity = "Uncommon"
-art-owned = false
-card-number = 347
-resonance = ["Tide"]
-
-[[cards]]
-name = "Stargazer's Vigil"
-id = "d2068cd9-e8d8-43c2-86b8-20d052e81252"
-rendered-text = "Choose one: Dissolve an enemy with spark 3 or less. / Return an enemy to hand."
-flash = true
-energy-cost = 3
-card-type = "Event"
-is-fast = true
-image-number = 571228786
-rarity = "Uncommon"
-art-owned = false
-card-number = 348
-subtype = ""
-spark = ""
-
-[[cards]]
 name = "Vessel on Grey Tides"
 id = "1105e04f-a048-4ac3-a144-632995663865"
 rendered-text = "Discard a card or abandon an ally: Draw 2 cards."
 shatter = true
 submerge = true
+surge = true
 energy-cost = 2
 card-type = "Event"
 is-fast = false
@@ -6013,10 +5916,10 @@ spark = ""
 [[cards]]
 name = "Lantern Ascent"
 id = "378061fa-6376-48d9-afd7-1463a8305194"
-rendered-text = "Return up to 2 events from your void to your hand."
+rendered-text = "Return up to 3 random events from your void to your hand."
 endure = true
 surge = true
-energy-cost = 6
+energy-cost = 4
 card-type = "Event"
 is-fast = false
 image-number = 334049255
@@ -6031,7 +5934,6 @@ resonance = ["Stone", "Tide"]
 name = "Wreck of the Fallen Star"
 id = "b7f308e2-d674-4e8b-9e01-e6efb15f0ca2"
 rendered-text = "Materialize a Radiant Figment for each card you have played this turn."
-ignite = true
 surge = true
 energy-cost = 3
 card-type = "Event"
@@ -6048,7 +5950,7 @@ resonance = ["Flame"]
 name = "Iron Matron"
 id = "1824049c-8af9-4dc3-94e6-09ac90c1ee85"
 rendered-text = "▸ Materialized: You may play cards from the top of your deck this turn."
-flicker = true
+awaken = true
 surge = true
 energy-cost = 1
 card-type = "Character"
@@ -6059,22 +5961,6 @@ image-number = 2427491219
 rarity = "Rare"
 art-owned = false
 card-number = 352
-resonance = ["Flame"]
-
-[[cards]]
-name = "Crowcaller of the Eclipse"
-id = "38497b91-779d-4ad5-b773-6ce53326549c"
-rendered-text = "▸ Judgment: You may discard a card to dissolve an enemy with spark 2 or less."
-submerge = true
-energy-cost = 3
-card-type = "Character"
-subtype = "Mage"
-is-fast = false
-spark = 1
-image-number = 703988032
-rarity = "Rare"
-art-owned = false
-card-number = 353
 resonance = ["Flame"]
 
 [[cards]]
@@ -6098,7 +5984,6 @@ resonance = ["Thunder"]
 name = "Sunset Blade Sentinel"
 id = "d610b91d-61c3-494f-8cf5-ab37847fa171"
 rendered-text = "▸ Judgment: With 3 cards in your void, this character gains +2 spark."
-ignite = true
 endure = true
 energy-cost = 1
 card-type = "Character"
@@ -6115,7 +6000,6 @@ resonance = ["Stone"]
 name = "Aurora's Embrace"
 id = "018c304f-90b1-4365-8568-8f527279b703"
 rendered-text = "Abandon an ally: Gain 1 maximum ●."
-awaken = true
 shatter = true
 energy-cost = 2
 card-type = "Event"
@@ -6162,28 +6046,10 @@ card-number = 358
 resonance = ["Thunder"]
 
 [[cards]]
-name = "Sunset Antler Stag"
-id = "e0c31872-0a57-4805-96a9-9c46a3addb5e"
-rendered-text = "▸ Materialized: Draw a card. ▸ Judgment: Gain 1●."
-awaken = true
-flicker = true
-energy-cost = 3
-card-type = "Character"
-subtype = "Spirit Animal"
-is-fast = false
-spark = 1
-image-number = 1134692654
-rarity = "Common"
-art-owned = false
-card-number = 359
-resonance = ["Thunder"]
-
-[[cards]]
 name = "Stargazer Astromancer"
 id = "82f87087-9da1-401d-aab1-8c5fcda03338"
 rendered-text = "When you materialize a Spirit Animal, gain 1●. When you materialize 2 Spirit Animals in a turn, discover a Spirit Animal."
 awaken = true
-flicker = true
 energy-cost = 3
 card-type = "Character"
 subtype = "Mage"
@@ -6198,10 +6064,9 @@ resonance = ["Tide"]
 [[cards]]
 name = "Duskpeak Chronicler"
 id = "cb30a53c-fce2-4048-b808-6ef106c9e054"
-rendered-text = "▸ Materialized: Abandon an ally to materialize a Shadow Figment."
-ignite = true
+rendered-text = "▸ Materialized: Abandon an ally. Materialize a Shadow Figment."
 shatter = true
-energy-cost = 5
+energy-cost = 2
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -6217,7 +6082,6 @@ name = "Celestial Abduction"
 id = "a3f91057-ef7a-44e7-8183-d3a06d5e2884"
 rendered-text = "Pay X●: Discover a Spirit Animal with cost X● or less and materialize it."
 awaken = true
-shatter = true
 energy-cost = "*"
 card-type = "Event"
 is-fast = false
@@ -6233,7 +6097,6 @@ resonance = ["Thunder"]
 name = "Twilight Offering"
 id = "4b39e1f0-418d-45f7-923d-3ea629e55e11"
 rendered-text = "Dissolve up to 2 enemies. Materialize a Shadow Figment for each enemy dissolved."
-ignite = true
 energy-cost = 4
 card-type = "Event"
 is-fast = false
@@ -6264,7 +6127,6 @@ card-number = 364
 name = "Cloaked Wolfcaller"
 id = "44cb7de5-4d8a-479e-af0e-b88e47f60cee"
 rendered-text = "To play this character, lose 1 maximum ●."
-flash = true
 energy-cost = 1
 card-type = "Character"
 subtype = "Outsider"
@@ -6280,7 +6142,7 @@ resonance = ["Thunder"]
 name = "Void Drifting Jellyfish"
 id = "41b097e9-44b5-4c61-8977-6a05a8e61dee"
 rendered-text = "▸ Judgment: You may abandon this character to gain 4●."
-awaken = true
+surge = true
 shatter = true
 energy-cost = 2
 card-type = "Character"
@@ -6314,7 +6176,6 @@ name = "Scrapyard Guardian"
 id = "865e8aa9-4e20-469e-9ef6-c5329896fd53"
 rendered-text = "▸ Dissolved: Dissolve an enemy with spark 1 or less."
 shatter = true
-endure = true
 energy-cost = 2
 card-type = "Character"
 subtype = "Synth"
@@ -6360,23 +6221,6 @@ card-number = 370
 resonance = ["Stone"]
 
 [[cards]]
-name = "Foundry Marionette"
-id = "bd2b91a1-2bb1-4ec2-8254-3a22a438bc66"
-rendered-text = "▸ Dissolved: An ally gains +2 spark."
-shatter = true
-endure = true
-energy-cost = 3
-card-type = "Character"
-subtype = "Tinkerer"
-is-fast = false
-spark = 2
-image-number = 695511847
-rarity = "Uncommon"
-art-owned = false
-card-number = 371
-resonance = ["Stone"]
-
-[[cards]]
 name = "Cloaked Inferno"
 id = "c5785c16-b3bf-4b85-af06-5b719c6d9891"
 rendered-text = "Choose a number: Dissolve all enemies with cost equal to that number."
@@ -6395,7 +6239,6 @@ resonance = ["Flame"]
 name = "Luminous Release"
 id = "57e41821-b153-4a0a-9b25-3c77e773fede"
 rendered-text = "Gain 1●."
-awaken = true
 surge = true
 energy-cost = 0
 card-type = "Event"

@@ -135,12 +135,7 @@ def format_card_display(
 
     colored_name = colors.card(display_name)
     bane_marker = f"  {colors.c('[BANE]', 'error', bold=True)}" if is_bane else ""
-    arch_tag = ""
-    if debug and design is not None and hasattr(design, "fitness"):
-        arch_tag = _archetype_emojis(design.fitness)
-        if arch_tag:
-            arch_tag = f" {arch_tag}"
-    line1 = f"{prefix}{colored_name}{bane_marker}{arch_tag}"
+    line1 = f"{prefix}{colored_name}{bane_marker}"
 
     lines = [line1]
 
@@ -161,7 +156,12 @@ def format_card_display(
         if rarity:
             type_parts.append(f" ({rarity.title()})")
         type_line = " ".join(type_parts)
-        lines.append(f"    {colors.dim(type_line)}")
+        type_display = colors.dim(type_line)
+        if debug and hasattr(design, "fitness"):
+            emojis = _archetype_emojis(design.fitness)
+            if emojis:
+                type_display = f"{type_display}  {emojis}"
+        lines.append(f"    {type_display}")
 
         # Inline image (only in non-interactive contexts)
         if show_images:
@@ -281,12 +281,7 @@ def _render_card_block(card, debug: bool = False) -> None:
     name = card_name(card)
     if len(name) > text_width:
         name = name[: text_width - 1] + "\u2026"
-    arch_tag = ""
-    if debug and design is not None and hasattr(design, "fitness"):
-        arch_tag = _archetype_emojis(design.fitness)
-        if arch_tag:
-            arch_tag = f" {arch_tag}"
-    text_lines.append(f"{colors.card(name)}{arch_tag}")
+    text_lines.append(colors.card(name))
 
     if design is not None:
         type_parts: list[str] = []
@@ -299,7 +294,12 @@ def _render_card_block(card, debug: bool = False) -> None:
         sub = getattr(design, "subtype", "")
         if sub:
             type_parts.append(f"- {sub}")
-        text_lines.append(colors.dim(" ".join(type_parts)))
+        type_line = colors.dim(" ".join(type_parts))
+        if debug and hasattr(design, "fitness"):
+            emojis = _archetype_emojis(design.fitness)
+            if emojis:
+                type_line = f"{type_line}  {emojis}"
+        text_lines.append(type_line)
 
         rules = getattr(design, "rules_text", "")
         if rules:
