@@ -107,6 +107,18 @@ def build_parser() -> argparse.ArgumentParser:
         default=False,
         help="Disable rarity weighting in archetype draft (all cards at equal weight)",
     )
+    parser.add_argument(
+        "--original-cards",
+        action="store_true",
+        default=False,
+        help="Restrict card pool to the original 220 cards (archetype draft only)",
+    )
+    parser.add_argument(
+        "--allied",
+        action="store_true",
+        default=False,
+        help="Select contiguous archetypes from the alliance circle (archetype draft only)",
+    )
     return parser
 
 
@@ -198,7 +210,8 @@ def main() -> None:
                 "--archetype-draft requires cards.rendered_toml_path to be set"
             )
         cards = card_generator.load_cards_for_archetype_draft(
-            cfg.cards.rendered_toml_path
+            cfg.cards.rendered_toml_path,
+            original_only=args.original_cards,
         )
     else:
         cards = card_generator.generate_cards(cfg, rng)
@@ -240,6 +253,7 @@ def main() -> None:
             all_cards=cards,
             num_archetypes=args.num_archetypes,
             no_rarity=args.no_rarity,
+            allied=args.allied,
         )
         archetype_names = [
             render.ARCHETYPE_NAMES[i] for i in archetype_strategy.selected_archetypes

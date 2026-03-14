@@ -198,7 +198,8 @@ def run_web_server(args: Any) -> None:
                 "--archetype-draft requires cards.rendered_toml_path to be set"
             )
         cards = card_generator.load_cards_for_archetype_draft(
-            cfg.cards.rendered_toml_path
+            cfg.cards.rendered_toml_path,
+            original_only=getattr(args, "original_cards", False),
         )
     else:
         cards = card_generator.generate_cards(cfg, rng)
@@ -238,6 +239,8 @@ def run_web_server(args: Any) -> None:
             rng=rng,
             all_cards=cards,
             num_archetypes=getattr(args, "num_archetypes", 3),
+            no_rarity=getattr(args, "no_rarity", False),
+            allied=getattr(args, "allied", False),
         )
         import render
 

@@ -116,11 +116,16 @@ def load_real_cards(
     return cards
 
 
-def load_cards_for_archetype_draft(rendered_toml_path: str) -> list[CardDesign]:
+def load_cards_for_archetype_draft(
+    rendered_toml_path: str, original_only: bool = False
+) -> list[CardDesign]:
     """Load card designs using only rendered-cards.toml for archetype draft.
 
     Builds fitness vectors from boolean archetype tags in the TOML file
     (e.g. ``shatter = true``). Does not require card-metadata.toml.
+
+    When ``original_only`` is True, only cards with card-number <= 220
+    are included (the original card set).
     """
     import tomllib
 
@@ -143,6 +148,11 @@ def load_cards_for_archetype_draft(rendered_toml_path: str) -> list[CardDesign]:
         raw_rarity = card.get("rarity", "")
         if raw_rarity == "Special":
             continue
+
+        if original_only:
+            card_number = card.get("card-number", None)
+            if card_number is None or card_number > 220:
+                continue
 
         card_id = card.get("id", "")
         fitness = [1.0 if card.get(key, False) else 0.0 for key in ARCHETYPE_KEYS]

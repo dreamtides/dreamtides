@@ -579,6 +579,7 @@ class ArchetypeDraftStrategy(DraftStrategy):
         all_cards: list[CardDesign],
         num_archetypes: int = 3,
         no_rarity: bool = False,
+        allied: bool = False,
     ) -> None:
         self._rng = rng
         self._draft_cfg = SimulatorConfig()
@@ -587,8 +588,14 @@ class ArchetypeDraftStrategy(DraftStrategy):
         self._round_index: int = 0
         self._global_pick_index: int = 0
 
-        # Select random archetypes
-        self._selected_archetypes: list[int] = rng.sample(range(8), num_archetypes)
+        # Select archetypes: contiguous run on the alliance circle, or random
+        if allied:
+            start = rng.randint(0, 7)
+            self._selected_archetypes: list[int] = [
+                (start + i) % 8 for i in range(num_archetypes)
+            ]
+        else:
+            self._selected_archetypes: list[int] = rng.sample(range(8), num_archetypes)
 
         # Build preference vector: 1.0 for selected, 0.0 for others, normalized
         raw = [1.0 if i in self._selected_archetypes else 0.0 for i in range(8)]
