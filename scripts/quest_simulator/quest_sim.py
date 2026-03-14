@@ -12,7 +12,7 @@ import random
 import sys
 import traceback
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 _PROMPT_PATH = Path(".logs/quest_ai_prompt.json")
 _RESPONSE_PATH = Path(".logs/quest_ai_response.json")
@@ -25,7 +25,7 @@ if _DRAFT_SIM_DIR not in sys.path:
 import agents
 import card_generator
 import cube_manager
-from config import SimulatorConfig
+from config import SimulatorConfig, _apply_dict, _apply_override, _load_file
 from draft_models import CubeConsumptionMode
 
 import atlas
@@ -107,10 +107,33 @@ def build_parser() -> argparse.ArgumentParser:
         default=False,
         help="Select contiguous archetypes from the alliance circle (archetype draft only)",
     )
+    parser.add_argument(
+        "--config",
+        type=str,
+        default=None,
+        help="Path to TOML/JSON config file for draft parameters",
+    )
+    parser.add_argument(
+        "--set",
+        action="append",
+        default=[],
+        dest="overrides",
+        metavar="KEY=VALUE",
+        help="Override config field (dot-notation, repeatable). E.g. --set pack_generation.strategy=uniform",
+    )
+    parser.add_argument(
+        "--no-resonance-filter",
+        action="store_true",
+        default=False,
+        help="Disable dual-resonance filtering (all cards eligible regardless of resonance)",
+    )
     return parser
 
 
-def _build_draft_config() -> SimulatorConfig:
+def _build_draft_config(
+    config_path: Optional[str] = None,
+    overrides: Optional[list[str]] = None,
+) -> SimulatorConfig:
     """Construct a SimulatorConfig for quest mode without validation."""
     cfg = SimulatorConfig()
     cfg.draft.seat_count = 6
@@ -134,6 +157,14 @@ def _build_draft_config() -> SimulatorConfig:
     cfg.cards.rendered_toml_path = os.path.join(
         script_dir, "..", "..", "rules_engine", "tabula", "rendered-cards.toml"
     )
+
+    if config_path is not None:
+        raw = _load_file(config_path)
+        _apply_dict(cfg, raw)
+
+    if overrides:
+        for override in overrides:
+            _apply_override(cfg, override)
 
     return cfg
 
@@ -178,7 +209,10 @@ def main() -> None:
     rng = random.Random(seed)
 
     # Build draft engine configuration
-    cfg = _build_draft_config()
+    cfg = _build_draft_config(
+        config_path=args.config,
+        overrides=args.overrides if args.overrides else None,
+    )
 
     # Generate card pool
     if args.archetype_draft:
@@ -263,13 +297,19 @@ def main() -> None:
             f"{1 + len(ai_agents)} agents created"
         )
 
+        if args.no_resonance_filter:
+            resonance_pair_fn = lambda: None
+            cfg.agents.ai_resonance_commit_pick = 9999
+        else:
+            resonance_pair_fn = lambda: resonance_filter.human_resonance_pair(state)
+
         state.draft_strategy = SixSeatDraftStrategy(
             rng=rng,
             human_agent=human_agent,
             ai_agents=ai_agents,
             cube=cube,
             draft_cfg=cfg,
-            resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
+            resonance_pair_fn=resonance_pair_fn,
         )
 
     # Assemble data bundle for site dispatch

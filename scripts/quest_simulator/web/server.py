@@ -192,7 +192,10 @@ def run_web_server(args: Any) -> None:
     seed: int = args.seed if args.seed is not None else random.randint(0, 2**32)
     rng = random.Random(seed)
 
-    cfg = _build_draft_config()
+    cfg = _build_draft_config(
+        config_path=getattr(args, "config", None),
+        overrides=getattr(args, "overrides", None) or None,
+    )
 
     if getattr(args, "archetype_draft", False):
         if cfg.cards.rendered_toml_path is None:
@@ -267,13 +270,19 @@ def run_web_server(args: Any) -> None:
             agents.create_agent(archetype_count=cfg.cards.archetype_count)
             for _ in range(cfg.draft.seat_count - 1)
         ]
+        if getattr(args, "no_resonance_filter", False):
+            resonance_pair_fn = lambda: None
+            cfg.agents.ai_resonance_commit_pick = 9999
+        else:
+            resonance_pair_fn = lambda: resonance_filter.human_resonance_pair(state)
+
         strategy = SixSeatDraftStrategy(
             rng=rng,
             human_agent=human_agent,
             ai_agents=ai_agents,
             cube=cube,
             draft_cfg=cfg,
-            resonance_pair_fn=lambda: resonance_filter.human_resonance_pair(state),
+            resonance_pair_fn=resonance_pair_fn,
         )
     state.draft_strategy = strategy
 
