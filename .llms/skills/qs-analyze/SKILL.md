@@ -9,11 +9,13 @@ Analyze JSONL logs from quest simulator sessions to answer questions about human
 
 ## Step 1: Find the Most Recent Session
 
+Use filesystem modification time, NOT filename sorting (filenames embed creation date which may not reflect the most recent run):
+
 ```bash
-ls -t .logs/quest_*.jsonl | head -1
+stat -f "%Sm %N" .logs/quest_*.jsonl | sort -r | head -5
 ```
 
-The filename encodes: `quest_{DATE}_{NANOS}_seed{SEED}.jsonl`
+Pick the file with the most recent modification timestamp. The filename encodes: `quest_{DATE}_{NANOS}_seed{SEED}.jsonl`
 
 ## Step 2: Load and Parse Events
 
