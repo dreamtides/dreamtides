@@ -6741,7 +6741,6 @@ name = "Rift Torchbearer"
 id = "e2a9fa5d-20c8-4aee-992c-d956e18c1e41"
 rendered-text = "▸ Materialized: Discover a card with cost 2● or less and play it for 0●."
 flicker = true
-shatter = true
 energy-cost = 3
 card-type = "Character"
 subtype = "Explorer"
@@ -6771,39 +6770,6 @@ spark = ""
 resonance = ["Thunder"]
 
 [[cards]]
-name = "Frozen Lantern Walk"
-id = "94dd55b1-2fea-4656-a834-25079e252d04"
-rendered-text = "▸ Judgment: With 5 or more differently-named allies, materialize a Shadow Figment."
-ignite = true
-energy-cost = 4
-card-type = "Character"
-subtype = "Ancient"
-is-fast = false
-spark = 1
-image-number = 503460994
-rarity = "Rare"
-art-owned = false
-card-number = 395
-resonance = ["Flame"]
-
-[[cards]]
-name = "Factory-Born Sentinel"
-id = "c9154c8a-1538-47a6-94d6-a3638a24d58c"
-rendered-text = "▸ Dissolved: An ally gains +2 spark."
-ignite = true
-shatter = true
-energy-cost = 2
-card-type = "Character"
-subtype = "Synth"
-is-fast = false
-spark = 2
-image-number = 339410654
-rarity = "Uncommon"
-art-owned = false
-card-number = 396
-resonance = ["Flame"]
-
-[[cards]]
 name = "Crimson City Retreat"
 id = "f1e4afd2-cb16-454a-a11b-f2e5ede8d46b"
 rendered-text = "Abandon an ally: Return any number of allies to hand."
@@ -6823,7 +6789,6 @@ spark = ""
 name = "Verdant Horizon Seeker"
 id = "e8555cdd-6c83-472c-a269-3317005e5703"
 rendered-text = "▸ Judgment: Kindle 1. You may pay 3● to materialize a Radiant Figment."
-awaken = true
 ignite = true
 energy-cost = 3
 card-type = "Character"
@@ -6841,7 +6806,6 @@ name = "Inferno's Last Stand"
 id = "4c1b4afa-6ae8-4966-b9c2-66f483485245"
 rendered-text = "When an ally is abandoned, materialize a Shadow Figment."
 shatter = true
-ignite = true
 energy-cost = 5
 card-type = "Character"
 subtype = "Ancient"
@@ -6862,7 +6826,7 @@ energy-cost = 1
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
-spark = 2
+spark = 3
 image-number = 1047769090
 rarity = "Common"
 art-owned = false
@@ -6873,7 +6837,7 @@ resonance = ["Flame"]
 name = "Ironworks Foreman"
 id = "16771c40-46a9-4122-b5e1-a80f3912d99e"
 rendered-text = """
-▸ Materialized: Materialize a Halcyon Figment. Abandon an ally: Foresee 1.
+Abandon an ally: Foresee 1.
 
 Reclaim 4●"""
 endure = true
@@ -6911,7 +6875,7 @@ id = "45eaba8d-8f3e-4f65-9c31-30565988e804"
 rendered-text = """
 ▸ Judgment: Materialize two Shadow Figments.
 
-Abandon an ally: Draw 2 cards."""
+Abandon an ally: Draw a card."""
 ignite = true
 shatter = true
 energy-cost = 5
@@ -6942,53 +6906,19 @@ card-number = 404
 resonance = ["Stone"]
 
 [[cards]]
-name = "Colossal Lab Sentinel"
-id = "ebfd5a60-8a65-4450-9759-c102ff678069"
-rendered-text = "Dissolve enemies with total spark 3 or less, divided among one, two, or three enemies."
-energy-cost = 3
-card-type = "Event"
-is-fast = false
-image-number = 2186149273
-rarity = "Uncommon"
-art-owned = false
-card-number = 405
-subtype = ""
-spark = ""
-resonance = ["Flame"]
-
-[[cards]]
 name = "Engine Light Dreamer"
 id = "12bdc762-59ec-481a-9936-8c5327ae7c09"
-rendered-text = "▸ Dissolved: Materialize up to 3 characters from your deck with total cost 6● or less."
+rendered-text = "Materialize 3 random characters from your deck with total cost 6● or less."
 shatter = true
 ignite = true
 energy-cost = 7
-card-type = "Character"
-subtype = "Visionary"
+card-type = "Event"
 is-fast = false
-spark = 5
 image-number = 2018848973
 rarity = "Rare"
 art-owned = false
 card-number = 406
 resonance = ["Flame"]
-
-[[cards]]
-name = "Hellfire Conjuration"
-id = "000dc7ca-546e-489c-b0ea-8bfcdd92bf75"
-rendered-text = "↯fast -- Discover a character and materialize it. At the start of your next turn, pay that character's cost or the opponent gains 6⍏."
-flash = true
-shatter = true
-energy-cost = 0
-card-type = "Event"
-is-fast = true
-image-number = 1419437210
-rarity = "Rare"
-art-owned = false
-card-number = 407
-subtype = ""
-spark = ""
-resonance = ["Tide"]
 
 [[cards]]
 name = "Autumn Nightfall Warden"
@@ -7011,7 +6941,6 @@ name = "Starlit Cradle Keeper"
 id = "2555ec68-c322-42f6-9fba-27a09e59c7c9"
 rendered-text = "Abandon this character: Return a character dissolved this turn from your void to play."
 shatter = true
-endure = true
 energy-cost = 3
 card-type = "Character"
 subtype = "Tinkerer"
@@ -7059,8 +6988,8 @@ resonance = ["Stone", "Flame"]
 [[cards]]
 name = "Crimson Dune Ascent"
 id = "47c59376-dc4b-46d7-ba97-44db55e9d523"
-rendered-text = "▸ Judgment: Dissolve an enemy or ally with the lowest spark."
-shatter = true
+rendered-text = "▸ Judgment: Dissolve an enemy or ally among those with the lowest spark."
+endure = true
 energy-cost = 3
 card-type = "Character"
 subtype = "Visionary"
@@ -7076,7 +7005,6 @@ resonance = ["Tide"]
 name = "Ruinwalker Sentinel"
 id = "fa780152-23dd-4138-8ff7-3083e46fc2bb"
 rendered-text = "3●: Until end of turn, this character becomes a copy of an ally or enemy."
-flicker = true
 energy-cost = 4
 card-type = "Character"
 subtype = "Synth"
@@ -7090,7 +7018,7 @@ card-number = 413
 [[cards]]
 name = "Watcher of Burning Skies"
 id = "c0f7a075-a5a5-4383-8487-07f9788a623c"
-rendered-text = "Once per turn, when you return an ally to hand, draw a card."
+rendered-text = "When you return an ally to hand, draw a card."
 flicker = true
 energy-cost = 4
 card-type = "Character"
