@@ -42,6 +42,8 @@ from site_dispatch import SiteData
 
 _STATIC_DIR = Path(__file__).parent / "static"
 
+_archetype_draft_mode = False
+
 
 def _serialize_deck_card(dc: Any) -> dict:
     design = dc.instance.design
@@ -55,7 +57,7 @@ def _serialize_deck_card(dc: Any) -> dict:
         "card_type": design.card_type,
         "rules_text": design.rules_text,
         "spark": design.spark,
-        "resonance": list(design.resonance),
+        "resonance": [] if _archetype_draft_mode else list(design.resonance),
     }
 
 
@@ -229,6 +231,8 @@ def run_web_server(args: Any) -> None:
     from draft_strategy import ArchetypeDraftStrategy, SixSeatDraftStrategy
 
     if getattr(args, "archetype_draft", False):
+        global _archetype_draft_mode
+        _archetype_draft_mode = True
         strategy = ArchetypeDraftStrategy(
             rng=rng,
             all_cards=cards,
@@ -302,12 +306,13 @@ def run_web_server(args: Any) -> None:
         for d in cards
     }
     card_spark_map: dict[str, int | None] = {d.name: d.spark for d in cards}
-    card_resonance_map: dict[str, tuple[str, ...]] = {
-        d.name: d.resonance for d in cards
-    }
     input_handler.set_card_name_image_map(card_image_map)
     input_handler.set_card_name_spark_map(card_spark_map)
-    input_handler.set_card_name_resonance_map(card_resonance_map)
+    if not _archetype_draft_mode:
+        card_resonance_map: dict[str, tuple[str, ...]] = {
+            d.name: d.resonance for d in cards
+        }
+        input_handler.set_card_name_resonance_map(card_resonance_map)
 
     def _prefetch_images() -> None:
         for d in cards:
