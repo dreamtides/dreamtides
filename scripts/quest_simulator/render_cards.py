@@ -60,11 +60,26 @@ def _top_archetype(fitness: list[float]) -> str:
     return f"{name}={best_val:.2f}"
 
 
+def _archetype_emojis(fitness: list[float]) -> str:
+    """Return archetype emojis for all archetypes with fitness >= 0.5."""
+    if not fitness:
+        return ""
+    emojis: list[str] = []
+    for i, v in enumerate(fitness):
+        if v >= 0.5 and i < len(ARCHETYPE_NAMES):
+            name = ARCHETYPE_NAMES[i]
+            emoji = render.ARCHETYPE_EMOJI.get(name, "")
+            if emoji:
+                emojis.append(emoji)
+    return "".join(emojis)
+
+
 def format_card_display(
     card_or_deck_card,
     highlighted: bool = False,
     max_width: int = render.CONTENT_WIDTH,
     show_images: bool = False,
+    debug: bool = False,
 ) -> list[str]:
     """Format a card as display lines.
 
@@ -120,7 +135,12 @@ def format_card_display(
 
     colored_name = colors.card(display_name)
     bane_marker = f"  {colors.c('[BANE]', 'error', bold=True)}" if is_bane else ""
-    line1 = f"{prefix}{colored_name}{bane_marker}"
+    arch_tag = ""
+    if debug and design is not None and hasattr(design, "fitness"):
+        arch_tag = _archetype_emojis(design.fitness)
+        if arch_tag:
+            arch_tag = f" {arch_tag}"
+    line1 = f"{prefix}{colored_name}{bane_marker}{arch_tag}"
 
     lines = [line1]
 
@@ -239,7 +259,7 @@ def _generate_image_escape(card) -> str | None:
     return esc
 
 
-def _render_card_block(card) -> None:
+def _render_card_block(card, debug: bool = False) -> None:
     """Render a single card with image on the left and text on the right.
 
     Pre-generates the image escape sequence to determine layout: if
@@ -261,7 +281,12 @@ def _render_card_block(card) -> None:
     name = card_name(card)
     if len(name) > text_width:
         name = name[: text_width - 1] + "\u2026"
-    text_lines.append(colors.card(name))
+    arch_tag = ""
+    if debug and design is not None and hasattr(design, "fitness"):
+        arch_tag = _archetype_emojis(design.fitness)
+        if arch_tag:
+            arch_tag = f" {arch_tag}"
+    text_lines.append(f"{colors.card(name)}{arch_tag}")
 
     if design is not None:
         type_parts: list[str] = []
@@ -299,7 +324,7 @@ def _render_card_block(card) -> None:
         sys.stdout.flush()
 
 
-def render_card_columns(cards) -> None:
+def render_card_columns(cards, debug: bool = False) -> None:
     """Render cards with image on the left and text on the right.
 
     Each card is displayed as a block: image at columns 1-15, card
@@ -310,7 +335,7 @@ def render_card_columns(cards) -> None:
         return
 
     for card in cards:
-        _render_card_block(card)
+        _render_card_block(card, debug=debug)
 
 
 def _deck_card_sort_key(dc: DeckCard) -> tuple[str, str]:

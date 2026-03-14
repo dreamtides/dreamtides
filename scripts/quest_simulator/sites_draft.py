@@ -58,7 +58,7 @@ def run_draft(
         print()
 
         # Show card columns (images + text) above interactive selector
-        render_cards.render_card_columns(shown_cards)
+        render_cards.render_card_columns(shown_cards, debug=state.debug)
         print(render.draw_separator())
 
         option_labels = [render_cards.card_name(card) for card in shown_cards]
@@ -95,7 +95,7 @@ def run_draft(
                 # Re-display header and cards before re-prompting
                 print(header)
                 print()
-                render_cards.render_card_columns(shown_cards)
+                render_cards.render_card_columns(shown_cards, debug=state.debug)
                 print(render.draw_separator())
                 continue
 

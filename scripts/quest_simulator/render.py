@@ -21,6 +21,17 @@ ARCHETYPE_NAMES: list[str] = [
     "Surge",
 ]
 
+ARCHETYPE_EMOJI: dict[str, str] = {
+    "Endure": "🔄",
+    "Shatter": "💀",
+    "Ignite": "🔥",
+    "Flicker": "✨",
+    "Awaken": "🌿",
+    "Flash": "🛡️",
+    "Surge": "🌊",
+    "Submerge": "🌀",
+}
+
 ARCHETYPE_RESONANCE: dict[str, tuple[str, str]] = {
     "Flash": ("Thunder", "Tide"),
     "Awaken": ("Thunder", "Flame"),
