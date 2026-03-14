@@ -20,8 +20,8 @@ class CubeManager:
     def __init__(
         self,
         designs: list[CardDesign],
-        copies_per_card: int,
-        consumption_mode: CubeConsumptionMode,
+        copies_per_card: int | dict[str, int] = 1,
+        consumption_mode: CubeConsumptionMode = CubeConsumptionMode.WITHOUT_REPLACEMENT,
     ) -> None:
         self._consumption_mode: CubeConsumptionMode = consumption_mode
         self._all_instances: list[CardInstance] = _create_instances(
@@ -100,14 +100,31 @@ def validate_supply(cfg: config.SimulatorConfig, cube_size: int) -> None:
         )
 
 
+def build_copies_map(
+    cards: list[CardDesign], rarity_cfg: config.RarityConfig
+) -> int | dict[str, int]:
+    """Build a copies-per-card value from cards and rarity config.
+
+    When rarity is enabled, returns a dict mapping rarity tier to copy
+    count (Common=3, Uncommon=2, Rare=1). Otherwise returns 1.
+    """
+    if not rarity_cfg.enabled:
+        return 1
+    return {"common": 3, "uncommon": 2, "rare": 1}
+
+
 def _create_instances(
-    designs: list[CardDesign], copies_per_card: int
+    designs: list[CardDesign], copies_per_card: int | dict[str, int]
 ) -> list[CardInstance]:
     """Create CardInstance objects with unique instance_ids."""
     instances: list[CardInstance] = []
     instance_id = 0
     for design in designs:
-        for _ in range(copies_per_card):
+        if isinstance(copies_per_card, dict):
+            copies = copies_per_card.get(design.rarity, 1)
+        else:
+            copies = copies_per_card
+        for _ in range(copies):
             instances.append(CardInstance(instance_id=instance_id, design=design))
             instance_id += 1
     return instances

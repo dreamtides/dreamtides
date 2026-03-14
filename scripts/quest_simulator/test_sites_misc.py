@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Optional
 from unittest.mock import create_autospec, patch
 
-_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator_v2")
 if _DRAFT_SIM_DIR not in sys.path:
     sys.path.insert(0, _DRAFT_SIM_DIR)
 
@@ -35,11 +35,10 @@ def _build_cfg() -> SimulatorConfig:
     cfg.agents.learning_rate = 3.0
     cfg.agents.openness_window = 3
     cfg.cards.archetype_count = 8
-    cfg.cards.source = "synthetic"
+    cfg.cards.rendered_toml_path = str(Path(__file__).resolve().parent.parent.parent / "rules_engine" / "tabula" / "rendered-cards.toml")
     cfg.cube.distinct_cards = 540
     cfg.cube.copies_per_card = 1
     cfg.cube.consumption_mode = "with_replacement"
-    cfg.refill.strategy = "no_refill"
     cfg.pack_generation.strategy = "seeded_themed"
     return cfg
 
@@ -52,9 +51,7 @@ def _make_card_instance(
         card_id=name,
         name=name,
         fitness=[0.5] * 8,
-        power=0.5,
-        commit=0.5,
-        flex=0.5,
+        rarity_value=0.33,
     )
     return CardInstance(instance_id=instance_id, design=design)
 

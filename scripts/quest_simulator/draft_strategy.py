@@ -402,7 +402,7 @@ class SixSeatDraftStrategy(DraftStrategy):
             return agents.score_card_signal_ignorant(card, ai_agent, agents_cfg)
         else:
             design = getattr(card, "design", card)
-            return getattr(design, "power", 0.0)
+            return getattr(design, "rarity_value", 0.0)
 
     def _advance_to_human_pick(self, logger: Optional[SessionLogger] = None) -> Pack:
         """Generate packs if needed, run AI picks, return pack at seat 0."""

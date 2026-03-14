@@ -13,9 +13,7 @@ def _make_design(
     name: str = "Test Card",
     card_id: str = "test_001",
     fitness: Optional[list[float]] = None,
-    power: float = 0.5,
-    commit: float = 0.3,
-    flex: float = 0.2,
+    rarity_value: float = 0.0,
 ) -> CardDesign:
     """Create a CardDesign for testing."""
     if fitness is None:
@@ -24,9 +22,7 @@ def _make_design(
         card_id=card_id,
         name=name,
         fitness=fitness,
-        power=power,
-        commit=commit,
-        flex=flex,
+        rarity_value=rarity_value,
     )
 
 
@@ -35,10 +31,10 @@ def _make_instance(
     name: str = "Test Card",
     card_id: str = "test_001",
     fitness: Optional[list[float]] = None,
-    power: float = 0.5,
+    rarity_value: float = 0.0,
 ) -> CardInstance:
     """Create a CardInstance for testing."""
-    design = _make_design(name=name, card_id=card_id, fitness=fitness, power=power)
+    design = _make_design(name=name, card_id=card_id, fitness=fitness, rarity_value=rarity_value)
     return CardInstance(instance_id=instance_id, design=design)
 
 
@@ -47,7 +43,7 @@ def _make_high_fitness_instances(
     count: int,
     start_id: int = 0,
     fitness_value: float = 0.9,
-    power: float = 0.5,
+    rarity_value: float = 0.0,
 ) -> list[CardInstance]:
     """Create instances with high fitness for a specific archetype."""
     instances = []
@@ -58,7 +54,7 @@ def _make_high_fitness_instances(
             name=f"High A{archetype_index} Card {i}",
             card_id=f"high_a{archetype_index}_{i}",
             fitness=fitness,
-            power=power,
+            rarity_value=rarity_value,
         )
         instances.append(CardInstance(instance_id=start_id + i, design=design))
     return instances
@@ -78,7 +74,7 @@ def _make_quest_state(
     import sys
     from pathlib import Path
 
-    draft_dir = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+    draft_dir = str(Path(__file__).resolve().parent.parent / "draft_simulator_v2")
     if draft_dir not in sys.path:
         sys.path.insert(0, draft_dir)
 
@@ -101,7 +97,7 @@ def _make_quest_state(
                 name=f"HighFit Card {i}",
                 card_id=f"highfit_{i}",
                 fitness=fitness,
-                power=0.3 + (i % 10) * 0.1,
+                rarity_value=round((i % 3) * 0.33, 2),
             )
         )
     for i in range(half, card_count):
@@ -111,7 +107,7 @@ def _make_quest_state(
                 name=f"LowFit Card {i}",
                 card_id=f"lowfit_{i}",
                 fitness=fitness,
-                power=0.3 + (i % 10) * 0.1,
+                rarity_value=round((i % 3) * 0.33, 2),
             )
         )
 
@@ -172,7 +168,7 @@ class TestDrawAndFilter:
         import sys
         from pathlib import Path
 
-        draft_dir = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+        draft_dir = str(Path(__file__).resolve().parent.parent / "draft_simulator_v2")
         if draft_dir not in sys.path:
             sys.path.insert(0, draft_dir)
 
@@ -227,44 +223,42 @@ class TestDrawAndFilter:
         assert len(cards) > 0
 
 
-class TestPowerBasedPricing:
-    """Test the power-based pricing formula for specialty shop."""
+class TestRarityBasedPricing:
+    """Test the rarity-based pricing formula for specialty shop."""
 
     def test_price_formula(self) -> None:
-        """Price should be round(power * 25) clamped to [5, 100]."""
-        from sites_discovery import compute_power_price
+        """Price should be max(5, min(100, round(10 + rarity_value * 60)))."""
+        from sites_discovery import compute_rarity_price
 
-        assert compute_power_price(0.0) == 5  # Clamped to min
-        assert compute_power_price(0.2) == 5  # round(5) = 5
-        assert compute_power_price(0.5) == 12  # round(12.5) = 12 (banker's rounding)
-        assert compute_power_price(1.0) == 25
-        assert compute_power_price(2.0) == 50
-        assert compute_power_price(4.0) == 100  # round(100) = 100
-        assert compute_power_price(5.0) == 100  # Clamped to max
+        assert compute_rarity_price(0.0) == 10
+        assert compute_rarity_price(0.33) == 30  # round(10 + 0.33*60) = round(29.8) = 30
+        assert compute_rarity_price(0.67) == 50  # round(10 + 0.67*60) = round(50.2) = 50
+        assert compute_rarity_price(1.0) == 70  # round(10 + 60) = 70
+        assert compute_rarity_price(1.5) == 100  # Clamped to max
 
     def test_price_never_below_minimum(self) -> None:
         """Price should never be below 5."""
-        from sites_discovery import compute_power_price
+        from sites_discovery import compute_rarity_price
 
-        for p in [0.0, 0.01, 0.05, 0.1]:
-            assert compute_power_price(p) >= 5
+        for rv in [0.0, 0.01, 0.05, 0.1]:
+            assert compute_rarity_price(rv) >= 5
 
     def test_price_never_above_maximum(self) -> None:
         """Price should never exceed 100."""
-        from sites_discovery import compute_power_price
+        from sites_discovery import compute_rarity_price
 
-        for p in [10.0, 20.0, 50.0]:
-            assert compute_power_price(p) <= 100
+        for rv in [1.0, 1.5, 2.0, 5.0]:
+            assert compute_rarity_price(rv) <= 100
 
 
 class TestShopItemCreation:
-    """Test shop item creation with CardInstance and power-based pricing."""
+    """Test shop item creation with CardInstance and rarity-based pricing."""
 
     def test_shop_item_has_card_instance(self) -> None:
         """ShopItem should reference a CardInstance, not the old pool entry type."""
         from sites_discovery import ShopItem
 
-        inst = _make_instance(power=1.0)
+        inst = _make_instance(rarity_value=0.33)
         item = ShopItem(instance=inst, base_price=25, discounted_price=None)
         assert item.instance is inst
         assert item.base_price == 25
@@ -273,7 +267,7 @@ class TestShopItemCreation:
         """Effective price should be base_price when no discount."""
         from sites_discovery import ShopItem
 
-        inst = _make_instance(power=1.0)
+        inst = _make_instance(rarity_value=0.33)
         item = ShopItem(instance=inst, base_price=50, discounted_price=None)
         assert item.effective_price == 50
 
@@ -281,7 +275,7 @@ class TestShopItemCreation:
         """Effective price should be discounted_price when set."""
         from sites_discovery import ShopItem
 
-        inst = _make_instance(power=1.0)
+        inst = _make_instance(rarity_value=0.33)
         item = ShopItem(instance=inst, base_price=50, discounted_price=30)
         assert item.effective_price == 30
 
@@ -397,14 +391,14 @@ class TestSpecialtyShopDoesNotAdvanceDraft:
 
 
 class TestSpecialtyShopPricing:
-    """Test that Specialty Shop uses power-based pricing."""
+    """Test that Specialty Shop uses rarity-based pricing."""
 
-    def test_shop_uses_power_pricing(self) -> None:
-        """Specialty Shop items should be priced based on power, not rarity."""
-        from sites_discovery import compute_power_price, prepare_shop_items
+    def test_shop_uses_rarity_pricing(self) -> None:
+        """Specialty Shop items should be priced based on rarity_value."""
+        from sites_discovery import compute_rarity_price, prepare_shop_items
 
         instances = [
-            _make_instance(instance_id=i, name=f"Card {i}", power=1.0 + i * 0.5)
+            _make_instance(instance_id=i, name=f"Card {i}", rarity_value=round(i * 0.33, 2))
             for i in range(4)
         ]
         rng = random.Random(42)
@@ -418,7 +412,7 @@ class TestSpecialtyShopPricing:
         items = prepare_shop_items(instances, rng, shop_config)
 
         for i, item in enumerate(items):
-            expected_base = compute_power_price(instances[i].design.power)
+            expected_base = compute_rarity_price(instances[i].design.rarity_value)
             assert item.base_price == expected_base
 
 
@@ -491,7 +485,7 @@ class TestDrawAndFilterSmallCube:
         import sys
         from pathlib import Path
 
-        draft_dir = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+        draft_dir = str(Path(__file__).resolve().parent.parent / "draft_simulator_v2")
         if draft_dir not in sys.path:
             sys.path.insert(0, draft_dir)
 
@@ -549,7 +543,7 @@ class TestDrawAndFilterSmallCube:
         import sys
         from pathlib import Path
 
-        draft_dir = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+        draft_dir = str(Path(__file__).resolve().parent.parent / "draft_simulator_v2")
         if draft_dir not in sys.path:
             sys.path.insert(0, draft_dir)
 

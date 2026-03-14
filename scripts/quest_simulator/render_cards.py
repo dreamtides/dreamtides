@@ -69,14 +69,13 @@ def format_card_display(
     """Format a card as display lines.
 
     Accepts a DeckCard, CardInstance, or CardDesign. Shows the card
-    name (colored), power, commit, flex, and top archetype fitness.
+    name (colored), rarity, and top archetype fitness.
 
-    For real cards (is_real=True), returns up to 4+ lines:
+    Returns up to 4+ lines:
       Line 1: marker + colored card name (with transfig/bane markers)
       Line 2: energy cost + card type + subtype + rarity
       Line 3+: rules text (word-wrapped)
-      Last:   power/commit/flex + top archetype
-    For synthetic cards, returns 2 lines (name + stats).
+      Last:   rarity + top archetype
     """
     marker = ">" if highlighted else " "
 
@@ -125,9 +124,8 @@ def format_card_display(
 
     lines = [line1]
 
-    # For real cards, add type line and rules text
-    is_real = getattr(design, "is_real", False) if design else False
-    if is_real and design is not None:
+    # Add type line and rules text
+    if design is not None:
         # Line 2: energy cost + card type + subtype + rarity
         type_parts: list[str] = []
         energy = getattr(design, "energy_cost", None)
@@ -161,15 +159,12 @@ def format_card_display(
             for wline in wrapped:
                 lines.append(f"    {wline}")
 
-    # Stats line: power/commit/flex + top archetype
+    # Stats line: rarity + top archetype
     details_parts: list[str] = []
     if design is not None:
-        if hasattr(design, "power"):
-            details_parts.append(f"Power: {colors.num(f'{design.power:.2f}')}")
-        if hasattr(design, "commit"):
-            details_parts.append(f"Commit: {colors.num(f'{design.commit:.2f}')}")
-        if hasattr(design, "flex"):
-            details_parts.append(f"Flex: {colors.num(f'{design.flex:.2f}')}")
+        rarity = getattr(design, "original_rarity", "") or getattr(design, "rarity", "")
+        if rarity:
+            details_parts.append(colors.dim(rarity.title()))
         if hasattr(design, "fitness"):
             arch = _top_archetype(design.fitness)
             if arch:
@@ -268,8 +263,7 @@ def _render_card_block(card) -> None:
         name = name[: text_width - 1] + "\u2026"
     text_lines.append(colors.card(name))
 
-    is_real = getattr(design, "is_real", False) if design else False
-    if is_real and design is not None:
+    if design is not None:
         type_parts: list[str] = []
         energy = getattr(design, "energy_cost", None)
         if energy is not None:

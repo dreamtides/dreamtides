@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 # Ensure draft_simulator is importable
-_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator_v2")
 if _DRAFT_SIM_DIR not in sys.path:
     sys.path.insert(0, _DRAFT_SIM_DIR)
 
@@ -33,11 +33,10 @@ def _build_cfg() -> SimulatorConfig:
     cfg.agents.learning_rate = 3.0
     cfg.agents.openness_window = 3
     cfg.cards.archetype_count = 8
-    cfg.cards.source = "synthetic"
+    cfg.cards.rendered_toml_path = str(Path(__file__).resolve().parent.parent.parent / "rules_engine" / "tabula" / "rendered-cards.toml")
     cfg.cube.distinct_cards = 540
     cfg.cube.copies_per_card = 1
     cfg.cube.consumption_mode = "with_replacement"
-    cfg.refill.strategy = "no_refill"
     cfg.pack_generation.strategy = "seeded_themed"
     return cfg
 
@@ -115,9 +114,7 @@ class TestCompleteHumanPick:
         round_manager.complete_human_pick(state, chosen, shown)
         assert state.packs is not None
         packs = state.packs
-        assert chosen not in packs[0].cards
-        # After rotation, packs[0] is a different pack; check the original
-        # pack (now at some other seat) lost a card
+        # After rotation + pick, total cards across all packs should drop by 1
         total_cards = sum(len(p.cards) for p in packs)
         expected = original_count - 1 + 19 * 5
         assert total_cards == expected

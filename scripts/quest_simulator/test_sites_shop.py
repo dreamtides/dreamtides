@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 # Ensure draft_simulator is importable
-_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator_v2")
 if _DRAFT_SIM_DIR not in sys.path:
     sys.path.insert(0, _DRAFT_SIM_DIR)
 
@@ -35,11 +35,10 @@ def _build_cfg() -> SimulatorConfig:
     cfg.agents.learning_rate = 3.0
     cfg.agents.openness_window = 3
     cfg.cards.archetype_count = 8
-    cfg.cards.source = "synthetic"
+    cfg.cards.rendered_toml_path = str(Path(__file__).resolve().parent.parent.parent / "rules_engine" / "tabula" / "rendered-cards.toml")
     cfg.cube.distinct_cards = 540
     cfg.cube.copies_per_card = 1
     cfg.cube.consumption_mode = "with_replacement"
-    cfg.refill.strategy = "no_refill"
     cfg.pack_generation.strategy = "seeded_themed"
     return cfg
 
@@ -77,43 +76,43 @@ def _make_dreamsigns(count: int = 5) -> list[Dreamsign]:
 
 
 class TestComputePrice:
-    """Tests for power-based pricing."""
+    """Tests for rarity-based pricing."""
 
-    def test_zero_power_clamps_to_minimum(self) -> None:
+    def test_zero_rarity_gives_base_price(self) -> None:
         from sites_shop import compute_price
 
-        assert compute_price(0.0) == 5
+        assert compute_price(0.0) == 10
 
-    def test_low_power_clamps_to_minimum(self) -> None:
+    def test_low_rarity(self) -> None:
         from sites_shop import compute_price
 
-        assert compute_price(0.1) == 5
+        assert compute_price(0.33) == 30
 
-    def test_medium_power(self) -> None:
+    def test_medium_rarity(self) -> None:
         from sites_shop import compute_price
 
-        assert compute_price(0.6) == 15
+        assert compute_price(0.67) == 50
 
-    def test_standard_power(self) -> None:
+    def test_high_rarity(self) -> None:
         from sites_shop import compute_price
 
-        assert compute_price(2.0) == 50
+        assert compute_price(1.0) == 70
 
-    def test_high_power_clamps_to_maximum(self) -> None:
+    def test_high_rarity_clamps_to_maximum(self) -> None:
         from sites_shop import compute_price
 
-        assert compute_price(4.0) == 100
+        assert compute_price(1.5) == 100
 
-    def test_very_high_power_clamps_to_maximum(self) -> None:
+    def test_very_high_rarity_clamps_to_maximum(self) -> None:
         from sites_shop import compute_price
 
-        assert compute_price(5.0) == 100
+        assert compute_price(2.0) == 100
 
     def test_rounding(self) -> None:
         from sites_shop import compute_price
 
-        # 1.3 * 25 = 32.5 -> rounds to 32
-        assert compute_price(1.3) == 32
+        # 10 + 0.5 * 60 = 40.0 -> rounds to 40
+        assert compute_price(0.5) == 40
 
 
 class TestBuildShopItems:
@@ -126,28 +125,24 @@ class TestBuildShopItems:
             card_id="c1",
             name="Test Card",
             fitness=[0.5] * 8,
-            power=2.0,
-            commit=0.5,
-            flex=0.3,
+            rarity_value=0.67,
         )
         cards = [CardInstance(instance_id=i, design=design) for i in range(3)]
         items = _build_shop_items(cards)
         assert len(items) == 3
 
-    def test_prices_match_power(self) -> None:
+    def test_prices_match_rarity(self) -> None:
         from sites_shop import _build_shop_items
 
         design = CardDesign(
             card_id="c1",
             name="Test Card",
             fitness=[0.5] * 8,
-            power=2.0,
-            commit=0.5,
-            flex=0.3,
+            rarity_value=0.67,
         )
         cards = [CardInstance(instance_id=1, design=design)]
         items = _build_shop_items(cards)
-        assert items[0].price == 50  # round(2.0 * 25)
+        assert items[0].price == 50  # max(5, min(100, round(10 + 0.67 * 60)))
 
     def test_item_references_card_instance(self) -> None:
         from sites_shop import _build_shop_items
@@ -156,9 +151,7 @@ class TestBuildShopItems:
             card_id="c1",
             name="Test Card",
             fitness=[0.5] * 8,
-            power=1.0,
-            commit=0.5,
-            flex=0.3,
+            rarity_value=0.5,
         )
         card = CardInstance(instance_id=42, design=design)
         items = _build_shop_items([card])

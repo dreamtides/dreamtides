@@ -68,6 +68,7 @@ class AgentsConfig:
     openness_window: int = 3
     learning_rate: float = 3.0
     force_archetype: Optional[int] = None
+    ai_resonance_commit_pick: int = 5
 
 
 @dataclass

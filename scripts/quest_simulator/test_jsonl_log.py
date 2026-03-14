@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator_v2")
 if _DRAFT_SIM_DIR not in sys.path:
     sys.path.insert(0, _DRAFT_SIM_DIR)
 
@@ -30,18 +30,14 @@ _NEXT_ID = 0
 def _make_design(
     name: str = "Test Card",
     card_id: str = "test_001",
-    power: float = 0.5,
-    commit: float = 0.3,
-    flex: float = 0.4,
+    rarity_value: float = 0.33,
     fitness: list[float] | None = None,
 ) -> CardDesign:
     return CardDesign(
         card_id=card_id,
         name=name,
         fitness=fitness if fitness is not None else [0.8, 0.2, 0.1],
-        power=power,
-        commit=commit,
-        flex=flex,
+        rarity_value=rarity_value,
     )
 
 
@@ -56,18 +52,14 @@ class TestDeckCardDict(unittest.TestCase):
         design = _make_design(
             name="Test Card",
             card_id="test_001",
-            power=0.5,
-            commit=0.3,
-            flex=0.4,
+            rarity_value=0.5,
             fitness=[0.9, 0.2],
         )
         dc = DeckCard(instance=_make_instance(design))
         d = jsonl_log._deck_card_dict(dc)
         self.assertEqual(d["name"], "Test Card")
         self.assertEqual(d["card_id"], "test_001")
-        self.assertEqual(d["power"], 0.5)
-        self.assertEqual(d["commit"], 0.3)
-        self.assertEqual(d["flex"], 0.4)
+        self.assertEqual(d["rarity_value"], 0.5)
         self.assertEqual(d["top_fitness"], [0.9, 0.2])
         self.assertFalse(d["is_bane"])
         self.assertFalse(d["is_transfigured"])
@@ -218,10 +210,10 @@ class TestSessionLogger(unittest.TestCase):
     def test_log_draft_pick(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
         inst_a = _make_instance(
-            _make_design("Card A", card_id="a_001", power=0.6, commit=0.3, flex=0.2)
+            _make_design("Card A", card_id="a_001", rarity_value=0.6)
         )
         inst_b = _make_instance(
-            _make_design("Card B", card_id="b_001", power=0.4, commit=0.5, flex=0.3)
+            _make_design("Card B", card_id="b_001", rarity_value=0.4)
         )
         logger.log_draft_pick(
             offered_cards=[inst_a, inst_b],
@@ -235,7 +227,7 @@ class TestSessionLogger(unittest.TestCase):
         self.assertEqual(event["offered"][0]["weight"], 1.5)
         self.assertEqual(event["offered"][0]["name"], "Card A")
         self.assertEqual(event["offered"][0]["card_id"], "a_001")
-        self.assertEqual(event["offered"][0]["power"], 0.6)
+        self.assertEqual(event["offered"][0]["rarity_value"], 0.6)
         self.assertEqual(event["picked"]["name"], "Card A")
         self.assertEqual(event["picked"]["card_id"], "a_001")
 
@@ -253,10 +245,10 @@ class TestSessionLogger(unittest.TestCase):
     def test_log_shop_purchase(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
         inst_a = _make_instance(
-            _make_design("Card A", card_id="a_001", power=0.5, commit=0.3, flex=0.4)
+            _make_design("Card A", card_id="a_001", rarity_value=0.5)
         )
         inst_b = _make_instance(
-            _make_design("Card B", card_id="b_001", power=0.6, commit=0.4, flex=0.2)
+            _make_design("Card B", card_id="b_001", rarity_value=0.6)
         )
         logger.log_shop_purchase(
             items_shown=[inst_a, inst_b],
@@ -269,7 +261,7 @@ class TestSessionLogger(unittest.TestCase):
         self.assertEqual(len(event["items_shown"]), 2)
         self.assertEqual(event["items_shown"][0]["name"], "Card A")
         self.assertEqual(event["items_shown"][0]["card_id"], "a_001")
-        self.assertEqual(event["items_shown"][0]["power"], 0.5)
+        self.assertEqual(event["items_shown"][0]["rarity_value"], 0.5)
         self.assertEqual(len(event["items_bought"]), 1)
         self.assertEqual(event["essence_spent"], 50)
 
@@ -321,7 +313,7 @@ class TestSessionLogger(unittest.TestCase):
         self.assertEqual(len(event["deck"]), 2)
         self.assertEqual(event["deck"][0]["name"], "A")
         self.assertEqual(event["deck"][0]["card_id"], "a_001")
-        self.assertIn("power", event["deck"][0])
+        self.assertIn("rarity_value", event["deck"][0])
         self.assertIn("top_fitness", event["deck"][0])
         self.assertEqual(event["essence"], 175)
         self.assertEqual(event["completion_level"], 7)
@@ -447,7 +439,7 @@ class TestSessionLogger(unittest.TestCase):
     def test_log_ai_pick(self) -> None:
         logger = jsonl_log.SessionLogger(seed=1)
         inst = _make_instance(
-            _make_design("AI Card", card_id="ai_001", power=0.7, commit=0.4, flex=0.3)
+            _make_design("AI Card", card_id="ai_001", rarity_value=0.7)
         )
         alt: dict[str, object] = {"name": "Alt Card", "score": 0.65}
         logger.log_ai_pick(
@@ -544,10 +536,10 @@ class TestSessionLogger(unittest.TestCase):
         """log_draft_pick with optional enrichment kwargs."""
         logger = jsonl_log.SessionLogger(seed=1)
         inst_a = _make_instance(
-            _make_design("Card A", card_id="a_001", power=0.6, commit=0.3, flex=0.2)
+            _make_design("Card A", card_id="a_001", rarity_value=0.6)
         )
         inst_b = _make_instance(
-            _make_design("Card B", card_id="b_001", power=0.4, commit=0.5, flex=0.3)
+            _make_design("Card B", card_id="b_001", rarity_value=0.4)
         )
         logger.log_draft_pick(
             offered_cards=[inst_a, inst_b],

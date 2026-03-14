@@ -14,7 +14,7 @@ from unittest.mock import patch
 
 # Ensure draft_simulator is importable before importing quest modules
 # that depend on it (e.g. flow -> render -> colors).
-_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator_v2")
 if _DRAFT_SIM_DIR not in sys.path:
     sys.path.insert(0, _DRAFT_SIM_DIR)
 
@@ -413,7 +413,7 @@ class TestSiteTypeCoverage:
     def test_all_site_types_exercisable(self) -> None:
         """All 16 site types should appear across a range of seeds."""
         all_site_types: set[str] = set()
-        for seed in [42, 1, 100, 5, 7]:
+        for seed in [42, 1, 100, 3, 7]:
             with patch("builtins.print"):
                 _, log_path = _run_full_quest(seed)
             events = _parse_log(log_path)

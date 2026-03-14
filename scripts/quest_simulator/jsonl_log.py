@@ -36,14 +36,11 @@ def _deck_card_dict(dc: DeckCard) -> dict[str, object]:
         result["name"] = design.name
     if hasattr(design, "card_id"):
         result["card_id"] = design.card_id
-    if hasattr(design, "power"):
-        result["power"] = round(design.power, 4)
-    if hasattr(design, "commit"):
-        result["commit"] = round(design.commit, 4)
-    if hasattr(design, "flex"):
-        result["flex"] = round(design.flex, 4)
+    if hasattr(design, "rarity_value"):
+        result["rarity_value"] = round(design.rarity_value, 4)
     if hasattr(design, "fitness"):
         fitness = design.fitness
+        result["tag_count"] = sum(1 for f in fitness if f >= 0.5)
         top = sorted(fitness, reverse=True)[:3] if fitness else []
         result["top_fitness"] = [round(v, 4) for v in top]
     return result
@@ -158,12 +155,8 @@ class SessionLogger:
                 entry["name"] = design.name
             if hasattr(design, "card_id"):
                 entry["card_id"] = design.card_id
-            if hasattr(design, "power"):
-                entry["power"] = round(design.power, 4)
-            if hasattr(design, "commit"):
-                entry["commit"] = round(design.commit, 4)
-            if hasattr(design, "flex"):
-                entry["flex"] = round(design.flex, 4)
+            if hasattr(design, "rarity_value"):
+                entry["rarity_value"] = round(design.rarity_value, 4)
             offered.append(entry)
 
         picked: dict[str, object] = {}
@@ -172,12 +165,8 @@ class SessionLogger:
             picked["name"] = picked_design.name
         if hasattr(picked_design, "card_id"):
             picked["card_id"] = picked_design.card_id
-        if hasattr(picked_design, "power"):
-            picked["power"] = round(picked_design.power, 4)
-        if hasattr(picked_design, "commit"):
-            picked["commit"] = round(picked_design.commit, 4)
-        if hasattr(picked_design, "flex"):
-            picked["flex"] = round(picked_design.flex, 4)
+        if hasattr(picked_design, "rarity_value"):
+            picked["rarity_value"] = round(picked_design.rarity_value, 4)
 
         event: dict[str, object] = {
             "event": "draft_pick",
@@ -303,12 +292,8 @@ class SessionLogger:
                 result["name"] = design.name
             if hasattr(design, "card_id"):
                 result["card_id"] = design.card_id
-            if hasattr(design, "power"):
-                result["power"] = round(design.power, 4)
-            if hasattr(design, "commit"):
-                result["commit"] = round(design.commit, 4)
-            if hasattr(design, "flex"):
-                result["flex"] = round(design.flex, 4)
+            if hasattr(design, "rarity_value"):
+                result["rarity_value"] = round(design.rarity_value, 4)
             return result
 
         self._write(

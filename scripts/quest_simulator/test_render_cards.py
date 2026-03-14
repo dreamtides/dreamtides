@@ -8,7 +8,7 @@ import unittest
 # are empty strings, making assertions on visible content straightforward.
 os.environ["NO_COLOR"] = "1"
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "draft_simulator"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "draft_simulator_v2"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 
 from draft_models import CardDesign, CardInstance
@@ -17,20 +17,16 @@ from models import DeckCard, Dreamcaller, Dreamsign
 
 def _make_design(
     name: str = "Whirlpool Seer",
-    power: float = 0.72,
-    commit: float = 0.60,
-    flex: float = 0.30,
     fitness: list[float] | None = None,
+    rarity_value: float = 0.33,
 ) -> CardDesign:
     if fitness is None:
-        fitness = [0.9, 0.1, 0.05, 0.0, 0.0, 0.0, 0.0, 0.05]
+        fitness = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     return CardDesign(
         card_id="test_001",
         name=name,
         fitness=fitness,
-        power=power,
-        commit=commit,
-        flex=flex,
+        rarity_value=rarity_value,
     )
 
 
@@ -67,7 +63,7 @@ class TestFormatCardDisplay(unittest.TestCase):
 
         dc = _make_deck_card()
         lines = format_card_display(dc, highlighted=False)
-        self.assertEqual(len(lines), 2)
+        self.assertGreaterEqual(len(lines), 2)
 
     def test_highlighted_has_marker(self) -> None:
         from render_cards import format_card_display
@@ -91,33 +87,13 @@ class TestFormatCardDisplay(unittest.TestCase):
         lines = format_card_display(dc, highlighted=False)
         self.assertIn("Whirlpool Seer", lines[0])
 
-    def test_power_in_line2(self) -> None:
+    def test_archetype_in_stats_line(self) -> None:
         from render_cards import format_card_display
 
         dc = _make_deck_card()
         lines = format_card_display(dc, highlighted=False)
-        self.assertIn("0.72", lines[1])
-
-    def test_commit_in_line2(self) -> None:
-        from render_cards import format_card_display
-
-        dc = _make_deck_card()
-        lines = format_card_display(dc, highlighted=False)
-        self.assertIn("0.60", lines[1])
-
-    def test_flex_in_line2(self) -> None:
-        from render_cards import format_card_display
-
-        dc = _make_deck_card()
-        lines = format_card_display(dc, highlighted=False)
-        self.assertIn("0.30", lines[1])
-
-    def test_archetype_fitness_in_line2(self) -> None:
-        from render_cards import format_card_display
-
-        dc = _make_deck_card()
-        lines = format_card_display(dc, highlighted=False)
-        self.assertIn("Flash=0.90", lines[1])
+        combined = "\n".join(lines)
+        self.assertIn("Flash=1.00", combined)
 
     def test_no_resonance_in_output(self) -> None:
         from render_cards import format_card_display
@@ -127,13 +103,14 @@ class TestFormatCardDisplay(unittest.TestCase):
         combined = "\n".join(lines)
         self.assertNotIn("resonance", combined.lower())
 
-    def test_no_rarity_in_output(self) -> None:
+    def test_no_raw_rarity_field_in_output(self) -> None:
         from render_cards import format_card_display
 
         dc = _make_deck_card()
         lines = format_card_display(dc, highlighted=False)
         combined = "\n".join(lines)
-        self.assertNotIn("rarity", combined.lower())
+        # The word "rarity_value" should not appear as a raw field name
+        self.assertNotIn("rarity_value", combined.lower())
 
     def test_no_rules_text_in_output(self) -> None:
         from render_cards import format_card_display
@@ -168,7 +145,7 @@ class TestFormatCardDisplay(unittest.TestCase):
 
         instance = _make_instance()
         lines = format_card_display(instance, highlighted=False)
-        self.assertEqual(len(lines), 2)
+        self.assertGreaterEqual(len(lines), 2)
         self.assertIn("Whirlpool Seer", lines[0])
 
     def test_accepts_card_design(self) -> None:
@@ -176,7 +153,7 @@ class TestFormatCardDisplay(unittest.TestCase):
 
         design = _make_design()
         lines = format_card_display(design, highlighted=False)
-        self.assertEqual(len(lines), 2)
+        self.assertGreaterEqual(len(lines), 2)
         self.assertIn("Whirlpool Seer", lines[0])
 
 
@@ -187,18 +164,15 @@ class TestRealCardDisplay(unittest.TestCase):
         return CardDesign(
             card_id="real_001",
             name="Titan of Forgotten Echoes",
-            fitness=[0.0, 0.15, 0.0, 0.0, 0.0, 0.85, 0.7, 0.3],
-            power=0.65,
-            commit=0.60,
-            flex=0.40,
+            fitness=[0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0],
             rarity="rare",
+            rarity_value=0.67,
             rules_text="When you play 2 cards in a turn, reclaim this character.",
             energy_cost=6,
             card_type="Character",
             subtype="Ancient",
             spark=4,
             is_fast=False,
-            is_real=True,
         )
 
     def test_real_card_has_more_than_2_lines(self) -> None:
@@ -233,31 +207,28 @@ class TestRealCardDisplay(unittest.TestCase):
         design = self._make_real_design()
         lines = format_card_display(design, highlighted=False)
         last_line = lines[-1]
-        self.assertIn("0.65", last_line)
+        self.assertIn("Rare", last_line)
 
-    def test_synthetic_card_still_2_lines(self) -> None:
+    def test_minimal_card_has_2_lines(self) -> None:
         from render_cards import format_card_display
 
         design = _make_design()
         lines = format_card_display(design, highlighted=False)
-        self.assertEqual(len(lines), 2)
+        self.assertGreaterEqual(len(lines), 2)
 
-    def test_real_card_no_rules_text_still_shows_type(self) -> None:
+    def test_card_no_rules_text_still_shows_type(self) -> None:
         from render_cards import format_card_display
 
         design = CardDesign(
             card_id="real_002",
             name="Vanilla Creature",
-            fitness=[0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-            power=0.3,
-            commit=0.2,
-            flex=0.1,
+            fitness=[1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
             rarity="common",
+            rarity_value=0.0,
             rules_text="",
             energy_cost=2,
             card_type="Character",
             subtype="",
-            is_real=True,
         )
         lines = format_card_display(design, highlighted=False)
         combined = "\n".join(lines)
@@ -270,9 +241,9 @@ class TestRenderFullDeckView(unittest.TestCase):
 
     def _make_deck_cards(self) -> list[DeckCard]:
         return [
-            _make_deck_card(name="Tide Runner", power=0.50, commit=0.30, flex=0.20),
-            _make_deck_card(name="Ember Guard", power=0.60, commit=0.40, flex=0.10),
-            _make_deck_card(name="Alpha Seer", power=0.80, commit=0.50, flex=0.30),
+            _make_deck_card(name="Tide Runner"),
+            _make_deck_card(name="Ember Guard"),
+            _make_deck_card(name="Alpha Seer"),
         ]
 
     def test_contains_deck_header(self) -> None:

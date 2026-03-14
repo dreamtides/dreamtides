@@ -22,7 +22,7 @@ _QS_DIR = str(Path(__file__).resolve().parent.parent)
 if _QS_DIR not in sys.path:
     sys.path.insert(0, _QS_DIR)
 
-_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent.parent / "draft_simulator")
+_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent.parent / "draft_simulator_v2")
 if _DRAFT_SIM_DIR not in sys.path:
     sys.path.insert(0, _DRAFT_SIM_DIR)
 
@@ -190,14 +190,14 @@ def run_web_server(args: Any) -> None:
     seed: int = args.seed if args.seed is not None else random.randint(0, 2**32)
     rng = random.Random(seed)
 
-    cfg = _build_draft_config(synthetic=args.synthetic, real_only=args.real_only)
+    cfg = _build_draft_config()
 
     if getattr(args, "archetype_draft", False):
         if cfg.cards.rendered_toml_path is None:
             raise ValueError(
                 "--archetype-draft requires cards.rendered_toml_path to be set"
             )
-        cards = card_generator.load_cards_for_archetype_draft(
+        cards = card_generator.load_cards(
             cfg.cards.rendered_toml_path,
             original_only=getattr(args, "original_cards", False),
         )

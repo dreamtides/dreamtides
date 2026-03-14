@@ -161,9 +161,6 @@ def _add_random_bane_card(
         card_id=chosen.name,
         name=chosen.name,
         fitness=[0.0] * 8,
-        power=0.0,
-        commit=0.0,
-        flex=0.0,
     )
 
     state.bane_instance_counter += 1

@@ -44,7 +44,7 @@ def _score_card_for_policy(
         return agents.score_card_signal_ignorant(card, ai_agent, agents_cfg)
     else:
         design = getattr(card, "design", card)
-        return getattr(design, "power", 0.0)
+        return getattr(design, "rarity_value", 0.0)
 
 
 def advance_to_human_pick(state, logger: Optional[SessionLogger] = None):

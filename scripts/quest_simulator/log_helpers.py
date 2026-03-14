@@ -26,8 +26,8 @@ def compute_show_n_scores(
             design = getattr(card, "design", card)
             fitness = getattr(design, "fitness", [])
             pref = _dot(fitness, w_norm)
-            power = getattr(design, "power", 0.0)
-            scores.append(0.3 * power + 0.7 * pref)
+            rarity_value = getattr(design, "rarity_value", 0.0)
+            scores.append(0.1 * rarity_value + 0.7 * pref)
         return [round(s, 4) for s in scores]
 
     if strategy == "top_scored" and human_w:
@@ -37,8 +37,8 @@ def compute_show_n_scores(
             design = getattr(card, "design", card)
             fitness = getattr(design, "fitness", [])
             pref = _dot(fitness, w_norm)
-            power = getattr(design, "power", 0.0)
-            scores.append(0.3 * power + 0.7 * pref)
+            rarity_value = getattr(design, "rarity_value", 0.0)
+            scores.append(0.1 * rarity_value + 0.7 * pref)
         return [round(s, 4) for s in scores]
 
     return [1.0] * len(shown_cards)
@@ -65,7 +65,7 @@ def w_concentration(w: list[float]) -> float:
 def card_instance_dict(card: Any) -> dict[str, object]:
     """Serialize a CardInstance for logging.
 
-    Includes name, card_id, power, commit, flex, and top 3 fitness values.
+    Includes name, card_id, rarity_value, tag_count, and top 3 fitness values.
     """
     design = getattr(card, "design", card)
     result: dict[str, object] = {}
@@ -73,14 +73,11 @@ def card_instance_dict(card: Any) -> dict[str, object]:
         result["name"] = design.name
     if hasattr(design, "card_id"):
         result["card_id"] = design.card_id
-    if hasattr(design, "power"):
-        result["power"] = round(design.power, 4)
-    if hasattr(design, "commit"):
-        result["commit"] = round(design.commit, 4)
-    if hasattr(design, "flex"):
-        result["flex"] = round(design.flex, 4)
+    if hasattr(design, "rarity_value"):
+        result["rarity_value"] = round(design.rarity_value, 4)
     if hasattr(design, "fitness"):
         fitness = design.fitness
+        result["tag_count"] = sum(1 for f in fitness if f >= 0.5)
         top = sorted(fitness, reverse=True)[:3] if fitness else []
         result["top_fitness"] = [round(v, 4) for v in top]
     return result

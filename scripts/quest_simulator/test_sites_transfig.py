@@ -7,7 +7,7 @@ from typing import Optional
 from unittest.mock import patch
 
 # Ensure draft_simulator is importable
-_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator")
+_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent / "draft_simulator_v2")
 if _DRAFT_SIM_DIR not in sys.path:
     sys.path.insert(0, _DRAFT_SIM_DIR)
 
@@ -21,18 +21,14 @@ _NEXT_INSTANCE_ID = 0
 def _make_design(
     name: str = "Test Card",
     card_id: str = "test_001",
-    power: float = 0.0,
-    commit: float = 0.0,
-    flex: float = 0.0,
+    rarity_value: float = 0.0,
     fitness: Optional[list[float]] = None,
 ) -> CardDesign:
     return CardDesign(
         card_id=card_id,
         name=name,
         fitness=fitness if fitness is not None else [],
-        power=power,
-        commit=commit,
-        flex=flex,
+        rarity_value=rarity_value,
     )
 
 
@@ -65,67 +61,60 @@ def _make_quest_state(
 class TestTransfigurationEligibility:
     """Tests for transfiguration type eligibility checking."""
 
-    def test_viridian_eligible_when_power_high(self) -> None:
-        """Viridian requires power > 0.3."""
+    def test_viridian_eligible_when_rarity_nonzero(self) -> None:
+        """Viridian requires rarity_value > 0.0."""
         from sites_transfig import is_eligible, TransfigType
 
-        design = _make_design(power=0.5)
+        design = _make_design(rarity_value=0.33)
         assert is_eligible(design, TransfigType.VIRIDIAN)
 
-    def test_viridian_ineligible_when_power_low(self) -> None:
-        """Viridian requires power > 0.3; low power should fail."""
+    def test_viridian_ineligible_when_rarity_zero(self) -> None:
+        """Viridian requires rarity_value > 0.0; zero should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        design = _make_design(power=0.1)
+        design = _make_design(rarity_value=0.0)
         assert not is_eligible(design, TransfigType.VIRIDIAN)
 
-    def test_viridian_ineligible_when_power_zero(self) -> None:
-        """Viridian requires power > 0.3; zero power should fail."""
+    def test_golden_eligible_when_tag_count_two(self) -> None:
+        """Golden requires tag_count >= 2."""
         from sites_transfig import is_eligible, TransfigType
 
-        design = _make_design(power=0.0)
-        assert not is_eligible(design, TransfigType.VIRIDIAN)
-
-    def test_golden_eligible_when_flex_high(self) -> None:
-        """Golden requires flex > 0.3."""
-        from sites_transfig import is_eligible, TransfigType
-
-        design = _make_design(flex=0.5)
+        design = _make_design(fitness=[1.0, 1.0, 0.0, 0.0])
         assert is_eligible(design, TransfigType.GOLDEN)
 
-    def test_golden_ineligible_when_flex_low(self) -> None:
-        """Golden requires flex > 0.3; low flex should fail."""
+    def test_golden_ineligible_when_tag_count_one(self) -> None:
+        """Golden requires tag_count >= 2; one tag should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        design = _make_design(flex=0.1)
+        design = _make_design(fitness=[1.0, 0.0, 0.0, 0.0])
         assert not is_eligible(design, TransfigType.GOLDEN)
 
-    def test_scarlet_eligible_when_commit_high(self) -> None:
-        """Scarlet requires commit > 0.5."""
+    def test_scarlet_eligible_when_rarity_uncommon(self) -> None:
+        """Scarlet requires rarity_value >= 0.33."""
         from sites_transfig import is_eligible, TransfigType
 
-        design = _make_design(commit=0.7)
+        design = _make_design(rarity_value=0.33)
         assert is_eligible(design, TransfigType.SCARLET)
 
-    def test_scarlet_ineligible_when_commit_low(self) -> None:
-        """Scarlet requires commit > 0.5; low commit should fail."""
+    def test_scarlet_ineligible_when_rarity_common(self) -> None:
+        """Scarlet requires rarity_value >= 0.33; common should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        design = _make_design(commit=0.3)
+        design = _make_design(rarity_value=0.0)
         assert not is_eligible(design, TransfigType.SCARLET)
 
     def test_magenta_eligible_with_high_fitness(self) -> None:
-        """Magenta requires top fitness > 0.7."""
+        """Magenta requires max(fitness) >= 0.5."""
         from sites_transfig import is_eligible, TransfigType
 
-        design = _make_design(fitness=[0.8, 0.2, 0.1])
+        design = _make_design(fitness=[1.0, 0.0, 0.0])
         assert is_eligible(design, TransfigType.MAGENTA)
 
     def test_magenta_ineligible_with_low_fitness(self) -> None:
-        """Magenta requires top fitness > 0.7; all low should fail."""
+        """Magenta requires max(fitness) >= 0.5; all low should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        design = _make_design(fitness=[0.5, 0.3, 0.2])
+        design = _make_design(fitness=[0.0, 0.0, 0.0])
         assert not is_eligible(design, TransfigType.MAGENTA)
 
     def test_magenta_ineligible_with_empty_fitness(self) -> None:
@@ -135,73 +124,79 @@ class TestTransfigurationEligibility:
         design = _make_design(fitness=[])
         assert not is_eligible(design, TransfigType.MAGENTA)
 
-    def test_azure_eligible_when_power_very_high(self) -> None:
-        """Azure requires power > 0.5."""
+    def test_azure_eligible_when_rarity_rare(self) -> None:
+        """Azure requires rarity_value >= 0.67."""
         from sites_transfig import is_eligible, TransfigType
 
-        design = _make_design(power=0.7)
+        design = _make_design(rarity_value=0.67)
         assert is_eligible(design, TransfigType.AZURE)
 
-    def test_azure_ineligible_when_power_moderate(self) -> None:
-        """Azure requires power > 0.5; moderate power should fail."""
+    def test_azure_ineligible_when_rarity_uncommon(self) -> None:
+        """Azure requires rarity_value >= 0.67; uncommon should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        design = _make_design(power=0.4)
+        design = _make_design(rarity_value=0.33)
         assert not is_eligible(design, TransfigType.AZURE)
 
-    def test_bronze_eligible_when_flex_very_high(self) -> None:
-        """Bronze requires flex > 0.5."""
+    def test_bronze_eligible_when_tag_count_three(self) -> None:
+        """Bronze requires tag_count >= 3."""
         from sites_transfig import is_eligible, TransfigType
 
-        design = _make_design(flex=0.7)
+        design = _make_design(fitness=[1.0, 1.0, 1.0, 0.0])
         assert is_eligible(design, TransfigType.BRONZE)
 
-    def test_bronze_ineligible_when_flex_moderate(self) -> None:
-        """Bronze requires flex > 0.5; moderate flex should fail."""
+    def test_bronze_ineligible_when_tag_count_two(self) -> None:
+        """Bronze requires tag_count >= 3; two tags should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        design = _make_design(flex=0.4)
+        design = _make_design(fitness=[1.0, 1.0, 0.0, 0.0])
         assert not is_eligible(design, TransfigType.BRONZE)
 
-    def test_rose_eligible_when_commit_and_flex_both_above_threshold(self) -> None:
-        """Rose requires commit > 0.3 and flex > 0.3."""
+    def test_rose_eligible_when_tags_and_rarity(self) -> None:
+        """Rose requires tag_count >= 2 and rarity_value >= 0.33."""
         from sites_transfig import is_eligible, TransfigType
 
-        design = _make_design(commit=0.5, flex=0.5)
+        design = _make_design(rarity_value=0.33, fitness=[1.0, 1.0, 0.0])
         assert is_eligible(design, TransfigType.ROSE)
 
-    def test_rose_ineligible_when_only_commit_high(self) -> None:
-        """Rose requires both commit > 0.3 and flex > 0.3."""
+    def test_rose_ineligible_when_only_tags(self) -> None:
+        """Rose requires both tag_count >= 2 and rarity_value >= 0.33."""
         from sites_transfig import is_eligible, TransfigType
 
-        design = _make_design(commit=0.5, flex=0.1)
+        design = _make_design(rarity_value=0.0, fitness=[1.0, 1.0, 0.0])
         assert not is_eligible(design, TransfigType.ROSE)
 
     def test_prismatic_eligible_for_multiple_types(self) -> None:
         """Prismatic requires eligibility for 2+ other types."""
         from sites_transfig import is_eligible, TransfigType
 
-        # High power -> Viridian + Azure, high flex -> Golden + Bronze
-        design = _make_design(power=0.8, flex=0.8)
+        # rarity_value=0.67 -> Viridian + Scarlet + Azure
+        # fitness with 2 tags -> Golden + Magenta
+        design = _make_design(rarity_value=0.67, fitness=[1.0, 1.0, 0.0])
         assert is_eligible(design, TransfigType.PRISMATIC)
 
     def test_prismatic_ineligible_for_single_type(self) -> None:
         """Prismatic requires 2+ other types; only 1 should fail."""
         from sites_transfig import is_eligible, TransfigType
 
-        # Only power > 0.3 (Viridian), nothing else
-        design = _make_design(power=0.4, commit=0.0, flex=0.0)
-        assert not is_eligible(design, TransfigType.PRISMATIC)
+        # Only rarity_value > 0.0 (Viridian), nothing else
+        design = _make_design(rarity_value=0.33, fitness=[0.0, 0.0])
+        # rarity_value=0.33 gives: Viridian (>0.0) + Scarlet (>=0.33) = 2 types
+        # So use a lower value that only qualifies for Viridian
+        design2 = _make_design(rarity_value=0.1, fitness=[0.0, 0.0])
+        assert not is_eligible(design2, TransfigType.PRISMATIC)
 
 
 class TestGetApplicableTypes:
     """Tests for finding all applicable transfiguration types."""
 
-    def test_high_power_and_flex_card(self) -> None:
-        """A card with high power and flex should match multiple types."""
+    def test_high_rarity_and_tags_card(self) -> None:
+        """A card with high rarity and many tags should match multiple types."""
         from sites_transfig import get_applicable_types, TransfigType
 
-        design = _make_design(power=0.8, flex=0.8)
+        # rarity_value=0.67 -> Viridian, Scarlet, Azure
+        # 3 tags -> Golden, Magenta, Bronze, Rose (tags>=2 and rarity>=0.33)
+        design = _make_design(rarity_value=0.67, fitness=[1.0, 1.0, 1.0, 0.0])
         types = get_applicable_types(design)
         assert TransfigType.VIRIDIAN in types
         assert TransfigType.GOLDEN in types
@@ -210,10 +205,10 @@ class TestGetApplicableTypes:
         assert TransfigType.PRISMATIC in types
 
     def test_single_qualifying_type(self) -> None:
-        """A card with only moderate power should match only Viridian."""
+        """A card with only rarity > 0.0 and no tags should match only Viridian."""
         from sites_transfig import get_applicable_types, TransfigType
 
-        design = _make_design(power=0.4, commit=0.0, flex=0.0)
+        design = _make_design(rarity_value=0.1, fitness=[0.0, 0.0])
         types = get_applicable_types(design)
         assert TransfigType.VIRIDIAN in types
         assert len(types) == 1  # No Prismatic since < 2 types
@@ -222,7 +217,7 @@ class TestGetApplicableTypes:
         """A card with all low stats should match nothing."""
         from sites_transfig import get_applicable_types
 
-        design = _make_design(power=0.0, commit=0.0, flex=0.0, fitness=[])
+        design = _make_design(rarity_value=0.0, fitness=[])
         types = get_applicable_types(design)
         assert len(types) == 0
 
@@ -239,8 +234,8 @@ class TestNormalTransfiguration:
             design = _make_design(
                 name=f"Card {i}",
                 card_id=f"card_{i}",
-                power=0.5 + i * 0.01,
-                flex=0.5,
+                rarity_value=0.33 + i * 0.01,
+                fitness=[1.0, 1.0, 0.0],
             )
             state.add_card(_make_instance(design))
 
@@ -277,8 +272,8 @@ class TestNormalTransfiguration:
             design = _make_design(
                 name=f"Card {i}",
                 card_id=f"card_{i}",
-                power=0.5,
-                flex=0.5,
+                rarity_value=0.33,
+                fitness=[1.0, 1.0, 0.0],
             )
             state.add_card(_make_instance(design))
             if i < 3:
@@ -317,8 +312,8 @@ class TestNormalTransfiguration:
             design = _make_design(
                 name=f"Card {i}",
                 card_id=f"card_{i}",
-                power=0.5,
-                flex=0.5,
+                rarity_value=0.33,
+                fitness=[1.0, 1.0, 0.0],
             )
             state.add_card(_make_instance(design))
 
@@ -348,8 +343,8 @@ class TestNormalTransfiguration:
             design = _make_design(
                 name=f"Card {i}",
                 card_id=f"card_{i}",
-                power=0.5,
-                flex=0.5,
+                rarity_value=0.33,
+                fitness=[1.0, 1.0, 0.0],
             )
             state.add_card(_make_instance(design))
 
@@ -402,9 +397,8 @@ class TestNormalTransfiguration:
             design = _make_design(
                 name=f"Card {i}",
                 card_id=f"card_{i}",
-                power=0.5 if i < 4 else 0.0,
-                commit=0.0,
-                flex=0.5 if i < 4 else 0.0,
+                rarity_value=0.33 if i < 4 else 0.0,
+                fitness=[1.0, 1.0, 0.0] if i < 4 else [0.0, 0.0, 0.0],
             )
             state.add_card(_make_instance(design))
 
@@ -454,9 +448,8 @@ class TestNormalTransfiguration:
             design = _make_design(
                 name=f"Card {i}",
                 card_id=f"card_{i}",
-                power=0.5 if i < 2 else 0.0,
-                commit=0.0,
-                flex=0.5 if i < 2 else 0.0,
+                rarity_value=0.33 if i < 2 else 0.0,
+                fitness=[1.0, 1.0, 0.0] if i < 2 else [0.0, 0.0, 0.0],
             )
             state.add_card(_make_instance(design))
 
@@ -507,8 +500,8 @@ class TestEnhancedTransfiguration:
             design = _make_design(
                 name=f"Card {i}",
                 card_id=f"card_{i}",
-                power=0.5,
-                flex=0.5,
+                rarity_value=0.33,
+                fitness=[1.0, 1.0, 0.0],
             )
             state.add_card(_make_instance(design))
         # Mark 2 as transfigured
@@ -545,12 +538,13 @@ class TestEnhancedTransfiguration:
         from sites_transfig import run_transfiguration
 
         state = _make_quest_state(seed=42)
-        # Card with high power + high flex -> Viridian + Golden + Azure + Bronze -> Prismatic
+        # rarity_value=0.67 -> Viridian + Scarlet + Azure
+        # 3 tags -> Golden + Magenta + Bronze + Rose -> Prismatic
         design = _make_design(
             name="Multi Card",
             card_id="multi_001",
-            power=0.8,
-            flex=0.8,
+            rarity_value=0.67,
+            fitness=[1.0, 1.0, 1.0, 0.0],
         )
         state.add_card(_make_instance(design))
 
@@ -577,13 +571,12 @@ class TestEnhancedTransfiguration:
         from sites_transfig import run_transfiguration
 
         state = _make_quest_state(seed=42)
-        # Only power > 0.3 (Viridian), nothing else
+        # Only rarity_value > 0.0 (Viridian), nothing else
         design = _make_design(
             name="Simple Card",
             card_id="simple_001",
-            power=0.4,
-            commit=0.0,
-            flex=0.0,
+            rarity_value=0.1,
+            fitness=[0.0, 0.0],
         )
         state.add_card(_make_instance(design))
 
@@ -617,8 +610,8 @@ class TestTransfigNote:
         design = _make_design(
             name="Whirlpool Seer",
             card_id="whirlpool_001",
-            power=0.5,
-            flex=0.5,
+            rarity_value=0.33,
+            fitness=[1.0, 1.0, 0.0],
         )
         state.add_card(_make_instance(design))
 
@@ -645,74 +638,76 @@ class TestTransfigNote:
 class TestEligibilityExplanation:
     """Tests for eligibility explanation strings."""
 
-    def test_viridian_explains_power(self) -> None:
-        """Viridian explanation should mention power value."""
+    def test_viridian_explains_rarity(self) -> None:
+        """Viridian explanation should mention rarity value."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        design = _make_design(power=0.5)
+        design = _make_design(rarity_value=0.33)
         explanation = eligibility_explanation(design, TransfigType.VIRIDIAN)
-        assert "0.50" in explanation
-        assert "power" in explanation.lower()
+        assert "0.33" in explanation
+        assert "rarity" in explanation.lower()
 
-    def test_golden_explains_flex(self) -> None:
-        """Golden explanation should mention flex value."""
+    def test_golden_explains_tags(self) -> None:
+        """Golden explanation should mention archetype tags."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        design = _make_design(flex=0.5)
+        design = _make_design(fitness=[1.0, 1.0, 0.0])
         explanation = eligibility_explanation(design, TransfigType.GOLDEN)
-        assert "0.50" in explanation
-        assert "flex" in explanation.lower()
+        assert "2" in explanation
+        assert "tag" in explanation.lower()
 
-    def test_scarlet_explains_commit(self) -> None:
-        """Scarlet explanation should mention commit value."""
+    def test_scarlet_explains_rarity(self) -> None:
+        """Scarlet explanation should mention rarity value."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        design = _make_design(commit=0.7)
+        design = _make_design(rarity_value=0.33)
         explanation = eligibility_explanation(design, TransfigType.SCARLET)
-        assert "0.70" in explanation
-        assert "commit" in explanation.lower()
+        assert "0.33" in explanation
+        assert "rarity" in explanation.lower()
 
     def test_magenta_explains_fitness(self) -> None:
         """Magenta explanation should mention top fitness value."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        design = _make_design(fitness=[0.9, 0.2, 0.1])
+        design = _make_design(fitness=[1.0, 0.0, 0.0])
         explanation = eligibility_explanation(design, TransfigType.MAGENTA)
-        assert "0.90" in explanation
+        assert "1.00" in explanation
         assert "fitness" in explanation.lower()
 
-    def test_azure_explains_power(self) -> None:
-        """Azure explanation should mention power value."""
+    def test_azure_explains_rarity(self) -> None:
+        """Azure explanation should mention rarity value."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        design = _make_design(power=0.7)
+        design = _make_design(rarity_value=0.67)
         explanation = eligibility_explanation(design, TransfigType.AZURE)
-        assert "0.70" in explanation
-        assert "power" in explanation.lower()
+        assert "0.67" in explanation
+        assert "rarity" in explanation.lower()
 
-    def test_bronze_explains_flex(self) -> None:
-        """Bronze explanation should mention flex value."""
+    def test_bronze_explains_tags(self) -> None:
+        """Bronze explanation should mention archetype tags."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        design = _make_design(flex=0.7)
+        design = _make_design(fitness=[1.0, 1.0, 1.0, 0.0])
         explanation = eligibility_explanation(design, TransfigType.BRONZE)
-        assert "0.70" in explanation
-        assert "flex" in explanation.lower()
+        assert "3" in explanation
+        assert "tag" in explanation.lower()
 
-    def test_rose_explains_commit_and_flex(self) -> None:
-        """Rose explanation should mention both commit and flex."""
+    def test_rose_explains_tags_and_rarity(self) -> None:
+        """Rose explanation should mention both tags and rarity."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        design = _make_design(commit=0.5, flex=0.5)
+        design = _make_design(rarity_value=0.33, fitness=[1.0, 1.0, 0.0])
         explanation = eligibility_explanation(design, TransfigType.ROSE)
-        assert "commit" in explanation.lower()
-        assert "flex" in explanation.lower()
+        assert "tag" in explanation.lower()
+        assert "rarity" in explanation.lower()
 
     def test_prismatic_lists_applicable_types(self) -> None:
         """Prismatic explanation should list all applicable sub-types."""
         from sites_transfig import eligibility_explanation, TransfigType
 
-        design = _make_design(power=0.8, flex=0.8)
+        # rarity_value=0.67 -> Viridian, Scarlet, Azure
+        # 3 tags -> Golden, Magenta, Bronze, Rose
+        design = _make_design(rarity_value=0.67, fitness=[1.0, 1.0, 1.0, 0.0])
         explanation = eligibility_explanation(design, TransfigType.PRISMATIC)
         assert "Viridian" in explanation
         assert "Golden" in explanation
@@ -764,9 +759,8 @@ class TestRenderTransfigPreview:
         design = _make_design(
             name="Whirlpool Seer",
             card_id="whirlpool_001",
-            power=0.5,
-            commit=0.3,
-            flex=0.4,
+            rarity_value=0.33,
+            fitness=[1.0, 1.0, 0.0],
         )
         dc = DeckCard(instance=_make_instance(design))
         candidates = [(dc, TransfigType.VIRIDIAN)]
@@ -782,7 +776,7 @@ class TestRenderTransfigPreview:
         design = _make_design(
             name="Whirlpool Seer",
             card_id="whirlpool_001",
-            power=0.5,
+            rarity_value=0.33,
         )
         dc = DeckCard(instance=_make_instance(design))
         candidates = [(dc, TransfigType.VIRIDIAN)]
@@ -794,7 +788,7 @@ class TestRenderTransfigPreview:
         """Skip option should be clearly visible."""
         from sites_transfig import _render_transfig_item, TransfigType
 
-        design = _make_design(name="Test", card_id="test_001", power=0.5)
+        design = _make_design(name="Test", card_id="test_001", rarity_value=0.33)
         dc = DeckCard(instance=_make_instance(design))
         candidates = [(dc, TransfigType.VIRIDIAN)]
 
@@ -819,8 +813,8 @@ class TestTransfigurationLogging:
             design = _make_design(
                 name=f"Card {i}",
                 card_id=f"card_{i}",
-                power=0.5,
-                flex=0.5,
+                rarity_value=0.33,
+                fitness=[1.0, 1.0, 0.0],
             )
             state.add_card(_make_instance(design))
 
@@ -853,8 +847,8 @@ class TestTransfigurationLogging:
             design = _make_design(
                 name=f"Card {i}",
                 card_id=f"card_{i}",
-                power=0.5,
-                flex=0.5,
+                rarity_value=0.33,
+                fitness=[1.0, 1.0, 0.0],
             )
             state.add_card(_make_instance(design))
 

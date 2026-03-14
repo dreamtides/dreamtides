@@ -6,6 +6,7 @@ engine types (CardInstance, CardDesign, AgentState).
 
 import io
 import random
+from pathlib import Path
 from typing import Optional
 from unittest.mock import patch
 
@@ -20,7 +21,6 @@ from config import (
     CubeConfig,
     DraftConfig,
     PackGenerationConfig,
-    RefillConfig,
     ScoringConfig,
     SimulatorConfig,
 )
@@ -51,14 +51,13 @@ def _make_draft_cfg() -> SimulatorConfig:
         ),
         cards=CardsConfig(
             archetype_count=8,
-            source="synthetic",
+            rendered_toml_path=str(Path(__file__).resolve().parent.parent.parent / "rules_engine" / "tabula" / "rendered-cards.toml"),
         ),
         cube=CubeConfig(
             distinct_cards=540,
             copies_per_card=1,
             consumption_mode="with_replacement",
         ),
-        refill=RefillConfig(strategy="no_refill"),
         pack_generation=PackGenerationConfig(strategy="seeded_themed"),
         scoring=ScoringConfig(),
     )

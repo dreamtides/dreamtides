@@ -6,7 +6,7 @@ from. Enhanced (Arcane biome) allows picking any number of offered
 cards. Neither site advances the draft pick counter.
 
 Specialty Shop draws from the CubeManager, filters by archetype
-fitness, and uses power-based pricing. Reroll re-draws from the cube.
+fitness, and uses rarity-based pricing. Reroll re-draws from the cube.
 """
 
 import random
@@ -139,9 +139,12 @@ def draw_and_filter(
     return (drawn + extra)[:count]
 
 
-def compute_power_price(power: float) -> int:
-    """Compute price based on card power: round(power * 25) clamped to [5, 100]."""
-    raw = round(power * 25)
+def compute_rarity_price(rarity_value: float) -> int:
+    """Compute price based on card rarity_value, clamped to [5, 100].
+
+    Common (0.0) -> 10, Uncommon (0.33) -> 30, Rare (0.67) -> 50.
+    """
+    raw = round(10 + rarity_value * 60)
     return max(_MIN_PRICE, min(_MAX_PRICE, raw))
 
 
@@ -166,10 +169,10 @@ def prepare_shop_items(
     rng: random.Random,
     shop_config: dict[str, int],
 ) -> list[ShopItem]:
-    """Prepare shop items with power-based prices and per-item discount chance."""
+    """Prepare shop items with rarity-based prices and per-item discount chance."""
     items: list[ShopItem] = []
     for inst in instances:
-        base_price = compute_power_price(inst.design.power)
+        base_price = compute_rarity_price(inst.design.rarity_value)
         items.append(
             ShopItem(
                 instance=inst,
@@ -306,7 +309,7 @@ def run_specialty_shop(
     """Run a Specialty Shop site interaction.
 
     Draws from the CubeManager, filters by archetype fitness, displays
-    items with power-based prices. Includes a dreamsign offering if
+    items with rarity-based prices. Includes a dreamsign offering if
     dreamsigns are available. Does NOT advance the draft pick counter.
     Reroll re-draws from the cube.
     """

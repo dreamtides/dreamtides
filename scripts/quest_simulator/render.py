@@ -101,7 +101,6 @@ def quest_start_banner(
     seed: int,
     starting_essence: int,
     card_count: int = 540,
-    real_card_count: int = 0,
 ) -> str:
     """Build the quest start banner text."""
     sep = draw_double_separator()
@@ -109,14 +108,7 @@ def quest_start_banner(
     seed_label = f"Seed: {seed}"
     title_vis = visible_len(title)
     gap = max(2, CONTENT_WIDTH - 2 - title_vis - len(seed_label) - 2)
-    if real_card_count > 0:
-        synth_count = card_count - real_card_count
-        pool_desc = (
-            f"  Card pool: {colors.num(real_card_count)} real + "
-            f"{colors.num(synth_count)} synthetic cards"
-        )
-    else:
-        pool_desc = f"  Card pool: {colors.num(card_count)} synthetic cards"
+    pool_desc = f"  Card pool: {colors.num(card_count)} card designs"
     lines: list[str] = [
         sep,
         f"  {title}{' ' * gap}{seed_label}",

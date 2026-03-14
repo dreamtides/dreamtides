@@ -2,7 +2,7 @@
 
 Implements transfiguration -- a card upgrade that adds a name prefix and
 display note. There are 8 transfiguration types with eligibility rules
-based on CardDesign attributes (power, commit, flex, fitness).
+based on CardDesign attributes (rarity_value, fitness tag count).
 Normal mode shows 3 random non-transfigured cards; enhanced (Prismatic
 biome) mode shows the full deck for selection. Each card preview shows
 the proposed transformation, eligibility reason, and colored type name.
@@ -89,30 +89,34 @@ def transfig_type_color(transfig_type: TransfigType) -> str:
     return _TRANSFIG_COLORS[transfig_type]
 
 
+def _tag_count(fitness: list[float]) -> int:
+    """Count the number of archetype tags (fitness >= 0.5) on a card."""
+    return sum(1 for f in fitness if f >= 0.5)
+
+
 def is_eligible(design, transfig_type: TransfigType) -> bool:
     """Check whether a CardDesign is eligible for a given transfiguration type.
 
-    Uses CardDesign attributes: power, commit, flex, fitness.
+    Uses CardDesign attributes: rarity_value and fitness (tag count).
     """
-    power = getattr(design, "power", 0.0)
-    commit = getattr(design, "commit", 0.0)
-    flex = getattr(design, "flex", 0.0)
+    rarity_value = getattr(design, "rarity_value", 0.0)
     fitness = getattr(design, "fitness", [])
+    tags = _tag_count(fitness)
 
     if transfig_type == TransfigType.VIRIDIAN:
-        return power > 0.3
+        return rarity_value > 0.0
     elif transfig_type == TransfigType.GOLDEN:
-        return flex > 0.3
+        return tags >= 2
     elif transfig_type == TransfigType.SCARLET:
-        return commit > 0.5
+        return rarity_value >= 0.33
     elif transfig_type == TransfigType.MAGENTA:
-        return len(fitness) > 0 and max(fitness) > 0.7
+        return len(fitness) > 0 and max(fitness) >= 0.5
     elif transfig_type == TransfigType.AZURE:
-        return power > 0.5
+        return rarity_value >= 0.67
     elif transfig_type == TransfigType.BRONZE:
-        return flex > 0.5
+        return tags >= 3
     elif transfig_type == TransfigType.ROSE:
-        return commit > 0.3 and flex > 0.3
+        return tags >= 2 and rarity_value >= 0.33
     elif transfig_type == TransfigType.PRISMATIC:
         count = sum(1 for t in _BASE_TYPES if is_eligible(design, t))
         return count >= 2
@@ -132,26 +136,25 @@ def get_applicable_types(design) -> list[TransfigType]:
 
 def eligibility_explanation(design, transfig_type: TransfigType) -> str:
     """Return a human-readable reason why a card is eligible for a type."""
-    power = getattr(design, "power", 0.0)
-    commit = getattr(design, "commit", 0.0)
-    flex = getattr(design, "flex", 0.0)
+    rarity_value = getattr(design, "rarity_value", 0.0)
     fitness = getattr(design, "fitness", [])
+    tags = _tag_count(fitness)
 
     if transfig_type == TransfigType.VIRIDIAN:
-        return f"power is {power:.2f} > 0.30"
+        return f"rarity {rarity_value:.2f} > 0.00"
     elif transfig_type == TransfigType.GOLDEN:
-        return f"flex is {flex:.2f} > 0.30"
+        return f"{tags} archetype tags >= 2"
     elif transfig_type == TransfigType.SCARLET:
-        return f"commit is {commit:.2f} > 0.50"
+        return f"rarity {rarity_value:.2f} >= 0.33"
     elif transfig_type == TransfigType.MAGENTA:
         top_fit = max(fitness) if fitness else 0.0
-        return f"top fitness is {top_fit:.2f} > 0.70"
+        return f"top fitness is {top_fit:.2f} >= 0.50"
     elif transfig_type == TransfigType.AZURE:
-        return f"power is {power:.2f} > 0.50"
+        return f"rarity {rarity_value:.2f} >= 0.67"
     elif transfig_type == TransfigType.BRONZE:
-        return f"flex is {flex:.2f} > 0.50"
+        return f"{tags} archetype tags >= 3"
     elif transfig_type == TransfigType.ROSE:
-        return f"commit={commit:.2f}>0.30, flex={flex:.2f}>0.30"
+        return f"{tags} tags >= 2, rarity {rarity_value:.2f} >= 0.33"
     elif transfig_type == TransfigType.PRISMATIC:
         applicable = [t for t in _BASE_TYPES if is_eligible(design, t)]
         names = ", ".join(t.value for t in applicable)
@@ -183,7 +186,7 @@ def _render_transfig_item(
     """Render a single card for the transfiguration single-select menu.
 
     Shows a 3-line preview:
-    Line 1: card name + stats (power/commit/flex)
+    Line 1: card name + rarity/tags info
     Line 2: Transfiguration type and effect note (colored)
     Line 3: Eligibility reason (dim)
     """
@@ -196,14 +199,13 @@ def _render_transfig_item(
     design = _get_design(deck_card)
     name = _card_name(deck_card)
 
-    # Line 1: name -> Transfig Name + stats
+    # Line 1: name -> Transfig Name + rarity info
     marker = ">" if is_selected else " "
     transformed_name = f"{transfig_type.value} {name}"
 
-    power = getattr(design, "power", 0.0)
-    commit = getattr(design, "commit", 0.0)
-    flex_val = getattr(design, "flex", 0.0)
-    right_side = f"P:{power:.2f}  C:{commit:.2f}  F:{flex_val:.2f}"
+    rarity = getattr(design, "original_rarity", "") or getattr(design, "rarity", "")
+    tags = _tag_count(getattr(design, "fitness", []))
+    right_side = f"{rarity.title()}  {tags} tags"
 
     prefix = f"  {marker} "
     max_name_width = render.CONTENT_WIDTH - len(prefix) - 2 - len(right_side)
@@ -253,14 +255,13 @@ def _render_enhanced_item(
     name = _card_name(dc)
     best_type = assigned_types[index]
 
-    # Line 1: transformed name + stats
+    # Line 1: transformed name + rarity info
     marker = ">" if is_selected else " "
     transformed_name = f"{best_type.value} {name}"
 
-    power = getattr(design, "power", 0.0)
-    commit = getattr(design, "commit", 0.0)
-    flex_val = getattr(design, "flex", 0.0)
-    right_side = f"P:{power:.2f}  C:{commit:.2f}  F:{flex_val:.2f}"
+    rarity = getattr(design, "original_rarity", "") or getattr(design, "rarity", "")
+    tags = _tag_count(getattr(design, "fitness", []))
+    right_side = f"{rarity.title()}  {tags} tags"
 
     prefix = f"  {marker} "
     max_name_width = render.CONTENT_WIDTH - len(prefix) - 2 - len(right_side)

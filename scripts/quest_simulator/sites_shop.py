@@ -2,7 +2,7 @@
 
 Implements the Shop site: 3 priced cards from the draft pack at seat 0,
 2 random dreamsign offerings, and a reroll option. Cards are priced based
-on power value. Each shop visit consumes at least 1 pick step from the
+on rarity value. Each shop visit consumes at least 1 pick step from the
 draft loop; rerolls cost 1 additional pick step each.
 """
 
@@ -31,12 +31,13 @@ class ShopItem:
     price: int
 
 
-def compute_price(power: float) -> int:
-    """Compute the shop price for a card based on its power value.
+def compute_price(rarity_value: float) -> int:
+    """Compute the shop price for a card based on its rarity_value.
 
-    Price is ``round(power * 25)``, clamped to the range [5, 100].
+    Common (0.0) -> 10, Uncommon (0.33) -> 30, Rare (0.67) -> 50.
+    Clamped to [5, 100].
     """
-    return max(5, min(100, round(power * 25)))
+    return max(5, min(100, round(10 + rarity_value * 60)))
 
 
 def _select_dreamsigns(
@@ -58,7 +59,7 @@ def _build_shop_items(shown_cards: list[CardInstance]) -> list[ShopItem]:
     return [
         ShopItem(
             card_instance=card,
-            price=compute_price(card.design.power),
+            price=compute_price(card.design.rarity_value),
         )
         for card in shown_cards
     ]
@@ -125,7 +126,7 @@ def run_shop(
     """Run a Shop site interaction.
 
     Displays 3 cards from the draft pack at seat 0 (filtered via
-    show_n=3), priced by power value, plus 2 dreamsign offerings and
+    show_n=3), priced by rarity value, plus 2 dreamsign offerings and
     a reroll option. Each visit consumes at least 1 draft pick step.
     Rerolls advance the draft by 1 additional pick step each.
     Enhanced shops (Verdant biome) get the first reroll free.

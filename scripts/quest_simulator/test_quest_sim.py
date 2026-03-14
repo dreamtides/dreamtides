@@ -13,7 +13,7 @@ from typing import Any, Optional
 os.environ["NO_COLOR"] = "1"
 
 # Ensure the quest_simulator and draft_simulator directories are on sys.path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "draft_simulator"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "draft_simulator_v2"))
 sys.path.insert(0, os.path.dirname(__file__))
 
 

@@ -8,7 +8,7 @@ import unittest
 # are empty strings, making assertions on visible content straightforward.
 os.environ["NO_COLOR"] = "1"
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "draft_simulator"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "draft_simulator_v2"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 
 

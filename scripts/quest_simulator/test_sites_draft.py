@@ -5,6 +5,7 @@ engine types (CardInstance, CardDesign, AgentState).
 """
 
 import random
+from pathlib import Path
 from unittest.mock import patch
 
 import agents
@@ -18,7 +19,6 @@ from config import (
     CubeConfig,
     DraftConfig,
     PackGenerationConfig,
-    RefillConfig,
     ScoringConfig,
     SimulatorConfig,
 )
@@ -48,14 +48,13 @@ def _make_draft_cfg() -> SimulatorConfig:
         ),
         cards=CardsConfig(
             archetype_count=8,
-            source="synthetic",
+            rendered_toml_path=str(Path(__file__).resolve().parent.parent.parent / "rules_engine" / "tabula" / "rendered-cards.toml"),
         ),
         cube=CubeConfig(
             distinct_cards=540,
             copies_per_card=1,
             consumption_mode="with_replacement",
         ),
-        refill=RefillConfig(strategy="no_refill"),
         pack_generation=PackGenerationConfig(strategy="seeded_themed"),
         scoring=ScoringConfig(),
     )
@@ -226,9 +225,8 @@ class TestRunDraft:
         for dc in state.deck:
             assert hasattr(dc.instance, "design")
             assert hasattr(dc.instance.design, "name")
-            assert hasattr(dc.instance.design, "power")
-            assert hasattr(dc.instance.design, "commit")
-            assert hasattr(dc.instance.design, "flex")
+            assert hasattr(dc.instance.design, "rarity_value")
+            assert hasattr(dc.instance.design, "fitness")
 
     def test_draft_respects_config_show_n(self) -> None:
         """Draft should offer show_n cards from config, not a hardcoded count."""
