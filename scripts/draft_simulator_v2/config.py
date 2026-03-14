@@ -328,7 +328,7 @@ def validate_config(cfg: SimulatorConfig) -> None:
     _check_range(
         errors, "agents.ai_signal_weight", cfg.agents.ai_signal_weight, 0.0, 1.0
     )
-    _check_range(errors, "agents.learning_rate", cfg.agents.learning_rate, 0.0, 10.0)
+    _check_range(errors, "agents.learning_rate", cfg.agents.learning_rate, 0.0, 50.0)
     _check_range(
         errors, "agents.ai_rarity_weight", cfg.agents.ai_rarity_weight, 0.0, 1.0
     )

@@ -215,6 +215,12 @@ def build_run_record(
         draft_metrics.early_openness_full.preference_entropy, 4
     )
 
+    # Commitment timing
+    ct = draft_metrics.commitment_timing
+    record["commitment_mean_pick"] = round(ct.mean_commitment_pick, 4)
+    record["commitment_uncommitted_rate"] = round(ct.uncommitted_rate, 4)
+    record["commitment_by_pick_5_rate"] = round(ct.by_pick_5_rate, 4)
+
     # Signal benefit and forceability
     record["signal_benefit"] = (
         round(draft_metrics.signal_benefit, 4)

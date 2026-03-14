@@ -160,6 +160,16 @@ class EarlyOpennessMetrics:
 
 
 @dataclass(frozen=True)
+class CommitmentTimingMetrics:
+    """Commitment timing metric family results."""
+
+    mean_commitment_pick: float
+    median_commitment_pick: float
+    uncommitted_rate: float
+    by_pick_5_rate: float
+
+
+@dataclass(frozen=True)
 class DraftMetrics:
     """Complete metrics for a single draft run."""
 
@@ -171,6 +181,9 @@ class DraftMetrics:
     splashability_shown: SplashabilityMetrics
     early_openness_full: EarlyOpennessMetrics
     early_openness_shown: EarlyOpennessMetrics
+    commitment_timing: CommitmentTimingMetrics = field(
+        default_factory=lambda: CommitmentTimingMetrics(0.0, 0.0, 1.0, 0.0)
+    )
     forceability: Optional[float] = None
     forceability_archetype: Optional[int] = None
     forceability_per_archetype: Optional[dict[int, float]] = None
@@ -597,6 +610,41 @@ def _compute_early_openness(
 
 
 # ---------------------------------------------------------------------------
+# Commitment Timing computation
+# ---------------------------------------------------------------------------
+
+
+def _compute_commitment_timing(
+    result: draft_runner.DraftResult,
+) -> CommitmentTimingMetrics:
+    """Compute commitment timing metrics across all seats."""
+    committed_picks: list[float] = []
+    total_seats = len(result.seat_results)
+
+    for sr in result.seat_results:
+        if sr.commitment_pick is not None:
+            committed_picks.append(float(sr.commitment_pick))
+
+    if not committed_picks:
+        return CommitmentTimingMetrics(
+            mean_commitment_pick=0.0,
+            median_commitment_pick=0.0,
+            uncommitted_rate=1.0 if total_seats > 0 else 0.0,
+            by_pick_5_rate=0.0,
+        )
+
+    uncommitted = total_seats - len(committed_picks)
+    by_pick_5 = sum(1 for p in committed_picks if p <= 5)
+
+    return CommitmentTimingMetrics(
+        mean_commitment_pick=_mean(committed_picks),
+        median_commitment_pick=_median(committed_picks),
+        uncommitted_rate=uncommitted / total_seats if total_seats > 0 else 0.0,
+        by_pick_5_rate=by_pick_5 / total_seats if total_seats > 0 else 0.0,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Main metrics computation
 # ---------------------------------------------------------------------------
 
@@ -621,6 +669,8 @@ def compute_metrics(
 
     early_openness_full = _compute_early_openness(result, cfg, use_shown=False)
     early_openness_shown = _compute_early_openness(result, cfg, use_shown=True)
+
+    commitment_timing = _compute_commitment_timing(result)
 
     forceability_val: Optional[float] = None
     forceability_arch: Optional[int] = None
@@ -657,6 +707,7 @@ def compute_metrics(
         splashability_shown=splashability_shown,
         early_openness_full=early_openness_full,
         early_openness_shown=early_openness_shown,
+        commitment_timing=commitment_timing,
         forceability=forceability_val,
         forceability_archetype=forceability_arch,
         forceability_per_archetype=forceability_per_arch,
@@ -869,6 +920,20 @@ def format_metrics(m: DraftMetrics) -> str:
         f"{colors.num(f'{eo.preference_entropy:.2f}')}"
     )
 
+    ct = m.commitment_timing
+    lines.append("")
+    lines.append(colors.section("Commitment Timing:"))
+    lines.append(
+        f"  {colors.label('Mean pick:')}"
+        f"    {colors.num(f'{ct.mean_commitment_pick:.1f}')}, "
+        f"{colors.dim('median=')}{colors.num(f'{ct.median_commitment_pick:.1f}')}"
+    )
+    lines.append(
+        f"  {colors.label('Uncommitted:')}"
+        f"  {colors.num(f'{ct.uncommitted_rate:.2f}')}, "
+        f"{colors.dim('by pick 5=')}{colors.num(f'{ct.by_pick_5_rate:.2f}')}"
+    )
+
     return "\n".join(lines)
 
 
@@ -937,6 +1002,14 @@ def average_metrics(metrics_list: list[DraftMetrics]) -> DraftMetrics:
     if n == 1:
         return metrics_list[0]
 
+    ct_items = [m.commitment_timing for m in metrics_list]
+    avg_commitment_timing = CommitmentTimingMetrics(
+        mean_commitment_pick=sum(c.mean_commitment_pick for c in ct_items) / n,
+        median_commitment_pick=sum(c.median_commitment_pick for c in ct_items) / n,
+        uncommitted_rate=sum(c.uncommitted_rate for c in ct_items) / n,
+        by_pick_5_rate=sum(c.by_pick_5_rate for c in ct_items) / n,
+    )
+
     force_vals = [m.forceability for m in metrics_list if m.forceability is not None]
     signal_vals = [
         m.signal_benefit for m in metrics_list if m.signal_benefit is not None
@@ -967,6 +1040,7 @@ def average_metrics(metrics_list: list[DraftMetrics]) -> DraftMetrics:
         early_openness_shown=_average_early_openness(
             [m.early_openness_shown for m in metrics_list]
         ),
+        commitment_timing=avg_commitment_timing,
         forceability=_mean(force_vals) if force_vals else None,
         signal_benefit=_mean(signal_vals) if signal_vals else None,
     )

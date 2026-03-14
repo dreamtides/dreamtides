@@ -94,7 +94,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--preset",
         type=str,
         default=None,
-        choices=["easy", "hard"],
+        choices=["easy", "hard", "quest-match"],
         help="Apply a difficulty preset",
     )
     parser.add_argument(
@@ -127,6 +127,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         default=False,
         help="Only include cards with original=true",
+    )
+    parser.add_argument(
+        "--skip-comparisons",
+        action="store_true",
+        default=False,
+        help="Skip comparison drafts in sweep (faster, no forceability/signal_benefit)",
     )
     return parser
 
@@ -172,6 +178,12 @@ def main() -> None:
         cfg.agents.ai_optimality = 0.9
         cfg.agents.ai_signal_weight = 0.8
         cfg.draft.seat_count = 8
+    elif args.preset == "quest-match":
+        cfg.cube.consumption_mode = "with_replacement"
+        cfg.cube.distinct_cards = 360
+        cfg.agents.ai_resonance_commit_pick = 9999
+        cfg.agents.mercy_reshuffle = False
+        cfg.agents.sharpening_decay = 0.0
 
     mode: str = args.mode
     output_dir: str = args.output_dir
@@ -194,7 +206,7 @@ def main() -> None:
         _run_explain()
     elif mode == "sweep":
         runs = args.runs if args.runs is not None else cfg.sweep.runs_per_point
-        _run_sweep(cfg, seed, runs, output_dir)
+        _run_sweep(cfg, seed, runs, output_dir, args.skip_comparisons)
 
 
 def _print_header(
@@ -924,12 +936,13 @@ def _run_sweep(
     base_seed: int,
     runs_per_point: int,
     output_dir: str,
+    skip_comparisons: bool = False,
 ) -> None:
     """Run a parameter sweep experiment with output serialization."""
     output.ensure_output_dir(output_dir)
 
     run_records, aggregate_records = sweep.run_sweep(
-        cfg, base_seed, runs_per_point, output_dir
+        cfg, base_seed, runs_per_point, output_dir, skip_comparisons
     )
 
     run_path = output.write_run_level_csv(output_dir, run_records)

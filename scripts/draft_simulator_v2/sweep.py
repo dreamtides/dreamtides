@@ -108,6 +108,7 @@ def run_sweep(
     base_seed: int,
     runs_per_point: int,
     output_dir: str,
+    skip_comparisons: bool = False,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Execute a full parameter sweep experiment."""
     points = build_sweep_points(cfg)
@@ -142,7 +143,14 @@ def run_sweep(
             for sr in result.seat_results:
                 adaptive_deck_values.append(sr.deck_value)
 
-            force_dvs, ignorant_dvs, aware_dvs = _run_comparison_drafts(point_cfg, seed)
+            if skip_comparisons:
+                force_dvs = None
+                ignorant_dvs = None
+                aware_dvs = None
+            else:
+                force_dvs, ignorant_dvs, aware_dvs = _run_comparison_drafts(
+                    point_cfg, seed
+                )
 
             draft_metrics = metrics.compute_metrics(
                 result,
