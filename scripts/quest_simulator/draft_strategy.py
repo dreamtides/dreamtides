@@ -578,6 +578,7 @@ class ArchetypeDraftStrategy(DraftStrategy):
         rng: random.Random,
         all_cards: list[CardDesign],
         num_archetypes: int = 3,
+        no_rarity: bool = False,
     ) -> None:
         self._rng = rng
         self._draft_cfg = SimulatorConfig()
@@ -608,12 +609,17 @@ class ArchetypeDraftStrategy(DraftStrategy):
             if is_member or is_neutral or is_legendary:
                 pool_designs[card.card_id] = card
 
-        # Build card instances with rarity-based copies
+        # Build card instances with rarity-based copies (or 1 copy each if no_rarity)
         self._pool: list[CardInstance] = []
         instance_id = 0
         for design in pool_designs.values():
-            rarity_key = design.original_rarity if design.original_rarity else "Common"
-            copies = self._COPIES_BY_RARITY.get(rarity_key, 3)
+            if no_rarity:
+                copies = 1
+            else:
+                rarity_key = (
+                    design.original_rarity if design.original_rarity else "Common"
+                )
+                copies = self._COPIES_BY_RARITY.get(rarity_key, 3)
             for _ in range(copies):
                 self._pool.append(CardInstance(instance_id=instance_id, design=design))
                 instance_id += 1

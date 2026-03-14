@@ -101,6 +101,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=3,
         help="Number of archetypes to include in archetype draft (default: 3)",
     )
+    parser.add_argument(
+        "--no-rarity",
+        action="store_true",
+        default=False,
+        help="Disable rarity weighting in archetype draft (all cards at equal weight)",
+    )
     return parser
 
 
@@ -232,6 +238,7 @@ def main() -> None:
             rng=rng,
             all_cards=cards,
             num_archetypes=args.num_archetypes,
+            no_rarity=args.no_rarity,
         )
         print(
             f"  Archetype draft initialized: archetypes {archetype_strategy.selected_archetypes}, "
