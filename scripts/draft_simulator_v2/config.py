@@ -21,6 +21,7 @@ class DraftConfig:
     round_count: int = 3
     picks_per_round: list[int] = field(default_factory=lambda: [10, 10, 10])
     pack_size: int = 20
+    pack_size_boost: int = 0
     alternate_direction: bool = False
     human_seats: int = 1
 
@@ -69,6 +70,8 @@ class AgentsConfig:
     learning_rate: float = 3.0
     force_archetype: Optional[int] = None
     ai_resonance_commit_pick: int = 5
+    sharpening_decay: float = 0.0
+    mercy_reshuffle: bool = False
 
 
 @dataclass

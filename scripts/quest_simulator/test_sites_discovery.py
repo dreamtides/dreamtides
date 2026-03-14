@@ -34,7 +34,9 @@ def _make_instance(
     rarity_value: float = 0.0,
 ) -> CardInstance:
     """Create a CardInstance for testing."""
-    design = _make_design(name=name, card_id=card_id, fitness=fitness, rarity_value=rarity_value)
+    design = _make_design(
+        name=name, card_id=card_id, fitness=fitness, rarity_value=rarity_value
+    )
     return CardInstance(instance_id=instance_id, design=design)
 
 
@@ -231,8 +233,12 @@ class TestRarityBasedPricing:
         from sites_discovery import compute_rarity_price
 
         assert compute_rarity_price(0.0) == 10
-        assert compute_rarity_price(0.33) == 30  # round(10 + 0.33*60) = round(29.8) = 30
-        assert compute_rarity_price(0.67) == 50  # round(10 + 0.67*60) = round(50.2) = 50
+        assert (
+            compute_rarity_price(0.33) == 30
+        )  # round(10 + 0.33*60) = round(29.8) = 30
+        assert (
+            compute_rarity_price(0.67) == 50
+        )  # round(10 + 0.67*60) = round(50.2) = 50
         assert compute_rarity_price(1.0) == 70  # round(10 + 60) = 70
         assert compute_rarity_price(1.5) == 100  # Clamped to max
 
@@ -398,7 +404,9 @@ class TestSpecialtyShopPricing:
         from sites_discovery import compute_rarity_price, prepare_shop_items
 
         instances = [
-            _make_instance(instance_id=i, name=f"Card {i}", rarity_value=round(i * 0.33, 2))
+            _make_instance(
+                instance_id=i, name=f"Card {i}", rarity_value=round(i * 0.33, 2)
+            )
             for i in range(4)
         ]
         rng = random.Random(42)

@@ -75,9 +75,11 @@ def run_draft(
     cube = cube_manager.CubeManager(
         designs=cards,
         copies_per_card=cfg.cube.copies_per_card,
-        consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT
-        if cfg.cube.consumption_mode == "with_replacement"
-        else CubeConsumptionMode.WITHOUT_REPLACEMENT,
+        consumption_mode=(
+            CubeConsumptionMode.WITH_REPLACEMENT
+            if cfg.cube.consumption_mode == "with_replacement"
+            else CubeConsumptionMode.WITHOUT_REPLACEMENT
+        ),
     )
     cube_manager.validate_supply(cfg, cube.total_size)
 
@@ -117,15 +119,43 @@ def run_draft(
                 is_human = seat_idx < cfg.draft.human_seats
 
                 if is_human:
+                    show_rng_seed = pick_rng.randint(0, 2**32)
                     shown = show_n.select_cards(
                         pack.cards,
                         cfg.agents.show_n,
                         cfg.agents.show_n_strategy,
-                        random.Random(pick_rng.randint(0, 2**32)),
+                        random.Random(show_rng_seed),
                         human_w=agent.w,
                         human_drafted=agent.drafted,
                         scoring_cfg=cfg.scoring,
+                        pick_in_pack=pick_k,
+                        sharpening_decay=cfg.agents.sharpening_decay,
                     )
+
+                    if (
+                        cfg.agents.mercy_reshuffle
+                        and pick_k >= cfg.agents.ai_resonance_commit_pick
+                    ):
+                        committed_arch = argmax(agent.w)
+                        best_fit = max(
+                            (c.design.fitness[committed_arch] for c in shown),
+                            default=0.0,
+                        )
+                        if best_fit == 0.0:
+                            remaining = [c for c in pack.cards if c not in shown]
+                            if remaining:
+                                shown = show_n.select_cards(
+                                    remaining,
+                                    cfg.agents.show_n,
+                                    cfg.agents.show_n_strategy,
+                                    random.Random(show_rng_seed + 1),
+                                    human_w=agent.w,
+                                    human_drafted=agent.drafted,
+                                    scoring_cfg=cfg.scoring,
+                                    pick_in_pack=pick_k,
+                                    sharpening_decay=cfg.agents.sharpening_decay,
+                                )
+
                     candidates = shown
                 else:
                     candidates = list(pack.cards)

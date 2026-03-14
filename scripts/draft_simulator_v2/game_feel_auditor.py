@@ -206,9 +206,7 @@ def evaluate_draft_feel(
         post_commitment_count += 1
         shown_ids = trace.shown_card_ids
         shown_cards = [
-            result.card_pool[cid]
-            for cid in shown_ids
-            if cid in result.card_pool
+            result.card_pool[cid] for cid in shown_ids if cid in result.card_pool
         ]
 
         strict_count = sum(
@@ -217,9 +215,7 @@ def evaluate_draft_feel(
             if c.design.fitness[committed_arch] >= strict_threshold
         )
         permissive_count = sum(
-            1
-            for c in shown_cards
-            if c.design.fitness[committed_arch] >= 0.3
+            1 for c in shown_cards if c.design.fitness[committed_arch] >= 0.3
         )
         best_fit = max(
             (c.design.fitness[committed_arch] for c in shown_cards),
@@ -260,9 +256,7 @@ def evaluate_draft_feel(
         )
 
     frustration_rate = (
-        frustrating_count / post_commitment_count
-        if post_commitment_count > 0
-        else 0.0
+        frustrating_count / post_commitment_count if post_commitment_count > 0 else 0.0
     )
 
     max_streak = _max_frustration_streak(pick_scores)
@@ -477,9 +471,15 @@ def run_audit(
     strict_threshold: float,
     resonance_pair: Optional[tuple[str, str]],
     verbose: bool = False,
+    pack_boost: int = 0,
+    sharpening_decay: float = 0.0,
+    mercy_reshuffle: bool = False,
 ) -> tuple[AuditSummary, list[DraftFeelReport]]:
     """Run the audit for a number of draft runs and return results."""
     cfg = _quest_mode_config()
+    cfg.draft.pack_size += pack_boost
+    cfg.agents.sharpening_decay = sharpening_decay
+    cfg.agents.mercy_reshuffle = mercy_reshuffle
     rng = random.Random(seed)
 
     reports: list[DraftFeelReport] = []
@@ -496,9 +496,7 @@ def run_audit(
         if effective_pair is None:
             sr = result.seat_results[0]
             if sr.committed_archetype is not None:
-                effective_pair = _resonance_pair_for_archetype(
-                    sr.committed_archetype
-                )
+                effective_pair = _resonance_pair_for_archetype(sr.committed_archetype)
 
         report = evaluate_draft_feel(result, cfg, effective_pair, strict_threshold)
         reports.append(report)
@@ -525,9 +523,7 @@ def run_all_resonances(
         pair = ARCHETYPE_RESONANCE[arch_name]
         print(f"\n{colors.dim(f'--- Running {arch_name} ({pair[0]}/{pair[1]}) ---')}")
 
-        summary, reports = run_audit(
-            runs, seed, strict_threshold, pair, verbose
-        )
+        summary, reports = run_audit(runs, seed, strict_threshold, pair, verbose)
         all_reports.extend(reports)
         print(format_audit_summary(summary, strict_threshold, label=arch_name))
 
@@ -562,9 +558,7 @@ def run_compare(
         if sr.committed_archetype is not None:
             pair = _resonance_pair_for_archetype(sr.committed_archetype)
 
-        feel_reports.append(
-            evaluate_draft_feel(result, cfg, pair, strict_threshold)
-        )
+        feel_reports.append(evaluate_draft_feel(result, cfg, pair, strict_threshold))
         draft_metrics_list.append(metrics.compute_metrics(result, cfg))
 
     sys.stderr.write(
@@ -635,6 +629,24 @@ def build_parser() -> argparse.ArgumentParser:
         default=False,
         help="Per-run detail for worst runs",
     )
+    parser.add_argument(
+        "--pack-boost",
+        type=int,
+        default=0,
+        help="Increase pack size by N (default: 0)",
+    )
+    parser.add_argument(
+        "--sharpening-decay",
+        type=float,
+        default=0.0,
+        help="Sharpening exponent decay per pick in pack (default: 0.0)",
+    )
+    parser.add_argument(
+        "--mercy-reshuffle",
+        action="store_true",
+        default=False,
+        help="Redraw shown cards when all have 0 fitness for committed archetype",
+    )
     return parser
 
 
@@ -656,10 +668,19 @@ def main() -> None:
             sys.exit(1)
         resonance_pair = ARCHETYPE_RESONANCE[args.resonance]
 
+    fix_label_parts: list[str] = []
+    if args.pack_boost:
+        fix_label_parts.append(f"pack_boost={args.pack_boost}")
+    if args.sharpening_decay:
+        fix_label_parts.append(f"sharpening_decay={args.sharpening_decay}")
+    if args.mercy_reshuffle:
+        fix_label_parts.append("mercy_reshuffle")
+    fix_label = ", ".join(fix_label_parts) if fix_label_parts else "baseline"
+
     print(
         colors.dim(
             f"Game Feel Auditor — seed={seed}, runs={args.runs}, "
-            f"strict_threshold={args.strict_threshold}"
+            f"strict_threshold={args.strict_threshold}, fixes=[{fix_label}]"
         )
     )
 
@@ -669,7 +690,14 @@ def main() -> None:
         run_compare(args.runs, seed, args.strict_threshold)
     else:
         summary, reports = run_audit(
-            args.runs, seed, args.strict_threshold, resonance_pair, args.verbose
+            args.runs,
+            seed,
+            args.strict_threshold,
+            resonance_pair,
+            args.verbose,
+            pack_boost=args.pack_boost,
+            sharpening_decay=args.sharpening_decay,
+            mercy_reshuffle=args.mercy_reshuffle,
         )
         print(format_audit_summary(summary, args.strict_threshold))
 

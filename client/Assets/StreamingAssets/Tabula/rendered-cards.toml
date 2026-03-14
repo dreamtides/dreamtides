@@ -6413,7 +6413,7 @@ id = "fe663f4c-593d-42a2-9fa2-a2bf3560eb46"
 rendered-text = "▸ Materialized, Judgment: Gain 2●. Lose 1⍏."
 awaken = true
 surge = true
-energy-cost = 0
+energy-cost = 2
 card-type = "Character"
 subtype = "Robot"
 is-fast = false
@@ -6425,28 +6425,10 @@ card-number = 374
 resonance = ["Thunder"]
 
 [[cards]]
-name = "Titan Menders"
-id = "2d90a022-7149-43b8-8b19-3cb3842b5bfe"
-rendered-text = "▸ Dissolved: Draw a card. ▸ Judgment: Gain 1●."
-awaken = true
-shatter = true
-endure = true
-energy-cost = 1
-card-type = "Character"
-subtype = "Tinkerer"
-is-fast = false
-spark = 0
-image-number = 608687447
-rarity = "Common"
-art-owned = false
-card-number = 375
-resonance = ["Thunder"]
-
-[[cards]]
 name = "Winter Bridge Guardian"
 id = "e71ac2d1-8d45-479d-81db-3127860ba498"
-rendered-text = "▸ Materialized: Gain 3●. ▸ Judgment: Lose 1●."
-awaken = true
+rendered-text = "▸ Materialized: Gain 4●. Lose 1 maximum ●."
+surge = true
 flicker = true
 energy-cost = 1
 card-type = "Character"
@@ -6463,7 +6445,6 @@ resonance = ["Thunder"]
 name = "Colony Overseer"
 id = "daa30155-1b40-42ff-b5b6-0745ad9d4277"
 rendered-text = "▸ Judgment: You may abandon an ally to gain 2●."
-awaken = true
 shatter = true
 energy-cost = 1
 card-type = "Character"
@@ -6479,7 +6460,7 @@ resonance = ["Stone", "Flame"]
 [[cards]]
 name = "Chromatic Dreamer"
 id = "0bf69801-fab9-4459-9eef-4c57eae90b02"
-rendered-text = "▸ Judgment: You may abandon an ally to mill cards from your deck equal to that ally's cost."
+rendered-text = "▸ Judgment: You may abandon an ally to put cards from your deck into your void equal to that ally's spark."
 shatter = true
 endure = true
 energy-cost = 2
@@ -6498,7 +6479,7 @@ name = "Rusted Street Patrol"
 id = "b3908e49-4a7a-4034-8a25-5e592246c5e5"
 rendered-text = "When the opponent materializes a character, materialize a Celestial Figment."
 ignite = true
-energy-cost = 2
+energy-cost = 3
 card-type = "Character"
 subtype = "Tinkerer"
 is-fast = false
@@ -6510,28 +6491,11 @@ card-number = 379
 resonance = ["Flame", "Stone"]
 
 [[cards]]
-name = "Sentinel's Shadow"
-id = "38a48538-dab4-41dd-951e-2b88e938f046"
-rendered-text = "An ally gains +3 spark. Abandon another ally."
-ignite = true
-shatter = true
-energy-cost = 3
-card-type = "Event"
-is-fast = false
-image-number = 1926604856
-rarity = "Uncommon"
-art-owned = false
-card-number = 380
-subtype = ""
-spark = ""
-resonance = ["Flame"]
-
-[[cards]]
 name = "Azure Colossus Gazer"
 id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
 rendered-text = """
 ▸ Materialized: Materialize a Shadow Figment.
-This character's spark equals the number of allied Figments."""
+This character's spark is equal to the number of allied Figments."""
 ignite = true
 energy-cost = 3
 card-type = "Character"
@@ -6547,9 +6511,8 @@ resonance = ["Flame"]
 [[cards]]
 name = "Summit Wanderer"
 id = "5aad0a6c-81d2-417a-8442-9490191b526e"
-rendered-text = "▸ Materialized: Disable an enemy's activated abilities. This character gains those activated abilities."
-flicker = true
-energy-cost = 2
+rendered-text = "▸ Materialized: Disable an enemy's triggered abilities. This character gains those abilities."
+energy-cost = 5
 card-type = "Character"
 subtype = "Agent"
 is-fast = false
@@ -6564,10 +6527,9 @@ resonance = ["Tide"]
 name = "Luminous Driftveil"
 id = "98a49295-1ad6-4c6a-bb78-659bfedeec21"
 rendered-text = """
-When an ally is banished, this gains +1 spark.
+When an ally is banished, this character gains +1 spark.
 
 ▸ Judgment: Banish an ally, then materialize it."""
-awaken = true
 flicker = true
 energy-cost = 3
 card-type = "Character"
@@ -6585,7 +6547,7 @@ name = "Skullweaver Broodmother"
 id = "9065b009-6ae3-4138-b5a0-1204a69abc00"
 rendered-text = "Costs 0● if you discarded a card this turn. ▸ Materialized: Dissolve an enemy with spark 3 or less."
 submerge = true
-energy-cost = 2
+energy-cost = 4
 card-type = "Character"
 subtype = "Monster"
 is-fast = false
@@ -6601,7 +6563,6 @@ name = "Astral Blade Knight"
 id = "9c9892a6-b472-497c-83b8-fe3460349743"
 rendered-text = "When you abandon an ally, this character gains +1 spark. ▸ Dissolved: Kindle 3."
 shatter = true
-ignite = true
 energy-cost = 2
 card-type = "Character"
 subtype = "Renegade"
@@ -6631,31 +6592,15 @@ spark = ""
 resonance = ["Stone", "Tide"]
 
 [[cards]]
-name = "Dreamer on the Pier"
-id = "9b592dd0-8f54-4177-baf7-3743e1eef3d2"
-rendered-text = "▸ Materialized: Dissolve an enemy with spark 2 or less. ▸ Dissolved: Return this character to your hand."
-flicker = true
-energy-cost = 4
-card-type = "Character"
-subtype = "Visionary"
-is-fast = false
-spark = 2
-image-number = 1053081800
-rarity = "Rare"
-art-owned = false
-card-number = 387
-resonance = ["Flame"]
-
-[[cards]]
 name = "Eagle's Wrath"
 id = "a374adac-d42d-4635-b68b-d2e55e65df3c"
 rendered-text = """
-Until end of turn, when you materialize a character, that character gains +1 spark.
+Until end of turn, when you materialize a character, that character gains +2 spark.
 
 Reclaim 3●"""
 flicker = true
-ignite = true
-energy-cost = 3
+awaken = true
+energy-cost = 1
 card-type = "Event"
 is-fast = false
 image-number = 581686492
@@ -6690,7 +6635,8 @@ rendered-text = """
 Dissolve an enemy with cost 3● or less.
 
 Reclaim -- Banish a card from hand."""
-flash = true
+submerge = true
+endure = true
 energy-cost = 3
 card-type = "Event"
 is-fast = true

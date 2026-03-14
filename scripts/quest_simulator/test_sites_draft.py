@@ -48,7 +48,12 @@ def _make_draft_cfg() -> SimulatorConfig:
         ),
         cards=CardsConfig(
             archetype_count=8,
-            rendered_toml_path=str(Path(__file__).resolve().parent.parent.parent / "rules_engine" / "tabula" / "rendered-cards.toml"),
+            rendered_toml_path=str(
+                Path(__file__).resolve().parent.parent.parent
+                / "rules_engine"
+                / "tabula"
+                / "rendered-cards.toml"
+            ),
         ),
         cube=CubeConfig(
             distinct_cards=540,

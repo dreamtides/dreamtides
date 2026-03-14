@@ -964,7 +964,9 @@ def _run_demo(cfg: SimulatorConfig, seed: int) -> None:
 
     cards = card_generator.generate_cards(cfg, rng)
 
-    print(f"\n{colors.label('Card source:')} {colors.c('rendered-cards.toml', 'special')}")
+    print(
+        f"\n{colors.label('Card source:')} {colors.c('rendered-cards.toml', 'special')}"
+    )
 
     card_generator.print_card_pool_stats(cards, cfg.cards.archetype_count)
 
@@ -1037,9 +1039,7 @@ def _demo_deck_scoring(
             w, card.fitness, cfg.agents.learning_rate
         )
 
-    coherence, focus, final = deck_scorer.deck_value_breakdown(
-        pool, w, cfg.scoring
-    )
+    coherence, focus, final = deck_scorer.deck_value_breakdown(pool, w, cfg.scoring)
 
     print(f"\n{colors.section('--- Deck Value Scoring ---')}")
     print(f"  {colors.label('Pool size:')} {colors.num(len(pool))}")
@@ -1049,8 +1049,7 @@ def _demo_deck_scoring(
     print(f"  {colors.label('Final score:')}          {colors.num(f'{final:.4f}')}")
 
     weighted = (
-        cfg.scoring.weight_coherence * coherence
-        + cfg.scoring.weight_focus * focus
+        cfg.scoring.weight_coherence * coherence + cfg.scoring.weight_focus * focus
     )
     print(
         f"  {colors.label('Weighted sum (before clamp):')} "

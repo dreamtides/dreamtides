@@ -35,7 +35,12 @@ def _build_cfg() -> SimulatorConfig:
     cfg.agents.learning_rate = 3.0
     cfg.agents.openness_window = 3
     cfg.cards.archetype_count = 8
-    cfg.cards.rendered_toml_path = str(Path(__file__).resolve().parent.parent.parent / "rules_engine" / "tabula" / "rendered-cards.toml")
+    cfg.cards.rendered_toml_path = str(
+        Path(__file__).resolve().parent.parent.parent
+        / "rules_engine"
+        / "tabula"
+        / "rendered-cards.toml"
+    )
     cfg.cube.distinct_cards = 540
     cfg.cube.copies_per_card = 1
     cfg.cube.consumption_mode = "with_replacement"

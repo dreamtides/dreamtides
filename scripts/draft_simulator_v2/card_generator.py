@@ -147,9 +147,7 @@ def print_card_pool_stats(cards: list[CardDesign], archetype_count: int) -> None
     print(f"\n  {colors.label('Cards per archetype (tag = 1.0):')}")
     for arch_idx, arch_name in enumerate(ARCHETYPE_KEYS):
         count = sum(1 for c in cards if c.fitness[arch_idx] == 1.0)
-        print(
-            f"    {colors.label(f'{arch_name:<12s}')} {colors.num(count)}"
-        )
+        print(f"    {colors.label(f'{arch_name:<12s}')} {colors.num(count)}")
 
     # Tag count distribution
     print(f"\n  {colors.label('Tag count distribution:')}")

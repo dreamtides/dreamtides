@@ -22,7 +22,9 @@ _QS_DIR = str(Path(__file__).resolve().parent.parent)
 if _QS_DIR not in sys.path:
     sys.path.insert(0, _QS_DIR)
 
-_DRAFT_SIM_DIR = str(Path(__file__).resolve().parent.parent.parent / "draft_simulator_v2")
+_DRAFT_SIM_DIR = str(
+    Path(__file__).resolve().parent.parent.parent / "draft_simulator_v2"
+)
 if _DRAFT_SIM_DIR not in sys.path:
     sys.path.insert(0, _DRAFT_SIM_DIR)
 

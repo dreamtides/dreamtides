@@ -24,6 +24,8 @@ def select_cards(
     human_w: list[float] | None = None,
     human_drafted: list[CardInstance] | None = None,
     scoring_cfg: ScoringConfig | None = None,
+    pick_in_pack: int = 0,
+    sharpening_decay: float = 0.0,
 ) -> list[CardInstance]:
     """Select N cards from the pack using the specified strategy."""
     if len(pack_cards) <= n:
@@ -40,7 +42,9 @@ def select_cards(
     elif strategy == "top_scored":
         return _select_top_scored(pack_cards, n, rng, human_w)
     elif strategy == "sharpened_preference":
-        return _select_sharpened_preference(pack_cards, n, rng, human_w)
+        return _select_sharpened_preference(
+            pack_cards, n, rng, human_w, pick_in_pack, sharpening_decay
+        )
     elif strategy == "plan_plus_power":
         return _select_plan_plus_power(pack_cards, n, rng, human_w)
     elif strategy == "deck_value_greedy":
@@ -169,6 +173,8 @@ def _select_sharpened_preference(
     n: int,
     rng: random.Random,
     human_w: list[float] | None,
+    pick_in_pack: int = 0,
+    sharpening_decay: float = 0.0,
 ) -> list[CardInstance]:
     """Select top N cards by combined rarity and sharpened preference score.
 
@@ -178,7 +184,8 @@ def _select_sharpened_preference(
     if human_w is None or not human_w:
         return _select_rarity_biased(cards, n, rng)
 
-    w_sharp = [v**4.0 for v in human_w]
+    exponent = max(1.0, 4.0 - sharpening_decay * pick_in_pack)
+    w_sharp = [v**exponent for v in human_w]
     w_norm = _ts_normalize(w_sharp)
     scored: list[tuple[float, int, CardInstance]] = []
     for idx, card in enumerate(cards):
