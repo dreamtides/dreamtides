@@ -75,7 +75,9 @@ def run_draft(
     cube = cube_manager.CubeManager(
         designs=cards,
         copies_per_card=cfg.cube.copies_per_card,
-        consumption_mode=CubeConsumptionMode.WITHOUT_REPLACEMENT,
+        consumption_mode=CubeConsumptionMode.WITH_REPLACEMENT
+        if cfg.cube.consumption_mode == "with_replacement"
+        else CubeConsumptionMode.WITHOUT_REPLACEMENT,
     )
     cube_manager.validate_supply(cfg, cube.total_size)
 
