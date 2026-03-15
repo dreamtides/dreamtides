@@ -47,6 +47,13 @@ def generate_cards(cfg: SimulatorConfig, rng: random.Random) -> list[CardDesign]
     return cards
 
 
+def load_cards(
+    rendered_toml_path: str, original_only: bool = False
+) -> list[CardDesign]:
+    """Load card designs from rendered-cards.toml using archetype tags."""
+    return load_cards_for_archetype_draft(rendered_toml_path, original_only)
+
+
 def load_real_cards(
     rendered_toml_path: str, metadata_toml_path: str
 ) -> list[CardDesign]:

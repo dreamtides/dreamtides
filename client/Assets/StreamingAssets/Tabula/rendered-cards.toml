@@ -664,7 +664,6 @@ spark = ""
 name = "Shatter the Frail"
 id = "56020364-cbe8-4500-900f-33510a95ff10"
 rendered-text = "Dissolve an enemy with spark 1 or less."
-flash = true
 energy-cost = 2
 card-type = "Event"
 is-fast = true
@@ -1107,7 +1106,6 @@ spark = ""
 name = "Shattering Gambit"
 id = "754a3d7d-24e8-40e0-9ed8-f99672bc76eb"
 rendered-text = "Dissolve an enemy. The opponent gains 3⍏."
-flash = true
 energy-cost = 0
 card-type = "Event"
 is-fast = true
@@ -1444,7 +1442,6 @@ resonance = ["Thunder"]
 name = "Ashlight Caller"
 id = "977ce2e4-ef8c-48e7-a27b-83a7348fa94f"
 rendered-text = "▸ Materialized: An event in your void gains reclaim equal to its cost this turn."
-flash = true
 flicker = true
 endure = true
 surge = true
@@ -1481,8 +1478,6 @@ resonance = ["Stone"]
 name = "Epiphany Unfolded"
 id = "84f1d31e-149f-4ab8-ac67-de35b0ad97a9"
 rendered-text = "Draw 3 cards."
-flash = true
-surge = true
 energy-cost = 1
 card-type = "Event"
 is-fast = true
@@ -3896,8 +3891,6 @@ rendered-text = """
 ▸ Materialized: Banish an enemy until this character leaves play.
 
 Abandon this character: Foresee 2."""
-flicker = true
-flash = true
 energy-cost = 3
 card-type = "Character"
 subtype = "Mage"
@@ -4200,23 +4193,6 @@ rarity = "Rare"
 art-owned = false
 card-number = 242
 resonance = ["Tide"]
-
-[[cards]]
-name = "Sacred Stone Shaper"
-id = "8792daa1-a31e-4fd2-a1f3-7493a3d6be41"
-rendered-text = "▸ Materialized: Materialize a Figment. Allied Synths have +1 spark."
-ignite = true
-flicker = true
-energy-cost = 3
-card-type = "Character"
-subtype = "Tinkerer"
-is-fast = false
-spark = 1
-image-number = 2415692461
-rarity = "Uncommon"
-art-owned = false
-card-number = 243
-resonance = ["Flame"]
 
 [[cards]]
 name = "Rainy Night Guardian"
@@ -6475,8 +6451,6 @@ rendered-text = """
 Dissolve an enemy with cost 3● or less.
 
 Reclaim -- Banish a card from hand."""
-submerge = true
-endure = true
 energy-cost = 3
 card-type = "Event"
 is-fast = true
@@ -7315,7 +7289,6 @@ name = "Shore of Burning Ships"
 id = "1cf26e51-dd11-4ad0-85d9-42c324a65e2e"
 rendered-text = "Each player may materialize a character from their hand for 0●."
 shatter = true
-ignite = true
 energy-cost = 3
 card-type = "Event"
 is-fast = false
@@ -7429,7 +7402,6 @@ id = "4bb1b10b-c1a5-48b0-909a-a405e241443e"
 rendered-text = """
 ▸ Materialized, Judgment: Put the top 3 cards of your deck into your void, then return a character from your void to your hand.
 """
-endure = true
 submerge = true
 energy-cost = 5
 card-type = "Character"

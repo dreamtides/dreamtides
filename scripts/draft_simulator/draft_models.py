@@ -53,6 +53,13 @@ class CardSource(Enum):
     FILE = "File"
 
 
+RARITY_VALUES: dict[str, float] = {
+    "common": 0.0,
+    "uncommon": 0.33,
+    "rare": 0.67,
+}
+
+
 @dataclass(frozen=True)
 class CardDesign:
     """A card design template with archetype fitness vector and attributes."""
@@ -60,10 +67,11 @@ class CardDesign:
     card_id: str
     name: str
     fitness: list[float]
-    power: float
-    commit: float
-    flex: float
+    power: float = 0.0
+    commit: float = 0.0
+    flex: float = 0.0
     rarity: str = ""
+    rarity_value: float = 0.0
     rules_text: str = ""
     energy_cost: int | None = None
     card_type: str = ""

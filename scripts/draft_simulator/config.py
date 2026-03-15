@@ -82,6 +82,8 @@ class AgentsConfig:
     learning_rate: float = 3.0
     force_archetype: Optional[int] = None
     ai_resonance_commit_pick: int = 5
+    sharpening_decay: float = 0.0
+    mercy_reshuffle: bool = False
 
 
 @dataclass
