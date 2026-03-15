@@ -52,8 +52,8 @@ function resonanceEmoji(name) {
 // ── Archetype helpers (debug mode) ──────────────────────────────────────
 
 const ARCHETYPE_NAMES = [
-  "Endure", "Shatter", "Ignite", "Flicker",
-  "Awaken", "Flash", "Submerge", "Surge",
+  "Flash", "Awaken", "Flicker", "Ignite",
+  "Shatter", "Endure", "Submerge", "Surge",
 ];
 
 const ARCHETYPE_EMOJI = {
@@ -67,25 +67,47 @@ const ARCHETYPE_EMOJI = {
   Submerge: "\u{1F300}",   // 🌀
 };
 
-function renderArchetypeTag(fitness) {
-  if (!fitness || fitness.length === 0) return null;
-  const emojis = [];
-  for (let i = 0; i < fitness.length && i < ARCHETYPE_NAMES.length; i++) {
-    if (fitness[i] >= 0.5) {
-      const emoji = ARCHETYPE_EMOJI[ARCHETYPE_NAMES[i]];
-      if (emoji) emojis.push(emoji);
-    }
-  }
-  if (emojis.length === 0) return null;
+// Regex matching emoji characters (surrogate pairs, variation selectors, ZWJ sequences)
+const EMOJI_RE = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{2B55}\u{FE0F}\u{200D}\u{2728}]+/gu;
+
+function splitTypeAndEmojis(cardType) {
+  if (!cardType) return { text: cardType, emojis: "" };
+  const emojis = (cardType.match(EMOJI_RE) || []).join("");
+  const text = cardType.replace(EMOJI_RE, "").trim();
+  return { text, emojis };
+}
+
+function renderArchetypeTagFromEmojis(emojiStr) {
+  if (!emojiStr) return null;
   const div = document.createElement("div");
   div.className = "tcg-resonance";
-  div.textContent = emojis.join("");
+  div.textContent = emojiStr;
   return div;
 }
 
+function cardTypeText(cardType) {
+  if (!debugMode || !cardType) return cardType;
+  return splitTypeAndEmojis(cardType).text;
+}
+
 function renderCardBottomTag(cardData) {
-  if (debugMode && cardData?.fitness) {
-    return renderArchetypeTag(cardData.fitness);
+  if (debugMode) {
+    // Prefer emojis extracted from type line (from CLI output, always correct)
+    if (cardData?.card_type) {
+      const { emojis } = splitTypeAndEmojis(cardData.card_type);
+      if (emojis) return renderArchetypeTagFromEmojis(emojis);
+    }
+    // Fallback to fitness vector (for deck sidebar cards without CLI type text)
+    if (cardData?.fitness) {
+      const emojis = [];
+      for (let i = 0; i < cardData.fitness.length && i < ARCHETYPE_NAMES.length; i++) {
+        if (cardData.fitness[i] >= 0.5) {
+          const emoji = ARCHETYPE_EMOJI[ARCHETYPE_NAMES[i]];
+          if (emoji) emojis.push(emoji);
+        }
+      }
+      if (emojis.length > 0) return renderArchetypeTagFromEmojis(emojis.join(""));
+    }
   }
   return renderResonanceTag(cardData?.resonance);
 }
@@ -195,7 +217,7 @@ function renderDeckSidebar(state) {
     // Type line
     const type = document.createElement("div");
     type.className = "tcg-type";
-    type.textContent = card.card_type;
+    type.textContent = cardTypeText(card.card_type);
     li.appendChild(type);
 
     // Rules text
@@ -357,7 +379,7 @@ function renderMultiSelect(data) {
       if (od?.card_type) {
         const type = document.createElement("div");
         type.className = "tcg-type";
-        type.textContent = od.card_type;
+        type.textContent = cardTypeText(od.card_type);
         li.appendChild(type);
       }
       if (od?.rules_text) {
@@ -477,7 +499,7 @@ function renderRemainingCards(cards) {
     if (card.card_type) {
       const type = document.createElement("div");
       type.className = "tcg-type";
-      type.textContent = card.card_type;
+      type.textContent = cardTypeText(card.card_type);
       li.appendChild(type);
     }
     if (card.rules_text) {
@@ -530,7 +552,7 @@ function createCardDataOptionLi(text, index, cardData) {
   if (cardData?.card_type) {
     const type = document.createElement("div");
     type.className = "tcg-type";
-    type.textContent = cardData.card_type;
+    type.textContent = cardTypeText(cardData.card_type);
     li.appendChild(type);
   }
   if (cardData?.rules_text) {
