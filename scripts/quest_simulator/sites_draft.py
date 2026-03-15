@@ -78,6 +78,11 @@ def run_draft(
                         card_type=c.design.card_type,
                         rules_text=c.design.rules_text,
                         spark=c.design.spark,
+                        fitness=(
+                            list(c.design.fitness)
+                            if state.debug and hasattr(c.design, "fitness")
+                            else None
+                        ),
                     )
                     for c in remaining
                 ]

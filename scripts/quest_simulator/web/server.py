@@ -47,12 +47,12 @@ _STATIC_DIR = Path(__file__).parent / "static"
 _archetype_draft_mode = False
 
 
-def _serialize_deck_card(dc: Any) -> dict:
+def _serialize_deck_card(dc: Any, include_fitness: bool = False) -> dict:
     design = dc.instance.design
     image_hash = None
     if design.image_number is not None:
         image_hash = image_cache.get_image_cache_key(design.image_number)
-    return {
+    result = {
         "name": design.name,
         "image_hash": image_hash,
         "energy_cost": design.energy_cost,
@@ -61,6 +61,9 @@ def _serialize_deck_card(dc: Any) -> dict:
         "spark": design.spark,
         "resonance": [] if _archetype_draft_mode else list(design.resonance),
     }
+    if include_fitness and hasattr(design, "fitness"):
+        result["fitness"] = list(design.fitness)
+    return result
 
 
 def _make_handler(
@@ -307,13 +310,17 @@ def run_web_server(args: Any) -> None:
             "essence": state.essence,
             "completion_level": state.completion_level,
             "total_battles": total_battles,
-            "deck": [_serialize_deck_card(dc) for dc in state.deck],
+            "deck": [
+                _serialize_deck_card(dc, include_fitness=state.debug)
+                for dc in state.deck
+            ],
             "dreamsigns": [ds.name for ds in state.dreamsigns],
             "dreamcaller": state.dreamcaller.name if state.dreamcaller else None,
             "dreamcaller_archetype": (
                 state.dreamcaller.archetype if state.dreamcaller else None
             ),
             "deck_count": state.deck_count(),
+            "debug": state.debug,
         }
 
     # Build card name → image hash map and prefetch missing images in background.
@@ -333,6 +340,11 @@ def run_web_server(args: Any) -> None:
             d.name: d.resonance for d in cards
         }
         input_handler.set_card_name_resonance_map(card_resonance_map)
+    if args.debug:
+        card_fitness_map: dict[str, list[float]] = {
+            d.name: list(d.fitness) for d in cards if hasattr(d, "fitness")
+        }
+        input_handler.set_card_name_fitness_map(card_fitness_map)
 
     def _prefetch_images() -> None:
         for d in cards:

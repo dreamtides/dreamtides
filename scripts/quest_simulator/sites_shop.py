@@ -245,6 +245,11 @@ def run_shop(
                 rules_text=item.card_instance.design.rules_text,
                 spark=item.card_instance.design.spark,
                 price=item.price,
+                fitness=(
+                    list(item.card_instance.design.fitness)
+                    if state.debug and hasattr(item.card_instance.design, "fitness")
+                    else None
+                ),
             )
             for item in items
         ] + [None] * (ds_count + 2)

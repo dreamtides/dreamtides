@@ -72,6 +72,7 @@ _web_state_callback: Optional[Callable[[], dict]] = None
 _card_name_image_map: dict[str, Optional[str]] = {}
 _card_name_spark_map: dict[str, Optional[int]] = {}
 _card_name_resonance_map: dict[str, tuple[str, ...]] = {}
+_card_name_fitness_map: dict[str, list[float]] = {}
 
 
 def set_card_name_image_map(mapping: dict[str, Optional[str]]) -> None:
@@ -92,6 +93,12 @@ def set_card_name_resonance_map(mapping: dict[str, tuple[str, ...]]) -> None:
     _card_name_resonance_map = mapping
 
 
+def set_card_name_fitness_map(mapping: dict[str, list[float]]) -> None:
+    """Register a card name → fitness vector mapping for web mode prompts."""
+    global _card_name_fitness_map
+    _card_name_fitness_map = mapping
+
+
 def make_card_option_data(
     name: str,
     energy_cost: Optional[int],
@@ -100,9 +107,10 @@ def make_card_option_data(
     spark: Optional[int] = None,
     price: Optional[int] = None,
     resonance: Optional[list[str]] = None,
+    fitness: Optional[list[float]] = None,
 ) -> dict:
     """Build a card options_data entry for web UI display."""
-    return {
+    result: dict[str, object] = {
         "name": name,
         "energy_cost": energy_cost,
         "card_type": card_type,
@@ -116,6 +124,9 @@ def make_card_option_data(
             else list(_card_name_resonance_map.get(name, ()))
         ),
     }
+    if fitness is not None:
+        result["fitness"] = fitness
+    return result
 
 
 def set_web_mode(
@@ -195,6 +206,11 @@ def _parse_options_data(
                 "image_hash": _card_name_image_map.get(option),
                 "spark": _card_name_spark_map.get(option),
                 "resonance": list(_card_name_resonance_map.get(option, ())),
+                **(
+                    {"fitness": _card_name_fitness_map[option]}
+                    if option in _card_name_fitness_map
+                    else {}
+                ),
             }
         )
 

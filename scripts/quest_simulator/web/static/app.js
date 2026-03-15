@@ -5,6 +5,7 @@
 let currentPrompt = null;  // last prompt received from server
 let focusIndex = 0;        // keyboard cursor position
 let checkedIndices = new Set();  // multi-select checked items
+let debugMode = false;     // debug mode flag from server state
 
 // ── DOM refs ───────────────────────────────────────────────────────────────
 
@@ -48,6 +49,47 @@ function resonanceEmoji(name) {
   return RESONANCE_EMOJI[name] || "";
 }
 
+// ── Archetype helpers (debug mode) ──────────────────────────────────────
+
+const ARCHETYPE_NAMES = [
+  "Endure", "Shatter", "Ignite", "Flicker",
+  "Awaken", "Flash", "Submerge", "Surge",
+];
+
+const ARCHETYPE_EMOJI = {
+  Endure: "\u{1F504}",     // 🔄
+  Shatter: "\u{1F480}",    // 💀
+  Ignite: "\u{1F525}",     // 🔥
+  Flicker: "\u{2728}",     // ✨
+  Awaken: "\u{1F33F}",     // 🌿
+  Flash: "\u{1F6E1}\uFE0F",// 🛡️
+  Surge: "\u{1F30A}",      // 🌊
+  Submerge: "\u{1F300}",   // 🌀
+};
+
+function renderArchetypeTag(fitness) {
+  if (!fitness || fitness.length === 0) return null;
+  const emojis = [];
+  for (let i = 0; i < fitness.length && i < ARCHETYPE_NAMES.length; i++) {
+    if (fitness[i] >= 0.5) {
+      const emoji = ARCHETYPE_EMOJI[ARCHETYPE_NAMES[i]];
+      if (emoji) emojis.push(emoji);
+    }
+  }
+  if (emojis.length === 0) return null;
+  const div = document.createElement("div");
+  div.className = "tcg-resonance";
+  div.textContent = emojis.join("");
+  return div;
+}
+
+function renderCardBottomTag(cardData) {
+  if (debugMode && cardData?.fitness) {
+    return renderArchetypeTag(cardData.fitness);
+  }
+  return renderResonanceTag(cardData?.resonance);
+}
+
 function renderResonanceTag(resonanceList) {
   if (!resonanceList || resonanceList.length === 0) return null;
   const div = document.createElement("div");
@@ -80,6 +122,7 @@ elDeckToggle.addEventListener("click", () => {
 
 function updateStatus(state) {
   if (!state) return;
+  debugMode = !!state.debug;
   elStatusEss.textContent  = `Essence: ${state.essence}`;
   elStatusComp.textContent = `Completion: ${state.completion_level}/${state.total_battles}`;
   elStatusDeck.textContent = `Deck: ${state.deck_count}`;
@@ -163,8 +206,8 @@ function renderDeckSidebar(state) {
       li.appendChild(rules);
     }
 
-    // Resonance
-    const resTag = renderResonanceTag(card.resonance);
+    // Bottom tag (archetype in debug mode, resonance otherwise)
+    const resTag = renderCardBottomTag(card);
     if (resTag) li.appendChild(resTag);
 
     elDeckList.appendChild(li);
@@ -329,7 +372,7 @@ function renderMultiSelect(data) {
         price.textContent = `${od.price}e`;
         li.appendChild(price);
       }
-      const resTag = renderResonanceTag(od?.resonance);
+      const resTag = renderCardBottomTag(od);
       if (resTag) li.appendChild(resTag);
       const idx = document.createElement("span");
       idx.className = "option-index";
@@ -444,7 +487,7 @@ function renderRemainingCards(cards) {
       li.appendChild(rules);
     }
 
-    const resTag = renderResonanceTag(card.resonance);
+    const resTag = renderCardBottomTag(card);
     if (resTag) li.appendChild(resTag);
 
     grid.appendChild(li);
@@ -503,7 +546,7 @@ function createCardDataOptionLi(text, index, cardData) {
     li.appendChild(price);
   }
 
-  const resTag = renderResonanceTag(cardData?.resonance);
+  const resTag = renderCardBottomTag(cardData);
   if (resTag) li.appendChild(resTag);
 
   const idx = document.createElement("span");
