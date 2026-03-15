@@ -359,6 +359,18 @@ class SessionLogger:
             event["preference_vector"] = [round(v, 4) for v in preference_vector]
         self._write(event)
 
+    def log_draft_commitment(
+        self,
+        seat_commitments: list[dict[str, object]],
+    ) -> None:
+        """Log post-hoc commitment detection results for all seats."""
+        self._write(
+            {
+                "event": "draft_commitment",
+                "seats": seat_commitments,
+            }
+        )
+
     def log_error(
         self,
         site_type: str,

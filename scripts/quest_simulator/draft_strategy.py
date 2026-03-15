@@ -141,6 +141,11 @@ class SixSeatDraftStrategy(DraftStrategy):
         self._round_index: int = 0
         self._global_pick_index: int = 0
 
+        # Track w snapshots for post-hoc commitment detection.
+        # Index 0 = human, 1..5 = AI agents (matching _ai_agents order).
+        seat_count = 1 + len(ai_agents)
+        self._w_histories: list[list[list[float]]] = [[] for _ in range(seat_count)]
+
     # -- DraftStrategy interface --
 
     def generate_pick(
@@ -223,6 +228,7 @@ class SixSeatDraftStrategy(DraftStrategy):
             cfg.agents.learning_rate,
             cfg.agents.openness_window,
         )
+        self._w_histories[0].append(list(self._human_agent.w))
 
         self._rotate_and_advance()
 
@@ -243,6 +249,7 @@ class SixSeatDraftStrategy(DraftStrategy):
             cfg.agents.learning_rate,
             cfg.agents.openness_window,
         )
+        self._w_histories[0].append(list(self._human_agent.w))
 
     def render_debug_panel(self) -> str:
         """Build a multi-line debug panel string."""
@@ -383,6 +390,14 @@ class SixSeatDraftStrategy(DraftStrategy):
     def draft_cfg(self) -> Any:
         return self._draft_cfg
 
+    def detect_all_commitments(self) -> list[commitment.CommitmentResult]:
+        """Run post-hoc commitment detection on all seats' w histories."""
+        cfg = self._draft_cfg.commitment
+        results: list[commitment.CommitmentResult] = []
+        for w_history in self._w_histories:
+            results.append(commitment.detect_commitment(w_history, cfg))
+        return results
+
     # -- Internal helpers --
 
     def _score_card_for_policy(
@@ -516,6 +531,7 @@ class SixSeatDraftStrategy(DraftStrategy):
                 cfg.agents.learning_rate,
                 cfg.agents.openness_window,
             )
+            self._w_histories[seat_idx].append(list(ai_agent.w))
 
         return packs[0]
 

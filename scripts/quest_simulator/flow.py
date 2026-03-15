@@ -121,6 +121,22 @@ def _show_victory(
     print(screen)
 
     if logger is not None:
+        # Log post-hoc commitment detection if draft strategy supports it
+        if hasattr(state.draft_strategy, "detect_all_commitments"):
+            commit_results = state.draft_strategy.detect_all_commitments()
+            seat_commitments: list[dict[str, object]] = []
+            for seat_idx, result in enumerate(commit_results):
+                seat_commitments.append(
+                    {
+                        "seat_index": seat_idx,
+                        "commitment_pick": result.commitment_pick,
+                        "committed_archetype": result.committed_archetype,
+                        "entropy_commitment_pick": result.entropy_commitment_pick,
+                        "entropy_committed_archetype": result.entropy_committed_archetype,
+                    }
+                )
+            logger.log_draft_commitment(seat_commitments)
+
         logger.log_session_end(
             deck=state.deck,
             essence=state.essence,
