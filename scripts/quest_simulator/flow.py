@@ -20,6 +20,7 @@ from models import (
     Site,
     SiteType,
 )
+from draft_strategy import SixSeatDraftStrategy
 from quest_state import QuestState
 from site_dispatch import SiteData, VisitContext
 
@@ -121,8 +122,8 @@ def _show_victory(
     print(screen)
 
     if logger is not None:
-        # Log post-hoc commitment detection if draft strategy supports it
-        if hasattr(state.draft_strategy, "detect_all_commitments"):
+        # Log post-hoc commitment detection for 6-seat drafts
+        if isinstance(state.draft_strategy, SixSeatDraftStrategy):
             commit_results = state.draft_strategy.detect_all_commitments()
             seat_commitments: list[dict[str, object]] = []
             for seat_idx, result in enumerate(commit_results):
