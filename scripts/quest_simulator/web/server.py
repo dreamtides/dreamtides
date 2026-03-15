@@ -345,6 +345,9 @@ def run_web_server(args: Any) -> None:
             d.name: list(d.fitness) for d in cards if hasattr(d, "fitness")
         }
         input_handler.set_card_name_fitness_map(card_fitness_map)
+        import render_cards
+
+        render_cards._suppress_type_line_emojis = True
 
     def _prefetch_images() -> None:
         for d in cards:

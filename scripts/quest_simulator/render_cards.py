@@ -18,6 +18,7 @@ import render
 ARCHETYPE_NAMES = render.ARCHETYPE_NAMES
 
 _IMAGES_ENABLED = sys.stdout.isatty()
+_suppress_type_line_emojis = False
 
 
 def _render_image_line(image_number: int) -> str | None:
@@ -157,7 +158,7 @@ def format_card_display(
             type_parts.append(f" ({rarity.title()})")
         type_line = " ".join(type_parts)
         type_display = colors.dim(type_line)
-        if debug and hasattr(design, "fitness"):
+        if debug and not _suppress_type_line_emojis and hasattr(design, "fitness"):
             emojis = _archetype_emojis(design.fitness)
             if emojis:
                 type_display = f"{type_display}  {emojis}"
@@ -295,7 +296,7 @@ def _render_card_block(card, debug: bool = False) -> None:
         if sub:
             type_parts.append(f"- {sub}")
         type_line = colors.dim(" ".join(type_parts))
-        if debug and hasattr(design, "fitness"):
+        if debug and not _suppress_type_line_emojis and hasattr(design, "fitness"):
             emojis = _archetype_emojis(design.fitness)
             if emojis:
                 type_line = f"{type_line}  {emojis}"
