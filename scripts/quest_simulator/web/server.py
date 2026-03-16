@@ -237,7 +237,11 @@ def run_web_server(args: Any) -> None:
     )
 
     import resonance_filter
-    from draft_strategy import ArchetypeDraftStrategy, RankDraftStrategy, SixSeatDraftStrategy
+    from draft_strategy import (
+        ArchetypeDraftStrategy,
+        RankDraftStrategy,
+        SixSeatDraftStrategy,
+    )
 
     if getattr(args, "archetype_draft", False):
         global _archetype_draft_mode

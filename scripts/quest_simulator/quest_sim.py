@@ -34,7 +34,11 @@ import flow
 import input_handler
 import render
 import resonance_filter
-from draft_strategy import ArchetypeDraftStrategy, RankDraftStrategy, SixSeatDraftStrategy
+from draft_strategy import (
+    ArchetypeDraftStrategy,
+    RankDraftStrategy,
+    SixSeatDraftStrategy,
+)
 from jsonl_log import SessionLogger
 from quest_state import QuestState
 from site_dispatch import SiteData

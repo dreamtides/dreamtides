@@ -260,7 +260,9 @@ def _generate_image_escape(card) -> str | None:
     return esc
 
 
-def _render_card_block(card, debug: bool = False, show_archetype_icons: bool = True) -> None:
+def _render_card_block(
+    card, debug: bool = False, show_archetype_icons: bool = True
+) -> None:
     """Render a single card with image on the left and text on the right.
 
     Pre-generates the image escape sequence to determine layout: if
@@ -325,7 +327,9 @@ def _render_card_block(card, debug: bool = False, show_archetype_icons: bool = T
         sys.stdout.flush()
 
 
-def render_card_columns(cards, debug: bool = False, show_archetype_icons: bool = True) -> None:
+def render_card_columns(
+    cards, debug: bool = False, show_archetype_icons: bool = True
+) -> None:
     """Render cards with image on the left and text on the right.
 
     Each card is displayed as a block: image at columns 1-15, card

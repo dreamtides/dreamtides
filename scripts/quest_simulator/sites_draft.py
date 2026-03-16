@@ -58,11 +58,15 @@ def run_draft(
         print()
 
         # Show card columns (images + text) above interactive selector
-        render_cards.render_card_columns(shown_cards, debug=state.debug, show_archetype_icons=not state.simple_draft)
+        render_cards.render_card_columns(
+            shown_cards, debug=state.debug, show_archetype_icons=not state.simple_draft
+        )
         print(render.draw_separator())
 
         option_labels = [render_cards.card_name(card) for card in shown_cards]
-        is_simple_draft = isinstance(strategy, (ArchetypeDraftStrategy, RankDraftStrategy))
+        is_simple_draft = isinstance(
+            strategy, (ArchetypeDraftStrategy, RankDraftStrategy)
+        )
         if state.debug and not is_simple_draft:
             option_labels.append("Debug")
 
@@ -100,7 +104,11 @@ def run_draft(
                 # Re-display header and cards before re-prompting
                 print(header)
                 print()
-                render_cards.render_card_columns(shown_cards, debug=state.debug, show_archetype_icons=not state.simple_draft)
+                render_cards.render_card_columns(
+                    shown_cards,
+                    debug=state.debug,
+                    show_archetype_icons=not state.simple_draft,
+                )
                 print(render.draw_separator())
                 continue
 
