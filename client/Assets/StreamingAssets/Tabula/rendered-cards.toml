@@ -13,6 +13,7 @@ image-number = 2521694543
 rarity = "Rare"
 art-owned = true
 card-number = 1
+w1-rank = 373
 resonance = ["Stone"]
 
 [[cards]]
@@ -26,6 +27,7 @@ image-number = 1633431262
 rarity = "Uncommon"
 art-owned = true
 card-number = 2
+w1-rank = 177
 subtype = ""
 spark = ""
 
@@ -46,6 +48,7 @@ image-number = 2269064817
 rarity = "Rare"
 art-owned = true
 card-number = 3
+w1-rank = 428
 resonance = ["Stone"]
 
 [[cards]]
@@ -64,6 +67,7 @@ image-number = 2269064809
 rarity = "Rare"
 art-owned = true
 card-number = 4
+w1-rank = 332
 resonance = ["Tide", "Stone"]
 
 [[cards]]
@@ -82,6 +86,7 @@ image-number = 2027158310
 rarity = "Common"
 art-owned = true
 card-number = 5
+w1-rank = 112
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -102,6 +107,7 @@ image-number = 2364396771
 rarity = "Common"
 art-owned = true
 card-number = 6
+w1-rank = 206
 resonance = ["Tide", "Stone"]
 
 [[cards]]
@@ -118,6 +124,7 @@ image-number = 2415692463
 rarity = "Uncommon"
 art-owned = true
 card-number = 7
+w1-rank = 333
 resonance = ["Tide"]
 
 [[cards]]
@@ -135,6 +142,7 @@ image-number = 1185684772
 rarity = "Rare"
 art-owned = true
 card-number = 8
+w1-rank = 83
 resonance = ["Tide"]
 
 [[cards]]
@@ -153,6 +161,7 @@ image-number = 1246321000
 rarity = "Common"
 art-owned = true
 card-number = 9
+w1-rank = 352
 
 [[cards]]
 name = "The Rising God"
@@ -170,6 +179,7 @@ image-number = 2290648801
 rarity = "Uncommon"
 art-owned = true
 card-number = 10
+w1-rank = 461
 resonance = ["Stone"]
 
 [[cards]]
@@ -187,6 +197,7 @@ image-number = 1347487814
 rarity = "Rare"
 art-owned = true
 card-number = 11
+w1-rank = 479
 resonance = ["Tide", "Stone"]
 subtype = ""
 
@@ -203,6 +214,7 @@ image-number = 1047769090
 rarity = "Common"
 art-owned = true
 card-number = 12
+w1-rank = 7
 
 [[cards]]
 name = "Glimpse of Infinity"
@@ -218,6 +230,7 @@ image-number = 2191235671
 rarity = "Legendary"
 art-owned = true
 card-number = 13
+w1-rank = 39
 spark = ""
 
 [[cards]]
@@ -231,6 +244,7 @@ image-number = 1798514908
 rarity = "Uncommon"
 art-owned = true
 card-number = 14
+w1-rank = 178
 subtype = ""
 spark = ""
 
@@ -248,6 +262,7 @@ image-number = 2424248089
 rarity = "Common"
 art-owned = true
 card-number = 15
+w1-rank = 297
 resonance = ["Tide", "Stone"]
 
 [[cards]]
@@ -266,6 +281,7 @@ image-number = 2295991863
 rarity = "Rare"
 art-owned = true
 card-number = 16
+w1-rank = 60
 resonance = ["Stone"]
 
 [[cards]]
@@ -284,6 +300,7 @@ image-number = 1633431265
 rarity = "Common"
 art-owned = true
 card-number = 17
+w1-rank = 334
 resonance = ["Tide"]
 
 [[cards]]
@@ -299,6 +316,7 @@ image-number = 1200949222
 rarity = "Rare"
 art-owned = true
 card-number = 18
+w1-rank = 480
 subtype = ""
 spark = ""
 
@@ -316,6 +334,7 @@ image-number = 1486924802
 rarity = "Uncommon"
 art-owned = true
 card-number = 19
+w1-rank = 179
 resonance = ["Tide"]
 
 [[cards]]
@@ -331,6 +350,7 @@ image-number = 1074377570
 rarity = "Rare"
 art-owned = true
 card-number = 20
+w1-rank = 398
 
 [[cards]]
 name = "Starsea Traveler"
@@ -351,6 +371,7 @@ image-number = 1084620233
 rarity = "Rare"
 art-owned = true
 card-number = 21
+w1-rank = 92
 resonance = ["Stone"]
 
 [[cards]]
@@ -370,6 +391,7 @@ image-number = 2216124455
 rarity = "Common"
 art-owned = true
 card-number = 22
+w1-rank = 364
 resonance = ["Flame"]
 
 [[cards]]
@@ -386,6 +408,7 @@ image-number = 2278837661
 rarity = "Common"
 art-owned = true
 card-number = 23
+w1-rank = 113
 resonance = ["Stone"]
 subtype = ""
 spark = ""
@@ -404,6 +427,7 @@ image-number = 1907487244
 rarity = "Common"
 art-owned = true
 card-number = 24
+w1-rank = 198
 subtype = ""
 spark = ""
 
@@ -422,6 +446,7 @@ image-number = 1639942840
 rarity = "Rare"
 art-owned = true
 card-number = 25
+w1-rank = 335
 resonance = ["Tide"]
 
 [[cards]]
@@ -438,6 +463,7 @@ image-number = 695511787
 rarity = "Uncommon"
 art-owned = true
 card-number = 26
+w1-rank = 221
 resonance = ["Tide"]
 
 [[cards]]
@@ -454,6 +480,7 @@ image-number = 700254508
 rarity = "Rare"
 art-owned = true
 card-number = 27
+w1-rank = 481
 resonance = ["Stone", "Tide"]
 
 [[cards]]
@@ -474,6 +501,7 @@ image-number = 2290648807
 rarity = "Common"
 art-owned = true
 card-number = 28
+w1-rank = 126
 resonance = ["Tide"]
 
 [[cards]]
@@ -491,6 +519,7 @@ image-number = 1577968036
 rarity = "Uncommon"
 art-owned = true
 card-number = 29
+w1-rank = 446
 resonance = ["Stone"]
 
 [[cards]]
@@ -507,6 +536,7 @@ image-number = 2027158301
 rarity = "Common"
 art-owned = true
 card-number = 30
+w1-rank = 33
 resonance = ["Flame"]
 
 [[cards]]
@@ -524,6 +554,7 @@ image-number = 2427491215
 rarity = "Rare"
 art-owned = true
 card-number = 31
+w1-rank = 340
 resonance = ["Flame"]
 
 [[cards]]
@@ -540,6 +571,7 @@ image-number = 1794244549
 rarity = "Common"
 art-owned = true
 card-number = 32
+w1-rank = 18
 resonance = ["Flame"]
 
 [[cards]]
@@ -557,6 +589,7 @@ image-number = 2186149279
 rarity = "Rare"
 art-owned = true
 card-number = 33
+w1-rank = 319
 resonance = ["Thunder"]
 
 [[cards]]
@@ -573,6 +606,7 @@ image-number = 1897537156
 rarity = "Uncommon"
 art-owned = true
 card-number = 34
+w1-rank = 22
 resonance = ["Flame"]
 
 [[cards]]
@@ -587,6 +621,7 @@ image-number = 1788833078
 rarity = "Uncommon"
 art-owned = true
 card-number = 35
+w1-rank = 75
 resonance = ["Flame"]
 subtype = ""
 spark = ""
@@ -607,6 +642,7 @@ image-number = 1798382140
 rarity = "Common"
 art-owned = true
 card-number = 36
+w1-rank = 8
 resonance = ["Flame"]
 
 [[cards]]
@@ -626,6 +662,7 @@ image-number = 2127752120
 rarity = "Rare"
 art-owned = true
 card-number = 37
+w1-rank = 433
 resonance = ["Flame"]
 
 [[cards]]
@@ -640,6 +677,7 @@ image-number = 2033123279
 rarity = "Uncommon"
 art-owned = true
 card-number = 38
+w1-rank = 180
 subtype = ""
 spark = ""
 resonance = ["Thunder"]
@@ -656,6 +694,7 @@ image-number = 1708315387
 rarity = "Uncommon"
 art-owned = true
 card-number = 39
+w1-rank = 40
 resonance = ["Flame"]
 subtype = ""
 spark = ""
@@ -671,6 +710,7 @@ image-number = 2521694541
 rarity = "Common"
 art-owned = true
 card-number = 40
+w1-rank = 256
 resonance = ["Thunder"]
 subtype = ""
 spark = ""
@@ -687,6 +727,7 @@ image-number = 2303852059
 rarity = "Common"
 art-owned = true
 card-number = 41
+w1-rank = 67
 resonance = ["Flame", "Stone"]
 subtype = ""
 spark = ""
@@ -703,6 +744,7 @@ image-number = 1570031575
 rarity = "Uncommon"
 art-owned = true
 card-number = 42
+w1-rank = 24
 resonance = ["Flame"]
 subtype = ""
 spark = ""
@@ -723,6 +765,7 @@ image-number = 1798514896
 rarity = "Common"
 art-owned = true
 card-number = 43
+w1-rank = 98
 resonance = ["Flame"]
 
 [[cards]]
@@ -741,6 +784,7 @@ image-number = 2521694547
 rarity = "Rare"
 art-owned = true
 card-number = 44
+w1-rank = 36
 resonance = ["Tide"]
 
 [[cards]]
@@ -757,6 +801,7 @@ image-number = 2216124451
 rarity = "Common"
 art-owned = true
 card-number = 45
+w1-rank = 16
 resonance = ["Flame"]
 
 [[cards]]
@@ -772,6 +817,7 @@ image-number = 1104412877
 rarity = "Legendary"
 art-owned = true
 card-number = 46
+w1-rank = 5
 
 [[cards]]
 name = "Bloomweaver"
@@ -790,6 +836,7 @@ image-number = 1790126246
 rarity = "Common"
 art-owned = true
 card-number = 47
+w1-rank = 2
 resonance = ["Flame"]
 
 [[cards]]
@@ -807,6 +854,7 @@ image-number = 1913887483
 rarity = "Common"
 art-owned = true
 card-number = 48
+w1-rank = 13
 resonance = ["Flame"]
 
 [[cards]]
@@ -826,6 +874,7 @@ image-number = 2131591275
 rarity = "Rare"
 art-owned = true
 card-number = 49
+w1-rank = 142
 resonance = ["Stone"]
 
 [[cards]]
@@ -844,6 +893,7 @@ image-number = 1289324164
 rarity = "Uncommon"
 art-owned = true
 card-number = 50
+w1-rank = 19
 resonance = ["Flame"]
 
 [[cards]]
@@ -860,6 +910,7 @@ image-number = 1785274670
 rarity = "Common"
 art-owned = true
 card-number = 51
+w1-rank = 3
 resonance = ["Flame", "Stone"]
 
 [[cards]]
@@ -876,6 +927,7 @@ image-number = 2287054239
 rarity = "Rare"
 art-owned = true
 card-number = 52
+w1-rank = 245
 resonance = ["Flame"]
 
 [[cards]]
@@ -893,6 +945,7 @@ image-number = 1295291155
 rarity = "Uncommon"
 art-owned = true
 card-number = 53
+w1-rank = 406
 resonance = ["Flame"]
 
 [[cards]]
@@ -910,6 +963,7 @@ image-number = 2293194529
 rarity = "Uncommon"
 art-owned = true
 card-number = 54
+w1-rank = 62
 resonance = ["Flame"]
 
 [[cards]]
@@ -928,6 +982,7 @@ image-number = 2218612343
 rarity = "Common"
 art-owned = true
 card-number = 55
+w1-rank = 1
 resonance = ["Flame"]
 
 [[cards]]
@@ -945,6 +1000,7 @@ image-number = 1794244543
 rarity = "Common"
 art-owned = true
 card-number = 56
+w1-rank = 246
 resonance = ["Stone"]
 
 [[cards]]
@@ -961,6 +1017,7 @@ image-number = 1891048570
 rarity = "Common"
 art-owned = true
 card-number = 57
+w1-rank = 10
 resonance = ["Flame", "Stone"]
 
 [[cards]]
@@ -977,6 +1034,7 @@ image-number = 1289324101
 rarity = "Uncommon"
 art-owned = true
 card-number = 58
+w1-rank = 28
 resonance = ["Flame", "Stone"]
 
 [[cards]]
@@ -993,6 +1051,7 @@ image-number = 2278837663
 rarity = "Rare"
 art-owned = true
 card-number = 59
+w1-rank = 15
 resonance = ["Flame", "Stone"]
 
 [[cards]]
@@ -1010,6 +1069,7 @@ image-number = 1164289078
 rarity = "Uncommon"
 art-owned = true
 card-number = 60
+w1-rank = 181
 resonance = ["Thunder"]
 subtype = ""
 spark = ""
@@ -1029,6 +1089,7 @@ image-number = 2258761881
 rarity = "Uncommon"
 art-owned = true
 card-number = 61
+w1-rank = 95
 resonance = ["Thunder"]
 subtype = ""
 spark = ""
@@ -1047,6 +1108,7 @@ image-number = 2123360837
 rarity = "Common"
 art-owned = true
 card-number = 62
+w1-rank = 99
 resonance = ["Thunder"]
 subtype = ""
 spark = ""
@@ -1063,6 +1125,7 @@ image-number = 2221518875
 rarity = "Uncommon"
 art-owned = true
 card-number = 63
+w1-rank = 249
 resonance = ["Tide"]
 subtype = ""
 spark = ""
@@ -1079,6 +1142,7 @@ image-number = 2030910791
 rarity = "Uncommon"
 art-owned = true
 card-number = 64
+w1-rank = 152
 resonance = ["Tide"]
 subtype = ""
 spark = ""
@@ -1098,6 +1162,7 @@ image-number = 2027158295
 rarity = "Uncommon"
 art-owned = true
 card-number = 65
+w1-rank = 93
 resonance = ["Thunder"]
 subtype = ""
 spark = ""
@@ -1113,6 +1178,7 @@ image-number = 1463121788
 rarity = "Rare"
 art-owned = true
 card-number = 66
+w1-rank = 144
 resonance = ["Thunder"]
 subtype = ""
 spark = ""
@@ -1129,6 +1195,7 @@ image-number = 1282908322
 rarity = "Common"
 art-owned = true
 card-number = 67
+w1-rank = 48
 resonance = ["Thunder"]
 subtype = ""
 spark = ""
@@ -1150,6 +1217,7 @@ image-number = 1328168243
 rarity = "Common"
 art-owned = true
 card-number = 68
+w1-rank = 30
 subtype = ""
 spark = ""
 
@@ -1167,6 +1235,7 @@ image-number = 2023111787
 rarity = "Uncommon"
 art-owned = false
 card-number = 69
+w1-rank = 153
 resonance = ["Stone"]
 subtype = ""
 spark = ""
@@ -1188,6 +1257,7 @@ image-number = 1794244546
 rarity = "Uncommon"
 art-owned = false
 card-number = 70
+w1-rank = 84
 resonance = ["Thunder"]
 
 [[cards]]
@@ -1205,6 +1275,7 @@ image-number = 316023560
 rarity = "Rare"
 art-owned = false
 card-number = 71
+w1-rank = 290
 resonance = ["Flame"]
 
 [[cards]]
@@ -1226,6 +1297,7 @@ image-number = 443761822
 rarity = "Rare"
 art-owned = false
 card-number = 72
+w1-rank = 298
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -1244,6 +1316,7 @@ image-number = 2275146333
 rarity = "Uncommon"
 art-owned = false
 card-number = 73
+w1-rank = 336
 
 [[cards]]
 name = "Astral Navigators"
@@ -1260,6 +1333,7 @@ image-number = 2278837659
 rarity = "Common"
 art-owned = false
 card-number = 74
+w1-rank = 413
 
 [[cards]]
 name = "Boundless Wanderer"
@@ -1280,6 +1354,7 @@ image-number = 2191235661
 rarity = "Common"
 art-owned = false
 card-number = 75
+w1-rank = 61
 
 [[cards]]
 name = "Sage of the Prelude"
@@ -1296,6 +1371,7 @@ image-number = 1084620026
 rarity = "Common"
 art-owned = false
 card-number = 76
+w1-rank = 337
 resonance = ["Thunder"]
 
 [[cards]]
@@ -1312,6 +1388,7 @@ image-number = 1005938032
 rarity = "Common"
 art-owned = false
 card-number = 77
+w1-rank = 414
 resonance = ["Thunder"]
 
 [[cards]]
@@ -1329,6 +1406,7 @@ image-number = 1074373424
 rarity = "Rare"
 art-owned = false
 card-number = 78
+w1-rank = 434
 resonance = ["Thunder", "Tide"]
 
 [[cards]]
@@ -1348,6 +1426,7 @@ image-number = 2320845229
 rarity = "Rare"
 art-owned = false
 card-number = 79
+w1-rank = 470
 resonance = ["Flame"]
 
 [[cards]]
@@ -1365,6 +1444,7 @@ image-number = 744309595
 rarity = "Common"
 art-owned = false
 card-number = 80
+w1-rank = 182
 resonance = ["Thunder"]
 
 [[cards]]
@@ -1384,6 +1464,7 @@ image-number = 1790126252
 rarity = "Rare"
 art-owned = false
 card-number = 81
+w1-rank = 85
 resonance = ["Thunder"]
 
 [[cards]]
@@ -1400,6 +1481,7 @@ image-number = 2131591273
 rarity = "Common"
 art-owned = false
 card-number = 82
+w1-rank = 247
 resonance = ["Tide"]
 subtype = ""
 spark = ""
@@ -1419,6 +1501,7 @@ image-number = 2212744819
 rarity = "Common"
 art-owned = false
 card-number = 83
+w1-rank = 227
 resonance = ["Thunder"]
 
 [[cards]]
@@ -1436,6 +1519,7 @@ image-number = 1047769036
 rarity = "Common"
 art-owned = false
 card-number = 84
+w1-rank = 435
 resonance = ["Thunder"]
 
 [[cards]]
@@ -1454,6 +1538,7 @@ image-number = 1044240499
 rarity = "Uncommon"
 art-owned = false
 card-number = 85
+w1-rank = 269
 resonance = ["Tide"]
 
 [[cards]]
@@ -1472,6 +1557,7 @@ image-number = 1725212353
 rarity = "Uncommon"
 art-owned = false
 card-number = 86
+w1-rank = 222
 resonance = ["Stone"]
 
 [[cards]]
@@ -1485,6 +1571,7 @@ image-number = 1021646686
 rarity = "Legendary"
 art-owned = false
 card-number = 87
+w1-rank = 31
 subtype = ""
 spark = ""
 
@@ -1502,6 +1589,7 @@ image-number = 1149594743
 rarity = "Common"
 art-owned = false
 card-number = 88
+w1-rank = 207
 subtype = ""
 spark = ""
 resonance = ["Thunder"]
@@ -1521,6 +1609,7 @@ image-number = 1016596177
 rarity = "Rare"
 art-owned = false
 card-number = 89
+w1-rank = 183
 resonance = ["Thunder"]
 
 [[cards]]
@@ -1536,6 +1625,7 @@ image-number = 2430444889
 rarity = "Rare"
 art-owned = false
 card-number = 90
+w1-rank = 287
 resonance = ["Tide", "Thunder"]
 subtype = ""
 spark = ""
@@ -1553,6 +1643,7 @@ image-number = 1798514905
 rarity = "Uncommon"
 art-owned = false
 card-number = 91
+w1-rank = 82
 resonance = ["Tide"]
 subtype = ""
 spark = ""
@@ -1574,6 +1665,7 @@ image-number = 2027158298
 rarity = "Uncommon"
 art-owned = false
 card-number = 92
+w1-rank = 436
 resonance = ["Tide", "Thunder"]
 
 [[cards]]
@@ -1590,6 +1682,7 @@ image-number = 1739438657
 rarity = "Uncommon"
 art-owned = false
 card-number = 93
+w1-rank = 353
 resonance = ["Tide", "Thunder"]
 subtype = ""
 spark = ""
@@ -1609,6 +1702,7 @@ image-number = 1196004052
 rarity = "Common"
 art-owned = false
 card-number = 94
+w1-rank = 448
 resonance = ["Tide", "Thunder"]
 subtype = ""
 spark = ""
@@ -1627,6 +1721,7 @@ image-number = 1005938023
 rarity = "Rare"
 art-owned = false
 card-number = 95
+w1-rank = 472
 resonance = ["Stone", "Tide"]
 subtype = ""
 spark = ""
@@ -1644,6 +1739,7 @@ image-number = 670293475
 rarity = "Common"
 art-owned = false
 card-number = 96
+w1-rank = 159
 resonance = ["Tide"]
 subtype = ""
 spark = ""
@@ -1660,6 +1756,7 @@ image-number = 717263302
 rarity = "Uncommon"
 art-owned = false
 card-number = 97
+w1-rank = 248
 resonance = ["Tide"]
 subtype = ""
 spark = ""
@@ -1678,6 +1775,7 @@ image-number = 2186149269
 rarity = "Common"
 art-owned = false
 card-number = 98
+w1-rank = 407
 resonance = ["Stone"]
 subtype = ""
 spark = ""
@@ -1696,6 +1794,7 @@ image-number = 1968259702
 rarity = "Uncommon"
 art-owned = false
 card-number = 99
+w1-rank = 41
 resonance = ["Thunder"]
 subtype = ""
 spark = ""
@@ -1713,6 +1812,7 @@ image-number = 758082493
 rarity = "Legendary"
 art-owned = false
 card-number = 100
+w1-rank = 27
 subtype = ""
 spark = ""
 
@@ -1731,6 +1831,7 @@ image-number = 2251144881
 rarity = "Common"
 art-owned = false
 card-number = 101
+w1-rank = 354
 resonance = ["Tide"]
 
 [[cards]]
@@ -1747,6 +1848,7 @@ image-number = 2221822101
 rarity = "Uncommon"
 art-owned = false
 card-number = 102
+w1-rank = 437
 resonance = ["Tide"]
 
 [[cards]]
@@ -1764,6 +1866,7 @@ image-number = 1063277315
 rarity = "Uncommon"
 art-owned = false
 card-number = 103
+w1-rank = 228
 resonance = ["Thunder"]
 subtype = ""
 spark = ""
@@ -1781,6 +1884,7 @@ image-number = 1314287447
 rarity = "Uncommon"
 art-owned = false
 card-number = 104
+w1-rank = 71
 resonance = ["Thunder"]
 subtype = ""
 spark = ""
@@ -1798,6 +1902,7 @@ image-number = 1529898278
 rarity = "Uncommon"
 art-owned = false
 card-number = 105
+w1-rank = 392
 resonance = ["Tide"]
 subtype = ""
 spark = ""
@@ -1817,6 +1922,7 @@ image-number = 1084619579
 rarity = "Common"
 art-owned = false
 card-number = 106
+w1-rank = 72
 subtype = ""
 spark = ""
 
@@ -1835,6 +1941,7 @@ image-number = 1728839131
 rarity = "Common"
 art-owned = false
 card-number = 107
+w1-rank = 267
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -1853,6 +1960,7 @@ image-number = 1005938035
 rarity = "Rare"
 art-owned = false
 card-number = 108
+w1-rank = 241
 resonance = ["Tide", "Thunder"]
 
 [[cards]]
@@ -1866,6 +1974,7 @@ image-number = 1480584617
 rarity = "Rare"
 art-owned = false
 card-number = 109
+w1-rank = 438
 subtype = ""
 spark = ""
 
@@ -1884,6 +1993,7 @@ image-number = 1164289066
 rarity = "Common"
 art-owned = false
 card-number = 110
+w1-rank = 45
 subtype = ""
 spark = ""
 resonance = ["Thunder"]
@@ -1903,6 +2013,7 @@ image-number = 2155438703
 rarity = "Uncommon"
 art-owned = false
 card-number = 111
+w1-rank = 100
 resonance = ["Stone"]
 subtype = ""
 spark = ""
@@ -1920,6 +2031,7 @@ image-number = 2018053223
 rarity = "Uncommon"
 art-owned = false
 card-number = 112
+w1-rank = 146
 resonance = ["Stone"]
 subtype = ""
 spark = ""
@@ -1938,6 +2050,7 @@ image-number = 1786390157
 rarity = "Uncommon"
 art-owned = false
 card-number = 113
+w1-rank = 449
 subtype = ""
 spark = ""
 resonance = ["Stone"]
@@ -1958,6 +2071,7 @@ image-number = 1739438660
 rarity = "Common"
 art-owned = false
 card-number = 114
+w1-rank = 154
 resonance = ["Stone"]
 subtype = ""
 spark = ""
@@ -1974,6 +2088,7 @@ image-number = 1042405558
 rarity = "Uncommon"
 art-owned = false
 card-number = 115
+w1-rank = 250
 resonance = ["Thunder"]
 subtype = ""
 spark = ""
@@ -1992,6 +2107,7 @@ image-number = 1798382125
 rarity = "Uncommon"
 art-owned = false
 card-number = 116
+w1-rank = 184
 resonance = ["Tide"]
 subtype = ""
 spark = ""
@@ -2010,6 +2126,7 @@ image-number = 1924168811
 rarity = "Common"
 art-owned = false
 card-number = 117
+w1-rank = 341
 resonance = ["Tide"]
 subtype = ""
 spark = ""
@@ -2030,6 +2147,7 @@ image-number = 1963305277
 rarity = "Common"
 art-owned = false
 card-number = 118
+w1-rank = 399
 resonance = ["Tide"]
 
 [[cards]]
@@ -2044,6 +2162,7 @@ image-number = 1058321690
 rarity = "Uncommon"
 art-owned = false
 card-number = 119
+w1-rank = 70
 resonance = ["Thunder"]
 subtype = ""
 spark = ""
@@ -2063,6 +2182,7 @@ image-number = 2023111784
 rarity = "Uncommon"
 art-owned = false
 card-number = 120
+w1-rank = 229
 resonance = ["Tide", "Thunder"]
 
 [[cards]]
@@ -2081,6 +2201,7 @@ image-number = 2419795159
 rarity = "Rare"
 art-owned = false
 card-number = 121
+w1-rank = 104
 resonance = ["Flame"]
 
 [[cards]]
@@ -2098,6 +2219,7 @@ image-number = 1734025934
 rarity = "Rare"
 art-owned = false
 card-number = 122
+w1-rank = 291
 resonance = ["Thunder", "Flame"]
 
 [[cards]]
@@ -2114,6 +2236,7 @@ image-number = 2293194521
 rarity = "Uncommon"
 art-owned = false
 card-number = 123
+w1-rank = 42
 resonance = ["Flame"]
 subtype = ""
 spark = ""
@@ -2134,6 +2257,7 @@ image-number = 2127752129
 rarity = "Common"
 art-owned = false
 card-number = 124
+w1-rank = 415
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2151,6 +2275,7 @@ image-number = 2127752123
 rarity = "Common"
 art-owned = false
 card-number = 125
+w1-rank = 208
 resonance = ["Flame"]
 
 [[cards]]
@@ -2169,6 +2294,7 @@ image-number = 1529898275
 rarity = "Uncommon"
 art-owned = false
 card-number = 126
+w1-rank = 120
 resonance = ["Flame"]
 
 [[cards]]
@@ -2186,6 +2312,7 @@ image-number = 2123360855
 rarity = "Rare"
 art-owned = false
 card-number = 127
+w1-rank = 270
 resonance = ["Thunder", "Flame"]
 
 [[cards]]
@@ -2202,6 +2329,7 @@ image-number = 2221822105
 rarity = "Common"
 art-owned = false
 card-number = 128
+w1-rank = 387
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2218,6 +2346,7 @@ image-number = 529374502
 rarity = "Common"
 art-owned = false
 card-number = 129
+w1-rank = 314
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2235,6 +2364,7 @@ image-number = 2303852065
 rarity = "Uncommon"
 art-owned = false
 card-number = 130
+w1-rank = 271
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2249,6 +2379,7 @@ image-number = 1913887486
 rarity = "Rare"
 art-owned = false
 card-number = 131
+w1-rank = 482
 resonance = ["Thunder", "Flame"]
 subtype = ""
 spark = ""
@@ -2269,6 +2400,7 @@ image-number = 2027158304
 rarity = "Rare"
 art-owned = false
 card-number = 132
+w1-rank = 484
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2284,6 +2416,7 @@ image-number = 1037215606
 rarity = "Uncommon"
 art-owned = false
 card-number = 133
+w1-rank = 416
 resonance = ["Flame"]
 subtype = ""
 spark = ""
@@ -2304,6 +2437,7 @@ image-number = 1134692546
 rarity = "Common"
 art-owned = false
 card-number = 134
+w1-rank = 209
 resonance = ["Flame"]
 
 [[cards]]
@@ -2322,6 +2456,7 @@ image-number = 1543022372
 rarity = "Uncommon"
 art-owned = false
 card-number = 135
+w1-rank = 355
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2338,6 +2473,7 @@ image-number = 1727859040
 rarity = "Uncommon"
 art-owned = false
 card-number = 136
+w1-rank = 400
 resonance = ["Thunder", "Flame"]
 
 [[cards]]
@@ -2356,6 +2492,7 @@ image-number = 2303852061
 rarity = "Common"
 art-owned = false
 card-number = 137
+w1-rank = 417
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2374,6 +2511,7 @@ image-number = 1047769120
 rarity = "Common"
 art-owned = false
 card-number = 138
+w1-rank = 315
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2396,6 +2534,7 @@ image-number = 410444914
 rarity = "Uncommon"
 art-owned = false
 card-number = 139
+w1-rank = 408
 resonance = ["Tide"]
 
 [[cards]]
@@ -2414,6 +2553,7 @@ image-number = 717263287
 rarity = "Common"
 art-owned = false
 card-number = 140
+w1-rank = 304
 resonance = ["Flame"]
 
 [[cards]]
@@ -2431,6 +2571,7 @@ image-number = 447372529
 rarity = "Common"
 art-owned = false
 card-number = 141
+w1-rank = 310
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2447,6 +2588,7 @@ image-number = 1169640025
 rarity = "Common"
 art-owned = false
 card-number = 142
+w1-rank = 342
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2467,6 +2609,7 @@ image-number = 1723965970
 rarity = "Uncommon"
 art-owned = false
 card-number = 143
+w1-rank = 439
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2487,6 +2630,7 @@ image-number = 2278837667
 rarity = "Uncommon"
 art-owned = false
 card-number = 144
+w1-rank = 343
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2503,6 +2647,7 @@ image-number = 2022594416
 rarity = "Uncommon"
 art-owned = false
 card-number = 145
+w1-rank = 401
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2520,6 +2665,7 @@ image-number = 726444853
 rarity = "Uncommon"
 art-owned = false
 card-number = 146
+w1-rank = 464
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2537,6 +2683,7 @@ image-number = 2022594419
 rarity = "Uncommon"
 art-owned = false
 card-number = 147
+w1-rank = 237
 resonance = ["Flame"]
 
 [[cards]]
@@ -2554,6 +2701,7 @@ image-number = 2285036623
 rarity = "Rare"
 art-owned = false
 card-number = 148
+w1-rank = 283
 resonance = ["Flame"]
 
 [[cards]]
@@ -2571,6 +2719,7 @@ image-number = 2287436067
 rarity = "Uncommon"
 art-owned = false
 card-number = 149
+w1-rank = 360
 resonance = ["Stone"]
 
 [[cards]]
@@ -2588,6 +2737,7 @@ image-number = 2256745747
 rarity = "Rare"
 art-owned = false
 card-number = 150
+w1-rank = 140
 resonance = ["Flame"]
 
 [[cards]]
@@ -2605,6 +2755,7 @@ image-number = 2025883232
 rarity = "Rare"
 art-owned = false
 card-number = 151
+w1-rank = 305
 resonance = ["Flame"]
 
 [[cards]]
@@ -2621,6 +2772,7 @@ image-number = 2155438705
 rarity = "Uncommon"
 art-owned = false
 card-number = 152
+w1-rank = 374
 resonance = ["Flame"]
 
 [[cards]]
@@ -2639,6 +2791,7 @@ image-number = 1726923523
 rarity = "Uncommon"
 art-owned = false
 card-number = 153
+w1-rank = 238
 resonance = ["Flame"]
 
 [[cards]]
@@ -2656,6 +2809,7 @@ image-number = 2212744813
 rarity = "Common"
 art-owned = false
 card-number = 154
+w1-rank = 43
 resonance = ["Flame"]
 subtype = ""
 spark = ""
@@ -2675,6 +2829,7 @@ image-number = 1727859046
 rarity = "Uncommon"
 art-owned = false
 card-number = 155
+w1-rank = 251
 resonance = ["Thunder"]
 
 [[cards]]
@@ -2690,6 +2845,7 @@ image-number = 1991802455
 rarity = "Rare"
 art-owned = false
 card-number = 156
+w1-rank = 25
 resonance = ["Flame"]
 subtype = ""
 spark = ""
@@ -2710,6 +2866,7 @@ image-number = 1037215528
 rarity = "Uncommon"
 art-owned = false
 card-number = 157
+w1-rank = 86
 resonance = ["Flame"]
 
 [[cards]]
@@ -2726,6 +2883,7 @@ image-number = 753489193
 rarity = "Uncommon"
 art-owned = false
 card-number = 158
+w1-rank = 440
 resonance = ["Flame", "Thunder"]
 
 [[cards]]
@@ -2744,6 +2902,7 @@ image-number = 1109402492
 rarity = "Common"
 art-owned = false
 card-number = 159
+w1-rank = 230
 resonance = ["Flame"]
 
 [[cards]]
@@ -2762,6 +2921,7 @@ image-number = 618071684
 rarity = "Rare"
 art-owned = false
 card-number = 160
+w1-rank = 32
 resonance = ["Tide"]
 subtype = ""
 spark = ""
@@ -2778,6 +2938,7 @@ image-number = 1239919309
 rarity = "Uncommon"
 art-owned = true
 card-number = 161
+w1-rank = 185
 resonance = ["Thunder"]
 subtype = ""
 spark = ""
@@ -2794,6 +2955,7 @@ image-number = 2182865325
 rarity = "Common"
 art-owned = false
 card-number = 162
+w1-rank = 257
 subtype = ""
 spark = ""
 
@@ -2813,6 +2975,7 @@ image-number = 1730836234
 rarity = "Rare"
 art-owned = false
 card-number = 163
+w1-rank = 127
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -2829,6 +2992,7 @@ image-number = 2299755789
 rarity = "Uncommon"
 art-owned = false
 card-number = 164
+w1-rank = 418
 subtype = ""
 spark = ""
 
@@ -2846,6 +3010,7 @@ image-number = 712713373
 rarity = "Uncommon"
 art-owned = false
 card-number = 165
+w1-rank = 49
 resonance = ["Flame"]
 
 [[cards]]
@@ -2862,6 +3027,7 @@ image-number = 1793552422
 rarity = "Rare"
 art-owned = false
 card-number = 166
+w1-rank = 239
 resonance = ["Flame"]
 
 [[cards]]
@@ -2876,6 +3042,7 @@ image-number = 2285036625
 rarity = "Uncommon"
 art-owned = false
 card-number = 167
+w1-rank = 87
 resonance = ["Flame", "Thunder"]
 subtype = ""
 spark = ""
@@ -2896,6 +3063,7 @@ image-number = 2287054241
 rarity = "Common"
 art-owned = false
 card-number = 168
+w1-rank = 223
 resonance = ["Flame"]
 
 [[cards]]
@@ -2914,6 +3082,7 @@ image-number = 2216124449
 rarity = "Rare"
 art-owned = false
 card-number = 169
+w1-rank = 66
 resonance = ["Flame"]
 
 [[cards]]
@@ -2929,6 +3098,7 @@ image-number = 1798382143
 rarity = "Common"
 art-owned = false
 card-number = 170
+w1-rank = 382
 resonance = ["Tide"]
 subtype = ""
 spark = ""
@@ -2947,6 +3117,7 @@ image-number = 2216124453
 rarity = "Common"
 art-owned = false
 card-number = 171
+w1-rank = 471
 resonance = ["Stone"]
 
 [[cards]]
@@ -2964,6 +3135,7 @@ image-number = 2258761879
 rarity = "Common"
 art-owned = false
 card-number = 172
+w1-rank = 388
 resonance = ["Stone"]
 
 [[cards]]
@@ -2980,6 +3152,7 @@ image-number = 2123360834
 rarity = "Common"
 art-owned = false
 card-number = 173
+w1-rank = 465
 resonance = ["Stone"]
 
 [[cards]]
@@ -3000,6 +3173,7 @@ image-number = 2025883229
 rarity = "Rare"
 art-owned = false
 card-number = 174
+w1-rank = 344
 resonance = ["Stone"]
 
 [[cards]]
@@ -3017,6 +3191,7 @@ image-number = 2438838891
 rarity = "Uncommon"
 art-owned = false
 card-number = 175
+w1-rank = 272
 resonance = ["Stone"]
 
 [[cards]]
@@ -3037,6 +3212,7 @@ image-number = 1913887480
 rarity = "Uncommon"
 art-owned = false
 card-number = 176
+w1-rank = 402
 resonance = ["Stone"]
 
 [[cards]]
@@ -3054,6 +3230,7 @@ image-number = 2303852063
 rarity = "Common"
 art-owned = false
 card-number = 177
+w1-rank = 427
 resonance = ["Stone"]
 
 [[cards]]
@@ -3071,6 +3248,7 @@ image-number = 691496698
 rarity = "Uncommon"
 art-owned = false
 card-number = 178
+w1-rank = 231
 resonance = ["Stone"]
 
 [[cards]]
@@ -3090,6 +3268,7 @@ image-number = 1727859043
 rarity = "Rare"
 art-owned = false
 card-number = 179
+w1-rank = 252
 resonance = ["Stone"]
 
 [[cards]]
@@ -3107,6 +3286,7 @@ image-number = 2258761883
 rarity = "Uncommon"
 art-owned = false
 card-number = 180
+w1-rank = 405
 resonance = ["Stone"]
 
 [[cards]]
@@ -3124,6 +3304,7 @@ image-number = 2287054243
 rarity = "Rare"
 art-owned = false
 card-number = 181
+w1-rank = 375
 resonance = ["Stone"]
 
 [[cards]]
@@ -3141,6 +3322,7 @@ image-number = 1252796545
 rarity = "Uncommon"
 art-owned = false
 card-number = 182
+w1-rank = 160
 resonance = ["Stone"]
 
 [[cards]]
@@ -3157,6 +3339,7 @@ image-number = 1104412604
 rarity = "Rare"
 art-owned = false
 card-number = 183
+w1-rank = 107
 resonance = ["Stone", "Tide"]
 
 [[cards]]
@@ -3175,6 +3358,7 @@ image-number = 1114007978
 rarity = "Uncommon"
 art-owned = false
 card-number = 184
+w1-rank = 199
 resonance = ["Stone"]
 
 [[cards]]
@@ -3192,6 +3376,7 @@ image-number = 2123360843
 rarity = "Uncommon"
 art-owned = false
 card-number = 185
+w1-rank = 419
 resonance = ["Stone"]
 
 [[cards]]
@@ -3209,6 +3394,7 @@ image-number = 512756368
 rarity = "Uncommon"
 art-owned = false
 card-number = 186
+w1-rank = 478
 resonance = ["Stone", "Tide"]
 
 [[cards]]
@@ -3226,6 +3412,7 @@ image-number = 457875892
 rarity = "Common"
 art-owned = false
 card-number = 187
+w1-rank = 345
 resonance = ["Stone"]
 
 [[cards]]
@@ -3242,6 +3429,7 @@ image-number = 1902130345
 rarity = "Uncommon"
 art-owned = false
 card-number = 188
+w1-rank = 389
 resonance = ["Stone"]
 
 [[cards]]
@@ -3261,6 +3449,7 @@ image-number = 2155438695
 rarity = "Rare"
 art-owned = false
 card-number = 189
+w1-rank = 161
 resonance = ["Stone"]
 subtype = ""
 spark = ""
@@ -3283,6 +3472,7 @@ image-number = 1971751580
 rarity = "Rare"
 art-owned = false
 card-number = 190
+w1-rank = 338
 resonance = ["Stone"]
 
 [[cards]]
@@ -3300,6 +3490,7 @@ image-number = 789291004
 rarity = "Rare"
 art-owned = false
 card-number = 191
+w1-rank = 420
 resonance = ["Stone", "Tide"]
 
 [[cards]]
@@ -3314,6 +3505,7 @@ image-number = 1790126243
 rarity = "Rare"
 art-owned = false
 card-number = 192
+w1-rank = 303
 resonance = ["Stone"]
 subtype = ""
 spark = ""
@@ -3332,6 +3524,7 @@ image-number = 2197688373
 rarity = "Common"
 art-owned = false
 card-number = 193
+w1-rank = 320
 resonance = ["Stone"]
 
 [[cards]]
@@ -3348,6 +3541,7 @@ image-number = 1557999812
 rarity = "Common"
 art-owned = false
 card-number = 194
+w1-rank = 210
 resonance = ["Stone"]
 
 [[cards]]
@@ -3365,6 +3559,7 @@ image-number = 1798382134
 rarity = "Uncommon"
 art-owned = false
 card-number = 195
+w1-rank = 37
 resonance = ["Stone"]
 
 [[cards]]
@@ -3381,6 +3576,7 @@ image-number = 2131591277
 rarity = "Rare"
 art-owned = false
 card-number = 196
+w1-rank = 429
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -3397,6 +3593,7 @@ image-number = 1626794383
 rarity = "Rare"
 art-owned = false
 card-number = 197
+w1-rank = 121
 resonance = ["Stone"]
 
 [[cards]]
@@ -3415,6 +3612,7 @@ image-number = 1633431256
 rarity = "Common"
 art-owned = false
 card-number = 198
+w1-rank = 211
 resonance = ["Stone"]
 
 [[cards]]
@@ -3432,6 +3630,7 @@ image-number = 1639942843
 rarity = "Common"
 art-owned = false
 card-number = 199
+w1-rank = 114
 resonance = ["Stone"]
 
 [[cards]]
@@ -3448,6 +3647,7 @@ image-number = 1180104511
 rarity = "Rare"
 art-owned = false
 card-number = 200
+w1-rank = 105
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -3466,6 +3666,7 @@ image-number = 2290648803
 rarity = "Common"
 art-owned = false
 card-number = 201
+w1-rank = 284
 resonance = ["Stone"]
 
 [[cards]]
@@ -3484,6 +3685,7 @@ image-number = 1740270992
 rarity = "Uncommon"
 art-owned = false
 card-number = 202
+w1-rank = 26
 resonance = ["Stone"]
 
 [[cards]]
@@ -3503,6 +3705,7 @@ image-number = 753489184
 rarity = "Uncommon"
 art-owned = false
 card-number = 203
+w1-rank = 224
 resonance = ["Flame"]
 
 [[cards]]
@@ -3521,6 +3724,7 @@ image-number = 2123360849
 rarity = "Uncommon"
 art-owned = false
 card-number = 204
+w1-rank = 68
 resonance = ["Flame"]
 
 [[cards]]
@@ -3536,6 +3740,7 @@ image-number = 1785274679
 rarity = "Common"
 art-owned = false
 card-number = 205
+w1-rank = 268
 subtype = ""
 spark = ""
 resonance = ["Flame"]
@@ -3555,6 +3760,7 @@ image-number = 2131591279
 rarity = "Uncommon"
 art-owned = false
 card-number = 206
+w1-rank = 301
 resonance = ["Flame"]
 
 [[cards]]
@@ -3571,6 +3777,7 @@ image-number = 1991802452
 rarity = "Uncommon"
 art-owned = false
 card-number = 207
+w1-rank = 273
 resonance = ["Stone"]
 
 [[cards]]
@@ -3587,6 +3794,7 @@ image-number = 529374445
 rarity = "Common"
 art-owned = false
 card-number = 208
+w1-rank = 232
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -3601,6 +3809,7 @@ image-number = 1470059006
 rarity = "Common"
 art-owned = false
 card-number = 209
+w1-rank = 186
 resonance = ["Stone", "Flame"]
 subtype = ""
 spark = ""
@@ -3621,6 +3830,7 @@ image-number = 439817032
 rarity = "Rare"
 art-owned = false
 card-number = 210
+w1-rank = 76
 resonance = ["Stone"]
 subtype = ""
 spark = ""
@@ -3642,6 +3852,7 @@ image-number = 678431950
 rarity = "Rare"
 art-owned = false
 card-number = 211
+w1-rank = 321
 resonance = ["Stone", "Tide"]
 
 [[cards]]
@@ -3660,6 +3871,7 @@ image-number = 454095982
 rarity = "Rare"
 art-owned = false
 card-number = 212
+w1-rank = 56
 resonance = ["Stone"]
 subtype = ""
 spark = ""
@@ -3678,6 +3890,7 @@ image-number = 708313726
 rarity = "Rare"
 art-owned = false
 card-number = 213
+w1-rank = 381
 resonance = ["Tide"]
 subtype = ""
 spark = ""
@@ -3696,6 +3909,7 @@ image-number = 1026869440
 rarity = "Uncommon"
 art-owned = false
 card-number = 214
+w1-rank = 69
 resonance = ["Stone"]
 
 [[cards]]
@@ -3712,6 +3926,7 @@ image-number = 489056605
 rarity = "Uncommon"
 art-owned = true
 card-number = 215
+w1-rank = 162
 subtype = ""
 spark = ""
 
@@ -3728,6 +3943,7 @@ image-number = 1794244540
 rarity = "Common"
 art-owned = true
 card-number = 216
+w1-rank = 322
 
 [[cards]]
 name = "Sundown Surfer"
@@ -3743,6 +3959,7 @@ image-number = 403770319
 rarity = "Uncommon"
 art-owned = true
 card-number = 217
+w1-rank = 254
 resonance = ["Thunder"]
 
 [[cards]]
@@ -3761,6 +3978,7 @@ image-number = 644603677
 rarity = "Rare"
 art-owned = true
 card-number = 218
+w1-rank = 430
 resonance = ["Tide"]
 subtype = ""
 spark = ""
@@ -3782,6 +4000,7 @@ image-number = 1200949264
 rarity = "Uncommon"
 art-owned = true
 card-number = 219
+w1-rank = 97
 subtype = ""
 spark = ""
 resonance = ["Thunder"]
@@ -3800,6 +4019,7 @@ image-number = 1621160806
 rarity = "Common"
 art-owned = true
 card-number = 220
+w1-rank = 299
 resonance = ["Thunder"]
 subtype = ""
 spark = ""
@@ -3814,6 +4034,7 @@ image-number = 313783940
 rarity = "Special"
 art-owned = true
 card-number = 221
+w1-rank = 483
 resonance = ["Stone"]
 card-type = "Event"
 subtype = ""
@@ -3830,6 +4051,7 @@ image-number = 1486924805
 rarity = "Special"
 art-owned = true
 card-number = 222
+w1-rank = 485
 subtype = ""
 spark = ""
 
@@ -3848,6 +4070,7 @@ image-number = 682942714
 rarity = "Uncommon"
 art-owned = false
 card-number = 223
+w1-rank = 50
 resonance = ["Tide"]
 
 [[cards]]
@@ -3865,6 +4088,7 @@ image-number = 1334747702
 rarity = "Rare"
 art-owned = false
 card-number = 224
+w1-rank = 187
 resonance = ["Tide"]
 
 [[cards]]
@@ -3882,6 +4106,7 @@ image-number = 1725212356
 rarity = "Uncommon"
 art-owned = false
 card-number = 225
+w1-rank = 188
 resonance = ["Tide"]
 
 [[cards]]
@@ -3900,6 +4125,7 @@ image-number = 1913887477
 rarity = "Rare"
 art-owned = false
 card-number = 226
+w1-rank = 90
 resonance = ["Tide"]
 
 [[cards]]
@@ -3920,6 +4146,7 @@ image-number = 686903110
 rarity = "Rare"
 art-owned = false
 card-number = 227
+w1-rank = 233
 resonance = ["Tide"]
 
 [[cards]]
@@ -3940,6 +4167,7 @@ image-number = 730423171
 rarity = "Rare"
 art-owned = false
 card-number = 228
+w1-rank = 137
 resonance = ["Tide"]
 
 [[cards]]
@@ -3960,6 +4188,7 @@ image-number = 735242560
 rarity = "Rare"
 art-owned = false
 card-number = 229
+w1-rank = 292
 resonance = ["Flame"]
 
 [[cards]]
@@ -3980,6 +4209,7 @@ image-number = 450441277
 rarity = "Rare"
 art-owned = false
 card-number = 230
+w1-rank = 459
 resonance = ["Tide"]
 
 [[cards]]
@@ -3996,6 +4226,7 @@ image-number = 2320845233
 rarity = "Uncommon"
 art-owned = false
 card-number = 231
+w1-rank = 147
 resonance = ["Tide"]
 
 [[cards]]
@@ -4012,6 +4243,7 @@ image-number = 653554000
 rarity = "Common"
 art-owned = false
 card-number = 232
+w1-rank = 110
 resonance = ["Thunder"]
 
 [[cards]]
@@ -4028,6 +4260,7 @@ image-number = 1557999815
 rarity = "Common"
 art-owned = false
 card-number = 233
+w1-rank = 155
 resonance = ["Tide"]
 
 [[cards]]
@@ -4047,6 +4280,7 @@ image-number = 1213574263
 rarity = "Rare"
 art-owned = false
 card-number = 234
+w1-rank = 253
 resonance = ["Thunder"]
 
 [[cards]]
@@ -4064,6 +4298,7 @@ image-number = 695511784
 rarity = "Common"
 art-owned = false
 card-number = 235
+w1-rank = 115
 resonance = ["Thunder"]
 
 [[cards]]
@@ -4081,6 +4316,7 @@ image-number = 608687453
 rarity = "Common"
 art-owned = false
 card-number = 236
+w1-rank = 200
 resonance = ["Stone"]
 
 [[cards]]
@@ -4099,6 +4335,7 @@ image-number = 658075711
 rarity = "Rare"
 art-owned = false
 card-number = 237
+w1-rank = 323
 resonance = ["Stone"]
 
 [[cards]]
@@ -4115,6 +4352,7 @@ image-number = 2421338075
 rarity = "Common"
 art-owned = false
 card-number = 238
+w1-rank = 34
 resonance = ["Stone"]
 
 [[cards]]
@@ -4135,6 +4373,7 @@ image-number = 2293194527
 rarity = "Rare"
 art-owned = false
 card-number = 239
+w1-rank = 128
 resonance = ["Tide"]
 
 [[cards]]
@@ -4155,6 +4394,7 @@ image-number = 1798514914
 rarity = "Rare"
 art-owned = false
 card-number = 240
+w1-rank = 64
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -4172,6 +4412,7 @@ image-number = 1790126255
 rarity = "Common"
 art-owned = false
 card-number = 241
+w1-rank = 4
 resonance = ["Stone"]
 
 [[cards]]
@@ -4192,6 +4433,7 @@ image-number = 454095514
 rarity = "Rare"
 art-owned = false
 card-number = 242
+w1-rank = 240
 resonance = ["Tide"]
 
 [[cards]]
@@ -4209,6 +4451,7 @@ image-number = 596070029
 rarity = "Common"
 art-owned = false
 card-number = 244
+w1-rank = 274
 resonance = ["Flame"]
 
 [[cards]]
@@ -4226,6 +4469,7 @@ image-number = 695511856
 rarity = "Common"
 art-owned = false
 card-number = 245
+w1-rank = 11
 resonance = ["Thunder"]
 
 [[cards]]
@@ -4243,6 +4487,7 @@ image-number = 565499662
 rarity = "Common"
 art-owned = false
 card-number = 246
+w1-rank = 21
 resonance = ["Thunder"]
 
 [[cards]]
@@ -4260,6 +4505,7 @@ image-number = 1159163608
 rarity = "Uncommon"
 art-owned = false
 card-number = 247
+w1-rank = 38
 resonance = ["Stone"]
 
 [[cards]]
@@ -4277,6 +4523,7 @@ image-number = 712713571
 rarity = "Common"
 art-owned = false
 card-number = 248
+w1-rank = 302
 resonance = ["Tide"]
 
 [[cards]]
@@ -4296,6 +4543,7 @@ image-number = 758082490
 rarity = "Rare"
 art-owned = false
 card-number = 249
+w1-rank = 369
 resonance = ["Tide"]
 
 [[cards]]
@@ -4310,6 +4558,7 @@ image-number = 603547835
 rarity = "Common"
 art-owned = false
 card-number = 250
+w1-rank = 189
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -4327,6 +4576,7 @@ image-number = 596070053
 rarity = "Uncommon"
 art-owned = false
 card-number = 251
+w1-rank = 108
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -4344,6 +4594,7 @@ image-number = 748957522
 rarity = "Uncommon"
 art-owned = false
 card-number = 252
+w1-rank = 275
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -4360,6 +4611,7 @@ image-number = 313784348
 rarity = "Common"
 art-owned = false
 card-number = 253
+w1-rank = 361
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -4376,6 +4628,7 @@ image-number = 465449534
 rarity = "Uncommon"
 art-owned = false
 card-number = 254
+w1-rank = 293
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -4393,6 +4646,7 @@ image-number = 1926604868
 rarity = "Rare"
 art-owned = false
 card-number = 255
+w1-rank = 91
 subtype = ""
 spark = ""
 resonance = ["Stone"]
@@ -4410,6 +4664,7 @@ image-number = 2018848970
 rarity = "Rare"
 art-owned = false
 card-number = 256
+w1-rank = 55
 subtype = ""
 spark = ""
 resonance = ["Stone"]
@@ -4427,6 +4682,7 @@ image-number = 2424248087
 rarity = "Rare"
 art-owned = false
 card-number = 257
+w1-rank = 101
 subtype = ""
 spark = ""
 resonance = ["Stone"]
@@ -4446,6 +4702,7 @@ image-number = 533945275
 rarity = "Uncommon"
 art-owned = false
 card-number = 258
+w1-rank = 201
 subtype = ""
 spark = ""
 resonance = ["Stone"]
@@ -4463,6 +4720,7 @@ image-number = 439817434
 rarity = "Uncommon"
 art-owned = false
 card-number = 259
+w1-rank = 255
 subtype = ""
 spark = ""
 resonance = ["Stone"]
@@ -4479,6 +4737,7 @@ image-number = 603547391
 rarity = "Common"
 art-owned = false
 card-number = 260
+w1-rank = 383
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -4498,6 +4757,7 @@ image-number = 2212744815
 rarity = "Uncommon"
 art-owned = false
 card-number = 261
+w1-rank = 324
 resonance = ["Tide"]
 
 [[cards]]
@@ -4514,6 +4774,7 @@ image-number = 485518159
 rarity = "Uncommon"
 art-owned = false
 card-number = 262
+w1-rank = 431
 resonance = ["Stone"]
 
 [[cards]]
@@ -4531,6 +4792,7 @@ image-number = 762927766
 rarity = "Common"
 art-owned = false
 card-number = 263
+w1-rank = 346
 resonance = ["Tide"]
 
 [[cards]]
@@ -4548,6 +4810,7 @@ image-number = 1200949225
 rarity = "Uncommon"
 art-owned = false
 card-number = 264
+w1-rank = 163
 resonance = ["Stone", "Tide"]
 
 [[cards]]
@@ -4565,6 +4828,7 @@ image-number = 608687435
 rarity = "Uncommon"
 art-owned = false
 card-number = 265
+w1-rank = 276
 resonance = ["Flame", "Tide"]
 
 [[cards]]
@@ -4580,6 +4844,7 @@ image-number = 662452573
 rarity = "Common"
 art-owned = false
 card-number = 266
+w1-rank = 347
 
 [[cards]]
 name = "Rainbow Static Burst"
@@ -4597,6 +4862,7 @@ image-number = 1047769081
 rarity = "Rare"
 art-owned = false
 card-number = 267
+w1-rank = 88
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -4614,6 +4880,7 @@ image-number = 1785274667
 rarity = "Common"
 art-owned = false
 card-number = 268
+w1-rank = 51
 subtype = ""
 spark = ""
 
@@ -4630,6 +4897,7 @@ image-number = 1798382131
 rarity = "Common"
 art-owned = false
 card-number = 269
+w1-rank = 46
 subtype = ""
 spark = ""
 
@@ -4645,6 +4913,7 @@ image-number = 2033123270
 rarity = "Common"
 art-owned = false
 card-number = 270
+w1-rank = 29
 subtype = ""
 spark = ""
 
@@ -4660,6 +4929,7 @@ image-number = 539227204
 rarity = "Common"
 art-owned = false
 card-number = 271
+w1-rank = 190
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -4677,6 +4947,7 @@ image-number = 529374478
 rarity = "Common"
 art-owned = false
 card-number = 272
+w1-rank = 77
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -4693,6 +4964,7 @@ image-number = 721324504
 rarity = "Common"
 art-owned = false
 card-number = 273
+w1-rank = 277
 subtype = ""
 spark = ""
 
@@ -4709,6 +4981,7 @@ image-number = 492981766
 rarity = "Uncommon"
 art-owned = false
 card-number = 274
+w1-rank = 325
 subtype = ""
 spark = ""
 resonance = ["Stone", "Tide"]
@@ -4731,6 +5004,7 @@ image-number = 539226502
 rarity = "Rare"
 art-owned = false
 card-number = 275
+w1-rank = 116
 resonance = ["Stone"]
 
 [[cards]]
@@ -4750,6 +5024,7 @@ image-number = 2438838889
 rarity = "Rare"
 art-owned = false
 card-number = 276
+w1-rank = 164
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -4766,6 +5041,7 @@ image-number = 461706637
 rarity = "Common"
 art-owned = false
 card-number = 277
+w1-rank = 393
 resonance = ["Stone"]
 
 [[cards]]
@@ -4783,6 +5059,7 @@ image-number = 658076071
 rarity = "Uncommon"
 art-owned = false
 card-number = 278
+w1-rank = 212
 resonance = ["Stone"]
 
 [[cards]]
@@ -4800,6 +5077,7 @@ image-number = 1626794386
 rarity = "Uncommon"
 art-owned = false
 card-number = 279
+w1-rank = 106
 resonance = ["Stone", "Tide"]
 
 [[cards]]
@@ -4818,6 +5096,7 @@ image-number = 519475333
 rarity = "Rare"
 art-owned = false
 card-number = 280
+w1-rank = 78
 subtype = ""
 spark = ""
 resonance = ["Stone", "Tide"]
@@ -4834,6 +5113,7 @@ image-number = 678431875
 rarity = "Common"
 art-owned = false
 card-number = 281
+w1-rank = 213
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -4851,6 +5131,7 @@ image-number = 2123360840
 rarity = "Uncommon"
 art-owned = false
 card-number = 282
+w1-rank = 191
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -4868,6 +5149,7 @@ image-number = 1383318404
 rarity = "Common"
 art-owned = false
 card-number = 283
+w1-rank = 326
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -4885,6 +5167,7 @@ image-number = 478671385
 rarity = "Common"
 art-owned = false
 card-number = 284
+w1-rank = 117
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -4902,6 +5185,7 @@ image-number = 631097747
 rarity = "Common"
 art-owned = false
 card-number = 285
+w1-rank = 258
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -4921,6 +5205,7 @@ image-number = 703988173
 rarity = "Uncommon"
 art-owned = false
 card-number = 286
+w1-rank = 394
 resonance = ["Stone", "Tide"]
 
 [[cards]]
@@ -4938,6 +5223,7 @@ image-number = 1021646680
 rarity = "Common"
 art-owned = false
 card-number = 287
+w1-rank = 327
 resonance = ["Stone"]
 
 [[cards]]
@@ -4955,6 +5241,7 @@ image-number = 461706976
 rarity = "Common"
 art-owned = false
 card-number = 288
+w1-rank = 395
 resonance = ["Tide"]
 
 [[cards]]
@@ -4972,6 +5259,7 @@ image-number = 591626954
 rarity = "Common"
 art-owned = false
 card-number = 289
+w1-rank = 20
 resonance = ["Tide"]
 
 [[cards]]
@@ -4989,6 +5277,7 @@ image-number = 571228792
 rarity = "Uncommon"
 art-owned = false
 card-number = 290
+w1-rank = 148
 resonance = ["Thunder"]
 
 [[cards]]
@@ -5009,6 +5298,7 @@ image-number = 1968259699
 rarity = "Rare"
 art-owned = false
 card-number = 291
+w1-rank = 288
 resonance = ["Flame"]
 
 [[cards]]
@@ -5026,6 +5316,7 @@ image-number = 603547823
 rarity = "Common"
 art-owned = false
 card-number = 292
+w1-rank = 328
 resonance = ["Flame"]
 
 [[cards]]
@@ -5043,6 +5334,7 @@ image-number = 443761774
 rarity = "Common"
 art-owned = false
 card-number = 293
+w1-rank = 384
 resonance = ["Stone"]
 
 [[cards]]
@@ -5059,6 +5351,7 @@ image-number = 2275146325
 rarity = "Uncommon"
 art-owned = false
 card-number = 294
+w1-rank = 329
 resonance = ["Thunder"]
 
 [[cards]]
@@ -5076,6 +5369,7 @@ image-number = 1950881317
 rarity = "Rare"
 art-owned = false
 card-number = 295
+w1-rank = 476
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -5091,6 +5385,7 @@ image-number = 1621160803
 rarity = "Common"
 art-owned = false
 card-number = 296
+w1-rank = 65
 subtype = ""
 spark = ""
 resonance = ["Thunder"]
@@ -5108,6 +5403,7 @@ image-number = 635276567
 rarity = "Common"
 art-owned = false
 card-number = 297
+w1-rank = 165
 subtype = ""
 spark = ""
 resonance = ["Stone"]
@@ -5124,6 +5420,7 @@ image-number = 1129012508
 rarity = "Common"
 art-owned = false
 card-number = 298
+w1-rank = 396
 subtype = ""
 spark = ""
 resonance = ["Flame"]
@@ -5140,6 +5437,7 @@ image-number = 1302572578
 rarity = "Uncommon"
 art-owned = false
 card-number = 299
+w1-rank = 311
 subtype = ""
 spark = ""
 resonance = ["Stone"]
@@ -5159,6 +5457,7 @@ image-number = 1109402234
 rarity = "Common"
 art-owned = false
 card-number = 300
+w1-rank = 385
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -5176,6 +5475,7 @@ image-number = 2191235669
 rarity = "Common"
 art-owned = false
 card-number = 301
+w1-rank = 466
 resonance = ["Tide"]
 
 [[cards]]
@@ -5193,6 +5493,7 @@ image-number = 2212744817
 rarity = "Rare"
 art-owned = false
 card-number = 302
+w1-rank = 166
 resonance = ["Stone", "Tide"]
 
 [[cards]]
@@ -5210,6 +5511,7 @@ image-number = 2197688369
 rarity = "Uncommon"
 art-owned = false
 card-number = 303
+w1-rank = 281
 resonance = ["Tide"]
 
 [[cards]]
@@ -5227,6 +5529,7 @@ image-number = 2197688371
 rarity = "Uncommon"
 art-owned = false
 card-number = 304
+w1-rank = 421
 resonance = ["Thunder", "Tide"]
 
 [[cards]]
@@ -5244,6 +5547,7 @@ image-number = 436090600
 rarity = "Common"
 art-owned = false
 card-number = 305
+w1-rank = 122
 resonance = ["Flame"]
 
 [[cards]]
@@ -5258,6 +5562,7 @@ image-number = 1361568698
 rarity = "Common"
 art-owned = false
 card-number = 306
+w1-rank = 149
 subtype = ""
 spark = ""
 resonance = ["Flame"]
@@ -5278,6 +5583,7 @@ image-number = 410444920
 rarity = "Rare"
 art-owned = false
 card-number = 307
+w1-rank = 362
 subtype = ""
 spark = ""
 resonance = ["Flame"]
@@ -5296,6 +5602,7 @@ image-number = 2364396767
 rarity = "Uncommon"
 art-owned = false
 card-number = 308
+w1-rank = 386
 resonance = ["Thunder"]
 
 [[cards]]
@@ -5312,6 +5619,7 @@ image-number = 1498497890
 rarity = "Uncommon"
 art-owned = false
 card-number = 309
+w1-rank = 467
 resonance = ["Thunder"]
 
 [[cards]]
@@ -5329,6 +5637,7 @@ image-number = 1232455276
 rarity = "Uncommon"
 art-owned = false
 card-number = 310
+w1-rank = 477
 resonance = ["Thunder"]
 
 [[cards]]
@@ -5346,6 +5655,7 @@ image-number = 499788403
 rarity = "Uncommon"
 art-owned = false
 card-number = 311
+w1-rank = 9
 resonance = ["Stone"]
 
 [[cards]]
@@ -5363,6 +5673,7 @@ image-number = 2430444885
 rarity = "Rare"
 art-owned = false
 card-number = 312
+w1-rank = 23
 resonance = ["Flame"]
 
 [[cards]]
@@ -5379,6 +5690,7 @@ image-number = 2127752117
 rarity = "Common"
 art-owned = false
 card-number = 313
+w1-rank = 259
 resonance = ["Thunder"]
 
 [[cards]]
@@ -5396,6 +5708,7 @@ image-number = 1185684769
 rarity = "Uncommon"
 art-owned = false
 card-number = 314
+w1-rank = 356
 resonance = ["Stone"]
 
 [[cards]]
@@ -5410,6 +5723,7 @@ image-number = 1402715894
 rarity = "Common"
 art-owned = false
 card-number = 315
+w1-rank = 192
 subtype = ""
 spark = ""
 resonance = ["Thunder"]
@@ -5427,6 +5741,7 @@ image-number = 1185684766
 rarity = "Common"
 art-owned = false
 card-number = 316
+w1-rank = 294
 subtype = ""
 spark = ""
 
@@ -5446,6 +5761,7 @@ image-number = 658076065
 rarity = "Rare"
 art-owned = false
 card-number = 317
+w1-rank = 74
 resonance = ["Flame", "Thunder"]
 
 [[cards]]
@@ -5463,6 +5779,7 @@ image-number = 2433164311
 rarity = "Uncommon"
 art-owned = false
 card-number = 318
+w1-rank = 52
 resonance = ["Flame", "Thunder"]
 
 [[cards]]
@@ -5477,6 +5794,7 @@ image-number = 1354127294
 rarity = "Common"
 art-owned = false
 card-number = 319
+w1-rank = 422
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -5495,6 +5813,7 @@ image-number = 1104412427
 rarity = "Uncommon"
 art-owned = false
 card-number = 320
+w1-rank = 73
 resonance = ["Thunder"]
 
 [[cards]]
@@ -5511,6 +5830,7 @@ image-number = 789290995
 rarity = "Common"
 art-owned = false
 card-number = 321
+w1-rank = 150
 resonance = ["Thunder", "Tide"]
 
 [[cards]]
@@ -5527,6 +5847,7 @@ image-number = 662452588
 rarity = "Common"
 art-owned = false
 card-number = 322
+w1-rank = 403
 resonance = ["Thunder", "Tide"]
 
 [[cards]]
@@ -5545,6 +5866,7 @@ image-number = 591627044
 rarity = "Rare"
 art-owned = false
 card-number = 323
+w1-rank = 371
 resonance = ["Tide"]
 
 [[cards]]
@@ -5562,6 +5884,7 @@ image-number = 1159163521
 rarity = "Rare"
 art-owned = false
 card-number = 324
+w1-rank = 423
 resonance = ["Thunder"]
 
 [[cards]]
@@ -5577,6 +5900,7 @@ image-number = 686903113
 rarity = "Uncommon"
 art-owned = false
 card-number = 325
+w1-rank = 285
 subtype = ""
 spark = ""
 resonance = ["Stone"]
@@ -5598,6 +5922,7 @@ image-number = 1480584620
 rarity = "Rare"
 art-owned = false
 card-number = 326
+w1-rank = 214
 resonance = ["Flame", "Thunder"]
 
 [[cards]]
@@ -5618,6 +5943,7 @@ image-number = 2415692455
 rarity = "Rare"
 art-owned = false
 card-number = 327
+w1-rank = 215
 resonance = ["Stone", "Tide"]
 
 [[cards]]
@@ -5635,6 +5961,7 @@ image-number = 529374832
 rarity = "Rare"
 art-owned = false
 card-number = 328
+w1-rank = 295
 resonance = ["Thunder"]
 
 [[cards]]
@@ -5650,6 +5977,7 @@ image-number = 772547356
 rarity = "Common"
 art-owned = false
 card-number = 329
+w1-rank = 135
 subtype = ""
 spark = ""
 resonance = ["Flame"]
@@ -5667,6 +5995,7 @@ image-number = 686903233
 rarity = "Common"
 art-owned = false
 card-number = 330
+w1-rank = 167
 subtype = ""
 spark = ""
 resonance = ["Thunder", "Tide"]
@@ -5685,6 +6014,7 @@ image-number = 1897537153
 rarity = "Uncommon"
 art-owned = false
 card-number = 331
+w1-rank = 348
 subtype = ""
 spark = ""
 resonance = ["Flame"]
@@ -5702,6 +6032,7 @@ image-number = 793083754
 rarity = "Common"
 art-owned = false
 card-number = 332
+w1-rank = 260
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -5719,6 +6050,7 @@ image-number = 439817017
 rarity = "Common"
 art-owned = false
 card-number = 333
+w1-rank = 118
 subtype = ""
 spark = ""
 
@@ -5738,6 +6070,7 @@ image-number = 443761825
 rarity = "Uncommon"
 art-owned = false
 card-number = 334
+w1-rank = 409
 resonance = ["Stone"]
 subtype = ""
 spark = ""
@@ -5754,6 +6087,7 @@ image-number = 581686486
 rarity = "Rare"
 art-owned = false
 card-number = 335
+w1-rank = 473
 resonance = ["Flame"]
 subtype = ""
 spark = ""
@@ -5772,6 +6106,7 @@ image-number = 1016596165
 rarity = "Common"
 art-owned = false
 card-number = 336
+w1-rank = 202
 
 [[cards]]
 name = "Blastwave Runner"
@@ -5787,6 +6122,7 @@ image-number = 1694993299
 rarity = "Rare"
 art-owned = false
 card-number = 337
+w1-rank = 63
 resonance = ["Thunder"]
 
 [[cards]]
@@ -5803,6 +6139,7 @@ image-number = 2424248083
 rarity = "Rare"
 art-owned = false
 card-number = 338
+w1-rank = 216
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -5819,6 +6156,7 @@ image-number = 519475327
 rarity = "Common"
 art-owned = false
 card-number = 339
+w1-rank = 349
 resonance = ["Stone", "Tide"]
 
 [[cards]]
@@ -5833,6 +6171,7 @@ image-number = 586115630
 rarity = "Common"
 art-owned = false
 card-number = 341
+w1-rank = 129
 resonance = ["Flame"]
 subtype = ""
 spark = ""
@@ -5851,6 +6190,7 @@ image-number = 2025883235
 rarity = "Rare"
 art-owned = false
 card-number = 343
+w1-rank = 410
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -5865,6 +6205,7 @@ image-number = 644603227
 rarity = "Common"
 art-owned = false
 card-number = 344
+w1-rank = 350
 subtype = ""
 spark = ""
 resonance = ["Stone", "Flame"]
@@ -5883,6 +6224,7 @@ image-number = 586115303
 rarity = "Common"
 art-owned = false
 card-number = 349
+w1-rank = 168
 subtype = ""
 spark = ""
 
@@ -5899,6 +6241,7 @@ image-number = 334049255
 rarity = "Common"
 art-owned = false
 card-number = 350
+w1-rank = 441
 subtype = ""
 spark = ""
 resonance = ["Stone", "Tide"]
@@ -5915,6 +6258,7 @@ image-number = 323698610
 rarity = "Uncommon"
 art-owned = false
 card-number = 351
+w1-rank = 130
 subtype = ""
 spark = ""
 resonance = ["Flame"]
@@ -5934,6 +6278,7 @@ image-number = 2427491219
 rarity = "Rare"
 art-owned = false
 card-number = 352
+w1-rank = 156
 resonance = ["Flame"]
 
 [[cards]]
@@ -5951,6 +6296,7 @@ image-number = 2123360858
 rarity = "Uncommon"
 art-owned = false
 card-number = 354
+w1-rank = 111
 resonance = ["Thunder"]
 
 [[cards]]
@@ -5967,6 +6313,7 @@ image-number = 2295991865
 rarity = "Uncommon"
 art-owned = false
 card-number = 355
+w1-rank = 17
 resonance = ["Stone"]
 
 [[cards]]
@@ -5981,6 +6328,7 @@ image-number = 1011222388
 rarity = "Common"
 art-owned = false
 card-number = 356
+w1-rank = 391
 subtype = ""
 spark = ""
 resonance = ["Thunder"]
@@ -5999,6 +6347,7 @@ image-number = 533945362
 rarity = "Uncommon"
 art-owned = false
 card-number = 357
+w1-rank = 261
 resonance = ["Tide"]
 
 [[cards]]
@@ -6016,6 +6365,7 @@ image-number = 496761814
 rarity = "Uncommon"
 art-owned = false
 card-number = 358
+w1-rank = 79
 resonance = ["Thunder"]
 
 [[cards]]
@@ -6032,6 +6382,7 @@ image-number = 1258823164
 rarity = "Rare"
 art-owned = false
 card-number = 360
+w1-rank = 468
 resonance = ["Tide"]
 
 [[cards]]
@@ -6048,6 +6399,7 @@ image-number = 1118816066
 rarity = "Rare"
 art-owned = false
 card-number = 361
+w1-rank = 330
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -6062,6 +6414,7 @@ image-number = 2131591271
 rarity = "Uncommon"
 art-owned = false
 card-number = 362
+w1-rank = 244
 subtype = ""
 spark = ""
 resonance = ["Thunder"]
@@ -6077,6 +6430,7 @@ image-number = 1021646677
 rarity = "Rare"
 art-owned = false
 card-number = 363
+w1-rank = 363
 subtype = ""
 spark = ""
 resonance = ["Flame"]
@@ -6095,6 +6449,7 @@ image-number = 596070008
 rarity = "Rare"
 art-owned = false
 card-number = 364
+w1-rank = 424
 
 [[cards]]
 name = "Cloaked Wolfcaller"
@@ -6109,6 +6464,7 @@ image-number = 2293194523
 rarity = "Common"
 art-owned = false
 card-number = 365
+w1-rank = 390
 resonance = ["Thunder"]
 
 [[cards]]
@@ -6126,6 +6482,7 @@ image-number = 1734998174
 rarity = "Uncommon"
 art-owned = false
 card-number = 366
+w1-rank = 193
 resonance = ["Flame", "Thunder"]
 
 [[cards]]
@@ -6143,6 +6500,7 @@ image-number = 539227192
 rarity = "Rare"
 art-owned = false
 card-number = 367
+w1-rank = 47
 
 [[cards]]
 name = "Scrapyard Guardian"
@@ -6158,6 +6516,7 @@ image-number = 1144639382
 rarity = "Common"
 art-owned = false
 card-number = 368
+w1-rank = 318
 resonance = ["Flame"]
 
 [[cards]]
@@ -6174,6 +6533,7 @@ image-number = 2123360831
 rarity = "Rare"
 art-owned = false
 card-number = 369
+w1-rank = 138
 resonance = ["Thunder"]
 
 [[cards]]
@@ -6191,6 +6551,7 @@ image-number = 1037215513
 rarity = "Uncommon"
 art-owned = false
 card-number = 370
+w1-rank = 339
 resonance = ["Stone"]
 
 [[cards]]
@@ -6204,6 +6565,7 @@ image-number = 730423177
 rarity = "Uncommon"
 art-owned = false
 card-number = 372
+w1-rank = 411
 subtype = ""
 spark = ""
 resonance = ["Flame"]
@@ -6220,6 +6582,7 @@ image-number = 492981583
 rarity = "Common"
 art-owned = false
 card-number = 373
+w1-rank = 143
 subtype = ""
 spark = ""
 
@@ -6238,6 +6601,7 @@ image-number = 614473598
 rarity = "Rare"
 art-owned = false
 card-number = 374
+w1-rank = 123
 resonance = ["Thunder"]
 
 [[cards]]
@@ -6255,6 +6619,7 @@ image-number = 686903125
 rarity = "Uncommon"
 art-owned = false
 card-number = 376
+w1-rank = 157
 resonance = ["Thunder"]
 
 [[cards]]
@@ -6271,6 +6636,7 @@ image-number = 1225878700
 rarity = "Uncommon"
 art-owned = false
 card-number = 377
+w1-rank = 312
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -6288,6 +6654,7 @@ image-number = 739472623
 rarity = "Rare"
 art-owned = false
 card-number = 378
+w1-rank = 397
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -6304,6 +6671,7 @@ image-number = 2261959345
 rarity = "Rare"
 art-owned = false
 card-number = 379
+w1-rank = 306
 resonance = ["Flame", "Stone"]
 
 [[cards]]
@@ -6322,6 +6690,7 @@ image-number = 2258761877
 rarity = "Rare"
 art-owned = false
 card-number = 381
+w1-rank = 278
 resonance = ["Flame"]
 
 [[cards]]
@@ -6337,6 +6706,7 @@ image-number = 561496501
 rarity = "Rare"
 art-owned = false
 card-number = 382
+w1-rank = 447
 resonance = ["Tide"]
 
 [[cards]]
@@ -6356,6 +6726,7 @@ image-number = 708313729
 rarity = "Rare"
 art-owned = false
 card-number = 383
+w1-rank = 217
 resonance = ["Flame", "Thunder"]
 
 [[cards]]
@@ -6372,6 +6743,7 @@ image-number = 2438838893
 rarity = "Rare"
 art-owned = false
 card-number = 384
+w1-rank = 225
 resonance = ["Stone"]
 
 [[cards]]
@@ -6388,6 +6760,7 @@ image-number = 735243049
 rarity = "Rare"
 art-owned = false
 card-number = 385
+w1-rank = 124
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -6403,6 +6776,7 @@ image-number = 1739438654
 rarity = "Uncommon"
 art-owned = false
 card-number = 386
+w1-rank = 80
 subtype = ""
 spark = ""
 resonance = ["Stone", "Tide"]
@@ -6423,6 +6797,7 @@ image-number = 581686492
 rarity = "Rare"
 art-owned = false
 card-number = 388
+w1-rank = 44
 subtype = ""
 spark = ""
 resonance = ["Flame"]
@@ -6442,6 +6817,7 @@ image-number = 2261959347
 rarity = "Uncommon"
 art-owned = false
 card-number = 389
+w1-rank = 169
 resonance = ["Flame"]
 
 [[cards]]
@@ -6458,6 +6834,7 @@ image-number = 2430444883
 rarity = "Rare"
 art-owned = false
 card-number = 390
+w1-rank = 203
 subtype = ""
 spark = ""
 resonance = ["Stone"]
@@ -6477,6 +6854,7 @@ image-number = 2127752132
 rarity = "Rare"
 art-owned = false
 card-number = 391
+w1-rank = 370
 resonance = ["Stone"]
 
 [[cards]]
@@ -6494,6 +6872,7 @@ image-number = 1068256454
 rarity = "Rare"
 art-owned = false
 card-number = 392
+w1-rank = 404
 resonance = ["Flame", "Thunder"]
 
 [[cards]]
@@ -6510,6 +6889,7 @@ image-number = 2182865341
 rarity = "Rare"
 art-owned = false
 card-number = 393
+w1-rank = 357
 resonance = ["Tide"]
 
 [[cards]]
@@ -6525,6 +6905,7 @@ image-number = 640097968
 rarity = "Common"
 art-owned = false
 card-number = 394
+w1-rank = 109
 subtype = ""
 spark = ""
 resonance = ["Thunder"]
@@ -6542,6 +6923,7 @@ image-number = 658075714
 rarity = "Common"
 art-owned = false
 card-number = 397
+w1-rank = 170
 subtype = ""
 spark = ""
 
@@ -6559,6 +6941,7 @@ image-number = 1936124587
 rarity = "Uncommon"
 art-owned = false
 card-number = 398
+w1-rank = 412
 resonance = ["Thunder"]
 
 [[cards]]
@@ -6575,6 +6958,7 @@ image-number = 1058321645
 rarity = "Uncommon"
 art-owned = false
 card-number = 399
+w1-rank = 368
 resonance = ["Flame"]
 
 [[cards]]
@@ -6591,6 +6975,7 @@ image-number = 1047769090
 rarity = "Common"
 art-owned = false
 card-number = 400
+w1-rank = 59
 resonance = ["Flame"]
 
 [[cards]]
@@ -6611,6 +6996,7 @@ image-number = 565499326
 rarity = "Rare"
 art-owned = false
 card-number = 401
+w1-rank = 425
 resonance = ["Stone"]
 
 [[cards]]
@@ -6627,6 +7013,7 @@ image-number = 2421338071
 rarity = "Uncommon"
 art-owned = false
 card-number = 402
+w1-rank = 365
 resonance = ["Tide"]
 
 [[cards]]
@@ -6647,6 +7034,7 @@ image-number = 489056962
 rarity = "Rare"
 art-owned = false
 card-number = 403
+w1-rank = 450
 resonance = ["Flame"]
 
 [[cards]]
@@ -6663,6 +7051,7 @@ image-number = 450440626
 rarity = "Uncommon"
 art-owned = false
 card-number = 404
+w1-rank = 313
 resonance = ["Stone"]
 
 [[cards]]
@@ -6678,6 +7067,7 @@ image-number = 2018848973
 rarity = "Rare"
 art-owned = false
 card-number = 406
+w1-rank = 243
 resonance = ["Flame"]
 
 [[cards]]
@@ -6694,6 +7084,7 @@ image-number = 439817041
 rarity = "Common"
 art-owned = false
 card-number = 408
+w1-rank = 451
 resonance = ["Thunder"]
 
 [[cards]]
@@ -6710,6 +7101,7 @@ image-number = 670293673
 rarity = "Uncommon"
 art-owned = false
 card-number = 409
+w1-rank = 204
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -6726,6 +7118,7 @@ image-number = 586115315
 rarity = "Rare"
 art-owned = false
 card-number = 410
+w1-rank = 171
 resonance = ["Tide"]
 
 [[cards]]
@@ -6743,6 +7136,7 @@ image-number = 640098112
 rarity = "Uncommon"
 art-owned = false
 card-number = 411
+w1-rank = 262
 resonance = ["Stone", "Flame"]
 
 [[cards]]
@@ -6759,6 +7153,7 @@ image-number = 1114008224
 rarity = "Rare"
 art-owned = false
 card-number = 412
+w1-rank = 131
 resonance = ["Tide"]
 
 [[cards]]
@@ -6774,6 +7169,7 @@ image-number = 1721490838
 rarity = "Uncommon"
 art-owned = false
 card-number = 413
+w1-rank = 442
 
 [[cards]]
 name = "Watcher of Burning Skies"
@@ -6789,6 +7185,7 @@ image-number = 2419795155
 rarity = "Common"
 art-owned = false
 card-number = 414
+w1-rank = 366
 resonance = ["Tide"]
 
 [[cards]]
@@ -6805,6 +7202,7 @@ image-number = 489056947
 rarity = "Uncommon"
 art-owned = false
 card-number = 415
+w1-rank = 218
 resonance = ["Stone"]
 
 [[cards]]
@@ -6821,6 +7219,7 @@ image-number = 420863818
 rarity = "Rare"
 art-owned = false
 card-number = 416
+w1-rank = 94
 resonance = ["Thunder"]
 
 [[cards]]
@@ -6838,6 +7237,7 @@ image-number = 1109402969
 rarity = "Rare"
 art-owned = false
 card-number = 417
+w1-rank = 289
 resonance = ["Thunder"]
 
 [[cards]]
@@ -6855,6 +7255,7 @@ image-number = 571228789
 rarity = "Rare"
 art-owned = false
 card-number = 418
+w1-rank = 358
 resonance = ["Stone"]
 
 [[cards]]
@@ -6875,6 +7276,7 @@ image-number = 1926604862
 rarity = "Rare"
 art-owned = false
 card-number = 419
+w1-rank = 234
 resonance = ["Flame"]
 
 [[cards]]
@@ -6892,6 +7294,7 @@ image-number = 1340760329
 rarity = "Uncommon"
 art-owned = false
 card-number = 420
+w1-rank = 286
 resonance = ["Flame"]
 
 [[cards]]
@@ -6909,6 +7312,7 @@ image-number = 454095529
 rarity = "Common"
 art-owned = false
 card-number = 421
+w1-rank = 132
 resonance = ["Stone"]
 
 [[cards]]
@@ -6925,6 +7329,7 @@ image-number = 436090582
 rarity = "Rare"
 art-owned = false
 card-number = 422
+w1-rank = 14
 resonance = ["Flame"]
 
 [[cards]]
@@ -6941,6 +7346,7 @@ image-number = 539227177
 rarity = "Uncommon"
 art-owned = false
 card-number = 423
+w1-rank = 194
 resonance = ["Thunder"]
 
 [[cards]]
@@ -6956,6 +7362,7 @@ image-number = 670293463
 rarity = "Rare"
 art-owned = false
 card-number = 424
+w1-rank = 89
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -6974,6 +7381,7 @@ image-number = 2123360852
 rarity = "Rare"
 art-owned = false
 card-number = 425
+w1-rank = 443
 resonance = ["Stone"]
 
 [[cards]]
@@ -6991,6 +7399,7 @@ image-number = 2303852057
 rarity = "Rare"
 art-owned = false
 card-number = 426
+w1-rank = 12
 resonance = ["Stone"]
 
 [[cards]]
@@ -7006,6 +7415,7 @@ image-number = 1786390145
 rarity = "Common"
 art-owned = false
 card-number = 427
+w1-rank = 331
 resonance = ["Tide"]
 
 [[cards]]
@@ -7023,6 +7433,7 @@ image-number = 1328168246
 rarity = "Uncommon"
 art-owned = false
 card-number = 429
+w1-rank = 195
 resonance = ["Stone"]
 
 [[cards]]
@@ -7040,6 +7451,7 @@ image-number = 739472569
 rarity = "Uncommon"
 art-owned = false
 card-number = 430
+w1-rank = 456
 resonance = ["Flame", "Thunder"]
 
 [[cards]]
@@ -7057,6 +7469,7 @@ image-number = 758082487
 rarity = "Rare"
 art-owned = false
 card-number = 431
+w1-rank = 475
 resonance = ["Flame"]
 
 [[cards]]
@@ -7078,6 +7491,7 @@ image-number = 1463121791
 rarity = "Rare"
 art-owned = false
 card-number = 432
+w1-rank = 136
 resonance = ["Flame", "Thunder"]
 
 [[cards]]
@@ -7094,6 +7508,7 @@ image-number = 753489187
 rarity = "Common"
 art-owned = false
 card-number = 433
+w1-rank = 242
 resonance = ["Flame"]
 
 [[cards]]
@@ -7109,6 +7524,7 @@ image-number = 1239919303
 rarity = "Uncommon"
 art-owned = false
 card-number = 434
+w1-rank = 133
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -7126,6 +7542,7 @@ image-number = 700253824
 rarity = "Rare"
 art-owned = false
 card-number = 435
+w1-rank = 282
 subtype = ""
 spark = ""
 resonance = ["Stone", "Flame"]
@@ -7143,6 +7560,7 @@ image-number = 1026869335
 rarity = "Rare"
 art-owned = false
 card-number = 436
+w1-rank = 458
 subtype = ""
 spark = ""
 resonance = ["Flame"]
@@ -7159,6 +7577,7 @@ image-number = 1063277246
 rarity = "Rare"
 art-owned = false
 card-number = 437
+w1-rank = 474
 subtype = ""
 spark = ""
 resonance = ["Stone", "Flame"]
@@ -7178,6 +7597,7 @@ image-number = 2155438711
 rarity = "Uncommon"
 art-owned = false
 card-number = 438
+w1-rank = 219
 resonance = ["Tide"]
 
 [[cards]]
@@ -7195,6 +7615,7 @@ image-number = 612667835
 rarity = "Rare"
 art-owned = false
 card-number = 439
+w1-rank = 96
 resonance = ["Tide"]
 
 [[cards]]
@@ -7212,6 +7633,7 @@ image-number = 1077958364
 rarity = "Uncommon"
 art-owned = false
 card-number = 440
+w1-rank = 279
 resonance = ["Tide"]
 
 [[cards]]
@@ -7229,6 +7651,7 @@ image-number = 425039551
 rarity = "Rare"
 art-owned = false
 card-number = 441
+w1-rank = 54
 resonance = ["Tide"]
 
 [[cards]]
@@ -7246,6 +7669,7 @@ image-number = 447372517
 rarity = "Rare"
 art-owned = false
 card-number = 442
+w1-rank = 57
 resonance = ["Flame", "Thunder"]
 
 [[cards]]
@@ -7266,6 +7690,7 @@ image-number = 450440617
 rarity = "Rare"
 art-owned = false
 card-number = 443
+w1-rank = 444
 resonance = ["Tide", "Stone"]
 
 [[cards]]
@@ -7281,6 +7706,7 @@ image-number = 571228780
 rarity = "Common"
 art-owned = false
 card-number = 444
+w1-rank = 81
 subtype = ""
 spark = ""
 
@@ -7296,6 +7722,7 @@ image-number = 789291013
 rarity = "Common"
 art-owned = false
 card-number = 445
+w1-rank = 469
 subtype = ""
 spark = ""
 
@@ -7312,6 +7739,7 @@ image-number = 1950881314
 rarity = "Common"
 art-owned = false
 card-number = 446
+w1-rank = 53
 subtype = ""
 spark = ""
 
@@ -7327,6 +7755,7 @@ image-number = 1790126249
 rarity = "Common"
 art-owned = false
 card-number = 447
+w1-rank = 457
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -7345,6 +7774,7 @@ image-number = 626543207
 rarity = "Uncommon"
 art-owned = false
 card-number = 448
+w1-rank = 196
 resonance = ["Thunder", "Tide"]
 
 [[cards]]
@@ -7361,6 +7791,7 @@ image-number = 2155438709
 rarity = "Uncommon"
 art-owned = false
 card-number = 449
+w1-rank = 35
 
 [[cards]]
 name = "Acid World Voyager"
@@ -7376,6 +7807,7 @@ image-number = 762927769
 rarity = "Rare"
 art-owned = false
 card-number = 450
+w1-rank = 280
 resonance = ["Flame"]
 
 [[cards]]
@@ -7394,6 +7826,7 @@ image-number = 596070005
 rarity = "Rare"
 art-owned = false
 card-number = 451
+w1-rank = 372
 resonance = ["Flame"]
 
 [[cards]]
@@ -7412,6 +7845,7 @@ image-number = 678431953
 rarity = "Rare"
 art-owned = false
 card-number = 452
+w1-rank = 452
 resonance = ["Stone", "Tide"]
 
 [[cards]]
@@ -7429,6 +7863,7 @@ image-number = 666342238
 rarity = "Rare"
 art-owned = false
 card-number = 453
+w1-rank = 309
 resonance = ["Flame"]
 
 [[cards]]
@@ -7446,6 +7881,7 @@ image-number = 2415692459
 rarity = "Common"
 art-owned = false
 card-number = 454
+w1-rank = 460
 resonance = ["Tide"]
 
 [[cards]]
@@ -7461,6 +7897,7 @@ image-number = 461706646
 rarity = "Common"
 art-owned = false
 card-number = 455
+w1-rank = 172
 subtype = ""
 spark = ""
 
@@ -7479,6 +7916,7 @@ image-number = 735243058
 rarity = "Uncommon"
 art-owned = false
 card-number = 456
+w1-rank = 316
 resonance = ["Tide"]
 
 [[cards]]
@@ -7494,6 +7932,7 @@ image-number = 1387670426
 rarity = "Rare"
 art-owned = false
 card-number = 457
+w1-rank = 376
 resonance = ["Thunder", "Tide"]
 
 [[cards]]
@@ -7511,6 +7950,7 @@ image-number = 1639942837
 rarity = "Common"
 art-owned = false
 card-number = 458
+w1-rank = 307
 resonance = ["Tide"]
 
 [[cards]]
@@ -7527,6 +7967,7 @@ image-number = 1207264102
 rarity = "Rare"
 art-owned = false
 card-number = 459
+w1-rank = 220
 resonance = ["Tide"]
 
 [[cards]]
@@ -7543,6 +7984,7 @@ image-number = 2299755785
 rarity = "Uncommon"
 art-owned = false
 card-number = 460
+w1-rank = 263
 resonance = ["Thunder"]
 
 [[cards]]
@@ -7561,6 +8003,7 @@ image-number = 2131591267
 rarity = "Uncommon"
 art-owned = false
 card-number = 461
+w1-rank = 197
 resonance = ["Thunder", "Tide"]
 
 [[cards]]
@@ -7578,6 +8021,7 @@ image-number = 662452576
 rarity = "Uncommon"
 art-owned = false
 card-number = 462
+w1-rank = 264
 resonance = ["Tide"]
 
 [[cards]]
@@ -7594,6 +8038,7 @@ image-number = 2281682693
 rarity = "Rare"
 art-owned = false
 card-number = 463
+w1-rank = 125
 resonance = ["Tide"]
 
 [[cards]]
@@ -7612,6 +8057,7 @@ image-number = 1511229275
 rarity = "Uncommon"
 art-owned = false
 card-number = 464
+w1-rank = 300
 resonance = ["Flame"]
 
 [[cards]]
@@ -7631,6 +8077,7 @@ image-number = 499788421
 rarity = "Rare"
 art-owned = false
 card-number = 465
+w1-rank = 235
 resonance = ["Flame", "Thunder"]
 
 [[cards]]
@@ -7647,6 +8094,7 @@ image-number = 334049243
 rarity = "Rare"
 art-owned = false
 card-number = 466
+w1-rank = 102
 resonance = ["Tide"]
 
 [[cards]]
@@ -7662,6 +8110,7 @@ image-number = 1190830255
 rarity = "Common"
 art-owned = false
 card-number = 467
+w1-rank = 158
 resonance = ["Flame"]
 
 [[cards]]
@@ -7678,6 +8127,7 @@ image-number = 2127752144
 rarity = "Uncommon"
 art-owned = false
 card-number = 468
+w1-rank = 317
 resonance = ["Thunder"]
 
 [[cards]]
@@ -7694,6 +8144,7 @@ image-number = 515170279
 rarity = "Rare"
 art-owned = false
 card-number = 469
+w1-rank = 119
 resonance = ["Thunder"]
 
 [[cards]]
@@ -7710,6 +8161,7 @@ image-number = 1174403431
 rarity = "Uncommon"
 art-owned = false
 card-number = 470
+w1-rank = 173
 resonance = ["Thunder"]
 
 [[cards]]
@@ -7726,6 +8178,7 @@ image-number = 519475330
 rarity = "Uncommon"
 art-owned = false
 card-number = 471
+w1-rank = 6
 resonance = ["Flame"]
 
 [[cards]]
@@ -7745,6 +8198,7 @@ image-number = 496761802
 rarity = "Uncommon"
 art-owned = false
 card-number = 472
+w1-rank = 265
 resonance = ["Tide"]
 
 [[cards]]
@@ -7764,6 +8218,7 @@ image-number = 511427686
 rarity = "Rare"
 art-owned = false
 card-number = 473
+w1-rank = 432
 resonance = ["Thunder"]
 
 [[cards]]
@@ -7781,6 +8236,7 @@ image-number = 758082499
 rarity = "Rare"
 art-owned = false
 card-number = 474
+w1-rank = 453
 resonance = ["Thunder"]
 
 [[cards]]
@@ -7798,6 +8254,7 @@ image-number = 644603722
 rarity = "Uncommon"
 art-owned = false
 card-number = 475
+w1-rank = 236
 resonance = ["Flame"]
 
 [[cards]]
@@ -7815,6 +8272,7 @@ image-number = 561496489
 rarity = "Rare"
 art-owned = false
 card-number = 476
+w1-rank = 296
 resonance = ["Tide"]
 
 [[cards]]
@@ -7832,6 +8290,7 @@ image-number = 507269506
 rarity = "Rare"
 art-owned = false
 card-number = 477
+w1-rank = 463
 resonance = ["Flame"]
 
 [[cards]]
@@ -7846,6 +8305,7 @@ image-number = 691496713
 rarity = "Common"
 art-owned = false
 card-number = 478
+w1-rank = 174
 subtype = ""
 spark = ""
 resonance = ["Thunder"]
@@ -7862,6 +8322,7 @@ image-number = 1109403383
 rarity = "Rare"
 art-owned = false
 card-number = 479
+w1-rank = 103
 subtype = ""
 spark = ""
 resonance = ["Flame"]
@@ -7881,6 +8342,7 @@ image-number = 1375564451
 rarity = "Rare"
 art-owned = false
 card-number = 480
+w1-rank = 139
 resonance = ["Stone"]
 
 [[cards]]
@@ -7896,6 +8358,7 @@ image-number = 603547829
 rarity = "Uncommon"
 art-owned = false
 card-number = 481
+w1-rank = 380
 resonance = ["Thunder"]
 
 [[cards]]
@@ -7910,6 +8373,7 @@ image-number = 1740270995
 rarity = "Common"
 art-owned = false
 card-number = 482
+w1-rank = 151
 subtype = ""
 spark = ""
 
@@ -7925,6 +8389,7 @@ image-number = 2030910785
 rarity = "Uncommon"
 art-owned = false
 card-number = 483
+w1-rank = 175
 subtype = ""
 spark = ""
 
@@ -7942,6 +8407,7 @@ image-number = 1077959009
 rarity = "Uncommon"
 art-owned = false
 card-number = 484
+w1-rank = 359
 resonance = ["Thunder"]
 
 [[cards]]
@@ -7957,6 +8423,7 @@ image-number = 1733013506
 rarity = "Rare"
 art-owned = false
 card-number = 485
+w1-rank = 454
 subtype = ""
 spark = ""
 
@@ -7971,6 +8438,7 @@ image-number = 2251144877
 rarity = "Rare"
 art-owned = false
 card-number = 486
+w1-rank = 226
 subtype = ""
 spark = ""
 
@@ -7988,6 +8456,7 @@ image-number = 591627038
 rarity = "Common"
 art-owned = false
 card-number = 487
+w1-rank = 141
 resonance = ["Tide"]
 
 [[cards]]
@@ -8005,6 +8474,7 @@ image-number = 565499305
 rarity = "Rare"
 art-owned = false
 card-number = 488
+w1-rank = 462
 resonance = ["Stone"]
 
 [[cards]]
@@ -8022,6 +8492,7 @@ image-number = 700253806
 rarity = "Common"
 art-owned = false
 card-number = 489
+w1-rank = 351
 resonance = ["Thunder", "Tide"]
 
 [[cards]]
@@ -8035,6 +8506,7 @@ image-number = 708313984
 rarity = "Common"
 art-owned = false
 card-number = 490
+w1-rank = 377
 subtype = ""
 spark = ""
 resonance = ["Tide"]
@@ -8053,6 +8525,7 @@ image-number = 1786390151
 rarity = "Common"
 art-owned = false
 card-number = 491
+w1-rank = 455
 resonance = ["Thunder"]
 
 [[cards]]
@@ -8070,6 +8543,7 @@ image-number = 515170243
 rarity = "Uncommon"
 art-owned = false
 card-number = 492
+w1-rank = 176
 resonance = ["Thunder"]
 
 [[cards]]
@@ -8089,6 +8563,7 @@ image-number = 2218612335
 rarity = "Rare"
 art-owned = false
 card-number = 493
+w1-rank = 367
 resonance = ["Thunder"]
 
 [[cards]]
@@ -8106,6 +8581,7 @@ image-number = 1084620533
 rarity = "Rare"
 art-owned = false
 card-number = 494
+w1-rank = 445
 resonance = ["Tide"]
 
 [[cards]]
@@ -8120,6 +8596,7 @@ image-number = 1155706588
 rarity = "Common"
 art-owned = false
 card-number = 495
+w1-rank = 266
 subtype = ""
 spark = ""
 resonance = ["Flame"]
@@ -8141,6 +8618,7 @@ image-number = 618070745
 rarity = "Rare"
 art-owned = false
 card-number = 496
+w1-rank = 205
 resonance = ["Tide"]
 
 [[cards]]
@@ -8157,6 +8635,7 @@ image-number = 776481895
 rarity = "Common"
 art-owned = false
 card-number = 497
+w1-rank = 58
 resonance = ["Flame"]
 
 [[cards]]
@@ -8174,6 +8653,7 @@ image-number = 1125131714
 rarity = "Rare"
 art-owned = false
 card-number = 498
+w1-rank = 379
 resonance = ["Thunder"]
 
 [[cards]]
@@ -8190,6 +8670,7 @@ image-number = 1295291188
 rarity = "Rare"
 art-owned = false
 card-number = 499
+w1-rank = 378
 resonance = ["Thunder"]
 
 [[cards]]
@@ -8207,6 +8688,7 @@ image-number = 2197688367
 rarity = "Rare"
 art-owned = false
 card-number = 500
+w1-rank = 308
 resonance = ["Tide"]
 
 [[cards]]
@@ -8223,6 +8705,7 @@ image-number = 436089214
 rarity = "Rare"
 art-owned = false
 card-number = 501
+w1-rank = 145
 resonance = ["Thunder"]
 
 [[cards]]
@@ -8238,6 +8721,7 @@ image-number = 2269064813
 rarity = "Rare"
 art-owned = false
 card-number = 502
+w1-rank = 426
 resonance = ["Tide"]
 
 [[cards]]
@@ -8256,6 +8740,7 @@ image-number = 2186149271
 rarity = "Rare"
 art-owned = false
 card-number = 503
+w1-rank = 134
 resonance = ["Thunder"]
 
 [metadata]
