@@ -134,6 +134,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="w1-rank threshold for rank draft (default: 100, cards with rank < threshold are eligible)",
     )
     parser.add_argument(
+        "--reshuffle-threshold",
+        type=int,
+        default=10,
+        help="Reshuffle pool with fresh cards when remaining count falls below this (default: 10, rank draft only)",
+    )
+    parser.add_argument(
         "--no-resonance-filter",
         action="store_true",
         default=False,
@@ -291,6 +297,7 @@ def main() -> None:
             rng=rng,
             all_cards=cards,
             rank_threshold=args.rank_threshold,
+            reshuffle_threshold=args.reshuffle_threshold,
         )
         print(
             f"  Rank draft initialized: threshold {args.rank_threshold}, "

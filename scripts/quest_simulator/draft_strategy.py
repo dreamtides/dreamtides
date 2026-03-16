@@ -591,6 +591,7 @@ class RankDraftStrategy(DraftStrategy):
         rng: random.Random,
         all_cards: list[CardDesign],
         rank_threshold: int = 100,
+        reshuffle_threshold: int = 10,
     ) -> None:
         self._rng = rng
         self._draft_cfg = SimulatorConfig()
@@ -598,20 +599,33 @@ class RankDraftStrategy(DraftStrategy):
         self._round_pick_count: int = 0
         self._round_index: int = 0
         self._global_pick_index: int = 0
+        self._reshuffle_threshold = reshuffle_threshold
 
         # Filter cards to those with w1_rank below threshold, 1 copy each
-        pool_designs: dict[str, CardDesign] = {}
+        self._eligible_designs: list[CardDesign] = []
+        seen: set[str] = set()
         for card in all_cards:
-            if card.card_id not in pool_designs and card.w1_rank < rank_threshold:
-                pool_designs[card.card_id] = card
+            if card.card_id not in seen and card.w1_rank < rank_threshold:
+                seen.add(card.card_id)
+                self._eligible_designs.append(card)
 
-        self._pool: list[CardInstance] = []
-        instance_id = 0
-        for design in pool_designs.values():
-            self._pool.append(CardInstance(instance_id=instance_id, design=design))
-            instance_id += 1
-
+        self._next_instance_id = 0
+        self._pool: list[CardInstance] = self._build_fresh_pool()
         self._pool_adapter = _PoolAdapter(self._pool)
+
+    def _build_fresh_pool(self) -> list[CardInstance]:
+        """Create a fresh pool with one instance per eligible design."""
+        pool: list[CardInstance] = []
+        for design in self._eligible_designs:
+            pool.append(CardInstance(instance_id=self._next_instance_id, design=design))
+            self._next_instance_id += 1
+        return pool
+
+    def _maybe_reshuffle(self) -> None:
+        """Reshuffle the pool if it falls below the reshuffle threshold."""
+        if len(self._pool) < self._reshuffle_threshold:
+            self._pool = self._build_fresh_pool()
+            self._pool_adapter._pool = self._pool
 
     @property
     def pool_size(self) -> int:
@@ -625,6 +639,7 @@ class RankDraftStrategy(DraftStrategy):
         context: str = "draft",
     ) -> PickResult:
         """Sample n cards from the pool without removing them."""
+        self._maybe_reshuffle()
         actual = min(n, len(self._pool))
         if actual <= 0:
             return PickResult(shown_cards=[], all_eligible=[])

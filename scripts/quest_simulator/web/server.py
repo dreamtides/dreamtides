@@ -263,10 +263,12 @@ def run_web_server(args: Any) -> None:
         _archetype_draft_mode = True
         state.rank_draft = True
         rank_threshold = getattr(args, "rank_threshold", 100)
+        reshuffle_threshold = getattr(args, "reshuffle_threshold", 10)
         strategy = RankDraftStrategy(
             rng=rng,
             all_cards=cards,
             rank_threshold=rank_threshold,
+            reshuffle_threshold=reshuffle_threshold,
         )
         print(
             f"  Rank draft initialized: threshold {rank_threshold}, "
