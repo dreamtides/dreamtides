@@ -80,6 +80,7 @@ def format_card_display(
     max_width: int = render.CONTENT_WIDTH,
     show_images: bool = False,
     debug: bool = False,
+    show_archetype_icons: bool = True,
 ) -> list[str]:
     """Format a card as display lines.
 
@@ -157,7 +158,7 @@ def format_card_display(
             type_parts.append(f" ({rarity.title()})")
         type_line = " ".join(type_parts)
         type_display = colors.dim(type_line)
-        if debug and hasattr(design, "fitness"):
+        if debug and show_archetype_icons and hasattr(design, "fitness"):
             emojis = _archetype_emojis(design.fitness)
             if emojis:
                 type_display = f"{type_display}  {emojis}"
@@ -259,7 +260,7 @@ def _generate_image_escape(card) -> str | None:
     return esc
 
 
-def _render_card_block(card, debug: bool = False) -> None:
+def _render_card_block(card, debug: bool = False, show_archetype_icons: bool = True) -> None:
     """Render a single card with image on the left and text on the right.
 
     Pre-generates the image escape sequence to determine layout: if
@@ -295,7 +296,7 @@ def _render_card_block(card, debug: bool = False) -> None:
         if sub:
             type_parts.append(f"- {sub}")
         type_line = colors.dim(" ".join(type_parts))
-        if debug and hasattr(design, "fitness"):
+        if debug and show_archetype_icons and hasattr(design, "fitness"):
             emojis = _archetype_emojis(design.fitness)
             if emojis:
                 type_line = f"{type_line}  {emojis}"
@@ -324,7 +325,7 @@ def _render_card_block(card, debug: bool = False) -> None:
         sys.stdout.flush()
 
 
-def render_card_columns(cards, debug: bool = False) -> None:
+def render_card_columns(cards, debug: bool = False, show_archetype_icons: bool = True) -> None:
     """Render cards with image on the left and text on the right.
 
     Each card is displayed as a block: image at columns 1-15, card
@@ -335,7 +336,7 @@ def render_card_columns(cards, debug: bool = False) -> None:
         return
 
     for card in cards:
-        _render_card_block(card, debug=debug)
+        _render_card_block(card, debug=debug, show_archetype_icons=show_archetype_icons)
 
 
 def _deck_card_sort_key(dc: DeckCard) -> tuple[str, str]:

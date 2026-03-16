@@ -632,8 +632,9 @@ class RankDraftStrategy(DraftStrategy):
         return PickResult(shown_cards=shown, all_eligible=shown)
 
     def complete_pick(self, chosen: CardInstance, shown: list[CardInstance]) -> None:
-        """Remove chosen card from pool and track it."""
-        self._pool = [c for c in self._pool if c.instance_id != chosen.instance_id]
+        """Remove all shown cards from pool and track the chosen one."""
+        shown_ids = {c.instance_id for c in shown}
+        self._pool = [c for c in self._pool if c.instance_id not in shown_ids]
         self._pool_adapter._pool = self._pool
         self._drafted.append(chosen)
         self._global_pick_index += 1
