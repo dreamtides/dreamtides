@@ -34,7 +34,7 @@ import flow
 import input_handler
 import render
 import resonance_filter
-from draft_strategy import ArchetypeDraftStrategy, SixSeatDraftStrategy
+from draft_strategy import ArchetypeDraftStrategy, RankDraftStrategy, SixSeatDraftStrategy
 from jsonl_log import SessionLogger
 from quest_state import QuestState
 from site_dispatch import SiteData
@@ -120,6 +120,18 @@ def build_parser() -> argparse.ArgumentParser:
         dest="overrides",
         metavar="KEY=VALUE",
         help="Override config field (dot-notation, repeatable). E.g. --set pack_generation.strategy=uniform",
+    )
+    parser.add_argument(
+        "--rank-draft",
+        action="store_true",
+        default=False,
+        help="Use rank-based draft: cards with w1-rank below threshold, no resonance/archetype UI",
+    )
+    parser.add_argument(
+        "--rank-threshold",
+        type=int,
+        default=100,
+        help="w1-rank threshold for rank draft (default: 100, cards with rank < threshold are eligible)",
     )
     parser.add_argument(
         "--no-resonance-filter",
@@ -215,10 +227,10 @@ def main() -> None:
     )
 
     # Generate card pool
-    if args.archetype_draft:
+    if args.archetype_draft or args.rank_draft:
         if cfg.cards.rendered_toml_path is None:
             raise ValueError(
-                "--archetype-draft requires cards.rendered_toml_path to be set"
+                "--archetype-draft/--rank-draft requires cards.rendered_toml_path to be set"
             )
         cards = card_generator.load_cards(
             cfg.cards.rendered_toml_path,
@@ -273,6 +285,19 @@ def main() -> None:
             f"from {len(cards)} card designs"
         )
         state.draft_strategy = archetype_strategy
+    elif args.rank_draft:
+        state.rank_draft = True
+        rank_strategy = RankDraftStrategy(
+            rng=rng,
+            all_cards=cards,
+            rank_threshold=args.rank_threshold,
+        )
+        print(
+            f"  Rank draft initialized: threshold {args.rank_threshold}, "
+            f"pool size {rank_strategy.pool_size} instances "
+            f"from {len(cards)} card designs"
+        )
+        state.draft_strategy = rank_strategy
     else:
         # Create cube with rarity-based copy counts and replacement mode
         copies_per_card: int | dict[str, int] = cube_manager.build_copies_map(

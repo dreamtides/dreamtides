@@ -70,6 +70,7 @@ class CardDesign:
     image_number: int | None = None
     resonance: tuple[str, ...] = ()
     original_rarity: str = ""
+    w1_rank: int = 0
 
 
 @dataclass(frozen=True)

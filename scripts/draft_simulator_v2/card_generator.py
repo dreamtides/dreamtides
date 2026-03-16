@@ -92,6 +92,7 @@ def load_cards(
                 image_number=_parse_optional_int(card.get("image-number", "")),
                 resonance=tuple(card.get("resonance", [])),
                 original_rarity=raw_rarity,
+                w1_rank=card.get("w1-rank", 0),
             )
         )
 

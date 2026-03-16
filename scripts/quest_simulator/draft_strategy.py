@@ -579,6 +579,122 @@ class _PoolAdapter:
         return drawn
 
 
+class RankDraftStrategy(DraftStrategy):
+    """Rank-based draft strategy.
+
+    Builds a card pool from cards with w1_rank below a threshold and offers
+    uniform random picks with no AI involvement.
+    """
+
+    def __init__(
+        self,
+        rng: random.Random,
+        all_cards: list[CardDesign],
+        rank_threshold: int = 100,
+    ) -> None:
+        self._rng = rng
+        self._draft_cfg = SimulatorConfig()
+        self._drafted: list[CardInstance] = []
+        self._round_pick_count: int = 0
+        self._round_index: int = 0
+        self._global_pick_index: int = 0
+
+        # Filter cards to those with w1_rank below threshold, 1 copy each
+        pool_designs: dict[str, CardDesign] = {}
+        for card in all_cards:
+            if card.card_id not in pool_designs and card.w1_rank < rank_threshold:
+                pool_designs[card.card_id] = card
+
+        self._pool: list[CardInstance] = []
+        instance_id = 0
+        for design in pool_designs.values():
+            self._pool.append(CardInstance(instance_id=instance_id, design=design))
+            instance_id += 1
+
+        self._pool_adapter = _PoolAdapter(self._pool)
+
+    @property
+    def pool_size(self) -> int:
+        """Number of card instances in the pool."""
+        return len(self._pool)
+
+    def generate_pick(
+        self,
+        n: int,
+        logger: Optional[SessionLogger] = None,
+        context: str = "draft",
+    ) -> PickResult:
+        """Sample n cards from the pool without removing them."""
+        actual = min(n, len(self._pool))
+        if actual <= 0:
+            return PickResult(shown_cards=[], all_eligible=[])
+        shown = self._rng.sample(self._pool, actual)
+        return PickResult(shown_cards=shown, all_eligible=shown)
+
+    def complete_pick(self, chosen: CardInstance, shown: list[CardInstance]) -> None:
+        """Remove chosen card from pool and track it."""
+        self._pool = [c for c in self._pool if c.instance_id != chosen.instance_id]
+        self._pool_adapter._pool = self._pool
+        self._drafted.append(chosen)
+        self._global_pick_index += 1
+        self._round_pick_count += 1
+        if self._round_pick_count >= PICKS_PER_ROUND:
+            self._round_pick_count = 0
+            self._round_index += 1
+
+    def skip_pick(self) -> None:
+        """Advance counters without taking a card."""
+        self._global_pick_index += 1
+        self._round_pick_count += 1
+        if self._round_pick_count >= PICKS_PER_ROUND:
+            self._round_pick_count = 0
+            self._round_index += 1
+
+    def update_after_external_pick(self, card: CardInstance) -> None:
+        """Track an externally-picked card."""
+        self._drafted.append(card)
+
+    @property
+    def preference_vector(self) -> list[float]:
+        return [0.125] * 8
+
+    @property
+    def drafted_cards(self) -> list[CardInstance]:
+        return self._drafted
+
+    @property
+    def pick_index(self) -> int:
+        return self._global_pick_index
+
+    @property
+    def round_index(self) -> int:
+        return self._round_index
+
+    @property
+    def round_pick_count(self) -> int:
+        return self._round_pick_count
+
+    @property
+    def show_n_count(self) -> int:
+        return 4
+
+    @property
+    def show_n_strategy(self) -> str:
+        return "uniform"
+
+    @property
+    def scoring_cfg(self) -> Any:
+        return ScoringConfig()
+
+    @property
+    def cube(self) -> Any:
+        return self._pool_adapter
+
+    @property
+    def draft_cfg(self) -> Any:
+        return self._draft_cfg
+
+
 class ArchetypeDraftStrategy(DraftStrategy):
     """Simple archetype-based draft strategy.
 

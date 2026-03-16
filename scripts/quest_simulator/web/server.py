@@ -200,10 +200,10 @@ def run_web_server(args: Any) -> None:
         overrides=getattr(args, "overrides", None) or None,
     )
 
-    if getattr(args, "archetype_draft", False):
+    if getattr(args, "archetype_draft", False) or getattr(args, "rank_draft", False):
         if cfg.cards.rendered_toml_path is None:
             raise ValueError(
-                "--archetype-draft requires cards.rendered_toml_path to be set"
+                "--archetype-draft/--rank-draft requires cards.rendered_toml_path to be set"
             )
         cards = card_generator.load_cards(
             cfg.cards.rendered_toml_path,
@@ -237,7 +237,7 @@ def run_web_server(args: Any) -> None:
     )
 
     import resonance_filter
-    from draft_strategy import ArchetypeDraftStrategy, SixSeatDraftStrategy
+    from draft_strategy import ArchetypeDraftStrategy, RankDraftStrategy, SixSeatDraftStrategy
 
     if getattr(args, "archetype_draft", False):
         global _archetype_draft_mode
@@ -257,6 +257,19 @@ def run_web_server(args: Any) -> None:
         ]
         print(
             f"  Archetype draft initialized: {', '.join(archetype_names)}, "
+            f"pool size {strategy.pool_size} instances"
+        )
+    elif getattr(args, "rank_draft", False):
+        _archetype_draft_mode = True
+        state.rank_draft = True
+        rank_threshold = getattr(args, "rank_threshold", 100)
+        strategy = RankDraftStrategy(
+            rng=rng,
+            all_cards=cards,
+            rank_threshold=rank_threshold,
+        )
+        print(
+            f"  Rank draft initialized: threshold {rank_threshold}, "
             f"pool size {strategy.pool_size} instances"
         )
     else:

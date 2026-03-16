@@ -43,7 +43,13 @@ class QuestState:
         self.max_dreamsigns: int = max_dreamsigns
         self.debug: bool = debug
         self.archetype_draft: bool = False
+        self.rank_draft: bool = False
         self.bane_instance_counter: int = 0
+
+    @property
+    def simple_draft(self) -> bool:
+        """True when using a simplified draft mode that suppresses resonance/archetype UI."""
+        return self.archetype_draft or self.rank_draft
 
     def add_card(self, card_instance: Any) -> None:
         """Add a card to the deck from a draft CardInstance."""

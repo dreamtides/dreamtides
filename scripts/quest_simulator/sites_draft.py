@@ -14,7 +14,7 @@ import log_helpers
 import render
 import render_cards
 import render_status
-from draft_strategy import ArchetypeDraftStrategy
+from draft_strategy import ArchetypeDraftStrategy, RankDraftStrategy
 from jsonl_log import SessionLogger
 from quest_state import QuestState
 
@@ -62,8 +62,8 @@ def run_draft(
         print(render.draw_separator())
 
         option_labels = [render_cards.card_name(card) for card in shown_cards]
-        is_archetype_draft = isinstance(strategy, ArchetypeDraftStrategy)
-        if state.debug and not is_archetype_draft:
+        is_simple_draft = isinstance(strategy, (ArchetypeDraftStrategy, RankDraftStrategy))
+        if state.debug and not is_simple_draft:
             option_labels.append("Debug")
 
         # Build remaining cards data for web UI display
@@ -158,6 +158,6 @@ def run_draft(
         w=strategy.preference_vector,
         deck_count=len(state.deck),
         essence=state.essence,
-        archetype_draft=state.archetype_draft,
+        archetype_draft=state.simple_draft,
     )
     print(footer)

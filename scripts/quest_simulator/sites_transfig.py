@@ -317,7 +317,7 @@ def run_transfiguration(
             w=state.draft_strategy.preference_vector,
             deck_count=state.deck_count(),
             essence=state.essence,
-            archetype_draft=state.archetype_draft,
+            archetype_draft=state.simple_draft,
         )
         print(footer)
         return
@@ -354,7 +354,7 @@ def run_transfiguration(
         w=state.draft_strategy.preference_vector,
         deck_count=state.deck_count(),
         essence=state.essence,
-        archetype_draft=state.archetype_draft,
+        archetype_draft=state.simple_draft,
     )
     print(footer)
 

@@ -117,7 +117,7 @@ def _show_victory(
         essence=state.essence,
         w=state.draft_strategy.preference_vector,
         log_path=log_path,
-        archetype_draft=state.archetype_draft,
+        archetype_draft=state.simple_draft,
     )
     print(screen)
 

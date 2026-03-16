@@ -209,6 +209,6 @@ def run_battle(
         w=strategy.preference_vector,
         deck_count=len(state.deck),
         essence=state.essence,
-        archetype_draft=state.archetype_draft,
+        archetype_draft=state.simple_draft,
     )
     print(footer)
