@@ -2,14 +2,22 @@ import { useCallback } from "react";
 import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { generateInitialAtlas } from "../atlas/atlas-generator";
+import { DREAMSIGNS } from "../data/dreamsigns";
 import { logEvent } from "../logging";
 
 /** Intro screen with dark fantasy styling and "Begin Quest" button. */
 export function QuestStartScreen() {
-  const { state, mutations } = useQuest();
+  const { state, mutations, cardDatabase } = useQuest();
 
   const handleBeginQuest = useCallback(() => {
-    const atlas = generateInitialAtlas(state.completionLevel);
+    const playerHasBanes =
+      state.deck.some((e) => e.isBane) ||
+      state.dreamsigns.some((d) => d.isBane);
+    const atlas = generateInitialAtlas(state.completionLevel, {
+      cardDatabase,
+      dreamsignPool: DREAMSIGNS,
+      playerHasBanes,
+    });
     const nodeCount = Object.keys(atlas.nodes).length - 1; // subtract nexus
 
     logEvent("quest_started", {
@@ -19,7 +27,7 @@ export function QuestStartScreen() {
 
     mutations.updateAtlas(atlas);
     mutations.setScreen({ type: "atlas" });
-  }, [state.completionLevel, state.essence, mutations]);
+  }, [state.completionLevel, state.essence, state.deck, state.dreamsigns, mutations, cardDatabase]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">

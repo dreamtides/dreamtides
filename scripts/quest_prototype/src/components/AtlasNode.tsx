@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import type { DreamscapeNode } from "../types/quest";
 import {
   previewSiteTypes,
+  rewardPreviewLabel,
   siteTypeIcon,
   siteTypeName,
 } from "../atlas/atlas-generator";
@@ -60,6 +61,10 @@ export function AtlasNode({ node, isNexus, onNodeClick }: AtlasNodeProps) {
   }
 
   const previewSites = previewSiteTypes(node);
+
+  const rewardLabel = node.sites
+    .map((s) => rewardPreviewLabel(s))
+    .find((label) => label !== null) ?? null;
 
   return (
     <g
@@ -171,9 +176,9 @@ export function AtlasNode({ node, isNexus, onNodeClick }: AtlasNodeProps) {
         <g transform={`translate(0, ${String(-(radius + 16))})`}>
           <rect
             x={-90}
-            y={-60}
+            y={rewardLabel !== null ? -74 : -60}
             width={180}
-            height={56}
+            height={rewardLabel !== null ? 70 : 56}
             rx={8}
             fill="#1a1025"
             stroke={node.biomeColor}
@@ -183,7 +188,7 @@ export function AtlasNode({ node, isNexus, onNodeClick }: AtlasNodeProps) {
           {/* Biome name in tooltip */}
           <text
             x={0}
-            y={-40}
+            y={rewardLabel !== null ? -54 : -40}
             textAnchor="middle"
             fill={node.biomeColor}
             fontSize={12}
@@ -194,7 +199,7 @@ export function AtlasNode({ node, isNexus, onNodeClick }: AtlasNodeProps) {
           {/* Site icons */}
           <text
             x={0}
-            y={-18}
+            y={rewardLabel !== null ? -32 : -18}
             textAnchor="middle"
             fontSize={18}
           >
@@ -207,7 +212,7 @@ export function AtlasNode({ node, isNexus, onNodeClick }: AtlasNodeProps) {
           {/* Site names */}
           <text
             x={0}
-            y={-2}
+            y={rewardLabel !== null ? -16 : -2}
             textAnchor="middle"
             fill="#e2e8f0"
             fontSize={9}
@@ -215,6 +220,19 @@ export function AtlasNode({ node, isNexus, onNodeClick }: AtlasNodeProps) {
           >
             {previewSites.map((st) => siteTypeName(st)).join(" \u00B7 ")}
           </text>
+          {/* Reward preview label */}
+          {rewardLabel !== null && (
+            <text
+              x={0}
+              y={-2}
+              textAnchor="middle"
+              fill="#fbbf24"
+              fontSize={9}
+              fontWeight="bold"
+            >
+              {rewardLabel}
+            </text>
+          )}
         </g>
       )}
     </g>

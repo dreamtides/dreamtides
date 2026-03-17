@@ -4,8 +4,17 @@ import type {
   SiteState,
   SiteType,
 } from "../types/quest";
+import type { CardData } from "../types/cards";
+import type { Dreamsign } from "../types/quest";
 import { BIOMES, type Biome } from "../data/biomes";
 import { logEvent } from "../logging";
+
+/** Parameters for site generation that require external data. */
+export interface SiteGenerationContext {
+  cardDatabase: Map<number, CardData>;
+  dreamsignPool: ReadonlyArray<Omit<Dreamsign, "isBane">>;
+  playerHasBanes: boolean;
+}
 
 const BASE_RADIUS = 200;
 const RADIUS_INCREMENT = 160;
@@ -69,6 +78,7 @@ function weightedPick<T>(items: Array<[T, number]>): T {
 /** Builds the weighted site pool based on completion level. */
 function buildAdditionalSitePool(
   completionLevel: number,
+  playerHasBanes: boolean,
 ): Array<[SiteType, number]> {
   const pool: Array<[SiteType, number]> = [];
 
@@ -76,6 +86,14 @@ function buildAdditionalSitePool(
   pool.push(["Shop", 3]);
   pool.push(["Essence", 3]);
   pool.push(["DreamsignOffering", 3]);
+
+  // Reward available at all levels
+  pool.push(["Reward", 2]);
+
+  // Cleanse only when player has banes
+  if (playerHasBanes) {
+    pool.push(["Cleanse", 2]);
+  }
 
   // Mid game (level 3+): add DreamJourney, TemptingOffer
   if (completionLevel >= 3) {
@@ -96,10 +114,46 @@ function buildAdditionalSitePool(
   return pool;
 }
 
+/** Generates reward data for a Reward site at dreamscape creation time. */
+function generateRewardData(
+  context: SiteGenerationContext,
+): Record<string, unknown> {
+  const { cardDatabase, dreamsignPool } = context;
+  const cards = Array.from(cardDatabase.values());
+
+  // 70% chance card reward, 30% chance dreamsign reward
+  if (cards.length > 0 && Math.random() < 0.7) {
+    const card = cards[Math.floor(Math.random() * cards.length)];
+    return {
+      rewardType: "card",
+      cardNumber: card.cardNumber,
+      cardName: card.name,
+    };
+  }
+
+  if (dreamsignPool.length > 0) {
+    const template =
+      dreamsignPool[Math.floor(Math.random() * dreamsignPool.length)];
+    return {
+      rewardType: "dreamsign",
+      dreamsignName: template.name,
+      dreamsignTide: template.tide,
+      dreamsignEffect: template.effectDescription,
+    };
+  }
+
+  // Fallback to essence reward
+  return {
+    rewardType: "essence",
+    essenceAmount: randomInt(150, 350),
+  };
+}
+
 /** Generates the site composition for a dreamscape. Total: 3-6 sites. */
 export function generateSiteComposition(
   completionLevel: number,
   isFirstDreamscape: boolean,
+  context: SiteGenerationContext,
 ): SiteState[] {
   const sites: SiteState[] = [];
 
@@ -136,15 +190,18 @@ export function generateSiteComposition(
   const fixedCount = sites.length + 1;
   const minAdditional = Math.max(2, 3 - fixedCount);
   const maxAdditional = Math.max(minAdditional, 6 - fixedCount);
-  const pool = buildAdditionalSitePool(completionLevel);
+  const pool = buildAdditionalSitePool(completionLevel, context.playerHasBanes);
   const additionalCount = randomInt(minAdditional, maxAdditional);
   for (let i = 0; i < additionalCount; i++) {
     const siteType = weightedPick(pool);
+    const data =
+      siteType === "Reward" ? generateRewardData(context) : undefined;
     sites.push({
       id: nextSiteId(),
       type: siteType,
       isEnhanced: false,
       isVisited: false,
+      data,
     });
   }
 
@@ -188,10 +245,11 @@ function createNode(
   completionLevel: number,
   isFirstDreamscape: boolean,
   connections: string[],
+  context: SiteGenerationContext,
 ): DreamscapeNode {
   const id = nextNodeId();
   const biome = assignBiome();
-  const sites = generateSiteComposition(completionLevel, isFirstDreamscape);
+  const sites = generateSiteComposition(completionLevel, isFirstDreamscape, context);
   const enhancedSiteType = applyBiomeEnhancement(sites, biome);
 
   logEvent("atlas_node_generated", {
@@ -219,7 +277,10 @@ function createNode(
 }
 
 /** Creates the initial atlas with the Nexus and 2-3 starting dreamscapes. */
-export function generateInitialAtlas(completionLevel: number): DreamAtlas {
+export function generateInitialAtlas(
+  completionLevel: number,
+  context: SiteGenerationContext,
+): DreamAtlas {
   resetAtlasGenerator();
 
   const nexusId = "nexus";
@@ -254,6 +315,7 @@ export function generateInitialAtlas(completionLevel: number): DreamAtlas {
       completionLevel,
       i === 0,
       [nexusId],
+      context,
     );
     nodes[node.id] = node;
     edges.push([nexusId, node.id]);
@@ -271,6 +333,7 @@ export function generateNewNodes(
   atlas: DreamAtlas,
   completedNodeId: string,
   completionLevel: number,
+  context: SiteGenerationContext,
 ): DreamAtlas {
   const completedNode = atlas.nodes[completedNodeId];
   if (!completedNode) {
@@ -327,6 +390,7 @@ export function generateNewNodes(
       completionLevel,
       false,
       connections,
+      context,
     );
     updatedNodes[node.id] = node;
 
@@ -405,4 +469,23 @@ export function previewSiteTypes(node: DreamscapeNode): SiteType[] {
     .filter((s) => !excluded.has(s.type))
     .map((s) => s.type)
     .slice(0, 3);
+}
+
+/** Returns a reward preview label for atlas tooltip display, or null if not a reward site. */
+export function rewardPreviewLabel(site: SiteState): string | null {
+  if (site.type !== "Reward" || !site.data) return null;
+  const rewardType = site.data["rewardType"] as string | undefined;
+  if (rewardType === "card") {
+    const name = (site.data["cardName"] as string | undefined) ?? "Card";
+    return `Reward: ${name}`;
+  }
+  if (rewardType === "dreamsign") {
+    const name = (site.data["dreamsignName"] as string | undefined) ?? "Dreamsign";
+    return `Reward: ${name}`;
+  }
+  if (rewardType === "essence") {
+    const amount = (site.data["essenceAmount"] as number | undefined) ?? 0;
+    return `Reward: ${String(amount)} Essence`;
+  }
+  return null;
 }

@@ -58,6 +58,7 @@ export interface SiteState {
   type: SiteType;
   isEnhanced: boolean;
   isVisited: boolean;
+  data?: Record<string, unknown>;
 }
 
 /** A node on the Dream Atlas representing a dreamscape. */

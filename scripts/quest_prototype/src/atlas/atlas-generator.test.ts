@@ -5,9 +5,46 @@ import {
   generateNewNodes,
   assignBiome,
   previewSiteTypes,
+  rewardPreviewLabel,
   resetAtlasGenerator,
+  type SiteGenerationContext,
 } from "./atlas-generator";
-import type { DreamscapeNode } from "../types/quest";
+import type { DreamscapeNode, SiteState } from "../types/quest";
+import type { CardData } from "../types/cards";
+
+function defaultContext(
+  overrides?: Partial<SiteGenerationContext>,
+): SiteGenerationContext {
+  const db = new Map<number, CardData>();
+  db.set(1, {
+    name: "Test Card",
+    id: "test-card",
+    cardNumber: 1,
+    cardType: "Character",
+    subtype: "",
+    rarity: "Common",
+    energyCost: 2,
+    spark: 1,
+    isFast: false,
+    tide: "Bloom",
+    tideCost: 1,
+    renderedText: "Test rules text.",
+    imageNumber: 1,
+    artOwned: false,
+  });
+  return {
+    cardDatabase: db,
+    dreamsignPool: [
+      {
+        name: "Test Dreamsign",
+        tide: "Bloom",
+        effectDescription: "Test effect.",
+      },
+    ],
+    playerHasBanes: false,
+    ...overrides,
+  };
+}
 
 beforeEach(() => {
   resetAtlasGenerator();
@@ -19,7 +56,7 @@ describe("generateSiteComposition", () => {
   it("produces 3-6 sites for level 0 first dreamscape", () => {
     for (let i = 0; i < 50; i++) {
       resetAtlasGenerator();
-      const sites = generateSiteComposition(0, true);
+      const sites = generateSiteComposition(0, true, defaultContext());
       expect(sites.length).toBeGreaterThanOrEqual(3);
       expect(sites.length).toBeLessThanOrEqual(6);
     }
@@ -28,7 +65,7 @@ describe("generateSiteComposition", () => {
   it("produces 3-6 sites for level 0 non-first dreamscape", () => {
     for (let i = 0; i < 50; i++) {
       resetAtlasGenerator();
-      const sites = generateSiteComposition(0, false);
+      const sites = generateSiteComposition(0, false, defaultContext());
       expect(sites.length).toBeGreaterThanOrEqual(3);
       expect(sites.length).toBeLessThanOrEqual(6);
     }
@@ -37,7 +74,7 @@ describe("generateSiteComposition", () => {
   it("produces 3-6 sites for level 3", () => {
     for (let i = 0; i < 50; i++) {
       resetAtlasGenerator();
-      const sites = generateSiteComposition(3, false);
+      const sites = generateSiteComposition(3, false, defaultContext());
       expect(sites.length).toBeGreaterThanOrEqual(3);
       expect(sites.length).toBeLessThanOrEqual(6);
     }
@@ -46,33 +83,33 @@ describe("generateSiteComposition", () => {
   it("produces 3-6 sites for level 5+", () => {
     for (let i = 0; i < 50; i++) {
       resetAtlasGenerator();
-      const sites = generateSiteComposition(7, false);
+      const sites = generateSiteComposition(7, false, defaultContext());
       expect(sites.length).toBeGreaterThanOrEqual(3);
       expect(sites.length).toBeLessThanOrEqual(6);
     }
   });
 
   it("includes 2 draft sites at level 0", () => {
-    const sites = generateSiteComposition(0, false);
+    const sites = generateSiteComposition(0, false, defaultContext());
     const drafts = sites.filter((s) => s.type === "Draft");
     expect(drafts.length).toBe(2);
   });
 
   it("includes 1 draft site at level 2", () => {
-    const sites = generateSiteComposition(2, false);
+    const sites = generateSiteComposition(2, false, defaultContext());
     const drafts = sites.filter((s) => s.type === "Draft");
     expect(drafts.length).toBe(1);
   });
 
   it("includes 0 draft sites at level 5", () => {
-    const sites = generateSiteComposition(5, false);
+    const sites = generateSiteComposition(5, false, defaultContext());
     const drafts = sites.filter((s) => s.type === "Draft");
     expect(drafts.length).toBe(0);
   });
 
   it("includes DreamcallerDraft only for the first dreamscape", () => {
-    const first = generateSiteComposition(0, true);
-    const notFirst = generateSiteComposition(0, false);
+    const first = generateSiteComposition(0, true, defaultContext());
+    const notFirst = generateSiteComposition(0, false, defaultContext());
     expect(first.some((s) => s.type === "DreamcallerDraft")).toBe(true);
     expect(notFirst.some((s) => s.type === "DreamcallerDraft")).toBe(false);
   });
@@ -80,7 +117,7 @@ describe("generateSiteComposition", () => {
   it("always ends with a Battle site", () => {
     for (let level = 0; level <= 7; level++) {
       resetAtlasGenerator();
-      const sites = generateSiteComposition(level, false);
+      const sites = generateSiteComposition(level, false, defaultContext());
       expect(sites[sites.length - 1].type).toBe("Battle");
     }
   });
@@ -88,7 +125,7 @@ describe("generateSiteComposition", () => {
   it("has at least 2 non-draft non-battle sites for hover preview", () => {
     for (let i = 0; i < 50; i++) {
       resetAtlasGenerator();
-      const sites = generateSiteComposition(0, true);
+      const sites = generateSiteComposition(0, true, defaultContext());
       const previewable = sites.filter(
         (s) =>
           s.type !== "Battle" &&
@@ -100,16 +137,62 @@ describe("generateSiteComposition", () => {
   });
 
   it("assigns unique IDs to all sites", () => {
-    const sites = generateSiteComposition(0, true);
+    const sites = generateSiteComposition(0, true, defaultContext());
     const ids = sites.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("populates reward data on Reward sites", () => {
+    let foundReward = false;
+    for (let i = 0; i < 100; i++) {
+      resetAtlasGenerator();
+      const sites = generateSiteComposition(0, false, defaultContext());
+      const reward = sites.find((s) => s.type === "Reward");
+      if (reward) {
+        foundReward = true;
+        expect(reward.data).toBeDefined();
+        expect(reward.data!["rewardType"]).toBeDefined();
+        break;
+      }
+    }
+    expect(foundReward).toBe(true);
+  });
+
+  it("excludes Cleanse sites when player has no banes", () => {
+    for (let i = 0; i < 100; i++) {
+      resetAtlasGenerator();
+      const sites = generateSiteComposition(
+        0,
+        false,
+        defaultContext({ playerHasBanes: false }),
+      );
+      const cleanse = sites.filter((s) => s.type === "Cleanse");
+      expect(cleanse.length).toBe(0);
+    }
+  });
+
+  it("can include Cleanse sites when player has banes", () => {
+    let foundCleanse = false;
+    for (let i = 0; i < 200; i++) {
+      resetAtlasGenerator();
+      const sites = generateSiteComposition(
+        0,
+        false,
+        defaultContext({ playerHasBanes: true }),
+      );
+      if (sites.some((s) => s.type === "Cleanse")) {
+        foundCleanse = true;
+        break;
+      }
+    }
+    expect(foundCleanse).toBe(true);
   });
 });
 
 describe("generateInitialAtlas", () => {
   it("creates 2-3 dreamscape nodes plus the nexus", () => {
     for (let i = 0; i < 20; i++) {
-      const atlas = generateInitialAtlas(0);
+      const atlas = generateInitialAtlas(0, defaultContext());
       const nodeCount = Object.keys(atlas.nodes).length;
       expect(nodeCount).toBeGreaterThanOrEqual(3);
       expect(nodeCount).toBeLessThanOrEqual(4);
@@ -117,7 +200,7 @@ describe("generateInitialAtlas", () => {
   });
 
   it("places the nexus at (0,0) with status completed", () => {
-    const atlas = generateInitialAtlas(0);
+    const atlas = generateInitialAtlas(0, defaultContext());
     const nexus = atlas.nodes[atlas.nexusId];
     expect(nexus).toBeDefined();
     expect(nexus.position.x).toBe(0);
@@ -126,7 +209,7 @@ describe("generateInitialAtlas", () => {
   });
 
   it("marks all non-nexus nodes as available", () => {
-    const atlas = generateInitialAtlas(0);
+    const atlas = generateInitialAtlas(0, defaultContext());
     for (const [id, node] of Object.entries(atlas.nodes)) {
       if (id !== atlas.nexusId) {
         expect(node.status).toBe("available");
@@ -135,7 +218,7 @@ describe("generateInitialAtlas", () => {
   });
 
   it("creates edges from nexus to each dreamscape node", () => {
-    const atlas = generateInitialAtlas(0);
+    const atlas = generateInitialAtlas(0, defaultContext());
     const nonNexusIds = Object.keys(atlas.nodes).filter(
       (id) => id !== atlas.nexusId,
     );
@@ -150,7 +233,7 @@ describe("generateInitialAtlas", () => {
   });
 
   it("positions dreamscape nodes at the base radius distance from nexus", () => {
-    const atlas = generateInitialAtlas(0);
+    const atlas = generateInitialAtlas(0, defaultContext());
     for (const [id, node] of Object.entries(atlas.nodes)) {
       if (id === atlas.nexusId) continue;
       const dist = Math.sqrt(
@@ -165,11 +248,11 @@ describe("generateInitialAtlas", () => {
 describe("generateNewNodes", () => {
   it("generates 2-4 new nodes connected to the completed node", () => {
     for (let i = 0; i < 20; i++) {
-      const atlas = generateInitialAtlas(0);
+      const atlas = generateInitialAtlas(0, defaultContext());
       const completedId = Object.keys(atlas.nodes).find(
         (id) => id !== atlas.nexusId,
       )!;
-      const updated = generateNewNodes(atlas, completedId, 0);
+      const updated = generateNewNodes(atlas, completedId, 0, defaultContext());
       const newNodeCount =
         Object.keys(updated.nodes).length - Object.keys(atlas.nodes).length;
       expect(newNodeCount).toBeGreaterThanOrEqual(2);
@@ -178,20 +261,20 @@ describe("generateNewNodes", () => {
   });
 
   it("marks the completed node as completed", () => {
-    const atlas = generateInitialAtlas(0);
+    const atlas = generateInitialAtlas(0, defaultContext());
     const completedId = Object.keys(atlas.nodes).find(
       (id) => id !== atlas.nexusId,
     )!;
-    const updated = generateNewNodes(atlas, completedId, 0);
+    const updated = generateNewNodes(atlas, completedId, 0, defaultContext());
     expect(updated.nodes[completedId].status).toBe("completed");
   });
 
   it("sets correct availability on new nodes", () => {
-    const atlas = generateInitialAtlas(0);
+    const atlas = generateInitialAtlas(0, defaultContext());
     const completedId = Object.keys(atlas.nodes).find(
       (id) => id !== atlas.nexusId,
     )!;
-    const updated = generateNewNodes(atlas, completedId, 0);
+    const updated = generateNewNodes(atlas, completedId, 0, defaultContext());
 
     const completedIds = new Set(
       Object.values(updated.nodes)
@@ -215,8 +298,8 @@ describe("generateNewNodes", () => {
   });
 
   it("returns atlas unchanged for an invalid node ID", () => {
-    const atlas = generateInitialAtlas(0);
-    const result = generateNewNodes(atlas, "nonexistent", 0);
+    const atlas = generateInitialAtlas(0, defaultContext());
+    const result = generateNewNodes(atlas, "nonexistent", 0, defaultContext());
     expect(result).toBe(atlas);
   });
 });
@@ -269,5 +352,55 @@ describe("previewSiteTypes", () => {
     };
     const preview = previewSiteTypes(node);
     expect(preview.length).toBeLessThanOrEqual(3);
+  });
+});
+
+describe("rewardPreviewLabel", () => {
+  it("returns card reward label for card reward sites", () => {
+    const site: SiteState = {
+      id: "s1",
+      type: "Reward",
+      isEnhanced: false,
+      isVisited: false,
+      data: { rewardType: "card", cardNumber: 1, cardName: "Fire Bolt" },
+    };
+    expect(rewardPreviewLabel(site)).toBe("Reward: Fire Bolt");
+  });
+
+  it("returns dreamsign reward label for dreamsign reward sites", () => {
+    const site: SiteState = {
+      id: "s2",
+      type: "Reward",
+      isEnhanced: false,
+      isVisited: false,
+      data: {
+        rewardType: "dreamsign",
+        dreamsignName: "Ember's Whisper",
+        dreamsignTide: "Ignite",
+        dreamsignEffect: "Fire effect.",
+      },
+    };
+    expect(rewardPreviewLabel(site)).toBe("Reward: Ember's Whisper");
+  });
+
+  it("returns essence reward label for essence reward sites", () => {
+    const site: SiteState = {
+      id: "s3",
+      type: "Reward",
+      isEnhanced: false,
+      isVisited: false,
+      data: { rewardType: "essence", essenceAmount: 250 },
+    };
+    expect(rewardPreviewLabel(site)).toBe("Reward: 250 Essence");
+  });
+
+  it("returns null for non-reward sites", () => {
+    const site: SiteState = {
+      id: "s4",
+      type: "Shop",
+      isEnhanced: false,
+      isVisited: false,
+    };
+    expect(rewardPreviewLabel(site)).toBeNull();
   });
 });

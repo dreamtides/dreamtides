@@ -10,6 +10,7 @@ import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
 import { logEvent } from "../logging";
 import { generateNewNodes } from "../atlas/atlas-generator";
+import { DREAMSIGNS } from "../data/dreamsigns";
 
 type BattlePhase = "preBattle" | "animation" | "victory";
 
@@ -530,10 +531,18 @@ export function BattleScreen({
 
           if (dreamscapeId) {
             const node = atlas.nodes[dreamscapeId];
+            const playerHasBanes =
+              state.deck.some((e) => e.isBane) ||
+              state.dreamsigns.some((d) => d.isBane);
             const updatedAtlas = generateNewNodes(
               atlas,
               dreamscapeId,
               completionLevel,
+              {
+                cardDatabase,
+                dreamsignPool: DREAMSIGNS,
+                playerHasBanes,
+              },
             );
             mutations.updateAtlas(updatedAtlas);
 
@@ -558,6 +567,9 @@ export function BattleScreen({
       completionLevel,
       isFinalBoss,
       isMiniboss,
+      state.deck,
+      state.dreamsigns,
+      cardDatabase,
     ],
   );
 

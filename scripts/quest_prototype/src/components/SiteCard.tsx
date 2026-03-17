@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import type { SiteState } from "../types/quest";
-import { siteTypeIcon, siteTypeName } from "../atlas/atlas-generator";
+import { rewardPreviewLabel, siteTypeIcon, siteTypeName } from "../atlas/atlas-generator";
 
 interface SiteCardProps {
   site: SiteState;
@@ -117,6 +117,15 @@ export function SiteCard({
         {isBattle && isLocked && (
           <span className="text-xs opacity-50">
             Complete all other sites to unlock
+          </span>
+        )}
+        {/* Reward preview */}
+        {rewardPreviewLabel(site) !== null && !site.isVisited && (
+          <span
+            className="text-xs font-medium"
+            style={{ color: "#fbbf24" }}
+          >
+            {rewardPreviewLabel(site)}
           </span>
         )}
       </div>

@@ -18,6 +18,8 @@ import { TemptingOfferScreen } from "../screens/TemptingOfferScreen";
 import { PurgeSiteScreen } from "../screens/PurgeSiteScreen";
 import { TransfigurationSiteScreen } from "../screens/TransfigurationSiteScreen";
 import { DuplicationSiteScreen } from "../screens/DuplicationSiteScreen";
+import { RewardSiteScreen } from "../screens/RewardSiteScreen";
+import { CleanseSiteScreen } from "../screens/CleanseSiteScreen";
 import { siteTypeName } from "../atlas/atlas-generator";
 import { logEvent } from "../logging";
 import type { SiteState } from "../types/quest";
@@ -128,6 +130,14 @@ function SiteScreen({ siteId }: { siteId: string }) {
 
   if (site.type === "Duplication") {
     return <DuplicationSiteScreen site={site} />;
+  }
+
+  if (site.type === "Reward") {
+    return <RewardSiteScreen site={site} />;
+  }
+
+  if (site.type === "Cleanse") {
+    return <CleanseSiteScreen site={site} />;
   }
 
   return <GenericSitePlaceholder site={site} />;
