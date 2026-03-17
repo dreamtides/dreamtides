@@ -36,7 +36,7 @@ export const DEFAULT_DRAFT_CONFIG: Readonly<DraftConfig> = {
 };
 
 /** Number of player picks per draft site visit. */
-const SITE_PICKS = 5;
+export const SITE_PICKS = 5;
 
 /** Compute the 7-element fitness vector for a card based on its tide. */
 export function computeFitness(card: CardData): number[] {

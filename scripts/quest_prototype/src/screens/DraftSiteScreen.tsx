@@ -9,13 +9,11 @@ import {
   initializeDraftState,
   processPlayerPick,
   completeDraftSite,
+  SITE_PICKS,
 } from "../draft/draft-engine";
 import type { DraftState } from "../types/draft";
 import type { CardData } from "../types/cards";
 import { logEvent } from "../logging";
-
-/** Number of player picks per draft site visit. */
-const SITE_PICKS = 5;
 
 /** Delay in ms before showing the next pack after a pick. */
 const NEXT_PACK_DELAY = 500;
@@ -142,6 +140,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
   // Initialize draft state on mount
   useEffect(() => {
     if (initializedRef.current) return;
+    if (cardDatabase.size === 0) return;
     initializedRef.current = true;
 
     let ds = state.draftState;
@@ -227,7 +226,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
     [pickPhase, cardDatabase, mutations, refreshPack],
   );
 
-  const handleCardHover = useCallback(
+  const handleCardInspect = useCallback(
     (card: CardData) => {
       if (pickPhase === "idle") {
         setOverlayCard(card);
@@ -253,6 +252,29 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
 
   const pickNumber = draftedThisSite.length + 1;
   const packSize = currentPackCards.length;
+  const currentRound = (draftStateRef.current?.currentRound ?? 0) + 1;
+
+  if (cardDatabase.size === 0) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4">
+        <p className="text-lg opacity-60">
+          Card database unavailable. Cannot start draft.
+        </p>
+        <button
+          className="rounded-lg px-6 py-3 font-bold text-white transition-colors"
+          style={{
+            background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
+            border: "1px solid rgba(168, 85, 247, 0.5)",
+          }}
+          onClick={() => {
+            mutations.setScreen({ type: "dreamscape" });
+          }}
+        >
+          Return to Dreamscape
+        </button>
+      </div>
+    );
+  }
 
   if (isComplete) {
     return (
@@ -276,7 +298,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
             Draft
           </h2>
           <span className="text-xs opacity-50">
-            {String(packSize)} cards in pack
+            Round {String(currentRound)} &middot; {String(packSize)} cards in pack
           </span>
         </div>
 
@@ -359,6 +381,10 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
                         onMouseLeave={(e) => {
                           e.currentTarget.style.boxShadow = "none";
                         }}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          handleCardInspect(card);
+                        }}
                       >
                         <CardDisplay
                           card={card}
@@ -369,9 +395,6 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
                                 }
                               : undefined
                           }
-                          onHover={() => {
-                            handleCardHover(card);
-                          }}
                         />
                       </div>
                     </motion.div>
