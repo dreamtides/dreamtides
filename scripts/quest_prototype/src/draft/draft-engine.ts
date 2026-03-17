@@ -373,21 +373,32 @@ export function botPick(
   });
 }
 
-/** Rotate packs between seats in a single fixed direction (left). */
+/** Rotate packs between seats. Odd rounds rotate left, even rounds rotate right. */
 export function rotatePacks(state: DraftState): void {
   const packs = state.packs;
   const count = packs.length;
 
-  // Always rotate left: seat N's pack goes to seat N+1
-  const last = packs[count - 1];
-  for (let i = count - 1; i > 0; i--) {
-    packs[i] = packs[i - 1];
+  if (state.currentRound % 2 === 1) {
+    // Odd round: rotate left (seat N's pack goes to seat N+1)
+    const last = packs[count - 1];
+    for (let i = count - 1; i > 0; i--) {
+      packs[i] = packs[i - 1];
+    }
+    packs[0] = last;
+  } else {
+    // Even round: rotate right (seat N's pack goes to seat N-1)
+    const first = packs[0];
+    for (let i = 0; i < count - 1; i++) {
+      packs[i] = packs[i + 1];
+    }
+    packs[count - 1] = first;
   }
-  packs[0] = last;
 
+  const direction = state.currentRound % 2 === 1 ? "left" : "right";
   logEvent("draft_packs_rotated", {
     roundNumber: state.currentRound,
     pickNumber: state.currentPick,
+    direction,
   });
 }
 
