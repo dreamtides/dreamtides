@@ -302,11 +302,6 @@ export function QuestProvider({
           dreamscapeId: nodeId,
           biomeName: node?.biomeName ?? "unknown",
         });
-      } else if (prev.currentDreamscape !== null) {
-        logEvent("dreamscape_completed", {
-          dreamscapeId: prev.currentDreamscape,
-          sitesVisitedCount: prev.visitedSites.length,
-        });
       }
       return {
         ...prev,

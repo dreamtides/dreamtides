@@ -3,14 +3,13 @@ import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { SiteCard } from "../components/SiteCard";
 import { logEvent } from "../logging";
-import { generateNewNodes } from "../atlas/atlas-generator";
 
 /** The dreamscape view: shows all sites in the current dreamscape. */
 export function DreamscapeScreen() {
   const { state, mutations } = useQuest();
-  const { atlas, currentDreamscape, completionLevel } = state;
+  const { currentDreamscape, completionLevel } = state;
 
-  const node = currentDreamscape !== null ? atlas.nodes[currentDreamscape] : undefined;
+  const node = currentDreamscape !== null ? state.atlas.nodes[currentDreamscape] : undefined;
 
   const allNonBattleVisited = useMemo(() => {
     if (!node) return false;
@@ -41,27 +40,6 @@ export function DreamscapeScreen() {
     mutations.setCurrentDreamscape(null);
     mutations.setScreen({ type: "atlas" });
   }, [mutations]);
-
-  // Handle dreamscape completion: generates new atlas nodes, marks the
-  // node as completed, and transitions back to the atlas.
-  // The dreamscape_completed event is logged by setCurrentDreamscape(null).
-  const handleDreamscapeCompletion = useCallback(() => {
-    if (!currentDreamscape) return;
-
-    const updatedAtlas = generateNewNodes(
-      atlas,
-      currentDreamscape,
-      completionLevel,
-    );
-    mutations.updateAtlas(updatedAtlas);
-    mutations.setCurrentDreamscape(null);
-    mutations.setScreen({ type: "atlas" });
-  }, [atlas, currentDreamscape, completionLevel, mutations]);
-
-  const allSitesVisited = useMemo(() => {
-    if (!node) return false;
-    return node.sites.every((s) => s.isVisited);
-  }, [node]);
 
   if (!node) {
     return (
@@ -111,19 +89,8 @@ export function DreamscapeScreen() {
         })}
       </div>
 
-      {/* Action buttons */}
+      {/* Escape hatch: return to atlas without completing */}
       <div className="mt-6 flex gap-3 md:mt-8">
-        {allSitesVisited && (
-          <button
-            className="rounded-lg px-5 py-2.5 text-sm font-bold text-white transition-colors md:text-base"
-            style={{
-              background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
-            }}
-            onClick={handleDreamscapeCompletion}
-          >
-            Complete Dreamscape
-          </button>
-        )}
         <button
           className="rounded-lg px-4 py-2 text-sm font-medium transition-colors md:text-base"
           style={{

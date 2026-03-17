@@ -5,7 +5,7 @@ import { AtlasScreen } from "../screens/AtlasScreen";
 import { QuestStartScreen } from "../screens/QuestStartScreen";
 import { QuestCompleteScreen } from "../screens/QuestCompleteScreen";
 import { DreamscapeScreen } from "../screens/DreamscapeScreen";
-import { siteTypeName } from "../atlas/atlas-generator";
+import { generateNewNodes, siteTypeName } from "../atlas/atlas-generator";
 import { logEvent } from "../logging";
 import type { SiteState } from "../types/quest";
 
@@ -126,7 +126,7 @@ function GenericSitePlaceholder({ site }: { site: SiteState }) {
  */
 function BattleSitePlaceholder({ site }: { site: SiteState }) {
   const { state, mutations } = useQuest();
-  const { completionLevel } = state;
+  const { atlas, currentDreamscape, completionLevel } = state;
 
   const essenceReward = 100 + completionLevel * 50;
   const isFinalBoss = completionLevel >= 6;
@@ -150,11 +150,6 @@ function BattleSitePlaceholder({ site }: { site: SiteState }) {
       isFinalBoss,
     });
 
-    // Use the same mutations the real BattleScreen will use.
-    // incrementCompletionLevel handles the quest-complete transition
-    // for the final boss (level 7), so we only navigate back to
-    // the dreamscape for non-final battles.
-    mutations.incrementCompletionLevel(essenceReward, null);
     mutations.changeEssence(essenceReward, "battle_reward");
 
     logEvent("site_completed", {
@@ -164,10 +159,35 @@ function BattleSitePlaceholder({ site }: { site: SiteState }) {
 
     mutations.markSiteVisited(site.id);
 
-    if (!isFinalBoss) {
-      mutations.setScreen({ type: "dreamscape" });
+    // Complete the dreamscape: generate new atlas nodes and mark
+    // this node as completed before incrementing completion level,
+    // since the final boss transition to questComplete needs the
+    // atlas to already reflect the completed dreamscape.
+    if (currentDreamscape) {
+      const node = atlas.nodes[currentDreamscape];
+      const updatedAtlas = generateNewNodes(
+        atlas,
+        currentDreamscape,
+        completionLevel,
+      );
+      mutations.updateAtlas(updatedAtlas);
+
+      logEvent("dreamscape_completed", {
+        dreamscapeId: currentDreamscape,
+        sitesVisitedCount: (node?.sites.length ?? 0),
+      });
+
+      mutations.setCurrentDreamscape(null);
     }
-  }, [completionLevel, isMiniboss, isFinalBoss, essenceReward, site, mutations]);
+
+    // incrementCompletionLevel handles the quest-complete screen
+    // transition for the final boss (level 7).
+    mutations.incrementCompletionLevel(essenceReward, null);
+
+    if (!isFinalBoss) {
+      mutations.setScreen({ type: "atlas" });
+    }
+  }, [atlas, currentDreamscape, completionLevel, isMiniboss, isFinalBoss, essenceReward, site, mutations]);
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-5 p-8">
