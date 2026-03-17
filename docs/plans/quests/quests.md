@@ -89,8 +89,7 @@ rules engine.
 ## Tides
 
 Every card, dreamsign, and dreamcaller in Dreamtides is associated with a
-**tide**, which represents a deck archetype and philosophical identity. Tides
-replace the former "resonance" system entirely. See
+**tide**, which represents a deck archetype and philosophical identity. See
 [Tides](../../tides/tides.md) for the full tide design including archetype
 descriptions and alliances.
 
@@ -98,56 +97,80 @@ The seven core tides are: **Bloom**, **Arc**, **Ignite**, **Pact**, **Umbra**,
 **Rime**, and **Surge**. **Wild** is a neutral tide that sits at the center,
 compatible with all strategies.
 
-Unlike the old resonance system, tides have direct mechanical impact on gameplay
-through **tide crystals** — a resource required to play cards during battles.
-See [Tide Crystals](#tide-crystals) for details.
+Tides have direct mechanical impact on gameplay through **tide crystals** — a
+resource required to play cards during battles. See
+[Tide Crystals](#tide-crystals) for details.
 
-## Tide Crystals
+## Cube Draft
 
-Tide crystals are the resource system that governs which cards a player can play
-during a battle. Each card has a **tide cost** indicating how many crystals of
-its tide are required to play it:
+The cube draft is the primary mechanism by which players build their deck during
+a quest. It is modeled after cube drafts in Magic: the Gathering.
 
-- Most cards cost **1** tide crystal of their tide.
-- Cards that heavily commit to a specific archetype may cost **2 or 3** crystals
-  of their tide.
-- **Wild** cards cost **0** tide crystals and can always be played regardless of
-  crystal state.
-- No cards currently require crystals from multiple different tides.
+### Draft Pool
 
-### Crystal Pool Generation
+At the start of each quest, a **draft pool** is created containing every card in
+the game (approximately 480 cards). Each card appears exactly once in the pool —
+there is **no rarity weighting** in the draft pool. The draft operates as a
+10-person cube draft table with the player and **9 AI bot drafters**.
 
-Before each battle begins, a **crystal pool** is assembled based on the
-composition of the player's deck. The algorithm functions like a skilled Magic:
-the Gathering deck builder designing a mana base — it asks "what distribution of
-tide crystals would be most likely to let this player play their cards on
-curve?" The crystal pool is a fixed list of approximately 30 crystals.
+### Draft Mechanics
 
-The design goal is that **mono-tide decks can be played without any thought
-about crystals**, while **splashing additional tides carries added cost** and
-requires deliberate investment. Players who want to play cards from multiple
-tides must plan accordingly.
+The cube draft works as follows:
 
-### Crystal Accumulation During Battle
+1. **Pack dealing:** 10 packs of 15 cards each are dealt simultaneously from the
+   draft pool, one for each drafter at the table.
+2. **Picking and passing:** Each drafter takes 1 card from their pack, then
+   passes the remaining cards to the next drafter. Packs circulate in a single
+   fixed direction — always the same 9 AIs passing to the player.
+3. **Player's view:** The player opens their own pack and sees all 15 cards on
+   their first pick. On their second pick, they receive a pack passed from the
+   adjacent AI (14 cards remaining). On their third pick, the pack has been
+   through 2 AIs (13 cards), and so on. By the 10th pick, the pack has passed
+   through all 9 AIs and the player sees 6 remaining cards.
+4. **Leftovers:** After all 10 drafters have picked from a pack, 5 cards remain.
+   These leftover cards are discarded and do not return to the pool.
+5. **No wheeling:** Packs do not wheel back to the player. Each pack passes
+   through the player exactly once, and the draft direction never alternates.
 
-During each **Dreamwell phase** of a battle, the player receives 1 random
-crystal drawn from their crystal pool. Crystals accumulate over the course of
-the battle, with a **cap of 3 crystals per tide**. If the crystal pool is
-somehow exhausted, a randomized second copy is generated.
+### Draft Sites on the Map
 
-### Acquiring Additional Crystals
+Each [Draft site](#draft) on the dreamscape map provides **5 picks** from the
+ongoing cube draft. With 2 draft sites per dreamscape at early completion
+levels, the player makes 10 picks per dreamscape — completing one full pass
+through the 10 circulating packs.
 
-Players have several ways to improve their tide crystal situation beyond the
-automatic Dreamwell phase allocation:
+- The **first "draft 5" site** in a dreamscape covers picks from packs with 15,
+  14, 13, 12, and 11 cards (the player's own pack and packs that have passed
+  through 1-4 AIs).
+- The **second "draft 5" site** covers picks from packs with 10, 9, 8, 7, and 6
+  cards (packs that have passed through 5-9 AIs).
 
-- **Dreamcallers** grant 1 permanent tide crystal of their associated tide. The
-  player starts each battle already having this crystal in play.
-- **Shops** sell the ability to gain a tide crystal in exchange for essence,
-  allowing the player to start battles with a pre-purchased crystal in play.
-  This is a key tool for enabling multi-tide decks.
-- **Cards** — certain cards will be designed that generate tide crystals as part
-  of their effects, allowing players to fix their tide pool and play cards from
-  multiple tides.
+### Rounds and Pool Refresh
+
+After the player completes 10 picks (one full set of circulating packs), a new
+**round** begins: 10 new packs of 15 cards are dealt from the remaining pool.
+After **3 rounds** (30 total player picks), the draft pool is discarded and a
+completely fresh pool is created from all cards in the game. This is the only
+point at which duplicate cards may appear in draft picks. The draft state (pool,
+AI bot state, round counter) persists across dreamscapes throughout the entire
+quest.
+
+### AI Bot Drafters
+
+The 9 AI bot drafters are persistent throughout the quest, maintaining the same
+archetype preferences even across pool refreshes. Each AI bot scores cards using
+a weighted blend of:
+
+- **Raw power (20%):** How strong the card is in isolation.
+- **Archetype alignment (60%):** How well the card fits the bot's learned
+  archetype preferences (based on its tide commitment).
+- **Openness signals (20%):** Estimated archetype availability based on what
+  cards are being passed to the bot.
+
+Bots **commit to a tide after 5 picks** and pick **randomly 20% of the time**
+for variety. The AI bots' drafted cards are not used elsewhere — they serve
+purely to simulate realistic pack dynamics where desirable cards are taken
+before they reach the player.
 
 ## Dreamscape Sites
 
@@ -193,83 +216,17 @@ Icon: "Sword"
 
 ### Draft
 
-The Draft site is one of the two core components of Dreamtides gameplay,
-allowing users to add cards to their deck. Dreamtides uses a **cube draft**
-system inspired by Magic: the Gathering cube drafts.
+The Draft site allows users to add cards to their deck via the
+[Cube Draft](#cube-draft) system. Each draft site provides 5 picks from the
+ongoing cube draft. There is no way to "skip" or "reroll" draft picks by
+default, but of course all rules can be broken by specific dreamsigns.
 
-#### Cube Draft Overview
-
-At the start of each quest, a **draft pool** is created containing every card in
-the game (approximately 480 cards). Each card appears exactly once in the pool —
-there is **no rarity weighting** in the draft pool. The draft operates as a
-10-person cube draft table with the player and **9 AI bot drafters**.
-
-#### Draft Mechanics
-
-The cube draft works as follows:
-
-1. **Pack dealing:** 10 packs of 15 cards each are dealt simultaneously from the
-   draft pool, one for each drafter at the table.
-2. **Picking and passing:** Each drafter takes 1 card from their pack, then
-   passes the remaining cards to the next drafter. Packs circulate in a single
-   fixed direction — always the same 9 AIs passing to the player.
-3. **Player's view:** The player opens their own pack and sees all 15 cards on
-   their first pick. On their second pick, they receive a pack passed from the
-   adjacent AI (14 cards remaining). On their third pick, the pack has been
-   through 2 AIs (13 cards), and so on. By the 10th pick, the pack has passed
-   through all 9 AIs and the player sees 6 remaining cards.
-4. **Leftovers:** After all 10 drafters have picked from a pack, 5 cards remain.
-   These leftover cards are discarded and do not return to the pool.
-5. **No wheeling:** The draft direction never alternates. It is always a linear
-   sequence of the same 9 AIs passing to the player.
-
-#### Draft Sites on the Map
-
-Each draft site on the dreamscape map provides **5 picks** from the ongoing cube
-draft. With 2 draft sites per dreamscape at early completion levels, the player
-makes 10 picks per dreamscape — completing one full pass through the 10
-circulating packs.
-
-- The **first "draft 5" site** in a dreamscape covers picks from packs with 15,
-  14, 13, 12, and 11 cards (the player's own pack and packs that have passed
-  through 1-4 AIs).
-- The **second "draft 5" site** covers picks from packs with 10, 9, 8, 7, and 6
-  cards (packs that have passed through 5-9 AIs).
-
-#### Rounds and Pool Refresh
-
-After the player completes 10 picks (one full set of circulating packs), a new
-**round** begins: 10 new packs of 15 cards are dealt from the remaining pool.
-After **3 rounds** (30 total player picks), the draft pool is discarded and a
-completely fresh pool is created from all cards in the game. This is the only
-point at which duplicate cards may appear in draft picks. The draft state (pool,
-AI bot state, round counter) persists across dreamscapes throughout the entire
-quest.
-
-#### AI Bot Drafters
-
-The 9 AI bot drafters are persistent throughout the quest, maintaining the same
-archetype preferences even across pool refreshes. Each AI bot scores cards using
-a weighted blend of:
-
-- **Raw power (20%):** How strong the card is in isolation.
-- **Archetype alignment (60%):** How well the card fits the bot's learned
-  archetype preferences (based on its tide commitment).
-- **Openness signals (20%):** Estimated archetype availability based on what
-  cards are being passed to the bot.
-
-Bots **commit to a tide after 5 picks** and pick **randomly 20% of the time**
-for variety. The AI bots' drafted cards are not used elsewhere — they serve
-purely to simulate realistic pack dynamics where desirable cards are taken
-before they reach the player.
-
-**UI:** The cards available for the current pick are shown in a row (landscape
-mode) or in multiple rows (portrait mode). The pack of cards to draft from is
-shown in a pile in the 3D scene, then the available cards animate in to be
-selected. Clicking a card animates it to the quest deck, and the remaining cards
-animate away as the next pack arrives. After all picks at a draft site are
-completed, the camera automatically pulls back to the map view. Cards are shown
-with an orange outline.
+**UI:** The cards available for the current pick are shown in multiple rows. The
+pack of cards to draft from is shown in a pile in the 3D scene, then the
+available cards animate in to be selected. Clicking a card animates it to the
+quest deck, and the remaining cards animate away as the next pack arrives. After
+all picks at a draft site are completed, the camera automatically pulls back to
+the map view. Cards are shown with an orange outline.
 
 Icon: "Rectangle Vertical"
 
@@ -726,6 +683,53 @@ visited. The available enhanced sites are:
 - **Duplication**: The player may select which card in their deck is duplicated
 - **Specialty Shop**: The player may select any number of the offered cards to
   add to their deck.
+
+## Tide Crystals
+
+Tide crystals are the resource system that governs which cards a player can play
+during a battle. Each card has a **tide cost** indicating how many crystals of
+its tide are required to play it:
+
+- Most cards cost **1** tide crystal of their tide.
+- Cards that heavily commit to a specific archetype may cost **2 or 3** crystals
+  of their tide.
+- **Wild** cards cost **0** tide crystals and can always be played regardless of
+  crystal state.
+- No cards currently require crystals from multiple different tides.
+
+### Crystal Pool Generation
+
+Before each battle begins, a **crystal pool** is assembled based on the
+composition of the player's deck. The algorithm functions like a skilled Magic:
+the Gathering deck builder designing a mana base — it asks "what distribution of
+tide crystals would be most likely to let this player play their cards on
+curve?" The crystal pool is a fixed list of approximately 30 crystals.
+
+The design goal is that **mono-tide decks can be played without any thought
+about crystals**, while **splashing additional tides carries added cost** and
+requires deliberate investment. Players who want to play cards from multiple
+tides must plan accordingly.
+
+### Crystal Accumulation During Battle
+
+During each **Dreamwell phase** of a battle, the player receives 1 random
+crystal drawn from their crystal pool. Crystals accumulate over the course of
+the battle, with a **cap of 3 crystals per tide**. If the crystal pool is
+somehow exhausted, a randomized second copy is generated.
+
+### Acquiring Additional Crystals
+
+Players have several ways to improve their tide crystal situation beyond the
+automatic Dreamwell phase allocation:
+
+- **Dreamcallers** grant 1 permanent tide crystal of their associated tide. The
+  player starts each battle already having this crystal in play.
+- **Shops** sell the ability to gain a tide crystal in exchange for essence,
+  allowing the player to start battles with a pre-purchased crystal in play.
+  This is a key tool for enabling multi-tide decks.
+- **Cards** — certain cards will be designed that generate tide crystals as part
+  of their effects, allowing players to fix their tide pool and play cards from
+  multiple tides.
 
 ## Implementation Strategy and QA
 
