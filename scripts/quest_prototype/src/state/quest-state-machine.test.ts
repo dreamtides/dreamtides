@@ -248,6 +248,113 @@ describe("early exit from dreamscape", () => {
   });
 });
 
+/**
+ * Replicates the setScreen state updater logic from quest-context.tsx.
+ */
+function applySetScreen(prev: QuestState, screen: Screen): QuestState {
+  logEvent("screen_transition", {
+    from: screenName(prev.screen),
+    to: screenName(screen),
+  });
+  const activeSiteId = screen.type === "site" ? screen.siteId : null;
+  return { ...prev, screen, activeSiteId };
+}
+
+/**
+ * Simulates the SiteScreen lookup from ScreenRouter.tsx to determine
+ * whether a site can be resolved given the current state.
+ */
+function canResolveSite(state: QuestState): boolean {
+  if (state.screen.type !== "site") return true;
+  const node =
+    state.currentDreamscape !== null
+      ? state.atlas.nodes[state.currentDreamscape]
+      : undefined;
+  const site = node?.sites.find(
+    (s) => state.screen.type === "site" && s.id === state.screen.siteId,
+  );
+  return site !== undefined;
+}
+
+describe("battle reward transition does not orphan the screen", () => {
+  it("never shows site-not-found after battle reward selection", () => {
+    // The correct mutation sequence from handleSelectReward defers
+    // setCurrentDreamscape(null) to the post-animation callback, so
+    // the screen transitions to "atlas" before the dreamscape is cleared.
+    // This ensures SiteScreen never tries to look up a site with a null
+    // dreamscape.
+
+    const battleSite = makeSite("Battle", false);
+    const node = makeNode("ds-1", [
+      makeSite("Shop", true),
+      makeSite("Essence", true),
+      battleSite,
+    ]);
+    const state = createTestState({
+      completionLevel: 2,
+      currentDreamscape: "ds-1",
+      screen: { type: "site", siteId: battleSite.id },
+      atlas: {
+        nodes: { nexus: makeNode("nexus", [], "completed"), "ds-1": node },
+        edges: [["nexus", "ds-1"]],
+        nexusId: "nexus",
+      },
+    });
+
+    // Phase 1: Synchronous mutations (while screen is still "site").
+    // These must NOT clear currentDreamscape.
+    let next: QuestState = {
+      ...state,
+      visitedSites: [...state.visitedSites, battleSite.id],
+    };
+
+    // incrementCompletionLevel runs synchronously
+    next = applyIncrementCompletionLevel(next, 200, 42);
+
+    // The site must still be resolvable after synchronous mutations.
+    expect(canResolveSite(next)).toBe(true);
+    expect(next.currentDreamscape).toBe("ds-1");
+
+    // Phase 2: Post-animation callback (800ms later).
+    // The screen transitions to "atlas", THEN the dreamscape is cleared.
+    next = applySetScreen(next, { type: "atlas" });
+    next = applySetCurrentDreamscape(next, null);
+
+    expect(next.screen.type).toBe("atlas");
+    expect(next.currentDreamscape).toBeNull();
+  });
+
+  it("final boss path clears dreamscape after questComplete transition", () => {
+    const battleSite = makeSite("Battle", false);
+    const node = makeNode("ds-7", [
+      makeSite("Shop", true),
+      battleSite,
+    ]);
+    const state = createTestState({
+      completionLevel: 6,
+      currentDreamscape: "ds-7",
+      screen: { type: "site", siteId: battleSite.id },
+      atlas: {
+        nodes: { nexus: makeNode("nexus", [], "completed"), "ds-7": node },
+        edges: [["nexus", "ds-7"]],
+        nexusId: "nexus",
+      },
+    });
+
+    // Synchronous: incrementCompletionLevel transitions to questComplete
+    let next = applyIncrementCompletionLevel(state, 400, 99);
+
+    // The screen is now questComplete, not site, so the lookup is fine.
+    expect(next.screen.type).toBe("questComplete");
+
+    // Post-animation: dreamscape cleared (harmless since screen is already
+    // questComplete).
+    next = applySetCurrentDreamscape(next, null);
+    expect(next.currentDreamscape).toBeNull();
+    expect(next.screen.type).toBe("questComplete");
+  });
+});
+
 describe("final-boss completion path", () => {
   it("dreamscape should be marked completed before quest-complete transition", () => {
     // Simulate the battle auto-complete flow for the final boss:

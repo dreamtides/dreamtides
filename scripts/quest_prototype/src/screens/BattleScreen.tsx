@@ -498,24 +498,6 @@ export function BattleScreen({
       // Mark site visited
       mutations.markSiteVisited(site.id);
 
-      // Complete the dreamscape
-      if (currentDreamscape) {
-        const node = atlas.nodes[currentDreamscape];
-        const updatedAtlas = generateNewNodes(
-          atlas,
-          currentDreamscape,
-          completionLevel,
-        );
-        mutations.updateAtlas(updatedAtlas);
-
-        logEvent("dreamscape_completed", {
-          dreamscapeId: currentDreamscape,
-          sitesVisitedCount: node?.sites.length ?? 0,
-        });
-
-        mutations.setCurrentDreamscape(null);
-      }
-
       // Increment completion level (handles quest complete for level 7)
       mutations.incrementCompletionLevel(
         essenceReward,
@@ -529,13 +511,38 @@ export function BattleScreen({
         outcome: `Victory - earned ${String(essenceReward)} essence, card #${String(card.cardNumber)}`,
       });
 
-      // After animation delay, navigate away
+      // Capture dreamscape info before the delayed callback to avoid
+      // stale closure issues.
+      const dreamscapeId = currentDreamscape;
+
+      // After animation delay, navigate away and complete the dreamscape.
+      // The dreamscape clearing is deferred to this callback so that the
+      // screen transitions to "atlas" first. Clearing currentDreamscape
+      // while the screen is still "site" would cause SiteScreen to show
+      // "Site not found." and unmount BattleScreen, canceling this timer.
       timersRef.current.push(
         setTimeout(() => {
           // If final boss, incrementCompletionLevel already transitions
           // to quest complete. Otherwise go to atlas.
           if (!isFinalBoss) {
             mutations.setScreen({ type: "atlas" });
+          }
+
+          if (dreamscapeId) {
+            const node = atlas.nodes[dreamscapeId];
+            const updatedAtlas = generateNewNodes(
+              atlas,
+              dreamscapeId,
+              completionLevel,
+            );
+            mutations.updateAtlas(updatedAtlas);
+
+            logEvent("dreamscape_completed", {
+              dreamscapeId,
+              sitesVisitedCount: node?.sites.length ?? 0,
+            });
+
+            mutations.setCurrentDreamscape(null);
           }
         }, 800),
       );
