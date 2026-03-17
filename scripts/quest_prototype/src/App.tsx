@@ -1,19 +1,38 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { CardData } from "./types/cards";
 import { loadCardDatabase } from "./data/card-database";
 import { QuestProvider, useQuest } from "./state/quest-context";
 import { ScreenRouter } from "./components/ScreenRouter";
 import { HUD } from "./components/HUD";
+import { DeckViewer } from "./components/DeckViewer";
 
 /** Inner component that renders the screen router and HUD. */
-function QuestApp() {
+function QuestApp({
+  cardDatabase,
+}: {
+  cardDatabase: Map<number, CardData>;
+}) {
   const { state } = useQuest();
   const showHud = state.screen.type !== "questStart";
+  const [deckViewerOpen, setDeckViewerOpen] = useState(false);
+
+  const handleOpenDeckViewer = useCallback(() => {
+    setDeckViewerOpen(true);
+  }, []);
+
+  const handleCloseDeckViewer = useCallback(() => {
+    setDeckViewerOpen(false);
+  }, []);
 
   return (
     <div style={{ paddingBottom: showHud ? "48px" : "0" }}>
       <ScreenRouter />
-      {showHud && <HUD />}
+      {showHud && <HUD onOpenDeckViewer={handleOpenDeckViewer} />}
+      <DeckViewer
+        isOpen={deckViewerOpen}
+        onClose={handleCloseDeckViewer}
+        cardDatabase={cardDatabase}
+      />
     </div>
   );
 }
@@ -40,7 +59,7 @@ export default function App() {
 
   return (
     <QuestProvider cardDatabase={cardDatabase}>
-      <QuestApp />
+      <QuestApp cardDatabase={cardDatabase} />
     </QuestProvider>
   );
 }
