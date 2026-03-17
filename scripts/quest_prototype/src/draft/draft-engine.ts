@@ -106,7 +106,7 @@ function computeSupplySignal(
 export function scoreCard(
   card: CardData,
   agent: AgentState,
-  config: DraftConfig,
+  config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): number {
   const fitness = computeFitness(card);
   const normalizedPref = normalize(agent.preference);
@@ -172,8 +172,8 @@ function countByTide(
 /** Create initial DraftState from all non-Special cards. */
 export function initializeDraftState(
   cardDatabase: Map<number, CardData>,
+  config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): DraftState {
-  const config = DEFAULT_DRAFT_CONFIG;
   const pool = Array.from(cardDatabase.keys());
 
   logEvent("draft_pool_initialized", {
@@ -195,18 +195,25 @@ export function initializeDraftState(
   };
 }
 
-/** Create a fresh pool from all cards. Reset round/pick counters. Preserve bot preferences. */
+/** Create a fresh pool from all cards. Reset round/pick counters. Preserve bot preference vectors but clear stale openness history. */
 export function refreshPool(
   state: DraftState,
   cardDatabase: Map<number, CardData>,
+  config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): void {
   const pool = Array.from(cardDatabase.keys());
   state.pool = shuffle([...pool]);
-  state.packs = Array.from({ length: DEFAULT_DRAFT_CONFIG.seatCount }, () => []);
+  state.packs = Array.from({ length: config.seatCount }, () => []);
   state.currentRound = 0;
   state.currentPick = 0;
   state.totalPicks = 0;
   state.isActive = false;
+
+  // Clear stale openness history from the previous pool while preserving
+  // preference vectors so bots maintain their tide affinities.
+  for (const agent of state.agents) {
+    agent.opennessHistory = [];
+  }
 
   logEvent("draft_pool_refreshed", {
     poolSize: state.pool.length,
@@ -215,8 +222,10 @@ export function refreshPool(
 }
 
 /** Draw 10 packs of 15 from the pool (uniform random, without replacement). */
-export function dealRound(state: DraftState): void {
-  const config = DEFAULT_DRAFT_CONFIG;
+export function dealRound(
+  state: DraftState,
+  config: DraftConfig = DEFAULT_DRAFT_CONFIG,
+): void {
   const totalNeeded = config.seatCount * config.packSize;
   const available = Math.min(totalNeeded, state.pool.length);
 
@@ -242,16 +251,17 @@ export function dealRound(state: DraftState): void {
   });
 }
 
-/** Player picks a specific card from seat 0's current pack. */
+/** Player picks a specific card from seat 0's current pack. Returns true if the card was found and picked. */
 export function playerPick(
   cardNumber: number,
   state: DraftState,
   cardDatabase: Map<number, CardData>,
-): void {
+  config: DraftConfig = DEFAULT_DRAFT_CONFIG,
+): boolean {
   const pack = state.packs[0];
   const cardIndex = pack.indexOf(cardNumber);
   if (cardIndex === -1) {
-    return; // Card not in pack; no-op
+    return false;
   }
 
   const card = cardDatabase.get(cardNumber);
@@ -265,7 +275,6 @@ export function playerPick(
   // Update player preference vector
   if (card) {
     const fitness = computeFitness(card);
-    const config = DEFAULT_DRAFT_CONFIG;
     for (let i = 0; i < config.tideCount; i++) {
       state.agents[0].preference[i] += config.learningRate * fitness[i];
     }
@@ -275,12 +284,10 @@ export function playerPick(
   const signal = computeSupplySignal(
     packContents,
     cardDatabase,
-    DEFAULT_DRAFT_CONFIG.tideCount,
+    config.tideCount,
   );
   state.agents[0].opennessHistory.push(signal);
-  if (
-    state.agents[0].opennessHistory.length > DEFAULT_DRAFT_CONFIG.opennessWindow
-  ) {
+  if (state.agents[0].opennessHistory.length > config.opennessWindow) {
     state.agents[0].opennessHistory.shift();
   }
 
@@ -292,6 +299,7 @@ export function playerPick(
     cardsAvailableCount: packContents.length,
     packContents: packContents,
   });
+  return true;
 }
 
 /** AI bot picks a card from its current pack. */
@@ -299,7 +307,7 @@ export function botPick(
   seatIndex: number,
   state: DraftState,
   cardDatabase: Map<number, CardData>,
-  config: DraftConfig,
+  config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): void {
   const pack = state.packs[seatIndex];
   if (pack.length === 0) {
@@ -365,28 +373,22 @@ export function botPick(
   });
 }
 
-/** Rotate packs between seats. Odd rounds rotate left, even rounds rotate right. */
+/** Rotate packs between seats in a single fixed direction (left). */
 export function rotatePacks(state: DraftState): void {
   const packs = state.packs;
   const count = packs.length;
 
-  if (state.currentRound % 2 === 0) {
-    // Odd round (0-indexed even = 1st, 3rd round) => rotate left
-    // Seat N's pack goes to seat N+1
-    const last = packs[count - 1];
-    for (let i = count - 1; i > 0; i--) {
-      packs[i] = packs[i - 1];
-    }
-    packs[0] = last;
-  } else {
-    // Even round (0-indexed odd = 2nd round) => rotate right
-    // Seat N's pack goes to seat N-1
-    const first = packs[0];
-    for (let i = 0; i < count - 1; i++) {
-      packs[i] = packs[i + 1];
-    }
-    packs[count - 1] = first;
+  // Always rotate left: seat N's pack goes to seat N+1
+  const last = packs[count - 1];
+  for (let i = count - 1; i > 0; i--) {
+    packs[i] = packs[i - 1];
   }
+  packs[0] = last;
+
+  logEvent("draft_packs_rotated", {
+    roundNumber: state.currentRound,
+    pickNumber: state.currentPick,
+  });
 }
 
 /**
@@ -397,23 +399,22 @@ export function rotatePacks(state: DraftState): void {
 export function advancePick(
   state: DraftState,
   cardDatabase: Map<number, CardData>,
+  config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): void {
   state.currentPick += 1;
   state.totalPicks += 1;
 
-  const config = DEFAULT_DRAFT_CONFIG;
-
   if (state.totalPicks >= config.roundsPerPool * config.picksPerRound) {
     // Pool exhausted -- refresh
-    refreshPool(state, cardDatabase);
+    refreshPool(state, cardDatabase, config);
     return;
   }
 
   if (state.currentPick >= config.picksPerRound) {
-    // Round complete -- deal new packs
+    // Round complete -- increment round and deal new packs if rounds remain
     state.currentRound += 1;
     state.currentPick = 0;
-    state.isActive = false;
+    dealRound(state, config);
   }
 }
 
@@ -421,16 +422,16 @@ export function advancePick(
 export function enterDraftSite(
   state: DraftState,
   _cardDatabase: Map<number, CardData>,
+  config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): void {
   state.sitePicksCompleted = 0;
 
   if (!state.isActive) {
-    dealRound(state);
+    dealRound(state, config);
   }
 
   logEvent("draft_site_entered", {
-    picksRemainingInRound:
-      DEFAULT_DRAFT_CONFIG.picksPerRound - state.currentPick,
+    picksRemainingInRound: config.picksPerRound - state.currentPick,
   });
 }
 
@@ -447,11 +448,15 @@ export function processPlayerPick(
   cardNumber: number,
   state: DraftState,
   cardDatabase: Map<number, CardData>,
+  config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): boolean {
-  const config = DEFAULT_DRAFT_CONFIG;
-
-  // Player picks
-  playerPick(cardNumber, state, cardDatabase);
+  // Player picks -- abort if the card is not in the player's pack
+  const picked = playerPick(cardNumber, state, cardDatabase, config);
+  if (!picked) {
+    throw new Error(
+      `Card ${String(cardNumber)} is not in seat 0's current pack`,
+    );
+  }
 
   // All bots pick
   for (let seat = 1; seat < config.seatCount; seat++) {
@@ -462,16 +467,10 @@ export function processPlayerPick(
   rotatePacks(state);
 
   // Advance pick counter
-  advancePick(state, cardDatabase);
+  advancePick(state, cardDatabase, config);
 
   // Track site picks
   state.sitePicksCompleted += 1;
-
-  // If round ended and more rounds remain, deal the next round automatically
-  // so the next pick has packs available
-  if (!state.isActive && state.totalPicks > 0 && state.totalPicks < 30) {
-    dealRound(state);
-  }
 
   return state.sitePicksCompleted >= SITE_PICKS;
 }

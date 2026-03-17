@@ -228,12 +228,11 @@ describe("dealRound", () => {
 });
 
 describe("rotatePacks", () => {
-  it("rotates left on odd rounds (round 0 is the first, index 0)", () => {
+  it("always rotates left: seat N's pack goes to seat N+1", () => {
     const db = makeDatabase(483);
     const state = initializeDraftState(db);
     dealRound(state);
     const packsBefore = state.packs.map((p) => [...p]);
-    // Round 0 is odd (first round), rotates left: seat N's pack goes to seat N+1
     state.currentRound = 0;
     rotatePacks(state);
     // Seat 1 should now have what seat 0 had
@@ -242,17 +241,27 @@ describe("rotatePacks", () => {
     expect(state.packs[0]).toEqual(packsBefore[9]);
   });
 
-  it("rotates right on even rounds (round 1)", () => {
+  it("rotates in the same direction regardless of round number", () => {
     const db = makeDatabase(483);
     const state = initializeDraftState(db);
     dealRound(state);
     const packsBefore = state.packs.map((p) => [...p]);
     state.currentRound = 1;
     rotatePacks(state);
-    // Seat 0 should now have what seat 1 had
-    expect(state.packs[0]).toEqual(packsBefore[1]);
-    // Seat 9 should have what seat 0 had (wrap)
-    expect(state.packs[9]).toEqual(packsBefore[0]);
+    // Even on round 1, direction should still be left
+    expect(state.packs[1]).toEqual(packsBefore[0]);
+    expect(state.packs[0]).toEqual(packsBefore[9]);
+  });
+
+  it("emits draft_packs_rotated event", () => {
+    const db = makeDatabase(483);
+    const state = initializeDraftState(db);
+    dealRound(state);
+    rotatePacks(state);
+    const entries = getLogEntries();
+    const event = entries.find((e) => e.event === "draft_packs_rotated");
+    expect(event).toBeDefined();
+    expect(event?.roundNumber).toBe(0);
   });
 });
 
@@ -278,6 +287,15 @@ describe("playerPick", () => {
     expect(pickEvent).toBeDefined();
     expect(pickEvent?.cardNumber).toBe(cardToPick);
     expect(pickEvent?.packContents).toBeDefined();
+  });
+
+  it("returns false when the card is not in the pack", () => {
+    const db = makeDatabase(483);
+    const state = initializeDraftState(db);
+    dealRound(state);
+    const result = playerPick(999999, state, db);
+    expect(result).toBe(false);
+    expect(state.agents[0].picks).toHaveLength(0);
   });
 });
 
@@ -333,8 +351,9 @@ describe("refreshPool", () => {
     state.totalPicks = 30;
     state.currentRound = 2;
     state.currentPick = 9;
-    // Give bots some preferences to verify persistence
+    // Give bots some preferences and stale openness history
     state.agents[1].preference = [1, 2, 3, 4, 5, 6, 7];
+    state.agents[1].opennessHistory = [[0.1, 0.2, 0.3, 0.1, 0.1, 0.1, 0.1]];
     refreshPool(state, db);
     expect(state.pool).toHaveLength(483);
     expect(state.currentRound).toBe(0);
@@ -343,6 +362,8 @@ describe("refreshPool", () => {
     expect(state.isActive).toBe(false);
     // Bot preferences should persist
     expect(state.agents[1].preference).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    // Openness history should be cleared (stale signals from previous pool)
+    expect(state.agents[1].opennessHistory).toHaveLength(0);
   });
 
   it("logs draft_pool_refreshed event", () => {
@@ -417,6 +438,21 @@ describe("processPlayerPick", () => {
       }
     }
     expect(state.sitePicksCompleted).toBe(5);
+  });
+
+  it("throws an error when the card is not in the player's pack", () => {
+    const db = makeDatabase(483);
+    const state = initializeDraftState(db);
+    enterDraftSite(state, db);
+    expect(() => processPlayerPick(999999, state, db)).toThrow(
+      "Card 999999 is not in seat 0's current pack",
+    );
+    // State should not be corrupted: no bot picks, no rotation, no advancement
+    expect(state.sitePicksCompleted).toBe(0);
+    expect(state.currentPick).toBe(0);
+    for (let i = 1; i < 10; i++) {
+      expect(state.agents[i].picks).toHaveLength(0);
+    }
   });
 });
 
