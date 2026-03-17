@@ -15,6 +15,9 @@ import { DreamsignOfferingScreen } from "../screens/DreamsignOfferingScreen";
 import { DreamsignDraftScreen } from "../screens/DreamsignDraftScreen";
 import { DreamJourneyScreen } from "../screens/DreamJourneyScreen";
 import { TemptingOfferScreen } from "../screens/TemptingOfferScreen";
+import { PurgeSiteScreen } from "../screens/PurgeSiteScreen";
+import { TransfigurationSiteScreen } from "../screens/TransfigurationSiteScreen";
+import { DuplicationSiteScreen } from "../screens/DuplicationSiteScreen";
 import { siteTypeName } from "../atlas/atlas-generator";
 import { logEvent } from "../logging";
 import type { SiteState } from "../types/quest";
@@ -113,6 +116,18 @@ function SiteScreen({ siteId }: { siteId: string }) {
 
   if (site.type === "TemptingOffer") {
     return <TemptingOfferScreen site={site} />;
+  }
+
+  if (site.type === "Purge") {
+    return <PurgeSiteScreen site={site} />;
+  }
+
+  if (site.type === "Transfiguration") {
+    return <TransfigurationSiteScreen site={site} />;
+  }
+
+  if (site.type === "Duplication") {
+    return <DuplicationSiteScreen site={site} />;
   }
 
   return <GenericSitePlaceholder site={site} />;
