@@ -82,10 +82,11 @@ function buildAdditionalSitePool(
 ): Array<[SiteType, number]> {
   const pool: Array<[SiteType, number]> = [];
 
-  // Early game (all levels): Shop, Essence, DreamsignOffering
+  // Early game (all levels): Shop, Essence, DreamsignOffering, DreamsignDraft
   pool.push(["Shop", 3]);
   pool.push(["Essence", 3]);
   pool.push(["DreamsignOffering", 3]);
+  pool.push(["DreamsignDraft", 1]);
 
   // Reward available at all levels
   pool.push(["Reward", 2]);

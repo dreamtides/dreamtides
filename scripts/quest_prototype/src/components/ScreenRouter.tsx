@@ -22,11 +22,14 @@ import { RewardSiteScreen } from "../screens/RewardSiteScreen";
 import { CleanseSiteScreen } from "../screens/CleanseSiteScreen";
 import { siteTypeName } from "../atlas/atlas-generator";
 import { logEvent } from "../logging";
-import type { SiteState } from "../types/quest";
+import type { Screen, SiteState } from "../types/quest";
 
-/** Computes a stable key for AnimatePresence from the current screen type. */
-function screenKey(screenType: string): string {
-  return `screen-${screenType}`;
+/** Computes a stable key for AnimatePresence from the current screen. */
+function screenKey(screen: Screen): string {
+  if (screen.type === "site") {
+    return `screen-site-${screen.siteId}`;
+  }
+  return `screen-${screen.type}`;
 }
 
 /** Routes to the correct screen component based on quest state. */
@@ -52,7 +55,7 @@ export function ScreenRouter() {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={screenKey(screen.type)}
+        key={screenKey(screen)}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
