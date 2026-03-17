@@ -59,17 +59,21 @@ function kebabToCamel(str) {
 
 /**
  * Convert a TOML card record to its JSON representation with camelCase keys.
- * The spark field is converted from "" to null for Events.
+ * Spark normalization: "" or missing becomes null; "*" (variable spark)
+ * becomes null; integer values are preserved.
  */
 function transformCard(card) {
   const result = {};
   for (const [key, value] of Object.entries(card)) {
     const camelKey = kebabToCamel(key);
     if (camelKey === "spark") {
-      result[camelKey] = value === "" ? null : value;
+      result[camelKey] = value === "" || value === "*" ? null : value;
     } else {
       result[camelKey] = value;
     }
+  }
+  if (!("spark" in result)) {
+    result.spark = null;
   }
   return result;
 }

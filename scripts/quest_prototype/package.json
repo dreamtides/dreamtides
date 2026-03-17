@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
+    "dev": "node scripts/setup-assets.mjs && vite",
+    "build": "node scripts/setup-assets.mjs && tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint src/",
     "test": "vitest run",
