@@ -5,6 +5,7 @@ import { AtlasScreen } from "../screens/AtlasScreen";
 import { QuestStartScreen } from "../screens/QuestStartScreen";
 import { QuestCompleteScreen } from "../screens/QuestCompleteScreen";
 import { DreamscapeScreen } from "../screens/DreamscapeScreen";
+import { DraftSiteScreen } from "../screens/DraftSiteScreen";
 import { ShopScreen } from "../screens/ShopScreen";
 import { SpecialtyShopScreen } from "../screens/SpecialtyShopScreen";
 import { generateNewNodes, siteTypeName } from "../atlas/atlas-generator";
@@ -65,6 +66,10 @@ function SiteScreen({ siteId }: { siteId: string }) {
         <p className="text-lg opacity-50">Site not found.</p>
       </div>
     );
+  }
+
+  if (site.type === "Draft") {
+    return <DraftSiteScreen siteId={siteId} />;
   }
 
   if (site.type === "Battle") {

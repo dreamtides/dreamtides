@@ -1,4 +1,5 @@
 import type { Tide } from "./cards";
+import type { DraftState } from "./draft";
 
 /** Badge applied to a card via a Transfiguration site. */
 export type TransfigurationType =
@@ -96,7 +97,7 @@ export interface QuestState {
   atlas: DreamAtlas;
   currentDreamscape: string | null;
   visitedSites: string[];
-  draftState: unknown;
+  draftState: DraftState | null;
   screen: Screen;
   activeSiteId: string | null;
 }

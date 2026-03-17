@@ -17,6 +17,7 @@ import type {
   Screen,
   TransfigurationType,
 } from "../types/quest";
+import type { DraftState } from "../types/draft";
 import { logEvent, resetLog } from "../logging";
 
 const MAX_DREAMSIGNS = 12;
@@ -39,6 +40,7 @@ export interface QuestMutations {
   markSiteVisited: (siteId: string) => void;
   setCurrentDreamscape: (nodeId: string | null) => void;
   updateAtlas: (atlas: DreamAtlas) => void;
+  setDraftState: (draftState: DraftState) => void;
   resetQuest: () => void;
 }
 
@@ -316,6 +318,10 @@ export function QuestProvider({
     setState((prev) => ({ ...prev, atlas }));
   }, []);
 
+  const setDraftState = useCallback((draftState: DraftState) => {
+    setState((prev) => ({ ...prev, draftState }));
+  }, []);
+
   const resetQuest = useCallback(() => {
     resetLog();
     entryIdCounter.current = 0;
@@ -337,6 +343,7 @@ export function QuestProvider({
       markSiteVisited,
       setCurrentDreamscape,
       updateAtlas,
+      setDraftState,
       resetQuest,
     }),
     [
@@ -353,6 +360,7 @@ export function QuestProvider({
       markSiteVisited,
       setCurrentDreamscape,
       updateAtlas,
+      setDraftState,
       resetQuest,
     ],
   );

@@ -23,3 +23,12 @@ body {
     sans-serif;
   min-height: 100vh;
 }
+
+@media (min-width: 1280px) {
+  .draft-pack-grid {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
+  .draft-summary-grid {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
+}
