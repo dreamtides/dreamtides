@@ -23,6 +23,8 @@ interface CardDisplayProps {
   onHover?: () => void;
   selected?: boolean;
   selectionColor?: string;
+  /** When set, tints the card's stat values and rules text in this color. */
+  tintColor?: string;
 }
 
 /** Renders styled rules text, replacing special symbols with colored spans. */
@@ -53,6 +55,7 @@ export function CardDisplay({
   onHover,
   selected = false,
   selectionColor = "#f97316",
+  tintColor,
 }: CardDisplayProps) {
   const [imageError, setImageError] = useState(false);
 
@@ -100,8 +103,8 @@ export function CardDisplay({
           border: "1px solid rgba(251, 191, 36, 0.5)",
         }}
       >
-        <span style={{ color: "#fbbf24" }}>{"\u25CF"}</span>
-        <span className="text-white">
+        <span style={{ color: tintColor ?? "#fbbf24" }}>{"\u25CF"}</span>
+        <span style={{ color: tintColor ?? "#ffffff" }}>
           {card.energyCost !== null ? String(card.energyCost) : "X"}
         </span>
       </div>
@@ -188,7 +191,7 @@ export function CardDisplay({
         {/* Rules text */}
         <div
           className="mt-1 min-h-0 flex-1 overflow-y-auto text-[10px] leading-tight opacity-80"
-          style={{ color: "#e2e8f0" }}
+          style={{ color: tintColor ?? "#e2e8f0" }}
         >
           {renderRulesText(card.renderedText)}
         </div>
@@ -203,8 +206,8 @@ export function CardDisplay({
                 border: "1px solid rgba(192, 132, 252, 0.5)",
               }}
             >
-              <span style={{ color: "#c084fc" }}>{"\u234F"}</span>
-              <span className="text-white">{String(card.spark)}</span>
+              <span style={{ color: tintColor ?? "#c084fc" }}>{"\u234F"}</span>
+              <span style={{ color: tintColor ?? "#ffffff" }}>{String(card.spark)}</span>
             </div>
           </div>
         )}

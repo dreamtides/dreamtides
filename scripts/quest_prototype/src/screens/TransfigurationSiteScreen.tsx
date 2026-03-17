@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { SiteState, DeckEntry } from "../types/quest";
 import type { CardData } from "../types/cards";
@@ -9,6 +9,7 @@ import { logEvent } from "../logging";
 import {
   assignTransfiguration,
   TRANSFIGURATION_COLORS,
+  transfigurationEffectDetails,
   type TransfigurationOffer,
 } from "../transfiguration/transfiguration-logic";
 
@@ -72,16 +73,38 @@ export function TransfigurationSiteScreen({
     [deck],
   );
 
+  const autoReturnTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (autoReturnTimer.current !== null) {
+        clearTimeout(autoReturnTimer.current);
+      }
+    };
+  }, []);
+
   const handleAccept = useCallback(
     (candidate: TransfigurationCandidate) => {
-      mutations.transfigureCard(candidate.entry.entryId, candidate.offer.type);
-      setAcceptedEntryIds((prev) => {
-        const next = new Set(prev);
-        next.add(candidate.entry.entryId);
-        return next;
+      if (acceptedEntryIds.size > 0) return;
+      mutations.transfigureCard(
+        candidate.entry.entryId,
+        candidate.offer.type,
+        candidate.offer.description,
+        transfigurationEffectDetails(candidate.offer, candidate.card),
+      );
+      setAcceptedEntryIds(new Set([candidate.entry.entryId]));
+
+      logEvent("site_completed", {
+        siteType: "Transfiguration",
+        outcome: "completed",
       });
+      autoReturnTimer.current = setTimeout(() => {
+        autoReturnTimer.current = null;
+        mutations.markSiteVisited(site.id);
+        mutations.setScreen({ type: "dreamscape" });
+      }, 800);
     },
-    [mutations],
+    [mutations, acceptedEntryIds.size, site.id],
   );
 
   const handleEnhancedPick = useCallback(
@@ -98,16 +121,43 @@ export function TransfigurationSiteScreen({
 
   const handleEnhancedAccept = useCallback(() => {
     if (!enhancedPickedEntry || !enhancedOffer) return;
-    mutations.transfigureCard(enhancedPickedEntry.entryId, enhancedOffer.type);
+    const card = cardDatabase.get(enhancedPickedEntry.cardNumber);
+    if (!card) return;
+    mutations.transfigureCard(
+      enhancedPickedEntry.entryId,
+      enhancedOffer.type,
+      enhancedOffer.description,
+      transfigurationEffectDetails(enhancedOffer, card),
+    );
     setEnhancedAccepted(true);
-  }, [enhancedPickedEntry, enhancedOffer, mutations]);
 
-  const handleClose = useCallback(() => {
     logEvent("site_completed", {
       siteType: "Transfiguration",
-      outcome:
-        acceptedEntryIds.size > 0 || enhancedAccepted ? "completed" : "skipped",
+      outcome: "completed",
     });
+    autoReturnTimer.current = setTimeout(() => {
+      autoReturnTimer.current = null;
+      mutations.markSiteVisited(site.id);
+      mutations.setScreen({ type: "dreamscape" });
+    }, 800);
+  }, [enhancedPickedEntry, enhancedOffer, mutations, cardDatabase, site.id]);
+
+  const handleEnhancedReject = useCallback(() => {
+    setEnhancedPickedEntry(null);
+    setEnhancedOffer(null);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    if (autoReturnTimer.current !== null) {
+      clearTimeout(autoReturnTimer.current);
+      autoReturnTimer.current = null;
+    }
+    if (acceptedEntryIds.size === 0 && !enhancedAccepted) {
+      logEvent("site_completed", {
+        siteType: "Transfiguration",
+        outcome: "skipped",
+      });
+    }
     mutations.markSiteVisited(site.id);
     mutations.setScreen({ type: "dreamscape" });
   }, [mutations, site.id, acceptedEntryIds.size, enhancedAccepted]);
@@ -175,6 +225,7 @@ export function TransfigurationSiteScreen({
             offer={enhancedOffer}
             cardDatabase={cardDatabase}
             onAccept={handleEnhancedAccept}
+            onReject={handleEnhancedReject}
           />
         )}
 
@@ -288,6 +339,7 @@ export function TransfigurationSiteScreen({
                     card={candidate.offer.previewCard}
                     selected={true}
                     selectionColor={color}
+                    tintColor={color}
                   />
                 </div>
 
@@ -302,6 +354,16 @@ export function TransfigurationSiteScreen({
                     }}
                   >
                     Applied!
+                  </div>
+                ) : acceptedEntryIds.size > 0 ? (
+                  <div
+                    className="w-full rounded-lg px-4 py-2 text-center text-sm font-bold opacity-40"
+                    style={{
+                      background: "#4b5563",
+                      color: "#9ca3af",
+                    }}
+                  >
+                    Unavailable
                   </div>
                 ) : (
                   <button
@@ -344,11 +406,13 @@ function EnhancedPreview({
   offer,
   cardDatabase,
   onAccept,
+  onReject,
 }: {
   entry: DeckEntry;
   offer: TransfigurationOffer;
   cardDatabase: Map<number, CardData>;
   onAccept: () => void;
+  onReject: () => void;
 }) {
   const card = cardDatabase.get(entry.cardNumber);
   if (!card) return null;
@@ -396,19 +460,33 @@ function EnhancedPreview({
           card={offer.previewCard}
           selected={true}
           selectionColor={color}
+          tintColor={color}
         />
       </div>
 
-      <button
-        className="w-full rounded-lg px-4 py-2 text-sm font-bold transition-opacity hover:opacity-90"
-        style={{
-          background: `linear-gradient(135deg, ${color} 0%, ${color}cc 100%)`,
-          color: "#ffffff",
-        }}
-        onClick={onAccept}
-      >
-        Accept {offer.type}
-      </button>
+      <div className="flex w-full gap-2">
+        <button
+          className="flex-1 rounded-lg px-4 py-2 text-sm font-bold transition-opacity hover:opacity-90"
+          style={{
+            background: `linear-gradient(135deg, ${color} 0%, ${color}cc 100%)`,
+            color: "#ffffff",
+          }}
+          onClick={onAccept}
+        >
+          Accept
+        </button>
+        <button
+          className="flex-1 rounded-lg px-4 py-2 text-sm font-bold transition-opacity hover:opacity-90"
+          style={{
+            background: "rgba(107, 114, 128, 0.2)",
+            border: "1px solid rgba(107, 114, 128, 0.4)",
+            color: "#9ca3af",
+          }}
+          onClick={onReject}
+        >
+          Reject
+        </button>
+      </div>
     </motion.div>
   );
 }

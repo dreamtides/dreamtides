@@ -4,13 +4,13 @@ import type { CardData, Tide } from "../types/cards";
 import type {
   DeckEntry,
   QuestState,
-  TransfigurationType,
 } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { CardDisplay } from "./CardDisplay";
 import { CardOverlay } from "./CardOverlay";
 import { logEvent } from "../logging";
+import { TRANSFIGURATION_COLORS } from "../transfiguration/transfiguration-logic";
 
 /** All tides including Wild, used for filter toggles. */
 const ALL_TIDES: readonly Tide[] = [...NAMED_TIDES, "Wild"] as const;
@@ -34,15 +34,6 @@ const SORT_LABELS: Readonly<Record<SortCriteria, string>> = {
 
 /** Card type filter options. */
 type CardTypeFilter = "All" | "Characters" | "Events";
-
-/** Transfiguration colors. */
-const TRANSFIG_COLORS: Readonly<Record<TransfigurationType, string>> = {
-  Viridian: "#10b981",
-  Golden: "#f59e0b",
-  Scarlet: "#ef4444",
-  Azure: "#3b82f6",
-  Bronze: "#d97706",
-};
 
 /** Tide ordering for sort-by-tide. */
 const TIDE_ORDER: Readonly<Record<Tide, number>> = {
@@ -450,11 +441,11 @@ export function DeckViewer({
                           className="absolute -top-1 -right-1 z-10 rounded-full px-1.5 py-0.5 text-[9px] font-bold shadow-md"
                           style={{
                             background:
-                              TRANSFIG_COLORS[
+                              TRANSFIGURATION_COLORS[
                                 resolved.entry.transfiguration
                               ],
                             color: "#fff",
-                            boxShadow: `0 0 6px ${TRANSFIG_COLORS[resolved.entry.transfiguration]}80`,
+                            boxShadow: `0 0 6px ${TRANSFIGURATION_COLORS[resolved.entry.transfiguration]}80`,
                           }}
                         >
                           {resolved.entry.transfiguration}
@@ -478,7 +469,7 @@ export function DeckViewer({
                         style={
                           resolved.entry.transfiguration !== null
                             ? {
-                                boxShadow: `0 0 8px ${TRANSFIG_COLORS[resolved.entry.transfiguration]}40`,
+                                boxShadow: `0 0 8px ${TRANSFIGURATION_COLORS[resolved.entry.transfiguration]}40`,
                                 borderRadius: "0.5rem",
                               }
                             : resolved.entry.isBane

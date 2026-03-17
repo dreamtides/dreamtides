@@ -28,7 +28,12 @@ export interface QuestMutations {
   addCard: (cardNumber: number, source: string) => void;
   addBaneCard: (cardNumber: number, source: string) => void;
   removeCard: (entryId: string, source: string) => void;
-  transfigureCard: (entryId: string, type: TransfigurationType) => void;
+  transfigureCard: (
+    entryId: string,
+    type: TransfigurationType,
+    effectDescription: string,
+    effectDetails: Record<string, unknown>,
+  ) => void;
   setDreamcaller: (dreamcaller: Dreamcaller) => void;
   addDreamsign: (dreamsign: Dreamsign, sourceSiteType: string) => void;
   removeDreamsign: (index: number, reason: string) => void;
@@ -188,24 +193,24 @@ export function QuestProvider({
   );
 
   const transfigureCard = useCallback(
-    (entryId: string, type: TransfigurationType) => {
+    (
+      entryId: string,
+      type: TransfigurationType,
+      effectDescription: string,
+      effectDetails: Record<string, unknown>,
+    ) => {
       setState((prev) => {
         const entry = prev.deck.find((e) => e.entryId === entryId);
         if (!entry) return prev;
         const card = cardDatabase.get(entry.cardNumber);
         const cardName =
           card?.name ?? `Unknown Card #${String(entry.cardNumber)}`;
-        const modifiedFields: Record<string, unknown> = {
-          transfiguration: {
-            from: entry.transfiguration,
-            to: type,
-          },
-        };
         logEvent("card_transfigured", {
           cardNumber: entry.cardNumber,
           cardName,
           transfigurationType: type,
-          modifiedFields,
+          effectDescription,
+          modifiedFields: effectDetails,
         });
         const deck = prev.deck.map((e) =>
           e.entryId === entryId ? { ...e, transfiguration: type } : e,

@@ -158,3 +158,38 @@ export function assignTransfiguration(
   const chosen = eligible[Math.floor(Math.random() * eligible.length)];
   return buildOffer(card, chosen);
 }
+
+/** Returns a human-readable description of what a transfiguration does to a card. */
+export function describeTransfiguration(
+  card: CardData,
+  type: TransfigurationType,
+): string {
+  return buildOffer(card, type).description;
+}
+
+/** Returns a record of the specific fields modified by a transfiguration offer. */
+export function transfigurationEffectDetails(
+  offer: TransfigurationOffer,
+  originalCard: CardData,
+): Record<string, unknown> {
+  const details: Record<string, unknown> = {};
+  if (offer.previewCard.energyCost !== originalCard.energyCost) {
+    details.energyCost = {
+      from: originalCard.energyCost,
+      to: offer.previewCard.energyCost,
+    };
+  }
+  if (offer.previewCard.spark !== originalCard.spark) {
+    details.spark = {
+      from: originalCard.spark,
+      to: offer.previewCard.spark,
+    };
+  }
+  if (offer.previewCard.renderedText !== originalCard.renderedText) {
+    details.renderedText = {
+      from: originalCard.renderedText,
+      to: offer.previewCard.renderedText,
+    };
+  }
+  return details;
+}

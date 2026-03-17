@@ -9,6 +9,8 @@ import {
   isBronzeEligible,
   eligibleTransfigurations,
   assignTransfiguration,
+  describeTransfiguration,
+  transfigurationEffectDetails,
   TRANSFIGURATION_COLORS,
 } from "./transfiguration-logic";
 
@@ -277,5 +279,65 @@ describe("assignTransfiguration", () => {
     expect(offer!.type).toBe("Viridian");
     // Math.round(5/2) = Math.round(2.5) = 3
     expect(offer!.previewCard.energyCost).toBe(3);
+  });
+});
+
+describe("describeTransfiguration", () => {
+  it("returns a description string for Viridian", () => {
+    const card = makeCard({ energyCost: 6 });
+    const desc = describeTransfiguration(card, "Viridian");
+    expect(desc).toContain("6");
+    expect(desc).toContain("3");
+  });
+
+  it("returns a description string for Scarlet", () => {
+    const card = makeCard({ cardType: "Character", spark: 3 });
+    const desc = describeTransfiguration(card, "Scarlet");
+    expect(desc).toContain("3");
+    expect(desc).toContain("6");
+  });
+
+  it("returns a description string for Azure", () => {
+    const card = makeCard({ cardType: "Event", renderedText: "Foresee." });
+    const desc = describeTransfiguration(card, "Azure");
+    expect(desc).toContain("Draw a card.");
+  });
+});
+
+describe("transfigurationEffectDetails", () => {
+  it("returns energy cost change for Viridian", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+    const card = makeCard({ energyCost: 6 });
+    const offer = assignTransfiguration(card, null)!;
+    const details = transfigurationEffectDetails(offer, card);
+    expect(details.energyCost).toEqual({ from: 6, to: 3 });
+  });
+
+  it("returns spark change for Scarlet", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+    const card = makeCard({
+      cardType: "Character",
+      energyCost: 0,
+      renderedText: "",
+      spark: 2,
+    });
+    const offer = assignTransfiguration(card, null)!;
+    const details = transfigurationEffectDetails(offer, card);
+    expect(details.spark).toEqual({ from: 2, to: 4 });
+  });
+
+  it("returns renderedText change for Azure", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+    const card = makeCard({
+      cardType: "Event",
+      energyCost: 0,
+      renderedText: "Foresee.",
+    });
+    const offer = assignTransfiguration(card, null)!;
+    const details = transfigurationEffectDetails(offer, card);
+    expect(details.renderedText).toBeDefined();
+    expect(
+      (details.renderedText as { to: string }).to,
+    ).toContain("Draw a card.");
   });
 });

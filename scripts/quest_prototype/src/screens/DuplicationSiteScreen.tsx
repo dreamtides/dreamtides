@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { SiteState, DeckEntry } from "../types/quest";
 import type { CardData } from "../types/cards";
@@ -53,6 +53,16 @@ export function DuplicationSiteScreen({ site }: DuplicationSiteScreenProps) {
     useState<DeckEntry | null>(null);
   const [enhancedCopyCount, setEnhancedCopyCount] = useState<number>(0);
 
+  const autoReturnTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (autoReturnTimer.current !== null) {
+        clearTimeout(autoReturnTimer.current);
+      }
+    };
+  }, []);
+
   const handleDuplicate = useCallback(
     (candidate: DuplicationCandidate) => {
       if (duplicated) return;
@@ -70,7 +80,8 @@ export function DuplicationSiteScreen({ site }: DuplicationSiteScreenProps) {
       setDuplicated(true);
 
       // Return to dreamscape after brief delay for visual feedback
-      setTimeout(() => {
+      autoReturnTimer.current = setTimeout(() => {
+        autoReturnTimer.current = null;
         mutations.markSiteVisited(site.id);
         mutations.setScreen({ type: "dreamscape" });
       }, 800);
@@ -106,7 +117,8 @@ export function DuplicationSiteScreen({ site }: DuplicationSiteScreenProps) {
 
     setDuplicated(true);
 
-    setTimeout(() => {
+    autoReturnTimer.current = setTimeout(() => {
+      autoReturnTimer.current = null;
       mutations.markSiteVisited(site.id);
       mutations.setScreen({ type: "dreamscape" });
     }, 800);
@@ -120,6 +132,10 @@ export function DuplicationSiteScreen({ site }: DuplicationSiteScreenProps) {
   ]);
 
   const handleClose = useCallback(() => {
+    if (autoReturnTimer.current !== null) {
+      clearTimeout(autoReturnTimer.current);
+      autoReturnTimer.current = null;
+    }
     logEvent("site_completed", {
       siteType: "Duplication",
       outcome: duplicated ? "completed" : "skipped",
