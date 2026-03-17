@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuest } from "../state/quest-context";
 import { downloadLog, logEvent } from "../logging";
 import { TIDE_COLORS } from "../data/card-database";
@@ -9,12 +9,11 @@ const ESSENCE_ANIM_DURATION = 500;
 /** Animates a number from one value to another over a duration. */
 function useAnimatedNumber(target: number, duration: number): number {
   const [display, setDisplay] = useState(target);
-  const prevRef = useRef(target);
+  const displayRef = useRef(target);
   const frameRef = useRef(0);
 
   useEffect(() => {
-    const start = prevRef.current;
-    prevRef.current = target;
+    const start = displayRef.current;
 
     if (start === target) return;
 
@@ -25,7 +24,9 @@ function useAnimatedNumber(target: number, duration: number): number {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplay(Math.round(start + delta * eased));
+      const value = Math.round(start + delta * eased);
+      displayRef.current = value;
+      setDisplay(value);
 
       if (progress < 1) {
         frameRef.current = requestAnimationFrame(tick);
@@ -50,11 +51,22 @@ export function HUD() {
     ESSENCE_ANIM_DURATION,
   );
 
-  function handleDeckViewer() {
+  const [deckViewerHint, setDeckViewerHint] = useState(false);
+  const deckViewerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleDeckViewer = useCallback(() => {
     logEvent("deck_viewer_opened", {
       cardCount: state.deck.length,
     });
-  }
+    setDeckViewerHint(true);
+    if (deckViewerTimerRef.current !== null) {
+      clearTimeout(deckViewerTimerRef.current);
+    }
+    deckViewerTimerRef.current = setTimeout(() => {
+      setDeckViewerHint(false);
+      deckViewerTimerRef.current = null;
+    }, 1500);
+  }, [state.deck.length]);
 
   function handleDownloadLog() {
     downloadLog();
@@ -159,18 +171,31 @@ export function HUD() {
 
       {/* Right section: buttons */}
       <div className="flex items-center gap-2 md:gap-3">
-        <button
-          className="cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors md:px-3 md:text-sm"
-          style={{
-            background: "rgba(124, 58, 237, 0.2)",
-            border: "1px solid rgba(124, 58, 237, 0.4)",
-            color: "#c084fc",
-          }}
-          onClick={handleDeckViewer}
-        >
-          <span className="lg:hidden">{"\uD83C\uDCCF"}</span>
-          <span className="hidden lg:inline">View Deck</span>
-        </button>
+        <div className="relative">
+          <button
+            className="cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors md:px-3 md:text-sm"
+            style={{
+              background: "rgba(124, 58, 237, 0.2)",
+              border: "1px solid rgba(124, 58, 237, 0.4)",
+              color: "#c084fc",
+            }}
+            onClick={handleDeckViewer}
+          >
+            <span className="lg:hidden">{"\uD83C\uDCCF"}</span>
+            <span className="hidden lg:inline">View Deck</span>
+          </button>
+          {deckViewerHint && (
+            <span
+              className="absolute bottom-full left-1/2 mb-1 -translate-x-1/2 rounded px-2 py-0.5 text-[10px] whitespace-nowrap"
+              style={{
+                background: "rgba(124, 58, 237, 0.8)",
+                color: "#e2e8f0",
+              }}
+            >
+              Coming soon
+            </span>
+          )}
+        </div>
         <button
           className="cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors md:px-3 md:text-sm"
           style={{

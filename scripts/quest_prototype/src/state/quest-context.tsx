@@ -245,7 +245,15 @@ export function QuestProvider({
           essenceReward,
           rewardCardNumber,
         });
-        return { ...prev, completionLevel: newLevel };
+        const screen: Screen =
+          newLevel >= 7 ? { type: "questComplete" } : prev.screen;
+        if (newLevel >= 7) {
+          logEvent("screen_transition", {
+            from: screenName(prev.screen),
+            to: screenName(screen),
+          });
+        }
+        return { ...prev, completionLevel: newLevel, screen };
       });
     },
     [],
