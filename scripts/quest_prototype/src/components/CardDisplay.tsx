@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { CardData } from "../types/cards";
 import {
   cardImageUrl,
@@ -6,6 +6,15 @@ import {
   TIDE_COLORS,
   RARITY_COLORS,
 } from "../data/card-database";
+import { tokenizeRulesText, formatTypeLine } from "./card-text";
+
+/** Color used for each symbol type when rendering rules text. */
+const SYMBOL_COLORS: Readonly<Record<string, string>> = {
+  energy: "#fbbf24",
+  spark: "#c084fc",
+  trigger: "#f97316",
+  fast: "#facc15",
+};
 
 /** Props for the CardDisplay component. */
 interface CardDisplayProps {
@@ -18,75 +27,20 @@ interface CardDisplayProps {
 
 /** Renders styled rules text, replacing special symbols with colored spans. */
 function renderRulesText(text: string): ReactNode[] {
-  const segments: ReactNode[] = [];
-  let key = 0;
-  let buffer = "";
-
-  function flushBuffer() {
-    if (buffer.length > 0) {
-      segments.push(<span key={key}>{buffer}</span>);
-      key += 1;
-      buffer = "";
+  return tokenizeRulesText(text).map((segment, i) => {
+    if (segment.kind === "text") {
+      return <span key={i}>{segment.value}</span>;
     }
-  }
-
-  for (const char of text) {
-    switch (char) {
-      case "\u25CF": // energy symbol
-        flushBuffer();
-        segments.push(
-          <span key={key} className="font-bold" style={{ color: "#fbbf24" }}>
-            {"\u25CF"}
-          </span>,
-        );
-        key += 1;
-        break;
-      case "\u234F": // spark symbol
-        flushBuffer();
-        segments.push(
-          <span
-            key={key}
-            className="font-bold"
-            style={{ color: "#c084fc" }}
-          >
-            {"\u2606"}
-          </span>,
-        );
-        key += 1;
-        break;
-      case "\u25B8": // trigger prefix
-        flushBuffer();
-        segments.push(
-          <span key={key} className="font-bold" style={{ color: "#f97316" }}>
-            {"\u25B8"}
-          </span>,
-        );
-        key += 1;
-        break;
-      case "\u21AF": // fast/lightning symbol
-        flushBuffer();
-        segments.push(
-          <span key={key} className="font-bold" style={{ color: "#facc15" }}>
-            {"\u21AF"}
-          </span>,
-        );
-        key += 1;
-        break;
-      default:
-        buffer += char;
-        break;
-    }
-  }
-  flushBuffer();
-  return segments;
-}
-
-/** Format the card type and subtype line. */
-function formatTypeLine(card: CardData): string {
-  if (card.subtype && card.subtype !== "" && card.subtype !== "*") {
-    return `${card.cardType} \u2014 ${card.subtype}`;
-  }
-  return card.cardType;
+    return (
+      <span
+        key={i}
+        className="font-bold"
+        style={{ color: SYMBOL_COLORS[segment.symbol] }}
+      >
+        {segment.char}
+      </span>
+    );
+  });
 }
 
 /**
@@ -102,6 +56,10 @@ export function CardDisplay({
 }: CardDisplayProps) {
   const [imageError, setImageError] = useState(false);
 
+  useEffect(() => {
+    setImageError(false);
+  }, [card.cardNumber]);
+
   const tideColor = TIDE_COLORS[card.tide];
   const rarityColor = RARITY_COLORS[card.rarity];
 
@@ -109,9 +67,11 @@ export function CardDisplay({
     ? { boxShadow: `0 0 0 3px ${selectionColor}, 0 0 12px ${selectionColor}` }
     : { boxShadow: `0 0 6px ${rarityColor}40, inset 0 0 8px ${rarityColor}15` };
 
+  const isInteractive = onClick !== undefined;
+
   return (
     <div
-      className="relative flex cursor-pointer flex-col overflow-hidden rounded-lg transition-transform duration-200 hover:scale-[1.02]"
+      className={`relative flex flex-col overflow-hidden rounded-lg transition-transform duration-200${isInteractive ? " cursor-pointer hover:scale-[1.02]" : ""}`}
       style={{
         aspectRatio: "2 / 3",
         background: "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
@@ -120,13 +80,17 @@ export function CardDisplay({
       }}
       onClick={onClick}
       onMouseEnter={onHover}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          onClick?.();
-        }
-      }}
+      {...(isInteractive
+        ? {
+            role: "button" as const,
+            tabIndex: 0,
+            onKeyDown: (e: React.KeyboardEvent) => {
+              if (e.key === "Enter" || e.key === " ") {
+                onClick();
+              }
+            },
+          }
+        : {})}
     >
       {/* Energy cost badge */}
       <div
@@ -239,7 +203,7 @@ export function CardDisplay({
                 border: "1px solid rgba(192, 132, 252, 0.5)",
               }}
             >
-              <span style={{ color: "#c084fc" }}>{"\u2606"}</span>
+              <span style={{ color: "#c084fc" }}>{"\u234F"}</span>
               <span className="text-white">{String(card.spark)}</span>
             </div>
           </div>
