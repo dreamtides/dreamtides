@@ -143,7 +143,7 @@ export function DreamJourneyScreen({ site }: DreamJourneyScreenProps) {
             ] as const;
             for (const entry of toUpgrade) {
               const type = types[Math.floor(Math.random() * types.length)];
-              mutations.transfigureCard(entry.entryId, type);
+              mutations.transfigureCard(entry.entryId, type, "Dream Journey upgrade", { source: "dreamJourney", type });
             }
           }
           break;
