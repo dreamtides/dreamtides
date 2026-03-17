@@ -63,7 +63,9 @@ export function rerollCost(rerollCount: number, isEnhanced: boolean): number {
 function selectWeightedCard(
   cards: CardData[],
   deckTideCounts: Record<Tide, number>,
-): CardData {
+): CardData | null {
+  if (cards.length === 0) return null;
+
   const totalDeckCards = Object.values(deckTideCounts).reduce(
     (sum, c) => sum + c,
     0,
@@ -184,15 +186,17 @@ export function generateShopInventory(
 
     // Default: card slot
     const card = selectWeightedCard(allCards, deckTideCounts);
-    slots.push({
-      itemType: "card",
-      card,
-      dreamsign: null,
-      tideCrystal: null,
-      basePrice: RARITY_PRICES[card.rarity],
-      discountPercent: 0,
-      purchased: false,
-    });
+    if (card) {
+      slots.push({
+        itemType: "card",
+        card,
+        dreamsign: null,
+        tideCrystal: null,
+        basePrice: RARITY_PRICES[card.rarity],
+        discountPercent: 0,
+        purchased: false,
+      });
+    }
   }
 
   // Apply discounts to 1-2 random non-reroll slots
@@ -228,15 +232,17 @@ export function generateSpecialtyShopInventory(
 
   for (let i = 0; i < 4; i++) {
     const card = selectWeightedCard(rareCards, deckTideCounts);
-    slots.push({
-      itemType: "card",
-      card,
-      dreamsign: null,
-      tideCrystal: null,
-      basePrice: RARITY_PRICES.Rare,
-      discountPercent: 0,
-      purchased: false,
-    });
+    if (card) {
+      slots.push({
+        itemType: "card",
+        card,
+        dreamsign: null,
+        tideCrystal: null,
+        basePrice: RARITY_PRICES.Rare,
+        discountPercent: 0,
+        purchased: false,
+      });
+    }
   }
 
   return slots;

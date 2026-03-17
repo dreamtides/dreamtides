@@ -96,6 +96,12 @@ export function ShopScreen({ site }: ShopScreenProps) {
 
       // Regenerate unpurchased non-reroll slots
       const newInventory = generateShopInventory(cardDatabase, deck);
+      // Collect only non-reroll replacement items to avoid introducing
+      // a second reroll slot from the freshly generated inventory.
+      const replacements = newInventory.filter(
+        (s) => s.itemType !== "reroll",
+      );
+      let replacementIdx = 0;
       setSlots((prev) =>
         prev.map((s, i) => {
           if (s.purchased) return s;
@@ -108,7 +114,9 @@ export function ShopScreen({ site }: ShopScreenProps) {
             };
           }
           if (s.itemType === "reroll") return s;
-          return newInventory[i] ?? s;
+          const replacement = replacements[replacementIdx];
+          replacementIdx += 1;
+          return replacement ?? s;
         }),
       );
     },
@@ -163,7 +171,7 @@ export function ShopScreen({ site }: ShopScreenProps) {
       </div>
 
       {/* Item grid: 3 columns desktop, 2 tablet */}
-      <div className="grid w-full max-w-4xl grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
+      <div className="grid w-full max-w-4xl grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-6">
         {slots.map((slot, index) => (
           <ShopSlotCard
             key={`shop-slot-${String(index)}`}
@@ -222,16 +230,14 @@ function ShopSlotCard({
   if (slot.purchased) {
     return (
       <div
-        className="flex items-center justify-center rounded-lg opacity-30"
+        className="rounded-lg opacity-20"
         style={{
           aspectRatio: "2 / 3",
           background:
             "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-          border: "1px solid rgba(107, 114, 128, 0.2)",
+          border: "1px dashed rgba(107, 114, 128, 0.15)",
         }}
-      >
-        <span className="text-sm opacity-40">Sold</span>
-      </div>
+      />
     );
   }
 

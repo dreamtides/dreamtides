@@ -188,6 +188,27 @@ describe("generateShopInventory", () => {
   });
 });
 
+describe("generateShopInventory with empty database", () => {
+  it("does not crash on an empty card database", () => {
+    const emptyDb = new Map<number, CardData>();
+    const slots = generateShopInventory(emptyDb, []);
+    // Should still produce some slots (dreamsigns, tide crystals, or rerolls)
+    // but no card slots since the database is empty.
+    for (const slot of slots) {
+      if (slot.itemType === "card") {
+        expect(slot.card).not.toBeNull();
+      }
+    }
+  });
+
+  it("generates valid inventory when run many times with empty database", () => {
+    const emptyDb = new Map<number, CardData>();
+    for (let i = 0; i < 20; i++) {
+      expect(() => generateShopInventory(emptyDb, [])).not.toThrow();
+    }
+  });
+});
+
 describe("generateSpecialtyShopInventory", () => {
   const cards = [
     makeCard({ cardNumber: 1, rarity: "Common", tide: "Bloom" }),
@@ -239,5 +260,20 @@ describe("generateSpecialtyShopInventory", () => {
     }
     // Arc should appear significantly more than average
     expect(tideCounts.Arc).toBeGreaterThan(tideCounts.Ignite);
+  });
+
+  it("returns empty slots when no rare cards exist", () => {
+    const noRareDb = makeDatabase([
+      makeCard({ cardNumber: 10, rarity: "Common", tide: "Bloom" }),
+    ]);
+    const slots = generateSpecialtyShopInventory(noRareDb, []);
+    expect(slots).toHaveLength(0);
+  });
+
+  it("does not crash on an empty card database", () => {
+    const emptyDb = new Map<number, CardData>();
+    expect(() => generateSpecialtyShopInventory(emptyDb, [])).not.toThrow();
+    const slots = generateSpecialtyShopInventory(emptyDb, []);
+    expect(slots).toHaveLength(0);
   });
 });

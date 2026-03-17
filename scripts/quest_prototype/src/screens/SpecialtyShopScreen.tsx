@@ -110,7 +110,7 @@ export function SpecialtyShopScreen({ site }: SpecialtyShopScreenProps) {
       </div>
 
       {/* Card grid: 4 columns desktop, 2 tablet */}
-      <div className="grid w-full max-w-5xl grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+      <div className="grid w-full max-w-5xl grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
         {slots.map((slot, index) => (
           <SpecialtySlotCard
             key={`specialty-slot-${String(index)}`}
@@ -164,16 +164,14 @@ function SpecialtySlotCard({
   if (slot.purchased) {
     return (
       <div
-        className="flex items-center justify-center rounded-lg opacity-30"
+        className="rounded-lg opacity-20"
         style={{
           aspectRatio: "2 / 3",
           background:
             "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-          border: "1px solid rgba(107, 114, 128, 0.2)",
+          border: "1px dashed rgba(107, 114, 128, 0.15)",
         }}
-      >
-        <span className="text-sm opacity-40">Sold</span>
-      </div>
+      />
     );
   }
 
