@@ -46,6 +46,7 @@ export interface QuestMutations {
 export interface QuestContextValue {
   state: QuestState;
   mutations: QuestMutations;
+  cardDatabase: Map<number, CardData>;
 }
 
 const QuestContext = createContext<QuestContextValue | null>(null);
@@ -357,8 +358,8 @@ export function QuestProvider({
   );
 
   const value = useMemo<QuestContextValue>(
-    () => ({ state, mutations }),
-    [state, mutations],
+    () => ({ state, mutations, cardDatabase }),
+    [state, mutations, cardDatabase],
   );
 
   return (

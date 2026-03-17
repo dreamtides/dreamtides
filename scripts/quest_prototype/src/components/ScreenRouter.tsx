@@ -5,6 +5,8 @@ import { AtlasScreen } from "../screens/AtlasScreen";
 import { QuestStartScreen } from "../screens/QuestStartScreen";
 import { QuestCompleteScreen } from "../screens/QuestCompleteScreen";
 import { DreamscapeScreen } from "../screens/DreamscapeScreen";
+import { ShopScreen } from "../screens/ShopScreen";
+import { SpecialtyShopScreen } from "../screens/SpecialtyShopScreen";
 import { generateNewNodes, siteTypeName } from "../atlas/atlas-generator";
 import { logEvent } from "../logging";
 import type { SiteState } from "../types/quest";
@@ -65,11 +67,16 @@ function SiteScreen({ siteId }: { siteId: string }) {
     );
   }
 
-  // All site types currently use the auto-complete placeholder.
-  // As specific site screens are built (Draft, Shop, Battle, etc.),
-  // add cases here to render the real component instead.
   if (site.type === "Battle") {
     return <BattleSitePlaceholder site={site} />;
+  }
+
+  if (site.type === "Shop") {
+    return <ShopScreen site={site} />;
+  }
+
+  if (site.type === "SpecialtyShop") {
+    return <SpecialtyShopScreen site={site} />;
   }
 
   return <GenericSitePlaceholder site={site} />;
