@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -23,13 +24,16 @@ const MAX_DREAMSIGNS = 12;
 export interface QuestMutations {
   changeEssence: (delta: number, source: string) => void;
   addCard: (cardNumber: number, source: string) => void;
-  removeCard: (deckIndex: number, source: string) => void;
-  transfigureCard: (deckIndex: number, type: TransfigurationType) => void;
+  removeCard: (entryId: string, source: string) => void;
+  transfigureCard: (entryId: string, type: TransfigurationType) => void;
   setDreamcaller: (dreamcaller: Dreamcaller) => void;
-  addDreamsign: (dreamsign: Dreamsign) => void;
-  removeDreamsign: (index: number) => void;
+  addDreamsign: (dreamsign: Dreamsign, sourceSiteType: string) => void;
+  removeDreamsign: (index: number, reason: string) => void;
   addTideCrystal: (tide: Tide, count: number) => void;
-  incrementCompletionLevel: () => void;
+  incrementCompletionLevel: (
+    essenceReward: number,
+    rewardCardNumber: number | null,
+  ) => void;
   setScreen: (screen: Screen) => void;
   markSiteVisited: (siteId: string) => void;
   setCurrentDreamscape: (nodeId: string | null) => void;
@@ -87,6 +91,12 @@ export function QuestProvider({
   cardDatabase: Map<number, CardData>;
 }) {
   const [state, setState] = useState<QuestState>(createDefaultState);
+  const entryIdCounter = useRef(0);
+
+  function nextEntryId(): string {
+    entryIdCounter.current += 1;
+    return `deck-${String(entryIdCounter.current)}`;
+  }
 
   const changeEssence = useCallback((delta: number, source: string) => {
     setState((prev) => {
@@ -111,8 +121,10 @@ export function QuestProvider({
         cardName,
         source,
       });
+      const entryId = nextEntryId();
       setState((prev) => {
         const entry: DeckEntry = {
+          entryId,
           cardNumber,
           transfiguration: null,
           isBane: false,
@@ -124,9 +136,9 @@ export function QuestProvider({
   );
 
   const removeCard = useCallback(
-    (deckIndex: number, source: string) => {
+    (entryId: string, source: string) => {
       setState((prev) => {
-        const entry = prev.deck[deckIndex];
+        const entry = prev.deck.find((e) => e.entryId === entryId);
         if (!entry) return prev;
         const card = cardDatabase.get(entry.cardNumber);
         const cardName =
@@ -136,7 +148,7 @@ export function QuestProvider({
           cardName,
           source,
         });
-        const deck = prev.deck.filter((_, i) => i !== deckIndex);
+        const deck = prev.deck.filter((e) => e.entryId !== entryId);
         return { ...prev, deck };
       });
     },
@@ -144,20 +156,27 @@ export function QuestProvider({
   );
 
   const transfigureCard = useCallback(
-    (deckIndex: number, type: TransfigurationType) => {
+    (entryId: string, type: TransfigurationType) => {
       setState((prev) => {
-        const entry = prev.deck[deckIndex];
+        const entry = prev.deck.find((e) => e.entryId === entryId);
         if (!entry) return prev;
         const card = cardDatabase.get(entry.cardNumber);
         const cardName =
           card?.name ?? `Unknown Card #${String(entry.cardNumber)}`;
+        const modifiedFields: Record<string, unknown> = {
+          transfiguration: {
+            from: entry.transfiguration,
+            to: type,
+          },
+        };
         logEvent("card_transfigured", {
           cardNumber: entry.cardNumber,
           cardName,
           transfigurationType: type,
+          modifiedFields,
         });
-        const deck = prev.deck.map((e, i) =>
-          i === deckIndex ? { ...e, transfiguration: type } : e,
+        const deck = prev.deck.map((e) =>
+          e.entryId === entryId ? { ...e, transfiguration: type } : e,
         );
         return { ...prev, deck };
       });
@@ -174,25 +193,30 @@ export function QuestProvider({
     setState((prev) => ({ ...prev, dreamcaller }));
   }, []);
 
-  const addDreamsign = useCallback((dreamsign: Dreamsign) => {
-    setState((prev) => {
-      if (prev.dreamsigns.length >= MAX_DREAMSIGNS) return prev;
-      logEvent("dreamsign_acquired", {
-        name: dreamsign.name,
-        tide: dreamsign.tide,
-        isBane: dreamsign.isBane,
+  const addDreamsign = useCallback(
+    (dreamsign: Dreamsign, sourceSiteType: string) => {
+      setState((prev) => {
+        if (prev.dreamsigns.length >= MAX_DREAMSIGNS) return prev;
+        logEvent("dreamsign_acquired", {
+          name: dreamsign.name,
+          tide: dreamsign.tide,
+          isBane: dreamsign.isBane,
+          sourceSiteType,
+        });
+        return { ...prev, dreamsigns: [...prev.dreamsigns, dreamsign] };
       });
-      return { ...prev, dreamsigns: [...prev.dreamsigns, dreamsign] };
-    });
-  }, []);
+    },
+    [],
+  );
 
-  const removeDreamsign = useCallback((index: number) => {
+  const removeDreamsign = useCallback((index: number, reason: string) => {
     setState((prev) => {
       const dreamsign = prev.dreamsigns[index];
       if (!dreamsign) return prev;
       logEvent("dreamsign_removed", {
         name: dreamsign.name,
         tide: dreamsign.tide,
+        reason,
       });
       const dreamsigns = prev.dreamsigns.filter((_, i) => i !== index);
       return { ...prev, dreamsigns };
@@ -210,15 +234,20 @@ export function QuestProvider({
     }));
   }, []);
 
-  const incrementCompletionLevel = useCallback(() => {
-    setState((prev) => {
-      const newLevel = prev.completionLevel + 1;
-      logEvent("battle_won", {
-        completionLevel: newLevel,
+  const incrementCompletionLevel = useCallback(
+    (essenceReward: number, rewardCardNumber: number | null) => {
+      setState((prev) => {
+        const newLevel = prev.completionLevel + 1;
+        logEvent("battle_won", {
+          completionLevel: newLevel,
+          essenceReward,
+          rewardCardNumber,
+        });
+        return { ...prev, completionLevel: newLevel };
       });
-      return { ...prev, completionLevel: newLevel };
-    });
-  }, []);
+    },
+    [],
+  );
 
   const setScreen = useCallback((screen: Screen) => {
     setState((prev) => {
@@ -226,14 +255,32 @@ export function QuestProvider({
         from: screenName(prev.screen),
         to: screenName(screen),
       });
-      return { ...prev, screen };
+      const activeSiteId =
+        screen.type === "site" ? screen.siteId : null;
+      return { ...prev, screen, activeSiteId };
     });
   }, []);
 
   const markSiteVisited = useCallback((siteId: string) => {
     setState((prev) => {
       if (prev.visitedSites.includes(siteId)) return prev;
-      return { ...prev, visitedSites: [...prev.visitedSites, siteId] };
+      logEvent("site_visited", { siteId });
+      const updatedNodes = { ...prev.atlas.nodes };
+      for (const [nodeId, node] of Object.entries(updatedNodes)) {
+        const siteIndex = node.sites.findIndex((s) => s.id === siteId);
+        if (siteIndex !== -1) {
+          const updatedSites = node.sites.map((s, i) =>
+            i === siteIndex ? { ...s, isVisited: true } : s,
+          );
+          updatedNodes[nodeId] = { ...node, sites: updatedSites };
+          break;
+        }
+      }
+      return {
+        ...prev,
+        visitedSites: [...prev.visitedSites, siteId],
+        atlas: { ...prev.atlas, nodes: updatedNodes },
+      };
     });
   }, []);
 
@@ -261,6 +308,7 @@ export function QuestProvider({
 
   const resetQuest = useCallback(() => {
     resetLog();
+    entryIdCounter.current = 0;
     setState(createDefaultState());
   }, []);
 

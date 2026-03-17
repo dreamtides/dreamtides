@@ -28,6 +28,7 @@ export type SiteType =
 
 /** An entry in the player's deck. Duplicates are possible. */
 export interface DeckEntry {
+  entryId: string;
   cardNumber: number;
   transfiguration: TransfigurationType | null;
   isBane: boolean;
