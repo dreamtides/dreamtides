@@ -96,7 +96,7 @@ function buildAdditionalSitePool(
   return pool;
 }
 
-/** Generates the site composition for a dreamscape. */
+/** Generates the site composition for a dreamscape. Total: 3-6 sites. */
 export function generateSiteComposition(
   completionLevel: number,
   isFirstDreamscape: boolean,
@@ -131,9 +131,13 @@ export function generateSiteComposition(
     });
   }
 
-  // 1-3 additional sites from the weighted pool
+  // Additional sites from the weighted pool, clamped so total is 3-6.
+  // Fixed count = drafts + dreamcaller draft + battle (always 1).
+  const fixedCount = sites.length + 1;
+  const minAdditional = Math.max(2, 3 - fixedCount);
+  const maxAdditional = Math.max(minAdditional, 6 - fixedCount);
   const pool = buildAdditionalSitePool(completionLevel);
-  const additionalCount = randomInt(1, 3);
+  const additionalCount = randomInt(minAdditional, maxAdditional);
   for (let i = 0; i < additionalCount; i++) {
     const siteType = weightedPick(pool);
     sites.push({
@@ -358,48 +362,33 @@ export function generateNewNodes(
   };
 }
 
-/** Site icon mapping: returns an emoji character for each site type. */
+/** Metadata for each site type: icon and display name in one table. */
+const SITE_TYPE_META: Record<SiteType, { icon: string; name: string }> = {
+  Battle: { icon: "\u2694\uFE0F", name: "Battle" },
+  Draft: { icon: "\uD83C\uDCCF", name: "Draft" },
+  DreamcallerDraft: { icon: "\uD83D\uDC51", name: "Dreamcaller Draft" },
+  Shop: { icon: "\uD83C\uDFEA", name: "Shop" },
+  SpecialtyShop: { icon: "\u2B50", name: "Specialty Shop" },
+  DreamsignOffering: { icon: "\u2728", name: "Dreamsign Offering" },
+  DreamsignDraft: { icon: "\u2728", name: "Dreamsign Draft" },
+  DreamJourney: { icon: "\uD83C\uDF19", name: "Dream Journey" },
+  TemptingOffer: { icon: "\u2696\uFE0F", name: "Tempting Offer" },
+  Purge: { icon: "\uD83D\uDD25", name: "Purge" },
+  Essence: { icon: "\uD83D\uDC8E", name: "Essence" },
+  Transfiguration: { icon: "\u2697\uFE0F", name: "Transfiguration" },
+  Duplication: { icon: "\uD83D\uDCCB", name: "Duplication" },
+  Reward: { icon: "\uD83C\uDF81", name: "Reward" },
+  Cleanse: { icon: "\u2744\uFE0F", name: "Cleanse" },
+};
+
+/** Returns an emoji icon for the given site type. */
 export function siteTypeIcon(siteType: SiteType): string {
-  const icons: Record<SiteType, string> = {
-    Battle: "\u2694\uFE0F",
-    Draft: "\uD83C\uDCCF",
-    DreamcallerDraft: "\uD83D\uDC51",
-    Shop: "\uD83C\uDFEA",
-    SpecialtyShop: "\u2B50",
-    DreamsignOffering: "\u2728",
-    DreamsignDraft: "\u2728",
-    DreamJourney: "\uD83C\uDF19",
-    TemptingOffer: "\u2696\uFE0F",
-    Purge: "\uD83D\uDD25",
-    Essence: "\uD83D\uDC8E",
-    Transfiguration: "\u2697\uFE0F",
-    Duplication: "\uD83D\uDCCB",
-    Reward: "\uD83C\uDF81",
-    Cleanse: "\u2744\uFE0F",
-  };
-  return icons[siteType];
+  return SITE_TYPE_META[siteType].icon;
 }
 
-/** Site type display name for tooltips. */
+/** Returns the display name for the given site type. */
 export function siteTypeName(siteType: SiteType): string {
-  const names: Record<SiteType, string> = {
-    Battle: "Battle",
-    Draft: "Draft",
-    DreamcallerDraft: "Dreamcaller Draft",
-    Shop: "Shop",
-    SpecialtyShop: "Specialty Shop",
-    DreamsignOffering: "Dreamsign Offering",
-    DreamsignDraft: "Dreamsign Draft",
-    DreamJourney: "Dream Journey",
-    TemptingOffer: "Tempting Offer",
-    Purge: "Purge",
-    Essence: "Essence",
-    Transfiguration: "Transfiguration",
-    Duplication: "Duplication",
-    Reward: "Reward",
-    Cleanse: "Cleanse",
-  };
-  return names[siteType];
+  return SITE_TYPE_META[siteType].name;
 }
 
 /**
