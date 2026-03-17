@@ -10,6 +10,11 @@ import { DreamcallerDraftScreen } from "../screens/DreamcallerDraftScreen";
 import { BattleScreen } from "../screens/BattleScreen";
 import { ShopScreen } from "../screens/ShopScreen";
 import { SpecialtyShopScreen } from "../screens/SpecialtyShopScreen";
+import { EssenceSiteScreen } from "../screens/EssenceSiteScreen";
+import { DreamsignOfferingScreen } from "../screens/DreamsignOfferingScreen";
+import { DreamsignDraftScreen } from "../screens/DreamsignDraftScreen";
+import { DreamJourneyScreen } from "../screens/DreamJourneyScreen";
+import { TemptingOfferScreen } from "../screens/TemptingOfferScreen";
 import { siteTypeName } from "../atlas/atlas-generator";
 import { logEvent } from "../logging";
 import type { SiteState } from "../types/quest";
@@ -88,6 +93,26 @@ function SiteScreen({ siteId }: { siteId: string }) {
 
   if (site.type === "SpecialtyShop") {
     return <SpecialtyShopScreen site={site} />;
+  }
+
+  if (site.type === "Essence") {
+    return <EssenceSiteScreen site={site} />;
+  }
+
+  if (site.type === "DreamsignOffering") {
+    return <DreamsignOfferingScreen site={site} />;
+  }
+
+  if (site.type === "DreamsignDraft") {
+    return <DreamsignDraftScreen site={site} />;
+  }
+
+  if (site.type === "DreamJourney") {
+    return <DreamJourneyScreen site={site} />;
+  }
+
+  if (site.type === "TemptingOffer") {
+    return <TemptingOfferScreen site={site} />;
   }
 
   return <GenericSitePlaceholder site={site} />;

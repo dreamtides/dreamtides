@@ -26,6 +26,7 @@ const MAX_DREAMSIGNS = 12;
 export interface QuestMutations {
   changeEssence: (delta: number, source: string) => void;
   addCard: (cardNumber: number, source: string) => void;
+  addBaneCard: (cardNumber: number, source: string) => void;
   removeCard: (entryId: string, source: string) => void;
   transfigureCard: (entryId: string, type: TransfigurationType) => void;
   setDreamcaller: (dreamcaller: Dreamcaller) => void;
@@ -135,6 +136,30 @@ export function QuestProvider({
           cardNumber,
           transfiguration: null,
           isBane: false,
+        };
+        return { ...prev, deck: [...prev.deck, entry] };
+      });
+    },
+    [cardDatabase],
+  );
+
+  const addBaneCard = useCallback(
+    (cardNumber: number, source: string) => {
+      const card = cardDatabase.get(cardNumber);
+      const cardName = card?.name ?? `Unknown Card #${String(cardNumber)}`;
+      logEvent("card_added", {
+        cardNumber,
+        cardName,
+        source,
+        isBane: true,
+      });
+      const entryId = nextEntryId();
+      setState((prev) => {
+        const entry: DeckEntry = {
+          entryId,
+          cardNumber,
+          transfiguration: null,
+          isBane: true,
         };
         return { ...prev, deck: [...prev.deck, entry] };
       });
@@ -341,6 +366,7 @@ export function QuestProvider({
     () => ({
       changeEssence,
       addCard,
+      addBaneCard,
       removeCard,
       transfigureCard,
       setDreamcaller,
@@ -358,6 +384,7 @@ export function QuestProvider({
     [
       changeEssence,
       addCard,
+      addBaneCard,
       removeCard,
       transfigureCard,
       setDreamcaller,
