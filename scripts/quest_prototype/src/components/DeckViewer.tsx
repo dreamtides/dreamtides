@@ -195,13 +195,9 @@ export function DeckViewer({
     setTideFilters((prev) => ({ ...prev, [tide]: !prev[tide] }));
   }, []);
 
-  const handleCardClick = useCallback(
-    (card: CardData) => {
-      setOverlayCard(card);
-      logEvent("card_hover", { cardNumber: card.cardNumber });
-    },
-    [],
-  );
+  const handleCardClick = useCallback((card: CardData) => {
+    setOverlayCard(card);
+  }, []);
 
   const handleCloseOverlay = useCallback(() => {
     setOverlayCard(null);
@@ -442,7 +438,7 @@ export function DeckViewer({
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-3 gap-3 md:grid-cols-5">
+                <div className="grid grid-cols-3 gap-3 xl:grid-cols-5">
                   {sortedEntries.map((resolved) => (
                     <div
                       key={resolved.entry.entryId}
@@ -823,27 +819,41 @@ function MobileSidebar({
                   dreamsigns.map((sign, i) => (
                     <div
                       key={`mobile-${sign.name}-${String(i)}`}
-                      className="flex items-center gap-1.5"
+                      className="rounded-lg p-2"
+                      style={{
+                        background: sign.isBane
+                          ? "rgba(239, 68, 68, 0.1)"
+                          : "rgba(124, 58, 237, 0.08)",
+                        border: `1px solid ${sign.isBane ? "rgba(239, 68, 68, 0.25)" : "rgba(124, 58, 237, 0.15)"}`,
+                      }}
                     >
-                      <img
-                        src={tideIconUrl(sign.tide)}
-                        alt={sign.tide}
-                        className="h-3 w-3 rounded-full"
-                      />
-                      <span
-                        className="text-[10px] font-medium"
-                        style={{ color: TIDE_COLORS[sign.tide] }}
-                      >
-                        {sign.name}
-                      </span>
-                      {sign.isBane && (
+                      <div className="flex items-center gap-1.5">
+                        <img
+                          src={tideIconUrl(sign.tide)}
+                          alt={sign.tide}
+                          className="h-3 w-3 rounded-full"
+                        />
                         <span
-                          className="text-[9px]"
-                          style={{ color: "#ef4444" }}
+                          className="text-[10px] font-medium"
+                          style={{ color: TIDE_COLORS[sign.tide] }}
                         >
-                          {"\u2620"}
+                          {sign.name}
                         </span>
-                      )}
+                        {sign.isBane && (
+                          <span
+                            className="ml-auto text-[9px]"
+                            style={{ color: "#ef4444" }}
+                          >
+                            {"\u2620"}
+                          </span>
+                        )}
+                      </div>
+                      <p
+                        className="mt-1 text-[10px] leading-snug opacity-60"
+                        style={{ color: "#e2e8f0" }}
+                      >
+                        {sign.effectDescription}
+                      </p>
                     </div>
                   ))
                 )}
