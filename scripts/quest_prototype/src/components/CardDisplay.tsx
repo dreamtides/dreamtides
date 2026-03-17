@@ -1,0 +1,256 @@
+import { useState, type ReactNode } from "react";
+import type { CardData } from "../types/cards";
+import {
+  cardImageUrl,
+  tideIconUrl,
+  TIDE_COLORS,
+  RARITY_COLORS,
+} from "../data/card-database";
+
+/** Props for the CardDisplay component. */
+interface CardDisplayProps {
+  card: CardData;
+  onClick?: () => void;
+  onHover?: () => void;
+  selected?: boolean;
+  selectionColor?: string;
+}
+
+/** Renders styled rules text, replacing special symbols with colored spans. */
+function renderRulesText(text: string): ReactNode[] {
+  const segments: ReactNode[] = [];
+  let key = 0;
+  let buffer = "";
+
+  function flushBuffer() {
+    if (buffer.length > 0) {
+      segments.push(<span key={key}>{buffer}</span>);
+      key += 1;
+      buffer = "";
+    }
+  }
+
+  for (const char of text) {
+    switch (char) {
+      case "\u25CF": // energy symbol
+        flushBuffer();
+        segments.push(
+          <span key={key} className="font-bold" style={{ color: "#fbbf24" }}>
+            {"\u25CF"}
+          </span>,
+        );
+        key += 1;
+        break;
+      case "\u234F": // spark symbol
+        flushBuffer();
+        segments.push(
+          <span
+            key={key}
+            className="font-bold"
+            style={{ color: "#c084fc" }}
+          >
+            {"\u2606"}
+          </span>,
+        );
+        key += 1;
+        break;
+      case "\u25B8": // trigger prefix
+        flushBuffer();
+        segments.push(
+          <span key={key} className="font-bold" style={{ color: "#f97316" }}>
+            {"\u25B8"}
+          </span>,
+        );
+        key += 1;
+        break;
+      case "\u21AF": // fast/lightning symbol
+        flushBuffer();
+        segments.push(
+          <span key={key} className="font-bold" style={{ color: "#facc15" }}>
+            {"\u21AF"}
+          </span>,
+        );
+        key += 1;
+        break;
+      default:
+        buffer += char;
+        break;
+    }
+  }
+  flushBuffer();
+  return segments;
+}
+
+/** Format the card type and subtype line. */
+function formatTypeLine(card: CardData): string {
+  if (card.subtype && card.subtype !== "" && card.subtype !== "*") {
+    return `${card.cardType} \u2014 ${card.subtype}`;
+  }
+  return card.cardType;
+}
+
+/**
+ * Renders a Dreamtides card with full details including art, name, cost,
+ * spark, tide, rarity glow, type/subtype, rules text, and fast badge.
+ */
+export function CardDisplay({
+  card,
+  onClick,
+  onHover,
+  selected = false,
+  selectionColor = "#f97316",
+}: CardDisplayProps) {
+  const [imageError, setImageError] = useState(false);
+
+  const tideColor = TIDE_COLORS[card.tide];
+  const rarityColor = RARITY_COLORS[card.rarity];
+
+  const borderStyle = selected
+    ? { boxShadow: `0 0 0 3px ${selectionColor}, 0 0 12px ${selectionColor}` }
+    : { boxShadow: `0 0 6px ${rarityColor}40, inset 0 0 8px ${rarityColor}15` };
+
+  return (
+    <div
+      className="relative flex cursor-pointer flex-col overflow-hidden rounded-lg transition-transform duration-200 hover:scale-[1.02]"
+      style={{
+        aspectRatio: "2 / 3",
+        background: "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
+        border: `1px solid ${rarityColor}60`,
+        ...borderStyle,
+      }}
+      onClick={onClick}
+      onMouseEnter={onHover}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          onClick?.();
+        }
+      }}
+    >
+      {/* Energy cost badge */}
+      <div
+        className="absolute top-1.5 left-1.5 z-10 flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-bold shadow-md"
+        style={{
+          background: "rgba(0, 0, 0, 0.75)",
+          border: "1px solid rgba(251, 191, 36, 0.5)",
+        }}
+      >
+        <span style={{ color: "#fbbf24" }}>{"\u25CF"}</span>
+        <span className="text-white">
+          {card.energyCost !== null ? String(card.energyCost) : "X"}
+        </span>
+      </div>
+
+      {/* Fast badge */}
+      {card.isFast && (
+        <div
+          className="absolute top-1.5 right-1.5 z-10 flex items-center rounded-full px-1.5 py-0.5 text-xs font-bold shadow-md"
+          style={{
+            background: "rgba(0, 0, 0, 0.75)",
+            border: "1px solid rgba(250, 204, 21, 0.5)",
+            color: "#facc15",
+          }}
+        >
+          {"\u21AF"}
+        </div>
+      )}
+
+      {/* Card art area */}
+      <div className="relative w-full" style={{ height: "45%" }}>
+        {!imageError ? (
+          <img
+            src={cardImageUrl(card.cardNumber)}
+            alt={card.name}
+            className="h-full w-full object-cover"
+            onError={() => {
+              setImageError(true);
+            }}
+            loading="lazy"
+          />
+        ) : (
+          <div
+            className="flex h-full w-full items-center justify-center p-2"
+            style={{
+              background: `linear-gradient(135deg, ${tideColor}20, ${tideColor}08)`,
+            }}
+          >
+            <span
+              className="text-center text-sm font-medium opacity-60"
+              style={{ color: tideColor }}
+            >
+              {card.name}
+            </span>
+          </div>
+        )}
+        {/* Gradient overlay at bottom of art */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-4"
+          style={{
+            background: "linear-gradient(transparent, #1a1025)",
+          }}
+        />
+      </div>
+
+      {/* Card info area */}
+      <div className="flex min-h-0 flex-1 flex-col px-2 pt-1 pb-1.5">
+        {/* Card name */}
+        <h3
+          className="truncate text-sm leading-tight font-bold"
+          style={{ color: tideColor }}
+        >
+          {card.name}
+        </h3>
+
+        {/* Type line with tide icon */}
+        <div className="mt-0.5 flex items-center gap-1">
+          <img
+            src={tideIconUrl(card.tide)}
+            alt={card.tide}
+            className="h-3.5 w-3.5 rounded-full object-contain"
+            style={{ border: `1px solid ${tideColor}` }}
+          />
+          <span className="text-[10px] font-medium opacity-60">
+            {String(card.tideCost)}
+          </span>
+          <span
+            className="truncate text-[10px] opacity-50"
+            style={{ color: "#e2e8f0" }}
+          >
+            {formatTypeLine(card)}
+          </span>
+        </div>
+
+        {/* Rules text */}
+        <div
+          className="mt-1 min-h-0 flex-1 overflow-y-auto text-[10px] leading-tight opacity-80"
+          style={{ color: "#e2e8f0" }}
+        >
+          {renderRulesText(card.renderedText)}
+        </div>
+
+        {/* Spark badge for Characters */}
+        {card.spark !== null && (
+          <div className="mt-auto flex items-center justify-end pt-0.5">
+            <div
+              className="flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+              style={{
+                background: "rgba(0, 0, 0, 0.5)",
+                border: "1px solid rgba(192, 132, 252, 0.5)",
+              }}
+            >
+              <span style={{ color: "#c084fc" }}>{"\u2606"}</span>
+              <span className="text-white">{String(card.spark)}</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Rarity glow bottom accent */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
+        style={{ background: `${rarityColor}80` }}
+      />
+    </div>
+  );
+}
