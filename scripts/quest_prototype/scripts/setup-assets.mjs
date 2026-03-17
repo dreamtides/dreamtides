@@ -66,7 +66,7 @@ function transformCard(card) {
   const result = {};
   for (const [key, value] of Object.entries(card)) {
     const camelKey = kebabToCamel(key);
-    if (camelKey === "spark") {
+    if (camelKey === "spark" || camelKey === "energyCost") {
       result[camelKey] = value === "" || value === "*" ? null : value;
     } else {
       result[camelKey] = value;
@@ -74,6 +74,9 @@ function transformCard(card) {
   }
   if (!("spark" in result)) {
     result.spark = null;
+  }
+  if (!("subtype" in result) || result.subtype == null) {
+    result.subtype = "";
   }
   return result;
 }

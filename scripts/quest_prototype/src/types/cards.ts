@@ -23,7 +23,7 @@ export interface CardData {
   cardType: CardType;
   subtype: string;
   rarity: Rarity;
-  energyCost: number;
+  energyCost: number | null;
   spark: number | null;
   isFast: boolean;
   tide: Tide;
