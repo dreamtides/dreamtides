@@ -4,7 +4,7 @@ import { useQuest } from "../state/quest-context";
 import { generateInitialAtlas } from "../atlas/atlas-generator";
 import { logEvent } from "../logging";
 
-/** Intro screen with a "Begin Quest" button that initializes the atlas. */
+/** Intro screen with dark fantasy styling and "Begin Quest" button. */
 export function QuestStartScreen() {
   const { state, mutations } = useQuest();
 
@@ -22,39 +22,54 @@ export function QuestStartScreen() {
   }, [state.completionLevel, state.essence, mutations]);
 
   return (
-    <motion.div
-      className="flex h-full flex-col items-center justify-center gap-6 p-8"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
-    >
-      <h1
-        className="text-5xl font-bold tracking-wider md:text-6xl"
-        style={{ color: "#a855f7" }}
+    <div className="flex min-h-screen flex-col items-center justify-center px-4">
+      <motion.h1
+        className="mb-2 text-center text-5xl font-extrabold tracking-wide md:text-7xl lg:text-8xl"
+        style={{
+          background: "linear-gradient(135deg, #a855f7 0%, #7c3aed 40%, #c084fc 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          textShadow: "0 0 60px rgba(168, 85, 247, 0.4), 0 0 120px rgba(124, 58, 237, 0.2)",
+          filter: "drop-shadow(0 0 40px rgba(168, 85, 247, 0.3))",
+        }}
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
       >
         Dreamtides
-      </h1>
-      <p
-        className="text-lg opacity-70"
+      </motion.h1>
+
+      <motion.p
+        className="mb-10 text-center text-lg opacity-60 md:text-xl"
         style={{ color: "#e2e8f0" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.6 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
       >
         A Roguelike Deckbuilding Quest
-      </p>
-      <div className="mt-4 rounded-lg border border-gray-700 bg-black/30 p-4 text-center text-sm opacity-60">
-        <p>Starting essence: {String(state.essence)}</p>
-      </div>
-      <button
-        className="mt-6 rounded-xl px-8 py-3 text-lg font-bold text-white shadow-lg transition-transform hover:scale-105"
+      </motion.p>
+
+      <motion.button
+        className="cursor-pointer rounded-lg px-10 py-4 text-lg font-bold tracking-wide text-white transition-colors md:text-xl"
         style={{
-          background: "linear-gradient(135deg, #7c3aed, #a855f7)",
-          boxShadow: "0 0 20px #7c3aed40",
+          background: "linear-gradient(135deg, #d4a017 0%, #b8860b 100%)",
+          border: "2px solid rgba(251, 191, 36, 0.6)",
+          boxShadow:
+            "0 0 20px rgba(212, 160, 23, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
         }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
+        whileHover={{
+          boxShadow:
+            "0 0 30px rgba(212, 160, 23, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+          scale: 1.05,
+        }}
+        whileTap={{ scale: 0.97 }}
         onClick={handleBeginQuest}
-        aria-label="Begin Quest"
       >
         Begin Quest
-      </button>
-    </motion.div>
+      </motion.button>
+    </div>
   );
 }

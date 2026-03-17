@@ -1,8 +1,9 @@
 import { useCallback } from "react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { AtlasScreen } from "../screens/AtlasScreen";
 import { QuestStartScreen } from "../screens/QuestStartScreen";
+import { QuestCompleteScreen } from "../screens/QuestCompleteScreen";
 import { generateNewNodes } from "../atlas/atlas-generator";
 
 /** Shared layout for placeholder screens that will be built in later tasks. */
@@ -36,27 +37,42 @@ function PlaceholderScreen({
   );
 }
 
+/** Computes a stable key for AnimatePresence from the current screen type. */
+function screenKey(screenType: string): string {
+  return `screen-${screenType}`;
+}
+
 /** Routes to the correct screen component based on quest state. */
 export function ScreenRouter() {
   const { state } = useQuest();
+  const { screen } = state;
+
+  function renderScreen() {
+    switch (screen.type) {
+      case "questStart":
+        return <QuestStartScreen />;
+      case "atlas":
+        return <AtlasScreen />;
+      case "dreamscape":
+        return <DreamscapePlaceholder />;
+      case "site":
+        return <SitePlaceholder />;
+      case "questComplete":
+        return <QuestCompleteScreen />;
+    }
+  }
 
   return (
     <AnimatePresence mode="wait">
-      {state.screen.type === "questStart" && (
-        <QuestStartScreen key="questStart" />
-      )}
-      {state.screen.type === "atlas" && (
-        <AtlasScreen key="atlas" />
-      )}
-      {state.screen.type === "dreamscape" && (
-        <DreamscapePlaceholder key="dreamscape" />
-      )}
-      {state.screen.type === "site" && (
-        <SitePlaceholder key="site" />
-      )}
-      {state.screen.type === "questComplete" && (
-        <QuestCompletePlaceholder key="questComplete" />
-      )}
+      <motion.div
+        key={screenKey(screen.type)}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.35 }}
+      >
+        {renderScreen()}
+      </motion.div>
     </AnimatePresence>
   );
 }
@@ -96,20 +112,6 @@ function SitePlaceholder() {
       title="Site View"
       buttonLabel="Back to Dreamscape"
       onButtonClick={() => { mutations.setScreen({ type: "dreamscape" }); }}
-    />
-  );
-}
-
-/** Placeholder for the quest complete screen (built in a later task). */
-function QuestCompletePlaceholder() {
-  const { mutations } = useQuest();
-  return (
-    <PlaceholderScreen
-      title="Quest Complete!"
-      titleColor="#fbbf24"
-      titleSize="text-3xl"
-      buttonLabel="New Quest"
-      onButtonClick={() => { mutations.resetQuest(); }}
     />
   );
 }
