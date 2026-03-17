@@ -6,6 +6,12 @@ export interface LogEntry {
   [key: string]: unknown;
 }
 
+const RESERVED_KEYS: ReadonlySet<string> = new Set([
+  "timestamp",
+  "event",
+  "seq",
+]);
+
 let sequenceCounter = 0;
 const logAccumulator: LogEntry[] = [];
 
@@ -13,26 +19,36 @@ const logAccumulator: LogEntry[] = [];
  * Log a structured event. Assigns timestamp and sequence number
  * automatically, writes single-line JSON to console.log, and stores
  * the entry in the in-memory accumulator.
+ *
+ * Reserved fields (`timestamp`, `event`, `seq`) in the additional
+ * fields parameter are silently stripped so that logger-assigned
+ * values are always authoritative.
  */
 export function logEvent(
   event: string,
   fields: Record<string, unknown> = {},
-): LogEntry {
+): Readonly<LogEntry> {
   sequenceCounter += 1;
+  const sanitized: Record<string, unknown> = {};
+  for (const key of Object.keys(fields)) {
+    if (!RESERVED_KEYS.has(key)) {
+      sanitized[key] = fields[key];
+    }
+  }
   const entry: LogEntry = {
+    ...sanitized,
     timestamp: new Date().toISOString(),
     event,
     seq: sequenceCounter,
-    ...fields,
   };
   console.log(JSON.stringify(entry));
   logAccumulator.push(entry);
-  return entry;
+  return Object.freeze({ ...entry });
 }
 
-/** Returns a shallow copy of all accumulated log entries. */
-export function getLogEntries(): ReadonlyArray<LogEntry> {
-  return [...logAccumulator];
+/** Returns a deep-copied snapshot of all accumulated log entries. */
+export function getLogEntries(): ReadonlyArray<Readonly<LogEntry>> {
+  return logAccumulator.map((e) => Object.freeze({ ...e }));
 }
 
 /** Clears the in-memory log accumulator and resets the sequence counter. */
