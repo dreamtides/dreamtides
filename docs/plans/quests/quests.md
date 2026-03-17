@@ -40,11 +40,14 @@ lead their deck and may have some number of "dreamsigns":
 
 - **Dreamcaller:** An animated 3D character who starts each battle already in
   play for both participants in a battle. Each dreamcaller has powerful ongoing
-  static, triggered, or activated abilities.
+  static, triggered, or activated abilities. Each dreamcaller is associated with
+  a tide and typically grants 1 permanent tide crystal (see
+  [Tide Crystals](#tide-crystals)).
 - **Dreamsigns:** Cards with 2D illustrations of objects, which provide more
   minor ongoing effects. Dreamsign effects can apply during battles, on the
   quest map, or both. Generally we try to assign the splashy "build around"
-  effects to dreamcallers and secondary effects to dreamsigns.
+  effects to dreamcallers and secondary effects to dreamsigns. Dreamsigns are
+  associated with tides.
 
 Quests display a top-level 3D screen called the [Dream Atlas](#dream-atlas) with
 a series of "dreamscapes" the user can navigate to. Each dreamscape is
@@ -82,6 +85,69 @@ reference for the current quest prototype implementation, covering Rust types,
 client layout and site system, prototype interaction flows, and implementation
 gaps. Read when implementing quest features or migrating prototype logic to the
 rules engine.
+
+## Tides
+
+Every card, dreamsign, and dreamcaller in Dreamtides is associated with a
+**tide**, which represents a deck archetype and philosophical identity. Tides
+replace the former "resonance" system entirely. See
+[Tides](../../tides/tides.md) for the full tide design including archetype
+descriptions and alliances.
+
+The seven core tides are: **Bloom**, **Arc**, **Ignite**, **Pact**, **Umbra**,
+**Rime**, and **Surge**. **Wild** is a neutral tide that sits at the center,
+compatible with all strategies.
+
+Unlike the old resonance system, tides have direct mechanical impact on gameplay
+through **tide crystals** — a resource required to play cards during battles.
+See [Tide Crystals](#tide-crystals) for details.
+
+## Tide Crystals
+
+Tide crystals are the resource system that governs which cards a player can play
+during a battle. Each card has a **tide cost** indicating how many crystals of
+its tide are required to play it:
+
+- Most cards cost **1** tide crystal of their tide.
+- Cards that heavily commit to a specific archetype may cost **2 or 3** crystals
+  of their tide.
+- **Wild** cards cost **0** tide crystals and can always be played regardless of
+  crystal state.
+- No cards currently require crystals from multiple different tides.
+
+### Crystal Pool Generation
+
+Before each battle begins, a **crystal pool** is assembled based on the
+composition of the player's deck. The algorithm functions like a skilled Magic:
+the Gathering deck builder designing a mana base — it asks "what distribution of
+tide crystals would be most likely to let this player play their cards on
+curve?" The crystal pool is a fixed list of approximately 30 crystals.
+
+The design goal is that **mono-tide decks can be played without any thought
+about crystals**, while **splashing additional tides carries added cost** and
+requires deliberate investment. Players who want to play cards from multiple
+tides must plan accordingly.
+
+### Crystal Accumulation During Battle
+
+During each **Dreamwell phase** of a battle, the player receives 1 random
+crystal drawn from their crystal pool. Crystals accumulate over the course of
+the battle, with a **cap of 3 crystals per tide**. If the crystal pool is
+somehow exhausted, a randomized second copy is generated.
+
+### Acquiring Additional Crystals
+
+Players have several ways to improve their tide crystal situation beyond the
+automatic Dreamwell phase allocation:
+
+- **Dreamcallers** grant 1 permanent tide crystal of their associated tide. The
+  player starts each battle already having this crystal in play.
+- **Shops** sell the ability to gain a tide crystal in exchange for essence,
+  allowing the player to start battles with a pre-purchased crystal in play.
+  This is a key tool for enabling multi-tide decks.
+- **Cards** — certain cards will be designed that generate tide crystals as part
+  of their effects, allowing players to fix their tide pool and play cards from
+  multiple tides.
 
 ## Dreamscape Sites
 
@@ -127,21 +193,83 @@ Icon: "Sword"
 
 ### Draft
 
-The Draft site is the other core component of Dreamtides gameplay, allowing
-users to add cards to their deck. A draft site will display groups of cards to
-select from, typically 4, and the user must pick a card to add to their deck. A
-draft site will typically offer a repeated sequence of draft picks, so for
-example a user might end up drafting 5 cards to add to their deck over 5 draft
-picks, out of a pool of 20 possible choices. There is no way to "skip" or
-"reroll" draft picks by default, but of course all rules can be broken by
-specific dreamsigns.
+The Draft site is one of the two core components of Dreamtides gameplay,
+allowing users to add cards to their deck. Dreamtides uses a **cube draft**
+system inspired by Magic: the Gathering cube drafts.
 
-**UI:** 4 cards are shown in a row (landscape mode) or in two rows (portrait
-mode). The cards to draft from are shown in a pile in the 3D scene, then 4 of
-them animate in to be selected. Clicking a card animates it to the quest deck,
-and the others animate away, then 4 more cards from the pile animate in. After
-all drafts are completed, the camera automatically pulls back to the map view.
-Cards are shown with an orange outline.
+#### Cube Draft Overview
+
+At the start of each quest, a **draft pool** is created containing every card in
+the game (approximately 480 cards). Each card appears exactly once in the pool —
+there is **no rarity weighting** in the draft pool. The draft operates as a
+10-person cube draft table with the player and **9 AI bot drafters**.
+
+#### Draft Mechanics
+
+The cube draft works as follows:
+
+1. **Pack dealing:** 10 packs of 15 cards each are dealt simultaneously from the
+   draft pool, one for each drafter at the table.
+2. **Picking and passing:** Each drafter takes 1 card from their pack, then
+   passes the remaining cards to the next drafter. Packs circulate in a single
+   fixed direction — always the same 9 AIs passing to the player.
+3. **Player's view:** The player opens their own pack and sees all 15 cards on
+   their first pick. On their second pick, they receive a pack passed from the
+   adjacent AI (14 cards remaining). On their third pick, the pack has been
+   through 2 AIs (13 cards), and so on. By the 10th pick, the pack has passed
+   through all 9 AIs and the player sees 6 remaining cards.
+4. **Leftovers:** After all 10 drafters have picked from a pack, 5 cards remain.
+   These leftover cards are discarded and do not return to the pool.
+5. **No wheeling:** The draft direction never alternates. It is always a linear
+   sequence of the same 9 AIs passing to the player.
+
+#### Draft Sites on the Map
+
+Each draft site on the dreamscape map provides **5 picks** from the ongoing cube
+draft. With 2 draft sites per dreamscape at early completion levels, the player
+makes 10 picks per dreamscape — completing one full pass through the 10
+circulating packs.
+
+- The **first "draft 5" site** in a dreamscape covers picks from packs with 15,
+  14, 13, 12, and 11 cards (the player's own pack and packs that have passed
+  through 1-4 AIs).
+- The **second "draft 5" site** covers picks from packs with 10, 9, 8, 7, and 6
+  cards (packs that have passed through 5-9 AIs).
+
+#### Rounds and Pool Refresh
+
+After the player completes 10 picks (one full set of circulating packs), a new
+**round** begins: 10 new packs of 15 cards are dealt from the remaining pool.
+After **3 rounds** (30 total player picks), the draft pool is discarded and a
+completely fresh pool is created from all cards in the game. This is the only
+point at which duplicate cards may appear in draft picks. The draft state (pool,
+AI bot state, round counter) persists across dreamscapes throughout the entire
+quest.
+
+#### AI Bot Drafters
+
+The 9 AI bot drafters are persistent throughout the quest, maintaining the same
+archetype preferences even across pool refreshes. Each AI bot scores cards using
+a weighted blend of:
+
+- **Raw power (20%):** How strong the card is in isolation.
+- **Archetype alignment (60%):** How well the card fits the bot's learned
+  archetype preferences (based on its tide commitment).
+- **Openness signals (20%):** Estimated archetype availability based on what
+  cards are being passed to the bot.
+
+Bots **commit to a tide after 5 picks** and pick **randomly 20% of the time**
+for variety. The AI bots' drafted cards are not used elsewhere — they serve
+purely to simulate realistic pack dynamics where desirable cards are taken
+before they reach the player.
+
+**UI:** The cards available for the current pick are shown in a row (landscape
+mode) or in multiple rows (portrait mode). The pack of cards to draft from is
+shown in a pile in the 3D scene, then the available cards animate in to be
+selected. Clicking a card animates it to the quest deck, and the remaining cards
+animate away as the next pack arrives. After all picks at a draft site are
+completed, the camera automatically pulls back to the map view. Cards are shown
+with an orange outline.
 
 Icon: "Rectangle Vertical"
 
@@ -151,9 +279,17 @@ The user activates the Dreamcaller Draft site to select their chosen
 dreamcaller. This displays a selection of around 3 dreamcallers. Dreamcallers
 are animated 3D characters, and we'll typically play character animations on
 this screen. The user can read the special abilities of the offered dreamcallers
-and pick one to lead their deck. Dreamcallers affect which cards are offered in
-future Draft sites, refer to the [Resonance](#resonance) section below for more
-details.
+and pick one to lead their deck.
+
+Each dreamcaller is associated with a **tide** and grants **1 permanent tide
+crystal** of that tide, which the player starts each battle with. This is a key
+enabler for the player's tide commitment.
+
+If the Dreamcaller Draft is visited **before** any card drafting, the displayed
+dreamcallers are a random selection. If visited **after** drafting cards, the
+displayed dreamcallers are **weighted based on the tides in the player's deck**
+— for example, the player will always see a dreamcaller matching their 3
+most-drafted tides if possible.
 
 Each dreamcaller comes with a different **essence bonus** gained for selecting
 that option, which serves as a lever for balancing more powerful dreamcallers.
@@ -175,23 +311,44 @@ selected dreamcaller animates to the bottom left of the screen to appear in a
 
 Icon: "Crown"
 
-### Discovery Draft
+### Specialty Shop
 
-Shows four cards which have some unifying mechanical theme, for example showing
-warrior cards, removal spells, cards that involve discarding a card, rare cards,
-only dreamsigns, only triggered abilities, etc. The user selects a single card.
+A specialty shop operates in a similar manner to
+[Boss Rewards](#battle-rewards), showing a selection of powerful rare cards
+weighted to match the player's tides.
 
-**UI:** This site follows the same interface behavior as the "Draft" site.
+Future iterations may experiment with more novel offerings, such as:
 
-Icon: "Compass"
+- A curated selection of cards from *other* tides that synergize well with the
+  player's deck.
+- A curated offering of removal effects, card advantage effects, or other
+  mechanical categories.
+- Tide-weighted rare card selection (the default behavior).
+
+**UI:** Identical UI to the regular shop site except that it features a
+different NPC.
+
+Icon: "Store Alt 2"
 
 ### Shop
 
 The shop is the primary site in which the user can spend their essence. Shops
-offer individual cards and dreamsigns for purchase, and may rarely offer other
-site options such as purchasing journeys, purging cards, transfiguring cards,
-duplicating cards, etc. Shops do offer the ability to spend essence to "reroll"
-(generate a new set of shop items to buy).
+offer individual cards, dreamsigns, and **tide crystals** for purchase, and may
+rarely offer other site options such as purchasing journeys, purging cards,
+transfiguring cards, duplicating cards, etc. Shops do offer the ability to spend
+essence to "reroll" (generate a new set of shop items to buy).
+
+The cards and dreamsigns shown in a shop are **weighted to match the player's
+tides** in their deck. A player who has heavily committed to Surge will see
+predominantly Surge cards and dreamsigns. The weighting should be aggressive
+enough that committed players see mostly their main tide, while still
+occasionally showing complementary options from allied tides. Card rarity is
+still exposed in the shop through **pricing** — rare cards cost more essence
+than common ones.
+
+**Tide crystal purchases** allow the player to gain a permanent tide crystal in
+exchange for essence. The purchased crystal is in play at the start of each
+subsequent battle. This is a key mechanism for enabling multi-tide splashes.
 
 Shop base prices and the overall essence economy are defined in TOML. The shop
 implements a random "discount" system where one or more items can be displayed
@@ -213,21 +370,11 @@ place visually rather than animating away, but the site cannot be revisited.
 
 Icon: "Store"
 
-### Specialty Shop
-
-A specialty shop functions in the same manner as a regular shop, but it shows
-items with a unifying mechanical theme. Specialty shops use the same generation
-algorithm and tagging system as [Discovery Draft](#discovery-draft) sites.
-
-**UI:** Identical UI to the regular shop site except that it features a
-different NPC.
-
-Icon: "Store Alt 2"
-
 ### Dreamsign Offering
 
 At a dreamsign offering site, the user is presented with a single dreamsign to
 gain. The offering may be rejected, but there is no reward for doing so.
+Dreamsigns are associated with tides.
 
 **UI:** The dreamsign animates to be displayed from screen center at a small
 scale. A purple accept button and a gray reject button are displayed. The
@@ -449,10 +596,12 @@ custom cards in their decks. See [Boss Dreamcallers](bosses.md) for details.
 ### Battle Rewards
 
 Completing a battle always grants an essence reward, which increases as the user
-completes more dreamscapes. The user also gets a "rare draft" pick, functioning
-like a single pick from a normal [Draft](#draft) site but drawing only from rare
-cards in the pool. As with all draft picks, card selection is influenced by
-resonance and tags. This draft pick cannot be skipped.
+completes more dreamscapes. The user also gets a **rare card draft** pick: a
+choice from among 4 cards that are weighted to match the player's tides and
+always drawn from **rare cards**. Since the main cube draft ignores rarity, boss
+rewards are one of the few places where rarity serves as a visible power-level
+distinction. These cards should feel very strong in the player's deck. This
+draft pick cannot be skipped.
 
 ## Limits
 
@@ -479,61 +628,6 @@ cards generally have negative effects when drawn, while bane dreamsigns provide
 ongoing negative effects on the quest. Bane cards can be [purged](#purge) as
 normal. Bane cards and bane dreamsigns can be removed via the
 [cleanse](#cleanse) site.
-
-## Resonance
-
-A critical component of the drafting system in Dreamtides is "card resonance",
-which performs a function similar to the color pie in Magic: the Gathering. Each
-card, dreamsign, and dreamcaller has zero or more resonance symbols associated
-with it, drawn from four resonances arranged in a circle:
-
-- Stone
-- Flame
-- Thunder
-- Tide
-
-Each resonance has two archetypes, which together form a second circle. Adjacent
-archetypes share an "alliance", meaning cards designed for one archetype should
-also be playable in the allied archetype. See
-[Resonance](../../resonance/resonance.md) for the full resonance design
-including archetype descriptions and alliances.
-
-When generating draft picks, shop offerings, or dreamsign offerings, the user's
-*current* deck and dreamcaller are evaluated for a combined resonance score, and
-the selection of draft cards is weighted towards that score, i.e. a deck that
-contains a lot of Stone and Tide cards will generally see more Stone and Tide
-cards. As more cards with a given resonance are added, the chance of seeing
-other resonances diminishes. Generally the system converges towards decks built
-around a single resonance after 5-10 draft picks.
-
-Draft picks are drawn from a "pool" of cards generated at the start of a quest.
-When presenting draft options, cards are selected from this pool with
-probability proportional to how well their resonance matches the user's current
-resonance score, so the pool contents are fixed but the likelihood of being
-offered any given card shifts as the deck evolves. Cards are drawn without
-replacement, meaning the odds of seeing cards more than once diminish over time.
-
-When starting a new quest, the draft pool is weighted based on card rarity, with
-more copies of common cards and fewer copies of rare/legendary cards. There is
-also a slight random starting bias in the pool to make the play experience
-variable; there might for example be 20% more stone cards, 10% more flame cards,
-10% less thunder cards, and 20% less tide cards in the pool.
-
-The exact configuration of the draft pool, including weighting algorithms, is
-all data-driven and managed by TOML files.
-
-### Card Tagging
-
-In addition to resonance, cards can have zero or more **tags** defined on them.
-Tags can cover any sort of mechanical theme and generally correspond to possible
-deck archetypes, such as cards that care about discard, cards that support a
-specific tribe like spirit animals, cards that care about reclaim, etc. Tags
-influence card selection in a similar manner to resonance: as the user drafts
-more cards sharing a tag, subsequent offerings are more likely to include cards
-with that same tag. [Discovery Draft](#discovery-draft) and
-[Specialty Shop](#specialty-shop) sites use tags to generate their thematic
-groupings, selecting a tag and then offering cards that share it. Tag behavior
-is configured in TOML.
 
 ## Dream Atlas
 
@@ -630,8 +724,8 @@ visited. The available enhanced sites are:
 - **Transfiguration**: The player may select which card in their deck receives
   transfiguration
 - **Duplication**: The player may select which card in their deck is duplicated
-- **Discovery**: The player may select any number of the offered cards to add to
-  their deck.
+- **Specialty Shop**: The player may select any number of the offered cards to
+  add to their deck.
 
 ## Implementation Strategy and QA
 
