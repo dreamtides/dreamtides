@@ -10,6 +10,7 @@ import {
 import type { CardData, Tide } from "../types/cards";
 import type {
   DeckEntry,
+  DreamAtlas,
   Dreamcaller,
   Dreamsign,
   QuestState,
@@ -37,6 +38,7 @@ export interface QuestMutations {
   setScreen: (screen: Screen) => void;
   markSiteVisited: (siteId: string) => void;
   setCurrentDreamscape: (nodeId: string | null) => void;
+  updateAtlas: (atlas: DreamAtlas) => void;
   resetQuest: () => void;
 }
 
@@ -306,6 +308,10 @@ export function QuestProvider({
     });
   }, []);
 
+  const updateAtlas = useCallback((atlas: DreamAtlas) => {
+    setState((prev) => ({ ...prev, atlas }));
+  }, []);
+
   const resetQuest = useCallback(() => {
     resetLog();
     entryIdCounter.current = 0;
@@ -326,6 +332,7 @@ export function QuestProvider({
       setScreen,
       markSiteVisited,
       setCurrentDreamscape,
+      updateAtlas,
       resetQuest,
     }),
     [
@@ -341,6 +348,7 @@ export function QuestProvider({
       setScreen,
       markSiteVisited,
       setCurrentDreamscape,
+      updateAtlas,
       resetQuest,
     ],
   );
