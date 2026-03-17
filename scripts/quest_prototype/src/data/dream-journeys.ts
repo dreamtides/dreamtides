@@ -1,15 +1,30 @@
+import type { Tide, Rarity } from "../types/cards";
+
 /** A structured effect applied when a dream journey is chosen. */
 export type JourneyEffect =
   | { type: "addEssence"; amount: number }
+  | { type: "removeEssence"; amount: number }
   | { type: "removeRandomCards"; count: number }
-  | { type: "addRandomCards"; count: number; rarity: string }
+  | { type: "addRandomCards"; count: number; rarity: Rarity }
   | {
       type: "addEssenceAndRemoveCards";
       essenceAmount: number;
       removeCount: number;
     }
+  | {
+      type: "removeCardsAndAddRandomCards";
+      removeCount: number;
+      addCount: number;
+      rarity: Rarity;
+    }
+  | {
+      type: "removeCardsAndAddTideCrystal";
+      removeCount: number;
+      tide: Tide;
+      crystalCount: number;
+    }
   | { type: "upgradeRandomCards"; count: number }
-  | { type: "addTideCrystal"; tide: string; count: number };
+  | { type: "addTideCrystal"; tide: Tide; count: number };
 
 /** A dramatic deck-altering event offered at journey sites. */
 export interface DreamJourney {
@@ -48,7 +63,7 @@ export const DREAM_JOURNEYS: readonly DreamJourney[] = [
     name: "The Wanderer's Toll",
     description:
       "A giant carved from driftwood blocks the path. Pay its toll in essence and it grants safe passage through treacherous dreamscapes ahead.",
-    effect: { type: "addEssence", amount: -100 },
+    effect: { type: "removeEssence", amount: 100 },
   },
   {
     name: "Garden of Crystallized Thought",
@@ -72,12 +87,12 @@ export const DREAM_JOURNEYS: readonly DreamJourney[] = [
     name: "Pact of the Drowned Stars",
     description:
       "Fallen constellations whisper bargains from beneath black water. You surrender two cards and receive a tide crystal pulsing with Surge energy.",
-    effect: { type: "addTideCrystal", tide: "Surge", count: 2 },
+    effect: { type: "removeCardsAndAddTideCrystal", removeCount: 2, tide: "Surge", crystalCount: 1 },
   },
   {
     name: "The Flensing Wind",
     description:
       "A howling gale strips away everything inessential. Two cards are torn from your deck, but the wind deposits a single legendary card in their place.",
-    effect: { type: "addRandomCards", count: 1, rarity: "Legendary" },
+    effect: { type: "removeCardsAndAddRandomCards", removeCount: 2, addCount: 1, rarity: "Legendary" },
   },
 ] as const;

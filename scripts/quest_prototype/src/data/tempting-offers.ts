@@ -1,8 +1,11 @@
+import type { Tide, Rarity } from "../types/cards";
+
 /** A structured effect for the benefit or cost of a tempting offer. */
 export type OfferEffect =
   | { type: "addEssence"; amount: number }
-  | { type: "addRandomCards"; count: number; rarity: string }
-  | { type: "addTideCrystal"; tide: string; count: number }
+  | { type: "addRandomCards"; count: number; rarity: Rarity }
+  | { type: "addTideCrystal"; tide: Tide; count: number }
+  | { type: "addMultipleTideCrystals"; crystals: Array<{ tide: Tide; count: number }> }
   | { type: "addBaneCards"; count: number }
   | { type: "removeEssence"; amount: number }
   | { type: "removeDreamsign" }
@@ -73,7 +76,7 @@ export const TEMPTING_OFFERS: readonly TemptingOffer[] = [
       "A constellation of tide crystals descends. Gain one crystal each of Arc and Rime.",
     costDescription:
       "The celestial gift narrows your dreamsign capacity. Max dreamsigns reduced by 2.",
-    benefit: { type: "addTideCrystal", tide: "Arc", count: 2 },
+    benefit: { type: "addMultipleTideCrystals", crystals: [{ tide: "Arc", count: 1 }, { tide: "Rime", count: 1 }] },
     cost: { type: "reduceMaxDreamsigns", amount: 2 },
   },
   {
