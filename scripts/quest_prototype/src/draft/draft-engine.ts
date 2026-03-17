@@ -1,0 +1,489 @@
+import type { CardData, Tide } from "../types/cards";
+import type { DraftConfig, DraftState, AgentState } from "../types/draft";
+import { NAMED_TIDES } from "../data/card-database";
+import { logEvent } from "../logging";
+
+/** Ordered tide indices matching the fitness vector layout. */
+const TIDE_INDEX: Readonly<Record<string, number>> = {
+  Bloom: 0,
+  Arc: 1,
+  Ignite: 2,
+  Pact: 3,
+  Umbra: 4,
+  Rime: 5,
+  Surge: 6,
+};
+
+/** Default configuration for the cube draft engine. */
+export const DEFAULT_DRAFT_CONFIG: Readonly<DraftConfig> = {
+  seatCount: 10,
+  packSize: 15,
+  roundsPerPool: 3,
+  picksPerRound: 10,
+  tideCount: 7,
+  preferenceWeight: 0.6,
+  signalWeight: 0.2,
+  rarityWeight: 0.2,
+  aiOptimality: 0.8,
+  learningRate: 3.0,
+  opennessWindow: 3,
+  rarityValues: {
+    Common: 0.0,
+    Uncommon: 0.33,
+    Rare: 0.67,
+    Legendary: 1.0,
+  },
+};
+
+/** Number of player picks per draft site visit. */
+const SITE_PICKS = 5;
+
+/** Compute the 7-element fitness vector for a card based on its tide. */
+export function computeFitness(card: CardData): number[] {
+  const fitness = new Array<number>(7).fill(0);
+  if (card.tide === "Wild") {
+    fitness.fill(0.15);
+  } else {
+    const idx = TIDE_INDEX[card.tide];
+    if (idx !== undefined) {
+      fitness[idx] = 1.0;
+    }
+  }
+  return fitness;
+}
+
+/** Normalize a vector to sum to 1. Returns uniform [1/7, ...] for all-zero input. */
+export function normalize(w: number[]): number[] {
+  const sum = w.reduce((s, v) => s + v, 0);
+  if (sum <= 0) {
+    return new Array<number>(w.length).fill(1 / w.length);
+  }
+  return w.map((v) => v / sum);
+}
+
+/**
+ * Compute the openness vector from an agent's history of supply signals.
+ * Returns the element-wise mean of the stored signal vectors.
+ * If history is empty, returns uniform [1/7, ...].
+ */
+function computeOpenness(agent: AgentState, tideCount: number): number[] {
+  if (agent.opennessHistory.length === 0) {
+    return new Array<number>(tideCount).fill(1 / tideCount);
+  }
+  const result = new Array<number>(tideCount).fill(0);
+  for (const signal of agent.opennessHistory) {
+    for (let i = 0; i < tideCount; i++) {
+      result[i] += signal[i];
+    }
+  }
+  const count = agent.opennessHistory.length;
+  return result.map((v) => v / count);
+}
+
+/**
+ * Compute the supply signal vector for a pack.
+ * The signal is the normalized sum of fitness vectors of all cards in the pack.
+ */
+function computeSupplySignal(
+  pack: number[],
+  cardDatabase: Map<number, CardData>,
+  tideCount: number,
+): number[] {
+  const signal = new Array<number>(tideCount).fill(0);
+  for (const cardNum of pack) {
+    const card = cardDatabase.get(cardNum);
+    if (card) {
+      const fitness = computeFitness(card);
+      for (let i = 0; i < tideCount; i++) {
+        signal[i] += fitness[i];
+      }
+    }
+  }
+  return normalize(signal);
+}
+
+/** Score a card for an AI agent using the adaptive scoring formula. */
+export function scoreCard(
+  card: CardData,
+  agent: AgentState,
+  config: DraftConfig,
+): number {
+  const fitness = computeFitness(card);
+  const normalizedPref = normalize(agent.preference);
+  const openness = computeOpenness(agent, config.tideCount);
+
+  const prefScore = dot(fitness, normalizedPref);
+  const signalScore = dot(fitness, openness);
+  const rarityValue = config.rarityValues[card.rarity] ?? 0;
+
+  return (
+    config.preferenceWeight * prefScore +
+    config.signalWeight * signalScore +
+    config.rarityWeight * rarityValue
+  );
+}
+
+/** Dot product of two arrays. */
+function dot(a: number[], b: number[]): number {
+  let sum = 0;
+  const len = Math.min(a.length, b.length);
+  for (let i = 0; i < len; i++) {
+    sum += a[i] * b[i];
+  }
+  return sum;
+}
+
+/** Fisher-Yates shuffle of an array in place. */
+function shuffle<T>(arr: T[]): T[] {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/** Create a fresh agent state with zero preference vector. */
+function createAgentState(tideCount: number): AgentState {
+  return {
+    preference: new Array<number>(tideCount).fill(0),
+    opennessHistory: [],
+    picks: [],
+  };
+}
+
+/** Count cards per tide in a collection of card numbers. */
+function countByTide(
+  cardNumbers: number[],
+  cardDatabase: Map<number, CardData>,
+): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const tide of [...NAMED_TIDES, "Wild" as Tide]) {
+    counts[tide] = 0;
+  }
+  for (const num of cardNumbers) {
+    const card = cardDatabase.get(num);
+    if (card) {
+      counts[card.tide] = (counts[card.tide] ?? 0) + 1;
+    }
+  }
+  return counts;
+}
+
+/** Create initial DraftState from all non-Special cards. */
+export function initializeDraftState(
+  cardDatabase: Map<number, CardData>,
+): DraftState {
+  const config = DEFAULT_DRAFT_CONFIG;
+  const pool = Array.from(cardDatabase.keys());
+
+  logEvent("draft_pool_initialized", {
+    poolSize: pool.length,
+    cardCountByTide: countByTide(pool, cardDatabase),
+  });
+
+  return {
+    pool: shuffle([...pool]),
+    packs: Array.from({ length: config.seatCount }, () => []),
+    agents: Array.from({ length: config.seatCount }, () =>
+      createAgentState(config.tideCount),
+    ),
+    currentRound: 0,
+    currentPick: 0,
+    totalPicks: 0,
+    isActive: false,
+    sitePicksCompleted: 0,
+  };
+}
+
+/** Create a fresh pool from all cards. Reset round/pick counters. Preserve bot preferences. */
+export function refreshPool(
+  state: DraftState,
+  cardDatabase: Map<number, CardData>,
+): void {
+  const pool = Array.from(cardDatabase.keys());
+  state.pool = shuffle([...pool]);
+  state.packs = Array.from({ length: DEFAULT_DRAFT_CONFIG.seatCount }, () => []);
+  state.currentRound = 0;
+  state.currentPick = 0;
+  state.totalPicks = 0;
+  state.isActive = false;
+
+  logEvent("draft_pool_refreshed", {
+    poolSize: state.pool.length,
+    roundNumber: state.currentRound,
+  });
+}
+
+/** Draw 10 packs of 15 from the pool (uniform random, without replacement). */
+export function dealRound(state: DraftState): void {
+  const config = DEFAULT_DRAFT_CONFIG;
+  const totalNeeded = config.seatCount * config.packSize;
+  const available = Math.min(totalNeeded, state.pool.length);
+
+  // Draw cards from the pool
+  const drawn = state.pool.splice(0, available);
+
+  // Distribute evenly across packs
+  const packSize = Math.floor(available / config.seatCount);
+  const remainder = available % config.seatCount;
+  state.packs = [];
+  let offset = 0;
+  for (let i = 0; i < config.seatCount; i++) {
+    const size = packSize + (i < remainder ? 1 : 0);
+    state.packs.push(drawn.slice(offset, offset + size));
+    offset += size;
+  }
+
+  state.isActive = true;
+
+  logEvent("draft_round_started", {
+    roundNumber: state.currentRound,
+    packsDealCount: config.seatCount,
+  });
+}
+
+/** Player picks a specific card from seat 0's current pack. */
+export function playerPick(
+  cardNumber: number,
+  state: DraftState,
+  cardDatabase: Map<number, CardData>,
+): void {
+  const pack = state.packs[0];
+  const cardIndex = pack.indexOf(cardNumber);
+  if (cardIndex === -1) {
+    return; // Card not in pack; no-op
+  }
+
+  const card = cardDatabase.get(cardNumber);
+  const packContents = [...pack];
+
+  // Remove card from pack
+  pack.splice(cardIndex, 1);
+  // Add to player's picks
+  state.agents[0].picks.push(cardNumber);
+
+  // Update player preference vector
+  if (card) {
+    const fitness = computeFitness(card);
+    const config = DEFAULT_DRAFT_CONFIG;
+    for (let i = 0; i < config.tideCount; i++) {
+      state.agents[0].preference[i] += config.learningRate * fitness[i];
+    }
+  }
+
+  // Update player openness history
+  const signal = computeSupplySignal(
+    packContents,
+    cardDatabase,
+    DEFAULT_DRAFT_CONFIG.tideCount,
+  );
+  state.agents[0].opennessHistory.push(signal);
+  if (
+    state.agents[0].opennessHistory.length > DEFAULT_DRAFT_CONFIG.opennessWindow
+  ) {
+    state.agents[0].opennessHistory.shift();
+  }
+
+  logEvent("draft_pick_player", {
+    pickNumber: state.currentPick,
+    cardNumber,
+    cardName: card?.name ?? "Unknown",
+    cardTide: card?.tide ?? "Wild",
+    cardsAvailableCount: packContents.length,
+    packContents: packContents,
+  });
+}
+
+/** AI bot picks a card from its current pack. */
+export function botPick(
+  seatIndex: number,
+  state: DraftState,
+  cardDatabase: Map<number, CardData>,
+  config: DraftConfig,
+): void {
+  const pack = state.packs[seatIndex];
+  if (pack.length === 0) {
+    return; // Empty pack; no-op
+  }
+
+  const agent = state.agents[seatIndex];
+
+  // Update openness history before scoring
+  const signal = computeSupplySignal(pack, cardDatabase, config.tideCount);
+  agent.opennessHistory.push(signal);
+  if (agent.opennessHistory.length > config.opennessWindow) {
+    agent.opennessHistory.shift();
+  }
+
+  // Score all cards in the pack
+  const scored: Array<{ cardNumber: number; score: number }> = [];
+  for (const cardNum of pack) {
+    const card = cardDatabase.get(cardNum);
+    if (card) {
+      scored.push({ cardNumber: cardNum, score: scoreCard(card, agent, config) });
+    }
+  }
+
+  if (scored.length === 0) {
+    return;
+  }
+
+  // Sort by score descending
+  scored.sort((a, b) => b.score - a.score);
+
+  // 80% chance of picking the best card, 20% random
+  let chosen: { cardNumber: number; score: number };
+  if (Math.random() < config.aiOptimality) {
+    chosen = scored[0];
+  } else {
+    chosen = scored[Math.floor(Math.random() * scored.length)];
+  }
+
+  // Remove chosen card from pack
+  const cardIndex = pack.indexOf(chosen.cardNumber);
+  if (cardIndex !== -1) {
+    pack.splice(cardIndex, 1);
+  }
+
+  // Add to agent's picks
+  agent.picks.push(chosen.cardNumber);
+
+  // Update preference vector
+  const pickedCard = cardDatabase.get(chosen.cardNumber);
+  if (pickedCard) {
+    const fitness = computeFitness(pickedCard);
+    for (let i = 0; i < config.tideCount; i++) {
+      agent.preference[i] += config.learningRate * fitness[i];
+    }
+  }
+
+  logEvent("draft_pick_bot", {
+    seatNumber: seatIndex,
+    pickNumber: state.currentPick,
+    cardNumber: chosen.cardNumber,
+    cardTide: pickedCard?.tide ?? "Wild",
+  });
+}
+
+/** Rotate packs between seats. Odd rounds rotate left, even rounds rotate right. */
+export function rotatePacks(state: DraftState): void {
+  const packs = state.packs;
+  const count = packs.length;
+
+  if (state.currentRound % 2 === 0) {
+    // Odd round (0-indexed even = 1st, 3rd round) => rotate left
+    // Seat N's pack goes to seat N+1
+    const last = packs[count - 1];
+    for (let i = count - 1; i > 0; i--) {
+      packs[i] = packs[i - 1];
+    }
+    packs[0] = last;
+  } else {
+    // Even round (0-indexed odd = 2nd round) => rotate right
+    // Seat N's pack goes to seat N-1
+    const first = packs[0];
+    for (let i = 0; i < count - 1; i++) {
+      packs[i] = packs[i + 1];
+    }
+    packs[count - 1] = first;
+  }
+}
+
+/**
+ * After all seats have picked, increment pick counter.
+ * If round complete (10 picks), increment round and deal new packs if rounds remain.
+ * If pool exhausted (30 picks), trigger refresh.
+ */
+export function advancePick(
+  state: DraftState,
+  cardDatabase: Map<number, CardData>,
+): void {
+  state.currentPick += 1;
+  state.totalPicks += 1;
+
+  const config = DEFAULT_DRAFT_CONFIG;
+
+  if (state.totalPicks >= config.roundsPerPool * config.picksPerRound) {
+    // Pool exhausted -- refresh
+    refreshPool(state, cardDatabase);
+    return;
+  }
+
+  if (state.currentPick >= config.picksPerRound) {
+    // Round complete -- deal new packs
+    state.currentRound += 1;
+    state.currentPick = 0;
+    state.isActive = false;
+  }
+}
+
+/** Prepare the state for a draft site visit (5 player picks). */
+export function enterDraftSite(
+  state: DraftState,
+  _cardDatabase: Map<number, CardData>,
+): void {
+  state.sitePicksCompleted = 0;
+
+  if (!state.isActive) {
+    dealRound(state);
+  }
+
+  logEvent("draft_site_entered", {
+    picksRemainingInRound:
+      DEFAULT_DRAFT_CONFIG.picksPerRound - state.currentPick,
+  });
+}
+
+/** Return the current pack available to seat 0 for display. */
+export function getPlayerPack(state: DraftState): number[] {
+  return state.packs[0];
+}
+
+/**
+ * Process a player pick. Run all bot picks for this rotation,
+ * rotate packs, and advance. Return whether the 5-pick site batch is complete.
+ */
+export function processPlayerPick(
+  cardNumber: number,
+  state: DraftState,
+  cardDatabase: Map<number, CardData>,
+): boolean {
+  const config = DEFAULT_DRAFT_CONFIG;
+
+  // Player picks
+  playerPick(cardNumber, state, cardDatabase);
+
+  // All bots pick
+  for (let seat = 1; seat < config.seatCount; seat++) {
+    botPick(seat, state, cardDatabase, config);
+  }
+
+  // Rotate packs
+  rotatePacks(state);
+
+  // Advance pick counter
+  advancePick(state, cardDatabase);
+
+  // Track site picks
+  state.sitePicksCompleted += 1;
+
+  // If round ended and more rounds remain, deal the next round automatically
+  // so the next pick has packs available
+  if (!state.isActive && state.totalPicks > 0 && state.totalPicks < 30) {
+    dealRound(state);
+  }
+
+  return state.sitePicksCompleted >= SITE_PICKS;
+}
+
+/** Finalize a draft site visit. Log the cards drafted during this visit. */
+export function completeDraftSite(state: DraftState): void {
+  const playerPicks = state.agents[0].picks;
+  const sitePicks = playerPicks.slice(
+    playerPicks.length - state.sitePicksCompleted,
+  );
+
+  logEvent("draft_site_completed", {
+    cardsDrafted: sitePicks,
+  });
+}
