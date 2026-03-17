@@ -12,15 +12,16 @@ interface SiteCardProps {
 
 /** Returns the battle label based on completion level. */
 function battleLabel(completionLevel: number): string {
-  if (completionLevel >= 6) return "Final Boss";
-  if (completionLevel >= 3) return "Miniboss";
+  if (completionLevel === 6) return "Final Boss";
+  if (completionLevel === 3) return "Miniboss";
   return "Battle";
 }
 
 /** Returns border color for battle sites based on completion level. */
 function battleBorderColor(completionLevel: number): string {
-  if (completionLevel >= 6) return "#fbbf24";
-  return "#ef4444";
+  if (completionLevel === 6) return "#fbbf24";
+  if (completionLevel === 3) return "#ef4444";
+  return "rgba(124, 58, 237, 0.5)";
 }
 
 /** Renders a single site as a clickable card within the dreamscape view. */

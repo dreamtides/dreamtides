@@ -35,6 +35,8 @@ export interface QuestMutations {
   incrementCompletionLevel: (
     essenceReward: number,
     rewardCardNumber: number | null,
+    rewardCardName: string | null,
+    isMiniboss: boolean,
   ) => void;
   setScreen: (screen: Screen) => void;
   markSiteVisited: (siteId: string) => void;
@@ -240,13 +242,20 @@ export function QuestProvider({
   }, []);
 
   const incrementCompletionLevel = useCallback(
-    (essenceReward: number, rewardCardNumber: number | null) => {
+    (
+      essenceReward: number,
+      rewardCardNumber: number | null,
+      rewardCardName: string | null,
+      isMiniboss: boolean,
+    ) => {
       setState((prev) => {
         const newLevel = prev.completionLevel + 1;
         logEvent("battle_won", {
           completionLevel: newLevel,
           essenceReward,
           rewardCardNumber,
+          rewardCardName,
+          isMiniboss,
         });
         const screen: Screen =
           newLevel >= 7 ? { type: "questComplete" } : prev.screen;

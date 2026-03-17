@@ -5,6 +5,7 @@ import type { SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { DREAMCALLERS } from "../data/dreamcallers";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { countDeckTides, selectRareRewards } from "../data/tide-weights";
 import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
 import { logEvent } from "../logging";
@@ -41,66 +42,6 @@ function generateEnemy(): EnemyData {
     dreamsignCount: Math.floor(Math.random() * 5) + 1,
     tide: template.tide,
   };
-}
-
-/**
- * Selects 4 rare cards weighted toward the player's deck tides.
- * Draws from an infinite pool (does not deplete the draft cube).
- */
-function selectRareRewards(
-  cardDatabase: Map<number, CardData>,
-  deckTideCounts: Map<Tide, number>,
-): CardData[] {
-  const rareCards = Array.from(cardDatabase.values()).filter(
-    (c) => c.rarity === "Rare",
-  );
-
-  if (rareCards.length === 0) return [];
-
-  const maxTideCount = Math.max(...deckTideCounts.values(), 1);
-
-  const weighted: Array<[CardData, number]> = rareCards.map((card) => {
-    const tideCount = deckTideCounts.get(card.tide) ?? 0;
-    const weight = 1 + (tideCount / maxTideCount) * 3;
-    return [card, weight];
-  });
-
-  const selected: CardData[] = [];
-  const remaining = [...weighted];
-
-  for (let pick = 0; pick < 4 && remaining.length > 0; pick++) {
-    const total = remaining.reduce((sum, [, w]) => sum + w, 0);
-    let roll = Math.random() * total;
-    let chosenIndex = remaining.length - 1;
-
-    for (let i = 0; i < remaining.length; i++) {
-      roll -= remaining[i][1];
-      if (roll <= 0) {
-        chosenIndex = i;
-        break;
-      }
-    }
-
-    selected.push(remaining[chosenIndex][0]);
-    remaining.splice(chosenIndex, 1);
-  }
-
-  return selected;
-}
-
-/** Counts tide occurrences in the player's deck. */
-function countDeckTides(
-  deck: Array<{ cardNumber: number }>,
-  cardDatabase: Map<number, CardData>,
-): Map<Tide, number> {
-  const counts = new Map<Tide, number>();
-  for (const entry of deck) {
-    const card = cardDatabase.get(entry.cardNumber);
-    if (card) {
-      counts.set(card.tide, (counts.get(card.tide) ?? 0) + 1);
-    }
-  }
-  return counts;
 }
 
 /** Animates a number counting up from 0 to the target. */
@@ -491,6 +432,16 @@ export function BattleScreen({
   const [phase, setPhase] = useState<BattlePhase>("preBattle");
   const [selectedRewardIndex, setSelectedRewardIndex] = useState<number | null>(null);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Clear all pending timers on unmount
+  useEffect(() => {
+    return () => {
+      for (const id of timersRef.current) {
+        clearTimeout(id);
+      }
+    };
+  }, []);
 
   const isMiniboss = completionLevel === 3;
   const isFinalBoss = completionLevel === 6;
@@ -523,9 +474,11 @@ export function BattleScreen({
     setPhase("animation");
 
     // After 1.5 seconds, transition to victory
-    setTimeout(() => {
-      setPhase("victory");
-    }, 1500);
+    timersRef.current.push(
+      setTimeout(() => {
+        setPhase("victory");
+      }, 1500),
+    );
   }, [completionLevel, enemy.name, isMiniboss, isFinalBoss]);
 
   const handleSelectReward = useCallback(
@@ -564,7 +517,12 @@ export function BattleScreen({
       }
 
       // Increment completion level (handles quest complete for level 7)
-      mutations.incrementCompletionLevel(essenceReward, card.cardNumber);
+      mutations.incrementCompletionLevel(
+        essenceReward,
+        card.cardNumber,
+        card.name,
+        isMiniboss,
+      );
 
       logEvent("site_completed", {
         siteType: "Battle",
@@ -572,13 +530,15 @@ export function BattleScreen({
       });
 
       // After animation delay, navigate away
-      setTimeout(() => {
-        // If final boss, incrementCompletionLevel already transitions
-        // to quest complete. Otherwise go to atlas.
-        if (!isFinalBoss) {
-          mutations.setScreen({ type: "atlas" });
-        }
-      }, 800);
+      timersRef.current.push(
+        setTimeout(() => {
+          // If final boss, incrementCompletionLevel already transitions
+          // to quest complete. Otherwise go to atlas.
+          if (!isFinalBoss) {
+            mutations.setScreen({ type: "atlas" });
+          }
+        }, 800),
+      );
     },
     [
       selectedRewardIndex,
@@ -590,6 +550,7 @@ export function BattleScreen({
       atlas,
       completionLevel,
       isFinalBoss,
+      isMiniboss,
     ],
   );
 

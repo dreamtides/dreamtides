@@ -1,29 +1,12 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Dreamcaller, SiteState } from "../types/quest";
 import type { Tide } from "../types/cards";
 import { useQuest } from "../state/quest-context";
 import { DREAMCALLERS } from "../data/dreamcallers";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { countDeckTides, tideWeight, weightedSample } from "../data/tide-weights";
 import { logEvent } from "../logging";
-
-/**
- * Counts the occurrences of each tide in the player's deck, using
- * the card database to look up tide values.
- */
-function countDeckTides(
-  deck: Array<{ cardNumber: number }>,
-  cardDatabase: Map<number, { tide: Tide }>,
-): Map<Tide, number> {
-  const counts = new Map<Tide, number>();
-  for (const entry of deck) {
-    const card = cardDatabase.get(entry.cardNumber);
-    if (card) {
-      counts.set(card.tide, (counts.get(card.tide) ?? 0) + 1);
-    }
-  }
-  return counts;
-}
 
 /**
  * Selects 3 distinct dreamcallers. If the player has drafted cards,
@@ -45,38 +28,8 @@ function selectOfferedDreamcallers(
     return pool.slice(0, 3);
   }
 
-  // Weight toward player's most-drafted tides
   const tideCounts = countDeckTides(deck, cardDatabase);
-  const maxCount = Math.max(...tideCounts.values(), 1);
-
-  const weighted: Array<[Dreamcaller, number]> = pool.map((dc) => {
-    const tideCount = tideCounts.get(dc.tide) ?? 0;
-    // Base weight 1 + proportion of max tide count
-    const weight = 1 + (tideCount / maxCount) * 3;
-    return [dc, weight];
-  });
-
-  const selected: Dreamcaller[] = [];
-  const remaining = [...weighted];
-
-  for (let pick = 0; pick < 3 && remaining.length > 0; pick++) {
-    const total = remaining.reduce((sum, [, w]) => sum + w, 0);
-    let roll = Math.random() * total;
-    let chosenIndex = remaining.length - 1;
-
-    for (let i = 0; i < remaining.length; i++) {
-      roll -= remaining[i][1];
-      if (roll <= 0) {
-        chosenIndex = i;
-        break;
-      }
-    }
-
-    selected.push(remaining[chosenIndex][0]);
-    remaining.splice(chosenIndex, 1);
-  }
-
-  return selected;
+  return weightedSample(pool, 3, (dc) => tideWeight(dc.tide, tideCounts));
 }
 
 interface DreamcallerCardProps {
@@ -212,6 +165,16 @@ function DreamcallerCard({
 export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
   const { state, mutations, cardDatabase } = useQuest();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear pending timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
 
   // Compute offered dreamcallers once on first render and keep stable.
   const offeredRef = useRef<Dreamcaller[] | null>(null);
@@ -244,7 +207,7 @@ export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
       });
 
       // After animation delay, return to dreamscape
-      setTimeout(() => {
+      timerRef.current = setTimeout(() => {
         mutations.markSiteVisited(site.id);
         mutations.setScreen({ type: "dreamscape" });
       }, 500);
