@@ -106,9 +106,7 @@ function DraftSummary({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: i * 0.1 }}
           >
-            <div style={{ aspectRatio: "2 / 3", maxHeight: "320px" }}>
-              <CardDisplay card={card} />
-            </div>
+            <CardDisplay card={card} />
           </motion.div>
         ))}
       </div>
