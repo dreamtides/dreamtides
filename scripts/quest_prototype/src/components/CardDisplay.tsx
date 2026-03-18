@@ -96,17 +96,37 @@ export function CardDisplay({
         : {})}
     >
       {/* Energy cost badge */}
-      <div
-        className="absolute top-1.5 left-1.5 z-10 flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-bold shadow-md"
-        style={{
-          background: "rgba(0, 0, 0, 0.75)",
-          border: "1px solid rgba(251, 191, 36, 0.5)",
-        }}
-      >
-        <span style={{ color: tintColor ?? "#fbbf24" }}>{"\u25CF"}</span>
-        <span style={{ color: tintColor ?? "#ffffff" }}>
-          {card.energyCost !== null ? String(card.energyCost) : "X"}
-        </span>
+      <div className="absolute top-1.5 left-1.5 z-10 flex flex-col items-center gap-1">
+        <div
+          className="flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-bold shadow-md"
+          style={{
+            background: "rgba(0, 0, 0, 0.75)",
+            border: "1px solid rgba(251, 191, 36, 0.5)",
+          }}
+        >
+          <span style={{ color: tintColor ?? "#fbbf24" }}>{"\u25CF"}</span>
+          <span style={{ color: tintColor ?? "#ffffff" }}>
+            {card.energyCost !== null ? String(card.energyCost) : "X"}
+          </span>
+        </div>
+
+        {/* Tide cost symbols */}
+        {card.tideCost > 0 && (
+          <div className="flex flex-col items-center gap-0.5">
+            {Array.from({ length: card.tideCost }, (_, i) => (
+              <img
+                key={i}
+                src={tideIconUrl(card.tide)}
+                alt={card.tide}
+                className="h-7 w-7 rounded-full object-contain shadow-md"
+                style={{
+                  border: `1px solid ${tideColor}`,
+                  background: "rgba(0, 0, 0, 0.5)",
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Fast badge */}
@@ -169,17 +189,8 @@ export function CardDisplay({
           {card.name}
         </h3>
 
-        {/* Type line with tide icon */}
+        {/* Type line */}
         <div className="mt-0.5 flex items-center gap-1">
-          <img
-            src={tideIconUrl(card.tide)}
-            alt={card.tide}
-            className="h-3.5 w-3.5 rounded-full object-contain"
-            style={{ border: `1px solid ${tideColor}` }}
-          />
-          <span className="text-[10px] font-medium opacity-60">
-            {String(card.tideCost)}
-          </span>
           <span
             className="truncate text-[10px] opacity-50"
             style={{ color: "#e2e8f0" }}
