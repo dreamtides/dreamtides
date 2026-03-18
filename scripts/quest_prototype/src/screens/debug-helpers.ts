@@ -13,9 +13,11 @@ const TIDE_VECTOR_ORDER: readonly Tide[] = [
   "Surge",
 ] as const;
 
-/** Summary of a single bot's draft state for display. */
-export interface BotSummary {
+/** Summary of a single seat's draft state for display. */
+export interface SeatSummary {
   seatIndex: number;
+  isPlayer: boolean;
+  receivesFromSeat: number;
   primaryTide: Tide | null;
   secondaryTide: Tide | null;
   preferenceWeights: Record<string, number>;
@@ -24,18 +26,29 @@ export interface BotSummary {
   totalCards: number;
 }
 
-/** Extract and sort bot summaries from draft state for display. */
-export function extractBotSummaries(
+/** Debug info for the entire draft table. */
+export interface DraftDebugInfo {
+  seats: SeatSummary[];
+  currentRound: number;
+  displayRound: number;
+  seatPassingToPlayer: number;
+}
+
+/** Extract seat summaries and passing info from draft state. */
+export function extractDraftDebugInfo(
   draftState: DraftState | null,
   cardDatabase: Map<number, CardData>,
-): BotSummary[] {
+): DraftDebugInfo | null {
   if (draftState === null) {
-    return [];
+    return null;
   }
 
-  const summaries: BotSummary[] = [];
+  const seatCount = draftState.agents.length;
+  const currentRound = draftState.currentRound;
 
-  for (let i = 1; i < draftState.agents.length; i++) {
+  const seats: SeatSummary[] = [];
+
+  for (let i = 0; i < seatCount; i++) {
     const agent = draftState.agents[i];
     const pref = agent.preference;
 
@@ -65,8 +78,13 @@ export function extractBotSummaries(
       }
     }
 
-    summaries.push({
+    // Packs always pass left: seat (i-1) passes to seat i
+    const receivesFromSeat = (i - 1 + seatCount) % seatCount;
+
+    seats.push({
       seatIndex: i,
+      isPlayer: i === 0,
+      receivesFromSeat,
       primaryTide,
       secondaryTide,
       preferenceWeights: normalizedWeights,
@@ -76,16 +94,15 @@ export function extractBotSummaries(
     });
   }
 
-  summaries.sort((a, b) => {
-    const aTide = a.primaryTide ?? "";
-    const bTide = b.primaryTide ?? "";
-    if (aTide !== bTide) {
-      return aTide.localeCompare(bTide);
-    }
-    return a.seatIndex - b.seatIndex;
-  });
+  // Seat (count-1) always passes to seat 0
+  const seatPassingToPlayer = seatCount - 1;
 
-  return summaries;
+  return {
+    seats,
+    currentRound,
+    displayRound: currentRound + 1,
+    seatPassingToPlayer,
+  };
 }
 
 /** Normalize preference vector into a Record keyed by tide name with values summing to 1. */

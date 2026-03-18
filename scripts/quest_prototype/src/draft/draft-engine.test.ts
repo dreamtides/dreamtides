@@ -229,12 +229,11 @@ describe("dealRound", () => {
 });
 
 describe("rotatePacks", () => {
-  it("rotates left on odd rounds: seat N's pack goes to seat N+1", () => {
+  it("always rotates left: seat N's pack goes to seat N+1", () => {
     const db = makeDatabase(483);
     const state = initializeDraftState(db);
     dealRound(state);
     const packsBefore = state.packs.map((p) => [...p]);
-    state.currentRound = 1; // odd round => left
     rotatePacks(state);
     // Seat 1 should now have what seat 0 had
     expect(state.packs[1]).toEqual(packsBefore[0]);
@@ -242,33 +241,20 @@ describe("rotatePacks", () => {
     expect(state.packs[0]).toEqual(packsBefore[9]);
   });
 
-  it("rotates right on even rounds: seat N's pack goes to seat N-1", () => {
-    const db = makeDatabase(483);
-    const state = initializeDraftState(db);
-    dealRound(state);
-    const packsBefore = state.packs.map((p) => [...p]);
-    state.currentRound = 0; // even round => right
-    rotatePacks(state);
-    // Seat 0 should now have what seat 1 had
-    expect(state.packs[0]).toEqual(packsBefore[1]);
-    // Seat 9 should have what seat 0 had (wrap)
-    expect(state.packs[9]).toEqual(packsBefore[0]);
-  });
-
-  it("alternates direction across rounds", () => {
+  it("rotates the same direction regardless of round number", () => {
     const db = makeDatabase(483);
     const state = initializeDraftState(db);
     dealRound(state);
     const packsBefore = state.packs.map((p) => [...p]);
 
-    // Round 2 (even) => right
     state.currentRound = 2;
     rotatePacks(state);
-    expect(state.packs[0]).toEqual(packsBefore[1]);
-    expect(state.packs[9]).toEqual(packsBefore[0]);
+    // Still left: seat 1 gets seat 0's pack
+    expect(state.packs[1]).toEqual(packsBefore[0]);
+    expect(state.packs[0]).toEqual(packsBefore[9]);
   });
 
-  it("emits draft_packs_rotated event with direction", () => {
+  it("emits draft_packs_rotated event", () => {
     const db = makeDatabase(483);
     const state = initializeDraftState(db);
     dealRound(state);
@@ -277,7 +263,6 @@ describe("rotatePacks", () => {
     const event = entries.find((e) => e.event === "draft_packs_rotated");
     expect(event).toBeDefined();
     expect(event?.roundNumber).toBe(0);
-    expect(event?.direction).toBeDefined();
   });
 });
 

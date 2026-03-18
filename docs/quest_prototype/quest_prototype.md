@@ -89,6 +89,8 @@ src/
     atlas-generator.ts  — dream atlas + dreamscape generation
   draft/
     draft-engine.ts     — 10-seat cube draft (pick, rotate, bots)
+    |                     Packs always pass left (seat N → seat N+1).
+    |                     Seat 0 is the human player; seats 1-9 are AI bots.
   data/               — synthetic data (dreamcallers, dreamsigns,
   |                     journeys, offers, biomes)
   shop/               — shop item generation helpers

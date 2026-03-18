@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
 import type { DraftState } from "../types/draft";
 import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
-import { extractBotSummaries, type BotSummary } from "./debug-helpers";
+import { extractDraftDebugInfo, type SeatSummary } from "./debug-helpers";
 
 /** Props for the DebugScreen component. */
 interface DebugScreenProps {
@@ -14,8 +14,9 @@ interface DebugScreenProps {
 }
 
 /**
- * Full-screen overlay showing AI bot draft intelligence data.
- * Displays each bot's tide preferences, drafted cards, and preference vectors.
+ * Full-screen overlay showing draft intelligence data for all seats.
+ * Displays each seat's tide preferences, drafted cards, passing direction,
+ * and highlights the human player seat.
  */
 export function DebugScreen({
   isOpen,
@@ -23,8 +24,8 @@ export function DebugScreen({
   draftState,
   cardDatabase,
 }: DebugScreenProps) {
-  const botSummaries = useMemo(
-    () => extractBotSummaries(draftState, cardDatabase),
+  const debugInfo = useMemo(
+    () => extractDraftDebugInfo(draftState, cardDatabase),
     [draftState, cardDatabase],
   );
 
@@ -66,12 +67,20 @@ export function DebugScreen({
                 "linear-gradient(180deg, rgba(10, 6, 18, 0.95) 0%, rgba(10, 6, 18, 0.8) 100%)",
             }}
           >
-            <h2
-              className="text-lg font-bold md:text-xl"
-              style={{ color: "#e2e8f0" }}
-            >
-              Debug: AI Draft Intelligence
-            </h2>
+            <div>
+              <h2
+                className="text-lg font-bold md:text-xl"
+                style={{ color: "#e2e8f0" }}
+              >
+                Debug: AI Draft Intelligence
+              </h2>
+              {debugInfo !== null && (
+                <PassingBanner
+                  displayRound={debugInfo.displayRound}
+                  seatPassingToPlayer={debugInfo.seatPassingToPlayer}
+                />
+              )}
+            </div>
             <button
               className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-lg transition-colors"
               style={{
@@ -87,7 +96,7 @@ export function DebugScreen({
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto px-4 py-4 md:px-6">
-            {botSummaries.length === 0 ? (
+            {debugInfo === null ? (
               <div className="flex h-full items-center justify-center">
                 <p className="text-sm opacity-40">
                   No draft data available yet.
@@ -95,11 +104,14 @@ export function DebugScreen({
               </div>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {botSummaries.map((bot) => (
-                  <BotCard
-                    key={bot.seatIndex}
-                    bot={bot}
+                {debugInfo.seats.map((seat) => (
+                  <SeatCard
+                    key={seat.seatIndex}
+                    seat={seat}
                     cardDatabase={cardDatabase}
+                    passesToPlayer={
+                      seat.seatIndex === debugInfo.seatPassingToPlayer
+                    }
                   />
                 ))}
               </div>
@@ -111,53 +123,115 @@ export function DebugScreen({
   );
 }
 
-/** Card displaying a single bot's draft intelligence. */
-function BotCard({
-  bot,
-  cardDatabase: _cardDatabase,
+/** Banner showing current round and passing info. */
+function PassingBanner({
+  displayRound,
+  seatPassingToPlayer,
 }: {
-  bot: BotSummary;
+  displayRound: number;
+  seatPassingToPlayer: number;
+}) {
+  return (
+    <div
+      className="mt-1 flex items-center gap-3 text-xs"
+      style={{ color: "#94a3b8" }}
+    >
+      <span>Round {String(displayRound)} {"\u2190"} Packs pass left</span>
+      <span
+        className="rounded-full px-2 py-0.5"
+        style={{
+          background: "rgba(251, 191, 36, 0.15)",
+          border: "1px solid rgba(251, 191, 36, 0.3)",
+          color: "#fbbf24",
+        }}
+      >
+        Seat {String(seatPassingToPlayer)} passes to you
+      </span>
+    </div>
+  );
+}
+
+/** Card displaying a single seat's draft intelligence. */
+function SeatCard({
+  seat,
+  cardDatabase: _cardDatabase,
+  passesToPlayer,
+}: {
+  seat: SeatSummary;
   cardDatabase: Map<number, CardData>;
+  passesToPlayer: boolean;
 }) {
   const primaryColor =
-    bot.primaryTide !== null ? TIDE_COLORS[bot.primaryTide] : "#6b7280";
+    seat.primaryTide !== null ? TIDE_COLORS[seat.primaryTide] : "#6b7280";
+
+  const borderColor = seat.isPlayer
+    ? "#fbbf24"
+    : passesToPlayer
+      ? "#38bdf8"
+      : primaryColor;
 
   return (
     <div
       className="rounded-lg p-4"
       style={{
-        background: "rgba(10, 6, 18, 0.6)",
-        border: `1px solid ${primaryColor}40`,
+        background: seat.isPlayer
+          ? "rgba(251, 191, 36, 0.05)"
+          : "rgba(10, 6, 18, 0.6)",
+        border: seat.isPlayer
+          ? "2px solid rgba(251, 191, 36, 0.4)"
+          : passesToPlayer
+            ? `1px solid rgba(56, 189, 248, 0.4)`
+            : `1px solid ${primaryColor}40`,
       }}
     >
-      {/* Bot header */}
+      {/* Seat header */}
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div
             className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold"
             style={{
-              background: `${primaryColor}20`,
-              border: `2px solid ${primaryColor}60`,
-              color: primaryColor,
+              background: seat.isPlayer
+                ? "rgba(251, 191, 36, 0.2)"
+                : `${primaryColor}20`,
+              border: seat.isPlayer
+                ? "2px solid rgba(251, 191, 36, 0.6)"
+                : `2px solid ${primaryColor}60`,
+              color: seat.isPlayer ? "#fbbf24" : primaryColor,
             }}
           >
-            {String(bot.seatIndex)}
+            {seat.isPlayer ? "\u2605" : String(seat.seatIndex)}
           </div>
           <div>
-            <span
-              className="text-sm font-bold"
-              style={{ color: "#e2e8f0" }}
-            >
-              Seat {String(bot.seatIndex)}
-            </span>
             <div className="flex items-center gap-1.5">
-              {bot.primaryTide !== null && (
-                <TideBadge tide={bot.primaryTide} size="primary" />
+              <span
+                className="text-sm font-bold"
+                style={{ color: seat.isPlayer ? "#fbbf24" : "#e2e8f0" }}
+              >
+                {seat.isPlayer
+                  ? "You (Seat 0)"
+                  : `Seat ${String(seat.seatIndex)}`}
+              </span>
+              {passesToPlayer && !seat.isPlayer && (
+                <span
+                  className="rounded-full px-1.5 py-0.5 text-[9px] font-bold"
+                  style={{
+                    background: "rgba(56, 189, 248, 0.15)",
+                    border: "1px solid rgba(56, 189, 248, 0.3)",
+                    color: "#38bdf8",
+                  }}
+                >
+                  {"\u2192"} passes to you
+                </span>
               )}
-              {bot.secondaryTide !== null && (
-                <TideBadge tide={bot.secondaryTide} size="secondary" />
+            </div>
+            <div className="flex items-center gap-1.5">
+              {seat.primaryTide !== null && (
+                <TideBadge tide={seat.primaryTide} size="primary" />
               )}
-              {bot.primaryTide === null && (
+              {seat.secondaryTide !== null && (
+                <TideBadge tide={seat.secondaryTide} size="secondary" />
+              )}
+              {seat.primaryTide === null && (
                 <span className="text-[10px] opacity-40">
                   No tide preference
                 </span>
@@ -165,19 +239,43 @@ function BotCard({
             </div>
           </div>
         </div>
-        <span
-          className="text-xs opacity-50"
-          style={{ color: "#e2e8f0" }}
-        >
-          {String(bot.totalCards)} cards
-        </span>
+        <div className="flex flex-col items-end gap-0.5">
+          <span
+            className="text-xs opacity-50"
+            style={{ color: "#e2e8f0" }}
+          >
+            {String(seat.totalCards)} cards
+          </span>
+          <span
+            className="text-[9px] opacity-30"
+            style={{ color: borderColor }}
+          >
+            {"\u2190"} from seat {String(seat.receivesFromSeat)}
+          </span>
+        </div>
       </div>
 
       {/* Preference weights bar chart */}
-      <PreferenceBar weights={bot.preferenceWeights} />
+      {!seat.isPlayer && (
+        <PreferenceBar weights={seat.preferenceWeights} />
+      )}
+
+      {/* Player seat: simplified view */}
+      {seat.isPlayer && (
+        <div
+          className="rounded p-2 text-center text-xs"
+          style={{
+            background: "rgba(251, 191, 36, 0.08)",
+            border: "1px solid rgba(251, 191, 36, 0.15)",
+            color: "#fbbf24",
+          }}
+        >
+          Human Player
+        </div>
+      )}
 
       {/* Cards by tide summary */}
-      {bot.totalCards > 0 && (
+      {seat.totalCards > 0 && (
         <div className="mt-3">
           <h4
             className="mb-1.5 text-[10px] font-bold uppercase tracking-wider"
@@ -185,12 +283,12 @@ function BotCard({
           >
             Drafted Cards
           </h4>
-          <TideCardCounts cardsByTide={bot.cardsByTide} />
+          <TideCardCounts cardsByTide={seat.cardsByTide} />
         </div>
       )}
 
       {/* Card name list */}
-      {bot.draftedCards.length > 0 && (
+      {seat.draftedCards.length > 0 && (
         <div className="mt-2">
           <div
             className="max-h-32 overflow-y-auto rounded p-2"
@@ -200,7 +298,7 @@ function BotCard({
             }}
           >
             <div className="flex flex-wrap gap-1">
-              {bot.draftedCards.map((card, i) => (
+              {seat.draftedCards.map((card, i) => (
                 <span
                   key={`${String(card.cardNumber)}-${String(i)}`}
                   className="rounded-full px-2 py-0.5 text-[10px] font-medium"
