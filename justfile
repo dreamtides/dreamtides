@@ -433,9 +433,6 @@ parser-release *args='':
 render-quest-cards:
   just render-cards-toml scripts/quest_simulator/data/rendered-cards.toml 'true'
 
-quest-sim:
-  cd scripts/quest_simulator && python3 quest_sim.py
-
 export-cards:
   #!/usr/bin/env bash
   mkdir -p scripts/quest_simulator/data
@@ -780,6 +777,23 @@ prune-remote-branches:
     echo "Deleting remote branch: $b"
         git push -d origin "$b" || true
     done
+
+quest-dev:
+    #!/usr/bin/env bash
+    cd scripts/quest_prototype
+    npm install
+    npm run setup-assets
+    open http://localhost:5173 &
+    npx vite
+
+qs-typecheck:
+    cd scripts/quest_prototype && npm run typecheck
+
+qs-lint:
+    cd scripts/quest_prototype && npm run lint
+
+qs-test:
+    cd scripts/quest_prototype && npm test
 
 tv-dev:
     #!/usr/bin/env bash

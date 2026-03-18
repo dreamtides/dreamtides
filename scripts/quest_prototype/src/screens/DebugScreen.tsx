@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { Fragment, useCallback, useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
 import type { DraftState } from "../types/draft";
@@ -103,18 +103,59 @@ export function DebugScreen({
                 </p>
               </div>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {debugInfo.seats.map((seat) => (
-                  <SeatCard
-                    key={seat.seatIndex}
-                    seat={seat}
-                    cardDatabase={cardDatabase}
-                    passesToPlayer={
-                      seat.seatIndex === debugInfo.seatPassingToPlayer
-                    }
-                  />
-                ))}
-              </div>
+              <>
+                {/* Pack flow diagram */}
+                <PackFlowDiagram
+                  seatCount={debugInfo.seats.length}
+                  seatPassingToPlayer={debugInfo.seatPassingToPlayer}
+                />
+
+                {/* Passing pair: Seat 9 → YOU */}
+                <div className="mb-6 flex flex-col items-stretch gap-0 lg:flex-row lg:items-stretch lg:justify-center">
+                  <div className="lg:max-w-[400px] lg:flex-1">
+                    <SeatCard
+                      seat={
+                        debugInfo.seats[debugInfo.seatPassingToPlayer]
+                      }
+                      cardDatabase={cardDatabase}
+                      passesToPlayer={true}
+                    />
+                  </div>
+                  <PassingArrow label="passes to you" highlighted />
+                  <div className="lg:max-w-[400px] lg:flex-1">
+                    <SeatCard
+                      seat={debugInfo.seats[0]}
+                      cardDatabase={cardDatabase}
+                      passesToPlayer={false}
+                    />
+                  </div>
+                </div>
+
+                {/* Remaining seats in passing order */}
+                <h3
+                  className="mb-3 text-[10px] font-bold uppercase tracking-wider"
+                  style={{ color: "#64748b" }}
+                >
+                  Other Drafters
+                </h3>
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {debugInfo.seats
+                    .filter(
+                      (s) =>
+                        s.seatIndex !== 0 &&
+                        s.seatIndex !==
+                          debugInfo.seatPassingToPlayer,
+                    )
+                    .map((seat) => (
+                      <SeatCard
+                        key={seat.seatIndex}
+                        seat={seat}
+                        cardDatabase={cardDatabase}
+                        passesToPlayer={false}
+                      />
+                    ))}
+                </div>
+              </>
             )}
           </div>
         </motion.div>
@@ -151,6 +192,146 @@ function PassingBanner({
   );
 }
 
+/** Compact horizontal diagram showing all seats in pack-passing order. */
+function PackFlowDiagram({
+  seatCount,
+  seatPassingToPlayer,
+}: {
+  seatCount: number;
+  seatPassingToPlayer: number;
+}) {
+  const halfBefore = Math.floor(seatCount / 2);
+  const orderedSeats: number[] = [];
+  for (let i = -halfBefore; i < seatCount - halfBefore; i++) {
+    orderedSeats.push(((i % seatCount) + seatCount) % seatCount);
+  }
+
+  return (
+    <div
+      className="mb-4 flex flex-wrap items-center justify-center gap-0.5 rounded-lg px-4 py-3"
+      style={{
+        background: "rgba(10, 6, 18, 0.8)",
+        border: "1px solid rgba(124, 58, 237, 0.2)",
+      }}
+    >
+      <span
+        className="mr-3 text-[10px] font-bold uppercase tracking-wider"
+        style={{ color: "#64748b" }}
+      >
+        Pack flow
+      </span>
+      {orderedSeats.map((seatIdx, i) => {
+        const isPlayer = seatIdx === 0;
+        const isPasser = seatIdx === seatPassingToPlayer;
+        const arrowToPlayer = i > 0 && isPlayer;
+        const arrowFromPlayer =
+          i > 0 && orderedSeats[i - 1] === 0;
+
+        return (
+          <Fragment key={seatIdx}>
+            {i > 0 && (
+              <span
+                className="mx-0.5"
+                style={{
+                  color: arrowToPlayer
+                    ? "#fbbf24"
+                    : arrowFromPlayer
+                      ? "#38bdf8"
+                      : "#334155",
+                  fontSize:
+                    arrowToPlayer || arrowFromPlayer
+                      ? "14px"
+                      : "10px",
+                  fontWeight:
+                    arrowToPlayer || arrowFromPlayer ? 800 : 400,
+                }}
+              >
+                {"\u2192"}
+              </span>
+            )}
+            <div
+              className="flex items-center justify-center rounded-full font-bold"
+              style={{
+                width: isPlayer ? "28px" : isPasser ? "24px" : "20px",
+                height: isPlayer
+                  ? "28px"
+                  : isPasser
+                    ? "24px"
+                    : "20px",
+                fontSize: isPlayer ? "12px" : "9px",
+                background: isPlayer
+                  ? "rgba(251, 191, 36, 0.3)"
+                  : isPasser
+                    ? "rgba(56, 189, 248, 0.2)"
+                    : "rgba(255, 255, 255, 0.05)",
+                border: isPlayer
+                  ? "2px solid rgba(251, 191, 36, 0.8)"
+                  : isPasser
+                    ? "2px solid rgba(56, 189, 248, 0.6)"
+                    : "1px solid rgba(255, 255, 255, 0.1)",
+                color: isPlayer
+                  ? "#fbbf24"
+                  : isPasser
+                    ? "#38bdf8"
+                    : "#64748b",
+              }}
+            >
+              {isPlayer ? "\u2605" : String(seatIdx)}
+            </div>
+          </Fragment>
+        );
+      })}
+      <span
+        className="ml-1 text-xs opacity-30"
+        style={{ color: "#e2e8f0" }}
+      >
+        {"\u21A9"}
+      </span>
+    </div>
+  );
+}
+
+/** Arrow connector between seats in the passing trio. */
+function PassingArrow({
+  label,
+  highlighted,
+}: {
+  label: string;
+  highlighted?: boolean;
+}) {
+  const color = highlighted ? "#fbbf24" : "#64748b";
+  return (
+    <div className="flex shrink-0 flex-col items-center justify-center px-1 py-2 lg:px-3 lg:py-0">
+      {/* Desktop: horizontal arrow */}
+      <div
+        className="hidden items-center lg:flex"
+        style={{ color }}
+      >
+        <div
+          className="h-[2px] w-8"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${color})`,
+          }}
+        />
+        <span className="text-xl">{"\u25B6"}</span>
+      </div>
+      {/* Mobile: vertical arrow */}
+      <span
+        className="block text-xl lg:hidden"
+        style={{ color }}
+      >
+        {"\u25BC"}
+      </span>
+      <span
+        className="mt-0.5 text-[9px] font-bold whitespace-nowrap"
+        style={{ color }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
+
 /** Card displaying a single seat's draft intelligence. */
 function SeatCard({
   seat,
@@ -163,12 +344,6 @@ function SeatCard({
 }) {
   const primaryColor =
     seat.primaryTide !== null ? TIDE_COLORS[seat.primaryTide] : "#6b7280";
-
-  const borderColor = seat.isPlayer
-    ? "#fbbf24"
-    : passesToPlayer
-      ? "#38bdf8"
-      : primaryColor;
 
   return (
     <div
@@ -211,18 +386,6 @@ function SeatCard({
                   ? "You (Seat 0)"
                   : `Seat ${String(seat.seatIndex)}`}
               </span>
-              {passesToPlayer && !seat.isPlayer && (
-                <span
-                  className="rounded-full px-1.5 py-0.5 text-[9px] font-bold"
-                  style={{
-                    background: "rgba(56, 189, 248, 0.15)",
-                    border: "1px solid rgba(56, 189, 248, 0.3)",
-                    color: "#38bdf8",
-                  }}
-                >
-                  {"\u2192"} passes to you
-                </span>
-              )}
             </div>
             <div className="flex items-center gap-1.5">
               {seat.primaryTide !== null && (
@@ -239,18 +402,12 @@ function SeatCard({
             </div>
           </div>
         </div>
-        <div className="flex flex-col items-end gap-0.5">
+        <div>
           <span
             className="text-xs opacity-50"
             style={{ color: "#e2e8f0" }}
           >
             {String(seat.totalCards)} cards
-          </span>
-          <span
-            className="text-[9px] opacity-30"
-            style={{ color: borderColor }}
-          >
-            {"\u2190"} from seat {String(seat.receivesFromSeat)}
           </span>
         </div>
       </div>

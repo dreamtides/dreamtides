@@ -176,7 +176,7 @@ export function generateSiteComposition(
     });
   }
 
-  // Dreamcaller draft only in the very first dreamscape
+  // Dreamcaller draft in initial dreamscapes connected to nexus
   if (isFirstDreamscape) {
     sites.push({
       id: nextSiteId(),
@@ -314,7 +314,7 @@ export function generateInitialAtlas(
     const node = createNode(
       { x, y },
       completionLevel,
-      i === 0,
+      true,
       [nexusId],
       context,
     );

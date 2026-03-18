@@ -243,13 +243,15 @@ describe("generateInitialAtlas", () => {
     }
   });
 
-  it("always includes DreamcallerDraft in exactly one initial dreamscape node", () => {
+  it("includes DreamcallerDraft in every initial dreamscape node", () => {
     for (let i = 0; i < 30; i++) {
       const atlas = generateInitialAtlas(0, defaultContext());
-      const nodesWithDreamcaller = Object.values(atlas.nodes)
-        .filter((n) => n.id !== atlas.nexusId)
-        .filter((n) => n.sites.some((s) => s.type === "DreamcallerDraft"));
-      expect(nodesWithDreamcaller.length).toBe(1);
+      const initialNodes = Object.values(atlas.nodes).filter(
+        (n) => n.id !== atlas.nexusId,
+      );
+      for (const node of initialNodes) {
+        expect(node.sites.some((s) => s.type === "DreamcallerDraft")).toBe(true);
+      }
     }
   });
 });
