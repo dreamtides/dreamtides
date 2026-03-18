@@ -20,7 +20,6 @@ const SYMBOL_COLORS: Readonly<Record<string, string>> = {
 interface CardDisplayProps {
   card: CardData;
   onClick?: () => void;
-  onHover?: () => void;
   selected?: boolean;
   selectionColor?: string;
   /** When set, tints the card's stat values and rules text in this color. */
@@ -52,7 +51,6 @@ function renderRulesText(text: string): ReactNode[] {
 export function CardDisplay({
   card,
   onClick,
-  onHover,
   selected = false,
   selectionColor = "#f97316",
   tintColor,
@@ -82,7 +80,6 @@ export function CardDisplay({
         ...borderStyle,
       }}
       onClick={onClick}
-      onMouseEnter={onHover}
       {...(isInteractive
         ? {
             role: "button" as const,

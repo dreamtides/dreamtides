@@ -7,7 +7,6 @@ import { DREAMCALLERS } from "../data/dreamcallers";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { countDeckTides, selectRareRewards } from "../data/tide-weights";
 import { CardDisplay } from "../components/CardDisplay";
-import { CardOverlay } from "../components/CardOverlay";
 import { logEvent } from "../logging";
 import { generateNewNodes } from "../atlas/atlas-generator";
 import { DREAMSIGNS } from "../data/dreamsigns";
@@ -306,9 +305,6 @@ interface VictoryPhaseProps {
   rareCards: CardData[];
   selectedRewardIndex: number | null;
   onSelectReward: (index: number) => void;
-  overlayCard: CardData | null;
-  onCloseOverlay: () => void;
-  onHoverCard: (card: CardData) => void;
 }
 
 /** Victory phase: displays rewards and rare card picks. */
@@ -317,9 +313,6 @@ function VictoryPhase({
   rareCards,
   selectedRewardIndex,
   onSelectReward,
-  overlayCard,
-  onCloseOverlay,
-  onHoverCard,
 }: VictoryPhaseProps) {
   return (
     <motion.div
@@ -401,9 +394,6 @@ function VictoryPhase({
                     onClick={() => {
                       onSelectReward(index);
                     }}
-                    onHover={() => {
-                      onHoverCard(card);
-                    }}
                     selected={isSelected}
                     selectionColor="#fbbf24"
                   />
@@ -414,7 +404,6 @@ function VictoryPhase({
         </div>
       </motion.div>
 
-      <CardOverlay card={overlayCard} onClose={onCloseOverlay} />
     </motion.div>
   );
 }
@@ -432,7 +421,6 @@ export function BattleScreen({
 
   const [phase, setPhase] = useState<BattlePhase>("preBattle");
   const [selectedRewardIndex, setSelectedRewardIndex] = useState<number | null>(null);
-  const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   // Clear all pending timers on unmount
@@ -573,14 +561,6 @@ export function BattleScreen({
     ],
   );
 
-  const handleHoverCard = useCallback((card: CardData) => {
-    setOverlayCard(card);
-  }, []);
-
-  const handleCloseOverlay = useCallback(() => {
-    setOverlayCard(null);
-  }, []);
-
   return (
     <AnimatePresence mode="wait">
       {phase === "preBattle" && (
@@ -608,9 +588,6 @@ export function BattleScreen({
             rareCards={rareCards}
             selectedRewardIndex={selectedRewardIndex}
             onSelectReward={handleSelectReward}
-            overlayCard={overlayCard}
-            onCloseOverlay={handleCloseOverlay}
-            onHoverCard={handleHoverCard}
           />
         </motion.div>
       )}

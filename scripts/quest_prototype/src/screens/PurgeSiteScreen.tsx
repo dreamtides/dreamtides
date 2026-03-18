@@ -1,9 +1,7 @@
 import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import type { SiteState } from "../types/quest";
-import type { CardData } from "../types/cards";
 import { CardDisplay } from "../components/CardDisplay";
-import { CardOverlay } from "../components/CardOverlay";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
 
@@ -21,7 +19,6 @@ export function PurgeSiteScreen({ site }: PurgeSiteScreenProps) {
   const [selectedEntryIds, setSelectedEntryIds] = useState<Set<string>>(
     new Set(),
   );
-  const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
 
   const toggleSelection = useCallback(
     (entryId: string) => {
@@ -129,7 +126,6 @@ export function PurgeSiteScreen({ site }: PurgeSiteScreenProps) {
               <CardDisplay
                 card={card}
                 onClick={() => toggleSelection(entry.entryId)}
-                onHover={() => setOverlayCard(card)}
                 selected={isSelected}
                 selectionColor="#ef4444"
               />
@@ -170,7 +166,6 @@ export function PurgeSiteScreen({ site }: PurgeSiteScreenProps) {
         </button>
       </div>
 
-      <CardOverlay card={overlayCard} onClose={() => setOverlayCard(null)} />
     </motion.div>
   );
 }

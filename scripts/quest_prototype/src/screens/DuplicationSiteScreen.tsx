@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import type { SiteState, DeckEntry } from "../types/quest";
 import type { CardData } from "../types/cards";
 import { CardDisplay } from "../components/CardDisplay";
-import { CardOverlay } from "../components/CardOverlay";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
 
@@ -46,7 +45,6 @@ export function DuplicationSiteScreen({ site }: DuplicationSiteScreenProps) {
     selectCandidates(deck, cardDatabase, 3),
   );
   const [duplicated, setDuplicated] = useState(false);
-  const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
 
   // Enhanced mode state
   const [enhancedPickedEntry, setEnhancedPickedEntry] =
@@ -193,7 +191,6 @@ export function DuplicationSiteScreen({ site }: DuplicationSiteScreenProps) {
                   <CardDisplay
                     card={card}
                     onClick={() => handleEnhancedPick(entry)}
-                    onHover={() => setOverlayCard(card)}
                   />
                 </motion.div>
               );
@@ -234,7 +231,6 @@ export function DuplicationSiteScreen({ site }: DuplicationSiteScreenProps) {
           Close
         </button>
 
-        <CardOverlay card={overlayCard} onClose={() => setOverlayCard(null)} />
       </motion.div>
     );
   }
@@ -282,7 +278,6 @@ export function DuplicationSiteScreen({ site }: DuplicationSiteScreenProps) {
               <div style={{ width: "100%" }}>
                 <CardDisplay
                   card={candidate.card}
-                  onHover={() => setOverlayCard(candidate.card)}
                 />
               </div>
 
@@ -338,7 +333,6 @@ export function DuplicationSiteScreen({ site }: DuplicationSiteScreenProps) {
         Close
       </button>
 
-      <CardOverlay card={overlayCard} onClose={() => setOverlayCard(null)} />
     </motion.div>
   );
 }
