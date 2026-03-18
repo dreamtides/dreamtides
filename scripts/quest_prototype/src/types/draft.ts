@@ -1,3 +1,6 @@
+/** Algorithm used to seed initial packs from the card pool. */
+export type SeedingAlgorithm = "random" | "balanced";
+
 /** Configuration constants for the cube draft engine. */
 export interface DraftConfig {
   /** Total number of seats in the draft (1 player + bots). */
@@ -24,6 +27,8 @@ export interface DraftConfig {
   opennessWindow: number;
   /** Numeric value assigned to each rarity for scoring. */
   rarityValues: Readonly<Record<string, number>>;
+  /** Algorithm for distributing cards into packs: "random" or "balanced" (even tide distribution). */
+  seedingAlgorithm: SeedingAlgorithm;
 }
 
 /** Per-seat agent state, tracking preferences and picks. */
