@@ -331,7 +331,10 @@ Icon: "Store"
 
 At a dreamsign offering site, the user is presented with a single dreamsign to
 gain. The offering may be rejected, but there is no reward for doing so.
-Dreamsigns are associated with tides.
+Dreamsigns are associated with tides. The offered dreamsign is **weighted to
+match the player's tides** — dreamsigns matching the player's dominant deck
+tides are more likely to appear, using the same tide-weighting system as shops
+and dreamcaller drafts.
 
 **UI:** The dreamsign animates to be displayed from screen center at a small
 scale. A purple accept button and a gray reject button are displayed. The
@@ -344,6 +347,9 @@ Icon: "Sparkles"
 
 At a dreamsign draft site, the user is presented with around three dreamsigns
 and is able to select one to gain. It is again possible to select no dreamsign.
+The presented dreamsigns are **weighted to match the player's tides** —
+dreamsigns matching the player's dominant deck tides are more likely to appear,
+using the same tide-weighting system as shops and dreamcaller drafts.
 
 **UI:** The three dreamsigns animate in at full size from the bottom of the
 screen in a staggered animation, positioning themselves in a single row. Purple

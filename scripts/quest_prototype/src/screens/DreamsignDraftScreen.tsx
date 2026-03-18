@@ -5,6 +5,11 @@ import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
 import { DREAMSIGNS } from "../data/dreamsigns";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import {
+  countDeckTides,
+  tideWeight,
+  weightedSample,
+} from "../data/tide-weights";
 
 const MAX_DREAMSIGNS = 12;
 
@@ -13,27 +18,19 @@ interface DreamsignDraftScreenProps {
   site: SiteState;
 }
 
-/** Picks N random unique elements from an array. */
-function pickRandom<T>(arr: readonly T[], count: number): T[] {
-  const shuffled = [...arr].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
-}
-
 /** Shows 3 (or 4 enhanced) dreamsign options. Pick 1 or skip. */
 export function DreamsignDraftScreen({ site }: DreamsignDraftScreenProps) {
-  const { state, mutations } = useQuest();
-  const { dreamsigns: currentDreamsigns } = state;
+  const { state, mutations, cardDatabase } = useQuest();
+  const { dreamsigns: currentDreamsigns, deck } = state;
 
   const optionCount = site.isEnhanced ? 4 : 3;
 
-  const options = useMemo<Dreamsign[]>(
-    () =>
-      pickRandom(DREAMSIGNS, optionCount).map((t) => ({
-        ...t,
-        isBane: false,
-      })),
-    [optionCount],
-  );
+  const options = useMemo<Dreamsign[]>(() => {
+    const deckTides = countDeckTides(deck, cardDatabase);
+    return weightedSample(DREAMSIGNS, optionCount, (t) =>
+      tideWeight(t.tide, deckTides),
+    ).map((t) => ({ ...t, isBane: false }));
+  }, [optionCount, deck, cardDatabase]);
 
   const [purging, setPurging] = useState(false);
   const [pendingDreamsign, setPendingDreamsign] = useState<Dreamsign | null>(
@@ -244,7 +241,7 @@ function DreamsignCard({ dreamsign }: { dreamsign: Dreamsign }) {
 
   return (
     <div
-      className="flex w-52 flex-col items-center gap-2 rounded-lg p-4"
+      className="flex w-52 flex-1 flex-col items-center gap-2 rounded-lg p-4"
       style={{
         background:
           "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
