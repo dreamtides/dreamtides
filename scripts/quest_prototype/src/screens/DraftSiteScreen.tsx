@@ -9,6 +9,7 @@ import {
   initializeDraftState,
   processPlayerPick,
   completeDraftSite,
+  sortCardsByTide,
   SITE_PICKS,
 } from "../draft/draft-engine";
 import type { DraftState } from "../types/draft";
@@ -105,7 +106,9 @@ function DraftSummary({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: i * 0.1 }}
           >
-            <CardDisplay card={card} />
+            <div style={{ aspectRatio: "2 / 3", maxHeight: "320px" }}>
+              <CardDisplay card={card} />
+            </div>
           </motion.div>
         ))}
       </div>
@@ -154,15 +157,15 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
     draftStateRef.current = cloned;
     mutations.setDraftState(cloned);
 
-    // Load initial pack
+    // Load initial pack, sorted by tide
     const packNums = getPlayerPack(cloned);
     const cards = packNums
       .map((num) => cardDatabase.get(num))
       .filter((c): c is CardData => c !== undefined);
-    setCurrentPackCards(cards);
+    setCurrentPackCards(sortCardsByTide(cards));
   }, [state.draftState, cardDatabase, mutations]);
 
-  // Resolve the current pack from draft state
+  // Resolve the current pack from draft state, sorted by tide
   const refreshPack = useCallback(() => {
     const ds = draftStateRef.current;
     if (!ds) return;
@@ -170,7 +173,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
     const cards = packNums
       .map((num) => cardDatabase.get(num))
       .filter((c): c is CardData => c !== undefined);
-    setCurrentPackCards(cards);
+    setCurrentPackCards(sortCardsByTide(cards));
     setPackKey((prev) => prev + 1);
   }, [cardDatabase]);
 

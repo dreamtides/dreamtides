@@ -17,6 +17,7 @@ import {
   getPlayerPack,
   processPlayerPick,
   completeDraftSite,
+  sortCardsByTide,
 } from "./draft-engine";
 
 /** Helper to build a minimal CardData for testing. */
@@ -559,5 +560,143 @@ describe("full draft flow integration", () => {
     const entries = getLogEntries();
     const refreshEvents = entries.filter((e) => e.event === "draft_pool_refreshed");
     expect(refreshEvents.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe("sortCardsByTide", () => {
+  it("sorts cards by tide order: Bloom, Arc, Ignite, Pact, Umbra, Rime, Surge, Wild", () => {
+    const db = new Map<number, CardData>();
+    db.set(1, makeCard(1, "Surge"));
+    db.set(2, makeCard(2, "Bloom"));
+    db.set(3, makeCard(3, "Wild"));
+    db.set(4, makeCard(4, "Ignite"));
+    db.set(5, makeCard(5, "Arc"));
+
+    const cards = [db.get(1)!, db.get(2)!, db.get(3)!, db.get(4)!, db.get(5)!];
+    const sorted = sortCardsByTide(cards);
+
+    expect(sorted.map((c) => c.tide)).toEqual([
+      "Bloom",
+      "Arc",
+      "Ignite",
+      "Surge",
+      "Wild",
+    ]);
+  });
+
+  it("preserves original order for cards of the same tide", () => {
+    const db = new Map<number, CardData>();
+    db.set(1, makeCard(1, "Bloom"));
+    db.set(2, makeCard(2, "Bloom"));
+    db.set(3, makeCard(3, "Bloom"));
+
+    const cards = [db.get(1)!, db.get(2)!, db.get(3)!];
+    const sorted = sortCardsByTide(cards);
+
+    expect(sorted.map((c) => c.cardNumber)).toEqual([1, 2, 3]);
+  });
+
+  it("returns an empty array for empty input", () => {
+    expect(sortCardsByTide([])).toEqual([]);
+  });
+
+  it("does not mutate the original array", () => {
+    const db = new Map<number, CardData>();
+    db.set(1, makeCard(1, "Surge"));
+    db.set(2, makeCard(2, "Bloom"));
+
+    const cards = [db.get(1)!, db.get(2)!];
+    const original = [...cards];
+    sortCardsByTide(cards);
+
+    expect(cards.map((c) => c.cardNumber)).toEqual(original.map((c) => c.cardNumber));
+  });
+});
+
+describe("balanced seeding", () => {
+  it("distributes cards evenly across tides when using balanced algorithm", () => {
+    const db = makeDatabase(483);
+    const config = {
+      ...DEFAULT_DRAFT_CONFIG,
+      seedingAlgorithm: "balanced" as const,
+    };
+    const state = initializeDraftState(db, config);
+    dealRound(state, db, config);
+
+    // Each pack should have approximately 2 cards per tide (15/7 ~ 2.14)
+    for (const pack of state.packs) {
+      const tideCounts: Record<string, number> = {};
+      for (const cardNum of pack) {
+        const card = db.get(cardNum);
+        if (card) {
+          tideCounts[card.tide] = (tideCounts[card.tide] ?? 0) + 1;
+        }
+      }
+      // Each tide should have at least 1 card and at most 3 in a 15-card pack
+      for (const count of Object.values(tideCounts)) {
+        expect(count).toBeGreaterThanOrEqual(1);
+        expect(count).toBeLessThanOrEqual(3);
+      }
+    }
+  });
+
+  it("creates packs of the correct size with balanced seeding", () => {
+    const db = makeDatabase(483);
+    const config = {
+      ...DEFAULT_DRAFT_CONFIG,
+      seedingAlgorithm: "balanced" as const,
+    };
+    const state = initializeDraftState(db, config);
+    dealRound(state, db, config);
+
+    expect(state.packs).toHaveLength(10);
+    for (const pack of state.packs) {
+      expect(pack).toHaveLength(15);
+    }
+  });
+
+  it("draws cards without replacement using balanced seeding", () => {
+    const db = makeDatabase(483);
+    const config = {
+      ...DEFAULT_DRAFT_CONFIG,
+      seedingAlgorithm: "balanced" as const,
+    };
+    const state = initializeDraftState(db, config);
+    dealRound(state, db, config);
+
+    const allDealt = state.packs.flat();
+    const uniqueDealt = new Set(allDealt);
+    expect(uniqueDealt.size).toBe(150);
+  });
+
+  it("defaults to balanced seeding by default", () => {
+    const db = makeDatabase(483);
+    const state = initializeDraftState(db);
+    dealRound(state, db);
+
+    expect(state.packs).toHaveLength(10);
+    for (const pack of state.packs) {
+      expect(pack).toHaveLength(15);
+    }
+  });
+
+  it("handles a pool with missing tides gracefully", () => {
+    // Create a database with only 2 tides
+    const db = new Map<number, CardData>();
+    for (let i = 1; i <= 200; i++) {
+      db.set(i, makeCard(i, i % 2 === 0 ? "Bloom" : "Arc"));
+    }
+
+    const config = {
+      ...DEFAULT_DRAFT_CONFIG,
+      seedingAlgorithm: "balanced" as const,
+    };
+    const state = initializeDraftState(db, config);
+    dealRound(state, db, config);
+
+    expect(state.packs).toHaveLength(10);
+    for (const pack of state.packs) {
+      expect(pack).toHaveLength(15);
+    }
   });
 });

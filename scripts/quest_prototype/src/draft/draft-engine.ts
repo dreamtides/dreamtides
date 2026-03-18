@@ -33,7 +33,29 @@ export const DEFAULT_DRAFT_CONFIG: Readonly<DraftConfig> = {
     Rare: 0.67,
     Legendary: 1.0,
   },
+  seedingAlgorithm: "balanced",
 };
+
+/** Tide ordering for display sorting. */
+const TIDE_ORDER: Readonly<Record<string, number>> = {
+  Bloom: 0,
+  Arc: 1,
+  Ignite: 2,
+  Pact: 3,
+  Umbra: 4,
+  Rime: 5,
+  Surge: 6,
+  Wild: 7,
+};
+
+/** Sort an array of cards by tide order without mutating the original. */
+export function sortCardsByTide(cards: CardData[]): CardData[] {
+  return [...cards].sort((a, b) => {
+    const orderA = TIDE_ORDER[a.tide] ?? 8;
+    const orderB = TIDE_ORDER[b.tide] ?? 8;
+    return orderA - orderB;
+  });
+}
 
 /** Number of player picks per draft site visit. */
 export const SITE_PICKS = 5;
@@ -224,15 +246,33 @@ export function refreshPool(
 /** Draw 10 packs of 15 from the pool (uniform random, without replacement). */
 export function dealRound(
   state: DraftState,
+  cardDatabase?: Map<number, CardData>,
   config: DraftConfig = DEFAULT_DRAFT_CONFIG,
+): void {
+  if (config.seedingAlgorithm === "balanced" && cardDatabase) {
+    dealRoundBalanced(state, cardDatabase, config);
+  } else {
+    dealRoundRandom(state, config);
+  }
+
+  state.isActive = true;
+
+  logEvent("draft_round_started", {
+    roundNumber: state.currentRound,
+    packsDealCount: config.seatCount,
+  });
+}
+
+/** Random deal: draw sequentially from shuffled pool and distribute evenly. */
+function dealRoundRandom(
+  state: DraftState,
+  config: DraftConfig,
 ): void {
   const totalNeeded = config.seatCount * config.packSize;
   const available = Math.min(totalNeeded, state.pool.length);
 
-  // Draw cards from the pool
   const drawn = state.pool.splice(0, available);
 
-  // Distribute evenly across packs
   const packSize = Math.floor(available / config.seatCount);
   const remainder = available % config.seatCount;
   state.packs = [];
@@ -242,13 +282,109 @@ export function dealRound(
     state.packs.push(drawn.slice(offset, offset + size));
     offset += size;
   }
+}
 
-  state.isActive = true;
+/** Balanced deal: distribute cards evenly across tides within each pack. */
+function dealRoundBalanced(
+  state: DraftState,
+  cardDatabase: Map<number, CardData>,
+  config: DraftConfig,
+): void {
+  const totalNeeded = config.seatCount * config.packSize;
+  const available = Math.min(totalNeeded, state.pool.length);
 
-  logEvent("draft_round_started", {
-    roundNumber: state.currentRound,
-    packsDealCount: config.seatCount,
-  });
+  const drawn = state.pool.splice(0, available);
+
+  // Group drawn cards by tide
+  const byTide = new Map<string, number[]>();
+  const ungrouped: number[] = [];
+  for (const cardNum of drawn) {
+    const card = cardDatabase.get(cardNum);
+    if (!card) {
+      ungrouped.push(cardNum);
+      continue;
+    }
+    const tide = card.tide;
+    if (!byTide.has(tide)) {
+      byTide.set(tide, []);
+    }
+    byTide.get(tide)!.push(cardNum);
+  }
+
+  // Shuffle each tide group
+  for (const group of byTide.values()) {
+    shuffle(group);
+  }
+  shuffle(ungrouped);
+
+  const tideKeys = [...byTide.keys()];
+  shuffle(tideKeys);
+  const targetPackSize = Math.floor(available / config.seatCount);
+  const extraRemainder = available % config.seatCount;
+
+  const numPacks = config.seatCount;
+  const packTargets = Array.from({ length: numPacks }, (_, i) =>
+    targetPackSize + (i < extraRemainder ? 1 : 0),
+  );
+
+  // Pre-compute allocations: for each tide, compute how many cards go
+  // into each pack. Distribute floor(tideCount/numPacks) to each pack,
+  // then add remainders one at a time to the packs with the most room.
+  const allocations: number[][] = Array.from(
+    { length: numPacks },
+    () => new Array<number>(tideKeys.length).fill(0),
+  );
+
+  for (let t = 0; t < tideKeys.length; t++) {
+    const tideTotal = byTide.get(tideKeys[t])!.length;
+    const base = Math.floor(tideTotal / numPacks);
+    let rem = tideTotal - base * numPacks;
+
+    for (let p = 0; p < numPacks; p++) {
+      allocations[p][t] = base;
+    }
+
+    // Distribute remainder cards to packs that have the most capacity left
+    while (rem > 0) {
+      // Find pack with most remaining capacity
+      let bestPack = -1;
+      let bestRoom = -1;
+      for (let p = 0; p < numPacks; p++) {
+        const allocated = allocations[p].reduce((s, v) => s + v, 0);
+        const room = packTargets[p] - allocated;
+        if (room > bestRoom) {
+          bestRoom = room;
+          bestPack = p;
+        }
+      }
+      if (bestPack === -1 || bestRoom <= 0) break;
+      allocations[bestPack][t] += 1;
+      rem -= 1;
+    }
+  }
+
+  // Build packs using the computed allocations
+  state.packs = [];
+  for (let p = 0; p < numPacks; p++) {
+    const pack: number[] = [];
+    for (let t = 0; t < tideKeys.length; t++) {
+      const group = byTide.get(tideKeys[t])!;
+      const count = allocations[p][t];
+      for (let j = 0; j < count && group.length > 0; j++) {
+        pack.push(group.pop()!);
+      }
+    }
+    state.packs.push(pack);
+  }
+
+  // Fill any remaining slots from leftover cards
+  const leftover = [...ungrouped, ...[...byTide.values()].flatMap((g) => g)];
+  shuffle(leftover);
+  for (let p = 0; p < numPacks; p++) {
+    while (state.packs[p].length < packTargets[p] && leftover.length > 0) {
+      state.packs[p].push(leftover.pop()!);
+    }
+  }
 }
 
 /** Player picks a specific card from seat 0's current pack. Returns true if the card was found and picked. */
@@ -425,20 +561,20 @@ export function advancePick(
     // Round complete -- increment round and deal new packs if rounds remain
     state.currentRound += 1;
     state.currentPick = 0;
-    dealRound(state, config);
+    dealRound(state, cardDatabase, config);
   }
 }
 
 /** Prepare the state for a draft site visit (5 player picks). */
 export function enterDraftSite(
   state: DraftState,
-  _cardDatabase: Map<number, CardData>,
+  cardDatabase: Map<number, CardData>,
   config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): void {
   state.sitePicksCompleted = 0;
 
   if (!state.isActive) {
-    dealRound(state, config);
+    dealRound(state, cardDatabase, config);
   }
 
   logEvent("draft_site_entered", {
