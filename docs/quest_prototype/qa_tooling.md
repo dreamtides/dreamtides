@@ -1,8 +1,8 @@
 # QA Tooling for the Quest Prototype
 
-Browser testing for the quest prototype requires Python Playwright. WebFetch
-and `mcp__ide__executeCode` both fail on localhost URLs. This document covers
-the correct tools and patterns.
+Browser testing for the quest prototype requires Python Playwright. WebFetch and
+`mcp__ide__executeCode` both fail on localhost URLs. This document covers the
+correct tools and patterns.
 
 ## Browser Automation
 
@@ -24,15 +24,15 @@ Confirm availability: `which agent-browser` or
 `/opt/homebrew/bin/playwright --version`.
 
 **WebFetch does not work on localhost.** Every attempt to
-`WebFetch http://localhost:5173` returns `ERROR: Invalid URL`. Do not try
-it. Do not search for `mcp__ide__executeCode` — it is not available in this
-pipeline context.
+`WebFetch http://localhost:5173` returns `ERROR: Invalid URL`. Do not try it. Do
+not search for `mcp__ide__executeCode` — it is not available in this pipeline
+context.
 
 ## Screenshot Limitations
 
-Screenshots saved to `/tmp/` cannot be viewed inline by agents — the Read
-tool returns `(no result)` for PNG files in subagent contexts. Screenshots
-are evidence for human review only.
+Screenshots saved to `/tmp/` cannot be viewed inline by agents — the Read tool
+returns `(no result)` for PNG files in subagent contexts. Screenshots are
+evidence for human review only.
 
 Use DOM inspection as the primary verification method:
 
@@ -69,16 +69,16 @@ EOF
 node --experimental-strip-types /tmp/test.mjs
 ```
 
-Avoid `node -e` with shell-special characters like `!`. Write to a file and
-run it instead.
+Avoid `node -e` with shell-special characters like `!`. Write to a file and run
+it instead.
 
-Running `npx tsx` is an alternative if `node --experimental-strip-types`
-does not resolve imports correctly.
+Running `npx tsx` is an alternative if `node --experimental-strip-types` does
+not resolve imports correctly.
 
 ## Vite SPA Fallback Behavior
 
-Vite serves the HTML fallback document for any path that does not match a
-static file. This means a `curl` request for a missing static file (e.g.,
+Vite serves the HTML fallback document for any path that does not match a static
+file. This means a `curl` request for a missing static file (e.g.,
 `/tides/Wild.png`) returns HTTP 200 with `Content-Type: text/html`, not 404.
 Check the `Content-Type` header rather than the status code when verifying
 whether a static file exists:

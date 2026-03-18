@@ -1,181 +1,155 @@
 ---
 name: qs-analyze
-description: Use when analyzing quest simulator logs, investigating draft behavior, reviewing AI bot decisions, or answering questions about a quest session. Triggers on quest log analysis, draft analysis, AI agent picks, archetype commitment, session replay, qs-analyze, analyze quest, what happened in the draft.
+description: Use when analyzing quest prototype logs, investigating draft behavior, reviewing site visit sequences, or answering questions about a quest session. Triggers on quest log analysis, draft analysis, AI bot picks, session replay, qs-analyze, analyze quest, what happened in the draft.
 ---
 
-# Quest Simulator Log Analysis
+# Quest Prototype Log Analysis
 
-Analyze JSONL logs from quest simulator sessions to answer questions about human and AI drafter behavior.
+Analyze JSONL logs from quest prototype sessions to answer questions about player behavior, draft decisions, and quest progression.
 
-## Step 1: Find the Most Recent Session
+## Step 1: Get the Log
 
-Use filesystem modification time, NOT filename sorting (filenames embed creation date which may not reflect the most recent run):
+Quest logs are downloaded from the prototype's HUD "Download Log" button as `.jsonl` files. The user will provide a file path. If no path is given, check for recently downloaded files:
 
 ```bash
-stat -f "%Sm %N" .logs/quest_*.jsonl | sort -r | head -5
+ls -t ~/Downloads/quest-log-*.jsonl | head -5
 ```
-
-Pick the file with the most recent modification timestamp. The filename encodes: `quest_{DATE}_{NANOS}_seed{SEED}.jsonl`
 
 ## Step 2: Load and Parse Events
 
-Read the JSONL file. Each line is a JSON object with an `"event"` field. Key event types:
+Read the JSONL file. Each line is a JSON object with `timestamp`, `event`, and `seq` fields, plus event-specific data. Key event types:
+
+### Quest Lifecycle
 
 | Event | Key Fields | Use For |
 |-------|-----------|---------|
-| `session_start` | `seed`, `draft_config` | Session parameters |
-| `round_start` | `round_index`, `global_pick_index`, `pack_card_count` | Draft round boundaries |
-| `ai_pick` | `seat_index`, `global_pick_index`, `chosen`, `chosen_score`, `agent_w_top3`, `agent_w`, `was_random`, `committed_resonance`, `drafted_count`, `concentration` | AI bot decisions |
-| `show_n_filter` | `shown_cards_with_scores`, `filtered_out_top3`, `strategy` | What human was shown vs filtered |
-| `draft_pick` | `offered`, `picked`, `human_w_top3`, `global_pick_index` | Human picks |
-| `preference_snapshot` | `preference_vector`, `top_archetype_index`, `concentration` | Human archetype evolution |
-| `site_visit` | `site_type`, `choices_offered`, `choice_made` | Non-draft site interactions |
-| `battle_complete` | `opponent_name`, `essence_reward`, `rare_pick` | Battle outcomes |
-| `session_end` | `deck`, `preference_vector`, `completion_level` | Final deck and state |
+| `quest_started` | `essence`, `completionLevel` | Session start |
+| `screen_transition` | `from`, `to` | Screen flow reconstruction |
+| `quest_completed` | `essence`, `completionLevel`, `deckSize`, `dreamcallerName`, `dreamsignCount` | Final stats |
 
-### Card Data Fields (in `chosen`, `top_alternatives`, `offered`, etc.)
+### Draft Events
 
-Cards are serialized with: `name`, `card_id`, `rarity_value`, `rarity` (original rarity string), `tag_count`, `top_fitness` (top 3), `fitness` (full 8-element archetype fitness vector), `resonance` (list of resonance names), `energy_cost`, `card_type`, `spark`.
+| Event | Key Fields | Use For |
+|-------|-----------|---------|
+| `draft_pool_initialized` | `poolSize`, `excludedCount` | Pool creation |
+| `pack_dealt` | `round`, `seatIndex`, `packSize` | Pack distribution |
+| `draft_pick_player` | `cardNumber`, `cardName`, `pickIndex`, `packSize` | Player picks |
+| `draft_pick_bot` | `seatIndex`, `cardNumber`, `cardName`, `pickIndex` | AI bot picks |
+| `draft_pool_refreshed` | `newPoolSize`, `roundsCompleted` | Pool refresh after 3 rounds |
+| `draft_site_entered` | `picksAvailable`, `currentRound`, `currentPick` | Draft site visits |
+| `draft_site_completed` | `cardsDrafted` | Draft site completion |
 
-### AI Pick Fields Detail
+### Site Visit Events
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `chosen` | card dict | The card picked, with full card data fields above |
-| `chosen_score` | float | Policy score for the chosen card |
-| `candidates_count` | int | Number of cards available after resonance filtering |
-| `top_alternatives` | list[card dict + score] | Top 3 scored alternatives the bot didn't pick |
-| `was_random` | bool | True if the bot made a random pick instead of policy-optimal |
-| `agent_w_top3` | list[{archetype, value}] | Top 3 archetype preferences |
-| `agent_w` | list[float] | Full 8-element preference vector |
-| `committed_resonance` | [str, str] or absent | Resonance pair if committed, absent if not yet |
-| `drafted_count` | int | Number of cards drafted so far (before this pick) |
-| `concentration` | float | max(w)/sum(w), measuring archetype commitment strength |
+| Event | Key Fields | Use For |
+|-------|-----------|---------|
+| `dreamscape_entered` | `dreamscapeId`, `biomeName` | Dreamscape navigation |
+| `dreamscape_completed` | `dreamscapeId`, `sitesVisitedCount` | Dreamscape completion |
+| `site_entered` | `siteType`, `siteId` | Site visits |
+| `site_completed` | `siteType`, `siteId` | Site completions |
+| `dreamcaller_selected` | `name`, `tide`, `essenceBonus` | Dreamcaller draft |
+| `battle_started` | `completionLevel`, `enemyName` | Battle initiation |
+| `battle_won` | `completionLevel`, `essenceReward` | Battle completion |
+| `rare_card_drafted` | `cardNumber`, `cardName` | Post-battle reward pick |
 
-## Step 3: Archetype Index Mapping
+### Economy Events
 
-Map archetype indices to names using this table:
+| Event | Key Fields | Use For |
+|-------|-----------|---------|
+| `essence_changed` | `oldValue`, `newValue`, `delta`, `source` | Essence tracking |
+| `card_added` | `cardNumber`, `cardName` | Deck additions |
+| `card_removed` | `cardNumber`, `cardName` | Card purging |
+| `shop_purchase` | `itemType`, `cardNumber`, `essenceRemaining` | Shop purchases |
+| `shop_reroll` | `rerollCost`, `rerollCount` | Shop rerolls |
 
-| Index | Name | Resonance |
-|-------|------|-----------|
-| 0 | Flash | Thunder/Tide |
-| 1 | Awaken | Thunder/Flame |
-| 2 | Flicker | Flame/Thunder |
-| 3 | Ignite | Flame/Stone |
-| 4 | Shatter | Stone/Flame |
-| 5 | Endure | Stone/Tide |
-| 6 | Submerge | Tide/Stone |
-| 7 | Surge | Tide/Thunder |
+### Other Events
 
-Only a subset of archetypes are active per session. Check `session_start.draft_config` for which are selected.
+| Event | Key Fields | Use For |
+|-------|-----------|---------|
+| `dreamsign_acquired` | `name`, `tide`, `effect` | Dreamsign collection |
+| `tempting_offer_accepted` | `journeyName`, `costName` | Tempting offer decisions |
+| `card_transfigured` | `cardNumber`, `transfigurationType`, `colorName` | Transfiguration |
+| `card_duplicated` | `cardNumber`, `copyCount` | Card duplication |
+| `purge_completed` | `purgedCount`, `cardNumbers` | Card purging |
+| `cleanse_completed` | `cleansedCards`, `cleansedDreamsigns` | Bane removal |
+| `reward_claimed` | `rewardType` | Reward acceptance |
+| `deck_viewer_opened` | — | UI interaction |
+| `atlas_node_generated` | `dreamscapeId`, `biomeName` | Atlas growth |
+
+## Step 3: Tide Mapping
+
+The 7 tides and their theme colors:
+
+| Tide | Color |
+|------|-------|
+| Bloom | Green / emerald |
+| Arc | Yellow / amber |
+| Ignite | Red / crimson |
+| Pact | Pink / magenta |
+| Umbra | Purple / deep violet |
+| Rime | Blue / ice blue |
+| Surge | Cyan / teal |
+| Wild | Gray / silver (neutral) |
 
 ## Step 4: Answer Questions
 
-### AI Agent Archetype Commitment
+### Draft Behavior
 
-AI agents commit to an archetype after picking `ai_resonance_commit_pick` cards (default ~9). To find when agent N committed:
+Track via `draft_pick_player` and `draft_pick_bot` events:
+- Player picks show which cards were chosen and at what pack sizes
+- Bot picks show AI decisions per seat (seats 1-9)
+- Pack size decreases each pick (15 → 14 → ... → 6, then 5 discarded)
+- Packs rotate direction by round (odd=left, even=right)
 
-1. Filter `ai_pick` events where `seat_index == N`
-2. The `committed_resonance` field appears once the bot commits — the first pick where it's present is the commitment point
-3. Track `concentration` to see how strongly the bot is committed (higher = more focused)
-4. Use `agent_w` (full vector) to see exact archetype weights, or `agent_w_top3` for a summary
+### Quest Progression
 
-### Human Drafter Behavior
+Use `screen_transition` events to reconstruct the full session flow. Cross-reference with `essence_changed` (source field) to track economy.
 
-Track via `draft_pick` events:
-- `human_w_top3` shows evolving archetype preferences
-- `offered` vs `picked` shows decision-making
-- `preference_snapshot` events show concentration (commitment strength)
+### Deck Evolution
 
-### Draft Flow Reconstruction
+Track `card_added`, `card_removed`, `card_transfigured`, and `card_duplicated` events chronologically to see how the deck evolved from empty to final state.
 
-Use `round_start` events to segment picks into rounds. Within each round, `ai_pick` events for each seat precede the `draft_pick` (human pick). The `global_pick_index` links all events to a unified timeline.
+### Site Visit Sequence
 
-### Bot Pick-by-Pick Breakdown
-
-When asked to explain what a bot did and why, produce a pick-by-pick analysis with this structure:
-
-1. **Identify the seat.** Seat 5 passes directly to the human (seat 0). Seat 1 is farthest upstream.
-2. **For each pick, explain the decision.** Use this template per pick:
-
-```
-Pick N (round R, global G): CARD_NAME
-  Score: X.XXX | Random: yes/no | Candidates: N
-  Fitness: [archetype breakdown showing which archetypes this card fits]
-  Resonance: [card's resonance tags]
-  Energy: N | Type: X | Spark: N
-  Top archetype: NAME (X.XX) | Concentration: X.XX
-  Committed: yes/no (resonance pair if yes)
-  Why: [1-sentence explanation based on fitness alignment with top archetype + score vs alternatives]
-```
-
-3. **Highlight key inflection points:**
-   - When the bot's top archetype changed
-   - When `committed_resonance` first appeared (hard commitment)
-   - Random picks that pulled the bot in an unexpected direction
-   - Picks where the bot took a card that would have been good for the human
-
-4. **Compare with the human's trajectory** using `draft_pick` events to show where both converged on the same archetype.
-
-Use `chosen.fitness[archetype_index]` to check if a card fits a specific archetype (>= 0.5 means it fits). Cross-reference with the archetype index table to explain WHY the bot's preferences shifted.
+Filter `site_entered` events to see the order of site visits. Group by `dreamscape_entered` events to see per-dreamscape breakdown.
 
 ## Analysis Script
 
-For complex queries, write a Python script inline:
+For complex queries, write a TypeScript or Python script inline:
 
 ```python
 import json, sys
 events = [json.loads(line) for line in open(LOG_PATH)]
 # Filter by event type
-ai_picks = [e for e in events if e["event"] == "ai_pick"]
-# Group by seat
-from collections import defaultdict
-by_seat = defaultdict(list)
-for p in ai_picks:
-    by_seat[p["seat_index"]].append(p)
+picks = [e for e in events if e["event"] == "draft_pick_player"]
+# Track essence over time
+essence_events = [e for e in events if e["event"] == "essence_changed"]
 ```
 
 ## Common Questions
 
-- **"What did AI agent N pick?"** — Filter `ai_pick` where `seat_index == N`, list `chosen.name` fields
-- **"When did agent N commit?"** — Find the first `ai_pick` for seat N where `committed_resonance` is present
-- **"What was filtered from the human?"** — Check `show_n_filter` events, compare `shown_cards_with_scores` vs `filtered_out_top3`
-- **"What archetype did the human end up in?"** — Check `session_end.preference_vector` or last `preference_snapshot`
-- **"What was the final deck?"** — Read `session_end.deck` array
-- **"Why did the bot pick card X?"** — Find the `ai_pick` with that card, check `chosen_score` vs `top_alternatives` scores, look at `chosen.fitness` alignment with the bot's `agent_w`, and note if `was_random`
-- **"Which bot competes with me?"** — Compare each seat's final `agent_w_top3` top archetype with the human's top archetype from `preference_snapshot`
+- **"What cards did I draft?"** — Filter `draft_pick_player`, list `cardName` fields
+- **"What did the bots pick?"** — Filter `draft_pick_bot`, group by `seatIndex`
+- **"How did my essence change?"** — Filter `essence_changed`, plot `newValue` over `seq`
+- **"What sites did I visit?"** — Filter `site_entered`, list `siteType` fields
+- **"What was my final deck?"** — Check `quest_completed` or reconstruct from `card_added` / `card_removed` events
+- **"How many battles did I win?"** — Count `battle_won` events
+- **"What dreamcaller did I pick?"** — Find `dreamcaller_selected` event
+- **"What dreamsigns did I collect?"** — Filter `dreamsign_acquired` events
+- **"Did I accept any tempting offers?"** — Filter `tempting_offer_accepted` events
 
 ## When Logs Cannot Answer the Question
 
-If the existing log events lack the data needed to answer a question, add new logging rather than guessing.
+If the existing log events lack the data needed, add new logging rather than guessing.
 
 ### Procedure
 
-1. **Identify the gap.** State exactly what data is missing and which event type would logically carry it (existing or new).
-2. **Check if an existing event can be enriched.** Prefer adding fields to an existing event over creating a new event type. For example, if `ai_pick` lacks a field you need, add it there.
-3. **Add logging in the source code.** All logging goes through `SessionLogger` in `scripts/quest_simulator/jsonl_log.py`:
-   - To enrich an existing event: add a parameter to the relevant `log_*()` method and include it in the `_write()` dict.
-   - To add a new event type: add a new `log_*()` method following the existing pattern.
-4. **Wire it up at the call site.** Find where the `log_*()` method is called (typically in `round_manager.py`, `draft_strategy.py`, or `sites_*.py`) and pass the new data.
-5. **Update the test.** Add a test case in `scripts/quest_simulator/test_jsonl_log.py` that verifies the new field/event appears in output.
-6. **Re-run the simulator** to generate a fresh log with the new data:
-   ```bash
-   python3 scripts/quest_simulator/quest_sim.py --seed 42
-   ```
-7. **Update this skill.** Add the new event/field to the event table in Step 2 above so future analysis sessions know it exists.
-
-### Key files for adding logging
-
-| File | Role |
-|------|------|
-| `scripts/quest_simulator/jsonl_log.py` | `SessionLogger` — all log methods defined here |
-| `scripts/quest_simulator/log_helpers.py` | Shared scoring/serialization helpers |
-| `scripts/quest_simulator/round_manager.py` | AI pick loop — calls `log_ai_pick`, `log_round_start` |
-| `scripts/quest_simulator/draft_strategy.py` | Show-N filtering — calls `log_show_n_filter` |
-| `scripts/quest_simulator/sites_*.py` | Site handlers — call `log_draft_pick`, `log_site_visit`, etc. |
-| `scripts/quest_simulator/test_jsonl_log.py` | Tests for all log methods |
+1. **Identify the gap.** State exactly what data is missing.
+2. **Add logging in `src/logging.ts`.** Call `logEvent(eventName, fields)` at the appropriate point in the relevant screen component or mutation.
+3. **Re-run the prototype** to generate a fresh log with the new data.
+4. **Update this skill.** Add the new event to the event table above.
 
 ### Rules
 
 - Never invent data or guess values that aren't in the logs. If it's not logged, say so and offer to add logging.
-- Follow the `qs` skill acceptance criteria after any code changes: run the simulator manually, run tests, `just fmt`, `just review`.
+- Follow the `qs` skill acceptance criteria after any code changes.

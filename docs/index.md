@@ -177,23 +177,23 @@
   and test the simulator. Read before any work on the quest simulator, and
   before any work that involves replicating or extending the draft loop.
 
-- [quest_prototype.md](quest_prototype/quest_prototype.md): Developer guide
-  for the quest mode web prototype at `scripts/quest_prototype/` — how to
-  run it (including the mandatory `npm install` step in each worktree), tech
-  stack (React 19 + Vite 7 + Tailwind v4), module layout, the two-step
-  registration required when adding a new site type (ScreenRouter + atlas
-  pool), QuestState extension patterns, JSONL logging invariants (reserved
-  fields, spread order), and card data normalization rules for TOML edge
-  cases (`"*"`, absent fields). Read before any work on the quest prototype.
+- [quest_prototype.md](quest_prototype/quest_prototype.md): Developer guide for
+  the quest mode web prototype at `scripts/quest_prototype/` — how to run it
+  (including the mandatory `npm install` step in each worktree), tech stack
+  (React 19 + Vite 7 + Tailwind v4), module layout, the two-step registration
+  required when adding a new site type (ScreenRouter + atlas pool), QuestState
+  extension patterns, JSONL logging invariants (reserved fields, spread order),
+  and card data normalization rules for TOML edge cases (`"*"`, absent fields).
+  Read before any work on the quest prototype.
 
-- [qa_tooling.md](quest_prototype/qa_tooling.md): QA browser-testing guide
-  for the quest prototype — Python Playwright as the correct tool (WebFetch
-  and mcp__ide__executeCode both fail on localhost), how to take screenshots
-  and why they cannot be viewed inline by agents, DOM inspection patterns as
-  the primary verification method, TypeScript module testing via
-  `node --experimental-strip-types`, Vite's SPA fallback behavior (200 does
-  not mean file exists), and `as const` runtime semantics. Read before
-  performing any manual QA on the quest prototype.
+- [qa_tooling.md](quest_prototype/qa_tooling.md): QA browser-testing guide for
+  the quest prototype — Python Playwright as the correct tool (WebFetch and
+  mcp\_\_ide\_\_executeCode both fail on localhost), how to take screenshots and
+  why they cannot be viewed inline by agents, DOM inspection patterns as the
+  primary verification method, TypeScript module testing via
+  `node --experimental-strip-types`, Vite's SPA fallback behavior (200 does not
+  mean file exists), and `as const` runtime semantics. Read before performing
+  any manual QA on the quest prototype.
 
 - [abu_internals.md](abu/abu_internals.md): ABU implementation details —
   architecture (TcpServer, AbuBridge, SnapshotCommandHandler, SnapshotFormatter,

@@ -3,8 +3,8 @@
 A standalone web prototype of Dreamtides Quest Mode at
 `scripts/quest_prototype/`. Implements the full roguelike loop: cube draft,
 Dream Atlas navigation, 15 site types, auto-resolved battles, and essence
-economy across 7 battles. State is in-memory (resets on page load). No
-backend, no persistence.
+economy across 7 battles. State is in-memory (resets on page load). No backend,
+no persistence.
 
 ## Running the Prototype
 
@@ -14,14 +14,14 @@ npm install          # required — node_modules is not committed
 npm run dev          # runs setup-assets.mjs then starts Vite dev server
 ```
 
-`npm run dev` invokes `scripts/setup-assets.mjs` automatically before
-starting Vite. The setup script is idempotent and:
+`npm run dev` invokes `scripts/setup-assets.mjs` automatically before starting
+Vite. The setup script is idempotent and:
 
 1. Parses `rendered-cards.toml` to write `public/card-data.json` (483 cards,
    Special-rarity excluded).
 2. Symlinks `public/cards/{cardNumber}.webp` into the local image cache at
-   `~/Library/Caches/io.github.dreamtides.tv/image_cache/`. Missing images
-   are skipped with a warning.
+   `~/Library/Caches/io.github.dreamtides.tv/image_cache/`. Missing images are
+   skipped with a warning.
 3. Copies the 7 tide PNGs into `public/tides/`.
 
 The `public/cards/`, `public/tides/`, and `public/card-data.json` paths are
@@ -46,10 +46,10 @@ React 19, Vite 7, TypeScript 5.8 (strict mode). Tailwind CSS v4 via
 `@import "tailwindcss"` in `src/index.css`. Framer Motion for animations.
 `smol-toml` for the asset setup script.
 
-TypeScript is configured for bundler mode (`moduleResolution: "bundler"`,
-no `@types/node`). Node built-in modules (`node:fs`, etc.) are not available
-in type-checked code. Tests that need file I/O should mock `fetch` or use
-Vitest's `node` environment, not `import("node:fs")`.
+TypeScript is configured for bundler mode (`moduleResolution: "bundler"`, no
+`@types/node`). Node built-in modules (`node:fs`, etc.) are not available in
+type-checked code. Tests that need file I/O should mock `fetch` or use Vitest's
+`node` environment, not `import("node:fs")`.
 
 ESLint uses `typescript-eslint` `recommendedTypeChecked` with `no-unsafe-*`
 rules at error level. The `eslint-plugin-react-hooks` plugin is **not**
@@ -57,10 +57,10 @@ configured — `react-hooks/exhaustive-deps` is not enforced.
 
 ## Architecture
 
-All state lives in a single `QuestState` object provided by `QuestProvider`
-in `src/state/quest-context.tsx`. Components read state and call mutations
-through `useQuestContext()`. The current screen is stored in
-`state.currentScreen` and drives `ScreenRouter.tsx`.
+All state lives in a single `QuestState` object provided by `QuestProvider` in
+`src/state/quest-context.tsx`. Components read state and call mutations through
+`useQuestContext()`. The current screen is stored in `state.currentScreen` and
+drives `ScreenRouter.tsx`.
 
 ```
 src/
@@ -99,47 +99,47 @@ src/
 
 Adding a site type requires changes in two places:
 
-1. **Screen component** — create `src/screens/MySiteScreen.tsx` and add a
-   case to `ScreenRouter.tsx`.
-2. **Atlas pool** — add the site type with a weight to
-   `buildAdditionalSitePool` in `src/atlas/atlas-generator.ts`. Without
-   this step the site type is unreachable during gameplay.
+1. **Screen component** — create `src/screens/MySiteScreen.tsx` and add a case
+   to `ScreenRouter.tsx`.
+2. **Atlas pool** — add the site type with a weight to `buildAdditionalSitePool`
+   in `src/atlas/atlas-generator.ts`. Without this step the site type is
+   unreachable during gameplay.
 
 ## Extending QuestState
 
 `QuestContextValue`, `QuestMutations`, and `QuestState` are defined in
-`src/state/quest-context.tsx` and `src/types/quest.ts`. When multiple
-parallel tasks need to add fields to these interfaces, they will conflict at
-merge time. Prefer adding interface extensions in a preparatory commit on
-the task branch before writing the screen that uses them.
+`src/state/quest-context.tsx` and `src/types/quest.ts`. When multiple parallel
+tasks need to add fields to these interfaces, they will conflict at merge time.
+Prefer adding interface extensions in a preparatory commit on the task branch
+before writing the screen that uses them.
 
 ## JSONL Event Logging
 
 Every game event is logged via `logEvent(eventName, fields)` in
 `src/logging.ts`. The logger appends to an in-memory array and writes to
-`console.log` as single-line JSON. A "Download Log" button in the HUD
-exports the full `.jsonl` file.
+`console.log` as single-line JSON. A "Download Log" button in the HUD exports
+the full `.jsonl` file.
 
-Reserved fields (`timestamp`, `event`, `seq`) are assigned by the logger
-and cannot be overridden by caller-supplied `fields`. The spread order is
+Reserved fields (`timestamp`, `event`, `seq`) are assigned by the logger and
+cannot be overridden by caller-supplied `fields`. The spread order is
 `{ timestamp, event, seq, ...fields }`.
 
-Every mutation that changes game state must call `logEvent` before or after
-the mutation. Missing log calls are a conformance blocker.
+Every mutation that changes game state must call `logEvent` before or after the
+mutation. Missing log calls are a conformance blocker.
 
 ## Card Data Normalization
 
-The TOML source has several field variants that `setup-assets.mjs` normalizes
-to JSON:
+The TOML source has several field variants that `setup-assets.mjs` normalizes to
+JSON:
 
-| Field        | TOML source values               | JSON output     |
-|--------------|----------------------------------|-----------------|
-| `spark`      | absent, `""`, `"*"`, integer     | `null` or int   |
-| `energy-cost`| `"*"`, integer                   | `null` or int   |
-| `subtype`    | absent, string                   | `""` or string  |
+| Field         | TOML source values           | JSON output    |
+| ------------- | ---------------------------- | -------------- |
+| `spark`       | absent, `""`, `"*"`, integer | `null` or int  |
+| `energy-cost` | `"*"`, integer               | `null` or int  |
+| `subtype`     | absent, string               | `""` or string |
 
 The `"*"` value appears on 4 "Abomination" cards for spark and 2 cards for
-energy cost. The absent `spark` key appears on some Event cards. Normalize
-all three variants to `null`.
+energy cost. The absent `spark` key appears on some Event cards. Normalize all
+three variants to `null`.
 
 Keys are converted from TOML kebab-case to camelCase in JSON output.
