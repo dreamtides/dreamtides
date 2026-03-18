@@ -27,7 +27,7 @@ export function CardOverlay({ card, onClose }: CardOverlayProps) {
 
   useEffect(() => {
     if (card !== null) {
-      logEvent("card_hover", { cardNumber: card.cardNumber });
+      logEvent("card_preview", { cardNumber: card.cardNumber });
       window.addEventListener("keydown", handleKeyDown);
       return () => {
         window.removeEventListener("keydown", handleKeyDown);

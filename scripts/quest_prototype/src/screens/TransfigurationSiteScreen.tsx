@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import type { SiteState, DeckEntry } from "../types/quest";
 import type { CardData } from "../types/cards";
 import { CardDisplay } from "../components/CardDisplay";
-import { CardOverlay } from "../components/CardOverlay";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
 import {
@@ -59,7 +58,6 @@ export function TransfigurationSiteScreen({
   const [acceptedEntryIds, setAcceptedEntryIds] = useState<Set<string>>(
     new Set(),
   );
-  const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
 
   // Enhanced mode: pick from full deck
   const [enhancedPickedEntry, setEnhancedPickedEntry] =
@@ -211,7 +209,6 @@ export function TransfigurationSiteScreen({
                   <CardDisplay
                     card={card}
                     onClick={() => handleEnhancedPick(entry)}
-                    onHover={() => setOverlayCard(card)}
                   />
                 </motion.div>
               );
@@ -253,7 +250,6 @@ export function TransfigurationSiteScreen({
           Close
         </button>
 
-        <CardOverlay card={overlayCard} onClose={() => setOverlayCard(null)} />
       </motion.div>
     );
   }
@@ -395,7 +391,6 @@ export function TransfigurationSiteScreen({
         Close
       </button>
 
-      <CardOverlay card={overlayCard} onClose={() => setOverlayCard(null)} />
     </motion.div>
   );
 }
