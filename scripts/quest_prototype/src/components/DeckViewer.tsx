@@ -11,6 +11,7 @@ import { CardDisplay } from "./CardDisplay";
 import { CardOverlay } from "./CardOverlay";
 import { logEvent } from "../logging";
 import { TRANSFIGURATION_COLORS } from "../transfiguration/transfiguration-logic";
+import { computeTideDistribution } from "./tide-distribution";
 
 /** All tides including Wild, used for filter toggles. */
 const ALL_TIDES: readonly Tide[] = [...NAMED_TIDES, "Wild"] as const;
@@ -139,6 +140,17 @@ export function DeckViewer({
       .filter((e): e is ResolvedEntry => e !== null);
   }, [state.deck, cardDatabase]);
 
+  const tideDistribution = useMemo(
+    () => computeTideDistribution(state.deck, cardDatabase),
+    [state.deck, cardDatabase],
+  );
+
+  const activeFilterCount = useMemo(() => {
+    const tideActive = ALL_TIDES.some((t) => !tideFilters[t]);
+    const typeActive = cardTypeFilter !== "All";
+    return tideActive || typeActive;
+  }, [tideFilters, cardTypeFilter]);
+
   const filteredEntries = useMemo<ResolvedEntry[]>(() => {
     return resolvedEntries.filter((resolved) => {
       if (!tideFilters[resolved.card.tide]) return false;
@@ -258,6 +270,94 @@ export function DeckViewer({
               {"\u2715"}
             </button>
           </div>
+
+          {/* Tide distribution bar */}
+          {tideDistribution.total > 0 && (
+            <div
+              className="px-4 py-2 md:px-6"
+              style={{
+                borderBottom: "1px solid rgba(124, 58, 237, 0.15)",
+                background: "rgba(10, 6, 18, 0.5)",
+              }}
+            >
+              {/* Proportional bar */}
+              <div
+                className="mb-2 flex h-2 overflow-hidden rounded-full"
+                style={{ background: "rgba(255, 255, 255, 0.05)" }}
+              >
+                {tideDistribution.tides
+                  .filter((t) => t.count > 0)
+                  .map((t) => (
+                    <div
+                      key={t.tide}
+                      style={{
+                        width: `${String(t.percentage)}%`,
+                        background: TIDE_COLORS[t.tide],
+                        opacity: 0.8,
+                      }}
+                      title={`${t.tide}: ${String(t.count)} (${String(t.percentage)}%)`}
+                    />
+                  ))}
+              </div>
+
+              {/* Tide badges row */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                {tideDistribution.tides.map((t) => (
+                  <div
+                    key={t.tide}
+                    className="flex items-center gap-1"
+                    style={{
+                      opacity: t.count > 0 ? 1 : 0.3,
+                    }}
+                  >
+                    <img
+                      src={tideIconUrl(t.tide)}
+                      alt={t.tide}
+                      className="h-4 w-4 rounded-full"
+                      style={{
+                        border: t.isDominant
+                          ? `1.5px solid ${TIDE_COLORS[t.tide]}`
+                          : "1px solid rgba(255, 255, 255, 0.15)",
+                      }}
+                    />
+                    <span
+                      className="text-[11px] font-medium"
+                      style={{
+                        color: t.count > 0 ? TIDE_COLORS[t.tide] : "#6b7280",
+                      }}
+                    >
+                      {t.tide}
+                    </span>
+                    <span
+                      className="text-[11px]"
+                      style={{
+                        color: t.count > 0 ? "#e2e8f0" : "#4b5563",
+                        fontWeight: t.isDominant ? 700 : 400,
+                      }}
+                    >
+                      {String(t.count)}
+                    </span>
+                    {t.count > 0 && (
+                      <span
+                        className="text-[10px]"
+                        style={{ color: "#9ca3af" }}
+                      >
+                        ({String(t.percentage)}%)
+                      </span>
+                    )}
+                  </div>
+                ))}
+                {activeFilterCount && (
+                  <span
+                    className="ml-auto text-[10px] italic"
+                    style={{ color: "#6b7280" }}
+                  >
+                    (showing full deck)
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Controls row */}
           <div
