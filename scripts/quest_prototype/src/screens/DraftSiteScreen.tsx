@@ -335,10 +335,10 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
         <AnimatePresence mode="wait">
           <motion.div
             key={`pack-${String(packKey)}`}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
           >
             <div
               className="draft-pack-grid grid w-full gap-3 px-2 md:gap-4 md:px-4"
@@ -360,9 +360,9 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
                       layout
                       initial={{ opacity: 0, y: 30 }}
                       animate={
-                        isPicked && pickPhase === "animating"
+                        isPicked && pickPhase !== "idle"
                           ? { opacity: 0, y: 80, scale: 0.9 }
-                          : isOther && pickPhase === "animating"
+                          : isOther && pickPhase !== "idle"
                             ? { opacity: 0, scale: 0.95 }
                             : { opacity: 1, y: 0, scale: 1 }
                       }

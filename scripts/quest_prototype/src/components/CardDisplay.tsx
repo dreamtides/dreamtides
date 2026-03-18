@@ -4,7 +4,6 @@ import {
   cardImageUrl,
   tideIconUrl,
   TIDE_COLORS,
-  RARITY_COLORS,
 } from "../data/card-database";
 import { tokenizeRulesText, formatTypeLine } from "./card-text";
 
@@ -62,11 +61,10 @@ export function CardDisplay({
   }, [card.cardNumber]);
 
   const tideColor = TIDE_COLORS[card.tide];
-  const rarityColor = RARITY_COLORS[card.rarity];
 
   const borderStyle = selected
     ? { boxShadow: `0 0 0 3px ${selectionColor}, 0 0 12px ${selectionColor}` }
-    : { boxShadow: `0 0 6px ${rarityColor}40, inset 0 0 8px ${rarityColor}15` };
+    : {};
 
   const isInteractive = onClick !== undefined;
 
@@ -76,7 +74,7 @@ export function CardDisplay({
       style={{
         aspectRatio: "2 / 3",
         background: "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-        border: `1px solid ${rarityColor}60`,
+        border: "1px solid rgba(255, 255, 255, 0.15)",
         ...borderStyle,
       }}
       onClick={onClick}
@@ -221,10 +219,10 @@ export function CardDisplay({
         )}
       </div>
 
-      {/* Rarity glow bottom accent */}
+      {/* Bottom accent */}
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
-        style={{ background: `${rarityColor}80` }}
+        style={{ background: "rgba(255, 255, 255, 0.15)" }}
       />
     </div>
   );
