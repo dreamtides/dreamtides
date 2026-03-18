@@ -110,51 +110,11 @@ export function DebugScreen({
                   seatPassingToPlayer={debugInfo.seatPassingToPlayer}
                 />
 
-                {/* Passing pair: Seat 9 → YOU */}
-                <div className="mb-6 flex flex-col items-stretch gap-0 lg:flex-row lg:items-stretch lg:justify-center">
-                  <div className="lg:max-w-[400px] lg:flex-1">
-                    <SeatCard
-                      seat={
-                        debugInfo.seats[debugInfo.seatPassingToPlayer]
-                      }
-                      cardDatabase={cardDatabase}
-                      passesToPlayer={true}
-                    />
-                  </div>
-                  <PassingArrow label="passes to you" highlighted />
-                  <div className="lg:max-w-[400px] lg:flex-1">
-                    <SeatCard
-                      seat={debugInfo.seats[0]}
-                      cardDatabase={cardDatabase}
-                      passesToPlayer={false}
-                    />
-                  </div>
-                </div>
-
-                {/* Remaining seats in passing order */}
-                <h3
-                  className="mb-3 text-[10px] font-bold uppercase tracking-wider"
-                  style={{ color: "#64748b" }}
-                >
-                  Other Drafters
-                </h3>
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {debugInfo.seats
-                    .filter(
-                      (s) =>
-                        s.seatIndex !== 0 &&
-                        s.seatIndex !==
-                          debugInfo.seatPassingToPlayer,
-                    )
-                    .map((seat) => (
-                      <SeatCard
-                        key={seat.seatIndex}
-                        seat={seat}
-                        cardDatabase={cardDatabase}
-                        passesToPlayer={false}
-                      />
-                    ))}
-                </div>
+                {/* All seats in passing order, human last */}
+                <SeatFlowGrid
+                  seats={debugInfo.seats}
+                  cardDatabase={cardDatabase}
+                />
               </>
             )}
           </div>
@@ -200,11 +160,11 @@ function PackFlowDiagram({
   seatCount: number;
   seatPassingToPlayer: number;
 }) {
-  const halfBefore = Math.floor(seatCount / 2);
   const orderedSeats: number[] = [];
-  for (let i = -halfBefore; i < seatCount - halfBefore; i++) {
-    orderedSeats.push(((i % seatCount) + seatCount) % seatCount);
+  for (let i = 1; i < seatCount; i++) {
+    orderedSeats.push(i);
   }
+  orderedSeats.push(0);
 
   return (
     <div
@@ -291,6 +251,101 @@ function PackFlowDiagram({
   );
 }
 
+/** Grid showing all seats in passing order with arrows between pairs. */
+function SeatFlowGrid({
+  seats,
+  cardDatabase,
+}: {
+  seats: SeatSummary[];
+  cardDatabase: Map<number, CardData>;
+}) {
+  // Order: seats 1..N-1, then seat 0 (human last)
+  const orderedSeats = [
+    ...seats.filter((s) => !s.isPlayer).sort((a, b) => a.seatIndex - b.seatIndex),
+    seats[0],
+  ];
+
+  // Group into pairs for 2-column layout
+  const pairs: SeatSummary[][] = [];
+  for (let i = 0; i < orderedSeats.length; i += 2) {
+    pairs.push(orderedSeats.slice(i, i + 2));
+  }
+
+  return (
+    <div className="space-y-0">
+      {pairs.map((pair, pairIdx) => (
+        <Fragment key={pairIdx}>
+          {pairIdx > 0 && (
+            <RowConnector />
+          )}
+          <div className="flex flex-col items-stretch gap-0 md:flex-row">
+            <div className="min-w-0 flex-1">
+              <SeatCard
+                seat={pair[0]}
+                cardDatabase={cardDatabase}
+                passesToPlayer={false}
+              />
+            </div>
+            {pair.length > 1 && (
+              <>
+                <PassingArrow
+                  label={pair[1].isPlayer ? "passes to you" : ""}
+                  highlighted={pair[1].isPlayer}
+                />
+                <div className="min-w-0 flex-1">
+                  <SeatCard
+                    seat={pair[1]}
+                    cardDatabase={cardDatabase}
+                    passesToPlayer={false}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+
+/** U-shaped connector between rows: down from right, left across, down to left. */
+function RowConnector() {
+  const color = "#475569";
+  return (
+    <>
+      {/* Desktop: U-shaped connector */}
+      <div className="relative my-1 hidden h-8 w-full md:block" aria-hidden="true">
+        {/* Down from right card center */}
+        <div
+          className="absolute top-0 h-2.5"
+          style={{ right: "25%", width: "2px", background: color }}
+        />
+        {/* Horizontal line going left */}
+        <div
+          className="absolute h-[2px]"
+          style={{ left: "25%", right: "25%", top: "10px", background: color }}
+        />
+        {/* Down to left card center */}
+        <div
+          className="absolute h-3"
+          style={{ left: "25%", top: "10px", width: "2px", background: color }}
+        />
+        {/* Arrowhead */}
+        <span
+          className="absolute text-[10px]"
+          style={{ left: "calc(25% - 4px)", top: "18px", color }}
+        >
+          {"\u25BC"}
+        </span>
+      </div>
+      {/* Mobile: simple centered down arrow */}
+      <div className="flex justify-center py-1 md:hidden" aria-hidden="true">
+        <span className="text-sm" style={{ color }}>{"\u25BC"}</span>
+      </div>
+    </>
+  );
+}
+
 /** Arrow connector between seats in the passing trio. */
 function PassingArrow({
   label,
@@ -301,10 +356,10 @@ function PassingArrow({
 }) {
   const color = highlighted ? "#fbbf24" : "#64748b";
   return (
-    <div className="flex shrink-0 flex-col items-center justify-center px-1 py-2 lg:px-3 lg:py-0">
+    <div className="flex shrink-0 flex-col items-center justify-center px-1 py-2 md:px-3 md:py-0">
       {/* Desktop: horizontal arrow */}
       <div
-        className="hidden items-center lg:flex"
+        className="hidden items-center md:flex"
         style={{ color }}
       >
         <div
@@ -317,17 +372,19 @@ function PassingArrow({
       </div>
       {/* Mobile: vertical arrow */}
       <span
-        className="block text-xl lg:hidden"
+        className="block text-xl md:hidden"
         style={{ color }}
       >
         {"\u25BC"}
       </span>
-      <span
-        className="mt-0.5 text-[9px] font-bold whitespace-nowrap"
-        style={{ color }}
-      >
-        {label}
-      </span>
+      {label !== "" && (
+        <span
+          className="mt-0.5 text-[9px] font-bold whitespace-nowrap"
+          style={{ color }}
+        >
+          {label}
+        </span>
+      )}
     </div>
   );
 }
