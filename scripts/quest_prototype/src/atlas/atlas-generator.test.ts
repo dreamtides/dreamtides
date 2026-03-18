@@ -129,8 +129,7 @@ describe("generateSiteComposition", () => {
       const previewable = sites.filter(
         (s) =>
           s.type !== "Battle" &&
-          s.type !== "Draft" &&
-          s.type !== "DreamcallerDraft",
+          s.type !== "Draft",
       );
       expect(previewable.length).toBeGreaterThanOrEqual(2);
     }
@@ -243,6 +242,16 @@ describe("generateInitialAtlas", () => {
       expect(dist).toBeCloseTo(200, 0);
     }
   });
+
+  it("always includes DreamcallerDraft in exactly one initial dreamscape node", () => {
+    for (let i = 0; i < 30; i++) {
+      const atlas = generateInitialAtlas(0, defaultContext());
+      const nodesWithDreamcaller = Object.values(atlas.nodes)
+        .filter((n) => n.id !== atlas.nexusId)
+        .filter((n) => n.sites.some((s) => s.type === "DreamcallerDraft"));
+      expect(nodesWithDreamcaller.length).toBe(1);
+    }
+  });
 });
 
 describe("generateNewNodes", () => {
@@ -315,7 +324,7 @@ describe("assignBiome", () => {
 });
 
 describe("previewSiteTypes", () => {
-  it("excludes Battle, Draft, and DreamcallerDraft", () => {
+  it("excludes Battle and Draft but includes DreamcallerDraft", () => {
     const node: DreamscapeNode = {
       id: "test",
       biomeName: "Test",
@@ -332,7 +341,7 @@ describe("previewSiteTypes", () => {
       enhancedSiteType: null,
     };
     const preview = previewSiteTypes(node);
-    expect(preview).toEqual(["Shop", "Essence"]);
+    expect(preview).toEqual(["DreamcallerDraft", "Shop", "Essence"]);
   });
 
   it("returns at most 3 site types", () => {

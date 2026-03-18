@@ -173,12 +173,12 @@ export function AtlasNode({ node, isNexus, onNodeClick }: AtlasNodeProps) {
 
       {/* Hover tooltip */}
       {isHovered && (isAvailable || isCompleted) && !isNexus && (
-        <g transform={`translate(0, ${String(-(radius + 16))})`}>
+        <g transform={`translate(0, ${String(-(radius + 20))})`}>
           <rect
-            x={-90}
-            y={rewardLabel !== null ? -74 : -60}
-            width={180}
-            height={rewardLabel !== null ? 70 : 56}
+            x={-115}
+            y={rewardLabel !== null ? -80 : -64}
+            width={230}
+            height={rewardLabel !== null ? 78 : 62}
             rx={8}
             fill="#1a1025"
             stroke={node.biomeColor}
@@ -188,7 +188,7 @@ export function AtlasNode({ node, isNexus, onNodeClick }: AtlasNodeProps) {
           {/* Biome name in tooltip */}
           <text
             x={0}
-            y={rewardLabel !== null ? -54 : -40}
+            y={rewardLabel !== null ? -58 : -44}
             textAnchor="middle"
             fill={node.biomeColor}
             fontSize={12}
@@ -199,7 +199,7 @@ export function AtlasNode({ node, isNexus, onNodeClick }: AtlasNodeProps) {
           {/* Site icons */}
           <text
             x={0}
-            y={rewardLabel !== null ? -32 : -18}
+            y={rewardLabel !== null ? -36 : -22}
             textAnchor="middle"
             fontSize={18}
           >
@@ -212,10 +212,10 @@ export function AtlasNode({ node, isNexus, onNodeClick }: AtlasNodeProps) {
           {/* Site names */}
           <text
             x={0}
-            y={rewardLabel !== null ? -16 : -2}
+            y={rewardLabel !== null ? -18 : -4}
             textAnchor="middle"
             fill="#e2e8f0"
-            fontSize={9}
+            fontSize={8}
             opacity={0.7}
           >
             {previewSites.map((st) => siteTypeName(st)).join(" \u00B7 ")}
@@ -224,10 +224,10 @@ export function AtlasNode({ node, isNexus, onNodeClick }: AtlasNodeProps) {
           {rewardLabel !== null && (
             <text
               x={0}
-              y={-2}
+              y={-4}
               textAnchor="middle"
               fill="#fbbf24"
-              fontSize={9}
+              fontSize={8}
               fontWeight="bold"
             >
               {rewardLabel}

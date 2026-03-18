@@ -464,7 +464,6 @@ export function previewSiteTypes(node: DreamscapeNode): SiteType[] {
   const excluded: Set<SiteType> = new Set([
     "Battle",
     "Draft",
-    "DreamcallerDraft",
   ]);
   return node.sites
     .filter((s) => !excluded.has(s.type))
