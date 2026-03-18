@@ -97,7 +97,7 @@ function DraftSummary({
 
       <div
         className="draft-summary-grid grid w-full max-w-4xl gap-3 md:gap-4"
-        style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+        style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))", alignItems: "start" }}
       >
         {draftedCards.map((card, i) => (
           <motion.div
@@ -343,7 +343,8 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
             <div
               className="draft-pack-grid grid w-full gap-3 px-2 md:gap-4 md:px-4"
               style={{
-                gridTemplateColumns: "repeat(3, 1fr)",
+                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                alignItems: "start",
               }}
             >
               <AnimatePresence>
