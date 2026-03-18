@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import argparse
 import os
 import shlex
 import socket
@@ -254,6 +255,51 @@ def step_specs() -> list[StepSpec]:
     ]
 
 
+def parse_review_args() -> argparse.Namespace:
+    """Parses CLI arguments for review execution mode."""
+    parser = argparse.ArgumentParser(description="Run scoped review with perf logging")
+    parser.add_argument("commit", nargs="?", default=None, help="Commit SHA to review")
+    parser.add_argument(
+        "--from", dest="from_sha", default=None, help="Start of commit range"
+    )
+    parser.add_argument("--to", dest="to_sha", default=None, help="End of commit range")
+    parser.add_argument("--all", action="store_true", help="Run all review phases")
+    return parser.parse_args()
+
+
+def has_local_changes() -> bool:
+    """Returns whether the worktree has modifications or untracked files."""
+    if git_is_dirty():
+        return True
+    try:
+        output = subprocess.check_output(
+            ["git", "ls-files", "--others", "--exclude-standard"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+    except subprocess.CalledProcessError:
+        return False
+    return bool(output.strip())
+
+
+def get_commit_files(commit_sha: str) -> str:
+    """Returns newline-separated changed files for a single commit."""
+    try:
+        output = subprocess.check_output(
+            ["git", "diff-tree", "--no-commit-id", "--name-only", "-r", commit_sha],
+            text=True,
+            stderr=subprocess.PIPE,
+        )
+    except subprocess.CalledProcessError as exc:
+        stderr_text = exc.stderr.strip() if exc.stderr else "unknown error"
+        print(
+            f"error: failed to get files for commit {commit_sha}: {stderr_text}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    return output.strip()
+
+
 def run_review() -> int:
     """Executes all review steps with perf instrumentation."""
     run_id = run_id_now()
@@ -432,6 +478,53 @@ def run_review() -> int:
 
 def main() -> int:
     """Entrypoint for review perf runner."""
+    args = parse_review_args()
+
+    if args.all:
+        os.environ["REVIEW_SCOPE_FORCE_FULL"] = "1"
+    elif args.commit:
+        files = get_commit_files(args.commit)
+        if not files:
+            print(
+                f"error: commit {args.commit} has no changed files",
+                file=sys.stderr,
+            )
+            return 1
+        os.environ["REVIEW_SCOPE_CHANGED_FILES"] = files
+    elif args.from_sha or args.to_sha:
+        if not args.from_sha or not args.to_sha:
+            print(
+                "error: --from and --to must both be specified",
+                file=sys.stderr,
+            )
+            return 1
+        os.environ["REVIEW_SCOPE_BASE_REF"] = args.from_sha
+        os.environ["REVIEW_SCOPE_HEAD_REF"] = args.to_sha
+    else:
+        if not has_local_changes():
+            print(
+                "error: no modified or untracked files detected.",
+                file=sys.stderr,
+            )
+            print("Specify what to review:", file=sys.stderr)
+            print(
+                "  just review              # review local changes",
+                file=sys.stderr,
+            )
+            print(
+                "  just review <commit>     # review a specific commit",
+                file=sys.stderr,
+            )
+            print(
+                "  just review --from <sha> --to <sha>  # review a commit range",
+                file=sys.stderr,
+            )
+            print(
+                "  just review --all        # run all review phases",
+                file=sys.stderr,
+            )
+            return 1
+
     try:
         return run_review()
     except Exception as exc:

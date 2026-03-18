@@ -11,12 +11,12 @@ code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; just clean-test-dir; exit 1)
     just clean-test-dir
 
-review:
+review *args:
     #!/usr/bin/env bash
     if [ "${REVIEW_PERF:-1}" = "0" ]; then
         just review-direct
     else
-        python3 scripts/review/review_runner.py
+        python3 scripts/review/review_runner.py {{args}}
     fi
 
 review-direct: check-snapshots check-format check-python-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test python-test pyre-check local-unity-test parser-test tv-check tv-clippy tv-test
