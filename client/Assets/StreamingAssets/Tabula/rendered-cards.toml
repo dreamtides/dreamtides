@@ -8037,7 +8037,7 @@ colors = ["#E8D0F0", "#D0E4F5", "#D5F0D0", "#F5D0D0", "#F5EED0"]
 column = "tide"
 type = "enum"
 enum = ["Wild", "Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge"]
-colors = ["#DEC4A0", "#A8DDA8", "#F0E88A", "#F0A0A0", "#F0C88A", "#CDA8F0", "#8AE0E0", "#D0D0D0"]
+colors = ["#A0784C", "#A8DDA8", "#F0E88A", "#F0A0A0", "#F5B870", "#CDA8F0", "#8AE0E0", "#D0D0D0"]
 
 [[metadata.validation_rules]]
 column = "tide-cost"
