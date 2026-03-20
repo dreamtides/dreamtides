@@ -117,6 +117,11 @@ export const UniverSpreadsheet = forwardRef<
     new Map(),
   );
   const sortPendingRef = useRef(false);
+  // Tracks the last derivedColumnState.values that were applied to cells,
+  // so the useEffect can skip re-applying unchanged values.
+  const lastAppliedDerivedValuesRef = useRef<
+    Record<string, Record<number, Record<string, unknown>>>
+  >({});
 
   onChangeRef.current = onChange;
   onActiveSheetChangedRef.current = onActiveSheetChanged;
@@ -1618,13 +1623,15 @@ export const UniverSpreadsheet = forwardRef<
     isLoadingRef.current = false;
   }, [multiSheetData]);
 
-  // Handle derived column value updates
+  // Handle derived column value updates (incremental — only applies changes)
   useEffect(() => {
     if (!derivedColumnState) return;
     if (!univerAPIRef.current) return;
 
     const workbook = univerAPIRef.current.getActiveWorkbook();
     if (!workbook) return;
+
+    const prevApplied = lastAppliedDerivedValuesRef.current;
 
     for (const [sheetId, configs] of Object.entries(
       derivedColumnState.configs,
@@ -1640,10 +1647,12 @@ export const UniverSpreadsheet = forwardRef<
       const sheetValues = derivedColumnState.values[sheetId];
       if (!sheetValues) continue;
 
-      isLoadingRef.current = true;
+      const prevSheetValues = prevApplied[sheetId];
 
       const mapping =
         columnMappingRef.current.get(sheetId) ?? EMPTY_MAPPING;
+
+      let anyChange = false;
 
       for (const config of configs) {
         const derivedColIndex = getDerivedColumnIndex(
@@ -1652,19 +1661,27 @@ export const UniverSpreadsheet = forwardRef<
           mapping,
         );
 
-        // Set header for derived column (row 0)
-        const headerRange = sheet.getRange(0, derivedColIndex, 1, 1);
-        if (headerRange) {
-          headerRange.setValues([[formatHeaderForDisplay(config.name)]]);
-          headerRange.setFontWeight("bold");
+        // Set header for derived column (row 0) only on first apply
+        if (!prevSheetValues) {
+          const headerRange = sheet.getRange(0, derivedColIndex, 1, 1);
+          if (headerRange) {
+            headerRange.setValues([[formatHeaderForDisplay(config.name)]]);
+            headerRange.setFontWeight("bold");
+          }
         }
 
-        // Update each row with computed values
+        // Update only rows whose results have changed
         for (const [rowIndexStr, rowValues] of Object.entries(sheetValues)) {
           const rowIndex = parseInt(rowIndexStr, 10);
           const result = rowValues[config.function];
           if (!result) continue;
 
+          // Skip if this exact result was already applied
+          const prevRowValues = prevSheetValues?.[rowIndex];
+          if (prevRowValues?.[config.function] === result) continue;
+
+          anyChange = true;
+          isLoadingRef.current = true;
           const cellRow = rowIndex + 1; // +1 for header row
           applyDerivedResultToCell(
             sheet,
@@ -1672,12 +1689,15 @@ export const UniverSpreadsheet = forwardRef<
             derivedColIndex,
             result,
           );
+          isLoadingRef.current = false;
         }
 
-        // Show loading indicator for rows without results
-        if (multiSheetData) {
+        // Show loading indicator for rows without results, but only on
+        // initial population (when no previous values exist for this sheet)
+        if (!prevSheetValues && multiSheetData) {
           const sheetData = multiSheetData.sheets.find((s) => s.id === sheetId);
           if (sheetData) {
+            isLoadingRef.current = true;
             for (
               let rowIndex = 0;
               rowIndex < sheetData.data.rows.length;
@@ -1693,11 +1713,19 @@ export const UniverSpreadsheet = forwardRef<
                 }
               }
             }
+            isLoadingRef.current = false;
           }
         }
       }
 
-      isLoadingRef.current = false;
+      // Snapshot the current values so next run can diff against them.
+      // Use the same object references so identity comparison works.
+      if (anyChange || !prevSheetValues) {
+        lastAppliedDerivedValuesRef.current = {
+          ...lastAppliedDerivedValuesRef.current,
+          [sheetId]: sheetValues,
+        };
+      }
     }
   }, [derivedColumnState, multiSheetData]);
 
