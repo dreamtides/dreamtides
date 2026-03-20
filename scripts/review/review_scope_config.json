@@ -47,7 +47,8 @@
     ]
   },
   "core_path_prefixes": [
-    "client/Assets/StreamingAssets/"
+    "client/Assets/StreamingAssets/",
+    "scripts/quest_prototype/"
   ],
   "always_run_steps": [
     "check-snapshots",

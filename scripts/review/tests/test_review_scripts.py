@@ -255,7 +255,10 @@ class ReviewScopePlannerTests(unittest.TestCase):
             tv_steps=("tv-check", "tv-clippy", "tv-test"),
             python_steps=("python-test",),
             csharp_steps=("local-unity-test",),
-            core_path_prefixes=("client/Assets/StreamingAssets/",),
+            core_path_prefixes=(
+                "client/Assets/StreamingAssets/",
+                "scripts/quest_prototype/",
+            ),
         )
         self.metadata = review_scope.WorkspaceMetadata(
             crate_roots={
@@ -641,6 +644,24 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.assertIn("test-core", decision.selected_steps)
         self.assertNotIn("python-test", decision.selected_steps)
         self.assertIn("python-test", decision.skipped_steps)
+
+    def test_quest_prototype_change_is_core_not_unmapped(self) -> None:
+        env = {
+            "REVIEW_SCOPE_MODE": "enforce",
+            "REVIEW_SCOPE_CHANGED_FILES": "scripts/quest_prototype/src/types/cards.ts",
+        }
+        decision = review_scope.plan_review_scope(
+            self.step_names,
+            env=env,
+            repo_root=Path.cwd(),
+            config=self.config,
+            metadata=self.metadata,
+        )
+        self.assertFalse(decision.forced_full)
+        self.assertEqual(decision.domains, ["core"])
+        self.assertEqual(decision.unmapped_paths, [])
+        self.assertNotIn("local-unity-test", decision.selected_steps)
+        self.assertIn("local-unity-test", decision.skipped_steps)
 
     def test_mixed_markdown_and_code_change_is_not_markdown_only(self) -> None:
         env = {
