@@ -138,6 +138,7 @@ export function AppRoot() {
   const [statisticsVisible, setStatisticsVisible] = useState(false);
   const [statisticsConfigs, setStatisticsConfigs] = useState<Record<string, StatisticConfig[]>>({});
   const [enumValidationRules, setEnumValidationRules] = useState<Record<string, EnumValidationInfo[]>>({});
+  const [dataVersion, setDataVersion] = useState(0);
   const saveTimeoutRef = useRef<number | null>(null);
   const isSavingRef = useRef<Record<string, boolean>>({});
   const watchersStartedRef = useRef<Set<string>>(new Set());
@@ -465,6 +466,7 @@ export function AppRoot() {
         }
 
         lastKnownDataRef.current[sheetId] = newData;
+        setDataVersion((v) => v + 1);
 
         const rowCountChanged = !previousData ||
           previousData.rows.length !== newData.rows.length;
@@ -825,12 +827,13 @@ export function AppRoot() {
   }, []);
 
   useEffect(() => {
-    const statisticsSub = ipc.onStatisticsOverlayToggled((visible) => {
-      setStatisticsVisible(visible);
+    const statisticsSub = ipc.onStatisticsOverlayToggled(() => {
+      const newValue = !statisticsVisibleRef.current;
+      setStatisticsVisible(newValue);
       const sheetInfo = activeSheetIdRef.current
         ? sheets.find((s) => s.id === activeSheetIdRef.current)
         : undefined;
-      ipc.saveViewState(sheetInfo?.path ?? null, visible).catch((e) =>
+      ipc.saveViewState(sheetInfo?.path ?? null, newValue).catch((e) =>
         logger.error("Failed to save view state", { error: String(e) })
       );
     });
@@ -877,23 +880,26 @@ export function AppRoot() {
   }, [sheets, reloadSheet]);
 
   const statisticResults: StatisticResult[] = useMemo(() => {
-    if (!statisticsVisible || !activeSheetId || !multiSheetData) return [];
+    if (!statisticsVisible || !activeSheetId) return [];
     const configs = statisticsConfigs[activeSheetId];
     if (!configs || configs.length === 0) return [];
 
-    const activeSheet = multiSheetData.sheets.find((s) => s.id === activeSheetId);
-    if (!activeSheet) return [];
+    // Read from lastKnownDataRef which always has the latest data,
+    // unlike multiSheetData which only updates on row count changes.
+    // dataVersion in deps ensures recomputation on every save.
+    const sheetData = lastKnownDataRef.current[activeSheetId];
+    if (!sheetData) return [];
 
     const enumRules = enumValidationRules[activeSheetId] ?? [];
 
     return configs.map((config) => {
-      const colIndex = activeSheet.data.headers.indexOf(config.column);
+      const colIndex = sheetData.headers.indexOf(config.column);
       if (colIndex === -1) {
         return { label: config.label, counts: [], total: 0 };
       }
 
       const valueCounts = new Map<string, number>();
-      for (const row of activeSheet.data.rows) {
+      for (const row of sheetData.rows) {
         const cellValue = row[colIndex];
         const key = cellValue != null ? String(cellValue) : "";
         valueCounts.set(key, (valueCounts.get(key) ?? 0) + 1);
@@ -920,10 +926,10 @@ export function AppRoot() {
       return {
         label: config.label,
         counts,
-        total: activeSheet.data.rows.length,
+        total: sheetData.rows.length,
       };
     });
-  }, [statisticsVisible, activeSheetId, multiSheetData, statisticsConfigs, enumValidationRules]);
+  }, [statisticsVisible, activeSheetId, statisticsConfigs, enumValidationRules, dataVersion]);
 
   const hasPermissionError = permissionError !== null;
   const hasError = error !== null || hasPermissionError;

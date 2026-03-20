@@ -1020,4 +1020,4 @@ export const onOpenFindDialog =
   createVoidEventListener("open-find-dialog");
 
 export const onStatisticsOverlayToggled =
-  createEventListener<boolean>("statistics-overlay-toggled");
+  createVoidEventListener("statistics-overlay-toggled");

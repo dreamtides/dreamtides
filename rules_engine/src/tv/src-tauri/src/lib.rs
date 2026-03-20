@@ -155,24 +155,16 @@ pub fn run(paths: cli::AppPaths) {
                     window.open_devtools();
                 }
             } else if event.id() == "show_statistics" {
-                if let Some(window) = app_handle.get_webview_window("main") {
-                    if let Some(menu) = window.menu() {
-                        if let Some(MenuItemKind::Check(check_item)) = menu.get("show_statistics") {
-                            let visible = check_item.is_checked().unwrap_or(false);
-                            tracing::info!(
-                                component = "tv.menu",
-                                statistics_visible = visible,
-                                "Statistics overlay toggled"
-                            );
-                            if let Err(e) = app_handle.emit("statistics-overlay-toggled", visible) {
-                                tracing::error!(
-                                    component = "tv.menu",
-                                    error = %e,
-                                    "Failed to emit statistics-overlay-toggled event"
-                                );
-                            }
-                        }
-                    }
+                tracing::info!(
+                    component = "tv.menu",
+                    "Statistics overlay toggled"
+                );
+                if let Err(e) = app_handle.emit("statistics-overlay-toggled", ()) {
+                    tracing::error!(
+                        component = "tv.menu",
+                        error = %e,
+                        "Failed to emit statistics-overlay-toggled event"
+                    );
                 }
             } else if event.id() == "disable_autosave" {
                 // CheckMenuItem automatically toggles its checked state on click.
