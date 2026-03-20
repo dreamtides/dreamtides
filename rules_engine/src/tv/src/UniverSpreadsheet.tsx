@@ -255,41 +255,6 @@ export const UniverSpreadsheet = forwardRef<
     univerAPIRef.current = instance.univerAPI;
     imageCellRendererRef.current = new ImageCellRenderer(instance.univerAPI);
 
-    // Jank detector: a recurring timer that detects when the main thread
-    // is blocked for more than 50ms, regardless of the source.
-    let jankLastCheck = performance.now();
-    const jankInterval = setInterval(() => {
-      const now = performance.now();
-      const gap = now - jankLastCheck;
-      jankLastCheck = now;
-      // setInterval(16ms) should fire roughly every 16ms. If the gap is
-      // much larger, the main thread was blocked.
-      if (gap > 50) {
-        logger.perf("main_thread_jank_detected", gap, {
-          expectedInterval: 16,
-        });
-      }
-    }, 16);
-
-    // Long task observer via PerformanceObserver (if available).
-    // Reports any task that takes >50ms in the browser's task queue.
-    let longTaskObserver: PerformanceObserver | null = null;
-    if (typeof PerformanceObserver !== "undefined") {
-      try {
-        longTaskObserver = new PerformanceObserver((list) => {
-          for (const entry of list.getEntries()) {
-            logger.perf("browser_long_task", entry.duration, {
-              name: entry.name,
-              startTime: entry.startTime,
-            });
-          }
-        });
-        longTaskObserver.observe({ type: "longtask", buffered: false });
-      } catch {
-        // longtask type not supported in this environment
-      }
-    }
-
     const buildMappingFromGrid = (
       sheetId: string,
     ): Map<number, number> | null => {
@@ -771,19 +736,6 @@ export const UniverSpreadsheet = forwardRef<
       logger.debug("Workbook initialized in single-sheet mode");
     }
 
-    // Track when set-range-values commands start (before Univer processes them)
-    // so we can measure Univer's own processing time.
-    const commandStartTimes = new Map<string, number>();
-    instance.univerAPI.onBeforeCommandExecute((command) => {
-      if (isLoadingRef.current) return;
-      if (
-        command.id === "sheet.mutation.set-range-values" ||
-        command.id === "sheet.command.set-range-values"
-      ) {
-        commandStartTimes.set(command.id, performance.now());
-      }
-    });
-
     // Listen for cell value changes and row removal
     instance.univerAPI.onCommandExecuted((command) => {
       if (isLoadingRef.current) return;
@@ -793,16 +745,6 @@ export const UniverSpreadsheet = forwardRef<
         command.id === "sheet.mutation.remove-rows" ||
         command.id === "sheet.command.remove-row"
       ) {
-        const handlerStart = performance.now();
-        const beforeTime = commandStartTimes.get(command.id);
-        if (beforeTime !== undefined) {
-          logger.perf(
-            "univer.internal_processing",
-            handlerStart - beforeTime,
-            { commandId: command.id },
-          );
-          commandStartTimes.delete(command.id);
-        }
         const perfTimer = logger.startPerfTimer("onCommandExecuted", {
           commandId: command.id,
         });
@@ -830,33 +772,6 @@ export const UniverSpreadsheet = forwardRef<
         }
 
         perfTimer.stop({ sheetId });
-
-        // Measure main thread jank: how long after our handler returns
-        // until the browser can run a setTimeout(0) and rAF. This
-        // captures time spent in Univer's own processing + rendering.
-        const afterHandler = performance.now();
-        setTimeout(() => {
-          const timeoutFired = performance.now();
-          logger.perf(
-            "onCommandExecuted.jank_setTimeout",
-            timeoutFired - afterHandler,
-            {
-              commandId: command.id,
-              handlerDuration: afterHandler - handlerStart,
-            },
-          );
-        }, 0);
-        requestAnimationFrame(() => {
-          const rafFired = performance.now();
-          logger.perf(
-            "onCommandExecuted.jank_rAF",
-            rafFired - afterHandler,
-            {
-              commandId: command.id,
-              handlerDuration: afterHandler - handlerStart,
-            },
-          );
-        });
       }
     });
 
@@ -1353,8 +1268,6 @@ export const UniverSpreadsheet = forwardRef<
     });
 
     return () => {
-      clearInterval(jankInterval);
-      longTaskObserver?.disconnect();
       activeSheetDisposable.dispose();
       sheetMovedDisposable.dispose();
       sortDisposable.dispose();
