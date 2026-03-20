@@ -507,7 +507,7 @@ card-number = 30
 [[cards]]
 name = "The Dread Sovereign"
 id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
-tide = "Pact"
+tide = "Ignite"
 tide-cost = 1
 rendered-text = "▸ Judgment: You may abandon a Warrior to discover a Warrior with cost 1● higher and materialize it."
 energy-cost = 3
@@ -523,10 +523,10 @@ card-number = 31
 [[cards]]
 name = "Tranquil Duelist"
 id = "84eedef8-9dc9-42ef-afe8-07bc1882f7ee"
-tide = "Pact"
+tide = "Ignite"
 tide-cost = 1
 rendered-text = "▸ Materialized, Dissolved: Draw a card."
-energy-cost = 2
+energy-cost = 3
 card-type = "Character"
 subtype = "Warrior"
 rarity = "Common"
@@ -605,7 +605,7 @@ card-number = 36
 [[cards]]
 name = "Lumin-Gate Seer"
 id = "d4123a89-fa76-46f9-a8b7-6a1d4ecc4c4f"
-tide = "Arc"
+tide = "Ignite"
 tide-cost = 1
 rendered-text = """
 Once per turn, when you materialize a character with cost 2● or less, draw a card.
@@ -639,7 +639,7 @@ card-number = 38
 [[cards]]
 name = "Judgment of the Blade"
 id = "e0c88a46-b85f-4497-ab19-850acc868863"
-tide = "Ignite"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Banish a non-Warrior enemy."
 energy-cost = 1
