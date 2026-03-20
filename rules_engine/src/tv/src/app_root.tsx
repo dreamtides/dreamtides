@@ -4,7 +4,7 @@ import { ErrorBanner } from "./error_banner";
 import { StatusIndicator } from "./status_indicator";
 import * as ipc from "./ipc_bridge";
 import type { TomlTableData, DerivedValuePayload, RowConfig, ColumnConfig, PermissionState, PermissionStateChangedPayload } from "./ipc_bridge";
-import type { MultiSheetData, SheetData, DerivedColumnState, CellChange } from "./spreadsheet_types";
+import type { MultiSheetData, SheetData, DerivedColumnState } from "./spreadsheet_types";
 import { createLogger } from "./logger_frontend";
 
 export type { TomlTableData };
@@ -560,143 +560,6 @@ export function AppRoot() {
     [saveData]
   );
 
-  const saveCellChanges = useCallback(
-    async (changes: CellChange[], sheetId: string) => {
-      const totalTimer = logger.startPerfTimer("saveCellChanges", {
-        sheetId,
-        changeCount: changes.length,
-      });
-
-      const sheetInfo = sheets.find((s) => s.id === sheetId);
-      if (!sheetInfo) {
-        totalTimer.stop({ aborted: "sheet not found" });
-        return;
-      }
-
-      if (autoSaveDisabledRef.current) {
-        logger.info("Auto-save disabled, skipping cell save", { sheetId });
-        totalTimer.stop({ skipped: "autosave disabled" });
-        return;
-      }
-
-      try {
-        if (changes.length === 1) {
-          const c = changes[0];
-          const tomlRow = await ipc.translateRowIndex(
-            sheetInfo.path,
-            sheetInfo.tableName,
-            c.displayRowIndex,
-          );
-          const result = await ipc.saveCell(
-            sheetInfo.path,
-            sheetInfo.tableName,
-            tomlRow,
-            c.columnKey,
-            c.value,
-          );
-          if (!result.success) {
-            logger.error("saveCell failed", { error: result.error });
-          }
-        } else {
-          // Translate all row indices and batch save
-          const updates: ipc.BatchCellUpdate[] = await Promise.all(
-            changes.map(async (c) => {
-              const tomlRow = await ipc.translateRowIndex(
-                sheetInfo.path,
-                sheetInfo.tableName,
-                c.displayRowIndex,
-              );
-              return {
-                rowIndex: tomlRow,
-                columnKey: c.columnKey,
-                value: c.value,
-              };
-            }),
-          );
-          const result = await ipc.saveBatch(
-            sheetInfo.path,
-            sheetInfo.tableName,
-            updates,
-          );
-          if (result.failedCount > 0) {
-            logger.error("saveBatch had failures", {
-              failedCount: result.failedCount,
-              failedUpdates: result.failedUpdates,
-            });
-          }
-        }
-
-        // Record save time for file watcher suppression
-        lastSaveTimeRef.current[sheetId] = Date.now();
-
-        // Trigger derived computations for changed rows
-        const lastKnown = lastKnownDataRef.current[sheetId];
-        if (lastKnown) {
-          const changedRows = changes.map((c) => c.displayRowIndex);
-          try {
-            const configs = await ipc.getDerivedColumnsConfig(sheetInfo.path);
-            if (configs.length > 0) {
-              setDerivedColumnState((prev) => ({
-                ...prev,
-                configs: { ...prev.configs, [sheetId]: configs },
-              }));
-              void triggerDerivedComputations(
-                sheetInfo,
-                lastKnown,
-                configs,
-                changedRows,
-              );
-            }
-          } catch (e) {
-            logger.error("Failed to trigger derived computations after cell save", {
-              error: String(e),
-            });
-          }
-        }
-
-        totalTimer.stop({ success: true });
-      } catch (e) {
-        const errorMsg = String(e);
-        if (errorMsg.includes("Permission denied") || errorMsg.includes("permission denied")) {
-          logger.warn("Cell save failed due to permissions", { error: errorMsg });
-          totalTimer.stop({ permissionError: true });
-        } else {
-          logger.error("Cell save error, falling back to full save", { error: errorMsg });
-          totalTimer.stop({ error: errorMsg, fallback: true });
-          // Fallback: schedule a full save by extracting data through the slow path
-          // This is a best-effort recovery — the next onCommandExecuted will use the slow path
-        }
-      }
-    },
-    [sheets, triggerDerivedComputations],
-  );
-
-  const handleCellChange = useCallback(
-    (changes: CellChange[], sheetId: string) => {
-      const perfTimer = logger.startPerfTimer("handleCellChange", {
-        sheetId,
-        changeCount: changes.length,
-      });
-
-      // Update lastKnownDataRef in-place for each changed cell
-      const lastKnown = lastKnownDataRef.current[sheetId];
-      if (lastKnown) {
-        for (const change of changes) {
-          const row = lastKnown.rows[change.displayRowIndex];
-          if (row && change.dataColumnIndex < row.length) {
-            row[change.dataColumnIndex] = change.value;
-          }
-        }
-      }
-
-      // Save directly — no debounce for discrete cell edits (dropdown, checkbox)
-      void saveCellChanges(changes, sheetId);
-
-      perfTimer.stop({ scheduled: true });
-    },
-    [saveCellChanges],
-  );
-
   const handleActiveSheetChanged = useCallback((sheetId: string) => {
     setActiveSheetId(sheetId);
     const sheetInfo = sheets.find((s) => s.id === sheetId);
@@ -991,7 +854,6 @@ export function AppRoot() {
           error={null}
           loading={loading}
           onChange={handleChange}
-          onCellChange={handleCellChange}
           onActiveSheetChanged={handleActiveSheetChanged}
           onSheetOrderChanged={handleSheetOrderChanged}
           derivedColumnState={derivedColumnState}
