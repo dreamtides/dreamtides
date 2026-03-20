@@ -829,7 +829,15 @@ export const UniverSpreadsheet = forwardRef<
         if (isSetRange && onCellChangeRef.current) {
           const fastTimer = logger.startPerfTimer(
             "onCommandExecuted.fast_path_attempt",
-            { sheetId },
+            {
+              sheetId,
+              commandId: command.id,
+              paramKeys: command.params
+                ? Object.keys(
+                    command.params as Record<string, unknown>,
+                  ).join(",")
+                : "null",
+            },
           );
           const cellChanges = extractCellChangesFromParams(
             command.params,
@@ -837,9 +845,30 @@ export const UniverSpreadsheet = forwardRef<
           );
 
           // Use fast path if extraction succeeded, few cells changed,
-          // and no filter is active (filter changes row visibility).
+          // and no filter criteria are active (filter changes row visibility).
+          // Note: getFilter() returns a filter object even when no criteria
+          // are set (the filter range exists for header dropdown arrows).
+          let filterActive = false;
           const filter = activeSheet?.getFilter();
-          const filterActive = filter != null;
+          if (filter) {
+            const headers = isMultiSheetRef.current
+              ? (headersMapRef.current.get(sheetId) ?? [])
+              : headersRef.current;
+            const mapping =
+              columnMappingRef.current.get(sheetId) ?? EMPTY_MAPPING;
+            for (let i = 0; i < headers.length; i++) {
+              const visualCol = mapping.dataToVisual[i];
+              if (visualCol === undefined) continue;
+              const criteria = filter.getColumnFilterCriteria(visualCol);
+              if (
+                criteria?.filters?.filters &&
+                criteria.filters.filters.length > 0
+              ) {
+                filterActive = true;
+                break;
+              }
+            }
+          }
 
           if (
             cellChanges &&
