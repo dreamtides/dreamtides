@@ -56,7 +56,7 @@ Run one test with e.g. `just battle-test <NAME>`.
   most style violations before attempting manual fixes.
 - `just check` — type check
 - `just clippy` — lint
-- `just review` — full gate (~5 min, keep polling, don't restart)
+- `just review` — full gate (please run in foreground)
 - `just tabula-generate` — regenerate from TOML
 - `just schema` — regenerate C# types from Rust
 
