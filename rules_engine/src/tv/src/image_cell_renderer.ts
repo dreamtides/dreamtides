@@ -58,6 +58,9 @@ export class ImageCellRenderer {
   private univerAPI: FUniver;
   private imageStates: Map<string, ImageCellState> = new Map();
   private imageIds: Map<string, string> = new Map();
+  /// Tracks the source path currently displayed for each cell, used to
+  /// skip redundant remove+insert when the image hasn't changed.
+  private imageSources: Map<string, string> = new Map();
   private commandsReady = false;
   private cachedInjector: Injector | null = null;
 
@@ -208,6 +211,14 @@ export class ImageCellRenderer {
     rowHeight?: number
   ): Promise<void> {
     try {
+      // Skip if this cell already shows the same image source.
+      if (
+        this.imageStates.get(cellKey) === "loaded" &&
+        this.imageSources.get(cellKey) === cachePath
+      ) {
+        return;
+      }
+
       const ready = await this.waitForCommandsReady(sheet);
       if (!ready) {
         this.setErrorState(sheet, cellKey, row, column, "Drawing commands not available");
@@ -281,6 +292,7 @@ export class ImageCellRenderer {
 
       this.imageIds.set(cellKey, drawingId);
       this.imageStates.set(cellKey, "loaded");
+      this.imageSources.set(cellKey, cachePath);
 
       logger.info("Image inserted at cell", { cellKey, row, column, imageWidth, imageHeight });
     } catch (e) {
@@ -329,6 +341,7 @@ export class ImageCellRenderer {
     }
 
     this.imageIds.delete(cellKey);
+    this.imageSources.delete(cellKey);
   }
 
   /**
@@ -413,6 +426,7 @@ export class ImageCellRenderer {
       }
       this.imageStates.delete(key);
       this.imageIds.delete(key);
+      this.imageSources.delete(key);
     }
 
     if (drawingsToRemove.length > 0 && unitId) {
@@ -438,5 +452,6 @@ export class ImageCellRenderer {
   clearAll(): void {
     this.imageStates.clear();
     this.imageIds.clear();
+    this.imageSources.clear();
   }
 }
