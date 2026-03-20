@@ -5,9 +5,10 @@ use std::path::{Path, PathBuf};
 use atomic_write_file::AtomicWriteFile;
 use core_data::identifiers::UserId;
 use core_data::initialization_error::{ErrorCode, InitializationError};
+use serde_json;
 use serde_json::error::Category;
+use serde_path_to_error;
 use tracing::debug;
-use {serde_json, serde_path_to_error};
 
 use crate::save_file::SaveFile;
 

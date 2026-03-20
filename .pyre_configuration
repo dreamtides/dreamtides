@@ -1,11 +1,10 @@
 {
   "source_directories": ["scripts"],
   "search_path": [
-    "scripts/quest_simulator",
     "scripts/review",
     "scripts/abu"
   ],
-  "typeshed": "/opt/homebrew/lib/pyre_check/typeshed",
+  "typeshed": "/Users/dthurn/.cache/uv/archive-v0/Py28s1sKdR_5Wl1mm1S8m/lib/pyre_check/typeshed",
   "exclude": [
     "**/venv/**",
     "**/.venv/**",
