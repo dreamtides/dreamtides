@@ -72,6 +72,18 @@ export interface UniverSpreadsheetHandle {
   getSheetData: (sheetId: string) => TomlTableData | null;
 }
 
+/// A single cell change extracted from a set-range-values command.
+export interface CellChange {
+  /// Display row index (0-based, relative to data rows, not including header).
+  displayRowIndex: number;
+  /// Data column index (index into the headers array).
+  dataColumnIndex: number;
+  /// Header name for this column.
+  columnKey: string;
+  /// The new cell value.
+  value: string | number | boolean | null;
+}
+
 export interface UniverSpreadsheetProps {
   width?: string | number;
   height?: string | number;
@@ -81,6 +93,8 @@ export interface UniverSpreadsheetProps {
   multiSheetData?: MultiSheetData;
   /** Called when cell data changes in any sheet */
   onChange?: (data: TomlTableData, sheetId: string) => void;
+  /** Called for fast-path single/few-cell changes (e.g. dropdown edits) */
+  onCellChange?: (changes: CellChange[], sheetId: string) => void;
   /** Called when the active sheet changes */
   onActiveSheetChanged?: (sheetId: string) => void;
   /** Called when the user reorders sheet tabs via drag */

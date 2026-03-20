@@ -38,6 +38,7 @@ import { applyTableStyle, applyConditionalFormatting } from "./table_style_utils
 import { ImageCellRenderer } from "./image_cell_renderer";
 import { createLogger } from "./logger_frontend";
 import type {
+  CellChange,
   MultiSheetData,
   UniverSpreadsheetHandle,
   UniverSpreadsheetProps,
@@ -62,6 +63,7 @@ export const UniverSpreadsheet = forwardRef<
     data,
     multiSheetData,
     onChange,
+    onCellChange,
     onActiveSheetChanged,
     onSheetOrderChanged,
     derivedColumnState,
@@ -80,6 +82,7 @@ export const UniverSpreadsheet = forwardRef<
   // Legacy single-sheet headers (for backward compatibility)
   const headersRef = useRef<string[]>([]);
   const onChangeRef = useRef(onChange);
+  const onCellChangeRef = useRef(onCellChange);
   const onActiveSheetChangedRef = useRef(onActiveSheetChanged);
   const onSheetOrderChangedRef = useRef(onSheetOrderChanged);
   const isLoadingRef = useRef(false);
@@ -119,6 +122,7 @@ export const UniverSpreadsheet = forwardRef<
   const sortPendingRef = useRef(false);
 
   onChangeRef.current = onChange;
+  onCellChangeRef.current = onCellChange;
   onActiveSheetChangedRef.current = onActiveSheetChanged;
   onSheetOrderChangedRef.current = onSheetOrderChanged;
 
@@ -229,6 +233,72 @@ export const UniverSpreadsheet = forwardRef<
   /** Legacy extractData for backward compatibility */
   const extractData = (): TomlTableData | null => {
     return extractDataFromSheet();
+  };
+
+  /**
+   * Extract cell changes directly from set-range-values command params.
+   * Returns null if the params can't be parsed (caller should fall back to slow path).
+   */
+  const extractCellChangesFromParams = (
+    params: unknown,
+    sheetId: string,
+  ): CellChange[] | null => {
+    if (!params || typeof params !== "object") return null;
+    const p = params as Record<string, unknown>;
+    const cellValue = p.cellValue;
+    if (!cellValue || typeof cellValue !== "object") return null;
+
+    const mapping = columnMappingRef.current.get(sheetId) ?? EMPTY_MAPPING;
+    if (mapping.dataToVisual.length === 0) return null;
+
+    const headers = isMultiSheetRef.current
+      ? (headersMapRef.current.get(sheetId) ?? [])
+      : headersRef.current;
+    if (headers.length === 0) return null;
+
+    const changes: CellChange[] = [];
+    const cellValueObj = cellValue as Record<
+      string,
+      Record<string, unknown>
+    >;
+
+    for (const rowStr of Object.keys(cellValueObj)) {
+      const rowIndex = parseInt(rowStr, 10);
+      if (isNaN(rowIndex) || rowIndex < 1) return null; // row 0 is header
+      const displayRowIndex = rowIndex - 1; // convert to 0-based data row
+
+      const colEntries = cellValueObj[rowStr];
+      if (!colEntries || typeof colEntries !== "object") return null;
+
+      for (const colStr of Object.keys(colEntries)) {
+        const visualCol = parseInt(colStr, 10);
+        if (isNaN(visualCol)) return null;
+
+        const dataColIndex = mapping.visualToData.get(visualCol);
+        if (dataColIndex === undefined) return null;
+        if (dataColIndex >= headers.length) return null;
+
+        const cellData = colEntries[colStr] as Record<string, unknown> | null;
+        let value: string | number | boolean | null = null;
+        if (cellData) {
+          if (cellData.p != null) {
+            // Rich text cell — fall back to slow path for proper extraction
+            return null;
+          } else if (cellData.v !== undefined && cellData.v !== null) {
+            value = cellData.v as string | number | boolean;
+          }
+        }
+
+        changes.push({
+          displayRowIndex,
+          dataColumnIndex: dataColIndex,
+          columnKey: headers[dataColIndex],
+          value,
+        });
+      }
+    }
+
+    return changes.length > 0 ? changes : null;
   };
 
   useImperativeHandle(ref, () => ({
@@ -740,15 +810,65 @@ export const UniverSpreadsheet = forwardRef<
         command.id === "sheet.mutation.remove-rows" ||
         command.id === "sheet.command.remove-row"
       ) {
-        const perfTimer = logger.startPerfTimer("onCommandExecuted", {
-          commandId: command.id,
-        });
+        const blockingTimer = logger.startPerfTimer(
+          "onCommandExecuted.blocking_total",
+          { commandId: command.id },
+        );
 
         const activeSheet = instance.univerAPI
           .getActiveWorkbook()
           ?.getActiveSheet();
         const sheetId = activeSheet?.getSheetId() ?? "";
 
+        // Fast path: for set-range-values, try to extract changes directly
+        // from command params instead of re-reading the entire grid.
+        const isSetRange =
+          command.id === "sheet.mutation.set-range-values" ||
+          command.id === "sheet.command.set-range-values";
+
+        if (isSetRange && onCellChangeRef.current) {
+          const fastTimer = logger.startPerfTimer(
+            "onCommandExecuted.fast_path_attempt",
+            { sheetId },
+          );
+          const cellChanges = extractCellChangesFromParams(
+            command.params,
+            sheetId,
+          );
+
+          // Use fast path if extraction succeeded, few cells changed,
+          // and no filter is active (filter changes row visibility).
+          const filter = activeSheet?.getFilter();
+          const filterActive = filter != null;
+
+          if (
+            cellChanges &&
+            cellChanges.length <= 10 &&
+            !filterActive
+          ) {
+            onCellChangeRef.current(cellChanges, sheetId);
+            fastTimer.stop({
+              used: true,
+              changeCount: cellChanges.length,
+            });
+            blockingTimer.stop({
+              sheetId,
+              path: "fast",
+              changeCount: cellChanges.length,
+            });
+            return;
+          }
+          fastTimer.stop({
+            used: false,
+            reason: !cellChanges
+              ? "extraction_failed"
+              : filterActive
+                ? "filter_active"
+                : "too_many_changes",
+          });
+        }
+
+        // Slow path: read entire grid and compare
         const extractTimer = logger.startPerfTimer("extractDataFromSheet", {
           sheetId,
           commandId: command.id,
@@ -766,7 +886,7 @@ export const UniverSpreadsheet = forwardRef<
           onChangeTimer.stop();
         }
 
-        perfTimer.stop({ sheetId });
+        blockingTimer.stop({ sheetId, path: "slow" });
       }
     });
 

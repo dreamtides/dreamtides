@@ -1,12 +1,13 @@
 import { UniverSpreadsheet } from "./UniverSpreadsheet";
 import type { TomlTableData, RowConfig, ColumnConfig } from "./ipc_bridge";
-import type { MultiSheetData, DerivedColumnState } from "./spreadsheet_types";
+import type { MultiSheetData, DerivedColumnState, CellChange } from "./spreadsheet_types";
 
 interface SpreadsheetViewProps {
   multiSheetData?: MultiSheetData | null;
   error: string | null;
   loading: boolean;
   onChange: (data: TomlTableData, sheetId: string) => void;
+  onCellChange?: (changes: CellChange[], sheetId: string) => void;
   onActiveSheetChanged?: (sheetId: string) => void;
   onSheetOrderChanged?: (sheetNames: string[]) => void;
   derivedColumnState?: DerivedColumnState;
@@ -21,6 +22,7 @@ export function SpreadsheetView({
   error,
   loading,
   onChange,
+  onCellChange,
   onActiveSheetChanged,
   onSheetOrderChanged,
   derivedColumnState,
@@ -43,6 +45,7 @@ export function SpreadsheetView({
         height="100%"
         multiSheetData={multiSheetData ?? undefined}
         onChange={onChange}
+        onCellChange={onCellChange}
         onActiveSheetChanged={onActiveSheetChanged}
         onSheetOrderChanged={onSheetOrderChanged}
         derivedColumnState={derivedColumnState}
