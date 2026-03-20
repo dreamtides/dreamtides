@@ -255,6 +255,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
             tv_steps=("tv-check", "tv-clippy", "tv-test"),
             python_steps=("python-test",),
             csharp_steps=("local-unity-test",),
+            core_path_prefixes=("client/Assets/StreamingAssets/",),
         )
         self.metadata = review_scope.WorkspaceMetadata(
             crate_roots={
@@ -437,6 +438,26 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.assertTrue(decision.forced_full)
         self.assertIn("unmapped changed path", decision.forced_full_reason)
         self.assertIn("notes/unmapped.txt", decision.unmapped_paths)
+
+    def test_core_path_prefix_skips_csharp_domain(self) -> None:
+        env = {
+            "REVIEW_SCOPE_MODE": "enforce",
+            "REVIEW_SCOPE_CHANGED_FILES": "client/Assets/StreamingAssets/Tabula/rendered-cards.toml",
+        }
+        decision = review_scope.plan_review_scope(
+            self.step_names,
+            env=env,
+            repo_root=Path.cwd(),
+            config=self.config,
+            metadata=self.metadata,
+        )
+        self.assertFalse(decision.forced_full)
+        self.assertNotIn("csharp", decision.domains)
+        self.assertIn("local-unity-test", decision.skipped_steps)
+        self.assertNotIn(
+            "client/Assets/StreamingAssets/Tabula/rendered-cards.toml",
+            decision.unmapped_paths,
+        )
 
     def test_tabula_path_forces_full(self) -> None:
         env = {

@@ -241,7 +241,7 @@ namespace Dreamtides.Services
         )
       )
       {
-        if (targetScenes.Contains(element.gameObject.scene))
+        if (!element.IsInitialized && targetScenes.Contains(element.gameObject.scene))
         {
           element.Initialize(this, mode, testConfiguration, fromRegistry: true);
         }
@@ -249,7 +249,10 @@ namespace Dreamtides.Services
 
       foreach (var service in GetComponentsInChildren<Service>())
       {
-        service.Initialize(this, mode, testConfiguration);
+        if (!service.IsInitialized)
+        {
+          service.Initialize(this, mode, testConfiguration);
+        }
       }
 
       foreach (

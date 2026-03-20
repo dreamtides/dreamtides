@@ -134,6 +134,14 @@ namespace Dreamtides.Tests.TestUtils
           UnityEngine.Object.DestroyImmediate(createdObject);
         }
       }
+      _createdObjects.Clear();
+      _registry = null;
+      _portraitLayout = null;
+      _landscapeLayout = null;
+      _mainCamera = null;
+      _testConfiguration = null;
+      _fakeSoundService = null;
+      _fakeActionService = null;
     }
 
     public static void AssertVector3Equal(Vector3 expected, Vector3 actual, float tolerance = 0.01f)

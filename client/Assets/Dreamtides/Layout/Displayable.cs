@@ -34,6 +34,8 @@ namespace Dreamtides.Layout
     GameMode _mode = GameMode.MainMenu;
     TestConfiguration? _testConfiguration;
 
+    public bool IsInitialized => _initialized;
+
     protected Registry Registry =>
       _initialized ? _registry : throw new InvalidOperationException($"{name} not initialized!");
 

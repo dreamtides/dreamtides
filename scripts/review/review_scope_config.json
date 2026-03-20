@@ -46,6 +46,9 @@
       "client/Assets/"
     ]
   },
+  "core_path_prefixes": [
+    "client/Assets/StreamingAssets/"
+  ],
   "always_run_steps": [
     "check-snapshots",
     "check-format",

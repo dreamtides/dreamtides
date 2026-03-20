@@ -41,6 +41,7 @@ class ScopeConfig:
     tv_path_prefixes: tuple[str, ...]
     csharp_crate_seeds: tuple[str, ...]
     csharp_path_prefixes: tuple[str, ...]
+    core_path_prefixes: tuple[str, ...]
     always_run_steps: tuple[str, ...]
     markdown_only_skip_steps: tuple[str, ...]
     python_docs_only_skip_steps: tuple[str, ...]
@@ -386,6 +387,9 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
         csharp_path_prefixes=read_rules(
             csharp_section.get("path_prefixes", []), "csharp.path_prefixes"
         ),
+        core_path_prefixes=read_rules(
+            payload.get("core_path_prefixes", []), "core_path_prefixes"
+        ),
         always_run_steps=read_names(
             payload.get("always_run_steps", []), "always_run_steps"
         ),
@@ -713,12 +717,18 @@ def plan_review_scope(
             full_trigger_match = first_matching_rule(
                 changed_path, scope_config.global_full_triggers
             )
+            core_path_match = bool(
+                first_matching_rule(changed_path, scope_config.core_path_prefixes)
+            )
             changed_path_is_markdown = is_markdown_path(changed_path)
             changed_path_is_shell = path_has_extension(changed_path, SHELL_EXTENSIONS)
             domain_matches = {
                 domain.name: bool(
-                    first_matching_rule(changed_path, domain.path_prefixes)
-                    or path_has_extension(changed_path, domain.file_extensions)
+                    not core_path_match
+                    and (
+                        first_matching_rule(changed_path, domain.path_prefixes)
+                        or path_has_extension(changed_path, domain.file_extensions)
+                    )
                 )
                 for domain in domain_rules
             }
@@ -743,6 +753,7 @@ def plan_review_scope(
             has_domain_match = (
                 changed_path_is_markdown
                 or changed_path_is_shell
+                or core_path_match
                 or any(domain_matches.values())
             )
             if not full_trigger_match and not has_domain_match and not mapped_crates:
@@ -845,6 +856,7 @@ def validate_scope_configuration(
 
     duplicate_checks: list[tuple[str, tuple[str, ...]]] = [
         ("global_full_triggers", config.global_full_triggers),
+        ("core_path_prefixes", config.core_path_prefixes),
         ("always_run_steps", config.always_run_steps),
         ("markdown_only_skip_steps", config.markdown_only_skip_steps),
         ("python_docs_only_skip_steps", config.python_docs_only_skip_steps),

@@ -14,6 +14,8 @@ namespace Dreamtides.Services
     GameMode _mode = GameMode.MainMenu;
     TestConfiguration? _testConfiguration = null;
 
+    public bool IsInitialized => _initialized;
+
     protected GameMode Mode =>
       _initialized ? _mode : throw new InvalidOperationException($"{name} not initialized!");
 
