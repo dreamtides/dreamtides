@@ -49,7 +49,7 @@ export const DREAMSIGNS: readonly DreamsignTemplate[] = [
   },
   {
     name: "Untamed Compass",
-    tide: "Wild",
+    tide: "Neutral",
     effectDescription:
       "New dreamscapes generate one additional site, the wild current carving unexpected paths.",
   },

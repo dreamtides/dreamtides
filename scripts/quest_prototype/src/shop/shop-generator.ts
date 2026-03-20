@@ -102,7 +102,7 @@ function countDeckTides(
     Umbra: 0,
     Rime: 0,
     Surge: 0,
-    Wild: 0,
+    Neutral: 0,
   };
   for (const entry of deck) {
     const card = cardDatabase.get(entry.cardNumber);

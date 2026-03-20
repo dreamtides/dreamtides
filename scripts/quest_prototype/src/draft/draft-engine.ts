@@ -45,7 +45,7 @@ const TIDE_ORDER: Readonly<Record<string, number>> = {
   Umbra: 4,
   Rime: 5,
   Surge: 6,
-  Wild: 7,
+  Neutral: 7,
 };
 
 /** Sort an array of cards by tide order without mutating the original. */
@@ -63,7 +63,7 @@ export const SITE_PICKS = 5;
 /** Compute the 7-element fitness vector for a card based on its tide. */
 export function computeFitness(card: CardData): number[] {
   const fitness = new Array<number>(7).fill(0);
-  if (card.tide === "Wild") {
+  if (card.tide === "Neutral") {
     fitness.fill(0.15);
   } else {
     const idx = TIDE_INDEX[card.tide];
@@ -179,7 +179,7 @@ function countByTide(
   cardDatabase: Map<number, CardData>,
 ): Record<string, number> {
   const counts: Record<string, number> = {};
-  for (const tide of [...NAMED_TIDES, "Wild" as Tide]) {
+  for (const tide of [...NAMED_TIDES, "Neutral" as Tide]) {
     counts[tide] = 0;
   }
   for (const num of cardNumbers) {
@@ -431,7 +431,7 @@ export function playerPick(
     pickNumber: state.currentPick,
     cardNumber,
     cardName: card?.name ?? "Unknown",
-    cardTide: card?.tide ?? "Wild",
+    cardTide: card?.tide ?? "Neutral",
     cardsAvailableCount: packContents.length,
     packContents: packContents,
   });
@@ -505,7 +505,7 @@ export function botPick(
     seatNumber: seatIndex,
     pickNumber: state.currentPick,
     cardNumber: chosen.cardNumber,
-    cardTide: pickedCard?.tide ?? "Wild",
+    cardTide: pickedCard?.tide ?? "Neutral",
   });
 }
 

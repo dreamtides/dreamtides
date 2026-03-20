@@ -71,8 +71,8 @@ describe("computeFitness", () => {
     expect(fitness[2]).toBe(0.0);
   });
 
-  it("returns 0.15 uniform for a Wild card", () => {
-    const card = makeCard(1, "Wild");
+  it("returns 0.15 uniform for a Neutral card", () => {
+    const card = makeCard(1, "Neutral");
     const fitness = computeFitness(card);
     expect(fitness).toHaveLength(7);
     for (const v of fitness) {
@@ -549,11 +549,11 @@ describe("full draft flow integration", () => {
 });
 
 describe("sortCardsByTide", () => {
-  it("sorts cards by tide order: Bloom, Arc, Ignite, Pact, Umbra, Rime, Surge, Wild", () => {
+  it("sorts cards by tide order: Bloom, Arc, Ignite, Pact, Umbra, Rime, Surge, Neutral", () => {
     const db = new Map<number, CardData>();
     db.set(1, makeCard(1, "Surge"));
     db.set(2, makeCard(2, "Bloom"));
-    db.set(3, makeCard(3, "Wild"));
+    db.set(3, makeCard(3, "Neutral"));
     db.set(4, makeCard(4, "Ignite"));
     db.set(5, makeCard(5, "Arc"));
 
@@ -565,7 +565,7 @@ describe("sortCardsByTide", () => {
       "Arc",
       "Ignite",
       "Surge",
-      "Wild",
+      "Neutral",
     ]);
   });
 

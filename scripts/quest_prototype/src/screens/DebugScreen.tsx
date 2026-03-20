@@ -635,7 +635,7 @@ function TideCardCounts({
 }: {
   cardsByTide: Record<string, number>;
 }) {
-  const nonZeroTides = [...NAMED_TIDES, "Wild" as Tide].filter(
+  const nonZeroTides = [...NAMED_TIDES, "Neutral" as Tide].filter(
     (tide) => (cardsByTide[tide] ?? 0) > 0,
   );
 

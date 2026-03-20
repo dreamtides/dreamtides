@@ -7,7 +7,7 @@ export type Tide =
   | "Umbra"
   | "Rime"
   | "Surge"
-  | "Wild";
+  | "Neutral";
 
 /** Card rarity levels (Special excluded from the draft pool). */
 export type Rarity = "Common" | "Uncommon" | "Rare" | "Legendary";

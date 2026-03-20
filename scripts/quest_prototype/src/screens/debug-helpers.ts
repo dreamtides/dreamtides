@@ -66,7 +66,7 @@ export function extractDraftDebugInfo(
 
     const draftedCards: CardData[] = [];
     const cardsByTide: Record<string, number> = {};
-    for (const tide of [...NAMED_TIDES, "Wild" as Tide]) {
+    for (const tide of [...NAMED_TIDES, "Neutral" as Tide]) {
       cardsByTide[tide] = 0;
     }
 

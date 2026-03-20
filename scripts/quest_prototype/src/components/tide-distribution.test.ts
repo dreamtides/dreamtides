@@ -137,7 +137,7 @@ describe("computeTideDistribution", () => {
     expect(tideNames).toContain("Umbra");
     expect(tideNames).toContain("Rime");
     expect(tideNames).toContain("Surge");
-    expect(tideNames).toContain("Wild");
+    expect(tideNames).toContain("Neutral");
     expect(result.tides).toHaveLength(8);
   });
 

@@ -60,11 +60,11 @@ export const DREAMCALLERS: readonly Dreamcaller[] = [
   },
   {
     name: "Eryndra Wildsong",
-    tide: "Wild",
+    tide: "Neutral",
     abilityDescription:
       "She belongs to no tide and all tides. The raw chaos of the dreamscape answers her call.",
     essenceBonus: 150,
-    tideCrystalGrant: "Wild",
+    tideCrystalGrant: "Neutral",
   },
   {
     name: "Vaelith, Ember Augur",

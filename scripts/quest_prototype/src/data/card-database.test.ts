@@ -96,18 +96,18 @@ describe("tideIconUrl", () => {
     }
   });
 
-  it("returns a fallback for Wild tide", () => {
-    const url = tideIconUrl("Wild");
-    expect(url).not.toBe("/tides/Wild.png");
+  it("returns a fallback for Neutral tide", () => {
+    const url = tideIconUrl("Neutral");
+    expect(url).not.toBe("/tides/Neutral.png");
     expect(url.length).toBeGreaterThan(0);
     expect(url).toContain("data:");
   });
 });
 
 describe("NAMED_TIDES", () => {
-  it("contains exactly 7 tides excluding Wild", () => {
+  it("contains exactly 7 tides excluding Neutral", () => {
     expect(NAMED_TIDES).toHaveLength(7);
-    expect(NAMED_TIDES).not.toContain("Wild");
+    expect(NAMED_TIDES).not.toContain("Neutral");
   });
 
   it("contains all named tide values", () => {
@@ -131,7 +131,7 @@ describe("TIDE_COLORS", () => {
       Umbra: "#8b5cf6",
       Rime: "#3b82f6",
       Surge: "#06b6d4",
-      Wild: "#9ca3af",
+      Neutral: "#9ca3af",
     };
     for (const [tide, color] of Object.entries(expected)) {
       expect(TIDE_COLORS[tide as Tide]).toBe(color);
@@ -222,7 +222,7 @@ describe("loadCardDatabase integration (real card-data.json)", () => {
       "Umbra",
       "Rime",
       "Surge",
-      "Wild",
+      "Neutral",
     ]);
 
     for (const [cardNumber, card] of db) {

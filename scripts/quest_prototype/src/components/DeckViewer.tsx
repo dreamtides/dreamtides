@@ -13,8 +13,8 @@ import { logEvent } from "../logging";
 import { TRANSFIGURATION_COLORS } from "../transfiguration/transfiguration-logic";
 import { computeTideDistribution } from "./tide-distribution";
 
-/** All tides including Wild, used for filter toggles. */
-const ALL_TIDES: readonly Tide[] = [...NAMED_TIDES, "Wild"] as const;
+/** All tides including Neutral, used for filter toggles. */
+const ALL_TIDES: readonly Tide[] = [...NAMED_TIDES, "Neutral"] as const;
 
 /** Sort criteria options. */
 type SortCriteria =
@@ -45,7 +45,7 @@ const TIDE_ORDER: Readonly<Record<Tide, number>> = {
   Umbra: 4,
   Rime: 5,
   Surge: 6,
-  Wild: 7,
+  Neutral: 7,
 };
 
 /** A deck entry paired with its resolved card data. */

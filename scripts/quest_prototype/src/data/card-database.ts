@@ -1,10 +1,10 @@
 import type { CardData, Tide, Rarity } from "../types/cards";
 
-/** Gray circle SVG used as fallback icon for the Wild tide. */
-const WILD_TIDE_FALLBACK =
+/** Gray circle SVG used as fallback icon for the Neutral tide. */
+const NEUTRAL_TIDE_FALLBACK =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%239ca3af'/%3E%3C/svg%3E";
 
-/** The 7 named tides (excludes Wild), for iteration. */
+/** The 7 named tides (excludes Neutral), for iteration. */
 export const NAMED_TIDES: readonly Tide[] = [
   "Bloom",
   "Arc",
@@ -24,7 +24,7 @@ export const TIDE_COLORS: Readonly<Record<Tide, string>> = {
   Umbra: "#8b5cf6",
   Rime: "#3b82f6",
   Surge: "#06b6d4",
-  Wild: "#9ca3af",
+  Neutral: "#9ca3af",
 };
 
 /** Display color hex value for each rarity. */
@@ -40,10 +40,10 @@ export function cardImageUrl(cardNumber: number): string {
   return `/cards/${String(cardNumber)}.webp`;
 }
 
-/** Returns the URL path for a tide's icon. Wild returns an inline SVG fallback. */
+/** Returns the URL path for a tide's icon. Neutral returns an inline SVG fallback. */
 export function tideIconUrl(tide: Tide): string {
-  if (tide === "Wild") {
-    return WILD_TIDE_FALLBACK;
+  if (tide === "Neutral") {
+    return NEUTRAL_TIDE_FALLBACK;
   }
   return `/tides/${tide}.png`;
 }

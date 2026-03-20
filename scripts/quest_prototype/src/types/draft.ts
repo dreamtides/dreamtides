@@ -11,7 +11,7 @@ export interface DraftConfig {
   roundsPerPool: number;
   /** Number of picks per round (one per seat). */
   picksPerRound: number;
-  /** Number of tides in the fitness vector (excludes Wild). */
+  /** Number of tides in the fitness vector (excludes Neutral). */
   tideCount: number;
   /** Scoring weight for preference alignment. */
   preferenceWeight: number;

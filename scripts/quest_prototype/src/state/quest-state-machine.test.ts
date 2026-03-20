@@ -20,7 +20,7 @@ function createTestState(overrides: Partial<QuestState> = {}): QuestState {
       Umbra: 0,
       Rime: 0,
       Surge: 0,
-      Wild: 0,
+      Neutral: 0,
     },
     completionLevel: 0,
     atlas: { nodes: {}, edges: [], nexusId: "" },

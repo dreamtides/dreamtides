@@ -17,7 +17,7 @@ card-number = 1
 [[cards]]
 name = "Beacon of Tomorrow"
 id = "6d7969d2-9d18-4a38-8c26-c900aca5f1d4"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Discover a card with cost 2●."
 energy-cost = 2
@@ -138,7 +138,7 @@ card-number = 8
 [[cards]]
 name = "Synaptic Sentinel"
 id = "c9531521-b8ae-4ce0-8857-474e60aa814a"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Judgment: Foresee 1."
 energy-cost = 3
@@ -188,7 +188,7 @@ card-number = 11
 [[cards]]
 name = "Ethereal Trailblazer"
 id = "2c037f79-f049-4f19-b73a-50231ad7e751"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Judgment: Gain 1●."
 energy-cost = 0
@@ -204,7 +204,7 @@ card-number = 12
 [[cards]]
 name = "Glimpse of Infinity"
 id = "a23df796-03d2-4082-9c30-fe6958e65ffe"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = """
 Gain 3●.
@@ -222,7 +222,7 @@ card-number = 13
 [[cards]]
 name = "Unleash Ruin"
 id = "187870b3-165c-41ea-8126-abb096f5d6ab"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Dissolve an enemy. You lose 4⍏."
 energy-cost = 2
@@ -270,7 +270,7 @@ card-number = 16
 [[cards]]
 name = "Chronicle Reclaimer"
 id = "177f4f38-2265-459d-a0a5-db196f32c6e1"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = """
 ▸ Judgment: Draw a card, then discard a card.
@@ -288,7 +288,7 @@ card-number = 17
 [[cards]]
 name = "Apocalypse"
 id = "d122f4a5-c8a9-49bf-9c8a-a16b8d9567a6"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = """
 Dissolve all characters.
@@ -322,7 +322,7 @@ card-number = 19
 [[cards]]
 name = "The Calling Night"
 id = "be97e5e0-eebb-4b90-a676-fcf909b35600"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Judgment: Draw a card, then the opponent gains 2⍏."
 energy-cost = 2
@@ -390,7 +390,7 @@ card-number = 23
 [[cards]]
 name = "Immolate"
 id = "36c2a4e1-3212-4933-979a-73f109f9b256"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = """
 Dissolve an enemy.
@@ -623,7 +623,7 @@ card-number = 37
 [[cards]]
 name = "Veil Shatter"
 id = "4a4db2a7-0d00-4762-8dad-18648ddbc4fc"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Banish an enemy with cost 2● or less."
 energy-cost = 2
@@ -655,7 +655,7 @@ card-number = 39
 [[cards]]
 name = "Shatter the Frail"
 id = "56020364-cbe8-4500-900f-33510a95ff10"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Dissolve an enemy with spark 1 or less."
 energy-cost = 2
@@ -1086,7 +1086,7 @@ card-number = 65
 [[cards]]
 name = "Shattering Gambit"
 id = "754a3d7d-24e8-40e0-9ed8-f99672bc76eb"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Dissolve an enemy. The opponent gains 3⍏."
 energy-cost = 0
@@ -1240,7 +1240,7 @@ card-number = 74
 [[cards]]
 name = "Boundless Wanderer"
 id = "bd99da06-6591-4458-a4f6-d372a2def6bb"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = """
 Has all character types.
@@ -1441,7 +1441,7 @@ card-number = 86
 [[cards]]
 name = "Epiphany Unfolded"
 id = "84f1d31e-149f-4ab8-ac67-de35b0ad97a9"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Draw 3 cards."
 energy-cost = 1
@@ -1659,7 +1659,7 @@ card-number = 99
 [[cards]]
 name = "Moment Rewound"
 id = "214169c7-dc03-487f-bd85-d560f68031a1"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = """
 Take an extra turn after this one.
@@ -1811,7 +1811,7 @@ card-number = 108
 [[cards]]
 name = "Wheel of the Heavens"
 id = "4950a8cd-85d5-402a-8a2d-efdd250764b7"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Each player shuffles their hand and void into their deck and then draws 5 cards."
 energy-cost = 4
@@ -1877,7 +1877,7 @@ card-number = 112
 [[cards]]
 name = "Knowledge Restored"
 id = "ded25ef2-3c3f-4012-8717-8dec3def1854"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Draw 3 cards."
 energy-cost = 5
@@ -1893,7 +1893,7 @@ card-number = 113
 [[cards]]
 name = "Harvest the Forgotten"
 id = "540cd70f-4fc8-417b-ac0d-3b337bfe8f01"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = """
 Put the top 3 cards of your deck into your void. Draw a card.
@@ -1927,7 +1927,7 @@ card-number = 115
 [[cards]]
 name = "Door to Possibility"
 id = "2529d712-3e11-449e-a389-6dadd49cc145"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Discover an event."
 energy-cost = 2
@@ -2689,7 +2689,7 @@ card-number = 161
 [[cards]]
 name = "Scorched Reckoning"
 id = "2b0d4a5a-83f0-4cae-a7e3-aefbb595fd1d"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Dissolve an enemy with spark 3 or more."
 energy-cost = 2
@@ -2724,7 +2724,7 @@ card-number = 163
 [[cards]]
 name = "Burst of Obliteration"
 id = "f841dd11-102c-42b2-b85a-492930189fbd"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Pay 1 or more ●: Dissolve all characters with spark less than the amount of ● paid."
 energy-cost = 3
@@ -2905,7 +2905,7 @@ card-number = 174
 [[cards]]
 name = "Soulbinder"
 id = "ad04efcb-158b-4ac7-a48f-7d15d7e9daff"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Abandon an ally: Gain 1●."
 energy-cost = 3
@@ -3004,7 +3004,7 @@ card-number = 180
 [[cards]]
 name = "Avatar of Cosmic Reckoning"
 id = "0ebb38a7-5a30-40b3-b2f0-b6516a53303c"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "When an ally is ▸ Dissolved:, gain 1⍏."
 energy-cost = 6
@@ -3100,7 +3100,7 @@ card-number = 186
 [[cards]]
 name = "Exiles of the Last Light"
 id = "37c39729-f5f9-45ac-a01a-9f65c09c731c"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Abandon an ally: Kindle 1."
 energy-cost = 3
@@ -3116,7 +3116,7 @@ card-number = 187
 [[cards]]
 name = "Ruin Scavenger"
 id = "6a95e4f6-75c7-435b-ae21-35a01e58c0b1"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Judgment: You may banish a card from the opponent's void to gain 1●."
 energy-cost = 1
@@ -3185,7 +3185,7 @@ card-number = 191
 [[cards]]
 name = "Through the Rift"
 id = "437fc66b-c0eb-46fd-82fa-ebbb16939e66"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Discover a Survivor."
 energy-cost = 1
@@ -3477,7 +3477,7 @@ card-number = 209
 [[cards]]
 name = "Rite of Summoning"
 id = "f35d60ff-da13-4abb-87ab-5fd27874e9bf"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = """
 Discover a character with an activated ability.
@@ -3562,7 +3562,7 @@ card-number = 214
 [[cards]]
 name = "Dreamscatter"
 id = "a6e8e100-9aa6-4a53-82ec-4ab161829533"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Pay 1 or more ●: Draw a card for each ● spent."
 energy-cost = 2
@@ -3578,7 +3578,7 @@ card-number = 215
 [[cards]]
 name = "Minstrel of Falling Light"
 id = "7285732f-7460-4544-8c74-9300a078a337"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "3●: Draw a card."
 energy-cost = 2
@@ -3817,7 +3817,7 @@ card-number = 229
 [[cards]]
 name = "Skyborn Citadel"
 id = "af53173c-e091-4064-a7a7-854cecfe4820"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 2
 rendered-text = """
 ▸ Materialized: Banish an enemy until this character leaves play.
@@ -3852,7 +3852,7 @@ card-number = 231
 [[cards]]
 name = "Stairway Stargazer"
 id = "a370f303-8fe2-4748-9b0b-f24fcde9b1a9"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Judgment: You may pay 2● to draw a card."
 energy-cost = 1
@@ -4023,7 +4023,7 @@ card-number = 241
 [[cards]]
 name = "Boxbound Wanderer"
 id = "987aaa03-962d-4549-8149-8dbeccfc9911"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = """
 Characters cost you 1● less.
@@ -4268,7 +4268,7 @@ card-number = 257
 [[cards]]
 name = "Luminous Cocoon"
 id = "3df2dd36-dd51-4355-87f2-b5ae197bb4dc"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = """
 Reclaim a character with cost 3● or less.
@@ -4399,7 +4399,7 @@ card-number = 265
 [[cards]]
 name = "Birdcaller in Radiance"
 id = "f04e32b3-d897-4c24-9999-3f0557482ba1"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Judgment: Draw a card."
 energy-cost = 3
@@ -4450,7 +4450,7 @@ card-number = 268
 [[cards]]
 name = "Defiance of Steel"
 id = "8751e259-6e46-4b1d-a6a0-0df5421e1054"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Foresee 3. Draw a card."
 energy-cost = 2
@@ -4466,7 +4466,7 @@ card-number = 269
 [[cards]]
 name = "Blade of Ascension"
 id = "37711e14-b1b6-47e4-8f40-4293c1a49429"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Draw a card. Foresee 2."
 energy-cost = 1
@@ -5053,7 +5053,7 @@ card-number = 305
 [[cards]]
 name = "Desperate Retreat"
 id = "102c3047-58d9-4b2b-bea9-10739e84b9cd"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Dissolve an enemy with spark 3 or less."
 energy-cost = 1
@@ -5069,7 +5069,7 @@ card-number = 306
 [[cards]]
 name = "Rooftop Reckoning"
 id = "528ac63c-9928-4c8e-bfea-610b33c8b0d7"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = """
 Dissolve all enemies with spark 2 or less.
@@ -5850,7 +5850,7 @@ card-number = 362
 [[cards]]
 name = "Twilight Offering"
 id = "4b39e1f0-418d-45f7-923d-3ea629e55e11"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Dissolve up to 2 enemies. Materialize a Shadow Figment for each enemy dissolved."
 energy-cost = 4
@@ -5978,7 +5978,7 @@ card-number = 370
 [[cards]]
 name = "Cloaked Inferno"
 id = "c5785c16-b3bf-4b85-af06-5b719c6d9891"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Choose a number: Dissolve all enemies with cost equal to that number."
 energy-cost = 3
@@ -5994,7 +5994,7 @@ card-number = 372
 [[cards]]
 name = "Luminous Release"
 id = "57e41821-b153-4a0a-9b25-3c77e773fede"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Gain 1●."
 energy-cost = 0
@@ -6226,7 +6226,7 @@ card-number = 389
 [[cards]]
 name = "Forgotten Engine"
 id = "9e29bb8c-2faf-4964-be86-006883c8d539"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = """
 Dissolve an enemy with cost 3● or less.
@@ -6277,7 +6277,7 @@ card-number = 392
 [[cards]]
 name = "Rift Torchbearer"
 id = "e2a9fa5d-20c8-4aee-992c-d956e18c1e41"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Materialized: Discover a card with cost 2● or less and play it for 0●."
 energy-cost = 3
@@ -6392,7 +6392,7 @@ card-number = 401
 [[cards]]
 name = "Titan's Bannered Charge"
 id = "ac839892-f6bc-44c3-8306-a7f02db08679"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Materialized: Dissolve an enemy."
 energy-cost = 4
@@ -6427,7 +6427,7 @@ card-number = 403
 [[cards]]
 name = "Masked Threshold Guardian"
 id = "cc30f664-bf0a-48ea-9b91-6308b442fdec"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Judgment: You may pay 2● to return a character from your void to your hand."
 energy-cost = 1
@@ -6443,7 +6443,7 @@ card-number = 404
 [[cards]]
 name = "Engine Light Dreamer"
 id = "12bdc762-59ec-481a-9936-8c5327ae7c09"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 2
 rendered-text = "Materialize 3 random characters from your deck with total cost 6● or less."
 energy-cost = 7
@@ -6521,7 +6521,7 @@ card-number = 411
 [[cards]]
 name = "Crimson Dune Ascent"
 id = "47c59376-dc4b-46d7-ba97-44db55e9d523"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Judgment: Dissolve an enemy or ally among those with the lowest spark."
 energy-cost = 3
@@ -6537,7 +6537,7 @@ card-number = 412
 [[cards]]
 name = "Ruinwalker Sentinel"
 id = "fa780152-23dd-4138-8ff7-3083e46fc2bb"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "3●: Until end of turn, this character becomes a copy of an ally or enemy."
 energy-cost = 4
@@ -6585,7 +6585,7 @@ card-number = 415
 [[cards]]
 name = "Riverside Oracle"
 id = "6c44da89-75f8-48a7-a1be-d4a6cc3fd66e"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Judgment: Foresee 3. You may put a found character into your hand."
 energy-cost = 4
@@ -6700,7 +6700,7 @@ card-number = 422
 [[cards]]
 name = "Golden Light Automaton"
 id = "72d3cda9-1140-4427-8e16-093226f7ac1b"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Judgment: You may pay 1● to trigger the ▸ Judgment: ability of an ally."
 energy-cost = 2
@@ -6864,7 +6864,7 @@ card-number = 433
 [[cards]]
 name = "Enchanted Mire"
 id = "ecd53ca5-f250-4402-a686-c51148e1e3b8"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Return an enemy character to the top or bottom of its owner's deck."
 energy-cost = 3
@@ -6880,7 +6880,7 @@ card-number = 434
 [[cards]]
 name = "Cloudborne Vigil"
 id = "aa399f47-2025-4539-ac69-a6bca90e2786"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Each player abandons characters until they have as many as the player with fewest."
 energy-cost = 4
@@ -6896,7 +6896,7 @@ card-number = 435
 [[cards]]
 name = "Alien Hatching"
 id = "27474cc8-5c37-453e-aa2d-b03e1931a74b"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 2
 rendered-text = "Banish all characters. For each of your characters banished this way, materialize a Radiant figment."
 energy-cost = 7
@@ -6912,7 +6912,7 @@ card-number = 436
 [[cards]]
 name = "Fallen Moon's Reflection"
 id = "063190f6-7723-44f3-bdb4-59f4037faea3"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Dissolve all characters. Gain 1● for each of your characters dissolved this way."
 energy-cost = 6
@@ -6960,7 +6960,7 @@ card-number = 439
 [[cards]]
 name = "Ruins of Tomorrow"
 id = "eef822ee-7226-4b70-85ce-d0d61780e186"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Judgment: You may pay 2● to foresee 2 and draw a card."
 energy-cost = 3
@@ -7027,7 +7027,7 @@ card-number = 443
 [[cards]]
 name = "Cloudborne Voyage"
 id = "e0889e66-ab8c-4851-a909-b2bf9fc8ae55"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Foresee X, where X is your current energy. Draw a card."
 energy-cost = 2
@@ -7059,7 +7059,7 @@ card-number = 445
 [[cards]]
 name = "Autumn Morning Path"
 id = "c589cabf-bc08-4527-9ab8-d9d9a622ad8c"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Foresee 5. Draw 2 cards."
 energy-cost = 3
@@ -7075,7 +7075,7 @@ card-number = 446
 [[cards]]
 name = "Autumn Bicycle Reverie"
 id = "17c95d25-fdc4-477c-ac98-92b2b2c1829b"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Return all characters to their owners' hands."
 energy-cost = 6
@@ -7139,7 +7139,7 @@ card-number = 450
 [[cards]]
 name = "Eclipse Citadel Warden"
 id = "05b4c64a-8eb3-4a09-a37f-5c205d734850"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = """
 ▸ Materialized: Each enemy loses 2 spark.
@@ -7191,7 +7191,7 @@ card-number = 453
 [[cards]]
 name = "Skystone Wanderer"
 id = "2eefb602-7236-4256-b2c8-5be725c0c2a0"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "8●: Draw 8 cards."
 energy-cost = 8
@@ -7389,7 +7389,7 @@ card-number = 465
 [[cards]]
 name = "Twilight Market Sovereign"
 id = "b4877df2-cbc8-41ea-b021-c778b0c3c55a"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 2
 rendered-text = "▸ Materialized: Draw an event from the opponent's deck, then play it for 0●."
 energy-cost = 4
@@ -7405,7 +7405,7 @@ card-number = 466
 [[cards]]
 name = "Portal Gazing Astronaut"
 id = "6a23256e-8dff-4b37-a8bd-6e6b744c74a9"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Materialized: Dissolve an enemy with spark 2 or less."
 energy-cost = 1
@@ -7554,7 +7554,7 @@ card-number = 475
 [[cards]]
 name = "Crimson Planet City"
 id = "c8554288-6676-4738-a27e-d58180d5d4db"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Materialized: Draw a card. ▸ Dissolved: Discover a character with cost 3● or less."
 energy-cost = 5
@@ -7634,7 +7634,7 @@ card-number = 480
 [[cards]]
 name = "Wanderer Beyond Smoke"
 id = "5f0cd400-31d7-4321-aae2-dd970758c99a"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 2
 rendered-text = "When you play this character from hand, take an extra turn after this one."
 energy-cost = 13
@@ -7714,7 +7714,7 @@ card-number = 485
 [[cards]]
 name = "Starbound Embrace"
 id = "396882b8-7e8c-4759-8b56-d3e15de8f07e"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Choose one: Draw 2 cards or Dissolve an enemy with spark 3 or less."
 energy-cost = 4
@@ -7778,7 +7778,7 @@ card-number = 489
 [[cards]]
 name = "Crimson Portal Rite"
 id = "3d9919e3-de73-43a9-9168-573be50a7479"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Banish an enemy. Materialize a copy of it."
 energy-cost = 6
@@ -7910,7 +7910,7 @@ card-number = 497
 [[cards]]
 name = "Ruins and Hound"
 id = "97eaacbe-bd52-4ef1-b7d2-b553a06db48b"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 2
 rendered-text = "▸ Materialized: Gain 3●. Draw 3 cards. Dissolve an enemy with spark 2 or less."
 energy-cost = 10
@@ -7942,7 +7942,7 @@ card-number = 499
 [[cards]]
 name = "Sunset Shore Wanderer"
 id = "0fc24a42-0ab3-4da0-a6bf-ff0a18203f35"
-tide = "Wild"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Materialized: Draw a character and an event from your deck."
 energy-cost = 7
@@ -8036,7 +8036,7 @@ colors = ["#E8D0F0", "#D0E4F5", "#D5F0D0", "#F5D0D0", "#F5EED0"]
 [[metadata.validation_rules]]
 column = "tide"
 type = "enum"
-enum = ["Wild", "Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge"]
+enum = ["Neutral", "Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge"]
 colors = ["#A0784C", "#A8DDA8", "#F0E88A", "#F0A0A0", "#F5B870", "#CDA8F0", "#8AE0E0", "#D0D0D0"]
 
 [[metadata.validation_rules]]

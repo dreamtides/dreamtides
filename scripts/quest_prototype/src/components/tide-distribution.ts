@@ -2,8 +2,8 @@ import type { CardData, Tide } from "../types/cards";
 import type { DeckEntry } from "../types/quest";
 import { NAMED_TIDES } from "../data/card-database";
 
-/** All tides including Wild, used for distribution computation. */
-const ALL_TIDES: readonly Tide[] = [...NAMED_TIDES, "Wild"] as const;
+/** All tides including Neutral, used for distribution computation. */
+const ALL_TIDES: readonly Tide[] = [...NAMED_TIDES, "Neutral"] as const;
 
 /** A single tide's distribution entry. */
 export interface TideDistributionEntry {
