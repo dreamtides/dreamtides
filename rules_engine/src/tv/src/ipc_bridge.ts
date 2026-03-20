@@ -765,6 +765,22 @@ export async function setDerivedColumnWidth(
   });
 }
 
+// ============ Statistics Commands ============
+
+export type StatisticType = "value_counts";
+
+export interface StatisticConfig {
+  column: string;
+  label: string;
+  statistic_type: StatisticType;
+}
+
+export async function getStatisticsConfig(
+  filePath: string,
+): Promise<StatisticConfig[]> {
+  return invoke<StatisticConfig[]>("get_statistics_config", { filePath });
+}
+
 // ============ Validation Commands ============
 
 export interface EnumValidationInfo {
@@ -859,6 +875,7 @@ export async function logPerf(entry: FrontendPerfLogEntry): Promise<void> {
 
 export interface ViewState {
   active_sheet_path: string | null;
+  statistics_visible: boolean;
 }
 
 export async function loadViewState(): Promise<ViewState> {
@@ -867,8 +884,9 @@ export async function loadViewState(): Promise<ViewState> {
 
 export async function saveViewState(
   activeSheetPath: string | null,
+  statisticsVisible?: boolean,
 ): Promise<void> {
-  return invoke("save_view_state", { activeSheetPath });
+  return invoke("save_view_state", { activeSheetPath, statisticsVisible: statisticsVisible ?? null });
 }
 
 // ============ Permission Commands ============
@@ -1000,3 +1018,6 @@ export const onAutosaveDisabledChanged =
 
 export const onOpenFindDialog =
   createVoidEventListener("open-find-dialog");
+
+export const onStatisticsOverlayToggled =
+  createEventListener<boolean>("statistics-overlay-toggled");

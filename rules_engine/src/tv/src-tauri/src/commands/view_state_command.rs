@@ -11,6 +11,16 @@ pub fn load_view_state(state: State<AppPaths>) -> ViewState {
 
 /// Saves the current view state to disk.
 #[tauri::command]
-pub fn save_view_state(state: State<AppPaths>, active_sheet_path: Option<String>) {
-    view_state_types::save_view_state(&state, &ViewState { active_sheet_path });
+pub fn save_view_state(
+    state: State<AppPaths>,
+    active_sheet_path: Option<String>,
+    statistics_visible: Option<bool>,
+) {
+    view_state_types::save_view_state(
+        &state,
+        &ViewState {
+            active_sheet_path,
+            statistics_visible: statistics_visible.unwrap_or(false),
+        },
+    );
 }

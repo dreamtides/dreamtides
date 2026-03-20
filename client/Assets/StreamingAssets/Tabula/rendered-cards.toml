@@ -8097,3 +8097,8 @@ width = 125
 [[metadata.columns]]
 key = "is-fast"
 width = 80
+
+[[metadata.statistics]]
+column = "tide"
+label = "Tide Distribution"
+statistic_type = "value_counts"

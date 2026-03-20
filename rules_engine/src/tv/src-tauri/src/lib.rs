@@ -119,6 +119,14 @@ pub fn run(paths: cli::AppPaths) {
                 false,
                 None::<&str>,
             )?;
+            let show_statistics = CheckMenuItem::with_id(
+                app_handle,
+                "show_statistics",
+                "Show Statistics",
+                true,
+                false,
+                None::<&str>,
+            )?;
             for item in menu.items()? {
                 if let MenuItemKind::Submenu(ref submenu) = item {
                     let text = submenu.text().unwrap_or_default();
@@ -127,6 +135,7 @@ pub fn run(paths: cli::AppPaths) {
                     } else if text == "View" {
                         submenu.append(&dev_tools)?;
                         submenu.append(&disable_autosave)?;
+                        submenu.append(&show_statistics)?;
                     }
                 }
             }
@@ -144,6 +153,26 @@ pub fn run(paths: cli::AppPaths) {
             } else if event.id() == "dev_tools" {
                 if let Some(window) = app_handle.get_webview_window("main") {
                     window.open_devtools();
+                }
+            } else if event.id() == "show_statistics" {
+                if let Some(window) = app_handle.get_webview_window("main") {
+                    if let Some(menu) = window.menu() {
+                        if let Some(MenuItemKind::Check(check_item)) = menu.get("show_statistics") {
+                            let visible = check_item.is_checked().unwrap_or(false);
+                            tracing::info!(
+                                component = "tv.menu",
+                                statistics_visible = visible,
+                                "Statistics overlay toggled"
+                            );
+                            if let Err(e) = app_handle.emit("statistics-overlay-toggled", visible) {
+                                tracing::error!(
+                                    component = "tv.menu",
+                                    error = %e,
+                                    "Failed to emit statistics-overlay-toggled event"
+                                );
+                            }
+                        }
+                    }
                 }
             } else if event.id() == "disable_autosave" {
                 // CheckMenuItem automatically toggles its checked state on click.
@@ -225,6 +254,7 @@ pub fn run(paths: cli::AppPaths) {
             commands::permission_command::retry_pending_updates,
             commands::permission_command::check_permission_state,
             commands::permission_command::clear_permission_state,
+            commands::statistics_command::get_statistics_config,
             get_app_paths,
         ])
         .setup(|app| {

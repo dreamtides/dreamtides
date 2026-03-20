@@ -9,6 +9,7 @@ pub mod row_command;
 pub mod save_command;
 pub mod sheet_order_command;
 pub mod sort_command;
+pub mod statistics_command;
 pub mod style_command;
 pub mod validation_command;
 pub mod view_state_command;

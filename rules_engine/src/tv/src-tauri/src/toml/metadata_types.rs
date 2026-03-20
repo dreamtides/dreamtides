@@ -59,6 +59,10 @@ pub struct Metadata {
     /// Application settings stored with the file.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub app_settings: Option<AppSettings>,
+
+    /// Statistics overlay configurations.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub statistics: Vec<StatisticConfig>,
 }
 
 impl Metadata {
@@ -553,4 +557,26 @@ impl ScrollPosition {
     pub fn new(row: usize, column: usize) -> Self {
         Self { row, column }
     }
+}
+
+/// Configuration for a statistics overlay panel.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct StatisticConfig {
+    /// Column to compute statistics for.
+    pub column: String,
+
+    /// Display label for the statistic.
+    pub label: String,
+
+    /// Type of statistic to compute.
+    #[serde(default)]
+    pub statistic_type: StatisticType,
+}
+
+/// Type of statistic computation.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Default)]
+#[serde(rename_all = "snake_case")]
+pub enum StatisticType {
+    #[default]
+    ValueCounts,
 }

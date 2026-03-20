@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SpreadsheetView } from "./spreadsheet_view";
 import { ErrorBanner } from "./error_banner";
 import { StatusIndicator } from "./status_indicator";
+import { StatisticsOverlay } from "./statistics_overlay";
+import type { StatisticResult } from "./statistics_overlay";
 import * as ipc from "./ipc_bridge";
-import type { TomlTableData, DerivedValuePayload, RowConfig, ColumnConfig, PermissionState, PermissionStateChangedPayload } from "./ipc_bridge";
+import type { TomlTableData, DerivedValuePayload, RowConfig, ColumnConfig, PermissionState, PermissionStateChangedPayload, StatisticConfig, EnumValidationInfo } from "./ipc_bridge";
 import type { MultiSheetData, SheetData, DerivedColumnState } from "./spreadsheet_types";
 import { createLogger } from "./logger_frontend";
 
@@ -133,6 +135,9 @@ export function AppRoot() {
   const [persistedSheetOrder, setPersistedSheetOrder] = useState<string[] | undefined>(undefined);
   const [_permissionStates, setPermissionStates] = useState<Record<string, PermissionState>>({});
   const [permissionError, setPermissionError] = useState<string | null>(null);
+  const [statisticsVisible, setStatisticsVisible] = useState(false);
+  const [statisticsConfigs, setStatisticsConfigs] = useState<Record<string, StatisticConfig[]>>({});
+  const [enumValidationRules, setEnumValidationRules] = useState<Record<string, EnumValidationInfo[]>>({});
   const saveTimeoutRef = useRef<number | null>(null);
   const isSavingRef = useRef<Record<string, boolean>>({});
   const watchersStartedRef = useRef<Set<string>>(new Set());
@@ -145,6 +150,8 @@ export function AppRoot() {
   activeSheetIdRef.current = activeSheetId;
   // When true, changes apply only in the UI layer and are not persisted to TOML files
   const autoSaveDisabledRef = useRef(false);
+  const statisticsVisibleRef = useRef(false);
+  statisticsVisibleRef.current = statisticsVisible;
 
   const loadSingleFile = useCallback(async (path: string, tableName: string): Promise<TomlTableData | null> => {
     try {
@@ -238,6 +245,8 @@ export function AppRoot() {
     const allDerivedConfigs: Record<string, ipc.DerivedColumnInfo[]> = {};
     const allRowConfigs: Record<string, RowConfig> = {};
     const allColumnConfigs: Record<string, ColumnConfig[]> = {};
+    const allStatisticsConfigs: Record<string, StatisticConfig[]> = {};
+    const allEnumRules: Record<string, EnumValidationInfo[]> = {};
     await Promise.all(
       validSheets.map(async (sheet) => {
         try {
@@ -264,6 +273,22 @@ export function AppRoot() {
         } catch (e) {
           logger.error("Failed to load column configs", { path: sheet.path, error: String(e) });
         }
+        try {
+          const statConfigs = await ipc.getStatisticsConfig(sheet.path);
+          if (statConfigs.length > 0) {
+            allStatisticsConfigs[sheet.id] = statConfigs;
+          }
+        } catch (e) {
+          logger.error("Failed to load statistics config", { path: sheet.path, error: String(e) });
+        }
+        try {
+          const enumRules = await ipc.getEnumValidationRules(sheet.path);
+          if (enumRules.length > 0) {
+            allEnumRules[sheet.id] = enumRules;
+          }
+        } catch (e) {
+          logger.error("Failed to load enum validation rules", { path: sheet.path, error: String(e) });
+        }
       })
     );
 
@@ -280,6 +305,12 @@ export function AppRoot() {
     }
     if (Object.keys(allColumnConfigs).length > 0) {
       setColumnConfigs((prev) => ({ ...prev, ...allColumnConfigs }));
+    }
+    if (Object.keys(allStatisticsConfigs).length > 0) {
+      setStatisticsConfigs((prev) => ({ ...prev, ...allStatisticsConfigs }));
+    }
+    if (Object.keys(allEnumRules).length > 0) {
+      setEnumValidationRules((prev) => ({ ...prev, ...allEnumRules }));
     }
 
     setMultiSheetData({ sheets: validSheets });
@@ -564,7 +595,7 @@ export function AppRoot() {
     setActiveSheetId(sheetId);
     const sheetInfo = sheets.find((s) => s.id === sheetId);
     if (sheetInfo) {
-      ipc.saveViewState(sheetInfo.path).catch((e) =>
+      ipc.saveViewState(sheetInfo.path, statisticsVisibleRef.current).catch((e) =>
         logger.error("Failed to save view state", { error: String(e) })
       );
     }
@@ -603,6 +634,9 @@ export function AppRoot() {
             if (match) {
               restoredSheetId = match.id;
             }
+          }
+          if (viewState.statistics_visible) {
+            setStatisticsVisible(true);
           }
         } catch (e) {
           logger.error("Failed to load view state", { error: String(e) });
@@ -791,6 +825,21 @@ export function AppRoot() {
   }, []);
 
   useEffect(() => {
+    const statisticsSub = ipc.onStatisticsOverlayToggled((visible) => {
+      setStatisticsVisible(visible);
+      const sheetInfo = activeSheetIdRef.current
+        ? sheets.find((s) => s.id === activeSheetIdRef.current)
+        : undefined;
+      ipc.saveViewState(sheetInfo?.path ?? null, visible).catch((e) =>
+        logger.error("Failed to save view state", { error: String(e) })
+      );
+    });
+    return () => {
+      statisticsSub.dispose();
+    };
+  }, [sheets]);
+
+  useEffect(() => {
     return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
@@ -826,6 +875,55 @@ export function AppRoot() {
     }
     setPermissionError(null);
   }, [sheets, reloadSheet]);
+
+  const statisticResults: StatisticResult[] = useMemo(() => {
+    if (!statisticsVisible || !activeSheetId || !multiSheetData) return [];
+    const configs = statisticsConfigs[activeSheetId];
+    if (!configs || configs.length === 0) return [];
+
+    const activeSheet = multiSheetData.sheets.find((s) => s.id === activeSheetId);
+    if (!activeSheet) return [];
+
+    const enumRules = enumValidationRules[activeSheetId] ?? [];
+
+    return configs.map((config) => {
+      const colIndex = activeSheet.data.headers.indexOf(config.column);
+      if (colIndex === -1) {
+        return { label: config.label, counts: [], total: 0 };
+      }
+
+      const valueCounts = new Map<string, number>();
+      for (const row of activeSheet.data.rows) {
+        const cellValue = row[colIndex];
+        const key = cellValue != null ? String(cellValue) : "";
+        valueCounts.set(key, (valueCounts.get(key) ?? 0) + 1);
+      }
+
+      const enumRule = enumRules.find((r) => r.column === config.column);
+      const colorMap = new Map<string, string>();
+      if (enumRule?.colors) {
+        for (let i = 0; i < enumRule.allowed_values.length; i++) {
+          if (i < enumRule.colors.length) {
+            colorMap.set(enumRule.allowed_values[i], enumRule.colors[i]);
+          }
+        }
+      }
+
+      const counts = Array.from(valueCounts.entries())
+        .sort((a, b) => b[1] - a[1])
+        .map(([value, count]) => ({
+          value,
+          count,
+          color: colorMap.get(value),
+        }));
+
+      return {
+        label: config.label,
+        counts,
+        total: activeSheet.data.rows.length,
+      };
+    });
+  }, [statisticsVisible, activeSheetId, multiSheetData, statisticsConfigs, enumValidationRules]);
 
   const hasPermissionError = permissionError !== null;
   const hasError = error !== null || hasPermissionError;
@@ -863,6 +961,7 @@ export function AppRoot() {
           persistedSheetOrder={persistedSheetOrder}
         />
       </div>
+      <StatisticsOverlay visible={statisticsVisible} results={statisticResults} />
       <StatusIndicator />
     </div>
   );

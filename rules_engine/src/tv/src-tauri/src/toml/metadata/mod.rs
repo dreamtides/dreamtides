@@ -5,6 +5,7 @@ pub mod formatting_parser;
 pub mod helpers;
 pub mod row_parser;
 pub mod sort_parser;
+pub mod statistics_parser;
 pub mod style_parser;
 pub mod validation_parser;
 
@@ -28,6 +29,9 @@ pub use row_parser::{
 };
 pub use sort_parser::{
     parse_sort_config_from_content, parse_sort_config_from_file, parse_sort_config_with_fs,
+};
+pub use statistics_parser::{
+    parse_statistics_from_content, parse_statistics_from_file, parse_statistics_with_fs,
 };
 pub use style_parser::{
     parse_table_style_from_content, parse_table_style_from_file, parse_table_style_with_fs,

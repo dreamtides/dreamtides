@@ -9,6 +9,9 @@ const VIEW_STATE_FILENAME: &str = ".tv_view_state.json";
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ViewState {
     pub active_sheet_path: Option<String>,
+
+    #[serde(default)]
+    pub statistics_visible: bool,
 }
 
 /// Derives the `.tv_view_state.json` path from the parent directory of the
