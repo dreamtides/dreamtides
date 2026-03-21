@@ -441,7 +441,6 @@ namespace Dreamtides.Services
       }
     }
 
-    [SerializeField]
     T Check<T>(T? value)
       where T : Object => Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
 
