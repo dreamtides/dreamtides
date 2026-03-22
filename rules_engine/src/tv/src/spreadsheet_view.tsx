@@ -7,6 +7,7 @@ interface SpreadsheetViewProps {
   error: string | null;
   loading: boolean;
   onChange: (data: TomlTableData, sheetId: string) => void;
+  onDeleteRow?: (sheetId: string, displayRowIndex: number) => void;
   onActiveSheetChanged?: (sheetId: string) => void;
   onSheetOrderChanged?: (sheetNames: string[]) => void;
   derivedColumnState?: DerivedColumnState;
@@ -21,6 +22,7 @@ export function SpreadsheetView({
   error,
   loading,
   onChange,
+  onDeleteRow,
   onActiveSheetChanged,
   onSheetOrderChanged,
   derivedColumnState,
@@ -43,6 +45,7 @@ export function SpreadsheetView({
         height="100%"
         multiSheetData={multiSheetData ?? undefined}
         onChange={onChange}
+        onDeleteRow={onDeleteRow}
         onActiveSheetChanged={onActiveSheetChanged}
         onSheetOrderChanged={onSheetOrderChanged}
         derivedColumnState={derivedColumnState}

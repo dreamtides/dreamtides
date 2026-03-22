@@ -62,6 +62,7 @@ export const UniverSpreadsheet = forwardRef<
     data,
     multiSheetData,
     onChange,
+    onDeleteRow,
     onActiveSheetChanged,
     onSheetOrderChanged,
     derivedColumnState,
@@ -80,6 +81,7 @@ export const UniverSpreadsheet = forwardRef<
   // Legacy single-sheet headers (for backward compatibility)
   const headersRef = useRef<string[]>([]);
   const onChangeRef = useRef(onChange);
+  const onDeleteRowRef = useRef(onDeleteRow);
   const onActiveSheetChangedRef = useRef(onActiveSheetChanged);
   const onSheetOrderChangedRef = useRef(onSheetOrderChanged);
   const isLoadingRef = useRef(false);
@@ -117,6 +119,8 @@ export const UniverSpreadsheet = forwardRef<
     new Map(),
   );
   const sortPendingRef = useRef(false);
+  // Capture the visual row index of a pending row deletion
+  const pendingDeleteRowRef = useRef<number | null>(null);
   // Tracks the last derivedColumnState.values that were applied to cells,
   // so the useEffect can skip re-applying unchanged values.
   const lastAppliedDerivedValuesRef = useRef<
@@ -124,6 +128,7 @@ export const UniverSpreadsheet = forwardRef<
   >({});
 
   onChangeRef.current = onChange;
+  onDeleteRowRef.current = onDeleteRow;
   onActiveSheetChangedRef.current = onActiveSheetChanged;
   onSheetOrderChangedRef.current = onSheetOrderChanged;
 
@@ -736,14 +741,62 @@ export const UniverSpreadsheet = forwardRef<
       logger.debug("Workbook initialized in single-sheet mode");
     }
 
+    // Capture the visual row index before a row removal command executes.
+    // The remove-row mutation params contain the row index in a range object.
+    instance.univerAPI.onBeforeCommandExecute((command) => {
+      if (
+        command.id === "sheet.command.remove-row" ||
+        command.id === "sheet.command.remove-row-confirm"
+      ) {
+        const activeSheet = instance.univerAPI
+          .getActiveWorkbook()
+          ?.getActiveSheet();
+        if (activeSheet) {
+          const selection = activeSheet.getSelection();
+          const range = selection?.getActiveRange();
+          if (range) {
+            // Row index in the grid is 0-based; row 0 is the header row,
+            // so data rows start at 1. Store as 0-based data row index.
+            const visualRow = range.getRow() - 1;
+            pendingDeleteRowRef.current = visualRow;
+            logger.debug("Captured pending row deletion", {
+              visualRow,
+              gridRow: range.getRow(),
+            });
+          }
+        }
+      }
+    });
+
     // Listen for cell value changes and row removal
     instance.univerAPI.onCommandExecuted((command) => {
       if (isLoadingRef.current) return;
+
+      // Handle row removal separately via the dedicated onDeleteRow callback
       if (
-        command.id === "sheet.mutation.set-range-values" ||
-        command.id === "sheet.command.set-range-values" ||
         command.id === "sheet.mutation.remove-rows" ||
         command.id === "sheet.command.remove-row"
+      ) {
+        const deletedRow = pendingDeleteRowRef.current;
+        pendingDeleteRowRef.current = null;
+
+        if (deletedRow !== null && deletedRow >= 0 && onDeleteRowRef.current) {
+          const activeSheet = instance.univerAPI
+            .getActiveWorkbook()
+            ?.getActiveSheet();
+          const sheetId = activeSheet?.getSheetId() ?? "";
+          logger.info("Row deleted, calling onDeleteRow", {
+            sheetId,
+            displayRowIndex: deletedRow,
+          });
+          onDeleteRowRef.current(sheetId, deletedRow);
+        }
+        return;
+      }
+
+      if (
+        command.id === "sheet.mutation.set-range-values" ||
+        command.id === "sheet.command.set-range-values"
       ) {
         const perfTimer = logger.startPerfTimer("onCommandExecuted", {
           commandId: command.id,

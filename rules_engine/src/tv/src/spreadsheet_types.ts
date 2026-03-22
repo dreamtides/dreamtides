@@ -81,6 +81,8 @@ export interface UniverSpreadsheetProps {
   multiSheetData?: MultiSheetData;
   /** Called when cell data changes in any sheet */
   onChange?: (data: TomlTableData, sheetId: string) => void;
+  /** Called when a row is deleted via context menu. Receives the visual row index (0-based data row). */
+  onDeleteRow?: (sheetId: string, displayRowIndex: number) => void;
   /** Called when the active sheet changes */
   onActiveSheetChanged?: (sheetId: string) => void;
   /** Called when the user reorders sheet tabs via drag */

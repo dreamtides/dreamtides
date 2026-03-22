@@ -593,6 +593,44 @@ export function AppRoot() {
     [saveData]
   );
 
+  const handleDeleteRow = useCallback(
+    (sheetId: string, displayRowIndex: number) => {
+      const sheetInfo = sheets.find((s) => s.id === sheetId);
+      if (!sheetInfo) return;
+
+      const doDelete = async () => {
+        try {
+          // Translate display row index to TOML row index via sort mapping
+          let tomlRowIndex = displayRowIndex;
+          try {
+            const mapping = await ipc.getSortRowMapping(sheetInfo.path, sheetInfo.tableName);
+            if (mapping.length > 0 && displayRowIndex < mapping.length) {
+              tomlRowIndex = mapping[displayRowIndex];
+            }
+          } catch {
+            // No active sort — display index equals TOML index
+          }
+
+          logger.info("Deleting row", {
+            sheetId,
+            displayRowIndex,
+            tomlRowIndex,
+            path: sheetInfo.path,
+          });
+
+          await ipc.deleteRow(sheetInfo.path, sheetInfo.tableName, tomlRowIndex);
+          await reloadSheet(sheetId);
+        } catch (e) {
+          logger.error("Failed to delete row", { error: String(e) });
+          setError(`Failed to delete row: ${String(e)}`);
+        }
+      };
+
+      void doDelete();
+    },
+    [sheets, reloadSheet],
+  );
+
   const handleActiveSheetChanged = useCallback((sheetId: string) => {
     setActiveSheetId(sheetId);
     const sheetInfo = sheets.find((s) => s.id === sheetId);
@@ -958,6 +996,7 @@ export function AppRoot() {
           error={null}
           loading={loading}
           onChange={handleChange}
+          onDeleteRow={handleDeleteRow}
           onActiveSheetChanged={handleActiveSheetChanged}
           onSheetOrderChanged={handleSheetOrderChanged}
           derivedColumnState={derivedColumnState}

@@ -7,7 +7,8 @@ use crate::error::permission_recovery::{self, PermissionState};
 use crate::sync::state_machine;
 use crate::toml::document_loader::TomlTableData;
 use crate::toml::document_writer::{
-    self, AddRowResult, CellUpdate, SaveBatchResult, SaveCellResult, SaveTableResult,
+    self, AddRowResult, CellUpdate, DeleteRowResult, SaveBatchResult, SaveCellResult,
+    SaveTableResult,
 };
 use crate::traits::TvConfig;
 
@@ -157,6 +158,22 @@ pub fn add_row(
     state_machine::begin_save(&app_handle, &file_path)?;
 
     let result = document_writer::add_row(&TvConfig::default(), &file_path, &table_name, position, initial_values);
+    let _ = state_machine::end_save(&app_handle, &file_path, result.is_ok());
+
+    result
+}
+
+/// Tauri command to delete a row from the TOML array-of-tables.
+#[tauri::command]
+pub fn delete_row(
+    app_handle: AppHandle,
+    file_path: String,
+    table_name: String,
+    row_index: usize,
+) -> Result<DeleteRowResult, TvError> {
+    state_machine::begin_save(&app_handle, &file_path)?;
+
+    let result = document_writer::delete_row(&TvConfig::default(), &file_path, &table_name, row_index);
     let _ = state_machine::end_save(&app_handle, &file_path, result.is_ok());
 
     result

@@ -502,6 +502,23 @@ export async function addRow(
   });
 }
 
+export interface DeleteRowResult {
+  success: boolean;
+  deletedIndex: number;
+}
+
+export async function deleteRow(
+  filePath: string,
+  tableName: string,
+  rowIndex: number,
+): Promise<DeleteRowResult> {
+  return invoke<DeleteRowResult>("delete_row", {
+    filePath,
+    tableName,
+    rowIndex,
+  });
+}
+
 export async function startFileWatcher(filePath: string): Promise<void> {
   return invoke("start_file_watcher", { filePath });
 }

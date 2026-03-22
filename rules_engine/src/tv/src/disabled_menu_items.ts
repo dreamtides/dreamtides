@@ -50,8 +50,7 @@ export const DISABLED_MENU_ITEMS: MenuConfig = {
   "sheet.command.insert-row-by-range": { hidden: true },
   "sheet.command.insert-multi-rows-above": { hidden: true },
   "sheet.command.insert-multi-rows-after": { hidden: true },
-  "sheet.command.remove-row-by-range": { hidden: true },
-  "sheet.command.remove-row-confirm": { hidden: true },
+  // row deletion menu items are enabled — handled by onDeleteRow callback
   "sheet.command.insert-col-before": { hidden: true },
   "sheet.command.insert-col-after": { hidden: true },
   "sheet.command.insert-col-by-range": { hidden: true },
