@@ -509,3 +509,82 @@ id = "card-1"
     assert_eq!(table.rows[1][id_idx].as_str(), Some("card-3"));
     assert_eq!(table.rows[2][id_idx].as_str(), Some("card-5"));
 }
+
+#[test]
+fn test_delete_row_with_mismatched_table_name() {
+    // Regression test: when the table_name hint (from filename) differs from
+    // the actual TOML key (e.g. file "rendered-cards.toml" containing
+    // [[cards]]), the delete must not create a duplicate table with the hint
+    // name. This was the bug that caused [[rendered-cards]] entries to appear
+    // interleaved with [[cards]] entries.
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "rendered-cards.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "First"
+
+[[cards]]
+id = "card-2"
+name = "Second"
+
+[[cards]]
+id = "card-3"
+name = "Third"
+"#,
+    );
+
+    // Delete middle row using the filename-derived table name
+    let result = harness.delete_row(&path, "rendered-cards", 1);
+    assert!(result.is_ok(), "Delete row should succeed: {:?}", result);
+
+    // Verify correct row was deleted
+    let table = harness.load_table(&path, "rendered-cards").unwrap();
+    assert_eq!(table.rows.len(), 2);
+    let id_idx = table.headers.iter().position(|h| h == "id").unwrap();
+    assert_eq!(table.rows[0][id_idx].as_str(), Some("card-1"));
+    assert_eq!(table.rows[1][id_idx].as_str(), Some("card-3"));
+
+    // The critical check: the file must NOT contain [[rendered-cards]]
+    let content = harness.read_file_content(&path);
+    assert!(
+        !content.contains("[[rendered-cards]]"),
+        "File must not contain [[rendered-cards]] — only [[cards]]. Got:\n{content}"
+    );
+    assert_eq!(
+        content.matches("[[cards]]").count(),
+        2,
+        "File should have exactly 2 [[cards]] entries"
+    );
+}
+
+#[test]
+fn test_add_row_with_mismatched_table_name() {
+    // Same regression test for add_row
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "rendered-cards.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "First"
+"#,
+    );
+
+    let mut initial_values = HashMap::new();
+    initial_values.insert("id".to_string(), json!("card-2"));
+    initial_values.insert("name".to_string(), json!("Second"));
+
+    let result = harness.add_row(&path, "rendered-cards", None, Some(initial_values));
+    assert!(result.is_ok(), "Add row should succeed: {:?}", result);
+
+    let content = harness.read_file_content(&path);
+    assert!(
+        !content.contains("[[rendered-cards]]"),
+        "File must not contain [[rendered-cards]] — only [[cards]]. Got:\n{content}"
+    );
+    assert_eq!(
+        content.matches("[[cards]]").count(),
+        2,
+        "File should have exactly 2 [[cards]] entries"
+    );
+}

@@ -798,6 +798,9 @@ export const UniverSpreadsheet = forwardRef<
         command.id === "sheet.mutation.set-range-values" ||
         command.id === "sheet.command.set-range-values"
       ) {
+        // Skip set-range-values events that fire as part of a row removal —
+        // the dedicated onDeleteRow callback handles saving in that case.
+        if (pendingDeleteRowRef.current !== null) return;
         const perfTimer = logger.startPerfTimer("onCommandExecuted", {
           commandId: command.id,
         });

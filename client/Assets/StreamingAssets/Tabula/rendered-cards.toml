@@ -3815,28 +3815,9 @@ art-owned = false
 card-number = 229
 
 [[cards]]
-name = "Skyborn Citadel"
-id = "af53173c-e091-4064-a7a7-854cecfe4820"
-tide = "Neutral"
-tide-cost = 2
-rendered-text = """
-▸ Materialized: Banish an enemy until this character leaves play.
-
-▸ Dissolved: Reclaim this character."""
-energy-cost = 8
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Rare"
-is-fast = false
-spark = 5
-image-number = 450441277
-art-owned = false
-card-number = 230
-
-[[cards]]
 name = "Whispering Wand Acolyte"
 id = "1a25ed29-5681-4d13-9752-aeb3628c190c"
-tide = "Surge"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "↯fast -- Abandon an ally: Prevent a played event which could dissolve an ally."
 energy-cost = 1
@@ -3868,7 +3849,7 @@ card-number = 232
 [[cards]]
 name = "Ruined Sky Herald"
 id = "e6ad4cf5-b8dd-4eb0-b713-2a9db71c866e"
-tide = "Bloom"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Materialized, Judgment: Foresee 1."
 energy-cost = 1
@@ -3890,7 +3871,7 @@ rendered-text = """
 ▸ Materialized: Foresee 1.
 
 ▸ Judgment: Gain 1●."""
-energy-cost = 1
+energy-cost = 2
 card-type = "Character"
 subtype = "Visionary"
 rarity = "Rare"
@@ -3919,7 +3900,7 @@ card-number = 235
 [[cards]]
 name = "Golden Clockwork Warden"
 id = "5a596f0b-8bb8-4d00-bf41-1d2fd272b86e"
-tide = "Arc"
+tide = "Ignite"
 tide-cost = 1
 rendered-text = "When you materialize an ally, that ally gains +1 spark."
 energy-cost = 3
@@ -3933,27 +3914,9 @@ art-owned = false
 card-number = 236
 
 [[cards]]
-name = "Redwing Flock Warden"
-id = "3f721176-1c77-43e3-a2f3-9e6d93a5a20a"
-tide = "Rime"
-tide-cost = 1
-rendered-text = """
-▸ Judgment: You may banish a card from the opponent's void. If it was a character, this character gains +1 spark.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = false
-spark = 0
-image-number = 658075711
-art-owned = false
-card-number = 237
-
-[[cards]]
 name = "Wraith Rider"
 id = "8c16cd05-1925-4df1-ac08-86c3d84c45ee"
-tide = "Ignite"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Judgment: Kindle 1."
 energy-cost = 2
@@ -4023,7 +3986,7 @@ card-number = 241
 [[cards]]
 name = "Boxbound Wanderer"
 id = "987aaa03-962d-4549-8149-8dbeccfc9911"
-tide = "Neutral"
+tide = "Bloom"
 tide-cost = 1
 rendered-text = """
 Characters cost you 1● less.
@@ -4060,7 +4023,7 @@ name = "Twin Blade Vanguard"
 id = "6e6fc45d-3505-4119-af15-bbed67fa059a"
 tide = "Ignite"
 tide-cost = 1
-rendered-text = "▸ Materialized: Discover a character with cost 1● or less."
+rendered-text = "▸ Materialized: Draw a character with cost 2● or less."
 energy-cost = 3
 card-type = "Character"
 subtype = "Warrior"
@@ -4076,7 +4039,7 @@ name = "Crimson Moon Samurai"
 id = "a27275ba-252f-41ba-a98b-be23c0b28cba"
 tide = "Ignite"
 tide-cost = 1
-rendered-text = "▸ Materialized: Discover a character with spark 2 or less."
+rendered-text = "▸ Materialized: Draw a character with spark 2 or less."
 energy-cost = 3
 card-type = "Character"
 subtype = "Warrior"
@@ -4090,7 +4053,7 @@ card-number = 246
 [[cards]]
 name = "Crowfather's Herald"
 id = "0fde6cd3-4879-41c9-8ec0-3b3bb178b0b3"
-tide = "Rime"
+tide = "Surge"
 tide-cost = 1
 rendered-text = "↯fast -- Abandon this character: The opponent can't play events this turn."
 energy-cost = 2
@@ -4125,14 +4088,14 @@ id = "226addd8-f09a-4237-ba75-c40635fbdb3b"
 tide = "Umbra"
 tide-cost = 2
 rendered-text = """
-▸ Materialized: Kindle 1.
+▸ Materialized: This character gains +1 spark.
 ▸ Judgment: Reclaim a character with cost up to this character's spark ●."""
 energy-cost = 5
 card-type = "Character"
 subtype = "Visionary"
 rarity = "Rare"
 is-fast = false
-spark = 3
+spark = 0
 image-number = 758082490
 art-owned = false
 card-number = 249
@@ -4143,7 +4106,7 @@ id = "ac9dbb02-de06-4977-a2eb-0ac839ab4c90"
 tide = "Surge"
 tide-cost = 1
 rendered-text = "Prevent a played character. Draw a card."
-energy-cost = 2
+energy-cost = 3
 card-type = "Event"
 subtype = ""
 rarity = "Common"
@@ -4172,7 +4135,7 @@ card-number = 251
 [[cards]]
 name = "Ascent of Floating Stones"
 id = "c038e4b2-ae16-4981-bc63-c13e6276b034"
-tide = "Rime"
+tide = "Neutral"
 tide-cost = 1
 rendered-text = "Banish a card from hand: Play this event for 0●. Banish an enemy with cost 3● or less."
 energy-cost = 3
@@ -4191,7 +4154,7 @@ id = "a9d7abc1-c290-49c6-8153-83f097942b45"
 tide = "Arc"
 tide-cost = 1
 rendered-text = "Banish an enemy until your next main phase."
-energy-cost = 4
+energy-cost = 3
 card-type = "Event"
 subtype = ""
 rarity = "Common"
@@ -4250,25 +4213,9 @@ art-owned = false
 card-number = 256
 
 [[cards]]
-name = "Wasteland Confrontation"
-id = "c20722ae-5d81-4677-bcf8-7c0ec0e95b93"
-tide = "Pact"
-tide-cost = 2
-rendered-text = "Reclaim up to 3 characters with cost 2● or less. Abandon them at end of turn."
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = true
-spark = ""
-image-number = 2424248087
-art-owned = false
-card-number = 257
-
-[[cards]]
 name = "Luminous Cocoon"
 id = "3df2dd36-dd51-4355-87f2-b5ae197bb4dc"
-tide = "Neutral"
+tide = "Umbra"
 tide-cost = 1
 rendered-text = """
 Reclaim a character with cost 3● or less.
@@ -4303,7 +4250,7 @@ card-number = 259
 [[cards]]
 name = "Misty Dawn Catch"
 id = "98db4d6d-842c-401f-8037-699a518f96d5"
-tide = "Pact"
+tide = "Umbra"
 tide-cost = 1
 rendered-text = "Reclaim a character. Lose 1 maximum ●."
 energy-cost = 1
@@ -4317,27 +4264,11 @@ art-owned = false
 card-number = 260
 
 [[cards]]
-name = "Cavern Voyager"
-id = "d7129a27-7edd-404a-86a7-08b893140e94"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "▸ Materialized: This character gains +1 spark for each event in your void."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2212744815
-art-owned = false
-card-number = 261
-
-[[cards]]
 name = "Crimson Ruin Sentinel"
 id = "0242717d-a6ba-42b6-9bf5-325191a1a2da"
 tide = "Umbra"
 tide-cost = 1
-rendered-text = "When you reclaim a character, it gains +2 spark."
+rendered-text = "When you reclaim a character, it gains +3 spark."
 energy-cost = 4
 card-type = "Character"
 subtype = "Ancient"
@@ -4353,7 +4284,7 @@ name = "Stormtide Oarsman"
 id = "564ef717-7898-4623-9c94-e3fc986701e4"
 tide = "Rime"
 tide-cost = 1
-rendered-text = "▸ Materialized: Discard a card to discover a character."
+rendered-text = "▸ Materialized: You may discard a card to draw a character."
 energy-cost = 3
 card-type = "Character"
 subtype = "Explorer"

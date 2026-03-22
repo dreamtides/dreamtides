@@ -90,7 +90,7 @@ pub fn add_row(
         new_array.push(new_table);
     }
 
-    doc[table_name] = toml_edit::Item::ArrayOfTables(new_array);
+    doc[&key] = toml_edit::Item::ArrayOfTables(new_array);
 
     config.fs().write_atomic(Path::new(file_path), &doc.to_string())
         .map_err(|e| map_atomic_write_error(e, file_path))?;
@@ -167,7 +167,7 @@ pub fn delete_row(
         }
     }
 
-    doc[table_name] = toml_edit::Item::ArrayOfTables(new_array);
+    doc[&key] = toml_edit::Item::ArrayOfTables(new_array);
 
     config.fs().write_atomic(Path::new(file_path), &doc.to_string())
         .map_err(|e| map_atomic_write_error(e, file_path))?;
