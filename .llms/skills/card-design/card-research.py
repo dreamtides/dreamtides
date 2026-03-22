@@ -7,15 +7,18 @@ the existing design space without reading the entire 8000-line file.
 
 Usage:
     python3 card-research.py tide <tide_name>
+    python3 card-research.py tide-events <tide_name>
     python3 card-research.py mechanic <keyword> [keyword2 ...]
     python3 card-research.py subtype <subtype_name>
     python3 card-research.py name <search_term>
     python3 card-research.py cost <energy_cost>
     python3 card-research.py stats
     python3 card-research.py similar <mechanic_description>
+    python3 card-research.py where <keyword>
 
 Examples:
     python3 card-research.py tide Rime
+    python3 card-research.py tide-events Umbra
     python3 card-research.py mechanic prevent
     python3 card-research.py mechanic discard kindle
     python3 card-research.py subtype Survivor
@@ -23,6 +26,7 @@ Examples:
     python3 card-research.py cost 3
     python3 card-research.py stats
     python3 card-research.py similar "when you discard"
+    python3 card-research.py where kindle
 """
 
 import sys
@@ -311,6 +315,49 @@ def cmd_stats(args: list[str], cards: list[dict]):
             print(f"  {name}: Phase {phase}, +{energy}●, effect: {rules} {variables}")
 
 
+def cmd_tide_events(args: list[str], cards: list[dict]):
+    """Show only events in a given tide, sorted by cost."""
+    tide = args[0] if args else ""
+    matches = [
+        c for c in cards
+        if c.get("tide", "").lower() == tide.lower() and c.get("card-type") == "Event"
+    ]
+    if not matches:
+        print(f"No events found for tide '{tide}'")
+        print(f"Valid tides: Arc, Bloom, Ignite, Neutral, Pact, Rime, Surge, Umbra")
+        return
+
+    matches.sort(key=lambda c: int(c.get("energy-cost", 0)))
+    print(f"\n=== {tide.upper()} EVENTS — {len(matches)} events ===\n")
+    for c in matches:
+        print(format_card(c))
+
+
+def cmd_where(args: list[str], cards: list[dict]):
+    """Show which tides use a mechanic keyword, with counts and card names."""
+    if not args:
+        print("Usage: card-research.py where <keyword>")
+        return
+
+    keyword = args[0].lower()
+    tide_cards: dict[str, list[str]] = {}
+    for c in cards:
+        text = c.get("rendered-text", "").lower()
+        name = c.get("name", "")
+        if keyword in text or keyword in name.lower():
+            t = c.get("tide", "(none)")
+            tide_cards.setdefault(t, []).append(name)
+
+    total = sum(len(v) for v in tide_cards.values())
+    print(f"\n=== '{args[0]}' across tides — {total} total cards ===\n")
+    for t in sorted(tide_cards.keys(), key=lambda x: -len(tide_cards[x])):
+        names = tide_cards[t]
+        print(f"  {t:10s}: {len(names):2d} cards")
+        for n in sorted(names):
+            print(f"    - {n}")
+    print()
+
+
 def cmd_similar(args: list[str], cards: list[dict]):
     """Find cards with similar rules text (case-insensitive substring match)."""
     if not args:
@@ -335,12 +382,14 @@ def main():
 
     commands = {
         "tide": cmd_tide,
+        "tide-events": cmd_tide_events,
         "mechanic": cmd_mechanic,
         "subtype": cmd_subtype,
         "name": cmd_name,
         "cost": cmd_cost,
         "stats": cmd_stats,
         "similar": cmd_similar,
+        "where": cmd_where,
     }
 
     if command in commands:

@@ -7,7 +7,7 @@ description: Design a new Dreamtides card based on art input. Use when designing
 
 You are an expert card game designer, creating novel game designs with deep thinking and analysis. Run everything with ultrathink.
 
-Read @docs/battle_rules/battle_rules.md and @docs/tides/tides.md.
+Read `docs/battle_rules/battle_rules.md` and `docs/tides/tides.md` (use the Read tool).
 
 ## Research Tool
 
@@ -37,33 +37,56 @@ python3 .claude/skills/card-design/card-research.py cost 3
 
 # Search rules text for a phrase
 python3 .claude/skills/card-design/card-research.py similar "when you discard"
+
+# Show all events in a tide (useful for event design)
+python3 .claude/skills/card-design/card-research.py tide-events Umbra
+
+# Show mechanic distribution across tides (which tides use a mechanic)
+python3 .claude/skills/card-design/card-research.py where kindle
 ```
 
 # Phase 1: Classify Art
 
-The first step in card design is to classify the card art. There are 3 possible types of card art:
+The first step in card design is to classify the card art. There are 3 possible types of
+card art:
 
-1) **Character.** Does the art show a single figure of a person, creature, animal, monster, etc? Then this is a character card.
-2) **Dreamwell.** Does the art depict a landscape? A wide depiction of a wilderness or urban landscape is a dreamwell card.
+1) **Character.** Does the art show a single figure of a person, creature, animal, monster,
+   etc. as the primary subject? Then this is a character card.
+2) **Dreamwell.** Does the art depict a landscape? A wide depiction of a wilderness or urban
+   landscape is a dreamwell card.
 3) **Event.** Art which does not depict a character or landscape is by default an event card.
 
 ### Classification Tips
 
-- Interior scenes (rooms, corridors, vehicles) without a central figure are events, not landscapes.
-- Group scenes (armies, crowds, flocks) are always events, never characters. A character card must depict a single figure.
-- Landscapes need a sense of scale and openness. A close-up of a single tree or rock formation is not a landscape.
+- **Figure + dominant object/structure:** If a single figure is present but clearly
+  secondary to a larger subject (a portal, monument, explosion, artifact, vehicle), classify
+  based on the dominant element. A person dwarfed by a massive shattered monolith is an
+  event (the shattering), not a character (the person). A person holding a glowing artifact
+  at the center of the frame is a character (the person), not an event.
+- **Interior scenes** (rooms, corridors, vehicles) without a central figure are events, not
+  landscapes.
+- **Group scenes** (armies, crowds, flocks) are always events, never characters. A character
+  card must depict a single figure as the primary subject.
+- **Landscapes** need a sense of scale and openness. A close-up of a single tree or rock
+  formation is not a landscape.
+- **Action scenes** showing an ongoing process (a ritual, a storm, a collapse) are events
+  even if a single figure is participating, as long as the process is the visual focus.
 
 # Phase 2: Identify Art Constraints
 
-Analyze the art and what it depicts, and think about how this would translate into game terms. Many excellent card designs
-fail because they don't match the art. For example:
+Analyze the art and what it depicts, and think about how this would translate into game
+terms. Many excellent card designs fail because they don't match the art. For example:
 
-- Art showing a larger-than-human character must correspond to an expensive/high-spark character card
-- Art with a positive/uplifting mood should have a positive-coded game effect for the player such as drawing cards
-- Art with a horror/destructive mood should have a negative-coded effect such as interacting with the opponent or the void
+- Art showing a larger-than-human character must correspond to an expensive/high-spark
+  character card
+- Art with a positive/uplifting mood should have a positive-coded game effect for the player
+  such as drawing cards
+- Art with a horror/destructive mood should have a negative-coded effect such as interacting
+  with the opponent or the void
 
-Connecting the mood of the art to the card design is very important. We are trying to build a coherent narrative
-that explains e.g. *what is happening* in this event or *who this character is*.
+Connecting the mood of the art to the card design is very important. We are trying to build
+a coherent narrative that explains e.g. *what is happening* in this event or *who this
+character is*.
 
 ### Art-to-Mechanic Translation Guide
 
@@ -81,6 +104,10 @@ that explains e.g. *what is happening* in this event or *who this character is*.
 | Ice, winter, austerity | Discard effects, taxation, cost increase |
 | Machinery, technology, circuits | Repeatable effects, engines, systematic processes |
 | Magical cascades, chains, links | Event chaining, copying, storm effects |
+| Ruins, decay, entropy | Mill, void recursion, scaling with void count |
+| Portals, gateways, thresholds | Banish/return, blink, zone transitions |
+| Shields, barriers, protection | Prevent, cost increase, immunity |
+| Mirrors, reflections, duality | Copy effects, symmetrical effects |
 
 **Size-to-cost mapping for characters:**
 
@@ -91,6 +118,17 @@ that explains e.g. *what is happening* in this event or *who this character is*.
 | Large creature/imposing figure | 4-6 | 3-5 |
 | Titanic/mythic being | 7-9 | 5-7 |
 
+**Scale-to-cost mapping for events:**
+
+The visual drama and scale of the art should match the event's cost and impact:
+
+| Art Scale | Typical Cost | Effect Tier |
+|---|---|---|
+| Small/intimate (a hand gesture, a whisper, a single rune) | 0-1 | Cantrip, minor trick |
+| Medium action (a spell being cast, a figure in motion) | 2-3 | Core utility, targeted removal |
+| Large/dramatic (a massive structure, a storm, a ritual) | 3-5 | High-impact, sweeper, finisher |
+| Cataclysmic (world-altering, apocalyptic) | 5-7 | Board wipe, game-defining |
+
 **Mood-to-effect mapping:**
 
 | Mood | Player Effect | Opponent Effect |
@@ -98,17 +136,21 @@ that explains e.g. *what is happening* in this event or *who this character is*.
 | Serene, contemplative | Foresee, card selection | — |
 | Joyful, triumphant | Draw cards, gain energy | — |
 | Mysterious, hidden | Discover, look at top of deck | — |
+| Melancholic, nostalgic | Void recursion, Reclaim, return from void | — |
+| Ominous, foreboding | Foresee, taxation, cost increase | — |
+| Awe, sublime wonder | Scaling effects, large mill, high-impact one-shots | — |
+| Defiant, rebellious | Cost reduction, alt-cost, rule-breaking | — |
 | Aggressive, intense | — | Dissolve, forced sacrifice |
 | Eerie, haunting | Void recursion, Reclaim | Discard from hand |
 | Chaotic, explosive | — | Mass removal, sweepers |
 
 # Phase 3: Connect to Tides
 
-Each card needs to be assigned to one of the 7 tides (or neutral) and should support the primary game plan of that
-tide. **The primary goal is making a great card for its tide.** If a design also happens to
-work well in an adjacent tide's hybrid deck, that's a nice bonus — but never compromise a
-card's core identity to chase cross-tide appeal. A card that's excellent in one tide is
-better than a card that's mediocre in two.
+Each card needs to be assigned to one of the 7 tides (or neutral) and should support the
+primary game plan of that tide. **The primary goal is making a great card for its tide.** If
+a design also happens to work well in an adjacent tide's hybrid deck, that's a nice bonus —
+but never compromise a card's core identity to chase cross-tide appeal. A card that's
+excellent in one tide is better than a card that's mediocre in two.
 
 ### Tide Quick Reference
 
@@ -127,9 +169,7 @@ better than a card that's mediocre in two.
 
 The tide circle is: Bloom — Arc — Ignite — Pact — Umbra — Rime — Surge — (back to Bloom).
 Adjacent tides have natural overlaps. If your design happens to bridge two neighbors, that's
-a bonus for draftability — but don't force it. Some tide pairs (notably Bloom + Arc) have
-limited mechanical overlap, and trying to serve both can produce worse designs than focusing
-on one.
+a bonus for draftability — but don't force it.
 
 - **Bloom + Arc:** Limited overlap — Bloom's ramp and Arc's blink don't naturally combine
 - **Arc + Ignite:** Token tempo (blink token-producers)
@@ -139,9 +179,14 @@ on one.
 - **Rime + Surge:** Full control (proactive disruption + reactive counterspells)
 - **Surge + Bloom:** Ramp combo (accelerate energy, chain events)
 
+Use `where <mechanic>` to check which tides already use a mechanic before assigning it to
+your card. A mechanic that appears in 0 cards in a tide is a red flag unless you have a
+strong reason to introduce it.
+
 ### Tide Cost
 
-Tide cost is a deckbuilding constraint — higher tide cost requires deeper commitment to that tide.
+Tide cost is a deckbuilding constraint — higher tide cost requires deeper commitment to that
+tide.
 
 - **Tide-cost 1:** Lightly committed; splashable in hybrid decks
 - **Tide-cost 2:** Requires real commitment to this tide
@@ -212,11 +257,25 @@ Use the research script to explore the existing card pool. Run at minimum:
 2. `tide <your_tide>` — see all existing cards in your chosen tide
 3. `mechanic <keyword>` — search for cards with similar mechanics to your concept
 4. `similar <phrase>` — find cards with similar rules text
+5. `name <word>` — check for name collisions with your working name
 
-The goal is to (a) avoid duplicating existing designs, (b) understand the templating syntax,
-and (c) calibrate your cost/spark values against comparable cards.
+### What to Look For
 
-### Spark-per-Cost Benchmarks
+- **Novelty check:** Search for your mechanic *combination*, not just individual mechanics.
+  "Mill + kindle" being novel is more important than "mill" or "kindle" being novel alone.
+  Run `mechanic <keyword1> <keyword2>` with multiple keywords to check combinations.
+- **Saturation check:** How many cards already exist at your cost point in your tide? If
+  there are already 12 cards at 3● in Umbra, consider a different cost.
+- **Closest comparables:** Identify the 2-3 existing cards most similar to your concept.
+  Your design should be meaningfully different from each of them. These become your "Similar
+  Cards" in the final design.
+- **Templating:** Copy the exact phrasing patterns from existing cards. Don't invent new
+  templating for effects that already have established wording.
+- **Tide mechanic check:** Run `where <mechanic>` to confirm your chosen mechanic actually
+  appears in your chosen tide. If it doesn't, either pick a different tide or have a strong
+  reason for introducing a new mechanic to that tide.
+
+### Spark-per-Cost Benchmarks (Characters)
 
 Average spark values by energy cost across all characters:
 
@@ -232,6 +291,49 @@ Average spark values by energy cost across all characters:
 
 Cards with powerful abilities trade spark downward (e.g., cost 3, spark 0-1 with a strong
 engine effect). Cards with weak or no abilities get above-curve spark.
+
+### Event Cost Benchmarks
+
+The "going rate" for common event effects in the existing card pool:
+
+| Effect | Typical Cost | Notes |
+|---|---|---|
+| Draw 1 | 0-1 | Usually a rider on another effect |
+| Draw 2 + discard 1-2 ("loot") | 2 | Standard filtering |
+| Draw 2 (no discard) | 4 | Pure card advantage is expensive |
+| Draw 3 + discard 2 | 3 | Standard 3-cost draw |
+| Foresee 3 + draw 1 | 2 | Fast variant available |
+| Gain 4● (net +2) | 2 | Standard energy burst rate |
+| Gain 6● (net +2) | 4 | Same net rate at larger scale |
+| Mill 2-3 + minor bonus | 1 | Mill is cheap because it needs synergy |
+| Mill 3 + draw 1 | 1 | Umbra cantrip baseline |
+| Dissolve (conditional) | 1-2 | Requires spark/cost restriction |
+| Dissolve (unconditional, fast) | 3 | The key removal benchmark |
+| Dissolve (unconditional) + drawback | 2 | Must lose 2 max ● or 4 ✪ |
+| Dissolve all (board wipe) | 6 | Format-defining at any cost |
+| Dissolve all spark ≤ 2 | 4 | Conditional sweeper |
+| Prevent (unconditional, fast) | 2 | Standard counterspell rate |
+| Prevent (conditional or drawback) | 0-1 | Must have significant downside |
+| Return enemy to hand + bonus | 3 fast | Tempo play with rider |
+| Return from void to hand | 2 | Baseline recursion |
+| Return from void to hand + draw 1 | 2 | Slightly above-rate for Umbra |
+| Banish enemy until next main | 3 fast | Tempo removal |
+| Materialize 3 figment tokens | 3 | Go-wide baseline |
+| Reclaim character (cost ≤ 3) | 3 | Needs setup (card must be in void) |
+| Reclaim up to 3 (cost ≤ 2) | 4 | Premium recursion |
+| Copy next event played | 3 | Engine setup |
+
+**Event costing principles:**
+- **Fast adds ~1●** to an effect's cost, or the card gets a restriction instead.
+- **Reclaim costs** on events are typically equal to or slightly above the card's printed
+  cost (e.g., a 2● event might have Reclaim 2-3●). Reclaim is priced at a premium because
+  replaying from void is inherently card-advantageous.
+- **Scaling effects** (e.g., "kindle 1 per character milled") should be evaluated at their
+  average case, not best case. A mill-5 that averages kindle-3 should be costed for ~3
+  kindle worth of value plus the mill's synergy value.
+- **Net value** matters more than gross. A 4● event that gains 6● is net +2, same as a 2●
+  event that gains 4●. The higher-cost version is worse because it requires more upfront
+  energy.
 
 ### Templating Conventions
 
@@ -302,14 +404,16 @@ concept should be:
 
 - A single sentence describing the mechanic
 - The tide and approximate cost
-- How it connects to the art
+- How it connects to the art (in parentheses)
 
 Present these concepts briefly, then pick the best one to develop fully. This avoids the
 trap of over-investing in the first idea that comes to mind.
 
 **Example concepts for art showing a hooded figure in rain catching glowing fragments:**
-1. "Rime 3●/2✦ — discard 2 to prevent a played card (umbrella as shield, fragments as discarded cards)"
-2. "Umbra 3●/1✦ — Judgment: mill 2, return a non-character from void (catching fragments from the void)"
+1. "Rime 3●/2✦ — discard 2 to prevent a played card (umbrella as shield, fragments as
+   discarded cards)"
+2. "Umbra 3●/1✦ — Judgment: mill 2, return a non-character from void (catching fragments
+   from the void)"
 3. "Rime 2●/1✦ — when you discard, foresee 1 (fragments reveal glimpses of the future)"
 
 ### Concept Evaluation Criteria
@@ -317,9 +421,24 @@ trap of over-investing in the first idea that comes to mind.
 Pick the concept that best satisfies ALL of these:
 - **Art match:** Does the mechanic tell the same story as the art?
 - **Tide fit:** Does it advance the tide's primary strategy?
-- **Novelty:** Is it meaningfully different from existing cards?
+- **Novelty:** Is it meaningfully different from existing cards? (Check using research.)
 - **Simplicity:** Can you express it in one clean rules text block?
 - **Draftability:** Would you pick this in a draft? Is it appealing on its own merits?
+
+### Refine Before Committing
+
+After picking a concept, stress-test it before writing the final design:
+
+- **Art coherence:** Re-examine the art. Does the mechanic still tell a believable story, or
+  did you drift during ideation? If the art shows something serene and your mechanic is
+  aggressive, revisit.
+- **Power check:** Estimate the average case for variable effects. If your card mills 5 and
+  kindles per character found, calculate the expected kindle value (~60-65% of cards are
+  characters, so mill 5 averages ~3 kindle). Is that total value appropriate for the cost?
+  Compare to the event/character benchmarks.
+- **Is there a simpler version?** If you have two mechanics stapled together, ask whether
+  the card would be better with just one of them at a lower cost. Simpler is almost always
+  better.
 
 # Phase 6: Final Design
 
@@ -349,15 +468,16 @@ Dreamwell cards have a different structure than regular cards:
 - **Phase:** 0 (early game only, no bonus) or 1 (every cycle, has a bonus effect).
 - **Bonus effects (phase 1 only):** Simple one-line effects. Existing effects are: Foresee 1,
   Gain 1 point, Gain 1 energy, Draw 1/Discard 1, Mill top 3 to void.
-- **Naming:** Location names — evocative place names (Skypath, Autumn Glade, Twilight Radiance,
-  Auroral Passage).
+- **Naming:** Location names — evocative place names (Skypath, Autumn Glade, Twilight
+  Radiance, Auroral Passage).
 - Dreamwell cards have no tide, no cost, no spark, and no rarity.
 
 ### Design Principles
 
 1. **Simplicity first.** The best cards have one clean mechanic, not three stapled together.
    If you can express the card in one sentence of rules text, do so. A card should have at
-   most 2 mechanical elements (e.g., a trigger + an effect, or a cost reduction + an ability).
+   most 2 mechanical elements (e.g., a trigger + an effect, or a cost reduction + an
+   ability).
 
 2. **Match the art.** The narrative must be believable. A serene forest spirit should not
    dissolve enemies. A war machine should not draw cards peacefully. If the art and mechanic
@@ -366,9 +486,9 @@ Dreamwell cards have a different structure than regular cards:
 3. **Avoid duplication.** If an existing card already does what you're designing, find a
    different angle. Use the research script to check thoroughly.
 
-4. **Cost appropriately.** Compare to existing cards at similar power levels using the
-   spark-per-cost benchmarks. Card draw is roughly 1 card per 1-2 energy. Dissolve effects
-   cost 2-4 energy depending on restrictions. Prevent effects cost 1-3 energy.
+4. **Cost appropriately.** Use the spark-per-cost benchmarks for characters and the event
+   cost benchmarks for events. For variable effects, evaluate the average case, not the best
+   or worst case. Compare directly to the 2-3 closest existing cards.
 
 5. **Consider the digital medium.** Digital card games can use mechanics with interesting
    variance (e.g., "discover a character" from a random set, scaling effects based on game
@@ -395,7 +515,8 @@ Dreamwell cards have a different structure than regular cards:
 - **Stapled mechanics:** Two unrelated abilities on one card (e.g., "Draw 2 cards. Dissolve
   an enemy.") with no connecting theme. The abilities should form a cohesive whole.
 - **Wrong-tide mechanics:** A Rime card that generates figment tokens, or a Surge card with
-  abandon synergies. Mechanics should belong to the card's tide or an adjacent ally.
+  abandon synergies. Mechanics should belong to the card's tide or an adjacent ally. Use
+  `where <mechanic>` to verify.
 - **Overcomplexity:** If the rules text is more than 3 lines, simplify. The best designs are
   often the most elegant.
 
@@ -415,24 +536,40 @@ rigid patterns. Some common structures that appear in the card pool:
 These are guidelines, not rules. Prioritize names that are memorable, evocative of the
 card's identity, and feel natural. Creative names that don't fit any pattern are fine.
 
-### Worked Example
+### Worked Example: Character
 
-**Art:** A massive glowing stag standing in an ancient forest, golden light radiating from its antlers.
+**Art:** A massive glowing stag standing in an ancient forest, golden light radiating from
+its antlers.
 
-**Phase 1 — Classification:** Single figure (animal) → Character.
+**Phase 1 — Classification:** Single figure (animal) as primary subject → Character.
 
-**Phase 2 — Art constraints:** Large creature → cost 4-6, spark 3-5. Golden light/radiance → card draw or revelation. Nature/growth → Bloom. Serene, majestic mood → positive player effect.
+**Phase 2 — Art constraints:** Large creature → cost 4-6, spark 3-5. Golden light/radiance →
+card draw or revelation. Nature/growth → Bloom. Serene, majestic mood → positive player
+effect.
 
-**Phase 3 — Tide:** Bloom (nature, spirit animal, ramp). Focus on making a great Bloom card first.
+**Phase 3 — Tide:** Bloom (nature, spirit animal, ramp). Focus on making a great Bloom card
+first.
 
-**Phase 4 — Research:** Run `tide Bloom`, `subtype "Spirit Animal"`, `similar "draw a card"`. Found existing energy-producing spirit animals at various costs. No existing 5-cost spirit animal that conditionally draws cards.
+**Phase 4 — Research:** Run `tide Bloom`, `subtype "Spirit Animal"`, `similar "draw a card"`.
+Found existing energy-producing spirit animals at various costs. No existing 5-cost spirit
+animal that conditionally draws cards.
 
 **Phase 5 — Concepts:**
-1. "Bloom 5●/3✦ Spirit Animal — Materialized, Judgment: Draw a card if you have 8+ energy (radiant knowledge rewards ramp)"
+1. "Bloom 5●/3✦ Spirit Animal — Materialized, Judgment: Draw a card if you have 8+ energy
+   (radiant knowledge rewards ramp)"
 2. "Bloom 4●/2✦ Spirit Animal — Your Spirit Animals cost 1 less (ancient forest patron)"
-3. "Bloom 5●/3✦ Spirit Animal — Materialized: Gain 2 max energy (permanent growth, not temporary)"
+3. "Bloom 5●/3✦ Spirit Animal — Materialized: Gain 2 max energy (permanent growth, not
+   temporary)"
 
-Concept 1 best matches the golden radiance (knowledge/revelation) and rewards Bloom's core ramp strategy — you only draw if you've been ramping, which is exactly what Bloom wants to do. The Judgment trigger gives it ongoing value. Pick concept 1.
+Concept 1 best matches the golden radiance (knowledge/revelation) and rewards Bloom's core
+ramp strategy — you only draw if you've been ramping, which is exactly what Bloom wants to
+do. The Judgment trigger gives it ongoing value. Pick concept 1.
+
+**Refinement:** Power check — conditional draw 1 per turn on a 5●/3✦ body is comparable to
+Looming Oracle (4●/2✦, draws with 3 Spirit Animals). This card's condition (8+ max energy)
+is achievable by turn 5-6 in a ramp deck, making it slightly later but more reliable once
+online. The spark is 3 at cost 5 (slightly above average 2.1), justified by the conditional
+nature of the draw. Looks balanced.
 
 **Phase 6 — Final Design:**
 - **Card Name:** Luminheart Stag
@@ -443,7 +580,78 @@ Concept 1 best matches the golden radiance (knowledge/revelation) and rewards Bl
 - **Rarity:** Rare
 - **Fast:** No
 - **Rules Text:** `▸ Materialized, Judgment: With 8 or more maximum energy, draw a card.`
-- **Art Description:** A massive glowing stag stands in an ancient forest, golden light radiating from its antlers.
-- **Archetype Description:** Rewards Bloom's ramp investment with card advantage — once you've built your energy high enough, this stag keeps your hand full to deploy more threats.
-- **Narrative:** The Luminheart Stag is an ancient guardian of the deep forest who reveals hidden truths to those who have proven their connection to the land — only dreamers who have cultivated enough energy can perceive the visions its antlers illuminate.
-- **Similar Cards:** Looming Oracle (Bloom, 4●/2✦, Judgment: With 3 allied Spirit Animals, draw a card — tribal condition instead of ramp condition). Spiritbound Alpha (Bloom, 5●/3✦, Materialized: Gain 2 max energy — ramp payoff but energy instead of cards). This card is a dedicated ramp payoff that converts Bloom's energy investment into card flow.
+- **Art Description:** A massive glowing stag stands in an ancient forest, golden light
+  radiating from its antlers.
+- **Archetype Description:** Rewards Bloom's ramp investment with card advantage — once
+  you've built your energy high enough, this stag keeps your hand full to deploy more
+  threats.
+- **Narrative:** The Luminheart Stag is an ancient guardian of the deep forest who reveals
+  hidden truths to those who have proven their connection to the land — only dreamers who
+  have cultivated enough energy can perceive the visions its antlers illuminate.
+- **Similar Cards:** Looming Oracle (Bloom, 4●/2✦, Judgment: With 3 allied Spirit Animals,
+  draw a card — tribal condition instead of ramp condition). Spiritbound Alpha (Bloom,
+  5●/3✦, Materialized: Gain 2 max energy — ramp payoff but energy instead of cards).
+
+### Worked Example: Event
+
+**Art:** A woman stands on a reflective beach before a massive broken technological
+monolith, its cracked teal screen releasing fragments into a moonlit sky.
+
+**Phase 1 — Classification:** Single figure present but dwarfed by the massive monolith —
+the shattered structure is the visual focus, not the person. The art depicts a moment of
+witnessing a collapse. → Event.
+
+**Phase 2 — Art constraints:** Massive broken structure → cost 3-5 (large/dramatic scale).
+Fragments scattering away → mill, dispersal to void. Ruins/decay/entropy → void interaction.
+Contemplative figure in awe → not aggressive, player-positive with void flavor. Mood is
+melancholic wonder → void recursion, Reclaim, or extracting value from lost things.
+
+**Phase 3 — Tide:** Umbra (ruins releasing fragments = cards scattering to void, figure
+extracting meaning from wreckage = void payoff). Run `where kindle` to check: kindle
+appears in Umbra on 2 cards — present but not primary. Acceptable as a secondary mechanic
+paired with mill, which is Umbra's core.
+
+**Phase 4 — Research:** Run `tide Umbra`, `mechanic kindle`, `similar "put the top"`. Found
+no existing card combining mill with kindle. Existing Umbra events at 3●: Abyssal Plunge
+(dissolve, reclaim 1●) and Luminous Cocoon (reclaim character). Mill events cluster at 1●
+(mill 2-3 + minor bonus). A 3● mill event with a scaling payoff would be novel.
+
+**Phase 5 — Concepts:**
+1. "Umbra 3● Event — mill 5, kindle 1 per character milled (fragments from broken gate
+   become spark)"
+2. "Umbra 2● Event — mill 4, with 8+ void cards draw 2 (broken signal becomes readable once
+   enough fragments accumulate)"
+3. "Umbra 3● Event — mill 6, return a card from among them to hand (massive dig through the
+   wreckage)"
+
+Concept 1 is most novel (no existing mill+kindle card), has strongest art match (scattered
+fragments becoming concentrated spark), and creates interesting variance. Concept 2 is too
+similar to Harvest the Forgotten. Concept 3 is a bigger Starlit Voyager effect.
+
+**Refinement:** Power check — mill 5 hits ~3 characters on average (60-65% of a typical deck
+is characters). So the card reads roughly "3●: Mill 5, kindle 3." By the event cost
+benchmarks: mill 3 + draw 1 costs 1●, so mill 5 alone is worth ~1-2●. Kindle 3 has no
+direct event benchmark, but kindle 1/turn on a character body costs ~1-2●. A one-shot
+kindle 3 at sorcery speed is worth ~1-2●. Total value ~3-4● worth of effects for 3● cost,
+with variance risk (could be 0-5 kindle). Seems fairly costed.
+
+**Phase 6 — Final Design:**
+- **Card Name:** Fractured Dreamgate
+- **Card Type:** Event
+- **Tide:** Umbra (tide cost 1)
+- **Energy Cost:** 3
+- **Rarity:** Uncommon
+- **Fast:** No
+- **Rules Text:** `Put the top 5 cards of your deck into your void. Kindle 1 for each character among them.`
+- **Art Description:** A woman stands on a reflective beach before a massive broken
+  technological monolith, its cracked teal screen releasing fragments into a moonlit sky.
+- **Archetype Description:** Stocks the void heavily for Umbra's self-mill engine while
+  converting character echoes into immediate spark — rewarding creature-dense builds.
+- **Narrative:** The Dreamgate was once a portal between worlds, now shattered on a
+  forgotten shore — its stored echoes of past travelers spill outward as fragments of
+  power, concentrated into the spark of whoever stands witness.
+- **Similar Cards:** Harvest the Forgotten (Umbra, 1●: mill 3 + draw 1 — cheaper cantrip
+  with card advantage instead of spark). Signal from Beyond (Umbra, 2●: look at top 4,
+  keep 1, void rest — selective but no spark payoff). Skull Cliff Sentinel (Umbra, 5●/2✦:
+  "When a card leaves your void, kindle 2" — character-based kindle-void engine; this event
+  is the one-shot complement).
