@@ -9,40 +9,37 @@ You are an expert card game designer, creating novel game designs with deep thin
 
 Read `docs/battle_rules/battle_rules.md` and `docs/tides/tides.md` (use the Read tool).
 
-## Research Tool
+## Research: Card Pool Reference
 
-A research script is available at `.claude/skills/card-design/card-research.py`. Use it
-directly via bash instead of spawning subagents to read rendered-cards.toml. Run these
-commands as needed throughout the design process:
+**Start by reading the entire card pool into context.** Run this command first — it outputs
+every card in compact format (~500 lines), grouped by tide and sorted by cost:
 
 ```bash
-# Overview of the full card pool
-python3 .claude/skills/card-design/card-research.py stats
+python3 .claude/skills/card-design/card-research.py dump
+```
 
-# All cards in a tide (sorted by cost)
-python3 .claude/skills/card-design/card-research.py tide Rime
+Each line is: `Name | Tide+Cost | Stats | Type | Rarity | Rules Text`
 
-# Find cards by mechanic keyword(s) — searches name + rules text
-python3 .claude/skills/card-design/card-research.py mechanic prevent
+Having the full card pool visible lets you spot gaps, patterns, and naming conventions
+organically — rather than only finding what you already thought to search for.
+
+### Supplemental Research Commands
+
+For cross-cutting analysis that's hard to do by eye on 473 cards, these commands are
+available:
+
+```bash
+# Which tides use a mechanic (cross-tide distribution)
+python3 .claude/skills/card-design/card-research.py where kindle
+
+# Find cards matching multiple keywords (intersection search)
 python3 .claude/skills/card-design/card-research.py mechanic discard kindle
-
-# Find cards by subtype
-python3 .claude/skills/card-design/card-research.py subtype Survivor
-
-# Find cards by name fragment
-python3 .claude/skills/card-design/card-research.py name "Storm"
-
-# Find cards at a specific energy cost
-python3 .claude/skills/card-design/card-research.py cost 3
 
 # Search rules text for a phrase
 python3 .claude/skills/card-design/card-research.py similar "when you discard"
 
-# Show all events in a tide (useful for event design)
-python3 .claude/skills/card-design/card-research.py tide-events Umbra
-
-# Show mechanic distribution across tides (which tides use a mechanic)
-python3 .claude/skills/card-design/card-research.py where kindle
+# Show cards at a specific cost within a specific tide (saturation check)
+python3 .claude/skills/card-design/card-research.py cost-in-tide Umbra 3
 ```
 
 # Phase 1: Classify Art
@@ -89,6 +86,12 @@ a coherent narrative that explains e.g. *what is happening* in this event or *wh
 character is*.
 
 ### Art-to-Mechanic Translation Guide
+
+The tables below are a **starting point to get you thinking**, not an authoritative mapping.
+Most art combines multiple visual elements, and the best designs often bridge elements from
+different rows — e.g., golden light + ruins might suggest revelation FROM the void (mill +
+draw, or kindle from mill), not just one or the other. Use these associations as creative
+seeds, then let the specific art guide you to a mechanic that tells its unique story.
 
 **Visual elements and their mechanical associations:**
 
@@ -186,12 +189,17 @@ strong reason to introduce it.
 ### Tide Cost
 
 Tide cost is a deckbuilding constraint — higher tide cost requires deeper commitment to that
-tide.
+tide. **Most cards should be tide-cost 1** — this is the default. Only increase tide cost
+when the card explicitly rewards being deep in a tide's strategy.
 
-- **Tide-cost 1:** Lightly committed; splashable in hybrid decks
-- **Tide-cost 2:** Requires real commitment to this tide
-- **Tide-cost 3:** Build-around card, only for deep single-tide decks
-- **Neutral tide-cost 1:** Playable in any deck
+- **Tide-cost 1 (default):** Lightly committed; splashable in hybrid decks. Use this unless
+  you have a specific reason for higher commitment.
+- **Tide-cost 2:** Card references tide-specific resources or conditions (void count,
+  discard triggers, warrior count, "events matter" payoffs). The card is clearly stronger
+  when surrounded by its tide's other cards.
+- **Tide-cost 3:** Extreme build-around or alternate win condition. Very rare — only for
+  cards that define an entire deck.
+- **Neutral tide-cost 1:** Playable in any deck.
 
 ### Character Subtypes
 
@@ -251,13 +259,18 @@ by tide:
 
 # Phase 4: Research Existing Cards
 
-Use the research script to explore the existing card pool. Run at minimum:
+**Note:** These phases are presented linearly but the process is iterative. Research may
+reveal that your tide choice (Phase 3) doesn't work, or concept exploration (Phase 5) may
+send you back to research. Loop back when earlier decisions need revision.
 
-1. `stats` — understand the overall card pool shape
-2. `tide <your_tide>` — see all existing cards in your chosen tide
-3. `mechanic <keyword>` — search for cards with similar mechanics to your concept
-4. `similar <phrase>` — find cards with similar rules text
-5. `name <word>` — check for name collisions with your working name
+You should already have the full card pool dump in context (from the `dump` command run at
+the start). Use it to examine your chosen tide's cards, check for name collisions, and
+identify comparable cards. Supplement with targeted commands as needed:
+
+1. `where <mechanic>` — confirm your mechanic appears in your chosen tide
+2. `mechanic <kw1> <kw2>` — check if your mechanic *combination* already exists
+3. `similar <phrase>` — find cards with similar rules text
+4. `cost-in-tide <tide> <cost>` — check saturation at your cost point
 
 ### What to Look For
 
@@ -322,6 +335,9 @@ The "going rate" for common event effects in the existing card pool:
 | Reclaim character (cost ≤ 3) | 3 | Needs setup (card must be in void) |
 | Reclaim up to 3 (cost ≤ 2) | 4 | Premium recursion |
 | Copy next event played | 3 | Engine setup |
+| Kindle 1-2 (one-shot) | 0-1 | Usually a rider on another effect |
+| Kindle 3-4 (one-shot) | 1-2 | Scaling/conditional variants |
+| Kindle 1/turn (on character) | 1-2● of budget | Part of a character's ability value |
 
 **Event costing principles:**
 - **Fast adds ~1●** to an effect's cost, or the card gets a restriction instead.
@@ -334,6 +350,31 @@ The "going rate" for common event effects in the existing card pool:
 - **Net value** matters more than gross. A 4● event that gains 6● is net +2, same as a 2●
   event that gains 4●. The higher-cost version is worse because it requires more upfront
   energy.
+
+### Deck Composition Reference
+
+When evaluating scaling effects based on card type (e.g., "kindle 1 per character milled"),
+use these baselines:
+
+- **~60-65% of cards in a typical deck are characters**, ~35-40% are events
+- A mill-5 that scales per character averages ~3-3.5 hits
+- A mill-5 that scales per event averages ~1.5-2 hits
+- Deck size is typically 30 cards
+
+### Reclaim on Events
+
+Whether to add Reclaim to an event depends on tide and context:
+
+- **Umbra** events frequently have Reclaim — the void is Umbra's second hand, and replaying
+  events from the void is core to the tide's identity
+- **Surge** events sometimes have Reclaim — replaying events feeds "events matter" triggers
+- **Rime** events occasionally have Reclaim — discarding a reclaim event to void sets up a
+  future replay
+- **Other tides** rarely have Reclaim on events unless there's a specific narrative or
+  mechanical reason
+- Events that represent a singular, unrepeatable moment narratively should not have Reclaim
+- Events with self-mill effects should consider Reclaim since they'll end up in the void
+  anyway and replaying them creates a satisfying loop
 
 ### Templating Conventions
 
@@ -424,6 +465,12 @@ Pick the concept that best satisfies ALL of these:
 - **Novelty:** Is it meaningfully different from existing cards? (Check using research.)
 - **Simplicity:** Can you express it in one clean rules text block?
 - **Draftability:** Would you pick this in a draft? Is it appealing on its own merits?
+- **Play-pattern appeal:** Is this card fun to play? The best cards create satisfying
+  moments: variance that generates excitement (mill-and-see-what-you-hit), meaningful
+  decisions (modal choices, targeting decisions), or deckbuilding rewards (scaling effects
+  that pay off investment). Avoid mechanics that feel bad to use — for example, effects
+  that make a player lose victory points feel terrible even when they're balanced. A card
+  can be perfectly costed and still be unfun.
 
 ### Refine Before Committing
 
@@ -444,7 +491,10 @@ After picking a concept, stress-test it before writing the final design:
 
 Develop your chosen concept into a complete card. Write your response with the following:
 
-- **Card Name:** Evocative short name for this card
+**Hard limits:** Card names must be 25 characters or fewer. Rules text must be 100
+characters or fewer.
+
+- **Card Name:** Evocative short name for this card (max 25 characters)
 - **Card Type:** Character (with subtype) or Event
 - **Tide:** Which tide and its tide cost (1-3)
 - **Energy Cost:** Proposed cost
@@ -517,14 +567,15 @@ Dreamwell cards have a different structure than regular cards:
 - **Wrong-tide mechanics:** A Rime card that generates figment tokens, or a Surge card with
   abandon synergies. Mechanics should belong to the card's tide or an adjacent ally. Use
   `where <mechanic>` to verify.
-- **Overcomplexity:** If the rules text is more than 3 lines, simplify. The best designs are
-  often the most elegant.
+- **Overcomplexity:** Rules text has a hard limit of 100 characters. If you can't fit the
+  effect in 100 characters, simplify. The best designs are often the most elegant.
 
 ### Naming Guidelines
 
-Names should be evocative and creative. Use the research script (`name` command) to check
-the existing naming landscape and avoid collisions, but don't feel constrained to follow
-rigid patterns. Some common structures that appear in the card pool:
+Names must be **25 characters or fewer** and should be evocative and creative. Most names
+are 2-3 words. Use the research script (`name` command) to check the existing naming
+landscape and avoid collisions, but don't feel constrained to follow rigid patterns. Some
+common structures that appear in the card pool:
 
 - **[Adjective] [Noun]:** Silent Avenger, Eternal Sentry
 - **[Compound] [Noun]:** Bloomweaver, Starcatcher
@@ -536,122 +587,3 @@ rigid patterns. Some common structures that appear in the card pool:
 These are guidelines, not rules. Prioritize names that are memorable, evocative of the
 card's identity, and feel natural. Creative names that don't fit any pattern are fine.
 
-### Worked Example: Character
-
-**Art:** A massive glowing stag standing in an ancient forest, golden light radiating from
-its antlers.
-
-**Phase 1 — Classification:** Single figure (animal) as primary subject → Character.
-
-**Phase 2 — Art constraints:** Large creature → cost 4-6, spark 3-5. Golden light/radiance →
-card draw or revelation. Nature/growth → Bloom. Serene, majestic mood → positive player
-effect.
-
-**Phase 3 — Tide:** Bloom (nature, spirit animal, ramp). Focus on making a great Bloom card
-first.
-
-**Phase 4 — Research:** Run `tide Bloom`, `subtype "Spirit Animal"`, `similar "draw a card"`.
-Found existing energy-producing spirit animals at various costs. No existing 5-cost spirit
-animal that conditionally draws cards.
-
-**Phase 5 — Concepts:**
-1. "Bloom 5●/3✦ Spirit Animal — Materialized, Judgment: Draw a card if you have 8+ energy
-   (radiant knowledge rewards ramp)"
-2. "Bloom 4●/2✦ Spirit Animal — Your Spirit Animals cost 1 less (ancient forest patron)"
-3. "Bloom 5●/3✦ Spirit Animal — Materialized: Gain 2 max energy (permanent growth, not
-   temporary)"
-
-Concept 1 best matches the golden radiance (knowledge/revelation) and rewards Bloom's core
-ramp strategy — you only draw if you've been ramping, which is exactly what Bloom wants to
-do. The Judgment trigger gives it ongoing value. Pick concept 1.
-
-**Refinement:** Power check — conditional draw 1 per turn on a 5●/3✦ body is comparable to
-Looming Oracle (4●/2✦, draws with 3 Spirit Animals). This card's condition (8+ max energy)
-is achievable by turn 5-6 in a ramp deck, making it slightly later but more reliable once
-online. The spark is 3 at cost 5 (slightly above average 2.1), justified by the conditional
-nature of the draw. Looks balanced.
-
-**Phase 6 — Final Design:**
-- **Card Name:** Luminheart Stag
-- **Card Type:** Character — Spirit Animal
-- **Tide:** Bloom (tide cost 2)
-- **Energy Cost:** 5
-- **Spark:** 3
-- **Rarity:** Rare
-- **Fast:** No
-- **Rules Text:** `▸ Materialized, Judgment: With 8 or more maximum energy, draw a card.`
-- **Art Description:** A massive glowing stag stands in an ancient forest, golden light
-  radiating from its antlers.
-- **Archetype Description:** Rewards Bloom's ramp investment with card advantage — once
-  you've built your energy high enough, this stag keeps your hand full to deploy more
-  threats.
-- **Narrative:** The Luminheart Stag is an ancient guardian of the deep forest who reveals
-  hidden truths to those who have proven their connection to the land — only dreamers who
-  have cultivated enough energy can perceive the visions its antlers illuminate.
-- **Similar Cards:** Looming Oracle (Bloom, 4●/2✦, Judgment: With 3 allied Spirit Animals,
-  draw a card — tribal condition instead of ramp condition). Spiritbound Alpha (Bloom,
-  5●/3✦, Materialized: Gain 2 max energy — ramp payoff but energy instead of cards).
-
-### Worked Example: Event
-
-**Art:** A woman stands on a reflective beach before a massive broken technological
-monolith, its cracked teal screen releasing fragments into a moonlit sky.
-
-**Phase 1 — Classification:** Single figure present but dwarfed by the massive monolith —
-the shattered structure is the visual focus, not the person. The art depicts a moment of
-witnessing a collapse. → Event.
-
-**Phase 2 — Art constraints:** Massive broken structure → cost 3-5 (large/dramatic scale).
-Fragments scattering away → mill, dispersal to void. Ruins/decay/entropy → void interaction.
-Contemplative figure in awe → not aggressive, player-positive with void flavor. Mood is
-melancholic wonder → void recursion, Reclaim, or extracting value from lost things.
-
-**Phase 3 — Tide:** Umbra (ruins releasing fragments = cards scattering to void, figure
-extracting meaning from wreckage = void payoff). Run `where kindle` to check: kindle
-appears in Umbra on 2 cards — present but not primary. Acceptable as a secondary mechanic
-paired with mill, which is Umbra's core.
-
-**Phase 4 — Research:** Run `tide Umbra`, `mechanic kindle`, `similar "put the top"`. Found
-no existing card combining mill with kindle. Existing Umbra events at 3●: Abyssal Plunge
-(dissolve, reclaim 1●) and Luminous Cocoon (reclaim character). Mill events cluster at 1●
-(mill 2-3 + minor bonus). A 3● mill event with a scaling payoff would be novel.
-
-**Phase 5 — Concepts:**
-1. "Umbra 3● Event — mill 5, kindle 1 per character milled (fragments from broken gate
-   become spark)"
-2. "Umbra 2● Event — mill 4, with 8+ void cards draw 2 (broken signal becomes readable once
-   enough fragments accumulate)"
-3. "Umbra 3● Event — mill 6, return a card from among them to hand (massive dig through the
-   wreckage)"
-
-Concept 1 is most novel (no existing mill+kindle card), has strongest art match (scattered
-fragments becoming concentrated spark), and creates interesting variance. Concept 2 is too
-similar to Harvest the Forgotten. Concept 3 is a bigger Starlit Voyager effect.
-
-**Refinement:** Power check — mill 5 hits ~3 characters on average (60-65% of a typical deck
-is characters). So the card reads roughly "3●: Mill 5, kindle 3." By the event cost
-benchmarks: mill 3 + draw 1 costs 1●, so mill 5 alone is worth ~1-2●. Kindle 3 has no
-direct event benchmark, but kindle 1/turn on a character body costs ~1-2●. A one-shot
-kindle 3 at sorcery speed is worth ~1-2●. Total value ~3-4● worth of effects for 3● cost,
-with variance risk (could be 0-5 kindle). Seems fairly costed.
-
-**Phase 6 — Final Design:**
-- **Card Name:** Fractured Dreamgate
-- **Card Type:** Event
-- **Tide:** Umbra (tide cost 1)
-- **Energy Cost:** 3
-- **Rarity:** Uncommon
-- **Fast:** No
-- **Rules Text:** `Put the top 5 cards of your deck into your void. Kindle 1 for each character among them.`
-- **Art Description:** A woman stands on a reflective beach before a massive broken
-  technological monolith, its cracked teal screen releasing fragments into a moonlit sky.
-- **Archetype Description:** Stocks the void heavily for Umbra's self-mill engine while
-  converting character echoes into immediate spark — rewarding creature-dense builds.
-- **Narrative:** The Dreamgate was once a portal between worlds, now shattered on a
-  forgotten shore — its stored echoes of past travelers spill outward as fragments of
-  power, concentrated into the spark of whoever stands witness.
-- **Similar Cards:** Harvest the Forgotten (Umbra, 1●: mill 3 + draw 1 — cheaper cantrip
-  with card advantage instead of spark). Signal from Beyond (Umbra, 2●: look at top 4,
-  keep 1, void rest — selective but no spark payoff). Skull Cliff Sentinel (Umbra, 5●/2✦:
-  "When a card leaves your void, kindle 2" — character-based kindle-void engine; this event
-  is the one-shot complement).

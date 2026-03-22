@@ -8,10 +8,12 @@ the existing design space without reading the entire 8000-line file.
 Usage:
     python3 card-research.py tide <tide_name>
     python3 card-research.py tide-events <tide_name>
+    python3 card-research.py tide-characters <tide_name>
     python3 card-research.py mechanic <keyword> [keyword2 ...]
     python3 card-research.py subtype <subtype_name>
     python3 card-research.py name <search_term>
     python3 card-research.py cost <energy_cost>
+    python3 card-research.py cost-in-tide <tide_name> <energy_cost>
     python3 card-research.py stats
     python3 card-research.py similar <mechanic_description>
     python3 card-research.py where <keyword>
@@ -19,11 +21,13 @@ Usage:
 Examples:
     python3 card-research.py tide Rime
     python3 card-research.py tide-events Umbra
+    python3 card-research.py tide-characters Bloom
     python3 card-research.py mechanic prevent
     python3 card-research.py mechanic discard kindle
     python3 card-research.py subtype Survivor
     python3 card-research.py name "Storm"
     python3 card-research.py cost 3
+    python3 card-research.py cost-in-tide Umbra 3
     python3 card-research.py stats
     python3 card-research.py similar "when you discard"
     python3 card-research.py where kindle
@@ -333,6 +337,45 @@ def cmd_tide_events(args: list[str], cards: list[dict]):
         print(format_card(c))
 
 
+def cmd_tide_characters(args: list[str], cards: list[dict]):
+    """Show only characters in a given tide, sorted by cost."""
+    tide = args[0] if args else ""
+    matches = [
+        c for c in cards
+        if c.get("tide", "").lower() == tide.lower() and c.get("card-type") == "Character"
+    ]
+    if not matches:
+        print(f"No characters found for tide '{tide}'")
+        print(f"Valid tides: Arc, Bloom, Ignite, Neutral, Pact, Rime, Surge, Umbra")
+        return
+
+    matches.sort(key=lambda c: int(c.get("energy-cost", 0)))
+    print(f"\n=== {tide.upper()} CHARACTERS — {len(matches)} characters ===\n")
+    for c in matches:
+        print(format_card(c))
+
+
+def cmd_cost_in_tide(args: list[str], cards: list[dict]):
+    """Show cards at a specific cost within a specific tide."""
+    if len(args) < 2:
+        print("Usage: card-research.py cost-in-tide <tide> <cost>")
+        return
+
+    tide = args[0]
+    cost = args[1]
+    matches = [
+        c for c in cards
+        if c.get("tide", "").lower() == tide.lower() and c.get("energy-cost", "") == cost
+    ]
+
+    chars = [c for c in matches if c.get("card-type") == "Character"]
+    events = [c for c in matches if c.get("card-type") == "Event"]
+
+    print(f"\n=== {tide.upper()} at {cost}● — {len(matches)} total ({len(chars)} characters, {len(events)} events) ===\n")
+    for c in sorted(matches, key=lambda c: c.get("name", "")):
+        print(format_card(c))
+
+
 def cmd_where(args: list[str], cards: list[dict]):
     """Show which tides use a mechanic keyword, with counts and card names."""
     if not args:
@@ -358,6 +401,66 @@ def cmd_where(args: list[str], cards: list[dict]):
     print()
 
 
+def cmd_dump(args: list[str], cards: list[dict]):
+    """Dump all cards in compact one-line-per-card format for reading into context."""
+    # Group by tide, sort by cost within each tide
+    tide_order = ["Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge", "Neutral", ""]
+    by_tide: dict[str, list[dict]] = {}
+    for c in cards:
+        t = c.get("tide", "")
+        by_tide.setdefault(t, []).append(c)
+
+    for tide in tide_order:
+        if tide not in by_tide:
+            continue
+        def safe_cost(c: dict) -> int:
+            try:
+                return int(c.get("energy-cost", 0))
+            except ValueError:
+                return 99
+
+        tide_cards = sorted(by_tide[tide], key=lambda c: (
+            0 if c.get("card-type") == "Character" else 1,
+            safe_cost(c),
+            c.get("name", ""),
+        ))
+        label = tide if tide else "(no tide)"
+        chars = [c for c in tide_cards if c.get("card-type") == "Character"]
+        events = [c for c in tide_cards if c.get("card-type") == "Event"]
+        print(f"\n=== {label.upper()} ({len(chars)}C, {len(events)}E) ===")
+        for c in tide_cards:
+            name = c.get("name", "???")
+            tc = c.get("tide-cost", "")
+            cost = c.get("energy-cost", "?")
+            spark = c.get("spark", "")
+            ct = c.get("card-type", "?")
+            sub = c.get("subtype", "")
+            fast = "↯" if c.get("is-fast", "false") == "true" else ""
+            rarity = c.get("rarity", "")[0] if c.get("rarity", "") else ""
+            text = c.get("rendered-text", "").replace("\\n", " ").strip()
+
+            if ct == "Character":
+                type_str = sub if sub and sub != "*" else "Char"
+                stat = f"{cost}●/{spark}✦"
+            else:
+                type_str = "Event"
+                stat = f"{cost}●"
+
+            print(f"{name} | {tide}{tc} | {stat} | {type_str}{fast} | {rarity} | {text}")
+
+    # Dreamwell cards
+    if DREAMWELL.exists():
+        dw_cards = parse_dreamwell(DREAMWELL)
+        print(f"\n=== DREAMWELL ({len(dw_cards)} cards) ===")
+        for dw in dw_cards:
+            name = dw.get("name", "?")
+            energy = dw.get("energy-produced", "?")
+            phase = dw.get("phase", "?")
+            rules = dw.get("rules-text", "(none)")
+            variables = dw.get("variables", "")
+            print(f"{name} | Phase {phase} | +{energy}● | {rules} {variables}")
+
+
 def cmd_similar(args: list[str], cards: list[dict]):
     """Find cards with similar rules text (case-insensitive substring match)."""
     if not args:
@@ -381,12 +484,15 @@ def main():
     cards = parse_cards(RENDERED_CARDS)
 
     commands = {
+        "dump": cmd_dump,
         "tide": cmd_tide,
         "tide-events": cmd_tide_events,
+        "tide-characters": cmd_tide_characters,
         "mechanic": cmd_mechanic,
         "subtype": cmd_subtype,
         "name": cmd_name,
         "cost": cmd_cost,
+        "cost-in-tide": cmd_cost_in_tide,
         "stats": cmd_stats,
         "similar": cmd_similar,
         "where": cmd_where,
