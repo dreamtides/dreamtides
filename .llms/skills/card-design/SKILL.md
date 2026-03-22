@@ -554,6 +554,15 @@ After picking a concept, stress-test it before writing the final design:
   connection in one sentence without straining, the design has drifted. Go back to the art.
 - **Power check:** Estimate the average case for variable effects. Use the event/character
   benchmarks to verify the total value is appropriate for the cost.
+- **Play pattern check:** For every triggered ability, answer concretely: who causes this
+  to fire, how often, and can they choose not to? If the trigger depends on the opponent
+  taking an action they can simply avoid (e.g., "when this character is banished" — the
+  opponent will just Dissolve it instead), the ability is effectively blank text. If the
+  trigger requires a specific other card in play, estimate how often you'll have it. Then
+  mentally play the turn you cast this card and the next 2-3 turns: what concretely happens
+  each turn? If the answer is "nothing, unless..." the design is too conditional. Every card
+  should do something meaningful through actions the player naturally takes in their tide's
+  game plan.
 - **Is there a simpler version?** If you have two mechanics stapled together, ask whether
   the card would be better with just one of them at a lower cost. Simpler is almost always
   better.
@@ -641,6 +650,12 @@ Dreamwell cards have a different structure than regular cards:
   an enemy.") with no connecting theme. The abilities should form a cohesive whole.
 - **Wrong-tide mechanics:** A Rime card that generates figment tokens, or a Surge card with
   abandon synergies. Mechanics should belong to the card's tide or an adjacent ally.
+- **Opponent-cooperative triggers:** Abilities that rely on the opponent taking a specific
+  action they can choose to avoid. "When this character is banished" sounds elegant but the
+  opponent will Dissolve it instead. "When the opponent discards" gives them veto power over
+  your card text. Good triggers fire from things under YOUR control or things the opponent
+  MUST do (like playing cards at all). Test: could a smart opponent make this ability blank
+  by changing their play? If yes, it's too weak to be a card's primary mechanic.
 - **Overcomplexity:** Rules text has a hard limit of 100 characters. If you can't fit the
   effect in 100 characters, simplify. The best designs are often the most elegant.
 
