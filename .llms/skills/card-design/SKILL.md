@@ -25,22 +25,18 @@ organically — rather than only finding what you already thought to search for.
 
 ### Supplemental Research Commands
 
-For cross-cutting analysis that's hard to do by eye on 473 cards, these commands are
-available:
+For targeted checks after you've already developed an art-driven concept:
 
 ```bash
-# Which tides use a mechanic (cross-tide distribution)
-python3 .claude/skills/card-design/card-research.py where kindle
-
-# Find cards matching multiple keywords (intersection search)
-python3 .claude/skills/card-design/card-research.py mechanic discard kindle
-
-# Search rules text for a phrase
+# Search rules text for a phrase (check for duplicates of your concept)
 python3 .claude/skills/card-design/card-research.py similar "when you discard"
 
 # Show cards at a specific cost within a specific tide (saturation check)
 python3 .claude/skills/card-design/card-research.py cost-in-tide Umbra 3
 ```
+
+These commands are for **validation**, not generation. Use them to confirm your concept
+doesn't duplicate an existing card, not to find mechanical gaps to fill.
 
 # Phase 1: Classify Art
 
@@ -69,10 +65,25 @@ card art:
 - **Action scenes** showing an ongoing process (a ritual, a storm, a collapse) are events
   even if a single figure is participating, as long as the process is the visual focus.
 
-# Phase 2: Identify Art Constraints
+# Phase 2: Read the Art's Story
 
-Analyze the art and what it depicts, and think about how this would translate into game
-terms. Many excellent card designs fail because they don't match the art. For example:
+Before thinking about mechanics at all, sit with the art and write a **narrative anchor**:
+2-3 sentences describing what you see in pure story terms — no game vocabulary. What emotion
+does it evoke? What's happening? What kind of person/creature/moment is this? The narrative
+anchor is the single most important output of the design process. Every mechanical decision
+must serve it.
+
+**Example narrative anchors:**
+- "A lone traveler stands in an endless golden field, watching in quiet awe as impossibly
+  vast runestones descend from the heavens. It's not destruction — it's revelation, ancient
+  knowledge returning to the earth."
+- "A feral wolf-spirit erupts from a thicket of thorns, trailing wisps of violet light.
+  It's hunting, but what it hunts is not prey — it's something lost, something it needs
+  to reclaim."
+- "Two figures stand back-to-back on a crumbling bridge over a void. They're not fighting
+  each other — they're the last defense against something unseen below."
+
+Then identify the **practical constraints** the art places on the design:
 
 - Art showing a larger-than-human character must correspond to an expensive/high-spark
   character card
@@ -81,9 +92,9 @@ terms. Many excellent card designs fail because they don't match the art. For ex
 - Art with a horror/destructive mood should have a negative-coded effect such as interacting
   with the opponent or the void
 
-Connecting the mood of the art to the card design is very important. We are trying to build
-a coherent narrative that explains e.g. *what is happening* in this event or *who this
-character is*.
+The narrative anchor is the source of truth. If at any point during the design process you
+find yourself justifying a mechanic that doesn't match the anchor, stop and either revise
+the mechanic or revise the anchor — don't force-fit.
 
 ### Art-to-Mechanic Translation Guide
 
@@ -149,11 +160,18 @@ The visual drama and scale of the art should match the event's cost and impact:
 
 # Phase 3: Connect to Tides
 
-Each card needs to be assigned to one of the 7 tides (or neutral) and should support the
-primary game plan of that tide. **The primary goal is making a great card for its tide.** If
-a design also happens to work well in an adjacent tide's hybrid deck, that's a nice bonus —
-but never compromise a card's core identity to chase cross-tide appeal. A card that's
-excellent in one tide is better than a card that's mediocre in two.
+Choose a tide based on **which tide's philosophy resonates with your narrative anchor** —
+not which tide's mechanics seem useful. Read the tide philosophies in `docs/tides/tides.md`
+and ask: "Which worldview does this art's story belong to?" A traveler witnessing ancient
+knowledge descending could be Bloom (patience rewarded), Arc (thresholds and transitions),
+or Surge (knowledge as power) — the same art can belong to different tides depending on
+which emotional thread you pull. Pick the tide whose *philosophy* makes the art's story
+richer.
+
+**The primary goal is making a great card for its tide.** If a design also happens to work
+well in an adjacent tide's hybrid deck, that's a nice bonus — but never compromise a card's
+core identity to chase cross-tide appeal. A card that's excellent in one tide is better than
+a card that's mediocre in two.
 
 ### Tide Quick Reference
 
@@ -182,9 +200,9 @@ a bonus for draftability — but don't force it.
 - **Rime + Surge:** Full control (proactive disruption + reactive counterspells)
 - **Surge + Bloom:** Ramp combo (accelerate energy, chain events)
 
-Use `where <mechanic>` to check which tides already use a mechanic before assigning it to
-your card. A mechanic that appears in 0 cards in a tide is a red flag unless you have a
-strong reason to introduce it.
+When reviewing the card pool dump, glance at whether your chosen tide already uses
+the mechanic you're considering. A mechanic that appears in 0 cards in a tide is a yellow
+flag — but if the art's story demands it, that's a valid reason to introduce it.
 
 ### Tide Cost
 
@@ -257,26 +275,30 @@ by tide:
 - **General rule:** If the effect is reactive (responds to opponent's actions), it should
   probably be fast. If it's proactive (builds your board), it should not be.
 
-# Phase 4: Research Existing Cards
+# Phase 4: Validate Against Existing Cards
 
 **Note:** These phases are presented linearly but the process is iterative. Research may
 reveal that your tide choice (Phase 3) doesn't work, or concept exploration (Phase 5) may
 send you back to research. Loop back when earlier decisions need revision.
 
+**Research is for validation, not generation.** You should already have an art-driven concept
+in mind from Phases 2-3. The purpose of research is to check that your concept doesn't
+duplicate an existing card and to find the right cost/stats. Do NOT use research to find
+"gaps" in the card pool and then backfit an art justification — that produces generic
+designs disconnected from the art.
+
 You should already have the full card pool dump in context (from the `dump` command run at
 the start). Use it to examine your chosen tide's cards, check for name collisions, and
 identify comparable cards. Supplement with targeted commands as needed:
 
-1. `where <mechanic>` — confirm your mechanic appears in your chosen tide
-2. `mechanic <kw1> <kw2>` — check if your mechanic *combination* already exists
-3. `similar <phrase>` — find cards with similar rules text
-4. `cost-in-tide <tide> <cost>` — check saturation at your cost point
+1. `similar <phrase>` — find cards with similar rules text to your concept
+2. `cost-in-tide <tide> <cost>` — check saturation at your cost point
 
 ### What to Look For
 
-- **Novelty check:** Search for your mechanic *combination*, not just individual mechanics.
-  "Mill + kindle" being novel is more important than "mill" or "kindle" being novel alone.
-  Run `mechanic <keyword1> <keyword2>` with multiple keywords to check combinations.
+- **Duplicate check:** Search for your concept's rules text phrasing. If an existing card
+  already does what you're designing, find a different angle — but stay true to the art's
+  story. Change the mechanic, not the narrative anchor.
 - **Saturation check:** How many cards already exist at your cost point in your tide? If
   there are already 12 cards at 3● in Umbra, consider a different cost.
 - **Closest comparables:** Identify the 2-3 existing cards most similar to your concept.
@@ -284,9 +306,6 @@ identify comparable cards. Supplement with targeted commands as needed:
   Cards" in the final design.
 - **Templating:** Copy the exact phrasing patterns from existing cards. Don't invent new
   templating for effects that already have established wording.
-- **Tide mechanic check:** Run `where <mechanic>` to confirm your chosen mechanic actually
-  appears in your chosen tide. If it doesn't, either pick a different tide or have a strong
-  reason for introducing a new mechanic to that tide.
 
 ### Spark-per-Cost Benchmarks (Characters)
 
@@ -344,9 +363,9 @@ The "going rate" for common event effects in the existing card pool:
 - **Reclaim costs** on events are typically equal to or slightly above the card's printed
   cost (e.g., a 2● event might have Reclaim 2-3●). Reclaim is priced at a premium because
   replaying from void is inherently card-advantageous.
-- **Scaling effects** (e.g., "kindle 1 per character milled") should be evaluated at their
-  average case, not best case. A mill-5 that averages kindle-3 should be costed for ~3
-  kindle worth of value plus the mill's synergy value.
+- **Scaling effects** (e.g., "draw 1 per ally on the battlefield") should be evaluated at
+  their average case, not best case. An effect that averages 3 draws should be costed for
+  ~3 draws worth of value.
 - **Net value** matters more than gross. A 4● event that gains 6● is net +2, same as a 2●
   event that gains 4●. The higher-cost version is worse because it requires more upfront
   energy.
@@ -440,37 +459,50 @@ Choose one: Draw 2 cards or Dissolve an enemy with spark 3 or less.
 
 # Phase 5: Explore Concepts
 
-Before committing to a final design, generate **2-3 one-line concept sketches**. Each
-concept should be:
+Before committing to a final design, generate **3 concept sketches that tell different
+stories about the art**. Each concept must start from a different emotional or narrative
+reading of the art — not the same reading with different mechanics bolted on. The goal is
+to explore what the art *means* before deciding what it *does*.
 
-- A single sentence describing the mechanic
-- The tide and approximate cost
-- How it connects to the art (in parentheses)
+Each concept should be:
 
-Present these concepts briefly, then pick the best one to develop fully. This avoids the
-trap of over-investing in the first idea that comes to mind.
+- A one-sentence narrative interpretation of the art (what's happening, who is this, how
+  does it feel)
+- The tide that matches that interpretation and approximate cost
+- The mechanic that flows from the narrative (in parentheses)
 
 **Example concepts for art showing a hooded figure in rain catching glowing fragments:**
-1. "Rime 3●/2✦ — discard 2 to prevent a played card (umbrella as shield, fragments as
-   discarded cards)"
-2. "Umbra 3●/1✦ — Judgment: mill 2, return a non-character from void (catching fragments
-   from the void)"
-3. "Rime 2●/1✦ — when you discard, foresee 1 (fragments reveal glimpses of the future)"
+1. "A watcher shields the world from a cascade of broken spells — Rime 3●/2✦ (discard 2
+   to prevent a played card; discarded cards are the fragments caught)"
+2. "A scavenger of lost dreams, gathering fragments of forgotten power from the rain —
+   Umbra 3●/1✦ (Judgment: mill 2, return a non-character from void; catching = retrieving)"
+3. "A seer reading omens in the patterns of falling light — Rime 2●/1✦ (when you discard,
+   foresee 1; fragments reveal glimpses of the future)"
+
+Notice how each concept tells a *different story* about who the figure is and what they're
+doing — not just "same figure, different mechanic."
 
 ### Concept Evaluation Criteria
 
-Pick the concept that best satisfies ALL of these:
-- **Art match:** Does the mechanic tell the same story as the art?
-- **Tide fit:** Does it advance the tide's primary strategy?
-- **Novelty:** Is it meaningfully different from existing cards? (Check using research.)
-- **Simplicity:** Can you express it in one clean rules text block?
-- **Draftability:** Would you pick this in a draft? Is it appealing on its own merits?
-- **Play-pattern appeal:** Is this card fun to play? The best cards create satisfying
-  moments: variance that generates excitement (mill-and-see-what-you-hit), meaningful
-  decisions (modal choices, targeting decisions), or deckbuilding rewards (scaling effects
-  that pay off investment). Avoid mechanics that feel bad to use — for example, effects
-  that make a player lose victory points feel terrible even when they're balanced. A card
-  can be perfectly costed and still be unfun.
+Pick the concept that best satisfies ALL of these, in priority order:
+
+1. **Narrative resonance (most important):** Does the mechanic feel like it *is* what the
+   art depicts? The best card designs create an "aha" moment where the mechanic and art
+   feel inseparable — you can't imagine different art on this card, or a different mechanic
+   for this art. If you have to write more than one sentence explaining how the mechanic
+   connects to the art, the connection is too weak.
+2. **Tide fit:** Does the narrative interpretation naturally belong to this tide's
+   philosophy? Does the mechanic advance the tide's primary strategy?
+3. **Simplicity:** Can you express it in one clean rules text block?
+4. **Play-pattern appeal:** Is this card fun to play? The best cards create satisfying
+   moments: variance that generates excitement, meaningful decisions (modal choices,
+   targeting decisions), or deckbuilding rewards (scaling effects that pay off investment).
+   Avoid mechanics that feel bad to use — for example, effects that make a player lose
+   victory points feel terrible even when they're balanced.
+5. **Novelty:** Is it meaningfully different from existing cards? (Check using research.)
+   Novelty matters, but it is the *least* important criterion — a card that perfectly
+   captures its art in a familiar mechanic is better than a "novel" card that doesn't
+   match the art.
 
 ### Cost-to-Excitement Scaling
 
@@ -517,13 +549,11 @@ feels proportional to the energy spent.
 
 After picking a concept, stress-test it before writing the final design:
 
-- **Art coherence:** Re-examine the art. Does the mechanic still tell a believable story, or
-  did you drift during ideation? If the art shows something serene and your mechanic is
-  aggressive, revisit.
-- **Power check:** Estimate the average case for variable effects. If your card mills 5 and
-  kindles per character found, calculate the expected kindle value (~60-65% of cards are
-  characters, so mill 5 averages ~3 kindle). Is that total value appropriate for the cost?
-  Compare to the event/character benchmarks.
+- **Narrative anchor check:** Re-read your narrative anchor from Phase 2. Does the mechanic
+  still tell that story, or did you drift during ideation? If you can't explain the
+  connection in one sentence without straining, the design has drifted. Go back to the art.
+- **Power check:** Estimate the average case for variable effects. Use the event/character
+  benchmarks to verify the total value is appropriate for the cost.
 - **Is there a simpler version?** If you have two mechanics stapled together, ask whether
   the card would be better with just one of them at a lower cost. Simpler is almost always
   better.
@@ -599,6 +629,10 @@ Dreamwell cards have a different structure than regular cards:
 
 ### Design Anti-Patterns to Avoid
 
+- **Mechanic-first design:** Finding a "novel" mechanical combination through card pool
+  analysis and then backfitting an art justification. If you arrived at your mechanic by
+  searching for gaps rather than by reading the art, start over. The art generates the
+  concept; research validates it.
 - **Parasitic design:** Cards that do literally nothing without specific other cards. Every
   card should have a baseline of usefulness even without synergy.
 - **Strict duplicates:** If an existing card does the same thing at the same cost, your
@@ -606,8 +640,7 @@ Dreamwell cards have a different structure than regular cards:
 - **Stapled mechanics:** Two unrelated abilities on one card (e.g., "Draw 2 cards. Dissolve
   an enemy.") with no connecting theme. The abilities should form a cohesive whole.
 - **Wrong-tide mechanics:** A Rime card that generates figment tokens, or a Surge card with
-  abandon synergies. Mechanics should belong to the card's tide or an adjacent ally. Use
-  `where <mechanic>` to verify.
+  abandon synergies. Mechanics should belong to the card's tide or an adjacent ally.
 - **Overcomplexity:** Rules text has a hard limit of 100 characters. If you can't fit the
   effect in 100 characters, simplify. The best designs are often the most elegant.
 
