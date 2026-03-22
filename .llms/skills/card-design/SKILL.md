@@ -472,6 +472,47 @@ Pick the concept that best satisfies ALL of these:
   that make a player lose victory points feel terrible even when they're balanced. A card
   can be perfectly costed and still be unfun.
 
+### Cost-to-Excitement Scaling
+
+A card's energy cost sets the player's expectations for how dramatic it should feel. A 2●
+common can be a simple stat body or a modest trigger — the investment is small, so the
+payoff can be small. But when a player spends 7● on a rare, they've committed most of their
+turn's energy to one play. That moment needs to feel *worth it*.
+
+**The problem with "just numbers":** A 7● character with "▸ Judgment: Kindle 3" is
+mechanically strong but experientially flat — nothing interesting happens when you play it,
+nothing interesting happens each turn. It's a number that goes up. Compare this to
+"▸ Materialized: Materialize a random Spirit Animal from your deck" — the moment you slam
+this card, something exciting and unpredictable happens. The player watches to see what they
+hit, the board state visibly changes, and the game creates a *moment*.
+
+**What makes expensive cards feel exciting:**
+
+| Element | Example | Why it works |
+|---|---|---|
+| Immediate board impact | "▸ Materialized: Dissolve an enemy" | Something happens RIGHT NOW |
+| Variance / discovery | "Materialize a random character from your deck" | Anticipation and surprise |
+| Scaling with investment | "Each allied Spirit Animal gains +2 spark" | Rewards the work you did getting here |
+| Meaningful choices | "Choose one: [3 options]" | Player agency in a big moment |
+| Dramatic opponent interaction | "The opponent abandons 3 characters" | Reshapes the entire game state |
+
+**Guidelines by cost:**
+
+- **0-2●:** Simple, incremental, or engine-piece effects are fine. "Judgment: Gain 1●" is
+  perfectly acceptable at 1●. The card earns its keep through repetition over many turns.
+- **3-4●:** Should have at least one moment of interest — a materialized trigger, a
+  meaningful decision, or a conditional payoff that feels good when met.
+- **5-6●:** Must create a noticeable board shift when played. If someone watches you play
+  this card and nothing visibly changes, it's too passive for the cost.
+- **7+●:** This is your big play of the turn. It should create a *story* — a moment the
+  player remembers. Materialized triggers are almost mandatory at this cost. Pure
+  passive/judgment-only effects need an extremely compelling reason to justify this
+  investment with no immediate payoff.
+
+This doesn't mean expensive cards must be *complex* — "▸ Materialized: Draw 3 cards" is
+simple but dramatically impactful at 7●. The goal is that the *moment of playing the card*
+feels proportional to the energy spent.
+
 ### Refine Before Committing
 
 After picking a concept, stress-test it before writing the final design:
