@@ -4314,7 +4314,7 @@ card-number = 264
 [[cards]]
 name = "Crimson Mars Walker"
 id = "b3c35d35-8410-42c7-86b7-a310a2557383"
-tide = "Ignite"
+tide = "Rime"
 tide-cost = 1
 rendered-text = "▸ Judgment: Draw a card, then discard a card. 2●: Materialize a Shadow Figment."
 energy-cost = 3
@@ -4333,7 +4333,7 @@ id = "f04e32b3-d897-4c24-9999-3f0557482ba1"
 tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Judgment: Draw a card."
-energy-cost = 3
+energy-cost = 5
 card-type = "Character"
 subtype = "Guide"
 rarity = "Common"
@@ -4349,9 +4349,9 @@ id = "238a405b-1eb9-4f0e-9904-4da39a7c810e"
 tide = "Surge"
 tide-cost = 1
 rendered-text = """
-Copy the next event you play this turn.
+Copy the next event you play this turn. If this event was reclaimed, copy it twice instead.
 
-Reclaim 3● -- Copy the next event you play this turn twice instead."""
+Reclaim 3●"""
 energy-cost = 3
 card-type = "Event"
 subtype = ""
@@ -4361,22 +4361,6 @@ spark = ""
 image-number = 1047769081
 art-owned = false
 card-number = 267
-
-[[cards]]
-name = "Horizon's Last Bough"
-id = "5ffd3613-af5a-4546-9129-9fbfd38cb86a"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Draw 3 cards. Discard 2 cards unless you discard an event."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 1785274667
-art-owned = false
-card-number = 268
 
 [[cards]]
 name = "Defiance of Steel"
@@ -4432,7 +4416,7 @@ id = "435a6ac4-58a6-4d63-acc7-17377496acf4"
 tide = "Arc"
 tide-cost = 1
 rendered-text = "Return an enemy to hand. Gain 2●."
-energy-cost = 2
+energy-cost = 3
 card-type = "Event"
 subtype = ""
 rarity = "Common"
@@ -4441,22 +4425,6 @@ spark = ""
 image-number = 529374478
 art-owned = false
 card-number = 272
-
-[[cards]]
-name = "Voyage Through Ruin"
-id = "6d5d0f3c-e993-44f8-86b2-502bd63e7846"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Return an enemy or a played card to hand."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 721324504
-art-owned = false
-card-number = 273
 
 [[cards]]
 name = "Neon Wanderer's Path"
@@ -4482,7 +4450,7 @@ tide-cost = 1
 rendered-text = """
 ▸ Materialized: Put the top 3 cards of your deck into your void.
 
-▸ Dissolved: Return a character from your void to your hand."""
+▸ Dissolved: Return another character from your void to your hand."""
 energy-cost = 2
 card-type = "Character"
 subtype = "Outsider"
@@ -4496,7 +4464,7 @@ card-number = 275
 [[cards]]
 name = "Wasteland Ironclad"
 id = "e1e7c403-251e-4db1-bd3b-5ee03124e681"
-tide = "Umbra"
+tide = "Pact"
 tide-cost = 1
 rendered-text = """
 ▸ Materialized: Put the top 3 cards of your deck into your void.
@@ -4549,7 +4517,7 @@ id = "fec40d51-abbe-49b2-bed3-ad4f7f8069a1"
 tide = "Umbra"
 tide-cost = 1
 rendered-text = "▸ Judgment: Put the top 2 cards of your deck into your void. You may return a character from your void to your hand."
-energy-cost = 3
+energy-cost = 4
 card-type = "Character"
 subtype = "Spirit Animal"
 rarity = "Uncommon"
@@ -4584,7 +4552,7 @@ id = "38147bfd-8410-4293-a952-e348258c0542"
 tide = "Surge"
 tide-cost = 1
 rendered-text = "Prevent a played card. Gain ● equal to that card's cost."
-energy-cost = 3
+energy-cost = 2
 card-type = "Event"
 subtype = ""
 rarity = "Common"
@@ -4616,7 +4584,7 @@ id = "5b2c6dca-8bb0-412e-87ef-d98ad31ad986"
 tide = "Surge"
 tide-cost = 1
 rendered-text = "Prevent a played card. The opponent draws 2 cards."
-energy-cost = 2
+energy-cost = 0
 card-type = "Event"
 subtype = ""
 rarity = "Common"
@@ -4663,7 +4631,7 @@ name = "Melting Visage"
 id = "97466d3a-452c-4991-8d6a-5ee3dae64d3e"
 tide = "Umbra"
 tide-cost = 1
-rendered-text = "▸ Dissolved: You may pay 1●. If you do, reclaim this character."
+rendered-text = "▸ Dissolved: You may pay 1● to return this character to hand."
 energy-cost = 2
 card-type = "Character"
 subtype = "Survivor"
@@ -4693,7 +4661,7 @@ card-number = 287
 [[cards]]
 name = "Smoke-Veiled Stranger"
 id = "2280b92e-4444-4655-b398-f5bfa458dc62"
-tide = "Ignite"
+tide = "Rime"
 tide-cost = 1
 rendered-text = "Discard 2 cards: Materialize a Shadow Figment."
 energy-cost = 2
@@ -4711,7 +4679,7 @@ name = "Curled Horn Fiend"
 id = "1980e1bb-0c85-4e5f-8cac-66bd27d76499"
 tide = "Ignite"
 tide-cost = 1
-rendered-text = "2●, Banish a card from your void: Materialize a Shadow Figment."
+rendered-text = "2●, Banish a card from your void: Materialize a Warrior Figment."
 energy-cost = 2
 card-type = "Character"
 subtype = "Warrior"
@@ -4746,7 +4714,7 @@ tide-cost = 2
 rendered-text = """
 When an ally is dissolved, materialize a Shadow Figment.
 
-▸ Judgment: With 5 or more Shadow Figments, each gains +2 spark."""
+With 5 or more Shadow Figments, each gains +2 spark."""
 energy-cost = 5
 card-type = "Character"
 subtype = "Outsider"
@@ -4760,7 +4728,7 @@ card-number = 291
 [[cards]]
 name = "Forsaken Colossus"
 id = "f2b7ec1f-8878-4658-a4ca-1277e02f01a5"
-tide = "Ignite"
+tide = "Pact"
 tide-cost = 1
 rendered-text = "▸ Dissolved: Materialize a Shadow Figment."
 energy-cost = 2
@@ -4790,38 +4758,6 @@ art-owned = false
 card-number = 293
 
 [[cards]]
-name = "Planetfall Witch"
-id = "50e33ac4-d626-4094-89cb-555a2510a207"
-tide = "Ignite"
-tide-cost = 1
-rendered-text = "▸ Judgment: If you have no Figments in play, materialize a Shadow Figment."
-energy-cost = 2
-card-type = "Character"
-subtype = "Mage"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2275146325
-art-owned = false
-card-number = 294
-
-[[cards]]
-name = "Deepwood Wanderer"
-id = "11294825-2521-4cd7-a95d-2c7843f73302"
-tide = "Pact"
-tide-cost = 2
-rendered-text = "You may not spend ● to play this card. Abandon 2 allies: Reclaim this character."
-energy-cost = 8
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 6
-image-number = 1950881317
-art-owned = false
-card-number = 295
-
-[[cards]]
 name = "Rift Gate Surge"
 id = "5fe5a1ea-a98d-4332-9eaf-eabc627bc8e8"
 tide = "Surge"
@@ -4840,7 +4776,7 @@ card-number = 296
 [[cards]]
 name = "Forsaken Alley Haunt"
 id = "eb47dd55-748f-44f8-9edc-3476182c4396"
-tide = "Bloom"
+tide = "Surge"
 tide-cost = 1
 rendered-text = "Gain 3●. If you have 7 or more cards in your void, gain 5● instead."
 energy-cost = 2
@@ -4858,7 +4794,7 @@ name = "Sunset Chapel Rest"
 id = "1f600865-4f4d-4d3a-82ed-b4b37a8bedb6"
 tide = "Pact"
 tide-cost = 1
-rendered-text = "Abandon an ally: Discover a character."
+rendered-text = "Abandon an ally: Draw a character."
 energy-cost = 2
 card-type = "Event"
 subtype = ""
@@ -4874,7 +4810,7 @@ name = "Twilight Reforge"
 id = "12aedbb7-c14d-4a89-a9d9-ca4d7c557676"
 tide = "Pact"
 tide-cost = 1
-rendered-text = "Abandon an ally: Discover a character with cost equal to that ally's cost."
+rendered-text = "Abandon an ally: Draw a character with cost equal to that ally's cost."
 energy-cost = 1
 card-type = "Event"
 subtype = ""
@@ -4922,7 +4858,7 @@ name = "Sunset Voyager Mage"
 id = "a62ff9de-81ca-43b4-a37f-1b2b558e1cfb"
 tide = "Umbra"
 tide-cost = 1
-rendered-text = "▸ Judgment: You may reclaim an event from your void with cost up to this character's spark."
+rendered-text = "▸ Judgment: You may reclaim an event with cost up to this character's spark."
 energy-cost = 2
 card-type = "Character"
 subtype = "Mage"
@@ -4936,7 +4872,7 @@ card-number = 302
 [[cards]]
 name = "Castle Hallway Spearbearer"
 id = "44f4ee06-8dbd-414e-b985-4a6434975e23"
-tide = "Umbra"
+tide = "Arc"
 tide-cost = 1
 rendered-text = "▸ Materialized: Return an event with cost 3● or less from your void to your hand."
 energy-cost = 4
@@ -5003,9 +4939,9 @@ id = "528ac63c-9928-4c8e-bfea-610b33c8b0d7"
 tide = "Neutral"
 tide-cost = 1
 rendered-text = """
-Dissolve all enemies with spark 2 or less.
+Dissolve all characters with spark 2 or less. When you reclaim this card, dissolve all characters instead.
 
-Reclaim 6●: Dissolve all enemies."""
+Reclaim 6●"""
 energy-cost = 4
 card-type = "Event"
 subtype = ""
@@ -5051,9 +4987,9 @@ card-number = 309
 [[cards]]
 name = "Winterwood Impala"
 id = "4413a3c5-ef54-4253-b6fa-e8da64baf63f"
-tide = "Bloom"
+tide = "Arc"
 tide-cost = 1
-rendered-text = "▸ Judgment: You may return a Spirit Animal to hand to gain 2●."
+rendered-text = "▸ Judgment: You may return a character to hand to gain 3●."
 energy-cost = 1
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -5069,7 +5005,7 @@ name = "Frostland Trident Knight"
 id = "ee0aa963-6b13-4dbe-adb4-314390c5c9b5"
 tide = "Ignite"
 tide-cost = 1
-rendered-text = "Once per turn, when you materialize an allied Warrior, materialize a Radiant Figment."
+rendered-text = "Once per turn, when you materialize a Warrior, materialize a Radiant Figment."
 energy-cost = 2
 card-type = "Character"
 subtype = "Warrior"
@@ -5111,22 +5047,6 @@ spark = 1
 image-number = 2127752117
 art-owned = false
 card-number = 313
-
-[[cards]]
-name = "Fading Circuit Walker"
-id = "65bebce3-fc49-4b89-833a-b6615cb43010"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "▸ Dissolved: Return a Tinkerer from your void to your hand."
-energy-cost = 3
-card-type = "Character"
-subtype = "Tinkerer"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 1185684769
-art-owned = false
-card-number = 314
 
 [[cards]]
 name = "Meteor Shower Cascade"
@@ -5241,29 +5161,11 @@ art-owned = false
 card-number = 321
 
 [[cards]]
-name = "Scrapheap Scavenger"
-id = "4e5101e3-4366-4a75-a89e-abf57266c868"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Players can only play one event per turn."
-energy-cost = 2
-card-type = "Character"
-subtype = "Synth"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 662452588
-art-owned = false
-card-number = 322
-
-[[cards]]
 name = "Rampaging Iron Colossus"
 id = "640d798d-3100-49f7-bbe2-6c18d4b818f9"
 tide = "Surge"
 tide-cost = 1
-rendered-text = """
-▸ Materialized: Discover an event. 2●: Play an event from your hand for 0●.
-"""
+rendered-text = "▸ Materialized: Draw an event. 2●: Play an event from your hand for 0●."
 energy-cost = 5
 card-type = "Character"
 subtype = "Tinkerer"
@@ -5312,8 +5214,8 @@ id = "cc5e770a-210d-4737-8aa7-6be7328b0dbd"
 tide = "Ignite"
 tide-cost = 2
 rendered-text = """
-▸ Materialized: Materialize a Celestial Figment. When you materialize a Figment, draw a card.
-"""
+▸ Materialized: Materialize a Warrior figment. 
+When you materialize a Figment, draw a card."""
 energy-cost = 3
 card-type = "Character"
 subtype = "Tinkerer"
@@ -5325,30 +5227,11 @@ art-owned = false
 card-number = 326
 
 [[cards]]
-name = "Crimson Spear Enchantress"
-id = "45f33982-1994-47f1-a29c-8bc329f1fe2e"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Materialized: Put the top 4 cards of your deck into your void.
-▸ Judgment: Reclaim an event from your void.
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Mage"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 2415692455
-art-owned = false
-card-number = 327
-
-[[cards]]
 name = "Gentle Rusted Wanderer"
 id = "ad9a9b5c-6dc9-4a89-b709-786b04988d3e"
 tide = "Ignite"
 tide-cost = 2
-rendered-text = "▸ Materialized: Materialize a Halcyon Figment. ▸ Judgment: Gain 1● for each allied Figment."
+rendered-text = "▸ Materialized: Materialize a Warrior figment. ▸Judgment: Gain 1● for each allied Figment."
 energy-cost = 5
 card-type = "Character"
 subtype = "Tinkerer"
@@ -5396,7 +5279,7 @@ name = "Blade Against Sorcery"
 id = "71473ab1-a9c7-4d42-a5a7-163e9b31b0f5"
 tide = "Rime"
 tide-cost = 1
-rendered-text = "Draw 3 cards, then discard 3 cards. Materialize a Figment for each character discarded this way."
+rendered-text = "Draw 3 cards, then discard 3 cards. Materialize a Warrior figment for each character discarded this way."
 energy-cost = 3
 card-type = "Event"
 subtype = ""
@@ -5428,7 +5311,7 @@ name = "Veiled Throne"
 id = "5a90acb3-a769-4369-8ef5-2cdc3ebc7c2d"
 tide = "Surge"
 tide-cost = 1
-rendered-text = "Draw 2 cards. If you played no characters this turn, discard a card."
+rendered-text = "Draw 2 cards. If you played no other events this turn, discard a card."
 energy-cost = 2
 card-type = "Event"
 subtype = ""
@@ -5442,13 +5325,13 @@ card-number = 333
 [[cards]]
 name = "Molten Cliff Leap"
 id = "80495b0d-de40-4ed5-b731-530b9b38b91e"
-tide = "Umbra"
+tide = "Surge"
 tide-cost = 1
 rendered-text = """
 Draw 2 cards.
 
 Reclaim -- Lose 1 maximum ●"""
-energy-cost = 3
+energy-cost = 4
 card-type = "Event"
 subtype = ""
 rarity = "Uncommon"
@@ -5480,12 +5363,12 @@ id = "cd0d7da1-d3bc-4978-860d-42ce4bd38772"
 tide = "Ignite"
 tide-cost = 1
 rendered-text = "This character costs 1● less for each ally in play."
-energy-cost = 3
+energy-cost = 6
 card-type = "Character"
 subtype = "Synth"
 rarity = "Common"
 is-fast = false
-spark = 2
+spark = 5
 image-number = 1016596165
 art-owned = false
 card-number = 336
@@ -5495,8 +5378,8 @@ name = "Blastwave Runner"
 id = "e55f98a9-2be2-4760-b527-d7edf1d8b585"
 tide = "Ignite"
 tide-cost = 1
-rendered-text = "▸ Judgment: Materialize a Shadow Figment."
-energy-cost = 3
+rendered-text = "▸ Judgment: Materialize a Warrior figment."
+energy-cost = 5
 card-type = "Character"
 subtype = "Warrior"
 rarity = "Rare"
@@ -5511,7 +5394,7 @@ name = "Scepter Invoker"
 id = "029e7b87-fa96-4c0c-abdd-1c8b532f0477"
 tide = "Pact"
 tide-cost = 1
-rendered-text = "▸ Judgment: You may abandon 2 allies to gain 2●, draw a card, and kindle 2."
+rendered-text = "▸ Judgment: You may abandon 2 allies to gain 2● and draw 2 cards."
 energy-cost = 3
 card-type = "Character"
 subtype = "Mage"
@@ -5607,7 +5490,7 @@ name = "Lantern Ascent"
 id = "378061fa-6376-48d9-afd7-1463a8305194"
 tide = "Surge"
 tide-cost = 1
-rendered-text = "Return up to 3 random events from your void to your hand."
+rendered-text = "Return 3 random events from your void to your hand."
 energy-cost = 4
 card-type = "Event"
 subtype = ""
@@ -5617,22 +5500,6 @@ spark = ""
 image-number = 334049255
 art-owned = false
 card-number = 350
-
-[[cards]]
-name = "Wreck of the Fallen Star"
-id = "b7f308e2-d674-4e8b-9e01-e6efb15f0ca2"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Materialize a Radiant Figment for each card you have played this turn."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 323698610
-art-owned = false
-card-number = 351
 
 [[cards]]
 name = "Iron Matron"
@@ -5669,7 +5536,7 @@ card-number = 354
 [[cards]]
 name = "Sunset Blade Sentinel"
 id = "d610b91d-61c3-494f-8cf5-ab37847fa171"
-tide = "Ignite"
+tide = "Umbra"
 tide-cost = 1
 rendered-text = "▸ Judgment: With 3 cards in your void, this character gains +2 spark."
 energy-cost = 1
@@ -5685,7 +5552,7 @@ card-number = 355
 [[cards]]
 name = "Aurora's Embrace"
 id = "018c304f-90b1-4365-8568-8f527279b703"
-tide = "Bloom"
+tide = "Pact"
 tide-cost = 1
 rendered-text = "Abandon an ally: Gain 1 maximum ●."
 energy-cost = 2
@@ -5703,7 +5570,7 @@ name = "Wallbreaker Sorceress"
 id = "c2a48aa4-c818-4551-af44-f29b865f5d1c"
 tide = "Rime"
 tide-cost = 1
-rendered-text = "▸ Judgment: You may discard a card to discover a character."
+rendered-text = "▸ Judgment: You may discard a card to draw a character."
 energy-cost = 2
 card-type = "Character"
 subtype = "Mage"
@@ -5735,7 +5602,7 @@ name = "Stargazer Astromancer"
 id = "82f87087-9da1-401d-aab1-8c5fcda03338"
 tide = "Bloom"
 tide-cost = 2
-rendered-text = "When you materialize a Spirit Animal, gain 1●. When you materialize 2 Spirit Animals in a turn, discover a Spirit Animal."
+rendered-text = "When you materialize a Spirit Animal, gain 1●. When you materialize 2 Spirit Animals in a turn, draw a Spirit Animal."
 energy-cost = 3
 card-type = "Character"
 subtype = "Mage"
@@ -5751,7 +5618,7 @@ name = "Duskpeak Chronicler"
 id = "cb30a53c-fce2-4048-b808-6ef106c9e054"
 tide = "Pact"
 tide-cost = 1
-rendered-text = "▸ Materialized: Abandon an ally. Materialize a Shadow Figment."
+rendered-text = "▸ Materialized: Abandon an ally. Materialize a Shadow figment."
 energy-cost = 2
 card-type = "Character"
 subtype = "Explorer"
@@ -5821,7 +5688,7 @@ card-type = "Character"
 subtype = "Outsider"
 rarity = "Common"
 is-fast = false
-spark = 3
+spark = 5
 image-number = 2293194523
 art-owned = false
 card-number = 365
