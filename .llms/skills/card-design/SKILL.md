@@ -39,11 +39,16 @@ card art:
 
 # Phase 2: Read the Art's Story
 
-Before thinking about mechanics at all, sit with the art and write a **narrative anchor**:
-2-3 sentences describing what you see in pure story terms — no game vocabulary. What emotion
-does it evoke? What's happening? What kind of person/creature/moment is this? The narrative
-anchor is the single most important output of the design process. Every mechanical decision
-must serve it.
+Before thinking about mechanics, sit with the art and write two things:
+
+**Literal reading:** One sentence about what is physically happening in the art. "A figure
+is striking a bear with a pickaxe." "A woman floats above a glowing pool." This grounds
+you in what a viewer actually *sees*.
+
+**Narrative anchor:** 2-3 sentences describing what you see in pure story terms — no game
+vocabulary. What emotion does it evoke? What's happening? What kind of person/creature/moment
+is this? The narrative anchor is a creative prompt that guides your design — it should
+inspire mechanical ideas, but it does not constrain them.
 
 **Example narrative anchors:**
 - "A lone traveler stands in an endless golden field, watching in quiet awe as impossibly
@@ -64,9 +69,12 @@ Then identify the **practical constraints** the art places on the design:
 - Art with a horror/destructive mood should have a negative-coded effect such as interacting
   with the opponent or the void
 
-The narrative anchor is the source of truth. If at any point during the design process you
-find yourself justifying a mechanic that doesn't match the anchor, stop and either revise
-the mechanic or revise the anchor — don't force-fit.
+**Priority hierarchy — fun first:** The #1 goal is a mechanically novel, fun card. Art
+resonance is a bonus that makes a great card even better, but it must never veto an
+exciting mechanic. If you find a genuinely novel mechanic that doesn't perfectly match the
+literal reading, that's fine — use creative interpretation to connect them. A loose but
+honest art connection on an exciting card beats a perfect art match on a boring one. When
+in doubt, prioritize the mechanic that would be most fun to play.
 
 ### Art-to-Dynamic Translation Guide
 
@@ -265,17 +273,19 @@ many times) and which are absent. Then CLOSE THE POOL mentally and return to the
 concepts should flow from the narrative anchor, informed by the knowledge of what the game
 has already explored.
 
-Before committing to a final design, generate **4 concept sketches that tell different
-stories about the art**. Each concept must start from a different emotional or narrative
-reading of the art — not the same reading with different mechanics bolted on. The goal is
-to explore what the art *means* before deciding what it *does*.
+Before committing to a final design, generate **4 concept sketches inspired by the art**.
+Each concept should start from a different creative angle — a different emotional reading,
+a different element of the art, or a different abstract dynamic the art suggests. The art
+is a creative springboard: some concepts may closely match the literal reading, others may
+be inspired by mood, setting, or a single visual detail. Both are valid. The goal is to
+explore a wide range of exciting mechanics, not to find the one "correct" interpretation.
 
 Each concept should be:
 
-- A one-sentence narrative interpretation of the art (what's happening, who is this, how
-  does it feel)
-- The tide that matches that interpretation and approximate cost
-- The mechanic that flows from the narrative (in parentheses)
+- A one-sentence creative angle inspired by the art (can be literal, metaphorical, or
+  based on mood/setting/a single visual detail)
+- The tide and approximate cost
+- The mechanic, with a brief note on why it's fun (in parentheses)
 
 **Critical requirement: at least 3 of the 4 concepts must be "wild" concepts** — mechanics
 or mechanical combinations that you believe do not currently exist on any card in the pool.
@@ -409,9 +419,10 @@ the top 3 cards of the opponent's deck. Play one of them for 0●" creates a *st
 
 ### Concept Evaluation Criteria
 
-**Novelty has veto power.** A concept that fails the novelty test is rejected regardless
-of how well it scores on other criteria. The game already has 300+ cards — it does not need
-another competent-but-familiar design. It needs cards that create new play experiences.
+**Fun and novelty are the top priorities.** A card must be exciting to play — that's the
+non-negotiable. Art resonance enhances a design but never overrides it. The game already
+has 300+ cards — it does not need another competent-but-familiar design. It needs cards
+that create new play experiences.
 
 1. **Mechanical novelty (REQUIRED — veto power):** Does this card create a play experience
    that no existing card creates? This is not about the specific numbers, trigger condition,
@@ -419,14 +430,17 @@ another competent-but-familiar design. It needs cards that create new play exper
    and say "playing my card feels like playing that card," the concept fails. You must be
    able to complete this sentence: "No existing card ___" where the blank describes the
    unique play experience. If you cannot, reject the concept and try again.
-2. **Narrative resonance:** Does the mechanic feel like it *is* what the art depicts? The
-   best card designs create an "aha" moment where the mechanic and art feel inseparable.
-   If you have to write more than one sentence explaining how the mechanic connects to the
-   art, the connection is too weak.
-3. **Tide fit:** Does the narrative interpretation naturally belong to this tide's
-   philosophy? Does the mechanic advance the tide's primary strategy?
+2. **Fun factor:** Would a player be excited to discover this card in a draft? Does playing
+   it create a memorable moment? Fun is more important than thematic elegance.
+3. **Tide fit:** Does the mechanic advance the tide's primary strategy? Does it have a
+   natural home in the tide's game plan?
 4. **Simplicity:** Can you express it in one clean rules text block? Novelty does not mean
    complexity — the best novel designs are often elegantly simple.
+5. **Narrative resonance (bonus, not requirement):** Does the mechanic connect to the art?
+   The best designs create an "aha" moment where mechanic and art feel inseparable — but a
+   loose, creative connection is perfectly acceptable. The art is a starting point for
+   inspiration, not a specification to implement. If the mechanic is fun and novel, a
+   one-sentence creative interpretation in the Narrative field is all you need.
 
 ### Cost-to-Excitement Scaling
 
@@ -473,9 +487,10 @@ feels proportional to the energy spent.
 
 After picking a concept, stress-test it before writing the final design:
 
-- **Narrative anchor check:** Re-read your narrative anchor from Phase 2. Does the mechanic
-  still tell that story, or did you drift during ideation? If you can't explain the
-  connection in one sentence without straining, the design has drifted. Go back to the art.
+- **Art connection check:** Can you write a one-sentence creative interpretation connecting
+  the mechanic to the art? The connection can be loose or metaphorical — it just needs to
+  not actively contradict what a viewer sees. If the mechanic is fun and novel, a creative
+  stretch is fine. Only redesign if the art and mechanic are completely irreconcilable.
 - **Power check:** Estimate the average case for variable effects. Use the event/character
   benchmarks (in Phase 5) to verify the total value is appropriate for the cost.
 - **Play pattern check:** For every triggered ability, answer concretely: who causes this
@@ -744,16 +759,20 @@ Dreamwell cards have a different structure than regular cards:
 
 ### Design Principles
 
-1. **Novelty is non-negotiable.** Every card must create a play experience that doesn't
-   already exist in the card pool. "Solid but not exciting" is a rejection. Before
+1. **Fun is non-negotiable.** The card must be exciting to play. Would you be happy to
+   draft this? Does it create a moment? "Solid but not exciting" is a rejection. Before
    finalizing, ask: "Could I describe this card to a friend and have them say 'whoa, that's
    cool'?" If the answer is "it's like [existing card] but [minor difference]," the design
    has failed — return to Phase 4. The card pool has 300+ cards. It does not need another
    competent role-player. It needs cards that create new stories.
 
-2. **Match the art.** The narrative must be believable. A serene forest spirit should not
-   dissolve enemies. A war machine should not draw cards peacefully. If the art and mechanic
-   don't tell the same story, redesign.
+2. **Connect to the art — but don't be enslaved by it.** The art is a creative starting
+   point, not a specification. The mechanic should not *actively contradict* what a viewer
+   sees (a serene forest spirit probably shouldn't dissolve enemies), but a loose or
+   metaphorical connection is perfectly fine. Name, flavor, and creative interpretation can
+   bridge significant gaps between art and mechanic. Never sacrifice an exciting mechanic
+   because the art connection requires a sentence of explanation — that sentence is what
+   the Narrative field is for.
 
 3. **Simplicity serves novelty.** The best novel designs are elegantly simple — one clean
    idea expressed clearly, not three ideas stapled together. If you can express the card in
@@ -797,10 +816,13 @@ Dreamwell cards have a different structure than regular cards:
   The card pool already has hundreds of "draw a card," "kindle N," and "gain N●" triggers.
   These effects can appear as *riders* on a card whose primary identity is novel, but they
   must never BE the card's identity.
-- **Mechanic-first design:** Finding a "novel" mechanical combination through card pool
-  analysis and then backfitting an art justification. If you arrived at your mechanic by
-  searching for gaps rather than by reading the art, start over. The art generates the
-  concept; research validates it.
+- **Pure gap-filling without inspiration:** Mechanically scanning the card pool for "what's
+  missing" and generating a design to fill the gap, with no creative spark from the art.
+  The art should still *inspire* concepts — but inspiration can be loose. A violent
+  confrontation in a blizzard might inspire a joust mechanic (the confrontation), a spark
+  reset (the blizzard), or a punisher choice (the standoff) — all valid even though only
+  one literally depicts "what's happening." What's NOT valid is ignoring the art entirely
+  and designing "the game needs more Rime 3-drops, here's a generic one."
 - **Parasitic design:** Cards that do literally nothing without specific other cards. Every
   card should have a baseline of usefulness even without synergy.
 - **Strict duplicates:** If an existing card does the same thing at the same cost, your
