@@ -5,38 +5,10 @@ description: Design a new Dreamtides card based on art input. Use when designing
 
 # Card Design Skill
 
-You are an expert card game designer, creating novel game designs with deep thinking and analysis. Run everything with ultrathink.
+You are an expert card game designer, creating novel game designs with deep thinking and
+analysis. Run everything with ultrathink.
 
 Read `docs/battle_rules/battle_rules.md` and `docs/tides/tides.md` (use the Read tool).
-
-## Research: Card Pool Reference
-
-**Start by reading the entire card pool into context.** Run this command first — it outputs
-every card in compact format (~500 lines), grouped by tide and sorted by cost:
-
-```bash
-python3 .claude/skills/card-design/card-research.py dump
-```
-
-Each line is: `Name | Tide+Cost | Stats | Type | Rarity | Rules Text`
-
-Having the full card pool visible lets you spot gaps, patterns, and naming conventions
-organically — rather than only finding what you already thought to search for.
-
-### Supplemental Research Commands
-
-For targeted checks after you've already developed an art-driven concept:
-
-```bash
-# Search rules text for a phrase (check for duplicates of your concept)
-python3 .claude/skills/card-design/card-research.py similar "when you discard"
-
-# Show cards at a specific cost within a specific tide (saturation check)
-python3 .claude/skills/card-design/card-research.py cost-in-tide Umbra 3
-```
-
-These commands are for **validation**, not generation. Use them to confirm your concept
-doesn't duplicate an existing card, not to find mechanical gaps to fill.
 
 # Phase 1: Classify Art
 
@@ -96,32 +68,36 @@ The narrative anchor is the source of truth. If at any point during the design p
 find yourself justifying a mechanic that doesn't match the anchor, stop and either revise
 the mechanic or revise the anchor — don't force-fit.
 
-### Art-to-Mechanic Translation Guide
+### Art-to-Dynamic Translation Guide
 
-The tables below are a **starting point to get you thinking**, not an authoritative mapping.
-Most art combines multiple visual elements, and the best designs often bridge elements from
-different rows — e.g., golden light + ruins might suggest revelation FROM the void (mill +
-draw, or kindle from mill), not just one or the other. Use these associations as creative
-seeds, then let the specific art guide you to a mechanic that tells its unique story.
+The table below maps visual elements to the **dynamics and feelings** they suggest — not to
+specific game keywords. The goal is to spark creative thinking, not to channel you into
+pre-existing mechanical patterns. When you see a portal in the art, don't immediately think
+"banish/blink" — think about what a portal *means narratively* (transformation, crossing a
+threshold, the moment between before and after) and then invent a mechanic that captures
+*that* feeling, whether or not it maps to an existing keyword.
 
-**Visual elements and their mechanical associations:**
-
-| Visual Element | Mechanical Association |
+| Visual Element | Dynamic It Suggests |
 |---|---|
-| Golden light, sparks, radiance | Card draw, Foresee, Discover — revelation/knowledge |
-| Darkness, shadow, void imagery | Void interaction, mill, Reclaim — hidden resources |
-| Fire, explosion, destruction | Dissolve, Banish, removal — destroying threats |
-| Growth, nature, blooming | Ramp, energy gain, max energy increase |
-| Speed, motion blur, flight | Fast keyword, tempo, return-to-hand effects |
-| Crowds, armies, banners | Token generation, go-wide, tribal effects |
-| Sacrifice, altars, blood | Abandon effects, sacrifice-for-value |
-| Ice, winter, austerity | Discard effects, taxation, cost increase |
-| Machinery, technology, circuits | Repeatable effects, engines, systematic processes |
-| Magical cascades, chains, links | Event chaining, copying, storm effects |
-| Ruins, decay, entropy | Mill, void recursion, scaling with void count |
-| Portals, gateways, thresholds | Banish/return, blink, zone transitions |
-| Shields, barriers, protection | Prevent, cost increase, immunity |
-| Mirrors, reflections, duality | Copy effects, symmetrical effects |
+| Golden light, sparks, radiance | Revelation, uncovering, gaining knowledge or options |
+| Darkness, shadow, void imagery | Hidden resources, delayed payoff, things not yet found |
+| Fire, explosion, destruction | Decisive action, removing obstacles, clearing the way |
+| Growth, nature, blooming | Acceleration, compounding returns, investment that pays off |
+| Speed, motion blur, flight | Tempo, responsiveness, being ahead of the moment |
+| Crowds, armies, banners | Strength in numbers, collective power, coordination |
+| Sacrifice, altars, blood | Trading one thing for something better, transformation through loss |
+| Ice, winter, austerity | Discipline, doing more with less, denial |
+| Machinery, technology, circuits | Repeatability, precision, systematic advantage |
+| Magical cascades, chains, links | Sequences, momentum, each action enabling the next |
+| Ruins, decay, entropy | Value in what's been lost, the past as resource |
+| Portals, gateways, thresholds | Transformation, conditionality, "before and after" moments |
+| Shields, barriers, protection | Control over what happens, authority, selective denial |
+| Mirrors, reflections, duality | Echoing, doubling, symmetry or asymmetry |
+
+These dynamics are starting points, not endpoints. The best designs often combine two
+dynamics in an unexpected way — e.g., "revelation + loss" might become a card that forces
+you to show your hand to gain a powerful effect, or "tempo + sacrifice" might be a card
+that returns itself to hand to save an ally but costs you a turn of spark.
 
 **Size-to-cost mapping for characters:**
 
@@ -133,8 +109,6 @@ seeds, then let the specific art guide you to a mechanic that tells its unique s
 | Titanic/mythic being | 7-9 | 5-7 |
 
 **Scale-to-cost mapping for events:**
-
-The visual drama and scale of the art should match the event's cost and impact:
 
 | Art Scale | Typical Cost | Effect Tier |
 |---|---|---|
@@ -199,10 +173,6 @@ a bonus for draftability — but don't force it.
 - **Umbra + Rime:** Grindy midrange (discard and mill to void, recur)
 - **Rime + Surge:** Full control (proactive disruption + reactive counterspells)
 - **Surge + Bloom:** Ramp combo (accelerate energy, chain events)
-
-When reviewing the card pool dump, glance at whether your chosen tide already uses
-the mechanic you're considering. A mechanic that appears in 0 cards in a tide is a yellow
-flag — but if the art's story demands it, that's a valid reason to introduce it.
 
 ### Tide Cost
 
@@ -275,24 +245,211 @@ by tide:
 - **General rule:** If the effect is reactive (responds to opponent's actions), it should
   probably be fast. If it's proactive (builds your board), it should not be.
 
-# Phase 4: Validate Against Existing Cards
+# Phase 4: Explore Concepts
 
-**Note:** These phases are presented linearly but the process is iterative. Research may
-reveal that your tide choice (Phase 3) doesn't work, or concept exploration (Phase 5) may
-send you back to research. Loop back when earlier decisions need revision.
+**Do NOT read the card pool before this phase.** Concepts should come from the art and your
+imagination, not from surveying what already exists. You will validate against the card pool
+in Phase 5 — but the creative work happens here, unbounded.
 
-**Research is for validation, not generation.** You should already have an art-driven concept
-in mind from Phases 2-3. The purpose of research is to check that your concept doesn't
-duplicate an existing card and to find the right cost/stats. Do NOT use research to find
-"gaps" in the card pool and then backfit an art justification — that produces generic
-designs disconnected from the art.
+Before committing to a final design, generate **4 concept sketches that tell different
+stories about the art**. Each concept must start from a different emotional or narrative
+reading of the art — not the same reading with different mechanics bolted on. The goal is
+to explore what the art *means* before deciding what it *does*.
 
-You should already have the full card pool dump in context (from the `dump` command run at
-the start). Use it to examine your chosen tide's cards, check for name collisions, and
-identify comparable cards. Supplement with targeted commands as needed:
+Each concept should be:
 
-1. `similar <phrase>` — find cards with similar rules text to your concept
-2. `cost-in-tide <tide> <cost>` — check saturation at your cost point
+- A one-sentence narrative interpretation of the art (what's happening, who is this, how
+  does it feel)
+- The tide that matches that interpretation and approximate cost
+- The mechanic that flows from the narrative (in parentheses)
+
+**Critical requirement: at least one concept must be a "wild" concept** — a mechanic or
+mechanical combination that you believe does not currently exist on any card in the pool.
+Push into unexplored design space. Invent something the game has never done. The wild
+concept might not be the one you pick, but it forces you to think beyond existing patterns.
+
+**Example concepts for art showing a hooded figure in rain catching glowing fragments:**
+1. "A watcher shields the world from a cascade of broken spells — Rime 3●/2✦ (discard 2
+   to prevent a played card; discarded cards are the fragments caught)"
+2. "A scavenger of lost dreams, gathering fragments of forgotten power from the rain —
+   Umbra 3●/1✦ (Judgment: mill 2, return a non-character from void; catching = retrieving)"
+3. "A seer reading omens in the patterns of falling light — Neutral 2●/1✦ (when you
+   foresee, you may also look at the top card of the opponent's deck; fragments reveal
+   hidden knowledge)" **(wild — opponent deck peeking tied to foresee is new)**
+4. "The figure is not catching the fragments — they're *becoming* them, dissolving into pure
+   magic to be reborn — Arc 4●/1✦ (Materialized: banish this character and a card from your
+   hand. At end of turn, materialize both and they each gain +2 spark; transformation
+   through the rain)" **(wild — self-banish + hand-banish with delayed co-materialization)**
+
+Notice how concepts 3 and 4 push into territory that doesn't exist in the card pool.
+They may need refinement, but they start from a genuinely novel place.
+
+### Novel Design Space — Think Like a Digital Card Game
+
+Dreamtides is a digital card game. It can track hidden state, randomize, transform cards
+in zones, and do things that would be impossible in paper. When generating concepts,
+actively consider mechanics from this design space. The following are **examples of
+unexplored or lightly-explored territory** — not a checklist, but a prompt to think bigger:
+
+**Cards that transform or evolve:**
+- A card in your hand that changes (gains abilities, reduces cost, transforms into a
+  different card) based on game events while you hold it
+- A character that becomes a different character when a condition is met
+- An event that upgrades itself each time it's played from void (via Reclaim)
+
+**Cards that interact with hidden information:**
+- Reveal the top card of the opponent's deck; effect depends on what's revealed
+- Look at the opponent's hand and gain a bonus based on what you see
+- Effects that scale with information neither player fully controls (top of deck,
+  random selection from deck)
+
+**Cards with unusual scaling or conditions:**
+- Effects that scale with the score differential (stronger when you're behind, or when
+  you're ahead)
+- Cards that care about the current turn number or energy production tier
+- Effects based on the total cost of characters on either battlefield
+- Cards that count something unusual (events in your void, characters the opponent has
+  materialized this game, number of times you've used foresee)
+
+**Cards that give the opponent choices (punisher mechanics):**
+- "The opponent chooses: you draw 3 cards, or they abandon a character"
+- Effects where the opponent picks which of two bad outcomes happens to them
+- Cards that get stronger if the opponent takes a specific public action
+
+**Cards that change rules or modify other cards:**
+- "Characters you materialize this turn gain the Judgment ability of the first character
+  you materialized"
+- "The next character you play this turn costs 0● but is abandoned at end of turn"
+- "Until end of turn, your events also kindle 1 when played"
+- Effects that temporarily change what a zone does (void becomes a second hand, top of
+  deck is revealed)
+
+**Cards with unusual timing or delayed effects:**
+- Effects that trigger N turns from now ("At the start of your 3rd turn after this one...")
+- Cards that set up a future payoff visible to both players
+- Characters that do nothing initially but have an inevitable payoff if they survive
+
+**Cards that create variance and moments:**
+- Play a random card from your deck (some versions exist — explore more)
+- Effects that generate a random card not in your deck (from a pool)
+- Discover with unusual criteria ("discover a card the opponent has in their deck")
+- "Joust" effects — reveal from both decks, compare, winner gets a bonus
+
+These mechanics create the memorable moments that players talk about after a game. A card
+that says "▸ Judgment: Kindle 2" is forgettable. A card that says "▸ Materialized: Reveal
+the top 3 cards of the opponent's deck. Play one of them for 0●" creates a *story*.
+
+### Concept Evaluation Criteria
+
+Pick the concept that best satisfies ALL of these. Unlike the numbered list suggests, these
+criteria should be weighed holistically — a concept that's extraordinary on novelty and
+play pattern can win even if narrative resonance is merely "good" rather than "perfect."
+
+1. **Narrative resonance:** Does the mechanic feel like it *is* what the art depicts? The
+   best card designs create an "aha" moment where the mechanic and art feel inseparable.
+   If you have to write more than one sentence explaining how the mechanic connects to the
+   art, the connection is too weak.
+2. **Novelty and play-pattern appeal:** Is this card doing something the game hasn't done
+   before, or hasn't done in this way? Does it create interesting decisions, exciting
+   moments, or surprising outcomes? **A novel card with good narrative fit is almost always
+   better than a derivative card with perfect narrative fit.** The existing card pool already
+   has plenty of "draw a card," "kindle N," and "gain N●" triggers — the game doesn't need
+   another one unless it's doing something genuinely new with it. Cards that create stories
+   (variance, meaningful choices, dramatic moments) are better than cards that create
+   incremental value.
+3. **Tide fit:** Does the narrative interpretation naturally belong to this tide's
+   philosophy? Does the mechanic advance the tide's primary strategy?
+4. **Simplicity:** Can you express it in one clean rules text block? Novelty does not mean
+   complexity — the best novel designs are often elegantly simple.
+
+### Cost-to-Excitement Scaling
+
+A card's energy cost sets the player's expectations for how dramatic it should feel. A 2●
+common can be a simple stat body or a modest trigger — the investment is small, so the
+payoff can be small. But when a player spends 7● on a rare, they've committed most of their
+turn's energy to one play. That moment needs to feel *worth it*.
+
+**The problem with "just numbers":** A 7● character with "▸ Judgment: Kindle 3" is
+mechanically strong but experientially flat — nothing interesting happens when you play it,
+nothing interesting happens each turn. It's a number that goes up. Compare this to
+"▸ Materialized: Materialize a random Spirit Animal from your deck" — the moment you slam
+this card, something exciting and unpredictable happens. The player watches to see what they
+hit, the board state visibly changes, and the game creates a *moment*.
+
+**What makes expensive cards feel exciting:**
+
+| Element | Example | Why it works |
+|---|---|---|
+| Immediate board impact | "▸ Materialized: Dissolve an enemy" | Something happens RIGHT NOW |
+| Variance / discovery | "Materialize a random character from your deck" | Anticipation and surprise |
+| Scaling with investment | "Each allied Spirit Animal gains +2 spark" | Rewards the work you did getting here |
+| Meaningful choices | "Choose one: [3 options]" | Player agency in a big moment |
+| Dramatic opponent interaction | "The opponent abandons 3 characters" | Reshapes the entire game state |
+
+**Guidelines by cost:**
+
+- **0-2●:** Simple, incremental, or engine-piece effects are fine. "Judgment: Gain 1●" is
+  perfectly acceptable at 1●. The card earns its keep through repetition over many turns.
+- **3-4●:** Should have at least one moment of interest — a materialized trigger, a
+  meaningful decision, or a conditional payoff that feels good when met.
+- **5-6●:** Must create a noticeable board shift when played. If someone watches you play
+  this card and nothing visibly changes, it's too passive for the cost.
+- **7+●:** This is your big play of the turn. It should create a *story* — a moment the
+  player remembers. Materialized triggers are almost mandatory at this cost. Pure
+  passive/judgment-only effects need an extremely compelling reason to justify this
+  investment with no immediate payoff.
+
+This doesn't mean expensive cards must be *complex* — "▸ Materialized: Draw 3 cards" is
+simple but dramatically impactful at 7●. The goal is that the *moment of playing the card*
+feels proportional to the energy spent.
+
+### Refine Before Committing
+
+After picking a concept, stress-test it before writing the final design:
+
+- **Narrative anchor check:** Re-read your narrative anchor from Phase 2. Does the mechanic
+  still tell that story, or did you drift during ideation? If you can't explain the
+  connection in one sentence without straining, the design has drifted. Go back to the art.
+- **Power check:** Estimate the average case for variable effects. Use the event/character
+  benchmarks (in Phase 5) to verify the total value is appropriate for the cost.
+- **Play pattern check:** For every triggered ability, answer concretely: who causes this
+  to fire, how often, and can they choose not to? If the trigger depends on the opponent
+  taking an action they can simply avoid (e.g., "when this character is banished" — the
+  opponent will just Dissolve it instead), the ability is effectively blank text. If the
+  trigger requires a specific other card in play, estimate how often you'll have it. Then
+  mentally play the turn you cast this card and the next 2-3 turns: what concretely happens
+  each turn? If the answer is "nothing, unless..." the design is too conditional. Every card
+  should do something meaningful through actions the player naturally takes in their tide's
+  game plan.
+- **Is there a simpler version?** If you have two mechanics stapled together, ask whether
+  the card would be better with just one of them at a lower cost. Simpler is almost always
+  better.
+
+# Phase 5: Validate Against Existing Cards
+
+**Now — and only now — read the card pool.** Run the dump command to load every card:
+
+```bash
+python3 .claude/skills/card-design/card-research.py dump
+```
+
+Each line is: `Name | Tide+Cost | Stats | Type | Rarity | Rules Text`
+
+Then use targeted commands to validate your chosen concept:
+
+```bash
+# Search rules text for a phrase (check for duplicates of your concept)
+python3 .claude/skills/card-design/card-research.py similar "when you discard"
+
+# Show cards at a specific cost within a specific tide (saturation check)
+python3 .claude/skills/card-design/card-research.py cost-in-tide Umbra 3
+```
+
+**Note:** These phases are presented linearly but the process is iterative. Validation may
+reveal that your concept duplicates an existing card, your tide doesn't work, or your cost
+is wrong. Loop back to Phase 4 when earlier decisions need revision — but carry the creative
+ambition forward. If your novel concept turns out to duplicate a card, find a *different*
+novel angle, don't fall back to a safe, derivative design.
 
 ### What to Look For
 
@@ -457,116 +614,6 @@ Choose one: Draw 2 cards or Dissolve an enemy with spark 3 or less.
 
 **Symbols:** `●` = energy, `✪` = victory points, `▸` = trigger, `↯` = fast
 
-# Phase 5: Explore Concepts
-
-Before committing to a final design, generate **3 concept sketches that tell different
-stories about the art**. Each concept must start from a different emotional or narrative
-reading of the art — not the same reading with different mechanics bolted on. The goal is
-to explore what the art *means* before deciding what it *does*.
-
-Each concept should be:
-
-- A one-sentence narrative interpretation of the art (what's happening, who is this, how
-  does it feel)
-- The tide that matches that interpretation and approximate cost
-- The mechanic that flows from the narrative (in parentheses)
-
-**Example concepts for art showing a hooded figure in rain catching glowing fragments:**
-1. "A watcher shields the world from a cascade of broken spells — Rime 3●/2✦ (discard 2
-   to prevent a played card; discarded cards are the fragments caught)"
-2. "A scavenger of lost dreams, gathering fragments of forgotten power from the rain —
-   Umbra 3●/1✦ (Judgment: mill 2, return a non-character from void; catching = retrieving)"
-3. "A seer reading omens in the patterns of falling light — Rime 2●/1✦ (when you discard,
-   foresee 1; fragments reveal glimpses of the future)"
-
-Notice how each concept tells a *different story* about who the figure is and what they're
-doing — not just "same figure, different mechanic."
-
-### Concept Evaluation Criteria
-
-Pick the concept that best satisfies ALL of these, in priority order:
-
-1. **Narrative resonance (most important):** Does the mechanic feel like it *is* what the
-   art depicts? The best card designs create an "aha" moment where the mechanic and art
-   feel inseparable — you can't imagine different art on this card, or a different mechanic
-   for this art. If you have to write more than one sentence explaining how the mechanic
-   connects to the art, the connection is too weak.
-2. **Tide fit:** Does the narrative interpretation naturally belong to this tide's
-   philosophy? Does the mechanic advance the tide's primary strategy?
-3. **Simplicity:** Can you express it in one clean rules text block?
-4. **Play-pattern appeal:** Is this card fun to play? The best cards create satisfying
-   moments: variance that generates excitement, meaningful decisions (modal choices,
-   targeting decisions), or deckbuilding rewards (scaling effects that pay off investment).
-   Avoid mechanics that feel bad to use — for example, effects that make a player lose
-   victory points feel terrible even when they're balanced.
-5. **Novelty:** Is it meaningfully different from existing cards? (Check using research.)
-   Novelty matters, but it is the *least* important criterion — a card that perfectly
-   captures its art in a familiar mechanic is better than a "novel" card that doesn't
-   match the art.
-
-### Cost-to-Excitement Scaling
-
-A card's energy cost sets the player's expectations for how dramatic it should feel. A 2●
-common can be a simple stat body or a modest trigger — the investment is small, so the
-payoff can be small. But when a player spends 7● on a rare, they've committed most of their
-turn's energy to one play. That moment needs to feel *worth it*.
-
-**The problem with "just numbers":** A 7● character with "▸ Judgment: Kindle 3" is
-mechanically strong but experientially flat — nothing interesting happens when you play it,
-nothing interesting happens each turn. It's a number that goes up. Compare this to
-"▸ Materialized: Materialize a random Spirit Animal from your deck" — the moment you slam
-this card, something exciting and unpredictable happens. The player watches to see what they
-hit, the board state visibly changes, and the game creates a *moment*.
-
-**What makes expensive cards feel exciting:**
-
-| Element | Example | Why it works |
-|---|---|---|
-| Immediate board impact | "▸ Materialized: Dissolve an enemy" | Something happens RIGHT NOW |
-| Variance / discovery | "Materialize a random character from your deck" | Anticipation and surprise |
-| Scaling with investment | "Each allied Spirit Animal gains +2 spark" | Rewards the work you did getting here |
-| Meaningful choices | "Choose one: [3 options]" | Player agency in a big moment |
-| Dramatic opponent interaction | "The opponent abandons 3 characters" | Reshapes the entire game state |
-
-**Guidelines by cost:**
-
-- **0-2●:** Simple, incremental, or engine-piece effects are fine. "Judgment: Gain 1●" is
-  perfectly acceptable at 1●. The card earns its keep through repetition over many turns.
-- **3-4●:** Should have at least one moment of interest — a materialized trigger, a
-  meaningful decision, or a conditional payoff that feels good when met.
-- **5-6●:** Must create a noticeable board shift when played. If someone watches you play
-  this card and nothing visibly changes, it's too passive for the cost.
-- **7+●:** This is your big play of the turn. It should create a *story* — a moment the
-  player remembers. Materialized triggers are almost mandatory at this cost. Pure
-  passive/judgment-only effects need an extremely compelling reason to justify this
-  investment with no immediate payoff.
-
-This doesn't mean expensive cards must be *complex* — "▸ Materialized: Draw 3 cards" is
-simple but dramatically impactful at 7●. The goal is that the *moment of playing the card*
-feels proportional to the energy spent.
-
-### Refine Before Committing
-
-After picking a concept, stress-test it before writing the final design:
-
-- **Narrative anchor check:** Re-read your narrative anchor from Phase 2. Does the mechanic
-  still tell that story, or did you drift during ideation? If you can't explain the
-  connection in one sentence without straining, the design has drifted. Go back to the art.
-- **Power check:** Estimate the average case for variable effects. Use the event/character
-  benchmarks to verify the total value is appropriate for the cost.
-- **Play pattern check:** For every triggered ability, answer concretely: who causes this
-  to fire, how often, and can they choose not to? If the trigger depends on the opponent
-  taking an action they can simply avoid (e.g., "when this character is banished" — the
-  opponent will just Dissolve it instead), the ability is effectively blank text. If the
-  trigger requires a specific other card in play, estimate how often you'll have it. Then
-  mentally play the turn you cast this card and the next 2-3 turns: what concretely happens
-  each turn? If the answer is "nothing, unless..." the design is too conditional. Every card
-  should do something meaningful through actions the player naturally takes in their tide's
-  game plan.
-- **Is there a simpler version?** If you have two mechanics stapled together, ask whether
-  the card would be better with just one of them at a lower cost. Simpler is almost always
-  better.
-
 # Phase 6: Final Design
 
 Develop your chosen concept into a complete card. Write your response with the following:
@@ -604,40 +651,52 @@ Dreamwell cards have a different structure than regular cards:
 
 ### Design Principles
 
-1. **Simplicity first.** The best cards have one clean mechanic, not three stapled together.
-   If you can express the card in one sentence of rules text, do so. A card should have at
-   most 2 mechanical elements (e.g., a trigger + an effect, or a cost reduction + an
-   ability).
+1. **Novelty and play-pattern first.** The best cards do something the game hasn't done
+   before, or create a moment players remember. Before finalizing any design, ask: "Could
+   I describe this card to a friend and have them say 'whoa, that's cool'?" If the answer
+   is "it's solid but not exciting," push harder. A card that makes players *feel* something
+   — surprise, delight, tension, dread — is worth more than a card that's perfectly
+   balanced but forgettable.
 
 2. **Match the art.** The narrative must be believable. A serene forest spirit should not
    dissolve enemies. A war machine should not draw cards peacefully. If the art and mechanic
    don't tell the same story, redesign.
 
-3. **Avoid duplication.** If an existing card already does what you're designing, find a
+3. **Simplicity serves novelty.** The best novel designs are elegantly simple — one clean
+   idea expressed clearly, not three ideas stapled together. If you can express the card in
+   one sentence of rules text, do so. A card should have at most 2 mechanical elements
+   (e.g., a trigger + an effect, or a cost reduction + an ability).
+
+4. **Avoid duplication.** If an existing card already does what you're designing, find a
    different angle. Use the research script to check thoroughly.
 
-4. **Cost appropriately.** Use the spark-per-cost benchmarks for characters and the event
+5. **Cost appropriately.** Use the spark-per-cost benchmarks for characters and the event
    cost benchmarks for events. For variable effects, evaluate the average case, not the best
    or worst case. Compare directly to the 2-3 closest existing cards.
 
-5. **Consider the digital medium.** Digital card games can use mechanics with interesting
+6. **Consider the digital medium.** Digital card games can use mechanics with interesting
    variance (e.g., "discover a character" from a random set, scaling effects based on game
    state). Embrace mechanics that would be impractical in paper.
 
-6. **Tide commitment should match power.** Tide-cost 1 cards are good role-players.
+7. **Tide commitment should match power.** Tide-cost 1 cards are good role-players.
    Tide-cost 2 cards should meaningfully reward being in that tide. Tide-cost 3 cards
    should be build-arounds.
 
-7. **Think about the draft.** Cards that only work in one specific deck are less interesting
+8. **Think about the draft.** Cards that only work in one specific deck are less interesting
    than cards that are good in their primary tide but also playable in an adjacent hybrid
    strategy.
 
-8. **Rarity guides complexity.** Common cards should have simple, clean effects. Uncommon
+9. **Rarity guides complexity.** Common cards should have simple, clean effects. Uncommon
    cards can have one conditional or synergy-based ability. Rare cards can have more complex
    or build-around effects. Legendary cards are format-defining and uniquely powerful.
 
 ### Design Anti-Patterns to Avoid
 
+- **Derivative design:** Reskinning an existing card with different numbers. If your design
+  is "like Card X but costs 1 more and has +1 spark," you haven't designed a new card —
+  you've made a variant. Push further. The card pool already has hundreds of "draw a card,"
+  "kindle N," and "gain N●" triggers. A new card using these effects needs to combine or
+  contextualize them in a way that creates a genuinely new play experience.
 - **Mechanic-first design:** Finding a "novel" mechanical combination through card pool
   analysis and then backfitting an art justification. If you arrived at your mechanic by
   searching for gaps rather than by reading the art, start over. The art generates the
@@ -675,4 +734,3 @@ common structures that appear in the card pool:
 
 These are guidelines, not rules. Prioritize names that are memorable, evocative of the
 card's identity, and feel natural. Creative names that don't fit any pattern are fine.
-
