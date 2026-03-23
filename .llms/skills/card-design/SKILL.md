@@ -247,9 +247,23 @@ by tide:
 
 # Phase 4: Explore Concepts
 
-**Do NOT read the card pool before this phase.** Concepts should come from the art and your
-imagination, not from surveying what already exists. You will validate against the card pool
-in Phase 5 — but the creative work happens here, unbounded.
+**Read the card pool NOW** — before generating concepts. Run the dump command to load every
+card:
+
+```bash
+python3 .claude/skills/card-design/card-research.py dump
+```
+
+**Why read first:** You cannot design something genuinely novel if you don't know what
+already exists. The pool read is defensive — it tells you what to AVOID, not what to DO.
+Do NOT let the pool drive your concepts. The art and narrative anchor drive concepts; the
+pool prevents you from accidentally recreating an existing card.
+
+**How to use the pool:** Scan for mechanical patterns, not specific cards. Note which
+*play experiences* are well-covered (e.g., "character that draws when materialized" appears
+many times) and which are absent. Then CLOSE THE POOL mentally and return to the art. Your
+concepts should flow from the narrative anchor, informed by the knowledge of what the game
+has already explored.
 
 Before committing to a final design, generate **4 concept sketches that tell different
 stories about the art**. Each concept must start from a different emotional or narrative
@@ -263,33 +277,87 @@ Each concept should be:
 - The tide that matches that interpretation and approximate cost
 - The mechanic that flows from the narrative (in parentheses)
 
-**Critical requirement: at least one concept must be a "wild" concept** — a mechanic or
-mechanical combination that you believe does not currently exist on any card in the pool.
-Push into unexplored design space. Invent something the game has never done. The wild
-concept might not be the one you pick, but it forces you to think beyond existing patterns.
+**Critical requirement: at least 3 of the 4 concepts must be "wild" concepts** — mechanics
+or mechanical combinations that you believe do not currently exist on any card in the pool.
+The default expectation is that the final card will use a wild concept. You may only pick a
+non-wild concept if you can articulate a specific, compelling reason why every wild concept
+fails for this art — and even then, push harder for a wild alternative first.
+
+**What counts as genuinely wild vs. superficially wild:**
+
+- **NOT wild:** "Materialize a random character from your deck" — this mechanic already
+  exists (Light of Emergence, Engine Light Dreamer). Changing the cost restriction, the
+  number of characters, or adding "Spirit Animal" does not make it wild. The *play
+  experience* is the same: you play a card, a random thing appears from your deck.
+- **NOT wild:** "Draw N cards" or "Kindle N" with a new trigger condition. The play
+  experience of "something happens, you draw/kindle" is deeply explored. A new trigger
+  stapled onto draw/kindle is not a new card — it's a new trigger on a familiar chassis.
+- **NOT wild:** Moving an existing mechanic to a different tide. "Abandon an ally: Draw a
+  card" in Bloom instead of Pact is not novel — it's the same card in different colors.
+- **WILD:** A mechanic that creates a play experience no existing card creates. "The
+  opponent chooses: you draw 3 or they abandon a character" — no card gives the opponent
+  this kind of choice. "When you foresee, you may also look at the opponent's top card" —
+  no card ties foresee to opponent information. "This character's spark equals the number
+  of events in your void" — no character scales this way.
+
+**The litmus test for novelty:** Describe the card to a friend who knows the game. If they
+say "oh, like [existing card] but different," it's not wild. If they say "wait, you can DO
+that?" — it's wild.
 
 **Example concepts for art showing a hooded figure in rain catching glowing fragments:**
-1. "A watcher shields the world from a cascade of broken spells — Rime 3●/2✦ (discard 2
-   to prevent a played card; discarded cards are the fragments caught)"
-2. "A scavenger of lost dreams, gathering fragments of forgotten power from the rain —
-   Umbra 3●/1✦ (Judgment: mill 2, return a non-character from void; catching = retrieving)"
-3. "A seer reading omens in the patterns of falling light — Neutral 2●/1✦ (when you
+1. "A seer reading omens in the patterns of falling light — Neutral 2●/1✦ (when you
    foresee, you may also look at the top card of the opponent's deck; fragments reveal
-   hidden knowledge)" **(wild — opponent deck peeking tied to foresee is new)**
-4. "The figure is not catching the fragments — they're *becoming* them, dissolving into pure
+   hidden knowledge)" **(wild — foresee grants opponent information access, entirely new)**
+2. "The figure is not catching the fragments — they're *becoming* them, dissolving into pure
    magic to be reborn — Arc 4●/1✦ (Materialized: banish this character and a card from your
    hand. At end of turn, materialize both and they each gain +2 spark; transformation
    through the rain)" **(wild — self-banish + hand-banish with delayed co-materialization)**
+3. "A lightning rod absorbing stray magic before it hits the ground — the more spells that
+   fly, the more power this figure holds — Surge 3●/0✦ (this character gains +1 spark each
+   time any player plays an event; the fragments are spells accumulating)" **(wild — spark
+   scales with global event count, no existing card does this)**
+4. "A watcher shields the world from a cascade of broken spells — Rime 3●/2✦ (discard 2
+   to prevent a played card; discarded cards are the fragments caught)" (not wild — discard
+   as prevent cost is a known pattern, included as backup only)
 
-Notice how concepts 3 and 4 push into territory that doesn't exist in the card pool.
-They may need refinement, but they start from a genuinely novel place.
+Notice how concepts 1-3 each create a play experience that doesn't exist anywhere in the
+card pool. Concept 4 is the lone non-wild backup — included for completeness but not the
+preferred pick.
 
 ### Novel Design Space — Think Like a Digital Card Game
 
 Dreamtides is a digital card game. It can track hidden state, randomize, transform cards
 in zones, and do things that would be impossible in paper. When generating concepts,
-actively consider mechanics from this design space. The following are **examples of
-unexplored or lightly-explored territory** — not a checklist, but a prompt to think bigger:
+actively consider mechanics from this design space.
+
+**IMPORTANT — Mechanical Gravity Wells to Resist:**
+The following mechanics are well-explored in the card pool and act as "gravity wells" that
+pull designs toward them. They are not banned, but using them requires justification for
+why THIS card's version creates a genuinely different play experience:
+
+- **"Draw N cards" / "Kindle N" as triggers** — The pool has dozens of these on every
+  trigger type. A new draw/kindle trigger is only justified if the trigger condition itself
+  is unprecedented AND the card's identity is the trigger, not the draw/kindle.
+- **"Materialize a random character from your deck"** — Already exists on Light of
+  Emergence, Engine Light Dreamer, Speaker for the Forgotten, Beacon Gazer (for events).
+  Changing the cost cap or card type doesn't create novelty.
+- **"Gain N●" on Judgment** — The Bloom ramp baseline. Another gain-energy-on-judgment card
+  needs an extraordinary twist to justify its existence.
+- **"Mill N + void synergy"** — The Umbra baseline. Mill-then-benefit is the most common
+  Umbra pattern. Don't default here.
+- **"Abandon an ally: [benefit]"** — The Pact baseline. Another abandon-for-value outlet
+  needs to offer a benefit type that doesn't exist yet.
+- **"When you play an event, [benefit]"** — The Surge baseline. Another events-matter
+  payoff needs to reward in a way no existing card does.
+- **Dissolve/Return/Banish as removal** — The Neutral baseline. Another removal variant is
+  only justified if the targeting condition or secondary effect is unprecedented.
+
+If you find yourself writing rules text that fits one of these patterns, STOP and ask: "What
+is the play experience this card creates that no existing card creates?" If you can't answer
+clearly, the concept needs more creative work.
+
+The following are **examples of genuinely unexplored territory** — not a checklist, but a
+prompt to think bigger:
 
 **Cards that transform or evolve:**
 - A card in your hand that changes (gains abilities, reduces cost, transforms into a
@@ -341,22 +409,20 @@ the top 3 cards of the opponent's deck. Play one of them for 0●" creates a *st
 
 ### Concept Evaluation Criteria
 
-Pick the concept that best satisfies ALL of these. Unlike the numbered list suggests, these
-criteria should be weighed holistically — a concept that's extraordinary on novelty and
-play pattern can win even if narrative resonance is merely "good" rather than "perfect."
+**Novelty has veto power.** A concept that fails the novelty test is rejected regardless
+of how well it scores on other criteria. The game already has 300+ cards — it does not need
+another competent-but-familiar design. It needs cards that create new play experiences.
 
-1. **Narrative resonance:** Does the mechanic feel like it *is* what the art depicts? The
+1. **Mechanical novelty (REQUIRED — veto power):** Does this card create a play experience
+   that no existing card creates? This is not about the specific numbers, trigger condition,
+   or tide — it's about the *experience at the table*. If you can point to an existing card
+   and say "playing my card feels like playing that card," the concept fails. You must be
+   able to complete this sentence: "No existing card ___" where the blank describes the
+   unique play experience. If you cannot, reject the concept and try again.
+2. **Narrative resonance:** Does the mechanic feel like it *is* what the art depicts? The
    best card designs create an "aha" moment where the mechanic and art feel inseparable.
    If you have to write more than one sentence explaining how the mechanic connects to the
    art, the connection is too weak.
-2. **Novelty and play-pattern appeal:** Is this card doing something the game hasn't done
-   before, or hasn't done in this way? Does it create interesting decisions, exciting
-   moments, or surprising outcomes? **A novel card with good narrative fit is almost always
-   better than a derivative card with perfect narrative fit.** The existing card pool already
-   has plenty of "draw a card," "kindle N," and "gain N●" triggers — the game doesn't need
-   another one unless it's doing something genuinely new with it. Cards that create stories
-   (variance, meaningful choices, dramatic moments) are better than cards that create
-   incremental value.
 3. **Tide fit:** Does the narrative interpretation naturally belong to this tide's
    philosophy? Does the mechanic advance the tide's primary strategy?
 4. **Simplicity:** Can you express it in one clean rules text block? Novelty does not mean
@@ -425,17 +491,35 @@ After picking a concept, stress-test it before writing the final design:
   the card would be better with just one of them at a lower cost. Simpler is almost always
   better.
 
+### Novelty Gate (MANDATORY)
+
+Before proceeding to Phase 5, you must pass this gate. Write the following:
+
+**"No existing card ___."** Complete this sentence with the unique play experience your
+chosen concept creates. This must describe a *play experience*, not a cosmetic difference.
+
+**PASS examples:**
+- "No existing card lets the opponent choose between two bad outcomes."
+- "No existing card has spark that scales with the number of events in your void."
+- "No existing card transforms into a different card while in your hand."
+- "No existing card punishes the opponent for having more characters than you."
+
+**FAIL examples:**
+- "No existing card materializes a random Spirit Animal costing 2 or less." (This is
+  "materialize random character from deck" with a subtype filter — same play experience
+  as Light of Emergence.)
+- "No existing card draws a card when a Warrior is banished." (This is "draw a card on
+  [trigger]" — same play experience as dozens of existing cards with different triggers.)
+- "No existing card in Bloom kindles 3 on materialized." (Kindle-on-materialized exists
+  in other tides — different tide is not a different play experience.)
+
+If you cannot pass the gate, **return to Phase 4 and generate new concepts.** Do not
+proceed with a derivative design. The purpose of Phase 5 is to refine a novel concept, not
+to rescue a derivative one.
+
 # Phase 5: Validate Against Existing Cards
 
-**Now — and only now — read the card pool.** Run the dump command to load every card:
-
-```bash
-python3 .claude/skills/card-design/card-research.py dump
-```
-
-Each line is: `Name | Tide+Cost | Stats | Type | Rarity | Rules Text`
-
-Then use targeted commands to validate your chosen concept:
+Use targeted commands to validate your chosen concept:
 
 ```bash
 # Search rules text for a phrase (check for duplicates of your concept)
@@ -447,20 +531,25 @@ python3 .claude/skills/card-design/card-research.py cost-in-tide Umbra 3
 
 **Note:** These phases are presented linearly but the process is iterative. Validation may
 reveal that your concept duplicates an existing card, your tide doesn't work, or your cost
-is wrong. Loop back to Phase 4 when earlier decisions need revision — but carry the creative
-ambition forward. If your novel concept turns out to duplicate a card, find a *different*
-novel angle, don't fall back to a safe, derivative design.
+is wrong. **When this happens, return to Phase 4 and generate entirely new concepts** — do
+not try to rescue a derivative concept by adjusting numbers. Carry the creative ambition
+forward: if your wild concept collides with an existing card, find a *different* wild angle.
+Never fall back to a safe, derivative design just because validation was hard.
 
 ### What to Look For
 
-- **Duplicate check:** Search for your concept's rules text phrasing. If an existing card
-  already does what you're designing, find a different angle — but stay true to the art's
-  story. Change the mechanic, not the narrative anchor.
+- **Duplicate check:** Search for your concept's key mechanical phrases. If an existing card
+  already creates the same play experience, **return to Phase 4** — do not simply adjust
+  numbers or cost. A truly novel concept can survive discovering a partial overlap; a
+  derivative concept cannot be rescued by tweaking.
+- **Differentiation test (MANDATORY):** For each of the 2-3 closest comparable cards, write
+  one sentence explaining how your card creates a **different play experience** — not just
+  different numbers, cost, tide, or trigger condition. If you find yourself writing "mine
+  does X instead of Y" where X and Y are the same type of effect (e.g., "mine draws 2
+  instead of 1," "mine targets cost ≤3 instead of ≤2"), the differentiation is
+  insufficient. **Return to Phase 4.**
 - **Saturation check:** How many cards already exist at your cost point in your tide? If
   there are already 12 cards at 3● in Umbra, consider a different cost.
-- **Closest comparables:** Identify the 2-3 existing cards most similar to your concept.
-  Your design should be meaningfully different from each of them. These become your "Similar
-  Cards" in the final design.
 - **Templating:** Copy the exact phrasing patterns from existing cards. Don't invent new
   templating for effects that already have established wording.
 
@@ -635,7 +724,11 @@ characters or fewer.
 - **Narrative:** One sentence connecting the art to the mechanics. For characters, who is
   this person and why do they have this ability? For events, what is happening? For
   dreamwell, where is this place?
-- **Similar Cards:** 2-4 existing cards with similar effects, with brief comparison.
+- **Novelty Statement:** "No existing card ___." The unique play experience, carried from
+  the Novelty Gate.
+- **Similar Cards:** 2-4 existing cards with the closest mechanical overlap, with one
+  sentence each explaining why your card creates a **different play experience** (not just
+  different numbers).
 
 ### Dreamwell Design (if applicable)
 
@@ -651,12 +744,12 @@ Dreamwell cards have a different structure than regular cards:
 
 ### Design Principles
 
-1. **Novelty and play-pattern first.** The best cards do something the game hasn't done
-   before, or create a moment players remember. Before finalizing any design, ask: "Could
-   I describe this card to a friend and have them say 'whoa, that's cool'?" If the answer
-   is "it's solid but not exciting," push harder. A card that makes players *feel* something
-   — surprise, delight, tension, dread — is worth more than a card that's perfectly
-   balanced but forgettable.
+1. **Novelty is non-negotiable.** Every card must create a play experience that doesn't
+   already exist in the card pool. "Solid but not exciting" is a rejection. Before
+   finalizing, ask: "Could I describe this card to a friend and have them say 'whoa, that's
+   cool'?" If the answer is "it's like [existing card] but [minor difference]," the design
+   has failed — return to Phase 4. The card pool has 300+ cards. It does not need another
+   competent role-player. It needs cards that create new stories.
 
 2. **Match the art.** The narrative must be believable. A serene forest spirit should not
    dissolve enemies. A war machine should not draw cards peacefully. If the art and mechanic
@@ -692,11 +785,18 @@ Dreamwell cards have a different structure than regular cards:
 
 ### Design Anti-Patterns to Avoid
 
-- **Derivative design:** Reskinning an existing card with different numbers. If your design
-  is "like Card X but costs 1 more and has +1 spark," you haven't designed a new card —
-  you've made a variant. Push further. The card pool already has hundreds of "draw a card,"
-  "kindle N," and "gain N●" triggers. A new card using these effects needs to combine or
-  contextualize them in a way that creates a genuinely new play experience.
+- **Derivative design (the #1 problem — instant rejection):** If your card's play
+  experience can be described as "[existing card] but [different numbers/tide/trigger]," it
+  is derivative and must be rejected. This includes:
+  - Same mechanic in a different tide ("abandon-for-value but in Bloom")
+  - Same mechanic with a different number ("kindle 3 instead of kindle 2")
+  - Same mechanic with a different trigger ("draw on banish instead of draw on materialize")
+  - Same mechanic with a different restriction ("cost ≤3 instead of cost ≤2")
+  - Same mechanic on a different body ("materialize random from deck, but on a character
+    instead of an event")
+  The card pool already has hundreds of "draw a card," "kindle N," and "gain N●" triggers.
+  These effects can appear as *riders* on a card whose primary identity is novel, but they
+  must never BE the card's identity.
 - **Mechanic-first design:** Finding a "novel" mechanical combination through card pool
   analysis and then backfitting an art justification. If you arrived at your mechanic by
   searching for gaps rather than by reading the art, start over. The art generates the

@@ -6680,7 +6680,7 @@ card-number = 441
 [[cards]]
 name = "Lantern Drift Maiden"
 id = "36eb38d7-c57f-4c60-8b7a-21d4e955728e"
-tide = "Surge"
+tide = "Arc"
 tide-cost = 2
 rendered-text = "When you play an event, you may banish an ally, then materialize it."
 energy-cost = 4
@@ -6692,25 +6692,6 @@ spark = 1
 image-number = 447372517
 art-owned = false
 card-number = 442
-
-[[cards]]
-name = "Magma Bridge Walker"
-id = "c235b54e-e55b-4868-92b6-1473e77f3f7c"
-tide = "Umbra"
-tide-cost = 3
-rendered-text = """
-When you have no cards in your deck, you win the game.
-▸ Judgment: Put the top 3 cards of your deck into your void.
-"""
-energy-cost = 4
-card-type = "Character"
-subtype = "Mage"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 450440617
-art-owned = false
-card-number = 443
 
 [[cards]]
 name = "Cloudborne Voyage"
@@ -6734,7 +6715,7 @@ id = "1cf26e51-dd11-4ad0-85d9-42c324a65e2e"
 tide = "Bloom"
 tide-cost = 1
 rendered-text = "Each player may materialize a character from their hand for 0●."
-energy-cost = 3
+energy-cost = 2
 card-type = "Event"
 subtype = ""
 rarity = "Common"
@@ -6813,7 +6794,7 @@ name = "Acid World Voyager"
 id = "ef905bc3-6602-4b61-83bd-1b223cd5c5a2"
 tide = "Ignite"
 tide-cost = 1
-rendered-text = "▸ Judgment: If the opponent has more ✪ than you, materialize a Radiant Figment and draw a card."
+rendered-text = "▸ Judgment: If the opponent has more ✪ than you, materialize a Warrior figment and draw a card."
 energy-cost = 3
 card-type = "Character"
 subtype = "Explorer"
@@ -6829,9 +6810,7 @@ name = "Eclipse Citadel Warden"
 id = "05b4c64a-8eb3-4a09-a37f-5c205d734850"
 tide = "Neutral"
 tide-cost = 1
-rendered-text = """
-▸ Materialized: Each enemy loses 2 spark.
-"""
+rendered-text = "▸ Materialized: Each enemy loses 2 spark."
 energy-cost = 5
 card-type = "Character"
 subtype = "Visionary"
@@ -6841,24 +6820,6 @@ spark = 3
 image-number = 596070005
 art-owned = false
 card-number = 451
-
-[[cards]]
-name = "Rainshadow Drifter"
-id = "4bb1b10b-c1a5-48b0-909a-a405e241443e"
-tide = "Umbra"
-tide-cost = 2
-rendered-text = """
-▸ Materialized, Judgment: Put the top 3 cards of your deck into your void, then return a character from your void to your hand.
-"""
-energy-cost = 5
-card-type = "Character"
-subtype = "Outsider"
-rarity = "Rare"
-is-fast = false
-spark = 3
-image-number = 678431953
-art-owned = false
-card-number = 452
 
 [[cards]]
 name = "Pyre of Ruin"
@@ -6898,7 +6859,7 @@ id = "b461e967-7ff3-4f99-898e-67c33ad1e723"
 tide = "Umbra"
 tide-cost = 1
 rendered-text = "Reclaim the character with the lowest cost in your void."
-energy-cost = 2
+energy-cost = 1
 card-type = "Event"
 subtype = ""
 rarity = "Common"
@@ -6913,7 +6874,7 @@ name = "Foundry Spacer"
 id = "e4c24242-619c-4dd1-862f-edf988e1d6cc"
 tide = "Rime"
 tide-cost = 1
-rendered-text = "▸ Judgment: You may discard up to 2 cards, then draw that many cards. This character gains +1 spark."
+rendered-text = "▸ Judgment: You may discard up to 2 cards, then draw that many cards. This character gains +1 spark per card discarded."
 energy-cost = 1
 card-type = "Character"
 subtype = "Tinkerer"
@@ -6930,7 +6891,7 @@ id = "3002b466-fe0e-4237-b686-bd1c98235fad"
 tide = "Rime"
 tide-cost = 2
 rendered-text = "▸ Judgment: Banish a card from the top of the opponent's deck. You may play it this turn."
-energy-cost = 6
+energy-cost = 4
 card-type = "Character"
 subtype = "Renegade"
 rarity = "Rare"
@@ -6946,7 +6907,7 @@ id = "29229288-b647-4ca8-b866-f42c983269cc"
 tide = "Rime"
 tide-cost = 2
 rendered-text = "▸ Materialized: The opponent discards a card. Draw a card."
-energy-cost = 6
+energy-cost = 5
 card-type = "Character"
 subtype = "Survivor"
 rarity = "Common"
@@ -7039,42 +7000,6 @@ art-owned = false
 card-number = 463
 
 [[cards]]
-name = "Voidgate Rider"
-id = "d701aad1-2ecd-4b08-a4b7-962022907ae2"
-tide = "Pact"
-tide-cost = 1
-rendered-text = """
-▸ Judgment: You may abandon an ally to dissolve an enemy with spark equal to that ally's spark.
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Renegade"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 1511229275
-art-owned = false
-card-number = 464
-
-[[cards]]
-name = "Winter's Joyful Herald"
-id = "9ae541d8-2c1b-4a29-8193-d5e6d0b7fb5d"
-tide = "Rime"
-tide-cost = 1
-rendered-text = """
-▸ Materialized: Disable the ▸ Materialized: abilities of enemies until your next main phase.
-"""
-energy-cost = 4
-card-type = "Character"
-subtype = "Outsider"
-rarity = "Rare"
-is-fast = true
-spark = 2
-image-number = 499788421
-art-owned = false
-card-number = 465
-
-[[cards]]
 name = "Twilight Market Sovereign"
 id = "b4877df2-cbc8-41ea-b021-c778b0c3c55a"
 tide = "Neutral"
@@ -7125,7 +7050,7 @@ card-number = 468
 [[cards]]
 name = "Frostbound Wanderer"
 id = "e1a60439-1741-4f27-971f-986a16130bf7"
-tide = "Bloom"
+tide = "Ignite"
 tide-cost = 1
 rendered-text = "▸ Judgment: Kindle 1. 5●: Each allied character gains +1 spark."
 energy-cost = 2
@@ -7171,33 +7096,12 @@ art-owned = false
 card-number = 471
 
 [[cards]]
-name = "Starlit Voyager"
-id = "ba4c4948-efa4-4388-8567-d329538f1594"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Materialized: Put the top 4 cards of your deck into your void. Return a character from among them to hand.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 496761802
-art-owned = false
-card-number = 472
-
-[[cards]]
 name = "Luminous Bridge Wayfarer"
 id = "73d0d323-bf47-4d73-9c17-6bebe8b3622e"
 tide = "Bloom"
 tide-cost = 1
-rendered-text = """
-This character's spark is equal to your maximum ●.
-
-Reclaim"""
-energy-cost = 4
+rendered-text = "This character's spark is equal to your maximum ●."
+energy-cost = 6
 card-type = "Character"
 subtype = "Guide"
 rarity = "Rare"
@@ -7210,7 +7114,7 @@ card-number = 473
 [[cards]]
 name = "Garden of Glowing Dusk"
 id = "c7840f3b-3297-4409-b124-4309ed93e542"
-tide = "Bloom"
+tide = "Ignite"
 tide-cost = 2
 rendered-text = "▸ Judgment: Each ally gains spark equal to this character's spark."
 energy-cost = 5
@@ -7226,9 +7130,9 @@ card-number = 474
 [[cards]]
 name = "Sunset Vigil"
 id = "9c02bbbb-8c55-486a-9742-4d3a14f90545"
-tide = "Pact"
+tide = "Ignite"
 tide-cost = 1
-rendered-text = "When a non-Figment ally is dissolved, materialize a Radiant Figment."
+rendered-text = "When a non-Figment ally is dissolved, materialize a Warrior figment."
 energy-cost = 5
 card-type = "Character"
 subtype = "Survivor"
@@ -7240,27 +7144,11 @@ art-owned = false
 card-number = 475
 
 [[cards]]
-name = "Crimson Planet City"
-id = "c8554288-6676-4738-a27e-d58180d5d4db"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Materialized: Draw a card. ▸ Dissolved: Discover a character with cost 3● or less."
-energy-cost = 5
-card-type = "Character"
-subtype = "Visionary"
-rarity = "Rare"
-is-fast = false
-spark = 3
-image-number = 561496489
-art-owned = false
-card-number = 476
-
-[[cards]]
 name = "Leafborne Dreamer"
 id = "11f31879-cc52-44ee-bbdf-74fb2d830dab"
-tide = "Pact"
+tide = "Ignite"
 tide-cost = 2
-rendered-text = "▸ Dissolved: Materialize three Shadow Figments."
+rendered-text = "▸ Dissolved: Materialize three Warrior figments."
 energy-cost = 10
 card-type = "Character"
 subtype = "Ancient"
@@ -7277,7 +7165,7 @@ id = "53b9b423-156b-4e70-888b-107fe7ecce5b"
 tide = "Umbra"
 tide-cost = 1
 rendered-text = "Gain N maximum ●, where N is the number of characters in your void."
-energy-cost = 2
+energy-cost = 4
 card-type = "Event"
 subtype = ""
 rarity = "Common"
@@ -7304,22 +7192,6 @@ art-owned = false
 card-number = 479
 
 [[cards]]
-name = "Rooftop Eternity"
-id = "b0b4de61-336a-4cb1-94f0-4ce558df5bd5"
-tide = "Umbra"
-tide-cost = 2
-rendered-text = "▸ Dissolved: Return this character to your hand."
-energy-cost = 5
-card-type = "Character"
-subtype = "Outsider"
-rarity = "Rare"
-is-fast = false
-spark = 8
-image-number = 1375564451
-art-owned = false
-card-number = 480
-
-[[cards]]
 name = "Wanderer Beyond Smoke"
 id = "5f0cd400-31d7-4321-aae2-dd970758c99a"
 tide = "Neutral"
@@ -7328,7 +7200,7 @@ rendered-text = "When you play this character from hand, take an extra turn afte
 energy-cost = 13
 card-type = "Character"
 subtype = "Explorer"
-rarity = "Uncommon"
+rarity = "Legendary"
 is-fast = false
 spark = 10
 image-number = 603547829
@@ -7352,22 +7224,6 @@ art-owned = false
 card-number = 482
 
 [[cards]]
-name = "Autumn's Distant Gaze"
-id = "a3850a56-0159-4205-8035-3a3f26b561d1"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "↯fast -- An ally gains +1 spark. Prevent the next event that could dissolve it."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 2030910785
-art-owned = false
-card-number = 483
-
-[[cards]]
 name = "Midnight Arsonist"
 id = "cf62737a-9bee-44f4-8e26-8c7d0387f39b"
 tide = "Bloom"
@@ -7389,7 +7245,7 @@ id = "084cfbdf-1263-4be2-b56a-ff5dbc801ba0"
 tide = "Rime"
 tide-cost = 2
 rendered-text = "Each player draws 5 cards, then discards 2 cards."
-energy-cost = 5
+energy-cost = 3
 card-type = "Event"
 subtype = ""
 rarity = "Rare"
@@ -7398,22 +7254,6 @@ spark = ""
 image-number = 1733013506
 art-owned = false
 card-number = 485
-
-[[cards]]
-name = "Starbound Embrace"
-id = "396882b8-7e8c-4759-8b56-d3e15de8f07e"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Choose one: Draw 2 cards or Dissolve an enemy with spark 3 or less."
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 2251144877
-art-owned = false
-card-number = 486
 
 [[cards]]
 name = "Shore of Worlds"
@@ -7516,9 +7356,7 @@ name = "Beacon Gazer"
 id = "3382a698-67f8-4642-9428-2547a3e03931"
 tide = "Surge"
 tide-cost = 1
-rendered-text = """
-▸ Materialized: Play a random event with cost 3● or less from your deck, with targets chosen randomly.
-"""
+rendered-text = "▸ Materialized: Play a random event with cost 3● or less from your deck, with targets chosen randomly."
 energy-cost = 4
 card-type = "Character"
 subtype = "Tinkerer"
@@ -7534,7 +7372,7 @@ name = "Forge Horizon Pilgrim"
 id = "bb4990d2-7fc4-492a-88b3-12022292e0df"
 tide = "Bloom"
 tide-cost = 1
-rendered-text = "▸ Materialized: Draw the top card of your deck if it's a character."
+rendered-text = "▸ Materialized: Draw the top character of your deck."
 energy-cost = 4
 card-type = "Character"
 subtype = "Visionary"
@@ -7548,10 +7386,10 @@ card-number = 494
 [[cards]]
 name = "Dawn Over Paris"
 id = "a6e4bc2e-8f67-411f-9c21-94b625156af1"
-tide = "Pact"
+tide = "Bloom"
 tide-cost = 1
 rendered-text = "Lose 2 maximum ●: Dissolve an enemy."
-energy-cost = 2
+energy-cost = 1
 card-type = "Event"
 subtype = ""
 rarity = "Common"
@@ -7646,7 +7484,7 @@ card-number = 500
 [[cards]]
 name = "Faerie Canopy Town"
 id = "c4d6affd-7608-415d-8a22-d0ccf86681d6"
-tide = "Bloom"
+tide = "Surge"
 tide-cost = 1
 rendered-text = "▸ Judgment: Gain 3●. When you materialize another character, abandon this one."
 energy-cost = 0
@@ -7678,11 +7516,9 @@ card-number = 502
 [[cards]]
 name = "Planetfall Standard Bearer"
 id = "963064ca-b422-49c5-b2af-56a8429b4a63"
-tide = "Arc"
+tide = "Bloom"
 tide-cost = 1
-rendered-text = """
-▸ Materialized: Gain the ▸ Judgment: ability of a chosen ally.
-"""
+rendered-text = "▸ Materialized: Gain the ▸ Judgment: ability of a chosen ally."
 energy-cost = 3
 card-type = "Character"
 subtype = "Synth"
