@@ -77,6 +77,12 @@ challenge. Do not phone in designs 2-10 because you liked design 1. The goal is 
 10 different creative angles and pick the best. If you find yourself writing "this is similar
 to card #3 so..." — STOP and push harder for a different angle.
 
+**When a concept feels derivative, abandon it entirely.** Don't try to fix a mediocre idea by
+tweaking numbers or swapping triggers. Instead, return to the Hearthstone card's abstract
+mechanic and approach it from a completely different angle — a different tide, a different
+card type, a different Dreamtides system. The best designs in a batch typically come from the
+second or third creative attempt on a card, not the first.
+
 # Phase 3: Design 10 Cards
 
 For each Hearthstone card, produce a complete Dreamtides card concept:
@@ -89,6 +95,16 @@ For each Hearthstone card, produce a complete Dreamtides card concept:
   `rendered-cards.toml`
 - **Play Pattern:** 2-3 sentences on what concretely happens when you play this card and
   over the next 2-3 turns
+- **Turn Simulation:** Walk through turns 4-7 (or whenever this card is likely played) with
+  this card in your deck. What does the board look like before you play it? What changes
+  immediately? What happens on the opponent's next turn? What happens on YOUR next turn? If
+  the card sounds exciting in the abstract but plays out boringly in simulation, redesign.
+
+**Subtype selection:** Choose a subtype that reinforces the card's mechanical identity, not
+just its flavor. A character that sacrifices allies should be an Ancient or Outsider (Pact
+subtypes), not a Spirit Animal. A character with fast-speed tricks belongs to Musician or
+Visitor (Arc subtypes). Check the subtype table — if your chosen subtype has zero presence
+in your chosen tide, you need a strong reason.
 
 **Design constraints (apply to ALL 10 designs, not just the final pick):**
 
@@ -349,54 +365,39 @@ does. Be honest — if a design is mediocre, say so and explain why.
 
 # Phase 5: Validate the Winner
 
-Take your top-ranked design and validate it:
+The full card pool is already in your context from Phase 1. Use it directly — do not run
+additional search commands.
 
-```bash
-# Search for mechanical overlap
-python3 .claude/skills/card-design/card-research.py similar "your key mechanic phrase"
+For each top-ranked design, validate:
 
-# Check cost saturation in the tide
-python3 .claude/skills/card-design/card-research.py cost-in-tide TideName N
-```
+- **Differentiation test (MANDATORY):** Identify the 2-3 closest existing cards (you've
+  already read them all). For each, write one sentence explaining how your card creates a
+  **different play experience** — not just different numbers, cost, or trigger. If you can't
+  differentiate, **promote the next design.**
+- **Novelty gate (MANDATORY):** Write: **"No existing card ___."** This must describe a
+  *play experience*, not a cosmetic difference.
+- **Templating check:** Copy exact phrasing patterns from existing cards in the pool. Don't
+  invent new templating.
 
-### Validation Checks
-
-- **Duplicate check:** Search for your concept's key mechanical phrases. If an existing card
-  already creates the same play experience, **promote your #2 design and validate that
-  instead.** Do not try to rescue a derivative concept by adjusting numbers.
-- **Differentiation test (MANDATORY):** For each of the 2-3 closest comparable cards, write
-  one sentence explaining how your card creates a **different play experience** — not just
-  different numbers, cost, or trigger.
-- **Saturation check:** How many cards exist at your cost in your tide? If overcrowded,
-  consider adjusting cost.
-- **Templating check:** Copy exact phrasing patterns from existing cards in
-  `rendered-cards.toml`. Don't invent new templating.
-
-**Novelty Gate (MANDATORY):**
-
-Write: **"No existing card ___."** This must describe a *play experience*, not a cosmetic
-difference.
-
-**PASS examples:**
+**Novelty gate PASS examples:**
 - "No existing card lets the opponent choose between two bad outcomes."
 - "No existing card has spark that scales with the number of events in your void."
-- "No existing card transforms into a different card while in your hand."
 
-**FAIL examples:**
+**Novelty gate FAIL examples:**
 - "No existing card materializes a random Spirit Animal costing 2 or less." (Same as Light
   of Emergence with a subtype filter.)
 - "No existing card draws a card when a Warrior is banished." (Same play experience as
   dozens of draw-on-trigger cards.)
 
-If validation fails, promote the next design in your ranking and validate that instead.
-Continue until you find a design that passes.
+If validation fails, promote the next design and validate that instead.
 
 # Phase 6: Final Output
 
 **Print ONLY the final card design(s).** Do not print the intermediate analysis, the 10
 design attempts, or the ranking. The user wants to see clean output.
 
-If the user requested top-N (e.g., "top 3"), print N designs. Default is 1.
+If the user requested top-N (e.g., "top 3"), print N designs **ranked from best to worst**,
+with #1 being your strongest recommendation. Default is 1.
 
 **Hard limits:** Card names must be 25 characters or fewer. Rules text must be 100
 characters or fewer.
