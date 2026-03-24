@@ -59,18 +59,25 @@ are absent.
 
 For each of the 10 input cards, write:
 
-1. **Core Fantasy:** One sentence — what is the exciting thing this card does in Hearthstone?
-   What makes it fun to play? What's the "moment" it creates?
-2. **Abstract Mechanic:** Strip away Hearthstone-specific keywords and describe the
+1. **Core Fantasy & Abstract Mechanic:** Two sentences. First: what is the exciting *moment*
+   this card creates in Hearthstone? Second: strip away HS keywords and describe the
    underlying *dynamic* in universal game terms. E.g., Edwin VanCleef isn't "Combo: +2/+2
-   per card" — it's "a threat that scales with how many resources you invested in one turn."
-   Ysera Unleashed isn't "shuffle Dream Portals" — it's "a delayed value engine that converts
-   deck draws into free threats over many turns."
-3. **Dreamtides Translation Seed:** 1-2 sentences on how this abstract dynamic might manifest
-   in Dreamtides. This is NOT a 1:1 port — it's "outside the box" thinking. What Dreamtides
-   mechanics could capture the same *feeling*? How might the same game *moment* be achieved
-   using Dreamtides' unique systems (tides, spark, void, foresee, materialize, judgment,
-   energy, abandoning, etc.)?
+   per card" — the moment is slamming a huge threat after a chain of cheap cards, and the
+   abstract mechanic is "a threat that scales with how many resources you invested in one
+   turn." Ysera Unleashed isn't "shuffle Dream Portals" — the moment is watching free
+   dragons pour out of your deck for turns, and the abstract mechanic is "a delayed value
+   engine that converts deck draws into free threats over many turns."
+2. **Thematic clustering check:** Before moving on, scan the batch — do 3+ HS cards share the
+   same abstract mechanic? (e.g., "build toward a payoff," "curated tutoring," "conditional
+   cost reduction.") If so, flag the cluster and plan to force each clustered card into a
+   **different tide and card type** during Phase 3 to maximize design diversity.
+
+**Non-minion/non-spell HS cards (Locations, Heroes, Weapons):** These card types have no
+Dreamtides equivalent. Do not try to replicate the card type — focus entirely on the abstract
+mechanic. A Location's "repeatable effect" might become a Judgment trigger. A Hero's
+"transformation" might become a powerful Materialized ability. A Weapon's "equip and swing"
+might become an activated ability. The extra creative distance required by a missing card type
+is an advantage, not a problem — it naturally prevents 1:1 ports.
 
 **IMPORTANT:** Do NOT converge early. Treat each of the 10 cards as a genuine design
 challenge. Do not phone in designs 2-10 because you liked design 1. The goal is to explore
@@ -98,18 +105,33 @@ tide — a different tide means different mechanics, which means different play 
 
 For each Hearthstone card, produce a complete Dreamtides card concept:
 
-- **Inspired by:** [Hearthstone card name]
-- **Tide:** Which tide and why (1 sentence)
+- **Creative Origin:** [Hearthstone card name] — which aspect of this card sparked the design?
+  (The connection can be abstract — "both reward patience" is fine. If the best design drifted
+  far from the HS source, that's a sign of good non-port design, not a problem.)
+- **Tide & Win-Plan Link:** Which tide, and one sentence explaining how this card helps that
+  tide's primary strategy **win the game**. Not "this fits Rime's theme of patience" — but
+  "in a Rime discard deck, this card does X which advances the win condition because Y." If
+  you can't write a concrete win-plan link, the card is in the wrong tide. Move it.
 - **Card Type:** Character (with subtype if applicable) or Event
 - **Energy Cost / Spark** (characters only)
 - **Rules Text:** Full templated ability text (max 100 characters), using conventions from
   `rendered-cards.toml`
 - **Play Pattern:** 2-3 sentences on what concretely happens when you play this card and
   over the next 2-3 turns
-- **Turn Simulation:** Walk through turns 4-7 (or whenever this card is likely played) with
-  this card in your deck. What does the board look like before you play it? What changes
-  immediately? What happens on the opponent's next turn? What happens on YOUR next turn? If
-  the card sounds exciting in the abstract but plays out boringly in simulation, redesign.
+- **Turn Simulation:** Walk through a concrete sequence using this format:
+  - **T[N] Board before:** What's on the battlefield and what's the score?
+  - **T[N] Play card:** What changes immediately when you play it?
+  - **T[N+1] Opponent response:** What does the opponent likely do?
+  - **T[N+2] Your follow-up:** What happens on your next turn?
+  If the card sounds exciting in the abstract but plays out boringly in simulation, redesign.
+- **Costing Validation:** For characters, walk the stat line against the spark-per-cost
+  benchmark table at the cost the card is most likely to be played. If the card has variable
+  or growing stats (e.g., scaling spark, cost reduction over time), evaluate the stat line at
+  each likely game state (e.g., after 1 turn, 2 turns, 3 turns of growth). If the card
+  exceeds the benchmark by more than 50% with no meaningful condition or setup cost, reduce
+  the growth rate, increase the base cost, or add a restriction. For events, compare to the
+  event cost benchmarks. A card that is dramatically above rate on turn 2 but fair on turn 5
+  needs its early case nerfed, not its late case.
 
 **Subtype selection:** Choose a subtype that reinforces the card's mechanical identity, not
 just its flavor. A character that sacrifices allies should be an Ancient or Outsider (Pact
@@ -130,11 +152,19 @@ Each design must pass these checks:
    tension or decisions also count ("do I drain more spark or abandon it now?"). What does
    NOT pass: cards whose entire play experience is steady incremental value with no peak,
    no tension, and no interesting decisions — just "+N every turn."
-4. **Not a 1:1 port:** The card must take *inspiration* from the Hearthstone card, not
+4. **Not a 1:1 port:** The card must take *creative inspiration* from the Hearthstone card, not
    mechanically replicate it. If someone who knows both games would say "oh, that's just
-   [HS card] in Dreamtides," redesign.
-5. **100-character limit:** Rules text must fit in 100 characters.
-6. **25-character name limit.**
+   [HS card] in Dreamtides," redesign. The best designs often drift far from the HS source —
+   a distant, abstract connection is a feature, not a bug.
+5. **Tide win-plan check:** Does this card actively advance its tide's strategy toward
+   winning? Concretely: name 2-3 existing cards in the same tide that this card synergizes
+   with, and explain the line of play. If the card is mechanically at odds with its tide's
+   core mechanics (e.g., a card that rewards holding cards in a tide built around discarding
+   them, or a card that wants a full board in a tide built around sacrifice), it's in the
+   wrong tide — move it or redesign. Thematic fit ("patience fits Rime's philosophy") is not
+   sufficient; mechanical synergy with the tide's existing cards is required.
+6. **100-character limit:** Rules text must fit in 100 characters.
+7. **25-character name limit.**
 
 ### Tide Quick Reference
 
@@ -370,7 +400,9 @@ order):
    playing it create a memorable moment? "Solid but not exciting" is a rejection. Bonus:
    cards that create **persistent board tension** — warping how the opponent plays just by
    existing on the battlefield — are especially valuable.
-3. **Tide fit:** Does the mechanic advance the tide's primary strategy?
+3. **Tide fit (hard check):** Does the card mechanically synergize with existing cards in its
+   tide and advance the tide's win condition? A card that is thematically aligned but
+   mechanically at odds with its tide's core game plan fails this check.
 4. **Simplicity:** Can you express it cleanly? Novelty != complexity.
 5. **Not a port:** Does it feel like its own card, or like a Hearthstone card wearing a
    Dreamtides costume?
@@ -406,8 +438,12 @@ For each top-ranked design, validate:
   differentiate, **promote the next design.**
 - **Novelty gate (MANDATORY):** Write: **"No existing card ___."** This must describe a
   *play experience*, not a cosmetic difference.
-- **Templating check:** Copy exact phrasing patterns from existing cards in the pool. Don't
-  invent new templating.
+- **Templating check:** Copy exact phrasing patterns from existing cards in the pool where
+  possible. If the mechanic is genuinely novel and no existing template fits, write the rules
+  text in the simplest possible English using existing keyword vocabulary (●, ✪, ▸, ↯, spark,
+  dissolve, banish, materialize, kindle, foresee, reclaim, abandon, etc.). Prefer "this card
+  gains/costs/has" over inventing new phrasing. A novel mechanic may need novel templating —
+  that's acceptable if the wording is unambiguous and uses familiar building blocks.
 
 **Novelty gate PASS examples:**
 - "No existing card lets the opponent choose between two bad outcomes."
@@ -435,7 +471,8 @@ characters or fewer.
 For each final design, print:
 
 - **Card Name:** Evocative short name (max 25 characters)
-- **Inspired by:** [Hearthstone card name] — one sentence on what inspired the translation
+- **Creative Origin:** [Hearthstone card name] — one sentence on what aspect of the HS card
+  sparked the design (the connection can be abstract — distant inspiration is fine)
 - **Card Type:** Character (with subtype) or Event
 - **Tide:** Which tide and its tide cost (1-3)
 - **Energy Cost:** Proposed cost
@@ -443,7 +480,8 @@ For each final design, print:
 - **Rarity:** Common, Uncommon, Rare, or Legendary
 - **Fast:** Yes/No
 - **Rules Text:** Proposed ability text (max 100 characters)
-- **Archetype Description:** One sentence on how this card supports its tide's strategy
+- **Archetype Description:** One sentence explaining how this card helps its tide WIN — name
+  specific existing cards it synergizes with and the line of play (not thematic flavor)
 - **Narrative:** One sentence — who is this character / what is this event?
 - **Novelty Statement:** "No existing card ___."
 - **Similar Cards:** 2-4 existing Dreamtides cards with the closest mechanical overlap, with
