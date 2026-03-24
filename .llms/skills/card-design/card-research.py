@@ -402,9 +402,12 @@ def cmd_where(args: list[str], cards: list[dict]):
 
 
 def cmd_dump(args: list[str], cards: list[dict]):
-    """Dump all cards in compact one-line-per-card format for reading into context."""
-    # Group by tide, sort by cost within each tide
+    """Dump all cards in compact one-line-per-card format for reading into context.
+
+    Optional argument: a tide name to dump only that tide (e.g. dump Bloom).
+    """
     tide_order = ["Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge", "Neutral", ""]
+    filter_tide = args[0].lower() if args else None
     by_tide: dict[str, list[dict]] = {}
     for c in cards:
         t = c.get("tide", "")
@@ -412,6 +415,8 @@ def cmd_dump(args: list[str], cards: list[dict]):
 
     for tide in tide_order:
         if tide not in by_tide:
+            continue
+        if filter_tide and tide.lower() != filter_tide:
             continue
         def safe_cost(c: dict) -> int:
             try:
@@ -448,8 +453,8 @@ def cmd_dump(args: list[str], cards: list[dict]):
 
             print(f"{name} | {tide}{tc} | {stat} | {type_str}{fast} | {rarity} | {text}")
 
-    # Dreamwell cards
-    if DREAMWELL.exists():
+    # Dreamwell cards (skip when filtering to a specific tide)
+    if DREAMWELL.exists() and not filter_tide:
         dw_cards = parse_dreamwell(DREAMWELL)
         print(f"\n=== DREAMWELL ({len(dw_cards)} cards) ===")
         for dw in dw_cards:

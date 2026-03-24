@@ -255,11 +255,19 @@ by tide:
 
 # Phase 4: Explore Concepts
 
-**Read the card pool NOW** — before generating concepts. Run the dump command to load every
-card:
+**Read the card pool NOW** — before generating concepts. Load the full card pool by running
+**all 8 tide dumps in parallel** (8 separate Bash tool calls in a single message). Each tide
+fits comfortably in one Bash output:
 
 ```bash
-python3 .claude/skills/card-design/card-research.py dump
+python3 .claude/skills/card-design/card-research.py dump Bloom
+python3 .claude/skills/card-design/card-research.py dump Arc
+python3 .claude/skills/card-design/card-research.py dump Ignite
+python3 .claude/skills/card-design/card-research.py dump Pact
+python3 .claude/skills/card-design/card-research.py dump Umbra
+python3 .claude/skills/card-design/card-research.py dump Rime
+python3 .claude/skills/card-design/card-research.py dump Surge
+python3 .claude/skills/card-design/card-research.py dump Neutral
 ```
 
 **Why read first:** You cannot design something genuinely novel if you don't know what
