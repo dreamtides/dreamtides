@@ -83,6 +83,13 @@ mechanic and approach it from a completely different angle — a different tide,
 card type, a different Dreamtides system. The best designs in a batch typically come from the
 second or third creative attempt on a card, not the first.
 
+**When an entire concept space is saturated, discard the Hearthstone card.** Some HS cards
+map to design spaces that are already well-covered in Dreamtides (e.g., "+spark on
+materialize" has many implementations). If after two serious attempts you cannot find a novel
+angle, **skip that card entirely** and spend the design slot on a second attempt at a
+different, more fertile Hearthstone card from the batch. 10 designs from 8 cards is better
+than 10 designs where 2 are forced.
+
 # Phase 3: Design 10 Cards
 
 For each Hearthstone card, produce a complete Dreamtides card concept:
@@ -114,11 +121,16 @@ Each design must pass these checks:
    experience difference? If not, redesign.
 2. **Play pattern check:** Who fires the trigger? How often? Can the opponent make this blank
    by changing their play? If yes, redesign.
-3. **Not a 1:1 port:** The card must take *inspiration* from the Hearthstone card, not
+3. **Moment test:** Describe what makes this card interesting to play. The best cards create
+   a dramatic turn ("I held 4 events, they dissolved it, my hand doubled"), but interesting
+   tension or decisions also count ("do I drain more spark or abandon it now?"). What does
+   NOT pass: cards whose entire play experience is steady incremental value with no peak,
+   no tension, and no interesting decisions — just "+N every turn."
+4. **Not a 1:1 port:** The card must take *inspiration* from the Hearthstone card, not
    mechanically replicate it. If someone who knows both games would say "oh, that's just
    [HS card] in Dreamtides," redesign.
-4. **100-character limit:** Rules text must fit in 100 characters.
-5. **25-character name limit.**
+5. **100-character limit:** Rules text must fit in 100 characters.
+6. **25-character name limit.**
 
 ### Tide Quick Reference
 
@@ -200,6 +212,10 @@ experience:
 - **"Abandon an ally: [benefit]"** — The Pact baseline.
 - **"When you play an event, [benefit]"** — The Surge baseline.
 - **Dissolve/Return/Banish as removal** — The Neutral baseline.
+- **"+N spark/energy/draw when you materialize a character"** — Heavily explored across
+  multiple tides (Golden Clockwork Warden, Sunshadow Eagle, Stormcaller Ascendant, Angel of
+  the Eclipse, Endless Projection, etc.). A new materialize-trigger card must do something
+  qualitatively different from granting spark, energy, or cards.
 
 If you find yourself writing rules text that fits one of these patterns, STOP and ask: "What
 is the play experience this card creates that no existing card creates?"
@@ -207,7 +223,10 @@ is the play experience this card creates that no existing card creates?"
 ### Novel Design Space — Think Like a Digital Card Game
 
 Dreamtides is a digital card game. It can track hidden state, randomize, transform cards
-in zones, and do things impossible in paper. Actively consider:
+in zones, and do things impossible in paper. The examples below are starting points, not a
+checklist — the best designs come from original ideas that aren't on any list. Push beyond
+these suggestions. If you find yourself implementing one of these examples verbatim, you're
+not thinking hard enough.
 
 **Cards that transform or evolve:**
 - A card in hand that changes based on game events while you hold it
@@ -224,10 +243,6 @@ in zones, and do things impossible in paper. Actively consider:
 - Cards that care about the current turn number or energy production
 - Effects based on the total cost of characters on either battlefield
 - Cards that count something unusual (events in void, opponent's materializations)
-
-**Cards that give the opponent choices (punisher mechanics):**
-- "The opponent chooses: you draw 3 or they abandon a character"
-- Effects where the opponent picks which of two bad outcomes happens
 
 **Cards that change rules or modify other cards:**
 - "Characters you materialize this turn gain the Judgment ability of the first character"
@@ -357,6 +372,9 @@ order):
   card's identity.
 - Any design that is "draw N on [trigger]" or "gain energy on [trigger]" with a new trigger:
   **-1 point.** The pool is saturated with these.
+- Any design that is an incremental value engine with no peak moment: **-1 point.** If the
+  card just generates "+N of something every turn" with no dramatic turn, it's boring
+  regardless of how novel the trigger or resource type is. Cards need a MOMENT.
 - Any design where a knowledgeable player would say "oh, like [existing card] but different":
   **automatic bottom 3.**
 
