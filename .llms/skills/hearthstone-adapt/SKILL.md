@@ -90,6 +90,10 @@ angle, **skip that card entirely** and spend the design slot on a second attempt
 different, more fertile Hearthstone card from the batch. 10 designs from 8 cards is better
 than 10 designs where 2 are forced.
 
+**Spread across tides.** If 4+ of your 10 designs land in the same tide, you are circling
+the same design space. When you notice clustering, force the next design into a different
+tide — a different tide means different mechanics, which means different play experiences.
+
 # Phase 3: Design 10 Cards
 
 For each Hearthstone card, produce a complete Dreamtides card concept:
@@ -355,12 +359,17 @@ Choose one: Draw 2 cards or Dissolve an enemy with spark 3 or less.
 After designing all 10, rank them from best to worst using these criteria (in priority
 order):
 
-1. **Mechanical novelty (REQUIRED — veto power):** Does this card create a play experience
-   that no existing Dreamtides card creates? If you can point to an existing card and say
-   "playing my card feels like playing that card," the concept fails. You must complete:
-   "No existing card ___" with a unique play experience.
+1. **Play-experience novelty (REQUIRED — veto power):** Does this card create a play
+   experience that no existing Dreamtides card creates? Focus on how the card FEELS to play
+   and play against, not whether the mechanic type is new. A new keyword or template that
+   produces a familiar play pattern ("draw N on new trigger") is NOT novel. A familiar
+   mechanic that creates new board tension or decisions IS novel (e.g., a death trigger that
+   makes the opponent dread using removal). You must complete: "No existing card ___" with a
+   unique play experience — not a unique mechanic type.
 2. **Fun factor / Splashiness:** Would a player be excited to discover this in a draft? Does
-   playing it create a memorable moment? "Solid but not exciting" is a rejection.
+   playing it create a memorable moment? "Solid but not exciting" is a rejection. Bonus:
+   cards that create **persistent board tension** — warping how the opponent plays just by
+   existing on the battlefield — are especially valuable.
 3. **Tide fit:** Does the mechanic advance the tide's primary strategy?
 4. **Simplicity:** Can you express it cleanly? Novelty != complexity.
 5. **Not a port:** Does it feel like its own card, or like a Hearthstone card wearing a
@@ -377,6 +386,9 @@ order):
   regardless of how novel the trigger or resource type is. Cards need a MOMENT.
 - Any design where a knowledgeable player would say "oh, like [existing card] but different":
   **automatic bottom 3.**
+- Any design that uses "the opponent chooses" / punisher mechanics: **-1 point.** In practice
+  one option is almost always correct for the opponent, so the "choice" is illusory and the
+  card collapses to a fixed effect. Design space isn't fruitful.
 
 Write out your full ranking with 1-2 sentences per card explaining why it ranks where it
 does. Be honest — if a design is mediocre, say so and explain why.
