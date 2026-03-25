@@ -81,7 +81,7 @@ fighter, etc.
   the general "Char" pool.
 - If the art does not match any of these three types (e.g., a child, a robot, a person at
   a computer), the subtype is **open**. In Phase 3, you will search the "Char" pool (cards
-  with no mechanical subtype dependency). The subtype will be assigned later in Phase 6.
+  with no mechanical subtype dependency). The subtype will be assigned later in Phase 4.
 
 Record your classification:
 - **Locked subtype:** "This art depicts a [Spirit Animal/Warrior/Survivor]."
@@ -357,13 +357,24 @@ A strong narrative match in the "wrong" color always beats a weak match in the "
 
 ## Select the Winner
 
-Once you've found your strongest match (or compared 2-3 strong contenders), select the
-winner. Briefly explain:
+**Guard against primacy bias.** LLMs tend to favor the first candidate they evaluate in
+detail — the one that gets labeled "Candidate A." Before selecting a winner, you MUST:
+1. Identify your top 2-3 candidates.
+2. For each candidate *other than* the first one you noticed, write a **steel-man argument**
+   (2-3 sentences) for why it could be the best match.
+3. For the first candidate you noticed, write a **devil's advocate argument** (2-3 sentences)
+   for why it might NOT be the best match — what's weak about it?
+4. Only after completing steps 2-3, make your final selection.
+
+It is completely fine to still pick the first candidate after this exercise — but you must
+genuinely consider whether a later candidate is stronger.
+
+Once you've selected the winner, briefly explain:
 - What is the narrative connection — the "story" this card tells?
 - Why does this match beat any alternatives you considered?
 - Any concerns or compromises?
 
-# Phase 6: Assign Subtype and Name
+# Phase 4: Assign Subtype and Name
 
 ### Subtype Assignment (Characters Only)
 
@@ -431,7 +442,7 @@ Common name structures (use variety — don't default to the first few):
 - **[Role] [Participle]:** Sentinel Unbound, Pilgrim Returned
 - **Abstract / Poetic:** Hollow Meridian, Pale Crescendo, Rust and Reverie
 
-# Phase 7: Final Output
+# Phase 5: Final Output
 
 Present the final card assignment:
 
