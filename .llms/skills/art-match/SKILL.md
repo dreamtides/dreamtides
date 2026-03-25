@@ -111,6 +111,15 @@ don't apply):
 - **Art Style:** Painterly, photorealistic, impressionistic, stylized? Soft edges or sharp
   detail?
 
+**Grounding rule — describe only what you see.** Do not infer weather, particles, or
+environmental effects that are not clearly depicted. Ambiguous visual elements (floating
+specks, haze, atmospheric effects) must be described neutrally — "floating particles" not
+"snow," "atmospheric haze" not "fog," "light specks" not "fireflies." If you are uncertain
+what something is, say so explicitly: "particles that could be dust, pollen, or ash." Never
+commit to a specific interpretation of an ambiguous element. This is critical because
+downstream phases (naming, narrative) will build on your description, and a wrong label here
+(e.g., calling dust "snow") will propagate through the entire output.
+
 **Example breakdown:** "The painting depicts a sci-fi scene on an alien, Mars-like planet
 with a warm red-orange color palette. At the center-right stands a large robotic walker — a
 mechanized vehicle with insect-like legs and a glowing yellowish-orange visor suggesting a
@@ -428,6 +437,11 @@ Name guidelines:
 - The name should evoke what a viewer sees in the art
 - It should feel natural alongside the card's rules text
 - It should hint at the narrative you've constructed
+- **Do not reference weather, particles, or environmental details in the name unless they
+  are unambiguously depicted in the art.** If the art breakdown described something as
+  ambiguous (e.g., "floating particles"), do not name the card after a specific
+  interpretation of that element (e.g., "Snowfall," "Ashrain"). Ground the name in the
+  subject, setting, and mood — not in uncertain details.
 
 Common name structures (use variety — don't default to the first few):
 - **[Adjective] [Noun]:** Silent Avenger, Eternal Sentry
