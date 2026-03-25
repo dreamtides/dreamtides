@@ -48,6 +48,15 @@ Your image ID is {IMAGE_ID}.
 
 Read the art-match skill at `.llms/skills/art-match/SKILL.md` and follow it completely.
 
+## Overused Name Words
+
+During Phase 4 (naming), before choosing a final name, run:
+```bash
+python3 .llms/skills/art-batch/overused-words.py
+```
+This prints words used 3+ times across already-assigned cards. Do NOT use any of those
+words in your card name — find synonyms or different concepts instead.
+
 ## Final Step: Write to art-assigned.toml
 
 After selecting a winner and assigning a name/subtype (Phase 4 of the skill), find the

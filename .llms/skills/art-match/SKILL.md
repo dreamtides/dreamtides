@@ -475,6 +475,8 @@ Name guidelines:
   interpretation of that element (e.g., "Snowfall," "Ashrain"). Ground the name in the
   subject, setting, and mood — not in uncertain details.
 
+**Banned words:** Do not use "hollow," "waif," "ruin/ruins," or "witness" in card names — they are severely overused across prior sessions.
+
 Common name structures (use variety — don't default to the first few):
 - **[Adjective] [Noun]:** Silent Avenger, Eternal Sentry
 - **[Compound] [Noun]:** Bloomweaver, Starcatcher
@@ -486,7 +488,7 @@ Common name structures (use variety — don't default to the first few):
 - **[Possessive] [Noun]:** Siren's Lament, Nobody's Herald
 - **[Noun] [Verb]:** Starfall, Duskwalk, Nightbloom
 - **[Role] [Participle]:** Sentinel Unbound, Pilgrim Returned
-- **Abstract / Poetic:** Hollow Meridian, Pale Crescendo, Rust and Reverie
+- **Abstract / Poetic:** Pale Crescendo, Rust and Reverie
 
 # Phase 5: Final Output
 
