@@ -28,25 +28,25 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent
 REPO_ROOT = SCRIPT_DIR.parent.parent.parent
 ANON_FILE = REPO_ROOT / "cards_anonymized.txt"
-ASSIGNED_FILE = REPO_ROOT / "client" / "Assets" / "StreamingAssets" / "Tabula" / "art-assigned.toml"
+ASSIGNED_FILE = REPO_ROOT / "rules_engine" / "tabula" / "art-assigned.toml"
 
 MECHANICAL_SUBTYPES = {"warrior", "spirit animal", "survivor"}
 
 # Cards assigned this many times or more are excluded from the pool
-SATURATION_LIMIT = 5
+SATURATION_LIMIT = 3
 
 
-def get_saturated_texts() -> set[str]:
-    """Return rendered-text values assigned SATURATION_LIMIT or more times."""
+def get_match_counts() -> dict[str, int]:
+    """Return a dict of rendered-text -> assignment count."""
     if not ASSIGNED_FILE.exists():
-        return set()
+        return {}
     counts: dict[str, int] = {}
     for line in ASSIGNED_FILE.read_text().splitlines():
         m = re.match(r'^rendered-text\s*=\s*"(.+)"', line.strip())
         if m:
             text = m.group(1)
             counts[text] = counts.get(text, 0) + 1
-    return {text for text, count in counts.items() if count >= SATURATION_LIMIT}
+    return counts
 
 # Pattern: TideCost | Cost●[/Spark✦] | Type[↯] | R | Rules text
 LINE_RE = re.compile(
@@ -112,11 +112,13 @@ def main():
             return
 
     # Read and parse all card lines, excluding saturated cards
-    saturated = get_saturated_texts()
+    match_counts = get_match_counts()
+    saturated = {t for t, c in match_counts.items() if c >= SATURATION_LIMIT}
     cards = []
     for line in ANON_FILE.read_text().splitlines():
         card = parse_line(line)
         if card and card["text"] not in saturated:
+            card["match_count"] = match_counts.get(card["text"], 0)
             cards.append(card)
 
     # Filter by command type
@@ -160,7 +162,13 @@ def main():
             current_tide = t
             tide_cards = [x for x in filtered if x["tide"] == t]
             print(f"\n=== {t.upper()} ({len(tide_cards)}) ===")
-        print(c["raw"])
+        mc = c["match_count"]
+        if mc >= 2:
+            print(f"⚠{mc}× {c['raw']}")
+        elif mc == 1:
+            print(f" 1× {c['raw']}")
+        else:
+            print(f"    {c['raw']}")
         count += 1
 
     filters_desc = []

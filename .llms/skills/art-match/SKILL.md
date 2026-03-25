@@ -413,6 +413,28 @@ Once you've selected the winner, briefly explain:
 - Why does this match beat any alternatives you considered?
 - Any concerns or compromises?
 
+## Match Count Check
+
+After selecting your winner, check how many times this rules text has already been assigned:
+
+```bash
+python3 .llms/skills/art-batch/check-match-count.py "EXACT RULES TEXT HERE"
+```
+
+This prints one of:
+- **PASS** — card is fresh, proceed to Phase 4.
+- **WARN: 1 match** — card has been used once. Briefly note this and proceed — one reuse
+  is acceptable.
+- **WARN: 2 matches** — card is becoming a gravity well. You MUST go back and identify your
+  best alternative candidate that prints PASS or WARN: 1. Only keep the 2-match card if you
+  can articulate why this specific art is a *uniquely* better fit than any fresh card — "it's
+  a strong narrative match" is not sufficient when the card has already been matched twice.
+- **FAIL** — card is saturated (3+ matches). You MUST pick a different card. Go back to your
+  candidate list and select the next best option, then re-run this check.
+
+The pool filter also annotates cards with their match count (⚠2× prefix for 2+ matches,
+1× for 1 match). Prefer unmarked cards when browsing.
+
 # Phase 4: Assign Subtype and Name
 
 ### Subtype Assignment (Characters Only)

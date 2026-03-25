@@ -94,12 +94,20 @@ If the art is landscape or abstract, do NOT write anything. Print "SKIP: [reason
 Print ONLY the card name, tide, and cost as your final output.
 ```
 
-## Oversaturation Protection
+## Gravity Well Protection
 
-The pool filter automatically excludes cards that have been assigned to 5 or more
-images. This prevents any single rules text from being overrepresented. If you see
-"N cards hidden" in the pool filter output, those cards have hit the saturation limit
-and are no longer available for matching.
+Two layers prevent any single rules text from being overrepresented:
+
+1. **Soft gate (check-match-count.py):** After selecting a winner, the subagent runs
+   `check-match-count.py` with the exact rules text. WARN at 2 matches forces
+   reconsideration; FAIL at 3+ forces picking a different card.
+
+2. **Hard cap (pool-filter.py):** Cards matched 3+ times are excluded from pool output
+   entirely. The pool also annotates cards with ⚠2× or 1× prefixes so the agent can
+   see popularity at browse time.
+
+If you see "N cards hidden" in the pool filter output, those cards have hit the
+saturation limit and are no longer available for matching.
 
 ## Context Preservation
 
