@@ -17,6 +17,7 @@ Usage:
     python3 card-research.py stats
     python3 card-research.py similar <mechanic_description>
     python3 card-research.py where <keyword>
+    python3 card-research.py dump-anon [tide]
 
 Examples:
     python3 card-research.py tide Rime
@@ -466,6 +467,78 @@ def cmd_dump(args: list[str], cards: list[dict]):
             print(f"{name} | Phase {phase} | +{energy}● | {rules} {variables}")
 
 
+MECHANICAL_SUBTYPES = {"warrior", "spirit animal", "survivor"}
+
+
+def cmd_dump_anon(args: list[str], cards: list[dict]):
+    """Dump all cards with names, non-mechanical subtypes, and image-numbers stripped.
+
+    Keeps subtypes that are mechanically relevant: Warrior, Spirit Animal, Survivor.
+    Optional argument: a tide name to dump only that tide.
+    """
+    tide_order = ["Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge", "Neutral", ""]
+    filter_tide = args[0].lower() if args else None
+    by_tide: dict[str, list[dict]] = {}
+    for c in cards:
+        t = c.get("tide", "")
+        by_tide.setdefault(t, []).append(c)
+
+    for tide in tide_order:
+        if tide not in by_tide:
+            continue
+        if filter_tide and tide.lower() != filter_tide:
+            continue
+
+        def safe_cost(c: dict) -> int:
+            try:
+                return int(c.get("energy-cost", 0))
+            except ValueError:
+                return 99
+
+        tide_cards = sorted(by_tide[tide], key=lambda c: (
+            0 if c.get("card-type") == "Character" else 1,
+            safe_cost(c),
+            c.get("name", ""),
+        ))
+        label = tide if tide else "(no tide)"
+        chars = [c for c in tide_cards if c.get("card-type") == "Character"]
+        events = [c for c in tide_cards if c.get("card-type") == "Event"]
+        print(f"\n=== {label.upper()} ({len(chars)}C, {len(events)}E) ===")
+        for c in tide_cards:
+            tc = c.get("tide-cost", "")
+            cost = c.get("energy-cost", "?")
+            spark = c.get("spark", "")
+            ct = c.get("card-type", "?")
+            sub = c.get("subtype", "")
+            fast = "↯" if c.get("is-fast", "false") == "true" else ""
+            rarity = c.get("rarity", "")[0] if c.get("rarity", "") else ""
+            text = c.get("rendered-text", "").replace("\\n", " ").strip()
+
+            # Keep subtype only if mechanically relevant
+            if sub.lower() not in MECHANICAL_SUBTYPES:
+                sub = ""
+
+            if ct == "Character":
+                type_str = sub if sub and sub != "*" else "Char"
+                stat = f"{cost}●/{spark}✦"
+            else:
+                type_str = "Event"
+                stat = f"{cost}●"
+
+            print(f"{tide}{tc} | {stat} | {type_str}{fast} | {rarity} | {text}")
+
+    # Dreamwell cards (skip when filtering to a specific tide)
+    if DREAMWELL.exists() and not filter_tide:
+        dw_cards = parse_dreamwell(DREAMWELL)
+        print(f"\n=== DREAMWELL ({len(dw_cards)} cards) ===")
+        for dw in dw_cards:
+            energy = dw.get("energy-produced", "?")
+            phase = dw.get("phase", "?")
+            rules = dw.get("rules-text", "(none)")
+            variables = dw.get("variables", "")
+            print(f"Phase {phase} | +{energy}● | {rules} {variables}")
+
+
 def cmd_similar(args: list[str], cards: list[dict]):
     """Find cards with similar rules text (case-insensitive substring match)."""
     if not args:
@@ -490,6 +563,7 @@ def main():
 
     commands = {
         "dump": cmd_dump,
+        "dump-anon": cmd_dump_anon,
         "tide": cmd_tide,
         "tide-events": cmd_tide_events,
         "tide-characters": cmd_tide_characters,
