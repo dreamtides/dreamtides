@@ -363,6 +363,7 @@ The best matches create an "aha" moment where the art and the mechanic feel inse
 - The effect requires you to invent a hypothetical scenario ("when the beast breaks free…", "when the guardian falls…") rather than being visually suggested by what the art actually depicts — if the art shows a predator standing in a lab, the mechanic should feel like what a predator in a lab *does*, not what might happen in a future scene you imagined
 - The mechanic references or produces something not depicted in the art (e.g., "Discover a Spirit Animal" when the art shows no animal) — every entity or object the card creates or searches for should have a visual basis in the art
 - The narrative connection is generic enough to work for many different pieces of art — if your justification boils down to "this art is dark/dramatic, and this card is a dramatic effect," that's not a real match. A strong match should feel specific: swapping in different art of similar mood should break the connection. Cards with very short, unconditional rules text (e.g., a single clause with no targeting, triggers, or conditions) are especially prone to this — prefer cards with more mechanical detail, since each detail is an additional anchor point that must connect to something visible in the art
+- A solitary figure in the art does not mean you should pick the "with no allies" card — being depicted alone is the default state for character art, not a mechanical signal
 
 ## Tide Color Bias
 
