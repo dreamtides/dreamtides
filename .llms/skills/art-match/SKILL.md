@@ -497,6 +497,8 @@ Name guidelines:
   interpretation of that element (e.g., "Snowfall," "Ashrain"). Ground the name in the
   subject, setting, and mood — not in uncertain details.
 
+**Banned prefix:** Card names must NEVER start with "The" — this pattern is severely overused. Use other name structures instead.
+
 **Banned words:** Do not use "hollow," "waif," "ruin/ruins," or "witness" in card names — they are severely overused across prior sessions.
 
 Common name structures (use variety — don't default to the first few):
