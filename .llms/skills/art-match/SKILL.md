@@ -205,6 +205,8 @@ to identify which rules text entries resonate with the art's mood and story.
 
 These ranges are guidelines for the art's visual weight, not minimums — a card whose power comes from its entrance effect (e.g., a sweeper) rather than its stats can have spark well below the range and still be a strong match for imposing art.
 
+**Scale calibration:** Reserve the "titanic/mythic" tier (7-9 cost) for creatures that are literally building-sized or larger — kaiju, colossi, world-serpents; a creature that is merely larger than a human (e.g., a giant spider the size of a car, a large bear, an ogre) belongs in the "large creature" tier (4-6 cost).
+
 **Scale-to-cost mapping for events:**
 
 | Art Scale | Typical Cost | Effect Tier |
