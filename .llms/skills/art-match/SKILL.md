@@ -56,6 +56,7 @@ The first step is to classify the card art. There are 3 possible types:
   card must depict a single figure as the primary subject.
 - **Landscapes** need a sense of scale and openness. A close-up of a single tree or rock
   formation is not a landscape.
+- **Small figures in vast scenes** are events, not characters — if the figure is dwarfed by the environment and serves mainly to provide scale or a point of perspective (e.g., a person standing in an endless reflective expanse, a silhouette on a cliff edge), the art is about the scene/moment, not the person.
 - **Action scenes** showing an ongoing process (a ritual, a storm, a collapse) are events
   even if a single figure is participating, as long as the process is the visual focus.
 - **Two figures in conflict** (a warrior fighting a monster, two dueling figures) are events
