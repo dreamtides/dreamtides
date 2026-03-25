@@ -214,7 +214,12 @@ to identify which rules text entries resonate with the art's mood and story.
 | Surge | Storm | Events matter, Prevent, event copying, energy burst | Chain events in one explosive turn |
 | Neutral | Utility | Removal, Discover, Foresee, sweepers | Flexible answers for any deck |
 
-# Phase 3: Load the Card Pool
+# Phase 3: Search and Match
+
+This phase is iterative. You will search the card pool, evaluate candidates, and refine
+your search until you find a strong match — or determine that no strong match exists.
+
+## The Pool Filter Tool
 
 Use the pool filter script to load candidate cards. The script reads from
 `cards_anonymized.txt` (pre-generated anonymized card data). Run it from the
@@ -243,14 +248,16 @@ TideCost | Cost/Spark | Type | Rarity | Rules Text
 ```
 For example: `Bloom1 | 3●/2✦ | Spirit Animal | R | ▸ Dissolved: Put this card on top of your deck with +2 spark.`
 
-**Step 1: Load based on classification.** Use the subtype classification from Phase 1 to
-determine which pool to search:
+## Round 1: Initial Search
+
+Run your first queries based on the classification from Phase 1 and the practical
+constraints from Phase 2. Run multiple filtered queries in parallel to explore efficiently.
+
+**Start with subtype + constraint filters:**
 
 ```bash
 # Locked subtype — ONLY search that subtype:
 python3 .llms/skills/art-match/pool-filter.py characters --subtype Warrior
-python3 .llms/skills/art-match/pool-filter.py characters --subtype "Spirit Animal"
-python3 .llms/skills/art-match/pool-filter.py characters --subtype Survivor
 
 # Ambiguous — search both possible subtypes:
 python3 .llms/skills/art-match/pool-filter.py characters --subtype Warrior
@@ -263,84 +270,72 @@ python3 .llms/skills/art-match/pool-filter.py characters --subtype Char
 python3 .llms/skills/art-match/pool-filter.py events
 ```
 
-**Step 2: Narrow with filters.** Use the practical constraints from Phase 2 to run
-focused queries. Run multiple filtered queries in parallel to explore efficiently:
+**Combine with constraint filters from Phase 2:**
 
 ```bash
-# Example: small creature → cheap characters
-python3 .llms/skills/art-match/pool-filter.py characters --cost 1-2
+# Scale constraint: titanic creature → expensive characters
+python3 .llms/skills/art-match/pool-filter.py characters --subtype Char --cost 6-9
 
-# Example: dark/void mood → Umbra or Pact characters
+# Mood constraint: dark/void mood → Umbra or Pact
 python3 .llms/skills/art-match/pool-filter.py characters --tide Umbra
 python3 .llms/skills/art-match/pool-filter.py characters --tide Pact
 
-# Example: dramatic event → high-cost events
-python3 .llms/skills/art-match/pool-filter.py events --cost 4-7
-
-# Example: events with specific mechanic
+# Mechanic constraint: art suggests a specific mechanic
 python3 .llms/skills/art-match/pool-filter.py events --mechanic "dissolve"
 ```
 
-Review the filtered results and identify your working set of candidates.
+## Evaluate and Iterate
 
-# Phase 4: Generate Matching Concepts
+Scan the results from Round 1. For each card that catches your eye, ask the **"aha" test:**
 
-Generate **at least 5 candidate matches** between the art and cards from the pool. Each
-concept should:
+> If a player saw this art on this card, would they say "of course this character/event
+> does that"? Does the mechanic complete the story the art is telling?
 
-1. **Identify the card** from the pool (cite the full line)
-2. **Write a narrative anchor** explaining the connection: Why does this rules text fit this
-   art? How does the mechanic tell the story of what's happening in the image?
-   - For characters: Who is this character? What is their story? Why do they have this
-     ability? How does the ability reflect what we see?
-   - For events: What is happening in this event? How did it cause these game effects? Why
-     does the mechanical effect match the visual moment?
-3. **Rate the fit** on three dimensions:
-   - **Mood alignment** (1-5): Does the emotional tone of the art match the feel of the
-     mechanic? Uplifting art with draw/gain effects = high. Horror art with dissolve = high.
-     Mismatch = low.
-   - **Scale alignment** (1-5): Does the visual "size" of the subject match the card's cost
-     and impact? A towering figure matching a 6-cost powerhouse = high. A small bird matching
-     a 7-cost bomb = low.
-   - **Narrative coherence** (1-5): How naturally does the mechanic tell a story about the
-     art? Can you explain "this character does X because..." without straining? A protector
-     figure matching a prevent effect = high. A serene meditator matching an aggressive
-     dissolve = low.
+**If you spot a strong candidate:** Develop it. Write 2-3 sentences explaining the
+art-mechanic connection. Check that:
+- The cost/spark matches the visual weight of the subject
+- The mood of the mechanic matches the mood of the art
+- The tide philosophy fits the art's worldview
+- You can explain "this character does X because..." without straining
 
-### What Makes a Strong Match
+**If nothing in Round 1 is compelling:** Widen your search. Try different filters:
+- A different cost range (maybe the scale is more ambiguous than you thought)
+- A different tide (maybe the mood maps to a tide you didn't initially consider)
+- A mechanic keyword derived from the art's dynamics
+- Removing a filter that was too restrictive
 
-The best matches create an "aha" moment where the art and the mechanic feel inseparable —
-where a player seeing the card would say "of course this character does that." Aim for
-matches where:
+**If you find multiple strong candidates:** Good — hold them and compare. You don't need
+to force a quota, but having 2-3 genuine contenders makes for a more confident final pick.
+
+Continue iterating until you either:
+1. **Find a match that passes the "aha" test** — the art and mechanic feel inseparable
+2. **Exhaust the reasonable search space** — you've tried multiple tides, cost ranges, and
+   mechanic keywords, and nothing fits well. If this happens, say so honestly. Not every
+   piece of art will have a perfect match in a finite pool.
+
+## What Makes a Strong Match
+
+The best matches create an "aha" moment where the art and the mechanic feel inseparable.
 
 - **The mechanic IS the character's story.** A card that reads "▸ Dissolved: Return each
   ally to hand" paired with art of a guardian figure creates the narrative: "When the
   guardian falls, they use their last strength to save everyone else." The mechanic doesn't
   just coexist with the art — it completes the story.
-
 - **The cost/spark matches the visual weight.** A massive, imposing creature should feel
-  expensive and impactful. A small, nimble figure should feel cheap and tricky. A dramatic
-  catastrophe should be a high-cost event.
-
+  expensive and impactful. A small, nimble figure should feel cheap and tricky.
 - **The tide philosophy matches the art's worldview.** A nature scene with growth imagery
-  naturally fits Bloom's patient accumulation. A figure surrounded by spectral ruins fits
-  Umbra's relationship with the void. Dark sacrifice imagery fits Pact. Bright, fast,
-  energetic imagery fits Arc or Surge.
+  naturally fits Bloom. A figure surrounded by spectral ruins fits Umbra. Dark sacrifice
+  imagery fits Pact. Bright, energetic imagery fits Arc or Surge.
 
-### What Makes a Weak Match
-
-Avoid matches where:
-
+**Reject matches where:**
 - The mechanic actively contradicts the art (a peaceful scene matched with mass destruction)
 - The cost/scale is wildly mismatched (a tiny creature on a 7-cost card)
 - The narrative requires too many logical leaps to explain
-- The mood of the mechanic clashes with the mood of the art
 
-### Tide Color Bias
+## Tide Color Bias
 
-Each tide has an associated color palette. This is a **minor factor** — narrative coherence,
-scale, and mood all matter much more — but when choosing between otherwise-equal candidates,
-prefer the tide whose color matches the art's dominant palette:
+Each tide has an associated color palette. This is a **tiebreaker only** — when choosing
+between otherwise-equal candidates, prefer the tide whose color matches the art:
 
 | Tide | Color |
 |---|---|
@@ -352,28 +347,15 @@ prefer the tide whose color matches the art's dominant palette:
 | Rime | Blue |
 | Surge | Gray |
 
-This is a soft bias, not a hard rule. A strong narrative match in the "wrong" color always
-beats a weak match in the "right" color.
+A strong narrative match in the "wrong" color always beats a weak match in the "right" color.
 
-### Priority Hierarchy
+## Select the Winner
 
-1. **Narrative coherence** is king — the art-mechanic connection should feel natural and
-   tell a compelling story
-2. **Scale alignment** is critical — the visual weight must match the mechanical weight
-3. **Mood alignment** supports the whole — the emotional tone should be consistent
-4. **Tide philosophy** is a bonus — a natural tide fit enhances the match
-5. **Tide color bias** is a tiebreaker — prefer the tide whose color matches the art
-
-# Phase 5: Select the Winner
-
-Review your 5+ concepts and select the strongest match. Explain your reasoning:
-
-- Why does this match beat the alternatives?
+Once you've found your strongest match (or compared 2-3 strong contenders), select the
+winner. Briefly explain:
 - What is the narrative connection — the "story" this card tells?
-- Are there any concerns or compromises in this match?
-
-If no match feels genuinely strong (all concepts score below 3 on narrative coherence),
-say so honestly. Not every piece of art will have a perfect match in a finite pool.
+- Why does this match beat any alternatives you considered?
+- Any concerns or compromises?
 
 # Phase 6: Assign Subtype and Name
 
