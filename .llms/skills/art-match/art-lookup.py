@@ -26,8 +26,13 @@ def main():
     fname_no_id = re.sub(r'-\d+$', '', fname_no_ext)
     # Remove stock-photo- / stock-vector- prefix
     desc_slug = re.sub(r'^stock-(?:photo|vector)-', '', fname_no_id)
-    # Convert hyphens to spaces and title-case
+    # Convert hyphens to spaces
     description = desc_slug.replace("-", " ").strip()
+    # Strip common boilerplate suffixes (may appear in any combination)
+    description = re.sub(
+        r'[\s,]*(?:digital|art|style|illustration|painting|oil|watercolor|freehand|sketch)+(?:\s+(?:digital|art|style|illustration|painting|oil|watercolor|freehand|sketch))*\s*$',
+        '', description, flags=re.IGNORECASE,
+    ).strip()
 
     print(f"Path: {path}")
     print(f"Description: {description}")

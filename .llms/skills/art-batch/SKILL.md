@@ -1,6 +1,6 @@
 ---
 name: art-batch
-description: Orchestrate batch art-to-card matching across 2200 images. Runs all images against the full card pool, writing results to art-assigned.toml.
+description: Orchestrate batch art-to-card matching across ~1500 images. Runs all images against the full card pool, writing results to art-assigned.toml.
 ---
 
 # Art Batch Matching Orchestrator
@@ -103,7 +103,7 @@ and are no longer available for matching.
 
 ## Context Preservation
 
-This runs for a very long time across ~2200 agents. To preserve context:
+This runs for a very long time across ~1500 agents. To preserve context:
 
 1. **Keep output minimal.** One line per agent.
 2. **Do not accumulate results.** Subagents write to the file.
