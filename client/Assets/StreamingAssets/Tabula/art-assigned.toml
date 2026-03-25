@@ -1,0 +1,31 @@
+[[cards]]
+name = "The Unmoored"
+id = "a04cb59f-1ce6-48e7-9a2d-5e3b09613e6a"
+tide = "Umbra"
+tide-cost = 1
+rendered-text = "▸ Judgment: Return this character from your void to your hand."
+energy-cost = 4
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 2681394203
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Total Liquidation"
+id = "063190f6-7723-44f3-bdb4-59f4037faea3"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "Dissolve all characters. Gain 1● for each of your characters dissolved this way."
+energy-cost = 6
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+image-number = 2675749427
+art-owned = false
+card-number = 0

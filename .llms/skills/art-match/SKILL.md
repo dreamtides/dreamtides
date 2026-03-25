@@ -250,12 +250,8 @@ python3 .llms/skills/art-match/pool-filter.py <command> [filters...]
 - `characters` — all anonymized characters
 - `events` — all anonymized events
 
-**Filters (combinable):**
-- `--cost LOW-HIGH` — energy cost range (e.g. `--cost 2-4` or `--cost 3`)
-- `--spark LOW-HIGH` — spark range, characters only (e.g. `--spark 1-3`)
+**Filters:**
 - `--tide TIDE` — filter to one tide (e.g. `--tide Bloom`)
-- `--rarity RARITY` — filter to a rarity (e.g. `--rarity Rare`)
-- `--mechanic KEYWORD` — filter to cards whose rules text contains keyword
 - `--subtype SUBTYPE` — filter to a character subtype: `Warrior`, `"Spirit Animal"`,
   `Survivor`, or `Char` (cards with no mechanical subtype)
 
@@ -267,10 +263,12 @@ For example: `Bloom1 | 3●/2✦ | Spirit Animal | R | ▸ Dissolved: Put this c
 
 ## Round 1: Initial Search
 
-Run your first queries based on the classification from Phase 1 and the practical
-constraints from Phase 2. Run multiple filtered queries in parallel to explore efficiently.
+Run your first queries based on the classification from Phase 1 and your narrative from
+Phase 2. **Browse broadly** — read through full card lists by type and tide, letting the
+rules text surprise you. Do NOT pre-filter by cost, mechanic, or rarity. The best matches
+often come from unexpected cards you wouldn't have searched for.
 
-**Start with subtype + constraint filters:**
+**For characters**, start with the subtype classification:
 
 ```bash
 # Locked subtype — ONLY search that subtype:
@@ -287,18 +285,11 @@ python3 .llms/skills/art-match/pool-filter.py characters --subtype Char
 python3 .llms/skills/art-match/pool-filter.py events
 ```
 
-**Combine with constraint filters from Phase 2:**
+Then browse tides that fit the art's mood and color:
 
 ```bash
-# Scale constraint: titanic creature → expensive characters
-python3 .llms/skills/art-match/pool-filter.py characters --subtype Char --cost 6-9
-
-# Mood constraint: dark/void mood → Umbra or Pact
 python3 .llms/skills/art-match/pool-filter.py characters --tide Umbra
 python3 .llms/skills/art-match/pool-filter.py characters --tide Pact
-
-# Mechanic constraint: art suggests a specific mechanic
-python3 .llms/skills/art-match/pool-filter.py events --mechanic "dissolve"
 ```
 
 ## Evaluate and Iterate
@@ -315,20 +306,17 @@ art-mechanic connection. Check that:
 - The tide philosophy fits the art's worldview
 - You can explain "this character does X because..." without straining
 
-**If nothing in Round 1 is compelling:** Widen your search. Try different filters:
-- A different cost range (maybe the scale is more ambiguous than you thought)
-- A different tide (maybe the mood maps to a tide you didn't initially consider)
-- A mechanic keyword derived from the art's dynamics
-- Removing a filter that was too restrictive
+**If nothing in Round 1 is compelling:** Widen your search. Try different tides — maybe
+the mood maps to a tide you didn't initially consider.
 
 **If you find multiple strong candidates:** Good — hold them and compare. You don't need
 to force a quota, but having 2-3 genuine contenders makes for a more confident final pick.
 
 Continue iterating until you either:
 1. **Find a match that passes the "aha" test** — the art and mechanic feel inseparable
-2. **Exhaust the reasonable search space** — you've tried multiple tides, cost ranges, and
-   mechanic keywords, and nothing fits well. If this happens, say so honestly. Not every
-   piece of art will have a perfect match in a finite pool.
+2. **Exhaust the reasonable search space** — you've tried multiple tides and nothing fits
+   well. If this happens, say so honestly. Not every piece of art will have a perfect
+   match in a finite pool.
 
 ## What Makes a Strong Match
 
