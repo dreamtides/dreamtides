@@ -50,12 +50,12 @@ Read the art-match skill at `.llms/skills/art-match/SKILL.md` and follow it comp
 
 ## Overused Name Words
 
-During Phase 4 (naming), before choosing a final name, run:
+During Phase 4 (naming), check your proposed name before finalizing:
 ```bash
-python3 .llms/skills/art-batch/overused-words.py
+python3 .llms/skills/art-batch/overused-words.py "Proposed Card Name"
 ```
-This prints words used 3+ times across already-assigned cards. Do NOT use any of those
-words in your card name — find synonyms or different concepts instead.
+If it prints FAIL, one or more words are overused (3+ prior uses) — pick a different name
+and check again. Only finalize a name that prints PASS.
 
 ## Final Step: Write to art-assigned.toml
 
