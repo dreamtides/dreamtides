@@ -100,7 +100,9 @@ don't apply):
 
 - **The Subject:** What is the central figure, creature, object, or action? Describe their
   posture, clothing, equipment, expression, and any distinguishing features. Note their
-  apparent size relative to the scene.
+  apparent size relative to the scene. Do not infer age from scale alone — a figure that
+  appears small may simply be dwarfed by a massive environment; default to adult unless
+  childlike proportions (large head-to-body ratio, short limbs) are clearly visible.
 - **The Setting/Terrain:** What environment surrounds the subject? Describe the ground,
   structures, vegetation, or lack thereof. Is it natural, urban, alien, ruined?
 - **The Sky/Background:** What's behind or above the scene? Weather, celestial bodies,
