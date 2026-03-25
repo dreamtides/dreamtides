@@ -32,7 +32,13 @@ The first step is to classify the card art. There are 3 possible types:
 2) **Landscape.** Does the art depict a landscape? A wide depiction of a wilderness or urban
    landscape is a dreamwell/landscape card. **If the art is a landscape, state this clearly
    and EXIT. We do not handle dreamwell cards in this process.**
-3) **Event.** Art which does not depict a character or landscape is by default an event card.
+3) **Abstract.** Is the art an abstract texture, pattern, or color field with no discernible
+   subject, scene, or action? Examples: paint textures, color gradients, geometric patterns,
+   marble/stone surfaces, bokeh/light effects with no scene context. Abstract art is not
+   suitable for use as card art. **If the art is abstract, state this clearly and EXIT. We do
+   not handle abstract art in this process.**
+4) **Event.** Art which does not depict a character, landscape, or abstract texture is by
+   default an event card.
 
 ### Classification Tips
 
