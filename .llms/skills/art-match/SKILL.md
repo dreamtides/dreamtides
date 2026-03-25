@@ -436,6 +436,7 @@ descriptors, or abstract phrases instead. The characters are unnamed figures in 
 
 Name guidelines:
 - Character cards must be named as a person/creature (a role, title, or descriptor), never as an object, weapon, body part, or action they happen to be performing. Event-style names that describe a phenomenon, force, or occurrence (e.g., "Emerald Pyre", "Meltdown", "Cataclysm") are wrong for characters — the name must identify *who* the figure is, not *what is happening around them*.
+- Prefer poetic, evocative names over literal descriptions of what the art depicts — "The Undaunted" is better than "The Sunleaper," and names should suggest mood and identity rather than narrating the visual scene.
 - The name should evoke the **primary subject** of the art (the figure, creature, or action), not minor background elements like ambient lighting, secondary environmental effects, or background details that a viewer would not identify as the focal point
 - It should feel natural alongside the card's rules text
 - It should hint at the narrative you've constructed
