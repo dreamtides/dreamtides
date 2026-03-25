@@ -21,7 +21,10 @@ python3 .llms/skills/art-match/art-lookup.py <image_id>
 ```
 
 This prints the local file path and the art description. Use the Read tool on the file path
-to view the image, and use the description as additional context for your analysis.
+to view the image, and use the description as additional context for your analysis. If the
+image cannot be read for any reason (permission denied, file not found, etc.), STOP
+immediately and report the error — do not proceed with the skill using only the text
+description.
 
 # Phase 1: Classify Art
 
@@ -432,6 +435,7 @@ never include specific character names (e.g., "Voss", "Kael", "Aria"). Use title
 descriptors, or abstract phrases instead. The characters are unnamed figures in a dream.
 
 Name guidelines:
+- Character cards must be named as a person/creature (a role, title, or descriptor), never as an object, weapon, body part, or action they happen to be performing
 - The name should evoke what a viewer sees in the art
 - It should feel natural alongside the card's rules text
 - It should hint at the narrative you've constructed
