@@ -348,6 +348,7 @@ The best matches create an "aha" moment where the art and the mechanic feel inse
 - The narrative requires too many logical leaps to explain
 - A card has a secondary mechanic (e.g. abandon, sacrifice, discard) that contradicts the art's mood even if the primary mechanic fits — every part of the rules text must be justifiable from the art, not just the headline ability
 - The effect requires you to invent a hypothetical scenario ("when the beast breaks free…", "when the guardian falls…") rather than being visually suggested by what the art actually depicts — if the art shows a predator standing in a lab, the mechanic should feel like what a predator in a lab *does*, not what might happen in a future scene you imagined
+- The mechanic references or produces something not depicted in the art (e.g., "Discover a Spirit Animal" when the art shows no animal) — every entity or object the card creates or searches for should have a visual basis in the art
 
 ## Tide Color Bias
 
