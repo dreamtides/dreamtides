@@ -28,8 +28,25 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent
 REPO_ROOT = SCRIPT_DIR.parent.parent.parent
 ANON_FILE = REPO_ROOT / "cards_anonymized.txt"
+ASSIGNED_FILE = REPO_ROOT / "client" / "Assets" / "StreamingAssets" / "Tabula" / "art-assigned.toml"
 
 MECHANICAL_SUBTYPES = {"warrior", "spirit animal", "survivor"}
+
+# Cards assigned this many times or more are excluded from the pool
+SATURATION_LIMIT = 5
+
+
+def get_saturated_texts() -> set[str]:
+    """Return rendered-text values assigned SATURATION_LIMIT or more times."""
+    if not ASSIGNED_FILE.exists():
+        return set()
+    counts: dict[str, int] = {}
+    for line in ASSIGNED_FILE.read_text().splitlines():
+        m = re.match(r'^rendered-text\s*=\s*"(.+)"', line.strip())
+        if m:
+            text = m.group(1)
+            counts[text] = counts.get(text, 0) + 1
+    return {text for text, count in counts.items() if count >= SATURATION_LIMIT}
 
 # Pattern: TideCost | Cost●[/Spark✦] | Type[↯] | R | Rules text
 LINE_RE = re.compile(
@@ -94,11 +111,12 @@ def main():
             print(f"Unknown argument: {args[i]}")
             return
 
-    # Read and parse all card lines
+    # Read and parse all card lines, excluding saturated cards
+    saturated = get_saturated_texts()
     cards = []
     for line in ANON_FILE.read_text().splitlines():
         card = parse_line(line)
-        if card:
+        if card and card["text"] not in saturated:
             cards.append(card)
 
     # Filter by command type
@@ -153,6 +171,8 @@ def main():
     filter_str = f" [{', '.join(filters_desc)}]" if filters_desc else ""
 
     print(f"\n--- {count} {label}{filter_str} ---")
+    if saturated:
+        print(f"({len(saturated)} cards hidden — assigned {SATURATION_LIMIT}+ times)")
 
 
 if __name__ == "__main__":

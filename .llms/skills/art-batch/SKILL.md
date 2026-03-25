@@ -85,6 +85,13 @@ If the art is landscape or abstract, do NOT write anything. Print "SKIP: [reason
 Print ONLY the card name, tide, and cost as your final output.
 ```
 
+## Oversaturation Protection
+
+The pool filter automatically excludes cards that have been assigned to 5 or more
+images. This prevents any single rules text from being overrepresented. If you see
+"N cards hidden" in the pool filter output, those cards have hit the saturation limit
+and are no longer available for matching.
+
 ## Context Preservation
 
 This runs for a very long time across ~2200 agents. To preserve context:
