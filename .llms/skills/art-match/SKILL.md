@@ -55,6 +55,11 @@ The first step is to classify the card art. There are 3 possible types:
   formation is not a landscape.
 - **Action scenes** showing an ongoing process (a ritual, a storm, a collapse) are events
   even if a single figure is participating, as long as the process is the visual focus.
+- **Two figures in conflict** (a warrior fighting a monster, two dueling figures) are events
+  — the confrontation is the subject, not either participant. But a secondary figure that
+  provides *scale* or *context* for a dominant creature (e.g., a tiny diver near a massive
+  manta ray, a traveler gazing up at a colossus) does not make it an event; classify based
+  on the dominant figure as a character.
 
 **If the art is a landscape:** Print "This art depicts a landscape and would be a dreamwell
 card. Dreamwell cards are not handled by this process." Then STOP. Do not continue.
