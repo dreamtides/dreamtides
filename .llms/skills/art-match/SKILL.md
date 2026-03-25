@@ -199,6 +199,8 @@ to identify which rules text entries resonate with the art's mood and story.
 | Large creature/imposing figure | 4-6 | 3-5 |
 | Titanic/mythic being | 7-9 | 5-7 |
 
+These ranges are guidelines for the art's visual weight, not minimums — a card whose power comes from its entrance effect (e.g., a sweeper) rather than its stats can have spark well below the range and still be a strong match for imposing art.
+
 **Scale-to-cost mapping for events:**
 
 | Art Scale | Typical Cost | Effect Tier |
