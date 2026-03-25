@@ -4,13 +4,19 @@
 Writes one image ID per line to /tmp/art-batch-images.txt
 """
 
-import json
+import os
+import re
 
-with open("/Users/dthurn/Documents/shutterstock/image_urls.json") as f:
-    entries = json.load(f)
+IMAGES_DIR = "/Users/dthurn/Documents/shutterstock/images_clean"
+
+ids = []
+for fname in sorted(os.listdir(IMAGES_DIR)):
+    m = re.search(r'-(\d+)\.\w+$', fname)
+    if m:
+        ids.append(m.group(1))
 
 with open("/tmp/art-batch-images.txt", "w") as out:
-    for e in entries:
-        out.write(e["id"] + "\n")
+    for img_id in ids:
+        out.write(img_id + "\n")
 
-print(f"Wrote {len(entries)} image IDs to /tmp/art-batch-images.txt")
+print(f"Wrote {len(ids)} image IDs to /tmp/art-batch-images.txt")
