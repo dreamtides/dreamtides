@@ -386,16 +386,6 @@ A strong narrative match in the "wrong" color always beats a weak match in the "
 
 ## Select the Winner
 
-**Guard against Umbra/Pact bias.** Umbra and Pact have narratively rich mechanics
-(sacrifice, void recursion, things returning from death) that tend to "win" narrative
-evaluations even when a simpler mechanic is an equally good fit. Before selecting an Umbra
-or Pact card as your winner, you MUST identify your best non-Umbra/non-Pact candidate and
-write a steel-man argument for why it could be the right pick. Remember: the art provides
-the drama — the mechanic doesn't need to add more. A clean utility effect (Foresee, draw,
-energy gain, Discover) matched to dramatic art can create an "aha" moment through tonal
-fit, not just narrative reinforcement. If your top 3 candidates are all Umbra/Pact, step
-back and ask whether you've been matching mood-to-void too aggressively.
-
 **Guard against primacy bias.** LLMs tend to favor the first candidate they evaluate in
 detail — the one that gets labeled "Candidate A." Before selecting a winner, you MUST:
 1. Identify your top 2-3 candidates.
