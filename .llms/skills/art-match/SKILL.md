@@ -341,6 +341,7 @@ The best matches create an "aha" moment where the art and the mechanic feel inse
 - The mechanic actively contradicts the art (a peaceful scene matched with mass destruction)
 - The cost/scale is wildly mismatched (a tiny creature on a 7-cost card)
 - The narrative requires too many logical leaps to explain
+- A card has a secondary mechanic (e.g. abandon, sacrifice, discard) that contradicts the art's mood even if the primary mechanic fits — every part of the rules text must be justifiable from the art, not just the headline ability
 
 ## Tide Color Bias
 
