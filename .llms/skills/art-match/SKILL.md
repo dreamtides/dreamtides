@@ -11,6 +11,18 @@ unassigned card from the pool. Run everything with ultrathink.
 
 Read `docs/battle_rules/battle_rules.md` and `docs/tides/tides.md` (use the Read tool).
 
+# Phase 0: Load the Art
+
+The user will provide an image ID number. Use the lookup script to find the image path and
+description:
+
+```bash
+python3 .llms/skills/art-match/art-lookup.py <image_id>
+```
+
+This prints the local file path and the art description. Use the Read tool on the file path
+to view the image, and use the description as additional context for your analysis.
+
 # Phase 1: Classify Art
 
 The first step is to classify the card art. There are 3 possible types:
@@ -324,6 +336,25 @@ Avoid matches where:
 - The narrative requires too many logical leaps to explain
 - The mood of the mechanic clashes with the mood of the art
 
+### Tide Color Bias
+
+Each tide has an associated color palette. This is a **minor factor** — narrative coherence,
+scale, and mood all matter much more — but when choosing between otherwise-equal candidates,
+prefer the tide whose color matches the art's dominant palette:
+
+| Tide | Color |
+|---|---|
+| Bloom | Green |
+| Ignite | Red |
+| Arc | Yellow |
+| Pact | Orange/Brown |
+| Umbra | Purple |
+| Rime | Blue |
+| Surge | Gray |
+
+This is a soft bias, not a hard rule. A strong narrative match in the "wrong" color always
+beats a weak match in the "right" color.
+
 ### Priority Hierarchy
 
 1. **Narrative coherence** is king — the art-mechanic connection should feel natural and
@@ -331,6 +362,7 @@ Avoid matches where:
 2. **Scale alignment** is critical — the visual weight must match the mechanical weight
 3. **Mood alignment** supports the whole — the emotional tone should be consistent
 4. **Tide philosophy** is a bonus — a natural tide fit enhances the match
+5. **Tide color bias** is a tiebreaker — prefer the tide whose color matches the art
 
 # Phase 5: Select the Winner
 
