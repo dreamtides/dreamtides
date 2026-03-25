@@ -347,6 +347,7 @@ The best matches create an "aha" moment where the art and the mechanic feel inse
 - The cost/scale is wildly mismatched (a tiny creature on a 7-cost card)
 - The narrative requires too many logical leaps to explain
 - A card has a secondary mechanic (e.g. abandon, sacrifice, discard) that contradicts the art's mood even if the primary mechanic fits — every part of the rules text must be justifiable from the art, not just the headline ability
+- The effect requires you to invent a hypothetical scenario ("when the beast breaks free…", "when the guardian falls…") rather than being visually suggested by what the art actually depicts — if the art shows a predator standing in a lab, the mechanic should feel like what a predator in a lab *does*, not what might happen in a future scene you imagined
 
 ## Tide Color Bias
 
