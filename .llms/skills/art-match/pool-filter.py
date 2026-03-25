@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Filter the anonymized card pool for art-matching.
 
-Reads rendered-cards.toml and outputs anonymized card entries filtered by
-type (character/event), cost range, tide, and rarity. Designed for the
-art-match skill so agents can quickly narrow down candidate cards.
+Reads cards_anonymized.txt and outputs filtered card entries by type
+(character/event), cost range, tide, rarity, and subtype.
 
 Usage:
     python3 pool-filter.py characters
@@ -15,14 +14,10 @@ Usage:
     python3 pool-filter.py characters --spark 0-1
     python3 pool-filter.py events --mechanic "dissolve"
     python3 pool-filter.py events --mechanic "draw"
-    python3 pool-filter.py unassigned-characters
-    python3 pool-filter.py unassigned-events
 
 Commands:
     characters              All anonymized character entries
     events                  All anonymized event entries
-    unassigned-characters   Characters without art (no image-number)
-    unassigned-events       Events without art (no image-number)
 
 Filters (combinable):
     --cost LOW-HIGH         Energy cost range (e.g. 2-4, or just 3)
@@ -34,72 +29,46 @@ Filters (combinable):
                             Survivor, Char). Use "Char" for cards with no mechanical subtype.
 """
 
+import re
 import sys
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
 REPO_ROOT = SCRIPT_DIR.parent.parent.parent
-RENDERED_CARDS = REPO_ROOT / "rules_engine" / "tabula" / "rendered-cards.toml"
+ANON_FILE = REPO_ROOT / "cards_anonymized.txt"
 
 MECHANICAL_SUBTYPES = {"warrior", "spirit animal", "survivor"}
 
+# Pattern: TideCost | Cost●[/Spark✦] | Type[↯] | R | Rules text
+LINE_RE = re.compile(
+    r'^(\w+?)(\d+|\*)\s*\|\s*'             # tide + tide-cost
+    r'(\d+|\*?)●(?:/(\d+|\*?)✦)?\s*\|\s*'  # cost / optional spark
+    r'(.+?)(\u21AF)?\s*\|\s*'              # type + optional fast marker
+    r'([CURL])\s*\|\s*'                    # rarity
+    r'(.+)$'                               # rules text
+)
 
-def parse_toml_entries(path: Path, entry_key: str) -> list[dict]:
-    """Parse a TOML file with repeated [[entry_key]] entries into a list of dicts."""
-    cards = []
-    current: dict = {}
-    in_multiline = False
-    multiline_key = ""
-    multiline_value = ""
-    in_metadata = False
 
-    for line in path.read_text().splitlines():
-        stripped = line.strip()
-
-        if stripped == "[metadata]" or stripped.startswith("[metadata."):
-            in_metadata = True
-            continue
-        if in_metadata:
-            if stripped.startswith("[[") and not stripped.startswith("[[metadata"):
-                in_metadata = False
-            else:
-                continue
-
-        if in_multiline:
-            if '"""' in stripped:
-                multiline_value += " " + stripped.replace('"""', "").strip()
-                current[multiline_key] = multiline_value.strip()
-                in_multiline = False
-            else:
-                multiline_value += " " + stripped
-            continue
-
-        if stripped == f"[[{entry_key}]]":
-            if current:
-                cards.append(current)
-            current = {}
-            continue
-
-        if "=" in stripped and not stripped.startswith("#") and not stripped.startswith("[["):
-            key, _, value = stripped.partition("=")
-            key = key.strip()
-            value = value.strip()
-            if value.startswith('"""'):
-                content = value[3:]
-                if content.endswith('"""'):
-                    current[key] = content[:-3].strip()
-                else:
-                    in_multiline = True
-                    multiline_key = key
-                    multiline_value = content
-            elif value.startswith('"') and value.endswith('"'):
-                current[key] = value[1:-1]
-            else:
-                current[key] = value
-
-    if current:
-        cards.append(current)
-    return cards
+def parse_line(line: str) -> dict | None:
+    """Parse a single anonymized card line into a dict."""
+    m = LINE_RE.match(line.strip())
+    if not m:
+        return None
+    tide, tide_cost, cost, spark, card_type, fast, rarity, text = m.groups()
+    card_type = card_type.strip()
+    is_event = card_type == "Event"
+    return {
+        "tide": tide,
+        "tide-cost": tide_cost,
+        "cost": cost,
+        "spark": spark or "",
+        "type": card_type,
+        "is-event": is_event,
+        "is-fast": fast == "↯" if fast else False,
+        "rarity": rarity,
+        "text": text.strip(),
+        "raw": line.strip(),
+    }
 
 
 def parse_range(s: str) -> tuple[int, int]:
@@ -111,43 +80,11 @@ def parse_range(s: str) -> tuple[int, int]:
     return val, val
 
 
-def format_anon(card: dict) -> str:
-    """Format a card in anonymized one-line format."""
-    tide = card.get("tide", "")
-    tc = card.get("tide-cost", "")
-    cost = card.get("energy-cost", "?")
-    spark = card.get("spark", "")
-    ct = card.get("card-type", "?")
-    sub = card.get("subtype", "")
-    fast = "↯" if card.get("is-fast", "false") == "true" else ""
-    rarity = card.get("rarity", "")[0] if card.get("rarity", "") else ""
-    text = card.get("rendered-text", "").replace("\\n", " ").strip()
-
-    if sub.lower() not in MECHANICAL_SUBTYPES:
-        sub = ""
-
-    if ct == "Character":
-        type_str = sub if sub and sub != "*" else "Char"
-        stat = f"{cost}●/{spark}✦"
-    else:
-        type_str = "Event"
-        stat = f"{cost}●"
-
-    return f"{tide}{tc} | {stat} | {type_str}{fast} | {rarity} | {text}"
-
-
-def safe_cost(card: dict) -> int:
+def safe_int(s: str, default: int = 0) -> int:
     try:
-        return int(card.get("energy-cost", 0))
-    except ValueError:
-        return 99
-
-
-def safe_spark(card: dict) -> int:
-    try:
-        return int(card.get("spark", 0))
-    except ValueError:
-        return 0
+        return int(s)
+    except (ValueError, TypeError):
+        return default
 
 
 def main():
@@ -178,7 +115,7 @@ def main():
             tide_filter = args[i + 1].lower()
             i += 2
         elif args[i] == "--rarity" and i + 1 < len(args):
-            rarity_filter = args[i + 1].lower()
+            rarity_filter = args[i + 1][0].upper()  # C, U, R, or L
             i += 2
         elif args[i] == "--mechanic" and i + 1 < len(args):
             mechanic_filter = args[i + 1].lower()
@@ -190,72 +127,69 @@ def main():
             print(f"Unknown argument: {args[i]}")
             return
 
-    cards = parse_toml_entries(RENDERED_CARDS, "cards")
+    # Read and parse all card lines
+    cards = []
+    for line in ANON_FILE.read_text().splitlines():
+        card = parse_line(line)
+        if card:
+            cards.append(card)
 
     # Filter by command type
-    unassigned_only = command.startswith("unassigned-")
-    if command in ("characters", "unassigned-characters"):
-        filtered = [c for c in cards if c.get("card-type") == "Character"]
-        label = "CHARACTERS"
-    elif command in ("events", "unassigned-events"):
-        filtered = [c for c in cards if c.get("card-type") == "Event"]
-        label = "EVENTS"
+    if command == "characters":
+        filtered = [c for c in cards if not c["is-event"]]
+        label = "characters"
+    elif command == "events":
+        filtered = [c for c in cards if c["is-event"]]
+        label = "events"
     else:
         print(f"Unknown command: {command}")
-        print("Valid commands: characters, events, unassigned-characters, unassigned-events")
+        print("Valid commands: characters, events")
         return
-
-    # Filter to unassigned (no image-number) if requested
-    if unassigned_only:
-        filtered = [c for c in filtered if not c.get("image-number")]
-        label = f"UNASSIGNED {label}"
 
     # Apply optional filters
     if cost_range:
         low, high = cost_range
-        filtered = [c for c in filtered if low <= safe_cost(c) <= high]
+        filtered = [c for c in filtered if low <= safe_int(c["cost"], 99) <= high]
 
     if spark_range:
         low, high = spark_range
-        filtered = [c for c in filtered if low <= safe_spark(c) <= high]
+        filtered = [c for c in filtered if low <= safe_int(c["spark"], 0) <= high]
 
     if tide_filter:
-        filtered = [c for c in filtered if c.get("tide", "").lower() == tide_filter]
+        filtered = [c for c in filtered if c["tide"].lower() == tide_filter]
 
     if rarity_filter:
-        filtered = [c for c in filtered if c.get("rarity", "").lower() == rarity_filter]
+        filtered = [c for c in filtered if c["rarity"] == rarity_filter]
 
     if mechanic_filter:
-        filtered = [c for c in filtered
-                    if mechanic_filter in c.get("rendered-text", "").lower()]
+        filtered = [c for c in filtered if mechanic_filter in c["text"].lower()]
 
     if subtype_filter:
         if subtype_filter == "char":
-            # "Char" means cards with no mechanical subtype (not Warrior/Spirit Animal/Survivor)
             filtered = [c for c in filtered
-                        if c.get("subtype", "").lower() not in MECHANICAL_SUBTYPES]
+                        if c["type"].lower() not in MECHANICAL_SUBTYPES]
         else:
             filtered = [c for c in filtered
-                        if c.get("subtype", "").lower() == subtype_filter]
+                        if c["type"].lower() == subtype_filter]
 
     # Sort by tide then cost
     tide_order = {"Bloom": 0, "Arc": 1, "Ignite": 2, "Pact": 3,
                   "Umbra": 4, "Rime": 5, "Surge": 6, "Neutral": 7}
     filtered.sort(key=lambda c: (
-        tide_order.get(c.get("tide", ""), 8),
-        safe_cost(c),
+        tide_order.get(c["tide"], 8),
+        safe_int(c["cost"], 99),
     ))
 
     # Group by tide for display
     current_tide = None
     count = 0
     for c in filtered:
-        t = c.get("tide", "")
+        t = c["tide"]
         if t != current_tide:
             current_tide = t
-            tide_cards = [x for x in filtered if x.get("tide", "") == t]
-            print(f"\n=== {t.upper() or '(none)'} ({len(tide_cards)}) ===")
-        print(format_anon(c))
+            tide_cards = [x for x in filtered if x["tide"] == t]
+            print(f"\n=== {t.upper()} ({len(tide_cards)}) ===")
+        print(c["raw"])
         count += 1
 
     filters_desc = []
@@ -273,7 +207,7 @@ def main():
         filters_desc.append(f"subtype={subtype_filter}")
     filter_str = f" [{', '.join(filters_desc)}]" if filters_desc else ""
 
-    print(f"\n--- {count} {label.lower()}{filter_str} ---")
+    print(f"\n--- {count} {label}{filter_str} ---")
 
 
 if __name__ == "__main__":

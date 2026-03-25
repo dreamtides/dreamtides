@@ -1,3 +1,4 @@
+
 === BLOOM (56C, 11E) ===
 Bloom1 | 1●/1✦ | Warrior | C | Once per turn, when you materialize a character, gain 1●.
 Bloom1 | 1●/1✦ | Spirit Animal | C | When you materialize an allied Spirit Animal, gain 1●.
@@ -136,7 +137,7 @@ Arc1 | 5● | Event↯ | C | Banish an enemy until your next main phase.
 Arc2 | 5● | Event | R | Materialize two random characters with cost 3● or less from your deck.
 
 === IGNITE (58C, 9E) ===
-Ignite1 | 0●/1✦ | Warrior | C |
+Ignite1 | 0●/1✦ | Warrior | C | 
 Ignite1 | 0●/0✦ | Warrior | C | ▸ Materialized, Judgment: With 2 allied Warriors, gain 1●.
 Ignite1 | 1●/1✦ | Survivor | U | ▸ Dissolved: Materialize a Warrior figment for each spark this character has.
 Ignite1 | 1●/1✦ | Warrior | U | ▸ Judgment: With 3 cards in your void, this character gains +2 spark.
@@ -553,3 +554,16 @@ Neutral1 | 6● | Event | C | Return all characters to their owners' hands.
 Neutral1 | 6● | Event | C | Banish an enemy. Materialize a copy of it.
 Neutral1 | 6● | Event | R | Dissolve all characters. Gain 1● for each of your characters dissolved this way.
 Neutral1 | *● | Event↯ | U | Choose One: • 2●: Return an enemy to hand. • 3●: Draw 2 cards.
+
+=== (NO TIDE) (0C, 2E) ===
+ | 0● | Event | S | 
+ | 2● | Event | S | Draw a card.
+
+=== DREAMWELL (7 cards) ===
+Phase 0 | +2● | (none) 
+Phase 0 | +2● | (none) 
+Phase 1 | +1● | {Foresee($f)}. f: 1
+Phase 1 | +1● | Gain {points($p)}. p: 1
+Phase 1 | +1● | Gain {energy($e)}. e: 1
+Phase 1 | +1● | Draw {cards($c)}. Discard {cards($d)}. c: 1 d: 1
+Phase 1 | +1● | Put the {top_n_cards($v)} of your deck into your void. v: 3

@@ -205,7 +205,7 @@ to identify which rules text entries resonate with the art's mood and story.
 # Phase 3: Load the Card Pool
 
 Use the pool filter script to load candidate cards. The script reads from
-`rendered-cards.toml` and outputs anonymized entries (names stripped). Run it from the
+`cards_anonymized.txt` (pre-generated anonymized card data). Run it from the
 repo root:
 
 ```bash
@@ -215,8 +215,6 @@ python3 .llms/skills/art-match/pool-filter.py <command> [filters...]
 **Commands:**
 - `characters` — all anonymized characters
 - `events` — all anonymized events
-- `unassigned-characters` — characters without art assigned (preferred)
-- `unassigned-events` — events without art assigned (preferred)
 
 **Filters (combinable):**
 - `--cost LOW-HIGH` — energy cost range (e.g. `--cost 2-4` or `--cost 3`)
@@ -238,19 +236,19 @@ determine which pool to search:
 
 ```bash
 # Locked subtype — ONLY search that subtype:
-python3 .llms/skills/art-match/pool-filter.py unassigned-characters --subtype Warrior
-python3 .llms/skills/art-match/pool-filter.py unassigned-characters --subtype "Spirit Animal"
-python3 .llms/skills/art-match/pool-filter.py unassigned-characters --subtype Survivor
+python3 .llms/skills/art-match/pool-filter.py characters --subtype Warrior
+python3 .llms/skills/art-match/pool-filter.py characters --subtype "Spirit Animal"
+python3 .llms/skills/art-match/pool-filter.py characters --subtype Survivor
 
 # Ambiguous — search both possible subtypes:
-python3 .llms/skills/art-match/pool-filter.py unassigned-characters --subtype Warrior
-python3 .llms/skills/art-match/pool-filter.py unassigned-characters --subtype Survivor
+python3 .llms/skills/art-match/pool-filter.py characters --subtype Warrior
+python3 .llms/skills/art-match/pool-filter.py characters --subtype Survivor
 
 # Open subtype — search Char (no mechanical subtype):
-python3 .llms/skills/art-match/pool-filter.py unassigned-characters --subtype Char
+python3 .llms/skills/art-match/pool-filter.py characters --subtype Char
 
 # Event art:
-python3 .llms/skills/art-match/pool-filter.py unassigned-events
+python3 .llms/skills/art-match/pool-filter.py events
 ```
 
 **Step 2: Narrow with filters.** Use the practical constraints from Phase 2 to run
@@ -258,22 +256,20 @@ focused queries. Run multiple filtered queries in parallel to explore efficientl
 
 ```bash
 # Example: small creature → cheap characters
-python3 .llms/skills/art-match/pool-filter.py unassigned-characters --cost 1-2
+python3 .llms/skills/art-match/pool-filter.py characters --cost 1-2
 
 # Example: dark/void mood → Umbra or Pact characters
-python3 .llms/skills/art-match/pool-filter.py unassigned-characters --tide Umbra
-python3 .llms/skills/art-match/pool-filter.py unassigned-characters --tide Pact
+python3 .llms/skills/art-match/pool-filter.py characters --tide Umbra
+python3 .llms/skills/art-match/pool-filter.py characters --tide Pact
 
 # Example: dramatic event → high-cost events
-python3 .llms/skills/art-match/pool-filter.py unassigned-events --cost 4-7
+python3 .llms/skills/art-match/pool-filter.py events --cost 4-7
 
 # Example: events with specific mechanic
-python3 .llms/skills/art-match/pool-filter.py unassigned-events --mechanic "dissolve"
+python3 .llms/skills/art-match/pool-filter.py events --mechanic "dissolve"
 ```
 
-Review the filtered results and identify your working set of candidates. If the unassigned
-pool is too small or has no good matches, fall back to the full pool (without `unassigned-`
-prefix) — assigned cards can be reassigned if the match is compelling enough.
+Review the filtered results and identify your working set of candidates.
 
 # Phase 4: Generate Matching Concepts
 
