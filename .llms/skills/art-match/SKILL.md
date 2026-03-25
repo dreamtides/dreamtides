@@ -167,7 +167,7 @@ Then identify the **practical constraints** the art places on matching:
 - Art with a positive/uplifting mood should match a positive-coded game effect for the player
   such as drawing cards
 - Art with a horror/destructive mood should match a negative-coded effect such as interacting
-  with the opponent or the void
+  with the opponent
 - Art showing a small creature should match a cheap/low-cost character
 - Art showing a massive, dramatic event should match a high-cost event
 - Art showing a subtle, quiet moment should match a low-cost or utility event
@@ -180,7 +180,7 @@ to identify which rules text entries resonate with the art's mood and story.
 | Visual Element | Dynamic It Suggests |
 |---|---|
 | Golden light, sparks, radiance | Revelation, uncovering, gaining knowledge or options |
-| Darkness, shadow, void imagery | Hidden resources, delayed payoff, things not yet found |
+| Darkness, shadow, void imagery | Hidden resources, delayed payoff, denial, austerity |
 | Fire, explosion, destruction | Decisive action, removing obstacles, clearing the way |
 | Growth, nature, blooming | Acceleration, compounding returns, investment that pays off |
 | Speed, motion blur, flight | Tempo, responsiveness, being ahead of the moment |
@@ -189,7 +189,7 @@ to identify which rules text entries resonate with the art's mood and story.
 | Ice, winter, austerity | Discipline, doing more with less, denial |
 | Machinery, technology, circuits | Repeatability, precision, systematic advantage |
 | Magical cascades, chains, links | Sequences, momentum, each action enabling the next |
-| Ruins, decay, entropy | Value in what's been lost, the past as resource |
+| Ruins, decay, entropy | Endurance, history, the weight of time |
 | Portals, gateways, thresholds | Transformation, conditionality, "before and after" moments |
 | Shields, barriers, protection | Control over what happens, authority, selective denial |
 | Mirrors, reflections, duality | Echoing, doubling, symmetry or asymmetry |
@@ -219,15 +219,20 @@ These ranges are guidelines for the art's visual weight, not minimums — a card
 | Mood | Player Effect | Opponent Effect |
 |---|---|---|
 | Serene, contemplative | Foresee, card selection | — |
-| Joyful, triumphant | Draw cards, gain energy | — |
-| Mysterious, hidden | Discover, look at top of deck | — |
-| Melancholic, nostalgic | Void recursion, Reclaim, return from void | — |
+| Joyful, triumphant | Draw cards, gain energy, max energy gain | — |
+| Mysterious, hidden | Discover, Foresee, look at top of deck | — |
+| Melancholic, nostalgic | Return to hand, card selection, self-discard for value | — |
 | Ominous, foreboding | Foresee, taxation, cost increase | — |
-| Awe, sublime wonder | Scaling effects, large mill, high-impact one-shots | — |
+| Awe, sublime wonder | Max energy gain, large Foresee, Discover, high-impact one-shots | — |
 | Defiant, rebellious | Cost reduction, alt-cost, rule-breaking | — |
-| Aggressive, intense | — | Dissolve, forced sacrifice |
-| Eerie, haunting | Void recursion, Reclaim | Discard from hand |
+| Aggressive, intense | — | Dissolve, targeted removal |
+| Eerie, haunting | Self-mill, Foresee (peering into the unknown) | Discard from hand |
 | Chaotic, explosive | — | Mass removal, sweepers |
+
+**Important:** A dark color palette or mysterious atmosphere does NOT require void/sacrifice
+mechanics. Darkness can represent Rime's austerity, Surge's cerebral control, Neutral's
+flexible power, or simply a nighttime setting. Match mechanics to the art's *action and
+subject*, not just its color temperature.
 
 ### Tide Quick Reference
 
@@ -308,7 +313,14 @@ python3 .llms/skills/art-match/pool-filter.py characters --tide Pact
 Scan the results from Round 1. For each card that catches your eye, ask the **"aha" test:**
 
 > If a player saw this art on this card, would they say "of course this character/event
-> does that"? Does the mechanic complete the story the art is telling?
+> does that"? Does the mechanic feel right for this art?
+
+The "aha" can come from **narrative resonance** ("of course this does that") OR from
+**tonal fit** ("this mechanic *feels* like this art"). A serene landscape on a Foresee card
+is an "aha" through mood alignment, even without a dramatic story. A dramatic scene on a
+simple but powerful utility card (draw 3, gain max energy) can feel right because the art
+provides the drama and the mechanic provides the impact — the card doesn't need to add
+narrative complexity on top of dramatic art.
 
 **If you spot a strong candidate:** Develop it. Write 2-3 sentences explaining the
 art-mechanic connection. Check that:
@@ -369,6 +381,16 @@ between otherwise-equal candidates, prefer the tide whose color matches the art:
 A strong narrative match in the "wrong" color always beats a weak match in the "right" color.
 
 ## Select the Winner
+
+**Guard against Umbra/Pact bias.** Umbra and Pact have narratively rich mechanics
+(sacrifice, void recursion, things returning from death) that tend to "win" narrative
+evaluations even when a simpler mechanic is an equally good fit. Before selecting an Umbra
+or Pact card as your winner, you MUST identify your best non-Umbra/non-Pact candidate and
+write a steel-man argument for why it could be the right pick. Remember: the art provides
+the drama — the mechanic doesn't need to add more. A clean utility effect (Foresee, draw,
+energy gain, Discover) matched to dramatic art can create an "aha" moment through tonal
+fit, not just narrative reinforcement. If your top 3 candidates are all Umbra/Pact, step
+back and ask whether you've been matching mood-to-void too aggressively.
 
 **Guard against primacy bias.** LLMs tend to favor the first candidate they evaluate in
 detail — the one that gets labeled "Candidate A." Before selecting a winner, you MUST:
