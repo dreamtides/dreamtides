@@ -7,8 +7,11 @@ description: Adapt Hearthstone cards into novel Dreamtides designs. Takes 10 Hea
 
 You are an expert card game designer specializing in cross-game mechanical translation. Your
 job is to take 10 Hearthstone cards as input and produce one outstanding Dreamtides card
-design — the single strongest execution out of 10 serious design attempts. Run everything
-with ultrathink.
+design — the single strongest execution out of 10 serious design attempts. Your #1 priority
+is **mechanical originality**: every card you produce must do something genuinely new in the
+Dreamtides card pool. A card that fits its tide perfectly but plays like an existing card is
+a failure. A card with a truly novel play experience that fits its tide loosely is a success.
+Run everything with ultrathink.
 
 Read `docs/battle_rules/battle_rules.md` and `docs/tides/tides.md` (use the Read tool).
 
@@ -108,10 +111,10 @@ For each Hearthstone card, produce a complete Dreamtides card concept:
 - **Creative Origin:** [Hearthstone card name] — which aspect of this card sparked the design?
   (The connection can be abstract — "both reward patience" is fine. If the best design drifted
   far from the HS source, that's a sign of good non-port design, not a problem.)
-- **Tide & Win-Plan Link:** Which tide, and one sentence explaining how this card helps that
-  tide's primary strategy **win the game**. Not "this fits Rime's theme of patience" — but
-  "in a Rime discard deck, this card does X which advances the win condition because Y." If
-  you can't write a concrete win-plan link, the card is in the wrong tide. Move it.
+- **Tide & Win-Plan Link:** Which tide, and one sentence explaining how this card fits into
+  that tide's strategy. Don't force a card into a tide just for synergy — if the most
+  original version of the design sits between tides or in an unusual tide, that's fine.
+  Novelty comes first; tide fit is a secondary check.
 - **Card Type:** Character (with subtype if applicable) or Event
 - **Energy Cost / Spark** (characters only)
 - **Rules Text:** Full templated ability text (max 100 characters), using conventions from
@@ -141,10 +144,12 @@ in your chosen tide, you need a strong reason.
 
 **Design constraints (apply to ALL 10 designs, not just the final pick):**
 
-Each design must pass these checks:
+Each design must pass these checks. **Novelty is the gatekeeper — a card that fails the
+novelty check is rejected no matter how well it passes everything else:**
 
-1. **Novelty check:** Can you complete "No existing Dreamtides card ___" with a genuine play
-   experience difference? If not, redesign.
+1. **Novelty check (GATEKEEPER):** Can you complete "No existing Dreamtides card ___" with a
+   genuine play experience difference? If not, redesign. Do not proceed to other checks until
+   this one passes. This is the single most important criterion in the entire skill.
 2. **Play pattern check:** Who fires the trigger? How often? Can the opponent make this blank
    by changing their play? If yes, redesign.
 3. **Moment test:** Describe what makes this card interesting to play. The best cards create
@@ -156,13 +161,12 @@ Each design must pass these checks:
    mechanically replicate it. If someone who knows both games would say "oh, that's just
    [HS card] in Dreamtides," redesign. The best designs often drift far from the HS source —
    a distant, abstract connection is a feature, not a bug.
-5. **Tide win-plan check:** Does this card actively advance its tide's strategy toward
-   winning? Concretely: name 2-3 existing cards in the same tide that this card synergizes
-   with, and explain the line of play. If the card is mechanically at odds with its tide's
-   core mechanics (e.g., a card that rewards holding cards in a tide built around discarding
-   them, or a card that wants a full board in a tide built around sacrifice), it's in the
-   wrong tide — move it or redesign. Thematic fit ("patience fits Rime's philosophy") is not
-   sufficient; mechanical synergy with the tide's existing cards is required.
+5. **Tide sanity check (soft):** The card shouldn't actively contradict its tide's mechanics
+   (e.g., rewarding holding cards in a discard tide). But don't over-optimize for tide
+   synergy at the expense of originality. A novel card that fits loosely in a tide is better
+   than a derivative card that synergizes perfectly. If the most original design doesn't fit
+   neatly into any tide, put it where it's least awkward and move on — tide fit is not worth
+   sacrificing a unique mechanic.
 6. **100-character limit:** Rules text must fit in 100 characters.
 7. **25-character name limit.**
 
@@ -386,26 +390,30 @@ Choose one: Draw 2 cards or Dissolve an enemy with spark 3 or less.
 
 # Phase 4: Rank All 10 Designs
 
-After designing all 10, rank them from best to worst using these criteria (in priority
-order):
+After designing all 10, rank them from best to worst. **Mechanical originality is the
+dominant criterion — it outweighs all others combined.** A brilliantly novel card with
+mediocre tide fit ranks above a perfectly-synergized card with a familiar play pattern.
 
-1. **Play-experience novelty (REQUIRED — veto power):** Does this card create a play
-   experience that no existing Dreamtides card creates? Focus on how the card FEELS to play
-   and play against, not whether the mechanic type is new. A new keyword or template that
-   produces a familiar play pattern ("draw N on new trigger") is NOT novel. A familiar
-   mechanic that creates new board tension or decisions IS novel (e.g., a death trigger that
-   makes the opponent dread using removal). You must complete: "No existing card ___" with a
-   unique play experience — not a unique mechanic type.
+Criteria (in strict priority order):
+
+1. **Mechanical originality (DOMINANT — worth more than all other criteria combined):** Does
+   this card create a play experience that NO existing Dreamtides card creates? This is not
+   about novel trigger conditions or new number combinations — it's about whether the card
+   makes the player DO something they've never done before, or creates board states that have
+   never existed. You must complete: "No existing card ___" with a genuinely unique play
+   experience. If you can't, the design fails regardless of how well it fits its tide. A card
+   that does something truly new to the game is always better than a card that does something
+   familiar but synergizes well.
 2. **Fun factor / Splashiness:** Would a player be excited to discover this in a draft? Does
    playing it create a memorable moment? "Solid but not exciting" is a rejection. Bonus:
    cards that create **persistent board tension** — warping how the opponent plays just by
    existing on the battlefield — are especially valuable.
-3. **Tide fit (hard check):** Does the card mechanically synergize with existing cards in its
-   tide and advance the tide's win condition? A card that is thematically aligned but
-   mechanically at odds with its tide's core game plan fails this check.
-4. **Simplicity:** Can you express it cleanly? Novelty != complexity.
-5. **Not a port:** Does it feel like its own card, or like a Hearthstone card wearing a
+3. **Simplicity:** Can you express it cleanly? Novelty != complexity.
+4. **Not a port:** Does it feel like its own card, or like a Hearthstone card wearing a
    Dreamtides costume?
+5. **Tide fit (soft check):** Does the card make sense in its tide? It shouldn't actively
+   contradict the tide's mechanics, but perfect synergy is NOT required. A novel card that
+   fits loosely always beats a derivative card that fits perfectly.
 
 **Ranking anti-patterns:**
 - Any design that uses "Kindle" as its primary mechanic: **-2 points automatic penalty.**
@@ -421,6 +429,9 @@ order):
 - Any design that uses "the opponent chooses" / punisher mechanics: **-1 point.** In practice
   one option is almost always correct for the opponent, so the "choice" is illusory and the
   card collapses to a fixed effect. Design space isn't fruitful.
+- Any design whose primary selling point is "fits perfectly into [tide] strategy": **-1
+  point.** Tide fit is a sanity check, not a virtue. If the most interesting thing about a
+  card is that it synergizes well, the card itself isn't interesting enough.
 
 Write out your full ranking with 1-2 sentences per card explaining why it ranks where it
 does. Be honest — if a design is mediocre, say so and explain why.
@@ -480,8 +491,8 @@ For each final design, print:
 - **Rarity:** Common, Uncommon, Rare, or Legendary
 - **Fast:** Yes/No
 - **Rules Text:** Proposed ability text (max 100 characters)
-- **Archetype Description:** One sentence explaining how this card helps its tide WIN — name
-  specific existing cards it synergizes with and the line of play (not thematic flavor)
+- **Archetype Description:** One sentence on where this card fits in a deck — name a couple
+  of existing cards it works well with if applicable (not required for truly novel designs)
 - **Narrative:** One sentence — who is this character / what is this event?
 - **Novelty Statement:** "No existing card ___."
 - **Similar Cards:** 2-4 existing Dreamtides cards with the closest mechanical overlap, with
@@ -489,19 +500,22 @@ For each final design, print:
 
 ### Design Principles
 
-1. **Fun is non-negotiable.** The card must be exciting to play. "Solid but not exciting" is
+1. **Originality is the #1 priority.** The card must do something mechanically unique in the
+   Dreamtides card pool. If you can describe the card as "[existing card] but [different],"
+   it fails. Every other principle is secondary to this one.
+2. **Fun is non-negotiable.** The card must be exciting to play. "Solid but not exciting" is
    a rejection.
-2. **Inspiration, not imitation.** The Hearthstone card is a creative springboard. The final
+3. **Inspiration, not imitation.** The Hearthstone card is a creative springboard. The final
    design should feel native to Dreamtides, not like a port.
-3. **Simplicity serves novelty.** One clean idea expressed clearly, not three ideas stapled
+4. **Simplicity serves novelty.** One clean idea expressed clearly, not three ideas stapled
    together.
-4. **Avoid duplication.** Use the research script to check thoroughly.
-5. **Cost appropriately.** Use the benchmarks above.
-6. **Embrace the digital medium.** Mechanics that would be impractical in paper are welcome.
-7. **Tide commitment should match power.** Tide-cost 1 for role-players, 2 for rewarding
-   deep commitment, 3 for build-arounds.
-8. **Think about the draft.** Cards that work in their primary tide but are also playable in
-   an adjacent hybrid strategy are more interesting.
+5. **Avoid duplication.** Use the research script to check thoroughly.
+6. **Cost appropriately.** Use the benchmarks above.
+7. **Embrace the digital medium.** Mechanics that would be impractical in paper are welcome.
+8. **Tide fit is a sanity check, not a design goal.** Don't let tide synergy drive your
+   design. Design the most original card first, then find the tide where it fits best. A
+   card that's loosely in-tide but genuinely novel is always better than a card that's
+   perfectly synergized but mechanically familiar.
 
 ### Design Anti-Patterns
 
