@@ -435,7 +435,7 @@ never include specific character names (e.g., "Voss", "Kael", "Aria"). Use title
 descriptors, or abstract phrases instead. The characters are unnamed figures in a dream.
 
 Name guidelines:
-- Character cards must be named as a person/creature (a role, title, or descriptor), never as an object, weapon, body part, or action they happen to be performing
+- Character cards must be named as a person/creature (a role, title, or descriptor), never as an object, weapon, body part, or action they happen to be performing. Event-style names that describe a phenomenon, force, or occurrence (e.g., "Emerald Pyre", "Meltdown", "Cataclysm") are wrong for characters — the name must identify *who* the figure is, not *what is happening around them*.
 - The name should evoke what a viewer sees in the art
 - It should feel natural alongside the card's rules text
 - It should hint at the narrative you've constructed
