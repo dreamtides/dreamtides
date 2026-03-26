@@ -1,32 +1,38 @@
 #!/usr/bin/env python3
-"""Print the next unprocessed image ID and its index.
+"""Print the next unprocessed image ID from a lane file.
 
-Usage: python3 next-image.py
+Usage: python3 next-image.py --lane N
 
-Reads /tmp/art-batch-images.txt for the full list and checks
-rules_engine/tabula/art-assigned.toml and /tmp/art-batch-skips.txt
-for already-processed IDs.
+Reads /tmp/art-batch-lane-{N}.txt and checks /tmp/art-batch-results/
+and /tmp/art-batch-skips.txt for already-processed IDs.
 
 Output: INDEX TOTAL IMAGE_ID
-Or "DONE" if all images are processed.
+Or "DONE" if all images in this lane are processed.
 """
 
-import re
+import argparse
 from pathlib import Path
 
-IMAGES = Path("/tmp/art-batch-images.txt")
-ASSIGNED = Path(__file__).parent.parent.parent.parent / "rules_engine" / "tabula" / "art-assigned.toml"
+parser = argparse.ArgumentParser()
+parser.add_argument("--lane", type=int, required=True)
+args = parser.parse_args()
+
+LANE_FILE = Path(f"/tmp/art-batch-lane-{args.lane}.txt")
+RESULTS_DIR = Path("/tmp/art-batch-results")
 SKIPS = Path("/tmp/art-batch-skips.txt")
 
-all_ids = IMAGES.read_text().splitlines()
+if not LANE_FILE.exists():
+    print("DONE")
+    exit()
+
+all_ids = [line.strip() for line in LANE_FILE.read_text().splitlines() if line.strip()]
 total = len(all_ids)
 
 done = set()
-if ASSIGNED.exists():
-    for line in ASSIGNED.read_text().splitlines():
-        m = re.match(r'^image-number\s*=\s*(\d+)', line.strip())
-        if m:
-            done.add(m.group(1))
+if RESULTS_DIR.exists():
+    for f in RESULTS_DIR.iterdir():
+        if f.suffix == ".toml":
+            done.add(f.stem)
 if SKIPS.exists():
     for line in SKIPS.read_text().splitlines():
         s = line.strip()
@@ -34,8 +40,8 @@ if SKIPS.exists():
             done.add(s)
 
 for i, img_id in enumerate(all_ids):
-    if img_id.strip() and img_id.strip() not in done:
-        print(f"{i+1} {total} {img_id.strip()}")
+    if img_id not in done:
+        print(f"{i + 1} {total} {img_id}")
         break
 else:
     print("DONE")
