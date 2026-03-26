@@ -21,7 +21,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from match_counts import get_match_counts
+from match_counts import get_match_counts, normalize_text
 
 HARD_CAP = 4
 
@@ -39,7 +39,7 @@ if not target:
     sys.exit(1)
 
 counts = get_match_counts()
-count = counts.get(target, 0)
+count = counts.get(normalize_text(target), 0)
 
 if count >= HARD_CAP:
     print(f"FAIL: {count} matches — this card is saturated, pick a different card")
