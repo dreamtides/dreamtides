@@ -28,25 +28,15 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent
 REPO_ROOT = SCRIPT_DIR.parent.parent.parent
 ANON_FILE = REPO_ROOT / "cards_anonymized.txt"
-ASSIGNED_FILE = REPO_ROOT / "rules_engine" / "tabula" / "art-assigned.toml"
+
+# Import shared match counting (handles multiline TOML + batch results)
+sys.path.insert(0, str(REPO_ROOT / ".llms" / "skills" / "art-batch"))
+from match_counts import get_match_counts
 
 MECHANICAL_SUBTYPES = {"warrior", "spirit animal", "survivor"}
 
 # Cards assigned this many times or more are excluded from the pool
-SATURATION_LIMIT = 3
-
-
-def get_match_counts() -> dict[str, int]:
-    """Return a dict of rendered-text -> assignment count."""
-    if not ASSIGNED_FILE.exists():
-        return {}
-    counts: dict[str, int] = {}
-    for line in ASSIGNED_FILE.read_text().splitlines():
-        m = re.match(r'^rendered-text\s*=\s*"(.+)"', line.strip())
-        if m:
-            text = m.group(1)
-            counts[text] = counts.get(text, 0) + 1
-    return counts
+SATURATION_LIMIT = 4
 
 # Pattern: TideCost | Cost●[/Spark✦] | Type[↯] | R | Rules text
 LINE_RE = re.compile(

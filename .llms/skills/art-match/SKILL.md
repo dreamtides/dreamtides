@@ -405,10 +405,19 @@ Once you've selected the winner, briefly explain:
 
 ## Match Count Check
 
-After selecting your winner, check how many times this rules text has already been assigned:
+After selecting your winner, check how many times this rules text has already been assigned.
 
+For **single-line** rules text:
 ```bash
 python3 .llms/skills/art-batch/check-match-count.py "EXACT RULES TEXT HERE"
+```
+
+For **multiline** rules text (contains newlines), you MUST use `--stdin` to avoid shell mangling:
+```bash
+cat <<'RULES' | python3 .llms/skills/art-batch/check-match-count.py --stdin
+FIRST LINE OF RULES TEXT
+SECOND LINE OF RULES TEXT
+RULES
 ```
 
 This prints one of:
@@ -419,7 +428,7 @@ This prints one of:
   best alternative candidate that prints PASS or WARN: 1. Only keep the 2-match card if you
   can articulate why this specific art is a *uniquely* better fit than any fresh card — "it's
   a strong narrative match" is not sufficient when the card has already been matched twice.
-- **FAIL** — card is saturated (3+ matches). You MUST pick a different card. Go back to your
+- **FAIL** — card is saturated (4+ matches). You MUST pick a different card. Go back to your
   candidate list and select the next best option, then re-run this check.
 
 The pool filter also annotates cards with their match count (⚠2× prefix for 2+ matches,

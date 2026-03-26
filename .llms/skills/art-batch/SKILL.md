@@ -5,8 +5,8 @@ description: Orchestrate batch art-to-card matching across ~1500 images. Runs al
 
 # Art Batch Matching Orchestrator
 
-You are an orchestrator that runs **parallel** art-matching across 5 lanes. Each lane
-processes its share of images sequentially, but all 5 lanes run concurrently.
+You are an orchestrator that matches art to cards. You launch **one subagent per image**,
+running up to 5 images concurrently in each batch.
 
 **All subagents MUST be launched with `model: "opus"`.**
 
@@ -22,116 +22,92 @@ processes its share of images sequentially, but all 5 lanes run concurrently.
    mkdir -p /tmp/art-batch-results
    ```
 
-3. Partition images into 5 lanes:
-   ```bash
-   python3 .llms/skills/art-batch/partition-images.py 5
-   ```
-   This excludes already-processed images and distributes the rest across lanes.
-
-## Launch Lanes
-
-Launch **5 background Agent calls in a single message**, one per lane. Each lane agent
-gets the Lane Agent Prompt below with its lane number filled in. Use `model: "opus"` and
-`run_in_background: true` for all 5.
-
-As each lane agent completes, print a summary of its results.
-
-After all 5 lanes complete, run the join step.
-
-### Lane Agent Prompt
-
-```
-You are lane {LANE_NUMBER} of a parallel art-batch matching run. You process images
-sequentially from your lane file.
-
-**All art-match subagents MUST be launched with `model: "opus"`.**
-
-## Your Loop
+## Batch Loop
 
 Repeat until done:
 
-1. Get your next image:
+1. Get the next batch of unprocessed images:
    ```bash
-   python3 .llms/skills/art-batch/next-image.py --lane {LANE_NUMBER}
+   python3 .llms/skills/art-batch/next-batch.py 5
    ```
-   This prints `INDEX TOTAL IMAGE_ID` or `DONE`. If `DONE`, print your final stats and stop.
+   This prints up to 5 image IDs (one per line), or `DONE` if none remain.
+   If `DONE`, proceed to the Join step.
 
-2. Launch ONE foreground Agent with `model: "opus"` and this prompt (fill in IMAGE_ID):
+2. Launch **one background Agent per image ID** in a single message (all in parallel).
+   Use `model: "opus"` and `run_in_background: true` for each. Give each agent the
+   Image Agent Prompt below with its IMAGE_ID filled in.
 
-   ---
-   You are matching one piece of art to a card from the Dreamtides card pool. Run with
-   ultrathink.
+3. As each agent completes, print a one-line status:
+   - Match: `image {ID} -> {card name} ({tide}, {cost})`
+   - Skip: `image {ID} -> SKIP ({reason})`
+   - Fail: `image {ID} -> FAIL ({reason})`
 
-   Your image ID is {IMAGE_ID}.
+4. Once all agents in the batch have completed, go back to step 1.
 
-   Read the art-match skill at `.llms/skills/art-match/SKILL.md` and follow it completely.
+### Image Agent Prompt
 
-   ## Overused Name Words
+```
+You are matching one piece of art to a card from the Dreamtides card pool. Run with
+ultrathink.
 
-   During Phase 4 (naming), check your proposed name before finalizing:
-   ```bash
-   python3 .llms/skills/art-batch/overused-words.py "Proposed Card Name"
-   ```
-   If it prints FAIL, one or more words are overused (3+ prior uses) — pick a different name
-   and check again. Only finalize a name that prints PASS.
+Your image ID is {IMAGE_ID}.
 
-   ## Final Step: Write Result
+Read the art-match skill at `.llms/skills/art-match/SKILL.md` and follow it completely.
 
-   After selecting a winner and assigning a name/subtype (Phase 4 of the skill), find the
-   real card matching your selected anonymized rules text:
+## Overused Name Words
 
-   ```bash
-   grep -n 'rendered-text' rules_engine/tabula/rendered-cards.toml | grep '<EXACT RULES TEXT>'
-   ```
+During Phase 4 (naming), check your proposed name before finalizing:
+```bash
+python3 .llms/skills/art-batch/overused-words.py "Proposed Card Name"
+```
+If it prints FAIL, one or more words are overused (3+ prior uses) — pick a different name
+and check again. Only finalize a name that prints PASS.
 
-   Use the line number to read the surrounding [[cards]] block and extract the real card's
-   id, tide, tide-cost, energy-cost, card-type, rarity, is-fast, and spark.
+## Final Step: Write Result
 
-   Then write this TOML block to `/tmp/art-batch-results/{IMAGE_ID}.toml`:
+After selecting a winner and assigning a name/subtype (Phase 4 of the skill), find the
+real card matching your selected anonymized rules text:
 
-   ```toml
-   [[cards]]
-   name = "<YOUR new card name from Phase 4>"
-   id = "<real card UUID>"
-   tide = "<tide from real card>"
-   tide-cost = <from real card>
-   rendered-text = "<rules text from real card>"
-   energy-cost = <from real card>
-   card-type = "<from real card>"
-   subtype = "<YOUR subtype from Phase 4>"
-   rarity = "<from real card>"
-   is-fast = <from real card>
-   spark = <from real card, or "" for events>
-   image-number = {IMAGE_ID}
-   art-owned = false
-   card-number = 0
-   ```
+```bash
+grep -n 'rendered-text' rules_engine/tabula/rendered-cards.toml | grep '<EXACT RULES TEXT>'
+```
 
-   If the art is landscape or abstract, do NOT write a result file. Instead, record the
-   skip by appending the image ID to `/tmp/art-batch-skips.txt`:
-   ```bash
-   echo "{IMAGE_ID}" >> /tmp/art-batch-skips.txt
-   ```
-   Then print "SKIP: [reason]" and stop.
+Use the line number to read the surrounding [[cards]] block and extract the real card's
+id, tide, tide-cost, energy-cost, card-type, rarity, is-fast, and spark.
 
-   Print ONLY the card name, tide, and cost as your final output.
-   ---
+Then write this TOML block to `/tmp/art-batch-results/{IMAGE_ID}.toml`:
 
-3. Print a one-line status:
-   - Match: `[Lane {LANE_NUMBER}] [{N}/{TOTAL}] image {ID} -> {card name} ({tide}, {cost})`
-   - Skip: `[Lane {LANE_NUMBER}] [{N}/{TOTAL}] image {ID} -> SKIP ({reason})`
-   - Fail: `[Lane {LANE_NUMBER}] [{N}/{TOTAL}] image {ID} -> FAIL ({reason})`
+```toml
+[[cards]]
+name = "<YOUR new card name from Phase 4>"
+id = "<real card UUID>"
+tide = "<tide from real card>"
+tide-cost = <from real card>
+rendered-text = "<rules text from real card>"
+energy-cost = <from real card>
+card-type = "<from real card>"
+subtype = "<YOUR subtype from Phase 4>"
+rarity = "<from real card>"
+is-fast = <from real card>
+spark = <from real card, or "" for events>
+image-number = {IMAGE_ID}
+art-owned = false
+card-number = 0
+```
 
-Do not retry failures. Every 25 images print:
-`--- Lane {LANE_NUMBER} Checkpoint: {N}/{TOTAL}, {skips} skips, {failures} failures ---`
+If the art is landscape or abstract, do NOT write a result file. Instead, record the
+skip by appending the image ID to `/tmp/art-batch-skips.txt`:
+```bash
+echo "{IMAGE_ID}" >> /tmp/art-batch-skips.txt
+```
+Then print "SKIP: [reason]" and stop.
 
-When done, print:
-`=== Lane {LANE_NUMBER} Complete: {matched} matched, {skips} skips, {failures} failures ===`
+Print ONLY the card name, tide, and cost as your final output.
 ```
 
 ## Join Results
 
-After all 5 lanes finish:
+After all batches are done:
 
 ```bash
 python3 .llms/skills/art-batch/join-results.py
@@ -156,18 +132,15 @@ Two layers prevent any single rules text from being overrepresented:
    `check-match-count.py` with the exact rules text. WARN at 2 matches forces
    reconsideration; FAIL at 3+ forces picking a different card.
 
-2. **Hard cap (pool-filter.py):** Cards matched 3+ times are excluded from pool output
-   entirely. The pool also annotates cards with ⚠2× or 1× prefixes so the agent can
-   see popularity at browse time.
+2. **Hard cap (pool-filter.py in art-match):** Cards matched 3+ times are excluded from
+   pool output entirely. The pool also annotates cards with ⚠2× or 1× prefixes so the
+   agent can see popularity at browse time.
 
-**Note:** With parallel lanes, gravity well checks only see results from art-assigned.toml
-(prior runs), not from other lanes running concurrently. Some duplicate assignments are
-expected and can be audited after joining.
+Both scripts use `match_counts.py` to count assignments across **all** sources
+(art-assigned.toml + /tmp/art-batch-results/*.toml) with proper TOML parsing.
 
 ## Context Preservation
 
-Each lane runs for a long time across hundreds of agents. To preserve context:
-
-1. **Keep output minimal.** One line per agent.
+1. **Keep output minimal.** One line per completed agent.
 2. **Do not accumulate results.** Subagents write to individual files.
-3. **Track only:** current index, total, skip count, failure count.
+3. **Do not summarize or restate batch results.** Just the one-line status per image.
