@@ -421,18 +421,16 @@ RULES
 ```
 
 This prints one of:
-- **PASS** — card is fresh, proceed to Phase 4.
-- **WARN: 1 match** — card has been used once. Briefly note this and proceed — one reuse
-  is acceptable.
-- **WARN: 2 matches** — card is becoming a gravity well. You MUST go back and identify your
-  best alternative candidate that prints PASS or WARN: 1. Only keep the 2-match card if you
+- **PASS** — card has 0-2 matches, proceed to Phase 4.
+- **WARN: 3+ matches** — card is becoming a gravity well. You MUST go back and identify your
+  best alternative candidate that prints PASS. Only keep the 3+-match card if you
   can articulate why this specific art is a *uniquely* better fit than any fresh card — "it's
-  a strong narrative match" is not sufficient when the card has already been matched twice.
-- **FAIL** — card is saturated (4+ matches). You MUST pick a different card. Go back to your
+  a strong narrative match" is not sufficient when the card has already been matched 3+ times.
+- **FAIL** — card is saturated (5+ matches). You MUST pick a different card. Go back to your
   candidate list and select the next best option, then re-run this check.
 
-The pool filter also annotates cards with their match count (⚠2× prefix for 2+ matches,
-1× for 1 match). Prefer unmarked cards when browsing.
+The pool filter also annotates cards with their match count (⚠3× or higher prefix).
+Prefer unmarked cards when browsing.
 
 # Phase 4: Assign Subtype and Name
 

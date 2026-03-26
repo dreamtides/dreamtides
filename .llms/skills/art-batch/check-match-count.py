@@ -23,7 +23,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from match_counts import get_match_counts, normalize_text
 
-HARD_CAP = 4
+HARD_CAP = 5
 
 if "--stdin" in sys.argv:
     target = sys.stdin.read().strip()
@@ -43,9 +43,9 @@ count = counts.get(normalize_text(target), 0)
 
 if count >= HARD_CAP:
     print(f"FAIL: {count} matches — this card is saturated, pick a different card")
-elif count >= 2:
+elif count >= 3:
     print(f"WARN: {count} matches — this card is popular, you must justify why this art is a uniquely better fit than prior matches or pick a different card")
 elif count >= 1:
-    print(f"WARN: {count} match — this card has been used before, consider alternatives")
+    print(f"PASS ({count} match{'es' if count > 1 else ''})")
 else:
     print("PASS (0 matches)")

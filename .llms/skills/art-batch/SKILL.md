@@ -37,12 +37,12 @@ Repeat until done:
    Use `model: "opus"` and `run_in_background: true` for each. Give each agent the
    Image Agent Prompt below with its IMAGE_ID filled in.
 
-3. As each agent completes, print a one-line status:
-   - Match: `image {ID} -> {card name} ({tide}, {cost})`
-   - Skip: `image {ID} -> SKIP ({reason})`
-   - Fail: `image {ID} -> FAIL ({reason})`
+3. **Wait for notifications.** Do NOT poll, sleep-loop, or check on agents. You will be
+   automatically notified when each agent completes. When notified, print one short line
+   per completed agent and nothing else.
 
-4. Once all agents in the batch have completed, go back to step 1.
+4. Once all 5 agents in the batch have completed, immediately start the next batch.
+   Do NOT print batch summaries, progress reports, or status updates between batches.
 
 ### Image Agent Prompt
 
@@ -129,18 +129,23 @@ Skips: [count]
 Two layers prevent any single rules text from being overrepresented:
 
 1. **Soft gate (check-match-count.py):** After selecting a winner, the subagent runs
-   `check-match-count.py` with the exact rules text. WARN at 2 matches forces
-   reconsideration; FAIL at 3+ forces picking a different card.
+   `check-match-count.py` with the exact rules text. WARN at 3 matches forces
+   reconsideration; FAIL at 5+ forces picking a different card.
 
-2. **Hard cap (pool-filter.py in art-match):** Cards matched 3+ times are excluded from
-   pool output entirely. The pool also annotates cards with ⚠2× or 1× prefixes so the
-   agent can see popularity at browse time.
+2. **Hard cap (pool-filter.py in art-match):** Cards matched 5+ times are excluded from
+   pool output entirely. The pool also annotates cards with ⚠3× or higher prefixes so
+   the agent can see popularity at browse time.
 
 Both scripts use `match_counts.py` to count assignments across **all** sources
 (art-assigned.toml + /tmp/art-batch-results/*.toml) with proper TOML parsing.
 
-## Context Preservation
+## Context Preservation — CRITICAL
 
-1. **Keep output minimal.** One line per completed agent.
-2. **Do not accumulate results.** Subagents write to individual files.
-3. **Do not summarize or restate batch results.** Just the one-line status per image.
+You will run 300+ batches. Your context window WILL overflow if you are not disciplined.
+
+1. **Never print more than one line per completed agent.** No commentary, no analysis.
+2. **Never print batch summaries, progress updates, or status messages between batches.**
+3. **Do not accumulate results.** Subagents write to individual files.
+4. **Do not restate or reflect on previous batches.**
+5. **Do not poll or sleep-loop for agent completion.** Wait for notifications.
+6. **Immediately launch the next batch** after all agents complete. No pauses.
