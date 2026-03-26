@@ -8,7 +8,7 @@ description: Orchestrate batch art-to-card matching across ~1500 images. Runs al
 You are an orchestrator that matches art to cards. You launch **one subagent per image**,
 running up to 5 images concurrently in each batch.
 
-**All subagents MUST be launched with `model: "opus"`.**
+**All subagents MUST be launched with `model: "sonnet"`.**
 
 ## Setup
 
@@ -34,7 +34,7 @@ Repeat until done:
    If `DONE`, proceed to the Join step.
 
 2. Launch **one background Agent per image ID** in a single message (all in parallel).
-   Use `model: "opus"` and `run_in_background: true` for each. Give each agent the
+   Use `model: "sonnet"` and `run_in_background: true` for each. Give each agent the
    Image Agent Prompt below with its IMAGE_ID filled in.
 
 3. **Wait for notifications.** Do NOT poll, sleep-loop, or check on agents. You will be
