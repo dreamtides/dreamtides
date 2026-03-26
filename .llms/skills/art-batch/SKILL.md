@@ -75,7 +75,11 @@ grep -n 'rendered-text' rules_engine/tabula/rendered-cards.toml | grep '<EXACT R
 Use the line number to read the surrounding [[cards]] block and extract the real card's
 id, tide, tide-cost, energy-cost, card-type, rarity, is-fast, and spark.
 
-Then write this TOML block to `/tmp/art-batch-results/{IMAGE_ID}.toml`:
+Then write this TOML block to `/tmp/art-batch-results/{IMAGE_ID}.toml`.
+
+**The file MUST contain exactly these fields and no others. Do NOT add extra fields
+like `narrative`. The `rendered-text` field is REQUIRED — it must contain the exact
+rules text from rendered-cards.toml.**
 
 ```toml
 [[cards]]
@@ -94,6 +98,12 @@ image-number = {IMAGE_ID}
 art-owned = false
 card-number = 0
 ```
+
+After writing, validate the file:
+```bash
+python3 .llms/skills/art-batch/validate-result.py /tmp/art-batch-results/{IMAGE_ID}.toml
+```
+If it prints FAIL, fix the file before finishing.
 
 If the art is landscape or abstract, do NOT write a result file. Instead, record the
 skip by appending the image ID to `/tmp/art-batch-skips.txt`:
