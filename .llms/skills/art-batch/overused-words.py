@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Check a proposed card name against overused words in art-assigned.toml.
+"""Check a proposed card name against overused words.
+
+Checks both art-assigned.toml and /tmp/art-batch-results/*.toml using
+proper TOML parsing.
 
 Usage: python3 overused-words.py "Proposed Card Name"
 
@@ -7,34 +10,51 @@ Prints PASS if no word in the name is overused (3+ prior uses), or
 FAIL with the offending words if any are overused.
 """
 
-import re
 import sys
+import tomllib
 from collections import Counter
 from pathlib import Path
 
 ASSIGNED = Path(__file__).parent.parent.parent.parent / "rules_engine" / "tabula" / "art-assigned.toml"
+RESULTS_DIR = Path("/tmp/art-batch-results")
 STOP_WORDS = {"the", "of", "a", "an", "in", "on", "at", "to", "and", "for", "from", "with"}
+OVERUSE_THRESHOLD = 3
 
 if len(sys.argv) < 2:
-    print("Usage: python3 overused-words.py \"Proposed Card Name\"")
+    print('Usage: python3 overused-words.py "Proposed Card Name"')
     sys.exit(1)
 
 words: Counter[str] = Counter()
+
+
+def count_names(path: Path) -> None:
+    with open(path, "rb") as f:
+        data = tomllib.load(f)
+    for card in data.get("cards", []):
+        name = card.get("name", "")
+        for w in name.lower().split():
+            # Strip possessives
+            if w.endswith("'s") or w.endswith("\u2019s"):
+                w = w[:-2]
+            if w not in STOP_WORDS and len(w) > 2:
+                words[w] += 1
+
+
 if ASSIGNED.exists():
-    for line in ASSIGNED.read_text().splitlines():
-        m = re.match(r'^name\s*=\s*"(.+)"', line.strip())
-        if m:
-            for w in m.group(1).lower().split():
-                if w not in STOP_WORDS and len(w) > 2:
-                    words[w] += 1
+    count_names(ASSIGNED)
+if RESULTS_DIR.exists():
+    for f in sorted(RESULTS_DIR.iterdir()):
+        if f.suffix == ".toml":
+            count_names(f)
 
 proposed = sys.argv[1]
 conflicts = []
 for w in proposed.lower().split():
-    if w in STOP_WORDS or len(w) <= 2:
+    w_clean = w[:-2] if (w.endswith("'s") or w.endswith("\u2019s")) else w
+    if w_clean in STOP_WORDS or len(w_clean) <= 2:
         continue
-    if words[w] >= 3:
-        conflicts.append(f"{w} ({words[w]} uses)")
+    if words[w_clean] >= OVERUSE_THRESHOLD:
+        conflicts.append(f"{w_clean} ({words[w_clean]} uses)")
 
 if conflicts:
     print(f"FAIL: {', '.join(conflicts)}")
