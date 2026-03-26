@@ -89,7 +89,12 @@ art-owned = false
 card-number = 0
 ```
 
-If the art is landscape or abstract, do NOT write anything. Print "SKIP: [reason]" and stop.
+If the art is landscape or abstract, do NOT write to art-assigned.toml. Instead, record the
+skip by appending the image ID to `/tmp/art-batch-skips.txt`:
+```bash
+echo "{IMAGE_ID}" >> /tmp/art-batch-skips.txt
+```
+Then print "SKIP: [reason]" and stop.
 
 Print ONLY the card name, tide, and cost as your final output.
 ```

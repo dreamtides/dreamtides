@@ -4,7 +4,8 @@
 Usage: python3 next-image.py
 
 Reads /tmp/art-batch-images.txt for the full list and checks
-rules_engine/tabula/art-assigned.toml for already-processed IDs.
+rules_engine/tabula/art-assigned.toml and /tmp/art-batch-skips.txt
+for already-processed IDs.
 
 Output: INDEX TOTAL IMAGE_ID
 Or "DONE" if all images are processed.
@@ -15,6 +16,7 @@ from pathlib import Path
 
 IMAGES = Path("/tmp/art-batch-images.txt")
 ASSIGNED = Path(__file__).parent.parent.parent.parent / "rules_engine" / "tabula" / "art-assigned.toml"
+SKIPS = Path("/tmp/art-batch-skips.txt")
 
 all_ids = IMAGES.read_text().splitlines()
 total = len(all_ids)
@@ -25,6 +27,11 @@ if ASSIGNED.exists():
         m = re.match(r'^image-number\s*=\s*(\d+)', line.strip())
         if m:
             done.add(m.group(1))
+if SKIPS.exists():
+    for line in SKIPS.read_text().splitlines():
+        s = line.strip()
+        if s:
+            done.add(s)
 
 for i, img_id in enumerate(all_ids):
     if img_id.strip() and img_id.strip() not in done:
