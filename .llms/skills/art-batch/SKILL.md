@@ -5,8 +5,9 @@ description: Orchestrate batch art-to-card matching across ~1500 images. Runs al
 
 # Art Batch Matching Orchestrator
 
-You are an orchestrator that matches art to cards. You launch **one subagent per image**,
-running up to 5 images concurrently in each batch.
+You are an orchestrator that matches art to cards using a **rolling parallelism** model.
+You maintain a target number of concurrent subagents (default 25), launching replacements
+immediately as each agent completes — never waiting for an entire batch to finish.
 
 **All subagents MUST be launched with `model: "sonnet"`. Or, in Codex, use a supported GPT model such as `gpt-5.4-mini` or `gpt-5.4`; `reasoning_effort: "medium"` is acceptable for routine matching.**
 
@@ -22,31 +23,43 @@ running up to 5 images concurrently in each batch.
    mkdir -p /tmp/art-batch-results
    ```
 
-## Batch Loop
+## Rolling Launch
 
-Repeat until done:
+### Initial Fill
 
-1. Get the next batch of unprocessed images:
+Get the first N image IDs (where N is the parallelism target, default 25):
+```bash
+python3 .llms/skills/art-batch/next-batch.py 25
+```
+This prints up to 25 image IDs (one per line), or `DONE` if none remain.
+
+Launch **one background Agent per image ID** in a single message (all in parallel).
+Use `model: "sonnet"` and `run_in_background: true` for each. Or, in Codex, use
+`spawn_agent` with a supported GPT model. Give each agent the Image Agent Prompt
+below with its IMAGE_ID filled in.
+
+### Continuous Refill
+
+After the initial fill, **wait for notifications**. Do NOT poll, sleep-loop, or check
+on agents. You will be automatically notified when each agent completes.
+
+When notified that one or more agents have completed:
+
+1. Print one short line per completed agent (name, tide, cost — or SKIP reason).
+2. Immediately request replacement image IDs for however many agents just finished:
    ```bash
-   python3 .llms/skills/art-batch/next-batch.py 5
+   python3 .llms/skills/art-batch/next-batch.py <COUNT>
    ```
-   This prints up to 5 image IDs (one per line), or `DONE` if none remain.
-   If `DONE`, proceed to the Join step.
+3. If this returns image IDs, launch new background agents for each in a single message.
+   If it returns `DONE`, do not launch new agents — let the remaining in-flight agents
+   drain.
+4. Continue waiting for the next notification.
 
-2. Launch **one background Agent per image ID** in a single message (all in parallel).
-   Use `model: "sonnet"` and `run_in_background: true` for each. Or, in Codex, use
-   `spawn_agent` with a supported GPT model; background execution is implicit after spawn,
-   so no separate `run_in_background` flag is needed. Give each agent the Image Agent
-   Prompt below with its IMAGE_ID filled in.
+### Drain & Finish
 
-3. **Wait for notifications.** Do NOT poll, sleep-loop, or check on agents. You will be
-   automatically notified when each agent completes. Or, in Codex, rely on subagent
-   completion notifications; only use `wait_agent` when the next orchestration step is
-   blocked on a result. When notified, print one short line per completed agent and nothing
-   else.
-
-4. Once all 5 agents in the batch have completed, immediately start the next batch.
-   Do NOT print batch summaries, progress reports, or status updates between batches.
+Once `next-batch.py` returns `DONE`, stop launching new agents. Continue receiving
+notifications for the remaining in-flight agents, printing one line each, until all
+have completed. Then proceed to the Join step.
 
 ### Image Agent Prompt
 
@@ -123,7 +136,7 @@ Print ONLY the card name, tide, and cost as your final output.
 
 ## Join Results
 
-After all batches are done:
+After all agents have drained:
 
 ```bash
 python3 .llms/skills/art-batch/join-results.py
@@ -157,11 +170,13 @@ Both scripts use `match_counts.py` to count assignments across **all** sources
 
 ## Context Preservation — CRITICAL
 
-You will run 300+ batches. Your context window WILL overflow if you are not disciplined.
+You will process 1500+ images. Your context window WILL overflow if you are not disciplined.
 
 1. **Never print more than one line per completed agent.** No commentary, no analysis.
-2. **Never print batch summaries, progress updates, or status messages between batches.**
+2. **Never print summaries, progress updates, or status messages between refills.**
 3. **Do not accumulate results.** Subagents write to individual files.
-4. **Do not restate or reflect on previous batches.**
+4. **Do not restate or reflect on previous completions.**
 5. **Do not poll or sleep-loop for agent completion.** Wait for notifications.
-6. **Immediately launch the next batch** after all agents complete. No pauses.
+6. **Immediately launch replacements** after each completion notification. No pauses.
+7. **Batch your refill launches.** If multiple agents complete in quick succession before
+   you respond, request all replacement IDs at once and launch them in a single message.
