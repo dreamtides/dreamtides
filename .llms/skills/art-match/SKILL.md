@@ -7,9 +7,12 @@ description: Match card art to existing rules text from the anonymized card pool
 
 You are an expert card game designer matching art to existing card rules text. Your goal is
 to find the strongest thematic and narrative fit between a piece of art and an existing
-unassigned card from the pool. Run everything with ultrathink.
+unassigned card from the pool. Run everything with ultrathink. Or, in Codex, use a
+supported GPT model and set `reasoning_effort` as needed; `medium` is acceptable for
+routine matching and `high` is acceptable for harder cases.
 
 Read `docs/battle_rules/battle_rules.md` and `docs/tides/tides.md` (use the Read tool).
+Or, in Codex, read those files directly with normal file access.
 
 # Phase 0: Load the Art
 
@@ -21,7 +24,9 @@ python3 .llms/skills/art-match/art-lookup.py <image_id>
 ```
 
 This prints the local file path and the art description. Use the Read tool on the file path
-to view the image, and use the description as additional context for your analysis. If the
+to view the image, and use the description as additional context for your analysis. Or, in
+Codex, attach the image as a `local_image` input item or open it with `view_image`; do not
+proceed from filename text or description alone if the image itself cannot be viewed. If the
 image cannot be read for any reason (permission denied, file not found, etc.), STOP
 immediately and report the error — do not proceed with the skill using only the text
 description.

@@ -8,7 +8,7 @@ description: Orchestrate batch art-to-card matching across ~1500 images. Runs al
 You are an orchestrator that matches art to cards. You launch **one subagent per image**,
 running up to 5 images concurrently in each batch.
 
-**All subagents MUST be launched with `model: "sonnet"`.**
+**All subagents MUST be launched with `model: "sonnet"`. Or, in Codex, use a supported GPT model such as `gpt-5.4-mini` or `gpt-5.4`; `reasoning_effort: "medium"` is acceptable for routine matching.**
 
 ## Setup
 
@@ -34,12 +34,16 @@ Repeat until done:
    If `DONE`, proceed to the Join step.
 
 2. Launch **one background Agent per image ID** in a single message (all in parallel).
-   Use `model: "sonnet"` and `run_in_background: true` for each. Give each agent the
-   Image Agent Prompt below with its IMAGE_ID filled in.
+   Use `model: "sonnet"` and `run_in_background: true` for each. Or, in Codex, use
+   `spawn_agent` with a supported GPT model; background execution is implicit after spawn,
+   so no separate `run_in_background` flag is needed. Give each agent the Image Agent
+   Prompt below with its IMAGE_ID filled in.
 
 3. **Wait for notifications.** Do NOT poll, sleep-loop, or check on agents. You will be
-   automatically notified when each agent completes. When notified, print one short line
-   per completed agent and nothing else.
+   automatically notified when each agent completes. Or, in Codex, rely on subagent
+   completion notifications; only use `wait_agent` when the next orchestration step is
+   blocked on a result. When notified, print one short line per completed agent and nothing
+   else.
 
 4. Once all 5 agents in the batch have completed, immediately start the next batch.
    Do NOT print batch summaries, progress reports, or status updates between batches.
@@ -52,7 +56,9 @@ ultrathink.
 
 Your image ID is {IMAGE_ID}.
 
-Read the art-match skill at `.llms/skills/art-match/SKILL.md` and follow it completely.
+Read the art-match skill at `.llms/skills/art-match/SKILL.md` and follow it completely. Or,
+in Codex, read enough of that skill to execute the workflow accurately, and pass the actual
+local image as a `local_image` input item when available.
 
 ## Overused Name Words
 
