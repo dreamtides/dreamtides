@@ -11165,16 +11165,16 @@ card-number = 0
 
 [[cards]]
 name = "Zenith Lookout"
-id = "1125132674"
+id = 1125132674
 tide = "Rime"
-tide-cost = "1"
+tide-cost = 1
 rendered-text = "When the opponent plays an event, draw a card."
-energy-cost = "1"
+energy-cost = 1
 card-type = "Character"
 subtype = "Explorer"
 rarity = "C"
 is-fast = false
-spark = "1"
+spark = 1
 image-number = 1125132674
 art-owned = false
 card-number = 0
