@@ -33,12 +33,8 @@ export interface ContiguousSegment {
 export function buildColumnMapping(
   configs: DerivedColumnInfo[] | undefined,
   dataColumnCount: number,
-  reserveDeleteColumn?: boolean,
 ): ColumnMapping {
   const reservedPositions = new Set<number>();
-  if (reserveDeleteColumn) {
-    reservedPositions.add(0);
-  }
   if (configs) {
     for (const c of configs) {
       if (c.position !== undefined && c.position !== null) {

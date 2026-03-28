@@ -97,6 +97,4 @@ export interface UniverSpreadsheetProps {
   columnConfigs?: Record<string, ColumnConfig[]>;
   /** Persisted sheet order (filenames without .toml extension) for tab ordering */
   persistedSheetOrder?: string[];
-  /** When true, show a delete button column as the leftmost column */
-  showDeleteButton?: boolean;
 }

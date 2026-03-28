@@ -69,7 +69,6 @@ export function buildMultiSheetWorkbook(
   rowConfigs?: Record<string, RowConfig>,
   columnConfigs?: Record<string, ColumnConfig[]>,
   persistedSheetOrder?: string[],
-  showDeleteButton?: boolean,
 ): Partial<IWorkbookData> {
   const sortedSheets = applySheetOrder(
     multiSheetData.sheets,
@@ -87,7 +86,6 @@ export function buildMultiSheetWorkbook(
     const mapping = buildColumnMapping(
       configs,
       sheetData.data.headers.length,
-      showDeleteButton,
     );
     sheetMappings.set(sheetData.id, mapping);
 
@@ -100,7 +98,7 @@ export function buildMultiSheetWorkbook(
       number,
       Record<
         number,
-        { v?: unknown; p?: unknown; t?: CellValueType; s?: { bl?: number; cl?: { rgb: string }; ht?: number } }
+        { v?: unknown; p?: unknown; t?: CellValueType; s?: { bl?: number } }
       >
     > = {};
 
@@ -180,22 +178,8 @@ export function buildMultiSheetWorkbook(
       });
     });
 
-    // Populate delete button column at position 0 when enabled
-    if (showDeleteButton) {
-      cellData[0][0] = { v: "" };
-      for (let r = 0; r < sheetData.data.rows.length; r++) {
-        cellData[r + 1][0] = {
-          v: "✕",
-          s: { cl: { rgb: "#CC0000" }, ht: HorizontalAlign.CENTER },
-        };
-      }
-    }
-
     // Set column widths for positioned derived columns
     const columnData: Record<number, { w: number }> = {};
-    if (showDeleteButton) {
-      columnData[0] = { w: 35 };
-    }
     if (configs) {
       for (const config of configs) {
         if (
@@ -290,11 +274,6 @@ export function buildMultiSheetWorkbook(
           frozenColumns = Math.max(frozenColumns, config.position + 1);
         }
       }
-    }
-
-    // Ensure the delete button column is frozen
-    if (showDeleteButton) {
-      frozenColumns = Math.max(frozenColumns, 1);
     }
 
     const sheetConfig: Record<string, unknown> = {
