@@ -21345,3 +21345,95 @@ spark = ""
 image-number = 2681394203
 art-owned = false
 card-number = 0
+
+[metadata]
+schema_version = 1
+
+[metadata.table_style]
+color_scheme = "blue_light"
+
+[[metadata.validation_rules]]
+column = "card-type"
+type = "enum"
+enum = ["Character", "Event"]
+
+[[metadata.validation_rules]]
+column = "rarity"
+type = "enum"
+enum = ["Common", "Uncommon", "Rare", "Legendary", "Special"]
+colors = ["#D8D8D8", "#A8DDA8", "#A0C8F0", "#F0D08A", "#F0A0A0"]
+
+[[metadata.validation_rules]]
+column = "subtype"
+type = "enum"
+enum = ["Agent", "Ancient", "Avatar", "Child", "Detective", "Enigma", "Explorer", "Guide", "Hacker", "Mage", "Monster", "Musician", "Outsider", "Renegade", "Robot", "Spirit Animal", "Super", "Survivor", "Synth", "Tinkerer", "Trooper", "Visionary", "Visitor", "Warrior"]
+
+[[metadata.validation_rules]]
+column = "tide"
+type = "enum"
+enum = ["Neutral", "Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge"]
+colors = ["#A0784C", "#A8DDA8", "#F0E88A", "#F0A0A0", "#F5B870", "#CDA8F0", "#8AE0E0", "#D0D0D0"]
+
+[[metadata.validation_rules]]
+column = "tide-cost"
+type = "type"
+value_type = "integer"
+
+[[metadata.derived_columns]]
+name = ""
+function = "image_derived"
+position = 0
+width = 160
+inputs = ["image_number"]
+url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_number}.jpg"
+frozen = true
+
+[metadata.rows]
+default_height = 100
+frozen_rows = 1
+
+[[metadata.columns]]
+key = "name"
+width = 200
+bold = true
+
+[[metadata.columns]]
+key = "id"
+width = 140
+
+[[metadata.columns]]
+key = "tide"
+width = 120
+
+[[metadata.columns]]
+key = "tide-cost"
+width = 56
+
+[[metadata.columns]]
+key = "rendered-text"
+width = 320
+
+[[metadata.columns]]
+key = "energy-cost"
+width = 100
+
+[[metadata.columns]]
+key = "card-type"
+width = 150
+
+[[metadata.columns]]
+key = "subtype"
+width = 200
+
+[[metadata.columns]]
+key = "rarity"
+width = 125
+
+[[metadata.columns]]
+key = "is-fast"
+width = 80
+
+[[metadata.statistics]]
+column = "tide"
+label = "Tide Distribution"
+statistic_type = "value_counts"
