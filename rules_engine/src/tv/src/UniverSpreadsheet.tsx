@@ -65,7 +65,6 @@ export const UniverSpreadsheet = forwardRef<
     onDeleteRow,
     onActiveSheetChanged,
     onSheetOrderChanged,
-    onUniverAPIReady,
     derivedColumnState,
     initialActiveSheetId,
     rowConfigs,
@@ -260,7 +259,6 @@ export const UniverSpreadsheet = forwardRef<
     univerRef.current = instance.univer;
     univerAPIRef.current = instance.univerAPI;
     imageCellRendererRef.current = new ImageCellRenderer(instance.univerAPI);
-    onUniverAPIReady?.(instance.univerAPI);
 
     const buildMappingFromGrid = (
       sheetId: string,
