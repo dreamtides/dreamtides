@@ -70,6 +70,7 @@ export const UniverSpreadsheet = forwardRef<
     rowConfigs,
     columnConfigs,
     persistedSheetOrder,
+    showDeleteButton,
   },
   ref,
 ) {
@@ -126,6 +127,10 @@ export const UniverSpreadsheet = forwardRef<
   const lastAppliedDerivedValuesRef = useRef<
     Record<string, Record<number, Record<string, unknown>>>
   >({});
+
+  const showDeleteButtonRef = useRef(showDeleteButton);
+  showDeleteButtonRef.current = showDeleteButton;
+  console.log("UniverSpreadsheet render, showDeleteButton =", showDeleteButton);
 
   onChangeRef.current = onChange;
   onDeleteRowRef.current = onDeleteRow;
@@ -415,7 +420,7 @@ export const UniverSpreadsheet = forwardRef<
         const configs = derivedColumnState?.configs[sheetData.id];
         columnMappingRef.current.set(
           sheetData.id,
-          buildColumnMapping(configs, sheetData.data.headers.length),
+          buildColumnMapping(configs, sheetData.data.headers.length, showDeleteButton),
         );
       }
 
@@ -425,6 +430,7 @@ export const UniverSpreadsheet = forwardRef<
         rowConfigs,
         columnConfigs,
         persistedSheetOrder,
+        showDeleteButton,
       );
       instance.univerAPI.createWorkbook(workbookData);
 
@@ -743,7 +749,22 @@ export const UniverSpreadsheet = forwardRef<
 
     // Capture the visual row index before a row removal command executes.
     // The remove-row mutation params contain the row index in a range object.
+    // Also prevent editing the delete button column (column 0).
     instance.univerAPI.onBeforeCommandExecute((command) => {
+      // Block cell editing on the delete button column
+      if (
+        showDeleteButtonRef.current &&
+        command.id === "sheet.command.set-range-values"
+      ) {
+        const activeSheet = instance.univerAPI
+          .getActiveWorkbook()
+          ?.getActiveSheet();
+        const selection = activeSheet?.getSelection()?.getActiveRange();
+        if (selection && selection.getColumn() === 0) {
+          throw new Error("Delete button column is not editable");
+        }
+      }
+
       if (
         command.id === "sheet.command.remove-row" ||
         command.id === "sheet.command.remove-row-confirm"
@@ -771,6 +792,32 @@ export const UniverSpreadsheet = forwardRef<
     // Listen for cell value changes and row removal
     instance.univerAPI.onCommandExecuted((command) => {
       if (isLoadingRef.current) return;
+
+      // Detect clicks on the delete button column (column 0)
+      if (
+        showDeleteButtonRef.current &&
+        command.id === "sheet.operation.set-selections"
+      ) {
+        const activeSheet = instance.univerAPI
+          .getActiveWorkbook()
+          ?.getActiveSheet();
+        if (activeSheet) {
+          const selection = activeSheet.getSelection();
+          const range = selection?.getActiveRange();
+          if (range && range.getColumn() === 0) {
+            const visualRow = range.getRow() - 1;
+            if (visualRow >= 0 && onDeleteRowRef.current) {
+              const sheetId = activeSheet.getSheetId();
+              // Move selection away first to prevent re-trigger
+              activeSheet.getRange(range.getRow(), 1, 1, 1)?.activate();
+              if (window.confirm(`Delete row ${visualRow + 1}?`)) {
+                onDeleteRowRef.current(sheetId, visualRow);
+              }
+            }
+          }
+        }
+        return;
+      }
 
       // Handle row removal separately via the dedicated onDeleteRow callback
       if (
@@ -1418,7 +1465,7 @@ export const UniverSpreadsheet = forwardRef<
       const configs = derivedColumnStateRef.current?.configs[sheetData.id];
       columnMappingRef.current.set(
         sheetData.id,
-        buildColumnMapping(configs, sheetData.data.headers.length),
+        buildColumnMapping(configs, sheetData.data.headers.length, showDeleteButtonRef.current),
       );
     }
 

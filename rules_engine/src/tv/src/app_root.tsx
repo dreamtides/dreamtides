@@ -136,6 +136,7 @@ export function AppRoot() {
   const [_permissionStates, setPermissionStates] = useState<Record<string, PermissionState>>({});
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [statisticsVisible, setStatisticsVisible] = useState(false);
+  const [deleteButtonVisible, setDeleteButtonVisible] = useState(false);
   const [statisticsConfigs, setStatisticsConfigs] = useState<Record<string, StatisticConfig[]>>({});
   const [enumValidationRules, setEnumValidationRules] = useState<Record<string, EnumValidationInfo[]>>({});
   const [dataVersion, setDataVersion] = useState(0);
@@ -153,6 +154,8 @@ export function AppRoot() {
   const autoSaveDisabledRef = useRef(false);
   const statisticsVisibleRef = useRef(false);
   statisticsVisibleRef.current = statisticsVisible;
+  const deleteButtonVisibleRef = useRef(false);
+  deleteButtonVisibleRef.current = deleteButtonVisible;
 
   const loadSingleFile = useCallback(async (path: string, tableName: string): Promise<TomlTableData | null> => {
     try {
@@ -635,7 +638,7 @@ export function AppRoot() {
     setActiveSheetId(sheetId);
     const sheetInfo = sheets.find((s) => s.id === sheetId);
     if (sheetInfo) {
-      ipc.saveViewState(sheetInfo.path, statisticsVisibleRef.current).catch((e) =>
+      ipc.saveViewState(sheetInfo.path, statisticsVisibleRef.current, deleteButtonVisibleRef.current).catch((e) =>
         logger.error("Failed to save view state", { error: String(e) })
       );
     }
@@ -677,6 +680,9 @@ export function AppRoot() {
           }
           if (viewState.statistics_visible) {
             setStatisticsVisible(true);
+          }
+          if (viewState.delete_button_visible) {
+            setDeleteButtonVisible(true);
           }
         } catch (e) {
           logger.error("Failed to load view state", { error: String(e) });
@@ -871,12 +877,29 @@ export function AppRoot() {
       const sheetInfo = activeSheetIdRef.current
         ? sheets.find((s) => s.id === activeSheetIdRef.current)
         : undefined;
-      ipc.saveViewState(sheetInfo?.path ?? null, newValue).catch((e) =>
+      ipc.saveViewState(sheetInfo?.path ?? null, newValue, deleteButtonVisibleRef.current).catch((e) =>
         logger.error("Failed to save view state", { error: String(e) })
       );
     });
     return () => {
       statisticsSub.dispose();
+    };
+  }, [sheets]);
+
+  useEffect(() => {
+    const deleteButtonSub = ipc.onDeleteButtonVisibilityChanged((visible) => {
+      logger.info("DELETE BUTTON VISIBILITY CHANGED", { visible });
+      console.log("DELETE BUTTON VISIBILITY CHANGED", visible);
+      setDeleteButtonVisible(visible);
+      const sheetInfo = activeSheetIdRef.current
+        ? sheets.find((s) => s.id === activeSheetIdRef.current)
+        : undefined;
+      ipc.saveViewState(sheetInfo?.path ?? null, statisticsVisibleRef.current, visible).catch((e) =>
+        logger.error("Failed to save view state", { error: String(e) })
+      );
+    });
+    return () => {
+      deleteButtonSub.dispose();
     };
   }, [sheets]);
 
@@ -1004,6 +1027,7 @@ export function AppRoot() {
           rowConfigs={rowConfigs}
           columnConfigs={columnConfigs}
           persistedSheetOrder={persistedSheetOrder}
+          showDeleteButton={deleteButtonVisible}
         />
       </div>
       <StatisticsOverlay visible={statisticsVisible} results={statisticResults} />

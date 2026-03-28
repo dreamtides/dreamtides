@@ -15,6 +15,7 @@ interface SpreadsheetViewProps {
   rowConfigs?: Record<string, RowConfig>;
   columnConfigs?: Record<string, ColumnConfig[]>;
   persistedSheetOrder?: string[];
+  showDeleteButton?: boolean;
 }
 
 export function SpreadsheetView({
@@ -30,6 +31,7 @@ export function SpreadsheetView({
   rowConfigs,
   columnConfigs,
   persistedSheetOrder,
+  showDeleteButton,
 }: SpreadsheetViewProps) {
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -42,6 +44,7 @@ export function SpreadsheetView({
   return (
     <main className="container">
       <UniverSpreadsheet
+        key={showDeleteButton ? "delete-col" : "no-delete-col"}
         height="100%"
         multiSheetData={multiSheetData ?? undefined}
         onChange={onChange}
@@ -53,6 +56,7 @@ export function SpreadsheetView({
         rowConfigs={rowConfigs}
         columnConfigs={columnConfigs}
         persistedSheetOrder={persistedSheetOrder}
+        showDeleteButton={showDeleteButton}
       />
     </main>
   );

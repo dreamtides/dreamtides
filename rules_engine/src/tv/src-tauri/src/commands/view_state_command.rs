@@ -15,12 +15,14 @@ pub fn save_view_state(
     state: State<AppPaths>,
     active_sheet_path: Option<String>,
     statistics_visible: Option<bool>,
+    delete_button_visible: Option<bool>,
 ) {
     view_state_types::save_view_state(
         &state,
         &ViewState {
             active_sheet_path,
             statistics_visible: statistics_visible.unwrap_or(false),
+            delete_button_visible: delete_button_visible.unwrap_or(false),
         },
     );
 }
