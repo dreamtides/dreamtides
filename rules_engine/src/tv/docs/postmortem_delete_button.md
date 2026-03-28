@@ -105,23 +105,49 @@ heavy-handed approach that destroys and recreates the entire Univer instance.
 
 ## Recommendations for Retry
 
-### Option A: React overlay (recommended)
+### Option A: Column-based with embedded offset (recommended)
+
+Retry the column-based approach with these fixes for each failure:
+
+**Failure 1 fix:** Use the `show_statistics` void event pattern instead
+of the `disable_autosave` pattern. Emit directly on `app_handle` without
+looking up the menu item via `menu.get()` (which doesn't search submenus).
+
+**Failure 2 fix:** Embed the delete column offset inside the `ColumnMapping`
+struct itself, rather than passing it as a separate parameter to every
+consumer. This way `getDerivedColumnIndex` reads the offset from the
+mapping automatically, and no call sites need to change:
+
+```typescript
+interface ColumnMapping {
+  dataToVisual: number[];
+  visualToData: Map<number, number>;
+  reservedPositions: Set<number>;
+  totalVisualColumns: number;
+  deleteColumnOffset: number;  // 0 or 1
+}
+```
+
+Then `getDerivedColumnIndex` returns `config.position + mapping.deleteColumnOffset`
+for positioned columns. The offset also applies to derived column header
+placement, width placement, and frozen column calculations in
+`buildMultiSheetWorkbook` — all of which can read `mapping.deleteColumnOffset`
+from the mapping they already have.
+
+**Failure 3 fix:** Key prop on `<UniverSpreadsheet>` to force remount.
+Heavy but functional; no alternative since Univer doesn't support dynamic
+column insertion.
+
+### Option B: React overlay (NOT recommended)
 
 Render delete buttons as a React component overlaid on the spreadsheet,
-outside Univer entirely. Sync scroll position with the spreadsheet container.
+outside Univer entirely.
 
-**Pros:** Zero interaction with column mapping, derived columns, or Univer internals.
-**Cons:** Must track scroll position and row heights to align buttons.
-
-### Option B: Fixed leftmost derived column
-
-Configure the delete button as a proper derived column in TOML metadata
-with `position: 0`, and shift all other derived column positions in the
-metadata. The delete column would always exist (no toggle needed), just
-with different visual treatment.
-
-**Pros:** Works within existing derived column system.
-**Cons:** Always present, no toggle; requires metadata changes per file.
+**Why not:** Univer uses canvas-based rendering with virtual scrolling.
+There is no DOM scroll container to hook into. Syncing an overlay would
+require listening to Univer's internal scroll events, which are not
+exposed through the Facade API. This approach is harder than the column
+approach, not easier.
 
 ### Option C: Context menu enhancement
 
