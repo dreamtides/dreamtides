@@ -75,7 +75,7 @@ export function DeleteRowOverlay({
           return;
         }
 
-        setButtonPosition({ x: 4, y: localY - BUTTON_HEIGHT_PX / 2 });
+        setButtonPosition({ x: 29, y: localY - BUTTON_HEIGHT_PX / 2 });
       });
     };
 

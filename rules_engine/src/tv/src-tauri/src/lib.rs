@@ -176,16 +176,28 @@ pub fn run(paths: cli::AppPaths) {
                     );
                 }
             } else if event.id() == "show_delete_buttons" {
-                tracing::info!(
-                    component = "tv.menu",
-                    "Delete buttons toggled"
-                );
-                if let Err(e) = app_handle.emit("delete-buttons-toggled", ()) {
-                    tracing::error!(
-                        component = "tv.menu",
-                        error = %e,
-                        "Failed to emit delete-buttons-toggled event"
-                    );
+                if let Some(window) = app_handle.get_webview_window("main") {
+                    if let Some(menu) = window.menu() {
+                        if let Some(MenuItemKind::Check(check_item)) =
+                            menu.get("show_delete_buttons")
+                        {
+                            let visible = check_item.is_checked().unwrap_or(false);
+                            tracing::info!(
+                                component = "tv.menu",
+                                delete_buttons_visible = visible,
+                                "Delete buttons toggled"
+                            );
+                            if let Err(e) =
+                                app_handle.emit("delete-buttons-toggled", visible)
+                            {
+                                tracing::error!(
+                                    component = "tv.menu",
+                                    error = %e,
+                                    "Failed to emit delete-buttons-toggled event"
+                                );
+                            }
+                        }
+                    }
                 }
             } else if event.id() == "disable_autosave" {
                 // CheckMenuItem automatically toggles its checked state on click.

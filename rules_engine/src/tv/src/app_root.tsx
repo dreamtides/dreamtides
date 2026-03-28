@@ -887,13 +887,12 @@ export function AppRoot() {
   }, [sheets]);
 
   useEffect(() => {
-    const deleteButtonsSub = ipc.onDeleteButtonsToggled(() => {
-      const newValue = !deleteButtonsVisibleRef.current;
-      setDeleteButtonsVisible(newValue);
+    const deleteButtonsSub = ipc.onDeleteButtonsToggled((visible) => {
+      setDeleteButtonsVisible(visible);
       const sheetInfo = activeSheetIdRef.current
         ? sheets.find((s) => s.id === activeSheetIdRef.current)
         : undefined;
-      ipc.saveViewState(sheetInfo?.path ?? null, statisticsVisibleRef.current, newValue).catch((e) =>
+      ipc.saveViewState(sheetInfo?.path ?? null, statisticsVisibleRef.current, visible).catch((e) =>
         logger.error("Failed to save view state", { error: String(e) })
       );
     });

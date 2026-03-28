@@ -1046,4 +1046,4 @@ export const onStatisticsOverlayToggled =
   createVoidEventListener("statistics-overlay-toggled");
 
 export const onDeleteButtonsToggled =
-  createVoidEventListener("delete-buttons-toggled");
+  createEventListener<boolean>("delete-buttons-toggled");

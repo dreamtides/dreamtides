@@ -8,8 +8,8 @@
 .tv-delete-row-button {
   pointer-events: auto;
   position: absolute;
-  padding: 2px 8px;
-  font-size: 11px;
+  padding: 4px 12px;
+  font-size: 13px;
   font-weight: 600;
   background: #cc0000;
   color: white;
