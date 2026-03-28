@@ -1,4 +1,7 @@
+import { useCallback, useRef, useState } from "react";
+import type { FUniver } from "@univerjs/core/facade";
 import { UniverSpreadsheet } from "./UniverSpreadsheet";
+import { DeleteRowOverlay } from "./delete_row_overlay";
 import type { TomlTableData, RowConfig, ColumnConfig } from "./ipc_bridge";
 import type { MultiSheetData, DerivedColumnState } from "./spreadsheet_types";
 
@@ -15,6 +18,8 @@ interface SpreadsheetViewProps {
   rowConfigs?: Record<string, RowConfig>;
   columnConfigs?: Record<string, ColumnConfig[]>;
   persistedSheetOrder?: string[];
+  deleteButtonsVisible?: boolean;
+  activeSheetId?: string;
 }
 
 export function SpreadsheetView({
@@ -30,7 +35,16 @@ export function SpreadsheetView({
   rowConfigs,
   columnConfigs,
   persistedSheetOrder,
+  deleteButtonsVisible,
+  activeSheetId,
 }: SpreadsheetViewProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [univerAPI, setUniverAPI] = useState<FUniver | null>(null);
+
+  const handleUniverAPIReady = useCallback((api: FUniver) => {
+    setUniverAPI(api);
+  }, []);
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
@@ -40,7 +54,7 @@ export function SpreadsheetView({
   }
 
   return (
-    <main className="container">
+    <main className="container" ref={containerRef} style={{ position: "relative" }}>
       <UniverSpreadsheet
         height="100%"
         multiSheetData={multiSheetData ?? undefined}
@@ -48,12 +62,21 @@ export function SpreadsheetView({
         onDeleteRow={onDeleteRow}
         onActiveSheetChanged={onActiveSheetChanged}
         onSheetOrderChanged={onSheetOrderChanged}
+        onUniverAPIReady={handleUniverAPIReady}
         derivedColumnState={derivedColumnState}
         initialActiveSheetId={initialActiveSheetId}
         rowConfigs={rowConfigs}
         columnConfigs={columnConfigs}
         persistedSheetOrder={persistedSheetOrder}
       />
+      {deleteButtonsVisible && (
+        <DeleteRowOverlay
+          containerRef={containerRef}
+          univerAPI={univerAPI}
+          onDeleteRow={onDeleteRow}
+          activeSheetId={activeSheetId ?? ""}
+        />
+      )}
     </main>
   );
 }

@@ -127,6 +127,14 @@ pub fn run(paths: cli::AppPaths) {
                 false,
                 None::<&str>,
             )?;
+            let show_delete_buttons = CheckMenuItem::with_id(
+                app_handle,
+                "show_delete_buttons",
+                "Show Delete Buttons",
+                true,
+                false,
+                None::<&str>,
+            )?;
             for item in menu.items()? {
                 if let MenuItemKind::Submenu(ref submenu) = item {
                     let text = submenu.text().unwrap_or_default();
@@ -136,6 +144,7 @@ pub fn run(paths: cli::AppPaths) {
                         submenu.append(&dev_tools)?;
                         submenu.append(&disable_autosave)?;
                         submenu.append(&show_statistics)?;
+                        submenu.append(&show_delete_buttons)?;
                     }
                 }
             }
@@ -164,6 +173,18 @@ pub fn run(paths: cli::AppPaths) {
                         component = "tv.menu",
                         error = %e,
                         "Failed to emit statistics-overlay-toggled event"
+                    );
+                }
+            } else if event.id() == "show_delete_buttons" {
+                tracing::info!(
+                    component = "tv.menu",
+                    "Delete buttons toggled"
+                );
+                if let Err(e) = app_handle.emit("delete-buttons-toggled", ()) {
+                    tracing::error!(
+                        component = "tv.menu",
+                        error = %e,
+                        "Failed to emit delete-buttons-toggled event"
                     );
                 }
             } else if event.id() == "disable_autosave" {

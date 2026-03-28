@@ -1,4 +1,4 @@
-import { LocaleType, mergeLocales, Univer } from "@univerjs/core";
+import { LocaleType, LogLevel, mergeLocales, Univer } from "@univerjs/core";
 import { FUniver } from "@univerjs/core/facade";
 import { UniverDataValidationPlugin } from "@univerjs/data-validation";
 import DesignEnUS from "@univerjs/design/locale/en-US";
@@ -90,6 +90,7 @@ export function createUniverInstance(config: UniverConfig): UniverInstance {
 
   const univer = new Univer({
     locale,
+    logLevel: LogLevel.SILENT,
     locales: {
       [LocaleType.EN_US]: mergeLocales(
         DesignEnUS,

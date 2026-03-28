@@ -12,6 +12,9 @@ pub struct ViewState {
 
     #[serde(default)]
     pub statistics_visible: bool,
+
+    #[serde(default)]
+    pub delete_buttons_visible: bool,
 }
 
 /// Derives the `.tv_view_state.json` path from the parent directory of the

@@ -893,6 +893,7 @@ export async function logPerf(entry: FrontendPerfLogEntry): Promise<void> {
 export interface ViewState {
   active_sheet_path: string | null;
   statistics_visible: boolean;
+  delete_buttons_visible: boolean;
 }
 
 export async function loadViewState(): Promise<ViewState> {
@@ -902,8 +903,13 @@ export async function loadViewState(): Promise<ViewState> {
 export async function saveViewState(
   activeSheetPath: string | null,
   statisticsVisible?: boolean,
+  deleteButtonsVisible?: boolean,
 ): Promise<void> {
-  return invoke("save_view_state", { activeSheetPath, statisticsVisible: statisticsVisible ?? null });
+  return invoke("save_view_state", {
+    activeSheetPath,
+    statisticsVisible: statisticsVisible ?? null,
+    deleteButtonsVisible: deleteButtonsVisible ?? null,
+  });
 }
 
 // ============ Permission Commands ============
@@ -1038,3 +1044,6 @@ export const onOpenFindDialog =
 
 export const onStatisticsOverlayToggled =
   createVoidEventListener("statistics-overlay-toggled");
+
+export const onDeleteButtonsToggled =
+  createVoidEventListener("delete-buttons-toggled");

@@ -1,4 +1,5 @@
 import type { FRange } from "@univerjs/sheets/facade";
+import type { FUniver } from "@univerjs/core/facade";
 
 import type {
   TomlTableData,
@@ -95,6 +96,8 @@ export interface UniverSpreadsheetProps {
   rowConfigs?: Record<string, RowConfig>;
   /** Column configurations per sheet ID (widths from metadata) */
   columnConfigs?: Record<string, ColumnConfig[]>;
+  /** Called when the Univer API is initialized, providing read-only access */
+  onUniverAPIReady?: (api: FUniver) => void;
   /** Persisted sheet order (filenames without .toml extension) for tab ordering */
   persistedSheetOrder?: string[];
 }

@@ -1,0 +1,39 @@
+.tv-delete-row-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.tv-delete-row-button {
+  pointer-events: auto;
+  position: absolute;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #cc0000;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  opacity: 0.9;
+  transition: opacity 0.1s;
+  line-height: 1;
+}
+
+.tv-delete-row-button:hover {
+  opacity: 1;
+  background: #aa0000;
+}
+
+@media (prefers-color-scheme: dark) {
+  .tv-delete-row-button {
+    background: #dd3333;
+  }
+
+  .tv-delete-row-button:hover {
+    background: #bb2222;
+  }
+}
