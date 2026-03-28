@@ -105,7 +105,46 @@ heavy-handed approach that destroys and recreates the entire Univer instance.
 
 ## Recommendations for Retry
 
-### Option A: Column-based with embedded offset (recommended)
+### Option A: Floating hover button via skeleton service (recommended)
+
+Show a single floating React `<button>` that appears when the mouse
+is near the left edge of the spreadsheet. Use Univer's internal
+`SheetSkeletonManagerService` to map the mouse Y coordinate to a row.
+
+**How it works:**
+1. Add `onMouseMove` listener to the UniverSpreadsheet container div
+2. When mouse X < ~40px, query the skeleton to find the hovered row:
+   ```typescript
+   const skeleton = sheetSkeletonManagerService.getCurrentSkeleton();
+   const row = skeleton.getRowIndexByOffsetY(mouseY, scaleY, scrollXY);
+   ```
+3. Render a single absolutely-positioned React delete button at that
+   row's Y position (use skeleton to get row start/end coordinates)
+4. On click, call the existing `onDeleteRow(sheetId, row - 1)` callback
+5. Toggle visibility via the View menu (just controls whether the
+   mouse listener is active)
+
+**Pros:**
+- Zero column mapping changes — no offset, no derived column conflicts
+- No workbook rebuild on toggle — just show/hide a React element
+- No `key` remount needed
+- Single integration point (UniverSpreadsheet.tsx mouse handler)
+- Precedent: `image_cell_renderer.ts` already accesses internal
+  Univer services via the injector
+
+**Cons:**
+- Requires accessing Univer internals (`SheetSkeletonManagerService`)
+  rather than the Facade API — may break on Univer version upgrades
+- Need scroll position and scale from the render engine to pass
+  to `getRowIndexByOffsetY()`
+
+**Key APIs** (from `@univerjs/core` and `@univerjs/sheets-ui`):
+- `SheetSkeletonManagerService.getCurrentSkeleton()` — get active skeleton
+- `skeleton.getRowIndexByOffsetY(offsetY, scaleY, scrollXY)` — Y to row
+- `skeleton.getCellWithCoordByOffset(x, y, sx, sy, scroll)` — full cell info
+  with `startY`/`endY` for positioning the button
+
+### Option B: Column-based with embedded offset
 
 Retry the column-based approach with these fixes for each failure:
 
@@ -138,7 +177,7 @@ from the mapping they already have.
 Heavy but functional; no alternative since Univer doesn't support dynamic
 column insertion.
 
-### Option B: React overlay (NOT recommended)
+### Option C: React overlay (NOT recommended)
 
 Render delete buttons as a React component overlaid on the spreadsheet,
 outside Univer entirely.
@@ -149,7 +188,7 @@ require listening to Univer's internal scroll events, which are not
 exposed through the Facade API. This approach is harder than the column
 approach, not easier.
 
-### Option C: Context menu enhancement
+### Option D: Context menu enhancement
 
 Instead of a visible column, enhance the existing right-click delete with
 a more prominent affordance (e.g., row highlight on hover, or a toolbar
