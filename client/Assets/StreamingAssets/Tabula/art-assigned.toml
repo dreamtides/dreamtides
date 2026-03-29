@@ -1,56 +1,5 @@
 [[cards]]
 keep = false
-name = "Liminal Crossing"
-id = "5af14769-48c7-45eb-a73d-52fdea4405c4"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Banish up to 2 allies, then materialize them."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 503461000
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Aperture Transit"
-id = "5af14769-48c7-45eb-a73d-52fdea4405c4"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Banish up to 2 allies, then materialize them."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 1190830255
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Gilded Transit"
-id = "5af14769-48c7-45eb-a73d-52fdea4405c4"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Banish up to 2 allies, then materialize them."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2182865331
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Portal of Twin Paths"
 id = "5af14769-48c7-45eb-a73d-52fdea4405c4"
 tide = "Arc"
@@ -65,23 +14,6 @@ spark = ""
 image-number = 2285036625
 art-owned = false
 card-number = 167
-
-[[cards]]
-keep = false
-name = "Proving Ground"
-id = "5af14769-48c7-45eb-a73d-52fdea4405c4"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Banish up to 2 allies, then materialize them."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2299755781
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -466,76 +398,6 @@ card-number = 81
 
 [[cards]]
 keep = false
-name = "Ashwalker"
-id = "c85edc15-ff74-45d5-aed5-7ca488b6d100"
-tide = "Pact"
-tide-cost = 1
-rendered-text = """
-▸ Dissolved: You may pay 1● to return this character to your hand.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 1791664445
-art-owned = false
-card-number = 182
-
-[[cards]]
-keep = false
-name = "Shimmerfall"
-id = "958b9c00-bdbf-4bad-974e-baf57357c3a5"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Pay 1 or more ●: Draw a card for each ● spent, then discard 2 cards."
-energy-cost = 0
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 383196127
-art-owned = true
-card-number = 82
-
-[[cards]]
-keep = false
-name = "Aqueous Vision"
-id = "958b9c00-bdbf-4bad-974e-baf57357c3a5"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Pay 1 or more ●: Draw a card for each ● spent, then discard 2 cards."
-energy-cost = 0
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 1786390154
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Fathomless Rune"
-id = "958b9c00-bdbf-4bad-974e-baf57357c3a5"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Pay 1 or more ●: Draw a card for each ● spent, then discard 2 cards."
-energy-cost = 0
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 1798382128
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Secrets of the Deep"
 id = "958b9c00-bdbf-4bad-974e-baf57357c3a5"
 tide = "Rime"
@@ -567,57 +429,6 @@ spark = ""
 image-number = 1314287447
 art-owned = false
 card-number = 104
-
-[[cards]]
-keep = false
-name = "Arcane Deluge"
-id = "1a6babbe-c0fe-47ed-8ad3-4cdbf0585b10"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Double the amount of ● you have."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 1794244546
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Depthlight Surge"
-id = "1a6babbe-c0fe-47ed-8ad3-4cdbf0585b10"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Double the amount of ● you have."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2131591273
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Ancient Crescendo"
-id = "1a6babbe-c0fe-47ed-8ad3-4cdbf0585b10"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Double the amount of ● you have."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2639857435
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -793,44 +604,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Lanternward"
-id = "f06932ac-6d8a-493f-b47e-9134676ea396"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-Once per turn, you may play a character with cost 2● or less from your void.
-"""
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 533945284
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Glowcap Archivist"
-id = "f06932ac-6d8a-493f-b47e-9134676ea396"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-Once per turn, you may play a character with cost 2● or less from your void.
-"""
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 708313993
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Starsea Traveler"
 id = "f06932ac-6d8a-493f-b47e-9134676ea396"
 tide = "Umbra"
@@ -986,48 +759,6 @@ card-number = 146
 
 [[cards]]
 keep = false
-name = "Runewhale"
-id = "64b5552f-1fc3-4aee-a79c-cebc19792044"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = """
-Reveal the top card of your deck.
-
-You may play characters from the top of your deck.
-"""
-energy-cost = 4
-card-type = "Character"
-subtype = "Spirit Animal"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 726444853
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Pathlit Stag"
-id = "64b5552f-1fc3-4aee-a79c-cebc19792044"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = """
-Reveal the top card of your deck.
-
-You may play characters from the top of your deck.
-"""
-energy-cost = 4
-card-type = "Character"
-subtype = "Spirit Animal"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 2022594416
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Seeker of the Radiant Wilds"
 id = "0dc21b19-b21b-4905-9a9a-113db544e587"
 tide = "Bloom"
@@ -1042,74 +773,6 @@ spark = 1
 image-number = 2022594416
 art-owned = false
 card-number = 145
-
-[[cards]]
-keep = false
-name = "Spiritcaller"
-id = "0dc21b19-b21b-4905-9a9a-113db544e587"
-tide = "Bloom"
-tide-cost = 2
-rendered-text = "▸ Materialized: Draw a card for each allied Spirit Animal."
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2186149275
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Dream Visitor"
-id = "0dc21b19-b21b-4905-9a9a-113db544e587"
-tide = "Bloom"
-tide-cost = 2
-rendered-text = "▸ Materialized: Draw a card for each allied Spirit Animal."
-energy-cost = 2
-card-type = "Character"
-subtype = "Visitor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2189428531
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Tidechaser"
-id = "0dc21b19-b21b-4905-9a9a-113db544e587"
-tide = "Bloom"
-tide-cost = 2
-rendered-text = "▸ Materialized: Draw a card for each allied Spirit Animal."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2197688367
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Cub of the Old Grove"
-id = "0dc21b19-b21b-4905-9a9a-113db544e587"
-tide = "Bloom"
-tide-cost = 2
-rendered-text = "▸ Materialized: Draw a card for each allied Spirit Animal."
-energy-cost = 2
-card-type = "Character"
-subtype = "Child"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2597662159
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -1164,40 +827,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Hidden Frequency"
-id = "437fc66b-c0eb-46fd-82fa-ebbb16939e66"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "Discover a Survivor."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 318372524
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Shelter Seekers"
-id = "437fc66b-c0eb-46fd-82fa-ebbb16939e66"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "Discover a Survivor."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1207264099
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Through the Rift"
 id = "437fc66b-c0eb-46fd-82fa-ebbb16939e66"
 tide = "Umbra"
@@ -1212,23 +841,6 @@ spark = ""
 image-number = 1790126243
 art-owned = false
 card-number = 192
-
-[[cards]]
-keep = false
-name = "Creeping Reclamation"
-id = "437fc66b-c0eb-46fd-82fa-ebbb16939e66"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "Discover a Survivor."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 2639857437
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -1283,23 +895,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Nightwalk Operative"
-id = "ef6c27d3-e55f-4107-b2fd-69ad00994351"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Once per turn, when you play a ↯fast card, draw a card."
-energy-cost = 2
-card-type = "Character"
-subtype = "Detective"
-rarity = "Common"
-is-fast = true
-spark = 1
-image-number = 612667832
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Sage of the Prelude"
 id = "ef6c27d3-e55f-4107-b2fd-69ad00994351"
 tide = "Arc"
@@ -1314,108 +909,6 @@ spark = 1
 image-number = 1084620026
 art-owned = false
 card-number = 76
-
-[[cards]]
-keep = false
-name = "Dawning Mind"
-id = "ef6c27d3-e55f-4107-b2fd-69ad00994351"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Once per turn, when you play a ↯fast card, draw a card."
-energy-cost = 2
-card-type = "Character"
-subtype = "Child"
-rarity = "Common"
-is-fast = true
-spark = 1
-image-number = 1902130348
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Emerald Trailblazer"
-id = "ef6c27d3-e55f-4107-b2fd-69ad00994351"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Once per turn, when you play a ↯fast card, draw a card."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = true
-spark = 1
-image-number = 2320845235
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Starlit Passenger"
-id = "3ab4dd0d-28c6-42e7-ab47-691781d458c5"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "When you play a character, materialize a Celestial figment."
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 334049255
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Dawnwatcher"
-id = "3ab4dd0d-28c6-42e7-ab47-691781d458c5"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "When you play a character, materialize a Celestial figment."
-energy-cost = 4
-card-type = "Character"
-subtype = "Visitor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 529374502
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Branchborn Minstrel"
-id = "3ab4dd0d-28c6-42e7-ab47-691781d458c5"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "When you play a character, materialize a Celestial figment."
-energy-cost = 4
-card-type = "Character"
-subtype = "Musician"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 1084620026
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Celestial Shepherd"
-id = "3ab4dd0d-28c6-42e7-ab47-691781d458c5"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "When you play a character, materialize a Celestial figment."
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 1185684766
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -1572,40 +1065,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Dreamchild"
-id = "4b4da6ef-d0e6-43dc-962d-44d8447e84c1"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "You may only play this character from your void."
-energy-cost = 2
-card-type = "Character"
-subtype = "Child"
-rarity = "Uncommon"
-is-fast = false
-spark = 6
-image-number = 1005938029
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Thornborn"
-id = "4b4da6ef-d0e6-43dc-962d-44d8447e84c1"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "You may only play this character from your void."
-energy-cost = 2
-card-type = "Character"
-subtype = "Child"
-rarity = "Uncommon"
-is-fast = false
-spark = 6
-image-number = 1735968134
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Revenant of the Lost"
 id = "4b4da6ef-d0e6-43dc-962d-44d8447e84c1"
 tide = "Umbra"
@@ -1623,57 +1082,6 @@ card-number = 185
 
 [[cards]]
 keep = false
-name = "Darkwater Devotee"
-id = "4b4da6ef-d0e6-43dc-962d-44d8447e84c1"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "You may only play this character from your void."
-energy-cost = 2
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Uncommon"
-is-fast = false
-spark = 6
-image-number = 2295991861
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Bright Tangle"
-id = "85eaf1ac-bcb4-4266-84be-844965bce25d"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "Until end of turn, when you play a character, draw a card."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 244275955
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Wishing Rain"
-id = "85eaf1ac-bcb4-4266-84be-844965bce25d"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "Until end of turn, when you play a character, draw a card."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 1562814892
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Celestial Reverie"
 id = "85eaf1ac-bcb4-4266-84be-844965bce25d"
 tide = "Bloom"
@@ -1688,40 +1096,6 @@ spark = ""
 image-number = 2293194521
 art-owned = false
 card-number = 123
-
-[[cards]]
-keep = false
-name = "Summit of Rings"
-id = "85eaf1ac-bcb4-4266-84be-844965bce25d"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "Until end of turn, when you play a character, draw a card."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2637215369
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Null Exchange"
-id = "7d1b1516-f89a-4a27-b9b6-54afaa85c217"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Draw 2 cards. Discard 2 cards. Gain 2●."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 1926604868
-art-owned = false
-card-number = 107
 
 [[cards]]
 keep = false
@@ -1776,23 +1150,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Overcharge"
-id = "90a624db-d288-4856-afc9-f9222e67d3bd"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Double the amount of ● you gain from card effects this turn."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 618071660
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Catalyst Ignition"
 id = "90a624db-d288-4856-afc9-f9222e67d3bd"
 tide = "Surge"
@@ -1807,40 +1164,6 @@ spark = ""
 image-number = 1529898278
 art-owned = false
 card-number = 105
-
-[[cards]]
-keep = false
-name = "Skyward Epiphany"
-id = "90a624db-d288-4856-afc9-f9222e67d3bd"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Double the amount of ● you gain from card effects this turn."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2313906187
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Resonance Spire"
-id = "90a624db-d288-4856-afc9-f9222e67d3bd"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Double the amount of ● you gain from card effects this turn."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2642886415
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -1895,23 +1218,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Price of Defiance"
-id = "f83a0657-f55a-4ee6-8630-c2ca2d8429ac"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "Abandon an ally or discard a card: Dissolve an enemy."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 1517426177
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Pyrokinetic Surge"
 id = "f83a0657-f55a-4ee6-8630-c2ca2d8429ac"
 tide = "Pact"
@@ -1926,40 +1232,6 @@ spark = ""
 image-number = 2023111787
 art-owned = false
 card-number = 69
-
-[[cards]]
-keep = false
-name = "Bitter Exchange"
-id = "f83a0657-f55a-4ee6-8630-c2ca2d8429ac"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "Abandon an ally or discard a card: Dissolve an enemy."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 2221822099
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Emperor's Tribute"
-id = "f83a0657-f55a-4ee6-8630-c2ca2d8429ac"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "Abandon an ally or discard a card: Dissolve an enemy."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 2427491215
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -2031,23 +1303,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Shade Pursuer"
-id = "b9b26dbb-0384-4839-bff2-3b25c4c26518"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "2●, Banish another card in your void: Reclaim this character."
-energy-cost = 3
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 581686498
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Ashen Avenger"
 id = "b9b26dbb-0384-4839-bff2-3b25c4c26518"
 tide = "Umbra"
@@ -2065,120 +1320,6 @@ card-number = 43
 
 [[cards]]
 keep = false
-name = "Risen Swordmaster"
-id = "b9b26dbb-0384-4839-bff2-3b25c4c26518"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "2●, Banish another card in your void: Reclaim this character."
-energy-cost = 3
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 2295991865
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Ashfire Reaper"
-id = "e5ac026b-a397-47ee-929d-46de1177784c"
-tide = "Ignite"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may banish 3 cards from your void to dissolve an enemy with cost 2● or less."
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 1798514893
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Dawnwalker"
-id = "76435ef9-18df-4c2d-bf5a-c92d997e86b5"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-To play this card, return an ally with cost 3● or more to hand.
-
-▸ Judgment: Draw a card.
-"""
-energy-cost = 5
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 3
-image-number = 499788835
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Ringwalker"
-id = "76435ef9-18df-4c2d-bf5a-c92d997e86b5"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-To play this card, return an ally with cost 3● or more to hand.
-
-▸ Judgment: Draw a card.
-"""
-energy-cost = 5
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Rare"
-is-fast = false
-spark = 3
-image-number = 1798514905
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Cosmos Emissary"
-id = "76435ef9-18df-4c2d-bf5a-c92d997e86b5"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-To play this card, return an ally with cost 3● or more to hand.
-
-▸ Judgment: Draw a card.
-"""
-energy-cost = 5
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 3
-image-number = 2261959343
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Pinnacle Insight"
-id = "5ddbb693-5fc3-4e5a-8040-944fa9e9755d"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Draw a card for each card you have played this turn."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 309018632
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Echoes of the Journey"
 id = "5ddbb693-5fc3-4e5a-8040-944fa9e9755d"
 tide = "Surge"
@@ -2193,40 +1334,6 @@ spark = ""
 image-number = 1798514905
 art-owned = false
 card-number = 91
-
-[[cards]]
-keep = false
-name = "Prismatic Gate"
-id = "5ddbb693-5fc3-4e5a-8040-944fa9e9755d"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Draw a card for each card you have played this turn."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2586513027
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Gathered Brilliance"
-id = "5ddbb693-5fc3-4e5a-8040-944fa9e9755d"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Draw a card for each card you have played this turn."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2642886417
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -2386,57 +1493,6 @@ card-number = 77
 
 [[cards]]
 keep = false
-name = "Redline Sprinter"
-id = "8ace6dbe-f2cd-4a5c-b56d-6ea01d60985b"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "When you play a ↯fast card, this character gains +2 spark."
-energy-cost = 3
-card-type = "Character"
-subtype = "Renegade"
-rarity = "Common"
-is-fast = true
-spark = 2
-image-number = 1063277315
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Momentum Chaser"
-id = "8ace6dbe-f2cd-4a5c-b56d-6ea01d60985b"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "When you play a ↯fast card, this character gains +2 spark."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = true
-spark = 2
-image-number = 1902130357
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Crestwalker"
-id = "8ace6dbe-f2cd-4a5c-b56d-6ea01d60985b"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "When you play a ↯fast card, this character gains +2 spark."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = true
-spark = 2
-image-number = 2191235661
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Shadow Soloist"
 id = "8bd6ece5-5273-4829-90b0-3d529dd8d42e"
 tide = "Surge"
@@ -2488,25 +1544,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Arboreal Zenith"
-id = "a43133a1-ad75-4685-a5dd-9e94b249e463"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Gain 6●.
-"""
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 425039572
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Flash of Power"
 id = "a43133a1-ad75-4685-a5dd-9e94b249e463"
 tide = "Surge"
@@ -2523,82 +1560,6 @@ spark = ""
 image-number = 1063277315
 art-owned = false
 card-number = 103
-
-[[cards]]
-keep = false
-name = "Stormchannel"
-id = "a43133a1-ad75-4685-a5dd-9e94b249e463"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Gain 6●.
-"""
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 1174403272
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Resonance Cascade"
-id = "a43133a1-ad75-4685-a5dd-9e94b249e463"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Gain 6●.
-"""
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2191235671
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Glimpse of Infinity"
-id = "a23df796-03d2-4082-9c30-fe6958e65ffe"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Gain 3●.
-"""
-energy-cost = 0
-card-type = "Event"
-subtype = "Survivor"
-rarity = "Legendary"
-is-fast = false
-spark = ""
-image-number = 1099575602
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Lunar Windfall"
-id = "a23df796-03d2-4082-9c30-fe6958e65ffe"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Gain 3●.
-"""
-energy-cost = 0
-card-type = "Event"
-subtype = "Survivor"
-rarity = "Legendary"
-is-fast = false
-spark = ""
-image-number = 1710151561
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -2621,40 +1582,6 @@ card-number = 13
 
 [[cards]]
 keep = false
-name = "Threefold Channel"
-id = "afee62e2-7768-47d5-87bd-eaea08400fad"
-tide = "Surge"
-tide-cost = 2
-rendered-text = "▸ Materialized: Copy the next event you play this turn three times."
-energy-cost = 6
-card-type = "Character"
-subtype = "Tinkerer"
-rarity = "Rare"
-is-fast = false
-spark = 3
-image-number = 436090561
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Grand Artificer"
-id = "afee62e2-7768-47d5-87bd-eaea08400fad"
-tide = "Surge"
-tide-cost = 2
-rendered-text = "▸ Materialized: Copy the next event you play this turn three times."
-energy-cost = 6
-card-type = "Character"
-subtype = "Tinkerer"
-rarity = "Rare"
-is-fast = false
-spark = 3
-image-number = 686903236
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "The Ringleader"
 id = "afee62e2-7768-47d5-87bd-eaea08400fad"
 tide = "Surge"
@@ -2669,74 +1596,6 @@ spark = 3
 image-number = 1005938035
 art-owned = false
 card-number = 108
-
-[[cards]]
-keep = false
-name = "Manifold Spearlord"
-id = "afee62e2-7768-47d5-87bd-eaea08400fad"
-tide = "Surge"
-tide-cost = 2
-rendered-text = "▸ Materialized: Copy the next event you play this turn three times."
-energy-cost = 6
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = false
-spark = 3
-image-number = 1295291155
-art-owned = true
-card-number = 108
-
-[[cards]]
-keep = false
-name = "Grand Maestro"
-id = "afee62e2-7768-47d5-87bd-eaea08400fad"
-tide = "Surge"
-tide-cost = 2
-rendered-text = "▸ Materialized: Copy the next event you play this turn three times."
-energy-cost = 6
-card-type = "Character"
-subtype = "Musician"
-rarity = "Rare"
-is-fast = false
-spark = 3
-image-number = 1383318395
-art-owned = false
-card-number = 108
-
-[[cards]]
-keep = false
-name = "Castle Interloper"
-id = "f453990c-934d-42c6-a12c-2a7d50689909"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "The opponent's events cost 1● more."
-energy-cost = 3
-card-type = "Character"
-subtype = "Renegade"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 644603212
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Stormwarden"
-id = "f453990c-934d-42c6-a12c-2a7d50689909"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "The opponent's events cost 1● more."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 649132936
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -2757,23 +1616,6 @@ card-number = 53
 
 [[cards]]
 keep = false
-name = "Crestwalker"
-id = "f453990c-934d-42c6-a12c-2a7d50689909"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "The opponent's events cost 1● more."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 2018848964
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Stormward"
 id = "38147bfd-8410-4293-a952-e348258c0542"
 tide = "Surge"
@@ -2786,63 +1628,6 @@ rarity = "Common"
 is-fast = true
 spark = ""
 image-number = 1005938035
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Reunion"
-id = "3e93788c-bae3-4fda-a94c-a387cf0f386d"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-Return an enemy or ally to hand. Draw a card.
-"""
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 246784636
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Grotto's Light"
-id = "3e93788c-bae3-4fda-a94c-a387cf0f386d"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-Return an enemy or ally to hand. Draw a card.
-"""
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 565499323
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Veilgate"
-id = "3e93788c-bae3-4fda-a94c-a387cf0f386d"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-Return an enemy or ally to hand. Draw a card.
-"""
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 1005938023
 art-owned = false
 card-number = 0
 
@@ -2864,25 +1649,6 @@ spark = ""
 image-number = 1149594743
 art-owned = false
 card-number = 88
-
-[[cards]]
-keep = false
-name = "Ashline Retreat"
-id = "3e93788c-bae3-4fda-a94c-a387cf0f386d"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-Return an enemy or ally to hand. Draw a card.
-"""
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 2256745753
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -2937,40 +1703,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Forgotten Citadel"
-id = "16853a85-1211-462e-9ca4-8a0ba0890657"
-tide = "Surge"
-tide-cost = 2
-rendered-text = "All cards currently in your void gain reclaim equal to their cost this turn."
-energy-cost = 6
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 260377973
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Astral Salvage"
-id = "16853a85-1211-462e-9ca4-8a0ba0890657"
-tide = "Surge"
-tide-cost = 2
-rendered-text = "All cards currently in your void gain reclaim equal to their cost this turn."
-energy-cost = 6
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 622024826
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Path to Redemption"
 id = "16853a85-1211-462e-9ca4-8a0ba0890657"
 tide = "Surge"
@@ -2985,103 +1717,6 @@ spark = ""
 image-number = 1005938023
 art-owned = false
 card-number = 95
-
-[[cards]]
-keep = false
-name = "Bright Abyss"
-id = "16853a85-1211-462e-9ca4-8a0ba0890657"
-tide = "Surge"
-tide-cost = 2
-rendered-text = "All cards currently in your void gain reclaim equal to their cost this turn."
-energy-cost = 6
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1063277171
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Pulse of Power"
-id = "a43133a1-ad75-4685-a5dd-9e94b249e463"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Gain 6●."
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 1125132389
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Chronicler of Loss"
-id = "233f67e8-2715-4b30-8985-2b5b15f851ac"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Dissolved: Draw a card.
-
-When an allied Survivor is ▸ Dissolved:, draw a card.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 556546645
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Faithful Exile"
-id = "233f67e8-2715-4b30-8985-2b5b15f851ac"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Dissolved: Draw a card.
-
-When an allied Survivor is ▸ Dissolved:, draw a card.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 1125131714
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Scorched Earth Lookout"
-id = "233f67e8-2715-4b30-8985-2b5b15f851ac"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Dissolved: Draw a card.
-
-When an allied Survivor is ▸ Dissolved:, draw a card.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2258761883
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -3119,23 +1754,6 @@ card-number = 180
 
 [[cards]]
 keep = false
-name = "Rain-Walker"
-id = "04f44172-4877-476e-aa91-36a6eb50b53c"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "When you discard a card, kindle 1."
-energy-cost = 2
-card-type = "Character"
-subtype = "Renegade"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 383195848
-art-owned = true
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Mother of Flames"
 id = "04f44172-4877-476e-aa91-36a6eb50b53c"
 tide = "Rime"
@@ -3150,23 +1768,6 @@ spark = 1
 image-number = 1486924802
 art-owned = true
 card-number = 19
-
-[[cards]]
-keep = false
-name = "Petal Ward"
-id = "89084e83-a934-4fda-9178-f6a371ccac13"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "Prevent a played event which could dissolve an ally."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 248741191
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -3238,40 +1839,6 @@ card-number = 558
 
 [[cards]]
 keep = false
-name = "Chargebinder"
-id = "d12cbf86-5b50-4654-8c33-ff4428537c71"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Gain 3●."
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 2189428525
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Dawnwatcher"
-id = "d12cbf86-5b50-4654-8c33-ff4428537c71"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Gain 3●."
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 2275146331
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Aurora Channeler"
 id = "d12cbf86-5b50-4654-8c33-ff4428537c71"
 tide = "Arc"
@@ -3286,23 +1853,6 @@ spark = 1
 image-number = 2287054241
 art-owned = false
 card-number = 168
-
-[[cards]]
-keep = false
-name = "Goldwood Channeler"
-id = "d12cbf86-5b50-4654-8c33-ff4428537c71"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Gain 3●."
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 2320845231
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -3498,40 +2048,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Monolith Rising"
-id = "7b22f49a-04a3-4ed9-9834-841883c2b14d"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Gain 4●."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 678431956
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Firewheel"
-id = "7b22f49a-04a3-4ed9-9834-841883c2b14d"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Gain 4●."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 2212744813
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Passage Through Oblivion"
 id = "59f826ee-55d1-499e-86bb-8266c382f5fa"
 tide = "Arc"
@@ -3637,57 +2153,6 @@ card-number = 20
 
 [[cards]]
 keep = false
-name = "Sunlit Recorder"
-id = "be97e5e0-eebb-4b90-a676-fcf909b35600"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Judgment: Draw a card, then the opponent gains 2✪."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 1118816066
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Stillwater"
-id = "be97e5e0-eebb-4b90-a676-fcf909b35600"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Judgment: Draw a card, then the opponent gains 2✪."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 1924252175
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Dreamgazer"
-id = "be97e5e0-eebb-4b90-a676-fcf909b35600"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Judgment: Draw a card, then the opponent gains 2✪."
-energy-cost = 2
-card-type = "Character"
-subtype = "Visitor"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 2189428521
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Twilight Reclaimer"
 id = "fb3029e1-7f43-4284-bcdd-11dfe6711f96"
 tide = "Umbra"
@@ -3700,23 +2165,6 @@ rarity = "Rare"
 is-fast = false
 spark = 1
 image-number = 1104412604
-art-owned = false
-card-number = 183
-
-[[cards]]
-keep = false
-name = "Aureole Survivor"
-id = "fb3029e1-7f43-4284-bcdd-11dfe6711f96"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "▸ Dissolved: A Survivor in your void gains reclaim equal to its cost."
-energy-cost = 1
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1936124599
 art-owned = false
 card-number = 183
 
@@ -3736,108 +2184,6 @@ spark = 1
 image-number = 678431950
 art-owned = false
 card-number = 211
-
-[[cards]]
-keep = false
-name = "Scrapheap Oracle"
-id = "2530adcc-5ae2-486a-94b2-f40dd62f3755"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "While you have 7 or more cards in your void, they have reclaim equal to their cost."
-energy-cost = 2
-card-type = "Character"
-subtype = "Synth"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1104412604
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Gravewarden"
-id = "2530adcc-5ae2-486a-94b2-f40dd62f3755"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "While you have 7 or more cards in your void, they have reclaim equal to their cost."
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1252796551
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Twilight Archivist"
-id = "2530adcc-5ae2-486a-94b2-f40dd62f3755"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "While you have 7 or more cards in your void, they have reclaim equal to their cost."
-energy-cost = 2
-card-type = "Character"
-subtype = "Synth"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1570031572
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Street Confessor"
-id = "f649bc96-1d35-4665-97d9-799208558ff3"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Materialized: Discard a chosen card from the opponent's hand. They draw a card."
-energy-cost = 3
-card-type = "Character"
-subtype = "Outsider"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 428216245
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Cobblestone Informant"
-id = "f649bc96-1d35-4665-97d9-799208558ff3"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Materialized: Discard a chosen card from the opponent's hand. They draw a card."
-energy-cost = 3
-card-type = "Character"
-subtype = "Detective"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 447325231
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Wired Infiltrator"
-id = "f649bc96-1d35-4665-97d9-799208558ff3"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Materialized: Discard a chosen card from the opponent's hand. They draw a card."
-energy-cost = 3
-card-type = "Character"
-subtype = "Tinkerer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 678431950
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -3940,57 +2286,6 @@ spark = 1
 image-number = 1016596177
 art-owned = false
 card-number = 89
-
-[[cards]]
-keep = false
-name = "Astral Prospector"
-id = "7066c559-3ab1-4c89-b654-39c22dcb8603"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Discover a ↯fast event."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = true
-spark = 1
-image-number = 1169640028
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Heir of Lost Stones"
-id = "7066c559-3ab1-4c89-b654-39c22dcb8603"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Discover a ↯fast event."
-energy-cost = 2
-card-type = "Character"
-subtype = "Child"
-rarity = "Rare"
-is-fast = true
-spark = 1
-image-number = 2027158301
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Veilwalker"
-id = "7066c559-3ab1-4c89-b654-39c22dcb8603"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Discover a ↯fast event."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = true
-spark = 1
-image-number = 2424249729
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -4256,57 +2551,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Murmuration"
-id = "c37964f0-153d-417e-8651-bbd043c5e118"
-tide = "Ignite"
-tide-cost = 1
-rendered-text = "Materialize three Warrior figments."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 297872186
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "March of Embers"
-id = "c37964f0-153d-417e-8651-bbd043c5e118"
-tide = "Ignite"
-tide-cost = 1
-rendered-text = "Materialize three Warrior figments."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 306660611
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Ascending Flock"
-id = "c37964f0-153d-417e-8651-bbd043c5e118"
-tide = "Ignite"
-tide-cost = 1
-rendered-text = "Materialize three Warrior figments."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 492981583
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Radiant Trio"
 id = "c37964f0-153d-417e-8651-bbd043c5e118"
 tide = "Ignite"
@@ -4321,23 +2565,6 @@ spark = ""
 image-number = 1785274679
 art-owned = false
 card-number = 205
-
-[[cards]]
-keep = false
-name = "Warband Judgement"
-id = "cd3d7b81-de72-4668-b505-e09848a477be"
-tide = "Ignite"
-tide-cost = 1
-rendered-text = "Dissolve an enemy with cost less than the number of allied Warriors."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 1785274679
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -4484,74 +2711,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Iron Custodian"
-id = "fb2661ee-387c-4a8f-965e-dd89be65cfe0"
-tide = "Pact"
-tide-cost = 3
-rendered-text = "Abandon 2 allies: Reclaim this character."
-energy-cost = 9
-card-type = "Character"
-subtype = "Synth"
-rarity = "Uncommon"
-is-fast = false
-spark = 6
-image-number = 695511850
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Abiding Doom"
-id = "fb2661ee-387c-4a8f-965e-dd89be65cfe0"
-tide = "Pact"
-tide-cost = 3
-rendered-text = "Abandon 2 allies: Reclaim this character."
-energy-cost = 9
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Uncommon"
-is-fast = false
-spark = 6
-image-number = 700254508
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Infernal Patriarch"
-id = "fb2661ee-387c-4a8f-965e-dd89be65cfe0"
-tide = "Pact"
-tide-cost = 3
-rendered-text = "Abandon 2 allies: Reclaim this character."
-energy-cost = 9
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Uncommon"
-is-fast = false
-spark = 6
-image-number = 1716379555
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Eternal Scourge"
-id = "fb2661ee-387c-4a8f-965e-dd89be65cfe0"
-tide = "Pact"
-tide-cost = 3
-rendered-text = "Abandon 2 allies: Reclaim this character."
-energy-cost = 9
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Uncommon"
-is-fast = false
-spark = 6
-image-number = 2023111781
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "The Rising God"
 id = "fb2661ee-387c-4a8f-965e-dd89be65cfe0"
 tide = "Pact"
@@ -4586,74 +2745,6 @@ card-number = 27
 
 [[cards]]
 keep = false
-name = "Risen Engine"
-id = "99720e39-6bad-4c6c-867c-7bc5c326195e"
-tide = "Umbra"
-tide-cost = 2
-rendered-text = "Banish your void with 8 or more cards: Reclaim this character."
-energy-cost = 8
-card-type = "Character"
-subtype = "Synth"
-rarity = "Rare"
-is-fast = false
-spark = 8
-image-number = 1144639382
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Nightfall Wyrm"
-id = "99720e39-6bad-4c6c-867c-7bc5c326195e"
-tide = "Umbra"
-tide-cost = 2
-rendered-text = "Banish your void with 8 or more cards: Reclaim this character."
-energy-cost = 8
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Rare"
-is-fast = false
-spark = 8
-image-number = 1913887486
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Nightbloom Rite"
-id = "1396e9c8-5719-42bc-8ef6-98d2777cc069"
-tide = "Bloom"
-tide-cost = 3
-rendered-text = "Each allied Spirit Animal gains spark equal to the number of allied Spirit Animals. "
-energy-cost = 12
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 721324498
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Stride of Giants"
-id = "1396e9c8-5719-42bc-8ef6-98d2777cc069"
-tide = "Bloom"
-tide-cost = 3
-rendered-text = "Each allied Spirit Animal gains spark equal to the number of allied Spirit Animals. "
-energy-cost = 12
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1232455276
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Spirit Bond"
 id = "1396e9c8-5719-42bc-8ef6-98d2777cc069"
 tide = "Bloom"
@@ -4668,40 +2759,6 @@ spark = ""
 image-number = 1913887486
 art-owned = false
 card-number = 131
-
-[[cards]]
-keep = false
-name = "Herd's Ascendance"
-id = "1396e9c8-5719-42bc-8ef6-98d2777cc069"
-tide = "Bloom"
-tide-cost = 3
-rendered-text = "Each allied Spirit Animal gains spark equal to the number of allied Spirit Animals. "
-energy-cost = 12
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 2586513019
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Unburnt Grace"
-id = "cf339e0b-685a-4a06-abb2-2fad01916ca7"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "↯fast -- Abandon this character: Prevent a played event."
-energy-cost = 1
-card-type = "Character"
-subtype = "Visitor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 1419437213
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -4785,25 +2842,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Flashpoint"
-id = "36c2a4e1-3212-4933-979a-73f109f9b256"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Dissolve an enemy.
-"""
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 635276744
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Immolate"
 id = "36c2a4e1-3212-4933-979a-73f109f9b256"
 tide = "Neutral"
@@ -4823,40 +2861,6 @@ card-number = 24
 
 [[cards]]
 keep = false
-name = "Swarmcaller"
-id = "fe13ba87-8935-4740-b762-23c8ccd89ff9"
-tide = "Surge"
-tide-cost = 2
-rendered-text = "When an event is put into your void, this character gains +1 spark."
-energy-cost = 4
-card-type = "Character"
-subtype = "Detective"
-rarity = "Uncommon"
-is-fast = false
-spark = "*"
-image-number = 413612494
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Frequencywalker"
-id = "fe13ba87-8935-4740-b762-23c8ccd89ff9"
-tide = "Surge"
-tide-cost = 2
-rendered-text = "When an event is put into your void, this character gains +1 spark."
-energy-cost = 4
-card-type = "Character"
-subtype = "Tinkerer"
-rarity = "Uncommon"
-is-fast = false
-spark = "*"
-image-number = 524175043
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Spirit of Smoldering Echoes"
 id = "fe13ba87-8935-4740-b762-23c8ccd89ff9"
 tide = "Surge"
@@ -4871,23 +2875,6 @@ spark = "*"
 image-number = 2023111784
 art-owned = false
 card-number = 120
-
-[[cards]]
-keep = false
-name = "Voltaic Channeler"
-id = "fe13ba87-8935-4740-b762-23c8ccd89ff9"
-tide = "Surge"
-tide-cost = 2
-rendered-text = "When an event is put into your void, this character gains +1 spark."
-energy-cost = 4
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Uncommon"
-is-fast = false
-spark = "*"
-image-number = 2433164311
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -5010,40 +2997,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Garden Awakener"
-id = "cb474c3f-1670-4e44-88d9-bef6475a4199"
-tide = "Bloom"
-tide-cost = 2
-rendered-text = "When you materialize a character, trigger the ▸ Judgment: ability of each ally."
-energy-cost = 5
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 576358327
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Grove Catalyst"
-id = "cb474c3f-1670-4e44-88d9-bef6475a4199"
-tide = "Bloom"
-tide-cost = 2
-rendered-text = "When you materialize a character, trigger the ▸ Judgment: ability of each ally."
-energy-cost = 5
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 1730836237
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Conduit of Resonance"
 id = "cb474c3f-1670-4e44-88d9-bef6475a4199"
 tide = "Bloom"
@@ -5058,23 +3011,6 @@ spark = 2
 image-number = 1734025934
 art-owned = false
 card-number = 122
-
-[[cards]]
-keep = false
-name = "Leyline Strider"
-id = "cb474c3f-1670-4e44-88d9-bef6475a4199"
-tide = "Bloom"
-tide-cost = 2
-rendered-text = "When you materialize a character, trigger the ▸ Judgment: ability of each ally."
-energy-cost = 5
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 2258761885
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -5243,40 +3179,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Advance the Hour"
-id = "ab07f1aa-ca7a-4716-988e-281ab871baf4"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "At the end of this turn, trigger an additional Judgment phase."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 439817416
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Shared Vigil"
-id = "ab07f1aa-ca7a-4716-988e-281ab871baf4"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "At the end of this turn, trigger an additional Judgment phase."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 1504647497
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Surge of Fury"
 id = "ab07f1aa-ca7a-4716-988e-281ab871baf4"
 tide = "Surge"
@@ -5291,23 +3193,6 @@ spark = ""
 image-number = 1968259702
 art-owned = false
 card-number = 99
-
-[[cards]]
-keep = false
-name = "Twilight Embrace"
-id = "ab07f1aa-ca7a-4716-988e-281ab871baf4"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "At the end of this turn, trigger an additional Judgment phase."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2018053214
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -5670,74 +3555,6 @@ card-number = 101
 
 [[cards]]
 keep = false
-name = "Illumined Youth"
-id = "b7bc4166-8763-44b4-9bf0-4307362bf509"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Events cost you 1● less."
-energy-cost = 3
-card-type = "Character"
-subtype = "Child"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 2415692463
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Solstice Renegade"
-id = "bd9ec464-fac5-4f42-85f5-2c61e2f04636"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may discard a card to draw a card and gain 1✪."
-energy-cost = 2
-card-type = "Character"
-subtype = "Renegade"
-rarity = "Rare"
-is-fast = false
-spark = 0
-image-number = 373305985
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Bridgewalker"
-id = "bd9ec464-fac5-4f42-85f5-2c61e2f04636"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may discard a card to draw a card and gain 1✪."
-energy-cost = 2
-card-type = "Character"
-subtype = "Child"
-rarity = "Rare"
-is-fast = false
-spark = 0
-image-number = 511427686
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Citygazer"
-id = "bd9ec464-fac5-4f42-85f5-2c61e2f04636"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may discard a card to draw a card and gain 1✪."
-energy-cost = 2
-card-type = "Character"
-subtype = "Child"
-rarity = "Rare"
-is-fast = false
-spark = 0
-image-number = 1936124596
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Pattern Seeker"
 id = "bd9ec464-fac5-4f42-85f5-2c61e2f04636"
 tide = "Rime"
@@ -5752,25 +3569,6 @@ spark = 0
 image-number = 2415692463
 art-owned = true
 card-number = 7
-
-[[cards]]
-keep = false
-name = "Gatecaller"
-id = "476638a3-6ed9-47bc-b129-ad8b6662f41e"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-4●: Materialize a copy of an ally.
-"""
-energy-cost = 1
-card-type = "Character"
-subtype = "Child"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1037215528
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -5860,40 +3658,6 @@ spark = 1
 image-number = 403770319
 art-owned = true
 card-number = 217
-
-[[cards]]
-keep = false
-name = "Stormwalker"
-id = "04be5c1e-20ab-475e-b02f-e78b82ca2e8d"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "When you play a card during the opponent's turn, this character gains +1 spark."
-energy-cost = 2
-card-type = "Character"
-subtype = "Visitor"
-rarity = "Uncommon"
-is-fast = true
-spark = 1
-image-number = 1032222736
-art-owned = true
-card-number = 217
-
-[[cards]]
-keep = false
-name = "Cloudleaper"
-id = "04be5c1e-20ab-475e-b02f-e78b82ca2e8d"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "When you play a card during the opponent's turn, this character gains +1 spark."
-energy-cost = 2
-card-type = "Character"
-subtype = "Child"
-rarity = "Uncommon"
-is-fast = true
-spark = 1
-image-number = 1740270989
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -6101,57 +3865,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Dim Conviction"
-id = "ff0bdb02-7d2b-448d-98e3-f360f39aafc3"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Return all but one ally to hand: Draw a card for each ally returned."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 529374493
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Parting Crowd"
-id = "ff0bdb02-7d2b-448d-98e3-f360f39aafc3"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Return all but one ally to hand: Draw a card for each ally returned."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 571229656
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Skyward Exodus"
-id = "ff0bdb02-7d2b-448d-98e3-f360f39aafc3"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Return all but one ally to hand: Draw a card for each ally returned."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 670293475
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Key to the Moment"
 id = "ff0bdb02-7d2b-448d-98e3-f360f39aafc3"
 tide = "Arc"
@@ -6166,57 +3879,6 @@ spark = ""
 image-number = 1037215606
 art-owned = false
 card-number = 133
-
-[[cards]]
-keep = false
-name = "Rain Market"
-id = "48578752-91df-44dd-a9ac-1f46fe4454ed"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Discard a card. Draw 2 cards."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 245477704
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Borrowed Warmth"
-id = "48578752-91df-44dd-a9ac-1f46fe4454ed"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Discard a card. Draw 2 cards."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 339410090
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Autumn Passage"
-id = "48578752-91df-44dd-a9ac-1f46fe4454ed"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Discard a card. Draw 2 cards."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 393588076
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -6266,132 +3928,6 @@ rarity = "Uncommon"
 is-fast = false
 spark = 1
 image-number = 457875118
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Fading Promenade"
-id = "8cc1a7da-42f8-4ab8-a41a-b9c8867f2dc4"
-tide = "Rime"
-tide-cost = 1
-rendered-text = """
-Draw 2 cards. Discard 2 cards.
-
-Reclaim 2●
-"""
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 360302045
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Fading Promenade"
-id = "8cc1a7da-42f8-4ab8-a41a-b9c8867f2dc4"
-tide = "Rime"
-tide-cost = 1
-rendered-text = """
-Draw 2 cards. Discard 2 cards.
-
-Reclaim 2●
-"""
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 363401060
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Moonlit Voyage"
-id = "8cc1a7da-42f8-4ab8-a41a-b9c8867f2dc4"
-tide = "Rime"
-tide-cost = 1
-rendered-text = """
-Draw 2 cards. Discard 2 cards.
-
-Reclaim 2●
-"""
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 565499317
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Threefold Invocation"
-id = "5ce29518-6ccd-420c-9fbf-c4b882266593"
-tide = "Surge"
-tide-cost = 2
-rendered-text = """
-Copy the next event you play this turn three times.
-
-Reclaim 2●
-"""
-energy-cost = 5
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 306660629
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Spellfire Nexus"
-id = "5ce29518-6ccd-420c-9fbf-c4b882266593"
-tide = "Surge"
-tide-cost = 2
-rendered-text = """
-Copy the next event you play this turn three times.
-
-Reclaim 2●
-"""
-energy-cost = 5
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 339410639
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Heavenspire"
-id = "5ce29518-6ccd-420c-9fbf-c4b882266593"
-tide = "Surge"
-tide-cost = 2
-rendered-text = """
-Copy the next event you play this turn three times.
-
-Reclaim 2●
-"""
-energy-cost = 5
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 612667835
 art-owned = false
 card-number = 0
 
@@ -6584,40 +4120,6 @@ spark = ""
 image-number = 1730836234
 art-owned = false
 card-number = 163
-
-[[cards]]
-keep = false
-name = "Pelagic Mourner"
-id = "5aee5a0d-c22a-4c09-9612-248d28c3df2f"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may draw 2 cards, then discard 3 cards."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 0
-image-number = 1730836234
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Tidegazer"
-id = "5aee5a0d-c22a-4c09-9612-248d28c3df2f"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may draw 2 cards, then discard 3 cards."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 0
-image-number = 1936124593
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -6912,40 +4414,6 @@ card-number = 12
 
 [[cards]]
 keep = false
-name = "Torch Corsair"
-id = "a42e3d7a-35a0-4dbc-a85d-c71b191d44a8"
-tide = "Ignite"
-tide-cost = 1
-rendered-text = "▸ Materialized: Draw a Warrior from your deck."
-energy-cost = 3
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 1047769090
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Bower Knight"
-id = "a42e3d7a-35a0-4dbc-a85d-c71b191d44a8"
-tide = "Ignite"
-tide-cost = 1
-rendered-text = "▸ Materialized: Draw a Warrior from your deck."
-energy-cost = 3
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 1368549095
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Runeblade"
 id = "a42e3d7a-35a0-4dbc-a85d-c71b191d44a8"
 tide = "Ignite"
@@ -6977,23 +4445,6 @@ spark = 2
 image-number = 1913887483
 art-owned = true
 card-number = 48
-
-[[cards]]
-keep = false
-name = "Starfield Rover"
-id = "a42e3d7a-35a0-4dbc-a85d-c71b191d44a8"
-tide = "Ignite"
-tide-cost = 1
-rendered-text = "▸ Materialized: Draw a Warrior from your deck."
-energy-cost = 3
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 2606475977
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -7065,23 +4516,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Arboreal Omen"
-id = "84f1d31e-149f-4ab8-ac67-de35b0ad97a9"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Draw 3 cards."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Legendary"
-is-fast = true
-spark = ""
-image-number = 712713142
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Epiphany Unfolded"
 id = "84f1d31e-149f-4ab8-ac67-de35b0ad97a9"
 tide = "Neutral"
@@ -7096,23 +4530,6 @@ spark = ""
 image-number = 1021646686
 art-owned = false
 card-number = 87
-
-[[cards]]
-keep = false
-name = "Bright Arrival"
-id = "ded25ef2-3c3f-4012-8717-8dec3def1854"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Draw 3 cards."
-energy-cost = 5
-card-type = "Event"
-subtype = ""
-rarity = "Legendary"
-is-fast = false
-spark = ""
-image-number = 1504647500
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -7286,57 +4703,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Saltwater Prophet"
-id = "c9531521-b8ae-4ce0-8857-474e60aa814a"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Judgment: Foresee 1."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = true
-spark = 2
-image-number = 425039599
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Moonrider"
-id = "c9531521-b8ae-4ce0-8857-474e60aa814a"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Judgment: Foresee 1."
-energy-cost = 3
-card-type = "Character"
-subtype = "Child"
-rarity = "Common"
-is-fast = true
-spark = 2
-image-number = 700253824
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Pale Reception"
-id = "c9531521-b8ae-4ce0-8857-474e60aa814a"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Judgment: Foresee 1."
-energy-cost = 3
-card-type = "Character"
-subtype = "Child"
-rarity = "Common"
-is-fast = true
-spark = 2
-image-number = 793083754
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Synaptic Sentinel"
 id = "c9531521-b8ae-4ce0-8857-474e60aa814a"
 tide = "Neutral"
@@ -7351,23 +4717,6 @@ spark = 2
 image-number = 1246321000
 art-owned = true
 card-number = 9
-
-[[cards]]
-keep = false
-name = "Clifftop Gazer"
-id = "c9531521-b8ae-4ce0-8857-474e60aa814a"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Judgment: Foresee 1."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = true
-spark = 2
-image-number = 2256745743
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -7490,23 +4839,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Igneous Marauder"
-id = "cc474374-2538-4e5d-9b84-15ed70b0c774"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "▸ Judgment: Each player abandons a character."
-energy-cost = 1
-card-type = "Character"
-subtype = "Monster"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 515170243
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Nightmare Manifest"
 id = "cc474374-2538-4e5d-9b84-15ed70b0c774"
 tide = "Pact"
@@ -7609,23 +4941,6 @@ card-number = 67
 
 [[cards]]
 keep = false
-name = "Forced Retreat"
-id = "eb85b69a-3771-4148-83cf-a7ddb0caee98"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Prevent a played card."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 1361568698
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Guiding Light"
 id = "62bf2eb8-4afb-42b1-a8c5-5423eed96545"
 tide = "Surge"
@@ -7663,74 +4978,6 @@ card-number = 46
 
 [[cards]]
 keep = false
-name = "Lanternkeeper"
-id = "d8f9abc2-a864-47b9-96e6-2ced9f9ba208"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Materialized, Judgment: Gain 2●."
-energy-cost = 1
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Legendary"
-is-fast = false
-spark = 0
-image-number = 1328168243
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Infernoplate"
-id = "3baa112c-951f-4552-bc9e-0a3ee61543fa"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "Abandon an ally: This character gains +1 spark."
-energy-cost = 4
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 337161542
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Emberstride"
-id = "3baa112c-951f-4552-bc9e-0a3ee61543fa"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "Abandon an ally: This character gains +1 spark."
-energy-cost = 4
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 561497176
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Driftwood Cutthroat"
-id = "3baa112c-951f-4552-bc9e-0a3ee61543fa"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "Abandon an ally: This character gains +1 spark."
-energy-cost = 4
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 1104412877
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Forsworn Champion"
 id = "3baa112c-951f-4552-bc9e-0a3ee61543fa"
 tide = "Pact"
@@ -7745,23 +4992,6 @@ spark = 2
 image-number = 1794244543
 art-owned = true
 card-number = 56
-
-[[cards]]
-keep = false
-name = "Elegy Warrior"
-id = "3baa112c-951f-4552-bc9e-0a3ee61543fa"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "Abandon an ally: This character gains +1 spark."
-energy-cost = 4
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 2287054239
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -7816,40 +5046,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Blazefront Soldier"
-id = "7d1820ef-80c4-415e-bc36-7d361259225c"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may pay 1● to kindle 1 and banish a card from the opponent's void."
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = false
-spark = 0
-image-number = 1639942837
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Tundra Vigilant"
-id = "7d1820ef-80c4-415e-bc36-7d361259225c"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may pay 1● to kindle 1 and banish a card from the opponent's void."
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = false
-spark = 0
-image-number = 2218612343
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Spirit Field Reclaimer"
 id = "7d1820ef-80c4-415e-bc36-7d361259225c"
 tide = "Rime"
@@ -7864,23 +5060,6 @@ spark = 0
 image-number = 2287054239
 art-owned = true
 card-number = 52
-
-[[cards]]
-keep = false
-name = "Gloaming Stalker"
-id = "7d1820ef-80c4-415e-bc36-7d361259225c"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may pay 1● to kindle 1 and banish a card from the opponent's void."
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = false
-spark = 0
-image-number = 2299755785
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -7915,57 +5094,6 @@ spark = 2
 image-number = 2218612343
 art-owned = true
 card-number = 55
-
-[[cards]]
-keep = false
-name = "Nightwarden"
-id = "5ed4d321-07d9-4607-9897-3a645df8c012"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "The '▸ Judgment:' ability of allies triggers when you materialize them."
-energy-cost = 3
-card-type = "Character"
-subtype = "Spirit Animal"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 717263287
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Starwhale"
-id = "5ed4d321-07d9-4607-9897-3a645df8c012"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "The '▸ Judgment:' ability of allies triggers when you materialize them."
-energy-cost = 3
-card-type = "Character"
-subtype = "Spirit Animal"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 1786390151
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Dawnstrider"
-id = "5ed4d321-07d9-4607-9897-3a645df8c012"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "The '▸ Judgment:' ability of allies triggers when you materialize them."
-energy-cost = 3
-card-type = "Character"
-subtype = "Spirit Animal"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 2018848976
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -8037,74 +5165,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Nullguard"
-id = "4e3420f2-6f0d-4381-b2b1-afb16af7549f"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Materialized: Disable the activated abilities of an enemy while this character is in play."
-energy-cost = 3
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 653554603
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Dustland Enforcer"
-id = "4e3420f2-6f0d-4381-b2b1-afb16af7549f"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Materialized: Disable the activated abilities of an enemy while this character is in play."
-energy-cost = 3
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 691496704
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Hushing Duelist"
-id = "4e3420f2-6f0d-4381-b2b1-afb16af7549f"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Materialized: Disable the activated abilities of an enemy while this character is in play."
-energy-cost = 3
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 695511856
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Domainkeeper"
-id = "4e3420f2-6f0d-4381-b2b1-afb16af7549f"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Materialized: Disable the activated abilities of an enemy while this character is in play."
-energy-cost = 3
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 708313726
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Twilight Suppressor"
 id = "4e3420f2-6f0d-4381-b2b1-afb16af7549f"
 tide = "Rime"
@@ -8122,40 +5182,6 @@ card-number = 54
 
 [[cards]]
 keep = false
-name = "Scorched Crossing"
-id = "12a59f07-7ff4-4a3b-9e9f-4f9b524d26af"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Abandon a character, Discard your hand: Gain 5●."
-energy-cost = 0
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 443761825
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Total Combustion"
-id = "12a59f07-7ff4-4a3b-9e9f-4f9b524d26af"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Abandon a character, Discard your hand: Gain 5●."
-energy-cost = 0
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 644603209
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Pulse of Sacrifice"
 id = "12a59f07-7ff4-4a3b-9e9f-4f9b524d26af"
 tide = "Surge"
@@ -8170,23 +5196,6 @@ spark = ""
 image-number = 708313726
 art-owned = false
 card-number = 213
-
-[[cards]]
-keep = false
-name = "Ossuary's Price"
-id = "12a59f07-7ff4-4a3b-9e9f-4f9b524d26af"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Abandon a character, Discard your hand: Gain 5●."
-energy-cost = 0
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 753489181
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -8346,23 +5355,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "World-Gazer"
-id = "b1eb6004-c379-4b87-93be-3fe527b830b7"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Draw 2 cards."
-energy-cost = 6
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 1936124587
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Keeper of Forgotten Light"
 id = "b1eb6004-c379-4b87-93be-3fe527b830b7"
 tide = "Arc"
@@ -8377,23 +5369,6 @@ spark = 2
 image-number = 2155438705
 art-owned = false
 card-number = 152
-
-[[cards]]
-keep = false
-name = "Lightseeker"
-id = "b1eb6004-c379-4b87-93be-3fe527b830b7"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Draw 2 cards."
-energy-cost = 6
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 2221822103
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -8448,23 +5423,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Epoch's Edge"
-id = "129ec84c-6423-466f-ad75-c83b50bab09f"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "When you play an event, foresee 1."
-energy-cost = 2
-card-type = "Character"
-subtype = "Child"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 2033123264
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Murk Oarsman"
 id = "5fc8b425-5170-4281-bcef-230d82af20f9"
 tide = "Umbra"
@@ -8481,25 +5439,6 @@ spark = 1
 image-number = 2033123282
 art-owned = false
 card-number = 277
-
-[[cards]]
-keep = false
-name = "Crescent Navigator"
-id = "2df6ba84-9aec-451d-80e6-f14d743a6db6"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-When you play an event, gain 1●.
-"""
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 2027158310
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -8699,74 +5638,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Ghost Rocket"
-id = "35cc788c-b7f1-46ae-b398-7ad37a624247"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "An event in your void gains reclaim 0● this turn."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 556546660
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Dreamrise"
-id = "35cc788c-b7f1-46ae-b398-7ad37a624247"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "An event in your void gains reclaim 0● this turn."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 612667715
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Moonfall Ferry"
-id = "35cc788c-b7f1-46ae-b398-7ad37a624247"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "An event in your void gains reclaim 0● this turn."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 753489193
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Forgotten Passage"
-id = "35cc788c-b7f1-46ae-b398-7ad37a624247"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "An event in your void gains reclaim 0● this turn."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 1058321690
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Whisper of the Past"
 id = "35cc788c-b7f1-46ae-b398-7ad37a624247"
 tide = "Surge"
@@ -8798,23 +5669,6 @@ spark = ""
 image-number = 1058321690
 art-owned = false
 card-number = 119
-
-[[cards]]
-keep = false
-name = "Spellclash"
-id = "44701519-e4f1-431e-bb7d-5e76ae75fe35"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Prevent a played card. Put it on top of the opponent's deck."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 1200949264
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -9011,40 +5865,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Cloudborn"
-id = "d70473b6-ef2b-4fae-bc64-6043c7a7f2be"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "When you materialize an ally, gain 1●."
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 3
-image-number = 316023017
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Ironworks Pilot"
-id = "d70473b6-ef2b-4fae-bc64-6043c7a7f2be"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "When you materialize an ally, gain 1●."
-energy-cost = 4
-card-type = "Character"
-subtype = "Tinkerer"
-rarity = "Uncommon"
-is-fast = false
-spark = 3
-image-number = 511427890
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Angel of the Eclipse"
 id = "d70473b6-ef2b-4fae-bc64-6043c7a7f2be"
 tide = "Arc"
@@ -9059,74 +5879,6 @@ spark = 3
 image-number = 753489184
 art-owned = false
 card-number = 203
-
-[[cards]]
-keep = false
-name = "Blazing Catalyst"
-id = "d70473b6-ef2b-4fae-bc64-6043c7a7f2be"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "When you materialize an ally, gain 1●."
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 3
-image-number = 2189428529
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Silent Dispersal"
-id = "540cd70f-4fc8-417b-ac0d-3b337bfe8f01"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "Put the top 3 cards of your deck into your void. Draw a card."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 447372592
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Nightmill"
-id = "540cd70f-4fc8-417b-ac0d-3b337bfe8f01"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "Put the top 3 cards of your deck into your void. Draw a card."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 626542568
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Circuit Delve"
-id = "540cd70f-4fc8-417b-ac0d-3b337bfe8f01"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "Put the top 3 cards of your deck into your void. Draw a card."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 640098112
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -9198,23 +5950,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Mountain's Bounty"
-id = "a23df796-03d2-4082-9c30-fe6958e65ffe"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Gain 3●."
-energy-cost = 0
-card-type = "Event"
-subtype = "Survivor"
-rarity = "Legendary"
-is-fast = false
-spark = ""
-image-number = 1963305271
-art-owned = false
-card-number = 13
-
-[[cards]]
-keep = false
 name = "Hilltop Refuge"
 id = "ec5a996e-6d43-48ca-adba-01fee6a64d4d"
 tide = "Bloom"
@@ -9283,40 +6018,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Pyreguard"
-id = "fb285715-af52-4358-94de-b40256916f9b"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "When the opponent plays an event which could dissolve an ally, prevent that card."
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 700253818
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Glade Warden"
-id = "fb285715-af52-4358-94de-b40256916f9b"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "When the opponent plays an event which could dissolve an ally, prevent that card."
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1739438663
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Voidshield Guardian"
 id = "fb285715-af52-4358-94de-b40256916f9b"
 tide = "Bloom"
@@ -9331,23 +6032,6 @@ spark = 1
 image-number = 2186149279
 art-owned = true
 card-number = 33
-
-[[cards]]
-keep = false
-name = "Grove Warden"
-id = "fb285715-af52-4358-94de-b40256916f9b"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "When the opponent plays an event which could dissolve an ally, prevent that card."
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 2415692455
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -9453,25 +6137,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Rebuilt Frame"
-id = "46634b47-e83c-4eda-a0ff-7f1ba4e1ce89"
-tide = "Rime"
-tide-cost = 1
-rendered-text = """
-When you discard this character, materialize it.
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Synth"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 1740270995
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Ridge Vortex Explorer"
 id = "46634b47-e83c-4eda-a0ff-7f1ba4e1ce89"
 tide = "Rime"
@@ -9488,23 +6153,6 @@ spark = 2
 image-number = 2364396771
 art-owned = true
 card-number = 6
-
-[[cards]]
-keep = false
-name = "Mosswork Chronicler"
-id = "9979e005-3a9e-4c98-ae7b-d8a25307c959"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "When you play a Survivor, put the top 2 cards of your deck into your void."
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 1913887480
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -9613,74 +6261,6 @@ card-number = 161
 
 [[cards]]
 keep = false
-name = "Gatekeepers"
-id = "716aa6ec-ddac-488c-aafe-e9a997335c58"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Prevent a played character."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 2590831711
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Immolate"
-id = "36c2a4e1-3212-4933-979a-73f109f9b256"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 626543207
-art-owned = true
-card-number = 24
-
-[[cards]]
-keep = false
-name = "Stonefall"
-id = "36c2a4e1-3212-4933-979a-73f109f9b256"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 1239919309
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Wreck Haunter"
-id = "10ad7a9e-401d-494e-b4f3-5580b8d850d0"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "When you materialize a Survivor, reclaim this character."
-energy-cost = 3
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 640098127
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Veil of the Wastes"
 id = "10ad7a9e-401d-494e-b4f3-5580b8d850d0"
 tide = "Umbra"
@@ -9695,40 +6275,6 @@ spark = 1
 image-number = 789291004
 art-owned = false
 card-number = 191
-
-[[cards]]
-keep = false
-name = "Vigil Keeper"
-id = "10ad7a9e-401d-494e-b4f3-5580b8d850d0"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "When you materialize a Survivor, reclaim this character."
-energy-cost = 3
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1077958364
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Junkyard Empress"
-id = "10ad7a9e-401d-494e-b4f3-5580b8d850d0"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "When you materialize a Survivor, reclaim this character."
-energy-cost = 3
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1114007978
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -9783,57 +6329,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Ironclad Outcast"
-id = "b5d3ce4f-2587-47a6-b8c2-d73204d4c05a"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may pay 1● to return this character from your void to your hand."
-energy-cost = 3
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 631097750
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Smoke Sentry"
-id = "b5d3ce4f-2587-47a6-b8c2-d73204d4c05a"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may pay 1● to return this character from your void to your hand."
-energy-cost = 3
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 662452576
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Holdout at the Edge"
-id = "b5d3ce4f-2587-47a6-b8c2-d73204d4c05a"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may pay 1● to return this character from your void to your hand."
-energy-cost = 3
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 721324501
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Wreckheap Survivor"
 id = "b5d3ce4f-2587-47a6-b8c2-d73204d4c05a"
 tide = "Umbra"
@@ -9851,40 +6346,6 @@ card-number = 184
 
 [[cards]]
 keep = false
-name = "Starward Pilgrim"
-id = "a916abc5-97ad-49dc-8d61-5f68f739d44b"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "At the end of your turn, gain 2●."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 439817398
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Neon Pilgrim"
-id = "a916abc5-97ad-49dc-8d61-5f68f739d44b"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "At the end of your turn, gain 2●."
-energy-cost = 2
-card-type = "Character"
-subtype = "Tinkerer"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 703988164
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Virtuoso of Harmony"
 id = "a916abc5-97ad-49dc-8d61-5f68f739d44b"
 tide = "Arc"
@@ -9899,23 +6360,6 @@ spark = 2
 image-number = 744309595
 art-owned = false
 card-number = 80
-
-[[cards]]
-keep = false
-name = "Conduit Salvager"
-id = "a916abc5-97ad-49dc-8d61-5f68f739d44b"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "At the end of your turn, gain 2●."
-energy-cost = 2
-card-type = "Character"
-subtype = "Synth"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 1786390145
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -9987,109 +6431,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Undying Duel"
-id = "810764f4-fda3-414a-9364-9ce3f2092710"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-Dissolve an enemy with cost 3● or more.
-
-Reclaim 1●
-"""
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 439817032
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Rocket Salute"
-id = "810764f4-fda3-414a-9364-9ce3f2092710"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-Dissolve an enemy with cost 3● or more.
-
-Reclaim 1●
-"""
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 703988038
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Midnight Purge"
-id = "810764f4-fda3-414a-9364-9ce3f2092710"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-Dissolve an enemy with cost 3● or more.
-
-Reclaim 1●
-"""
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 735242563
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Apex Quarry"
-id = "810764f4-fda3-414a-9364-9ce3f2092710"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-Dissolve an enemy with cost 3● or more.
-
-Reclaim 1●
-"""
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 2218612339
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Overgrown Archive"
-id = "f35d60ff-da13-4abb-87ab-5fd27874e9bf"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Discover a character with an activated ability.
-"""
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 360302378
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Rite of Summoning"
 id = "f35d60ff-da13-4abb-87ab-5fd27874e9bf"
 tide = "Neutral"
@@ -10106,82 +6447,6 @@ spark = ""
 image-number = 439817032
 art-owned = false
 card-number = 210
-
-[[cards]]
-keep = false
-name = "Resonant Beacon"
-id = "f35d60ff-da13-4abb-87ab-5fd27874e9bf"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Discover a character with an activated ability.
-"""
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1084619579
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Wrought Vision"
-id = "f35d60ff-da13-4abb-87ab-5fd27874e9bf"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Discover a character with an activated ability.
-"""
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 2197688365
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Recommission"
-id = "c27871a8-5256-4505-bdd1-8f5c8c222153"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Gain 2●. Draw a card.
-"""
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 393588451
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Lattice Hymn"
-id = "c27871a8-5256-4505-bdd1-8f5c8c222153"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Gain 2●. Draw a card.
-"""
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 686903233
-art-owned = false
-card-number = 106
 
 [[cards]]
 keep = false
@@ -10323,86 +6588,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Solitary Gleam"
-id = "dfcf69cb-c569-484a-8a98-b673a5c47899"
-tide = "Rime"
-tide-cost = 2
-rendered-text = "Once per turn, when you discard a card, gain 1 energy, then kindle 2."
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 3
-image-number = 691496965
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Universal Prototype"
-id = "bd99da06-6591-4458-a4f6-d372a2def6bb"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Has all character types.
-
-▸ Judgment: With 3 allies that share a character type, draw a card.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Synth"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 454095514
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Catalyst Node"
-id = "bd99da06-6591-4458-a4f6-d372a2def6bb"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Has all character types.
-
-▸ Judgment: With 3 allies that share a character type, draw a card.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Synth"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 708313999
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Roaming Scholar"
-id = "bd99da06-6591-4458-a4f6-d372a2def6bb"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Has all character types.
-
-▸ Judgment: With 3 allies that share a character type, draw a card.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 1213574257
-art-owned = false
-card-number = 75
-
-[[cards]]
-keep = false
 name = "Skywatcher"
 id = "262a8632-a40e-4dda-bf3e-aaebbe96b190"
 tide = "Bloom"
@@ -10470,23 +6655,6 @@ spark = ""
 image-number = 758082493
 art-owned = false
 card-number = 100
-
-[[cards]]
-keep = false
-name = "Turning the Gears"
-id = "5de09339-b7de-45bd-abc0-1ab3a09e859d"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Until end of turn, when an ally leaves play, gain 2●."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 758082493
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -10575,103 +6743,6 @@ card-number = 197
 
 [[cards]]
 keep = false
-name = "Cinderwatch"
-id = "36ca76ae-0202-495f-bf99-d0ce98da6352"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Dissolved: Kindle 2.
-
-When an allied Survivor is ▸ Dissolved:, kindle 2.
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 485518159
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Torchbearer"
-id = "36ca76ae-0202-495f-bf99-d0ce98da6352"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Dissolved: Kindle 2.
-
-When an allied Survivor is ▸ Dissolved:, kindle 2.
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 1387670426
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Pyre Walker"
-id = "36ca76ae-0202-495f-bf99-d0ce98da6352"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Dissolved: Kindle 2.
-
-When an allied Survivor is ▸ Dissolved:, kindle 2.
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 1626794383
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Dark Murmuration"
-id = "6897e6d5-2ab6-4faa-a221-dfa5ffe0a0a7"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "Dissolve an enemy with cost less than the number of cards in your void."
-energy-cost = 0
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 424818601
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Into the Gloam"
-id = "6897e6d5-2ab6-4faa-a221-dfa5ffe0a0a7"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "Dissolve an enemy with cost less than the number of cards in your void."
-energy-cost = 0
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 758082496
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Weight of Memory"
 id = "6897e6d5-2ab6-4faa-a221-dfa5ffe0a0a7"
 tide = "Umbra"
@@ -10689,23 +6760,6 @@ card-number = 112
 
 [[cards]]
 keep = false
-name = "Burden of Ghosts"
-id = "6897e6d5-2ab6-4faa-a221-dfa5ffe0a0a7"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "Dissolve an enemy with cost less than the number of cards in your void."
-energy-cost = 0
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2281682695
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Shattering Gambit"
 id = "754a3d7d-24e8-40e0-9ed8-f99672bc76eb"
 tide = "Neutral"
@@ -10720,57 +6774,6 @@ spark = ""
 image-number = 1463121788
 art-owned = true
 card-number = 66
-
-[[cards]]
-keep = false
-name = "Grim Bargain"
-id = "754a3d7d-24e8-40e0-9ed8-f99672bc76eb"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy. The opponent gains 3✪."
-energy-cost = 0
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = true
-spark = ""
-image-number = 1968259699
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Purge Directive"
-id = "754a3d7d-24e8-40e0-9ed8-f99672bc76eb"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy. The opponent gains 3✪."
-energy-cost = 0
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = true
-spark = ""
-image-number = 2018053223
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Fatal Exchange"
-id = "754a3d7d-24e8-40e0-9ed8-f99672bc76eb"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy. The opponent gains 3✪."
-energy-cost = 0
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = true
-spark = ""
-image-number = 2281682693
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -10896,57 +6899,6 @@ card-number = 39
 
 [[cards]]
 keep = false
-name = "Eldritch Expulsion"
-id = "e0c88a46-b85f-4497-ab19-850acc868863"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Banish a non-Warrior enemy."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2131591275
-art-owned = true
-card-number = 39
-
-[[cards]]
-keep = false
-name = "Blood-Oath Swordsman"
-id = "1b69b697-4829-4e25-8d53-7462572cbb55"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "2●, Abandon a character, Discard your hand: Draw 3 cards."
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 436090582
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Plunge Berserker"
-id = "1b69b697-4829-4e25-8d53-7462572cbb55"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "2●, Abandon a character, Discard your hand: Draw 3 cards."
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1239919306
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Rebirth Ritualist"
 id = "1b69b697-4829-4e25-8d53-7462572cbb55"
 tide = "Pact"
@@ -10961,23 +6913,6 @@ spark = 1
 image-number = 2131591275
 art-owned = true
 card-number = 49
-
-[[cards]]
-keep = false
-name = "Ashbound Witch"
-id = "1b69b697-4829-4e25-8d53-7462572cbb55"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "2●, Abandon a character, Discard your hand: Draw 3 cards."
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 2290648803
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -11071,69 +7006,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Wirebound Operator"
-id = "8fad0360-df91-4c08-8e48-298a07a4c3f3"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Events cost you 2● more.
-
-When you play an event from your hand, copy it.
-"""
-energy-cost = 4
-card-type = "Character"
-subtype = "Tinkerer"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 339410630
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Dread Ritualist"
-id = "8fad0360-df91-4c08-8e48-298a07a4c3f3"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Events cost you 2● more.
-
-When you play an event from your hand, copy it.
-"""
-energy-cost = 4
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 2278837663
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Twice-Spoken"
-id = "8fad0360-df91-4c08-8e48-298a07a4c3f3"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Events cost you 2● more.
-
-When you play an event from your hand, copy it.
-"""
-energy-cost = 4
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 2424248083
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Speaker for the Forgotten"
 id = "59f14f33-3aff-45d2-9492-fb06c0ef7fea"
 tide = "Ignite"
@@ -11168,23 +7040,6 @@ card-number = 173
 
 [[cards]]
 keep = false
-name = "Packmother"
-id = "c08ffd90-ef79-48f7-9aa2-22875acbeba4"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "▸ Materialized, Judgment: With 2 allied Survivors, draw a card. "
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 2430444885
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Horizon Follower"
 id = "d124e9cc-407f-4288-9a09-78e426c00761"
 tide = "Neutral"
@@ -11204,40 +7059,6 @@ card-number = 73
 
 [[cards]]
 keep = false
-name = "Voidweaver"
-id = "86e7ff73-90bf-4e3d-9069-d6533f4407b8"
-tide = "Umbra"
-tide-cost = 2
-rendered-text = "This character's spark is equal to the number of cards in your void."
-energy-cost = 5
-card-type = "Character"
-subtype = "Outsider"
-rarity = "Uncommon"
-is-fast = false
-spark = "*"
-image-number = 306660617
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Sleeping Giant"
-id = "86e7ff73-90bf-4e3d-9069-d6533f4407b8"
-tide = "Umbra"
-tide-cost = 2
-rendered-text = "This character's spark is equal to the number of cards in your void."
-energy-cost = 5
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Uncommon"
-is-fast = false
-spark = "*"
-image-number = 1480584620
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Abomination of Memory"
 id = "86e7ff73-90bf-4e3d-9069-d6533f4407b8"
 tide = "Umbra"
@@ -11252,76 +7073,6 @@ spark = "*"
 image-number = 1577968036
 art-owned = true
 card-number = 29
-
-[[cards]]
-keep = false
-name = "Greywood Sojourner"
-id = "86e7ff73-90bf-4e3d-9069-d6533f4407b8"
-tide = "Umbra"
-tide-cost = 2
-rendered-text = "This character's spark is equal to the number of cards in your void."
-energy-cost = 5
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = "*"
-image-number = 2275146333
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Monstrous Eclipse"
-id = "d122f4a5-c8a9-49bf-9c8a-a16b8d9567a6"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve all characters."
-energy-cost = 6
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1577968036
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Cataclysm"
-id = "d122f4a5-c8a9-49bf-9c8a-a16b8d9567a6"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve all characters."
-energy-cost = 6
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 2419795153
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Meadow Minstrel"
-id = "129ec84c-6423-466f-ad75-c83b50bab09f"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-When you play an event, foresee 1.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Musician"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 1794244540
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -11344,61 +7095,6 @@ card-number = 118
 
 [[cards]]
 keep = false
-name = "Little Cosmographer"
-id = "129ec84c-6423-466f-ad75-c83b50bab09f"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-When you play an event, foresee 1.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Child"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 2022594419
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Abyssal Cartographer"
-id = "129ec84c-6423-466f-ad75-c83b50bab09f"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-When you play an event, foresee 1.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 2023111778
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Seam Crosser"
-id = "3d9f38a4-6ae8-4e90-bc75-84d711b5fef9"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: You may banish an ally, then materialize it."
-energy-cost = 5
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = true
-spark = 1
-image-number = 410444923
-art-owned = false
-card-number = 147
-
-[[cards]]
-keep = false
 name = "Starlight Guide"
 id = "3d9f38a4-6ae8-4e90-bc75-84d711b5fef9"
 tide = "Arc"
@@ -11413,57 +7109,6 @@ spark = 1
 image-number = 2022594419
 art-owned = false
 card-number = 147
-
-[[cards]]
-keep = false
-name = "Cloudborne Visionary"
-id = "7285732f-7460-4544-8c74-9300a078a337"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "3●: Draw a card."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 485518039
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Wandering Astronomer"
-id = "7285732f-7460-4544-8c74-9300a078a337"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "3●: Draw a card."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 571228786
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Phantasmal Vendor"
-id = "7285732f-7460-4544-8c74-9300a078a337"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "3●: Draw a card."
-energy-cost = 2
-card-type = "Character"
-subtype = "Musician"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 614473202
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -11739,132 +7384,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Midnight Cast"
-id = "62bf2eb8-4afb-42b1-a8c5-5423eed96545"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Foresee 1. Draw a card.
-
-Reclaim 3●
-"""
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 318372281
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Into the Drift"
-id = "62bf2eb8-4afb-42b1-a8c5-5423eed96545"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Foresee 1. Draw a card.
-
-Reclaim 3●
-"""
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 450441286
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Lanternward"
-id = "62bf2eb8-4afb-42b1-a8c5-5423eed96545"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Foresee 1. Draw a card.
-
-Reclaim 3●
-"""
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 499788430
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Dustline"
-id = "62bf2eb8-4afb-42b1-a8c5-5423eed96545"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Foresee 1. Draw a card.
-
-Reclaim 3●
-"""
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 678431947
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "First Light"
-id = "62bf2eb8-4afb-42b1-a8c5-5423eed96545"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Foresee 1. Draw a card.
-
-Reclaim 3●
-"""
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 1302572584
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Distant Horizons"
-id = "62bf2eb8-4afb-42b1-a8c5-5423eed96545"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Foresee 1. Draw a card.
-
-Reclaim 3●
-"""
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 2182865337
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Vanguard of Dawn"
 id = "987aaa03-962d-4549-8149-8dbeccfc9911"
 tide = "Bloom"
@@ -11923,23 +7442,6 @@ rarity = "Rare"
 is-fast = false
 spark = 2
 image-number = 2295991867
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Night's Lantern"
-id = "c27871a8-5256-4505-bdd1-8f5c8c222153"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Gain 2●. Draw a card."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 596070044
 art-owned = false
 card-number = 0
 
@@ -12013,57 +7515,6 @@ card-number = 215
 
 [[cards]]
 keep = false
-name = "Depths Unveiled"
-id = "a6e8e100-9aa6-4a53-82ec-4ab161829533"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Pay 1 or more ●: Draw a card for each ● spent."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 581686504
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Beacon of Ages"
-id = "a6e8e100-9aa6-4a53-82ec-4ab161829533"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Pay 1 or more ●: Draw a card for each ● spent."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 618071684
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Distant Landfall"
-id = "a6e8e100-9aa6-4a53-82ec-4ab161829533"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Pay 1 or more ●: Draw a card for each ● spent."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 1225878700
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Light of Emergence"
 id = "3f98591f-5ede-4add-9df6-536e39780ec3"
 tide = "Arc"
@@ -12078,57 +7529,6 @@ spark = ""
 image-number = 618071684
 art-owned = false
 card-number = 160
-
-[[cards]]
-keep = false
-name = "Dreamrise"
-id = "3f98591f-5ede-4add-9df6-536e39780ec3"
-tide = "Arc"
-tide-cost = 2
-rendered-text = "Materialize two random characters with cost 3● or less from your deck."
-energy-cost = 5
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1068256454
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "First Footfall"
-id = "3f98591f-5ede-4add-9df6-536e39780ec3"
-tide = "Arc"
-tide-cost = 2
-rendered-text = "Materialize two random characters with cost 3● or less from your deck."
-energy-cost = 5
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1543022375
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Convergence Gate"
-id = "3f98591f-5ede-4add-9df6-536e39780ec3"
-tide = "Arc"
-tide-cost = 2
-rendered-text = "Materialize two random characters with cost 3● or less from your deck."
-energy-cost = 5
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 2603708601
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -12348,23 +7748,6 @@ card-number = 78
 
 [[cards]]
 keep = false
-name = "Aerial Reckoner"
-id = "bca1b98b-729b-480b-8375-04db7b1be6f1"
-tide = "Arc"
-tide-cost = 2
-rendered-text = "When you play a ↯fast card, gain 1✪."
-energy-cost = 4
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = true
-spark = 2
-image-number = 2186149277
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Infernal Ascendant"
 id = "e89e3b97-984b-40a2-a74b-3c0489511eba"
 tide = "Pact"
@@ -12537,57 +7920,6 @@ card-number = 188
 
 [[cards]]
 keep = false
-name = "Derelict Salvager"
-id = "0ad4ca5c-f723-4494-8dec-1e058c37a099"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "▸ Materialized: A card with cost 3● or less in your void gains reclaim 0●."
-energy-cost = 4
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 1077959225
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Blight Analyst"
-id = "0ad4ca5c-f723-4494-8dec-1e058c37a099"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "▸ Materialized: A card with cost 3● or less in your void gains reclaim 0●."
-energy-cost = 4
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 1902130345
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Depths Scavenger"
-id = "0ad4ca5c-f723-4494-8dec-1e058c37a099"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "▸ Materialized: A card with cost 3● or less in your void gains reclaim 0●."
-energy-cost = 4
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2018848979
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Reclaimer of Lost Paths"
 id = "0ad4ca5c-f723-4494-8dec-1e058c37a099"
 tide = "Umbra"
@@ -12621,25 +7953,6 @@ spark = 2
 image-number = 1289324164
 art-owned = true
 card-number = 50
-
-[[cards]]
-keep = false
-name = "Rift's Last Guard"
-id = "91a32fb4-5bb2-4f8d-b24a-22a8963b3302"
-tide = "Rime"
-tide-cost = 1
-rendered-text = """
-Disable the ▸ Materialized: abilities of enemies.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 2287436067
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -12774,40 +8087,6 @@ card-number = 26
 
 [[cards]]
 keep = false
-name = "Frontier Hermit"
-id = "dfcf69cb-c569-484a-8a98-b673a5c47899"
-tide = "Rime"
-tide-cost = 2
-rendered-text = "Once per turn, when you discard a card, gain 1●, then kindle 2."
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 3
-image-number = 768349741
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Stonecaller"
-id = "dfcf69cb-c569-484a-8a98-b673a5c47899"
-tide = "Rime"
-tide-cost = 2
-rendered-text = "Once per turn, when you discard a card, gain 1●, then kindle 2."
-energy-cost = 4
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = false
-spark = 3
-image-number = 1963305277
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Castellan Synth"
 id = "194e61db-a950-42e4-b94d-67b83756103c"
 tide = "Arc"
@@ -12924,25 +8203,6 @@ rarity = "Uncommon"
 is-fast = false
 spark = 1
 image-number = 1543022372
-art-owned = false
-card-number = 135
-
-[[cards]]
-keep = false
-name = "Sacred Hart"
-id = "ec80cc3c-a23d-465e-a2cf-4eed6fb89e1d"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = """
-When you play a Spirit Animal, draw a card.
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Spirit Animal"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2261959339
 art-owned = false
 card-number = 135
 
@@ -13203,40 +8463,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Scaffold Vagrant"
-id = "977ce2e4-ef8c-48e7-a27b-83a7348fa94f"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "▸ Materialized: An event in your void gains reclaim equal to its cost this turn."
-energy-cost = 3
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = true
-spark = 1
-image-number = 565499326
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Hazewalker"
-id = "977ce2e4-ef8c-48e7-a27b-83a7348fa94f"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "▸ Materialized: An event in your void gains reclaim equal to its cost this turn."
-energy-cost = 3
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = true
-spark = 1
-image-number = 603547829
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Ashlight Caller"
 id = "977ce2e4-ef8c-48e7-a27b-83a7348fa94f"
 tide = "Umbra"
@@ -13251,80 +8477,6 @@ spark = 1
 image-number = 1044240499
 art-owned = false
 card-number = 85
-
-[[cards]]
-keep = false
-name = "Relic Hunter"
-id = "977ce2e4-ef8c-48e7-a27b-83a7348fa94f"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "▸ Materialized: An event in your void gains reclaim equal to its cost this turn."
-energy-cost = 3
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = true
-spark = 1
-image-number = 1282908319
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Still Observer"
-id = "a04cb59f-1ce6-48e7-9a2d-5e3b09613e6a"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Judgment: Return this character from your void to your hand.
-"""
-energy-cost = 4
-card-type = "Character"
-subtype = "Tinkerer"
-rarity = "Rare"
-is-fast = false
-spark = 0
-image-number = 386654044
-art-owned = true
-card-number = 3
-
-[[cards]]
-keep = false
-name = "Smoldering Dead"
-id = "a04cb59f-1ce6-48e7-9a2d-5e3b09613e6a"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Judgment: Return this character from your void to your hand.
-"""
-energy-cost = 4
-card-type = "Character"
-subtype = "Monster"
-rarity = "Rare"
-is-fast = false
-spark = 0
-image-number = 524175040
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Tireless Husk"
-id = "a04cb59f-1ce6-48e7-9a2d-5e3b09613e6a"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Judgment: Return this character from your void to your hand.
-"""
-energy-cost = 4
-card-type = "Character"
-subtype = "Synth"
-rarity = "Rare"
-is-fast = false
-spark = 0
-image-number = 789290995
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -13500,61 +8652,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Stolen Moment"
-id = "d02cc851-4c89-463a-b988-a94dfefef797"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Lose 1 maximum ●: Play this event for 0●.
-
-Prevent a played card.
-"""
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 662452591
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Corrupted Agent"
-id = "2246466d-341e-4fe2-a804-5bc4ed3541e2"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Materialized: Each player discards a card."
-energy-cost = 1
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = true
-spark = 1
-image-number = 658076065
-art-owned = false
-card-number = 179
-
-[[cards]]
-keep = false
-name = "Contagion Bearer"
-id = "2246466d-341e-4fe2-a804-5bc4ed3541e2"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Materialized: Each player discards a card."
-energy-cost = 1
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = true
-spark = 1
-image-number = 666342580
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Wasteland Arbitrator"
 id = "2246466d-341e-4fe2-a804-5bc4ed3541e2"
 tide = "Rime"
@@ -13572,40 +8669,6 @@ card-number = 179
 
 [[cards]]
 keep = false
-name = "Corsair of Ash"
-id = "b8bc35ae-4a4a-402e-a570-707bedceb5ce"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "Abandon an ally: You may dissolve an enemy with spark less than that ally's spark."
-energy-cost = 3
-card-type = "Character"
-subtype = "Renegade"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 670293463
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Scarlet Arbiter"
-id = "b8bc35ae-4a4a-402e-a570-707bedceb5ce"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "Abandon an ally: You may dissolve an enemy with spark less than that ally's spark."
-energy-cost = 3
-card-type = "Character"
-subtype = "Outsider"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 703988167
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Shardwoven Tyrant"
 id = "b8bc35ae-4a4a-402e-a570-707bedceb5ce"
 tide = "Pact"
@@ -13620,23 +8683,6 @@ spark = 1
 image-number = 1180104511
 art-owned = false
 card-number = 200
-
-[[cards]]
-keep = false
-name = "Ash Vanguard"
-id = "b8bc35ae-4a4a-402e-a570-707bedceb5ce"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "Abandon an ally: You may dissolve an enemy with spark less than that ally's spark."
-energy-cost = 3
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1727859043
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -13725,57 +8771,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Cold Decree"
-id = "89d54c43-ffd6-4e0f-94ec-9e08f59e8891"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Discard a chosen character from the opponent's hand."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 318372506
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Bleating Dark"
-id = "89d54c43-ffd6-4e0f-94ec-9e08f59e8891"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Discard a chosen character from the opponent's hand."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 691496713
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Uninvited Hands"
-id = "89d54c43-ffd6-4e0f-94ec-9e08f59e8891"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Discard a chosen character from the opponent's hand."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2018848970
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Lurking Dread"
 id = "89d54c43-ffd6-4e0f-94ec-9e08f59e8891"
 tide = "Rime"
@@ -13790,44 +8785,6 @@ spark = ""
 image-number = 2030910791
 art-owned = true
 card-number = 64
-
-[[cards]]
-keep = false
-name = "Fume Stalker"
-id = "560ad530-9ad9-452c-b80e-902d9a76af0c"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Materialized, Dissolved: Put the top 4 cards of your deck into your void.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 608686829
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Deluge Outcast"
-id = "560ad530-9ad9-452c-b80e-902d9a76af0c"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Materialized, Dissolved: Put the top 4 cards of your deck into your void.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 735242548
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -13847,25 +8804,6 @@ spark = 1
 image-number = 1971751580
 art-owned = false
 card-number = 190
-
-[[cards]]
-keep = false
-name = "Duskwatcher"
-id = "560ad530-9ad9-452c-b80e-902d9a76af0c"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Materialized, Dissolved: Put the top 4 cards of your deck into your void.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 2182865339
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -13932,23 +8870,6 @@ rarity = "Rare"
 is-fast = false
 spark = 0
 image-number = 2438838889
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Cinder-Sworn"
-id = "d41a0c56-ca67-4626-90b6-c7fadeadfc4a"
-tide = "Umbra"
-tide-cost = 2
-rendered-text = "With an allied Survivor, you may play this card from your hand or void for 1●."
-energy-cost = 5
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 1498497893
 art-owned = false
 card-number = 0
 
@@ -14273,57 +9194,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Hidden Dossier"
-id = "129bd326-ec4d-4da6-aff6-f1c2b78f10e4"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Discard a chosen card with cost 3● or less from the opponent's hand."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 283208783
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Winter's Ransom"
-id = "129bd326-ec4d-4da6-aff6-f1c2b78f10e4"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Discard a chosen card with cost 3● or less from the opponent's hand."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 576358636
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Buried Secrets"
-id = "129bd326-ec4d-4da6-aff6-f1c2b78f10e4"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Discard a chosen card with cost 3● or less from the opponent's hand."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2018053211
-art-owned = true
-card-number = 63
-
-[[cards]]
-keep = false
 name = "Break the Veil"
 id = "129bd326-ec4d-4da6-aff6-f1c2b78f10e4"
 tide = "Rime"
@@ -14409,57 +9279,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Lamplit Trove"
-id = "6d7969d2-9d18-4a38-8c26-c900aca5f1d4"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Discover a card with cost 2●."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 253521013
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Forecast Array"
-id = "6d7969d2-9d18-4a38-8c26-c900aca5f1d4"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Discover a card with cost 2●."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 260711438
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Orb of Knowing"
-id = "6d7969d2-9d18-4a38-8c26-c900aca5f1d4"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Discover a card with cost 2●."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 1295291188
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Beacon of Tomorrow"
 id = "6d7969d2-9d18-4a38-8c26-c900aca5f1d4"
 tide = "Neutral"
@@ -14474,74 +9293,6 @@ spark = ""
 image-number = 1633431262
 art-owned = true
 card-number = 2
-
-[[cards]]
-keep = false
-name = "Verdant Obelisk"
-id = "6d7969d2-9d18-4a38-8c26-c900aca5f1d4"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Discover a card with cost 2●."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2645678685
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Beckoning Arch"
-id = "66ae76ab-13ba-473c-891d-9d53403c300e"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Discover a character with a ▸ Materialized: ability."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1164289066
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Beckoning Spires"
-id = "66ae76ab-13ba-473c-891d-9d53403c300e"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Discover a character with a ▸ Materialized: ability."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1219782718
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Stellar Summons"
-id = "66ae76ab-13ba-473c-891d-9d53403c300e"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Discover a character with a ▸ Materialized: ability."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1633431262
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -14562,42 +9313,6 @@ card-number = 156
 
 [[cards]]
 keep = false
-name = "Cavern's Revelation"
-id = "66ae76ab-13ba-473c-891d-9d53403c300e"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Discover a character with a ▸ Materialized: ability."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 2606475971
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Coinfall"
-id = "7b22f49a-04a3-4ed9-9834-841883c2b14d"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Gain 4●.
-"""
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 571228801
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Arc Gate Opening"
 id = "7b22f49a-04a3-4ed9-9834-841883c2b14d"
 tide = "Surge"
@@ -14614,23 +9329,6 @@ spark = ""
 image-number = 1164289066
 art-owned = false
 card-number = 110
-
-[[cards]]
-keep = false
-name = "Lightborne"
-id = "baae7f70-226f-48af-94c8-b8b211fd5087"
-tide = "Ignite"
-tide-cost = 1
-rendered-text = "When you materialize a character, this character gains +1 spark."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 596069606
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -14697,91 +9395,6 @@ rarity = "Uncommon"
 is-fast = false
 spark = 1
 image-number = 2278837659
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Forest Wayfinder"
-id = "03f73699-bf4d-4f36-a811-0e1f847b55f7"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Materialized: Foresee 2."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = true
-spark = 2
-image-number = 302396894
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Lattice Guide"
-id = "03f73699-bf4d-4f36-a811-0e1f847b55f7"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Materialized: Foresee 2."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = true
-spark = 2
-image-number = 649133680
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Enchanted Pathfinder"
-id = "03f73699-bf4d-4f36-a811-0e1f847b55f7"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Materialized: Foresee 2."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = true
-spark = 2
-image-number = 662452597
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Fenwalker"
-id = "03f73699-bf4d-4f36-a811-0e1f847b55f7"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Materialized: Foresee 2."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = true
-spark = 2
-image-number = 1239919303
-art-owned = true
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Horizon Walker"
-id = "03f73699-bf4d-4f36-a811-0e1f847b55f7"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Materialized: Foresee 2."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = true
-spark = 2
-image-number = 2018053208
 art-owned = false
 card-number = 0
 
@@ -14872,23 +9485,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Ghost Armada"
-id = "39bbbc92-34d0-4699-8ac6-99805a1248fb"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "Abandon any number of allies: Draw a card for each ally abandoned."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 1026869638
-art-owned = true
-card-number = 209
-
-[[cards]]
-keep = false
 name = "Desperation"
 id = "39bbbc92-34d0-4699-8ac6-99805a1248fb"
 tide = "Pact"
@@ -14903,25 +9499,6 @@ spark = ""
 image-number = 1470059006
 art-owned = false
 card-number = 209
-
-[[cards]]
-keep = false
-name = "Duskwing"
-id = "e3beadd0-4248-4835-a1c5-d41f85737d4d"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-▸ Materialized: Banish an enemy until this character leaves play.
-"""
-energy-cost = 5
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 768349750
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -14944,23 +9521,6 @@ card-number = 153
 
 [[cards]]
 keep = false
-name = "Voidweb Abomination"
-id = "e3beadd0-4248-4835-a1c5-d41f85737d4d"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Banish an enemy until this character leaves play."
-energy-cost = 5
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 1557999812
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Between-World Operative"
 id = "e3beadd0-4248-4835-a1c5-d41f85737d4d"
 tide = "Arc"
@@ -14973,23 +9533,6 @@ rarity = "Uncommon"
 is-fast = false
 spark = 2
 image-number = 1726923523
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Gatewarden"
-id = "e3beadd0-4248-4835-a1c5-d41f85737d4d"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Banish an enemy until this character leaves play."
-energy-cost = 5
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 2197688369
 art-owned = false
 card-number = 0
 
@@ -15097,23 +9640,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Saltblood Reaver"
-id = "fc294a5d-7239-4fd2-9d5e-e1760d342f60"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "When you abandon a character, gain 1✪."
-energy-cost = 4
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 539226472
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Fathomless Maw"
 id = "fc294a5d-7239-4fd2-9d5e-e1760d342f60"
 tide = "Pact"
@@ -15131,57 +9657,6 @@ card-number = 196
 
 [[cards]]
 keep = false
-name = "Resplendent Finale"
-id = "a2381225-b97f-4a38-845b-cefd8b86d499"
-tide = "Surge"
-tide-cost = 2
-rendered-text = "Gain 1✪ for each card you have played this turn."
-energy-cost = 5
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 413822515
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Culminating Flare"
-id = "a2381225-b97f-4a38-845b-cefd8b86d499"
-tide = "Surge"
-tide-cost = 2
-rendered-text = "Gain 1✪ for each card you have played this turn."
-energy-cost = 5
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 789291013
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Final Approach"
-id = "a2381225-b97f-4a38-845b-cefd8b86d499"
-tide = "Surge"
-tide-cost = 2
-rendered-text = "Gain 1✪ for each card you have played this turn."
-energy-cost = 5
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1891048582
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Illumination of Glory"
 id = "a2381225-b97f-4a38-845b-cefd8b86d499"
 tide = "Surge"
@@ -15196,23 +9671,6 @@ spark = ""
 image-number = 2430444889
 art-owned = false
 card-number = 90
-
-[[cards]]
-keep = false
-name = "Drift Ascending"
-id = "5de09339-b7de-45bd-abc0-1ab3a09e859d"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "Until end of turn, when an ally leaves play, gain {energy($e)}."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 2430444889
-art-owned = false
-card-number = 170
 
 [[cards]]
 keep = false
@@ -15335,57 +9793,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Ironclad Sleeper"
-id = "d31723e7-8faa-41e3-89b6-c30d8fdf9cca"
-tide = "Umbra"
-tide-cost = 2
-rendered-text = "When you play 2 cards in a turn, reclaim this character."
-energy-cost = 6
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Rare"
-is-fast = false
-spark = 4
-image-number = 603547823
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Perpetual Engine"
-id = "d31723e7-8faa-41e3-89b6-c30d8fdf9cca"
-tide = "Umbra"
-tide-cost = 2
-rendered-text = "When you play 2 cards in a turn, reclaim this character."
-energy-cost = 6
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Rare"
-is-fast = false
-spark = 4
-image-number = 608687447
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Driftborn"
-id = "d31723e7-8faa-41e3-89b6-c30d8fdf9cca"
-tide = "Umbra"
-tide-cost = 2
-rendered-text = "When you play 2 cards in a turn, reclaim this character."
-energy-cost = 6
-card-type = "Character"
-subtype = "Child"
-rarity = "Rare"
-is-fast = false
-spark = 4
-image-number = 1798514908
-art-owned = true
-card-number = 1
-
-[[cards]]
-keep = false
 name = "Titan of Forgotten Echoes"
 id = "d31723e7-8faa-41e3-89b6-c30d8fdf9cca"
 tide = "Umbra"
@@ -15403,74 +9810,6 @@ card-number = 1
 
 [[cards]]
 keep = false
-name = "Desperate Measure"
-id = "187870b3-165c-41ea-8126-abb096f5d6ab"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy. You lose 4✪."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 454095541
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Cinderwake"
-id = "187870b3-165c-41ea-8126-abb096f5d6ab"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy. You lose 4✪."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 666342238
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Unmoored"
-id = "187870b3-165c-41ea-8126-abb096f5d6ab"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy. You lose 4✪."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 670293469
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Terrible Bargain"
-id = "187870b3-165c-41ea-8126-abb096f5d6ab"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy. You lose 4✪."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 1174403353
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Unleash Ruin"
 id = "187870b3-165c-41ea-8126-abb096f5d6ab"
 tide = "Neutral"
@@ -15485,23 +9824,6 @@ spark = ""
 image-number = 1798514908
 art-owned = true
 card-number = 14
-
-[[cards]]
-keep = false
-name = "Endless Apparition"
-id = "187870b3-165c-41ea-8126-abb096f5d6ab"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy. You lose 4✪."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2290648799
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -15573,57 +9895,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Lunar Stillness"
-id = "57fb24df-bedf-414d-b190-03e831570fda"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Draw 3 cards. Discard 2 cards."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 318372245
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Many Dawns"
-id = "57fb24df-bedf-414d-b190-03e831570fda"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Draw 3 cards. Discard 2 cards."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 744309598
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Scouring Trek"
-id = "57fb24df-bedf-414d-b190-03e831570fda"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Draw 3 cards. Discard 2 cards."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 1114008224
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Fragments of Vision"
 id = "57fb24df-bedf-414d-b190-03e831570fda"
 tide = "Rime"
@@ -15670,25 +9941,6 @@ rarity = "Uncommon"
 is-fast = false
 spark = 2
 image-number = 1159163608
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Apocalypse Vigilante"
-id = "b6c8065c-ddc0-4eb1-9243-a3dcdcc870a4"
-tide = "Rime"
-tide-cost = 2
-rendered-text = """
-When you discard a card, gain 1✪.
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Renegade"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 450440632
 art-owned = false
 card-number = 0
 
@@ -15820,40 +10072,6 @@ card-number = 61
 
 [[cards]]
 keep = false
-name = "Phasebound Stalker"
-id = "e4b6ce4c-363e-4483-8246-a4b7ac368d17"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Banish an enemy until your next main phase."
-energy-cost = 5
-card-type = "Character"
-subtype = "Synth"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 410445424
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Riftwalker"
-id = "e4b6ce4c-363e-4483-8246-a4b7ac368d17"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Banish an enemy until your next main phase."
-energy-cost = 5
-card-type = "Character"
-subtype = "Synth"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 410445436
-art-owned = false
-card-number = 166
-
-[[cards]]
-keep = false
 name = "Riftwalker"
 id = "e4b6ce4c-363e-4483-8246-a4b7ac368d17"
 tide = "Arc"
@@ -15868,23 +10086,6 @@ spark = 2
 image-number = 1793552422
 art-owned = false
 card-number = 166
-
-[[cards]]
-keep = false
-name = "Depth Conjurer"
-id = "e4b6ce4c-363e-4483-8246-a4b7ac368d17"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Banish an enemy until your next main phase."
-energy-cost = 5
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 2258761881
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -16244,74 +10445,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Boreal Pathfinder"
-id = "30e50754-0903-45ef-8569-b9032a93ed8f"
-tide = "Bloom"
-tide-cost = 2
-rendered-text = "Characters cost you 2● less."
-energy-cost = 5
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 622025003
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Wildwood Guide"
-id = "30e50754-0903-45ef-8569-b9032a93ed8f"
-tide = "Bloom"
-tide-cost = 2
-rendered-text = "Characters cost you 2● less."
-energy-cost = 5
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 653554021
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Fen Navigator"
-id = "30e50754-0903-45ef-8569-b9032a93ed8f"
-tide = "Bloom"
-tide-cost = 2
-rendered-text = "Characters cost you 2● less."
-energy-cost = 5
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 1302572581
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Leafcatcher"
-id = "30e50754-0903-45ef-8569-b9032a93ed8f"
-tide = "Bloom"
-tide-cost = 2
-rendered-text = "Characters cost you 2● less."
-energy-cost = 5
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 1789989914
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Nexus Wayfinder"
 id = "30e50754-0903-45ef-8569-b9032a93ed8f"
 tide = "Bloom"
@@ -16375,91 +10508,6 @@ rarity = "Rare"
 is-fast = false
 spark = 0
 image-number = 2218612335
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Sunder"
-id = "2b0d4a5a-83f0-4cae-a7e3-aefbb595fd1d"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy with spark 3 or more."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 454095982
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Furnace Verdict"
-id = "2b0d4a5a-83f0-4cae-a7e3-aefbb595fd1d"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy with spark 3 or more."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 674166682
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Conflagration"
-id = "2b0d4a5a-83f0-4cae-a7e3-aefbb595fd1d"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy with spark 3 or more."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 789290998
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Monsterfall"
-id = "2b0d4a5a-83f0-4cae-a7e3-aefbb595fd1d"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy with spark 3 or more."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 1798382137
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Focused Severance"
-id = "2b0d4a5a-83f0-4cae-a7e3-aefbb595fd1d"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Dissolve an enemy with spark 3 or more."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 2123360840
 art-owned = false
 card-number = 0
 
@@ -16725,57 +10773,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Voidpetal"
-id = "ddde23e7-939c-4b0f-be6a-ecc1e38c92f0"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "You may return a character from your void to your hand, then draw a card."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 321042374
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Deepwood Beacon"
-id = "ddde23e7-939c-4b0f-be6a-ecc1e38c92f0"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "You may return a character from your void to your hand, then draw a card."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 393588079
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Kindred Return"
-id = "ddde23e7-939c-4b0f-be6a-ecc1e38c92f0"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "You may return a character from your void to your hand, then draw a card."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 556545841
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Reunion"
 id = "ddde23e7-939c-4b0f-be6a-ecc1e38c92f0"
 tide = "Umbra"
@@ -16861,44 +10858,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Infinite Refrain"
-id = "2910484b-ecfe-445d-92b7-2f7d246b17fd"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Until end of turn, when you play an event, copy it.
-"""
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 403770313
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Arcane Resonance"
-id = "2910484b-ecfe-445d-92b7-2f7d246b17fd"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Until end of turn, when you play an event, copy it.
-"""
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 1068257321
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Cascade of Reflections"
 id = "2910484b-ecfe-445d-92b7-2f7d246b17fd"
 tide = "Surge"
@@ -16915,25 +10874,6 @@ spark = ""
 image-number = 1739438657
 art-owned = false
 card-number = 93
-
-[[cards]]
-keep = false
-name = "Sigil of Echoes"
-id = "2910484b-ecfe-445d-92b7-2f7d246b17fd"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Until end of turn, when you play an event, copy it.
-"""
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2285036621
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -17245,23 +11185,6 @@ card-number = 62
 
 [[cards]]
 keep = false
-name = "Levitant"
-id = "d8017d8f-7855-47e5-bfe5-89ca2e7c5203"
-tide = "Arc"
-tide-cost = 2
-rendered-text = "▸ Materialized, Judgment: Banish an ally with spark 2 or less, then materialize it."
-energy-cost = 4
-card-type = "Character"
-subtype = "Child"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1950881320
-art-owned = false
-card-number = 148
-
-[[cards]]
-keep = false
 name = "Flickerveil Adept"
 id = "d8017d8f-7855-47e5-bfe5-89ca2e7c5203"
 tide = "Arc"
@@ -17347,23 +11270,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Neon Rendezvous"
-id = "2529d712-3e11-449e-a389-6dadd49cc145"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Discover an event."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 658075714
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Door to Possibility"
 id = "2529d712-3e11-449e-a389-6dadd49cc145"
 tide = "Neutral"
@@ -17378,57 +11284,6 @@ spark = ""
 image-number = 1798382125
 art-owned = false
 card-number = 116
-
-[[cards]]
-keep = false
-name = "Stone Scripture"
-id = "2529d712-3e11-449e-a389-6dadd49cc145"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Discover an event."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2182865327
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Pilgrim's Ascent"
-id = "2529d712-3e11-449e-a389-6dadd49cc145"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Discover an event."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2613755705
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Pilgrim's Gate"
-id = "2529d712-3e11-449e-a389-6dadd49cc145"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Discover an event."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 2667786599
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -17495,40 +11350,6 @@ rarity = "Rare"
 is-fast = false
 spark = 0
 image-number = 2256745741
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Resilient Frame"
-id = "46634b47-e83c-4eda-a0ff-7f1ba4e1ce89"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "When you discard this character, materialize it."
-energy-cost = 3
-card-type = "Character"
-subtype = "Synth"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 1470059003
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Boundless Urchin"
-id = "46634b47-e83c-4eda-a0ff-7f1ba4e1ce89"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "When you discard this character, materialize it."
-energy-cost = 3
-card-type = "Character"
-subtype = "Child"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 2123360846
 art-owned = false
 card-number = 0
 
@@ -17899,40 +11720,6 @@ card-number = 165
 
 [[cards]]
 keep = false
-name = "Riftstrider"
-id = "6e7c552f-23b5-431a-9d50-f7706e27166a"
-tide = "Arc"
-tide-cost = 2
-rendered-text = "▸ Judgment: You may pay 3● to banish up to 2 allies, then materialize them."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 1053081860
-art-owned = false
-card-number = 165
-
-[[cards]]
-keep = false
-name = "Gatewalker"
-id = "6e7c552f-23b5-431a-9d50-f7706e27166a"
-tide = "Arc"
-tide-cost = 2
-rendered-text = "▸ Judgment: You may pay 3● to banish up to 2 allies, then materialize them."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 1196004052
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Echoes of Eternity"
 id = "5ce29518-6ccd-420c-9fbf-c4b882266593"
 tide = "Surge"
@@ -17969,63 +11756,6 @@ spark = ""
 image-number = 644603677
 art-owned = true
 card-number = 218
-
-[[cards]]
-keep = false
-name = "Rebroadcast"
-id = "1ce137cb-4234-45f7-abd2-d0ce97549885"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Return up to 2 events from your void to your hand.
-"""
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1047769081
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Void Pilgrimage"
-id = "1ce137cb-4234-45f7-abd2-d0ce97549885"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Return up to 2 events from your void to your hand.
-"""
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1213574263
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Shattered Archive"
-id = "1ce137cb-4234-45f7-abd2-d0ce97549885"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Return up to 2 events from your void to your hand.
-"""
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 2430444887
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -18160,23 +11890,6 @@ rarity = "Rare"
 is-fast = false
 spark = 2
 image-number = 1016596165
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Planetgazer"
-id = "81008e3a-e2d1-4d7e-a13a-1583ef75b2ff"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Judgment: Gain 2✪."
-energy-cost = 4
-card-type = "Character"
-subtype = "Visitor"
-rarity = "Common"
-is-fast = true
-spark = 0
-image-number = 703988035
 art-owned = false
 card-number = 0
 
@@ -18487,40 +12200,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Alleywalker"
-id = "a4322fb3-6195-41e5-9cb2-74113f961f4d"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Return an ally to hand."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = true
-spark = 1
-image-number = 366712730
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Lantern Ferryman"
-id = "a4322fb3-6195-41e5-9cb2-74113f961f4d"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Return an ally to hand."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = true
-spark = 1
-image-number = 478671154
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Nomad of Endless Paths"
 id = "a4322fb3-6195-41e5-9cb2-74113f961f4d"
 tide = "Arc"
@@ -18535,74 +12214,6 @@ spark = 1
 image-number = 1529898275
 art-owned = false
 card-number = 126
-
-[[cards]]
-keep = false
-name = "Duskrider"
-id = "a4322fb3-6195-41e5-9cb2-74113f961f4d"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Return an ally to hand."
-energy-cost = 2
-card-type = "Character"
-subtype = "Child"
-rarity = "Uncommon"
-is-fast = true
-spark = 1
-image-number = 1739438654
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Boulevard Saint"
-id = "2df6ba84-9aec-451d-80e6-f14d743a6db6"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "When you play an event, gain 1●."
-energy-cost = 4
-card-type = "Character"
-subtype = "Visitor"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 360302021
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Stormwalker"
-id = "2df6ba84-9aec-451d-80e6-f14d743a6db6"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "When you play an event, gain 1●."
-energy-cost = 4
-card-type = "Character"
-subtype = "Visitor"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 1492489760
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Stormreader"
-id = "2df6ba84-9aec-451d-80e6-f14d743a6db6"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "When you play an event, gain 1●."
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 1529898275
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -19003,90 +12614,6 @@ card-number = 461
 
 [[cards]]
 keep = false
-name = "Relic Gardener"
-id = "cb445b05-ea7b-4a1b-9484-110021e266f3"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Materialized: Draw a card, then discard a card.
-
-Reclaim 3●
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Synth"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 529374832
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Ashwalker"
-id = "cb445b05-ea7b-4a1b-9484-110021e266f3"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Materialized: Draw a card, then discard a card.
-
-Reclaim 3●
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 561422755
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Wayward Porter"
-id = "cb445b05-ea7b-4a1b-9484-110021e266f3"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Materialized: Draw a card, then discard a card.
-
-Reclaim 3●
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Synth"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 666342256
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Duskwatcher"
-id = "cb445b05-ea7b-4a1b-9484-110021e266f3"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = """
-▸ Materialized: Draw a card, then discard a card.
-
-Reclaim 3●
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 1053081800
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Nocturne Strummer"
 id = "2cf1bea9-6136-4626-a76e-39481978283a"
 tide = "Surge"
@@ -19189,40 +12716,6 @@ card-number = 186
 
 [[cards]]
 keep = false
-name = "Masked Innocent"
-id = "7d20f2bb-50b5-418a-a435-da13a13ad257"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "If this card is in your void, allied Survivors have +2 spark."
-energy-cost = 2
-card-type = "Character"
-subtype = "Child"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 603547394
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Sacrificial Holdout"
-id = "7d20f2bb-50b5-418a-a435-da13a13ad257"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "If this card is in your void, allied Survivors have +2 spark."
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 1149594491
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Woodland Apparition"
 id = "b98869d1-3498-4c00-a140-1c305ad86b5f"
 tide = "Umbra"
@@ -19274,40 +12767,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Sky Beyond Sky"
-id = "be92ff6f-a468-4545-8ea2-cd8c3c53cb9a"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Double the number of cards you draw from card effects this turn."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 465449513
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Brilliant Overflow"
-id = "be92ff6f-a468-4545-8ea2-cd8c3c53cb9a"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Double the number of cards you draw from card effects this turn."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 533945275
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "The Power Within"
 id = "be92ff6f-a468-4545-8ea2-cd8c3c53cb9a"
 tide = "Surge"
@@ -19322,23 +12781,6 @@ spark = ""
 image-number = 717263302
 art-owned = false
 card-number = 97
-
-[[cards]]
-keep = false
-name = "City Refraction"
-id = "be92ff6f-a468-4545-8ea2-cd8c3c53cb9a"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Double the number of cards you draw from card effects this turn."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 1032222850
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -19444,40 +12886,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Headlong Rush"
-id = "e79d484f-d564-4429-9eca-0f90d2af5ef5"
-tide = "Ignite"
-tide-cost = 1
-rendered-text = "An ally gains +1 spark for each allied Warrior."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 1735968137
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Wingmate's Fury"
-id = "e79d484f-d564-4429-9eca-0f90d2af5ef5"
-tide = "Ignite"
-tide-cost = 1
-rendered-text = "An ally gains +1 spark for each allied Warrior."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 1786390148
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Ride of the Vanguard"
 id = "e79d484f-d564-4429-9eca-0f90d2af5ef5"
 tide = "Ignite"
@@ -19507,69 +12915,6 @@ rarity = "Rare"
 is-fast = false
 spark = 2
 image-number = 1785274676
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Charnel Threshold"
-id = "dfd2523a-ff26-4c8c-9197-ba60f492d819"
-tide = "Pact"
-tide-cost = 1
-rendered-text = """
-Dissolve an enemy. Draw a card.
-
-This event costs 0● if a character dissolved this turn.
-"""
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1621160800
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Crestfall"
-id = "dfd2523a-ff26-4c8c-9197-ba60f492d819"
-tide = "Pact"
-tide-cost = 1
-rendered-text = """
-Dissolve an enemy. Draw a card.
-
-This event costs 0● if a character dissolved this turn.
-"""
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1785274673
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Into the Maw"
-id = "dfd2523a-ff26-4c8c-9197-ba60f492d819"
-tide = "Pact"
-tide-cost = 1
-rendered-text = """
-Dissolve an enemy. Draw a card.
-
-This event costs 0● if a character dissolved this turn.
-"""
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1793552410
 art-owned = false
 card-number = 0
 
@@ -19905,25 +13250,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Pelagic Monarch"
-id = "b8b55ef4-2f79-4c62-b347-e91bea3a40bd"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = """
-When you materialize an allied Spirit Animal, that character gains +1 spark.
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Spirit Animal"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 447372529
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Sunshadow Eagle"
 id = "b8b55ef4-2f79-4c62-b347-e91bea3a40bd"
 tide = "Bloom"
@@ -19938,25 +13264,6 @@ rarity = "Common"
 is-fast = false
 spark = 1
 image-number = 2303852061
-art-owned = false
-card-number = 137
-
-[[cards]]
-keep = false
-name = "Runebound Wolf"
-id = "b8b55ef4-2f79-4c62-b347-e91bea3a40bd"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = """
-When you materialize an allied Spirit Animal, that character gains +1 spark.
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Spirit Animal"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 2438838887
 art-owned = false
 card-number = 137
 
@@ -20066,132 +13373,6 @@ rarity = "Rare"
 is-fast = false
 spark = 2
 image-number = 443761822
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Molten Overlord"
-id = "5aea70af-2df6-411f-b513-cb9ee8b18fb4"
-tide = "Pact"
-tide-cost = 1
-rendered-text = """
-Abandon an ally: Play this character for 0●, then abandon it.
-
-▸ Materialized: Dissolve an enemy.
-"""
-energy-cost = 6
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 1219782721
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Scythe Automaton"
-id = "5aea70af-2df6-411f-b513-cb9ee8b18fb4"
-tide = "Pact"
-tide-cost = 1
-rendered-text = """
-Abandon an ally: Play this character for 0●, then abandon it.
-
-▸ Materialized: Dissolve an enemy.
-"""
-energy-cost = 6
-card-type = "Character"
-subtype = "Synth"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 1798382131
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Roused Behemoth"
-id = "5aea70af-2df6-411f-b513-cb9ee8b18fb4"
-tide = "Pact"
-tide-cost = 1
-rendered-text = """
-Abandon an ally: Play this character for 0●, then abandon it.
-
-▸ Materialized: Dissolve an enemy.
-"""
-energy-cost = 6
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 2186149281
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Advent Blockade"
-id = "4666416e-5f12-47a3-9e7e-56943c0d6e44"
-tide = "Surge"
-tide-cost = 1
-rendered-text = """
-Banish a card from hand: Play this event for 0●.
-
-Prevent a played card.
-"""
-energy-cost = 5
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 1517426174
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Shattered Veil"
-id = "ff10c460-125f-4f77-b9e2-4c4f33adff3e"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Banish a card from hand: Play this event for 0●.
-
-Dissolve an enemy.
-"""
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = true
-spark = ""
-image-number = 1063277267
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Defiant Strike"
-id = "ff10c460-125f-4f77-b9e2-4c4f33adff3e"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Banish a card from hand: Play this event for 0●.
-
-Dissolve an enemy.
-"""
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = true
-spark = ""
-image-number = 1897537153
 art-owned = false
 card-number = 0
 
@@ -20524,23 +13705,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Ironbound Escort"
-id = "f06932ac-6d8a-493f-b47e-9134676ea396"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "Once per turn, you may play a character with cost 2● or less from your void."
-energy-cost = 4
-card-type = "Character"
-subtype = "Synth"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 2261959345
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Blazebound Sentinel"
 id = "d50d357a-8a8d-4da4-bf19-d29b8163e3c5"
 tide = "Bloom"
@@ -20815,40 +13979,6 @@ card-number = 182
 
 [[cards]]
 keep = false
-name = "Forsaken Marksman"
-id = "adfd1cfe-459b-4a9b-bc90-203847082a03"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may discard a card to dissolve an enemy with spark 1 or less."
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 691496698
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Fumeworn"
-id = "adfd1cfe-459b-4a9b-bc90-203847082a03"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may discard a card to dissolve an enemy with spark 1 or less."
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 1252796545
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Duneveil Vanguard"
 id = "adfd1cfe-459b-4a9b-bc90-203847082a03"
 tide = "Rime"
@@ -20863,57 +13993,6 @@ spark = 1
 image-number = 1639942840
 art-owned = true
 card-number = 25
-
-[[cards]]
-keep = false
-name = "Final Holdout"
-id = "adfd1cfe-459b-4a9b-bc90-203847082a03"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may discard a card to dissolve an enemy with spark 1 or less."
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1793552419
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Wasteland Hawk"
-id = "adfd1cfe-459b-4a9b-bc90-203847082a03"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may discard a card to dissolve an enemy with spark 1 or less."
-energy-cost = 2
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 1911412798
-art-owned = true
-card-number = 25
-
-[[cards]]
-keep = false
-name = "Sunset Chronicler"
-id = "ef74faa0-b550-4134-9afc-c6898f7af44c"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "When an ally is ▸ Dissolved:, draw a card."
-energy-cost = 4
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 644603722
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -20999,25 +14078,6 @@ spark = 2
 image-number = 1639942840
 art-owned = false
 card-number = 0
-
-[[cards]]
-keep = false
-name = "Duskwatch Synth"
-id = "d8017d8f-7855-47e5-bfe5-89ca2e7c5203"
-tide = "Arc"
-tide-cost = 2
-rendered-text = """
-▸ Materialized, Judgment: Banish an ally with spark 2 or less, then materialize it.
-"""
-energy-cost = 4
-card-type = "Character"
-subtype = "Synth"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 670293673
-art-owned = false
-card-number = 148
 
 [[cards]]
 keep = false
@@ -21140,23 +14200,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Ashfall"
-id = "4a4db2a7-0d00-4762-8dad-18648ddbc4fc"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Banish an enemy with cost 2● or less."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 666342250
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Veil Shatter"
 id = "4a4db2a7-0d00-4762-8dad-18648ddbc4fc"
 tide = "Neutral"
@@ -21225,40 +14268,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Ashwatcher"
-id = "b6c8065c-ddc0-4eb1-9243-a3dcdcc870a4"
-tide = "Rime"
-tide-cost = 2
-rendered-text = "When you discard a card, gain 1✪."
-energy-cost = 3
-card-type = "Character"
-subtype = "Survivor"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1328168246
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Sandstrider"
-id = "177f4f38-2265-459d-a0a5-db196f32c6e1"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Judgment: Draw a card, then discard a card."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 1104412514
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Archive Diver"
 id = "177f4f38-2265-459d-a0a5-db196f32c6e1"
 tide = "Neutral"
@@ -21271,25 +14280,6 @@ rarity = "Rare"
 is-fast = false
 spark = 1
 image-number = 1633431265
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Wayward Cartographer"
-id = "177f4f38-2265-459d-a0a5-db196f32c6e1"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-▸ Judgment: Draw a card, then discard a card.
-"""
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 309018620
 art-owned = false
 card-number = 0
 
@@ -21546,57 +14536,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Torrent Dancer"
-id = "4d3eebd3-02b4-4016-a15a-0e8a05b6696b"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "▸ Materialized: Materialize a Celestial figment for each card you have played this turn."
-energy-cost = 1
-card-type = "Character"
-subtype = "Mage"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 428216260
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Wishing Child"
-id = "4d3eebd3-02b4-4016-a15a-0e8a05b6696b"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "▸ Materialized: Materialize a Celestial figment for each card you have played this turn."
-energy-cost = 1
-card-type = "Character"
-subtype = "Child"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 507269506
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Fledgling Luminary"
-id = "4d3eebd3-02b4-4016-a15a-0e8a05b6696b"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "▸ Materialized: Materialize a Celestial figment for each card you have played this turn."
-energy-cost = 1
-card-type = "Character"
-subtype = "Child"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 1149594110
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Packcaller of Shadows"
 id = "4d3eebd3-02b4-4016-a15a-0e8a05b6696b"
 tide = "Surge"
@@ -21609,23 +14548,6 @@ rarity = "Uncommon"
 is-fast = false
 spark = 1
 image-number = 2123360849
-art-owned = false
-card-number = 204
-
-[[cards]]
-keep = false
-name = "Skycaller"
-id = "4d3eebd3-02b4-4016-a15a-0e8a05b6696b"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "▸ Materialized: Materialize a Celestial figment for each card you have played this turn."
-energy-cost = 1
-card-type = "Character"
-subtype = "Child"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2320845233
 art-owned = false
 card-number = 204
 
@@ -21840,23 +14762,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Another World"
-id = "4950a8cd-85d5-402a-8a2d-efdd250764b7"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Each player may shuffle their hand and void into their deck and then draw 5 cards."
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 603547844
-art-owned = true
-card-number = 109
-
-[[cards]]
-keep = false
 name = "Wheel of the Heavens"
 id = "4950a8cd-85d5-402a-8a2d-efdd250764b7"
 tide = "Surge"
@@ -21888,57 +14793,6 @@ spark = ""
 image-number = 1480584617
 art-owned = false
 card-number = 109
-
-[[cards]]
-keep = false
-name = "Prismatic Renewal"
-id = "4950a8cd-85d5-402a-8a2d-efdd250764b7"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Each player may shuffle their hand and void into their deck and then draw 5 cards."
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 2617241837
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Tidal Amnesia"
-id = "4950a8cd-85d5-402a-8a2d-efdd250764b7"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Each player may shuffle their hand and void into their deck and then draw 5 cards."
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 2645678687
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Cosmic Convergence"
-id = "4950a8cd-85d5-402a-8a2d-efdd250764b7"
-tide = "Surge"
-tide-cost = 1
-rendered-text = "Each player may shuffle their hand and void into their deck and then draw 5 cards."
-energy-cost = 4
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 2657255501
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -21988,23 +14842,6 @@ rarity = "Rare"
 is-fast = false
 spark = 2
 image-number = 2633345427
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Kindred Wolf"
-id = "a52a502f-558b-4e33-bd33-44a866582f17"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "▸ Materialized: Return a character from your void to your hand."
-energy-cost = 3
-card-type = "Character"
-subtype = "Spirit Animal"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2654359871
 art-owned = false
 card-number = 0
 
@@ -22211,25 +15048,6 @@ spark = 3
 image-number = 1246320997
 art-owned = false
 card-number = 636
-
-[[cards]]
-keep = false
-name = "Crest Caller"
-id = "b7bc3d79-3c83-4015-92c5-1984c37830f3"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = """
-▸ Judgment: Gain 1● for each allied Spirit Animal.
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Spirit Animal"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 331258328
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -22575,57 +15393,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Pendulum Synth"
-id = "dce8efc8-2643-47a4-ae13-4b9a7e4ba8bb"
-tide = "Arc"
-tide-cost = 2
-rendered-text = "▸ Judgment: You may banish an ally, then materialize it."
-energy-cost = 3
-card-type = "Character"
-subtype = "Synth"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 468862544
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Cloudswept"
-id = "dce8efc8-2643-47a4-ae13-4b9a7e4ba8bb"
-tide = "Arc"
-tide-cost = 2
-rendered-text = "▸ Judgment: You may banish an ally, then materialize it."
-energy-cost = 3
-card-type = "Character"
-subtype = "Visitor"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 649132927
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Spiralborn"
-id = "dce8efc8-2643-47a4-ae13-4b9a7e4ba8bb"
-tide = "Arc"
-tide-cost = 2
-rendered-text = "▸ Judgment: You may banish an ally, then materialize it."
-energy-cost = 3
-card-type = "Character"
-subtype = "Child"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2033123267
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Cascading Radiance"
 id = "5fe5a1ea-a98d-4332-9eaf-eabc627bc8e8"
 tide = "Surge"
@@ -22728,40 +15495,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Ice-Path Pioneer"
-id = "aa0cd61a-13ce-4d61-b063-578686d1445a"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Materialized: Discard 2 cards, then draw 2 cards."
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 3
-image-number = 507269911
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Boreal Contemplative"
-id = "aa0cd61a-13ce-4d61-b063-578686d1445a"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Materialized: Discard 2 cards, then draw 2 cards."
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 3
-image-number = 653554000
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Augur Crow"
 id = "e2e378cd-f599-40fc-93a5-2b95318a85a4"
 tide = "Surge"
@@ -22808,63 +15541,6 @@ rarity = "Common"
 is-fast = false
 spark = ""
 image-number = 658076059
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Starless Host"
-id = "d122f4a5-c8a9-49bf-9c8a-a16b8d9567a6"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Dissolve all characters.
-"""
-energy-cost = 6
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 316023560
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Shattered Skyline"
-id = "d122f4a5-c8a9-49bf-9c8a-a16b8d9567a6"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Dissolve all characters.
-"""
-energy-cost = 6
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 342191531
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Final Reckoning"
-id = "d122f4a5-c8a9-49bf-9c8a-a16b8d9567a6"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Dissolve all characters.
-"""
-energy-cost = 6
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 793083757
 art-owned = false
 card-number = 0
 
@@ -22953,23 +15629,6 @@ is-fast = false
 spark = ""
 image-number = 626542574
 art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Unquiet Dead"
-id = "a04cb59f-1ce6-48e7-9a2d-5e3b09613e6a"
-tide = "Umbra"
-tide-cost = 1
-rendered-text = "▸ Judgment: Return this character from your void to your hand."
-energy-cost = 4
-card-type = "Character"
-subtype = "Monster"
-rarity = "Rare"
-is-fast = false
-spark = 0
-image-number = 389999809
-art-owned = true
 card-number = 0
 
 [[cards]]
@@ -23109,23 +15768,6 @@ spark = 1
 image-number = 410444914
 art-owned = false
 card-number = 139
-
-[[cards]]
-keep = false
-name = "Nightwood Familiar"
-id = "2ff0d711-4202-4dca-983d-96622849b76a"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "▸ Materialized, Judgment: Kindle 1."
-energy-cost = 1
-card-type = "Character"
-subtype = "Spirit Animal"
-rarity = "Common"
-is-fast = false
-spark = 1
-image-number = 410444914
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -23299,57 +15941,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Null Vector"
-id = "6e757f74-08e4-4f4e-ab27-70106b93a159"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Prevent a played card with cost 2● or less."
-energy-cost = 3
-card-type = "Character"
-subtype = "Synth"
-rarity = "Uncommon"
-is-fast = true
-spark = 1
-image-number = 403770331
-art-owned = false
-card-number = 70
-
-[[cards]]
-keep = false
-name = "Interceptor Primed"
-id = "6e757f74-08e4-4f4e-ab27-70106b93a159"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Prevent a played card with cost 2● or less."
-energy-cost = 3
-card-type = "Character"
-subtype = "Synth"
-rarity = "Uncommon"
-is-fast = true
-spark = 1
-image-number = 439817020
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Flamecalm"
-id = "6e757f74-08e4-4f4e-ab27-70106b93a159"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Prevent a played card with cost 2● or less."
-energy-cost = 3
-card-type = "Character"
-subtype = "Outsider"
-rarity = "Uncommon"
-is-fast = true
-spark = 1
-image-number = 1734025928
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Orbit Reaper"
 id = "47c59376-dc4b-46d7-ba97-44db55e9d523"
 tide = "Neutral"
@@ -23398,69 +15989,6 @@ rarity = "Rare"
 is-fast = false
 spark = 1
 image-number = 461706649
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Lightfall"
-id = "59f826ee-55d1-499e-86bb-8266c382f5fa"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-Banish an ally. Materialize it at end of turn.
-
-Reclaim 1●
-"""
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 306660596
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Duskborne Voyage"
-id = "59f826ee-55d1-499e-86bb-8266c382f5fa"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-Banish an ally. Materialize it at end of turn.
-
-Reclaim 1●
-"""
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 461706655
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Warp Run"
-id = "59f826ee-55d1-499e-86bb-8266c382f5fa"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-Banish an ally. Materialize it at end of turn.
-
-Reclaim 1●
-"""
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = false
-spark = ""
-image-number = 703988176
 art-owned = false
 card-number = 0
 
@@ -23647,69 +16175,6 @@ rarity = "Rare"
 is-fast = false
 spark = ""
 image-number = 2256745745
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Ridgeline Pioneer"
-id = "1f5024e3-aa36-4a44-b257-0caf35484cf8"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-Characters in your hand have ↯fast.
-
-Once per turn, when you play a ↯fast character, gain 1●.
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 309018680
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Blazing Courier"
-id = "1f5024e3-aa36-4a44-b257-0caf35484cf8"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-Characters in your hand have ↯fast.
-
-Once per turn, when you play a ↯fast character, gain 1●.
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 472322392
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Ridgerunner"
-id = "1f5024e3-aa36-4a44-b257-0caf35484cf8"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-Characters in your hand have ↯fast.
-
-Once per turn, when you play a ↯fast character, gain 1●.
-"""
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 2030910776
 art-owned = false
 card-number = 0
 
@@ -23919,23 +16384,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Aloft Reveler"
-id = "d124e9cc-407f-4288-9a09-78e426c00761"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "▸ Judgment: Gain 1✪."
-energy-cost = 2
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Common"
-is-fast = false
-spark = 2
-image-number = 512756359
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Green Abyss"
 id = "ecd53ca5-f250-4402-a686-c51148e1e3b8"
 tide = "Neutral"
@@ -23982,40 +16430,6 @@ rarity = "Uncommon"
 is-fast = true
 spark = ""
 image-number = 2256745747
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Veilwalker"
-id = "c4766fc9-9d67-49b6-89d1-e457aa9a415d"
-tide = "Arc"
-tide-cost = 2
-rendered-text = "▸ Materialized: Banish any number of allies, then materialize them."
-energy-cost = 6
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 3
-image-number = 447372517
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Stormmantle"
-id = "c4766fc9-9d67-49b6-89d1-e457aa9a415d"
-tide = "Arc"
-tide-cost = 2
-rendered-text = "▸ Materialized: Banish any number of allies, then materialize them."
-energy-cost = 6
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Rare"
-is-fast = false
-spark = 3
-image-number = 519475330
 art-owned = false
 card-number = 0
 
@@ -24599,23 +17013,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Glowchaser"
-id = "476638a3-6ed9-47bc-b129-ad8b6662f41e"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "4●: Materialize a copy of an ally."
-energy-cost = 1
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1109402234
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Pyrestone Avatar"
 id = "c85de002-4b55-4975-b800-a627fb699615"
 tide = "Arc"
@@ -24681,23 +17078,6 @@ rarity = "Rare"
 is-fast = false
 spark = 0
 image-number = 2421338075
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Stargazer"
-id = "d4123a89-fa76-46f9-a8b7-6a1d4ecc4c4f"
-tide = "Ignite"
-tide-cost = 1
-rendered-text = "Once per turn, when you materialize a character with cost 2● or less, draw a card."
-energy-cost = 4
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 2
-image-number = 1114007801
 art-owned = false
 card-number = 0
 
@@ -25027,57 +17407,6 @@ rarity = "Common"
 is-fast = false
 spark = 0
 image-number = 1717652863
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Clockwork Dominion"
-id = "214169c7-dc03-487f-bd85-d560f68031a1"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Take an extra turn after this one."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Legendary"
-is-fast = false
-spark = ""
-image-number = 596070020
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Monolith Descent"
-id = "214169c7-dc03-487f-bd85-d560f68031a1"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Take an extra turn after this one."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Legendary"
-is-fast = false
-spark = ""
-image-number = 1694993302
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Vast Reverie"
-id = "214169c7-dc03-487f-bd85-d560f68031a1"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Take an extra turn after this one."
-energy-cost = 3
-card-type = "Event"
-subtype = ""
-rarity = "Legendary"
-is-fast = false
-spark = ""
-image-number = 2594220421
 art-owned = false
 card-number = 0
 
@@ -25508,57 +17837,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Infernal Labyrinth"
-id = "f841dd11-102c-42b2-b85a-492930189fbd"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Pay 1 or more ●: Dissolve all characters with spark less than the amount of ● paid."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 443761747
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Molten Fracture"
-id = "f841dd11-102c-42b2-b85a-492930189fbd"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Pay 1 or more ●: Dissolve all characters with spark less than the amount of ● paid."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 450440617
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Labyrinth's End"
-id = "f841dd11-102c-42b2-b85a-492930189fbd"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Pay 1 or more ●: Dissolve all characters with spark less than the amount of ● paid."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 1185684772
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Burst of Obliteration"
 id = "f841dd11-102c-42b2-b85a-492930189fbd"
 tide = "Neutral"
@@ -25576,40 +17854,6 @@ card-number = 164
 
 [[cards]]
 keep = false
-name = "Cataclysm"
-id = "f841dd11-102c-42b2-b85a-492930189fbd"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Pay 1 or more ●: Dissolve all characters with spark less than the amount of ● paid."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 2675749427
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Errant Liege"
-id = "33d83d81-0d4e-40ab-aaeb-daa820ffbde3"
-tide = "Rime"
-tide-cost = 2
-rendered-text = "When you discard a card, it gains reclaim equal to its cost this turn."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 309018608
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Ashmaze Guide"
 id = "33d83d81-0d4e-40ab-aaeb-daa820ffbde3"
 tide = "Rime"
@@ -25623,23 +17867,6 @@ is-fast = false
 spark = 1
 image-number = 1185684772
 art-owned = true
-card-number = 8
-
-[[cards]]
-keep = false
-name = "Tidecaller"
-id = "33d83d81-0d4e-40ab-aaeb-daa820ffbde3"
-tide = "Rime"
-tide-cost = 2
-rendered-text = "When you discard a card, it gains reclaim equal to its cost this turn."
-energy-cost = 3
-card-type = "Character"
-subtype = "Explorer"
-rarity = "Rare"
-is-fast = false
-spark = 1
-image-number = 1926604862
-art-owned = false
 card-number = 8
 
 [[cards]]
@@ -26052,57 +18279,6 @@ card-number = 0
 
 [[cards]]
 keep = false
-name = "Starcaller"
-id = "ec80cc3c-a23d-465e-a2cf-4eed6fb89e1d"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "When you play a Spirit Animal, draw a card."
-energy-cost = 3
-card-type = "Character"
-subtype = "Spirit Animal"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2216124457
-art-owned = false
-card-number = 135
-
-[[cards]]
-keep = false
-name = "Mistpath Panther"
-id = "ec80cc3c-a23d-465e-a2cf-4eed6fb89e1d"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "When you play a Spirit Animal, draw a card."
-energy-cost = 3
-card-type = "Character"
-subtype = "Spirit Animal"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2626599355
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Horizon Pilgrimage"
-id = "f35d60ff-da13-4abb-87ab-5fd27874e9bf"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = "Discover a character with an activated ability."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Rare"
-is-fast = false
-spark = ""
-image-number = 2419795157
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Lightningborn"
 id = "e8aa4af2-99d5-4933-a211-ff103cdd18ea"
 tide = "Surge"
@@ -26154,23 +18330,6 @@ card-number = 16
 
 [[cards]]
 keep = false
-name = "Crimson Woodsman"
-id = "e5ac026b-a397-47ee-929d-46de1177784c"
-tide = "Ignite"
-tide-cost = 1
-rendered-text = "▸ Judgment: You may banish 3 cards from your void to dissolve an enemy with cost 2● or less. "
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Uncommon"
-is-fast = false
-spark = 1
-image-number = 2419795161
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
 name = "Shatter the Frail"
 id = "56020364-cbe8-4500-900f-33510a95ff10"
 tide = "Neutral"
@@ -26185,57 +18344,6 @@ spark = ""
 image-number = 2521694541
 art-owned = true
 card-number = 40
-
-[[cards]]
-keep = false
-name = "Duskward Ronin"
-id = "91a32fb4-5bb2-4f8d-b24a-22a8963b3302"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Disable the ▸ Materialized: abilities of enemies."
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 565499662
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Defiant Vanguard"
-id = "91a32fb4-5bb2-4f8d-b24a-22a8963b3302"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "Disable the ▸ Materialized: abilities of enemies."
-energy-cost = 2
-card-type = "Character"
-subtype = "Warrior"
-rarity = "Uncommon"
-is-fast = false
-spark = 2
-image-number = 2590831715
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Castaway's Bargain"
-id = "36c59908-aae7-42fb-9419-4a6aa1255211"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "Abandon an ally: Gain ● equal to that character's cost."
-energy-cost = 1
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = false
-spark = ""
-image-number = 612667706
-art-owned = false
-card-number = 0
 
 [[cards]]
 keep = false
@@ -26285,111 +18393,6 @@ rarity = "Rare"
 is-fast = false
 spark = 1
 image-number = 2155438703
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Drifting Augury"
-id = "6e94b4a6-4164-4572-91c1-e74de3e75188"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Choose One:
-• 2●: Return an enemy to hand.
-• 3●: Draw 2 cards.
-"""
-energy-cost = "*"
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 748957522
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Descending Omen"
-id = "6e94b4a6-4164-4572-91c1-e74de3e75188"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Choose One:
-• 2●: Return an enemy to hand.
-• 3●: Draw 2 cards.
-"""
-energy-cost = "*"
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 1368549116
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Cryptic Cache"
-id = "6e94b4a6-4164-4572-91c1-e74de3e75188"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Choose One:
-• 2●: Return an enemy to hand.
-• 3●: Draw 2 cards.
-"""
-energy-cost = "*"
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 1383318404
-art-owned = true
-card-number = 219
-
-[[cards]]
-keep = false
-name = "Painted Crossroads"
-id = "6e94b4a6-4164-4572-91c1-e74de3e75188"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Choose One:
-• 2●: Return an enemy to hand.
-• 3●: Draw 2 cards.
-"""
-energy-cost = "*"
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 2256745751
-art-owned = false
-card-number = 0
-
-[[cards]]
-keep = false
-name = "Wanderers' Gateway"
-id = "6e94b4a6-4164-4572-91c1-e74de3e75188"
-tide = "Neutral"
-tide-cost = 1
-rendered-text = """
-Choose One:
-• 2●: Return an enemy to hand.
-• 3●: Draw 2 cards.
-"""
-energy-cost = "*"
-card-type = "Event"
-subtype = ""
-rarity = "Uncommon"
-is-fast = true
-spark = ""
-image-number = 2438838895
 art-owned = false
 card-number = 0
 
