@@ -11,9 +11,13 @@ import glob as glob_module
 import re
 
 ANONYMIZED_FILE = pathlib.Path("/Users/dthurn/dreamtides/cards_anonymized.txt")
-ART_ASSIGNED = pathlib.Path("/Users/dthurn/dreamtides/rules_engine/tabula/art-assigned.toml")
+ART_ASSIGNED = pathlib.Path(
+    "/Users/dthurn/dreamtides/rules_engine/tabula/art-assigned.toml"
+)
 BATCH_RESULTS_DIR = pathlib.Path("/tmp/art-batch-results")
-OUTPUT_FILE = pathlib.Path("/Users/dthurn/dreamtides/rules_engine/tabula/art-batch-candidates.toml")
+OUTPUT_FILE = pathlib.Path(
+    "/Users/dthurn/dreamtides/rules_engine/tabula/art-batch-candidates.toml"
+)
 
 
 def load_pool_rendered_texts():
@@ -109,7 +113,9 @@ def main():
                 first = False
 
     total_entries = sum(len(v) for v in groups.values())
-    print(f"\nWrote {total_entries} entries representing {len(sorted_texts)} unique cards to:")
+    print(
+        f"\nWrote {total_entries} entries representing {len(sorted_texts)} unique cards to:"
+    )
     print(f"  {OUTPUT_FILE}")
 
 

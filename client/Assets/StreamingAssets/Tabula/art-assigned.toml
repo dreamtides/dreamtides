@@ -16560,11 +16560,11 @@ card-number = 0
 
 [[cards]]
 name = "Stormcaller"
-id = "1063277267"
+id = 1063277267
 tide = "Ignite"
-tide-cost = "1"
-energy-cost = "3"
-spark = "1"
+tide-cost = 1
+energy-cost = 3
+spark = 1
 card-type = "Character"
 subtype = "Warrior"
 rarity = "R"
@@ -16740,7 +16740,9 @@ name = "Forerunner"
 id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
 tide = "Ignite"
 tide-cost = 2
-rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
 energy-cost = 3
 card-type = "Character"
 subtype = "Synth"
@@ -16801,7 +16803,7 @@ card-number = 0
 
 [[cards]]
 name = "Cinder Lord"
-id = "1219782721"
+id = 1219782721
 tide = "Ignite"
 tide-cost = 1
 energy-cost = 3
@@ -16914,7 +16916,9 @@ name = "Gauntlet Runner"
 id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
 tide = "Ignite"
 tide-cost = 2
-rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
 energy-cost = 3
 card-type = "Character"
 subtype = "Warrior"
@@ -16982,7 +16986,9 @@ name = "Assembly Wraith"
 id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
 tide = "Ignite"
 tide-cost = 2
-rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
 energy-cost = 3
 card-type = "Character"
 subtype = "Synth"
@@ -17014,7 +17020,9 @@ name = "Dreadnought Prime"
 id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
 tide = "Ignite"
 tide-cost = 2
-rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
 energy-cost = 3
 card-type = "Character"
 subtype = "Synth"
@@ -17413,11 +17421,11 @@ card-number = 0
 
 [[cards]]
 name = "Dreamsgate Envoy"
-id = "2182865331"
+id = 2182865331
 tide = "Ignite"
-tide-cost = "2"
-energy-cost = "5"
-spark = "1"
+tide-cost = 2
+energy-cost = 5
+spark = 1
 card-type = "Character"
 subtype = "Explorer"
 rarity = "R"
@@ -17528,7 +17536,9 @@ name = "Machine Acolyte"
 id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
 tide = "Ignite"
 tide-cost = 2
-rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
 energy-cost = 3
 card-type = "Character"
 subtype = "Synth"
@@ -17576,7 +17586,10 @@ name = "Gloomantler"
 id = "25ee7d34-d1b0-4164-b0c2-e07e15c8d4cd"
 tide = "Rime"
 tide-cost = 1
-rendered-text = "Banish a card from hand: Play this character for 0●, then abandon it.\n\n▸ Materialized: Dissolve an enemy with spark 2 or less."
+rendered-text = """
+Banish a card from hand: Play this character for 0●, then abandon it.
+
+▸ Materialized: Dissolve an enemy with spark 2 or less."""
 energy-cost = 5
 card-type = "Character"
 subtype = "Ancient"
@@ -17977,11 +17990,11 @@ card-number = 0
 
 [[cards]]
 name = "Crackbringer"
-id = "2430444887"
+id = 2430444887
 tide = "Ignite"
-tide-cost = "1"
-energy-cost = "2"
-spark = "1"
+tide-cost = 1
+energy-cost = 2
+spark = 1
 card-type = "Character"
 subtype = "Warrior"
 rarity = "R"
@@ -18351,7 +18364,9 @@ name = "Fracture Surveyor"
 id = "cc5e770a-210d-4737-8aa7-6be7328b0dbd"
 tide = "Ignite"
 tide-cost = 2
-rendered-text = "▸ Materialized: Materialize a Warrior figment. \nWhen you materialize a Figment, draw a card."
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment. 
+When you materialize a Figment, draw a card."""
 energy-cost = 3
 card-type = "Character"
 subtype = "Tinkerer"
@@ -18835,7 +18850,9 @@ name = "War Effigy"
 id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
 tide = "Ignite"
 tide-cost = 2
-rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
 energy-cost = 3
 card-type = "Character"
 subtype = "Synth"
@@ -18919,7 +18936,9 @@ name = "Siege Construct"
 id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
 tide = "Ignite"
 tide-cost = 2
-rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
 energy-cost = 3
 card-type = "Character"
 subtype = "Synth"
@@ -18935,7 +18954,9 @@ name = "Fractal Skitter"
 id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
 tide = "Ignite"
 tide-cost = 2
-rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
 energy-cost = 3
 card-type = "Character"
 subtype = "Synth"
@@ -19028,11 +19049,11 @@ card-number = 0
 
 [[cards]]
 name = "Labyrinth Overseer"
-id = "443761747"
+id = 443761747
 tide = "Pact"
-tide-cost = "1"
-energy-cost = "2"
-spark = "1"
+tide-cost = 1
+energy-cost = 2
+spark = 1
 card-type = "Character"
 subtype = "Explorer"
 rarity = "R"
@@ -19288,7 +19309,9 @@ name = "Planetfall Drone"
 id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
 tide = "Ignite"
 tide-cost = 2
-rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
 energy-cost = 3
 card-type = "Character"
 subtype = "Synth"
@@ -19404,7 +19427,9 @@ name = "Neon Shepherd"
 id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
 tide = "Ignite"
 tide-cost = 2
-rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
 energy-cost = 3
 card-type = "Character"
 subtype = "Synth"
@@ -19502,7 +19527,9 @@ name = "Scatter Synth"
 id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
 tide = "Ignite"
 tide-cost = 2
-rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
 energy-cost = 3
 card-type = "Character"
 subtype = "Synth"
