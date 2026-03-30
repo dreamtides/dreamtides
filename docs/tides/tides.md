@@ -10,7 +10,7 @@ natural pressures of drafting and deckbuilding tend to push players toward cards
 that share a tide, since those cards are designed to mechanically reinforce each
 other.
 
-There are seven core tides plus a special neutral tide called Wild. Each core
+There are seven core tides plus a special neutral tide called Neutral. Each core
 tide has a primary deck archetype and strategy it supports. Tides are not
 islands — they share borders. Adjacent tides have natural mechanical overlaps
 that reward players who draft across tide lines, creating hybrid strategies that
@@ -18,66 +18,66 @@ combine the strengths of two philosophies.
 
 The tide circle, in order, is: Bloom — Arc — Ignite — Pact — Umbra — Rime —
 Surge, which loops back to Bloom. Each tide is most naturally allied with its
-two neighbors on this circle, and Wild sits at the center, compatible with all.
+two neighbors on this circle, and Neutral sits at the center, compatible with all.
 
 ______________________________________________________________________
 
-# Wild
+# Neutral
 
 ## Philosophy
 
-Wild is the tide of the untamed and the uncategorized. It believes that the
+Neutral is the tide of the untamed and the uncategorized. It believes that the
 dream is too vast, too strange, and too fundamentally unknowable to be captured
 by any single philosophy. Where other tides commit to a worldview and draw
-strength from that commitment, Wild draws strength from refusing to commit at
+strength from that commitment, Neutral draws strength from refusing to commit at
 all. It is the trickster, the shapeshifter, the force of raw possibility that
 exists before the dreamer chooses what to dream.
 
-Wild does not reject the other tides — it sees truth in all of them. It simply
-refuses to be bound by any one truth. To Wild, flexibility is the highest form
+Neutral does not reject the other tides — it sees truth in all of them. It simply
+refuses to be bound by any one truth. To Neutral, flexibility is the highest form
 of power. The dreamer who can adapt to anything will outlast the dreamer who has
-mastered only one thing. Wild is drawn to the legendary, the singular, the
+mastered only one thing. Neutral is drawn to the legendary, the singular, the
 mythic — the kind of power that transcends category and defies classification.
 
 ## Mechanical Identity
 
-Wild is the neutral tide. Its cards are designed to be effective across three or
+Neutral is the neutral tide. Its cards are designed to be effective across three or
 more strategies, serving as glue that holds hybrid decks together and as
 standalone power that any drafter can use.
 
 **Primary tools:**
 
-- **Generic removal** — Wild provides flexible answers that don't require
+- **Generic removal** — Neutral provides flexible answers that don't require
   tide-specific synergy. Dissolve effects, banish effects, and targeted spark
   reduction all live here.
-- **Discover cards** — Wild is the primary home of Discover, offering flexible
+- **Discover cards** — Neutral is the primary home of Discover, offering flexible
   card selection that helps any strategy find what it needs.
 - **Sweepers** — Board-clearing effects that dissolve or banish multiple
-  characters. These are Wild's most dramatic tools, resetting the battlefield
+  characters. These are Neutral's most dramatic tools, resetting the battlefield
   when things go wrong.
-- **Legendary powers** — Wild is the exclusive home of the most mythic,
+- **Legendary powers** — Neutral is the exclusive home of the most mythic,
   format-warping effects: extra turns, massive card draw (draw 3), free energy
   generation (gain 3 energy for 0 cost), and permanent energy acceleration (gain
   2 extra energy per turn). These effects are rare, expensive, and
   game-defining.
 
-**Strategy:** Wild does not have a dedicated deck archetype. Instead, Wild cards
+**Strategy:** Neutral does not have a dedicated deck archetype. Instead, Neutral cards
 appear in every deck as utility, removal, and raw power. A draft that goes
-poorly in a specific tide can often be rescued by pivoting into a Wild-heavy
-"good stuff" pile that wins through card quality over synergy. Wild cards are
+poorly in a specific tide can often be rescued by pivoting into a Neutral-heavy
+"good stuff" pile that wins through card quality over synergy. Neutral cards are
 the safety net of the draft.
 
 ## Relationships
 
-Wild is allied with every tide and enemy of none. It is the connective tissue of
+Neutral is allied with every tide and enemy of none. It is the connective tissue of
 the format. Its generic removal helps aggressive decks push through blockers and
 control decks answer threats. Its Discover cards help combo decks find pieces
 and midrange decks find answers. Its legendary powers are coveted by everyone.
 
-The tension in Wild is opportunity cost: drafting Wild cards means passing on
-synergy-heavy tide cards. A deck full of Wild cards is powerful but undirected,
-like a river without banks. The best decks weave Wild's raw power into a tide's
-focused strategy, using Wild to shore up weaknesses rather than replace
+The tension in Neutral is opportunity cost: drafting Neutral cards means passing on
+synergy-heavy tide cards. A deck full of Neutral cards is powerful but undirected,
+like a river without banks. The best decks weave Neutral's raw power into a tide's
+focused strategy, using Neutral to shore up weaknesses rather than replace
 strengths.
 
 ______________________________________________________________________
@@ -309,7 +309,7 @@ overwhelm the opponent's spark total.
   end games from seemingly stable positions.
 
 **Weakness:** Ignite runs out of gas. Its cards are cheap but individually weak,
-and once the initial wave is answered — especially by a Wild sweeper — Ignite
+and once the initial wave is answered — especially by a Neutral sweeper — Ignite
 has little ability to rebuild. Ignite also struggles against go-tall strategies,
 where a single enormous character can outspark Ignite's entire army.
 
@@ -704,5 +704,5 @@ hybrid playstyle:
 | **Rime + Surge**  | Full control — proactive disruption meets reactive counterspells        |
 | **Surge + Bloom** | Ramp combo — accelerate energy, then chain events for a decisive turn   |
 
-Wild enhances any of these alliances by providing removal, card selection, and
+Neutral enhances any of these alliances by providing removal, card selection, and
 format-warping legendary effects.
