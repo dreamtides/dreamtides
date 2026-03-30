@@ -28,6 +28,17 @@ In other words:
 
 Wild remains the neutral / glue space. It is not part of the tide circle.
 
+For full rules definitions of game terms used in this document, see
+[battle_rules.md](../battle_rules/battle_rules.md). Key terms in brief:
+
+- **Materialize** — put a character onto the battlefield from any zone.
+- **Dreamwell** — shared card drawn each turn that produces energy.
+- **Judgment** — start-of-turn phase where spark totals are compared and victory
+  points scored.
+- **Fast** — a card property allowing play outside normal main-phase timing.
+- **Figment** — a token character created by card effects rather than played
+  from a deck.
+
 A useful way to read the system is:
 
 - **shared creature families** often live across a pair,
@@ -47,6 +58,8 @@ Ownership levels:
 - **Secondary** — this tide materially supports that mechanic.
 - **Tertiary** — this tide may have glue pieces, but not much density.
 - **Not Real** — this mechanic should not meaningfully pull drafters here.
+
+Blm=Bloom, Arc=Arc, Ign=Ignite, Pct=Pact, Umb=Umbra, Rim=Rime, Srg=Surge.
 
 | Function                       | Blm   | Arc   | Ign   | Pct   | Umb   | Rim   | Srg   |
 | ------------------------------ | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
@@ -157,90 +170,6 @@ Legend: **P** = Primary, **S** = Secondary, **T** = Tertiary, **N** = Not Real
 
 ______________________________________________________________________
 
-# Broader Deck-Style Map
-
-The named neighbor pairs are the primary archetypes, but the tides should also
-support broader deck-style identities that can appear in draft and deckbuilding.
-
-## Aggro
-
-Primarily **Ignite + Pact**, with some **Arc + Ignite** tempo-aggro variants.
-
-- Ignite supplies efficient pressure, go-wide scaling, and entry snowball.
-- Pact supplies better anchor bodies, profitable combat losses, and closing
-  conversion when the board stalls.
-
-## Midrange
-
-Primarily **Bloom + Arc**, **Ignite + Pact**, and **Pact + Umbra**.
-
-- Bloom-Arc is tall midrange.
-- Ignite-Pact is board-centric creature midrange.
-- Pact-Umbra is attrition midrange with recursive staying power.
-
-## Tempo
-
-Primarily **Arc + Ignite**, secondarily **Arc + Surge** and some **Rime +
-Surge**.
-
-- Arc is the main tempo tide: bounce, reset, replay, fast positioning.
-- Ignite turns those openings into immediate board pressure.
-- Surge contributes cheap reactive play and burst turns.
-- Rime contributes sculpting and selective disruption.
-
-## Draw-Go Control
-
-Primarily **Surge + Rime**, with Arc as a secondary contributor.
-
-- Surge owns fast cards, Prevent, copied interaction, and instant-speed reward.
-- Rime owns sculpting, opponent discard, and inevitability via card quality.
-- Arc contributes some fast bodies and tempo resets.
-
-## Tap-Out Control
-
-Primarily **Rime + Umbra**, secondarily **Pact + Umbra** and **Rime + Surge**.
-
-- Rime supplies draw, sculpting, prison elements, and hand attack.
-- Umbra supplies recursive inevitability and hard-to-exhaust threats.
-- Pact supplies removal and attrition punishers.
-- Surge supplies payoff turns and emergency reactive support.
-
-## Combo / Combo-Control
-
-Primarily **Surge + Bloom**, secondarily **Rime + Surge** and **Umbra + Rime**.
-
-- Surge-Bloom is spell-chain combo.
-- Rime-Surge is sculpted-hand combo-control.
-- Umbra-Rime can produce recursion-combo or reclaim-combo shells.
-
-## Reanimator
-
-Primarily **Umbra + Rime**, with Pact support.
-
-- Umbra owns the recursion engine.
-- Rime owns void loading and curation.
-- Pact can provide premium discard / abandon fodder and reward bodies.
-
-## Figments
-
-Primarily **Ignite + Pact**, with some Arc and Surge bleed.
-
-- Pact is the main home of Figment creation, especially Warrior Figments.
-- Ignite is the main home of scaling and "matters" rewards for going wide.
-- Arc can replay Figment-producing bodies.
-- Surge can support spell-based Figment bursts at tertiary density.
-
-## Prison / Stax / Hatebears
-
-Primarily **Rime + Pact**, secondarily **Surge + Rime**.
-
-- Rime owns taxation, hand attack, denial, and narrow lock pieces.
-- Pact owns disruptive creatures, punishing battlefield rules, and removal.
-- Surge contributes Prevent and reactive lock support.
-- These should exist as subthemes, not dominate the environment.
-
-______________________________________________________________________
-
 # The Seven Neighbor Archetypes
 
 ## Bloom + Arc — Ramp / Go Tall
@@ -251,7 +180,7 @@ Animal payoff cards.
 
 **How it wins:**
 
-- accelerate earlier than the normal Dreamwell curve,
+- accelerate earlier than the normal Dreamwell energy progression,
 - land oversized Arc threats,
 - scale a small number of premium Spirit Animals,
 - and protect or reuse those threats with Arc reset tools.
@@ -301,21 +230,21 @@ materialized triggers.
 
 - repeatedly flicker high-value materialized creatures,
 - turn each replay into fresh board presence or value,
-- scale through repeated entry rather than static size.
+- scale through repeated materialization rather than static size.
 
 **Arc contributes:**
 
 - the best flicker / blink / replay effects,
 - bounce and protective reset,
 - tempo repositioning,
-- the core engine that lets the deck loop entries.
+- the core engine that lets the deck loop materializations.
 
 **Ignite contributes:**
 
 - the best materialized abilities,
 - repeated-flicker reward cards,
 - creatures that are especially good to re-materialize,
-- scaling from repeated entry.
+- scaling from repeated materialization.
 
 **Overlap in both:**
 
@@ -327,8 +256,8 @@ materialized triggers.
 **Mini-archetypes inside the pair:**
 
 - **Tempo** — Arc interaction plus Ignite pressure.
-- **Blink value** — slower engine deck with many entry triggers.
-- **Aggro-combo** — cheap threats that snowball from repeated entries.
+- **Blink value** — slower engine deck with many materialize triggers.
+- **Aggro-combo** — cheap threats that snowball from repeated materialization.
 
 **Where fast cards matter lives:**
 
@@ -363,7 +292,7 @@ Warrior Figments.
 - shared Warrior presence,
 - the best "Warriors matter" payoffs,
 - go-wide scaling,
-- repeated-entry support for swarming.
+- repeated-materialize support for swarming.
 
 **Pact contributes:**
 
@@ -475,7 +404,7 @@ careful curation.
 
 **Overlap in both:**
 
-- Survivors overlap here with Umbra,
+- Survivors bridge the two tides,
 - void-facing card flow,
 - recursion-adjacent pieces,
 - slow inevitability tools.
@@ -701,7 +630,7 @@ ______________________________________________________________________
 
 ## Ignite
 
-Ignite is the tide of **entry payload and battlefield multiplication**.
+Ignite is the tide of **materialize payload and battlefield multiplication**.
 
 **It does:**
 
@@ -709,7 +638,7 @@ Ignite is the tide of **entry payload and battlefield multiplication**.
 - repeated-flicker reward cards,
 - shared Warrior presence with Pact,
 - "Warriors matter" scaling,
-- repeated-entry payoffs,
+- repeated-materialize payoffs,
 - aggressive board snowball.
 
 **Left deck: Arc + Ignite**
