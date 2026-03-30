@@ -3668,7 +3668,7 @@ subtype = ""
 rarity = "Special"
 is-fast = false
 spark = ""
-image-number = 313783940
+image-number = 0
 art-owned = true
 card-number = 221
 tide = ""
@@ -3684,7 +3684,7 @@ subtype = ""
 rarity = "Special"
 is-fast = false
 spark = ""
-image-number = 1486924805
+image-number = 0
 art-owned = true
 card-number = 222
 tide = ""
@@ -3702,7 +3702,7 @@ subtype = "Spirit Animal"
 rarity = "Uncommon"
 is-fast = false
 spark = 2
-image-number = 682942714
+image-number = 0
 art-owned = false
 card-number = 223
 
@@ -3810,7 +3810,7 @@ subtype = "Ancient"
 rarity = "Rare"
 is-fast = false
 spark = 3
-image-number = 735242560
+image-number = 0
 art-owned = false
 card-number = 229
 
@@ -3826,7 +3826,7 @@ subtype = "Mage"
 rarity = "Uncommon"
 is-fast = false
 spark = 0
-image-number = 2320845233
+image-number = 0
 art-owned = false
 card-number = 231
 
@@ -3909,7 +3909,7 @@ subtype = "Ancient"
 rarity = "Common"
 is-fast = false
 spark = 2
-image-number = 608687453
+image-number = 0
 art-owned = false
 card-number = 236
 
@@ -3925,7 +3925,7 @@ subtype = "Warrior"
 rarity = "Common"
 is-fast = false
 spark = 1
-image-number = 2421338075
+image-number = 0
 art-owned = false
 card-number = 238
 
@@ -3979,7 +3979,7 @@ subtype = "Warrior"
 rarity = "Common"
 is-fast = false
 spark = 2
-image-number = 1790126255
+image-number = 0
 art-owned = false
 card-number = 241
 
@@ -4014,7 +4014,7 @@ subtype = "Robot"
 rarity = "Common"
 is-fast = false
 spark = 2
-image-number = 596070029
+image-number = 0
 art-owned = false
 card-number = 244
 
@@ -4112,7 +4112,7 @@ subtype = ""
 rarity = "Common"
 is-fast = true
 spark = ""
-image-number = 603547835
+image-number = 0
 art-owned = false
 card-number = 250
 
@@ -4128,7 +4128,7 @@ subtype = ""
 rarity = "Uncommon"
 is-fast = true
 spark = ""
-image-number = 596070053
+image-number = 0
 art-owned = false
 card-number = 251
 
@@ -4160,7 +4160,7 @@ subtype = ""
 rarity = "Common"
 is-fast = true
 spark = ""
-image-number = 313784348
+image-number = 0
 art-owned = false
 card-number = 253
 
@@ -4192,7 +4192,7 @@ subtype = ""
 rarity = "Rare"
 is-fast = false
 spark = ""
-image-number = 1926604868
+image-number = 0
 art-owned = false
 card-number = 255
 
@@ -4323,7 +4323,7 @@ subtype = "Explorer"
 rarity = "Uncommon"
 is-fast = false
 spark = 1
-image-number = 608687435
+image-number = 0
 art-owned = false
 card-number = 265
 
@@ -4523,7 +4523,7 @@ subtype = "Spirit Animal"
 rarity = "Uncommon"
 is-fast = false
 spark = 2
-image-number = 1626794386
+image-number = 0
 art-owned = false
 card-number = 279
 
@@ -4558,7 +4558,7 @@ subtype = ""
 rarity = "Common"
 is-fast = true
 spark = ""
-image-number = 678431875
+image-number = 0
 art-owned = false
 card-number = 281
 
@@ -4574,7 +4574,7 @@ subtype = ""
 rarity = "Uncommon"
 is-fast = true
 spark = ""
-image-number = 2123360840
+image-number = 0
 art-owned = false
 card-number = 282
 
@@ -4590,7 +4590,7 @@ subtype = ""
 rarity = "Common"
 is-fast = true
 spark = ""
-image-number = 1383318404
+image-number = 0
 art-owned = false
 card-number = 283
 
@@ -4670,7 +4670,7 @@ subtype = "Outsider"
 rarity = "Common"
 is-fast = false
 spark = 1
-image-number = 461706976
+image-number = 0
 art-owned = false
 card-number = 288
 
@@ -4686,7 +4686,7 @@ subtype = "Warrior"
 rarity = "Common"
 is-fast = false
 spark = 2
-image-number = 591626954
+image-number = 0
 art-owned = false
 card-number = 289
 
@@ -4702,7 +4702,7 @@ subtype = "Survivor"
 rarity = "Uncommon"
 is-fast = false
 spark = 1
-image-number = 571228792
+image-number = 0
 art-owned = false
 card-number = 290
 
@@ -4753,7 +4753,7 @@ subtype = "Mage"
 rarity = "Common"
 is-fast = false
 spark = 1
-image-number = 443761774
+image-number = 0
 art-owned = false
 card-number = 293
 
@@ -4833,7 +4833,7 @@ subtype = "Survivor"
 rarity = "Common"
 is-fast = false
 spark = 0
-image-number = 1109402234
+image-number = 0
 art-owned = false
 card-number = 300
 
@@ -4849,7 +4849,7 @@ subtype = "Renegade"
 rarity = "Common"
 is-fast = true
 spark = 1
-image-number = 2191235669
+image-number = 0
 art-owned = false
 card-number = 301
 
@@ -4865,7 +4865,7 @@ subtype = "Mage"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 2212744817
+image-number = 0
 art-owned = false
 card-number = 302
 
@@ -4929,7 +4929,7 @@ subtype = ""
 rarity = "Common"
 is-fast = true
 spark = ""
-image-number = 1361568698
+image-number = 0
 art-owned = false
 card-number = 306
 
@@ -4980,7 +4980,7 @@ subtype = "Spirit Animal"
 rarity = "Uncommon"
 is-fast = false
 spark = 1
-image-number = 1498497890
+image-number = 0
 art-owned = false
 card-number = 309
 
@@ -4996,7 +4996,7 @@ subtype = "Spirit Animal"
 rarity = "Uncommon"
 is-fast = false
 spark = 1
-image-number = 1232455276
+image-number = 0
 art-owned = false
 card-number = 310
 
@@ -5188,7 +5188,7 @@ subtype = "Synth"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 1159163521
+image-number = 0
 art-owned = false
 card-number = 324
 
@@ -5222,7 +5222,7 @@ subtype = "Tinkerer"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 1480584620
+image-number = 0
 art-owned = false
 card-number = 326
 
@@ -5238,7 +5238,7 @@ subtype = "Tinkerer"
 rarity = "Rare"
 is-fast = false
 spark = 2
-image-number = 529374832
+image-number = 0
 art-owned = false
 card-number = 328
 
@@ -5385,7 +5385,7 @@ subtype = "Warrior"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 1694993299
+image-number = 0
 art-owned = false
 card-number = 337
 
@@ -5401,7 +5401,7 @@ subtype = "Mage"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 2424248083
+image-number = 0
 art-owned = false
 card-number = 338
 
@@ -5449,7 +5449,7 @@ subtype = "Ancient"
 rarity = "Rare"
 is-fast = false
 spark = 0
-image-number = 2025883235
+image-number = 0
 art-owned = false
 card-number = 343
 
@@ -5545,7 +5545,7 @@ subtype = "Warrior"
 rarity = "Uncommon"
 is-fast = false
 spark = 1
-image-number = 2295991865
+image-number = 0
 art-owned = false
 card-number = 355
 
@@ -5561,7 +5561,7 @@ subtype = ""
 rarity = "Common"
 is-fast = false
 spark = ""
-image-number = 1011222388
+image-number = 0
 art-owned = false
 card-number = 356
 
@@ -5625,7 +5625,7 @@ subtype = "Explorer"
 rarity = "Rare"
 is-fast = false
 spark = 5
-image-number = 1118816066
+image-number = 0
 art-owned = false
 card-number = 361
 
@@ -5657,7 +5657,7 @@ subtype = ""
 rarity = "Rare"
 is-fast = false
 spark = ""
-image-number = 1021646677
+image-number = 0
 art-owned = false
 card-number = 363
 
@@ -5737,7 +5737,7 @@ subtype = "Tinkerer"
 rarity = "Rare"
 is-fast = false
 spark = 0
-image-number = 2123360831
+image-number = 0
 art-owned = false
 card-number = 369
 
@@ -5785,7 +5785,7 @@ subtype = ""
 rarity = "Common"
 is-fast = false
 spark = ""
-image-number = 492981583
+image-number = 0
 art-owned = false
 card-number = 373
 
@@ -5817,7 +5817,7 @@ subtype = "Tinkerer"
 rarity = "Uncommon"
 is-fast = false
 spark = 0
-image-number = 686903125
+image-number = 0
 art-owned = false
 card-number = 376
 
@@ -5833,7 +5833,7 @@ subtype = "Tinkerer"
 rarity = "Uncommon"
 is-fast = false
 spark = 0
-image-number = 1225878700
+image-number = 0
 art-owned = false
 card-number = 377
 
@@ -5849,7 +5849,7 @@ subtype = "Visionary"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 739472623
+image-number = 0
 art-owned = false
 card-number = 378
 
@@ -5865,7 +5865,7 @@ subtype = "Tinkerer"
 rarity = "Rare"
 is-fast = false
 spark = 0
-image-number = 2261959345
+image-number = 0
 art-owned = false
 card-number = 379
 
@@ -5883,7 +5883,7 @@ subtype = "Synth"
 rarity = "Rare"
 is-fast = false
 spark = 0
-image-number = 2258761877
+image-number = 0
 art-owned = false
 card-number = 381
 
@@ -5918,7 +5918,7 @@ subtype = "Spirit Animal"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 708313729
+image-number = 0
 art-owned = false
 card-number = 383
 
@@ -5966,7 +5966,7 @@ subtype = ""
 rarity = "Uncommon"
 is-fast = true
 spark = ""
-image-number = 1739438654
+image-number = 0
 art-owned = false
 card-number = 386
 
@@ -6001,7 +6001,7 @@ subtype = "Tinkerer"
 rarity = "Uncommon"
 is-fast = false
 spark = 1
-image-number = 2261959347
+image-number = 0
 art-owned = false
 card-number = 389
 
@@ -6052,7 +6052,7 @@ subtype = "Spirit Animal"
 rarity = "Rare"
 is-fast = true
 spark = 1
-image-number = 1068256454
+image-number = 0
 art-owned = false
 card-number = 392
 
@@ -6084,7 +6084,7 @@ subtype = ""
 rarity = "Common"
 is-fast = true
 spark = ""
-image-number = 658075714
+image-number = 0
 art-owned = false
 card-number = 397
 
@@ -6186,7 +6186,7 @@ subtype = "Guide"
 rarity = "Common"
 is-fast = false
 spark = 0
-image-number = 439817041
+image-number = 0
 art-owned = false
 card-number = 408
 
@@ -6250,7 +6250,7 @@ subtype = "Visionary"
 rarity = "Rare"
 is-fast = false
 spark = 2
-image-number = 1114008224
+image-number = 0
 art-owned = false
 card-number = 412
 
@@ -6282,7 +6282,7 @@ subtype = "Mage"
 rarity = "Common"
 is-fast = false
 spark = 2
-image-number = 2419795155
+image-number = 0
 art-owned = false
 card-number = 414
 
@@ -6381,7 +6381,7 @@ subtype = "Guide"
 rarity = "Uncommon"
 is-fast = false
 spark = 2
-image-number = 1340760329
+image-number = 0
 art-owned = false
 card-number = 420
 
@@ -6397,7 +6397,7 @@ subtype = "Survivor"
 rarity = "Common"
 is-fast = false
 spark = 0
-image-number = 454095529
+image-number = 0
 art-owned = false
 card-number = 421
 
@@ -6413,7 +6413,7 @@ subtype = "Warrior"
 rarity = "Rare"
 is-fast = false
 spark = 3
-image-number = 436090582
+image-number = 0
 art-owned = false
 card-number = 422
 
@@ -6461,7 +6461,7 @@ subtype = "Warrior"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 2303852057
+image-number = 0
 art-owned = false
 card-number = 426
 
@@ -6673,7 +6673,7 @@ subtype = "Mage"
 rarity = "Rare"
 is-fast = true
 spark = 2
-image-number = 425039551
+image-number = 0
 art-owned = false
 card-number = 441
 
@@ -6801,7 +6801,7 @@ subtype = "Explorer"
 rarity = "Rare"
 is-fast = false
 spark = 2
-image-number = 762927769
+image-number = 0
 art-owned = false
 card-number = 450
 
@@ -6817,7 +6817,7 @@ subtype = "Visionary"
 rarity = "Rare"
 is-fast = false
 spark = 3
-image-number = 596070005
+image-number = 0
 art-owned = false
 card-number = 451
 
@@ -6881,7 +6881,7 @@ subtype = "Tinkerer"
 rarity = "Uncommon"
 is-fast = false
 spark = 1
-image-number = 735243058
+image-number = 0
 art-owned = false
 card-number = 456
 
@@ -7027,7 +7027,7 @@ subtype = "Tinkerer"
 rarity = "Common"
 is-fast = false
 spark = 0
-image-number = 1190830255
+image-number = 0
 art-owned = false
 card-number = 467
 
@@ -7059,7 +7059,7 @@ subtype = "Mage"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 515170279
+image-number = 0
 art-owned = false
 card-number = 469
 
@@ -7075,7 +7075,7 @@ subtype = "Spirit Animal"
 rarity = "Uncommon"
 is-fast = false
 spark = 1
-image-number = 1174403431
+image-number = 0
 art-owned = false
 card-number = 470
 
@@ -7123,7 +7123,7 @@ subtype = "Visionary"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 758082499
+image-number = 0
 art-owned = false
 card-number = 474
 
@@ -7155,7 +7155,7 @@ subtype = "Ancient"
 rarity = "Rare"
 is-fast = false
 spark = 8
-image-number = 507269506
+image-number = 0
 art-owned = false
 card-number = 477
 
@@ -7267,7 +7267,7 @@ subtype = "Explorer"
 rarity = "Common"
 is-fast = false
 spark = 2
-image-number = 591627038
+image-number = 0
 art-owned = false
 card-number = 487
 
@@ -7283,7 +7283,7 @@ subtype = "Visionary"
 rarity = "Rare"
 is-fast = false
 spark = 4
-image-number = 565499305
+image-number = 0
 art-owned = false
 card-number = 488
 
@@ -7331,7 +7331,7 @@ subtype = "Spirit Animal"
 rarity = "Common"
 is-fast = false
 spark = 1
-image-number = 1786390151
+image-number = 0
 art-owned = false
 card-number = 491
 
@@ -7445,7 +7445,7 @@ subtype = "Explorer"
 rarity = "Rare"
 is-fast = true
 spark = 3
-image-number = 1125131714
+image-number = 0
 art-owned = false
 card-number = 498
 
@@ -7509,7 +7509,7 @@ subtype = "Visionary"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 2269064813
+image-number = 0
 art-owned = false
 card-number = 502
 
@@ -7591,7 +7591,7 @@ is-fast = true
 spark = 1
 art-owned = false
 card-number = 509
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Signal Resonant"
@@ -7639,7 +7639,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 515
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Manufactured Abomination"
@@ -7735,7 +7735,7 @@ is-fast = false
 spark = 0
 art-owned = false
 card-number = 523
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Veilseeker"
@@ -7815,7 +7815,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 530
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Cloudmantle Ray"
@@ -8007,7 +8007,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 557
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Broadcast Array"
@@ -8167,7 +8167,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 572
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Edgelock Warden"
@@ -8183,7 +8183,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 573
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Clockwork Conductor"
@@ -8215,7 +8215,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 578
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Phantasmal Recruiter"
@@ -8231,7 +8231,7 @@ is-fast = false
 spark = 1
 art-owned = false
 card-number = 579
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Spiritecho Hydra"
@@ -8247,7 +8247,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 580
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Charnel Seraph"
@@ -8279,7 +8279,7 @@ is-fast = false
 spark = ""
 art-owned = false
 card-number = 582
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Glacial Doppelganger"
@@ -8295,7 +8295,7 @@ is-fast = false
 spark = 0
 art-owned = false
 card-number = 585
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Resonant Dreamseer"
@@ -8311,7 +8311,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 587
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Hollowed Offering"
@@ -8327,7 +8327,7 @@ is-fast = false
 spark = ""
 art-owned = false
 card-number = 590
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Cindermarch"
@@ -8423,7 +8423,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 600
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Veil Crosser"
@@ -8487,7 +8487,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 605
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Blazebound Sentinel"
@@ -8519,7 +8519,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 609
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Dreadmount Sovereign"
@@ -8663,7 +8663,7 @@ is-fast = false
 spark = 1
 art-owned = false
 card-number = 632
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Dread Arbiter"
@@ -8743,7 +8743,7 @@ is-fast = false
 spark = 0
 art-owned = false
 card-number = 643
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Patient Ascendant"
@@ -8775,7 +8775,7 @@ is-fast = false
 spark = 1
 art-owned = false
 card-number = 646
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Stoneborn Leviathan"
@@ -8839,7 +8839,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 658
-image-number = ""
+image-number = 0
 
 [[cards]]
 name = "Petal-Seer"
