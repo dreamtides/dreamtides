@@ -36,7 +36,7 @@ from match_counts import get_match_counts
 MECHANICAL_SUBTYPES = {"warrior", "spirit animal", "survivor"}
 
 # Cards assigned this many times or more are excluded from the pool
-SATURATION_LIMIT = 5
+SATURATION_LIMIT = 3
 
 # Pattern: TideCost | Cost●[/Spark✦] | Type[↯] | R | Rules text
 LINE_RE = re.compile(
@@ -153,7 +153,7 @@ def main():
             tide_cards = [x for x in filtered if x["tide"] == t]
             print(f"\n=== {t.upper()} ({len(tide_cards)}) ===")
         mc = c["match_count"]
-        if mc >= 3:
+        if mc >= 2:
             print(f"⚠{mc}× {c['raw']}")
         else:
             print(f"    {c['raw']}")

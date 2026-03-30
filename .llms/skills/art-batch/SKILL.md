@@ -1,6 +1,6 @@
 ---
 name: art-batch
-description: Orchestrate batch art-to-card matching across ~1500 images. Runs all images against the full card pool, writing results to art-assigned.toml.
+description: Orchestrate batch art-to-card matching across ~442 candidate images for 90 unassigned cards. Runs all images against the card pool, writing results to art-assigned.toml.
 ---
 
 # Art Batch Matching Orchestrator
@@ -8,6 +8,9 @@ description: Orchestrate batch art-to-card matching across ~1500 images. Runs al
 You are an orchestrator that matches art to cards using a **rolling parallelism** model.
 You maintain a target number of concurrent subagents (default 25), launching replacements
 immediately as each agent completes — never waiting for an entire batch to finish.
+
+The candidate images are pre-filtered to `/tmp/art-narrow/candidates/` (~442 images).
+The card pool is the 90 unassigned cards in `cards_anonymized.txt`.
 
 **All subagents MUST be launched with `model: "sonnet"`. Or, in Codex, use a supported GPT model such as `gpt-5.4-mini` or `gpt-5.4`; `reasoning_effort: "medium"` is acceptable for routine matching.**
 
@@ -158,11 +161,11 @@ Skips: [count]
 Two layers prevent any single rules text from being overrepresented:
 
 1. **Soft gate (check-match-count.py):** After selecting a winner, the subagent runs
-   `check-match-count.py` with the exact rules text. WARN at 3 matches forces
-   reconsideration; FAIL at 5+ forces picking a different card.
+   `check-match-count.py` with the exact rules text. WARN at 2 matches forces
+   reconsideration; FAIL at 3+ forces picking a different card.
 
-2. **Hard cap (pool-filter.py in art-match):** Cards matched 5+ times are excluded from
-   pool output entirely. The pool also annotates cards with ⚠3× or higher prefixes so
+2. **Hard cap (pool-filter.py in art-match):** Cards matched 3+ times are excluded from
+   pool output entirely. The pool also annotates cards with ⚠2× or higher prefixes so
    the agent can see popularity at browse time.
 
 Both scripts use `match_counts.py` to count assignments across **all** sources
@@ -170,7 +173,7 @@ Both scripts use `match_counts.py` to count assignments across **all** sources
 
 ## Context Preservation — CRITICAL
 
-You will process 1500+ images. Your context window WILL overflow if you are not disciplined.
+You will process ~442 images. Your context window may overflow if you are not disciplined.
 
 1. **Never print more than one line per completed agent.** No commentary, no analysis.
 2. **Never print summaries, progress updates, or status messages between refills.**

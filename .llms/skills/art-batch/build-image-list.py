@@ -7,7 +7,7 @@ Writes one image ID per line to /tmp/art-batch-images.txt
 import os
 import re
 
-IMAGES_DIR = "/Users/dthurn/Documents/shutterstock/images_clean"
+IMAGES_DIR = "/tmp/art-narrow/candidates"
 
 ids = []
 for fname in sorted(os.listdir(IMAGES_DIR)):

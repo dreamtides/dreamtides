@@ -11,9 +11,19 @@ def main():
         sys.exit(1)
 
     image_id = sys.argv[1]
-    images_dir = "/Users/dthurn/Documents/shutterstock/images_clean"
+    # Search candidate pool first, then fall back to full image directories
+    search_dirs = [
+        "/tmp/art-narrow/candidates",
+        "/Users/dthurn/Documents/shutterstock/images_clean",
+        "/Users/dthurn/Documents/shutterstock/images",
+    ]
 
-    matches = glob.glob(f"{images_dir}/*-{image_id}.*")
+    matches = []
+    for images_dir in search_dirs:
+        matches = glob.glob(f"{images_dir}/*-{image_id}.*")
+        if matches:
+            break
+
     if not matches:
         print(f"No image file found for ID {image_id}", file=sys.stderr)
         sys.exit(1)

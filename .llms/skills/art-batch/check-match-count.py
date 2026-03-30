@@ -12,9 +12,9 @@ For multiline rules text, always use --stdin to avoid shell mangling.
 
 Prints one of:
   PASS (0 matches)        — card is fresh, no concerns
-  WARN: 1 match           — card has been used once, consider alternatives
-  WARN: 2 matches         — card is popular, must justify why this art is a better fit
-  FAIL: 4+ matches (N)    — card is saturated, pick a different card
+  PASS (1 match)          — card has one match, still open
+  WARN: 2 matches         — card is at soft cap, must justify why this art is a better fit
+  FAIL: 3+ matches (N)    — card is saturated (hard cap), pick a different card
 """
 
 import sys
@@ -23,7 +23,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from match_counts import get_match_counts, normalize_text
 
-HARD_CAP = 5
+HARD_CAP = 3
+SOFT_CAP = 2
 
 if "--stdin" in sys.argv:
     target = sys.stdin.read().strip()
@@ -42,9 +43,9 @@ counts = get_match_counts()
 count = counts.get(normalize_text(target), 0)
 
 if count >= HARD_CAP:
-    print(f"FAIL: {count} matches — this card is saturated, pick a different card")
-elif count >= 3:
-    print(f"WARN: {count} matches — this card is popular, you must justify why this art is a uniquely better fit than prior matches or pick a different card")
+    print(f"FAIL: {count} matches — this card is saturated (hard cap {HARD_CAP}), pick a different card")
+elif count >= SOFT_CAP:
+    print(f"WARN: {count} matches — this card is popular (soft cap {SOFT_CAP}), you must justify why this art is a uniquely better fit than prior matches or pick a different card")
 elif count >= 1:
     print(f"PASS ({count} match{'es' if count > 1 else ''})")
 else:
