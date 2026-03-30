@@ -3723,7 +3723,7 @@ art-owned = false
 card-number = 224
 
 [[cards]]
-name = "Winged Void Rider"
+name = "Voidborne Herald"
 id = "5bfed3c9-cd1b-4fe7-a40b-dcec654db206"
 tide = "Rime"
 tide-cost = 1
@@ -4062,7 +4062,7 @@ subtype = "Warrior"
 rarity = "Uncommon"
 is-fast = true
 spark = 2
-image-number = 1159163608
+image-number = 432001921
 art-owned = false
 card-number = 247
 
@@ -4083,7 +4083,7 @@ art-owned = false
 card-number = 248
 
 [[cards]]
-name = "Lantern Reverie Sage"
+name = "Moss-Veiled Explorer"
 id = "226addd8-f09a-4237-ba75-c40635fbdb3b"
 tide = "Umbra"
 tide-cost = 2
@@ -4092,11 +4092,11 @@ rendered-text = """
 ▸ Judgment: Reclaim a character with cost up to this character's spark ●."""
 energy-cost = 5
 card-type = "Character"
-subtype = "Visionary"
+subtype = "Explorer"
 rarity = "Rare"
 is-fast = false
 spark = 0
-image-number = 758082490
+image-number = 1891048576
 art-owned = false
 card-number = 249
 
@@ -4213,7 +4213,7 @@ art-owned = false
 card-number = 256
 
 [[cards]]
-name = "Luminous Cocoon"
+name = "Strangled Streets"
 id = "3df2dd36-dd51-4355-87f2-b5ae197bb4dc"
 tide = "Umbra"
 tide-cost = 1
@@ -4227,7 +4227,7 @@ subtype = ""
 rarity = "Uncommon"
 is-fast = false
 spark = ""
-image-number = 533945275
+image-number = 1282908316
 art-owned = false
 card-number = 258
 
@@ -4280,7 +4280,7 @@ art-owned = false
 card-number = 262
 
 [[cards]]
-name = "Stormtide Oarsman"
+name = "Gleamharvester"
 id = "564ef717-7898-4623-9c94-e3fc986701e4"
 tide = "Rime"
 tide-cost = 1
@@ -4291,8 +4291,8 @@ subtype = "Explorer"
 rarity = "Common"
 is-fast = false
 spark = 1
-image-number = 762927766
-art-owned = false
+image-number = 2030910782
+art-owned = true
 card-number = 263
 
 [[cards]]
@@ -4328,18 +4328,18 @@ art-owned = false
 card-number = 265
 
 [[cards]]
-name = "Birdcaller in Radiance"
+name = "Copperleaf Mystic"
 id = "f04e32b3-d897-4c24-9999-3f0557482ba1"
 tide = "Neutral"
 tide-cost = 1
 rendered-text = "▸ Judgment: Draw a card."
 energy-cost = 5
 card-type = "Character"
-subtype = "Guide"
+subtype = "Explorer"
 rarity = "Common"
 is-fast = false
 spark = 2
-image-number = 662452573
+image-number = 1793552425
 art-owned = false
 card-number = 266
 
@@ -4395,7 +4395,7 @@ art-owned = false
 card-number = 270
 
 [[cards]]
-name = "Fractured Self"
+name = "Annular Recall"
 id = "79cdd40b-26d0-457d-9af2-bd15bfa88806"
 tide = "Arc"
 tide-cost = 1
@@ -4406,7 +4406,7 @@ subtype = ""
 rarity = "Common"
 is-fast = true
 spark = ""
-image-number = 539227204
+image-number = 1042405690
 art-owned = false
 card-number = 271
 
@@ -4480,18 +4480,18 @@ art-owned = false
 card-number = 276
 
 [[cards]]
-name = "Skyborn Drifter"
+name = "Dream Garden Visitor"
 id = "5fc8b425-5170-4281-bcef-230d82af20f9"
 tide = "Umbra"
 tide-cost = 1
 rendered-text = "▸ Materialized: Put the top 3 cards of your deck into your void."
 energy-cost = 2
 card-type = "Character"
-subtype = "Explorer"
+subtype = "Child"
 rarity = "Common"
 is-fast = false
 spark = 1
-image-number = 461706637
+image-number = 758082499
 art-owned = false
 card-number = 277
 
@@ -4627,7 +4627,7 @@ art-owned = false
 card-number = 285
 
 [[cards]]
-name = "Melting Visage"
+name = "Deathwalker"
 id = "97466d3a-452c-4991-8d6a-5ee3dae64d3e"
 tide = "Umbra"
 tide-cost = 1
@@ -4638,7 +4638,7 @@ subtype = "Survivor"
 rarity = "Uncommon"
 is-fast = true
 spark = 1
-image-number = 703988173
+image-number = 712713349
 art-owned = false
 card-number = 286
 
@@ -4801,7 +4801,7 @@ subtype = ""
 rarity = "Common"
 is-fast = false
 spark = ""
-image-number = 1129012508
+image-number = 482055286
 art-owned = false
 card-number = 298
 
@@ -4902,18 +4902,18 @@ art-owned = false
 card-number = 304
 
 [[cards]]
-name = "Shadowed Forest Sorcerer"
+name = "Nocturne Strummer"
 id = "2cf1bea9-6136-4626-a76e-39481978283a"
 tide = "Surge"
 tide-cost = 1
 rendered-text = "When you play an event, materialize a Radiant Figment."
 energy-cost = 2
 card-type = "Character"
-subtype = "Mage"
+subtype = "Musician"
 rarity = "Common"
 is-fast = false
 spark = 1
-image-number = 436090600
+image-number = 507269458
 art-owned = false
 card-number = 305
 
@@ -5001,7 +5001,7 @@ art-owned = false
 card-number = 310
 
 [[cards]]
-name = "Frostland Trident Knight"
+name = "Ashcrown Charger"
 id = "ee0aa963-6b13-4dbe-adb4-314390c5c9b5"
 tide = "Ignite"
 tide-cost = 1
@@ -5012,7 +5012,7 @@ subtype = "Warrior"
 rarity = "Uncommon"
 is-fast = false
 spark = 2
-image-number = 499788403
+image-number = 2189428523
 art-owned = false
 card-number = 311
 
@@ -5243,7 +5243,7 @@ art-owned = false
 card-number = 328
 
 [[cards]]
-name = "Torchlit Inversion"
+name = "Apex Ingress"
 id = "56f1e5d2-f15e-40e4-85de-f18607f4de4e"
 tide = "Arc"
 tide-cost = 1
@@ -5254,7 +5254,7 @@ subtype = ""
 rarity = "Common"
 is-fast = true
 spark = ""
-image-number = 772547356
+image-number = 2212744811
 art-owned = false
 card-number = 329
 
@@ -5470,7 +5470,7 @@ art-owned = false
 card-number = 344
 
 [[cards]]
-name = "Vessel on Grey Tides"
+name = "Ardent Farewell"
 id = "1105e04f-a048-4ac3-a144-632995663865"
 tide = "Rime"
 tide-cost = 1
@@ -5481,7 +5481,7 @@ subtype = ""
 rarity = "Common"
 is-fast = false
 spark = ""
-image-number = 586115303
+image-number = 256243528
 art-owned = false
 card-number = 349
 
@@ -5518,18 +5518,18 @@ art-owned = false
 card-number = 352
 
 [[cards]]
-name = "Glowing Stag Rider"
+name = "Saffron Trailblazer"
 id = "b2ae8947-1fca-47b7-9b93-4454584fead3"
 tide = "Bloom"
 tide-cost = 1
 rendered-text = "▸ Materialized: Gain 1 maximum ●."
 energy-cost = 1
 card-type = "Character"
-subtype = "Spirit Animal"
+subtype = "Explorer"
 rarity = "Uncommon"
 is-fast = false
 spark = 0
-image-number = 2123360858
+image-number = 682942894
 art-owned = false
 card-number = 354
 
@@ -6271,18 +6271,18 @@ art-owned = false
 card-number = 413
 
 [[cards]]
-name = "Watcher of Burning Skies"
+name = "Oakwood Messenger"
 id = "c0f7a075-a5a5-4383-8487-07f9788a623c"
 tide = "Arc"
 tide-cost = 1
 rendered-text = "When you return an ally to hand, draw a card."
 energy-cost = 4
 card-type = "Character"
-subtype = "Mage"
+subtype = "Explorer"
 rarity = "Common"
 is-fast = false
 spark = 2
-image-number = 2419795155
+image-number = 1950881314
 art-owned = false
 card-number = 414
 
@@ -6319,7 +6319,7 @@ art-owned = false
 card-number = 416
 
 [[cards]]
-name = "Skyfall Sovereign"
+name = "Harrowing Officiant"
 id = "19aac5e2-357c-4a50-8ef1-f40aa880a4c4"
 tide = "Neutral"
 tide-cost = 2
@@ -6330,8 +6330,8 @@ subtype = "Ancient"
 rarity = "Rare"
 is-fast = false
 spark = 2
-image-number = 1109402969
-art-owned = false
+image-number = 571228789
+art-owned = true
 card-number = 417
 
 [[cards]]
@@ -6530,7 +6530,7 @@ art-owned = false
 card-number = 431
 
 [[cards]]
-name = "Frosted Village Warden"
+name = "Starbound"
 id = "77bae5b0-ad0a-4b51-b211-141e95b3862a"
 tide = "Arc"
 tide-cost = 1
@@ -6541,27 +6541,27 @@ rendered-text = """
 • Dissolve an enemy with spark 2 or less."""
 energy-cost = 4
 card-type = "Character"
-subtype = "Visionary"
+subtype = "Explorer"
 rarity = "Rare"
 is-fast = true
 spark = 1
-image-number = 1463121791
+image-number = 1159163476
 art-owned = false
 card-number = 432
 
 [[cards]]
-name = "Moonlit Harbor"
+name = "Breathweaver"
 id = "91a34bf7-a856-498d-ba6a-c866494176ce"
 tide = "Ignite"
 tide-cost = 2
 rendered-text = "When you materialize a Figment, materialize an additional Figment."
 energy-cost = 4
 card-type = "Character"
-subtype = "Visionary"
+subtype = "Explorer"
 rarity = "Common"
 is-fast = false
 spark = 3
-image-number = 753489187
+image-number = 524175046
 art-owned = false
 card-number = 433
 
@@ -6678,18 +6678,18 @@ art-owned = false
 card-number = 441
 
 [[cards]]
-name = "Lantern Drift Maiden"
+name = "Skywarden"
 id = "36eb38d7-c57f-4c60-8b7a-21d4e955728e"
 tide = "Arc"
 tide-cost = 2
 rendered-text = "When you play an event, you may banish an ally, then materialize it."
 energy-cost = 4
 card-type = "Character"
-subtype = "Visionary"
+subtype = "Explorer"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 447372517
+image-number = 682942888
 art-owned = false
 card-number = 442
 
@@ -6742,7 +6742,7 @@ art-owned = false
 card-number = 446
 
 [[cards]]
-name = "Autumn Bicycle Reverie"
+name = "Conflagration"
 id = "17c95d25-fdc4-477c-ac98-92b2b2c1829b"
 tide = "Neutral"
 tide-cost = 1
@@ -6753,7 +6753,7 @@ subtype = ""
 rarity = "Common"
 is-fast = false
 spark = ""
-image-number = 1790126249
+image-number = 1095632744
 art-owned = false
 card-number = 447
 
@@ -6902,7 +6902,7 @@ art-owned = false
 card-number = 457
 
 [[cards]]
-name = "Frontline Marksman"
+name = "Sorrow Watcher"
 id = "29229288-b647-4ca8-b866-f42c983269cc"
 tide = "Rime"
 tide-cost = 2
@@ -6913,7 +6913,7 @@ subtype = "Survivor"
 rarity = "Common"
 is-fast = false
 spark = 1
-image-number = 1639942837
+image-number = 2299755787
 art-owned = false
 card-number = 458
 
@@ -6950,7 +6950,7 @@ art-owned = false
 card-number = 460
 
 [[cards]]
-name = "Spearmaiden's Guardian"
+name = "Fargazer"
 id = "2fe66e67-6d99-472b-9edf-982bda562df7"
 tide = "Rime"
 tide-cost = 1
@@ -6963,7 +6963,7 @@ subtype = "Renegade"
 rarity = "Uncommon"
 is-fast = false
 spark = 1
-image-number = 2131591267
+image-number = 2030910785
 art-owned = false
 card-number = 461
 
@@ -6984,18 +6984,18 @@ art-owned = false
 card-number = 462
 
 [[cards]]
-name = "Cliffside Duelists"
+name = "Edgewalker"
 id = "ac83cf04-f3c8-4c0d-aa05-98c142d2c322"
 tide = "Rime"
 tide-cost = 1
 rendered-text = "▸ Judgment: If the opponent has more cards in hand, draw a card."
 energy-cost = 2
 card-type = "Character"
-subtype = "Renegade"
+subtype = "Explorer"
 rarity = "Rare"
 is-fast = true
 spark = 2
-image-number = 2281682693
+image-number = 2281682689
 art-owned = false
 card-number = 463
 
@@ -7144,7 +7144,7 @@ art-owned = false
 card-number = 475
 
 [[cards]]
-name = "Leafborne Dreamer"
+name = "Steel Overlord"
 id = "11f31879-cc52-44ee-bbdf-74fb2d830dab"
 tide = "Ignite"
 tide-cost = 2
@@ -7155,7 +7155,7 @@ subtype = "Ancient"
 rarity = "Rare"
 is-fast = false
 spark = 8
-image-number = 507269506
+image-number = 1926604856
 art-owned = false
 card-number = 477
 
@@ -7240,7 +7240,7 @@ art-owned = false
 card-number = 484
 
 [[cards]]
-name = "Horizon Leviathan"
+name = "Twin Panorama"
 id = "084cfbdf-1263-4be2-b56a-ff5dbc801ba0"
 tide = "Rime"
 tide-cost = 2
@@ -7251,8 +7251,8 @@ subtype = ""
 rarity = "Rare"
 is-fast = false
 spark = ""
-image-number = 1733013506
-art-owned = false
+image-number = 1375564451
+art-owned = true
 card-number = 485
 
 [[cards]]
@@ -7498,18 +7498,18 @@ art-owned = false
 card-number = 501
 
 [[cards]]
-name = "Doomsday Chronicler"
+name = "Pinnacle Hermit"
 id = "91b9b0ad-af62-439f-9b68-15eaa0221fe9"
 tide = "Rime"
 tide-cost = 1
 rendered-text = "▸ Judgment: With exactly 5 cards in your hand, draw a card."
 energy-cost = 3
 card-type = "Character"
-subtype = "Visionary"
+subtype = "Explorer"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 2269064813
+image-number = 640097968
 art-owned = false
 card-number = 502
 
@@ -7642,7 +7642,7 @@ card-number = 515
 image-number = ""
 
 [[cards]]
-name = "Glacial Arbiter"
+name = "Manufactured Abomination"
 id = "60da36da-c426-43e0-9f2f-d891b442e199"
 tide = "Rime"
 tide-cost = 2
@@ -7655,7 +7655,7 @@ is-fast = false
 spark = 5
 art-owned = false
 card-number = 518
-image-number = ""
+image-number = 2281682691
 
 [[cards]]
 name = "Dreamforge Anvil"
@@ -7690,7 +7690,7 @@ card-number = 520
 image-number = ""
 
 [[cards]]
-name = "Tideshift Confluence"
+name = "Wellspring"
 id = "44c678e4-1a58-448c-83c1-70711bc92f38"
 tide = "Bloom"
 tide-cost = 1
@@ -7703,7 +7703,7 @@ is-fast = false
 spark = ""
 art-owned = false
 card-number = 521
-image-number = ""
+image-number = 618070745
 
 [[cards]]
 name = "Dusk Arbiter"
@@ -7770,20 +7770,20 @@ card-number = 526
 image-number = ""
 
 [[cards]]
-name = "Stormbreak Conjurer"
+name = "Thundercatcher"
 id = "d02caa3e-5eb6-4ba8-a931-9b967e88ab01"
 tide = "Surge"
 tide-cost = 2
 rendered-text = "When you prevent a card, draw a card and gain 2●."
 energy-cost = 3
 card-type = "Character"
-subtype = "Mage"
+subtype = "Warrior"
 rarity = "Rare"
 is-fast = false
 spark = 1
 art-owned = false
 card-number = 527
-image-number = ""
+image-number = 533945362
 
 [[cards]]
 name = "The Hollow Mirror"
@@ -7818,7 +7818,7 @@ card-number = 530
 image-number = ""
 
 [[cards]]
-name = "Worldsplitter"
+name = "Forestborn Elder"
 id = "3a15b27d-6274-4228-81f1-9e0e8ba295f3"
 tide = "Bloom"
 tide-cost = 2
@@ -7831,7 +7831,7 @@ is-fast = false
 spark = 3
 art-owned = false
 card-number = 535
-image-number = ""
+image-number = 1155706246
 
 [[cards]]
 name = "Stormcrest Oracle"
@@ -7850,20 +7850,20 @@ card-number = 538
 image-number = ""
 
 [[cards]]
-name = "Cascade Adept"
+name = "Gearwright"
 id = "8e3f53c6-bd60-4f2a-8891-195d8ab10ad7"
 tide = "Surge"
 tide-cost = 2
 rendered-text = "When you play an event, draw an event with lower cost."
 energy-cost = 5
 card-type = "Character"
-subtype = "Mage"
+subtype = "Tinkerer"
 rarity = "Rare"
 is-fast = false
 spark = 1
 art-owned = false
 card-number = 541
-image-number = ""
+image-number = 730423171
 
 [[cards]]
 name = "Ruinbringer Colossus"
@@ -7879,7 +7879,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 544
-image-number = ""
+image-number = 674166688
 
 [[cards]]
 name = "Dreambound Understudy"
@@ -7978,20 +7978,20 @@ card-number = 554
 image-number = ""
 
 [[cards]]
-name = "Voidsworn Trickster"
+name = "Upended Traveler"
 id = "3c3871cb-190d-435f-b35f-fcd5d88228e7"
 tide = "Arc"
 tide-cost = 1
 rendered-text = "▸ Materialized: Swap this character's spark with an enemy's spark."
 energy-cost = 6
 card-type = "Character"
-subtype = "Mage"
+subtype = "Explorer"
 rarity = "Rare"
 is-fast = false
 spark = 1
 art-owned = false
 card-number = 556
-image-number = ""
+image-number = 1225878703
 
 [[cards]]
 name = "Hearthwood Transplanter"
@@ -8362,20 +8362,20 @@ card-number = 593
 image-number = ""
 
 [[cards]]
-name = "Temporal Fold Mage"
+name = "Forge-Twin"
 id = "194e61db-a950-42e4-b94d-67b83756103c"
 tide = "Arc"
 tide-cost = 1
 rendered-text = "▸ Materialized: Banish an ally. At end of turn, materialize it and a copy of it."
 energy-cost = 5
 card-type = "Character"
-subtype = "Mage"
+subtype = "Warrior"
 rarity = "Rare"
 is-fast = false
 spark = 1
 art-owned = false
 card-number = 594
-image-number = ""
+image-number = 768349747
 
 [[cards]]
 name = "Ashforge Vessel"
@@ -8554,7 +8554,7 @@ card-number = 615
 image-number = ""
 
 [[cards]]
-name = "Voidthorn Leech"
+name = "Horror's Equal"
 id = "30363d50-516a-4784-aa55-1eeb5e7be508"
 tide = "Umbra"
 tide-cost = 1
@@ -8567,10 +8567,10 @@ is-fast = false
 spark = 0
 art-owned = false
 card-number = 616
-image-number = ""
+image-number = 1722480805
 
 [[cards]]
-name = "Worldsong Conductor"
+name = "Stonewaker"
 id = "13be5284-0a7c-4894-ba59-5559841ec9ae"
 tide = "Ignite"
 tide-cost = 2
@@ -8583,7 +8583,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 617
-image-number = ""
+image-number = 2427491217
 
 [[cards]]
 name = "Living Fractal"
@@ -8682,7 +8682,7 @@ card-number = 635
 image-number = ""
 
 [[cards]]
-name = "Doomclock Sentinel"
+name = "Epicenter"
 id = "56d74dc7-c88c-4039-bedf-9f38bcee0538"
 tide = "Neutral"
 tide-cost = 1
@@ -8695,7 +8695,7 @@ is-fast = false
 spark = 3
 art-owned = false
 card-number = 636
-image-number = ""
+image-number = 1246320997
 
 [[cards]]
 name = "Seedheart Stag"
@@ -8730,7 +8730,7 @@ card-number = 641
 image-number = ""
 
 [[cards]]
-name = "Void Reflection"
+name = "Cosmos Watcher"
 id = "1dd2d90c-b597-462b-aaf5-75b9c9cea47b"
 tide = "Bloom"
 tide-cost = 2
@@ -8743,7 +8743,7 @@ is-fast = false
 spark = 0
 art-owned = false
 card-number = 643
-image-number = ""
+image-number = 2313906189
 
 [[cards]]
 name = "Stillwater Oracle"
@@ -8762,20 +8762,20 @@ card-number = 644
 image-number = ""
 
 [[cards]]
-name = "Torch of the Fallen"
+name = "Splintered Bloom"
 id = "e27d0cee-f22c-4651-b446-ca60e50dd4a7"
 tide = "Bloom"
 tide-cost = 1
 rendered-text = "▸ Dissolved: The next character you play costs 0● and gains this ability."
 energy-cost = 2
 card-type = "Character"
-subtype = "Ancient"
+subtype = "Outsider"
 rarity = "Rare"
 is-fast = false
 spark = 1
 art-owned = false
 card-number = 646
-image-number = ""
+image-number = 674166679
 
 [[cards]]
 name = "Worldheart Resonator"
