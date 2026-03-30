@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
-"""Print the next batch of unprocessed image IDs.
+"""Print the next batch of unprocessed image IDs (rolling-window aware).
 
 Usage: python3 next-batch.py [BATCH_SIZE]
 
-Reads /tmp/art-batch-images.txt and checks art-assigned.toml,
-/tmp/art-batch-results/, and /tmp/art-batch-skips.txt for already-processed IDs.
+Tracks three states for each image ID:
+  - done:      result file exists, or listed in art-assigned.toml / skips.txt
+  - in-flight: listed in /tmp/art-batch-inflight.txt but not yet done
+  - remaining: neither done nor in-flight
 
-Output: one image ID per line (up to BATCH_SIZE), or "DONE" if none remain.
+The script automatically graduates in-flight IDs to done when their result or
+skip appears, keeping the inflight file accurate without manual cleanup.
+
+Output: one image ID per line (up to BATCH_SIZE new IDs), or "DONE" if no
+remaining images exist. Newly printed IDs are appended to the inflight file.
 Also prints a progress summary to stderr.
 """
 
@@ -17,6 +23,7 @@ from pathlib import Path
 BATCH_SIZE = int(sys.argv[1]) if len(sys.argv) > 1 else 5
 
 IMAGES = Path("/tmp/art-batch-images.txt")
+INFLIGHT = Path("/tmp/art-batch-inflight.txt")
 ASSIGNED = (
     Path(__file__).parent.parent.parent.parent
     / "rules_engine"
@@ -29,6 +36,7 @@ RESULTS_DIR = Path("/tmp/art-batch-results")
 all_ids = [line.strip() for line in IMAGES.read_text().splitlines() if line.strip()]
 total = len(all_ids)
 
+# Collect completed IDs from all sources
 done = set()
 if ASSIGNED.exists():
     for line in ASSIGNED.read_text().splitlines():
@@ -45,13 +53,33 @@ if RESULTS_DIR.exists():
         if f.suffix == ".toml":
             done.add(f.stem)
 
-remaining = [img_id for img_id in all_ids if img_id not in done]
+# Load in-flight set, pruning any that have since completed
+inflight = set()
+if INFLIGHT.exists():
+    for line in INFLIGHT.read_text().splitlines():
+        s = line.strip()
+        if s and s not in done:
+            inflight.add(s)
+    # Rewrite pruned inflight file
+    INFLIGHT.write_text("\n".join(sorted(inflight)) + "\n" if inflight else "")
 
-print(f"Total: {total}, Done: {len(done)}, Remaining: {len(remaining)}", file=sys.stderr)
+remaining = [img_id for img_id in all_ids if img_id not in done and img_id not in inflight]
+
+print(
+    f"Total: {total}, Done: {len(done)}, In-flight: {len(inflight)}, Remaining: {len(remaining)}",
+    file=sys.stderr,
+)
 
 if not remaining:
-    print("DONE")
+    if inflight:
+        print("WAITING")
+    else:
+        print("DONE")
 else:
     batch = remaining[:BATCH_SIZE]
+    # Append new IDs to inflight file
+    with open(INFLIGHT, "a") as f:
+        for img_id in batch:
+            f.write(img_id + "\n")
     for img_id in batch:
         print(img_id)

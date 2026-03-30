@@ -21,9 +21,10 @@ The card pool is the 90 unassigned cards in `cards_anonymized.txt`.
    python3 .llms/skills/art-batch/build-image-list.py
    ```
 
-2. Create the results directory:
+2. Create the results directory and clear stale inflight state:
    ```bash
    mkdir -p /tmp/art-batch-results
+   rm -f /tmp/art-batch-inflight.txt
    ```
 
 ## Rolling Launch
@@ -53,9 +54,14 @@ When notified that one or more agents have completed:
    ```bash
    python3 .llms/skills/art-batch/next-batch.py <COUNT>
    ```
+   `next-batch.py` tracks in-flight IDs automatically — it will never return an ID
+   that is already launched. It outputs one of:
+   - **Image IDs** (one per line): launch a new background agent for each.
+   - **`WAITING`**: all remaining images are in-flight; no new agents to launch. Just
+     wait for the next notification.
+   - **`DONE`**: every image is either done or skipped. Let remaining in-flight agents
+     drain.
 3. If this returns image IDs, launch new background agents for each in a single message.
-   If it returns `DONE`, do not launch new agents — let the remaining in-flight agents
-   drain.
 4. Continue waiting for the next notification.
 
 ### Drain & Finish
