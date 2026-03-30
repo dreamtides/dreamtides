@@ -16524,3 +16524,3351 @@ width = 80
 column = "tide"
 label = "Tide Distribution"
 statistic_type = "value_counts"
+
+
+[[cards]]
+name = "Dead Signal"
+id = "9daf5b3e-76e4-4e7e-aa74-1b4b9f5d9e3e"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "Return an ally to hand: Play this event for 0●. Prevent a played card unless the opponent pays 2●."
+energy-cost = 1
+card-type = "Event"
+subtype = ""
+rarity = "Uncommon"
+is-fast = true
+spark = ""
+image-number = 1026869335
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Void Corsair"
+id = "6370c96d-741c-4642-904d-0e5c8ab1421d"
+tide = "Arc"
+tide-cost = 1
+rendered-text = "▸ Materialized: If you drew this character this turn, banish an enemy."
+energy-cost = 5
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 1026869638
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Stormcaller"
+id = "1063277267"
+tide = "Ignite"
+tide-cost = "1"
+energy-cost = "3"
+spark = "1"
+card-type = "Character"
+subtype = "Warrior"
+rarity = "R"
+rendered-text = "▸ Materialized: Materialize a Warrior figment. ▸Judgment: Kindle 1 for each allied Warrior."
+is-fast = false
+image-number = 1063277267
+
+[[cards]]
+name = "Grim Reckoner"
+id = "72b9b786-c098-4e96-95f2-e9eabfd010a0"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "Discard a card: Gain 2●."
+energy-cost = 4
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Common"
+is-fast = false
+spark = 0
+image-number = 1077958364
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Ironwaste Exile"
+id = "2280b92e-4444-4655-b398-f5bfa458dc62"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "Discard 2 cards: Materialize a Shadow Figment."
+energy-cost = 2
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Common"
+is-fast = false
+spark = 1
+image-number = 1077959225
+art-owned = false
+card-number = 288
+
+[[cards]]
+name = "Sands Enduring"
+id = "a1df8763-d714-4cfe-8290-a63dbe2c6871"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "When you abandon a figment, gain 1✪."
+energy-cost = 4
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Uncommon"
+is-fast = false
+spark = 2
+image-number = 1114008224
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Arc Disciple"
+id = "daa30155-1b40-42ff-b5b6-0745ad9d4277"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "▸ Judgment: You may abandon an ally to gain 2●."
+energy-cost = 1
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Uncommon"
+is-fast = false
+spark = 0
+image-number = 1125132389
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Shadowprowler"
+id = "b6864d2c-b922-4aa3-ad55-643ca4b88d9e"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "Discard a card: This character gains +2 spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Common"
+is-fast = false
+spark = 1
+image-number = 1129012706
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Junk Golem"
+id = "25ee7d34-d1b0-4164-b0c2-e07e15c8d4cd"
+tide = "Rime"
+tide-cost = 1
+rendered-text = """
+Banish a card from hand: Play this character for 0●, then abandon it.
+
+▸ Materialized: Dissolve an enemy with spark 2 or less."""
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 3
+image-number = 1144639382
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Defiant Holdout"
+id = "7e4ecad0-7688-4144-aef3-abf9adc0d2e6"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Dissolved: Materialize a Warrior figment for each spark this character has."
+energy-cost = 1
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 1149594491
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Astral Pioneer"
+id = "b3c35d35-8410-42c7-86b7-a310a2557383"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "▸ Judgment: Draw a card, then discard a card. 2●: Materialize a Shadow Figment."
+energy-cost = 3
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 1169640028
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Storm Vigil"
+id = "2cb1defb-38d9-40fd-b7f0-43fcac173ccc"
+tide = "Umbra"
+tide-cost = 2
+rendered-text = "▸ Judgment: Put the top cards 2 of your deck into your void. Materialize a copy of a random character from among them with 1 spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 1174403272
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Vortex Engineer"
+id = "8c2de60e-1e06-4563-acf9-beb76a2620c2"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Judgment: Each ally gains +1 spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 1174403353
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Forerunner"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 1190830255
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Ashfall Kin"
+id = "b696de0b-420a-4e2b-b1e7-adf9644a18e6"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "Abandon an ally: Draw a card."
+energy-cost = 1
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Common"
+is-fast = false
+spark = 0
+image-number = 1207264099
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Field Reverent"
+id = "94e9b5d7-d583-4d6b-8362-d3664dd3b353"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Materialized: Choose an ally. Each other ally's spark becomes equal to that ally's spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 1213574257
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Null Navigator"
+id = "b3c35d35-8410-42c7-86b7-a310a2557383"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "▸ Judgment: Draw a card, then discard a card. 2●: Materialize a Shadow Figment."
+energy-cost = 3
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 1213574263
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Cinder Lord"
+id = "1219782721"
+tide = "Ignite"
+tide-cost = 1
+energy-cost = 3
+spark = 2
+card-type = "Character"
+subtype = "Ancient"
+rarity = "C"
+rendered-text = "When you materialize an ally, that ally gains +1 spark."
+is-fast = false
+image-number = 1219782721
+
+[[cards]]
+name = "Dawnfront Engineer"
+id = "0d83b9c0-cd72-4b11-9b4f-4079c1671f85"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment. ▸Judgment: Gain 1● for each allied Figment."
+energy-cost = 5
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 1225878700
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Timberwatch Stag"
+id = "00000000-0000-0000-0000-000000000000"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Materialized: Draw a card. With 3 allied Spirit Animals, dissolve an enemy with spark 2 or less."
+energy-cost = 2
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 1232455276
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Junkfield Renegade"
+id = "b696de0b-420a-4e2b-b1e7-adf9644a18e6"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "Abandon an ally: Draw a card."
+energy-cost = 1
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Common"
+is-fast = false
+spark = 0
+image-number = 1282908319
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Mosslight Acolyte"
+id = "4581b6c1-a060-41ee-b681-7d0a5ed7c658"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Judgment: Kindle 1. 5●: Each allied character gains +1 spark."
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 1295291188
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Wreckage Lookout"
+id = "b696de0b-420a-4e2b-b1e7-adf9644a18e6"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "Abandon an ally: Draw a card."
+energy-cost = 1
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Common"
+is-fast = false
+spark = 0
+image-number = 1302572584
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Warfield Stalwart"
+id = "d09f9ec0-02e0-4ce3-9281-b6d833e208c5"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "At the end of your turn, if an ally left play this turn, materialize a Warrior figment."
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 1328168246
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Gauntlet Runner"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 1361568698
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Key Sifter"
+id = "e4c24242-619c-4dd1-862f-edf988e1d6cc"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "▸ Judgment: You may discard up to 2 cards, then draw that many cards. This character gains +1 spark per card discarded."
+energy-cost = 1
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 1383318404
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Last Beacon"
+id = "cc5e770a-210d-4737-8aa7-6be7328b0dbd"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+When you materialize a Figment, draw a card."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 1387670426
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Meteor Invader"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 1402715894
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Assembly Wraith"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 1470059003
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Ironclad Holdout"
+id = "d610b91d-61c3-494f-8cf5-ab37847fa171"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Judgment: With 3 cards in your void, this character gains +2 spark."
+energy-cost = 1
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 1511229272
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Dreadnought Prime"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 1517426174
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Dragon's Rebuke"
+id = "38147bfd-8410-4293-a952-e348258c0542"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "Prevent a played card. Gain ● equal to that card's cost."
+energy-cost = 2
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = true
+spark = ""
+image-number = 1517426177
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Salvage Engine"
+id = "abb94289-9bb4-4adc-aea4-375fba2d38e9"
+tide = "Rime"
+tide-cost = 2
+rendered-text = "When you discard a character, it gains +3 spark and is put into your deck instead."
+energy-cost = 4
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 1570031572
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Shadow Bargainer"
+id = "cb30a53c-fce2-4048-b808-6ef106c9e054"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "▸ Materialized: Abandon an ally. Materialize a Shadow figment."
+energy-cost = 2
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Rare"
+is-fast = false
+spark = 5
+image-number = 1621160800
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Ironwatch"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 1639942837
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Cinderborne"
+id = "d610b91d-61c3-494f-8cf5-ab37847fa171"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Judgment: With 3 cards in your void, this character gains +2 spark."
+energy-cost = 1
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 1694993299
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Vast Carrion Lord"
+id = "cb30a53c-fce2-4048-b808-6ef106c9e054"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "▸ Materialized: Abandon an ally. Materialize a Shadow figment."
+energy-cost = 2
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 5
+image-number = 1716379555
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Thornwood Ranger"
+id = "c8ad42f8-39d4-4bd4-9100-d9afeb31c11c"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "Allied Warriors cost you 1● less."
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Common"
+is-fast = false
+spark = 2
+image-number = 1739438663
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Reboot"
+id = "cf12f551-e084-43ed-97e7-d7d54b21bc2d"
+tide = "Rime"
+tide-cost = 2
+rendered-text = "When you discard a character, materialize it."
+energy-cost = 5
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 1740270995
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Defiant Marksman"
+id = "8c16cd05-1925-4df1-ac08-86c3d84c45ee"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Judgment: Kindle 1."
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Common"
+is-fast = false
+spark = 1
+image-number = 1785274673
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Overload Vagrant"
+id = "72b9b786-c098-4e96-95f2-e9eabfd010a0"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "Discard a card: Gain 2●."
+energy-cost = 4
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Common"
+is-fast = false
+spark = 0
+image-number = 1786390145
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Heavenborn Whale"
+id = "e06f42fb-b7ec-401f-b374-76c889f697f2"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Materialized, Judgment: Gain 2●. The opponent gains 1✪."
+energy-cost = 2
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 1786390151
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Autumn's Bounty"
+id = "57e41821-b153-4a0a-9b25-3c77e773fede"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "Gain 1●."
+energy-cost = 0
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = false
+spark = ""
+image-number = 1789989914
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Cinderfield Hunter"
+id = "47c59376-dc4b-46d7-ba97-44db55e9d523"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Judgment: Dissolve a random enemy or ally among those with the lowest spark."
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 1790126255
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Unbroken"
+id = "634c3afc-64f5-4203-8b53-4316dcc42bc0"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "When you discard a card, this character gains +2 spark."
+energy-cost = 2
+card-type = "Character"
+subtype = "Renegade"
+rarity = "Common"
+is-fast = true
+spark = 1
+image-number = 1791664445
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Eventide Minstrel"
+id = "94e9b5d7-d583-4d6b-8362-d3664dd3b353"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Materialized: Choose an ally. Each other ally's spark becomes equal to that ally's spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Musician"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 1792373848
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Scorched Crusader"
+id = "a9c4db29-be96-467a-9b4b-b0bb0f779def"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Materialized: Materialize a Warrior figment. ▸ Judgment: Kindle 1 for each allied Warrior."
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 1798514893
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Defiant Parry"
+id = "38147bfd-8410-4293-a952-e348258c0542"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "Prevent a played card. Gain ● equal to that card's cost."
+energy-cost = 2
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = true
+spark = ""
+image-number = 1897537153
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Dark Bargain"
+id = "5b2c6dca-8bb0-412e-87ef-d98ad31ad986"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "Prevent a played card. The opponent draws 2 cards."
+energy-cost = 0
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = true
+spark = ""
+image-number = 1968259699
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Undying Fang"
+id = "2b5af1ab-76f4-48f7-894f-5e99f0c58a34"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Dissolved: The ally with the most spark gains +3 spark and this ability."
+energy-cost = 4
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2018848976
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Duskwall Delver"
+id = "2cb1defb-38d9-40fd-b7f0-43fcac173ccc"
+tide = "Umbra"
+tide-cost = 2
+rendered-text = "▸ Judgment: Put the top cards 2 of your deck into your void. Materialize a copy of a random character from among them with 1 spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2018848979
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Dragonward Knight"
+id = "9890e774-3d4e-4e63-b56c-5fbfe4bceeff"
+tide = "Ignite"
+tide-cost = 1
+energy-cost = 5
+spark = 1
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+rendered-text = "▸ Judgment: Materialize a Warrior figment."
+image-number = 2023111781
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Conduit Unchained"
+id = "e71ac2d1-8d45-479d-81db-3127860ba498"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "▸ Materialized: Gain 4●. Lose 1 maximum ●."
+energy-cost = 1
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Uncommon"
+is-fast = false
+spark = 0
+image-number = 2025883238
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Suspended Hour"
+id = "5b2c6dca-8bb0-412e-87ef-d98ad31ad986"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "Prevent a played card. The opponent draws 2 cards."
+energy-cost = 0
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = true
+spark = ""
+image-number = 2033123264
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Standoff"
+id = "5b2c6dca-8bb0-412e-87ef-d98ad31ad986"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "Prevent a played card. The opponent draws 2 cards."
+energy-cost = 0
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = true
+spark = ""
+image-number = 2123360840
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Dreamsgate Envoy"
+id = "2182865331"
+tide = "Ignite"
+tide-cost = "2"
+energy-cost = "5"
+spark = "1"
+card-type = "Character"
+subtype = "Explorer"
+rarity = "R"
+rendered-text = "▸ Judgment: Each ally gains spark equal to this character's spark."
+is-fast = false
+image-number = 2182865331
+
+[[cards]]
+name = "Cinderborn"
+id = "7e4ecad0-7688-4144-aef3-abf9adc0d2e6"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Dissolved: Materialize a Warrior figment for each spark this character has."
+energy-cost = 1
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 2182865339
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Standard Bearer"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 2186149271
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Emberfang"
+id = "e06f42fb-b7ec-401f-b374-76c889f697f2"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Materialized, Judgment: Gain 2●. The opponent gains 1✪."
+energy-cost = 2
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 2186149275
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Voidsire"
+id = "521f2592-3539-47fc-b0c9-f236ad06b29c"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "If this card is in your void, when you abandon an ally, materialize a Shadow Figment."
+energy-cost = 3
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 2186149281
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Ruptured Dynamo"
+id = "e71ac2d1-8d45-479d-81db-3127860ba498"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "▸ Materialized: Gain 4●. Lose 1 maximum ●."
+energy-cost = 1
+card-type = "Character"
+subtype = "Synth"
+rarity = "Uncommon"
+is-fast = false
+spark = 0
+image-number = 2189428525
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Gilded Catalyst"
+id = "04de0d16-6ff1-45c1-8590-88a5923935ff"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "When you materialize a Warrior, materialize a Halcyon Figment."
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Common"
+is-fast = false
+spark = 2
+image-number = 2189428529
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Machine Acolyte"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 2197688365
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Gateway Defender"
+id = "8c16cd05-1925-4df1-ac08-86c3d84c45ee"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Judgment: Kindle 1."
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Common"
+is-fast = false
+spark = 1
+image-number = 2197688369
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Moonbound Wolf"
+id = "4413a3c5-ef54-4253-b6fa-e8da64baf63f"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Judgment: You may return a character to hand to gain 3●."
+energy-cost = 1
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 2216124457
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Gloomantler"
+id = "25ee7d34-d1b0-4164-b0c2-e07e15c8d4cd"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "Banish a card from hand: Play this character for 0●, then abandon it.\n\n▸ Materialized: Dissolve an enemy with spark 2 or less."
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 3
+image-number = 2218612339
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Ambush Operative"
+id = "6370c96d-741c-4642-904d-0e5c8ab1421d"
+tide = "Arc"
+tide-cost = 1
+rendered-text = "▸ Materialized: If you drew this character this turn, banish an enemy."
+energy-cost = 5
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2221822099
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Mountainwatch Alpha"
+id = "05b21b36-09ff-461f-94a8-009b5140ee80"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Materialized: Draw a card. With 3 allied Spirit Animals, dissolve an enemy with spark 2 or less."
+energy-cost = 2
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Rare"
+is-fast = true
+spark = 1
+image-number = 2261959337
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Hallowed Stag"
+id = "26c452e9-b296-47b5-8f79-998369062487"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Judgment: Each character in your hand gains +1 spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 2261959339
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "City Wardens"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 2261959345
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Dusk Duelist"
+id = "6a23256e-8dff-4b37-a8bd-6e6b744c74a9"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Materialized: Dissolve an enemy with spark 2 or less."
+energy-cost = 1
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Common"
+is-fast = false
+spark = 0
+image-number = 2281682693
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Phantom-Ringed"
+id = "d610b91d-61c3-494f-8cf5-ab37847fa171"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Judgment: With 3 cards in your void, this character gains +2 spark."
+energy-cost = 1
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 2281682695
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Fracture Vigil"
+id = "2cb1defb-38d9-40fd-b7f0-43fcac173ccc"
+tide = "Umbra"
+tide-cost = 2
+rendered-text = "▸ Judgment: Put the top cards 2 of your deck into your void. Materialize a copy of a random character from among them with 1 spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2285036621
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Bog Apparition"
+id = "bd202039-a261-46a6-81ad-5563b7e27de0"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Materialized: The spark of each enemy becomes 1."
+energy-cost = 6
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2285036629
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Immeasured"
+id = "1dd2d90c-b597-462b-aaf5-75b9c9cea47b"
+tide = "Bloom"
+tide-cost = 2
+rendered-text = "This character's spark is equal to the highest enemy's spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 2290648799
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Shadowpack Warden"
+id = "58719d39-a9da-498f-a756-cfe82576d834"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "When you draw a character, materialize a Warrior figment."
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 2293194523
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Moonspire Ancient"
+id = "bd202039-a261-46a6-81ad-5563b7e27de0"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Materialized: The spark of each enemy becomes 1."
+energy-cost = 6
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2293194525
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Nightswimmer"
+id = "2280b92e-4444-4655-b398-f5bfa458dc62"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "Discard 2 cards: Materialize a Shadow Figment."
+energy-cost = 2
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Common"
+is-fast = false
+spark = 1
+image-number = 2295991861
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Sundown Ronin"
+id = "c8ad42f8-39d4-4bd4-9100-d9afeb31c11c"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "Allied Warriors cost you 1● less."
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Common"
+is-fast = false
+spark = 2
+image-number = 2295991865
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Voidcaller"
+id = "1980e1bb-0c85-4e5f-8cac-66bd27d76499"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "2●, Banish a card from your void: Materialize a Warrior Figment."
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Common"
+is-fast = false
+spark = 2
+image-number = 2299755785
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Conjurer of Hosts"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 2320845233
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Sylvan Matriarch"
+id = "5a596f0b-8bb8-4d00-bf41-1d2fd272b86e"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "When you materialize an ally, that ally gains +1 spark."
+energy-cost = 3
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Common"
+is-fast = false
+spark = 2
+image-number = 2415692455
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Rift Walker"
+id = "6370c96d-741c-4642-904d-0e5c8ab1421d"
+tide = "Arc"
+tide-cost = 1
+rendered-text = "▸ Materialized: If you drew this character this turn, banish an enemy."
+energy-cost = 5
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2415692461
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Cinderbeast"
+id = "47a7096a-946a-4715-811f-d4cb77198895"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a random 1-spark, a 2-spark, and a 3-spark character from your void."
+energy-cost = 6
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2419795153
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Drifting Scholar"
+id = "70306c8a-a77c-4d07-a4f8-abb51704be8c"
+tide = "Surge"
+tide-cost = 2
+rendered-text = "When you play a card, draw a card."
+energy-cost = 7
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Common"
+is-fast = false
+spark = 2
+image-number = 2419795157
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Duskwood Butcher"
+id = "1980e1bb-0c85-4e5f-8cac-66bd27d76499"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "2●, Banish a card from your void: Materialize a Warrior Figment."
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Common"
+is-fast = false
+spark = 2
+image-number = 2419795161
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Spellweaver"
+id = "7a696093-1347-49bf-81f6-4240a59198b7"
+tide = "Surge"
+tide-cost = 2
+rendered-text = "When you play an event, materialize a random character with equal cost from your deck."
+energy-cost = 5
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2424248083
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Fume Stalker"
+id = "2cb1defb-38d9-40fd-b7f0-43fcac173ccc"
+tide = "Umbra"
+tide-cost = 2
+rendered-text = "▸ Judgment: Put the top cards 2 of your deck into your void. Materialize a copy of a random character from among them with 1 spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2424248087
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Gateseeker"
+id = "c996cacb-1d18-4281-b695-42cee67278a8"
+tide = "Arc"
+tide-cost = 2
+rendered-text = "Your cards have ↯fast."
+energy-cost = 5
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Common"
+is-fast = false
+spark = 0
+image-number = 2424249729
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Wasteland Tamer"
+id = "2280b92e-4444-4655-b398-f5bfa458dc62"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "Discard 2 cards: Materialize a Shadow Figment."
+energy-cost = 2
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Common"
+is-fast = false
+spark = 1
+image-number = 2430444885
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Crackbringer"
+id = "2430444887"
+tide = "Ignite"
+tide-cost = "1"
+energy-cost = "2"
+spark = "1"
+card-type = "Character"
+subtype = "Warrior"
+rarity = "R"
+rendered-text = "▸ Judgment: Kindle 1. 5●: Each allied character gains +1 spark."
+is-fast = false
+image-number = 2430444887
+
+[[cards]]
+name = "Arcing Revenant"
+id = "dae4d76c-eb57-4775-ba66-105bd813ac76"
+tide = "Surge"
+tide-cost = 2
+rendered-text = "When you prevent a character, materialize a copy of it."
+energy-cost = 5
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2433164311
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Fangbound"
+id = "4bf0723b-ff81-4748-8253-a6b3540110e2"
+tide = "Arc"
+tide-cost = 1
+rendered-text = "▸ Materialized: Banish an enemy with cost 3● or less until this character leaves play."
+energy-cost = 3
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Uncommon"
+is-fast = false
+spark = 2
+image-number = 2438838887
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Boundary Ward"
+id = "ac9dbb02-de06-4977-a2eb-0ac839ab4c90"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "Prevent a played character. Draw a card."
+energy-cost = 3
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = true
+spark = ""
+image-number = 2438838895
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Gravewarden Wolf"
+id = "2b5af1ab-76f4-48f7-894f-5e99f0c58a34"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Dissolved: The ally with the most spark gains +3 spark and this ability."
+energy-cost = 4
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2521694545
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Shatterstrike"
+id = "05b4c64a-8eb3-4a09-a37f-5c205d734850"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Materialized: Each enemy loses 2 spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 3
+image-number = 2530614283
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Phantom Cull"
+id = "4b39e1f0-418d-45f7-923d-3ea629e55e11"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "Dissolve up to 2 enemies. Materialize a Shadow Figment for each enemy dissolved."
+energy-cost = 4
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+image-number = 2544257341
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Matched Adversary"
+id = "1dd2d90c-b597-462b-aaf5-75b9c9cea47b"
+tide = "Bloom"
+tide-cost = 2
+rendered-text = "This character's spark is equal to the highest enemy's spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 2544257345
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Starrunner"
+id = "4737eeb2-c564-4ae3-a409-ae3472f9fc11"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Judgment: Gain 1●. With 4 or more allies, gain 3● instead."
+energy-cost = 2
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 2586513019
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Martyr of Embers"
+id = "7e4ecad0-7688-4144-aef3-abf9adc0d2e6"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Dissolved: Materialize a Warrior figment for each spark this character has."
+energy-cost = 1
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 2586513023
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Gateway Synth"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 2586513027
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Dark Sentinels"
+id = "5b2c6dca-8bb0-412e-87ef-d98ad31ad986"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "Prevent a played card. The opponent draws 2 cards."
+energy-cost = 0
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = true
+spark = ""
+image-number = 2590831711
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Wasteland Holdout"
+id = "ef905bc3-6602-4b61-83bd-1b223cd5c5a2"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Judgment: If the opponent has more ✪ than you, materialize a Warrior figment and draw a card."
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2590831715
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Breach Soldier"
+id = "f6ccb2d8-663e-4c9b-830b-79b2ddc89f79"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Judgment: With a non-Warrior ally, draw a Warrior and materialize it."
+energy-cost = 5
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 3
+image-number = 2590831717
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Pale Pathfinder"
+id = "97eaacbe-bd52-4ef1-b7d2-b553a06db48b"
+tide = "Neutral"
+tide-cost = 2
+rendered-text = "▸ Materialized: Gain 3●. Draw 3 cards. Dissolve an enemy with spark 2 or less."
+energy-cost = 10
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Rare"
+is-fast = true
+spark = 3
+image-number = 2594220421
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Forest Familiar"
+id = "98a49295-1ad6-4c6a-bb78-659bfedeec21"
+tide = "Arc"
+tide-cost = 2
+rendered-text = """
+When an ally is banished, this character gains +1 spark.
+
+▸ Judgment: Banish an ally, then materialize it."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 2597662159
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Sanctum Unraveling"
+id = "4b39e1f0-418d-45f7-923d-3ea629e55e11"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "Dissolve up to 2 enemies. Materialize a Shadow Figment for each enemy dissolved."
+energy-cost = 4
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+image-number = 2603708595
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Pale Emissary"
+id = "97eaacbe-bd52-4ef1-b7d2-b553a06db48b"
+tide = "Neutral"
+tide-cost = 2
+rendered-text = "▸ Materialized: Gain 3●. Draw 3 cards. Dissolve an enemy with spark 2 or less."
+energy-cost = 10
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Rare"
+is-fast = true
+spark = 3
+image-number = 2603708601
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Wandering Archivist"
+id = "b3c35d35-8410-42c7-86b7-a310a2557383"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "▸ Judgment: Draw a card, then discard a card. 2●: Materialize a Shadow Figment."
+energy-cost = 3
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 2606475971
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Signal Dispatcher"
+id = "d09f9ec0-02e0-4ce3-9281-b6d833e208c5"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "At the end of your turn, if an ally left play this turn, materialize a Warrior figment."
+energy-cost = 2
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 260711438
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Farshore Rover"
+id = "70306c8a-a77c-4d07-a4f8-abb51704be8c"
+tide = "Surge"
+tide-cost = 2
+rendered-text = "When you play a card, draw a card."
+energy-cost = 7
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Common"
+is-fast = false
+spark = 2
+image-number = 2617241839
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Iron Drake"
+id = "bd202039-a261-46a6-81ad-5563b7e27de0"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Materialized: The spark of each enemy becomes 1."
+energy-cost = 6
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2617241841
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Rift Trekker"
+id = "70306c8a-a77c-4d07-a4f8-abb51704be8c"
+tide = "Surge"
+tide-cost = 2
+rendered-text = "When you play a card, draw a card."
+energy-cost = 7
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Common"
+is-fast = false
+spark = 2
+image-number = 2622590199
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Fracture Surveyor"
+id = "cc5e770a-210d-4737-8aa7-6be7328b0dbd"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment. \nWhen you materialize a Figment, draw a card."
+energy-cost = 3
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 2626599311
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Ridgeclaw"
+id = "26c452e9-b296-47b5-8f79-998369062487"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Judgment: Each character in your hand gains +1 spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 2626599355
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Shadowfire Adept"
+id = "cb30a53c-fce2-4048-b808-6ef106c9e054"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "▸ Materialized: Abandon an ally. Materialize a Shadow figment."
+energy-cost = 2
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Rare"
+is-fast = false
+spark = 5
+image-number = 263151206
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Summit Revelator"
+id = "97eaacbe-bd52-4ef1-b7d2-b553a06db48b"
+tide = "Neutral"
+tide-cost = 2
+rendered-text = "▸ Materialized: Gain 3●. Draw 3 cards. Dissolve an enemy with spark 2 or less."
+energy-cost = 10
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Rare"
+is-fast = true
+spark = 3
+image-number = 2637215369
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Crumbling Covenant"
+id = "018c304f-90b1-4365-8568-8f527279b703"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "Abandon an ally: Gain 1 maximum ●."
+energy-cost = 2
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = false
+spark = ""
+image-number = 2639857435
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Vine Golem"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 2639857437
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Crestwalker"
+id = "ef905bc3-6602-4b61-83bd-1b223cd5c5a2"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Judgment: If the opponent has more ✪ than you, materialize a Warrior figment and draw a card."
+energy-cost = 3
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2639857439
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Dune Reaper"
+id = "05b4c64a-8eb3-4a09-a37f-5c205d734850"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Materialized: Each enemy loses 2 spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 3
+image-number = 2639857441
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Cloudbreak Scholar"
+id = "97eaacbe-bd52-4ef1-b7d2-b553a06db48b"
+tide = "Neutral"
+tide-cost = 2
+rendered-text = "▸ Materialized: Gain 3●. Draw 3 cards. Dissolve an enemy with spark 2 or less."
+energy-cost = 10
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Rare"
+is-fast = true
+spark = 3
+image-number = 2642886415
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Dreaming Obelisk"
+id = "47a7096a-946a-4715-811f-d4cb77198895"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a random 1-spark, a 2-spark, and a 3-spark character from your void."
+energy-cost = 6
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2645678685
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Eclipsed Relic"
+id = "521f2592-3539-47fc-b0c9-f236ad06b29c"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "If this card is in your void, when you abandon an ally, materialize a Shadow Figment."
+energy-cost = 3
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 2645678687
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Aureate Vision"
+id = "c7840f3b-3297-4409-b124-4309ed93e542"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Judgment: Each ally gains spark equal to this character's spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Visionary"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 264681587
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Frozen Apex"
+id = "bd202039-a261-46a6-81ad-5563b7e27de0"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Materialized: The spark of each enemy becomes 1."
+energy-cost = 6
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2654359867
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Veilwood Alpha"
+id = "26c452e9-b296-47b5-8f79-998369062487"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Judgment: Each character in your hand gains +1 spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 2654359871
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Sandglider"
+id = "c996cacb-1d18-4281-b695-42cee67278a8"
+tide = "Arc"
+tide-cost = 2
+rendered-text = "Your cards have ↯fast."
+energy-cost = 5
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Common"
+is-fast = false
+spark = 0
+image-number = 2657255499
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Crucible Warlord"
+id = "f6ccb2d8-663e-4c9b-830b-79b2ddc89f79"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Judgment: With a non-Warrior ally, draw a Warrior and materialize it."
+energy-cost = 5
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 3
+image-number = 2661986989
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Liminal Striker"
+id = "f21c6100-c8de-452f-bd98-0f22b62aea71"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "When you draw a Warrior, materialize a copy of it with 1 spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 2667786599
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Precipice Renegade"
+id = "97eaacbe-bd52-4ef1-b7d2-b553a06db48b"
+tide = "Neutral"
+tide-cost = 2
+rendered-text = "▸ Materialized: Gain 3●. Draw 3 cards. Dissolve an enemy with spark 2 or less."
+energy-cost = 10
+card-type = "Character"
+subtype = "Renegade"
+rarity = "Rare"
+is-fast = true
+spark = 3
+image-number = 2675749427
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Crucible Works"
+id = "018c304f-90b1-4365-8568-8f527279b703"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "Abandon an ally: Gain 1 maximum ●."
+energy-cost = 2
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = false
+spark = ""
+image-number = 269168198
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Carrion Flock"
+id = "b6864d2c-b922-4aa3-ad55-643ca4b88d9e"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "Discard a card: This character gains +2 spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Common"
+is-fast = false
+spark = 1
+image-number = 297872186
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Sunbreak Hunter"
+id = "0cce3648-d2a8-481c-8521-8565853f664a"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "Abandon an ally: Foresee 2."
+energy-cost = 1
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Common"
+is-fast = false
+spark = 1
+image-number = 302396894
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Tidecaller"
+id = "a4f02e6c-1a14-4529-94a5-b2e1299f979d"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "▸ Materialized: The opponent discards a card. They can't play cards with that cost until your next turn."
+energy-cost = 3
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 309018608
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Vantage Broker"
+id = "daa30155-1b40-42ff-b5b6-0745ad9d4277"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "▸ Judgment: You may abandon an ally to gain 2●."
+energy-cost = 1
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Uncommon"
+is-fast = false
+spark = 0
+image-number = 309018632
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Driftrider"
+id = "c0f7a075-a5a5-4383-8487-07f9788a623c"
+tide = "Arc"
+tide-cost = 1
+rendered-text = "When you return an ally to hand, draw a card."
+energy-cost = 4
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Common"
+is-fast = false
+spark = 2
+image-number = 309018680
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Untethered"
+id = "dae4d76c-eb57-4775-ba66-105bd813ac76"
+tide = "Surge"
+tide-cost = 2
+rendered-text = "When you prevent a character, materialize a copy of it."
+energy-cost = 5
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 316023020
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Astral Angler"
+id = "7d499e79-df6a-47e1-9f1a-7f9b7ad9d8a8"
+tide = "Rime"
+tide-cost = 2
+rendered-text = "While in hand, when you discard another card, this gains +2 spark."
+energy-cost = 3
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 318372281
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Dreadkeep"
+id = "f5f60506-b4a2-4743-92f5-b460518e127a"
+tide = "Rime"
+tide-cost = 2
+rendered-text = "Discard a character: Play this character for 0● and it gains that character's spark."
+energy-cost = 3
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 318372506
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Beacon Vessel"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 318372524
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Orbital Hermit"
+id = "029e7b87-fa96-4c0c-abdd-1c8b532f0477"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "▸ Judgment: You may abandon 2 allies to gain 2● and draw 2 cards."
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 326238221
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Crestcaller"
+id = "4737eeb2-c564-4ae3-a409-ae3472f9fc11"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Judgment: Gain 1●. With 4 or more allies, gain 3● instead."
+energy-cost = 2
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 331258328
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "War Effigy"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 337161542
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Construct Marshal"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 339410630
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Null Sphere"
+id = "ac9dbb02-de06-4977-a2eb-0ac839ab4c90"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "Prevent a played character. Draw a card."
+energy-cost = 3
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = true
+spark = ""
+image-number = 339410639
+art-owned = false
+card-number = 250
+
+[[cards]]
+name = "Overgrown Engine"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 360302378
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Primal Glow"
+id = "57e41821-b153-4a0a-9b25-3c77e773fede"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "Gain 1●."
+energy-cost = 0
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = false
+spark = ""
+image-number = 393588079
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Siege Construct"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 393588451
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Fractal Skitter"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 410445424
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Somber Flockmaster"
+id = "a62ff9de-81ca-43b4-a37f-1b2b558e1cfb"
+tide = "Umbra"
+tide-cost = 1
+rendered-text = "▸ Judgment: You may reclaim an event with cost up to this character's spark."
+energy-cost = 2
+card-type = "Character"
+subtype = "Mage"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 424818601
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Celestial Forger"
+id = "b3908e49-4a7a-4034-8a25-5e592246c5e5"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "When the opponent materializes a character, materialize a Celestial Figment."
+energy-cost = 3
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 425039572
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Field Marshal"
+id = "c8ad42f8-39d4-4bd4-9100-d9afeb31c11c"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "Allied Warriors cost you 1● less."
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Common"
+is-fast = false
+spark = 2
+image-number = 436090582
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Obsidian Dominion"
+id = "18b1d155-a89a-4f37-87c4-644ff83c16ef"
+tide = "Umbra"
+tide-cost = 2
+rendered-text = "▸ Materialized: The opponent abandons 3 characters"
+energy-cost = 9
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 4
+image-number = 436090636
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Stargazer Adrift"
+id = "0cce3648-d2a8-481c-8521-8565853f664a"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "Abandon an ally: Foresee 2."
+energy-cost = 1
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Common"
+is-fast = false
+spark = 1
+image-number = 439817398
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Labyrinth Overseer"
+id = "443761747"
+tide = "Pact"
+tide-cost = "1"
+energy-cost = "2"
+spark = "1"
+card-type = "Character"
+subtype = "Explorer"
+rarity = "R"
+rendered-text = "▸ Judgment: You may abandon an ally to put cards from your deck into your void equal to that ally's spark."
+is-fast = false
+image-number = 443761747
+
+[[cards]]
+name = "Lantern Bearer"
+id = "abb94289-9bb4-4adc-aea4-375fba2d38e9"
+tide = "Rime"
+tide-cost = 2
+rendered-text = "When you discard a character, it gains +3 spark and is put into your deck instead."
+energy-cost = 4
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 447372517
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Eruption"
+id = "daa1eaa3-6504-4669-b4f2-50f1e2494dcc"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "Until end of turn, characters in hand cost 1● and have 1 spark."
+energy-cost = 3
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+image-number = 450440617
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Unflinching"
+id = "ef905bc3-6602-4b61-83bd-1b223cd5c5a2"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Judgment: If the opponent has more ✪ than you, materialize a Warrior figment and draw a card."
+energy-cost = 3
+card-type = "Character"
+subtype = "Renegade"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 450440632
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Pit Descender"
+id = "0bf69801-fab9-4459-9eef-4c57eae90b02"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "▸ Judgment: You may abandon an ally to put cards from your deck into your void equal to that ally's spark."
+energy-cost = 2
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 450441286
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Aberrant Frame"
+id = "04de0d16-6ff1-45c1-8590-88a5923935ff"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "When you materialize a Warrior, materialize a Halcyon Figment."
+energy-cost = 3
+card-type = "Character"
+subtype = "Robot"
+rarity = "Common"
+is-fast = false
+spark = 2
+image-number = 454095514
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Crumbling Behemoth"
+id = "11f31879-cc52-44ee-bbdf-74fb2d830dab"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Dissolved: Materialize three Warrior figments."
+energy-cost = 10
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 8
+image-number = 461706985
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Toll of Passage"
+id = "9daf5b3e-76e4-4e7e-aa74-1b4b9f5d9e3e"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "Return an ally to hand: Play this event for 0●. Prevent a played card unless the opponent pays 2●."
+energy-cost = 1
+card-type = "Event"
+subtype = ""
+rarity = "Uncommon"
+is-fast = true
+spark = ""
+image-number = 499788430
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Arcane Wayfinder"
+id = "942f0a01-40a8-4351-9fdb-417674bdd221"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment.  When you materialize a Figment, draw a card."
+energy-cost = 3
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 503461000
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Steel Locust"
+id = "ad9a9b5c-6dc9-4a89-b709-786b04988d3e"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment. ▸Judgment: Gain 1● for each allied Figment."
+energy-cost = 5
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 511427890
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Skybourne Drake"
+id = "98a49295-1ad6-4c6a-bb78-659bfedeec21"
+tide = "Arc"
+tide-cost = 2
+rendered-text = """
+When an ally is banished, this character gains +1 spark.
+
+▸ Judgment: Banish an ally, then materialize it."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 519475330
+art-owned = false
+card-number = 383
+
+[[cards]]
+name = "Deepwood Torchbearer"
+id = "8c16cd05-1925-4df1-ac08-86c3d84c45ee"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Judgment: Kindle 1."
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Common"
+is-fast = false
+spark = 1
+image-number = 533945284
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Saltwater Warlord"
+id = "f6ccb2d8-663e-4c9b-830b-79b2ddc89f79"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Judgment: With a non-Warrior ally, draw a Warrior and materialize it."
+energy-cost = 5
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 3
+image-number = 539226472
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Cinder Walker"
+id = "72b9b786-c098-4e96-95f2-e9eabfd010a0"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "Discard a card: Gain 2●."
+energy-cost = 4
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Common"
+is-fast = false
+spark = 0
+image-number = 561422755
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Darkstep Ronin"
+id = "029e7b87-fa96-4c0c-abdd-1c8b532f0477"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "▸ Judgment: You may abandon 2 allies to gain 2● and draw 2 cards."
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 565499662
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Cosmos Cartographer"
+id = "b3908e49-4a7a-4034-8a25-5e592246c5e5"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "When the opponent materializes a character, materialize a Celestial Figment."
+energy-cost = 3
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 571228786
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Planetfall Drone"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 581686579
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Saltless Mariner"
+id = "a1df8763-d714-4cfe-8290-a63dbe2c6871"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "When you abandon a figment, gain 1✪."
+energy-cost = 4
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Uncommon"
+is-fast = false
+spark = 2
+image-number = 586115630
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Forge Giant"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 603547823
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Scarlet Outcast"
+id = "634c3afc-64f5-4203-8b53-4316dcc42bc0"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "When you discard a card, this character gains +2 spark."
+energy-cost = 2
+card-type = "Character"
+subtype = "Renegade"
+rarity = "Common"
+is-fast = true
+spark = 1
+image-number = 603547829
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Assembly Prime"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 608687447
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Cloudwright"
+id = "8c2de60e-1e06-4563-acf9-beb76a2620c2"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Judgment: Each ally gains +1 spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 612667835
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Unbound Horror"
+id = "47c59376-dc4b-46d7-ba97-44db55e9d523"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Judgment: Dissolve a random enemy or ally among those with the lowest spark."
+energy-cost = 3
+card-type = "Character"
+subtype = "Monster"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 626543207
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Neon Shepherd"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 640098112
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Orbital Dreadnought"
+id = "47a7096a-946a-4715-811f-d4cb77198895"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a random 1-spark, a 2-spark, and a 3-spark character from your void."
+energy-cost = 6
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 640098136
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Rune Petitioner"
+id = "029e7b87-fa96-4c0c-abdd-1c8b532f0477"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "▸ Judgment: You may abandon 2 allies to gain 2● and draw 2 cards."
+energy-cost = 3
+card-type = "Character"
+subtype = "Mage"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 644603200
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Dreadweaver"
+id = "029e7b87-fa96-4c0c-abdd-1c8b532f0477"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "▸ Judgment: You may abandon 2 allies to gain 2● and draw 2 cards."
+energy-cost = 3
+card-type = "Character"
+subtype = "Mage"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 649133680
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Vesper Outsider"
+id = "f5f60506-b4a2-4743-92f5-b460518e127a"
+tide = "Rime"
+tide-cost = 2
+rendered-text = "Discard a character: Play this character for 0● and it gains that character's spark."
+energy-cost = 3
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 653554000
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Phalanx Construct"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 653554603
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Scatter Synth"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment.\nThis character's spark is equal to the number of allied Figments."
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 658076065
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Forest Sojourner"
+id = "0cce3648-d2a8-481c-8521-8565853f664a"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "Abandon an ally: Foresee 2."
+energy-cost = 1
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Common"
+is-fast = false
+spark = 1
+image-number = 662452597
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Wayward Porter"
+id = "abb94289-9bb4-4adc-aea4-375fba2d38e9"
+tide = "Rime"
+tide-cost = 2
+rendered-text = "When you discard a character, it gains +3 spark and is put into your deck instead."
+energy-cost = 4
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 666342256
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Embered Corsair"
+id = "6370c96d-741c-4642-904d-0e5c8ab1421d"
+tide = "Arc"
+tide-cost = 1
+rendered-text = "▸ Materialized: If you drew this character this turn, banish an enemy."
+energy-cost = 5
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 670293463
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Shadow March"
+id = "4b39e1f0-418d-45f7-923d-3ea629e55e11"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "Dissolve up to 2 enemies. Materialize a Shadow Figment for each enemy dissolved."
+energy-cost = 4
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+image-number = 670293472
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Molten Duel"
+id = "102c3047-58d9-4b2b-bea9-10739e84b9cd"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "Dissolve an enemy with spark 3 or less."
+energy-cost = 1
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = true
+spark = ""
+image-number = 674166682
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Rubble Runner"
+id = "d09f9ec0-02e0-4ce3-9281-b6d833e208c5"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "At the end of your turn, if an ally left play this turn, materialize a Warrior figment."
+energy-cost = 2
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Uncommon"
+is-fast = false
+spark = 1
+image-number = 678431947
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Null Pyramid"
+id = "102c3047-58d9-4b2b-bea9-10739e84b9cd"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "Dissolve an enemy with spark 3 or less."
+energy-cost = 1
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = true
+spark = ""
+image-number = 678431956
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Skyward Elder"
+id = "2b5af1ab-76f4-48f7-894f-5e99f0c58a34"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Dissolved: The ally with the most spark gains +3 spark and this ability."
+energy-cost = 4
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 682942714
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Flesh Sculptor"
+id = "ad9a9b5c-6dc9-4a89-b709-786b04988d3e"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "▸ Materialized: Materialize a Warrior figment. ▸Judgment: Gain 1● for each allied Figment."
+energy-cost = 5
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 686903233
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Dustland Cavalier"
+id = "8c16cd05-1925-4df1-ac08-86c3d84c45ee"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Judgment: Kindle 1."
+energy-cost = 2
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Common"
+is-fast = false
+spark = 1
+image-number = 691496704
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Warborn Juggernaut"
+id = "05b4c64a-8eb3-4a09-a37f-5c205d734850"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Materialized: Each enemy loses 2 spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 3
+image-number = 695511850
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Twin-Blade Knight"
+id = "ef2bf150-649a-45ad-bc2b-6392297cf815"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Judgment: Materialize a Warrior figment."
+energy-cost = 5
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 695511856
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Ember Shepherd"
+id = "1a25ed29-5681-4d13-9752-aeb3628c190c"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "↯fast -- Abandon an ally: Prevent a played event which could dissolve an ally."
+energy-cost = 1
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Uncommon"
+is-fast = false
+spark = 0
+image-number = 700253818
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Blazing Commando"
+id = "f21c6100-c8de-452f-bd98-0f22b62aea71"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "When you draw a Warrior, materialize a copy of it with 1 spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 703988038
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Dissident Node"
+id = "230d47b8-bc95-49d0-bbe5-a1cb5849fc05"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = """
+▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 708313999
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Starless Navigator"
+id = "f5610594-4017-4908-8242-ba125119279d"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "When the opponent materializes a character, materialize a Celestial Figment."
+energy-cost = 3
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 712713142
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Last Stand"
+id = "00000000-0000-0000-0000-000000000000"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "Return an ally to hand: Play this event for 0●. Prevent a played card unless the opponent pays 2●."
+energy-cost = 1
+card-type = "Event"
+subtype = ""
+rarity = "Uncommon"
+is-fast = true
+spark = 0
+image-number = 735242563
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Soaring Immensity"
+id = "25ee7d34-d1b0-4164-b0c2-e07e15c8d4cd"
+tide = "Rime"
+tide-cost = 1
+rendered-text = """
+Banish a card from hand: Play this character for 0●, then abandon it.
+
+▸ Materialized: Dissolve an enemy with spark 2 or less."""
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 3
+image-number = 739472569
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Duskmount"
+id = "98a49295-1ad6-4c6a-bb78-659bfedeec21"
+tide = "Arc"
+tide-cost = 2
+rendered-text = """
+When an ally is banished, this character gains +1 spark.
+
+▸ Judgment: Banish an ally, then materialize it."""
+energy-cost = 3
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Rare"
+is-fast = false
+spark = 1
+image-number = 768349750
+art-owned = false
+card-number = 383
+
+[[cards]]
+name = "Undaunted Inheritor"
+id = "f5f60506-b4a2-4743-92f5-b460518e127a"
+tide = "Rime"
+tide-cost = 2
+rendered-text = "Discard a character: Play this character for 0● and it gains that character's spark."
+energy-cost = 3
+card-type = "Character"
+subtype = "Outsider"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 772547359
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Ironwraith"
+id = "521f2592-3539-47fc-b0c9-f236ad06b29c"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "If this card is in your void, when you abandon an ally, materialize a Shadow Figment."
+energy-cost = 3
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 0
+image-number = 789290995
+art-owned = false
+card-number = 0
+
+[[cards]]
+name = "Inferno Catalyst"
+id = "94e9b5d7-d583-4d6b-8362-d3664dd3b353"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Materialized: Choose an ally. Each other ally's spark becomes equal to that ally's spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 2
+image-number = 789290998
+art-owned = false
+card-number = 0

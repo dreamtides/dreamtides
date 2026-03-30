@@ -18,7 +18,8 @@ combine the strengths of two philosophies.
 
 The tide circle, in order, is: Bloom — Arc — Ignite — Pact — Umbra — Rime —
 Surge, which loops back to Bloom. Each tide is most naturally allied with its
-two neighbors on this circle, and Neutral sits at the center, compatible with all.
+two neighbors on this circle, and Neutral sits at the center, compatible with
+all.
 
 ______________________________________________________________________
 
@@ -33,16 +34,17 @@ strength from that commitment, Neutral draws strength from refusing to commit at
 all. It is the trickster, the shapeshifter, the force of raw possibility that
 exists before the dreamer chooses what to dream.
 
-Neutral does not reject the other tides — it sees truth in all of them. It simply
-refuses to be bound by any one truth. To Neutral, flexibility is the highest form
-of power. The dreamer who can adapt to anything will outlast the dreamer who has
-mastered only one thing. Neutral is drawn to the legendary, the singular, the
-mythic — the kind of power that transcends category and defies classification.
+Neutral does not reject the other tides — it sees truth in all of them. It
+simply refuses to be bound by any one truth. To Neutral, flexibility is the
+highest form of power. The dreamer who can adapt to anything will outlast the
+dreamer who has mastered only one thing. Neutral is drawn to the legendary, the
+singular, the mythic — the kind of power that transcends category and defies
+classification.
 
 ## Mechanical Identity
 
-Neutral is the neutral tide. Its cards are designed to be effective across three or
-more strategies, serving as glue that holds hybrid decks together and as
+Neutral is the neutral tide. Its cards are designed to be effective across three
+or more strategies, serving as glue that holds hybrid decks together and as
 standalone power that any drafter can use.
 
 **Primary tools:**
@@ -50,8 +52,8 @@ standalone power that any drafter can use.
 - **Generic removal** — Neutral provides flexible answers that don't require
   tide-specific synergy. Dissolve effects, banish effects, and targeted spark
   reduction all live here.
-- **Discover cards** — Neutral is the primary home of Discover, offering flexible
-  card selection that helps any strategy find what it needs.
+- **Discover cards** — Neutral is the primary home of Discover, offering
+  flexible card selection that helps any strategy find what it needs.
 - **Sweepers** — Board-clearing effects that dissolve or banish multiple
   characters. These are Neutral's most dramatic tools, resetting the battlefield
   when things go wrong.
@@ -61,24 +63,25 @@ standalone power that any drafter can use.
   2 extra energy per turn). These effects are rare, expensive, and
   game-defining.
 
-**Strategy:** Neutral does not have a dedicated deck archetype. Instead, Neutral cards
-appear in every deck as utility, removal, and raw power. A draft that goes
+**Strategy:** Neutral does not have a dedicated deck archetype. Instead, Neutral
+cards appear in every deck as utility, removal, and raw power. A draft that goes
 poorly in a specific tide can often be rescued by pivoting into a Neutral-heavy
 "good stuff" pile that wins through card quality over synergy. Neutral cards are
 the safety net of the draft.
 
 ## Relationships
 
-Neutral is allied with every tide and enemy of none. It is the connective tissue of
-the format. Its generic removal helps aggressive decks push through blockers and
-control decks answer threats. Its Discover cards help combo decks find pieces
-and midrange decks find answers. Its legendary powers are coveted by everyone.
+Neutral is allied with every tide and enemy of none. It is the connective tissue
+of the format. Its generic removal helps aggressive decks push through blockers
+and control decks answer threats. Its Discover cards help combo decks find
+pieces and midrange decks find answers. Its legendary powers are coveted by
+everyone.
 
-The tension in Neutral is opportunity cost: drafting Neutral cards means passing on
-synergy-heavy tide cards. A deck full of Neutral cards is powerful but undirected,
-like a river without banks. The best decks weave Neutral's raw power into a tide's
-focused strategy, using Neutral to shore up weaknesses rather than replace
-strengths.
+The tension in Neutral is opportunity cost: drafting Neutral cards means passing
+on synergy-heavy tide cards. A deck full of Neutral cards is powerful but
+undirected, like a river without banks. The best decks weave Neutral's raw power
+into a tide's focused strategy, using Neutral to shore up weaknesses rather than
+replace strengths.
 
 ______________________________________________________________________
 
@@ -704,5 +707,5 @@ hybrid playstyle:
 | **Rime + Surge**  | Full control — proactive disruption meets reactive counterspells        |
 | **Surge + Bloom** | Ramp combo — accelerate energy, then chain events for a decisive turn   |
 
-Neutral enhances any of these alliances by providing removal, card selection, and
-format-warping legendary effects.
+Neutral enhances any of these alliances by providing removal, card selection,
+and format-warping legendary effects.

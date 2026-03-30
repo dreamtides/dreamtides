@@ -35,7 +35,9 @@ def format_card(card):
 
 def main():
     script_dir = Path(__file__).parent
-    toml_path = script_dir.parent.parent / "rules_engine" / "tabula" / "rendered-cards.toml"
+    toml_path = (
+        script_dir.parent.parent / "rules_engine" / "tabula" / "rendered-cards.toml"
+    )
     output_path = toml_path.parent / "rendered_cards_anonymized.txt"
 
     if not toml_path.exists():
