@@ -13251,7 +13251,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Ashen Harbinger"
 id = "56d74dc7-c88c-4039-bedf-9f38bcee0538"
 tide = "Neutral"
@@ -13387,7 +13387,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Ordained Collapse"
 id = "c5785c16-b3bf-4b85-af06-5b719c6d9891"
 tide = "Neutral"
@@ -13404,7 +13404,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Lone Castaway"
 id = "fe663f4c-593d-42a2-9fa2-a2bf3560eb46"
 tide = "Bloom"
@@ -13523,7 +13523,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Tidewreck Navigator"
 id = "ffbc62c3-4445-4b16-8829-3e7dca99ab21"
 tide = "Umbra"
@@ -13540,7 +13540,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Wreckland Maverick"
 id = "d52909bf-0278-4e8a-b869-34399501c442"
 tide = "Umbra"
@@ -13642,7 +13642,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Starfall"
 id = "5fe5a1ea-a98d-4332-9eaf-eabc627bc8e8"
 tide = "Surge"
@@ -13659,7 +13659,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Thundercatcher"
 id = "d02caa3e-5eb6-4ba8-a931-9b967e88ab01"
 tide = "Surge"
@@ -13710,7 +13710,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Augur Crow"
 id = "e2e378cd-f599-40fc-93a5-2b95318a85a4"
 tide = "Surge"
@@ -13727,7 +13727,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "From the Barrow"
 id = "b461e967-7ff3-4f99-898e-67c33ad1e723"
 tide = "Umbra"
@@ -13795,7 +13795,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Seaside Requiem"
 id = "1105e04f-a048-4ac3-a144-632995663865"
 tide = "Rime"
@@ -13931,7 +13931,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Steelwright"
 id = "77820028-b9be-4348-bb48-5052c3e0c2b9"
 tide = "Arc"
@@ -13965,7 +13965,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Iron Executor"
 id = "9065b009-6ae3-4138-b5a0-1204a69abc00"
 tide = "Rime"
@@ -13982,7 +13982,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Starshot Gunner"
 id = "67cc1fd0-e41d-44d8-9d62-1150ba0e6148"
 tide = "Ignite"
@@ -14016,7 +14016,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Mourning Rite"
 id = "678733f0-1685-40fe-84c4-629bb07fcb55"
 tide = "Pact"
@@ -14050,7 +14050,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Primordial Tyrant"
 id = "aba94351-4486-4710-ac3d-ae9e29279ac0"
 tide = "Pact"
@@ -14118,7 +14118,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Ridgecutter"
 id = "435a6ac4-58a6-4d63-acc7-17377496acf4"
 tide = "Arc"
@@ -14135,7 +14135,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Carrion Shepherd"
 id = "6a96b4ba-892c-4ee7-86d3-83bccb8dd66d"
 tide = "Umbra"
@@ -14175,7 +14175,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Vanishing Inquisitor"
 id = "c9862d86-5a1f-46c1-b45a-0c2549eb5b25"
 tide = "Rime"
@@ -14323,7 +14323,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Cascading Detonation"
 id = "efc06a7e-08ec-483f-a8ab-368c8b44fc43"
 tide = "Surge"
@@ -14391,7 +14391,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Wreckage Prowler"
 id = "3a7a69c5-eb6d-4874-a016-97a9a618ee03"
 tide = "Umbra"
@@ -14425,7 +14425,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Glimmering Voyager"
 id = "bb4990d2-7fc4-492a-88b3-12022292e0df"
 tide = "Bloom"
@@ -14476,7 +14476,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Derelict Voyage"
 id = "98db4d6d-842c-401f-8037-699a518f96d5"
 tide = "Umbra"
@@ -14527,8 +14527,8 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
-name = "Ferntread"
+keep = true
+name = "Fern Treader"
 id = "45914018-3210-4b1b-81a5-0a819e04df1a"
 tide = "Bloom"
 tide-cost = 1
@@ -14544,7 +14544,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Green Abyss"
 id = "ecd53ca5-f250-4402-a686-c51148e1e3b8"
 tide = "Neutral"
@@ -14595,7 +14595,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Hatching Ground"
 id = "6014454b-9fdc-4f6a-9dcf-20f908bc90f9"
 tide = "Surge"
@@ -14663,7 +14663,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Patient Ascendant"
 id = "bb1fbd5e-511f-4e58-9ad6-967a3ea1a2e7"
 tide = "Arc"
@@ -14697,7 +14697,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Mirror Protocol"
 id = "d2306c6b-45de-4f67-8a47-ae13de98293e"
 tide = "Arc"
@@ -14765,7 +14765,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "World Ablaze"
 id = "aa399f47-2025-4539-ac69-a6bca90e2786"
 tide = "Pact"
@@ -14799,7 +14799,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Rooftop Prophet"
 id = "c84bf4e3-7cb5-4825-927a-3b87fcc5e92a"
 tide = "Umbra"
@@ -14850,7 +14850,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Burning Pursuit"
 id = "a99a5101-0fe3-43cd-a63b-44f6aba62682"
 tide = "Ignite"
@@ -14918,7 +14918,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Sunken Radiance"
 id = "9e15951e-c144-45de-9347-c054c58a74d1"
 tide = "Rime"
@@ -14969,7 +14969,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Dream Garden Visitor"
 id = "5fc8b425-5170-4281-bcef-230d82af20f9"
 tide = "Umbra"
@@ -15037,7 +15037,7 @@ art-owned = false
 card-number = 447
 
 [[cards]]
-keep = false
+keep = true
 name = "Cosmic Undertow"
 id = "17c95d25-fdc4-477c-ac98-92b2b2c1829b"
 tide = "Neutral"
@@ -15122,7 +15122,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Graywatch"
 id = "d593a1be-dfb4-407c-8196-fabeff1782b7"
 tide = "Umbra"
@@ -15156,7 +15156,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Infernal Cavalier"
 id = "a9d5a6b0-e6fe-4f34-b955-4e5129c1ab0f"
 tide = "Pact"
@@ -15164,7 +15164,7 @@ tide-cost = 1
 rendered-text = "▸ Dissolved: Return all enemies to hand."
 energy-cost = 5
 card-type = "Character"
-subtype = "Ancient"
+subtype = "Warrior"
 rarity = "Rare"
 is-fast = false
 spark = 0
@@ -15173,7 +15173,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Torn Circuit Feeder"
 id = "e4087594-d3b3-42eb-9db3-07274f767eda"
 tide = "Neutral"
@@ -15190,7 +15190,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Fleeting Reunion"
 id = "44a4ab1a-ed1f-418a-8866-3c4b5642492f"
 tide = "Pact"
@@ -15241,7 +15241,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Dreadwood Emissary"
 id = "e1e7c403-251e-4db1-bd3b-5ee03124e681"
 tide = "Pact"
@@ -15312,7 +15312,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Cindermarch"
 id = "ebe77543-19bb-4281-b5e5-02a6dcaa60aa"
 tide = "Ignite"
@@ -15346,15 +15346,15 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Forsaken Pact"
 id = "0382ee13-69bc-4e2a-b9da-e85d2f124779"
 tide = "Pact"
 tide-cost = 2
 rendered-text = "▸ Judgment: You may abandon a character to materialize a random character from your deck."
 energy-cost = 4
-card-type = "Event"
-subtype = ""
+card-type = "Character"
+subtype = "Warrior"
 rarity = "Rare"
 is-fast = false
 spark = ""
@@ -15465,7 +15465,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Rootspring Summons"
 id = "12bdc762-59ec-481a-9936-8c5327ae7c09"
 tide = "Bloom"
@@ -15533,7 +15533,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Worldsong Behemoth"
 id = "73d0d323-bf47-4d73-9c17-6bebe8b3622e"
 tide = "Bloom"
@@ -15567,7 +15567,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Lunar Hart"
 id = "e264a35e-7c8a-4c67-9a63-b23f3416c196"
 tide = "Bloom"
@@ -15652,7 +15652,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Stargazer"
 id = "4c45be08-290c-4129-9238-897cd73b7279"
 tide = "Arc"
@@ -15737,7 +15737,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Grim Pursuer"
 id = "5bfed3c9-cd1b-4fe7-a40b-dcec654db206"
 tide = "Rime"
@@ -15805,7 +15805,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Starlight Reckoner"
 id = "f04e32b3-d897-4c24-9999-3f0557482ba1"
 tide = "Neutral"
@@ -15856,7 +15856,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Spent Courier"
 id = "b964cd06-967a-4f65-95ea-46fd698713f4"
 tide = "Neutral"
@@ -15873,7 +15873,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Grounded"
 id = "c038e4b2-ae16-4981-bc63-c13e6276b034"
 tide = "Neutral"
@@ -15941,7 +15941,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Ferryman of the Falls"
 id = "c9ec2950-f87e-4041-a50d-cd0fb85217f0"
 tide = "Umbra"
@@ -16043,7 +16043,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Verdant Pilgrim"
 id = "eef822ee-7226-4b70-85ce-d0d61780e186"
 tide = "Neutral"
@@ -16060,7 +16060,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Forgotten Factory Titan"
 id = "9e88669a-c0a7-4d5c-b871-d7dd1aac072f"
 tide = "Ignite"
@@ -16128,7 +16128,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Starfall Communion"
 id = "c23462ee-cbc8-4c19-8013-b3bbef5beffb"
 tide = "Rime"
@@ -16179,7 +16179,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Veinwalker"
 id = "cf62737a-9bee-44f4-8e26-8c7d0387f39b"
 tide = "Bloom"
@@ -16196,7 +16196,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Vaultbreaker"
 id = "cd0d7da1-d3bc-4978-860d-42ce4bd38772"
 tide = "Ignite"
@@ -16230,7 +16230,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Dreadlord"
 id = "22a259a2-c721-4d98-94c0-5a9de3d7afe3"
 tide = "Ignite"
@@ -16264,7 +16264,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Lightningborn"
 id = "e8aa4af2-99d5-4933-a211-ff103cdd18ea"
 tide = "Surge"
@@ -16298,7 +16298,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Smoldering Ancient"
 id = "d5a6959b-6829-4fc1-a1b0-547bb92733b2"
 tide = "Pact"
@@ -16315,7 +16315,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Aurora Confluence"
 id = "084cfbdf-1263-4be2-b56a-ff5dbc801ba0"
 tide = "Rime"
@@ -16400,7 +16400,7 @@ art-owned = false
 card-number = 0
 
 [[cards]]
-keep = false
+keep = true
 name = "Harrowing Officiant"
 id = "19aac5e2-357c-4a50-8ef1-f40aa880a4c4"
 tide = "Neutral"
