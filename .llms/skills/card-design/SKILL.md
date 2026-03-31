@@ -1,6 +1,6 @@
 ---
 name: card-design
-description: Design a new Dreamtides card from art + Hearthstone inspiration. Takes card art as input, finds HS mechanics that resonate with the art's narrative, and produces a mechanically novel design that matches the art. Triggers on card design, design card, new card, card art, card concept.
+description: Design a new Dreamtides card from art + Hearthstone inspiration. Produces 5 candidate designs for the user to evaluate, iterates on the chosen design, then writes it to rendered-cards.toml and commits. Triggers on card design, design card, new card, card art, card concept.
 ---
 
 # Card Design Skill
@@ -254,20 +254,26 @@ universal game terms.
 The goal is to find HS mechanics that, when filtered through the art's narrative, could
 produce a Dreamtides card that is both mechanically novel AND narratively honest to the art.
 
-# Phase 5: Explore Concepts
+# Phase 5: Generate 5 Card Designs
 
-Generate **4 concept sketches** where each concept is inspired by a different Hearthstone
-ability mapped through the art's narrative. Each concept must:
+Generate **5 complete card designs**, each inspired by a different Hearthstone ability mapped
+through the art's narrative. Each design must include ALL of the following:
 
-1. Name the HS ability that inspired it
-2. Explain the abstract dynamic extracted from that HS ability
-3. Explain how the art's narrative transforms that dynamic into something new
-4. State the tide and approximate cost
-5. State the mechanic, with a brief note on why it's fun
+1. **HS Inspiration:** Name the HS ability and the abstract dynamic extracted from it
+2. **Art Connection:** One sentence on how the art's narrative transforms that dynamic
+3. **Card Name:** Evocative short name (max 25 characters)
+4. **Card Type:** Character (with subtype) or Event
+5. **Tide:** Which tide and its tide cost (1-3)
+6. **Energy Cost:** Proposed cost
+7. **Spark:** Proposed spark value (characters only; events use "")
+8. **Rarity:** Common, Uncommon, Rare, or Legendary
+9. **Fast:** Yes/No
+10. **Rules Text:** Proposed ability text using templating conventions below (max 100 chars)
+11. **Novelty Statement:** "No existing card ___." — the unique play experience
+12. **Fun Pitch:** 1-2 sentences on why this card is exciting to play
 
-**Critical requirement: at least 3 of the 4 concepts must be "wild" concepts** — mechanics
-or mechanical combinations that do not currently exist on any card in the Dreamtides pool.
-The default expectation is that the final card will use a wild concept.
+**Critical requirement: at least 4 of the 5 designs must be "wild"** — mechanics or
+mechanical combinations that do not currently exist on any card in the Dreamtides pool.
 
 **What counts as genuinely wild vs. superficially wild:**
 
@@ -285,34 +291,15 @@ The default expectation is that the final card will use a wild concept.
 say "oh, like [existing card] but different," it's not wild. If they say "wait, you can DO
 that?" — it's wild.
 
-**Art/narrative check for each concept:** Can you explain in one sentence why this mechanic
+**Art/narrative check for each design:** Can you explain in one sentence why this mechanic
 belongs on this art? The connection can be metaphorical or abstract, but it must be honest —
 a viewer looking at the art should be able to nod and say "yeah, I can see that." If the
 mechanic actively contradicts what the art depicts, reject the concept.
 
-**Example concepts for art showing a hooded figure in rain catching glowing fragments:**
-1. *HS inspiration: "After you cast a spell, gain Spell Damage +1"* — Abstract: accumulates
-   power from repeated actions. The figure catches fragments one by one, each making them
-   stronger. → Surge 3●/0✦ (this character gains +1 spark each time any player plays an
-   event; the fragments are spells accumulating) **(wild — spark scales with global event
-   count)**
-2. *HS inspiration: "Battlecry: Discover a spell from your opponent's class"* — Abstract:
-   gaining knowledge from an external source. The fragments carry alien knowledge from above.
-   → Neutral 2●/1✦ (when you foresee, you may also look at the top card of the opponent's
-   deck; fragments reveal hidden knowledge) **(wild — foresee grants opponent info access)**
-3. *HS inspiration: "Deathrattle: Return this to your hand as a 4/4"* — Abstract:
-   transformation through apparent destruction. The figure dissolves into fragments only to
-   reform. → Arc 4●/1✦ (Materialized: banish this and a card from your hand. At end of turn,
-   materialize both and each gains +2 spark) **(wild — self-banish + hand-banish with delayed
-   co-materialization)**
-4. *HS inspiration: "Counter a spell"* — Abstract: interception. The figure intercepts
-   falling magic before it reaches the ground. → Rime 3●/2✦ (discard 2 to prevent a played
-   card) (not wild — discard as prevent cost is known, included as backup)
-
 ### Novel Design Space — Think Like a Digital Card Game
 
 Dreamtides is a digital card game. It can track hidden state, randomize, transform cards
-in zones, and do things impossible in paper. When generating concepts, actively consider
+in zones, and do things impossible in paper. When generating designs, actively consider
 mechanics from this design space.
 
 **IMPORTANT — Mechanical Gravity Wells to Resist:**
@@ -338,7 +325,7 @@ is the play experience this card creates that no existing card creates?"
 correct for the opponent, so the "choice" is illusory and the card collapses to a fixed
 effect. This design space is not fruitful — do not use it.
 
-### Concept Evaluation Criteria
+### Design Evaluation Criteria
 
 All four criteria are required. A design that fails any one is rejected.
 
@@ -352,112 +339,12 @@ All four criteria are required. A design that fails any one is rejected.
    can be metaphorical or abstract, but a viewer looking at the art must be able to see the
    relationship. The mechanic must not actively contradict what the art depicts.
 
-### Concept Selection — Comparative Ranking (MANDATORY)
-
-**WARNING: There is a strong observed bias toward selecting Concept 1.** The first concept
-generated benefits from anchoring — it feels most developed because you spent the most
-creative energy on it. This bias has persisted even when evaluation tables showed later
-concepts scoring higher. You must actively counteract it.
-
-After generating all 4 concepts, you MUST complete this ranking before selecting:
-
-1. **Novelty rank:** Order all 4 concepts from most to least novel. For each, write the
-   "No existing card ___" sentence. Which concept makes a player say "wait, you can DO
-   that?" most strongly?
-2. **Fun rank:** Order all 4 by how exciting the play pattern is. Which creates the most
-   memorable moments? Which has the most interesting decision space?
-3. **Combined pick:** Select the concept that ranks highest across both dimensions. If
-   Concept 1 wins, you must write an explicit 2-sentence justification for why it beats
-   the highest-ranked alternative on *novelty specifically* — not just "it's the most
-   balanced" or "it fits best."
-
-**If you find yourself gravitating toward Concept 1 "because it's the most complete,"
-that's the bias talking.** All concepts are equally sketched at this stage. Pick the one
-with the wildest mechanic that still passes the four criteria, then develop it.
-
 ### Cost-to-Excitement Scaling
 
 - **0-2●:** Simple, incremental effects fine. Card earns its keep through repetition.
 - **3-4●:** Should have at least one moment of interest.
 - **5-6●:** Must create a noticeable board shift when played.
 - **7+●:** This is your big play. It should create a *story*.
-
-### Refine Before Committing
-
-After picking via the Comparative Ranking above, stress-test the chosen concept:
-
-- **Art connection check:** Can you write a one-sentence creative interpretation connecting
-  the mechanic to the art? The connection can be loose or metaphorical — it just needs to
-  not actively contradict what a viewer sees.
-- **Power check:** Estimate the average case for variable effects. Use the benchmarks
-  (in Phase 7) to verify the total value is appropriate for the cost.
-- **Play pattern check:** For every triggered ability, answer concretely: who causes this
-  to fire, how often, and can they choose not to? If the trigger depends on the opponent
-  taking an action they can simply avoid, the ability is effectively blank text. Mentally
-  play the turn you cast this card and the next 2-3 turns: what concretely happens each
-  turn?
-- **Is there a simpler version?** If you have two mechanics stapled together, ask whether
-  the card would be better with just one at a lower cost.
-
-### Novelty Gate (MANDATORY)
-
-Before proceeding to Phase 6, you must pass this gate. Write the following:
-
-**"No existing card ___."** Complete this sentence with the unique play experience your
-chosen concept creates. This must describe a *play experience*, not a cosmetic difference.
-
-**PASS examples:**
-- "No existing card transforms into a different card while in your hand."
-- "No existing card lets you play a card from the opponent's deck."
-
-**FAIL examples:**
-- "No existing card materializes a random Spirit Animal costing 2 or less." (Same play
-  experience as Light of Emergence with a subtype filter.)
-- "No existing card draws a card when a Warrior is banished." (Same play experience as
-  dozens of draw-on-trigger cards.)
-
-If you cannot pass the gate, **return to Phase 5 and generate new concepts.**
-
-# Phase 6: Validate Against Existing Cards
-
-The full card pool is already in your context from Phase 4. Use it directly to validate:
-
-- **Duplicate check:** Scan the anonymized pool for your concept's key mechanical phrases.
-  If an existing card already creates the same play experience, **return to Phase 5**.
-- **Differentiation test (MANDATORY):** For each of the 2-3 closest comparable cards in the
-  anonymized pool, write one sentence explaining how your card creates a **different play
-  experience** — not just different numbers, cost, tide, or trigger. If you find yourself
-  writing "mine does X instead of Y" where X and Y are the same type of effect, the
-  differentiation is insufficient. **Return to Phase 5.**
-- **Templating:** Copy exact phrasing patterns from existing cards in the anonymized pool.
-  Don't invent new templating for effects that already have established wording.
-
-# Phase 7: Final Design
-
-Develop your chosen concept into a complete card. Write your response with the following:
-
-**Hard limits:** Card names must be 25 characters or fewer. Rules text must be 100
-characters or fewer.
-
-- **Card Name:** Evocative short name for this card (max 25 characters)
-- **Card Type:** Character (with subtype) or Event
-- **Tide:** Which tide and its tide cost (1-3)
-- **Energy Cost:** Proposed cost
-- **Spark:** Proposed spark value (characters only)
-- **Rarity:** Common, Uncommon, Rare, or Legendary
-- **Fast:** Yes/No (whether the card itself has `is-fast = true`)
-- **Rules Text:** Proposed ability text, using the templating conventions below (max 100 chars)
-- **Art Description:** One sentence description of the card art.
-- **Archetype Description:** One sentence on how this card supports its tide's strategy.
-- **Narrative:** One sentence connecting the art to the mechanics. For characters, who is
-  this person and why do they have this ability? For events, what is happening?
-- **Hearthstone Inspiration:** Name the HS ability that inspired this design, and one
-  sentence on how the abstract dynamic was transformed through the art's narrative.
-- **Novelty Statement:** "No existing card ___." The unique play experience, carried from
-  the Novelty Gate.
-- **Similar Cards:** 2-4 existing cards from the anonymized pool with the closest mechanical
-  overlap, with one sentence each explaining why your card creates a **different play
-  experience** (not just different numbers).
 
 ### Costing Guidelines
 
@@ -576,3 +463,96 @@ Names must be **25 characters or fewer**. Most names are 2-3 words. Common struc
 - **[Noun] of [Noun]:** Titan of Forgotten Echoes, Blade of Oblivion
 - **Single word:** Apocalypse, Reunion, Nocturne
 - **The [Title]:** The Devourer, The Rising God
+
+# Phase 6: Present Designs for Evaluation
+
+Present all 5 designs to the user in a clear numbered list format. For each design, show:
+
+1. **Card Name** — Tide, Cost●/Spark✦, Type (Subtype), Rarity
+2. Rules text
+3. HS Inspiration (1 line)
+4. Art connection (1 line)
+5. Novelty statement
+6. Fun pitch
+
+Then ask the user which design they'd like to proceed with, or if they'd like revisions to
+any of the designs.
+
+# Phase 7: Iterate and Finalize
+
+Once the user selects a design (or asks for revisions), iterate until the user is satisfied.
+When the user confirms a final design, proceed to Phase 8.
+
+Before finalizing, stress-test the chosen design:
+
+- **Art connection check:** Can you write a one-sentence creative interpretation connecting
+  the mechanic to the art? The connection can be loose or metaphorical — it just needs to
+  not actively contradict what a viewer sees.
+- **Power check:** Estimate the average case for variable effects. Use the costing guidelines
+  to verify the total value is appropriate for the cost.
+- **Play pattern check:** For every triggered ability, answer concretely: who causes this
+  to fire, how often, and can they choose not to? If the trigger depends on the opponent
+  taking an action they can simply avoid, the ability is effectively blank text. Mentally
+  play the turn you cast this card and the next 2-3 turns: what concretely happens each
+  turn?
+- **Is there a simpler version?** If you have two mechanics stapled together, ask whether
+  the card would be better with just one at a lower cost.
+- **Duplicate check:** Scan the anonymized pool for the concept's key mechanical phrases.
+  If an existing card already creates the same play experience, flag this to the user.
+
+# Phase 8: Write to rendered-cards.toml and Commit
+
+Once the user confirms the final design, write it to `rendered-cards.toml` and create a
+commit.
+
+### Step 1: Determine card-number and image-number
+
+- **card-number:** Find the highest existing `card-number` in
+  `client/Assets/StreamingAssets/Tabula/rendered-cards.toml` and increment by 1.
+- **image-number:** The user must have provided an image. Extract the Shutterstock image
+  number from the filename (the numeric portion of the image filename). If uncertain, ask
+  the user.
+
+### Step 2: Generate a UUID
+
+Run `uuidgen | tr '[:upper:]' '[:lower:]'` to generate a new UUID for the card's `id` field.
+
+### Step 3: Write the card entry
+
+Insert a new `[[cards]]` entry into `rendered-cards.toml` **immediately before** the
+`[metadata]` line. The entry must use this exact field order:
+
+```toml
+[[cards]]
+name = "Card Name"
+id = "generated-uuid-here"
+tide = "Tide"
+tide-cost = 1
+rendered-text = "Rules text here."
+energy-cost = 3
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 2
+art-owned = false
+card-number = 666
+image-number = 1234567890
+```
+
+Field notes:
+- `rendered-text`: Use the **rendered** rules text with symbols (●, ▸, ↯, ✪), not the
+  directive syntax from cards.toml. For multiline text, use TOML triple-quoted strings.
+- `spark`: Use an integer for characters. Use `""` (empty string) for events.
+- `art-owned`: Set to `false` unless the user specifies otherwise.
+- `subtype`: Use `""` (empty string) for events.
+- `is-fast`: `true` if the card itself has fast speed; `false` otherwise (even if it has
+  a fast activated ability — that's encoded in the rules text via `↯fast`).
+
+### Step 4: Create a commit
+
+Use the `/commit` skill (or equivalent) to commit the change with a message like:
+`Add [Card Name] to rendered-cards.toml`
+
+Include in the commit description: the card's tide, type, cost, and a brief note on the
+mechanic.
