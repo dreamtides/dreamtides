@@ -15,8 +15,11 @@ import tomllib
 from collections import Counter
 from pathlib import Path
 
-ASSIGNED = Path(__file__).parent.parent.parent.parent / "rules_engine" / "tabula" / "art-assigned.toml"
+REPO_ROOT = Path(__file__).parent.parent.parent.parent
+RENDERED = REPO_ROOT / "rules_engine" / "tabula" / "rendered-cards.toml"
+ASSIGNED = REPO_ROOT / "rules_engine" / "tabula" / "art-assigned.toml"
 RESULTS_DIR = Path("/tmp/art-batch-results")
+BATCH_RESULTS_DIR = Path("/tmp/card-design-batch-results")
 STOP_WORDS = {"the", "of", "a", "an", "in", "on", "at", "to", "and", "for", "from", "with"}
 OVERUSE_THRESHOLD = 3
 
@@ -40,12 +43,15 @@ def count_names(path: Path) -> None:
                 words[w] += 1
 
 
+if RENDERED.exists():
+    count_names(RENDERED)
 if ASSIGNED.exists():
     count_names(ASSIGNED)
-if RESULTS_DIR.exists():
-    for f in sorted(RESULTS_DIR.iterdir()):
-        if f.suffix == ".toml":
-            count_names(f)
+for d in [RESULTS_DIR, BATCH_RESULTS_DIR]:
+    if d.exists():
+        for f in sorted(d.iterdir()):
+            if f.suffix == ".toml":
+                count_names(f)
 
 proposed = sys.argv[1]
 conflicts = []
