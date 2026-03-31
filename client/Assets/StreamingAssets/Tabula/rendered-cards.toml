@@ -8873,6 +8873,406 @@ art-owned = false
 card-number = 667
 image-number = 1788833075
 
+[[cards]]
+name = "The Festering Mass"
+id = "789c2aa7-5d72-421d-b136-286701fb6074"
+tide = "Umbra"
+tide-cost = 2
+rendered-text = "▸ Judgment: Each enemy loses 1 spark. This character gains +1 spark for each."
+energy-cost = 7
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 3
+art-owned = false
+card-number = 668
+image-number = 2285036629
+
+[[cards]]
+name = "Ochre Prospector"
+id = "5e112441-745e-4d4f-b8ac-417b6d658f67"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Judgment: Banish the top card of your deck. ▸ Dissolved: Play each card banished this way for 0●."
+energy-cost = 4
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Rare"
+is-fast = false
+spark = 1
+art-owned = false
+card-number = 669
+image-number = 581686579
+
+[[cards]]
+name = "Emberwolf Triad"
+id = "3581a5f9-aa26-4e52-9f60-7d9f11e38f03"
+tide = "Arc"
+tide-cost = 1
+rendered-text = "▸ Materialized: Choose an ally. ▸ Judgment: Materialize a copy of it with 1 spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Rare"
+is-fast = false
+spark = 1
+art-owned = false
+card-number = 670
+image-number = 2293194523
+
+[[cards]]
+name = "Trenchborn Manta"
+id = "e4b1aa60-eb33-4926-8c3b-97b8cb302388"
+tide = "Umbra"
+tide-cost = 1
+rendered-text = "▸ Materialized, Judgment: Each character in your void gains +2 spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 2
+art-owned = false
+card-number = 671
+image-number = 2657255497
+
+[[cards]]
+name = "Shatterpoint Agent"
+id = "ca261bd3-fca9-4b96-9050-1af5546a55b3"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "▸ Materialized: An enemy's spark becomes 0 until your next turn. Discard a card."
+energy-cost = 3
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 1
+art-owned = false
+card-number = 672
+image-number = 2590831717
+
+[[cards]]
+name = "Rootbound Witness"
+id = "581e3324-8692-4edb-9f4e-411496928c09"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "▸ Judgment: You may abandon an ally to play the top card of the opponent's deck for 0●."
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 2
+art-owned = false
+card-number = 673
+image-number = 2433164315
+
+[[cards]]
+name = "Oathbound Pair"
+id = "fa45f327-5840-45c9-8568-a3427d2ba9b1"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Materialized: Choose an ally. ▸ Judgment: That ally and this character each gain +1 spark."
+energy-cost = 2
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Rare"
+is-fast = false
+spark = 1
+art-owned = false
+card-number = 674
+image-number = 2597662159
+
+[[cards]]
+name = "Grimwood Ritualist"
+id = "148b0926-705b-44a4-8ea9-2867458ac88c"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "When you abandon an ally, this character becomes a copy of that ally. It keeps this ability."
+energy-cost = 4
+card-type = "Character"
+subtype = "Ancient"
+rarity = "Rare"
+is-fast = false
+spark = 1
+art-owned = false
+card-number = 675
+image-number = 277174382
+
+[[cards]]
+name = "Cosmonaut of Tides"
+id = "21c406af-ffa1-47f6-9635-6a6d2d0571ba"
+tide = "Surge"
+tide-cost = 2
+rendered-text = "▸ Materialized: Choose an event in hand. At the beginning of each turn, play a copy of it for 0●."
+energy-cost = 4
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Rare"
+is-fast = false
+spark = 2
+art-owned = false
+card-number = 676
+image-number = 2023111778
+
+[[cards]]
+name = "Weblight Waif"
+id = "33b9ce2d-dd18-4213-a4bd-0e14bb42a9ce"
+tide = "Umbra"
+tide-cost = 1
+rendered-text = "When a character enters your void from your deck, add it to your hand."
+energy-cost = 3
+card-type = "Character"
+subtype = "Child"
+rarity = "Rare"
+is-fast = false
+spark = 1
+art-owned = false
+card-number = 677
+image-number = 748956895
+
+[[cards]]
+name = "Tethered Hollow"
+id = "0da0f7c9-7175-4944-ac27-8d3ba5653c79"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "▸ Dissolved: For the rest of the game, your first character each turn costs 2● less."
+energy-cost = 4
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 2
+art-owned = false
+card-number = 678
+image-number = 465449504
+
+[[cards]]
+name = "Scrapyard Custodian"
+id = "350285d8-d986-49f9-9f33-db4bb661d4ce"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "▸ Dissolved: Materialize each character abandoned this turn from your void with +3 spark."
+energy-cost = 7
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 4
+art-owned = false
+card-number = 679
+image-number = 695511850
+
+[[cards]]
+name = "Pyre Challenger"
+id = "d37b5344-545f-4c1c-8078-d167b1d5e90a"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "▸ Materialized: An enemy loses all spark. This character gains that much spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 1
+art-owned = false
+card-number = 680
+image-number = 2023111781
+
+[[cards]]
+name = "Winterbough Monk"
+id = "0a2993a3-d624-4c3c-b562-ea93b28e619d"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "▸ Judgment: You may swap a card in your hand with a card in your void."
+energy-cost = 3
+card-type = "Character"
+subtype = "Explorer"
+rarity = "Uncommon"
+is-fast = false
+spark = 2
+art-owned = false
+card-number = 681
+image-number = 1726923520
+
+[[cards]]
+name = "Reforged Automaton"
+id = "af812604-b2c6-4fd1-8c8f-767d766af463"
+tide = "Ignite"
+tide-cost = 2
+rendered-text = "When you materialize a Figment, this character gains +2 spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 1
+art-owned = false
+card-number = 682
+image-number = 608687447
+
+[[cards]]
+name = "Desolation's Edge"
+id = "9ea29478-57f1-46a7-beb1-f5fae483eb98"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "Abandon this character: Dissolve an enemy."
+energy-cost = 4
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 2
+art-owned = false
+card-number = 683
+image-number = 776481895
+
+[[cards]]
+name = "Crossfire Specialist"
+id = "c52b81bb-a07f-4936-b044-4ac1aa5cc67d"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "When you play an event, the enemy with the most spark loses 1 spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Renegade"
+rarity = "Rare"
+is-fast = false
+spark = 2
+art-owned = false
+card-number = 684
+image-number = 432001921
+
+[[cards]]
+name = "Barrage Specialist"
+id = "d7d12836-b187-4f08-9043-473b1ac7fbb4"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "▸ Materialized: Dissolve a random enemy for each event you played this turn."
+energy-cost = 5
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 2
+art-owned = false
+card-number = 685
+image-number = 450347140
+
+[[cards]]
+name = "Entropy Spike"
+id = "c8f4f3d4-78e0-4ce3-af63-783f6aeb652f"
+tide = "Surge"
+tide-cost = 1
+rendered-text = "▸ Materialized: Events cost you 2● less this turn. For the rest of the game after that, events cost you 1● more."
+energy-cost = 3
+card-type = "Character"
+subtype = "Survivor"
+rarity = "Rare"
+is-fast = false
+spark = 1
+art-owned = false
+card-number = 686
+image-number = 658076065
+
+[[cards]]
+name = "The Deathsworn"
+id = "1894cb9f-e46b-4f1a-9c2e-9486f9abd084"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "When an allied Warrior is dissolved, reclaim it with 1 spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Warrior"
+rarity = "Rare"
+is-fast = false
+spark = 2
+art-owned = false
+card-number = 687
+image-number = 1562815903
+
+[[cards]]
+name = "Headtaker Wurm"
+id = "ef50eb65-e0c1-4dc9-8654-03827ff4fdb0"
+tide = "Arc"
+tide-cost = 1
+rendered-text = "▸ Materialized: Banish an enemy. Add a copy of it to your hand."
+energy-cost = 6
+card-type = "Character"
+subtype = "Monster"
+rarity = "Rare"
+is-fast = false
+spark = 3
+art-owned = false
+card-number = 688
+image-number = 515170831
+
+[[cards]]
+name = "Meadowlight Charger"
+id = "d72f7664-b7e2-45bf-8979-59237bc36889"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "When another ally gains spark, this character gains +1 spark."
+energy-cost = 4
+card-type = "Character"
+subtype = "Spirit Animal"
+rarity = "Rare"
+is-fast = false
+spark = 2
+art-owned = false
+card-number = 689
+image-number = 2123360858
+
+[[cards]]
+name = "Nullstone Contemplant"
+id = "4ed375e4-0bab-48da-83bc-c3bf7617ff25"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "▸ Materialized: Reorder your deck from highest cost to lowest cost."
+energy-cost = 3
+card-type = "Character"
+subtype = "Visionary"
+rarity = "Rare"
+is-fast = false
+spark = 2
+art-owned = false
+card-number = 690
+image-number = 2421338079
+
+[[cards]]
+name = "Voltage Linked"
+id = "2b5e7d77-c882-4d22-a4c5-9b2fc3e9b82c"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "▸ Materialized: Double an ally's spark."
+energy-cost = 5
+card-type = "Character"
+subtype = "Tinkerer"
+rarity = "Rare"
+is-fast = false
+spark = 2
+art-owned = false
+card-number = 691
+image-number = 2258761877
+
+[[cards]]
+name = "Rusted Monolith"
+id = "dcc4834d-292e-4239-b77b-1425402800c6"
+tide = "Umbra"
+tide-cost = 1
+rendered-text = "Events you reclaim cost 0●."
+energy-cost = 4
+card-type = "Character"
+subtype = "Synth"
+rarity = "Rare"
+is-fast = false
+spark = 2
+art-owned = false
+card-number = 692
+image-number = 1926604856
+
 [metadata]
 schema_version = 1
 
