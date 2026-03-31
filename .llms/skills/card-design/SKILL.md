@@ -201,7 +201,7 @@ a bonus for draftability — but don't force it.
 |---|---|---|
 | Celestial | 1 | Arc, Bloom, Surge |
 | Radiant | 1 | Ignite, Surge |
-| Halcyon | 1 | Ignite |
+| Warrior | 1 | Ignite |
 | Shadow | 0 | Pact (primary), Rime, Umbra |
 
 ### Fast Speed Guidelines
@@ -277,10 +277,9 @@ The default expectation is that the final card will use a wild concept.
 - **NOT wild:** "Draw N cards" or "Kindle N" with a new trigger condition. The play
   experience of "something happens, you draw/kindle" is deeply explored.
 - **NOT wild:** Moving an existing mechanic to a different tide.
-- **WILD:** A mechanic that creates a play experience no existing card creates. "The
-  opponent chooses: you draw 3 or they abandon a character" — no card gives the opponent
-  this kind of choice. "This character's spark equals the number of events in your void" —
-  no character scales this way.
+- **WILD:** A mechanic that creates a play experience no existing card creates. Look for
+  mechanics where the *decision space* or *board interaction* is fundamentally different from
+  anything in the pool — not just a familiar effect with a new trigger or scaling variable.
 
 **The litmus test for novelty:** Describe the card to a friend who knows the game. If they
 say "oh, like [existing card] but different," it's not wild. If they say "wait, you can DO
@@ -335,42 +334,9 @@ justification for why THIS card's version creates a genuinely different play exp
 If you find yourself writing rules text that fits one of these patterns, STOP and ask: "What
 is the play experience this card creates that no existing card creates?"
 
-**Examples of genuinely unexplored territory** (prompts to think bigger, not a checklist):
-
-**Cards that transform or evolve:**
-- A card in your hand that changes based on game events while you hold it
-- A character that becomes a different character when a condition is met
-- An event that upgrades itself each time it's played from void
-
-**Cards that interact with hidden information:**
-- Reveal the top card of the opponent's deck; effect depends on what's revealed
-- Look at the opponent's hand and gain a bonus based on what you see
-- Effects that scale with information neither player fully controls
-
-**Cards with unusual scaling or conditions:**
-- Effects that scale with the score differential
-- Cards that care about the current turn number or energy production
-- Effects based on the total cost of characters on either battlefield
-- Cards that count something unusual (events in void, opponent's materializations)
-
-**Cards that give the opponent choices (punisher mechanics):**
-- "The opponent chooses: you draw 3 cards, or they abandon a character"
-- Effects where the opponent picks which of two bad outcomes happens
-
-**Cards that change rules or modify other cards:**
-- "Characters you materialize this turn gain the Judgment ability of the first character"
-- "The next character you play costs 0● but is abandoned at end of turn"
-- Effects that temporarily change what a zone does
-
-**Cards with unusual timing or delayed effects:**
-- Effects that trigger N turns from now
-- Cards that set up a visible future payoff
-- Characters that do nothing initially but have inevitable payoff if they survive
-
-**Cards that create variance and moments:**
-- Play a random card from your deck
-- Discover with unusual criteria ("discover a card the opponent has in their deck")
-- "Joust" effects — reveal from both decks, compare, winner gets a bonus
+**Avoid "opponent chooses" / punisher mechanics.** In practice one option is almost always
+correct for the opponent, so the "choice" is illusory and the card collapses to a fixed
+effect. This design space is not fruitful — do not use it.
 
 ### Concept Evaluation Criteria
 
@@ -386,6 +352,29 @@ All four criteria are required. A design that fails any one is rejected.
    can be metaphorical or abstract, but a viewer looking at the art must be able to see the
    relationship. The mechanic must not actively contradict what the art depicts.
 
+### Concept Selection — Comparative Ranking (MANDATORY)
+
+**WARNING: There is a strong observed bias toward selecting Concept 1.** The first concept
+generated benefits from anchoring — it feels most developed because you spent the most
+creative energy on it. This bias has persisted even when evaluation tables showed later
+concepts scoring higher. You must actively counteract it.
+
+After generating all 4 concepts, you MUST complete this ranking before selecting:
+
+1. **Novelty rank:** Order all 4 concepts from most to least novel. For each, write the
+   "No existing card ___" sentence. Which concept makes a player say "wait, you can DO
+   that?" most strongly?
+2. **Fun rank:** Order all 4 by how exciting the play pattern is. Which creates the most
+   memorable moments? Which has the most interesting decision space?
+3. **Combined pick:** Select the concept that ranks highest across both dimensions. If
+   Concept 1 wins, you must write an explicit 2-sentence justification for why it beats
+   the highest-ranked alternative on *novelty specifically* — not just "it's the most
+   balanced" or "it fits best."
+
+**If you find yourself gravitating toward Concept 1 "because it's the most complete,"
+that's the bias talking.** All concepts are equally sketched at this stage. Pick the one
+with the wildest mechanic that still passes the four criteria, then develop it.
+
 ### Cost-to-Excitement Scaling
 
 - **0-2●:** Simple, incremental effects fine. Card earns its keep through repetition.
@@ -395,7 +384,7 @@ All four criteria are required. A design that fails any one is rejected.
 
 ### Refine Before Committing
 
-After picking a concept, stress-test it:
+After picking via the Comparative Ranking above, stress-test the chosen concept:
 
 - **Art connection check:** Can you write a one-sentence creative interpretation connecting
   the mechanic to the art? The connection can be loose or metaphorical — it just needs to
@@ -418,9 +407,8 @@ Before proceeding to Phase 6, you must pass this gate. Write the following:
 chosen concept creates. This must describe a *play experience*, not a cosmetic difference.
 
 **PASS examples:**
-- "No existing card lets the opponent choose between two bad outcomes."
-- "No existing card has spark that scales with the number of events in your void."
 - "No existing card transforms into a different card while in your hand."
+- "No existing card lets you play a card from the opponent's deck."
 
 **FAIL examples:**
 - "No existing card materializes a random Spirit Animal costing 2 or less." (Same play
@@ -462,8 +450,7 @@ characters or fewer.
 - **Art Description:** One sentence description of the card art.
 - **Archetype Description:** One sentence on how this card supports its tide's strategy.
 - **Narrative:** One sentence connecting the art to the mechanics. For characters, who is
-  this person and why do they have this ability? For events, what is happening? For
-  dreamwell, where is this place?
+  this person and why do they have this ability? For events, what is happening?
 - **Hearthstone Inspiration:** Name the HS ability that inspired this design, and one
   sentence on how the abstract dynamic was transformed through the art's narrative.
 - **Novelty Statement:** "No existing card ___." The unique play experience, carried from
@@ -472,82 +459,13 @@ characters or fewer.
   overlap, with one sentence each explaining why your card creates a **different play
   experience** (not just different numbers).
 
-### Dreamwell Design (if applicable)
+### Costing Guidelines
 
-Dreamwell cards have a different structure than regular cards:
-
-- **Energy produced:** Phase 0 cards produce 2 energy. Phase 1 cards produce 1 energy.
-- **Phase:** 0 (early game only, no bonus) or 1 (every cycle, has a bonus effect).
-- **Bonus effects (phase 1 only):** Simple one-line effects. Existing effects are: Foresee 1,
-  Gain 1 point, Gain 1 energy, Draw 1/Discard 1, Mill top 3 to void.
-- **Naming:** Location names — evocative place names (Skypath, Autumn Glade, Twilight
-  Radiance, Auroral Passage).
-- Dreamwell cards have no tide, no cost, no spark, and no rarity.
-
-### Spark-per-Cost Benchmarks (Characters)
-
-| Cost | Avg Spark | Typical Range | Notes |
-|---|---|---|---|
-| 0 | 0.2 | 0-1 | Mostly utility (0 spark + ability) |
-| 1 | 0.9 | 0-1 | Role-players, engine pieces |
-| 2 | 1.2 | 0-2 | Workhorse slot; 1 spark + good ability is standard |
-| 3 | 1.4 | 1-2 | 2 spark + ability is the sweet spot |
-| 4 | 2.0 | 1-3 | 2-3 spark, meaningful abilities |
-| 5 | 2.1 | 1-3 | Diminishing returns — ability must justify the cost |
-| 6+ | 2.6-5.0 | 2-8 | High-end threats, often with alt costs or cheat-into-play |
-
-### Event Cost Benchmarks
-
-| Effect | Typical Cost | Notes |
-|---|---|---|
-| Draw 1 | 0-1 | Usually a rider on another effect |
-| Draw 2 + discard 1-2 ("loot") | 2 | Standard filtering |
-| Draw 2 (no discard) | 4 | Pure card advantage is expensive |
-| Draw 3 + discard 2 | 3 | Standard 3-cost draw |
-| Foresee 3 + draw 1 | 2 | Fast variant available |
-| Gain 4● (net +2) | 2 | Standard energy burst rate |
-| Gain 6● (net +2) | 4 | Same net rate at larger scale |
-| Mill 2-3 + minor bonus | 1 | Mill is cheap because it needs synergy |
-| Mill 3 + draw 1 | 1 | Umbra cantrip baseline |
-| Dissolve (conditional) | 1-2 | Requires spark/cost restriction |
-| Dissolve (unconditional, fast) | 3 | The key removal benchmark |
-| Dissolve (unconditional) + drawback | 2 | Must lose 2 max ● or 4 ✪ |
-| Dissolve all (board wipe) | 6 | Format-defining at any cost |
-| Dissolve all spark <= 2 | 4 | Conditional sweeper |
-| Prevent (unconditional, fast) | 2 | Standard counterspell rate |
-| Prevent (conditional or drawback) | 0-1 | Must have significant downside |
-| Return enemy to hand + bonus | 3 fast | Tempo play with rider |
-| Return from void to hand | 2 | Baseline recursion |
-| Return from void to hand + draw 1 | 2 | Slightly above-rate for Umbra |
-| Banish enemy until next main | 3 fast | Tempo removal |
-| Materialize 3 figment tokens | 3 | Go-wide baseline |
-| Reclaim character (cost <= 3) | 3 | Needs setup (card must be in void) |
-| Reclaim up to 3 (cost <= 2) | 4 | Premium recursion |
-| Copy next event played | 3 | Engine setup |
-| Kindle 1-2 (one-shot) | 0-1 | Usually a rider on another effect |
-| Kindle 3-4 (one-shot) | 1-2 | Scaling/conditional variants |
-| Kindle 1/turn (on character) | 1-2● of budget | Part of a character's ability value |
-
-**Event costing principles:**
-- **Fast adds ~1●** to an effect's cost, or the card gets a restriction instead.
-- **Reclaim costs** on events are typically equal to or slightly above the card's printed
-  cost.
-- **Scaling effects** should be evaluated at their average case, not best case.
-- **Net value** matters more than gross.
-
-### Deck Composition Reference
-
-- ~60-65% of cards in a typical deck are characters, ~35-40% are events
-- Deck size is typically 30 cards
-
-### Reclaim on Events
-
-- **Umbra** events frequently have Reclaim — the void is Umbra's second hand
-- **Surge** events sometimes have Reclaim — replaying events feeds triggers
-- **Rime** events occasionally have Reclaim — discarding a reclaim event to void sets up
-  future replay
-- **Other tides** rarely have Reclaim unless there's a specific reason
-- Events that represent a singular, unrepeatable moment should not have Reclaim
+Energy cost and spark are a rough estimate — don't overthink them. Use the anonymized card
+pool as a reference: find cards at similar cost points with similar power levels and match
+accordingly. Characters typically have spark roughly equal to half their energy cost (e.g.,
+cost 4 → spark 2), with powerful abilities trading spark downward. Fast adds ~1● to an
+effect's cost. Reclaim is mainly for Umbra, Surge, and Rime events.
 
 ### Templating Conventions
 
@@ -639,6 +557,8 @@ Choose one: Draw 2 cards or Dissolve an enemy with spark 3 or less.
   shouldn't heal.
 - **Parasitic design:** Cards that do literally nothing without specific other cards.
 - **Opponent-cooperative triggers:** Abilities the opponent can make blank by changing play.
+- **Opponent chooses / punisher mechanics:** One option is almost always correct for the
+  opponent, so the "choice" is illusory. Do not use this design space.
 - **Overcomplexity:** If it doesn't fit in 100 characters, simplify.
 - **Stapled mechanics:** Two unrelated abilities with no connecting theme.
 - **Wrong-tide mechanics:** A Rime card generating figments, a Surge card with abandon.
