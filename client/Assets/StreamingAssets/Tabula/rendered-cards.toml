@@ -4149,7 +4149,7 @@ art-owned = false
 card-number = 252
 
 [[cards]]
-name = "Haunted Vow"
+name = "Maze"
 id = "a9d7abc1-c290-49c6-8153-83f097942b45"
 tide = "Arc"
 tide-cost = 1
@@ -4160,7 +4160,7 @@ subtype = ""
 rarity = "Common"
 is-fast = true
 spark = ""
-image-number = 0
+image-number = 443761747
 art-owned = false
 card-number = 253
 
@@ -4181,7 +4181,7 @@ art-owned = false
 card-number = 254
 
 [[cards]]
-name = "Enigma Sphere"
+name = "Part the Veil"
 id = "a0fd3b74-ae21-4a07-8306-7df3645c28d9"
 tide = "Pact"
 tide-cost = 1
@@ -4192,7 +4192,7 @@ subtype = ""
 rarity = "Rare"
 is-fast = false
 spark = ""
-image-number = 0
+image-number = 2261959341
 art-owned = false
 card-number = 255
 
@@ -4512,7 +4512,7 @@ art-owned = false
 card-number = 278
 
 [[cards]]
-name = "Treecrown Spearhunter"
+name = "Silent Gatherer"
 id = "fec40d51-abbe-49b2-bed3-ad4f7f8069a1"
 tide = "Umbra"
 tide-cost = 1
@@ -4523,7 +4523,7 @@ subtype = "Spirit Animal"
 rarity = "Uncommon"
 is-fast = false
 spark = 2
-image-number = 0
+image-number = 658076071
 art-owned = false
 card-number = 279
 
@@ -4563,7 +4563,7 @@ art-owned = false
 card-number = 281
 
 [[cards]]
-name = "Clash of Destinies"
+name = "Call of Calamity"
 id = "31d222f7-40c8-480d-82b0-d235f57d53c2"
 tide = "Surge"
 tide-cost = 1
@@ -4574,7 +4574,7 @@ subtype = ""
 rarity = "Uncommon"
 is-fast = true
 spark = ""
-image-number = 0
+image-number = 465449525
 art-owned = false
 card-number = 282
 
@@ -5177,27 +5177,27 @@ art-owned = false
 card-number = 323
 
 [[cards]]
-name = "Scarred Guardian"
+name = "Inspiring Templar"
 id = "c77ead7a-e7a4-4c92-819c-558bc26773f3"
 tide = "Ignite"
 tide-cost = 1
-rendered-text = "▸ Judgment: You may pay N● to have each ally gain +N spark."
+rendered-text = "▸ Judgment: You may pay 2● to have each ally gain +2 spark."
 energy-cost = 3
 card-type = "Character"
-subtype = "Synth"
+subtype = "Warrior"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 0
+image-number = 1200949225
 art-owned = false
 card-number = 324
 
 [[cards]]
-name = "Waking the Fallen"
+name = "Wake the Fallen"
 id = "2f932c14-02cb-4c93-be06-03e067496cb6"
 tide = "Pact"
 tide-cost = 1
-rendered-text = "Reclaim each character dissolved or abandoned this turn."
+rendered-text = "Reclaim each character dissolved this turn."
 energy-cost = 4
 card-type = "Event"
 subtype = ""
@@ -5227,18 +5227,18 @@ art-owned = false
 card-number = 326
 
 [[cards]]
-name = "Gentle Rusted Wanderer"
+name = "Ashfront Lieutenant"
 id = "ad9a9b5c-6dc9-4a89-b709-786b04988d3e"
 tide = "Ignite"
 tide-cost = 2
 rendered-text = "▸ Materialized: Materialize a Warrior figment. ▸Judgment: Gain 1● for each allied Figment."
 energy-cost = 5
 card-type = "Character"
-subtype = "Tinkerer"
+subtype = "Warrior"
 rarity = "Rare"
 is-fast = false
 spark = 2
-image-number = 0
+image-number = 1639942837
 art-owned = false
 card-number = 328
 
@@ -5374,7 +5374,7 @@ art-owned = false
 card-number = 336
 
 [[cards]]
-name = "Blastwave Runner"
+name = "Cinderblade Legionnaire"
 id = "e55f98a9-2be2-4760-b527-d7edf1d8b585"
 tide = "Ignite"
 tide-cost = 1
@@ -5385,7 +5385,7 @@ subtype = "Warrior"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 0
+image-number = 337161542
 art-owned = false
 card-number = 337
 
@@ -5726,18 +5726,18 @@ art-owned = false
 card-number = 367
 
 [[cards]]
-name = "Meadow Sentinel"
+name = "Last Light Herald"
 id = "8c2de60e-1e06-4563-acf9-beb76a2620c2"
 tide = "Ignite"
 tide-cost = 2
 rendered-text = "▸ Judgment: Each ally gains +1 spark."
 energy-cost = 5
 card-type = "Character"
-subtype = "Tinkerer"
+subtype = "Synth"
 rarity = "Rare"
 is-fast = false
 spark = 0
-image-number = 0
+image-number = 644603722
 art-owned = false
 card-number = 369
 
@@ -5854,7 +5854,7 @@ art-owned = false
 card-number = 378
 
 [[cards]]
-name = "Rusted Street Patrol"
+name = "Celestial Lookout"
 id = "b3908e49-4a7a-4034-8a25-5e592246c5e5"
 tide = "Ignite"
 tide-cost = 1
@@ -5865,7 +5865,7 @@ subtype = "Tinkerer"
 rarity = "Rare"
 is-fast = false
 spark = 0
-image-number = 0
+image-number = 515170852
 art-owned = false
 card-number = 379
 
@@ -5955,18 +5955,18 @@ art-owned = false
 card-number = 385
 
 [[cards]]
-name = "Sunset Farewell"
+name = "Fading Farewell"
 id = "e4196e79-c4f1-406c-8b9e-90a7323ae85e"
 tide = "Rime"
 tide-cost = 1
 rendered-text = "Return a character from your void to your hand. The opponent discards a card."
-energy-cost = 2
+energy-cost = 3
 card-type = "Event"
 subtype = ""
 rarity = "Uncommon"
 is-fast = true
 spark = ""
-image-number = 0
+image-number = 347770439
 art-owned = false
 card-number = 386
 
@@ -6071,22 +6071,6 @@ spark = 2
 image-number = 2033123273
 art-owned = false
 card-number = 393
-
-[[cards]]
-name = "Crimson City Retreat"
-id = "f1e4afd2-cb16-454a-a11b-f2e5ede8d46b"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "Abandon an ally: Return any number of allies to hand."
-energy-cost = 2
-card-type = "Event"
-subtype = ""
-rarity = "Common"
-is-fast = true
-spark = ""
-image-number = 0
-art-owned = false
-card-number = 397
 
 [[cards]]
 name = "Shadowcaller"
@@ -6662,18 +6646,18 @@ art-owned = false
 card-number = 440
 
 [[cards]]
-name = "Starfield Silencer"
+name = "Crowflight Silencer"
 id = "90e97e94-2d89-4c25-b4ab-23d469b9a723"
 tide = "Arc"
 tide-cost = 1
-rendered-text = "▸ Materialized: Disable an enemy's activated and Judgment abilities while this character is in play."
+rendered-text = "▸ Materialized: Disable an enemy's activated and triggered abilities while this character is in play."
 energy-cost = 3
 card-type = "Character"
 subtype = "Mage"
 rarity = "Rare"
 is-fast = true
 spark = 2
-image-number = 0
+image-number = 247705264
 art-owned = false
 card-number = 441
 
@@ -7048,18 +7032,18 @@ art-owned = false
 card-number = 468
 
 [[cards]]
-name = "Frostbound Wanderer"
+name = "Sorrowful Prince"
 id = "e1a60439-1741-4f27-971f-986a16130bf7"
 tide = "Ignite"
 tide-cost = 1
 rendered-text = "▸ Judgment: Kindle 1. 5●: Each allied character gains +1 spark."
 energy-cost = 2
 card-type = "Character"
-subtype = "Mage"
+subtype = "Warrior"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 0
+image-number = 432001912
 art-owned = false
 card-number = 469
 
@@ -7256,23 +7240,23 @@ art-owned = true
 card-number = 485
 
 [[cards]]
-name = "Shore of Worlds"
+name = "Lord of Hidden Paths"
 id = "70306c8a-a77c-4d07-a4f8-abb51704be8c"
 tide = "Surge"
 tide-cost = 2
 rendered-text = "When you play a card, draw a card."
-energy-cost = 7
+energy-cost = 6
 card-type = "Character"
-subtype = "Explorer"
+subtype = "Spirit Animal"
 rarity = "Common"
 is-fast = false
 spark = 2
-image-number = 0
+image-number = 2594220423
 art-owned = false
 card-number = 487
 
 [[cards]]
-name = "Luminous City Sovereign"
+name = "Avatar of Oblivion"
 id = "18b1d155-a89a-4f37-87c4-644ff83c16ef"
 tide = "Umbra"
 tide-cost = 2
@@ -7283,7 +7267,7 @@ subtype = "Visionary"
 rarity = "Rare"
 is-fast = false
 spark = 4
-image-number = 0
+image-number = 1219782721
 art-owned = false
 card-number = 488
 
@@ -7434,18 +7418,18 @@ art-owned = false
 card-number = 497
 
 [[cards]]
-name = "Ruins and Hound"
+name = "Old Growth Sovereign"
 id = "97eaacbe-bd52-4ef1-b7d2-b553a06db48b"
 tide = "Neutral"
 tide-cost = 2
 rendered-text = "▸ Materialized: Gain 3●. Draw 3 cards. Dissolve an enemy with spark 2 or less."
-energy-cost = 10
+energy-cost = 7
 card-type = "Character"
-subtype = "Explorer"
+subtype = "Ancient"
 rarity = "Rare"
 is-fast = true
 spark = 3
-image-number = 0
+image-number = 1207264096
 art-owned = false
 card-number = 498
 
@@ -7498,7 +7482,7 @@ art-owned = false
 card-number = 501
 
 [[cards]]
-name = "Doomsday Chronicler"
+name = "Iconoclast"
 id = "91b9b0ad-af62-439f-9b68-15eaa0221fe9"
 tide = "Rime"
 tide-cost = 1
@@ -7509,7 +7493,7 @@ subtype = "Visionary"
 rarity = "Rare"
 is-fast = false
 spark = 1
-image-number = 0
+image-number = 2025883238
 art-owned = false
 card-number = 502
 
