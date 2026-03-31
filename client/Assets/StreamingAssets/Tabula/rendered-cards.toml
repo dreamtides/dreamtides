@@ -7575,7 +7575,7 @@ is-fast = true
 spark = 1
 art-owned = false
 card-number = 509
-image-number = 0
+image-number = 2586513027
 
 [[cards]]
 name = "Signal Resonant"
@@ -7610,7 +7610,7 @@ card-number = 514
 image-number = 1419437210
 
 [[cards]]
-name = "Phantom Forgemaster"
+name = "Pinnacle Ascendant"
 id = "cf12f551-e084-43ed-97e7-d7d54b21bc2d"
 tide = "Rime"
 tide-cost = 2
@@ -7623,7 +7623,7 @@ is-fast = false
 spark = 2
 art-owned = false
 card-number = 515
-image-number = 0
+image-number = 2419795155
 
 [[cards]]
 name = "Manufactured Abomination"
@@ -8215,7 +8215,7 @@ is-fast = false
 spark = 1
 art-owned = false
 card-number = 579
-image-number = 0
+image-number = 436090582
 
 [[cards]]
 name = "Liminal Striker"
@@ -8250,11 +8250,11 @@ card-number = 581
 image-number = 2295991869
 
 [[cards]]
-name = "Legion's Reflection"
+name = "Shadow Reflection"
 id = "4154a8e2-d5fc-485e-9000-65b4be547266"
 tide = "Ignite"
 tide-cost = 1
-rendered-text = "Materialize a copy of each allied Warrior with 0 spark."
+rendered-text = "Materialize a 0 spark copy of each allied Warrior."
 energy-cost = 4
 card-type = "Event"
 subtype = ""
@@ -8263,7 +8263,7 @@ is-fast = false
 spark = ""
 art-owned = false
 card-number = 582
-image-number = 0
+image-number = 695511784
 
 [[cards]]
 name = "Vesper Outsider"
@@ -8744,22 +8744,6 @@ spark = 1
 art-owned = false
 card-number = 644
 image-number = 591627035
-
-[[cards]]
-name = "Torch of the Fallen"
-id = "e27d0cee-f22c-4651-b446-ca60e50dd4a7"
-tide = "Bloom"
-tide-cost = 1
-rendered-text = "▸ Dissolved: The next character you play costs 0● and gains this ability."
-energy-cost = 2
-card-type = "Character"
-subtype = "Ancient"
-rarity = "Rare"
-is-fast = false
-spark = 1
-art-owned = false
-card-number = 646
-image-number = 0
 
 [[cards]]
 name = "Stoneborn Leviathan"
