@@ -26,7 +26,7 @@ In other words:
 > **A tide should not be a deck. A tide should be a cohesive mechanical**
 > **cluster whose cards naturally serve both neighboring decks.**
 
-Wild remains the neutral / glue space. It is not part of the tide circle.
+Neutral remains the neutral / glue space. It is not part of the tide circle.
 
 For full rules definitions of game terms used in this document, see
 [battle_rules.md](../battle_rules/battle_rules.md). Key terms in brief:
@@ -174,6 +174,7 @@ Legend: **P** = Primary, **S** = Secondary, **T** = Tertiary, **N** = Not Real
 - the best permanent ramp,
 - the best repeatable energy generation,
 - the best rituals / temporary energy generation,
+- the highest density of kindle and spark growth effects,
 - shared Spirit Animal presence with Arc,
 - and mana-positive development.
 
@@ -250,7 +251,9 @@ Animal payoff cards.
 - the best repeatable energy generation,
 - the best rituals,
 - shared Spirit Animal presence,
-- mana-positive development pieces.
+- mana-positive development pieces,
+- spark growth cards — especially those triggered by materializing or replaying
+  creatures, which naturally pair with Arc's flicker tools.
 
 **Arc contributes:**
 
@@ -263,7 +266,9 @@ Animal payoff cards.
 
 - Spirit Animals live genuinely in both tides,
 - materialized-value creatures,
-- tempo-safe reset tools for tall bodies.
+- tempo-safe reset tools for tall bodies,
+- spark growth triggered by materializing bridges both tides — Bloom owns the
+  growth card, Arc provides the repeated materializations.
 
 **Mini-archetypes inside the pair:**
 
@@ -271,6 +276,8 @@ Animal payoff cards.
 - **Spirit Animal engine** — more synergy-driven, centered on replaying and
   multiplying tribe payoffs.
 - **Tap-out control ramp** — heavier Arc top-end, fewer tribal synergies.
+- **Growth engine** — Bloom spark-growth creatures plus Arc flicker to keep
+  materializing them and accumulating spark.
 
 **Why both are required:**
 
@@ -571,12 +578,15 @@ turns possible.
 - the best rituals,
 - the best temporary energy generation,
 - long-term mana growth,
-- some stable setup through creature development.
+- spark growth cards — especially those triggered by playing events or chaining
+  cards, which naturally pair with Surge's event density.
 
 **Overlap in both:**
 
 - mana-positive setup,
 - scaling cards,
+- spark growth triggered by events bridges both tides — Bloom owns the growth
+  card, Surge provides the event volume,
 - cards that reward abundance or sequencing,
 - some combo-control crossover.
 
@@ -597,9 +607,9 @@ ______________________________________________________________________
 
 # The Seven Tide Identities
 
-## Wild
+## Neutral
 
-Wild is the neutral glue space, not part of the circle.
+Neutral is the neutral glue space, not part of the circle.
 
 **It does:**
 
@@ -626,16 +636,23 @@ Bloom is the tide of **resource abundance and living growth**.
 - permanent ramp,
 - repeatable energy generation,
 - rituals / temporary energy generation,
+- kindle and spark growth,
 - shared Spirit Animal presence with Arc,
 - mana-positive development.
+
+Spark growth is a key overlap mechanic with Bloom's neighbors — see the "Kindle
+/ Spark Growth" section in the ownership matrix for detailed assignment
+guidance.
 
 **Left deck: Surge + Bloom**
 
 - powers event turns with rituals and burst mana.
+- Bloom spark-growth cards triggered by events bridge the two tides.
 
 **Right deck: Bloom + Arc**
 
 - ramps into Arc's premium threats and Spirit Animal payoffs.
+- Bloom spark-growth cards triggered by materializing bridge the two tides.
 
 **Broader homes:**
 
@@ -643,7 +660,8 @@ Bloom is the tide of **resource abundance and living growth**.
 - tall midrange,
 - ramp-combo.
 
-**Core idea:** Bloom creates more dreamstuff than everyone else.
+**Core idea:** Bloom creates more dreamstuff than everyone else — more energy,
+more spark, more growth over time.
 
 **It should not be:**
 
@@ -870,6 +888,42 @@ Surge is the tide of **event critical mass and reactive self-churn**.
 
 - the best ritual tide,
 - or a self-contained storm deck.
+
+______________________________________________________________________
+
+### Kindle / Spark Growth — Bloom's Growth Mechanic
+
+Bloom is the primary home of cards that add spark to individual characters over
+time — kindle effects, "+1 spark" triggers, and scaling spark accumulation.
+Bloom is the tide of living growth, and growing characters over time is a core
+expression of that identity.
+
+**Default assignment:** A card whose primary purpose is growing spark on
+characters belongs to Bloom. "Judgment: this character gains +1 spark," "when
+you materialize a character, kindle 1," or "2●: this character gains +1 spark"
+are Bloom cards.
+
+**Overlap with allies:** Spark growth is a key mechanic for bridging Bloom with
+its neighbors. A Bloom card that grows spark based on banishing or you
+materializing your creatures naturally serves the Bloom + Arc archetype (Arc
+provides repeated materializations). A Bloom card that grows spark based on
+playing events naturally serves the Surge + Bloom archetype (Surge provides
+event volume). In these cases the card is still Bloom — the spark growth is the
+primary identity, and the trigger creates synergy with the neighbor.
+
+**When spark growth is NOT Bloom:** A card only stops being Bloom when spark
+growth is a minor rider on a mechanic that is strongly anchored to a non-ally
+tide. "When you abandon a character, gain 1 spark" is a Pact card — the abandon
+trigger is the card's core identity. "When you discard a card, gain 1 spark" is
+a Rime card. "Warriors you control gain +1 spark" is an Ignite card. In these
+cases the card's primary mechanical identity belongs to another tide and the
+spark growth is incidental.
+
+This is always a case-by-case judgment when a card has multiple mechanical
+elements. A card with spark growth and reclaim could still be Bloom — reclaim
+alone does not pull it to Umbra. A card with spark growth and figment generation
+could still be Bloom. The question is which mechanic defines the card's
+identity, not which mechanics are present.
 
 ______________________________________________________________________
 
