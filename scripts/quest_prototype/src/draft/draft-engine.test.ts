@@ -131,6 +131,7 @@ describe("scoreCard", () => {
       preference: [7, 0, 0, 0, 0, 0, 0],
       opennessHistory: [],
       picks: [],
+      committedPair: null,
     };
     const score = scoreCard(card, agent, DEFAULT_DRAFT_CONFIG);
     const expected = 0.6 * 1.0 + 0.2 * (1 / 7) + 0.2 * 0.67;
@@ -143,6 +144,7 @@ describe("scoreCard", () => {
       preference: [0, 0, 0, 0, 0, 0, 0],
       opennessHistory: [],
       picks: [],
+      committedPair: null,
     };
     const score = scoreCard(card, agent, DEFAULT_DRAFT_CONFIG);
     // preference normalized to uniform, dot with bloom fitness = 1/7

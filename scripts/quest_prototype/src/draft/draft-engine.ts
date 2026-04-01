@@ -1,5 +1,5 @@
 import type { CardData, Tide } from "../types/cards";
-import type { DraftConfig, DraftState, AgentState } from "../types/draft";
+import type { DraftConfig, DraftState, AgentState, TidePair } from "../types/draft";
 import { NAMED_TIDES } from "../data/card-database";
 import { logEvent } from "../logging";
 
@@ -13,6 +13,20 @@ const TIDE_INDEX: Readonly<Record<string, number>> = {
   Rime: 5,
   Surge: 6,
 };
+
+/**
+ * The 7 valid neighboring tide pairs from the tide circle.
+ * Bloom → Arc → Ignite → Pact → Umbra → Rime → Surge → Bloom.
+ */
+export const TIDE_PAIRS: readonly TidePair[] = [
+  { tide1: "Bloom", tide2: "Arc", label: "Bloom + Arc" },
+  { tide1: "Arc", tide2: "Ignite", label: "Arc + Ignite" },
+  { tide1: "Ignite", tide2: "Pact", label: "Ignite + Pact" },
+  { tide1: "Pact", tide2: "Umbra", label: "Pact + Umbra" },
+  { tide1: "Umbra", tide2: "Rime", label: "Umbra + Rime" },
+  { tide1: "Rime", tide2: "Surge", label: "Rime + Surge" },
+  { tide1: "Surge", tide2: "Bloom", label: "Surge + Bloom" },
+] as const;
 
 /** Default configuration for the cube draft engine. */
 export const DEFAULT_DRAFT_CONFIG: Readonly<DraftConfig> = {
@@ -34,6 +48,7 @@ export const DEFAULT_DRAFT_CONFIG: Readonly<DraftConfig> = {
     Legendary: 1.0,
   },
   seedingAlgorithm: "balanced",
+  commitByPick: 5,
 };
 
 /** Tide ordering for display sorting. */
@@ -124,6 +139,34 @@ function computeSupplySignal(
   return normalize(signal);
 }
 
+/**
+ * Determine which tide pair best matches an agent's current preference vector.
+ * Returns the pair whose two tides have the highest combined preference weight.
+ */
+export function bestTidePair(preference: number[]): TidePair {
+  let bestPair = TIDE_PAIRS[0];
+  let bestScore = -Infinity;
+  for (const pair of TIDE_PAIRS) {
+    const idx1 = TIDE_INDEX[pair.tide1] ?? 0;
+    const idx2 = TIDE_INDEX[pair.tide2] ?? 0;
+    const score = (preference[idx1] ?? 0) + (preference[idx2] ?? 0);
+    if (score > bestScore) {
+      bestScore = score;
+      bestPair = pair;
+    }
+  }
+  return bestPair;
+}
+
+/**
+ * Check whether a card belongs to a committed tide pair.
+ * Neutral cards are always considered on-pair.
+ */
+function cardMatchesPair(card: CardData, pair: TidePair): boolean {
+  if (card.tide === "Neutral") return true;
+  return card.tide === pair.tide1 || card.tide === pair.tide2;
+}
+
 /** Score a card for an AI agent using the adaptive scoring formula. */
 export function scoreCard(
   card: CardData,
@@ -138,11 +181,17 @@ export function scoreCard(
   const signalScore = dot(fitness, openness);
   const rarityValue = config.rarityValues[card.rarity] ?? 0;
 
-  return (
+  let score =
     config.preferenceWeight * prefScore +
     config.signalWeight * signalScore +
-    config.rarityWeight * rarityValue
-  );
+    config.rarityWeight * rarityValue;
+
+  // After commitment, heavily penalize off-pair cards
+  if (agent.committedPair !== null && !cardMatchesPair(card, agent.committedPair)) {
+    score *= 0.15;
+  }
+
+  return score;
 }
 
 /** Dot product of two arrays. */
@@ -170,6 +219,7 @@ function createAgentState(tideCount: number): AgentState {
     preference: new Array<number>(tideCount).fill(0),
     opennessHistory: [],
     picks: [],
+    committedPair: null,
   };
 }
 
@@ -501,11 +551,22 @@ export function botPick(
     }
   }
 
+  // Commit to a tide pair once the agent has made enough picks
+  if (agent.committedPair === null && agent.picks.length >= config.commitByPick) {
+    agent.committedPair = bestTidePair(agent.preference);
+    logEvent("draft_bot_committed", {
+      seatNumber: seatIndex,
+      tidePair: agent.committedPair.label,
+      pickCount: agent.picks.length,
+    });
+  }
+
   logEvent("draft_pick_bot", {
     seatNumber: seatIndex,
     pickNumber: state.currentPick,
     cardNumber: chosen.cardNumber,
     cardTide: pickedCard?.tide ?? "Neutral",
+    committedPair: agent.committedPair?.label ?? null,
   });
 }
 

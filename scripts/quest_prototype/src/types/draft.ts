@@ -1,6 +1,20 @@
 /** Algorithm used to seed initial packs from the card pool. */
 export type SeedingAlgorithm = "random" | "balanced";
 
+/**
+ * A neighboring tide pair from the tide circle.
+ * The tide circle is: Bloom → Arc → Ignite → Pact → Umbra → Rime → Surge → Bloom.
+ * Each pair represents a draft archetype built around two adjacent tides.
+ */
+export interface TidePair {
+  /** First tide in the pair. */
+  tide1: string;
+  /** Second tide in the pair. */
+  tide2: string;
+  /** Display label, e.g. "Bloom + Arc". */
+  label: string;
+}
+
 /** Configuration constants for the cube draft engine. */
 export interface DraftConfig {
   /** Total number of seats in the draft (1 player + bots). */
@@ -29,6 +43,8 @@ export interface DraftConfig {
   rarityValues: Readonly<Record<string, number>>;
   /** Algorithm for distributing cards into packs: "random" or "balanced" (even tide distribution). */
   seedingAlgorithm: SeedingAlgorithm;
+  /** Number of picks after which a bot commits to a tide pair. */
+  commitByPick: number;
 }
 
 /** Per-seat agent state, tracking preferences and picks. */
@@ -39,6 +55,8 @@ export interface AgentState {
   opennessHistory: number[][];
   /** Card numbers picked by this agent so far. */
   picks: number[];
+  /** Committed tide pair, locked in after commitByPick picks. Null before commitment. */
+  committedPair: TidePair | null;
 }
 
 /** Full persistent draft state, survives across dreamscapes. */

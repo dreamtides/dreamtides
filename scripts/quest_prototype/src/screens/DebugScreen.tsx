@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
-import type { DraftState } from "../types/draft";
+import type { DraftState, TidePair } from "../types/draft";
 import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { extractDraftDebugInfo, type SeatSummary } from "./debug-helpers";
 
@@ -445,16 +445,22 @@ function SeatCard({
               </span>
             </div>
             <div className="flex items-center gap-1.5">
-              {seat.primaryTide !== null && (
-                <TideBadge tide={seat.primaryTide} size="primary" />
-              )}
-              {seat.secondaryTide !== null && (
-                <TideBadge tide={seat.secondaryTide} size="secondary" />
-              )}
-              {seat.primaryTide === null && (
-                <span className="text-[10px] opacity-40">
-                  No tide preference
-                </span>
+              {seat.committedPair !== null ? (
+                <TidePairBadge pair={seat.committedPair} />
+              ) : (
+                <>
+                  {seat.primaryTide !== null && (
+                    <TideBadge tide={seat.primaryTide} size="primary" />
+                  )}
+                  {seat.secondaryTide !== null && (
+                    <TideBadge tide={seat.secondaryTide} size="secondary" />
+                  )}
+                  {seat.primaryTide === null && (
+                    <span className="text-[10px] opacity-40">
+                      No tide preference
+                    </span>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -569,6 +575,47 @@ function TideBadge({
         }}
       >
         {tide}
+      </span>
+    </div>
+  );
+}
+
+/** Badge showing a committed tide pair with both tide icons. */
+function TidePairBadge({ pair }: { pair: TidePair }) {
+  const color1 = TIDE_COLORS[pair.tide1 as Tide];
+  const color2 = TIDE_COLORS[pair.tide2 as Tide];
+  return (
+    <div
+      className="flex items-center gap-1 rounded-full px-2 py-0.5"
+      style={{
+        background: `linear-gradient(90deg, ${color1}20, ${color2}20)`,
+        border: `1px solid ${color1}60`,
+      }}
+    >
+      <img
+        src={tideIconUrl(pair.tide1 as Tide)}
+        alt={pair.tide1}
+        className="h-3.5 w-3.5 rounded-full"
+        style={{ border: `1px solid ${color1}` }}
+      />
+      <span
+        className="text-[10px] font-bold"
+        style={{ color: color1 }}
+      >
+        {pair.tide1}
+      </span>
+      <span className="text-[9px] opacity-40" style={{ color: "#e2e8f0" }}>+</span>
+      <img
+        src={tideIconUrl(pair.tide2 as Tide)}
+        alt={pair.tide2}
+        className="h-3.5 w-3.5 rounded-full"
+        style={{ border: `1px solid ${color2}` }}
+      />
+      <span
+        className="text-[10px] font-bold"
+        style={{ color: color2 }}
+      >
+        {pair.tide2}
       </span>
     </div>
   );

@@ -3,8 +3,8 @@ import { extractDraftDebugInfo } from "./debug-helpers";
 import type { DraftState, AgentState } from "../types/draft";
 import type { CardData } from "../types/cards";
 
-function makeAgent(preference: number[], picks: number[]): AgentState {
-  return { preference, opennessHistory: [], picks };
+function makeAgent(preference: number[], picks: number[], committedPair: AgentState["committedPair"] = null): AgentState {
+  return { preference, opennessHistory: [], picks, committedPair };
 }
 
 function makeCard(num: number, tide: string, name: string): CardData {
@@ -170,6 +170,18 @@ describe("extractDraftDebugInfo", () => {
     expect(round1.seatPassingToPlayer).toBe(9);
     expect(round0.seats[0].receivesFromSeat).toBe(9);
     expect(round1.seats[0].receivesFromSeat).toBe(9);
+  });
+
+  it("exposes committed tide pair from agent state", () => {
+    const pair = { tide1: "Bloom", tide2: "Arc", label: "Bloom + Arc" };
+    const agents = [
+      makeAgent([0, 0, 0, 0, 0, 0, 0], []),
+      makeAgent([6, 3, 0, 0, 0, 0, 0], [1, 2, 3, 4, 5], pair),
+    ];
+    const state = makeDraftState(agents);
+    const result = extractDraftDebugInfo(state, new Map())!;
+    expect(result.seats[1].committedPair).toEqual(pair);
+    expect(result.seats[0].committedPair).toBeNull();
   });
 
   it("computes receivesFromSeat correctly for all seats", () => {

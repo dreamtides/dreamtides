@@ -1,5 +1,5 @@
 import type { Tide, CardData } from "../types/cards";
-import type { DraftState } from "../types/draft";
+import type { DraftState, TidePair } from "../types/draft";
 import { NAMED_TIDES } from "../data/card-database";
 
 /** Ordered tide names matching the 7-element preference vector layout. */
@@ -20,6 +20,7 @@ export interface SeatSummary {
   receivesFromSeat: number;
   primaryTide: Tide | null;
   secondaryTide: Tide | null;
+  committedPair: TidePair | null;
   preferenceWeights: Record<string, number>;
   draftedCards: CardData[];
   cardsByTide: Record<string, number>;
@@ -87,6 +88,7 @@ export function extractDraftDebugInfo(
       receivesFromSeat,
       primaryTide,
       secondaryTide,
+      committedPair: agent.committedPair,
       preferenceWeights: normalizedWeights,
       draftedCards,
       cardsByTide,
