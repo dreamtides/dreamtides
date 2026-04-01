@@ -8686,8 +8686,8 @@ name = "Nineborn Specter"
 id = "0ebeb891-3c28-4f3e-8389-b3b8e2eb3684"
 tide = "Bloom"
 tide-cost = 1
-rendered-text = "▸ Dissolved: Put this card on top of your deck with +2 spark."
-energy-cost = 3
+rendered-text = "▸ Dissolved: You may put this card on top of your deck with +3 spark."
+energy-cost = 2
 card-type = "Character"
 subtype = "Spirit Animal"
 rarity = "Rare"
@@ -9272,6 +9272,294 @@ spark = 2
 art-owned = false
 card-number = 692
 image-number = 1926604856
+
+[[cards]]
+name = "Ghost Line"
+id = "74a58f68-7ee0-4a29-9a9c-9ae2e8c1d287"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "Swap your hand with the top 5 cards of your deck."
+energy-cost = 3
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 693
+image-number = 635276741
+
+[[cards]]
+name = "The Thinning"
+id = "3b3d3beb-5678-4649-9fc2-066a5c7a9d62"
+tide = "Surge"
+tide-cost = 2
+rendered-text = "Banish your hand. For the rest of the game, cards you draw cost 1● less."
+energy-cost = 4
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 694
+image-number = 1492489850
+
+[[cards]]
+name = "Petition the Megalith"
+id = "dbac7638-7216-4e61-8f4f-2d232b46f71b"
+tide = "Arc"
+tide-cost = 1
+rendered-text = "Return each ally to hand. They cost 2● less this turn."
+energy-cost = 3
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 695
+image-number = 2415692461
+
+[[cards]]
+name = "Lithic Severance"
+id = "e7ddc96c-bc7e-4e08-92ad-1b0b21a81e31"
+tide = "Arc"
+tide-cost = 1
+rendered-text = "Banish all characters, then materialize them."
+energy-cost = 3
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 696
+image-number = 1694993302
+
+[[cards]]
+name = "Colossal Convergence"
+id = "e8dcb92a-4ee6-4dc7-86c2-a9092a9bf7c7"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "An ally gains the total spark of your other allies. Abandon them."
+energy-cost = 4
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 697
+image-number = 2430444881
+
+[[cards]]
+name = "Borrowed Minutes"
+id = "f0e4b898-a39e-403e-a153-c97baa809e90"
+tide = "Umbra"
+tide-cost = 2
+rendered-text = "Return each event in your void to your hand. At end of turn, banish them."
+energy-cost = 4
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 698
+image-number = 662452591
+
+[[cards]]
+name = "Conjured Zenith"
+id = "53a957e9-d35b-45ac-bb61-4394e9bb403c"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "Materialize a random character from your deck with cost equal to the number of cards in your hand."
+energy-cost = 2
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 699
+image-number = 454046968
+
+[[cards]]
+name = "The Grand Heist"
+id = "9d3a63f7-68b0-490d-a521-321dfeb8a05e"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "Look at the top 5 cards of the opponent's deck. Play one for 0●. Put the rest on the bottom."
+energy-cost = 4
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 700
+image-number = 316023032
+
+[[cards]]
+name = "Tidal Prism"
+id = "dc1ffde8-189c-4906-8251-0a9838f6e708"
+tide = "Arc"
+tide-cost = 1
+rendered-text = "Until end of turn, when you materialize a character, materialize a copy of it."
+energy-cost = 5
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 701
+image-number = 2586513021
+
+[[cards]]
+name = "Collateral Damage"
+id = "28868166-7f79-4019-9960-b478397689a0"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "Dissolve an enemy. Each other enemy loses spark equal to the dissolved character's cost."
+energy-cost = 5
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 702
+image-number = 703988038
+
+[[cards]]
+name = "Overthrow"
+id = "9509756c-1033-4cfc-8bd5-df1d6f3afb5c"
+tide = "Neutral"
+tide-cost = 1
+rendered-text = "Dissolve an enemy with spark 4 or more."
+energy-cost = 2
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = true
+spark = ""
+art-owned = false
+card-number = 703
+image-number = 1785274673
+
+[[cards]]
+name = "Fenlight Expedition"
+id = "6b756f16-aa6d-4ec7-9588-65526e286acd"
+tide = "Umbra"
+tide-cost = 1
+rendered-text = "Put 5 random events from your deck into your void."
+energy-cost = 2
+card-type = "Event"
+subtype = ""
+rarity = "Common"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 704
+image-number = 1334747705
+
+[[cards]]
+name = "Scuttled Fortune"
+id = "ff8a3548-f00b-4724-928a-fdbe886bbbf5"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "Abandon all allies. Gain 2● and draw a card for each ally dissolved."
+energy-cost = 4
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 705
+image-number = 539226472
+
+[[cards]]
+name = "Aftermath Bloom"
+id = "62e920a2-4b5d-4236-837d-ec02bc2e14bd"
+tide = "Pact"
+tide-cost = 1
+rendered-text = "Abandon any number of allies. Materialize a random character from your deck for each ally abandoned."
+energy-cost = 5
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 706
+image-number = 789290998
+
+[[cards]]
+name = "Cradle of Storms"
+id = "02e4db99-f7f6-42f3-b317-345938e43a10"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "Until end of turn, when you discard a character, materialize it."
+energy-cost = 3
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 707
+image-number = 1302572584
+
+[[cards]]
+name = "Peak Plunder"
+id = "42fceb59-96a6-4053-bbfb-dcd841b0e196"
+tide = "Bloom"
+tide-cost = 1
+rendered-text = "The cost of a random character in your hand becomes 0●."
+energy-cost = 2
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 708
+image-number = 1963305271
+
+[[cards]]
+name = "Vertiginous Leap"
+id = "b93e0cef-e543-4229-a7b4-243e652dd31e"
+tide = "Rime"
+tide-cost = 1
+rendered-text = "Look at the opponent's hand. You may play an event from it for 0●."
+energy-cost = 4
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 709
+image-number = 410444923
+
+[[cards]]
+name = "Feeding the Flames"
+id = "03e86c76-2aaf-4dde-a635-3c12693d1d89"
+tide = "Ignite"
+tide-cost = 1
+rendered-text = "Each ally becomes a copy of the ally with the most spark."
+energy-cost = 6
+card-type = "Event"
+subtype = ""
+rarity = "Rare"
+is-fast = false
+spark = ""
+art-owned = false
+card-number = 710
+image-number = 1347487793
 
 [metadata]
 schema_version = 1
