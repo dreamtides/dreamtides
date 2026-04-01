@@ -527,7 +527,7 @@ Arc1 | 3●/0✦ | Explorer | R | ▸ Materialized: Banish the top card of your 
 Bloom1 | 4●/1✦ | Spirit Animal | R | ▸ Judgment: Each character in your hand gains +1 spark.
 Umbra2 | 4●/2✦ | Ancient | R | ▸ Materialized: The opponent chooses — you draw 2 cards, or they abandon a character.
 Neutral1 | 4●/3✦ | Ancient | R | ▸ Judgment: Lose 1 spark. If this has 0 spark, dissolve all enemies.
-Bloom1 | 3●/2✦ | Spirit Animal | R | ▸ Dissolved: Put this card on top of your deck with +2 spark.
+Bloom1 | 2●/2✦ | Spirit Animal | R | ▸ Dissolved: You may put this card on top of your deck with +3 spark.
 Umbra2 | 6●/2✦ | Ancient | R | ▸ Materialized: Each enemy loses 1 spark.
 Bloom2 | 5●/0✦ | Outsider | R | This character's spark is equal to the highest enemy's spark.
 Arc2 | 4●/1✦ | Explorer | R | At the end of your turn, this character gains +1 spark for each unspent ● you have.
@@ -538,3 +538,47 @@ Rime2 | 4●/2✦ | Tinkerer | R | When you discard a character, it gains +3 spa
 Rime2 | 4●/2✦ | Outsider | R | When you discard a card, reveal the top of your deck. If it costs less, play it for 0●.
 Arc2 | 4●/2✦ | Explorer | R | ▸ Materialized: Choose an enemy. It cannot gain spark while this character is in play.
 Rime2 | 3●/2✦ | Warrior | R | ▸ Materialized: Choose an enemy. ▸ Judgment: It loses 2 spark. At 0, dissolve it and draw 2.
+Bloom2 | 7●/7✦ | Ancient | L | ▸ Materialized: For the rest of the game, ▸ Judgment: abilities trigger twice.
+Umbra2 | 7●/3✦ | Ancient | R | ▸ Judgment: Each enemy loses 1 spark. This character gains +1 spark for each.
+Neutral1 | 4●/1✦ | Tinkerer | R | ▸ Judgment: Banish the top card of your deck. ▸ Dissolved: Play each card banished this way for 0●.
+Arc1 | 4●/1✦ | Spirit Animal | R | ▸ Materialized: Choose an ally. ▸ Judgment: Materialize a copy of it with 1 spark.
+Umbra1 | 5●/2✦ | Ancient | R | ▸ Materialized, Judgment: Each character in your void gains +2 spark.
+Rime1 | 3●/1✦ | Synth | R | ▸ Materialized: An enemy's spark becomes 0 until your next turn. Discard a card.
+Pact1 | 4●/2✦ | Ancient | R | ▸ Judgment: You may abandon an ally to play the top card of the opponent's deck for 0●.
+Bloom1 | 2●/1✦ | Spirit Animal | R | ▸ Materialized: Choose an ally. ▸ Judgment: That ally and this character each gain +1 spark.
+Pact1 | 4●/1✦ | Ancient | R | When you abandon an ally, this character becomes a copy of that ally. It keeps this ability.
+Surge2 | 4●/2✦ | Explorer | R | ▸ Materialized: Choose an event in hand. At the beginning of each turn, play a copy of it for 0●.
+Umbra1 | 3●/1✦ | Child | R | When a character enters your void from your deck, add it to your hand.
+Pact1 | 4●/2✦ | Warrior | R | ▸ Dissolved: For the rest of the game, your first character each turn costs 2● less.
+Pact1 | 7●/4✦ | Synth | R | ▸ Dissolved: Materialize each character abandoned this turn from your void with +3 spark.
+Ignite1 | 4●/1✦ | Warrior | R | ▸ Materialized: An enemy loses all spark. This character gains that much spark.
+Rime1 | 3●/2✦ | Explorer | U | ▸ Judgment: You may swap a card in your hand with a card in your void.
+Ignite2 | 5●/1✦ | Synth | R | When you materialize a Figment, this character gains +2 spark.
+Pact1 | 4●/2✦ | Warrior | R | Abandon this character: Dissolve an enemy.
+Surge1 | 4●/2✦ | Renegade | R | When you play an event, the enemy with the most spark loses 1 spark.
+Surge1 | 5●/2✦ | Warrior | R | ▸ Materialized: Dissolve a random enemy for each event you played this turn.
+Surge1 | 3●/1✦ | Survivor | R | ▸ Materialized: Events cost you 2● less this turn. For the rest of the game after that, events cost you 1● more.
+Ignite1 | 4●/2✦ | Warrior | R | When an allied Warrior is dissolved, reclaim it with 1 spark.
+Arc1 | 6●/3✦ | Monster | R | ▸ Materialized: Banish an enemy. Add a copy of it to your hand.
+Bloom1 | 4●/2✦ | Spirit Animal | R | When another ally gains spark, this character gains +1 spark.
+Neutral1 | 3●/2✦ | Visionary | R | ▸ Materialized: Reorder your deck from highest cost to lowest cost.
+Bloom1 | 5●/2✦ | Tinkerer | R | ▸ Materialized: Double an ally's spark.
+Umbra1 | 4●/2✦ | Synth | R | Events you reclaim cost 0●.
+Rime1 | 3● | Event | R | Swap your hand with the top 5 cards of your deck.
+Surge2 | 4● | Event | R | Banish your hand. For the rest of the game, cards you draw cost 1● less.
+Arc1 | 3● | Event | R | Return each ally to hand. They cost 2● less this turn.
+Arc1 | 3● | Event | R | Banish all characters, then materialize them.
+Pact1 | 4● | Event | R | An ally gains the total spark of your other allies. Abandon them.
+Umbra2 | 4● | Event | R | Return each event in your void to your hand. At end of turn, banish them.
+Bloom1 | 2● | Event | R | Materialize a random character from your deck with cost equal to the number of cards in your hand.
+Rime1 | 4● | Event | R | Look at the top 5 cards of the opponent's deck. Play one for 0●. Put the rest on the bottom.
+Arc1 | 5● | Event | R | Until end of turn, when you materialize a character, materialize a copy of it.
+Neutral1 | 5● | Event | R | Dissolve an enemy. Each other enemy loses spark equal to the dissolved character's cost.
+Neutral1 | 2● | Fast Event | C | Dissolve an enemy with spark 4 or more.
+Umbra1 | 2● | Event | C | Put 5 random events from your deck into your void.
+Pact1 | 4● | Event | R | Abandon all allies. Gain 2● and draw a card for each ally dissolved.
+Pact1 | 5● | Event | R | Abandon any number of allies. Materialize a random character from your deck for each ally abandoned.
+Rime1 | 3● | Event | R | Until end of turn, when you discard a character, materialize it.
+Bloom1 | 2● | Event | R | The cost of a random character in your hand becomes 0●.
+Rime1 | 4● | Event | R | Look at the opponent's hand. You may play an event from it for 0●.
+Ignite1 | 6● | Event | R | Each ally becomes a copy of the ally with the most spark.
