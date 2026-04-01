@@ -111,6 +111,7 @@ Blm=Bloom, Arc=Arc, Ign=Ignite, Pct=Pact, Umb=Umbra, Rim=Rime, Srg=Surge.
 | Permanent ramp                 | **P** | T     | N     | T     | N     | N     | N     |
 | Repeatable energy generation   | **P** | T     | N     | N     | N     | N     | T     |
 | Rituals / temporary energy     | **P** | T     | T     | T     | N     | N     | **S** |
+| Kindle / spark growth          | **P** | N     | T     | **S** | T     | **S** | N     |
 | Spirit Animal presence         | **P** | **P** | N     | N     | N     | N     | T     |
 | "Spirit Animals matter"        | S     | **P** | N     | N     | N     | N     | T     |
 | Flicker / blink / replay       | N     | **P** | **S** | N     | N     | N     | T     |
