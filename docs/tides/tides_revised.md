@@ -52,58 +52,118 @@ ______________________________________________________________________
 
 # Mechanical Ownership Matrix
 
-Ownership levels:
+## Mechanic Categories
 
-- **Primary** — this tide is the main home for that mechanic.
+Not all mechanics in the matrix carry the same weight for tide identity. There
+are three categories:
+
+**Neutral infrastructure** — mechanics that every tide needs access to and that
+do not define any tide's identity. Any tide can have these cards. A tide being
+listed as Primary means it should have the best or most efficient versions, but
+these cards do not pull drafters toward that tide specifically. Examples:
+
+- **Raw card draw** — every tide draws cards; Rime and Surge are best at it.
+- **Removal** — every tide removes things; Pact has the most density.
+- **Minor materialized abilities** — most characters have enter-play effects;
+  this is a baseline card quality, not a tide mechanic.
+
+**Distributed with density** — mechanics that can appear in any tide but where
+one or two tides should be noticeably denser. The Primary tide has the most
+cards with this mechanic and the best payoffs for caring about it, but other
+tides will still have individual cards that use it. Example:
+
+- **Materialized abilities** (strong ETBs) — Ignite is Primary and should have
+  the highest concentration, but a Bloom ramp creature or a Rime filtering
+  creature can still have a strong materialized ability. The difference is that
+  Ignite is the tide where you go *because* you want to build around repeated
+  materializations.
+
+**Identity-defining** — mechanics that are concentrated in one or two tides and
+rarely appear elsewhere. These are the mechanics that make a tide feel like
+itself and that pull drafters into specific lanes. Examples:
+
+- **Event copying** — almost exclusively Surge.
+- **Warrior Figment generation** — almost exclusively Pact.
+- **Permanent ramp** — almost exclusively Bloom.
+
+The matrix below includes all three categories. When evaluating whether each
+tide has enough design space, focus on the identity-defining and
+distributed-with-density rows. Neutral infrastructure should be roughly balanced
+across all tides and does not contribute to a tide feeling mechanically
+distinct.
+
+## Ownership Levels
+
+- **Primary** — this tide is the main home for that mechanic. For
+  identity-defining mechanics, this means the mechanic is concentrated here. For
+  distributed mechanics, this means the highest density is here. For neutral
+  infrastructure, this means the best or most efficient versions are here.
 - **Secondary** — this tide materially supports that mechanic.
 - **Tertiary** — this tide may have glue pieces, but not much density.
 - **Not Real** — this mechanic should not meaningfully pull drafters here.
 
 Blm=Bloom, Arc=Arc, Ign=Ignite, Pct=Pact, Umb=Umbra, Rim=Rime, Srg=Surge.
 
+### Identity-Defining Mechanics
+
 | Function                       | Blm   | Arc   | Ign   | Pct   | Umb   | Rim   | Srg   |
 | ------------------------------ | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
 | Permanent ramp                 | **P** | T     | N     | T     | N     | N     | N     |
 | Repeatable energy generation   | **P** | T     | N     | N     | N     | N     | T     |
 | Rituals / temporary energy     | **P** | T     | T     | T     | N     | N     | **S** |
-| Big payoff threats             | T     | **P** | N     | S     | T     | N     | N     |
 | Spirit Animal presence         | **P** | **P** | N     | N     | N     | N     | T     |
 | "Spirit Animals matter"        | S     | **P** | N     | N     | N     | N     | T     |
 | Flicker / blink / replay       | N     | **P** | **S** | N     | N     | N     | T     |
 | Repeated flicker payoff        | N     | **S** | **P** | N     | N     | N     | T     |
-| Materialized abilities         | T     | **S** | **P** | T     | N     | T     | T     |
-| Warrior presence               | T     | N     | **P** | **P** | N     | N     | N     |
 | "Warriors matter"              | N     | N     | **P** | S     | N     | N     | N     |
-| Figment generation             | T     | T     | **S** | **P** | T     | N     | T     |
-| Warrior Figment generation     | N     | N     | S     | **P** | N     | N     | N     |
 | Go-wide scaling                | T     | T     | **P** | S     | N     | N     | T     |
+| Warrior Figment generation     | N     | N     | S     | **P** | N     | N     | N     |
 | Individual Warrior quality     | N     | N     | S     | **P** | N     | N     | N     |
-| Abandon outlets                | N     | T     | T     | S     | **P** | N     | T     |
 | "When you abandon" payoffs     | N     | N     | T     | **P** | S     | N     | N     |
 | Profitable-to-abandon chars    | N     | N     | T     | **P** | S     | N     | N     |
-| Survivor presence              | N     | N     | N     | **P** | **P** | T     | N     |
+| Abandon outlets                | N     | T     | T     | S     | **P** | N     | T     |
 | Void recursion / reclaim       | T     | N     | T     | S     | **P** | S     | T     |
 | Self-mill / void filling       | N     | T     | N     | T     | S     | **P** | T     |
 | Foresee / selection / sculpt   | S     | **S** | N     | T     | T     | **P** | S     |
-| Self-discard enablers          | N     | N     | T     | T     | T     | **S** | **P** |
 | Opponent discard / hand attack | N     | N     | N     | T     | T     | **P** | S     |
 | "When you discard" payoffs     | N     | N     | T     | N     | T     | **P** | **S** |
-| Raw card draw                  | S     | S     | S     | S     | T     | **P** | **P** |
-| Event density                  | S     | T     | T     | T     | N     | T     | **P** |
+| Self-discard enablers          | N     | N     | T     | T     | T     | **S** | **P** |
 | "Events matter" payoffs        | T     | T     | N     | N     | N     | T     | **P** |
 | Event copying                  | N     | N     | N     | N     | N     | N     | **P** |
-| Fast cards matter              | T     | **S** | S     | N     | T     | S     | **P** |
 | Prevent / counterspell         | N     | S     | N     | N     | N     | T     | **P** |
-| Removal                        | T     | S     | S     | **P** | S     | S     | T     |
-| Reach / inevitability          | N     | N     | T     | S     | **S** | **S** | **P** |
 | Prison / tax / rule-setting    | N     | T     | N     | S     | T     | **P** | **S** |
-| Hatebears / disruptive bodies  | T     | S     | S     | **P** | T     | **S** | N     |
-| Tempo tools                    | T     | **P** | **S** | N     | T     | S     | **S** |
-| Midrange glue                  | **S** | **S** | S     | **P** | **S** | T     | N     |
-| Aggro tools                    | T     | S     | **P** | **S** | N     | N     | T     |
-| Tap-out control tools          | N     | T     | N     | **S** | **S** | **P** | **S** |
-| Draw-go control tools          | N     | **S** | N     | N     | T     | **S** | **P** |
 | Reanimator / recursion combo   | N     | N     | T     | S     | **P** | **S** | T     |
+
+### Distributed With Density
+
+These mechanics appear across all tides but the Primary tide should have the
+highest concentration and the strongest reason to build around them.
+
+| Function                      | Blm | Arc   | Ign   | Pct   | Umb   | Rim   | Srg   |
+| ----------------------------- | --- | ----- | ----- | ----- | ----- | ----- | ----- |
+| Big payoff threats            | T   | **P** | N     | S     | T     | N     | N     |
+| Materialized abilities        | T   | **S** | **P** | T     | N     | T     | T     |
+| Warrior presence              | T   | N     | **P** | **P** | N     | N     | N     |
+| Figment generation            | T   | T     | **S** | **P** | T     | N     | T     |
+| Survivor presence             | N   | N     | N     | **P** | **P** | T     | N     |
+| Hatebears / disruptive bodies | T   | S     | S     | **P** | T     | **S** | N     |
+| Fast cards matter             | T   | **S** | S     | N     | T     | S     | **P** |
+| Event density                 | S   | T     | T     | T     | N     | T     | **P** |
+
+### Neutral Infrastructure
+
+Every tide needs these. Primary here means "best at it," not "only home."
+
+| Function              | Blm   | Arc   | Ign   | Pct   | Umb   | Rim   | Srg   |
+| --------------------- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| Raw card draw         | S     | S     | S     | S     | T     | **P** | **P** |
+| Removal               | T     | S     | S     | **P** | S     | S     | T     |
+| Reach / inevitability | N     | N     | T     | S     | **S** | **S** | **P** |
+| Tempo tools           | T     | **P** | **S** | N     | T     | S     | **S** |
+| Midrange glue         | **S** | **S** | S     | **P** | **S** | T     | N     |
+| Aggro tools           | T     | S     | **P** | **S** | N     | N     | T     |
+| Tap-out control tools | N     | T     | N     | **S** | **S** | **P** | **S** |
+| Draw-go control tools | N     | **S** | N     | N     | T     | **S** | **P** |
 
 Legend: **P** = Primary, **S** = Secondary, **T** = Tertiary, **N** = Not Real
 
