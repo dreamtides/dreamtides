@@ -618,7 +618,8 @@ Neutral is the neutral glue space, not part of the circle.
 - discover,
 - sweepers,
 - flexible standalone utility,
-- a small number of universally playable high-rarity effects.
+- legendaries: universally playable high-rarity effects like "draw 3 cards" or
+  "make energy every turn for 0". This overwrites the base tide.
 
 **It does not:**
 
