@@ -63,7 +63,7 @@ export function CardDisplay({
     setImageError(false);
   }, [card.cardNumber]);
 
-  const tideColor = TIDE_COLORS[card.tide];
+  const tideColor = showTideSymbols ? TIDE_COLORS[card.tide] : "#9ca3af";
 
   const borderStyle = selected
     ? { boxShadow: `0 0 0 3px ${selectionColor}, 0 0 12px ${selectionColor}` }

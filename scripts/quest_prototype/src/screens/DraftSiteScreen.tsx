@@ -331,7 +331,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
       </div>
 
       {/* Pack grid: 2x2 for 4 cards */}
-      <div className="w-full max-w-3xl flex-1">
+      <div className="w-full max-w-5xl flex-1">
         <AnimatePresence mode="wait">
           <motion.div
             key={`pack-${String(packKey)}`}
@@ -341,7 +341,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
             transition={{ duration: 0.25 }}
           >
             <div
-              className="draft-pack-grid grid w-full gap-3 px-2 md:gap-4 md:px-4"
+              className="draft-pack-grid grid w-full gap-4 px-4 md:gap-6 md:px-8"
               style={{
                 gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
                 alignItems: "start",
