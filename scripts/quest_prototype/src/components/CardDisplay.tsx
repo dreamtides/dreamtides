@@ -25,6 +25,10 @@ interface CardDisplayProps {
   tintColor?: string;
   /** Whether to show tide cost symbols (default true). */
   showTideSymbols?: boolean;
+  /** Additional CSS class name for the root element. */
+  className?: string;
+  /** Use larger text sizes for rules text, name, type line, and stats. */
+  large?: boolean;
 }
 
 /** Renders styled rules text, replacing special symbols with colored spans. */
@@ -56,6 +60,8 @@ export function CardDisplay({
   selectionColor = "#f97316",
   tintColor,
   showTideSymbols = true,
+  className,
+  large = false,
 }: CardDisplayProps) {
   const [imageError, setImageError] = useState(false);
 
@@ -73,7 +79,7 @@ export function CardDisplay({
 
   return (
     <div
-      className={`relative flex flex-col overflow-hidden rounded-lg transition-transform duration-200${isInteractive ? " cursor-pointer hover:scale-[1.02]" : ""}`}
+      className={`relative flex flex-col overflow-hidden rounded-lg transition-transform duration-200${isInteractive ? " cursor-pointer hover:scale-[1.02]" : ""}${className ? ` ${className}` : ""}`}
       style={{
         aspectRatio: "2 / 3",
         background: "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
@@ -94,9 +100,9 @@ export function CardDisplay({
         : {})}
     >
       {/* Energy cost badge */}
-      <div className="absolute top-1.5 left-1.5 z-10 flex flex-col items-center gap-1">
+      <div className={`absolute ${large ? "top-2 left-2" : "top-1.5 left-1.5"} z-10 flex flex-col items-center gap-1`}>
         <div
-          className="flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-bold shadow-md"
+          className={`flex items-center gap-0.5 rounded-full ${large ? "px-2.5 py-1 text-base" : "px-1.5 py-0.5 text-xs"} font-bold shadow-md`}
           style={{
             background: "rgba(0, 0, 0, 0.75)",
             border: "1px solid rgba(251, 191, 36, 0.5)",
@@ -116,7 +122,7 @@ export function CardDisplay({
                 key={i}
                 src={tideIconUrl(card.tide)}
                 alt={card.tide}
-                className="h-7 w-7 rounded-full object-contain shadow-md"
+                className={`${large ? "h-10 w-10" : "h-7 w-7"} rounded-full object-contain shadow-md`}
                 style={{
                   border: `1px solid ${tideColor}`,
                   background: "rgba(0, 0, 0, 0.5)",
@@ -130,7 +136,7 @@ export function CardDisplay({
       {/* Fast badge */}
       {card.isFast && (
         <div
-          className="absolute top-1.5 right-1.5 z-10 flex items-center rounded-full px-1.5 py-0.5 text-xs font-bold shadow-md"
+          className={`absolute ${large ? "top-2 right-2 px-2.5 py-1 text-base" : "top-1.5 right-1.5 px-1.5 py-0.5 text-xs"} z-10 flex items-center rounded-full font-bold shadow-md`}
           style={{
             background: "rgba(0, 0, 0, 0.75)",
             border: "1px solid rgba(250, 204, 21, 0.5)",
@@ -178,10 +184,10 @@ export function CardDisplay({
       </div>
 
       {/* Card info area */}
-      <div className="flex min-h-0 flex-1 flex-col px-2 pt-1 pb-1.5">
+      <div className={`flex min-h-0 flex-1 flex-col ${large ? "px-3 pt-2 pb-2" : "px-2 pt-1 pb-1.5"}`}>
         {/* Card name */}
         <h3
-          className="truncate text-sm leading-tight font-bold"
+          className={`truncate ${large ? "text-xl" : "text-sm"} leading-tight font-bold`}
           style={{ color: tideColor }}
         >
           {card.name}
@@ -190,7 +196,7 @@ export function CardDisplay({
         {/* Type line */}
         <div className="mt-0.5 flex items-center gap-1">
           <span
-            className="truncate text-[10px] opacity-50"
+            className={`truncate ${large ? "text-sm" : "text-[10px]"} opacity-50`}
             style={{ color: "#e2e8f0" }}
           >
             {formatTypeLine(card)}
@@ -199,7 +205,7 @@ export function CardDisplay({
 
         {/* Rules text */}
         <div
-          className="mt-1 min-h-0 flex-1 overflow-y-auto text-[10px] leading-tight opacity-80"
+          className={`mt-1 min-h-0 flex-1 overflow-y-auto ${large ? "text-base leading-snug" : "text-[10px] leading-tight"} opacity-80`}
           style={{ color: tintColor ?? "#e2e8f0" }}
         >
           {renderRulesText(card.renderedText)}
@@ -209,7 +215,7 @@ export function CardDisplay({
         {card.spark !== null && (
           <div className="mt-auto flex items-center justify-end pt-0.5">
             <div
-              className="flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+              className={`flex items-center gap-0.5 rounded-full ${large ? "px-2.5 py-1 text-sm" : "px-1.5 py-0.5 text-[10px]"} font-bold`}
               style={{
                 background: "rgba(0, 0, 0, 0.5)",
                 border: "1px solid rgba(192, 132, 252, 0.5)",

@@ -287,127 +287,117 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
     );
   }
 
+  {/*
+    Layout: full viewport minus HUD (48px). Cards use viewport-relative
+    heights so the 2x2 grid fills the screen. Each card is ~42vh tall
+    (two rows + gap + header ≈ 100vh - 48px). Width follows from the
+    2:3 aspect ratio.
+  */}
   return (
-    <div className="flex min-h-screen flex-col items-center pb-16">
-      {/* Header with progress info */}
-      <div className="flex w-full items-center justify-between px-4 py-4 md:px-8">
-        <div className="flex flex-col gap-1">
+    <div
+      className="flex flex-col items-center justify-center"
+      style={{ height: "calc(100vh - 48px)" }}
+    >
+      {/* Compact header */}
+      <div className="flex w-full items-center justify-between px-4 py-1 md:px-8">
+        <div className="flex items-center gap-3">
           <h2
-            className="text-xl font-bold tracking-wide md:text-2xl"
+            className="text-lg font-bold tracking-wide"
             style={{ color: "#a855f7" }}
           >
             Draft
           </h2>
           <span className="text-xs opacity-50">
-            Choose 1 card to add to your deck
+            Pick {String(Math.min(pickNumber, SITE_PICKS))}/{String(SITE_PICKS)}
           </span>
         </div>
-
-        {/* Progress indicator */}
-        <div className="flex flex-col items-end gap-1">
-          <span
-            className="text-sm font-bold md:text-base"
-            style={{ color: "#f97316" }}
-          >
-            Pick {String(Math.min(pickNumber, SITE_PICKS))} of{" "}
-            {String(SITE_PICKS)}
-          </span>
-          {/* Progress bar */}
-          <div
-            className="h-1.5 w-24 overflow-hidden rounded-full md:w-32"
-            style={{ background: "rgba(124, 58, 237, 0.2)" }}
-          >
-            <motion.div
-              className="h-full rounded-full"
-              style={{ background: "#f97316" }}
-              initial={false}
-              animate={{
-                width: `${String((draftedThisSite.length / SITE_PICKS) * 100)}%`,
-              }}
-              transition={{ duration: 0.3 }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Pack grid: 2x2 for 4 cards */}
-      <div className="w-full max-w-5xl flex-1">
-        <AnimatePresence mode="wait">
+        <div
+          className="h-1.5 w-24 overflow-hidden rounded-full md:w-32"
+          style={{ background: "rgba(124, 58, 237, 0.2)" }}
+        >
           <motion.div
-            key={`pack-${String(packKey)}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-          >
-            <div
-              className="draft-pack-grid grid w-full gap-4 px-4 md:gap-6 md:px-8"
-              style={{
-                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-                alignItems: "start",
-              }}
-            >
-              <AnimatePresence>
-                {currentPackCards.map((card) => {
-                  const isPicked =
-                    pickedCardNumber === card.cardNumber;
-                  const isOther =
-                    pickedCardNumber !== null && !isPicked;
-
-                  return (
-                    <motion.div
-                      key={`card-${String(card.cardNumber)}`}
-                      layout
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={
-                        isPicked && pickPhase !== "idle"
-                          ? { opacity: 0, y: 80, scale: 0.9 }
-                          : isOther && pickPhase !== "idle"
-                            ? { opacity: 0, scale: 0.95 }
-                            : { opacity: 1, y: 0, scale: 1 }
-                      }
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <div
-                        className="relative rounded-lg transition-shadow duration-200"
-                        style={{
-                          boxShadow: "none",
-                        }}
-                        onMouseEnter={(e) => {
-                          if (pickPhase === "idle") {
-                            e.currentTarget.style.boxShadow =
-                              "0 0 0 3px #f97316, 0 0 16px rgba(249, 115, 22, 0.4)";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.boxShadow = "none";
-                        }}
-                        onContextMenu={(e) => {
-                          e.preventDefault();
-                          handleCardInspect(card);
-                        }}
-                      >
-                        <CardDisplay
-                          card={card}
-                          showTideSymbols={questConfig.showTideSymbols}
-                          onClick={
-                            pickPhase === "idle"
-                              ? () => {
-                                  handleCardPick(card.cardNumber);
-                                }
-                              : undefined
-                          }
-                        />
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+            className="h-full rounded-full"
+            style={{ background: "#f97316" }}
+            initial={false}
+            animate={{
+              width: `${String((draftedThisSite.length / SITE_PICKS) * 100)}%`,
+            }}
+            transition={{ duration: 0.3 }}
+          />
+        </div>
       </div>
+
+      {/* 2x2 card grid, centered */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`pack-${String(packKey)}`}
+          className="grid gap-3 md:gap-4"
+          style={{
+            gridTemplateColumns: "repeat(2, auto)",
+            gridTemplateRows: "repeat(2, auto)",
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+        >
+          {currentPackCards.map((card) => {
+            const isPicked = pickedCardNumber === card.cardNumber;
+            const isOther = pickedCardNumber !== null && !isPicked;
+
+            return (
+              <motion.div
+                key={`card-${String(card.cardNumber)}`}
+                initial={{ opacity: 0 }}
+                animate={
+                  isPicked && pickPhase !== "idle"
+                    ? { opacity: 0, scale: 0.9 }
+                    : isOther && pickPhase !== "idle"
+                      ? { opacity: 0, scale: 0.95 }
+                      : { opacity: 1, scale: 1 }
+                }
+                transition={{ duration: 0.3 }}
+              >
+                <div
+                  className="relative rounded-lg transition-shadow duration-200"
+                  style={{
+                    height: "calc((100vh - 48px - 80px) / 2)",
+                    aspectRatio: "2 / 3",
+                    boxShadow: "none",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (pickPhase === "idle") {
+                      e.currentTarget.style.boxShadow =
+                        "0 0 0 3px #f97316, 0 0 16px rgba(249, 115, 22, 0.4)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    handleCardInspect(card);
+                  }}
+                >
+                  <CardDisplay
+                    card={card}
+                    className="h-full w-full"
+                    large
+                    showTideSymbols={questConfig.showTideSymbols}
+                    onClick={
+                      pickPhase === "idle"
+                        ? () => {
+                            handleCardPick(card.cardNumber);
+                          }
+                        : undefined
+                    }
+                  />
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </AnimatePresence>
 
       {/* Drafted cards row */}
       <DraftedCardsRow
