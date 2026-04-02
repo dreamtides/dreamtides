@@ -25,7 +25,7 @@ export function ShopScreen({ site }: ShopScreenProps) {
   const { essence, deck } = state;
 
   const [slots, setSlots] = useState<ShopSlot[]>(() =>
-    generateShopInventory(cardDatabase, deck),
+    generateShopInventory(cardDatabase, deck, state.excludedTides),
   );
   const [rerollCount, setRerollCount] = useState(0);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
@@ -95,7 +95,7 @@ export function ShopScreen({ site }: ShopScreenProps) {
       setRerollCount((prev) => prev + 1);
 
       // Regenerate unpurchased non-reroll slots
-      const newInventory = generateShopInventory(cardDatabase, deck);
+      const newInventory = generateShopInventory(cardDatabase, deck, state.excludedTides);
       // Collect only non-reroll replacement items to avoid introducing
       // a second reroll slot from the freshly generated inventory.
       const replacements = newInventory.filter(

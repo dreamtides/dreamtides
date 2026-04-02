@@ -99,6 +99,8 @@ export interface QuestState {
   currentDreamscape: string | null;
   visitedSites: string[];
   draftState: DraftState | null;
+  /** Core tides excluded from the draft pool for this quest. */
+  excludedTides: Tide[];
   screen: Screen;
   activeSiteId: string | null;
 }

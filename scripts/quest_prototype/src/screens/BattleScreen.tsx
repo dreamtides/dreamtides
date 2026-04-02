@@ -446,7 +446,7 @@ export function BattleScreen({
   const rareCardsRef = useRef<CardData[] | null>(null);
   if (rareCardsRef.current === null) {
     const tideCounts = countDeckTides(deck, cardDatabase);
-    rareCardsRef.current = selectRareRewards(cardDatabase, tideCounts);
+    rareCardsRef.current = selectRareRewards(cardDatabase, tideCounts, state.excludedTides);
   }
   const rareCards = rareCardsRef.current;
 
@@ -530,6 +530,7 @@ export function BattleScreen({
                 cardDatabase,
                 dreamsignPool: DREAMSIGNS,
                 playerHasBanes,
+                excludedTides: state.excludedTides,
               },
             );
             mutations.updateAtlas(updatedAtlas);

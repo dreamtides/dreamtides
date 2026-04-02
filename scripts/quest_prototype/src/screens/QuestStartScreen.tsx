@@ -2,14 +2,34 @@ import { useCallback } from "react";
 import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { generateInitialAtlas } from "../atlas/atlas-generator";
+import { NAMED_TIDES } from "../data/card-database";
 import { DREAMSIGNS } from "../data/dreamsigns";
 import { logEvent } from "../logging";
+import { useQuestConfig } from "../state/quest-config";
+import type { Tide } from "../types/cards";
+
+/** Selects N random core tides to exclude (never Neutral). */
+function selectExcludedTides(count: number): Tide[] {
+  if (count <= 0) return [];
+  const pool = [...NAMED_TIDES];
+  const excluded: Tide[] = [];
+  for (let i = 0; i < count && pool.length > 0; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    excluded.push(pool[idx]);
+    pool.splice(idx, 1);
+  }
+  return excluded;
+}
 
 /** Intro screen with dark fantasy styling and "Begin Quest" button. */
 export function QuestStartScreen() {
   const { state, mutations, cardDatabase } = useQuest();
+  const config = useQuestConfig();
 
   const handleBeginQuest = useCallback(() => {
+    const excludedTides = selectExcludedTides(config.excludedTideCount);
+    mutations.setExcludedTides(excludedTides);
+
     const playerHasBanes =
       state.deck.some((e) => e.isBane) ||
       state.dreamsigns.some((d) => d.isBane);
@@ -17,17 +37,19 @@ export function QuestStartScreen() {
       cardDatabase,
       dreamsignPool: DREAMSIGNS,
       playerHasBanes,
+      excludedTides,
     });
     const nodeCount = Object.keys(atlas.nodes).length - 1; // subtract nexus
 
     logEvent("quest_started", {
       initialEssence: state.essence,
       dreamscapesGenerated: nodeCount,
+      excludedTides,
     });
 
     mutations.updateAtlas(atlas);
     mutations.setScreen({ type: "atlas" });
-  }, [state.completionLevel, state.essence, state.deck, state.dreamsigns, mutations, cardDatabase]);
+  }, [state.completionLevel, state.essence, state.deck, state.dreamsigns, mutations, cardDatabase, config.excludedTideCount]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">

@@ -27,6 +27,7 @@ function createTestState(overrides: Partial<QuestState> = {}): QuestState {
     currentDreamscape: null,
     visitedSites: [],
     draftState: null,
+    excludedTides: [],
     screen: { type: "questStart" },
     activeSiteId: null,
     ...overrides,

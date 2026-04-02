@@ -49,6 +49,7 @@ export interface QuestMutations {
   setCurrentDreamscape: (nodeId: string | null) => void;
   updateAtlas: (atlas: DreamAtlas) => void;
   setDraftState: (draftState: DraftState) => void;
+  setExcludedTides: (tides: Tide[]) => void;
   resetQuest: () => void;
 }
 
@@ -90,6 +91,7 @@ function createDefaultState(): QuestState {
     currentDreamscape: null,
     visitedSites: [],
     draftState: null,
+    excludedTides: [],
     screen: { type: "questStart" },
     activeSiteId: null,
   };
@@ -361,6 +363,11 @@ export function QuestProvider({
     setState((prev) => ({ ...prev, draftState }));
   }, []);
 
+  const setExcludedTides = useCallback((tides: Tide[]) => {
+    logEvent("tides_excluded", { excludedTides: tides });
+    setState((prev) => ({ ...prev, excludedTides: tides }));
+  }, []);
+
   const resetQuest = useCallback(() => {
     resetLog();
     entryIdCounter.current = 0;
@@ -384,6 +391,7 @@ export function QuestProvider({
       setCurrentDreamscape,
       updateAtlas,
       setDraftState,
+      setExcludedTides,
       resetQuest,
     }),
     [
@@ -402,6 +410,7 @@ export function QuestProvider({
       setCurrentDreamscape,
       updateAtlas,
       setDraftState,
+      setExcludedTides,
       resetQuest,
     ],
   );

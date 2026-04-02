@@ -74,9 +74,11 @@ export function tideWeight(
 export function selectRareRewards(
   cardDatabase: Map<number, CardData>,
   deckTideCounts: Map<Tide, number>,
+  excludedTides: Tide[] = [],
 ): CardData[] {
+  const excludedSet = new Set(excludedTides);
   const rareCards = Array.from(cardDatabase.values()).filter(
-    (c) => c.rarity === "Rare",
+    (c) => c.rarity === "Rare" && !excludedSet.has(c.tide),
   );
 
   if (rareCards.length === 0) return [];

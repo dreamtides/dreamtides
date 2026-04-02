@@ -19,7 +19,7 @@ function QuestApp({
   const [debugScreenOpen, setDebugScreenOpen] = useState(false);
 
   const hasDraftData = state.draftState !== null &&
-    state.draftState.agents.some((agent, i) => i > 0 && agent.picks.length > 0);
+    state.draftState.draftedCards.length > 0;
 
   const handleOpenDeckViewer = useCallback(() => {
     setDeckViewerOpen(true);

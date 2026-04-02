@@ -15,6 +15,7 @@ import {
 import type { DraftState } from "../types/draft";
 import type { CardData } from "../types/cards";
 import { logEvent } from "../logging";
+import { useQuestConfig } from "../state/quest-config";
 
 /** Delay in ms before showing the next pack after a pick. */
 const NEXT_PACK_DELAY = 500;
@@ -125,9 +126,10 @@ function DraftSummary({
   );
 }
 
-/** The draft site screen: pack display, card picking, and summary. */
+/** The draft site screen: 4-card pack display, card picking, and summary. */
 export function DraftSiteScreen({ siteId }: { siteId: string }) {
   const { state, mutations, cardDatabase } = useQuest();
+  const questConfig = useQuestConfig();
   const [pickPhase, setPickPhase] = useState<PickPhase>("idle");
   const [pickedCardNumber, setPickedCardNumber] = useState<number | null>(null);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
@@ -146,7 +148,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
 
     let ds = state.draftState;
     if (ds === null) {
-      ds = initializeDraftState(cardDatabase);
+      ds = initializeDraftState(cardDatabase, state.excludedTides);
     }
 
     // Deep clone to avoid mutating React state directly
@@ -161,7 +163,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
       .map((num) => cardDatabase.get(num))
       .filter((c): c is CardData => c !== undefined);
     setCurrentPackCards(sortCardsByTide(cards));
-  }, [state.draftState, cardDatabase, mutations]);
+  }, [state.draftState, state.excludedTides, cardDatabase, mutations]);
 
   // Resolve the current pack from draft state, sorted by tide
   const refreshPack = useCallback(() => {
@@ -252,8 +254,6 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
   }, [siteId, draftedThisSite, mutations]);
 
   const pickNumber = draftedThisSite.length + 1;
-  const packSize = currentPackCards.length;
-  const currentRound = (draftStateRef.current?.currentRound ?? 0) + 1;
 
   if (cardDatabase.size === 0) {
     return (
@@ -299,7 +299,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
             Draft
           </h2>
           <span className="text-xs opacity-50">
-            Round {String(currentRound)} &middot; {String(packSize)} cards in pack
+            Choose 1 card to add to your deck
           </span>
         </div>
 
@@ -330,8 +330,8 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
         </div>
       </div>
 
-      {/* Pack grid */}
-      <div className="w-full max-w-6xl flex-1">
+      {/* Pack grid: 2x2 for 4 cards */}
+      <div className="w-full max-w-3xl flex-1">
         <AnimatePresence mode="wait">
           <motion.div
             key={`pack-${String(packKey)}`}
@@ -343,7 +343,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
             <div
               className="draft-pack-grid grid w-full gap-3 px-2 md:gap-4 md:px-4"
               style={{
-                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
                 alignItems: "start",
               }}
             >
@@ -390,6 +390,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
                       >
                         <CardDisplay
                           card={card}
+                          showTideSymbols={questConfig.showTideSymbols}
                           onClick={
                             pickPhase === "idle"
                               ? () => {

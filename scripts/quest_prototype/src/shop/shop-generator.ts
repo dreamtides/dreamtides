@@ -119,9 +119,12 @@ function selectRandomDreamsign(): Dreamsign {
   return { ...template, isBane: false };
 }
 
-/** Selects a random named tide for a tide crystal. */
-function selectRandomTide(): Tide {
-  return NAMED_TIDES[Math.floor(Math.random() * NAMED_TIDES.length)];
+/** Selects a random named tide for a tide crystal, excluding specified tides. */
+function selectRandomTide(excludedTides: Tide[]): Tide {
+  const excludedSet = new Set(excludedTides);
+  const available = NAMED_TIDES.filter((t) => !excludedSet.has(t));
+  if (available.length === 0) return NAMED_TIDES[0];
+  return available[Math.floor(Math.random() * available.length)];
 }
 
 /**
@@ -131,8 +134,12 @@ function selectRandomTide(): Tide {
 export function generateShopInventory(
   cardDatabase: Map<number, CardData>,
   playerDeck: DeckEntry[],
+  excludedTides: Tide[] = [],
 ): ShopSlot[] {
-  const allCards = Array.from(cardDatabase.values());
+  const excludedSet = new Set(excludedTides);
+  const allCards = Array.from(cardDatabase.values()).filter(
+    (c) => !excludedSet.has(c.tide),
+  );
   const deckTideCounts = countDeckTides(playerDeck, cardDatabase);
   const slots: ShopSlot[] = [];
 
@@ -176,7 +183,7 @@ export function generateShopInventory(
         itemType: "tideCrystal",
         card: null,
         dreamsign: null,
-        tideCrystal: selectRandomTide(),
+        tideCrystal: selectRandomTide(excludedTides),
         basePrice: TIDE_CRYSTAL_PRICE,
         discountPercent: 0,
         purchased: false,
@@ -223,9 +230,11 @@ export function generateShopInventory(
 export function generateSpecialtyShopInventory(
   cardDatabase: Map<number, CardData>,
   playerDeck: DeckEntry[],
+  excludedTides: Tide[] = [],
 ): ShopSlot[] {
+  const excludedSet = new Set(excludedTides);
   const rareCards = Array.from(cardDatabase.values()).filter(
-    (c) => c.rarity === "Rare",
+    (c) => c.rarity === "Rare" && !excludedSet.has(c.tide),
   );
   const deckTideCounts = countDeckTides(playerDeck, cardDatabase);
   const slots: ShopSlot[] = [];

@@ -23,6 +23,8 @@ interface CardDisplayProps {
   selectionColor?: string;
   /** When set, tints the card's stat values and rules text in this color. */
   tintColor?: string;
+  /** Whether to show tide cost symbols (default true). */
+  showTideSymbols?: boolean;
 }
 
 /** Renders styled rules text, replacing special symbols with colored spans. */
@@ -53,6 +55,7 @@ export function CardDisplay({
   selected = false,
   selectionColor = "#f97316",
   tintColor,
+  showTideSymbols = true,
 }: CardDisplayProps) {
   const [imageError, setImageError] = useState(false);
 
@@ -106,7 +109,7 @@ export function CardDisplay({
         </div>
 
         {/* Tide cost symbols */}
-        {card.tideCost > 0 && (
+        {showTideSymbols && card.tideCost > 0 && (
           <div className="flex flex-col items-center gap-0.5">
             {Array.from({ length: card.tideCost }, (_, i) => (
               <img

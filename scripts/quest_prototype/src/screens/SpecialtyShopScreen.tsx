@@ -23,7 +23,7 @@ export function SpecialtyShopScreen({ site }: SpecialtyShopScreenProps) {
   const { essence, deck } = state;
 
   const [slots, setSlots] = useState<ShopSlot[]>(() => {
-    const inventory = generateSpecialtyShopInventory(cardDatabase, deck);
+    const inventory = generateSpecialtyShopInventory(cardDatabase, deck, state.excludedTides);
     if (site.isEnhanced) {
       return inventory.map((s) => ({
         ...s,

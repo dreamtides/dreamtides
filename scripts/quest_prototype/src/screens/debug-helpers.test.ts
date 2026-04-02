@@ -1,11 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { extractDraftDebugInfo } from "./debug-helpers";
-import type { DraftState, AgentState } from "../types/draft";
+import type { DraftState } from "../types/draft";
 import type { CardData } from "../types/cards";
-
-function makeAgent(preference: number[], picks: number[], committedPair: AgentState["committedPair"] = null): AgentState {
-  return { preference, opennessHistory: [], picks, committedPair };
-}
 
 function makeCard(num: number, tide: string, name: string): CardData {
   return {
@@ -27,17 +23,14 @@ function makeCard(num: number, tide: string, name: string): CardData {
 }
 
 function makeDraftState(
-  agents: AgentState[],
-  currentRound = 0,
+  draftedCards: number[] = [],
+  pickNumber = 1,
 ): DraftState {
   return {
     pool: [],
-    packs: agents.map(() => []),
-    agents,
-    currentRound,
-    currentPick: 0,
-    totalPicks: 0,
-    isActive: true,
+    draftedCards,
+    currentPack: [],
+    pickNumber,
     sitePicksCompleted: 0,
   };
 }
@@ -48,86 +41,27 @@ describe("extractDraftDebugInfo", () => {
     expect(result).toBeNull();
   });
 
-  it("includes seat 0 (the player) marked as isPlayer", () => {
-    const agents = [
-      makeAgent([10, 0, 0, 0, 0, 0, 0], []),
-      makeAgent([0, 5, 0, 0, 0, 0, 0], []),
-    ];
-    const state = makeDraftState(agents);
+  it("returns basic info for empty draft state", () => {
+    const state = makeDraftState();
     const result = extractDraftDebugInfo(state, new Map())!;
-    expect(result.seats).toHaveLength(2);
-    expect(result.seats[0].seatIndex).toBe(0);
-    expect(result.seats[0].isPlayer).toBe(true);
-    expect(result.seats[1].seatIndex).toBe(1);
-    expect(result.seats[1].isPlayer).toBe(false);
+    expect(result.totalCards).toBe(0);
+    expect(result.pickNumber).toBe(1);
+    expect(result.primaryTide).toBeNull();
+    expect(result.secondaryTide).toBeNull();
   });
 
-  it("identifies primary and secondary tides from preference vector", () => {
-    const agents = [
-      makeAgent([0, 0, 0, 0, 0, 0, 0], []),
-      makeAgent([3, 9, 0, 0, 0, 6, 0], []),
-    ];
-    const state = makeDraftState(agents);
-    const result = extractDraftDebugInfo(state, new Map())!;
-    expect(result.seats[1].primaryTide).toBe("Arc");
-    expect(result.seats[1].secondaryTide).toBe("Rime");
-  });
-
-  it("returns null tides when preference is all zeros", () => {
-    const agents = [
-      makeAgent([0, 0, 0, 0, 0, 0, 0], []),
-      makeAgent([0, 0, 0, 0, 0, 0, 0], []),
-    ];
-    const state = makeDraftState(agents);
-    const result = extractDraftDebugInfo(state, new Map())!;
-    expect(result.seats[1].primaryTide).toBeNull();
-    expect(result.seats[1].secondaryTide).toBeNull();
-  });
-
-  it("resolves card data for drafted cards", () => {
+  it("resolves drafted card data", () => {
     const db = new Map<number, CardData>();
     db.set(1, makeCard(1, "Bloom", "Rose Golem"));
     db.set(2, makeCard(2, "Arc", "Lightning Sprite"));
 
-    const agents = [
-      makeAgent([0, 0, 0, 0, 0, 0, 0], []),
-      makeAgent([3, 6, 0, 0, 0, 0, 0], [1, 2]),
-    ];
-    const state = makeDraftState(agents);
+    const state = makeDraftState([2, 1], 3);
     const result = extractDraftDebugInfo(state, db)!;
 
-    expect(result.seats[1].draftedCards).toHaveLength(2);
-    expect(result.seats[1].draftedCards[0].name).toBe("Rose Golem");
-    expect(result.seats[1].draftedCards[1].name).toBe("Lightning Sprite");
-  });
-
-  it("sorts seats by seat index", () => {
-    const agents = [
-      makeAgent([0, 0, 0, 0, 0, 0, 0], []),
-      makeAgent([0, 0, 10, 0, 0, 0, 0], []),
-      makeAgent([10, 0, 0, 0, 0, 0, 0], []),
-      makeAgent([0, 0, 0, 0, 0, 0, 10], []),
-    ];
-    const state = makeDraftState(agents);
-    const result = extractDraftDebugInfo(state, new Map())!;
-
-    expect(result.seats[0].seatIndex).toBe(0);
-    expect(result.seats[1].seatIndex).toBe(1);
-    expect(result.seats[2].seatIndex).toBe(2);
-    expect(result.seats[3].seatIndex).toBe(3);
-  });
-
-  it("computes normalized preference weights", () => {
-    const agents = [
-      makeAgent([0, 0, 0, 0, 0, 0, 0], []),
-      makeAgent([3, 0, 0, 0, 0, 0, 0], []),
-    ];
-    const state = makeDraftState(agents);
-    const result = extractDraftDebugInfo(state, new Map())!;
-
-    const weights = result.seats[1].preferenceWeights;
-    expect(weights.Bloom).toBeCloseTo(1.0);
-    expect(weights.Arc).toBeCloseTo(0.0);
+    expect(result.draftedCards).toHaveLength(2);
+    expect(result.draftedCards[0].name).toBe("Lightning Sprite");
+    expect(result.draftedCards[1].name).toBe("Rose Golem");
+    expect(result.totalCards).toBe(2);
   });
 
   it("groups drafted cards by tide", () => {
@@ -136,65 +70,44 @@ describe("extractDraftDebugInfo", () => {
     db.set(2, makeCard(2, "Bloom", "Vine Crawler"));
     db.set(3, makeCard(3, "Arc", "Spark Mage"));
 
-    const agents = [
-      makeAgent([0, 0, 0, 0, 0, 0, 0], []),
-      makeAgent([6, 3, 0, 0, 0, 0, 0], [1, 2, 3]),
-    ];
-    const state = makeDraftState(agents);
+    const state = makeDraftState([3, 2, 1], 4);
     const result = extractDraftDebugInfo(state, db)!;
 
-    expect(result.seats[1].cardsByTide.Bloom).toBe(2);
-    expect(result.seats[1].cardsByTide.Arc).toBe(1);
+    expect(result.cardsByTide.Bloom).toBe(2);
+    expect(result.cardsByTide.Arc).toBe(1);
   });
 
-  it("always passes left: seat 9 passes to player", () => {
-    const agents = Array.from({ length: 10 }, () =>
-      makeAgent([0, 0, 0, 0, 0, 0, 0], []),
+  it("computes tide affinities", () => {
+    const db = new Map<number, CardData>();
+    db.set(1, makeCard(1, "Bloom", "Rose Golem"));
+
+    const state = makeDraftState([1], 2);
+    const result = extractDraftDebugInfo(state, db)!;
+
+    // Bloom should have highest affinity
+    expect(result.tideAffinities.Bloom).toBeGreaterThan(
+      result.tideAffinities.Pact,
     );
-    const state = makeDraftState(agents, 0);
-    const result = extractDraftDebugInfo(state, new Map())!;
-
-    expect(result.seatPassingToPlayer).toBe(9);
-    expect(result.displayRound).toBe(1);
-    expect(result.seats[0].receivesFromSeat).toBe(9);
   });
 
-  it("passing direction is the same regardless of round", () => {
-    const agents = Array.from({ length: 10 }, () =>
-      makeAgent([0, 0, 0, 0, 0, 0, 0], []),
-    );
-    const round0 = extractDraftDebugInfo(makeDraftState(agents, 0), new Map())!;
-    const round1 = extractDraftDebugInfo(makeDraftState(agents, 1), new Map())!;
+  it("identifies primary and secondary tides", () => {
+    const db = new Map<number, CardData>();
+    // Draft several Bloom and one Arc card
+    db.set(1, makeCard(1, "Bloom", "B1"));
+    db.set(2, makeCard(2, "Bloom", "B2"));
+    db.set(3, makeCard(3, "Bloom", "B3"));
+    db.set(4, makeCard(4, "Arc", "A1"));
 
-    expect(round0.seatPassingToPlayer).toBe(9);
-    expect(round1.seatPassingToPlayer).toBe(9);
-    expect(round0.seats[0].receivesFromSeat).toBe(9);
-    expect(round1.seats[0].receivesFromSeat).toBe(9);
+    const state = makeDraftState([4, 3, 2, 1], 5);
+    const result = extractDraftDebugInfo(state, db)!;
+
+    expect(result.primaryTide).toBe("Bloom");
   });
 
-  it("exposes committed tide pair from agent state", () => {
-    const pair = { tide1: "Bloom", tide2: "Arc", label: "Bloom + Arc" };
-    const agents = [
-      makeAgent([0, 0, 0, 0, 0, 0, 0], []),
-      makeAgent([6, 3, 0, 0, 0, 0, 0], [1, 2, 3, 4, 5], pair),
-    ];
-    const state = makeDraftState(agents);
+  it("computes focus value", () => {
+    const state = makeDraftState([], 10);
     const result = extractDraftDebugInfo(state, new Map())!;
-    expect(result.seats[1].committedPair).toEqual(pair);
-    expect(result.seats[0].committedPair).toBeNull();
-  });
-
-  it("computes receivesFromSeat correctly for all seats", () => {
-    const agents = Array.from({ length: 4 }, () =>
-      makeAgent([0, 0, 0, 0, 0, 0, 0], []),
-    );
-    const state = makeDraftState(agents, 0);
-    const result = extractDraftDebugInfo(state, new Map())!;
-
-    // Packs always pass left: seat i receives from seat i-1
-    expect(result.seats[0].receivesFromSeat).toBe(3);
-    expect(result.seats[1].receivesFromSeat).toBe(0);
-    expect(result.seats[2].receivesFromSeat).toBe(1);
-    expect(result.seats[3].receivesFromSeat).toBe(2);
+    // focus = max(0, (10 - 3) * 0.35) = 2.45
+    expect(result.focus).toBeCloseTo(2.45, 1);
   });
 });

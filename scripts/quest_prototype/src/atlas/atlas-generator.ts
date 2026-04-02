@@ -4,7 +4,7 @@ import type {
   SiteState,
   SiteType,
 } from "../types/quest";
-import type { CardData } from "../types/cards";
+import type { CardData, Tide } from "../types/cards";
 import type { Dreamsign } from "../types/quest";
 import { BIOMES, type Biome } from "../data/biomes";
 import { logEvent } from "../logging";
@@ -14,6 +14,7 @@ export interface SiteGenerationContext {
   cardDatabase: Map<number, CardData>;
   dreamsignPool: ReadonlyArray<Omit<Dreamsign, "isBane">>;
   playerHasBanes: boolean;
+  excludedTides: Tide[];
 }
 
 const BASE_RADIUS = 200;
@@ -119,8 +120,11 @@ function buildAdditionalSitePool(
 function generateRewardData(
   context: SiteGenerationContext,
 ): Record<string, unknown> {
-  const { cardDatabase, dreamsignPool } = context;
-  const cards = Array.from(cardDatabase.values());
+  const { cardDatabase, dreamsignPool, excludedTides } = context;
+  const excludedSet = new Set(excludedTides);
+  const cards = Array.from(cardDatabase.values()).filter(
+    (c) => !excludedSet.has(c.tide),
+  );
 
   // 70% chance card reward, 30% chance dreamsign reward
   if (cards.length > 0 && Math.random() < 0.7) {

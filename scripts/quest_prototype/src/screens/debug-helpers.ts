@@ -1,41 +1,22 @@
 import type { Tide, CardData } from "../types/cards";
-import type { DraftState, TidePair } from "../types/draft";
+import type { DraftState } from "../types/draft";
 import { NAMED_TIDES } from "../data/card-database";
+import { computeTideAffinity, computeFocus } from "../draft/draft-engine";
 
-/** Ordered tide names matching the 7-element preference vector layout. */
-const TIDE_VECTOR_ORDER: readonly Tide[] = [
-  "Bloom",
-  "Arc",
-  "Ignite",
-  "Pact",
-  "Umbra",
-  "Rime",
-  "Surge",
-] as const;
-
-/** Summary of a single seat's draft state for display. */
-export interface SeatSummary {
-  seatIndex: number;
-  isPlayer: boolean;
-  receivesFromSeat: number;
-  primaryTide: Tide | null;
-  secondaryTide: Tide | null;
-  committedPair: TidePair | null;
-  preferenceWeights: Record<string, number>;
+/** Debug info for the player's draft state. */
+export interface DraftDebugInfo {
   draftedCards: CardData[];
   cardsByTide: Record<string, number>;
   totalCards: number;
+  pickNumber: number;
+  poolSize: number;
+  focus: number;
+  tideAffinities: Record<string, number>;
+  primaryTide: Tide | null;
+  secondaryTide: Tide | null;
 }
 
-/** Debug info for the entire draft table. */
-export interface DraftDebugInfo {
-  seats: SeatSummary[];
-  currentRound: number;
-  displayRound: number;
-  seatPassingToPlayer: number;
-}
-
-/** Extract seat summaries and passing info from draft state. */
+/** Extract debug info from the current draft state. */
 export function extractDraftDebugInfo(
   draftState: DraftState | null,
   cardDatabase: Map<number, CardData>,
@@ -44,85 +25,46 @@ export function extractDraftDebugInfo(
     return null;
   }
 
-  const seatCount = draftState.agents.length;
-  const currentRound = draftState.currentRound;
-
-  const seats: SeatSummary[] = [];
-
-  for (let i = 0; i < seatCount; i++) {
-    const agent = draftState.agents[i];
-    const pref = agent.preference;
-
-    const normalizedWeights = normalizePreference(pref);
-
-    const sorted = tidesSortedByWeight(normalizedWeights);
-    const primaryTide: Tide | null =
-      sorted.length > 0 && normalizedWeights[sorted[0]] > 0
-        ? (sorted[0] as Tide)
-        : null;
-    const secondaryTide: Tide | null =
-      sorted.length > 1 && normalizedWeights[sorted[1]] > 0
-        ? (sorted[1] as Tide)
-        : null;
-
-    const draftedCards: CardData[] = [];
-    const cardsByTide: Record<string, number> = {};
-    for (const tide of [...NAMED_TIDES, "Neutral" as Tide]) {
-      cardsByTide[tide] = 0;
-    }
-
-    for (const cardNum of agent.picks) {
-      const card = cardDatabase.get(cardNum);
-      if (card) {
-        draftedCards.push(card);
-        cardsByTide[card.tide] = (cardsByTide[card.tide] ?? 0) + 1;
-      }
-    }
-
-    // Packs always pass left: seat (i-1) passes to seat i
-    const receivesFromSeat = (i - 1 + seatCount) % seatCount;
-
-    seats.push({
-      seatIndex: i,
-      isPlayer: i === 0,
-      receivesFromSeat,
-      primaryTide,
-      secondaryTide,
-      committedPair: agent.committedPair,
-      preferenceWeights: normalizedWeights,
-      draftedCards,
-      cardsByTide,
-      totalCards: draftedCards.length,
-    });
+  const draftedCards: CardData[] = [];
+  const cardsByTide: Record<string, number> = {};
+  for (const tide of [...NAMED_TIDES, "Neutral" as Tide]) {
+    cardsByTide[tide] = 0;
   }
 
-  // Seat (count-1) always passes to seat 0
-  const seatPassingToPlayer = seatCount - 1;
+  for (const cardNum of draftState.draftedCards) {
+    const card = cardDatabase.get(cardNum);
+    if (card) {
+      draftedCards.push(card);
+      cardsByTide[card.tide] = (cardsByTide[card.tide] ?? 0) + 1;
+    }
+  }
+
+  const affinity = computeTideAffinity(
+    draftState.draftedCards,
+    cardDatabase,
+  );
+  const tideAffinities: Record<string, number> = {};
+  for (const [tide, value] of affinity.entries()) {
+    tideAffinities[tide] = Math.round(value * 100) / 100;
+  }
+
+  const sorted = Object.entries(tideAffinities)
+    .filter(([tide]) => tide !== "Neutral")
+    .sort(([, a], [, b]) => b - a);
+  const primaryTide: Tide | null =
+    sorted.length > 0 && sorted[0][1] > 1.0 ? (sorted[0][0] as Tide) : null;
+  const secondaryTide: Tide | null =
+    sorted.length > 1 && sorted[1][1] > 1.0 ? (sorted[1][0] as Tide) : null;
 
   return {
-    seats,
-    currentRound,
-    displayRound: currentRound + 1,
-    seatPassingToPlayer,
+    draftedCards,
+    cardsByTide,
+    totalCards: draftedCards.length,
+    pickNumber: draftState.pickNumber,
+    poolSize: draftState.pool.length,
+    focus: Math.round(computeFocus(draftState.pickNumber) * 100) / 100,
+    tideAffinities,
+    primaryTide,
+    secondaryTide,
   };
-}
-
-/** Normalize preference vector into a Record keyed by tide name with values summing to 1. */
-function normalizePreference(pref: number[]): Record<string, number> {
-  const result: Record<string, number> = {};
-  const sum = pref.reduce((s, v) => s + v, 0);
-
-  for (let i = 0; i < TIDE_VECTOR_ORDER.length; i++) {
-    const tideName = TIDE_VECTOR_ORDER[i];
-    result[tideName] = sum > 0 ? pref[i] / sum : 0;
-  }
-
-  return result;
-}
-
-/** Return tide names sorted by descending weight. */
-function tidesSortedByWeight(weights: Record<string, number>): string[] {
-  return Object.entries(weights)
-    .sort(([, a], [, b]) => b - a)
-    .map(([tide]) => tide);
 }
