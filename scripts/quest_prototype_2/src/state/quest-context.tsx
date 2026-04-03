@@ -34,6 +34,10 @@ export interface QuestMutations {
     effectDescription: string,
     effectDetails: Record<string, unknown>,
   ) => void;
+  moveToDeck: (entryId: string) => void;
+  moveToPool: (entryId: string) => void;
+  moveAllToDeck: () => void;
+  moveAllToPool: () => void;
   setDreamcaller: (dreamcaller: Dreamcaller) => void;
   addDreamsign: (dreamsign: Dreamsign, sourceSiteType: string) => void;
   removeDreamsign: (index: number, reason: string) => void;
@@ -70,6 +74,7 @@ function createDefaultState(): QuestState {
   return {
     essence: 250,
     deck: [],
+    pool: [],
     dreamcaller: null,
     dreamsigns: [],
     tideCrystals: {
@@ -177,7 +182,9 @@ export function QuestProvider({
   const removeCard = useCallback(
     (entryId: string, source: string) => {
       setState((prev) => {
-        const entry = prev.deck.find((e) => e.entryId === entryId);
+        const entry =
+          prev.deck.find((e) => e.entryId === entryId) ??
+          prev.pool.find((e) => e.entryId === entryId);
         if (!entry) return prev;
         const card = cardDatabase.get(entry.cardNumber);
         const cardName =
@@ -188,7 +195,8 @@ export function QuestProvider({
           source,
         });
         const deck = prev.deck.filter((e) => e.entryId !== entryId);
-        return { ...prev, deck };
+        const pool = prev.pool.filter((e) => e.entryId !== entryId);
+        return { ...prev, deck, pool };
       });
     },
     [cardDatabase],
@@ -222,6 +230,70 @@ export function QuestProvider({
     },
     [cardDatabase],
   );
+
+  const moveToDeck = useCallback(
+    (entryId: string) => {
+      setState((prev) => {
+        const entry = prev.pool.find((e) => e.entryId === entryId);
+        if (!entry) return prev;
+        const card = cardDatabase.get(entry.cardNumber);
+        logEvent("card_moved_to_deck", {
+          cardNumber: entry.cardNumber,
+          cardName: card?.name ?? `Unknown Card #${String(entry.cardNumber)}`,
+        });
+        return {
+          ...prev,
+          pool: prev.pool.filter((e) => e.entryId !== entryId),
+          deck: [...prev.deck, entry],
+        };
+      });
+    },
+    [cardDatabase],
+  );
+
+  const moveToPool = useCallback(
+    (entryId: string) => {
+      setState((prev) => {
+        const entry = prev.deck.find((e) => e.entryId === entryId);
+        if (!entry) return prev;
+        const card = cardDatabase.get(entry.cardNumber);
+        logEvent("card_moved_to_pool", {
+          cardNumber: entry.cardNumber,
+          cardName: card?.name ?? `Unknown Card #${String(entry.cardNumber)}`,
+        });
+        return {
+          ...prev,
+          deck: prev.deck.filter((e) => e.entryId !== entryId),
+          pool: [...prev.pool, entry],
+        };
+      });
+    },
+    [cardDatabase],
+  );
+
+  const moveAllToDeck = useCallback(() => {
+    setState((prev) => {
+      if (prev.pool.length === 0) return prev;
+      logEvent("all_cards_moved_to_deck", { count: prev.pool.length });
+      return {
+        ...prev,
+        deck: [...prev.deck, ...prev.pool],
+        pool: [],
+      };
+    });
+  }, []);
+
+  const moveAllToPool = useCallback(() => {
+    setState((prev) => {
+      if (prev.deck.length === 0) return prev;
+      logEvent("all_cards_moved_to_pool", { count: prev.deck.length });
+      return {
+        ...prev,
+        pool: [...prev.pool, ...prev.deck],
+        deck: [],
+      };
+    });
+  }, []);
 
   const setDreamcaller = useCallback((dreamcaller: Dreamcaller) => {
     logEvent("dreamcaller_selected", {
@@ -381,6 +453,10 @@ export function QuestProvider({
       addBaneCard,
       removeCard,
       transfigureCard,
+      moveToDeck,
+      moveToPool,
+      moveAllToDeck,
+      moveAllToPool,
       setDreamcaller,
       addDreamsign,
       removeDreamsign,
@@ -400,6 +476,10 @@ export function QuestProvider({
       addBaneCard,
       removeCard,
       transfigureCard,
+      moveToDeck,
+      moveToPool,
+      moveAllToDeck,
+      moveAllToPool,
       setDreamcaller,
       addDreamsign,
       removeDreamsign,

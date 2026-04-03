@@ -91,6 +91,7 @@ export type Screen =
 export interface QuestState {
   essence: number;
   deck: DeckEntry[];
+  pool: DeckEntry[];
   dreamcaller: Dreamcaller | null;
   dreamsigns: Dreamsign[];
   tideCrystals: Record<Tide, number>;
