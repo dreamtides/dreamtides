@@ -10,6 +10,7 @@ function createTestState(overrides: Partial<QuestState> = {}): QuestState {
   return {
     essence: 250,
     deck: [],
+    pool: [],
     dreamcaller: null,
     dreamsigns: [],
     tideCrystals: {

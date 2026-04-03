@@ -1,0 +1,746 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import type { CardData, Tide } from "../types/cards";
+import type { DeckEntry } from "../types/quest";
+import { useQuest } from "../state/quest-context";
+import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { CardDisplay } from "./CardDisplay";
+import { CardOverlay } from "./CardOverlay";
+import { TRANSFIGURATION_COLORS } from "../transfiguration/transfiguration-logic";
+
+/** All tides including Neutral, used for filter toggles. */
+const ALL_TIDES: readonly Tide[] = [...NAMED_TIDES, "Neutral"] as const;
+
+/** Sort criteria for the pool panel. */
+type SortCriteria = "energyCost" | "name" | "tide" | "cardType";
+
+const SORT_LABELS: Readonly<Record<SortCriteria, string>> = {
+  energyCost: "Energy Cost",
+  name: "Name",
+  tide: "Tide",
+  cardType: "Card Type",
+};
+
+/** Card type filter options. */
+type CardTypeFilter = "All" | "Characters" | "Events";
+
+/** Tide ordering for sort-by-tide. */
+const TIDE_ORDER: Readonly<Record<Tide, number>> = {
+  Bloom: 0,
+  Arc: 1,
+  Ignite: 2,
+  Pact: 3,
+  Umbra: 4,
+  Rime: 5,
+  Surge: 6,
+  Neutral: 7,
+};
+
+/** A resolved pool entry with card data. */
+interface ResolvedEntry {
+  entry: DeckEntry;
+  card: CardData;
+}
+
+/** A grouped deck row for the compact list. */
+interface DeckRow {
+  cardNumber: number;
+  card: CardData;
+  transfiguration: DeckEntry["transfiguration"];
+  isBane: boolean;
+  entryIds: string[];
+  count: number;
+}
+
+/** Props for the DeckEditor component. */
+interface DeckEditorProps {
+  isOpen: boolean;
+  onClose: () => void;
+  cardDatabase: Map<number, CardData>;
+}
+
+/** Full-screen deck editor with pool grid and compact deck list. */
+export function DeckEditor({
+  isOpen,
+  onClose,
+  cardDatabase,
+}: DeckEditorProps) {
+  const { state, mutations } = useQuest();
+
+  const [tideFilters, setTideFilters] = useState<Record<Tide, boolean>>(() => {
+    const filters: Partial<Record<Tide, boolean>> = {};
+    for (const tide of ALL_TIDES) {
+      filters[tide] = true;
+    }
+    return filters as Record<Tide, boolean>;
+  });
+  const [cardTypeFilter, setCardTypeFilter] = useState<CardTypeFilter>("All");
+  const [sortCriteria, setSortCriteria] = useState<SortCriteria>("energyCost");
+  const [sortAscending, setSortAscending] = useState(true);
+  const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        if (overlayCard !== null) return;
+        onClose();
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, overlayCard, onClose]);
+
+  useEffect(() => {
+    if (!showSortDropdown) return undefined;
+    function handleClick() {
+      setShowSortDropdown(false);
+    }
+    window.addEventListener("click", handleClick);
+    return () => {
+      window.removeEventListener("click", handleClick);
+    };
+  }, [showSortDropdown]);
+
+  // Resolve pool entries
+  const resolvedPool = useMemo<ResolvedEntry[]>(() => {
+    return state.pool
+      .map((entry) => {
+        const card = cardDatabase.get(entry.cardNumber);
+        if (!card) return null;
+        return { entry, card };
+      })
+      .filter((e): e is ResolvedEntry => e !== null);
+  }, [state.pool, cardDatabase]);
+
+  // Filter pool entries
+  const filteredPool = useMemo<ResolvedEntry[]>(() => {
+    return resolvedPool.filter((resolved) => {
+      if (!tideFilters[resolved.card.tide]) return false;
+      if (cardTypeFilter === "Characters" && resolved.card.cardType !== "Character") return false;
+      if (cardTypeFilter === "Events" && resolved.card.cardType !== "Event") return false;
+      return true;
+    });
+  }, [resolvedPool, tideFilters, cardTypeFilter]);
+
+  // Sort pool entries
+  const sortedPool = useMemo<ResolvedEntry[]>(() => {
+    const sorted = [...filteredPool];
+    sorted.sort((a, b) => {
+      let cmp = 0;
+      switch (sortCriteria) {
+        case "energyCost":
+          cmp = (a.card.energyCost ?? 0) - (b.card.energyCost ?? 0);
+          break;
+        case "name":
+          cmp = a.card.name.localeCompare(b.card.name);
+          break;
+        case "tide":
+          cmp = TIDE_ORDER[a.card.tide] - TIDE_ORDER[b.card.tide];
+          break;
+        case "cardType":
+          cmp = a.card.cardType.localeCompare(b.card.cardType);
+          break;
+      }
+      return sortAscending ? cmp : -cmp;
+    });
+    return sorted;
+  }, [filteredPool, sortCriteria, sortAscending]);
+
+  // Group deck entries into compact rows
+  const deckRows = useMemo<DeckRow[]>(() => {
+    const groups = new Map<string, DeckRow>();
+    for (const entry of state.deck) {
+      const card = cardDatabase.get(entry.cardNumber);
+      if (!card) continue;
+      const key = `${String(entry.cardNumber)}-${entry.transfiguration ?? "none"}-${String(entry.isBane)}`;
+      const existing = groups.get(key);
+      if (existing) {
+        existing.entryIds.push(entry.entryId);
+        existing.count += 1;
+      } else {
+        groups.set(key, {
+          cardNumber: entry.cardNumber,
+          card,
+          transfiguration: entry.transfiguration,
+          isBane: entry.isBane,
+          entryIds: [entry.entryId],
+          count: 1,
+        });
+      }
+    }
+    const rows = Array.from(groups.values());
+    rows.sort((a, b) => {
+      const costCmp = (a.card.energyCost ?? 0) - (b.card.energyCost ?? 0);
+      if (costCmp !== 0) return costCmp;
+      return a.card.name.localeCompare(b.card.name);
+    });
+    return rows;
+  }, [state.deck, cardDatabase]);
+
+  // Group deck rows by energy cost for dividers
+  const deckRowsByEnergy = useMemo(() => {
+    const groups: Array<{ cost: number; rows: DeckRow[] }> = [];
+    let currentCost: number | null = null;
+    for (const row of deckRows) {
+      const cost = row.card.energyCost ?? 0;
+      if (cost !== currentCost) {
+        groups.push({ cost, rows: [row] });
+        currentCost = cost;
+      } else {
+        groups[groups.length - 1].rows.push(row);
+      }
+    }
+    return groups;
+  }, [deckRows]);
+
+  const totalCards = state.deck.length + state.pool.length;
+
+  const toggleTide = useCallback((tide: Tide) => {
+    setTideFilters((prev) => ({ ...prev, [tide]: !prev[tide] }));
+  }, []);
+
+  const handlePoolCardClick = useCallback(
+    (entryId: string) => {
+      mutations.moveToDeck(entryId);
+    },
+    [mutations],
+  );
+
+  const handleDeckRowClick = useCallback(
+    (row: DeckRow) => {
+      const entryId = row.entryIds[row.entryIds.length - 1];
+      mutations.moveToPool(entryId);
+    },
+    [mutations],
+  );
+
+  const handleCardOverlay = useCallback((card: CardData) => {
+    setOverlayCard(card);
+  }, []);
+
+  const handleCloseOverlay = useCallback(() => {
+    setOverlayCard(null);
+  }, []);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="deck-editor-backdrop"
+          className="fixed inset-0 z-[60] flex flex-col"
+          style={{ backgroundColor: "rgba(5, 2, 10, 0.95)" }}
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 40 }}
+          transition={{ duration: 0.3 }}
+        >
+          {/* Header */}
+          <div
+            className="flex items-center justify-between px-4 py-3 md:px-6"
+            style={{
+              borderBottom: "1px solid rgba(124, 58, 237, 0.3)",
+              background:
+                "linear-gradient(180deg, rgba(10, 6, 18, 0.95) 0%, rgba(10, 6, 18, 0.8) 100%)",
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg font-bold md:text-xl" style={{ color: "#e2e8f0" }}>
+                Deck Editor
+              </h2>
+              <span
+                className="rounded-full px-3 py-0.5 text-xs font-bold"
+                style={{
+                  background: "rgba(251, 191, 36, 0.15)",
+                  border: "1px solid rgba(251, 191, 36, 0.3)",
+                  color: "#fbbf24",
+                }}
+              >
+                {String(state.deck.length)}{" "}
+                <span className="font-normal opacity-70">/ {String(totalCards)}</span>
+              </span>
+            </div>
+            <button
+              className="cursor-pointer rounded-lg px-5 py-2 text-sm font-semibold transition-colors"
+              style={{
+                background: "rgba(251, 191, 36, 0.2)",
+                border: "1px solid rgba(251, 191, 36, 0.5)",
+                color: "#fbbf24",
+                textShadow: "0 0 8px rgba(251, 191, 36, 0.3)",
+              }}
+              onClick={onClose}
+            >
+              Done
+            </button>
+          </div>
+
+          {/* Main content: two panels */}
+          <div className="flex min-h-0 flex-1">
+            {/* Left panel: Pool */}
+            <div
+              className="flex flex-1 flex-col"
+              style={{ borderRight: "1px solid rgba(124, 58, 237, 0.4)" }}
+            >
+              {/* Pool header + filters (merged into one compact bar) */}
+              <div
+                className="px-4 py-2 md:px-6"
+                style={{
+                  borderBottom: "1px solid rgba(124, 58, 237, 0.15)",
+                  background: "rgba(10, 6, 18, 0.6)",
+                }}
+              >
+                {/* Row 1: Pool label + tide filters */}
+                <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+                  <span className="mr-1 text-sm font-bold" style={{ color: "#a855f7" }}>
+                    Pool{" "}
+                    <span className="font-normal opacity-60">
+                      ({String(sortedPool.length)}
+                      {sortedPool.length !== resolvedPool.length
+                        ? ` / ${String(resolvedPool.length)}`
+                        : ""})
+                    </span>
+                  </span>
+                  <div
+                    className="mx-1 h-4"
+                    style={{ borderLeft: "1px solid rgba(124, 58, 237, 0.3)" }}
+                  />
+                  {ALL_TIDES.map((tide) => (
+                    <button
+                      key={tide}
+                      className="flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium transition-all"
+                      style={{
+                        background: tideFilters[tide]
+                          ? `${TIDE_COLORS[tide]}25`
+                          : "rgba(255, 255, 255, 0.03)",
+                        border: `1px solid ${tideFilters[tide] ? `${TIDE_COLORS[tide]}60` : "rgba(255, 255, 255, 0.1)"}`,
+                        color: tideFilters[tide] ? TIDE_COLORS[tide] : "#6b7280",
+                        opacity: tideFilters[tide] ? 1 : 0.5,
+                      }}
+                      onClick={() => {
+                        toggleTide(tide);
+                      }}
+                    >
+                      <img
+                        src={tideIconUrl(tide)}
+                        alt={tide}
+                        className="h-3 w-3 rounded-full"
+                        style={{ opacity: tideFilters[tide] ? 1 : 0.4 }}
+                      />
+                      <span className="hidden sm:inline">{tide}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Row 2: Type filter + Sort */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="mr-1 text-[11px] uppercase tracking-wider opacity-60" style={{ color: "#a855f7" }}>
+                    Type
+                  </span>
+                  {(["All", "Characters", "Events"] as const).map((filter) => (
+                    <button
+                      key={filter}
+                      className="cursor-pointer rounded-full px-2 py-0.5 text-[11px] font-medium transition-all"
+                      style={{
+                        background:
+                          cardTypeFilter === filter
+                            ? "rgba(168, 85, 247, 0.25)"
+                            : "rgba(255, 255, 255, 0.03)",
+                        border: `1px solid ${cardTypeFilter === filter ? "rgba(168, 85, 247, 0.5)" : "rgba(255, 255, 255, 0.1)"}`,
+                        color: cardTypeFilter === filter ? "#c084fc" : "#6b7280",
+                      }}
+                      onClick={() => {
+                        setCardTypeFilter(filter);
+                      }}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+
+                  <div
+                    className="mx-1 h-4"
+                    style={{ borderLeft: "1px solid rgba(255, 255, 255, 0.1)" }}
+                  />
+
+                  <span className="mr-1 text-[11px] uppercase tracking-wider opacity-60" style={{ color: "#a855f7" }}>
+                    Sort
+                  </span>
+                  <div className="relative">
+                    <button
+                      className="flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium transition-all"
+                      style={{
+                        background: "rgba(255, 255, 255, 0.05)",
+                        border: "1px solid rgba(255, 255, 255, 0.15)",
+                        color: "#e2e8f0",
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowSortDropdown((prev) => !prev);
+                      }}
+                    >
+                      {SORT_LABELS[sortCriteria]}
+                      <span className="opacity-50">{"\u25BE"}</span>
+                    </button>
+                    {showSortDropdown && (
+                      <div
+                        className="absolute top-full left-0 z-10 mt-1 rounded-lg py-1 shadow-xl"
+                        style={{
+                          background: "#1a1025",
+                          border: "1px solid rgba(124, 58, 237, 0.3)",
+                          minWidth: "160px",
+                        }}
+                      >
+                        {(Object.keys(SORT_LABELS) as SortCriteria[]).map((criteria) => (
+                          <button
+                            key={criteria}
+                            className="block w-full cursor-pointer px-3 py-1.5 text-left text-xs transition-colors"
+                            style={{
+                              color: sortCriteria === criteria ? "#c084fc" : "#e2e8f0",
+                              background:
+                                sortCriteria === criteria
+                                  ? "rgba(168, 85, 247, 0.15)"
+                                  : "transparent",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSortCriteria(criteria);
+                              setShowSortDropdown(false);
+                            }}
+                          >
+                            {SORT_LABELS[criteria]}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    className="flex cursor-pointer items-center rounded-full px-1.5 py-0.5 text-[11px] transition-all"
+                    style={{
+                      background: "rgba(255, 255, 255, 0.05)",
+                      border: "1px solid rgba(255, 255, 255, 0.15)",
+                      color: "#e2e8f0",
+                    }}
+                    onClick={() => {
+                      setSortAscending((prev) => !prev);
+                    }}
+                    aria-label={sortAscending ? "Sort descending" : "Sort ascending"}
+                  >
+                    {sortAscending ? "\u2191" : "\u2193"}
+                  </button>
+
+                  <span className="ml-auto hidden text-[10px] opacity-30 xl:inline">
+                    Click to add to deck. Right-click for details.
+                  </span>
+                </div>
+              </div>
+
+              {/* Pool card grid */}
+              <div
+                className="flex-1 overflow-y-auto px-4 py-3 md:px-6"
+                style={{ background: "radial-gradient(ellipse at center, rgba(124, 58, 237, 0.03) 0%, transparent 70%)" }}
+              >
+                {sortedPool.length === 0 ? (
+                  <div className="flex h-full items-center justify-center">
+                    <p className="text-sm opacity-40">
+                      {resolvedPool.length === 0
+                        ? "No cards in pool. Move cards from your deck to manage them here."
+                        : "No cards match the current filters."}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
+                    <AnimatePresence mode="popLayout">
+                      {sortedPool.map((resolved) => (
+                        <motion.div
+                          key={resolved.entry.entryId}
+                          className="relative"
+                          layout
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, x: 50, scale: 0.95 }}
+                          transition={{ duration: 0.15 }}
+                        >
+                          {/* Transfiguration indicator */}
+                          {resolved.entry.transfiguration !== null && (
+                            <div
+                              className="absolute -top-1 -right-1 z-10 rounded-full px-1.5 py-0.5 text-[9px] font-bold shadow-md"
+                              style={{
+                                background: TRANSFIGURATION_COLORS[resolved.entry.transfiguration],
+                                color: "#fff",
+                                boxShadow: `0 0 6px ${TRANSFIGURATION_COLORS[resolved.entry.transfiguration]}80`,
+                              }}
+                            >
+                              {resolved.entry.transfiguration}
+                            </div>
+                          )}
+                          {/* Bane indicator */}
+                          {resolved.entry.isBane && (
+                            <div
+                              className="absolute -top-1 -left-1 z-10 flex h-5 w-5 items-center justify-center rounded-full text-[10px] shadow-md"
+                              style={{
+                                background: "#7f1d1d",
+                                border: "1px solid #ef4444",
+                                color: "#fca5a5",
+                              }}
+                              title="Bane"
+                            >
+                              {"\u2620"}
+                            </div>
+                          )}
+                          <div
+                            className="cursor-pointer transition-transform hover:scale-[1.03]"
+                            style={
+                              resolved.entry.transfiguration !== null
+                                ? {
+                                    boxShadow: `0 0 8px ${TRANSFIGURATION_COLORS[resolved.entry.transfiguration]}40`,
+                                    borderRadius: "0.5rem",
+                                  }
+                                : resolved.entry.isBane
+                                  ? {
+                                      boxShadow: "0 0 8px rgba(239, 68, 68, 0.3)",
+                                      borderRadius: "0.5rem",
+                                    }
+                                  : undefined
+                            }
+                            onClick={() => {
+                              handlePoolCardClick(resolved.entry.entryId);
+                            }}
+                            onContextMenu={(e) => {
+                              e.preventDefault();
+                              handleCardOverlay(resolved.card);
+                            }}
+                          >
+                            <CardDisplay card={resolved.card} />
+                          </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right panel: Deck list */}
+            <div
+              className="flex w-72 shrink-0 flex-col lg:w-80 xl:w-96"
+              style={{
+                background: "rgba(5, 2, 10, 0.6)",
+                boxShadow: "inset 4px 0 12px rgba(0, 0, 0, 0.3)",
+              }}
+            >
+              {/* Deck header */}
+              <div
+                className="flex items-center justify-between px-4 py-2.5"
+                style={{
+                  borderBottom: "1px solid rgba(124, 58, 237, 0.2)",
+                  background: "rgba(10, 6, 18, 0.6)",
+                }}
+              >
+                <h3 className="text-sm font-bold" style={{ color: "#a855f7" }}>
+                  Deck{" "}
+                  <span className="font-normal opacity-60">
+                    ({String(state.deck.length)})
+                  </span>
+                </h3>
+              </div>
+
+              {/* Deck card list */}
+              <div className="flex-1 overflow-y-auto px-2 py-2">
+                {deckRowsByEnergy.length === 0 ? (
+                  <div className="flex h-full items-center justify-center">
+                    <p className="px-4 text-center text-sm opacity-40">
+                      Deck is empty. Click cards in the pool to add them.
+                    </p>
+                  </div>
+                ) : (
+                  <AnimatePresence mode="popLayout">
+                    {deckRowsByEnergy.map((group, groupIndex) => (
+                      <div key={group.cost} className={groupIndex === 0 ? "mb-2" : "mb-2 mt-3"}>
+                        {/* Cost divider */}
+                        <div className="mb-1.5 flex items-center gap-2 px-2 py-1">
+                          <div className="h-px flex-1" style={{ background: "rgba(124, 58, 237, 0.5)" }} />
+                          <span
+                            className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider"
+                            style={{ color: "#fbbf24" }}
+                          >
+                            <span
+                              className="flex h-4 w-4 items-center justify-center rounded-full text-[9px]"
+                              style={{
+                                background: "rgba(251, 191, 36, 0.2)",
+                                border: "1px solid rgba(251, 191, 36, 0.4)",
+                              }}
+                            >
+                              {String(group.cost)}
+                            </span>
+                            Cost
+                          </span>
+                          <div className="h-px flex-1" style={{ background: "rgba(124, 58, 237, 0.5)" }} />
+                        </div>
+
+                        {/* Card rows */}
+                        {group.rows.map((row) => (
+                          <motion.div
+                            key={`${String(row.cardNumber)}-${row.transfiguration ?? "none"}-${String(row.isBane)}`}
+                            layout
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -30 }}
+                            transition={{ duration: 0.15 }}
+                          >
+                            <DeckListRow
+                              row={row}
+                              onClick={() => {
+                                handleDeckRowClick(row);
+                              }}
+                              onRightClick={() => {
+                                handleCardOverlay(row.card);
+                              }}
+                            />
+                          </motion.div>
+                        ))}
+                      </div>
+                    ))}
+                  </AnimatePresence>
+                )}
+              </div>
+
+              {/* Bulk action buttons */}
+              <div
+                className="flex gap-2 px-3 py-2.5"
+                style={{ borderTop: "1px solid rgba(124, 58, 237, 0.2)" }}
+              >
+                <button
+                  className="flex-1 cursor-pointer rounded-lg px-3 py-2 text-xs font-semibold transition-colors"
+                  style={{
+                    background: "rgba(124, 58, 237, 0.25)",
+                    border: "1px solid rgba(124, 58, 237, 0.5)",
+                    color: "#c084fc",
+                    opacity: state.pool.length === 0 ? 0.4 : 1,
+                  }}
+                  disabled={state.pool.length === 0}
+                  onClick={() => {
+                    mutations.moveAllToDeck();
+                  }}
+                >
+                  {"\u2192"} Add All to Deck
+                </button>
+                <button
+                  className="flex-1 cursor-pointer rounded-lg px-3 py-2 text-xs font-medium transition-colors"
+                  style={{
+                    background: "rgba(239, 68, 68, 0.15)",
+                    border: "1px solid rgba(239, 68, 68, 0.4)",
+                    color: "#f87171",
+                    opacity: state.deck.length === 0 ? 0.4 : 1,
+                  }}
+                  disabled={state.deck.length === 0}
+                  onClick={() => {
+                    mutations.moveAllToPool();
+                  }}
+                >
+                  {"\u2190"} Move All to Pool
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Card overlay */}
+          <CardOverlay card={overlayCard} onClose={handleCloseOverlay} />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/** A single row in the compact deck list. */
+function DeckListRow({
+  row,
+  onClick,
+  onRightClick,
+}: {
+  row: DeckRow;
+  onClick: () => void;
+  onRightClick: () => void;
+}) {
+  const tideColor = TIDE_COLORS[row.card.tide];
+
+  return (
+    <button
+      className="mb-1 flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-left transition-all"
+      style={{
+        background: `linear-gradient(90deg, ${tideColor}20 0%, rgba(10, 6, 18, 0.8) 70%)`,
+        borderLeft: `3px solid ${tideColor}80`,
+        borderTop: `1px solid ${tideColor}15`,
+        borderRight: `1px solid ${tideColor}15`,
+        borderBottom: `1px solid ${tideColor}15`,
+      }}
+      onClick={onClick}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        onRightClick();
+      }}
+    >
+      {/* Tide icon */}
+      <img
+        src={tideIconUrl(row.card.tide)}
+        alt={row.card.tide}
+        className="h-4 w-4 shrink-0 rounded-full"
+        style={{ border: `1px solid ${tideColor}60` }}
+      />
+
+      {/* Card name */}
+      <span
+        className="min-w-0 flex-1 truncate text-xs font-medium"
+        style={{ color: "#e2e8f0" }}
+      >
+        {row.card.name}
+      </span>
+
+      {/* Transfiguration badge */}
+      {row.transfiguration !== null && (
+        <span
+          className="shrink-0 rounded-full px-1 py-0.5 text-[8px] font-bold"
+          style={{
+            background: TRANSFIGURATION_COLORS[row.transfiguration],
+            color: "#fff",
+          }}
+        >
+          {row.transfiguration.charAt(0)}
+        </span>
+      )}
+
+      {/* Bane indicator */}
+      {row.isBane && (
+        <span className="shrink-0 text-[10px]" style={{ color: "#ef4444" }}>
+          {"\u2620"}
+        </span>
+      )}
+
+      {/* Count badge */}
+      {row.count > 1 && (
+        <span
+          className="shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-bold"
+          style={{
+            background: `${tideColor}30`,
+            color: tideColor,
+          }}
+        >
+          {"\u00D7"}{String(row.count)}
+        </span>
+      )}
+
+      {/* Energy cost */}
+      <span
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold"
+        style={{
+          background: "rgba(251, 191, 36, 0.2)",
+          color: "#fbbf24",
+          border: "1px solid rgba(251, 191, 36, 0.3)",
+        }}
+      >
+        {String(row.card.energyCost ?? 0)}
+      </span>
+    </button>
+  );
+}

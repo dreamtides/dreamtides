@@ -46,12 +46,13 @@ function useAnimatedNumber(target: number, duration: number): number {
 /** Props for the HUD component. */
 interface HudProps {
   onOpenDeckViewer: () => void;
+  onOpenDeckEditor: () => void;
   onOpenDebugScreen: () => void;
   hasDraftData: boolean;
 }
 
 /** Persistent HUD bar anchored to the bottom of the viewport. */
-export function HUD({ onOpenDeckViewer, onOpenDebugScreen, hasDraftData }: HudProps) {
+export function HUD({ onOpenDeckViewer, onOpenDeckEditor, onOpenDebugScreen, hasDraftData }: HudProps) {
   const { state } = useQuest();
   const animatedEssence = useAnimatedNumber(
     state.essence,
@@ -172,6 +173,18 @@ export function HUD({ onOpenDeckViewer, onOpenDebugScreen, hasDraftData }: HudPr
         >
           <span className="lg:hidden">{"\uD83C\uDCCF"}</span>
           <span className="hidden lg:inline">View Deck</span>
+        </button>
+        <button
+          className="cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors md:px-3 md:text-sm"
+          style={{
+            background: "rgba(34, 197, 94, 0.15)",
+            border: "1px solid rgba(34, 197, 94, 0.3)",
+            color: "#4ade80",
+          }}
+          onClick={onOpenDeckEditor}
+        >
+          <span className="lg:hidden">{"\u270F"}</span>
+          <span className="hidden lg:inline">Edit Deck</span>
         </button>
         {hasDraftData && (
           <button

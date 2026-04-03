@@ -5,6 +5,7 @@ import { QuestProvider, useQuest } from "./state/quest-context";
 import { ScreenRouter } from "./components/ScreenRouter";
 import { HUD } from "./components/HUD";
 import { DeckViewer } from "./components/DeckViewer";
+import { DeckEditor } from "./components/DeckEditor";
 import { DebugScreen } from "./screens/DebugScreen";
 
 /** Inner component that renders the screen router and HUD. */
@@ -16,6 +17,7 @@ function QuestApp({
   const { state } = useQuest();
   const showHud = state.screen.type !== "questStart";
   const [deckViewerOpen, setDeckViewerOpen] = useState(false);
+  const [deckEditorOpen, setDeckEditorOpen] = useState(false);
   const [debugScreenOpen, setDebugScreenOpen] = useState(false);
 
   const hasDraftData = state.draftState !== null &&
@@ -27,6 +29,14 @@ function QuestApp({
 
   const handleCloseDeckViewer = useCallback(() => {
     setDeckViewerOpen(false);
+  }, []);
+
+  const handleOpenDeckEditor = useCallback(() => {
+    setDeckEditorOpen(true);
+  }, []);
+
+  const handleCloseDeckEditor = useCallback(() => {
+    setDeckEditorOpen(false);
   }, []);
 
   const handleOpenDebugScreen = useCallback(() => {
@@ -43,6 +53,7 @@ function QuestApp({
       {showHud && (
         <HUD
           onOpenDeckViewer={handleOpenDeckViewer}
+          onOpenDeckEditor={handleOpenDeckEditor}
           onOpenDebugScreen={handleOpenDebugScreen}
           hasDraftData={hasDraftData}
         />
@@ -50,6 +61,11 @@ function QuestApp({
       <DeckViewer
         isOpen={deckViewerOpen}
         onClose={handleCloseDeckViewer}
+        cardDatabase={cardDatabase}
+      />
+      <DeckEditor
+        isOpen={deckEditorOpen}
+        onClose={handleCloseDeckEditor}
         cardDatabase={cardDatabase}
       />
       <DebugScreen
