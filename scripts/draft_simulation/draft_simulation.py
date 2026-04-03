@@ -45,11 +45,13 @@ class Variant:
         self.decay_factor = overrides.get("decay_factor", 0.85)
         # Tide exclusion
         self.initial_tide_exclusion = overrides.get("initial_tide_exclusion", 2)
-        # Pool bias
+        # Pool bias (physical removal)
         self.featured_tide_count = overrides.get("featured_tide_count", 0)
         self.non_featured_removal_rate = overrides.get(
             "non_featured_removal_rate", 0.30
         )
+        # Pool bias (weight multiplier, no removal)
+        self.featured_weight = overrides.get("featured_weight", 1.0)
 
 
 def load_card_pool():
@@ -110,14 +112,17 @@ def compute_focus(pick_number, variant):
     return f
 
 
-def weighted_sample_indices(pool, affinities, focus, n):
+def weighted_sample_indices(pool, affinities, focus, n, tide_multipliers=None):
     if len(pool) <= n:
         return list(range(len(pool)))
 
     weights = []
     for tide in pool:
         a = affinities.get(tide, 1.0)
-        weights.append(a**focus if focus > 0 else 1.0)
+        w = a**focus if focus > 0 else 1.0
+        if tide_multipliers and tide in tide_multipliers:
+            w *= tide_multipliers[tide]
+        weights.append(w)
 
     selected = []
     remaining_indices = list(range(len(pool)))
@@ -154,9 +159,7 @@ def get_allied_tides(tide):
 
 def classify_pack(pack_tides, dominant_tides, allied_tides):
     dominant = sum(1 for t in pack_tides if t in dominant_tides)
-    allied = sum(
-        1 for t in pack_tides if t in allied_tides and t not in dominant_tides
-    )
+    allied = sum(1 for t in pack_tides if t in allied_tides and t not in dominant_tides)
     neutral = sum(
         1 for t in pack_tides if t == NEUTRAL and NEUTRAL not in dominant_tides
     )
@@ -169,35 +172,42 @@ def classify_pack(pack_tides, dominant_tides, allied_tides):
     }
 
 
-def apply_pool_bias(pool, variant, excluded_tides):
-    """Apply pool bias: remove a fraction of non-featured tide cards.
-
-    Featured tides are always an adjacent pair on the circle.
-    """
-    if variant.featured_tide_count == 0:
-        return pool, []
-
+def pick_featured_tides(excluded_tides):
+    """Pick a random adjacent pair of core tides (both available after exclusion)."""
     available_core = [t for t in CORE_TIDES if t not in excluded_tides]
     if len(available_core) < 2:
-        return pool, []
-
-    # Pick a random adjacent pair (both must be available after exclusion)
+        return []
     attempts = 0
     while attempts < 50:
         t1 = random.choice(available_core)
         idx = CORE_TIDES.index(t1)
         t2 = CORE_TIDES[(idx + 1) % 7]
         if t2 in available_core:
-            featured = [t1, t2]
-            break
+            return [t1, t2]
         t2 = CORE_TIDES[(idx - 1) % 7]
         if t2 in available_core:
-            featured = [t1, t2]
-            break
+            return [t1, t2]
         attempts += 1
-    else:
-        featured = random.sample(available_core, 2)
+    return random.sample(available_core, 2)
 
+
+def apply_pool_bias(pool, variant, excluded_tides):
+    """Apply pool bias: remove a fraction of non-featured tide cards.
+
+    Featured tides are always an adjacent pair on the circle.
+    """
+    if variant.featured_tide_count == 0 and variant.featured_weight <= 1.0:
+        return pool, []
+
+    featured = pick_featured_tides(excluded_tides)
+    if not featured:
+        return pool, []
+
+    # Weight-only bias: no physical removal, just return featured list
+    if variant.featured_tide_count == 0:
+        return pool, featured
+
+    # Physical removal bias
     biased_pool = []
     for tide in pool:
         if tide in featured or tide == NEUTRAL:
@@ -224,6 +234,11 @@ def simulate_draft(
 
     pool, featured_tides = apply_pool_bias(pool, variant, excluded)
 
+    # Build tide multipliers for weighted bias (no physical removal)
+    tide_multipliers = None
+    if featured_tides and variant.featured_weight > 1.0:
+        tide_multipliers = {t: variant.featured_weight for t in featured_tides}
+
     drafted = []
     metrics = []
 
@@ -234,7 +249,9 @@ def simulate_draft(
 
         affinities = compute_affinities(drafted, variant, pick)
         focus = compute_focus(pick, variant)
-        pack_indices = weighted_sample_indices(pool, affinities, focus, PACK_SIZE)
+        pack_indices = weighted_sample_indices(
+            pool, affinities, focus, PACK_SIZE, tide_multipliers
+        )
         pack_tides = [pool[i] for i in pack_indices]
 
         current_dominant = set(dominant_tides_fn(drafted))
@@ -601,10 +618,12 @@ def run_variant(card_pool, variant, num_trials, key_picks, strategies=None):
     print(f"  {variant.name}")
     print(f"  {variant.description}")
     n_exc = variant.initial_tide_exclusion
-    feat = variant.featured_tide_count
-    removal = variant.non_featured_removal_rate
+    fw = variant.featured_weight
+    removal = (
+        variant.non_featured_removal_rate if variant.featured_tide_count > 0 else 0
+    )
     fr = variant.focus_rate
-    print(f"  N={n_exc} | featured={feat} | removal={removal} | focus_rate={fr}")
+    print(f"  N={n_exc} | weight={fw}x | removal={removal} | focus_rate={fr}")
     print(f"{'=' * 70}")
 
     for strat_name, factory_fn in strategies.items():
@@ -625,72 +644,56 @@ def main():
     KEY_PICKS = [1, 3, 5, 7, 10, 15, 20, 25]
 
     variants = [
-        # Baseline: no pool bias
+        # Baseline
         Variant(
-            "BASELINE (no bias)",
-            "Current algorithm: decay=0.85, focus=0.35, N=2",
+            "BASELINE",
+            "Current algorithm: no bias",
         ),
-        # Pool bias sweep: removal rate
+        # Weighted bias sweep: featured_weight multiplier (no physical removal)
         Variant(
-            "BIAS 20%",
-            "Featured pair, 20% non-featured removal",
-            featured_tide_count=2,
-            non_featured_removal_rate=0.20,
-        ),
-        Variant(
-            "BIAS 30%",
-            "Featured pair, 30% non-featured removal",
-            featured_tide_count=2,
-            non_featured_removal_rate=0.30,
+            "WEIGHT 1.5x",
+            "Featured pair gets 1.5x sampling weight",
+            featured_weight=1.5,
         ),
         Variant(
-            "BIAS 40%",
-            "Featured pair, 40% non-featured removal",
-            featured_tide_count=2,
-            non_featured_removal_rate=0.40,
+            "WEIGHT 2.0x",
+            "Featured pair gets 2.0x sampling weight",
+            featured_weight=2.0,
         ),
         Variant(
-            "BIAS 50%",
-            "Featured pair, 50% non-featured removal",
-            featured_tide_count=2,
-            non_featured_removal_rate=0.50,
-        ),
-        # Pool bias replacing N=2: bias + reduced exclusion
-        Variant(
-            "BIAS 30% N=1",
-            "Featured pair 30% removal + only 1 tide excluded",
-            featured_tide_count=2,
-            non_featured_removal_rate=0.30,
-            initial_tide_exclusion=1,
+            "WEIGHT 2.5x",
+            "Featured pair gets 2.5x sampling weight",
+            featured_weight=2.5,
         ),
         Variant(
-            "BIAS 40% N=1",
-            "Featured pair 40% removal + only 1 tide excluded",
-            featured_tide_count=2,
-            non_featured_removal_rate=0.40,
-            initial_tide_exclusion=1,
+            "WEIGHT 3.0x",
+            "Featured pair gets 3.0x sampling weight",
+            featured_weight=3.0,
         ),
         Variant(
-            "BIAS 50% N=1",
-            "Featured pair 50% removal + only 1 tide excluded",
-            featured_tide_count=2,
-            non_featured_removal_rate=0.50,
-            initial_tide_exclusion=1,
+            "WEIGHT 4.0x",
+            "Featured pair gets 4.0x sampling weight",
+            featured_weight=4.0,
         ),
-        # Pool bias with higher focus to compensate
+        # Weighted bias with higher focus
         Variant(
-            "BIAS 40% FR=0.40",
-            "Featured pair 40% removal + focus_rate 0.40",
-            featured_tide_count=2,
-            non_featured_removal_rate=0.40,
+            "WEIGHT 2.5x FR=0.40",
+            "Featured 2.5x + focus_rate 0.40",
+            featured_weight=2.5,
             focus_rate=0.40,
         ),
         Variant(
-            "BIAS 40% FR=0.45",
-            "Featured pair 40% removal + focus_rate 0.45",
+            "WEIGHT 3.0x FR=0.40",
+            "Featured 3.0x + focus_rate 0.40",
+            featured_weight=3.0,
+            focus_rate=0.40,
+        ),
+        # Compare: physical removal 40% vs weight equivalent
+        Variant(
+            "REMOVAL 40% (reference)",
+            "Physical removal for comparison",
             featured_tide_count=2,
             non_featured_removal_rate=0.40,
-            focus_rate=0.45,
         ),
     ]
 
