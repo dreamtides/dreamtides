@@ -32,17 +32,6 @@
           }
         ]
       }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/scripts/hooks/enforce_finalsteps.sh",
-            "timeout": 30
-          }
-        ]
-      }
     ]
   }
 }

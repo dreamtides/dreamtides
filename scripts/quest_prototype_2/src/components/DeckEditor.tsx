@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
 import type { DeckEntry } from "../types/quest";
 import { useQuest } from "../state/quest-context";
-import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { NAMED_TIDES, TIDE_COLORS, tideIconUrl, cardImageUrl } from "../data/card-database";
 import { CardDisplay } from "./CardDisplay";
 import { CardOverlay } from "./CardOverlay";
 import { TRANSFIGURATION_COLORS } from "../transfiguration/transfiguration-logic";
@@ -457,10 +457,14 @@ export function DeckEditor({
                           key={resolved.entry.entryId}
                           className="relative"
                           layout
+                          layoutId={resolved.entry.entryId}
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, x: 50, scale: 0.95 }}
-                          transition={{ duration: 0.15 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{
+                            duration: 0.15,
+                            layout: { duration: 0.35, ease: [0.4, 0, 0.2, 1] },
+                          }}
                         >
                           {/* Transfiguration indicator */}
                           {resolved.entry.transfiguration !== null && (
@@ -584,10 +588,14 @@ export function DeckEditor({
                           <motion.div
                             key={`${String(row.cardNumber)}-${row.transfiguration ?? "none"}-${String(row.isBane)}`}
                             layout
+                            layoutId={row.entryIds[row.entryIds.length - 1]}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -30 }}
-                            transition={{ duration: 0.15 }}
+                            transition={{
+                              duration: 0.15,
+                              layout: { duration: 0.35, ease: [0.4, 0, 0.2, 1] },
+                            }}
                           >
                             <DeckListRow
                               row={row}
@@ -667,7 +675,7 @@ function DeckListRow({
 
   return (
     <button
-      className="mb-1 flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-left transition-all"
+      className="relative mb-1 flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-3 py-2 text-left transition-all"
       style={{
         background: `linear-gradient(90deg, ${tideColor}20 0%, rgba(10, 6, 18, 0.8) 70%)`,
         borderLeft: `3px solid ${tideColor}80`,
@@ -681,17 +689,30 @@ function DeckListRow({
         onRightClick();
       }}
     >
+      {/* Card art crop (Hearthstone-style background) */}
+      <img
+        src={cardImageUrl(row.cardNumber)}
+        alt=""
+        className="pointer-events-none absolute top-0 right-0 h-full object-cover"
+        style={{
+          width: "45%",
+          maskImage: "linear-gradient(to right, transparent 0%, black 60%)",
+          WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 60%)",
+          opacity: 0.35,
+        }}
+      />
+
       {/* Tide icon */}
       <img
         src={tideIconUrl(row.card.tide)}
         alt={row.card.tide}
-        className="h-4 w-4 shrink-0 rounded-full"
+        className="relative z-10 h-4 w-4 shrink-0 rounded-full"
         style={{ border: `1px solid ${tideColor}60` }}
       />
 
       {/* Card name */}
       <span
-        className="min-w-0 flex-1 truncate text-xs font-medium"
+        className="relative z-10 min-w-0 flex-1 truncate text-xs font-medium"
         style={{ color: "#e2e8f0" }}
       >
         {row.card.name}
@@ -700,7 +721,7 @@ function DeckListRow({
       {/* Transfiguration badge */}
       {row.transfiguration !== null && (
         <span
-          className="shrink-0 rounded-full px-1 py-0.5 text-[8px] font-bold"
+          className="relative z-10 shrink-0 rounded-full px-1 py-0.5 text-[8px] font-bold"
           style={{
             background: TRANSFIGURATION_COLORS[row.transfiguration],
             color: "#fff",
@@ -712,7 +733,7 @@ function DeckListRow({
 
       {/* Bane indicator */}
       {row.isBane && (
-        <span className="shrink-0 text-[10px]" style={{ color: "#ef4444" }}>
+        <span className="relative z-10 shrink-0 text-[10px]" style={{ color: "#ef4444" }}>
           {"\u2620"}
         </span>
       )}
@@ -720,7 +741,7 @@ function DeckListRow({
       {/* Count badge */}
       {row.count > 1 && (
         <span
-          className="shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-bold"
+          className="relative z-10 shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-bold"
           style={{
             background: `${tideColor}30`,
             color: tideColor,
@@ -732,7 +753,7 @@ function DeckListRow({
 
       {/* Energy cost */}
       <span
-        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold"
+        className="relative z-10 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold"
         style={{
           background: "rgba(251, 191, 36, 0.2)",
           color: "#fbbf24",
