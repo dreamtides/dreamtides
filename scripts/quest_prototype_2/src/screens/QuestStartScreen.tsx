@@ -1,0 +1,105 @@
+import { useCallback } from "react";
+import { motion } from "framer-motion";
+import { useQuest } from "../state/quest-context";
+import { generateInitialAtlas } from "../atlas/atlas-generator";
+import { NAMED_TIDES } from "../data/card-database";
+import { DREAMSIGNS } from "../data/dreamsigns";
+import { logEvent } from "../logging";
+import { useQuestConfig } from "../state/quest-config";
+import type { Tide } from "../types/cards";
+
+/** Selects N random core tides to exclude (never Neutral). */
+function selectExcludedTides(count: number): Tide[] {
+  if (count <= 0) return [];
+  const pool = [...NAMED_TIDES];
+  const excluded: Tide[] = [];
+  for (let i = 0; i < count && pool.length > 0; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    excluded.push(pool[idx]);
+    pool.splice(idx, 1);
+  }
+  return excluded;
+}
+
+/** Intro screen with dark fantasy styling and "Begin Quest" button. */
+export function QuestStartScreen() {
+  const { state, mutations, cardDatabase } = useQuest();
+  const config = useQuestConfig();
+
+  const handleBeginQuest = useCallback(() => {
+    const excludedTides = selectExcludedTides(config.excludedTideCount);
+    mutations.setExcludedTides(excludedTides);
+
+    const playerHasBanes =
+      state.deck.some((e) => e.isBane) ||
+      state.dreamsigns.some((d) => d.isBane);
+    const atlas = generateInitialAtlas(state.completionLevel, {
+      cardDatabase,
+      dreamsignPool: DREAMSIGNS,
+      playerHasBanes,
+      excludedTides,
+    });
+    const nodeCount = Object.keys(atlas.nodes).length - 1; // subtract nexus
+
+    logEvent("quest_started", {
+      initialEssence: state.essence,
+      dreamscapesGenerated: nodeCount,
+      excludedTides,
+    });
+
+    mutations.updateAtlas(atlas);
+    mutations.setScreen({ type: "atlas" });
+  }, [state.completionLevel, state.essence, state.deck, state.dreamsigns, mutations, cardDatabase, config.excludedTideCount]);
+
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center px-4">
+      <motion.h1
+        className="mb-2 text-center text-5xl font-extrabold tracking-wide md:text-7xl lg:text-8xl"
+        style={{
+          background: "linear-gradient(135deg, #a855f7 0%, #7c3aed 40%, #c084fc 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          textShadow: "0 0 60px rgba(168, 85, 247, 0.4), 0 0 120px rgba(124, 58, 237, 0.2)",
+          filter: "drop-shadow(0 0 40px rgba(168, 85, 247, 0.3))",
+        }}
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
+        Dreamtides
+      </motion.h1>
+
+      <motion.p
+        className="mb-10 text-center text-lg opacity-60 md:text-xl"
+        style={{ color: "#e2e8f0" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.6 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
+      >
+        A Roguelike Deckbuilding Quest
+      </motion.p>
+
+      <motion.button
+        className="cursor-pointer rounded-lg px-10 py-4 text-lg font-bold tracking-wide text-white transition-colors md:text-xl"
+        style={{
+          background: "linear-gradient(135deg, #d4a017 0%, #b8860b 100%)",
+          border: "2px solid rgba(251, 191, 36, 0.6)",
+          boxShadow:
+            "0 0 20px rgba(212, 160, 23, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
+        }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
+        whileHover={{
+          boxShadow:
+            "0 0 30px rgba(212, 160, 23, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+          scale: 1.05,
+        }}
+        whileTap={{ scale: 0.97 }}
+        onClick={handleBeginQuest}
+      >
+        Begin Quest
+      </motion.button>
+    </div>
+  );
+}

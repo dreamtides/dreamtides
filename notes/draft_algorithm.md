@@ -8,14 +8,12 @@ chosen tides appear more often, and distant tides fade away."
 ## Overview
 
 The draft shows 4 cards at a time. The player picks 1 card to add to their deck;
-all 4 cards leave the pool permanently. Three mechanisms shape which cards appear:
+all 4 cards leave the pool permanently. Two mechanisms shape which cards appear:
 
 1. **Initial Tide Exclusion** -- at quest start, entire tides are removed from
    the pool
 2. **Tide Current** -- each pack is drawn with weights that increasingly favor
    the player's recent draft choices
-3. **Pack Coherence** -- early packs are themed around a single tide, making
-   signals easier to read
 
 ## Mechanism 1: Initial Tide Exclusion
 
@@ -133,17 +131,17 @@ pick number.
 focus = max(0, (pick_number - 2) * FOCUS_RATE)
 ```
 
-**FOCUS_RATE = 0.40**
+**FOCUS_RATE = 0.35**
 
 | Pick | Focus | Effect                        |
 |------|-------|-------------------------------|
 | 1-2  | 0.00  | Fully random                  |
-| 3    | 0.40  | Barely perceptible bias       |
-| 5    | 1.20  | Noticeable tilt               |
-| 8    | 2.40  | Strong preference             |
-| 10   | 3.20  | Dominant tide ~50% of packs   |
-| 15   | 5.20  | Dominant tide ~75% of packs   |
-| 20   | 7.20  | Stabilized, very concentrated |
+| 3    | 0.35  | Barely perceptible bias       |
+| 5    | 1.05  | Noticeable tilt               |
+| 8    | 2.10  | Strong preference             |
+| 10   | 2.80  | Dominant tide ~50% of packs   |
+| 15   | 4.55  | Dominant tide ~75% of packs   |
+| 20   | 6.30  | Stabilized, very concentrated |
 
 ### Step 3: Compute Card Weights
 
@@ -161,85 +159,27 @@ high-affinity tides are exponentially amplified relative to low-affinity tides.
 Sample 4 cards from the pool without replacement, probability proportional to
 weight. Present them to the player. The player picks 1; all 4 cards leave the
 pool permanently (the 3 unpicked cards are discarded).
-S
-## Mechanism 3: Pack Coherence
-
-Early in the draft (picks 1-8), focus is low and packs are drawn nearly at
-random. Without intervention, each pack contains cards from 3-4 different tides,
-making it hard for the player to read signals about which tides are available.
-Pack coherence addresses this by giving early packs a consistent theme.
-
-### How It Works
-
-When generating a pack during picks 1 through **COHERENCE_END_PICK**:
-
-1. Draw card 1 normally (weighted by affinity^focus).
-2. For each of cards 2, 3, and 4: with probability **COHERENCE_PROB**, draw from
-   the same tide as card 1 (uniform random among that tide's remaining pool
-   cards). Otherwise, draw normally (weighted).
-
-**COHERENCE_PROB = 0.35** -- each additional slot has a 35% chance of matching
-card 1's tide.
-
-**COHERENCE_END_PICK = 8** -- coherence is active for picks 1-8 only. After
-pick 8, focus is high enough (~2.4) to naturally cluster packs around the
-player's dominant tide, so coherence is no longer needed.
-
-### Effect on Pack Composition
-
-During picks 1-8, the expected number of cards sharing the most common tide in a
-pack is ~2.5 (vs ~1.8 without coherence). This means early packs typically
-contain 2-3 cards of one tide plus 1-2 others, creating a clear "this pack is
-about Bloom" signal rather than "4 random tides."
-
-### Why Early-Only
-
-Applying coherence for the entire draft slows late-game convergence: when a pack
-has 3 cards of an unwanted tide, all 3 leave the pool -- wasting cards that could
-have been useful. Limiting coherence to picks 1-8 provides readability when it
-matters most (the discovery phase) while letting the focus-based weighting handle
-the commitment phase. Monte Carlo simulation confirmed that early-only coherence
-recovers near-baseline convergence while keeping readable early packs.
 
 ## Expected Behavior
 
 The following tables are derived from Monte Carlo simulation against the real
-582-card pool (2,000+ trials per scenario). The simulation code is at
+582-card pool (5,000+ trials per scenario). The simulation code is at
 `scripts/draft_simulation/draft_simulation.py`.
 
 ### Mono-Tide Player (consistently picks one tide)
 
 | Pick | Dominant | Allied | Neutral | Distant | Pool | P(>=1) | P(>=2) | P(>=3) |
 |------|----------|--------|---------|---------|------|--------|--------|--------|
-| 1    | 0.50     | 0.90   | 0.71    | 1.89    | 437  | 0.30   | 0.12   | 0.07   |
-| 5    | 0.91     | 0.97   | 0.52    | 1.61    | 421  | 0.52   | 0.25   | 0.12   |
-| 10   | 1.84     | 1.01   | 0.34    | 0.81    | 401  | 0.85   | 0.61   | 0.31   |
-| 15   | 2.85     | 0.66   | 0.18    | 0.31    | 381  | 0.93   | 0.85   | 0.70   |
-| 20   | 3.27     | 0.40   | 0.14    | 0.18    | 361  | 0.94   | 0.90   | 0.83   |
-| 25   | 3.27     | 0.37   | 0.21    | 0.16    | 341  | 0.92   | 0.88   | 0.83   |
+| 1    | 0.67     | 0.86   | 0.71    | 1.76    | 437  | 0.53   | 0.13   | 0.02   |
+| 5    | 1.00     | 0.99   | 0.55    | 1.46    | 421  | 0.67   | 0.26   | 0.06   |
+| 10   | 2.15     | 0.96   | 0.37    | 0.53    | 382  | 0.93   | 0.73   | 0.38   |
+| 15   | 3.14     | 0.56   | 0.20    | 0.10    | 310  | 0.98   | 0.95   | 0.80   |
+| 20   | 3.53     | 0.31   | 0.11    | 0.05    | 236  | 0.99   | 0.98   | 0.93   |
+| 25   | 3.54     | 0.29   | 0.13    | 0.04    | 206  | 0.98   | 0.97   | 0.93   |
 
-Hits convergence targets: ~1 at pick 5, ~2 at pick 10, ~3 at pick 15. Early
-packs (picks 1-7) have pack coherence ~2.5 (average max same-tide count),
-meaning most packs show 2-3 cards of one tide.
-
-### Signal Reader (reads pack signals, commits around pick 8)
-
-This models a player who takes the best available card early, reads which tides
-appear most often, and gradually commits:
-
-| Pick | Dominant | Allied | Neutral | Distant | Pool | P(>=1) | P(>=2) | P(>=3) |
-|------|----------|--------|---------|---------|------|--------|--------|--------|
-| 1    | 0.47     | 0.94   | 0.67    | 1.92    | 437  | 0.29   | 0.12   | 0.05   |
-| 5    | 1.01     | 0.99   | 0.47    | 1.53    | 421  | 0.56   | 0.29   | 0.13   |
-| 10   | 2.25     | 1.10   | 0.29    | 0.36    | 401  | 0.96   | 0.76   | 0.42   |
-| 15   | 3.33     | 0.50   | 0.14    | 0.03    | 381  | 1.00   | 0.98   | 0.86   |
-| 20   | 3.68     | 0.26   | 0.06    | 0.00    | 361  | 1.00   | 1.00   | 0.96   |
-| 25   | 3.40     | 0.39   | 0.21    | 0.00    | 341  | 0.96   | 0.94   | 0.87   |
-
-The signal reader converges slightly faster than the mono-tide player because
-they naturally gravitate toward tides that are well-represented in the pool.
-Pack coherence amplifies this: themed packs make it easy to identify which tides
-are available within the first 3-5 picks.
+Hits the convergence targets: ~1 at pick 5, ~2 at pick 10, ~3 at pick 15. The
+system stabilizes around 3.5/4 in the late draft, leaving consistent room for
+allied/neutral splash cards.
 
 ### Pivot Scenario (switch tide at pick 8)
 
@@ -248,17 +188,18 @@ column tracks the post-pivot tide B:
 
 | Pick | Dominant | Allied | Neutral | Distant | Pool | P(>=1) | P(>=2) | P(>=3) |
 |------|----------|--------|---------|---------|------|--------|--------|--------|
-| 5    | 0.71     | 0.98   | 0.55    | 1.76    | 421  | 0.42   | 0.19   | 0.09   |
-| 10   | 0.89     | 0.92   | 0.33    | 1.85    | 401  | 0.51   | 0.25   | 0.11   |
-| 15   | 1.77     | 0.71   | 0.19    | 1.32    | 381  | 0.65   | 0.54   | 0.39   |
-| 20   | 2.26     | 0.46   | 0.13    | 1.16    | 361  | 0.67   | 0.63   | 0.57   |
-| 25   | 2.41     | 0.33   | 0.16    | 1.10    | 341  | 0.67   | 0.65   | 0.62   |
+| 5    | 0.61     | 0.83   | 0.56    | 2.00    | 421  | 0.49   | 0.11   | 0.01   |
+| 10   | 0.50     | 0.72   | 0.35    | 2.43    | 384  | 0.34   | 0.12   | 0.03   |
+| 12   | 0.74     | 0.71   | 0.29    | 2.26    | 364  | 0.41   | 0.22   | 0.10   |
+| 15   | 1.19     | 0.59   | 0.22    | 2.00    | 326  | 0.48   | 0.38   | 0.25   |
+| 18   | 1.58     | 0.43   | 0.15    | 1.84    | 286  | 0.51   | 0.46   | 0.39   |
+| 20   | 1.74     | 0.34   | 0.12    | 1.80    | 263  | 0.52   | 0.50   | 0.45   |
+| 25   | 1.93     | 0.22   | 0.15    | 1.70    | 227  | 0.53   | 0.52   | 0.50   |
 
-Pivoting is costly but more viable than before. The new tide reaches ~1.8
-cards per pack by pick 15 (7 picks after the switch) and ~2.4 by pick 25. The
-combination of recency decay and early-only coherence helps pivots: coherence
-stops at pick 8 (right when the pivot happens), so the new tide isn't fighting
-against coherent packs themed around the old tide.
+Pivoting is costly but viable. The new tide reaches ~1.2 cards per pack by pick
+15 (7 picks after the switch) and approaches ~1.9 by pick 25. Without the
+recency decay, these numbers are significantly worse (0.84 at pick 15, 1.19 at
+pick 20) -- the old tide's affinity dominates indefinitely.
 
 ## Tide Circle Distance Reference
 
@@ -316,7 +257,7 @@ All parameters are configured in TOML.
 | `initial_tide_exclusion`     | 2       | Number of core tides removed at quest start          |
 | `base_affinity`              | 1.0     | Minimum affinity for any tide                        |
 | `focus_start_pick`           | 3       | First pick where focus > 0                           |
-| `focus_rate`                 | 0.40    | Focus increase per pick after focus_start_pick       |
+| `focus_rate`                 | 0.35    | Focus increase per pick after focus_start_pick       |
 | `decay_factor`               | 0.85    | Recency decay per pick position (1.0 = no decay)    |
 | `ally_similarity`            | 0.5     | Affinity contribution from allied-tide drafted cards |
 | `distance_2_similarity`      | 0.15    | Affinity contribution from distance-2 drafted cards  |
@@ -324,8 +265,6 @@ All parameters are configured in TOML.
 | `neutral_draft_contribution` | 0.4     | Affinity added to all tides per Neutral card drafted |
 | `neutral_affinity_factor`    | 0.5     | Neutral's affinity as fraction of highest core tide  |
 | `pack_size`                  | 4       | Number of cards shown per pick                       |
-| `coherence_prob`             | 0.35    | Probability each card 2-4 matches card 1's tide      |
-| `coherence_end_pick`         | 8       | Last pick where pack coherence is active             |
 
 ## Design Rationale
 
@@ -368,29 +307,6 @@ Decay does not hurt mono-tide convergence because a committed player keeps
 drafting the same tide, continuously refreshing its affinity. The system hits
 1.0/2.15/3.14 dominant cards at picks 5/10/15 with or without decay.
 
-### Why early-only pack coherence?
-
-Without coherence, early packs are effectively random -- 4 cards from 3-4
-different tides. This makes the first 5-7 picks feel scattered ("pick 1 is
-storm, pick 2 is self-discard, pick 3 is flicker"). The player can't identify a
-clear signal about what's available, which incentivizes the degenerate strategy of
-hard-committing to a tide from pick 1 regardless of what's offered.
-
-Pack coherence solves this by giving each early pack a theme: 2-3 cards of one
-tide. The player can evaluate "is this a Bloom pack for me?" rather than parsing
-4 unrelated cards. The coherent tide rotates naturally based on pool composition,
-giving the player something to read.
-
-Coherence is limited to picks 1-8 because:
-
-1. After pick 8, focus is high enough (~2.4) to naturally cluster packs around
-   the player's dominant tide. Coherence becomes redundant.
-2. Always-on coherence causes convergence regression: when a pack has 3 unwanted
-   cards of one tide, all 3 leave the pool, wasting cards that could have been
-   useful. Early-only avoids this in the critical late-draft phase.
-3. Pivoting benefits: a player who switches tides at pick 8 doesn't face coherent
-   packs themed around their old tide. The transition is smoother.
-
 ### Why no pool trimming?
 
 An earlier version of this algorithm included a "pool trimming" mechanism that
@@ -416,66 +332,38 @@ approach produces soft, continuous affinity that naturally handles:
 Parameters were validated via Monte Carlo simulation against the real 582-card
 pool. The simulation code is at `scripts/draft_simulation/draft_simulation.py`.
 
-### Pack coherence sweep
+### Variants tested
 
-Pack coherence was the primary improvement over the original algorithm. The key
-finding: early packs feel random (coherence ~1.8, meaning 4 different tides)
-because focus is near zero for picks 1-5. Coherence directly addresses this by
-theming packs around a single tide.
+Eight algorithmic variants were compared on mono-tide convergence and pivot
+recovery (5,000 mono-tide trials, 2,000 pivot trials each):
 
-**Coherence probability sweep** (mono-tide dominant at pick 15):
+| Variant                     | P5 Dom | P10 Dom | P15 Dom | P15 Pivot | P20 Pivot |
+|-----------------------------|--------|---------|---------|-----------|-----------|
+| Baseline (focus=0.35)       | 1.03   | 2.16    | 3.10    | 0.84      | 1.19      |
+| Focus cap at 3.5            | 0.98   | 2.18    | 2.68    | 0.72      | 0.93      |
+| Sqrt affinity               | 0.93   | 1.61    | 2.37    | 0.92      | 1.30      |
+| Sqrt + focus 0.50           | 1.07   | 2.12    | 2.98    | 0.90      | 1.28      |
+| **Decay 0.85 (chosen)**     | 1.00   | 2.15    | 3.14    | 1.19      | 1.74      |
+| Decay 0.90 + focus 0.40     | 1.07   | 2.39    | 3.34    | 1.11      | 1.52      |
+| Guaranteed off-tide slot    | 0.82   | 1.79    | 2.44    | 0.51      | 0.69      |
+| No trimming                 | 1.00   | 2.13    | 3.09    | 0.83      | 1.21      |
 
-| Coherence | Cohr@1-5 | Mono@15 | Signal@15 | Pivot@15 |
-|-----------|----------|---------|-----------|----------|
-| 0 (off)   | 1.8      | 2.75    | 3.17      | 1.52     |
-| 0.15      | 2.1      | 2.67    | 3.12      | 1.50     |
-| 0.25      | 2.3      | 2.58    | 3.04      | 1.51     |
-| 0.35      | 2.5      | 2.50    | 3.01      | 1.43     |
-| 0.45      | 2.7      | 2.33    | 2.89      | 1.38     |
+### Key findings
 
-Always-on coherence trades readability for convergence speed (~0.05 dominant per
-0.05 coherence step). Limiting coherence to early picks eliminates this tradeoff:
-
-**Early-only coherence** (coherence=0.35, active until pick N):
-
-| End Pick | Mono@15 | Signal@15 | Pivot@15 |
-|----------|---------|-----------|----------|
-| 5        | 2.72    | 3.15      | 1.62     |
-| **8**    | **2.59** | **3.10** | **1.73** |
-| 10       | 2.61    | 3.05      | 1.60     |
-| always   | 2.50    | 3.01      | 1.43     |
-
-END@8 is the sweet spot: coherence stops right when focus takes over, and pivot
-viability actually *improves* because the pivoter isn't fighting coherent packs
-themed around their old tide.
-
-**Focus rate compensation**: raising focus_rate from 0.35 to 0.40 fully recovers
-the small convergence cost of coherence:
-
-| Variant                  | Mono@15 | Signal@15 | Pivot@15 |
-|--------------------------|---------|-----------|----------|
-| No coherence, FR=0.35    | 2.75    | 3.17      | 1.52     |
-| **COHR=0.35 END@8 FR=0.40** | **2.85** | **3.33** | **1.77** |
-
-The chosen configuration is strictly better than the original on every metric.
-
-### Earlier variant testing
-
-Eight algorithmic variants were compared before coherence was added (5,000 trials
-each). Key findings that informed the final design:
-
-- **Pool trimming has no effect.** Removed from the algorithm.
-- **Decay 0.85 is essential for pivot viability** (1.19 dominant at pick 15
-  post-pivot vs 0.84 without decay).
-- **Focus cap causes regression.** Weights stop concentrating while the pool
-  still shrinks.
+- **Pool trimming has no effect.** Baseline and no-trimming variants are
+  statistically identical. Removed from the algorithm.
+- **Decay 0.85 is the best pivot fix** without hurting mono-tide convergence.
+  It's the only variant that reaches 1.19 dominant at pick 15 post-pivot (vs
+  0.84 baseline). The improvement comes entirely from the old tide's influence
+  fading.
+- **Focus cap causes regression.** After the cap point, the pool shrinks
+  physically but the weights stop concentrating, causing dominant tide frequency
+  to drop in the late draft.
+- **Sqrt affinity converges too slowly** at the default focus rate. Compensating
+  with a higher rate (0.50) works but adds complexity for marginal benefit over
+  decay.
 - **Guaranteed off-tide slot kills convergence.** Forcing 1 of 4 cards to be
-  non-dominant prevents reaching the 3/4 target.
-- **Pool bias** (removing 30% of non-featured tide cards) creates readable
-  signals but hurts non-featured-tide drafters. Not adopted as a standalone
-  mechanism.
-- **Jumpstart** (minimum focus of 0.3) has negligible effect -- focus 0.3 on
-  near-identical affinities produces near-identical weights.
+  non-dominant makes it impossible to reach the 3/4 target.
 
 ### Neutral affinity fix
 

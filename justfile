@@ -786,6 +786,14 @@ quest-dev:
     open http://localhost:5173 &
     npx vite
 
+quest-dev-2:
+    #!/usr/bin/env bash
+    cd scripts/quest_prototype_2
+    npm install
+    npm run setup-assets
+    open http://localhost:5173 &
+    npx vite
+
 qs-typecheck:
     cd scripts/quest_prototype && npm run typecheck
 
