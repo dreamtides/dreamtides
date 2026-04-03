@@ -792,12 +792,12 @@ quest-dev:
     open http://localhost:5173 &
     exec npx vite --port 5173 --strictPort
 
-quest-dev-2:
+constructed-quest-dev:
     #!/usr/bin/env bash
     set -euo pipefail
     lsof -ti:5173 | xargs kill 2>/dev/null || true
     sleep 0.5
-    cd scripts/quest_prototype_2
+    cd scripts/constructed_quest_prototype
     npm install
     npm run setup-assets
     open http://localhost:5173 &

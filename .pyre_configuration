@@ -8,6 +8,7 @@
   "exclude": [
     "**/venv/**",
     "**/.venv/**",
-    "**/site-packages/**"
+    "**/site-packages/**",
+    ".*/quest_simulation/.*"
   ]
 }
