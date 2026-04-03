@@ -1,11 +1,30 @@
 import type { CardData, Tide } from "../types/cards";
-import type { DraftConfig, DraftState } from "../types/draft";
+import type { DraftConfig, DraftState, PackContext, PackStrategy } from "../types/draft";
 import { NAMED_TIDES } from "../data/card-database";
 import { logEvent } from "../logging";
 
-/** Default configuration for the Tide Current draft algorithm. */
+/** Default shared draft configuration. */
 export const DEFAULT_DRAFT_CONFIG: Readonly<DraftConfig> = {
   packSize: 4,
+};
+
+/** Number of player picks per draft site visit. */
+export const SITE_PICKS = 5;
+
+/** Internal configuration for the Tide Current algorithm. */
+interface TideCurrentConfig {
+  baseAffinity: number;
+  focusStartPick: number;
+  focusRate: number;
+  decayFactor: number;
+  allySimilarity: number;
+  distance2Similarity: number;
+  distance3Similarity: number;
+  neutralDraftContribution: number;
+  neutralAffinityFactor: number;
+}
+
+const TIDE_CURRENT_CONFIG: Readonly<TideCurrentConfig> = {
   baseAffinity: 1.0,
   focusStartPick: 3,
   focusRate: 0.35,
@@ -16,9 +35,6 @@ export const DEFAULT_DRAFT_CONFIG: Readonly<DraftConfig> = {
   neutralDraftContribution: 0.4,
   neutralAffinityFactor: 0.5,
 };
-
-/** Number of player picks per draft site visit. */
-export const SITE_PICKS = 5;
 
 /** Tide ordering for display sorting. */
 const TIDE_ORDER: Readonly<Record<string, number>> = {
@@ -50,7 +66,7 @@ function tideCircleDistance(a: string, b: string): number {
 }
 
 /** Returns circle similarity for a given distance. */
-function circleSimilarity(dist: number, config: DraftConfig): number {
+function circleSimilarity(dist: number, config: TideCurrentConfig): number {
   switch (dist) {
     case 0: return 1.0;
     case 1: return config.allySimilarity;
@@ -67,7 +83,7 @@ function circleSimilarity(dist: number, config: DraftConfig): number {
 export function computeTideAffinity(
   draftedCards: number[],
   cardDatabase: Map<number, CardData>,
-  config: DraftConfig = DEFAULT_DRAFT_CONFIG,
+  config: TideCurrentConfig = TIDE_CURRENT_CONFIG,
 ): Map<string, number> {
   const affinity = new Map<string, number>();
   for (const tide of NAMED_TIDES) {
@@ -121,7 +137,7 @@ export function computeTideAffinity(
 /** Compute focus value for a given pick number. */
 export function computeFocus(
   pickNumber: number,
-  config: DraftConfig = DEFAULT_DRAFT_CONFIG,
+  config: TideCurrentConfig = TIDE_CURRENT_CONFIG,
 ): number {
   return Math.max(0, (pickNumber - config.focusStartPick) * config.focusRate);
 }
@@ -146,29 +162,14 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 /**
- * Draw a pack of cards from the pool using weighted sampling without
- * replacement. Cards are sampled proportional to their affinity-based weight.
+ * Sample cards from weighted entries without replacement.
+ * Returns the selected card numbers.
  */
-export function drawPack(
-  pool: number[],
-  cardDatabase: Map<number, CardData>,
-  draftedCards: number[],
-  pickNumber: number,
-  config: DraftConfig = DEFAULT_DRAFT_CONFIG,
+function weightedSample(
+  entries: Array<{ cardNumber: number; weight: number }>,
+  count: number,
 ): number[] {
-  const affinity = computeTideAffinity(draftedCards, cardDatabase, config);
-  const focus = computeFocus(pickNumber, config);
-
-  // Build weighted entries for the pool
-  const entries: Array<{ cardNumber: number; weight: number }> = [];
-  for (const cardNumber of pool) {
-    const card = cardDatabase.get(cardNumber);
-    if (!card) continue;
-    entries.push({ cardNumber, weight: computeCardWeight(card, affinity, focus) });
-  }
-
-  // Sample packSize cards without replacement, proportional to weight
-  const packSize = Math.min(config.packSize, entries.length);
+  const packSize = Math.min(count, entries.length);
   const selected: number[] = [];
 
   for (let i = 0; i < packSize; i++) {
@@ -190,6 +191,74 @@ export function drawPack(
   }
 
   return selected;
+}
+
+/** Generate a pack using the Tide Current algorithm (affinity^focus weighting). */
+function tideCurrentPack(ctx: PackContext): number[] {
+  const affinity = computeTideAffinity(ctx.draftedCards, ctx.cardDatabase);
+  const focus = computeFocus(ctx.pickNumber);
+
+  const entries: Array<{ cardNumber: number; weight: number }> = [];
+  for (const cardNumber of ctx.pool) {
+    const card = ctx.cardDatabase.get(cardNumber);
+    if (!card) continue;
+    entries.push({ cardNumber, weight: computeCardWeight(card, affinity, focus) });
+  }
+
+  return weightedSample(entries, ctx.packSize);
+}
+
+/** Generate a pack using Tide Current + pool bias for featured tides. */
+function poolBiasPack(
+  strategy: Extract<PackStrategy, { type: "pool_bias" }>,
+  ctx: PackContext,
+): number[] {
+  const affinity = computeTideAffinity(ctx.draftedCards, ctx.cardDatabase);
+  const focus = computeFocus(ctx.pickNumber);
+  const featuredSet = new Set<string>(strategy.featuredTides);
+
+  const entries: Array<{ cardNumber: number; weight: number }> = [];
+  for (const cardNumber of ctx.pool) {
+    const card = ctx.cardDatabase.get(cardNumber);
+    if (!card) continue;
+    let weight = computeCardWeight(card, affinity, focus);
+    if (featuredSet.has(card.tide)) {
+      weight *= strategy.featuredWeight;
+    }
+    entries.push({ cardNumber, weight });
+  }
+
+  return weightedSample(entries, ctx.packSize);
+}
+
+/** Generate a pack of cards using the given strategy. */
+export function generatePack(strategy: PackStrategy, ctx: PackContext): number[] {
+  switch (strategy.type) {
+    case "tide_current":
+      return tideCurrentPack(ctx);
+    case "pool_bias":
+      return poolBiasPack(strategy, ctx);
+  }
+}
+
+/**
+ * Select 2 adjacent tides on the tide circle from the available tides.
+ * Returns the pair, or an empty array if fewer than 2 adjacent tides are available.
+ */
+export function selectFeaturedTides(availableTides: Tide[]): Tide[] {
+  const availableSet = new Set<string>(availableTides);
+  const pairs: [Tide, Tide][] = [];
+
+  for (let i = 0; i < TIDE_CIRCLE_ORDER.length; i++) {
+    const a = TIDE_CIRCLE_ORDER[i];
+    const b = TIDE_CIRCLE_ORDER[(i + 1) % TIDE_CIRCLE_ORDER.length];
+    if (availableSet.has(a) && availableSet.has(b)) {
+      pairs.push([a as Tide, b as Tide]);
+    }
+  }
+
+  if (pairs.length === 0) return [];
+  return pairs[Math.floor(Math.random() * pairs.length)];
 }
 
 /** Sort an array of cards by tide order without mutating the original. */
@@ -223,6 +292,7 @@ function countByTide(
 export function initializeDraftState(
   cardDatabase: Map<number, CardData>,
   excludedTides: Tide[],
+  poolBias: boolean = false,
 ): DraftState {
   const excludedSet = new Set(excludedTides);
   const pool = Array.from(cardDatabase.keys()).filter((cardNum) => {
@@ -230,10 +300,20 @@ export function initializeDraftState(
     return card !== undefined && !excludedSet.has(card.tide);
   });
 
+  const availableTides = NAMED_TIDES.filter((t) => !excludedSet.has(t));
+  let packStrategy: PackStrategy;
+  if (poolBias) {
+    const featuredTides = selectFeaturedTides(availableTides);
+    packStrategy = { type: "pool_bias", featuredTides, featuredWeight: 2.0 };
+  } else {
+    packStrategy = { type: "tide_current" };
+  }
+
   logEvent("draft_pool_initialized", {
     poolSize: pool.length,
     excludedTides,
     cardCountByTide: countByTide(pool, cardDatabase),
+    packStrategy,
   });
 
   return {
@@ -242,6 +322,7 @@ export function initializeDraftState(
     currentPack: [],
     pickNumber: 1,
     sitePicksCompleted: 0,
+    packStrategy,
   };
 }
 
@@ -252,13 +333,13 @@ export function enterDraftSite(
   config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): void {
   state.sitePicksCompleted = 0;
-  state.currentPack = drawPack(
-    state.pool,
+  state.currentPack = generatePack(state.packStrategy, {
+    pool: state.pool,
     cardDatabase,
-    state.draftedCards,
-    state.pickNumber,
-    config,
-  );
+    draftedCards: state.draftedCards,
+    pickNumber: state.pickNumber,
+    packSize: config.packSize,
+  });
 
   logEvent("draft_site_entered", {
     pickNumber: state.pickNumber,
@@ -316,13 +397,13 @@ export function processPlayerPick(
   }
 
   // Draw the next pack
-  state.currentPack = drawPack(
-    state.pool,
+  state.currentPack = generatePack(state.packStrategy, {
+    pool: state.pool,
     cardDatabase,
-    state.draftedCards,
-    state.pickNumber,
-    config,
-  );
+    draftedCards: state.draftedCards,
+    pickNumber: state.pickNumber,
+    packSize: config.packSize,
+  });
 
   return false;
 }

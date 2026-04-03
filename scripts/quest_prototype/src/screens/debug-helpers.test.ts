@@ -32,6 +32,7 @@ function makeDraftState(
     currentPack: [],
     pickNumber,
     sitePicksCompleted: 0,
+    packStrategy: { type: "tide_current" },
   };
 }
 

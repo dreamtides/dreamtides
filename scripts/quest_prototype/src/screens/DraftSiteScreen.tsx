@@ -148,7 +148,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
 
     let ds = state.draftState;
     if (ds === null) {
-      ds = initializeDraftState(cardDatabase, state.excludedTides);
+      ds = initializeDraftState(cardDatabase, state.excludedTides, questConfig.poolBias);
     }
 
     // Deep clone to avoid mutating React state directly

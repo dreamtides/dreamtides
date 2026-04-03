@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { resetLog, getLogEntries } from "../logging";
 import type { CardData, Tide } from "../types/cards";
+import type { PackStrategy } from "../types/draft";
 import {
   initializeDraftState,
   enterDraftSite,
@@ -10,7 +11,8 @@ import {
   sortCardsByTide,
   computeTideAffinity,
   computeFocus,
-  drawPack,
+  generatePack,
+  selectFeaturedTides,
   SITE_PICKS,
 } from "./draft-engine";
 
@@ -71,6 +73,7 @@ describe("initializeDraftState", () => {
     expect(state.draftedCards).toEqual([]);
     expect(state.pickNumber).toBe(1);
     expect(state.sitePicksCompleted).toBe(0);
+    expect(state.packStrategy.type).toBe("tide_current");
   });
 
   it("excludes specified tides from pool", () => {
@@ -104,6 +107,22 @@ describe("initializeDraftState", () => {
     );
     expect(initEvent).toBeDefined();
     expect((initEvent as Record<string, unknown>).poolSize).toBe(40);
+  });
+
+  it("uses tide_current strategy by default", () => {
+    const db = buildEvenDB(10);
+    const state = initializeDraftState(db, []);
+    expect(state.packStrategy).toEqual({ type: "tide_current" });
+  });
+
+  it("uses pool_bias strategy when poolBias is true", () => {
+    const db = buildEvenDB(10);
+    const state = initializeDraftState(db, [], true);
+    expect(state.packStrategy.type).toBe("pool_bias");
+    if (state.packStrategy.type === "pool_bias") {
+      expect(state.packStrategy.featuredTides).toHaveLength(2);
+      expect(state.packStrategy.featuredWeight).toBe(2.0);
+    }
   });
 });
 
@@ -169,26 +188,128 @@ describe("computeFocus", () => {
   });
 });
 
-describe("drawPack", () => {
-  it("draws exactly packSize cards", () => {
+describe("generatePack", () => {
+  it("draws exactly packSize cards with tide_current strategy", () => {
     const db = buildEvenDB(10);
     const pool = Array.from(db.keys());
-    const pack = drawPack(pool, db, [], 1);
+    const pack = generatePack(
+      { type: "tide_current" },
+      { pool, cardDatabase: db, draftedCards: [], pickNumber: 1, packSize: 4 },
+    );
     expect(pack.length).toBe(4);
   });
 
   it("draws fewer cards if pool is smaller than packSize", () => {
     const db = buildDB([makeCard(1), makeCard(2)]);
     const pool = [1, 2];
-    const pack = drawPack(pool, db, [], 1);
+    const pack = generatePack(
+      { type: "tide_current" },
+      { pool, cardDatabase: db, draftedCards: [], pickNumber: 1, packSize: 4 },
+    );
     expect(pack.length).toBe(2);
   });
 
   it("draws unique cards (no duplicates)", () => {
     const db = buildEvenDB(10);
     const pool = Array.from(db.keys());
-    const pack = drawPack(pool, db, [], 1);
+    const pack = generatePack(
+      { type: "tide_current" },
+      { pool, cardDatabase: db, draftedCards: [], pickNumber: 1, packSize: 4 },
+    );
     expect(new Set(pack).size).toBe(pack.length);
+  });
+
+  it("pool_bias strategy statistically favors featured tides", () => {
+    const db = buildEvenDB(50);
+    const pool = Array.from(db.keys());
+    const strategy: PackStrategy = {
+      type: "pool_bias",
+      featuredTides: ["Bloom", "Arc"],
+      featuredWeight: 2.0,
+    };
+
+    const tideCounts: Record<string, number> = {};
+    const trials = 500;
+    for (let i = 0; i < trials; i++) {
+      const pack = generatePack(
+        strategy,
+        { pool, cardDatabase: db, draftedCards: [], pickNumber: 1, packSize: 4 },
+      );
+      for (const cardNum of pack) {
+        const card = db.get(cardNum)!;
+        tideCounts[card.tide] = (tideCounts[card.tide] ?? 0) + 1;
+      }
+    }
+
+    // Featured tides should appear significantly more than non-featured core tides
+    const featuredCount = (tideCounts["Bloom"] ?? 0) + (tideCounts["Arc"] ?? 0);
+    const nonFeaturedCount = (tideCounts["Ignite"] ?? 0) + (tideCounts["Pact"] ?? 0);
+    expect(featuredCount).toBeGreaterThan(nonFeaturedCount * 1.5);
+  });
+
+  it("pool_bias does not affect non-featured tide cards", () => {
+    // With only non-featured tides in the pool, bias has no effect
+    const cards: CardData[] = [];
+    for (let i = 1; i <= 40; i++) {
+      cards.push(makeCard(i, "Ignite"));
+    }
+    const db = buildDB(cards);
+    const pool = Array.from(db.keys());
+    const strategy: PackStrategy = {
+      type: "pool_bias",
+      featuredTides: ["Bloom", "Arc"],
+      featuredWeight: 2.0,
+    };
+
+    const pack = generatePack(
+      strategy,
+      { pool, cardDatabase: db, draftedCards: [], pickNumber: 1, packSize: 4 },
+    );
+    expect(pack.length).toBe(4);
+    for (const cardNum of pack) {
+      expect(db.get(cardNum)!.tide).toBe("Ignite");
+    }
+  });
+});
+
+describe("selectFeaturedTides", () => {
+  it("returns 2 adjacent tides from available pool", () => {
+    const available: Tide[] = ["Bloom", "Arc", "Ignite", "Pact", "Umbra"];
+    const featured = selectFeaturedTides(available);
+    expect(featured).toHaveLength(2);
+
+    // Both tides should be in the available pool
+    expect(available).toContain(featured[0]);
+    expect(available).toContain(featured[1]);
+  });
+
+  it("returns only adjacent pairs on the tide circle", () => {
+    const available: Tide[] = ["Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge"];
+    // Run multiple times to check all returned pairs are adjacent
+    const adjacentPairs = new Set([
+      "Bloom,Arc", "Arc,Ignite", "Ignite,Pact", "Pact,Umbra",
+      "Umbra,Rime", "Rime,Surge", "Surge,Bloom",
+    ]);
+    for (let i = 0; i < 100; i++) {
+      const featured = selectFeaturedTides(available);
+      const key = `${featured[0]},${featured[1]}`;
+      expect(adjacentPairs.has(key)).toBe(true);
+    }
+  });
+
+  it("returns empty array when no adjacent pairs are available", () => {
+    // Bloom and Ignite are not adjacent (distance 2)
+    const available: Tide[] = ["Bloom", "Ignite"];
+    const featured = selectFeaturedTides(available);
+    expect(featured).toHaveLength(0);
+  });
+
+  it("handles wrap-around (Surge + Bloom)", () => {
+    const available: Tide[] = ["Surge", "Bloom"];
+    const featured = selectFeaturedTides(available);
+    expect(featured).toHaveLength(2);
+    expect(featured).toContain("Surge");
+    expect(featured).toContain("Bloom");
   });
 });
 

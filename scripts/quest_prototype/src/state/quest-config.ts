@@ -6,6 +6,8 @@ export interface QuestConfig {
   excludedTideCount: number;
   /** Whether to show tide cost symbols on cards (default true). */
   showTideSymbols: boolean;
+  /** Whether to enable weighted pool bias for featured tides (default false). */
+  poolBias: boolean;
 }
 
 const DEFAULT_EXCLUDED_TIDE_COUNT = 2;
@@ -26,7 +28,9 @@ export function getQuestConfig(): QuestConfig {
   const showTideSymbolsRaw = params.get("showTideSymbols");
   const showTideSymbols = showTideSymbolsRaw !== "false";
 
-  return { excludedTideCount, showTideSymbols };
+  const poolBias = params.get("poolBias") === "true";
+
+  return { excludedTideCount, showTideSymbols, poolBias };
 }
 
 /** React hook that returns quest configuration from URL parameters. */
