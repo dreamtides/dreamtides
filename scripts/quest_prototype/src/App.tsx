@@ -57,6 +57,7 @@ function QuestApp({
         onClose={handleCloseDebugScreen}
         draftState={state.draftState}
         cardDatabase={cardDatabase}
+        excludedTides={state.excludedTides}
       />
     </div>
   );

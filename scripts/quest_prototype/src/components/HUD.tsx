@@ -184,7 +184,7 @@ export function HUD({ onOpenDeckViewer, onOpenDebugScreen, hasDraftData }: HudPr
             onClick={onOpenDebugScreen}
           >
             <span className="lg:hidden">{"\uD83D\uDC1B"}</span>
-            <span className="hidden lg:inline">Debug AI</span>
+            <span className="hidden lg:inline">Debug</span>
           </button>
         )}
         <button

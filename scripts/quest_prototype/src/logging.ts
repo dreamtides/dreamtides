@@ -43,6 +43,11 @@ export function logEvent(
   };
   console.log(JSON.stringify(entry));
   logAccumulator.push(entry);
+  fetch("/api/log", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entry),
+  }).catch(() => {});
   return Object.freeze({ ...entry });
 }
 

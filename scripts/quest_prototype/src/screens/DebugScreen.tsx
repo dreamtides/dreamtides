@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
-import type { DraftState } from "../types/draft";
+import type { DraftState, PackStrategy } from "../types/draft";
 import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { extractDraftDebugInfo } from "./debug-helpers";
+import type { DecayEntry } from "./debug-helpers";
 
 /** Props for the DebugScreen component. */
 interface DebugScreenProps {
@@ -11,6 +12,7 @@ interface DebugScreenProps {
   onClose: () => void;
   draftState: DraftState | null;
   cardDatabase: Map<number, CardData>;
+  excludedTides: Tide[];
 }
 
 /** Full-screen overlay showing draft state debug info. */
@@ -19,10 +21,11 @@ export function DebugScreen({
   onClose,
   draftState,
   cardDatabase,
+  excludedTides,
 }: DebugScreenProps) {
   const debugInfo = useMemo(
-    () => extractDraftDebugInfo(draftState, cardDatabase),
-    [draftState, cardDatabase],
+    () => extractDraftDebugInfo(draftState, cardDatabase, excludedTides),
+    [draftState, cardDatabase, excludedTides],
   );
 
   const handleClose = useCallback(() => {
@@ -98,7 +101,14 @@ export function DebugScreen({
                   <StatBadge label="Pool" value={String(debugInfo.poolSize)} />
                   <StatBadge label="Focus" value={String(debugInfo.focus)} />
                   <StatBadge label="Drafted" value={String(debugInfo.totalCards)} />
+                  <StatBadge label="Exp. Dom" value={String(debugInfo.expectedDominant)} />
                 </div>
+
+                {/* Quest setup: strategy + excluded tides */}
+                <QuestSetupSection
+                  packStrategy={debugInfo.packStrategy}
+                  excludedTides={debugInfo.excludedTides}
+                />
 
                 {/* Primary/secondary tides */}
                 <div className="flex items-center gap-2">
@@ -116,15 +126,23 @@ export function DebugScreen({
                 {/* Tide affinity bar chart */}
                 <AffinityBar affinities={debugInfo.tideAffinities} />
 
+                {/* Effective sampling weights */}
+                <EffectiveWeightsBar
+                  effectiveWeights={debugInfo.effectiveWeights}
+                  tideProbabilities={debugInfo.tideProbabilities}
+                  packStrategy={debugInfo.packStrategy}
+                  excludedTides={debugInfo.excludedTides}
+                />
+
+                {/* Recency decay profile */}
+                {debugInfo.decayProfile.length > 0 && (
+                  <DecayProfileSection decayProfile={debugInfo.decayProfile} />
+                )}
+
                 {/* Cards by tide */}
                 {debugInfo.totalCards > 0 && (
                   <div>
-                    <h4
-                      className="mb-1.5 text-[10px] font-bold uppercase tracking-wider"
-                      style={{ color: "#a855f7" }}
-                    >
-                      Drafted Cards by Tide
-                    </h4>
+                    <SectionHeader>Drafted Cards by Tide</SectionHeader>
                     <TideCardCounts cardsByTide={debugInfo.cardsByTide} />
                   </div>
                 )}
@@ -132,12 +150,7 @@ export function DebugScreen({
                 {/* Card name list */}
                 {debugInfo.draftedCards.length > 0 && (
                   <div>
-                    <h4
-                      className="mb-1.5 text-[10px] font-bold uppercase tracking-wider"
-                      style={{ color: "#a855f7" }}
-                    >
-                      All Drafted Cards (newest first)
-                    </h4>
+                    <SectionHeader>All Drafted Cards (newest first)</SectionHeader>
                     <div
                       className="max-h-48 overflow-y-auto rounded p-2"
                       style={{
@@ -172,6 +185,18 @@ export function DebugScreen({
   );
 }
 
+/** Section header label. */
+function SectionHeader({ children }: { children: string }) {
+  return (
+    <h4
+      className="mb-1.5 text-[10px] font-bold uppercase tracking-wider"
+      style={{ color: "#a855f7" }}
+    >
+      {children}
+    </h4>
+  );
+}
+
 /** Small stat badge. */
 function StatBadge({ label, value }: { label: string; value: string }) {
   return (
@@ -186,6 +211,88 @@ function StatBadge({ label, value }: { label: string; value: string }) {
       <span className="ml-1.5 text-sm font-bold" style={{ color: "#c084fc" }}>
         {value}
       </span>
+    </div>
+  );
+}
+
+/** Quest setup: pack strategy and excluded tides. */
+function QuestSetupSection({
+  packStrategy,
+  excludedTides,
+}: {
+  packStrategy: PackStrategy;
+  excludedTides: Tide[];
+}) {
+  return (
+    <div
+      className="rounded-lg p-3"
+      style={{
+        background: "rgba(0, 0, 0, 0.3)",
+        border: "1px solid rgba(124, 58, 237, 0.15)",
+      }}
+    >
+      <SectionHeader>Quest Setup</SectionHeader>
+      <div className="flex flex-wrap items-center gap-2">
+        {/* Strategy badge */}
+        <span
+          className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+          style={{
+            background: packStrategy.type === "pool_bias"
+              ? "rgba(249, 115, 22, 0.15)"
+              : "rgba(124, 58, 237, 0.15)",
+            border: `1px solid ${packStrategy.type === "pool_bias" ? "rgba(249, 115, 22, 0.4)" : "rgba(124, 58, 237, 0.3)"}`,
+            color: packStrategy.type === "pool_bias" ? "#fb923c" : "#c084fc",
+          }}
+        >
+          {packStrategy.type === "pool_bias" ? "Pool Bias" : "Tide Current"}
+        </span>
+
+        {/* Featured tides (pool bias only) */}
+        {packStrategy.type === "pool_bias" && packStrategy.featuredTides.map((tide) => (
+          <div
+            key={tide}
+            className="flex items-center gap-1 rounded-full px-1.5 py-0.5"
+            style={{
+              background: `${TIDE_COLORS[tide]}20`,
+              border: `1px solid ${TIDE_COLORS[tide]}50`,
+            }}
+          >
+            <img
+              src={tideIconUrl(tide)}
+              alt={tide}
+              className="h-3 w-3 rounded-full"
+              style={{ border: `1px solid ${TIDE_COLORS[tide]}` }}
+            />
+            <span className="text-[10px] font-bold" style={{ color: TIDE_COLORS[tide] }}>
+              {tide}
+            </span>
+            <span className="text-[9px] font-medium opacity-60" style={{ color: TIDE_COLORS[tide] }}>
+              {String(packStrategy.featuredWeight)}x
+            </span>
+          </div>
+        ))}
+
+        {/* Excluded tides */}
+        {excludedTides.length > 0 && (
+          <>
+            <span className="text-[9px] uppercase tracking-wider opacity-30">Excluded:</span>
+            {excludedTides.map((tide) => (
+              <span
+                key={tide}
+                className="rounded-full px-1.5 py-0.5 text-[9px] font-medium"
+                style={{
+                  background: "rgba(255, 255, 255, 0.05)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  color: "rgba(255, 255, 255, 0.3)",
+                  textDecoration: "line-through",
+                }}
+              >
+                {tide}
+              </span>
+            ))}
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -237,12 +344,7 @@ function AffinityBar({ affinities }: { affinities: Record<string, number> }) {
 
   return (
     <div className="flex flex-col gap-1">
-      <h4
-        className="text-[10px] font-bold uppercase tracking-wider"
-        style={{ color: "#a855f7" }}
-      >
-        Tide Affinities
-      </h4>
+      <SectionHeader>Tide Affinities</SectionHeader>
       {[...NAMED_TIDES, "Neutral" as Tide].map((tide) => {
         const value = affinities[tide] ?? 0;
         const pct = (value / maxAffinity) * 100;
@@ -282,6 +384,126 @@ function AffinityBar({ affinities }: { affinities: Record<string, number> }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+/** Horizontal bar chart showing effective sampling weights with probabilities. */
+function EffectiveWeightsBar({
+  effectiveWeights,
+  tideProbabilities,
+  packStrategy,
+  excludedTides,
+}: {
+  effectiveWeights: Record<string, number>;
+  tideProbabilities: Record<string, number>;
+  packStrategy: PackStrategy;
+  excludedTides: Tide[];
+}) {
+  const excludedSet = new Set<string>(excludedTides);
+  const activeTides = [...NAMED_TIDES, "Neutral" as Tide].filter(
+    (t) => !excludedSet.has(t),
+  );
+  const maxWeight = Math.max(
+    ...activeTides.map((t) => effectiveWeights[t] ?? 0),
+    0.001,
+  );
+  const featuredSet = new Set<string>(
+    packStrategy.type === "pool_bias" ? packStrategy.featuredTides : [],
+  );
+
+  return (
+    <div className="flex flex-col gap-1">
+      <SectionHeader>Effective Sampling Weights</SectionHeader>
+      {activeTides.map((tide) => {
+        const weight = effectiveWeights[tide] ?? 0;
+        const prob = tideProbabilities[tide] ?? 0;
+        const pct = (weight / maxWeight) * 100;
+        const isFeatured = featuredSet.has(tide);
+        return (
+          <div key={tide} className="flex items-center gap-1.5">
+            <img
+              src={tideIconUrl(tide)}
+              alt={tide}
+              className="h-3 w-3 rounded-full"
+              style={{ border: `1px solid ${TIDE_COLORS[tide]}` }}
+            />
+            <span
+              className="w-12 text-[9px] font-medium"
+              style={{ color: TIDE_COLORS[tide] }}
+            >
+              {tide}
+            </span>
+            {isFeatured && (
+              <span className="text-[8px]" title="Featured tide">
+                {"*"}
+              </span>
+            )}
+            <div
+              className="h-2.5 flex-1 overflow-hidden rounded-full"
+              style={{ background: "rgba(255, 255, 255, 0.05)" }}
+            >
+              <div
+                className="h-full rounded-full transition-all duration-300"
+                style={{
+                  width: `${String(Math.max(pct, 0))}%`,
+                  background: isFeatured
+                    ? `linear-gradient(90deg, ${TIDE_COLORS[tide]}, #fb923c)`
+                    : TIDE_COLORS[tide],
+                  opacity: 0.8,
+                }}
+              />
+            </div>
+            <span
+              className="w-12 text-right text-[9px] font-mono opacity-50"
+              style={{ color: "#e2e8f0" }}
+            >
+              {prob.toFixed(1)}%
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Recency decay profile showing how older picks fade. */
+function DecayProfileSection({ decayProfile }: { decayProfile: DecayEntry[] }) {
+  return (
+    <div>
+      <SectionHeader>{`Recency Decay (last ${String(decayProfile.length)} picks)`}</SectionHeader>
+      <div className="flex flex-wrap gap-1">
+        {decayProfile.map((entry, i) => (
+          <div
+            key={`decay-${String(i)}`}
+            className="flex items-center gap-1 rounded-full px-1.5 py-0.5"
+            style={{
+              background: `${TIDE_COLORS[entry.tide]}${Math.round(entry.decay * 20).toString(16).padStart(2, "0")}`,
+              border: `1px solid ${TIDE_COLORS[entry.tide]}30`,
+              opacity: 0.4 + entry.decay * 0.6,
+            }}
+          >
+            <img
+              src={tideIconUrl(entry.tide)}
+              alt={entry.tide}
+              className="h-2.5 w-2.5 rounded-full"
+              style={{ border: `1px solid ${TIDE_COLORS[entry.tide]}` }}
+            />
+            <span
+              className="text-[9px] font-medium"
+              style={{ color: TIDE_COLORS[entry.tide] }}
+            >
+              {entry.cardName}
+            </span>
+            <span
+              className="text-[8px] font-mono opacity-60"
+              style={{ color: "#e2e8f0" }}
+            >
+              {"\u00d7"}{entry.decay.toFixed(2)}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
