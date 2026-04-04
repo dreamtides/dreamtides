@@ -20,6 +20,7 @@ import { RewardSiteScreen } from "../screens/RewardSiteScreen";
 import { CleanseSiteScreen } from "../screens/CleanseSiteScreen";
 import { LootPackScreen } from "../screens/LootPackScreen";
 import { PackShopScreen } from "../screens/PackShopScreen";
+import { ForgeScreen } from "../screens/ForgeScreen";
 import { siteTypeName } from "../atlas/atlas-generator";
 import { logEvent } from "../logging";
 import type { Screen, SiteState } from "../types/quest";
@@ -144,7 +145,7 @@ function SiteScreen({ siteId }: { siteId: string }) {
   }
 
   if (site.type === "Forge") {
-    return <GenericSitePlaceholder site={site} />;
+    return <ForgeScreen site={site} />;
   }
 
   if (site.type === "Provisioner") {

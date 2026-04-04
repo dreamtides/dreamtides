@@ -55,7 +55,7 @@ export interface PackShopSlot {
 export interface ForgeRecipe {
   sacrificeTide: Tide;
   sacrificeCount: number;
-  outputCard: CardData;
+  outputCard: CardData | null;
 }
 
 /** An option available from the provisioner. */
