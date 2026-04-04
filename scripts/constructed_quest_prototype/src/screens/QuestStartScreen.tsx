@@ -2,23 +2,63 @@ import { useCallback } from "react";
 import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { generateInitialAtlas } from "../atlas/atlas-generator";
-import { NAMED_TIDES } from "../data/card-database";
+import { NAMED_TIDES, adjacentTides } from "../data/card-database";
 import { DREAMSIGNS } from "../data/dreamsigns";
+import { weightedSample } from "../data/tide-weights";
 import { logEvent } from "../logging";
 import { useQuestConfig } from "../state/quest-config";
-import type { Tide } from "../types/cards";
+import type { Tide, CardData } from "../types/cards";
+import type { SiteState, SiteType } from "../types/quest";
 
-/** Selects N random core tides to exclude (never Neutral). */
-function selectExcludedTides(count: number): Tide[] {
-  if (count <= 0) return [];
-  const pool = [...NAMED_TIDES];
-  const excluded: Tide[] = [];
-  for (let i = 0; i < count && pool.length > 0; i++) {
-    const idx = Math.floor(Math.random() * pool.length);
-    excluded.push(pool[idx]);
-    pool.splice(idx, 1);
+/** Energy cost bracket for a card. */
+function costBracket(card: CardData): "low" | "mid" | "high" {
+  const cost = card.energyCost ?? 0;
+  if (cost <= 2) return "low";
+  if (cost <= 4) return "mid";
+  return "high";
+}
+
+/**
+ * Enforces energy curve minimums by swapping cards between brackets.
+ * Mutates the array in place.
+ */
+function enforceEnergyCurve(
+  cards: CardData[],
+  cardDatabase: Map<number, CardData>,
+  minLow: number,
+  minMid: number,
+  minHigh: number,
+): void {
+  const count = (bracket: "low" | "mid" | "high") =>
+    cards.filter((c) => costBracket(c) === bracket).length;
+
+  const brackets: Array<"low" | "mid" | "high"> = ["low", "mid", "high"];
+  const mins: Record<string, number> = { low: minLow, mid: minMid, high: minHigh };
+
+  for (const needed of brackets) {
+    while (count(needed) < mins[needed]) {
+      // Find an over-represented bracket to swap from
+      const donor = brackets.find(
+        (b) => b !== needed && count(b) > mins[b],
+      );
+      if (!donor) break;
+
+      // Find the donor card index in our array
+      const donorIdx = cards.findIndex((c) => costBracket(c) === donor);
+      if (donorIdx === -1) break;
+
+      // Find a replacement card from the database in the needed bracket
+      const existingNumbers = new Set(cards.map((c) => c.cardNumber));
+      const replacements = Array.from(cardDatabase.values()).filter(
+        (c) => costBracket(c) === needed && !existingNumbers.has(c.cardNumber),
+      );
+      if (replacements.length === 0) break;
+
+      const replacement =
+        replacements[Math.floor(Math.random() * replacements.length)];
+      cards[donorIdx] = replacement;
+    }
   }
-  return excluded;
 }
 
 /** Intro screen with dark fantasy styling and "Begin Quest" button. */
@@ -27,29 +67,157 @@ export function QuestStartScreen() {
   const config = useQuestConfig();
 
   const handleBeginQuest = useCallback(() => {
-    const startingTides = selectExcludedTides(config.startingTides);
-    mutations.setStartingTides(startingTides);
+    // Select center tide randomly from the 7 named tides
+    const centerTide =
+      NAMED_TIDES[Math.floor(Math.random() * NAMED_TIDES.length)];
 
-    const playerHasBanes =
-      state.deck.some((e) => e.isBane) ||
-      state.dreamsigns.some((d) => d.isBane);
+    // Determine starting tides
+    let selectedTides: Tide[];
+    if (config.sequentialTides) {
+      const neighbors = adjacentTides(centerTide);
+      selectedTides = [centerTide, ...neighbors];
+    } else {
+      // Pick config.startingTides random distinct tides
+      const pool = [...NAMED_TIDES];
+      selectedTides = [];
+      for (let i = 0; i < config.startingTides && pool.length > 0; i++) {
+        const idx = Math.floor(Math.random() * pool.length);
+        selectedTides.push(pool[idx]);
+        pool.splice(idx, 1);
+      }
+    }
+
+    mutations.setStartingTides(selectedTides);
+
+    // Generate tide-colored starter cards
+    const cardsPerTide = Math.floor(config.initialCards / selectedTides.length);
+    const allCards = Array.from(cardDatabase.values());
+    const starterCards: CardData[] = [];
+
+    for (let t = 0; t < selectedTides.length; t++) {
+      const tide = selectedTides[t];
+      const tidePool = allCards.filter((c) => c.tide === tide);
+      const count =
+        t < config.initialCards % selectedTides.length
+          ? cardsPerTide + 1
+          : cardsPerTide;
+      const picked = weightedSample(tidePool, count, () => 1);
+      starterCards.push(...picked);
+    }
+    // Trim to exactly initialCards
+    starterCards.length = Math.min(starterCards.length, config.initialCards);
+
+    // Generate neutral cards
+    const neutralPool = allCards.filter((c) => c.tide === "Neutral");
+    const neutralCards = weightedSample(
+      neutralPool,
+      config.starterNeutral,
+      () => 1,
+    );
+
+    const allStarterCards = [...starterCards, ...neutralCards];
+
+    // Energy curve enforcement
+    enforceEnergyCurve(
+      allStarterCards,
+      cardDatabase,
+      config.starterLowCost,
+      config.starterMidCost,
+      config.starterHighCost,
+    );
+
+    // Add all cards to pool
+    for (const card of allStarterCards) {
+      mutations.addToPool(card.cardNumber, "starter");
+    }
+
+    // Initialize deck from pool
+    mutations.initializeDeckFromPool();
+
+    // Adjust essence if needed
+    if (config.startingEssence !== 250) {
+      mutations.changeEssence(config.startingEssence - 250, "starting_essence");
+    }
+
+    // Generate initial atlas
     const atlas = generateInitialAtlas(state.completionLevel, {
       cardDatabase,
       dreamsignPool: DREAMSIGNS,
-      playerHasBanes,
-      startingTides,
+      playerHasBanes: false,
+      startingTides: selectedTides,
     });
-    const nodeCount = Object.keys(atlas.nodes).length - 1; // subtract nexus
+
+    // Override first non-nexus dreamscape's sites to fixed composition
+    const firstNodeId = atlas.edges[0]?.[1];
+    if (firstNodeId && atlas.nodes[firstNodeId]) {
+      const fixedSites: SiteState[] = [
+        {
+          id: "site-0",
+          type: "DreamcallerDraft" as SiteType,
+          isEnhanced: false,
+          isVisited: false,
+        },
+        {
+          id: "site-1",
+          type: "LootPack" as SiteType,
+          isEnhanced: false,
+          isVisited: false,
+        },
+        {
+          id: "site-2",
+          type: "LootPack" as SiteType,
+          isEnhanced: false,
+          isVisited: false,
+        },
+        {
+          id: "site-3",
+          type: "LootPack" as SiteType,
+          isEnhanced: false,
+          isVisited: false,
+        },
+        {
+          id: "site-4",
+          type: "CardShop" as SiteType,
+          isEnhanced: false,
+          isVisited: false,
+        },
+        {
+          id: "site-5",
+          type: "Battle" as SiteType,
+          isEnhanced: false,
+          isVisited: false,
+        },
+      ];
+      atlas.nodes[firstNodeId] = {
+        ...atlas.nodes[firstNodeId],
+        sites: fixedSites,
+      };
+    }
+
+    const nodeCount = Object.keys(atlas.nodes).length - 1;
 
     logEvent("quest_started", {
-      initialEssence: state.essence,
+      initialEssence: config.startingEssence,
       dreamscapesGenerated: nodeCount,
-      startingTides,
+      startingTides: selectedTides,
+      starterCardCount: allStarterCards.length,
     });
 
     mutations.updateAtlas(atlas);
-    mutations.setScreen({ type: "atlas" });
-  }, [state.completionLevel, state.essence, state.deck, state.dreamsigns, mutations, cardDatabase, config.startingTides]);
+
+    // Set current dreamscape to first non-nexus node
+    if (firstNodeId) {
+      mutations.setCurrentDreamscape(firstNodeId);
+    }
+
+    // Navigate to dreamscape screen
+    mutations.setScreen({ type: "dreamscape" });
+  }, [
+    state.completionLevel,
+    mutations,
+    cardDatabase,
+    config,
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
