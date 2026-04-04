@@ -465,7 +465,7 @@ export function QuestProvider({
   const initializeDeckFromPool = useCallback(() => {
     setState((prev) => {
       logEvent("deck_initialized_from_pool", { count: prev.pool.length });
-      return { ...prev, deck: [...prev.pool] };
+      return { ...prev, deck: [...prev.pool], pool: [] };
     });
   }, []);
 

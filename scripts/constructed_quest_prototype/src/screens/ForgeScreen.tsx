@@ -52,7 +52,7 @@ export function ForgeScreen({ site }: ForgeScreenProps) {
       isEnhanced: site.isEnhanced,
       recipeCount: generated.length,
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const currentRecipe =
     pickingRecipeIndex !== null ? recipes[pickingRecipeIndex] : null;
@@ -107,7 +107,7 @@ export function ForgeScreen({ site }: ForgeScreenProps) {
 
     // Standard mode: execute the forge
     executeForge(currentRecipe.outputCard);
-  }, [currentRecipe, pickingRecipeIndex, site.isEnhanced, cardDatabase, startingTides]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentRecipe, pickingRecipeIndex, site.isEnhanced, cardDatabase, startingTides]);
 
   const executeForge = useCallback(
     (outputCard: CardData | null) => {

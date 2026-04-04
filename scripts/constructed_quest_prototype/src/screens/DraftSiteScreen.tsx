@@ -33,8 +33,6 @@ export function DraftSiteScreen({ site }: { site: SiteState }) {
     });
 
     return selected;
-    // Generate once on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [site.id]);
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);

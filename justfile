@@ -19,9 +19,9 @@ review *args:
         python3 scripts/review/review_runner.py {{args}}
     fi
 
-review-direct: check-snapshots check-format check-python-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test python-test pyre-check local-unity-test parser-test tv-check tv-clippy tv-test
+review-direct: check-snapshots check-format check-python-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test python-test pyre-check local-unity-test parser-test tv-check tv-clippy tv-test cqs-check
 
-review-verbose: check-snapshots check-format-verbose check-python-format-verbose check-docs-format-verbose check-token-limits-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose local-unity-test review-core-test-verbose python-test-verbose pyre-check-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test
+review-verbose: check-snapshots check-format-verbose check-python-format-verbose check-docs-format-verbose check-token-limits-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose local-unity-test review-core-test-verbose python-test-verbose pyre-check-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test cqs-check
 
 review-scope-plan:
     python3 scripts/review/review_scope.py plan
@@ -811,6 +811,16 @@ qs-lint:
 
 qs-test:
     cd scripts/quest_prototype && npm test
+
+cqs-check:
+    #!/usr/bin/env bash
+    cd scripts/constructed_quest_prototype
+    output=$(npx tsc --noEmit 2>&1)
+    if [ $? -ne 0 ]; then echo "$output"; exit 1; fi
+    echo "CQS TypeScript check passed"
+    output=$(npx eslint src/ 2>&1)
+    if [ $? -ne 0 ]; then echo "$output"; exit 1; fi
+    echo "CQS ESLint check passed"
 
 tv-dev:
     #!/usr/bin/env bash

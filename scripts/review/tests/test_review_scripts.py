@@ -221,6 +221,8 @@ class ReviewScopePlannerTests(unittest.TestCase):
             tv_path_prefixes=("rules_engine/src/tv/", "rules_engine/tests/tv_tests/"),
             csharp_crate_seeds=(),
             csharp_path_prefixes=("client/Assets/",),
+            cqs_crate_seeds=(),
+            cqs_path_prefixes=("scripts/constructed_quest_prototype/",),
             always_run_steps=(
                 "check-snapshots",
                 "check-format",
@@ -255,6 +257,7 @@ class ReviewScopePlannerTests(unittest.TestCase):
             tv_steps=("tv-check", "tv-clippy", "tv-test"),
             python_steps=("python-test",),
             csharp_steps=("local-unity-test",),
+            cqs_steps=("cqs-check",),
             core_path_prefixes=(
                 "client/Assets/StreamingAssets/",
                 "scripts/quest_prototype/",

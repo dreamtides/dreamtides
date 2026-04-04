@@ -31,8 +31,6 @@ export function LootPackScreen({ site }: LootPackScreenProps) {
         config,
         site.isEnhanced,
       ),
-    // Generate once on mount — intentionally using site.id as the stable key
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [site.id],
   );
 
@@ -54,7 +52,6 @@ export function LootPackScreen({ site }: LootPackScreenProps) {
     for (const card of packCards) {
       mutations.addToPool(card.cardNumber, "loot_pack");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [site.id]);
 
   const handleContinue = useCallback(() => {

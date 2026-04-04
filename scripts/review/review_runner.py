@@ -252,6 +252,27 @@ def step_specs() -> list[StepSpec]:
         ),
         StepSpec("tv-clippy", [CommandSpec("tv-clippy", ["just", "tv-clippy"])]),
         StepSpec("tv-test", [CommandSpec("tv-test", ["just", "tv-test"])]),
+        StepSpec(
+            "cqs-check",
+            [
+                CommandSpec(
+                    "cqs-check-tsc",
+                    [
+                        "bash",
+                        "-lc",
+                        'output=$(cd scripts/constructed_quest_prototype && npx tsc --noEmit 2>&1); if [ $? -eq 0 ]; then echo "CQS TypeScript check passed"; else echo "$output"; exit 1; fi',
+                    ],
+                ),
+                CommandSpec(
+                    "cqs-check-eslint",
+                    [
+                        "bash",
+                        "-lc",
+                        'output=$(cd scripts/constructed_quest_prototype && npx eslint src/ 2>&1); if [ $? -eq 0 ]; then echo "CQS ESLint check passed"; else echo "$output"; exit 1; fi',
+                    ],
+                ),
+            ],
+        ),
     ]
 
 

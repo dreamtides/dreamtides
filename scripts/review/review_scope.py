@@ -41,6 +41,8 @@ class ScopeConfig:
     tv_path_prefixes: tuple[str, ...]
     csharp_crate_seeds: tuple[str, ...]
     csharp_path_prefixes: tuple[str, ...]
+    cqs_crate_seeds: tuple[str, ...]
+    cqs_path_prefixes: tuple[str, ...]
     core_path_prefixes: tuple[str, ...]
     always_run_steps: tuple[str, ...]
     markdown_only_skip_steps: tuple[str, ...]
@@ -49,6 +51,7 @@ class ScopeConfig:
     tv_steps: tuple[str, ...]
     python_steps: tuple[str, ...]
     csharp_steps: tuple[str, ...]
+    cqs_steps: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -335,6 +338,7 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
     parser_section = payload.get("parser", {})
     tv_section = payload.get("tv", {})
     csharp_section = payload.get("csharp", {})
+    cqs_section = payload.get("constructed_quest_prototype", {})
 
     if not isinstance(parser_section, dict):
         raise ScopePlannerError("scope config 'parser' must be an object")
@@ -342,6 +346,8 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
         raise ScopePlannerError("scope config 'tv' must be an object")
     if not isinstance(csharp_section, dict):
         raise ScopePlannerError("scope config 'csharp' must be an object")
+    if not isinstance(cqs_section, dict):
+        raise ScopePlannerError("scope config 'constructed_quest_prototype' must be an object")
 
     def read_rules(value: Any, field_name: str) -> tuple[str, ...]:
         if not isinstance(value, list) or not all(
@@ -387,6 +393,12 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
         csharp_path_prefixes=read_rules(
             csharp_section.get("path_prefixes", []), "csharp.path_prefixes"
         ),
+        cqs_crate_seeds=read_names(
+            cqs_section.get("crate_seeds", []), "constructed_quest_prototype.crate_seeds"
+        ),
+        cqs_path_prefixes=read_rules(
+            cqs_section.get("path_prefixes", []), "constructed_quest_prototype.path_prefixes"
+        ),
         core_path_prefixes=read_rules(
             payload.get("core_path_prefixes", []), "core_path_prefixes"
         ),
@@ -404,6 +416,7 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
         tv_steps=read_names(payload.get("tv_steps", []), "tv_steps"),
         python_steps=read_names(payload.get("python_steps", []), "python_steps"),
         csharp_steps=read_names(payload.get("csharp_steps", []), "csharp_steps"),
+        cqs_steps=read_names(payload.get("cqs_steps", []), "cqs_steps"),
     )
 
 
@@ -529,6 +542,13 @@ def scoped_domains(config: ScopeConfig) -> tuple[ScopedDomain, ...]:
             path_prefixes=config.csharp_path_prefixes,
             file_extensions=(),
             gated_steps=config.csharp_steps,
+        ),
+        ScopedDomain(
+            name="cqs",
+            crate_seeds=config.cqs_crate_seeds,
+            path_prefixes=config.cqs_path_prefixes,
+            file_extensions=(),
+            gated_steps=config.cqs_steps,
         ),
     )
 

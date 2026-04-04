@@ -46,6 +46,12 @@
       "client/Assets/"
     ]
   },
+  "constructed_quest_prototype": {
+    "crate_seeds": [],
+    "path_prefixes": [
+      "scripts/constructed_quest_prototype/"
+    ]
+  },
   "core_path_prefixes": [
     "client/Assets/StreamingAssets/",
     "scripts/quest_prototype/"
@@ -95,5 +101,8 @@
   ],
   "csharp_steps": [
     "local-unity-test"
+  ],
+  "cqs_steps": [
+    "cqs-check"
   ]
 }
