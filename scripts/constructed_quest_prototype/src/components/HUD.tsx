@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuest } from "../state/quest-context";
+import { useQuestConfig } from "../state/quest-config";
 import { downloadLog } from "../logging";
 import { TIDE_COLORS } from "../data/card-database";
 
@@ -52,6 +53,7 @@ interface HudProps {
 /** Persistent HUD bar anchored to the bottom of the viewport. */
 export function HUD({ onOpenDeckViewer, onOpenDeckEditor }: HudProps) {
   const { state } = useQuest();
+  const config = useQuestConfig();
   const animatedEssence = useAnimatedNumber(
     state.essence,
     ESSENCE_ANIM_DURATION,
@@ -106,13 +108,13 @@ export function HUD({ onOpenDeckViewer, onOpenDeckEditor }: HudProps) {
           </span>
         </div>
 
-        {/* Deck size */}
+        {/* Deck size with min/max */}
         <div className="flex items-center gap-1.5">
           <span className="text-sm opacity-70 md:text-base" aria-label="Deck">
             {"\uD83C\uDCCF"}
           </span>
           <span className="text-sm font-bold md:text-base">
-            Deck: {String(state.deck.length)}
+            Deck: {String(state.deck.length)}/{String(config.minimumDeckSize)}-{String(config.maximumDeckSize)}
           </span>
         </div>
 

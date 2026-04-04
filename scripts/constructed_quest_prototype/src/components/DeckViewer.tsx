@@ -248,16 +248,21 @@ export function DeckViewer({
                 "linear-gradient(180deg, rgba(10, 6, 18, 0.95) 0%, rgba(10, 6, 18, 0.8) 100%)",
             }}
           >
-            <h2 className="text-lg font-bold md:text-xl" style={{ color: "#e2e8f0" }}>
-              Deck{" "}
-              <span className="text-sm font-normal opacity-60 md:text-base">
-                ({String(sortedEntries.length)}
-                {sortedEntries.length !== resolvedEntries.length
-                  ? ` / ${String(resolvedEntries.length)}`
-                  : ""}{" "}
-                cards)
+            <div className="flex items-center gap-4">
+              <h2 className="text-lg font-bold md:text-xl" style={{ color: "#e2e8f0" }}>
+                Deck{" "}
+                <span className="text-sm font-normal opacity-60 md:text-base">
+                  ({String(sortedEntries.length)}
+                  {sortedEntries.length !== resolvedEntries.length
+                    ? ` / ${String(resolvedEntries.length)}`
+                    : ""}{" "}
+                  cards)
+                </span>
+              </h2>
+              <span className="text-sm opacity-50" style={{ color: "#e2e8f0" }}>
+                Pool: {String(state.pool.length)} cards
               </span>
-            </h2>
+            </div>
             <button
               className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-lg transition-colors"
               style={{

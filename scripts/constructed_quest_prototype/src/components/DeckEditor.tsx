@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
 import type { DeckEntry } from "../types/quest";
 import { useQuest } from "../state/quest-context";
+import { useQuestConfig } from "../state/quest-config";
 import { NAMED_TIDES, TIDE_COLORS, tideIconUrl, cardImageUrl } from "../data/card-database";
 import { CardDisplay } from "./CardDisplay";
 import { CardOverlay } from "./CardOverlay";
@@ -66,6 +67,8 @@ export function DeckEditor({
   cardDatabase,
 }: DeckEditorProps) {
   const { state, mutations } = useQuest();
+  const config = useQuestConfig();
+  const [validationMessage, setValidationMessage] = useState<string | null>(null);
 
   const [tideFilters, setTideFilters] = useState<Record<Tide, boolean>>(() => {
     const filters: Partial<Record<Tide, boolean>> = {};
@@ -80,19 +83,32 @@ export function DeckEditor({
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
+  const handleDone = useCallback(() => {
+    if (state.deck.length < config.minimumDeckSize) {
+      setValidationMessage(`Deck needs at least ${String(config.minimumDeckSize)} cards`);
+      return;
+    }
+    if (state.deck.length > config.maximumDeckSize) {
+      setValidationMessage(`Deck has too many cards (max ${String(config.maximumDeckSize)})`);
+      return;
+    }
+    setValidationMessage(null);
+    onClose();
+  }, [state.deck.length, config.minimumDeckSize, config.maximumDeckSize, onClose]);
+
   useEffect(() => {
     if (!isOpen) return undefined;
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") {
         if (overlayCard !== null) return;
-        onClose();
+        handleDone();
       }
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, overlayCard, onClose]);
+  }, [isOpen, overlayCard, handleDone]);
 
   useEffect(() => {
     if (!showSortDropdown) return undefined;
@@ -197,21 +213,41 @@ export function DeckEditor({
     return groups;
   }, [deckRows]);
 
-  const totalCards = state.deck.length + state.pool.length;
+  // Count copies of each cardNumber currently in the deck
+  const deckCopyCounts = useMemo(() => {
+    const counts = new Map<number, number>();
+    for (const entry of state.deck) {
+      counts.set(entry.cardNumber, (counts.get(entry.cardNumber) ?? 0) + 1);
+    }
+    return counts;
+  }, [state.deck]);
+
+  // Count bane vs chosen cards in deck
+  const baneCount = useMemo(() => state.deck.filter((e) => e.isBane).length, [state.deck]);
+  const chosenCount = state.deck.length - baneCount;
+
+  // Deck size color coding
+  const deckSizeColor =
+    state.deck.length < config.minimumDeckSize || state.deck.length > config.maximumDeckSize
+      ? "#ef4444"
+      : "#10b981";
 
   const toggleTide = useCallback((tide: Tide) => {
     setTideFilters((prev) => ({ ...prev, [tide]: !prev[tide] }));
   }, []);
 
   const handlePoolCardClick = useCallback(
-    (entryId: string) => {
-      mutations.moveToDeck(entryId);
+    (entry: DeckEntry) => {
+      const currentCopies = deckCopyCounts.get(entry.cardNumber) ?? 0;
+      if (currentCopies >= config.maxCopies) return;
+      mutations.moveToDeck(entry.entryId);
     },
-    [mutations],
+    [mutations, deckCopyCounts, config.maxCopies],
   );
 
   const handleDeckRowClick = useCallback(
     (row: DeckRow) => {
+      if (row.isBane) return;
       const entryId = row.entryIds[row.entryIds.length - 1];
       mutations.moveToPool(entryId);
     },
@@ -256,25 +292,34 @@ export function DeckEditor({
                 style={{
                   background: "rgba(251, 191, 36, 0.15)",
                   border: "1px solid rgba(251, 191, 36, 0.3)",
-                  color: "#fbbf24",
+                  color: deckSizeColor,
                 }}
               >
-                {String(state.deck.length)}{" "}
-                <span className="font-normal opacity-70">/ {String(totalCards)}</span>
+                Deck: {String(state.deck.length)} / {String(config.minimumDeckSize)}-{String(config.maximumDeckSize)}
+              </span>
+              <span className="text-[11px] opacity-60" style={{ color: "#e2e8f0" }}>
+                {String(state.deck.length)} cards ({String(baneCount)} bane, {String(chosenCount)} chosen)
               </span>
             </div>
-            <button
-              className="cursor-pointer rounded-lg px-5 py-2 text-sm font-semibold transition-colors"
-              style={{
-                background: "rgba(251, 191, 36, 0.2)",
-                border: "1px solid rgba(251, 191, 36, 0.5)",
-                color: "#fbbf24",
-                textShadow: "0 0 8px rgba(251, 191, 36, 0.3)",
-              }}
-              onClick={onClose}
-            >
-              Done
-            </button>
+            <div className="flex items-center gap-3">
+              {validationMessage !== null && (
+                <span className="text-xs font-medium" style={{ color: "#ef4444" }}>
+                  {validationMessage}
+                </span>
+              )}
+              <button
+                className="cursor-pointer rounded-lg px-5 py-2 text-sm font-semibold transition-colors"
+                style={{
+                  background: "rgba(251, 191, 36, 0.2)",
+                  border: "1px solid rgba(251, 191, 36, 0.5)",
+                  color: "#fbbf24",
+                  textShadow: "0 0 8px rgba(251, 191, 36, 0.3)",
+                }}
+                onClick={handleDone}
+              >
+                Done
+              </button>
+            </div>
           </div>
 
           {/* Main content: two panels */}
@@ -493,6 +538,26 @@ export function DeckEditor({
                               {"\u2620"}
                             </div>
                           )}
+                          {/* MAX badge for cards at copy limit */}
+                          {(deckCopyCounts.get(resolved.entry.cardNumber) ?? 0) >= config.maxCopies && (
+                            <div
+                              className="absolute inset-0 z-20 flex items-center justify-center rounded-lg"
+                              style={{
+                                background: "rgba(0, 0, 0, 0.5)",
+                                pointerEvents: "none",
+                              }}
+                            >
+                              <span
+                                className="rounded px-2 py-1 text-xs font-bold"
+                                style={{
+                                  background: "rgba(239, 68, 68, 0.8)",
+                                  color: "#fff",
+                                }}
+                              >
+                                MAX
+                              </span>
+                            </div>
+                          )}
                           <div
                             className="cursor-pointer transition-transform hover:scale-[1.03]"
                             style={
@@ -509,7 +574,7 @@ export function DeckEditor({
                                   : undefined
                             }
                             onClick={() => {
-                              handlePoolCardClick(resolved.entry.entryId);
+                              handlePoolCardClick(resolved.entry);
                             }}
                             onContextMenu={(e) => {
                               e.preventDefault();
@@ -544,8 +609,8 @@ export function DeckEditor({
               >
                 <h3 className="text-sm font-bold" style={{ color: "#a855f7" }}>
                   Deck{" "}
-                  <span className="font-normal opacity-60">
-                    ({String(state.deck.length)})
+                  <span className="font-normal" style={{ color: deckSizeColor }}>
+                    ({String(state.deck.length)} / {String(config.minimumDeckSize)}-{String(config.maximumDeckSize)})
                   </span>
                 </h3>
               </div>
@@ -648,6 +713,7 @@ export function DeckEditor({
                   }}
                 >
                   {"\u2190"} Move All to Pool
+                  <span className="block text-[9px] font-normal opacity-60">(banes will remain in deck)</span>
                 </button>
               </div>
             </div>
@@ -675,13 +741,14 @@ function DeckListRow({
 
   return (
     <button
-      className="relative mb-1 flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-3 py-2 text-left transition-all"
+      className="relative mb-1 flex w-full items-center gap-2 overflow-hidden rounded-lg px-3 py-2 text-left transition-all"
       style={{
         background: `linear-gradient(90deg, ${tideColor}20 0%, rgba(10, 6, 18, 0.8) 70%)`,
         borderLeft: `3px solid ${tideColor}80`,
         borderTop: `1px solid ${tideColor}15`,
         borderRight: `1px solid ${tideColor}15`,
         borderBottom: `1px solid ${tideColor}15`,
+        cursor: row.isBane ? "not-allowed" : "pointer",
       }}
       onClick={onClick}
       onContextMenu={(e) => {
@@ -731,10 +798,10 @@ function DeckListRow({
         </span>
       )}
 
-      {/* Bane indicator */}
+      {/* Bane lock indicator */}
       {row.isBane && (
-        <span className="relative z-10 shrink-0 text-[10px]" style={{ color: "#ef4444" }}>
-          {"\u2620"}
+        <span className="relative z-10 shrink-0 text-[10px]" style={{ color: "#ef4444" }} title="Bane - cannot be removed">
+          {"\uD83D\uDD12"}
         </span>
       )}
 
