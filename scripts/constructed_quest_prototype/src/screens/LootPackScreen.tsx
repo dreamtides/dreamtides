@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import type { SiteState } from "../types/quest";
 import type { Tide } from "../types/cards";
@@ -36,7 +36,12 @@ export function LootPackScreen({ site }: LootPackScreenProps) {
     [site.id],
   );
 
+  const hasAddedRef = useRef(false);
+
   useEffect(() => {
+    if (hasAddedRef.current) return;
+    hasAddedRef.current = true;
+
     logEvent("site_entered", {
       siteType: "LootPack",
       isEnhanced: site.isEnhanced,
