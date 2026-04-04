@@ -191,7 +191,7 @@ describe("loadCardDatabase integration (real card-data.json)", () => {
     );
 
     const db = await loadCardDatabase();
-    expect(db.size).toBe(483);
+    expect(db.size).toBe(582);
   });
 
   it("every card has all required fields with correct types", async () => {

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import type { Tide } from "../types/cards";
 import type { DreamscapeNode } from "../types/quest";
 import {
   previewSiteTypes,
@@ -7,6 +8,7 @@ import {
   siteTypeIcon,
   siteTypeName,
 } from "../atlas/atlas-generator";
+import { TIDE_COLORS } from "../data/card-database";
 
 const NODE_RADIUS_REGULAR = 28;
 const NODE_RADIUS_NEXUS = 40;
@@ -65,6 +67,11 @@ export function AtlasNode({ node, isNexus, onNodeClick }: AtlasNodeProps) {
   const rewardLabel = node.sites
     .map((s) => rewardPreviewLabel(s))
     .find((label) => label !== null) ?? null;
+
+  // Collect tide colors from LootPack sites
+  const packTides: Tide[] = node.sites
+    .filter((s) => s.type === "LootPack" && s.data?.["packTide"])
+    .map((s) => s.data!["packTide"] as Tide);
 
   return (
     <g
@@ -169,6 +176,27 @@ export function AtlasNode({ node, isNexus, onNodeClick }: AtlasNodeProps) {
         >
           {node.biomeName}
         </text>
+      )}
+
+      {/* Tide-colored dots for LootPack sites */}
+      {!isNexus && packTides.length > 0 && (
+        <g transform={`translate(0, ${String(radius + 24)})`}>
+          {packTides.map((tide, i) => {
+            const totalWidth = (packTides.length - 1) * 8;
+            const cx = -totalWidth / 2 + i * 8;
+            return (
+              <circle
+                key={`tide-dot-${String(i)}`}
+                cx={cx}
+                cy={0}
+                r={3}
+                fill={TIDE_COLORS[tide]}
+                opacity={isUnavailable ? 0.4 : 0.9}
+                style={{ pointerEvents: "none" }}
+              />
+            );
+          })}
+        </g>
       )}
 
       {/* Hover tooltip */}

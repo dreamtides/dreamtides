@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
+import { useQuestConfig } from "../state/quest-config";
 import { logEvent } from "../logging";
 
 /** Props for the EssenceSiteScreen component. */
@@ -17,13 +18,18 @@ function randomIntInRange(min: number, max: number): number {
 /** Grants essence with a count-up animation and auto-completes. */
 export function EssenceSiteScreen({ site }: EssenceSiteScreenProps) {
   const { mutations } = useQuest();
+  const config = useQuestConfig();
 
+  const baseAmount = config.essenceSiteAmount;
   const essenceAmount = useMemo(
-    () =>
-      site.isEnhanced
-        ? randomIntInRange(400, 600)
-        : randomIntInRange(200, 300),
-    [site.isEnhanced],
+    () => {
+      const base = baseAmount;
+      const min = Math.round(base * 0.9);
+      const max = Math.round(base * 1.2);
+      const amount = randomIntInRange(min, max);
+      return site.isEnhanced ? amount * 2 : amount;
+    },
+    [site.isEnhanced, baseAmount],
   );
 
   const [displayValue, setDisplayValue] = useState(0);

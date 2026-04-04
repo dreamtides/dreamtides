@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
+import type { Tide } from "../types/cards";
 import type { SiteState } from "../types/quest";
 import { rewardPreviewLabel, siteTypeIcon, siteTypeName } from "../atlas/atlas-generator";
+import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 
 interface SiteCardProps {
   site: SiteState;
@@ -43,6 +45,8 @@ export function SiteCard({
 
   const icon = siteTypeIcon(site.type);
   const label = isBattle ? battleLabel(completionLevel) : siteTypeName(site.type);
+  const packTide = site.type === "LootPack" ? (site.data?.["packTide"] as Tide | undefined) ?? null : null;
+  const packTideColor = packTide !== null ? TIDE_COLORS[packTide] : null;
 
   // Border styling
   let borderColor = "rgba(124, 58, 237, 0.3)";
@@ -97,6 +101,25 @@ export function SiteCard({
           >
             {label}
           </span>
+
+          {/* Pack tide indicator for LootPack sites */}
+          {packTide !== null && packTideColor !== null && !site.isVisited && (
+            <span
+              className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold md:text-xs"
+              style={{
+                background: `${packTideColor}20`,
+                color: packTideColor,
+                border: `1px solid ${packTideColor}40`,
+              }}
+            >
+              <img
+                src={tideIconUrl(packTide)}
+                alt={packTide}
+                className="h-3 w-3 object-contain"
+              />
+              {packTide}
+            </span>
+          )}
 
           {/* Enhanced indicator */}
           {site.isEnhanced && !site.isVisited && (

@@ -57,9 +57,18 @@ export function QuestCompleteScreen() {
   const dreamcallerColor =
     dreamcallerTide !== null ? TIDE_COLORS[dreamcallerTide] : "#6b7280";
 
+  const totalCollection = state.deck.length + state.pool.length;
+  const uniqueCards = new Set([
+    ...state.deck.map((e) => e.cardNumber),
+    ...state.pool.map((e) => e.cardNumber),
+  ]).size;
+
   const stats = [
     { label: "Battles Won", value: String(state.completionLevel) },
     { label: "Cards in Deck", value: String(state.deck.length) },
+    { label: "Cards in Pool", value: String(state.pool.length) },
+    { label: "Total Collection", value: String(totalCollection) },
+    { label: "Unique Cards", value: String(uniqueCards) },
     { label: "Essence Remaining", value: String(state.essence) },
     { label: "Dreamscapes Visited", value: String(completedDreamscapes) },
     { label: "Dreamsigns", value: String(state.dreamsigns.length) },
@@ -127,7 +136,7 @@ export function QuestCompleteScreen() {
 
       {/* Stats grid */}
       <motion.div
-        className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6"
+        className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.3 }}

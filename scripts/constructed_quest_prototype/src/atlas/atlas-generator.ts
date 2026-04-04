@@ -444,13 +444,13 @@ export function generateNewNodes(
 /** Metadata for each site type: icon and display name in one table. */
 const SITE_TYPE_META: Record<SiteType, { icon: string; name: string }> = {
   Battle: { icon: "\u2694\uFE0F", name: "Battle" },
-  LootPack: { icon: "layers", name: "Loot Pack" },
-  CardShop: { icon: "store", name: "Card Shop" },
-  PackShop: { icon: "gift", name: "Pack Shop" },
+  LootPack: { icon: "\uD83C\uDCCF", name: "Loot Pack" },
+  CardShop: { icon: "\uD83D\uDED2", name: "Card Shop" },
+  PackShop: { icon: "\uD83C\uDF81", name: "Pack Shop" },
   DreamcallerDraft: { icon: "\uD83D\uDC51", name: "Dreamcaller Draft" },
-  DraftSite: { icon: "layout-grid", name: "Draft" },
-  Forge: { icon: "anvil", name: "Forge" },
-  Provisioner: { icon: "compass", name: "Provisioner" },
+  DraftSite: { icon: "\uD83C\uDFB2", name: "Draft" },
+  Forge: { icon: "\uD83D\uDD28", name: "Forge" },
+  Provisioner: { icon: "\uD83E\uDDED", name: "Provisioner" },
   DreamsignOffering: { icon: "\u2728", name: "Dreamsign Offering" },
   DreamsignDraft: { icon: "\u2728", name: "Dreamsign Draft" },
   DreamJourney: { icon: "\uD83C\uDF19", name: "Dream Journey" },
@@ -458,7 +458,7 @@ const SITE_TYPE_META: Record<SiteType, { icon: string; name: string }> = {
   Essence: { icon: "\uD83D\uDC8E", name: "Essence" },
   Transfiguration: { icon: "\u2697\uFE0F", name: "Transfiguration" },
   Duplication: { icon: "\uD83D\uDCCB", name: "Duplication" },
-  Reward: { icon: "\uD83C\uDF81", name: "Reward" },
+  Reward: { icon: "\uD83C\uDFC6", name: "Reward" },
   Cleanse: { icon: "\u2744\uFE0F", name: "Cleanse" },
 };
 
