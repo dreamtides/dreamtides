@@ -9,15 +9,16 @@ import {
 } from "react";
 import type { CardData, Tide } from "../types/cards";
 import type {
+  AnteState,
   DeckEntry,
   DreamAtlas,
   Dreamcaller,
   Dreamsign,
   QuestState,
   Screen,
+  SiteState,
   TransfigurationType,
 } from "../types/quest";
-import type { DraftState } from "../types/draft";
 import { logEvent, resetLog } from "../logging";
 
 const MAX_DREAMSIGNS = 12;
@@ -25,9 +26,10 @@ const MAX_DREAMSIGNS = 12;
 /** Mutation functions exposed by the quest context. */
 export interface QuestMutations {
   changeEssence: (delta: number, source: string) => void;
-  addCard: (cardNumber: number, source: string) => void;
-  addBaneCard: (cardNumber: number, source: string) => void;
+  addToPool: (cardNumber: number, source: string) => void;
+  addBaneToPool: (cardNumber: number, source: string) => void;
   removeCard: (entryId: string, source: string) => void;
+  removeFromPool: (entryId: string, source: string) => void;
   transfigureCard: (
     entryId: string,
     type: TransfigurationType,
@@ -42,18 +44,15 @@ export interface QuestMutations {
   addDreamsign: (dreamsign: Dreamsign, sourceSiteType: string) => void;
   removeDreamsign: (index: number, reason: string) => void;
   addTideCrystal: (tide: Tide, count: number) => void;
-  incrementCompletionLevel: (
-    essenceReward: number,
-    rewardCardNumber: number | null,
-    rewardCardName: string | null,
-    isMiniboss: boolean,
-  ) => void;
+  incrementCompletionLevel: (isMiniboss: boolean) => void;
   setScreen: (screen: Screen) => void;
   markSiteVisited: (siteId: string) => void;
   setCurrentDreamscape: (nodeId: string | null) => void;
   updateAtlas: (atlas: DreamAtlas) => void;
-  setDraftState: (draftState: DraftState) => void;
-  setExcludedTides: (tides: Tide[]) => void;
+  setStartingTides: (tides: Tide[]) => void;
+  setAnteState: (anteState: AnteState | null) => void;
+  addProvisionedSite: (dreamscapeId: string, site: SiteState) => void;
+  initializeDeckFromPool: () => void;
   resetQuest: () => void;
 }
 
@@ -95,10 +94,10 @@ function createDefaultState(): QuestState {
     },
     currentDreamscape: null,
     visitedSites: [],
-    draftState: null,
-    excludedTides: [],
     screen: { type: "questStart" },
     activeSiteId: null,
+    startingTides: [],
+    anteState: null,
   };
 }
 
@@ -132,7 +131,7 @@ export function QuestProvider({
     });
   }, []);
 
-  const addCard = useCallback(
+  const addToPool = useCallback(
     (cardNumber: number, source: string) => {
       const card = cardDatabase.get(cardNumber);
       const cardName = card?.name ?? `Unknown Card #${String(cardNumber)}`;
@@ -149,13 +148,13 @@ export function QuestProvider({
           transfiguration: null,
           isBane: false,
         };
-        return { ...prev, deck: [...prev.deck, entry] };
+        return { ...prev, pool: [...prev.pool, entry] };
       });
     },
     [cardDatabase],
   );
 
-  const addBaneCard = useCallback(
+  const addBaneToPool = useCallback(
     (cardNumber: number, source: string) => {
       const card = cardDatabase.get(cardNumber);
       const cardName = card?.name ?? `Unknown Card #${String(cardNumber)}`;
@@ -173,7 +172,11 @@ export function QuestProvider({
           transfiguration: null,
           isBane: true,
         };
-        return { ...prev, deck: [...prev.deck, entry] };
+        return {
+          ...prev,
+          pool: [...prev.pool, entry],
+          deck: [...prev.deck, entry],
+        };
       });
     },
     [cardDatabase],
@@ -256,6 +259,7 @@ export function QuestProvider({
       setState((prev) => {
         const entry = prev.deck.find((e) => e.entryId === entryId);
         if (!entry) return prev;
+        if (entry.isBane) return prev;
         const card = cardDatabase.get(entry.cardNumber);
         logEvent("card_moved_to_pool", {
           cardNumber: entry.cardNumber,
@@ -285,12 +289,14 @@ export function QuestProvider({
 
   const moveAllToPool = useCallback(() => {
     setState((prev) => {
-      if (prev.deck.length === 0) return prev;
-      logEvent("all_cards_moved_to_pool", { count: prev.deck.length });
+      const nonBane = prev.deck.filter((e) => !e.isBane);
+      if (nonBane.length === 0) return prev;
+      const banes = prev.deck.filter((e) => e.isBane);
+      logEvent("all_cards_moved_to_pool", { count: nonBane.length });
       return {
         ...prev,
-        pool: [...prev.pool, ...prev.deck],
-        deck: [],
+        pool: [...prev.pool, ...nonBane],
+        deck: banes,
       };
     });
   }, []);
@@ -345,35 +351,24 @@ export function QuestProvider({
     }));
   }, []);
 
-  const incrementCompletionLevel = useCallback(
-    (
-      essenceReward: number,
-      rewardCardNumber: number | null,
-      rewardCardName: string | null,
-      isMiniboss: boolean,
-    ) => {
-      setState((prev) => {
-        const newLevel = prev.completionLevel + 1;
-        logEvent("battle_won", {
-          completionLevel: newLevel,
-          essenceReward,
-          rewardCardNumber,
-          rewardCardName,
-          isMiniboss,
-        });
-        const screen: Screen =
-          newLevel >= 7 ? { type: "questComplete" } : prev.screen;
-        if (newLevel >= 7) {
-          logEvent("screen_transition", {
-            from: screenName(prev.screen),
-            to: screenName(screen),
-          });
-        }
-        return { ...prev, completionLevel: newLevel, screen };
+  const incrementCompletionLevel = useCallback((isMiniboss: boolean) => {
+    setState((prev) => {
+      const newLevel = prev.completionLevel + 1;
+      logEvent("battle_won", {
+        completionLevel: newLevel,
+        isMiniboss,
       });
-    },
-    [],
-  );
+      const screen: Screen =
+        newLevel >= 7 ? { type: "questComplete" } : prev.screen;
+      if (newLevel >= 7) {
+        logEvent("screen_transition", {
+          from: screenName(prev.screen),
+          to: screenName(screen),
+        });
+      }
+      return { ...prev, completionLevel: newLevel, screen };
+    });
+  }, []);
 
   const setScreen = useCallback((screen: Screen) => {
     setState((prev) => {
@@ -431,14 +426,68 @@ export function QuestProvider({
     setState((prev) => ({ ...prev, atlas }));
   }, []);
 
-  const setDraftState = useCallback((draftState: DraftState) => {
-    setState((prev) => ({ ...prev, draftState }));
+  const setStartingTides = useCallback((tides: Tide[]) => {
+    logEvent("starting_tides_set", { tides });
+    setState((prev) => ({ ...prev, startingTides: tides }));
   }, []);
 
-  const setExcludedTides = useCallback((tides: Tide[]) => {
-    logEvent("tides_excluded", { excludedTides: tides });
-    setState((prev) => ({ ...prev, excludedTides: tides }));
+  const setAnteState = useCallback((anteState: AnteState | null) => {
+    logEvent("ante_state_changed", { anteState });
+    setState((prev) => ({ ...prev, anteState }));
   }, []);
+
+  const addProvisionedSite = useCallback(
+    (dreamscapeId: string, site: SiteState) => {
+      logEvent("site_provisioned", {
+        dreamscapeId,
+        siteId: site.id,
+        siteType: site.type,
+      });
+      setState((prev) => {
+        const node = prev.atlas.nodes[dreamscapeId];
+        if (!node) return prev;
+        const updatedNode = { ...node, sites: [...node.sites, site] };
+        return {
+          ...prev,
+          atlas: {
+            ...prev.atlas,
+            nodes: { ...prev.atlas.nodes, [dreamscapeId]: updatedNode },
+          },
+        };
+      });
+    },
+    [],
+  );
+
+  const initializeDeckFromPool = useCallback(() => {
+    setState((prev) => {
+      logEvent("deck_initialized_from_pool", { count: prev.pool.length });
+      return { ...prev, deck: [...prev.pool] };
+    });
+  }, []);
+
+  const removeFromPool = useCallback(
+    (entryId: string, source: string) => {
+      setState((prev) => {
+        const entry = prev.pool.find((e) => e.entryId === entryId);
+        if (!entry) return prev;
+        const card = cardDatabase.get(entry.cardNumber);
+        const cardName =
+          card?.name ?? `Unknown Card #${String(entry.cardNumber)}`;
+        logEvent("card_removed_from_pool", {
+          cardNumber: entry.cardNumber,
+          cardName,
+          source,
+        });
+        return {
+          ...prev,
+          pool: prev.pool.filter((e) => e.entryId !== entryId),
+          deck: prev.deck.filter((e) => e.entryId !== entryId),
+        };
+      });
+    },
+    [cardDatabase],
+  );
 
   const resetQuest = useCallback(() => {
     resetLog();
@@ -449,9 +498,10 @@ export function QuestProvider({
   const mutations = useMemo<QuestMutations>(
     () => ({
       changeEssence,
-      addCard,
-      addBaneCard,
+      addToPool,
+      addBaneToPool,
       removeCard,
+      removeFromPool,
       transfigureCard,
       moveToDeck,
       moveToPool,
@@ -466,15 +516,18 @@ export function QuestProvider({
       markSiteVisited,
       setCurrentDreamscape,
       updateAtlas,
-      setDraftState,
-      setExcludedTides,
+      setStartingTides,
+      setAnteState,
+      addProvisionedSite,
+      initializeDeckFromPool,
       resetQuest,
     }),
     [
       changeEssence,
-      addCard,
-      addBaneCard,
+      addToPool,
+      addBaneToPool,
       removeCard,
+      removeFromPool,
       transfigureCard,
       moveToDeck,
       moveToPool,
@@ -489,8 +542,10 @@ export function QuestProvider({
       markSiteVisited,
       setCurrentDreamscape,
       updateAtlas,
-      setDraftState,
-      setExcludedTides,
+      setStartingTides,
+      setAnteState,
+      addProvisionedSite,
+      initializeDeckFromPool,
       resetQuest,
     ],
   );
