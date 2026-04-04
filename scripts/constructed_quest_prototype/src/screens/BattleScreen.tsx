@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
-import type { SiteState } from "../types/quest";
+import type { AnteState, DeckEntry, SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { DREAMCALLERS } from "../data/dreamcallers";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
@@ -9,8 +9,20 @@ import { logEvent } from "../logging";
 import { generateNewNodes } from "../atlas/atlas-generator";
 import { DREAMSIGNS } from "../data/dreamsigns";
 import { useQuestConfig } from "../state/quest-config";
+import { CardDisplay } from "../components/CardDisplay";
+import {
+  generateOpponentAnteCards,
+  aiEscalationDecision,
+  resolveAnte,
+} from "../ante/ante-logic";
 
-type BattlePhase = "preBattle" | "animation" | "victory";
+type BattlePhase =
+  | "preBattle"
+  | "anteSelection"
+  | "animation"
+  | "escalation"
+  | "victory"
+  | "defeat";
 
 interface EnemyData {
   name: string;
@@ -299,16 +311,264 @@ function BattleAnimationPhase() {
   );
 }
 
+interface AnteSelectionProps {
+  opponentCard: CardData | null;
+  playerPool: DeckEntry[];
+  cardDatabase: Map<number, CardData>;
+  onAccept: (playerCardNumber: number) => void;
+  onDecline: () => void;
+}
+
+/** Ante selection phase: shows opponent card, player picks a card to wager. */
+function AnteSelectionPhase({
+  opponentCard,
+  playerPool,
+  cardDatabase,
+  onAccept,
+  onDecline,
+}: AnteSelectionProps) {
+  const [selectedCard, setSelectedCard] = useState<number | null>(null);
+
+  const poolCards = useMemo(() => {
+    const seen = new Set<number>();
+    const result: Array<{ entry: DeckEntry; card: CardData }> = [];
+    for (const entry of playerPool) {
+      if (seen.has(entry.cardNumber)) continue;
+      seen.add(entry.cardNumber);
+      const card = cardDatabase.get(entry.cardNumber);
+      if (card) {
+        result.push({ entry, card });
+      }
+    }
+    return result.sort((a, b) => (b.card.energyCost ?? 0) - (a.card.energyCost ?? 0));
+  }, [playerPool, cardDatabase]);
+
+  return (
+    <motion.div
+      className="flex min-h-screen flex-col items-center px-4 py-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      <h2
+        className="mb-2 text-center text-2xl font-bold md:text-3xl"
+        style={{ color: "#fbbf24" }}
+      >
+        Opponent Antes a Card
+      </h2>
+      <p className="mb-6 text-center text-sm opacity-60">
+        Accept the ante by choosing one of your cards, or decline to fight without stakes.
+      </p>
+
+      {/* Opponent's anted card */}
+      {opponentCard && (
+        <div className="mb-8">
+          <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
+            Opponent&apos;s Ante
+          </p>
+          <div style={{ width: 180 }}>
+            <CardDisplay card={opponentCard} />
+          </div>
+        </div>
+      )}
+
+      {/* Player card picker */}
+      <p className="mb-3 text-sm font-semibold opacity-70">Choose a card to wager:</p>
+      <div
+        className="mb-6 grid gap-3 overflow-y-auto"
+        style={{
+          gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+          maxHeight: 360,
+          maxWidth: 720,
+          width: "100%",
+        }}
+      >
+        {poolCards.map(({ entry, card }) => (
+          <div key={entry.cardNumber} style={{ width: "100%" }}>
+            <CardDisplay
+              card={card}
+              onClick={() => setSelectedCard(entry.cardNumber)}
+              selected={selectedCard === entry.cardNumber}
+              selectionColor="#fbbf24"
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex gap-4">
+        <motion.button
+          className="cursor-pointer rounded-lg px-6 py-3 text-base font-bold text-white"
+          style={{
+            background:
+              selectedCard !== null
+                ? "linear-gradient(135deg, #fbbf24 0%, #d4a017 100%)"
+                : "rgba(100, 100, 100, 0.3)",
+            border: "2px solid rgba(251, 191, 36, 0.5)",
+            opacity: selectedCard !== null ? 1 : 0.4,
+          }}
+          whileHover={selectedCard !== null ? { scale: 1.05 } : {}}
+          whileTap={selectedCard !== null ? { scale: 0.97 } : {}}
+          onClick={() => {
+            if (selectedCard !== null) onAccept(selectedCard);
+          }}
+        >
+          Accept Ante & Fight
+        </motion.button>
+
+        <motion.button
+          className="cursor-pointer rounded-lg px-6 py-3 text-base font-bold text-white"
+          style={{
+            background: "rgba(100, 100, 100, 0.3)",
+            border: "2px solid rgba(168, 85, 247, 0.4)",
+          }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={onDecline}
+        >
+          Decline Ante & Fight
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+}
+
+interface EscalationProps {
+  secondOpponentCard: CardData | null;
+  playerPool: DeckEntry[];
+  cardDatabase: Map<number, CardData>;
+  alreadyAntedCards: number[];
+  onMatch: (playerCardNumber: number) => void;
+  onConcede: () => void;
+}
+
+/** Escalation phase: opponent reveals 2nd card, player matches or concedes. */
+function EscalationPhase({
+  secondOpponentCard,
+  playerPool,
+  cardDatabase,
+  alreadyAntedCards,
+  onMatch,
+  onConcede,
+}: EscalationProps) {
+  const [selectedCard, setSelectedCard] = useState<number | null>(null);
+  const antedSet = useMemo(() => new Set(alreadyAntedCards), [alreadyAntedCards]);
+
+  const poolCards = useMemo(() => {
+    const seen = new Set<number>();
+    const result: Array<{ entry: DeckEntry; card: CardData }> = [];
+    for (const entry of playerPool) {
+      if (antedSet.has(entry.cardNumber)) continue;
+      if (seen.has(entry.cardNumber)) continue;
+      seen.add(entry.cardNumber);
+      const card = cardDatabase.get(entry.cardNumber);
+      if (card) {
+        result.push({ entry, card });
+      }
+    }
+    return result.sort((a, b) => (b.card.energyCost ?? 0) - (a.card.energyCost ?? 0));
+  }, [playerPool, cardDatabase, antedSet]);
+
+  return (
+    <motion.div
+      className="flex min-h-screen flex-col items-center px-4 py-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      <h2
+        className="mb-2 text-center text-2xl font-bold md:text-3xl"
+        style={{ color: "#ef4444" }}
+      >
+        Escalation!
+      </h2>
+      <p className="mb-6 text-center text-sm opacity-60">
+        Your opponent raises the stakes! Match with another card or concede.
+      </p>
+
+      {/* Opponent's second card */}
+      {secondOpponentCard && (
+        <div className="mb-8">
+          <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
+            Opponent&apos;s Escalation Card
+          </p>
+          <div style={{ width: 180 }}>
+            <CardDisplay card={secondOpponentCard} />
+          </div>
+        </div>
+      )}
+
+      {/* Player card picker */}
+      <p className="mb-3 text-sm font-semibold opacity-70">Choose a card to match:</p>
+      <div
+        className="mb-6 grid gap-3 overflow-y-auto"
+        style={{
+          gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+          maxHeight: 360,
+          maxWidth: 720,
+          width: "100%",
+        }}
+      >
+        {poolCards.map(({ entry, card }) => (
+          <div key={entry.cardNumber} style={{ width: "100%" }}>
+            <CardDisplay
+              card={card}
+              onClick={() => setSelectedCard(entry.cardNumber)}
+              selected={selectedCard === entry.cardNumber}
+              selectionColor="#ef4444"
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex gap-4">
+        <motion.button
+          className="cursor-pointer rounded-lg px-6 py-3 text-base font-bold text-white"
+          style={{
+            background:
+              selectedCard !== null
+                ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
+                : "rgba(100, 100, 100, 0.3)",
+            border: "2px solid rgba(239, 68, 68, 0.5)",
+            opacity: selectedCard !== null ? 1 : 0.4,
+          }}
+          whileHover={selectedCard !== null ? { scale: 1.05 } : {}}
+          whileTap={selectedCard !== null ? { scale: 0.97 } : {}}
+          onClick={() => {
+            if (selectedCard !== null) onMatch(selectedCard);
+          }}
+        >
+          Match & Fight
+        </motion.button>
+
+        <motion.button
+          className="cursor-pointer rounded-lg px-6 py-3 text-base font-bold text-white"
+          style={{
+            background: "rgba(100, 100, 100, 0.3)",
+            border: "2px solid rgba(168, 85, 247, 0.4)",
+          }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={onConcede}
+        >
+          Concede
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+}
+
 interface VictoryPhaseProps {
   essenceReward: number;
+  cardsGained: CardData[];
   onContinue: () => void;
 }
 
-/** Victory phase: displays essence reward and continue button. */
-function VictoryPhase({
-  essenceReward,
-  onContinue,
-}: VictoryPhaseProps) {
+/** Victory phase: displays essence reward, ante trophies, and continue button. */
+function VictoryPhase({ essenceReward, cardsGained, onContinue }: VictoryPhaseProps) {
   return (
     <motion.div
       className="flex min-h-screen flex-col items-center px-4 py-8 md:px-8 md:py-12"
@@ -351,6 +611,27 @@ function VictoryPhase({
         </div>
       </motion.div>
 
+      {/* Ante trophies */}
+      {cardsGained.length > 0 && (
+        <motion.div
+          className="mb-8 flex flex-col items-center gap-3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <span className="text-sm font-semibold uppercase tracking-wider opacity-60">
+            Cards Won from Ante
+          </span>
+          <div className="flex gap-4">
+            {cardsGained.map((card) => (
+              <div key={card.cardNumber} style={{ width: 160 }}>
+                <CardDisplay card={card} />
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
       {/* Continue button */}
       <motion.button
         className="rounded-lg px-8 py-3 text-lg font-bold text-white"
@@ -372,7 +653,87 @@ function VictoryPhase({
   );
 }
 
-/** Full battle site screen with pre-battle, animation, and victory phases. */
+interface DefeatPhaseProps {
+  cardsLost: CardData[];
+  onContinue: () => void;
+}
+
+/** Defeat phase (concession only): shows lost cards and continue button. */
+function DefeatPhase({ cardsLost, onContinue }: DefeatPhaseProps) {
+  return (
+    <motion.div
+      className="flex min-h-screen flex-col items-center px-4 py-8 md:px-8 md:py-12"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      {/* Defeat header */}
+      <motion.h1
+        className="mb-6 text-center text-4xl font-extrabold tracking-wide md:text-5xl"
+        style={{
+          background: "linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          filter: "drop-shadow(0 0 30px rgba(239, 68, 68, 0.4))",
+        }}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        Conceded
+      </motion.h1>
+
+      <p className="mb-6 text-center text-sm opacity-60">
+        You conceded the battle. No essence reward.
+      </p>
+
+      {/* Cards lost */}
+      {cardsLost.length > 0 && (
+        <motion.div
+          className="mb-8 flex flex-col items-center gap-3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <span
+            className="text-sm font-semibold uppercase tracking-wider"
+            style={{ color: "#ef4444" }}
+          >
+            Cards Lost
+          </span>
+          <div className="flex gap-4">
+            {cardsLost.map((card) => (
+              <div key={card.cardNumber} style={{ width: 160 }}>
+                <CardDisplay card={card} tintColor="#ef4444" />
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Continue button */}
+      <motion.button
+        className="rounded-lg px-8 py-3 text-lg font-bold text-white"
+        style={{
+          background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
+          border: "1px solid rgba(168, 85, 247, 0.5)",
+          boxShadow: "0 0 20px rgba(124, 58, 237, 0.3)",
+        }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.97 }}
+        onClick={onContinue}
+      >
+        Continue
+      </motion.button>
+    </motion.div>
+  );
+}
+
+/** Full battle site screen with pre-battle, ante, animation, escalation, and result phases. */
 export function BattleScreen({
   site,
   cardDatabase,
@@ -386,6 +747,7 @@ export function BattleScreen({
 
   const [phase, setPhase] = useState<BattlePhase>("preBattle");
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const [anteState, setLocalAnteState] = useState<AnteState | null>(null);
 
   // Clear all pending timers on unmount
   useEffect(() => {
@@ -398,7 +760,7 @@ export function BattleScreen({
 
   const isMiniboss = completionLevel === 3;
   const isFinalBoss = completionLevel === 6;
-  const essenceReward = 100 + completionLevel * 50;
+  const essenceReward = config.battleEssence + state.completionLevel * config.essencePerLevel;
 
   // Generate enemy once on mount and keep stable.
   const enemyRef = useRef<EnemyData | null>(null);
@@ -406,6 +768,17 @@ export function BattleScreen({
     enemyRef.current = generateEnemy();
   }
   const enemy = enemyRef.current;
+
+  // Generate opponent ante cards once on mount.
+  const opponentAnteCardsRef = useRef<number[] | null>(null);
+  if (opponentAnteCardsRef.current === null) {
+    opponentAnteCardsRef.current = generateOpponentAnteCards(
+      cardDatabase,
+      state.pool,
+      config,
+    );
+  }
+  const opponentAnteCards = opponentAnteCardsRef.current;
 
   const hasCompletedRef = useRef(false);
 
@@ -417,23 +790,163 @@ export function BattleScreen({
       isFinalBoss,
     });
 
-    setPhase("animation");
+    if (config.anteEnabled && opponentAnteCards.length > 0) {
+      setPhase("anteSelection");
+    } else {
+      setPhase("animation");
+      timersRef.current.push(
+        setTimeout(() => {
+          setPhase("victory");
+        }, 1500),
+      );
+    }
+  }, [completionLevel, enemy.name, isMiniboss, isFinalBoss, config.anteEnabled, opponentAnteCards]);
 
-    // After 1.5 seconds, transition to victory
+  const handleAnteAccept = useCallback(
+    (playerCardNumber: number) => {
+      const newAnteState: AnteState = {
+        anteAccepted: true,
+        playerAnteCards: [playerCardNumber],
+        opponentAnteCards: [opponentAnteCards[0]],
+        escalationTriggered: false,
+        playerConceded: false,
+        escalationPhase: "none",
+      };
+      setLocalAnteState(newAnteState);
+      mutations.setAnteState(newAnteState);
+
+      logEvent("ante_accepted", {
+        playerCard: playerCardNumber,
+        opponentCard: opponentAnteCards[0],
+      });
+
+      setPhase("animation");
+
+      // Ante accepted: first 750ms then escalation check
+      timersRef.current.push(
+        setTimeout(() => {
+          const shouldEscalate =
+            opponentAnteCards.length >= 2 && aiEscalationDecision(false);
+          if (shouldEscalate) {
+            setPhase("escalation");
+          } else {
+            setPhase("victory");
+          }
+        }, 750),
+      );
+    },
+    [opponentAnteCards, mutations],
+  );
+
+  const handleAnteDecline = useCallback(() => {
+    const newAnteState: AnteState = {
+      anteAccepted: false,
+      playerAnteCards: [],
+      opponentAnteCards: [],
+      escalationTriggered: false,
+      playerConceded: false,
+      escalationPhase: "none",
+    };
+    setLocalAnteState(newAnteState);
+    mutations.setAnteState(newAnteState);
+
+    logEvent("ante_declined", {});
+
+    setPhase("animation");
     timersRef.current.push(
       setTimeout(() => {
         setPhase("victory");
       }, 1500),
     );
-  }, [completionLevel, enemy.name, isMiniboss, isFinalBoss]);
+  }, [mutations]);
 
-  const handleContinue = useCallback(
+  const handleEscalationMatch = useCallback(
+    (playerCardNumber: number) => {
+      if (!anteState) return;
+
+      const secondOpponent = opponentAnteCards[1];
+      const updatedAnteState: AnteState = {
+        ...anteState,
+        playerAnteCards: [...anteState.playerAnteCards, playerCardNumber],
+        opponentAnteCards: [...anteState.opponentAnteCards, secondOpponent],
+        escalationTriggered: true,
+        escalationPhase: "resolved",
+      };
+      setLocalAnteState(updatedAnteState);
+      mutations.setAnteState(updatedAnteState);
+
+      logEvent("escalation_matched", {
+        playerCard: playerCardNumber,
+        opponentCard: secondOpponent,
+      });
+
+      setPhase("animation");
+      timersRef.current.push(
+        setTimeout(() => {
+          setPhase("victory");
+        }, 750),
+      );
+    },
+    [anteState, opponentAnteCards, mutations],
+  );
+
+  const handleEscalationConcede = useCallback(() => {
+    if (!anteState) return;
+
+    const updatedAnteState: AnteState = {
+      ...anteState,
+      playerConceded: true,
+      escalationTriggered: true,
+      escalationPhase: "resolved",
+    };
+    setLocalAnteState(updatedAnteState);
+    mutations.setAnteState(updatedAnteState);
+
+    logEvent("escalation_conceded", {});
+
+    setPhase("defeat");
+  }, [anteState, mutations]);
+
+  // Resolve ante results for display
+  const anteResult = useMemo(() => {
+    if (!anteState) return { cardsGained: [] as number[], cardsLost: [] as number[] };
+    return resolveAnte(anteState, true);
+  }, [anteState]);
+
+  const cardsGainedData = useMemo(
+    () =>
+      anteResult.cardsGained
+        .map((cn) => cardDatabase.get(cn))
+        .filter((c): c is CardData => c !== undefined),
+    [anteResult.cardsGained, cardDatabase],
+  );
+
+  const defeatCardsLost = useMemo(() => {
+    if (!anteState) return [];
+    const result = resolveAnte(anteState, false);
+    // If conceded, resolveAnte with playerConceded=true returns the first card
+    return result.cardsLost
+      .map((cn) => cardDatabase.get(cn))
+      .filter((c): c is CardData => c !== undefined);
+  }, [anteState, cardDatabase]);
+
+  const handleVictoryContinue = useCallback(
     () => {
       if (hasCompletedRef.current) return;
       hasCompletedRef.current = true;
 
       // Grant essence reward
       mutations.changeEssence(essenceReward, "battle_reward");
+
+      // Add opponent ante cards to pool if ante was accepted
+      if (anteState?.anteAccepted) {
+        for (const cardNum of anteResult.cardsGained) {
+          mutations.addToPool(cardNum, "ante_win");
+        }
+      }
+
+      // Clear ante state
+      mutations.setAnteState(null);
 
       // Mark site visited
       mutations.markSiteVisited(site.id);
@@ -446,19 +959,10 @@ export function BattleScreen({
         outcome: `Victory - earned ${String(essenceReward)} essence`,
       });
 
-      // Capture dreamscape info before the delayed callback to avoid
-      // stale closure issues.
       const dreamscapeId = currentDreamscape;
 
-      // After animation delay, navigate away and complete the dreamscape.
-      // The dreamscape clearing is deferred to this callback so that the
-      // screen transitions to "atlas" first. Clearing currentDreamscape
-      // while the screen is still "site" would cause SiteScreen to show
-      // "Site not found." and unmount BattleScreen, canceling this timer.
       timersRef.current.push(
         setTimeout(() => {
-          // If final boss, incrementCompletionLevel already transitions
-          // to quest complete. Otherwise go to atlas.
           if (!isFinalBoss) {
             mutations.setScreen({ type: "atlas" });
           }
@@ -496,6 +1000,8 @@ export function BattleScreen({
     [
       mutations,
       essenceReward,
+      anteState,
+      anteResult.cardsGained,
       site.id,
       currentDreamscape,
       atlas,
@@ -505,9 +1011,48 @@ export function BattleScreen({
       state.deck,
       state.dreamsigns,
       state.startingTides,
+      state.pool,
       cardDatabase,
+      config,
     ],
   );
+
+  const handleDefeatContinue = useCallback(() => {
+    if (hasCompletedRef.current) return;
+    hasCompletedRef.current = true;
+
+    // Remove player's first ante card from pool
+    if (anteState?.playerConceded && anteState.playerAnteCards.length > 0) {
+      const lostCardNumber = anteState.playerAnteCards[0];
+      const poolEntry = state.pool.find((e) => e.cardNumber === lostCardNumber);
+      if (poolEntry) {
+        mutations.removeFromPool(poolEntry.entryId, "ante_loss");
+      }
+    }
+
+    // No essence reward on defeat
+    // Clear ante state
+    mutations.setAnteState(null);
+
+    // Mark site visited
+    mutations.markSiteVisited(site.id);
+
+    logEvent("site_completed", {
+      siteType: "Battle",
+      outcome: "Defeat via concession",
+    });
+
+    // Return to dreamscape (do NOT increment completion level)
+    mutations.setScreen({ type: "dreamscape" });
+  }, [anteState, state.pool, mutations, site.id]);
+
+  // Get the first opponent card for the ante selection display
+  const firstOpponentCard =
+    opponentAnteCards.length > 0 ? cardDatabase.get(opponentAnteCards[0]) ?? null : null;
+
+  // Get the second opponent card for escalation display
+  const secondOpponentCard =
+    opponentAnteCards.length > 1 ? cardDatabase.get(opponentAnteCards[1]) ?? null : null;
 
   return (
     <AnimatePresence mode="wait">
@@ -523,9 +1068,34 @@ export function BattleScreen({
         </motion.div>
       )}
 
+      {phase === "anteSelection" && (
+        <motion.div key="ante-selection">
+          <AnteSelectionPhase
+            opponentCard={firstOpponentCard}
+            playerPool={state.pool}
+            cardDatabase={cardDatabase}
+            onAccept={handleAnteAccept}
+            onDecline={handleAnteDecline}
+          />
+        </motion.div>
+      )}
+
       {phase === "animation" && (
         <motion.div key="animation">
           <BattleAnimationPhase />
+        </motion.div>
+      )}
+
+      {phase === "escalation" && (
+        <motion.div key="escalation">
+          <EscalationPhase
+            secondOpponentCard={secondOpponentCard}
+            playerPool={state.pool}
+            cardDatabase={cardDatabase}
+            alreadyAntedCards={anteState?.playerAnteCards ?? []}
+            onMatch={handleEscalationMatch}
+            onConcede={handleEscalationConcede}
+          />
         </motion.div>
       )}
 
@@ -533,7 +1103,17 @@ export function BattleScreen({
         <motion.div key="victory">
           <VictoryPhase
             essenceReward={essenceReward}
-            onContinue={handleContinue}
+            cardsGained={cardsGainedData}
+            onContinue={handleVictoryContinue}
+          />
+        </motion.div>
+      )}
+
+      {phase === "defeat" && (
+        <motion.div key="defeat">
+          <DefeatPhase
+            cardsLost={defeatCardsLost}
+            onContinue={handleDefeatContinue}
           />
         </motion.div>
       )}
