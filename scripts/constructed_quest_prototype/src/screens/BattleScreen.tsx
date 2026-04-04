@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
-import type { AnteState, DeckEntry, SiteState } from "../types/quest";
+import type { AnteState, SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { DREAMCALLERS } from "../data/dreamcallers";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
@@ -363,36 +363,18 @@ function BattleAnimationPhase() {
 
 interface AnteSelectionProps {
   opponentCard: CardData | null;
-  playerPool: DeckEntry[];
-  cardDatabase: Map<number, CardData>;
+  playerAnteCard: CardData | null;
   onAccept: (playerCardNumber: number) => void;
   onDecline: () => void;
 }
 
-/** Ante selection phase: shows opponent card, player picks a card to wager. */
+/** Ante selection phase: shows opponent card and the randomly-chosen player ante card. */
 function AnteSelectionPhase({
   opponentCard,
-  playerPool,
-  cardDatabase,
+  playerAnteCard,
   onAccept,
   onDecline,
 }: AnteSelectionProps) {
-  const [selectedCard, setSelectedCard] = useState<number | null>(null);
-
-  const poolCards = useMemo(() => {
-    const seen = new Set<number>();
-    const result: Array<{ entry: DeckEntry; card: CardData }> = [];
-    for (const entry of playerPool) {
-      if (seen.has(entry.cardNumber)) continue;
-      seen.add(entry.cardNumber);
-      const card = cardDatabase.get(entry.cardNumber);
-      if (card) {
-        result.push({ entry, card });
-      }
-    }
-    return result.sort((a, b) => (b.card.energyCost ?? 0) - (a.card.energyCost ?? 0));
-  }, [playerPool, cardDatabase]);
-
   return (
     <motion.div
       className="flex min-h-screen flex-col items-center px-4 py-8"
@@ -405,45 +387,37 @@ function AnteSelectionPhase({
         className="mb-2 text-center text-2xl font-bold md:text-3xl"
         style={{ color: "#fbbf24" }}
       >
-        Opponent Antes a Card
+        Ante
       </h2>
-      <p className="mb-6 text-center text-sm opacity-60">
-        Accept the ante by choosing one of your cards, or decline to fight without stakes.
+      <p className="mb-8 text-center text-sm opacity-60">
+        Both sides wager a card. Win to claim your opponent&apos;s ante, or decline to fight without stakes.
       </p>
 
-      {/* Opponent's anted card */}
-      {opponentCard && (
-        <div className="mb-8">
-          <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
-            Opponent&apos;s Ante
-          </p>
-          <div style={{ width: 180 }}>
-            <CardDisplay card={opponentCard} />
+      {/* Side-by-side ante display */}
+      <div className="mb-8 flex items-start gap-8">
+        {/* Opponent's anted card */}
+        {opponentCard && (
+          <div>
+            <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
+              Opponent&apos;s Ante
+            </p>
+            <div style={{ width: 180 }}>
+              <CardDisplay card={opponentCard} />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Player card picker */}
-      <p className="mb-3 text-sm font-semibold opacity-70">Choose a card to wager:</p>
-      <div
-        className="mb-6 grid gap-3 overflow-y-auto"
-        style={{
-          gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-          maxHeight: 360,
-          maxWidth: 720,
-          width: "100%",
-        }}
-      >
-        {poolCards.map(({ entry, card }) => (
-          <div key={entry.cardNumber} style={{ width: "100%" }}>
-            <CardDisplay
-              card={card}
-              onClick={() => setSelectedCard(entry.cardNumber)}
-              selected={selectedCard === entry.cardNumber}
-              selectionColor="#fbbf24"
-            />
+        {/* Player's randomly chosen ante card */}
+        {playerAnteCard && (
+          <div>
+            <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
+              Your Ante
+            </p>
+            <div style={{ width: 180 }}>
+              <CardDisplay card={playerAnteCard} />
+            </div>
           </div>
-        ))}
+        )}
       </div>
 
       {/* Action buttons */}
@@ -451,17 +425,13 @@ function AnteSelectionPhase({
         <motion.button
           className="cursor-pointer rounded-lg px-6 py-3 text-base font-bold text-white"
           style={{
-            background:
-              selectedCard !== null
-                ? "linear-gradient(135deg, #fbbf24 0%, #d4a017 100%)"
-                : "rgba(100, 100, 100, 0.3)",
+            background: "linear-gradient(135deg, #fbbf24 0%, #d4a017 100%)",
             border: "2px solid rgba(251, 191, 36, 0.5)",
-            opacity: selectedCard !== null ? 1 : 0.4,
           }}
-          whileHover={selectedCard !== null ? { scale: 1.05 } : {}}
-          whileTap={selectedCard !== null ? { scale: 0.97 } : {}}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
           onClick={() => {
-            if (selectedCard !== null) onAccept(selectedCard);
+            if (playerAnteCard) onAccept(playerAnteCard.cardNumber);
           }}
         >
           Accept Ante & Fight
@@ -486,40 +456,18 @@ function AnteSelectionPhase({
 
 interface EscalationProps {
   secondOpponentCard: CardData | null;
-  playerPool: DeckEntry[];
-  cardDatabase: Map<number, CardData>;
-  alreadyAntedCards: number[];
+  playerEscalationCard: CardData | null;
   onMatch: (playerCardNumber: number) => void;
   onConcede: () => void;
 }
 
-/** Escalation phase: opponent reveals 2nd card, player matches or concedes. */
+/** Escalation phase: shows both sides' escalation cards, player matches or concedes. */
 function EscalationPhase({
   secondOpponentCard,
-  playerPool,
-  cardDatabase,
-  alreadyAntedCards,
+  playerEscalationCard,
   onMatch,
   onConcede,
 }: EscalationProps) {
-  const [selectedCard, setSelectedCard] = useState<number | null>(null);
-  const antedSet = useMemo(() => new Set(alreadyAntedCards), [alreadyAntedCards]);
-
-  const poolCards = useMemo(() => {
-    const seen = new Set<number>();
-    const result: Array<{ entry: DeckEntry; card: CardData }> = [];
-    for (const entry of playerPool) {
-      if (antedSet.has(entry.cardNumber)) continue;
-      if (seen.has(entry.cardNumber)) continue;
-      seen.add(entry.cardNumber);
-      const card = cardDatabase.get(entry.cardNumber);
-      if (card) {
-        result.push({ entry, card });
-      }
-    }
-    return result.sort((a, b) => (b.card.energyCost ?? 0) - (a.card.energyCost ?? 0));
-  }, [playerPool, cardDatabase, antedSet]);
-
   return (
     <motion.div
       className="flex min-h-screen flex-col items-center px-4 py-8"
@@ -534,43 +482,33 @@ function EscalationPhase({
       >
         Escalation!
       </h2>
-      <p className="mb-6 text-center text-sm opacity-60">
-        Your opponent raises the stakes! Match with another card or concede.
+      <p className="mb-8 text-center text-sm opacity-60">
+        Your opponent raises the stakes! Match or concede (losing only your first ante card).
       </p>
 
-      {/* Opponent's second card */}
-      {secondOpponentCard && (
-        <div className="mb-8">
-          <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
-            Opponent&apos;s Escalation Card
-          </p>
-          <div style={{ width: 180 }}>
-            <CardDisplay card={secondOpponentCard} />
+      {/* Side-by-side escalation display */}
+      <div className="mb-8 flex items-start gap-8">
+        {secondOpponentCard && (
+          <div>
+            <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
+              Opponent&apos;s Escalation
+            </p>
+            <div style={{ width: 180 }}>
+              <CardDisplay card={secondOpponentCard} />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Player card picker */}
-      <p className="mb-3 text-sm font-semibold opacity-70">Choose a card to match:</p>
-      <div
-        className="mb-6 grid gap-3 overflow-y-auto"
-        style={{
-          gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-          maxHeight: 360,
-          maxWidth: 720,
-          width: "100%",
-        }}
-      >
-        {poolCards.map(({ entry, card }) => (
-          <div key={entry.cardNumber} style={{ width: "100%" }}>
-            <CardDisplay
-              card={card}
-              onClick={() => setSelectedCard(entry.cardNumber)}
-              selected={selectedCard === entry.cardNumber}
-              selectionColor="#ef4444"
-            />
+        {playerEscalationCard && (
+          <div>
+            <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
+              Your Escalation
+            </p>
+            <div style={{ width: 180 }}>
+              <CardDisplay card={playerEscalationCard} />
+            </div>
           </div>
-        ))}
+        )}
       </div>
 
       {/* Action buttons */}
@@ -578,17 +516,13 @@ function EscalationPhase({
         <motion.button
           className="cursor-pointer rounded-lg px-6 py-3 text-base font-bold text-white"
           style={{
-            background:
-              selectedCard !== null
-                ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
-                : "rgba(100, 100, 100, 0.3)",
+            background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
             border: "2px solid rgba(239, 68, 68, 0.5)",
-            opacity: selectedCard !== null ? 1 : 0.4,
           }}
-          whileHover={selectedCard !== null ? { scale: 1.05 } : {}}
-          whileTap={selectedCard !== null ? { scale: 0.97 } : {}}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
           onClick={() => {
-            if (selectedCard !== null) onMatch(selectedCard);
+            if (playerEscalationCard) onMatch(playerEscalationCard.cardNumber);
           }}
         >
           Match & Fight
@@ -1025,7 +959,7 @@ export function BattleScreen({
             const updatedAtlas = generateNewNodes(
               atlas,
               dreamscapeId,
-              completionLevel,
+              completionLevel + 1,
               {
                 cardDatabase,
                 dreamsignPool: DREAMSIGNS,
@@ -1104,6 +1038,21 @@ export function BattleScreen({
   const secondOpponentCard =
     opponentAnteCards.length > 1 ? cardDatabase.get(opponentAnteCards[1]) ?? null : null;
 
+  // Pre-generate random player ante cards (2 distinct random cards from deck)
+  const playerAnteCardsRef = useRef<number[] | null>(null);
+  if (playerAnteCardsRef.current === null) {
+    const deckCards = state.deck.map((e) => e.cardNumber);
+    const uniqueDeckCards = [...new Set(deckCards)];
+    const shuffled = [...uniqueDeckCards].sort(() => Math.random() - 0.5);
+    playerAnteCardsRef.current = shuffled.slice(0, 2);
+  }
+  const playerRandomAnteCards = playerAnteCardsRef.current;
+
+  const playerAnteCard = playerRandomAnteCards.length > 0
+    ? cardDatabase.get(playerRandomAnteCards[0]) ?? null : null;
+  const playerEscalationCard = playerRandomAnteCards.length > 1
+    ? cardDatabase.get(playerRandomAnteCards[1]) ?? null : null;
+
   return (
     <AnimatePresence mode="wait">
       {phase === "preBattle" && (
@@ -1123,8 +1072,7 @@ export function BattleScreen({
         <motion.div key="ante-selection">
           <AnteSelectionPhase
             opponentCard={firstOpponentCard}
-            playerPool={state.pool}
-            cardDatabase={cardDatabase}
+            playerAnteCard={playerAnteCard}
             onAccept={handleAnteAccept}
             onDecline={handleAnteDecline}
           />
@@ -1141,9 +1089,7 @@ export function BattleScreen({
         <motion.div key="escalation">
           <EscalationPhase
             secondOpponentCard={secondOpponentCard}
-            playerPool={state.pool}
-            cardDatabase={cardDatabase}
-            alreadyAntedCards={anteState?.playerAnteCards ?? []}
+            playerEscalationCard={playerEscalationCard}
             onMatch={handleEscalationMatch}
             onConcede={handleEscalationConcede}
           />

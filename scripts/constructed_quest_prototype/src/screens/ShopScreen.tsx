@@ -137,10 +137,13 @@ export function ShopScreen({ site }: ShopScreenProps) {
         <button
           className="rounded-lg px-6 py-2.5 text-base font-bold transition-opacity"
           style={{
-            background: currentRerollCost <= essence ? "#7c3aed" : "#4b5563",
-            color: currentRerollCost <= essence ? "#fbbf24" : "#9ca3af",
+            background: currentRerollCost <= essence
+              ? "linear-gradient(135deg, #d4a017 0%, #b8860b 100%)"
+              : "#4b5563",
+            color: currentRerollCost <= essence ? "#ffffff" : "#9ca3af",
             opacity: currentRerollCost <= essence ? 1 : 0.6,
             cursor: currentRerollCost <= essence ? "pointer" : "not-allowed",
+            border: currentRerollCost <= essence ? "1px solid rgba(251, 191, 36, 0.5)" : undefined,
           }}
           disabled={currentRerollCost > essence}
           onClick={handleReroll}
@@ -251,10 +254,13 @@ function PriceButton({
     <button
       className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition-opacity"
       style={{
-        background: canAfford ? "#7c3aed" : "#4b5563",
-        color: canAfford ? "#fbbf24" : "#9ca3af",
+        background: canAfford
+          ? "linear-gradient(135deg, #d4a017 0%, #b8860b 100%)"
+          : "#4b5563",
+        color: canAfford ? "#ffffff" : "#9ca3af",
         opacity: canAfford ? 1 : 0.6,
         cursor: canAfford ? "pointer" : "not-allowed",
+        border: canAfford ? "1px solid rgba(251, 191, 36, 0.5)" : undefined,
       }}
       disabled={!canAfford}
       onClick={onClick}

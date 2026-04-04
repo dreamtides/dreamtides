@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { CardData } from "../types/cards";
 import {
   cardImageUrl,
@@ -64,10 +64,45 @@ export function CardDisplay({
   large = false,
 }: CardDisplayProps) {
   const [imageError, setImageError] = useState(false);
+  const rulesRef = useRef<HTMLDivElement>(null);
+  const [autoFontSize, setAutoFontSize] = useState<number | null>(null);
 
   useEffect(() => {
     setImageError(false);
   }, [card.cardNumber]);
+
+  const computeFontSize = useCallback(() => {
+    if (large) return;
+    const el = rulesRef.current;
+    if (!el) return;
+    // Reset to max size to measure
+    el.style.fontSize = "11px";
+    const maxSize = 11;
+    const minSize = 6;
+    for (let size = maxSize; size >= minSize; size -= 0.5) {
+      el.style.fontSize = `${String(size)}px`;
+      if (el.scrollHeight <= el.clientHeight + 1) {
+        setAutoFontSize(size);
+        return;
+      }
+    }
+    setAutoFontSize(minSize);
+  }, [large, card.renderedText]);
+
+  useEffect(() => {
+    computeFontSize();
+  }, [computeFontSize]);
+
+  useEffect(() => {
+    if (large) return undefined;
+    const el = rulesRef.current;
+    if (!el) return undefined;
+    const observer = new ResizeObserver(() => {
+      computeFontSize();
+    });
+    observer.observe(el);
+    return () => { observer.disconnect(); };
+  }, [large, computeFontSize]);
 
   const tideColor = showTideSymbols ? TIDE_COLORS[card.tide] : "#9ca3af";
 
@@ -205,8 +240,12 @@ export function CardDisplay({
 
         {/* Rules text */}
         <div
-          className={`mt-1 min-h-0 flex-1 overflow-y-auto ${large ? "text-base leading-snug" : "text-[10px] leading-tight"} opacity-80`}
-          style={{ color: tintColor ?? "#e2e8f0" }}
+          ref={rulesRef}
+          className={`mt-1 min-h-0 flex-1 overflow-hidden ${large ? "text-base leading-snug" : "leading-tight"} opacity-80`}
+          style={{
+            color: tintColor ?? "#e2e8f0",
+            fontSize: large ? undefined : autoFontSize !== null ? `${String(autoFontSize)}px` : "10px",
+          }}
         >
           {renderRulesText(card.renderedText)}
         </div>

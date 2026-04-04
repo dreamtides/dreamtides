@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
 import type { DeckEntry } from "../types/quest";
@@ -94,6 +94,8 @@ export function DeckEditor({
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [hoverPreview, setHoverPreview] = useState<{ card: CardData; top: number } | null>(null);
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const deckScrollRef = useRef<HTMLDivElement>(null);
   const [viewMode, setViewMode] = useState<"edit" | "view">("edit");
 
   const handleDone = useCallback(() => {
@@ -114,6 +116,23 @@ export function DeckEditor({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen, overlayCard, handleDone]);
+
+  // Clear hover preview on scroll or when editor closes
+  useEffect(() => {
+    if (!isOpen) {
+      setHoverPreview(null);
+      return undefined;
+    }
+    const scrollEl = deckScrollRef.current;
+    if (!scrollEl) return undefined;
+    function handleScroll() {
+      setHoverPreview(null);
+    }
+    scrollEl.addEventListener("scroll", handleScroll);
+    return () => {
+      scrollEl.removeEventListener("scroll", handleScroll);
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!showSortDropdown) return undefined;
@@ -726,7 +745,7 @@ export function DeckEditor({
                     </button>
                     {showSortDropdown && (
                       <div
-                        className="absolute top-full left-0 z-10 mt-1 rounded-lg py-1 shadow-xl"
+                        className="absolute top-full left-0 z-50 mt-1 rounded-lg py-1 shadow-xl"
                         style={{
                           background: "#1a1025",
                           border: "1px solid rgba(124, 58, 237, 0.3)",
@@ -791,7 +810,7 @@ export function DeckEditor({
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
+                  <div className="grid grid-cols-3 gap-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                     <AnimatePresence>
                       {poolGroups.map((group) => (
                         <motion.div
@@ -921,7 +940,7 @@ export function DeckEditor({
               </div>
 
               {/* Deck card list */}
-              <div className="flex-1 overflow-y-auto px-2 py-2">
+              <div ref={deckScrollRef} className="flex-1 overflow-y-auto px-2 py-2">
                 {deckRowsByEnergy.length === 0 ? (
                   <div className="flex h-full items-center justify-center">
                     <p className="px-4 text-center text-sm opacity-40">
@@ -976,11 +995,14 @@ export function DeckEditor({
                                 handleCardOverlay(row.card);
                               }}
                               onMouseEnter={(e) => {
+                                if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
                                 const rect = e.currentTarget.getBoundingClientRect();
                                 setHoverPreview({ card: row.card, top: rect.top });
                               }}
                               onMouseLeave={() => {
-                                setHoverPreview(null);
+                                hoverTimeoutRef.current = setTimeout(() => {
+                                  setHoverPreview(null);
+                                }, 50);
                               }}
                             />
                           </motion.div>

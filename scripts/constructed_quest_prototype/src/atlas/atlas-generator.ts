@@ -163,21 +163,17 @@ export function generateSiteComposition(
 
   if (clampedLevel === 0) {
     // Level 0: fixed composition (DreamcallerDraft, 3 LootPacks, CardShop, Battle)
+    // Loot packs are drawn from the player's starting tides (duplicates allowed)
     sites.push({
       id: nextSiteId(),
       type: "DreamcallerDraft",
       isEnhanced: false,
       isVisited: false,
     });
-    const existingPackTides: Tide[] = [];
     for (let i = 0; i < 3; i++) {
-      const packTide = selectPackTide(
-        context.playerPool,
-        context.cardDatabase,
-        context.config,
-        existingPackTides,
-      );
-      existingPackTides.push(packTide);
+      const packTide = context.startingTides.length > 0
+        ? context.startingTides[Math.floor(Math.random() * context.startingTides.length)]
+        : pickRandom(["Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge"] as Tide[]);
       sites.push({
         id: nextSiteId(),
         type: "LootPack",
