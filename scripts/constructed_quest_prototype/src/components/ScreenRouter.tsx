@@ -21,6 +21,7 @@ import { CleanseSiteScreen } from "../screens/CleanseSiteScreen";
 import { LootPackScreen } from "../screens/LootPackScreen";
 import { PackShopScreen } from "../screens/PackShopScreen";
 import { ForgeScreen } from "../screens/ForgeScreen";
+import { ProvisionerScreen } from "../screens/ProvisionerScreen";
 import { siteTypeName } from "../atlas/atlas-generator";
 import { logEvent } from "../logging";
 import type { Screen, SiteState } from "../types/quest";
@@ -149,7 +150,7 @@ function SiteScreen({ siteId }: { siteId: string }) {
   }
 
   if (site.type === "Provisioner") {
-    return <GenericSitePlaceholder site={site} />;
+    return <ProvisionerScreen site={site} />;
   }
 
   return <GenericSitePlaceholder site={site} />;
