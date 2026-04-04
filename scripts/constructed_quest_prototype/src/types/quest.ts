@@ -1,5 +1,4 @@
-import type { Tide } from "./cards";
-import type { DraftState } from "./draft";
+import type { CardData, Tide } from "./cards";
 
 /** Badge applied to a card via a Transfiguration site. */
 export type TransfigurationType =
@@ -12,20 +11,59 @@ export type TransfigurationType =
 /** All site types available in dreamscapes. */
 export type SiteType =
   | "Battle"
-  | "Draft"
+  | "LootPack"
+  | "CardShop"
+  | "PackShop"
   | "DreamcallerDraft"
-  | "Shop"
-  | "SpecialtyShop"
+  | "DraftSite"
+  | "Forge"
+  | "Provisioner"
   | "DreamsignOffering"
   | "DreamsignDraft"
   | "DreamJourney"
   | "TemptingOffer"
-  | "Purge"
   | "Essence"
   | "Transfiguration"
   | "Duplication"
   | "Reward"
   | "Cleanse";
+
+/** State for the ante system during battles. */
+export interface AnteState {
+  anteAccepted: boolean;
+  playerAnteCards: number[];
+  opponentAnteCards: number[];
+  escalationTriggered: boolean;
+  playerConceded: boolean;
+  escalationPhase: "none" | "pending" | "resolved";
+}
+
+/** Types of card packs available in the pack shop. */
+export type PackType = "tide" | "alliance" | "removal" | "aggro" | "events";
+
+/** A slot in the pack shop. */
+export interface PackShopSlot {
+  packType: PackType;
+  tide?: Tide;
+  alliance?: string;
+  price: number;
+  cards: CardData[];
+  purchased: boolean;
+}
+
+/** A recipe for the forge system. */
+export interface ForgeRecipe {
+  sacrificeTide: Tide;
+  sacrificeCount: number;
+  outputCard: CardData;
+}
+
+/** An option available from the provisioner. */
+export interface ProvisionerOption {
+  siteType: SiteType;
+  cost: number;
+  purchased: boolean;
+}
 
 /** An entry in the player's deck. Duplicates are possible. */
 export interface DeckEntry {
@@ -99,9 +137,8 @@ export interface QuestState {
   atlas: DreamAtlas;
   currentDreamscape: string | null;
   visitedSites: string[];
-  draftState: DraftState | null;
-  /** Core tides excluded from the draft pool for this quest. */
-  excludedTides: Tide[];
+  startingTides: Tide[];
+  anteState: AnteState | null;
   screen: Screen;
   activeSiteId: string | null;
 }

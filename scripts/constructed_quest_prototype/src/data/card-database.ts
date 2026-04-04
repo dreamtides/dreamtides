@@ -1,5 +1,34 @@
 import type { CardData, Tide, Rarity } from "../types/cards";
 
+/** Tide circle: Bloom -> Arc -> Ignite -> Pact -> Umbra -> Rime -> Surge -> Bloom. */
+export const TIDE_CIRCLE_ORDER: readonly Tide[] = [
+  "Bloom",
+  "Arc",
+  "Ignite",
+  "Pact",
+  "Umbra",
+  "Rime",
+  "Surge",
+] as const;
+
+/** Compute shortest distance on the 7-tide circle. Returns -1 for Neutral. */
+export function tideCircleDistance(a: Tide, b: Tide): number {
+  const idxA = TIDE_CIRCLE_ORDER.indexOf(a);
+  const idxB = TIDE_CIRCLE_ORDER.indexOf(b);
+  if (idxA === -1 || idxB === -1) return -1;
+  const diff = Math.abs(idxA - idxB);
+  return Math.min(diff, 7 - diff);
+}
+
+/** Returns the two neighboring tides on the circle. Returns empty for Neutral. */
+export function adjacentTides(tide: Tide): Tide[] {
+  const idx = TIDE_CIRCLE_ORDER.indexOf(tide);
+  if (idx === -1) return [];
+  const prev = TIDE_CIRCLE_ORDER[(idx + 6) % 7];
+  const next = TIDE_CIRCLE_ORDER[(idx + 1) % 7];
+  return [prev, next];
+}
+
 /** Gray circle SVG used as fallback icon for the Neutral tide. */
 const NEUTRAL_TIDE_FALLBACK =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%239ca3af'/%3E%3C/svg%3E";
