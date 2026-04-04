@@ -4,6 +4,7 @@ import type { ProvisionerOption, SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { siteTypeName } from "../atlas/atlas-generator";
 import { generateProvisionerOptions } from "../provisioner/provisioner-logic";
+import { useQuestConfig } from "../state/quest-config";
 import { logEvent } from "../logging";
 
 /** Props for the ProvisionerScreen component. */
@@ -14,9 +15,10 @@ interface ProvisionerScreenProps {
 /** Displays purchasable site options that get added to the current dreamscape. */
 export function ProvisionerScreen({ site }: ProvisionerScreenProps) {
   const { state, mutations } = useQuest();
+  const config = useQuestConfig();
 
   const [options, setOptions] = useState<ProvisionerOption[]>(() =>
-    generateProvisionerOptions(),
+    generateProvisionerOptions(config),
   );
 
   const dreamscapeId = state.currentDreamscape;
@@ -28,10 +30,10 @@ export function ProvisionerScreen({ site }: ProvisionerScreenProps) {
       if (state.essence < option.cost) return;
       if (dreamscapeId === null) return;
 
-      mutations.changeEssence(-option.cost, "provisioner_purchase");
+      mutations.changeEssence(-option.cost, "provisioner");
 
       const newSite: SiteState = {
-        id: `provisioned-${option.siteType}-${String(Date.now())}`,
+        id: crypto.randomUUID(),
         type: option.siteType,
         isEnhanced: false,
         isVisited: false,

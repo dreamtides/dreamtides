@@ -1,7 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import type { CardData } from "../types/cards";
+import type { SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
+import { useQuestConfig } from "../state/quest-config";
 import { CardDisplay } from "../components/CardDisplay";
 import {
   countDeckTides,
@@ -10,12 +12,10 @@ import {
 } from "../data/tide-weights";
 import { logEvent } from "../logging";
 
-/** Show 4 draft options, player keeps 1. */
-const DRAFT_OPTIONS = 4;
-
-/** Displays 4 cards weighted toward player tides; player picks 1 to add to pool. */
-export function DraftSiteScreen({ siteId }: { siteId: string }) {
+/** Displays cards weighted toward player tides; player picks 1 to add to pool. */
+export function DraftSiteScreen({ site }: { site: SiteState }) {
   const { state, mutations, cardDatabase } = useQuest();
+  const config = useQuestConfig();
 
   const draftCards = useMemo(() => {
     const deckTideCounts = countDeckTides(state.pool, cardDatabase);
@@ -23,7 +23,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
 
     const selected = weightedSample<CardData>(
       allCards,
-      DRAFT_OPTIONS,
+      config.draftSiteTotal,
       (card) => tideWeight(card.tide, deckTideCounts),
     );
 
@@ -35,7 +35,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
     return selected;
     // Generate once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [siteId]);
+  }, [site.id]);
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [confirmed, setConfirmed] = useState(false);
@@ -64,9 +64,9 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
   }, [selectedIndex, confirmed, draftCards, mutations]);
 
   const handleContinue = useCallback(() => {
-    mutations.markSiteVisited(siteId);
+    mutations.markSiteVisited(site.id);
     mutations.setScreen({ type: "dreamscape" });
-  }, [siteId, mutations]);
+  }, [site.id, mutations]);
 
   return (
     <motion.div
@@ -93,7 +93,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
       <motion.div
         className="mb-8 grid gap-4"
         style={{
-          gridTemplateColumns: `repeat(${String(DRAFT_OPTIONS)}, minmax(150px, 200px))`,
+          gridTemplateColumns: `repeat(${String(config.draftSiteTotal)}, minmax(150px, 200px))`,
         }}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}

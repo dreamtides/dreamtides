@@ -446,7 +446,11 @@ export function QuestProvider({
       setState((prev) => {
         const node = prev.atlas.nodes[dreamscapeId];
         if (!node) return prev;
-        const updatedNode = { ...node, sites: [...node.sites, site] };
+        const sites = [...node.sites];
+        const lastSite = sites[sites.length - 1];
+        const insertIdx = lastSite?.type === "Battle" ? sites.length - 1 : sites.length;
+        sites.splice(insertIdx, 0, site);
+        const updatedNode = { ...node, sites };
         return {
           ...prev,
           atlas: {

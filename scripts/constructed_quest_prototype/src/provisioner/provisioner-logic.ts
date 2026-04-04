@@ -1,4 +1,5 @@
 import type { ProvisionerOption, SiteType } from "../types/quest";
+import type { QuestConfig } from "../state/quest-config";
 
 /** All purchasable site types with their costs. */
 const PROVISIONER_CATALOG: ReadonlyArray<{ siteType: SiteType; cost: number }> =
@@ -13,12 +14,12 @@ const PROVISIONER_CATALOG: ReadonlyArray<{ siteType: SiteType; cost: number }> =
   ];
 
 /**
- * Generates 3 distinct purchasable site options from the provisioner catalog.
+ * Generates distinct purchasable site options from the provisioner catalog.
  * Uses Fisher-Yates partial shuffle to select without replacement.
  */
-export function generateProvisionerOptions(): ProvisionerOption[] {
+export function generateProvisionerOptions(config: QuestConfig): ProvisionerOption[] {
   const pool = [...PROVISIONER_CATALOG];
-  const count = Math.min(3, pool.length);
+  const count = Math.min(config.provisionerOptions, pool.length);
   const result: ProvisionerOption[] = [];
 
   for (let i = 0; i < count; i++) {

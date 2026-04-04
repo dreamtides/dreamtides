@@ -86,7 +86,7 @@ function SiteScreen({ siteId }: { siteId: string }) {
   }
 
   if (site.type === "DraftSite") {
-    return <DraftSiteScreen siteId={siteId} />;
+    return <DraftSiteScreen site={site} />;
   }
 
   if (site.type === "DreamcallerDraft") {
