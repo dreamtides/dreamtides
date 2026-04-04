@@ -5,10 +5,10 @@ import type { SiteState } from "../types/quest";
 import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
 import { useQuest } from "../state/quest-context";
+import { useQuestConfig } from "../state/quest-config";
 import { logEvent } from "../logging";
-import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import {
-  generateShopInventory,
+  generateCardShopInventory,
   effectivePrice,
   rerollCost,
   type ShopSlot,
@@ -19,20 +19,21 @@ interface ShopScreenProps {
   site: SiteState;
 }
 
-/** Renders the Shop site screen with a 2x3 item grid, purchasing, and rerolling. */
+/** Renders the Card Shop site screen with a card grid, purchasing, and rerolling. */
 export function ShopScreen({ site }: ShopScreenProps) {
   const { state, mutations, cardDatabase } = useQuest();
-  const { essence, deck } = state;
+  const config = useQuestConfig();
+  const { essence } = state;
 
   const [slots, setSlots] = useState<ShopSlot[]>(() =>
-    generateShopInventory(cardDatabase, deck, state.startingTides),
+    generateCardShopInventory(cardDatabase, state.pool, state.startingTides, config),
   );
   const [rerollCount, setRerollCount] = useState(0);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
 
   const currentRerollCost = useMemo(
-    () => rerollCost(rerollCount, site.isEnhanced),
-    [rerollCount, site.isEnhanced],
+    () => rerollCost(rerollCount, site.isEnhanced, config),
+    [rerollCount, site.isEnhanced, config],
   );
 
   const handleBuy = useCallback(
@@ -44,36 +45,15 @@ export function ShopScreen({ site }: ShopScreenProps) {
       if (price > essence) return;
 
       mutations.changeEssence(-price, "shop_purchase");
+      mutations.addToPool(slot.card.cardNumber, "card_shop");
 
-      if (slot.itemType === "card" && slot.card) {
-        mutations.addToPool(slot.card.cardNumber, "card_shop");
-        logEvent("shop_purchase", {
-          itemType: "card",
-          cardNumber: slot.card.cardNumber,
-          cardName: slot.card.name,
-          basePrice: slot.basePrice,
-          discountedPrice: price,
-          essenceRemaining: essence - price,
-        });
-      } else if (slot.itemType === "dreamsign" && slot.dreamsign) {
-        mutations.addDreamsign(slot.dreamsign, "CardShop");
-        logEvent("shop_purchase", {
-          itemType: "dreamsign",
-          dreamsignName: slot.dreamsign.name,
-          basePrice: slot.basePrice,
-          discountedPrice: price,
-          essenceRemaining: essence - price,
-        });
-      } else if (slot.itemType === "tideCrystal" && slot.tideCrystal) {
-        mutations.addTideCrystal(slot.tideCrystal, 1);
-        logEvent("shop_purchase", {
-          itemType: "tideCrystal",
-          tide: slot.tideCrystal,
-          basePrice: slot.basePrice,
-          discountedPrice: price,
-          essenceRemaining: essence - price,
-        });
-      }
+      logEvent("shop_purchase", {
+        cardNumber: slot.card.cardNumber,
+        cardName: slot.card.name,
+        basePrice: slot.basePrice,
+        discountedPrice: price,
+        essenceRemaining: essence - price,
+      });
 
       setSlots((prev) =>
         prev.map((s, i) => (i === index ? { ...s, purchased: true } : s)),
@@ -82,54 +62,22 @@ export function ShopScreen({ site }: ShopScreenProps) {
     [slots, essence, mutations],
   );
 
-  const handleReroll = useCallback(
-    (index: number) => {
-      if (currentRerollCost > essence) return;
+  const handleReroll = useCallback(() => {
+    if (currentRerollCost > essence) return;
 
+    if (currentRerollCost > 0) {
       mutations.changeEssence(-currentRerollCost, "shop_reroll");
-      logEvent("shop_reroll", {
-        rerollCost: currentRerollCost,
-        rerollCount: rerollCount + 1,
-      });
+    }
+    logEvent("shop_reroll", {
+      rerollCost: currentRerollCost,
+      rerollCount: rerollCount + 1,
+    });
 
-      setRerollCount((prev) => prev + 1);
-
-      // Regenerate unpurchased non-reroll slots
-      const newInventory = generateShopInventory(cardDatabase, deck, state.startingTides);
-      // Collect only non-reroll replacement items to avoid introducing
-      // a second reroll slot from the freshly generated inventory.
-      const replacements = newInventory.filter(
-        (s) => s.itemType !== "reroll",
-      );
-      let replacementIdx = 0;
-      setSlots((prev) =>
-        prev.map((s, i) => {
-          if (s.purchased) return s;
-          if (i === index) {
-            // Keep the reroll slot but update its price
-            return {
-              ...s,
-              basePrice:
-                rerollCost(rerollCount + 1, site.isEnhanced),
-            };
-          }
-          if (s.itemType === "reroll") return s;
-          const replacement = replacements[replacementIdx];
-          replacementIdx += 1;
-          return replacement ?? s;
-        }),
-      );
-    },
-    [
-      currentRerollCost,
-      essence,
-      rerollCount,
-      cardDatabase,
-      deck,
-      site.isEnhanced,
-      mutations,
-    ],
-  );
+    setRerollCount((prev) => prev + 1);
+    setSlots(
+      generateCardShopInventory(cardDatabase, state.pool, state.startingTides, config),
+    );
+  }, [currentRerollCost, essence, rerollCount, cardDatabase, state.pool, state.startingTides, config, mutations]);
 
   const handleLeave = useCallback(() => {
     logEvent("site_completed", {
@@ -154,7 +102,7 @@ export function ShopScreen({ site }: ShopScreenProps) {
           className="text-2xl font-bold tracking-wide md:text-3xl"
           style={{ color: "#a855f7" }}
         >
-          Shop
+          Card Shop
         </h2>
         {site.isEnhanced && (
           <span
@@ -170,27 +118,42 @@ export function ShopScreen({ site }: ShopScreenProps) {
         )}
       </div>
 
-      {/* Item grid: 3 columns desktop, 2 tablet */}
-      <div className="grid w-full max-w-4xl grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-6">
+      {/* Card grid: 2 columns on small screens, 4 on large */}
+      <div className="grid w-full max-w-4xl grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
         {slots.map((slot, index) => (
           <ShopSlotCard
             key={`shop-slot-${String(index)}`}
             slot={slot}
             index={index}
             canAfford={effectivePrice(slot) <= essence}
-            rerollCost={
-              slot.itemType === "reroll" ? currentRerollCost : undefined
-            }
             onBuy={handleBuy}
-            onReroll={handleReroll}
             onCardClick={setOverlayCard}
           />
         ))}
       </div>
 
+      {/* Reroll button */}
+      <div className="mt-6">
+        <button
+          className="rounded-lg px-6 py-2.5 text-base font-bold transition-opacity"
+          style={{
+            background: currentRerollCost <= essence ? "#7c3aed" : "#4b5563",
+            color: currentRerollCost <= essence ? "#fbbf24" : "#9ca3af",
+            opacity: currentRerollCost <= essence ? 1 : 0.6,
+            cursor: currentRerollCost <= essence ? "pointer" : "not-allowed",
+          }}
+          disabled={currentRerollCost > essence}
+          onClick={handleReroll}
+        >
+          {currentRerollCost === 0
+            ? "Reroll (FREE)"
+            : `Reroll -- ${String(currentRerollCost)} Essence`}
+        </button>
+      </div>
+
       {/* Leave button */}
       <button
-        className="mt-8 rounded-lg px-6 py-2.5 text-base font-medium transition-colors"
+        className="mt-4 rounded-lg px-6 py-2.5 text-base font-medium transition-colors"
         style={{
           background: "rgba(107, 114, 128, 0.2)",
           border: "1px solid rgba(107, 114, 128, 0.4)",
@@ -198,7 +161,7 @@ export function ShopScreen({ site }: ShopScreenProps) {
         }}
         onClick={handleLeave}
       >
-        Leave Shop
+        Leave Card Shop
       </button>
 
       <CardOverlay card={overlayCard} onClose={() => setOverlayCard(null)} />
@@ -211,9 +174,7 @@ interface ShopSlotCardProps {
   slot: ShopSlot;
   index: number;
   canAfford: boolean;
-  rerollCost?: number;
   onBuy: (index: number) => void;
-  onReroll: (index: number) => void;
   onCardClick: (card: CardData) => void;
 }
 
@@ -222,9 +183,7 @@ function ShopSlotCard({
   slot,
   index,
   canAfford,
-  rerollCost: rerollCostValue,
   onBuy,
-  onReroll,
   onCardClick,
 }: ShopSlotCardProps) {
   if (slot.purchased) {
@@ -244,173 +203,34 @@ function ShopSlotCard({
   const price = effectivePrice(slot);
   const hasDiscount = slot.discountPercent > 0;
 
-  if (slot.itemType === "reroll") {
-    const displayCost = rerollCostValue ?? slot.basePrice;
-    const canAffordReroll = displayCost <= 0 || canAfford;
-    return (
-      <div className="flex flex-col gap-2">
-        <div
-          className="flex flex-col items-center justify-center gap-3 rounded-lg p-4"
-          style={{
-            aspectRatio: "2 / 3",
-            background:
-              "linear-gradient(145deg, #1a1025 0%, #1a1030 60%, #0d0814 100%)",
-            border: "1px solid rgba(168, 85, 247, 0.4)",
-            boxShadow: "0 0 12px rgba(168, 85, 247, 0.15)",
-          }}
-        >
-          <div className="text-4xl">{"\u267B\uFE0F"}</div>
-          <h3
-            className="text-center text-lg font-bold"
-            style={{ color: "#a855f7" }}
-          >
-            Reroll Shop
-          </h3>
-          <p className="text-center text-xs opacity-50">
-            Refresh all unsold items with new stock
-          </p>
-        </div>
-        <button
-          className="w-full rounded-lg px-3 py-2 text-sm font-bold transition-opacity"
-          style={{
-            background: canAffordReroll ? "#7c3aed" : "#4b5563",
-            color: canAffordReroll ? "#fbbf24" : "#9ca3af",
-            opacity: canAffordReroll ? 1 : 0.6,
-            cursor: canAffordReroll ? "pointer" : "not-allowed",
-          }}
-          disabled={!canAffordReroll}
-          onClick={() => onReroll(index)}
-        >
-          {displayCost === 0 ? "Reroll (FREE)" : `Reroll -- ${String(displayCost)} Essence`}
-        </button>
-      </div>
-    );
-  }
-
-  if (slot.itemType === "dreamsign" && slot.dreamsign) {
-    const ds = slot.dreamsign;
-    const tideColor = TIDE_COLORS[ds.tide];
-    return (
-      <div className="flex flex-col gap-2">
-        <div
-          className="flex flex-col items-center justify-center gap-2 rounded-lg p-3"
-          style={{
-            aspectRatio: "2 / 3",
-            background:
-              "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-            border: `1px solid ${tideColor}60`,
-            boxShadow: `0 0 8px ${tideColor}20`,
-          }}
-        >
-          <img
-            src={tideIconUrl(ds.tide)}
-            alt={ds.tide}
-            className="h-10 w-10 rounded-full object-contain"
-            style={{ border: `2px solid ${tideColor}` }}
-          />
-          <span
-            className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-            style={{
-              background: `${tideColor}20`,
-              color: tideColor,
-              border: `1px solid ${tideColor}40`,
-            }}
-          >
-            Dreamsign
-          </span>
-          <h3
-            className="text-center text-sm font-bold"
-            style={{ color: tideColor }}
-          >
-            {ds.name}
-          </h3>
-          <p
-            className="text-center text-[10px] leading-tight opacity-70"
-            style={{ color: "#e2e8f0" }}
-          >
-            {ds.effectDescription}
-          </p>
-        </div>
-        <PriceButton
-          basePrice={slot.basePrice}
-          price={price}
-          hasDiscount={hasDiscount}
-          canAfford={canAfford}
-          onClick={() => onBuy(index)}
-        />
-      </div>
-    );
-  }
-
-  if (slot.itemType === "tideCrystal" && slot.tideCrystal) {
-    const tide = slot.tideCrystal;
-    const tideColor = TIDE_COLORS[tide];
-    return (
-      <div className="flex flex-col gap-2">
-        <div
-          className="flex flex-col items-center justify-center gap-3 rounded-lg p-4"
-          style={{
-            aspectRatio: "2 / 3",
-            background:
-              "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-            border: `1px solid ${tideColor}60`,
-            boxShadow: `0 0 8px ${tideColor}20`,
-          }}
-        >
-          <img
-            src={tideIconUrl(tide)}
-            alt={tide}
-            className="h-14 w-14 rounded-full object-contain"
-            style={{ border: `2px solid ${tideColor}` }}
-          />
-          <span
-            className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-            style={{
-              background: `${tideColor}20`,
-              color: tideColor,
-              border: `1px solid ${tideColor}40`,
-            }}
-          >
-            Tide Crystal
-          </span>
-          <h3
-            className="text-center text-base font-bold"
-            style={{ color: tideColor }}
-          >
-            {tide}
-          </h3>
-        </div>
-        <PriceButton
-          basePrice={slot.basePrice}
-          price={price}
-          hasDiscount={hasDiscount}
-          canAfford={canAfford}
-          onClick={() => onBuy(index)}
-        />
-      </div>
-    );
-  }
-
-  // Card slot
-  if (slot.card) {
-    return (
-      <div className="flex flex-col gap-2">
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="relative">
         <CardDisplay
           card={slot.card}
-          onClick={() => onCardClick(slot.card!)}
+          onClick={() => onCardClick(slot.card)}
         />
-        <PriceButton
-          basePrice={slot.basePrice}
-          price={price}
-          hasDiscount={hasDiscount}
-          canAfford={canAfford}
-          onClick={() => onBuy(index)}
-        />
+        {hasDiscount && (
+          <span
+            className="absolute right-1 top-1 rounded-full px-2 py-0.5 text-xs font-bold"
+            style={{
+              background: "rgba(239, 68, 68, 0.9)",
+              color: "#fff",
+            }}
+          >
+            -{String(slot.discountPercent)}%
+          </span>
+        )}
       </div>
-    );
-  }
-
-  return null;
+      <PriceButton
+        basePrice={slot.basePrice}
+        price={price}
+        hasDiscount={hasDiscount}
+        canAfford={canAfford}
+        onClick={() => onBuy(index)}
+      />
+    </div>
+  );
 }
 
 /** Renders the Buy button with price display, including discount styling. */

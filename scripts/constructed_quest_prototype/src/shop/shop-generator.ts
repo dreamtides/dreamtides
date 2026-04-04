@@ -1,43 +1,11 @@
-import type { CardData, Tide, Rarity } from "../types/cards";
-import type { DeckEntry, Dreamsign } from "../types/quest";
-import { NAMED_TIDES } from "../data/card-database";
-import { DREAMSIGNS } from "../data/dreamsigns";
+import type { CardData, Tide } from "../types/cards";
+import type { DeckEntry } from "../types/quest";
+import type { QuestConfig } from "../state/quest-config";
+import { countDeckTides, tideWeight, weightedSample } from "../data/tide-weights";
 
-/** Prices by rarity for card items. */
-const RARITY_PRICES: Readonly<Record<Rarity, number>> = {
-  Common: 50,
-  Uncommon: 100,
-  Rare: 200,
-  Legendary: 400,
-};
-
-/** Fixed price for dreamsign items. */
-const DREAMSIGN_PRICE = 150;
-
-/** Fixed price for tide crystal items. */
-const TIDE_CRYSTAL_PRICE = 200;
-
-/** Base cost for a shop reroll. */
-const REROLL_BASE_COST = 50;
-
-/** Additional cost per previous reroll. */
-const REROLL_INCREMENT = 25;
-
-/** Chance (out of 6) for a slot to be a dreamsign. */
-const DREAMSIGN_CHANCE = 1 / 6;
-
-/** Chance (out of 6) for a non-dreamsign slot to be a tide crystal. */
-const TIDE_CRYSTAL_CHANCE = 1 / 6;
-
-/** The types of items that can appear in a shop slot. */
-export type ShopItemType = "card" | "dreamsign" | "tideCrystal" | "reroll";
-
-/** A single slot in the shop inventory. */
+/** A single slot in the card shop inventory. */
 export interface ShopSlot {
-  itemType: ShopItemType;
-  card: CardData | null;
-  dreamsign: Dreamsign | null;
-  tideCrystal: Tide | null;
+  card: CardData;
   basePrice: number;
   discountPercent: number;
   purchased: boolean;
@@ -50,208 +18,66 @@ export function effectivePrice(slot: ShopSlot): number {
 }
 
 /** Computes reroll cost given the number of previous rerolls. */
-export function rerollCost(rerollCount: number, isEnhanced: boolean): number {
+export function rerollCost(
+  rerollCount: number,
+  isEnhanced: boolean,
+  config: QuestConfig,
+): number {
   if (isEnhanced) return 0;
-  return REROLL_BASE_COST + REROLL_INCREMENT * rerollCount;
+  return config.rerollBase + config.rerollIncrement * rerollCount;
 }
 
 /**
- * Selects a card weighted toward the player's drafted tides.
- * Cards matching drafted tides get proportional weight; undrafted tides
- * get a baseline weight.
+ * Generates card shop inventory with `config.cardShopSize` card slots.
+ * Cards are weighted toward the player's starting tides. Prices are
+ * randomized in [cardPriceMin, cardPriceMax] rounded to nearest 5,
+ * with 1-2 random slots receiving a 30-70% discount.
  */
-function selectWeightedCard(
-  cards: CardData[],
-  deckTideCounts: Record<Tide, number>,
-): CardData | null {
-  if (cards.length === 0) return null;
+export function generateCardShopInventory(
+  cardDatabase: Map<number, CardData>,
+  playerPool: DeckEntry[],
+  startingTides: Tide[],
+  config: QuestConfig,
+): ShopSlot[] {
+  const poolTideCounts = countDeckTides(playerPool, cardDatabase);
 
-  const totalDeckCards = Object.values(deckTideCounts).reduce(
-    (sum, c) => sum + c,
-    0,
+  // Use starting tides to seed counts if pool is empty
+  for (const tide of startingTides) {
+    if (!poolTideCounts.has(tide)) {
+      poolTideCounts.set(tide, 1);
+    }
+  }
+
+  const allCards = Array.from(cardDatabase.values()).filter(
+    (c) => c.tide !== "Neutral",
   );
-  const baseline = 1;
 
-  const weights = cards.map((card) => {
-    if (totalDeckCards === 0) return 1;
-    const tideCount = deckTideCounts[card.tide] ?? 0;
-    return baseline + (tideCount / totalDeckCards) * 10;
+  const selected = weightedSample(
+    allCards,
+    config.cardShopSize,
+    (card) => tideWeight(card.tide, poolTideCounts),
+  );
+
+  const slots: ShopSlot[] = selected.map((card) => {
+    const rawPrice =
+      config.cardPriceMin +
+      Math.random() * (config.cardPriceMax - config.cardPriceMin);
+    const basePrice = Math.round(rawPrice / 5) * 5;
+    return {
+      card,
+      basePrice,
+      discountPercent: 0,
+      purchased: false,
+    };
   });
 
-  const totalWeight = weights.reduce((sum, w) => sum + w, 0);
-  if (totalWeight <= 0) return cards[0];
-
-  let roll = Math.random() * totalWeight;
-  for (let i = 0; i < cards.length; i++) {
-    roll -= weights[i];
-    if (roll <= 0) return cards[i];
-  }
-  return cards[cards.length - 1];
-}
-
-/** Counts tide occurrences in the player's deck. */
-function countDeckTides(
-  deck: DeckEntry[],
-  cardDatabase: Map<number, CardData>,
-): Record<Tide, number> {
-  const counts: Record<Tide, number> = {
-    Bloom: 0,
-    Arc: 0,
-    Ignite: 0,
-    Pact: 0,
-    Umbra: 0,
-    Rime: 0,
-    Surge: 0,
-    Neutral: 0,
-  };
-  for (const entry of deck) {
-    const card = cardDatabase.get(entry.cardNumber);
-    if (card) {
-      counts[card.tide] += 1;
-    }
-  }
-  return counts;
-}
-
-/** Selects a random dreamsign from the synthetic pool. */
-function selectRandomDreamsign(): Dreamsign {
-  const template = DREAMSIGNS[Math.floor(Math.random() * DREAMSIGNS.length)];
-  return { ...template, isBane: false };
-}
-
-/** Selects a random named tide for a tide crystal, excluding specified tides. */
-function selectRandomTide(excludedTides: Tide[]): Tide {
-  const excludedSet = new Set(excludedTides);
-  const available = NAMED_TIDES.filter((t) => !excludedSet.has(t));
-  if (available.length === 0) return NAMED_TIDES[0];
-  return available[Math.floor(Math.random() * available.length)];
-}
-
-/**
- * Generates shop inventory with 6 slots. Each slot can be a card,
- * dreamsign, tide crystal, or reroll option.
- */
-export function generateShopInventory(
-  cardDatabase: Map<number, CardData>,
-  playerDeck: DeckEntry[],
-  excludedTides: Tide[] = [],
-): ShopSlot[] {
-  const excludedSet = new Set(excludedTides);
-  const allCards = Array.from(cardDatabase.values()).filter(
-    (c) => !excludedSet.has(c.tide),
-  );
-  const deckTideCounts = countDeckTides(playerDeck, cardDatabase);
-  const slots: ShopSlot[] = [];
-
-  // Decide if reroll slot appears (50% chance)
-  const hasRerollSlot = Math.random() < 0.5;
-  const rerollSlotIndex = hasRerollSlot
-    ? Math.floor(Math.random() * 6)
-    : -1;
-
-  for (let i = 0; i < 6; i++) {
-    if (i === rerollSlotIndex) {
-      slots.push({
-        itemType: "reroll",
-        card: null,
-        dreamsign: null,
-        tideCrystal: null,
-        basePrice: REROLL_BASE_COST,
-        discountPercent: 0,
-        purchased: false,
-      });
-      continue;
-    }
-
-    // Roll for dreamsign
-    if (Math.random() < DREAMSIGN_CHANCE) {
-      slots.push({
-        itemType: "dreamsign",
-        card: null,
-        dreamsign: selectRandomDreamsign(),
-        tideCrystal: null,
-        basePrice: DREAMSIGN_PRICE,
-        discountPercent: 0,
-        purchased: false,
-      });
-      continue;
-    }
-
-    // Roll for tide crystal
-    if (Math.random() < TIDE_CRYSTAL_CHANCE) {
-      slots.push({
-        itemType: "tideCrystal",
-        card: null,
-        dreamsign: null,
-        tideCrystal: selectRandomTide(excludedTides),
-        basePrice: TIDE_CRYSTAL_PRICE,
-        discountPercent: 0,
-        purchased: false,
-      });
-      continue;
-    }
-
-    // Default: card slot
-    const card = selectWeightedCard(allCards, deckTideCounts);
-    if (card) {
-      slots.push({
-        itemType: "card",
-        card,
-        dreamsign: null,
-        tideCrystal: null,
-        basePrice: RARITY_PRICES[card.rarity],
-        discountPercent: 0,
-        purchased: false,
-      });
-    }
-  }
-
-  // Apply discounts to 1-2 random non-reroll slots
-  const discountableIndices = slots
-    .map((s, i) => (s.itemType !== "reroll" ? i : -1))
-    .filter((i) => i >= 0);
-
+  // Apply discounts to 1-2 random slots
   const discountCount = Math.random() < 0.5 ? 1 : 2;
-  const shuffled = discountableIndices.sort(() => Math.random() - 0.5);
-  for (let d = 0; d < discountCount && d < shuffled.length; d++) {
-    const idx = shuffled[d];
-    // 30-90% discount in increments of 10
-    const discount = 30 + Math.floor(Math.random() * 7) * 10;
-    slots[idx] = { ...slots[idx], discountPercent: discount };
-  }
-
-  return slots;
-}
-
-/**
- * Generates specialty shop inventory: 4 rare cards weighted
- * toward the player's drafted tides.
- */
-export function generateSpecialtyShopInventory(
-  cardDatabase: Map<number, CardData>,
-  playerDeck: DeckEntry[],
-  excludedTides: Tide[] = [],
-): ShopSlot[] {
-  const excludedSet = new Set(excludedTides);
-  const rareCards = Array.from(cardDatabase.values()).filter(
-    (c) => c.rarity === "Rare" && !excludedSet.has(c.tide),
-  );
-  const deckTideCounts = countDeckTides(playerDeck, cardDatabase);
-  const slots: ShopSlot[] = [];
-
-  for (let i = 0; i < 4; i++) {
-    const card = selectWeightedCard(rareCards, deckTideCounts);
-    if (card) {
-      slots.push({
-        itemType: "card",
-        card,
-        dreamsign: null,
-        tideCrystal: null,
-        basePrice: RARITY_PRICES.Rare,
-        discountPercent: 0,
-        purchased: false,
-      });
-    }
+  const indices = slots.map((_, i) => i).sort(() => Math.random() - 0.5);
+  for (let d = 0; d < discountCount && d < indices.length; d++) {
+    // 30, 40, 50, 60, or 70 percent discount
+    const discount = 30 + Math.floor(Math.random() * 5) * 10;
+    slots[indices[d]] = { ...slots[indices[d]], discountPercent: discount };
   }
 
   return slots;
