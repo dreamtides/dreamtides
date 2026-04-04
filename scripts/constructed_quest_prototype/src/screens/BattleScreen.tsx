@@ -15,6 +15,8 @@ import {
   aiEscalationDecision,
   resolveAnte,
 } from "../ante/ante-logic";
+import { DeckEditor } from "../components/DeckEditor";
+import { weightedSample, tideWeight } from "../data/tide-weights";
 
 type BattlePhase =
   | "preBattle"
@@ -93,6 +95,7 @@ interface PreBattleProps {
   completionLevel: number;
   isMiniboss: boolean;
   isFinalBoss: boolean;
+  cardDatabase: Map<number, CardData>;
   onStartBattle: () => void;
 }
 
@@ -102,8 +105,16 @@ function PreBattlePhase({
   completionLevel,
   isMiniboss,
   isFinalBoss,
+  cardDatabase,
   onStartBattle,
 }: PreBattleProps) {
+  const [showDeckEditor, setShowDeckEditor] = useState(false);
+
+  const previewCards = useMemo(() => {
+    const allCards = Array.from(cardDatabase.values());
+    const deckTideCounts = new Map<Tide, number>([[enemy.tide, 10]]);
+    return weightedSample(allCards, 3, (card) => tideWeight(card.tide, deckTideCounts));
+  }, [cardDatabase, enemy.tide]);
   let borderColor = "rgba(124, 58, 237, 0.3)";
   let accentColor = "#a855f7";
   let label = "Battle";
@@ -184,31 +195,70 @@ function PreBattlePhase({
         </p>
 
         {/* Dreamsign count */}
-        <div className="mb-8 flex items-center gap-2">
+        <div className="mb-6 flex items-center gap-2">
           <span className="text-sm opacity-60">{"\u2728"}</span>
           <span className="text-sm font-medium opacity-70">
             {String(enemy.dreamsignCount)} Dreamsign{enemy.dreamsignCount !== 1 ? "s" : ""}
           </span>
         </div>
 
-        {/* Start Battle button */}
-        <motion.button
-          className="cursor-pointer rounded-lg px-8 py-3 text-lg font-bold text-white"
-          style={{
-            background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}cc 100%)`,
-            border: `2px solid ${accentColor}80`,
-            boxShadow: `0 0 20px ${accentColor}30`,
-          }}
-          whileHover={{
-            boxShadow: `0 0 30px ${accentColor}50`,
-            scale: 1.05,
-          }}
-          whileTap={{ scale: 0.97 }}
-          onClick={onStartBattle}
-        >
-          Start Battle
-        </motion.button>
+        {/* Opponent preview cards */}
+        {previewCards.length > 0 && (
+          <div className="mb-8">
+            <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
+              Key Cards
+            </p>
+            <div className="flex gap-3">
+              {previewCards.map((card) => (
+                <div key={card.cardNumber} style={{ width: 120 }}>
+                  <CardDisplay card={card} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Action buttons */}
+        <div className="flex gap-4">
+          <motion.button
+            className="cursor-pointer rounded-lg px-6 py-3 text-base font-bold text-white"
+            style={{
+              background: "rgba(100, 100, 100, 0.3)",
+              border: "2px solid rgba(168, 85, 247, 0.4)",
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => setShowDeckEditor(true)}
+          >
+            Edit Deck
+          </motion.button>
+
+          <motion.button
+            className="cursor-pointer rounded-lg px-8 py-3 text-lg font-bold text-white"
+            style={{
+              background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}cc 100%)`,
+              border: `2px solid ${accentColor}80`,
+              boxShadow: `0 0 20px ${accentColor}30`,
+            }}
+            whileHover={{
+              boxShadow: `0 0 30px ${accentColor}50`,
+              scale: 1.05,
+            }}
+            whileTap={{ scale: 0.97 }}
+            onClick={onStartBattle}
+          >
+            Start Battle
+          </motion.button>
+        </div>
       </motion.div>
+
+      {showDeckEditor && (
+        <DeckEditor
+          isOpen={showDeckEditor}
+          onClose={() => setShowDeckEditor(false)}
+          cardDatabase={cardDatabase}
+        />
+      )}
     </motion.div>
   );
 }
@@ -1063,6 +1113,7 @@ export function BattleScreen({
             completionLevel={completionLevel}
             isMiniboss={isMiniboss}
             isFinalBoss={isFinalBoss}
+            cardDatabase={cardDatabase}
             onStartBattle={handleStartBattle}
           />
         </motion.div>
