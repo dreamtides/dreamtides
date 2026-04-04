@@ -140,8 +140,8 @@ export function QuestProvider({
         cardName,
         source,
       });
-      const entryId = nextEntryId();
       setState((prev) => {
+        const entryId = nextEntryId();
         const entry: DeckEntry = {
           entryId,
           cardNumber,
@@ -164,8 +164,8 @@ export function QuestProvider({
         source,
         isBane: true,
       });
-      const entryId = nextEntryId();
       setState((prev) => {
+        const entryId = nextEntryId();
         const entry: DeckEntry = {
           entryId,
           cardNumber,
