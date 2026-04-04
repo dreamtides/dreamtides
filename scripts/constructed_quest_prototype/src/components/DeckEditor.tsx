@@ -8,6 +8,7 @@ import { NAMED_TIDES, TIDE_COLORS, tideIconUrl, cardImageUrl } from "../data/car
 import { CardDisplay } from "./CardDisplay";
 import { CardOverlay } from "./CardOverlay";
 import { TRANSFIGURATION_COLORS } from "../transfiguration/transfiguration-logic";
+import { computeTideDistribution } from "./tide-distribution";
 
 /** All tides including Neutral, used for filter toggles. */
 const ALL_TIDES: readonly Tide[] = [...NAMED_TIDES, "Neutral"] as const;
@@ -41,6 +42,16 @@ const TIDE_ORDER: Readonly<Record<Tide, number>> = {
 interface ResolvedEntry {
   entry: DeckEntry;
   card: CardData;
+}
+
+/** A grouped pool entry combining duplicates. */
+interface PoolGroup {
+  cardNumber: number;
+  card: CardData;
+  transfiguration: DeckEntry["transfiguration"];
+  isBane: boolean;
+  entryIds: string[];
+  count: number;
 }
 
 /** A grouped deck row for the compact list. */
@@ -82,19 +93,13 @@ export function DeckEditor({
   const [sortAscending, setSortAscending] = useState(true);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [hoverPreview, setHoverPreview] = useState<{ card: CardData; top: number } | null>(null);
+  const [viewMode, setViewMode] = useState<"edit" | "view">("edit");
 
   const handleDone = useCallback(() => {
-    if (state.deck.length < config.minimumDeckSize) {
-      setValidationMessage(`Deck needs at least ${String(config.minimumDeckSize)} cards`);
-      return;
-    }
-    if (state.deck.length > config.maximumDeckSize) {
-      setValidationMessage(`Deck has too many cards (max ${String(config.maximumDeckSize)})`);
-      return;
-    }
     setValidationMessage(null);
     onClose();
-  }, [state.deck.length, config.minimumDeckSize, config.maximumDeckSize, onClose]);
+  }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -161,10 +166,37 @@ export function DeckEditor({
           cmp = a.card.cardType.localeCompare(b.card.cardType);
           break;
       }
+      if (cmp === 0) cmp = (a.card.energyCost ?? 0) - (b.card.energyCost ?? 0);
+      if (cmp === 0) cmp = a.card.name.localeCompare(b.card.name);
       return sortAscending ? cmp : -cmp;
     });
     return sorted;
   }, [filteredPool, sortCriteria, sortAscending]);
+
+  // Group sorted pool entries by card identity for duplicate badges
+  const poolGroups = useMemo<PoolGroup[]>(() => {
+    const groups = new Map<string, PoolGroup>();
+    const order: string[] = [];
+    for (const resolved of sortedPool) {
+      const key = `${String(resolved.entry.cardNumber)}-${resolved.entry.transfiguration ?? "none"}-${String(resolved.entry.isBane)}`;
+      const existing = groups.get(key);
+      if (existing) {
+        existing.entryIds.push(resolved.entry.entryId);
+        existing.count += 1;
+      } else {
+        order.push(key);
+        groups.set(key, {
+          cardNumber: resolved.entry.cardNumber,
+          card: resolved.card,
+          transfiguration: resolved.entry.transfiguration,
+          isBane: resolved.entry.isBane,
+          entryIds: [resolved.entry.entryId],
+          count: 1,
+        });
+      }
+    }
+    return order.map((key) => groups.get(key)!);
+  }, [sortedPool]);
 
   // Group deck entries into compact rows
   const deckRows = useMemo<DeckRow[]>(() => {
@@ -226,6 +258,59 @@ export function DeckEditor({
   const baneCount = useMemo(() => state.deck.filter((e) => e.isBane).length, [state.deck]);
   const chosenCount = state.deck.length - baneCount;
 
+  // Tide distribution for view mode
+  const tideDistribution = useMemo(
+    () => computeTideDistribution(state.deck, cardDatabase),
+    [state.deck, cardDatabase],
+  );
+
+  // Resolved deck entries for view mode card grid
+  const resolvedDeck = useMemo<ResolvedEntry[]>(() => {
+    return state.deck
+      .map((entry) => {
+        const card = cardDatabase.get(entry.cardNumber);
+        if (!card) return null;
+        return { entry, card };
+      })
+      .filter((e): e is ResolvedEntry => e !== null);
+  }, [state.deck, cardDatabase]);
+
+  // Filtered deck entries for view mode
+  const filteredDeck = useMemo<ResolvedEntry[]>(() => {
+    return resolvedDeck.filter((resolved) => {
+      if (!tideFilters[resolved.card.tide]) return false;
+      if (cardTypeFilter === "Characters" && resolved.card.cardType !== "Character") return false;
+      if (cardTypeFilter === "Events" && resolved.card.cardType !== "Event") return false;
+      return true;
+    });
+  }, [resolvedDeck, tideFilters, cardTypeFilter]);
+
+  // Sorted deck entries for view mode
+  const sortedDeck = useMemo<ResolvedEntry[]>(() => {
+    const sorted = [...filteredDeck];
+    sorted.sort((a, b) => {
+      let cmp = 0;
+      switch (sortCriteria) {
+        case "energyCost":
+          cmp = (a.card.energyCost ?? 0) - (b.card.energyCost ?? 0);
+          break;
+        case "name":
+          cmp = a.card.name.localeCompare(b.card.name);
+          break;
+        case "tide":
+          cmp = TIDE_ORDER[a.card.tide] - TIDE_ORDER[b.card.tide];
+          break;
+        case "cardType":
+          cmp = a.card.cardType.localeCompare(b.card.cardType);
+          break;
+      }
+      if (cmp === 0) cmp = (a.card.energyCost ?? 0) - (b.card.energyCost ?? 0);
+      if (cmp === 0) cmp = a.card.name.localeCompare(b.card.name);
+      return sortAscending ? cmp : -cmp;
+    });
+    return sorted;
+  }, [filteredDeck, sortCriteria, sortAscending]);
+
   // Deck size color coding
   const deckSizeColor =
     state.deck.length < config.minimumDeckSize || state.deck.length > config.maximumDeckSize
@@ -236,11 +321,12 @@ export function DeckEditor({
     setTideFilters((prev) => ({ ...prev, [tide]: !prev[tide] }));
   }, []);
 
-  const handlePoolCardClick = useCallback(
-    (entry: DeckEntry) => {
-      const currentCopies = deckCopyCounts.get(entry.cardNumber) ?? 0;
+  const handlePoolGroupClick = useCallback(
+    (group: PoolGroup) => {
+      const currentCopies = deckCopyCounts.get(group.cardNumber) ?? 0;
       if (currentCopies >= config.maxCopies) return;
-      mutations.moveToDeck(entry.entryId);
+      const entryId = group.entryIds[group.entryIds.length - 1];
+      mutations.moveToDeck(entryId);
     },
     [mutations, deckCopyCounts, config.maxCopies],
   );
@@ -307,6 +393,32 @@ export function DeckEditor({
                   {validationMessage}
                 </span>
               )}
+              <div
+                className="flex overflow-hidden rounded-lg"
+                style={{ border: "1px solid rgba(124, 58, 237, 0.4)" }}
+              >
+                <button
+                  className="cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors"
+                  style={{
+                    background: viewMode === "edit" ? "rgba(124, 58, 237, 0.3)" : "transparent",
+                    color: viewMode === "edit" ? "#c084fc" : "#6b7280",
+                  }}
+                  onClick={() => { setViewMode("edit"); }}
+                >
+                  Edit
+                </button>
+                <button
+                  className="cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors"
+                  style={{
+                    background: viewMode === "view" ? "rgba(124, 58, 237, 0.3)" : "transparent",
+                    color: viewMode === "view" ? "#c084fc" : "#6b7280",
+                    borderLeft: "1px solid rgba(124, 58, 237, 0.4)",
+                  }}
+                  onClick={() => { setViewMode("view"); }}
+                >
+                  View
+                </button>
+              </div>
               <button
                 className="cursor-pointer rounded-lg px-5 py-2 text-sm font-semibold transition-colors"
                 style={{
@@ -322,7 +434,188 @@ export function DeckEditor({
             </div>
           </div>
 
-          {/* Main content: two panels */}
+          {/* Main content */}
+          {viewMode === "view" ? (
+            /* View mode: full card grid of deck cards */
+            <div className="flex min-h-0 flex-1 flex-col">
+              {/* Tide distribution bar */}
+              {tideDistribution.total > 0 && (
+                <div
+                  className="px-4 py-2 md:px-6"
+                  style={{
+                    borderBottom: "1px solid rgba(124, 58, 237, 0.15)",
+                    background: "rgba(10, 6, 18, 0.5)",
+                  }}
+                >
+                  <div
+                    className="mb-2 flex h-2 overflow-hidden rounded-full"
+                    style={{ background: "rgba(255, 255, 255, 0.05)" }}
+                  >
+                    {tideDistribution.tides
+                      .filter((t) => t.count > 0)
+                      .map((t) => (
+                        <div
+                          key={t.tide}
+                          style={{
+                            width: `${String(t.percentage)}%`,
+                            background: TIDE_COLORS[t.tide],
+                            opacity: 0.8,
+                          }}
+                          title={`${t.tide}: ${String(t.count)} (${String(t.percentage)}%)`}
+                        />
+                      ))}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    {tideDistribution.tides.map((t) => (
+                      <div
+                        key={t.tide}
+                        className="flex items-center gap-1"
+                        style={{ opacity: t.count > 0 ? 1 : 0.3 }}
+                      >
+                        <img
+                          src={tideIconUrl(t.tide)}
+                          alt={t.tide}
+                          className="h-4 w-4 rounded-full"
+                          style={{
+                            border: t.isDominant
+                              ? `1.5px solid ${TIDE_COLORS[t.tide]}`
+                              : "1px solid rgba(255, 255, 255, 0.15)",
+                          }}
+                        />
+                        <span
+                          className="text-[11px] font-medium"
+                          style={{ color: t.count > 0 ? TIDE_COLORS[t.tide] : "#6b7280" }}
+                        >
+                          {t.tide}
+                        </span>
+                        <span
+                          className="text-[11px]"
+                          style={{
+                            color: t.count > 0 ? "#e2e8f0" : "#4b5563",
+                            fontWeight: t.isDominant ? 700 : 400,
+                          }}
+                        >
+                          {String(t.count)}
+                        </span>
+                        {t.count > 0 && (
+                          <span className="text-[10px]" style={{ color: "#9ca3af" }}>
+                            ({String(t.percentage)}%)
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Filter + sort bar */}
+              <div
+                className="px-4 py-2 md:px-6"
+                style={{
+                  borderBottom: "1px solid rgba(124, 58, 237, 0.15)",
+                  background: "rgba(10, 6, 18, 0.6)",
+                }}
+              >
+                <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+                  {ALL_TIDES.map((tide) => (
+                    <button
+                      key={tide}
+                      className="flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium transition-all"
+                      style={{
+                        background: tideFilters[tide]
+                          ? `${TIDE_COLORS[tide]}25`
+                          : "rgba(255, 255, 255, 0.03)",
+                        border: `1px solid ${tideFilters[tide] ? `${TIDE_COLORS[tide]}60` : "rgba(255, 255, 255, 0.1)"}`,
+                        color: tideFilters[tide] ? TIDE_COLORS[tide] : "#6b7280",
+                        opacity: tideFilters[tide] ? 1 : 0.5,
+                      }}
+                      onClick={() => { toggleTide(tide); }}
+                    >
+                      <img
+                        src={tideIconUrl(tide)}
+                        alt={tide}
+                        className="h-3 w-3 rounded-full"
+                        style={{ opacity: tideFilters[tide] ? 1 : 0.4 }}
+                      />
+                      <span className="hidden sm:inline">{tide}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  {(["All", "Characters", "Events"] as const).map((filter) => (
+                    <button
+                      key={filter}
+                      className="cursor-pointer rounded-full px-2 py-0.5 text-[11px] font-medium transition-all"
+                      style={{
+                        background:
+                          cardTypeFilter === filter
+                            ? "rgba(168, 85, 247, 0.25)"
+                            : "rgba(255, 255, 255, 0.03)",
+                        border: `1px solid ${cardTypeFilter === filter ? "rgba(168, 85, 247, 0.5)" : "rgba(255, 255, 255, 0.1)"}`,
+                        color: cardTypeFilter === filter ? "#c084fc" : "#6b7280",
+                      }}
+                      onClick={() => { setCardTypeFilter(filter); }}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Deck card grid */}
+              <div
+                className="flex-1 overflow-y-auto px-4 py-3 md:px-6"
+                style={{ background: "radial-gradient(ellipse at center, rgba(124, 58, 237, 0.03) 0%, transparent 70%)" }}
+              >
+                {sortedDeck.length === 0 ? (
+                  <div className="flex h-full items-center justify-center">
+                    <p className="text-sm opacity-40">
+                      {resolvedDeck.length === 0
+                        ? "Deck is empty."
+                        : "No cards match the current filters."}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                    {sortedDeck.map((resolved) => (
+                      <div
+                        key={resolved.entry.entryId}
+                        className="relative cursor-pointer transition-transform hover:scale-[1.03]"
+                        onClick={() => { handleCardOverlay(resolved.card); }}
+                      >
+                        {resolved.entry.transfiguration !== null && (
+                          <div
+                            className="absolute -top-1 -right-1 z-10 rounded-full px-1.5 py-0.5 text-[9px] font-bold shadow-md"
+                            style={{
+                              background: TRANSFIGURATION_COLORS[resolved.entry.transfiguration],
+                              color: "#fff",
+                              boxShadow: `0 0 6px ${TRANSFIGURATION_COLORS[resolved.entry.transfiguration]}80`,
+                            }}
+                          >
+                            {resolved.entry.transfiguration}
+                          </div>
+                        )}
+                        {resolved.entry.isBane && (
+                          <div
+                            className="absolute -top-1 -left-1 z-10 flex h-5 w-5 items-center justify-center rounded-full text-[10px] shadow-md"
+                            style={{
+                              background: "#7f1d1d",
+                              border: "1px solid #ef4444",
+                              color: "#fca5a5",
+                            }}
+                            title="Bane"
+                          >
+                            {"\u2620"}
+                          </div>
+                        )}
+                        <CardDisplay card={resolved.card} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
           <div className="flex min-h-0 flex-1">
             {/* Left panel: Pool */}
             <div
@@ -345,6 +638,9 @@ export function DeckEditor({
                       ({String(sortedPool.length)}
                       {sortedPool.length !== resolvedPool.length
                         ? ` / ${String(resolvedPool.length)}`
+                        : ""}
+                      {poolGroups.length !== sortedPool.length
+                        ? `, ${String(poolGroups.length)} unique`
                         : ""})
                     </span>
                   </span>
@@ -486,7 +782,7 @@ export function DeckEditor({
                 className="flex-1 overflow-y-auto px-4 py-3 md:px-6"
                 style={{ background: "radial-gradient(ellipse at center, rgba(124, 58, 237, 0.03) 0%, transparent 70%)" }}
               >
-                {sortedPool.length === 0 ? (
+                {poolGroups.length === 0 ? (
                   <div className="flex h-full items-center justify-center">
                     <p className="text-sm opacity-40">
                       {resolvedPool.length === 0
@@ -496,36 +792,45 @@ export function DeckEditor({
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
-                    <AnimatePresence mode="popLayout">
-                      {sortedPool.map((resolved) => (
+                    <AnimatePresence>
+                      {poolGroups.map((group) => (
                         <motion.div
-                          key={resolved.entry.entryId}
+                          key={`${String(group.cardNumber)}-${group.transfiguration ?? "none"}-${String(group.isBane)}`}
                           className="relative"
-                          layout
-                          layoutId={resolved.entry.entryId}
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.95 }}
-                          transition={{
-                            duration: 0.15,
-                            layout: { duration: 0.35, ease: [0.4, 0, 0.2, 1] },
-                          }}
+                          transition={{ duration: 0.15 }}
                         >
-                          {/* Transfiguration indicator */}
-                          {resolved.entry.transfiguration !== null && (
+                          {/* Count badge for duplicates */}
+                          {group.count > 1 && (
                             <div
-                              className="absolute -top-1 -right-1 z-10 rounded-full px-1.5 py-0.5 text-[9px] font-bold shadow-md"
+                              className="absolute -top-1.5 -right-1.5 z-30 rounded-md px-1.5 py-0.5 text-[10px] font-bold shadow-md"
                               style={{
-                                background: TRANSFIGURATION_COLORS[resolved.entry.transfiguration],
+                                background: "#000",
                                 color: "#fff",
-                                boxShadow: `0 0 6px ${TRANSFIGURATION_COLORS[resolved.entry.transfiguration]}80`,
+                                border: "1px solid rgba(255, 255, 255, 0.3)",
                               }}
                             >
-                              {resolved.entry.transfiguration}
+                              {String(group.count)}{"\u00D7"}
+                            </div>
+                          )}
+                          {/* Transfiguration indicator */}
+                          {group.transfiguration !== null && (
+                            <div
+                              className="absolute -top-1 z-10 rounded-full px-1.5 py-0.5 text-[9px] font-bold shadow-md"
+                              style={{
+                                right: group.count > 1 ? "1.5rem" : "-0.25rem",
+                                background: TRANSFIGURATION_COLORS[group.transfiguration],
+                                color: "#fff",
+                                boxShadow: `0 0 6px ${TRANSFIGURATION_COLORS[group.transfiguration]}80`,
+                              }}
+                            >
+                              {group.transfiguration}
                             </div>
                           )}
                           {/* Bane indicator */}
-                          {resolved.entry.isBane && (
+                          {group.isBane && (
                             <div
                               className="absolute -top-1 -left-1 z-10 flex h-5 w-5 items-center justify-center rounded-full text-[10px] shadow-md"
                               style={{
@@ -539,7 +844,7 @@ export function DeckEditor({
                             </div>
                           )}
                           {/* MAX badge for cards at copy limit */}
-                          {(deckCopyCounts.get(resolved.entry.cardNumber) ?? 0) >= config.maxCopies && (
+                          {(deckCopyCounts.get(group.cardNumber) ?? 0) >= config.maxCopies && (
                             <div
                               className="absolute inset-0 z-20 flex items-center justify-center rounded-lg"
                               style={{
@@ -561,12 +866,12 @@ export function DeckEditor({
                           <div
                             className="cursor-pointer transition-transform hover:scale-[1.03]"
                             style={
-                              resolved.entry.transfiguration !== null
+                              group.transfiguration !== null
                                 ? {
-                                    boxShadow: `0 0 8px ${TRANSFIGURATION_COLORS[resolved.entry.transfiguration]}40`,
+                                    boxShadow: `0 0 8px ${TRANSFIGURATION_COLORS[group.transfiguration]}40`,
                                     borderRadius: "0.5rem",
                                   }
-                                : resolved.entry.isBane
+                                : group.isBane
                                   ? {
                                       boxShadow: "0 0 8px rgba(239, 68, 68, 0.3)",
                                       borderRadius: "0.5rem",
@@ -574,14 +879,14 @@ export function DeckEditor({
                                   : undefined
                             }
                             onClick={() => {
-                              handlePoolCardClick(resolved.entry);
+                              handlePoolGroupClick(group);
                             }}
                             onContextMenu={(e) => {
                               e.preventDefault();
-                              handleCardOverlay(resolved.card);
+                              handleCardOverlay(group.card);
                             }}
                           >
-                            <CardDisplay card={resolved.card} />
+                            <CardDisplay card={group.card} />
                           </div>
                         </motion.div>
                       ))}
@@ -670,6 +975,13 @@ export function DeckEditor({
                               onRightClick={() => {
                                 handleCardOverlay(row.card);
                               }}
+                              onMouseEnter={(e) => {
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                setHoverPreview({ card: row.card, top: rect.top });
+                              }}
+                              onMouseLeave={() => {
+                                setHoverPreview(null);
+                              }}
                             />
                           </motion.div>
                         ))}
@@ -718,6 +1030,20 @@ export function DeckEditor({
               </div>
             </div>
           </div>
+          )}
+
+          {/* Hover preview for deck rows */}
+          {hoverPreview !== null && (
+            <div
+              className="pointer-events-none fixed z-[70] w-56"
+              style={{
+                right: "calc(288px + 1rem)",
+                top: Math.max(16, Math.min(hoverPreview.top - 80, window.innerHeight - 340)),
+              }}
+            >
+              <CardDisplay card={hoverPreview.card} />
+            </div>
+          )}
 
           {/* Card overlay */}
           <CardOverlay card={overlayCard} onClose={handleCloseOverlay} />
@@ -732,10 +1058,14 @@ function DeckListRow({
   row,
   onClick,
   onRightClick,
+  onMouseEnter,
+  onMouseLeave,
 }: {
   row: DeckRow;
   onClick: () => void;
   onRightClick: () => void;
+  onMouseEnter: (e: React.MouseEvent) => void;
+  onMouseLeave: () => void;
 }) {
   const tideColor = TIDE_COLORS[row.card.tide];
 
@@ -755,6 +1085,8 @@ function DeckListRow({
         e.preventDefault();
         onRightClick();
       }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       {/* Card art crop (Hearthstone-style background) */}
       <img
@@ -769,13 +1101,18 @@ function DeckListRow({
         }}
       />
 
-      {/* Tide icon */}
-      <img
-        src={tideIconUrl(row.card.tide)}
-        alt={row.card.tide}
-        className="relative z-10 h-4 w-4 shrink-0 rounded-full"
-        style={{ border: `1px solid ${tideColor}60` }}
-      />
+      {/* Tide icons (one per copy) */}
+      <div className="relative z-10 flex shrink-0 items-center gap-0.5">
+        {Array.from({ length: row.count }, (_, i) => (
+          <img
+            key={i}
+            src={tideIconUrl(row.card.tide)}
+            alt={row.card.tide}
+            className="h-4 w-4 rounded-full"
+            style={{ border: `1px solid ${tideColor}60` }}
+          />
+        ))}
+      </div>
 
       {/* Card name */}
       <span
@@ -802,19 +1139,6 @@ function DeckListRow({
       {row.isBane && (
         <span className="relative z-10 shrink-0 text-[10px]" style={{ color: "#ef4444" }} title="Bane - cannot be removed">
           {"\uD83D\uDD12"}
-        </span>
-      )}
-
-      {/* Count badge */}
-      {row.count > 1 && (
-        <span
-          className="relative z-10 shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-bold"
-          style={{
-            background: `${tideColor}30`,
-            color: tideColor,
-          }}
-        >
-          {"\u00D7"}{String(row.count)}
         </span>
       )}
 

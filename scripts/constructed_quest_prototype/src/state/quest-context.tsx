@@ -174,7 +174,6 @@ export function QuestProvider({
         };
         return {
           ...prev,
-          pool: [...prev.pool, entry],
           deck: [...prev.deck, entry],
         };
       });

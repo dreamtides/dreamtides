@@ -46,12 +46,11 @@ function useAnimatedNumber(target: number, duration: number): number {
 
 /** Props for the HUD component. */
 interface HudProps {
-  onOpenDeckViewer: () => void;
   onOpenDeckEditor: () => void;
 }
 
 /** Persistent HUD bar anchored to the bottom of the viewport. */
-export function HUD({ onOpenDeckViewer, onOpenDeckEditor }: HudProps) {
+export function HUD({ onOpenDeckEditor }: HudProps) {
   const { state } = useQuest();
   const config = useQuestConfig();
   const animatedEssence = useAnimatedNumber(
@@ -178,22 +177,10 @@ export function HUD({ onOpenDeckViewer, onOpenDeckEditor }: HudProps) {
             border: "1px solid rgba(124, 58, 237, 0.4)",
             color: "#c084fc",
           }}
-          onClick={onOpenDeckViewer}
-        >
-          <span className="lg:hidden">{"\uD83C\uDCCF"}</span>
-          <span className="hidden lg:inline">View Deck</span>
-        </button>
-        <button
-          className="cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors md:px-3 md:text-sm"
-          style={{
-            background: "rgba(34, 197, 94, 0.15)",
-            border: "1px solid rgba(34, 197, 94, 0.3)",
-            color: "#4ade80",
-          }}
           onClick={onOpenDeckEditor}
         >
-          <span className="lg:hidden">{"\u270F"}</span>
-          <span className="hidden lg:inline">Edit Deck</span>
+          <span className="lg:hidden">{"\uD83C\uDCCF"}</span>
+          <span className="hidden lg:inline">Deck</span>
         </button>
         <button
           className="cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors md:px-3 md:text-sm"
