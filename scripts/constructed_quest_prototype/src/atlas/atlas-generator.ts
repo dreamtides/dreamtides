@@ -14,7 +14,7 @@ export interface SiteGenerationContext {
   cardDatabase: Map<number, CardData>;
   dreamsignPool: ReadonlyArray<Omit<Dreamsign, "isBane">>;
   playerHasBanes: boolean;
-  excludedTides: Tide[];
+  startingTides: Tide[];
 }
 
 const BASE_RADIUS = 200;
@@ -83,8 +83,8 @@ function buildAdditionalSitePool(
 ): Array<[SiteType, number]> {
   const pool: Array<[SiteType, number]> = [];
 
-  // Early game (all levels): Shop, Essence, DreamsignOffering, DreamsignDraft
-  pool.push(["Shop", 3]);
+  // Early game (all levels): CardShop, Essence, DreamsignOffering, DreamsignDraft
+  pool.push(["CardShop", 3]);
   pool.push(["Essence", 3]);
   pool.push(["DreamsignOffering", 3]);
   pool.push(["DreamsignDraft", 1]);
@@ -103,15 +103,15 @@ function buildAdditionalSitePool(
     pool.push(["TemptingOffer", 2]);
   }
 
-  // Late game (level 5+): add Transfiguration, Purge, Duplication
+  // Late game (level 5+): add Transfiguration, LootPack, Duplication
   if (completionLevel >= 5) {
     pool.push(["Transfiguration", 2]);
-    pool.push(["Purge", 2]);
+    pool.push(["LootPack", 2]);
     pool.push(["Duplication", 2]);
   }
 
-  // SpecialtyShop uncommon at any level
-  pool.push(["SpecialtyShop", 1]);
+  // PackShop uncommon at any level
+  pool.push(["PackShop", 1]);
 
   return pool;
 }
@@ -120,8 +120,8 @@ function buildAdditionalSitePool(
 function generateRewardData(
   context: SiteGenerationContext,
 ): Record<string, unknown> {
-  const { cardDatabase, dreamsignPool, excludedTides } = context;
-  const excludedSet = new Set(excludedTides);
+  const { cardDatabase, dreamsignPool, startingTides } = context;
+  const excludedSet = new Set(startingTides);
   const cards = Array.from(cardDatabase.values()).filter(
     (c) => !excludedSet.has(c.tide),
   );
@@ -174,7 +174,7 @@ export function generateSiteComposition(
   for (let i = 0; i < draftCount; i++) {
     sites.push({
       id: nextSiteId(),
-      type: "Draft",
+      type: "DraftSite",
       isEnhanced: false,
       isVisited: false,
     });
@@ -434,15 +434,17 @@ export function generateNewNodes(
 /** Metadata for each site type: icon and display name in one table. */
 const SITE_TYPE_META: Record<SiteType, { icon: string; name: string }> = {
   Battle: { icon: "\u2694\uFE0F", name: "Battle" },
-  Draft: { icon: "\uD83C\uDCCF", name: "Draft" },
+  LootPack: { icon: "layers", name: "Loot Pack" },
+  CardShop: { icon: "store", name: "Card Shop" },
+  PackShop: { icon: "gift", name: "Pack Shop" },
   DreamcallerDraft: { icon: "\uD83D\uDC51", name: "Dreamcaller Draft" },
-  Shop: { icon: "\uD83C\uDFEA", name: "Shop" },
-  SpecialtyShop: { icon: "\u2B50", name: "Specialty Shop" },
+  DraftSite: { icon: "layout-grid", name: "Draft" },
+  Forge: { icon: "anvil", name: "Forge" },
+  Provisioner: { icon: "compass", name: "Provisioner" },
   DreamsignOffering: { icon: "\u2728", name: "Dreamsign Offering" },
   DreamsignDraft: { icon: "\u2728", name: "Dreamsign Draft" },
   DreamJourney: { icon: "\uD83C\uDF19", name: "Dream Journey" },
   TemptingOffer: { icon: "\u2696\uFE0F", name: "Tempting Offer" },
-  Purge: { icon: "\uD83D\uDD25", name: "Purge" },
   Essence: { icon: "\uD83D\uDC8E", name: "Essence" },
   Transfiguration: { icon: "\u2697\uFE0F", name: "Transfiguration" },
   Duplication: { icon: "\uD83D\uDCCB", name: "Duplication" },
@@ -467,7 +469,7 @@ export function siteTypeName(siteType: SiteType): string {
 export function previewSiteTypes(node: DreamscapeNode): SiteType[] {
   const excluded: Set<SiteType> = new Set([
     "Battle",
-    "Draft",
+    "DraftSite",
   ]);
   return node.sites
     .filter((s) => !excluded.has(s.type))

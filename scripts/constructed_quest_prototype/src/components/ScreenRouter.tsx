@@ -9,13 +9,11 @@ import { DraftSiteScreen } from "../screens/DraftSiteScreen";
 import { DreamcallerDraftScreen } from "../screens/DreamcallerDraftScreen";
 import { BattleScreen } from "../screens/BattleScreen";
 import { ShopScreen } from "../screens/ShopScreen";
-import { SpecialtyShopScreen } from "../screens/SpecialtyShopScreen";
 import { EssenceSiteScreen } from "../screens/EssenceSiteScreen";
 import { DreamsignOfferingScreen } from "../screens/DreamsignOfferingScreen";
 import { DreamsignDraftScreen } from "../screens/DreamsignDraftScreen";
 import { DreamJourneyScreen } from "../screens/DreamJourneyScreen";
 import { TemptingOfferScreen } from "../screens/TemptingOfferScreen";
-import { PurgeSiteScreen } from "../screens/PurgeSiteScreen";
 import { TransfigurationSiteScreen } from "../screens/TransfigurationSiteScreen";
 import { DuplicationSiteScreen } from "../screens/DuplicationSiteScreen";
 import { RewardSiteScreen } from "../screens/RewardSiteScreen";
@@ -83,7 +81,7 @@ function SiteScreen({ siteId }: { siteId: string }) {
     );
   }
 
-  if (site.type === "Draft") {
+  if (site.type === "DraftSite") {
     return <DraftSiteScreen siteId={siteId} />;
   }
 
@@ -95,12 +93,8 @@ function SiteScreen({ siteId }: { siteId: string }) {
     return <BattleScreen site={site} cardDatabase={cardDatabase} />;
   }
 
-  if (site.type === "Shop") {
+  if (site.type === "CardShop") {
     return <ShopScreen site={site} />;
-  }
-
-  if (site.type === "SpecialtyShop") {
-    return <SpecialtyShopScreen site={site} />;
   }
 
   if (site.type === "Essence") {
@@ -123,10 +117,6 @@ function SiteScreen({ siteId }: { siteId: string }) {
     return <TemptingOfferScreen site={site} />;
   }
 
-  if (site.type === "Purge") {
-    return <PurgeSiteScreen site={site} />;
-  }
-
   if (site.type === "Transfiguration") {
     return <TransfigurationSiteScreen site={site} />;
   }
@@ -141,6 +131,22 @@ function SiteScreen({ siteId }: { siteId: string }) {
 
   if (site.type === "Cleanse") {
     return <CleanseSiteScreen site={site} />;
+  }
+
+  if (site.type === "LootPack") {
+    return <GenericSitePlaceholder site={site} />;
+  }
+
+  if (site.type === "PackShop") {
+    return <GenericSitePlaceholder site={site} />;
+  }
+
+  if (site.type === "Forge") {
+    return <GenericSitePlaceholder site={site} />;
+  }
+
+  if (site.type === "Provisioner") {
+    return <GenericSitePlaceholder site={site} />;
   }
 
   return <GenericSitePlaceholder site={site} />;

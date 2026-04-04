@@ -42,7 +42,7 @@ function defaultContext(
       },
     ],
     playerHasBanes: false,
-    excludedTides: [],
+    startingTides: [],
     ...overrides,
   };
 }
@@ -92,19 +92,19 @@ describe("generateSiteComposition", () => {
 
   it("includes 2 draft sites at level 0", () => {
     const sites = generateSiteComposition(0, false, defaultContext());
-    const drafts = sites.filter((s) => s.type === "Draft");
+    const drafts = sites.filter((s) => s.type === "DraftSite");
     expect(drafts.length).toBe(2);
   });
 
   it("includes 1 draft site at level 2", () => {
     const sites = generateSiteComposition(2, false, defaultContext());
-    const drafts = sites.filter((s) => s.type === "Draft");
+    const drafts = sites.filter((s) => s.type === "DraftSite");
     expect(drafts.length).toBe(1);
   });
 
   it("includes 0 draft sites at level 5", () => {
     const sites = generateSiteComposition(5, false, defaultContext());
-    const drafts = sites.filter((s) => s.type === "Draft");
+    const drafts = sites.filter((s) => s.type === "DraftSite");
     expect(drafts.length).toBe(0);
   });
 
@@ -130,7 +130,7 @@ describe("generateSiteComposition", () => {
       const previewable = sites.filter(
         (s) =>
           s.type !== "Battle" &&
-          s.type !== "Draft",
+          s.type !== "DraftSite",
       );
       expect(previewable.length).toBeGreaterThanOrEqual(2);
     }
@@ -333,10 +333,10 @@ describe("previewSiteTypes", () => {
       biomeName: "Test",
       biomeColor: "#000",
       sites: [
-        { id: "s1", type: "Draft", isEnhanced: false, isVisited: false },
+        { id: "s1", type: "DraftSite", isEnhanced: false, isVisited: false },
         { id: "s2", type: "Battle", isEnhanced: false, isVisited: false },
         { id: "s3", type: "DreamcallerDraft", isEnhanced: false, isVisited: false },
-        { id: "s4", type: "Shop", isEnhanced: false, isVisited: false },
+        { id: "s4", type: "CardShop", isEnhanced: false, isVisited: false },
         { id: "s5", type: "Essence", isEnhanced: false, isVisited: false },
       ],
       position: { x: 0, y: 0 },
@@ -344,7 +344,7 @@ describe("previewSiteTypes", () => {
       enhancedSiteType: null,
     };
     const preview = previewSiteTypes(node);
-    expect(preview).toEqual(["DreamcallerDraft", "Shop", "Essence"]);
+    expect(preview).toEqual(["DreamcallerDraft", "CardShop", "Essence"]);
   });
 
   it("returns at most 3 site types", () => {
@@ -353,9 +353,9 @@ describe("previewSiteTypes", () => {
       biomeName: "Test",
       biomeColor: "#000",
       sites: [
-        { id: "s1", type: "Shop", isEnhanced: false, isVisited: false },
+        { id: "s1", type: "CardShop", isEnhanced: false, isVisited: false },
         { id: "s2", type: "Essence", isEnhanced: false, isVisited: false },
-        { id: "s3", type: "Purge", isEnhanced: false, isVisited: false },
+        { id: "s3", type: "LootPack", isEnhanced: false, isVisited: false },
         { id: "s4", type: "DreamJourney", isEnhanced: false, isVisited: false },
       ],
       position: { x: 0, y: 0 },
@@ -409,7 +409,7 @@ describe("rewardPreviewLabel", () => {
   it("returns null for non-reward sites", () => {
     const site: SiteState = {
       id: "s4",
-      type: "Shop",
+      type: "CardShop",
       isEnhanced: false,
       isVisited: false,
     };

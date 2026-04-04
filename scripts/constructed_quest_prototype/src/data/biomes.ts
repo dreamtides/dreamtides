@@ -12,7 +12,7 @@ export const BIOMES: readonly Biome[] = [
   {
     name: "Verdant Hollow",
     color: "#2dd4bf",
-    enhancedSiteType: "Shop",
+    enhancedSiteType: "CardShop",
   },
   {
     name: "Starfall Glade",
@@ -32,7 +32,7 @@ export const BIOMES: readonly Biome[] = [
   {
     name: "Ashfall Basin",
     color: "#f87171",
-    enhancedSiteType: "Purge",
+    enhancedSiteType: "LootPack",
   },
   {
     name: "Crystal Spire",
@@ -42,7 +42,7 @@ export const BIOMES: readonly Biome[] = [
   {
     name: "Shadowforge",
     color: "#a78bfa",
-    enhancedSiteType: "Transfiguration",
+    enhancedSiteType: "Forge",
   },
   {
     name: "Hall of Echoes",
@@ -52,6 +52,6 @@ export const BIOMES: readonly Biome[] = [
   {
     name: "The Obsidian Bazaar",
     color: "#fb923c",
-    enhancedSiteType: "SpecialtyShop",
+    enhancedSiteType: "PackShop",
   },
 ] as const;

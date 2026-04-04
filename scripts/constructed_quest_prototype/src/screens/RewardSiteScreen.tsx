@@ -43,7 +43,7 @@ export function RewardSiteScreen({ site }: RewardSiteScreenProps) {
   const handleAccept = useCallback(() => {
     if (rewardType === "card") {
       const cardNumber = rewardData["cardNumber"] as number;
-      mutations.addCard(cardNumber, "reward_site");
+      mutations.addToPool(cardNumber, "reward_site");
     } else if (rewardType === "dreamsign") {
       const dreamsign: Dreamsign = {
         name: rewardData["dreamsignName"] as string,

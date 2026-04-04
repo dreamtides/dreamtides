@@ -27,8 +27,8 @@ export function QuestStartScreen() {
   const config = useQuestConfig();
 
   const handleBeginQuest = useCallback(() => {
-    const excludedTides = selectExcludedTides(config.excludedTideCount);
-    mutations.setExcludedTides(excludedTides);
+    const startingTides = selectExcludedTides(config.startingTides);
+    mutations.setStartingTides(startingTides);
 
     const playerHasBanes =
       state.deck.some((e) => e.isBane) ||
@@ -37,19 +37,19 @@ export function QuestStartScreen() {
       cardDatabase,
       dreamsignPool: DREAMSIGNS,
       playerHasBanes,
-      excludedTides,
+      startingTides,
     });
     const nodeCount = Object.keys(atlas.nodes).length - 1; // subtract nexus
 
     logEvent("quest_started", {
       initialEssence: state.essence,
       dreamscapesGenerated: nodeCount,
-      excludedTides,
+      startingTides,
     });
 
     mutations.updateAtlas(atlas);
     mutations.setScreen({ type: "atlas" });
-  }, [state.completionLevel, state.essence, state.deck, state.dreamsigns, mutations, cardDatabase, config.excludedTideCount]);
+  }, [state.completionLevel, state.essence, state.deck, state.dreamsigns, mutations, cardDatabase, config.startingTides]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">

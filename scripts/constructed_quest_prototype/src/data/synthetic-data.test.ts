@@ -249,15 +249,15 @@ describe("biomes", () => {
 
   it("has exactly one biome per enhanced site type", () => {
     const expected = new Set([
-      "Shop",
+      "CardShop",
       "DreamsignOffering",
       "DreamJourney",
       "TemptingOffer",
-      "Purge",
+      "LootPack",
       "Essence",
-      "Transfiguration",
+      "Forge",
       "Duplication",
-      "SpecialtyShop",
+      "PackShop",
     ]);
     const actual = new Set(BIOMES.map((b) => b.enhancedSiteType));
     expect(actual).toEqual(expected);

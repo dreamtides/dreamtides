@@ -27,8 +27,8 @@ function createTestState(overrides: Partial<QuestState> = {}): QuestState {
     atlas: { nodes: {}, edges: [], nexusId: "" },
     currentDreamscape: null,
     visitedSites: [],
-    draftState: null,
-    excludedTides: [],
+    startingTides: [],
+    anteState: null,
     screen: { type: "questStart" },
     activeSiteId: null,
     ...overrides,
@@ -46,14 +46,12 @@ function screenName(screen: Screen): string {
  */
 function applyIncrementCompletionLevel(
   prev: QuestState,
-  essenceReward: number,
-  rewardCardNumber: number | null,
+  isMiniboss: boolean = false,
 ): QuestState {
   const newLevel = prev.completionLevel + 1;
   logEvent("battle_won", {
     completionLevel: newLevel,
-    essenceReward,
-    rewardCardNumber,
+    isMiniboss,
   });
   const screen: Screen =
     newLevel >= 7 ? { type: "questComplete" } : prev.screen;
@@ -77,7 +75,7 @@ describe("incrementCompletionLevel state transitions", () => {
       completionLevel: 3,
       screen: { type: "atlas" },
     });
-    const next = applyIncrementCompletionLevel(state, 50, null);
+    const next = applyIncrementCompletionLevel(state);
     expect(next.completionLevel).toBe(4);
     expect(next.screen.type).toBe("atlas");
   });
@@ -87,7 +85,7 @@ describe("incrementCompletionLevel state transitions", () => {
       completionLevel: 6,
       screen: { type: "atlas" },
     });
-    const next = applyIncrementCompletionLevel(state, 100, 42);
+    const next = applyIncrementCompletionLevel(state);
     expect(next.completionLevel).toBe(7);
     expect(next.screen.type).toBe("questComplete");
   });
@@ -97,7 +95,7 @@ describe("incrementCompletionLevel state transitions", () => {
       completionLevel: 6,
       screen: { type: "atlas" },
     });
-    applyIncrementCompletionLevel(state, 100, null);
+    applyIncrementCompletionLevel(state);
     const entries = getLogEntries();
     const transition = entries.find((e) => e.event === "screen_transition");
     expect(transition).toBeDefined();
@@ -110,7 +108,7 @@ describe("incrementCompletionLevel state transitions", () => {
       completionLevel: 4,
       screen: { type: "atlas" },
     });
-    applyIncrementCompletionLevel(state, 50, null);
+    applyIncrementCompletionLevel(state);
     const entries = getLogEntries();
     const transition = entries.find((e) => e.event === "screen_transition");
     expect(transition).toBeUndefined();
@@ -121,13 +119,11 @@ describe("incrementCompletionLevel state transitions", () => {
       completionLevel: 2,
       screen: { type: "atlas" },
     });
-    applyIncrementCompletionLevel(state, 75, 10);
+    applyIncrementCompletionLevel(state);
     const entries = getLogEntries();
     const battleWon = entries.find((e) => e.event === "battle_won");
     expect(battleWon).toBeDefined();
     expect(battleWon?.completionLevel).toBe(3);
-    expect(battleWon?.essenceReward).toBe(75);
-    expect(battleWon?.rewardCardNumber).toBe(10);
   });
 
   it("transitions from any screen to questComplete at level 7", () => {
@@ -135,7 +131,7 @@ describe("incrementCompletionLevel state transitions", () => {
       completionLevel: 6,
       screen: { type: "site", siteId: "battle-1" },
     });
-    const next = applyIncrementCompletionLevel(state, 100, null);
+    const next = applyIncrementCompletionLevel(state);
     expect(next.screen.type).toBe("questComplete");
     const entries = getLogEntries();
     const transition = entries.find((e) => e.event === "screen_transition");
@@ -179,7 +175,7 @@ function makeNode(
 describe("battle site unlock gating", () => {
   it("battle is locked when non-battle sites remain unvisited", () => {
     const sites = [
-      makeSite("Shop", false),
+      makeSite("CardShop", false),
       makeSite("Essence", false),
       makeSite("Battle", false),
     ];
@@ -191,7 +187,7 @@ describe("battle site unlock gating", () => {
 
   it("battle unlocks when all non-battle sites are visited", () => {
     const sites = [
-      makeSite("Shop", true),
+      makeSite("CardShop", true),
       makeSite("Essence", true),
       makeSite("Battle", false),
     ];
@@ -226,7 +222,7 @@ function applySetCurrentDreamscape(
 
 describe("early exit from dreamscape", () => {
   it("does not log dreamscape_completed when clearing currentDreamscape", () => {
-    const node = makeNode("ds-1", [makeSite("Shop", false), makeSite("Battle", false)]);
+    const node = makeNode("ds-1", [makeSite("CardShop", false), makeSite("Battle", false)]);
     const state = createTestState({
       currentDreamscape: "ds-1",
       atlas: { nodes: { "ds-1": node }, edges: [], nexusId: "nexus" },
@@ -238,7 +234,7 @@ describe("early exit from dreamscape", () => {
   });
 
   it("logs dreamscape_entered when entering a dreamscape", () => {
-    const node = makeNode("ds-1", [makeSite("Shop", false)]);
+    const node = makeNode("ds-1", [makeSite("CardShop", false)]);
     const state = createTestState({
       atlas: { nodes: { "ds-1": node }, edges: [], nexusId: "nexus" },
     });
@@ -288,7 +284,7 @@ describe("battle reward transition does not orphan the screen", () => {
 
     const battleSite = makeSite("Battle", false);
     const node = makeNode("ds-1", [
-      makeSite("Shop", true),
+      makeSite("CardShop", true),
       makeSite("Essence", true),
       battleSite,
     ]);
@@ -311,7 +307,7 @@ describe("battle reward transition does not orphan the screen", () => {
     };
 
     // incrementCompletionLevel runs synchronously
-    next = applyIncrementCompletionLevel(next, 200, 42);
+    next = applyIncrementCompletionLevel(next);
 
     // The site must still be resolvable after synchronous mutations.
     expect(canResolveSite(next)).toBe(true);
@@ -329,7 +325,7 @@ describe("battle reward transition does not orphan the screen", () => {
   it("final boss path clears dreamscape after questComplete transition", () => {
     const battleSite = makeSite("Battle", false);
     const node = makeNode("ds-7", [
-      makeSite("Shop", true),
+      makeSite("CardShop", true),
       battleSite,
     ]);
     const state = createTestState({
@@ -344,7 +340,7 @@ describe("battle reward transition does not orphan the screen", () => {
     });
 
     // Synchronous: incrementCompletionLevel transitions to questComplete
-    let next = applyIncrementCompletionLevel(state, 400, 99);
+    let next = applyIncrementCompletionLevel(state);
 
     // The screen is now questComplete, not site, so the lookup is fine.
     expect(next.screen.type).toBe("questComplete");
@@ -364,7 +360,7 @@ describe("final-boss completion path", () => {
     // 2. setCurrentDreamscape(null)
     // 3. incrementCompletionLevel -> questComplete
     const node = makeNode("ds-7", [
-      makeSite("Shop", true),
+      makeSite("CardShop", true),
       makeSite("Battle", true),
     ]);
     const state = createTestState({
@@ -397,7 +393,7 @@ describe("final-boss completion path", () => {
     next = applySetCurrentDreamscape(next, null);
 
     // Step 4: increment completion level (triggers questComplete)
-    next = applyIncrementCompletionLevel(next, 400, null);
+    next = applyIncrementCompletionLevel(next);
 
     // The atlas should already show the dreamscape as completed
     expect(next.atlas.nodes["ds-7"].status).toBe("completed");

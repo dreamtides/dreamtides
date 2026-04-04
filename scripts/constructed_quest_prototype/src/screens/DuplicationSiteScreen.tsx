@@ -72,7 +72,7 @@ export function DuplicationSiteScreen({ site }: DuplicationSiteScreenProps) {
       });
 
       for (let i = 0; i < candidate.copyCount; i++) {
-        mutations.addCard(candidate.card.cardNumber, "duplication");
+        mutations.addToPool(candidate.card.cardNumber, "duplication");
       }
 
       setDuplicated(true);
@@ -110,7 +110,7 @@ export function DuplicationSiteScreen({ site }: DuplicationSiteScreenProps) {
     });
 
     for (let i = 0; i < enhancedCopyCount; i++) {
-      mutations.addCard(card.cardNumber, "duplication");
+      mutations.addToPool(card.cardNumber, "duplication");
     }
 
     setDuplicated(true);

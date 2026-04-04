@@ -103,7 +103,7 @@ export function TemptingOfferScreen({ site }: TemptingOfferScreenProps) {
       for (let i = 0; i < count; i++) {
         const card =
           cardsOfRarity[Math.floor(Math.random() * cardsOfRarity.length)];
-        mutations.addCard(card.cardNumber, "tempting_offer");
+        mutations.addToPool(card.cardNumber, "tempting_offer");
       }
     },
     [cardDatabase, mutations],
@@ -119,7 +119,7 @@ export function TemptingOfferScreen({ site }: TemptingOfferScreenProps) {
       for (let i = 0; i < count; i++) {
         const card =
           commonCards[Math.floor(Math.random() * commonCards.length)];
-        mutations.addBaneCard(card.cardNumber, "tempting_offer");
+        mutations.addBaneToPool(card.cardNumber, "tempting_offer");
       }
     },
     [cardDatabase, mutations],

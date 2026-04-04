@@ -94,7 +94,7 @@ export function DreamJourneyScreen({ site }: DreamJourneyScreenProps) {
       for (let i = 0; i < count; i++) {
         const card =
           cardsOfRarity[Math.floor(Math.random() * cardsOfRarity.length)];
-        mutations.addCard(card.cardNumber, "dream_journey");
+        mutations.addToPool(card.cardNumber, "dream_journey");
       }
     },
     [cardDatabase, mutations],

@@ -5,8 +5,6 @@ import type { SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { DREAMCALLERS } from "../data/dreamcallers";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
-import { countDeckTides, selectRareRewards } from "../data/tide-weights";
-import { CardDisplay } from "../components/CardDisplay";
 import { logEvent } from "../logging";
 import { generateNewNodes } from "../atlas/atlas-generator";
 import { DREAMSIGNS } from "../data/dreamsigns";
@@ -302,17 +300,13 @@ function BattleAnimationPhase() {
 
 interface VictoryPhaseProps {
   essenceReward: number;
-  rareCards: CardData[];
-  selectedRewardIndex: number | null;
-  onSelectReward: (index: number) => void;
+  onContinue: () => void;
 }
 
-/** Victory phase: displays rewards and rare card picks. */
+/** Victory phase: displays essence reward and continue button. */
 function VictoryPhase({
   essenceReward,
-  rareCards,
-  selectedRewardIndex,
-  onSelectReward,
+  onContinue,
 }: VictoryPhaseProps) {
   return (
     <motion.div
@@ -356,54 +350,23 @@ function VictoryPhase({
         </div>
       </motion.div>
 
-      {/* Card reward section */}
-      <motion.div
-        className="w-full max-w-4xl"
+      {/* Continue button */}
+      <motion.button
+        className="rounded-lg px-8 py-3 text-lg font-bold text-white"
+        style={{
+          background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
+          border: "1px solid rgba(168, 85, 247, 0.5)",
+          boxShadow: "0 0 20px rgba(124, 58, 237, 0.3)",
+        }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.97 }}
+        onClick={onContinue}
       >
-        <h2
-          className="mb-4 text-center text-lg font-bold md:text-xl"
-          style={{ color: "#e2e8f0" }}
-        >
-          Choose a Rare Card
-        </h2>
-
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-          <AnimatePresence>
-            {rareCards.map((card, index) => {
-              const isSelected = selectedRewardIndex === index;
-              const isDismissed =
-                selectedRewardIndex !== null && selectedRewardIndex !== index;
-
-              return (
-                <motion.div
-                  key={card.cardNumber}
-                  animate={
-                    isSelected
-                      ? { scale: 1.05 }
-                      : isDismissed
-                        ? { opacity: 0, scale: 0.9 }
-                        : { scale: 1, opacity: 1 }
-                  }
-                  transition={{ duration: 0.4 }}
-                >
-                  <CardDisplay
-                    card={card}
-                    onClick={() => {
-                      onSelectReward(index);
-                    }}
-                    selected={isSelected}
-                    selectionColor="#fbbf24"
-                  />
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </div>
-      </motion.div>
-
+        Continue
+      </motion.button>
     </motion.div>
   );
 }
@@ -417,10 +380,9 @@ export function BattleScreen({
   cardDatabase: Map<number, CardData>;
 }) {
   const { state, mutations } = useQuest();
-  const { completionLevel, atlas, currentDreamscape, deck } = state;
+  const { completionLevel, atlas, currentDreamscape } = state;
 
   const [phase, setPhase] = useState<BattlePhase>("preBattle");
-  const [selectedRewardIndex, setSelectedRewardIndex] = useState<number | null>(null);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   // Clear all pending timers on unmount
@@ -436,19 +398,12 @@ export function BattleScreen({
   const isFinalBoss = completionLevel === 6;
   const essenceReward = 100 + completionLevel * 50;
 
-  // Generate enemy and rare card rewards once on mount and keep stable.
+  // Generate enemy once on mount and keep stable.
   const enemyRef = useRef<EnemyData | null>(null);
   if (enemyRef.current === null) {
     enemyRef.current = generateEnemy();
   }
   const enemy = enemyRef.current;
-
-  const rareCardsRef = useRef<CardData[] | null>(null);
-  if (rareCardsRef.current === null) {
-    const tideCounts = countDeckTides(deck, cardDatabase);
-    rareCardsRef.current = selectRareRewards(cardDatabase, tideCounts, state.excludedTides);
-  }
-  const rareCards = rareCardsRef.current;
 
   const hasCompletedRef = useRef(false);
 
@@ -470,34 +425,23 @@ export function BattleScreen({
     );
   }, [completionLevel, enemy.name, isMiniboss, isFinalBoss]);
 
-  const handleSelectReward = useCallback(
-    (index: number) => {
-      if (selectedRewardIndex !== null || hasCompletedRef.current) return;
+  const handleContinue = useCallback(
+    () => {
+      if (hasCompletedRef.current) return;
       hasCompletedRef.current = true;
-
-      const card = rareCards[index];
-      setSelectedRewardIndex(index);
 
       // Grant essence reward
       mutations.changeEssence(essenceReward, "battle_reward");
-
-      // Add reward card to deck
-      mutations.addCard(card.cardNumber, "battle_reward");
 
       // Mark site visited
       mutations.markSiteVisited(site.id);
 
       // Increment completion level (handles quest complete for level 7)
-      mutations.incrementCompletionLevel(
-        essenceReward,
-        card.cardNumber,
-        card.name,
-        isMiniboss,
-      );
+      mutations.incrementCompletionLevel(isMiniboss);
 
       logEvent("site_completed", {
         siteType: "Battle",
-        outcome: `Victory - earned ${String(essenceReward)} essence, card #${String(card.cardNumber)}`,
+        outcome: `Victory - earned ${String(essenceReward)} essence`,
       });
 
       // Capture dreamscape info before the delayed callback to avoid
@@ -530,7 +474,7 @@ export function BattleScreen({
                 cardDatabase,
                 dreamsignPool: DREAMSIGNS,
                 playerHasBanes,
-                excludedTides: state.excludedTides,
+                startingTides: state.startingTides,
               },
             );
             mutations.updateAtlas(updatedAtlas);
@@ -546,8 +490,6 @@ export function BattleScreen({
       );
     },
     [
-      selectedRewardIndex,
-      rareCards,
       mutations,
       essenceReward,
       site.id,
@@ -558,6 +500,7 @@ export function BattleScreen({
       isMiniboss,
       state.deck,
       state.dreamsigns,
+      state.startingTides,
       cardDatabase,
     ],
   );
@@ -586,9 +529,7 @@ export function BattleScreen({
         <motion.div key="victory">
           <VictoryPhase
             essenceReward={essenceReward}
-            rareCards={rareCards}
-            selectedRewardIndex={selectedRewardIndex}
-            onSelectReward={handleSelectReward}
+            onContinue={handleContinue}
           />
         </motion.div>
       )}

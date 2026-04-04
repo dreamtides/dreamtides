@@ -47,12 +47,10 @@ function useAnimatedNumber(target: number, duration: number): number {
 interface HudProps {
   onOpenDeckViewer: () => void;
   onOpenDeckEditor: () => void;
-  onOpenDebugScreen: () => void;
-  hasDraftData: boolean;
 }
 
 /** Persistent HUD bar anchored to the bottom of the viewport. */
-export function HUD({ onOpenDeckViewer, onOpenDeckEditor, onOpenDebugScreen, hasDraftData }: HudProps) {
+export function HUD({ onOpenDeckViewer, onOpenDeckEditor }: HudProps) {
   const { state } = useQuest();
   const animatedEssence = useAnimatedNumber(
     state.essence,
@@ -98,15 +96,24 @@ export function HUD({ onOpenDeckViewer, onOpenDeckEditor, onOpenDebugScreen, has
           <span className="hidden text-xs opacity-50 lg:inline">Essence</span>
         </div>
 
+        {/* Pool size */}
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm opacity-70 md:text-base" aria-label="Pool">
+            {"\uD83C\uDCCF"}
+          </span>
+          <span className="text-sm font-bold md:text-base">
+            Pool: {String(state.pool.length)}
+          </span>
+        </div>
+
         {/* Deck size */}
         <div className="flex items-center gap-1.5">
           <span className="text-sm opacity-70 md:text-base" aria-label="Deck">
             {"\uD83C\uDCCF"}
           </span>
           <span className="text-sm font-bold md:text-base">
-            {String(state.deck.length)}
+            Deck: {String(state.deck.length)}
           </span>
-          <span className="hidden text-xs opacity-50 lg:inline">Cards</span>
         </div>
 
         {/* Dreamcaller portrait */}
@@ -186,20 +193,6 @@ export function HUD({ onOpenDeckViewer, onOpenDeckEditor, onOpenDebugScreen, has
           <span className="lg:hidden">{"\u270F"}</span>
           <span className="hidden lg:inline">Edit Deck</span>
         </button>
-        {hasDraftData && (
-          <button
-            className="cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors md:px-3 md:text-sm"
-            style={{
-              background: "rgba(239, 68, 68, 0.15)",
-              border: "1px solid rgba(239, 68, 68, 0.3)",
-              color: "#f87171",
-            }}
-            onClick={onOpenDebugScreen}
-          >
-            <span className="lg:hidden">{"\uD83D\uDC1B"}</span>
-            <span className="hidden lg:inline">Debug AI</span>
-          </button>
-        )}
         <button
           className="cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors md:px-3 md:text-sm"
           style={{

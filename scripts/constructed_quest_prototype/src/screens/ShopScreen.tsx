@@ -25,7 +25,7 @@ export function ShopScreen({ site }: ShopScreenProps) {
   const { essence, deck } = state;
 
   const [slots, setSlots] = useState<ShopSlot[]>(() =>
-    generateShopInventory(cardDatabase, deck, state.excludedTides),
+    generateShopInventory(cardDatabase, deck, state.startingTides),
   );
   const [rerollCount, setRerollCount] = useState(0);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
@@ -46,7 +46,7 @@ export function ShopScreen({ site }: ShopScreenProps) {
       mutations.changeEssence(-price, "shop_purchase");
 
       if (slot.itemType === "card" && slot.card) {
-        mutations.addCard(slot.card.cardNumber, "shop");
+        mutations.addToPool(slot.card.cardNumber, "card_shop");
         logEvent("shop_purchase", {
           itemType: "card",
           cardNumber: slot.card.cardNumber,
@@ -56,7 +56,7 @@ export function ShopScreen({ site }: ShopScreenProps) {
           essenceRemaining: essence - price,
         });
       } else if (slot.itemType === "dreamsign" && slot.dreamsign) {
-        mutations.addDreamsign(slot.dreamsign, "Shop");
+        mutations.addDreamsign(slot.dreamsign, "CardShop");
         logEvent("shop_purchase", {
           itemType: "dreamsign",
           dreamsignName: slot.dreamsign.name,
@@ -95,7 +95,7 @@ export function ShopScreen({ site }: ShopScreenProps) {
       setRerollCount((prev) => prev + 1);
 
       // Regenerate unpurchased non-reroll slots
-      const newInventory = generateShopInventory(cardDatabase, deck, state.excludedTides);
+      const newInventory = generateShopInventory(cardDatabase, deck, state.startingTides);
       // Collect only non-reroll replacement items to avoid introducing
       // a second reroll slot from the freshly generated inventory.
       const replacements = newInventory.filter(
@@ -133,7 +133,7 @@ export function ShopScreen({ site }: ShopScreenProps) {
 
   const handleLeave = useCallback(() => {
     logEvent("site_completed", {
-      siteType: "Shop",
+      siteType: "CardShop",
       outcome: "left",
     });
     mutations.markSiteVisited(site.id);
