@@ -18,6 +18,7 @@ import { TransfigurationSiteScreen } from "../screens/TransfigurationSiteScreen"
 import { DuplicationSiteScreen } from "../screens/DuplicationSiteScreen";
 import { RewardSiteScreen } from "../screens/RewardSiteScreen";
 import { CleanseSiteScreen } from "../screens/CleanseSiteScreen";
+import { LootPackScreen } from "../screens/LootPackScreen";
 import { siteTypeName } from "../atlas/atlas-generator";
 import { logEvent } from "../logging";
 import type { Screen, SiteState } from "../types/quest";
@@ -134,7 +135,7 @@ function SiteScreen({ siteId }: { siteId: string }) {
   }
 
   if (site.type === "LootPack") {
-    return <GenericSitePlaceholder site={site} />;
+    return <LootPackScreen site={site} />;
   }
 
   if (site.type === "PackShop") {
