@@ -8,7 +8,6 @@ import { weightedSample } from "../data/tide-weights";
 import { logEvent } from "../logging";
 import { useQuestConfig } from "../state/quest-config";
 import type { Tide, CardData } from "../types/cards";
-import type { SiteState, SiteType } from "../types/quest";
 
 /** Energy cost bracket for a card. */
 function costBracket(card: CardData): "low" | "mid" | "high" {
@@ -139,61 +138,17 @@ export function QuestStartScreen() {
       mutations.changeEssence(config.startingEssence - 250, "starting_essence");
     }
 
-    // Generate initial atlas
+    // Generate initial atlas (level 0 produces single node with fixed composition)
     const atlas = generateInitialAtlas(state.completionLevel, {
       cardDatabase,
       dreamsignPool: DREAMSIGNS,
       playerHasBanes: false,
       startingTides: selectedTides,
+      playerPool: state.pool,
+      config,
     });
 
-    // Override first non-nexus dreamscape's sites to fixed composition
     const firstNodeId = atlas.edges[0]?.[1];
-    if (firstNodeId && atlas.nodes[firstNodeId]) {
-      const fixedSites: SiteState[] = [
-        {
-          id: "site-0",
-          type: "DreamcallerDraft" as SiteType,
-          isEnhanced: false,
-          isVisited: false,
-        },
-        {
-          id: "site-1",
-          type: "LootPack" as SiteType,
-          isEnhanced: false,
-          isVisited: false,
-        },
-        {
-          id: "site-2",
-          type: "LootPack" as SiteType,
-          isEnhanced: false,
-          isVisited: false,
-        },
-        {
-          id: "site-3",
-          type: "LootPack" as SiteType,
-          isEnhanced: false,
-          isVisited: false,
-        },
-        {
-          id: "site-4",
-          type: "CardShop" as SiteType,
-          isEnhanced: false,
-          isVisited: false,
-        },
-        {
-          id: "site-5",
-          type: "Battle" as SiteType,
-          isEnhanced: false,
-          isVisited: false,
-        },
-      ];
-      atlas.nodes[firstNodeId] = {
-        ...atlas.nodes[firstNodeId],
-        sites: fixedSites,
-      };
-    }
-
     const nodeCount = Object.keys(atlas.nodes).length - 1;
 
     logEvent("quest_started", {

@@ -1,4 +1,5 @@
 import type {
+  DeckEntry,
   DreamAtlas,
   DreamscapeNode,
   SiteState,
@@ -6,7 +7,9 @@ import type {
 } from "../types/quest";
 import type { CardData, Tide } from "../types/cards";
 import type { Dreamsign } from "../types/quest";
+import type { QuestConfig } from "../state/quest-config";
 import { BIOMES, type Biome } from "../data/biomes";
+import { selectPackTide } from "../data/tide-weights";
 import { logEvent } from "../logging";
 
 /** Parameters for site generation that require external data. */
@@ -15,6 +18,8 @@ export interface SiteGenerationContext {
   dreamsignPool: ReadonlyArray<Omit<Dreamsign, "isBane">>;
   playerHasBanes: boolean;
   startingTides: Tide[];
+  playerPool: DeckEntry[];
+  config: QuestConfig;
 }
 
 const BASE_RADIUS = 200;
@@ -60,60 +65,54 @@ function distance(
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-/** Weighted random selection from an array of [item, weight] pairs. */
-function weightedPick<T>(items: Array<[T, number]>): T {
-  const total = items.reduce((sum, [, w]) => sum + w, 0);
-  if (total <= 0) {
-    return items[0][0];
+
+/** Loot pack counts per completion level (levels 0-6). */
+const LOOT_PACK_COUNTS: readonly number[] = [3, 3, 2, 2, 1, 1, 1];
+
+/** Returns the site pool for a given completion level. */
+function getPoolForLevel(level: number, hasBanes: boolean): SiteType[] {
+  const pool: SiteType[] = [];
+  switch (level) {
+    case 0:
+      // Level 0 is fixed composition, no pool needed
+      break;
+    case 1:
+      pool.push("CardShop", "PackShop", "Essence", "DreamsignOffering");
+      break;
+    case 2:
+      pool.push("CardShop", "PackShop", "DraftSite", "Essence", "DreamsignDraft", "DreamJourney", "Reward");
+      break;
+    case 3:
+      pool.push("CardShop", "PackShop", "Forge", "DraftSite", "DreamJourney", "TemptingOffer", "Essence");
+      break;
+    case 4:
+      pool.push("CardShop", "PackShop", "Forge", "Provisioner", "Transfiguration", "Duplication", "DraftSite", "DreamJourney", "TemptingOffer", "DreamsignDraft");
+      break;
+    case 5:
+      pool.push("CardShop", "PackShop", "Forge", "Provisioner", "Transfiguration", "Duplication", "DreamJourney", "TemptingOffer");
+      break;
+    default:
+      // Level 6+
+      pool.push("CardShop", "PackShop", "Forge", "Transfiguration", "Essence");
+      break;
   }
-  let roll = Math.random() * total;
-  for (const [item, weight] of items) {
-    roll -= weight;
-    if (roll <= 0) {
-      return item;
-    }
+  if (hasBanes && level > 0) {
+    pool.push("Cleanse");
   }
-  return items[items.length - 1][0];
+  return pool;
 }
 
-/** Builds the weighted site pool based on completion level. */
-function buildAdditionalSitePool(
-  completionLevel: number,
-  playerHasBanes: boolean,
-): Array<[SiteType, number]> {
-  const pool: Array<[SiteType, number]> = [];
-
-  // Early game (all levels): CardShop, Essence, DreamsignOffering, DreamsignDraft
-  pool.push(["CardShop", 3]);
-  pool.push(["Essence", 3]);
-  pool.push(["DreamsignOffering", 3]);
-  pool.push(["DreamsignDraft", 1]);
-
-  // Reward available at all levels
-  pool.push(["Reward", 2]);
-
-  // Cleanse only when player has banes
-  if (playerHasBanes) {
-    pool.push(["Cleanse", 2]);
+/** Returns the [min, max] count range for pool sites at a given level. */
+function getPoolCountRange(level: number): [number, number] {
+  switch (level) {
+    case 0: return [0, 0];
+    case 1: return [1, 2];
+    case 2: return [2, 3];
+    case 3: return [2, 3];
+    case 4: return [3, 4];
+    case 5: return [3, 4];
+    default: return [2, 3]; // Level 6+
   }
-
-  // Mid game (level 3+): add DreamJourney, TemptingOffer
-  if (completionLevel >= 3) {
-    pool.push(["DreamJourney", 2]);
-    pool.push(["TemptingOffer", 2]);
-  }
-
-  // Late game (level 5+): add Transfiguration, LootPack, Duplication
-  if (completionLevel >= 5) {
-    pool.push(["Transfiguration", 2]);
-    pool.push(["LootPack", 2]);
-    pool.push(["Duplication", 2]);
-  }
-
-  // PackShop uncommon at any level
-  pool.push(["PackShop", 1]);
-
-  return pool;
 }
 
 /** Generates reward data for a Reward site at dreamscape creation time. */
@@ -154,60 +153,82 @@ function generateRewardData(
   };
 }
 
-/** Generates the site composition for a dreamscape. Total: 3-6 sites. */
+/** Generates the site composition for a dreamscape based on completion level. */
 export function generateSiteComposition(
   completionLevel: number,
-  isFirstDreamscape: boolean,
   context: SiteGenerationContext,
 ): SiteState[] {
   const sites: SiteState[] = [];
+  const clampedLevel = Math.min(Math.max(completionLevel, 0), 6);
 
-  // Draft sites based on completion level
-  let draftCount: number;
-  if (completionLevel <= 1) {
-    draftCount = 2;
-  } else if (completionLevel <= 3) {
-    draftCount = 1;
-  } else {
-    draftCount = 0;
-  }
-  for (let i = 0; i < draftCount; i++) {
-    sites.push({
-      id: nextSiteId(),
-      type: "DraftSite",
-      isEnhanced: false,
-      isVisited: false,
-    });
-  }
-
-  // Dreamcaller draft in initial dreamscapes connected to nexus
-  if (isFirstDreamscape) {
+  if (clampedLevel === 0) {
+    // Level 0: fixed composition (DreamcallerDraft, 3 LootPacks, CardShop, Battle)
     sites.push({
       id: nextSiteId(),
       type: "DreamcallerDraft",
       isEnhanced: false,
       isVisited: false,
     });
-  }
-
-  // Additional sites from the weighted pool, clamped so total is 3-6.
-  // Fixed count = drafts + dreamcaller draft + battle (always 1).
-  const fixedCount = sites.length + 1;
-  const minAdditional = Math.max(2, 3 - fixedCount);
-  const maxAdditional = Math.max(minAdditional, 6 - fixedCount);
-  const pool = buildAdditionalSitePool(completionLevel, context.playerHasBanes);
-  const additionalCount = randomInt(minAdditional, maxAdditional);
-  for (let i = 0; i < additionalCount; i++) {
-    const siteType = weightedPick(pool);
-    const data =
-      siteType === "Reward" ? generateRewardData(context) : undefined;
+    const existingPackTides: Tide[] = [];
+    for (let i = 0; i < 3; i++) {
+      const packTide = selectPackTide(
+        context.playerPool,
+        context.cardDatabase,
+        context.config,
+        existingPackTides,
+      );
+      existingPackTides.push(packTide);
+      sites.push({
+        id: nextSiteId(),
+        type: "LootPack",
+        isEnhanced: false,
+        isVisited: false,
+        data: { packTide },
+      });
+    }
     sites.push({
       id: nextSiteId(),
-      type: siteType,
+      type: "CardShop",
       isEnhanced: false,
       isVisited: false,
-      data,
     });
+  } else {
+    // Levels 1-6: loot packs + random pool sites
+    const lootPackCount = LOOT_PACK_COUNTS[clampedLevel] ?? 1;
+    const existingPackTides: Tide[] = [];
+    for (let i = 0; i < lootPackCount; i++) {
+      const packTide = selectPackTide(
+        context.playerPool,
+        context.cardDatabase,
+        context.config,
+        existingPackTides,
+      );
+      existingPackTides.push(packTide);
+      sites.push({
+        id: nextSiteId(),
+        type: "LootPack",
+        isEnhanced: false,
+        isVisited: false,
+        data: { packTide },
+      });
+    }
+
+    // Random pool sites
+    const pool = getPoolForLevel(clampedLevel, context.playerHasBanes);
+    const [minCount, maxCount] = getPoolCountRange(clampedLevel);
+    const poolCount = randomInt(minCount, maxCount);
+    for (let i = 0; i < poolCount && pool.length > 0; i++) {
+      const siteType = pickRandom(pool);
+      const data =
+        siteType === "Reward" ? generateRewardData(context) : undefined;
+      sites.push({
+        id: nextSiteId(),
+        type: siteType,
+        isEnhanced: false,
+        isVisited: false,
+        data,
+      });
+    }
   }
 
   // Battle site always last
@@ -248,13 +269,12 @@ function applyBiomeEnhancement(
 function createNode(
   position: { x: number; y: number },
   completionLevel: number,
-  isFirstDreamscape: boolean,
   connections: string[],
   context: SiteGenerationContext,
 ): DreamscapeNode {
   const id = nextNodeId();
   const biome = assignBiome();
-  const sites = generateSiteComposition(completionLevel, isFirstDreamscape, context);
+  const sites = generateSiteComposition(completionLevel, context);
   const enhancedSiteType = applyBiomeEnhancement(sites, biome);
 
   logEvent("atlas_node_generated", {
@@ -281,7 +301,7 @@ function createNode(
   };
 }
 
-/** Creates the initial atlas with the Nexus and 2-3 starting dreamscapes. */
+/** Creates the initial atlas with the Nexus and a single starting dreamscape. */
 export function generateInitialAtlas(
   completionLevel: number,
   context: SiteGenerationContext,
@@ -303,28 +323,19 @@ export function generateInitialAtlas(
     enhancedSiteType: null,
   };
 
-  // 2-3 initial dreamscape nodes
-  const nodeCount = randomInt(2, 3);
-  const baseAngle = randomFloat(0, Math.PI * 2);
+  // Single initial dreamscape node
+  const angle = randomFloat(0, Math.PI * 2);
+  const x = Math.cos(angle) * BASE_RADIUS;
+  const y = Math.sin(angle) * BASE_RADIUS;
 
-  for (let i = 0; i < nodeCount; i++) {
-    const angle =
-      baseAngle +
-      (i * Math.PI * 2) / nodeCount +
-      randomFloat(-0.3, 0.3);
-    const x = Math.cos(angle) * BASE_RADIUS;
-    const y = Math.sin(angle) * BASE_RADIUS;
-
-    const node = createNode(
-      { x, y },
-      completionLevel,
-      true,
-      [nexusId],
-      context,
-    );
-    nodes[node.id] = node;
-    edges.push([nexusId, node.id]);
-  }
+  const node = createNode(
+    { x, y },
+    completionLevel,
+    [nexusId],
+    context,
+  );
+  nodes[node.id] = node;
+  edges.push([nexusId, node.id]);
 
   return { nodes, edges, nexusId };
 }
@@ -393,7 +404,6 @@ export function generateNewNodes(
     const node = createNode(
       { x, y },
       completionLevel,
-      false,
       connections,
       context,
     );

@@ -11,6 +11,49 @@ import {
 } from "./atlas-generator";
 import type { DreamscapeNode, SiteState } from "../types/quest";
 import type { CardData } from "../types/cards";
+import type { QuestConfig } from "../state/quest-config";
+
+const TEST_CONFIG: QuestConfig = {
+  revisedTides: true,
+  startingTides: 3,
+  sequentialTides: true,
+  initialCards: 10,
+  starterNeutral: 5,
+  starterLowCost: 4,
+  starterMidCost: 3,
+  starterHighCost: 1,
+  startingEssence: 250,
+  lootPackSize: 4,
+  dupePenalty2: 50,
+  dupePenalty3: 90,
+  packOnTheme: 60,
+  packAdjacent: 25,
+  packExplore: 15,
+  minimumDeckSize: 25,
+  maximumDeckSize: 50,
+  maxCopies: 2,
+  cardShopSize: 4,
+  cardPriceMin: 50,
+  cardPriceMax: 100,
+  rerollBase: 40,
+  rerollIncrement: 20,
+  packShopSize: 3,
+  specialPackChance: 20,
+  anteEnabled: true,
+  escalationTurn: 6,
+  maxAnteCards: 2,
+  forgeRecipes: 3,
+  forgeCost: 4,
+  draftSiteTotal: 4,
+  draftSiteKeep: 1,
+  provisionerOptions: 3,
+  dreamcallerChoices: 3,
+  opponentPreviewCards: 3,
+  battleEssence: 150,
+  essencePerLevel: 50,
+  essenceSiteAmount: 200,
+  showTideSymbols: true,
+};
 
 function defaultContext(
   overrides?: Partial<SiteGenerationContext>,
@@ -42,7 +85,9 @@ function defaultContext(
       },
     ],
     playerHasBanes: false,
-    startingTides: [],
+    startingTides: ["Bloom", "Arc", "Surge"],
+    playerPool: [],
+    config: TEST_CONFIG,
     ...overrides,
   };
 }
@@ -54,71 +99,41 @@ beforeEach(() => {
 });
 
 describe("generateSiteComposition", () => {
-  it("produces 3-6 sites for level 0 first dreamscape", () => {
-    for (let i = 0; i < 50; i++) {
-      resetAtlasGenerator();
-      const sites = generateSiteComposition(0, true, defaultContext());
-      expect(sites.length).toBeGreaterThanOrEqual(3);
-      expect(sites.length).toBeLessThanOrEqual(6);
+  it("produces exactly 6 sites for level 0 (DreamcallerDraft + 3 LootPacks + CardShop + Battle)", () => {
+    const sites = generateSiteComposition(0, defaultContext());
+    expect(sites.length).toBe(6);
+    expect(sites[0].type).toBe("DreamcallerDraft");
+    expect(sites.filter((s) => s.type === "LootPack").length).toBe(3);
+    expect(sites.some((s) => s.type === "CardShop")).toBe(true);
+    expect(sites[sites.length - 1].type).toBe("Battle");
+  });
+
+  it("produces correct site counts for levels 1-6", () => {
+    const expectedPackCounts = [3, 3, 2, 2, 1, 1, 1];
+    for (let level = 1; level <= 6; level++) {
+      for (let i = 0; i < 20; i++) {
+        resetAtlasGenerator();
+        const sites = generateSiteComposition(level, defaultContext());
+        const packs = sites.filter((s) => s.type === "LootPack");
+        expect(packs.length).toBe(expectedPackCounts[level]);
+        expect(sites[sites.length - 1].type).toBe("Battle");
+        // Total sites = packs + pool sites + battle
+        expect(sites.length).toBeGreaterThanOrEqual(packs.length + 2);
+      }
     }
   });
 
-  it("produces 3-6 sites for level 0 non-first dreamscape", () => {
-    for (let i = 0; i < 50; i++) {
-      resetAtlasGenerator();
-      const sites = generateSiteComposition(0, false, defaultContext());
-      expect(sites.length).toBeGreaterThanOrEqual(3);
-      expect(sites.length).toBeLessThanOrEqual(6);
-    }
-  });
-
-  it("produces 3-6 sites for level 3", () => {
-    for (let i = 0; i < 50; i++) {
-      resetAtlasGenerator();
-      const sites = generateSiteComposition(3, false, defaultContext());
-      expect(sites.length).toBeGreaterThanOrEqual(3);
-      expect(sites.length).toBeLessThanOrEqual(6);
-    }
-  });
-
-  it("produces 3-6 sites for level 5+", () => {
-    for (let i = 0; i < 50; i++) {
-      resetAtlasGenerator();
-      const sites = generateSiteComposition(7, false, defaultContext());
-      expect(sites.length).toBeGreaterThanOrEqual(3);
-      expect(sites.length).toBeLessThanOrEqual(6);
-    }
-  });
-
-  it("includes 2 draft sites at level 0", () => {
-    const sites = generateSiteComposition(0, false, defaultContext());
-    const drafts = sites.filter((s) => s.type === "DraftSite");
-    expect(drafts.length).toBe(2);
-  });
-
-  it("includes 1 draft site at level 2", () => {
-    const sites = generateSiteComposition(2, false, defaultContext());
-    const drafts = sites.filter((s) => s.type === "DraftSite");
-    expect(drafts.length).toBe(1);
-  });
-
-  it("includes 0 draft sites at level 5", () => {
-    const sites = generateSiteComposition(5, false, defaultContext());
-    const drafts = sites.filter((s) => s.type === "DraftSite");
-    expect(drafts.length).toBe(0);
-  });
-
-  it("includes DreamcallerDraft only for the first dreamscape", () => {
-    const first = generateSiteComposition(0, true, defaultContext());
-    const notFirst = generateSiteComposition(0, false, defaultContext());
-    expect(first.some((s) => s.type === "DreamcallerDraft")).toBe(true);
-    expect(notFirst.some((s) => s.type === "DreamcallerDraft")).toBe(false);
+  it("includes DreamcallerDraft only at level 0", () => {
+    const level0 = generateSiteComposition(0, defaultContext());
+    expect(level0.some((s) => s.type === "DreamcallerDraft")).toBe(true);
+    const level1 = generateSiteComposition(1, defaultContext());
+    expect(level1.some((s) => s.type === "DreamcallerDraft")).toBe(false);
   });
 
   it("always ends with a Battle site", () => {
     for (let level = 0; level <= 7; level++) {
       resetAtlasGenerator();
-      const sites = generateSiteComposition(level, false, defaultContext());
+      const sites = generateSiteComposition(level, defaultContext());
       expect(sites[sites.length - 1].type).toBe("Battle");
     }
   });
@@ -126,7 +141,7 @@ describe("generateSiteComposition", () => {
   it("has at least 2 non-draft non-battle sites for hover preview", () => {
     for (let i = 0; i < 50; i++) {
       resetAtlasGenerator();
-      const sites = generateSiteComposition(0, true, defaultContext());
+      const sites = generateSiteComposition(0, defaultContext());
       const previewable = sites.filter(
         (s) =>
           s.type !== "Battle" &&
@@ -137,16 +152,16 @@ describe("generateSiteComposition", () => {
   });
 
   it("assigns unique IDs to all sites", () => {
-    const sites = generateSiteComposition(0, true, defaultContext());
+    const sites = generateSiteComposition(0, defaultContext());
     const ids = sites.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
   it("populates reward data on Reward sites", () => {
     let foundReward = false;
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 200; i++) {
       resetAtlasGenerator();
-      const sites = generateSiteComposition(0, false, defaultContext());
+      const sites = generateSiteComposition(2, defaultContext());
       const reward = sites.find((s) => s.type === "Reward");
       if (reward) {
         foundReward = true;
@@ -162,8 +177,7 @@ describe("generateSiteComposition", () => {
     for (let i = 0; i < 100; i++) {
       resetAtlasGenerator();
       const sites = generateSiteComposition(
-        0,
-        false,
+        1,
         defaultContext({ playerHasBanes: false }),
       );
       const cleanse = sites.filter((s) => s.type === "Cleanse");
@@ -176,8 +190,7 @@ describe("generateSiteComposition", () => {
     for (let i = 0; i < 200; i++) {
       resetAtlasGenerator();
       const sites = generateSiteComposition(
-        0,
-        false,
+        1,
         defaultContext({ playerHasBanes: true }),
       );
       if (sites.some((s) => s.type === "Cleanse")) {
@@ -187,16 +200,23 @@ describe("generateSiteComposition", () => {
     }
     expect(foundCleanse).toBe(true);
   });
+
+  it("LootPack sites have packTide in their data", () => {
+    const sites = generateSiteComposition(0, defaultContext());
+    const packs = sites.filter((s) => s.type === "LootPack");
+    expect(packs.length).toBe(3);
+    for (const pack of packs) {
+      expect(pack.data).toBeDefined();
+      expect(pack.data!["packTide"]).toBeDefined();
+    }
+  });
 });
 
 describe("generateInitialAtlas", () => {
-  it("creates 2-3 dreamscape nodes plus the nexus", () => {
-    for (let i = 0; i < 20; i++) {
-      const atlas = generateInitialAtlas(0, defaultContext());
-      const nodeCount = Object.keys(atlas.nodes).length;
-      expect(nodeCount).toBeGreaterThanOrEqual(3);
-      expect(nodeCount).toBeLessThanOrEqual(4);
-    }
+  it("creates exactly 1 dreamscape node plus the nexus", () => {
+    const atlas = generateInitialAtlas(0, defaultContext());
+    const nodeCount = Object.keys(atlas.nodes).length;
+    expect(nodeCount).toBe(2);
   });
 
   it("places the nexus at (0,0) with status completed", () => {

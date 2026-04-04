@@ -8,6 +8,7 @@ import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { logEvent } from "../logging";
 import { generateNewNodes } from "../atlas/atlas-generator";
 import { DREAMSIGNS } from "../data/dreamsigns";
+import { useQuestConfig } from "../state/quest-config";
 
 type BattlePhase = "preBattle" | "animation" | "victory";
 
@@ -380,6 +381,7 @@ export function BattleScreen({
   cardDatabase: Map<number, CardData>;
 }) {
   const { state, mutations } = useQuest();
+  const config = useQuestConfig();
   const { completionLevel, atlas, currentDreamscape } = state;
 
   const [phase, setPhase] = useState<BattlePhase>("preBattle");
@@ -475,6 +477,8 @@ export function BattleScreen({
                 dreamsignPool: DREAMSIGNS,
                 playerHasBanes,
                 startingTides: state.startingTides,
+                playerPool: state.pool,
+                config,
               },
             );
             mutations.updateAtlas(updatedAtlas);
