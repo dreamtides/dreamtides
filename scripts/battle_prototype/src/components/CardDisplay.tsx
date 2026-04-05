@@ -7,6 +7,9 @@ interface CardDisplayProps {
   disabled?: boolean;
   compact?: boolean;
   battlefield?: boolean;
+  draggable?: boolean;
+  onDragStart?: (e: React.DragEvent) => void;
+  onDragEnd?: (e: React.DragEvent) => void;
 }
 
 function colorToCSS(c: DisplayColor): string {
@@ -81,6 +84,9 @@ export function CardDisplay({
   disabled,
   compact,
   battlefield,
+  draggable,
+  onDragStart,
+  onDragEnd,
 }: CardDisplayProps) {
   const [dataLoaded, setDataLoaded] = useState(imageNumberToCardNumber != null);
 
@@ -141,13 +147,16 @@ export function CardDisplay({
   return (
     <div
       onClick={handleClick}
+      draggable={draggable}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
       className="rounded overflow-hidden flex flex-col"
       style={{
         width: compact ? 90 : 140,
         minHeight: compact ? 48 : 180,
         background: "var(--color-surface)",
         border: `2px solid ${outlineColor}`,
-        cursor: isClickable ? "pointer" : "default",
+        cursor: draggable ? "grab" : isClickable ? "pointer" : "default",
         opacity: disabled ? 0.5 : 1,
       }}
     >
