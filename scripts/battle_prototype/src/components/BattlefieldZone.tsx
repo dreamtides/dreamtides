@@ -30,6 +30,7 @@ export function BattlefieldZone({
           onAction={onAction}
           disabled={disabled}
           compact
+          battlefield
         />
       ))}
     </div>

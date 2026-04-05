@@ -6,6 +6,7 @@ interface CardDisplayProps {
   onAction?: (action: GameAction) => void;
   disabled?: boolean;
   compact?: boolean;
+  battlefield?: boolean;
 }
 
 function colorToCSS(c: DisplayColor): string {
@@ -71,6 +72,7 @@ export function CardDisplay({
   onAction,
   disabled,
   compact,
+  battlefield,
 }: CardDisplayProps) {
   const [dataLoaded, setDataLoaded] = useState(imageNumberToCardNumber != null);
 
@@ -154,13 +156,17 @@ export function CardDisplay({
           <span className="font-bold truncate" style={{ maxWidth: "70%" }}>
             {revealed.name}
           </span>
-          {revealed.cost != null && (
-            <span style={{ color: "var(--color-gold)" }}>{revealed.cost}</span>
-          )}
+          {battlefield
+            ? revealed.spark != null && (
+                <span style={{ color: "var(--color-gold)" }}>&#x2351;{revealed.spark}</span>
+              )
+            : revealed.cost != null && (
+                <span style={{ color: "var(--color-gold)" }}>{revealed.cost}</span>
+              )}
         </div>
         <div className="flex justify-between" style={{ color: "var(--color-text-dim)", fontSize: compact ? 8 : 9 }}>
           <span>{stripAllTags(revealed.card_type)}</span>
-          {revealed.spark != null && <span>&#x2351;{revealed.spark}</span>}
+          {!battlefield && revealed.spark != null && <span>&#x2351;{revealed.spark}</span>}
         </div>
         {revealed.is_fast && (
           <span style={{ color: "var(--color-gold-light)", fontSize: compact ? 7 : 8 }}>

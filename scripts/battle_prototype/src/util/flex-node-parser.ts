@@ -10,19 +10,20 @@ export interface ExtractedOverlay {
   buttons: ExtractedButton[];
 }
 
-/** Strip Unity rich text tags and icon font characters */
+/** Strip Unity rich text tags, icon font characters, and trailing icon glyphs */
 function stripRichText(text: string): string {
   return text
     .replace(/<\/?[^>]+>/gi, "")
-    // Strip icon font characters (PUA, Arabic Presentation Forms, CJK used as icons)
+    // Strip icon font characters (PUA, Arabic Presentation Forms)
     .replace(/[\uE000-\uF8FF\uFB50-\uFDFF\uFE70-\uFEFF]/g, "")
+    // Strip trailing standalone CJK/symbol characters used as Unity icons
+    // (e.g. "Choose cards to discard. 粒" → "Choose cards to discard.")
+    .replace(/\s+[\u2E80-\u9FFF\uF900-\uFAFF]$/g, "")
     .trim();
 }
 
 /** Check if a label is only icon/symbol characters with no readable text */
 function isIconOnlyLabel(text: string): boolean {
-  // After stripping tags and icon ranges, check if remaining is only
-  // single CJK characters or other non-Latin symbols used as icons
   const stripped = text.trim();
   return stripped.length <= 2 && /^[\u2E80-\u9FFF\uF900-\uFAFF]$/.test(stripped);
 }

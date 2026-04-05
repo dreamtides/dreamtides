@@ -32,7 +32,7 @@ export function OverlayPrompt({
   if (hasInteractiveButtons) {
     return (
       <div
-        className="fixed inset-0 flex items-center justify-center z-50"
+        className="fixed inset-0 flex items-center justify-center z-60"
         style={{ background: "rgba(0, 0, 0, 0.7)" }}
       >
         <div
@@ -78,7 +78,7 @@ export function OverlayPrompt({
   // Non-blocking banner at the top
   return (
     <div
-      className="fixed top-0 left-0 right-0 flex justify-center z-30 pointer-events-none"
+      className="fixed top-0 left-0 right-0 flex justify-center z-60 pointer-events-none"
       style={{ paddingTop: 40 }}
     >
       <div

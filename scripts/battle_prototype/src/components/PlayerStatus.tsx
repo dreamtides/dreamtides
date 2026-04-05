@@ -4,6 +4,7 @@ interface PlayerStatusProps {
   player: PlayerView;
   label: string;
   deckCount: number;
+  handCount?: number;
   voidCount: number;
   banishedCount: number;
   onVoidClick?: () => void;
@@ -13,6 +14,7 @@ export function PlayerStatus({
   player,
   label,
   deckCount,
+  handCount,
   voidCount,
   banishedCount,
   onVoidClick,
@@ -44,6 +46,11 @@ export function PlayerStatus({
             {player.total_spark}
           </span>
         </span>
+        {handCount != null && (
+          <span style={{ color: "var(--color-text-dim)" }}>
+            Hand: {handCount}
+          </span>
+        )}
         <span style={{ color: "var(--color-text-dim)" }}>
           Deck: {deckCount}
         </span>

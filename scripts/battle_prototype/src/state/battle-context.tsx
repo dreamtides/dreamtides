@@ -24,6 +24,12 @@ function getPosition(card: CardView): [string, string | null] {
   return [key, typeof val === "string" ? val : null];
 }
 
+function playerLabel(player: string | null): string {
+  if (player === "Enemy") return "Enemy";
+  if (player === "User") return "You";
+  return "???";
+}
+
 function generateEvents(oldBattle: BattleView, newBattle: BattleView): string[] {
   const events: string[] = [];
   const oldMap = new Map(oldBattle.cards.map((c) => [c.id, c]));
@@ -31,20 +37,39 @@ function generateEvents(oldBattle: BattleView, newBattle: BattleView): string[] 
   for (const card of newBattle.cards) {
     const old = oldMap.get(card.id);
     if (!old) continue;
-    const [oldPos] = getPosition(old);
+    const [oldPos, oldPlayer] = getPosition(old);
     const [newPos, newPlayer] = getPosition(card);
     if (oldPos === newPos) continue;
     const name = card.revealed?.name ?? old.revealed?.name;
     if (!name) continue;
 
-    if (newPos === "OnBattlefield" && newPlayer === "Enemy" && oldPos !== "OnBattlefield") {
-      events.push(`Enemy materialized ${name}`);
-    } else if (oldPos === "OnBattlefield" && newPos === "InVoid") {
-      events.push(`${name} was dissolved`);
-    } else if (oldPos === "OnBattlefield" && newPos === "InBanished") {
-      events.push(`${name} was banished`);
-    } else if (oldPos === "InHand" && newPlayer === "Enemy" && newPos === "OnStack") {
-      events.push(`Enemy played ${name}`);
+    // Card materialized (appeared on battlefield from any non-battlefield zone)
+    if (newPos === "OnBattlefield" && oldPos !== "OnBattlefield") {
+      events.push(`${playerLabel(newPlayer)} materialized ${name}`);
+    }
+    // Card dissolved (battlefield -> void)
+    else if (oldPos === "OnBattlefield" && newPos === "InVoid") {
+      events.push(`${playerLabel(oldPlayer)}: ${name} dissolved`);
+    }
+    // Card banished (battlefield -> banished)
+    else if (oldPos === "OnBattlefield" && newPos === "InBanished") {
+      events.push(`${playerLabel(oldPlayer)}: ${name} banished`);
+    }
+    // Card played from hand (to stack)
+    else if (oldPos === "InHand" && newPos === "OnStack") {
+      events.push(`${playerLabel(oldPlayer)} played ${name}`);
+    }
+    // Card drawn (deck -> hand)
+    else if (oldPos === "InDeck" && newPos === "InHand") {
+      events.push(`${playerLabel(newPlayer)} drew a card`);
+    }
+    // Card returned to hand
+    else if (oldPos === "OnBattlefield" && newPos === "InHand") {
+      events.push(`${name} returned to ${playerLabel(newPlayer)}'s hand`);
+    }
+    // Card moved to void from hand or deck
+    else if (newPos === "InVoid" && oldPos !== "OnBattlefield" && oldPos !== "InVoid") {
+      events.push(`${name} sent to ${playerLabel(newPlayer)}'s void`);
     }
   }
 
@@ -63,6 +88,7 @@ interface BattleContextValue {
   isPolling: boolean;
   error: string | null;
   events: string[];
+  showYourTurn: boolean;
   sendAction: (action: GameAction) => void;
   sendDebugAction: (action: GameAction) => void;
   reconnect: (deck?: TestDeckName) => void;
@@ -83,9 +109,11 @@ export function BattleProvider({ children }: { children: ReactNode }) {
   const [isPolling, setIsPolling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<string[]>([]);
+  const [showYourTurn, setShowYourTurn] = useState(false);
   const responseVersionRef = useRef<string | undefined>(undefined);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const prevBattleRef = useRef<BattleView | null>(null);
+  const wasPollingRef = useRef(false);
   // Generation counter to invalidate stale in-flight polls
   const pollGenerationRef = useRef(0);
 
@@ -107,6 +135,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
     pollGenerationRef.current++;
     const myGeneration = pollGenerationRef.current;
     setIsPolling(true);
+    wasPollingRef.current = true;
     let pollInFlight = false;
     const interval = setInterval(() => {
       if (pollInFlight) return;
@@ -132,6 +161,11 @@ export function BattleProvider({ children }: { children: ReactNode }) {
               prevBattleRef.current = view;
               setBattle(view);
               if (view.user.can_act) {
+                if (wasPollingRef.current) {
+                  setShowYourTurn(true);
+                  setTimeout(() => setShowYourTurn(false), 100);
+                  wasPollingRef.current = false;
+                }
                 stopPolling();
               }
             }
@@ -156,7 +190,6 @@ export function BattleProvider({ children }: { children: ReactNode }) {
   const sendAction = useCallback(
     (action: GameAction) => {
       if (isPolling) return;
-      setEvents([]);
       void (async () => {
         try {
           setError(null);
@@ -166,6 +199,12 @@ export function BattleProvider({ children }: { children: ReactNode }) {
           );
           const view = extractBattleView(res.commands);
           if (view) {
+            if (prevBattleRef.current) {
+              const newEvents = generateEvents(prevBattleRef.current, view);
+              if (newEvents.length > 0) {
+                setEvents((prev) => [...prev, ...newEvents]);
+              }
+            }
             prevBattleRef.current = view;
             setBattle(view);
             if (view.user.can_act) return;
@@ -255,7 +294,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
 
   return (
     <BattleContext.Provider
-      value={{ battle, isPolling, error, events, sendAction, sendDebugAction, reconnect }}
+      value={{ battle, isPolling, error, events, showYourTurn, sendAction, sendDebugAction, reconnect }}
     >
       {children}
     </BattleContext.Provider>

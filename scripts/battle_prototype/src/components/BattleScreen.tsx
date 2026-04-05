@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { BattleView, CardView, DisplayPlayer, GameAction } from "../types/battle";
 import { PlayerStatus } from "./PlayerStatus";
 import { BattlefieldZone } from "./BattlefieldZone";
@@ -16,6 +16,7 @@ interface BattleScreenProps {
   onReconnect: () => void;
   events: string[];
   disabled: boolean;
+  showYourTurn: boolean;
 }
 
 function cardsByPosition(cards: CardView[], position: string, player?: DisplayPlayer): CardView[] {
@@ -52,10 +53,19 @@ function cardOrderCards(cards: CardView[]): CardView[] {
   });
 }
 
-export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, events, disabled }: BattleScreenProps) {
+export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, events, disabled, showYourTurn }: BattleScreenProps) {
   const [showDebug, setShowDebug] = useState(false);
   const [showVoid, setShowVoid] = useState<DisplayPlayer | null>(null);
+  const [showLog, setShowLog] = useState(false);
+  const [yourTurnVisible, setYourTurnVisible] = useState(false);
   const ui = battle.interface;
+
+  useEffect(() => {
+    if (!showYourTurn) return;
+    setYourTurnVisible(true);
+    const timer = setTimeout(() => setYourTurnVisible(false), 2000);
+    return () => clearTimeout(timer);
+  }, [showYourTurn]);
 
   const isGameOver =
     !disabled &&
@@ -100,6 +110,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
         player={battle.enemy}
         label="Enemy"
         deckCount={countCards(battle.cards, "InDeck", "Enemy")}
+        handCount={countCards(battle.cards, "InHand", "Enemy")}
         voidCount={countCards(battle.cards, "InVoid", "Enemy")}
         banishedCount={countCards(battle.cards, "InBanished", "Enemy")}
         onVoidClick={() => setShowVoid("Enemy")}
@@ -143,34 +154,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
         disabled={disabled}
       />
 
-      {/* Opponent event log */}
-      {events.length > 0 && (
-        <div
-          className="px-4 py-2"
-          style={{
-            background: "var(--color-surface-light)",
-            borderTop: "1px solid var(--color-border)",
-          }}
-        >
-          <div
-            className="text-xs font-bold mb-1"
-            style={{ color: "var(--color-primary-light)" }}
-          >
-            Opponent Actions
-          </div>
-          {events.map((event, i) => (
-            <div
-              key={i}
-              className="text-xs"
-              style={{ color: "var(--color-text-dim)" }}
-            >
-              {"\u2022"} {event}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Action buttons */}
+      {/* Battle log toggle + Action buttons */}
       <ActionBar
         primaryButton={ui.primary_action_button ?? undefined}
         secondaryButton={ui.secondary_action_button ?? undefined}
@@ -181,8 +165,21 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
         disabled={disabled}
       />
 
-      {/* Dev toggle button */}
-      <div className="flex justify-center py-1">
+      {/* Battle log + Dev toggle */}
+      <div className="flex justify-center gap-2 py-1">
+        {events.length > 0 && (
+          <button
+            onClick={() => setShowLog((prev) => !prev)}
+            className="px-3 py-1 rounded text-xs"
+            style={{
+              background: "var(--color-surface-light)",
+              color: "var(--color-primary-light)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            Battle Log ({events.length})
+          </button>
+        )}
         <button
           onClick={() => setShowDebug((prev) => !prev)}
           className="px-3 py-1 rounded text-xs"
@@ -196,6 +193,35 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
         </button>
       </div>
 
+      {/* Battle log panel */}
+      {showLog && events.length > 0 && (
+        <div
+          className="px-4 py-2"
+          style={{
+            background: "var(--color-surface-light)",
+            borderTop: "1px solid var(--color-border)",
+            maxHeight: 200,
+            overflowY: "auto",
+          }}
+        >
+          <div
+            className="text-xs font-bold mb-1"
+            style={{ color: "var(--color-primary-light)" }}
+          >
+            Battle Log
+          </div>
+          {events.map((event, i) => (
+            <div
+              key={i}
+              className="text-xs"
+              style={{ color: "var(--color-text-dim)" }}
+            >
+              {"\u2022"} {event}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Debug panel */}
       {showDebug && (
         <DebugPanel
@@ -207,7 +233,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
       {/* Card browser (void browsing) */}
       {browserCards(battle.cards).length > 0 && (
         <div
-          className="fixed inset-0 flex items-center justify-center z-40"
+          className="fixed inset-0 flex items-center justify-center z-50"
           style={{ background: "rgba(0, 0, 0, 0.7)" }}
         >
           <div
@@ -252,7 +278,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
       {/* Void viewer */}
       {showVoid && (
         <div
-          className="fixed inset-0 flex items-center justify-center z-40"
+          className="fixed inset-0 flex items-center justify-center z-50"
           style={{ background: "rgba(0, 0, 0, 0.7)" }}
         >
           <div
@@ -297,7 +323,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
       {/* Card order selector (Foresee) */}
       {ui.card_order_selector && cardOrderCards(battle.cards).length > 0 && (
         <div
-          className="fixed inset-0 flex items-center justify-center z-40"
+          className="fixed inset-0 flex items-center justify-center z-50"
           style={{ background: "rgba(0, 0, 0, 0.7)" }}
         >
           <div
@@ -380,6 +406,26 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
                   );
                 })}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Your Turn popup */}
+      {yourTurnVisible && (
+        <div
+          className="fixed inset-0 flex items-center justify-center pointer-events-none"
+          style={{ zIndex: 55 }}
+        >
+          <div
+            className="text-2xl font-bold px-8 py-4 rounded-lg"
+            style={{
+              background: "rgba(0, 0, 0, 0.85)",
+              border: "2px solid var(--color-primary)",
+              color: "var(--color-primary-light)",
+              animation: "fadeInOut 2s ease-in-out",
+            }}
+          >
+            Your Turn
           </div>
         </div>
       )}
