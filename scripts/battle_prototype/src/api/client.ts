@@ -7,7 +7,12 @@ import type {
   Metadata,
 } from "../types/battle";
 
-const USER_ID = "00000000-0000-0000-0000-000000000001";
+function getUserId(): string {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("user") ?? "00000000-0000-0000-0000-000000000001";
+}
+
+const USER_ID = getUserId();
 
 function metadata(): Metadata {
   return { user_id: USER_ID };

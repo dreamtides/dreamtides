@@ -1,5 +1,10 @@
 import type { ButtonView, GameAction } from "../types/battle";
 
+/** Strip Unity rich text tags like <color=#hex>...</color> from labels */
+function stripRichText(text: string): string {
+  return text.replace(/<\/?color[^>]*>/gi, "");
+}
+
 interface ActionBarProps {
   primaryButton?: ButtonView;
   secondaryButton?: ButtonView;
@@ -40,7 +45,7 @@ function ActionButton({
         border: "1px solid var(--color-border)",
       }}
     >
-      {button.label}
+      {stripRichText(button.label)}
     </button>
   );
 }
@@ -66,6 +71,8 @@ export function ActionBar({
       style={{
         background: "var(--color-surface)",
         borderTop: "1px solid var(--color-border)",
+        position: "relative",
+        zIndex: 45,
       }}
     >
       {incrementButton && (

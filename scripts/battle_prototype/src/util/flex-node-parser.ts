@@ -10,9 +10,14 @@ export interface ExtractedOverlay {
   buttons: ExtractedButton[];
 }
 
+/** Strip Unity rich text tags like <color=#hex>...</color> */
+function stripRichText(text: string): string {
+  return text.replace(/<\/?[^>]+>/gi, "").trim();
+}
+
 function getTextFromNodeType(nodeType: NodeType): string | null {
-  if ("Text" in nodeType) return nodeType.Text.label;
-  if ("TypewriterTextNode" in nodeType) return nodeType.TypewriterTextNode.label;
+  if ("Text" in nodeType) return stripRichText(nodeType.Text.label);
+  if ("TypewriterTextNode" in nodeType) return stripRichText(nodeType.TypewriterTextNode.label);
   return null;
 }
 

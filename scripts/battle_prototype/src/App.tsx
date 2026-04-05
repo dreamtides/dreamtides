@@ -6,7 +6,7 @@ function BattleApp() {
   const { battle, isPolling, error, sendAction, sendDebugAction, reconnect } = useBattle();
 
   useEffect(() => {
-    reconnect("Core11");
+    reconnect((new URLSearchParams(window.location.search).get("deck") as "Vanilla" | "StartingFive" | "Benchmark1" | "Core11") ?? "Core11");
   }, [reconnect]);
 
   if (!battle && error) {
@@ -16,7 +16,7 @@ function BattleApp() {
         <button
           className="mt-2 px-4 py-2 rounded"
           style={{ background: "var(--color-primary)" }}
-          onClick={() => reconnect("Core11")}
+          onClick={() => reconnect((new URLSearchParams(window.location.search).get("deck") as "Vanilla" | "StartingFive" | "Benchmark1" | "Core11") ?? "Core11")}
         >
           Retry
         </button>
@@ -43,7 +43,7 @@ function BattleApp() {
           <button
             className="px-3 py-1 rounded text-xs"
             style={{ background: "var(--color-primary)", color: "var(--color-text)" }}
-            onClick={() => reconnect("Core11")}
+            onClick={() => reconnect((new URLSearchParams(window.location.search).get("deck") as "Vanilla" | "StartingFive" | "Benchmark1" | "Core11") ?? "Core11")}
           >
             Reconnect
           </button>

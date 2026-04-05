@@ -73,7 +73,7 @@ fn check_response_size<T: Serialize + Clone>(response: &T, log_size: bool) -> Js
 async fn connect(body: String) -> AppResult<Json<ConnectResponse>> {
     println!();
 
-    let req: ConnectRequest = parse_json(&body)?;
+    let mut req: ConnectRequest = parse_json(&body)?;
     let user_id = req.metadata.user_id;
 
     info!(?user_id, "Got connect request");
@@ -84,6 +84,15 @@ async fn connect(body: String) -> AppResult<Json<ConnectResponse>> {
             return Err(AppError::Internal(e.clone()));
         }
     };
+
+    if req.streaming_assets_path.is_empty() {
+        req.streaming_assets_path = logging::get_developer_mode_streaming_assets_path();
+    }
+
+    if req.persistent_data_path.is_empty() {
+        req.persistent_data_path = "/tmp/dreamtides_dev".to_string();
+    }
+
     let response = engine::connect(&req, RequestContext {
         logging_options: LoggingOptions {
             log_directory: Some(log_directory),

@@ -55,8 +55,30 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, dis
   const [showDebug, setShowDebug] = useState(false);
   const ui = battle.interface;
 
+  const isGameOver =
+    !disabled &&
+    !battle.user.can_act &&
+    !ui.primary_action_button &&
+    !ui.secondary_action_button &&
+    (battle.user.score >= 12 || battle.enemy.score >= 12);
+
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Game over banner */}
+      {isGameOver && (
+        <div
+          className="text-center py-3 text-lg font-bold"
+          style={{
+            background: battle.user.score >= 12 ? "#065f46" : "#7f1d1d",
+            color: "white",
+          }}
+        >
+          {battle.user.score >= 12
+            ? `Victory! You won ${battle.user.score} - ${battle.enemy.score}`
+            : `Defeat. You lost ${battle.user.score} - ${battle.enemy.score}`}
+        </div>
+      )}
+
       {/* Turn info */}
       <div
         className="text-center py-1 text-sm"
@@ -152,7 +174,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, dis
       )}
 
       {/* Card browser (void browsing) */}
-      {ui.browser && browserCards(battle.cards).length > 0 && (
+      {browserCards(battle.cards).length > 0 && (
         <div
           className="fixed inset-0 flex items-center justify-center z-40"
           style={{ background: "rgba(0, 0, 0, 0.7)" }}
@@ -168,7 +190,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, dis
           >
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-bold">Card Browser</h3>
-              {ui.browser.close_button != null && (
+              {ui.browser?.close_button != null && (
                 <button
                   onClick={() => onAction(ui.browser!.close_button!)}
                   className="px-3 py-1 rounded text-sm"
