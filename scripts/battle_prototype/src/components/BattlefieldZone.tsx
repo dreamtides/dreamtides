@@ -15,10 +15,11 @@ export function BattlefieldZone({
   const sorted = [...cards].sort((a, b) => a.position.sorting_key - b.position.sorting_key);
   return (
     <div
-      className="flex gap-2 justify-center items-center py-2 min-h-[100px]"
+      className="flex gap-1 justify-center items-center py-1 flex-wrap"
+      style={{ minHeight: sorted.length === 0 ? 40 : 60 }}
     >
       {sorted.length === 0 && (
-        <span style={{ color: "var(--color-text-dim)", fontSize: 12 }}>
+        <span style={{ color: "var(--color-text-dim)", fontSize: 11 }}>
           No characters
         </span>
       )}

@@ -97,9 +97,10 @@ export function CardDisplay({
       onAction(clickAction);
     } else if (selectOrderCardId != null) {
       const pos = card.position.position;
-      const target = typeof pos !== "string" && "CardOrderSelector" in pos
+      const posTarget = typeof pos !== "string" && "CardOrderSelector" in pos
         ? (pos as Record<string, string>).CardOrderSelector
         : "Deck";
+      const target = posTarget === "Void" ? "Void" : { Deck: 0 };
       onAction({
         BattleAction: {
           SelectOrderForDeckCard: { card_id: selectOrderCardId, target },
@@ -168,11 +169,12 @@ export function CardDisplay({
         )}
         {!compact && revealed.rules_text && (
           <div
-            className="mt-1"
+            className="mt-1 overflow-hidden"
             style={{
               fontSize: 9,
               color: "var(--color-text-dim)",
               lineHeight: 1.3,
+              maxHeight: 52,
             }}
             dangerouslySetInnerHTML={{ __html: stripUnityTags(revealed.rules_text) }}
           />

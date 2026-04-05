@@ -61,9 +61,10 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, dis
       <div
         className="text-center py-1 text-sm"
         style={{
-          background: "var(--color-surface)",
+          background: disabled ? "var(--color-primary)" : "var(--color-surface)",
           borderBottom: "1px solid var(--color-border)",
-          color: "var(--color-text-dim)",
+          color: disabled ? "var(--color-text)" : "var(--color-text-dim)",
+          transition: "background 0.2s",
         }}
       >
         Turn {battle.turn_number}

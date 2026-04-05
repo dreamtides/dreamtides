@@ -9,7 +9,7 @@ function BattleApp() {
     reconnect("Core11");
   }, [reconnect]);
 
-  if (error) {
+  if (!battle && error) {
     return (
       <div className="p-4">
         <p className="text-red-400">Error: {error}</p>
@@ -33,13 +33,30 @@ function BattleApp() {
   }
 
   return (
-    <BattleScreen
-      battle={battle}
-      onAction={sendAction}
-      onDebugAction={sendDebugAction}
-      onReconnect={reconnect}
-      disabled={isPolling}
-    />
+    <>
+      {error && (
+        <div
+          className="px-4 py-2 text-sm flex items-center justify-between"
+          style={{ background: "#7f1d1d", color: "#fecaca" }}
+        >
+          <span>Error: {error}</span>
+          <button
+            className="px-3 py-1 rounded text-xs"
+            style={{ background: "var(--color-primary)", color: "var(--color-text)" }}
+            onClick={() => reconnect("Core11")}
+          >
+            Reconnect
+          </button>
+        </div>
+      )}
+      <BattleScreen
+        battle={battle}
+        onAction={sendAction}
+        onDebugAction={sendDebugAction}
+        onReconnect={reconnect}
+        disabled={isPolling}
+      />
+    </>
   );
 }
 
