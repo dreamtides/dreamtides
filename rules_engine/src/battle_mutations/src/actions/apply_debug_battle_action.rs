@@ -29,9 +29,6 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
         DebugBattleAction::SetProducedEnergy { player: player_name, energy } => {
             battle.players.player_mut(player_name).produced_energy = energy;
         }
-        DebugBattleAction::SetSparkBonus { player: player_name, spark } => {
-            battle.players.player_mut(player_name).spark_bonus = spark;
-        }
         DebugBattleAction::AddCardToHand { player: player_name, card: card_name } => {
             add_to_hand(battle, player_name, source, card_name);
         }

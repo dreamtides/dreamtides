@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use ai_data::game_ai::GameAI;
 use core_data::identifiers::UserId;
-use core_data::numerics::{Energy, Points, Spark};
+use core_data::numerics::{Energy, Points};
 use quest_state::quest::quest_state::QuestState;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -30,10 +30,6 @@ pub struct BattlePlayerState {
     /// Energy produced each turn
     #[serde(default)]
     pub produced_energy: Energy,
-
-    /// Additional spark for this player
-    #[serde(default)]
-    pub spark_bonus: Spark,
 
     /// The deck name for this player.
     pub deck_name: TestDeckName,

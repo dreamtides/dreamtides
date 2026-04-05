@@ -40,7 +40,6 @@ fn debug_player_state(name: PlayerName, state: &BattlePlayerState) -> DebugBattl
         points: format!("{:?}", state.points),
         current_energy: format!("{:?}", state.current_energy),
         produced_energy: format!("{:?}", state.produced_energy),
-        spark_bonus: format!("{:?}", state.spark_bonus),
     }
 }
 

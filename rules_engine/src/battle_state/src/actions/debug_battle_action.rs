@@ -1,5 +1,5 @@
 use core_data::identifiers::{BaseCardId, DreamwellCardId};
-use core_data::numerics::{Energy, Points, Spark};
+use core_data::numerics::{Energy, Points};
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -16,8 +16,6 @@ pub enum DebugBattleAction {
     SetPoints { player: PlayerName, points: Points },
     /// Set the produced energy of the player
     SetProducedEnergy { player: PlayerName, energy: Energy },
-    /// Set the spark bonus of the player
-    SetSparkBonus { player: PlayerName, spark: Spark },
     /// Add a specific card to hand
     AddCardToHand { player: PlayerName, card: BaseCardId },
     /// Add a specific card to battlefield

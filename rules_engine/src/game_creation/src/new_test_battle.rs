@@ -24,7 +24,7 @@ use battle_state::battle_player::player_map::PlayerMap;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger_state::TriggerState;
 use core_data::identifiers::{BattleId, QuestId, UserId};
-use core_data::numerics::{Energy, Essence, Points, Spark, TurnId};
+use core_data::numerics::{Energy, Essence, Points, TurnId};
 use core_data::types::PlayerName;
 use quest_state::quest::deck::Deck;
 use quest_state::quest::quest_state::QuestState;
@@ -87,7 +87,6 @@ pub fn create_and_start(
             one: BattlePlayerState {
                 player_type: player_one.player_type,
                 points: Points(0),
-                spark_bonus: Spark(0),
                 current_energy: Energy(0),
                 produced_energy: Energy(0),
                 deck_name: player_one.deck_name,
@@ -97,7 +96,6 @@ pub fn create_and_start(
             two: BattlePlayerState {
                 player_type: player_two.player_type,
                 points: Points(0),
-                spark_bonus: Spark(0),
                 current_energy: Energy(0),
                 produced_energy: Energy(0),
                 deck_name: player_two.deck_name,

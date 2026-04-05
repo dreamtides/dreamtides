@@ -43,48 +43,6 @@ fn hand_size_limit_exceeded_shows_interface_message() {
 }
 
 #[test]
-fn character_limit_exceeded_shows_interface_message() {
-    let mut s = TestBattle::builder().connect();
-
-    for _ in 0..8 {
-        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
-    }
-
-    let char_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
-    let preview = s.user_client.cards.get_play_effect_preview(&char_id);
-    let message = preview.preview_message.as_ref().expect("preview should show message");
-    assert!(
-        test_interface_view::extract_text_from_node(message).contains("Character limit exceeded"),
-        "preview should show message when character limit will be exceeded"
-    );
-}
-#[test]
-fn both_limits_exceeded_shows_combined_interface_message() {
-    let mut s = TestBattle::builder().connect();
-
-    for _ in 0..8 {
-        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
-    }
-
-    for _ in 0..9 {
-        s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
-    }
-
-    let draw_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VARIABLE_ENERGY_DRAW);
-    s.play_card_from_hand(DisplayPlayer::User, &draw_id);
-    s.click_increment_button(DisplayPlayer::User);
-    s.click_increment_button(DisplayPlayer::User);
-
-    let preview = s.user_client.active_battle_preview();
-    let message = preview.preview_message.as_ref().expect("preview should show message");
-    let message_text = test_interface_view::extract_text_from_node(message);
-    assert!(
-        message_text.contains("Character limit exceeded")
-            || message_text.contains("Cards drawn in excess"),
-        "preview should show message when both limits will be exceeded, got: {message_text}"
-    );
-}
-#[test]
 fn card_preview_shows_cost_changes_from_effects() {
     let mut s = TestBattle::builder().connect();
     let char_id = s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);

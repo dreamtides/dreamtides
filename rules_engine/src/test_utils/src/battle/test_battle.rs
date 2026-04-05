@@ -117,9 +117,5 @@ impl TestBattle {
         self.session.perform_user_action(BattleAction::Debug(
             DebugBattleAction::SetProducedEnergy { player, energy: config.produced_energy },
         ));
-        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::SetSparkBonus {
-            player,
-            spark: config.spark_bonus,
-        }));
     }
 }

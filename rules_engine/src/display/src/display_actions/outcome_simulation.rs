@@ -8,9 +8,8 @@ use battle_queries::legal_action_queries::legal_actions_data::ForPlayer;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
-use battle_state::battle::card_id::{CardId, CardIdType, CharacterId};
+use battle_state::battle::card_id::{CardId, CharacterId};
 use battle_state::prompt_types::prompt_data::PromptType;
-use core_data::display_color;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattlePreviewView, PlayerPreviewView};
 use display_data::card_view::CardPreviewView;
@@ -19,7 +18,6 @@ use strings::strings;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
 use ui_components::component::Component;
-use ui_components::icon;
 
 use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
@@ -104,7 +102,7 @@ pub fn action_effect_preview(
     };
 
     let preview_message = get_preview_message(&simulation, player);
-    let cards = get_preview_cards(battle, &simulation, player);
+    let cards = get_preview_cards(battle, &simulation);
 
     BattlePreviewView { user: user_preview, enemy: enemy_preview, cards, preview_message }
 }
@@ -138,47 +136,15 @@ pub fn current_prompt_battle_preview(
 }
 
 fn get_preview_message(simulation: &BattleState, player: PlayerName) -> Option<FlexNode> {
-    let hand_size_exceeded =
-        simulation.turn_history.current_action_history.player(player).hand_size_limit_exceeded;
-    let character_limit_exceeded = !simulation
-        .turn_history
-        .current_action_history
-        .player(player)
-        .character_limit_characters_abandoned
-        .is_empty();
-
-    match (hand_size_exceeded, character_limit_exceeded) {
-        (true, true) => combined_limit_messages().flex_node(),
-        (true, false) => hand_size_limit_exceeded_message().flex_node(),
-        (false, true) => character_limit_message().flex_node(),
-        (false, false) => None,
+    if simulation.turn_history.current_action_history.player(player).hand_size_limit_exceeded {
+        hand_size_limit_exceeded_message().flex_node()
+    } else {
+        None
     }
 }
 
-fn get_preview_cards(
-    battle: &BattleState,
-    simulation: &BattleState,
-    player: PlayerName,
-) -> Vec<CardPreviewView> {
+fn get_preview_cards(battle: &BattleState, simulation: &BattleState) -> Vec<CardPreviewView> {
     let mut card_previews: HashMap<CardId, CardPreviewView> = HashMap::new();
-
-    for character_id in &simulation
-        .turn_history
-        .current_action_history
-        .player(player)
-        .character_limit_characters_abandoned
-    {
-        let card_id = character_id.card_id();
-        card_previews
-            .entry(card_id)
-            .or_insert_with(|| CardPreviewView {
-                card_id: adapter::client_card_id(card_id),
-                ..Default::default()
-            })
-            .battlefield_icon = Some(icon::WARNING.to_string());
-        card_previews.get_mut(&card_id).unwrap().battlefield_icon_color =
-            Some(display_color::RED_900);
-    }
 
     for card_id in battle.cards.all_cards() {
         let original_cost = card_properties::converted_energy_cost(battle, card_id);
@@ -212,22 +178,6 @@ fn get_preview_cards(
 fn hand_size_limit_exceeded_message() -> impl Component {
     InterfaceMessage::builder()
         .text(strings::hand_size_limit_exceeded_warning_message().to_string())
-        .anchor_position(AnchorPosition::Top)
-        .temporary(false)
-        .build()
-}
-
-fn character_limit_message() -> impl Component {
-    InterfaceMessage::builder()
-        .text(strings::character_limit_exceeded_warning_message().to_string())
-        .anchor_position(AnchorPosition::Top)
-        .temporary(false)
-        .build()
-}
-
-fn combined_limit_messages() -> impl Component {
-    InterfaceMessage::builder()
-        .text(strings::combined_limit_warning_message().to_string())
         .anchor_position(AnchorPosition::Top)
         .temporary(false)
         .build()

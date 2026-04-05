@@ -10,7 +10,6 @@ use core_data::types::PlayerName;
 
 use crate::card_mutations::move_card;
 use crate::effects::apply_effect;
-use crate::play_cards::character_limit;
 
 /// Marks a player as having taken the "pass" action on the current stack.
 ///
@@ -71,7 +70,6 @@ fn resolve_stack_card(battle: &mut BattleState, item: &StackItemState, card_id: 
         let character_id = CharacterId(card_id.card_id());
         let source = EffectSource::Player { controller: item.controller };
         battle.push_animation(source, || BattleAnimation::ResolveCharacter { character_id });
-        character_limit::apply(battle, source, item.controller);
         move_card::from_stack_to_battlefield(battle, source, item.controller, card_id);
     }
 }

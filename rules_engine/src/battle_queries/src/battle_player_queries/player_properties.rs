@@ -4,11 +4,9 @@ use core_data::types::PlayerName;
 
 /// Returns the total spark value for a player.
 pub fn spark_total(battle: &BattleState, player: PlayerName) -> Spark {
-    battle
-        .cards
-        .battlefield_state(player)
-        .values()
-        .map(|character_state| character_state.spark)
-        .sum::<Spark>()
-        + battle.players.player(player).spark_bonus
+    let mut total = Spark(0);
+    for character_id in battle.cards.battlefield(player).all_characters() {
+        total += battle.cards.spark(player, character_id).unwrap_or(Spark(0));
+    }
+    total
 }

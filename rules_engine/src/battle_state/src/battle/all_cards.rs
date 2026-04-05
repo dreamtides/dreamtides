@@ -398,7 +398,15 @@ impl AllCards {
                 self.banished.player_mut(controller).insert(BanishedCardId(card_id));
             }
             Zone::Battlefield => {
-                self.battlefield.player_mut(controller).add_to_back_rank(CharacterId(card_id));
+                let bf = self.battlefield.player_mut(controller);
+                if bf.first_empty_back_slot().is_some() {
+                    bf.add_to_back_rank(CharacterId(card_id));
+                } else {
+                    let index = bf
+                        .first_empty_front_slot()
+                        .expect("Cannot add to battlefield: both ranks are full");
+                    bf.front[index] = Some(CharacterId(card_id));
+                }
                 self.battlefield_state
                     .player_mut(controller)
                     .insert(CharacterId(card_id), CharacterState::default());

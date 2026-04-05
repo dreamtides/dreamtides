@@ -39,30 +39,20 @@ fn hand_size_limit_exceeded_gains_energy() {
 }
 
 #[test]
-fn character_limit_exceeded_abandons_character() {
+fn character_limit_prevents_playing_character() {
     let mut s = TestBattle::builder().connect();
-    let initial_void = s.user_client.cards.user_void().len();
-    // Add 8  to the battlefield
-    for _ in 0..8 {
+    for _ in 0..16 {
         s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     }
     assert_eq!(
         s.user_client.cards.user_battlefield().len(),
-        8,
-        "User should have 8 characters on battlefield"
+        16,
+        "User should have 16 characters on battlefield"
     );
     let char_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
-    s.play_card_from_hand(DisplayPlayer::User, &char_id);
-
-    assert_eq!(
-        s.user_client.cards.user_battlefield().len(),
-        8,
-        "User should still have 8 characters on battlefield"
-    );
-    assert_eq!(
-        s.user_client.cards.user_void().len(),
-        initial_void + 1,
-        "User void should have increased by 1"
+    assert!(
+        s.user_client.cards.get_revealed(&char_id).actions.can_play.is_none(),
+        "Character should not be playable when battlefield is full"
     );
 }
 
