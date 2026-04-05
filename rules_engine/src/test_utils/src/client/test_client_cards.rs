@@ -43,6 +43,13 @@ impl TestClientCards {
         TestClientCardList::new(cards)
     }
 
+    /// Get all cards matching a position predicate
+    pub fn cards_matching(&self, predicate: impl Fn(&Position) -> bool) -> TestClientCardList<'_> {
+        let cards =
+            self.card_map.values().filter(|card| predicate(&card.view.position.position)).collect();
+        TestClientCardList::new(cards)
+    }
+
     /// Get all cards in the user's hand
     pub fn user_hand(&self) -> TestClientCardList<'_> {
         self.cards_at_position(&Position::InHand(DisplayPlayer::User))
@@ -55,12 +62,12 @@ impl TestClientCards {
 
     /// Get all cards on the user's battlefield
     pub fn user_battlefield(&self) -> TestClientCardList<'_> {
-        self.cards_at_position(&Position::OnBattlefield(DisplayPlayer::User))
+        self.cards_matching(|p| matches!(p, Position::OnBattlefield(DisplayPlayer::User, _, _)))
     }
 
     /// Get all cards on the enemy's battlefield
     pub fn enemy_battlefield(&self) -> TestClientCardList<'_> {
-        self.cards_at_position(&Position::OnBattlefield(DisplayPlayer::Enemy))
+        self.cards_matching(|p| matches!(p, Position::OnBattlefield(DisplayPlayer::Enemy, _, _)))
     }
 
     /// Get all cards in the user's void

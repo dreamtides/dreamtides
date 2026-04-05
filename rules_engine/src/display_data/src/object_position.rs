@@ -16,6 +16,15 @@ pub struct ObjectPosition {
     pub sorting_key: u32,
 }
 
+/// Represents the rank (row) of a character on the battlefield.
+#[derive(
+    Debug, Clone, Copy, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
+pub enum Rank {
+    Front,
+    Back,
+}
+
 /// Possible types of display positions
 #[derive(
     Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema,
@@ -55,7 +64,7 @@ pub enum Position {
     InBanished(DisplayPlayer),
 
     /// Object is on the battlefield
-    OnBattlefield(DisplayPlayer),
+    OnBattlefield(DisplayPlayer, Rank, u8),
 
     /// Object is in a player's status zone
     InPlayerStatus(DisplayPlayer),

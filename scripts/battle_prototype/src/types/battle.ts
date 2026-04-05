@@ -77,7 +77,7 @@ export type Position =
   | { InDeck: DisplayPlayer }
   | { InVoid: DisplayPlayer }
   | { InBanished: DisplayPlayer }
-  | { OnBattlefield: DisplayPlayer }
+  | { OnBattlefield: [DisplayPlayer, "Front" | "Back", number] }
   | { InPlayerStatus: DisplayPlayer }
   | "Browser"
   | { CardOrderSelector: string }

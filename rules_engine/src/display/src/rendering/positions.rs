@@ -1,13 +1,14 @@
 use battle_queries::battle_card_queries::{card, valid_target_queries};
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardId, CardIdType};
+use battle_state::battle::card_id::{CardId, CardIdType, CharacterId};
+use battle_state::battle_cards::battlefield::Battlefield;
 use battle_state::battle_cards::stack_card_state::{
     EffectTargets, StackItemId, StandardEffectTarget,
 };
 use battle_state::battle_cards::zone::Zone;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
-use display_data::object_position::{ObjectPosition, Position, StackType};
+use display_data::object_position::{ObjectPosition, Position, Rank, StackType};
 
 use crate::core::response_builder::ResponseBuilder;
 use crate::rendering::position_overrides;
@@ -27,7 +28,12 @@ pub fn calculate(
     let position = match zone {
         Zone::Hand => Position::InHand(player),
         Zone::Deck => Position::InDeck(player),
-        Zone::Battlefield => Position::OnBattlefield(player),
+        Zone::Battlefield => {
+            let character_id = CharacterId(card_id);
+            let battlefield = battle.cards.battlefield(controller);
+            let (rank, slot) = battlefield_rank_and_slot(battlefield, character_id);
+            Position::OnBattlefield(player, rank, slot)
+        }
         Zone::Stack => Position::OnStack(current_stack_type(builder, battle)),
         Zone::Void => Position::InVoid(player),
         Zone::Banished => Position::InBanished(player),
@@ -126,4 +132,18 @@ pub fn current_stack_type(builder: &ResponseBuilder, battle: &BattleState) -> St
     } else {
         StackType::Default
     }
+}
+
+fn battlefield_rank_and_slot(battlefield: &Battlefield, character_id: CharacterId) -> (Rank, u8) {
+    for (i, slot) in battlefield.front.iter().enumerate() {
+        if *slot == Some(character_id) {
+            return (Rank::Front, i as u8);
+        }
+    }
+    for (i, slot) in battlefield.back.iter().enumerate() {
+        if *slot == Some(character_id) {
+            return (Rank::Back, i as u8);
+        }
+    }
+    panic!("Character {character_id:?} not found on battlefield")
 }

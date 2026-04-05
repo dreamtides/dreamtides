@@ -25,7 +25,10 @@ function cardsByPosition(cards: CardView[], position: string, player?: DisplayPl
     if (typeof pos === "string") return false;
     if (position in pos) {
       if (player === undefined) return true;
-      return (pos as Record<string, unknown>)[position] === player;
+      const val = (pos as Record<string, unknown>)[position];
+      // OnBattlefield is now a tuple [player, rank, slot]
+      if (Array.isArray(val)) return val[0] === player;
+      return val === player;
     }
     return false;
   });

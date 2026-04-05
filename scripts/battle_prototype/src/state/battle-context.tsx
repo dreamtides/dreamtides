@@ -21,6 +21,8 @@ function getPosition(card: CardView): [string, string | null] {
   if (typeof pos === "string") return [pos, null];
   const key = Object.keys(pos)[0];
   const val = (pos as Record<string, unknown>)[key];
+  // OnBattlefield is now a tuple [player, rank, slot]
+  if (Array.isArray(val)) return [key, typeof val[0] === "string" ? val[0] : null];
   return [key, typeof val === "string" ? val : null];
 }
 
