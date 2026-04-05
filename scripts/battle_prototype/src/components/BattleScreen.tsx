@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { BattleView, CardView, DisplayPlayer, GameAction } from "../types/battle";
 import { PlayerStatus } from "./PlayerStatus";
-import { BattlefieldZone } from "./BattlefieldZone";
+import { RankZone } from "./BattlefieldZone";
 import { StackZone } from "./StackZone";
 import { HandZone } from "./HandZone";
 import { ActionBar } from "./ActionBar";
@@ -119,10 +119,49 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
         onVoidClick={() => setShowVoid("Enemy")}
       />
 
-      {/* Enemy battlefield */}
-      <BattlefieldZone
-        label="Enemy Characters"
-        cards={cardsByPosition(battle.cards, "OnBattlefield", "Enemy")}
+      {/* Enemy back rank */}
+      <RankZone
+        label="ENEMY BACK RANK"
+        cards={battle.cards}
+        player="Enemy"
+        rank="Back"
+        onAction={onAction}
+        disabled={disabled}
+      />
+
+      {/* Enemy front rank */}
+      <RankZone
+        label="ENEMY FRONT RANK"
+        cards={battle.cards}
+        player="Enemy"
+        rank="Front"
+        onAction={onAction}
+        disabled={disabled}
+      />
+
+      {/* Judgment line */}
+      <div className="flex items-center justify-center gap-2 py-1">
+        <div className="flex-1 border-t border-yellow-600/50" />
+        <span className="text-xs text-yellow-600">{"\u26A1"} JUDGMENT LINE {"\u26A1"}</span>
+        <div className="flex-1 border-t border-yellow-600/50" />
+      </div>
+
+      {/* Your front rank */}
+      <RankZone
+        label="YOUR FRONT RANK"
+        cards={battle.cards}
+        player="User"
+        rank="Front"
+        onAction={onAction}
+        disabled={disabled}
+      />
+
+      {/* Your back rank */}
+      <RankZone
+        label="YOUR BACK RANK"
+        cards={battle.cards}
+        player="User"
+        rank="Back"
         onAction={onAction}
         disabled={disabled}
       />
@@ -130,14 +169,6 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
       {/* Stack */}
       <StackZone
         cards={stackCards(battle.cards)}
-        onAction={onAction}
-        disabled={disabled}
-      />
-
-      {/* User battlefield */}
-      <BattlefieldZone
-        label="Your Characters"
-        cards={cardsByPosition(battle.cards, "OnBattlefield", "User")}
         onAction={onAction}
         disabled={disabled}
       />
