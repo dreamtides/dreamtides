@@ -73,6 +73,7 @@ pub fn apply(
         StandardEffect::PutCardsFromYourDeckIntoVoid { count } => {
             put_cards_from_your_deck_into_void(battle, source, *count)
         }
+        StandardEffect::Kindle { amount } => kindle(battle, source, *amount),
         _ => todo!("Implement {:?}", effect),
     }
 }
@@ -270,6 +271,40 @@ fn return_up_to_count_from_your_void_to_hand(
         move_card::from_void_to_hand(battle, source, controller, void_card_target.card_id);
     }
     Some(EffectWasApplied)
+}
+
+fn kindle(
+    battle: &mut BattleState,
+    source: EffectSource,
+    amount: Spark,
+) -> Option<EffectWasApplied> {
+    let player = source.controller();
+    let characters = battle.cards.battlefield(player).all_characters();
+    let target = characters.iter().copied().max_by(|&a, &b| {
+        let a_spark = battle.cards.spark(player, a).unwrap_or_default();
+        let b_spark = battle.cards.spark(player, b).unwrap_or_default();
+        let a_turn = battle
+            .cards
+            .battlefield_state(player)
+            .get(&a)
+            .map(|s| s.played_turn)
+            .unwrap_or(u32::MAX);
+        let b_turn = battle
+            .cards
+            .battlefield_state(player)
+            .get(&b)
+            .map(|s| s.played_turn)
+            .unwrap_or(u32::MAX);
+        a_spark.cmp(&b_spark).then(b_turn.cmp(&a_turn))
+    });
+
+    if let Some(id) = target {
+        battle_trace!("Kindling character", battle, id, amount);
+        spark::gain(battle, source, id, amount);
+        Some(EffectWasApplied)
+    } else {
+        None
+    }
 }
 
 fn return_from_battlefield_to_hand(
