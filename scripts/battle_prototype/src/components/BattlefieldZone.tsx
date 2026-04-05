@@ -76,8 +76,8 @@ export function RankZone({
             <div
               key={`empty-${i}`}
               style={{
-                width: 100,
-                height: 60,
+                width: 90,
+                height: 48,
                 border: "1px dashed var(--color-border)",
                 borderRadius: 4,
               }}

@@ -13,7 +13,7 @@ export function HandZone({ cards, onAction, disabled }: HandZoneProps) {
   );
 
   return (
-    <div className="flex gap-1 justify-center items-end py-2 flex-wrap" style={{ maxWidth: "100%", padding: "8px 4px" }}>
+    <div className="flex gap-1 justify-center items-end flex-wrap" style={{ maxWidth: "100%", padding: "4px 4px" }}>
       {sorted.map((card) => (
         <CardDisplay
           key={card.id}

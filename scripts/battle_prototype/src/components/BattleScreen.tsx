@@ -78,7 +78,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
     (battle.user.score >= 12 || battle.enemy.score >= 12);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-screen overflow-y-auto" style={{ paddingBottom: 48 }}>
       {/* Game over banner */}
       {isGameOver && (
         <div
@@ -140,7 +140,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
       />
 
       {/* Judgment line */}
-      <div className="flex items-center justify-center gap-2 py-1">
+      <div className="flex items-center justify-center gap-2 py-0.5">
         <div className="flex-1 border-t border-yellow-600/50" />
         <span className="text-xs text-yellow-600">{"\u26A1"} JUDGMENT LINE {"\u26A1"}</span>
         <div className="flex-1 border-t border-yellow-600/50" />

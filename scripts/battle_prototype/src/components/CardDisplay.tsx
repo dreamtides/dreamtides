@@ -135,8 +135,8 @@ export function CardDisplay({
       onClick={handleClick}
       className="rounded overflow-hidden flex flex-col"
       style={{
-        width: compact ? 100 : 140,
-        minHeight: compact ? 60 : 180,
+        width: compact ? 90 : 140,
+        minHeight: compact ? 48 : 180,
         background: "var(--color-surface)",
         border: `2px solid ${outlineColor}`,
         cursor: isClickable ? "pointer" : "default",
@@ -148,7 +148,7 @@ export function CardDisplay({
           src={imageUrl}
           alt={revealed.name}
           className="w-full object-cover"
-          style={{ height: compact ? 40 : 80 }}
+          style={{ height: compact ? 28 : 80 }}
         />
       )}
       <div className="p-1 flex flex-col gap-0.5" style={{ fontSize: compact ? 9 : 11 }}>
