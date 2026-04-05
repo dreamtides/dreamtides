@@ -39,8 +39,11 @@ export function BattleProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const responseVersionRef = useRef<string | undefined>(undefined);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Generation counter to invalidate stale in-flight polls
+  const pollGenerationRef = useRef(0);
 
   const stopPolling = useCallback(() => {
+    pollGenerationRef.current++;
     if (pollIntervalRef.current != null) {
       clearInterval(pollIntervalRef.current);
       pollIntervalRef.current = null;
@@ -54,14 +57,22 @@ export function BattleProvider({ children }: { children: ReactNode }) {
       clearInterval(pollIntervalRef.current);
       pollIntervalRef.current = null;
     }
+    pollGenerationRef.current++;
+    const myGeneration = pollGenerationRef.current;
     setIsPolling(true);
     let pollInFlight = false;
     const interval = setInterval(() => {
       if (pollInFlight) return;
+      if (pollGenerationRef.current !== myGeneration) {
+        clearInterval(interval);
+        return;
+      }
       pollInFlight = true;
       void (async () => {
         try {
           const pollRes = await api.poll();
+          // Check if this poll generation is still current
+          if (pollGenerationRef.current !== myGeneration) return;
           if (pollRes.commands) {
             const view = extractBattleView(pollRes.commands);
             if (view) {
@@ -114,23 +125,52 @@ export function BattleProvider({ children }: { children: ReactNode }) {
 
   const sendDebugAction = useCallback(
     (action: GameAction) => {
+      // Stop any background polling and invalidate in-flight polls.
+      stopPolling();
       void (async () => {
         try {
           setError(null);
-          // Don't send last_response_version for debug actions so
-          // the server always returns the full updated state.
           const res = await api.performAction(action, undefined);
-          const view = extractBattleView(res.commands);
+          let view = extractBattleView(res.commands);
           if (view) {
             setBattle(view);
           }
-          startPolling();
+          // Poll with retries to get the updated state.
+          for (let attempt = 0; attempt < 8; attempt++) {
+            await new Promise((r) => setTimeout(r, 150 + attempt * 100));
+            const pollRes = await api.poll();
+            if (pollRes.commands) {
+              const pollView = extractBattleView(pollRes.commands);
+              if (pollView) {
+                setBattle(pollView);
+                view = pollView;
+              }
+            }
+            if (pollRes.response_version) {
+              responseVersionRef.current = pollRes.response_version;
+            }
+            if (pollRes.response_type === "Final") {
+              break;
+            }
+            // If the response was consumed by a stale in-flight poll,
+            // re-send the action to generate a new response.
+            if (pollRes.response_type === "None" && attempt === 0) {
+              await api.performAction(action, undefined);
+              continue;
+            }
+            if (pollRes.response_type === "None") {
+              break;
+            }
+          }
+          if (view && !view.user.can_act) {
+            startPolling();
+          }
         } catch (e) {
           setError(e instanceof Error ? e.message : "Debug action failed");
         }
       })();
     },
-    [startPolling],
+    [stopPolling, startPolling],
   );
 
   const reconnect = useCallback(
