@@ -795,16 +795,13 @@ quest-dev:
 battle-dev:
     #!/usr/bin/env bash
     set -euo pipefail
-    if lsof -ti:5174 >/dev/null 2>&1; then
-        echo "Error: port 5174 is already in use. Kill the existing process first:" >&2
-        echo "  lsof -ti:5174 | xargs kill" >&2
-        exit 1
-    fi
+    lsof -ti:5174 | xargs kill 2>/dev/null || true
+    sleep 0.5
     cd scripts/battle_prototype
     npm install
     npm run setup-assets
     open http://localhost:5174 &
-    exec npx vite --port 5174 --strictPort
+    npx vite --port 5174 --strictPort
 
 constructed-quest-dev:
     #!/usr/bin/env bash
