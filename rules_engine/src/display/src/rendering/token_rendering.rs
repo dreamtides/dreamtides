@@ -227,6 +227,7 @@ pub fn token_card_view(view: TokenCardView) -> CardView {
             rules_text: view.rules_text,
             outline_color: view.outline_color,
             is_fast: view.is_fast,
+            summoning_sick: false,
             actions: view.actions,
             effects: CardEffects::default(),
             info_zoom_data: view.info_zoom_data,

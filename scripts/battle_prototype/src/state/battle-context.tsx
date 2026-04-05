@@ -32,6 +32,12 @@ function playerLabel(player: string | null): string {
   return "???";
 }
 
+function possessiveLabel(player: string | null): string {
+  if (player === "Enemy") return "Enemy's";
+  if (player === "User") return "Your";
+  return "???'s";
+}
+
 function generateEvents(oldBattle: BattleView, newBattle: BattleView): string[] {
   const events: string[] = [];
   const oldMap = new Map(oldBattle.cards.map((c) => [c.id, c]));
@@ -67,11 +73,11 @@ function generateEvents(oldBattle: BattleView, newBattle: BattleView): string[] 
     }
     // Card returned to hand
     else if (oldPos === "OnBattlefield" && newPos === "InHand") {
-      events.push(`${name} returned to ${playerLabel(newPlayer)}'s hand`);
+      events.push(`${name} returned to ${possessiveLabel(newPlayer)} hand`);
     }
     // Card moved to void from hand or deck
     else if (newPos === "InVoid" && oldPos !== "OnBattlefield" && oldPos !== "InVoid") {
-      events.push(`${name} sent to ${playerLabel(newPlayer)}'s void`);
+      events.push(`${name} sent to ${possessiveLabel(newPlayer)} void`);
     }
   }
 

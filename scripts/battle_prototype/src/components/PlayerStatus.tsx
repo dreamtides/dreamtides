@@ -32,7 +32,7 @@ export function PlayerStatus({
       <div className="flex gap-4 text-sm">
         <span>
           Score:{" "}
-          <span style={{ color: "var(--color-gold)" }}>{player.score}</span>
+          <span style={{ color: "var(--color-gold)" }}>{player.score}/12</span>
         </span>
         <span>
           Energy:{" "}

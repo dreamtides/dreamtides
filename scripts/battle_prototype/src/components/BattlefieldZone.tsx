@@ -118,10 +118,13 @@ export function RankZone({
   };
 
   return (
-    <div className="relative py-0.5 px-2">
+    <div className="relative py-0.5 px-2" style={{
+      background: player === "User" ? "rgba(34, 197, 94, 0.04)" : "rgba(239, 68, 68, 0.04)",
+      borderLeft: `2px solid ${player === "User" ? "rgba(34, 197, 94, 0.2)" : "rgba(239, 68, 68, 0.2)"}`,
+    }}>
       <span
         className="absolute left-2 text-[10px]"
-        style={{ color: "var(--color-text-dim)", top: 0 }}
+        style={{ color: player === "User" ? "rgba(34, 197, 94, 0.6)" : "rgba(239, 68, 68, 0.6)", top: 0 }}
       >
         {label}
       </span>

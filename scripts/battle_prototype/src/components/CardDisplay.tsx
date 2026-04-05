@@ -75,6 +75,7 @@ function stripIconChars(text: string): string {
   return text
     .replace(/[\uE000-\uF8FF\uFB50-\uFDFF\uFE70-\uFEFF]/g, "")
     .replace(/[\u2E80-\u9FFF\uF900-\uFAFF]/g, "")
+    .replace(/[\u{F0000}-\u{FFFFD}]/gu, "")
     .trim();
 }
 
@@ -154,8 +155,8 @@ export function CardDisplay({
       style={{
         width: compact ? 90 : 140,
         minHeight: compact ? 48 : 180,
-        background: "var(--color-surface)",
-        border: `2px solid ${outlineColor}`,
+        background: revealed.summoning_sick && battlefield ? "rgba(100, 149, 237, 0.1)" : "var(--color-surface)",
+        border: `2px solid ${revealed.summoning_sick && battlefield ? "rgba(100, 149, 237, 0.6)" : outlineColor}`,
         cursor: draggable ? "grab" : isClickable ? "pointer" : "default",
         opacity: disabled ? 0.5 : 1,
       }}
@@ -172,6 +173,9 @@ export function CardDisplay({
         <div className="flex justify-between items-center">
           <span className="font-bold truncate" style={{ maxWidth: "70%" }}>
             {revealed.name}
+            {revealed.summoning_sick && battlefield && (
+              <span style={{ color: "rgba(100, 149, 237, 0.8)", fontSize: compact ? 7 : 9, marginLeft: 2 }} title="Summoning Sick">zzz</span>
+            )}
           </span>
           {battlefield
             ? revealed.spark != null && (
@@ -182,7 +186,7 @@ export function CardDisplay({
               )}
         </div>
         <div className="flex justify-between" style={{ color: "var(--color-text-dim)", fontSize: compact ? 8 : 9 }}>
-          <span>{stripAllTags(revealed.card_type)}</span>
+          <span>{stripIconChars(stripAllTags(revealed.card_type))}</span>
           {!battlefield && revealed.spark != null && <span>&#x2351;{revealed.spark}</span>}
         </div>
         {revealed.is_fast && (

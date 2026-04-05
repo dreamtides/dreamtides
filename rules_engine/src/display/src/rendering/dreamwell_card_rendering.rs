@@ -61,6 +61,7 @@ fn dreamwell_card_view(
             outline_color: None,
             info_zoom_data: None,
             is_fast: false,
+            summoning_sick: false,
             actions: CardActions::default(),
             effects: CardEffects::default(),
         }),

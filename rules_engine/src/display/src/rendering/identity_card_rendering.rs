@@ -61,6 +61,7 @@ pub fn identity_card_view(
             },
             outline_color: None,
             is_fast: false,
+            summoning_sick: false,
             actions: CardActions::default(),
             effects: CardEffects::default(),
             info_zoom_data: None,

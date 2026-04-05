@@ -104,6 +104,10 @@ pub struct RevealedCardView {
     /// True if this card can be played during the opponent's turn
     pub is_fast: bool,
 
+    /// True if this character has summoning sickness and cannot move to the
+    /// front rank this turn.
+    pub summoning_sick: bool,
+
     /// Actions available for this card
     pub actions: CardActions,
 

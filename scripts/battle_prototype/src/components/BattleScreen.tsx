@@ -91,6 +91,18 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
           {battle.user.score >= 12
             ? `Victory! You won ${battle.user.score} - ${battle.enemy.score}`
             : `Defeat. You lost ${battle.user.score} - ${battle.enemy.score}`}
+          <button
+            onClick={onReconnect}
+            className="ml-4 px-4 py-1 rounded text-sm font-bold"
+            style={{
+              background: "rgba(255, 255, 255, 0.2)",
+              color: "white",
+              border: "1px solid rgba(255, 255, 255, 0.4)",
+              cursor: "pointer",
+            }}
+          >
+            Play Again
+          </button>
         </div>
       )}
 

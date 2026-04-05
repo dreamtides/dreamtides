@@ -208,6 +208,12 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
         Some(strings::asterisk_icon().to_string())
     };
 
+    let summoning_sick = battle
+        .cards
+        .battlefield_state(controller)
+        .get(&CharacterId(card_id))
+        .is_some_and(|state| state.played_turn == battle.turn.turn_id.0);
+
     RevealedCardView {
         image: DisplayImage::Sprite(card_image(battle, card_id)),
         name: card_name(battle, card_id),
@@ -225,6 +231,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
         },
         info_zoom_data: build_info_zoom_data(battle, card_id),
         is_fast: false,
+        summoning_sick,
         actions: CardActions {
             can_play: play_action.map(GameAction::BattleAction),
             can_select_order: can_select_order_action(&legal_actions, card_id),

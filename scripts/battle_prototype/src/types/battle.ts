@@ -143,6 +143,7 @@ export interface RevealedCardView {
   rules_text: string;
   outline_color?: DisplayColor;
   is_fast: boolean;
+  summoning_sick: boolean;
   actions: CardActions;
   effects: CardEffects;
   info_zoom_data?: unknown;
