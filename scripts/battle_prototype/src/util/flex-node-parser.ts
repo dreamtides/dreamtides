@@ -10,9 +10,21 @@ export interface ExtractedOverlay {
   buttons: ExtractedButton[];
 }
 
-/** Strip Unity rich text tags like <color=#hex>...</color> */
+/** Strip Unity rich text tags and icon font characters */
 function stripRichText(text: string): string {
-  return text.replace(/<\/?[^>]+>/gi, "").trim();
+  return text
+    .replace(/<\/?[^>]+>/gi, "")
+    // Strip icon font characters (PUA, Arabic Presentation Forms, CJK used as icons)
+    .replace(/[\uE000-\uF8FF\uFB50-\uFDFF\uFE70-\uFEFF]/g, "")
+    .trim();
+}
+
+/** Check if a label is only icon/symbol characters with no readable text */
+function isIconOnlyLabel(text: string): boolean {
+  // After stripping tags and icon ranges, check if remaining is only
+  // single CJK characters or other non-Latin symbols used as icons
+  const stripped = text.trim();
+  return stripped.length <= 2 && /^[\u2E80-\u9FFF\uF900-\uFAFF]$/.test(stripped);
 }
 
 function getTextFromNodeType(nodeType: NodeType): string | null {
@@ -46,7 +58,7 @@ function extractFromNode(
         }
       }
     }
-    if (label) {
+    if (label && !isIconOnlyLabel(label)) {
       result.buttons.push({
         label,
         action: node.event_handlers.on_click,

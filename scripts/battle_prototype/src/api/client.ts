@@ -7,15 +7,22 @@ import type {
   Metadata,
 } from "../types/battle";
 
-function getUserId(): string {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("user") ?? "00000000-0000-0000-0000-000000000001";
+function generateUserId(): string {
+  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
+    (Number(c) ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (Number(c) / 4)))).toString(16),
+  );
 }
 
-const USER_ID = getUserId();
+let currentUserId: string =
+  new URLSearchParams(window.location.search).get("user") ??
+  generateUserId();
 
 function metadata(): Metadata {
-  return { user_id: USER_ID };
+  return { user_id: currentUserId };
+}
+
+export function resetUserId(): void {
+  currentUserId = generateUserId();
 }
 
 export async function connect(

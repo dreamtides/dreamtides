@@ -1,12 +1,9 @@
-import type { GameAction, TestDeckName } from "../types/battle";
-import { useState } from "react";
+import type { GameAction } from "../types/battle";
 
 interface DebugPanelProps {
   onAction: (action: GameAction) => void;
-  onReconnect: (deck: TestDeckName) => void;
+  onReconnect: () => void;
 }
-
-const DECKS: TestDeckName[] = ["Vanilla", "StartingFive", "Benchmark1", "Core11"];
 
 interface DebugButtonConfig {
   label: string;
@@ -73,8 +70,6 @@ export function DebugPanel({
   onAction,
   onReconnect,
 }: DebugPanelProps) {
-  const [selectedDeck, setSelectedDeck] = useState<TestDeckName>("Benchmark1");
-
   return (
     <div
       className="p-4 flex flex-col gap-3"
@@ -87,26 +82,10 @@ export function DebugPanel({
         Debug Panel
       </h3>
 
-      {/* Restart with deck */}
+      {/* Restart */}
       <div className="flex gap-2 items-center">
-        <select
-          value={selectedDeck}
-          onChange={(e) => setSelectedDeck(e.target.value as TestDeckName)}
-          className="rounded px-2 py-1 text-sm"
-          style={{
-            background: "var(--color-surface-light)",
-            color: "var(--color-text)",
-            border: "1px solid var(--color-border)",
-          }}
-        >
-          {DECKS.map((d) => (
-            <option key={d} value={d}>
-              {d}
-            </option>
-          ))}
-        </select>
         <button
-          onClick={() => onReconnect(selectedDeck)}
+          onClick={() => onReconnect()}
           className="px-3 py-1 rounded text-sm"
           style={{
             background: "var(--color-primary)",
@@ -114,7 +93,7 @@ export function DebugPanel({
             cursor: "pointer",
           }}
         >
-          Restart Battle
+          Restart Battle (Core11)
         </button>
       </div>
 

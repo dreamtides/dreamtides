@@ -6,6 +6,7 @@ interface PlayerStatusProps {
   deckCount: number;
   voidCount: number;
   banishedCount: number;
+  onVoidClick?: () => void;
 }
 
 export function PlayerStatus({
@@ -14,6 +15,7 @@ export function PlayerStatus({
   deckCount,
   voidCount,
   banishedCount,
+  onVoidClick,
 }: PlayerStatusProps) {
   return (
     <div
@@ -45,9 +47,21 @@ export function PlayerStatus({
         <span style={{ color: "var(--color-text-dim)" }}>
           Deck: {deckCount}
         </span>
-        <span style={{ color: "var(--color-text-dim)" }}>
+        <button
+          onClick={onVoidClick}
+          style={{
+            color: "var(--color-primary-light)",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            textDecoration: "underline",
+            padding: 0,
+            font: "inherit",
+            fontSize: "inherit",
+          }}
+        >
           Void: {voidCount}
-        </span>
+        </button>
         {banishedCount > 0 && (
           <span style={{ color: "var(--color-text-dim)" }}>
             Banished: {banishedCount}

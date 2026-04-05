@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { BattleView, CardView, DisplayPlayer, GameAction, TestDeckName } from "../types/battle";
+import type { BattleView, CardView, DisplayPlayer, GameAction } from "../types/battle";
 import { PlayerStatus } from "./PlayerStatus";
 import { BattlefieldZone } from "./BattlefieldZone";
 import { StackZone } from "./StackZone";
@@ -13,7 +13,8 @@ interface BattleScreenProps {
   battle: BattleView;
   onAction: (action: GameAction) => void;
   onDebugAction: (action: GameAction) => void;
-  onReconnect: (deck: TestDeckName) => void;
+  onReconnect: () => void;
+  events: string[];
   disabled: boolean;
 }
 
@@ -51,8 +52,9 @@ function cardOrderCards(cards: CardView[]): CardView[] {
   });
 }
 
-export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, disabled }: BattleScreenProps) {
+export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, events, disabled }: BattleScreenProps) {
   const [showDebug, setShowDebug] = useState(false);
+  const [showVoid, setShowVoid] = useState<DisplayPlayer | null>(null);
   const ui = battle.interface;
 
   const isGameOver =
@@ -100,6 +102,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, dis
         deckCount={countCards(battle.cards, "InDeck", "Enemy")}
         voidCount={countCards(battle.cards, "InVoid", "Enemy")}
         banishedCount={countCards(battle.cards, "InBanished", "Enemy")}
+        onVoidClick={() => setShowVoid("Enemy")}
       />
 
       {/* Enemy battlefield */}
@@ -130,6 +133,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, dis
         deckCount={countCards(battle.cards, "InDeck", "User")}
         voidCount={countCards(battle.cards, "InVoid", "User")}
         banishedCount={countCards(battle.cards, "InBanished", "User")}
+        onVoidClick={() => setShowVoid("User")}
       />
 
       {/* Hand */}
@@ -138,6 +142,33 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, dis
         onAction={onAction}
         disabled={disabled}
       />
+
+      {/* Opponent event log */}
+      {events.length > 0 && (
+        <div
+          className="px-4 py-2"
+          style={{
+            background: "var(--color-surface-light)",
+            borderTop: "1px solid var(--color-border)",
+          }}
+        >
+          <div
+            className="text-xs font-bold mb-1"
+            style={{ color: "var(--color-primary-light)" }}
+          >
+            Opponent Actions
+          </div>
+          {events.map((event, i) => (
+            <div
+              key={i}
+              className="text-xs"
+              style={{ color: "var(--color-text-dim)" }}
+            >
+              {"\u2022"} {event}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Action buttons */}
       <ActionBar
@@ -218,6 +249,51 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, dis
         </div>
       )}
 
+      {/* Void viewer */}
+      {showVoid && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-40"
+          style={{ background: "rgba(0, 0, 0, 0.7)" }}
+        >
+          <div
+            className="rounded-lg p-4 max-w-2xl w-full mx-4"
+            style={{
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-border)",
+              maxHeight: "80vh",
+              overflowY: "auto",
+            }}
+          >
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-bold">
+                {showVoid === "Enemy" ? "Enemy" : "Your"} Void
+              </h3>
+              <button
+                onClick={() => setShowVoid(null)}
+                className="px-3 py-1 rounded text-sm"
+                style={{
+                  background: "var(--color-surface-light)",
+                  border: "1px solid var(--color-border)",
+                  cursor: "pointer",
+                  color: "var(--color-text)",
+                }}
+              >
+                Close
+              </button>
+            </div>
+            <div className="flex gap-2 flex-wrap justify-center">
+              {cardsByPosition(battle.cards, "InVoid", showVoid).length === 0 ? (
+                <p style={{ color: "var(--color-text-dim)" }}>No cards in void</p>
+              ) : (
+                cardsByPosition(battle.cards, "InVoid", showVoid).map((card) => (
+                  <CardDisplay key={card.id} card={card} disabled />
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Card order selector (Foresee) */}
       {ui.card_order_selector && cardOrderCards(battle.cards).length > 0 && (
         <div
@@ -229,20 +305,80 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, dis
             style={{
               background: "var(--color-surface)",
               border: "1px solid var(--color-border)",
+              maxHeight: "80vh",
+              overflowY: "auto",
             }}
           >
-            <h3 className="font-bold mb-3">Reorder Cards (click to select position)</h3>
-            <div className="flex gap-2 flex-wrap justify-center">
+            <h3 className="font-bold mb-1">Foresee</h3>
+            <p className="text-xs mb-3" style={{ color: "var(--color-text-dim)" }}>
+              Choose a destination for each card.
+            </p>
+            <div className="flex flex-col gap-3">
               {cardOrderCards(battle.cards)
                 .sort((a, b) => a.position.sorting_key - b.position.sorting_key)
-                .map((card) => (
-                  <CardDisplay
-                    key={card.id}
-                    card={card}
-                    onAction={onAction}
-                    disabled={disabled}
-                  />
-                ))}
+                .map((card) => {
+                  const cardId = card.revealed?.actions.can_select_order;
+                  return (
+                    <div
+                      key={card.id}
+                      className="flex items-center gap-3 p-2 rounded"
+                      style={{ background: "var(--color-surface-light)" }}
+                    >
+                      <CardDisplay card={card} compact disabled />
+                      <div className="flex gap-2">
+                        {ui.card_order_selector!.include_deck && (
+                          <button
+                            onClick={() =>
+                              onAction({
+                                BattleAction: {
+                                  SelectOrderForDeckCard: {
+                                    card_id: cardId,
+                                    target: { Deck: 0 },
+                                  },
+                                },
+                              })
+                            }
+                            disabled={disabled || cardId == null}
+                            className="px-3 py-1 rounded text-xs font-bold"
+                            style={{
+                              background: "var(--color-primary)",
+                              color: "var(--color-text)",
+                              cursor: cardId != null ? "pointer" : "not-allowed",
+                              opacity: cardId != null ? 1 : 0.5,
+                            }}
+                          >
+                            {"\u2192"} Top of Deck
+                          </button>
+                        )}
+                        {ui.card_order_selector!.include_void && (
+                          <button
+                            onClick={() =>
+                              onAction({
+                                BattleAction: {
+                                  SelectOrderForDeckCard: {
+                                    card_id: cardId,
+                                    target: "Void",
+                                  },
+                                },
+                              })
+                            }
+                            disabled={disabled || cardId == null}
+                            className="px-3 py-1 rounded text-xs font-bold"
+                            style={{
+                              background: "var(--color-surface)",
+                              color: "var(--color-text)",
+                              border: "1px solid var(--color-border)",
+                              cursor: cardId != null ? "pointer" : "not-allowed",
+                              opacity: cardId != null ? 1 : 0.5,
+                            }}
+                          >
+                            {"\u2192"} Void
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         </div>

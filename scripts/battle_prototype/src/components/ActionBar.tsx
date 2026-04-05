@@ -1,8 +1,13 @@
 import type { ButtonView, GameAction } from "../types/battle";
 
-/** Strip Unity rich text tags like <color=#hex>...</color> from labels */
+/** Strip Unity rich text tags and icon font characters from labels */
 function stripRichText(text: string): string {
-  return text.replace(/<\/?color[^>]*>/gi, "");
+  return text
+    .replace(/<\/?color[^>]*>/gi, "")
+    .replace(/<\/?size[^>]*>/gi, "")
+    // Strip icon font characters (Arabic Presentation Forms, PUA, etc.)
+    .replace(/[\uE000-\uF8FF\uFB50-\uFDFF\uFE70-\uFEFF]/g, "")
+    .trim();
 }
 
 interface ActionBarProps {
@@ -93,7 +98,11 @@ export function ActionBar({
         />
       )}
       {undoButton && (
-        <ActionButton button={undoButton} onAction={onAction} disabled={disabled} />
+        <ActionButton
+          button={{ ...undoButton, label: stripRichText(undoButton.label) || "\u21A9 Undo" }}
+          onAction={onAction}
+          disabled={disabled}
+        />
       )}
       {devButton && (
         <ActionButton button={devButton} onAction={onAction} disabled={disabled} />

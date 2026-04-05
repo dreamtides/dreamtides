@@ -8,16 +8,61 @@ import {
 } from "react";
 import type {
   BattleView,
+  CardView,
   GameAction,
   TestDeckName,
 } from "../types/battle";
 import * as api from "../api/client";
+import { resetUserId } from "../api/client";
 import { extractBattleView } from "../util/command-parser";
+
+function getPosition(card: CardView): [string, string | null] {
+  const pos = card.position.position;
+  if (typeof pos === "string") return [pos, null];
+  const key = Object.keys(pos)[0];
+  const val = (pos as Record<string, unknown>)[key];
+  return [key, typeof val === "string" ? val : null];
+}
+
+function generateEvents(oldBattle: BattleView, newBattle: BattleView): string[] {
+  const events: string[] = [];
+  const oldMap = new Map(oldBattle.cards.map((c) => [c.id, c]));
+
+  for (const card of newBattle.cards) {
+    const old = oldMap.get(card.id);
+    if (!old) continue;
+    const [oldPos] = getPosition(old);
+    const [newPos, newPlayer] = getPosition(card);
+    if (oldPos === newPos) continue;
+    const name = card.revealed?.name ?? old.revealed?.name;
+    if (!name) continue;
+
+    if (newPos === "OnBattlefield" && newPlayer === "Enemy" && oldPos !== "OnBattlefield") {
+      events.push(`Enemy materialized ${name}`);
+    } else if (oldPos === "OnBattlefield" && newPos === "InVoid") {
+      events.push(`${name} was dissolved`);
+    } else if (oldPos === "OnBattlefield" && newPos === "InBanished") {
+      events.push(`${name} was banished`);
+    } else if (oldPos === "InHand" && newPlayer === "Enemy" && newPos === "OnStack") {
+      events.push(`Enemy played ${name}`);
+    }
+  }
+
+  if (newBattle.enemy.score !== oldBattle.enemy.score) {
+    events.push(`Enemy score: ${oldBattle.enemy.score} \u2192 ${newBattle.enemy.score}`);
+  }
+  if (newBattle.user.score !== oldBattle.user.score) {
+    events.push(`Your score: ${oldBattle.user.score} \u2192 ${newBattle.user.score}`);
+  }
+
+  return events;
+}
 
 interface BattleContextValue {
   battle: BattleView | null;
   isPolling: boolean;
   error: string | null;
+  events: string[];
   sendAction: (action: GameAction) => void;
   sendDebugAction: (action: GameAction) => void;
   reconnect: (deck?: TestDeckName) => void;
@@ -37,8 +82,10 @@ export function BattleProvider({ children }: { children: ReactNode }) {
   const [battle, setBattle] = useState<BattleView | null>(null);
   const [isPolling, setIsPolling] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [events, setEvents] = useState<string[]>([]);
   const responseVersionRef = useRef<string | undefined>(undefined);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const prevBattleRef = useRef<BattleView | null>(null);
   // Generation counter to invalidate stale in-flight polls
   const pollGenerationRef = useRef(0);
 
@@ -76,6 +123,13 @@ export function BattleProvider({ children }: { children: ReactNode }) {
           if (pollRes.commands) {
             const view = extractBattleView(pollRes.commands);
             if (view) {
+              if (prevBattleRef.current) {
+                const newEvents = generateEvents(prevBattleRef.current, view);
+                if (newEvents.length > 0) {
+                  setEvents((prev) => [...prev, ...newEvents]);
+                }
+              }
+              prevBattleRef.current = view;
               setBattle(view);
               if (view.user.can_act) {
                 stopPolling();
@@ -102,6 +156,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
   const sendAction = useCallback(
     (action: GameAction) => {
       if (isPolling) return;
+      setEvents([]);
       void (async () => {
         try {
           setError(null);
@@ -111,6 +166,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
           );
           const view = extractBattleView(res.commands);
           if (view) {
+            prevBattleRef.current = view;
             setBattle(view);
             if (view.user.can_act) return;
           }
@@ -178,11 +234,17 @@ export function BattleProvider({ children }: { children: ReactNode }) {
       void (async () => {
         try {
           setError(null);
+          setEvents([]);
           stopPolling();
+          setBattle(null);
+          resetUserId();
           const res = await api.connect(deck);
           responseVersionRef.current = res.response_version;
           const view = extractBattleView(res.commands);
-          if (view) setBattle(view);
+          if (view) {
+            prevBattleRef.current = view;
+            setBattle(view);
+          }
         } catch (e) {
           setError(e instanceof Error ? e.message : "Connect failed");
         }
@@ -193,7 +255,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
 
   return (
     <BattleContext.Provider
-      value={{ battle, isPolling, error, sendAction, sendDebugAction, reconnect }}
+      value={{ battle, isPolling, error, events, sendAction, sendDebugAction, reconnect }}
     >
       {children}
     </BattleContext.Provider>
