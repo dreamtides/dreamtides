@@ -50,13 +50,23 @@ fn debug_all_cards(battle: &BattleState) -> DebugAllCards {
             battle,
             Zone::Battlefield,
             PlayerName::One,
-            battle.cards.battlefield(PlayerName::One).iter().map(CardIdType::card_id),
+            battle
+                .cards
+                .battlefield(PlayerName::One)
+                .all_characters()
+                .into_iter()
+                .map(CardIdType::card_id),
         ),
         p2_battlefield: debug_zone(
             battle,
             Zone::Battlefield,
             PlayerName::Two,
-            battle.cards.battlefield(PlayerName::Two).iter().map(CardIdType::card_id),
+            battle
+                .cards
+                .battlefield(PlayerName::Two)
+                .all_characters()
+                .into_iter()
+                .map(CardIdType::card_id),
         ),
         p1_void: debug_zone(
             battle,

@@ -35,15 +35,16 @@ pub fn matching_characters(
                 .and_then(|id| battle.cards.to_character_id(source.controller().opponent(), id)),
         ),
         Predicate::Your(card_predicate) => {
-            let battlefield = battle.cards.battlefield(source.controller()).clone();
+            let battlefield = battle.cards.battlefield(source.controller()).as_card_set();
             on_battlefield(battle, source, battlefield, card_predicate)
         }
         Predicate::Enemy(card_predicate) => {
-            let battlefield = battle.cards.battlefield(source.controller().opponent()).clone();
+            let battlefield =
+                battle.cards.battlefield(source.controller().opponent()).as_card_set();
             on_battlefield(battle, source, battlefield, card_predicate)
         }
         Predicate::Another(card_predicate) => {
-            let mut battlefield = battle.cards.battlefield(source.controller()).clone();
+            let mut battlefield = battle.cards.battlefield(source.controller()).as_card_set();
             if let Some(id) = source.card_id() {
                 battlefield.remove(CharacterId(id));
             }

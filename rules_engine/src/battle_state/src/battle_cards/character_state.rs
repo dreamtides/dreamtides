@@ -4,4 +4,5 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct CharacterState {
     pub spark: Spark,
+    pub played_turn: u32,
 }

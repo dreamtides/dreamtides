@@ -268,7 +268,10 @@ fn on_enter_battlefield(
     let Some(spark) = card_properties::base_spark(battle, id) else {
         panic_no_base_spark(battle, id);
     };
-    battle.cards.battlefield_state_mut(controller).insert(id, CharacterState { spark });
+    battle
+        .cards
+        .battlefield_state_mut(controller)
+        .insert(id, CharacterState { spark, played_turn: battle.turn.turn_id.0 });
 
     battle.triggers.push(source, Trigger::Materialized(id));
 }

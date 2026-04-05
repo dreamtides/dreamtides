@@ -81,7 +81,8 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         battle
             .cards
             .battlefield(builder.act_for_player())
-            .iter()
+            .all_characters()
+            .into_iter()
             .filter(|card_id| {
                 can_activate_abilities::activated_ability_energy_cost(
                     battle,

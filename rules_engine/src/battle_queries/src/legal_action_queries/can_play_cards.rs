@@ -230,7 +230,12 @@ fn meets_restriction(
         }
         CanPlayRestriction::DissolveEnemyCharacter => {
             let prevent = effect_queries::prevent_dissolved_set(battle);
-            battle.cards.battlefield(controller.opponent()).iter().any(|c| !prevent.contains(c))
+            battle
+                .cards
+                .battlefield(controller.opponent())
+                .all_characters()
+                .iter()
+                .any(|c| !prevent.contains(*c))
         }
         CanPlayRestriction::EnemyCardOnStack => {
             !battle.cards.stack_set(controller.opponent()).is_empty()

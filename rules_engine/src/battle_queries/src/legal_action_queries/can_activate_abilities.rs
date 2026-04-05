@@ -22,7 +22,7 @@ pub fn for_player(
 ) -> CardSet<CharacterId> {
     let mut candidates =
         legal_actions_cache::activate_ability_candidates(battle, player, fast_only);
-    candidates.intersect_with(battle.cards.battlefield(player));
+    candidates.intersect_with(&battle.cards.battlefield(player).as_card_set());
 
     let mut characters_with_abilities = CardSet::new();
 

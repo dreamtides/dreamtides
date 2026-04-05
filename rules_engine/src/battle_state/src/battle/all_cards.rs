@@ -14,6 +14,7 @@ use crate::battle::card_id::{
 };
 use crate::battle_cards::ability_list::CanPlayRestriction;
 use crate::battle_cards::battle_card_state::{BattleCardState, ObjectId};
+use crate::battle_cards::battlefield::Battlefield;
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_cards::character_state::CharacterState;
 use crate::battle_cards::stack_card_state::{
@@ -41,7 +42,7 @@ pub struct CreatedCard {
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct AllCards {
     cards: Vec<BattleCardState>,
-    battlefield: PlayerMap<CardSet<CharacterId>>,
+    battlefield: PlayerMap<Battlefield>,
     battlefield_state: PlayerMap<CharacterMap>,
     void: PlayerMap<CardSet<VoidCardId>>,
     hands: PlayerMap<CardSet<HandCardId>>,
@@ -122,14 +123,23 @@ impl AllCards {
             .chain(self.tops_of_decks.player(player).iter().copied())
     }
 
-    /// Returns the set of characters on the battlefield for a given player
-    pub fn battlefield(&self, player: PlayerName) -> &CardSet<CharacterId> {
+    /// Returns the battlefield for a given player.
+    pub fn battlefield(&self, player: PlayerName) -> &Battlefield {
         self.battlefield.player(player)
+    }
+
+    /// Mutable equivalent to [Self::battlefield].
+    pub fn battlefield_mut(&mut self, player: PlayerName) -> &mut Battlefield {
+        self.battlefield.player_mut(player)
     }
 
     /// Returns an iterator over all characters on the battlefield.
     pub fn all_battlefield_characters(&self) -> impl Iterator<Item = CharacterId> + '_ {
-        self.battlefield.one.iter().chain(self.battlefield.two.iter())
+        self.battlefield
+            .one
+            .all_characters()
+            .into_iter()
+            .chain(self.battlefield.two.all_characters())
     }
 
     /// Returns the state of characters on the battlefield for a given player
@@ -388,7 +398,7 @@ impl AllCards {
                 self.banished.player_mut(controller).insert(BanishedCardId(card_id));
             }
             Zone::Battlefield => {
-                self.battlefield.player_mut(controller).insert(CharacterId(card_id));
+                self.battlefield.player_mut(controller).add_to_back_rank(CharacterId(card_id));
                 self.battlefield_state
                     .player_mut(controller)
                     .insert(CharacterId(card_id), CharacterState::default());
