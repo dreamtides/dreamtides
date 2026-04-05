@@ -6,6 +6,7 @@ use ai_uct::uct_config::UctConfig;
 use ai_uct::uct_search;
 use battle_mutations::player_mutations::player_state;
 use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
 use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
@@ -42,6 +43,15 @@ pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI)
     if legal_actions.len() == 1 {
         debug!("Automatically selecting action {:?}", legal_actions.all()[0]);
         return legal_actions.all()[0];
+    }
+
+    // Always reposition eligible back-rank characters to the front rank
+    // before ending the turn. MCTS rollouts undervalue repositioning because
+    // the random default policy rarely moves characters forward, so we handle
+    // it deterministically.
+    if let Some(reposition) = forced_reposition_to_front(&legal_actions) {
+        debug!("Automatically repositioning character to front rank: {:?}", reposition);
+        return reposition;
     }
 
     let start_time = Instant::now();
@@ -106,4 +116,18 @@ fn first_available_action(battle: &BattleState, player: PlayerName) -> BattleAct
 fn random_action(battle: &BattleState, player: PlayerName) -> BattleAction {
     let actions = legal_actions::compute(battle, player).all();
     *actions.choose(&mut rand::rng()).unwrap()
+}
+
+/// Returns a reposition-to-front action if available during the main phase.
+///
+/// The AI should always move eligible back-rank characters to the front rank
+/// before ending the turn, since characters in the back rank cannot
+/// participate in judgment.
+fn forced_reposition_to_front(legal_actions: &LegalActions) -> Option<BattleAction> {
+    if let LegalActions::Standard { actions } = legal_actions {
+        if let Some(&(character_id, position)) = actions.reposition_to_front.first() {
+            return Some(BattleAction::MoveCharacterToFrontRank(character_id, position));
+        }
+    }
+    None
 }

@@ -201,17 +201,21 @@ fn reposition_actions(
 
 /// Returns a simplified set of reposition actions for the AI player to
 /// avoid infinite MCTS branching.
+///
+/// Reposition-to-front actions are not included here because the AI
+/// agent layer handles them deterministically (always moving eligible
+/// back-rank characters to the front before ending the turn). This
+/// avoids wasting MCTS search iterations on a decision that is always
+/// forced.
 fn ai_reposition_actions(
     battle: &BattleState,
     player: PlayerName,
 ) -> (RepositionActions, RepositionActions) {
     let bf = battle.cards.battlefield(player);
-    let opponent_bf = battle.cards.battlefield(player.opponent());
-    let current_turn = battle.turn.turn_id.0;
     let mut to_front = Vec::new();
     let mut to_back = Vec::new();
 
-    let has_empty_front = bf.first_empty_front_slot().is_some();
+    let current_turn = battle.turn.turn_id.0;
 
     for character_id in bf.back.iter().flatten() {
         let has_summoning_sickness = battle
@@ -219,20 +223,11 @@ fn ai_reposition_actions(
             .battlefield_state(player)
             .get(character_id)
             .is_some_and(|state| state.played_turn == current_turn);
-        if has_summoning_sickness {
-            continue;
-        }
-
-        // MoveToEmptyFrontSlot: one action per eligible back-rank character
-        if has_empty_front {
-            let target = bf.first_empty_front_slot().unwrap() as u8;
-            to_front.push((*character_id, target));
-        }
-
-        // MoveToAttack: one action per enemy front-rank character
-        for (pos, enemy_id) in opponent_bf.front.iter().enumerate() {
-            if enemy_id.is_some() {
-                to_front.push((*character_id, pos as u8));
+        if !has_summoning_sickness {
+            // Include a single move-to-front action per eligible character
+            // so the action is available for forced repositioning.
+            if let Some(target) = bf.first_empty_front_slot() {
+                to_front.push((*character_id, target as u8));
             }
         }
     }
