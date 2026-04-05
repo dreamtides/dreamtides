@@ -413,7 +413,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
       )}
 
       {/* Your Turn popup */}
-      {yourTurnVisible && (
+      {yourTurnVisible && !ui.card_order_selector && !ui.screen_overlay && browserCards(battle.cards).length === 0 && !showVoid && (
         <div
           className="fixed left-4 top-1/2 -translate-y-1/2 pointer-events-none"
           style={{ zIndex: 45 }}
