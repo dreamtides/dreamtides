@@ -134,12 +134,12 @@ variables = "t: Warrior"
 russian = "Искра этого персонажа равна количеству союзных <color=#2E7D32><b>Воинов</b></color>."
 
 [[tests]]
-english = "The '{Judgment}' ability of allies triggers when you {materialize} them."
-russian = "Способность союзников «▸ <b>Суд:</b>» срабатывает, когда вы воплощаете их."
+english = "The '{Dawn}' ability of allies triggers when you {materialize} them."
+russian = "Способность союзников «▸ <b>Рассвет:</b>» срабатывает, когда вы воплощаете их."
 
 [[tests]]
-english = "{Judgment} You may {banish} an ally, then {materialize} it."
-russian = "▸ <b>Суд:</b> Вы можете изгнать союзника, затем воплотить его."
+english = "{Dawn} You may {banish} an ally, then {materialize} it."
+russian = "▸ <b>Рассвет:</b> Вы можете изгнать союзника, затем воплотить его."
 
 [[tests]]
 english = "Once per turn, when you {materialize} a character, gain {energy($e)}."
@@ -151,10 +151,10 @@ english = "Has all character types."
 russian = "У этого персонажа есть все типы персонажей."
 
 [[tests]]
-english = "{Judgment} With {count_allies($a)} that share a character type, draw {cards($c)}."
+english = "{Dawn} With {count_allies($a)} that share a character type, draw {cards($c)}."
 variables = """a: 3
 c: 1"""
-russian = "▸ <b>Суд:</b> Если у вас есть 3 союзника с общим типом персонажа, возьмите карту."
+russian = "▸ <b>Рассвет:</b> Если у вас есть 3 союзника с общим типом персонажа, возьмите карту."
 
 [[tests]]
 english = """{choose_one}
@@ -195,10 +195,10 @@ variables = "c: 1"
 russian = "До конца хода, когда вы играете персонажа, возьмите карту."
 
 [[tests]]
-english = "{Judgment} Draw {cards($c)}, then discard {cards($d)}."
+english = "{Dawn} Draw {cards($c)}, then discard {cards($d)}."
 variables = """c: 1
 d: 1"""
-russian = "▸ <b>Суд:</b> Возьмите карту, затем сбросьте карту."
+russian = "▸ <b>Рассвет:</b> Возьмите карту, затем сбросьте карту."
 
 [[tests]]
 english = "The opponent's events cost {energy($e)} more."
@@ -212,8 +212,8 @@ s: 1"""
 russian = "Когда вы воплощаете союзного <color=#2E7D32><b>Воина</b></color>, этот персонаж получает +1 к искре."
 
 [[tests]]
-english = "When you {materialize} a character, trigger the {Judgment} ability of each ally."
-russian = "Когда вы воплощаете персонажа, срабатывает способность «▸ <b>Суд:</b>» каждого союзника."
+english = "When you {materialize} a character, trigger the {Dawn} ability of each ally."
+russian = "Когда вы воплощаете персонажа, срабатывает способность «▸ <b>Рассвет:</b>» каждого союзника."
 
 [[tests]]
 english = "{Materialized} Gain control of an enemy with cost {energy($e)} or less."
@@ -231,9 +231,9 @@ c: 1"""
 russian = "Получите <color=#00838F>2●</color>. Возьмите карту."
 
 [[tests]]
-english = "{Materialized_Judgment} Gain {energy($e)}."
+english = "{Materialized_Dawn} Gain {energy($e)}."
 variables = "e: 2"
-russian = "▸ <b>Воплощён, Суд:</b> Получите <color=#00838F>2●</color>."
+russian = "▸ <b>Воплощён, Рассвет:</b> Получите <color=#00838F>2●</color>."
 
 [[tests]]
 english = "When you {materialize} an allied {subtype($t)}, gain {energy($e)}."
@@ -247,10 +247,10 @@ variables = "c: 1"
 russian = "Отрекитесь от любого количества союзников: Возьмите карту за каждого союзника, от которого вы отреклись."
 
 [[tests]]
-english = "{Judgment} You may pay {energy($e)} to {banish} {up_to_n_allies($n)}, then {materialize} {pronoun:$n}."
+english = "{Dawn} You may pay {energy($e)} to {banish} {up_to_n_allies($n)}, then {materialize} {pronoun:$n}."
 variables = """e: 3
 n: 2"""
-russian = "▸ <b>Суд:</b> Вы можете заплатить <color=#00838F>3●</color>, чтобы изгнать до 2 союзников, затем воплотить их."
+russian = "▸ <b>Рассвет:</b> Вы можете заплатить <color=#00838F>3●</color>, чтобы изгнать до 2 союзников, затем воплотить их."
 
 [[tests]]
 english = "{Discover} an event."
@@ -276,15 +276,15 @@ english = "Pay 1 or more {energy_symbol}: Draw {cards($c)} for each {energy_symb
 variables = "c: 1"
 russian = "Заплатите не менее 1<color=#00838F>●</color>: Возьмите карту за каждый потраченный <color=#00838F>●</color>."
 [[tests]]
-english = "{Materialized_Judgment} Gain {energy($e)}."
+english = "{Materialized_Dawn} Gain {energy($e)}."
 variables = "e: 1"
-russian = "▸ <b>Воплощён, Суд:</b> Получите <color=#00838F>1●</color>."
+russian = "▸ <b>Воплощён, Рассвет:</b> Получите <color=#00838F>1●</color>."
 
 [[tests]]
-english = "{Judgment} You may discard {cards($d)} to {dissolve} an enemy with spark {$s} or less."
+english = "{Dawn} You may discard {cards($d)} to {dissolve} an enemy with spark {$s} or less."
 variables = """d: 1
 s: 1"""
-russian = "▸ <b>Суд:</b> Вы можете сбросить карту, чтобы рассеять врага с искрой 1 или меньше."
+russian = "▸ <b>Рассвет:</b> Вы можете сбросить карту, чтобы рассеять врага с искрой 1 или меньше."
 
 [[tests]]
 english = "When an ally is {dissolved}, this card gains {reclaim_for_cost($r)} this turn."
@@ -292,9 +292,9 @@ variables = "r: 1"
 russian = "Когда союзник рассеивается, эта карта получает <color=#964B00>Возвышение</color> <color=#00838F>1●</color> до конца хода."
 
 [[tests]]
-english = "{Materialized_Judgment} {Kindle($k)}."
+english = "{Materialized_Dawn} {Kindle($k)}."
 variables = "k: 1"
-russian = "▸ <b>Воплощён, Суд:</b> Разожгите 1."
+russian = "▸ <b>Воплощён, Рассвет:</b> Разожгите 1."
 
 [[tests]]
 english = "Events cost you {energy($e)} more."
@@ -329,10 +329,10 @@ english = "{Prevent} a played card."
 russian = "Отмените розыгрыш карты."
 
 [[tests]]
-english = "{Judgment} You may {banish} {cards($c)} from your void to {dissolve} an enemy with cost {energy($e)} or less."
+english = "{Dawn} You may {banish} {cards($c)} from your void to {dissolve} an enemy with cost {energy($e)} or less."
 variables = """c: 3
 e: 2"""
-russian = "▸ <b>Суд:</b> Вы можете изгнать 3 карты из вашей Пустоты, чтобы рассеять врага стоимостью <color=#00838F>2●</color> или меньше."
+russian = "▸ <b>Рассвет:</b> Вы можете изгнать 3 карты из вашей Пустоты, чтобы рассеять врага стоимостью <color=#00838F>2●</color> или меньше."
 
 [[tests]]
 english = "{energy($e)}, Discard {cards($d)}: {Kindle($k)}."
@@ -342,9 +342,9 @@ k: 2"""
 russian = "<color=#00838F>1●</color>, сбросьте карту: Разожгите 2."
 
 [[tests]]
-english = "{Judgment} Gain {energy($e)}."
+english = "{Dawn} Gain {energy($e)}."
 variables = "e: 2"
-russian = "▸ <b>Суд:</b> Получите <color=#00838F>2●</color>."
+russian = "▸ <b>Рассвет:</b> Получите <color=#00838F>2●</color>."
 
 [[tests]]
 english = "When you play a character, {materialize} {@a figment($g)}."
@@ -373,15 +373,15 @@ english = "{Materialized} You may return an ally to hand."
 russian = "▸ <b>Воплощён:</b> Вы можете вернуть союзника в руку."
 
 [[tests]]
-english = "{Judgment} Gain {energy($e)}."
+english = "{Dawn} Gain {energy($e)}."
 variables = "e: 1"
-russian = "▸ <b>Суд:</b> Получите <color=#00838F>1●</color>."
+russian = "▸ <b>Рассвет:</b> Получите <color=#00838F>1●</color>."
 
 [[tests]]
-english = "{Judgment} You may draw {cards($c)}, then discard {cards($d)}."
+english = "{Dawn} You may draw {cards($c)}, then discard {cards($d)}."
 variables = """c: 2
 d: 3"""
-russian = "▸ <b>Суд:</b> Вы можете взять 2 карты, затем сбросить 3 карты."
+russian = "▸ <b>Рассвет:</b> Вы можете взять 2 карты, затем сбросить 3 карты."
 
 [[tests]]
 english = "Abandon an ally: {Kindle($k)}."
@@ -414,9 +414,9 @@ variables = "e: 6"
 russian = "Получите <color=#00838F>6●</color>."
 
 [[tests]]
-english = "{Materialized_Judgment} {Banish} an ally with spark {$s} or less, then {materialize} it."
+english = "{Materialized_Dawn} {Banish} an ally with spark {$s} or less, then {materialize} it."
 variables = "s: 2"
-russian = "▸ <b>Воплощён, Суд:</b> Изгоните союзника с искрой 2 или меньше, затем воплотите его."
+russian = "▸ <b>Воплощён, Рассвет:</b> Изгоните союзника с искрой 2 или меньше, затем воплотите его."
 
 [[tests]]
 english = "This character costs {energy($e)} if you have discarded a card this turn."
@@ -450,10 +450,10 @@ variables = "n: 2"
 russian = "Удвойте количество <color=#00838F>●</color>, которое у вас есть."
 
 [[tests]]
-english = "{Judgment} Gain {energy($e)} for each allied {subtype($t)}."
+english = "{Dawn} Gain {energy($e)} for each allied {subtype($t)}."
 variables = """e: 1
 t: SpiritAnimal"""
-russian = "▸ <b>Суд:</b> Получите <color=#00838F>1●</color> за каждого союзного <color=#2E7D32><b>Духа-Зверя</b></color>."
+russian = "▸ <b>Рассвет:</b> Получите <color=#00838F>1●</color> за каждого союзного <color=#2E7D32><b>Духа-Зверя</b></color>."
 
 [[tests]]
 english = "Gain {energy($e)}."
@@ -492,15 +492,15 @@ english = "{Fast} -- Abandon this character: {Prevent} a played event."
 russian = "↯Стремительность — Отрекитесь от этого персонажа: Отмените розыгрыш события."
 
 [[tests]]
-english = "{Materialized_Judgment} With {count_allied_subtype($a, $t)}, draw {cards($c)}."
+english = "{Materialized_Dawn} With {count_allied_subtype($a, $t)}, draw {cards($c)}."
 variables = """a: 2
 t: Survivor
 c: 1"""
-russian = "▸ <b>Воплощён, Суд:</b> Если у вас есть 2 союзных <color=#2E7D32><b>Выживших</b></color>, возьмите карту."
+russian = "▸ <b>Воплощён, Рассвет:</b> Если у вас есть 2 союзных <color=#2E7D32><b>Выживших</b></color>, возьмите карту."
 [[tests]]
-english = "{Judgment} Gain {points($p)}."
+english = "{Dawn} Gain {points($p)}."
 variables = "p: 1"
-russian = "▸ <b>Суд:</b> Получите <color=#F57F17>1⍏</color>."
+russian = "▸ <b>Рассвет:</b> Получите <color=#F57F17>1⍏</color>."
 
 [[tests]]
 english = "Gain {points($p)} for each card you have played this turn."
@@ -571,9 +571,9 @@ variables = "c: 3"
 russian = "Возьмите 3 карты."
 
 [[tests]]
-english = "{Judgment} Gain {points($p)}."
+english = "{Dawn} Gain {points($p)}."
 variables = "p: 2"
-russian = "▸ <b>Суд:</b> Получите <color=#F57F17>2⍏</color>."
+russian = "▸ <b>Рассвет:</b> Получите <color=#F57F17>2⍏</color>."
 
 [[tests]]
 english = "{Materialize} {n_random_characters($n)} with cost {energy($e)} or less from your deck."
@@ -597,11 +597,11 @@ english = "When you have no cards in your deck, you win the game."
 russian = "Если в вашей колоде нет карт, вы выигрываете игру."
 
 [[tests]]
-english = "{Judgment} With {count_allied_subtype($a, $t)}, gain {energy($e)}."
+english = "{Dawn} With {count_allied_subtype($a, $t)}, gain {energy($e)}."
 variables = """t: SpiritAnimal
 a: 2
 e: 2"""
-russian = "▸ <b>Суд:</b> Если у вас есть 2 союзных <color=#2E7D32><b>Духа-Зверя</b></color>, получите <color=#00838F>2●</color>."
+russian = "▸ <b>Рассвет:</b> Если у вас есть 2 союзных <color=#2E7D32><b>Духа-Зверя</b></color>, получите <color=#00838F>2●</color>."
 
 [[tests]]
 english = "Discard a chosen character from the opponent's hand."
@@ -681,8 +681,8 @@ variables = "e: 2"
 russian = "Ваши персонажи стоят на <color=#00838F>2●</color> меньше."
 
 [[tests]]
-english = "{Judgment} Each player abandons a character."
-russian = "▸ <b>Суд:</b> Каждый игрок отрекается от персонажа."
+english = "{Dawn} Each player abandons a character."
+russian = "▸ <b>Рассвет:</b> Каждый игрок отрекается от персонажа."
 
 [[tests]]
 english = "Draw {cards($c)}."
@@ -746,11 +746,11 @@ english = "All cards currently in your void gain {reclaim} equal to their cost t
 russian = "Все карты в вашей Пустоте получают Возвышение, равное их стоимости, до конца хода."
 
 [[tests]]
-english = "{Judgment} You may discard {cards($d)} to draw {cards($c)} and gain {points($p)}."
+english = "{Dawn} You may discard {cards($d)} to draw {cards($c)} and gain {points($p)}."
 variables = """d: 1
 c: 1
 p: 1"""
-russian = "▸ <b>Суд:</b> Вы можете сбросить карту, чтобы взять карту и получить <color=#F57F17>1⍏</color>."
+russian = "▸ <b>Рассвет:</b> Вы можете сбросить карту, чтобы взять карту и получить <color=#F57F17>1⍏</color>."
 
 [[tests]]
 english = "{Banish} {up_to_n_allies($n)}, then {materialize} {pronoun:$n}."
@@ -842,10 +842,10 @@ english = "{Discover} a character with an activated ability."
 russian = "Откройте персонажа с активируемой способностью."
 
 [[tests]]
-english = "{Judgment} You may {banish} {cards($c)} from the opponent's void to gain {energy($e)}."
+english = "{Dawn} You may {banish} {cards($c)} from the opponent's void to gain {energy($e)}."
 variables = """c: 1
 e: 1"""
-russian = "▸ <b>Суд:</b> Вы можете изгнать карту из Пустоты противника, чтобы получить <color=#00838F>1●</color>."
+russian = "▸ <b>Рассвет:</b> Вы можете изгнать карту из Пустоты противника, чтобы получить <color=#00838F>1●</color>."
 
 [[tests]]
 english = "Once per turn, when you play a {fast} card, draw {cards($c)}."
@@ -858,8 +858,8 @@ variables = "s: 3"
 russian = "Рассеяйте врага с искрой 3 или больше."
 
 [[tests]]
-english = "{Judgment} Return this character from your void to your hand."
-russian = "▸ <b>Суд:</b> Верните этого персонажа из вашей Пустоты в руку."
+english = "{Dawn} Return this character from your void to your hand."
+russian = "▸ <b>Рассвет:</b> Верните этого персонажа из вашей Пустоты в руку."
 
 [[tests]]
 english = "{Materialized_Dissolved} Put the {top_n_cards($v)} of your deck into your void."
@@ -971,11 +971,11 @@ variables = "t: SpiritAnimal"
 russian = "Каждый союзный <color=#2E7D32><b>Дух-Зверь</b></color> получает искру, равную количеству союзных <color=#2E7D32><b>Духов-Зверей</b></color>."
 
 [[tests]]
-english = "{Judgment} You may pay {energy($e)} to {kindle($k)} and {banish} {cards($c)} from the opponent's void."
+english = "{Dawn} You may pay {energy($e)} to {kindle($k)} and {banish} {cards($c)} from the opponent's void."
 variables = """e: 1
 k: 1
 c: 1"""
-russian = "▸ <b>Суд:</b> Вы можете заплатить <color=#00838F>1●</color>, чтобы Разжечь 1 и изгнать карту из Пустоты противника."
+russian = "▸ <b>Рассвет:</b> Вы можете заплатить <color=#00838F>1●</color>, чтобы Разжечь 1 и изгнать карту из Пустоты противника."
 
 [[tests]]
 english = "Abandon an ally: Gain {energy_symbol} equal to that character's cost."
@@ -987,16 +987,16 @@ variables = "s: 1"
 russian = "Когда событие попадает в вашу Пустоту, этот персонаж получает +1 к искре."
 
 [[tests]]
-english = "{Judgment} Gain {energy($e)} for each allied character."
+english = "{Dawn} Gain {energy($e)} for each allied character."
 variables = "e: 1"
-russian = "▸ <b>Суд:</b> Получите <color=#00838F>1●</color> за каждого союзного персонажа."
+russian = "▸ <b>Рассвет:</b> Получите <color=#00838F>1●</color> за каждого союзного персонажа."
 
 [[tests]]
-english = "{Judgment} You may pay {energy($e)} to have each allied {subtype($t)} gain +{$s} spark."
+english = "{Dawn} You may pay {energy($e)} to have each allied {subtype($t)} gain +{$s} spark."
 variables = """e: 4
 t: SpiritAnimal
 s: 2"""
-russian = "▸ <b>Суд:</b> Вы можете заплатить <color=#00838F>4●</color>, чтобы каждый союзный <color=#2E7D32><b>Дух-Зверь</b></color> получил +2 к искре."
+russian = "▸ <b>Рассвет:</b> Вы можете заплатить <color=#00838F>4●</color>, чтобы каждый союзный <color=#2E7D32><b>Дух-Зверь</b></color> получил +2 к искре."
 
 [[tests]]
 english = "When you play an event, gain {energy($e)}."
@@ -1039,13 +1039,13 @@ s:1"""
 russian = "Когда вы воплощаете союзного <color=#2E7D32><b>Духа-Зверя</b></color>, этот персонаж получает +1 к искре."
 
 [[tests]]
-english = "At the end of this turn, trigger an additional {judgment_phase_name} phase."
-russian = "В конце этого хода проведите дополнительную фазу <b>Суда</b>."
+english = "At the end of this turn, trigger an additional {dawn_phase_name} phase."
+russian = "В конце этого хода проведите дополнительную фазу <b>Рассвета</b>."
 
 [[tests]]
-english = "{Judgment} {Foresee($f)}."
+english = "{Dawn} {Foresee($f)}."
 variables = "f: 1"
-russian = "▸ <b>Суд:</b> Прозрение 1."
+russian = "▸ <b>Рассвет:</b> Прозрение 1."
 
 [[tests]]
 english = "When you {materialize} a character, this character gains +{$s} spark."
@@ -1053,10 +1053,10 @@ variables = "s: 1"
 russian = "Когда вы воплощаете персонажа, этот персонаж получает +1 к искре."
 
 [[tests]]
-english = "{Judgment} Draw {cards($c)}, then the opponent gains {points($p)}."
+english = "{Dawn} Draw {cards($c)}, then the opponent gains {points($p)}."
 variables = """c: 1
 p: 2"""
-russian = "▸ <b>Суд:</b> Возьмите карту, затем противник получает 2⍏."
+russian = "▸ <b>Рассвет:</b> Возьмите карту, затем противник получает 2⍏."
 
 [[tests]]
 english = "{Banish} your void with {count($n)} or more cards: {Reclaim} this character."
@@ -1064,10 +1064,10 @@ variables = "n: 8"
 russian = "Изгоните все карты из вашей Пустоты, если в ней 8 или больше карт: Возвысьте этого персонажа."
 
 [[tests]]
-english = "{Judgment} You may abandon {@a subtype($t)} to {discover} {@a subtype($t)} with cost {energy($e)} higher and {materialize} it."
+english = "{Dawn} You may abandon {@a subtype($t)} to {discover} {@a subtype($t)} with cost {energy($e)} higher and {materialize} it."
 variables = """t: Warrior
 e: 1"""
-russian = "▸ <b>Суд:</b> Вы можете отречься от <color=#2E7D32><b>Воина</b></color>, чтобы открыть <color=#2E7D32><b>Воина</b></color> стоимостью на <color=#00838F>1●</color> выше и воплотить его."
+russian = "▸ <b>Рассвет:</b> Вы можете отречься от <color=#2E7D32><b>Воина</b></color>, чтобы открыть <color=#2E7D32><b>Воина</b></color> стоимостью на <color=#00838F>1●</color> выше и воплотить его."
 
 [[tests]]
 english = "Abandon an ally, once per turn: Gain {points($p)}."
@@ -1095,10 +1095,10 @@ c: 1"""
 russian = "Чтобы сыграть эту карту, верните в руку союзника стоимостью <color=#00838F>3●</color> или больше."
 
 [[tests]]
-english = "{Judgment} Draw {cards($c)}."
+english = "{Dawn} Draw {cards($c)}."
 variables = """e: 3
 c: 1"""
-russian = "▸ <b>Суд:</b> Возьмите карту."
+russian = "▸ <b>Рассвет:</b> Возьмите карту."
 
 [[tests]]
 english = "{Materialized} {Prevent} a played card with cost {energy($e)} or less."
@@ -1214,11 +1214,11 @@ variables = "r: 0"
 russian = "Событие в вашей Пустоте получает <color=#964B00>Возвышение</color> <color=#00838F>0●</color> до конца хода."
 
 [[tests]]
-english = "{Materialized_Judgment} With {count_allied_subtype($a, $t)}, gain {energy($e)}."
+english = "{Materialized_Dawn} With {count_allied_subtype($a, $t)}, gain {energy($e)}."
 variables = """t: Warrior
 a: 2
 e: 1"""
-russian = "▸ <b>Воплощён, Суд:</b> Если у вас есть 2 союзных <color=#2E7D32><b>Воина</b></color>, получите <color=#00838F>1●</color>."
+russian = "▸ <b>Воплощён, Рассвет:</b> Если у вас есть 2 союзных <color=#2E7D32><b>Воина</b></color>, получите <color=#00838F>1●</color>."
 
 [[tests]]
 english = "{Materialized} Discard a chosen card from the opponent's hand. They draw {cards($c)}."
@@ -1226,9 +1226,9 @@ variables = "c: 1"
 russian = "▸ <b>Воплощён:</b> Сбросьте выбранную карту из руки противника. Затем противник берёт карту."
 
 [[tests]]
-english = "{Judgment} You may pay {energy($e)} to return this character from your void to your hand."
+english = "{Dawn} You may pay {energy($e)} to return this character from your void to your hand."
 variables = "e: 1"
-russian = "▸ <b>Суд:</b> Вы можете заплатить <color=#00838F>1●</color>, чтобы вернуть этого персонажа из вашей Пустоты в руку."
+russian = "▸ <b>Рассвет:</b> Вы можете заплатить <color=#00838F>1●</color>, чтобы вернуть этого персонажа из вашей Пустоты в руку."
 
 [[tests]]
 english = "{Banish} {up_to_n_allies($n)}, then {materialize} {pronoun:$n}."
@@ -1244,41 +1244,41 @@ english = "{Materialized} You may {banish} an ally, then {materialize} it."
 russian = "▸ <b>Воплощён:</b> Вы можете изгнать союзника, затем воплотить его."
 
 [[tests]]
-english = "{Judgment} You may {banish} an ally, then {materialize} it."
-russian = "▸ <b>Суд:</b> Вы можете изгнать союзника, затем воплотить его."
+english = "{Dawn} You may {banish} an ally, then {materialize} it."
+russian = "▸ <b>Рассвет:</b> Вы можете изгнать союзника, затем воплотить его."
 
 [[tests]]
 english = "{Materialized} {Banish} any number of allies, then {materialize} them."
 russian = "▸ <b>Воплощён:</b> Изгоните любое количество союзников, затем воплотите их."
 
 [[tests]]
-english = "{Judgment} You may discard {cards($d)} to draw {cards($c)} and gain {points($p)}."
+english = "{Dawn} You may discard {cards($d)} to draw {cards($c)} and gain {points($p)}."
 variables = """d: 1
 c: 1
 p: 1"""
-russian = "▸ <b>Суд:</b> Вы можете сбросить карту, чтобы взять карту и получить <color=#F57F17>1⍏</color>."
+russian = "▸ <b>Рассвет:</b> Вы можете сбросить карту, чтобы взять карту и получить <color=#F57F17>1⍏</color>."
 
 [[tests]]
-english = "{Judgment} You may draw {cards($c)}, then discard {cards($d)}."
+english = "{Dawn} You may draw {cards($c)}, then discard {cards($d)}."
 variables = """c: 2
 d: 3"""
-russian = "▸ <b>Суд:</b> Вы можете взять 2 карты, затем сбросить 3 карты."
+russian = "▸ <b>Рассвет:</b> Вы можете взять 2 карты, затем сбросить 3 карты."
 
 [[tests]]
-english = "{Judgment} You may discard {cards($d)} to {dissolve} an enemy with spark {$s} or less."
+english = "{Dawn} You may discard {cards($d)} to {dissolve} an enemy with spark {$s} or less."
 variables = """d: 1
 s: 1"""
-russian = "▸ <b>Суд:</b> Вы можете сбросить карту, чтобы рассеять врага с искрой 1 или меньше."
+russian = "▸ <b>Рассвет:</b> Вы можете сбросить карту, чтобы рассеять врага с искрой 1 или меньше."
 
 [[tests]]
-english = "{Judgment} You may {banish} {cards($c)} from the opponent's void to gain {energy($e)}."
+english = "{Dawn} You may {banish} {cards($c)} from the opponent's void to gain {energy($e)}."
 variables = """c: 1
 e: 1"""
-russian = "▸ <b>Суд:</b> Вы можете изгнать карту из Пустоты противника, чтобы получить <color=#00838F>1●</color>."
+russian = "▸ <b>Рассвет:</b> Вы можете изгнать карту из Пустоты противника, чтобы получить <color=#00838F>1●</color>."
 
 [[tests]]
-english = "{Judgment} Return this character from your void to your hand."
-russian = "▸ <b>Суд:</b> Верните этого персонажа из вашей Пустоты в руку."
+english = "{Dawn} Return this character from your void to your hand."
+russian = "▸ <b>Рассвет:</b> Верните этого персонажа из вашей Пустоты в руку."
 
 [[tests]]
 english = "{energy($e)}, Abandon an ally with spark {$s} or less: Draw {cards($c)}."
@@ -1324,12 +1324,12 @@ r: 1"""
 russian = "Когда вы берёте 2 карты за ход, если эта карта находится в вашей Пустоте, она получает <color=#964B00>Возвышение</color> <color=#00838F>1●</color> до конца хода."
 
 [[tests]]
-english = "When you {materialize} a character, trigger the {Judgment} ability of each ally."
-russian = "Когда вы воплощаете персонажа, срабатывает способность «▸ <b>Суд:</b>» каждого союзника."
+english = "When you {materialize} a character, trigger the {Dawn} ability of each ally."
+russian = "Когда вы воплощаете персонажа, срабатывает способность «▸ <b>Рассвет:</b>» каждого союзника."
 
 [[tests]]
-english = "{Judgment} Each player abandons a character."
-russian = "▸ <b>Суд:</b> Каждый игрок отрекается от персонажа."
+english = "{Dawn} Each player abandons a character."
+russian = "▸ <b>Рассвет:</b> Каждый игрок отрекается от персонажа."
 
 [[tests]]
 english = "Return {up_to_n_events($n)} from your void to your hand."
@@ -1437,9 +1437,9 @@ english = "Disable the {Materialized} abilities of enemies."
 russian = "Отключите у врагов способности «▸ <b>Воплощён:</b>»."
 
 [[tests]]
-english = "{Materialized_Judgment} {Banish} an ally with spark {$s} or less, then {materialize} it."
+english = "{Materialized_Dawn} {Banish} an ally with spark {$s} or less, then {materialize} it."
 variables = "s: 2"
-russian = "▸ <b>Воплощён, Суд:</b> Изгоните союзника с искрой 2 или меньше, затем воплотите его."
+russian = "▸ <b>Воплощён, Рассвет:</b> Изгоните союзника с искрой 2 или меньше, затем воплотите его."
 
 [[tests]]
 english = "{Materialized} Discard {cards($d)}, then draw {cards($c)}."
@@ -1447,9 +1447,9 @@ variables = "d: 2, c: 2"
 russian = "▸ <b>Воплощён:</b> Сбросьте 2 карты, затем возьмите 2 карты."
 
 [[tests]]
-english = "{Materialized_Judgment} With {count_allied_subtype($a, $t)}, gain {energy($e)}."
+english = "{Materialized_Dawn} With {count_allied_subtype($a, $t)}, gain {energy($e)}."
 variables = "a: 2, t: Warrior, e: 1"
-russian = "▸ <b>Воплощён, Суд:</b> Если у вас есть 2 союзных <color=#2E7D32><b>Воина</b></color>, получите <color=#00838F>1●</color>."
+russian = "▸ <b>Воплощён, Рассвет:</b> Если у вас есть 2 союзных <color=#2E7D32><b>Воина</b></color>, получите <color=#00838F>1●</color>."
 
 [[tests]]
 english = "{Materialized} Copy the next event you play {this_turn_times($n)}."
@@ -1491,8 +1491,8 @@ variables = "e: 2"
 russian = "В конце вашего хода получите <color=#00838F>2●</color>."
 
 [[tests]]
-english = "The '{Judgment}' ability of allies triggers when you {materialize} them."
-russian = "Способность союзников «▸ <b>Суд:</b>» срабатывает, когда вы воплощаете их."
+english = "The '{Dawn}' ability of allies triggers when you {materialize} them."
+russian = "Способность союзников «▸ <b>Рассвет:</b>» срабатывает, когда вы воплощаете их."
 
 [[tests]]
 english = "When the opponent plays an event which could {dissolve} an ally, {prevent} that card."
@@ -1553,9 +1553,9 @@ variables = "t: Survivor"
 russian = "▸ <b>Рассеян:</b> <color=#2E7D32><b>Выживший</b></color> в вашей Пустоте получает Возвышение, равное его стоимости."
 
 [[tests]]
-english = "{Judgment} With {count_allies($a)} that share a character type, draw {cards($c)}."
+english = "{Dawn} With {count_allies($a)} that share a character type, draw {cards($c)}."
 variables = "a: 3, c: 1"
-russian = "▸ <b>Суд:</b> Если у вас есть 3 союзника с общим типом персонажа, возьмите карту."
+russian = "▸ <b>Рассвет:</b> Если у вас есть 3 союзника с общим типом персонажа, возьмите карту."
 
 [[tests]]
 english = "This event costs {energy($e)} if a character dissolved this turn."
@@ -1567,9 +1567,9 @@ english = "{Reclaim} -- Abandon an ally"
 russian = "<color=#964B00>Возвышение</color> — Отрекитесь от союзника."
 
 [[tests]]
-english = "{Judgment} Draw {cards($c)}."
+english = "{Dawn} Draw {cards($c)}."
 variables = "c: 1"
-russian = "▸ <b>Суд:</b> Возьмите карту."
+russian = "▸ <b>Рассвет:</b> Возьмите карту."
 
 [[tests]]
 english = "{Reclaim_For_Cost($r)}"
@@ -1581,7 +1581,7 @@ english = "{Reclaim_For_Cost($r)}"
 variables = "r: 2"
 russian = "<color=#964B00>Возвышение</color> <color=#00838F>2●</color>"
 [[tests]]
-english = "{Judgment} You may abandon {@a subtype($t)} to {discover} {@a subtype($t)} with cost {energy($e)} higher and {materialize} it."
+english = "{Dawn} You may abandon {@a subtype($t)} to {discover} {@a subtype($t)} with cost {energy($e)} higher and {materialize} it."
 variables = "t: Warrior, e: 1"
-russian = "▸ <b>Суд:</b> Вы можете отречься от <color=#2E7D32><b>Воина</b></color>, чтобы открыть <color=#2E7D32><b>Воина</b></color> стоимостью на <color=#00838F>1●</color> выше и воплотить его."
+russian = "▸ <b>Рассвет:</b> Вы можете отречься от <color=#2E7D32><b>Воина</b></color>, чтобы открыть <color=#2E7D32><b>Воина</b></color> стоимостью на <color=#00838F>1●</color> выше и воплотить его."
 

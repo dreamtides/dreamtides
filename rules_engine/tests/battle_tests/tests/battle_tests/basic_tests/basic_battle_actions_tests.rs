@@ -84,26 +84,15 @@ fn play_character_increase_spark() {
 }
 
 #[test]
-fn play_character_score_points() {
+fn play_character_no_scoring_without_judgment() {
+    // Scoring is disabled until Judgment phase combat resolution is
+    // implemented (Task 10).
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
     s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     s.perform_user_action(BattleAction::EndTurn);
-    assert_eq!(s.user_client.me.score(), Points(0), "score unchanged");
+    assert_eq!(s.user_client.me.score(), Points(0), "score unchanged after user turn");
     s.perform_enemy_action(BattleAction::EndTurn);
-    assert_eq!(s.user_client.me.score(), Points(5), "score increased");
-    test_helpers::assert_clients_identical(&s);
-}
-
-#[test]
-fn play_character_win_battle() {
-    let mut s =
-        TestBattle::builder().user(TestPlayer::builder().energy(99).points(20).build()).connect();
-    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
-    s.perform_user_action(BattleAction::EndTurn);
-    s.perform_enemy_action(BattleAction::EndTurn);
-    assert_eq!(s.user_client.me.score(), Points(25), "score increased");
-    assert_eq!(s.user_client.last_game_message, Some(GameMessageType::Victory), "victory message");
-    assert_eq!(s.enemy_client.last_game_message, Some(GameMessageType::Defeat), "defeat message");
+    assert_eq!(s.user_client.me.score(), Points(0), "score still unchanged without judgment");
     test_helpers::assert_clients_identical(&s);
 }
 

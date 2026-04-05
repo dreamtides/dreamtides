@@ -94,8 +94,8 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::SpendAllEnergyDrawAndDiscard => None,
         StandardEffect::TakeExtraTurn => None,
         StandardEffect::ThenMaterializeIt => None,
-        StandardEffect::TriggerAdditionalJudgmentPhaseAtEndOfTurn => None,
-        StandardEffect::TriggerJudgmentAbility { .. } => None,
+        StandardEffect::TriggerAdditionalDawnPhaseAtEndOfTurn => None,
+        StandardEffect::TriggerDawnAbility { .. } => None,
         StandardEffect::YouWinTheGame => None,
     }
 }

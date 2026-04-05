@@ -6,10 +6,11 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Ord, PartialOrd, Hash, EnumSetType, Sequence, Serialize, Deserialize)]
 pub enum BattleTurnPhase {
     Starting,
-    Judgment,
     Dreamwell,
     Draw,
+    Dawn,
     Main,
+    Judgment,
     Ending,
     EndingPhaseFinished,
     FiringEndOfTurnTriggers,

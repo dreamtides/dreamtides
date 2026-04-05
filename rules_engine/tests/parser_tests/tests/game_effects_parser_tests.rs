@@ -64,13 +64,13 @@ fn test_materialize_random_characters_with_cost() {
 #[test]
 fn test_judgment_materialize_random_subtype_from_deck() {
     let result = parse_ability(
-        "{Judgment} {Materialize} {n_random_characters} {subtype} from your deck.",
+        "{Dawn} {Materialize} {n_random_characters} {subtype} from your deck.",
         "n: 2, t: Warrior",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: Effect(MaterializeRandomFromDeck(
         count: 2,
@@ -82,11 +82,11 @@ fn test_judgment_materialize_random_subtype_from_deck() {
 
 #[test]
 fn test_judgment_foresee() {
-    let result = parse_ability("{Judgment} {Foresee}.", "f: 3");
+    let result = parse_ability("{Dawn} {Foresee}.", "f: 3");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: Effect(Foresee(
         count: 3,
@@ -252,11 +252,11 @@ fn test_materialized_you_may_banish_ally_then_materialize_it() {
 
 #[test]
 fn test_judgment_you_may_banish_ally_then_materialize_it() {
-    let result = parse_ability("{Judgment} You may {banish} an ally, then {materialize} it.", "");
+    let result = parse_ability("{Dawn} You may {banish} an ally, then {materialize} it.", "");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: WithOptions(EffectWithOptions(
         effect: BanishThenMaterialize(
@@ -680,13 +680,13 @@ fn test_dissolve_enemy_with_cost_less_than_void_count() {
 #[test]
 fn test_judgment_pay_energy_to_kindle_and_banish_cards_from_opponent_void() {
     let result = parse_ability(
-        "{Judgment} Pay {e} to {kindle} and {banish} {cards} from the opponent's void.",
+        "{Dawn} Pay {e} to {kindle} and {banish} {cards} from the opponent's void.",
         "e: 1, k: 1, c: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: ListWithOptions(ListWithOptions(
         effects: [
@@ -712,13 +712,13 @@ fn test_judgment_pay_energy_to_kindle_and_banish_cards_from_opponent_void() {
 #[test]
 fn test_judgment_you_may_pay_energy_to_kindle_and_banish_cards_from_opponent_void() {
     let result = parse_ability(
-        "{Judgment} You may pay {e} to {kindle} and {banish} {cards} from the opponent's void.",
+        "{Dawn} You may pay {e} to {kindle} and {banish} {cards} from the opponent's void.",
         "e: 1, k: 1, c: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: ListWithOptions(ListWithOptions(
         effects: [
@@ -744,13 +744,13 @@ fn test_judgment_you_may_pay_energy_to_kindle_and_banish_cards_from_opponent_voi
 #[test]
 fn test_judgment_you_may_banish_cards_from_your_void_to_dissolve_enemy_with_cost() {
     let result = parse_ability(
-        "{Judgment} You may {banish} {cards} from your void to {dissolve} an enemy with cost {e} or less.",
+        "{Dawn} You may {banish} {cards} from your void to {dissolve} an enemy with cost {e} or less.",
         "c: 3, e: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: WithOptions(EffectWithOptions(
         effect: DissolveCharacter(
@@ -770,13 +770,13 @@ fn test_judgment_you_may_banish_cards_from_your_void_to_dissolve_enemy_with_cost
 #[test]
 fn test_judgment_you_may_banish_cards_from_opponent_void_to_gain_energy() {
     let result = parse_ability(
-        "{Judgment} You may {banish} {cards} from the opponent's void to gain {e}.",
+        "{Dawn} You may {banish} {cards} from the opponent's void to gain {e}.",
         "c: 1, e: 1",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: WithOptions(EffectWithOptions(
         effect: GainEnergy(
@@ -792,13 +792,13 @@ fn test_judgment_you_may_banish_cards_from_opponent_void_to_gain_energy() {
 #[test]
 fn test_judgment_you_may_abandon_subtype_to_discover_subtype_with_cost_higher_and_materialize_it() {
     let result = parse_ability(
-        "{Judgment} You may abandon {a_subtype} to {discover} {a_subtype} with cost {e} higher and {materialize} it.",
+        "{Dawn} You may abandon {a_subtype} to {discover} {a_subtype} with cost {e} higher and {materialize} it.",
         "t: Warrior, e: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: WithOptions(EffectWithOptions(
         effect: DiscoverAndThenMaterialize(
@@ -821,13 +821,13 @@ fn test_judgment_you_may_abandon_subtype_to_discover_subtype_with_cost_higher_an
 #[test]
 fn test_judgment_you_may_pay_energy_to_banish_up_to_n_allies_then_materialize_them() {
     let result = parse_ability(
-        "{Judgment} You may pay {e} to {banish} {up_to_n_allies}, then {materialize} {pronoun:$n}.",
+        "{Dawn} You may pay {e} to {banish} {up_to_n_allies}, then {materialize} {pronoun:$n}.",
         "e: 1, n: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: WithOptions(EffectWithOptions(
         effect: BanishThenMaterialize(
@@ -1021,14 +1021,14 @@ fn test_event_copy_next_event() {
 }
 
 #[test]
-fn test_event_trigger_additional_judgment_phase() {
+fn test_event_trigger_additional_dawn_phase() {
     let result = parse_ability(
-        "At the end of this turn, trigger an additional {judgment_phase_name} phase.",
+        "At the end of this turn, trigger an additional {dawn_phase_name} phase.",
         "",
     );
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
-      effect: Effect(TriggerAdditionalJudgmentPhaseAtEndOfTurn),
+      effect: Effect(TriggerAdditionalDawnPhaseAtEndOfTurn),
     ))
     "###);
 }
@@ -1086,13 +1086,13 @@ fn test_each_player_shuffles_hand_and_void_and_draws() {
 #[test]
 fn test_judgment_each_player_shuffles_hand_and_void_and_draws() {
     let result = parse_ability(
-        "{Judgment} Each player shuffles their hand and void into their deck and then draws {cards}.",
+        "{Dawn} Each player shuffles their hand and void into their deck and then draws {cards}.",
         "c: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: Effect(EachPlayerShufflesHandAndVoidIntoDeckAndDraws(
         count: 3,
@@ -1139,13 +1139,13 @@ fn test_take_an_extra_turn_after_this_one() {
 #[test]
 fn test_when_you_materialize_trigger_judgment_ability_each_ally() {
     let result = parse_ability(
-        "When you {materialize} a character, trigger the {Judgment} ability of each ally.",
+        "When you {materialize} a character, trigger the {Dawn} ability of each ally.",
         "",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Materialize(Your(Character)),
-      effect: Effect(TriggerJudgmentAbility(
+      effect: Effect(TriggerDawnAbility(
         matching: Another(Character),
         collection: All,
       )),
@@ -1156,13 +1156,13 @@ fn test_when_you_materialize_trigger_judgment_ability_each_ally() {
 #[test]
 fn test_when_you_materialize_trigger_judgment_ability_each_enemy() {
     let result = parse_ability(
-        "When you {materialize} a character, trigger the {Judgment} ability of each enemy.",
+        "When you {materialize} a character, trigger the {Dawn} ability of each enemy.",
         "",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Materialize(Your(Character)),
-      effect: Effect(TriggerJudgmentAbility(
+      effect: Effect(TriggerDawnAbility(
         matching: Enemy(Character),
         collection: All,
       )),

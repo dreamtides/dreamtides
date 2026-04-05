@@ -161,10 +161,10 @@ mod tests {
     }
     #[test]
     fn test_suggest_directive_close_match() {
-        let suggestions = suggest_directive("Judgement");
+        let suggestions = suggest_directive("dwan_phase_name");
         assert!(suggestions.is_some());
         let suggestions = suggestions.unwrap();
-        assert!(suggestions.contains(&"Judgment".to_string()));
+        assert!(suggestions.contains(&"dawn_phase_name".to_string()));
     }
     #[test]
     fn test_suggest_directive_no_match() {

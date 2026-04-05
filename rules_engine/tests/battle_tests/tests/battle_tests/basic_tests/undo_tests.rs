@@ -1,5 +1,4 @@
 use action_data::game_action_data::GameAction;
-use battle_state::actions::battle_actions::BattleAction;
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
@@ -131,21 +130,19 @@ fn undo_does_not_include_display_actions() {
 }
 
 #[test]
-fn undo_restores_points_and_spark() {
+fn undo_restores_spark() {
+    // Scoring is disabled until the new Judgment phase combat resolution is
+    // implemented (Task 10). This test verifies undo restores spark.
     let mut s =
         TestBattle::builder().user(TestPlayer::builder().energy(10).points(5).build()).connect();
 
     s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
-    s.perform_user_action(BattleAction::EndTurn);
-    s.perform_enemy_action(BattleAction::EndTurn);
-
-    assert_eq!(s.user_client.me.score(), Points(10), "points increased");
     assert_eq!(s.user_client.me.total_spark(), Spark(5), "spark from character");
 
     s.perform_user_action(GameAction::Undo(PlayerName::One));
 
-    assert_eq!(s.user_client.me.score(), Points(5), "points reverted to before end turn");
-    assert_eq!(s.user_client.me.total_spark(), Spark(5), "spark from character still present");
+    assert_eq!(s.user_client.me.score(), Points(5), "points unchanged");
+    assert_eq!(s.user_client.me.total_spark(), Spark(0), "spark reverted after undo");
     test_helpers::assert_clients_identical(&s);
 }
 

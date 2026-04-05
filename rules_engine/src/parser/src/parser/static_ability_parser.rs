@@ -64,7 +64,7 @@ fn standard_static_ability<'a>(
         your_cards_cost_modification(),
         reveal_top_card_of_deck(),
         play_from_top_of_deck(),
-        judgment_triggers_when_materialized(),
+        dawn_triggers_when_materialized(),
     ))
     .boxed()
 }
@@ -250,17 +250,17 @@ fn play_from_top_of_deck<'a>(
         .map(|matching| StandardStaticAbility::YouMayPlayFromTopOfDeck { matching })
 }
 
-fn judgment_triggers_when_materialized<'a>(
+fn dawn_triggers_when_materialized<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
     words(&["the", "'"])
-        .ignore_then(directive("judgment"))
+        .ignore_then(directive("dawn"))
         .ignore_then(words(&["'", "ability", "of"]))
         .ignore_then(predicate_parser::predicate_parser())
         .then_ignore(words(&["triggers", "when", "you"]))
         .then_ignore(directive("materialize"))
         .then_ignore(word("them"))
         .then_ignore(period())
-        .map(|predicate| StandardStaticAbility::JudgmentTriggersWhenMaterialized { predicate })
+        .map(|predicate| StandardStaticAbility::DawnTriggersWhenMaterialized { predicate })
 }
 
 fn spark_equal_to_predicate_count<'a>(

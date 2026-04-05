@@ -341,9 +341,9 @@ fn test_foresee_draw_with_reclaim() {
 // ============================================================================
 
 #[test]
-fn test_extra_judgment_phase() {
+fn test_extra_dawn_phase() {
     assert_rendered_match(
-        "At the end of this turn, trigger an additional {judgment_phase_name} phase.",
+        "At the end of this turn, trigger an additional {dawn_phase_name} phase.",
         "",
     );
 }

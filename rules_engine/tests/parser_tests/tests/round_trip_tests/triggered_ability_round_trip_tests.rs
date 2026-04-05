@@ -238,7 +238,7 @@ fn test_until_end_of_turn_play_event_trigger_copy() {
 #[test]
 fn test_materialize_character_trigger_judgment() {
     assert_rendered_match(
-        "When you {materialize} a character, trigger the {Judgment} ability of each ally.",
+        "When you {materialize} a character, trigger the {Dawn} ability of each ally.",
         "",
     );
 }
@@ -254,7 +254,7 @@ fn test_until_end_of_turn_play_character_trigger_draw() {
 #[test]
 fn test_judgment_triggers_on_materialize() {
     assert_rendered_match(
-        "The '{Judgment}' ability of allies triggers when you {materialize} them.",
+        "The '{Dawn}' ability of allies triggers when you {materialize} them.",
         "",
     );
 }

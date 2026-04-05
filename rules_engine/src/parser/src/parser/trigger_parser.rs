@@ -20,7 +20,7 @@ fn keyword_triggers<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, Pars
 fn keyword_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone
 {
     choice((
-        directive("judgment").to(TriggerKeyword::Judgment),
+        directive("dawn").to(TriggerKeyword::Dawn),
         directive("materialized").to(TriggerKeyword::Materialized),
         directive("dissolved").to(TriggerKeyword::Dissolved),
     ))
@@ -30,8 +30,7 @@ fn keyword_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, Parse
 fn combined_keyword_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     choice((
-        directive("materialized_judgment")
-            .to(vec![TriggerKeyword::Materialized, TriggerKeyword::Judgment]),
+        directive("materialized_dawn").to(vec![TriggerKeyword::Materialized, TriggerKeyword::Dawn]),
         directive("materialized_dissolved")
             .to(vec![TriggerKeyword::Materialized, TriggerKeyword::Dissolved]),
     ))

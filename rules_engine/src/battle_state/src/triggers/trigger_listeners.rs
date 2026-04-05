@@ -9,6 +9,7 @@ use crate::triggers::trigger::TriggerName;
 pub struct TriggerListeners {
     pub abandoned: CardSet<CardId>,
     pub banished: CardSet<CardId>,
+    pub dawn: CardSet<CardId>,
     pub discarded: CardSet<CardId>,
     pub dissolved: CardSet<CardId>,
     pub put_into_void: CardSet<CardId>,
@@ -28,6 +29,7 @@ impl TriggerListeners {
         match name {
             TriggerName::Abandonded => &self.abandoned,
             TriggerName::Banished => &self.banished,
+            TriggerName::Dawn => &self.dawn,
             TriggerName::Discarded => &self.discarded,
             TriggerName::Dissolved => &self.dissolved,
             TriggerName::PutIntoVoid => &self.put_into_void,
@@ -48,6 +50,7 @@ impl TriggerListeners {
         match name {
             TriggerName::Abandonded => &mut self.abandoned,
             TriggerName::Banished => &mut self.banished,
+            TriggerName::Dawn => &mut self.dawn,
             TriggerName::Discarded => &mut self.discarded,
             TriggerName::Dissolved => &mut self.dissolved,
             TriggerName::PutIntoVoid => &mut self.put_into_void,

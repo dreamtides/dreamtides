@@ -35,7 +35,7 @@ pub enum StandardStaticAbility {
     DisableEnemyMaterializedAbilities,
     EnemyCardsCostIncrease { matching: CardPredicate, increase: Energy },
     HasAllCharacterTypes,
-    JudgmentTriggersWhenMaterialized { predicate: Predicate },
+    DawnTriggersWhenMaterialized { predicate: Predicate },
     MultiplyCardDrawFromCardEffects { multiplier: u32 },
     MultiplyEnergyGainFromCardEffects { multiplier: u32 },
     OncePerTurnPlayFromVoid { matching: CardPredicate },

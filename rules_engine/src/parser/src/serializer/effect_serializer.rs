@@ -297,16 +297,16 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> Phrase {
         StandardEffect::DrawMatchingCard { predicate } => strings::draw_matching_from_deck(
             predicate_serializer::serialize_card_predicate_phrase(predicate),
         ),
-        StandardEffect::TriggerJudgmentAbility { matching, collection } => match collection {
-            CollectionExpression::All => strings::trigger_judgment_of_each(
-                predicate_serializer::predicate_base_phrase(matching),
-            ),
-            _ => strings::trigger_judgment_of_collection(serialize_collection_target(
+        StandardEffect::TriggerDawnAbility { matching, collection } => match collection {
+            CollectionExpression::All => {
+                strings::trigger_dawn_of_each(predicate_serializer::predicate_base_phrase(matching))
+            }
+            _ => strings::trigger_dawn_of_collection(serialize_collection_target(
                 collection, matching,
             )),
         },
-        StandardEffect::TriggerAdditionalJudgmentPhaseAtEndOfTurn => {
-            strings::judgment_phase_at_end_of_turn_effect()
+        StandardEffect::TriggerAdditionalDawnPhaseAtEndOfTurn => {
+            strings::dawn_phase_at_end_of_turn_effect()
         }
         StandardEffect::TakeExtraTurn => strings::take_extra_turn_effect(),
         StandardEffect::YouWinTheGame => strings::you_win_the_game_effect(),

@@ -104,12 +104,12 @@ fn test_materialized_copy_event_multiple_times() {
 
 #[test]
 fn test_materialized_judgment_gain_energy() {
-    assert_rendered_match("{Materialized_Judgment} Gain {energy($e)}.", "e: 2");
+    assert_rendered_match("{Materialized_Dawn} Gain {energy($e)}.", "e: 2");
 }
 
 #[test]
 fn test_materialized_judgment_kindle() {
-    assert_rendered_match("{Materialized_Judgment} {Kindle($k)}.", "k: 1");
+    assert_rendered_match("{Materialized_Dawn} {Kindle($k)}.", "k: 1");
 }
 
 #[test]
@@ -119,7 +119,7 @@ fn test_materialized_return_character_from_void() {
 
 #[test]
 fn test_materialized_judgment_gain_one_energy() {
-    assert_rendered_match("{Materialized_Judgment} Gain {energy($e)}.", "e: 1");
+    assert_rendered_match("{Materialized_Dawn} Gain {energy($e)}.", "e: 1");
 }
 
 #[test]

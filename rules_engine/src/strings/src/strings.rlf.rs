@@ -29,18 +29,18 @@ rlf::rlf! {
     trigger($t) = "\u{25B8} <b>{$t}:</b>";
     // Materialized trigger prefix.
     materialized = "\u{25B8} <b>Materialized:</b>";
-    // Judgment trigger prefix.
-    judgment = "\u{25B8} <b>Judgment:</b>";
+    // Dawn trigger prefix.
+    dawn = "\u{25B8} <b>Dawn:</b>";
     // Dissolved trigger prefix.
     dissolved = "\u{25B8} <b>Dissolved:</b>";
-    // Combined materialized and judgment trigger prefix.
-    materialized_judgment = "\u{25B8} <b>Materialized, Judgment:</b>";
+    // Combined materialized and dawn trigger prefix.
+    materialized_dawn = "\u{25B8} <b>Materialized, Dawn:</b>";
     // Combined materialized and dissolved trigger prefix.
     materialized_dissolved = "\u{25B8} <b>Materialized, Dissolved:</b>";
-    // Bold judgment phase name for card text references.
-    judgment_phase_name = "<b>Judgment</b>";
-    // Bare keyword name for Judgment (used in multi-keyword fallback).
-    judgment_keyword_name = "Judgment";
+    // Bold dawn phase name for card text references.
+    dawn_phase_name = "<b>Dawn</b>";
+    // Bare keyword name for Dawn (used in multi-keyword fallback).
+    dawn_keyword_name = "Dawn";
     // Bare keyword name for Materialized (used in multi-keyword fallback).
     materialized_keyword_name = "Materialized";
     // Bare keyword name for Dissolved (used in multi-keyword fallback).
@@ -626,9 +626,9 @@ rlf::rlf! {
     banish_cards_from_enemy_void_effect($c) = "{banish} {cards($c)} from the opponent's void";
     // Banish enemy void effect fragment (no trailing period).
     banish_enemy_void_effect = "{banish} the opponent's void";
-    // Judgment phase at end of turn effect fragment (no trailing period).
-    judgment_phase_at_end_of_turn_effect =
-        "at the end of this turn, trigger an additional {judgment_phase_name} phase";
+    // Dawn phase at end of turn effect fragment (no trailing period).
+    dawn_phase_at_end_of_turn_effect =
+        "at the end of this turn, trigger an additional {dawn_phase_name} phase";
     // Multiply energy effect fragment (no trailing period).
     multiply_energy_effect($n) = "{multiply_by($n)} the amount of {energy_symbol} you have";
     // Spend all energy dissolve effect fragment (no trailing period).
@@ -1097,12 +1097,12 @@ rlf::rlf! {
     materialize_copies_equal_to_quantity($target, $quantity) = :from($target)
         "{materialize} a number of copies of {$target} equal to the number of {$quantity}";
 
-    // Trigger judgment ability of a collection target.
-    trigger_judgment_of_collection($target) = :from($target)
-        "trigger the {Judgment} ability of {$target}";
-    // Trigger judgment ability of each matching target.
-    trigger_judgment_of_each($target) = :from($target)
-        "trigger the {Judgment} ability of each {$target}";
+    // Trigger dawn ability of a collection target.
+    trigger_dawn_of_collection($target) = :from($target)
+        "trigger the {Dawn} ability of {$target}";
+    // Trigger dawn ability of each matching target.
+    trigger_dawn_of_each($target) = :from($target)
+        "trigger the {Dawn} ability of each {$target}";
 
     // =========================================================================
     // Materialize figment quantity phrases
@@ -1280,9 +1280,9 @@ rlf::rlf! {
     // You may play matching cards from the top of your deck (uses plural variant).
     you_may_play_from_top_of_deck($matching) = :from($matching)
         "you may play {$matching:other} from the top of your deck";
-    // Judgment ability of matching characters triggers when materialized (uses plural variant).
-    judgment_triggers_when_materialized($matching) = :from($matching)
-        "the '{Judgment}' ability of {$matching:other} triggers when you {materialize} them";
+    // Dawn ability of matching characters triggers when materialized (uses plural variant).
+    dawn_triggers_when_materialized($matching) = :from($matching)
+        "the '{Dawn}' ability of {$matching:other} triggers when you {materialize} them";
     // This character's spark equals predicate count (uses plural variant).
     spark_equal_to_predicate_count($matching) = :from($matching)
         "{this_character}'s spark is equal to the number of {$matching:other}";

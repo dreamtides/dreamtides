@@ -3,12 +3,12 @@ use parser_tests::test_helpers::*;
 
 #[test]
 fn test_materialized_judgment_kindle() {
-    let result = parse_ability("{Materialized_Judgment} {Kindle}.", "k: 1");
+    let result = parse_ability("{Materialized_Dawn} {Kindle}.", "k: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
         Materialized,
-        Judgment,
+        Dawn,
       ]),
       effect: Effect(Kindle(
         amount: Spark(1),
@@ -35,13 +35,13 @@ fn test_ally_gains_spark_for_each_allied_subtype() {
 #[test]
 fn test_judgment_you_may_pay_to_have_each_allied_gain_spark() {
     let result = parse_ability(
-        "{Judgment} You may pay {e} to have each allied {subtype} gain +{s} spark.",
+        "{Dawn} You may pay {e} to have each allied {subtype} gain +{s} spark.",
         "e: 1, t: Warrior, s: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: WithOptions(EffectWithOptions(
         effect: EachMatchingGainsSpark(
@@ -95,13 +95,13 @@ fn test_each_allied_subtype_gains_spark_for_each_allied_subtype() {
 #[test]
 fn test_judgment_each_allied_subtype_gains_spark_for_each_allied_subtype() {
     let result = parse_ability(
-        "{Judgment} Each allied {subtype} gains spark equal to the number of allied {plural_subtype}.",
+        "{Dawn} Each allied {subtype} gains spark equal to the number of allied {plural_subtype}.",
         "t: Warrior",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: Effect(EachMatchingGainsSparkForEach(
         each: CharacterType(Warrior),

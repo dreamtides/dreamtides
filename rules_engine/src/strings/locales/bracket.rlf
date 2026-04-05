@@ -13,12 +13,12 @@ maximum_energy($max) = "[{$max} maximum {energy_symbol}]";
 
 trigger($t) = "[▸ <b>{$t}:</b>]";
 materialized = "[▸ <b>Materialized:</b>]";
-judgment = "[▸ <b>Judgment:</b>]";
+dawn = "[▸ <b>Dawn:</b>]";
 dissolved = "[▸ <b>Dissolved:</b>]";
-materialized_judgment = "[▸ <b>Materialized, Judgment:</b>]";
+materialized_dawn = "[▸ <b>Materialized, Dawn:</b>]";
 materialized_dissolved = "[▸ <b>Materialized, Dissolved:</b>]";
-judgment_phase_name = "[<b>Judgment</b>]";
-judgment_keyword_name = "[Judgment]";
+dawn_phase_name = "[<b>Dawn</b>]";
+dawn_keyword_name = "[Dawn]";
 materialized_keyword_name = "[Materialized]";
 dissolved_keyword_name = "[Dissolved]";
 
@@ -313,8 +313,8 @@ gain_energy_equal_to_this_cost_effect = "[gain {energy_symbol} equal to this cha
 put_deck_into_void_effect($v) = "[put the {top_n_cards($v)} of your deck into your void]";
 banish_cards_from_enemy_void_effect($c) = "[{banish} {cards($c)} from the opponent's void]";
 banish_enemy_void_effect = "[{banish} the opponent's void]";
-judgment_phase_at_end_of_turn_effect =
-    "[at the end of this turn, trigger an additional {judgment_phase_name} phase]";
+dawn_phase_at_end_of_turn_effect =
+    "[at the end of this turn, trigger an additional {dawn_phase_name} phase]";
 multiply_energy_effect($n) = "[{multiply_by($n)} the amount of {energy_symbol} you have]";
 spend_all_energy_dissolve_effect = "[spend all your {energy_symbol}. {dissolve} an enemy with cost less than or equal to the amount spent]";
 spend_all_energy_draw_discard_effect = "[spend all your {energy_symbol}. Draw cards equal to the amount spent, then discard that many cards]";
@@ -557,8 +557,8 @@ materialize_copies_equal_to_energy($target) =
 materialize_copies_equal_to_quantity($target, $quantity) =
     "[{materialize} a number of copies of {$target} equal to the number of {$quantity}]";
 
-trigger_judgment_of_collection($target) = "[trigger the {Judgment} ability of {$target}]";
-trigger_judgment_of_each($target) = "[trigger the {Judgment} ability of each {$target}]";
+trigger_dawn_of_collection($target) = "[trigger the {Dawn} ability of {$target}]";
+trigger_dawn_of_each($target) = "[trigger the {Dawn} ability of each {$target}]";
 
 
 materialize_figments_for_each_quantity($fig, $quantity) =
@@ -649,8 +649,8 @@ reveal_top_card = "[reveal the top card of your deck]";
 you_may_look_at_top_card = "[you may look at the top card of your deck]";
 you_may_play_from_top_of_deck($matching) =
     "[you may play {$matching:other} from the top of your deck]";
-judgment_triggers_when_materialized($matching) =
-    "[the '{Judgment}' ability of {$matching:other} triggers when you {materialize} them]";
+dawn_triggers_when_materialized($matching) =
+    "[the '{Dawn}' ability of {$matching:other} triggers when you {materialize} them]";
 spark_equal_to_predicate_count($matching) =
     "[{this_character}'s spark is equal to the number of {$matching:other}]";
 play_only_from_void = "[you may only play {this_character} from your void]";

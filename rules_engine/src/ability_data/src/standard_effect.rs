@@ -262,8 +262,8 @@ pub enum StandardEffect {
     SpendAllEnergyDrawAndDiscard,
     TakeExtraTurn,
     ThenMaterializeIt,
-    TriggerAdditionalJudgmentPhaseAtEndOfTurn,
-    TriggerJudgmentAbility {
+    TriggerAdditionalDawnPhaseAtEndOfTurn,
+    TriggerDawnAbility {
         matching: Predicate,
         collection: CollectionExpression,
     },

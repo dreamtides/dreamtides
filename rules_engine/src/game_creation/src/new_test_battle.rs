@@ -106,7 +106,7 @@ pub fn create_and_start(
         status: BattleStatus::Setup,
         stack_priority: None,
         turn: TurnData { active_player: PlayerName::One, turn_id: TurnId::default() },
-        phase: BattleTurnPhase::Judgment,
+        phase: BattleTurnPhase::Dreamwell,
         seed,
         rng: Xoshiro256PlusPlus::seed_from_u64(seed),
         animations: None,

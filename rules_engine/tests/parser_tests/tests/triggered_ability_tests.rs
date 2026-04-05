@@ -626,12 +626,11 @@ fn test_when_you_play_a_fast_card_this_character_gains_spark() {
 
 #[test]
 fn test_judgment_gain_energy_for_each_allied_subtype() {
-    let result =
-        parse_ability("{Judgment} Gain {e} for each allied {subtype}.", "t: Warrior, e: 1");
+    let result = parse_ability("{Dawn} Gain {e} for each allied {subtype}.", "t: Warrior, e: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: Effect(GainEnergyForEach(
         gains: Energy(1),
@@ -643,11 +642,11 @@ fn test_judgment_gain_energy_for_each_allied_subtype() {
 
 #[test]
 fn test_judgment_gain_energy_for_each_allied_character() {
-    let result = parse_ability("{Judgment} Gain {e} for each allied character.", "e: 1");
+    let result = parse_ability("{Dawn} Gain {e} for each allied character.", "e: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: Effect(GainEnergyForEach(
         gains: Energy(1),
@@ -660,13 +659,13 @@ fn test_judgment_gain_energy_for_each_allied_character() {
 #[test]
 fn test_judgment_you_may_discard_draw_gain_points() {
     let result = parse_ability(
-        "{Judgment} You may discard {discards} to draw {cards} and gain {points}.",
+        "{Dawn} You may discard {discards} to draw {cards} and gain {points}.",
         "d: 2, c: 1, p: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: ListWithOptions(ListWithOptions(
         effects: [
@@ -695,13 +694,13 @@ fn test_judgment_you_may_discard_draw_gain_points() {
 #[test]
 fn test_judgment_you_may_discard_to_dissolve_enemy_with_spark_or_less() {
     let result = parse_ability(
-        "{Judgment} You may discard a card to {dissolve} an enemy with spark {s} or less.",
+        "{Dawn} You may discard a card to {dissolve} an enemy with spark {s} or less.",
         "s: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: WithOptions(EffectWithOptions(
         effect: DissolveCharacter(
@@ -719,14 +718,12 @@ fn test_judgment_you_may_discard_to_dissolve_enemy_with_spark_or_less() {
 
 #[test]
 fn test_judgment_with_count_allied_subtype_gain_energy() {
-    let result = parse_ability(
-        "{Judgment} With {count_allied_subtype}, gain {e}.",
-        "t: Warrior, a: 2, e: 3",
-    );
+    let result =
+        parse_ability("{Dawn} With {count_allied_subtype}, gain {e}.", "t: Warrior, a: 2, e: 3");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: WithOptions(EffectWithOptions(
         effect: GainEnergy(
@@ -745,14 +742,14 @@ fn test_judgment_with_count_allied_subtype_gain_energy() {
 #[test]
 fn test_materialized_judgment_with_count_allied_subtype_gain_energy() {
     let result = parse_ability(
-        "{Materialized_Judgment} With {count_allied_subtype}, gain {e}.",
+        "{Materialized_Dawn} With {count_allied_subtype}, gain {e}.",
         "t: Warrior, a: 2, e: 3",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
         Materialized,
-        Judgment,
+        Dawn,
       ]),
       effect: WithOptions(EffectWithOptions(
         effect: GainEnergy(
@@ -771,14 +768,14 @@ fn test_materialized_judgment_with_count_allied_subtype_gain_energy() {
 #[test]
 fn test_materialized_judgment_with_count_allied_subtype_draw_cards() {
     let result = parse_ability(
-        "{Materialized_Judgment} With {count_allied_subtype}, draw {cards}.",
+        "{Materialized_Dawn} With {count_allied_subtype}, draw {cards}.",
         "t: Warrior, a: 2, c: 1",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
         Materialized,
-        Judgment,
+        Dawn,
       ]),
       effect: WithOptions(EffectWithOptions(
         effect: DrawCards(
@@ -896,13 +893,13 @@ fn test_when_you_play_this_character_gain_energy() {
 #[test]
 fn test_judgment_with_count_allies_that_share_character_type_draw_cards() {
     let result = parse_ability(
-        "{Judgment} With {count_allies} that share a character type, draw {cards}.",
+        "{Dawn} With {count_allies} that share a character type, draw {cards}.",
         "a: 3, c: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Judgment,
+        Dawn,
       ]),
       effect: WithOptions(EffectWithOptions(
         effect: DrawCards(
@@ -942,7 +939,7 @@ fn test_events_cost_more_and_play_event_from_hand_copy() {
 #[test]
 fn test_has_all_character_types_and_judgment_with_allies() {
     let result = parse_abilities(
-        "Has all character types.\n\n{Judgment} With {count_allies} that share a character type, draw {cards}.",
+        "Has all character types.\n\n{Dawn} With {count_allies} that share a character type, draw {cards}.",
         "a: 2, c: 1",
     );
     assert_ron_snapshot!(result, @r###"
@@ -950,7 +947,7 @@ fn test_has_all_character_types_and_judgment_with_allies() {
       Static(StaticAbility(HasAllCharacterTypes)),
       Triggered(TriggeredAbility(
         trigger: Keywords([
-          Judgment,
+          Dawn,
         ]),
         effect: WithOptions(EffectWithOptions(
           effect: DrawCards(

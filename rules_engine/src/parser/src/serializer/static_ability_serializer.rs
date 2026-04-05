@@ -121,8 +121,8 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Phr
                 &Predicate::Any(matching.clone()),
             ))
         }
-        StandardStaticAbility::JudgmentTriggersWhenMaterialized { predicate } => {
-            strings::judgment_triggers_when_materialized(predicate_serializer::serialize_predicate(
+        StandardStaticAbility::DawnTriggersWhenMaterialized { predicate } => {
+            strings::dawn_triggers_when_materialized(predicate_serializer::serialize_predicate(
                 predicate,
             ))
         }
