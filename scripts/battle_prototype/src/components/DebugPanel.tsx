@@ -149,6 +149,20 @@ const DEBUG_BUTTONS: DebugButtonConfig[] = [
     },
   },
   {
+    label: "Knight\u2192Your Front 0",
+    action: {
+      BattleAction: {
+        Debug: {
+          AddCardToFrontRank: {
+            player: "One",
+            card: "a1b2c3d4-3333-4000-8000-000000000003",
+            position: 0,
+          },
+        },
+      },
+    },
+  },
+  {
     label: "Vanilla\u2192Hand",
     action: {
       BattleAction: {
