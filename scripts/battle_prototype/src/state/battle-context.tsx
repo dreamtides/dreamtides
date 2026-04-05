@@ -41,13 +41,22 @@ export function BattleProvider({ children }: { children: ReactNode }) {
 
   const startPolling = useCallback(() => {
     setIsPolling(true);
+    let pollInFlight = false;
     const interval = setInterval(() => {
+      if (pollInFlight) return;
+      pollInFlight = true;
       void (async () => {
         try {
           const pollRes = await api.poll();
           if (pollRes.commands) {
             const view = extractBattleView(pollRes.commands);
-            if (view) setBattle(view);
+            if (view) {
+              setBattle(view);
+              if (view.user.can_act) {
+                clearInterval(interval);
+                setIsPolling(false);
+              }
+            }
           }
           if (pollRes.response_version) {
             responseVersionRef.current = pollRes.response_version;
@@ -60,6 +69,8 @@ export function BattleProvider({ children }: { children: ReactNode }) {
           clearInterval(interval);
           setIsPolling(false);
           setError(e instanceof Error ? e.message : "Poll failed");
+        } finally {
+          pollInFlight = false;
         }
       })();
     }, POLL_INTERVAL_MS);
@@ -76,7 +87,10 @@ export function BattleProvider({ children }: { children: ReactNode }) {
             responseVersionRef.current,
           );
           const view = extractBattleView(res.commands);
-          if (view) setBattle(view);
+          if (view) {
+            setBattle(view);
+            if (view.user.can_act) return;
+          }
           startPolling();
         } catch (e) {
           setError(e instanceof Error ? e.message : "Action failed");
@@ -116,13 +130,12 @@ export function BattleProvider({ children }: { children: ReactNode }) {
           responseVersionRef.current = res.response_version;
           const view = extractBattleView(res.commands);
           if (view) setBattle(view);
-          startPolling();
         } catch (e) {
           setError(e instanceof Error ? e.message : "Connect failed");
         }
       })();
     },
-    [startPolling],
+    [],
   );
 
   return (

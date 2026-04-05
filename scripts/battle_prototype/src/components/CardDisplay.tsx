@@ -83,16 +83,28 @@ export function CardDisplay({
   const revealed = card.revealed;
   const isFaceDown = card.card_facing === "FaceDown" || !revealed;
 
+  const selectOrderCardId = revealed?.actions.can_select_order as number | undefined;
   const clickAction = revealed?.actions.can_play ?? revealed?.actions.on_click;
-  const isClickable = !disabled && clickAction != null;
+  const isClickable = !disabled && (clickAction != null || selectOrderCardId != null);
 
   const outlineColor = revealed?.outline_color
     ? colorToCSS(revealed.outline_color)
     : "var(--color-border)";
 
   const handleClick = () => {
-    if (isClickable && clickAction && onAction) {
+    if (!isClickable || !onAction) return;
+    if (clickAction) {
       onAction(clickAction);
+    } else if (selectOrderCardId != null) {
+      const pos = card.position.position;
+      const target = typeof pos !== "string" && "CardOrderSelector" in pos
+        ? (pos as Record<string, string>).CardOrderSelector
+        : "Deck";
+      onAction({
+        BattleAction: {
+          SelectOrderForDeckCard: { card_id: selectOrderCardId, target },
+        },
+      });
     }
   };
 
