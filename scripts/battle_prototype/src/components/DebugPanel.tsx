@@ -64,6 +64,111 @@ const DEBUG_BUTTONS: DebugButtonConfig[] = [
       },
     },
   },
+  {
+    label: "Sentry\u2192Enemy Front 0",
+    action: {
+      BattleAction: {
+        Debug: {
+          AddCardToFrontRank: {
+            player: "Two",
+            card: "a1b2c3d4-1111-4000-8000-000000000001",
+            position: 0,
+          },
+        },
+      },
+    },
+  },
+  {
+    label: "Knight\u2192Enemy Front 1",
+    action: {
+      BattleAction: {
+        Debug: {
+          AddCardToFrontRank: {
+            player: "Two",
+            card: "a1b2c3d4-3333-4000-8000-000000000003",
+            position: 1,
+          },
+        },
+      },
+    },
+  },
+  {
+    label: "Titan\u2192Enemy Front 2",
+    action: {
+      BattleAction: {
+        Debug: {
+          AddCardToFrontRank: {
+            player: "Two",
+            card: "a1b2c3d4-5555-4000-8000-000000000005",
+            position: 2,
+          },
+        },
+      },
+    },
+  },
+  {
+    label: "Colossus\u2192Enemy Front 3",
+    action: {
+      BattleAction: {
+        Debug: {
+          AddCardToFrontRank: {
+            player: "Two",
+            card: "a1b2c3d4-7777-4000-8000-000000000006",
+            position: 3,
+          },
+        },
+      },
+    },
+  },
+  {
+    label: "Scout\u2192Your Front 0",
+    action: {
+      BattleAction: {
+        Debug: {
+          AddCardToFrontRank: {
+            player: "One",
+            card: "a1b2c3d4-2222-4000-8000-000000000002",
+            position: 0,
+          },
+        },
+      },
+    },
+  },
+  {
+    label: "Warrior\u2192Your Front 1",
+    action: {
+      BattleAction: {
+        Debug: {
+          AddCardToFrontRank: {
+            player: "One",
+            card: "a1b2c3d4-4444-4000-8000-000000000004",
+            position: 1,
+          },
+        },
+      },
+    },
+  },
+  {
+    label: "Vanilla\u2192Hand",
+    action: {
+      BattleAction: {
+        Debug: {
+          AddCardToHand: {
+            player: "One",
+            card: "a1b2c3d4-3333-4000-8000-000000000003",
+          },
+        },
+      },
+    },
+  },
+  {
+    label: "Skip to Judgment",
+    action: {
+      BattleAction: {
+        Debug: "SkipToJudgment",
+      },
+    },
+  },
 ];
 
 export function DebugPanel({

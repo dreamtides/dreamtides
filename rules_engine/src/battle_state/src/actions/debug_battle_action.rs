@@ -35,4 +35,11 @@ pub enum DebugBattleAction {
     /// indicated definition ID. Panics if this card is not present in the
     /// dreamwell.
     SetNextDreamwellCard { base_card_id: DreamwellCardId },
+    /// Place a character directly into the front rank at a specific position.
+    /// Bypasses summoning sickness.
+    AddCardToFrontRank { player: PlayerName, card: BaseCardId, position: u8 },
+    /// Place a character directly into the back rank at a specific position.
+    AddCardToBackRank { player: PlayerName, card: BaseCardId, position: u8 },
+    /// Skip directly to the Judgment phase.
+    SkipToJudgment,
 }

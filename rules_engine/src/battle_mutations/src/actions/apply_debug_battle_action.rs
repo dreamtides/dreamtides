@@ -4,6 +4,7 @@ use battle_queries::legal_action_queries::legal_actions_data::{LegalActions, Pri
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::battle::card_id::{BattleDeckCardId, CardId, HandCardId};
 use battle_state::core::effect_source::EffectSource;
 use core_data::identifiers::BaseCardId;
@@ -93,6 +94,37 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
                 panic!("Card with definition ID {base_card_id:?} not found in dreamwell");
             };
             battle.dreamwell.next_index = position;
+        }
+        DebugBattleAction::AddCardToFrontRank {
+            player: player_name,
+            card: card_name,
+            position,
+        } => {
+            let card_count = battle.cards.all_cards().count();
+            let definition =
+                battle.tabula.cards.get(&card_name).expect("Card definition not found").clone();
+            battle_deck::debug_add_cards(battle, player_name, &[definition]);
+            let new_card_id = BattleDeckCardId(CardId(card_count));
+            let character_id =
+                move_card::from_deck_to_battlefield(battle, source, player_name, new_card_id);
+            let bf = battle.cards.battlefield_mut(player_name);
+            bf.remove(character_id);
+            bf.front[position as usize] = Some(character_id);
+        }
+        DebugBattleAction::AddCardToBackRank { player: player_name, card: card_name, position } => {
+            let card_count = battle.cards.all_cards().count();
+            let definition =
+                battle.tabula.cards.get(&card_name).expect("Card definition not found").clone();
+            battle_deck::debug_add_cards(battle, player_name, &[definition]);
+            let new_card_id = BattleDeckCardId(CardId(card_count));
+            let character_id =
+                move_card::from_deck_to_battlefield(battle, source, player_name, new_card_id);
+            let bf = battle.cards.battlefield_mut(player_name);
+            bf.remove(character_id);
+            bf.back[position as usize] = Some(character_id);
+        }
+        DebugBattleAction::SkipToJudgment => {
+            battle.phase = BattleTurnPhase::Judgment;
         }
     }
 }
