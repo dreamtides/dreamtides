@@ -154,9 +154,9 @@ async fn main() {
     info!("Starting server on port 26598");
 
     let app = Router::new()
-        .route("/connect", get(connect))
+        .route("/connect", get(connect).post(connect))
         .route("/perform_action", post(perform_action))
-        .route("/poll", get(poll))
+        .route("/poll", get(poll).post(poll))
         .route("/log", post(log));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:26598").await.unwrap_or_else(|e| {
