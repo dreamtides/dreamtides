@@ -67,6 +67,14 @@ function stripUnityTags(text: string): string {
     .replace(/<\/line-height=[^>]*>/gi, "");
 }
 
+/** Strip Unity icon font characters (PUA + CJK used as icons) from a label */
+function stripIconChars(text: string): string {
+  return text
+    .replace(/[\uE000-\uF8FF\uFB50-\uFDFF\uFE70-\uFEFF]/g, "")
+    .replace(/[\u2E80-\u9FFF\uF900-\uFAFF]/g, "")
+    .trim();
+}
+
 export function CardDisplay({
   card,
   onAction,
@@ -186,7 +194,8 @@ export function CardDisplay({
           />
         )}
       </div>
-      {revealed.actions.button_attachment && (
+      {revealed.actions.button_attachment &&
+        stripIconChars(revealed.actions.button_attachment.label) !== "" && (
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -214,7 +223,7 @@ export function CardDisplay({
             fontSize: compact ? 8 : 10,
           }}
         >
-          {revealed.actions.button_attachment.label}
+          {stripIconChars(revealed.actions.button_attachment.label)}
         </button>
       )}
     </div>

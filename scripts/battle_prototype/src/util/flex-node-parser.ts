@@ -19,6 +19,8 @@ function stripRichText(text: string): string {
     // Strip trailing standalone CJK/symbol characters used as Unity icons
     // (e.g. "Choose cards to discard. 粒" → "Choose cards to discard.")
     .replace(/\s+[\u2E80-\u9FFF\uF900-\uFAFF]$/g, "")
+    // Strip strings that are *only* an icon character (no surrounding text)
+    .replace(/^[\u2E80-\u9FFF\uF900-\uFAFF]$/g, "")
     .trim();
 }
 
