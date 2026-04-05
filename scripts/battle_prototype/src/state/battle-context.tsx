@@ -19,6 +19,7 @@ interface BattleContextValue {
   isPolling: boolean;
   error: string | null;
   sendAction: (action: GameAction) => void;
+  sendDebugAction: (action: GameAction) => void;
   reconnect: (deck?: TestDeckName) => void;
 }
 
@@ -85,6 +86,26 @@ export function BattleProvider({ children }: { children: ReactNode }) {
     [isPolling, startPolling],
   );
 
+  const sendDebugAction = useCallback(
+    (action: GameAction) => {
+      void (async () => {
+        try {
+          setError(null);
+          const res = await api.performAction(
+            action,
+            responseVersionRef.current,
+          );
+          const view = extractBattleView(res.commands);
+          if (view) setBattle(view);
+          startPolling();
+        } catch (e) {
+          setError(e instanceof Error ? e.message : "Debug action failed");
+        }
+      })();
+    },
+    [startPolling],
+  );
+
   const reconnect = useCallback(
     (deck?: TestDeckName) => {
       void (async () => {
@@ -106,7 +127,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
 
   return (
     <BattleContext.Provider
-      value={{ battle, isPolling, error, sendAction, reconnect }}
+      value={{ battle, isPolling, error, sendAction, sendDebugAction, reconnect }}
     >
       {children}
     </BattleContext.Provider>
