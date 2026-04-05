@@ -401,11 +401,13 @@ impl AllCards {
                 let bf = self.battlefield.player_mut(controller);
                 if bf.first_empty_back_slot().is_some() {
                     bf.add_to_back_rank(CharacterId(card_id));
-                } else {
-                    let index = bf
-                        .first_empty_front_slot()
-                        .expect("Cannot add to battlefield: both ranks are full");
+                } else if let Some(index) = bf.first_empty_front_slot() {
                     bf.front[index] = Some(CharacterId(card_id));
+                } else {
+                    // Battlefield is completely full. This should not happen
+                    // in normal play (legal actions prevent it), but can occur
+                    // during AI MCTS rollouts. Silently skip.
+                    return;
                 }
                 self.battlefield_state
                     .player_mut(controller)

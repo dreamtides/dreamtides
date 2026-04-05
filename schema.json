@@ -1,0 +1,5679 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SchemaTypes",
+  "type": "object",
+  "properties": {
+    "client_log_request": {
+      "$ref": "#/definitions/ClientLogRequest"
+    },
+    "client_log_response": {
+      "$ref": "#/definitions/ClientLogResponse"
+    },
+    "connect_request": {
+      "$ref": "#/definitions/ConnectRequest"
+    },
+    "connect_response": {
+      "$ref": "#/definitions/ConnectResponse"
+    },
+    "perform_action_request": {
+      "$ref": "#/definitions/PerformActionRequest"
+    },
+    "perform_action_response": {
+      "$ref": "#/definitions/PerformActionResponse"
+    },
+    "poll_request": {
+      "$ref": "#/definitions/PollRequest"
+    },
+    "poll_response": {
+      "$ref": "#/definitions/PollResponse"
+    }
+  },
+  "required": [
+    "connect_request",
+    "connect_response",
+    "perform_action_request",
+    "perform_action_response",
+    "poll_request",
+    "poll_response",
+    "client_log_request",
+    "client_log_response"
+  ],
+  "definitions": {
+    "AnchorToScreenPositionCommand": {
+      "type": "object",
+      "properties": {
+        "anchor": {
+          "$ref": "#/definitions/ScreenAnchor"
+        },
+        "node": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexNode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "show_duration": {
+          "description": "If provided, this element will be faded out and removed from the\nhierarchy after this duration.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Milliseconds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "anchor"
+      ]
+    },
+    "ArrowStyle": {
+      "type": "string",
+      "enum": [
+        "Red",
+        "Blue",
+        "Green"
+      ]
+    },
+    "AudioClipAddress": {
+      "type": "object",
+      "properties": {
+        "audio_clip": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "audio_clip"
+      ]
+    },
+    "BaseCardId": {
+      "description": "Identifies the base rules for a card.\n\nThe 'base card' describes the abilities of a card before any modifications\nare applied to it, i.e. a card that appears in the Tabula database.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "BattleAction": {
+      "description": "An action that can be performed in a battle",
+      "oneOf": [
+        {
+          "description": "Developer action",
+          "type": "object",
+          "properties": {
+            "Debug": {
+              "$ref": "#/definitions/DebugBattleAction"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Debug"
+          ]
+        },
+        {
+          "description": "Play a card in the user's hand using the standard play action.",
+          "type": "object",
+          "properties": {
+            "PlayCardFromHand": {
+              "$ref": "#/definitions/HandCardId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "PlayCardFromHand"
+          ]
+        },
+        {
+          "description": "Play a card in the user's void using the lowest-cost ability.",
+          "type": "object",
+          "properties": {
+            "PlayCardFromVoid": {
+              "$ref": "#/definitions/VoidCardId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "PlayCardFromVoid"
+          ]
+        },
+        {
+          "description": "Activate a character's ability by character ID, prompting for ability\nselection if multiple exist.",
+          "type": "object",
+          "properties": {
+            "ActivateAbilityForCharacter": {
+              "$ref": "#/definitions/CharacterId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "ActivateAbilityForCharacter"
+          ]
+        },
+        {
+          "description": "Pass on taking actions in response to a card being played by the\nopponent, thus causing the stack to be resolved.",
+          "type": "string",
+          "const": "PassPriority"
+        },
+        {
+          "description": "End your turn",
+          "type": "string",
+          "const": "EndTurn"
+        },
+        {
+          "description": "Start your next turn after the opponent takes the `EndTurn` action.",
+          "type": "string",
+          "const": "StartNextTurn"
+        },
+        {
+          "description": "Select a character as a target",
+          "type": "object",
+          "properties": {
+            "SelectCharacterTarget": {
+              "$ref": "#/definitions/CharacterId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SelectCharacterTarget"
+          ]
+        },
+        {
+          "description": "Select a card on the stack as a target",
+          "type": "object",
+          "properties": {
+            "SelectStackCardTarget": {
+              "$ref": "#/definitions/StackCardId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SelectStackCardTarget"
+          ]
+        },
+        {
+          "description": "Select a card in a void as a target",
+          "type": "object",
+          "properties": {
+            "SelectVoidCardTarget": {
+              "$ref": "#/definitions/VoidCardId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SelectVoidCardTarget"
+          ]
+        },
+        {
+          "description": "Submit the selected void card targets",
+          "type": "string",
+          "const": "SubmitVoidCardTargets"
+        },
+        {
+          "description": "Select a card in hand as a target",
+          "type": "object",
+          "properties": {
+            "SelectHandCardTarget": {
+              "$ref": "#/definitions/HandCardId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SelectHandCardTarget"
+          ]
+        },
+        {
+          "description": "Submit the selected hand card targets",
+          "type": "string",
+          "const": "SubmitHandCardTargets"
+        },
+        {
+          "description": "Select a choice at a given index position in response to a prompt.",
+          "type": "object",
+          "properties": {
+            "SelectPromptChoice": {
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SelectPromptChoice"
+          ]
+        },
+        {
+          "description": "Pick an amount of energy to pay as an additional cost to play a card.",
+          "type": "object",
+          "properties": {
+            "SelectEnergyAdditionalCost": {
+              "$ref": "#/definitions/Energy"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SelectEnergyAdditionalCost"
+          ]
+        },
+        {
+          "description": "Sets the position of a card in a card order selector.",
+          "type": "object",
+          "properties": {
+            "SelectOrderForDeckCard": {
+              "$ref": "#/definitions/DeckCardSelectedOrder"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SelectOrderForDeckCard"
+          ]
+        },
+        {
+          "description": "Submit the selected deck card order configuration in the current\nordering prompt.",
+          "type": "string",
+          "const": "SubmitDeckCardOrder"
+        },
+        {
+          "description": "Confirm the selected cards to mulligan",
+          "type": "string",
+          "const": "SubmitMulligan"
+        },
+        {
+          "description": "Select a modal effect choice for an effect or item on the stack",
+          "type": "object",
+          "properties": {
+            "SelectModalEffectChoice": {
+              "$ref": "#/definitions/ModelEffectChoiceIndex"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SelectModalEffectChoice"
+          ]
+        },
+        {
+          "description": "Select which activated ability to activate from a character",
+          "type": "object",
+          "properties": {
+            "SelectActivatedAbilityChoice": {
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SelectActivatedAbilityChoice"
+          ]
+        }
+      ]
+    },
+    "BattleDeckCardId": {
+      "$ref": "#/definitions/CardId"
+    },
+    "BattleDisplayAction": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "CloseCardBrowser"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "BrowseCards": {
+              "$ref": "#/definitions/CardBrowserType"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "BrowseCards"
+          ]
+        },
+        {
+          "description": "Sets the selected amount of energy to pay as an additional cost to play\na card.",
+          "type": "object",
+          "properties": {
+            "SetSelectedEnergyAdditionalCost": {
+              "$ref": "#/definitions/Energy"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SetSelectedEnergyAdditionalCost"
+          ]
+        },
+        {
+          "description": "Opens a panel based on its address.",
+          "type": "object",
+          "properties": {
+            "OpenPanel": {
+              "$ref": "#/definitions/PanelAddress"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "OpenPanel"
+          ]
+        },
+        {
+          "description": "Closes the currently open panel.",
+          "type": "string",
+          "const": "CloseCurrentPanel"
+        },
+        {
+          "description": "Toggles the visibility of the stack.",
+          "type": "string",
+          "const": "ToggleStackVisibility"
+        }
+      ]
+    },
+    "BattleId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "BattlePreviewState": {
+      "oneOf": [
+        {
+          "description": "No preview is currently active. Clear any existing preview.",
+          "type": "string",
+          "const": "None"
+        },
+        {
+          "description": "Unknown battle preview state during animation\n\nUsed to not remove the existing preview to avoid the interface jumping\naround between states.",
+          "type": "string",
+          "const": "Pending"
+        },
+        {
+          "description": "Active battle preview, e.g. when a prompt is active.",
+          "type": "object",
+          "properties": {
+            "Active": {
+              "$ref": "#/definitions/BattlePreviewView"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Active"
+          ]
+        }
+      ]
+    },
+    "BattlePreviewView": {
+      "description": "Preview of a potential future state of a battle, shown e.g. in response to a\ncard being selected to be played.",
+      "type": "object",
+      "properties": {
+        "cards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CardPreviewView"
+          }
+        },
+        "enemy": {
+          "$ref": "#/definitions/PlayerPreviewView"
+        },
+        "preview_message": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexNode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "user": {
+          "$ref": "#/definitions/PlayerPreviewView"
+        }
+      },
+      "required": [
+        "user",
+        "enemy",
+        "cards"
+      ]
+    },
+    "BattleView": {
+      "description": "Represents the visual state of an ongoing dream battle",
+      "type": "object",
+      "properties": {
+        "arrows": {
+          "description": "Arrows to display between cards",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DisplayArrow"
+          }
+        },
+        "cards": {
+          "description": "Visual state of cards in the game",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CardView"
+          }
+        },
+        "enemy": {
+          "description": "Opponent of user",
+          "allOf": [
+            {
+              "$ref": "#/definitions/PlayerView"
+            }
+          ]
+        },
+        "id": {
+          "description": "Unique identifier for this dream battle",
+          "allOf": [
+            {
+              "$ref": "#/definitions/BattleId"
+            }
+          ]
+        },
+        "interface": {
+          "description": "UI to display to the player.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/InterfaceView"
+            }
+          ]
+        },
+        "preview": {
+          "description": "Preview of the next state of the battle, used e.g. when confirming\nprompt choices.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/BattlePreviewState"
+            }
+          ]
+        },
+        "turn_number": {
+          "description": "Current turn number",
+          "allOf": [
+            {
+              "$ref": "#/definitions/TurnId"
+            }
+          ]
+        },
+        "user": {
+          "description": "Player who is operating the client",
+          "allOf": [
+            {
+              "$ref": "#/definitions/PlayerView"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "user",
+        "enemy",
+        "cards",
+        "interface",
+        "arrows",
+        "preview",
+        "turn_number"
+      ]
+    },
+    "BorderColor": {
+      "type": "object",
+      "properties": {
+        "bottom": {
+          "$ref": "#/definitions/DisplayColor"
+        },
+        "left": {
+          "$ref": "#/definitions/DisplayColor"
+        },
+        "right": {
+          "$ref": "#/definitions/DisplayColor"
+        },
+        "top": {
+          "$ref": "#/definitions/DisplayColor"
+        }
+      },
+      "required": [
+        "top",
+        "right",
+        "bottom",
+        "left"
+      ]
+    },
+    "BorderRadius": {
+      "type": "object",
+      "properties": {
+        "bottom_left": {
+          "$ref": "#/definitions/Dimension"
+        },
+        "bottom_right": {
+          "$ref": "#/definitions/Dimension"
+        },
+        "top_left": {
+          "$ref": "#/definitions/Dimension"
+        },
+        "top_right": {
+          "$ref": "#/definitions/Dimension"
+        }
+      },
+      "required": [
+        "top_left",
+        "top_right",
+        "bottom_right",
+        "bottom_left"
+      ]
+    },
+    "BorderWidth": {
+      "type": "object",
+      "properties": {
+        "bottom": {
+          "type": "number",
+          "format": "float"
+        },
+        "left": {
+          "type": "number",
+          "format": "float"
+        },
+        "right": {
+          "type": "number",
+          "format": "float"
+        },
+        "top": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "required": [
+        "top",
+        "right",
+        "bottom",
+        "left"
+      ]
+    },
+    "ButtonView": {
+      "description": "Button to perform some game action",
+      "type": "object",
+      "properties": {
+        "action": {
+          "description": "Action to perform when the button is clicked. If None is provided, the\nbutton will appear disabled.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GameAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "label"
+      ]
+    },
+    "CardActions": {
+      "type": "object",
+      "properties": {
+        "button_attachment": {
+          "description": "Button to display below this card.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ButtonView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "can_play": {
+          "description": "If this card can currently be played from hand, an action to invoke when\nplayed.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GameAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "can_select_order": {
+          "description": "If this card can currently be dragged within a Card Order Selector, the\ncard ID to use when selecting order.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/CardId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "on_click": {
+          "description": "Action to perform when this card is clicked.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GameAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "on_play_sound": {
+          "description": "Sound to play when this card is played.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/AudioClipAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "play_effect_preview": {
+          "description": "Preview of the battle state after this card is played.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/BattlePreviewView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "CardBrowserType": {
+      "type": "string",
+      "enum": [
+        "UserDeck",
+        "EnemyDeck",
+        "UserVoid",
+        "EnemyVoid",
+        "UserStatus",
+        "EnemyStatus",
+        "QuestDeck"
+      ]
+    },
+    "CardBrowserView": {
+      "type": "object",
+      "properties": {
+        "close_button": {
+          "description": "Action to perform when the close button is clicked.\n\nIf None is provided, no close button should be shown.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GameAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "CardEffects": {
+      "type": "object",
+      "properties": {
+        "looping_effect": {
+          "description": "Ongoing visual effect to display for this card.\n\nIf a previous effect with a different address is present, it will be\ndestroyed before adding this effect. If an effect with the same address\nis present, this will be ignored.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/EffectAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reverse_dissolve_on_appear": {
+          "description": "If provided, this card will play a 'fade in' reverse dissolve animation\nwhen it is first created, using the provided dissolve command. The\n'target' of the command will be ignored.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DissolveCardCommand"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "CardFacing": {
+      "description": "Whether a card is face-down or face-up",
+      "type": "string",
+      "enum": [
+        "FaceDown",
+        "FaceUp"
+      ]
+    },
+    "CardId": {
+      "type": "integer",
+      "format": "uint",
+      "minimum": 0
+    },
+    "CardOrderSelectionTarget": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "Void"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Deck": {
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Deck"
+          ]
+        }
+      ]
+    },
+    "CardOrderSelectionTargetDiscriminants": {
+      "description": "Auto-generated discriminant enum variants",
+      "type": "string",
+      "enum": [
+        "Deck",
+        "Void"
+      ]
+    },
+    "CardOrderSelectorView": {
+      "type": "object",
+      "properties": {
+        "include_deck": {
+          "description": "Include the user's deck as a card drop target",
+          "type": "boolean"
+        },
+        "include_void": {
+          "description": "Include the user's void as a card drop target",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "include_deck",
+        "include_void"
+      ]
+    },
+    "CardPrefab": {
+      "type": "string",
+      "enum": [
+        "Character",
+        "Event",
+        "Identity",
+        "Token",
+        "Dreamwell",
+        "Enemy",
+        "Dreamsign",
+        "IconCard",
+        "Journey",
+        "OfferCost"
+      ]
+    },
+    "CardPreviewView": {
+      "description": "Preview of a potential future state of a card.",
+      "type": "object",
+      "properties": {
+        "battlefield_icon": {
+          "description": "Icon to display over this card on the battlefield",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "battlefield_icon_color": {
+          "description": "Color of the battlefield icon",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DisplayColor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "card_id": {
+          "description": "Identifier for this card",
+          "type": "string"
+        },
+        "cost": {
+          "description": "New cost value for this card",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "spark": {
+          "description": "New spark value for this card",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "card_id"
+      ]
+    },
+    "CardView": {
+      "description": "Represents the visual state of a card or ability in a game",
+      "type": "object",
+      "properties": {
+        "backless": {
+          "description": "True if this card is initially revealed and thus should not play the\n'flip' animation from its back side.",
+          "type": "boolean"
+        },
+        "card_facing": {
+          "description": "Face up/face down state for this card",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CardFacing"
+            }
+          ]
+        },
+        "create_position": {
+          "description": "Optionally, a position at which to create this card.\n\nIf this card does not already exist, it will be created at this position\nbefore being animated to [Self::position].",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ObjectPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "create_sound": {
+          "description": "Optionally, a sound to play when this card is created.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/AudioClipAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "destroy_position": {
+          "description": "Optionally, a position at which to destroy this card.\n\nIf provided, the card will be animated to this position before being\ndestroyed.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ObjectPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "id": {
+          "description": "Identifier for this card",
+          "type": "string"
+        },
+        "position": {
+          "description": "Position of this card in the UI",
+          "allOf": [
+            {
+              "$ref": "#/definitions/ObjectPosition"
+            }
+          ]
+        },
+        "prefab": {
+          "description": "Represents the general category of card being displayed.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CardPrefab"
+            }
+          ]
+        },
+        "revealed": {
+          "description": "If this card is revealed to the viewer, contains information on the\nrevealed face of the card.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RevealedCardView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "revealed_to_opponents": {
+          "description": "True if this card is in a hidden zone but known to one or more opponents",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "position",
+        "revealed_to_opponents",
+        "card_facing",
+        "backless",
+        "prefab"
+      ]
+    },
+    "CharacterId": {
+      "$ref": "#/definitions/CardId"
+    },
+    "ClientLogRequest": {
+      "type": "object",
+      "properties": {
+        "entry": {
+          "$ref": "#/definitions/LogEntry"
+        }
+      },
+      "required": [
+        "entry"
+      ]
+    },
+    "ClientLogResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "success"
+      ]
+    },
+    "CloseButtonView": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "description": "Action to perform when the close button is clicked.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/GameAction"
+            }
+          ]
+        }
+      },
+      "required": [
+        "action"
+      ]
+    },
+    "Command": {
+      "description": "Represents an animated update to the visual state of the game.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "UpdateBattle": {
+              "$ref": "#/definitions/UpdateBattleCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "UpdateBattle"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "UpdateQuest": {
+              "$ref": "#/definitions/UpdateQuestCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "UpdateQuest"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Wait": {
+              "$ref": "#/definitions/Milliseconds"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Wait"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "FireProjectile": {
+              "$ref": "#/definitions/FireProjectileCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "FireProjectile"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "DissolveCard": {
+              "$ref": "#/definitions/DissolveCardCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "DissolveCard"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "DisplayGameMessage": {
+              "$ref": "#/definitions/GameMessageType"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "DisplayGameMessage"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "DisplayEffect": {
+              "$ref": "#/definitions/DisplayEffectCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "DisplayEffect"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "PlayAudioClip": {
+              "$ref": "#/definitions/PlayAudioClipCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "PlayAudioClip"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "MoveCardsWithCustomAnimation": {
+              "$ref": "#/definitions/MoveCardsWithCustomAnimationCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "MoveCardsWithCustomAnimation"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "DisplayJudgment": {
+              "$ref": "#/definitions/DisplayJudgmentCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "DisplayJudgment"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "DisplayDreamwellActivation": {
+              "$ref": "#/definitions/DisplayDreamwellActivationCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "DisplayDreamwellActivation"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "DisplayEnemyMessage": {
+              "$ref": "#/definitions/DisplayEnemyMessageCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "DisplayEnemyMessage"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "PlayStudioAnimation": {
+              "$ref": "#/definitions/PlayStudioAnimationCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "PlayStudioAnimation"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "PlayMecanimAnimation": {
+              "$ref": "#/definitions/PlayMecanimAnimationCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "PlayMecanimAnimation"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "SetCardTrail": {
+              "$ref": "#/definitions/SetCardTrailCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SetCardTrail"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ShuffleVoidIntoDeck": {
+              "$ref": "#/definitions/ShuffleVoidIntoDeckCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "ShuffleVoidIntoDeck"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "UpdateScreenOverlay": {
+              "$ref": "#/definitions/UpdateScreenOverlayCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "UpdateScreenOverlay"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "AnchorToScreenPosition": {
+              "$ref": "#/definitions/AnchorToScreenPositionCommand"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "AnchorToScreenPosition"
+          ]
+        }
+      ]
+    },
+    "CommandSequence": {
+      "description": "A list of [ParallelCommandGroup]s to execute sequentially.",
+      "type": "object",
+      "properties": {
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ParallelCommandGroup"
+          }
+        }
+      },
+      "required": [
+        "groups"
+      ]
+    },
+    "ConnectRequest": {
+      "type": "object",
+      "properties": {
+        "debug_configuration": {
+          "description": "If specified, the battle will be created with the given debug\nconfiguration.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DebugConfiguration"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "display_properties": {
+          "description": "Display properties from the client (screen dimensions, mobile device\nflag, etc.)",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DisplayProperties"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "metadata": {
+          "$ref": "#/definitions/Metadata"
+        },
+        "persistent_data_path": {
+          "description": "Contains the path to a persistent data directory.\n\nWhen you build the Unity application, a GUID is generated that is based\non the Bundle Identifier. This GUID is part of persistentDataPath. If\nyou keep the same Bundle Identifier in future versions, the application\nkeeps accessing the same location on every update.",
+          "type": "string"
+        },
+        "streaming_assets_path": {
+          "description": "Contains the path to the streaming assets directory.\n\nThis is used to load assets that are bundled with the game, such as JSON\ndata.\n\nNOTE: On Android, this will return a URL and cannot be accessed via\ndirect file system APIs.",
+          "type": "string"
+        },
+        "vs_opponent": {
+          "description": "If specified, treats this as a multiplayer game using the save file\nprovided in this ID and adds this user as a player in the battle.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/UserId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "metadata",
+        "persistent_data_path",
+        "streaming_assets_path"
+      ]
+    },
+    "ConnectResponse": {
+      "type": "object",
+      "properties": {
+        "commands": {
+          "$ref": "#/definitions/CommandSequence"
+        },
+        "metadata": {
+          "$ref": "#/definitions/Metadata"
+        },
+        "response_version": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "metadata",
+        "commands",
+        "response_version"
+      ]
+    },
+    "DebugAction": {
+      "description": "Private actions for developer use",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "RestartBattle",
+            "SetOpponentAsHuman"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ApplyTestScenarioAction": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "ApplyTestScenarioAction"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "RestartBattleWithDecks": {
+              "type": "object",
+              "properties": {
+                "one": {
+                  "$ref": "#/definitions/TestDeckName"
+                },
+                "two": {
+                  "$ref": "#/definitions/TestDeckName"
+                }
+              },
+              "required": [
+                "one",
+                "two"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "RestartBattleWithDecks"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "SetOpponentAgent": {
+              "$ref": "#/definitions/GameAI"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SetOpponentAgent"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ApplyActionList": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DebugBattleAction"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "ApplyActionList"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "CloseCurrentPanelApplyAction": {
+              "$ref": "#/definitions/DebugBattleAction"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "CloseCurrentPanelApplyAction"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "PerformOpponentAction": {
+              "$ref": "#/definitions/BattleAction"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "PerformOpponentAction"
+          ]
+        }
+      ]
+    },
+    "DebugBattleAction": {
+      "oneOf": [
+        {
+          "description": "Draw a card",
+          "type": "object",
+          "properties": {
+            "DrawCard": {
+              "type": "object",
+              "properties": {
+                "player": {
+                  "$ref": "#/definitions/PlayerName"
+                }
+              },
+              "required": [
+                "player"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "DrawCard"
+          ]
+        },
+        {
+          "description": "Set the energy of the player",
+          "type": "object",
+          "properties": {
+            "SetEnergy": {
+              "type": "object",
+              "properties": {
+                "energy": {
+                  "$ref": "#/definitions/Energy"
+                },
+                "player": {
+                  "$ref": "#/definitions/PlayerName"
+                }
+              },
+              "required": [
+                "player",
+                "energy"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SetEnergy"
+          ]
+        },
+        {
+          "description": "Set the points total of the player",
+          "type": "object",
+          "properties": {
+            "SetPoints": {
+              "type": "object",
+              "properties": {
+                "player": {
+                  "$ref": "#/definitions/PlayerName"
+                },
+                "points": {
+                  "$ref": "#/definitions/Points"
+                }
+              },
+              "required": [
+                "player",
+                "points"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SetPoints"
+          ]
+        },
+        {
+          "description": "Set the produced energy of the player",
+          "type": "object",
+          "properties": {
+            "SetProducedEnergy": {
+              "type": "object",
+              "properties": {
+                "energy": {
+                  "$ref": "#/definitions/Energy"
+                },
+                "player": {
+                  "$ref": "#/definitions/PlayerName"
+                }
+              },
+              "required": [
+                "player",
+                "energy"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SetProducedEnergy"
+          ]
+        },
+        {
+          "description": "Add a specific card to hand",
+          "type": "object",
+          "properties": {
+            "AddCardToHand": {
+              "type": "object",
+              "properties": {
+                "card": {
+                  "$ref": "#/definitions/BaseCardId"
+                },
+                "player": {
+                  "$ref": "#/definitions/PlayerName"
+                }
+              },
+              "required": [
+                "player",
+                "card"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "AddCardToHand"
+          ]
+        },
+        {
+          "description": "Add a specific card to battlefield",
+          "type": "object",
+          "properties": {
+            "AddCardToBattlefield": {
+              "type": "object",
+              "properties": {
+                "card": {
+                  "$ref": "#/definitions/BaseCardId"
+                },
+                "player": {
+                  "$ref": "#/definitions/PlayerName"
+                }
+              },
+              "required": [
+                "player",
+                "card"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "AddCardToBattlefield"
+          ]
+        },
+        {
+          "description": "Add a specific card to void",
+          "type": "object",
+          "properties": {
+            "AddCardToVoid": {
+              "type": "object",
+              "properties": {
+                "card": {
+                  "$ref": "#/definitions/BaseCardId"
+                },
+                "player": {
+                  "$ref": "#/definitions/PlayerName"
+                }
+              },
+              "required": [
+                "player",
+                "card"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "AddCardToVoid"
+          ]
+        },
+        {
+          "description": "Move all cards from hand to deck",
+          "type": "object",
+          "properties": {
+            "MoveHandToDeck": {
+              "type": "object",
+              "properties": {
+                "player": {
+                  "$ref": "#/definitions/PlayerName"
+                }
+              },
+              "required": [
+                "player"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "MoveHandToDeck"
+          ]
+        },
+        {
+          "description": "Set the number of cards remaining in a player's deck. All other cards\nare moved to the void.",
+          "type": "object",
+          "properties": {
+            "SetCardsRemainingInDeck": {
+              "type": "object",
+              "properties": {
+                "cards": {
+                  "type": "integer",
+                  "format": "uint",
+                  "minimum": 0
+                },
+                "player": {
+                  "$ref": "#/definitions/PlayerName"
+                }
+              },
+              "required": [
+                "player",
+                "cards"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SetCardsRemainingInDeck"
+          ]
+        },
+        {
+          "description": "Play a card for the opponent, with prompt choices",
+          "type": "object",
+          "properties": {
+            "OpponentPlayCard": {
+              "type": "object",
+              "properties": {
+                "card": {
+                  "$ref": "#/definitions/BaseCardId"
+                }
+              },
+              "required": [
+                "card"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "OpponentPlayCard"
+          ]
+        },
+        {
+          "description": "Cause the opponent to take a 'continue' legal action",
+          "type": "string",
+          "const": "OpponentContinue"
+        },
+        {
+          "description": "Sets the `next_index` for the dreamwell to draw the card with the\nindicated definition ID. Panics if this card is not present in the\ndreamwell.",
+          "type": "object",
+          "properties": {
+            "SetNextDreamwellCard": {
+              "type": "object",
+              "properties": {
+                "base_card_id": {
+                  "$ref": "#/definitions/DreamwellCardId"
+                }
+              },
+              "required": [
+                "base_card_id"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SetNextDreamwellCard"
+          ]
+        }
+      ]
+    },
+    "DebugConfiguration": {
+      "type": "object",
+      "properties": {
+        "deck_override": {
+          "description": "If specified, the battle will be created with the given deck for both\nplayers.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/TestDeckName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dreamwell_override": {
+          "description": "If specified, the battle will be created with the given dreamwell.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DreamwellCardIdList"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "enemy": {
+          "description": "If specified, the enemy will be this player type.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/PlayerType"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "seed": {
+          "description": "If specified, the battle will be seeded with the given value. Otherwise\na random seed will be used.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        }
+      }
+    },
+    "DeckCardSelectedOrder": {
+      "type": "object",
+      "properties": {
+        "card_id": {
+          "$ref": "#/definitions/BattleDeckCardId"
+        },
+        "target": {
+          "$ref": "#/definitions/CardOrderSelectionTarget"
+        }
+      },
+      "required": [
+        "card_id",
+        "target"
+      ]
+    },
+    "Dimension": {
+      "type": "object",
+      "properties": {
+        "unit": {
+          "$ref": "#/definitions/DimensionUnit"
+        },
+        "value": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "required": [
+        "unit",
+        "value"
+      ]
+    },
+    "DimensionGroup": {
+      "type": "object",
+      "properties": {
+        "bottom": {
+          "$ref": "#/definitions/Dimension"
+        },
+        "left": {
+          "$ref": "#/definitions/Dimension"
+        },
+        "right": {
+          "$ref": "#/definitions/Dimension"
+        },
+        "top": {
+          "$ref": "#/definitions/Dimension"
+        }
+      },
+      "required": [
+        "top",
+        "right",
+        "bottom",
+        "left"
+      ]
+    },
+    "DimensionUnit": {
+      "type": "string",
+      "enum": [
+        "Pixels",
+        "Percentage",
+        "ViewportWidth",
+        "ViewportHeight",
+        "SafeAreaTopInset",
+        "SafeAreaRightInset",
+        "SafeAreaBottomInset",
+        "SafeAreaLeftInset"
+      ]
+    },
+    "DisplayArrow": {
+      "type": "object",
+      "properties": {
+        "color": {
+          "$ref": "#/definitions/ArrowStyle"
+        },
+        "source": {
+          "$ref": "#/definitions/GameObjectId"
+        },
+        "target": {
+          "$ref": "#/definitions/GameObjectId"
+        }
+      },
+      "required": [
+        "source",
+        "target",
+        "color"
+      ]
+    },
+    "DisplayColor": {
+      "description": "Represents a color with the given RGBA values represented as floats in the\n0-1 range.",
+      "type": "object",
+      "properties": {
+        "alpha": {
+          "type": "number",
+          "format": "float"
+        },
+        "blue": {
+          "type": "number",
+          "format": "float"
+        },
+        "green": {
+          "type": "number",
+          "format": "float"
+        },
+        "red": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "required": [
+        "red",
+        "green",
+        "blue",
+        "alpha"
+      ]
+    },
+    "DisplayDreamwellActivationCommand": {
+      "type": "object",
+      "properties": {
+        "card_id": {
+          "description": "The card to display an activation for. This card will be moved from its\ncurrent position (assumed to be the 'Dreamwell' position) to the\nDreamwellActivation position, and an update to the player's produced\nenergy value will be displayed.\n\nIf there are triggered events as a result of this activation, the card\nshould be kept in the DreamwellActivation position for the next\nupdate. Otherwise it's typical to return the card to the Dreamwell\nposition.",
+          "type": "string"
+        },
+        "new_energy": {
+          "description": "New energy available to this player, if it has changed.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Energy"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "new_produced_energy": {
+          "description": "New energy produced by this player at the start of the turn, if it has\nchanged.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Energy"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "player": {
+          "description": "The player to display the dreamwell activation for.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/DisplayPlayer"
+            }
+          ]
+        }
+      },
+      "required": [
+        "player",
+        "card_id"
+      ]
+    },
+    "DisplayEffectCommand": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "description": "How long to wait before continuing with animations.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Milliseconds"
+            }
+          ]
+        },
+        "effect": {
+          "description": "The effect to display.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/EffectAddress"
+            }
+          ]
+        },
+        "scale": {
+          "description": "Local scale to apply to this effect",
+          "allOf": [
+            {
+              "$ref": "#/definitions/FlexVector3"
+            }
+          ]
+        },
+        "sound": {
+          "description": "Sound to play along with effect",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/AudioClipAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "target": {
+          "description": "The target to display the effect on.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/GameObjectId"
+            }
+          ]
+        }
+      },
+      "required": [
+        "target",
+        "effect",
+        "duration",
+        "scale"
+      ]
+    },
+    "DisplayEnemyMessageCommand": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "show_duration": {
+          "$ref": "#/definitions/Milliseconds"
+        }
+      },
+      "required": [
+        "message",
+        "show_duration"
+      ]
+    },
+    "DisplayImage": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Sprite": {
+              "$ref": "#/definitions/SpriteAddress"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Sprite"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Prefab": {
+              "$ref": "#/definitions/DisplayPrefabImage"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Prefab"
+          ]
+        }
+      ]
+    },
+    "DisplayJudgmentCommand": {
+      "type": "object",
+      "properties": {
+        "new_score": {
+          "description": "The new score for the player, if it has changed.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Points"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "player": {
+          "description": "The player to display the judgment animation for.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/DisplayPlayer"
+            }
+          ]
+        }
+      },
+      "required": [
+        "player"
+      ]
+    },
+    "DisplayPlayer": {
+      "description": "Represents a player within the context of the display layer.\n\nThe \"viewer\" is always the player operating the game client, this may\ncorrespond to either of the actual players in the game.",
+      "type": "string",
+      "enum": [
+        "User",
+        "Enemy"
+      ]
+    },
+    "DisplayPrefabImage": {
+      "type": "object",
+      "properties": {
+        "prefab": {
+          "$ref": "#/definitions/PrefabAddress"
+        },
+        "studio_type": {
+          "$ref": "#/definitions/StudioType"
+        }
+      },
+      "required": [
+        "prefab",
+        "studio_type"
+      ]
+    },
+    "DisplayProperties": {
+      "type": "object",
+      "properties": {
+        "is_mobile_device": {
+          "type": "boolean"
+        },
+        "screen_height": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "screen_width": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "screen_width",
+        "screen_height",
+        "is_mobile_device"
+      ]
+    },
+    "DisplayedTurnIndicator": {
+      "oneOf": [
+        {
+          "description": "Left indicator, indicates start of turn or main phase",
+          "type": "string",
+          "const": "Left"
+        },
+        {
+          "description": "Right indicator, indicates ending phase",
+          "type": "string",
+          "const": "Right"
+        }
+      ]
+    },
+    "DissolveCardCommand": {
+      "type": "object",
+      "properties": {
+        "color": {
+          "description": "The color to use for the dissolve effect.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/DisplayColor"
+            }
+          ]
+        },
+        "dissolve_speed": {
+          "description": "The speed multiplier of the dissolve effect. Defaults to 1.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "keep_dissolve_material": {
+          "description": "If true, the original material will NOT be restored after the dissolve\neffect completes, and the dissolve material will be used permanently.\n\nOnly applicable if 'reverse' is true. This prevents the visual\ntransition between the two materials, since they have slightly different\ncolor rendering (sprite vs world space). Use this when applying a\nreverse dissolve to a card rendering in sprite mode.",
+          "type": "boolean"
+        },
+        "material": {
+          "description": "The material to use for the dissolve effect.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/MaterialAddress"
+            }
+          ]
+        },
+        "reverse": {
+          "description": "If true, dissolve will be played backwards to \"create\" the card.",
+          "type": "boolean"
+        },
+        "sound": {
+          "description": "Sound to play",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/AudioClipAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "start_delay": {
+          "description": "The delay before starting the dissolve effect.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Milliseconds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "target": {
+          "description": "The card to dissolve.\n\nOnce a card is dissolved, it will be invisible until a reverse dissolve\nis applied to it.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "target",
+        "material",
+        "reverse",
+        "color",
+        "keep_dissolve_material"
+      ]
+    },
+    "DraggableNode": {
+      "type": "object",
+      "properties": {
+        "custom_drag_indicator": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexNode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "drop_target_identifiers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hide_indicator_children": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "horizontal_drag_start_distance": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "on_drag_detected": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GameAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "on_drop": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GameAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "over_target_indicator": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexNode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "remove_original": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "drop_target_identifiers",
+        "hide_indicator_children"
+      ]
+    },
+    "DreamwellCardId": {
+      "description": "Identifies a dreamwell card.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "DreamwellCardIdList": {
+      "description": "Identifies a predefined list of dreamwell_card_id cards.",
+      "type": "string",
+      "enum": [
+        "TestDreamwellNoAbilities",
+        "TestDreamwellBasic5",
+        "DreamwellBasic5"
+      ]
+    },
+    "EasingMode": {
+      "type": "string",
+      "enum": [
+        "Ease",
+        "EaseIn",
+        "EaseOut",
+        "EaseInOut",
+        "Linear",
+        "EaseInSine",
+        "EaseOutSine",
+        "EaseInOutSine",
+        "EaseInCubic",
+        "EaseOutCubic",
+        "EaseInOutCubic",
+        "EaseInCirc",
+        "EaseOutCirc",
+        "EaseInOutCirc",
+        "EaseInElastic",
+        "EaseOutElastic",
+        "EaseInOutElastic",
+        "EaseInBack",
+        "EaseOutBack",
+        "EaseInOutBack",
+        "EaseInBounce",
+        "EaseOutBounce",
+        "EaseInOutBounce"
+      ]
+    },
+    "EffectAddress": {
+      "type": "object",
+      "properties": {
+        "effect": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "effect"
+      ]
+    },
+    "Energy": {
+      "description": "A resource used to pay for cards & abilities.",
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "Essence": {
+      "description": "Currency used during quests.",
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "EventHandlers": {
+      "type": "object",
+      "properties": {
+        "on_click": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GameAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "on_field_changed": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GameAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "on_long_press": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GameAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "on_mouse_down": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GameAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "on_mouse_enter": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GameAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "on_mouse_leave": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GameAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "on_mouse_up": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GameAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "FireProjectileCommand": {
+      "type": "object",
+      "properties": {
+        "additional_hit": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/EffectAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "additional_hit_delay": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Milliseconds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fire_sound": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/AudioClipAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hide_on_hit": {
+          "type": "boolean"
+        },
+        "impact_sound": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/AudioClipAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "jump_to_position": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ObjectPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "projectile": {
+          "$ref": "#/definitions/ProjectileAddress"
+        },
+        "scale_override": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "source_id": {
+          "$ref": "#/definitions/GameObjectId"
+        },
+        "target_id": {
+          "$ref": "#/definitions/GameObjectId"
+        },
+        "travel_duration": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Milliseconds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "wait_duration": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Milliseconds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "source_id",
+        "target_id",
+        "projectile",
+        "hide_on_hit"
+      ]
+    },
+    "FlexAlign": {
+      "type": "string",
+      "enum": [
+        "Auto",
+        "FlexStart",
+        "Center",
+        "FlexEnd",
+        "Stretch"
+      ]
+    },
+    "FlexDirection": {
+      "type": "string",
+      "enum": [
+        "Column",
+        "ColumnReverse",
+        "Row",
+        "RowReverse"
+      ]
+    },
+    "FlexDisplayStyle": {
+      "type": "string",
+      "enum": [
+        "Flex",
+        "None"
+      ]
+    },
+    "FlexGrow": {
+      "type": "number",
+      "format": "float"
+    },
+    "FlexInsets": {
+      "type": "object",
+      "properties": {
+        "bottom": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "left": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "right": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "top": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "FlexJustify": {
+      "type": "string",
+      "enum": [
+        "FlexStart",
+        "Center",
+        "FlexEnd",
+        "SpaceBetween",
+        "SpaceAround"
+      ]
+    },
+    "FlexNode": {
+      "type": "object",
+      "properties": {
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FlexNode"
+          }
+        },
+        "event_handlers": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/EventHandlers"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hover_style": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexStyle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "node_type": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/NodeType"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "on_attach_style": {
+          "description": "Style to apply to the element when it is first attached to a panel.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexStyle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "on_attach_style_duration": {
+          "description": "How long to keep the `on_attach_style` applied.\n\nIf not specified, the style will be applied indefinitely.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Milliseconds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pressed_style": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexStyle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexStyle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "children"
+      ]
+    },
+    "FlexPickingMode": {
+      "type": "string",
+      "enum": [
+        "Position",
+        "Ignore"
+      ]
+    },
+    "FlexPosition": {
+      "type": "string",
+      "enum": [
+        "Relative",
+        "Absolute"
+      ]
+    },
+    "FlexRotate": {
+      "type": "object",
+      "properties": {
+        "degrees": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "required": [
+        "degrees"
+      ]
+    },
+    "FlexScale": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/FlexVector3"
+        }
+      },
+      "required": [
+        "amount"
+      ]
+    },
+    "FlexShrink": {
+      "type": "number",
+      "format": "float"
+    },
+    "FlexStyle": {
+      "type": "object",
+      "properties": {
+        "align_content": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexAlign"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "align_items": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexAlign"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "align_self": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexAlign"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "background_color": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DisplayColor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "background_image": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SpriteAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "background_image_tint_color": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DisplayColor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "border_color": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/BorderColor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "border_radius": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/BorderRadius"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "border_width": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/BorderWidth"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "color": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DisplayColor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "display": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexDisplayStyle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "flex_basis": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "flex_direction": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexDirection"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "flex_grow": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexGrow"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "flex_shrink": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexShrink"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "font": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FontAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "font_size": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "font_style": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FontStyle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "height": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "image_slice": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ImageSlice"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "inset": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexInsets"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "justify_content": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexJustify"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "letter_spacing": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "margin": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DimensionGroup"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "max_height": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "max_width": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "min_height": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "min_width": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "opacity": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Opacity"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "overflow": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexVisibility"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "overflow_clip_box": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/OverflowClipBox"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "padding": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DimensionGroup"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "paragraph_spacing": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "picking_mode": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexPickingMode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "position": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rotate": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexRotate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scale": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexScale"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text_align": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/TextAlign"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text_outline_color": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DisplayColor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text_outline_width": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "text_overflow": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/TextOverflow"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text_overflow_position": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/TextOverflowPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text_shadow": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/TextShadow"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "transform_origin": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexTranslate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "transition_delays": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Milliseconds"
+          }
+        },
+        "transition_durations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Milliseconds"
+          }
+        },
+        "transition_easing_modes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EasingMode"
+          }
+        },
+        "transition_properties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "translate": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexTranslate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "visibility": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexVisibility"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "white_space": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/WhiteSpace"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "width": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "word_spacing": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Dimension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "wrap": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexWrap"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "transition_delays",
+        "transition_durations",
+        "transition_properties",
+        "transition_easing_modes"
+      ]
+    },
+    "FlexTranslate": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "$ref": "#/definitions/Dimension"
+        },
+        "y": {
+          "$ref": "#/definitions/Dimension"
+        },
+        "z": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z"
+      ]
+    },
+    "FlexVector2": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "format": "float"
+        },
+        "y": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ]
+    },
+    "FlexVector3": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "format": "float"
+        },
+        "y": {
+          "type": "number",
+          "format": "float"
+        },
+        "z": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z"
+      ]
+    },
+    "FlexVisibility": {
+      "type": "string",
+      "enum": [
+        "Visible",
+        "Hidden"
+      ]
+    },
+    "FlexWrap": {
+      "type": "string",
+      "enum": [
+        "NoWrap",
+        "Wrap",
+        "WrapReverse"
+      ]
+    },
+    "FontAddress": {
+      "type": "object",
+      "properties": {
+        "font": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "font"
+      ]
+    },
+    "FontStyle": {
+      "type": "string",
+      "enum": [
+        "Normal",
+        "Bold",
+        "Italic",
+        "BoldAndItalic"
+      ]
+    },
+    "GameAI": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "AlwaysPanic",
+            "FirstAvailableAction",
+            "RandomAction",
+            "WaitFiveSeconds"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "MonteCarlo": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "MonteCarlo"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "MonteCarloSingleThreaded": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "MonteCarloSingleThreaded"
+          ]
+        }
+      ]
+    },
+    "GameAction": {
+      "description": "All possible user interface actions",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "NoOp"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "DebugAction": {
+              "$ref": "#/definitions/DebugAction"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "DebugAction"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "BattleAction": {
+              "$ref": "#/definitions/BattleAction"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "BattleAction"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "BattleDisplayAction": {
+              "$ref": "#/definitions/BattleDisplayAction"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "BattleDisplayAction"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Undo": {
+              "$ref": "#/definitions/PlayerName"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Undo"
+          ]
+        }
+      ]
+    },
+    "GameMessageType": {
+      "type": "string",
+      "enum": [
+        "YourTurn",
+        "EnemyTurn",
+        "Victory",
+        "Defeat"
+      ]
+    },
+    "GameObjectId": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "CardId": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "CardId"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Deck": {
+              "$ref": "#/definitions/DisplayPlayer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Deck"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Void": {
+              "$ref": "#/definitions/DisplayPlayer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Void"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Avatar": {
+              "$ref": "#/definitions/DisplayPlayer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Avatar"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "QuestObject": {
+              "$ref": "#/definitions/QuestObjectId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "QuestObject"
+          ]
+        }
+      ]
+    },
+    "HandCardId": {
+      "$ref": "#/definitions/CardId"
+    },
+    "ImageSlice": {
+      "type": "object",
+      "properties": {
+        "bottom": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "left": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "right": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "top": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "top",
+        "right",
+        "bottom",
+        "left"
+      ]
+    },
+    "InfoZoomData": {
+      "type": "object",
+      "properties": {
+        "icons": {
+          "description": "Icons to display on other cards during info zoom, e.g. indicating\ntargets.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InfoZoomIcon"
+          }
+        },
+        "supplemental_card_info": {
+          "description": "Additional help text about this card, describing its abilities.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexNode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "icons"
+      ]
+    },
+    "InfoZoomIcon": {
+      "type": "object",
+      "properties": {
+        "card_id": {
+          "type": "string"
+        },
+        "color": {
+          "$ref": "#/definitions/DisplayColor"
+        },
+        "icon": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "card_id",
+        "icon",
+        "color"
+      ]
+    },
+    "InterfaceView": {
+      "description": "User interaction options",
+      "type": "object",
+      "properties": {
+        "browser": {
+          "description": "Options for displaying the card browser",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/CardBrowserView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "card_order_selector": {
+          "description": "Options for display of the card order selector",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/CardOrderSelectorView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decrement_button": {
+          "description": "Button to decrement the number shown in a number prompt.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ButtonView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dev_button": {
+          "description": "Button to toggle the display of the developer panel",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ButtonView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "has_open_panels": {
+          "description": "Whether any panels are currently open",
+          "type": "boolean"
+        },
+        "increment_button": {
+          "description": "Button to increment the number shown in a number prompt.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ButtonView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "primary_action_button": {
+          "description": "Primary action button, used for confirming selections and ending the\nturn. None indicates no button should be shown.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ButtonView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "primary_action_show_on_idle_duration": {
+          "description": "If provided, when the primary action button is not visible, the button\nwill wait for this duration after the last \"update\" before appearing. If\nthis is None the button will display immediately.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Milliseconds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "screen_overlay": {
+          "description": "Content to display on top of all other game UI.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexNode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "secondary_action_button": {
+          "description": "Secondary action button, used for alternative choice options.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ButtonView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "undo_button": {
+          "description": "Button to perform an undo operation",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ButtonView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "has_open_panels"
+      ]
+    },
+    "LogEntry": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Event": {
+              "type": "object",
+              "properties": {
+                "log_type": {
+                  "$ref": "#/definitions/LogType"
+                },
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "log_type",
+                "message"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Event"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "EventSpan": {
+              "type": "object",
+              "properties": {
+                "entries": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/LogEntry"
+                  }
+                },
+                "name": {
+                  "$ref": "#/definitions/LogSpanName"
+                }
+              },
+              "required": [
+                "name",
+                "entries"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "EventSpan"
+          ]
+        }
+      ]
+    },
+    "LogSpanName": {
+      "type": "string",
+      "enum": [
+        "Untagged",
+        "Connect",
+        "PerformAction",
+        "Poll",
+        "ApplyCommands",
+        "ApplyCommandGroup",
+        "UpdateBattleLayout"
+      ]
+    },
+    "LogType": {
+      "type": "string",
+      "enum": [
+        "Warning",
+        "Error",
+        "Info",
+        "Debug"
+      ]
+    },
+    "MaterialAddress": {
+      "type": "object",
+      "properties": {
+        "material": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "material"
+      ]
+    },
+    "MecanimParameter": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "TriggerParam": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "TriggerParam"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "BoolParam": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "name",
+                "value"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "BoolParam"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "IntParam": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "required": [
+                "name",
+                "value"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "IntParam"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "FloatParam": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "number",
+                  "format": "float"
+                }
+              },
+              "required": [
+                "name",
+                "value"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "FloatParam"
+          ]
+        }
+      ]
+    },
+    "Metadata": {
+      "type": "object",
+      "properties": {
+        "battle_id": {
+          "description": "ID of the current battle.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/BattleId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "integration_test_id": {
+          "description": "If specified, the request is part of an integration test with the given\nID. State will not be persisted.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "request_id": {
+          "description": "Identifies the request from the client.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "user_id": {
+          "description": "ID of the user making the request.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/UserId"
+            }
+          ]
+        }
+      },
+      "required": [
+        "user_id"
+      ]
+    },
+    "Milliseconds": {
+      "type": "object",
+      "properties": {
+        "milliseconds_value": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "milliseconds_value"
+      ]
+    },
+    "ModelEffectChoiceIndex": {
+      "description": "Identifies a [ModalEffectChoice] in a [Effect::Modal].",
+      "type": "integer",
+      "format": "uint",
+      "minimum": 0
+    },
+    "MoveCardsCustomAnimation": {
+      "description": "Animation to perform when moving cards",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "DefaultAnimation",
+            "ShowAtDrawnCardsPosition",
+            "ShowInDraftPickLayout",
+            "ShowInShopLayout",
+            "HideShopLayout"
+          ]
+        },
+        {
+          "description": "Animates card views in `cards` to the quest deck if they are specified\nas being in the quest deck position. Animates all other views in `cards`\nto the destroyed position.",
+          "type": "string",
+          "const": "MoveToQuestDeckOrDestroy"
+        },
+        {
+          "description": "Animates card views in `cards` to the dreamsign display if they are\nspecified as being in the dreamsign display position. Animates all\nother views in `cards` to the destroyed position.",
+          "type": "string",
+          "const": "MoveToDreamsignDisplayOrDestroy"
+        }
+      ]
+    },
+    "MoveCardsWithCustomAnimationCommand": {
+      "type": "object",
+      "properties": {
+        "animation": {
+          "$ref": "#/definitions/MoveCardsCustomAnimation"
+        },
+        "card_trail": {
+          "description": "If provided, a card trail will be displayed on the moving cards.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ProjectileAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cards": {
+          "description": "Cards to move. Must already be present in the game.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CardView"
+          }
+        },
+        "destination": {
+          "description": "Destination position to move the cards to",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Position"
+            }
+          ]
+        },
+        "pause_duration": {
+          "description": "Time used by some animations to display each card before moving it to\nfinal destination.\n\nShould be less than stagger_interval for best results.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Milliseconds"
+            }
+          ]
+        },
+        "stagger_interval": {
+          "description": "Time to wait between moving subsequent cards.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Milliseconds"
+            }
+          ]
+        }
+      },
+      "required": [
+        "animation",
+        "cards",
+        "stagger_interval",
+        "pause_duration",
+        "destination"
+      ]
+    },
+    "NodeType": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Text": {
+              "$ref": "#/definitions/TextNode"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Text"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "TypewriterTextNode": {
+              "$ref": "#/definitions/TypewriterTextNode"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "TypewriterTextNode"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ScrollViewNode": {
+              "$ref": "#/definitions/ScrollViewNode"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "ScrollViewNode"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "DraggableNode": {
+              "$ref": "#/definitions/DraggableNode"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "DraggableNode"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "TextFieldNode": {
+              "$ref": "#/definitions/TextFieldNode"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "TextFieldNode"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "SliderNode": {
+              "$ref": "#/definitions/SliderNode"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SliderNode"
+          ]
+        }
+      ]
+    },
+    "ObjectPosition": {
+      "description": "Represents the position of some object in the UI",
+      "type": "object",
+      "properties": {
+        "position": {
+          "description": "Position category",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Position"
+            }
+          ]
+        },
+        "sorting_key": {
+          "description": "Sorting key, determines order within the position",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "position",
+        "sorting_key"
+      ]
+    },
+    "Opacity": {
+      "type": "number",
+      "format": "float"
+    },
+    "OverflowClipBox": {
+      "type": "string",
+      "enum": [
+        "PaddingBox",
+        "ContentBox"
+      ]
+    },
+    "PanelAddress": {
+      "description": "Identifies a window on screen containing UI elements",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "Developer",
+            "SetOpponentAgent",
+            "AddCardToHand",
+            "PlayOpponentCard"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ViewLogs": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "ViewLogs"
+          ]
+        }
+      ]
+    },
+    "ParallelCommandGroup": {
+      "description": "A set of [Command]s to execute simultaneously.",
+      "type": "object",
+      "properties": {
+        "commands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Command"
+          }
+        }
+      },
+      "required": [
+        "commands"
+      ]
+    },
+    "PerformActionRequest": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "$ref": "#/definitions/GameAction"
+        },
+        "last_response_version": {
+          "description": "The version of the last response the client received, used to prevent\nduplicate actions.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "metadata": {
+          "$ref": "#/definitions/Metadata"
+        },
+        "save_file_id": {
+          "description": "If specified, treats this as a multiplayer game using the save file\nprovided in this ID instead of reading the user's own save file.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/UserId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "metadata",
+        "action"
+      ]
+    },
+    "PerformActionResponse": {
+      "type": "object",
+      "properties": {
+        "commands": {
+          "$ref": "#/definitions/CommandSequence"
+        },
+        "metadata": {
+          "$ref": "#/definitions/Metadata"
+        }
+      },
+      "required": [
+        "metadata",
+        "commands"
+      ]
+    },
+    "PlayAudioClipCommand": {
+      "type": "object",
+      "properties": {
+        "pause_duration": {
+          "description": "How long to pause before continuing with animations.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Milliseconds"
+            }
+          ]
+        },
+        "sound": {
+          "description": "Sound to play",
+          "allOf": [
+            {
+              "$ref": "#/definitions/AudioClipAddress"
+            }
+          ]
+        }
+      },
+      "required": [
+        "sound",
+        "pause_duration"
+      ]
+    },
+    "PlayMecanimAnimationCommand": {
+      "type": "object",
+      "properties": {
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MecanimParameter"
+          }
+        },
+        "site_id": {
+          "$ref": "#/definitions/SiteId"
+        }
+      },
+      "required": [
+        "site_id",
+        "parameters"
+      ]
+    },
+    "PlayStudioAnimationCommand": {
+      "type": "object",
+      "properties": {
+        "animation": {
+          "$ref": "#/definitions/StudioAnimation"
+        },
+        "enter_animation": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/StudioAnimation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exit_animation": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/StudioAnimation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "studio_type": {
+          "$ref": "#/definitions/StudioType"
+        }
+      },
+      "required": [
+        "studio_type",
+        "animation"
+      ]
+    },
+    "PlayerName": {
+      "description": "Identifies a player in an ongoing battle.",
+      "type": "string",
+      "enum": [
+        "One",
+        "Two"
+      ]
+    },
+    "PlayerPreviewView": {
+      "description": "Preview of a potential future state of a player",
+      "type": "object",
+      "properties": {
+        "energy": {
+          "description": "New energy available to this player",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Energy"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "produced_energy": {
+          "description": "New energy produced total",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Energy"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "score": {
+          "description": "New score total",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Points"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "total_spark": {
+          "description": "New total spark for this player",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Spark"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "PlayerType": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "User": {
+              "$ref": "#/definitions/UserId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "User"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Agent": {
+              "$ref": "#/definitions/GameAI"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Agent"
+          ]
+        }
+      ]
+    },
+    "PlayerView": {
+      "description": "Represents the visual state of a player in a game",
+      "type": "object",
+      "properties": {
+        "can_act": {
+          "description": "Can this player currently take a game action?",
+          "type": "boolean"
+        },
+        "energy": {
+          "description": "Energy available to this player",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Energy"
+            }
+          ]
+        },
+        "is_victory_imminent": {
+          "description": "Will this player win the game in their next judgment phase?",
+          "type": "boolean"
+        },
+        "produced_energy": {
+          "description": "Energy produced by this player at the start of the current turn",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Energy"
+            }
+          ]
+        },
+        "score": {
+          "description": "Current score total",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Points"
+            }
+          ]
+        },
+        "total_spark": {
+          "description": "Total spark for this player",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Spark"
+            }
+          ]
+        },
+        "turn_indicator": {
+          "description": "Indicates whether it is this player's turn, and if so, which phase of\nthe turn they are in.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DisplayedTurnIndicator"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "score",
+        "can_act",
+        "energy",
+        "produced_energy",
+        "total_spark",
+        "is_victory_imminent"
+      ]
+    },
+    "Points": {
+      "description": "Victory points. Enable the player to win the game.",
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "PollRequest": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/Metadata"
+        }
+      },
+      "required": [
+        "metadata"
+      ]
+    },
+    "PollResponse": {
+      "type": "object",
+      "properties": {
+        "commands": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/CommandSequence"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "metadata": {
+          "$ref": "#/definitions/Metadata"
+        },
+        "response_type": {
+          "$ref": "#/definitions/PollResponseType"
+        },
+        "response_version": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "metadata",
+        "response_type"
+      ]
+    },
+    "PollResponseType": {
+      "type": "string",
+      "enum": [
+        "None",
+        "Incremental",
+        "Final"
+      ]
+    },
+    "Position": {
+      "description": "Possible types of display positions",
+      "oneOf": [
+        {
+          "description": "Object position used in interface elements like the deck viewer which\ndon't rely on game positioning.",
+          "type": "string",
+          "const": "Default"
+        },
+        {
+          "description": "Object is not visible.",
+          "type": "string",
+          "const": "Offscreen"
+        },
+        {
+          "description": "Object is on the stack, typically used by cards which were just played.\n\nThere are four types of stacks. By default, cards display at a large\ndisplay size, blocking the view of the battlefield. However, if any\ncards are present on the stack which target a character on the\nbattlefield, the cards are displayed at a smaller size in order to\nenable viewing & selecting targets appropriately, based on the set of\ncards which are current or eligible targets.",
+          "type": "object",
+          "properties": {
+            "OnStack": {
+              "$ref": "#/definitions/StackType"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "OnStack"
+          ]
+        },
+        {
+          "description": "Position for cards to be shown to the user immediately after they're\ndrawn.",
+          "type": "string",
+          "const": "Drawn"
+        },
+        {
+          "description": "Object is in a player's hand",
+          "type": "object",
+          "properties": {
+            "InHand": {
+              "$ref": "#/definitions/DisplayPlayer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "InHand"
+          ]
+        },
+        {
+          "description": "Object is shuffled into a player's deck",
+          "type": "object",
+          "properties": {
+            "InDeck": {
+              "$ref": "#/definitions/DisplayPlayer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "InDeck"
+          ]
+        },
+        {
+          "description": "Object is in a player's void",
+          "type": "object",
+          "properties": {
+            "InVoid": {
+              "$ref": "#/definitions/DisplayPlayer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "InVoid"
+          ]
+        },
+        {
+          "description": "Object is in this player's banished zone",
+          "type": "object",
+          "properties": {
+            "InBanished": {
+              "$ref": "#/definitions/DisplayPlayer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "InBanished"
+          ]
+        },
+        {
+          "description": "Object is on the battlefield",
+          "type": "object",
+          "properties": {
+            "OnBattlefield": {
+              "$ref": "#/definitions/DisplayPlayer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "OnBattlefield"
+          ]
+        },
+        {
+          "description": "Object is in a player's status zone",
+          "type": "object",
+          "properties": {
+            "InPlayerStatus": {
+              "$ref": "#/definitions/DisplayPlayer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "InPlayerStatus"
+          ]
+        },
+        {
+          "description": "Object is being displayed in a card browser, e.g. to select from a list\nof cards while searching",
+          "type": "string",
+          "const": "Browser"
+        },
+        {
+          "description": "Object is being displayed in a selector to determine the order of cards,\ne.g. when resolving the \"forsee\" effect.",
+          "type": "object",
+          "properties": {
+            "CardOrderSelector": {
+              "$ref": "#/definitions/CardOrderSelectionTargetDiscriminants"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "CardOrderSelector"
+          ]
+        },
+        {
+          "description": "Object is in a temporary holding space for cards in hand while resolving\nsome other 'play card' ability.",
+          "type": "string",
+          "const": "HandStorage"
+        },
+        {
+          "description": "Object is in the dreamwell for a player (usually off-screen).",
+          "type": "object",
+          "properties": {
+            "InDreamwell": {
+              "$ref": "#/definitions/DisplayPlayer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "InDreamwell"
+          ]
+        },
+        {
+          "description": "Object is in a position to display itself as part of a dreamwell\nactivation.",
+          "type": "string",
+          "const": "DreamwellActivation"
+        },
+        {
+          "description": "Object is hidden within a card",
+          "type": "object",
+          "properties": {
+            "HiddenWithinCard": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "HiddenWithinCard"
+          ]
+        },
+        {
+          "description": "Object describes a game modifier or ongoing game effect",
+          "type": "string",
+          "const": "GameModifier"
+        },
+        {
+          "description": "Object is in the on-screen storage area, used to hold objects at a small\nsize when they're not being focused on, e.g. when the user hides a\ncard browser to get a better view of the battlefield.",
+          "type": "string",
+          "const": "OnScreenStorage"
+        },
+        {
+          "description": "Object is above the void, used to display void cards which are currently\nbeing targeted.",
+          "type": "object",
+          "properties": {
+            "AboveVoid": {
+              "$ref": "#/definitions/DisplayPlayer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "AboveVoid"
+          ]
+        },
+        {
+          "description": "User deck displayed in the quest view",
+          "type": "string",
+          "const": "QuestDeck"
+        },
+        {
+          "description": "User identity card displayed in the quest view",
+          "type": "string",
+          "const": "QuestUserIdentityCard"
+        },
+        {
+          "description": "Quest deck is open, showing all cards in a large scrollable format.",
+          "type": "string",
+          "const": "QuestDeckBrowser"
+        },
+        {
+          "description": "Object is hidden after being destroyed during a quest, for example when\nnot selected for a draft pick.",
+          "type": "string",
+          "const": "DestroyedQuestCards"
+        },
+        {
+          "description": "Dreamsigns owned by the player in a quest",
+          "type": "string",
+          "const": "DreamsignDisplay"
+        },
+        {
+          "description": "Object is in a deck of cards displayed at a given dreamscape site, e.g.\nbefore being drafted.",
+          "type": "object",
+          "properties": {
+            "SiteDeck": {
+              "$ref": "#/definitions/SiteId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SiteDeck"
+          ]
+        },
+        {
+          "description": "Object is being displayed in the possession of an NPC at a given\ndreamscape site (prior to animation to the display), e.g. a merchant.",
+          "type": "object",
+          "properties": {
+            "SiteNpc": {
+              "$ref": "#/definitions/SiteId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SiteNpc"
+          ]
+        },
+        {
+          "description": "Object is being displayed as a potential draft pick choice",
+          "type": "string",
+          "const": "DraftPickDisplay"
+        },
+        {
+          "description": "Object is being displayed in the shop interface",
+          "type": "string",
+          "const": "ShopDisplay"
+        },
+        {
+          "description": "Object is being displayed as an option in a journey choice.",
+          "type": "string",
+          "const": "JourneyDisplay"
+        },
+        {
+          "description": "Object is being displayed as an option in a tempting offer choice.",
+          "type": "object",
+          "properties": {
+            "TemptingOfferDisplay": {
+              "$ref": "#/definitions/TemptingOfferPosition"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "TemptingOfferDisplay"
+          ]
+        },
+        {
+          "description": "Object is being displayed prominently, applying an effect to the\ncurrently active quest. Similar to a card being on the stack during a\nbattle.",
+          "type": "string",
+          "const": "QuestEffect"
+        },
+        {
+          "description": "Object is being displayed at the origin position of a battle at the\ngiven site.",
+          "type": "object",
+          "properties": {
+            "StartBattleCardOrigin": {
+              "$ref": "#/definitions/SiteId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "StartBattleCardOrigin"
+          ]
+        },
+        {
+          "description": "Object is being displayed as one of the identity cards participating in\na battle.",
+          "type": "object",
+          "properties": {
+            "StartBattleDisplay": {
+              "$ref": "#/definitions/StartBattleDisplayType"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "StartBattleDisplay"
+          ]
+        }
+      ]
+    },
+    "PrefabAddress": {
+      "type": "object",
+      "properties": {
+        "prefab": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "prefab"
+      ]
+    },
+    "ProjectileAddress": {
+      "type": "object",
+      "properties": {
+        "projectile": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "projectile"
+      ]
+    },
+    "QuestId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "QuestObjectId": {
+      "type": "string",
+      "enum": [
+        "EssenceTotal",
+        "QuestDeck"
+      ]
+    },
+    "QuestView": {
+      "description": "Represents the visual state of a dream quest",
+      "type": "object",
+      "properties": {
+        "cards": {
+          "description": "Cards which are currently being displayed",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CardView"
+          }
+        },
+        "close_site_button": {
+          "description": "If present, a button should be displayed to exit the currently open\nsite.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/CloseButtonView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "essence_total": {
+          "description": "Total essence available to the player.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Essence"
+            }
+          ]
+        },
+        "id": {
+          "description": "Unique identifier for this quest",
+          "allOf": [
+            {
+              "$ref": "#/definitions/QuestId"
+            }
+          ]
+        },
+        "interface": {
+          "description": "UI to display to the player.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/InterfaceView"
+            }
+          ]
+        },
+        "sites": {
+          "description": "Sites which can be visited within the currently-active dreamscape.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SiteView"
+          }
+        },
+        "tempting_offer": {
+          "description": "State for the 'tempting offer' view.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/TemptingOfferView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "cards",
+        "interface",
+        "sites",
+        "essence_total"
+      ]
+    },
+    "RevealedCardView": {
+      "description": "Visual state of a revealed card",
+      "type": "object",
+      "properties": {
+        "actions": {
+          "description": "Actions available for this card",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CardActions"
+            }
+          ]
+        },
+        "card_type": {
+          "description": "Type or subtype of this card",
+          "type": "string"
+        },
+        "cost": {
+          "description": "Cost of this card",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "effects": {
+          "description": "Special effects to display for this card",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CardEffects"
+            }
+          ]
+        },
+        "image": {
+          "description": "Image for this card",
+          "allOf": [
+            {
+              "$ref": "#/definitions/DisplayImage"
+            }
+          ]
+        },
+        "info_zoom_data": {
+          "description": "Data providing supplemental information about this card on long\npress/hover.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InfoZoomData"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "is_fast": {
+          "description": "True if this card can be played during the opponent's turn",
+          "type": "boolean"
+        },
+        "name": {
+          "description": "Name of this card",
+          "type": "string"
+        },
+        "outline_color": {
+          "description": "Outline color of this card",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DisplayColor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "produced": {
+          "description": "Energy produced by this card",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rules_text": {
+          "description": "Rules text to display for this car",
+          "type": "string"
+        },
+        "spark": {
+          "description": "Spark value for this card",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "image",
+        "name",
+        "card_type",
+        "rules_text",
+        "is_fast",
+        "actions",
+        "effects"
+      ]
+    },
+    "ScreenAnchor": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "SiteCharacter": {
+              "$ref": "#/definitions/SiteId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SiteCharacter"
+          ]
+        }
+      ]
+    },
+    "ScrollBar": {
+      "type": "object",
+      "properties": {
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexStyle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ScrollBarVisibility": {
+      "type": "string",
+      "enum": [
+        "Auto",
+        "AlwaysVisible",
+        "Hidden"
+      ]
+    },
+    "ScrollViewNode": {
+      "type": "object",
+      "properties": {
+        "elasticity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "horizontal_page_size": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "horizontal_scroll_bar": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ScrollBar"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "horizontal_scroll_bar_visibility": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ScrollBarVisibility"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mouse_wheel_scroll_size": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "scroll_deceleration_rate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "touch_scroll_behavior": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/TouchScrollBehavior"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "vertical_page_size": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "vertical_scroll_bar": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ScrollBar"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "vertical_scroll_bar_visibility": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ScrollBarVisibility"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "SetCardTrailCommand": {
+      "type": "object",
+      "properties": {
+        "card_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "duration": {
+          "$ref": "#/definitions/Milliseconds"
+        },
+        "trail": {
+          "$ref": "#/definitions/ProjectileAddress"
+        }
+      },
+      "required": [
+        "card_ids",
+        "trail",
+        "duration"
+      ]
+    },
+    "ShuffleVoidIntoDeckCommand": {
+      "type": "object",
+      "properties": {
+        "player": {
+          "$ref": "#/definitions/DisplayPlayer"
+        }
+      },
+      "required": [
+        "player"
+      ]
+    },
+    "SiteId": {
+      "description": "Identifies a location with an effect within a dreamscape.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "SiteView": {
+      "description": "Represents the visual state of a site within a dreamscape",
+      "type": "object",
+      "properties": {
+        "icon": {
+          "description": "Icon representing this site",
+          "type": "string"
+        },
+        "id": {
+          "description": "Unique identifier for this site",
+          "allOf": [
+            {
+              "$ref": "#/definitions/SiteId"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "icon"
+      ]
+    },
+    "SliderDirection": {
+      "type": "string",
+      "enum": [
+        "Horizontal",
+        "Vertical"
+      ]
+    },
+    "SliderNode": {
+      "type": "object",
+      "properties": {
+        "direction": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SliderDirection"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "drag_container_style": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexStyle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dragger_border_style": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexStyle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dragger_style": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexStyle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "high_value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "initial_value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "inverted": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label_style": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexStyle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "low_value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "page_size": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "preference_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "show_input_field": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "tracker_style": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexStyle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "Spark": {
+      "description": "Represents the 'power' of characters; the primary way in which players earn\nvictory points.",
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "SpriteAddress": {
+      "type": "object",
+      "properties": {
+        "sprite": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sprite"
+      ]
+    },
+    "StackCardId": {
+      "$ref": "#/definitions/CardId"
+    },
+    "StackType": {
+      "type": "string",
+      "enum": [
+        "Default",
+        "TargetingUserBattlefield",
+        "TargetingEnemyBattlefield",
+        "TargetingBothBattlefields"
+      ]
+    },
+    "StartBattleDisplayType": {
+      "type": "string",
+      "enum": [
+        "UserIdentityCard",
+        "EnemyIdentityCard",
+        "UserDreamsigns",
+        "EnemyDreamsigns"
+      ]
+    },
+    "StudioAnimation": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "StudioType": {
+      "type": "string",
+      "enum": [
+        "UserStatus",
+        "EnemyStatus",
+        "UserIdentityCard",
+        "EnemyIdentityCard"
+      ]
+    },
+    "TemptingOfferAction": {
+      "type": "object",
+      "properties": {
+        "button": {
+          "description": "Button to display to accept this offer.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/ButtonView"
+            }
+          ]
+        },
+        "number": {
+          "description": "Identifier for this offer",
+          "allOf": [
+            {
+              "$ref": "#/definitions/TemptingOfferNumber"
+            }
+          ]
+        }
+      },
+      "required": [
+        "number",
+        "button"
+      ]
+    },
+    "TemptingOfferNumber": {
+      "description": "Identifier for a tempting offer.",
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "TemptingOfferPosition": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "$ref": "#/definitions/TemptingOfferNumber"
+        },
+        "offer_type": {
+          "$ref": "#/definitions/TemptingOfferType"
+        }
+      },
+      "required": [
+        "number",
+        "offer_type"
+      ]
+    },
+    "TemptingOfferType": {
+      "type": "string",
+      "enum": [
+        "Journey",
+        "Cost"
+      ]
+    },
+    "TemptingOfferView": {
+      "type": "object",
+      "properties": {
+        "actions": {
+          "description": "Offers to display to the player.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TemptingOfferAction"
+          }
+        }
+      },
+      "required": [
+        "actions"
+      ]
+    },
+    "TestDeckName": {
+      "type": "string",
+      "enum": [
+        "Vanilla",
+        "StartingFive",
+        "Benchmark1",
+        "Core11"
+      ]
+    },
+    "TextAlign": {
+      "type": "string",
+      "enum": [
+        "UpperLeft",
+        "UpperCenter",
+        "UpperRight",
+        "MiddleLeft",
+        "MiddleCenter",
+        "MiddleRight",
+        "LowerLeft",
+        "LowerCenter",
+        "LowerRight"
+      ]
+    },
+    "TextFieldNode": {
+      "type": "object",
+      "properties": {
+        "double_click_selects_word": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "global_identifier": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "initial_text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "is_password_field": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "is_read_only": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "mask_character": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_length": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "multiline": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "triple_click_selects_line": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      }
+    },
+    "TextNode": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "label"
+      ]
+    },
+    "TextOverflow": {
+      "type": "string",
+      "enum": [
+        "Clip",
+        "Ellipsis"
+      ]
+    },
+    "TextOverflowPosition": {
+      "type": "string",
+      "enum": [
+        "End",
+        "Start",
+        "Middle"
+      ]
+    },
+    "TextShadow": {
+      "type": "object",
+      "properties": {
+        "blur_radius": {
+          "type": "number",
+          "format": "float"
+        },
+        "color": {
+          "$ref": "#/definitions/DisplayColor"
+        },
+        "offset": {
+          "$ref": "#/definitions/FlexVector2"
+        }
+      },
+      "required": [
+        "offset",
+        "blur_radius",
+        "color"
+      ]
+    },
+    "TouchScrollBehavior": {
+      "type": "string",
+      "enum": [
+        "Unrestricted",
+        "Elastic",
+        "Clamped"
+      ]
+    },
+    "TurnId": {
+      "description": "Identifies a turn within a game.\n\nTurn 0 is the starting player's first turn.",
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "TypewriterTextNode": {
+      "type": "object",
+      "properties": {
+        "character_delay": {
+          "$ref": "#/definitions/Milliseconds"
+        },
+        "label": {
+          "type": "string"
+        },
+        "sound_effect": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/AudioClipAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "label",
+        "character_delay"
+      ]
+    },
+    "UpdateBattleCommand": {
+      "type": "object",
+      "properties": {
+        "battle": {
+          "description": "The battle to update.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/BattleView"
+            }
+          ]
+        },
+        "update_sound": {
+          "description": "Sound to play when the battle is updated.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/AudioClipAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "battle"
+      ]
+    },
+    "UpdateQuestCommand": {
+      "type": "object",
+      "properties": {
+        "quest": {
+          "description": "The quest to update.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/QuestView"
+            }
+          ]
+        },
+        "update_sound": {
+          "description": "Sound to play when the quest is updated.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/AudioClipAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "quest"
+      ]
+    },
+    "UpdateScreenOverlayCommand": {
+      "type": "object",
+      "properties": {
+        "screen_overlay": {
+          "description": "New screen overlay to set. If None clears the current overlay.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlexNode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "UserId": {
+      "description": "Identifies a human player of the game.\n\nEquivalently, this identifies a save file.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "VoidCardId": {
+      "$ref": "#/definitions/CardId"
+    },
+    "WhiteSpace": {
+      "type": "string",
+      "enum": [
+        "Normal",
+        "NoWrap"
+      ]
+    }
+  }
+}
