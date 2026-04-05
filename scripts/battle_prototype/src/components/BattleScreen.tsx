@@ -118,6 +118,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
 
       {/* Enemy battlefield */}
       <BattlefieldZone
+        label="Enemy Characters"
         cards={cardsByPosition(battle.cards, "OnBattlefield", "Enemy")}
         onAction={onAction}
         disabled={disabled}
@@ -132,6 +133,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
 
       {/* User battlefield */}
       <BattlefieldZone
+        label="Your Characters"
         cards={cardsByPosition(battle.cards, "OnBattlefield", "User")}
         onAction={onAction}
         disabled={disabled}
