@@ -13,10 +13,17 @@ pub struct TurnData {
     /// Each player's turn gets its own ID, so the first turn of the game is
     /// turn 0 for the starting player and then turn 1 for the next player.
     pub turn_id: TurnId,
+
+    /// Current column position being resolved during the Judgment phase (0-7).
+    pub judgment_position: u8,
 }
 
 impl Default for TurnData {
     fn default() -> Self {
-        TurnData { active_player: PlayerName::One, turn_id: TurnId::default() }
+        TurnData {
+            active_player: PlayerName::One,
+            turn_id: TurnId::default(),
+            judgment_position: 0,
+        }
     }
 }

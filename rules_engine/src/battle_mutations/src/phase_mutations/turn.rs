@@ -10,17 +10,19 @@ use core_data::numerics::TurnId;
 
 use crate::card_mutations::battle_deck;
 use crate::effects::apply_effect;
-use crate::phase_mutations::{dawn_phase, dreamwell_phase, fire_triggers};
+use crate::phase_mutations::{dawn_phase, dreamwell_phase, fire_triggers, judgment_phase};
 
 /// End the current player's turn.
 ///
-/// Transitions through the Judgment phase (combat resolution stub) before
-/// ending. Their opponent may take 'fast' actions before beginning a new
-/// turn.
+/// Transitions into the Judgment phase for column-by-column combat resolution.
 pub fn to_ending_phase(battle: &mut BattleState) {
-    // Judgment phase stub: combat resolution will be implemented in Task 10.
-    battle.phase = BattleTurnPhase::Ending;
-    battle_trace!("Moving to end step for player", battle, player = battle.turn.active_player);
+    battle.turn.judgment_position = 0;
+    battle.phase = BattleTurnPhase::Judgment;
+    battle_trace!(
+        "Moving to judgment phase for player",
+        battle,
+        player = battle.turn.active_player
+    );
 }
 
 pub fn run_turn_state_machine_if_no_active_prompts(battle: &mut BattleState) {
@@ -85,6 +87,24 @@ pub fn run_turn_state_machine_if_no_active_prompts(battle: &mut BattleState) {
             }
             BattleTurnPhase::Dawn => {
                 battle.phase = BattleTurnPhase::Main;
+            }
+            BattleTurnPhase::Judgment => {
+                let player = battle.turn.active_player;
+                let source = EffectSource::Game { controller: player };
+                let finished = judgment_phase::run(battle, player, source);
+                apply_effect::execute_pending_effects_if_no_active_prompt(battle);
+                fire_triggers::execute_if_no_active_prompt(battle);
+                if finished && battle.prompts.is_empty() {
+                    battle.triggers.push(source, Trigger::Judgment(player));
+                    apply_effect::execute_pending_effects_if_no_active_prompt(battle);
+                    fire_triggers::execute_if_no_active_prompt(battle);
+                    battle.phase = BattleTurnPhase::Ending;
+                    battle_trace!(
+                        "Judgment phase complete, moving to ending for player",
+                        battle,
+                        player
+                    );
+                }
             }
             _ => {
                 break;
