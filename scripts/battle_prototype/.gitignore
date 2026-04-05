@@ -1,0 +1,6 @@
+node_modules/
+dist/
+public/cards/
+public/tides/
+public/card-data.json
+logs/
