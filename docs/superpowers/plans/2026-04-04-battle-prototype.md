@@ -312,9 +312,19 @@ export default function App() {
 
 Run: `cd scripts/battle_prototype && npm install && npm run dev`
 
-Expected: Vite dev server starts on a local port (e.g., 5173). Opening the URL shows "Battle Prototype — connecting...".
+Expected: Vite dev server starts on a local port (e.g., 5173).
 
-- [ ] **Step 12: Commit**
+- [ ] **Step 12: QA — Verify scaffold renders**
+
+Use `agent-browser` to open the Vite dev server URL (e.g., http://localhost:5173). Take a screenshot. Verify:
+1. The page loads without a white screen or error.
+2. The text "Battle Prototype — connecting..." is visible.
+3. The background color is dark (#0a0612).
+4. There are no console errors visible in the page.
+
+If the page is blank or shows errors, fix before proceeding.
+
+- [ ] **Step 13: Commit**
 
 ```bash
 git add scripts/battle_prototype/
@@ -473,13 +483,21 @@ function main() {
 main();
 ```
 
-- [ ] **Step 2: Run setup-assets and verify**
+- [ ] **Step 2: Run setup-assets and verify via CLI**
 
 Run: `cd scripts/battle_prototype && npm run setup-assets`
 
-Expected: Console output showing cards parsed, images linked, tide icons copied. Verify `public/card-data.json` exists and contains card entries. Verify `public/cards/` contains `.webp` symlinks.
+Expected: Console output showing cards parsed, images linked, tide icons copied. Verify `public/card-data.json` exists and contains card entries. Verify `public/cards/` contains `.webp` symlinks. Run `ls public/cards/ | head -5` to confirm symlinks exist. Run `cat public/card-data.json | head -20` to confirm JSON structure has cardNumber, imageNumber, name fields.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: QA — Verify card images load in browser**
+
+Create a temporary test page or add a quick test to App.tsx that renders `<img src="/cards/1.webp" />` (or whatever the first card number is from card-data.json). Use `agent-browser` to open the app. Take a screenshot. Verify:
+1. At least one card image loads (not a broken image icon).
+2. The image is visible and appears to be card art (not a placeholder or error).
+
+Remove the temporary test code after verification. If images don't load, debug the symlink path and image cache before proceeding.
+
+- [ ] **Step 4: Commit**
 
 ```bash
 git add scripts/battle_prototype/scripts/setup-assets.mjs
@@ -978,7 +996,35 @@ Run: `cd scripts/battle_prototype && npx tsc --noEmit`
 
 Expected: No errors.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 4: QA — Verify API client connects to dev server**
+
+Temporarily update App.tsx to call `connect()` on mount and display the result:
+
+```tsx
+import { useEffect, useState } from "react";
+import { connect } from "./api/client";
+
+export default function App() {
+  const [status, setStatus] = useState("Connecting...");
+  useEffect(() => {
+    void connect("Benchmark1").then((res) => {
+      setStatus(`Connected! Cards: ${JSON.stringify(res.commands.groups.length)} groups, version: ${res.response_version}`);
+    }).catch((e: Error) => {
+      setStatus(`Error: ${e.message}`);
+    });
+  }, []);
+  return <div className="p-4"><p>{status}</p></div>;
+}
+```
+
+Ensure the Rust dev server is running (`cd rules_engine && just dev-server`). Use `agent-browser` to open the app. Take a screenshot. Verify:
+1. The page shows "Connected!" with a non-zero group count and a UUID version string.
+2. It does NOT show "Error:".
+3. If it shows an error about GET-with-body, switch `connect` and `poll` in client.ts to use `method: "POST"` instead and re-test.
+
+After verification, revert App.tsx to the placeholder (this will be properly replaced in Task 5).
+
+- [ ] **Step 5: Commit**
 
 ```bash
 git add scripts/battle_prototype/src/api/ scripts/battle_prototype/src/util/command-parser.ts
@@ -1187,7 +1233,28 @@ Run (in a separate terminal): `cd rules_engine && just dev-server`
 
 Then open the battle prototype in the browser. Verify: page shows "You" and "Enemy" stats, turn number, card count, and raw JSON.
 
-**QA:** Use `agent-browser` to open the battle prototype URL. Take a screenshot. Verify the BattleView JSON is displayed with valid data (cards array is non-empty, scores are 0, energy > 0, turn_number is 1). Reload the page and take another screenshot to verify reconnection works.
+**QA:** Use `agent-browser` to open the battle prototype URL.
+
+**Screenshot 1:** Take a screenshot of the initial page. Verify:
+1. The page does NOT show "Connecting..." stuck forever or "Error:".
+2. "You" and "Enemy" sections are visible with score, energy, spark values.
+3. The raw JSON is displayed in the `<pre>` block at the bottom.
+
+**Screenshot 2:** Inspect the displayed data. Verify:
+1. `cards` array in the JSON is non-empty (should have 30+ cards for a Benchmark1 deck).
+2. Score values are 0 (start of game).
+3. Energy is > 0 (dreamwell provides starting energy).
+4. `turn_number` is 1.
+5. `interface` field exists and contains at least one button (primary_action_button or similar).
+
+**Screenshot 3:** Reload the page in `agent-browser`. Take a screenshot after reload. Verify:
+1. The page reconnects successfully (shows data, not an error).
+2. The state is consistent (similar card count, turn 1).
+
+If the connection fails (error message displayed), debug:
+- Is the Rust dev server running? Check with `curl http://localhost:26598/connect -d '{...}'`.
+- Is the Vite proxy working? Check browser network tab for proxy errors.
+- Is the GET-with-body issue? Switch to POST if needed.
 
 - [ ] **Step 4: Commit**
 
@@ -1336,7 +1403,61 @@ Run: `cd scripts/battle_prototype && npx tsc --noEmit`
 
 Expected: No errors.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: QA — Verify CardDisplay renders real cards**
+
+Temporarily update App.tsx to connect to the server, extract the BattleView, and render the first few cards from hand using CardDisplay:
+
+```tsx
+import { useEffect, useState } from "react";
+import { connect } from "./api/client";
+import { extractBattleView } from "./util/command-parser";
+import { CardDisplay } from "./components/CardDisplay";
+import type { BattleView } from "./types/battle";
+
+export default function App() {
+  const [battle, setBattle] = useState<BattleView | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    void connect("Benchmark1").then((res) => {
+      const view = extractBattleView(res.commands);
+      setBattle(view);
+    }).catch((e: Error) => setError(e.message));
+  }, []);
+  if (error) return <p className="p-4 text-red-400">Error: {error}</p>;
+  if (!battle) return <p className="p-4">Loading...</p>;
+
+  const handCards = battle.cards.filter((c) => {
+    const pos = c.position.position;
+    return typeof pos !== "string" && "InHand" in pos;
+  });
+
+  return (
+    <div className="p-4">
+      <h1 className="text-lg font-bold mb-4">Card Display Test</h1>
+      <div className="flex gap-3 flex-wrap">
+        {handCards.map((card) => (
+          <CardDisplay key={card.id} card={card} />
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+Use `agent-browser` to open the app. Take a screenshot. Verify:
+1. Cards are visible — not blank rectangles or error messages.
+2. Card names are displayed and readable.
+3. Energy costs are shown (gold-colored numbers).
+4. At least one card shows art (loaded `.webp` image, not a broken image icon). If ALL images are broken, the sprite-to-card-number mapping needs debugging — inspect the `DisplayImage` value in the BattleView JSON and compare against what `getCardImageUrl` extracts.
+5. For character cards, spark values are displayed.
+6. Rules text is visible on at least one card (not raw HTML tags).
+7. If any card has `is_fast: true`, the fast badge (↯ Fast) appears.
+
+If cards render but images are broken, debug `getCardImageUrl` — log the sprite address from the server and compare to the card-data.json mapping. Fix the mapping logic before proceeding.
+
+After verification, revert App.tsx (it will be properly replaced in Task 7).
+
+- [ ] **Step 4: Commit**
 
 ```bash
 git add scripts/battle_prototype/src/components/CardDisplay.tsx
@@ -1830,17 +1951,35 @@ Run: `cd scripts/battle_prototype && npx tsc --noEmit`
 
 Expected: No errors.
 
-**QA:** Use `agent-browser` to open the app. Take a screenshot. Verify:
-- Enemy status bar shows score, energy, spark, deck/void counts
-- Enemy battlefield shows character cards (if any at start)
-- Stack zone appears only if cards are on the stack
-- Your battlefield shows your characters (if any)
-- Your status bar shows your stats
-- Your hand shows cards along the bottom
-- Action buttons appear at the very bottom
-- Card names, costs, and spark values are visible
+**QA:** Use `agent-browser` to open the app. This is a critical QA gate — the full layout must be verified before proceeding.
 
-Count cards in each zone and compare against the BattleView data. Take at least 2 screenshots.
+**Screenshot 1: Initial state overview.** Take a screenshot of the full page. Verify:
+1. The page has a dark background (#0a0612) — not white or default browser background.
+2. The layout has distinct horizontal zones stacked vertically: turn info, enemy status, enemy battlefield, (stack if present), your battlefield, your status, your hand, action bar.
+3. No zone is missing or blank.
+
+**Screenshot 2: Card count verification.** Log the BattleView to the console (or display counts on screen). Compare:
+1. Count cards rendered in your hand zone. Must match the number of cards with `InHand: "User"` position in the BattleView.
+2. Count cards on your battlefield. Must match `OnBattlefield: "User"` cards.
+3. Count cards on enemy battlefield. Must match `OnBattlefield: "Enemy"` cards.
+4. Verify deck count in your status bar matches `InDeck: "User"` card count.
+5. Verify void count in your status bar matches `InVoid: "User"` card count.
+6. Log the expected vs. actual counts. If ANY count is wrong, debug the position filtering logic before proceeding.
+
+**Screenshot 3: Player stats verification.**
+1. Verify your score, energy (current/produced), and spark values match `battle.user`.
+2. Verify enemy score, energy, and spark match `battle.enemy`.
+3. Verify turn number is displayed and equals `battle.turn_number`.
+
+**Screenshot 4: Card details.**
+1. Zoom in on a hand card (or inspect it in the screenshot). Verify: name is readable, cost is shown, card art is loaded.
+2. If any battlefield characters exist, verify spark values are displayed on them.
+
+**Screenshot 5: Action bar.**
+1. Verify at least one button is visible (e.g., "Start Next Turn" or "End Turn" or "Pass Priority").
+2. Verify button labels match the `InterfaceView` button labels from the BattleView.
+
+Fix any issues found before proceeding. Take additional screenshots to confirm fixes.
 
 - [ ] **Step 9: Commit**
 
@@ -2023,7 +2162,22 @@ Run: `cd scripts/battle_prototype && npx tsc --noEmit`
 
 Expected: No errors.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: QA — Verify overlays render**
+
+Use `agent-browser` to open the app. The goal is to trigger a screen_overlay. Two approaches:
+
+**Approach A (if the dev_button is wired):** If the BattleView includes a `dev_button` in `InterfaceView`, click it. This should trigger the developer panel overlay. Take a screenshot. Verify:
+1. An overlay appears with a semi-transparent dark backdrop.
+2. Text content is visible (button labels like "Set AI", "Draw Card", etc.).
+3. Buttons are rendered and appear clickable.
+
+**Approach B (if no overlay appears naturally):** Log `battle.interface.screen_overlay` to the console. If it is non-null, take a screenshot and verify the overlay renders. If it IS null during normal gameplay, proceed — overlays will be tested more thoroughly when the debug panel is wired in Task 9 and during playtesting.
+
+Regardless of which approach works, also verify:
+1. When no overlay is present, the game renders normally (no empty overlay covering the screen).
+2. The overlay component doesn't crash on a null `screen_overlay`.
+
+- [ ] **Step 6: Commit**
 
 ```bash
 git add scripts/battle_prototype/src/
@@ -2429,7 +2583,26 @@ Run: `cd scripts/battle_prototype && npx tsc --noEmit`
 
 Expected: No errors.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: QA — Verify card browser works**
+
+Use `agent-browser` to play through a game until cards are in the void. Then trigger the card browser (if the BattleView provides a browser action — this may come from a card effect or the overlay). If the browser doesn't trigger naturally during gameplay:
+
+1. Use the debug panel to play several turns until the void has cards.
+2. Check if `battle.interface.browser` is non-null at any point. Log it.
+3. If browser is null throughout normal play, check whether any card's `actions.on_click` triggers a `BrowseCards` display action.
+
+If the card browser DOES appear:
+1. Take a screenshot. Verify: modal overlay with dark backdrop, cards displayed inside, Close button visible.
+2. Click a card if it has an `on_click` action. Verify selection works.
+3. Click Close. Verify the modal disappears and the game continues normally.
+
+For the card order selector (Foresee), this is harder to trigger naturally. If available:
+1. Play a Foresee card. Take a screenshot showing the reorder UI.
+2. Click cards to select ordering. Verify the action is sent.
+
+If neither can be triggered in this task, note it — they will be exercised during the playtest rounds (Tasks 13-17) where specific prompt types are targeted.
+
+- [ ] **Step 4: Commit**
 
 ```bash
 git add scripts/battle_prototype/src/
@@ -2455,12 +2628,47 @@ Go through each component and ensure:
 
 No specific code changes prescribed here — the subagent should review screenshots and fix any visual issues.
 
-**QA:** Take screenshots of:
-1. Initial game state — verify dark theme, readable text
-2. During polling — verify disabled state is clear
-3. Empty stack — verify it disappears
-4. Full battlefield (8 cards) — verify they fit
-5. Game end state
+**QA — This is a thorough visual QA pass. Each item requires a screenshot.**
+
+**Screenshot 1: Dark theme.** Take a screenshot of the initial game state. Verify:
+1. Background is dark (#0a0612), not white or grey.
+2. Text is light-colored and readable against the dark background.
+3. Card borders are visible and distinct.
+4. Status bars have a slightly lighter surface color.
+
+**Screenshot 2: Disabled/polling state.** Play a card, then immediately take a screenshot DURING the polling phase (before Final response). Verify:
+1. Cards in hand appear dimmed/greyed out (opacity reduced).
+2. Action buttons appear disabled.
+3. The turn info bar shows "waiting..." or similar indicator.
+4. Clicking a card during this state does NOT send another action.
+
+**Screenshot 3: Empty stack.** At the start of a turn (before playing any cards), take a screenshot. Verify:
+1. The stack zone is either invisible or collapsed to a thin line.
+2. There is NOT a large empty gold-bordered box taking up space.
+
+**Screenshot 4: Active stack.** Play a card. Take a screenshot while it's on the stack (before resolution). Verify:
+1. The stack zone is visible with the gold border.
+2. The card on the stack shows its name and details.
+3. The "newest" indicator appears on the most recent card.
+
+**Screenshot 5: Full battlefield.** Use the debug panel (99 energy + draw cards) to play 8 characters onto your battlefield. Take a screenshot. Verify:
+1. All 8 character cards are visible and not overlapping.
+2. Each card shows its name and spark value.
+3. The layout doesn't break or scroll horizontally.
+
+**Screenshot 6: Battlefield overflow (abandon).** Play a 9th character. Take a screenshot. Verify:
+1. The battlefield still shows 8 cards (one was abandoned).
+2. The spark bonus in the status bar may have increased.
+
+**Screenshot 7: Scoring.** Play enough turns for judgment phase to score points. Take a screenshot. Verify:
+1. The score in the status bar has changed from 0.
+2. The score is visually prominent (gold-colored).
+
+**Screenshot 8: Game end.** If possible, play until one player wins (12 points). Take a screenshot. Verify:
+1. There is some indication the game has ended (no more action buttons, or a message).
+2. Final scores are displayed.
+
+Fix any visual issues found. Take additional screenshots to confirm fixes.
 
 - [ ] **Step 2: Commit any polish changes**
 
