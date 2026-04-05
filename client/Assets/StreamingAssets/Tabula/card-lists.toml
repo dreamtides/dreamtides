@@ -92,91 +92,91 @@ copies = 1
 list-name = "Core 11"
 list-type = "BaseCardId"
 card-id = "36c2a4e1-3212-4933-979a-73f109f9b256"
-copies = 8
+copies = 4
 
 [[card-lists]]
 list-name = "Core 11"
 list-type = "BaseCardId"
 card-id = "eb85b69a-3771-4148-83cf-a7ddb0caee98"
-copies = 6
-
-[[card-lists]]
-list-name = "Core 11"
-list-type = "BaseCardId"
-card-id = "9c605a08-dac4-4c3e-8aff-437b79809937"
-copies = 4
-
-[[card-lists]]
-list-name = "Core 11"
-list-type = "BaseCardId"
-card-id = "a6e8e100-9aa6-4a53-82ec-4ab161829533"
-copies = 6
-
-[[card-lists]]
-list-name = "Core 11"
-list-type = "BaseCardId"
-card-id = "04be5c1e-20ab-475e-b02f-e78b82ca2e8d"
-copies = 8
-
-[[card-lists]]
-list-name = "Core 11"
-list-type = "BaseCardId"
-card-id = "7285732f-7460-4544-8c74-9300a078a337"
-copies = 10
-
-[[card-lists]]
-list-name = "Core 11"
-list-type = "BaseCardId"
-card-id = "1ce137cb-4234-45f7-abd2-d0ce97549885"
-copies = 4
-
-[[card-lists]]
-list-name = "Core 11"
-list-type = "BaseCardId"
-card-id = "6e94b4a6-4164-4572-91c1-e74de3e75188"
-copies = 4
-
-[[card-lists]]
-list-name = "Core 11"
-list-type = "BaseCardId"
-card-id = "89084e83-a934-4fda-9178-f6a371ccac13"
 copies = 3
 
 [[card-lists]]
 list-name = "Core 11"
 list-type = "BaseCardId"
-card-id = "62bf2eb8-4afb-42b1-a8c5-5423eed96545"
-copies = 6
+card-id = "9c605a08-dac4-4c3e-8aff-437b79809937"
+copies = 2
 
 [[card-lists]]
 list-name = "Core 11"
 list-type = "BaseCardId"
-card-id = "716aa6ec-ddac-488c-aafe-e9a997335c58"
+card-id = "a6e8e100-9aa6-4a53-82ec-4ab161829533"
+copies = 3
+
+[[card-lists]]
+list-name = "Core 11"
+list-type = "BaseCardId"
+card-id = "04be5c1e-20ab-475e-b02f-e78b82ca2e8d"
 copies = 4
 
 [[card-lists]]
 list-name = "Core 11"
 list-type = "BaseCardId"
+card-id = "7285732f-7460-4544-8c74-9300a078a337"
+copies = 5
+
+[[card-lists]]
+list-name = "Core 11"
+list-type = "BaseCardId"
+card-id = "1ce137cb-4234-45f7-abd2-d0ce97549885"
+copies = 2
+
+[[card-lists]]
+list-name = "Core 11"
+list-type = "BaseCardId"
+card-id = "6e94b4a6-4164-4572-91c1-e74de3e75188"
+copies = 2
+
+[[card-lists]]
+list-name = "Core 11"
+list-type = "BaseCardId"
+card-id = "89084e83-a934-4fda-9178-f6a371ccac13"
+copies = 2
+
+[[card-lists]]
+list-name = "Core 11"
+list-type = "BaseCardId"
+card-id = "62bf2eb8-4afb-42b1-a8c5-5423eed96545"
+copies = 3
+
+[[card-lists]]
+list-name = "Core 11"
+list-type = "BaseCardId"
+card-id = "716aa6ec-ddac-488c-aafe-e9a997335c58"
+copies = 2
+
+[[card-lists]]
+list-name = "Core 11"
+list-type = "BaseCardId"
 card-id = "a1b2c3d4-1111-4000-8000-000000000001"
-copies = 8
+copies = 5
 
 [[card-lists]]
 list-name = "Core 11"
 list-type = "BaseCardId"
 card-id = "a1b2c3d4-2222-4000-8000-000000000002"
-copies = 8
+copies = 5
 
 [[card-lists]]
 list-name = "Core 11"
 list-type = "BaseCardId"
 card-id = "a1b2c3d4-3333-4000-8000-000000000003"
-copies = 6
+copies = 5
 
 [[card-lists]]
 list-name = "Core 11"
 list-type = "BaseCardId"
 card-id = "a1b2c3d4-4444-4000-8000-000000000004"
-copies = 6
+copies = 5
 
 [[card-lists]]
 list-name = "Core 11"
