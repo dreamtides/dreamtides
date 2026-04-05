@@ -273,6 +273,13 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
                 />
               ))}
             </div>
+            <ActionBar
+              primaryButton={ui.primary_action_button ?? undefined}
+              secondaryButton={ui.secondary_action_button ?? undefined}
+              undoButton={ui.undo_button ?? undefined}
+              onAction={onAction}
+              disabled={disabled}
+            />
           </div>
         </div>
       )}
@@ -408,6 +415,13 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
                   );
                 })}
             </div>
+            <ActionBar
+              primaryButton={ui.primary_action_button ?? undefined}
+              secondaryButton={ui.secondary_action_button ?? undefined}
+              undoButton={ui.undo_button ?? undefined}
+              onAction={onAction}
+              disabled={disabled}
+            />
           </div>
         </div>
       )}
