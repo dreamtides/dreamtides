@@ -154,6 +154,42 @@ list-type = "BaseCardId"
 card-id = "716aa6ec-ddac-488c-aafe-e9a997335c58"
 copies = 4
 
+[[card-lists]]
+list-name = "Core 11"
+list-type = "BaseCardId"
+card-id = "a1b2c3d4-1111-4000-8000-000000000001"
+copies = 8
+
+[[card-lists]]
+list-name = "Core 11"
+list-type = "BaseCardId"
+card-id = "a1b2c3d4-2222-4000-8000-000000000002"
+copies = 8
+
+[[card-lists]]
+list-name = "Core 11"
+list-type = "BaseCardId"
+card-id = "a1b2c3d4-3333-4000-8000-000000000003"
+copies = 6
+
+[[card-lists]]
+list-name = "Core 11"
+list-type = "BaseCardId"
+card-id = "a1b2c3d4-4444-4000-8000-000000000004"
+copies = 6
+
+[[card-lists]]
+list-name = "Core 11"
+list-type = "BaseCardId"
+card-id = "a1b2c3d4-5555-4000-8000-000000000005"
+copies = 4
+
+[[card-lists]]
+list-name = "Core 11"
+list-type = "BaseCardId"
+card-id = "a1b2c3d4-7777-4000-8000-000000000006"
+copies = 4
+
 [metadata]
 schema_version = 1
 
