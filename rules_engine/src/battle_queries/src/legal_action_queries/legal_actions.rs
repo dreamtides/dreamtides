@@ -1,6 +1,7 @@
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
+use battle_state::battle_player::battle_player_state::PlayerType;
 use battle_state::prompt_types::prompt_data::PromptType;
 use bit_set::BitSet;
 use core_data::types::PlayerName;
@@ -150,6 +151,10 @@ fn reposition_actions(
     battle: &BattleState,
     player: PlayerName,
 ) -> (RepositionActions, RepositionActions) {
+    if matches!(battle.players.player(player).player_type, PlayerType::Agent(_)) {
+        return (vec![], vec![]);
+    }
+
     let bf = battle.cards.battlefield(player);
     let current_turn = battle.turn.turn_id.0;
     let mut to_front = Vec::new();

@@ -14,12 +14,14 @@ use battle_state::battle::card_id::{
 use battle_state::battle_cards::stack_card_state::{
     EffectTargets, StackCardAdditionalCostsPaid, StandardEffectTarget,
 };
+use battle_state::battle_cards::zone::Zone;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::card_types::CardType;
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::SpriteAddress;
 use core_data::identifiers::AbilityNumber;
 use core_data::types::{CardFacing, PlayerName};
+use display_data::battle_view::ButtonView;
 use display_data::card_view::{
     CardActions, CardPrefab, CardView, DisplayImage, InfoZoomData, InfoZoomIcon, RevealedCardView,
 };
@@ -234,6 +236,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
                     play_action,
                 )
             }),
+            button_attachment: reposition_button(battle, &legal_actions, card_id, controller),
             ..Default::default()
         },
         effects: apply_card_fx::persistent_card_effects(battle, card_id),
@@ -470,6 +473,55 @@ fn targeting_color(
     } else {
         display_color::RED_500
     }
+}
+
+/// Returns a reposition button for a battlefield character, if applicable.
+fn reposition_button(
+    battle: &BattleState,
+    legal_actions: &LegalActions,
+    card_id: CardId,
+    controller: PlayerName,
+) -> Option<ButtonView> {
+    let LegalActions::Standard { actions } = legal_actions else {
+        return None;
+    };
+
+    let character_id = CharacterId(card_id);
+    let bf = battle.cards.battlefield(controller);
+
+    // Check if this character is on the battlefield
+    if !battle.cards.contains_card(controller, card_id, Zone::Battlefield) {
+        return None;
+    }
+
+    let is_in_front = bf.front.contains(&Some(character_id));
+    let is_in_back = bf.back.contains(&Some(character_id));
+
+    if is_in_back {
+        // Character in back rank: offer "Move to Front" with the first available
+        // front slot
+        let target_position = bf.front.iter().position(Option::is_none).unwrap_or(0) as u8;
+        let action = BattleAction::MoveCharacterToFrontRank(character_id, target_position);
+        if actions.reposition_to_front.contains(&(character_id, target_position)) {
+            return Some(ButtonView {
+                label: "\u{2191} Front".to_string(),
+                action: Some(action.into()),
+            });
+        }
+    } else if is_in_front {
+        // Character in front rank: offer "Move to Back" with the first available
+        // back slot
+        let target_position = bf.back.iter().position(Option::is_none).unwrap_or(0) as u8;
+        let action = BattleAction::MoveCharacterToBackRank(character_id, target_position);
+        if actions.reposition_to_back.contains(&(character_id, target_position)) {
+            return Some(ButtonView {
+                label: "\u{2193} Back".to_string(),
+                action: Some(action.into()),
+            });
+        }
+    }
+
+    None
 }
 
 /// Extracts all modal effect choices from a card's displayed abilities

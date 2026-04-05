@@ -186,6 +186,37 @@ export function CardDisplay({
           />
         )}
       </div>
+      {revealed.actions.button_attachment && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (
+              !disabled &&
+              onAction &&
+              revealed.actions.button_attachment?.action != null
+            ) {
+              onAction(revealed.actions.button_attachment.action);
+            }
+          }}
+          disabled={disabled || revealed.actions.button_attachment.action == null}
+          className="w-full text-center py-0.5 text-xs font-bold"
+          style={{
+            background: "var(--color-primary)",
+            color:
+              disabled || revealed.actions.button_attachment.action == null
+                ? "var(--color-text-dim)"
+                : "var(--color-text)",
+            cursor:
+              disabled || revealed.actions.button_attachment.action == null
+                ? "not-allowed"
+                : "pointer",
+            borderTop: "1px solid var(--color-border)",
+            fontSize: compact ? 8 : 10,
+          }}
+        >
+          {revealed.actions.button_attachment.label}
+        </button>
+      )}
     </div>
   );
 }
