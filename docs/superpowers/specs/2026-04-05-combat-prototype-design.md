@@ -50,8 +50,8 @@ Each player gets one `Battlefield`. `AllCards` changes from
 `battlefield: PlayerMap<Battlefield>`.
 
 This is optimized for MCTS performance: fixed-size arrays are cheap to clone
-(memcpy), O(1) positional lookup, and Judgment resolution is a tight loop over
-8 pairs.
+(memcpy), O(1) positional lookup, and Judgment resolution is a tight loop over 8
+pairs.
 
 ### CharacterState Changes
 
@@ -77,6 +77,7 @@ Starting → Dreamwell → Draw → Dawn → Main → Judgment → Ending →
 EndingPhaseFinished → FiringEndOfTurnTriggers
 
 Changes from current order:
+
 - Dreamwell moves to first (after Starting)
 - Draw stays after Dreamwell
 - Dawn (renamed from Judgment) fires start-of-turn triggers, no scoring
@@ -95,12 +96,13 @@ Draw is still skipped on turn 1. No other phase changes.
 
 ## Judgment Phase Resolution
 
-Runs automatically at the end of the active player's turn. No player actions,
-no priority, no card playing.
+Runs automatically at the end of the active player's turn. No player actions, no
+priority, no card playing.
 
 ### Algorithm
 
 For each position i from 0 to 7:
+
 1. Let attacker = active player's front rank at position i
 2. Let defender = opponent's front rank at position i
 3. If both present: compare spark values
@@ -125,6 +127,7 @@ Check for victory condition after all 8 positions resolve.
 ### Human Player (Battle Prototype)
 
 During main phase, drag-and-drop characters between slots:
+
 - Drag to empty slot → move character there
 - Drag onto another character → swap positions
 - Drag to front rank while summoning sick → rejected with visual feedback
@@ -133,6 +136,7 @@ During main phase, drag-and-drop characters between slots:
 ### AI Actions (Simplified for MCTS)
 
 Three action types to avoid infinite branching:
+
 - **MoveToEmptyFrontSlot(CharacterId)** — move to any unoccupied front-rank
   position (all empty slots are equivalent for scoring)
 - **MoveToAttack(CharacterId, CharacterId)** — move attacker to the position
@@ -146,6 +150,7 @@ of next turn.
 ### BattleAction Variants
 
 New variants added to the BattleAction enum:
+
 - `MoveCharacterToFrontRank(CharacterId, u8)` — move to front rank position
   (used by human drag-and-drop mapped to specific positions)
 - `MoveCharacterToBackRank(CharacterId, u8)` — move to back rank position
@@ -156,15 +161,15 @@ AI legal action generator wraps these into the simplified actions above.
 
 ### Layout (Top to Bottom)
 
-1. Enemy player status bar (score, energy, deck, hand counts)
-2. Enemy back rank (8 slots)
-3. Enemy front rank (8 slots)
-4. Judgment line separator
-5. Your front rank (8 slots)
-6. Your back rank (8 slots)
-7. Your player status bar
-8. Your hand
-9. Action bar (End Turn, Undo, etc.)
+01. Enemy player status bar (score, energy, deck, hand counts)
+02. Enemy back rank (8 slots)
+03. Enemy front rank (8 slots)
+04. Judgment line separator
+05. Your front rank (8 slots)
+06. Your back rank (8 slots)
+07. Your player status bar
+08. Your hand
+09. Action bar (End Turn, Undo, etc.)
 10. Battle log
 
 ### Rank Rendering
@@ -175,9 +180,8 @@ a visual indicator.
 
 ### Position Data from Rust
 
-`ObjectPosition` changes: `OnBattlefield` goes from
-`{ player: DisplayPlayer }` to
-`{ player: DisplayPlayer, rank: "Front" | "Back", position: u8 }`.
+`ObjectPosition` changes: `OnBattlefield` goes from `{ player: DisplayPlayer }`
+to `{ player: DisplayPlayer, rank: "Front" | "Back", position: u8 }`.
 
 ## Keyword & Effect Changes
 
@@ -200,8 +204,8 @@ scope.
 
 ### Dissolve/Banish/Abandon
 
-Work unchanged. Dissolving a character vacates its slot
-(`Option<CharacterId>` becomes `None`).
+Work unchanged. Dissolving a character vacates its slot (`Option<CharacterId>`
+becomes `None`).
 
 ## Vanilla Test Characters
 
@@ -210,7 +214,7 @@ register them in the Core 11 card list. These provide clean combat testing
 without ability noise:
 
 | Name              | Cost | Spark | Copies |
-|-------------------|------|-------|--------|
+| ----------------- | ---- | ----- | ------ |
 | Duskborne Sentry  | 1    | 1     | 8      |
 | Glimmer Scout     | 2    | 2     | 8      |
 | Veilward Knight   | 3    | 3     | 6      |
@@ -225,20 +229,24 @@ agent-browser CLI against the battle prototype.
 
 ### QA Milestones (at least 15 dedicated QA passes)
 
-1. Rank rendering — 4 ranks display, labels, empty slots
-2. Character placement — characters appear in back rank on play
-3. Drag-and-drop basics — reposition within ranks, between ranks
-4. Summoning sickness — can't drag to front on turn played
-5. Judgment resolution visuals — combats resolve, dissolves happen, points scored
-6. Full game loop round 1 — play 10+ turns, check turn structure, phase ordering
-7. AI behavior round 1 — AI repositions, makes attacks, no loops
-8. Card effects with ranks — Kindle, dissolve, materialize interactions
-9. UX polish round 1 — layout readability, labels, log clarity, missing info
+01. Rank rendering — 4 ranks display, labels, empty slots
+02. Character placement — characters appear in back rank on play
+03. Drag-and-drop basics — reposition within ranks, between ranks
+04. Summoning sickness — can't drag to front on turn played
+05. Judgment resolution visuals — combats resolve, dissolves happen, points
+    scored
+06. Full game loop round 1 — play 10+ turns, check turn structure, phase
+    ordering
+07. AI behavior round 1 — AI repositions, makes attacks, no loops
+08. Card effects with ranks — Kindle, dissolve, materialize interactions
+09. UX polish round 1 — layout readability, labels, log clarity, missing info
 10. Extended play round 1 — 15+ turns, look for mid-game bugs
 11. Extended play round 2 — focus on board-full states, 16 characters
-12. Extended play round 3 — focus on judgment edge cases (ties, empty, zero spark)
+12. Extended play round 3 — focus on judgment edge cases (ties, empty, zero
+    spark)
 13. AI behavior round 2 — watch AI tactical choices over many games
-14. UX polish round 2 — fix issues from extended play, improve judgment readability
+14. UX polish round 2 — fix issues from extended play, improve judgment
+    readability
 15. Extended play round 4 — final 20+ turn stress test, late-game states
 
 Each QA pass produces a bug report. Bugs are fixed, then next QA pass runs.

@@ -11,8 +11,8 @@ battles will require an equivalent for quests.
 This document is the high level "vision" for quests, other documents in this
 directory provide more detailed gameplay & technical breakdowns of the feature.
 The document at [battle_rules](../../battle_rules/battle_rules.md) provides more
-information about the actual rules of the game. See [Boss
-Dreamcallers](bosses.md) for boss details and
+information about the actual rules of the game. See
+[Boss Dreamcallers](bosses.md) for boss details and
 [Meta Progression](meta_progression.md) for unlock systems.
 
 ## The Golden Rule: Configuration via TOML
@@ -40,8 +40,8 @@ acquisition works like a single-player RPG card game (Shandalar, Thronebreaker,
 Balatro) rather than a draft format:
 
 - **Packs are loot.** You open them and get everything inside. The strategic
-  choice is *where you go* to get specific packs, not *which cards to pick*
-  from a pack.
+  choice is *where you go* to get specific packs, not *which cards to pick* from
+  a pack.
 - **Shops are the agency center.** You browse individual cards and buy what you
   need. A separate pack vendor sells themed packs. This is where essence matters
   most.
@@ -79,8 +79,8 @@ lead their deck and may have some number of "dreamsigns":
   effects to dreamcallers and secondary effects to dreamsigns. Dreamsigns are
   associated with tides.
 
-Quests display a top-level 3D screen called the [Dream Atlas](#dream-atlas)
-with a series of "dreamscapes" the user can navigate to. Each dreamscape is
+Quests display a top-level 3D screen called the [Dream Atlas](#dream-atlas) with
+a series of "dreamscapes" the user can navigate to. Each dreamscape is
 associated with "sites", specific rewards available in that dreamscape.
 
 Dreamscapes show a group of individual white icons with black circular
@@ -131,8 +131,8 @@ compatible with all strategies.
 
 The default tide system for quests is the **revised tide system**
 (docs/tides/tides_revised.md) where archetypes live in the overlap between
-neighboring tides rather than within single tides. This makes collection-building
-more interesting because:
+neighboring tides rather than within single tides. This makes
+collection-building more interesting because:
 
 - A pack from a single tide gives you *tools* but not a *complete strategy*.
 - Players naturally want cards from 2-3 adjacent tides.
@@ -247,7 +247,8 @@ deck icon during a dreamscape. Features:
 - **Split view**: Pool on one side, deck on the other. Click to move cards
   between them.
 - **Filters**: By tide, energy cost, card type, keyword.
-- **Deck stats**: Tide distribution, energy curve histogram, card type breakdown.
+- **Deck stats**: Tide distribution, energy curve histogram, card type
+  breakdown.
 - **Deck size indicator**: Current size and min/max boundaries.
 
 ### Pre-Battle Sideboarding
@@ -311,8 +312,8 @@ level:
 | 6                | 1               |
 
 **UI:** The cards available in the pack are shown in the 3D scene. The pack of
-cards animates open and the cards fan out to be displayed. All cards then animate
-to the quest deck/pool area. Cards are shown with an orange outline.
+cards animates open and the cards fan out to be displayed. All cards then
+animate to the quest deck/pool area. Cards are shown with an orange outline.
 
 Icon: "Layers"
 
@@ -396,8 +397,8 @@ new card. The design is deliberately simple:
 **How it works:** The Forge shows `<forge_recipes>` (default: **3**) offers.
 Each offer is:
 
-> "Sacrifice `<forge_cost>` (default: **4**) [Tide] cards -> Gain [specific card
-> from a different tide]"
+> "Sacrifice `<forge_cost>` (default: **4**) [Tide] cards -> Gain \[specific
+> card from a different tide\]"
 
 The output card is always from a **different tide** than the sacrifice. This is
 the Forge's key purpose: converting cards you don't need into cards from a tide
@@ -418,8 +419,8 @@ The player may decline all offers.
 
 **UI:** An NPC is shown. The forge offers are displayed as recipe cards showing
 the sacrifice cost on the left and the output card on the right. Clicking an
-offer animates the sacrifice cards out of the pool and plays a forge/transmutation
-effect, then the output card animates into the pool.
+offer animates the sacrifice cards out of the pool and plays a
+forge/transmutation effect, then the output card animates into the pool.
 
 Icon: "Anvil"
 
@@ -446,8 +447,8 @@ Icon: "Rectangle Vertical"
 ### Provisioner (Buy sites for the current dreamscape)
 
 The Provisioner is a site where the player can spend essence to **add a site to
-the current dreamscape**. The Provisioner shows `<provisioner_options>` (default:
-**3**) potential sites with their costs:
+the current dreamscape**. The Provisioner shows `<provisioner_options>`
+(default: **3**) potential sites with their costs:
 
 | Purchasable Site   | Cost |
 | ------------------ | ---- |
@@ -489,15 +490,15 @@ Icon: "Treasure Chest"
 
 ### Acquisition Summary
 
-| Source      | Volume     | Agency      | How it feels               |
-| ----------- | ---------- | ----------- | -------------------------- |
-| Loot Packs  | ~44 cards  | Navigation  | "Exploring and finding"    |
-| Card Shop   | ~8 cards   | Full (buy)  | "Shopping for what I need" |
-| Pack Shop   | ~8 cards   | Buy + theme | "Investing in a theme"     |
-| Ante wins   | ~7-14 cards| Risk/reward | "Claiming a trophy"        |
-| Forge       | ~3 cards   | Creative    | "Transmuting"              |
-| Draft Site  | ~2 cards   | Pick 1 of 4 | "Curated browsing"         |
-| Other       | ~5 cards   | Variable    | Journeys, rewards, etc.    |
+| Source     | Volume      | Agency      | How it feels               |
+| ---------- | ----------- | ----------- | -------------------------- |
+| Loot Packs | ~44 cards   | Navigation  | "Exploring and finding"    |
+| Card Shop  | ~8 cards    | Full (buy)  | "Shopping for what I need" |
+| Pack Shop  | ~8 cards    | Buy + theme | "Investing in a theme"     |
+| Ante wins  | ~7-14 cards | Risk/reward | "Claiming a trophy"        |
+| Forge      | ~3 cards    | Creative    | "Transmuting"              |
+| Draft Site | ~2 cards    | Pick 1 of 4 | "Curated browsing"         |
+| Other      | ~5 cards    | Variable    | Journeys, rewards, etc.    |
 
 **Estimated total over a quest:** ~15 (starter) + ~77-84 (acquired) = ~92-99
 cards in pool. Ante wins add variance -- a player who accepts and wins every
@@ -545,10 +546,10 @@ If both sides match, there are now 2 cards at stake per side. The eventual
 winner takes both of the opponent's anted cards.
 
 **Why turn 6:** By turn 6, the board state is developed enough that both sides
-have meaningful information about who's winning. The escalation forces a dramatic
-decision at a moment when the player can actually evaluate their position. It
-creates a natural "second act" -- the early game is about establishing position,
-and turn 6 is when you commit or fold.
+have meaningful information about who's winning. The escalation forces a
+dramatic decision at a moment when the player can actually evaluate their
+position. It creates a natural "second act" -- the early game is about
+establishing position, and turn 6 is when you commit or fold.
 
 ### Concession as Strategy
 
@@ -563,8 +564,8 @@ skill.
 
 The AI opponent's escalation decision at turn 6 is based on its estimated win
 probability. An AI that's ahead will always escalate. An AI that's behind will
-sometimes bluff-escalate (configurable probability), creating uncertainty for the
-player.
+sometimes bluff-escalate (configurable probability), creating uncertainty for
+the player.
 
 ### Ante Parameters
 
@@ -600,16 +601,13 @@ its starting position. An opening hand of cards is dealt to both players.
 Icon: "Sword"
 
 **Loot Pack** -- Open a themed pack, all cards to pool. See
-[Loot Packs](#loot-packs-primary-volume-no-card-level-choice).
-Icon: "Layers"
+[Loot Packs](#loot-packs-primary-volume-no-card-level-choice). Icon: "Layers"
 
 **Card Shop** -- Buy individual cards. See
-[Card Shop](#card-shop-targeted-individual-card-acquisition).
-Icon: "Store"
+[Card Shop](#card-shop-targeted-individual-card-acquisition). Icon: "Store"
 
 **Pack Shop** -- Buy themed packs. See
-[Pack Shop](#pack-shop-bulk-themed-acquisition).
-Icon: "Gift"
+[Pack Shop](#pack-shop-bulk-themed-acquisition). Icon: "Gift"
 
 **Dreamcaller Draft** -- At the Dreamcaller Draft site (first dreamscape), the
 player sees `<dreamcaller_choices>` (default: **3**) dreamcallers. Since the
@@ -643,20 +641,19 @@ Icon: "Crown"
 ### Acquisition Sites
 
 **Draft Site** -- See 4 cards, keep 1. See
-[Draft Site](#draft-site-occasional-small-draft-element).
-Icon: "Rectangle Vertical"
+[Draft Site](#draft-site-occasional-small-draft-element). Icon: "Rectangle
+Vertical"
 
 **Forge** -- Sacrifice cards of one tide to gain a card of another. See
-[Forge](#forge-mid-late-game-transmutation).
-Icon: "Anvil"
+[Forge](#forge-mid-late-game-transmutation). Icon: "Anvil"
 
 **Provisioner** -- Buy additional sites for the current dreamscape. See
-[Provisioner](#provisioner-buy-sites-for-the-current-dreamscape).
-Icon: "Compass"
+[Provisioner](#provisioner-buy-sites-for-the-current-dreamscape). Icon:
+"Compass"
 
 **Reward** -- Known card(s) visible on atlas preview. See
-[Reward Sites](#reward-sites-navigation-agency-fully-known-in-advance).
-Icon: "Treasure Chest"
+[Reward Sites](#reward-sites-navigation-agency-fully-known-in-advance). Icon:
+"Treasure Chest"
 
 ### Dreamsign & Journey Sites
 
@@ -668,8 +665,8 @@ dominant deck tides are more likely to appear.
 
 **UI:** The dreamsign animates to be displayed from screen center at a small
 scale. A purple accept button and a gray reject button are displayed. The
-dreamsign animates to the bottom right dreamsign display if accepted and animates
-back to a small scale if rejected.
+dreamsign animates to the bottom right dreamsign display if accepted and
+animates back to a small scale if rejected.
 
 Icon: "Sparkles"
 
@@ -732,12 +729,11 @@ Icon: "Law"
 
 ### Refinement Sites
 
-**Transfiguration** -- A transfiguration site shows the user 3 random cards
-from their deck, and they may select one to apply a transfiguration to,
-modifying that card's rules text. Each card can only receive a single
-transfiguration; cards that have already been transfigured are not eligible. If
-multiple transfigurations are applicable to a card, a random one is selected to
-suggest.
+**Transfiguration** -- A transfiguration site shows the user 3 random cards from
+their deck, and they may select one to apply a transfiguration to, modifying
+that card's rules text. Each card can only receive a single transfiguration;
+cards that have already been transfigured are not eligible. If multiple
+transfigurations are applicable to a card, a random one is selected to suggest.
 
 Transfigurations are named after colors, and cause the card name and any
 modified rules text to display in a different color to indicate the
@@ -801,10 +797,10 @@ Icon: "Copy"
 around `<essence_site_amount>` (default: **200**).
 
 **UI:** Unlike with other sites, the camera does not zoom in to essence sites.
-Instead the button simply vanishes on click and a purple particle effect appears,
-animating in a winding path to the user's essence total and then plays a 'hit'
-particle effect when it reaches the bottom left essence total and updates the
-quantity of essence shown.
+Instead the button simply vanishes on click and a purple particle effect
+appears, animating in a winding path to the user's essence total and then plays
+a 'hit' particle effect when it reaches the bottom left essence total and
+updates the quantity of essence shown.
 
 Icon: "Diamond"
 
@@ -841,17 +837,17 @@ configuration and assignment are defined in TOML. Each dreamscape biome has an
 affinity for a specific site, and produces an "enhanced site" of that type when
 visited:
 
-| Biome                | Enhanced Effect                                                                             |
-| -------------------- | ------------------------------------------------------------------------------------------- |
-| Verdant Hollow       | **Card Shop**: Free reroll                                                                  |
-| Starfall Glade       | **Dreamsign Offering**: Becomes dreamsign draft                                             |
-| Wanderer's Threshold | **Dream Journey**: 3rd option                                                               |
-| The Gilded Maw       | **Tempting Offer**: 3 options instead of 2                                                  |
-| Ashfall Basin        | **Loot Pack**: Pack contains double cards                                                   |
-| Crystal Spire        | **Essence**: Amount doubled                                                                 |
-| Shadowforge          | **Forge**: Player picks the output card from any card in the game matching their tides      |
-| Hall of Echoes       | **Duplication**: Player picks which card to duplicate                                       |
-| The Obsidian Bazaar  | **Pack Shop**: All packs are free                                                           |
+| Biome                | Enhanced Effect                                                                        |
+| -------------------- | -------------------------------------------------------------------------------------- |
+| Verdant Hollow       | **Card Shop**: Free reroll                                                             |
+| Starfall Glade       | **Dreamsign Offering**: Becomes dreamsign draft                                        |
+| Wanderer's Threshold | **Dream Journey**: 3rd option                                                          |
+| The Gilded Maw       | **Tempting Offer**: 3 options instead of 2                                             |
+| Ashfall Basin        | **Loot Pack**: Pack contains double cards                                              |
+| Crystal Spire        | **Essence**: Amount doubled                                                            |
+| Shadowforge          | **Forge**: Player picks the output card from any card in the game matching their tides |
+| Hall of Echoes       | **Duplication**: Player picks which card to duplicate                                  |
+| The Obsidian Bazaar  | **Pack Shop**: All packs are free                                                      |
 
 ## Victory & Defeat
 
@@ -877,20 +873,21 @@ Completing a battle always grants an essence reward. Base reward is
 **50**) per completion level, so rewards increase as the user completes more
 dreamscapes.
 
-The primary card reward from battles comes through the [Ante System](#ante-system)
--- the winner takes the opponent's anted cards as trophies.
+The primary card reward from battles comes through the
+[Ante System](#ante-system) -- the winner takes the opponent's anted cards as
+trophies.
 
 ## Limits
 
-| Limit               | Value                                    |
-| -------------------- | ---------------------------------------- |
-| Minimum deck size    | `<minimum_deck_size>` (default: **25**)  |
-| Maximum deck size    | `<maximum_deck_size>` (default: **50**)  |
-| Max copies per card  | `<max_copies>` (default: **2**)          |
-| Maximum dreamsigns   | 12                                       |
-| Maximum dreamcallers | 1                                        |
-| Tide crystal cap     | 3 per tide (during battle)               |
-| Card pool size       | No limit                                 |
+| Limit                | Value                                   |
+| -------------------- | --------------------------------------- |
+| Minimum deck size    | `<minimum_deck_size>` (default: **25**) |
+| Maximum deck size    | `<maximum_deck_size>` (default: **50**) |
+| Max copies per card  | `<max_copies>` (default: **2**)         |
+| Maximum dreamsigns   | 12                                      |
+| Maximum dreamcallers | 1                                       |
+| Tide crystal cap     | 3 per tide (during battle)              |
+| Card pool size       | No limit                                |
 
 If the deck size limits are violated before battle, the player must adjust their
 deck via the deck editor before proceeding.
@@ -923,11 +920,12 @@ Each dreamscape can be in one of three states:
 
 - **Completed**: The player has already visited this dreamscape and finished its
   battle.
-- **Available**: The player can choose this dreamscape as their next destination.
+- **Available**: The player can choose this dreamscape as their next
+  destination.
 - **Unavailable**: The player cannot choose this dreamscape yet.
 
-The player begins at the center of the Dream Atlas, called the **Nexus**. At
-the start, the first dreamscape is entered automatically -- no atlas navigation.
+The player begins at the center of the Dream Atlas, called the **Nexus**. At the
+start, the first dreamscape is entered automatically -- no atlas navigation.
 After the first battle, any dreamscapes connected to the Nexus are
 **Available**.
 
@@ -966,8 +964,8 @@ the dreamscape becomes available. The pool for site generation changes over
 time, with new options being shuffled in after each dreamscape is completed.
 Each completed dreamscape shuffles in a new set of sites as defined in TOML for
 that completion level. All sites can appear a maximum of 1 time in a dreamscape,
-with the exception that there can be up to 3 Loot Pack sites and up to 2
-Essence sites.
+with the exception that there can be up to 3 Loot Pack sites and up to 2 Essence
+sites.
 
 **All dreamscapes contain at least 1 loot pack site.** Loot pack sites are
 handled with deterministic counts based on completion level (see
@@ -984,38 +982,30 @@ dreamscape visited, and only in that dreamscape.
 
 ### Dreamscape Composition by Completion Level
 
-**Completion Level 0 (First dreamscape, automatic):**
-Fixed: Dreamcaller Draft (1), Loot Pack (3), Card Shop (1), Battle (1)
+**Completion Level 0 (First dreamscape, automatic):** Fixed: Dreamcaller Draft
+(1), Loot Pack (3), Card Shop (1), Battle (1)
 
-**Completion Level 1:**
-Fixed: Loot Pack (3), Battle (1)
-From pool: 1-2 from {Card Shop, Pack Shop, Essence, Dreamsign Offering}
+**Completion Level 1:** Fixed: Loot Pack (3), Battle (1) From pool: 1-2 from
+{Card Shop, Pack Shop, Essence, Dreamsign Offering}
 
-**Completion Level 2:**
-Fixed: Loot Pack (2), Battle (1)
-From pool: 2-3 from {Card Shop, Pack Shop, Draft Site, Essence,
-Dreamsign Draft, Dream Journey, Reward}
+**Completion Level 2:** Fixed: Loot Pack (2), Battle (1) From pool: 2-3 from
+{Card Shop, Pack Shop, Draft Site, Essence, Dreamsign Draft, Dream Journey,
+Reward}
 
-**Completion Level 3 (Miniboss):**
-Fixed: Loot Pack (2), Battle (1)
-From pool: 2-3 from {Card Shop, Pack Shop, Forge, Draft Site,
-Dream Journey, Tempting Offer, Essence}
+**Completion Level 3 (Miniboss):** Fixed: Loot Pack (2), Battle (1) From pool:
+2-3 from {Card Shop, Pack Shop, Forge, Draft Site, Dream Journey, Tempting
+Offer, Essence}
 
-**Completion Level 4:**
-Fixed: Loot Pack (1), Battle (1)
-From pool: 3-4 from {Card Shop, Pack Shop, Forge, Provisioner,
-Transfiguration, Duplication, Draft Site, Dream Journey, Tempting Offer,
-Dreamsign Draft}
+**Completion Level 4:** Fixed: Loot Pack (1), Battle (1) From pool: 3-4 from
+{Card Shop, Pack Shop, Forge, Provisioner, Transfiguration, Duplication, Draft
+Site, Dream Journey, Tempting Offer, Dreamsign Draft}
 
-**Completion Level 5:**
-Fixed: Loot Pack (1), Battle (1)
-From pool: 3-4 from {Card Shop, Pack Shop, Forge, Provisioner,
-Transfiguration, Duplication, Dream Journey, Tempting Offer}
+**Completion Level 5:** Fixed: Loot Pack (1), Battle (1) From pool: 3-4 from
+{Card Shop, Pack Shop, Forge, Provisioner, Transfiguration, Duplication, Dream
+Journey, Tempting Offer}
 
-**Completion Level 6 (Final Boss):**
-Fixed: Loot Pack (1), Battle (1)
-From pool: 2-3 from {Card Shop, Pack Shop, Forge, Transfiguration,
-Essence}
+**Completion Level 6 (Final Boss):** Fixed: Loot Pack (1), Battle (1) From pool:
+2-3 from {Card Shop, Pack Shop, Forge, Transfiguration, Essence}
 
 ### Dreamscape Pack Theme Generation
 
@@ -1068,39 +1058,39 @@ automatic Dreamwell phase allocation:
 
 - **Dreamcallers** grant 1 permanent tide crystal of their associated tide. The
   player starts each battle already having this crystal in play.
-- **Card Shops** sell the ability to gain a tide crystal in exchange for essence,
-  allowing the player to start battles with a pre-purchased crystal in play.
-  This is a key tool for enabling multi-tide decks.
-- **Cards** -- certain cards will be designed that generate tide crystals as part
-  of their effects, allowing players to fix their tide pool and play cards from
-  multiple tides.
+- **Card Shops** sell the ability to gain a tide crystal in exchange for
+  essence, allowing the player to start battles with a pre-purchased crystal in
+  play. This is a key tool for enabling multi-tide decks.
+- **Cards** -- certain cards will be designed that generate tide crystals as
+  part of their effects, allowing players to fix their tide pool and play cards
+  from multiple tides.
 
 ## Economy
 
 ### Essence Sources
 
-| Source                  | Amount                                                             |
-| ----------------------- | ------------------------------------------------------------------ |
-| Starting                | `<starting_essence>` (default: **250**)                            |
-| Dreamcaller bonus       | 50-150 (varies by dreamcaller)                                     |
-| Battle reward (base)    | `<battle_essence>` (default: **150**)                              |
-| Battle reward (scaling) | +`<essence_per_level>` (default: **50**) per completion level      |
-| Essence site            | `<essence_site_amount>` (default: **200**)                         |
-| Dream journey effects   | Variable                                                           |
-| Ante wins               | Cards, not essence (see [Ante System](#ante-system))               |
+| Source                  | Amount                                                        |
+| ----------------------- | ------------------------------------------------------------- |
+| Starting                | `<starting_essence>` (default: **250**)                       |
+| Dreamcaller bonus       | 50-150 (varies by dreamcaller)                                |
+| Battle reward (base)    | `<battle_essence>` (default: **150**)                         |
+| Battle reward (scaling) | +`<essence_per_level>` (default: **50**) per completion level |
+| Essence site            | `<essence_site_amount>` (default: **200**)                    |
+| Dream journey effects   | Variable                                                      |
+| Ante wins               | Cards, not essence (see [Ante System](#ante-system))          |
 
 ### Essence Sinks
 
-| Sink                      | Cost             |
-| ------------------------- | ---------------- |
-| Card Shop: card           | 50-100 (random)  |
-| Pack Shop: Tide Pack      | 100              |
-| Pack Shop: Alliance Pack  | 125              |
-| Pack Shop: Mechanical Pack| 125              |
-| Card Shop: Reroll         | 40 + 20 per prev |
-| Dreamsign                 | 150              |
-| Tide Crystal              | 200              |
-| Provisioner sites         | 50-125 (varies)  |
+| Sink                       | Cost             |
+| -------------------------- | ---------------- |
+| Card Shop: card            | 50-100 (random)  |
+| Pack Shop: Tide Pack       | 100              |
+| Pack Shop: Alliance Pack   | 125              |
+| Pack Shop: Mechanical Pack | 125              |
+| Card Shop: Reroll          | 40 + 20 per prev |
+| Dreamsign                  | 150              |
+| Tide Crystal               | 200              |
+| Provisioner sites          | 50-125 (varies)  |
 
 ### Economy Analysis
 
@@ -1154,16 +1144,16 @@ interactively building a high-quality `DreamtidesSceneWalker.Quest.cs` scene
 
 Five quests with identical starting conditions should diverge because:
 
-1. **Random starting tides**: Different center tide each run.
-2. **Dreamscape atlas topology** (random generation): Different paths.
-3. **Loot pack contents** (random within theme): Different cards each time.
-4. **Loot pack themes** (weighted random per dreamscape): Different tides
-   available at each dreamscape.
-5. **Dreamscape navigation** (player choice): Different dreamscapes visited.
-6. **Card Shop inventories** (random, tide-weighted): Different cards for sale.
-7. **Pack Shop themes** (random): Different bulk options.
-8. **Battle opponents** (from completion-level pool): Different ante cards.
-9. **Dreamcaller offering** (weighted random): Different abilities/crystals.
+01. **Random starting tides**: Different center tide each run.
+02. **Dreamscape atlas topology** (random generation): Different paths.
+03. **Loot pack contents** (random within theme): Different cards each time.
+04. **Loot pack themes** (weighted random per dreamscape): Different tides
+    available at each dreamscape.
+05. **Dreamscape navigation** (player choice): Different dreamscapes visited.
+06. **Card Shop inventories** (random, tide-weighted): Different cards for sale.
+07. **Pack Shop themes** (random): Different bulk options.
+08. **Battle opponents** (from completion-level pool): Different ante cards.
+09. **Dreamcaller offering** (weighted random): Different abilities/crystals.
 10. **Forge offers** (pool-dependent): Different transmutation options.
 11. **Dream journey outcomes**: Can dramatically reshape decks.
 12. **Ante outcomes**: Won/lost cards change the pool.
@@ -1172,46 +1162,46 @@ Five quests with identical starting conditions should diverge because:
 
 ## Full Parameter Table
 
-| Parameter               | Default | Description                          |
-| ----------------------- | ------- | ------------------------------------ |
-| `revised_tides`         | true    | Use revised tide system              |
-| `starting_tides`        | 3       | Tides in starting pool               |
-| `sequential_tides`      | true    | Sequential (true) or random tides    |
-| `initial_cards`         | 10      | Non-neutral cards in starting pool   |
-| `starter_neutral`       | 5       | Neutral cards in starter             |
-| `starter_low_cost`      | 4       | Min 0-2 cost cards in starter        |
-| `starter_mid_cost`      | 3       | Min 3-4 cost cards in starter        |
-| `starter_high_cost`     | 1       | Min 5+ cost cards in starter         |
-| `starting_essence`      | 250     | Essence at quest start               |
-| `loot_pack_size`        | 4       | Cards per loot pack                  |
-| `dupe_penalty_2`        | 50      | Weight reduction % for 2nd copy      |
-| `dupe_penalty_3`        | 90      | Weight reduction % for 3rd+ copy     |
-| `pack_on_theme_weight`  | 60      | % weight for on-theme pack tides     |
-| `pack_adjacent_weight`  | 25      | % weight for adjacent pack tides     |
-| `pack_explore_weight`   | 15      | % weight for off-theme pack tides    |
-| `minimum_deck_size`     | 25      | Min cards in deck for battle         |
-| `maximum_deck_size`     | 50      | Max cards in deck                    |
-| `max_copies`            | 2       | Max copies of one card in deck       |
-| `card_shop_size`        | 4       | Individual cards in Card Shop        |
-| `card_price_min`        | 50      | Min card price in Card Shop          |
-| `card_price_max`        | 100     | Max card price in Card Shop          |
-| `reroll_base`           | 40      | Base reroll cost                     |
-| `reroll_increment`      | 20      | Added cost per previous reroll       |
-| `pack_shop_size`        | 3       | Packs for sale in Pack Shop          |
-| `special_pack_chance`   | 20      | % of non-tide packs in Pack Shop     |
-| `ante_enabled`          | true    | Whether ante system is active        |
-| `escalation_turn`       | 6       | Turn at which escalation happens     |
-| `max_ante_cards`        | 2       | Max cards each side can ante         |
-| `forge_recipes`         | 3       | Offers shown at forge                |
-| `forge_cost`            | 4       | Cards sacrificed per forge           |
-| `draft_site_total`      | 4       | Cards shown at draft site            |
-| `draft_site_keep`       | 1       | Cards kept from draft site           |
-| `provisioner_options`   | 3       | Site options at provisioner          |
-| `dreamcaller_choices`   | 3       | Dreamcallers at draft                |
-| `opponent_preview_cards`| 3       | Opponent cards shown before battle   |
-| `battle_essence`        | 150     | Base essence per battle win          |
-| `essence_per_level`     | 50      | Extra essence per completion level   |
-| `essence_site_amount`   | 200     | Essence from essence sites           |
+| Parameter                | Default | Description                        |
+| ------------------------ | ------- | ---------------------------------- |
+| `revised_tides`          | true    | Use revised tide system            |
+| `starting_tides`         | 3       | Tides in starting pool             |
+| `sequential_tides`       | true    | Sequential (true) or random tides  |
+| `initial_cards`          | 10      | Non-neutral cards in starting pool |
+| `starter_neutral`        | 5       | Neutral cards in starter           |
+| `starter_low_cost`       | 4       | Min 0-2 cost cards in starter      |
+| `starter_mid_cost`       | 3       | Min 3-4 cost cards in starter      |
+| `starter_high_cost`      | 1       | Min 5+ cost cards in starter       |
+| `starting_essence`       | 250     | Essence at quest start             |
+| `loot_pack_size`         | 4       | Cards per loot pack                |
+| `dupe_penalty_2`         | 50      | Weight reduction % for 2nd copy    |
+| `dupe_penalty_3`         | 90      | Weight reduction % for 3rd+ copy   |
+| `pack_on_theme_weight`   | 60      | % weight for on-theme pack tides   |
+| `pack_adjacent_weight`   | 25      | % weight for adjacent pack tides   |
+| `pack_explore_weight`    | 15      | % weight for off-theme pack tides  |
+| `minimum_deck_size`      | 25      | Min cards in deck for battle       |
+| `maximum_deck_size`      | 50      | Max cards in deck                  |
+| `max_copies`             | 2       | Max copies of one card in deck     |
+| `card_shop_size`         | 4       | Individual cards in Card Shop      |
+| `card_price_min`         | 50      | Min card price in Card Shop        |
+| `card_price_max`         | 100     | Max card price in Card Shop        |
+| `reroll_base`            | 40      | Base reroll cost                   |
+| `reroll_increment`       | 20      | Added cost per previous reroll     |
+| `pack_shop_size`         | 3       | Packs for sale in Pack Shop        |
+| `special_pack_chance`    | 20      | % of non-tide packs in Pack Shop   |
+| `ante_enabled`           | true    | Whether ante system is active      |
+| `escalation_turn`        | 6       | Turn at which escalation happens   |
+| `max_ante_cards`         | 2       | Max cards each side can ante       |
+| `forge_recipes`          | 3       | Offers shown at forge              |
+| `forge_cost`             | 4       | Cards sacrificed per forge         |
+| `draft_site_total`       | 4       | Cards shown at draft site          |
+| `draft_site_keep`        | 1       | Cards kept from draft site         |
+| `provisioner_options`    | 3       | Site options at provisioner        |
+| `dreamcaller_choices`    | 3       | Dreamcallers at draft              |
+| `opponent_preview_cards` | 3       | Opponent cards shown before battle |
+| `battle_essence`         | 150     | Base essence per battle win        |
+| `essence_per_level`      | 50      | Extra essence per completion level |
+| `essence_site_amount`    | 200     | Essence from essence sites         |
 
 ## Appendix A: Alternative Designs for Playtesting
 
