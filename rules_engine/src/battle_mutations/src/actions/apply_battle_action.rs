@@ -8,6 +8,7 @@ use tracing::instrument;
 
 use crate::actions::{apply_card_order_action, apply_debug_battle_action};
 use crate::activated_abilities::activate_ability;
+use crate::card_mutations::reposition;
 use crate::effects::apply_effect;
 use crate::phase_mutations::{fire_triggers, turn};
 use crate::play_cards::{
@@ -101,6 +102,12 @@ pub fn execute_without_tracking_history(
         }
         BattleAction::SelectActivatedAbilityChoice(choice_index) => {
             activate_ability::execute_selected_ability(battle, player, choice_index);
+        }
+        BattleAction::MoveCharacterToFrontRank(character_id, position) => {
+            reposition::to_front_rank(battle, player, character_id, position);
+        }
+        BattleAction::MoveCharacterToBackRank(character_id, position) => {
+            reposition::to_back_rank(battle, player, character_id, position);
         }
     }
 

@@ -55,6 +55,10 @@ pub enum BattleAction {
     SelectModalEffectChoice(ModelEffectChoiceIndex),
     /// Select which activated ability to activate from a character
     SelectActivatedAbilityChoice(usize),
+    /// Move a character to a specific front rank position (0-7).
+    MoveCharacterToFrontRank(CharacterId, u8),
+    /// Move a character to a specific back rank position (0-7).
+    MoveCharacterToBackRank(CharacterId, u8),
 }
 
 #[derive(
@@ -132,6 +136,12 @@ impl BattleAction {
             }
             BattleAction::SelectActivatedAbilityChoice(choice_index) => {
                 format!("SAAC{choice_index:?}")
+            }
+            BattleAction::MoveCharacterToFrontRank(character_id, position) => {
+                format!("MCFR{:?}P{position}", character_id.0.0)
+            }
+            BattleAction::MoveCharacterToBackRank(character_id, position) => {
+                format!("MCBR{:?}P{position}", character_id.0.0)
             }
         }
     }

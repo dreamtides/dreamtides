@@ -9,6 +9,9 @@ use bit_set::BitSet;
 use core_data::numerics::Energy;
 use fastrand;
 
+/// A reposition action: (character_id, target_position).
+pub type RepositionActions = Vec<(CharacterId, u8)>;
+
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum LegalActions {
     NoActionsGameOver,
@@ -58,6 +61,8 @@ pub struct StandardLegalActions {
     pub play_card_from_hand: CardSet<HandCardId>,
     pub play_card_from_void: CardSet<VoidCardId>,
     pub activate_abilities_for_character: CardSet<CharacterId>,
+    pub reposition_to_front: RepositionActions,
+    pub reposition_to_back: RepositionActions,
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
@@ -240,6 +245,20 @@ impl LegalActions {
             BattleAction::SubmitDeckCardOrder => {
                 matches!(self, LegalActions::SelectDeckCardOrder { .. })
             }
+            BattleAction::MoveCharacterToFrontRank(character_id, position) => {
+                if let LegalActions::Standard { actions } = self {
+                    actions.reposition_to_front.contains(&(character_id, position))
+                } else {
+                    false
+                }
+            }
+            BattleAction::MoveCharacterToBackRank(character_id, position) => {
+                if let LegalActions::Standard { actions } = self {
+                    actions.reposition_to_back.contains(&(character_id, position))
+                } else {
+                    false
+                }
+            }
             BattleAction::SubmitMulligan => todo!("Implement this"),
             BattleAction::SelectModalEffectChoice(modal_choice_index) => {
                 if let LegalActions::ModalEffectPrompt { valid_choices } = self {
@@ -289,7 +308,13 @@ impl LegalActions {
                 let play_cards_count = actions.play_card_from_hand.len();
                 let play_void_cards_count = actions.play_card_from_void.len();
                 let character_ability_count = actions.activate_abilities_for_character.len();
-                primary_count + play_cards_count + play_void_cards_count + character_ability_count
+                let reposition_count =
+                    actions.reposition_to_front.len() + actions.reposition_to_back.len();
+                primary_count
+                    + play_cards_count
+                    + play_void_cards_count
+                    + character_ability_count
+                    + reposition_count
             }
 
             LegalActions::SelectCharacterPrompt { valid } => valid.len(),
@@ -369,18 +394,32 @@ impl LegalActions {
                             })
                         {
                             Some(BattleAction::PlayCardFromVoid(card_id))
+                        } else if let Some(character_id) = standard_actions
+                            .activate_abilities_for_character
+                            .iter()
+                            .find(|&character_id| {
+                                !actions.contains(&BattleAction::ActivateAbilityForCharacter(
+                                    character_id,
+                                ))
+                            })
+                        {
+                            Some(BattleAction::ActivateAbilityForCharacter(character_id))
+                        } else if let Some(&(id, pos)) =
+                            standard_actions.reposition_to_front.iter().find(|(id, pos)| {
+                                !actions
+                                    .contains(&BattleAction::MoveCharacterToFrontRank(*id, *pos))
+                            })
+                        {
+                            Some(BattleAction::MoveCharacterToFrontRank(id, pos))
                         } else {
-                            // All abilities are now handled through
-                            // activate_abilities_for_character
                             standard_actions
-                                .activate_abilities_for_character
+                                .reposition_to_back
                                 .iter()
-                                .find(|&character_id| {
-                                    !actions.contains(&BattleAction::ActivateAbilityForCharacter(
-                                        character_id,
-                                    ))
+                                .find(|(id, pos)| {
+                                    !actions
+                                        .contains(&BattleAction::MoveCharacterToBackRank(*id, *pos))
                                 })
-                                .map(BattleAction::ActivateAbilityForCharacter)
+                                .map(|&(id, pos)| BattleAction::MoveCharacterToBackRank(id, pos))
                         }
                     }
                 }
@@ -514,6 +553,14 @@ impl LegalActions {
                     result.push(BattleAction::ActivateAbilityForCharacter(character_id));
                 }
 
+                for &(character_id, position) in &actions.reposition_to_front {
+                    result.push(BattleAction::MoveCharacterToFrontRank(character_id, position));
+                }
+
+                for &(character_id, position) in &actions.reposition_to_back {
+                    result.push(BattleAction::MoveCharacterToBackRank(character_id, position));
+                }
+
                 result
             }
 
@@ -632,10 +679,24 @@ impl LegalActions {
                                 .map(BattleAction::PlayCardFromVoid)
                         } else {
                             let ability_index = void_index - actions.play_card_from_void.len();
-                            actions
-                                .activate_abilities_for_character
-                                .get_at_index(ability_index)
-                                .map(BattleAction::ActivateAbilityForCharacter)
+                            if ability_index < actions.activate_abilities_for_character.len() {
+                                actions
+                                    .activate_abilities_for_character
+                                    .get_at_index(ability_index)
+                                    .map(BattleAction::ActivateAbilityForCharacter)
+                            } else {
+                                let reposition_index =
+                                    ability_index - actions.activate_abilities_for_character.len();
+                                if reposition_index < actions.reposition_to_front.len() {
+                                    let (id, pos) = actions.reposition_to_front[reposition_index];
+                                    Some(BattleAction::MoveCharacterToFrontRank(id, pos))
+                                } else {
+                                    let back_index =
+                                        reposition_index - actions.reposition_to_front.len();
+                                    let (id, pos) = actions.reposition_to_back[back_index];
+                                    Some(BattleAction::MoveCharacterToBackRank(id, pos))
+                                }
+                            }
                         }
                     }
                 }

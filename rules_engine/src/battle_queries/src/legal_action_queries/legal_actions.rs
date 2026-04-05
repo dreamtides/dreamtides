@@ -7,7 +7,7 @@ use core_data::types::PlayerName;
 
 use crate::legal_action_queries::can_play_cards::{self, FastOnly};
 use crate::legal_action_queries::legal_actions_data::{
-    LegalActions, PrimaryLegalAction, StandardLegalActions,
+    LegalActions, PrimaryLegalAction, RepositionActions, StandardLegalActions,
 };
 use crate::legal_action_queries::{can_activate_abilities, legal_modal_effect_choices};
 
@@ -128,6 +128,12 @@ fn standard_legal_actions(
     primary: PrimaryLegalAction,
     fast_only: FastOnly,
 ) -> StandardLegalActions {
+    let (reposition_to_front, reposition_to_back) = if matches!(fast_only, FastOnly::No) {
+        reposition_actions(battle, player)
+    } else {
+        (vec![], vec![])
+    };
+
     StandardLegalActions {
         primary,
         play_card_from_hand: can_play_cards::from_hand(battle, player, fast_only),
@@ -135,5 +141,55 @@ fn standard_legal_actions(
         activate_abilities_for_character: can_activate_abilities::for_player(
             battle, player, fast_only,
         ),
+        reposition_to_front,
+        reposition_to_back,
     }
+}
+
+fn reposition_actions(
+    battle: &BattleState,
+    player: PlayerName,
+) -> (RepositionActions, RepositionActions) {
+    let bf = battle.cards.battlefield(player);
+    let current_turn = battle.turn.turn_id.0;
+    let mut to_front = Vec::new();
+    let mut to_back = Vec::new();
+
+    // Characters in back rank can move to front rank positions (if no
+    // summoning sickness)
+    for character_id in bf.back.iter().flatten() {
+        let has_summoning_sickness = battle
+            .cards
+            .battlefield_state(player)
+            .get(character_id)
+            .is_some_and(|state| state.played_turn == current_turn);
+        if !has_summoning_sickness {
+            for position in 0..8u8 {
+                to_front.push((*character_id, position));
+            }
+        }
+
+        // Characters in back rank can move to other back rank positions
+        for position in 0..8u8 {
+            if bf.back[position as usize] != Some(*character_id) {
+                to_back.push((*character_id, position));
+            }
+        }
+    }
+
+    // Characters in front rank can move to back rank positions
+    for character_id in bf.front.iter().flatten() {
+        for position in 0..8u8 {
+            to_back.push((*character_id, position));
+        }
+
+        // Characters in front rank can move to other front rank positions
+        for position in 0..8u8 {
+            if bf.front[position as usize] != Some(*character_id) {
+                to_front.push((*character_id, position));
+            }
+        }
+    }
+
+    (to_front, to_back)
 }
