@@ -418,32 +418,157 @@ git commit -m "feat: render four battlefield ranks with judgment line separator"
 
 ---
 
-## Task 8: QA — Character Placement Deep Test
+## Task 8: Extended Debug Tools for Combat Testing
 
-**Dedicated QA milestone — no code changes, just testing.**
+**Files:**
+- Modify: `rules_engine/src/battle_state/src/actions/debug_battle_action.rs`
+- Modify: `rules_engine/src/battle_mutations/src/actions/apply_debug_battle_action.rs`
+- Modify: `scripts/battle_prototype/src/components/DebugPanel.tsx`
 
-- [ ] **Step 1: QA VERIFY — Character placement and battlefield state**
+The existing debug system has `AddCardToHand`, `AddCardToBattlefield`, `SetEnergy`,
+`DrawCard`, etc. We need combat-specific debug tools for QA.
+
+- [ ] **Step 1: Add new DebugBattleAction variants**
+
+In `debug_battle_action.rs`, add:
+
+```rust
+/// Place a character directly into the front rank at a specific position.
+/// Bypasses summoning sickness.
+AddCardToFrontRank { player: PlayerName, card: BaseCardId, position: u8 },
+
+/// Place a character directly into the back rank at a specific position.
+AddCardToBackRank { player: PlayerName, card: BaseCardId, position: u8 },
+
+/// Skip directly to the Judgment phase, resolving all front-rank combat.
+SkipToJudgment,
+```
+
+- [ ] **Step 2: Implement handlers in apply_debug_battle_action.rs**
+
+For `AddCardToFrontRank` / `AddCardToBackRank`:
+1. Create the card via `battle_deck::debug_add_cards()`
+2. Move from deck to battlefield using existing `move_card::from_deck_to_battlefield()`
+3. Then reposition the character from its default back-rank slot to the target rank/position
+
+For `SkipToJudgment`:
+1. Set `battle.phase = BattleTurnPhase::Judgment`
+2. The state machine will pick it up on the next tick and call `judgment_phase::run()`
+
+- [ ] **Step 3: Add combat-focused debug buttons to DebugPanel.tsx**
+
+Add these buttons to the DEBUG_BUTTONS array:
+
+```tsx
+{
+  label: "Add Sentry (1✦) to Enemy Front 0",
+  action: { BattleAction: { Debug: {
+    AddCardToFrontRank: { player: "Two", card: "a1b2c3d4-1111-4000-8000-000000000001", position: 0 }
+  }}}
+},
+{
+  label: "Add Knight (3✦) to Enemy Front 1",
+  action: { BattleAction: { Debug: {
+    AddCardToFrontRank: { player: "Two", card: "a1b2c3d4-3333-4000-8000-000000000003", position: 1 }
+  }}}
+},
+{
+  label: "Add Titan (7✦) to Enemy Front 2",
+  action: { BattleAction: { Debug: {
+    AddCardToFrontRank: { player: "Two", card: "a1b2c3d4-5555-4000-8000-000000000005", position: 2 }
+  }}}
+},
+{
+  label: "Add Colossus (10✦) to Enemy Front 3",
+  action: { BattleAction: { Debug: {
+    AddCardToFrontRank: { player: "Two", card: "a1b2c3d4-7777-4000-8000-000000000006", position: 3 }
+  }}}
+},
+{
+  label: "Add Scout (2✦) to Your Front 0",
+  action: { BattleAction: { Debug: {
+    AddCardToFrontRank: { player: "One", card: "a1b2c3d4-2222-4000-8000-000000000002", position: 0 }
+  }}}
+},
+{
+  label: "Add Warrior (5✦) to Your Front 1",
+  action: { BattleAction: { Debug: {
+    AddCardToFrontRank: { player: "One", card: "a1b2c3d4-4444-4000-8000-000000000004", position: 1 }
+  }}}
+},
+{
+  label: "Add Vanilla to Hand",
+  action: { BattleAction: { Debug: {
+    AddCardToHand: { player: "One", card: "a1b2c3d4-3333-4000-8000-000000000003" }
+  }}}
+},
+{
+  label: "Skip to Judgment",
+  action: { BattleAction: { Debug: "SkipToJudgment" } }
+},
+```
+
+These let QA set up exact board states: specific characters at specific positions
+in specific ranks, then trigger judgment to see the outcome.
+
+- [ ] **Step 4: Run `just fmt` then `just review`**
+
+- [ ] **Step 5: QA VERIFY — Debug tools work**
+
+Dispatch QA subagent:
+- Open game, open debug panel
+- Click "99 Energy" → verify energy display changes
+- Click "Add Sentry (1✦) to Enemy Front 0" → verify enemy front rank slot 0 shows a character
+- Click "Add Scout (2✦) to Your Front 0" → verify your front rank slot 0 shows a character
+- Click "Skip to Judgment" → verify judgment resolves (Scout 2✦ vs Sentry 1✦ → Sentry dissolved)
+- Verify score increased by correct amount for uncontested characters
+- Test placing characters in multiple positions
+- Test adding multiple enemy characters then running judgment
+- Report to `/tmp/qa-report-task8.md`
+
+- [ ] **Step 6: Commit**
+
+```bash
+git commit -m "feat: add combat-focused debug tools for QA testing
+
+AddCardToFrontRank, AddCardToBackRank, SkipToJudgment debug actions.
+Debug panel buttons for placing vanilla characters at specific positions
+and triggering judgment phase for combat testing."
+```
+
+---
+
+## Task 9: QA — Character Placement Deep Test (Using Debug Tools)
+
+**Dedicated QA milestone — use debug tools to set up exact board states.**
+
+- [ ] **Step 1: QA VERIFY — Character placement and debug tool validation**
 
 Dispatch QA subagent with extended protocol:
 - Play 8+ turns, playing characters each turn
+- **Use debug tools to test specific scenarios:**
+  - "99 Energy" then play multiple vanilla characters in one turn
+  - "Add Vanilla to Hand" to get specific characters
+  - "Add Sentry to Enemy Front 0" → verify enemy character appears in correct slot
+  - Place characters in multiple specific positions using debug buttons
+  - "Skip to Judgment" to verify judgment works with debug-placed characters
 - **Invariants to track:**
-  - Characters always appear in back rank when played
+  - Characters played from hand always appear in back rank
+  - Debug-placed characters appear in the specified rank/slot
   - Total characters on battlefield matches expected count
   - Spark values on battlefield match card spark
-  - Hand count decreases by 1 when a card is played
-  - Energy decreases by card cost when played
+  - Hand count decreases by 1 when a card is played from hand
+  - Energy decreases by card cost when played from hand
 - Verify enemy AI also places characters in back rank
-- Test playing multiple characters in one turn
 - Test playing events (should NOT appear on battlefield)
-- Test playing when hand is nearly empty
-- Take screenshots after every character played
-- Report to `/tmp/qa-report-task8.md`
+- Take screenshots after every action
+- Report to `/tmp/qa-report-task9.md`
 
 - [ ] **Step 2: Fix any bugs found and commit**
 
 ---
 
-## Task 9: New Judgment Phase Resolution
+## Task 10: New Judgment Phase Resolution
 
 **Files:**
 - Create: `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`
@@ -521,7 +646,7 @@ git commit -m "feat: implement Judgment phase with front-rank combat resolution"
 
 ---
 
-## Task 10: Character Materialization to Back Rank
+## Task 11: Character Materialization to Back Rank
 
 **Files:**
 - Modify: `rules_engine/src/battle_mutations/src/card_mutations/move_card.rs`
@@ -552,7 +677,7 @@ git commit -m "feat: characters materialize into back rank with played_turn trac
 
 ---
 
-## Task 11: Repositioning Actions
+## Task 12: Repositioning Actions
 
 **Files:**
 - Modify: `rules_engine/src/battle_state/src/actions/battle_actions.rs`
@@ -608,7 +733,7 @@ git commit -m "feat: add character repositioning between front and back ranks"
 
 ---
 
-## Task 12: QA — Summoning Sickness Deep Test
+## Task 13: QA — Summoning Sickness Deep Test
 
 **Dedicated QA milestone.**
 
@@ -631,7 +756,7 @@ Dispatch QA subagent:
 
 ---
 
-## Task 13: AI Simplified Actions
+## Task 14: AI Simplified Actions
 
 **Files:**
 - Modify: `rules_engine/src/battle_queries/src/legal_action_queries/legal_actions.rs`
@@ -673,7 +798,7 @@ git commit -m "feat: simplified AI repositioning actions for MCTS"
 
 ---
 
-## Task 14: Battle Prototype UI — Drag and Drop
+## Task 15: Battle Prototype UI — Drag and Drop
 
 **Files:**
 - Modify: `scripts/battle_prototype/src/components/BattleScreen.tsx` or RankZone component
@@ -712,7 +837,7 @@ git commit -m "feat: drag-and-drop character repositioning in battle prototype"
 
 ---
 
-## Task 15: QA — Full Game Loop Round 1
+## Task 16: QA — Full Game Loop Round 1
 
 **Dedicated QA milestone — play a complete game.**
 
@@ -748,7 +873,7 @@ Dispatch QA subagent with full adversarial QA protocol:
 
 ---
 
-## Task 16: Kindle Effect Update
+## Task 17: Kindle Effect Update
 
 **Files:**
 - Modify: `rules_engine/src/battle_mutations/src/effects/apply_standard_effect.rs`
@@ -775,7 +900,7 @@ git commit -m "feat: kindle targets highest-spark character instead of leftmost"
 
 ---
 
-## Task 17: QA — Card Effects with Ranks
+## Task 18: QA — Card Effects with Ranks
 
 **Dedicated QA milestone — test card abilities interact correctly with rank system.**
 
@@ -800,7 +925,7 @@ Dispatch QA subagent:
 
 ---
 
-## Task 18: QA — UX Polish Round 1
+## Task 19: QA — UX Polish Round 1
 
 **Dedicated QA milestone — focused on usability, not functionality.**
 
@@ -835,7 +960,7 @@ Dispatch QA subagent:
 
 ---
 
-## Task 19: QA — Extended Play Round 1 (15+ turns)
+## Task 20: QA — Extended Play Round 1 (15+ turns)
 
 **Dedicated QA milestone — mid-game stress test.**
 
@@ -858,7 +983,7 @@ Dispatch QA subagent:
 
 ---
 
-## Task 20: QA — Extended Play Round 2 (Board Full States)
+## Task 21: QA — Extended Play Round 2 (Board Full States)
 
 **Dedicated QA milestone — push to 16 characters.**
 
@@ -881,31 +1006,34 @@ Dispatch QA subagent:
 
 ---
 
-## Task 21: QA — Extended Play Round 3 (Judgment Edge Cases)
+## Task 22: QA — Extended Play Round 3 (Judgment Edge Cases)
 
-**Dedicated QA milestone — adversarial judgment testing.**
+**Dedicated QA milestone — use debug tools to construct exact edge case board states.**
 
-- [ ] **Step 1: QA VERIFY — Judgment edge cases**
+- [ ] **Step 1: QA VERIFY — Judgment edge cases using debug tools**
 
 Dispatch QA subagent:
-- Set up and test specific judgment scenarios:
-  - **Tie:** Two characters with same spark in same column → both dissolve
-  - **Zero spark:** Character with 0 spark in combat
-  - **All 8 positions filled:** Both sides have full front ranks
-  - **Mass scoring:** Full front rank vs empty front rank → massive point gain
-  - **Dissolved trigger cascade:** Character with Dissolved trigger that buffs another character before their column resolves
-  - **Empty board judgment:** No front rank characters → nothing happens
+- **Use debug tools to set up specific scenarios:**
+  - **Tie:** Place Veilward Knight (3✦) at Your Front 0, and Knight (3✦) at Enemy Front 0 → Skip to Judgment → both dissolve
+  - **Asymmetric:** Place Titan (7✦) at Your Front 0, Sentry (1✦) at Enemy Front 0 → Skip to Judgment → Sentry dissolved
+  - **Zero spark:** If possible, create 0-spark character via debug
+  - **All 8 positions filled:** Use debug to fill all 8 front positions on both sides → Skip to Judgment → all 8 pairs resolve
+  - **Mass scoring:** Fill your front rank with 8 characters, leave enemy front empty → Skip to Judgment → massive point gain (sum of all spark)
+  - **Uncontested + contested mix:** Some columns have matchups, some are empty
+  - **Empty board judgment:** No front rank characters → Skip to Judgment → nothing happens
 - **Invariants:**
   - Ties always dissolve both
-  - Uncontested scoring = exact spark value
+  - Uncontested scoring = exact spark value of each uncontested character
+  - Higher spark always wins
   - Dissolved triggers fire between each column
-- Report to `/tmp/qa-report-task21.md`
+- Take screenshot before and after each Skip to Judgment
+- Report to `/tmp/qa-report-task22.md`
 
 - [ ] **Step 2: Fix bugs and commit**
 
 ---
 
-## Task 22: QA — AI Behavior Round 2
+## Task 23: QA — AI Behavior Round 2
 
 **Dedicated QA milestone — evaluate AI tactical quality.**
 
@@ -928,7 +1056,7 @@ Dispatch QA subagent:
 
 ---
 
-## Task 23: QA — UX Polish Round 2
+## Task 24: QA — UX Polish Round 2
 
 **Dedicated QA milestone — second UX pass after extended play learnings.**
 
@@ -949,7 +1077,7 @@ Dispatch QA subagent:
 
 ---
 
-## Task 24: QA — Extended Play Round 4 (20+ turns)
+## Task 25: QA — Extended Play Round 4 (20+ turns)
 
 **Dedicated QA milestone — long game stress test.**
 
@@ -973,7 +1101,7 @@ Dispatch QA subagent:
 
 ---
 
-## Task 25: QA — Extended Play Round 5 (Another Full Game)
+## Task 26: QA — Extended Play Round 5 (Another Full Game)
 
 **Dedicated QA milestone — fresh game with all fixes applied.**
 
@@ -990,7 +1118,7 @@ Dispatch QA subagent:
 
 ---
 
-## Task 26: QA — Stress Testing
+## Task 27: QA — Stress Testing
 
 **Dedicated QA milestone — adversarial interaction testing.**
 
@@ -1012,7 +1140,7 @@ Dispatch QA subagent:
 
 ---
 
-## Task 27: Update Battle Rules Documentation
+## Task 28: Update Battle Rules Documentation
 
 **Files:**
 - Modify: `docs/battle_rules/battle_rules.md`
@@ -1029,7 +1157,7 @@ git commit -m "docs: update battle rules for combat prototype"
 
 ---
 
-## Task 28: QA — Final Regression Pass
+## Task 29: QA — Final Regression Pass
 
 **Dedicated QA milestone — comprehensive final test.**
 
@@ -1077,26 +1205,27 @@ git commit -m "chore: final cleanup for combat prototype"
 | 5 | Phase & Trigger Renames | Code + QA |
 | 6 | ObjectPosition Changes | Code + QA |
 | 7 | UI Rank Rendering | Code + QA |
-| 8 | Character Placement Deep Test | QA |
-| 9 | Judgment Phase Resolution | Code + QA |
-| 10 | Materialization to Back Rank | Code + QA |
-| 11 | Repositioning Actions | Code + QA |
-| 12 | Summoning Sickness Deep Test | QA |
-| 13 | AI Simplified Actions | Code + QA |
-| 14 | Drag and Drop UI | Code + QA |
-| 15 | Full Game Loop Round 1 | QA |
-| 16 | Kindle Effect | Code + QA |
-| 17 | Card Effects with Ranks | QA |
-| 18 | UX Polish Round 1 | QA |
-| 19 | Extended Play Round 1 (15+ turns) | QA |
-| 20 | Extended Play Round 2 (Board Full) | QA |
-| 21 | Extended Play Round 3 (Judgment Edge Cases) | QA |
-| 22 | AI Behavior Round 2 | QA |
-| 23 | UX Polish Round 2 | QA |
-| 24 | Extended Play Round 4 (20+ turns) | QA |
-| 25 | Extended Play Round 5 (Regression) | QA |
-| 26 | Stress Testing | QA |
-| 27 | Update Documentation | Code |
-| 28 | Final Regression Pass | QA |
+| 8 | Extended Debug Tools | Code + QA |
+| 9 | Character Placement Deep Test | QA (uses debug tools) |
+| 10 | Judgment Phase Resolution | Code + QA |
+| 11 | Materialization to Back Rank | Code + QA |
+| 12 | Repositioning Actions | Code + QA |
+| 13 | Summoning Sickness Deep Test | QA |
+| 14 | AI Simplified Actions | Code + QA |
+| 15 | Drag and Drop UI | Code + QA |
+| 16 | Full Game Loop Round 1 | QA |
+| 17 | Kindle Effect | Code + QA |
+| 18 | Card Effects with Ranks | QA |
+| 19 | UX Polish Round 1 | QA |
+| 20 | Extended Play Round 1 (15+ turns) | QA |
+| 21 | Extended Play Round 2 (Board Full) | QA |
+| 22 | Extended Play Round 3 (Judgment Edge Cases) | QA (uses debug tools) |
+| 23 | AI Behavior Round 2 | QA |
+| 24 | UX Polish Round 2 | QA |
+| 25 | Extended Play Round 4 (20+ turns) | QA |
+| 26 | Extended Play Round 5 (Regression) | QA |
+| 27 | Stress Testing | QA |
+| 28 | Update Documentation | Code |
+| 29 | Final Regression Pass | QA |
 
-**QA passes: 19 dedicated** (Tasks 1, 8, 12, 15, 17-26, 28) plus QA verification steps embedded in all 12 code tasks = **31 total QA checkpoints.**
+**29 tasks total.** QA passes: 20 dedicated (Tasks 1, 9, 13, 16, 18-27, 29) plus QA verification in all 13 code tasks = **33 total QA checkpoints.** Debug tools (Task 8) enable precise board state setup for QA scenarios throughout.
