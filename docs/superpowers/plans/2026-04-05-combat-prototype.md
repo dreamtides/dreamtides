@@ -10,7 +10,9 @@
 
 **Spec:** `docs/superpowers/specs/2026-04-05-combat-prototype-design.md`
 
-**Key constraint:** NO automated tests. All validation through manual QA using `agent-browser` CLI against the battle prototype. At least 15 milestones are dedicated QA passes.
+**Key constraint:** NO automated tests. All validation through manual QA using `agent-browser` CLI against the battle prototype. Every implementation task is followed by a QA verification pass. QA subagents follow the full adversarial QA protocol: screenshots after every action, pre-committed predictions, invariant tracking, and never rationalizing anomalies.
+
+**QA tool:** `/Users/dthurn/Library/pnpm/agent-browser`
 
 **Build/run commands:**
 - Format: `just fmt`
@@ -34,370 +36,184 @@
 
 ---
 
-## Task 1: Add Vanilla Characters to Card Pool
+## QA Protocol for Every Verification Step
+
+Every "QA VERIFY" step in this plan dispatches a QA subagent that follows this protocol:
+
+1. **Open the battle prototype** at the dev server URL using `agent-browser open`
+2. **Take a screenshot and READ it** — visual inspection is primary, not DOM snapshots
+3. **Establish invariants** for the feature under test (counts, scores, zone contents)
+4. **For each test scenario:**
+   - STATE: Write current values
+   - PREDICT: Write what should happen
+   - ACT: Perform the action
+   - SCREENSHOT + READ: Take screenshot after every action
+   - MEASURE: Re-check invariants via `agent-browser eval`
+   - COMPARE: Predicted vs actual
+   - VERDICT: PASS only if all predictions match; otherwise BUG
+5. **Never rationalize anomalies** — wrong numbers, garbled text, layout issues are bugs
+6. **Write report** to `/tmp/qa-report-taskN.md` with bugs, UX issues, and passed scenarios
+7. **Play through extensively** — never just 2-3 turns. Minimum 10 turns for game loop tests.
+
+The QA subagent MUST NOT read source code. It tests the application as a user would.
+
+---
+
+## Task 1: QA Baseline — Current Game State
+
+**Before any code changes, establish a QA baseline of the current game.**
+
+- [ ] **Step 1: Start the battle prototype servers**
+
+Start both the Rust dev server and the TypeScript frontend. Verify the game loads.
+
+- [ ] **Step 2: QA VERIFY — Baseline gameplay**
+
+Dispatch QA subagent:
+- URL: battle prototype (default http://localhost:5174 or check scripts)
+- Area: Full game — play 5+ turns to establish baseline behavior
+- Invariants to track:
+  - Score only changes during judgment phase
+  - Energy resets each turn
+  - Cards drawn each turn
+  - Characters appear on battlefield when played
+- Document: current turn structure, scoring behavior, UI layout
+- Take screenshots of every phase transition
+- Write report to `/tmp/qa-report-baseline.md`
+
+Purpose: This baseline lets us compare before/after and catch regressions.
+
+- [ ] **Step 3: Save baseline report and commit**
+
+---
+
+## Task 2: Add Vanilla Characters to Card Pool
 
 **Files:**
-- Modify: `client/Assets/StreamingAssets/Tabula/cards.toml` (append after line 3802)
-- Modify: `client/Assets/StreamingAssets/Tabula/card-lists.toml` (insert before line 157)
+- Modify: `client/Assets/StreamingAssets/Tabula/cards.toml` (append after last card)
+- Modify: `client/Assets/StreamingAssets/Tabula/card-lists.toml` (insert before `[metadata]`)
 
 - [ ] **Step 1: Add 6 vanilla character cards to cards.toml**
 
-Append these cards at the end of the `[[cards]]` entries in `cards.toml` (before the `[metadata]` section if there is one, otherwise at the end). Use card numbers 223-228. Generate unique UUIDs for each.
+Append 6 cards with no abilities (empty rules-text), card numbers 223-228:
 
-```toml
-[[cards]]
-name = "Duskborne Sentry"
-id = "a1b2c3d4-1111-4000-8000-000000000001"
-energy-cost = 1
-rules-text = ""
-card-type = "Character"
-subtype = ""
-is-fast = false
-spark = 1
-image-number = 0
-rarity = "Common"
-art-owned = false
-card-number = 223
-variables = ""
+| Name              | ID (UUID)                              | Cost | Spark | Rarity   |
+|-------------------|----------------------------------------|------|-------|----------|
+| Duskborne Sentry  | a1b2c3d4-1111-4000-8000-000000000001   | 1    | 1     | Common   |
+| Glimmer Scout     | a1b2c3d4-2222-4000-8000-000000000002   | 2    | 2     | Common   |
+| Veilward Knight   | a1b2c3d4-3333-4000-8000-000000000003   | 3    | 3     | Common   |
+| Embertide Warrior | a1b2c3d4-4444-4000-8000-000000000004   | 4    | 5     | Uncommon |
+| Starforged Titan  | a1b2c3d4-5555-4000-8000-000000000005   | 5    | 7     | Uncommon |
+| Abyssal Colossus  | a1b2c3d4-7777-4000-8000-000000000006   | 7    | 10    | Rare     |
 
-[[cards]]
-name = "Glimmer Scout"
-id = "a1b2c3d4-2222-4000-8000-000000000002"
-energy-cost = 2
-rules-text = ""
-card-type = "Character"
-subtype = ""
-is-fast = false
-spark = 2
-image-number = 0
-rarity = "Common"
-art-owned = false
-card-number = 224
-variables = ""
-
-[[cards]]
-name = "Veilward Knight"
-id = "a1b2c3d4-3333-4000-8000-000000000003"
-energy-cost = 3
-rules-text = ""
-card-type = "Character"
-subtype = ""
-is-fast = false
-spark = 3
-image-number = 0
-rarity = "Common"
-art-owned = false
-card-number = 225
-variables = ""
-
-[[cards]]
-name = "Embertide Warrior"
-id = "a1b2c3d4-4444-4000-8000-000000000004"
-energy-cost = 4
-rules-text = ""
-card-type = "Character"
-subtype = ""
-is-fast = false
-spark = 5
-image-number = 0
-rarity = "Uncommon"
-art-owned = false
-card-number = 226
-variables = ""
-
-[[cards]]
-name = "Starforged Titan"
-id = "a1b2c3d4-5555-4000-8000-000000000005"
-energy-cost = 5
-rules-text = ""
-card-type = "Character"
-subtype = ""
-is-fast = false
-spark = 7
-image-number = 0
-rarity = "Uncommon"
-art-owned = false
-card-number = 227
-variables = ""
-
-[[cards]]
-name = "Abyssal Colossus"
-id = "a1b2c3d4-7777-4000-8000-000000000006"
-energy-cost = 7
-rules-text = ""
-card-type = "Character"
-subtype = ""
-is-fast = false
-spark = 10
-image-number = 0
-rarity = "Rare"
-art-owned = false
-card-number = 228
-variables = ""
-```
+All cards: `card-type = "Character"`, `is-fast = false`, `image-number = 0`, `art-owned = false`, `subtype = ""`, `variables = ""`.
 
 - [ ] **Step 2: Add vanilla characters to the Core 11 card list**
 
-In `card-lists.toml`, insert these entries before the `[metadata]` line (line 157):
-
-```toml
-[[card-lists]]
-list-name = "Core 11"
-list-type = "BaseCardId"
-card-id = "a1b2c3d4-1111-4000-8000-000000000001"
-copies = 8
-
-[[card-lists]]
-list-name = "Core 11"
-list-type = "BaseCardId"
-card-id = "a1b2c3d4-2222-4000-8000-000000000002"
-copies = 8
-
-[[card-lists]]
-list-name = "Core 11"
-list-type = "BaseCardId"
-card-id = "a1b2c3d4-3333-4000-8000-000000000003"
-copies = 6
-
-[[card-lists]]
-list-name = "Core 11"
-list-type = "BaseCardId"
-card-id = "a1b2c3d4-4444-4000-8000-000000000004"
-copies = 6
-
-[[card-lists]]
-list-name = "Core 11"
-list-type = "BaseCardId"
-card-id = "a1b2c3d4-5555-4000-8000-000000000005"
-copies = 4
-
-[[card-lists]]
-list-name = "Core 11"
-list-type = "BaseCardId"
-card-id = "a1b2c3d4-7777-4000-8000-000000000006"
-copies = 4
-```
+In `card-lists.toml`, insert entries before `[metadata]` with copies: 8, 8, 6, 6, 4, 4 respectively.
 
 - [ ] **Step 3: Regenerate parsed data**
 
 Run: `just tabula-generate`
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 4: QA VERIFY — Vanilla characters appear in game**
+
+Dispatch QA subagent:
+- Start a new game and play several turns
+- Verify vanilla characters appear in hand (no abilities, just name + cost + spark)
+- Verify they can be played and appear on battlefield
+- Verify their spark values display correctly
+- Check that they have no rules text (empty)
+- Report to `/tmp/qa-report-task2.md`
+
+- [ ] **Step 5: Commit**
 
 ```bash
-git add client/Assets/StreamingAssets/Tabula/cards.toml client/Assets/StreamingAssets/Tabula/card-lists.toml
 git commit -m "feat: add 6 vanilla characters to Core 11 for combat testing"
 ```
 
 ---
 
-## Task 2: Battlefield Data Model
+## Task 3: Battlefield Data Model
 
 **Files:**
 - Create: `rules_engine/src/battle_state/src/battle_cards/battlefield.rs`
-- Modify: `rules_engine/src/battle_state/src/battle_cards/mod.rs` (add module declaration)
-- Modify: `rules_engine/src/battle_state/src/battle/all_cards.rs` (replace battlefield storage)
-- Modify: `rules_engine/src/battle_state/src/battle_cards/character_state.rs` (add played_turn)
+- Modify: `rules_engine/src/battle_state/src/battle_cards/mod.rs`
+- Modify: `rules_engine/src/battle_state/src/battle/all_cards.rs`
+- Modify: `rules_engine/src/battle_state/src/battle_cards/character_state.rs`
 
 - [ ] **Step 1: Create the Battlefield struct**
 
-Create `rules_engine/src/battle_state/src/battle_cards/battlefield.rs`:
-
-```rust
-use core_data::types::CharacterId;
-use serde::{Deserialize, Serialize};
-
-/// Two-rank battlefield for a single player. Front rank characters
-/// participate in Judgment; back rank characters are safe but inert.
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Battlefield {
-    pub front: [Option<CharacterId>; 8],
-    pub back: [Option<CharacterId>; 8],
-}
-
-impl Default for Battlefield {
-    fn default() -> Self {
-        Self {
-            front: [None; 8],
-            back: [None; 8],
-        }
-    }
-}
-
-impl Battlefield {
-    /// Returns the total number of characters across both ranks.
-    pub fn character_count(&self) -> usize {
-        self.front.iter().filter(|s| s.is_some()).count()
-            + self.back.iter().filter(|s| s.is_some()).count()
-    }
-
-    /// Returns true if both ranks are completely full (16 characters).
-    pub fn is_full(&self) -> bool {
-        self.character_count() >= 16
-    }
-
-    /// Finds the first empty slot in the back rank. Returns the index.
-    pub fn first_empty_back_slot(&self) -> Option<usize> {
-        self.back.iter().position(|s| s.is_none())
-    }
-
-    /// Finds the first empty slot in the front rank. Returns the index.
-    pub fn first_empty_front_slot(&self) -> Option<usize> {
-        self.front.iter().position(|s| s.is_none())
-    }
-
-    /// Returns true if the given character is in any slot.
-    pub fn contains(&self, character_id: CharacterId) -> bool {
-        self.front.iter().any(|s| *s == Some(character_id))
-            || self.back.iter().any(|s| *s == Some(character_id))
-    }
-
-    /// Removes a character from whatever slot it occupies. Returns true
-    /// if the character was found and removed.
-    pub fn remove(&mut self, character_id: CharacterId) -> bool {
-        for slot in self.front.iter_mut().chain(self.back.iter_mut()) {
-            if *slot == Some(character_id) {
-                *slot = None;
-                return true;
-            }
-        }
-        false
-    }
-
-    /// Adds a character to the first available back rank slot.
-    /// Panics if the back rank is full.
-    pub fn add_to_back_rank(&mut self, character_id: CharacterId) -> usize {
-        let idx = self
-            .first_empty_back_slot()
-            .expect("Back rank is full");
-        self.back[idx] = Some(character_id);
-        idx
-    }
-
-    /// Returns true if the character is in the front rank.
-    pub fn is_in_front_rank(&self, character_id: CharacterId) -> bool {
-        self.front.iter().any(|s| *s == Some(character_id))
-    }
-
-    /// Returns true if the character is in the back rank.
-    pub fn is_in_back_rank(&self, character_id: CharacterId) -> bool {
-        self.back.iter().any(|s| *s == Some(character_id))
-    }
-
-    /// Returns all CharacterIds on the battlefield (both ranks).
-    pub fn all_characters(&self) -> Vec<CharacterId> {
-        self.front
-            .iter()
-            .chain(self.back.iter())
-            .filter_map(|s| *s)
-            .collect()
-    }
-}
-```
+Create `rules_engine/src/battle_state/src/battle_cards/battlefield.rs` with:
+- `Battlefield { front: [Option<CharacterId>; 8], back: [Option<CharacterId>; 8] }`
+- Methods: `character_count()`, `is_full()`, `first_empty_back_slot()`, `first_empty_front_slot()`, `contains()`, `remove()`, `add_to_back_rank()`, `is_in_front_rank()`, `is_in_back_rank()`, `all_characters()`
+- Derive Clone, Debug, Serialize, Deserialize. Manual Default impl (arrays of None).
 
 - [ ] **Step 2: Add module declaration**
 
-In `rules_engine/src/battle_state/src/battle_cards/mod.rs`, add:
-
-```rust
-pub mod battlefield;
-```
+In `battle_cards/mod.rs`, add `pub mod battlefield;`
 
 - [ ] **Step 3: Add played_turn to CharacterState**
 
-Modify `rules_engine/src/battle_state/src/battle_cards/character_state.rs`:
-
-```rust
-use core_data::numerics::Spark;
-use serde::{Deserialize, Serialize};
-
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
-pub struct CharacterState {
-    pub spark: Spark,
-    /// The turn number on which this character was played.
-    /// Used for summoning sickness (cannot move to front rank on this turn).
-    pub played_turn: u32,
-}
-```
+In `character_state.rs`, add `pub played_turn: u32` field with doc comment for summoning sickness.
 
 - [ ] **Step 4: Replace battlefield storage in AllCards**
 
-In `rules_engine/src/battle_state/src/battle/all_cards.rs`:
-
-1. Add import: `use crate::battle_cards::battlefield::Battlefield;`
-2. Replace the `battlefield: PlayerMap<CardSet<CharacterId>>` field (line ~44) with:
-   ```rust
-   battlefield: PlayerMap<Battlefield>,
-   ```
-3. Update the `battlefield()` method (lines 125-128) to return `&Battlefield`:
-   ```rust
-   pub fn battlefield(&self, player: PlayerName) -> &Battlefield {
-       self.battlefield.player(player)
-   }
-   ```
-4. Add a `battlefield_mut()` method:
-   ```rust
-   pub fn battlefield_mut(&mut self, player: PlayerName) -> &mut Battlefield {
-       self.battlefield.player_mut(player)
-   }
-   ```
-5. Update `all_battlefield_characters()` (lines 130-133) to use the new Battlefield:
-   ```rust
-   pub fn all_battlefield_characters(&self) -> Vec<CharacterId> {
-       let mut result = self.battlefield.user.all_characters();
-       result.extend(self.battlefield.enemy.all_characters());
-       result
-   }
-   ```
-6. Update `add_to_zone()` (lines 390-395) for the Battlefield case to use `add_to_back_rank()` instead of CardSet insert
-7. Update `remove_from_zone()` (lines 423-426) for the Battlefield case to use `battlefield.remove()` instead of CardSet remove
-8. Update `contains_card()` (lines 260-282) for the Battlefield case to use `battlefield.contains()`
-
-Note: This will cause compilation errors in many downstream files that use the old `CardSet<CharacterId>` battlefield API. Those will be fixed in subsequent tasks. The goal of this task is to get the data model in place and fix enough call sites that `just check` passes.
+In `all_cards.rs`:
+- Replace `battlefield: PlayerMap<CardSet<CharacterId>>` with `battlefield: PlayerMap<Battlefield>`
+- Update `battlefield()` to return `&Battlefield`
+- Add `battlefield_mut()` returning `&mut Battlefield`
+- Update `all_battlefield_characters()` to use `Battlefield::all_characters()`
+- Update `add_to_zone()` Battlefield case to use `add_to_back_rank()`
+- Update `remove_from_zone()` Battlefield case to use `battlefield.remove()`
+- Update `contains_card()` Battlefield case to use `battlefield.contains()`
 
 - [ ] **Step 5: Fix all compilation errors**
 
-After changing the battlefield type, run `just check` and fix every compilation error. Key call sites to update:
-- `battle_queries/src/battle_player_queries/player_properties.rs` — `spark_total()` iterates battlefield characters
-- `battle_queries/src/legal_action_queries/legal_actions.rs` — character ability enumeration
-- `battle_mutations/src/play_cards/character_limit.rs` — character count check
-- `battle_mutations/src/card_mutations/move_card.rs` — `on_enter_battlefield()` and `on_leave_battlefield()`
-- `display_data` — anywhere ObjectPosition::OnBattlefield is constructed
-- Any query that iterates `battlefield()` as a CardSet
+Run `just check` and fix every compilation error. Key call sites:
+- `player_properties.rs` — `spark_total()` iterates battlefield
+- `legal_actions.rs` — character ability enumeration
+- `character_limit.rs` — character count
+- `move_card.rs` — `on_enter_battlefield()` and `on_leave_battlefield()`
+- `display_data` — ObjectPosition::OnBattlefield construction
+- Any query iterating battlefield as a CardSet
 
-For each call site, replace CardSet iteration with `battlefield.all_characters()` or the appropriate Battlefield method. The goal is compilation, not final behavior — judgment phase and repositioning come later.
+Replace CardSet iteration with `battlefield.all_characters()` or appropriate methods.
 
 - [ ] **Step 6: Run `just fmt` then `just review`**
 
-Fix any remaining issues until the full gate passes.
+- [ ] **Step 7: QA VERIFY — Game still works after data model change**
 
-- [ ] **Step 7: Commit**
+Dispatch QA subagent:
+- Play 5+ turns to verify no regressions from data model refactor
+- Characters should still appear on battlefield when played
+- Scoring should still work (old judgment for now)
+- No crashes, no missing characters, no incorrect counts
+- Report to `/tmp/qa-report-task3.md`
+
+- [ ] **Step 8: Commit**
 
 ```bash
-git commit -m "feat: replace battlefield CardSet with ranked Battlefield struct
-
-Two-rank battlefield with [Option<CharacterId>; 8] arrays for front
-and back ranks. Characters enter the back rank by default. Added
-played_turn to CharacterState for summoning sickness."
+git commit -m "feat: replace battlefield CardSet with ranked Battlefield struct"
 ```
 
 ---
 
-## Task 3: Remove Spark Bonus and Old Character Limit
+## Task 4: Remove Spark Bonus and Old Character Limit
 
 **Files:**
-- Modify: `rules_engine/src/battle_state/src/battle_player/battle_player_state.rs` (remove spark_bonus)
-- Modify: `rules_engine/src/battle_queries/src/battle_player_queries/player_properties.rs` (simplify spark_total)
-- Modify: `rules_engine/src/battle_mutations/src/play_cards/character_limit.rs` (new limit logic)
+- Modify: `rules_engine/src/battle_state/src/battle_player/battle_player_state.rs`
+- Modify: `rules_engine/src/battle_queries/src/battle_player_queries/player_properties.rs`
+- Modify: `rules_engine/src/battle_mutations/src/play_cards/character_limit.rs`
+- Modify: `rules_engine/src/battle_queries/src/legal_action_queries/legal_actions.rs`
 
 - [ ] **Step 1: Remove spark_bonus from BattlePlayerState**
 
-In `battle_player_state.rs`, remove the `pub spark_bonus: Spark` field (line ~36). Fix any compilation errors from code that reads or writes this field.
+Delete `pub spark_bonus: Spark` field. Fix all compilation errors.
 
 - [ ] **Step 2: Simplify spark_total()**
 
-In `player_properties.rs`, update `spark_total()` to only sum character spark values without adding spark_bonus:
-
+Update to only sum character spark values:
 ```rust
 pub fn spark_total(battle: &BattleState, player: PlayerName) -> Spark {
     let mut total = Spark(0);
@@ -410,352 +226,333 @@ pub fn spark_total(battle: &BattleState, player: PlayerName) -> Spark {
 
 - [ ] **Step 3: Replace character limit logic**
 
-In `character_limit.rs`, change `CHARACTER_LIMIT` from 8 to 16 and replace the abandon logic. The `apply()` function should now simply prevent playing characters when the battlefield is full rather than abandoning the lowest-spark character:
+Change CHARACTER_LIMIT to 16. Replace abandon logic with `is_full()` check. Remove the old `apply()` function. Update legal actions to filter out character cards when battlefield is full.
 
-```rust
-const CHARACTER_LIMIT: usize = 16;
+- [ ] **Step 4: Run `just fmt` then `just review`**
 
-/// Returns true if the player's battlefield is full and no more
-/// characters can be played.
-pub fn is_full(battle: &BattleState, player: PlayerName) -> bool {
-    battle.cards.battlefield(player).character_count() >= CHARACTER_LIMIT
-}
-```
+- [ ] **Step 5: QA VERIFY — Scoring and character limits**
 
-Remove the old `apply()` function that did the abandon logic. Update any call site that called `character_limit::apply()` after materializing — it should instead check `character_limit::is_full()` before allowing a character to be played.
-
-- [ ] **Step 4: Update legal action checks**
-
-In `legal_actions.rs`, when building the list of playable cards from hand, filter out character cards if the battlefield is full. Find where `play_card_from_hand` is populated in `standard_legal_actions()` and add a check:
-
-```rust
-// Skip character cards if battlefield is full
-if character_limit::is_full(battle, player) {
-    // Filter to only event cards
-}
-```
-
-- [ ] **Step 5: Run `just fmt` then `just review`**
+Dispatch QA subagent:
+- Play 5+ turns, verify scoring still works without spark bonus
+- Try to accumulate many characters — should be able to have more than 8 now
+- Verify no abandon/overflow happens
+- Report to `/tmp/qa-report-task4.md`
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git commit -m "feat: remove spark bonus and change character limit to 16
-
-Spark bonus eliminated — spark only comes from characters on the field.
-Character limit raised to 16 (8 per rank). Playing characters when
-full is prevented instead of abandoning lowest-spark character."
+git commit -m "feat: remove spark bonus and change character limit to 16"
 ```
 
 ---
 
-## Task 4: Phase and Trigger Renames
+## Task 5: Phase and Trigger Renames
 
 **Files:**
 - Modify: `rules_engine/src/battle_state/src/battle/battle_turn_phase.rs`
 - Modify: `rules_engine/src/battle_state/src/triggers/trigger.rs`
-- Modify: `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`
+- Rename: `judgment_phase.rs` → `dawn_phase.rs` in `phase_mutations/`
 - Modify: `rules_engine/src/battle_mutations/src/phase_mutations/turn.rs`
-- Modify: All files referencing `BattleTurnPhase::Judgment` or `Trigger::Judgment`
+- Modify: All files referencing old Judgment phase/trigger names
 
-- [ ] **Step 1: Rename Judgment phase to Dawn, add new Judgment**
+- [ ] **Step 1: Update BattleTurnPhase enum**
 
-In `battle_turn_phase.rs`, update the enum:
+New order: Starting, Dreamwell, Draw, Dawn, Main, Judgment, Ending, EndingPhaseFinished, FiringEndOfTurnTriggers
 
-```rust
-#[derive(Debug, Ord, PartialOrd, Hash, EnumSetType, Sequence, Serialize, Deserialize)]
-pub enum BattleTurnPhase {
-    Starting,
-    Dreamwell,
-    Draw,
-    Dawn,
-    Main,
-    Judgment,
-    Ending,
-    EndingPhaseFinished,
-    FiringEndOfTurnTriggers,
-}
-```
+- [ ] **Step 2: Rename Trigger::Judgment → Trigger::Dawn, add new Trigger::Judgment**
 
-Note the new ordering: Starting → Dreamwell → Draw → Dawn → Main → Judgment → Ending → EndingPhaseFinished → FiringEndOfTurnTriggers.
-
-- [ ] **Step 2: Rename Trigger::Judgment to Trigger::Dawn, add new Trigger::Judgment**
-
-In `trigger.rs`, rename the existing `Judgment(PlayerName)` variant to `Dawn(PlayerName)` and add a new `Judgment(PlayerName)` variant:
-
-```rust
-pub enum Trigger {
-    Abandonded(VoidCardId),
-    Banished(VoidCardId),
-    Dawn(PlayerName),
-    Discarded(VoidCardId),
-    Dissolved(VoidCardId),
-    // ... existing variants ...
-    Judgment(PlayerName),
-    Materialized(CharacterId),
-    // ... rest ...
-}
-```
-
-Update `TriggerName` enum similarly: rename `Judgment` to `Dawn`, add new `Judgment`. Update the `name()` method in the impl block.
+Update both `Trigger` and `TriggerName` enums. Update the `name()` method.
 
 - [ ] **Step 3: Rename judgment_phase.rs to dawn_phase.rs**
 
-Rename the file `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs` to `dawn_phase.rs`. Update the module declaration in `phase_mutations/mod.rs`. Update the function to fire `Trigger::Dawn` instead of `Trigger::Judgment`:
-
+Update module declaration. Remove scoring logic from Dawn — it's now just a trigger window:
 ```rust
-/// Runs a Dawn phase for the indicated player. This is a trigger
-/// window only — no scoring happens here.
 pub fn run(battle: &mut BattleState, player: PlayerName, source: EffectSource) {
     battle.push_animation(source, || BattleAnimation::Dawn { player });
     battle.triggers.push(source, Trigger::Dawn(player));
 }
 ```
 
-Note: The old scoring logic (spark comparison, point gain) is removed from Dawn. It will be reimplemented differently in the new Judgment phase (Task 6).
+- [ ] **Step 4: Reorder turn state machine**
 
-- [ ] **Step 4: Update turn state machine**
-
-In `turn.rs`, reorder the phase transitions to match the new turn structure:
-
+Update `run_turn_state_machine_if_no_active_prompts()`:
 ```
 Starting → Dreamwell
-Dreamwell → Draw
+Dreamwell → Draw  
 Draw → Dawn
 Dawn → Main
-Main → Judgment (new!)
+Main → Judgment (stub: just transition to Ending for now)
 Judgment → Ending
 ```
 
-The `run_turn_state_machine_if_no_active_prompts()` function needs each match arm updated. The new Judgment arm will call a new `judgment_phase::run()` function (to be created in Task 6). For now, have it simply transition to Ending without doing anything.
-
 - [ ] **Step 5: Fix all compilation errors from renames**
 
-Run `just check` and fix every reference to the old `BattleTurnPhase::Judgment`, `Trigger::Judgment`, and `judgment_phase` module. Key files:
-- Card ability definitions that reference `TriggerName::Judgment` → change to `TriggerName::Dawn`
-- Display code that checks phase
-- Any animation code referencing Judgment
+Update every reference to old `BattleTurnPhase::Judgment`, `Trigger::Judgment`, and `judgment_phase` module. Key: card ability definitions referencing `TriggerName::Judgment` → `TriggerName::Dawn`.
 
 - [ ] **Step 6: Run `just fmt` then `just review`**
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: QA VERIFY — Turn structure and Dawn phase**
+
+Dispatch QA subagent:
+- Play 5+ turns and observe the turn structure
+- Verify phases happen in new order: Dreamwell → Draw → Dawn → Main → End
+- Dawn should fire triggers but NOT score points
+- No scoring should happen yet (judgment is stubbed)
+- Verify the game doesn't crash or hang between phases
+- Report to `/tmp/qa-report-task5.md`
+
+- [ ] **Step 8: Commit**
 
 ```bash
-git commit -m "feat: rename Judgment phase to Dawn, add new Judgment phase
-
-Dawn is now a start-of-turn trigger window (like MTG upkeep). New
-Judgment phase added at end of turn for front-rank combat resolution.
-Turn order: Dreamwell → Draw → Dawn → Main → Judgment → Ending."
+git commit -m "feat: rename Judgment to Dawn, add new Judgment phase at end of turn"
 ```
 
 ---
 
-## Task 5: ObjectPosition Changes for Rank/Position
+## Task 6: ObjectPosition Changes for Rank/Position
 
 **Files:**
 - Modify: `rules_engine/src/display_data/src/object_position.rs`
 - Modify: `scripts/battle_prototype/src/types/battle.ts`
-- Modify: All Rust code that constructs `Position::OnBattlefield`
+- Modify: All Rust code constructing `Position::OnBattlefield`
 
 - [ ] **Step 1: Add Rank enum and update Position::OnBattlefield**
 
-In `object_position.rs`, add a `Rank` enum and change `OnBattlefield` to include rank and position:
-
+In `object_position.rs`:
 ```rust
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
 pub enum Rank {
     Front,
     Back,
 }
-
-// In the Position enum, change:
-// OnBattlefield(DisplayPlayer),
-// to:
-OnBattlefield(DisplayPlayer, Rank, u8),
 ```
 
-Where the `u8` is the slot index (0-7).
+Change `OnBattlefield(DisplayPlayer)` to `OnBattlefield(DisplayPlayer, Rank, u8)`.
 
-- [ ] **Step 2: Update all Position::OnBattlefield construction sites**
+- [ ] **Step 2: Update all construction sites**
 
-Run `just check` and find every place that constructs `Position::OnBattlefield(player)` and update to include rank and position. The primary site is in the display/view builder that converts internal state to display positions. You'll need to look up the character's rank and position from the Battlefield struct to populate these fields.
-
-Key files to check:
-- The view builder that creates CardView objects with ObjectPosition
-- `move_card.rs` — where positions are assigned after entering battlefield
+Find every `Position::OnBattlefield(player)` and update to include rank and position. Look up the character's rank/position from the Battlefield struct.
 
 - [ ] **Step 3: Update TypeScript types**
 
-In `scripts/battle_prototype/src/types/battle.ts`, update the Position type:
-
+In `battle.ts`, change OnBattlefield from `{ OnBattlefield: DisplayPlayer }` to:
 ```typescript
-// Change from:
-// { OnBattlefield: DisplayPlayer }
-// to:
 { OnBattlefield: { player: DisplayPlayer, rank: "Front" | "Back", position: number } }
 ```
 
-- [ ] **Step 4: Update BattleScreen.tsx cardsByPosition helper**
+- [ ] **Step 4: Update BattleScreen.tsx position filtering**
 
-The `cardsByPosition()` function at lines 22-32 of `BattleScreen.tsx` filters cards by position. It needs to handle the new OnBattlefield structure to filter by rank and player.
+Update `cardsByPosition()` helper and all references that filter by OnBattlefield.
 
-- [ ] **Step 5: Run `just fmt` then `just review` and `cd scripts/battle_prototype && npx tsc --noEmit`**
+- [ ] **Step 5: Run `just fmt`, `just review`, and `npx tsc --noEmit`**
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: QA VERIFY — Position data correctness**
+
+Dispatch QA subagent:
+- Play characters and verify they appear in the UI
+- Use `agent-browser eval` to inspect card position data in the DOM/state
+- Verify position includes rank ("Back") and slot index
+- Verify cards still render in the battlefield area
+- Report to `/tmp/qa-report-task6.md`
+
+- [ ] **Step 7: Commit**
 
 ```bash
-git commit -m "feat: add rank and position to OnBattlefield position data
-
-OnBattlefield now carries DisplayPlayer, Rank (Front/Back), and slot
-index (0-7). Updated Rust construction sites and TypeScript types."
+git commit -m "feat: add rank and position to OnBattlefield position data"
 ```
 
 ---
 
-## Task 6: New Judgment Phase Resolution
+## Task 7: Battle Prototype UI — Rank Rendering
+
+**Files:**
+- Modify: `scripts/battle_prototype/src/components/BattleScreen.tsx`
+- Modify: `scripts/battle_prototype/src/components/BattlefieldZone.tsx` (rewrite as RankZone)
+- Modify: `scripts/battle_prototype/src/components/CardDisplay.tsx`
+
+- [ ] **Step 1: Rewrite BattlefieldZone as RankZone with 8 fixed slots**
+
+Each rank renders 8 fixed-width slots. Empty slots are dashed outlines. Cards placed by their position index from OnBattlefield data.
+
+- [ ] **Step 2: Update BattleScreen layout to 4 ranks**
+
+Replace 2 battlefield zones with 4 rank zones + judgment line separator:
+1. Enemy status → Enemy back rank → Enemy front rank → Judgment line → Your front rank → Your back rank → Your status → Hand → Actions → Log
+
+Helper to filter by rank:
+```tsx
+function cardsByRank(cards: CardView[], player: DisplayPlayer, rank: "Front" | "Back"): CardView[]
+```
+
+- [ ] **Step 3: Add judgment line separator**
+
+Gold-colored divider with "⚡ JUDGMENT LINE ⚡" text between enemy front and your front rank.
+
+- [ ] **Step 4: Add summoning sickness visual indicator**
+
+Add `summoning_sick: bool` to card view data from Rust. Show visual indicator (e.g., blue tint or icon) on summoning-sick characters.
+
+- [ ] **Step 5: Verify TypeScript compiles**
+
+- [ ] **Step 6: QA VERIFY — Rank rendering**
+
+Dispatch QA subagent with full QA protocol:
+- Verify 4 rank zones display (enemy back, enemy front, your front, your back)
+- Each rank shows 8 slots with dashed outlines for empty ones
+- Labels visible and correct for each rank
+- Judgment line separator visible between front ranks
+- Characters appear in correct rank (should be back rank when played)
+- Spark values display on battlefield cards
+- Layout is readable, not cramped, no overlapping
+- All text is readable (no garbled characters)
+- Take screenshots of: empty board, 1 character placed, multiple characters
+- Report to `/tmp/qa-report-task7.md`
+
+- [ ] **Step 7: Fix bugs from QA report**
+
+- [ ] **Step 8: Commit**
+
+```bash
+git commit -m "feat: render four battlefield ranks with judgment line separator"
+```
+
+---
+
+## Task 8: QA — Character Placement Deep Test
+
+**Dedicated QA milestone — no code changes, just testing.**
+
+- [ ] **Step 1: QA VERIFY — Character placement and battlefield state**
+
+Dispatch QA subagent with extended protocol:
+- Play 8+ turns, playing characters each turn
+- **Invariants to track:**
+  - Characters always appear in back rank when played
+  - Total characters on battlefield matches expected count
+  - Spark values on battlefield match card spark
+  - Hand count decreases by 1 when a card is played
+  - Energy decreases by card cost when played
+- Verify enemy AI also places characters in back rank
+- Test playing multiple characters in one turn
+- Test playing events (should NOT appear on battlefield)
+- Test playing when hand is nearly empty
+- Take screenshots after every character played
+- Report to `/tmp/qa-report-task8.md`
+
+- [ ] **Step 2: Fix any bugs found and commit**
+
+---
+
+## Task 9: New Judgment Phase Resolution
 
 **Files:**
 - Create: `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`
-- Modify: `rules_engine/src/battle_mutations/src/phase_mutations/turn.rs` (wire in judgment)
-- Modify: `rules_engine/src/battle_mutations/src/phase_mutations/mod.rs` (add module)
+- Modify: `rules_engine/src/battle_mutations/src/phase_mutations/mod.rs`
+- Modify: `rules_engine/src/battle_mutations/src/phase_mutations/turn.rs`
 
-- [ ] **Step 1: Create new judgment_phase.rs**
+- [ ] **Step 1: Create judgment_phase.rs**
 
-Create `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`:
+Implement the column-by-column combat resolution:
 
 ```rust
-use battle_state::battle::battle_state::BattleState;
-use battle_state::core::effect_source::EffectSource;
-use battle_state::core::should_animate::ShouldAnimate;
-use battle_state::triggers::trigger::Trigger;
-use core_data::numerics::Points;
-use core_data::types::PlayerName;
-
-use crate::card_mutations::dissolve;
-use crate::player_mutations::points;
-
-/// Runs the Judgment phase: for each front-rank position, the active
-/// player's character fights the opponent's character in the same
-/// column. Uncontested characters score victory points.
 pub fn run(battle: &mut BattleState, player: PlayerName, source: EffectSource) {
     let opponent = player.opponent();
-
     for position in 0..8u8 {
         let attacker_id = battle.cards.battlefield(player).front[position as usize];
         let defender_id = battle.cards.battlefield(opponent).front[position as usize];
-
         match (attacker_id, defender_id) {
             (Some(attacker), Some(defender)) => {
                 let attacker_spark = battle.cards.spark(attacker);
                 let defender_spark = battle.cards.spark(defender);
-
                 if attacker_spark > defender_spark {
                     dissolve::run(battle, defender, source, ShouldAnimate::Yes);
                 } else if defender_spark > attacker_spark {
                     dissolve::run(battle, attacker, source, ShouldAnimate::Yes);
                 } else {
-                    // Tie: dissolve both
                     dissolve::run(battle, defender, source, ShouldAnimate::Yes);
                     dissolve::run(battle, attacker, source, ShouldAnimate::Yes);
                 }
             }
             (Some(attacker), None) => {
-                // Uncontested: score victory points equal to spark
                 let spark = battle.cards.spark(attacker);
-                let vp = Points(spark.0);
-                points::gain(battle, player, source, vp, ShouldAnimate::Yes);
+                points::gain(battle, player, source, Points(spark.0), ShouldAnimate::Yes);
             }
-            _ => {
-                // Only defender or both empty: nothing happens
-            }
+            _ => {}
         }
     }
-
     battle.triggers.push(source, Trigger::Judgment(player));
 }
 ```
 
-Note: This implementation fires Dissolved triggers after each dissolution because `dissolve::run()` already pushes the Dissolved trigger internally. The triggers will resolve before moving to the next position because the turn state machine checks for active prompts before continuing.
+Dissolved triggers fire after each dissolution because `dissolve::run()` pushes `Trigger::Dissolved` internally. Verify this — if triggers are queued and processed later, restructure as a state machine processing one position per tick.
 
-- [ ] **Step 2: Verify dissolve::run fires triggers correctly**
+- [ ] **Step 2: Wire into turn state machine**
 
-Read `rules_engine/src/battle_mutations/src/card_mutations/dissolve.rs` (or wherever the dissolve function lives) and confirm it pushes `Trigger::Dissolved`. If it does, the judgment loop will naturally pause after each dissolution to resolve triggers before the state machine advances.
+In `turn.rs`, replace the Judgment stub with `judgment_phase::run()`.
 
-Important: The judgment phase needs to process one position at a time. If the trigger system processes triggers immediately inline, the loop above works. If triggers are queued and processed later, you may need to restructure this as a state machine that tracks the current position index. Check how `dawn_phase::run()` and the trigger system interact — if `run()` completes fully and then triggers fire, you'll need to change the approach to process one position per state machine tick.
+- [ ] **Step 3: Run `just fmt` then `just review`**
 
-- [ ] **Step 3: Wire judgment into the turn state machine**
+- [ ] **Step 4: QA VERIFY — Judgment phase resolution**
 
-In `turn.rs`, update the Judgment phase arm to call `judgment_phase::run()`:
+Dispatch QA subagent with extensive testing:
+- Play 10+ turns, manually moving characters to front rank (if repositioning works) or observing AI
+- **Scenarios to test:**
+  - Two characters facing each other: higher spark wins
+  - Two characters with equal spark: both dissolve
+  - Uncontested character (no opponent across): scores victory points
+  - Empty columns: nothing happens
+  - Only defender present (opponent has character, you don't): nothing happens
+- **Invariants:**
+  - Score only increases by exact spark value of uncontested characters
+  - Dissolved characters disappear from battlefield
+  - Dissolved character's slot becomes empty
+  - Score changes visible in player status bar
+- Take screenshots of judgment resolution at every turn
+- Verify battle log shows judgment results
+- Report to `/tmp/qa-report-task9.md`
 
-```rust
-BattleTurnPhase::Judgment => {
-    judgment_phase::run(battle, current_player, source);
-    battle.phase = BattleTurnPhase::Ending;
-}
-```
+- [ ] **Step 5: Fix bugs from QA report**
 
-- [ ] **Step 4: Run `just fmt` then `just review`**
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git commit -m "feat: implement new Judgment phase with front-rank combat
-
-Each front-rank position resolves independently: higher spark wins,
-ties dissolve both, uncontested characters score victory points.
-Dissolved triggers fire after each comparison."
+git commit -m "feat: implement Judgment phase with front-rank combat resolution"
 ```
 
 ---
 
-## Task 7: Character Materialization to Back Rank
+## Task 10: Character Materialization to Back Rank
 
 **Files:**
 - Modify: `rules_engine/src/battle_mutations/src/card_mutations/move_card.rs`
 
 - [ ] **Step 1: Update on_enter_battlefield()**
 
-In `move_card.rs`, the `on_enter_battlefield()` function (lines ~255-274) is called when a character enters the battlefield. Update it to:
-1. Place the character in the first available back rank slot via `battlefield.add_to_back_rank(character_id)`
-2. Set `played_turn` on the CharacterState to the current turn number
-
-```rust
-fn on_enter_battlefield(battle: &mut BattleState, card_id: CardId, player: PlayerName) -> CharacterId {
-    let character_id = CharacterId(card_id);
-    let spark = /* get base spark from card data */;
-    let current_turn = battle.turn.turn_number;
-    battle.cards.battlefield_mut(player).add_to_back_rank(character_id);
-    battle.cards.battlefield_state_mut(player).insert(
-        character_id,
-        CharacterState {
-            spark,
-            played_turn: current_turn,
-        },
-    );
-    character_id
-}
-```
-
-Adapt this to match the exact existing code structure — the key changes are using `add_to_back_rank()` instead of CardSet insert, and setting `played_turn`.
+Place character in first available back rank slot via `battlefield.add_to_back_rank()`. Set `played_turn` on CharacterState to current turn number.
 
 - [ ] **Step 2: Update on_leave_battlefield()**
 
-In the `on_leave_battlefield()` function (lines ~276-294), update to remove the character from the Battlefield struct via `battlefield.remove(character_id)` instead of removing from a CardSet.
+Remove character from Battlefield struct via `battlefield.remove()` instead of CardSet remove.
 
 - [ ] **Step 3: Run `just fmt` then `just review`**
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 4: QA VERIFY — Materialization targeting**
+
+Dispatch QA subagent:
+- Play 5+ turns, verify characters always enter back rank
+- Verify effects that materialize from void (Reclaim) also go to back rank
+- Verify dissolve removes character from correct slot
+- Report to `/tmp/qa-report-task10.md`
+
+- [ ] **Step 5: Commit**
 
 ```bash
-git commit -m "feat: characters materialize into back rank with played_turn tracking
-
-Characters now enter the back rank when materialized. CharacterState
-tracks the turn they were played for summoning sickness."
+git commit -m "feat: characters materialize into back rank with played_turn tracking"
 ```
 
 ---
 
-## Task 8: Repositioning Actions
+## Task 11: Repositioning Actions
 
 **Files:**
 - Modify: `rules_engine/src/battle_state/src/actions/battle_actions.rs`
@@ -764,731 +561,542 @@ tracks the turn they were played for summoning sickness."
 - Modify: `rules_engine/src/battle_queries/src/legal_action_queries/legal_actions.rs`
 - Modify: `rules_engine/src/battle_queries/src/legal_action_queries/legal_actions_data.rs`
 
-- [ ] **Step 1: Add new BattleAction variants**
-
-In `battle_actions.rs`, add two new variants to the `BattleAction` enum:
+- [ ] **Step 1: Add BattleAction variants**
 
 ```rust
 MoveCharacterToFrontRank(CharacterId, u8),
 MoveCharacterToBackRank(CharacterId, u8),
 ```
 
-Update the `battle_action_string()` method to format these.
-
 - [ ] **Step 2: Create reposition mutation**
 
-Create `rules_engine/src/battle_mutations/src/card_mutations/reposition.rs`:
-
-```rust
-use battle_state::battle::battle_state::BattleState;
-use core_data::types::{CharacterId, PlayerName};
-
-/// Moves a character to a specific front rank position.
-/// Panics if the character has summoning sickness or the target slot
-/// is occupied by another player's character.
-pub fn to_front_rank(
-    battle: &mut BattleState,
-    player: PlayerName,
-    character_id: CharacterId,
-    position: u8,
-) {
-    let battlefield = battle.cards.battlefield_mut(player);
-    battlefield.remove(character_id);
-    let target = &mut battlefield.front[position as usize];
-    if let Some(existing) = *target {
-        // Swap: move the existing character to where the moving character was
-        // Find where the moving character came from and place existing there
-        // For simplicity, put existing in first empty back slot
-        // Actually: need to track the source slot for proper swap
-    }
-    *target = Some(character_id);
-}
-
-/// Moves a character to a specific back rank position.
-pub fn to_back_rank(
-    battle: &mut BattleState,
-    player: PlayerName,
-    character_id: CharacterId,
-    position: u8,
-) {
-    let battlefield = battle.cards.battlefield_mut(player);
-    battlefield.remove(character_id);
-    let target = &mut battlefield.back[position as usize];
-    if let Some(existing) = *target {
-        // Swap logic similar to above
-    }
-    *target = Some(character_id);
-}
-```
-
-Implement proper swap logic: when moving to an occupied slot, the occupant goes to the slot the mover came from.
-
-Add the module to `card_mutations/mod.rs`.
+`reposition.rs` with `to_front_rank()` and `to_back_rank()` functions. Include swap logic: when target slot is occupied, the occupant moves to the mover's original slot.
 
 - [ ] **Step 3: Add repositioning to legal actions**
 
-In `legal_actions.rs`, within the `standard_legal_actions()` function, add repositioning options when the phase is Main and it's the player's turn. Add a new field to `StandardLegalActions`:
+In `standard_legal_actions()`, populate reposition actions during Main phase:
+- Back-rank characters without summoning sickness → can move to any front slot
+- Front-rank characters → can move to any back slot
+- Same-rank moves for repositioning within a rank
 
-In `legal_actions_data.rs`, add to `StandardLegalActions`:
-```rust
-pub move_character_to_front_rank: Vec<(CharacterId, u8)>,
-pub move_character_to_back_rank: Vec<(CharacterId, u8)>,
-```
+- [ ] **Step 4: Handle actions in the dispatcher**
 
-Populate these in `standard_legal_actions()`:
-- For each character in back rank that doesn't have summoning sickness, add entries for each empty front rank slot
-- For each character in front rank, add entries for each empty back rank slot
-- For swaps: add entries for moving to occupied slots too
+Add match arms for `MoveCharacterToFrontRank` and `MoveCharacterToBackRank`.
 
-- [ ] **Step 4: Handle the new actions in the action dispatcher**
+- [ ] **Step 5: Update LegalActions methods**
 
-Find where `BattleAction` is matched and dispatched (likely in `battle_mutations` somewhere that handles `perform_action` or `handle_action`). Add match arms for:
-- `BattleAction::MoveCharacterToFrontRank(id, pos)` → call `reposition::to_front_rank()`
-- `BattleAction::MoveCharacterToBackRank(id, pos)` → call `reposition::to_back_rank()`
-
-- [ ] **Step 5: Update LegalActions to include reposition actions**
-
-Update `LegalActions::all()`, `LegalActions::len()`, `LegalActions::contains()`, and `LegalActions::random_action()` methods in `legal_actions_data.rs` to include the new repositioning actions.
+Update `all()`, `len()`, `contains()`, `random_action()` to include reposition actions.
 
 - [ ] **Step 6: Run `just fmt` then `just review`**
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: QA VERIFY — Repositioning works**
+
+Dispatch QA subagent:
+- Verify characters can be moved from back to front rank (via UI buttons or actions)
+- Verify summoning sickness blocks front-rank moves on the turn played
+- Verify front-rank characters can retreat to back rank
+- Verify position swaps work when moving to occupied slot
+- Test: play character, try to move to front rank same turn → should fail
+- Test: next turn, move to front rank → should succeed
+- Report to `/tmp/qa-report-task11.md`
+
+- [ ] **Step 8: Commit**
 
 ```bash
-git commit -m "feat: add character repositioning actions for front/back ranks
-
-Players can move characters between ranks during main phase.
-Summoning sickness prevents moving to front rank on the turn played.
-Includes swap logic when moving to an occupied slot."
+git commit -m "feat: add character repositioning between front and back ranks"
 ```
 
 ---
 
-## Task 9: AI Simplified Actions
+## Task 12: QA — Summoning Sickness Deep Test
+
+**Dedicated QA milestone.**
+
+- [ ] **Step 1: QA VERIFY — Summoning sickness edge cases**
+
+Dispatch QA subagent:
+- Play 10+ turns focusing on summoning sickness:
+  - Play character turn N → can't move to front turn N → CAN move turn N+1
+  - Play multiple characters same turn → all summoning sick
+  - Character materialized from void (Reclaim) → also summoning sick?
+  - Summoning sick character CAN be moved within back rank
+  - Summoning sick indicator visible and clear
+- **Invariants:**
+  - No summoning-sick character ever appears in front rank on the turn it was played
+  - Summoning sickness clears on the player's next turn
+- Take screenshots showing summoning sickness indicator
+- Report to `/tmp/qa-report-task12.md`
+
+- [ ] **Step 2: Fix bugs and commit**
+
+---
+
+## Task 13: AI Simplified Actions
 
 **Files:**
 - Modify: `rules_engine/src/battle_queries/src/legal_action_queries/legal_actions.rs`
 - Modify: `rules_engine/src/battle_queries/src/legal_action_queries/legal_actions_data.rs`
-- Modify: `rules_engine/src/battle_state/src/battle/battle_state.rs` (add moved_this_turn tracking)
+- Modify: `rules_engine/src/battle_state/src/battle/battle_state.rs` or turn data (add moved_this_turn)
 
 - [ ] **Step 1: Add per-turn moved tracking**
 
-Add a `moved_this_turn: HashSet<CharacterId>` or similar to `BattleState` (or to turn-scoped transient state). This set tracks which characters the AI has already moved this turn, preventing MoveToBack on characters that were already repositioned. Clear it at the start of each turn.
-
-If there's existing turn-scoped transient state, use that. Otherwise, add a field to `TurnData` or a new transient state container.
+Add `moved_this_turn` set (e.g., `Vec<CharacterId>` or `BTreeSet<CharacterId>`) to turn-scoped state. Clear at turn start.
 
 - [ ] **Step 2: Implement AI action reduction**
 
-In the legal action computation, when generating repositioning actions, check if the current player is an AI player. If so, generate the simplified action set:
-
-- **MoveToEmptyFrontSlot(CharacterId)**: For each back-rank character without summoning sickness, if there's any empty front-rank slot, emit ONE action (not one per empty slot — they're all equivalent)
-- **MoveToAttack(CharacterId, CharacterId)**: For each back-rank character without summoning sickness and each enemy character in the opponent's front rank, emit one action to move to that enemy's position
-- **MoveToBack(CharacterId)**: For each front-rank character NOT in `moved_this_turn`, emit one action to retreat
-
-These map to the underlying `MoveCharacterToFrontRank`/`MoveCharacterToBackRank` actions. For MoveToEmptyFrontSlot, pick the first empty slot. For MoveToAttack, use the enemy character's position.
+When generating reposition actions for AI players:
+- **MoveToEmptyFrontSlot(CharacterId)**: one action per eligible character (not per empty slot)
+- **MoveToAttack(CharacterId, CharacterId)**: one action per (attacker, defender) pair
+- **MoveToBack(CharacterId)**: only if character NOT in moved_this_turn
 
 - [ ] **Step 3: Mark characters as moved after repositioning**
 
-In the reposition mutation handlers, add the character to `moved_this_turn` after a successful move.
-
 - [ ] **Step 4: Clear moved_this_turn at turn start**
-
-In the turn state machine, clear the `moved_this_turn` set when transitioning to a new turn (Starting phase).
 
 - [ ] **Step 5: Run `just fmt` then `just review`**
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: QA VERIFY — AI repositioning behavior**
+
+Dispatch QA subagent:
+- Play 10+ turns and observe AI behavior
+- AI should move characters to front rank
+- AI should attack enemy characters (move to occupied enemy positions)
+- AI turns should complete in reasonable time (no infinite loop)
+- AI should NOT repeatedly move the same character back and forth
+- Report to `/tmp/qa-report-task13.md`
+
+- [ ] **Step 7: Commit**
 
 ```bash
-git commit -m "feat: simplified AI repositioning actions for MCTS
-
-AI gets three action types: MoveToEmptyFrontSlot, MoveToAttack, and
-MoveToBack. MoveToBack blocked for already-moved characters to prevent
-infinite MCTS loops. All empty front slots treated as equivalent."
+git commit -m "feat: simplified AI repositioning actions for MCTS"
 ```
 
 ---
 
-## Task 10: Battle Prototype UI — Rank Rendering
+## Task 14: Battle Prototype UI — Drag and Drop
 
 **Files:**
-- Modify: `scripts/battle_prototype/src/components/BattleScreen.tsx`
-- Modify: `scripts/battle_prototype/src/components/BattlefieldZone.tsx`
-- Modify: `scripts/battle_prototype/src/components/CardDisplay.tsx` (summoning sickness indicator)
+- Modify: `scripts/battle_prototype/src/components/BattleScreen.tsx` or RankZone component
+- Modify: `scripts/battle_prototype/src/components/CardDisplay.tsx`
 
-- [ ] **Step 1: Update BattlefieldZone to render 8 fixed slots**
+- [ ] **Step 1: Implement HTML5 drag-and-drop**
 
-Rewrite `BattlefieldZone.tsx` to render a fixed grid of 8 slots. Each slot is either empty (dashed outline) or contains a compact card. Cards are placed by their `position` index from the OnBattlefield position data.
+Characters are `draggable={true}` during main phase. Empty slots and occupied slots are valid drop targets. On drop: dispatch `MoveCharacterToFrontRank` or `MoveCharacterToBackRank` action.
 
-```tsx
-interface RankZoneProps {
-  label: string;
-  cards: CardView[];
-  onAction: (action: BattleAction) => void;
-  disabled: boolean;
-}
+- [ ] **Step 2: Add visual drag feedback**
 
-function RankZone({ label, cards, onAction, disabled }: RankZoneProps) {
-  const slots = Array.from({ length: 8 }, (_, i) => {
-    const card = cards.find(c => {
-      const pos = c.position.position;
-      if (typeof pos === 'object' && 'OnBattlefield' in pos) {
-        return pos.OnBattlefield.position === i;
-      }
-      return false;
-    });
-    return { index: i, card };
-  });
-
-  return (
-    <div>
-      <div className="text-xs text-slate-500 mb-1">{label}</div>
-      <div className="flex gap-1 justify-center">
-        {slots.map(({ index, card }) => (
-          <div key={index} className="w-[100px] h-[60px]">
-            {card ? (
-              <CardDisplay card={card} compact battlefield onAction={onAction} disabled={disabled} />
-            ) : (
-              <div className="w-full h-full border border-dashed border-slate-700 rounded" />
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-```
-
-- [ ] **Step 2: Update BattleScreen layout to 4 ranks**
-
-In `BattleScreen.tsx`, replace the two BattlefieldZone renders with four RankZone renders. Filter cards by rank:
-
-```tsx
-// Helper to filter by rank
-function cardsByRank(cards: CardView[], player: DisplayPlayer, rank: "Front" | "Back"): CardView[] {
-  return cards.filter(c => {
-    const pos = c.position.position;
-    return typeof pos === 'object'
-      && 'OnBattlefield' in pos
-      && pos.OnBattlefield.player === player
-      && pos.OnBattlefield.rank === rank;
-  });
-}
-```
-
-Layout order (top to bottom):
-1. Enemy status
-2. Enemy back rank (label: "ENEMY BACK RANK")
-3. Enemy front rank (label: "ENEMY FRONT RANK")
-4. Judgment line separator (gold border with "⚡ JUDGMENT LINE ⚡" text)
-5. Your front rank (label: "YOUR FRONT RANK")
-6. Your back rank (label: "YOUR BACK RANK")
-7. Your status
-8. Hand
-9. Action bar
-10. Battle log
-
-- [ ] **Step 3: Add summoning sickness visual indicator**
-
-In `CardDisplay.tsx`, if the card has a property indicating summoning sickness (you'll need to add this to CardView or infer it from card data), show a visual indicator like a blue border or an icon overlay. The Rust side should include this info in the CardView — add a `summoning_sick: bool` field to whatever card view type is used.
-
-- [ ] **Step 4: Add judgment line separator component**
-
-Add a styled divider between enemy front rank and your front rank:
-
-```tsx
-<div className="flex items-center justify-center gap-2 py-1">
-  <div className="flex-1 border-t border-yellow-600/50" />
-  <span className="text-xs text-yellow-600">⚡ JUDGMENT LINE ⚡</span>
-  <div className="flex-1 border-t border-yellow-600/50" />
-</div>
-```
-
-- [ ] **Step 5: Verify TypeScript compiles**
-
-Run: `cd scripts/battle_prototype && npx tsc --noEmit`
-
-- [ ] **Step 6: Commit**
-
-```bash
-git commit -m "feat: render four battlefield ranks with judgment line separator
-
-Battle screen now shows enemy back rank, enemy front rank, judgment
-line, your front rank, your back rank. Each rank has 8 fixed slots."
-```
-
----
-
-## Task 11: QA — Rank Rendering
-
-**QA milestone using agent-browser CLI.**
-
-- [ ] **Step 1: Start the battle prototype**
-
-Start both the Rust dev server and the frontend dev server. Navigate to the battle prototype URL.
-
-- [ ] **Step 2: Run QA pass**
-
-Using the QA skill with agent-browser, verify:
-- 4 rank zones display (enemy back, enemy front, your front, your back)
-- Each rank shows 8 slots
-- Labels are visible and correct
-- Judgment line separator is visible between the two front ranks
-- Empty slots show as dashed outlines
-- Overall layout is readable and not cramped
-
-- [ ] **Step 3: Fix any bugs found**
-
-- [ ] **Step 4: Commit fixes**
-
----
-
-## Task 12: QA — Character Placement
-
-**QA milestone using agent-browser CLI.**
-
-- [ ] **Step 1: Play characters and verify placement**
-
-Using agent-browser, play the game and verify:
-- Characters appear in the back rank when played
-- Characters show in the correct slot (not overlapping)
-- Spark values display correctly on battlefield cards
-- Enemy characters also appear in back rank
-
-- [ ] **Step 2: Fix any bugs found**
-
-- [ ] **Step 3: Commit fixes**
-
----
-
-## Task 13: Battle Prototype UI — Drag and Drop
-
-**Files:**
-- Modify: `scripts/battle_prototype/src/components/BattleScreen.tsx`
-- Create: `scripts/battle_prototype/src/components/RankZone.tsx` (if not already extracted)
-
-- [ ] **Step 1: Implement drag-and-drop for character repositioning**
-
-Add HTML5 drag-and-drop to the RankZone component. During the main phase when it's the player's turn:
-- Characters are draggable (set `draggable={true}`)
-- Empty slots and occupied slots are valid drop targets
-- On drop: dispatch the appropriate `MoveCharacterToFrontRank` or `MoveCharacterToBackRank` action
-- Summoning-sick characters cannot be dragged to front rank slots (visual feedback on invalid drop)
-
-```tsx
-// On drag start, store the character's card ID
-const handleDragStart = (e: React.DragEvent, cardId: string) => {
-  e.dataTransfer.setData('text/plain', cardId);
-};
-
-// On drop, determine target rank and position, dispatch action
-const handleDrop = (e: React.DragEvent, targetRank: "Front" | "Back", targetPosition: number) => {
-  const cardId = e.dataTransfer.getData('text/plain');
-  if (targetRank === "Front") {
-    onAction({ MoveCharacterToFrontRank: [cardId, targetPosition] });
-  } else {
-    onAction({ MoveCharacterToBackRank: [cardId, targetPosition] });
-  }
-};
-```
-
-- [ ] **Step 2: Add drag visual feedback**
-
-When dragging, highlight valid drop targets with a green border. Invalid targets (summoning sick to front) get a red indicator.
+Highlight valid drop targets (green). Invalid targets (summoning sick to front) get red indicator. Drag cursor changes.
 
 - [ ] **Step 3: Disable drag outside main phase**
 
-Only enable dragging when `can_act` is true and the phase is Main.
+Only enable when `can_act` is true and phase is Main.
 
-- [ ] **Step 4: Verify TypeScript compiles and commit**
+- [ ] **Step 4: QA VERIFY — Drag and drop**
+
+Dispatch QA subagent:
+- Test dragging character from back rank to empty front slot → works
+- Test dragging character from front rank to empty back slot → works  
+- Test dragging to swap two characters in same rank → works
+- Test dragging to swap between ranks → works
+- Test dragging summoning-sick character to front → rejected
+- Test dragging during opponent's turn → disabled
+- Test rapid drag operations → no visual glitches
+- Test dragging onto the judgment line → nothing happens
+- Report to `/tmp/qa-report-task14.md`
+
+- [ ] **Step 5: Fix bugs and commit**
 
 ```bash
-git commit -m "feat: drag-and-drop character repositioning in battle prototype
-
-Characters can be dragged between rank slots during main phase.
-Summoning-sick characters cannot be dragged to front rank.
-Visual feedback for valid/invalid drop targets."
+git commit -m "feat: drag-and-drop character repositioning in battle prototype"
 ```
 
 ---
 
-## Task 14: QA — Drag and Drop Basics
+## Task 15: QA — Full Game Loop Round 1
 
-**QA milestone using agent-browser CLI.**
+**Dedicated QA milestone — play a complete game.**
 
-- [ ] **Step 1: Test repositioning interactions**
+- [ ] **Step 1: QA VERIFY — Complete game, 10+ turns**
 
-Using agent-browser, verify:
-- Can drag a character from back rank to an empty front rank slot
-- Can drag a character from front rank to an empty back rank slot
-- Can drag a character to swap with another character in the same rank
-- Dragging to a different rank's occupied slot swaps correctly
-- Drag is disabled when it's not your turn
-- Drag is disabled outside the main phase
+Dispatch QA subagent with full adversarial QA protocol:
+- Play a FULL game of 10+ turns against AI
+- **Invariants to track continuously:**
+  - Turn structure: Dreamwell → Draw → Dawn → Main → Judgment → End
+  - Energy resets each turn to produced amount
+  - Score only changes during judgment phase
+  - Characters enter back rank only
+  - Front rank characters fight during judgment
+  - Back rank characters do nothing during judgment
+  - Total characters per player ≤ 16
+- **Test every feature:**
+  - Play characters, events
+  - Reposition characters via drag-and-drop
+  - Observe judgment resolution
+  - Observe AI play
+  - Check battle log accuracy
+- **Visual audit:**
+  - All ranks labeled correctly
+  - Judgment line visible
+  - Score display accurate
+  - Card counts match visible cards
+- Take screenshots at EVERY phase transition and EVERY judgment resolution
+- Report to `/tmp/qa-report-task15.md`
 
-- [ ] **Step 2: Fix any bugs found**
-
-- [ ] **Step 3: Commit fixes**
-
----
-
-## Task 15: QA — Summoning Sickness
-
-**QA milestone using agent-browser CLI.**
-
-- [ ] **Step 1: Test summoning sickness**
-
-Using agent-browser, verify:
-- A character played this turn CANNOT be dragged to the front rank
-- The summoning-sick character CAN be moved within the back rank
-- On the next turn, the character CAN be moved to the front rank
-- Visual indicator clearly shows which characters are summoning sick
-
-- [ ] **Step 2: Fix any bugs found**
+- [ ] **Step 2: Fix all bugs found**
 
 - [ ] **Step 3: Commit fixes**
 
 ---
 
-## Task 16: QA — Judgment Resolution Visuals
-
-**QA milestone using agent-browser CLI.**
-
-- [ ] **Step 1: Test judgment phase resolution**
-
-Using agent-browser, play several turns and verify:
-- End turn triggers judgment phase
-- Front rank characters fight opposing column characters
-- Higher spark character wins (opponent dissolved)
-- Lower spark character loses (dissolved)
-- Ties dissolve both
-- Uncontested characters score victory points
-- Battle log shows judgment results clearly
-- Score updates correctly after judgment
-- Back rank characters are unaffected
-
-- [ ] **Step 2: Fix any bugs found**
-
-- [ ] **Step 3: Commit fixes**
-
----
-
-## Task 17: QA — Full Game Loop Round 1
-
-**QA milestone using agent-browser CLI.**
-
-- [ ] **Step 1: Play 10+ turns**
-
-Play a full game against the AI for at least 10 turns. Verify:
-- Turn structure: Dreamwell → Draw → Dawn → Main → Judgment → End
-- Energy resets correctly each turn
-- Card drawing works
-- Dawn triggers fire (if any cards have them)
-- Playing characters and events works
-- Judgment phase resolves correctly each turn
-- Score accumulates properly
-- Game ends when threshold reached
-
-- [ ] **Step 2: Track invariants**
-
-- Total characters on battlefield never exceeds 16 per player
-- Score only increases during judgment phase
-- Characters only enter back rank
-- Phase order is consistent every turn
-
-- [ ] **Step 3: Fix any bugs found**
-
-- [ ] **Step 4: Commit fixes**
-
----
-
-## Task 18: QA — AI Behavior Round 1
-
-**QA milestone using agent-browser CLI.**
-
-- [ ] **Step 1: Observe AI play**
-
-Play several games and observe:
-- AI plays characters
-- AI moves characters to front rank (not on turn played)
-- AI moves characters to attack enemy characters
-- AI doesn't loop infinitely (game doesn't hang on AI turn)
-- AI retreats characters sometimes
-- AI doesn't move the same character back and forth
-
-- [ ] **Step 2: Fix any bugs found**
-
-- [ ] **Step 3: Commit fixes**
-
----
-
-## Task 19: Kindle Effect Update
+## Task 16: Kindle Effect Update
 
 **Files:**
 - Modify: `rules_engine/src/battle_mutations/src/effects/apply_standard_effect.rs`
-- Modify: Kindle target query (find where "leftmost" logic exists)
 
 - [ ] **Step 1: Implement Kindle as highest-spark targeting**
 
-Find the Kindle effect handler (it may be unimplemented — falling to `todo!()`). Implement it to:
-1. Find the character with the highest spark among the player's battlefield characters
-2. Tiebreaker: oldest character (lowest `played_turn` value)
-3. Add the Kindle amount to that character's spark
-
-```rust
-StandardEffect::Kindle { amount } => {
-    let player = source_player;
-    let characters = battle.cards.battlefield(player).all_characters();
-    if let Some(target) = characters
-        .iter()
-        .max_by_key(|&&c| {
-            let spark = battle.cards.spark(c);
-            let played_turn = battle.cards.battlefield_state(player).get(&c)
-                .map(|s| s.played_turn)
-                .unwrap_or(0);
-            // Sort by spark descending, then by played_turn ascending (oldest first)
-            (spark, std::cmp::Reverse(played_turn))
-        })
-    {
-        let state = battle.cards.battlefield_state_mut(player)
-            .get_mut(target)
-            .expect("Character must exist");
-        state.spark += amount;
-    }
-}
-```
+Find Kindle handler (may be `todo!()`). Implement: find character with highest spark, tiebreak by lowest `played_turn` (oldest). Add the Kindle amount to that character's spark.
 
 - [ ] **Step 2: Run `just fmt` then `just review`**
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: QA VERIFY — Kindle effect**
+
+Dispatch QA subagent:
+- Play until a Kindle effect triggers (may need specific cards)
+- Verify spark goes to the highest-spark character, not leftmost
+- If two characters have equal spark, verify it goes to the one played first
+- Report to `/tmp/qa-report-task16.md`
+
+- [ ] **Step 4: Commit**
 
 ```bash
-git commit -m "feat: kindle targets highest-spark character instead of leftmost
-
-Tiebreaker: oldest character (first played). Replaces the old
-position-based leftmost targeting."
+git commit -m "feat: kindle targets highest-spark character instead of leftmost"
 ```
 
 ---
 
-## Task 20: QA — Card Effects with Ranks
+## Task 17: QA — Card Effects with Ranks
 
-**QA milestone using agent-browser CLI.**
+**Dedicated QA milestone — test card abilities interact correctly with rank system.**
 
-- [ ] **Step 1: Test card effect interactions**
+- [ ] **Step 1: QA VERIFY — Card effect interactions**
 
-Using agent-browser, verify:
-- Dissolve effects correctly remove characters from their rank slot
-- Materialize effects (from void, from deck) place characters in back rank
-- Kindle applies to highest-spark character
-- Banish removes characters from their slot
-- Cards that reference "characters on the battlefield" work for both ranks
+Dispatch QA subagent:
+- Play 10+ turns focused on triggering card abilities
+- **Test scenarios:**
+  - Dissolve effect removes character from correct rank slot
+  - Materialize from void places character in back rank
+  - Banish removes character from slot
+  - Cards targeting "a character on the battlefield" can target both ranks
+  - Triggered abilities (Materialized, Dissolved) fire correctly
+  - Dawn triggers fire at start of turn
+- **Invariants:**
+  - After dissolve, slot becomes empty
+  - After materialize, character appears in back rank
+  - Card counts stay consistent across zones
+- Report to `/tmp/qa-report-task17.md`
 
-- [ ] **Step 2: Fix any bugs found**
-
-- [ ] **Step 3: Commit fixes**
+- [ ] **Step 2: Fix bugs and commit**
 
 ---
 
-## Task 21: QA — UX Polish Round 1
+## Task 18: QA — UX Polish Round 1
 
-**QA milestone using agent-browser CLI.**
+**Dedicated QA milestone — focused on usability, not functionality.**
 
-- [ ] **Step 1: Full UX audit**
+- [ ] **Step 1: QA VERIFY — Full UX audit**
 
-Review the entire battle prototype for usability:
-- Are rank labels clear and readable?
-- Is the judgment line visually distinct?
-- Can you tell which characters are summoning sick?
-- Does the battle log explain judgment results clearly?
-- Is the score display accurate?
-- Are card spark values visible on battlefield cards?
-- Is the overall layout too tall/cramped for the screen?
-- Can you tell which characters will fight which during judgment?
-- Are empty slots visible enough to understand valid positions?
+Dispatch QA subagent:
+- **Layout and readability:**
+  - Are rank labels clear? Can you tell front from back?
+  - Is the judgment line visually distinct?
+  - Is the layout too tall for the screen? Do you need to scroll?
+  - Can you see all 4 ranks simultaneously?
+- **Information completeness:**
+  - Can you tell which characters will fight during judgment? (column alignment)
+  - Are spark values clearly visible on all battlefield characters?
+  - Does the battle log explain what happened during judgment?
+  - Can you see opponent's rank positions clearly?
+- **Summoning sickness:**
+  - Is the indicator clear? Can you tell which characters are sick?
+  - Does the game communicate WHY you can't drag to front rank?
+- **Drag and drop:**
+  - Are valid drop targets obvious?
+  - Is drag feedback clear?
+  - Does the game feel responsive during repositioning?
+- **Missing features:**
+  - Is there a way to preview judgment matchups before ending turn?
+  - Can you tell how many points you'd score from uncontested characters?
+- Report to `/tmp/qa-report-task18.md`
 
 - [ ] **Step 2: Implement UX improvements based on findings**
-
-Common improvements might include:
-- Column highlighting to show which characters face each other
-- Judgment phase animation or log entries
-- Better summoning sickness indicator
-- Score change animations
 
 - [ ] **Step 3: Commit improvements**
 
 ---
 
-## Task 22: QA — Extended Play Round 1 (15+ turns)
+## Task 19: QA — Extended Play Round 1 (15+ turns)
 
-**QA milestone using agent-browser CLI.**
+**Dedicated QA milestone — mid-game stress test.**
 
-- [ ] **Step 1: Play an extended game**
+- [ ] **Step 1: QA VERIFY — 15+ turn game**
 
-Play 15+ turns against the AI. Focus on:
-- Mid-game board states with many characters
-- Characters accumulating in both ranks
-- Multiple judgment phases with complex board states
-- Score progression and game ending correctly
-
-- [ ] **Step 2: Log all anomalies**
-
-Track every bug, visual glitch, or unexpected behavior.
-
-- [ ] **Step 3: Fix bugs and commit**
-
----
-
-## Task 23: QA — Extended Play Round 2 (Board Full States)
-
-**QA milestone using agent-browser CLI.**
-
-- [ ] **Step 1: Test board-full scenarios**
-
-Try to fill the battlefield to 16 characters. Verify:
-- Can't play more characters when board is full
-- The UI communicates why you can't play a character
-- Events can still be played when board is full
-- If characters die during judgment, you can play more next turn
+Dispatch QA subagent:
+- Play a FULL game of 15+ turns
+- Focus on mid-game board states with many characters
+- **Watch for:**
+  - Characters accumulating in both ranks
+  - Complex judgment phases with many matchups
+  - Score progression accuracy
+  - AI making reasonable moves with many pieces
+  - Performance — does the UI stay responsive?
+  - Battle log getting long — is it still readable?
+- Take screenshots of every judgment phase showing full board state
+- Report to `/tmp/qa-report-task19.md`
 
 - [ ] **Step 2: Fix bugs and commit**
 
 ---
 
-## Task 24: QA — Extended Play Round 3 (Judgment Edge Cases)
+## Task 20: QA — Extended Play Round 2 (Board Full States)
 
-**QA milestone using agent-browser CLI.**
+**Dedicated QA milestone — push to 16 characters.**
 
-- [ ] **Step 1: Test judgment edge cases**
+- [ ] **Step 1: QA VERIFY — Board full scenarios**
 
-Set up and test:
-- Tie: two characters with the same spark in the same column → both dissolve
-- Zero spark characters in combat
-- All 8 front rank positions filled on both sides
-- One side has full front rank, other side has empty front rank (mass scoring)
-- Dissolved trigger that modifies another character's spark before their column resolves
-- Character dissolved by judgment that had a Dissolved trigger
-
-- [ ] **Step 2: Fix bugs and commit**
-
----
-
-## Task 25: QA — AI Behavior Round 2
-
-**QA milestone using agent-browser CLI.**
-
-- [ ] **Step 1: Watch AI tactics across multiple games**
-
-Play 3+ full games and evaluate:
-- Does AI position high-spark characters against enemy low-spark ones?
-- Does AI leave uncontested characters to score?
-- Does AI retreat valuable characters when threatened?
-- Does AI use events effectively alongside positioning?
-- Are AI turns completing in reasonable time?
-- Does AI avoid obviously bad moves (like putting 1-spark vs 10-spark)?
+Dispatch QA subagent:
+- Attempt to fill the battlefield to 16 characters
+- **Test scenarios:**
+  - Play characters until both ranks are full → can't play more
+  - UI communicates why you can't play a character when full
+  - Events can still be played when board is full
+  - Characters die during judgment → can play more next turn
+  - AI handles full board correctly
+- **Invariants:**
+  - Never more than 16 characters per player
+  - Full board = 8 front + 8 back
+- Report to `/tmp/qa-report-task20.md`
 
 - [ ] **Step 2: Fix bugs and commit**
 
 ---
 
-## Task 26: QA — UX Polish Round 2
+## Task 21: QA — Extended Play Round 3 (Judgment Edge Cases)
 
-**QA milestone using agent-browser CLI.**
+**Dedicated QA milestone — adversarial judgment testing.**
 
-- [ ] **Step 1: Second UX pass**
+- [ ] **Step 1: QA VERIFY — Judgment edge cases**
 
-Based on all previous extended play sessions, audit:
-- Judgment phase readability: is it clear what happened during judgment?
-- Battle log: does it show enough info about judgment results?
-- Column alignment: can you visually see which characters are paired?
-- Turn transition: is it clear when judgment fires vs when the turn ends?
-- Any confusion about front/back rank semantics?
+Dispatch QA subagent:
+- Set up and test specific judgment scenarios:
+  - **Tie:** Two characters with same spark in same column → both dissolve
+  - **Zero spark:** Character with 0 spark in combat
+  - **All 8 positions filled:** Both sides have full front ranks
+  - **Mass scoring:** Full front rank vs empty front rank → massive point gain
+  - **Dissolved trigger cascade:** Character with Dissolved trigger that buffs another character before their column resolves
+  - **Empty board judgment:** No front rank characters → nothing happens
+- **Invariants:**
+  - Ties always dissolve both
+  - Uncontested scoring = exact spark value
+  - Dissolved triggers fire between each column
+- Report to `/tmp/qa-report-task21.md`
+
+- [ ] **Step 2: Fix bugs and commit**
+
+---
+
+## Task 22: QA — AI Behavior Round 2
+
+**Dedicated QA milestone — evaluate AI tactical quality.**
+
+- [ ] **Step 1: QA VERIFY — AI tactics across multiple games**
+
+Dispatch QA subagent:
+- Play 3+ full games, observing AI closely
+- **Evaluate:**
+  - Does AI position high-spark characters against low-spark enemies?
+  - Does AI leave uncontested characters to score?
+  - Does AI retreat valuable characters when threatened?
+  - Does AI use events alongside positioning?
+  - Are AI turns completing in reasonable time?
+  - Does AI avoid obviously bad moves (1-spark vs 10-spark)?
+  - Does AI move characters to front rank at all?
+  - Does AI ever have a full front rank?
+- Report to `/tmp/qa-report-task22.md`
+
+- [ ] **Step 2: Fix bugs and commit**
+
+---
+
+## Task 23: QA — UX Polish Round 2
+
+**Dedicated QA milestone — second UX pass after extended play learnings.**
+
+- [ ] **Step 1: QA VERIFY — Second UX audit**
+
+Dispatch QA subagent:
+- Based on all previous extended play:
+  - Is judgment phase resolution clear to the player?
+  - Does the battle log show enough info about judgment (which character beat which)?
+  - Column alignment — can you visually trace which characters are paired?
+  - Turn transitions — is it clear when judgment fires vs turn end?
+  - Any confusion about front/back rank semantics?
+  - Is the drag-and-drop discoverable for a new player?
+  - Does the game communicate the risk of placing characters in front rank?
+- Report to `/tmp/qa-report-task23.md`
 
 - [ ] **Step 2: Implement improvements and commit**
 
 ---
 
-## Task 27: QA — Extended Play Round 4 (20+ Turns Stress Test)
+## Task 24: QA — Extended Play Round 4 (20+ turns)
 
-**QA milestone using agent-browser CLI.**
+**Dedicated QA milestone — long game stress test.**
 
-- [ ] **Step 1: Final extended play session**
+- [ ] **Step 1: QA VERIFY — 20+ turn endurance test**
 
-Play a full 20+ turn game. This is the final comprehensive test. Verify:
-- No crashes or hangs
-- Score correctly reaches threshold and game ends
-- All card effects still work
-- Judgment resolves correctly even with complex board states
-- AI plays reasonably throughout
-- UI remains readable and performant with many characters
-- Battle log is useful and accurate
+Dispatch QA subagent:
+- Play a full 20+ turn game
+- Focus on late-game states:
+  - Many characters on both sides
+  - High scores approaching victory threshold
+  - Board refilling after mass judgment dissolutions
+  - AI behavior in complex late-game states
+- **Watch for:**
+  - Performance degradation
+  - Memory issues (battle log growing huge)
+  - Score overflow or display issues with large numbers
+  - Any desynchronization between UI and game state
+- Report to `/tmp/qa-report-task24.md`
 
-- [ ] **Step 2: Fix any remaining bugs and commit**
+- [ ] **Step 2: Fix bugs and commit**
 
 ---
 
-## Task 28: Update Battle Rules Documentation
+## Task 25: QA — Extended Play Round 5 (Another Full Game)
+
+**Dedicated QA milestone — fresh game with all fixes applied.**
+
+- [ ] **Step 1: QA VERIFY — Clean full game**
+
+Dispatch QA subagent:
+- Play a fresh full game (15+ turns) with all previous fixes applied
+- This is a regression check — verify nothing broken by previous fixes
+- Track ALL invariants from earlier milestones
+- Note any NEW issues that weren't present before
+- Report to `/tmp/qa-report-task25.md`
+
+- [ ] **Step 2: Fix bugs and commit**
+
+---
+
+## Task 26: QA — Stress Testing
+
+**Dedicated QA milestone — adversarial interaction testing.**
+
+- [ ] **Step 1: QA VERIFY — Stress scenarios**
+
+Dispatch QA subagent:
+- Rapid repeated clicks on action buttons
+- Drag and immediately drop in same position
+- Drag to invalid locations (outside battlefield, onto enemy back rank)
+- Play card then immediately try to drag it
+- End turn while drag is in progress
+- Undo after repositioning
+- Open void viewer / card browser during main phase
+- Resize browser window — does layout break?
+- Rapid end-turn clicking
+- Report to `/tmp/qa-report-task26.md`
+
+- [ ] **Step 2: Fix bugs and commit**
+
+---
+
+## Task 27: Update Battle Rules Documentation
 
 **Files:**
 - Modify: `docs/battle_rules/battle_rules.md`
 
 - [ ] **Step 1: Update rules document**
 
-Update the battle rules document to reflect all changes:
-- Two-rank battlefield (front/back)
-- New turn structure (Dreamwell → Draw → Dawn → Main → Judgment)
-- Judgment phase resolution (column-by-column combat)
-- Summoning sickness
-- Character limit of 16
-- No spark bonus
-- Kindle targets highest-spark character
-- Dawn phase (renamed from Judgment, trigger window only)
+Reflect all changes: two-rank battlefield, new turn structure, judgment phase, summoning sickness, character limit 16, no spark bonus, Kindle targets highest-spark, Dawn phase.
 
 - [ ] **Step 2: Commit**
 
 ```bash
-git commit -m "docs: update battle rules for combat prototype
-
-Reflects two-rank battlefield, new judgment phase with front-rank
-combat, revised turn structure, and updated keywords."
+git commit -m "docs: update battle rules for combat prototype"
 ```
 
 ---
 
-## Task 29: QA — Final Regression Pass
+## Task 28: QA — Final Regression Pass
 
-**QA milestone using agent-browser CLI.**
+**Dedicated QA milestone — comprehensive final test.**
 
-- [ ] **Step 1: Full regression test**
+- [ ] **Step 1: QA VERIFY — Complete regression**
 
-Play a complete game from start to finish, testing every feature:
-- Character placement in back rank
-- Repositioning via drag-and-drop
-- Summoning sickness
-- Judgment resolution (win/lose/tie/uncontested)
-- Dissolved triggers during judgment
-- Card effects (dissolve, kindle, materialize, etc.)
-- Board-full prevention
-- AI behavior
-- Score accumulation and game end
-- Turn phases in correct order
+Dispatch QA subagent:
+- Play a complete game start to finish (15+ turns)
+- Test EVERY feature in one session:
+  - Character placement in back rank
+  - Drag-and-drop repositioning (front, back, swap)
+  - Summoning sickness
+  - Judgment resolution (win, lose, tie, uncontested)
+  - Dissolved triggers during judgment
+  - Card effects (dissolve, kindle, materialize)
+  - Board-full prevention
+  - AI behavior
+  - Score accumulation and game end
+  - Turn phases in correct order
+  - Battle log accuracy
+  - All UI elements readable and correct
+- **Final invariant check:**
+  - All invariants from all previous milestones still hold
+- Report to `/tmp/qa-report-task28.md`
 
-- [ ] **Step 2: Fix any remaining issues and commit**
+- [ ] **Step 2: Fix any remaining issues**
 
-- [ ] **Step 3: Run `just fmt` then `just review` one final time**
+- [ ] **Step 3: Run `just fmt` then `just review`**
 
----
-
-## Task 30: Final Commit and Cleanup
-
-- [ ] **Step 1: Run full review gate**
-
-Run: `just review` (in foreground)
-
-Fix any remaining lint, format, or type errors.
-
-- [ ] **Step 2: Final commit**
+- [ ] **Step 4: Final commit**
 
 ```bash
 git commit -m "chore: final cleanup for combat prototype"
 ```
+
+---
+
+## Task Summary
+
+| # | Task | Type |
+|---|------|------|
+| 1 | QA Baseline | QA |
+| 2 | Vanilla Characters | Code + QA |
+| 3 | Battlefield Data Model | Code + QA |
+| 4 | Remove Spark Bonus / Char Limit | Code + QA |
+| 5 | Phase & Trigger Renames | Code + QA |
+| 6 | ObjectPosition Changes | Code + QA |
+| 7 | UI Rank Rendering | Code + QA |
+| 8 | Character Placement Deep Test | QA |
+| 9 | Judgment Phase Resolution | Code + QA |
+| 10 | Materialization to Back Rank | Code + QA |
+| 11 | Repositioning Actions | Code + QA |
+| 12 | Summoning Sickness Deep Test | QA |
+| 13 | AI Simplified Actions | Code + QA |
+| 14 | Drag and Drop UI | Code + QA |
+| 15 | Full Game Loop Round 1 | QA |
+| 16 | Kindle Effect | Code + QA |
+| 17 | Card Effects with Ranks | QA |
+| 18 | UX Polish Round 1 | QA |
+| 19 | Extended Play Round 1 (15+ turns) | QA |
+| 20 | Extended Play Round 2 (Board Full) | QA |
+| 21 | Extended Play Round 3 (Judgment Edge Cases) | QA |
+| 22 | AI Behavior Round 2 | QA |
+| 23 | UX Polish Round 2 | QA |
+| 24 | Extended Play Round 4 (20+ turns) | QA |
+| 25 | Extended Play Round 5 (Regression) | QA |
+| 26 | Stress Testing | QA |
+| 27 | Update Documentation | Code |
+| 28 | Final Regression Pass | QA |
+
+**QA passes: 19 dedicated** (Tasks 1, 8, 12, 15, 17-26, 28) plus QA verification steps embedded in all 12 code tasks = **31 total QA checkpoints.**
