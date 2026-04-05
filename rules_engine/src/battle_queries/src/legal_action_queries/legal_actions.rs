@@ -152,7 +152,7 @@ fn reposition_actions(
     player: PlayerName,
 ) -> (RepositionActions, RepositionActions) {
     if matches!(battle.players.player(player).player_type, PlayerType::Agent(_)) {
-        return (vec![], vec![]);
+        return ai_reposition_actions(battle, player);
     }
 
     let bf = battle.cards.battlefield(player);
@@ -193,6 +193,56 @@ fn reposition_actions(
             if bf.front[position as usize] != Some(*character_id) {
                 to_front.push((*character_id, position));
             }
+        }
+    }
+
+    (to_front, to_back)
+}
+
+/// Returns a simplified set of reposition actions for the AI player to
+/// avoid infinite MCTS branching.
+fn ai_reposition_actions(
+    battle: &BattleState,
+    player: PlayerName,
+) -> (RepositionActions, RepositionActions) {
+    let bf = battle.cards.battlefield(player);
+    let opponent_bf = battle.cards.battlefield(player.opponent());
+    let current_turn = battle.turn.turn_id.0;
+    let mut to_front = Vec::new();
+    let mut to_back = Vec::new();
+
+    let has_empty_front = bf.first_empty_front_slot().is_some();
+
+    for character_id in bf.back.iter().flatten() {
+        let has_summoning_sickness = battle
+            .cards
+            .battlefield_state(player)
+            .get(character_id)
+            .is_some_and(|state| state.played_turn == current_turn);
+        if has_summoning_sickness {
+            continue;
+        }
+
+        // MoveToEmptyFrontSlot: one action per eligible back-rank character
+        if has_empty_front {
+            let target = bf.first_empty_front_slot().unwrap() as u8;
+            to_front.push((*character_id, target));
+        }
+
+        // MoveToAttack: one action per enemy front-rank character
+        for (pos, enemy_id) in opponent_bf.front.iter().enumerate() {
+            if enemy_id.is_some() {
+                to_front.push((*character_id, pos as u8));
+            }
+        }
+    }
+
+    // MoveToBack: one action per front-rank character not already moved
+    for character_id in bf.front.iter().flatten() {
+        if !battle.turn.moved_this_turn.contains(character_id)
+            && let Some(target) = bf.first_empty_back_slot()
+        {
+            to_back.push((*character_id, target as u8));
         }
     }
 

@@ -24,6 +24,7 @@ pub fn to_front_rank(
     }
 
     bf.front[position as usize] = Some(character_id);
+    battle.turn.moved_this_turn.push(character_id);
 }
 
 /// Moves a character to a specific back rank position.
@@ -47,6 +48,7 @@ pub fn to_back_rank(
     }
 
     bf.back[position as usize] = Some(character_id);
+    battle.turn.moved_this_turn.push(character_id);
 }
 
 enum SlotLocation {

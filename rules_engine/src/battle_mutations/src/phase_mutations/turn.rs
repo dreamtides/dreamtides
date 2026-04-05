@@ -49,6 +49,7 @@ pub fn run_turn_state_machine_if_no_active_prompts(battle: &mut BattleState) {
                     .clear();
                 battle.turn.active_player = next_player;
                 battle.turn.turn_id += TurnId(1);
+                battle.turn.moved_this_turn.clear();
                 if battle.turn.turn_id >= TurnId(50) {
                     // If the battle has lasted more than 50 turns (25 per player), it is a
                     // draw.

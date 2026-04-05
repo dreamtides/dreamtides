@@ -2,8 +2,10 @@ use core_data::numerics::TurnId;
 use core_data::types::PlayerName;
 use serde::{Deserialize, Serialize};
 
+use crate::battle::card_id::CharacterId;
+
 /// Identifies a turn within the game.
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Serialize, Deserialize)]
 pub struct TurnData {
     /// Player whose turn it is or was.
     pub active_player: PlayerName,
@@ -16,6 +18,10 @@ pub struct TurnData {
 
     /// Current column position being resolved during the Judgment phase (0-7).
     pub judgment_position: u8,
+
+    /// Characters that have been repositioned this turn, used to prevent
+    /// infinite back-and-forth movement by the AI.
+    pub moved_this_turn: Vec<CharacterId>,
 }
 
 impl Default for TurnData {
@@ -24,6 +30,7 @@ impl Default for TurnData {
             active_player: PlayerName::One,
             turn_id: TurnId::default(),
             judgment_position: 0,
+            moved_this_turn: Vec::new(),
         }
     }
 }
