@@ -16,7 +16,7 @@ interface BattleScreenProps {
   onReconnect: () => void;
   events: string[];
   disabled: boolean;
-  showYourTurn: boolean;
+  yourTurnCounter: number;
 }
 
 function cardsByPosition(cards: CardView[], position: string, player?: DisplayPlayer): CardView[] {
@@ -53,7 +53,7 @@ function cardOrderCards(cards: CardView[]): CardView[] {
   });
 }
 
-export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, events, disabled, showYourTurn }: BattleScreenProps) {
+export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, events, disabled, yourTurnCounter }: BattleScreenProps) {
   const [showDebug, setShowDebug] = useState(false);
   const [showVoid, setShowVoid] = useState<DisplayPlayer | null>(null);
   const [showLog, setShowLog] = useState(false);
@@ -61,11 +61,11 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
   const ui = battle.interface;
 
   useEffect(() => {
-    if (!showYourTurn) return;
+    if (yourTurnCounter === 0) return;
     setYourTurnVisible(true);
     const timer = setTimeout(() => setYourTurnVisible(false), 2000);
     return () => clearTimeout(timer);
-  }, [showYourTurn]);
+  }, [yourTurnCounter]);
 
   const isGameOver =
     !disabled &&
@@ -415,11 +415,11 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
       {/* Your Turn popup */}
       {yourTurnVisible && (
         <div
-          className="fixed inset-0 flex items-center justify-center pointer-events-none"
-          style={{ zIndex: 55 }}
+          className="fixed left-4 top-1/2 -translate-y-1/2 pointer-events-none"
+          style={{ zIndex: 45 }}
         >
           <div
-            className="text-2xl font-bold px-8 py-4 rounded-lg"
+            className="text-lg font-bold px-4 py-2 rounded-lg"
             style={{
               background: "rgba(0, 0, 0, 0.85)",
               border: "2px solid var(--color-primary)",

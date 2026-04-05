@@ -88,7 +88,7 @@ interface BattleContextValue {
   isPolling: boolean;
   error: string | null;
   events: string[];
-  showYourTurn: boolean;
+  yourTurnCounter: number;
   sendAction: (action: GameAction) => void;
   sendDebugAction: (action: GameAction) => void;
   reconnect: (deck?: TestDeckName) => void;
@@ -109,7 +109,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
   const [isPolling, setIsPolling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<string[]>([]);
-  const [showYourTurn, setShowYourTurn] = useState(false);
+  const [yourTurnCounter, setYourTurnCounter] = useState(0);
   const responseVersionRef = useRef<string | undefined>(undefined);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const prevBattleRef = useRef<BattleView | null>(null);
@@ -162,8 +162,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
               setBattle(view);
               if (view.user.can_act) {
                 if (wasPollingRef.current) {
-                  setShowYourTurn(true);
-                  setTimeout(() => setShowYourTurn(false), 100);
+                  setYourTurnCounter((c) => c + 1);
                   wasPollingRef.current = false;
                 }
                 stopPolling();
@@ -294,7 +293,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
 
   return (
     <BattleContext.Provider
-      value={{ battle, isPolling, error, events, showYourTurn, sendAction, sendDebugAction, reconnect }}
+      value={{ battle, isPolling, error, events, yourTurnCounter, sendAction, sendDebugAction, reconnect }}
     >
       {children}
     </BattleContext.Provider>
