@@ -38,8 +38,22 @@ export function BattleProvider({ children }: { children: ReactNode }) {
   const [isPolling, setIsPolling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const responseVersionRef = useRef<string | undefined>(undefined);
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const stopPolling = useCallback(() => {
+    if (pollIntervalRef.current != null) {
+      clearInterval(pollIntervalRef.current);
+      pollIntervalRef.current = null;
+    }
+    setIsPolling(false);
+  }, []);
 
   const startPolling = useCallback(() => {
+    // Clear any existing polling interval before starting a new one
+    if (pollIntervalRef.current != null) {
+      clearInterval(pollIntervalRef.current);
+      pollIntervalRef.current = null;
+    }
     setIsPolling(true);
     let pollInFlight = false;
     const interval = setInterval(() => {
@@ -53,8 +67,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
             if (view) {
               setBattle(view);
               if (view.user.can_act) {
-                clearInterval(interval);
-                setIsPolling(false);
+                stopPolling();
               }
             }
           }
@@ -62,19 +75,18 @@ export function BattleProvider({ children }: { children: ReactNode }) {
             responseVersionRef.current = pollRes.response_version;
           }
           if (pollRes.response_type === "Final") {
-            clearInterval(interval);
-            setIsPolling(false);
+            stopPolling();
           }
         } catch (e) {
-          clearInterval(interval);
-          setIsPolling(false);
+          stopPolling();
           setError(e instanceof Error ? e.message : "Poll failed");
         } finally {
           pollInFlight = false;
         }
       })();
     }, POLL_INTERVAL_MS);
-  }, []);
+    pollIntervalRef.current = interval;
+  }, [stopPolling]);
 
   const sendAction = useCallback(
     (action: GameAction) => {
@@ -105,12 +117,13 @@ export function BattleProvider({ children }: { children: ReactNode }) {
       void (async () => {
         try {
           setError(null);
-          const res = await api.performAction(
-            action,
-            responseVersionRef.current,
-          );
+          // Don't send last_response_version for debug actions so
+          // the server always returns the full updated state.
+          const res = await api.performAction(action, undefined);
           const view = extractBattleView(res.commands);
-          if (view) setBattle(view);
+          if (view) {
+            setBattle(view);
+          }
           startPolling();
         } catch (e) {
           setError(e instanceof Error ? e.message : "Debug action failed");
@@ -125,7 +138,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
       void (async () => {
         try {
           setError(null);
-          setIsPolling(false);
+          stopPolling();
           const res = await api.connect(deck);
           responseVersionRef.current = res.response_version;
           const view = extractBattleView(res.commands);
@@ -135,7 +148,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
         }
       })();
     },
-    [],
+    [stopPolling],
   );
 
   return (

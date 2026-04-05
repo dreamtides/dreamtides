@@ -59,6 +59,14 @@ const DEBUG_BUTTONS: DebugButtonConfig[] = [
       },
     },
   },
+  {
+    label: "0 Energy",
+    action: {
+      BattleAction: {
+        Debug: { SetEnergy: { player: "One", energy: 0 } },
+      },
+    },
+  },
 ];
 
 export function DebugPanel({
