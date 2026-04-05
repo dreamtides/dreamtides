@@ -203,6 +203,21 @@ scope.
 Work unchanged. Dissolving a character vacates its slot
 (`Option<CharacterId>` becomes `None`).
 
+## Vanilla Test Characters
+
+Add 6 vanilla characters (no abilities, just spark/cost) to cards.toml and
+register them in the Core 11 card list. These provide clean combat testing
+without ability noise:
+
+| Name              | Cost | Spark | Copies |
+|-------------------|------|-------|--------|
+| Duskborne Sentry  | 1    | 1     | 8      |
+| Glimmer Scout     | 2    | 2     | 8      |
+| Veilward Knight   | 3    | 3     | 6      |
+| Embertide Warrior | 4    | 5     | 6      |
+| Starforged Titan  | 5    | 7     | 4      |
+| Abyssal Colossus  | 7    | 10    | 4      |
+
 ## QA Strategy
 
 No integration tests or unit tests. All validation through manual QA using
