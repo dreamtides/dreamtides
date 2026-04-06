@@ -160,7 +160,7 @@ async fn main() {
             enable_action_legality_check: true,
         },
     });
-    info!("Starting server on port 26598");
+    info!(build_timestamp = env!("BUILD_TIMESTAMP", "unknown"), "Starting server on port 26598");
 
     let app = Router::new()
         .route("/connect", get(connect).post(connect))

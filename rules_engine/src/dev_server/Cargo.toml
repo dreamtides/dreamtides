@@ -13,6 +13,9 @@ test = false
 doctest = false
 bench = false
 
+[build-dependencies]
+chrono = { workspace = true }
+
 [dependencies]
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
