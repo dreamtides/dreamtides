@@ -2,10 +2,12 @@
 
 Dreamtides is a two-player card game in the tradition of collectible card games
 like Magic: The Gathering. Players build decks of character and event cards,
-then compete to score victory points by accumulating spark on the battlefield.
-Two key differences from traditional card games: the shared Dreamwell system
-replaces lands for energy production, and there is no combat phase — instead,
-spark totals are compared each turn during the Judgment phase to score points.
+then compete to score victory points through positional combat on a two-rank
+battlefield. Two key differences from traditional card games: the shared
+Dreamwell system replaces lands for energy production, and combat is resolved
+positionally — during the Judgment phase at the end of each turn, opposing
+characters in the same front-rank column fight, and uncontested characters score
+points.
 
 ## Table of Contents
 
@@ -25,17 +27,19 @@ spark totals are compared each turn during the Judgment phase to score points.
 
 The first player to reach the victory point threshold wins the game. The default
 threshold is 12 points, but this is configurable per battle. Points are scored
-during the Judgment phase at the start of each turn by having more total spark
-than your opponent. If 50 turns pass without a winner, the game ends in a draw.
+during the Judgment phase at the end of each turn when uncontested front-rank
+characters score victory points equal to their spark. If 50 turns pass without a
+winner, the game ends in a draw.
 
 ## Card Types
 
 **Character** — Permanent cards that enter the battlefield when they resolve.
-Each character has a spark value, which contributes to scoring during the
-Judgment phase. Characters remain on the battlefield until removed by an effect
-(Dissolve, Banish, or Abandon). They can have triggered, activated, and static
-abilities. Characters have subtypes (Mage, Warrior, Robot, etc.) that other
-cards can reference.
+Each character has a spark value used in combat during the Judgment phase.
+Characters enter the back rank and can be repositioned to the front rank on
+subsequent turns. Characters remain on the battlefield until removed by an effect
+(Dissolve or Banish) or defeated in combat. They can have triggered, activated,
+and static abilities. Characters have subtypes (Mage, Warrior, Robot, etc.) that
+other cards can reference.
 
 **Event** — One-shot cards that produce an effect when they resolve, then move
 to the void. Events can be marked as "fast," allowing them to be played during
@@ -69,13 +73,14 @@ resolved. While a card is on the stack, the opponent may respond with fast
 cards. Characters move to the battlefield when they resolve; events move to the
 void.
 
-**Battlefield** — Where characters reside and generate spark. Each player can
-have up to 8 characters on the battlefield at once (see Character Limit under
-Spark and Scoring).
+**Battlefield** — Where characters reside. Each player's battlefield has two
+ranks: a front rank (8 slots, positions 0–7) and a back rank (8 slots). Each
+player can have up to 16 characters total on the battlefield (8 per rank). Only
+front-rank characters participate in Judgment phase combat.
 
 **Void** — The discard pile. Events go here after resolving. Characters go here
-when dissolved or abandoned. Some cards can interact with cards in the void
-(notably via Reclaim).
+when dissolved. Some cards can interact with cards in the void (notably via
+Reclaim).
 
 **Banished** — A permanent exile zone. Cards sent here cannot return to play
 under normal circumstances.
@@ -114,16 +119,20 @@ effect, while a phase 1 card might produce 1 energy and also let you Foresee 1.
 
 Each turn progresses through these phases in order:
 
-1. **Judgment** — Spark totals are compared and points are scored (see Spark and
-   Scoring).
-2. **Dreamwell** — The active player draws the next Dreamwell card, permanently
+1. **Dreamwell** — The active player draws the next Dreamwell card, permanently
    increasing their energy production and resetting their current energy. Any
    bonus effect on the card is applied.
-3. **Draw** — The active player draws one card from their deck. (Skipped on the
+2. **Draw** — The active player draws one card from their deck. (Skipped on the
    very first turn of the game.)
+3. **Dawn** — Start-of-turn trigger window. Abilities that trigger "at the start
+   of your turn" fire during this phase. No scoring occurs here. (Comparable to
+   MTG's upkeep step.)
 4. **Main** — The active player can play cards from hand, activate abilities,
-   and take other actions. This is the primary action phase.
-5. **Ending** — The active player passes. The opponent may play fast cards
+   reposition characters between front and back ranks, and take other actions.
+   This is the primary action phase.
+5. **Judgment** — End-of-turn combat resolution. Each front-rank position (0–7)
+   is resolved independently (see Spark and Scoring).
+6. **Ending** — The active player passes. The opponent may play fast cards
    during this window. Once the opponent also passes, end-of-turn triggers fire
    and the turn passes to the opponent.
 
@@ -148,23 +157,34 @@ empty, the card's controller receives priority.
 
 ## Spark and Scoring
 
-Spark is the primary stat on characters. Each character on the battlefield
-contributes its spark value to the player's total. Characters have no health or
-toughness — spark is their only stat. Characters are removed from the
-battlefield by specific effects (Dissolve, Banish, Abandon), not by damage.
+Spark is the primary stat on characters. Characters have no health or
+toughness — spark is their only stat.
 
-During the Judgment phase at the start of each turn, the active player's total
-spark (sum of all their characters' spark values plus any spark bonus) is
-compared to the opponent's total spark. If the active player's total is higher,
-they gain victory points equal to the difference. Otherwise, nothing happens.
+**Judgment phase resolution:** During the Judgment phase at the end of each
+turn, each front-rank position (0–7) is resolved independently:
 
-**Spark bonus:** A permanent addition to a player's spark total that is not tied
-to any character. This is gained primarily from the character limit mechanic.
+- **Both players have a character at the position:** The character with higher
+  spark wins; the losing character is dissolved. If spark values are tied, both
+  characters are dissolved. Dissolved triggers fire after each column is
+  resolved.
+- **Only the active player has a character:** The active player scores victory
+  points equal to that character's spark value.
+- **Only the opponent has a character:** Nothing happens.
 
-**Character limit:** Each player can have at most 8 characters on the
-battlefield. When a 9th character would enter, the character with the lowest
-spark value is automatically abandoned to the void. The abandoned character's
-current spark value is permanently added to the player's spark bonus.
+Back-rank characters are safe during Judgment — they do not fight and do not
+score points.
+
+**Summoning sickness:** When a character enters the battlefield, it is placed in
+the back rank. Characters cannot be moved to the front rank on the same turn
+they were played.
+
+**Repositioning:** During the Main phase, a player can move their characters
+between front and back ranks freely (subject to summoning sickness and slot
+availability).
+
+**Character limit:** Each player can have at most 16 characters on the
+battlefield (8 per rank). If the battlefield is full, additional characters
+cannot be played.
 
 ## Keywords and Effects
 
@@ -177,9 +197,11 @@ Banished zone. Several variants exist: banish from the battlefield, banish from
 the void, banish until the banishing card leaves play, and banish until the next
 main phase.
 
-**Materialize** — Put a character onto the battlefield. This is the term for a
-character entering play, whether from hand (played normally), from the void (via
-Reclaim or effects), from the deck (via effects), or as a token (Figments).
+**Materialize** — Put a character onto the battlefield's back rank. This is the
+term for a character entering play, whether from hand (played normally), from the
+void (via Reclaim or effects), from the deck (via effects), or as a token
+(Figments). Characters enter with summoning sickness and cannot move to the front
+rank on the turn they are materialized.
 
 **Prevent** — Counter a card on the stack, sending it to the void without
 resolving. Prevent effects are always fast (they must be played in response to a
@@ -189,7 +211,8 @@ card on the stack).
 Cannot be prevented and only targets your own characters. Fires the "Dissolved"
 trigger. Often used as a cost for abilities.
 
-**Kindle N** — Add N spark to your leftmost character on the battlefield.
+**Kindle N** — Add N spark to your character with the highest spark value. If
+there is a tie, the oldest character (earliest materialized) is chosen.
 
 **Foresee N** — Look at the top N cards of your deck. You may reorder them in
 any order and optionally send any of them to the void.
@@ -225,11 +248,11 @@ event resolves from the stack, then the event moves to the void.
 
 **Triggered abilities** — Abilities that fire automatically when a specific game
 event occurs. Three keyword triggers can appear on characters: **Materialized**
-(fires when the character enters the battlefield), **Judgment** (fires during
-the Judgment phase each turn), and **Dissolved** (fires when the character is
-destroyed). Triggered abilities can also use descriptive conditions like "When
-you play a card" or "At end of turn." Characters can have combined triggers such
-as "Materialized, Judgment" (fires both on entry and each Judgment phase).
+(fires when the character enters the battlefield), **Dawn** (fires during the
+Dawn phase at the start of each turn), and **Dissolved** (fires when the
+character is destroyed). Triggered abilities can also use descriptive conditions
+like "When you play a card" or "At end of turn." Characters can have combined
+triggers such as "Materialized, Dawn" (fires both on entry and each Dawn phase).
 
 **Activated abilities** — Abilities with a cost that a player chooses to use,
 written as "Cost: Effect" (e.g., "2 energy: Draw a card"). Can be once per turn
