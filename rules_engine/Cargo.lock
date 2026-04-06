@@ -4926,7 +4926,6 @@ dependencies = [
  "rand_xoshiro",
  "serde",
  "serde_json",
- "state_provider",
  "tabula_data",
  "tabula_generated",
  "tracing",

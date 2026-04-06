@@ -1,7 +1,9 @@
 use std::cell::RefCell;
 use std::io::{self, Write};
 use std::panic::{self, AssertUnwindSafe};
+use std::path::Path;
 use std::process;
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use ai_agents::agent_search;
@@ -19,9 +21,7 @@ use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
 use game_creation::new_test_battle;
 use serde_json::from_str;
-use state_provider::display_state_provider::DisplayStateProvider;
-use state_provider::state_provider::StateProvider;
-use state_provider::test_state_provider::TestStateProvider;
+use tabula_data::tabula::{Tabula, TabulaSource};
 use tabula_generated::card_lists::DreamwellCardIdList;
 use tracing::{debug, subscriber};
 use tracing_subscriber::layer::SubscriberExt;
@@ -57,6 +57,28 @@ impl DeckChoice {
             DeckChoice::Core11 => TestDeckName::Core11,
         }
     }
+
+    fn tabula_source(self) -> TabulaSource {
+        match self {
+            DeckChoice::Core11 => TabulaSource::Production,
+            _ => TabulaSource::Test,
+        }
+    }
+
+    fn dreamwell_list(self) -> DreamwellCardIdList {
+        match self {
+            DeckChoice::Core11 => DreamwellCardIdList::DreamwellBasic5,
+            _ => DreamwellCardIdList::TestDreamwellNoAbilities,
+        }
+    }
+}
+
+fn load_tabula(source: TabulaSource) -> Arc<Tabula> {
+    let streaming_assets_path = logging::get_developer_mode_streaming_assets_path();
+    let tabula_dir = Path::new(&streaming_assets_path).join("Tabula");
+    let tabula = Tabula::load(source, &tabula_dir)
+        .unwrap_or_else(|errors| panic!("Failed to load tabula: {errors:?}"));
+    Arc::new(tabula)
 }
 
 #[derive(Parser)]
@@ -206,7 +228,7 @@ fn run_match(
     seed: u64,
     verbosity: Verbosity,
     swap_positions: bool,
-    deck: TestDeckName,
+    deck: DeckChoice,
 ) -> Result<(MatchOutcome, MatchActionStats), (String, String)> {
     let ai_one_parsed = from_str(ai_one).unwrap();
     let ai_two_parsed = from_str(ai_two).unwrap();
@@ -245,22 +267,19 @@ fn run_match(
 
     let ai_one_str = ai_one.to_string();
     let ai_two_str = ai_two.to_string();
+    let deck_name = deck.to_test_deck_name();
+    let tabula = load_tabula(deck.tabula_source());
+    let dreamwell_list = deck.dreamwell_list();
 
     catch_panic(move || {
         let battle_id = BattleId(Uuid::new_v4());
-        let provider = TestStateProvider::new();
-        let streaming_assets_path = logging::get_developer_mode_streaming_assets_path();
-        let _ = provider.initialize("/tmp/test", &streaming_assets_path);
         let mut battle = new_test_battle::create_and_start(
             battle_id,
-            provider.tabula(),
+            tabula.clone(),
             seed,
-            Dreamwell::from_card_list(
-                &provider.tabula(),
-                DreamwellCardIdList::TestDreamwellNoAbilities,
-            ),
-            CreateBattlePlayer { player_type: battle_ai_one, deck_name: deck },
-            CreateBattlePlayer { player_type: battle_ai_two, deck_name: deck },
+            Dreamwell::from_card_list(&tabula, dreamwell_list),
+            CreateBattlePlayer { player_type: battle_ai_one, deck_name },
+            CreateBattlePlayer { player_type: battle_ai_two, deck_name },
             RequestContext { logging_options: LoggingOptions::default() },
         );
 
@@ -346,8 +365,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Err("Number of matches must be greater than 0".into());
     }
 
-    let deck = args.deck.to_test_deck_name();
-
     let mut results = MatchResult {
         player_one_wins: 0,
         player_two_wins: 0,
@@ -377,7 +394,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 match_seed,
                 Verbosity::None,
                 swap_positions,
-                deck,
+                args.deck,
             );
 
             match result {
@@ -438,7 +455,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             match_seed,
             match_verbosity,
             swap_positions,
-            deck,
+            args.deck,
         );
 
         let (outcome, stats) = match result {
