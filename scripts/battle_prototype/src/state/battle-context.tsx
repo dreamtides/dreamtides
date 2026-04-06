@@ -106,10 +106,10 @@ function generateEvents(oldBattle: BattleView, newBattle: BattleView): GenerateE
         }
       } else if (u) {
         judgmentHadAction = true;
-        events.push(`Slot ${slot}: Your ${u.name} (${u.spark} spark) was uncontested — scored ${u.spark} points`);
+        events.push(`Slot ${slot}: Your ${u.name} (${u.spark} spark) attacked unblocked — scored ${u.spark} points`);
       } else if (e) {
         judgmentHadAction = true;
-        events.push(`Slot ${slot}: Enemy ${e.name} (${e.spark} spark) was uncontested — scored ${e.spark} points`);
+        events.push(`Slot ${slot}: Enemy ${e.name} (${e.spark} spark) attacked unblocked — scored ${e.spark} points`);
       }
     }
   }
