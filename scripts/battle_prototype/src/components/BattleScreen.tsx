@@ -72,6 +72,14 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
     return () => clearTimeout(timer);
   }, [yourTurnCounter]);
 
+  // Auto-dismiss judgment pause when there's an active prompt so the user
+  // can interact with the prompt (e.g. Foresee) immediately.
+  useEffect(() => {
+    if (judgmentPause && (ui.card_order_selector || ui.screen_overlay)) {
+      onContinueFromJudgment?.();
+    }
+  }, [judgmentPause, ui.card_order_selector, ui.screen_overlay, onContinueFromJudgment]);
+
   const isGameOver = battle.game_over;
 
   return (
