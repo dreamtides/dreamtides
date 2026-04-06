@@ -17,6 +17,10 @@ import { resetUserId } from "../api/client";
 import { extractBattleView } from "../util/command-parser";
 import * as log from "../api/logger";
 
+function stripTags(text: string): string {
+  return text.replace(/<[^>]*>/g, "").trim();
+}
+
 function getPosition(card: CardView): [string, string | null] {
   const pos = card.position.position;
   if (typeof pos === "string") return [pos, null];
@@ -65,6 +69,13 @@ function getFrontRankCards(battle: BattleView): FrontRankCard[] {
   return result;
 }
 
+function hasStackCards(battle: BattleView): boolean {
+  return battle.cards.some((c) => {
+    const pos = c.position.position;
+    return typeof pos !== "string" && "OnStack" in pos;
+  });
+}
+
 interface GenerateEventsResult {
   events: string[];
   /** True when judgment happened AND something meaningful occurred (score change or combat) */
@@ -77,61 +88,72 @@ function generateEvents(oldBattle: BattleView, newBattle: BattleView): GenerateE
   const judgmentOccurred = newBattle.turn_number !== oldBattle.turn_number;
   let judgmentHadAction = false;
 
-  // Generate detailed judgment log if turn changed
+  // Generate detailed judgment log if turn changed.
+  // In the combat model, the *non-active* player's front-rank characters are
+  // the attackers during judgment. The active player is the one whose turn just
+  // ended — they had can_act=true in oldBattle.
   if (judgmentOccurred) {
+    const activePlayer = oldBattle.user.can_act ? "User" : "Enemy";
+    const attackingPlayer = activePlayer === "User" ? "Enemy" : "User";
     const oldFront = getFrontRankCards(oldBattle);
-    const userCards = oldFront.filter((c) => c.player === "User");
-    const enemyCards = oldFront.filter((c) => c.player === "Enemy");
-    const userBySlot = new Map(userCards.map((c) => [c.slot, c]));
-    const enemyBySlot = new Map(enemyCards.map((c) => [c.slot, c]));
-    const allSlots = new Set([...userBySlot.keys(), ...enemyBySlot.keys()]);
+    const activeCards = oldFront.filter((c) => c.player === activePlayer);
+    const attackerCards = oldFront.filter((c) => c.player === attackingPlayer);
+    const activeBySlot = new Map(activeCards.map((c) => [c.slot, c]));
+    const attackerBySlot = new Map(attackerCards.map((c) => [c.slot, c]));
+    const allSlots = new Set([...activeBySlot.keys(), ...attackerBySlot.keys()]);
 
     if (allSlots.size > 0) {
       events.push("--- Judgment Phase ---");
     }
 
     for (const slot of [...allSlots].sort((a, b) => a - b)) {
-      const u = userBySlot.get(slot);
-      const e = enemyBySlot.get(slot);
-      if (u && e) {
+      const attacker = attackerBySlot.get(slot);
+      const blocker = activeBySlot.get(slot);
+      if (attacker && blocker) {
+        // Both players have a front-rank character: spark comparison
         judgmentHadAction = true;
-        const uSpark = parseInt(u.spark) || 0;
-        const eSpark = parseInt(e.spark) || 0;
-        if (uSpark > eSpark) {
-          events.push(`Slot ${slot}: Your ${u.name} (${uSpark} spark) defeated Enemy ${e.name} (${eSpark} spark)`);
-        } else if (eSpark > uSpark) {
-          events.push(`Slot ${slot}: Enemy ${e.name} (${eSpark} spark) defeated Your ${u.name} (${uSpark} spark)`);
+        const aSpark = parseInt(attacker.spark) || 0;
+        const bSpark = parseInt(blocker.spark) || 0;
+        if (aSpark > bSpark) {
+          events.push(`Slot ${slot}: ${playerLabel(attacker.player)} ${attacker.name} (${aSpark}) defeated ${playerLabel(blocker.player)} ${blocker.name} (${bSpark})`);
+        } else if (bSpark > aSpark) {
+          events.push(`Slot ${slot}: ${playerLabel(blocker.player)} ${blocker.name} (${bSpark}) defeated ${playerLabel(attacker.player)} ${attacker.name} (${aSpark})`);
         } else {
-          events.push(`Slot ${slot}: Your ${u.name} and Enemy ${e.name} clashed at ${uSpark} spark — both dissolved`);
+          events.push(`Slot ${slot}: ${playerLabel(attacker.player)} ${attacker.name} and ${playerLabel(blocker.player)} ${blocker.name} clashed at ${aSpark} spark — both dissolved`);
         }
-      } else if (u) {
+      } else if (attacker) {
+        // Attacker with no blocker: scores spark as points
         judgmentHadAction = true;
-        events.push(`Slot ${slot}: Your ${u.name} (${u.spark} spark) attacked unblocked — scored ${u.spark} points`);
-      } else if (e) {
-        judgmentHadAction = true;
-        events.push(`Slot ${slot}: Enemy ${e.name} (${e.spark} spark) attacked unblocked — scored ${e.spark} points`);
+        events.push(`Slot ${slot}: ${playerLabel(attacker.player)} ${attacker.name} (${attacker.spark} spark) attacked unblocked — scored ${attacker.spark} points`);
       }
+      // Active player's unblocked characters do nothing during judgment
     }
   }
 
   const scoreChanged = newBattle.enemy.score !== oldBattle.enemy.score ||
     newBattle.user.score !== oldBattle.user.score;
 
-  // Build arrow target lookup: source card ID → list of target card names
-  const newCardMap = new Map(newBattle.cards.map((c) => [c.id, c]));
+  // Build arrow target lookup: source card ID → list of target card names.
+  // Check arrows from both old and new battle states — during polling, we may
+  // miss the intermediate stack state where arrows are present.
+  const allCardMap = new Map([
+    ...oldBattle.cards.map((c) => [c.id, c] as const),
+    ...newBattle.cards.map((c) => [c.id, c] as const),
+  ]);
   const arrowTargets = new Map<string, string[]>();
-  for (const arrow of newBattle.arrows) {
+  const allArrows = [...oldBattle.arrows, ...newBattle.arrows];
+  for (const arrow of allArrows) {
     const src = arrow.source as Record<string, unknown>;
     const tgt = arrow.target as Record<string, unknown>;
     const srcId = typeof src === "object" && src !== null && "CardId" in src ? src["CardId"] as string : null;
     const tgtId = typeof tgt === "object" && tgt !== null && "CardId" in tgt ? tgt["CardId"] as string : null;
     if (srcId && tgtId) {
-      const tgtCard = newCardMap.get(tgtId);
+      const tgtCard = allCardMap.get(tgtId);
       const tgtName = tgtCard?.revealed?.name;
       if (tgtName) {
         const existing = arrowTargets.get(srcId);
         if (existing) {
-          existing.push(tgtName);
+          if (!existing.includes(tgtName)) existing.push(tgtName);
         } else {
           arrowTargets.set(srcId, [tgtName]);
         }
@@ -162,8 +184,8 @@ function generateEvents(oldBattle: BattleView, newBattle: BattleView): GenerateE
     else if (oldPos === "OnBattlefield" && newPos === "InBanished") {
       events.push(`${playerLabel(oldPlayer)}: ${name} banished`);
     }
-    // Card played from hand (to stack)
-    else if (oldPos === "InHand" && newPos === "OnStack") {
+    // Card played from hand (to stack, or resolved past the stack during a poll gap)
+    else if (oldPos === "InHand" && (newPos === "OnStack" || newPos === "InVoid")) {
       const targets = arrowTargets.get(card.id);
       if (targets && targets.length > 0) {
         events.push(`${playerLabel(oldPlayer)} played ${name} targeting ${targets.join(", ")}`);
@@ -179,9 +201,26 @@ function generateEvents(oldBattle: BattleView, newBattle: BattleView): GenerateE
     else if (oldPos === "OnBattlefield" && newPos === "InHand") {
       events.push(`${name} returned to ${possessiveLabel(newPlayer)} hand`);
     }
-    // Card moved to void from hand or deck
-    else if (newPos === "InVoid" && oldPos !== "OnBattlefield" && oldPos !== "InVoid") {
+    // Card moved to void from non-hand, non-battlefield source
+    else if (newPos === "InVoid" && oldPos !== "OnBattlefield" && oldPos !== "InVoid" && oldPos !== "InHand") {
       events.push(`${name} sent to ${possessiveLabel(newPlayer)} void`);
+    }
+    // Dreamwell activated (card moved to DreamwellActivation position).
+    // The dreamwell is shared, so all cards render as "User". Determine the
+    // actual owner from whose turn it is (dreamwell fires at turn start).
+    else if (newPos === "DreamwellActivation" && oldPos !== "DreamwellActivation") {
+      const rulesText = card.revealed?.rules_text ?? old.revealed?.rules_text;
+      const desc = rulesText ? ` — ${stripTags(rulesText)}` : "";
+      const owner = newBattle.user.can_act ? "User" : "Enemy";
+      events.push(`${possessiveLabel(owner)} dreamwell: ${name}${desc}`);
+    }
+    // Card placed in dreamwell
+    else if (newPos === "InDreamwell" && oldPos !== "InDreamwell") {
+      events.push(`${name} placed in ${possessiveLabel(newPlayer)} dreamwell`);
+    }
+    // Card left dreamwell (to somewhere other than activation)
+    else if (oldPos === "InDreamwell" && newPos !== "InDreamwell" && newPos !== "DreamwellActivation") {
+      events.push(`${name} left ${possessiveLabel(oldPlayer)} dreamwell`);
     }
   }
 
@@ -217,6 +256,7 @@ export function useBattle(): BattleContextValue {
 }
 
 const POLL_INTERVAL_MS = 200;
+const STACK_PAUSE_MS = 500;
 
 export function BattleProvider({ children }: { children: ReactNode }) {
   const [battle, setBattle] = useState<BattleView | null>(null);
@@ -231,6 +271,8 @@ export function BattleProvider({ children }: { children: ReactNode }) {
   const wasPollingRef = useRef(false);
   // Generation counter to invalidate stale in-flight polls
   const pollGenerationRef = useRef(0);
+  // Timestamp until which polling should pause (for stack visibility)
+  const stackPauseUntilRef = useRef(0);
 
   const stopPolling = useCallback((reason?: string) => {
     pollGenerationRef.current++;
@@ -260,6 +302,8 @@ export function BattleProvider({ children }: { children: ReactNode }) {
         clearInterval(interval);
         return;
       }
+      // Skip this poll tick if we're in a stack pause
+      if (performance.now() < stackPauseUntilRef.current) return;
       pollInFlight = true;
       void (async () => {
         const pollStart = performance.now();
@@ -298,6 +342,10 @@ export function BattleProvider({ children }: { children: ReactNode }) {
             }
             prevBattleRef.current = view;
             setBattle(view);
+            // Pause polling while cards are on the stack for visibility
+            if (hasStackCards(view)) {
+              stackPauseUntilRef.current = performance.now() + STACK_PAUSE_MS;
+            }
             log.logStateUpdate("poll", view.turn_number, view.user.score, view.enemy.score, view.user.can_act, view.user.energy, view.game_over);
             if (view.user.can_act || view.game_over) {
               if (wasPollingRef.current && !view.game_over) {
@@ -359,6 +407,9 @@ export function BattleProvider({ children }: { children: ReactNode }) {
             }
             prevBattleRef.current = view;
             setBattle(view);
+            if (hasStackCards(view)) {
+              stackPauseUntilRef.current = performance.now() + STACK_PAUSE_MS;
+            }
             log.logStateUpdate("action", view.turn_number, view.user.score, view.enemy.score, view.user.can_act, view.user.energy, view.game_over);
             if (view.user.can_act || view.game_over) return;
           }

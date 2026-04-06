@@ -1,24 +1,37 @@
 # Combat Model Redesign Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use
+> superpowers:subagent-driven-development (recommended) or
+> superpowers:executing-plans to implement this plan task-by-task. Steps use
+> checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Revise the Dreamtides battle system so the non-active player's front-rank characters attack during the active player's Judgment, with post-judgment return to back rank, phase reordering (Ending before Judgment), and an 8-character battlefield limit.
+**Goal:** Revise the Dreamtides battle system so the non-active player's
+front-rank characters attack during the active player's Judgment, with
+post-judgment return to back rank, phase reordering (Ending before Judgment),
+and an 8-character battlefield limit.
 
-**Architecture:** Modify existing judgment resolution, phase transitions, and playability checks in the Rust rules engine. Update event generation in the TypeScript battle prototype. No new crates, modules, or data structures beyond a single new field on TurnData.
+**Architecture:** Modify existing judgment resolution, phase transitions, and
+playability checks in the Rust rules engine. Update event generation in the
+TypeScript battle prototype. No new crates, modules, or data structures beyond a
+single new field on TurnData.
 
 **Tech Stack:** Rust (rules engine), TypeScript/React (battle prototype)
 
----
+______________________________________________________________________
 
 ### Task 1: Change Character Limit to 8
 
 **Files:**
-- Modify: `rules_engine/src/battle_queries/src/legal_action_queries/can_play_cards.rs:20`
+
+- Modify:
+  `rules_engine/src/battle_queries/src/legal_action_queries/can_play_cards.rs:20`
+
 - Modify: `rules_engine/src/battle_state/src/battle_cards/battlefield.rs:21-22`
 
 - [ ] **Step 1: Update CHARACTER_LIMIT constant**
 
-In `rules_engine/src/battle_queries/src/legal_action_queries/can_play_cards.rs`, change line 20:
+In `rules_engine/src/battle_queries/src/legal_action_queries/can_play_cards.rs`,
+change line 20:
 
 ```rust
 const CHARACTER_LIMIT: usize = 8;
@@ -26,7 +39,8 @@ const CHARACTER_LIMIT: usize = 8;
 
 - [ ] **Step 2: Update is_full() method**
 
-In `rules_engine/src/battle_state/src/battle_cards/battlefield.rs`, change the `is_full` method and its doc comment:
+In `rules_engine/src/battle_state/src/battle_cards/battlefield.rs`, change the
+`is_full` method and its doc comment:
 
 ```rust
     /// Returns true if the battlefield has 8 or more characters (the maximum).
@@ -43,17 +57,20 @@ git add rules_engine/src/battle_queries/src/legal_action_queries/can_play_cards.
 git commit -m "feat: reduce battlefield character limit from 16 to 8"
 ```
 
----
+______________________________________________________________________
 
 ### Task 2: Reorder Phases — Ending Before Judgment
 
 **Files:**
+
 - Modify: `rules_engine/src/battle_state/src/battle/battle_turn_phase.rs`
+
 - Modify: `rules_engine/src/battle_mutations/src/phase_mutations/turn.rs`
 
 - [ ] **Step 1: Reorder the BattleTurnPhase enum**
 
-In `rules_engine/src/battle_state/src/battle/battle_turn_phase.rs`, swap `Ending` before `Judgment` so the enum matches the new phase flow:
+In `rules_engine/src/battle_state/src/battle/battle_turn_phase.rs`, swap
+`Ending` before `Judgment` so the enum matches the new phase flow:
 
 ```rust
 #[derive(Debug, Ord, PartialOrd, Hash, EnumSetType, Sequence, Serialize, Deserialize)]
@@ -70,9 +87,13 @@ pub enum BattleTurnPhase {
 }
 ```
 
-- [ ] **Step 2: Update to_ending_phase() to transition to Ending (not Judgment)**
+- [ ] **Step 2: Update to_ending_phase() to transition to Ending (not
+  Judgment)**
 
-In `rules_engine/src/battle_mutations/src/phase_mutations/turn.rs`, change `to_ending_phase()` (lines 18-26) to set the phase to `Ending` instead of `Judgment`, and remove the judgment_position initialization (that moves to Step 3):
+In `rules_engine/src/battle_mutations/src/phase_mutations/turn.rs`, change
+`to_ending_phase()` (lines 18-26) to set the phase to `Ending` instead of
+`Judgment`, and remove the judgment_position initialization (that moves to Step
+3):
 
 ```rust
 /// End the current player's turn.
@@ -89,9 +110,11 @@ pub fn to_ending_phase(battle: &mut BattleState) {
 }
 ```
 
-- [ ] **Step 3: Update start_next_turn() to transition to Judgment (not EndingPhaseFinished)**
+- [ ] **Step 3: Update start_next_turn() to transition to Judgment (not
+  EndingPhaseFinished)**
 
-In the same file, change `start_next_turn()` (lines 117-120) to initialize judgment and transition to the Judgment phase:
+In the same file, change `start_next_turn()` (lines 117-120) to initialize
+judgment and transition to the Judgment phase:
 
 ```rust
 /// Transition from the Ending phase to the Judgment phase.
@@ -109,11 +132,16 @@ pub fn start_next_turn(battle: &mut BattleState) {
 }
 ```
 
-Note: `judgment_participants` is added in Task 4 Step 1. If building Task 2 before Task 4, temporarily omit the `judgment_participants.clear()` line and add it during Task 4.
+Note: `judgment_participants` is added in Task 4 Step 1. If building Task 2
+before Task 4, temporarily omit the `judgment_participants.clear()` line and add
+it during Task 4.
 
-- [ ] **Step 4: Update Judgment case to transition to EndingPhaseFinished (not Ending)**
+- [ ] **Step 4: Update Judgment case to transition to EndingPhaseFinished (not
+  Ending)**
 
-In the same file, in `run_turn_state_machine_if_no_active_prompts()`, change the Judgment case (lines 92-108). After judgment finishes, transition to `EndingPhaseFinished` instead of `Ending`:
+In the same file, in `run_turn_state_machine_if_no_active_prompts()`, change the
+Judgment case (lines 92-108). After judgment finishes, transition to
+`EndingPhaseFinished` instead of `Ending`:
 
 ```rust
             BattleTurnPhase::Judgment => {
@@ -137,7 +165,8 @@ In the same file, in `run_turn_state_machine_if_no_active_prompts()`, change the
             }
 ```
 
-Note: `judgment_phase::return_participants_to_back_rank` is implemented in Task 4.
+Note: `judgment_phase::return_participants_to_back_rank` is implemented in Task
+4\.
 
 - [ ] **Step 5: Commit**
 
@@ -147,16 +176,20 @@ git add rules_engine/src/battle_state/src/battle/battle_turn_phase.rs \
 git commit -m "feat: reorder phases so Ending (fast actions) occurs before Judgment"
 ```
 
----
+______________________________________________________________________
 
 ### Task 3: Flip Judgment Resolution — Non-Active Player Attacks
 
 **Files:**
-- Modify: `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`
+
+- Modify:
+  `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`
 
 - [ ] **Step 1: Swap attacker and defender roles**
 
-In `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`, rewrite the `run()` function. The non-active player's front-rank characters are now attackers, and the active player's front-rank characters are blockers:
+In `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`,
+rewrite the `run()` function. The non-active player's front-rank characters are
+now attackers, and the active player's front-rank characters are blockers:
 
 ```rust
 /// Resolves one column of front-rank combat during the Judgment phase.
@@ -203,11 +236,16 @@ pub fn run(battle: &mut BattleState, player: PlayerName, source: EffectSource) -
 }
 ```
 
-Note: `judgment_participants` tracking is added in Tasks 3 and 4. The `(opponent, attacker, position)` and `(player, blocker, position)` tuples record the player, character ID, and column for post-judgment back-rank return.
+Note: `judgment_participants` tracking is added in Tasks 3 and 4. The
+`(opponent, attacker, position)` and `(player, blocker, position)` tuples record
+the player, character ID, and column for post-judgment back-rank return.
 
 - [ ] **Step 2: Add the import for PlayerName**
 
-At the top of the file, ensure `PlayerName` is imported (it already is via the `player: PlayerName` parameter, but verify). Also add the `use` for the new `judgment_participants` field — no new imports needed since `PlayerName` and `CharacterId` are already in scope via the function signatures.
+At the top of the file, ensure `PlayerName` is imported (it already is via the
+`player: PlayerName` parameter, but verify). Also add the `use` for the new
+`judgment_participants` field — no new imports needed since `PlayerName` and
+`CharacterId` are already in scope via the function signatures.
 
 - [ ] **Step 3: Commit**
 
@@ -216,18 +254,23 @@ git add rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs
 git commit -m "feat: non-active player's front-rank characters now attack during Judgment"
 ```
 
----
+______________________________________________________________________
 
 ### Task 4: Post-Judgment Return to Back Rank
 
 **Files:**
+
 - Modify: `rules_engine/src/battle_state/src/battle/turn_data.rs`
-- Modify: `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`
+
+- Modify:
+  `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`
+
 - Modify: `rules_engine/src/battle_state/src/battle_cards/battlefield.rs`
 
 - [ ] **Step 1: Add judgment_participants field to TurnData**
 
-In `rules_engine/src/battle_state/src/battle/turn_data.rs`, add the import for `PlayerName` (already present) and add a new field to `TurnData`:
+In `rules_engine/src/battle_state/src/battle/turn_data.rs`, add the import for
+`PlayerName` (already present) and add a new field to `TurnData`:
 
 ```rust
 use core_data::numerics::TurnId;
@@ -276,7 +319,9 @@ impl Default for TurnData {
 
 - [ ] **Step 2: Add return_to_back_rank_at_column method to Battlefield**
 
-In `rules_engine/src/battle_state/src/battle_cards/battlefield.rs`, add a new method that moves a character from front rank to back rank, preferring the same column index:
+In `rules_engine/src/battle_state/src/battle_cards/battlefield.rs`, add a new
+method that moves a character from front rank to back rank, preferring the same
+column index:
 
 ```rust
     /// Moves a character from the front rank to the back rank, preferring the
@@ -304,9 +349,11 @@ In `rules_engine/src/battle_state/src/battle_cards/battlefield.rs`, add a new me
     }
 ```
 
-- [ ] **Step 3: Add return_participants_to_back_rank function to judgment_phase.rs**
+- [ ] **Step 3: Add return_participants_to_back_rank function to
+  judgment_phase.rs**
 
-In `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`, add a new public function after the `run()` function:
+In `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`,
+add a new public function after the `run()` function:
 
 ```rust
 /// After all Judgment columns resolve, move surviving participants back to
@@ -326,17 +373,22 @@ pub fn return_participants_to_back_rank(battle: &mut BattleState) {
 
 - [ ] **Step 4: Add the judgment_participants.clear() call in start_next_turn**
 
-If not already added in Task 2 Step 3, ensure `rules_engine/src/battle_mutations/src/phase_mutations/turn.rs` has `battle.turn.judgment_participants.clear();` inside `start_next_turn()`.
+If not already added in Task 2 Step 3, ensure
+`rules_engine/src/battle_mutations/src/phase_mutations/turn.rs` has
+`battle.turn.judgment_participants.clear();` inside `start_next_turn()`.
 
-- [ ] **Step 5: Also clear judgment_participants in the FiringEndOfTurnTriggers transition**
+- [ ] **Step 5: Also clear judgment_participants in the FiringEndOfTurnTriggers
+  transition**
 
-In `turn.rs`, inside the `FiringEndOfTurnTriggers` case (around line 52 where `moved_this_turn.clear()` is called), add:
+In `turn.rs`, inside the `FiringEndOfTurnTriggers` case (around line 52 where
+`moved_this_turn.clear()` is called), add:
 
 ```rust
 battle.turn.judgment_participants.clear();
 ```
 
-right after `battle.turn.moved_this_turn.clear();` to ensure a clean slate for the next turn.
+right after `battle.turn.moved_this_turn.clear();` to ensure a clean slate for
+the next turn.
 
 - [ ] **Step 6: Commit**
 
@@ -348,7 +400,7 @@ git add rules_engine/src/battle_state/src/battle/turn_data.rs \
 git commit -m "feat: surviving judgment participants return to back rank after combat"
 ```
 
----
+______________________________________________________________________
 
 ### Task 5: Build and Fix Compilation Errors
 
@@ -367,9 +419,15 @@ cd /Users/dthurn/dreamtides/rules_engine && just check
 ```
 
 Fix any compilation errors. Common issues:
-- Missing imports for `PlayerName` in `judgment_phase.rs` (should already be available via function parameter)
-- `judgment_participants` field not recognized if Task 4 Step 1 wasn't applied before Task 2/3
-- `return_participants_to_back_rank` not found if Task 4 Step 3 wasn't applied before Task 2 Step 4
+
+- Missing imports for `PlayerName` in `judgment_phase.rs` (should already be
+  available via function parameter)
+
+- `judgment_participants` field not recognized if Task 4 Step 1 wasn't applied
+  before Task 2/3
+
+- `return_participants_to_back_rank` not found if Task 4 Step 3 wasn't applied
+  before Task 2 Step 4
 
 - [ ] **Step 3: Run clippy**
 
@@ -394,18 +452,27 @@ git add -u
 git commit -m "fix: resolve compilation and lint issues from combat model changes"
 ```
 
----
+______________________________________________________________________
 
 ### Task 6: Update Battle Prototype Event Generation
 
 **Files:**
+
 - Modify: `scripts/battle_prototype/src/state/battle-context.tsx`
 
 - [ ] **Step 1: Update generateEvents() judgment log**
 
-In `scripts/battle_prototype/src/state/battle-context.tsx`, the `generateEvents()` function (lines 74-196) generates judgment event descriptions. The current logic treats both players symmetrically — it just says who defeated whom. The log messages should now reflect that the non-active player's characters are the attackers.
+In `scripts/battle_prototype/src/state/battle-context.tsx`, the
+`generateEvents()` function (lines 74-196) generates judgment event
+descriptions. The current logic treats both players symmetrically — it just says
+who defeated whom. The log messages should now reflect that the non-active
+player's characters are the attackers.
 
-The current judgment detection uses `turn_number` change as a proxy. The event messages at lines 96-113 already describe outcomes symmetrically ("Your X defeated Enemy Y" / "Enemy X defeated Your Y"), which is acceptable. The "uncontested" messages should be updated to say "attacked unblocked" instead of "was uncontested":
+The current judgment detection uses `turn_number` change as a proxy. The event
+messages at lines 96-113 already describe outcomes symmetrically ("Your X
+defeated Enemy Y" / "Enemy X defeated Your Y"), which is acceptable. The
+"uncontested" messages should be updated to say "attacked unblocked" instead of
+"was uncontested":
 
 Replace lines 107-113:
 
@@ -432,7 +499,7 @@ git add scripts/battle_prototype/src/state/battle-context.tsx
 git commit -m "feat: update battle prototype judgment event text for new combat model"
 ```
 
----
+______________________________________________________________________
 
 ### Task 7: Manual QA
 
@@ -440,7 +507,8 @@ git commit -m "feat: update battle prototype judgment event text for new combat 
 
 - [ ] **Step 1: Start the dev server**
 
-Start both the rules engine server and the battle prototype dev server. The rules engine server is typically started with:
+Start both the rules engine server and the battle prototype dev server. The
+rules engine server is typically started with:
 
 ```bash
 cd /Users/dthurn/dreamtides/rules_engine && cargo run
@@ -454,17 +522,26 @@ cd /Users/dthurn/dreamtides/scripts/battle_prototype && npm run dev
 
 - [ ] **Step 2: Run QA using the qa skill**
 
-Dispatch a QA subagent using the `qa` skill (see `.llms/skills/qa/SKILL.md`) to test the battle prototype at `http://localhost:5173`. The QA agent should verify:
+Dispatch a QA subagent using the `qa` skill (see `.llms/skills/qa/SKILL.md`) to
+test the battle prototype at `http://localhost:5173`. The QA agent should
+verify:
 
-1. **Attacker/blocker classification:** Front-rank characters with an enemy across are blockers; those without are attackers
-2. **Non-active player attacks:** During the active player's Judgment, the opponent's attackers attack (not the active player's)
-3. **Spark comparisons:** Higher spark wins, equal spark both dissolve, attacker does not score when blocked
-4. **Unblocked attackers score:** Points equal to spark for unblocked attackers
-5. **Post-judgment back rank return:** Surviving participants (winners of spark comparisons) return to back rank
-6. **Non-participants stay:** Front-rank characters not involved in judgment remain in front rank
-7. **8-character limit:** Cannot play a 9th character when 8 are on battlefield
-8. **Summoning sickness:** Characters played this turn cannot move to front rank
-9. **Phase ordering:** Ending phase (fast actions) occurs before Judgment — use fast-speed dissolve to remove an attacker before Judgment
+01. **Attacker/blocker classification:** Front-rank characters with an enemy
+    across are blockers; those without are attackers
+02. **Non-active player attacks:** During the active player's Judgment, the
+    opponent's attackers attack (not the active player's)
+03. **Spark comparisons:** Higher spark wins, equal spark both dissolve,
+    attacker does not score when blocked
+04. **Unblocked attackers score:** Points equal to spark for unblocked attackers
+05. **Post-judgment back rank return:** Surviving participants (winners of spark
+    comparisons) return to back rank
+06. **Non-participants stay:** Front-rank characters not involved in judgment
+    remain in front rank
+07. **8-character limit:** Cannot play a 9th character when 8 are on battlefield
+08. **Summoning sickness:** Characters played this turn cannot move to front
+    rank
+09. **Phase ordering:** Ending phase (fast actions) occurs before Judgment — use
+    fast-speed dissolve to remove an attacker before Judgment
 10. **Repositioning restrictions:** Can only reposition during main phase
 
 - [ ] **Step 3: Fix any bugs found during QA**

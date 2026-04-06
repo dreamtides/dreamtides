@@ -52,6 +52,7 @@ front-rank characters are evaluated as attackers. For each column 0–7:
    Unblocked attacker. Scores victory points equal to its spark.
 
 2. **Both players have a front-rank character:** Spark comparison (judgment).
+
    - Lower spark is dissolved (sent to Void).
    - Equal spark: both dissolved.
    - The attacker does **not** score points even if it survives.
@@ -78,10 +79,10 @@ front-rank characters are evaluated as attackers. For each column 0–7:
 Attacks are delayed by one turn:
 
 1. Player A places characters in front rank during their main phase.
-2. Player A's turn ends → Ending phase (Player B may play fast cards) →
-   Judgment phase evaluates Player B's front-rank characters as attackers.
-3. Player B's turn → Player B positions blockers → Player B's turn ends →
-   Ending phase (Player A may play fast cards) → Judgment evaluates Player A's
+2. Player A's turn ends → Ending phase (Player B may play fast cards) → Judgment
+   phase evaluates Player B's front-rank characters as attackers.
+3. Player B's turn → Player B positions blockers → Player B's turn ends → Ending
+   phase (Player A may play fast cards) → Judgment evaluates Player A's
    front-rank characters as attackers.
 
 Characters placed in the front rank during your turn will not attack until the
@@ -121,9 +122,9 @@ Unchanged: first player to reach `points_to_win` (currently 25) wins.
 
 ## Battle Prototype UI Changes
 
-1. **Judgment event generation** (`battle-context.tsx`): Update `generateEvents()`
-   to describe non-active player's characters as attackers with appropriate log
-   messages.
+1. **Judgment event generation** (`battle-context.tsx`): Update
+   `generateEvents()` to describe non-active player's characters as attackers
+   with appropriate log messages.
 
 2. **Post-judgment positioning**: Surviving participants visually move to back
    rank (same column). Back-rank characters shift to accommodate.

@@ -111,18 +111,37 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
         </div>
       )}
 
-      {/* Turn info */}
+      {/* Status bar */}
       <div
-        className="text-center py-1 text-sm"
+        className="flex items-center justify-between px-3 py-1 text-xs"
         style={{
-          background: disabled ? "var(--color-primary)" : "var(--color-surface)",
+          background: "var(--color-surface)",
           borderBottom: "1px solid var(--color-border)",
-          color: disabled ? "var(--color-text)" : "var(--color-text-dim)",
-          transition: "background 0.2s",
+          color: "var(--color-text-dim)",
         }}
       >
-        Turn {battle.turn_number}
-        {disabled && " — waiting..."}
+        <span>Turn {battle.turn_number}</span>
+        <span
+          className="font-bold"
+          style={{
+            color: judgmentPause
+              ? "var(--color-gold)"
+              : battle.user.can_act
+                ? "var(--color-primary-light)"
+                : "var(--color-text-dim)",
+          }}
+        >
+          {judgmentPause
+            ? "\u26A1 Judgment"
+            : battle.game_over
+              ? "Game Over"
+              : battle.user.can_act
+                ? "Your Turn"
+                : "Enemy Turn — waiting\u2026"}
+        </span>
+        <span>
+          {battle.user.score}–{battle.enemy.score}
+        </span>
       </div>
 
       {/* Enemy status */}
