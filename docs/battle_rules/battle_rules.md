@@ -36,10 +36,10 @@ winner, the game ends in a draw.
 **Character** — Permanent cards that enter the battlefield when they resolve.
 Each character has a spark value used in combat during the Judgment phase.
 Characters enter the back rank and can be repositioned to the front rank on
-subsequent turns. Characters remain on the battlefield until removed by an effect
-(Dissolve or Banish) or defeated in combat. They can have triggered, activated,
-and static abilities. Characters have subtypes (Mage, Warrior, Robot, etc.) that
-other cards can reference.
+subsequent turns. Characters remain on the battlefield until removed by an
+effect (Dissolve or Banish) or defeated in combat. They can have triggered,
+activated, and static abilities. Characters have subtypes (Mage, Warrior, Robot,
+etc.) that other cards can reference.
 
 **Event** — One-shot cards that produce an effect when they resolve, then move
 to the void. Events can be marked as "fast," allowing them to be played during
@@ -157,8 +157,8 @@ empty, the card's controller receives priority.
 
 ## Spark and Scoring
 
-Spark is the primary stat on characters. Characters have no health or
-toughness — spark is their only stat.
+Spark is the primary stat on characters. Characters have no health or toughness
+— spark is their only stat.
 
 **Judgment phase resolution:** During the Judgment phase at the end of each
 turn, each front-rank position (0–7) is resolved independently:
@@ -198,10 +198,10 @@ the void, banish until the banishing card leaves play, and banish until the next
 main phase.
 
 **Materialize** — Put a character onto the battlefield's back rank. This is the
-term for a character entering play, whether from hand (played normally), from the
-void (via Reclaim or effects), from the deck (via effects), or as a token
-(Figments). Characters enter with summoning sickness and cannot move to the front
-rank on the turn they are materialized.
+term for a character entering play, whether from hand (played normally), from
+the void (via Reclaim or effects), from the deck (via effects), or as a token
+(Figments). Characters enter with summoning sickness and cannot move to the
+front rank on the turn they are materialized.
 
 **Prevent** — Counter a card on the stack, sending it to the void without
 resolving. Prevent effects are always fast (they must be played in response to a
