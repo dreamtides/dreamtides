@@ -22,6 +22,12 @@ pub struct TurnData {
     /// Characters that have been repositioned this turn, used to prevent
     /// infinite back-and-forth movement by the AI.
     pub moved_this_turn: Vec<CharacterId>,
+
+    /// Characters that participated in a judgment (spark comparison) during
+    /// the current Judgment phase. Each entry is (player, character_id,
+    /// column). After all columns resolve, surviving participants return to
+    /// back rank.
+    pub judgment_participants: Vec<(PlayerName, CharacterId, u8)>,
 }
 
 impl Default for TurnData {
@@ -31,6 +37,7 @@ impl Default for TurnData {
             turn_id: TurnId::default(),
             judgment_position: 0,
             moved_this_turn: Vec::new(),
+            judgment_participants: Vec::new(),
         }
     }
 }

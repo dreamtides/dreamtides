@@ -10,8 +10,8 @@ pub enum BattleTurnPhase {
     Draw,
     Dawn,
     Main,
-    Judgment,
     Ending,
+    Judgment,
     EndingPhaseFinished,
     FiringEndOfTurnTriggers,
 }

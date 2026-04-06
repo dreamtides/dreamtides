@@ -14,15 +14,10 @@ use crate::phase_mutations::{dawn_phase, dreamwell_phase, fire_triggers, judgmen
 
 /// End the current player's turn.
 ///
-/// Transitions into the Judgment phase for column-by-column combat resolution.
+/// Transitions into the Ending phase for fast actions.
 pub fn to_ending_phase(battle: &mut BattleState) {
-    battle.turn.judgment_position = 0;
-    battle.phase = BattleTurnPhase::Judgment;
-    battle_trace!(
-        "Moving to judgment phase for player",
-        battle,
-        player = battle.turn.active_player
-    );
+    battle.phase = BattleTurnPhase::Ending;
+    battle_trace!("Moving to ending phase for player", battle, player = battle.turn.active_player);
 }
 
 pub fn run_turn_state_machine_if_no_active_prompts(battle: &mut BattleState) {
@@ -50,6 +45,7 @@ pub fn run_turn_state_machine_if_no_active_prompts(battle: &mut BattleState) {
                 battle.turn.active_player = next_player;
                 battle.turn.turn_id += TurnId(1);
                 battle.turn.moved_this_turn.clear();
+                battle.turn.judgment_participants.clear();
                 if battle.turn.turn_id >= TurnId(50) {
                     // If the battle has lasted more than 50 turns (25 per player), it is a
                     // draw.
@@ -96,12 +92,13 @@ pub fn run_turn_state_machine_if_no_active_prompts(battle: &mut BattleState) {
                 apply_effect::execute_pending_effects_if_no_active_prompt(battle);
                 fire_triggers::execute_if_no_active_prompt(battle);
                 if finished && battle.prompts.is_empty() {
+                    judgment_phase::return_participants_to_back_rank(battle);
                     battle.triggers.push(source, Trigger::Judgment(player));
                     apply_effect::execute_pending_effects_if_no_active_prompt(battle);
                     fire_triggers::execute_if_no_active_prompt(battle);
-                    battle.phase = BattleTurnPhase::Ending;
+                    battle.phase = BattleTurnPhase::EndingPhaseFinished;
                     battle_trace!(
-                        "Judgment phase complete, moving to ending for player",
+                        "Judgment phase complete, moving to ending phase finished for player",
                         battle,
                         player
                     );
@@ -114,7 +111,16 @@ pub fn run_turn_state_machine_if_no_active_prompts(battle: &mut BattleState) {
     }
 }
 
-/// Start a turn for the next player.
+/// Transition from the Ending phase to the Judgment phase.
+///
+/// Called when the non-active player passes during the Ending phase.
 pub fn start_next_turn(battle: &mut BattleState) {
-    battle.phase = BattleTurnPhase::EndingPhaseFinished;
+    battle.turn.judgment_position = 0;
+    battle.turn.judgment_participants.clear();
+    battle.phase = BattleTurnPhase::Judgment;
+    battle_trace!(
+        "Moving to judgment phase for player",
+        battle,
+        player = battle.turn.active_player
+    );
 }

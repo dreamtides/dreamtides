@@ -17,9 +17,9 @@ impl Battlefield {
             + self.back.iter().filter(|s| s.is_some()).count()
     }
 
-    /// Returns true if both ranks are full (16 total characters).
+    /// Returns true if the battlefield has 8 or more characters (the maximum).
     pub fn is_full(&self) -> bool {
-        self.character_count() == 16
+        self.character_count() >= 8
     }
 
     /// Returns the index of the first empty slot in the back rank, if any.
@@ -84,6 +84,28 @@ impl Battlefield {
     /// Returns true if the battlefield has no characters.
     pub fn is_empty(&self) -> bool {
         self.character_count() == 0
+    }
+
+    /// Moves a character from the front rank to the back rank, preferring the
+    /// same column index. If that back-rank slot is occupied, the character is
+    /// placed in the first available back-rank slot instead.
+    ///
+    /// Returns false if the character is not in the front rank or no back-rank
+    /// slot is available.
+    pub fn return_to_back_rank(&mut self, id: CharacterId) -> bool {
+        let Some(front_col) = self.front.iter().position(|s| *s == Some(id)) else {
+            return false;
+        };
+        self.front[front_col] = None;
+        if self.back[front_col].is_none() {
+            self.back[front_col] = Some(id);
+        } else if let Some(slot) = self.first_empty_back_slot() {
+            self.back[slot] = Some(id);
+        } else {
+            self.front[front_col] = Some(id);
+            return false;
+        }
+        true
     }
 
     /// Returns a [CardSet] containing all characters on the battlefield.

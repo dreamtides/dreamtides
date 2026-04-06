@@ -17,7 +17,7 @@ use crate::legal_action_queries::{
 };
 use crate::panic_with;
 
-const CHARACTER_LIMIT: usize = 16;
+const CHARACTER_LIMIT: usize = 8;
 
 /// Whether only cards with the `fast` property should be returned.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
