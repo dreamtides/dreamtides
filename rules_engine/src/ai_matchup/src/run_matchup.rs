@@ -1,4 +1,6 @@
 use std::io::{self, Write};
+use std::path::Path;
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use ai_agents::agent_search;
@@ -15,9 +17,7 @@ use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
 use game_creation::new_test_battle;
 use serde_json::from_str;
-use state_provider::display_state_provider::DisplayStateProvider;
-use state_provider::state_provider::StateProvider;
-use state_provider::test_state_provider::TestStateProvider;
+use tabula_data::tabula::{Tabula, TabulaSource};
 use tabula_generated::card_lists::DreamwellCardIdList;
 use tracing::{debug, subscriber};
 use tracing_subscriber::layer::SubscriberExt;
@@ -57,6 +57,55 @@ struct Args {
         help = "Number of matches to run, alternating player position"
     )]
     matches: usize,
+
+    #[arg(
+        long,
+        value_enum,
+        default_value = "starting-five",
+        help = "Deck to use for both players"
+    )]
+    deck: DeckChoice,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, ValueEnum)]
+enum DeckChoice {
+    Vanilla,
+    StartingFive,
+    Benchmark1,
+    Core11,
+}
+
+impl DeckChoice {
+    fn to_test_deck_name(self) -> TestDeckName {
+        match self {
+            DeckChoice::Vanilla => TestDeckName::Vanilla,
+            DeckChoice::StartingFive => TestDeckName::StartingFive,
+            DeckChoice::Benchmark1 => TestDeckName::Benchmark1,
+            DeckChoice::Core11 => TestDeckName::Core11,
+        }
+    }
+
+    fn tabula_source(self) -> TabulaSource {
+        match self {
+            DeckChoice::Core11 => TabulaSource::Production,
+            _ => TabulaSource::Test,
+        }
+    }
+
+    fn dreamwell_list(self) -> DreamwellCardIdList {
+        match self {
+            DeckChoice::Core11 => DreamwellCardIdList::DreamwellBasic5,
+            _ => DreamwellCardIdList::TestDreamwellNoAbilities,
+        }
+    }
+}
+
+fn load_tabula(source: TabulaSource) -> Arc<Tabula> {
+    let streaming_assets_path = logging::get_developer_mode_streaming_assets_path();
+    let tabula_dir = Path::new(&streaming_assets_path).join("Tabula");
+    let tabula = Tabula::load(source, &tabula_dir)
+        .unwrap_or_else(|errors| panic!("Failed to load tabula: {errors:?}"));
+    Arc::new(tabula)
 }
 
 struct MatchResult {
@@ -109,6 +158,7 @@ fn run_match(
     seed: u64,
     verbosity: Verbosity,
     swap_positions: bool,
+    deck: DeckChoice,
 ) -> (MatchOutcome, MatchActionStats) {
     let ai_one_parsed = from_str(ai_one).unwrap();
     let ai_two_parsed = from_str(ai_two).unwrap();
@@ -145,20 +195,17 @@ fn run_match(
         }
     }
 
+    let deck_name = deck.to_test_deck_name();
     let battle_id = BattleId(Uuid::new_v4());
-    let provider = TestStateProvider::new();
-    let streaming_assets_path = logging::get_developer_mode_streaming_assets_path();
-    let _ = provider.initialize("/tmp/test", &streaming_assets_path);
+    let tabula = load_tabula(deck.tabula_source());
+    let dreamwell_list = deck.dreamwell_list();
     let mut battle = new_test_battle::create_and_start(
         battle_id,
-        provider.tabula(),
+        tabula.clone(),
         seed,
-        Dreamwell::from_card_list(
-            &provider.tabula(),
-            DreamwellCardIdList::TestDreamwellNoAbilities,
-        ),
-        CreateBattlePlayer { player_type: battle_ai_one, deck_name: TestDeckName::StartingFive },
-        CreateBattlePlayer { player_type: battle_ai_two, deck_name: TestDeckName::StartingFive },
+        Dreamwell::from_card_list(&tabula, dreamwell_list),
+        CreateBattlePlayer { player_type: battle_ai_one, deck_name },
+        CreateBattlePlayer { player_type: battle_ai_two, deck_name },
         RequestContext { logging_options: LoggingOptions::default() },
     );
 
@@ -277,6 +324,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             args.seed,
             match_verbosity,
             swap_positions,
+            args.deck,
         );
 
         results.ai_one_timing.total += stats.ai_one.total;
