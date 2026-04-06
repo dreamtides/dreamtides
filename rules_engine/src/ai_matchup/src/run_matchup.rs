@@ -1,7 +1,11 @@
+use std::cell::RefCell;
 use std::io::{self, Write};
+use std::panic::{self, AssertUnwindSafe};
+use std::process;
 use std::time::{Duration, Instant};
 
 use ai_agents::agent_search;
+use backtrace::Backtrace;
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
@@ -24,12 +28,35 @@ use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::{EnvFilter, Layer};
 use uuid::Uuid;
 
+thread_local! {
+    static PANIC_INFO: RefCell<Option<(String, String, String)>> = const { RefCell::new(None) };
+}
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq, ValueEnum)]
 enum Verbosity {
     None,
     OneLine,
     Actions,
     Verbose,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, ValueEnum)]
+enum DeckChoice {
+    Vanilla,
+    StartingFive,
+    Benchmark1,
+    Core11,
+}
+
+impl DeckChoice {
+    fn to_test_deck_name(self) -> TestDeckName {
+        match self {
+            DeckChoice::Vanilla => TestDeckName::Vanilla,
+            DeckChoice::StartingFive => TestDeckName::StartingFive,
+            DeckChoice::Benchmark1 => TestDeckName::Benchmark1,
+            DeckChoice::Core11 => TestDeckName::Core11,
+        }
+    }
 }
 
 #[derive(Parser)]
@@ -57,6 +84,17 @@ struct Args {
         help = "Number of matches to run, alternating player position"
     )]
     matches: usize,
+
+    #[arg(long, help = "Run continuously until a crash is found")]
+    stress: bool,
+
+    #[arg(
+        long,
+        value_enum,
+        default_value = "starting-five",
+        help = "Deck to use for both players"
+    )]
+    deck: DeckChoice,
 }
 
 struct MatchResult {
@@ -103,13 +141,73 @@ enum MatchOutcome {
     Draw(usize, std::time::Duration),
 }
 
+struct CrashInfo {
+    seed: u64,
+    match_index: usize,
+    panic_message: String,
+    backtrace: String,
+}
+
+fn catch_panic<F, T>(function: F) -> Result<T, (String, String)>
+where
+    F: FnOnce() -> T,
+{
+    PANIC_INFO.with(|info| {
+        *info.borrow_mut() = None;
+    });
+
+    let prev_hook = panic::take_hook();
+    panic::set_hook(Box::new(|panic_info| {
+        let location_str = match panic_info.location() {
+            Some(location) => format!("{}:{}", location.file(), location.line()),
+            None => "unknown location".to_string(),
+        };
+
+        let panic_msg = format!("{panic_info}");
+        let backtrace = Backtrace::new();
+        let backtrace_str = format!("{backtrace:?}");
+
+        PANIC_INFO.with(|info| {
+            *info.borrow_mut() = Some((location_str, panic_msg, backtrace_str));
+        });
+    }));
+
+    let result = panic::catch_unwind(AssertUnwindSafe(function));
+
+    panic::set_hook(prev_hook);
+
+    match result {
+        Ok(value) => Ok(value),
+        Err(panic_error) => {
+            let panic_msg = match panic_error.downcast_ref::<&'static str>() {
+                Some(s) => s.to_string(),
+                None => match panic_error.downcast_ref::<String>() {
+                    Some(s) => s.clone(),
+                    None => "Unknown panic".to_string(),
+                },
+            };
+
+            let (message, backtrace) = PANIC_INFO.with(|info| {
+                if let Some((location, info, backtrace)) = &*info.borrow() {
+                    (format!("{panic_msg} at {location}\n\nDetails:\n{info}"), backtrace.clone())
+                } else {
+                    (format!("{panic_msg}\n\nNo backtrace available"), String::new())
+                }
+            });
+
+            Err((message, backtrace))
+        }
+    }
+}
+
 fn run_match(
     ai_one: &str,
     ai_two: &str,
     seed: u64,
     verbosity: Verbosity,
     swap_positions: bool,
-) -> (MatchOutcome, MatchActionStats) {
+    deck: TestDeckName,
+) -> Result<(MatchOutcome, MatchActionStats), (String, String)> {
     let ai_one_parsed = from_str(ai_one).unwrap();
     let ai_two_parsed = from_str(ai_two).unwrap();
 
@@ -145,101 +243,110 @@ fn run_match(
         }
     }
 
-    let battle_id = BattleId(Uuid::new_v4());
-    let provider = TestStateProvider::new();
-    let streaming_assets_path = logging::get_developer_mode_streaming_assets_path();
-    let _ = provider.initialize("/tmp/test", &streaming_assets_path);
-    let mut battle = new_test_battle::create_and_start(
-        battle_id,
-        provider.tabula(),
-        seed,
-        Dreamwell::from_card_list(
-            &provider.tabula(),
-            DreamwellCardIdList::TestDreamwellNoAbilities,
-        ),
-        CreateBattlePlayer { player_type: battle_ai_one, deck_name: TestDeckName::StartingFive },
-        CreateBattlePlayer { player_type: battle_ai_two, deck_name: TestDeckName::StartingFive },
-        RequestContext { logging_options: LoggingOptions::default() },
-    );
+    let ai_one_str = ai_one.to_string();
+    let ai_two_str = ai_two.to_string();
 
-    let start_time = Instant::now();
-    let mut turn_count = 0;
-    let mut ai_one_stats = AgentTimingStats::default();
-    let mut ai_two_stats = AgentTimingStats::default();
+    catch_panic(move || {
+        let battle_id = BattleId(Uuid::new_v4());
+        let provider = TestStateProvider::new();
+        let streaming_assets_path = logging::get_developer_mode_streaming_assets_path();
+        let _ = provider.initialize("/tmp/test", &streaming_assets_path);
+        let mut battle = new_test_battle::create_and_start(
+            battle_id,
+            provider.tabula(),
+            seed,
+            Dreamwell::from_card_list(
+                &provider.tabula(),
+                DreamwellCardIdList::TestDreamwellNoAbilities,
+            ),
+            CreateBattlePlayer { player_type: battle_ai_one, deck_name: deck },
+            CreateBattlePlayer { player_type: battle_ai_two, deck_name: deck },
+            RequestContext { logging_options: LoggingOptions::default() },
+        );
 
-    subscriber::with_default(subscriber, || {
-        while !matches!(battle.status, BattleStatus::GameOver { .. }) {
-            let turn = battle.turn.turn_id;
-            turn_count = turn.0 as usize;
+        let start_time = Instant::now();
+        let mut turn_count = 0;
+        let mut ai_one_stats = AgentTimingStats::default();
+        let mut ai_two_stats = AgentTimingStats::default();
 
-            if let Some(player) = legal_actions::next_to_act(&battle) {
-                let player_ai = match (player, swap_positions) {
-                    (PlayerName::One, false) | (PlayerName::Two, true) => ai_one_parsed,
-                    (PlayerName::Two, false) | (PlayerName::One, true) => ai_two_parsed,
-                };
+        subscriber::with_default(subscriber, || {
+            while !matches!(battle.status, BattleStatus::GameOver { .. }) {
+                let turn = battle.turn.turn_id;
+                turn_count = turn.0 as usize;
 
-                let player_ai_json = match (player, swap_positions) {
-                    (PlayerName::One, false) | (PlayerName::Two, true) => ai_one,
-                    (PlayerName::Two, false) | (PlayerName::One, true) => ai_two,
-                };
+                if let Some(player) = legal_actions::next_to_act(&battle) {
+                    let player_ai = match (player, swap_positions) {
+                        (PlayerName::One, false) | (PlayerName::Two, true) => ai_one_parsed,
+                        (PlayerName::Two, false) | (PlayerName::One, true) => ai_two_parsed,
+                    };
 
-                let legal_actions = legal_actions::compute(&battle, player);
-                let action_start = Instant::now();
-                let action = if legal_actions.len() == 1 {
-                    legal_actions.all()[0]
+                    let player_ai_json = match (player, swap_positions) {
+                        (PlayerName::One, false) | (PlayerName::Two, true) => &ai_one_str,
+                        (PlayerName::Two, false) | (PlayerName::One, true) => &ai_two_str,
+                    };
+
+                    let legal_actions = legal_actions::compute(&battle, player);
+                    let action_start = Instant::now();
+                    let action = if legal_actions.len() == 1 {
+                        legal_actions.all()[0]
+                    } else {
+                        agent_search::select_action_unchecked(&battle, player, &player_ai, None)
+                    };
+                    let action_time = action_start.elapsed();
+                    match (player, swap_positions) {
+                        (PlayerName::One, false) | (PlayerName::Two, true) => {
+                            ai_one_stats.record(action_time);
+                        }
+                        (PlayerName::Two, false) | (PlayerName::One, true) => {
+                            ai_two_stats.record(action_time);
+                        }
+                    }
+                    match verbosity {
+                        Verbosity::None => {}
+                        Verbosity::OneLine => {
+                            print!("\r\x1B[2K");
+                            print!("AI {player_ai_json} takes action: {action:?} in turn {turn}");
+                            io::stdout().flush().unwrap();
+                        }
+                        Verbosity::Actions | Verbosity::Verbose => {
+                            println!("AI {player_ai_json} takes action: {action:?} in turn {turn}");
+                        }
+                    }
+                    debug!("Player {:?} executing action: {:?}", player, action);
+                    apply_battle_action::execute(&mut battle, player, action);
+                    debug!("Action completed");
                 } else {
-                    agent_search::select_action_unchecked(&battle, player, &player_ai, None)
-                };
-                let action_time = action_start.elapsed();
-                match (player, swap_positions) {
-                    (PlayerName::One, false) | (PlayerName::Two, true) => {
-                        ai_one_stats.record(action_time);
-                    }
-                    (PlayerName::Two, false) | (PlayerName::One, true) => {
-                        ai_two_stats.record(action_time);
-                    }
+                    panic!("No player to act, but game not over.");
                 }
-                match verbosity {
-                    Verbosity::None => {}
-                    Verbosity::OneLine => {
-                        print!("\r\x1B[2K");
-                        print!("AI {player_ai_json} takes action: {action:?} in turn {turn}");
-                        io::stdout().flush().unwrap();
-                    }
-                    Verbosity::Actions | Verbosity::Verbose => {
-                        println!("AI {player_ai_json} takes action: {action:?} in turn {turn}");
-                    }
-                }
-                debug!("Player {:?} executing action: {:?}", player, action);
-                apply_battle_action::execute(&mut battle, player, action);
-                debug!("Action completed");
-            } else {
-                panic!("No player to act, but game not over.");
             }
-        }
-    });
+        });
 
-    if verbosity == Verbosity::OneLine {
-        println!();
-    }
-
-    let elapsed = start_time.elapsed();
-    let stats = MatchActionStats { ai_one: ai_one_stats, ai_two: ai_two_stats };
-    match battle.status {
-        BattleStatus::GameOver { winner: None } => (MatchOutcome::Draw(turn_count, elapsed), stats),
-        BattleStatus::GameOver { winner: Some(winner) } => {
-            (MatchOutcome::Winner(winner, turn_count, elapsed), stats)
+        if verbosity == Verbosity::OneLine {
+            println!();
         }
-        _ => panic!("Game ended without a winner"),
-    }
+
+        let elapsed = start_time.elapsed();
+        let stats = MatchActionStats { ai_one: ai_one_stats, ai_two: ai_two_stats };
+        match battle.status {
+            BattleStatus::GameOver { winner: None } => {
+                (MatchOutcome::Draw(turn_count, elapsed), stats)
+            }
+            BattleStatus::GameOver { winner: Some(winner) } => {
+                (MatchOutcome::Winner(winner, turn_count, elapsed), stats)
+            }
+            _ => panic!("Game ended without a winner"),
+        }
+    })
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
-    if args.matches == 0 {
+    if !args.stress && args.matches == 0 {
         return Err("Number of matches must be greater than 0".into());
     }
+
+    let deck = args.deck.to_test_deck_name();
 
     let mut results = MatchResult {
         player_one_wins: 0,
@@ -253,6 +360,59 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ai_two_timing: AgentTimingStats::default(),
     };
 
+    if args.stress {
+        println!(
+            "Stress testing with {} vs {} (deck: {:?})",
+            args.player_one_ai, args.player_two_ai, args.deck,
+        );
+
+        let mut match_index: usize = 0;
+        loop {
+            let swap_positions = match_index % 2 == 1;
+            let match_seed = args.seed.wrapping_add(match_index as u64);
+
+            let result = run_match(
+                &args.player_one_ai,
+                &args.player_two_ai,
+                match_seed,
+                Verbosity::None,
+                swap_positions,
+                deck,
+            );
+
+            match result {
+                Ok((outcome, _stats)) => {
+                    match_index += 1;
+                    match &outcome {
+                        MatchOutcome::Winner(_, _, _) => {}
+                        MatchOutcome::Draw(_, _) => {}
+                    }
+                    if match_index.is_multiple_of(10) {
+                        println!("Completed {match_index} matches without crash...");
+                    }
+                }
+                Err((panic_message, backtrace)) => {
+                    let crash =
+                        CrashInfo { seed: match_seed, match_index, panic_message, backtrace };
+                    println!("\n========== CRASH FOUND ==========");
+                    println!("Match index: {}", crash.match_index);
+                    println!("Seed: {}", crash.seed);
+                    println!("Swap positions: {swap_positions}");
+                    println!("Deck: {:?}", args.deck);
+                    println!("\nPanic message:\n{}", crash.panic_message);
+                    println!("\nBacktrace:\n{}", crash.backtrace);
+                    println!("\nReproduce with:");
+                    println!(
+                        "  just matchup '{}' '{}' --seed {} --deck {:?} -v actions",
+                        args.player_one_ai, args.player_two_ai, crash.seed, args.deck,
+                    );
+                    println!("==================================");
+                    process::exit(1);
+                }
+            }
+        }
+    }
+
     if args.matches > 1 {
         println!(
             "Running {} matches between {} and {}",
@@ -262,6 +422,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     for match_index in 0..args.matches {
         let swap_positions = match_index % 2 == 1;
+        let match_seed = args.seed.wrapping_add(match_index as u64);
 
         let match_verbosity =
             if args.verbosity == Verbosity::Verbose { Verbosity::Actions } else { args.verbosity };
@@ -271,13 +432,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             io::stdout().flush().unwrap();
         }
 
-        let (outcome, stats) = run_match(
+        let result = run_match(
             &args.player_one_ai,
             &args.player_two_ai,
-            args.seed,
+            match_seed,
             match_verbosity,
             swap_positions,
+            deck,
         );
+
+        let (outcome, stats) = match result {
+            Ok(r) => r,
+            Err((panic_message, backtrace)) => {
+                println!("\n========== CRASH ==========");
+                println!("Seed: {match_seed}");
+                println!("Panic: {panic_message}");
+                if !backtrace.is_empty() {
+                    println!("Backtrace:\n{backtrace}");
+                }
+                println!("============================");
+                continue;
+            }
+        };
 
         results.ai_one_timing.total += stats.ai_one.total;
         results.ai_one_timing.count += stats.ai_one.count;

@@ -683,6 +683,9 @@ samply-battle-benchmark *args='':
 matchup *args='':
     cargo run --manifest-path rules_engine/Cargo.toml --release --bin run_matchup -- "$@"
 
+stress-test *args='':
+    cargo run --manifest-path rules_engine/Cargo.toml --release --bin run_matchup -- '{"FirstAvailableAction":null}' '{"FirstAvailableAction":null}' --stress --deck core11 "$@"
+
 card-images:
     ./scripts/images/card_images.py --input client/Assets/ThirdParty/GameAssets/SourceImages --output client/Assets/ThirdParty/GameAssets/CardImages -r 50
 
