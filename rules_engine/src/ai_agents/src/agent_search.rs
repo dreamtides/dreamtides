@@ -124,10 +124,10 @@ fn random_action(battle: &BattleState, player: PlayerName) -> BattleAction {
 /// before ending the turn, since characters in the back rank cannot
 /// participate in judgment.
 fn forced_reposition_to_front(legal_actions: &LegalActions) -> Option<BattleAction> {
-    if let LegalActions::Standard { actions } = legal_actions {
-        if let Some(&(character_id, position)) = actions.reposition_to_front.first() {
-            return Some(BattleAction::MoveCharacterToFrontRank(character_id, position));
-        }
+    if let LegalActions::Standard { actions } = legal_actions
+        && let Some(&(character_id, position)) = actions.reposition_to_front.first()
+    {
+        return Some(BattleAction::MoveCharacterToFrontRank(character_id, position));
     }
     None
 }
