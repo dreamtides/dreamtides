@@ -98,6 +98,7 @@ async fn connect(body: String) -> AppResult<Json<ConnectResponse>> {
             log_directory: Some(log_directory),
             log_ai_search_diagram: true,
             enable_action_legality_check: true,
+            log_ai_decisions: true,
         },
     });
     Ok(check_response_size(&response, true))
@@ -158,6 +159,7 @@ async fn main() {
             log_directory: Some(log_directory),
             log_ai_search_diagram: true,
             enable_action_legality_check: true,
+            log_ai_decisions: true,
         },
     });
     info!(build_timestamp = env!("BUILD_TIMESTAMP", "unknown"), "Starting server on port 26598");

@@ -170,6 +170,9 @@ pub struct LoggingOptions {
 
     /// If true, perform action legality checks before executing actions.
     pub enable_action_legality_check: bool,
+
+    /// If true, log AI decision details in JSONL format.
+    pub log_ai_decisions: bool,
 }
 
 impl Default for LoggingOptions {
@@ -178,6 +181,7 @@ impl Default for LoggingOptions {
             log_directory: None,
             log_ai_search_diagram: false,
             enable_action_legality_check: true,
+            log_ai_decisions: false,
         }
     }
 }

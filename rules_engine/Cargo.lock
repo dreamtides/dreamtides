@@ -91,6 +91,7 @@ dependencies = [
  "battle_mutations",
  "battle_queries",
  "battle_state",
+ "chrono",
  "core_data",
  "ego-tree",
  "fastrand",
@@ -99,6 +100,8 @@ dependencies = [
  "rand 0.9.0",
  "rand_xoshiro",
  "rayon",
+ "serde",
+ "serde_json",
  "tracing",
  "tracing-subscriber",
 ]

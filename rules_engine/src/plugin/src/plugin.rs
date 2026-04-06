@@ -118,6 +118,7 @@ unsafe fn connect_impl(
             log_directory: Some(PathBuf::from(&deserialized_request.persistent_data_path)),
             log_ai_search_diagram: false,
             enable_action_legality_check: true,
+            log_ai_decisions: false,
         },
     };
 

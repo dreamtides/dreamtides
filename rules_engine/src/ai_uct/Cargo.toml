@@ -16,7 +16,7 @@ battle_mutations = { path = "../battle_mutations", version = "0.0.0" }
 battle_queries = { path = "../battle_queries", version = "0.0.0" }
 battle_state = { path = "../battle_state", version = "0.0.0" }
 core_data = { path = "../core_data", version = "0.0.0" }
-
+chrono = { workspace = true }
 ego-tree = { workspace = true }
 fastrand = { workspace = true }
 ordered-float = { workspace = true }
@@ -24,5 +24,7 @@ petgraph = { workspace = true }
 rand = { workspace = true }
 rand_xoshiro = { workspace = true }
 rayon = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
