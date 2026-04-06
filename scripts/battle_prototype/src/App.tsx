@@ -3,7 +3,7 @@ import { BattleProvider, useBattle } from "./state/battle-context.tsx";
 import { BattleScreen } from "./components/BattleScreen.tsx";
 
 function BattleApp() {
-  const { battle, isPolling, error, sendAction, sendDebugAction, reconnect, events, yourTurnCounter } = useBattle();
+  const { battle, isPolling, error, sendAction, sendDebugAction, reconnect, events, yourTurnCounter, judgmentPause, continueFromJudgment } = useBattle();
 
   useEffect(() => {
     reconnect("Core11");
@@ -55,8 +55,10 @@ function BattleApp() {
         onDebugAction={sendDebugAction}
         onReconnect={() => reconnect("Core11")}
         events={events}
-        disabled={isPolling}
+        disabled={isPolling || judgmentPause}
         yourTurnCounter={yourTurnCounter}
+        judgmentPause={judgmentPause}
+        onContinueFromJudgment={continueFromJudgment}
       />
     </>
   );

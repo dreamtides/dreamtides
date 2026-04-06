@@ -17,6 +17,8 @@ interface BattleScreenProps {
   events: string[];
   disabled: boolean;
   yourTurnCounter: number;
+  judgmentPause?: boolean;
+  onContinueFromJudgment?: () => void;
 }
 
 function cardsByPosition(cards: CardView[], position: string, player?: DisplayPlayer): CardView[] {
@@ -56,7 +58,7 @@ function cardOrderCards(cards: CardView[]): CardView[] {
   });
 }
 
-export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, events, disabled, yourTurnCounter }: BattleScreenProps) {
+export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, events, disabled, yourTurnCounter, judgmentPause, onContinueFromJudgment }: BattleScreenProps) {
   const [showDebug, setShowDebug] = useState(false);
   const [showVoid, setShowVoid] = useState<DisplayPlayer | null>(null);
   const [showLog, setShowLog] = useState(false);
@@ -463,6 +465,44 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
               onAction={onAction}
               disabled={disabled}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Judgment pause indicator */}
+      {judgmentPause && (
+        <div
+          className="fixed right-4 top-1/2 -translate-y-1/2 z-50"
+        >
+          <div
+            className="rounded-lg p-3 text-center"
+            style={{
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-gold)",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.4)",
+            }}
+          >
+            <div
+              className="text-sm font-bold mb-1"
+              style={{ color: "var(--color-gold)" }}
+            >
+              {"\u26A1"} Judgment
+            </div>
+            <div className="text-xs mb-2" style={{ color: "var(--color-text-dim)" }}>
+              You <span style={{ color: "var(--color-gold)" }}>{battle.user.score}</span> — <span style={{ color: "var(--color-gold)" }}>{battle.enemy.score}</span> Enemy
+            </div>
+            <button
+              onClick={onContinueFromJudgment}
+              className="px-4 py-1 rounded text-xs font-bold"
+              style={{
+                background: "var(--color-primary)",
+                color: "var(--color-text)",
+                border: "1px solid var(--color-primary-light)",
+                cursor: "pointer",
+              }}
+            >
+              Continue
+            </button>
           </div>
         </div>
       )}
