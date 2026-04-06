@@ -1,6 +1,6 @@
+use battle_queries::battle_trace;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::ForPlayer;
-use battle_queries::{battle_trace, panic_with};
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_player::battle_player_state::PlayerType;
@@ -17,8 +17,10 @@ use crate::play_cards::{
 };
 use crate::prompt_mutations::{select_additional_costs, select_choice_prompt_at_index};
 
+/// Returns true if the action was executed successfully, or false if the
+/// action was not legal in the current game state.
 #[instrument(name = "apply_battle_action", level = "debug", skip(battle))]
-pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleAction) {
+pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleAction) -> bool {
     battle_trace!("Executing action", battle, player, action);
     if battle.request_context.logging_options.enable_action_legality_check {
         let legal_actions = legal_actions::compute(battle, player);
@@ -30,13 +32,15 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
                 ForPlayer::Human
             };
         if !legal_actions.contains(action, for_player) {
-            panic_with!("Action is not legal", battle, action);
+            battle_trace!("Action is not legal, ignoring", battle, action);
+            return false;
         }
     }
 
     execute_without_tracking_history(battle, player, action);
 
     battle.push_history_action(player, action);
+    true
 }
 
 /// Applies the given action to the battle state.

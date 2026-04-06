@@ -59,7 +59,21 @@ pub fn execute(
 
     loop {
         battle_trace!("Executing battle action", battle, current_action, request_id);
-        apply_battle_action::execute(battle, current_player, current_action);
+        if !apply_battle_action::execute(battle, current_player, current_action) {
+            // Action was not legal, likely due to client/server state desync.
+            // Re-send the current state so the client can recover.
+            battle_trace!("Resending state after illegal action", battle);
+            render_updates(
+                provider,
+                battle,
+                initiated_by,
+                context,
+                request_id,
+                PollResponseType::Final,
+            );
+            battle.animations = Some(AnimationData::default());
+            return;
+        }
 
         let Some(next_player) = legal_actions::next_to_act(battle) else {
             battle_trace!("Rendering updates for game over", battle);
