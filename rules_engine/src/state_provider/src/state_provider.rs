@@ -2,10 +2,9 @@ use std::collections::HashMap;
 use std::panic::{RefUnwindSafe, UnwindSafe};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::sync::{Arc, Condvar, LazyLock, Mutex, RwLock};
+use std::sync::{Arc, LazyLock, Mutex, RwLock};
 use std::time::Instant;
 
-use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle_player::battle_player_state::TestDeckName;
 use core_data::identifiers::{BattleId, UserId};
@@ -49,9 +48,6 @@ static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<PollResult>>>> =
 static TOTAL_PENDING_UPDATES: LazyLock<AtomicUsize> = LazyLock::new(|| AtomicUsize::new(0));
 
 static DISPLAY_STATES: LazyLock<Mutex<HashMap<UserId, DisplayState>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
-static SPECULATIVE_SEARCHES: LazyLock<Mutex<HashMap<BattleId, SpeculativeSearchState>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 static TABULA_DATA: LazyLock<RwLock<Option<Arc<Tabula>>>> = LazyLock::new(|| RwLock::new(None));
@@ -100,10 +96,6 @@ pub trait StateProvider:
 
     fn take_next_poll_result(&self, user_id: UserId) -> Option<PollResult>;
 
-    fn set_speculative_search(&self, battle_id: BattleId, search: SpeculativeSearchState);
-
-    fn take_speculative_search(&self, battle_id: BattleId) -> Option<SpeculativeSearchState>;
-
     fn should_panic_on_error(&self) -> bool {
         false
     }
@@ -130,12 +122,6 @@ pub struct PollResult {
     pub commands: CommandSequence,
     pub request_id: Option<RequestId>,
     pub response_type: PollResponseType,
-}
-
-#[derive(Clone)]
-pub struct SpeculativeSearchState {
-    pub assumed_action: BattleAction,
-    pub result: Arc<(Mutex<Option<BattleAction>>, Condvar)>,
 }
 
 #[derive(Clone)]
@@ -329,20 +315,6 @@ impl StateProvider for DefaultStateProvider {
             return Some(result);
         }
         None
-    }
-
-    fn set_speculative_search(&self, battle_id: BattleId, search: SpeculativeSearchState) {
-        if let Ok(mut searches) = SPECULATIVE_SEARCHES.lock() {
-            searches.insert(battle_id, search);
-        }
-    }
-
-    fn take_speculative_search(&self, battle_id: BattleId) -> Option<SpeculativeSearchState> {
-        if let Ok(mut searches) = SPECULATIVE_SEARCHES.lock() {
-            searches.remove(&battle_id)
-        } else {
-            None
-        }
     }
 
     fn stored_initialization_error(&self) -> Option<String> {

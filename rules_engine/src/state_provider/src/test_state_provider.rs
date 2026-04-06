@@ -14,7 +14,7 @@ use tabula_generated::card_lists::DreamwellCardIdList;
 use uuid::Uuid;
 
 use crate::display_state_provider::{DisplayState, DisplayStateProvider};
-use crate::state_provider::{PollResult, SpeculativeSearchState, StateProvider};
+use crate::state_provider::{PollResult, StateProvider};
 
 #[derive(Clone)]
 pub struct TestStateProvider {
@@ -31,7 +31,6 @@ struct TestStateProviderInner {
     display_states: Mutex<HashMap<UserId, DisplayState>>,
     tabula: RwLock<Option<Arc<Tabula>>>,
     undo_stacks: Mutex<HashMap<BattleId, Vec<(PlayerName, BattleState)>>>,
-    speculative_searches: Mutex<HashMap<BattleId, SpeculativeSearchState>>,
 }
 
 impl TestStateProvider {
@@ -46,7 +45,6 @@ impl TestStateProvider {
                 pending_updates: Mutex::new(HashMap::new()),
                 display_states: Mutex::new(HashMap::new()),
                 undo_stacks: Mutex::new(HashMap::new()),
-                speculative_searches: Mutex::new(HashMap::new()),
                 tabula: RwLock::new(None),
             }),
         }
@@ -226,20 +224,6 @@ impl StateProvider for TestStateProvider {
             return Some(user_updates.remove(0));
         }
         None
-    }
-
-    fn set_speculative_search(&self, battle_id: BattleId, search: SpeculativeSearchState) {
-        if let Ok(mut searches) = self.inner.speculative_searches.lock() {
-            searches.insert(battle_id, search);
-        }
-    }
-
-    fn take_speculative_search(&self, battle_id: BattleId) -> Option<SpeculativeSearchState> {
-        if let Ok(mut searches) = self.inner.speculative_searches.lock() {
-            searches.remove(&battle_id)
-        } else {
-            None
-        }
     }
 
     fn push_undo_entry(&self, battle_id: BattleId, player: PlayerName, state: BattleState) {
