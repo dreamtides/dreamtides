@@ -3,6 +3,7 @@ use battle_queries::legal_action_queries::legal_actions_data::ForPlayer;
 use battle_queries::{battle_trace, panic_with};
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
+use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::types::PlayerName;
 use tracing::instrument;
 
@@ -22,7 +23,13 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
     if battle.request_context.logging_options.enable_action_legality_check {
         let legal_actions = legal_actions::compute(battle, player);
 
-        if !legal_actions.contains(action, ForPlayer::Human) {
+        let for_player =
+            if matches!(battle.players.player(player).player_type, PlayerType::Agent(_)) {
+                ForPlayer::Agent
+            } else {
+                ForPlayer::Human
+            };
+        if !legal_actions.contains(action, for_player) {
             panic_with!("Action is not legal", battle, action);
         }
     }
@@ -105,9 +112,16 @@ pub fn execute_without_tracking_history(
         }
         BattleAction::MoveCharacterToFrontRank(character_id, position) => {
             reposition::to_front_rank(battle, player, character_id, position);
+            battle.turn.positioning_character = None;
         }
         BattleAction::MoveCharacterToBackRank(character_id, position) => {
             reposition::to_back_rank(battle, player, character_id, position);
+        }
+        BattleAction::BeginPositioning => {
+            battle.turn.positioning_started = true;
+        }
+        BattleAction::SelectCharacterForPositioning(character_id) => {
+            battle.turn.positioning_character = Some(character_id);
         }
     }
 

@@ -23,6 +23,14 @@ pub struct TurnData {
     /// infinite back-and-forth movement by the AI.
     pub moved_this_turn: Vec<CharacterId>,
 
+    /// True once a player has entered the positioning sub-phase during their
+    /// main phase. Irreversible within a turn.
+    pub positioning_started: bool,
+
+    /// Character selected in positioning Step A, awaiting column assignment
+    /// in Step B. Cleared after the column assignment is applied.
+    pub positioning_character: Option<CharacterId>,
+
     /// Characters that participated in a judgment (spark comparison) during
     /// the current Judgment phase. Each entry is (player, character_id,
     /// column). After all columns resolve, surviving participants return to
@@ -37,6 +45,8 @@ impl Default for TurnData {
             turn_id: TurnId::default(),
             judgment_position: 0,
             moved_this_turn: Vec::new(),
+            positioning_started: false,
+            positioning_character: None,
             judgment_participants: Vec::new(),
         }
     }

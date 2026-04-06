@@ -53,6 +53,19 @@ pub enum LegalActions {
     SelectActivatedAbilityPrompt {
         choice_count: usize,
     },
+    /// Positioning Step A: select which back-rank character to move forward.
+    /// EndTurn is always available (done positioning).
+    SelectPositioningCharacter {
+        eligible: CardSet<CharacterId>,
+    },
+    /// Positioning Step B: assign the selected character to a column.
+    AssignColumn {
+        character: CharacterId,
+        /// Columns with opponent front-rank characters (blocking targets).
+        block_targets: Vec<u8>,
+        /// First empty column where neither player has a character, if any.
+        attack_column: Option<u8>,
+    },
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -63,6 +76,7 @@ pub struct StandardLegalActions {
     pub activate_abilities_for_character: CardSet<CharacterId>,
     pub reposition_to_front: RepositionActions,
     pub reposition_to_back: RepositionActions,
+    pub can_begin_positioning: bool,
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
@@ -124,13 +138,13 @@ impl LegalActions {
                     false
                 }
             }
-            BattleAction::EndTurn => {
-                if let LegalActions::Standard { actions } = self {
+            BattleAction::EndTurn => match self {
+                LegalActions::Standard { actions } => {
                     actions.primary == PrimaryLegalAction::EndTurn
-                } else {
-                    false
                 }
-            }
+                LegalActions::SelectPositioningCharacter { .. } => true,
+                _ => false,
+            },
             BattleAction::StartNextTurn => {
                 if let LegalActions::Standard { actions } = self {
                     actions.primary == PrimaryLegalAction::StartNextTurn
@@ -245,16 +259,33 @@ impl LegalActions {
             BattleAction::SubmitDeckCardOrder => {
                 matches!(self, LegalActions::SelectDeckCardOrder { .. })
             }
-            BattleAction::MoveCharacterToFrontRank(character_id, position) => {
-                if let LegalActions::Standard { actions } = self {
+            BattleAction::MoveCharacterToFrontRank(character_id, position) => match self {
+                LegalActions::Standard { actions } => {
                     actions.reposition_to_front.contains(&(character_id, position))
+                }
+                LegalActions::AssignColumn { character, block_targets, attack_column } => {
+                    character_id == *character
+                        && (block_targets.contains(&position) || *attack_column == Some(position))
+                }
+                _ => false,
+            },
+            BattleAction::MoveCharacterToBackRank(character_id, position) => {
+                if let LegalActions::Standard { actions } = self {
+                    actions.reposition_to_back.contains(&(character_id, position))
                 } else {
                     false
                 }
             }
-            BattleAction::MoveCharacterToBackRank(character_id, position) => {
+            BattleAction::BeginPositioning => {
                 if let LegalActions::Standard { actions } = self {
-                    actions.reposition_to_back.contains(&(character_id, position))
+                    actions.can_begin_positioning
+                } else {
+                    false
+                }
+            }
+            BattleAction::SelectCharacterForPositioning(character_id) => {
+                if let LegalActions::SelectPositioningCharacter { eligible } = self {
+                    eligible.contains(character_id)
                 } else {
                     false
                 }
@@ -293,6 +324,10 @@ impl LegalActions {
             LegalActions::SelectDeckCardOrder { .. } => false,
             LegalActions::ModalEffectPrompt { valid_choices } => valid_choices.is_empty(),
             LegalActions::SelectActivatedAbilityPrompt { choice_count } => *choice_count == 0,
+            LegalActions::SelectPositioningCharacter { .. } => false,
+            LegalActions::AssignColumn { block_targets, attack_column, .. } => {
+                block_targets.is_empty() && attack_column.is_none()
+            }
         }
     }
 
@@ -310,11 +345,13 @@ impl LegalActions {
                 let character_ability_count = actions.activate_abilities_for_character.len();
                 let reposition_count =
                     actions.reposition_to_front.len() + actions.reposition_to_back.len();
+                let begin_positioning_count = usize::from(actions.can_begin_positioning);
                 primary_count
                     + play_cards_count
                     + play_void_cards_count
                     + character_ability_count
                     + reposition_count
+                    + begin_positioning_count
             }
 
             LegalActions::SelectCharacterPrompt { valid } => valid.len(),
@@ -354,6 +391,10 @@ impl LegalActions {
             }
             LegalActions::ModalEffectPrompt { valid_choices } => valid_choices.len(),
             LegalActions::SelectActivatedAbilityPrompt { choice_count } => *choice_count,
+            LegalActions::SelectPositioningCharacter { eligible } => eligible.len() + 1,
+            LegalActions::AssignColumn { block_targets, attack_column, .. } => {
+                block_targets.len() + usize::from(attack_column.is_some())
+            }
         }
     }
 
@@ -411,15 +452,18 @@ impl LegalActions {
                             })
                         {
                             Some(BattleAction::MoveCharacterToFrontRank(id, pos))
+                        } else if let Some(&(id, pos)) =
+                            standard_actions.reposition_to_back.iter().find(|(id, pos)| {
+                                !actions.contains(&BattleAction::MoveCharacterToBackRank(*id, *pos))
+                            })
+                        {
+                            Some(BattleAction::MoveCharacterToBackRank(id, pos))
+                        } else if standard_actions.can_begin_positioning
+                            && !actions.contains(&BattleAction::BeginPositioning)
+                        {
+                            Some(BattleAction::BeginPositioning)
                         } else {
-                            standard_actions
-                                .reposition_to_back
-                                .iter()
-                                .find(|(id, pos)| {
-                                    !actions
-                                        .contains(&BattleAction::MoveCharacterToBackRank(*id, *pos))
-                                })
-                                .map(|&(id, pos)| BattleAction::MoveCharacterToBackRank(id, pos))
+                            None
                         }
                     }
                 }
@@ -521,6 +565,36 @@ impl LegalActions {
             LegalActions::SelectActivatedAbilityPrompt { choice_count } => (0..*choice_count)
                 .find(|&i| !actions.contains(&BattleAction::SelectActivatedAbilityChoice(i)))
                 .map(BattleAction::SelectActivatedAbilityChoice),
+
+            LegalActions::SelectPositioningCharacter { eligible } => {
+                if !actions.contains(&BattleAction::EndTurn) {
+                    Some(BattleAction::EndTurn)
+                } else {
+                    eligible
+                        .iter()
+                        .find(|id| {
+                            !actions.contains(&BattleAction::SelectCharacterForPositioning(*id))
+                        })
+                        .map(BattleAction::SelectCharacterForPositioning)
+                }
+            }
+
+            LegalActions::AssignColumn { character, block_targets, attack_column } => {
+                if let Some(&col) = block_targets.iter().find(|col| {
+                    !actions.contains(&BattleAction::MoveCharacterToFrontRank(*character, **col))
+                }) {
+                    Some(BattleAction::MoveCharacterToFrontRank(*character, col))
+                } else if let Some(col) = attack_column {
+                    if !actions.contains(&BattleAction::MoveCharacterToFrontRank(*character, *col))
+                    {
+                        Some(BattleAction::MoveCharacterToFrontRank(*character, *col))
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            }
         }
     }
 
@@ -559,6 +633,10 @@ impl LegalActions {
 
                 for &(character_id, position) in &actions.reposition_to_back {
                     result.push(BattleAction::MoveCharacterToBackRank(character_id, position));
+                }
+
+                if actions.can_begin_positioning {
+                    result.push(BattleAction::BeginPositioning);
                 }
 
                 result
@@ -636,6 +714,25 @@ impl LegalActions {
             LegalActions::SelectActivatedAbilityPrompt { choice_count } => (0..*choice_count)
                 .map(BattleAction::SelectActivatedAbilityChoice)
                 .collect::<Vec<_>>(),
+
+            LegalActions::SelectPositioningCharacter { eligible } => {
+                let mut result = vec![BattleAction::EndTurn];
+                for id in eligible.iter() {
+                    result.push(BattleAction::SelectCharacterForPositioning(id));
+                }
+                result
+            }
+
+            LegalActions::AssignColumn { character, block_targets, attack_column } => {
+                let mut result: Vec<BattleAction> = block_targets
+                    .iter()
+                    .map(|&col| BattleAction::MoveCharacterToFrontRank(*character, col))
+                    .collect();
+                if let Some(col) = attack_column {
+                    result.push(BattleAction::MoveCharacterToFrontRank(*character, *col));
+                }
+                result
+            }
         }
     }
 
@@ -693,8 +790,12 @@ impl LegalActions {
                                 } else {
                                     let back_index =
                                         reposition_index - actions.reposition_to_front.len();
-                                    let (id, pos) = actions.reposition_to_back[back_index];
-                                    Some(BattleAction::MoveCharacterToBackRank(id, pos))
+                                    if back_index < actions.reposition_to_back.len() {
+                                        let (id, pos) = actions.reposition_to_back[back_index];
+                                        Some(BattleAction::MoveCharacterToBackRank(id, pos))
+                                    } else {
+                                        Some(BattleAction::BeginPositioning)
+                                    }
                                 }
                             }
                         }
@@ -785,6 +886,36 @@ impl LegalActions {
                     Some(BattleAction::SelectActivatedAbilityChoice(fastrand::usize(
                         ..*choice_count,
                     )))
+                }
+            }
+
+            LegalActions::SelectPositioningCharacter { eligible } => {
+                let total = eligible.len() + 1;
+                let index = fastrand::usize(..total);
+                if index == 0 {
+                    Some(BattleAction::EndTurn)
+                } else {
+                    eligible.iter().nth(index - 1).map(BattleAction::SelectCharacterForPositioning)
+                }
+            }
+
+            LegalActions::AssignColumn { character, block_targets, attack_column } => {
+                let total = block_targets.len() + usize::from(attack_column.is_some());
+                if total == 0 {
+                    None
+                } else {
+                    let index = fastrand::usize(..total);
+                    if index < block_targets.len() {
+                        Some(BattleAction::MoveCharacterToFrontRank(
+                            *character,
+                            block_targets[index],
+                        ))
+                    } else {
+                        Some(BattleAction::MoveCharacterToFrontRank(
+                            *character,
+                            attack_column.unwrap(),
+                        ))
+                    }
                 }
             }
         }

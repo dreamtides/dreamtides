@@ -110,6 +110,8 @@ pub fn create_and_start(
             turn_id: TurnId::default(),
             judgment_position: 0,
             moved_this_turn: Vec::new(),
+            positioning_started: false,
+            positioning_character: None,
             judgment_participants: Vec::new(),
         },
         phase: BattleTurnPhase::Dreamwell,

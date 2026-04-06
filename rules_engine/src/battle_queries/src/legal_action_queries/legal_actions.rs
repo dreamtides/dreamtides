@@ -1,6 +1,7 @@
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
+use battle_state::battle::card_id::CharacterId;
 use battle_state::battle_player::battle_player_state::PlayerType;
 use battle_state::prompt_types::prompt_data::PromptType;
 use bit_set::BitSet;
@@ -80,13 +81,19 @@ pub fn compute(battle: &BattleState, player: PlayerName) -> LegalActions {
             LegalActions::NoActionsOpponentPriority
         }
     } else if battle.turn.active_player == player && battle.phase == BattleTurnPhase::Main {
-        LegalActions::Standard {
-            actions: standard_legal_actions(
-                battle,
-                player,
-                PrimaryLegalAction::EndTurn,
-                FastOnly::No,
-            ),
+        let use_phased = battle.action_history.is_none()
+            || matches!(battle.players.player(player).player_type, PlayerType::Agent(_));
+        if use_phased {
+            phased_main_phase_actions(battle, player)
+        } else {
+            LegalActions::Standard {
+                actions: standard_legal_actions(
+                    battle,
+                    player,
+                    PrimaryLegalAction::EndTurn,
+                    FastOnly::No,
+                ),
+            }
         }
     } else if battle.turn.active_player != player && battle.phase == BattleTurnPhase::Ending {
         LegalActions::Standard {
@@ -144,24 +151,20 @@ fn standard_legal_actions(
         ),
         reposition_to_front,
         reposition_to_back,
+        can_begin_positioning: false,
     }
 }
 
+/// Full reposition actions for the human player UI.
 fn reposition_actions(
     battle: &BattleState,
     player: PlayerName,
 ) -> (RepositionActions, RepositionActions) {
-    if matches!(battle.players.player(player).player_type, PlayerType::Agent(_)) {
-        return ai_reposition_actions(battle, player);
-    }
-
     let bf = battle.cards.battlefield(player);
     let current_turn = battle.turn.turn_id.0;
     let mut to_front = Vec::new();
     let mut to_back = Vec::new();
 
-    // Characters in back rank can move to front rank positions (if no
-    // summoning sickness)
     for character_id in bf.back.iter().flatten() {
         let has_summoning_sickness = battle
             .cards
@@ -174,7 +177,6 @@ fn reposition_actions(
             }
         }
 
-        // Characters in back rank can move to other back rank positions
         for position in 0..8u8 {
             if bf.back[position as usize] != Some(*character_id) {
                 to_back.push((*character_id, position));
@@ -182,13 +184,11 @@ fn reposition_actions(
         }
     }
 
-    // Characters in front rank can move to back rank positions
     for character_id in bf.front.iter().flatten() {
         for position in 0..8u8 {
             to_back.push((*character_id, position));
         }
 
-        // Characters in front rank can move to other front rank positions
         for position in 0..8u8 {
             if bf.front[position as usize] != Some(*character_id) {
                 to_front.push((*character_id, position));
@@ -199,47 +199,80 @@ fn reposition_actions(
     (to_front, to_back)
 }
 
-/// Returns a simplified set of reposition actions for the AI player to
-/// avoid infinite MCTS branching.
-///
-/// Reposition-to-front actions are not included here because the AI
-/// agent layer handles them deterministically (always moving eligible
-/// back-rank characters to the front before ending the turn). This
-/// avoids wasting MCTS search iterations on a decision that is always
-/// forced.
-fn ai_reposition_actions(
+/// Routes the AI's main phase through a phased state machine: card play
+/// first, then multi-step positioning.
+fn phased_main_phase_actions(battle: &BattleState, player: PlayerName) -> LegalActions {
+    if battle.turn.positioning_character.is_some() {
+        return assign_column_actions(battle, player);
+    }
+    if battle.turn.positioning_started {
+        return select_positioning_character_actions(battle, player);
+    }
+    card_play_phase_actions(battle, player)
+}
+
+/// Phase 1: card play. Cards, abilities, BeginPositioning, EndTurn.
+fn card_play_phase_actions(battle: &BattleState, player: PlayerName) -> LegalActions {
+    let has_eligible = eligible_back_rank_characters(battle, player).next().is_some();
+    LegalActions::Standard {
+        actions: StandardLegalActions {
+            primary: PrimaryLegalAction::EndTurn,
+            play_card_from_hand: can_play_cards::from_hand(battle, player, FastOnly::No),
+            play_card_from_void: can_play_cards::from_void(battle, player, FastOnly::No),
+            activate_abilities_for_character: can_activate_abilities::for_player(
+                battle,
+                player,
+                FastOnly::No,
+            ),
+            reposition_to_front: vec![],
+            reposition_to_back: vec![],
+            can_begin_positioning: has_eligible,
+        },
+    }
+}
+
+/// Step A: select which back-rank character to move forward.
+fn select_positioning_character_actions(battle: &BattleState, player: PlayerName) -> LegalActions {
+    LegalActions::SelectPositioningCharacter {
+        eligible: eligible_back_rank_characters(battle, player).collect(),
+    }
+}
+
+/// Step B: assign the selected character to a column.
+fn assign_column_actions(battle: &BattleState, player: PlayerName) -> LegalActions {
+    let character = battle.turn.positioning_character.expect("No positioning character set");
+    let opponent_front = &battle.cards.battlefield(player.opponent()).front;
+    let own_front = &battle.cards.battlefield(player).front;
+
+    let block_targets: Vec<u8> = opponent_front
+        .iter()
+        .enumerate()
+        .filter_map(|(col, slot)| slot.map(|_| col as u8))
+        .collect();
+
+    let attack_column = opponent_front
+        .iter()
+        .zip(own_front.iter())
+        .position(|(opp, own)| opp.is_none() && own.is_none())
+        .map(|col| col as u8);
+
+    LegalActions::AssignColumn { character, block_targets, attack_column }
+}
+
+/// Returns eligible back-rank characters: no summoning sickness, not
+/// already moved this turn.
+fn eligible_back_rank_characters(
     battle: &BattleState,
     player: PlayerName,
-) -> (RepositionActions, RepositionActions) {
+) -> impl Iterator<Item = CharacterId> + '_ {
     let bf = battle.cards.battlefield(player);
-    let mut to_front = Vec::new();
-    let mut to_back = Vec::new();
-
     let current_turn = battle.turn.turn_id.0;
-
-    for character_id in bf.back.iter().flatten() {
+    bf.back.iter().flatten().copied().filter(move |character_id| {
         let has_summoning_sickness = battle
             .cards
             .battlefield_state(player)
             .get(character_id)
             .is_some_and(|state| state.played_turn == current_turn);
-        if !has_summoning_sickness {
-            // Include a single move-to-front action per eligible character
-            // so the action is available for forced repositioning.
-            if let Some(target) = bf.first_empty_front_slot() {
-                to_front.push((*character_id, target as u8));
-            }
-        }
-    }
-
-    // MoveToBack: one action per front-rank character not already moved
-    for character_id in bf.front.iter().flatten() {
-        if !battle.turn.moved_this_turn.contains(character_id)
-            && let Some(target) = bf.first_empty_back_slot()
-        {
-            to_back.push((*character_id, target as u8));
-        }
-    }
-
-    (to_front, to_back)
+        !has_summoning_sickness && !battle.turn.moved_this_turn.contains(character_id)
+    })
 }

@@ -364,7 +364,13 @@ fn evaluate(battle: &mut BattleState, maximizing_player: PlayerName) -> OrderedF
     let BattleStatus::GameOver { winner } = battle.status else {
         panic_with!("Battle has not ended", battle);
     };
-    let reward = if winner == Some(maximizing_player) { 1.0 } else { -1.0 };
+    let reward = if winner == Some(maximizing_player) {
+        1.0
+    } else if winner.is_some() {
+        -1.0
+    } else {
+        0.0
+    };
     OrderedFloat(reward)
 }
 

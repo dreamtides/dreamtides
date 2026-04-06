@@ -59,6 +59,11 @@ pub enum BattleAction {
     MoveCharacterToFrontRank(CharacterId, u8),
     /// Move a character to a specific back rank position (0-7).
     MoveCharacterToBackRank(CharacterId, u8),
+    /// Transition from card-play sub-phase to positioning sub-phase.
+    BeginPositioning,
+    /// Select a back-rank character to move forward, awaiting column
+    /// assignment via a subsequent MoveCharacterToFrontRank action.
+    SelectCharacterForPositioning(CharacterId),
 }
 
 #[derive(
@@ -142,6 +147,10 @@ impl BattleAction {
             }
             BattleAction::MoveCharacterToBackRank(character_id, position) => {
                 format!("MCBR{:?}P{position}", character_id.0.0)
+            }
+            BattleAction::BeginPositioning => "BP".to_string(),
+            BattleAction::SelectCharacterForPositioning(character_id) => {
+                format!("SCFP{:?}", character_id.0.0)
             }
         }
     }
