@@ -2,6 +2,7 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::battle::card_id::CharacterId;
+use battle_state::battle_cards::card_set::CardSet;
 use battle_state::battle_player::battle_player_state::PlayerType;
 use battle_state::prompt_types::prompt_data::PromptType;
 use bit_set::BitSet;
@@ -202,7 +203,7 @@ fn reposition_actions(
 /// Routes the AI's main phase through a phased state machine: card play
 /// first, then multi-step positioning.
 fn phased_main_phase_actions(battle: &BattleState, player: PlayerName) -> LegalActions {
-    if battle.turn.positioning_character.is_some() {
+    if battle.turn.positioning_character.is_some() && has_available_column(battle, player) {
         return assign_column_actions(battle, player);
     }
     if battle.turn.positioning_started {
@@ -213,7 +214,8 @@ fn phased_main_phase_actions(battle: &BattleState, player: PlayerName) -> LegalA
 
 /// Phase 1: card play. Cards, abilities, BeginPositioning, EndTurn.
 fn card_play_phase_actions(battle: &BattleState, player: PlayerName) -> LegalActions {
-    let has_eligible = eligible_back_rank_characters(battle, player).next().is_some();
+    let has_eligible = eligible_back_rank_characters(battle, player).next().is_some()
+        && has_available_column(battle, player);
     LegalActions::Standard {
         actions: StandardLegalActions {
             primary: PrimaryLegalAction::EndTurn,
@@ -233,9 +235,12 @@ fn card_play_phase_actions(battle: &BattleState, player: PlayerName) -> LegalAct
 
 /// Step A: select which back-rank character to move forward.
 fn select_positioning_character_actions(battle: &BattleState, player: PlayerName) -> LegalActions {
-    LegalActions::SelectPositioningCharacter {
-        eligible: eligible_back_rank_characters(battle, player).collect(),
-    }
+    let eligible = if has_available_column(battle, player) {
+        eligible_back_rank_characters(battle, player).collect()
+    } else {
+        CardSet::default()
+    };
+    LegalActions::SelectPositioningCharacter { eligible }
 }
 
 /// Step B: assign the selected character to a column.
@@ -257,6 +262,19 @@ fn assign_column_actions(battle: &BattleState, player: PlayerName) -> LegalActio
         .map(|col| col as u8);
 
     LegalActions::AssignColumn { character, block_targets, attack_column }
+}
+
+/// Returns true if at least one front-rank column is available for
+/// placement (either an opponent character to block or an empty column
+/// to attack).
+fn has_available_column(battle: &BattleState, player: PlayerName) -> bool {
+    let opponent_front = &battle.cards.battlefield(player.opponent()).front;
+    let own_front = &battle.cards.battlefield(player).front;
+    opponent_front.iter().any(Option::is_some)
+        || opponent_front
+            .iter()
+            .zip(own_front.iter())
+            .any(|(opp, own)| opp.is_none() && own.is_none())
 }
 
 /// Returns eligible back-rank characters: no summoning sickness, not
