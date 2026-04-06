@@ -168,8 +168,8 @@ export function BattleProvider({ children }: { children: ReactNode }) {
               }
               prevBattleRef.current = view;
               setBattle(view);
-              if (view.user.can_act) {
-                if (wasPollingRef.current) {
+              if (view.user.can_act || view.game_over) {
+                if (wasPollingRef.current && !view.game_over) {
                   setYourTurnCounter((c) => c + 1);
                   wasPollingRef.current = false;
                 }
@@ -214,7 +214,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
             }
             prevBattleRef.current = view;
             setBattle(view);
-            if (view.user.can_act) return;
+            if (view.user.can_act || view.game_over) return;
           }
           startPolling();
         } catch (e) {

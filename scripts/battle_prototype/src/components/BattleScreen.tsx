@@ -70,12 +70,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
     return () => clearTimeout(timer);
   }, [yourTurnCounter]);
 
-  const isGameOver =
-    !disabled &&
-    !battle.user.can_act &&
-    !ui.primary_action_button &&
-    !ui.secondary_action_button &&
-    (battle.user.score >= 12 || battle.enemy.score >= 12);
+  const isGameOver = battle.game_over;
 
   return (
     <div className="flex flex-col h-screen overflow-y-auto" style={{ paddingBottom: 48 }}>
@@ -84,11 +79,11 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
         <div
           className="text-center py-3 text-lg font-bold"
           style={{
-            background: battle.user.score >= 12 ? "#065f46" : "#7f1d1d",
+            background: battle.user.score >= battle.enemy.score ? "#065f46" : "#7f1d1d",
             color: "white",
           }}
         >
-          {battle.user.score >= 12
+          {battle.user.score >= battle.enemy.score
             ? `Victory! You won ${battle.user.score} - ${battle.enemy.score}`
             : `Defeat. You lost ${battle.user.score} - ${battle.enemy.score}`}
           <button

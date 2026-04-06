@@ -36,6 +36,9 @@ pub struct BattleView {
 
     /// Current turn number
     pub turn_number: TurnId,
+
+    /// True if the game has ended
+    pub game_over: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

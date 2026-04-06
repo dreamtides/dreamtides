@@ -147,6 +147,7 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
             .unwrap_or(BattlePreviewState::None)
         },
         turn_number: battle.turn.turn_id,
+        game_over: battle.status.is_game_over(),
     }
 }
 
