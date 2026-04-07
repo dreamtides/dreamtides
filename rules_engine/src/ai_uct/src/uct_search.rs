@@ -5,12 +5,16 @@ use std::f64::consts;
 use battle_mutations::actions::apply_battle_action;
 use battle_mutations::player_mutations::player_state;
 use battle_queries::legal_action_queries::legal_actions;
-use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
+use battle_queries::legal_action_queries::legal_actions_data::{
+    ForPlayer, LegalActions, StandardLegalActions,
+};
 use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
+use battle_state::battle::card_id::CharacterId;
+use battle_state::battle_cards::card_set::CardSet;
 use chrono::Utc;
 use core_data::types::PlayerName;
 use ordered_float::OrderedFloat;
@@ -69,8 +73,23 @@ pub fn search(
     let legal = legal_actions::compute(initial_battle, player);
     let budget = compute_budget(&legal, config, initial_battle, player);
 
-    let action_results: Vec<_> = legal
-        .all()
+    // Remove BeginPositioning from candidates when the board state
+    // indicates attacking would be clearly suboptimal. The MCTS search has
+    // a systematic bias toward attacking because the tree exhausts its
+    // iteration budget on card-play branching before it can deeply evaluate
+    // the defensive value of keeping blockers alive. Pre-filtering avoids
+    // wasting iterations on a known-bad action and gives the remaining
+    // actions more budget.
+    let all_actions = legal.all();
+    let filter_bp = should_override_positioning(initial_battle, player);
+    let filtered_actions: Vec<BattleAction> = if filter_bp {
+        debug!("Filtering BeginPositioning: opponent back-rank threat exceeds AI back-rank spark");
+        all_actions.iter().copied().filter(|a| *a != BattleAction::BeginPositioning).collect()
+    } else {
+        all_actions
+    };
+
+    let action_results: Vec<_> = filtered_actions
         .par_iter()
         .with_min_len(if config.single_threaded { usize::MAX } else { 1 })
         .map(|&action| {
@@ -95,7 +114,7 @@ pub fn search(
     };
 
     let action = best_result.action;
-    let num_actions = legal.len();
+    let num_actions = filtered_actions.len();
     let total_iterations = budget.iterations_per_action * num_actions as u32;
     let num_threads = rayon::current_num_threads();
 
@@ -120,10 +139,6 @@ pub fn search(
             num_threads,
         );
     }
-
-    // I've experimented with persisting the search tree to reuse in future
-    // searches, and it does improve win rates somewhat, but the
-    // complexity/performance costs seem to not be worth it.
 
     action
 }
@@ -207,7 +222,7 @@ fn search_action_candidate(
         let visit_count = graph[root].visit_count;
         let tree_node_count = graph.node_count();
         let tree_max_depth = crate::decision_log::compute_tree_depth(&graph, root);
-        let depth_stats = traversal_stats.map(|s| s.into_depth_stats());
+        let depth_stats = traversal_stats.map(TreeTraversalAccumulator::into_depth_stats);
         ActionSearchResult {
             action,
             graph,
@@ -408,25 +423,15 @@ fn back_propagate_rewards(
 /// Scores a given [BattleState] for the maximizing player (the 'default policy'
 /// of the search).
 ///
-/// Plays out a game using random moves until a terminal state is reached.
-///
-/// Pseudocode:
-/// ```text
-/// 𝐟𝐮𝐧𝐜𝐭𝐢𝐨𝐧 DEFAULTPOLICY(s)
-///   𝐰𝐡𝐢𝐥𝐞 s is non-terminal 𝐝𝐨
-///     choose 𝒂 ∈ A(s) uniformly at random
-///     s ← f(s,𝒂)
-///   𝐫𝐞𝐭𝐮𝐫𝐧 reward for state s
-/// ```
+/// Plays out a game using random moves until a terminal state is reached,
+/// with heuristic overrides for positioning decisions.
 fn evaluate(battle: &mut BattleState, maximizing_player: PlayerName) -> OrderedFloat<f64> {
     while let Some(player) = legal_actions::next_to_act(battle) {
-        let Some(action) = legal_actions::compute(battle, player).random_action() else {
+        let legal = legal_actions::compute(battle, player);
+        let Some(action) = rollout_action(battle, player, &legal) else {
             panic_with!("No legal actions available", battle, player);
         };
         apply_battle_action::execute(battle, player, action);
-
-        // I've tried aborting early here and using heuristics to evaluate the
-        // battle state, but this has substantially worse win rates.
     }
 
     let BattleStatus::GameOver { winner } = battle.status else {
@@ -440,6 +445,191 @@ fn evaluate(battle: &mut BattleState, maximizing_player: PlayerName) -> OrderedF
         0.0
     };
     OrderedFloat(reward)
+}
+
+/// Checks whether the search's BeginPositioning choice should be overridden
+/// to EndTurn based on the board state.
+///
+/// Returns true when attacking would be clearly suboptimal: the opponent has
+/// no front-rank characters to block, but has back-rank characters whose
+/// maximum spark exceeds the AI's maximum back-rank spark. In this case,
+/// the AI's characters are more valuable as future blockers.
+fn should_override_positioning(battle: &BattleState, player: PlayerName) -> bool {
+    let opponent = player.opponent();
+    let opp_front = &battle.cards.battlefield(opponent).front;
+
+    if opp_front.iter().any(Option::is_some) {
+        return false;
+    }
+
+    let opp_back_max_spark = battle
+        .cards
+        .battlefield(opponent)
+        .back
+        .iter()
+        .filter_map(|slot| *slot)
+        .filter_map(|id| battle.cards.spark(opponent, id))
+        .map(|s| s.0)
+        .max()
+        .unwrap_or(0);
+
+    let own_back_max_spark = battle
+        .cards
+        .battlefield(player)
+        .back
+        .iter()
+        .filter_map(|slot| *slot)
+        .filter_map(|id| battle.cards.spark(player, id))
+        .map(|s| s.0)
+        .max()
+        .unwrap_or(0);
+
+    opp_back_max_spark > own_back_max_spark
+}
+
+/// Selects an action during rollout with heuristic overrides for positioning.
+///
+/// For positioning decisions, uses domain-specific heuristics instead of
+/// uniform random selection:
+/// - Positions a character when there are opponents to block, but saves
+///   characters when the opponent has larger back-rank threats
+/// - Prefers blocking high-spark opponents over attacking in empty columns
+fn rollout_action(
+    battle: &BattleState,
+    player: PlayerName,
+    legal: &LegalActions,
+) -> Option<BattleAction> {
+    match legal {
+        LegalActions::Standard { actions } => {
+            heuristic_standard_action(battle, player, legal, actions)
+        }
+        LegalActions::SelectPositioningCharacter { eligible } => {
+            heuristic_select_positioning_character(battle, player, eligible)
+        }
+        LegalActions::AssignColumn { character, block_targets, attack_column } => {
+            heuristic_assign_column(battle, player, *character, block_targets, *attack_column)
+        }
+        _ => legal.random_action(),
+    }
+}
+
+/// Heuristic for Standard action selection during rollouts.
+///
+/// When the random selection picks EndTurn but BeginPositioning is
+/// available, converts to BeginPositioning. This ensures rollouts always
+/// include positioning, making both players' attack/block decisions more
+/// realistic and properly reflecting the defensive value of blockers.
+fn heuristic_standard_action(
+    _battle: &BattleState,
+    _player: PlayerName,
+    legal: &LegalActions,
+    actions: &StandardLegalActions,
+) -> Option<BattleAction> {
+    let action = legal.random_action()?;
+    if action == BattleAction::EndTurn && actions.can_begin_positioning {
+        Some(BattleAction::BeginPositioning)
+    } else {
+        Some(action)
+    }
+}
+
+/// Heuristic for deciding whether to position a character during rollouts.
+///
+/// Always positions when there are opponent front-rank characters to block.
+/// When there are no block targets (would attack in empty columns), checks
+/// whether the opponent has threatening back-rank characters. If the
+/// opponent's largest back-rank threat exceeds the player's largest
+/// eligible character, saves characters for future blocking instead.
+fn heuristic_select_positioning_character(
+    battle: &BattleState,
+    player: PlayerName,
+    eligible: &CardSet<CharacterId>,
+) -> Option<BattleAction> {
+    if eligible.is_empty() {
+        return Some(BattleAction::EndTurn);
+    }
+
+    let opponent = player.opponent();
+    let opp_front = &battle.cards.battlefield(opponent).front;
+    let has_block_targets = opp_front.iter().any(Option::is_some);
+
+    // When attacking (no opponents to block), only position one
+    // character per turn to preserve the rest as future blockers.
+    if !has_block_targets && !battle.turn.moved_this_turn.is_empty() {
+        return Some(BattleAction::EndTurn);
+    }
+
+    if !has_block_targets {
+        let opp_back_max_spark = battle
+            .cards
+            .battlefield(opponent)
+            .back
+            .iter()
+            .filter_map(|slot| *slot)
+            .filter_map(|id| battle.cards.spark(opponent, id))
+            .map(|s| s.0)
+            .max()
+            .unwrap_or(0);
+
+        let own_max_spark = eligible
+            .iter()
+            .filter_map(|id| battle.cards.spark(player, id))
+            .map(|s| s.0)
+            .max()
+            .unwrap_or(0);
+
+        if opp_back_max_spark > own_max_spark {
+            return Some(BattleAction::EndTurn);
+        }
+    }
+
+    let index = fastrand::usize(..eligible.len());
+    eligible.iter().nth(index).map(BattleAction::SelectCharacterForPositioning)
+}
+
+/// Heuristic column assignment for rollout positioning decisions.
+///
+/// Blocks the highest-spark opponent character when their spark exceeds
+/// this character's spark (preventing more points than attacking would
+/// score). Otherwise attacks in an empty column if available.
+fn heuristic_assign_column(
+    battle: &BattleState,
+    player: PlayerName,
+    character: CharacterId,
+    block_targets: &[u8],
+    attack_column: Option<u8>,
+) -> Option<BattleAction> {
+    let own_spark = battle.cards.spark(player, character).unwrap_or_default().0;
+    let opponent = player.opponent();
+
+    let mut best_block_col = None;
+    let mut best_block_spark = 0u32;
+    for &col in block_targets {
+        if let Some(opp_id) = battle.cards.battlefield(opponent).front[col as usize] {
+            let opp_spark = battle.cards.spark(opponent, opp_id).unwrap_or_default().0;
+            if opp_spark > best_block_spark {
+                best_block_spark = opp_spark;
+                best_block_col = Some(col);
+            }
+        }
+    }
+
+    if let Some(col) = best_block_col
+        && best_block_spark >= own_spark
+    {
+        return Some(BattleAction::MoveCharacterToFrontRank(character, col));
+    }
+
+    if let Some(col) = attack_column {
+        return Some(BattleAction::MoveCharacterToFrontRank(character, col));
+    }
+
+    if !block_targets.is_empty() {
+        let index = fastrand::usize(..block_targets.len());
+        Some(BattleAction::MoveCharacterToFrontRank(character, block_targets[index]))
+    } else {
+        None
+    }
 }
 
 /// Computes the score for a child node based on its parent's visit count and
