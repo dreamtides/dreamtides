@@ -10,11 +10,12 @@ possible characters in 16 possible positions, the tree is wide/shallow with
 almost no node reuse (tree_node_count ~ visit_count).
 
 Additional problems:
+
 - Rollout policy always converts EndTurn to BeginPositioning, so both players
   always position every turn. No concept of strategically skipping positioning.
-- No "hold back when losing" logic. Characters are worth more as future
-  blockers than as 1-3 point attackers when behind, but rollouts always send
-  characters to fight.
+- No "hold back when losing" logic. Characters are worth more as future blockers
+  than as 1-3 point attackers when behind, but rollouts always send characters
+  to fight.
 - Blocking and attacking converge in rollouts: a character "saved" by blocking
   this turn gets re-positioned next turn, erasing the strategic value of
   defensive play.
@@ -33,6 +34,7 @@ or stay back). MCTS evaluates these candidates alongside other standard actions
 (card plays, EndTurn).
 
 Key principles:
+
 - Positioning is a geometric/tactical problem suited to heuristic computation.
 - "Should I attack or defend?" is a strategic question suited to MCTS rollout
   evaluation.
@@ -48,6 +50,7 @@ similar) with its own entry point. A new `GameAI` variant (e.g.,
 
 This allows direct head-to-head comparison via the existing `ai_matchup`
 harness:
+
 ```
 just matchup '{"MonteCarlo": 50}' '{"MonteCarloV2": 50}' --matches 20 --deck core-11
 ```
@@ -132,9 +135,9 @@ assignments covering the strategic spectrum.
 ### Scoring and selection
 
 If more than 6 candidates are generated, rank by a fast heuristic:
-`points_prevented_by_blocks - spark_of_characters_expected_to_die +
-points_expected_from_attacks * discount` where the discount reflects the
-opponent's ability to block based on their back-rank characters. Take the top 6.
+`points_prevented_by_blocks - spark_of_characters_expected_to_die + points_expected_from_attacks * discount`
+where the discount reflects the opponent's ability to block based on their
+back-rank characters. Take the top 6.
 
 In practice, with typical board states (2-4 eligible characters, 1-3 opponent
 front-rank threats), the generator produces 4-6 candidates naturally.
@@ -171,6 +174,7 @@ opponent plays a card onto the stack, the tree branches on the AI's response
 tree.
 
 The greedy opponent heuristic:
+
 - Play the highest-cost affordable card from hand, repeat until energy exhausted
   or no playable cards remain.
 - Activate abilities greedily.
@@ -204,7 +208,8 @@ A single rollout turn (for either player):
   appropriate, fixing the core problem of defensive play being invisible.
 - Fast cards are skipped in rollouts entirely. The tree handles AI fast-card
   decisions. Rollout-level counterspell modeling adds noise without signal. If
-  this turns out to lose important signal, a simple heuristic can be added later.
+  this turns out to lose important signal, a simple heuristic can be added
+  later.
 
 ## Decision Logging
 
@@ -216,6 +221,7 @@ positioning_candidates: Option<Vec<PositioningCandidate>>
 ```
 
 Each `PositioningCandidate` contains:
+
 - The list of placements (character ID + column or stay-back).
 - The heuristic score from the generator.
 - The MCTS results after evaluation (avg reward, visit count,
@@ -227,6 +233,7 @@ Example descriptions: `"hold-all"`, `"block-5@col2(with-3)+hold-rest"`,
 `"chump-1@col6+attack-4@col1"`.
 
 Example log entry for a positioning decision:
+
 ```json
 {
   "chosen_action": "PositionAssignment #3",
@@ -282,6 +289,7 @@ just matchup '{"MonteCarlo": 50}' '{"MonteCarloV2": 50}' --matches 20 --deck cor
 
 The harness alternates starting player on odd match indices, covering both
 configurations. Key metrics:
+
 - Win rate of new vs old AI.
 - Average game length (longer games suggest more defensive play, which is
   expected and desirable if the new AI is properly evaluating blocking).

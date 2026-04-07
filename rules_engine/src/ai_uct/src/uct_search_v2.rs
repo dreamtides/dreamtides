@@ -41,31 +41,6 @@ pub struct V2SearchResult {
     pub assignment: Option<PositionAssignment>,
 }
 
-#[derive(Debug, Clone)]
-enum SearchCandidate {
-    Action(BattleAction),
-    Assignment(PositionAssignment),
-}
-
-struct CandidateSearchResult {
-    candidate: SearchCandidate,
-    total_reward: OrderedFloat<f64>,
-    visit_count: u32,
-    wins: u32,
-    losses: u32,
-    draws: u32,
-    tree_node_count: usize,
-    tree_max_depth: u32,
-    depth_stats: Option<Vec<DepthLevelStats>>,
-}
-
-struct BudgetInfo {
-    iterations_per_action: u32,
-    base_iterations: u32,
-    multiplier: f64,
-    multiplier_reason: &'static str,
-}
-
 /// Monte Carlo search with heuristic position assignments.
 ///
 /// Replaces the multi-step positioning flow with atomic position
@@ -126,6 +101,31 @@ pub fn search(
     }
 
     result
+}
+
+#[derive(Debug, Clone)]
+enum SearchCandidate {
+    Action(BattleAction),
+    Assignment(PositionAssignment),
+}
+
+struct CandidateSearchResult {
+    candidate: SearchCandidate,
+    total_reward: OrderedFloat<f64>,
+    visit_count: u32,
+    wins: u32,
+    losses: u32,
+    draws: u32,
+    tree_node_count: usize,
+    tree_max_depth: u32,
+    depth_stats: Option<Vec<DepthLevelStats>>,
+}
+
+struct BudgetInfo {
+    iterations_per_action: u32,
+    base_iterations: u32,
+    multiplier: f64,
+    multiplier_reason: &'static str,
 }
 
 fn build_candidates(

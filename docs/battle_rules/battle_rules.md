@@ -207,9 +207,9 @@ they were played.
 
 **Repositioning:** During the Main phase, a player can freely reposition their
 characters by moving them between front and back ranks and between columns
-within a rank (subject to "summoning sickness" and slot availability). Characters
-cannot be repositioned outside the Main phase, and no cards can be played during
-Judgment.
+within a rank (subject to "summoning sickness" and slot availability).
+Characters cannot be repositioned outside the Main phase, and no cards can be
+played during Judgment.
 
 **Spark modification:** Spark may be modified by card effects before Judgment,
 but once Judgment begins, no new cards can be played in response.
