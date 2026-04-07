@@ -24,7 +24,9 @@ use tracing::debug;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
 
-use crate::decision_log::{ActionResult, BudgetDetails, DecisionLogEntry};
+use crate::decision_log::{
+    ActionResult, BudgetDetails, DecisionLogEntry, DepthLevelStats, TreeTraversalAccumulator,
+};
 use crate::uct_config::UctConfig;
 use crate::uct_tree::{SearchEdge, SearchGraph, SearchNode, SelectionMode};
 use crate::{decision_log, log_search_results};
@@ -172,6 +174,9 @@ fn search_action_candidate(
         let mut wins = 0u32;
         let mut losses = 0u32;
         let mut draws = 0u32;
+        let log_tree_stats = initial_battle.request_context.logging_options.log_ai_decisions;
+        let mut traversal_stats =
+            if log_tree_stats { Some(TreeTraversalAccumulator::default()) } else { None };
 
         for _ in 0..iterations_per_action {
             // Use a different random state every time. Doing this less
@@ -186,7 +191,8 @@ fn search_action_candidate(
 
             apply_battle_action::execute(&mut battle, player, action);
 
-            let node = next_evaluation_target(&mut battle, &mut graph, root);
+            let node =
+                next_evaluation_target(&mut battle, &mut graph, root, traversal_stats.as_mut());
             let reward = evaluate(&mut battle, player);
             back_propagate_rewards(&mut graph, player, node, reward);
 
@@ -201,6 +207,7 @@ fn search_action_candidate(
         let visit_count = graph[root].visit_count;
         let tree_node_count = graph.node_count();
         let tree_max_depth = crate::decision_log::compute_tree_depth(&graph, root);
+        let depth_stats = traversal_stats.map(|s| s.into_depth_stats());
         ActionSearchResult {
             action,
             graph,
@@ -212,6 +219,7 @@ fn search_action_candidate(
             draws,
             tree_node_count,
             tree_max_depth,
+            depth_stats,
         }
     })
 }
@@ -227,6 +235,7 @@ struct ActionSearchResult {
     draws: u32,
     tree_node_count: usize,
     tree_max_depth: u32,
+    depth_stats: Option<Vec<DepthLevelStats>>,
 }
 
 /// Returns a descendant node to evaluate next for the provided parent node.
@@ -262,8 +271,10 @@ fn next_evaluation_target(
     battle: &mut BattleState,
     graph: &mut SearchGraph,
     from_node: NodeIndex,
+    mut stats: Option<&mut TreeTraversalAccumulator>,
 ) -> NodeIndex {
     let mut node = from_node;
+    let mut depth = 0usize;
     while let Some(player) = legal_actions::next_to_act(battle) {
         let actions = legal_actions::compute(battle, player);
         let explored = &graph[node].tried;
@@ -271,15 +282,22 @@ fn next_evaluation_target(
         // over iterating through edges (~3% benchmark improvement).
         if let Some(action) = actions.find_missing(explored) {
             // An action exists from this node which has not yet been tried
+            if let Some(s) = stats.as_mut() {
+                s.record_expansion(depth, player, &action);
+            }
             return add_child(battle, graph, player, node, action);
         } else {
             // All actions from this node have been tried, recursively search
             // the best candidate
+            if let Some(s) = stats.as_mut() {
+                s.record_selection(depth, player);
+            }
             let best = best_child(graph, node, &actions, SelectionMode::Exploration);
             battle.request_context.logging_options.enable_action_legality_check = false;
             apply_battle_action::execute(battle, player, best.action);
             node = best.node;
         }
+        depth += 1;
     }
     node
 }
@@ -521,6 +539,7 @@ fn write_decision_log_entry(
         best_result.total_reward.0 / best_result.visit_count as f64
     };
 
+    let chosen_action = best_result.action;
     let mut results: Vec<ActionResult> = action_results
         .iter()
         .map(|r| {
@@ -537,6 +556,7 @@ fn write_decision_log_entry(
                 draws: r.draws,
                 tree_node_count: r.tree_node_count,
                 tree_max_depth: r.tree_max_depth,
+                depth_stats: if r.action == chosen_action { r.depth_stats.clone() } else { None },
             }
         })
         .collect();

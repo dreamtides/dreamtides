@@ -280,7 +280,13 @@ fn run_match(
             Dreamwell::from_card_list(&tabula, dreamwell_list),
             CreateBattlePlayer { player_type: battle_ai_one, deck_name },
             CreateBattlePlayer { player_type: battle_ai_two, deck_name },
-            RequestContext { logging_options: LoggingOptions::default() },
+            RequestContext {
+                logging_options: LoggingOptions {
+                    log_directory: logging::get_developer_mode_project_directory().ok(),
+                    log_ai_decisions: true,
+                    ..LoggingOptions::default()
+                },
+            },
         );
 
         let start_time = Instant::now();

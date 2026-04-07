@@ -1,8 +1,9 @@
-use std::collections::VecDeque;
+use std::collections::{BTreeMap, VecDeque};
 use std::fs::OpenOptions;
 use std::io::Write;
 
 use battle_queries::battle_card_queries::card;
+use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle::card_id::CharacterId;
 use core_data::types::PlayerName;
@@ -36,6 +37,8 @@ pub struct ActionResult {
     pub draws: u32,
     pub tree_node_count: usize,
     pub tree_max_depth: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub depth_stats: Option<Vec<DepthLevelStats>>,
 }
 
 #[derive(Serialize)]
@@ -79,6 +82,71 @@ pub struct BudgetDetails {
     pub multiplier: f64,
     pub multiplier_reason: String,
     pub num_threads: usize,
+}
+
+/// Per-depth statistics collected during MCTS tree traversal.
+#[derive(Clone, Serialize)]
+pub struct DepthLevelStats {
+    pub depth: u32,
+    pub player: String,
+    pub expansions: u32,
+    pub selections: u32,
+    pub tried_actions: BTreeMap<String, u32>,
+}
+
+/// Accumulates tree traversal statistics across iterations.
+#[derive(Default)]
+pub struct TreeTraversalAccumulator {
+    levels: Vec<DepthLevel>,
+}
+
+#[derive(Default)]
+struct DepthLevel {
+    player: Option<PlayerName>,
+    expansions: u32,
+    selections: u32,
+    expanded_actions: BTreeMap<String, u32>,
+}
+
+impl TreeTraversalAccumulator {
+    /// Records an expansion (new node created) at the given depth.
+    pub fn record_expansion(&mut self, depth: usize, player: PlayerName, action: &BattleAction) {
+        self.ensure_depth(depth, player);
+        self.levels[depth].expansions += 1;
+        *self.levels[depth].expanded_actions.entry(action.battle_action_string()).or_default() += 1;
+    }
+
+    /// Records a selection (existing node chosen via best_child) at the given
+    /// depth.
+    pub fn record_selection(&mut self, depth: usize, player: PlayerName) {
+        self.ensure_depth(depth, player);
+        self.levels[depth].selections += 1;
+    }
+
+    /// Converts accumulated stats into serializable depth level stats.
+    pub fn into_depth_stats(self) -> Vec<DepthLevelStats> {
+        self.levels
+            .into_iter()
+            .enumerate()
+            .filter(|(_, level)| level.expansions > 0 || level.selections > 0)
+            .map(|(i, level)| DepthLevelStats {
+                depth: i as u32,
+                player: format!("{:?}", level.player.unwrap_or(PlayerName::One)),
+                expansions: level.expansions,
+                selections: level.selections,
+                tried_actions: level.expanded_actions,
+            })
+            .collect()
+    }
+
+    fn ensure_depth(&mut self, depth: usize, player: PlayerName) {
+        while self.levels.len() <= depth {
+            self.levels.push(DepthLevel::default());
+        }
+        if self.levels[depth].player.is_none() {
+            self.levels[depth].player = Some(player);
+        }
+    }
 }
 
 /// Serializes a [DecisionLogEntry] and appends it to `ai_decisions.jsonl`.

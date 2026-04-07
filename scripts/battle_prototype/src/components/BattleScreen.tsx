@@ -136,7 +136,9 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
             : battle.game_over
               ? "Game Over"
               : battle.user.can_act
-                ? "Your Turn"
+                ? battle.user.turn_indicator
+                  ? "Your Turn"
+                  : "Enemy Turn — Respond"
                 : "Enemy Turn — waiting\u2026"}
         </span>
         <span>
@@ -549,7 +551,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
               animation: "fadeInOut 2s ease-in-out",
             }}
           >
-            Your Turn
+            {battle.user.turn_indicator ? "Your Turn" : "Respond"}
           </div>
         </div>
       )}
