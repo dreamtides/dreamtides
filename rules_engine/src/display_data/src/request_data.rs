@@ -79,6 +79,9 @@ pub struct DebugConfiguration {
 
     /// If specified, the battle will be created with the given dreamwell.
     pub dreamwell_override: Option<DreamwellCardIdList>,
+
+    /// If true, the human player goes second (on the draw) instead of first.
+    pub user_goes_second: Option<bool>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

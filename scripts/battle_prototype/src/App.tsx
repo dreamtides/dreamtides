@@ -53,7 +53,7 @@ function BattleApp() {
         battle={battle}
         onAction={sendAction}
         onDebugAction={sendDebugAction}
-        onReconnect={() => reconnect("Core11")}
+        onReconnect={(userGoesSecond?: boolean) => reconnect("Core11", userGoesSecond)}
         events={events}
         disabled={isPolling || judgmentPause}
         yourTurnCounter={yourTurnCounter}

@@ -2,7 +2,7 @@ import type { GameAction } from "../types/battle";
 
 interface DebugPanelProps {
   onAction: (action: GameAction) => void;
-  onReconnect: () => void;
+  onReconnect: (userGoesSecond?: boolean) => void;
 }
 
 interface DebugButtonConfig {
@@ -212,7 +212,18 @@ export function DebugPanel({
             cursor: "pointer",
           }}
         >
-          Restart Battle (Core11)
+          Restart (On the Play)
+        </button>
+        <button
+          onClick={() => onReconnect(true)}
+          className="px-3 py-1 rounded text-sm"
+          style={{
+            background: "var(--color-primary)",
+            color: "var(--color-text)",
+            cursor: "pointer",
+          }}
+        >
+          Restart (On the Draw)
         </button>
       </div>
 

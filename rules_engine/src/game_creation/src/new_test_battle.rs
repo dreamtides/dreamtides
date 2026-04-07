@@ -37,6 +37,7 @@ use user_state::user::user_state::UserState;
 use uuid::Uuid;
 
 /// Creates a new test battle between two Agents and starts it.
+#[expect(clippy::too_many_arguments)]
 pub fn create_and_start(
     id: BattleId,
     tabula: Arc<Tabula>,
@@ -45,6 +46,7 @@ pub fn create_and_start(
     player_one: CreateBattlePlayer,
     player_two: CreateBattlePlayer,
     request_context: RequestContext,
+    first_player: PlayerName,
 ) -> BattleState {
     let quest_one = Arc::new(create_quest_state(&tabula, player_one.deck_name));
     let quest_two = Arc::new(create_quest_state(&tabula, player_two.deck_name));
@@ -106,7 +108,7 @@ pub fn create_and_start(
         status: BattleStatus::Setup,
         stack_priority: None,
         turn: TurnData {
-            active_player: PlayerName::One,
+            active_player: first_player,
             turn_id: TurnId::default(),
             judgment_position: 0,
             moved_this_turn: Vec::new(),

@@ -101,6 +101,7 @@ fn generate_core_11_battle_with_logging(enable_logging: bool) -> BattleState {
             deck_name: TestDeckName::Benchmark1,
         },
         RequestContext { logging_options: LoggingOptions::default() },
+        PlayerName::One,
     );
 
     let mut action_count = 0;

@@ -282,11 +282,14 @@ fn run_match(
             CreateBattlePlayer { player_type: battle_ai_two, deck_name },
             RequestContext {
                 logging_options: LoggingOptions {
-                    log_directory: logging::get_developer_mode_project_directory().ok(),
+                    log_directory: logging::get_developer_mode_project_directory()
+                        .ok()
+                        .map(|p| p.join("matchup_logs")),
                     log_ai_decisions: true,
                     ..LoggingOptions::default()
                 },
             },
+            PlayerName::One,
         );
 
         let start_time = Instant::now();

@@ -18,8 +18,7 @@ pub struct PositionAssignment {
     pub placements: Vec<(CharacterId, CharacterPlacement)>,
 }
 
-/// Generates up to 6 candidate position assignments covering the strategic
-/// spectrum.
+/// Generates candidate position assignments covering the strategic spectrum.
 pub fn generate(battle: &BattleState, player: PlayerName) -> Vec<PositionAssignment> {
     let eligible = eligible_characters(battle, player);
     if eligible.is_empty() {
@@ -27,7 +26,7 @@ pub fn generate(battle: &BattleState, player: PlayerName) -> Vec<PositionAssignm
     }
 
     let threats = opponent_front_threats(battle, player.opponent());
-    let back_max = opponent_back_max_spark(battle, player.opponent());
+    let opp_max = opponent_max_spark(battle, player.opponent());
     let mut candidates: Vec<PositionAssignment> = Vec::new();
 
     // 1. Hold all back
@@ -39,22 +38,36 @@ pub fn generate(battle: &BattleState, player: PlayerName) -> Vec<PositionAssignm
         push_unique(&mut candidates, assignment);
     }
 
-    // 3. Chump blocking
+    // 3. Winning blocks — use the smallest character that strictly outclasses each
+    //    threat so the blocker survives and gets a free kill.
+    if let Some(assignment) = build_winning_blocks(&eligible, &threats) {
+        push_unique(&mut candidates, assignment);
+    }
+
+    // 4. Winning blocks + attack — after assigning winning blockers, send remaining
+    //    high-spark characters to attack empty lanes.
+    if let Some(assignment) =
+        build_winning_blocks_and_attack(battle, player, &eligible, &threats, opp_max)
+    {
+        push_unique(&mut candidates, assignment);
+    }
+
+    // 5. Chump blocking
     if let Some(assignment) = build_chump_blocking(&eligible, &threats) {
         push_unique(&mut candidates, assignment);
     }
 
-    // 4. Attack-focused
-    if let Some(assignment) = build_attack_focused(battle, player, &eligible, back_max) {
+    // 6. Attack-focused
+    if let Some(assignment) = build_attack_focused(battle, player, &eligible, opp_max) {
         push_unique(&mut candidates, assignment);
     }
 
-    // 5. Mixed
-    if let Some(assignment) = build_mixed(battle, player, &eligible, &threats, back_max) {
+    // 7. Mixed
+    if let Some(assignment) = build_mixed(battle, player, &eligible, &threats, opp_max) {
         push_unique(&mut candidates, assignment);
     }
 
-    // 6. Chump-block-all
+    // 8. Chump-block-all
     if let Some(assignment) = build_chump_block_all(&eligible, &threats) {
         push_unique(&mut candidates, assignment);
     }
@@ -70,11 +83,11 @@ pub fn best_assignment(battle: &BattleState, player: PlayerName) -> Option<Posit
     }
 
     let threats = opponent_front_threats(battle, player.opponent());
-    let back_max = opponent_back_max_spark(battle, player.opponent());
+    let opp_max = opponent_max_spark(battle, player.opponent());
 
     candidates.into_iter().max_by(|a, b| {
-        score(battle, player, a, &threats, back_max)
-            .partial_cmp(&score(battle, player, b, &threats, back_max))
+        score(battle, player, a, &threats, opp_max)
+            .partial_cmp(&score(battle, player, b, &threats, opp_max))
             .unwrap_or(Ordering::Equal)
     })
 }
@@ -166,12 +179,14 @@ fn opponent_front_threats(battle: &BattleState, opponent: PlayerName) -> Vec<Opp
         .collect()
 }
 
-fn opponent_back_max_spark(battle: &BattleState, opponent: PlayerName) -> u32 {
-    battle
-        .cards
-        .battlefield(opponent)
-        .back
+/// Returns the maximum spark among all opponent characters that could
+/// potentially block an attacker — this includes both front and back row,
+/// since back-row characters can be repositioned to block on the next turn.
+fn opponent_max_spark(battle: &BattleState, opponent: PlayerName) -> u32 {
+    let bf = battle.cards.battlefield(opponent);
+    bf.front
         .iter()
+        .chain(bf.back.iter())
         .flatten()
         .map(|&char_id| battle.cards.spark(opponent, char_id).map_or(0, |s| s.0))
         .max()
@@ -253,6 +268,120 @@ fn build_efficient_blocking(
     Some(PositionAssignment { placements })
 }
 
+/// Assigns blockers that strictly outclass each threat (spark > threat.spark),
+/// so the blocker survives combat. Uses the smallest such character per threat.
+fn build_winning_blocks(
+    eligible: &[EligibleCharacter],
+    threats: &[OpponentThreat],
+) -> Option<PositionAssignment> {
+    if threats.is_empty() {
+        return None;
+    }
+
+    let mut sorted_threats: Vec<&OpponentThreat> = threats.iter().collect();
+    sorted_threats.sort_by(|a, b| b.spark.cmp(&a.spark));
+
+    let mut used: Vec<bool> = vec![false; eligible.len()];
+    let mut assignments: Vec<(CharacterId, u8)> = Vec::new();
+
+    for threat in &sorted_threats {
+        let winner = eligible
+            .iter()
+            .enumerate()
+            .filter(|(i, c)| !used[*i] && c.spark > threat.spark)
+            .min_by_key(|(_, c)| c.spark);
+        if let Some((idx, blocker)) = winner {
+            used[idx] = true;
+            assignments.push((blocker.id, threat.column));
+        }
+    }
+
+    if assignments.is_empty() {
+        return None;
+    }
+
+    let placements = eligible
+        .iter()
+        .map(|c| {
+            if let Some((_, col)) = assignments.iter().find(|(id, _)| *id == c.id) {
+                (c.id, CharacterPlacement::MoveToFrontRank(*col))
+            } else {
+                (c.id, CharacterPlacement::StayBack)
+            }
+        })
+        .collect();
+
+    Some(PositionAssignment { placements })
+}
+
+/// Assigns winning blockers first, then sends remaining high-spark characters
+/// to attack empty lanes.
+fn build_winning_blocks_and_attack(
+    battle: &BattleState,
+    player: PlayerName,
+    eligible: &[EligibleCharacter],
+    threats: &[OpponentThreat],
+    opp_max: u32,
+) -> Option<PositionAssignment> {
+    if threats.is_empty() {
+        return None;
+    }
+
+    let own_front = &battle.cards.battlefield(player).front;
+    let opponent_front = &battle.cards.battlefield(player.opponent()).front;
+
+    let mut sorted_threats: Vec<&OpponentThreat> = threats.iter().collect();
+    sorted_threats.sort_by(|a, b| b.spark.cmp(&a.spark));
+
+    let mut used: Vec<bool> = vec![false; eligible.len()];
+    let mut assignments: Vec<(CharacterId, u8)> = Vec::new();
+    let mut used_cols: Vec<u8> = Vec::new();
+
+    // First pass: assign winning blockers
+    for threat in &sorted_threats {
+        let winner = eligible
+            .iter()
+            .enumerate()
+            .filter(|(i, c)| !used[*i] && c.spark > threat.spark)
+            .min_by_key(|(_, c)| c.spark);
+        if let Some((idx, blocker)) = winner {
+            used[idx] = true;
+            assignments.push((blocker.id, threat.column));
+            used_cols.push(threat.column);
+        }
+    }
+
+    if assignments.is_empty() {
+        return None;
+    }
+
+    // Second pass: send remaining high-spark characters to attack
+    let mut attackers: Vec<(usize, &EligibleCharacter)> =
+        eligible.iter().enumerate().filter(|(i, c)| !used[*i] && c.spark > opp_max).collect();
+    attackers.sort_by(|(_, a), (_, b)| b.spark.cmp(&a.spark));
+
+    for (idx, attacker) in attackers {
+        if let Some(col) = find_next_attack_column(own_front, opponent_front, &used_cols) {
+            used[idx] = true;
+            assignments.push((attacker.id, col));
+            used_cols.push(col);
+        }
+    }
+
+    let placements = eligible
+        .iter()
+        .map(|c| {
+            if let Some((_, col)) = assignments.iter().find(|(id, _)| *id == c.id) {
+                (c.id, CharacterPlacement::MoveToFrontRank(*col))
+            } else {
+                (c.id, CharacterPlacement::StayBack)
+            }
+        })
+        .collect();
+
+    Some(PositionAssignment { placements })
+}
+
 fn build_chump_blocking(
     eligible: &[EligibleCharacter],
     threats: &[OpponentThreat],
@@ -301,14 +430,14 @@ fn build_attack_focused(
     battle: &BattleState,
     player: PlayerName,
     eligible: &[EligibleCharacter],
-    back_max: u32,
+    opp_max: u32,
 ) -> Option<PositionAssignment> {
     let _ = find_attack_column(battle, player)?;
     let own_front = &battle.cards.battlefield(player).front;
     let opponent_front = &battle.cards.battlefield(player.opponent()).front;
 
     let mut sorted_eligible: Vec<&EligibleCharacter> =
-        eligible.iter().filter(|c| c.spark > back_max).collect();
+        eligible.iter().filter(|c| c.spark > opp_max).collect();
     sorted_eligible.sort_by(|a, b| b.spark.cmp(&a.spark));
 
     if sorted_eligible.is_empty() {
@@ -363,7 +492,7 @@ fn build_mixed(
     player: PlayerName,
     eligible: &[EligibleCharacter],
     threats: &[OpponentThreat],
-    back_max: u32,
+    opp_max: u32,
 ) -> Option<PositionAssignment> {
     if threats.is_empty() {
         return None;
@@ -382,10 +511,8 @@ fn build_mixed(
     let opponent_front = &battle.cards.battlefield(player.opponent()).front;
     let used_cols = vec![highest_threat.column];
 
-    let attacker = eligible
-        .iter()
-        .filter(|c| c.id != blocker.id && c.spark > back_max)
-        .max_by_key(|c| c.spark);
+    let attacker =
+        eligible.iter().filter(|c| c.id != blocker.id && c.spark > opp_max).max_by_key(|c| c.spark);
 
     let attack_assignment = attacker.and_then(|a| {
         find_next_attack_column(own_front, opponent_front, &used_cols).map(|col| (a.id, col))
@@ -460,7 +587,7 @@ fn score(
     player: PlayerName,
     assignment: &PositionAssignment,
     threats: &[OpponentThreat],
-    back_max: u32,
+    opp_max: u32,
 ) -> f64 {
     let mut points_prevented: f64 = 0.0;
     let mut spark_lost: f64 = 0.0;
@@ -478,7 +605,7 @@ fn score(
                     }
                 }
                 None => {
-                    let discount = if back_max >= our_spark { 0.25 } else { 0.75 };
+                    let discount = if opp_max >= our_spark { 0.25 } else { 0.75 };
                     attack_points += our_spark as f64 * discount;
                 }
             }

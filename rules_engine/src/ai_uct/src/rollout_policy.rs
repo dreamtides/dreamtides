@@ -103,3 +103,67 @@ fn resolve_until_standard(battle: &mut BattleState, player: PlayerName) {
         apply_battle_action::execute(battle, acting_player, action);
     }
 }
+
+/// Plays a complete turn for the given player using randomized logic with
+/// atomic position assignments.
+///
+/// Card play uses random action selection. When positioning is available,
+/// randomly selects one assignment from the generated candidates. Biases
+/// toward positioning when `EndTurn` would otherwise be chosen.
+pub fn play_random_turn(battle: &mut BattleState, player: PlayerName) {
+    let mut safety = 0;
+    loop {
+        if safety > 500 {
+            return;
+        }
+        safety += 1;
+
+        let Some(acting_player) = legal_actions::next_to_act(battle) else {
+            return;
+        };
+
+        if acting_player != player {
+            return;
+        }
+
+        let legal = legal_actions::compute(battle, player);
+        match &legal {
+            LegalActions::Standard { actions } => {
+                let action = legal.random_action();
+                let chose_end_turn = action == Some(BattleAction::EndTurn)
+                    || action == Some(BattleAction::StartNextTurn);
+                if chose_end_turn && actions.can_begin_positioning {
+                    let candidates = position_assignment::generate(battle, player);
+                    if !candidates.is_empty() {
+                        let index = fastrand::usize(..candidates.len());
+                        apply_position_assignment(battle, player, &candidates[index]);
+                        return;
+                    }
+                }
+
+                if actions.can_begin_positioning && action == Some(BattleAction::BeginPositioning) {
+                    let candidates = position_assignment::generate(battle, player);
+                    if !candidates.is_empty() {
+                        let index = fastrand::usize(..candidates.len());
+                        apply_position_assignment(battle, player, &candidates[index]);
+                        return;
+                    }
+                }
+
+                match action {
+                    Some(BattleAction::EndTurn | BattleAction::StartNextTurn) => return,
+                    Some(a) => {
+                        apply_battle_action::execute(battle, player, a);
+                    }
+                    None => return,
+                }
+            }
+            _ => {
+                let Some(action) = legal.random_action() else {
+                    return;
+                };
+                apply_battle_action::execute(battle, player, action);
+            }
+        }
+    }
+}

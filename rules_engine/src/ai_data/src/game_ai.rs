@@ -9,6 +9,8 @@ pub enum GameAI {
     MonteCarlo(u32),
     MonteCarloSingleThreaded(u32),
     MonteCarloV2(u32),
+    MonteCarloV3(u32),
+    MonteCarloV4(u32),
     WaitFiveSeconds,
 }
 

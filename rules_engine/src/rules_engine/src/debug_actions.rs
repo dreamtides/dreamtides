@@ -33,6 +33,21 @@ pub fn execute<P>(
                 battle.players.one.as_create_battle_player(),
                 battle.players.two.as_create_battle_player(),
                 battle.request_context.clone(),
+                PlayerName::One,
+            );
+            provider.clear_undo_stack(battle.id);
+        }
+        DebugAction::RestartBattleOnTheDraw => {
+            let seed = rand::rng().next_u64();
+            *battle = new_battle::create_and_start(
+                battle.id,
+                provider.tabula(),
+                seed,
+                battle.dreamwell.clone_and_reset(),
+                battle.players.one.as_create_battle_player(),
+                battle.players.two.as_create_battle_player(),
+                battle.request_context.clone(),
+                PlayerName::Two,
             );
             provider.clear_undo_stack(battle.id);
         }
@@ -52,6 +67,7 @@ pub fn execute<P>(
                     deck_name: two,
                 },
                 battle.request_context.clone(),
+                PlayerName::One,
             );
             provider.clear_undo_stack(battle.id);
         }

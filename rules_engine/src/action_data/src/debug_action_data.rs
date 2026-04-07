@@ -12,6 +12,7 @@ use crate::game_action_data::GameAction;
 pub enum DebugAction {
     ApplyTestScenarioAction(String),
     RestartBattle,
+    RestartBattleOnTheDraw,
     RestartBattleWithDecks { one: TestDeckName, two: TestDeckName },
     SetOpponentAgent(GameAI),
     SetOpponentAsHuman,

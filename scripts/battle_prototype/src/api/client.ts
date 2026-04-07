@@ -27,14 +27,19 @@ export function resetUserId(): void {
 
 export async function connect(
   deckOverride?: TestDeckName,
+  userGoesSecond?: boolean,
 ): Promise<ConnectResponse> {
+  const debugConfig = deckOverride || userGoesSecond
+    ? {
+        deck_override: deckOverride ?? undefined,
+        user_goes_second: userGoesSecond ?? undefined,
+      }
+    : undefined;
   const body = JSON.stringify({
     metadata: metadata(),
     persistent_data_path: "",
     streaming_assets_path: "",
-    debug_configuration: deckOverride
-      ? { deck_override: deckOverride }
-      : undefined,
+    debug_configuration: debugConfig,
   });
   const res = await fetch("/connect", {
     method: "POST",

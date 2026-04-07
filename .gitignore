@@ -8,6 +8,7 @@ log.json
 search_graph.dot
 !rules_engine/src/tv/src-tauri/CLAUDE.md
 release_builds
+matchup_logs
 client_secret.json
 service_account_key.json
 *.mm_profdata

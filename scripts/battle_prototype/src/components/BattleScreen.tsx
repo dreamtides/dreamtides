@@ -13,7 +13,7 @@ interface BattleScreenProps {
   battle: BattleView;
   onAction: (action: GameAction) => void;
   onDebugAction: (action: GameAction) => void;
-  onReconnect: () => void;
+  onReconnect: (userGoesSecond?: boolean) => void;
   events: string[];
   disabled: boolean;
   yourTurnCounter: number;

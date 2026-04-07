@@ -127,6 +127,7 @@ fn create_battle(tabula: Arc<Tabula>) -> BattleState {
             deck_name: TestDeckName::Core11,
         },
         RequestContext::default(),
+        PlayerName::One,
     )
 }
 

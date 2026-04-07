@@ -7,12 +7,14 @@ use battle_state::battle_cards::dreamwell_data::Dreamwell;
 use battle_state::battle_player::battle_player_state::CreateBattlePlayer;
 use battle_state::battle_trace::battle_tracing::BattleTracing;
 use core_data::identifiers::BattleId;
+use core_data::types::PlayerName;
 use tabula_data::tabula::Tabula;
 
 use crate::new_test_battle;
 
 /// Creates a new battle and starts it using a given seed and
 /// [`CreateBattlePlayer`] specification.
+#[expect(clippy::too_many_arguments)]
 pub fn create_and_start(
     battle_id: BattleId,
     tabula: Arc<Tabula>,
@@ -21,6 +23,7 @@ pub fn create_and_start(
     player_one: CreateBattlePlayer,
     player_two: CreateBattlePlayer,
     request_context: RequestContext,
+    first_player: PlayerName,
 ) -> BattleState {
     let mut battle = new_test_battle::create_and_start(
         battle_id,
@@ -30,6 +33,7 @@ pub fn create_and_start(
         player_one,
         player_two,
         request_context,
+        first_player,
     );
     battle.animations = Some(AnimationData::default());
     battle.tracing = Some(BattleTracing::default());

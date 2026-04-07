@@ -38,6 +38,7 @@ pub fn run(battle: &mut BattleState, player: PlayerName, source: EffectSource) -
             }
         }
         (Some(attacker), None) => {
+            battle.turn.judgment_participants.push((opponent, attacker, position));
             let spark = battle.cards.spark(opponent, attacker).unwrap_or_default();
             points::gain(battle, opponent, source, Points(spark.0), ShouldAnimate::Yes);
         }

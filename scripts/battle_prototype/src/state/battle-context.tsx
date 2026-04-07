@@ -244,7 +244,7 @@ interface BattleContextValue {
   continueFromJudgment: () => void;
   sendAction: (action: GameAction) => void;
   sendDebugAction: (action: GameAction) => void;
-  reconnect: (deck?: TestDeckName) => void;
+  reconnect: (deck?: TestDeckName, userGoesSecond?: boolean) => void;
 }
 
 const BattleContext = createContext<BattleContextValue | null>(null);
@@ -495,7 +495,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
   }, [battle, startPolling]);
 
   const reconnect = useCallback(
-    (deck?: TestDeckName) => {
+    (deck?: TestDeckName, userGoesSecond?: boolean) => {
       log.logReconnect(deck);
       void (async () => {
         const connectStart = performance.now();
@@ -505,7 +505,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
           stopPolling("reconnect");
           setBattle(null);
           resetUserId();
-          const res = await api.connect(deck);
+          const res = await api.connect(deck, userGoesSecond);
           const durationMs = performance.now() - connectStart;
           log.logResponseVersionUpdate("connect", responseVersionRef.current, res.response_version);
           responseVersionRef.current = res.response_version;

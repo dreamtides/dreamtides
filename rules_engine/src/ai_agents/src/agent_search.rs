@@ -5,7 +5,7 @@ use std::time::{Duration, Instant};
 use ai_data::game_ai::GameAI;
 use ai_uct::position_assignment::{CharacterPlacement, PositionAssignment};
 use ai_uct::uct_config::UctConfig;
-use ai_uct::{uct_search, uct_search_v2};
+use ai_uct::{uct_search, uct_search_v2, uct_search_v3, uct_search_v4};
 use battle_mutations::player_mutations::player_state;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
@@ -116,6 +116,34 @@ pub fn select_action_unchecked(
                 });
             }
             result.action
+        }
+        GameAI::MonteCarloV3(thousands_of_iterations) => {
+            if let Some(action) = next_assignment_action(battle, player) {
+                return action;
+            }
+
+            let config = UctConfig {
+                max_iterations_per_action: *thousands_of_iterations * 1000,
+                max_total_actions_multiplier: 6,
+                iteration_multiplier_override,
+                single_threaded: false,
+            };
+            let result = uct_search_v3::search(battle, player, &config);
+            if let Some(assignment) = result.assignment {
+                PENDING_ASSIGNMENT.with(|cell| {
+                    *cell.borrow_mut() = Some(assignment);
+                });
+            }
+            result.action
+        }
+        GameAI::MonteCarloV4(thousands_of_iterations) => {
+            let config = UctConfig {
+                max_iterations_per_action: *thousands_of_iterations * 1000,
+                max_total_actions_multiplier: 6,
+                iteration_multiplier_override,
+                single_threaded: false,
+            };
+            uct_search_v4::search(battle, player, &config)
         }
         GameAI::WaitFiveSeconds => {
             thread::sleep(Duration::from_secs(5));

@@ -5,4 +5,6 @@ pub mod rollout_policy;
 pub mod uct_config;
 pub mod uct_search;
 pub mod uct_search_v2;
+pub mod uct_search_v3;
+pub mod uct_search_v4;
 pub mod uct_tree;

@@ -106,6 +106,7 @@ impl TestSession {
                             .unwrap_or(&DreamwellCardIdList::TestDreamwellNoAbilities)
                             .clone(),
                     ),
+                    user_goes_second: None,
                 }),
             },
             self.request_context(),
