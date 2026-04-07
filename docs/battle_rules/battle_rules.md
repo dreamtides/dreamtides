@@ -6,7 +6,7 @@ then compete to score victory points through positional combat on a two-rank
 battlefield. Two key differences from traditional card games: the shared
 Dreamwell system replaces lands for energy production, and combat is resolved
 positionally — during the Judgment phase at the end of each turn, the non-active
-player's front-rank characters attack while the active player's characters
+player's judgment-rank characters attack while the active player's characters
 block. Unblocked attackers score points, while paired attackers and blockers
 compare spark and the weaker is dissolved.
 
@@ -36,10 +36,10 @@ winner, the game ends in a draw.
 
 **Character** — Permanent cards that enter the battlefield when they resolve.
 Each character has a spark value used in combat during the Judgment phase.
-Characters enter the back rank and can be repositioned to the front rank on
+Characters enter the focus rank and can be repositioned to the judgment rank on
 subsequent turns. Characters remain on the battlefield until removed by an
 effect (Dissolve or Banish) or defeated in combat. Characters that participate
-in a judgment are returned to the back rank afterward. They can have triggered,
+in a judgment are returned to the focus rank afterward. They can have triggered,
 activated, and static abilities. Characters have subtypes (Mage, Warrior, Robot,
 etc.) that other cards can reference.
 
@@ -77,9 +77,9 @@ void.
 
 **Battlefield** — Where characters reside. The battlefield has 8 columns
 (positions 0–7). Each player has two horizontal ranks across those columns: a
-front rank and a back rank, giving each player 16 possible slots. A player can
-have at most 8 total characters on the battlefield at once. Only front-rank
-characters participate in Judgment phase combat.
+judgment rank and a focus rank, giving each player 16 possible slots. A player
+can have at most 8 total characters on the battlefield at once. Only
+judgment-rank characters participate in Judgment phase combat.
 
 **Void** — The discard pile. Events go here after resolving. Characters go here
 when dissolved. Some cards can interact with cards in the void (notably via
@@ -131,14 +131,15 @@ Each turn progresses through these phases in order:
    of your turn" fire during this phase. No scoring occurs here. (Comparable to
    MTG's upkeep step.)
 4. **Main** — The active player can play cards from hand, activate abilities,
-   reposition characters between front and back ranks and between columns, and
+   reposition characters between judgment and focus ranks and between columns,
+   and
    take other actions. This is the primary action phase.
 5. **Ending** — The active player passes. The opponent may play fast cards
    during this window (e.g. using a fast-speed dissolve event to remove an
    attacker before Judgment). Once the opponent also passes, the turn proceeds
    to Judgment.
-6. **Judgment** — Combat resolution. The non-active player's front-rank
-   characters attack; the active player's front-rank characters block. Each
+6. **Judgment** — Combat resolution. The non-active player's judgment-rank
+   characters attack; the active player's judgment-rank characters block. Each
    column is resolved independently (see Spark and Scoring). After Judgment,
    end-of-turn triggers fire and the turn passes to the opponent.
 
@@ -166,22 +167,22 @@ empty, the card's controller receives priority.
 Spark is the primary stat on characters. Characters have no health or toughness
 — spark is their only stat.
 
-**Attackers and blockers:** Whether a front-rank character is an attacker or
+**Attackers and blockers:** Whether a judgment-rank character is an attacker or
 blocker is determined by board position at the moment Judgment begins — nothing
 is locked in advance.
 
-- A front-rank character is an **attacker** if the opposing front-rank space in
-  its column is empty.
-- A front-rank character is a **blocker** if there is an opposing front-rank
-  character directly across from it in the same column.
+- A judgment-rank character is an **attacker** if the opposing judgment-rank
+  space in its column is empty.
+- A judgment-rank character is a **blocker** if there is an opposing
+  judgment-rank character directly across from it in the same column.
 - Since a character can only attack into an empty opposing column, the number of
-  possible attackers is limited by the number of unoccupied enemy front-rank
+  possible attackers is limited by the number of unoccupied enemy judgment-rank
   slots. Positioning is a geometric constraint — players must choose which
   columns to contest and which to leave open.
 
 **Judgment phase resolution:** During the Judgment phase at the end of each
-turn, the non-active player's front-rank characters are the attackers and the
-active player's front-rank characters are the blockers. Each column (0–7) is
+turn, the non-active player's judgment-rank characters are the attackers and the
+active player's judgment-rank characters are the blockers. Each column (0–7) is
 resolved independently:
 
 - **Attacker with a blocker (paired judgment):** Compare their spark values. The
@@ -191,23 +192,23 @@ resolved independently:
 - **Attacker with no blocker (unblocked):** The attacker scores victory points
   equal to its spark value for the attacking player.
 - **Only the active player has a character at the position:** Nothing happens —
-  the active player's front-rank characters are blockers, not attackers.
+  the active player's judgment-rank characters are blockers, not attackers.
 - **Neither player has a character at the position:** Nothing happens.
 
 **After Judgment:** Every surviving character that participated in a judgment —
-whether as an attacker or blocker — returns to the back rank. Front-rank
+whether as an attacker or blocker — returns to the focus rank. Judgment-rank
 characters that did not participate in a judgment remain where they are.
 
-Back-rank characters are safe during Judgment — they do not fight and do not
+Focus-rank characters are safe during Judgment — they do not fight and do not
 score points.
 
 **Entering focused:** When a character enters the battlefield, it is placed in
-the back rank and enters focused. A focused character cannot be moved to the
-front rank. This temporary focused status wears off at the start of the
+the focus rank and enters focused. A focused character cannot be moved to the
+judgment rank. This temporary focused status wears off at the start of the
 controlling player's next turn.
 
 **Repositioning:** During the Main phase, a player can freely reposition their
-characters by moving them between front and back ranks and between columns
+characters by moving them between judgment and focus ranks and between columns
 within a rank (subject to the focused condition and slot availability).
 Characters cannot be repositioned outside the Main phase, and no cards can be
 played during Judgment.
@@ -230,11 +231,11 @@ Banished zone. Several variants exist: banish from the battlefield, banish from
 the void, banish until the banishing card leaves play, and banish until the next
 main phase.
 
-**Materialize** — Put a character onto the battlefield's back rank. This is the
+**Materialize** — Put a character onto the battlefield's focus rank. This is the
 term for a character entering play, whether from hand (played normally), from
 the void (via Reclaim or effects), from the deck (via effects), or as a token
-(Figments). Characters enter focused and cannot move to the front rank on the
-turn they are materialized.
+(Figments). Characters enter focused and cannot move to the judgment rank on the turn they
+are materialized.
 
 **Prevent** — Counter a card on the stack, sending it to the void without
 resolving. Prevent effects are always fast (they must be played in response to a
@@ -281,24 +282,25 @@ comparison, not to points scored if unblocked.
 **Preeminence** — This character wins spark ties in judgment. If both characters
 in a paired judgment have preeminence, both are dissolved as normal.
 
-**Unbound** — This character enters the front rank instead of the back rank and
-does not enter focused — it can attack or block on the turn it is materialized.
+**Unbound** — This character enters the judgment rank instead of the focus rank
+and does not enter focused — it can attack or block on the turn it is
+materialized.
 
 **Unstoppable** — This character scores victory points equal to its spark even
 when blocked. The paired spark comparison still occurs as normal.
 
-**Steadfast** — This character does not return to the back rank after blocking.
-It remains in the front rank and can attack in the next judgment.
+**Steadfast** — This character does not return to the focus rank after blocking.
+It remains in the judgment rank and can attack in the next judgment.
 
 **Veil X** — This character costs X additional energy for the opponent to target
 with cards or abilities.
 
-**Focused** — This character cannot be moved to the front rank. It remains in
-the back rank permanently, cannot participate in judgment, and cannot pay focus
+**Focused** — This character cannot be moved to the judgment rank. It remains in
+the focus rank permanently, cannot participate in judgment, and cannot pay focus
 costs.
 
 **Focus** — An activated ability that requires this character to skip its next
-judgment (it does not attack or block). The character remains in the back rank
+judgment (it does not attack or block). The character remains in the focus rank
 and is treated as absent during the judgment phase.
 
 **Other effect categories:** Effects also exist for drawing cards, gaining or
