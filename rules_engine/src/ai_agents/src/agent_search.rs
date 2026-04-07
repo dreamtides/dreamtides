@@ -1,11 +1,14 @@
+use std::cell::RefCell;
 use std::thread;
 use std::time::{Duration, Instant};
 
 use ai_data::game_ai::GameAI;
+use ai_uct::position_assignment::{CharacterPlacement, PositionAssignment};
 use ai_uct::uct_config::UctConfig;
 use ai_uct::{uct_search, uct_search_v2};
 use battle_mutations::player_mutations::player_state;
 use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
 use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
@@ -13,6 +16,10 @@ use core_data::types::PlayerName;
 use rand::Rng;
 use rand::seq::IndexedRandom;
 use tracing::{debug, instrument};
+
+thread_local! {
+    static PENDING_ASSIGNMENT: RefCell<Option<PositionAssignment>> = const { RefCell::new(None) };
+}
 
 /// Selects an action using a custom UctConfig (exposed for benchmarks to allow
 /// forcing iteration multipliers like setting iteration_multiplier_override).
@@ -92,19 +99,69 @@ pub fn select_action_unchecked(
             uct_search::search(battle, player, &config)
         }
         GameAI::MonteCarloV2(thousands_of_iterations) => {
+            if let Some(action) = next_assignment_action(battle, player) {
+                return action;
+            }
+
             let config = UctConfig {
                 max_iterations_per_action: *thousands_of_iterations * 1000,
                 max_total_actions_multiplier: 6,
                 iteration_multiplier_override,
                 single_threaded: false,
             };
-            uct_search_v2::search(battle, player, &config)
+            let result = uct_search_v2::search(battle, player, &config);
+            if let Some(assignment) = result.assignment {
+                PENDING_ASSIGNMENT.with(|cell| {
+                    *cell.borrow_mut() = Some(assignment);
+                });
+            }
+            result.action
         }
         GameAI::WaitFiveSeconds => {
             thread::sleep(Duration::from_secs(5));
             first_available_action(battle, player)
         }
     }
+}
+
+fn next_assignment_action(battle: &BattleState, player: PlayerName) -> Option<BattleAction> {
+    PENDING_ASSIGNMENT.with(|cell| {
+        let mut assignment = cell.borrow_mut();
+        let Some(ref a) = *assignment else {
+            return None;
+        };
+
+        let legal = legal_actions::compute(battle, player);
+
+        match &legal {
+            LegalActions::SelectPositioningCharacter { .. } => {
+                for &(char_id, placement) in &a.placements {
+                    if let CharacterPlacement::MoveToFrontRank(_) = placement {
+                        if battle.cards.battlefield(player).is_in_back_rank(char_id) {
+                            return Some(BattleAction::SelectCharacterForPositioning(char_id));
+                        }
+                    }
+                }
+                *assignment = None;
+                Some(BattleAction::EndTurn)
+            }
+            LegalActions::AssignColumn { character, .. } => {
+                for &(char_id, placement) in &a.placements {
+                    if char_id == *character {
+                        if let CharacterPlacement::MoveToFrontRank(col) = placement {
+                            return Some(BattleAction::MoveCharacterToFrontRank(char_id, col));
+                        }
+                    }
+                }
+                *assignment = None;
+                None
+            }
+            _ => {
+                *assignment = None;
+                None
+            }
+        }
+    })
 }
 
 fn first_available_action(battle: &BattleState, player: PlayerName) -> BattleAction {

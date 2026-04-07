@@ -34,6 +34,13 @@ use crate::rollout_policy;
 use crate::uct_config::UctConfig;
 use crate::uct_tree::{SearchEdge, SearchGraph, SearchNode, SelectionMode};
 
+/// Result returned by the V2 search, including the immediate action and any
+/// pending position assignment to be executed as follow-up actions.
+pub struct V2SearchResult {
+    pub action: BattleAction,
+    pub assignment: Option<PositionAssignment>,
+}
+
 #[derive(Debug, Clone)]
 enum SearchCandidate {
     Action(BattleAction),
@@ -68,7 +75,7 @@ pub fn search(
     initial_battle: &BattleState,
     player: PlayerName,
     config: &UctConfig,
-) -> BattleAction {
+) -> V2SearchResult {
     let legal = legal_actions::compute(initial_battle, player);
     let candidates = build_candidates(initial_battle, player, &legal);
     let budget = compute_budget(candidates.len(), config, initial_battle, player);
@@ -93,16 +100,18 @@ pub fn search(
         panic_with!("No legal actions available", initial_battle, player);
     };
 
-    let action = match &best_result.candidate {
-        SearchCandidate::Action(a) => *a,
-        SearchCandidate::Assignment(_) => BattleAction::BeginPositioning,
+    let result = match &best_result.candidate {
+        SearchCandidate::Action(a) => V2SearchResult { action: *a, assignment: None },
+        SearchCandidate::Assignment(a) => {
+            V2SearchResult { action: BattleAction::BeginPositioning, assignment: Some(a.clone()) }
+        }
     };
 
     let num_actions = candidate_results.len();
     let total_iterations = budget.iterations_per_action * num_actions as u32;
     let num_threads = rayon::current_num_threads();
 
-    debug!(?total_iterations, ?action, ?num_threads, "Picked AI action (V2)");
+    debug!(?total_iterations, action = ?result.action, ?num_threads, "Picked AI action (V2)");
 
     if initial_battle.request_context.logging_options.log_ai_decisions {
         write_decision_log_entry(
@@ -116,7 +125,7 @@ pub fn search(
         );
     }
 
-    action
+    result
 }
 
 fn build_candidates(
