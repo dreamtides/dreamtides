@@ -201,13 +201,13 @@ characters that did not participate in a judgment remain where they are.
 Back-rank characters are safe during Judgment — they do not fight and do not
 score points.
 
-**"Summoning sickness":** When a character enters the battlefield, it is placed
-in the back rank. Characters cannot be moved to the front rank on the same turn
-they were played.
+**Haze:** When a character enters the battlefield, it is placed in the back rank
+and gains haze. A character with haze cannot be moved to the front rank. Haze
+wears off at the start of the controlling player's next turn.
 
 **Repositioning:** During the Main phase, a player can freely reposition their
 characters by moving them between front and back ranks and between columns
-within a rank (subject to "summoning sickness" and slot availability).
+within a rank (subject to haze and slot availability).
 Characters cannot be repositioned outside the Main phase, and no cards can be
 played during Judgment.
 
@@ -232,8 +232,8 @@ main phase.
 **Materialize** — Put a character onto the battlefield's back rank. This is the
 term for a character entering play, whether from hand (played normally), from
 the void (via Reclaim or effects), from the deck (via effects), or as a token
-(Figments). Characters enter with "summoning sickness" and cannot move to the
-front rank on the turn they are materialized.
+(Figments). Characters enter with haze and cannot move to the front rank on the
+turn they are materialized.
 
 **Prevent** — Counter a card on the stack, sending it to the void without
 resolving. Prevent effects are always fast (they must be played in response to a
@@ -267,6 +267,41 @@ character on the battlefield or copying the next card played.
 
 **Gain Control** — Take control of an opponent's character, moving it to your
 side of the battlefield.
+
+**Haze** — A temporary condition on newly materialized characters. A character
+with haze cannot be moved to the front rank. Haze wears off at the start of the
+controlling player's next turn.
+
+**Test** — Initiate a one-on-one judgment between your character and a target
+character. The two characters compare spark as in a normal paired judgment — the
+character with lower spark is dissolved, and if both have the same spark, both
+are dissolved. No points are scored from a test.
+
+**Dread N** — During judgment, this character dissolves opposing characters as
+though its spark were N higher. The bonus applies only to the paired spark
+comparison, not to points scored if unblocked.
+
+**Preeminence** — This character wins spark ties in judgment. If both characters
+in a paired judgment have preeminence, both are dissolved as normal.
+
+**Unbound** — This character enters the front rank instead of the back rank and
+is not subject to haze — it can attack or block on the turn it is materialized.
+
+**Unstoppable** — This character scores victory points equal to its spark even
+when blocked. The paired spark comparison still occurs as normal.
+
+**Steadfast** — This character does not return to the back rank after blocking.
+It remains in the front rank and can attack in the next judgment.
+
+**Veil X** — This character costs X additional energy for the opponent to target
+with cards or abilities.
+
+**Focused** — This character cannot be moved to the front rank. It remains in
+the back rank permanently and cannot participate in judgment.
+
+**Focus** — An activated ability that requires this character to skip its next
+judgment (it does not attack or block). The character remains in the back rank
+and is treated as absent during the judgment phase.
 
 **Other effect categories:** Effects also exist for drawing cards, gaining or
 losing energy, gaining or losing points, modifying spark values on characters,
