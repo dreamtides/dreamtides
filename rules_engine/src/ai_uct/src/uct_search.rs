@@ -553,12 +553,6 @@ fn heuristic_select_positioning_character(
     let opp_front = &battle.cards.battlefield(opponent).front;
     let has_block_targets = opp_front.iter().any(Option::is_some);
 
-    // When attacking (no opponents to block), only position one
-    // character per turn to preserve the rest as future blockers.
-    if !has_block_targets && !battle.turn.moved_this_turn.is_empty() {
-        return Some(BattleAction::EndTurn);
-    }
-
     if !has_block_targets {
         let opp_back_max_spark = battle
             .cards
