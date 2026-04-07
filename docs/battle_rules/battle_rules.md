@@ -174,9 +174,10 @@ is locked in advance.
   its column is empty.
 - A front-rank character is a **blocker** if there is an opposing front-rank
   character directly across from it in the same column.
-- If every front-rank column across from you is occupied by an enemy front-rank
-  character, then none of your front-rank characters can be attackers; they can
-  only be blockers.
+- Since a character can only attack into an empty opposing column, the number of
+  possible attackers is limited by the number of unoccupied enemy front-rank
+  slots. Positioning is a geometric constraint — players must choose which
+  columns to contest and which to leave open.
 
 **Judgment phase resolution:** During the Judgment phase at the end of each
 turn, the non-active player's front-rank characters are the attackers and the
@@ -185,28 +186,28 @@ resolved independently:
 
 - **Attacker with a blocker (paired judgment):** Compare their spark values. The
   character with lower spark is dissolved. If both have the same spark, both are
-  dissolved. A paired attacker does **not** score points, even if it survives
-  its judgment. Dissolved triggers fire after each column is resolved.
+  dissolved. A paired attacker does **not** score points. Dissolved triggers
+  fire after each column is resolved.
 - **Attacker with no blocker (unblocked):** The attacker scores victory points
   equal to its spark value for the attacking player.
 - **Only the active player has a character at the position:** Nothing happens —
   the active player's front-rank characters are blockers, not attackers.
 - **Neither player has a character at the position:** Nothing happens.
 
-**After Judgment:** Every character that participated in a judgment — whether as
-an attacker or blocker — returns to the back rank, even if it survived. Front-
-rank characters that did not participate in a judgment remain where they are.
+**After Judgment:** Every surviving character that participated in a judgment —
+whether as an attacker or blocker — returns to the back rank. Front-rank
+characters that did not participate in a judgment remain where they are.
 
 Back-rank characters are safe during Judgment — they do not fight and do not
 score points.
 
-**Summoning sickness:** When a character enters the battlefield, it is placed in
-the back rank. Characters cannot be moved to the front rank on the same turn
+**"Summoning sickness":** When a character enters the battlefield, it is placed
+in the back rank. Characters cannot be moved to the front rank on the same turn
 they were played.
 
 **Repositioning:** During the Main phase, a player can freely reposition their
 characters by moving them between front and back ranks and between columns
-within a rank (subject to summoning sickness and slot availability). Characters
+within a rank (subject to "summoning sickness" and slot availability). Characters
 cannot be repositioned outside the Main phase, and no cards can be played during
 Judgment.
 
@@ -231,7 +232,7 @@ main phase.
 **Materialize** — Put a character onto the battlefield's back rank. This is the
 term for a character entering play, whether from hand (played normally), from
 the void (via Reclaim or effects), from the deck (via effects), or as a token
-(Figments). Characters enter with summoning sickness and cannot move to the
+(Figments). Characters enter with "summoning sickness" and cannot move to the
 front rank on the turn they are materialized.
 
 **Prevent** — Counter a card on the stack, sending it to the void without

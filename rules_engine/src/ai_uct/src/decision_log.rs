@@ -100,12 +100,44 @@ pub struct TreeTraversalAccumulator {
     levels: Vec<DepthLevel>,
 }
 
-#[derive(Default)]
-struct DepthLevel {
-    player: Option<PlayerName>,
-    expansions: u32,
-    selections: u32,
-    expanded_actions: BTreeMap<String, u32>,
+/// Serializes a [DecisionLogEntry] and appends it to `ai_decisions.jsonl`.
+pub fn write_decision_log(entry: &DecisionLogEntry, request_context: &RequestContext) {
+    let Some(log_dir) = &request_context.logging_options.log_directory else {
+        return;
+    };
+    let path = log_dir.join("ai_decisions.jsonl");
+    let Ok(json) = serde_json::to_string(entry) else {
+        return;
+    };
+    let Ok(mut file) = OpenOptions::new().create(true).append(true).open(&path) else {
+        return;
+    };
+    let _ = writeln!(file, "{json}");
+}
+
+/// Builds a [GameStateSnapshot] from the current battle state.
+pub fn build_game_state_snapshot(battle: &BattleState) -> GameStateSnapshot {
+    GameStateSnapshot {
+        turn_id: battle.turn.turn_id.0,
+        active_player: format!("{:?}", battle.turn.active_player),
+        phase: format!("{:?}", battle.phase),
+        player_one: build_player_snapshot(battle, PlayerName::One),
+        player_two: build_player_snapshot(battle, PlayerName::Two),
+    }
+}
+
+/// Computes the maximum depth of a search tree via BFS.
+pub fn compute_tree_depth(graph: &SearchGraph, root: NodeIndex) -> u32 {
+    let mut max_depth = 0u32;
+    let mut queue = VecDeque::new();
+    queue.push_back((root, 0u32));
+    while let Some((node, depth)) = queue.pop_front() {
+        max_depth = max_depth.max(depth);
+        for edge in graph.edges(node) {
+            queue.push_back((edge.target(), depth + 1));
+        }
+    }
+    max_depth
 }
 
 impl TreeTraversalAccumulator {
@@ -149,44 +181,12 @@ impl TreeTraversalAccumulator {
     }
 }
 
-/// Serializes a [DecisionLogEntry] and appends it to `ai_decisions.jsonl`.
-pub fn write_decision_log(entry: &DecisionLogEntry, request_context: &RequestContext) {
-    let Some(log_dir) = &request_context.logging_options.log_directory else {
-        return;
-    };
-    let path = log_dir.join("ai_decisions.jsonl");
-    let Ok(json) = serde_json::to_string(entry) else {
-        return;
-    };
-    let Ok(mut file) = OpenOptions::new().create(true).append(true).open(&path) else {
-        return;
-    };
-    let _ = writeln!(file, "{json}");
-}
-
-/// Builds a [GameStateSnapshot] from the current battle state.
-pub fn build_game_state_snapshot(battle: &BattleState) -> GameStateSnapshot {
-    GameStateSnapshot {
-        turn_id: battle.turn.turn_id.0,
-        active_player: format!("{:?}", battle.turn.active_player),
-        phase: format!("{:?}", battle.phase),
-        player_one: build_player_snapshot(battle, PlayerName::One),
-        player_two: build_player_snapshot(battle, PlayerName::Two),
-    }
-}
-
-/// Computes the maximum depth of a search tree via BFS.
-pub fn compute_tree_depth(graph: &SearchGraph, root: NodeIndex) -> u32 {
-    let mut max_depth = 0u32;
-    let mut queue = VecDeque::new();
-    queue.push_back((root, 0u32));
-    while let Some((node, depth)) = queue.pop_front() {
-        max_depth = max_depth.max(depth);
-        for edge in graph.edges(node) {
-            queue.push_back((edge.target(), depth + 1));
-        }
-    }
-    max_depth
+#[derive(Default)]
+struct DepthLevel {
+    player: Option<PlayerName>,
+    expansions: u32,
+    selections: u32,
+    expanded_actions: BTreeMap<String, u32>,
 }
 
 fn build_player_snapshot(battle: &BattleState, player: PlayerName) -> PlayerSnapshot {

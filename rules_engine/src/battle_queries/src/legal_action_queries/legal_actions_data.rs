@@ -423,7 +423,15 @@ impl LegalActions {
                         Some(BattleAction::StartNextTurn)
                     }
                     _ => {
-                        if let Some(card_id) =
+                        // BeginPositioning is tried before card plays so that
+                        // MCTS tree exploration is not starved by an
+                        // ever-expanding set of PlayCardFromHand actions from
+                        // randomized opponent hands.
+                        if standard_actions.can_begin_positioning
+                            && !actions.contains(&BattleAction::BeginPositioning)
+                        {
+                            Some(BattleAction::BeginPositioning)
+                        } else if let Some(card_id) =
                             standard_actions.play_card_from_hand.iter().find(|&card_id| {
                                 !actions.contains(&BattleAction::PlayCardFromHand(card_id))
                             })
@@ -458,10 +466,6 @@ impl LegalActions {
                             })
                         {
                             Some(BattleAction::MoveCharacterToBackRank(id, pos))
-                        } else if standard_actions.can_begin_positioning
-                            && !actions.contains(&BattleAction::BeginPositioning)
-                        {
-                            Some(BattleAction::BeginPositioning)
                         } else {
                             None
                         }
