@@ -294,7 +294,8 @@ It remains in the front rank and can attack in the next judgment.
 with cards or abilities.
 
 **Focused** — This character cannot be moved to the front rank. It remains in
-the back rank permanently and cannot participate in judgment.
+the back rank permanently, cannot participate in judgment, and cannot pay focus
+costs.
 
 **Focus** — An activated ability that requires this character to skip its next
 judgment (it does not attack or block). The character remains in the back rank
