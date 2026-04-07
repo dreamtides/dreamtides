@@ -127,19 +127,17 @@ pub fn select_action_unchecked(
 fn next_assignment_action(battle: &BattleState, player: PlayerName) -> Option<BattleAction> {
     PENDING_ASSIGNMENT.with(|cell| {
         let mut assignment = cell.borrow_mut();
-        let Some(ref a) = *assignment else {
-            return None;
-        };
+        let a = (*assignment).as_ref()?;
 
         let legal = legal_actions::compute(battle, player);
 
         match &legal {
             LegalActions::SelectPositioningCharacter { .. } => {
                 for &(char_id, placement) in &a.placements {
-                    if let CharacterPlacement::MoveToFrontRank(_) = placement {
-                        if battle.cards.battlefield(player).is_in_back_rank(char_id) {
-                            return Some(BattleAction::SelectCharacterForPositioning(char_id));
-                        }
+                    if let CharacterPlacement::MoveToFrontRank(_) = placement
+                        && battle.cards.battlefield(player).is_in_back_rank(char_id)
+                    {
+                        return Some(BattleAction::SelectCharacterForPositioning(char_id));
                     }
                 }
                 *assignment = None;
@@ -147,10 +145,10 @@ fn next_assignment_action(battle: &BattleState, player: PlayerName) -> Option<Ba
             }
             LegalActions::AssignColumn { character, .. } => {
                 for &(char_id, placement) in &a.placements {
-                    if char_id == *character {
-                        if let CharacterPlacement::MoveToFrontRank(col) = placement {
-                            return Some(BattleAction::MoveCharacterToFrontRank(char_id, col));
-                        }
+                    if char_id == *character
+                        && let CharacterPlacement::MoveToFrontRank(col) = placement
+                    {
+                        return Some(BattleAction::MoveCharacterToFrontRank(char_id, col));
                     }
                 }
                 *assignment = None;
