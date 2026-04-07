@@ -3,7 +3,7 @@ use std::time::{Duration, Instant};
 
 use ai_data::game_ai::GameAI;
 use ai_uct::uct_config::UctConfig;
-use ai_uct::uct_search;
+use ai_uct::{uct_search, uct_search_v2};
 use battle_mutations::player_mutations::player_state;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::panic_with;
@@ -90,6 +90,15 @@ pub fn select_action_unchecked(
                 single_threaded: true,
             };
             uct_search::search(battle, player, &config)
+        }
+        GameAI::MonteCarloV2(thousands_of_iterations) => {
+            let config = UctConfig {
+                max_iterations_per_action: *thousands_of_iterations * 1000,
+                max_total_actions_multiplier: 6,
+                iteration_multiplier_override,
+                single_threaded: false,
+            };
+            uct_search_v2::search(battle, player, &config)
         }
         GameAI::WaitFiveSeconds => {
             thread::sleep(Duration::from_secs(5));

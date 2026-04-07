@@ -8,6 +8,7 @@ pub enum GameAI {
     RandomAction,
     MonteCarlo(u32),
     MonteCarloSingleThreaded(u32),
+    MonteCarloV2(u32),
     WaitFiveSeconds,
 }
 

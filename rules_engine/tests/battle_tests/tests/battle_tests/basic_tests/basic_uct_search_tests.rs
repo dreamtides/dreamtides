@@ -13,3 +13,14 @@ async fn test_monte_carlo_agent_basic_game() {
         "Enemy should have completed their turn"
     );
 }
+
+#[tokio::test]
+async fn test_monte_carlo_v2_agent_basic_game() {
+    let mut s = TestBattle::builder().enemy_agent(GameAI::MonteCarloV2(1)).connect();
+    s.perform_user_action(BattleAction::EndTurn);
+    assert_eq!(
+        s.user_client.last_game_message,
+        Some(GameMessageType::YourTurn),
+        "Enemy should have completed their turn"
+    );
+}
