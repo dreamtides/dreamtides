@@ -2,7 +2,8 @@ import { useState } from "react";
 import type { CardView, DisplayPlayer, GameAction } from "../types/battle";
 import { CardDisplay } from "./CardDisplay";
 
-const SLOT_COUNT = 8;
+const FRONT_SLOT_COUNT = 4;
+const BACK_SLOT_COUNT = 5;
 
 interface RankZoneProps {
   label: string;
@@ -48,11 +49,12 @@ export function RankZone({
   const [dragOverSlot, setDragOverSlot] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
+  const slotCount = rank === "Front" ? FRONT_SLOT_COUNT : BACK_SLOT_COUNT;
   const rankCards = cardsForRank(cards, player, rank);
-  const cardBySlot: (CardView | null)[] = Array.from({ length: SLOT_COUNT }, () => null);
+  const cardBySlot: (CardView | null)[] = Array.from({ length: slotCount }, () => null);
   for (const card of rankCards) {
     const idx = slotIndex(card);
-    if (idx >= 0 && idx < SLOT_COUNT) {
+    if (idx >= 0 && idx < slotCount) {
       cardBySlot[idx] = card;
     }
   }
@@ -128,7 +130,10 @@ export function RankZone({
       >
         {label}
       </span>
-      <div className="flex gap-1 justify-center items-center pt-3">
+      <div className="flex gap-1 justify-center items-center pt-3" style={{
+        paddingLeft: rank === "Front" ? 46 : 0,
+        paddingRight: rank === "Front" ? 46 : 0,
+      }}>
         {cardBySlot.map((card, i) =>
           card ? (
             <div
