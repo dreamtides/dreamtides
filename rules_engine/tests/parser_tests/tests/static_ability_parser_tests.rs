@@ -98,7 +98,7 @@ fn test_additional_cost_to_play_return_ally() {
 #[test]
 fn test_additional_cost_to_play_with_judgment() {
     let result = parse_abilities(
-        "To play this card, return an ally with cost {e} or more to hand.\n\n{Dawn} Draw {cards}.",
+        "To play this card, return an ally with cost {e} or more to hand.\n\n{Judgment} Draw {cards}.",
         "e: 4, c: 2",
     );
     assert_ron_snapshot!(result, @r###"
@@ -113,7 +113,7 @@ fn test_additional_cost_to_play_with_judgment() {
       )))),
       Triggered(TriggeredAbility(
         trigger: Keywords([
-          Dawn,
+          Judgment,
         ]),
         effect: Effect(DrawCards(
           count: 2,
@@ -303,10 +303,12 @@ fn test_reveal_and_play_from_top() {
 
 #[test]
 fn test_judgment_ability_of_allies_triggers_when_materialize() {
-    let result =
-        parse_ability("The '{Dawn}' ability of allies triggers when you {materialize} them.", "");
+    let result = parse_ability(
+        "The '{Judgment}' ability of allies triggers when you {materialize} them.",
+        "",
+    );
     assert_ron_snapshot!(result, @r###"
-    Static(StaticAbility(DawnTriggersWhenMaterialized(
+    Static(StaticAbility(JudgmentTriggersWhenMaterialized(
       predicate: Another(Character),
     )))
     "###);

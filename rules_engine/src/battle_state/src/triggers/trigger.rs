@@ -10,7 +10,6 @@ use crate::battle::card_id::{CharacterId, StackCardId, VoidCardId};
 pub enum Trigger {
     Abandonded(VoidCardId),
     Banished(VoidCardId),
-    Dawn(PlayerName),
     Discarded(VoidCardId),
     Dissolved(VoidCardId),
     PutIntoVoid(VoidCardId),
@@ -28,7 +27,6 @@ pub enum Trigger {
 pub enum TriggerName {
     Abandonded,
     Banished,
-    Dawn,
     Discarded,
     Dissolved,
     PutIntoVoid,
@@ -48,7 +46,6 @@ impl Trigger {
         match self {
             Trigger::Abandonded(..) => TriggerName::Abandonded,
             Trigger::Banished(..) => TriggerName::Banished,
-            Trigger::Dawn(..) => TriggerName::Dawn,
             Trigger::Discarded(..) => TriggerName::Discarded,
             Trigger::Dissolved(..) => TriggerName::Dissolved,
             Trigger::PutIntoVoid(..) => TriggerName::PutIntoVoid,

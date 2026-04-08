@@ -23,7 +23,7 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
             discover_and_materialize(),
             discover(),
             counterspell_effects(),
-            trigger_dawn_ability(),
+            trigger_judgment_ability(),
         ))
         .boxed(),
         choice((
@@ -52,7 +52,7 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
                 materialize_character(),
             ))
             .boxed(),
-            trigger_additional_dawn_phase(),
+            trigger_additional_judgment_phase(),
             take_extra_turn(),
         ))
         .boxed(),
@@ -294,14 +294,14 @@ pub fn copy_it<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserE
     word("copy").ignore_then(word("it")).to(StandardEffect::Copy { target: Predicate::It })
 }
 
-pub fn trigger_additional_dawn_phase<'a>(
+pub fn trigger_additional_judgment_phase<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     words(&["at", "the", "end", "of", "this", "turn"])
         .ignore_then(comma())
         .ignore_then(words(&["trigger", "an", "additional"]))
-        .ignore_then(directive("dawn_phase_name"))
+        .ignore_then(directive("judgment_phase_name"))
         .ignore_then(word("phase"))
-        .to(StandardEffect::TriggerAdditionalDawnPhaseAtEndOfTurn)
+        .to(StandardEffect::TriggerAdditionalJudgmentPhaseAtEndOfTurn)
 }
 
 pub fn take_extra_turn<'a>(
@@ -310,13 +310,13 @@ pub fn take_extra_turn<'a>(
         .to(StandardEffect::TakeExtraTurn)
 }
 
-pub fn trigger_dawn_ability<'a>(
+pub fn trigger_judgment_ability<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     words(&["trigger", "the"])
-        .ignore_then(directive("dawn"))
+        .ignore_then(directive("judgment"))
         .ignore_then(words(&["ability", "of", "each"]))
         .ignore_then(predicate_parser::predicate_parser())
-        .map(|matching| StandardEffect::TriggerDawnAbility {
+        .map(|matching| StandardEffect::TriggerJudgmentAbility {
             matching,
             collection: CollectionExpression::All,
         })

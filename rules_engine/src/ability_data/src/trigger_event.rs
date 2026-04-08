@@ -30,7 +30,7 @@ pub enum TriggerEvent {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum TriggerKeyword {
     Materialized,
-    Dawn,
+    Judgment,
     Dissolved,
 }
 

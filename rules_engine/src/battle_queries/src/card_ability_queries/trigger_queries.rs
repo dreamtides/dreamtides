@@ -186,7 +186,6 @@ pub fn triggering_card_id(trigger: Trigger) -> Option<CardId> {
     match trigger {
         Trigger::Abandonded(card_id) => Some(card_id.card_id()),
         Trigger::Banished(card_id) => Some(card_id.card_id()),
-        Trigger::Dawn(..) => None,
         Trigger::Discarded(card_id) => Some(card_id.card_id()),
         Trigger::Dissolved(card_id) => Some(card_id.card_id()),
         Trigger::PutIntoVoid(card_id) => Some(card_id.card_id()),
@@ -212,8 +211,8 @@ fn matches_keyword(
             Trigger::Materialized(card_id) => owning_card_id == card_id.card_id(),
             _ => false,
         },
-        TriggerKeyword::Dawn => match trigger {
-            Trigger::Dawn(player) => owning_card_controller == player,
+        TriggerKeyword::Judgment => match trigger {
+            Trigger::Judgment(player) => owning_card_controller == player,
             _ => false,
         },
         TriggerKeyword::Dissolved => match trigger {

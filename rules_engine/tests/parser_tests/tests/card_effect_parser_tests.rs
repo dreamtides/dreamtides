@@ -3,11 +3,11 @@ use parser_tests::test_helpers::*;
 
 #[test]
 fn test_dawn_gain_points() {
-    let result = parse_ability("{Dawn} Gain {points}.", "p: 2");
+    let result = parse_ability("{Judgment} Gain {points}.", "p: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Dawn,
+        Judgment,
       ]),
       effect: Effect(GainPoints(
         gains: Points(2),
@@ -49,13 +49,13 @@ fn test_materialized_draw_cards_for_each_allied_subtype() {
 }
 
 #[test]
-fn test_materialized_dawn_gain_energy() {
-    let result = parse_ability("{Materialized_Dawn} Gain {e}.", "e: 1");
+fn test_materialized_judgment_gain_energy() {
+    let result = parse_ability("{Materialized_Judgment} Gain {e}.", "e: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
         Materialized,
-        Dawn,
+        Judgment,
       ]),
       effect: Effect(GainEnergy(
         gains: Energy(1),
@@ -127,11 +127,11 @@ fn test_gain_energy_draw_cards() {
 
 #[test]
 fn test_dawn_gain_energy_draw_cards() {
-    let result = parse_ability("{Dawn} Gain {e}. Draw {cards}.", "e: 1, c: 2");
+    let result = parse_ability("{Judgment} Gain {e}. Draw {cards}.", "e: 1, c: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Dawn,
+        Judgment,
       ]),
       effect: List([
         EffectWithOptions(
@@ -266,11 +266,11 @@ fn test_materialized_gain_energy() {
 
 #[test]
 fn test_dawn_draw_then_discard() {
-    let result = parse_ability("{Dawn} Draw {cards}, then discard {discards}.", "c: 2, d: 1");
+    let result = parse_ability("{Judgment} Draw {cards}, then discard {discards}.", "c: 2, d: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Dawn,
+        Judgment,
       ]),
       effect: List([
         EffectWithOptions(
@@ -404,11 +404,11 @@ fn test_materialized_return_character_from_void_to_hand() {
 
 #[test]
 fn test_dawn_return_this_from_void_to_hand() {
-    let result = parse_ability("{Dawn} Return this character from your void to your hand.", "");
+    let result = parse_ability("{Judgment} Return this character from your void to your hand.", "");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Dawn,
+        Judgment,
       ]),
       effect: Effect(ReturnFromYourVoidToHand(
         target: This,
@@ -448,13 +448,13 @@ fn test_you_may_return_character_from_void_draw_cards() {
 #[test]
 fn test_dawn_you_may_pay_to_return_this_from_void_to_hand() {
     let result = parse_ability(
-        "{Dawn} You may pay {e} to return this character from your void to your hand.",
+        "{Judgment} You may pay {e} to return this character from your void to your hand.",
         "e: 1",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Dawn,
+        Judgment,
       ]),
       effect: WithOptions(EffectWithOptions(
         effect: ReturnFromYourVoidToHand(
@@ -521,11 +521,11 @@ fn test_discard_chosen_card_with_cost_from_opponent_hand() {
 #[test]
 fn test_dawn_you_may_draw_then_discard() {
     let result =
-        parse_ability("{Dawn} You may draw {cards}, then discard {discards}.", "c: 2, d: 1");
+        parse_ability("{Judgment} You may draw {cards}, then discard {discards}.", "c: 2, d: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Dawn,
+        Judgment,
       ]),
       effect: List([
         EffectWithOptions(
@@ -562,11 +562,11 @@ fn test_materialized_each_player_discards() {
 
 #[test]
 fn test_dawn_each_player_abandons_character() {
-    let result = parse_ability("{Dawn} Each player abandons a character.", "");
+    let result = parse_ability("{Judgment} Each player abandons a character.", "");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Dawn,
+        Judgment,
       ]),
       effect: Effect(EachPlayerAbandonsCharacters(
         matching: Character,
@@ -639,16 +639,16 @@ fn test_banish_up_to_n_then_materialize_them() {
 }
 
 #[test]
-fn test_materialized_dawn_banish_ally_with_spark_then_materialize_it() {
+fn test_materialized_judgment_banish_ally_with_spark_then_materialize_it() {
     let result = parse_ability(
-        "{Materialized_Dawn} {Banish} an ally with spark {s} or less, then {materialize} it.",
+        "{Materialized_Judgment} {Banish} an ally with spark {s} or less, then {materialize} it.",
         "s: 2",
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
         Materialized,
-        Dawn,
+        Judgment,
       ]),
       effect: Effect(BanishThenMaterialize(
         target: Another(CharacterWithSpark(Spark(2), OrLess)),

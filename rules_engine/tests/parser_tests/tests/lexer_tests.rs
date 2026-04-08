@@ -51,11 +51,11 @@ fn test_card_2_discover() {
 
 #[test]
 fn test_card_3_judgment_return() {
-    let input = "{Dawn} Return this character from your void to your hand.";
+    let input = "{Judgment} Return this character from your void to your hand.";
     let result = lexer_tokenize::lex(input).expect("lexing should succeed");
 
     assert_eq!(tokens(&result), vec![
-        &Token::Directive("dawn".to_string()),
+        &Token::Directive("judgment".to_string()),
         &Token::Word("return".to_string()),
         &Token::Word("this".to_string()),
         &Token::Word("character".to_string()),
@@ -71,11 +71,11 @@ fn test_card_3_judgment_return() {
 
 #[test]
 fn test_card_4_judgment_may_discard() {
-    let input = "{Dawn} You may discard {discards} to draw {cards} and gain {points}.";
+    let input = "{Judgment} You may discard {discards} to draw {cards} and gain {points}.";
     let result = lexer_tokenize::lex(input).expect("lexing should succeed");
 
     assert_eq!(tokens(&result), vec![
-        &Token::Directive("dawn".to_string()),
+        &Token::Directive("judgment".to_string()),
         &Token::Word("you".to_string()),
         &Token::Word("may".to_string()),
         &Token::Word("discard".to_string()),
@@ -111,11 +111,11 @@ fn test_card_5_draw_discard_reclaim() {
 #[test]
 fn test_card_6_judgment_banish_dissolve() {
     let input =
-        "{Dawn} You may {banish} {cards} from your void to {dissolve} an enemy with cost {e} or less.";
+        "{Judgment} You may {banish} {cards} from your void to {dissolve} an enemy with cost {e} or less.";
     let result = lexer_tokenize::lex(input).expect("lexing should succeed");
 
     assert_eq!(tokens(&result), vec![
-        &Token::Directive("dawn".to_string()),
+        &Token::Directive("judgment".to_string()),
         &Token::Word("you".to_string()),
         &Token::Word("may".to_string()),
         &Token::Directive("banish".to_string()),
@@ -258,11 +258,11 @@ fn test_lowercase_conversion() {
 
 #[test]
 fn test_directive_lowercase_conversion() {
-    let input = "{Dawn} {CARDS}";
+    let input = "{Judgment} {CARDS}";
     let result = lexer_tokenize::lex(input).expect("lexing should succeed");
 
     assert_eq!(tokens(&result), vec![
-        &Token::Directive("dawn".to_string()),
+        &Token::Directive("judgment".to_string()),
         &Token::Directive("cards".to_string()),
     ]);
 }
@@ -334,11 +334,11 @@ fn test_apostrophe_in_word() {
 
 #[test]
 fn test_combined_trigger_directive() {
-    let input = "{Materialized_Dawn} Gain {e}.";
+    let input = "{Materialized_Judgment} Gain {e}.";
     let result = lexer_tokenize::lex(input).expect("lexing should succeed");
 
     assert_eq!(tokens(&result), vec![
-        &Token::Directive("materialized_dawn".to_string()),
+        &Token::Directive("materialized_judgment".to_string()),
         &Token::Word("gain".to_string()),
         &Token::Directive("e".to_string()),
         &Token::Period,

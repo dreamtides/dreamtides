@@ -37,7 +37,7 @@ const CARDS_TOML_PATH: &str = "rules_engine/tabula/cards.toml";
   parser parse \"Draw {cards}.\" --vars \"cards: 2\" --stage lex
 
   # Resolve variables for a dawn trigger
-  parser parse \"{Dawn} Gain {e}.\" --vars \"e: 3\" --stage resolve-variables --format json
+  parser parse \"{Judgment} Gain {e}.\" --vars \"e: 3\" --stage resolve-variables --format json
 
   # Parse compound directive (figments)
   parser parse \"{Materialize} {n-figments}.\" --vars \"number: 3, figment: radiant\" --stage resolve-variables
@@ -46,7 +46,7 @@ const CARDS_TOML_PATH: &str = "rules_engine/tabula/cards.toml";
   parser parse \"Allied {plural-subtype} have +{s} spark.\" --vars \"subtype: Warrior, s: 2\" --stage resolve-variables --format ron
 
   # Parse multi-variable ability with debug output
-  parser parse \"{Dawn} You may discard {discards} to draw {cards} and gain {points}.\" \\
+  parser parse \"{Judgment} You may discard {discards} to draw {cards} and gain {points}.\" \\
     --vars \"discards: 1, cards: 1, points: 1\" --stage resolve-variables --format debug
 
   # Parse all cards from TOML file

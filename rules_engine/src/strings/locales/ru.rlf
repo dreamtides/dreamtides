@@ -12,12 +12,12 @@ maximum_energy($max) = "максимум {energy_symbol}";
 
 trigger($t) = "▸ <b>{$t}:</b>";
 materialized = "▸ <b>Воплощён:</b>";
-dawn = "▸ <b>Рассвет:</b>";
+judgment = "▸ <b>Суд:</b>";
 dissolved = "▸ <b>Рассеян:</b>";
-materialized_dawn = "▸ <b>Воплощён, Рассвет:</b>";
+materialized_judgment = "▸ <b>Воплощён, Суд:</b>";
 materialized_dissolved = "▸ <b>Воплощён, Рассеян:</b>";
-dawn_phase_name = "<b>Рассвет</b>";
-dawn_keyword_name = "Рассвет";
+judgment_phase_name = "<b>Суд</b>";
+judgment_keyword_name = "Суд";
 materialized_keyword_name = "Воплощён";
 dissolved_keyword_name = "Рассеян";
 
@@ -733,7 +733,7 @@ banish_cards_from_enemy_void_effect($c) = {
 };
 banish_enemy_void_effect =
     "изгоните все карты из Пустоты противника";
-dawn_phase_at_end_of_turn_effect = "в конце этого хода проведите дополнительную фазу <b>Рассвета</b>";
+judgment_phase_at_end_of_turn_effect = "в конце этого хода проведите дополнительную фазу <b>Суда</b>";
 multiply_energy_effect($n) =
     "удвойте количество {energy_symbol}, которое у вас есть";
 spend_all_energy_dissolve_effect = "потратьте все ваши {energy_symbol}. {@cap dissolve} врага стоимостью не больше потраченного количества";
@@ -1475,10 +1475,10 @@ materialize_copies_equal_to_energy($target) = "{materialize} столько ко
 materialize_copies_equal_to_quantity($target, $quantity) =
     "{materialize} столько копий {$target}, сколько у вас {$quantity}";
 
-trigger_dawn_of_collection($target) =
-    "срабатывает способность «{dawn}» {$target}";
-trigger_dawn_of_each($target) = :from($target)
-    "срабатывает способность «{dawn}» каждого {$target:gen}";
+trigger_judgment_of_collection($target) =
+    "срабатывает способность «{judgment}» {$target}";
+trigger_judgment_of_each($target) = :from($target)
+    "срабатывает способность «{judgment}» каждого {$target:gen}";
 
 
 materialize_figments_for_each_quantity($fig, $quantity) =
@@ -1641,7 +1641,7 @@ you_may_look_at_top_card =
     "вы можете посмотреть верхнюю карту вашей колоды";
 you_may_play_from_top_of_deck($matching) = :from($matching)
     "вы можете играть {$matching:other} с верха вашей колоды";
-dawn_triggers_when_materialized($matching) = "способность {$matching:other} «{Dawn}» срабатывает, когда вы воплощаете их";
+judgment_triggers_when_materialized($matching) = "способность {$matching:other} «{Judgment}» срабатывает, когда вы воплощаете их";
 spark_equal_to_predicate_count($matching) =
     "Искра {this_character:gen} равна количеству {$matching:other}";
 play_only_from_void = "вы можете играть этого персонажа только из вашей Пустоты";

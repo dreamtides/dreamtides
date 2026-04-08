@@ -6,7 +6,7 @@ use serde::Serialize;
 use crate::lexer::lexer_token::{Spanned, Token};
 use crate::variables::parser_bindings::VariableBindings;
 
-static BARE_PHRASES: &[&str] = &["choose_one", "dawn_phase_name", "energy_symbol"];
+static BARE_PHRASES: &[&str] = &["choose_one", "judgment_phase_name", "energy_symbol"];
 
 static FIGMENT_PHRASES: &[(&str, &str)] = &[("figment", "g"), ("figments", "g")];
 

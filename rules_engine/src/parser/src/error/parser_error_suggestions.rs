@@ -164,7 +164,7 @@ mod tests {
         let suggestions = suggest_directive("dwan_phase_name");
         assert!(suggestions.is_some());
         let suggestions = suggestions.unwrap();
-        assert!(suggestions.contains(&"dawn_phase_name".to_string()));
+        assert!(suggestions.contains(&"judgment_phase_name".to_string()));
     }
     #[test]
     fn test_suggest_directive_no_match() {

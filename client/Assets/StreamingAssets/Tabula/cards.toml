@@ -34,7 +34,7 @@ name = "Scrap Reclaimer"
 id = "a04cb59f-1ce6-48e7-9a2d-5e3b09613e6a"
 energy-cost = 4
 rules-text = """
-{Dawn} Return this character from your void to your hand.
+{Judgment} Return this character from your void to your hand.
 """
 card-type = "Character"
 subtype = "Tinkerer"
@@ -52,7 +52,7 @@ name = "Evacuation Enforcer"
 id = "5aee5a0d-c22a-4c09-9612-248d28c3df2f"
 energy-cost = 2
 rules-text = """
-{Dawn} You may draw {cards($c)}, then discard {cards($d)}.
+{Judgment} You may draw {cards($c)}, then discard {cards($d)}.
 """
 variables = """
 c: 2
@@ -111,7 +111,7 @@ variables = ""
 name = "Pattern Seeker"
 id = "bd9ec464-fac5-4f42-85f5-2c61e2f04636"
 energy-cost = 2
-rules-text = "{Dawn} You may discard {cards($d)} to draw {cards($c)} and gain {points($p)}."
+rules-text = "{Judgment} You may discard {cards($d)} to draw {cards($c)} and gain {points($p)}."
 variables = """
 d: 1
 c: 1
@@ -146,7 +146,7 @@ variables = ""
 name = "Synaptic Sentinel"
 id = "c9531521-b8ae-4ce0-8857-474e60aa814a"
 energy-cost = 3
-rules-text = "{Dawn} {Foresee($f)}."
+rules-text = "{Judgment} {Foresee($f)}."
 variables = "f: 1"
 card-type = "Character"
 subtype = "Agent"
@@ -195,7 +195,7 @@ subtype = ""
 name = "Ethereal Trailblazer"
 id = "2c037f79-f049-4f19-b73a-50231ad7e751"
 energy-cost = 0
-rules-text = "{Dawn} Gain {energy($e)}."
+rules-text = "{Judgment} Gain {energy($e)}."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Warrior"
@@ -258,7 +258,7 @@ resonance = ["Tide", "Stone"]
 name = "Eclipse Herald"
 id = "e5ac026b-a397-47ee-929d-46de1177784c"
 energy-cost = 2
-rules-text = "{Dawn} You may {banish} {cards($c)} from your void to {dissolve} an enemy with cost {energy($e)} or less. "
+rules-text = "{Judgment} You may {banish} {cards($c)} from your void to {dissolve} an enemy with cost {energy($e)} or less. "
 variables = """
 c: 3
 e: 2"""
@@ -277,7 +277,7 @@ name = "Chronicle Reclaimer"
 id = "177f4f38-2265-459d-a0a5-db196f32c6e1"
 energy-cost = 2
 rules-text = """
-{Dawn} Draw {cards($c)}, then discard {cards($d)}.
+{Judgment} Draw {cards($c)}, then discard {cards($d)}.
 """
 variables = """
 c: 1
@@ -329,7 +329,7 @@ resonance = ["Tide"]
 name = "The Calling Night"
 id = "be97e5e0-eebb-4b90-a676-fcf909b35600"
 energy-cost = 2
-rules-text = "{Dawn} Draw {cards($c)}, then the opponent gains {points($p)}."
+rules-text = "{Judgment} Draw {cards($c)}, then the opponent gains {points($p)}."
 variables = """
 c: 1
 p: 2"""
@@ -417,7 +417,7 @@ spark = ""
 name = "Duneveil Vanguard"
 id = "adfd1cfe-459b-4a9b-bc90-203847082a03"
 energy-cost = 2
-rules-text = "{Dawn} You may discard {cards($d)} to {dissolve} an enemy with spark {$s} or less."
+rules-text = "{Judgment} You may discard {cards($d)} to {dissolve} an enemy with spark {$s} or less."
 variables = """
 d: 1
 s: 1"""
@@ -523,7 +523,7 @@ resonance = ["Flame"]
 name = "The Dread Sovereign"
 id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
 energy-cost = 3
-rules-text = "{Dawn} You may abandon {@a subtype($t)} to {discover} {@a subtype($t)} with cost {energy($e)} higher and {materialize} it."
+rules-text = "{Judgment} You may abandon {@a subtype($t)} to {discover} {@a subtype($t)} with cost {energy($e)} higher and {materialize} it."
 variables = """
 t: Warrior
 e: 1"""
@@ -765,7 +765,7 @@ resonance = ["Tide"]
 name = "Wolfbond Chieftain"
 id = "a5275ef5-2896-4a0a-89de-96b241e05472"
 energy-cost = 0
-rules-text = "{Materialized_Dawn} With {count_allied_subtype($a, $t)}, gain {energy($e)}. "
+rules-text = "{Materialized_Judgment} With {count_allied_subtype($a, $t)}, gain {energy($e)}. "
 variables = """
 t: Warrior
 a: 2
@@ -784,7 +784,7 @@ resonance = ["Flame"]
 name = "Dawnblade Wanderer"
 id = "d8f9abc2-a864-47b9-96e6-2ced9f9ba208"
 energy-cost = 1
-rules-text = "{Materialized_Dawn} Gain {energy($e)}."
+rules-text = "{Materialized_Judgment} Gain {energy($e)}."
 variables = "e: 2"
 card-type = "Character"
 subtype = "Warrior"
@@ -887,7 +887,7 @@ resonance = ["Flame", "Stone"]
 name = "Spirit Field Reclaimer"
 id = "7d1820ef-80c4-415e-bc36-7d361259225c"
 energy-cost = 2
-rules-text = "{Dawn} You may pay {energy($e)} to {kindle($k)} and {banish} {cards($c)} from the opponent's void."
+rules-text = "{Judgment} You may pay {energy($e)} to {kindle($k)} and {banish} {cards($c)} from the opponent's void."
 variables = """
 e: 1
 k: 1
@@ -1254,7 +1254,7 @@ name = "Horizon Follower"
 id = "d124e9cc-407f-4288-9a09-78e426c00761"
 energy-cost = 2
 rules-text = """
-{Dawn} Gain {points($p)}.
+{Judgment} Gain {points($p)}.
 """
 variables = "p: 1"
 card-type = "Character"
@@ -1288,7 +1288,7 @@ energy-cost = 2
 rules-text = """
 Has all character types.
 
-{Dawn} With {count_allies($a)} that share a character type, draw {cards($c)}."""
+{Judgment} With {count_allies($a)} that share a character type, draw {cards($c)}."""
 variables = """
 a: 3
 c: 1"""
@@ -1356,7 +1356,7 @@ energy-cost = 5
 rules-text = """
 To play this card, return an ally with cost {energy($e)} or more to hand.
 
-{Dawn} Draw {cards($c)}."""
+{Judgment} Draw {cards($c)}."""
 variables = """
 e: 3
 c: 1"""
@@ -1443,7 +1443,7 @@ variables = ""
 name = "Lantern Keeper"
 id = "81008e3a-e2d1-4d7e-a13a-1583ef75b2ff"
 energy-cost = 4
-rules-text = "{Dawn} Gain {points($p)}."
+rules-text = "{Judgment} Gain {points($p)}."
 variables = "p: 2"
 card-type = "Character"
 subtype = "Visitor"
@@ -1698,7 +1698,7 @@ spark = ""
 name = "Surge of Fury"
 id = "ab07f1aa-ca7a-4716-988e-281ab871baf4"
 energy-cost = 1
-rules-text = "At the end of this turn, trigger an additional {dawn_phase_name} phase."
+rules-text = "At the end of this turn, trigger an additional {judgment_phase_name} phase."
 card-type = "Event"
 is-fast = false
 image-number = 1968259702
@@ -2086,7 +2086,7 @@ resonance = ["Flame"]
 name = "Conduit of Resonance"
 id = "cb474c3f-1670-4e44-88d9-bef6475a4199"
 energy-cost = 5
-rules-text = "When you {materialize} a character, trigger the {Dawn} ability of each ally."
+rules-text = "When you {materialize} a character, trigger the {Judgment} ability of each ally."
 card-type = "Character"
 subtype = "Super"
 is-fast = false
@@ -2119,7 +2119,7 @@ name = "Ghostlight Wolves"
 id = "b7bc3d79-3c83-4015-92c5-1984c37830f3"
 energy-cost = 3
 rules-text = """
-{Dawn} Gain {energy($e)} for each allied {subtype($t)}.
+{Judgment} Gain {energy($e)} for each allied {subtype($t)}.
 """
 variables = """
 e: 1
@@ -2170,7 +2170,7 @@ variables = ""
 name = "Blazing Emberwing"
 id = "5ed4d321-07d9-4607-9897-3a645df8c012"
 energy-cost = 3
-rules-text = "The '{Dawn}' ability of allies triggers when you {materialize} them."
+rules-text = "The '{Judgment}' ability of allies triggers when you {materialize} them."
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -2204,7 +2204,7 @@ resonance = ["Thunder"]
 name = "Luminwings"
 id = "2621f88d-3207-40ec-840a-3d45fb5ed10f"
 energy-cost = 1
-rules-text = "{Dawn} With {count_allied_subtype($a, $t)}, gain {energy($e)}."
+rules-text = "{Judgment} With {count_allied_subtype($a, $t)}, gain {energy($e)}."
 variables = """
 t: SpiritAnimal
 a: 2
@@ -2223,7 +2223,7 @@ resonance = ["Thunder"]
 name = "Spirit of the Greenwood"
 id = "e1c49dfb-d84b-440e-80ef-029719c172d3"
 energy-cost = 3
-rules-text = "{Dawn} Gain {energy($e)} for each allied character."
+rules-text = "{Judgment} Gain {energy($e)} for each allied character."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -2323,7 +2323,7 @@ resonance = ["Thunder"]
 name = "Spiritbound Alpha"
 id = "86e31227-afab-4eb3-a53f-53e08c7ff227"
 energy-cost = 2
-rules-text = "{Dawn} You may pay {energy($e)} to have each allied {subtype($t)} gain +{$s} spark."
+rules-text = "{Judgment} You may pay {energy($e)} to have each allied {subtype($t)} gain +{$s} spark."
 variables = """
 e: 4
 t: SpiritAnimal
@@ -2363,7 +2363,7 @@ name = "Ebonwing"
 id = "2ff0d711-4202-4dca-983d-96622849b76a"
 energy-cost = 1
 rules-text = """
-{Materialized_Dawn} {Kindle($k)}.
+{Materialized_Judgment} {Kindle($k)}.
 """
 variables = "k: 1"
 card-type = "Character"
@@ -2414,7 +2414,7 @@ resonance = ["Flame"]
 name = "Driftcaller Sovereign"
 id = "919f4169-7a9d-4004-871f-9f36e3761e72"
 energy-cost = 1
-rules-text = "{Materialized_Dawn} Gain {energy($e)}."
+rules-text = "{Materialized_Judgment} Gain {energy($e)}."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -2430,7 +2430,7 @@ resonance = ["Thunder"]
 name = "Emerald Guardian"
 id = "08daba86-8d26-416c-ac16-4c7c2185951f"
 energy-cost = 3
-rules-text = "{Dawn} Gain {energy($e)}."
+rules-text = "{Judgment} Gain {energy($e)}."
 variables = "e: 2"
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -2536,7 +2536,7 @@ variables = ""
 name = "Flickerveil Adept"
 id = "d8017d8f-7855-47e5-bfe5-89ca2e7c5203"
 energy-cost = 4
-rules-text = "{Materialized_Dawn} {Banish} an ally with spark {$s} or less, then {materialize} it."
+rules-text = "{Materialized_Judgment} {Banish} an ally with spark {$s} or less, then {materialize} it."
 variables = "s: 2"
 card-type = "Character"
 subtype = "Mage"
@@ -2688,7 +2688,7 @@ name = "Blooming Path Wanderer"
 id = "dce8efc8-2643-47a4-ae13-4b9a7e4ba8bb"
 energy-cost = 3
 rules-text = """
-{Dawn} You may {banish} an ally, then {materialize} it.
+{Judgment} You may {banish} an ally, then {materialize} it.
 """
 card-type = "Character"
 subtype = "Explorer"
@@ -2824,7 +2824,7 @@ spark = ""
 name = "Dimensional Pathfinder"
 id = "6e7c552f-23b5-431a-9d50-f7706e27166a"
 energy-cost = 3
-rules-text = "{Dawn} You may pay {energy($e)} to {banish} {up_to_n_allies($n)}, then {materialize} {pronoun:$n}."
+rules-text = "{Judgment} You may pay {energy($e)} to {banish} {up_to_n_allies($n)}, then {materialize} {pronoun:$n}."
 variables = """
 e: 3
 n: 2"""
@@ -2961,7 +2961,7 @@ resonance = ["Stone"]
 name = "Hope's Vanguard"
 id = "c08ffd90-ef79-48f7-9aa2-22875acbeba4"
 energy-cost = 2
-rules-text = "{Materialized_Dawn} With {count_allied_subtype($a, $t)}, draw {cards($c)}. "
+rules-text = "{Materialized_Judgment} With {count_allied_subtype($a, $t)}, draw {cards($c)}. "
   variables = """
 a: 2
 t: Survivor
@@ -3150,7 +3150,7 @@ resonance = ["Stone", "Tide"]
 name = "Wreckheap Survivor"
 id = "b5d3ce4f-2587-47a6-b8c2-d73204d4c05a"
 energy-cost = 3
-rules-text = "{Dawn} You may pay {energy($e)} to return this character from your void to your hand."
+rules-text = "{Judgment} You may pay {energy($e)} to return this character from your void to your hand."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Survivor"
@@ -3216,7 +3216,7 @@ resonance = ["Stone"]
 name = "Ruin Scavenger"
 id = "6a95e4f6-75c7-435b-ae21-35a01e58c0b1"
 energy-cost = 1
-rules-text = "{Dawn} You may {banish} {cards($c)} from the opponent's void to gain {energy($e)}."
+rules-text = "{Judgment} You may {banish} {cards($c)} from the opponent's void to gain {energy($e)}."
 variables = """
 c: 1
 e: 1"""
@@ -3654,7 +3654,7 @@ spark = ""
 name = "Nightmare Manifest"
 id = "cc474374-2538-4e5d-9b84-15ed70b0c774"
 energy-cost = 1
-rules-text = "{Dawn} Each player abandons a character."
+rules-text = "{Judgment} Each player abandons a character."
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false

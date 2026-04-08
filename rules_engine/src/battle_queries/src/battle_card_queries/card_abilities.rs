@@ -324,8 +324,8 @@ fn watch_for_battlefield_triggers(event: &TriggerEvent) -> EnumSet<TriggerName> 
                     TriggerKeyword::Materialized => {
                         triggers.insert(TriggerName::Materialized);
                     }
-                    TriggerKeyword::Dawn => {
-                        triggers.insert(TriggerName::Dawn);
+                    TriggerKeyword::Judgment => {
+                        triggers.insert(TriggerName::Judgment);
                     }
                     TriggerKeyword::Dissolved => {
                         triggers.insert(TriggerName::Dissolved);

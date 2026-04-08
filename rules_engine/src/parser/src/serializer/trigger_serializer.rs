@@ -68,10 +68,12 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> Phrase {
 /// Serializes a keyword trigger list to its phrase representation.
 fn serialize_keyword_trigger(keywords: &[TriggerKeyword]) -> Phrase {
     match keywords {
-        [TriggerKeyword::Dawn] => strings::dawn(),
+        [TriggerKeyword::Judgment] => strings::judgment(),
         [TriggerKeyword::Materialized] => strings::materialized(),
         [TriggerKeyword::Dissolved] => strings::dissolved(),
-        [TriggerKeyword::Materialized, TriggerKeyword::Dawn] => strings::materialized_dawn(),
+        [TriggerKeyword::Materialized, TriggerKeyword::Judgment] => {
+            strings::materialized_judgment()
+        }
         [TriggerKeyword::Materialized, TriggerKeyword::Dissolved] => {
             strings::materialized_dissolved()
         }
@@ -86,7 +88,7 @@ fn serialize_keyword_trigger(keywords: &[TriggerKeyword]) -> Phrase {
 /// Returns the display name for a trigger keyword.
 fn serialize_keyword_name(keyword: &TriggerKeyword) -> String {
     match keyword {
-        TriggerKeyword::Dawn => strings::dawn_keyword_name().to_string(),
+        TriggerKeyword::Judgment => strings::judgment_keyword_name().to_string(),
         TriggerKeyword::Materialized => strings::materialized_keyword_name().to_string(),
         TriggerKeyword::Dissolved => strings::dissolved_keyword_name().to_string(),
     }

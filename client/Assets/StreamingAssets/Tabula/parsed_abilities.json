@@ -124,7 +124,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -406,7 +406,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -701,7 +701,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -795,7 +795,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -832,7 +832,7 @@
         "trigger": {
           "Keywords": [
             "Materialized",
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -1546,7 +1546,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -1871,7 +1871,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -2007,7 +2007,7 @@
     {
       "Static": {
         "StaticAbility": {
-          "DawnTriggersWhenMaterialized": {
+          "JudgmentTriggersWhenMaterialized": {
             "predicate": {
               "Another": "Character"
             }
@@ -2189,7 +2189,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -2286,7 +2286,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -2552,7 +2552,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -2621,7 +2621,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -2726,7 +2726,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -2915,7 +2915,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -3243,7 +3243,7 @@
         "trigger": {
           "Keywords": [
             "Materialized",
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -3275,6 +3275,24 @@
           "Effect": {
             "GainsSpark": {
               "target": "This",
+              "gains": 1
+            }
+          }
+        }
+      }
+    }
+  ],
+  "94b6509b-fe6a-400a-baf8-4d39adc4b296": [
+    {
+      "Triggered": {
+        "trigger": {
+          "Keywords": [
+            "Judgment"
+          ]
+        },
+        "effect": {
+          "Effect": {
+            "GainEnergy": {
               "gains": 1
             }
           }
@@ -3457,7 +3475,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -3571,7 +3589,7 @@
         "trigger": {
           "Keywords": [
             "Materialized",
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -3732,7 +3750,7 @@
     {
       "Event": {
         "effect": {
-          "Effect": "TriggerAdditionalDawnPhaseAtEndOfTurn"
+          "Effect": "TriggerAdditionalJudgmentPhaseAtEndOfTurn"
         }
       }
     }
@@ -3767,7 +3785,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -3876,7 +3894,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -3918,7 +3936,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -4076,7 +4094,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -4102,7 +4120,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -4160,7 +4178,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -4192,7 +4210,7 @@
         "trigger": {
           "Keywords": [
             "Materialized",
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -4326,7 +4344,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -4385,7 +4403,7 @@
         },
         "effect": {
           "Effect": {
-            "TriggerDawnAbility": {
+            "TriggerJudgmentAbility": {
               "matching": {
                 "Another": "Character"
               },
@@ -4420,7 +4438,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -4560,7 +4578,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -4710,7 +4728,7 @@
         "trigger": {
           "Keywords": [
             "Materialized",
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -4761,7 +4779,7 @@
         "trigger": {
           "Keywords": [
             "Materialized",
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -4805,7 +4823,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -5042,7 +5060,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {
@@ -5167,7 +5185,7 @@
       "Triggered": {
         "trigger": {
           "Keywords": [
-            "Dawn"
+            "Judgment"
           ]
         },
         "effect": {

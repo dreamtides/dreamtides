@@ -5,11 +5,11 @@ like Magic: The Gathering. Players build decks of character and event cards,
 then compete to score victory points through positional combat on a two-rank
 battlefield. Two key differences from traditional card games: the shared
 Dreamwell system replaces lands for energy production, and combat is resolved
-positionally on a staggered battlefield — during the Judgment phase at the end
-of each turn, the non-active player's front-rank characters attack across the
-four front lanes while the active player's front-rank characters block.
-Unblocked attackers score points, while paired attackers and blockers compare
-spark and the weaker is dissolved.
+positionally on a staggered battlefield — during the Judgment phase at the start
+of each turn, the active player's front-rank characters attack across the four
+front lanes while the non-active player's front-rank characters block. Unblocked
+attackers score points, while paired attackers and blockers compare spark and
+the weaker is dissolved.
 
 ## Table of Contents
 
@@ -29,7 +29,7 @@ spark and the weaker is dissolved.
 
 The first player to reach the victory point threshold wins the game. The default
 threshold is 25 points, but this is configurable per battle. Points are scored
-during the Judgment phase at the end of each turn when unblocked attacking
+during the Judgment phase at the start of each turn when unblocked attacking
 characters score victory points equal to their spark. If 50 turns pass without a
 winner, the game ends in a draw.
 
@@ -132,26 +132,21 @@ effect, while a phase 1 card might produce 1 energy and also let you Foresee 1.
 
 Each turn progresses through these phases in order:
 
-1. **Dreamwell** — The active player draws the next Dreamwell card, permanently
+1. **Judgment** — Start-of-turn trigger window and combat resolution. Judgment
+   abilities trigger first. Then the active player's front-rank characters
+   attack and the non-active player's front-rank characters block. Each
+   front-rank lane (`F0-F3`) is resolved independently (see Spark and Scoring).
+2. **Dreamwell** — The active player draws the next Dreamwell card, permanently
    increasing their energy production and resetting their current energy. Any
    bonus effect on the card is applied.
-2. **Draw** — The active player draws one card from their deck. (Skipped on the
+3. **Draw** — The active player draws one card from their deck. (Skipped on the
    very first turn of the game.)
-3. **Dawn** — Start-of-turn trigger window. Abilities that trigger "at the start
-   of your turn" fire during this phase. No scoring occurs here. (Comparable to
-   MTG's upkeep step.)
 4. **Main** — The active player can play cards from hand, activate abilities,
    reposition characters between the battlefield's 9 slots, and take other
    actions. This is the primary action phase.
 5. **Ending** — The active player passes. The opponent may play fast cards
-   during this window (e.g. using a fast-speed dissolve event to remove an
-   attacker before Judgment). Once the opponent also passes, the turn proceeds
-   to Judgment.
-6. **Judgment** — Combat resolution. The non-active player's front-rank
-   characters attack; the active player's front-rank characters block. Each
-   front-rank lane (`F0-F3`) is resolved independently (see Spark and Scoring).
-   After Judgment, end-of-turn triggers fire and the turn passes to the
-   opponent.
+   during this window. Once the opponent also passes, end-of-turn triggers fire
+   and the turn passes to the opponent.
 
 **Game start:** Each player draws 5 cards as their opening hand.
 
@@ -179,20 +174,20 @@ Spark is the primary stat on characters. Characters have no health or toughness
 including support-based effects from other characters, that effective spark is
 what Judgment, scoring, and other game rules use.
 
-**Attackers and blockers:** The non-active player's front-rank characters are
-the attacking side during Judgment. The active player's front-rank characters
+**Attackers and blockers:** The active player's front-rank characters are the
+attacking side during Judgment. The non-active player's front-rank characters
 are the blocking side. Combat happens only in the four front-rank lanes.
 
 - If both players have a front-rank character in the same lane, they are paired
   for combat in that lane.
-- If only the non-active player has a front-rank character in a lane, that
-  attacker is unblocked and can score points.
-- If only the active player has a front-rank character in a lane, nothing
+- If only the active player has a front-rank character in a lane, that attacker
+  is unblocked and can score points.
+- If only the non-active player has a front-rank character in a lane, nothing
   happens in that lane.
 
-**Judgment phase resolution:** During the Judgment phase at the end of each
-turn, the non-active player's front-rank characters are the attackers and the
-active player's front-rank characters are the blockers. Each front-rank lane
+**Judgment phase resolution:** During the Judgment phase at the start of each
+turn, the active player's front-rank characters are the attackers and the
+non-active player's front-rank characters are the blockers. Each front-rank lane
 (`F0-F3`) is resolved independently:
 
 - **Attacker with a blocker (paired judgment):** Compare their spark values. The
@@ -201,8 +196,8 @@ active player's front-rank characters are the blockers. Each front-rank lane
   fire after each lane is resolved.
 - **Attacker with no blocker (unblocked):** The attacker scores victory points
   equal to its spark value for the attacking player.
-- **Only the active player has a character in the lane:** Nothing happens — the
-  active player's front-rank characters are blockers, not attackers.
+- **Only the non-active player has a character in the lane:** Nothing happens —
+  the non-active player's front-rank characters are blockers, not attackers.
 - **Neither player has a character in the lane:** Nothing happens.
 
 **After Judgment:** Surviving characters stay where they are. There is no
@@ -308,11 +303,12 @@ event resolves from the stack, then the event moves to the void.
 
 **Triggered abilities** — Abilities that fire automatically when a specific game
 event occurs. Three keyword triggers can appear on characters: **Materialized**
-(fires when the character enters the battlefield), **Dawn** (fires during the
-Dawn phase at the start of each turn), and **Dissolved** (fires when the
+(fires when the character enters the battlefield), **Judgment** (fires during
+the Judgment phase at the start of each turn), and **Dissolved** (fires when the
 character is destroyed). Triggered abilities can also use descriptive conditions
 like "When you play a card" or "At end of turn." Characters can have combined
-triggers such as "Materialized, Dawn" (fires both on entry and each Dawn phase).
+triggers such as "Materialized, Judgment" (fires both on entry and each Judgment
+phase).
 
 **Activated abilities** — Abilities with a cost that a player chooses to use,
 written as "Cost: Effect" (e.g., "2 energy: Draw a card"). Can be once per turn

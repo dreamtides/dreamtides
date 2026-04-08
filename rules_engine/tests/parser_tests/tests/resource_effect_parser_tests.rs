@@ -16,11 +16,11 @@ fn test_multiply_your_energy() {
 #[test]
 fn test_judgment_multiply_your_energy() {
     let result =
-        parse_ability("{Dawn} {multiply_by} the amount of {energy_symbol} you have.", "n: 3");
+        parse_ability("{Judgment} {multiply_by} the amount of {energy_symbol} you have.", "n: 3");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Dawn,
+        Judgment,
       ]),
       effect: Effect(MultiplyYourEnergy(
         multiplier: 3,
@@ -77,11 +77,12 @@ fn test_dissolve_enemy_opponent_gains_points() {
 
 #[test]
 fn test_judgment_draw_cards_opponent_gains_points() {
-    let result = parse_ability("{Dawn} Draw {cards}. The opponent gains {points}.", "c: 2, p: 1");
+    let result =
+        parse_ability("{Judgment} Draw {cards}. The opponent gains {points}.", "c: 2, p: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([
-        Dawn,
+        Judgment,
       ]),
       effect: List([
         EffectWithOptions(

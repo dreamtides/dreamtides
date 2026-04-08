@@ -85,8 +85,8 @@ fn play_character_increase_spark() {
 
 #[test]
 fn play_character_no_scoring_without_judgment() {
-    // Scoring is disabled until Judgment phase combat resolution is
-    // implemented (Task 10).
+    // Characters added by normal play enter the back rank, so they do not
+    // score until a later turn after being moved to the front rank.
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
     s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     s.perform_user_action(BattleAction::EndTurn);

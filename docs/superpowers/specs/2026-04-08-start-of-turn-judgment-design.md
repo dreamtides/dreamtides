@@ -40,8 +40,8 @@ End-of-turn triggers remain separate and still occur after `Ending`.
 2. Front-rank combat resolves with the active player as attacker and the
    opponent as blocker.
 
-This preserves the old meaning of start-of-turn triggered abilities while
-making combat happen on the same player's turn.
+This preserves the old meaning of start-of-turn triggered abilities while making
+combat happen on the same player's turn.
 
 No fast-action window exists inside `Judgment`. Once the phase starts, triggered
 effects and combat resolve without new card plays.
@@ -72,9 +72,9 @@ Current `Dawn` trigger semantics move back onto `Judgment`.
   start-of-turn card abilities.
 - The separate post-combat `Trigger::Judgment(player)` emission is removed.
 
-This avoids overloading the same trigger name with two different meanings.
-Cards that currently read `{Dawn}` should read `{Judgment}` again and trigger at
-the start of the controller's turn before combat.
+This avoids overloading the same trigger name with two different meanings. Cards
+that currently read `{Dawn}` should read `{Judgment}` again and trigger at the
+start of the controller's turn before combat.
 
 ## Rules Engine Changes
 
@@ -92,8 +92,8 @@ the start of the controller's turn before combat.
 - Rename parser directives and serialized phrases from `dawn` back to
   `judgment`.
 - Rename localized strings such as `dawn_phase_name` back to `judgment`.
-- Update all card data in `client/Assets/StreamingAssets/Tabula/cards.toml`
-  from `{Dawn}` to `{Judgment}`.
+- Update all card data in `client/Assets/StreamingAssets/Tabula/cards.toml` from
+  `{Dawn}` to `{Judgment}`.
 - Regenerate generated parser/card artifacts with `just tabula-generate`.
 
 ## Documentation Changes

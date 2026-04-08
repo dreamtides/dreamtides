@@ -131,8 +131,7 @@ fn undo_does_not_include_display_actions() {
 
 #[test]
 fn undo_restores_spark() {
-    // Scoring is disabled until the new Judgment phase combat resolution is
-    // implemented (Task 10). This test verifies undo restores spark.
+    // This test verifies undo restores spark without changing score.
     let mut s =
         TestBattle::builder().user(TestPlayer::builder().energy(10).points(5).build()).connect();
 

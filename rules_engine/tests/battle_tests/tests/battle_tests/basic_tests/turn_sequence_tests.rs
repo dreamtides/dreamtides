@@ -1,7 +1,9 @@
 use battle_state::actions::battle_actions::BattleAction;
+use core_data::numerics::Energy;
 use display_data::battle_view::{DisplayPlayer, DisplayedTurnIndicator};
 use tabula_generated::test_card;
 use test_utils::battle::test_battle::TestBattle;
+use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
 
 #[test]
@@ -75,8 +77,23 @@ fn play_fast_card_during_enemy_end_step() {
     );
 }
 
-// Judgment scoring tests have been removed. Scoring is disabled until the
-// new Judgment phase combat resolution is implemented in Task 10.
+#[test]
+fn judgment_trigger_resolves_before_dreamwell_reset() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(0).produced_energy(0).build())
+        .enemy(TestPlayer::builder().energy(0).produced_energy(0).build())
+        .connect();
+
+    s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_JUDGMENT_GAIN_ENERGY);
+    s.perform_user_action(BattleAction::EndTurn);
+    s.perform_enemy_action(BattleAction::EndTurn);
+
+    assert_eq!(
+        s.user_client.me.energy(),
+        Energy(1),
+        "Judgment energy resolved before Dreamwell reset on the new turn"
+    );
+}
 
 #[test]
 fn turn_indicator_displays_correct_phase() {

@@ -482,6 +482,18 @@ spark = 1
 image-number = 1200949264
 subtype = ""
 
+[[test-cards]]
+name = "Test Judgment Gain Energy"
+id = "94b6509b-fe6a-400a-baf8-4d39adc4b296"
+energy-cost = 1
+rules-text = "{Judgment} Gain {energy($e)}."
+variables = "e: 1"
+card-type = "Character"
+is-fast = false
+spark = 1
+image-number = 1200949264
+subtype = ""
+
 
 [metadata]
 schema_version = 1
