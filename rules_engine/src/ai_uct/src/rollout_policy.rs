@@ -51,59 +51,6 @@ pub fn play_greedy_turn(battle: &mut BattleState, player: PlayerName) {
     apply_battle_action::execute(battle, player, BattleAction::EndTurn);
 }
 
-fn greedy_card_play(battle: &mut BattleState, player: PlayerName) {
-    loop {
-        let legal = legal_actions::compute(battle, player);
-        let LegalActions::Standard { actions } = &legal else {
-            return;
-        };
-
-        if let Some(action) = pick_best_card_action(actions) {
-            apply_battle_action::execute(battle, player, action);
-            resolve_until_standard(battle, player);
-        } else {
-            return;
-        }
-    }
-}
-
-fn pick_best_card_action(actions: &StandardLegalActions) -> Option<BattleAction> {
-    if let Some(card_id) = actions.play_card_from_hand.iter().next() {
-        return Some(BattleAction::PlayCardFromHand(card_id));
-    }
-    if let Some(card_id) = actions.play_card_from_void.iter().next() {
-        return Some(BattleAction::PlayCardFromVoid(card_id));
-    }
-    if let Some(char_id) = actions.activate_abilities_for_character.iter().next() {
-        return Some(BattleAction::ActivateAbilityForCharacter(char_id));
-    }
-    None
-}
-
-fn resolve_until_standard(battle: &mut BattleState, player: PlayerName) {
-    let mut safety = 0;
-    loop {
-        if safety > 500 {
-            return;
-        }
-        safety += 1;
-
-        let Some(acting_player) = legal_actions::next_to_act(battle) else {
-            return;
-        };
-
-        let legal = legal_actions::compute(battle, acting_player);
-        if acting_player == player && matches!(legal, LegalActions::Standard { .. }) {
-            return;
-        }
-
-        let Some(action) = legal.random_action() else {
-            return;
-        };
-        apply_battle_action::execute(battle, acting_player, action);
-    }
-}
-
 /// Plays a complete turn for the given player using randomized logic with
 /// atomic position assignments.
 ///
@@ -165,5 +112,58 @@ pub fn play_random_turn(battle: &mut BattleState, player: PlayerName) {
                 apply_battle_action::execute(battle, player, action);
             }
         }
+    }
+}
+
+fn greedy_card_play(battle: &mut BattleState, player: PlayerName) {
+    loop {
+        let legal = legal_actions::compute(battle, player);
+        let LegalActions::Standard { actions } = &legal else {
+            return;
+        };
+
+        if let Some(action) = pick_best_card_action(actions) {
+            apply_battle_action::execute(battle, player, action);
+            resolve_until_standard(battle, player);
+        } else {
+            return;
+        }
+    }
+}
+
+fn pick_best_card_action(actions: &StandardLegalActions) -> Option<BattleAction> {
+    if let Some(card_id) = actions.play_card_from_hand.iter().next() {
+        return Some(BattleAction::PlayCardFromHand(card_id));
+    }
+    if let Some(card_id) = actions.play_card_from_void.iter().next() {
+        return Some(BattleAction::PlayCardFromVoid(card_id));
+    }
+    if let Some(char_id) = actions.activate_abilities_for_character.iter().next() {
+        return Some(BattleAction::ActivateAbilityForCharacter(char_id));
+    }
+    None
+}
+
+fn resolve_until_standard(battle: &mut BattleState, player: PlayerName) {
+    let mut safety = 0;
+    loop {
+        if safety > 500 {
+            return;
+        }
+        safety += 1;
+
+        let Some(acting_player) = legal_actions::next_to_act(battle) else {
+            return;
+        };
+
+        let legal = legal_actions::compute(battle, acting_player);
+        if acting_player == player && matches!(legal, LegalActions::Standard { .. }) {
+            return;
+        }
+
+        let Some(action) = legal.random_action() else {
+            return;
+        };
+        apply_battle_action::execute(battle, acting_player, action);
     }
 }

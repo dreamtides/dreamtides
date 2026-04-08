@@ -41,18 +41,18 @@ fn hand_size_limit_exceeded_gains_energy() {
 #[test]
 fn character_limit_prevents_playing_character() {
     let mut s = TestBattle::builder().connect();
-    for _ in 0..16 {
+    for _ in 0..5 {
         s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     }
     assert_eq!(
         s.user_client.cards.user_battlefield().len(),
-        16,
-        "User should have 16 characters on battlefield"
+        5,
+        "User should have 5 characters on battlefield"
     );
     let char_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     assert!(
         s.user_client.cards.get_revealed(&char_id).actions.can_play.is_none(),
-        "Character should not be playable when battlefield is full"
+        "Character should not be playable when back row is full"
     );
 }
 
