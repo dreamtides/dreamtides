@@ -173,12 +173,12 @@ fn reposition_actions(
             .get(character_id)
             .is_some_and(|state| state.played_turn == current_turn);
         if !has_summoning_sickness {
-            for position in 0..8u8 {
+            for position in 0..4u8 {
                 to_front.push((*character_id, position));
             }
         }
 
-        for position in 0..8u8 {
+        for position in 0..5u8 {
             if bf.back[position as usize] != Some(*character_id) {
                 to_back.push((*character_id, position));
             }
@@ -186,11 +186,11 @@ fn reposition_actions(
     }
 
     for character_id in bf.front.iter().flatten() {
-        for position in 0..8u8 {
+        for position in 0..5u8 {
             to_back.push((*character_id, position));
         }
 
-        for position in 0..8u8 {
+        for position in 0..4u8 {
             if bf.front[position as usize] != Some(*character_id) {
                 to_front.push((*character_id, position));
             }
