@@ -97,7 +97,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
             ? `Victory! You won ${battle.user.score} - ${battle.enemy.score}`
             : `Defeat. You lost ${battle.user.score} - ${battle.enemy.score}`}
           <button
-            onClick={onReconnect}
+            onClick={() => onReconnect()}
             className="ml-4 px-4 py-1 rounded text-sm font-bold"
             style={{
               background: "rgba(255, 255, 255, 0.2)",
@@ -298,10 +298,18 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
 
       {/* Debug panel */}
       {showDebug && (
-        <DebugPanel
-          onAction={onDebugAction}
-          onReconnect={onReconnect}
-        />
+        <div
+          className="fixed inset-x-0 z-40 overflow-y-auto"
+          style={{
+            bottom: 56,
+            maxHeight: "min(45vh, calc(100vh - 8rem))",
+          }}
+        >
+          <DebugPanel
+            onAction={onDebugAction}
+            onReconnect={onReconnect}
+          />
+        </div>
       )}
 
       {/* Card browser (void browsing) */}
