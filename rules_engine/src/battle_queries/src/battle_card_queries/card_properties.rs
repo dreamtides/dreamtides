@@ -1,10 +1,13 @@
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, CharacterId};
+use battle_state::battle_cards::battlefield::Battlefield;
 use core_data::card_types::{CardSubtype, CardType};
 use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
 
 use crate::battle_card_queries::card;
+
+const DUSKBORNE_SENTRY: &str = "Duskborne Sentry";
 
 /// Returns the energy cost of a card, or 0 if it has no energy cost.
 ///
@@ -26,7 +29,11 @@ pub fn controller(battle: &BattleState, card_id: impl CardIdType) -> PlayerName 
 }
 
 pub fn spark(battle: &BattleState, controller: PlayerName, id: CharacterId) -> Option<Spark> {
-    battle.cards.spark(controller, id)
+    let stored = battle.cards.spark(controller, id)?;
+    let Some(slot) = front_slot(battle, controller, id) else {
+        return Some(stored);
+    };
+    Some(stored + supported_sentry_bonus(battle, controller, slot))
 }
 
 pub fn base_spark(battle: &BattleState, card_id: impl CardIdType) -> Option<Spark> {
@@ -43,4 +50,28 @@ pub fn card_subtype(_battle: &BattleState, _card_id: impl CardIdType) -> Option<
 
 pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
     card::get(battle, card_id).is_fast
+}
+
+fn front_slot(battle: &BattleState, controller: PlayerName, id: CharacterId) -> Option<usize> {
+    battle.cards.battlefield(controller).front.iter().position(|slot| *slot == Some(id))
+}
+
+fn has_displayed_name(battle: &BattleState, id: CharacterId, expected: &str) -> bool {
+    card::get_definition(battle, id).displayed_name == expected
+}
+
+fn supported_sentry_bonus(
+    battle: &BattleState,
+    controller: PlayerName,
+    front_slot: usize,
+) -> Spark {
+    let battlefield = battle.cards.battlefield(controller);
+    let supporters =
+        Battlefield::supporting_back_slots(front_slot, battle.rules_config.front_row_size);
+    let count = supporters
+        .into_iter()
+        .filter_map(|slot| battlefield.back.get(slot).copied().flatten())
+        .filter(|id| has_displayed_name(battle, *id, DUSKBORNE_SENTRY))
+        .count();
+    Spark((count as u32) * 2)
 }

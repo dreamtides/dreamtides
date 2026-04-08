@@ -10,7 +10,9 @@ use core_data::numerics::TurnId;
 
 use crate::card_mutations::battle_deck;
 use crate::effects::apply_effect;
-use crate::phase_mutations::{dawn_phase, dreamwell_phase, fire_triggers, judgment_phase};
+use crate::phase_mutations::{
+    dawn_phase, dreamwell_phase, fire_triggers, judgment_phase, prototype_support_effects,
+};
 
 /// End the current player's turn.
 ///
@@ -26,6 +28,11 @@ pub fn run_turn_state_machine_if_no_active_prompts(battle: &mut BattleState) {
             BattleTurnPhase::EndingPhaseFinished => {
                 battle.phase = BattleTurnPhase::FiringEndOfTurnTriggers;
                 let source = EffectSource::Game { controller: battle.turn.active_player };
+                prototype_support_effects::apply_end_of_turn_support_gains(
+                    battle,
+                    battle.turn.active_player,
+                    source,
+                );
                 battle.triggers.push(source, Trigger::EndOfTurn(battle.turn.active_player));
                 apply_effect::execute_pending_effects_if_no_active_prompt(battle);
                 fire_triggers::execute_if_no_active_prompt(battle);

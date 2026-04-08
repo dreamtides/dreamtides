@@ -158,7 +158,10 @@ fn debug_card_state(
         current_zone: format!("{current_zone:?}"),
         properties: DebugCardProperties {
             card_type: format!("{:?}", card_properties::card_type(battle, card_id)),
-            spark: format!("{:?}", battle.cards.spark(controller, CharacterId(card_id))),
+            spark: format!(
+                "{:?}",
+                card_properties::spark(battle, controller, CharacterId(card_id))
+            ),
             cost: format!("{:?}", card_properties::converted_energy_cost(battle, card_id)),
             is_fast: format!("{:?}", card_properties::is_fast(battle, card_id)),
         },

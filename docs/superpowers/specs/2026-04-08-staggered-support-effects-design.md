@@ -9,8 +9,8 @@ characters supporting it.
 
 This is a prototype implementation for the current staggered-grid battle flow.
 It does not go through the full ability parser pipeline and does not add
-general-purpose rules text plumbing. The goal is to make the effects real in
-the engine and visible in the battle prototype for playtesting.
+general-purpose rules text plumbing. The goal is to make the effects real in the
+engine and visible in the battle prototype for playtesting.
 
 ## Rules Semantics
 
@@ -20,8 +20,8 @@ the engine and visible in the battle prototype for playtesting.
 
 - The effect applies only while Duskborne Sentry is on the battlefield in the
   back rank.
-- A front-row character gets the bonus if its slot is supported by the
-  Sentry's back-row slot under the staggered-grid topology.
+- A front-row character gets the bonus if its slot is supported by the Sentry's
+  back-row slot under the staggered-grid topology.
 - The bonus is derived, not stored. It should affect all uses of spark,
   including judgment comparisons, scoring, AI evaluation, and rendered combat
   stats.
@@ -40,8 +40,8 @@ characters gain +1 spark."
   topology.
 - The gain is permanent battlefield spark, using the existing spark mutation
   path.
-- Multiple Knights stack. A back-row character behind two Knights gains `+2
-  spark` from their end-of-turn triggers.
+- Multiple Knights stack. A back-row character behind two Knights gains
+  `+2 spark` from their end-of-turn triggers.
 
 ## Support Topology
 

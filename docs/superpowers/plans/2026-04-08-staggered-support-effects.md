@@ -19,23 +19,39 @@ all see the same effective spark values.
 `ai_uct`, `display`), React/Vite battle prototype for manual QA, `agent-browser`
 CLI for adversarial verification
 
----
+______________________________________________________________________
 
 ### Task 1: Add Battle-Aware Supported Spark Calculation
 
 **Files:**
 
-- Modify: `rules_engine/src/battle_queries/src/battle_card_queries/card_properties.rs`
-- Modify: `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`
-- Modify: `rules_engine/src/battle_mutations/src/effects/apply_standard_effect.rs`
+- Modify:
+  `rules_engine/src/battle_queries/src/battle_card_queries/card_properties.rs`
+
+- Modify:
+  `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`
+
+- Modify:
+  `rules_engine/src/battle_mutations/src/effects/apply_standard_effect.rs`
+
 - Modify: `rules_engine/src/display/src/rendering/card_rendering.rs`
+
 - Modify: `rules_engine/src/display/src/display_actions/outcome_simulation.rs`
-- Modify: `rules_engine/src/battle_queries/src/battle_player_queries/player_properties.rs`
-- Modify: `rules_engine/src/battle_queries/src/debug_snapshot/debug_battle_snapshot.rs`
+
+- Modify:
+  `rules_engine/src/battle_queries/src/battle_player_queries/player_properties.rs`
+
+- Modify:
+  `rules_engine/src/battle_queries/src/debug_snapshot/debug_battle_snapshot.rs`
+
 - Modify: `rules_engine/src/ai_uct/src/decision_log.rs`
+
 - Modify: `rules_engine/src/ai_uct/src/position_assignment.rs`
+
 - Modify: `rules_engine/src/ai_uct/src/uct_search.rs`
+
 - Modify: `rules_engine/src/ai_uct/src/uct_search_v3.rs`
+
 - Modify: `rules_engine/src/ai_uct/src/uct_search_v4.rs`
 
 - [ ] **Step 1: Add private helpers for supported-slot spark queries**
@@ -89,7 +105,8 @@ pub fn spark(battle: &BattleState, controller: PlayerName, id: CharacterId) -> O
 This keeps stored spark unchanged for back-rank characters while giving
 front-rank characters the real effective spark used by the prototype.
 
-- [ ] **Step 3: Replace direct `battle.cards.spark(...)` reads with the battle-aware query**
+- [ ] **Step 3: Replace direct `battle.cards.spark(...)` reads with the
+  battle-aware query**
 
 Update the engine, display, and AI callers listed above to use
 `card_properties::spark(...)` instead of `battle.cards.spark(...)`. For example,
@@ -116,11 +133,10 @@ card_properties::spark(battle, player, character).unwrap_or_default().0
 
 - [ ] **Step 4: Run formatter and typecheck**
 
-Run: `just fmt`
-Expected: Rust formatting and style fixes apply cleanly.
+Run: `just fmt` Expected: Rust formatting and style fixes apply cleanly.
 
-Run: `just check`
-Expected: The rules engine compiles with the new battle-aware spark query.
+Run: `just check` Expected: The rules engine compiles with the new battle-aware
+spark query.
 
 - [ ] **Step 5: Commit**
 
@@ -146,12 +162,16 @@ git commit -m "feat: add supported spark calculation for Duskborne Sentry" -m \
 **Files:**
 
 - Modify: `rules_engine/src/battle_mutations/src/phase_mutations/mod.rs`
-- Create: `rules_engine/src/battle_mutations/src/phase_mutations/prototype_support_effects.rs`
+
+- Create:
+  `rules_engine/src/battle_mutations/src/phase_mutations/prototype_support_effects.rs`
+
 - Modify: `rules_engine/src/battle_mutations/src/phase_mutations/turn.rs`
 
 - [ ] **Step 1: Add a focused phase helper module**
 
-Create `rules_engine/src/battle_mutations/src/phase_mutations/prototype_support_effects.rs`
+Create
+`rules_engine/src/battle_mutations/src/phase_mutations/prototype_support_effects.rs`
 with a single public function:
 
 ```rust
@@ -241,12 +261,10 @@ BattleTurnPhase::EndingPhaseFinished => {
 
 - [ ] **Step 4: Run formatter and full review gate**
 
-Run: `just fmt`
-Expected: Formatting succeeds.
+Run: `just fmt` Expected: Formatting succeeds.
 
-Run: `just review`
-Expected: The repository review gate passes, or any failures are understood and
-fixed before continuing.
+Run: `just review` Expected: The repository review gate passes, or any failures
+are understood and fixed before continuing.
 
 - [ ] **Step 5: Commit**
 
@@ -263,6 +281,7 @@ git commit -m "feat: add Veilward Knight end-of-turn support gains" -m \
 **Files:**
 
 - Report output: `/tmp/qa-staggered-support-effects/qa-report.md`
+
 - Screenshot output: `/tmp/qa-staggered-support-effects/*.png`
 
 - [ ] **Step 1: Start the backend and battle prototype**
@@ -295,14 +314,20 @@ Target scenarios:
 
 - place Duskborne Sentry in an edge back slot and confirm exactly one front-row
   character gets `+2 spark`
-- place Duskborne Sentry in a middle back slot and confirm exactly two
-  front-row characters get `+2 spark`
+
+- place Duskborne Sentry in a middle back slot and confirm exactly two front-row
+  characters get `+2 spark`
+
 - overlap two Sentries on the same front-row target and confirm `+4 spark`
-- place Veilward Knight in an edge front slot and confirm the supported
-  back-row character gains `+1 spark` at end of turn
+
+- place Veilward Knight in an edge front slot and confirm the supported back-row
+  character gains `+1 spark` at end of turn
+
 - place Veilward Knight in a middle front slot and confirm two supported
   back-row characters gain `+1 spark`
+
 - overlap two Knights and confirm a shared back-row character gains `+2 spark`
+
 - verify at least one judgment outcome changes because of the modified spark
 
 - [ ] **Step 3: Capture the QA report**
@@ -316,7 +341,9 @@ Write the report to:
 The report must include:
 
 - invariants tracked for effective spark values on affected characters
+
 - any bugs or anomalies found
+
 - the screenshots proving the stacked and edge/middle cases
 
 - [ ] **Step 4: Commit the implementation after QA**

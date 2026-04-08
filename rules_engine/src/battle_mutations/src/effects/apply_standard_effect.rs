@@ -281,8 +281,8 @@ fn kindle(
     let player = source.controller();
     let characters = battle.cards.battlefield(player).all_characters();
     let target = characters.iter().copied().max_by(|&a, &b| {
-        let a_spark = battle.cards.spark(player, a).unwrap_or_default();
-        let b_spark = battle.cards.spark(player, b).unwrap_or_default();
+        let a_spark = card_properties::spark(battle, player, a).unwrap_or_default();
+        let b_spark = card_properties::spark(battle, player, b).unwrap_or_default();
         let a_turn = battle
             .cards
             .battlefield_state(player)

@@ -2,7 +2,7 @@ use std::collections::{BTreeMap, VecDeque};
 use std::fs::OpenOptions;
 use std::io::Write;
 
-use battle_queries::battle_card_queries::card;
+use battle_queries::battle_card_queries::{card, card_properties};
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle::card_id::CharacterId;
@@ -221,7 +221,7 @@ fn build_character_snapshot(
     let character_id = (*slot)?;
     Some(CharacterSnapshot {
         name: card::get_definition(battle, character_id).displayed_name.clone(),
-        spark: battle.cards.spark(player, character_id).map_or(0, |s| s.0),
+        spark: card_properties::spark(battle, player, character_id).map_or(0, |s| s.0),
         id: character_id.0.0,
     })
 }

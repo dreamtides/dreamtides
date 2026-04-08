@@ -1,3 +1,4 @@
+use battle_queries::battle_card_queries::card_properties;
 use battle_queries::battle_trace;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::core::effect_source::EffectSource;
@@ -25,8 +26,9 @@ pub fn run(battle: &mut BattleState, player: PlayerName, source: EffectSource) -
         (Some(attacker), Some(blocker)) => {
             battle.turn.judgment_participants.push((opponent, attacker, position));
             battle.turn.judgment_participants.push((player, blocker, position));
-            let attacker_spark = battle.cards.spark(opponent, attacker).unwrap_or_default();
-            let blocker_spark = battle.cards.spark(player, blocker).unwrap_or_default();
+            let attacker_spark =
+                card_properties::spark(battle, opponent, attacker).unwrap_or_default();
+            let blocker_spark = card_properties::spark(battle, player, blocker).unwrap_or_default();
             if attacker_spark > blocker_spark {
                 dissolve::execute(battle, source, blocker);
             } else if blocker_spark > attacker_spark {
@@ -38,7 +40,7 @@ pub fn run(battle: &mut BattleState, player: PlayerName, source: EffectSource) -
         }
         (Some(attacker), None) => {
             battle.turn.judgment_participants.push((opponent, attacker, position));
-            let spark = battle.cards.spark(opponent, attacker).unwrap_or_default();
+            let spark = card_properties::spark(battle, opponent, attacker).unwrap_or_default();
             points::gain(battle, opponent, source, Points(spark.0), ShouldAnimate::Yes);
         }
         _ => {}

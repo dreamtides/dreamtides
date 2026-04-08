@@ -4,6 +4,7 @@ use std::f64::consts;
 
 use battle_mutations::actions::apply_battle_action;
 use battle_mutations::player_mutations::player_state;
+use battle_queries::battle_card_queries::card_properties;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::{
     ForPlayer, LegalActions, StandardLegalActions,
@@ -468,7 +469,7 @@ fn should_override_positioning(battle: &BattleState, player: PlayerName) -> bool
         .back
         .iter()
         .filter_map(|slot| *slot)
-        .filter_map(|id| battle.cards.spark(opponent, id))
+        .filter_map(|id| card_properties::spark(battle, opponent, id))
         .map(|s| s.0)
         .max()
         .unwrap_or(0);
@@ -479,7 +480,7 @@ fn should_override_positioning(battle: &BattleState, player: PlayerName) -> bool
         .back
         .iter()
         .filter_map(|slot| *slot)
-        .filter_map(|id| battle.cards.spark(player, id))
+        .filter_map(|id| card_properties::spark(battle, player, id))
         .map(|s| s.0)
         .max()
         .unwrap_or(0);
@@ -560,14 +561,14 @@ fn heuristic_select_positioning_character(
             .back
             .iter()
             .filter_map(|slot| *slot)
-            .filter_map(|id| battle.cards.spark(opponent, id))
+            .filter_map(|id| card_properties::spark(battle, opponent, id))
             .map(|s| s.0)
             .max()
             .unwrap_or(0);
 
         let own_max_spark = eligible
             .iter()
-            .filter_map(|id| battle.cards.spark(player, id))
+            .filter_map(|id| card_properties::spark(battle, player, id))
             .map(|s| s.0)
             .max()
             .unwrap_or(0);
@@ -593,14 +594,14 @@ fn heuristic_assign_column(
     block_targets: &[u8],
     attack_column: Option<u8>,
 ) -> Option<BattleAction> {
-    let own_spark = battle.cards.spark(player, character).unwrap_or_default().0;
+    let own_spark = card_properties::spark(battle, player, character).unwrap_or_default().0;
     let opponent = player.opponent();
 
     let mut best_block_col = None;
     let mut best_block_spark = 0u32;
     for &col in block_targets {
         if let Some(opp_id) = battle.cards.battlefield(opponent).front[col as usize] {
-            let opp_spark = battle.cards.spark(opponent, opp_id).unwrap_or_default().0;
+            let opp_spark = card_properties::spark(battle, opponent, opp_id).unwrap_or_default().0;
             if opp_spark > best_block_spark {
                 best_block_spark = opp_spark;
                 best_block_col = Some(col);

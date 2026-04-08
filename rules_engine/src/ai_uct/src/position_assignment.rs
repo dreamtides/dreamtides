@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt::Write;
 
+use battle_queries::battle_card_queries::card_properties;
 use battle_state::battle::battle_rules_config::MAX_ROW_SIZE;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CharacterId;
@@ -109,7 +110,7 @@ pub fn describe(
 
     for &(char_id, placement) in &assignment.placements {
         if let CharacterPlacement::MoveToFrontRank(col) = placement {
-            let our_spark = battle.cards.spark(player, char_id).map_or(0, |s| s.0);
+            let our_spark = card_properties::spark(battle, player, char_id).map_or(0, |s| s.0);
             let threat_at_col = threats.iter().find(|t| t.column == col);
             match threat_at_col {
                 Some(threat) if our_spark >= threat.spark => {
@@ -160,7 +161,7 @@ fn eligible_characters(battle: &BattleState, player: PlayerName) -> Vec<Eligible
         })
         .map(|id| EligibleCharacter {
             id,
-            spark: battle.cards.spark(player, id).map_or(0, |s| s.0),
+            spark: card_properties::spark(battle, player, id).map_or(0, |s| s.0),
         })
         .collect()
 }
@@ -173,7 +174,7 @@ fn opponent_front_threats(battle: &BattleState, opponent: PlayerName) -> Vec<Opp
         .filter_map(|(col, slot)| {
             slot.map(|char_id| OpponentThreat {
                 column: col as u8,
-                spark: battle.cards.spark(opponent, char_id).map_or(0, |s| s.0),
+                spark: card_properties::spark(battle, opponent, char_id).map_or(0, |s| s.0),
             })
         })
         .collect()
@@ -190,7 +191,7 @@ fn opponent_max_spark(battle: &BattleState, opponent: PlayerName) -> u32 {
         .iter()
         .chain(bf.back[..back_size].iter())
         .flatten()
-        .map(|&char_id| battle.cards.spark(opponent, char_id).map_or(0, |s| s.0))
+        .map(|&char_id| card_properties::spark(battle, opponent, char_id).map_or(0, |s| s.0))
         .max()
         .unwrap_or(0)
 }
@@ -607,7 +608,7 @@ fn score(
 
     for &(char_id, placement) in &assignment.placements {
         if let CharacterPlacement::MoveToFrontRank(col) = placement {
-            let our_spark = battle.cards.spark(player, char_id).map_or(0, |s| s.0);
+            let our_spark = card_properties::spark(battle, player, char_id).map_or(0, |s| s.0);
             let threat_at_col = threats.iter().find(|t| t.column == col);
             match threat_at_col {
                 Some(threat) => {
