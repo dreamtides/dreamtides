@@ -5,10 +5,11 @@ like Magic: The Gathering. Players build decks of character and event cards,
 then compete to score victory points through positional combat on a two-rank
 battlefield. Two key differences from traditional card games: the shared
 Dreamwell system replaces lands for energy production, and combat is resolved
-positionally — during the Judgment phase at the end of each turn, the non-active
-player's front-rank characters attack while the active player's characters
-block. Unblocked attackers score points, while paired attackers and blockers
-compare spark and the weaker is dissolved.
+positionally on a staggered battlefield — during the Judgment phase at the end
+of each turn, the non-active player's front-rank characters attack across the
+four front lanes while the active player's front-rank characters block.
+Unblocked attackers score points, while paired attackers and blockers compare
+spark and the weaker is dissolved.
 
 ## Table of Contents
 
@@ -27,7 +28,7 @@ compare spark and the weaker is dissolved.
 ## Objective
 
 The first player to reach the victory point threshold wins the game. The default
-threshold is 12 points, but this is configurable per battle. Points are scored
+threshold is 25 points, but this is configurable per battle. Points are scored
 during the Judgment phase at the end of each turn when unblocked attacking
 characters score victory points equal to their spark. If 50 turns pass without a
 winner, the game ends in a draw.
@@ -38,10 +39,10 @@ winner, the game ends in a draw.
 Each character has a spark value used in combat during the Judgment phase.
 Characters enter the back rank and can be repositioned to the front rank on
 subsequent turns. Characters remain on the battlefield until removed by an
-effect (Dissolve or Banish) or defeated in combat. Characters that participate
-in a judgment are returned to the back rank afterward. They can have triggered,
-activated, and static abilities. Characters have subtypes (Mage, Warrior, Robot,
-etc.) that other cards can reference.
+effect (Dissolve or Banish) or defeated in combat. Surviving characters remain
+in their current slot after Judgment; they do not automatically return to the
+back rank. They can have triggered, activated, and static abilities. Characters
+have subtypes (Mage, Warrior, Robot, etc.) that other cards can reference.
 
 **Event** — One-shot cards that produce an effect when they resolve, then move
 to the void. Events can be marked as "fast," allowing them to be played during
@@ -75,11 +76,24 @@ resolved. While a card is on the stack, the opponent may respond with fast
 cards. Characters move to the battlefield when they resolve; events move to the
 void.
 
-**Battlefield** — Where characters reside. The battlefield has 8 columns
-(positions 0–7). Each player has two horizontal ranks across those columns: a
-front rank and a back rank, giving each player 16 possible slots. A player can
-have at most 8 total characters on the battlefield at once. Only front-rank
-characters participate in Judgment phase combat.
+**Battlefield** — Where characters reside. Each player has a staggered
+battlefield with 4 front-rank lanes (`F0-F3`) and 5 back-rank slots (`B0-B4`),
+for 9 total slots. The back rank is offset so each back-rank slot sits between
+one or two front-rank lanes:
+
+- `B0` supports `F0`
+- `B1` supports `F0` and `F1`
+- `B2` supports `F1` and `F2`
+- `B3` supports `F2` and `F3`
+- `B4` supports `F3`
+
+A back-rank character's **supported** characters are the front-rank characters
+in the lanes it supports. A front-rank character's **supporting** characters are
+the back-rank characters behind it (`F0` has `B0/B1`, `F1` has `B1/B2`, `F2` has
+`B2/B3`, `F3` has `B3/B4`). Support has no built-in rules effect by itself, but
+card abilities can reference those relationships. Only front-rank characters
+participate directly in Judgment phase combat. A player can have at most 9 total
+characters on the battlefield, and new characters always enter the back rank.
 
 **Void** — The discard pile. Events go here after resolving. Characters go here
 when dissolved. Some cards can interact with cards in the void (notably via
@@ -131,16 +145,17 @@ Each turn progresses through these phases in order:
    of your turn" fire during this phase. No scoring occurs here. (Comparable to
    MTG's upkeep step.)
 4. **Main** — The active player can play cards from hand, activate abilities,
-   reposition characters between front and back ranks and between columns, and
-   take other actions. This is the primary action phase.
+   reposition characters between the battlefield's 9 slots, and take other
+   actions. This is the primary action phase.
 5. **Ending** — The active player passes. The opponent may play fast cards
    during this window (e.g. using a fast-speed dissolve event to remove an
    attacker before Judgment). Once the opponent also passes, the turn proceeds
    to Judgment.
 6. **Judgment** — Combat resolution. The non-active player's front-rank
    characters attack; the active player's front-rank characters block. Each
-   column is resolved independently (see Spark and Scoring). After Judgment,
-   end-of-turn triggers fire and the turn passes to the opponent.
+   front-rank lane (`F0-F3`) is resolved independently (see Spark and Scoring).
+   After Judgment, end-of-turn triggers fire and the turn passes to the
+   opponent.
 
 **Game start:** Each player draws 5 cards as their opening hand.
 
@@ -164,57 +179,63 @@ empty, the card's controller receives priority.
 ## Spark and Scoring
 
 Spark is the primary stat on characters. Characters have no health or toughness
-— spark is their only stat.
+— spark is their only stat. When an effect modifies a character's spark,
+including support-based effects from other characters, that effective spark is
+what Judgment, scoring, and other game rules use.
 
-**Attackers and blockers:** Whether a front-rank character is an attacker or
-blocker is determined by board position at the moment Judgment begins — nothing
-is locked in advance.
+**Attackers and blockers:** The non-active player's front-rank characters are
+the attacking side during Judgment. The active player's front-rank characters
+are the blocking side. Combat happens only in the four front-rank lanes.
 
-- A front-rank character is an **attacker** if the opposing front-rank space in
-  its column is empty.
-- A front-rank character is a **blocker** if there is an opposing front-rank
-  character directly across from it in the same column.
-- Since a character can only attack into an empty opposing column, the number of
-  possible attackers is limited by the number of unoccupied enemy front-rank
-  slots. Positioning is a geometric constraint — players must choose which
-  columns to contest and which to leave open.
+- If both players have a front-rank character in the same lane, they are paired
+  for combat in that lane.
+- If only the non-active player has a front-rank character in a lane, that
+  attacker is unblocked and can score points.
+- If only the active player has a front-rank character in a lane, nothing
+  happens in that lane.
 
 **Judgment phase resolution:** During the Judgment phase at the end of each
 turn, the non-active player's front-rank characters are the attackers and the
-active player's front-rank characters are the blockers. Each column (0–7) is
-resolved independently:
+active player's front-rank characters are the blockers. Each front-rank lane
+(`F0-F3`) is resolved independently:
 
 - **Attacker with a blocker (paired judgment):** Compare their spark values. The
   character with lower spark is dissolved. If both have the same spark, both are
   dissolved. A paired attacker does **not** score points. Dissolved triggers
-  fire after each column is resolved.
+  fire after each lane is resolved.
 - **Attacker with no blocker (unblocked):** The attacker scores victory points
   equal to its spark value for the attacking player.
-- **Only the active player has a character at the position:** Nothing happens —
-  the active player's front-rank characters are blockers, not attackers.
-- **Neither player has a character at the position:** Nothing happens.
+- **Only the active player has a character in the lane:** Nothing happens — the
+  active player's front-rank characters are blockers, not attackers.
+- **Neither player has a character in the lane:** Nothing happens.
 
-**After Judgment:** Every surviving character that participated in a judgment —
-whether as an attacker or blocker — returns to the back rank. Front-rank
-characters that did not participate in a judgment remain where they are.
+**After Judgment:** Surviving characters stay where they are. There is no
+automatic return to the back rank after combat, so a surviving front-rank
+character remains in that lane until it is repositioned or removed.
 
-Back-rank characters are safe during Judgment — they do not fight and do not
-score points.
+Back-rank characters are safe during Judgment — they do not directly fight and
+do not score points, though their abilities can still affect front-rank
+characters they support.
 
 **"Summoning sickness":** When a character enters the battlefield, it is placed
 in the back rank. Characters cannot be moved to the front rank on the same turn
 they were played.
 
 **Repositioning:** During the Main phase, a player can freely reposition their
-characters by moving them between front and back ranks and between columns
-within a rank (subject to "summoning sickness" and slot availability).
-Characters cannot be repositioned outside the Main phase, and no cards can be
-played during Judgment.
+characters between front-rank and back-rank slots, and between lanes within a
+rank, subject to "summoning sickness." Moving a character onto an occupied slot
+swaps the two characters. Characters cannot be repositioned outside the Main
+phase, and no cards can be played during Judgment.
+
+**Materializing new characters:** Characters always enter the battlefield in the
+back rank. If all 5 back-rank slots are occupied, no additional characters can
+be played or materialized until a back-rank slot is freed, even if the player
+has open front-rank lanes.
 
 **Spark modification:** Spark may be modified by card effects before Judgment,
 but once Judgment begins, no new cards can be played in response.
 
-**Character limit:** Each player can have at most 8 characters on the
+**Character limit:** Each player can have at most 9 characters on the
 battlefield at once. If the battlefield is full, additional characters cannot be
 played.
 
@@ -233,7 +254,8 @@ main phase.
 term for a character entering play, whether from hand (played normally), from
 the void (via Reclaim or effects), from the deck (via effects), or as a token
 (Figments). Characters enter with "summoning sickness" and cannot move to the
-front rank on the turn they are materialized.
+front rank on the turn they are materialized. Materialize requires an empty
+back-rank slot.
 
 **Prevent** — Counter a card on the stack, sending it to the void without
 resolving. Prevent effects are always fast (they must be played in response to a
