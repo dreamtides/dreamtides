@@ -508,3 +508,148 @@ git add -A && git commit -m "fix: resolve remaining compilation errors for stagg
 
 Update all remaining references to 8-column battlefield layout."
 ```
+
+---
+
+### Task 7: QA Pass with agent-browser
+
+Run the battle prototype in a browser and play a full game to verify the
+staggered grid works end-to-end. This task uses the adversarial QA skill with
+`agent-browser` — do NOT read source code. Test only what you can see.
+
+**Prerequisites:** The Rust dev server and battle prototype must be running.
+
+- [ ] **Step 1: Start the dev server and battle UI**
+
+In two separate terminals (or background):
+
+```bash
+just dev          # Rust backend on port 26598
+just battle-dev   # React UI on port 5174
+```
+
+Wait for both to be ready.
+
+- [ ] **Step 2: Open the battle prototype and take a baseline screenshot**
+
+```bash
+agent-browser open http://localhost:5174
+agent-browser wait --load networkidle
+agent-browser screenshot /tmp/qa-staggered-grid/01-baseline.png
+```
+
+Read the screenshot. Establish baseline: how many slots are visible per row?
+Verify the grid shows 5 back-row slots and 4 front-row slots per player.
+
+- [ ] **Step 3: Establish invariants**
+
+Write down and track these invariants throughout the game:
+
+- **Grid shape:** Each player has exactly 5 back-row + 4 front-row = 9 slots
+- **Character limit:** No player ever has more than 9 characters on the
+  battlefield
+- **Back-row deployment:** Characters always appear in the back row when played
+- **Summoning sickness:** Newly played characters cannot be in the front row
+  on the same turn they were played
+- **Front-row persistence:** Characters that survive judgment remain in the
+  front row (they do NOT move back)
+- **Scoring:** Only unblocked attackers score. Only 4 lanes of combat exist
+- **Back-row bottleneck:** When all 5 back-row slots are full, character cards
+  should not be playable
+
+Use `agent-browser eval` to extract game state values where possible.
+
+- [ ] **Step 4: Play a full game (15+ turns)**
+
+Play through at least 15 turns, performing these actions and taking a
+screenshot + reading it after each one:
+
+**Early game (turns 1–5):**
+- Play several characters. Verify they appear in back row.
+- Try to move a character to front row on the turn it was played — should be
+  blocked by summoning sickness.
+- Move characters to front row on subsequent turns. Verify they appear in
+  front-row slots (4 available).
+- Take screenshots showing the staggered layout with characters in both rows.
+
+**Mid game (turns 6–10):**
+- Fill the back row with 5 characters. Attempt to play another character —
+  should not be playable.
+- Move one character to front to free a back-row slot, then play a character —
+  should work.
+- End a turn with front-row characters facing opponent front-row characters.
+  After judgment, verify surviving characters STAY in the front row.
+- Take screenshots before and after judgment to confirm persistence.
+
+**Late game (turns 11–15+):**
+- Continue playing until one player wins or the board is complex.
+- Verify scoring works: unblocked front-row attackers score points equal to
+  spark.
+- Verify combat: paired attackers/blockers compare spark, loser is dissolved.
+- Check that the score display updates correctly.
+- Verify the game ends when a player reaches the victory threshold.
+
+After EVERY action:
+1. Take a screenshot and READ it
+2. Re-check invariants
+3. Compare expected vs actual
+4. Log any discrepancy as a BUG
+
+- [ ] **Step 5: Test repositioning (free rearrangement)**
+
+During the main phase:
+- Drag characters between back-row slots (swap behavior).
+- Drag characters from back row to front row.
+- Drag characters from front row to back row.
+- Drag a character onto an occupied slot — should swap.
+- Take screenshots after each drag to verify positions updated correctly.
+
+- [ ] **Step 6: Test edge cases**
+
+- Play with a full board (9 characters). Verify no more can be played.
+- Dissolve a front-row character, verify the slot opens up for the opponent's
+  attacker to score through.
+- Verify that a character with summoning sickness can be rearranged within
+  the back row but not moved to the front row.
+- Rapid-click on UI elements to check for double-action bugs.
+
+- [ ] **Step 7: Write QA report**
+
+Write a report to `/tmp/qa-staggered-grid/qa-report.md` following this format:
+
+```markdown
+## QA Report: Staggered Grid Combat
+
+### Invariants Tracked
+- Grid shape (5-back/4-front): [HELD/BROKEN]
+- Character limit (9 max): [HELD/BROKEN]
+- Back-row deployment: [HELD/BROKEN]
+- Summoning sickness: [HELD/BROKEN]
+- Front-row persistence after judgment: [HELD/BROKEN]
+- Scoring (4 lanes only): [HELD/BROKEN]
+- Back-row bottleneck: [HELD/BROKEN]
+
+### Bugs Found
+- **BUG-N: [title]**
+  - Severity: Critical / Major / Minor / UX
+  - Steps to reproduce: [exact sequence]
+  - Expected: [what should happen]
+  - Actual: [what did happen]
+  - Evidence: [screenshot path]
+
+### UX Issues
+- **UX-N: [title]**
+  - Description / Suggestion / Evidence
+
+### Scenarios Passed
+[List with evidence]
+```
+
+- [ ] **Step 8: Address any critical or major bugs found**
+
+If the QA pass reveals critical or major bugs, fix them and re-test the
+specific scenario. Commit fixes separately:
+
+```bash
+git add -A && git commit -m "fix: [describe bug found in QA]"
+```
