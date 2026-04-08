@@ -1,13 +1,17 @@
 use serde::{Deserialize, Serialize};
 
+use crate::battle::battle_rules_config::MAX_ROW_SIZE;
 use crate::battle::card_id::CharacterId;
 use crate::battle_cards::card_set::CardSet;
 
 /// Represents the battlefield with front and back ranks for a single player.
+///
+/// Arrays are sized to [MAX_ROW_SIZE] but only the first `front_row_size` /
+/// `back_row_size` slots (from `BattleRulesConfig`) are used.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Battlefield {
-    pub front: [Option<CharacterId>; 4],
-    pub back: [Option<CharacterId>; 5],
+    pub front: [Option<CharacterId>; MAX_ROW_SIZE],
+    pub back: [Option<CharacterId>; MAX_ROW_SIZE],
 }
 
 impl Battlefield {
@@ -17,53 +21,44 @@ impl Battlefield {
             + self.back.iter().filter(|s| s.is_some()).count()
     }
 
-    /// Returns true if the battlefield has 9 or more characters (the maximum).
-    pub fn is_full(&self) -> bool {
-        self.character_count() >= 9
-    }
-
-    /// Returns true if all 5 back-row slots are occupied.
-    pub fn back_row_is_full(&self) -> bool {
-        self.back.iter().all(Option::is_some)
+    /// Returns true if all back-row slots up to `size` are occupied.
+    pub fn back_row_is_full(&self, size: usize) -> bool {
+        self.back[..size].iter().all(Option::is_some)
     }
 
     /// Returns the front-row slot indices that the given back-row slot
     /// supports in the staggered grid layout.
-    ///
-    /// B0→[F0], B1→[F0,F1], B2→[F1,F2], B3→[F2,F3], B4→[F3]
-    pub fn supported_front_slots(back_slot: usize) -> &'static [usize] {
-        match back_slot {
-            0 => &[0],
-            1 => &[0, 1],
-            2 => &[1, 2],
-            3 => &[2, 3],
-            4 => &[3],
-            _ => &[],
+    pub fn supported_front_slots(back_slot: usize, back_size: usize) -> Vec<usize> {
+        if back_slot >= back_size {
+            return vec![];
         }
+        let mut result = Vec::new();
+        if back_slot > 0 {
+            result.push(back_slot - 1);
+        }
+        if back_slot < back_size - 1 {
+            result.push(back_slot);
+        }
+        result
     }
 
     /// Returns the back-row slot indices that support the given front-row
     /// slot in the staggered grid layout.
-    ///
-    /// F0→[B0,B1], F1→[B1,B2], F2→[B2,B3], F3→[B3,B4]
-    pub fn supporting_back_slots(front_slot: usize) -> &'static [usize] {
-        match front_slot {
-            0 => &[0, 1],
-            1 => &[1, 2],
-            2 => &[2, 3],
-            3 => &[3, 4],
-            _ => &[],
+    pub fn supporting_back_slots(front_slot: usize, front_size: usize) -> Vec<usize> {
+        if front_slot >= front_size {
+            return vec![];
         }
+        vec![front_slot, front_slot + 1]
     }
 
-    /// Returns the index of the first empty slot in the back rank, if any.
-    pub fn first_empty_back_slot(&self) -> Option<usize> {
-        self.back.iter().position(Option::is_none)
+    /// Returns the index of the first empty slot in the back rank.
+    pub fn first_empty_back_slot(&self, size: usize) -> Option<usize> {
+        self.back[..size].iter().position(Option::is_none)
     }
 
-    /// Returns the index of the first empty slot in the front rank, if any.
-    pub fn first_empty_front_slot(&self) -> Option<usize> {
-        self.front.iter().position(Option::is_none)
+    /// Returns the index of the first empty slot in the front rank.
+    pub fn first_empty_front_slot(&self, size: usize) -> Option<usize> {
+        self.front[..size].iter().position(Option::is_none)
     }
 
     /// Returns true if the given character is on the battlefield.
@@ -93,9 +88,9 @@ impl Battlefield {
     /// Adds a character to the back rank, returning the index where placed.
     ///
     /// Panics if the back rank is full.
-    pub fn add_to_back_rank(&mut self, id: CharacterId) -> usize {
+    pub fn add_to_back_rank(&mut self, id: CharacterId, size: usize) -> usize {
         let index =
-            self.first_empty_back_slot().expect("Cannot add to back rank: back rank is full");
+            self.first_empty_back_slot(size).expect("Cannot add to back rank: back rank is full");
         self.back[index] = Some(id);
         index
     }

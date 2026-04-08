@@ -128,6 +128,8 @@ fn create_battle(tabula: Arc<Tabula>) -> BattleState {
         },
         RequestContext::default(),
         PlayerName::One,
+        None,
+        None,
     )
 }
 

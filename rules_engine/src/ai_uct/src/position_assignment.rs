@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt::Write;
 
+use battle_state::battle::battle_rules_config::MAX_ROW_SIZE;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CharacterId;
 use core_data::types::PlayerName;
@@ -144,7 +145,8 @@ struct OpponentThreat {
 fn eligible_characters(battle: &BattleState, player: PlayerName) -> Vec<EligibleCharacter> {
     let bf = battle.cards.battlefield(player);
     let current_turn = battle.turn.turn_id.0;
-    bf.back
+    let back_size = battle.rules_config.back_row_size;
+    bf.back[..back_size]
         .iter()
         .flatten()
         .copied()
@@ -164,10 +166,8 @@ fn eligible_characters(battle: &BattleState, player: PlayerName) -> Vec<Eligible
 }
 
 fn opponent_front_threats(battle: &BattleState, opponent: PlayerName) -> Vec<OpponentThreat> {
-    battle
-        .cards
-        .battlefield(opponent)
-        .front
+    let front_size = battle.rules_config.front_row_size;
+    battle.cards.battlefield(opponent).front[..front_size]
         .iter()
         .enumerate()
         .filter_map(|(col, slot)| {
@@ -184,9 +184,11 @@ fn opponent_front_threats(battle: &BattleState, opponent: PlayerName) -> Vec<Opp
 /// since back-row characters can be repositioned to block on the next turn.
 fn opponent_max_spark(battle: &BattleState, opponent: PlayerName) -> u32 {
     let bf = battle.cards.battlefield(opponent);
-    bf.front
+    let front_size = battle.rules_config.front_row_size;
+    let back_size = battle.rules_config.back_row_size;
+    bf.front[..front_size]
         .iter()
-        .chain(bf.back.iter())
+        .chain(bf.back[..back_size].iter())
         .flatten()
         .map(|&char_id| battle.cards.spark(opponent, char_id).map_or(0, |s| s.0))
         .max()
@@ -194,11 +196,12 @@ fn opponent_max_spark(battle: &BattleState, opponent: PlayerName) -> u32 {
 }
 
 fn find_attack_column(battle: &BattleState, player: PlayerName) -> Option<u8> {
+    let front_size = battle.rules_config.front_row_size;
     let opponent_front = &battle.cards.battlefield(player.opponent()).front;
     let own_front = &battle.cards.battlefield(player).front;
-    opponent_front
+    opponent_front[..front_size]
         .iter()
-        .zip(own_front.iter())
+        .zip(own_front[..front_size].iter())
         .position(|(opp, own)| opp.is_none() && own.is_none())
         .map(|col| col as u8)
 }
@@ -360,8 +363,11 @@ fn build_winning_blocks_and_attack(
         eligible.iter().enumerate().filter(|(i, c)| !used[*i] && c.spark > opp_max).collect();
     attackers.sort_by(|(_, a), (_, b)| b.spark.cmp(&a.spark));
 
+    let front_size = battle.rules_config.front_row_size;
     for (idx, attacker) in attackers {
-        if let Some(col) = find_next_attack_column(own_front, opponent_front, &used_cols) {
+        if let Some(col) =
+            find_next_attack_column(own_front, opponent_front, &used_cols, front_size)
+        {
             used[idx] = true;
             assignments.push((attacker.id, col));
             used_cols.push(col);
@@ -447,8 +453,11 @@ fn build_attack_focused(
     let mut assignments: Vec<(CharacterId, u8)> = Vec::new();
     let mut used_cols: Vec<u8> = Vec::new();
 
+    let front_size = battle.rules_config.front_row_size;
     for attacker in &sorted_eligible {
-        if let Some(col) = find_next_attack_column(own_front, opponent_front, &used_cols) {
+        if let Some(col) =
+            find_next_attack_column(own_front, opponent_front, &used_cols, front_size)
+        {
             assignments.push((attacker.id, col));
             used_cols.push(col);
         }
@@ -473,13 +482,14 @@ fn build_attack_focused(
 }
 
 fn find_next_attack_column(
-    own_front: &[Option<CharacterId>; 4],
-    opponent_front: &[Option<CharacterId>; 4],
+    own_front: &[Option<CharacterId>; MAX_ROW_SIZE],
+    opponent_front: &[Option<CharacterId>; MAX_ROW_SIZE],
     used_cols: &[u8],
+    front_size: usize,
 ) -> Option<u8> {
-    own_front
+    own_front[..front_size]
         .iter()
-        .zip(opponent_front.iter())
+        .zip(opponent_front[..front_size].iter())
         .enumerate()
         .position(|(col, (own, opp))| {
             own.is_none() && opp.is_none() && !used_cols.contains(&(col as u8))
@@ -514,8 +524,10 @@ fn build_mixed(
     let attacker =
         eligible.iter().filter(|c| c.id != blocker.id && c.spark > opp_max).max_by_key(|c| c.spark);
 
+    let front_size = battle.rules_config.front_row_size;
     let attack_assignment = attacker.and_then(|a| {
-        find_next_attack_column(own_front, opponent_front, &used_cols).map(|col| (a.id, col))
+        find_next_attack_column(own_front, opponent_front, &used_cols, front_size)
+            .map(|col| (a.id, col))
     });
 
     let placements = eligible

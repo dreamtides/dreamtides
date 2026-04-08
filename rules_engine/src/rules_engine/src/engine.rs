@@ -337,6 +337,8 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
                 CreateBattlePlayer { player_type: enemy, deck_name },
                 request_context,
                 first_player,
+                configuration.front_row_size,
+                configuration.back_row_size,
             );
             provider.clear_undo_stack(new_battle.id);
             let quest_id = QuestId(Uuid::new_v4());

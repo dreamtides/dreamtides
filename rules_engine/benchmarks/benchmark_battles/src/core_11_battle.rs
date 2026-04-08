@@ -102,6 +102,8 @@ fn generate_core_11_battle_with_logging(enable_logging: bool) -> BattleState {
         },
         RequestContext { logging_options: LoggingOptions::default() },
         PlayerName::One,
+        None,
+        None,
     );
 
     let mut action_count = 0;

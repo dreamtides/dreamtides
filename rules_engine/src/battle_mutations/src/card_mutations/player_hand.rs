@@ -14,7 +14,14 @@ pub fn randomize_player_hand(battle: &mut BattleState, player: PlayerName) {
     let count = hand.len();
 
     for card_id in &hand {
-        battle.cards.move_card(player, card_id, Zone::Hand, Zone::Deck);
+        battle.cards.move_card(
+            player,
+            card_id,
+            Zone::Hand,
+            Zone::Deck,
+            battle.rules_config.back_row_size,
+            battle.rules_config.front_row_size,
+        );
     }
 
     battle_deck::draw_cards(

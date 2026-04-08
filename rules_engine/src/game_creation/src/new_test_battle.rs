@@ -47,6 +47,8 @@ pub fn create_and_start(
     player_two: CreateBattlePlayer,
     request_context: RequestContext,
     first_player: PlayerName,
+    front_row_size: Option<usize>,
+    back_row_size: Option<usize>,
 ) -> BattleState {
     let quest_one = Arc::new(create_quest_state(&tabula, player_one.deck_name));
     let quest_two = Arc::new(create_quest_state(&tabula, player_two.deck_name));
@@ -82,7 +84,11 @@ pub fn create_and_start(
     let mut battle = BattleState {
         id,
         cards: AllCards::default(),
-        rules_config: BattleRulesConfig { points_to_win: Points(25) },
+        rules_config: BattleRulesConfig {
+            points_to_win: Points(25),
+            front_row_size: front_row_size.unwrap_or(4),
+            back_row_size: back_row_size.unwrap_or(5),
+        },
         tabula,
         card_definitions: ability_cache,
         players: PlayerMap {

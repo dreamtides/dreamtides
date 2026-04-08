@@ -313,6 +313,8 @@ export interface DebugConfiguration {
   seed?: number;
   deck_override?: TestDeckName;
   dreamwell_override?: unknown;
+  front_row_size?: number;
+  back_row_size?: number;
 }
 
 export type TestDeckName = "Vanilla" | "StartingFive" | "Benchmark1" | "Core11";

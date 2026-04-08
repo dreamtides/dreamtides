@@ -239,7 +239,14 @@ fn to_destination_zone(
         _ => {}
     }
 
-    battle.cards.move_card(controller, card_id, old, new);
+    battle.cards.move_card(
+        controller,
+        card_id,
+        old,
+        new,
+        battle.rules_config.back_row_size,
+        battle.rules_config.front_row_size,
+    );
 
     if new == Zone::Void {
         battle.triggers.push(source, Trigger::PutIntoVoid(VoidCardId(card_id)));

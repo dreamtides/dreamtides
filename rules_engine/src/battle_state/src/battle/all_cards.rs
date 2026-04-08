@@ -256,10 +256,12 @@ impl AllCards {
         card_id: impl CardIdType,
         from: Zone,
         to: Zone,
+        back_row_size: usize,
+        front_row_size: usize,
     ) {
         let id = card_id.card_id();
         self.remove_from_zone(controller, id, from);
-        self.add_to_zone(controller, id, to);
+        self.add_to_zone(controller, id, to, back_row_size, front_row_size);
 
         let new_object_id = self.new_object_id();
         let state = &mut self.cards[id.0];
@@ -392,16 +394,23 @@ impl AllCards {
         result
     }
 
-    fn add_to_zone(&mut self, controller: PlayerName, card_id: CardId, zone: Zone) {
+    fn add_to_zone(
+        &mut self,
+        controller: PlayerName,
+        card_id: CardId,
+        zone: Zone,
+        back_row_size: usize,
+        front_row_size: usize,
+    ) {
         match zone {
             Zone::Banished => {
                 self.banished.player_mut(controller).insert(BanishedCardId(card_id));
             }
             Zone::Battlefield => {
                 let bf = self.battlefield.player_mut(controller);
-                if bf.first_empty_back_slot().is_some() {
-                    bf.add_to_back_rank(CharacterId(card_id));
-                } else if let Some(index) = bf.first_empty_front_slot() {
+                if bf.first_empty_back_slot(back_row_size).is_some() {
+                    bf.add_to_back_rank(CharacterId(card_id), back_row_size);
+                } else if let Some(index) = bf.first_empty_front_slot(front_row_size) {
                     bf.front[index] = Some(CharacterId(card_id));
                 } else {
                     // Battlefield is completely full. This should not happen

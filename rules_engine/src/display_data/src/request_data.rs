@@ -82,6 +82,12 @@ pub struct DebugConfiguration {
 
     /// If true, the human player goes second (on the draw) instead of first.
     pub user_goes_second: Option<bool>,
+
+    /// If specified, the number of front-row slots per player.
+    pub front_row_size: Option<usize>,
+
+    /// If specified, the number of back-row slots per player.
+    pub back_row_size: Option<usize>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

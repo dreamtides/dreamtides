@@ -24,6 +24,8 @@ pub fn create_and_start(
     player_two: CreateBattlePlayer,
     request_context: RequestContext,
     first_player: PlayerName,
+    front_row_size: Option<usize>,
+    back_row_size: Option<usize>,
 ) -> BattleState {
     let mut battle = new_test_battle::create_and_start(
         battle_id,
@@ -34,6 +36,8 @@ pub fn create_and_start(
         player_two,
         request_context,
         first_player,
+        front_row_size,
+        back_row_size,
     );
     battle.animations = Some(AnimationData::default());
     battle.tracing = Some(BattleTracing::default());

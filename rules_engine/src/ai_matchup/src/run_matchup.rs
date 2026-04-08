@@ -290,6 +290,8 @@ fn run_match(
                 },
             },
             PlayerName::One,
+            None,
+            None,
         );
 
         let start_time = Instant::now();

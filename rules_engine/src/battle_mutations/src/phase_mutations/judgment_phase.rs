@@ -44,7 +44,7 @@ pub fn run(battle: &mut BattleState, player: PlayerName, source: EffectSource) -
         _ => {}
     }
 
-    if position >= 3 {
+    if position as usize >= battle.rules_config.front_row_size - 1 {
         true
     } else {
         battle.turn.judgment_position = position + 1;

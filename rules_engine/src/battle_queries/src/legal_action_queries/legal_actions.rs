@@ -166,31 +166,34 @@ fn reposition_actions(
     let mut to_front = Vec::new();
     let mut to_back = Vec::new();
 
-    for character_id in bf.back.iter().flatten() {
+    let front_size = battle.rules_config.front_row_size as u8;
+    let back_size = battle.rules_config.back_row_size as u8;
+
+    for character_id in bf.back[..back_size as usize].iter().flatten() {
         let has_summoning_sickness = battle
             .cards
             .battlefield_state(player)
             .get(character_id)
             .is_some_and(|state| state.played_turn == current_turn);
         if !has_summoning_sickness {
-            for position in 0..4u8 {
+            for position in 0..front_size {
                 to_front.push((*character_id, position));
             }
         }
 
-        for position in 0..5u8 {
+        for position in 0..back_size {
             if bf.back[position as usize] != Some(*character_id) {
                 to_back.push((*character_id, position));
             }
         }
     }
 
-    for character_id in bf.front.iter().flatten() {
-        for position in 0..5u8 {
+    for character_id in bf.front[..front_size as usize].iter().flatten() {
+        for position in 0..back_size {
             to_back.push((*character_id, position));
         }
 
-        for position in 0..4u8 {
+        for position in 0..front_size {
             if bf.front[position as usize] != Some(*character_id) {
                 to_front.push((*character_id, position));
             }
@@ -246,18 +249,19 @@ fn select_positioning_character_actions(battle: &BattleState, player: PlayerName
 /// Step B: assign the selected character to a column.
 fn assign_column_actions(battle: &BattleState, player: PlayerName) -> LegalActions {
     let character = battle.turn.positioning_character.expect("No positioning character set");
+    let front_size = battle.rules_config.front_row_size;
     let opponent_front = &battle.cards.battlefield(player.opponent()).front;
     let own_front = &battle.cards.battlefield(player).front;
 
-    let block_targets: Vec<u8> = opponent_front
+    let block_targets: Vec<u8> = opponent_front[..front_size]
         .iter()
         .enumerate()
         .filter_map(|(col, slot)| slot.map(|_| col as u8))
         .collect();
 
-    let attack_column = opponent_front
+    let attack_column = opponent_front[..front_size]
         .iter()
-        .zip(own_front.iter())
+        .zip(own_front[..front_size].iter())
         .position(|(opp, own)| opp.is_none() && own.is_none())
         .map(|col| col as u8);
 
@@ -268,12 +272,13 @@ fn assign_column_actions(battle: &BattleState, player: PlayerName) -> LegalActio
 /// placement (either an opponent character to block or an empty column
 /// to attack).
 fn has_available_column(battle: &BattleState, player: PlayerName) -> bool {
+    let front_size = battle.rules_config.front_row_size;
     let opponent_front = &battle.cards.battlefield(player.opponent()).front;
     let own_front = &battle.cards.battlefield(player).front;
-    opponent_front.iter().any(Option::is_some)
-        || opponent_front
+    opponent_front[..front_size].iter().any(Option::is_some)
+        || opponent_front[..front_size]
             .iter()
-            .zip(own_front.iter())
+            .zip(own_front[..front_size].iter())
             .any(|(opp, own)| opp.is_none() && own.is_none())
 }
 
@@ -285,7 +290,8 @@ fn eligible_back_rank_characters(
 ) -> impl Iterator<Item = CharacterId> + '_ {
     let bf = battle.cards.battlefield(player);
     let current_turn = battle.turn.turn_id.0;
-    bf.back.iter().flatten().copied().filter(move |character_id| {
+    let back_size = battle.rules_config.back_row_size;
+    bf.back[..back_size].iter().flatten().copied().filter(move |character_id| {
         let has_summoning_sickness = battle
             .cards
             .battlefield_state(player)

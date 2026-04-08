@@ -2,8 +2,9 @@ import { useState } from "react";
 import type { CardView, DisplayPlayer, GameAction } from "../types/battle";
 import { CardDisplay } from "./CardDisplay";
 
-const FRONT_SLOT_COUNT = 4;
-const BACK_SLOT_COUNT = 5;
+const params = new URLSearchParams(window.location.search);
+const FRONT_SLOT_COUNT = params.get("front") ? parseInt(params.get("front")!, 10) : 4;
+const BACK_SLOT_COUNT = params.get("back") ? parseInt(params.get("back")!, 10) : 5;
 
 interface RankZoneProps {
   label: string;
@@ -131,8 +132,8 @@ export function RankZone({
         {label}
       </span>
       <div className="flex gap-1 justify-center items-center pt-3" style={{
-        paddingLeft: rank === "Front" ? 46 : 0,
-        paddingRight: rank === "Front" ? 46 : 0,
+        paddingLeft: rank === "Front" && BACK_SLOT_COUNT > FRONT_SLOT_COUNT ? 46 : 0,
+        paddingRight: rank === "Front" && BACK_SLOT_COUNT > FRONT_SLOT_COUNT ? 46 : 0,
       }}>
         {cardBySlot.map((card, i) =>
           card ? (

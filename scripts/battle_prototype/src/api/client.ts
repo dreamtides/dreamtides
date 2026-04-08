@@ -29,10 +29,15 @@ export async function connect(
   deckOverride?: TestDeckName,
   userGoesSecond?: boolean,
 ): Promise<ConnectResponse> {
-  const debugConfig = deckOverride || userGoesSecond
+  const params = new URLSearchParams(window.location.search);
+  const frontRowSize = params.get("front") ? parseInt(params.get("front")!, 10) : undefined;
+  const backRowSize = params.get("back") ? parseInt(params.get("back")!, 10) : undefined;
+  const debugConfig = deckOverride || userGoesSecond || frontRowSize || backRowSize
     ? {
         deck_override: deckOverride ?? undefined,
         user_goes_second: userGoesSecond ?? undefined,
+        front_row_size: frontRowSize,
+        back_row_size: backRowSize,
       }
     : undefined;
   const body = JSON.stringify({

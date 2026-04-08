@@ -107,6 +107,8 @@ impl TestSession {
                             .clone(),
                     ),
                     user_goes_second: None,
+                    front_row_size: None,
+                    back_row_size: None,
                 }),
             },
             self.request_context(),
