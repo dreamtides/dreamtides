@@ -1,4 +1,4 @@
-import type { GameAction } from "../types/battle";
+import type { GameAI, GameAction } from "../types/battle";
 
 interface DebugPanelProps {
   onAction: (action: GameAction) => void;
@@ -9,6 +9,54 @@ interface DebugButtonConfig {
   label: string;
   action: GameAction;
 }
+
+interface DebugAiOption {
+  label: string;
+  action: GameAction;
+}
+
+function setOpponentAgent(agent: GameAI): GameAction {
+  return {
+    DebugAction: {
+      SetOpponentAgent: agent,
+    },
+  };
+}
+
+const DEBUG_AI_OPTIONS: DebugAiOption[] = [
+  {
+    label: "Human Player",
+    action: { DebugAction: "SetOpponentAsHuman" },
+  },
+  {
+    label: "Fast QA",
+    action: setOpponentAgent("FirstAvailableAction"),
+  },
+  {
+    label: "Random",
+    action: setOpponentAgent("RandomAction"),
+  },
+  {
+    label: "MC(5)",
+    action: setOpponentAgent({ MonteCarlo: 5 }),
+  },
+  {
+    label: "MC(10)",
+    action: setOpponentAgent({ MonteCarlo: 10 }),
+  },
+  {
+    label: "MC(25)",
+    action: setOpponentAgent({ MonteCarlo: 25 }),
+  },
+  {
+    label: "MC(50)",
+    action: setOpponentAgent({ MonteCarlo: 50 }),
+  },
+  {
+    label: "Wait 5s",
+    action: setOpponentAgent("WaitFiveSeconds"),
+  },
+];
 
 const DEBUG_BUTTONS: DebugButtonConfig[] = [
   {
@@ -225,6 +273,29 @@ export function DebugPanel({
         >
           Restart (On the Draw)
         </button>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <div className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--color-primary-light)" }}>
+          Set AI
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          {DEBUG_AI_OPTIONS.map((option) => (
+            <button
+              key={option.label}
+              onClick={() => onAction(option.action)}
+              className="px-3 py-1 rounded text-xs"
+              style={{
+                background: "var(--color-surface-light)",
+                color: "var(--color-text)",
+                border: "1px solid var(--color-border)",
+                cursor: "pointer",
+              }}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Debug action buttons */}

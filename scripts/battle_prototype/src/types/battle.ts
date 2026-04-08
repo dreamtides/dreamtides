@@ -87,7 +87,7 @@ export type Position =
   | "GameModifier"
   | "OnScreenStorage"
   | { AboveVoid: DisplayPlayer }
-  | string; // catch-all for quest-specific positions
+  | (string & {}); // catch-all for quest-specific positions
 
 export interface ObjectPosition {
   position: Position;
@@ -115,9 +115,29 @@ export type CardPrefab =
 // GameAction: externally tagged enum
 // Unit variants: "NoOp", "PassPriority", etc.
 // Data variants: { "BattleAction": { "PlayCardFromHand": ... } }
-// We use a loose type since actions are opaque — we receive them from
-// the server and send them back without inspecting internals.
-export type GameAction = unknown;
+// We keep this broad because most actions are still opaque to the prototype,
+// but type the debug shapes we construct locally.
+export type GameAI =
+  | "AlwaysPanic"
+  | "FirstAvailableAction"
+  | "RandomAction"
+  | "WaitFiveSeconds"
+  | { MonteCarlo: number }
+  | { MonteCarloSingleThreaded: number };
+
+export type DebugAction =
+  | "RestartBattle"
+  | "SetOpponentAsHuman"
+  | { ApplyTestScenarioAction: string }
+  | { RestartBattleWithDecks: { one: TestDeckName; two: TestDeckName } }
+  | { SetOpponentAgent: GameAI }
+  | Record<string, unknown>;
+
+export type GameAction =
+  | "NoOp"
+  | { DebugAction: DebugAction }
+  | { BattleAction: Record<string, unknown> }
+  | Record<string, unknown>;
 
 export interface CardActions {
   can_play?: GameAction;
