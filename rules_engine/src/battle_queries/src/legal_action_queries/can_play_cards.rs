@@ -17,7 +17,7 @@ use crate::legal_action_queries::{
 };
 use crate::panic_with;
 
-const CHARACTER_LIMIT: usize = 8;
+const CHARACTER_LIMIT: usize = 9;
 
 /// Whether only cards with the `fast` property should be returned.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -53,7 +53,8 @@ pub fn from_hand(
 ) -> CardSet<HandCardId> {
     let mut candidates = legal_actions_cache::play_card_candidates(battle, player, fast_only);
     candidates.intersect_with(battle.cards.hand(player));
-    let battlefield_full = battle.cards.battlefield(player).character_count() >= CHARACTER_LIMIT;
+    let battlefield_full = battle.cards.battlefield(player).character_count() >= CHARACTER_LIMIT
+        || battle.cards.battlefield(player).back_row_is_full();
 
     let mut legal_cards = CardSet::new();
     for card_id in &candidates {
@@ -79,7 +80,8 @@ pub fn from_void(
 ) -> CardSet<VoidCardId> {
     let mut candidates = legal_actions_cache::play_from_void_candidates(battle, player, fast_only);
     candidates.intersect_with(battle.cards.void(player));
-    let battlefield_full = battle.cards.battlefield(player).character_count() >= CHARACTER_LIMIT;
+    let battlefield_full = battle.cards.battlefield(player).character_count() >= CHARACTER_LIMIT
+        || battle.cards.battlefield(player).back_row_is_full();
     let mut legal_cards = CardSet::new();
 
     for card_id in &candidates {

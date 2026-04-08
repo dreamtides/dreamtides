@@ -6,8 +6,8 @@ use crate::battle_cards::card_set::CardSet;
 /// Represents the battlefield with front and back ranks for a single player.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Battlefield {
-    pub front: [Option<CharacterId>; 8],
-    pub back: [Option<CharacterId>; 8],
+    pub front: [Option<CharacterId>; 4],
+    pub back: [Option<CharacterId>; 5],
 }
 
 impl Battlefield {
@@ -17,9 +17,43 @@ impl Battlefield {
             + self.back.iter().filter(|s| s.is_some()).count()
     }
 
-    /// Returns true if the battlefield has 8 or more characters (the maximum).
+    /// Returns true if the battlefield has 9 or more characters (the maximum).
     pub fn is_full(&self) -> bool {
-        self.character_count() >= 8
+        self.character_count() >= 9
+    }
+
+    /// Returns true if all 5 back-row slots are occupied.
+    pub fn back_row_is_full(&self) -> bool {
+        self.back.iter().all(Option::is_some)
+    }
+
+    /// Returns the front-row slot indices that the given back-row slot
+    /// supports in the staggered grid layout.
+    ///
+    /// B0→[F0], B1→[F0,F1], B2→[F1,F2], B3→[F2,F3], B4→[F3]
+    pub fn supported_front_slots(back_slot: usize) -> &'static [usize] {
+        match back_slot {
+            0 => &[0],
+            1 => &[0, 1],
+            2 => &[1, 2],
+            3 => &[2, 3],
+            4 => &[3],
+            _ => &[],
+        }
+    }
+
+    /// Returns the back-row slot indices that support the given front-row
+    /// slot in the staggered grid layout.
+    ///
+    /// F0→[B0,B1], F1→[B1,B2], F2→[B2,B3], F3→[B3,B4]
+    pub fn supporting_back_slots(front_slot: usize) -> &'static [usize] {
+        match front_slot {
+            0 => &[0, 1],
+            1 => &[1, 2],
+            2 => &[2, 3],
+            3 => &[3, 4],
+            _ => &[],
+        }
     }
 
     /// Returns the index of the first empty slot in the back rank, if any.
