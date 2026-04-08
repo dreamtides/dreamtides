@@ -473,8 +473,8 @@ fn build_attack_focused(
 }
 
 fn find_next_attack_column(
-    own_front: &[Option<CharacterId>; 8],
-    opponent_front: &[Option<CharacterId>; 8],
+    own_front: &[Option<CharacterId>; 4],
+    opponent_front: &[Option<CharacterId>; 4],
     used_cols: &[u8],
 ) -> Option<u8> {
     own_front

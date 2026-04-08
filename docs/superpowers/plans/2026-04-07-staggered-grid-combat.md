@@ -1,25 +1,39 @@
 # Staggered Grid Combat Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use
+> superpowers:subagent-driven-development (recommended) or
+> superpowers:executing-plans to implement this plan task-by-task. Steps use
+> checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Change the battlefield from an 8-column aligned grid to a staggered 5-back/4-front layout with persistent front-row positioning.
+**Goal:** Change the battlefield from an 8-column aligned grid to a staggered
+5-back/4-front layout with persistent front-row positioning.
 
-**Architecture:** The `Battlefield` struct's arrays change from `[_; 8]` to `[_; 5]` (back) and `[_; 4]` (front). Judgment iterates 0–3. The return-to-back-rank step is removed. The `CHARACTER_LIMIT` changes from 8 to 9. Repositioning constants change from `0..8u8` to the appropriate range. Support relationships are added as a queryable function.
+**Architecture:** The `Battlefield` struct's arrays change from `[_; 8]` to
+`[_; 5]` (back) and `[_; 4]` (front). Judgment iterates 0–3. The
+return-to-back-rank step is removed. The `CHARACTER_LIMIT` changes from 8 to 9.
+Repositioning constants change from `0..8u8` to the appropriate range. Support
+relationships are added as a queryable function.
 
-**Tech Stack:** Rust (rules_engine crates), integration tests in `rules_engine/tests/`
+**Tech Stack:** Rust (rules_engine crates), integration tests in
+`rules_engine/tests/`
 
----
+______________________________________________________________________
 
 ### Task 1: Update Battlefield Struct and Constants
 
 **Files:**
+
 - Modify: `rules_engine/src/battle_state/src/battle_cards/battlefield.rs`
-- Modify: `rules_engine/src/battle_queries/src/legal_action_queries/can_play_cards.rs:20`
+
+- Modify:
+  `rules_engine/src/battle_queries/src/legal_action_queries/can_play_cards.rs:20`
+
 - Modify: `rules_engine/src/battle_mutations/src/play_cards/character_limit.rs`
 
 - [ ] **Step 1: Update the Battlefield struct arrays**
 
-In `rules_engine/src/battle_state/src/battle_cards/battlefield.rs`, change the struct:
+In `rules_engine/src/battle_state/src/battle_cards/battlefield.rs`, change the
+struct:
 
 ```rust
 pub struct Battlefield {
@@ -88,7 +102,8 @@ pub fn supporting_back_slots(front_slot: usize) -> &'static [usize] {
 
 - [ ] **Step 5: Update CHARACTER_LIMIT constant**
 
-In `rules_engine/src/battle_queries/src/legal_action_queries/can_play_cards.rs`, change:
+In `rules_engine/src/battle_queries/src/legal_action_queries/can_play_cards.rs`,
+change:
 
 ```rust
 const CHARACTER_LIMIT: usize = 9;
@@ -96,7 +111,8 @@ const CHARACTER_LIMIT: usize = 9;
 
 - [ ] **Step 6: Update character_limit::is_full**
 
-In `rules_engine/src/battle_mutations/src/play_cards/character_limit.rs`, change:
+In `rules_engine/src/battle_mutations/src/play_cards/character_limit.rs`,
+change:
 
 ```rust
 pub fn is_full(battle: &BattleState, player: PlayerName) -> bool {
@@ -106,7 +122,9 @@ pub fn is_full(battle: &BattleState, player: PlayerName) -> bool {
 
 - [ ] **Step 7: Add back-row-full check to can_play_cards**
 
-In `rules_engine/src/battle_queries/src/legal_action_queries/can_play_cards.rs`, in both `from_hand` (around line 56) and `from_void` (around line 82), change the `battlefield_full` check to also consider the back row. Replace:
+In `rules_engine/src/battle_queries/src/legal_action_queries/can_play_cards.rs`,
+in both `from_hand` (around line 56) and `from_void` (around line 82), change
+the `battlefield_full` check to also consider the back row. Replace:
 
 ```rust
 let battlefield_full = battle.cards.battlefield(player).character_count() >= CHARACTER_LIMIT;
@@ -119,12 +137,14 @@ let battlefield_full = battle.cards.battlefield(player).character_count() >= CHA
     || battle.cards.battlefield(player).back_row_is_full();
 ```
 
-This ensures characters can't be played if the back row is full (even if total < 9).
+This ensures characters can't be played if the back row is full (even if total
+\< 9).
 
 - [ ] **Step 8: Run `just fmt` then `just check`**
 
-Run: `just fmt && just check`
-Expected: Compilation succeeds (there will be downstream errors in other files that reference `[_; 8]`, but the core struct should compile).
+Run: `just fmt && just check` Expected: Compilation succeeds (there will be
+downstream errors in other files that reference `[_; 8]`, but the core struct
+should compile).
 
 - [ ] **Step 9: Commit**
 
@@ -136,17 +156,21 @@ Update CHARACTER_LIMIT from 8 to 9. Add back_row_is_full check and
 support relationship queries."
 ```
 
----
+______________________________________________________________________
 
 ### Task 2: Update Judgment Phase
 
 **Files:**
-- Modify: `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`
+
+- Modify:
+  `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`
+
 - Modify: `rules_engine/src/battle_mutations/src/phase_mutations/turn.rs:90-107`
 
 - [ ] **Step 1: Update judgment position bounds**
 
-In `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`, change the bounds check at line 48 from:
+In `rules_engine/src/battle_mutations/src/phase_mutations/judgment_phase.rs`,
+change the bounds check at line 48 from:
 
 ```rust
 if position >= 7 {
@@ -158,11 +182,13 @@ to:
 if position >= 3 {
 ```
 
-Also update the doc comment on `run` from "all 8 positions" to "all 4 positions".
+Also update the doc comment on `run` from "all 8 positions" to "all 4
+positions".
 
 - [ ] **Step 2: Remove return_participants_to_back_rank**
 
-In the same file, delete the entire `return_participants_to_back_rank` function (lines 59–68):
+In the same file, delete the entire `return_participants_to_back_rank` function
+(lines 59–68):
 
 ```rust
 // DELETE THIS ENTIRE FUNCTION:
@@ -180,7 +206,8 @@ pub fn return_participants_to_back_rank(battle: &mut BattleState) {
 
 - [ ] **Step 3: Remove the call to return_participants_to_back_rank**
 
-In `rules_engine/src/battle_mutations/src/phase_mutations/turn.rs`, in the `BattleTurnPhase::Judgment` match arm (around line 96-97), remove the call:
+In `rules_engine/src/battle_mutations/src/phase_mutations/turn.rs`, in the
+`BattleTurnPhase::Judgment` match arm (around line 96-97), remove the call:
 
 ```rust
 judgment_phase::return_participants_to_back_rank(battle);
@@ -203,12 +230,14 @@ if finished && battle.prompts.is_empty() {
 
 - [ ] **Step 4: Remove return_to_back_rank method from Battlefield**
 
-In `rules_engine/src/battle_state/src/battle_cards/battlefield.rs`, delete the `return_to_back_rank` method (lines 89–109). This method is no longer needed since characters stay in the front row.
+In `rules_engine/src/battle_state/src/battle_cards/battlefield.rs`, delete the
+`return_to_back_rank` method (lines 89–109). This method is no longer needed
+since characters stay in the front row.
 
 - [ ] **Step 5: Run `just fmt` then `just check`**
 
-Run: `just fmt && just check`
-Expected: Compiles (may have warnings about unused `judgment_participants` field).
+Run: `just fmt && just check` Expected: Compiles (may have warnings about unused
+`judgment_participants` field).
 
 - [ ] **Step 6: Commit**
 
@@ -219,21 +248,25 @@ Characters now stay in the front row after judgment. Remove
 return_participants_to_back_rank and the return_to_back_rank method."
 ```
 
----
+______________________________________________________________________
 
 ### Task 3: Update Repositioning Logic
 
 **Files:**
-- Modify: `rules_engine/src/battle_queries/src/legal_action_queries/legal_actions.rs:160-296`
+
+- Modify:
+  `rules_engine/src/battle_queries/src/legal_action_queries/legal_actions.rs:160-296`
+
 - Modify: `rules_engine/src/battle_mutations/src/card_mutations/reposition.rs`
 
 - [ ] **Step 1: Update reposition_actions ranges**
 
-In `rules_engine/src/battle_queries/src/legal_action_queries/legal_actions.rs`, update the `reposition_actions` function (lines 160–201). Change all four `0..8u8` loops to use the correct range for each rank:
+In `rules_engine/src/battle_queries/src/legal_action_queries/legal_actions.rs`,
+update the `reposition_actions` function (lines 160–201). Change all four
+`0..8u8` loops to use the correct range for each rank:
 
-For back-rank characters moving to front: `0..4u8`
-For back-rank characters moving within back: `0..5u8`
-For front-rank characters moving to back: `0..5u8`
+For back-rank characters moving to front: `0..4u8` For back-rank characters
+moving within back: `0..5u8` For front-rank characters moving to back: `0..5u8`
 For front-rank characters moving within front: `0..4u8`
 
 The updated function:
@@ -285,18 +318,27 @@ fn reposition_actions(
 
 - [ ] **Step 2: Update eligible_back_rank_characters**
 
-In the same file, the `eligible_back_rank_characters` function (lines 282–296) iterates `bf.back` which is now `[_; 5]`. This function uses `.iter().flatten()` on the array, so it should work without changes. Verify that no `0..8` range is used inside it.
+In the same file, the `eligible_back_rank_characters` function (lines 282–296)
+iterates `bf.back` which is now `[_; 5]`. This function uses `.iter().flatten()`
+on the array, so it should work without changes. Verify that no `0..8` range is
+used inside it.
 
-The function also checks `moved_this_turn`. With free rearrangement, the `moved_this_turn` check is no longer needed for the human player (they can freely rearrange). However, the AI positioning flow still uses this. For now, leave this function unchanged — the AI positioning phased flow in `phased_main_phase_actions` will still work with the new array sizes.
+The function also checks `moved_this_turn`. With free rearrangement, the
+`moved_this_turn` check is no longer needed for the human player (they can
+freely rearrange). However, the AI positioning flow still uses this. For now,
+leave this function unchanged — the AI positioning phased flow in
+`phased_main_phase_actions` will still work with the new array sizes.
 
 - [ ] **Step 3: Update assign_column_actions**
 
-In the same file, the `assign_column_actions` function (lines 247–265) and `has_available_column` (lines 270–278) reference `opponent_front` and `own_front` arrays. These use `.iter()` on the arrays, so they should work automatically with `[_; 4]`. No changes needed.
+In the same file, the `assign_column_actions` function (lines 247–265) and
+`has_available_column` (lines 270–278) reference `opponent_front` and
+`own_front` arrays. These use `.iter()` on the arrays, so they should work
+automatically with `[_; 4]`. No changes needed.
 
 - [ ] **Step 4: Run `just fmt` then `just check`**
 
-Run: `just fmt && just check`
-Expected: Compiles.
+Run: `just fmt && just check` Expected: Compiles.
 
 - [ ] **Step 5: Commit**
 
@@ -306,17 +348,21 @@ git add -A && git commit -m "feat: update repositioning for 5-back/4-front grid
 Change position ranges from 0..8 to 0..4 (front) and 0..5 (back)."
 ```
 
----
+______________________________________________________________________
 
 ### Task 4: Update AI (MonteCarloV1) Positioning Heuristics
 
 **Files:**
+
 - Modify: `rules_engine/src/ai_uct/src/uct_search.rs` (lines 490–627)
-- Modify: `rules_engine/src/ai_uct/src/position_assignment.rs` (lines 476–477 and any `[_; 8]` refs)
+
+- Modify: `rules_engine/src/ai_uct/src/position_assignment.rs` (lines 476–477
+  and any `[_; 8]` refs)
 
 - [ ] **Step 1: Update position_assignment.rs array types**
 
-In `rules_engine/src/ai_uct/src/position_assignment.rs`, find the function signature at lines 476–477:
+In `rules_engine/src/ai_uct/src/position_assignment.rs`, find the function
+signature at lines 476–477:
 
 ```rust
 own_front: &[Option<CharacterId>; 8],
@@ -330,18 +376,25 @@ own_front: &[Option<CharacterId>; 4],
 opponent_front: &[Option<CharacterId>; 4],
 ```
 
-Search the rest of this file for any other `[_; 8]` references or `0..8` ranges and update them to the correct sizes (`4` for front, `5` for back).
+Search the rest of this file for any other `[_; 8]` references or `0..8` ranges
+and update them to the correct sizes (`4` for front, `5` for back).
 
 - [ ] **Step 2: Verify uct_search.rs heuristics compile**
 
-The V1 rollout heuristics in `uct_search.rs` (lines 490–627) access `battlefield(opponent).front[col as usize]` and iterate over `front`/`back` arrays. Since the arrays are now smaller, the column values from `block_targets` and `attack_column` in `LegalActions::AssignColumn` will naturally be 0–3. The array accesses should be safe as long as the column values come from the legal actions system (which they do).
+The V1 rollout heuristics in `uct_search.rs` (lines 490–627) access
+`battlefield(opponent).front[col as usize]` and iterate over `front`/`back`
+arrays. Since the arrays are now smaller, the column values from `block_targets`
+and `attack_column` in `LegalActions::AssignColumn` will naturally be 0–3. The
+array accesses should be safe as long as the column values come from the legal
+actions system (which they do).
 
-Scan `uct_search.rs` for any hardcoded `0..8` ranges or `[_; 8]` type annotations and update them.
+Scan `uct_search.rs` for any hardcoded `0..8` ranges or `[_; 8]` type
+annotations and update them.
 
 - [ ] **Step 3: Run `just fmt` then `just check`**
 
-Run: `just fmt && just check`
-Expected: Compiles. There may be dead code warnings for V2/V3/V4 search files — that's fine, they're not used.
+Run: `just fmt && just check` Expected: Compiles. There may be dead code
+warnings for V2/V3/V4 search files — that's fine, they're not used.
 
 - [ ] **Step 4: Commit**
 
@@ -352,18 +405,27 @@ Update array type annotations and ranges in position_assignment.rs
 and uct_search.rs for 4-front/5-back layout."
 ```
 
----
+______________________________________________________________________
 
 ### Task 5: Update Tests
 
 **Files:**
-- Modify: `rules_engine/tests/battle_tests/tests/battle_tests/basic_tests/battle_limits_tests.rs`
-- Create: `rules_engine/tests/battle_tests/tests/battle_tests/basic_tests/staggered_grid_tests.rs`
-- Modify: `rules_engine/tests/battle_tests/tests/battle_tests/basic_tests.rs` (add module declaration)
+
+- Modify:
+  `rules_engine/tests/battle_tests/tests/battle_tests/basic_tests/battle_limits_tests.rs`
+
+- Create:
+  `rules_engine/tests/battle_tests/tests/battle_tests/basic_tests/staggered_grid_tests.rs`
+
+- Modify: `rules_engine/tests/battle_tests/tests/battle_tests/basic_tests.rs`
+  (add module declaration)
 
 - [ ] **Step 1: Update character_limit_prevents_playing_character test**
 
-In `rules_engine/tests/battle_tests/tests/battle_tests/basic_tests/battle_limits_tests.rs`, the test at line 42 adds 16 characters. The new limit is 9 total, but the actual constraint is back-row-full (5). Update the test:
+In
+`rules_engine/tests/battle_tests/tests/battle_tests/basic_tests/battle_limits_tests.rs`,
+the test at line 42 adds 16 characters. The new limit is 9 total, but the actual
+constraint is back-row-full (5). Update the test:
 
 ```rust
 #[test]
@@ -385,11 +447,15 @@ fn character_limit_prevents_playing_character() {
 }
 ```
 
-Note: `add_to_battlefield` places characters in the back row. With 5 back-row slots, adding 5 should fill the back row. The test may need adjustment depending on whether `add_to_battlefield` uses `add_to_back_rank` internally — verify by checking test behavior.
+Note: `add_to_battlefield` places characters in the back row. With 5 back-row
+slots, adding 5 should fill the back row. The test may need adjustment depending
+on whether `add_to_battlefield` uses `add_to_back_rank` internally — verify by
+checking test behavior.
 
 - [ ] **Step 2: Write staggered grid test file**
 
-Create `rules_engine/tests/battle_tests/tests/battle_tests/basic_tests/staggered_grid_tests.rs`:
+Create
+`rules_engine/tests/battle_tests/tests/battle_tests/basic_tests/staggered_grid_tests.rs`:
 
 ```rust
 use display_data::battle_view::DisplayPlayer;
@@ -447,7 +513,11 @@ fn can_play_character_after_moving_to_front() {
 }
 ```
 
-Note: These tests use `move_to_front_rank` which may not exist as a test helper yet. If not, the test will need to use the appropriate action sequence (e.g., `perform_user_action` with `MoveCharacterToFrontRank`). Adjust based on the available test utilities — check `test_session_battle_extension.rs` for available helpers.
+Note: These tests use `move_to_front_rank` which may not exist as a test helper
+yet. If not, the test will need to use the appropriate action sequence (e.g.,
+`perform_user_action` with `MoveCharacterToFrontRank`). Adjust based on the
+available test utilities — check `test_session_battle_extension.rs` for
+available helpers.
 
 - [ ] **Step 3: Add module declaration**
 
@@ -459,13 +529,13 @@ mod staggered_grid_tests;
 
 - [ ] **Step 4: Run tests**
 
-Run: `just fmt && just battle-test staggered_grid`
-Expected: Tests pass (adjust test code based on available test helpers).
+Run: `just fmt && just battle-test staggered_grid` Expected: Tests pass (adjust
+test code based on available test helpers).
 
 - [ ] **Step 5: Run full test suite**
 
-Run: `just fmt && just review`
-Expected: All tests pass. Fix any compilation errors from other tests that reference the old 8-column layout.
+Run: `just fmt && just review` Expected: All tests pass. Fix any compilation
+errors from other tests that reference the old 8-column layout.
 
 - [ ] **Step 6: Commit**
 
@@ -476,30 +546,37 @@ Test that characters stay in front after judgment, back-row-full
 prevents playing, and freeing a back-row slot re-enables play."
 ```
 
----
+______________________________________________________________________
 
 ### Task 6: Fix Remaining Compilation Errors and Clean Up
 
 **Files:**
+
 - Various files that reference `[_; 8]`, `>= 16`, or `return_to_back_rank`
 
 - [ ] **Step 1: Fix any remaining compilation errors**
 
 Run `just check` and fix any remaining errors. Common issues:
 
-- `position_assignment.rs`: Any remaining `[_; 8]` type annotations → change to `[_; 4]` or `[_; 5]`
-- `uct_search_v2.rs`, `uct_search_v3.rs`, `uct_search_v4.rs`: These files are large and may have `[_; 8]` references. Since we're using MonteCarloV1 only, these files can have their `[_; 8]` references updated to compile, or they can be `#[allow(dead_code)]` if they're not compiled. Check if they're included in the build.
+- `position_assignment.rs`: Any remaining `[_; 8]` type annotations → change to
+  `[_; 4]` or `[_; 5]`
+
+- `uct_search_v2.rs`, `uct_search_v3.rs`, `uct_search_v4.rs`: These files are
+  large and may have `[_; 8]` references. Since we're using MonteCarloV1 only,
+  these files can have their `[_; 8]` references updated to compile, or they can
+  be `#[allow(dead_code)]` if they're not compiled. Check if they're included in
+  the build.
+
 - `rollout_policy.rs`: May reference `[_; 8]` or old battlefield layout
 
 - [ ] **Step 2: Run `just fmt` then `just clippy`**
 
-Run: `just fmt && just clippy`
-Expected: No errors or warnings (aside from existing ones).
+Run: `just fmt && just clippy` Expected: No errors or warnings (aside from
+existing ones).
 
 - [ ] **Step 3: Run `just review`**
 
-Run: `just review`
-Expected: Full gate passes.
+Run: `just review` Expected: Full gate passes.
 
 - [ ] **Step 4: Commit**
 
@@ -509,7 +586,7 @@ git add -A && git commit -m "fix: resolve remaining compilation errors for stagg
 Update all remaining references to 8-column battlefield layout."
 ```
 
----
+______________________________________________________________________
 
 ### Task 7: QA Pass with agent-browser
 
@@ -549,8 +626,8 @@ Write down and track these invariants throughout the game:
 - **Character limit:** No player ever has more than 9 characters on the
   battlefield
 - **Back-row deployment:** Characters always appear in the back row when played
-- **Summoning sickness:** Newly played characters cannot be in the front row
-  on the same turn they were played
+- **Summoning sickness:** Newly played characters cannot be in the front row on
+  the same turn they were played
 - **Front-row persistence:** Characters that survive judgment remain in the
   front row (they do NOT move back)
 - **Scoring:** Only unblocked attackers score. Only 4 lanes of combat exist
@@ -561,10 +638,11 @@ Use `agent-browser eval` to extract game state values where possible.
 
 - [ ] **Step 4: Play a full game (15+ turns)**
 
-Play through at least 15 turns, performing these actions and taking a
-screenshot + reading it after each one:
+Play through at least 15 turns, performing these actions and taking a screenshot
+\+ reading it after each one:
 
 **Early game (turns 1–5):**
+
 - Play several characters. Verify they appear in back row.
 - Try to move a character to front row on the turn it was played — should be
   blocked by summoning sickness.
@@ -573,6 +651,7 @@ screenshot + reading it after each one:
 - Take screenshots showing the staggered layout with characters in both rows.
 
 **Mid game (turns 6–10):**
+
 - Fill the back row with 5 characters. Attempt to play another character —
   should not be playable.
 - Move one character to front to free a back-row slot, then play a character —
@@ -582,6 +661,7 @@ screenshot + reading it after each one:
 - Take screenshots before and after judgment to confirm persistence.
 
 **Late game (turns 11–15+):**
+
 - Continue playing until one player wins or the board is complex.
 - Verify scoring works: unblocked front-row attackers score points equal to
   spark.
@@ -590,6 +670,7 @@ screenshot + reading it after each one:
 - Verify the game ends when a player reaches the victory threshold.
 
 After EVERY action:
+
 1. Take a screenshot and READ it
 2. Re-check invariants
 3. Compare expected vs actual
@@ -598,19 +679,27 @@ After EVERY action:
 - [ ] **Step 5: Test repositioning (free rearrangement)**
 
 During the main phase:
+
 - Drag characters between back-row slots (swap behavior).
+
 - Drag characters from back row to front row.
+
 - Drag characters from front row to back row.
+
 - Drag a character onto an occupied slot — should swap.
+
 - Take screenshots after each drag to verify positions updated correctly.
 
 - [ ] **Step 6: Test edge cases**
 
 - Play with a full board (9 characters). Verify no more can be played.
+
 - Dissolve a front-row character, verify the slot opens up for the opponent's
   attacker to score through.
-- Verify that a character with summoning sickness can be rearranged within
-  the back row but not moved to the front row.
+
+- Verify that a character with summoning sickness can be rearranged within the
+  back row but not moved to the front row.
+
 - Rapid-click on UI elements to check for double-action bugs.
 
 - [ ] **Step 7: Write QA report**
@@ -647,8 +736,8 @@ Write a report to `/tmp/qa-staggered-grid/qa-report.md` following this format:
 
 - [ ] **Step 8: Address any critical or major bugs found**
 
-If the QA pass reveals critical or major bugs, fix them and re-test the
-specific scenario. Commit fixes separately:
+If the QA pass reveals critical or major bugs, fix them and re-test the specific
+scenario. Commit fixes separately:
 
 ```bash
 git add -A && git commit -m "fix: [describe bug found in QA]"

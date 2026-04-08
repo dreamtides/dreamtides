@@ -25,12 +25,12 @@ Maximum 9 characters per player on the battlefield.
 The stagger creates "support" adjacency between back-row and front-row slots:
 
 | Back slot | Supports front slots |
-|-----------|---------------------|
-| B0        | F0                  |
-| B1        | F0, F1              |
-| B2        | F1, F2              |
-| B3        | F2, F3              |
-| B4        | F3                  |
+| --------- | -------------------- |
+| B0        | F0                   |
+| B1        | F0, F1               |
+| B2        | F1, F2               |
+| B3        | F2, F3               |
+| B4        | F3                   |
 
 Support has no built-in mechanical effect. It is a queryable relationship that
 card effects can reference (e.g., "Supported characters get +1 spark" or "When a
@@ -65,6 +65,7 @@ around until satisfied, then ends their turn. Dragging a character onto an
 occupied slot swaps the two characters.
 
 Constraints:
+
 - **Summoning sickness:** Characters played this turn cannot be placed in a
   front-row slot. They must remain in the back row until the following turn.
 - **Back row is the deployment bottleneck:** Characters always materialize into
