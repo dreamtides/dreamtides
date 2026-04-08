@@ -94,7 +94,6 @@ pub fn run_turn_state_machine_if_no_active_prompts(battle: &mut BattleState) {
                 apply_effect::execute_pending_effects_if_no_active_prompt(battle);
                 fire_triggers::execute_if_no_active_prompt(battle);
                 if finished && battle.prompts.is_empty() {
-                    judgment_phase::return_participants_to_back_rank(battle);
                     battle.triggers.push(source, Trigger::Judgment(player));
                     apply_effect::execute_pending_effects_if_no_active_prompt(battle);
                     fire_triggers::execute_if_no_active_prompt(battle);

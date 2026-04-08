@@ -120,28 +120,6 @@ impl Battlefield {
         self.character_count() == 0
     }
 
-    /// Moves a character from the front rank to the back rank, preferring the
-    /// same column index. If that back-rank slot is occupied, the character is
-    /// placed in the first available back-rank slot instead.
-    ///
-    /// Returns false if the character is not in the front rank or no back-rank
-    /// slot is available.
-    pub fn return_to_back_rank(&mut self, id: CharacterId) -> bool {
-        let Some(front_col) = self.front.iter().position(|s| *s == Some(id)) else {
-            return false;
-        };
-        self.front[front_col] = None;
-        if self.back[front_col].is_none() {
-            self.back[front_col] = Some(id);
-        } else if let Some(slot) = self.first_empty_back_slot() {
-            self.back[slot] = Some(id);
-        } else {
-            self.front[front_col] = Some(id);
-            return false;
-        }
-        true
-    }
-
     /// Returns a [CardSet] containing all characters on the battlefield.
     pub fn as_card_set(&self) -> CardSet<CharacterId> {
         self.all_characters().into_iter().collect()
