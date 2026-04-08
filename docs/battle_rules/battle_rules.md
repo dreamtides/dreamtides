@@ -87,13 +87,9 @@ one or two front-rank lanes:
 - `B3` supports `F2` and `F3`
 - `B4` supports `F3`
 
-A back-rank character's **supported** characters are the front-rank characters
-in the lanes it supports. A front-rank character's **supporting** characters are
-the back-rank characters behind it (`F0` has `B0/B1`, `F1` has `B1/B2`, `F2` has
-`B2/B3`, `F3` has `B3/B4`). Support has no built-in rules effect by itself, but
-card abilities can reference those relationships. Only front-rank characters
-participate directly in Judgment phase combat. A player can have at most 9 total
-characters on the battlefield, and new characters always enter the back rank.
+Only front-rank characters participate directly in Judgment phase combat. A
+player can have at most 9 total characters on the battlefield, and new
+characters always enter the back rank.
 
 **Void** — The discard pile. Events go here after resolving. Characters go here
 when dissolved. Some cards can interact with cards in the void (notably via
@@ -256,6 +252,16 @@ the void (via Reclaim or effects), from the deck (via effects), or as a token
 (Figments). Characters enter with "summoning sickness" and cannot move to the
 front rank on the turn they are materialized. Materialize requires an empty
 back-rank slot.
+
+**Supported / Supporting** — These terms describe the staggered adjacency
+between the 5 back-rank slots and 4 front-rank lanes. A back-rank character's
+**supported** characters are the front-rank characters in the lanes its slot
+supports. A front-rank character's **supporting** characters are the back-rank
+characters behind it. On the standard battlefield, `B0` supports `F0`, `B1`
+supports `F0/F1`, `B2` supports `F1/F2`, `B3` supports `F2/F3`, and `B4`
+supports `F3`; equivalently, `F0` is supported by `B0/B1`, `F1` by `B1/B2`, `F2`
+by `B2/B3`, and `F3` by `B3/B4`. Support has no built-in effect by itself, but
+abilities can reference these relationships.
 
 **Prevent** — Counter a card on the stack, sending it to the void without
 resolving. Prevent effects are always fast (they must be played in response to a
