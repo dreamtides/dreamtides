@@ -1,6 +1,6 @@
 ---
 name: qa
-description: Adversarial manual QA of a web app using agent-browser CLI. Use when testing a web UI for bugs, verifying fixes, or performing manual QA. Triggers on /qa, manual QA, test the app, QA the prototype, verify the UI, browser testing.
+description: Use when testing a web UI or game prototype with agent-browser, especially when verifying fixes, reproducing bugs, or doing adversarial manual QA across many states.
 ---
 
 # Adversarial Manual QA
@@ -70,6 +70,17 @@ agent-browser get text <selector>  # Get element text
 agent-browser is visible <selector>
 ```
 
+**Important interaction note:**
+- `agent-browser click @ref` is the first choice, not the only choice.
+- If a click reports success but the screenshot and state do not change, do NOT
+  immediately conclude the feature is broken.
+- First check whether the target is obscured, offscreen inside a scroll
+  container, or covered by a fixed panel.
+- If the UI still looks unchanged, retry with a DOM-triggered click via
+  `agent-browser eval` using a stable button label or other visible text.
+- If DOM-triggered click works but ref-click does not, that is still a bug or
+  UX issue worth logging, but it is different from "the feature itself failed."
+
 ## QA Protocol
 
 ### Phase 1: Gather Context from the User
@@ -101,6 +112,26 @@ Before testing, open the app and establish baseline measurements:
 - "Number of DOM children in grid must equal the count shown in header"
 - "Clicking a button once must change the count by exactly 1"
 
+### Phase 2.5: Control the Pacing for Game QA
+
+For turn-based games or simulations, establish control over pacing before
+running deep scenarios:
+
+1. Find any debug controls for AI speed, turn advance, resources, or scenario
+   setup.
+2. Prefer a **fast deterministic AI** over a slow search AI when the goal is
+   to move through turns quickly.
+3. Do not assume "set opponent as human" is the best QA mode. In some
+   prototypes that may hand control to a different user/session and still not
+   unblock your test path.
+4. After changing AI/debug settings, verify the effect with a real turn cycle.
+   Example invariant: "After `Fast QA` + `End Turn`, control should return in
+   a short bounded time."
+5. If the app emits session logs or other runtime traces, you may use them to
+   answer a narrow question like "did my debug action reach the backend?" Do
+   NOT use logs to excuse away visible UI failures. UI behavior is still the
+   pass/fail source of truth.
+
 ### Phase 3: Execute Test Scenarios
 
 For EACH scenario, follow this exact sequence:
@@ -120,6 +151,14 @@ For EACH scenario, follow this exact sequence:
 
 **After every action**, re-check invariants. Do not batch actions.
 
+**Delivery troubleshooting rule:**
+- If an action is supposed to mutate state and nothing changes, split the
+  problem into:
+  - Did the app receive the action?
+  - Did the UI update after receiving it?
+  - Was the click blocked by layout/overlay/harness issues?
+- Only after answering those should you label the bug precisely.
+
 ### Phase 4: Visual Inspection Checklist
 
 After EVERY screenshot, check ALL of the following:
@@ -129,6 +168,9 @@ After EVERY screenshot, check ALL of the following:
 - Are interactive elements (buttons, inputs) fully visible and not obscured?
 - Does the modal/overlay have a working close mechanism?
 - Is content cut off, overflowing, or overlapping other elements?
+- When a fixed debug panel, action bar, or drawer is open, does it block
+  interaction with content underneath? Test with the overlay both open and
+  closed.
 
 **Text and Content:**
 - Is ALL text readable? Look for garbled Unicode, icon font characters
@@ -148,6 +190,8 @@ After EVERY screenshot, check ALL of the following:
   (e.g. a log should not disappear between turns)
 - After closing and reopening a modal, is the state preserved?
 - After an action, does the UI update consistently everywhere?
+- If a debug action claims to change resources or inventory, do both the
+  visible objects and the numeric counters update together?
 
 ### Phase 5: Extended State Exploration
 
@@ -166,6 +210,10 @@ For apps with multiple states (games, wizards, multi-step flows):
 5. **Test all overlays and prompts.** If the game has targeting prompts,
    selection prompts, or choice dialogs, trigger and test each one.
 6. **Take screenshots at each new state.** Read them all carefully.
+7. **Expect interruption states.** In games, prompts like judgment steps,
+   targeting overlays, or card-order dialogs may interrupt your scripted path.
+   Clear them intentionally, verify their behavior, then resume the main
+   scenario.
 
 ### Phase 6: Stress Testing
 
@@ -213,6 +261,11 @@ Anything suspicious that you could not confirm or rule out.
 List scenarios that genuinely passed with evidence.
 ```
 
+When relevant, separate these categories clearly:
+- **Feature works** but the browser/harness click path is unreliable
+- **Debug/setup control is broken**
+- **Core gameplay/UI behavior is broken**
+
 ## Anti-Patterns (things you must NOT do)
 
 - **DO NOT** read source code to understand behavior. Test what you see.
@@ -227,6 +280,10 @@ List scenarios that genuinely passed with evidence.
   not produce JS errors. Check actual state values instead.
 - **DO NOT** use `agent-browser snapshot` as your primary verification method.
   Snapshots show DOM structure, not visual correctness. Use screenshots + eval.
+- **DO NOT** assume a successful `agent-browser click` means the app actually
+  changed state. Always verify with screenshot + invariants.
+- **DO NOT** keep a debug drawer or overlay open while testing underlying
+  controls unless overlap itself is the thing you are testing.
 - **DO NOT** test only 2-3 states and call it done. Explore extensively.
 - **DO NOT** ignore visual layout issues. Z-index bugs, overlapping elements,
   and obscured content are real bugs.
@@ -251,6 +308,10 @@ The QA agent should:
 - Play through extensively (10+ turns for games, all flows for apps)
 - Take screenshots at every significant state change and READ each one
 - Test every modal, overlay, and prompt for z-index and content issues
+- Establish pacing controls early for game prototypes (fast AI, manual
+  continue, debug shortcuts) and verify they actually work
+- Escalate from ref-click to DOM-triggered click when needed to separate
+  harness issues from product issues
 - Audit all text for garbled/unsanitized characters
 - Report UX issues separately from functional bugs
 - Write the report to the specified path and return a summary with BUG count
