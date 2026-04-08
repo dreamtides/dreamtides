@@ -243,6 +243,7 @@ export interface BattleView {
   arrows: DisplayArrow[];
   preview: BattlePreviewState;
   turn_number: TurnId;
+  opponent_ai_label: string;
   game_over: boolean;
 }
 

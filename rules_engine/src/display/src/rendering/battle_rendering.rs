@@ -9,7 +9,7 @@ use battle_state::battle::card_id::CharacterId;
 use battle_state::battle_cards::stack_card_state::{
     EffectTargets, StackItemId, StandardEffectTarget,
 };
-use battle_state::battle_player::battle_player_state::BattlePlayerState;
+use battle_state::battle_player::battle_player_state::{BattlePlayerState, PlayerType};
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
 use display_data::battle_view::{
@@ -147,6 +147,7 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
             .unwrap_or(BattlePreviewState::None)
         },
         turn_number: battle.turn.turn_id,
+        opponent_ai_label: opponent_ai_label(battle, builder.display_for_player()),
         game_over: battle.status.is_game_over(),
     }
 }
@@ -179,6 +180,13 @@ fn player_view(battle: &BattleState, name: PlayerName, player: &BattlePlayerStat
             None
         },
         is_victory_imminent: outcome_simulation::is_victory_imminent_for_player(battle, name),
+    }
+}
+
+fn opponent_ai_label(battle: &BattleState, user_player: PlayerName) -> String {
+    match battle.players.player(user_player.opponent()).player_type {
+        PlayerType::User(id) => format!("Human: {id:?}"),
+        PlayerType::Agent(ref agent) => format!("{agent:?}"),
     }
 }
 

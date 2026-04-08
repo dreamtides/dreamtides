@@ -120,7 +120,12 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
           color: "var(--color-text-dim)",
         }}
       >
-        <span>Turn {battle.turn_number}</span>
+        <span className="flex items-center gap-2">
+          <span>Turn {battle.turn_number}</span>
+          <span style={{ color: "var(--color-primary-light)" }}>
+            AI: {battle.opponent_ai_label}
+          </span>
+        </span>
         <span
           className="font-bold"
           style={{

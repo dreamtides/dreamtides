@@ -37,6 +37,10 @@ pub struct BattleView {
     /// Current turn number
     pub turn_number: TurnId,
 
+    /// Current opponent AI mode, or a label indicating a human-controlled
+    /// opponent
+    pub opponent_ai_label: String,
+
     /// True if the game has ended
     pub game_over: bool,
 }
