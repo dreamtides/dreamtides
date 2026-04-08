@@ -63,6 +63,7 @@ name = "ai_agents"
 version = "0.0.0"
 dependencies = [
  "ai_data",
+ "ai_strategic",
  "ai_uct",
  "battle_mutations",
  "battle_queries",
@@ -82,6 +83,23 @@ dependencies = [
  "core_data",
  "schemars 1.0.2",
  "serde",
+]
+
+[[package]]
+name = "ai_strategic"
+version = "0.0.0"
+dependencies = [
+ "ai_uct",
+ "battle_mutations",
+ "battle_queries",
+ "battle_state",
+ "chrono",
+ "core_data",
+ "rand 0.9.0",
+ "rayon",
+ "serde",
+ "serde_json",
+ "tracing",
 ]
 
 [[package]]

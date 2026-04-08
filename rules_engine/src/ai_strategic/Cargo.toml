@@ -1,5 +1,5 @@
 [package]
-name = "ai_agents"
+name = "ai_strategic"
 version = "0.0.0"
 edition = "2024"
 [lints]
@@ -7,21 +7,19 @@ workspace = true
 
 
 [lib]
-test = false
 doctest = false
-bench = false
+test = false
 
 [dependencies]
-ai_data = { path = "../ai_data" }
-ai_strategic = { path = "../ai_strategic" }
 ai_uct = { path = "../ai_uct" }
 battle_mutations = { path = "../battle_mutations" }
 battle_queries = { path = "../battle_queries" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
-logging = { path = "../logging" }
 
-ordered-float = { workspace = true }
+chrono = { workspace = true }
 rand = { workspace = true }
+rayon = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 tracing = { workspace = true }
-tracing-subscriber = { workspace = true }

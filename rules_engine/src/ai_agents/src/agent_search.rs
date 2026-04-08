@@ -1,14 +1,16 @@
 use std::cell::RefCell;
+use std::collections::VecDeque;
 use std::thread;
 use std::time::{Duration, Instant};
 
 use ai_data::game_ai::GameAI;
+use ai_strategic::search;
 use ai_uct::position_assignment::{CharacterPlacement, PositionAssignment};
 use ai_uct::uct_config::UctConfig;
 use ai_uct::{uct_search, uct_search_v2, uct_search_v3, uct_search_v4};
 use battle_mutations::player_mutations::player_state;
 use battle_queries::legal_action_queries::legal_actions;
-use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
+use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
 use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
@@ -19,6 +21,7 @@ use tracing::{debug, instrument};
 
 thread_local! {
     static PENDING_ASSIGNMENT: RefCell<Option<PositionAssignment>> = const { RefCell::new(None) };
+    static PENDING_STRATEGIC_ACTIONS: RefCell<VecDeque<BattleAction>> = const { RefCell::new(VecDeque::new()) };
 }
 
 /// Selects an action using a custom UctConfig (exposed for benchmarks to allow
@@ -71,16 +74,30 @@ pub fn select_action_unchecked(
     game_ai: &GameAI,
     iteration_multiplier_override: Option<f64>,
 ) -> BattleAction {
-    let battle = &player_state::randomize_battle_player(
-        initial_battle,
-        player.opponent(),
-        rand::rng().random(),
-    );
     match game_ai {
         GameAI::AlwaysPanic => panic!("Always panic agent called for an action"),
-        GameAI::FirstAvailableAction => first_available_action(battle, player),
-        GameAI::RandomAction => random_action(battle, player),
+        GameAI::FirstAvailableAction => {
+            let battle = &player_state::randomize_battle_player(
+                initial_battle,
+                player.opponent(),
+                rand::rng().random(),
+            );
+            first_available_action(battle, player)
+        }
+        GameAI::RandomAction => {
+            let battle = &player_state::randomize_battle_player(
+                initial_battle,
+                player.opponent(),
+                rand::rng().random(),
+            );
+            random_action(battle, player)
+        }
         GameAI::MonteCarlo(thousands_of_iterations) => {
+            let battle = &player_state::randomize_battle_player(
+                initial_battle,
+                player.opponent(),
+                rand::rng().random(),
+            );
             let config = UctConfig {
                 max_iterations_per_action: *thousands_of_iterations * 1000,
                 max_total_actions_multiplier: 6,
@@ -90,6 +107,11 @@ pub fn select_action_unchecked(
             uct_search::search(battle, player, &config)
         }
         GameAI::MonteCarloSingleThreaded(thousands_of_iterations) => {
+            let battle = &player_state::randomize_battle_player(
+                initial_battle,
+                player.opponent(),
+                rand::rng().random(),
+            );
             let config = UctConfig {
                 max_iterations_per_action: *thousands_of_iterations * 1000,
                 max_total_actions_multiplier: 6,
@@ -99,6 +121,11 @@ pub fn select_action_unchecked(
             uct_search::search(battle, player, &config)
         }
         GameAI::MonteCarloV2(thousands_of_iterations) => {
+            let battle = &player_state::randomize_battle_player(
+                initial_battle,
+                player.opponent(),
+                rand::rng().random(),
+            );
             if let Some(action) = next_assignment_action(battle, player) {
                 return action;
             }
@@ -118,6 +145,11 @@ pub fn select_action_unchecked(
             result.action
         }
         GameAI::MonteCarloV3(thousands_of_iterations) => {
+            let battle = &player_state::randomize_battle_player(
+                initial_battle,
+                player.opponent(),
+                rand::rng().random(),
+            );
             if let Some(action) = next_assignment_action(battle, player) {
                 return action;
             }
@@ -137,6 +169,11 @@ pub fn select_action_unchecked(
             result.action
         }
         GameAI::MonteCarloV4(thousands_of_iterations) => {
+            let battle = &player_state::randomize_battle_player(
+                initial_battle,
+                player.opponent(),
+                rand::rng().random(),
+            );
             let config = UctConfig {
                 max_iterations_per_action: *thousands_of_iterations * 1000,
                 max_total_actions_multiplier: 6,
@@ -145,7 +182,25 @@ pub fn select_action_unchecked(
             };
             uct_search_v4::search(battle, player, &config)
         }
+        GameAI::StrategicV1(budget_ms) => {
+            if let Some(action) = next_strategic_action(initial_battle, player) {
+                return action;
+            }
+
+            let result = search::search(initial_battle, player, *budget_ms);
+            if !result.pending_actions.is_empty() {
+                PENDING_STRATEGIC_ACTIONS.with(|cell| {
+                    *cell.borrow_mut() = result.pending_actions.into_iter().collect();
+                });
+            }
+            result.action
+        }
         GameAI::WaitFiveSeconds => {
+            let battle = &player_state::randomize_battle_player(
+                initial_battle,
+                player.opponent(),
+                rand::rng().random(),
+            );
             thread::sleep(Duration::from_secs(5));
             first_available_action(battle, player)
         }
@@ -186,6 +241,21 @@ fn next_assignment_action(battle: &BattleState, player: PlayerName) -> Option<Ba
                 *assignment = None;
                 None
             }
+        }
+    })
+}
+
+fn next_strategic_action(battle: &BattleState, player: PlayerName) -> Option<BattleAction> {
+    PENDING_STRATEGIC_ACTIONS.with(|cell| {
+        let mut pending = cell.borrow_mut();
+        let action = pending.front().copied()?;
+        let legal = legal_actions::compute(battle, player);
+        if legal.contains(action, ForPlayer::Agent) {
+            pending.pop_front();
+            Some(action)
+        } else {
+            pending.clear();
+            None
         }
     })
 }

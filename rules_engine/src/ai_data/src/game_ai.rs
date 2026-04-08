@@ -11,6 +11,7 @@ pub enum GameAI {
     MonteCarloV2(u32),
     MonteCarloV3(u32),
     MonteCarloV4(u32),
+    StrategicV1(u32),
     WaitFiveSeconds,
 }
 

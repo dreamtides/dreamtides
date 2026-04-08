@@ -305,6 +305,76 @@
           "required": [
             "SelectActivatedAbilityChoice"
           ]
+        },
+        {
+          "description": "Move a character to a specific front rank position (0-7).",
+          "type": "object",
+          "properties": {
+            "MoveCharacterToFrontRank": {
+              "type": "array",
+              "items": [
+                {
+                  "$ref": "#/definitions/CharacterId"
+                },
+                {
+                  "type": "integer",
+                  "format": "uint8",
+                  "maximum": 255,
+                  "minimum": 0
+                }
+              ],
+              "maxItems": 2,
+              "minItems": 2
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "MoveCharacterToFrontRank"
+          ]
+        },
+        {
+          "description": "Move a character to a specific back rank position (0-7).",
+          "type": "object",
+          "properties": {
+            "MoveCharacterToBackRank": {
+              "type": "array",
+              "items": [
+                {
+                  "$ref": "#/definitions/CharacterId"
+                },
+                {
+                  "type": "integer",
+                  "format": "uint8",
+                  "maximum": 255,
+                  "minimum": 0
+                }
+              ],
+              "maxItems": 2,
+              "minItems": 2
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "MoveCharacterToBackRank"
+          ]
+        },
+        {
+          "description": "Transition from card-play sub-phase to positioning sub-phase.",
+          "type": "string",
+          "const": "BeginPositioning"
+        },
+        {
+          "description": "Select a back-rank character to move forward, awaiting column\nassignment via a subsequent MoveCharacterToFrontRank action.",
+          "type": "object",
+          "properties": {
+            "SelectCharacterForPositioning": {
+              "$ref": "#/definitions/CharacterId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "SelectCharacterForPositioning"
+          ]
         }
       ]
     },
@@ -459,6 +529,10 @@
             }
           ]
         },
+        "game_over": {
+          "description": "True if the game has ended",
+          "type": "boolean"
+        },
         "id": {
           "description": "Unique identifier for this dream battle",
           "allOf": [
@@ -474,6 +548,10 @@
               "$ref": "#/definitions/InterfaceView"
             }
           ]
+        },
+        "opponent_ai_label": {
+          "description": "Current opponent AI mode, or a label indicating a human-controlled\nopponent",
+          "type": "string"
         },
         "preview": {
           "description": "Preview of the next state of the battle, used e.g. when confirming\nprompt choices.",
@@ -508,7 +586,9 @@
         "interface",
         "arrows",
         "preview",
-        "turn_number"
+        "turn_number",
+        "opponent_ai_label",
+        "game_over"
       ]
     },
     "BorderColor": {
@@ -1307,6 +1387,7 @@
           "type": "string",
           "enum": [
             "RestartBattle",
+            "RestartBattleOnTheDraw",
             "SetOpponentAsHuman"
           ]
         },
@@ -1666,12 +1747,90 @@
           "required": [
             "SetNextDreamwellCard"
           ]
+        },
+        {
+          "description": "Place a character directly into the front rank at a specific position.\nBypasses summoning sickness.",
+          "type": "object",
+          "properties": {
+            "AddCardToFrontRank": {
+              "type": "object",
+              "properties": {
+                "card": {
+                  "$ref": "#/definitions/BaseCardId"
+                },
+                "player": {
+                  "$ref": "#/definitions/PlayerName"
+                },
+                "position": {
+                  "type": "integer",
+                  "format": "uint8",
+                  "maximum": 255,
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "player",
+                "card",
+                "position"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "AddCardToFrontRank"
+          ]
+        },
+        {
+          "description": "Place a character directly into the back rank at a specific position.",
+          "type": "object",
+          "properties": {
+            "AddCardToBackRank": {
+              "type": "object",
+              "properties": {
+                "card": {
+                  "$ref": "#/definitions/BaseCardId"
+                },
+                "player": {
+                  "$ref": "#/definitions/PlayerName"
+                },
+                "position": {
+                  "type": "integer",
+                  "format": "uint8",
+                  "maximum": 255,
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "player",
+                "card",
+                "position"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "AddCardToBackRank"
+          ]
+        },
+        {
+          "description": "Skip directly to the Judgment phase.",
+          "type": "string",
+          "const": "SkipToJudgment"
         }
       ]
     },
     "DebugConfiguration": {
       "type": "object",
       "properties": {
+        "back_row_size": {
+          "description": "If specified, the number of back-row slots per player.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint",
+          "minimum": 0
+        },
         "deck_override": {
           "description": "If specified, the battle will be created with the given deck for both\nplayers.",
           "anyOf": [
@@ -1705,6 +1864,15 @@
             }
           ]
         },
+        "front_row_size": {
+          "description": "If specified, the number of front-row slots per player.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint",
+          "minimum": 0
+        },
         "seed": {
           "description": "If specified, the battle will be seeded with the given value. Otherwise\na random seed will be used.",
           "type": [
@@ -1713,6 +1881,13 @@
           ],
           "format": "uint64",
           "minimum": 0
+        },
+        "user_goes_second": {
+          "description": "If true, the human player goes second (on the draw) instead of first.",
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       }
     },
@@ -3324,6 +3499,62 @@
           "required": [
             "MonteCarloSingleThreaded"
           ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "MonteCarloV2": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "MonteCarloV2"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "MonteCarloV3": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "MonteCarloV3"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "MonteCarloV4": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "MonteCarloV4"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "StrategicV1": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "StrategicV1"
+          ]
         }
       ]
     },
@@ -4568,7 +4799,23 @@
           "type": "object",
           "properties": {
             "OnBattlefield": {
-              "$ref": "#/definitions/DisplayPlayer"
+              "type": "array",
+              "items": [
+                {
+                  "$ref": "#/definitions/DisplayPlayer"
+                },
+                {
+                  "$ref": "#/definitions/Rank"
+                },
+                {
+                  "type": "integer",
+                  "format": "uint8",
+                  "maximum": 255,
+                  "minimum": 0
+                }
+              ],
+              "maxItems": 3,
+              "minItems": 3
             }
           },
           "additionalProperties": false,
@@ -4884,6 +5131,14 @@
         "essence_total"
       ]
     },
+    "Rank": {
+      "description": "Represents the rank (row) of a character on the battlefield.",
+      "type": "string",
+      "enum": [
+        "Front",
+        "Back"
+      ]
+    },
     "RevealedCardView": {
       "description": "Visual state of a revealed card",
       "type": "object",
@@ -4970,6 +5225,10 @@
             "string",
             "null"
           ]
+        },
+        "summoning_sick": {
+          "description": "True if this character has summoning sickness and cannot move to the\nfront rank this turn.",
+          "type": "boolean"
         }
       },
       "required": [
@@ -4978,6 +5237,7 @@
         "card_type",
         "rules_text",
         "is_fast",
+        "summoning_sick",
         "actions",
         "effects"
       ]
