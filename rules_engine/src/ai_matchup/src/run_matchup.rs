@@ -157,6 +157,12 @@ struct MatchActionStats {
     ai_two: AgentTimingStats,
 }
 
+struct MatchResources {
+    deck_name: TestDeckName,
+    dreamwell_list: DreamwellCardIdList,
+    tabula: Arc<Tabula>,
+}
+
 #[derive(Debug)]
 enum MatchOutcome {
     Winner(PlayerName, usize, std::time::Duration),
@@ -228,7 +234,7 @@ fn run_match(
     seed: u64,
     verbosity: Verbosity,
     swap_positions: bool,
-    deck: DeckChoice,
+    resources: &MatchResources,
 ) -> Result<(MatchOutcome, MatchActionStats), (String, String)> {
     let ai_one_parsed = from_str(ai_one).unwrap();
     let ai_two_parsed = from_str(ai_two).unwrap();
@@ -267,9 +273,9 @@ fn run_match(
 
     let ai_one_str = ai_one.to_string();
     let ai_two_str = ai_two.to_string();
-    let deck_name = deck.to_test_deck_name();
-    let tabula = load_tabula(deck.tabula_source());
-    let dreamwell_list = deck.dreamwell_list();
+    let deck_name = resources.deck_name;
+    let dreamwell_list = resources.dreamwell_list.clone();
+    let tabula = resources.tabula.clone();
 
     catch_panic(move || {
         let battle_id = BattleId(Uuid::new_v4());
@@ -376,6 +382,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Err("Number of matches must be greater than 0".into());
     }
 
+    let resources = MatchResources {
+        deck_name: args.deck.to_test_deck_name(),
+        dreamwell_list: args.deck.dreamwell_list(),
+        tabula: load_tabula(args.deck.tabula_source()),
+    };
+
     let mut results = MatchResult {
         player_one_wins: 0,
         player_two_wins: 0,
@@ -405,7 +417,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 match_seed,
                 Verbosity::None,
                 swap_positions,
-                args.deck,
+                &resources,
             );
 
             match result {
@@ -466,7 +478,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             match_seed,
             match_verbosity,
             swap_positions,
-            args.deck,
+            &resources,
         );
 
         let (outcome, stats) = match result {
