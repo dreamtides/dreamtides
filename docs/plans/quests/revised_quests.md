@@ -151,8 +151,8 @@ The seven neighbor archetypes (revised tides):
 | Dreamstorm        | Surge + Bloom | Storm                 |
 
 The card pool with revised tides is at
-`rules_engine/tabula/rendered-cards-revised.toml`. The card pool with original
-tides is at `rules_engine/tabula/rendered-cards.toml`.
+`rules_engine/tabula/rendered-cards.toml`. The card pool with original
+tides is at `rules_engine/tabula/rendered-cards-mono.toml`.
 
 Tides have direct mechanical impact on gameplay through **tide crystals** -- a
 resource required to play cards during battles. See
