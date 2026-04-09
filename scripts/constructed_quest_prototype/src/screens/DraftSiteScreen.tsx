@@ -19,7 +19,9 @@ export function DraftSiteScreen({ site }: { site: SiteState }) {
 
   const draftCards = useMemo(() => {
     const deckTideCounts = countDeckTides(state.pool, cardDatabase);
-    const allCards = Array.from(cardDatabase.values());
+    const allCards = Array.from(cardDatabase.values()).filter(
+      (c) => c.rarity !== "Starter",
+    );
 
     const selected = weightedSample<CardData>(
       allCards,
