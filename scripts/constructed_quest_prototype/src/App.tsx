@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { CardData } from "./types/cards";
 import { loadCardDatabase } from "./data/card-database";
 import { QuestProvider, useQuest } from "./state/quest-context";
+import { useQuestConfig } from "./state/quest-config";
 import { ScreenRouter } from "./components/ScreenRouter";
 import { HUD } from "./components/HUD";
 import { DeckEditor } from "./components/DeckEditor";
@@ -12,9 +13,20 @@ function QuestApp({
 }: {
   cardDatabase: Map<number, CardData>;
 }) {
-  const { state } = useQuest();
-  const showHud = state.screen.type !== "questStart" && state.screen.type !== "viewStartingDeck";
+  const { state, mutations } = useQuest();
+  const config = useQuestConfig();
   const [deckEditorOpen, setDeckEditorOpen] = useState(false);
+
+  // Initialize quest on first render if not yet initialized
+  const initializedRef = useRef(false);
+  useEffect(() => {
+    if (!initializedRef.current && state.deck.length === 0) {
+      initializedRef.current = true;
+      mutations.initializeQuest(cardDatabase, config);
+    }
+  }, [state.deck.length, mutations, cardDatabase, config]);
+
+  const showHud = state.screen.type !== "questComplete" && state.deck.length > 0;
 
   const handleOpenDeckEditor = useCallback(() => {
     setDeckEditorOpen(true);

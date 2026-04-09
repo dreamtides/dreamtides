@@ -150,7 +150,7 @@ export function QuestStartScreen() {
         mutations.setCurrentDreamscape(firstNodeId);
       }
 
-      mutations.setScreen({ type: "viewStartingDeck" });
+      mutations.setScreen({ type: "dreamscape" });
     },
     [state.completionLevel, mutations, cardDatabase, config],
   );

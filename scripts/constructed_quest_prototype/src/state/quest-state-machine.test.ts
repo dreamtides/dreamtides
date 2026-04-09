@@ -29,7 +29,7 @@ function createTestState(overrides: Partial<QuestState> = {}): QuestState {
     visitedSites: [],
     startingTide: null,
     anteState: null,
-    screen: { type: "questStart" },
+    screen: { type: "dreamscape" },
     activeSiteId: null,
     ...overrides,
   };
@@ -141,7 +141,6 @@ describe("incrementCompletionLevel state transitions", () => {
 
 describe("screen name serialization", () => {
   it("returns the type for non-site screens", () => {
-    expect(screenName({ type: "questStart" })).toBe("questStart");
     expect(screenName({ type: "atlas" })).toBe("atlas");
     expect(screenName({ type: "dreamscape" })).toBe("dreamscape");
     expect(screenName({ type: "questComplete" })).toBe("questComplete");

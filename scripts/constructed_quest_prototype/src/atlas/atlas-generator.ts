@@ -21,6 +21,8 @@ export interface SiteGenerationContext {
   startingTide: NamedTide | null;
   playerPool: DeckEntry[];
   config: QuestConfig;
+  /** The random tide assigned to dreamscape 1 for loot packs and shop weighting. */
+  dreamscapeTide?: NamedTide;
 }
 
 const BASE_RADIUS = 200;

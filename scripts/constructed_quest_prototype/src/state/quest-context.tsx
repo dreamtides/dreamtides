@@ -20,6 +20,10 @@ import type {
   TransfigurationType,
 } from "../types/quest";
 import { logEvent, resetLog } from "../logging";
+import type { QuestConfig } from "./quest-config";
+import { generateInitialAtlas } from "../atlas/atlas-generator";
+import { DREAMSIGNS } from "../data/dreamsigns";
+import { NAMED_TIDES } from "../data/card-database";
 
 const MAX_DREAMSIGNS = 12;
 
@@ -54,6 +58,7 @@ export interface QuestMutations {
   addProvisionedSite: (dreamscapeId: string, site: SiteState) => void;
   initializeDeckFromPool: () => void;
   resetQuest: () => void;
+  initializeQuest: (cardDatabase: Map<number, CardData>, config: QuestConfig) => void;
 }
 
 /** The value provided by the quest context. */
@@ -94,7 +99,7 @@ function createDefaultState(): QuestState {
     },
     currentDreamscape: null,
     visitedSites: [],
-    screen: { type: "questStart" },
+    screen: { type: "dreamscape" },
     activeSiteId: null,
     startingTide: null,
     anteState: null,
@@ -498,6 +503,88 @@ export function QuestProvider({
     setState(createDefaultState());
   }, []);
 
+  /** Card numbers for each starter card and the number of copies in the fixed deck. */
+  const STARTER_DECK_ALLOCATION: Array<[number, number]> = [
+    [718, 4], // Glimpse of What Was (1-cost Event)
+    [720, 3], // Worlds Await (1-cost Event)
+    [711, 4], // Nocturne Strummer (2-cost Character)
+    [717, 2], // Flashpoint Detonation (2-cost Event)
+    [719, 2], // Sign of Arrival (2-cost Event)
+    [715, 3], // Final Witness (3-cost Character)
+    [712, 3], // Ringwatcher (3-cost Character)
+    [713, 4], // Marked Direwolf (4-cost Character)
+    [714, 3], // Runebound Champion (5-cost Character)
+    [716, 2], // Wildflower Colossus (6-cost Character)
+  ];
+
+  const initializeQuest = useCallback(
+    (db: Map<number, CardData>, config: QuestConfig) => {
+      setState((prev) => {
+        // Build fixed starter deck
+        const deck: DeckEntry[] = [];
+        for (const [cardNumber, copies] of STARTER_DECK_ALLOCATION) {
+          for (let i = 0; i < copies; i++) {
+            entryIdCounter.current += 1;
+            deck.push({
+              entryId: `deck-${String(entryIdCounter.current)}`,
+              cardNumber,
+              transfiguration: null,
+              isBane: false,
+            });
+          }
+        }
+
+        logEvent("starting_deck_initialized", {
+          totalDeckSize: deck.length,
+          allocation: STARTER_DECK_ALLOCATION.map(([cn, copies]) => ({
+            cardNumber: cn,
+            name: db.get(cn)?.name ?? "Unknown",
+            copies,
+          })),
+        });
+
+        // Pick a random tide for the first dreamscape
+        const dreamscapeTide = NAMED_TIDES[
+          Math.floor(Math.random() * NAMED_TIDES.length)
+        ];
+
+        logEvent("dreamscape_tide_selected", { tide: dreamscapeTide });
+
+        // Generate initial atlas (startingTide is null since player has no tide)
+        const atlas = generateInitialAtlas(0, {
+          cardDatabase: db,
+          dreamsignPool: DREAMSIGNS,
+          playerHasBanes: false,
+          startingTide: null,
+          playerPool: [],
+          config,
+          dreamscapeTide: dreamscapeTide as NamedTide,
+        });
+
+        const firstNodeId = atlas.edges[0]?.[1] ?? null;
+
+        logEvent("quest_started", {
+          initialEssence: config.startingEssence,
+          dreamscapeTide,
+          startingDeckSize: deck.length,
+        });
+
+        return {
+          ...prev,
+          essence: config.startingEssence,
+          deck,
+          pool: [],
+          atlas,
+          currentDreamscape: firstNodeId,
+          visitedSites: [],
+          screen: { type: "dreamscape" } as Screen,
+          startingTide: null,
+        };
+      });
+    },
+    [],
+  );
+
   const mutations = useMemo<QuestMutations>(
     () => ({
       changeEssence,
@@ -524,6 +611,7 @@ export function QuestProvider({
       addProvisionedSite,
       initializeDeckFromPool,
       resetQuest,
+      initializeQuest,
     }),
     [
       changeEssence,
@@ -550,6 +638,7 @@ export function QuestProvider({
       addProvisionedSite,
       initializeDeckFromPool,
       resetQuest,
+      initializeQuest,
     ],
   );
 

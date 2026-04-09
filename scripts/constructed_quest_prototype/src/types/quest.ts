@@ -119,10 +119,8 @@ export interface DreamAtlas {
 
 /** Discriminated union for the current screen. */
 export type Screen =
-  | { type: "questStart" }
-  | { type: "viewStartingDeck" }
-  | { type: "atlas" }
   | { type: "dreamscape" }
+  | { type: "atlas" }
   | { type: "site"; siteId: string }
   | { type: "questComplete" };
 
