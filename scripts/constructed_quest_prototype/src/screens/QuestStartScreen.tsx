@@ -1,188 +1,156 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { generateInitialAtlas } from "../atlas/atlas-generator";
-import { NAMED_TIDES, adjacentTides } from "../data/card-database";
+import { NAMED_TIDES, adjacentTides, TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { DREAMSIGNS } from "../data/dreamsigns";
 import { weightedSample } from "../data/tide-weights";
 import { logEvent } from "../logging";
 import { useQuestConfig } from "../state/quest-config";
-import type { Tide, CardData } from "../types/cards";
+import type { NamedTide, CardData } from "../types/cards";
 
-/** Energy cost bracket for a card. */
-function costBracket(card: CardData): "low" | "mid" | "high" {
-  const cost = card.energyCost ?? 0;
-  if (cost <= 2) return "low";
-  if (cost <= 4) return "mid";
-  return "high";
-}
-
-/**
- * Enforces energy curve minimums by swapping cards between brackets.
- * Mutates the array in place.
- */
-function enforceEnergyCurve(
-  cards: CardData[],
-  cardDatabase: Map<number, CardData>,
-  minLow: number,
-  minMid: number,
-  minHigh: number,
-): void {
-  const count = (bracket: "low" | "mid" | "high") =>
-    cards.filter((c) => costBracket(c) === bracket).length;
-
-  const brackets: Array<"low" | "mid" | "high"> = ["low", "mid", "high"];
-  const mins: Record<string, number> = { low: minLow, mid: minMid, high: minHigh };
-
-  for (const needed of brackets) {
-    while (count(needed) < mins[needed]) {
-      // Find an over-represented bracket to swap from
-      const donor = brackets.find(
-        (b) => b !== needed && count(b) > mins[b],
-      );
-      if (!donor) break;
-
-      // Find the donor card index in our array
-      const donorIdx = cards.findIndex((c) => costBracket(c) === donor);
-      if (donorIdx === -1) break;
-
-      // Find a replacement card from the database in the needed bracket
-      const existingNumbers = new Set(cards.map((c) => c.cardNumber));
-      const replacements = Array.from(cardDatabase.values()).filter(
-        (c) => costBracket(c) === needed && !existingNumbers.has(c.cardNumber),
-      );
-      if (replacements.length === 0) break;
-
-      const replacement =
-        replacements[Math.floor(Math.random() * replacements.length)];
-      cards[donorIdx] = replacement;
-    }
+/** Shuffles an array using Fisher-Yates. Returns a new array. */
+function shuffled<T>(items: readonly T[]): T[] {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
   }
+  return result;
 }
 
-/** Intro screen with dark fantasy styling and "Begin Quest" button. */
+/** Generates 3 distinct named tide options for quest start. */
+function generateStartingTideOptions(): NamedTide[] {
+  return shuffled(NAMED_TIDES).slice(0, 3) as NamedTide[];
+}
+
+/** Builds the 30-card starting deck for a chosen tide. */
+function buildStartingDeck(
+  cardDatabase: Map<number, CardData>,
+  startingTide: NamedTide,
+): { starterCards: CardData[]; tideCards: CardData[]; neutralCards: CardData[] } {
+  const allCards = Array.from(cardDatabase.values());
+
+  // 10 Starter cards (fixed loadout)
+  const starterCards = allCards.filter((c) => c.rarity === "Starter");
+
+  // 10 random cards from starting tide (excluding Starter, Legendary)
+  const tideCandidates = allCards.filter(
+    (c) =>
+      c.tide === startingTide &&
+      c.rarity !== "Starter" &&
+      c.rarity !== "Legendary",
+  );
+  const tideCards = weightedSample(tideCandidates, 10, () => 1);
+
+  // 10 random Neutral cards (excluding Starter, Legendary)
+  const neutralCandidates = allCards.filter(
+    (c) =>
+      c.tide === "Neutral" &&
+      c.rarity !== "Starter" &&
+      c.rarity !== "Legendary",
+  );
+  const neutralCards = weightedSample(neutralCandidates, 10, () => 1);
+
+  return { starterCards, tideCards, neutralCards };
+}
+
+/** Starting tide selection screen. */
 export function QuestStartScreen() {
   const { state, mutations, cardDatabase } = useQuest();
   const config = useQuestConfig();
 
-  const handleBeginQuest = useCallback(() => {
-    // Select center tide randomly from the 7 named tides
-    const centerTide =
-      NAMED_TIDES[Math.floor(Math.random() * NAMED_TIDES.length)];
+  // Generate stable tide options once
+  const optionsRef = useRef<NamedTide[] | null>(null);
+  if (optionsRef.current === null) {
+    optionsRef.current = generateStartingTideOptions();
+    logEvent("starting_tide_options_generated", {
+      options: optionsRef.current,
+    });
+  }
+  const options = optionsRef.current;
 
-    // Determine starting tides
-    let selectedTides: Tide[];
-    if (config.sequentialTides) {
-      const neighbors = adjacentTides(centerTide);
-      selectedTides = [centerTide, ...neighbors];
-    } else {
-      // Pick config.startingTides random distinct tides
-      const pool = [...NAMED_TIDES];
-      selectedTides = [];
-      for (let i = 0; i < config.startingTides && pool.length > 0; i++) {
-        const idx = Math.floor(Math.random() * pool.length);
-        selectedTides.push(pool[idx]);
-        pool.splice(idx, 1);
+  const handleChooseTide = useCallback(
+    (startingTide: NamedTide) => {
+      // Set starting tide and grant crystal
+      mutations.setStartingTide(startingTide);
+      mutations.addTideCrystal(startingTide, 1);
+
+      // Build starting deck
+      const { starterCards, tideCards, neutralCards } = buildStartingDeck(
+        cardDatabase,
+        startingTide,
+      );
+
+      logEvent("starting_deck_initialized", {
+        startingTide,
+        starterCount: starterCards.length,
+        tideCount: tideCards.length,
+        neutralCount: neutralCards.length,
+        totalDeckSize:
+          starterCards.length + tideCards.length + neutralCards.length,
+      });
+
+      // Add all cards to pool
+      const allCards = [...starterCards, ...tideCards, ...neutralCards];
+      for (const card of allCards) {
+        mutations.addToPool(card.cardNumber, "starter");
       }
-    }
 
-    mutations.setStartingTides(selectedTides);
+      // Initialize deck from pool
+      mutations.initializeDeckFromPool();
 
-    // Generate tide-colored starter cards
-    const cardsPerTide = Math.floor(config.initialCards / selectedTides.length);
-    const allCards = Array.from(cardDatabase.values());
-    const starterCards: CardData[] = [];
+      // Adjust essence if needed
+      if (config.startingEssence !== 250) {
+        mutations.changeEssence(
+          config.startingEssence - 250,
+          "starting_essence",
+        );
+      }
 
-    for (let t = 0; t < selectedTides.length; t++) {
-      const tide = selectedTides[t];
-      const tidePool = allCards.filter((c) => c.tide === tide);
-      const count =
-        t < config.initialCards % selectedTides.length
-          ? cardsPerTide + 1
-          : cardsPerTide;
-      const picked = weightedSample(tidePool, count, () => 1);
-      starterCards.push(...picked);
-    }
-    // Trim to exactly initialCards
-    starterCards.length = Math.min(starterCards.length, config.initialCards);
+      // Generate initial atlas
+      const atlas = generateInitialAtlas(state.completionLevel, {
+        cardDatabase,
+        dreamsignPool: DREAMSIGNS,
+        playerHasBanes: false,
+        startingTide,
+        playerPool: state.pool,
+        config,
+      } as any);
 
-    // Generate neutral cards
-    const neutralPool = allCards.filter((c) => c.tide === "Neutral");
-    const neutralCards = weightedSample(
-      neutralPool,
-      config.starterNeutral,
-      () => 1,
-    );
+      const firstNodeId = atlas.edges[0]?.[1];
+      const nodeCount = Object.keys(atlas.nodes).length - 1;
 
-    const allStarterCards = [...starterCards, ...neutralCards];
+      logEvent("quest_started", {
+        initialEssence: config.startingEssence,
+        dreamscapesGenerated: nodeCount,
+        startingTide,
+        startingDeckSize:
+          starterCards.length + tideCards.length + neutralCards.length,
+      });
 
-    // Energy curve enforcement
-    enforceEnergyCurve(
-      allStarterCards,
-      cardDatabase,
-      config.starterLowCost,
-      config.starterMidCost,
-      config.starterHighCost,
-    );
+      mutations.updateAtlas(atlas);
 
-    // Add all cards to pool
-    for (const card of allStarterCards) {
-      mutations.addToPool(card.cardNumber, "starter");
-    }
+      if (firstNodeId) {
+        mutations.setCurrentDreamscape(firstNodeId);
+      }
 
-    // Initialize deck from pool
-    mutations.initializeDeckFromPool();
-
-    // Adjust essence if needed
-    if (config.startingEssence !== 250) {
-      mutations.changeEssence(config.startingEssence - 250, "starting_essence");
-    }
-
-    // Generate initial atlas (level 0 produces single node with fixed composition)
-    const atlas = generateInitialAtlas(state.completionLevel, {
-      cardDatabase,
-      dreamsignPool: DREAMSIGNS,
-      playerHasBanes: false,
-      startingTides: selectedTides,
-      playerPool: state.pool,
-      config,
-    });
-
-    const firstNodeId = atlas.edges[0]?.[1];
-    const nodeCount = Object.keys(atlas.nodes).length - 1;
-
-    logEvent("quest_started", {
-      initialEssence: config.startingEssence,
-      dreamscapesGenerated: nodeCount,
-      startingTides: selectedTides,
-      starterCardCount: allStarterCards.length,
-    });
-
-    mutations.updateAtlas(atlas);
-
-    // Set current dreamscape to first non-nexus node
-    if (firstNodeId) {
-      mutations.setCurrentDreamscape(firstNodeId);
-    }
-
-    // Navigate to dreamscape screen
-    mutations.setScreen({ type: "dreamscape" });
-  }, [
-    state.completionLevel,
-    mutations,
-    cardDatabase,
-    config,
-  ]);
+      mutations.setScreen({ type: "dreamscape" });
+    },
+    [state.completionLevel, mutations, cardDatabase, config],
+  );
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
       <motion.h1
         className="mb-2 text-center text-5xl font-extrabold tracking-wide md:text-7xl lg:text-8xl"
         style={{
-          background: "linear-gradient(135deg, #a855f7 0%, #7c3aed 40%, #c084fc 100%)",
+          background:
+            "linear-gradient(135deg, #a855f7 0%, #7c3aed 40%, #c084fc 100%)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
-          textShadow: "0 0 60px rgba(168, 85, 247, 0.4), 0 0 120px rgba(124, 58, 237, 0.2)",
+          textShadow:
+            "0 0 60px rgba(168, 85, 247, 0.4), 0 0 120px rgba(124, 58, 237, 0.2)",
           filter: "drop-shadow(0 0 40px rgba(168, 85, 247, 0.3))",
         }}
         initial={{ opacity: 0, y: -30 }}
@@ -199,30 +167,67 @@ export function QuestStartScreen() {
         animate={{ opacity: 0.6 }}
         transition={{ duration: 0.8, delay: 0.3 }}
       >
-        A Roguelike Deckbuilding Quest
+        Choose Your Starting Tide
       </motion.p>
 
-      <motion.button
-        className="cursor-pointer rounded-lg px-10 py-4 text-lg font-bold tracking-wide text-white transition-colors md:text-xl"
-        style={{
-          background: "linear-gradient(135deg, #d4a017 0%, #b8860b 100%)",
-          border: "2px solid rgba(251, 191, 36, 0.6)",
-          boxShadow:
-            "0 0 20px rgba(212, 160, 23, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
-        }}
+      <motion.div
+        className="flex w-full max-w-3xl flex-col items-center gap-4 md:flex-row md:justify-center md:gap-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
-        whileHover={{
-          boxShadow:
-            "0 0 30px rgba(212, 160, 23, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
-          scale: 1.05,
-        }}
-        whileTap={{ scale: 0.97 }}
-        onClick={handleBeginQuest}
+        transition={{ duration: 0.6, delay: 0.5 }}
       >
-        Begin Quest
-      </motion.button>
+        {options.map((tide) => {
+          const color = TIDE_COLORS[tide];
+          const neighbors = adjacentTides(tide);
+          return (
+            <motion.button
+              key={tide}
+              className="flex w-full max-w-[260px] cursor-pointer flex-col items-center rounded-xl px-5 py-6"
+              style={{
+                background:
+                  "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
+                border: `2px solid ${color}40`,
+                boxShadow: `0 0 20px ${color}15`,
+              }}
+              whileHover={{
+                boxShadow: `0 0 30px ${color}40`,
+                scale: 1.05,
+                borderColor: `${color}80`,
+              }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => {
+                handleChooseTide(tide);
+              }}
+            >
+              <img
+                src={tideIconUrl(tide)}
+                alt={tide}
+                className="mb-3 h-14 w-14 rounded-full object-contain"
+                style={{ border: `2px solid ${color}` }}
+              />
+              <span
+                className="mb-2 text-xl font-bold"
+                style={{ color }}
+              >
+                {tide}
+              </span>
+              <span
+                className="text-center text-xs leading-relaxed opacity-60"
+                style={{ color: "#e2e8f0" }}
+              >
+                10 {tide} cards, 10 Starter cards, 10 Neutral cards, +1{" "}
+                {tide} crystal
+              </span>
+              <span
+                className="mt-2 text-center text-[10px] opacity-40"
+                style={{ color: "#e2e8f0" }}
+              >
+                Neighbors: {neighbors.join(" & ")}
+              </span>
+            </motion.button>
+          );
+        })}
+      </motion.div>
     </div>
   );
 }
