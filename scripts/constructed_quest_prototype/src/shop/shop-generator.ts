@@ -36,20 +36,20 @@ export function rerollCost(
 export function generateCardShopInventory(
   cardDatabase: Map<number, CardData>,
   playerPool: DeckEntry[],
-  startingTides: Tide[],
+  seedTides: Tide[],
   config: QuestConfig,
 ): ShopSlot[] {
   const poolTideCounts = countDeckTides(playerPool, cardDatabase);
 
   // Use starting tides to seed counts if pool is empty
-  for (const tide of startingTides) {
+  for (const tide of seedTides) {
     if (!poolTideCounts.has(tide)) {
       poolTideCounts.set(tide, 1);
     }
   }
 
   const allCards = Array.from(cardDatabase.values()).filter(
-    (c) => c.tide !== "Neutral",
+    (c) => c.tide !== "Neutral" && c.rarity !== "Starter",
   );
 
   const selected = weightedSample(

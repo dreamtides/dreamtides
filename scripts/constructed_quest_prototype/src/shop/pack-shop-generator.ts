@@ -13,10 +13,10 @@ const REMOVAL_KEYWORDS = ["dissolve", "prevent", "destroy", "banish", "remove"];
 /** Picks a tide weighted toward the player's pool composition. */
 function pickWeightedTide(
   poolTideCounts: Map<Tide, number>,
-  startingTides: Tide[],
+  seedTides: Tide[],
 ): Tide {
   // Seed starting tides if not yet present
-  for (const tide of startingTides) {
+  for (const tide of seedTides) {
     if (!poolTideCounts.has(tide)) {
       poolTideCounts.set(tide, 1);
     }
@@ -37,16 +37,27 @@ function pickWeightedTide(
   return tides[tides.length - 1];
 }
 
-/** Generates cards for a tide pack: 4 cards from the chosen tide. */
+/** Generates cards for a tide pack: 3-4 cards from the chosen tide + 0-1 neutral. */
 function generateTidePackCards(
   cardDatabase: Map<number, CardData>,
   tide: Tide,
 ): CardData[] {
   const candidates = Array.from(cardDatabase.values()).filter(
-    (c) => c.tide === tide,
+    (c) => c.tide === tide && c.rarity !== "Starter",
   );
   if (candidates.length === 0) return [];
-  return weightedSample(candidates, 4, () => 1);
+  const tideCards = weightedSample(candidates, 4, () => 1);
+
+  // Approximately 50% chance to replace last card with a Neutral
+  const neutralCandidates = Array.from(cardDatabase.values()).filter(
+    (c) => c.tide === "Neutral" && c.rarity !== "Starter" && c.rarity !== "Legendary",
+  );
+  if (neutralCandidates.length > 0 && tideCards.length > 0 && Math.random() < 0.5) {
+    const neutralCard = neutralCandidates[Math.floor(Math.random() * neutralCandidates.length)];
+    tideCards[tideCards.length - 1] = neutralCard;
+  }
+
+  return tideCards;
 }
 
 /** Generates cards for an alliance pack: 4 cards from a tide and its neighbors. */
@@ -56,8 +67,8 @@ function generateAlliancePackCards(
 ): CardData[] {
   const neighbors = adjacentTides(tide);
   const allowedTides = new Set<Tide>([tide, ...neighbors]);
-  const candidates = Array.from(cardDatabase.values()).filter((c) =>
-    allowedTides.has(c.tide),
+  const candidates = Array.from(cardDatabase.values()).filter(
+    (c) => allowedTides.has(c.tide) && c.rarity !== "Starter",
   );
   if (candidates.length === 0) return [];
   return weightedSample(candidates, 4, () => 1);
@@ -68,6 +79,7 @@ function generateRemovalPackCards(
   cardDatabase: Map<number, CardData>,
 ): CardData[] {
   const candidates = Array.from(cardDatabase.values()).filter((c) => {
+    if (c.rarity === "Starter") return false;
     const text = c.renderedText.toLowerCase();
     return REMOVAL_KEYWORDS.some((kw) => text.includes(kw));
   });
@@ -83,7 +95,8 @@ function generateAggroPackCards(
     (c) =>
       c.cardType === "Character" &&
       c.energyCost !== null &&
-      c.energyCost <= 3,
+      c.energyCost <= 3 &&
+      c.rarity !== "Starter",
   );
   if (candidates.length === 0) return [];
   return weightedSample(candidates, 4, () => 1);
@@ -94,7 +107,7 @@ function generateEventsPackCards(
   cardDatabase: Map<number, CardData>,
 ): CardData[] {
   const candidates = Array.from(cardDatabase.values()).filter(
-    (c) => c.cardType === "Event",
+    (c) => c.cardType === "Event" && c.rarity !== "Starter",
   );
   if (candidates.length === 0) return [];
   return weightedSample(candidates, 4, () => 1);
@@ -107,7 +120,7 @@ function generateEventsPackCards(
 export function generatePackShopInventory(
   cardDatabase: Map<number, CardData>,
   playerPool: ReadonlyArray<DeckEntry>,
-  startingTides: Tide[],
+  seedTides: Tide[],
   config: QuestConfig,
 ): PackShopSlot[] {
   const poolTideCounts = countDeckTides(playerPool, cardDatabase);
@@ -126,7 +139,7 @@ export function generatePackShopInventory(
         case "alliance": {
           const tide = pickWeightedTide(
             new Map(poolTideCounts),
-            startingTides,
+            seedTides,
           );
           const neighbors = adjacentTides(tide);
           const allianceLabel = `${tide} + ${neighbors.join(" & ")}`;
@@ -166,7 +179,7 @@ export function generatePackShopInventory(
           break;
       }
     } else {
-      const tide = pickWeightedTide(new Map(poolTideCounts), startingTides);
+      const tide = pickWeightedTide(new Map(poolTideCounts), seedTides);
       packs.push({
         packType: "tide",
         tide,
