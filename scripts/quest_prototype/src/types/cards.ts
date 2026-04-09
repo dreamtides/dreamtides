@@ -9,6 +9,9 @@ export type Tide =
   | "Surge"
   | "Neutral";
 
+/** The 7 non-neutral tides on the revised tide circle. */
+export type NamedTide = Exclude<Tide, "Neutral">;
+
 /** Card rarity levels (Special excluded from the draft pool). */
 export type Rarity =
   | "Common"
