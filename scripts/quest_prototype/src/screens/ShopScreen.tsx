@@ -64,15 +64,6 @@ export function ShopScreen({ site }: ShopScreenProps) {
           discountedPrice: price,
           essenceRemaining: essence - price,
         });
-      } else if (slot.itemType === "tideCrystal" && slot.tideCrystal) {
-        mutations.addTideCrystal(slot.tideCrystal, 1);
-        logEvent("shop_purchase", {
-          itemType: "tideCrystal",
-          tide: slot.tideCrystal,
-          basePrice: slot.basePrice,
-          discountedPrice: price,
-          essenceRemaining: essence - price,
-        });
       }
 
       setSlots((prev) =>
@@ -330,55 +321,6 @@ function ShopSlotCard({
           >
             {ds.effectDescription}
           </p>
-        </div>
-        <PriceButton
-          basePrice={slot.basePrice}
-          price={price}
-          hasDiscount={hasDiscount}
-          canAfford={canAfford}
-          onClick={() => onBuy(index)}
-        />
-      </div>
-    );
-  }
-
-  if (slot.itemType === "tideCrystal" && slot.tideCrystal) {
-    const tide = slot.tideCrystal;
-    const tideColor = TIDE_COLORS[tide];
-    return (
-      <div className="flex flex-col gap-2">
-        <div
-          className="flex flex-col items-center justify-center gap-3 rounded-lg p-4"
-          style={{
-            aspectRatio: "2 / 3",
-            background:
-              "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-            border: `1px solid ${tideColor}60`,
-            boxShadow: `0 0 8px ${tideColor}20`,
-          }}
-        >
-          <img
-            src={tideIconUrl(tide)}
-            alt={tide}
-            className="h-14 w-14 rounded-full object-contain"
-            style={{ border: `2px solid ${tideColor}` }}
-          />
-          <span
-            className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-            style={{
-              background: `${tideColor}20`,
-              color: tideColor,
-              border: `1px solid ${tideColor}40`,
-            }}
-          >
-            Tide Crystal
-          </span>
-          <h3
-            className="text-center text-base font-bold"
-            style={{ color: tideColor }}
-          >
-            {tide}
-          </h3>
         </div>
         <PriceButton
           basePrice={slot.basePrice}

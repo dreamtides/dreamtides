@@ -1,6 +1,6 @@
 import type { CardData, Tide, Rarity } from "../types/cards";
 import type { DeckEntry, Dreamsign } from "../types/quest";
-import { NAMED_TIDES } from "../data/card-database";
+
 import { DREAMSIGNS } from "../data/dreamsigns";
 
 /** Prices by rarity for card items. */
@@ -14,9 +14,6 @@ const RARITY_PRICES: Readonly<Record<Rarity, number>> = {
 /** Fixed price for dreamsign items. */
 const DREAMSIGN_PRICE = 150;
 
-/** Fixed price for tide crystal items. */
-const TIDE_CRYSTAL_PRICE = 200;
-
 /** Base cost for a shop reroll. */
 const REROLL_BASE_COST = 50;
 
@@ -26,18 +23,14 @@ const REROLL_INCREMENT = 25;
 /** Chance (out of 6) for a slot to be a dreamsign. */
 const DREAMSIGN_CHANCE = 1 / 6;
 
-/** Chance (out of 6) for a non-dreamsign slot to be a tide crystal. */
-const TIDE_CRYSTAL_CHANCE = 1 / 6;
-
 /** The types of items that can appear in a shop slot. */
-export type ShopItemType = "card" | "dreamsign" | "tideCrystal" | "reroll";
+export type ShopItemType = "card" | "dreamsign" | "reroll";
 
 /** A single slot in the shop inventory. */
 export interface ShopSlot {
   itemType: ShopItemType;
   card: CardData | null;
   dreamsign: Dreamsign | null;
-  tideCrystal: Tide | null;
   basePrice: number;
   discountPercent: number;
   purchased: boolean;
@@ -119,14 +112,6 @@ function selectRandomDreamsign(): Dreamsign {
   return { ...template, isBane: false };
 }
 
-/** Selects a random named tide for a tide crystal, excluding specified tides. */
-function selectRandomTide(excludedTides: Tide[]): Tide {
-  const excludedSet = new Set(excludedTides);
-  const available = NAMED_TIDES.filter((t) => !excludedSet.has(t));
-  if (available.length === 0) return NAMED_TIDES[0];
-  return available[Math.floor(Math.random() * available.length)];
-}
-
 /**
  * Generates shop inventory with 6 slots. Each slot can be a card,
  * dreamsign, tide crystal, or reroll option.
@@ -155,7 +140,6 @@ export function generateShopInventory(
         itemType: "reroll",
         card: null,
         dreamsign: null,
-        tideCrystal: null,
         basePrice: REROLL_BASE_COST,
         discountPercent: 0,
         purchased: false,
@@ -169,22 +153,7 @@ export function generateShopInventory(
         itemType: "dreamsign",
         card: null,
         dreamsign: selectRandomDreamsign(),
-        tideCrystal: null,
         basePrice: DREAMSIGN_PRICE,
-        discountPercent: 0,
-        purchased: false,
-      });
-      continue;
-    }
-
-    // Roll for tide crystal
-    if (Math.random() < TIDE_CRYSTAL_CHANCE) {
-      slots.push({
-        itemType: "tideCrystal",
-        card: null,
-        dreamsign: null,
-        tideCrystal: selectRandomTide(excludedTides),
-        basePrice: TIDE_CRYSTAL_PRICE,
         discountPercent: 0,
         purchased: false,
       });
@@ -198,7 +167,6 @@ export function generateShopInventory(
         itemType: "card",
         card,
         dreamsign: null,
-        tideCrystal: null,
         basePrice: RARITY_PRICES[card.rarity],
         discountPercent: 0,
         purchased: false,
@@ -246,7 +214,6 @@ export function generateSpecialtyShopInventory(
         itemType: "card",
         card,
         dreamsign: null,
-        tideCrystal: null,
         basePrice: RARITY_PRICES.Rare,
         discountPercent: 0,
         purchased: false,

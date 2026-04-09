@@ -157,7 +157,7 @@ function generateRewardData(
 /** Generates the site composition for a dreamscape. Total: 3-6 sites. */
 export function generateSiteComposition(
   completionLevel: number,
-  isFirstDreamscape: boolean,
+  _isFirstDreamscape: boolean,
   context: SiteGenerationContext,
 ): SiteState[] {
   const sites: SiteState[] = [];
@@ -180,18 +180,8 @@ export function generateSiteComposition(
     });
   }
 
-  // Dreamcaller draft in initial dreamscapes connected to nexus
-  if (isFirstDreamscape) {
-    sites.push({
-      id: nextSiteId(),
-      type: "DreamcallerDraft",
-      isEnhanced: false,
-      isVisited: false,
-    });
-  }
-
   // Additional sites from the weighted pool, clamped so total is 3-6.
-  // Fixed count = drafts + dreamcaller draft + battle (always 1).
+  // Fixed count = drafts + battle (always 1).
   const fixedCount = sites.length + 1;
   const minAdditional = Math.max(2, 3 - fixedCount);
   const maxAdditional = Math.max(minAdditional, 6 - fixedCount);

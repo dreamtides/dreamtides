@@ -51,7 +51,6 @@ describe("effectivePrice", () => {
       itemType: "card",
       card: null,
       dreamsign: null,
-      tideCrystal: null,
       basePrice: 100,
       discountPercent: 0,
       purchased: false,
@@ -64,7 +63,6 @@ describe("effectivePrice", () => {
       itemType: "card",
       card: null,
       dreamsign: null,
-      tideCrystal: null,
       basePrice: 200,
       discountPercent: 50,
       purchased: false,
@@ -77,7 +75,6 @@ describe("effectivePrice", () => {
       itemType: "card",
       card: null,
       dreamsign: null,
-      tideCrystal: null,
       basePrice: 100,
       discountPercent: 30,
       purchased: false,
@@ -175,17 +172,6 @@ describe("generateShopInventory", () => {
     }
   });
 
-  it("tide crystal slots have price 200", () => {
-    for (let i = 0; i < 50; i++) {
-      const slots = generateShopInventory(db, []);
-      for (const slot of slots) {
-        if (slot.itemType === "tideCrystal") {
-          expect(slot.basePrice).toBe(200);
-          expect(slot.tideCrystal).not.toBeNull();
-        }
-      }
-    }
-  });
 });
 
 describe("generateShopInventory with empty database", () => {

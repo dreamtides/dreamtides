@@ -221,12 +221,6 @@ export function DeckViewer({
     };
   }, [showSortDropdown, closeSortDropdown]);
 
-  const nonZeroCrystals = useMemo(() => {
-    return Object.entries(state.tideCrystals).filter(
-      ([_, count]) => count > 0,
-    ) as Array<[Tide, number]>;
-  }, [state.tideCrystals]);
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -715,46 +709,6 @@ export function DeckViewer({
                 )}
               </div>
 
-              {/* Tide Crystals section */}
-              {nonZeroCrystals.length > 0 && (
-                <div>
-                  <h3
-                    className="mb-2 text-xs font-bold uppercase tracking-wider"
-                    style={{ color: "#a855f7" }}
-                  >
-                    Tide Crystals
-                  </h3>
-                  <div className="flex flex-col gap-1.5">
-                    {nonZeroCrystals.map(([tide, count]) => (
-                      <div
-                        key={tide}
-                        className="flex items-center gap-2"
-                      >
-                        <img
-                          src={tideIconUrl(tide)}
-                          alt={tide}
-                          className="h-4 w-4 rounded-full"
-                          style={{
-                            border: `1px solid ${TIDE_COLORS[tide]}`,
-                          }}
-                        />
-                        <span
-                          className="text-xs font-medium"
-                          style={{ color: TIDE_COLORS[tide] }}
-                        >
-                          {tide}
-                        </span>
-                        <span
-                          className="ml-auto text-xs font-bold"
-                          style={{ color: "#e2e8f0" }}
-                        >
-                          {String(count)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
@@ -762,7 +716,6 @@ export function DeckViewer({
           <MobileSidebar
             dreamcaller={state.dreamcaller}
             dreamsigns={state.dreamsigns}
-            tideCrystals={nonZeroCrystals}
           />
 
           {/* Card overlay */}
@@ -777,18 +730,16 @@ export function DeckViewer({
 function MobileSidebar({
   dreamcaller,
   dreamsigns,
-  tideCrystals,
 }: {
   dreamcaller: QuestState["dreamcaller"];
   dreamsigns: QuestState["dreamsigns"];
-  tideCrystals: Array<[Tide, number]>;
 }) {
   const [activeTab, setActiveTab] = useState<
-    "dreamcaller" | "dreamsigns" | "crystals" | null
+    "dreamcaller" | "dreamsigns" | null
   >(null);
 
   const toggleTab = useCallback(
-    (tab: "dreamcaller" | "dreamsigns" | "crystals") => {
+    (tab: "dreamcaller" | "dreamsigns") => {
       setActiveTab((prev) => (prev === tab ? null : tab));
     },
     [],
@@ -836,24 +787,6 @@ function MobileSidebar({
         >
           Signs ({String(dreamsigns.length)}/12)
         </button>
-        {tideCrystals.length > 0 && (
-          <button
-            className="flex-1 cursor-pointer px-2 py-1.5 text-[10px] font-medium transition-colors"
-            style={{
-              color: activeTab === "crystals" ? "#c084fc" : "#6b7280",
-              background:
-                activeTab === "crystals"
-                  ? "rgba(168, 85, 247, 0.15)"
-                  : "transparent",
-              borderBottom: `2px solid ${activeTab === "crystals" ? "#a855f7" : "transparent"}`,
-            }}
-            onClick={() => {
-              toggleTab("crystals");
-            }}
-          >
-            Crystals
-          </button>
-        )}
       </div>
 
       {/* Tab content */}
@@ -948,25 +881,6 @@ function MobileSidebar({
                     </div>
                   ))
                 )}
-              </div>
-            )}
-            {activeTab === "crystals" && (
-              <div className="flex flex-wrap gap-3">
-                {tideCrystals.map(([tide, count]) => (
-                  <div key={tide} className="flex items-center gap-1">
-                    <img
-                      src={tideIconUrl(tide)}
-                      alt={tide}
-                      className="h-3.5 w-3.5 rounded-full"
-                    />
-                    <span
-                      className="text-[10px] font-bold"
-                      style={{ color: TIDE_COLORS[tide] }}
-                    >
-                      {tide}: {String(count)}
-                    </span>
-                  </div>
-                ))}
               </div>
             )}
           </motion.div>

@@ -1,20 +1,50 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { generateInitialAtlas } from "../atlas/atlas-generator";
 import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { DREAMCALLERS } from "../data/dreamcallers";
 import { DREAMSIGNS } from "../data/dreamsigns";
 import { initializeDraftState } from "../draft/draft-engine";
 import { logEvent } from "../logging";
-import type { Tide } from "../types/cards";
+import type { Dreamcaller } from "../types/quest";
 
-/** Intro screen where the player picks one of 7 tides to draft from. */
+/** Pick 3 dreamcallers with distinct tides. */
+function selectStartingDreamcallers(): Dreamcaller[] {
+  const pool = [...DREAMCALLERS];
+  // Shuffle
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  const result: Dreamcaller[] = [];
+  const usedTides = new Set<string>();
+  for (const dc of pool) {
+    if (dc.tide === "Neutral") continue;
+    if (usedTides.has(dc.tide)) continue;
+    result.push(dc);
+    usedTides.add(dc.tide);
+    if (result.length === 3) break;
+  }
+  return result;
+}
+
+/** Intro screen where the player picks a dreamcaller to start the quest. */
 export function QuestStartScreen() {
   const { state, mutations, cardDatabase } = useQuest();
 
-  const handlePickTide = useCallback(
-    (tide: Tide) => {
+  const offeredRef = useRef<Dreamcaller[] | null>(null);
+  if (offeredRef.current === null) {
+    offeredRef.current = selectStartingDreamcallers();
+  }
+  const offered = offeredRef.current;
+
+  const handlePickDreamcaller = useCallback(
+    (dreamcaller: Dreamcaller) => {
+      const tide = dreamcaller.tide;
       mutations.setChosenTide(tide);
+      mutations.setDreamcaller(dreamcaller);
+      mutations.changeEssence(dreamcaller.essenceBonus, "dreamcaller_bonus");
 
       const excludedTides = NAMED_TIDES.filter((t) => t !== tide);
       const playerHasBanes =
@@ -39,6 +69,7 @@ export function QuestStartScreen() {
       logEvent("quest_started", {
         initialEssence: state.essence,
         chosenTide: tide,
+        dreamcallerName: dreamcaller.name,
         dreamscapesGenerated: Object.keys(atlas.nodes).length - 1,
       });
 
@@ -77,52 +108,77 @@ export function QuestStartScreen() {
         animate={{ opacity: 0.6 }}
         transition={{ duration: 0.8, delay: 0.3 }}
       >
-        Choose Your Tide
+        Choose Your Dreamcaller
       </motion.p>
 
       <motion.div
-        className="flex flex-wrap justify-center gap-4"
+        className="flex flex-col items-center gap-4 md:flex-row md:items-stretch md:gap-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
       >
-        {NAMED_TIDES.map((tide, index) => {
-          const color = TIDE_COLORS[tide];
+        {offered.map((dreamcaller, index) => {
+          const color = TIDE_COLORS[dreamcaller.tide];
           return (
             <motion.button
-              key={tide}
-              className="flex cursor-pointer flex-col items-center rounded-xl px-6 py-5"
+              key={dreamcaller.name}
+              className="flex cursor-pointer flex-col items-center rounded-xl px-5 py-6 md:px-6 md:py-8"
               style={{
                 background: "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
                 border: `2px solid ${color}40`,
-                boxShadow: `0 0 15px ${color}15`,
-                minWidth: "120px",
+                boxShadow: `0 0 20px ${color}15`,
+                minWidth: "220px",
+                maxWidth: "320px",
+                flex: "1 1 0",
               }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.6 + index * 0.07 }}
+              transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
               whileHover={{
-                boxShadow: `0 0 30px ${color}50`,
+                boxShadow: `0 0 40px ${color}50`,
                 borderColor: `${color}90`,
-                scale: 1.08,
+                scale: 1.05,
               }}
-              whileTap={{ scale: 0.95 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => {
-                handlePickTide(tide);
+                handlePickDreamcaller(dreamcaller);
               }}
             >
               <img
-                src={tideIconUrl(tide)}
-                alt={tide}
-                className="mb-3 h-14 w-14 rounded-full object-contain md:h-16 md:w-16"
+                src={tideIconUrl(dreamcaller.tide)}
+                alt={dreamcaller.tide}
+                className="mb-3 h-12 w-12 rounded-full object-contain md:h-14 md:w-14"
                 style={{ border: `2px solid ${color}` }}
               />
-              <span
-                className="text-lg font-bold"
+              <h3
+                className="mb-2 text-center text-xl font-bold leading-tight md:text-2xl"
                 style={{ color }}
               >
-                {tide}
+                {dreamcaller.name}
+              </h3>
+              <span
+                className="mb-3 rounded-full px-3 py-0.5 text-xs font-medium"
+                style={{
+                  background: `${color}20`,
+                  color,
+                  border: `1px solid ${color}30`,
+                }}
+              >
+                {dreamcaller.tide} Tide
               </span>
+              <p
+                className="mb-4 text-center text-sm leading-relaxed opacity-80"
+                style={{ color: "#e2e8f0" }}
+              >
+                {dreamcaller.abilityDescription}
+              </p>
+              <div className="flex items-center gap-1.5">
+                <span style={{ color: "#fbbf24" }}>{"\u25C6"}</span>
+                <span className="text-lg font-bold" style={{ color: "#fbbf24" }}>
+                  +{String(dreamcaller.essenceBonus)}
+                </span>
+                <span className="text-xs opacity-50">Essence</span>
+              </div>
             </motion.button>
           );
         })}

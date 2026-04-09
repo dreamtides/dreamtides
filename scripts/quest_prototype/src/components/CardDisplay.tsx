@@ -59,7 +59,7 @@ export function CardDisplay({
   selected = false,
   selectionColor = "#f97316",
   tintColor,
-  showTideSymbols = true,
+  showTideSymbols = false,
   className,
   large = false,
 }: CardDisplayProps) {

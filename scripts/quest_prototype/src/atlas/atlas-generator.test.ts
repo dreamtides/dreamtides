@@ -108,13 +108,6 @@ describe("generateSiteComposition", () => {
     expect(drafts.length).toBe(0);
   });
 
-  it("includes DreamcallerDraft only for the first dreamscape", () => {
-    const first = generateSiteComposition(0, true, defaultContext());
-    const notFirst = generateSiteComposition(0, false, defaultContext());
-    expect(first.some((s) => s.type === "DreamcallerDraft")).toBe(true);
-    expect(notFirst.some((s) => s.type === "DreamcallerDraft")).toBe(false);
-  });
-
   it("always ends with a Battle site", () => {
     for (let level = 0; level <= 7; level++) {
       resetAtlasGenerator();
@@ -244,17 +237,6 @@ describe("generateInitialAtlas", () => {
     }
   });
 
-  it("includes DreamcallerDraft in every initial dreamscape node", () => {
-    for (let i = 0; i < 30; i++) {
-      const atlas = generateInitialAtlas(0, defaultContext());
-      const initialNodes = Object.values(atlas.nodes).filter(
-        (n) => n.id !== atlas.nexusId,
-      );
-      for (const node of initialNodes) {
-        expect(node.sites.some((s) => s.type === "DreamcallerDraft")).toBe(true);
-      }
-    }
-  });
 });
 
 describe("generateNewNodes", () => {
@@ -327,7 +309,7 @@ describe("assignBiome", () => {
 });
 
 describe("previewSiteTypes", () => {
-  it("excludes Battle and Draft but includes DreamcallerDraft", () => {
+  it("excludes Battle and Draft", () => {
     const node: DreamscapeNode = {
       id: "test",
       biomeName: "Test",
@@ -335,7 +317,6 @@ describe("previewSiteTypes", () => {
       sites: [
         { id: "s1", type: "Draft", isEnhanced: false, isVisited: false },
         { id: "s2", type: "Battle", isEnhanced: false, isVisited: false },
-        { id: "s3", type: "DreamcallerDraft", isEnhanced: false, isVisited: false },
         { id: "s4", type: "Shop", isEnhanced: false, isVisited: false },
         { id: "s5", type: "Essence", isEnhanced: false, isVisited: false },
       ],
@@ -344,7 +325,7 @@ describe("previewSiteTypes", () => {
       enhancedSiteType: null,
     };
     const preview = previewSiteTypes(node);
-    expect(preview).toEqual(["DreamcallerDraft", "Shop", "Essence"]);
+    expect(preview).toEqual(["Shop", "Essence"]);
   });
 
   it("returns at most 3 site types", () => {

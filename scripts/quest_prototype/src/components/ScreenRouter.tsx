@@ -6,7 +6,7 @@ import { QuestStartScreen } from "../screens/QuestStartScreen";
 import { QuestCompleteScreen } from "../screens/QuestCompleteScreen";
 import { DreamscapeScreen } from "../screens/DreamscapeScreen";
 import { DraftSiteScreen } from "../screens/DraftSiteScreen";
-import { DreamcallerDraftScreen } from "../screens/DreamcallerDraftScreen";
+
 import { BattleScreen } from "../screens/BattleScreen";
 import { ShopScreen } from "../screens/ShopScreen";
 import { SpecialtyShopScreen } from "../screens/SpecialtyShopScreen";
@@ -85,10 +85,6 @@ function SiteScreen({ siteId }: { siteId: string }) {
 
   if (site.type === "Draft") {
     return <DraftSiteScreen siteId={siteId} />;
-  }
-
-  if (site.type === "DreamcallerDraft") {
-    return <DreamcallerDraftScreen site={site} />;
   }
 
   if (site.type === "Battle") {
