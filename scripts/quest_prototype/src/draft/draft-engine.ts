@@ -1,6 +1,9 @@
-import type { CardData, Tide } from "../types/cards";
+import type { CardData, NamedTide, Tide } from "../types/cards";
 import type { DraftConfig, DraftState, PackContext, PackStrategy } from "../types/draft";
+import type { QuestTideProfile } from "../data/quest-tide-profile";
 import { NAMED_TIDES } from "../data/card-database";
+import { draftPoolCards } from "../data/card-pools";
+import { tideProfileWeight } from "../data/quest-tide-profile";
 import { logEvent } from "../logging";
 
 /** Default shared draft configuration. */
@@ -147,9 +150,12 @@ function computeCardWeight(
   card: CardData,
   affinity: Map<string, number>,
   focus: number,
+  ctx: PackContext,
 ): number {
+  const profileWeight =
+    ctx.questTideProfile === undefined ? 1 : tideProfileWeight(ctx.questTideProfile, card.tide);
   const tideAffinity = affinity.get(card.tide) ?? 1.0;
-  return Math.pow(tideAffinity, focus);
+  return profileWeight * Math.pow(tideAffinity, focus);
 }
 
 /** Fisher-Yates shuffle of an array in place. */
@@ -202,7 +208,7 @@ function tideCurrentPack(ctx: PackContext): number[] {
   for (const cardNumber of ctx.pool) {
     const card = ctx.cardDatabase.get(cardNumber);
     if (!card) continue;
-    entries.push({ cardNumber, weight: computeCardWeight(card, affinity, focus) });
+    entries.push({ cardNumber, weight: computeCardWeight(card, affinity, focus, ctx) });
   }
 
   return weightedSample(entries, ctx.packSize);
@@ -221,7 +227,7 @@ function poolBiasPack(
   for (const cardNumber of ctx.pool) {
     const card = ctx.cardDatabase.get(cardNumber);
     if (!card) continue;
-    let weight = computeCardWeight(card, affinity, focus);
+    let weight = computeCardWeight(card, affinity, focus, ctx);
     if (featuredSet.has(card.tide)) {
       weight *= strategy.featuredWeight;
     }
@@ -293,13 +299,14 @@ export function initializeDraftState(
   cardDatabase: Map<number, CardData>,
   excludedTides: Tide[],
   poolBias: boolean = false,
+  consumedStartingCardNumbers: number[] = [],
 ): DraftState {
-  const excludedSet = new Set(excludedTides);
-  const pool = Array.from(cardDatabase.keys()).filter((cardNum) => {
-    const card = cardDatabase.get(cardNum);
-    return card !== undefined && !excludedSet.has(card.tide);
-  });
+  const pool = draftPoolCards(cardDatabase, {
+    excludedTides: excludedTides as NamedTide[],
+    consumedCardNumbers: new Set(consumedStartingCardNumbers),
+  }).map((card) => card.cardNumber);
 
+  const excludedSet = new Set(excludedTides);
   const availableTides = NAMED_TIDES.filter((t) => !excludedSet.has(t));
   let packStrategy: PackStrategy;
   if (poolBias) {
@@ -323,6 +330,7 @@ export function initializeDraftState(
     pickNumber: 1,
     sitePicksCompleted: 0,
     packStrategy,
+    consumedStartingCardNumbers,
   };
 }
 
@@ -331,6 +339,7 @@ export function enterDraftSite(
   state: DraftState,
   cardDatabase: Map<number, CardData>,
   config: DraftConfig = DEFAULT_DRAFT_CONFIG,
+  questTideProfile?: QuestTideProfile,
 ): void {
   state.sitePicksCompleted = 0;
   state.currentPack = generatePack(state.packStrategy, {
@@ -339,6 +348,7 @@ export function enterDraftSite(
     draftedCards: state.draftedCards,
     pickNumber: state.pickNumber,
     packSize: config.packSize,
+    questTideProfile,
   });
 
   logEvent("draft_site_entered", {
@@ -363,6 +373,7 @@ export function processPlayerPick(
   state: DraftState,
   cardDatabase: Map<number, CardData>,
   config: DraftConfig = DEFAULT_DRAFT_CONFIG,
+  questTideProfile?: QuestTideProfile,
 ): boolean {
   const packIndex = state.currentPack.indexOf(cardNumber);
   if (packIndex === -1) {
@@ -403,6 +414,7 @@ export function processPlayerPick(
     draftedCards: state.draftedCards,
     pickNumber: state.pickNumber,
     packSize: config.packSize,
+    questTideProfile,
   });
 
   return false;

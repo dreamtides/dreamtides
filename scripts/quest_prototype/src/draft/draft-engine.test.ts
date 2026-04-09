@@ -20,7 +20,7 @@ import {
 function makeCard(
   cardNumber: number,
   tide: Tide = "Bloom",
-  rarity: "Common" | "Uncommon" | "Rare" | "Legendary" = "Common",
+  rarity: "Common" | "Uncommon" | "Rare" | "Legendary" | "Starter" = "Common",
 ): CardData {
   return {
     name: `TestCard${String(cardNumber)}`,
@@ -123,6 +123,18 @@ describe("initializeDraftState", () => {
       expect(state.packStrategy.featuredTides).toHaveLength(2);
       expect(state.packStrategy.featuredWeight).toBe(2.0);
     }
+  });
+
+  it("excludes Starter cards and consumed starting cards from pool", () => {
+    const db = buildDB([
+      makeCard(1, "Bloom", "Common"),
+      makeCard(2, "Bloom", "Starter"),
+      makeCard(3, "Arc", "Common"),
+      makeCard(4, "Neutral", "Common"),
+    ]);
+    const state = initializeDraftState(db, [], false, [1, 4]);
+    expect(state.pool).toEqual([3]);
+    expect(state.consumedStartingCardNumbers).toEqual([1, 4]);
   });
 });
 
@@ -245,6 +257,35 @@ describe("generatePack", () => {
     const featuredCount = (tideCounts["Bloom"] ?? 0) + (tideCounts["Arc"] ?? 0);
     const nonFeaturedCount = (tideCounts["Ignite"] ?? 0) + (tideCounts["Pact"] ?? 0);
     expect(featuredCount).toBeGreaterThan(nonFeaturedCount * 1.5);
+  });
+
+  it("uses questTideProfile to seed early pack affinity", () => {
+    const db = buildEvenDB(40);
+    const pool = Array.from(db.keys());
+    const profile = {
+      weights: { Bloom: 30, Arc: 1, Ignite: 1, Pact: 1, Umbra: 1, Rime: 1, Surge: 1, Neutral: 1 },
+      contributions: {
+        baseline: { Bloom: 1, Arc: 1, Ignite: 1, Pact: 1, Umbra: 1, Rime: 1, Surge: 1, Neutral: 1 },
+        startingTide: { Bloom: 29, Arc: 0, Ignite: 0, Pact: 0, Umbra: 0, Rime: 0, Surge: 0, Neutral: 0 },
+        neighbors: { Bloom: 0, Arc: 0, Ignite: 0, Pact: 0, Umbra: 0, Rime: 0, Surge: 0, Neutral: 0 },
+        deck: { Bloom: 0, Arc: 0, Ignite: 0, Pact: 0, Umbra: 0, Rime: 0, Surge: 0, Neutral: 0 },
+        dreamcaller: { Bloom: 0, Arc: 0, Ignite: 0, Pact: 0, Umbra: 0, Rime: 0, Surge: 0, Neutral: 0 },
+        crystals: { Bloom: 0, Arc: 0, Ignite: 0, Pact: 0, Umbra: 0, Rime: 0, Surge: 0, Neutral: 0 },
+        recentDraftPicks: { Bloom: 0, Arc: 0, Ignite: 0, Pact: 0, Umbra: 0, Rime: 0, Surge: 0, Neutral: 0 },
+      },
+    };
+    const counts: Record<string, number> = {};
+    for (let i = 0; i < 300; i++) {
+      const pack = generatePack(
+        { type: "tide_current" },
+        { pool, cardDatabase: db, draftedCards: [], pickNumber: 1, packSize: 4, questTideProfile: profile },
+      );
+      for (const num of pack) {
+        const tide = db.get(num)!.tide;
+        counts[tide] = (counts[tide] ?? 0) + 1;
+      }
+    }
+    expect(counts.Bloom).toBeGreaterThan(counts.Pact * 3);
   });
 
   it("pool_bias does not affect non-featured tide cards", () => {

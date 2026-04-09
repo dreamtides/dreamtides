@@ -1,4 +1,5 @@
 import type { CardData, Tide } from "./cards";
+import type { QuestTideProfile } from "../data/quest-tide-profile";
 
 /** Configuration shared across all pack generation strategies. */
 export interface DraftConfig {
@@ -18,6 +19,8 @@ export interface PackContext {
   pickNumber: number;
   /** Number of cards to include in the pack. */
   packSize: number;
+  /** Optional adaptive quest profile used as an affinity seed. */
+  questTideProfile?: QuestTideProfile;
 }
 
 /** Strategy for generating card packs during draft. */
@@ -39,4 +42,6 @@ export interface DraftState {
   sitePicksCompleted: number;
   /** Strategy used to generate packs. */
   packStrategy: PackStrategy;
+  /** Cards consumed by quest-start random grants. Not part of finite draft pool. */
+  consumedStartingCardNumbers: number[];
 }
