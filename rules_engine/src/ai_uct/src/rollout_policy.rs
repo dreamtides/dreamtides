@@ -1,4 +1,7 @@
+use std::cmp::Ordering;
+
 use battle_mutations::actions::apply_battle_action;
+use battle_queries::battle_card_queries::card_properties;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::{
     LegalActions, StandardLegalActions,
@@ -8,6 +11,12 @@ use battle_state::battle::battle_state::BattleState;
 use core_data::types::PlayerName;
 
 use crate::position_assignment::{self, CharacterPlacement, PositionAssignment};
+
+pub struct HybridRolloutChoice {
+    pub action: BattleAction,
+    pub assignment: Option<PositionAssignment>,
+    pub pass_suppressed: bool,
+}
 
 /// Atomically applies a position assignment to the battle state via the
 /// standard action sequence.
@@ -115,6 +124,100 @@ pub fn play_random_turn(battle: &mut BattleState, player: PlayerName) {
     }
 }
 
+pub fn pick_hybrid_rollout_action(
+    battle: &BattleState,
+    player: PlayerName,
+    actions: &StandardLegalActions,
+) -> Option<HybridRolloutChoice> {
+    let legal = LegalActions::Standard { actions: actions.clone() };
+    let all_actions = legal.all();
+    if all_actions.is_empty() {
+        return None;
+    }
+
+    let has_proactive_action = all_actions.iter().copied().any(|action| {
+        !matches!(
+            action,
+            BattleAction::EndTurn | BattleAction::PassPriority | BattleAction::StartNextTurn
+        )
+    });
+    let best_assignment = if actions.can_begin_positioning {
+        position_assignment::best_assignment(battle, player)
+    } else {
+        None
+    };
+
+    let mut scored: Vec<_> = all_actions
+        .iter()
+        .copied()
+        .map(|action| (action, score_standard_action(battle, player, actions, action)))
+        .collect();
+    scored.sort_by(|left, right| right.1.partial_cmp(&left.1).unwrap_or(Ordering::Equal));
+    let (action, _) = scored.first().copied()?;
+    let pass_suppressed = has_proactive_action
+        && matches!(
+            action,
+            BattleAction::EndTurn | BattleAction::PassPriority | BattleAction::StartNextTurn
+        );
+
+    if action == BattleAction::BeginPositioning {
+        return Some(HybridRolloutChoice { action, assignment: best_assignment, pass_suppressed });
+    }
+
+    Some(HybridRolloutChoice { action, assignment: None, pass_suppressed })
+}
+
+pub fn score_standard_action(
+    battle: &BattleState,
+    player: PlayerName,
+    actions: &StandardLegalActions,
+    action: BattleAction,
+) -> f64 {
+    match action {
+        BattleAction::PlayCardFromHand(card_id) => {
+            let spark =
+                f64::from(card_properties::base_spark(battle, card_id).unwrap_or_default().0);
+            let cost = f64::from(card_properties::converted_energy_cost(battle, card_id).0);
+            let fast_bonus = if card_properties::is_fast(battle, card_id) { 12.0 } else { 0.0 };
+            55.0 + spark * 18.0 + cost * 8.0 + fast_bonus
+        }
+        BattleAction::PlayCardFromVoid(card_id) => {
+            let spark =
+                f64::from(card_properties::base_spark(battle, card_id).unwrap_or_default().0);
+            let cost = f64::from(card_properties::converted_energy_cost(battle, card_id).0);
+            let fast_bonus = if card_properties::is_fast(battle, card_id) { 10.0 } else { 0.0 };
+            48.0 + spark * 16.0 + cost * 7.0 + fast_bonus
+        }
+        BattleAction::ActivateAbilityForCharacter(character_id) => {
+            let spark = f64::from(
+                card_properties::spark(battle, player, character_id).unwrap_or_default().0,
+            );
+            28.0 + spark * 10.0
+        }
+        BattleAction::BeginPositioning => {
+            let assignment_score = position_assignment::best_assignment(battle, player)
+                .map(|assignment| position_assignment::describe(battle, player, &assignment))
+                .map_or(0.0, |description| assignment_description_score(&description));
+            36.0 + assignment_score
+        }
+        BattleAction::PassPriority => {
+            if has_non_pass_action(actions) {
+                -65.0
+            } else {
+                -5.0
+            }
+        }
+        BattleAction::EndTurn | BattleAction::StartNextTurn => {
+            if has_non_pass_action(actions) {
+                -80.0
+            } else {
+                -10.0
+            }
+        }
+        _ => 0.0,
+    }
+}
+
 fn greedy_card_play(battle: &mut BattleState, player: PlayerName) {
     loop {
         let legal = legal_actions::compute(battle, player);
@@ -142,6 +245,24 @@ fn pick_best_card_action(actions: &StandardLegalActions) -> Option<BattleAction>
         return Some(BattleAction::ActivateAbilityForCharacter(char_id));
     }
     None
+}
+
+fn assignment_description_score(description: &str) -> f64 {
+    if description == "hold-all" {
+        4.0
+    } else {
+        let attack_count = description.matches("attack-").count() as f64;
+        let block_count = description.matches("block-").count() as f64;
+        let chump_count = description.matches("chump-").count() as f64;
+        attack_count * 12.0 + block_count * 18.0 + chump_count * 10.0
+    }
+}
+
+fn has_non_pass_action(actions: &StandardLegalActions) -> bool {
+    !actions.play_card_from_hand.is_empty()
+        || !actions.play_card_from_void.is_empty()
+        || !actions.activate_abilities_for_character.is_empty()
+        || actions.can_begin_positioning
 }
 
 fn resolve_until_standard(battle: &mut BattleState, player: PlayerName) {

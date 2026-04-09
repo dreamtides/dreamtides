@@ -177,6 +177,9 @@ namespace Dreamtides.Schema
         [JsonProperty("MonteCarloSingleThreaded", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? MonteCarloSingleThreaded { get; set; }
 
+        [JsonProperty("MonteCarloHybridV1", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? MonteCarloHybridV1 { get; set; }
+
         [JsonProperty("StrategicV1", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? StrategicV1 { get; set; }
 

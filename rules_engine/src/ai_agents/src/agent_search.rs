@@ -7,7 +7,7 @@ use ai_data::game_ai::GameAI;
 use ai_strategic::{search, search_v2, search_v3};
 use ai_uct::position_assignment::{CharacterPlacement, PositionAssignment};
 use ai_uct::uct_config::UctConfig;
-use ai_uct::{uct_search, uct_search_v2, uct_search_v3, uct_search_v4};
+use ai_uct::{uct_search, uct_search_hybrid_v1, uct_search_v2, uct_search_v3, uct_search_v4};
 use battle_mutations::player_mutations::player_state;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
@@ -181,6 +181,27 @@ pub fn select_action_unchecked(
                 single_threaded: false,
             };
             uct_search_v4::search(battle, player, &config)
+        }
+        GameAI::MonteCarloHybridV1(budget_ms) => {
+            if !uct_search_hybrid_v1::is_available() {
+                debug!(
+                    "MonteCarloHybridV1 artifacts unavailable, falling back to MonteCarloV4(50)"
+                );
+                let battle = &player_state::randomize_battle_player(
+                    initial_battle,
+                    player.opponent(),
+                    rand::rng().random(),
+                );
+                let config = UctConfig {
+                    max_iterations_per_action: 50_000,
+                    max_total_actions_multiplier: 6,
+                    iteration_multiplier_override,
+                    single_threaded: false,
+                };
+                return uct_search_v4::search(battle, player, &config);
+            }
+
+            uct_search_hybrid_v1::search(initial_battle, player, *budget_ms)
         }
         GameAI::StrategicV1(budget_ms) => {
             if let Some(action) = next_strategic_action(initial_battle, player) {

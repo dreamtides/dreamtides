@@ -40,3 +40,8 @@ uuid = { workspace = true }
 name = "collect_strategic_v3_dataset"
 path = "src/collect_strategic_v3_dataset.rs"
 test = false
+
+[[bin]]
+name = "collect_monte_carlo_hybrid_v1_dataset"
+path = "src/collect_monte_carlo_hybrid_v1_dataset.rs"
+test = false

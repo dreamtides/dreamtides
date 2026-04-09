@@ -3545,6 +3545,20 @@
         {
           "type": "object",
           "properties": {
+            "MonteCarloHybridV1": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "MonteCarloHybridV1"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
             "StrategicV1": {
               "type": "integer",
               "format": "uint32",

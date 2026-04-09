@@ -1,9 +1,15 @@
 pub mod decision_log;
+pub mod hybrid_dataset;
+pub mod hybrid_decision_log;
+pub mod hybrid_eval;
+pub mod hybrid_features;
+pub mod hybrid_model;
 pub mod log_search_results;
 pub mod position_assignment;
 pub mod rollout_policy;
 pub mod uct_config;
 pub mod uct_search;
+pub mod uct_search_hybrid_v1;
 pub mod uct_search_v2;
 pub mod uct_search_v3;
 pub mod uct_search_v4;
