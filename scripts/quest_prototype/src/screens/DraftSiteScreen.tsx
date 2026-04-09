@@ -11,13 +11,11 @@ import {
   completeDraftSite,
   sortCardsByTide,
   SITE_PICKS,
-  DEFAULT_DRAFT_CONFIG,
 } from "../draft/draft-engine";
 import type { DraftState } from "../types/draft";
 import type { CardData } from "../types/cards";
 import { logEvent } from "../logging";
 import { useQuestConfig } from "../state/quest-config";
-import { computeQuestTideProfile, type QuestTideProfile } from "../data/quest-tide-profile";
 
 /** Delay in ms before showing the next pack after a pick. */
 const NEXT_PACK_DELAY = 500;
@@ -141,7 +139,6 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
   const [packKey, setPackKey] = useState(0);
   const draftStateRef = useRef<DraftState | null>(null);
   const initializedRef = useRef(false);
-  const profileRef = useRef<QuestTideProfile | undefined>(undefined);
 
   // Initialize draft state on mount
   useEffect(() => {
@@ -151,22 +148,12 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
 
     let ds = state.draftState;
     if (ds === null) {
-      ds = initializeDraftState(cardDatabase, state.excludedTides, questConfig.poolBias, state.consumedStartingCardNumbers);
+      ds = initializeDraftState(cardDatabase, state.excludedTides, questConfig.poolBias);
     }
-
-    const profile = computeQuestTideProfile({
-      startingTide: state.startingTide,
-      deck: state.deck,
-      cardDatabase,
-      dreamcaller: state.dreamcaller,
-      tideCrystals: state.tideCrystals,
-      recentDraftPicks: state.draftState?.draftedCards ?? [],
-    });
-    profileRef.current = profile;
 
     // Deep clone to avoid mutating React state directly
     const cloned = JSON.parse(JSON.stringify(ds)) as DraftState;
-    enterDraftSite(cloned, cardDatabase, DEFAULT_DRAFT_CONFIG, profile);
+    enterDraftSite(cloned, cardDatabase);
     draftStateRef.current = cloned;
     mutations.setDraftState(cloned);
 
@@ -212,8 +199,6 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
           cardNumber,
           cloned,
           cardDatabase,
-          DEFAULT_DRAFT_CONFIG,
-          profileRef.current,
         );
         draftStateRef.current = cloned;
         mutations.setDraftState(cloned);

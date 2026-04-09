@@ -33,7 +33,6 @@ function makeDraftState(
     pickNumber,
     sitePicksCompleted: 0,
     packStrategy: { type: "tide_current" },
-    consumedStartingCardNumbers: [],
   };
 }
 
