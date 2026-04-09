@@ -1,3 +1,4 @@
+use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::time::Duration;
@@ -74,6 +75,7 @@ pub fn write_decision_log(input: WriteDecisionLogV3<'_>) {
     let Ok(json) = serde_json::to_string(&entry) else {
         return;
     };
+    let _ = fs::create_dir_all(log_dir);
     let path = log_dir.join("ai_strategic_v3_decisions.jsonl");
     let Ok(mut file) = OpenOptions::new().create(true).append(true).open(path) else {
         return;

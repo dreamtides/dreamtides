@@ -38,6 +38,7 @@ const MAX_ROLLOUT_ACTIONS: u32 = 24;
 const MAX_ROLLOUT_HANDOFFS: u32 = 2;
 const MAX_RESOLUTION_ACTIONS: u32 = 12;
 const MAX_PARALLEL_ROOT_BATCHES: usize = 4;
+const HEURISTIC_PRIOR_WEIGHT: f64 = 0.35;
 const PRIOR_EPSILON: f64 = 1e-6;
 const PRIOR_TEMPERATURE: f64 = 1.5;
 const ROOT_PRIOR_WEIGHT: f64 = 0.7;
@@ -49,6 +50,7 @@ pub fn is_available() -> bool {
 }
 
 pub fn search(initial_battle: &BattleState, player: PlayerName, budget_ms: u32) -> BattleAction {
+    let start = Instant::now();
     let Some(model) = hybrid_model::load_model() else {
         panic_with!("MonteCarloHybridV1 requires trained policy artifacts", initial_battle, player);
     };
@@ -61,6 +63,8 @@ pub fn search(initial_battle: &BattleState, player: PlayerName, budget_ms: u32) 
     let mut states: Vec<_> = all_actions
         .iter()
         .map(|&action| {
+            let heuristic_prior_score =
+                heuristic_prior_score(initial_battle, player, &legal, action);
             RootActionState::new(
                 action,
                 initial_battle,
@@ -71,7 +75,8 @@ pub fn search(initial_battle: &BattleState, player: PlayerName, budget_ms: u32) 
                     &state_features,
                     &hybrid_features::extract_action_features(initial_battle, player, action),
                     legal_action_count,
-                )),
+                )) + HEURISTIC_PRIOR_WEIGHT * (heuristic_prior_score + 1.0),
+                heuristic_prior_score,
             )
         })
         .collect();
@@ -90,12 +95,21 @@ pub fn search(initial_battle: &BattleState, player: PlayerName, budget_ms: u32) 
         });
     }
 
-    write_decision_log(initial_battle, player, legal_action_count, &states, flat_prior);
-    states
+    let chosen = states
         .iter()
         .max_by(|left, right| state_avg_reward(left).total_cmp(&state_avg_reward(right)))
-        .map(|state| state.action)
-        .unwrap_or_else(|| panic_with!("No legal actions available", initial_battle, player))
+        .unwrap_or_else(|| panic_with!("No legal actions available", initial_battle, player));
+    write_decision_log(
+        initial_battle,
+        player,
+        budget_ms,
+        legal_action_count,
+        &states,
+        flat_prior,
+        chosen,
+        start.elapsed(),
+    );
+    chosen.action
 }
 
 struct BestChild {
@@ -110,6 +124,7 @@ struct RootActionState {
     graph: SearchGraph,
     losses: u32,
     pass_suppression_count: u32,
+    heuristic_prior_score: f64,
     prior_score: f64,
     prior_share: f64,
     randomize_player_rng: Xoshiro256PlusPlus,
@@ -126,6 +141,7 @@ impl RootActionState {
         state_features: &crate::hybrid_dataset::FeatureMap,
         legal_action_count: usize,
         prior_score: f64,
+        heuristic_prior_score: f64,
     ) -> Self {
         let mut graph = SearchGraph::default();
         let root = graph.add_node(SearchNode {
@@ -140,6 +156,7 @@ impl RootActionState {
             cutoff_count: 0,
             draws: 0,
             graph,
+            heuristic_prior_score,
             losses: 0,
             pass_suppression_count: 0,
             prior_score,
@@ -184,6 +201,64 @@ fn assign_prior_shares(states: &mut [RootActionState]) -> bool {
         state.prior_share = exp_score / total;
     }
     false
+}
+
+fn heuristic_prior_score(
+    battle: &BattleState,
+    player: PlayerName,
+    legal: &LegalActions,
+    action: BattleAction,
+) -> f64 {
+    match legal {
+        LegalActions::Standard { actions } => {
+            (rollout_policy::score_standard_action(battle, player, actions, action) / 100.0)
+                .clamp(-1.0, 1.0)
+        }
+        LegalActions::SelectPositioningCharacter { eligible: _ } => match action {
+            BattleAction::EndTurn => -0.6,
+            BattleAction::SelectCharacterForPositioning(character_id) => {
+                let assignments = position_assignment::generate(battle, player);
+                if assignments.is_empty() {
+                    0.0
+                } else {
+                    let usage = assignments
+                        .iter()
+                        .filter(|assignment| {
+                            assignment.placements.iter().any(|(id, placement)| {
+                                *id == character_id
+                                    && matches!(placement, CharacterPlacement::MoveToFrontRank(_))
+                            })
+                        })
+                        .count() as f64;
+                    (usage / assignments.len() as f64).clamp(0.0, 1.0)
+                }
+            }
+            _ => 0.0,
+        },
+        LegalActions::AssignColumn { character, block_targets, attack_column } => match action {
+            BattleAction::MoveCharacterToFrontRank(_, column) => {
+                let own_spark =
+                    card_properties::spark(battle, player, *character).unwrap_or_default().0;
+                let opponent = player.opponent();
+                let enemy_spark = battle.cards.battlefield(opponent).front[column as usize]
+                    .and_then(|id| card_properties::spark(battle, opponent, id))
+                    .map_or(0, |spark| spark.0);
+                let is_attack = attack_column.is_some_and(|attack| attack == column);
+                let is_block = block_targets.contains(&column);
+                let trade_bonus = if enemy_spark >= own_spark { 0.3 } else { 0.1 };
+                let role_bonus = if is_block {
+                    0.2
+                } else if is_attack {
+                    0.1
+                } else {
+                    0.0
+                };
+                ((f64::from(enemy_spark.min(8)) / 8.0) + trade_bonus + role_bonus).clamp(0.0, 1.0)
+            }
+            _ => 0.0,
+        },
+        _ => 0.0,
+    }
 }
 
 fn build_schedule(states: &[RootActionState]) -> Vec<u32> {
@@ -713,9 +788,12 @@ fn state_visit_count(state: &RootActionState) -> u32 {
 fn write_decision_log(
     battle: &BattleState,
     player: PlayerName,
+    budget_ms: u32,
     legal_action_count: usize,
     states: &[RootActionState],
     flat_prior: bool,
+    chosen: &RootActionState,
+    elapsed: Duration,
 ) {
     let total_iterations: u32 = states.iter().map(state_visit_count).sum();
     let average_rollout_length = if total_iterations == 0 {
@@ -727,6 +805,11 @@ fn write_decision_log(
 
     let entry = DecisionLogEntryHybrid {
         average_rollout_length,
+        budget_ms,
+        chosen_action: format!("{:?}", chosen.action),
+        chosen_action_short: chosen.action.battle_action_string(),
+        chosen_avg_reward: state_avg_reward(chosen),
+        elapsed_ms: elapsed.as_millis(),
         flat_prior,
         game_state: decision_log::build_game_state_snapshot(battle),
         legal_action_count,
@@ -747,6 +830,7 @@ fn write_decision_log(
                     state.graph[state.root].total_reward.0 / f64::from(state_visit_count(state))
                 },
                 draws: state.draws,
+                heuristic_prior_score: state.heuristic_prior_score,
                 iterations_allocated: state_visit_count(state),
                 losses: state.losses,
                 prior_score: state.prior_score,

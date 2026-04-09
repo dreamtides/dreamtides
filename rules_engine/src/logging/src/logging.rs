@@ -81,6 +81,7 @@ fn initialize(request_context: &RequestContext) {
 
     match request_context.logging_options.log_directory.as_ref() {
         Some(log_directory) => {
+            let _ = std::fs::create_dir_all(log_directory);
             // Set up dual output to stdout and file
             let log_path = log_directory.join("dreamtides.log");
             println!("Logging to: {}", log_path.display());

@@ -1,4 +1,5 @@
 use std::collections::{BTreeMap, VecDeque};
+use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
 
@@ -105,6 +106,7 @@ pub fn write_decision_log(entry: &DecisionLogEntry, request_context: &RequestCon
     let Some(log_dir) = &request_context.logging_options.log_directory else {
         return;
     };
+    let _ = fs::create_dir_all(log_dir);
     let path = log_dir.join("ai_decisions.jsonl");
     let Ok(json) = serde_json::to_string(entry) else {
         return;

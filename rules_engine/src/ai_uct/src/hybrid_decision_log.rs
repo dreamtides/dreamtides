@@ -1,3 +1,4 @@
+use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
 
@@ -10,6 +11,11 @@ use crate::decision_log::GameStateSnapshot;
 #[derive(Serialize)]
 pub struct DecisionLogEntryHybrid {
     pub average_rollout_length: f64,
+    pub budget_ms: u32,
+    pub chosen_action: String,
+    pub chosen_action_short: String,
+    pub chosen_avg_reward: f64,
+    pub elapsed_ms: u128,
     pub flat_prior: bool,
     pub game_state: GameStateSnapshot,
     pub legal_action_count: usize,
@@ -27,6 +33,7 @@ pub struct RootActionLog {
     pub action_short: String,
     pub avg_reward: f64,
     pub draws: u32,
+    pub heuristic_prior_score: f64,
     pub iterations_allocated: u32,
     pub losses: u32,
     pub prior_score: f64,
@@ -38,6 +45,7 @@ pub fn write_decision_log(entry: &DecisionLogEntryHybrid, battle: &BattleState) 
     let Some(log_dir) = &battle.request_context.logging_options.log_directory else {
         return;
     };
+    let _ = fs::create_dir_all(log_dir);
     let path = log_dir.join("ai_hybrid_decisions.jsonl");
     let Ok(json) = serde_json::to_string(entry) else {
         return;

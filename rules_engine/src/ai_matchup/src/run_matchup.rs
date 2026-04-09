@@ -2,9 +2,9 @@ use std::cell::RefCell;
 use std::io::{self, Write};
 use std::panic::{self, AssertUnwindSafe};
 use std::path::Path;
-use std::process;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
+use std::{fs, process};
 
 use ai_agents::agent_search;
 use backtrace::Backtrace;
@@ -278,6 +278,11 @@ fn run_match(
     let tabula = resources.tabula.clone();
 
     catch_panic(move || {
+        let log_directory =
+            logging::get_developer_mode_project_directory().ok().map(|p| p.join("matchup_logs"));
+        if let Some(log_dir) = &log_directory {
+            let _ = fs::create_dir_all(log_dir);
+        }
         let battle_id = BattleId(Uuid::new_v4());
         let mut battle = new_test_battle::create_and_start(
             battle_id,
@@ -288,9 +293,7 @@ fn run_match(
             CreateBattlePlayer { player_type: battle_ai_two, deck_name },
             RequestContext {
                 logging_options: LoggingOptions {
-                    log_directory: logging::get_developer_mode_project_directory()
-                        .ok()
-                        .map(|p| p.join("matchup_logs")),
+                    log_directory,
                     log_ai_decisions: true,
                     ..LoggingOptions::default()
                 },
