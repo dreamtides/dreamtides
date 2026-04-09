@@ -62,6 +62,7 @@ export const RARITY_COLORS: Readonly<Record<Rarity, string>> = {
   Uncommon: "#10b981",
   Rare: "#3b82f6",
   Legendary: "#a855f7",
+  Starter: "#d4a017",
 };
 
 /** Returns the URL path for a card's image. */

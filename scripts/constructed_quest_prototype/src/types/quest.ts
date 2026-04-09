@@ -1,4 +1,4 @@
-import type { CardData, Tide } from "./cards";
+import type { CardData, NamedTide, Tide } from "./cards";
 
 /** Badge applied to a card via a Transfiguration site. */
 export type TransfigurationType =
@@ -76,10 +76,10 @@ export interface DeckEntry {
 /** A selected character that grants bonuses. */
 export interface Dreamcaller {
   name: string;
-  tide: Tide;
+  tides: [NamedTide, NamedTide];
   abilityDescription: string;
   essenceBonus: number;
-  tideCrystalGrant: Tide;
+  tideCrystalGrant: NamedTide;
 }
 
 /** A passive effect collected during the quest. */
@@ -137,7 +137,7 @@ export interface QuestState {
   atlas: DreamAtlas;
   currentDreamscape: string | null;
   visitedSites: string[];
-  startingTides: Tide[];
+  startingTide: NamedTide | null;
   anteState: AnteState | null;
   screen: Screen;
   activeSiteId: string | null;

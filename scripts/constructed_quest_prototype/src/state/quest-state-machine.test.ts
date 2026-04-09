@@ -27,7 +27,7 @@ function createTestState(overrides: Partial<QuestState> = {}): QuestState {
     atlas: { nodes: {}, edges: [], nexusId: "" },
     currentDreamscape: null,
     visitedSites: [],
-    startingTides: [],
+    startingTide: null,
     anteState: null,
     screen: { type: "questStart" },
     activeSiteId: null,

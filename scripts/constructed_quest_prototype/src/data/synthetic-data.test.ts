@@ -6,7 +6,7 @@ import type { JourneyEffect } from "./dream-journeys";
 import { TEMPTING_OFFERS } from "./tempting-offers";
 import type { OfferEffect } from "./tempting-offers";
 import { BIOMES } from "./biomes";
-import type { Tide, Rarity } from "../types/cards";
+import type { Tide, Rarity, NamedTide } from "../types/cards";
 
 const ALL_TIDES: Tide[] = [
   "Bloom",
@@ -19,7 +19,7 @@ const ALL_TIDES: Tide[] = [
   "Neutral",
 ];
 const NAMED_TIDES: Tide[] = ALL_TIDES.filter((t) => t !== "Neutral");
-const ALL_RARITIES: Rarity[] = ["Common", "Uncommon", "Rare", "Legendary"];
+const ALL_RARITIES: Rarity[] = ["Common", "Uncommon", "Rare", "Legendary", "Starter"];
 const tideSet = new Set<string>(ALL_TIDES);
 const raritySet = new Set<string>(ALL_RARITIES);
 
@@ -74,21 +74,40 @@ describe("dreamcallers", () => {
     expect(DREAMCALLERS).toHaveLength(10);
   });
 
-  it("every entry has all required fields", () => {
+  it("every entry has two named tides and a matching named crystal", () => {
     for (const dc of DREAMCALLERS) {
       expect(dc.name.length).toBeGreaterThan(0);
-      expect(tideSet.has(dc.tide)).toBe(true);
+      expect(dc.tides).toHaveLength(2);
+      expect(dc.tides[0]).not.toBe(dc.tides[1]);
+      expect(tideSet.has(dc.tides[0])).toBe(true);
+      expect(tideSet.has(dc.tides[1])).toBe(true);
+      expect(dc.tides).not.toContain("Neutral");
       expect(dc.abilityDescription.length).toBeGreaterThan(0);
       expect(dc.essenceBonus).toBeGreaterThanOrEqual(50);
       expect(dc.essenceBonus).toBeLessThanOrEqual(150);
-      expect(dc.tideCrystalGrant).toBe(dc.tide);
+      expect(dc.tides).toContain(dc.tideCrystalGrant);
     }
   });
 
   it("covers every named tide at least once", () => {
-    const tides = new Set(DREAMCALLERS.map((dc) => dc.tide));
+    const tides = new Set(DREAMCALLERS.flatMap((dc) => dc.tides));
     for (const t of NAMED_TIDES) {
       expect(tides.has(t)).toBe(true);
+    }
+  });
+
+  it("covers all 7 neighbor pairs", () => {
+    const TIDE_CIRCLE: NamedTide[] = ["Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge"];
+    const pairs = new Set<string>();
+    for (const dc of DREAMCALLERS) {
+      const sorted = [...dc.tides].sort((a, b) => TIDE_CIRCLE.indexOf(a) - TIDE_CIRCLE.indexOf(b));
+      pairs.add(`${sorted[0]}/${sorted[1]}`);
+    }
+    for (let i = 0; i < 7; i++) {
+      const a = TIDE_CIRCLE[i];
+      const b = TIDE_CIRCLE[(i + 1) % 7];
+      const sorted = [a, b].sort((x, y) => TIDE_CIRCLE.indexOf(x) - TIDE_CIRCLE.indexOf(y));
+      expect(pairs.has(`${sorted[0]}/${sorted[1]}`)).toBe(true);
     }
   });
 

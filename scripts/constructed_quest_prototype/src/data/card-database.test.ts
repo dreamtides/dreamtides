@@ -146,6 +146,7 @@ describe("RARITY_COLORS", () => {
       Uncommon: "#10b981",
       Rare: "#3b82f6",
       Legendary: "#a855f7",
+      Starter: "#d4a017",
     };
     for (const [rarity, color] of Object.entries(expected)) {
       expect(RARITY_COLORS[rarity as Rarity]).toBe(color);
@@ -213,6 +214,7 @@ describe("loadCardDatabase integration (real card-data.json)", () => {
       "Uncommon",
       "Rare",
       "Legendary",
+      "Starter",
     ]);
     const validTides = new Set([
       "Bloom",
