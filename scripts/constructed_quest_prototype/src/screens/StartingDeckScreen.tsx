@@ -26,6 +26,7 @@ export function StartingDeckScreen() {
           isOpen={viewerOpen}
           onClose={handleClose}
           cardDatabase={cardDatabase}
+          initialSize="medium"
         />
       </motion.div>
     </div>

@@ -84,6 +84,8 @@ interface DeckViewerProps {
   isOpen: boolean;
   onClose: () => void;
   cardDatabase: Map<number, CardData>;
+  /** Initial card size preset (default "small"). */
+  initialSize?: CardSizePreset;
 }
 
 /**
@@ -94,6 +96,7 @@ export function DeckViewer({
   isOpen,
   onClose,
   cardDatabase,
+  initialSize = "small",
 }: DeckViewerProps) {
   const { state } = useQuest();
 
@@ -109,11 +112,11 @@ export function DeckViewer({
   const [cardTypeFilter, setCardTypeFilter] =
     useState<CardTypeFilter>("All");
   const [sortCriteria, setSortCriteria] =
-    useState<SortCriteria>("acquisitionOrder");
+    useState<SortCriteria>("tide");
   const [sortAscending, setSortAscending] = useState(true);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
-  const [cardSize, setCardSize] = useState<CardSizePreset>("small");
+  const [cardSize, setCardSize] = useState<CardSizePreset>(initialSize);
   const openTimestampRef = useRef<number>(0);
   const prevOpenRef = useRef(false);
 
@@ -391,7 +394,7 @@ export function DeckViewer({
 
           {/* Controls row */}
           <div
-            className="flex flex-wrap items-center gap-2 px-4 py-2 md:px-6"
+            className="relative z-20 flex flex-wrap items-center gap-2 px-4 py-2 md:px-6"
             style={{
               borderBottom: "1px solid rgba(124, 58, 237, 0.15)",
               background: "rgba(10, 6, 18, 0.6)",
@@ -651,6 +654,7 @@ export function DeckViewer({
                       >
                         <CardDisplay
                           card={resolved.card}
+                          compact={cardSize === "small"}
                           onClick={() => {
                             handleCardClick(resolved.card);
                           }}

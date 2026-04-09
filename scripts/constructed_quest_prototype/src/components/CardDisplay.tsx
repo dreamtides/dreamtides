@@ -29,6 +29,8 @@ interface CardDisplayProps {
   className?: string;
   /** Use larger text sizes for rules text, name, type line, and stats. */
   large?: boolean;
+  /** Use smaller badges and symbols for compact grid views. */
+  compact?: boolean;
 }
 
 /** Renders styled rules text, replacing special symbols with colored spans. */
@@ -62,6 +64,7 @@ export function CardDisplay({
   showTideSymbols = true,
   className,
   large = false,
+  compact = false,
 }: CardDisplayProps) {
   const [imageError, setImageError] = useState(false);
   const rulesRef = useRef<HTMLDivElement>(null);
@@ -137,7 +140,7 @@ export function CardDisplay({
       {/* Energy cost badge */}
       <div className={`absolute ${large ? "top-2 left-2" : "top-1.5 left-1.5"} z-10 flex flex-col items-center gap-1`}>
         <div
-          className={`flex items-center gap-0.5 rounded-full ${large ? "px-2.5 py-1 text-base" : "px-1.5 py-0.5 text-xs"} font-bold shadow-md`}
+          className={`flex items-center gap-0.5 rounded-full ${large ? "px-2.5 py-1 text-base" : compact ? "px-1 py-px text-[9px]" : "px-1.5 py-0.5 text-xs"} font-bold shadow-md`}
           style={{
             background: "rgba(0, 0, 0, 0.75)",
             border: "1px solid rgba(251, 191, 36, 0.5)",
@@ -149,15 +152,15 @@ export function CardDisplay({
           </span>
         </div>
 
-        {/* Tide cost symbols */}
-        {showTideSymbols && card.tideCost > 0 && (
-          <div className="flex flex-col items-center gap-0.5">
+        {/* Tide cost symbols (hidden for Neutral cards) */}
+        {showTideSymbols && card.tideCost > 0 && card.tide !== "Neutral" && (
+          <div className={`flex items-center ${compact ? "flex-row gap-px" : "flex-col gap-0.5"}`}>
             {Array.from({ length: card.tideCost }, (_, i) => (
               <img
                 key={i}
                 src={tideIconUrl(card.tide)}
                 alt={card.tide}
-                className={`${large ? "h-10 w-10" : "h-7 w-7"} rounded-full object-contain shadow-md`}
+                className={`${large ? "h-10 w-10" : compact ? "h-3 w-3" : "h-7 w-7"} rounded-full object-contain shadow-md`}
                 style={{
                   border: `1px solid ${tideColor}`,
                   background: "rgba(0, 0, 0, 0.5)",
@@ -171,7 +174,7 @@ export function CardDisplay({
       {/* Fast badge */}
       {card.isFast && (
         <div
-          className={`absolute ${large ? "top-2 right-2 px-2.5 py-1 text-base" : "top-1.5 right-1.5 px-1.5 py-0.5 text-xs"} z-10 flex items-center rounded-full font-bold shadow-md`}
+          className={`absolute ${large ? "top-2 right-2 px-2.5 py-1 text-base" : compact ? "top-0.5 right-0.5 px-1 py-px text-[9px]" : "top-1.5 right-1.5 px-1.5 py-0.5 text-xs"} z-10 flex items-center rounded-full font-bold shadow-md`}
           style={{
             background: "rgba(0, 0, 0, 0.75)",
             border: "1px solid rgba(250, 204, 21, 0.5)",
@@ -254,7 +257,7 @@ export function CardDisplay({
         {card.spark !== null && (
           <div className="mt-auto flex items-center justify-end pt-0.5">
             <div
-              className={`flex items-center gap-0.5 rounded-full ${large ? "px-2.5 py-1 text-sm" : "px-1.5 py-0.5 text-[10px]"} font-bold`}
+              className={`flex items-center gap-0.5 rounded-full ${large ? "px-2.5 py-1 text-sm" : compact ? "px-1 py-px text-[8px]" : "px-1.5 py-0.5 text-[10px]"} font-bold`}
               style={{
                 background: "rgba(0, 0, 0, 0.5)",
                 border: "1px solid rgba(192, 132, 252, 0.5)",
