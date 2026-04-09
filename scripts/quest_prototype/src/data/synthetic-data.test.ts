@@ -19,13 +19,7 @@ const ALL_TIDES: Tide[] = [
   "Neutral",
 ];
 const NAMED_TIDES: Tide[] = ALL_TIDES.filter((t) => t !== "Neutral");
-const ALL_RARITIES: Rarity[] = [
-  "Common",
-  "Uncommon",
-  "Rare",
-  "Legendary",
-  "Starter",
-];
+const ALL_RARITIES: Rarity[] = ["Common", "Uncommon", "Rare", "Legendary"];
 const tideSet = new Set<string>(ALL_TIDES);
 const raritySet = new Set<string>(ALL_RARITIES);
 

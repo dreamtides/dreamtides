@@ -9,7 +9,6 @@ const RARITY_PRICES: Readonly<Record<Rarity, number>> = {
   Uncommon: 100,
   Rare: 200,
   Legendary: 400,
-  Starter: 0,
 };
 
 /** Fixed price for dreamsign items. */
