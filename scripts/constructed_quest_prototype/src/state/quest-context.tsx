@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { CardData, Tide } from "../types/cards";
+import type { CardData, NamedTide, Tide } from "../types/cards";
 import type {
   AnteState,
   DeckEntry,
@@ -49,7 +49,7 @@ export interface QuestMutations {
   markSiteVisited: (siteId: string) => void;
   setCurrentDreamscape: (nodeId: string | null) => void;
   updateAtlas: (atlas: DreamAtlas) => void;
-  setStartingTides: (tides: Tide[]) => void;
+  setStartingTide: (tide: NamedTide) => void;
   setAnteState: (anteState: AnteState | null) => void;
   addProvisionedSite: (dreamscapeId: string, site: SiteState) => void;
   initializeDeckFromPool: () => void;
@@ -96,7 +96,7 @@ function createDefaultState(): QuestState {
     visitedSites: [],
     screen: { type: "questStart" },
     activeSiteId: null,
-    startingTides: [],
+    startingTide: null,
     anteState: null,
   };
 }
@@ -303,7 +303,7 @@ export function QuestProvider({
   const setDreamcaller = useCallback((dreamcaller: Dreamcaller) => {
     logEvent("dreamcaller_selected", {
       name: dreamcaller.name,
-      tide: dreamcaller.tide,
+      tides: dreamcaller.tides,
       essenceBonus: dreamcaller.essenceBonus,
     });
     setState((prev) => ({ ...prev, dreamcaller }));
@@ -425,9 +425,9 @@ export function QuestProvider({
     setState((prev) => ({ ...prev, atlas }));
   }, []);
 
-  const setStartingTides = useCallback((tides: Tide[]) => {
-    logEvent("starting_tides_set", { tides });
-    setState((prev) => ({ ...prev, startingTides: tides }));
+  const setStartingTide = useCallback((tide: NamedTide) => {
+    logEvent("starting_tide_set", { tide });
+    setState((prev) => ({ ...prev, startingTide: tide }));
   }, []);
 
   const setAnteState = useCallback((anteState: AnteState | null) => {
@@ -519,7 +519,7 @@ export function QuestProvider({
       markSiteVisited,
       setCurrentDreamscape,
       updateAtlas,
-      setStartingTides,
+      setStartingTide,
       setAnteState,
       addProvisionedSite,
       initializeDeckFromPool,
@@ -545,7 +545,7 @@ export function QuestProvider({
       markSiteVisited,
       setCurrentDreamscape,
       updateAtlas,
-      setStartingTides,
+      setStartingTide,
       setAnteState,
       addProvisionedSite,
       initializeDeckFromPool,

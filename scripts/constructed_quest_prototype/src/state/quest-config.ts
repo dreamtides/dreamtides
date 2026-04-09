@@ -4,10 +4,6 @@ import { useMemo } from "react";
 export interface QuestConfig {
   /** Whether to use revised tides. */
   revisedTides: boolean;
-  /** Number of starting tides. */
-  startingTides: number;
-  /** Whether tides are assigned sequentially. */
-  sequentialTides: boolean;
   /** Number of initial cards in the starter deck. */
   initialCards: number;
   /** Number of neutral cards in the starter deck. */
@@ -117,8 +113,6 @@ export function getQuestConfig(): QuestConfig {
 
   return {
     revisedTides: parseBoolParam(params, "revisedTides", true),
-    startingTides: parseIntParam(params, "startingTides", 3, 1, 8),
-    sequentialTides: parseBoolParam(params, "sequentialTides", true),
     initialCards: parseIntParam(params, "initialCards", 25, 1, 50),
     starterNeutral: parseIntParam(params, "starterNeutral", 5, 0, 20),
     starterLowCost: parseIntParam(params, "starterLowCost", 5, 0, 20),
