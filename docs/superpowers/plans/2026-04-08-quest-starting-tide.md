@@ -1,16 +1,28 @@
 # Quest Starting Tide Redesign Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use
+> superpowers:subagent-driven-development (recommended) or
+> superpowers:executing-plans to implement this plan task-by-task. Steps use
+> checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Redesign `scripts/quest_prototype` so a quest starts by choosing a named tide, builds a 30-card starting deck, and routes later offers through a shared adaptive tide profile.
+**Goal:** Redesign `scripts/quest_prototype` so a quest starts by choosing a
+named tide, builds a 30-card starting deck, and routes later offers through a
+shared adaptive tide profile.
 
-**Architecture:** Add small pure TypeScript generation modules for card-pool eligibility, quest-start deck construction, quest tide profiling, and dreamcaller offers. Extend quest context with `startingTide` and `consumedStartingCardNumbers`, then wire existing draft/shop/reward/dreamcaller screens through those pure helpers. Keep UI changes local to quest start, HUD, deck viewer, and dreamcaller cards.
+**Architecture:** Add small pure TypeScript generation modules for card-pool
+eligibility, quest-start deck construction, quest tide profiling, and
+dreamcaller offers. Extend quest context with `startingTide` and
+`consumedStartingCardNumbers`, then wire existing draft/shop/reward/dreamcaller
+screens through those pure helpers. Keep UI changes local to quest start, HUD,
+deck viewer, and dreamcaller cards.
 
-**Tech Stack:** React 19, Vite 7, TypeScript 5, Vitest, ESLint, agent-browser manual QA, downloaded JSONL quest logs
+**Tech Stack:** React 19, Vite 7, TypeScript 5, Vitest, ESLint, agent-browser
+manual QA, downloaded JSONL quest logs
 
-**Design spec:** `docs/superpowers/specs/2026-04-08-quest-starting-tide-design.md`
+**Design spec:**
+`docs/superpowers/specs/2026-04-08-quest-starting-tide-design.md`
 
----
+______________________________________________________________________
 
 ## Execution Rules
 
@@ -40,73 +52,92 @@ Manual QA tool:
 
 Copy this block into implementation-worker prompts for UI-affecting tasks:
 
-> Use the `qa` skill for browser verification and use `agent-browser` to take screenshots. Before each click, state the expected deck size, screen, visible origin tide, essence, crystals, and selected-card effect. After each click, take a screenshot and compare actual visible values plus any JS-evaluated state you use. Keep screenshots under `/tmp/quest-starting-tide-qa/`. Do not claim completion if deck size, HUD origin, crystal count, dreamcaller pair icons, shop item state, reward state, or logs differ from the expected behavior.
+> Use the `qa` skill for browser verification and use `agent-browser` to take
+> screenshots. Before each click, state the expected deck size, screen, visible
+> origin tide, essence, crystals, and selected-card effect. After each click,
+> take a screenshot and compare actual visible values plus any JS-evaluated
+> state you use. Keep screenshots under `/tmp/quest-starting-tide-qa/`. Do not
+> claim completion if deck size, HUD origin, crystal count, dreamcaller pair
+> icons, shop item state, reward state, or logs differ from the expected
+> behavior.
 
-Copy this block into implementation-worker prompts for logging / run-analysis tasks:
+Copy this block into implementation-worker prompts for logging / run-analysis
+tasks:
 
-> Use the `qs-analyze` skill after downloading a quest log. Analyze JSONL events; do not infer missing data. If the log cannot answer starting options, selected tide, starter/tide/neutral card groups, dreamcaller offer pairs, draft pool exclusions, shop offer tides, reward tides, or final deck size, add explicit logging and retest.
+> Use the `qs-analyze` skill after downloading a quest log. Analyze JSONL
+> events; do not infer missing data. If the log cannot answer starting options,
+> selected tide, starter/tide/neutral card groups, dreamcaller offer pairs,
+> draft pool exclusions, shop offer tides, reward tides, or final deck size, add
+> explicit logging and retest.
 
 ## File Map
 
 **Create:**
 
-| File | Responsibility |
-|------|----------------|
-| `scripts/quest_prototype/src/data/card-pools.ts` | Pure card eligibility, sampling, starter lookup, consumed-card filtering |
-| `scripts/quest_prototype/src/data/card-pools.test.ts` | Tests for Starter/Special/Neutral/consumed-card rules |
-| `scripts/quest_prototype/src/quest-start/quest-start-generator.ts` | Starting tide options and 30-card starting deck generation |
-| `scripts/quest_prototype/src/quest-start/quest-start-generator.test.ts` | Quest-start generation tests |
-| `scripts/quest_prototype/src/data/tide-circle.ts` | Named-tide type, circle neighbors, pair helpers |
-| `scripts/quest_prototype/src/data/tide-circle.test.ts` | Neighbor and pair-key tests |
-| `scripts/quest_prototype/src/data/quest-tide-profile.ts` | Shared adaptive tide weighting profile |
-| `scripts/quest_prototype/src/data/quest-tide-profile.test.ts` | Profile dominance, pivot, logging tests |
-| `scripts/quest_prototype/src/data/dreamcaller-offers.ts` | Three-slot dreamcaller offer selection |
-| `scripts/quest_prototype/src/data/dreamcaller-offers.test.ts` | Starting-tide pair and fallback tests |
-| `scripts/quest_prototype/src/qa/analyze-quest-log.mjs` | Local JSONL invariant checker for manual QA logs |
+| File                                                                    | Responsibility                                                           |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `scripts/quest_prototype/src/data/card-pools.ts`                        | Pure card eligibility, sampling, starter lookup, consumed-card filtering |
+| `scripts/quest_prototype/src/data/card-pools.test.ts`                   | Tests for Starter/Special/Neutral/consumed-card rules                    |
+| `scripts/quest_prototype/src/quest-start/quest-start-generator.ts`      | Starting tide options and 30-card starting deck generation               |
+| `scripts/quest_prototype/src/quest-start/quest-start-generator.test.ts` | Quest-start generation tests                                             |
+| `scripts/quest_prototype/src/data/tide-circle.ts`                       | Named-tide type, circle neighbors, pair helpers                          |
+| `scripts/quest_prototype/src/data/tide-circle.test.ts`                  | Neighbor and pair-key tests                                              |
+| `scripts/quest_prototype/src/data/quest-tide-profile.ts`                | Shared adaptive tide weighting profile                                   |
+| `scripts/quest_prototype/src/data/quest-tide-profile.test.ts`           | Profile dominance, pivot, logging tests                                  |
+| `scripts/quest_prototype/src/data/dreamcaller-offers.ts`                | Three-slot dreamcaller offer selection                                   |
+| `scripts/quest_prototype/src/data/dreamcaller-offers.test.ts`           | Starting-tide pair and fallback tests                                    |
+| `scripts/quest_prototype/src/qa/analyze-quest-log.mjs`                  | Local JSONL invariant checker for manual QA logs                         |
 
 **Modify:**
 
-| File | Responsibility |
-|------|----------------|
-| `scripts/quest_prototype/scripts/setup-assets.mjs` | Keep Starter cards in generated `card-data.json`; continue excluding Special |
-| `scripts/quest_prototype/src/types/cards.ts` | Add `Starter` rarity; add `NamedTide` type alias |
-| `scripts/quest_prototype/src/types/quest.ts` | Store `startingTide`, consumed starting cards, and two-tide Dreamcaller |
-| `scripts/quest_prototype/src/types/draft.ts` | Allow profile seed on draft pack strategy or context |
-| `scripts/quest_prototype/src/state/quest-config.ts` | Change default excluded tide count to 0 |
-| `scripts/quest_prototype/src/state/quest-context.tsx` | Add quest-start mutation; reset/log new state; adapt dreamcaller logging |
-| `scripts/quest_prototype/src/screens/QuestStartScreen.tsx` | Replace begin button with 3 starting-tide choice cards |
-| `scripts/quest_prototype/src/draft/draft-engine.ts` | Exclude consumed/Starter cards; seed affinity from profile |
-| `scripts/quest_prototype/src/screens/DraftSiteScreen.tsx` | Pass consumed cards and profile into draft initialization / pack entry |
-| `scripts/quest_prototype/src/data/dreamcallers.ts` | Convert synthetic callers to two named tides |
-| `scripts/quest_prototype/src/screens/DreamcallerDraftScreen.tsx` | Use dreamcaller offer helper; display two tide icons |
-| `scripts/quest_prototype/src/data/tide-weights.ts` | Replace rare rewards with profile-aware rare reward helper or delegate |
-| `scripts/quest_prototype/src/screens/BattleScreen.tsx` | Use profile-aware enemy / rare reward path |
-| `scripts/quest_prototype/src/shop/shop-generator.ts` | Use profile-aware card, dreamsign, crystal selection; exclude Starter/Special |
-| `scripts/quest_prototype/src/screens/ShopScreen.tsx` | Pass quest tide profile into shop inventory generation |
-| `scripts/quest_prototype/src/screens/SpecialtyShopScreen.tsx` | Pass quest tide profile into specialty shop generation |
-| `scripts/quest_prototype/src/atlas/atlas-generator.ts` | Stop pre-rolling card/dreamsign reward data for Reward sites |
-| `scripts/quest_prototype/src/screens/RewardSiteScreen.tsx` | Roll card/dreamsign reward at site entry from current profile |
-| `scripts/quest_prototype/src/components/HUD.tsx` | Show compact starting tide/origin badge |
-| `scripts/quest_prototype/src/components/DeckViewer.tsx` | Show Quest Origin and two-tide dreamcaller metadata |
-| `scripts/quest_prototype/src/components/CardDisplay.tsx` | Ensure Starter rarity renders with a stable color |
-| `scripts/quest_prototype/src/data/card-database.ts` | Add Starter rarity color |
-| Existing tests beside each modified module | Update expectations for Starter and two-tide dreamcallers |
+| File                                                             | Responsibility                                                                |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `scripts/quest_prototype/scripts/setup-assets.mjs`               | Keep Starter cards in generated `card-data.json`; continue excluding Special  |
+| `scripts/quest_prototype/src/types/cards.ts`                     | Add `Starter` rarity; add `NamedTide` type alias                              |
+| `scripts/quest_prototype/src/types/quest.ts`                     | Store `startingTide`, consumed starting cards, and two-tide Dreamcaller       |
+| `scripts/quest_prototype/src/types/draft.ts`                     | Allow profile seed on draft pack strategy or context                          |
+| `scripts/quest_prototype/src/state/quest-config.ts`              | Change default excluded tide count to 0                                       |
+| `scripts/quest_prototype/src/state/quest-context.tsx`            | Add quest-start mutation; reset/log new state; adapt dreamcaller logging      |
+| `scripts/quest_prototype/src/screens/QuestStartScreen.tsx`       | Replace begin button with 3 starting-tide choice cards                        |
+| `scripts/quest_prototype/src/draft/draft-engine.ts`              | Exclude consumed/Starter cards; seed affinity from profile                    |
+| `scripts/quest_prototype/src/screens/DraftSiteScreen.tsx`        | Pass consumed cards and profile into draft initialization / pack entry        |
+| `scripts/quest_prototype/src/data/dreamcallers.ts`               | Convert synthetic callers to two named tides                                  |
+| `scripts/quest_prototype/src/screens/DreamcallerDraftScreen.tsx` | Use dreamcaller offer helper; display two tide icons                          |
+| `scripts/quest_prototype/src/data/tide-weights.ts`               | Replace rare rewards with profile-aware rare reward helper or delegate        |
+| `scripts/quest_prototype/src/screens/BattleScreen.tsx`           | Use profile-aware enemy / rare reward path                                    |
+| `scripts/quest_prototype/src/shop/shop-generator.ts`             | Use profile-aware card, dreamsign, crystal selection; exclude Starter/Special |
+| `scripts/quest_prototype/src/screens/ShopScreen.tsx`             | Pass quest tide profile into shop inventory generation                        |
+| `scripts/quest_prototype/src/screens/SpecialtyShopScreen.tsx`    | Pass quest tide profile into specialty shop generation                        |
+| `scripts/quest_prototype/src/atlas/atlas-generator.ts`           | Stop pre-rolling card/dreamsign reward data for Reward sites                  |
+| `scripts/quest_prototype/src/screens/RewardSiteScreen.tsx`       | Roll card/dreamsign reward at site entry from current profile                 |
+| `scripts/quest_prototype/src/components/HUD.tsx`                 | Show compact starting tide/origin badge                                       |
+| `scripts/quest_prototype/src/components/DeckViewer.tsx`          | Show Quest Origin and two-tide dreamcaller metadata                           |
+| `scripts/quest_prototype/src/components/CardDisplay.tsx`         | Ensure Starter rarity renders with a stable color                             |
+| `scripts/quest_prototype/src/data/card-database.ts`              | Add Starter rarity color                                                      |
+| Existing tests beside each modified module                       | Update expectations for Starter and two-tide dreamcallers                     |
 
----
+______________________________________________________________________
 
 ## Task 1: Asset Data And Card Types
 
 **Files:**
+
 - Modify: `scripts/quest_prototype/scripts/setup-assets.mjs`
+
 - Modify: `scripts/quest_prototype/src/types/cards.ts`
+
 - Modify: `scripts/quest_prototype/src/data/card-database.ts`
+
 - Modify: `scripts/quest_prototype/src/data/card-database.test.ts`
+
 - Modify: `scripts/quest_prototype/src/data/synthetic-data.test.ts`
+
 - Modify: `scripts/quest_prototype/src/components/CardDisplay.tsx`
 
 - [ ] **Step 1: Write failing tests for Starter loading**
 
-In `scripts/quest_prototype/src/data/card-database.test.ts`, update rarity expectations:
+In `scripts/quest_prototype/src/data/card-database.test.ts`, update rarity
+expectations:
 
 ```ts
 describe("RARITY_COLORS", () => {
@@ -171,7 +202,8 @@ it("includes the 10 Starter loadout cards", async () => {
 });
 ```
 
-- [ ] **Step 2: Run the focused test and verify it fails before setup-assets changes**
+- [ ] **Step 2: Run the focused test and verify it fails before setup-assets
+  changes**
 
 Run:
 
@@ -179,11 +211,13 @@ Run:
 npm test -- src/data/card-database.test.ts
 ```
 
-Expected: FAIL. Acceptable failures are `db.size` still being old and the real data containing 0 Starter cards.
+Expected: FAIL. Acceptable failures are `db.size` still being old and the real
+data containing 0 Starter cards.
 
 - [ ] **Step 3: Extend Rarity type**
 
-In `scripts/quest_prototype/src/types/cards.ts`, replace the `Rarity` export with:
+In `scripts/quest_prototype/src/types/cards.ts`, replace the `Rarity` export
+with:
 
 ```ts
 /** Card rarity levels. Special is excluded from normal prototype card-data. */
@@ -197,7 +231,8 @@ export type Rarity =
 
 - [ ] **Step 4: Add Starter display color**
 
-In `scripts/quest_prototype/src/data/card-database.ts`, replace `RARITY_COLORS` with:
+In `scripts/quest_prototype/src/data/card-database.ts`, replace `RARITY_COLORS`
+with:
 
 ```ts
 /** Display color hex value for each rarity. */
@@ -278,14 +313,17 @@ git add scripts/quest_prototype/scripts/setup-assets.mjs scripts/quest_prototype
 git commit -m "feat(quest): load Starter cards in prototype data"
 ```
 
-Do not stage `scripts/quest_prototype/public/card-data.json` unless it is already tracked.
+Do not stage `scripts/quest_prototype/public/card-data.json` unless it is
+already tracked.
 
----
+______________________________________________________________________
 
 ## Task 2: Card Pool Helpers
 
 **Files:**
+
 - Create: `scripts/quest_prototype/src/data/card-pools.ts`
+
 - Create: `scripts/quest_prototype/src/data/card-pools.test.ts`
 
 - [ ] **Step 1: Write card-pool tests**
@@ -466,15 +504,21 @@ git add scripts/quest_prototype/src/data/card-pools.ts scripts/quest_prototype/s
 git commit -m "feat(quest): add prototype card pool eligibility helpers"
 ```
 
----
+______________________________________________________________________
 
 ## Task 3: Tide Circle And Starting Deck Generation
 
 **Files:**
+
 - Create: `scripts/quest_prototype/src/data/tide-circle.ts`
+
 - Create: `scripts/quest_prototype/src/data/tide-circle.test.ts`
+
 - Create: `scripts/quest_prototype/src/quest-start/quest-start-generator.ts`
-- Create: `scripts/quest_prototype/src/quest-start/quest-start-generator.test.ts`
+
+- Create:
+  `scripts/quest_prototype/src/quest-start/quest-start-generator.test.ts`
+
 - Modify: `scripts/quest_prototype/src/types/cards.ts`
 
 - [ ] **Step 1: Add NamedTide type**
@@ -757,14 +801,18 @@ git add scripts/quest_prototype/src/types/cards.ts scripts/quest_prototype/src/d
 git commit -m "feat(quest): generate starting tide choices and loadout"
 ```
 
----
+______________________________________________________________________
 
 ## Task 4: Quest State And Start Screen
 
 **Files:**
+
 - Modify: `scripts/quest_prototype/src/types/quest.ts`
+
 - Modify: `scripts/quest_prototype/src/state/quest-context.tsx`
+
 - Modify: `scripts/quest_prototype/src/state/quest-config.ts`
+
 - Modify: `scripts/quest_prototype/src/screens/QuestStartScreen.tsx`
 
 - [ ] **Step 1: Change default excluded tide config**
@@ -1010,13 +1058,16 @@ git add scripts/quest_prototype/src/types/quest.ts scripts/quest_prototype/src/s
 git commit -m "feat(quest): start quests from a selected tide"
 ```
 
----
+______________________________________________________________________
 
 ## Task 5: Shared Quest Tide Profile
 
 **Files:**
+
 - Create: `scripts/quest_prototype/src/data/quest-tide-profile.ts`
+
 - Create: `scripts/quest_prototype/src/data/quest-tide-profile.test.ts`
+
 - Modify: `scripts/quest_prototype/src/data/tide-weights.ts`
 
 - [ ] **Step 1: Write profile tests**
@@ -1340,20 +1391,30 @@ git add scripts/quest_prototype/src/data/quest-tide-profile.ts scripts/quest_pro
 git commit -m "feat(quest): compute shared quest tide profile"
 ```
 
----
+______________________________________________________________________
 
 ## Task 6: Two-Tide Dreamcallers And Offers
 
 **Files:**
+
 - Modify: `scripts/quest_prototype/src/types/quest.ts`
+
 - Modify: `scripts/quest_prototype/src/data/dreamcallers.ts`
+
 - Create: `scripts/quest_prototype/src/data/dreamcaller-offers.ts`
+
 - Create: `scripts/quest_prototype/src/data/dreamcaller-offers.test.ts`
+
 - Modify: `scripts/quest_prototype/src/data/synthetic-data.test.ts`
+
 - Modify: `scripts/quest_prototype/src/screens/DreamcallerDraftScreen.tsx`
+
 - Modify: `scripts/quest_prototype/src/state/quest-context.tsx`
+
 - Modify: `scripts/quest_prototype/src/screens/BattleScreen.tsx`
+
 - Modify: `scripts/quest_prototype/src/screens/QuestCompleteScreen.tsx`
+
 - Modify: `scripts/quest_prototype/src/components/DeckViewer.tsx`
 
 - [ ] **Step 1: Update Dreamcaller type**
@@ -1386,7 +1447,8 @@ In `scripts/quest_prototype/src/data/dreamcallers.ts`, change every entry:
 },
 ```
 
-Assign the 10 existing callers to named-tide pairs. Cover all 7 neighbor pairs at least once:
+Assign the 10 existing callers to named-tide pairs. Cover all 7 neighbor pairs
+at least once:
 
 ```text
 Bloom/Arc
@@ -1398,7 +1460,8 @@ Rime/Surge
 Surge/Bloom
 ```
 
-Remove the Neutral dreamcaller by converting that entry to one of the named pairs.
+Remove the Neutral dreamcaller by converting that entry to one of the named
+pairs.
 
 - [ ] **Step 3: Update synthetic-data dreamcaller tests**
 
@@ -1578,7 +1641,8 @@ export function selectOfferedDreamcallers(input: OfferInput): Dreamcaller[] {
 
 - [ ] **Step 6: Wire DreamcallerDraftScreen**
 
-Replace local `selectOfferedDreamcallers` in `DreamcallerDraftScreen.tsx` with imports:
+Replace local `selectOfferedDreamcallers` in `DreamcallerDraftScreen.tsx` with
+imports:
 
 ```ts
 import { selectOfferedDreamcallers } from "../data/dreamcaller-offers";
@@ -1634,7 +1698,8 @@ dreamcallerTides: dreamcaller.tides,
 
 - [ ] **Step 8: Update remaining dreamcaller callsites**
 
-Replace `dreamcaller.tide` reads with either `dreamcaller.tides[0]` for a representative accent or `dreamcaller.tides` for data display.
+Replace `dreamcaller.tide` reads with either `dreamcaller.tides[0]` for a
+representative accent or `dreamcaller.tides` for data display.
 
 Known callsites from the spec investigation:
 
@@ -1664,14 +1729,18 @@ git add scripts/quest_prototype/src/types/quest.ts scripts/quest_prototype/src/d
 git commit -m "feat(quest): offer two-tide dreamcaller archetype forks"
 ```
 
----
+______________________________________________________________________
 
 ## Task 7: Draft Pool And Profile Bias
 
 **Files:**
+
 - Modify: `scripts/quest_prototype/src/types/draft.ts`
+
 - Modify: `scripts/quest_prototype/src/draft/draft-engine.ts`
+
 - Modify: `scripts/quest_prototype/src/draft/draft-engine.test.ts`
+
 - Modify: `scripts/quest_prototype/src/screens/DraftSiteScreen.tsx`
 
 - [ ] **Step 1: Update draft type context**
@@ -1803,7 +1872,8 @@ Update callers in `tideCurrentPack` and `poolBiasPack` to pass `ctx`.
 
 - [ ] **Step 5: Pass current profile from DraftSiteScreen**
 
-In `DraftSiteScreen.tsx`, compute profile before initializer and `enterDraftSite`:
+In `DraftSiteScreen.tsx`, compute profile before initializer and
+`enterDraftSite`:
 
 ```ts
 const profile = computeQuestTideProfile({
@@ -1827,7 +1897,9 @@ ds = initializeDraftState(
 );
 ```
 
-When entering site and generating subsequent packs, make sure `questTideProfile: profile` reaches `generatePack`. If the simplest edit is changing `enterDraftSite` signature, use:
+When entering site and generating subsequent packs, make sure
+`questTideProfile: profile` reaches `generatePack`. If the simplest edit is
+changing `enterDraftSite` signature, use:
 
 ```ts
 enterDraftSite(cloned, cardDatabase, { packSize: 4 }, profile);
@@ -1854,18 +1926,26 @@ git add scripts/quest_prototype/src/types/draft.ts scripts/quest_prototype/src/d
 git commit -m "feat(quest): seed draft packs from quest tide profile"
 ```
 
----
+______________________________________________________________________
 
 ## Task 8: Shops, Rewards, Dreamsigns, And Deferred Reward Sites
 
 **Files:**
+
 - Modify: `scripts/quest_prototype/src/shop/shop-generator.ts`
+
 - Modify: `scripts/quest_prototype/src/shop/shop-generator.test.ts`
+
 - Modify: `scripts/quest_prototype/src/screens/ShopScreen.tsx`
+
 - Modify: `scripts/quest_prototype/src/screens/SpecialtyShopScreen.tsx`
+
 - Modify: `scripts/quest_prototype/src/data/tide-weights.ts`
+
 - Modify: `scripts/quest_prototype/src/screens/BattleScreen.tsx`
+
 - Modify: `scripts/quest_prototype/src/atlas/atlas-generator.ts`
+
 - Modify: `scripts/quest_prototype/src/screens/RewardSiteScreen.tsx`
 
 - [ ] **Step 1: Change shop generator signatures**
@@ -1949,7 +2029,8 @@ and the same profile fallback selection pattern.
 
 - [ ] **Step 4: Pass profile from shop screens**
 
-In `ShopScreen.tsx` and `SpecialtyShopScreen.tsx`, compute profile with current `state` and pass it as the fourth argument.
+In `ShopScreen.tsx` and `SpecialtyShopScreen.tsx`, compute profile with current
+`state` and pass it as the fourth argument.
 
 Use this exact profile input:
 
@@ -1966,7 +2047,8 @@ const profile = computeQuestTideProfile({
 
 - [ ] **Step 5: Keep battle rare rewards profile-aware and Starter-free**
 
-Either update `selectRareRewards` in `tide-weights.ts` to accept an optional `QuestTideProfile`, or create a replacement in `quest-tide-profile.ts`.
+Either update `selectRareRewards` in `tide-weights.ts` to accept an optional
+`QuestTideProfile`, or create a replacement in `quest-tide-profile.ts`.
 
 The card filter must be:
 
@@ -1976,21 +2058,28 @@ const rareCards = offerableCards(cardDatabase, { excludedTides }).filter(
 );
 ```
 
-In `BattleScreen.tsx`, pass the computed current profile when generating `rareCardsRef.current`.
+In `BattleScreen.tsx`, pass the computed current profile when generating
+`rareCardsRef.current`.
 
 - [ ] **Step 6: Defer reward-site concrete reward**
 
-In `atlas-generator.ts`, for Reward sites, keep `rewardType` if needed but stop writing concrete `cardNumber`, `dreamsignName`, `dreamsignTide`, and `dreamsignEffect` into site data.
+In `atlas-generator.ts`, for Reward sites, keep `rewardType` if needed but stop
+writing concrete `cardNumber`, `dreamsignName`, `dreamsignTide`, and
+`dreamsignEffect` into site data.
 
-In `RewardSiteScreen.tsx`, roll missing card/dreamsign rewards on first render using current profile:
+In `RewardSiteScreen.tsx`, roll missing card/dreamsign rewards on first render
+using current profile:
 
 ```ts
 const [rolledReward, setRolledReward] = useState<Record<string, unknown> | null>(null);
 ```
 
-When `rewardType === "card"`, sample one offerable/profile-weighted card and set `cardNumber`.
+When `rewardType === "card"`, sample one offerable/profile-weighted card and set
+`cardNumber`.
 
-When `rewardType === "dreamsign"`, sample one dreamsign with profile weighting and set the existing `dreamsignName`, `dreamsignTide`, and `dreamsignEffect` fields.
+When `rewardType === "dreamsign"`, sample one dreamsign with profile weighting
+and set the existing `dreamsignName`, `dreamsignTide`, and `dreamsignEffect`
+fields.
 
 Log:
 
@@ -2023,12 +2112,14 @@ git add scripts/quest_prototype/src/shop/shop-generator.ts scripts/quest_prototy
 git commit -m "feat(quest): weight shops and rewards from quest tide profile"
 ```
 
----
+______________________________________________________________________
 
 ## Task 9: HUD And Deck Viewer Origin Visibility
 
 **Files:**
+
 - Modify: `scripts/quest_prototype/src/components/HUD.tsx`
+
 - Modify: `scripts/quest_prototype/src/components/DeckViewer.tsx`
 
 - [ ] **Step 1: Add compact origin badge to HUD**
@@ -2124,7 +2215,8 @@ Commands:
 /Users/dthurn/Library/pnpm/agent-browser screenshot /tmp/quest-starting-tide-qa/deck-viewer-origin.png
 ```
 
-Expected: HUD shows selected origin; deck viewer shows 30 cards and Quest Origin.
+Expected: HUD shows selected origin; deck viewer shows 30 cards and Quest
+Origin.
 
 - [ ] **Step 5: Commit**
 
@@ -2134,15 +2226,20 @@ git add scripts/quest_prototype/src/components/HUD.tsx scripts/quest_prototype/s
 git commit -m "feat(quest): show quest origin in HUD and deck viewer"
 ```
 
----
+______________________________________________________________________
 
 ## Task 10: Structured Generation Logging And Log Analyzer
 
 **Files:**
+
 - Modify: `scripts/quest_prototype/src/data/quest-tide-profile.ts`
+
 - Modify: `scripts/quest_prototype/src/screens/ShopScreen.tsx`
+
 - Modify: `scripts/quest_prototype/src/screens/SpecialtyShopScreen.tsx`
+
 - Modify: `scripts/quest_prototype/src/draft/draft-engine.ts`
+
 - Create: `scripts/quest_prototype/src/qa/analyze-quest-log.mjs`
 
 - [ ] **Step 1: Add a profile log helper**
@@ -2283,12 +2380,14 @@ git add scripts/quest_prototype/src/data/quest-tide-profile.ts scripts/quest_pro
 git commit -m "feat(quest): log tide-profile generation decisions"
 ```
 
----
+______________________________________________________________________
 
 ## Task 11: Full Web Verification And Manual QA
 
 **Files:**
+
 - No production code edits expected
+
 - Write QA notes outside the repo under `/tmp/quest-starting-tide-qa/`
 
 - [ ] **Step 1: Run automated gates**
@@ -2332,7 +2431,8 @@ Expected: 3 named tide options, no browser page errors.
 
 - [ ] **Step 4: Browser QA selected start and deck viewer**
 
-Before clicking, record expectation: after selecting a tide, deck size = 30, starting crystal = 1 for selected tide, HUD origin = selected tide.
+Before clicking, record expectation: after selecting a tide, deck size = 30,
+starting crystal = 1 for selected tide, HUD origin = selected tide.
 
 Run:
 
@@ -2348,18 +2448,22 @@ Click one starting tide button by `@ref`, then:
 /Users/dthurn/Library/pnpm/agent-browser screenshot /tmp/quest-starting-tide-qa/03-deck-viewer.png
 ```
 
-Expected: deck viewer reports 30 cards, shows Quest Origin, shows 10 Starter cards somewhere in the deck grid.
+Expected: deck viewer reports 30 cards, shows Quest Origin, shows 10 Starter
+cards somewhere in the deck grid.
 
 - [ ] **Step 5: Browser QA draft and dreamcaller**
 
-Navigate to available dreamscape and visit Draft and Dreamcaller Draft sites. Use `snapshot -i` to find current clickable refs and screenshot after each action:
+Navigate to available dreamscape and visit Draft and Dreamcaller Draft sites.
+Use `snapshot -i` to find current clickable refs and screenshot after each
+action:
 
 ```bash
 /Users/dthurn/Library/pnpm/agent-browser screenshot /tmp/quest-starting-tide-qa/04-draft-pick-1.png
 /Users/dthurn/Library/pnpm/agent-browser screenshot /tmp/quest-starting-tide-qa/05-dreamcaller-offers.png
 ```
 
-Expected: draft pick flow increases deck size by 5 after completion; dreamcaller cards show two tide icons and at least one offer includes the starting tide.
+Expected: draft pick flow increases deck size by 5 after completion; dreamcaller
+cards show two tide icons and at least one offer includes the starting tide.
 
 - [ ] **Step 6: Browser QA shop/reward/battle paths**
 
@@ -2372,7 +2476,8 @@ Screenshot each generated offer:
 /Users/dthurn/Library/pnpm/agent-browser screenshot /tmp/quest-starting-tide-qa/07-battle-reward.png
 ```
 
-Expected: no visible Starter cards in generated offers; purchases/rewards change deck and essence by visible amounts.
+Expected: no visible Starter cards in generated offers; purchases/rewards change
+deck and essence by visible amounts.
 
 - [ ] **Step 7: Download and analyze log**
 
@@ -2383,7 +2488,8 @@ ls -t ~/Downloads/quest-log-*.jsonl | head -1
 node src/qa/analyze-quest-log.mjs "$(ls -t ~/Downloads/quest-log-*.jsonl | head -1)"
 ```
 
-Expected: analyzer prints JSON summary and exits 0. Summary must include selectedStartingTide and startingDeckTotal 30.
+Expected: analyzer prints JSON summary and exits 0. Summary must include
+selectedStartingTide and startingDeckTotal 30.
 
 - [ ] **Step 8: Reset/reload QA**
 
@@ -2395,7 +2501,8 @@ Run:
 /Users/dthurn/Library/pnpm/agent-browser screenshot /tmp/quest-starting-tide-qa/08-reloaded-start.png
 ```
 
-Expected: the new session is back at starting tide selection; previous deck/origin is not visible.
+Expected: the new session is back at starting tide selection; previous
+deck/origin is not visible.
 
 - [ ] **Step 9: Final status check**
 
@@ -2406,9 +2513,10 @@ git status --short
 git log --oneline -12
 ```
 
-Expected: only intentional files are changed. If all implementation tasks committed, status is empty.
+Expected: only intentional files are changed. If all implementation tasks
+committed, status is empty.
 
----
+______________________________________________________________________
 
 ## Plan Self-Review Checklist
 
@@ -2416,7 +2524,8 @@ Before implementing, verify these mappings from spec to plan:
 
 - Starting tide options: Task 3 pure helper and Task 4 UI.
 - 30-card starting deck: Task 3 helper and Task 4 state mutation.
-- Starter loadout-only data: Task 1 data load, Task 2 pool helper, Task 7 draft pool, Task 8 shop/reward pools.
+- Starter loadout-only data: Task 1 data load, Task 2 pool helper, Task 7 draft
+  pool, Task 8 shop/reward pools.
 - Consumed random grants: Task 4 state, Task 7 draft initialization.
 - No default excluded tides: Task 4 config step.
 - HUD/deck viewer origin: Task 9.

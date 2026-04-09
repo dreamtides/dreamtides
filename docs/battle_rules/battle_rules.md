@@ -132,8 +132,7 @@ Each turn progresses through these phases in order:
    MTG's upkeep step.)
 4. **Main** — The active player can play cards from hand, activate abilities,
    reposition characters between judgment and focus ranks and between columns,
-   and
-   take other actions. This is the primary action phase.
+   and take other actions. This is the primary action phase.
 5. **Ending** — The active player passes. The opponent may play fast cards
    during this window (e.g. using a fast-speed dissolve event to remove an
    attacker before Judgment). Once the opponent also passes, the turn proceeds
@@ -234,8 +233,8 @@ main phase.
 **Materialize** — Put a character onto the battlefield's focus rank. This is the
 term for a character entering play, whether from hand (played normally), from
 the void (via Reclaim or effects), from the deck (via effects), or as a token
-(Figments). Characters enter focused and cannot move to the judgment rank on the turn they
-are materialized.
+(Figments). Characters enter focused and cannot move to the judgment rank on the
+turn they are materialized.
 
 **Prevent** — Counter a card on the stack, sending it to the void without
 resolving. Prevent effects are always fast (they must be played in response to a

@@ -1,69 +1,94 @@
 # Battle Prototype Web Client Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use
+> superpowers:subagent-driven-development (recommended) or
+> superpowers:executing-plans to implement this plan task-by-task. Steps use
+> checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a playable web-based battle client that connects to the existing Rust dev server for prototyping Dreamtides battles against AI.
+**Goal:** Build a playable web-based battle client that connects to the existing
+Rust dev server for prototyping Dreamtides battles against AI.
 
-**Architecture:** React/Vite/TypeScript app at `scripts/battle_prototype/` that talks to the dev server on port 26598 via proxied HTTP. The server sends `BattleView` snapshots containing all card state, legal actions, and UI controls. The client renders zones, wires click handlers to embedded `GameAction` values, and polls for updates.
+**Architecture:** React/Vite/TypeScript app at `scripts/battle_prototype/` that
+talks to the dev server on port 26598 via proxied HTTP. The server sends
+`BattleView` snapshots containing all card state, legal actions, and UI
+controls. The client renders zones, wires click handlers to embedded
+`GameAction` values, and polls for updates.
 
 **Tech Stack:** Vite 7.x, React 19.x, TypeScript 5.x (strict), Tailwind CSS 4.x
 
 **Design spec:** `docs/superpowers/specs/2026-04-04-battle-prototype-design.md`
 
----
+______________________________________________________________________
 
 ## QA Requirements (MUST BE INCLUDED IN EVERY SUBAGENT PROMPT)
 
 **Copy this block verbatim into every subagent prompt:**
 
-> You MUST use `agent-browser` to take a screenshot and verify your work after every meaningful code change. You MUST NOT claim completion without screenshot evidence showing the feature works correctly. If a screenshot shows any issue, you MUST fix it before proceeding. When verifying game state, log the expected values from the server response and compare them against what is visible on screen. Take screenshots BEFORE and AFTER every user interaction (clicking a card, pressing a button) to verify state transitions. After implementing any interactive feature, play at least 2 full turns of a real battle to verify correctness.
+> You MUST use `agent-browser` to take a screenshot and verify your work after
+> every meaningful code change. You MUST NOT claim completion without screenshot
+> evidence showing the feature works correctly. If a screenshot shows any issue,
+> you MUST fix it before proceeding. When verifying game state, log the expected
+> values from the server response and compare them against what is visible on
+> screen. Take screenshots BEFORE and AFTER every user interaction (clicking a
+> card, pressing a button) to verify state transitions. After implementing any
+> interactive feature, play at least 2 full turns of a real battle to verify
+> correctness.
 
----
+______________________________________________________________________
 
 ## File Map
 
 **New files to create:**
 
-| File | Responsibility |
-|------|---------------|
-| `scripts/battle_prototype/package.json` | Dependencies and scripts |
-| `scripts/battle_prototype/vite.config.ts` | Vite config with proxy to dev server |
-| `scripts/battle_prototype/tsconfig.json` | TypeScript strict config |
-| `scripts/battle_prototype/tsconfig.node.json` | Node-side TS config |
-| `scripts/battle_prototype/index.html` | HTML entry point |
-| `scripts/battle_prototype/eslint.config.js` | ESLint config |
-| `scripts/battle_prototype/scripts/setup-assets.mjs` | Symlink card art, copy tide icons |
-| `scripts/battle_prototype/src/main.tsx` | React DOM mount |
-| `scripts/battle_prototype/src/App.tsx` | Root component, connect on mount |
-| `scripts/battle_prototype/src/index.css` | Tailwind + dark theme CSS |
-| `scripts/battle_prototype/src/types/battle.ts` | TypeScript types mirroring Rust display_data |
-| `scripts/battle_prototype/src/api/client.ts` | HTTP client: connect, performAction, poll |
-| `scripts/battle_prototype/src/state/battle-context.tsx` | React context for BattleView + polling |
-| `scripts/battle_prototype/src/util/command-parser.ts` | Extract BattleView from CommandSequence |
-| `scripts/battle_prototype/src/util/flex-node-parser.ts` | Extract text/buttons from FlexNode tree |
-| `scripts/battle_prototype/src/components/BattleScreen.tsx` | Main layout container |
-| `scripts/battle_prototype/src/components/PlayerStatus.tsx` | Score, energy, spark, deck/void counts |
-| `scripts/battle_prototype/src/components/BattlefieldZone.tsx` | Row of up to 8 characters |
-| `scripts/battle_prototype/src/components/StackZone.tsx` | Center column stack display |
-| `scripts/battle_prototype/src/components/HandZone.tsx` | Bottom hand of cards |
-| `scripts/battle_prototype/src/components/CardDisplay.tsx` | Single card rendering |
-| `scripts/battle_prototype/src/components/ActionBar.tsx` | InterfaceView buttons |
-| `scripts/battle_prototype/src/components/OverlayPrompt.tsx` | FlexNode text/button extraction |
-| `scripts/battle_prototype/src/components/DebugPanel.tsx` | Debug controls |
+| File                                                          | Responsibility                               |
+| ------------------------------------------------------------- | -------------------------------------------- |
+| `scripts/battle_prototype/package.json`                       | Dependencies and scripts                     |
+| `scripts/battle_prototype/vite.config.ts`                     | Vite config with proxy to dev server         |
+| `scripts/battle_prototype/tsconfig.json`                      | TypeScript strict config                     |
+| `scripts/battle_prototype/tsconfig.node.json`                 | Node-side TS config                          |
+| `scripts/battle_prototype/index.html`                         | HTML entry point                             |
+| `scripts/battle_prototype/eslint.config.js`                   | ESLint config                                |
+| `scripts/battle_prototype/scripts/setup-assets.mjs`           | Symlink card art, copy tide icons            |
+| `scripts/battle_prototype/src/main.tsx`                       | React DOM mount                              |
+| `scripts/battle_prototype/src/App.tsx`                        | Root component, connect on mount             |
+| `scripts/battle_prototype/src/index.css`                      | Tailwind + dark theme CSS                    |
+| `scripts/battle_prototype/src/types/battle.ts`                | TypeScript types mirroring Rust display_data |
+| `scripts/battle_prototype/src/api/client.ts`                  | HTTP client: connect, performAction, poll    |
+| `scripts/battle_prototype/src/state/battle-context.tsx`       | React context for BattleView + polling       |
+| `scripts/battle_prototype/src/util/command-parser.ts`         | Extract BattleView from CommandSequence      |
+| `scripts/battle_prototype/src/util/flex-node-parser.ts`       | Extract text/buttons from FlexNode tree      |
+| `scripts/battle_prototype/src/components/BattleScreen.tsx`    | Main layout container                        |
+| `scripts/battle_prototype/src/components/PlayerStatus.tsx`    | Score, energy, spark, deck/void counts       |
+| `scripts/battle_prototype/src/components/BattlefieldZone.tsx` | Row of up to 8 characters                    |
+| `scripts/battle_prototype/src/components/StackZone.tsx`       | Center column stack display                  |
+| `scripts/battle_prototype/src/components/HandZone.tsx`        | Bottom hand of cards                         |
+| `scripts/battle_prototype/src/components/CardDisplay.tsx`     | Single card rendering                        |
+| `scripts/battle_prototype/src/components/ActionBar.tsx`       | InterfaceView buttons                        |
+| `scripts/battle_prototype/src/components/OverlayPrompt.tsx`   | FlexNode text/button extraction              |
+| `scripts/battle_prototype/src/components/DebugPanel.tsx`      | Debug controls                               |
 
----
+______________________________________________________________________
 
 ## Task 1: Project Scaffold
 
 **Files:**
+
 - Create: `scripts/battle_prototype/package.json`
+
 - Create: `scripts/battle_prototype/vite.config.ts`
+
 - Create: `scripts/battle_prototype/tsconfig.json`
+
 - Create: `scripts/battle_prototype/tsconfig.node.json`
+
 - Create: `scripts/battle_prototype/index.html`
+
 - Create: `scripts/battle_prototype/eslint.config.js`
+
 - Create: `scripts/battle_prototype/src/main.tsx`
+
 - Create: `scripts/battle_prototype/src/index.css`
+
 - Create: `scripts/battle_prototype/.gitignore`
 
 - [ ] **Step 1: Create package.json**
@@ -316,7 +341,9 @@ Expected: Vite dev server starts on a local port (e.g., 5173).
 
 - [ ] **Step 12: QA — Verify scaffold renders**
 
-Use `agent-browser` to open the Vite dev server URL (e.g., http://localhost:5173). Take a screenshot. Verify:
+Use `agent-browser` to open the Vite dev server URL (e.g.,
+http://localhost:5173). Take a screenshot. Verify:
+
 1. The page loads without a white screen or error.
 2. The text "Battle Prototype — connecting..." is visible.
 3. The background color is dark (#0a0612).
@@ -331,16 +358,20 @@ git add scripts/battle_prototype/
 git commit -m "feat: scaffold battle prototype Vite project with proxy config"
 ```
 
----
+______________________________________________________________________
 
 ## Task 2: Asset Pipeline
 
 **Files:**
+
 - Create: `scripts/battle_prototype/scripts/setup-assets.mjs`
 
 - [ ] **Step 1: Create setup-assets.mjs**
 
-This is adapted from the quest prototype's script. It parses `rendered-cards.toml`, creates `card-data.json` (mapping card names/sprite addresses to card numbers for image lookup), symlinks card images, and copies tide icons.
+This is adapted from the quest prototype's script. It parses
+`rendered-cards.toml`, creates `card-data.json` (mapping card names/sprite
+addresses to card numbers for image lookup), symlinks card images, and copies
+tide icons.
 
 ```javascript
 import { readFileSync, mkdirSync, rmSync, symlinkSync, copyFileSync, readdirSync, existsSync } from "node:fs";
@@ -487,15 +518,23 @@ main();
 
 Run: `cd scripts/battle_prototype && npm run setup-assets`
 
-Expected: Console output showing cards parsed, images linked, tide icons copied. Verify `public/card-data.json` exists and contains card entries. Verify `public/cards/` contains `.webp` symlinks. Run `ls public/cards/ | head -5` to confirm symlinks exist. Run `cat public/card-data.json | head -20` to confirm JSON structure has cardNumber, imageNumber, name fields.
+Expected: Console output showing cards parsed, images linked, tide icons copied.
+Verify `public/card-data.json` exists and contains card entries. Verify
+`public/cards/` contains `.webp` symlinks. Run `ls public/cards/ | head -5` to
+confirm symlinks exist. Run `cat public/card-data.json | head -20` to confirm
+JSON structure has cardNumber, imageNumber, name fields.
 
 - [ ] **Step 3: QA — Verify card images load in browser**
 
-Create a temporary test page or add a quick test to App.tsx that renders `<img src="/cards/1.webp" />` (or whatever the first card number is from card-data.json). Use `agent-browser` to open the app. Take a screenshot. Verify:
+Create a temporary test page or add a quick test to App.tsx that renders
+`<img src="/cards/1.webp" />` (or whatever the first card number is from
+card-data.json). Use `agent-browser` to open the app. Take a screenshot. Verify:
+
 1. At least one card image loads (not a broken image icon).
 2. The image is visible and appears to be card art (not a placeholder or error).
 
-Remove the temporary test code after verification. If images don't load, debug the symlink path and image cache before proceeding.
+Remove the temporary test code after verification. If images don't load, debug
+the symlink path and image cache before proceeding.
 
 - [ ] **Step 4: Commit**
 
@@ -504,14 +543,17 @@ git add scripts/battle_prototype/scripts/setup-assets.mjs
 git commit -m "feat: add asset pipeline for card images and tide icons"
 ```
 
----
+______________________________________________________________________
 
 ## Task 3: TypeScript Types
 
 **Files:**
+
 - Create: `scripts/battle_prototype/src/types/battle.ts`
 
-This is the largest single file. It mirrors the Rust `display_data` types as TypeScript interfaces. All enums are externally tagged in serde (default) — unit variants serialize as strings, data variants as `{ "VariantName": data }`.
+This is the largest single file. It mirrors the Rust `display_data` types as
+TypeScript interfaces. All enums are externally tagged in serde (default) — unit
+variants serialize as strings, data variants as `{ "VariantName": data }`.
 
 - [ ] **Step 1: Create types/battle.ts**
 
@@ -876,12 +918,14 @@ git add scripts/battle_prototype/src/types/battle.ts
 git commit -m "feat: add TypeScript types mirroring Rust display_data"
 ```
 
----
+______________________________________________________________________
 
 ## Task 4: API Client & Command Parser
 
 **Files:**
+
 - Create: `scripts/battle_prototype/src/api/client.ts`
+
 - Create: `scripts/battle_prototype/src/util/command-parser.ts`
 
 - [ ] **Step 1: Create util/command-parser.ts**
@@ -988,7 +1032,11 @@ export async function poll(): Promise<PollResponse> {
 }
 ```
 
-**Note on GET with body:** The dev server's `connect` and `poll` handlers accept JSON body on GET requests (the Axum handler uses `body: String`). The `fetch` API supports this. If any browser restricts it, the subagent should switch to POST and update the Vite proxy config accordingly — but this matches how the Unity client works.
+**Note on GET with body:** The dev server's `connect` and `poll` handlers accept
+JSON body on GET requests (the Axum handler uses `body: String`). The `fetch`
+API supports this. If any browser restricts it, the subagent should switch to
+POST and update the Vite proxy config accordingly — but this matches how the
+Unity client works.
 
 - [ ] **Step 3: Verify types compile**
 
@@ -1017,12 +1065,17 @@ export default function App() {
 }
 ```
 
-Ensure the Rust dev server is running (`cd rules_engine && just dev-server`). Use `agent-browser` to open the app. Take a screenshot. Verify:
-1. The page shows "Connected!" with a non-zero group count and a UUID version string.
-2. It does NOT show "Error:".
-3. If it shows an error about GET-with-body, switch `connect` and `poll` in client.ts to use `method: "POST"` instead and re-test.
+Ensure the Rust dev server is running (`cd rules_engine && just dev-server`).
+Use `agent-browser` to open the app. Take a screenshot. Verify:
 
-After verification, revert App.tsx to the placeholder (this will be properly replaced in Task 5).
+1. The page shows "Connected!" with a non-zero group count and a UUID version
+   string.
+2. It does NOT show "Error:".
+3. If it shows an error about GET-with-body, switch `connect` and `poll` in
+   client.ts to use `method: "POST"` instead and re-test.
+
+After verification, revert App.tsx to the placeholder (this will be properly
+replaced in Task 5).
 
 - [ ] **Step 5: Commit**
 
@@ -1031,12 +1084,14 @@ git add scripts/battle_prototype/src/api/ scripts/battle_prototype/src/util/comm
 git commit -m "feat: add API client and command parser"
 ```
 
----
+______________________________________________________________________
 
 ## Task 5: Battle Context & App Connection
 
 **Files:**
+
 - Create: `scripts/battle_prototype/src/state/battle-context.tsx`
+
 - Modify: `scripts/battle_prototype/src/App.tsx`
 
 - [ ] **Step 1: Create state/battle-context.tsx**
@@ -1231,29 +1286,40 @@ export default function App() {
 
 Run (in a separate terminal): `cd rules_engine && just dev-server`
 
-Then open the battle prototype in the browser. Verify: page shows "You" and "Enemy" stats, turn number, card count, and raw JSON.
+Then open the battle prototype in the browser. Verify: page shows "You" and
+"Enemy" stats, turn number, card count, and raw JSON.
 
 **QA:** Use `agent-browser` to open the battle prototype URL.
 
 **Screenshot 1:** Take a screenshot of the initial page. Verify:
+
 1. The page does NOT show "Connecting..." stuck forever or "Error:".
 2. "You" and "Enemy" sections are visible with score, energy, spark values.
 3. The raw JSON is displayed in the `<pre>` block at the bottom.
 
 **Screenshot 2:** Inspect the displayed data. Verify:
-1. `cards` array in the JSON is non-empty (should have 30+ cards for a Benchmark1 deck).
+
+1. `cards` array in the JSON is non-empty (should have 30+ cards for a
+   Benchmark1 deck).
 2. Score values are 0 (start of game).
 3. Energy is > 0 (dreamwell provides starting energy).
 4. `turn_number` is 1.
-5. `interface` field exists and contains at least one button (primary_action_button or similar).
+5. `interface` field exists and contains at least one button
+   (primary_action_button or similar).
 
-**Screenshot 3:** Reload the page in `agent-browser`. Take a screenshot after reload. Verify:
+**Screenshot 3:** Reload the page in `agent-browser`. Take a screenshot after
+reload. Verify:
+
 1. The page reconnects successfully (shows data, not an error).
 2. The state is consistent (similar card count, turn 1).
 
 If the connection fails (error message displayed), debug:
-- Is the Rust dev server running? Check with `curl http://localhost:26598/connect -d '{...}'`.
+
+- Is the Rust dev server running? Check with
+  `curl http://localhost:26598/connect -d '{...}'`.
+
 - Is the Vite proxy working? Check browser network tab for proxy errors.
+
 - Is the GET-with-body issue? Switch to POST if needed.
 
 - [ ] **Step 4: Commit**
@@ -1263,11 +1329,12 @@ git add scripts/battle_prototype/src/state/ scripts/battle_prototype/src/App.tsx
 git commit -m "feat: battle context with connect, poll, and raw state display"
 ```
 
----
+______________________________________________________________________
 
 ## Task 6: Card Display Component
 
 **Files:**
+
 - Create: `scripts/battle_prototype/src/components/CardDisplay.tsx`
 
 - [ ] **Step 1: Create components/CardDisplay.tsx**
@@ -1405,7 +1472,8 @@ Expected: No errors.
 
 - [ ] **Step 3: QA — Verify CardDisplay renders real cards**
 
-Temporarily update App.tsx to connect to the server, extract the BattleView, and render the first few cards from hand using CardDisplay:
+Temporarily update App.tsx to connect to the server, extract the BattleView, and
+render the first few cards from hand using CardDisplay:
 
 ```tsx
 import { useEffect, useState } from "react";
@@ -1445,15 +1513,21 @@ export default function App() {
 ```
 
 Use `agent-browser` to open the app. Take a screenshot. Verify:
+
 1. Cards are visible — not blank rectangles or error messages.
 2. Card names are displayed and readable.
 3. Energy costs are shown (gold-colored numbers).
-4. At least one card shows art (loaded `.webp` image, not a broken image icon). If ALL images are broken, the sprite-to-card-number mapping needs debugging — inspect the `DisplayImage` value in the BattleView JSON and compare against what `getCardImageUrl` extracts.
+4. At least one card shows art (loaded `.webp` image, not a broken image icon).
+   If ALL images are broken, the sprite-to-card-number mapping needs debugging —
+   inspect the `DisplayImage` value in the BattleView JSON and compare against
+   what `getCardImageUrl` extracts.
 5. For character cards, spark values are displayed.
 6. Rules text is visible on at least one card (not raw HTML tags).
 7. If any card has `is_fast: true`, the fast badge (↯ Fast) appears.
 
-If cards render but images are broken, debug `getCardImageUrl` — log the sprite address from the server and compare to the card-data.json mapping. Fix the mapping logic before proceeding.
+If cards render but images are broken, debug `getCardImageUrl` — log the sprite
+address from the server and compare to the card-data.json mapping. Fix the
+mapping logic before proceeding.
 
 After verification, revert App.tsx (it will be properly replaced in Task 7).
 
@@ -1464,17 +1538,24 @@ git add scripts/battle_prototype/src/components/CardDisplay.tsx
 git commit -m "feat: card display component with art, stats, and click handling"
 ```
 
----
+______________________________________________________________________
 
 ## Task 7: Zone Components & Layout
 
 **Files:**
+
 - Create: `scripts/battle_prototype/src/components/PlayerStatus.tsx`
+
 - Create: `scripts/battle_prototype/src/components/BattlefieldZone.tsx`
+
 - Create: `scripts/battle_prototype/src/components/StackZone.tsx`
+
 - Create: `scripts/battle_prototype/src/components/HandZone.tsx`
+
 - Create: `scripts/battle_prototype/src/components/ActionBar.tsx`
+
 - Create: `scripts/battle_prototype/src/components/BattleScreen.tsx`
+
 - Modify: `scripts/battle_prototype/src/App.tsx`
 
 - [ ] **Step 1: Create components/PlayerStatus.tsx**
@@ -1951,35 +2032,54 @@ Run: `cd scripts/battle_prototype && npx tsc --noEmit`
 
 Expected: No errors.
 
-**QA:** Use `agent-browser` to open the app. This is a critical QA gate — the full layout must be verified before proceeding.
+**QA:** Use `agent-browser` to open the app. This is a critical QA gate — the
+full layout must be verified before proceeding.
 
-**Screenshot 1: Initial state overview.** Take a screenshot of the full page. Verify:
-1. The page has a dark background (#0a0612) — not white or default browser background.
-2. The layout has distinct horizontal zones stacked vertically: turn info, enemy status, enemy battlefield, (stack if present), your battlefield, your status, your hand, action bar.
+**Screenshot 1: Initial state overview.** Take a screenshot of the full page.
+Verify:
+
+1. The page has a dark background (#0a0612) — not white or default browser
+   background.
+2. The layout has distinct horizontal zones stacked vertically: turn info, enemy
+   status, enemy battlefield, (stack if present), your battlefield, your status,
+   your hand, action bar.
 3. No zone is missing or blank.
 
-**Screenshot 2: Card count verification.** Log the BattleView to the console (or display counts on screen). Compare:
-1. Count cards rendered in your hand zone. Must match the number of cards with `InHand: "User"` position in the BattleView.
+**Screenshot 2: Card count verification.** Log the BattleView to the console (or
+display counts on screen). Compare:
+
+1. Count cards rendered in your hand zone. Must match the number of cards with
+   `InHand: "User"` position in the BattleView.
 2. Count cards on your battlefield. Must match `OnBattlefield: "User"` cards.
 3. Count cards on enemy battlefield. Must match `OnBattlefield: "Enemy"` cards.
 4. Verify deck count in your status bar matches `InDeck: "User"` card count.
 5. Verify void count in your status bar matches `InVoid: "User"` card count.
-6. Log the expected vs. actual counts. If ANY count is wrong, debug the position filtering logic before proceeding.
+6. Log the expected vs. actual counts. If ANY count is wrong, debug the position
+   filtering logic before proceeding.
 
 **Screenshot 3: Player stats verification.**
-1. Verify your score, energy (current/produced), and spark values match `battle.user`.
+
+1. Verify your score, energy (current/produced), and spark values match
+   `battle.user`.
 2. Verify enemy score, energy, and spark match `battle.enemy`.
 3. Verify turn number is displayed and equals `battle.turn_number`.
 
 **Screenshot 4: Card details.**
-1. Zoom in on a hand card (or inspect it in the screenshot). Verify: name is readable, cost is shown, card art is loaded.
-2. If any battlefield characters exist, verify spark values are displayed on them.
+
+1. Zoom in on a hand card (or inspect it in the screenshot). Verify: name is
+   readable, cost is shown, card art is loaded.
+2. If any battlefield characters exist, verify spark values are displayed on
+   them.
 
 **Screenshot 5: Action bar.**
-1. Verify at least one button is visible (e.g., "Start Next Turn" or "End Turn" or "Pass Priority").
-2. Verify button labels match the `InterfaceView` button labels from the BattleView.
 
-Fix any issues found before proceeding. Take additional screenshots to confirm fixes.
+1. Verify at least one button is visible (e.g., "Start Next Turn" or "End Turn"
+   or "Pass Priority").
+2. Verify button labels match the `InterfaceView` button labels from the
+   BattleView.
+
+Fix any issues found before proceeding. Take additional screenshots to confirm
+fixes.
 
 - [ ] **Step 9: Commit**
 
@@ -1988,13 +2088,16 @@ git add scripts/battle_prototype/src/
 git commit -m "feat: full battle layout with zones, cards, status bars, and action buttons"
 ```
 
----
+______________________________________________________________________
 
 ## Task 8: FlexNode Overlay & Overlay Prompt
 
 **Files:**
+
 - Create: `scripts/battle_prototype/src/util/flex-node-parser.ts`
+
 - Create: `scripts/battle_prototype/src/components/OverlayPrompt.tsx`
+
 - Modify: `scripts/battle_prototype/src/components/BattleScreen.tsx`
 
 - [ ] **Step 1: Create util/flex-node-parser.ts**
@@ -2143,7 +2246,8 @@ Add this import to `BattleScreen.tsx`:
 import { OverlayPrompt } from "./OverlayPrompt";
 ```
 
-Add this just before the closing `</div>` of the BattleScreen component's return:
+Add this just before the closing `</div>` of the BattleScreen component's
+return:
 
 ```tsx
       {/* Overlay */}
@@ -2164,17 +2268,27 @@ Expected: No errors.
 
 - [ ] **Step 5: QA — Verify overlays render**
 
-Use `agent-browser` to open the app. The goal is to trigger a screen_overlay. Two approaches:
+Use `agent-browser` to open the app. The goal is to trigger a screen_overlay.
+Two approaches:
 
-**Approach A (if the dev_button is wired):** If the BattleView includes a `dev_button` in `InterfaceView`, click it. This should trigger the developer panel overlay. Take a screenshot. Verify:
+**Approach A (if the dev_button is wired):** If the BattleView includes a
+`dev_button` in `InterfaceView`, click it. This should trigger the developer
+panel overlay. Take a screenshot. Verify:
+
 1. An overlay appears with a semi-transparent dark backdrop.
 2. Text content is visible (button labels like "Set AI", "Draw Card", etc.).
 3. Buttons are rendered and appear clickable.
 
-**Approach B (if no overlay appears naturally):** Log `battle.interface.screen_overlay` to the console. If it is non-null, take a screenshot and verify the overlay renders. If it IS null during normal gameplay, proceed — overlays will be tested more thoroughly when the debug panel is wired in Task 9 and during playtesting.
+**Approach B (if no overlay appears naturally):** Log
+`battle.interface.screen_overlay` to the console. If it is non-null, take a
+screenshot and verify the overlay renders. If it IS null during normal gameplay,
+proceed — overlays will be tested more thoroughly when the debug panel is wired
+in Task 9 and during playtesting.
 
 Regardless of which approach works, also verify:
-1. When no overlay is present, the game renders normally (no empty overlay covering the screen).
+
+1. When no overlay is present, the game renders normally (no empty overlay
+   covering the screen).
 2. The overlay component doesn't crash on a null `screen_overlay`.
 
 - [ ] **Step 6: Commit**
@@ -2184,12 +2298,14 @@ git add scripts/battle_prototype/src/
 git commit -m "feat: FlexNode overlay parsing and prompt rendering"
 ```
 
----
+______________________________________________________________________
 
 ## Task 9: Debug Panel
 
 **Files:**
+
 - Create: `scripts/battle_prototype/src/components/DebugPanel.tsx`
+
 - Modify: `scripts/battle_prototype/src/components/BattleScreen.tsx`
 
 - [ ] **Step 1: Create components/DebugPanel.tsx**
@@ -2371,7 +2487,9 @@ Add the import for `useState`:
 import { useState } from "react";
 ```
 
-Replace the `devButton` in `ActionBar` with a custom handler. In the `ActionBar` props, remove `devButton` and instead add a manual Dev button right after the ActionBar:
+Replace the `devButton` in `ActionBar` with a custom handler. In the `ActionBar`
+props, remove `devButton` and instead add a manual Dev button right after the
+ActionBar:
 
 ```tsx
       {/* Action buttons */}
@@ -2431,7 +2549,11 @@ Run: `cd scripts/battle_prototype && npx tsc --noEmit`
 
 Expected: No errors.
 
-**QA:** Use `agent-browser` to open the app. Click "Show Debug". Take a screenshot. Verify: debug panel is visible with deck selector and action buttons. Click "99 Energy". Take a screenshot. Verify energy display shows 99. Select "Core11" and click "Restart Battle". Take a screenshot. Verify the game resets with new cards.
+**QA:** Use `agent-browser` to open the app. Click "Show Debug". Take a
+screenshot. Verify: debug panel is visible with deck selector and action
+buttons. Click "99 Energy". Take a screenshot. Verify energy display shows 99.
+Select "Core11" and click "Restart Battle". Take a screenshot. Verify the game
+resets with new cards.
 
 - [ ] **Step 5: Commit**
 
@@ -2440,19 +2562,22 @@ git add scripts/battle_prototype/src/
 git commit -m "feat: debug panel with restart, energy, draw, and other debug controls"
 ```
 
----
+______________________________________________________________________
 
 ## Task 10: Interactive QA — Milestone 4 Verification
 
-This task has no new code. It is a dedicated QA pass using `agent-browser` to verify that the full interaction loop works end-to-end.
+This task has no new code. It is a dedicated QA pass using `agent-browser` to
+verify that the full interaction loop works end-to-end.
 
 - [ ] **Step 1: Start the dev server and the battle prototype**
 
-Ensure the Rust dev server is running (`cd rules_engine && just dev-server`) and the Vite dev server is running (`cd scripts/battle_prototype && npm run dev`).
+Ensure the Rust dev server is running (`cd rules_engine && just dev-server`) and
+the Vite dev server is running (`cd scripts/battle_prototype && npm run dev`).
 
 - [ ] **Step 2: Full turn sequence QA**
 
 Use `agent-browser` to:
+
 1. Take a screenshot of the initial state. Note hand size, energy, battlefield.
 2. Click a playable card (green outline). Take a screenshot after.
 3. Verify: card moved from hand, energy decreased.
@@ -2464,7 +2589,8 @@ Use `agent-browser` to:
 
 - [ ] **Step 3: Fix any bugs found during QA**
 
-Fix all issues discovered. Re-run the QA steps to verify fixes. Take screenshots confirming each fix.
+Fix all issues discovered. Re-run the QA steps to verify fixes. Take screenshots
+confirming each fix.
 
 - [ ] **Step 4: Commit any fixes**
 
@@ -2473,18 +2599,22 @@ git add scripts/battle_prototype/src/
 git commit -m "fix: address bugs found during interaction QA"
 ```
 
----
+______________________________________________________________________
 
 ## Task 11: Card Browser & Card Order Selector
 
 **Files:**
+
 - Modify: `scripts/battle_prototype/src/components/BattleScreen.tsx`
 
-The card browser (for viewing void cards) and card order selector (for Foresee) use cards with `Position::Browser` and `Position::CardOrderSelector`. We need to render these as modal overlays.
+The card browser (for viewing void cards) and card order selector (for Foresee)
+use cards with `Position::Browser` and `Position::CardOrderSelector`. We need to
+render these as modal overlays.
 
 - [ ] **Step 1: Add browser and card order selector rendering to BattleScreen**
 
-Add these helper functions at the top of BattleScreen.tsx (or in a new component):
+Add these helper functions at the top of BattleScreen.tsx (or in a new
+component):
 
 ```tsx
 function browserCards(cards: CardView[]): CardView[] {
@@ -2585,22 +2715,32 @@ Expected: No errors.
 
 - [ ] **Step 3: QA — Verify card browser works**
 
-Use `agent-browser` to play through a game until cards are in the void. Then trigger the card browser (if the BattleView provides a browser action — this may come from a card effect or the overlay). If the browser doesn't trigger naturally during gameplay:
+Use `agent-browser` to play through a game until cards are in the void. Then
+trigger the card browser (if the BattleView provides a browser action — this may
+come from a card effect or the overlay). If the browser doesn't trigger
+naturally during gameplay:
 
 1. Use the debug panel to play several turns until the void has cards.
 2. Check if `battle.interface.browser` is non-null at any point. Log it.
-3. If browser is null throughout normal play, check whether any card's `actions.on_click` triggers a `BrowseCards` display action.
+3. If browser is null throughout normal play, check whether any card's
+   `actions.on_click` triggers a `BrowseCards` display action.
 
 If the card browser DOES appear:
-1. Take a screenshot. Verify: modal overlay with dark backdrop, cards displayed inside, Close button visible.
+
+1. Take a screenshot. Verify: modal overlay with dark backdrop, cards displayed
+   inside, Close button visible.
 2. Click a card if it has an `on_click` action. Verify selection works.
 3. Click Close. Verify the modal disappears and the game continues normally.
 
-For the card order selector (Foresee), this is harder to trigger naturally. If available:
+For the card order selector (Foresee), this is harder to trigger naturally. If
+available:
+
 1. Play a Foresee card. Take a screenshot showing the reorder UI.
 2. Click cards to select ordering. Verify the action is sent.
 
-If neither can be triggered in this task, note it — they will be exercised during the playtest rounds (Tasks 13-17) where specific prompt types are targeted.
+If neither can be triggered in this task, note it — they will be exercised
+during the playtest rounds (Tasks 13-17) where specific prompt types are
+targeted.
 
 - [ ] **Step 4: Commit**
 
@@ -2609,63 +2749,85 @@ git add scripts/battle_prototype/src/
 git commit -m "feat: card browser and card order selector modals"
 ```
 
----
+______________________________________________________________________
 
 ## Task 12: Polish Pass
 
 **Files:**
+
 - Modify: various components for styling improvements
 
 - [ ] **Step 1: Improve visual polish**
 
 Go through each component and ensure:
+
 - Dark background `#0a0612` is applied to body (already in CSS)
 - Card borders use tide colors when applicable (from `outline_color`)
 - Stack zone has gold border that collapses when empty (already done)
-- Disabled/polling state greys out cards and buttons (already handled via `opacity`)
+- Disabled/polling state greys out cards and buttons (already handled via
+  `opacity`)
 - Status bars are compact and readable
-- Hand cards are slightly larger than battlefield cards (already done via `compact` prop)
+- Hand cards are slightly larger than battlefield cards (already done via
+  `compact` prop)
 
-No specific code changes prescribed here — the subagent should review screenshots and fix any visual issues.
+No specific code changes prescribed here — the subagent should review
+screenshots and fix any visual issues.
 
 **QA — This is a thorough visual QA pass. Each item requires a screenshot.**
 
-**Screenshot 1: Dark theme.** Take a screenshot of the initial game state. Verify:
+**Screenshot 1: Dark theme.** Take a screenshot of the initial game state.
+Verify:
+
 1. Background is dark (#0a0612), not white or grey.
 2. Text is light-colored and readable against the dark background.
 3. Card borders are visible and distinct.
 4. Status bars have a slightly lighter surface color.
 
-**Screenshot 2: Disabled/polling state.** Play a card, then immediately take a screenshot DURING the polling phase (before Final response). Verify:
+**Screenshot 2: Disabled/polling state.** Play a card, then immediately take a
+screenshot DURING the polling phase (before Final response). Verify:
+
 1. Cards in hand appear dimmed/greyed out (opacity reduced).
 2. Action buttons appear disabled.
 3. The turn info bar shows "waiting..." or similar indicator.
 4. Clicking a card during this state does NOT send another action.
 
-**Screenshot 3: Empty stack.** At the start of a turn (before playing any cards), take a screenshot. Verify:
+**Screenshot 3: Empty stack.** At the start of a turn (before playing any
+cards), take a screenshot. Verify:
+
 1. The stack zone is either invisible or collapsed to a thin line.
 2. There is NOT a large empty gold-bordered box taking up space.
 
-**Screenshot 4: Active stack.** Play a card. Take a screenshot while it's on the stack (before resolution). Verify:
+**Screenshot 4: Active stack.** Play a card. Take a screenshot while it's on the
+stack (before resolution). Verify:
+
 1. The stack zone is visible with the gold border.
 2. The card on the stack shows its name and details.
 3. The "newest" indicator appears on the most recent card.
 
-**Screenshot 5: Full battlefield.** Use the debug panel (99 energy + draw cards) to play 8 characters onto your battlefield. Take a screenshot. Verify:
+**Screenshot 5: Full battlefield.** Use the debug panel (99 energy + draw cards)
+to play 8 characters onto your battlefield. Take a screenshot. Verify:
+
 1. All 8 character cards are visible and not overlapping.
 2. Each card shows its name and spark value.
 3. The layout doesn't break or scroll horizontally.
 
-**Screenshot 6: Battlefield overflow (abandon).** Play a 9th character. Take a screenshot. Verify:
+**Screenshot 6: Battlefield overflow (abandon).** Play a 9th character. Take a
+screenshot. Verify:
+
 1. The battlefield still shows 8 cards (one was abandoned).
 2. The spark bonus in the status bar may have increased.
 
-**Screenshot 7: Scoring.** Play enough turns for judgment phase to score points. Take a screenshot. Verify:
+**Screenshot 7: Scoring.** Play enough turns for judgment phase to score points.
+Take a screenshot. Verify:
+
 1. The score in the status bar has changed from 0.
 2. The score is visually prominent (gold-colored).
 
-**Screenshot 8: Game end.** If possible, play until one player wins (12 points). Take a screenshot. Verify:
-1. There is some indication the game has ended (no more action buttons, or a message).
+**Screenshot 8: Game end.** If possible, play until one player wins (12 points).
+Take a screenshot. Verify:
+
+1. There is some indication the game has ended (no more action buttons, or a
+   message).
 2. Final scores are displayed.
 
 Fix any visual issues found. Take additional screenshots to confirm fixes.
@@ -2677,7 +2839,7 @@ git add scripts/battle_prototype/src/
 git commit -m "fix: visual polish and styling improvements"
 ```
 
----
+______________________________________________________________________
 
 ## Task 13: Extended Playtesting — Round 1-2 (Basic Flow)
 
@@ -2685,7 +2847,8 @@ No new code. This is pure QA using `agent-browser`.
 
 - [ ] **Step 1: Play a full game with Benchmark1 vs Benchmark1**
 
-Start a new battle. Play every card you can each turn. Take a screenshot every turn. Play until one player reaches 12 points or 50 turns. Log every bug found.
+Start a new battle. Play every card you can each turn. Take a screenshot every
+turn. Play until one player reaches 12 points or 50 turns. Log every bug found.
 
 - [ ] **Step 2: Fix all bugs found in Round 1**
 
@@ -2706,13 +2869,15 @@ git add scripts/battle_prototype/src/
 git commit -m "fix: bugs found during playtest rounds 1-2 (basic flow)"
 ```
 
----
+______________________________________________________________________
 
 ## Task 14: Extended Playtesting — Round 3-4 (Prompts & Targeting)
 
 - [ ] **Step 1: Play a game focused on prompts and targeting**
 
-Use debug panel to set energy to 99. Deliberately play cards that require targets. Trigger choice prompts if available. Use Foresee if available. Take screenshots of every prompt interaction.
+Use debug panel to set energy to 99. Deliberately play cards that require
+targets. Trigger choice prompts if available. Use Foresee if available. Take
+screenshots of every prompt interaction.
 
 - [ ] **Step 2: Fix all bugs found in Round 3**
 
@@ -2727,16 +2892,20 @@ git add scripts/battle_prototype/src/
 git commit -m "fix: bugs found during playtest rounds 3-4 (prompts & targeting)"
 ```
 
----
+______________________________________________________________________
 
 ## Task 15: Extended Playtesting — Round 5-6 (Edge Cases)
 
 - [ ] **Step 1: Test edge cases**
 
 - Fill battlefield to 8 characters. Play a 9th. Verify abandon mechanic.
+
 - Empty your deck. Verify behavior.
+
 - Play with 0 energy. Verify only free cards are playable.
+
 - Put multiple cards on the stack simultaneously.
+
 - Take screenshots of each edge case.
 
 - [ ] **Step 2: Fix all bugs found in Round 5**
@@ -2752,13 +2921,14 @@ git add scripts/battle_prototype/src/
 git commit -m "fix: bugs found during playtest rounds 5-6 (edge cases)"
 ```
 
----
+______________________________________________________________________
 
 ## Task 16: Extended Playtesting — Round 7-8 (Full Game Arc)
 
 - [ ] **Step 1: Play a full game start-to-finish without debug tools**
 
-Use Vanilla deck. Play every turn carefully. Verify game ends correctly with accurate scores.
+Use Vanilla deck. Play every turn carefully. Verify game ends correctly with
+accurate scores.
 
 - [ ] **Step 2: Fix all bugs found in Round 7**
 
@@ -2775,13 +2945,14 @@ git add scripts/battle_prototype/src/
 git commit -m "fix: bugs found during playtest rounds 7-8 (full game arc)"
 ```
 
----
+______________________________________________________________________
 
 ## Task 17: Extended Playtesting — Round 9-10 (Stress Testing)
 
 - [ ] **Step 1: Stress test with aggressive debug panel usage**
 
-Set 99 energy, draw many cards, add enemy characters, restart mid-game, switch decks repeatedly. Take screenshots throughout.
+Set 99 energy, draw many cards, add enemy characters, restart mid-game, switch
+decks repeatedly. Take screenshots throughout.
 
 - [ ] **Step 2: Fix all bugs found in Round 9**
 
@@ -2791,7 +2962,8 @@ Same aggressive debug usage with a different deck.
 
 - [ ] **Step 4: Verify Round 10 is clean (ZERO bugs)**
 
-If any bugs are found, fix them and add additional rounds until two consecutive rounds are clean.
+If any bugs are found, fix them and add additional rounds until two consecutive
+rounds are clean.
 
 - [ ] **Step 5: Commit final fixes**
 
@@ -2800,7 +2972,7 @@ git add scripts/battle_prototype/src/
 git commit -m "fix: final bugs from stress testing rounds 9-10"
 ```
 
----
+______________________________________________________________________
 
 ## Task 18: Final Commit & Cleanup
 

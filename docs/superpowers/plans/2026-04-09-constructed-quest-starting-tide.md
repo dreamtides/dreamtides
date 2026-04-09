@@ -1,20 +1,34 @@
 # Constructed Quest Starting Tide Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use
+> superpowers:subagent-driven-development (recommended) or
+> superpowers:executing-plans to implement this plan task-by-task. Steps use
+> checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Redesign `scripts/constructed_quest_prototype` so a quest starts by choosing a named tide, builds a 30-card starting deck (10 Starter + 10 tide + 10 Neutral), converts dreamcallers to two-tide pairs, excludes Starter cards from all random offers, and mixes neutral cards into tide packs.
+**Goal:** Redesign `scripts/constructed_quest_prototype` so a quest starts by
+choosing a named tide, builds a 30-card starting deck (10 Starter + 10 tide + 10
+Neutral), converts dreamcallers to two-tide pairs, excludes Starter cards from
+all random offers, and mixes neutral cards into tide packs.
 
-**Architecture:** Modify the existing quest start flow, dreamcaller data, and card selection helpers in place. No new modules — adapt existing files. Change `QuestState.startingTides: Tide[]` to `QuestState.startingTide: NamedTide | null`. Update all downstream consumers (shops, packs, forge, atlas, battle, HUD, deck viewer) to derive tide seeding from the single starting tide + its circle neighbors.
+**Architecture:** Modify the existing quest start flow, dreamcaller data, and
+card selection helpers in place. No new modules — adapt existing files. Change
+`QuestState.startingTides: Tide[]` to
+`QuestState.startingTide: NamedTide | null`. Update all downstream consumers
+(shops, packs, forge, atlas, battle, HUD, deck viewer) to derive tide seeding
+from the single starting tide + its circle neighbors.
 
-**Tech Stack:** React 19, Vite 7, TypeScript 5, Vitest, ESLint, agent-browser manual QA
+**Tech Stack:** React 19, Vite 7, TypeScript 5, Vitest, ESLint, agent-browser
+manual QA
 
-**Design spec:** `docs/superpowers/specs/2026-04-09-constructed-quest-starting-tide-design.md`
+**Design spec:**
+`docs/superpowers/specs/2026-04-09-constructed-quest-starting-tide-design.md`
 
----
+______________________________________________________________________
 
 ## Execution Rules
 
-Run commands from `scripts/constructed_quest_prototype` unless a step explicitly says otherwise.
+Run commands from `scripts/constructed_quest_prototype` unless a step explicitly
+says otherwise.
 
 Primary verification commands:
 
@@ -35,53 +49,69 @@ Manual QA tool:
 
 Copy this block into implementation-worker prompts for UI-affecting tasks:
 
-> Use the `qa` skill for browser verification and use `agent-browser` to take screenshots. Before each click, state the expected deck size, screen, visible starting tide, essence, crystals, and selected-card effect. After each click, take a screenshot and compare actual visible values. Keep screenshots under `/tmp/constructed-quest-starting-tide-qa/`. Do not claim completion if deck size, crystal count, dreamcaller tide icons, shop item state, or pack contents differ from expected behavior.
+> Use the `qa` skill for browser verification and use `agent-browser` to take
+> screenshots. Before each click, state the expected deck size, screen, visible
+> starting tide, essence, crystals, and selected-card effect. After each click,
+> take a screenshot and compare actual visible values. Keep screenshots under
+> `/tmp/constructed-quest-starting-tide-qa/`. Do not claim completion if deck
+> size, crystal count, dreamcaller tide icons, shop item state, or pack contents
+> differ from expected behavior.
 
-Copy this block into implementation-worker prompts for logging / run-analysis tasks:
+Copy this block into implementation-worker prompts for logging / run-analysis
+tasks:
 
-> Use the `qs-analyze` skill after downloading a quest log. Analyze JSONL events; do not infer missing data. If the log cannot answer starting options, selected tide, starter/tide/neutral card groups, dreamcaller offer pairs, shop offer tides, or final deck size, add explicit logging and retest.
+> Use the `qs-analyze` skill after downloading a quest log. Analyze JSONL
+> events; do not infer missing data. If the log cannot answer starting options,
+> selected tide, starter/tide/neutral card groups, dreamcaller offer pairs, shop
+> offer tides, or final deck size, add explicit logging and retest.
 
 ## File Map
 
 **Modify:**
 
-| File | Responsibility |
-|------|----------------|
-| `src/types/cards.ts` | Add `Starter` to Rarity, add `NamedTide` type alias |
-| `src/types/quest.ts` | Change `startingTides: Tide[]` to `startingTide: NamedTide \| null`, convert Dreamcaller to two-tide |
-| `src/data/card-database.ts` | Add Starter to `RARITY_COLORS` |
-| `src/data/dreamcallers.ts` | Convert all 10 dreamcallers to two-tide neighbor pairs |
-| `src/state/quest-context.tsx` | Replace `setStartingTides` with `setStartingTide`, update `setDreamcaller` logging |
-| `src/state/quest-config.ts` | Remove `startingTides` and `sequentialTides` config params |
-| `src/screens/QuestStartScreen.tsx` | Show 3 tide choices, build 30-card deck on selection |
-| `src/screens/DreamcallerDraftScreen.tsx` | Two-tide offer logic with left-fork/right-fork/adaptive |
-| `src/screens/ShopScreen.tsx` | Pass `startingTide` + neighbors instead of `startingTides` |
-| `src/screens/PackShopScreen.tsx` | Pass `startingTide` + neighbors instead of `startingTides` |
-| `src/screens/BattleScreen.tsx` | Update atlas generation context, update enemy generation for two-tide |
-| `src/screens/ForgeScreen.tsx` | Derive eligible tides from `startingTide` + neighbors |
-| `src/shop/shop-generator.ts` | Accept `startingTide` + neighbors, exclude Starter rarity |
-| `src/shop/pack-shop-generator.ts` | Accept `startingTide` + neighbors, exclude Starter rarity |
-| `src/pack/pack-generator.ts` | Exclude Starter rarity, add 0-1 neutral cards to tide packs |
-| `src/atlas/atlas-generator.ts` | Change `SiteGenerationContext.startingTides` to derive from single tide |
-| `src/forge/forge-logic.ts` | Derive eligible tides from `startingTide` + neighbors, exclude Starter |
-| `src/data/tide-weights.ts` | Exclude Starter in `selectRareRewards` |
-| `src/components/DeckViewer.tsx` | Add Quest Origin display, update dreamcaller to show two tides |
-| `src/components/HUD.tsx` | Update dreamcaller display for two-tide |
-| `src/data/synthetic-data.test.ts` | Update dreamcaller tests for two-tide shape |
-| `src/data/card-database.test.ts` | Update RARITY_COLORS test for Starter |
-| `src/state/quest-state-machine.test.ts` | Update `createTestState` for new field shape |
-| `src/atlas/atlas-generator.test.ts` | Update context mock for new field shape |
+| File                                     | Responsibility                                                                                       |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `src/types/cards.ts`                     | Add `Starter` to Rarity, add `NamedTide` type alias                                                  |
+| `src/types/quest.ts`                     | Change `startingTides: Tide[]` to `startingTide: NamedTide \| null`, convert Dreamcaller to two-tide |
+| `src/data/card-database.ts`              | Add Starter to `RARITY_COLORS`                                                                       |
+| `src/data/dreamcallers.ts`               | Convert all 10 dreamcallers to two-tide neighbor pairs                                               |
+| `src/state/quest-context.tsx`            | Replace `setStartingTides` with `setStartingTide`, update `setDreamcaller` logging                   |
+| `src/state/quest-config.ts`              | Remove `startingTides` and `sequentialTides` config params                                           |
+| `src/screens/QuestStartScreen.tsx`       | Show 3 tide choices, build 30-card deck on selection                                                 |
+| `src/screens/DreamcallerDraftScreen.tsx` | Two-tide offer logic with left-fork/right-fork/adaptive                                              |
+| `src/screens/ShopScreen.tsx`             | Pass `startingTide` + neighbors instead of `startingTides`                                           |
+| `src/screens/PackShopScreen.tsx`         | Pass `startingTide` + neighbors instead of `startingTides`                                           |
+| `src/screens/BattleScreen.tsx`           | Update atlas generation context, update enemy generation for two-tide                                |
+| `src/screens/ForgeScreen.tsx`            | Derive eligible tides from `startingTide` + neighbors                                                |
+| `src/shop/shop-generator.ts`             | Accept `startingTide` + neighbors, exclude Starter rarity                                            |
+| `src/shop/pack-shop-generator.ts`        | Accept `startingTide` + neighbors, exclude Starter rarity                                            |
+| `src/pack/pack-generator.ts`             | Exclude Starter rarity, add 0-1 neutral cards to tide packs                                          |
+| `src/atlas/atlas-generator.ts`           | Change `SiteGenerationContext.startingTides` to derive from single tide                              |
+| `src/forge/forge-logic.ts`               | Derive eligible tides from `startingTide` + neighbors, exclude Starter                               |
+| `src/data/tide-weights.ts`               | Exclude Starter in `selectRareRewards`                                                               |
+| `src/components/DeckViewer.tsx`          | Add Quest Origin display, update dreamcaller to show two tides                                       |
+| `src/components/HUD.tsx`                 | Update dreamcaller display for two-tide                                                              |
+| `src/data/synthetic-data.test.ts`        | Update dreamcaller tests for two-tide shape                                                          |
+| `src/data/card-database.test.ts`         | Update RARITY_COLORS test for Starter                                                                |
+| `src/state/quest-state-machine.test.ts`  | Update `createTestState` for new field shape                                                         |
+| `src/atlas/atlas-generator.test.ts`      | Update context mock for new field shape                                                              |
 
----
+______________________________________________________________________
 
 ## Task 1: Type Changes And Rarity
 
 **Files:**
+
 - Modify: `src/types/cards.ts`
+
 - Modify: `src/types/quest.ts`
+
 - Modify: `src/data/card-database.ts`
+
 - Modify: `src/data/synthetic-data.test.ts`
+
 - Modify: `src/data/card-database.test.ts`
+
 - Modify: `src/state/quest-state-machine.test.ts`
 
 - [ ] **Step 1: Add Starter to Rarity and add NamedTide**
@@ -98,7 +128,8 @@ export type Rarity = "Common" | "Uncommon" | "Rare" | "Legendary" | "Starter";
 
 - [ ] **Step 2: Add Starter to RARITY_COLORS**
 
-In `src/data/card-database.ts`, replace the `RARITY_COLORS` constant (lines 60-65):
+In `src/data/card-database.ts`, replace the `RARITY_COLORS` constant (lines
+60-65):
 
 ```ts
 /** Display color hex value for each rarity. */
@@ -140,7 +171,8 @@ Replace `startingTides: Tide[];` in `QuestState` (line 140):
 
 - [ ] **Step 4: Update synthetic-data.test.ts**
 
-In `src/data/synthetic-data.test.ts`, update the ALL_RARITIES constant (line 22):
+In `src/data/synthetic-data.test.ts`, update the ALL_RARITIES constant (line
+22):
 
 ```ts
 const ALL_RARITIES: Rarity[] = ["Common", "Uncommon", "Rare", "Legendary", "Starter"];
@@ -206,7 +238,8 @@ import type { Tide, Rarity, NamedTide } from "../types/cards";
 
 - [ ] **Step 5: Update card-database.test.ts**
 
-In `src/data/card-database.test.ts`, find the RARITY_COLORS test and add Starter:
+In `src/data/card-database.test.ts`, find the RARITY_COLORS test and add
+Starter:
 
 ```ts
 Starter: "#d4a017",
@@ -216,7 +249,8 @@ Also find the `validRarities` set used in integration tests and add `"Starter"`.
 
 - [ ] **Step 6: Update quest-state-machine.test.ts**
 
-In `src/state/quest-state-machine.test.ts`, replace `startingTides: []` with `startingTide: null` in the `createTestState` helper (line 30).
+In `src/state/quest-state-machine.test.ts`, replace `startingTides: []` with
+`startingTide: null` in the `createTestState` helper (line 30).
 
 - [ ] **Step 7: Run typecheck to see remaining errors**
 
@@ -226,7 +260,9 @@ Run:
 npm run typecheck 2>&1 | head -80
 ```
 
-Expected: Type errors in files not yet updated (quest-context, screens, generators). The files modified in this task should be internally consistent. Collect the error list for subsequent tasks.
+Expected: Type errors in files not yet updated (quest-context, screens,
+generators). The files modified in this task should be internally consistent.
+Collect the error list for subsequent tasks.
 
 - [ ] **Step 8: Commit**
 
@@ -235,11 +271,12 @@ git add scripts/constructed_quest_prototype/src/types/cards.ts scripts/construct
 git commit -m "feat(quest): add Starter rarity, NamedTide type, two-tide Dreamcaller"
 ```
 
----
+______________________________________________________________________
 
 ## Task 2: Dreamcaller Data
 
 **Files:**
+
 - Modify: `src/data/dreamcallers.ts`
 
 - [ ] **Step 1: Convert all 10 dreamcallers to two-tide neighbor pairs**
@@ -334,7 +371,9 @@ export const DREAMCALLERS: readonly Dreamcaller[] = [
 ] as const;
 ```
 
-This covers all 7 neighbor pairs: Bloom/Arc, Arc/Ignite, Ignite/Pact, Pact/Umbra, Umbra/Rime, Rime/Surge, Surge/Bloom. Three pairs get a second caller (Bloom/Surge via Eryndra, Arc/Ignite via Vaelith, Pact/Rime via Orivane).
+This covers all 7 neighbor pairs: Bloom/Arc, Arc/Ignite, Ignite/Pact,
+Pact/Umbra, Umbra/Rime, Rime/Surge, Surge/Bloom. Three pairs get a second caller
+(Bloom/Surge via Eryndra, Arc/Ignite via Vaelith, Pact/Rime via Orivane).
 
 - [ ] **Step 2: Run the synthetic data test**
 
@@ -353,12 +392,14 @@ git add scripts/constructed_quest_prototype/src/data/dreamcallers.ts
 git commit -m "feat(quest): convert dreamcallers to two-tide neighbor pairs"
 ```
 
----
+______________________________________________________________________
 
 ## Task 3: Quest State Context
 
 **Files:**
+
 - Modify: `src/state/quest-context.tsx`
+
 - Modify: `src/state/quest-config.ts`
 
 - [ ] **Step 1: Update quest-config.ts**
@@ -371,6 +412,7 @@ In `src/state/quest-config.ts`, remove these fields from `QuestConfig`:
 Remove these lines from `getQuestConfig()`:
 
 - `startingTides: parseIntParam(params, "startingTides", 3, 1, 8),` (line 120)
+
 - `sequentialTides: parseBoolParam(params, "sequentialTides", true),` (line 121)
 
 - [ ] **Step 2: Update quest-context.tsx imports and types**
@@ -423,7 +465,8 @@ Replace the `setDreamcaller` callback (lines 303-310):
 
 - [ ] **Step 6: Update mutations object**
 
-In the `mutations` useMemo (line 501+), replace `setStartingTides` with `setStartingTide` in both the object literal and the dependency array.
+In the `mutations` useMemo (line 501+), replace `setStartingTides` with
+`setStartingTide` in both the object literal and the dependency array.
 
 - [ ] **Step 7: Commit**
 
@@ -432,11 +475,12 @@ git add scripts/constructed_quest_prototype/src/state/quest-context.tsx scripts/
 git commit -m "feat(quest): replace startingTides array with single startingTide"
 ```
 
----
+______________________________________________________________________
 
 ## Task 4: Quest Start Screen
 
 **Files:**
+
 - Modify: `src/screens/QuestStartScreen.tsx`
 
 - [ ] **Step 1: Rewrite QuestStartScreen**
@@ -687,18 +731,22 @@ git add scripts/constructed_quest_prototype/src/screens/QuestStartScreen.tsx
 git commit -m "feat(quest): starting tide selection screen with 30-card deck"
 ```
 
----
+______________________________________________________________________
 
 ## Task 5: Atlas Generator And Pack Generator
 
 **Files:**
+
 - Modify: `src/atlas/atlas-generator.ts`
+
 - Modify: `src/atlas/atlas-generator.test.ts`
+
 - Modify: `src/pack/pack-generator.ts`
 
 - [ ] **Step 1: Update SiteGenerationContext in atlas-generator.ts**
 
-In `src/atlas/atlas-generator.ts`, replace the `SiteGenerationContext` interface (lines 16-23):
+In `src/atlas/atlas-generator.ts`, replace the `SiteGenerationContext` interface
+(lines 16-23):
 
 ```ts
 /** Parameters for site generation that require external data. */
@@ -772,7 +820,10 @@ const packTide = startTideAndNeighbors.length > 0
 
 - [ ] **Step 4: Update atlas-generator.test.ts**
 
-In `src/atlas/atlas-generator.test.ts`, remove the `startingTides: 3` and `sequentialTides: true` lines from `TEST_CONFIG` (lines 18-19). Replace `startingTides: ["Bloom", "Arc", "Surge"]` in the `defaultContext` function (line 88) with `startingTide: "Bloom"`.
+In `src/atlas/atlas-generator.test.ts`, remove the `startingTides: 3` and
+`sequentialTides: true` lines from `TEST_CONFIG` (lines 18-19). Replace
+`startingTides: ["Bloom", "Arc", "Surge"]` in the `defaultContext` function
+(line 88) with `startingTide: "Bloom"`.
 
 - [ ] **Step 5: Add Starter exclusion and neutral mixing to pack-generator.ts**
 
@@ -834,17 +885,21 @@ git add scripts/constructed_quest_prototype/src/atlas/atlas-generator.ts scripts
 git commit -m "feat(quest): update atlas context for single tide, add neutral mixing to packs"
 ```
 
----
+______________________________________________________________________
 
 ## Task 6: Shop Generators
 
 **Files:**
+
 - Modify: `src/shop/shop-generator.ts`
+
 - Modify: `src/shop/pack-shop-generator.ts`
 
 - [ ] **Step 1: Update shop-generator.ts**
 
-In `src/shop/shop-generator.ts`, change the `generateCardShopInventory` signature. Replace the `startingTides: Tide[]` parameter (line 39) with `seedTides: Tide[]` and add Starter exclusion.
+In `src/shop/shop-generator.ts`, change the `generateCardShopInventory`
+signature. Replace the `startingTides: Tide[]` parameter (line 39) with
+`seedTides: Tide[]` and add Starter exclusion.
 
 Replace lines 36-84:
 
@@ -908,7 +963,8 @@ export function generateCardShopInventory(
 
 - [ ] **Step 2: Update pack-shop-generator.ts**
 
-In `src/shop/pack-shop-generator.ts`, update `pickWeightedTide` parameter name (line 14-16):
+In `src/shop/pack-shop-generator.ts`, update `pickWeightedTide` parameter name
+(line 14-16):
 
 ```ts
 function pickWeightedTide(
@@ -918,7 +974,8 @@ function pickWeightedTide(
   for (const tide of seedTides) {
 ```
 
-Update `generateTidePackCards` to exclude Starter and add neutral mixing (lines 41-50):
+Update `generateTidePackCards` to exclude Starter and add neutral mixing (lines
+41-50):
 
 ```ts
 /** Generates cards for a tide pack: 3-4 cards from the chosen tide + 0-1 neutral. */
@@ -983,7 +1040,9 @@ const candidates = Array.from(cardDatabase.values()).filter(
 );
 ```
 
-Update `generatePackShopInventory` parameter name from `startingTides: Tide[]` to `seedTides: Tide[]` (line 110). Update the two calls to `pickWeightedTide` to pass `seedTides` instead of `startingTides`.
+Update `generatePackShopInventory` parameter name from `startingTides: Tide[]`
+to `seedTides: Tide[]` (line 110). Update the two calls to `pickWeightedTide` to
+pass `seedTides` instead of `startingTides`.
 
 - [ ] **Step 3: Commit**
 
@@ -992,16 +1051,22 @@ git add scripts/constructed_quest_prototype/src/shop/shop-generator.ts scripts/c
 git commit -m "feat(quest): exclude Starter from shops, add neutral mixing to tide packs"
 ```
 
----
+______________________________________________________________________
 
 ## Task 7: Screens — Shop, PackShop, Battle, Forge
 
 **Files:**
+
 - Modify: `src/screens/ShopScreen.tsx`
+
 - Modify: `src/screens/PackShopScreen.tsx`
+
 - Modify: `src/screens/BattleScreen.tsx`
+
 - Modify: `src/screens/ForgeScreen.tsx`
+
 - Modify: `src/forge/forge-logic.ts`
+
 - Modify: `src/data/tide-weights.ts`
 
 - [ ] **Step 1: Create a helper to derive seed tides**
@@ -1026,7 +1091,8 @@ const rareCards = Array.from(cardDatabase.values()).filter(
 );
 ```
 
-This already excludes non-Rare, but verify no Starter cards have rarity "Rare" (they don't — Starters are rarity "Starter").
+This already excludes non-Rare, but verify no Starter cards have rarity "Rare"
+(they don't — Starters are rarity "Starter").
 
 - [ ] **Step 2: Update ShopScreen.tsx**
 
@@ -1036,9 +1102,11 @@ In `src/screens/ShopScreen.tsx`, add import:
 import { startingTideSeedTides } from "../data/tide-weights";
 ```
 
-Replace `state.startingTides` with `startingTideSeedTides(state.startingTide)` in two places:
+Replace `state.startingTides` with `startingTideSeedTides(state.startingTide)`
+in two places:
 
 Line 29 (initial state):
+
 ```ts
 const [slots, setSlots] = useState<ShopSlot[]>(() =>
   generateCardShopInventory(cardDatabase, state.pool, startingTideSeedTides(state.startingTide), config),
@@ -1046,11 +1114,13 @@ const [slots, setSlots] = useState<ShopSlot[]>(() =>
 ```
 
 Line 78 (reroll):
+
 ```ts
 setSlots(generateCardShopInventory(cardDatabase, state.pool, startingTideSeedTides(state.startingTide), config));
 ```
 
-Also update the dependency array around line 80 to use `state.startingTide` instead of `state.startingTides`.
+Also update the dependency array around line 80 to use `state.startingTide`
+instead of `state.startingTides`.
 
 - [ ] **Step 3: Update PackShopScreen.tsx**
 
@@ -1076,7 +1146,9 @@ In `src/screens/BattleScreen.tsx`, add import:
 import { startingTideSeedTides } from "../data/tide-weights";
 ```
 
-**Update enemy generation** (line 37-58). The `generateEnemy` function uses `DREAMCALLERS` and reads `template.tide`. Since dreamcallers now have `tides: [NamedTide, NamedTide]`, update to use the first tide:
+**Update enemy generation** (line 37-58). The `generateEnemy` function uses
+`DREAMCALLERS` and reads `template.tide`. Since dreamcallers now have
+`tides: [NamedTide, NamedTide]`, update to use the first tide:
 
 ```ts
 function generateEnemy(): EnemyData {
@@ -1109,7 +1181,8 @@ With:
 startingTide: state.startingTide,
 ```
 
-Update the dependency array (around line 997) to use `state.startingTide` instead of `state.startingTides`.
+Update the dependency array (around line 997) to use `state.startingTide`
+instead of `state.startingTides`.
 
 - [ ] **Step 5: Update forge-logic.ts**
 
@@ -1153,7 +1226,8 @@ export function getForgeEligibleCards(
 }
 ```
 
-Also add Starter exclusion to `generateForgeRecipes` output candidates (line 43):
+Also add Starter exclusion to `generateForgeRecipes` output candidates (line
+43):
 
 ```ts
 const outputCandidates = Array.from(cardDatabase.values()).filter(
@@ -1163,7 +1237,8 @@ const outputCandidates = Array.from(cardDatabase.values()).filter(
 
 - [ ] **Step 6: Update ForgeScreen.tsx**
 
-In `src/screens/ForgeScreen.tsx`, replace `startingTides` destructuring (line 25):
+In `src/screens/ForgeScreen.tsx`, replace `startingTides` destructuring (line
+25):
 
 ```ts
 const { pool, deck, startingTide } = state;
@@ -1179,7 +1254,8 @@ const eligible = getForgeEligibleCards(
 );
 ```
 
-Update the dependency array (line 110) to use `startingTide` instead of `startingTides`.
+Update the dependency array (line 110) to use `startingTide` instead of
+`startingTides`.
 
 - [ ] **Step 7: Commit**
 
@@ -1188,11 +1264,12 @@ git add scripts/constructed_quest_prototype/src/screens/ShopScreen.tsx scripts/c
 git commit -m "feat(quest): update all screens for single startingTide"
 ```
 
----
+______________________________________________________________________
 
 ## Task 8: Dreamcaller Draft Screen
 
 **Files:**
+
 - Modify: `src/screens/DreamcallerDraftScreen.tsx`
 
 - [ ] **Step 1: Rewrite the dreamcaller offer logic and UI**
@@ -1572,16 +1649,18 @@ git add scripts/constructed_quest_prototype/src/screens/DreamcallerDraftScreen.t
 git commit -m "feat(quest): two-tide dreamcaller draft with archetype forks"
 ```
 
----
+______________________________________________________________________
 
 ## Task 9: DraftSite Starter Exclusion
 
 **Files:**
+
 - Modify: `src/screens/DraftSiteScreen.tsx`
 
 - [ ] **Step 1: Add Starter exclusion to DraftSiteScreen**
 
-In `src/screens/DraftSiteScreen.tsx`, update the draft card selection (around line 22). Change:
+In `src/screens/DraftSiteScreen.tsx`, update the draft card selection (around
+line 22). Change:
 
 ```ts
 const allCards = Array.from(cardDatabase.values());
@@ -1602,17 +1681,20 @@ git add scripts/constructed_quest_prototype/src/screens/DraftSiteScreen.tsx
 git commit -m "feat(quest): exclude Starter cards from draft site offers"
 ```
 
----
+______________________________________________________________________
 
 ## Task 10: DeckViewer Quest Origin And Two-Tide Dreamcaller
 
 **Files:**
+
 - Modify: `src/components/DeckViewer.tsx`
+
 - Modify: `src/components/HUD.tsx`
 
 - [ ] **Step 1: Add Quest Origin to DeckViewer**
 
-In `src/components/DeckViewer.tsx`, find the Dreamcaller sidebar section (around line 610). Add a Quest Origin section just above it:
+In `src/components/DeckViewer.tsx`, find the Dreamcaller sidebar section (around
+line 610). Add a Quest Origin section just above it:
 
 ```tsx
 {/* Quest Origin section */}
@@ -1652,7 +1734,8 @@ In `src/components/DeckViewer.tsx`, find the Dreamcaller sidebar section (around
 
 - [ ] **Step 2: Update dreamcaller display for two tides**
 
-In the same file, find the dreamcaller display (around line 618-656). Replace the single tide icon and name with two:
+In the same file, find the dreamcaller display (around line 618-656). Replace
+the single tide icon and name with two:
 
 ```tsx
 {state.dreamcaller !== null ? (
@@ -1705,7 +1788,8 @@ In the same file, find the dreamcaller display (around line 618-656). Replace th
 
 - [ ] **Step 3: Update HUD.tsx for two-tide dreamcaller**
 
-In `src/components/HUD.tsx`, replace the dreamcaller color derivation (lines 65-68):
+In `src/components/HUD.tsx`, replace the dreamcaller color derivation (lines
+65-68):
 
 ```ts
 const dreamcallerName = state.dreamcaller?.name ?? null;
@@ -1720,7 +1804,7 @@ git add scripts/constructed_quest_prototype/src/components/DeckViewer.tsx script
 git commit -m "feat(quest): add Quest Origin display, update dreamcaller for two tides"
 ```
 
----
+______________________________________________________________________
 
 ## Task 11: Build Verification
 
@@ -1761,9 +1845,14 @@ Expected: Build succeeds.
 - [ ] **Step 5: Fix any errors found in steps 1-4**
 
 If there are errors, fix them. Common issues:
-- References to `dreamcaller.tide` (should be `dreamcaller.tides[0]` or `dreamcaller.tides`)
+
+- References to `dreamcaller.tide` (should be `dreamcaller.tides[0]` or
+  `dreamcaller.tides`)
+
 - References to `state.startingTides` (should be `state.startingTide`)
+
 - Missing `NamedTide` imports
+
 - Test assertions using old field shapes
 
 - [ ] **Step 6: Commit any fixes**
@@ -1773,13 +1862,14 @@ git add -u scripts/constructed_quest_prototype/
 git commit -m "fix(quest): resolve build errors from starting tide migration"
 ```
 
----
+______________________________________________________________________
 
 ## Task 12: Manual QA
 
 **Files:** None (QA only)
 
-Use the `qa` skill for browser verification. Use `agent-browser` to take screenshots. Keep screenshots under `/tmp/constructed-quest-starting-tide-qa/`.
+Use the `qa` skill for browser verification. Use `agent-browser` to take
+screenshots. Keep screenshots under `/tmp/constructed-quest-starting-tide-qa/`.
 
 - [ ] **Step 1: Start dev server**
 
@@ -1790,6 +1880,7 @@ npm run dev
 - [ ] **Step 2: QA scenario — Starting tide selection**
 
 Open the app and verify:
+
 - 3 named tide options displayed (no Neutral)
 - Each shows tide icon, name, neighbors, and deck composition description
 - Clicking a tide starts the quest
@@ -1799,10 +1890,12 @@ Take screenshot of the tide selection screen.
 - [ ] **Step 3: QA scenario — Starting deck verification**
 
 After selecting a tide:
+
 - Open deck viewer
 - Verify deck size is exactly 30
 - Verify Quest Origin section shows the selected tide
-- Verify deck contains ~10 Starter cards (Neutral), ~10 starting tide cards, ~10 Neutral non-starter cards
+- Verify deck contains ~10 Starter cards (Neutral), ~10 starting tide cards, ~10
+  Neutral non-starter cards
 - Verify starting tide crystal appears in crystal display
 
 Take screenshot of deck viewer.
@@ -1810,6 +1903,7 @@ Take screenshot of deck viewer.
 - [ ] **Step 4: QA scenario — Dreamcaller draft**
 
 Visit the dreamcaller draft site:
+
 - Verify 3 dreamcaller options displayed
 - Verify each shows TWO tide icons
 - Verify the left-fork and right-fork match the starting tide's neighbors
@@ -1820,6 +1914,7 @@ Take screenshot of dreamcaller draft.
 - [ ] **Step 5: QA scenario — Loot pack**
 
 Visit a loot pack site:
+
 - Verify no Starter cards in the pack
 - Check if a neutral card occasionally appears (may need multiple visits)
 
@@ -1828,6 +1923,7 @@ Take screenshot.
 - [ ] **Step 6: QA scenario — Card shop**
 
 Visit a card shop:
+
 - Verify no Starter cards offered
 - Verify cards are weighted toward starting tide
 
@@ -1836,6 +1932,7 @@ Take screenshot.
 - [ ] **Step 7: QA scenario — Pack shop**
 
 Visit a pack shop:
+
 - Verify no Starter cards in any packs
 
 Take screenshot.
@@ -1843,6 +1940,7 @@ Take screenshot.
 - [ ] **Step 8: QA scenario — Battle and reload**
 
 Win a battle, then reload the page:
+
 - Verify no state leaks (returns to quest start screen)
 - Verify 3 fresh tide options appear
 

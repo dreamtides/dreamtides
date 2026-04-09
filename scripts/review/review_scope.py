@@ -347,7 +347,9 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
     if not isinstance(csharp_section, dict):
         raise ScopePlannerError("scope config 'csharp' must be an object")
     if not isinstance(cqs_section, dict):
-        raise ScopePlannerError("scope config 'constructed_quest_prototype' must be an object")
+        raise ScopePlannerError(
+            "scope config 'constructed_quest_prototype' must be an object"
+        )
 
     def read_rules(value: Any, field_name: str) -> tuple[str, ...]:
         if not isinstance(value, list) or not all(
@@ -394,10 +396,12 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
             csharp_section.get("path_prefixes", []), "csharp.path_prefixes"
         ),
         cqs_crate_seeds=read_names(
-            cqs_section.get("crate_seeds", []), "constructed_quest_prototype.crate_seeds"
+            cqs_section.get("crate_seeds", []),
+            "constructed_quest_prototype.crate_seeds",
         ),
         cqs_path_prefixes=read_rules(
-            cqs_section.get("path_prefixes", []), "constructed_quest_prototype.path_prefixes"
+            cqs_section.get("path_prefixes", []),
+            "constructed_quest_prototype.path_prefixes",
         ),
         core_path_prefixes=read_rules(
             payload.get("core_path_prefixes", []), "core_path_prefixes"

@@ -1,9 +1,9 @@
 # Constructed Quest Starting Tide Redesign - Design Spec
 
-Redesign `scripts/constructed_quest_prototype` so each quest run begins with
-an explicit tide choice. The player picks one of 3 random named tides, receives
-a 30-card starting deck anchored to that tide, and then sees dreamcallers,
-packs, shops, and rewards that bias toward the chosen tide and its neighbors.
+Redesign `scripts/constructed_quest_prototype` so each quest run begins with an
+explicit tide choice. The player picks one of 3 random named tides, receives a
+30-card starting deck anchored to that tide, and then sees dreamcallers, packs,
+shops, and rewards that bias toward the chosen tide and its neighbors.
 
 This spec applies to `scripts/constructed_quest_prototype/`. It adapts the
 design intent from the `quest_prototype` starting tide spec
@@ -36,8 +36,8 @@ consumed-card tracking, simpler weighting infrastructure.
 
 `QuestStartScreen` becomes a starting tide selection screen.
 
-On first render, generate 3 distinct options from the 7 named tides:
-Bloom, Arc, Ignite, Pact, Umbra, Rime, Surge. Neutral is never offered.
+On first render, generate 3 distinct options from the 7 named tides: Bloom, Arc,
+Ignite, Pact, Umbra, Rime, Surge. Neutral is never offered.
 
 Selecting a tide starts the quest:
 
@@ -59,16 +59,15 @@ The starting deck contains exactly 30 cards:
 3. 10 random Neutral cards, excluding `Starter`, `Special`, and `Legendary`
    rarity.
 
-No cards are consumed from any pool. All sampling is infinite (with
-replacement across quests, without replacement within a single starting deck
-generation).
+No cards are consumed from any pool. All sampling is infinite (with replacement
+across quests, without replacement within a single starting deck generation).
 
 ## Rarity Type Change
 
-Add `Starter` to the `Rarity` type in `types/cards.ts`. Add a display color
-for Starter in `RARITY_COLORS`. The existing `setup-assets.mjs` already
-includes Starter cards in `card-data.json` (it only filters `Special`), so no
-asset pipeline changes are needed.
+Add `Starter` to the `Rarity` type in `types/cards.ts`. Add a display color for
+Starter in `RARITY_COLORS`. The existing `setup-assets.mjs` already includes
+Starter cards in `card-data.json` (it only filters `Special`), so no asset
+pipeline changes are needed.
 
 ## Starter Card Exclusion
 
@@ -172,11 +171,13 @@ tide:
 ## QuestState Changes
 
 Replace:
+
 ```ts
 startingTides: Tide[];
 ```
 
 With:
+
 ```ts
 startingTide: NamedTide | null;
 ```
@@ -211,8 +212,8 @@ Use `agent-browser` for extensive manual QA. Required scenarios:
    starter/tide/neutral groups.
 4. Visit dreamcaller draft — verify two-tide icons, left-fork/right-fork
    behavior for the chosen starting tide.
-5. Visit loot pack — verify no Starter cards, tide packs occasionally include
-   a neutral card.
+5. Visit loot pack — verify no Starter cards, tide packs occasionally include a
+   neutral card.
 6. Visit card shop — verify no Starter cards offered.
 7. Visit pack shop — verify no Starter cards in packs.
 8. Win a battle — verify rare rewards exclude Starter.

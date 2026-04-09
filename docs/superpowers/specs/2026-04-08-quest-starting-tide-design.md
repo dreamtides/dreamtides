@@ -31,8 +31,8 @@ This spec applies to the React quest prototype in `scripts/quest_prototype/`.
 
 `QuestStartScreen` becomes a starting tide selection screen.
 
-On first render, generate 3 distinct options from the 7 named tides:
-Bloom, Arc, Ignite, Pact, Umbra, Rime, Surge. Neutral is never offered.
+On first render, generate 3 distinct options from the 7 named tides: Bloom, Arc,
+Ignite, Pact, Umbra, Rime, Surge. Neutral is never offered.
 
 Selecting a tide starts the quest:
 
@@ -158,8 +158,8 @@ Intended behavior:
 - Neutral provides a baseline/glue option, not a dominant profile because the
   starter package is Neutral.
 
-Log profile summaries at major generation points. Every profile log includes
-the ordered total tide weights and the separate start/deck/dreamcaller/crystal
+Log profile summaries at major generation points. Every profile log includes the
+ordered total tide weights and the separate start/deck/dreamcaller/crystal
 contribution maps.
 
 ## Draft Sites
@@ -184,8 +184,8 @@ Regular shops and specialty shops sample card items from the shared profile
 instead of raw deck-count weighting. They never offer `Starter` or `Special`
 cards.
 
-Shop tide crystals prefer profile tides, but can occasionally offer a named
-tide with low or zero existing crystal count.
+Shop tide crystals prefer profile tides, but can occasionally offer a named tide
+with low or zero existing crystal count.
 
 Dreamsign offers, dreamsign drafts, dreamsign shop slots, and dreamsign reward
 sites sample dreamsigns using the profile.
@@ -203,8 +203,8 @@ Add structured events for the new flow:
 
 - `starting_tide_options_generated`: the 3 offered named tides
 - `starting_tide_selected`: selected tide, granted crystal
-- `starting_deck_initialized`: starter card numbers, starting-tide card
-  numbers, neutral card numbers, total deck size
+- `starting_deck_initialized`: starter card numbers, starting-tide card numbers,
+  neutral card numbers, total deck size
 - `quest_tide_profile_computed`: generation context, ordered tide weights
 - `dreamcaller_offers_generated`: offered names and tide pairs
 - `shop_inventory_generated`: slot item types and card/dreamsign/crystal tides
@@ -235,8 +235,8 @@ Add or update TypeScript tests for:
 Run the quest prototype tests, typecheck, lint, and build before browser QA.
 
 For this work, use web/prototype review gates only. The repo-level `just review`
-gate currently includes broken Unity work and should not block implementation
-of this prototype redesign.
+gate currently includes broken Unity work and should not block implementation of
+this prototype redesign.
 
 ## Manual QA
 
@@ -244,25 +244,25 @@ Use `agent-browser` for adversarial manual QA after implementation.
 
 Required scenarios:
 
-1. Start 3 fresh quests and screenshot the 3 starting tide options each time.
-2. Select at least 2 different starting tides across QA runs.
-3. Immediately open deck viewer. Verify deck size is 30, origin is visible,
-   crystal is visible, and the deck contains the expected starter/tide/neutral
-   groups.
-4. Enter Draft, record visible pack tides for all 5 picks, choose cards, and
-   verify deck size increases by exactly 5.
-5. Enter Dreamcaller Draft. Verify both-tide icon display and starting-tide
-   fork behavior where content exists.
-6. Enter Shop or Specialty Shop. Verify item purchases mutate essence/deck by
-   the displayed amounts and no Starter card is offered.
-7. Enter a Reward site. Verify card/dreamsign reward is generated at entry and
-   reflects current profile.
-8. Win a battle and choose a rare reward. Verify rare reward is not Starter or
-   Special and is logged.
-9. Download the quest log and run a log-analysis script that reconstructs:
-   starting options, selected tide, starting deck groups, draft pool size,
-   dreamcaller offer tides, shop offer tides, reward offer tides, final deck
-   size, and card additions/removals in order.
+01. Start 3 fresh quests and screenshot the 3 starting tide options each time.
+02. Select at least 2 different starting tides across QA runs.
+03. Immediately open deck viewer. Verify deck size is 30, origin is visible,
+    crystal is visible, and the deck contains the expected starter/tide/neutral
+    groups.
+04. Enter Draft, record visible pack tides for all 5 picks, choose cards, and
+    verify deck size increases by exactly 5.
+05. Enter Dreamcaller Draft. Verify both-tide icon display and starting-tide
+    fork behavior where content exists.
+06. Enter Shop or Specialty Shop. Verify item purchases mutate essence/deck by
+    the displayed amounts and no Starter card is offered.
+07. Enter a Reward site. Verify card/dreamsign reward is generated at entry and
+    reflects current profile.
+08. Win a battle and choose a rare reward. Verify rare reward is not Starter or
+    Special and is logged.
+09. Download the quest log and run a log-analysis script that reconstructs:
+    starting options, selected tide, starting deck groups, draft pool size,
+    dreamcaller offer tides, shop offer tides, reward offer tides, final deck
+    size, and card additions/removals in order.
 10. Reset/reload and verify no previous quest origin, deck, draft pool, or log
     state leaks into the next run.
 

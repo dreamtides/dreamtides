@@ -318,11 +318,6 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
                 configuration.enemy.as_ref().cloned().unwrap_or(DEFAULT_AI_OPPONENT.clone());
             let deck_name =
                 configuration.deck_override.unwrap_or_else(|| provider.default_deck_name());
-            let first_player = if configuration.user_goes_second.unwrap_or(false) {
-                PlayerName::Two
-            } else {
-                PlayerName::One
-            };
             let new_battle = new_battle::create_and_start(
                 battle_id,
                 provider.tabula(),
@@ -336,9 +331,6 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
                 CreateBattlePlayer { player_type: PlayerType::User(user_id), deck_name },
                 CreateBattlePlayer { player_type: enemy, deck_name },
                 request_context,
-                first_player,
-                configuration.front_row_size,
-                configuration.back_row_size,
             );
             provider.clear_undo_stack(new_battle.id);
             let quest_id = QuestId(Uuid::new_v4());
