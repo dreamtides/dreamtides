@@ -13,6 +13,7 @@ import {
   rerollCost,
   type ShopSlot,
 } from "../shop/shop-generator";
+import { computeQuestTideProfile } from "../data/quest-tide-profile";
 
 /** Props for the ShopScreen component. */
 interface ShopScreenProps {
@@ -24,9 +25,17 @@ export function ShopScreen({ site }: ShopScreenProps) {
   const { state, mutations, cardDatabase } = useQuest();
   const { essence, deck } = state;
 
-  const [slots, setSlots] = useState<ShopSlot[]>(() =>
-    generateShopInventory(cardDatabase, deck, state.excludedTides),
-  );
+  const [slots, setSlots] = useState<ShopSlot[]>(() => {
+    const profile = computeQuestTideProfile({
+      startingTide: state.startingTide,
+      deck: state.deck,
+      cardDatabase,
+      dreamcaller: state.dreamcaller,
+      tideCrystals: state.tideCrystals,
+      recentDraftPicks: state.draftState?.draftedCards ?? [],
+    });
+    return generateShopInventory(cardDatabase, deck, state.excludedTides, profile);
+  });
   const [rerollCount, setRerollCount] = useState(0);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
 
@@ -95,7 +104,15 @@ export function ShopScreen({ site }: ShopScreenProps) {
       setRerollCount((prev) => prev + 1);
 
       // Regenerate unpurchased non-reroll slots
-      const newInventory = generateShopInventory(cardDatabase, deck, state.excludedTides);
+      const profile = computeQuestTideProfile({
+        startingTide: state.startingTide,
+        deck: state.deck,
+        cardDatabase,
+        dreamcaller: state.dreamcaller,
+        tideCrystals: state.tideCrystals,
+        recentDraftPicks: state.draftState?.draftedCards ?? [],
+      });
+      const newInventory = generateShopInventory(cardDatabase, deck, state.excludedTides, profile);
       // Collect only non-reroll replacement items to avoid introducing
       // a second reroll slot from the freshly generated inventory.
       const replacements = newInventory.filter(
@@ -128,6 +145,7 @@ export function ShopScreen({ site }: ShopScreenProps) {
       deck,
       site.isEnhanced,
       mutations,
+      state,
     ],
   );
 

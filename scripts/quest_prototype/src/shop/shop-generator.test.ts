@@ -209,6 +209,24 @@ describe("generateShopInventory with empty database", () => {
   });
 });
 
+describe("generateShopInventory starter exclusion", () => {
+  it("never offers Starter cards in regular or specialty shops", () => {
+    const db = makeDatabase([
+      makeCard({ cardNumber: 1, rarity: "Starter", tide: "Bloom" }),
+      makeCard({ cardNumber: 2, rarity: "Rare", tide: "Bloom" }),
+      makeCard({ cardNumber: 3, rarity: "Common", tide: "Bloom" }),
+    ]);
+    for (let i = 0; i < 50; i++) {
+      const regular = generateShopInventory(db, []);
+      const specialty = generateSpecialtyShopInventory(db, []);
+      const offered = [...regular, ...specialty].flatMap((slot) =>
+        slot.card === null ? [] : [slot.card],
+      );
+      expect(offered.every((card) => card.rarity !== "Starter")).toBe(true);
+    }
+  });
+});
+
 describe("generateSpecialtyShopInventory", () => {
   const cards = [
     makeCard({ cardNumber: 1, rarity: "Common", tide: "Bloom" }),

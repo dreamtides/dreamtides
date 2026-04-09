@@ -11,6 +11,7 @@ import {
   effectivePrice,
   type ShopSlot,
 } from "../shop/shop-generator";
+import { computeQuestTideProfile } from "../data/quest-tide-profile";
 
 /** Props for the SpecialtyShopScreen component. */
 interface SpecialtyShopScreenProps {
@@ -23,7 +24,15 @@ export function SpecialtyShopScreen({ site }: SpecialtyShopScreenProps) {
   const { essence, deck } = state;
 
   const [slots, setSlots] = useState<ShopSlot[]>(() => {
-    const inventory = generateSpecialtyShopInventory(cardDatabase, deck, state.excludedTides);
+    const profile = computeQuestTideProfile({
+      startingTide: state.startingTide,
+      deck: state.deck,
+      cardDatabase,
+      dreamcaller: state.dreamcaller,
+      tideCrystals: state.tideCrystals,
+      recentDraftPicks: state.draftState?.draftedCards ?? [],
+    });
+    const inventory = generateSpecialtyShopInventory(cardDatabase, deck, state.excludedTides, profile);
     if (site.isEnhanced) {
       return inventory.map((s) => ({
         ...s,

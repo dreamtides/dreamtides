@@ -6,6 +6,7 @@ import { useQuest } from "../state/quest-context";
 import { DREAMCALLERS } from "../data/dreamcallers";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { countDeckTides, selectRareRewards } from "../data/tide-weights";
+import { computeQuestTideProfile } from "../data/quest-tide-profile";
 import { CardDisplay } from "../components/CardDisplay";
 import { logEvent } from "../logging";
 import { generateNewNodes } from "../atlas/atlas-generator";
@@ -446,7 +447,15 @@ export function BattleScreen({
   const rareCardsRef = useRef<CardData[] | null>(null);
   if (rareCardsRef.current === null) {
     const tideCounts = countDeckTides(deck, cardDatabase);
-    rareCardsRef.current = selectRareRewards(cardDatabase, tideCounts, state.excludedTides);
+    const profile = computeQuestTideProfile({
+      startingTide: state.startingTide,
+      deck: state.deck,
+      cardDatabase,
+      dreamcaller: state.dreamcaller,
+      tideCrystals: state.tideCrystals,
+      recentDraftPicks: state.draftState?.draftedCards ?? [],
+    });
+    rareCardsRef.current = selectRareRewards(cardDatabase, tideCounts, state.excludedTides, profile);
   }
   const rareCards = rareCardsRef.current;
 
