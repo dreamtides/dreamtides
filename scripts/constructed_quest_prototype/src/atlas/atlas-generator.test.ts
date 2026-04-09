@@ -97,13 +97,24 @@ beforeEach(() => {
 });
 
 describe("generateSiteComposition", () => {
-  it("produces exactly 6 sites for level 0 (DreamcallerDraft + 3 LootPacks + CardShop + Battle)", () => {
-    const sites = generateSiteComposition(0, defaultContext());
-    expect(sites.length).toBe(6);
-    expect(sites[0].type).toBe("DreamcallerDraft");
-    expect(sites.filter((s) => s.type === "LootPack").length).toBe(3);
-    expect(sites.some((s) => s.type === "CardShop")).toBe(true);
-    expect(sites[sites.length - 1].type).toBe("Battle");
+  it("level 0 produces DreamcallerDraft, 2 LootPacks, CardShop, PackShop, Battle", () => {
+    const sites = generateSiteComposition(0, defaultContext({ dreamscapeTide: "Bloom" }));
+    const types = sites.map((s) => s.type);
+    expect(types[0]).toBe("DreamcallerDraft");
+    expect(types.filter((t) => t === "LootPack")).toHaveLength(2);
+    expect(types).toContain("CardShop");
+    expect(types).toContain("PackShop");
+    expect(types[types.length - 1]).toBe("Battle");
+    expect(types).toHaveLength(6);
+  });
+
+  it("level 1+ always includes CardShop and PackShop", () => {
+    for (let i = 0; i < 20; i++) {
+      const sites = generateSiteComposition(1, defaultContext());
+      const types = sites.map((s) => s.type);
+      expect(types).toContain("CardShop");
+      expect(types).toContain("PackShop");
+    }
   });
 
   it("produces correct site counts for levels 1-6", () => {
@@ -202,7 +213,7 @@ describe("generateSiteComposition", () => {
   it("LootPack sites have packTide in their data", () => {
     const sites = generateSiteComposition(0, defaultContext());
     const packs = sites.filter((s) => s.type === "LootPack");
-    expect(packs.length).toBe(3);
+    expect(packs.length).toBe(2);
     for (const pack of packs) {
       expect(pack.data).toBeDefined();
       expect(pack.data!["packTide"]).toBeDefined();

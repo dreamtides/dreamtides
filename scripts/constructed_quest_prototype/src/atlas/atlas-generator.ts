@@ -171,22 +171,18 @@ export function generateSiteComposition(
   const clampedLevel = Math.min(Math.max(completionLevel, 0), 6);
 
   if (clampedLevel === 0) {
-    // Level 0: fixed composition (DreamcallerDraft, 3 LootPacks, CardShop, Battle)
-    // Loot packs are drawn from the player's starting tide and neighbors (duplicates allowed)
+    // Level 0: DreamcallerDraft, 2 LootPacks (same tide), CardShop, PackShop, Battle
     sites.push({
       id: nextSiteId(),
       type: "DreamcallerDraft",
       isEnhanced: false,
       isVisited: false,
     });
-    for (let i = 0; i < 3; i++) {
-      const startTideAndNeighbors: Tide[] = [];
-      if (context.startingTide !== null) {
-        startTideAndNeighbors.push(context.startingTide, ...adjacentTides(context.startingTide));
-      }
-      const packTide = startTideAndNeighbors.length > 0
-        ? pickRandom(startTideAndNeighbors)
-        : pickRandom(["Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge"] as Tide[]);
+
+    const packTide: Tide = context.dreamscapeTide ??
+      pickRandom(["Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge"] as Tide[]);
+
+    for (let i = 0; i < 2; i++) {
       sites.push({
         id: nextSiteId(),
         type: "LootPack",
@@ -195,11 +191,20 @@ export function generateSiteComposition(
         data: { packTide },
       });
     }
+
     sites.push({
       id: nextSiteId(),
       type: "CardShop",
       isEnhanced: false,
       isVisited: false,
+      data: { dreamscapeTide: packTide },
+    });
+    sites.push({
+      id: nextSiteId(),
+      type: "PackShop",
+      isEnhanced: false,
+      isVisited: false,
+      data: { dreamscapeTide: packTide },
     });
   } else {
     // Levels 1-6: loot packs + random pool sites
@@ -236,6 +241,24 @@ export function generateSiteComposition(
         isEnhanced: false,
         isVisited: false,
         data,
+      });
+    }
+
+    // Ensure at least one CardShop and one PackShop
+    if (!sites.some((s) => s.type === "CardShop")) {
+      sites.push({
+        id: nextSiteId(),
+        type: "CardShop",
+        isEnhanced: false,
+        isVisited: false,
+      });
+    }
+    if (!sites.some((s) => s.type === "PackShop")) {
+      sites.push({
+        id: nextSiteId(),
+        type: "PackShop",
+        isEnhanced: false,
+        isVisited: false,
       });
     }
   }
