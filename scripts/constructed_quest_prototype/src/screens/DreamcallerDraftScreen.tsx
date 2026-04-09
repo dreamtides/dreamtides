@@ -1,26 +1,51 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Dreamcaller, SiteState } from "../types/quest";
-import type { Tide } from "../types/cards";
+import type { NamedTide, Tide } from "../types/cards";
 import { useQuest } from "../state/quest-context";
 import { DREAMCALLERS } from "../data/dreamcallers";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { countDeckTides, tideWeight, weightedSample } from "../data/tide-weights";
 import { logEvent } from "../logging";
 
+/** Returns the left neighbor of a named tide on the circle. */
+function leftNeighbor(tide: NamedTide): NamedTide {
+  const circle: NamedTide[] = ["Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge"];
+  const idx = circle.indexOf(tide);
+  return circle[(idx + circle.length - 1) % circle.length];
+}
+
+/** Returns the right neighbor of a named tide on the circle. */
+function rightNeighbor(tide: NamedTide): NamedTide {
+  const circle: NamedTide[] = ["Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge"];
+  const idx = circle.indexOf(tide);
+  return circle[(idx + 1) % circle.length];
+}
+
+/** Returns true if a dreamcaller's pair contains both specified tides. */
+function matchesPair(dc: Dreamcaller, a: NamedTide, b: NamedTide): boolean {
+  return (dc.tides[0] === a && dc.tides[1] === b) || (dc.tides[0] === b && dc.tides[1] === a);
+}
+
+/** Returns true if a dreamcaller's pair contains the specified tide. */
+function containsTide(dc: Dreamcaller, tide: NamedTide): boolean {
+  return dc.tides[0] === tide || dc.tides[1] === tide;
+}
+
 /**
- * Selects 3 distinct dreamcallers. If the player has drafted cards,
- * weights the selection toward tides that match the player's deck.
- * Otherwise picks 3 at random.
+ * Selects 3 dreamcallers for the draft:
+ * 1. Left fork: pair containing startingTide + left neighbor
+ * 2. Right fork: pair containing startingTide + right neighbor
+ * 3. Adaptive: weighted sample from remaining callers
  */
 function selectOfferedDreamcallers(
+  startingTide: NamedTide | null,
   deck: Array<{ cardNumber: number }>,
   cardDatabase: Map<number, { tide: Tide }>,
 ): Dreamcaller[] {
   const pool = [...DREAMCALLERS];
 
-  if (deck.length === 0) {
-    // Shuffle and pick 3
+  if (startingTide === null) {
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -28,8 +53,47 @@ function selectOfferedDreamcallers(
     return pool.slice(0, 3);
   }
 
-  const tideCounts = countDeckTides(deck, cardDatabase);
-  return weightedSample(pool, 3, (dc) => tideWeight(dc.tide, tideCounts));
+  const left = leftNeighbor(startingTide);
+  const right = rightNeighbor(startingTide);
+  const selected: Dreamcaller[] = [];
+  const usedNames = new Set<string>();
+
+  // Slot 1: Left fork
+  const leftCandidates = pool.filter((dc) => matchesPair(dc, startingTide, left));
+  const leftFallback1 = pool.filter((dc) => containsTide(dc, startingTide) && !usedNames.has(dc.name));
+  const leftFallback2 = pool.filter((dc) => (containsTide(dc, left) || containsTide(dc, right)) && !usedNames.has(dc.name));
+  const leftPick = leftCandidates[0] ?? leftFallback1[0] ?? leftFallback2[0] ?? pool[0];
+  selected.push(leftPick);
+  usedNames.add(leftPick.name);
+
+  // Slot 2: Right fork
+  const rightCandidates = pool.filter((dc) => matchesPair(dc, startingTide, right) && !usedNames.has(dc.name));
+  const rightFallback1 = pool.filter((dc) => containsTide(dc, startingTide) && !usedNames.has(dc.name));
+  const rightFallback2 = pool.filter((dc) => (containsTide(dc, left) || containsTide(dc, right)) && !usedNames.has(dc.name));
+  const rightPick = rightCandidates[0] ?? rightFallback1[0] ?? rightFallback2[0] ?? pool.filter((dc) => !usedNames.has(dc.name))[0] ?? pool[0];
+  selected.push(rightPick);
+  usedNames.add(rightPick.name);
+
+  // Slot 3: Adaptive
+  const remaining = pool.filter((dc) => !usedNames.has(dc.name));
+  if (remaining.length === 0) {
+    selected.push(pool.filter((dc) => !usedNames.has(dc.name))[0] ?? pool[0]);
+  } else if (deck.length === 0) {
+    selected.push(remaining[Math.floor(Math.random() * remaining.length)]);
+  } else {
+    const tideCounts = countDeckTides(deck, cardDatabase);
+    const picked = weightedSample(remaining, 1, (dc) => {
+      return Math.max(tideWeight(dc.tides[0], tideCounts), tideWeight(dc.tides[1], tideCounts));
+    });
+    selected.push(picked[0] ?? remaining[0]);
+  }
+
+  logEvent("dreamcaller_offers_generated", {
+    offered: selected.map((dc) => ({ name: dc.name, tides: dc.tides })),
+    startingTide,
+  });
+
+  return selected;
 }
 
 interface DreamcallerCardProps {
@@ -39,64 +103,81 @@ interface DreamcallerCardProps {
   onSelect: () => void;
 }
 
-/** Renders a single dreamcaller option with name, tide, ability, and bonus. */
 function DreamcallerCard({
   dreamcaller,
   isSelected,
   isDismissed,
   onSelect,
 }: DreamcallerCardProps) {
-  const tideColor = TIDE_COLORS[dreamcaller.tide];
+  const primaryColor = TIDE_COLORS[dreamcaller.tides[0]];
+  const secondaryColor = TIDE_COLORS[dreamcaller.tides[1]];
 
   return (
     <motion.div
       className="flex flex-col items-center rounded-xl px-5 py-6 md:px-6 md:py-8"
       style={{
         background: "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-        border: `2px solid ${tideColor}40`,
-        boxShadow: `0 0 20px ${tideColor}15`,
+        border: `2px solid ${primaryColor}40`,
+        boxShadow: `0 0 20px ${primaryColor}15`,
         minWidth: "220px",
         maxWidth: "320px",
         flex: "1 1 0",
       }}
       animate={
         isSelected
-          ? { scale: 1.08, boxShadow: `0 0 40px ${tideColor}60` }
+          ? { scale: 1.08, boxShadow: `0 0 40px ${primaryColor}60` }
           : isDismissed
             ? { opacity: 0, scale: 0.9 }
             : { scale: 1, opacity: 1 }
       }
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      {/* Tide icon */}
-      <img
-        src={tideIconUrl(dreamcaller.tide)}
-        alt={dreamcaller.tide}
-        className="mb-3 h-12 w-12 rounded-full object-contain md:h-14 md:w-14"
-        style={{ border: `2px solid ${tideColor}` }}
-      />
+      <div className="mb-3 flex items-center gap-2">
+        <img
+          src={tideIconUrl(dreamcaller.tides[0])}
+          alt={dreamcaller.tides[0]}
+          className="h-12 w-12 rounded-full object-contain md:h-14 md:w-14"
+          style={{ border: `2px solid ${primaryColor}` }}
+        />
+        <span className="text-lg opacity-40" style={{ color: "#e2e8f0" }}>+</span>
+        <img
+          src={tideIconUrl(dreamcaller.tides[1])}
+          alt={dreamcaller.tides[1]}
+          className="h-12 w-12 rounded-full object-contain md:h-14 md:w-14"
+          style={{ border: `2px solid ${secondaryColor}` }}
+        />
+      </div>
 
-      {/* Dreamcaller name */}
       <h3
         className="mb-2 text-center text-xl font-bold leading-tight md:text-2xl"
-        style={{ color: tideColor }}
+        style={{ color: primaryColor }}
       >
         {dreamcaller.name}
       </h3>
 
-      {/* Tide label */}
-      <span
-        className="mb-3 rounded-full px-3 py-0.5 text-xs font-medium"
-        style={{
-          background: `${tideColor}20`,
-          color: tideColor,
-          border: `1px solid ${tideColor}30`,
-        }}
-      >
-        {dreamcaller.tide} Tide
-      </span>
+      <div className="mb-3 flex items-center gap-2">
+        <span
+          className="rounded-full px-2 py-0.5 text-xs font-medium"
+          style={{
+            background: `${primaryColor}20`,
+            color: primaryColor,
+            border: `1px solid ${primaryColor}30`,
+          }}
+        >
+          {dreamcaller.tides[0]}
+        </span>
+        <span
+          className="rounded-full px-2 py-0.5 text-xs font-medium"
+          style={{
+            background: `${secondaryColor}20`,
+            color: secondaryColor,
+            border: `1px solid ${secondaryColor}30`,
+          }}
+        >
+          {dreamcaller.tides[1]}
+        </span>
+      </div>
 
-      {/* Ability description */}
       <p
         className="mb-4 text-center text-sm leading-relaxed opacity-80"
         style={{ color: "#e2e8f0" }}
@@ -104,7 +185,6 @@ function DreamcallerCard({
         {dreamcaller.abilityDescription}
       </p>
 
-      {/* Essence bonus */}
       <div className="mb-2 flex items-center gap-1.5">
         <span style={{ color: "#fbbf24" }}>{"\u25C6"}</span>
         <span className="text-lg font-bold" style={{ color: "#fbbf24" }}>
@@ -113,19 +193,17 @@ function DreamcallerCard({
         <span className="text-xs opacity-50">Essence</span>
       </div>
 
-      {/* Tide crystal grant */}
       <div className="mb-5 flex items-center gap-1.5">
         <img
           src={tideIconUrl(dreamcaller.tideCrystalGrant)}
           alt={dreamcaller.tideCrystalGrant}
           className="h-4 w-4 rounded-full object-contain"
         />
-        <span className="text-sm font-medium" style={{ color: tideColor }}>
+        <span className="text-sm font-medium" style={{ color: TIDE_COLORS[dreamcaller.tideCrystalGrant] }}>
           1 {dreamcaller.tideCrystalGrant} Crystal
         </span>
       </div>
 
-      {/* Select button */}
       {!isSelected && !isDismissed && (
         <motion.button
           className="cursor-pointer rounded-lg px-6 py-2 text-sm font-bold text-white"
@@ -149,9 +227,9 @@ function DreamcallerCard({
         <span
           className="rounded-full px-4 py-1.5 text-sm font-bold"
           style={{
-            background: `${tideColor}20`,
-            color: tideColor,
-            border: `1px solid ${tideColor}`,
+            background: `${primaryColor}20`,
+            color: primaryColor,
+            border: `1px solid ${primaryColor}`,
           }}
         >
           Selected
@@ -161,13 +239,11 @@ function DreamcallerCard({
   );
 }
 
-/** Screen for selecting a dreamcaller from 3 options. */
 export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
   const { state, mutations, cardDatabase } = useQuest();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Clear pending timer on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current !== null) {
@@ -176,10 +252,10 @@ export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
     };
   }, []);
 
-  // Compute offered dreamcallers once on first render and keep stable.
   const offeredRef = useRef<Dreamcaller[] | null>(null);
   if (offeredRef.current === null) {
     offeredRef.current = selectOfferedDreamcallers(
+      state.startingTide,
       state.deck,
       cardDatabase,
     );
@@ -193,7 +269,6 @@ export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
       const dreamcaller = offered[index];
       setSelectedIndex(index);
 
-      // Apply state mutations
       mutations.setDreamcaller(dreamcaller);
       mutations.changeEssence(dreamcaller.essenceBonus, "dreamcaller_bonus");
       mutations.addTideCrystal(dreamcaller.tideCrystalGrant, 1);
@@ -202,11 +277,10 @@ export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
         siteType: "DreamcallerDraft",
         outcome: `Selected ${dreamcaller.name}`,
         dreamcallerName: dreamcaller.name,
-        dreamcallerTide: dreamcaller.tide,
+        dreamcallerTides: dreamcaller.tides,
         essenceBonus: dreamcaller.essenceBonus,
       });
 
-      // After animation delay, return to dreamscape
       timerRef.current = setTimeout(() => {
         mutations.markSiteVisited(site.id);
         mutations.setScreen({ type: "dreamscape" });
@@ -223,7 +297,6 @@ export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4 }}
     >
-      {/* Header */}
       <motion.h1
         className="mb-2 text-center text-3xl font-extrabold tracking-wide md:text-4xl"
         style={{
@@ -249,7 +322,6 @@ export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
         Select a dreamcaller to guide your journey through the dreamscape
       </motion.p>
 
-      {/* Dreamcaller cards */}
       <AnimatePresence>
         <motion.div
           className="flex w-full max-w-4xl flex-col items-center gap-4 md:flex-row md:items-stretch md:justify-center md:gap-6"
