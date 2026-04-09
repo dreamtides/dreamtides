@@ -128,7 +128,7 @@ describe("RARITY_COLORS", () => {
 In the real-data integration test, change the size test:
 
 ```ts
-it("loads 493 non-Special cards and indexes them by cardNumber", async () => {
+it("loads 592 non-Special cards and indexes them by cardNumber", async () => {
   const raw = await readCardDataJson();
   if (raw === null) return;
 
@@ -141,7 +141,7 @@ it("loads 493 non-Special cards and indexes them by cardNumber", async () => {
   );
 
   const db = await loadCardDatabase();
-  expect(db.size).toBe(493);
+  expect(db.size).toBe(592);
 });
 ```
 
@@ -255,8 +255,8 @@ npm run setup-assets
 Expected output includes:
 
 ```text
-Filtered to 493 non-Special cards
-Wrote 493 cards to card-data.json
+Filtered to 592 non-Special cards
+Wrote 592 cards to card-data.json
 ```
 
 - [ ] **Step 9: Run focused tests**
