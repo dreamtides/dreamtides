@@ -6,7 +6,7 @@ import { logEvent } from "../logging";
 import { CardDisplay } from "../components/CardDisplay";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import type { NamedTide, Tide } from "../types/cards";
-import { computeQuestTideProfile, weightedSampleByProfile } from "../data/quest-tide-profile";
+import { computeQuestTideProfile, questTideProfileLogFields, weightedSampleByProfile } from "../data/quest-tide-profile";
 import { offerableCards } from "../data/card-pools";
 import { DREAMSIGNS } from "../data/dreamsigns";
 
@@ -35,6 +35,11 @@ export function RewardSiteScreen({ site }: RewardSiteScreenProps) {
         dreamcaller: state.dreamcaller,
         tideCrystals: state.tideCrystals,
         recentDraftPicks: state.draftState?.draftedCards ?? [],
+      });
+      logEvent("quest_tide_profile_computed", {
+        source: "reward_site",
+        startingTide: state.startingTide,
+        ...questTideProfileLogFields(profile),
       });
       const pool = offerableCards(cardDatabase, { excludedTides: state.excludedTides as NamedTide[] });
       const card = weightedSampleByProfile(pool, profile, 1)[0] ?? null;

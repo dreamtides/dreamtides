@@ -227,6 +227,17 @@ export function computeQuestTideProfile({
   };
 }
 
+/** JSON-safe summary for quest_tide_profile_computed log events. */
+export function questTideProfileLogFields(profile: QuestTideProfile): Record<string, unknown> {
+  return {
+    weights: profile.weights,
+    contributions: profile.contributions,
+    orderedNamedTides: [...NAMED_TIDES]
+      .sort((a, b) => profile.weights[b] - profile.weights[a])
+      .map((tide) => ({ tide, weight: profile.weights[tide] })),
+  };
+}
+
 /** Returns the computed weight for a tide in the profile. */
 export function tideProfileWeight(profile: QuestTideProfile, tide: Tide): number {
   return profile.weights[tide];

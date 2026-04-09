@@ -5,7 +5,7 @@ import { useQuest } from "../state/quest-context";
 import { DREAMCALLERS } from "../data/dreamcallers";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { selectOfferedDreamcallers } from "../data/dreamcaller-offers";
-import { computeQuestTideProfile } from "../data/quest-tide-profile";
+import { computeQuestTideProfile, questTideProfileLogFields } from "../data/quest-tide-profile";
 import { logEvent } from "../logging";
 
 interface DreamcallerCardProps {
@@ -167,6 +167,11 @@ export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
       dreamcaller: state.dreamcaller,
       tideCrystals: state.tideCrystals,
       recentDraftPicks: state.draftState?.draftedCards ?? [],
+    });
+    logEvent("quest_tide_profile_computed", {
+      source: "dreamcaller_draft",
+      startingTide: state.startingTide,
+      ...questTideProfileLogFields(profile),
     });
     offeredRef.current = selectOfferedDreamcallers({
       pool: DREAMCALLERS,

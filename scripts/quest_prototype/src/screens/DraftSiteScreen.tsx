@@ -17,7 +17,7 @@ import type { DraftState } from "../types/draft";
 import type { CardData } from "../types/cards";
 import { logEvent } from "../logging";
 import { useQuestConfig } from "../state/quest-config";
-import { computeQuestTideProfile, type QuestTideProfile } from "../data/quest-tide-profile";
+import { computeQuestTideProfile, questTideProfileLogFields, type QuestTideProfile } from "../data/quest-tide-profile";
 
 /** Delay in ms before showing the next pack after a pick. */
 const NEXT_PACK_DELAY = 500;
@@ -163,6 +163,11 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
       recentDraftPicks: state.draftState?.draftedCards ?? [],
     });
     profileRef.current = profile;
+    logEvent("quest_tide_profile_computed", {
+      source: "draft_enter",
+      startingTide: state.startingTide,
+      ...questTideProfileLogFields(profile),
+    });
 
     // Deep clone to avoid mutating React state directly
     const cloned = JSON.parse(JSON.stringify(ds)) as DraftState;

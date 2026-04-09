@@ -11,7 +11,7 @@ import {
   effectivePrice,
   type ShopSlot,
 } from "../shop/shop-generator";
-import { computeQuestTideProfile } from "../data/quest-tide-profile";
+import { computeQuestTideProfile, questTideProfileLogFields } from "../data/quest-tide-profile";
 
 /** Props for the SpecialtyShopScreen component. */
 interface SpecialtyShopScreenProps {
@@ -32,7 +32,27 @@ export function SpecialtyShopScreen({ site }: SpecialtyShopScreenProps) {
       tideCrystals: state.tideCrystals,
       recentDraftPicks: state.draftState?.draftedCards ?? [],
     });
+    logEvent("quest_tide_profile_computed", {
+      source: "specialty_shop",
+      startingTide: state.startingTide,
+      ...questTideProfileLogFields(profile),
+    });
     const inventory = generateSpecialtyShopInventory(cardDatabase, deck, state.excludedTides, profile);
+    logEvent("shop_inventory_generated", {
+      siteType: "SpecialtyShop",
+      slots: inventory.map((slot) => ({
+        itemType: slot.itemType,
+        cardNumber: slot.card?.cardNumber ?? null,
+        cardName: slot.card?.name ?? null,
+        cardTide: slot.card?.tide ?? null,
+        cardRarity: slot.card?.rarity ?? null,
+        dreamsignName: slot.dreamsign?.name ?? null,
+        dreamsignTide: slot.dreamsign?.tide ?? null,
+        tideCrystal: slot.tideCrystal,
+        basePrice: slot.basePrice,
+        discountPercent: slot.discountPercent,
+      })),
+    });
     if (site.isEnhanced) {
       return inventory.map((s) => ({
         ...s,

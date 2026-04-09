@@ -13,7 +13,7 @@ import {
   rerollCost,
   type ShopSlot,
 } from "../shop/shop-generator";
-import { computeQuestTideProfile } from "../data/quest-tide-profile";
+import { computeQuestTideProfile, questTideProfileLogFields } from "../data/quest-tide-profile";
 
 /** Props for the ShopScreen component. */
 interface ShopScreenProps {
@@ -34,7 +34,28 @@ export function ShopScreen({ site }: ShopScreenProps) {
       tideCrystals: state.tideCrystals,
       recentDraftPicks: state.draftState?.draftedCards ?? [],
     });
-    return generateShopInventory(cardDatabase, deck, state.excludedTides, profile);
+    logEvent("quest_tide_profile_computed", {
+      source: "shop",
+      startingTide: state.startingTide,
+      ...questTideProfileLogFields(profile),
+    });
+    const inventory = generateShopInventory(cardDatabase, deck, state.excludedTides, profile);
+    logEvent("shop_inventory_generated", {
+      siteType: "Shop",
+      slots: inventory.map((slot) => ({
+        itemType: slot.itemType,
+        cardNumber: slot.card?.cardNumber ?? null,
+        cardName: slot.card?.name ?? null,
+        cardTide: slot.card?.tide ?? null,
+        cardRarity: slot.card?.rarity ?? null,
+        dreamsignName: slot.dreamsign?.name ?? null,
+        dreamsignTide: slot.dreamsign?.tide ?? null,
+        tideCrystal: slot.tideCrystal,
+        basePrice: slot.basePrice,
+        discountPercent: slot.discountPercent,
+      })),
+    });
+    return inventory;
   });
   const [rerollCount, setRerollCount] = useState(0);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
@@ -112,7 +133,27 @@ export function ShopScreen({ site }: ShopScreenProps) {
         tideCrystals: state.tideCrystals,
         recentDraftPicks: state.draftState?.draftedCards ?? [],
       });
+      logEvent("quest_tide_profile_computed", {
+        source: "shop",
+        startingTide: state.startingTide,
+        ...questTideProfileLogFields(profile),
+      });
       const newInventory = generateShopInventory(cardDatabase, deck, state.excludedTides, profile);
+      logEvent("shop_inventory_generated", {
+        siteType: "Shop",
+        slots: newInventory.map((slot) => ({
+          itemType: slot.itemType,
+          cardNumber: slot.card?.cardNumber ?? null,
+          cardName: slot.card?.name ?? null,
+          cardTide: slot.card?.tide ?? null,
+          cardRarity: slot.card?.rarity ?? null,
+          dreamsignName: slot.dreamsign?.name ?? null,
+          dreamsignTide: slot.dreamsign?.tide ?? null,
+          tideCrystal: slot.tideCrystal,
+          basePrice: slot.basePrice,
+          discountPercent: slot.discountPercent,
+        })),
+      });
       // Collect only non-reroll replacement items to avoid introducing
       // a second reroll slot from the freshly generated inventory.
       const replacements = newInventory.filter(
