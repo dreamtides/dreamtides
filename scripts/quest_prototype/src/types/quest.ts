@@ -38,10 +38,10 @@ export interface DeckEntry {
 /** A selected character that grants bonuses. */
 export interface Dreamcaller {
   name: string;
-  tide: Tide;
+  tides: [NamedTide, NamedTide];
   abilityDescription: string;
   essenceBonus: number;
-  tideCrystalGrant: Tide;
+  tideCrystalGrant: NamedTide;
 }
 
 /** A passive effect collected during the quest. */

@@ -40,7 +40,7 @@ function generateEnemy(): EnemyData {
     name: `${prefix} ${baseName}`,
     abilityText: template.abilityDescription,
     dreamsignCount: Math.floor(Math.random() * 5) + 1,
-    tide: template.tide,
+    tide: template.tides[0],
   };
 }
 
