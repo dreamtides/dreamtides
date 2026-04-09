@@ -15,8 +15,6 @@ import type { QuestConfig } from "../state/quest-config";
 
 const TEST_CONFIG: QuestConfig = {
   revisedTides: true,
-  startingTides: 3,
-  sequentialTides: true,
   initialCards: 10,
   starterNeutral: 5,
   starterLowCost: 4,
@@ -85,7 +83,7 @@ function defaultContext(
       },
     ],
     playerHasBanes: false,
-    startingTides: ["Bloom", "Arc", "Surge"],
+    startingTide: "Bloom",
     playerPool: [],
     config: TEST_CONFIG,
     ...overrides,

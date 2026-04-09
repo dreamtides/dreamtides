@@ -5,11 +5,12 @@ import type {
   SiteState,
   SiteType,
 } from "../types/quest";
-import type { CardData, Tide } from "../types/cards";
+import type { CardData, NamedTide, Tide } from "../types/cards";
 import type { Dreamsign } from "../types/quest";
 import type { QuestConfig } from "../state/quest-config";
 import { BIOMES, type Biome } from "../data/biomes";
 import { selectPackTide } from "../data/tide-weights";
+import { adjacentTides } from "../data/card-database";
 import { logEvent } from "../logging";
 
 /** Parameters for site generation that require external data. */
@@ -17,7 +18,7 @@ export interface SiteGenerationContext {
   cardDatabase: Map<number, CardData>;
   dreamsignPool: ReadonlyArray<Omit<Dreamsign, "isBane">>;
   playerHasBanes: boolean;
-  startingTides: Tide[];
+  startingTide: NamedTide | null;
   playerPool: DeckEntry[];
   config: QuestConfig;
 }
@@ -119,10 +120,16 @@ function getPoolCountRange(level: number): [number, number] {
 function generateRewardData(
   context: SiteGenerationContext,
 ): Record<string, unknown> {
-  const { cardDatabase, dreamsignPool, startingTides } = context;
-  const excludedSet = new Set(startingTides);
+  const { cardDatabase, dreamsignPool, startingTide } = context;
+  const excludedSet = new Set<Tide>();
+  if (startingTide !== null) {
+    excludedSet.add(startingTide);
+    for (const adj of adjacentTides(startingTide)) {
+      excludedSet.add(adj);
+    }
+  }
   const cards = Array.from(cardDatabase.values()).filter(
-    (c) => !excludedSet.has(c.tide),
+    (c) => !excludedSet.has(c.tide) && c.rarity !== "Starter",
   );
 
   // 70% chance card reward, 30% chance dreamsign reward
@@ -163,7 +170,7 @@ export function generateSiteComposition(
 
   if (clampedLevel === 0) {
     // Level 0: fixed composition (DreamcallerDraft, 3 LootPacks, CardShop, Battle)
-    // Loot packs are drawn from the player's starting tides (duplicates allowed)
+    // Loot packs are drawn from the player's starting tide and neighbors (duplicates allowed)
     sites.push({
       id: nextSiteId(),
       type: "DreamcallerDraft",
@@ -171,8 +178,12 @@ export function generateSiteComposition(
       isVisited: false,
     });
     for (let i = 0; i < 3; i++) {
-      const packTide = context.startingTides.length > 0
-        ? context.startingTides[Math.floor(Math.random() * context.startingTides.length)]
+      const startTideAndNeighbors: Tide[] = [];
+      if (context.startingTide !== null) {
+        startTideAndNeighbors.push(context.startingTide, ...adjacentTides(context.startingTide));
+      }
+      const packTide = startTideAndNeighbors.length > 0
+        ? pickRandom(startTideAndNeighbors)
         : pickRandom(["Bloom", "Arc", "Ignite", "Pact", "Umbra", "Rime", "Surge"] as Tide[]);
       sites.push({
         id: nextSiteId(),

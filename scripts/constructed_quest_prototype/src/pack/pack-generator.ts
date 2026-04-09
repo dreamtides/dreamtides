@@ -8,6 +8,7 @@ import { weightedSample, duplicateWeight } from "../data/tide-weights";
  * Filters the card database to matching-tide cards, applies duplicate
  * protection weights based on copies already in the player's pool,
  * then performs weighted sampling without replacement.
+ * Approximately 50% of the time, one slot is replaced with a Neutral card.
  */
 export function generateLootPack(
   cardDatabase: Map<number, CardData>,
@@ -17,7 +18,7 @@ export function generateLootPack(
   isEnhanced: boolean,
 ): CardData[] {
   const candidates = Array.from(cardDatabase.values()).filter(
-    (c) => c.tide === packTide,
+    (c) => c.tide === packTide && c.rarity !== "Starter",
   );
 
   if (candidates.length === 0) return [];
@@ -32,8 +33,19 @@ export function generateLootPack(
     ? config.lootPackSize * 2
     : config.lootPackSize;
 
-  return weightedSample(candidates, packSize, (card) => {
+  const tideCards = weightedSample(candidates, packSize, (card) => {
     const copies = copyCounts.get(card.cardNumber) ?? 0;
     return duplicateWeight(copies, config);
   });
+
+  // Approximately 50% chance to replace one card with a Neutral
+  const neutralCandidates = Array.from(cardDatabase.values()).filter(
+    (c) => c.tide === "Neutral" && c.rarity !== "Starter" && c.rarity !== "Legendary",
+  );
+  if (neutralCandidates.length > 0 && tideCards.length > 0 && Math.random() < 0.5) {
+    const neutralCard = neutralCandidates[Math.floor(Math.random() * neutralCandidates.length)];
+    tideCards[tideCards.length - 1] = neutralCard;
+  }
+
+  return tideCards;
 }
