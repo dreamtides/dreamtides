@@ -14,13 +14,36 @@ import { TRANSFIGURATION_COLORS } from "../transfiguration/transfiguration-logic
 import { computeTideDistribution } from "./tide-distribution";
 
 /** All tides including Neutral, used for filter toggles. */
-const ALL_TIDES: readonly Tide[] = [...NAMED_TIDES, "Neutral"] as const;
+export const ALL_TIDES: readonly Tide[] = [...NAMED_TIDES, "Neutral"] as const;
 
 /** Card size preset. */
-type CardSizePreset = "small" | "medium" | "large";
+export type CardSizePreset = "small" | "medium" | "large";
+
+/** LocalStorage key for persisting card size preference. */
+const CARD_SIZE_STORAGE_KEY = "quest-card-size";
+
+/** Read persisted card size from localStorage, falling back to the given default. */
+function getPersistedCardSize(fallback: CardSizePreset): CardSizePreset {
+  try {
+    const stored = localStorage.getItem(CARD_SIZE_STORAGE_KEY);
+    if (stored === "small" || stored === "medium" || stored === "large") return stored;
+  } catch {
+    // ignore
+  }
+  return fallback;
+}
+
+/** Persist card size to localStorage. */
+function persistCardSize(size: CardSizePreset): void {
+  try {
+    localStorage.setItem(CARD_SIZE_STORAGE_KEY, size);
+  } catch {
+    // ignore
+  }
+}
 
 /** Grid configuration for each size preset. */
-const SIZE_PRESETS: Readonly<
+export const SIZE_PRESETS: Readonly<
   Record<CardSizePreset, { columns: string; gap: string; label: string }>
 > = {
   small: {
@@ -41,7 +64,7 @@ const SIZE_PRESETS: Readonly<
 };
 
 /** Sort criteria options. */
-type SortCriteria =
+export type SortCriteria =
   | "acquisitionOrder"
   | "energyCost"
   | "name"
@@ -49,7 +72,7 @@ type SortCriteria =
   | "cardType";
 
 /** Labels for sort criteria. */
-const SORT_LABELS: Readonly<Record<SortCriteria, string>> = {
+export const SORT_LABELS: Readonly<Record<SortCriteria, string>> = {
   acquisitionOrder: "Acquisition Order",
   energyCost: "Energy Cost",
   name: "Name",
@@ -61,7 +84,7 @@ const SORT_LABELS: Readonly<Record<SortCriteria, string>> = {
 type CardTypeFilter = "All" | "Characters" | "Events";
 
 /** Tide ordering for sort-by-tide. */
-const TIDE_ORDER: Readonly<Record<Tide, number>> = {
+export const TIDE_ORDER: Readonly<Record<Tide, number>> = {
   Bloom: 0,
   Arc: 1,
   Ignite: 2,
@@ -79,13 +102,29 @@ interface ResolvedEntry {
   index: number;
 }
 
+/** A group of identical cards (same cardNumber and transfiguration) for display. */
+interface CardGroup {
+  card: CardData;
+  entries: ResolvedEntry[];
+  count: number;
+  sortKey: ResolvedEntry;
+}
+
 /** Props for the DeckViewer component. */
 interface DeckViewerProps {
   isOpen: boolean;
   onClose: () => void;
   cardDatabase: Map<number, CardData>;
-  /** Initial card size preset (default "small"). */
+  /** Initial card size preset (default "medium"). */
   initialSize?: CardSizePreset;
+}
+
+/** Props for the reusable deck content area (used by both DeckViewer and DeckEditor view mode). */
+export interface DeckViewerContentProps {
+  cardDatabase: Map<number, CardData>;
+  initialSize?: CardSizePreset;
+  /** If provided, shows a close button in the header. */
+  onClose?: () => void;
 }
 
 /**
@@ -96,8 +135,77 @@ export function DeckViewer({
   isOpen,
   onClose,
   cardDatabase,
-  initialSize = "small",
+  initialSize = "medium",
 }: DeckViewerProps) {
+  const { state } = useQuest();
+  const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
+  const openTimestampRef = useRef<number>(0);
+  const prevOpenRef = useRef(false);
+
+  useEffect(() => {
+    if (isOpen && !prevOpenRef.current) {
+      openTimestampRef.current = Date.now();
+      logEvent("deck_viewer_opened", { cardCount: state.deck.length });
+    }
+    prevOpenRef.current = isOpen;
+  }, [isOpen, state.deck.length]);
+
+  const handleClose = useCallback(() => {
+    const duration = Date.now() - openTimestampRef.current;
+    logEvent("deck_viewer_closed", { durationMs: duration });
+    onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        if (overlayCard !== null) {
+          setOverlayCard(null);
+          return;
+        }
+        handleClose();
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, overlayCard, handleClose]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="deck-viewer-backdrop"
+          className="fixed inset-0 z-[60] flex flex-col"
+          style={{ backgroundColor: "rgba(5, 2, 10, 0.92)" }}
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 40 }}
+          transition={{ duration: 0.3 }}
+        >
+          <DeckViewerContent
+            cardDatabase={cardDatabase}
+            initialSize={initialSize}
+            onClose={handleClose}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/**
+ * Reusable deck content area: header with card count, tide distribution,
+ * filter/sort controls, grouped card grid, sidebar, and card overlay.
+ * Used by both DeckViewer (standalone overlay) and DeckEditor (view mode).
+ */
+export function DeckViewerContent({
+  cardDatabase,
+  initialSize = "medium",
+  onClose,
+}: DeckViewerContentProps) {
   const { state } = useQuest();
 
   const [tideFilters, setTideFilters] = useState<Record<Tide, boolean>>(
@@ -116,47 +224,14 @@ export function DeckViewer({
   const [sortAscending, setSortAscending] = useState(true);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
-  const [cardSize, setCardSize] = useState<CardSizePreset>(initialSize);
-  const openTimestampRef = useRef<number>(0);
-  const prevOpenRef = useRef(false);
+  const [cardSize, setCardSizeState] = useState<CardSizePreset>(() =>
+    getPersistedCardSize(initialSize),
+  );
 
-  useEffect(() => {
-    if (isOpen && !prevOpenRef.current) {
-      openTimestampRef.current = Date.now();
-      logEvent("deck_viewer_opened", {
-        cardCount: state.deck.length,
-        tideFilters: Object.fromEntries(
-          Object.entries(tideFilters).filter(([_, v]) => !v),
-        ),
-        sortCriteria,
-        sortAscending,
-        cardTypeFilter,
-      });
-    }
-    prevOpenRef.current = isOpen;
-  }, [isOpen, state.deck.length, tideFilters, sortCriteria, sortAscending, cardTypeFilter]);
-
-  const handleClose = useCallback(() => {
-    const duration = Date.now() - openTimestampRef.current;
-    logEvent("deck_viewer_closed", { durationMs: duration });
-    onClose();
-  }, [onClose]);
-
-  useEffect(() => {
-    if (!isOpen) return undefined;
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        if (overlayCard !== null) {
-          return;
-        }
-        handleClose();
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, overlayCard, handleClose]);
+  const setCardSize = useCallback((size: CardSizePreset) => {
+    setCardSizeState(size);
+    persistCardSize(size);
+  }, []);
 
   const resolvedEntries = useMemo<ResolvedEntry[]>(() => {
     return state.deck
@@ -222,6 +297,29 @@ export function DeckViewer({
     return sorted;
   }, [filteredEntries, sortCriteria, sortAscending]);
 
+  const groupedEntries = useMemo<CardGroup[]>(() => {
+    const groups: CardGroup[] = [];
+    const seen = new Map<string, CardGroup>();
+    for (const resolved of sortedEntries) {
+      const key = `${String(resolved.entry.cardNumber)}-${resolved.entry.transfiguration ?? "none"}-${String(resolved.entry.isBane)}`;
+      const existing = seen.get(key);
+      if (existing) {
+        existing.entries.push(resolved);
+        existing.count += 1;
+      } else {
+        const group: CardGroup = {
+          card: resolved.card,
+          entries: [resolved],
+          count: 1,
+          sortKey: resolved,
+        };
+        groups.push(group);
+        seen.set(key, group);
+      }
+    }
+    return groups;
+  }, [sortedEntries]);
+
   const toggleTide = useCallback((tide: Tide) => {
     setTideFilters((prev) => ({ ...prev, [tide]: !prev[tide] }));
   }, []);
@@ -256,55 +354,47 @@ export function DeckViewer({
   }, [state.tideCrystals]);
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          key="deck-viewer-backdrop"
-          className="fixed inset-0 z-[60] flex flex-col"
-          style={{ backgroundColor: "rgba(5, 2, 10, 0.92)" }}
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 40 }}
-          transition={{ duration: 0.3 }}
-        >
-          {/* Header */}
-          <div
-            className="flex items-center justify-between px-4 py-3 md:px-6"
+    <>
+      {/* Header */}
+      <div
+        className="flex items-center justify-between px-4 py-3 md:px-6"
+        style={{
+          borderBottom: "1px solid rgba(124, 58, 237, 0.3)",
+          background:
+            "linear-gradient(180deg, rgba(10, 6, 18, 0.95) 0%, rgba(10, 6, 18, 0.8) 100%)",
+        }}
+      >
+        <div className="flex items-center gap-4">
+          <h2 className="text-lg font-bold md:text-xl" style={{ color: "#e2e8f0" }}>
+            Deck{" "}
+            <span className="text-sm font-normal opacity-60 md:text-base">
+              ({String(filteredEntries.length)}
+              {filteredEntries.length !== resolvedEntries.length
+                ? ` / ${String(resolvedEntries.length)}`
+                : ""}{" "}
+              cards)
+            </span>
+          </h2>
+          <span className="text-sm opacity-50" style={{ color: "#e2e8f0" }}>
+            Pool: {String(state.pool.length)} cards
+          </span>
+        </div>
+        {onClose !== undefined && (
+          <button
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-lg transition-colors"
             style={{
-              borderBottom: "1px solid rgba(124, 58, 237, 0.3)",
-              background:
-                "linear-gradient(180deg, rgba(10, 6, 18, 0.95) 0%, rgba(10, 6, 18, 0.8) 100%)",
+              background: "rgba(255, 255, 255, 0.1)",
+              color: "#e2e8f0",
             }}
+            onClick={onClose}
+            aria-label="Close deck viewer"
           >
-            <div className="flex items-center gap-4">
-              <h2 className="text-lg font-bold md:text-xl" style={{ color: "#e2e8f0" }}>
-                Deck{" "}
-                <span className="text-sm font-normal opacity-60 md:text-base">
-                  ({String(sortedEntries.length)}
-                  {sortedEntries.length !== resolvedEntries.length
-                    ? ` / ${String(resolvedEntries.length)}`
-                    : ""}{" "}
-                  cards)
-                </span>
-              </h2>
-              <span className="text-sm opacity-50" style={{ color: "#e2e8f0" }}>
-                Pool: {String(state.pool.length)} cards
-              </span>
-            </div>
-            <button
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-lg transition-colors"
-              style={{
-                background: "rgba(255, 255, 255, 0.1)",
-                color: "#e2e8f0",
-              }}
-              onClick={handleClose}
-              aria-label="Close deck viewer"
-            >
-              {"\u2715"}
-            </button>
-          </div>
+            {"\u2715"}
+          </button>
+        )}
+      </div>
 
-          {/* Tide distribution bar */}
+      {/* Tide distribution bar */}
           {tideDistribution.total > 0 && (
             <div
               className="px-4 py-2 md:px-6"
@@ -585,7 +675,7 @@ export function DeckViewer({
           <div className="flex min-h-0 flex-1">
             {/* Card grid */}
             <div className="flex-1 overflow-y-auto px-4 py-3 md:px-6">
-              {sortedEntries.length === 0 ? (
+              {groupedEntries.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                   <p className="text-sm opacity-40">
                     {resolvedEntries.length === 0
@@ -601,67 +691,85 @@ export function DeckViewer({
                     gap: SIZE_PRESETS[cardSize].gap,
                   }}
                 >
-                  {sortedEntries.map((resolved) => (
-                    <div
-                      key={resolved.entry.entryId}
-                      className="relative"
-                    >
-                      {/* Transfiguration indicator */}
-                      {resolved.entry.transfiguration !== null && (
-                        <div
-                          className="absolute -top-1 -right-1 z-10 rounded-full px-1.5 py-0.5 text-[9px] font-bold shadow-md"
-                          style={{
-                            background:
-                              TRANSFIGURATION_COLORS[
-                                resolved.entry.transfiguration
-                              ],
-                            color: "#fff",
-                            boxShadow: `0 0 6px ${TRANSFIGURATION_COLORS[resolved.entry.transfiguration]}80`,
-                          }}
-                        >
-                          {resolved.entry.transfiguration}
-                        </div>
-                      )}
-                      {/* Bane indicator */}
-                      {resolved.entry.isBane && (
-                        <div
-                          className="absolute -top-1 -left-1 z-10 flex h-5 w-5 items-center justify-center rounded-full text-[10px] shadow-md"
-                          style={{
-                            background: "#7f1d1d",
-                            border: "1px solid #ef4444",
-                            color: "#fca5a5",
-                          }}
-                          title="Bane"
-                        >
-                          {"\u2620"}
-                        </div>
-                      )}
+                  {groupedEntries.map((group) => {
+                    const representative = group.sortKey;
+                    return (
                       <div
-                        style={
-                          resolved.entry.transfiguration !== null
-                            ? {
-                                boxShadow: `0 0 8px ${TRANSFIGURATION_COLORS[resolved.entry.transfiguration]}40`,
-                                borderRadius: "0.5rem",
-                              }
-                            : resolved.entry.isBane
+                        key={representative.entry.entryId}
+                        className="relative"
+                      >
+                        {/* Copy count badge */}
+                        {group.count > 1 && (
+                          <div
+                            className="absolute -top-1.5 -right-1.5 z-20 flex items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold shadow-lg"
+                            style={{
+                              background: "rgba(124, 58, 237, 0.9)",
+                              color: "#fff",
+                              border: "1.5px solid rgba(168, 85, 247, 0.6)",
+                              minWidth: "22px",
+                              textAlign: "center",
+                            }}
+                          >
+                            {String(group.count)}x
+                          </div>
+                        )}
+                        {/* Transfiguration indicator */}
+                        {representative.entry.transfiguration !== null && (
+                          <div
+                            className={`absolute ${group.count > 1 ? "top-4 -right-1" : "-top-1 -right-1"} z-10 rounded-full px-1.5 py-0.5 text-[9px] font-bold shadow-md`}
+                            style={{
+                              background:
+                                TRANSFIGURATION_COLORS[
+                                  representative.entry.transfiguration
+                                ],
+                              color: "#fff",
+                              boxShadow: `0 0 6px ${TRANSFIGURATION_COLORS[representative.entry.transfiguration]}80`,
+                            }}
+                          >
+                            {representative.entry.transfiguration}
+                          </div>
+                        )}
+                        {/* Bane indicator */}
+                        {representative.entry.isBane && (
+                          <div
+                            className="absolute -top-1 -left-1 z-10 flex h-5 w-5 items-center justify-center rounded-full text-[10px] shadow-md"
+                            style={{
+                              background: "#7f1d1d",
+                              border: "1px solid #ef4444",
+                              color: "#fca5a5",
+                            }}
+                            title="Bane"
+                          >
+                            {"\u2620"}
+                          </div>
+                        )}
+                        <div
+                          style={
+                            representative.entry.transfiguration !== null
                               ? {
-                                  boxShadow:
-                                    "0 0 8px rgba(239, 68, 68, 0.3)",
+                                  boxShadow: `0 0 8px ${TRANSFIGURATION_COLORS[representative.entry.transfiguration]}40`,
                                   borderRadius: "0.5rem",
                                 }
-                              : undefined
-                        }
-                      >
-                        <CardDisplay
-                          card={resolved.card}
-                          compact={cardSize === "small"}
-                          onClick={() => {
-                            handleCardClick(resolved.card);
-                          }}
-                        />
+                              : representative.entry.isBane
+                                ? {
+                                    boxShadow:
+                                      "0 0 8px rgba(239, 68, 68, 0.3)",
+                                    borderRadius: "0.5rem",
+                                  }
+                                : undefined
+                          }
+                        >
+                          <CardDisplay
+                            card={group.card}
+                            compact={cardSize === "small"}
+                            onClick={() => {
+                              handleCardClick(group.card);
+                            }}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -879,11 +987,9 @@ export function DeckViewer({
             tideCrystals={nonZeroCrystals}
           />
 
-          {/* Card overlay */}
-          <CardOverlay card={overlayCard} onClose={handleCloseOverlay} />
-        </motion.div>
-      )}
-    </AnimatePresence>
+      {/* Card overlay */}
+      <CardOverlay card={overlayCard} onClose={handleCloseOverlay} />
+    </>
   );
 }
 

@@ -119,7 +119,7 @@ export function getQuestConfig(): QuestConfig {
     starterMidCost: parseIntParam(params, "starterMidCost", 4, 0, 20),
     starterHighCost: parseIntParam(params, "starterHighCost", 2, 0, 20),
     startingEssence: parseIntParam(params, "startingEssence", 250, 0, 9999),
-    lootPackSize: parseIntParam(params, "lootPackSize", 4, 1, 20),
+    lootPackSize: parseIntParam(params, "lootPackSize", 5, 1, 20),
     dupePenalty2: parseIntParam(params, "dupePenalty2", 50, 0, 100),
     dupePenalty3: parseIntParam(params, "dupePenalty3", 90, 0, 100),
     packOnTheme: parseIntParam(params, "packOnTheme", 60, 0, 100),

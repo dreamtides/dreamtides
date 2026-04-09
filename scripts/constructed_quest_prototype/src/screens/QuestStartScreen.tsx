@@ -24,6 +24,10 @@ function generateStartingTideOptions(): NamedTide[] {
   return shuffled(NAMED_TIDES).slice(0, 3) as NamedTide[];
 }
 
+/** Card numbers for starter cards with special copy counts. */
+const STARTER_3_COPIES = [711, 713]; // Nocturne Strummer, Marked Direwolf
+const STARTER_1_COPY = [717, 719]; // Flashpoint Detonation, Sign of Arrival
+
 /** Builds the 30-card starting deck for a chosen tide. */
 function buildStartingDeck(
   cardDatabase: Map<number, CardData>,
@@ -31,26 +35,37 @@ function buildStartingDeck(
 ): { starterCards: CardData[]; tideCards: CardData[]; neutralCards: CardData[] } {
   const allCards = Array.from(cardDatabase.values());
 
-  // 10 Starter cards (fixed loadout)
-  const starterCards = allCards.filter((c) => c.rarity === "Starter");
+  // 20 Starter cards with specific copy counts:
+  // 3x Nocturne Strummer, 3x Marked Direwolf
+  // 1x Flashpoint Detonation, 1x Sign of Arrival
+  // 2x each of the other 6 starters
+  const starterCards: CardData[] = [];
+  for (const card of allCards.filter((c) => c.rarity === "Starter")) {
+    let copies = 2;
+    if (STARTER_3_COPIES.includes(card.cardNumber)) copies = 3;
+    if (STARTER_1_COPY.includes(card.cardNumber)) copies = 1;
+    for (let i = 0; i < copies; i++) {
+      starterCards.push(card);
+    }
+  }
 
-  // 10 random cards from starting tide (excluding Starter, Legendary)
+  // 5 random cards from starting tide (excluding Starter, Legendary)
   const tideCandidates = allCards.filter(
     (c) =>
       c.tide === startingTide &&
       c.rarity !== "Starter" &&
       c.rarity !== "Legendary",
   );
-  const tideCards = weightedSample(tideCandidates, 10, () => 1);
+  const tideCards = weightedSample(tideCandidates, 5, () => 1);
 
-  // 10 random Neutral cards (excluding Starter, Legendary)
+  // 5 random Neutral cards (excluding Starter, Legendary)
   const neutralCandidates = allCards.filter(
     (c) =>
       c.tide === "Neutral" &&
       c.rarity !== "Starter" &&
       c.rarity !== "Legendary",
   );
-  const neutralCards = weightedSample(neutralCandidates, 10, () => 1);
+  const neutralCards = weightedSample(neutralCandidates, 5, () => 1);
 
   return { starterCards, tideCards, neutralCards };
 }
@@ -215,7 +230,7 @@ export function QuestStartScreen() {
                 className="text-center text-xs leading-relaxed opacity-60"
                 style={{ color: "#e2e8f0" }}
               >
-                10 {tide} cards, 10 Starter cards, 10 Neutral cards, +1{" "}
+                5 {tide} cards, 20 Starter cards, 5 Neutral cards, +1{" "}
                 {tide} crystal
               </span>
               <span
