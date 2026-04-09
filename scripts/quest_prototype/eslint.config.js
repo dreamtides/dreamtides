@@ -27,6 +27,6 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ["node_modules/", "dist/", "eslint.config.js", "vite.config.ts", "src/qa/"],
+    ignores: ["node_modules/", "dist/", "eslint.config.js", "vite.config.ts"],
   }
 );
