@@ -602,42 +602,6 @@ export function DeckViewer({
                 background: "rgba(10, 6, 18, 0.4)",
               }}
             >
-              {state.startingTide !== null && (
-                <div className="mb-4">
-                  <h3
-                    className="mb-2 text-xs font-bold uppercase tracking-wider"
-                    style={{ color: "#a855f7" }}
-                  >
-                    Quest Origin
-                  </h3>
-                  <div
-                    className="flex items-center gap-2 rounded-lg p-3"
-                    style={{
-                      background: `${TIDE_COLORS[state.startingTide]}10`,
-                      border: `1px solid ${TIDE_COLORS[state.startingTide]}35`,
-                    }}
-                  >
-                    <img
-                      src={tideIconUrl(state.startingTide)}
-                      alt={state.startingTide}
-                      className="h-6 w-6 rounded-full"
-                      style={{ border: `1px solid ${TIDE_COLORS[state.startingTide]}` }}
-                    />
-                    <div className="flex min-w-0 flex-col">
-                      <span
-                        className="text-sm font-bold"
-                        style={{ color: TIDE_COLORS[state.startingTide] }}
-                      >
-                        {state.startingTide}
-                      </span>
-                      <span className="text-[10px] opacity-50">
-                        Starting tide and first crystal
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* Dreamcaller section */}
               <div className="mb-4">
                 <h3

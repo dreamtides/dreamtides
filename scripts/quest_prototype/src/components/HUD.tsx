@@ -66,9 +66,6 @@ export function HUD({ onOpenDeckViewer, onOpenDebugScreen, hasDraftData }: HudPr
   const dreamcallerTide = state.dreamcaller?.tides[0] ?? null;
   const dreamcallerColor =
     dreamcallerTide !== null ? TIDE_COLORS[dreamcallerTide] : "#6b7280";
-  const startingTide = state.startingTide;
-  const startingTideColor =
-    startingTide !== null ? TIDE_COLORS[startingTide] : "#6b7280";
 
   return (
     <div
@@ -110,21 +107,6 @@ export function HUD({ onOpenDeckViewer, onOpenDebugScreen, hasDraftData }: HudPr
           </span>
           <span className="hidden text-xs opacity-50 lg:inline">Cards</span>
         </div>
-
-        {startingTide !== null && (
-          <div className="flex items-center gap-1.5" title={`Starting Tide: ${startingTide}`}>
-            <span
-              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-              style={{
-                background: `${startingTideColor}20`,
-                border: `1px solid ${startingTideColor}60`,
-                color: startingTideColor,
-              }}
-            >
-              {startingTide}
-            </span>
-          </div>
-        )}
 
         {/* Dreamcaller portrait */}
         <div className="flex items-center gap-1.5">
