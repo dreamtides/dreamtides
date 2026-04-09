@@ -6,9 +6,12 @@ use std::sync::{LazyLock, Mutex};
 use std::time::Instant;
 
 use action_data::game_action_data::GameAction;
+use ai_agents::agent_search;
 use ai_data::game_ai::GameAI;
 use backtrace::Backtrace;
+use battle_mutations::actions::apply_battle_action;
 use battle_queries::battle_trace;
+use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::macros::write_tracing_event;
 use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
@@ -41,10 +44,11 @@ static TEST_STATE_PROVIDERS: LazyLock<Mutex<HashMap<Uuid, TestStateProvider>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 static DEFAULT_AI_OPPONENT: LazyLock<PlayerType> =
-    LazyLock::new(|| PlayerType::Agent(GameAI::MonteCarlo(5)));
+    LazyLock::new(|| PlayerType::Agent(GameAI::MonteCarlo(100)));
 
 thread_local! {
-    static PANIC_INFO: RefCell<Option<(String, String, Backtrace)>> = const { RefCell::new(None) };
+    static PANIC_INFO : RefCell < Option < (String, String, Backtrace) >> = const {
+    RefCell::new(None) };
 }
 
 #[derive(Debug, Clone)]
@@ -73,9 +77,7 @@ pub fn connect_with_provider(
 ) -> ConnectResponse {
     let metadata = request.metadata;
     let user_id = metadata.user_id;
-
     provider.store_request_context(user_id, request_context.clone());
-
     let result = catch_panic_conditionally(&provider, || {
         connect_internal(&provider, request, request_context)
     });
@@ -83,10 +85,8 @@ pub fn connect_with_provider(
         Ok(commands) => commands,
         Err(error) => error_message::display_error_message(error),
     };
-
     let response_version = Uuid::new_v4();
     provider.store_last_response_version(user_id, response_version);
-
     ConnectResponse { metadata, commands, response_version }
 }
 
@@ -115,11 +115,9 @@ pub fn poll_with_provider(
     if let Some(poll_result) = handle_battle_action::poll(&provider, user_id) {
         let request_id = poll_result.request_id;
         let elapsed_msg = provider.get_elapsed_time_message(request_id);
-
         if request_id.is_some() && elapsed_msg.contains("unknown request ID") {
             error!(?request_id, "Unrecognized request ID in poll response");
         }
-
         let response_version = if matches!(poll_result.response_type, PollResponseType::Final) {
             let version = Uuid::new_v4();
             provider.store_last_response_version(user_id, version);
@@ -127,7 +125,6 @@ pub fn poll_with_provider(
         } else {
             None
         };
-
         debug!(?elapsed_msg, ?request_id, ?response_version, "Returning poll response");
         return Some(PollResponse {
             metadata: Metadata { user_id, request_id, ..metadata },
@@ -146,7 +143,6 @@ pub fn poll_with_provider(
 pub fn perform_action(request: PerformActionRequest) {
     let request_id = request.metadata.request_id;
     let user_id = request.metadata.user_id;
-
     if let Some(initialization_error) = DefaultStateProvider.stored_initialization_error() {
         let provider = DefaultStateProvider;
         provider.store_request_timestamp(request_id, Instant::now());
@@ -162,7 +158,6 @@ pub fn perform_action(request: PerformActionRequest) {
         });
         return;
     }
-
     if let Some(integration_test_id) = request.metadata.integration_test_id {
         debug!(?integration_test_id, "Performing action for integration test");
         let provider = get_test_state_provider(integration_test_id);
@@ -200,22 +195,18 @@ pub fn perform_action_blocking(
         };
     }
     let user_id = request.metadata.user_id;
-
     let processing_started = perform_action_internal(&provider, &request);
     if processing_started {
         provider.finish_processing(user_id);
     }
-
     let mut user_results = Vec::new();
     let mut enemy_results = Vec::new();
-
     while let Some(poll_result) = handle_battle_action::poll(&provider, user_id) {
         user_results.push(poll_result.clone());
         if matches!(poll_result.response_type, PollResponseType::Final) {
             break;
         }
     }
-
     if let Some(enemy_user_id) = enemy_id {
         while let Some(poll_result) = handle_battle_action::poll(&provider, enemy_user_id) {
             enemy_results.push(poll_result.clone());
@@ -224,7 +215,6 @@ pub fn perform_action_blocking(
             }
         }
     }
-
     PerformActionBlockingResult {
         user_poll_results: user_results,
         enemy_poll_results: enemy_results,
@@ -240,23 +230,18 @@ fn connect_internal<P: StateProvider + 'static>(
     let persistent_data_path = &request.persistent_data_path;
     let streaming_assets_path = &request.streaming_assets_path;
     write_tracing_event::clear_log_file();
-
     if let Some(ref display_props) = request.display_properties {
         display_properties::store_display_properties(user_id, display_props.clone());
     }
-
     debug!(">>> Initializing provider with persistent data path: {:?}", persistent_data_path);
     if let Err(errors) = provider.initialize(persistent_data_path, streaming_assets_path) {
         return error_message::display_error_message(format_initialization_errors(&errors));
     }
-
-    // Check if this is a multiplayer connection request
     if let Some(vs_opponent) = request.vs_opponent {
         return connect_for_multiplayer(provider, user_id, vs_opponent);
     } else {
         info!(?user_id, "Loading battle from database");
     }
-
     match load_battle_from_provider(
         provider,
         user_id,
@@ -270,7 +255,8 @@ fn connect_internal<P: StateProvider + 'static>(
                 handle_user_not_in_battle(provider, user_id, battle, quest_id, None)
             }
         }
-        Ok(LoadBattleResult::NewBattle(battle)) => {
+        Ok(LoadBattleResult::NewBattle(mut battle)) => {
+            run_initial_ai_turns(provider, &mut battle, user_id);
             renderer::connect(&battle, user_id, (*provider).clone(), false)
         }
         Err(error) => error_message::display_error_message(error),
@@ -287,30 +273,18 @@ fn connect_for_multiplayer<P: StateProvider + 'static>(
     vs_opponent: UserId,
 ) -> CommandSequence {
     info!(?user_id, ?vs_opponent, "Loading multiplayer battle from opponent's database");
-
     match provider.read_save_file(vs_opponent) {
-        Ok(Some(save_file)) => {
-            match deserialize_save_file::battle(provider, &save_file) {
-                Some((battle, quest_id)) => {
-                    // Check if the connecting user is already in the battle
-                    if is_user_in_battle(&battle, user_id) {
-                        return renderer::connect(&battle, user_id, (*provider).clone(), false);
-                    }
-
-                    // If not in the battle, try to join by replacing an AI player
-                    handle_user_not_in_battle(
-                        provider,
-                        user_id,
-                        battle,
-                        quest_id,
-                        Some(vs_opponent),
-                    )
+        Ok(Some(save_file)) => match deserialize_save_file::battle(provider, &save_file) {
+            Some((battle, quest_id)) => {
+                if is_user_in_battle(&battle, user_id) {
+                    return renderer::connect(&battle, user_id, (*provider).clone(), false);
                 }
-                None => error_message::display_error_message(
-                    "No battle found in opponent's save file".to_string(),
-                ),
+                handle_user_not_in_battle(provider, user_id, battle, quest_id, Some(vs_opponent))
             }
-        }
+            None => error_message::display_error_message(
+                "No battle found in opponent's save file".to_string(),
+            ),
+        },
         Ok(None) => error_message::display_error_message(format!(
             "No save file found for opponent ID: {vs_opponent:?}"
         )),
@@ -336,17 +310,19 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
             None => Err("No battle in save file".to_string()),
         },
         Ok(None) => {
-            // No save file exists, create a new battle
             info!(?user_id, "No save file found, creating new battle");
             let battle_id = BattleId(Uuid::new_v4());
-
             let configuration = debug_configuration.cloned().unwrap_or_default();
             let seed = configuration.seed.unwrap_or_else(|| rand::rng().next_u64());
             let enemy =
                 configuration.enemy.as_ref().cloned().unwrap_or(DEFAULT_AI_OPPONENT.clone());
-
             let deck_name =
                 configuration.deck_override.unwrap_or_else(|| provider.default_deck_name());
+            let first_player = if configuration.user_goes_second.unwrap_or(false) {
+                PlayerName::Two
+            } else {
+                PlayerName::One
+            };
             let new_battle = new_battle::create_and_start(
                 battle_id,
                 provider.tabula(),
@@ -360,10 +336,11 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
                 CreateBattlePlayer { player_type: PlayerType::User(user_id), deck_name },
                 CreateBattlePlayer { player_type: enemy, deck_name },
                 request_context,
+                first_player,
+                configuration.front_row_size,
+                configuration.back_row_size,
             );
-
             provider.clear_undo_stack(new_battle.id);
-            // Save new battle to database
             let quest_id = QuestId(Uuid::new_v4());
             let save_file = serialize_save_file::battle(user_id, quest_id, &new_battle);
             match provider.write_save_file(save_file) {
@@ -375,10 +352,47 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
     }
 }
 
+/// If the active player in a newly-created battle is an AI agent, runs the
+/// AI's turns inline so the connect response shows the state after the AI
+/// has acted.
+fn run_initial_ai_turns<P: StateProvider + 'static>(
+    provider: &P,
+    battle: &mut BattleState,
+    user_id: UserId,
+) {
+    loop {
+        let Some(next_player) = legal_actions::next_to_act(battle) else {
+            return;
+        };
+
+        let player_legal_actions = legal_actions::compute(battle, next_player);
+        if let Some(auto_action) =
+            handle_battle_action::should_auto_execute_action(&player_legal_actions)
+        {
+            apply_battle_action::execute(battle, next_player, auto_action);
+            continue;
+        }
+
+        if let PlayerType::Agent(agent) = battle.players.player(next_player).player_type.clone() {
+            let action = agent_search::select_action(battle, next_player, &agent);
+            apply_battle_action::execute(battle, next_player, action);
+        } else {
+            let quest_id = QuestId(Uuid::new_v4());
+            let save_file = serialize_save_file::battle(user_id, quest_id, battle);
+            let _ = provider.write_save_file(save_file);
+            return;
+        }
+    }
+}
+
 fn is_user_in_battle(battle: &BattleState, user_id: UserId) -> bool {
     match &battle.players.one.player_type {
         PlayerType::User(id) if *id == user_id => true,
-        _ => matches!(&battle.players.two.player_type, PlayerType::User(id) if *id == user_id),
+        _ => {
+            matches!(
+                & battle.players.two.player_type, PlayerType::User(id) if * id == user_id
+            )
+        }
     }
 }
 
@@ -390,25 +404,21 @@ fn handle_user_not_in_battle<P: StateProvider + 'static>(
     vs_opponent: Option<UserId>,
 ) -> CommandSequence {
     battle_trace!("User is not a player in this battle, attempting to join", &mut battle, user_id);
-
     let both_human_players =
         match (&battle.players.one.player_type, &battle.players.two.player_type) {
             (PlayerType::User(id1), PlayerType::User(id2)) => *id1 != user_id && *id2 != user_id,
             _ => false,
         };
-
     if both_human_players {
         warn!(?user_id, "Both players are human users, replacing player two with user");
         battle.players.two.player_type = PlayerType::User(user_id);
     } else if !matches!(battle.players.one.player_type, PlayerType::User(_)) {
-        // Replace the first non-human player with this user
         info!(?user_id, "Replacing player one with user");
         battle.players.one.player_type = PlayerType::User(user_id);
     } else if !matches!(battle.players.two.player_type, PlayerType::User(_)) {
         info!(?user_id, "Replacing player two with user");
         battle.players.two.player_type = PlayerType::User(user_id);
     }
-
     let save_user_id = vs_opponent.unwrap_or(user_id);
     match save_battle_to_provider(provider, save_user_id, quest_id, &battle) {
         Ok(_) => renderer::connect(&battle, user_id, (*provider).clone(), false),
@@ -434,8 +444,6 @@ fn perform_action_internal<P: StateProvider + 'static>(
     let metadata = request.metadata;
     let user_id = metadata.user_id;
     let request_id = metadata.request_id;
-
-    // Check if we should process this action
     if let Some(last_response_version) = request.last_response_version {
         let stored_version = provider.get_last_response_version(user_id);
         if stored_version != Some(last_response_version) {
@@ -448,17 +456,14 @@ fn perform_action_internal<P: StateProvider + 'static>(
             return false;
         }
     }
-
-    // Try to start processing - if we're already processing, ignore the action
     if !provider.start_processing(user_id) {
         warn!(?user_id, "Ignoring action: already processing another action for this user");
         return false;
     }
-
-    let span =
-        tracing::span!(Level::DEBUG, "perform_action", ?request_id, ?request.last_response_version);
+    let span = tracing::span!(
+        Level::DEBUG, "perform_action", ? request_id, ? request.last_response_version
+    );
     let _enter = span.enter();
-
     let result = catch_panic_conditionally(provider, || {
         let save_file_id = request.save_file_id.unwrap_or(user_id);
         let save = match provider.read_save_file(save_file_id) {
@@ -477,7 +482,6 @@ fn perform_action_internal<P: StateProvider + 'static>(
                 return;
             }
         };
-
         let Some((mut battle, quest_id)) = deserialize_save_file::battle(provider, &save) else {
             show_error_message(
                 provider,
@@ -486,10 +490,8 @@ fn perform_action_internal<P: StateProvider + 'static>(
             );
             return;
         };
-
         battle.animations = Some(AnimationData::default());
         handle_request_action(provider, request, user_id, &mut battle, request_id);
-
         if let Err(errors) =
             provider.write_save_file(serialize_save_file::battle(save_file_id, quest_id, &battle))
         {
@@ -500,11 +502,9 @@ fn perform_action_internal<P: StateProvider + 'static>(
             );
         }
     });
-
     if let Err(error) = result {
         show_error_message(provider, user_id, error);
     }
-
     true
 }
 
@@ -531,7 +531,6 @@ fn send_updates_to_user_and_opponent<P: StateProvider + 'static>(
         request_id,
         PollResponseType::Final,
     );
-
     if let PlayerType::User(opponent_id) = &battle.players.player(player.opponent()).player_type {
         handle_battle_action::append_update(
             provider,
@@ -556,13 +555,11 @@ fn handle_request_action<P: StateProvider + 'static>(
         .get_request_context(user_id)
         .unwrap_or(RequestContext { logging_options: Default::default() });
     apply_battle_display_action::on_action_performed(provider.clone(), &request.action, user_id);
-
     match &request.action {
         GameAction::NoOp => {}
         GameAction::DebugAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);
             debug_actions::execute(provider, battle, user_id, player, action.clone());
-
             send_updates_to_user_and_opponent(
                 provider,
                 battle,
@@ -642,11 +639,9 @@ fn show_error_message<P: StateProvider + 'static>(
     error_message: String,
 ) {
     error!("Error in engine: {error_message}");
-
     if provider.should_panic_on_error() {
         panic!("Error in test: {error_message}");
     }
-
     let request_context = provider
         .get_request_context(user_id)
         .unwrap_or(RequestContext { logging_options: Default::default() });
@@ -664,36 +659,26 @@ fn catch_panic<F, T>(function: F) -> Result<T, String>
 where
     F: FnOnce() -> T + panic::UnwindSafe,
 {
-    // Clear any previous panic info
     PANIC_INFO.with(|info| {
         *info.borrow_mut() = None;
     });
-
-    // Set panic hook to capture backtrace
     let prev_hook = panic::take_hook();
     panic::set_hook(Box::new(|panic_info| {
         let location_str = match panic_info.location() {
             Some(location) => format!("{}:{}", location.file(), location.line()),
             None => "unknown location".to_string(),
         };
-
         let panic_msg = format!("{panic_info}");
         let backtrace = Backtrace::new();
-
         PANIC_INFO.with(|info| {
             *info.borrow_mut() = Some((location_str, panic_msg, backtrace));
         });
     }));
-
     let result = panic::catch_unwind(function);
-
-    // Restore the original panic hook
     panic::set_hook(prev_hook);
-
     match result {
         Ok(value) => Ok(value),
         Err(panic_error) => {
-            // Extract a more meaningful error message from the panic payload
             let panic_msg = match panic_error.downcast_ref::<&'static str>() {
                 Some(s) => s.to_string(),
                 None => match panic_error.downcast_ref::<String>() {
@@ -701,25 +686,21 @@ where
                     None => "Unknown panic".to_string(),
                 },
             };
-
-            let mut error_message = PANIC_INFO.with(|info| {
-                if let Some((location, info, backtrace)) = &*info.borrow() {
-                    let backtrace_str = format!("{backtrace:?}");
-                    let filtered_backtrace = filter_backtrace(&backtrace_str);
-
-                    format!(
-                        "Error: {panic_msg} at {location}\n\nError details for developers:\n{info}\n{filtered_backtrace}"
-                    )
-                } else {
-                    format!("Error: {panic_msg}\n\nNo backtrace available")
-                }
-            });
-
-            // Limit the length of the error message to avoid overwhelming the UI
+            let mut error_message = PANIC_INFO
+                .with(|info| {
+                    if let Some((location, info, backtrace)) = &*info.borrow() {
+                        let backtrace_str = format!("{backtrace:?}");
+                        let filtered_backtrace = filter_backtrace(&backtrace_str);
+                        format!(
+                            "Error: {panic_msg} at {location}\n\nError details for developers:\n{info}\n{filtered_backtrace}"
+                        )
+                    } else {
+                        format!("Error: {panic_msg}\n\nNo backtrace available")
+                    }
+                });
             if error_message.len() > 3000 {
                 error_message = format!("{}...(truncated)", &error_message[..3000]);
             }
-
             error!("Captured panic: {}", error_message);
             Err(error_message)
         }
@@ -749,12 +730,10 @@ fn filter_backtrace(backtrace: &str) -> String {
         "rust_begin_unwind",
         "begin_panic_handler",
     ];
-
     for line in backtrace.lines() {
         if !skip.iter().any(|s| line.contains(s)) {
             writeln!(result, "{line}").ok();
         }
     }
-
     result
 }
