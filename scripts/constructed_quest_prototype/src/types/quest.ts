@@ -140,4 +140,5 @@ export interface QuestState {
   anteState: AnteState | null;
   screen: Screen;
   activeSiteId: string | null;
+  essenceWarningShown: boolean;
 }

@@ -31,6 +31,7 @@ function createTestState(overrides: Partial<QuestState> = {}): QuestState {
     anteState: null,
     screen: { type: "dreamscape" },
     activeSiteId: null,
+    essenceWarningShown: false,
     ...overrides,
   };
 }

@@ -96,7 +96,10 @@ interface PreBattleProps {
   isMiniboss: boolean;
   isFinalBoss: boolean;
   cardDatabase: Map<number, CardData>;
+  essence: number;
+  essenceWarningShown: boolean;
   onStartBattle: () => void;
+  onDismissEssenceWarning: () => void;
 }
 
 /** Pre-battle phase: shows enemy info and Start Battle button. */
@@ -106,9 +109,31 @@ function PreBattlePhase({
   isMiniboss,
   isFinalBoss,
   cardDatabase,
+  essence,
+  essenceWarningShown,
   onStartBattle,
+  onDismissEssenceWarning,
 }: PreBattleProps) {
   const [showDeckEditor, setShowDeckEditor] = useState(false);
+  const [showEssenceWarning, setShowEssenceWarning] = useState(false);
+
+  const handleStartClick = useCallback(() => {
+    if (!essenceWarningShown && essence >= 30) {
+      setShowEssenceWarning(true);
+    } else {
+      onStartBattle();
+    }
+  }, [essenceWarningShown, essence, onStartBattle]);
+
+  const handleConfirmBattle = useCallback(() => {
+    setShowEssenceWarning(false);
+    onDismissEssenceWarning();
+    onStartBattle();
+  }, [onDismissEssenceWarning, onStartBattle]);
+
+  const handleCancelBattle = useCallback(() => {
+    setShowEssenceWarning(false);
+  }, []);
 
   const previewCards = useMemo(() => {
     const allCards = Array.from(cardDatabase.values());
@@ -245,7 +270,7 @@ function PreBattlePhase({
               scale: 1.05,
             }}
             whileTap={{ scale: 0.97 }}
-            onClick={onStartBattle}
+            onClick={handleStartClick}
           >
             Start Battle
           </motion.button>
@@ -258,6 +283,66 @@ function PreBattlePhase({
           onClose={() => setShowDeckEditor(false)}
           cardDatabase={cardDatabase}
         />
+      )}
+
+      {showEssenceWarning && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: "rgba(0, 0, 0, 0.7)" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <motion.div
+            className="flex max-w-md flex-col items-center rounded-xl px-8 py-6"
+            style={{
+              background: "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
+              border: "2px solid rgba(251, 191, 36, 0.4)",
+              boxShadow: "0 0 30px rgba(251, 191, 36, 0.2)",
+            }}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+          >
+            <h3
+              className="mb-3 text-xl font-bold"
+              style={{ color: "#fbbf24" }}
+            >
+              Unspent Essence
+            </h3>
+            <p
+              className="mb-6 text-center text-sm leading-relaxed opacity-80"
+              style={{ color: "#e2e8f0" }}
+            >
+              You have {String(essence)} essence remaining. Unspent essence is
+              lost after this battle. Continue?
+            </p>
+            <div className="flex gap-4">
+              <motion.button
+                className="cursor-pointer rounded-lg px-5 py-2 font-medium text-white"
+                style={{
+                  background: "rgba(100, 100, 100, 0.3)",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={handleCancelBattle}
+              >
+                Go Back
+              </motion.button>
+              <motion.button
+                className="cursor-pointer rounded-lg px-5 py-2 font-bold text-white"
+                style={{
+                  background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
+                  border: "1px solid rgba(168, 85, 247, 0.5)",
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={handleConfirmBattle}
+              >
+                Start Battle
+              </motion.button>
+            </div>
+          </motion.div>
+        </motion.div>
       )}
     </motion.div>
   );
@@ -1063,7 +1148,10 @@ export function BattleScreen({
             isMiniboss={isMiniboss}
             isFinalBoss={isFinalBoss}
             cardDatabase={cardDatabase}
+            essence={state.essence}
+            essenceWarningShown={state.essenceWarningShown}
             onStartBattle={handleStartBattle}
+            onDismissEssenceWarning={mutations.dismissEssenceWarning}
           />
         </motion.div>
       )}

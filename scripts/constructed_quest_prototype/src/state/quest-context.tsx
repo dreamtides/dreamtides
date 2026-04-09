@@ -58,6 +58,7 @@ export interface QuestMutations {
   addProvisionedSite: (dreamscapeId: string, site: SiteState) => void;
   initializeDeckFromPool: () => void;
   resetQuest: () => void;
+  dismissEssenceWarning: () => void;
   initializeQuest: (cardDatabase: Map<number, CardData>, config: QuestConfig) => void;
 }
 
@@ -103,6 +104,7 @@ function createDefaultState(): QuestState {
     activeSiteId: null,
     startingTide: null,
     anteState: null,
+    essenceWarningShown: false,
   };
 }
 
@@ -467,6 +469,10 @@ export function QuestProvider({
     [],
   );
 
+  const dismissEssenceWarning = useCallback(() => {
+    setState((prev) => ({ ...prev, essenceWarningShown: true }));
+  }, []);
+
   const initializeDeckFromPool = useCallback(() => {
     setState((prev) => {
       logEvent("deck_initialized_from_pool", { count: prev.pool.length });
@@ -609,6 +615,7 @@ export function QuestProvider({
       setStartingTide,
       setAnteState,
       addProvisionedSite,
+      dismissEssenceWarning,
       initializeDeckFromPool,
       resetQuest,
       initializeQuest,
@@ -636,6 +643,7 @@ export function QuestProvider({
       setStartingTide,
       setAnteState,
       addProvisionedSite,
+      dismissEssenceWarning,
       initializeDeckFromPool,
       resetQuest,
       initializeQuest,
