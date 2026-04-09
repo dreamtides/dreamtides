@@ -1,4 +1,6 @@
-import type { CardData, NamedTide } from "../types/cards";
+import type { CardData, Tide } from "../types/cards";
+
+type NamedTide = Exclude<Tide, "Neutral">;
 
 export interface PoolOptions {
   excludedTides?: readonly NamedTide[];
