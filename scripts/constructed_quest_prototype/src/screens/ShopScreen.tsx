@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
+import type { NamedTide } from "../types/cards";
 import type { SiteState } from "../types/quest";
 import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
@@ -16,7 +17,7 @@ import {
   type TideCrystalSlot,
 } from "../shop/shop-generator";
 import { startingTideSeedTides } from "../data/tide-weights";
-import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { adjacentTides, TIDE_COLORS, tideIconUrl } from "../data/card-database";
 
 /** Props for the ShopScreen component. */
 interface ShopScreenProps {
@@ -45,8 +46,16 @@ export function ShopScreen({ site }: ShopScreenProps) {
     [state.tideCrystals],
   );
 
+  const seedTides = useMemo(() => {
+    const dreamscapeTide = site.data?.dreamscapeTide as NamedTide | undefined;
+    if (dreamscapeTide) {
+      return [dreamscapeTide, ...adjacentTides(dreamscapeTide)];
+    }
+    return startingTideSeedTides(state.startingTide);
+  }, [site.data, state.startingTide]);
+
   const [slots, setSlots] = useState<ShopSlot[]>(() =>
-    generateCardShopInventory(cardDatabase, state.pool, startingTideSeedTides(state.startingTide), config, playableTides),
+    generateCardShopInventory(cardDatabase, state.pool, seedTides, config, playableTides),
   );
   const [crystalSlots, setCrystalSlots] = useState<TideCrystalSlot[]>(() =>
     generateTideCrystalSlots(state.tideCrystals, state.startingTide),
@@ -98,9 +107,9 @@ export function ShopScreen({ site }: ShopScreenProps) {
 
     setRerollCount((prev) => prev + 1);
     setSlots(
-      generateCardShopInventory(cardDatabase, state.pool, startingTideSeedTides(state.startingTide), config, playableTides),
+      generateCardShopInventory(cardDatabase, state.pool, seedTides, config, playableTides),
     );
-  }, [currentRerollCost, essence, rerollCount, cardDatabase, state.pool, state.startingTide, config, mutations, playableTides]);
+  }, [currentRerollCost, essence, rerollCount, cardDatabase, state.pool, seedTides, config, mutations, playableTides]);
 
   const handleBuyCrystal = useCallback(
     (index: number) => {

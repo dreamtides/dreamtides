@@ -1,9 +1,10 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import type { SiteState, PackShopSlot } from "../types/quest";
+import type { NamedTide } from "../types/cards";
 import { useQuest } from "../state/quest-context";
 import { useQuestConfig } from "../state/quest-config";
-import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { adjacentTides, TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { CardDisplay } from "../components/CardDisplay";
 import { generatePackShopInventory } from "../shop/pack-shop-generator";
 import { logEvent } from "../logging";
@@ -38,11 +39,19 @@ export function PackShopScreen({ site }: PackShopScreenProps) {
   const config = useQuestConfig();
   const { essence } = state;
 
+  const seedTides = useMemo(() => {
+    const dreamscapeTide = site.data?.dreamscapeTide as NamedTide | undefined;
+    if (dreamscapeTide) {
+      return [dreamscapeTide, ...adjacentTides(dreamscapeTide)];
+    }
+    return startingTideSeedTides(state.startingTide);
+  }, [site.data, state.startingTide]);
+
   const [packs, setPacks] = useState<PackShopSlot[]>(() =>
     generatePackShopInventory(
       cardDatabase,
       state.pool,
-      startingTideSeedTides(state.startingTide),
+      seedTides,
       config,
     ),
   );
