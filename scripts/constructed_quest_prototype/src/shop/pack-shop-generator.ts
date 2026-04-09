@@ -147,7 +147,7 @@ export function generatePackShopInventory(
             packType: "alliance",
             tide,
             alliance: allianceLabel,
-            price: 125,
+            price: 100,
             cards: generateAlliancePackCards(cardDatabase, tide),
             purchased: false,
           });
@@ -156,7 +156,7 @@ export function generatePackShopInventory(
         case "removal":
           packs.push({
             packType: "removal",
-            price: 125,
+            price: 100,
             cards: generateRemovalPackCards(cardDatabase),
             purchased: false,
           });
@@ -164,7 +164,7 @@ export function generatePackShopInventory(
         case "aggro":
           packs.push({
             packType: "aggro",
-            price: 100,
+            price: 75,
             cards: generateAggroPackCards(cardDatabase),
             purchased: false,
           });
@@ -172,7 +172,7 @@ export function generatePackShopInventory(
         case "events":
           packs.push({
             packType: "events",
-            price: 100,
+            price: 75,
             cards: generateEventsPackCards(cardDatabase),
             purchased: false,
           });
@@ -183,7 +183,7 @@ export function generatePackShopInventory(
       packs.push({
         packType: "tide",
         tide,
-        price: 100,
+        price: 75,
         cards: generateTidePackCards(cardDatabase, tide),
         purchased: false,
       });
