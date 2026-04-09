@@ -179,6 +179,12 @@ namespace Dreamtides.Schema
 
         [JsonProperty("StrategicV1", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? StrategicV1 { get; set; }
+
+        [JsonProperty("StrategicV2", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? StrategicV2 { get; set; }
+
+        [JsonProperty("StrategicV3", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? StrategicV3 { get; set; }
     }
 
     public partial class DisplayProperties

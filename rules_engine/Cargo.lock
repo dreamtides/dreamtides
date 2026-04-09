@@ -4935,6 +4935,8 @@ version = "0.0.0"
 dependencies = [
  "ai_agents",
  "ai_data",
+ "ai_strategic",
+ "ai_uct",
  "backtrace",
  "battle_mutations",
  "battle_queries",

@@ -4,7 +4,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use ai_data::game_ai::GameAI;
-use ai_strategic::search;
+use ai_strategic::{search, search_v2, search_v3};
 use ai_uct::position_assignment::{CharacterPlacement, PositionAssignment};
 use ai_uct::uct_config::UctConfig;
 use ai_uct::{uct_search, uct_search_v2, uct_search_v3, uct_search_v4};
@@ -188,12 +188,69 @@ pub fn select_action_unchecked(
             }
 
             let result = search::search(initial_battle, player, *budget_ms);
-            if !result.pending_actions.is_empty() {
-                PENDING_STRATEGIC_ACTIONS.with(|cell| {
-                    *cell.borrow_mut() = result.pending_actions.into_iter().collect();
-                });
+            validated_strategic_action(
+                initial_battle,
+                player,
+                result.action,
+                result.pending_actions,
+            )
+        }
+        GameAI::StrategicV2(budget_ms) => {
+            if let Some(action) = next_strategic_action(initial_battle, player) {
+                return action;
             }
-            result.action
+
+            let result = search_v2::search(initial_battle, player, *budget_ms);
+            validated_strategic_action(
+                initial_battle,
+                player,
+                result.action,
+                result.pending_actions,
+            )
+        }
+        GameAI::StrategicV3(budget_ms) => {
+            if let Some(action) = next_strategic_action(initial_battle, player) {
+                return action;
+            }
+
+            if !search_v3::is_available() {
+                debug!("StrategicV3 artifacts unavailable, falling back to MonteCarlo(50)");
+                let battle = &player_state::randomize_battle_player(
+                    initial_battle,
+                    player.opponent(),
+                    rand::rng().random(),
+                );
+                let config = UctConfig {
+                    max_iterations_per_action: 50_000,
+                    max_total_actions_multiplier: 6,
+                    iteration_multiplier_override,
+                    single_threaded: false,
+                };
+                return uct_search::search(battle, player, &config);
+            }
+
+            let Some(result) = search_v3::search(initial_battle, player, *budget_ms) else {
+                debug!("StrategicV3 failed to initialize, falling back to MonteCarlo(50)");
+                let battle = &player_state::randomize_battle_player(
+                    initial_battle,
+                    player.opponent(),
+                    rand::rng().random(),
+                );
+                let config = UctConfig {
+                    max_iterations_per_action: 50_000,
+                    max_total_actions_multiplier: 6,
+                    iteration_multiplier_override,
+                    single_threaded: false,
+                };
+                return uct_search::search(battle, player, &config);
+            };
+
+            validated_strategic_action(
+                initial_battle,
+                player,
+                result.action,
+                result.pending_actions,
+            )
         }
         GameAI::WaitFiveSeconds => {
             let battle = &player_state::randomize_battle_player(
@@ -258,6 +315,31 @@ fn next_strategic_action(battle: &BattleState, player: PlayerName) -> Option<Bat
             None
         }
     })
+}
+
+fn validated_strategic_action(
+    battle: &BattleState,
+    player: PlayerName,
+    action: BattleAction,
+    pending_actions: Vec<BattleAction>,
+) -> BattleAction {
+    let legal = legal_actions::compute(battle, player);
+    if legal.contains(action, ForPlayer::Agent) {
+        PENDING_STRATEGIC_ACTIONS.with(|cell| {
+            *cell.borrow_mut() = pending_actions.into_iter().collect();
+        });
+        action
+    } else {
+        PENDING_STRATEGIC_ACTIONS.with(|cell| {
+            cell.borrow_mut().clear();
+        });
+        debug!(
+            ?action,
+            player = ?player,
+            "Discarding stale strategic action and falling back to first available action"
+        );
+        first_available_action(battle, player)
+    }
 }
 
 fn first_available_action(battle: &BattleState, player: PlayerName) -> BattleAction {

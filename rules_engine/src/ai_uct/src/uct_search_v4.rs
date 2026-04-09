@@ -37,6 +37,25 @@ use crate::uct_config::UctConfig;
 use crate::uct_tree::{SearchEdge, SearchGraph, SearchNode, SelectionMode};
 use crate::{decision_log, log_search_results};
 
+pub struct RootActionSummary {
+    pub action: BattleAction,
+    pub avg_reward: f64,
+    pub draws: u32,
+    pub losses: u32,
+    pub visit_count: u32,
+    pub wins: u32,
+}
+
+pub struct SearchSummary {
+    pub action: BattleAction,
+    pub action_results: Vec<RootActionSummary>,
+    pub base_iterations: u32,
+    pub iterations_per_action: u32,
+    pub multiplier: f64,
+    pub num_actions: usize,
+    pub num_threads: usize,
+}
+
 /// Monte Carlo search with heuristic-guided expansion for positioning nodes.
 ///
 /// Based on V1's architecture (multi-step positioning in the tree, full
@@ -47,6 +66,74 @@ pub fn search(
     player: PlayerName,
     config: &UctConfig,
 ) -> BattleAction {
+    let run = run_search(initial_battle, player, config);
+    let best_result = &run.action_results[run.best_result_index];
+    let action = best_result.action;
+
+    debug!(
+        total_iterations = run.budget.iterations_per_action * run.num_actions as u32,
+        ?action,
+        num_threads = run.num_threads,
+        "Picked AI action (V4)"
+    );
+    if initial_battle.request_context.logging_options.log_ai_search_diagram {
+        log_search_results::log_results_diagram(
+            &best_result.graph,
+            best_result.root,
+            action,
+            &initial_battle.request_context,
+        );
+    }
+
+    if initial_battle.request_context.logging_options.log_ai_decisions {
+        write_decision_log_entry(
+            initial_battle,
+            player,
+            &run.action_results,
+            best_result,
+            &run.budget,
+            run.num_actions,
+            run.num_threads,
+        );
+    }
+
+    action
+}
+
+pub fn search_summary(
+    initial_battle: &BattleState,
+    player: PlayerName,
+    config: &UctConfig,
+) -> SearchSummary {
+    let run = run_search(initial_battle, player, config);
+    let best_result = &run.action_results[run.best_result_index];
+    SearchSummary {
+        action: best_result.action,
+        action_results: run
+            .action_results
+            .into_iter()
+            .map(|result| RootActionSummary {
+                action: result.action,
+                avg_reward: if result.visit_count == 0 {
+                    0.0
+                } else {
+                    result.total_reward.0 / result.visit_count as f64
+                },
+                draws: result.draws,
+                losses: result.losses,
+                visit_count: result.visit_count,
+                wins: result.wins,
+            })
+            .collect(),
+        base_iterations: run.budget.base_iterations,
+        iterations_per_action: run.budget.iterations_per_action,
+        multiplier: run.budget.multiplier,
+        num_actions: run.num_actions,
+        num_threads: run.num_threads,
+    }
+}
+
+fn run_search(initial_battle: &BattleState, player: PlayerName, config: &UctConfig) -> SearchRun {
     let legal = legal_actions::compute(initial_battle, player);
     let budget = compute_budget(&legal, config, initial_battle, player);
 
@@ -75,35 +162,18 @@ pub fn search(
     }) else {
         panic_with!("No legal actions available", initial_battle, player);
     };
+    let best_result_index = action_results
+        .iter()
+        .position(|result| std::ptr::eq(result, best_result))
+        .expect("Best result should be present in action results");
 
-    let action = best_result.action;
-    let num_actions = all_actions.len();
-    let total_iterations = budget.iterations_per_action * num_actions as u32;
-    let num_threads = rayon::current_num_threads();
-
-    debug!(?total_iterations, ?action, ?num_threads, "Picked AI action (V4)");
-    if initial_battle.request_context.logging_options.log_ai_search_diagram {
-        log_search_results::log_results_diagram(
-            &best_result.graph,
-            best_result.root,
-            action,
-            &initial_battle.request_context,
-        );
+    SearchRun {
+        action_results,
+        best_result_index,
+        budget,
+        num_actions: all_actions.len(),
+        num_threads: rayon::current_num_threads(),
     }
-
-    if initial_battle.request_context.logging_options.log_ai_decisions {
-        write_decision_log_entry(
-            initial_battle,
-            player,
-            &action_results,
-            best_result,
-            &budget,
-            num_actions,
-            num_threads,
-        );
-    }
-
-    action
 }
 
 fn search_action_candidate(
@@ -189,6 +259,14 @@ struct ActionSearchResult {
     tree_node_count: usize,
     tree_max_depth: u32,
     depth_stats: Option<Vec<DepthLevelStats>>,
+}
+
+struct SearchRun {
+    action_results: Vec<ActionSearchResult>,
+    best_result_index: usize,
+    budget: BudgetInfo,
+    num_actions: usize,
+    num_threads: usize,
 }
 
 /// Returns a descendant node to evaluate next for the provided parent node.

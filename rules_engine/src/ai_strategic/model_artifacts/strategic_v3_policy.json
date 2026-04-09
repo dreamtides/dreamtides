@@ -1,0 +1,439 @@
+{
+  "feature_names": [
+    "action_base_spark",
+    "action_bias",
+    "action_character_spark",
+    "action_energy_cost",
+    "action_is_activate",
+    "action_is_begin_positioning",
+    "action_is_end_turn",
+    "action_is_fast",
+    "action_is_move_back",
+    "action_is_move_front",
+    "action_is_pass",
+    "action_is_play_hand",
+    "action_is_play_void",
+    "action_is_start_next_turn",
+    "global_legal_action_count",
+    "state_bias",
+    "state_can_begin_positioning",
+    "state_distance_margin",
+    "state_energy_margin",
+    "state_eval_blocker_coverage",
+    "state_eval_board_presence",
+    "state_eval_distance_to_win",
+    "state_eval_front_pressure",
+    "state_eval_hand_quality",
+    "state_eval_points_margin",
+    "state_eval_positioning_value",
+    "state_eval_resource_flow",
+    "state_eval_stack_pressure",
+    "state_eval_void_quality",
+    "state_hand_size_margin",
+    "state_has_prompt",
+    "state_has_stack",
+    "state_is_active_player",
+    "state_open_attack_lanes",
+    "state_our_back_count",
+    "state_our_back_spark",
+    "state_our_energy",
+    "state_our_front_col_0_spark",
+    "state_our_front_col_1_spark",
+    "state_our_front_col_2_spark",
+    "state_our_front_col_3_spark",
+    "state_our_front_count",
+    "state_our_front_spark",
+    "state_our_hand_size",
+    "state_our_points",
+    "state_our_ready_back",
+    "state_our_void_size",
+    "state_phase_ending",
+    "state_phase_judgment",
+    "state_phase_main",
+    "state_points_margin",
+    "state_produced_margin",
+    "state_stack_priority",
+    "state_their_back_count",
+    "state_their_back_spark",
+    "state_their_energy",
+    "state_their_front_col_0_spark",
+    "state_their_front_col_1_spark",
+    "state_their_front_col_2_spark",
+    "state_their_front_col_3_spark",
+    "state_their_front_count",
+    "state_their_front_spark",
+    "state_their_hand_size",
+    "state_their_points",
+    "state_their_ready_back",
+    "state_their_void_size",
+    "state_turn_id",
+    "state_void_size_margin"
+  ],
+  "model": {
+    "name": "tree",
+    "version": "v4",
+    "num_class": 1,
+    "num_tree_per_iteration": 1,
+    "label_index": 0,
+    "max_feature_idx": 67,
+    "objective": "lambdarank",
+    "average_output": false,
+    "feature_names": [
+      "action_base_spark",
+      "action_bias",
+      "action_character_spark",
+      "action_energy_cost",
+      "action_is_activate",
+      "action_is_begin_positioning",
+      "action_is_end_turn",
+      "action_is_fast",
+      "action_is_move_back",
+      "action_is_move_front",
+      "action_is_pass",
+      "action_is_play_hand",
+      "action_is_play_void",
+      "action_is_start_next_turn",
+      "global_legal_action_count",
+      "state_bias",
+      "state_can_begin_positioning",
+      "state_distance_margin",
+      "state_energy_margin",
+      "state_eval_blocker_coverage",
+      "state_eval_board_presence",
+      "state_eval_distance_to_win",
+      "state_eval_front_pressure",
+      "state_eval_hand_quality",
+      "state_eval_points_margin",
+      "state_eval_positioning_value",
+      "state_eval_resource_flow",
+      "state_eval_stack_pressure",
+      "state_eval_void_quality",
+      "state_hand_size_margin",
+      "state_has_prompt",
+      "state_has_stack",
+      "state_is_active_player",
+      "state_open_attack_lanes",
+      "state_our_back_count",
+      "state_our_back_spark",
+      "state_our_energy",
+      "state_our_front_col_0_spark",
+      "state_our_front_col_1_spark",
+      "state_our_front_col_2_spark",
+      "state_our_front_col_3_spark",
+      "state_our_front_count",
+      "state_our_front_spark",
+      "state_our_hand_size",
+      "state_our_points",
+      "state_our_ready_back",
+      "state_our_void_size",
+      "state_phase_ending",
+      "state_phase_judgment",
+      "state_phase_main",
+      "state_points_margin",
+      "state_produced_margin",
+      "state_stack_priority",
+      "state_their_back_count",
+      "state_their_back_spark",
+      "state_their_energy",
+      "state_their_front_col_0_spark",
+      "state_their_front_col_1_spark",
+      "state_their_front_col_2_spark",
+      "state_their_front_col_3_spark",
+      "state_their_front_count",
+      "state_their_front_spark",
+      "state_their_hand_size",
+      "state_their_points",
+      "state_their_ready_back",
+      "state_their_void_size",
+      "state_turn_id",
+      "state_void_size_margin"
+    ],
+    "monotone_constraints": [],
+    "feature_infos": {
+      "action_base_spark": {
+        "min_value": 0,
+        "max_value": 10,
+        "values": []
+      },
+      "action_character_spark": {
+        "min_value": 0,
+        "max_value": 4,
+        "values": []
+      },
+      "action_energy_cost": {
+        "min_value": 0,
+        "max_value": 7,
+        "values": []
+      },
+      "action_is_activate": {
+        "min_value": 0,
+        "max_value": 1,
+        "values": []
+      },
+      "action_is_begin_positioning": {
+        "min_value": 0,
+        "max_value": 1,
+        "values": []
+      },
+      "action_is_end_turn": {
+        "min_value": 0,
+        "max_value": 1,
+        "values": []
+      },
+      "action_is_fast": {
+        "min_value": 0,
+        "max_value": 1,
+        "values": []
+      },
+      "action_is_play_hand": {
+        "min_value": 0,
+        "max_value": 1,
+        "values": []
+      },
+      "action_is_play_void": {
+        "min_value": 0,
+        "max_value": 1,
+        "values": []
+      },
+      "global_legal_action_count": {
+        "min_value": 2,
+        "max_value": 11,
+        "values": []
+      },
+      "state_can_begin_positioning": {
+        "min_value": 0,
+        "max_value": 1,
+        "values": []
+      },
+      "state_distance_margin": {
+        "min_value": -16,
+        "max_value": 13,
+        "values": []
+      },
+      "state_energy_margin": {
+        "min_value": -3,
+        "max_value": 11,
+        "values": []
+      },
+      "state_eval_blocker_coverage": {
+        "min_value": -180,
+        "max_value": 290,
+        "values": []
+      },
+      "state_eval_board_presence": {
+        "min_value": -402,
+        "max_value": 380,
+        "values": []
+      },
+      "state_eval_distance_to_win": {
+        "min_value": -585,
+        "max_value": 720,
+        "values": []
+      },
+      "state_eval_front_pressure": {
+        "min_value": -825,
+        "max_value": 660,
+        "values": []
+      },
+      "state_eval_hand_quality": {
+        "min_value": -197.40000000000003,
+        "max_value": 194.40000000000003,
+        "values": []
+      },
+      "state_eval_points_margin": {
+        "min_value": -1820,
+        "max_value": 2240,
+        "values": []
+      },
+      "state_eval_positioning_value": {
+        "min_value": 0,
+        "max_value": 64,
+        "values": []
+      },
+      "state_eval_resource_flow": {
+        "min_value": -6,
+        "max_value": 64,
+        "values": []
+      },
+      "state_eval_void_quality": {
+        "min_value": -122.69999999999999,
+        "max_value": 118.80000000000001,
+        "values": []
+      },
+      "state_hand_size_margin": {
+        "min_value": -7,
+        "max_value": 7,
+        "values": []
+      },
+      "state_open_attack_lanes": {
+        "min_value": 0,
+        "max_value": 4,
+        "values": []
+      },
+      "state_our_back_count": {
+        "min_value": 0,
+        "max_value": 5,
+        "values": []
+      },
+      "state_our_back_spark": {
+        "min_value": 0,
+        "max_value": 14,
+        "values": []
+      },
+      "state_our_energy": {
+        "min_value": 0,
+        "max_value": 14,
+        "values": []
+      },
+      "state_our_front_col_0_spark": {
+        "min_value": 0,
+        "max_value": 7,
+        "values": []
+      },
+      "state_our_front_col_1_spark": {
+        "min_value": 0,
+        "max_value": 5,
+        "values": []
+      },
+      "state_our_front_col_2_spark": {
+        "min_value": 0,
+        "max_value": 3,
+        "values": []
+      },
+      "state_our_front_col_3_spark": {
+        "min_value": 0,
+        "max_value": 7,
+        "values": []
+      },
+      "state_our_front_count": {
+        "min_value": 0,
+        "max_value": 3,
+        "values": []
+      },
+      "state_our_front_spark": {
+        "min_value": 0,
+        "max_value": 12,
+        "values": []
+      },
+      "state_our_hand_size": {
+        "min_value": 1,
+        "max_value": 10,
+        "values": []
+      },
+      "state_our_points": {
+        "min_value": 0,
+        "max_value": 24,
+        "values": []
+      },
+      "state_our_ready_back": {
+        "min_value": 0,
+        "max_value": 4,
+        "values": []
+      },
+      "state_our_void_size": {
+        "min_value": 0,
+        "max_value": 34,
+        "values": []
+      },
+      "state_points_margin": {
+        "min_value": -13,
+        "max_value": 16,
+        "values": []
+      },
+      "state_produced_margin": {
+        "min_value": 0,
+        "max_value": 2,
+        "values": []
+      },
+      "state_their_back_count": {
+        "min_value": 0,
+        "max_value": 4,
+        "values": []
+      },
+      "state_their_back_spark": {
+        "min_value": 0,
+        "max_value": 14,
+        "values": []
+      },
+      "state_their_energy": {
+        "min_value": 0,
+        "max_value": 13,
+        "values": []
+      },
+      "state_their_front_col_0_spark": {
+        "min_value": 0,
+        "max_value": 7,
+        "values": []
+      },
+      "state_their_front_col_1_spark": {
+        "min_value": 0,
+        "max_value": 5,
+        "values": []
+      },
+      "state_their_front_col_2_spark": {
+        "min_value": 0,
+        "max_value": 10,
+        "values": []
+      },
+      "state_their_front_col_3_spark": {
+        "min_value": 0,
+        "max_value": 7,
+        "values": []
+      },
+      "state_their_front_count": {
+        "min_value": 0,
+        "max_value": 4,
+        "values": []
+      },
+      "state_their_front_spark": {
+        "min_value": 0,
+        "max_value": 15,
+        "values": []
+      },
+      "state_their_hand_size": {
+        "min_value": 1,
+        "max_value": 10,
+        "values": []
+      },
+      "state_their_points": {
+        "min_value": 0,
+        "max_value": 24,
+        "values": []
+      },
+      "state_their_ready_back": {
+        "min_value": 0,
+        "max_value": 4,
+        "values": []
+      },
+      "state_their_void_size": {
+        "min_value": 0,
+        "max_value": 35,
+        "values": []
+      },
+      "state_turn_id": {
+        "min_value": 0,
+        "max_value": 23,
+        "values": []
+      },
+      "state_void_size_margin": {
+        "min_value": -14,
+        "max_value": 13,
+        "values": []
+      }
+    },
+    "tree_info": [
+      {
+        "tree_index": 0,
+        "num_leaves": 1,
+        "num_cat": 0,
+        "shrinkage": 1,
+        "tree_structure": {
+          "leaf_value": 0,
+          "leaf_count": 447
+        }
+      }
+    ],
+    "feature_importances": {},
+    "pandas_categorical": null
+  }
+}

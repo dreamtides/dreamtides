@@ -92,6 +92,16 @@ impl Component for SetOpponentAgentPanel<'_> {
                                         .agent(GameAI::StrategicV1(3000))
                                         .build(),
                                 )
+                                .child(
+                                    SetAgentCell::builder()
+                                        .agent(GameAI::StrategicV2(3000))
+                                        .build(),
+                                )
+                                .child(
+                                    SetAgentCell::builder()
+                                        .agent(GameAI::StrategicV3(3000))
+                                        .build(),
+                                )
                                 .child(SetAgentCell::builder().agent(GameAI::RandomAction).build())
                                 .child(
                                     SetAgentCell::builder()

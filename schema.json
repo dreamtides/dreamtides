@@ -3555,6 +3555,34 @@
           "required": [
             "StrategicV1"
           ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "StrategicV2": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "StrategicV2"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "StrategicV3": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "StrategicV3"
+          ]
         }
       ]
     },

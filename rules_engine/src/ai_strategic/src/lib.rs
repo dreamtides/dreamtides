@@ -1,5 +1,13 @@
 pub mod candidate_generation;
+pub mod candidate_generation_v2;
+pub mod candidate_generation_v3;
+pub mod dataset;
 pub mod decision_log;
+pub mod decision_log_v3;
 pub mod evaluation;
+pub mod feature_extraction;
+pub mod model;
 pub mod search;
+pub mod search_v2;
+pub mod search_v3;
 pub mod state_key;

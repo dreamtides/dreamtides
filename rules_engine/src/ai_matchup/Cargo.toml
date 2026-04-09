@@ -15,6 +15,8 @@ test = false
 [dependencies]
 ai_agents = { path = "../ai_agents" }
 ai_data = { path = "../ai_data" }
+ai_strategic = { path = "../ai_strategic" }
+ai_uct = { path = "../ai_uct" }
 battle_mutations = { path = "../battle_mutations" }
 battle_queries = { path = "../battle_queries" }
 battle_state = { path = "../battle_state" }
@@ -33,3 +35,8 @@ serde_json = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 uuid = { workspace = true }
+
+[[bin]]
+name = "collect_strategic_v3_dataset"
+path = "src/collect_strategic_v3_dataset.rs"
+test = false
