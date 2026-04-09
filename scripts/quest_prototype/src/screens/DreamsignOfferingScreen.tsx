@@ -5,11 +5,6 @@ import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
 import { DREAMSIGNS } from "../data/dreamsigns";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
-import {
-  countDeckTides,
-  tideWeight,
-  weightedSample,
-} from "../data/tide-weights";
 
 const MAX_DREAMSIGNS = 12;
 
@@ -18,21 +13,36 @@ interface DreamsignOfferingScreenProps {
   site: SiteState;
 }
 
+/** Shuffle an array and return the first N elements. */
+function shufflePick<T>(items: readonly T[], count: number): T[] {
+  const pool = [...items];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, count);
+}
+
 /** Renders the Dreamsign Offering site. Normal: 1 dreamsign, Enhanced: 3 (mini-draft). */
 export function DreamsignOfferingScreen({
   site,
 }: DreamsignOfferingScreenProps) {
-  const { state, mutations, cardDatabase } = useQuest();
-  const { dreamsigns: currentDreamsigns, deck } = state;
+  const { state, mutations } = useQuest();
+  const { dreamsigns: currentDreamsigns } = state;
 
   const optionCount = site.isEnhanced ? 3 : 1;
 
   const options = useMemo<Dreamsign[]>(() => {
-    const deckTides = countDeckTides(deck, cardDatabase);
-    return weightedSample(DREAMSIGNS, optionCount, (t) =>
-      tideWeight(t.tide, deckTides),
-    ).map((t) => ({ ...t, isBane: false }));
-  }, [optionCount, deck, cardDatabase]);
+    const filtered = state.chosenTide
+      ? DREAMSIGNS.filter(
+          (d) => d.tide === state.chosenTide || d.tide === "Neutral",
+        )
+      : [...DREAMSIGNS];
+    return shufflePick(filtered, optionCount).map((t) => ({
+      ...t,
+      isBane: false,
+    }));
+  }, [optionCount, state.chosenTide]);
 
   const [purging, setPurging] = useState(false);
   const [pendingDreamsign, setPendingDreamsign] = useState<Dreamsign | null>(

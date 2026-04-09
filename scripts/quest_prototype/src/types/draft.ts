@@ -1,4 +1,4 @@
-import type { CardData, Tide } from "./cards";
+import type { CardData } from "./cards";
 
 /** Configuration shared across all pack generation strategies. */
 export interface DraftConfig {
@@ -21,9 +21,7 @@ export interface PackContext {
 }
 
 /** Strategy for generating card packs during draft. */
-export type PackStrategy =
-  | { type: "tide_current" }
-  | { type: "pool_bias"; featuredTides: Tide[]; featuredWeight: number };
+export type PackStrategy = { type: "depletion" };
 
 /** Persistent draft state, survives across dreamscape visits. */
 export interface DraftState {
@@ -39,4 +37,6 @@ export interface DraftState {
   sitePicksCompleted: number;
   /** Strategy used to generate packs. */
   packStrategy: PackStrategy;
+  /** Card numbers that have appeared in packs but were not picked (for depletion weighting). */
+  seenCards: number[];
 }

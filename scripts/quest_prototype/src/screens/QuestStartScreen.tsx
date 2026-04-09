@@ -2,54 +2,55 @@ import { useCallback } from "react";
 import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { generateInitialAtlas } from "../atlas/atlas-generator";
-import { NAMED_TIDES } from "../data/card-database";
+import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { DREAMSIGNS } from "../data/dreamsigns";
+import { initializeDraftState } from "../draft/draft-engine";
 import { logEvent } from "../logging";
-import { useQuestConfig } from "../state/quest-config";
 import type { Tide } from "../types/cards";
 
-/** Selects N random core tides to exclude (never Neutral). */
-function selectExcludedTides(count: number): Tide[] {
-  if (count <= 0) return [];
-  const pool = [...NAMED_TIDES];
-  const excluded: Tide[] = [];
-  for (let i = 0; i < count && pool.length > 0; i++) {
-    const idx = Math.floor(Math.random() * pool.length);
-    excluded.push(pool[idx]);
-    pool.splice(idx, 1);
-  }
-  return excluded;
-}
-
-/** Intro screen with dark fantasy styling and "Begin Quest" button. */
+/** Intro screen where the player picks one of 7 tides to draft from. */
 export function QuestStartScreen() {
   const { state, mutations, cardDatabase } = useQuest();
-  const config = useQuestConfig();
 
-  const handleBeginQuest = useCallback(() => {
-    const excludedTides = selectExcludedTides(config.excludedTideCount);
-    mutations.setExcludedTides(excludedTides);
+  const handlePickTide = useCallback(
+    (tide: Tide) => {
+      mutations.setChosenTide(tide);
 
-    const playerHasBanes =
-      state.deck.some((e) => e.isBane) ||
-      state.dreamsigns.some((d) => d.isBane);
-    const atlas = generateInitialAtlas(state.completionLevel, {
-      cardDatabase,
-      dreamsignPool: DREAMSIGNS,
-      playerHasBanes,
-      excludedTides,
-    });
-    const nodeCount = Object.keys(atlas.nodes).length - 1; // subtract nexus
+      const excludedTides = NAMED_TIDES.filter((t) => t !== tide);
+      const playerHasBanes =
+        state.deck.some((e) => e.isBane) ||
+        state.dreamsigns.some((d) => d.isBane);
+      const atlas = generateInitialAtlas(state.completionLevel, {
+        cardDatabase,
+        dreamsignPool: DREAMSIGNS,
+        playerHasBanes,
+        excludedTides,
+      });
 
-    logEvent("quest_started", {
-      initialEssence: state.essence,
-      dreamscapesGenerated: nodeCount,
-      excludedTides,
-    });
+      const draftState = initializeDraftState(cardDatabase, tide);
+      mutations.setDraftState(draftState);
+      mutations.updateAtlas(atlas);
 
-    mutations.updateAtlas(atlas);
-    mutations.setScreen({ type: "atlas" });
-  }, [state.completionLevel, state.essence, state.deck, state.dreamsigns, mutations, cardDatabase, config.excludedTideCount]);
+      // Auto-enter the first available dreamscape
+      const firstNode = Object.values(atlas.nodes).find(
+        (n) => n.status === "available",
+      );
+
+      logEvent("quest_started", {
+        initialEssence: state.essence,
+        chosenTide: tide,
+        dreamscapesGenerated: Object.keys(atlas.nodes).length - 1,
+      });
+
+      if (firstNode) {
+        mutations.setCurrentDreamscape(firstNode.id);
+        mutations.setScreen({ type: "dreamscape" });
+      } else {
+        mutations.setScreen({ type: "atlas" });
+      }
+    },
+    [state.completionLevel, state.essence, state.deck, state.dreamsigns, mutations, cardDatabase],
+  );
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
@@ -76,30 +77,56 @@ export function QuestStartScreen() {
         animate={{ opacity: 0.6 }}
         transition={{ duration: 0.8, delay: 0.3 }}
       >
-        A Roguelike Deckbuilding Quest
+        Choose Your Tide
       </motion.p>
 
-      <motion.button
-        className="cursor-pointer rounded-lg px-10 py-4 text-lg font-bold tracking-wide text-white transition-colors md:text-xl"
-        style={{
-          background: "linear-gradient(135deg, #d4a017 0%, #b8860b 100%)",
-          border: "2px solid rgba(251, 191, 36, 0.6)",
-          boxShadow:
-            "0 0 20px rgba(212, 160, 23, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
-        }}
+      <motion.div
+        className="flex flex-wrap justify-center gap-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
-        whileHover={{
-          boxShadow:
-            "0 0 30px rgba(212, 160, 23, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
-          scale: 1.05,
-        }}
-        whileTap={{ scale: 0.97 }}
-        onClick={handleBeginQuest}
+        transition={{ duration: 0.6, delay: 0.5 }}
       >
-        Begin Quest
-      </motion.button>
+        {NAMED_TIDES.map((tide, index) => {
+          const color = TIDE_COLORS[tide];
+          return (
+            <motion.button
+              key={tide}
+              className="flex cursor-pointer flex-col items-center rounded-xl px-6 py-5"
+              style={{
+                background: "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
+                border: `2px solid ${color}40`,
+                boxShadow: `0 0 15px ${color}15`,
+                minWidth: "120px",
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.6 + index * 0.07 }}
+              whileHover={{
+                boxShadow: `0 0 30px ${color}50`,
+                borderColor: `${color}90`,
+                scale: 1.08,
+              }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                handlePickTide(tide);
+              }}
+            >
+              <img
+                src={tideIconUrl(tide)}
+                alt={tide}
+                className="mb-3 h-14 w-14 rounded-full object-contain md:h-16 md:w-16"
+                style={{ border: `2px solid ${color}` }}
+              />
+              <span
+                className="text-lg font-bold"
+                style={{ color }}
+              >
+                {tide}
+              </span>
+            </motion.button>
+          );
+        })}
+      </motion.div>
     </div>
   );
 }

@@ -98,7 +98,7 @@ function recreateDir(dir) {
 }
 
 function main() {
-  const tomlPath = resolveAssetPath("client", "Assets", "StreamingAssets", "Tabula", "rendered-cards.toml");
+  const tomlPath = resolveAssetPath("client", "Assets", "StreamingAssets", "Tabula", "rendered-cards-mono.toml");
   const tideIconsDir = resolveAssetPath("client", "Assets", "ThirdParty", "GameAssets", "Tides");
 
   console.log("Parsing rendered-cards.toml...");
@@ -112,9 +112,9 @@ function main() {
 
   console.log(`Found ${allCards.length} total cards`);
 
-  // Filter out Special-rarity cards
-  const cards = allCards.filter((c) => c.rarity !== "Special");
-  console.log(`Filtered to ${cards.length} non-Special cards`);
+  // Filter out Special and Starter-rarity cards
+  const cards = allCards.filter((c) => c.rarity !== "Special" && c.rarity !== "Starter");
+  console.log(`Filtered to ${cards.length} draftable cards`);
 
   // Transform to camelCase JSON
   const jsonCards = cards.map(transformCard);

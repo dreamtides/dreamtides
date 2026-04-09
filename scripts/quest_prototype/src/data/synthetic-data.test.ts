@@ -70,8 +70,8 @@ function offerEffectRarities(e: OfferEffect): string[] {
 }
 
 describe("dreamcallers", () => {
-  it("has exactly 10 entries", () => {
-    expect(DREAMCALLERS).toHaveLength(10);
+  it("has exactly 25 entries", () => {
+    expect(DREAMCALLERS).toHaveLength(25);
   });
 
   it("every entry has all required fields", () => {

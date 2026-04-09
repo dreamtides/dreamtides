@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { CardData, Tide } from "../types/cards";
+import { NAMED_TIDES } from "../data/card-database";
 import type {
   DeckEntry,
   DreamAtlas,
@@ -49,6 +50,7 @@ export interface QuestMutations {
   setCurrentDreamscape: (nodeId: string | null) => void;
   updateAtlas: (atlas: DreamAtlas) => void;
   setDraftState: (draftState: DraftState) => void;
+  setChosenTide: (tide: Tide) => void;
   setExcludedTides: (tides: Tide[]) => void;
   resetQuest: () => void;
 }
@@ -91,6 +93,7 @@ function createDefaultState(): QuestState {
     currentDreamscape: null,
     visitedSites: [],
     draftState: null,
+    chosenTide: null,
     excludedTides: [],
     screen: { type: "questStart" },
     activeSiteId: null,
@@ -363,6 +366,12 @@ export function QuestProvider({
     setState((prev) => ({ ...prev, draftState }));
   }, []);
 
+  const setChosenTide = useCallback((tide: Tide) => {
+    const excludedTides = NAMED_TIDES.filter((t) => t !== tide);
+    logEvent("tide_chosen", { chosenTide: tide, excludedTides });
+    setState((prev) => ({ ...prev, chosenTide: tide, excludedTides }));
+  }, []);
+
   const setExcludedTides = useCallback((tides: Tide[]) => {
     logEvent("tides_excluded", { excludedTides: tides });
     setState((prev) => ({ ...prev, excludedTides: tides }));
@@ -391,6 +400,7 @@ export function QuestProvider({
       setCurrentDreamscape,
       updateAtlas,
       setDraftState,
+      setChosenTide,
       setExcludedTides,
       resetQuest,
     }),
@@ -410,6 +420,7 @@ export function QuestProvider({
       setCurrentDreamscape,
       updateAtlas,
       setDraftState,
+      setChosenTide,
       setExcludedTides,
       resetQuest,
     ],

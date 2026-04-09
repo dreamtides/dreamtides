@@ -5,31 +5,14 @@ import type { Tide } from "../types/cards";
 import { useQuest } from "../state/quest-context";
 import { DREAMCALLERS } from "../data/dreamcallers";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
-import { countDeckTides, tideWeight, weightedSample } from "../data/tide-weights";
 import { logEvent } from "../logging";
 
-/**
- * Selects 3 distinct dreamcallers. If the player has drafted cards,
- * weights the selection toward tides that match the player's deck.
- * Otherwise picks 3 at random.
- */
-function selectOfferedDreamcallers(
-  deck: Array<{ cardNumber: number }>,
-  cardDatabase: Map<number, { tide: Tide }>,
-): Dreamcaller[] {
-  const pool = [...DREAMCALLERS];
-
-  if (deck.length === 0) {
-    // Shuffle and pick 3
-    for (let i = pool.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [pool[i], pool[j]] = [pool[j], pool[i]];
-    }
-    return pool.slice(0, 3);
-  }
-
-  const tideCounts = countDeckTides(deck, cardDatabase);
-  return weightedSample(pool, 3, (dc) => tideWeight(dc.tide, tideCounts));
+/** Returns all dreamcallers matching the chosen tide or Neutral. */
+function selectOfferedDreamcallers(chosenTide: Tide | null): Dreamcaller[] {
+  if (chosenTide === null) return [...DREAMCALLERS];
+  return DREAMCALLERS.filter(
+    (dc) => dc.tide === chosenTide || dc.tide === "Neutral",
+  );
 }
 
 interface DreamcallerCardProps {
@@ -163,7 +146,7 @@ function DreamcallerCard({
 
 /** Screen for selecting a dreamcaller from 3 options. */
 export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
-  const { state, mutations, cardDatabase } = useQuest();
+  const { state, mutations } = useQuest();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -179,10 +162,7 @@ export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
   // Compute offered dreamcallers once on first render and keep stable.
   const offeredRef = useRef<Dreamcaller[] | null>(null);
   if (offeredRef.current === null) {
-    offeredRef.current = selectOfferedDreamcallers(
-      state.deck,
-      cardDatabase,
-    );
+    offeredRef.current = selectOfferedDreamcallers(state.chosenTide);
   }
   const offered = offeredRef.current;
 
