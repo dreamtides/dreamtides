@@ -106,6 +106,7 @@ dependencies = [
 name = "ai_uct"
 version = "0.0.0"
 dependencies = [
+ "ability_data",
  "battle_mutations",
  "battle_queries",
  "battle_state",
