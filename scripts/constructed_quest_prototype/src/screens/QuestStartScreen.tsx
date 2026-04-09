@@ -116,7 +116,7 @@ export function QuestStartScreen() {
         startingTide,
         playerPool: state.pool,
         config,
-      } as any);
+      });
 
       const firstNodeId = atlas.edges[0]?.[1];
       const nodeCount = Object.keys(atlas.nodes).length - 1;
