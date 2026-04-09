@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { CardData, Tide } from "../types/cards";
+import type { CardData, NamedTide, Tide } from "../types/cards";
 import type {
   DeckEntry,
   DreamAtlas,
@@ -26,6 +26,13 @@ const MAX_DREAMSIGNS = 12;
 export interface QuestMutations {
   changeEssence: (delta: number, source: string) => void;
   addCard: (cardNumber: number, source: string) => void;
+  chooseStartingTide: (
+    startingTide: NamedTide,
+    starterCardNumbers: number[],
+    tideCardNumbers: number[],
+    neutralCardNumbers: number[],
+    consumedRandomCardNumbers: number[],
+  ) => void;
   addBaneCard: (cardNumber: number, source: string) => void;
   removeCard: (entryId: string, source: string) => void;
   transfigureCard: (
@@ -70,6 +77,8 @@ function createDefaultState(): QuestState {
   return {
     essence: 250,
     deck: [],
+    startingTide: null,
+    consumedStartingCardNumbers: [],
     dreamcaller: null,
     dreamsigns: [],
     tideCrystals: {
@@ -148,6 +157,54 @@ export function QuestProvider({
       });
     },
     [cardDatabase],
+  );
+
+  const chooseStartingTide = useCallback(
+    (
+      startingTide: NamedTide,
+      starterCardNumbers: number[],
+      tideCardNumbers: number[],
+      neutralCardNumbers: number[],
+      consumedRandomCardNumbers: number[],
+    ) => {
+      const allCardNumbers = [
+        ...starterCardNumbers,
+        ...tideCardNumbers,
+        ...neutralCardNumbers,
+      ];
+      const addedDeckEntries: DeckEntry[] = allCardNumbers.map(
+        (cardNumber) => ({
+          entryId: nextEntryId(),
+          cardNumber,
+          transfiguration: null,
+          isBane: false,
+        }),
+      );
+
+      logEvent("starting_tide_selected", {
+        startingTide,
+        grantedCrystal: startingTide,
+      });
+      logEvent("starting_deck_initialized", {
+        startingTide,
+        starterCardNumbers,
+        tideCardNumbers,
+        neutralCardNumbers,
+        totalDeckSize: allCardNumbers.length,
+      });
+
+      setState((prev) => ({
+        ...prev,
+        startingTide,
+        consumedStartingCardNumbers: consumedRandomCardNumbers,
+        deck: [...prev.deck, ...addedDeckEntries],
+        tideCrystals: {
+          ...prev.tideCrystals,
+          [startingTide]: prev.tideCrystals[startingTide] + 1,
+        },
+      }));
+    },
+    [],
   );
 
   const addBaneCard = useCallback(
@@ -378,6 +435,7 @@ export function QuestProvider({
     () => ({
       changeEssence,
       addCard,
+      chooseStartingTide,
       addBaneCard,
       removeCard,
       transfigureCard,
@@ -397,6 +455,7 @@ export function QuestProvider({
     [
       changeEssence,
       addCard,
+      chooseStartingTide,
       addBaneCard,
       removeCard,
       transfigureCard,

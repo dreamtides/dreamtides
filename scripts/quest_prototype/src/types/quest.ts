@@ -1,4 +1,4 @@
-import type { Tide } from "./cards";
+import type { NamedTide, Tide } from "./cards";
 import type { DraftState } from "./draft";
 
 /** Badge applied to a card via a Transfiguration site. */
@@ -91,6 +91,10 @@ export type Screen =
 export interface QuestState {
   essence: number;
   deck: DeckEntry[];
+  /** Named tide selected at quest start. Null until the player chooses. */
+  startingTide: NamedTide | null;
+  /** Random starting grants removed from the finite draft pool. */
+  consumedStartingCardNumbers: number[];
   dreamcaller: Dreamcaller | null;
   dreamsigns: Dreamsign[];
   tideCrystals: Record<Tide, number>;
