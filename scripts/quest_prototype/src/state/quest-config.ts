@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 /** Configuration derived from URL parameters. */
 export interface QuestConfig {
-  /** Number of core tides to exclude at quest start (0-4, default 0). */
+  /** Number of core tides to exclude at quest start (0-4, default 2). */
   excludedTideCount: number;
   /** Whether to show tide cost symbols on cards (default true). */
   showTideSymbols: boolean;
@@ -10,7 +10,7 @@ export interface QuestConfig {
   poolBias: boolean;
 }
 
-const DEFAULT_EXCLUDED_TIDE_COUNT = 0;
+const DEFAULT_EXCLUDED_TIDE_COUNT = 2;
 
 /** Parses quest configuration from the current URL search parameters. */
 export function getQuestConfig(): QuestConfig {
