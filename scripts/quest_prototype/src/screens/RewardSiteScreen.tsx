@@ -1,14 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import type { SiteState, Dreamsign } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
 import { CardDisplay } from "../components/CardDisplay";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
-import type { NamedTide, Tide } from "../types/cards";
-import { computeQuestTideProfile, weightedSampleByProfile } from "../data/quest-tide-profile";
-import { offerableCards } from "../data/card-pools";
-import { DREAMSIGNS } from "../data/dreamsigns";
+import type { Tide } from "../types/cards";
 
 /** Props for the RewardSiteScreen component. */
 interface RewardSiteScreenProps {
@@ -17,7 +14,7 @@ interface RewardSiteScreenProps {
 
 /** Displays the reward site: shows the pre-defined reward and accept/decline buttons. */
 export function RewardSiteScreen({ site }: RewardSiteScreenProps) {
-  const { state, mutations, cardDatabase } = useQuest();
+  const { mutations } = useQuest();
 
   const rewardData = useMemo(
     () => site.data ?? {},
@@ -25,37 +22,6 @@ export function RewardSiteScreen({ site }: RewardSiteScreenProps) {
   );
 
   const rewardType = rewardData["rewardType"] as string | undefined;
-
-  const [rolledReward] = useState<Record<string, unknown> | null>(() => {
-    if (rewardType === "card" && rewardData["cardNumber"] === undefined) {
-      const profile = computeQuestTideProfile({
-        startingTide: state.startingTide,
-        deck: state.deck,
-        cardDatabase,
-        dreamcaller: state.dreamcaller,
-        tideCrystals: state.tideCrystals,
-        recentDraftPicks: state.draftState?.draftedCards ?? [],
-      });
-      const pool = offerableCards(cardDatabase, { excludedTides: state.excludedTides as NamedTide[] });
-      const card = weightedSampleByProfile(pool, profile, 1)[0] ?? null;
-      if (card) {
-        logEvent("reward_generated", { siteId: site.id, rewardType: "card", cardNumber: card.cardNumber, cardName: card.name });
-        return { cardNumber: card.cardNumber };
-      }
-      // Fallback to essence if card pool is empty
-      const essenceAmount = 150 + Math.floor(Math.random() * 200);
-      logEvent("reward_generated", { siteId: site.id, rewardType: "essence", essenceAmount, fallbackReason: "empty_card_pool" });
-      return { rewardType: "essence", essenceAmount };
-    }
-    if (rewardType === "dreamsign" && rewardData["dreamsignName"] === undefined) {
-      const template = DREAMSIGNS[Math.floor(Math.random() * DREAMSIGNS.length)];
-      logEvent("reward_generated", { siteId: site.id, rewardType: "dreamsign", dreamsignName: template.name, dreamsignTide: template.tide });
-      return { dreamsignName: template.name, dreamsignTide: template.tide, dreamsignEffect: template.effectDescription };
-    }
-    return null;
-  });
-
-  const effectiveData = { ...rewardData, ...(rolledReward ?? {}) };
 
   useEffect(() => {
     logEvent("site_entered", {
@@ -76,23 +42,23 @@ export function RewardSiteScreen({ site }: RewardSiteScreenProps) {
 
   const handleAccept = useCallback(() => {
     if (rewardType === "card") {
-      const cardNumber = effectiveData["cardNumber"] as number;
+      const cardNumber = rewardData["cardNumber"] as number;
       mutations.addCard(cardNumber, "reward_site");
     } else if (rewardType === "dreamsign") {
       const dreamsign: Dreamsign = {
-        name: effectiveData["dreamsignName"] as string,
-        tide: effectiveData["dreamsignTide"] as Tide,
-        effectDescription: effectiveData["dreamsignEffect"] as string,
+        name: rewardData["dreamsignName"] as string,
+        tide: rewardData["dreamsignTide"] as Tide,
+        effectDescription: rewardData["dreamsignEffect"] as string,
         isBane: false,
       };
       mutations.addDreamsign(dreamsign, "Reward");
     } else if (rewardType === "essence") {
-      const amount = effectiveData["essenceAmount"] as number;
+      const amount = rewardData["essenceAmount"] as number;
       mutations.changeEssence(amount, "reward_site");
     }
 
     completeSite();
-  }, [rewardType, effectiveData, mutations, completeSite]);
+  }, [rewardType, rewardData, mutations, completeSite]);
 
   const handleDecline = useCallback(() => {
     logEvent("reward_declined", {
@@ -130,18 +96,18 @@ export function RewardSiteScreen({ site }: RewardSiteScreenProps) {
         transition={{ delay: 0.2, duration: 0.5 }}
       >
         {rewardType === "card" && (
-          <CardRewardDisplay cardNumber={effectiveData["cardNumber"] as number} />
+          <CardRewardDisplay cardNumber={rewardData["cardNumber"] as number} />
         )}
         {rewardType === "dreamsign" && (
           <DreamsignRewardDisplay
-            name={effectiveData["dreamsignName"] as string}
-            tide={effectiveData["dreamsignTide"] as Tide}
-            effectDescription={effectiveData["dreamsignEffect"] as string}
+            name={rewardData["dreamsignName"] as string}
+            tide={rewardData["dreamsignTide"] as Tide}
+            effectDescription={rewardData["dreamsignEffect"] as string}
           />
         )}
         {rewardType === "essence" && (
           <EssenceRewardDisplay
-            amount={effectiveData["essenceAmount"] as number}
+            amount={rewardData["essenceAmount"] as number}
           />
         )}
         {rewardType === undefined && (

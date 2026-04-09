@@ -374,9 +374,9 @@ describe("rewardPreviewLabel", () => {
       type: "Reward",
       isEnhanced: false,
       isVisited: false,
-      data: { rewardType: "card" },
+      data: { rewardType: "card", cardNumber: 1, cardName: "Fire Bolt" },
     };
-    expect(rewardPreviewLabel(site)).toBe("Reward: Card");
+    expect(rewardPreviewLabel(site)).toBe("Reward: Fire Bolt");
   });
 
   it("returns dreamsign reward label for dreamsign reward sites", () => {
@@ -387,9 +387,12 @@ describe("rewardPreviewLabel", () => {
       isVisited: false,
       data: {
         rewardType: "dreamsign",
+        dreamsignName: "Ember's Whisper",
+        dreamsignTide: "Ignite",
+        dreamsignEffect: "Fire effect.",
       },
     };
-    expect(rewardPreviewLabel(site)).toBe("Reward: Dreamsign");
+    expect(rewardPreviewLabel(site)).toBe("Reward: Ember's Whisper");
   });
 
   it("returns essence reward label for essence reward sites", () => {

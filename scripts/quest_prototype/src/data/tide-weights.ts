@@ -1,7 +1,4 @@
-import type { CardData, NamedTide, Tide } from "../types/cards";
-import { offerableCards } from "./card-pools";
-import type { QuestTideProfile } from "./quest-tide-profile";
-import { weightedSampleByProfile } from "./quest-tide-profile";
+import type { CardData, Tide } from "../types/cards";
 
 /** Counts tide occurrences in the player's deck. */
 export function countDeckTides(
@@ -78,17 +75,13 @@ export function selectRareRewards(
   cardDatabase: Map<number, CardData>,
   deckTideCounts: Map<Tide, number>,
   excludedTides: Tide[] = [],
-  profile: QuestTideProfile | null = null,
 ): CardData[] {
-  const rareCards = offerableCards(cardDatabase, { excludedTides: excludedTides as NamedTide[] }).filter(
-    (c) => c.rarity === "Rare",
+  const excludedSet = new Set(excludedTides);
+  const rareCards = Array.from(cardDatabase.values()).filter(
+    (c) => c.rarity === "Rare" && !excludedSet.has(c.tide),
   );
 
   if (rareCards.length === 0) return [];
-
-  if (profile !== null) {
-    return weightedSampleByProfile(rareCards, profile, 4);
-  }
 
   return weightedSample(rareCards, 4, (card) =>
     tideWeight(card.tide, deckTideCounts),

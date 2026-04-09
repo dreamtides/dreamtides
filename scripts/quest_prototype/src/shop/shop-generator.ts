@@ -1,10 +1,7 @@
-import type { CardData, NamedTide, Tide, Rarity } from "../types/cards";
+import type { CardData, Tide, Rarity } from "../types/cards";
 import type { DeckEntry, Dreamsign } from "../types/quest";
 import { NAMED_TIDES } from "../data/card-database";
 import { DREAMSIGNS } from "../data/dreamsigns";
-import type { QuestTideProfile } from "../data/quest-tide-profile";
-import { weightedSampleByProfile } from "../data/quest-tide-profile";
-import { offerableCards } from "../data/card-pools";
 
 /** Prices by rarity for card items. */
 const RARITY_PRICES: Readonly<Record<Rarity, number>> = {
@@ -139,9 +136,11 @@ export function generateShopInventory(
   cardDatabase: Map<number, CardData>,
   playerDeck: DeckEntry[],
   excludedTides: Tide[] = [],
-  profile: QuestTideProfile | null = null,
 ): ShopSlot[] {
-  const allCards = offerableCards(cardDatabase, { excludedTides: excludedTides as NamedTide[] });
+  const excludedSet = new Set(excludedTides);
+  const allCards = Array.from(cardDatabase.values()).filter(
+    (c) => !excludedSet.has(c.tide),
+  );
   const deckTideCounts = countDeckTides(playerDeck, cardDatabase);
   const slots: ShopSlot[] = [];
 
@@ -194,10 +193,7 @@ export function generateShopInventory(
     }
 
     // Default: card slot
-    const card =
-      profile !== null
-        ? weightedSampleByProfile(allCards, profile, 1)[0] ?? null
-        : selectWeightedCard(allCards, deckTideCounts);
+    const card = selectWeightedCard(allCards, deckTideCounts);
     if (card) {
       slots.push({
         itemType: "card",
@@ -236,19 +232,16 @@ export function generateSpecialtyShopInventory(
   cardDatabase: Map<number, CardData>,
   playerDeck: DeckEntry[],
   excludedTides: Tide[] = [],
-  profile: QuestTideProfile | null = null,
 ): ShopSlot[] {
-  const rareCards = offerableCards(cardDatabase, { excludedTides: excludedTides as NamedTide[] }).filter(
-    (c) => c.rarity === "Rare",
+  const excludedSet = new Set(excludedTides);
+  const rareCards = Array.from(cardDatabase.values()).filter(
+    (c) => c.rarity === "Rare" && !excludedSet.has(c.tide),
   );
   const deckTideCounts = countDeckTides(playerDeck, cardDatabase);
   const slots: ShopSlot[] = [];
 
   for (let i = 0; i < 4; i++) {
-    const card =
-      profile !== null
-        ? weightedSampleByProfile(rareCards, profile, 1)[0] ?? null
-        : selectWeightedCard(rareCards, deckTideCounts);
+    const card = selectWeightedCard(rareCards, deckTideCounts);
     if (card) {
       slots.push({
         itemType: "card",

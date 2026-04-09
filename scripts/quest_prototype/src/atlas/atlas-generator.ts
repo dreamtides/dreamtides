@@ -4,10 +4,9 @@ import type {
   SiteState,
   SiteType,
 } from "../types/quest";
-import type { CardData, NamedTide, Tide } from "../types/cards";
+import type { CardData, Tide } from "../types/cards";
 import type { Dreamsign } from "../types/quest";
 import { BIOMES, type Biome } from "../data/biomes";
-import { offerableCards } from "../data/card-pools";
 import { logEvent } from "../logging";
 
 /** Parameters for site generation that require external data. */
@@ -122,16 +121,33 @@ function generateRewardData(
   context: SiteGenerationContext,
 ): Record<string, unknown> {
   const { cardDatabase, dreamsignPool, excludedTides } = context;
-  const cards = offerableCards(cardDatabase, { excludedTides: excludedTides as NamedTide[] });
+  const excludedSet = new Set(excludedTides);
+  const cards = Array.from(cardDatabase.values()).filter(
+    (c) => !excludedSet.has(c.tide),
+  );
 
+  // 70% chance card reward, 30% chance dreamsign reward
   if (cards.length > 0 && Math.random() < 0.7) {
-    return { rewardType: "card" };
+    const card = cards[Math.floor(Math.random() * cards.length)];
+    return {
+      rewardType: "card",
+      cardNumber: card.cardNumber,
+      cardName: card.name,
+    };
   }
 
   if (dreamsignPool.length > 0) {
-    return { rewardType: "dreamsign" };
+    const template =
+      dreamsignPool[Math.floor(Math.random() * dreamsignPool.length)];
+    return {
+      rewardType: "dreamsign",
+      dreamsignName: template.name,
+      dreamsignTide: template.tide,
+      dreamsignEffect: template.effectDescription,
+    };
   }
 
+  // Fallback to essence reward
   return {
     rewardType: "essence",
     essenceAmount: randomInt(150, 350),
@@ -464,10 +480,12 @@ export function rewardPreviewLabel(site: SiteState): string | null {
   if (site.type !== "Reward" || !site.data) return null;
   const rewardType = site.data["rewardType"] as string | undefined;
   if (rewardType === "card") {
-    return "Reward: Card";
+    const name = (site.data["cardName"] as string | undefined) ?? "Card";
+    return `Reward: ${name}`;
   }
   if (rewardType === "dreamsign") {
-    return "Reward: Dreamsign";
+    const name = (site.data["dreamsignName"] as string | undefined) ?? "Dreamsign";
+    return `Reward: ${name}`;
   }
   if (rewardType === "essence") {
     const amount = (site.data["essenceAmount"] as number | undefined) ?? 0;
