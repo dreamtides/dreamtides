@@ -1,12 +1,36 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Dreamcaller, SiteState } from "../types/quest";
+import type { Tide } from "../types/cards";
 import { useQuest } from "../state/quest-context";
 import { DREAMCALLERS } from "../data/dreamcallers";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
-import { selectOfferedDreamcallers } from "../data/dreamcaller-offers";
-import { computeQuestTideProfile } from "../data/quest-tide-profile";
+import { countDeckTides, tideWeight, weightedSample } from "../data/tide-weights";
 import { logEvent } from "../logging";
+
+/**
+ * Selects 3 distinct dreamcallers. If the player has drafted cards,
+ * weights the selection toward tides that match the player's deck.
+ * Otherwise picks 3 at random.
+ */
+function selectOfferedDreamcallers(
+  deck: Array<{ cardNumber: number }>,
+  cardDatabase: Map<number, { tide: Tide }>,
+): Dreamcaller[] {
+  const pool = [...DREAMCALLERS];
+
+  if (deck.length === 0) {
+    // Shuffle and pick 3
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    return pool.slice(0, 3);
+  }
+
+  const tideCounts = countDeckTides(deck, cardDatabase);
+  return weightedSample(pool, 3, (dc) => tideWeight(dc.tide, tideCounts));
+}
 
 interface DreamcallerCardProps {
   dreamcaller: Dreamcaller;
@@ -22,7 +46,7 @@ function DreamcallerCard({
   isDismissed,
   onSelect,
 }: DreamcallerCardProps) {
-  const tideColor = TIDE_COLORS[dreamcaller.tides[0]];
+  const tideColor = TIDE_COLORS[dreamcaller.tide];
 
   return (
     <motion.div
@@ -44,18 +68,13 @@ function DreamcallerCard({
       }
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      {/* Tide icons */}
-      <div className="mb-3 flex items-center gap-2">
-        {dreamcaller.tides.map((nt) => (
-          <img
-            key={nt}
-            src={tideIconUrl(nt)}
-            alt={nt}
-            className="h-12 w-12 rounded-full object-contain md:h-14 md:w-14"
-            style={{ border: `2px solid ${TIDE_COLORS[nt]}` }}
-          />
-        ))}
-      </div>
+      {/* Tide icon */}
+      <img
+        src={tideIconUrl(dreamcaller.tide)}
+        alt={dreamcaller.tide}
+        className="mb-3 h-12 w-12 rounded-full object-contain md:h-14 md:w-14"
+        style={{ border: `2px solid ${tideColor}` }}
+      />
 
       {/* Dreamcaller name */}
       <h3
@@ -74,7 +93,7 @@ function DreamcallerCard({
           border: `1px solid ${tideColor}30`,
         }}
       >
-        {dreamcaller.tides[0]} / {dreamcaller.tides[1]}
+        {dreamcaller.tide} Tide
       </span>
 
       {/* Ability description */}
@@ -160,27 +179,10 @@ export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
   // Compute offered dreamcallers once on first render and keep stable.
   const offeredRef = useRef<Dreamcaller[] | null>(null);
   if (offeredRef.current === null) {
-    const profile = computeQuestTideProfile({
-      startingTide: state.startingTide,
-      deck: state.deck,
+    offeredRef.current = selectOfferedDreamcallers(
+      state.deck,
       cardDatabase,
-      dreamcaller: state.dreamcaller,
-      tideCrystals: state.tideCrystals,
-      recentDraftPicks: state.draftState?.draftedCards ?? [],
-    });
-    offeredRef.current = selectOfferedDreamcallers({
-      pool: DREAMCALLERS,
-      startingTide: state.startingTide,
-      profile,
-    });
-    logEvent("dreamcaller_offers_generated", {
-      startingTide: state.startingTide,
-      offers: offeredRef.current.map((dc) => ({
-        name: dc.name,
-        tides: dc.tides,
-        tideCrystalGrant: dc.tideCrystalGrant,
-      })),
-    });
+    );
   }
   const offered = offeredRef.current;
 
@@ -200,7 +202,7 @@ export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
         siteType: "DreamcallerDraft",
         outcome: `Selected ${dreamcaller.name}`,
         dreamcallerName: dreamcaller.name,
-        dreamcallerTides: dreamcaller.tides,
+        dreamcallerTide: dreamcaller.tide,
         essenceBonus: dreamcaller.essenceBonus,
       });
 

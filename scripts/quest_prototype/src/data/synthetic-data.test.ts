@@ -6,7 +6,7 @@ import type { JourneyEffect } from "./dream-journeys";
 import { TEMPTING_OFFERS } from "./tempting-offers";
 import type { OfferEffect } from "./tempting-offers";
 import { BIOMES } from "./biomes";
-import type { Tide, NamedTide, Rarity } from "../types/cards";
+import type { Tide, Rarity } from "../types/cards";
 
 const ALL_TIDES: Tide[] = [
   "Bloom",
@@ -18,7 +18,7 @@ const ALL_TIDES: Tide[] = [
   "Surge",
   "Neutral",
 ];
-const NAMED_TIDES: NamedTide[] = ALL_TIDES.filter((t): t is NamedTide => t !== "Neutral");
+const NAMED_TIDES: Tide[] = ALL_TIDES.filter((t) => t !== "Neutral");
 const ALL_RARITIES: Rarity[] = [
   "Common",
   "Uncommon",
@@ -80,23 +80,19 @@ describe("dreamcallers", () => {
     expect(DREAMCALLERS).toHaveLength(10);
   });
 
-  it("every entry has two named tides and a matching named crystal", () => {
+  it("every entry has all required fields", () => {
     for (const dc of DREAMCALLERS) {
       expect(dc.name.length).toBeGreaterThan(0);
-      expect(dc.tides).toHaveLength(2);
-      expect(dc.tides[0]).not.toBe(dc.tides[1]);
-      expect(tideSet.has(dc.tides[0])).toBe(true);
-      expect(tideSet.has(dc.tides[1])).toBe(true);
-      expect(dc.tides).not.toContain("Neutral");
+      expect(tideSet.has(dc.tide)).toBe(true);
       expect(dc.abilityDescription.length).toBeGreaterThan(0);
       expect(dc.essenceBonus).toBeGreaterThanOrEqual(50);
       expect(dc.essenceBonus).toBeLessThanOrEqual(150);
-      expect(dc.tides).toContain(dc.tideCrystalGrant);
+      expect(dc.tideCrystalGrant).toBe(dc.tide);
     }
   });
 
   it("covers every named tide at least once", () => {
-    const tides = new Set(DREAMCALLERS.flatMap((dc) => dc.tides));
+    const tides = new Set(DREAMCALLERS.map((dc) => dc.tide));
     for (const t of NAMED_TIDES) {
       expect(tides.has(t)).toBe(true);
     }

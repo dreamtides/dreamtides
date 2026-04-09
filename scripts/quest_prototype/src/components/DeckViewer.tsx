@@ -619,22 +619,19 @@ export function DeckViewer({
                     }}
                   >
                     <div className="flex items-center gap-2">
-                      {state.dreamcaller.tides.map((nt) => (
-                        <img
-                          key={nt}
-                          src={tideIconUrl(nt)}
-                          alt={nt}
-                          className="h-5 w-5 rounded-full"
-                          style={{
-                            border: `1px solid ${TIDE_COLORS[nt]}`,
-                          }}
-                        />
-                      ))}
+                      <img
+                        src={tideIconUrl(state.dreamcaller.tide)}
+                        alt={state.dreamcaller.tide}
+                        className="h-5 w-5 rounded-full"
+                        style={{
+                          border: `1px solid ${TIDE_COLORS[state.dreamcaller.tide]}`,
+                        }}
+                      />
                       <span
                         className="text-sm font-bold"
                         style={{
                           color:
-                            TIDE_COLORS[state.dreamcaller.tides[0]],
+                            TIDE_COLORS[state.dreamcaller.tide],
                         }}
                       >
                         {state.dreamcaller.name}
@@ -874,22 +871,19 @@ function MobileSidebar({
               <div>
                 {dreamcaller !== null ? (
                   <div className="flex items-start gap-2">
-                    {dreamcaller.tides.map((nt) => (
-                      <img
-                        key={nt}
-                        src={tideIconUrl(nt)}
-                        alt={nt}
-                        className="mt-0.5 h-5 w-5 rounded-full"
-                        style={{
-                          border: `1px solid ${TIDE_COLORS[nt]}`,
-                        }}
-                      />
-                    ))}
+                    <img
+                      src={tideIconUrl(dreamcaller.tide)}
+                      alt={dreamcaller.tide}
+                      className="mt-0.5 h-5 w-5 rounded-full"
+                      style={{
+                        border: `1px solid ${TIDE_COLORS[dreamcaller.tide]}`,
+                      }}
+                    />
                     <div>
                       <span
                         className="text-xs font-bold"
                         style={{
-                          color: TIDE_COLORS[dreamcaller.tides[0]],
+                          color: TIDE_COLORS[dreamcaller.tide],
                         }}
                       >
                         {dreamcaller.name}

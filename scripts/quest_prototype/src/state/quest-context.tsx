@@ -283,9 +283,8 @@ export function QuestProvider({
   const setDreamcaller = useCallback((dreamcaller: Dreamcaller) => {
     logEvent("dreamcaller_selected", {
       name: dreamcaller.name,
-      tides: dreamcaller.tides,
+      tide: dreamcaller.tide,
       essenceBonus: dreamcaller.essenceBonus,
-      tideCrystalGrant: dreamcaller.tideCrystalGrant,
     });
     setState((prev) => ({ ...prev, dreamcaller }));
   }, []);

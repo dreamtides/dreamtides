@@ -53,7 +53,7 @@ export function QuestCompleteScreen() {
   ).length;
 
   const dreamcallerName = state.dreamcaller?.name ?? "None";
-  const dreamcallerTide = state.dreamcaller?.tides[0] ?? null;
+  const dreamcallerTide = state.dreamcaller?.tide ?? null;
   const dreamcallerColor =
     dreamcallerTide !== null ? TIDE_COLORS[dreamcallerTide] : "#6b7280";
 
