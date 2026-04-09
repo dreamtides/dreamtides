@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { AtlasScreen } from "../screens/AtlasScreen";
 import { QuestStartScreen } from "../screens/QuestStartScreen";
+import { StartingDeckScreen } from "../screens/StartingDeckScreen";
 import { QuestCompleteScreen } from "../screens/QuestCompleteScreen";
 import { DreamscapeScreen } from "../screens/DreamscapeScreen";
 import { DraftSiteScreen } from "../screens/DraftSiteScreen";
@@ -43,6 +44,8 @@ export function ScreenRouter() {
     switch (screen.type) {
       case "questStart":
         return <QuestStartScreen />;
+      case "viewStartingDeck":
+        return <StartingDeckScreen />;
       case "atlas":
         return <AtlasScreen />;
       case "dreamscape":

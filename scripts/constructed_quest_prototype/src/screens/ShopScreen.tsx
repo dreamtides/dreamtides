@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import type { CardData } from "../types/cards";
+import type { CardData, Tide } from "../types/cards";
 import type { SiteState } from "../types/quest";
 import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
@@ -9,15 +9,29 @@ import { useQuestConfig } from "../state/quest-config";
 import { logEvent } from "../logging";
 import {
   generateCardShopInventory,
+  generateTideCrystalSlots,
   effectivePrice,
   rerollCost,
   type ShopSlot,
+  type TideCrystalSlot,
 } from "../shop/shop-generator";
 import { startingTideSeedTides } from "../data/tide-weights";
+import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 
 /** Props for the ShopScreen component. */
 interface ShopScreenProps {
   site: SiteState;
+}
+
+/** Computes the set of tides the player can play based on their tide crystals. */
+function playableTidesFromCrystals(tideCrystals: Record<Tide, number>): Set<Tide> {
+  const result = new Set<Tide>();
+  for (const [tide, count] of Object.entries(tideCrystals)) {
+    if (count > 0) {
+      result.add(tide as Tide);
+    }
+  }
+  return result;
 }
 
 /** Renders the Card Shop site screen with a card grid, purchasing, and rerolling. */
@@ -26,8 +40,16 @@ export function ShopScreen({ site }: ShopScreenProps) {
   const config = useQuestConfig();
   const { essence } = state;
 
+  const playableTides = useMemo(
+    () => playableTidesFromCrystals(state.tideCrystals),
+    [state.tideCrystals],
+  );
+
   const [slots, setSlots] = useState<ShopSlot[]>(() =>
-    generateCardShopInventory(cardDatabase, state.pool, startingTideSeedTides(state.startingTide), config),
+    generateCardShopInventory(cardDatabase, state.pool, startingTideSeedTides(state.startingTide), config, playableTides),
+  );
+  const [crystalSlots, setCrystalSlots] = useState<TideCrystalSlot[]>(() =>
+    generateTideCrystalSlots(state.tideCrystals, state.startingTide),
   );
   const [rerollCount, setRerollCount] = useState(0);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
@@ -76,9 +98,30 @@ export function ShopScreen({ site }: ShopScreenProps) {
 
     setRerollCount((prev) => prev + 1);
     setSlots(
-      generateCardShopInventory(cardDatabase, state.pool, startingTideSeedTides(state.startingTide), config),
+      generateCardShopInventory(cardDatabase, state.pool, startingTideSeedTides(state.startingTide), config, playableTides),
     );
-  }, [currentRerollCost, essence, rerollCount, cardDatabase, state.pool, state.startingTide, config, mutations]);
+  }, [currentRerollCost, essence, rerollCount, cardDatabase, state.pool, state.startingTide, config, mutations, playableTides]);
+
+  const handleBuyCrystal = useCallback(
+    (index: number) => {
+      const slot = crystalSlots[index];
+      if (slot.purchased || slot.price > essence) return;
+
+      mutations.changeEssence(-slot.price, "crystal_purchase");
+      mutations.addTideCrystal(slot.tide, 1);
+
+      logEvent("crystal_purchase", {
+        tide: slot.tide,
+        price: slot.price,
+        essenceRemaining: essence - slot.price,
+      });
+
+      setCrystalSlots((prev) =>
+        prev.map((s, i) => (i === index ? { ...s, purchased: true } : s)),
+      );
+    },
+    [crystalSlots, essence, mutations],
+  );
 
   const handleLeave = useCallback(() => {
     logEvent("site_completed", {
@@ -118,6 +161,62 @@ export function ShopScreen({ site }: ShopScreenProps) {
           </span>
         )}
       </div>
+
+      {/* Tide Crystal slots */}
+      {crystalSlots.length > 0 && (
+        <div className="mb-6 w-full max-w-4xl">
+          <h3
+            className="mb-3 text-center text-sm font-bold uppercase tracking-wider"
+            style={{ color: "#c084fc" }}
+          >
+            Tide Crystals
+          </h3>
+          <div className="flex flex-wrap justify-center gap-3">
+            {crystalSlots.map((slot, index) => (
+              <button
+                key={slot.tide}
+                className="flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2.5 transition-opacity"
+                style={{
+                  background: slot.purchased
+                    ? "rgba(107, 114, 128, 0.1)"
+                    : `rgba(124, 58, 237, 0.1)`,
+                  border: slot.purchased
+                    ? "1px dashed rgba(107, 114, 128, 0.2)"
+                    : `1px solid ${TIDE_COLORS[slot.tide]}40`,
+                  opacity: slot.purchased ? 0.3 : slot.price <= essence ? 1 : 0.5,
+                  cursor: slot.purchased || slot.price > essence ? "not-allowed" : "pointer",
+                }}
+                disabled={slot.purchased || slot.price > essence}
+                onClick={() => handleBuyCrystal(index)}
+              >
+                <img
+                  src={tideIconUrl(slot.tide)}
+                  alt={slot.tide}
+                  className="h-6 w-6 rounded-full"
+                  style={{ border: `2px solid ${TIDE_COLORS[slot.tide]}` }}
+                />
+                <span
+                  className="text-sm font-bold"
+                  style={{ color: TIDE_COLORS[slot.tide] }}
+                >
+                  {slot.tide}
+                </span>
+                {!slot.purchased && (
+                  <span
+                    className="ml-1 text-xs font-medium"
+                    style={{ color: "#fbbf24" }}
+                  >
+                    {String(slot.price)} Essence
+                  </span>
+                )}
+                {slot.purchased && (
+                  <span className="ml-1 text-xs opacity-50">Purchased</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Card grid: 2 columns on small screens, 4 on large */}
       <div className="grid w-full max-w-4xl grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">

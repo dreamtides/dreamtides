@@ -16,6 +16,30 @@ import { computeTideDistribution } from "./tide-distribution";
 /** All tides including Neutral, used for filter toggles. */
 const ALL_TIDES: readonly Tide[] = [...NAMED_TIDES, "Neutral"] as const;
 
+/** Card size preset. */
+type CardSizePreset = "small" | "medium" | "large";
+
+/** Grid configuration for each size preset. */
+const SIZE_PRESETS: Readonly<
+  Record<CardSizePreset, { columns: string; gap: string; label: string }>
+> = {
+  small: {
+    columns: "repeat(auto-fill, minmax(100px, 1fr))",
+    gap: "0.375rem",
+    label: "S",
+  },
+  medium: {
+    columns: "repeat(auto-fill, minmax(160px, 1fr))",
+    gap: "0.5rem",
+    label: "M",
+  },
+  large: {
+    columns: "repeat(auto-fill, minmax(220px, 1fr))",
+    gap: "0.75rem",
+    label: "L",
+  },
+};
+
 /** Sort criteria options. */
 type SortCriteria =
   | "acquisitionOrder"
@@ -89,6 +113,7 @@ export function DeckViewer({
   const [sortAscending, setSortAscending] = useState(true);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [cardSize, setCardSize] = useState<CardSizePreset>("small");
   const openTimestampRef = useRef<number>(0);
   const prevOpenRef = useRef(false);
 
@@ -519,6 +544,38 @@ export function DeckViewer({
                 {sortAscending ? "\u2191" : "\u2193"}
               </button>
             </div>
+
+            {/* Divider */}
+            <div
+              className="mx-1 hidden h-5 md:block"
+              style={{ borderLeft: "1px solid rgba(255, 255, 255, 0.1)" }}
+            />
+
+            {/* Card size controls */}
+            <div className="flex items-center gap-1">
+              <span className="mr-1 text-[10px] uppercase tracking-wider opacity-40">
+                Size
+              </span>
+              {(Object.keys(SIZE_PRESETS) as CardSizePreset[]).map((preset) => (
+                <button
+                  key={preset}
+                  className="cursor-pointer rounded-full px-2 py-0.5 text-[11px] font-medium transition-all"
+                  style={{
+                    background:
+                      cardSize === preset
+                        ? "rgba(168, 85, 247, 0.25)"
+                        : "rgba(255, 255, 255, 0.03)",
+                    border: `1px solid ${cardSize === preset ? "rgba(168, 85, 247, 0.5)" : "rgba(255, 255, 255, 0.1)"}`,
+                    color: cardSize === preset ? "#c084fc" : "#6b7280",
+                  }}
+                  onClick={() => {
+                    setCardSize(preset);
+                  }}
+                >
+                  {SIZE_PRESETS[preset].label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Main content area */}
@@ -534,7 +591,13 @@ export function DeckViewer({
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-3 gap-3 xl:grid-cols-5">
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: SIZE_PRESETS[cardSize].columns,
+                    gap: SIZE_PRESETS[cardSize].gap,
+                  }}
+                >
                   {sortedEntries.map((resolved) => (
                     <div
                       key={resolved.entry.entryId}

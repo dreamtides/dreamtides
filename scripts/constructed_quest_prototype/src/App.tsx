@@ -13,7 +13,7 @@ function QuestApp({
   cardDatabase: Map<number, CardData>;
 }) {
   const { state } = useQuest();
-  const showHud = state.screen.type !== "questStart";
+  const showHud = state.screen.type !== "questStart" && state.screen.type !== "viewStartingDeck";
   const [deckEditorOpen, setDeckEditorOpen] = useState(false);
 
   const handleOpenDeckEditor = useCallback(() => {
