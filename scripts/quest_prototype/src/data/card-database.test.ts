@@ -140,12 +140,13 @@ describe("TIDE_COLORS", () => {
 });
 
 describe("RARITY_COLORS", () => {
-  it("maps all 4 rarities to hex colors", () => {
+  it("maps all 5 rarities to hex colors", () => {
     const expected: Record<Rarity, string> = {
       Common: "#ffffff",
       Uncommon: "#10b981",
       Rare: "#3b82f6",
       Legendary: "#a855f7",
+      Starter: "#d4a017",
     };
     for (const [rarity, color] of Object.entries(expected)) {
       expect(RARITY_COLORS[rarity as Rarity]).toBe(color);
@@ -178,7 +179,7 @@ async function readCardDataJson(): Promise<CardData[] | null> {
 /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
 
 describe("loadCardDatabase integration (real card-data.json)", () => {
-  it("loads 483 cards and indexes them by cardNumber", async () => {
+  it("loads 592 cards and indexes them by cardNumber", async () => {
     const raw = await readCardDataJson();
     if (raw === null) return;
 
@@ -191,7 +192,7 @@ describe("loadCardDatabase integration (real card-data.json)", () => {
     );
 
     const db = await loadCardDatabase();
-    expect(db.size).toBe(483);
+    expect(db.size).toBe(592);
   });
 
   it("every card has all required fields with correct types", async () => {
@@ -213,6 +214,7 @@ describe("loadCardDatabase integration (real card-data.json)", () => {
       "Uncommon",
       "Rare",
       "Legendary",
+      "Starter",
     ]);
     const validTides = new Set([
       "Bloom",
@@ -265,5 +267,19 @@ describe("loadCardDatabase integration (real card-data.json)", () => {
     expect(card).toBeDefined();
     expect(card?.cardNumber).toBe(1);
     expect(card?.name.length).toBeGreaterThan(0);
+  });
+
+  it("includes the 10 Starter loadout cards", async () => {
+    const raw = await readCardDataJson();
+    if (raw === null) return;
+
+    const starterCardNumbers = raw
+      .filter((card) => card.rarity === "Starter")
+      .map((card) => card.cardNumber)
+      .sort((a, b) => a - b);
+
+    expect(starterCardNumbers).toEqual([
+      711, 712, 713, 714, 715, 716, 717, 718, 719, 720,
+    ]);
   });
 });
