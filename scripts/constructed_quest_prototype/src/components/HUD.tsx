@@ -63,7 +63,7 @@ export function HUD({ onOpenDeckEditor }: HudProps) {
   }
 
   const dreamcallerName = state.dreamcaller?.name ?? null;
-  const dreamcallerTide = state.dreamcaller?.tide ?? null;
+  const dreamcallerTide = state.dreamcaller?.tides[0] ?? null;
   const dreamcallerColor =
     dreamcallerTide !== null ? TIDE_COLORS[dreamcallerTide] : "#6b7280";
 
