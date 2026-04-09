@@ -2,13 +2,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { AtlasNode } from "../components/AtlasNode";
+import { logEvent } from "../logging";
 
 const DRAG_THRESHOLD = 5;
 
 /** The Dream Atlas screen: a pannable radial graph of dreamscape nodes. */
 export function AtlasScreen() {
   const { state, mutations } = useQuest();
-  const { atlas } = state;
+  const { atlas, essence } = state;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -90,10 +91,19 @@ export function AtlasScreen() {
       const node = atlas.nodes[nodeId];
       if (!node || node.status !== "available") return;
 
+      // Reset essence to 0 when entering a new dreamscape
+      if (essence > 0) {
+        logEvent("essence_reset_on_dreamscape_entry", {
+          essenceLost: essence,
+          dreamscapeId: nodeId,
+        });
+        mutations.changeEssence(-essence, "dreamscape_transition");
+      }
+
       mutations.setCurrentDreamscape(nodeId);
       mutations.setScreen({ type: "dreamscape" });
     },
-    [atlas.nodes, mutations],
+    [atlas.nodes, mutations, essence],
   );
 
   const svgWidth = 1200;
