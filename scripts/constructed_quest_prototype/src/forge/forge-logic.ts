@@ -1,7 +1,7 @@
-import type { CardData, Tide } from "../types/cards";
+import type { CardData, NamedTide, Tide } from "../types/cards";
 import type { DeckEntry, ForgeRecipe } from "../types/quest";
 import type { QuestConfig } from "../state/quest-config";
-import { NAMED_TIDES } from "../data/card-database";
+import { adjacentTides, NAMED_TIDES } from "../data/card-database";
 import {
   countDeckTides,
   excessCardsByTide,
@@ -39,9 +39,9 @@ export function generateForgeRecipes(
     .filter((t) => (poolTideCounts.get(t) ?? 0) >= config.forgeCost)
     .sort((a, b) => (excess.get(b) ?? 0) - (excess.get(a) ?? 0));
 
-  // All non-Neutral cards for output selection
+  // All non-Neutral, non-Starter cards for output selection
   const outputCandidates = Array.from(cardDatabase.values()).filter(
-    (c) => c.tide !== "Neutral",
+    (c) => c.tide !== "Neutral" && c.rarity !== "Starter",
   );
 
   const recipes: ForgeRecipe[] = [];
@@ -88,20 +88,26 @@ export function generateForgeRecipes(
  */
 export function getForgeEligibleCards(
   cardDatabase: Map<number, CardData>,
-  startingTides: Tide[],
+  startingTide: NamedTide | null,
   excludeTide?: Tide,
 ): CardData[] {
-  const tideSet = new Set(startingTides);
+  const tideSet = new Set<Tide>();
+  if (startingTide !== null) {
+    tideSet.add(startingTide);
+    for (const adj of adjacentTides(startingTide)) {
+      tideSet.add(adj);
+    }
+  }
   const eligible = Array.from(cardDatabase.values()).filter(
     (c) =>
-      tideSet.has(c.tide) &&
+      (tideSet.size === 0 || tideSet.has(c.tide)) &&
       c.tide !== "Neutral" &&
+      c.rarity !== "Starter" &&
       (excludeTide === undefined || c.tide !== excludeTide),
   );
 
   if (eligible.length <= 20) return eligible;
 
-  // Simple random shuffle and take 20
   const shuffled = eligible.slice();
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

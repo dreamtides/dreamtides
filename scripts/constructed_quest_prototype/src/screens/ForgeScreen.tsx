@@ -22,7 +22,7 @@ interface ForgeScreenProps {
 export function ForgeScreen({ site }: ForgeScreenProps) {
   const { state, mutations, cardDatabase } = useQuest();
   const config = useQuestConfig();
-  const { pool, deck, startingTides } = state;
+  const { pool, deck, startingTide } = state;
 
   const [recipes, setRecipes] = useState<ForgeRecipe[]>([]);
   const [completedRecipes, setCompletedRecipes] = useState<Set<number>>(
@@ -97,7 +97,7 @@ export function ForgeScreen({ site }: ForgeScreenProps) {
       // Enhanced mode: show output picker
       const eligible = getForgeEligibleCards(
         cardDatabase,
-        startingTides,
+        startingTide,
         currentRecipe.sacrificeTide,
       );
       setEnhancedCards(eligible);
@@ -107,7 +107,7 @@ export function ForgeScreen({ site }: ForgeScreenProps) {
 
     // Standard mode: execute the forge
     executeForge(currentRecipe.outputCard);
-  }, [currentRecipe, pickingRecipeIndex, site.isEnhanced, cardDatabase, startingTides]);
+  }, [currentRecipe, pickingRecipeIndex, site.isEnhanced, cardDatabase, startingTide]);
 
   const executeForge = useCallback(
     (outputCard: CardData | null) => {

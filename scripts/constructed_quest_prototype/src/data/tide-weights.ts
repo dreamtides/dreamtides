@@ -1,7 +1,13 @@
-import type { CardData, Tide } from "../types/cards";
+import type { CardData, NamedTide, Tide } from "../types/cards";
 import type { DeckEntry } from "../types/quest";
 import type { QuestConfig } from "../state/quest-config";
 import { adjacentTides, NAMED_TIDES } from "./card-database";
+
+/** Derives seed tides from a starting tide: the tide itself + its two neighbors. */
+export function startingTideSeedTides(startingTide: NamedTide | null): Tide[] {
+  if (startingTide === null) return [];
+  return [startingTide, ...adjacentTides(startingTide)];
+}
 
 /** Counts tide occurrences in the player's deck. */
 export function countDeckTides(

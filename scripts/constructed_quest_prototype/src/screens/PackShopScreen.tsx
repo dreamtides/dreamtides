@@ -7,6 +7,7 @@ import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { CardDisplay } from "../components/CardDisplay";
 import { generatePackShopInventory } from "../shop/pack-shop-generator";
 import { logEvent } from "../logging";
+import { startingTideSeedTides } from "../data/tide-weights";
 
 /** Props for the PackShopScreen component. */
 interface PackShopScreenProps {
@@ -41,7 +42,7 @@ export function PackShopScreen({ site }: PackShopScreenProps) {
     generatePackShopInventory(
       cardDatabase,
       state.pool,
-      state.startingTides,
+      startingTideSeedTides(state.startingTide),
       config,
     ),
   );

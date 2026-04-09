@@ -53,7 +53,7 @@ function generateEnemy(): EnemyData {
     name: `${prefix} ${baseName}`,
     abilityText: template.abilityDescription,
     dreamsignCount: Math.floor(Math.random() * 5) + 1,
-    tide: template.tide,
+    tide: template.tides[0],
   };
 }
 
@@ -964,7 +964,7 @@ export function BattleScreen({
                 cardDatabase,
                 dreamsignPool: DREAMSIGNS,
                 playerHasBanes,
-                startingTides: state.startingTides,
+                startingTide: state.startingTide,
                 playerPool: state.pool,
                 config,
               },
@@ -994,7 +994,7 @@ export function BattleScreen({
       isMiniboss,
       state.deck,
       state.dreamsigns,
-      state.startingTides,
+      state.startingTide,
       state.pool,
       cardDatabase,
       config,

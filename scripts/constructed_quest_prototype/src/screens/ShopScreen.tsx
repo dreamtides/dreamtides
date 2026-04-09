@@ -13,6 +13,7 @@ import {
   rerollCost,
   type ShopSlot,
 } from "../shop/shop-generator";
+import { startingTideSeedTides } from "../data/tide-weights";
 
 /** Props for the ShopScreen component. */
 interface ShopScreenProps {
@@ -26,7 +27,7 @@ export function ShopScreen({ site }: ShopScreenProps) {
   const { essence } = state;
 
   const [slots, setSlots] = useState<ShopSlot[]>(() =>
-    generateCardShopInventory(cardDatabase, state.pool, state.startingTides, config),
+    generateCardShopInventory(cardDatabase, state.pool, startingTideSeedTides(state.startingTide), config),
   );
   const [rerollCount, setRerollCount] = useState(0);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
@@ -75,9 +76,9 @@ export function ShopScreen({ site }: ShopScreenProps) {
 
     setRerollCount((prev) => prev + 1);
     setSlots(
-      generateCardShopInventory(cardDatabase, state.pool, state.startingTides, config),
+      generateCardShopInventory(cardDatabase, state.pool, startingTideSeedTides(state.startingTide), config),
     );
-  }, [currentRerollCost, essence, rerollCount, cardDatabase, state.pool, state.startingTides, config, mutations]);
+  }, [currentRerollCost, essence, rerollCount, cardDatabase, state.pool, state.startingTide, config, mutations]);
 
   const handleLeave = useCallback(() => {
     logEvent("site_completed", {
