@@ -88,6 +88,9 @@ impl Component for SetOpponentAgentPanel<'_> {
                                     SetAgentCell::builder().agent(GameAI::MonteCarlo(500)).build(),
                                 )
                                 .child(
+                                    SetAgentCell::builder().agent(GameAI::MonteCarloV7(50)).build(),
+                                )
+                                .child(
                                     SetAgentCell::builder()
                                         .agent(GameAI::MonteCarloHybridV1(3000))
                                         .build(),
