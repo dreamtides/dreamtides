@@ -11,6 +11,7 @@ use ai_uct::{hybrid_features, uct_search_v4};
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
+use battle_state::battle::battle_rules_config::BalanceMode;
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle_cards::dreamwell_data::Dreamwell;
@@ -136,6 +137,7 @@ fn collect_match(
         PlayerName::One,
         None,
         None,
+        BalanceMode::None,
     );
 
     let teacher_ai = GameAI::MonteCarloV4(teacher_iterations);

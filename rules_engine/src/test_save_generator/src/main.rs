@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use ai_data::game_ai::GameAI;
 use battle_mutations::card_mutations::move_card;
+use battle_state::battle::battle_rules_config::BalanceMode;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle::card_id::BattleDeckCardId;
 use battle_state::battle_cards::dreamwell_data::Dreamwell;
@@ -130,6 +131,7 @@ fn create_battle(tabula: Arc<Tabula>) -> BattleState {
         PlayerName::One,
         None,
         None,
+        BalanceMode::None,
     )
 }
 

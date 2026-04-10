@@ -1,3 +1,4 @@
+use battle_state::battle::battle_rules_config::BalanceMode;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
@@ -169,12 +170,15 @@ fn reposition_actions(
     let front_size = battle.rules_config.front_row_size as u8;
     let back_size = battle.rules_config.back_row_size as u8;
 
+    let skip_sickness =
+        battle.rules_config.balance_mode == BalanceMode::NoSickness && current_turn == 1;
     for character_id in bf.back[..back_size as usize].iter().flatten() {
-        let has_summoning_sickness = battle
-            .cards
-            .battlefield_state(player)
-            .get(character_id)
-            .is_some_and(|state| state.played_turn == current_turn);
+        let has_summoning_sickness = !skip_sickness
+            && battle
+                .cards
+                .battlefield_state(player)
+                .get(character_id)
+                .is_some_and(|state| state.played_turn == current_turn);
         if !has_summoning_sickness {
             for position in 0..front_size {
                 to_front.push((*character_id, position));

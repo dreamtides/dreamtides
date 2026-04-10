@@ -7,6 +7,7 @@ use battle_mutations::actions::apply_battle_action;
 use battle_queries::battle_card_queries::{card, card_abilities};
 use battle_queries::legal_action_queries::{legal_actions, legal_actions_cache};
 use battle_state::battle::battle_card_definitions::BattleCardDefinitions;
+use battle_state::battle::battle_rules_config::BalanceMode;
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
 use battle_state::battle_cards::dreamwell_data::Dreamwell;
 use battle_state::battle_player::battle_player_state::{
@@ -104,6 +105,7 @@ fn generate_core_11_battle_with_logging(enable_logging: bool) -> BattleState {
         PlayerName::One,
         None,
         None,
+        BalanceMode::None,
     );
 
     let mut action_count = 0;

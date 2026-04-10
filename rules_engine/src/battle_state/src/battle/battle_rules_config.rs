@@ -4,6 +4,24 @@ use serde::{Deserialize, Serialize};
 /// Maximum number of slots per rank, used for fixed-size array allocation.
 pub const MAX_ROW_SIZE: usize = 8;
 
+/// Balance compensation mode for second player advantage.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum BalanceMode {
+    /// No compensation beyond the existing turn-0 draw skip.
+    #[default]
+    None,
+    /// P2 draws 6 opening cards instead of 5.
+    ExtraCard,
+    /// P2 starts with +1 produced and current energy.
+    BonusEnergy,
+    /// P2 starts with 3 victory points.
+    BonusPoints,
+    /// P2's characters skip summoning sickness on their first turn.
+    NoSickness,
+    /// P2 receives a 0-cost fast "Balance Coin" event (gain 1 energy).
+    Coin,
+}
+
 /// Global configuration for the rules of a battle.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct BattleRulesConfig {
@@ -17,6 +35,10 @@ pub struct BattleRulesConfig {
     /// Number of back-row slots per player.
     #[serde(default = "default_back_row_size")]
     pub back_row_size: usize,
+
+    /// Balance compensation for the second player.
+    #[serde(default)]
+    pub balance_mode: BalanceMode,
 }
 
 fn default_front_row_size() -> usize {

@@ -10,6 +10,7 @@ use ai_agents::agent_search;
 use backtrace::Backtrace;
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::legal_action_queries::legal_actions;
+use battle_state::battle::battle_rules_config::BalanceMode;
 use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle_cards::dreamwell_data::Dreamwell;
@@ -73,6 +74,20 @@ impl DeckChoice {
     }
 }
 
+fn parse_balance_mode(s: &str) -> BalanceMode {
+    match s {
+        "none" => BalanceMode::None,
+        "extra-card" => BalanceMode::ExtraCard,
+        "bonus-energy" => BalanceMode::BonusEnergy,
+        "bonus-points" => BalanceMode::BonusPoints,
+        "no-sickness" => BalanceMode::NoSickness,
+        "coin" => BalanceMode::Coin,
+        _ => panic!(
+            "Unknown balance mode: {s}. Expected: none, extra-card, bonus-energy, bonus-points, no-sickness, coin"
+        ),
+    }
+}
+
 fn load_tabula(source: TabulaSource) -> Arc<Tabula> {
     let streaming_assets_path = logging::get_developer_mode_streaming_assets_path();
     let tabula_dir = Path::new(&streaming_assets_path).join("Tabula");
@@ -117,6 +132,13 @@ struct Args {
         help = "Deck to use for both players"
     )]
     deck: DeckChoice,
+
+    #[arg(
+        long,
+        default_value = "none",
+        help = "Balance mode: none, extra-card, bonus-energy, bonus-points, no-sickness, coin"
+    )]
+    balance: String,
 }
 
 struct MatchResult {
@@ -161,6 +183,7 @@ struct MatchResources {
     deck_name: TestDeckName,
     dreamwell_list: DreamwellCardIdList,
     tabula: Arc<Tabula>,
+    balance_mode: BalanceMode,
 }
 
 #[derive(Debug)]
@@ -276,6 +299,7 @@ fn run_match(
     let deck_name = resources.deck_name;
     let dreamwell_list = resources.dreamwell_list.clone();
     let tabula = resources.tabula.clone();
+    let balance_mode = resources.balance_mode;
 
     catch_panic(move || {
         let log_directory =
@@ -301,6 +325,7 @@ fn run_match(
             PlayerName::One,
             None,
             None,
+            balance_mode,
         );
 
         let start_time = Instant::now();
@@ -389,6 +414,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         deck_name: args.deck.to_test_deck_name(),
         dreamwell_list: args.deck.dreamwell_list(),
         tabula: load_tabula(args.deck.tabula_source()),
+        balance_mode: parse_balance_mode(&args.balance),
     };
 
     let mut results = MatchResult {

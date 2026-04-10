@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use std::sync::Arc;
 
-use battle_mutations::card_mutations::battle_deck;
+use battle_mutations::card_mutations::{battle_deck, move_card};
 use battle_mutations::phase_mutations::turn;
 use battle_queries::battle_card_queries::card_abilities;
 use battle_queries::legal_action_queries::legal_actions_cache;
@@ -9,10 +9,11 @@ use battle_state::battle::all_cards::AllCards;
 use battle_state::battle::battle_card_definitions::{
     BattleCardDefinitions, BattleCardDefinitionsCard,
 };
-use battle_state::battle::battle_rules_config::BattleRulesConfig;
+use battle_state::battle::battle_rules_config::{BalanceMode, BattleRulesConfig};
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
+use battle_state::battle::card_id::{BattleDeckCardId, CardId};
 use battle_state::battle::turn_data::TurnData;
 use battle_state::battle::turn_history::TurnHistory;
 use battle_state::battle_cards::ability_state::AbilityState;
@@ -49,6 +50,7 @@ pub fn create_and_start(
     first_player: PlayerName,
     front_row_size: Option<usize>,
     back_row_size: Option<usize>,
+    balance_mode: BalanceMode,
 ) -> BattleState {
     let quest_one = Arc::new(create_quest_state(&tabula, player_one.deck_name));
     let quest_two = Arc::new(create_quest_state(&tabula, player_two.deck_name));
@@ -88,6 +90,7 @@ pub fn create_and_start(
             points_to_win: Points(25),
             front_row_size: front_row_size.unwrap_or(4),
             back_row_size: back_row_size.unwrap_or(5),
+            balance_mode,
         },
         tabula,
         card_definitions: ability_cache,
@@ -157,6 +160,35 @@ pub fn create_and_start(
         PlayerName::Two,
         5,
     );
+
+    let second_player = first_player.opponent();
+    let source = EffectSource::Game { controller: second_player };
+    match balance_mode {
+        BalanceMode::None | BalanceMode::NoSickness => {}
+        BalanceMode::ExtraCard => {
+            battle_deck::draw_card(&mut battle, source, second_player);
+        }
+        BalanceMode::BonusEnergy => {
+            let player_state = battle.players.player_mut(second_player);
+            player_state.produced_energy = Energy(1);
+            player_state.current_energy = Energy(1);
+        }
+        BalanceMode::BonusPoints => {
+            battle.players.player_mut(second_player).points = Points(3);
+        }
+        BalanceMode::Coin => {
+            let card_count = battle.cards.all_cards().count();
+            let definition = battle
+                .tabula
+                .cards
+                .get(&test_card::BALANCE_COIN)
+                .expect("Balance Coin card not found in tabula")
+                .clone();
+            battle_deck::debug_add_cards(&mut battle, second_player, &[definition]);
+            let card_id = BattleDeckCardId(CardId(card_count));
+            move_card::from_deck_to_hand(&mut battle, source, second_player, card_id);
+        }
+    }
 
     battle.phase = BattleTurnPhase::Starting;
     turn::run_turn_state_machine_if_no_active_prompts(&mut battle);

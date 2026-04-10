@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_history::BattleHistory;
+use battle_state::battle::battle_rules_config::BalanceMode;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle_cards::dreamwell_data::Dreamwell;
 use battle_state::battle_player::battle_player_state::CreateBattlePlayer;
@@ -38,6 +39,7 @@ pub fn create_and_start(
         first_player,
         front_row_size,
         back_row_size,
+        BalanceMode::None,
     );
     battle.animations = Some(AnimationData::default());
     battle.tracing = Some(BattleTracing::default());

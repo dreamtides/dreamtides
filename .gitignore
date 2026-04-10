@@ -36,3 +36,5 @@ Logs/
 
 .superpowers
 ai_decisions.jsonl
+
+scripts/balance_test_output

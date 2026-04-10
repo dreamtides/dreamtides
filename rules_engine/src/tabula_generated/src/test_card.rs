@@ -76,6 +76,8 @@ pub const TEST_DISCARD_TWO: BaseCardId = BaseCardId(uuid!("ef6d55f9-49ba-4637-af
 pub const TEST_MATERIALIZED_DRAW_CARD: BaseCardId = BaseCardId(uuid!("f62670ae-73ad-4645-8de4-4cd8fb58b920"));
 /// {Judgment} Gain {energy($e)}.
 pub const TEST_JUDGMENT_GAIN_ENERGY: BaseCardId = BaseCardId(uuid!("94b6509b-fe6a-400a-baf8-4d39adc4b296"));
+/// Gain {energy($e)}.
+pub const BALANCE_COIN: BaseCardId = BaseCardId(uuid!("39fe61ec-b193-454f-ae97-e2c0ae6ad655"));
 pub const DREAMWELL_PRODUCE_0: DreamwellCardId = DreamwellCardId(uuid!("146ae27e-a8ac-4f3c-aef2-cf2211e4bcfe"));
 pub const DREAMWELL_PRODUCE_1: DreamwellCardId = DreamwellCardId(uuid!("ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2"));
 pub const DREAMWELL_PRODUCE_2_STARTER: DreamwellCardId = DreamwellCardId(uuid!("308fd4c0-ca98-4bfa-a9be-c29b36a145fd"));
@@ -128,6 +130,7 @@ pub const ALL_TEST_CARD_IDS: &[BaseCardId] = &[
     TEST_DISCARD_TWO,
     TEST_MATERIALIZED_DRAW_CARD,
     TEST_JUDGMENT_GAIN_ENERGY,
+    BALANCE_COIN,
 ];
 
 pub const ALL_TEST_DREAMWELL_CARD_IDS: &[DreamwellCardId] = &[

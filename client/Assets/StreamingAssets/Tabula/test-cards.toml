@@ -494,6 +494,18 @@ spark = 1
 image-number = 1200949264
 subtype = ""
 
+[[test-cards]]
+name = "Balance Coin"
+id = "39fe61ec-b193-454f-ae97-e2c0ae6ad655"
+energy-cost = 0
+rules-text = "Gain {energy($e)}."
+variables = "e: 1"
+card-type = "Event"
+is-fast = true
+image-number = 489056605
+subtype = ""
+spark = ""
+
 
 [metadata]
 schema_version = 1

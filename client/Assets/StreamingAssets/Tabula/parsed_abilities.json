@@ -1027,6 +1027,30 @@
       }
     }
   ],
+  "39fe61ec-b193-454f-ae97-e2c0ae6ad655": [
+    {
+      "Event": {
+        "effect": {
+          "Effect": {
+            "GainEnergy": {
+              "gains": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "Event": {
+        "effect": {
+          "Effect": {
+            "GainEnergy": {
+              "gains": 1
+            }
+          }
+        }
+      }
+    }
+  ],
   "3ab4dd0d-28c6-42e7-ab47-691781d458c5": [
     {
       "Triggered": {
