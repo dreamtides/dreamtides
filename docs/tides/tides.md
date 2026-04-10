@@ -71,17 +71,8 @@ the safety net of the draft.
 
 ## Relationships
 
-Neutral is allied with every tide and enemy of none. It is the connective tissue
-of the format. Its generic removal helps aggressive decks push through blockers
-and control decks answer threats. Its Discover cards help combo decks find
-pieces and midrange decks find answers. Its legendary powers are coveted by
-everyone.
-
-The tension in Neutral is opportunity cost: drafting Neutral cards means passing
-on synergy-heavy tide cards. A deck full of Neutral cards is powerful but
-undirected, like a river without banks. The best decks weave Neutral's raw power
-into a tide's focused strategy, using Neutral to shore up weaknesses rather than
-replace strengths.
+Neutral is allied with every tide and enemy of none — its generic removal, card
+selection, and legendary powers slot into any strategy as utility.
 
 ______________________________________________________________________
 
@@ -144,32 +135,8 @@ investment.
 
 ## Relationships
 
-**Allies:**
-
-- **Arc** — Bloom's most natural ally. Arc's blink effects can re-trigger
-  Bloom's powerful materialized abilities on spirit animals, generating
-  additional energy and value. Arc provides the tempo tools that help Bloom
-  survive its slow early turns, while Bloom provides the massive payoffs that
-  Arc's engine wants to abuse. The Bloom-Arc hybrid deck ramps fast by
-  repeatedly materializing energy-producing spirit animals — each one generating
-  energy on entry and again every Judgment phase — then deploys a threat too
-  large for the opponent to handle.
-- **Surge** — Bloom generates enormous amounts of energy, and Surge knows
-  exactly what to do with it. Surge's expensive event chains become affordable
-  when powered by Bloom's ramp, while Bloom appreciates Surge's ability to
-  protect its key threat with counterspells during the critical turns. The
-  Bloom-Surge hybrid is a classic "ramp into combo" deck that spends early turns
-  building resources and late turns converting them into a decisive event chain.
-
-**Tensions:**
-
-- **Pact** — Bloom invests everything into preserving its best characters; Pact
-  wants to sacrifice them. These two tides are philosophically opposed. Bloom
-  sees Pact's willingness to destroy what it has built as wasteful; Pact sees
-  Bloom's attachment to its creatures as naive.
-- **Ignite** — Ignite's go-wide aggression is the strategic foil to Bloom's
-  go-tall plan. Ignite floods the board before Bloom can establish its engine,
-  and Bloom's single large threat can be overwhelmed by sheer numbers.
+Bloom's neighbors are Arc (blink effects re-trigger spirit animal materialized
+abilities for compounding ramp) and Surge (ramp fuels expensive event chains).
 
 ______________________________________________________________________
 
@@ -236,26 +203,8 @@ recursion or event chains.
 
 ## Relationships
 
-**Allies:**
-
-- **Bloom** — Arc provides the blink engine; Bloom provides the targets. Spirit
-  animals with powerful materialized abilities are Arc's favorite things to
-  blink, and Bloom's ramp helps pay for Arc's repeated materializations. The
-  hybrid deck generates enormous value by blinking energy-producing or
-  spark-boosting spirit animals.
-- **Ignite** — Arc's blink effects on Ignite's token-producing characters create
-  explosive board states. Blink a warrior that materializes two figments and
-  suddenly the board is flooded. Ignite's go-wide payoffs reward the sheer
-  volume of materialized triggers that Arc generates.
-
-**Tensions:**
-
-- **Umbra** — Arc wants characters on the battlefield to blink; Umbra wants them
-  in the void. Arc sees Umbra's self-destruction as counterproductive; Umbra
-  sees Arc's attachment to the battlefield as short-sighted.
-- **Rime** — Rime's disruption and forced discards threaten Arc's engine pieces
-  before they can be assembled. Arc needs specific cards to function; Rime
-  specializes in making sure opponents don't have what they need.
+Arc's neighbors are Bloom (spirit animals with materialized abilities are ideal
+blink targets) and Ignite (blinking token-producers floods the board).
 
 ______________________________________________________________________
 
@@ -318,26 +267,9 @@ where a single enormous character can outspark Ignite's entire army.
 
 ## Relationships
 
-**Allies:**
-
-- **Arc** — Arc's blink effects multiply Ignite's materialized triggers,
-  creating cascades of figment tokens and warrior bonuses. Arc provides the
-  repeatable engine that keeps Ignite's aggression going past the initial burst.
-  The hybrid deck plays like a machine gun of materialized triggers.
-- **Pact** — Ignite floods the board with expendable characters; Pact turns them
-  into resources. Warriors and figments that have already attacked serve as
-  perfect sacrifice fodder for Pact's abandon-for-value effects. The hybrid deck
-  generates disposable bodies and converts them into card advantage and
-  reanimated threats.
-
-**Tensions:**
-
-- **Bloom** — Bloom's single massive character can outspark Ignite's entire
-  board. Ignite wants the game over fast; Bloom wants it to go long. This is the
-  classic aggro-vs-ramp matchup.
-- **Surge** — Surge's counterspells and board interaction can dismantle Ignite's
-  setup turns, and Surge doesn't need the board to win. Ignite struggles when
-  its momentum is interrupted by reactive play.
+Ignite's neighbors are Arc (blink effects multiply materialized triggers for
+token cascades) and Pact (expendable warriors and figments fuel sacrifice
+engines).
 
 ______________________________________________________________________
 
@@ -403,28 +335,8 @@ cut off its reanimation plan entirely.
 
 ## Relationships
 
-**Allies:**
-
-- **Ignite** — Ignite provides the expendable bodies that Pact needs to fuel its
-  sacrifice engine. Figment tokens and cheap warriors are perfect abandon
-  targets, and Ignite doesn't mind losing characters that have already served
-  their purpose. The hybrid deck generates a stream of disposable characters and
-  converts them into reanimated threats.
-- **Umbra** — Pact and Umbra share a deep connection to the void. Pact fills it
-  through sacrifice; Umbra fills it through self-mill. Both want a stocked void,
-  and both reward having specific cards there. The hybrid deck is a void-centric
-  engine that stocks the void from two angles and then exploits it from both.
-
-**Tensions:**
-
-- **Bloom** — Bloom builds up; Pact tears down. Bloom's entire philosophy of
-  patient nurturing is antithetical to Pact's willingness to destroy what it has
-  created. A Bloom player watching a Pact player sacrifice a spirit animal sees
-  waste; a Pact player watching a Bloom player protect a spirit animal sees
-  cowardice.
-- **Arc** — Arc wants characters to stay on the battlefield to blink them; Pact
-  wants them in the void. These tides fight over the same resource (characters)
-  but want them in different zones.
+Pact's neighbors are Ignite (expendable warriors and figments serve as sacrifice
+fodder) and Umbra (both fill and exploit the void from different angles).
 
 ______________________________________________________________________
 
@@ -486,27 +398,9 @@ about the resources being denied.
 
 ## Relationships
 
-**Allies:**
-
-- **Pact** — The void alliance. Pact fills the void through sacrifice, Umbra
-  fills it through self-mill, and both have powerful payoffs for a stocked void.
-  Pact's reanimation works perfectly with Umbra's self-milled threats, and
-  Umbra's recursive engines give Pact's sacrifice outlets something to do every
-  turn. The hybrid deck is the ultimate void-centric strategy.
-- **Rime** — Umbra mills cards from deck to void; Rime discards cards from hand
-  to void. Both contribute to void density, and both reward having a full void.
-  Rime's efficient disruption protects Umbra's slow setup, while Umbra's
-  recursive engines provide the long-game inevitability that Rime's midrange
-  plan needs to close out games.
-
-**Tensions:**
-
-- **Arc** — Arc wants to keep things on the battlefield; Umbra wants them in the
-  void. Arc's blink effects feel pointless to Umbra, which would rather just let
-  the character die and reclaim it later.
-- **Ignite** — Ignite's aggressive speed can overrun Umbra before its engines
-  come online. Umbra's stax effects need time to set up, and Ignite doesn't give
-  time.
+Umbra's neighbors are Pact (both fill and exploit a stocked void) and Rime
+(discard-to-void feeds Umbra's recursive engines while Umbra provides late-game
+inevitability).
 
 ______________________________________________________________________
 
@@ -576,27 +470,9 @@ but its ceiling is low.
 
 ## Relationships
 
-**Allies:**
-
-- **Umbra** — Rime discards to the void; Umbra reclaims from it. Rime's
-  discarded cards become fuel for Umbra's recursive engines, and Umbra's
-  inevitability provides the late-game finisher that Rime's midrange plan
-  sometimes lacks. The hybrid deck grinds opponents down with efficient
-  disruption while building an unstoppable void-based engine.
-- **Surge** — Both tides value events and non-creature interaction. Rime's
-  disruption clears the way for Surge's combo turn, and Surge's card draw
-  replenishes the hand that Rime is constantly spending. The hybrid is a control
-  deck that uses Rime's proactive disruption and Surge's reactive counterspells
-  to lock opponents out from every angle.
-
-**Tensions:**
-
-- **Ignite** — Ignite goes wide fast, and Rime's one-for-one disruption can't
-  keep up with a flood of tokens. Rime needs time to establish its taxing
-  effects, and Ignite attacks before those effects matter.
-- **Bloom** — Bloom's enormous threats ignore Rime's taxation effects — when
-  your character has 8 spark, paying 1 extra energy is meaningless. Bloom also
-  goes over the top of Rime's efficient-but-modest threats.
+Rime's neighbors are Umbra (discarded cards fuel Umbra's void recursion) and
+Surge (proactive disruption pairs with reactive counterspells for full-spectrum
+control).
 
 ______________________________________________________________________
 
@@ -666,46 +542,15 @@ comes together.
 
 ## Relationships
 
-**Allies:**
-
-- **Rime** — Rime's proactive disruption pairs beautifully with Surge's reactive
-  counterspells, creating a two-pronged control strategy that attacks from
-  different angles. Rime handles threats that resolve; Surge handles threats
-  that haven't yet. Rime's hand-fueling discard outlets also help Surge cycle
-  toward combo pieces.
-- **Bloom** — Bloom's energy ramp directly enables Surge's explosive turns. A
-  Surge player with 10 energy available can chain twice as many events as one
-  with 5. Bloom's spirit animals also provide a fallback win condition for Surge
-  decks that don't find their combo — simply ramp into a big creature and
-  protect it with counterspells.
-
-**Tensions:**
-
-- **Pact** — Pact's sacrifice effects often don't use the stack and therefore
-  can't be countered. Pact also attacks from the void, a zone Surge has little
-  interaction with. Surge's counterspells are useless against characters that
-  were never cast.
-- **Umbra** — Umbra's grinding inevitability threatens Surge's control plan.
-  Surge can counter individual cards but can't stop Umbra's slow accumulation of
-  void resources. Umbra also forces discards, stripping Surge of the event
-  chains it needs to win.
+Surge's neighbors are Rime (proactive disruption complements reactive
+counterspells) and Bloom (energy ramp powers explosive event chains).
 
 ______________________________________________________________________
 
-# Tide Alliances Summary
+# Tide Circle Summary
 
-The tide circle creates seven natural two-tide alliances, each with a distinct
-hybrid playstyle:
-
-| Alliance          | Playstyle                                                               |
-| ----------------- | ----------------------------------------------------------------------- |
-| **Bloom + Arc**   | Blink ramp — repeatedly materialize spirit animals for energy and value |
-| **Arc + Ignite**  | Token tempo — blink token-producers for explosive board states          |
-| **Ignite + Pact** | Aristocrats — generate expendable bodies, sacrifice them for value      |
-| **Pact + Umbra**  | Void engine — fill the void from two angles, exploit it from both       |
-| **Umbra + Rime**  | Grindy midrange — discard and mill to void, recur for inevitability     |
-| **Rime + Surge**  | Full control — proactive disruption meets reactive counterspells        |
-| **Surge + Bloom** | Ramp combo — accelerate energy, then chain events for a decisive turn   |
-
-Neutral enhances any of these alliances by providing removal, card selection,
-and format-warping legendary effects.
+The tide circle is: Bloom — Arc — Ignite — Pact — Umbra — Rime — Surge
+(looping back to Bloom). Adjacent tides have natural mechanical overlaps that
+can reward hybrid drafting, but most decks focus on a single tide's strategy.
+Neutral enhances any tide by providing removal, card selection, and
+format-warping legendary effects.
