@@ -32,6 +32,86 @@ voluntarily provides new direction.
 No tide is assigned. No card name, cost, spark, rarity, or subtype. You are designing only the
 mechanical ability.
 
+## Output Format
+
+By default, output a single valid JSON object and no Markdown prose. Do not wrap the JSON in a
+code fence. The JSON should include the brainstorm pool and the final 5 designs in one response,
+using this schema:
+
+```json
+{
+  "theme": "string",
+  "brainstorm_pool": [
+    {
+      "id": 1,
+      "ability_idea": "string",
+      "interesting_note": "string",
+      "support_estimate": {
+        "approximate_cards": 0,
+        "bucket": "Broad | Medium | Thin | Fragile",
+        "basis": "string"
+      },
+      "novelty_test": {
+        "passes": true,
+        "notes": "string"
+      },
+      "quality_gates": {
+        "theme_fit": "string",
+        "draft_pull": "string",
+        "simplicity": "string"
+      },
+      "is_obvious_design": false,
+      "uses_battlefield_position": false,
+      "hearthstone_source": null,
+      "selected_for_final": false
+    }
+  ],
+  "final_designs": [
+    {
+      "id": 1,
+      "source_brainstorm_id": 1,
+      "ability_text": "string",
+      "ability_type": "Static | Triggered | Activated | Combination",
+      "design_rationale": "string",
+      "synergy_citations": [
+        {
+          "card": "string",
+          "note": "string"
+        }
+      ],
+      "support_estimate": {
+        "approximate_cards": 0,
+        "bucket": "Broad | Medium | Thin | Fragile",
+        "basis": "string"
+      },
+      "novelty_statement": "No existing card ...",
+      "inspiration_source": "string",
+      "tags": {
+        "obvious_design": false,
+        "hearthstone_inspired": false,
+        "positional": false
+      }
+    }
+  ],
+  "selection_notes": {
+    "selected_brainstorm_ids": [1, 2, 3, 4, 5],
+    "cut_brainstorm_ids": [6, 7, 8],
+    "constraints_satisfied": {
+      "obvious_design_count": 2,
+      "novel_design_count": 3,
+      "has_hearthstone_inspired_design": true,
+      "has_positional_design": true,
+      "ability_type_mix": ["Static", "Triggered", "Activated"]
+    }
+  }
+}
+```
+
+Use JSON null only for genuinely absent optional data, such as `hearthstone_source` on a concept
+with no Hearthstone inspiration. Keep all arrays present even when empty. Preserve symbols like
+`●`, `✦`, `✪`, `▸`, and `↯` as literal Unicode strings in JSON values. If the user explicitly
+asks for prose instead of JSON, use prose.
+
 ## Dreamcaller Design Principles
 
 **What makes a dreamcaller different from a regular card ability:**
@@ -165,7 +245,7 @@ Also evaluate each concept against these quality gates:
 - **Simplicity:** Can the core idea be expressed cleanly without fiddly tracking or redundant
   wording?
 
-Present the brainstorm pool to the user as a numbered list. The user may:
+Include the brainstorm pool in `brainstorm_pool` using the default JSON schema. The user may:
 - Ask you to proceed with your top 5 picks
 - Select specific concepts to keep or drop
 - Suggest modifications or new directions
@@ -173,10 +253,9 @@ Present the brainstorm pool to the user as a numbered list. The user may:
 After presenting the brainstorm pool, proceed directly to Phase 3 using your top 5 picks unless
 the user immediately interrupts with different instructions. Do not pause to ask for a choice.
 
-For each brainstorm concept, include:
-- the rough ability idea
-- one-line note on why it is interesting
-- **support estimate** in the format `Support: ~N cards (Bucket)`
+For each brainstorm concept, include the rough ability idea, one-line note on why it is
+interesting, support estimate, novelty test, quality gates, and selection metadata in the
+schema fields.
 
 Selection pressure:
 - Concepts with **Fragile** support should almost never advance unless the user explicitly asks
@@ -297,18 +376,12 @@ that fails one of these tests:
 
 ## Presenting Designs
 
-Present all 5 designs in a clear numbered list. For each design, show:
-
-1. **Ability text**
-2. Ability type
-3. Design rationale
-4. Synergy citations
-5. Support estimate
-6. Novelty statement
-7. Inspiration source
+Present all 5 designs in `final_designs` using the default JSON schema. For each design, include
+ability text, ability type, design rationale, synergy citations, support estimate, novelty
+statement, inspiration source, and tags.
 
 Do not ask the user which designs they'd like to keep, revise, or replace. Simply present the
-designs cleanly. If the user later offers feedback, use that to revise the set.
+designs cleanly in JSON. If the user later offers feedback, use that to revise the set.
 
 # Phase 4: Iterate
 

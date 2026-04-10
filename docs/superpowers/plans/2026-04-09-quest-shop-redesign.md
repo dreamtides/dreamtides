@@ -1,24 +1,38 @@
 # Quest Shop-Focused Redesign Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use
+> superpowers:subagent-driven-development (recommended) or
+> superpowers:executing-plans to implement this plan task-by-task. Steps use
+> checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Redesign the quest prototype's early game to remove tide selection, use a fixed starter deck, make shops the primary card acquisition path, and reset essence between dreamscapes.
+**Goal:** Redesign the quest prototype's early game to remove tide selection,
+use a fixed starter deck, make shops the primary card acquisition path, and
+reset essence between dreamscapes.
 
-**Architecture:** Replace QuestStartScreen with direct initialization logic in quest-context. Modify atlas-generator for new level 0 composition. Update economy defaults in quest-config. Add essence reset to dreamscape transitions and an essence warning before battles.
+**Architecture:** Replace QuestStartScreen with direct initialization logic in
+quest-context. Modify atlas-generator for new level 0 composition. Update
+economy defaults in quest-config. Add essence reset to dreamscape transitions
+and an essence warning before battles.
 
 **Tech Stack:** TypeScript, React, Vitest
 
----
+______________________________________________________________________
 
 ### Task 1: Update Economy Defaults in quest-config.ts
 
 **Files:**
-- Modify: `scripts/constructed_quest_prototype/src/state/quest-config.ts:121-135`
-- Modify: `scripts/constructed_quest_prototype/src/atlas/atlas-generator.test.ts:15-53` (TEST_CONFIG)
+
+- Modify:
+  `scripts/constructed_quest_prototype/src/state/quest-config.ts:121-135`
+
+- Modify:
+  `scripts/constructed_quest_prototype/src/atlas/atlas-generator.test.ts:15-53`
+  (TEST_CONFIG)
 
 - [ ] **Step 1: Update default values in getQuestConfig()**
 
-In `src/state/quest-config.ts`, change the following defaults in the `getQuestConfig()` function:
+In `src/state/quest-config.ts`, change the following defaults in the
+`getQuestConfig()` function:
 
 ```typescript
     startingEssence: parseIntParam(params, "startingEssence", 400, 0, 9999),
@@ -48,7 +62,8 @@ In `src/shop/pack-shop-generator.ts`, change hardcoded pack prices:
 
 - [ ] **Step 3: Update TEST_CONFIG in atlas-generator.test.ts**
 
-In `src/atlas/atlas-generator.test.ts`, update the TEST_CONFIG to match new defaults:
+In `src/atlas/atlas-generator.test.ts`, update the TEST_CONFIG to match new
+defaults:
 
 ```typescript
 const TEST_CONFIG: QuestConfig = {
@@ -64,8 +79,8 @@ const TEST_CONFIG: QuestConfig = {
 
 - [ ] **Step 4: Run tests**
 
-Run: `cd scripts/constructed_quest_prototype && npx vitest run`
-Expected: All tests pass
+Run: `cd scripts/constructed_quest_prototype && npx vitest run` Expected: All
+tests pass
 
 - [ ] **Step 5: Commit**
 
@@ -74,18 +89,25 @@ git add scripts/constructed_quest_prototype/src/state/quest-config.ts scripts/co
 git commit -m "Update economy defaults: cheaper cards, rerolls, and packs for shop-focused redesign"
 ```
 
----
+______________________________________________________________________
 
 ### Task 2: Replace QuestStartScreen with Direct Initialization
 
 **Files:**
-- Modify: `scripts/constructed_quest_prototype/src/state/quest-context.tsx:72-101` (createDefaultState, setCurrentDreamscape)
-- Modify: `scripts/constructed_quest_prototype/src/components/ScreenRouter.tsx:45-48`
+
+- Modify:
+  `scripts/constructed_quest_prototype/src/state/quest-context.tsx:72-101`
+  (createDefaultState, setCurrentDreamscape)
+- Modify:
+  `scripts/constructed_quest_prototype/src/components/ScreenRouter.tsx:45-48`
 - Modify: `scripts/constructed_quest_prototype/src/App.tsx:16`
 - Modify: `scripts/constructed_quest_prototype/src/types/quest.ts:121-127`
-- Modify: `scripts/constructed_quest_prototype/src/atlas/atlas-generator.ts:17-24` (SiteGenerationContext)
+- Modify:
+  `scripts/constructed_quest_prototype/src/atlas/atlas-generator.ts:17-24`
+  (SiteGenerationContext)
 
-This task replaces the tide selection screen with automatic initialization. The player starts directly in the first dreamscape with a fixed starter deck.
+This task replaces the tide selection screen with automatic initialization. The
+player starts directly in the first dreamscape with a fixed starter deck.
 
 - [ ] **Step 1: Add dreamscapeTide to SiteGenerationContext**
 
@@ -106,7 +128,8 @@ export interface SiteGenerationContext {
 
 - [ ] **Step 2: Add initializeQuest mutation to quest-context.tsx**
 
-In `src/state/quest-context.tsx`, add a new mutation to `QuestMutations` interface (after `resetQuest`):
+In `src/state/quest-context.tsx`, add a new mutation to `QuestMutations`
+interface (after `resetQuest`):
 
 ```typescript
   initializeQuest: (cardDatabase: Map<number, CardData>, config: QuestConfig) => void;
@@ -126,7 +149,8 @@ import { DREAMSIGNS } from "../data/dreamsigns";
 import { NAMED_TIDES } from "../data/card-database";
 ```
 
-Then implement the mutation inside `QuestProvider`, before the `mutations` useMemo:
+Then implement the mutation inside `QuestProvider`, before the `mutations`
+useMemo:
 
 ```typescript
   /** Card numbers for each starter card and the number of copies in the fixed deck. */
@@ -212,7 +236,8 @@ Then implement the mutation inside `QuestProvider`, before the `mutations` useMe
   );
 ```
 
-Add `initializeQuest` to the `mutations` useMemo object and its dependency array.
+Add `initializeQuest` to the `mutations` useMemo object and its dependency
+array.
 
 - [ ] **Step 3: Remove "questStart" and "viewStartingDeck" screen types**
 
@@ -226,7 +251,8 @@ export type Screen =
   | { type: "questComplete" };
 ```
 
-Update `createDefaultState()` in `src/state/quest-context.tsx` to use `"dreamscape"` as initial screen:
+Update `createDefaultState()` in `src/state/quest-context.tsx` to use
+`"dreamscape"` as initial screen:
 
 ```typescript
     screen: { type: "dreamscape" },
@@ -283,7 +309,8 @@ Add the `useRef` import.
 
 - [ ] **Step 6: Run tests and typecheck**
 
-Run: `cd scripts/constructed_quest_prototype && npx tsc --noEmit && npx vitest run`
+Run:
+`cd scripts/constructed_quest_prototype && npx tsc --noEmit && npx vitest run`
 Expected: Passes (some tests may need minor updates for removed screen types)
 
 - [ ] **Step 7: Commit**
@@ -293,16 +320,23 @@ git add scripts/constructed_quest_prototype/src/state/quest-context.tsx scripts/
 git commit -m "Replace tide selection with direct initialization using fixed starter deck"
 ```
 
----
+______________________________________________________________________
 
 ### Task 3: Update Level 0 Dreamscape Composition
 
 **Files:**
-- Modify: `scripts/constructed_quest_prototype/src/atlas/atlas-generator.ts:70-200`
-- Modify: `scripts/constructed_quest_prototype/src/atlas/atlas-generator.ts:17-24` (SiteGenerationContext)
-- Modify: `scripts/constructed_quest_prototype/src/atlas/atlas-generator.test.ts`
 
-The first dreamscape should have: DreamcallerDraft, 2 LootPacks (same random tide), CardShop, PackShop, Battle. The `dreamscapeTide` field was added to `SiteGenerationContext` in Task 2.
+- Modify:
+  `scripts/constructed_quest_prototype/src/atlas/atlas-generator.ts:70-200`
+- Modify:
+  `scripts/constructed_quest_prototype/src/atlas/atlas-generator.ts:17-24`
+  (SiteGenerationContext)
+- Modify:
+  `scripts/constructed_quest_prototype/src/atlas/atlas-generator.test.ts`
+
+The first dreamscape should have: DreamcallerDraft, 2 LootPacks (same random
+tide), CardShop, PackShop, Battle. The `dreamscapeTide` field was added to
+`SiteGenerationContext` in Task 2.
 
 - [ ] **Step 1: Update level 0 composition in generateSiteComposition()**
 
@@ -352,7 +386,8 @@ Replace the `clampedLevel === 0` branch:
 
 - [ ] **Step 2: Ensure level 1+ always includes CardShop and PackShop**
 
-In the `else` branch of `generateSiteComposition()`, after the pool sites loop, add guaranteed shops if not already present:
+In the `else` branch of `generateSiteComposition()`, after the pool sites loop,
+add guaranteed shops if not already present:
 
 ```typescript
     // Ensure at least one CardShop and one PackShop
@@ -409,8 +444,8 @@ Add a test for level 1+ guaranteed shops:
 
 - [ ] **Step 4: Run tests**
 
-Run: `cd scripts/constructed_quest_prototype && npx vitest run`
-Expected: All tests pass
+Run: `cd scripts/constructed_quest_prototype && npx vitest run` Expected: All
+tests pass
 
 - [ ] **Step 5: Commit**
 
@@ -419,21 +454,27 @@ git add scripts/constructed_quest_prototype/src/atlas/atlas-generator.ts scripts
 git commit -m "Update level 0 composition: 2 loot packs, CardShop + PackShop, guaranteed shops in all dreamscapes"
 ```
 
----
+______________________________________________________________________
 
 ### Task 4: Shop Tide Neighborhood Weighting for Dreamscape 1
 
 **Files:**
-- Modify: `scripts/constructed_quest_prototype/src/screens/ShopScreen.tsx:47-49`
-- Modify: `scripts/constructed_quest_prototype/src/screens/PackShopScreen.tsx:41-48`
-- Modify: `scripts/constructed_quest_prototype/src/shop/shop-generator.ts:45-97`
-- Modify: `scripts/constructed_quest_prototype/src/shop/pack-shop-generator.ts:120-194`
 
-For dreamscape 1, shops should weight cards toward the dreamscape tide and its neighbors (the 3-tide neighborhood). The `dreamscapeTide` is stored in `site.data` from Task 3.
+- Modify: `scripts/constructed_quest_prototype/src/screens/ShopScreen.tsx:47-49`
+- Modify:
+  `scripts/constructed_quest_prototype/src/screens/PackShopScreen.tsx:41-48`
+- Modify: `scripts/constructed_quest_prototype/src/shop/shop-generator.ts:45-97`
+- Modify:
+  `scripts/constructed_quest_prototype/src/shop/pack-shop-generator.ts:120-194`
+
+For dreamscape 1, shops should weight cards toward the dreamscape tide and its
+neighbors (the 3-tide neighborhood). The `dreamscapeTide` is stored in
+`site.data` from Task 3.
 
 - [ ] **Step 1: Update ShopScreen to pass dreamscapeTide as seed tides**
 
-In `src/screens/ShopScreen.tsx`, update the shop inventory generation to use `site.data?.dreamscapeTide` when available:
+In `src/screens/ShopScreen.tsx`, update the shop inventory generation to use
+`site.data?.dreamscapeTide` when available:
 
 ```typescript
 import { adjacentTides } from "../data/card-database";
@@ -488,8 +529,8 @@ import type { NamedTide } from "../types/cards";
 
 - [ ] **Step 3: Run typecheck**
 
-Run: `cd scripts/constructed_quest_prototype && npx tsc --noEmit`
-Expected: No type errors
+Run: `cd scripts/constructed_quest_prototype && npx tsc --noEmit` Expected: No
+type errors
 
 - [ ] **Step 4: Commit**
 
@@ -498,14 +539,17 @@ git add scripts/constructed_quest_prototype/src/screens/ShopScreen.tsx scripts/c
 git commit -m "Use dreamscape tide neighborhood for shop weighting in first dreamscape"
 ```
 
----
+______________________________________________________________________
 
 ### Task 5: Essence Reset Between Dreamscapes
 
 **Files:**
-- Modify: `scripts/constructed_quest_prototype/src/screens/AtlasScreen.tsx:87-97`
 
-When the player clicks a dreamscape node on the atlas, reset their essence to 0 before entering.
+- Modify:
+  `scripts/constructed_quest_prototype/src/screens/AtlasScreen.tsx:87-97`
+
+When the player clicks a dreamscape node on the atlas, reset their essence to 0
+before entering.
 
 - [ ] **Step 1: Add essence reset to handleNodeClick in AtlasScreen**
 
@@ -534,12 +578,13 @@ In `src/screens/AtlasScreen.tsx`, update `handleNodeClick`:
   );
 ```
 
-Add the `logEvent` import if not already present, and add `state` to the component's destructuring.
+Add the `logEvent` import if not already present, and add `state` to the
+component's destructuring.
 
 - [ ] **Step 2: Run typecheck**
 
-Run: `cd scripts/constructed_quest_prototype && npx tsc --noEmit`
-Expected: No type errors
+Run: `cd scripts/constructed_quest_prototype && npx tsc --noEmit` Expected: No
+type errors
 
 - [ ] **Step 3: Commit**
 
@@ -548,14 +593,21 @@ git add scripts/constructed_quest_prototype/src/screens/AtlasScreen.tsx
 git commit -m "Reset essence to 0 when entering a new dreamscape"
 ```
 
----
+______________________________________________________________________
 
 ### Task 6: Unspent Essence Warning Before Battle
 
 **Files:**
-- Modify: `scripts/constructed_quest_prototype/src/screens/BattleScreen.tsx:102-262` (PreBattlePhase)
-- Modify: `scripts/constructed_quest_prototype/src/state/quest-context.tsx` (add essenceWarningShown to state)
-- Modify: `scripts/constructed_quest_prototype/src/types/quest.ts:130-145` (QuestState)
+
+- Modify:
+  `scripts/constructed_quest_prototype/src/screens/BattleScreen.tsx:102-262`
+  (PreBattlePhase)
+
+- Modify: `scripts/constructed_quest_prototype/src/state/quest-context.tsx` (add
+  essenceWarningShown to state)
+
+- Modify: `scripts/constructed_quest_prototype/src/types/quest.ts:130-145`
+  (QuestState)
 
 - [ ] **Step 1: Add essenceWarningShown to QuestState**
 
@@ -588,11 +640,13 @@ Implement it in `QuestProvider`:
   }, []);
 ```
 
-Add `dismissEssenceWarning` to the `mutations` useMemo object and its dependency array.
+Add `dismissEssenceWarning` to the `mutations` useMemo object and its dependency
+array.
 
 - [ ] **Step 2: Add essence warning dialog to PreBattlePhase**
 
-In `src/screens/BattleScreen.tsx`, update `PreBattlePhase` to accept and show an essence warning:
+In `src/screens/BattleScreen.tsx`, update `PreBattlePhase` to accept and show an
+essence warning:
 
 Add new props to the PreBattleProps interface:
 
@@ -629,7 +683,8 @@ Inside the `PreBattlePhase` component, add state and logic:
   }, []);
 ```
 
-Change the "Start Battle" button's `onClick` from `onStartBattle` to `handleStartClick`.
+Change the "Start Battle" button's `onClick` from `onStartBattle` to
+`handleStartClick`.
 
 Add the warning dialog (after the DeckEditor, before the closing fragment):
 
@@ -697,7 +752,8 @@ Add the warning dialog (after the DeckEditor, before the closing fragment):
 
 - [ ] **Step 3: Pass new props from BattleScreen to PreBattlePhase**
 
-In the `BattleScreen` component (~line 1058-1066), update the PreBattlePhase rendering:
+In the `BattleScreen` component (~line 1058-1066), update the PreBattlePhase
+rendering:
 
 ```typescript
       {phase === "preBattle" && (
@@ -719,7 +775,8 @@ In the `BattleScreen` component (~line 1058-1066), update the PreBattlePhase ren
 
 - [ ] **Step 4: Run typecheck and tests**
 
-Run: `cd scripts/constructed_quest_prototype && npx tsc --noEmit && npx vitest run`
+Run:
+`cd scripts/constructed_quest_prototype && npx tsc --noEmit && npx vitest run`
 Expected: Passes
 
 - [ ] **Step 5: Commit**
@@ -729,15 +786,22 @@ git add scripts/constructed_quest_prototype/src/screens/BattleScreen.tsx scripts
 git commit -m "Add one-time unspent essence warning before battle when player has >= 30 essence"
 ```
 
----
+______________________________________________________________________
 
 ### Task 7: Fix Remaining References to Removed State
 
 **Files:**
-- Modify: `scripts/constructed_quest_prototype/src/screens/BattleScreen.tsx:967` (startingTide in generateNewNodes)
-- Modify: `scripts/constructed_quest_prototype/src/state/quest-state-machine.test.ts`
+
+- Modify: `scripts/constructed_quest_prototype/src/screens/BattleScreen.tsx:967`
+  (startingTide in generateNewNodes)
+
+- Modify:
+  `scripts/constructed_quest_prototype/src/state/quest-state-machine.test.ts`
+
 - Delete: `scripts/constructed_quest_prototype/src/screens/QuestStartScreen.tsx`
-- Delete: `scripts/constructed_quest_prototype/src/screens/StartingDeckScreen.tsx`
+
+- Delete:
+  `scripts/constructed_quest_prototype/src/screens/StartingDeckScreen.tsx`
 
 - [ ] **Step 1: Delete QuestStartScreen.tsx and StartingDeckScreen.tsx**
 
@@ -750,7 +814,10 @@ rm scripts/constructed_quest_prototype/src/screens/StartingDeckScreen.tsx
 
 - [ ] **Step 2: Fix quest-state-machine.test.ts**
 
-Update any test that references `{ type: "questStart" }` or `{ type: "viewStartingDeck" }` screens. Change the default state screen to `{ type: "dreamscape" }` and remove/update any assertions about removed screen types.
+Update any test that references `{ type: "questStart" }` or
+`{ type: "viewStartingDeck" }` screens. Change the default state screen to
+`{ type: "dreamscape" }` and remove/update any assertions about removed screen
+types.
 
 In the test file, update the default state:
 
@@ -758,11 +825,13 @@ In the test file, update the default state:
     screen: { type: "dreamscape" },
 ```
 
-Remove or update any test cases that assert `screenName({ type: "questStart" })`.
+Remove or update any test cases that assert
+`screenName({ type: "questStart" })`.
 
 - [ ] **Step 3: Run all tests**
 
-Run: `cd scripts/constructed_quest_prototype && npx tsc --noEmit && npx vitest run`
+Run:
+`cd scripts/constructed_quest_prototype && npx tsc --noEmit && npx vitest run`
 Expected: All pass
 
 - [ ] **Step 4: Commit**
@@ -772,7 +841,7 @@ git add -A scripts/constructed_quest_prototype/
 git commit -m "Remove QuestStartScreen, StartingDeckScreen, and fix remaining references"
 ```
 
----
+______________________________________________________________________
 
 ### Task 8: Manual Smoke Test
 
@@ -783,31 +852,47 @@ Run: `cd scripts/constructed_quest_prototype && npx vite dev`
 - [ ] **Step 2: Verify start flow**
 
 Open http://localhost:5173 in browser. Verify:
+
 - No tide selection screen appears
+
 - Player starts directly in a dreamscape
+
 - Deck has 30 cards (all starters with correct allocation)
+
 - Starting essence is 400
-- First dreamscape has: DreamcallerDraft, 2 LootPacks, CardShop, PackShop, Battle
+
+- First dreamscape has: DreamcallerDraft, 2 LootPacks, CardShop, PackShop,
+  Battle
 
 - [ ] **Step 3: Verify shops**
 
-- Open Card Shop: cards should be weighted toward the loot pack tide neighborhood
+- Open Card Shop: cards should be weighted toward the loot pack tide
+  neighborhood
+
 - Card prices should be in 30-70 range
+
 - Reroll cost should start at 10, increment by 5
+
 - Open Pack Shop: tide packs should cost 75, special packs 75-100
 
 - [ ] **Step 4: Verify essence warning**
 
 - With essence remaining (>= 30), click to start a battle
+
 - Warning dialog should appear with essence amount
+
 - "Go Back" should dismiss the dialog
+
 - "Start Battle" should proceed and suppress future warnings
 
 - [ ] **Step 5: Verify essence reset**
 
 - Complete a battle and reach the atlas
+
 - Note current essence
+
 - Click on a new dreamscape
+
 - Essence should be 0
 
 - [ ] **Step 6: Final commit if any fixes needed**

@@ -64,10 +64,10 @@ The seven neighbor archetypes (revised tides):
 | Shattered Verse   | Rime + Surge  | Discard Matters       |
 | Dreamstorm        | Surge + Bloom | Storm                 |
 
-The card pool with revised tides is at
-rules_engine/tabula/rendered-cards.toml
+The card pool with revised tides is at rules_engine/tabula/rendered-cards.toml
 
-The card pool with original tides is at rules_engine/tabula/rendered-cards-mono.toml
+The card pool with original tides is at
+rules_engine/tabula/rendered-cards-mono.toml
 
 ## 3. Starting a Quest
 

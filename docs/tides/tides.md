@@ -549,8 +549,8 @@ ______________________________________________________________________
 
 # Tide Circle Summary
 
-The tide circle is: Bloom — Arc — Ignite — Pact — Umbra — Rime — Surge
-(looping back to Bloom). Adjacent tides have natural mechanical overlaps that
-can reward hybrid drafting, but most decks focus on a single tide's strategy.
-Neutral enhances any tide by providing removal, card selection, and
-format-warping legendary effects.
+The tide circle is: Bloom — Arc — Ignite — Pact — Umbra — Rime — Surge (looping
+back to Bloom). Adjacent tides have natural mechanical overlaps that can reward
+hybrid drafting, but most decks focus on a single tide's strategy. Neutral
+enhances any tide by providing removal, card selection, and format-warping
+legendary effects.

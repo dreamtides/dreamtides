@@ -16,7 +16,7 @@ into their first dreamscape with a fixed starter deck and 0 tide crystals.
 All cards from the 10-card Starter pool, no tide or neutral extras:
 
 | Card                  | Cost | Type      | Copies |
-|-----------------------|------|-----------|--------|
+| --------------------- | ---- | --------- | ------ |
 | Glimpse of What Was   | 1    | Event     | 4      |
 | Worlds Await          | 1    | Event     | 3      |
 | Nocturne Strummer     | 2    | Character | 4      |
@@ -53,13 +53,13 @@ For example, if the dreamscape tide is Ignite, shops favor Ignite/Arc/Pact.
 
 ### New Defaults
 
-| Parameter          | Old     | New     |
-|--------------------|---------|---------|
-| Starting essence   | 250     | 400     |
-| Card price range   | 50-100  | 30-70   |
-| Reroll base        | 40      | 10      |
-| Reroll increment   | 20      | 5       |
-| Pack price (tide)  | 100     | 75      |
+| Parameter            | Old     | New    |
+| -------------------- | ------- | ------ |
+| Starting essence     | 250     | 400    |
+| Card price range     | 50-100  | 30-70  |
+| Reroll base          | 40      | 10     |
+| Reroll increment     | 20      | 5      |
+| Pack price (tide)    | 100     | 75     |
 | Pack price (special) | 100-125 | 75-100 |
 
 ### Essence Loss Between Dreamscapes
