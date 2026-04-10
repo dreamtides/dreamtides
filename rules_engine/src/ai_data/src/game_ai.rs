@@ -12,6 +12,7 @@ pub enum GameAI {
     MonteCarloV3(u32),
     MonteCarloV4(u32),
     MonteCarloV5(u32),
+    MonteCarloV6(u32),
     MonteCarloHybridV1(u32),
     StrategicV1(u32),
     StrategicV2(u32),

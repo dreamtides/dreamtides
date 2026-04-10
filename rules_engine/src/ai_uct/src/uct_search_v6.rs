@@ -1,6 +1,5 @@
 use std::cmp;
 use std::cmp::Ordering;
-use std::f64::consts;
 
 use ability_data::effect::ModelEffectChoiceIndex;
 use battle_mutations::actions::apply_battle_action;
@@ -40,12 +39,13 @@ use crate::decision_log::{
 };
 use crate::uct_config::UctConfig;
 use crate::uct_tree::{SearchEdge, SearchGraph, SearchNode, SelectionMode};
-use crate::{decision_log, log_search_results};
+use crate::{decision_log, log_search_results, rollout_policy};
 
-/// Monte Carlo search algorithm (V5: heuristic rollouts).
+/// Monte Carlo search algorithm (V6: PUCT tree policy with heuristic rollouts).
 ///
-/// Identical to V1 except rollouts bias toward playing cards instead of
-/// random pass/end decisions. See `heuristic_standard_action` for details.
+/// Combines V5's heuristic rollouts with a PUCT tree policy that uses
+/// domain-knowledge priors from `score_standard_action()` to bias tree
+/// exploration toward promising actions.
 pub fn search(
     initial_battle: &BattleState,
     player: PlayerName,
@@ -92,7 +92,7 @@ pub fn search(
     let total_iterations = budget.iterations_per_action * num_actions as u32;
     let num_threads = rayon::current_num_threads();
 
-    debug!(?total_iterations, ?action, ?num_threads, "Picked AI action (V5)");
+    debug!(?total_iterations, ?action, ?num_threads, "Picked AI action (V6)");
     if initial_battle.request_context.logging_options.log_ai_search_diagram {
         log_search_results::log_results_diagram(
             &best_result.graph,
@@ -217,7 +217,13 @@ fn next_evaluation_target(
             if let Some(s) = stats.as_mut() {
                 s.record_expansion(depth, player, &action);
             }
-            return add_child(battle, graph, player, node, action);
+            let priors = compute_priors(battle, player, &actions);
+            let prior = priors
+                .iter()
+                .find(|(a, _)| *a == action)
+                .map(|(_, p)| *p)
+                .unwrap_or(1.0 / actions.len().max(1) as f64);
+            return add_child(battle, graph, player, node, action, prior);
         } else {
             if let Some(s) = stats.as_mut() {
                 s.record_selection(depth, player);
@@ -238,6 +244,7 @@ fn add_child(
     player: PlayerName,
     parent: NodeIndex,
     action: BattleAction,
+    prior: f64,
 ) -> NodeIndex {
     battle.request_context.logging_options.enable_action_legality_check = false;
     graph[parent].tried.push(action);
@@ -248,7 +255,7 @@ fn add_child(
         visit_count: 0,
         tried: Vec::new(),
     });
-    graph.add_edge(parent, child, SearchEdge { action, prior: 0.0 });
+    graph.add_edge(parent, child, SearchEdge { action, prior });
     child
 }
 
@@ -274,6 +281,7 @@ fn best_child(
                 parent_visits,
                 graph[target].visit_count,
                 graph[target].total_reward,
+                edge.weight().prior,
                 selection_mode,
             )
         })
@@ -724,20 +732,63 @@ fn heuristic_select_deck_card_order(
     Some(BattleAction::SelectOrderForDeckCard(DeckCardSelectedOrder { card_id, target }))
 }
 
+/// Computes softmax prior probabilities for all legal actions.
+///
+/// For Standard actions, uses `rollout_policy::score_standard_action()`
+/// which scores cards by spark, energy cost, and fast status. For
+/// non-Standard actions (prompts, positioning), returns uniform priors.
+fn compute_priors(
+    battle: &BattleState,
+    player: PlayerName,
+    actions: &LegalActions,
+) -> Vec<(BattleAction, f64)> {
+    let all_actions = actions.all();
+    if all_actions.is_empty() {
+        return Vec::new();
+    }
+
+    let scores: Vec<f64> = match actions {
+        LegalActions::Standard { actions: standard } => all_actions
+            .iter()
+            .map(|&action| rollout_policy::score_standard_action(battle, player, standard, action))
+            .collect(),
+        _ => {
+            let uniform = 1.0 / all_actions.len() as f64;
+            return all_actions.into_iter().map(|a| (a, uniform)).collect();
+        }
+    };
+
+    // Softmax normalization. Temperature of 10.0 produces a moderately
+    // peaked distribution given score_standard_action's range of roughly
+    // [-80, 250]. A 100-point gap yields ~22000:1 prior ratio.
+    let temperature = 10.0;
+    let max_score = scores.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+    let exp_scores: Vec<f64> =
+        scores.iter().map(|&s| ((s - max_score) / temperature).exp()).collect();
+    let sum: f64 = exp_scores.iter().sum();
+
+    all_actions.into_iter().zip(exp_scores).map(|(action, exp_s)| (action, exp_s / sum)).collect()
+}
+
+const C_PUCT: f64 = 1.5;
+
+/// PUCT child scoring formula.
+///
+/// Replaces UCB1 with: Q/N + c_puct * P(a) * sqrt(N_parent) / (1 + N_child)
 fn child_score(
     parent_visits: u32,
     child_visits: u32,
     reward: OrderedFloat<f64>,
+    prior: f64,
     selection_mode: SelectionMode,
 ) -> OrderedFloat<f64> {
-    let exploitation = reward / f64::from(child_visits);
-    let exploration =
-        f64::sqrt((2.0 * f64::ln(f64::from(parent_visits))) / f64::from(child_visits));
-    let exploration_bias = match selection_mode {
-        SelectionMode::Exploration => consts::FRAC_1_SQRT_2,
+    let exploitation = reward.0 / f64::from(child_visits);
+    let exploration = prior * f64::sqrt(f64::from(parent_visits)) / (1.0 + f64::from(child_visits));
+    let exploration_weight = match selection_mode {
+        SelectionMode::Exploration => C_PUCT,
         SelectionMode::RewardOnly => 0.0,
     };
-    exploitation + (exploration_bias * exploration)
+    OrderedFloat(exploitation + exploration_weight * exploration)
 }
 
 struct BudgetInfo {

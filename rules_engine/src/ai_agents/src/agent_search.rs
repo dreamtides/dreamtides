@@ -9,6 +9,7 @@ use ai_uct::position_assignment::{CharacterPlacement, PositionAssignment};
 use ai_uct::uct_config::UctConfig;
 use ai_uct::{
     uct_search, uct_search_hybrid_v1, uct_search_v2, uct_search_v3, uct_search_v4, uct_search_v5,
+    uct_search_v6,
 };
 use battle_mutations::player_mutations::player_state;
 use battle_queries::legal_action_queries::legal_actions;
@@ -197,6 +198,20 @@ pub fn select_action_unchecked(
                 single_threaded: false,
             };
             uct_search_v5::search(battle, player, &config)
+        }
+        GameAI::MonteCarloV6(thousands_of_iterations) => {
+            let battle = &player_state::randomize_battle_player(
+                initial_battle,
+                player.opponent(),
+                rand::rng().random(),
+            );
+            let config = UctConfig {
+                max_iterations_per_action: *thousands_of_iterations * 1000,
+                max_total_actions_multiplier: 6,
+                iteration_multiplier_override,
+                single_threaded: false,
+            };
+            uct_search_v6::search(battle, player, &config)
         }
         GameAI::MonteCarloHybridV1(budget_ms) => {
             if !uct_search_hybrid_v1::is_available() {

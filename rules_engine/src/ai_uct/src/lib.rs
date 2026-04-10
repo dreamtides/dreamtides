@@ -14,4 +14,5 @@ pub mod uct_search_v2;
 pub mod uct_search_v3;
 pub mod uct_search_v4;
 pub mod uct_search_v5;
+pub mod uct_search_v6;
 pub mod uct_tree;

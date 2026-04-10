@@ -14,6 +14,9 @@ pub type SearchGraph = Graph<SearchNode, SearchEdge>;
 pub struct SearchEdge {
     /// Action taken to create the next node
     pub action: BattleAction,
+    /// Prior probability P(a) for PUCT selection. Set to 0.0 by V1-V5
+    /// which use UCB1 and ignore this field in their child_score.
+    pub prior: f64,
 }
 
 #[derive(Debug, Clone)]

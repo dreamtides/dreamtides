@@ -464,7 +464,7 @@ fn add_child(
         visit_count: 0,
         tried: Vec::new(),
     });
-    graph.add_edge(parent, child, SearchEdge { action });
+    graph.add_edge(parent, child, SearchEdge { action, prior: 0.0 });
     child
 }
 
