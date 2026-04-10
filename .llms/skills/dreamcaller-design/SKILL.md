@@ -125,6 +125,16 @@ to user) covering:
 5. **Hearthstone inspiration candidates** — Flag 5-10 HS abilities whose abstract dynamics
    resonate with the theme. Extract the abstract dynamic for each (strip HS keywords, describe
    what the mechanic does in universal game terms).
+6. **Support density map** — For each promising mechanical hook, estimate how many cards in the
+   current anonymized pool actually support it. Use rough buckets:
+   - **Broad support**: ~12+ cards
+   - **Medium support**: ~6-11 cards
+   - **Thin support**: ~3-5 cards
+   - **Fragile support**: ~0-2 cards
+
+When estimating support, count cards that would make a player meaningfully happier to draft this
+dreamcaller, not generic good cards that every deck would play anyway. Prefer undercounting to
+hand-wavy optimism.
 
 # Phase 2: Brainstorm
 
@@ -149,8 +159,9 @@ creates?" Flag concepts that fail, but keep them in the list.
 Also evaluate each concept against these quality gates:
 - **Theme-fit:** Does the incentive clearly push the named play pattern?
 - **Draft pull:** Can you state in one sentence what kinds of cards this makes the player want?
-- **Pool support:** Can you already name multiple existing cards or card categories that would
-  make the design attractive?
+- **Pool support:** Estimate how many cards in the current pool are real matches for this
+  concept. Give an approximate count and bucket (`Broad`, `Medium`, `Thin`, `Fragile`). If a
+  concept depends on only a few specific enablers, say so explicitly.
 - **Simplicity:** Can the core idea be expressed cleanly without fiddly tracking or redundant
   wording?
 
@@ -161,6 +172,18 @@ Present the brainstorm pool to the user as a numbered list. The user may:
 
 After presenting the brainstorm pool, proceed directly to Phase 3 using your top 5 picks unless
 the user immediately interrupts with different instructions. Do not pause to ask for a choice.
+
+For each brainstorm concept, include:
+- the rough ability idea
+- one-line note on why it is interesting
+- **support estimate** in the format `Support: ~N cards (Bucket)`
+
+Selection pressure:
+- Concepts with **Fragile** support should almost never advance unless the user explicitly asks
+  for that narrow mechanic.
+- Concepts with **Thin** support must clear a higher bar on novelty and excitement than concepts
+  with **Medium** or **Broad** support.
+- If a concept looks cool but the support estimate is weak, say so plainly and deprioritize it.
 
 # Phase 3: Design
 
@@ -176,9 +199,12 @@ flesh each into a full design.
    player to draft, and why it's interesting as a dreamcaller specifically
 4. **Synergy citations** — 3-5 specific cards from the anonymized pool that this dreamcaller
    would synergize with, with a brief note on each explaining how
-5. **Novelty statement** — "No existing card ___" — the unique play experience this creates.
+5. **Support estimate** — Approximate number of cards in the current anonymized pool that are
+   real matches for this dreamcaller, plus the support bucket (`Broad`, `Medium`, `Thin`,
+   `Fragile`) and a one-sentence explanation of what counts toward that estimate
+6. **Novelty statement** — "No existing card ___" — the unique play experience this creates.
    For the 1-2 obvious designs, this can describe why the obvious approach is the right one.
-6. **Inspiration source** — If from Hearthstone, name the HS ability and the abstract dynamic
+7. **Inspiration source** — If from Hearthstone, name the HS ability and the abstract dynamic
    extracted. If positional, explain the interaction. Otherwise, describe what sparked the idea.
 
 **Design constraints:**
@@ -188,6 +214,10 @@ flesh each into a full design.
 - At least 1 design must be from Hearthstone inspiration
 - At least 1 design must interact with battlefield position
 - Mix ability types — don't produce 5 triggered abilities
+- Prefer concepts with **Medium** or **Broad** support. A final design with **Thin** support is
+  acceptable only if the set still has strong overall pool coverage and the design is especially
+  compelling. Do not present any final design with **Fragile** support unless the user
+  explicitly asked for a narrow, low-support mechanic.
 
 **Design anti-patterns:**
 - **Opponent chooses / punisher mechanics.** One option is almost always correct for the
@@ -219,7 +249,8 @@ flesh each into a full design.
   to draft toward a plan, it is too weak for a dreamcaller.
 - **Thin pool support.** Do not rely on hand-wavy future cards or one narrow combo. If you
   struggle to find strong existing synergy citations from the actual pool, the design is not
-  ready.
+  ready. "Cool in theory" is not enough; if the support estimate is only ~0-5 cards, the
+  design needs to be cut or clearly labeled as narrow.
 - **Fiddly execution.** Avoid designs whose gameplay depends on repeated tiny transfers,
   excessive state tracking, or wording that feels awkward to implement or display. Preserve the
   core idea, then simplify.
@@ -272,8 +303,9 @@ Present all 5 designs in a clear numbered list. For each design, show:
 2. Ability type
 3. Design rationale
 4. Synergy citations
-5. Novelty statement
-6. Inspiration source
+5. Support estimate
+6. Novelty statement
+7. Inspiration source
 
 Do not ask the user which designs they'd like to keep, revise, or replace. Simply present the
 designs cleanly. If the user later offers feedback, use that to revise the set.
