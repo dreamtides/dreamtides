@@ -216,6 +216,11 @@ cat ~/Documents/hearthstone/hearthstone.txt
 If a read tool reports that file content exceeds its token limit, immediately switch to offset
 / limit reads or search-based sampling. Do not retry the same oversized full-file read.
 
+For broad archetype prompts like `aggro`, `midrange`, `tempo`, `control`, `removal`, `card
+draw`, or `events`, keep research brief. Gather enough evidence to ground the designs, then
+move to synthesis. Do not chase exhaustive support counts, source-code internals, or marginal
+extra searches once you already have a plausible support map and a few Hearthstone analogues.
+
 After reading, produce a **synergy landscape analysis** (internal working notes, not presented
 to user) covering:
 
