@@ -180,21 +180,41 @@ discarding means. The latter is more build-defining.
 
 # Phase 1: Research
 
-Read these three sources in parallel:
+Read these sources in parallel, but **do not full-read large corpora in one tool call**:
+
+- Re-read `docs/battle_rules/battle_rules.md`, focusing on battlefield position (front/back
+  rank, lanes F0-F3, back slots B0-B4, support relationships), judgment resolution, and zone
+  interactions.
+- For `rules_engine/tabula/rendered_cards_anonymized.txt`, get broad coverage with multiple
+  bounded reads. If the tool supports offsets/limits, read it in chunks. If not, use search
+  first and then read only the relevant slices. Do not attempt one full-file read.
+- For `~/Documents/hearthstone/hearthstone.txt`, do **not** try to read the whole file into
+  context. Use targeted search/grep to pull 40-80 relevant lines for the current theme, then
+  expand only around promising matches if needed.
+- When searching `hearthstone.txt`, do not rely only on Dreamtides or Hearthstone keyword
+  overlap. Search both:
+  - the direct theme words from the prompt
+  - adjacent generic mechanic phrases that describe the play pattern in broader card-game terms
+    such as `destroy a friendly minion`, `after a friendly minion dies`, `return to hand`,
+    `cost (1) less`, `summon a copy`, `gain its stats`, or other plain-English analogues of the
+    theme
+- If direct theme-word searches come up sparse, broaden to these abstract mechanic phrases before
+  concluding the Hearthstone corpus lacks relevant inspiration.
+
+Suggested approach:
 
 ```bash
-# Read the existing Dreamtides card pool (anonymized, ~584 lines)
+# Dreamtides card pool: either chunked reads, or search then targeted reads
 cat rules_engine/tabula/rendered_cards_anonymized.txt
 ```
 
 ```bash
-# Read the Hearthstone card pool (~1919 one-line ability descriptions)
+# Hearthstone card pool: search first, then inspect only relevant matches
 cat ~/Documents/hearthstone/hearthstone.txt
 ```
 
-Also re-read `docs/battle_rules/battle_rules.md`, focusing on battlefield position (front/back
-rank, lanes F0-F3, back slots B0-B4, support relationships), judgment resolution, and zone
-interactions.
+If a read tool reports that file content exceeds its token limit, immediately switch to offset
+/ limit reads or search-based sampling. Do not retry the same oversized full-file read.
 
 After reading, produce a **synergy landscape analysis** (internal working notes, not presented
 to user) covering:

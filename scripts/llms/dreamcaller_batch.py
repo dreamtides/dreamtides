@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any, TextIO
 
 DEFAULT_MAX_CONCURRENCY = 4
-DEFAULT_TIMEOUT_SECONDS = 600
+DEFAULT_TIMEOUT_SECONDS = 900
 DEFAULT_CLAUDE_LOG_DIR = Path.home() / ".claude/projects/-Users-dthurn-dreamtides"
 DEFAULT_CODEX_SESSIONS_DIR = Path.home() / ".codex/sessions"
 REQUIRED_TOP_LEVEL_KEYS = (
@@ -506,6 +506,10 @@ def build_agent_prompt(prompt: str, skill_text: str) -> str:
         "Follow the skill specification below exactly.\n"
         "Use the current repository as context and perform the research the skill requires.\n"
         "Output exactly one valid JSON object and no markdown or prose.\n"
+        "Never use a full-file read on large corpora if the tool has token limits.\n"
+        "For rendered_cards_anonymized.txt, use chunked reads or search plus targeted slices.\n"
+        "For hearthstone.txt, use grep/search first and inspect only relevant matches.\n"
+        "When searching hearthstone.txt, use both the prompt's theme words and adjacent plain-English mechanic phrases.\n"
         "If a file is too large for a single read, switch to chunked reads or targeted search.\n"
         "Do not repeatedly retry oversized full-file reads.\n\n"
         f"Theme prompt: {prompt}\n\n"
