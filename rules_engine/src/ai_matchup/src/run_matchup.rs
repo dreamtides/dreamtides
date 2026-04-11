@@ -79,11 +79,12 @@ fn parse_balance_mode(s: &str) -> BalanceMode {
         "none" => BalanceMode::None,
         "extra-card" => BalanceMode::ExtraCard,
         "bonus-energy" => BalanceMode::BonusEnergy,
+        "bonus-energy-no-draw" => BalanceMode::BonusEnergyNoDraw,
         "bonus-points" => BalanceMode::BonusPoints,
         "no-sickness" => BalanceMode::NoSickness,
         "coin" => BalanceMode::Coin,
         _ => panic!(
-            "Unknown balance mode: {s}. Expected: none, extra-card, bonus-energy, bonus-points, no-sickness, coin"
+            "Unknown balance mode: {s}. Expected: none, extra-card, bonus-energy, bonus-energy-no-draw, bonus-points, no-sickness, coin"
         ),
     }
 }
@@ -136,7 +137,7 @@ struct Args {
     #[arg(
         long,
         default_value = "none",
-        help = "Balance mode: none, extra-card, bonus-energy, bonus-points, no-sickness, coin"
+        help = "Balance mode: none, extra-card, bonus-energy, bonus-energy-no-draw, bonus-points, no-sickness, coin"
     )]
     balance: String,
 }

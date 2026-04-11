@@ -22,6 +22,7 @@ BALANCE_MODES = [
     "none",
     "extra-card",
     "bonus-energy",
+    "bonus-energy-no-draw",
     "bonus-points",
     "no-sickness",
     "coin",
@@ -31,9 +32,10 @@ SEED_OFFSETS = {
     "none": 0,
     "extra-card": 1000000,
     "bonus-energy": 2000000,
-    "bonus-points": 3000000,
-    "no-sickness": 4000000,
-    "coin": 5000000,
+    "bonus-energy-no-draw": 3000000,
+    "bonus-points": 4000000,
+    "no-sickness": 5000000,
+    "coin": 6000000,
 }
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -115,7 +117,9 @@ def format_elapsed(seconds: float) -> str:
     return f"{m}m{s:02d}s"
 
 
-def print_progress_table(processes: dict, results: dict, matches: int, start_time: float):
+def print_progress_table(
+    processes: dict, results: dict, matches: int, start_time: float
+):
     """Print a compact progress table for all active/completed modes."""
     elapsed = time.time() - start_time
     print(f"\n--- Progress ({format_elapsed(elapsed)} elapsed) ---")
@@ -206,9 +210,7 @@ def run_balance_tests(
             mode = pending.pop(0)
             info = launch_mode(mode, matches, ai_config, output_dir)
             active[mode] = info
-            print(
-                f"  [{mode:14s}] STARTED  PID {info['proc'].pid}"
-            )
+            print(f"  [{mode:14s}] STARTED  PID {info['proc'].pid}")
             sys.stdout.flush()
 
         # Check for completed processes

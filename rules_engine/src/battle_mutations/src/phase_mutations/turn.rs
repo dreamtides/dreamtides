@@ -1,5 +1,6 @@
 use battle_queries::battle_trace;
 use battle_state::battle::battle_animation_data::BattleAnimation;
+use battle_state::battle::battle_rules_config::BalanceMode;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
@@ -96,7 +97,7 @@ pub fn run_turn_state_machine_if_no_active_prompts(battle: &mut BattleState) {
             }
             BattleTurnPhase::Dreamwell => {
                 battle.phase = BattleTurnPhase::Draw;
-                if battle.turn.turn_id != TurnId(0) {
+                if should_draw_for_turn(battle) {
                     battle_deck::draw_card(
                         battle,
                         EffectSource::Game { controller: battle.turn.active_player },
@@ -128,4 +129,10 @@ pub fn start_next_turn(battle: &mut BattleState) {
         battle,
         player = battle.turn.active_player
     );
+}
+
+fn should_draw_for_turn(battle: &BattleState) -> bool {
+    battle.turn.turn_id != TurnId(0)
+        && !(battle.rules_config.balance_mode == BalanceMode::BonusEnergyNoDraw
+            && battle.turn.turn_id == TurnId(1))
 }

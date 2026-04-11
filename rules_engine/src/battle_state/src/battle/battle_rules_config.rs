@@ -14,6 +14,9 @@ pub enum BalanceMode {
     ExtraCard,
     /// P2 starts with +1 produced and current energy.
     BonusEnergy,
+    /// P2 starts with +1 produced and current energy, but skips the turn-1
+    /// draw.
+    BonusEnergyNoDraw,
     /// P2 starts with 3 victory points.
     BonusPoints,
     /// P2's characters skip summoning sickness on their first turn.

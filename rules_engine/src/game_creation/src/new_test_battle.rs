@@ -168,7 +168,7 @@ pub fn create_and_start(
         BalanceMode::ExtraCard => {
             battle_deck::draw_card(&mut battle, source, second_player);
         }
-        BalanceMode::BonusEnergy => {
+        BalanceMode::BonusEnergy | BalanceMode::BonusEnergyNoDraw => {
             let player_state = battle.players.player_mut(second_player);
             player_state.produced_energy = Energy(1);
             player_state.current_energy = Energy(1);
