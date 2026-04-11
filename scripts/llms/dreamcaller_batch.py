@@ -7,6 +7,7 @@ import argparse
 import asyncio
 import json
 import os
+import signal
 import sys
 import tempfile
 from dataclasses import dataclass
@@ -452,18 +453,11 @@ async def _run_codex(
     )
     os.close(output_handle)
     output_path = Path(output_name)
-    command = [
-        codex_bin,
-        "exec",
-        "--dangerously-bypass-approvals-and-sandbox",
-        "-C",
-        str(REPO_ROOT),
-        "--output-schema",
-        str(schema_path),
-        "-o",
-        str(output_path),
-        prompt_text,
-    ]
+    command = build_codex_command(
+        prompt_text=prompt_text,
+        output_path=output_path,
+        codex_bin=codex_bin,
+    )
     stdout, stderr, exit_code = await _run_command(command, timeout_seconds)
     if output_path.exists():
         return output_path.read_text(encoding="utf-8"), stderr, exit_code
@@ -479,6 +473,8 @@ async def _run_claude(
     command = [
         claude_bin,
         "-p",
+        "--output-format",
+        "json",
         "--dangerously-skip-permissions",
         "--permission-mode",
         "bypassPermissions",
@@ -489,30 +485,68 @@ async def _run_claude(
     return await _run_command(command, timeout_seconds)
 
 
+def build_codex_command(
+    *, prompt_text: str, output_path: Path, codex_bin: str
+) -> list[str]:
+    return [
+        codex_bin,
+        "exec",
+        "--dangerously-bypass-approvals-and-sandbox",
+        "-C",
+        str(REPO_ROOT),
+        "-o",
+        str(output_path),
+        prompt_text,
+    ]
+
+
 async def _run_command(
     command: list[str], timeout_seconds: int
 ) -> tuple[str, str, int]:
-    process = await asyncio.create_subprocess_exec(
-        *command,
-        cwd=REPO_ROOT,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-
-    try:
-        stdout_bytes, stderr_bytes = await asyncio.wait_for(
-            process.communicate(), timeout=timeout_seconds
+    with tempfile.TemporaryFile() as stdout_handle, tempfile.TemporaryFile() as stderr_handle:
+        process = await asyncio.create_subprocess_exec(
+            *command,
+            cwd=REPO_ROOT,
+            stdout=stdout_handle,
+            stderr=stderr_handle,
+            start_new_session=True,
         )
-    except asyncio.TimeoutError:
-        process.kill()
-        await process.communicate()
-        return "", f"Timed out after {timeout_seconds} seconds", 124
 
-    return (
-        stdout_bytes.decode("utf-8", errors="replace"),
-        stderr_bytes.decode("utf-8", errors="replace"),
-        process.returncode,
-    )
+        try:
+            await asyncio.wait_for(process.wait(), timeout=timeout_seconds)
+        except asyncio.TimeoutError:
+            _kill_process_group(process.pid)
+            await process.wait()
+            stdout_text = _read_temp_output(stdout_handle)
+            stderr_text = _read_temp_output(stderr_handle)
+            timeout_text = f"Timed out after {timeout_seconds} seconds"
+            return (
+                stdout_text,
+                (
+                    f"{stderr_text}\n{timeout_text}".strip()
+                    if stderr_text
+                    else timeout_text
+                ),
+                124,
+            )
+
+        return (
+            _read_temp_output(stdout_handle),
+            _read_temp_output(stderr_handle),
+            process.returncode,
+        )
+
+
+def _kill_process_group(process_id: int) -> None:
+    try:
+        os.killpg(process_id, signal.SIGKILL)
+    except ProcessLookupError:
+        return
+
+
+def _read_temp_output(handle: Any) -> str:
+    handle.seek(0)
+    return handle.read().decode("utf-8", errors="replace")
 
 
 def parse_and_validate_agent_output(
@@ -531,6 +565,13 @@ def parse_and_validate_agent_output(
         return None, [
             f"Invalid JSON: {error.msg} at line {error.lineno} column {error.colno}"
         ]
+
+    if (
+        isinstance(payload, dict)
+        and payload.get("type") == "result"
+        and "structured_output" in payload
+    ):
+        payload = payload["structured_output"]
 
     errors = validate_dreamcaller_result(payload)
     if errors:

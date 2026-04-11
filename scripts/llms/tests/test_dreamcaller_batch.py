@@ -4,7 +4,9 @@
 
 from __future__ import annotations
 
+import asyncio
 import tempfile
+import time
 import sys
 import unittest
 from pathlib import Path
@@ -112,6 +114,22 @@ class ValidationTests(unittest.TestCase):
 
         self.assertIn("Missing top-level key: selection_notes", errors)
 
+    def test_parse_and_validate_agent_output_extracts_claude_structured_output(
+        self,
+    ) -> None:
+        raw_text = (
+            '{"type":"result","subtype":"success","structured_output":'
+            + dreamcaller_batch.json.dumps(VALID_RESULT)
+            + "}"
+        )
+
+        parsed_json, errors = dreamcaller_batch.parse_and_validate_agent_output(
+            raw_text
+        )
+
+        self.assertEqual(parsed_json, VALID_RESULT)
+        self.assertEqual(errors, [])
+
 
 class SynthesisTests(unittest.TestCase):
     """Tests for synthesized output shape."""
@@ -148,6 +166,56 @@ class SynthesisTests(unittest.TestCase):
             synthesis["tempo"]["verification"]["claude"]["errors"], ["Invalid JSON"]
         )
         self.assertTrue(synthesis["tempo"]["verification"]["claude"]["used_retry"])
+
+
+class SubprocessTests(unittest.TestCase):
+    """Tests for subprocess handling edge cases."""
+
+    def test_run_command_returns_after_parent_exit(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            helper_path = Path(temp_dir) / "spawn_child.py"
+            helper_path.write_text(
+                "\n".join(
+                    [
+                        "#!/usr/bin/env python3",
+                        "import subprocess",
+                        "import sys",
+                        'print("parent-finished")',
+                        "sys.stdout.flush()",
+                        "subprocess.Popen(",
+                        "    [sys.executable, '-c', 'import time; time.sleep(2)'],",
+                        "    stdout=sys.stdout,",
+                        "    stderr=sys.stderr,",
+                        ")",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            start = time.monotonic()
+            stdout, stderr, exit_code = asyncio.run(
+                dreamcaller_batch._run_command(
+                    [sys.executable, str(helper_path)],
+                    timeout_seconds=1,
+                )
+            )
+            elapsed = time.monotonic() - start
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(stderr, "")
+        self.assertIn("parent-finished", stdout)
+        self.assertLess(elapsed, 1.0)
+
+    def test_build_codex_command_avoids_schema_flag(self) -> None:
+        command = dreamcaller_batch.build_codex_command(
+            prompt_text="Return JSON only.",
+            output_path=Path("/tmp/codex-test.json"),
+            codex_bin="codex",
+        )
+
+        self.assertNotIn("--output-schema", command)
+        self.assertIn("-o", command)
 
 
 if __name__ == "__main__":
