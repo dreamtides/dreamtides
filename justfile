@@ -182,6 +182,11 @@ python-test:
       echo "$output"
       exit 1
   fi
+  output=$(python3 -m unittest discover -s scripts/llms/tests -p "test_*.py" 2>&1)
+  if [ $? -ne 0 ]; then
+      echo "$output"
+      exit 1
+  fi
   output=$(cd scripts/abu && python3 -m unittest discover -s . -p "test_*.py" 2>&1)
   if [ $? -ne 0 ]; then
       echo "$output"
@@ -191,6 +196,7 @@ python-test:
 
 python-test-verbose:
   python3 -m unittest discover -s scripts/review/tests -p "test_*.py"
+  python3 -m unittest discover -s scripts/llms/tests -p "test_*.py"
   cd scripts/abu && python3 -m unittest discover -s . -p "test_*.py"
 
 pyre-check:
