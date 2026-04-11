@@ -97,8 +97,8 @@ using this schema:
     "selected_brainstorm_ids": [1, 2, 3, 4, 5],
     "cut_brainstorm_ids": [6, 7, 8],
     "constraints_satisfied": {
-      "obvious_design_count": 2,
-      "novel_design_count": 3,
+      "obvious_design_count": 1,
+      "novel_design_count": 4,
       "has_hearthstone_inspired_design": true,
       "has_positional_design": true,
       "ability_type_mix": ["Static", "Triggered", "Activated"]
@@ -151,12 +151,14 @@ asks for prose instead of JSON, use prose.
 
 ## Gravity Wells — Obvious Designs
 
-The following are the default dreamcaller templates. **2 of your 5 designs should use these
-patterns** — they are the expected, solid foundation of a dreamcaller set. The remaining 3
-should aim for more novel territory, but don't force novelty at the expense of fun or
-build-around clarity.
+The following are the default dreamcaller templates. **Exactly 1 of your 5 final designs should
+use one of these patterns** — a set benefits from one clean, obvious anchor, but too many of
+them makes the output repetitive and low-signal. The other 4 should aim for more novel
+territory, without sacrificing fun or build-around clarity.
 
-- **"When you [game action], draw a card"** — Drawing is the most generic reward.
+- **"When you [game action], draw a card"** — Drawing is the most generic reward, and therefore
+  the easiest trap. Use this as the obvious design only when card draw is unusually central to
+  the theme's actual play pattern. Do not default to it just because it fits grammatically.
 - **"[Subtype] characters get +N spark"** — Static tribal lord. Functional but uninteresting.
 - **"When you [game action], kindle N"** — Kindle as reward trigger.
 - **"Your [card type] cost N● less"** — Static cost reduction.
@@ -167,6 +169,10 @@ build-around clarity.
 and should be used sparingly. The agent should resist the gravitational pull of "the theme is
 X, so the ability triggers when you do X." A dreamcaller that *enables* or *transforms* the
 theme's play pattern is more interesting than one that just *rewards* it.
+
+**Important:** Do not let multiple concepts collapse into the same generic reward shell. If one
+concept already uses direct card draw as its obvious payoff, the rest of the pool should push
+toward different rewards or structural effects.
 
 **Example:** If the theme is "discard": "When you discard a card, draw a card" rewards
 discarding. But "Cards in your void have Reclaim equal to their energy cost" *transforms* what
@@ -227,10 +233,13 @@ yet — just the ability idea and a one-line note on why it's interesting.
   relationships)
 - Aim for a mix of ability types (static, triggered, activated) — don't produce 8 triggered
   abilities
-- 2-3 concepts should be "obvious" designs (straightforward trigger→reward or static buff) —
-  these are expected and healthy as the solid foundation of the set
+- 1-2 concepts may be "obvious" designs (straightforward trigger→reward or static buff) —
+  enough to provide a baseline, but not enough to dominate the pool
 - The remaining concepts should aim for novel play patterns that go beyond
   "[trigger] → [standard reward]," but never at the expense of fun or draft clarity
+- At most 1 brainstorm concept should use direct card draw as the primary reward. If you write
+  one "when you do X, draw a card" concept, make the other obvious concepts use different reward
+  structures
 
 **Self-filtering:** After generating all 8-10, evaluate each against this novelty test: "Does
 this create a play pattern that no existing card or obvious dreamcaller design already
@@ -263,6 +272,10 @@ Selection pressure:
 - Concepts with **Thin** support must clear a higher bar on novelty and excitement than concepts
   with **Medium** or **Broad** support.
 - If a concept looks cool but the support estimate is weak, say so plainly and deprioritize it.
+- If multiple concepts differ only by swapping in a generic reward like draw, kindle, or gain
+  energy, keep the strongest one and cut the rest.
+- If a direct-draw concept is merely acceptable while another obvious concept is more specific to
+  the theme, prefer the more specific concept.
 
 # Phase 3: Design
 
@@ -282,14 +295,14 @@ flesh each into a full design.
    real matches for this dreamcaller, plus the support bucket (`Broad`, `Medium`, `Thin`,
    `Fragile`) and a one-sentence explanation of what counts toward that estimate
 6. **Novelty statement** — "No existing card ___" — the unique play experience this creates.
-   For the 1-2 obvious designs, this can describe why the obvious approach is the right one.
+   For the single obvious design, this can describe why the obvious approach is the right one.
 7. **Inspiration source** — If from Hearthstone, name the HS ability and the abstract dynamic
    extracted. If positional, explain the interaction. Otherwise, describe what sparked the idea.
 
 **Design constraints:**
-- 2 designs should be straightforward "obvious" dreamcaller abilities — solid, clear
-  build-arounds that use standard templates well
-- The remaining 3 designs should have novel play patterns beyond "trigger when X, reward Y"
+- Exactly 1 design should be a straightforward "obvious" dreamcaller ability — a solid, clear
+  build-around that uses a standard template well
+- The remaining 4 designs should have novel play patterns beyond "trigger when X, reward Y"
 - At least 1 design must be from Hearthstone inspiration
 - At least 1 design must interact with battlefield position
 - Mix ability types — don't produce 5 triggered abilities
@@ -297,6 +310,8 @@ flesh each into a full design.
   acceptable only if the set still has strong overall pool coverage and the design is especially
   compelling. Do not present any final design with **Fragile** support unless the user
   explicitly asked for a narrow, low-support mechanic.
+- Use direct card draw as the primary reward in at most 1 final design, and only if it is the
+  single obvious design or unusually theme-essential.
 
 **Design anti-patterns:**
 - **Opponent chooses / punisher mechanics.** One option is almost always correct for the
@@ -309,6 +324,9 @@ flesh each into a full design.
   draft identity is neutralized.
 - **Pure value machines.** "Draw a card each turn" or "Gain 1● each turn" with no
   build-around requirement. These are generically good, not build-defining.
+- **Defaulting to card draw.** "When you do X, draw a card" is the easiest obvious design, not
+  the best one. If several concepts could plausibly use card draw, choose it for at most one and
+  force the others to differentiate through a different reward or a structural effect.
 - **1:1 Hearthstone port.** Translate the abstract dynamic, don't just rename HS keywords.
 - **Reactive/defensive designs.** Abilities that mitigate bad outcomes ("when your character
   would be dissolved, instead...") don't tell the player what to draft. They're safety nets,
