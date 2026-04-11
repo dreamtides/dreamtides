@@ -7,6 +7,7 @@ Usage:
     python3 scripts/balance_test.py          # Full run: 50 matches per mode, MonteCarloV8(50)
     python3 scripts/balance_test.py --smoke  # Quick test: 1 match per mode, MonteCarloV8(5)
     python3 scripts/balance_test.py --matches 20 --ai '{"MonteCarloV8":30}'
+    python3 scripts/balance_test.py --no-build --mode bonus-energy-no-draw
 """
 
 import argparse
@@ -118,13 +119,13 @@ def format_elapsed(seconds: float) -> str:
 
 
 def print_progress_table(
-    processes: dict, results: dict, matches: int, start_time: float
+    modes: list[str], processes: dict, results: dict, matches: int, start_time: float
 ):
     """Print a compact progress table for all active/completed modes."""
     elapsed = time.time() - start_time
     print(f"\n--- Progress ({format_elapsed(elapsed)} elapsed) ---")
     all_modes = list(results.keys()) + list(processes.keys())
-    for mode in BALANCE_MODES:
+    for mode in modes:
         if mode not in all_modes:
             continue
         if mode in results:
@@ -187,20 +188,21 @@ def launch_mode(mode: str, matches: int, ai_config: str, output_dir: Path):
 
 
 def run_balance_tests(
-    matches: int, ai_config: str, output_dir: Path, concurrency: int, skip: list[str]
+    matches: int,
+    ai_config: str,
+    output_dir: Path,
+    concurrency: int,
+    modes: list[str],
 ):
     """Launch balance mode tests with limited concurrency and collect results."""
     global_start = time.time()
-    modes_to_run = [m for m in BALANCE_MODES if m not in skip]
-    pending = list(modes_to_run)
+    pending = list(modes)
     active = {}
     results = {}
     last_progress_print = 0
 
-    if skip:
-        print(f"\nSkipping: {', '.join(skip)}")
     print(
-        f"Running {len(modes_to_run)} balance test groups ({matches} matches each, {concurrency} concurrent)..."
+        f"Running {len(modes)} balance test groups ({matches} matches each, {concurrency} concurrent)..."
     )
     print(f"Logs: {output_dir.relative_to(PROJECT_ROOT)}/\n")
 
@@ -242,7 +244,7 @@ def run_balance_tests(
 
         now = time.time()
         if active and now - last_progress_print >= 30:
-            print_progress_table(active, results, matches, global_start)
+            print_progress_table(modes, active, results, matches, global_start)
             last_progress_print = now
 
         if active:
@@ -251,7 +253,7 @@ def run_balance_tests(
     return results
 
 
-def print_summary(results: dict):
+def print_summary(results: dict, modes: list[str]):
     """Print a formatted comparison table."""
     print("\n===== Balance Test Results =====")
     print(
@@ -271,7 +273,7 @@ def print_summary(results: dict):
         + "-" * 14
     )
 
-    for mode in BALANCE_MODES:
+    for mode in modes:
         if mode not in results:
             print(
                 f"{mode:15s} | {'N/A':>7s} | {'N/A':>7s} | {'N/A':>6s} | {'N/A':>6s} | {'N/A':>14s}"
@@ -304,7 +306,7 @@ def print_summary(results: dict):
         print("Lower delta = better balance (0% = perfectly balanced)")
 
 
-def main():
+def parse_args(argv: list[str] | None = None):
     parser = argparse.ArgumentParser(
         description="Parallel balance mode testing for Dreamtides"
     )
@@ -336,11 +338,30 @@ def main():
         help="Balance modes to skip (e.g. --skip none extra-card)",
     )
     parser.add_argument(
+        "--mode",
+        choices=BALANCE_MODES,
+        help="Run only a single balance mode",
+    )
+    parser.add_argument(
         "--no-build",
         action="store_true",
         help="Skip building the binary (use existing release build)",
     )
-    args = parser.parse_args()
+    return parser.parse_args(argv)
+
+
+def selected_modes(mode: str | None, skip: list[str]) -> list[str]:
+    """Return the ordered set of balance modes to execute."""
+    if mode is not None:
+        if mode in skip:
+            print(f"Selected mode '{mode}' cannot also be skipped", file=sys.stderr)
+            sys.exit(1)
+        return [mode]
+    return [balance_mode for balance_mode in BALANCE_MODES if balance_mode not in skip]
+
+
+def main():
+    args = parse_args()
 
     if args.smoke:
         matches = 1
@@ -359,9 +380,12 @@ def main():
             print(f"Valid modes: {', '.join(BALANCE_MODES)}", file=sys.stderr)
             sys.exit(1)
 
+    modes = selected_modes(args.mode, skip)
+
     print(f"AI: {ai_config}")
     print(f"Matches per mode: {matches}")
     print(f"Concurrency: {concurrency}")
+    print(f"Modes: {', '.join(modes)}")
 
     if args.no_build:
         if not MATCHUP_BINARY.exists():
@@ -375,8 +399,8 @@ def main():
     output_dir = PROJECT_ROOT / "scripts" / "balance_test_output" / f"run_{timestamp}"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    results = run_balance_tests(matches, ai_config, output_dir, concurrency, skip)
-    print_summary(results)
+    results = run_balance_tests(matches, ai_config, output_dir, concurrency, modes)
+    print_summary(results, modes)
 
 
 if __name__ == "__main__":
