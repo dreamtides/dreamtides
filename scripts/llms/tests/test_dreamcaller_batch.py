@@ -11,6 +11,7 @@ import tempfile
 import time
 import sys
 import unittest
+from unittest import mock
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -218,6 +219,35 @@ class SubprocessTests(unittest.TestCase):
 
         self.assertNotIn("--output-schema", command)
         self.assertIn("-o", command)
+
+    def test_run_job_ignores_codex_stderr_when_exit_is_zero(self) -> None:
+        async def fake_run_codex(**_: object) -> tuple[str, str, int]:
+            return json.dumps(VALID_RESULT), "OpenAI Codex v0.118.0", 0
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with mock.patch.object(
+                dreamcaller_batch,
+                "_run_codex",
+                side_effect=fake_run_codex,
+            ):
+                result = asyncio.run(
+                    dreamcaller_batch._run_job(
+                        dreamcaller_batch.AgentJob(
+                            agent_name="codex",
+                            prompt="tempo",
+                        ),
+                        skill_text="skill",
+                        temp_dir=Path(temp_dir),
+                        codex_timeout_seconds=10,
+                        claude_timeout_seconds=10,
+                        codex_bin="codex",
+                        claude_bin="claude",
+                    )
+                )
+
+        self.assertTrue(result.success)
+        self.assertEqual(result.errors, [])
+        self.assertEqual(result.parsed_json, VALID_RESULT)
 
 
 class SchedulerTests(unittest.TestCase):

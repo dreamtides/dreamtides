@@ -726,7 +726,10 @@ async def _run_job(
     parsed_json, errors = parse_and_validate_agent_output(raw_text)
     if exit_code != 0:
         errors.append(f"{job.agent_name} exited with code {exit_code}")
-    if stderr.strip():
+    should_report_stderr = bool(
+        stderr.strip() and (job.agent_name != "codex" or exit_code != 0 or bool(errors))
+    )
+    if should_report_stderr:
         errors.append(f"{job.agent_name} stderr: {stderr.strip()}")
 
     return AgentAttemptResult(
