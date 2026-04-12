@@ -17,6 +17,8 @@ pub enum BalanceMode {
     /// P2 starts with +1 produced and current energy, but skips the turn-1
     /// draw.
     BonusEnergyNoDraw,
+    /// P1 starts with 4 opening cards and P2 starts with 6.
+    FourSixCards,
     /// P2 starts with 3 victory points.
     BonusPoints,
     /// P2's characters skip summoning sickness on their first turn.

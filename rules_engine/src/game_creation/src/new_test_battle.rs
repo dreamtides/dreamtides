@@ -148,23 +148,24 @@ pub fn create_and_start(
     legal_actions_cache::populate(&mut battle);
 
     battle.status = BattleStatus::Playing;
+    let (player_one_opening_hand, player_two_opening_hand) = opening_hand_sizes(balance_mode);
     battle_deck::draw_cards(
         &mut battle,
         EffectSource::Game { controller: PlayerName::One },
         PlayerName::One,
-        5,
+        player_one_opening_hand,
     );
     battle_deck::draw_cards(
         &mut battle,
         EffectSource::Game { controller: PlayerName::Two },
         PlayerName::Two,
-        5,
+        player_two_opening_hand,
     );
 
     let second_player = first_player.opponent();
     let source = EffectSource::Game { controller: second_player };
     match balance_mode {
-        BalanceMode::None | BalanceMode::NoSickness => {}
+        BalanceMode::None | BalanceMode::NoSickness | BalanceMode::FourSixCards => {}
         BalanceMode::ExtraCard => {
             battle_deck::draw_card(&mut battle, source, second_player);
         }
@@ -203,6 +204,13 @@ pub fn create_quest_state(tabula: &Tabula, deck_name: TestDeckName) -> QuestStat
         user: UserState { id: UserId::default() },
         deck: create_test_deck(tabula, deck_name),
         essence: Essence(0),
+    }
+}
+
+fn opening_hand_sizes(balance_mode: BalanceMode) -> (u32, u32) {
+    match balance_mode {
+        BalanceMode::FourSixCards => (4, 6),
+        _ => (5, 5),
     }
 }
 

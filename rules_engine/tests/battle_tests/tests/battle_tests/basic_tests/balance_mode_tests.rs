@@ -42,6 +42,19 @@ fn bonus_energy_no_draw_skips_second_players_first_turn_draw() {
     assert_eq!(bonus_energy_no_draw.cards.hand(PlayerName::Two).len(), 5);
 }
 
+#[test]
+fn four_six_cards_sets_opening_hands_to_four_and_six() {
+    let mut four_six_cards = create_battle(BalanceMode::FourSixCards);
+
+    assert_eq!(four_six_cards.cards.hand(PlayerName::One).len(), 4);
+    assert_eq!(four_six_cards.cards.hand(PlayerName::Two).len(), 6);
+
+    advance_to_second_players_turn(&mut four_six_cards);
+
+    assert_eq!(four_six_cards.turn.active_player, PlayerName::Two);
+    assert_eq!(four_six_cards.cards.hand(PlayerName::Two).len(), 7);
+}
+
 fn advance_to_second_players_turn(battle: &mut BattleState) {
     apply_battle_action::execute_without_tracking_history(
         battle,

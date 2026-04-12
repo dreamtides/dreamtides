@@ -24,6 +24,7 @@ BALANCE_MODES = [
     "extra-card",
     "bonus-energy",
     "bonus-energy-no-draw",
+    "four-six-cards",
     "bonus-points",
     "no-sickness",
     "coin",
@@ -34,9 +35,10 @@ SEED_OFFSETS = {
     "extra-card": 1000000,
     "bonus-energy": 2000000,
     "bonus-energy-no-draw": 3000000,
-    "bonus-points": 4000000,
-    "no-sickness": 5000000,
-    "coin": 6000000,
+    "four-six-cards": 4000000,
+    "bonus-points": 5000000,
+    "no-sickness": 6000000,
+    "coin": 7000000,
 }
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
