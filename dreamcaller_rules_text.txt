@@ -1,0 +1,340 @@
+If you've discarded a card this turn, the first character you play this turn has ↯fast.
+When your judgment-rank ally is dissolved, trigger the ▸ Judgment: of your focus-rank ally there.
+Once per turn, when a non-Figment ally is dissolved, materialize a Warrior figment.
+Once per turn, the first 5●+ character you play enters Unbound.
+Your events have reclaim equal to their cost.
+Once per turn, 1●: Return a focused ally to hand.
+When you play a character from your void, trigger its ▸ Materialized: ability an additional time.
+Characters you materialize from your void are Unbound if the opposing slot is empty.
+Your rightmost ally also has the ▸ Judgment: ability of your leftmost ally.
+Characters with cost 5● or more in your void have Reclaim 2●.
+At end of turn, if you have unspent ●, gain 1● for ↯fast cards until your next turn.
+1●: If you have 2 or fewer cards in hand, draw until you have 3. Use only once each turn.
+When you play a character, if you played an event this turn, that character gains +2 spark.
+Once per turn, the first ally you materialize with cost 5● or more enters judgment.
+When you prevent a card, kindle 2.
+▸ Judgment: Each ally in the judgment rank gains +1✦ for each other ally in the judgment rank.
+When you materialize a non-Figment character, materialize a Celestial Figment.
+Once per turn, when 2 or more allies score points, gain 1✪.
+Once per turn, when an ally dissolves an enemy in paired Judgment, it doesn't return to focus rank.
+Once per turn, 1●: The next event you play this turn that dissolves or banishes an enemy gains Reclaim 0●.
+Your events that cost 2● or less are copied.
+Once per turn, when you materialize a character, gain 1● for each other ally.
+When you discard a card, you may discard an additional card.
+Once per turn, when you prevent a card, the next event you play this turn is copied.
+1●: Foresee 2. You may play the top card of your deck this turn.
+When you play an event, kindle 1.
+Characters with cost 5● or more in your void have reclaim 2●.
+2●: Choose an ally. Its next ▸ Judgment: triggers an additional time this turn.
+Allies in your judgment rank have '▸ Judgment: You may discard a card.'
+Once per turn, when you discard a card, allied characters in the judgment rank gain +1 spark.
+When you materialize behind a judgment-rank ally, trigger that card's ▸ Materialized again.
+↯fast -- 3●: Copy the next ↯fast event you play this turn.
+At end of your turn, with 2+ unspent ●, a ↯fast event in your void gains reclaim 0●.
+1●, Return an ally to hand: Your next event this turn costs 2● less.
+Once per turn, when you prevent a card, return it to hand. It costs 1● more until end of next turn.
+Survivor cards cost you 1● less.
+Once per turn, Abandon an ally: Your next character from hand costs that ally's cost less.
+Once per turn, when you return an ally to hand, it costs 1● less this turn.
+Once per turn, 2●: Materialize a 1✦ copy of another allied Survivor.
+Once per turn, when you return an ally to hand, your next higher-cost character costs 2● less.
+When you discard a card, materialize a Radiant Figment.
+Your focus-rank Figments add their spark to your judgment-rank ally in their column.
+When you play your second event each turn, gain 1✪.
+2●: Your next character this turn has unbound.
+1●: Choose an event in your void. The next event you copy becomes a copy of it.
+Characters you abandon gain reclaim equal to their cost.
+Once per turn, when you materialize a 5●+ void character, trigger its ▸ Dissolved: ability.
+Once per turn, 2●: Trigger the ▸ Materialized: ability of an ally.
+Once per turn, when you foresee, gain 1●.
+Allies with a ▸ Judgment: ability remain in the judgment rank after Judgment.
+Once per turn, when you discard a card, trigger the ▸ Judgment ability of a judgment-rank ally.
+2●: Reveal a 5●+ card in hand. Play the top card of your deck if it costs less.
+Once per turn, when you foresee, draw a card.
+When you kindle, kindle an additional 1.
+Allied characters with cost 2● or less have Preeminence.
+Characters you materialize gain +1 spark for each other character materialized this turn.
+Once per turn, 1●: If you've played 2 other events, trigger an ally's ▸ Judgment: ability.
+When you play a card, you may discard a card.
+Allied Figments have +1 spark for each other allied Figment of the same type.
+Characters cost 1● less for each ally in the judgment rank.
+Once on each turn, when you play your second event, gain 1✪.
+When an allied character is dissolved, you may materialize a character with higher cost from your void.
+Once per turn, when you play a ↯fast card, you may move an ally to the judgment rank.
+When a card enters your void from your deck, kindle 1.
+Once per turn, when you discard a character, materialize a 1✦ copy of it.
+Cards you draw during the opponent's turn have ↯fast until end of turn.
+When an enemy is dissolved, materialize an unbound Shadow Figment in that column.
+Your events cost 1● less for each card you discarded this turn.
+▸ Your second event each turn: Your next two events this turn cost 1● less.
+Supported allies have +1 spark. Once per turn, after one survives Judgment, return its supporter.
+Characters with a ▸ Materialized: ability cost 1● less.
+When an ally's ▸ Materialized: ability triggers, gain 1●.
+Your ally with the most spark scores double ✪.
+Allies in your leftmost and rightmost occupied judgment columns have Unstoppable.
+▸ Dawn: Materialize a Figment. Allies supported by a Figment have +1 spark.
+Once per turn, when you return, banish, or prevent an enemy during your turn, gain 1●.
+Once per turn, when a 5●+ character materializes, choose a column. Allies there gain +2 spark.
+Your ↯fast cards cost 1● less.
+Allied non-Figment characters with cost 3● or less have '▸ Dissolved: Materialize a Shadow Figment.'
+Allies in the focus rank have 'Abandon this character: Gain 2●.'
+Once per turn, when cards enter your void from your deck, return a card from your void to hand.
+Once per turn, when you banish and materialize an ally, draw a card.
+Allied Figments have '▸ Dissolved: Materialize a Figment of the same type.'
+Your second event each turn costs 1● less.
+When you materialize a non-Figment character, it gains +1 spark for each allied Figment.
+When you draw your second card each turn, gain 2●.
+Once per turn, when you play a ↯fast card, draw a card.
+Allied Survivors have +1✦.
+Once per turn, when you play a character with cost 2● or less, materialize a copy with 1 spark.
+When you dissolve an enemy, your ally with the lowest spark gains spark equal to that enemy's spark.
+Once per turn, when you materialize a character costing 1● or less, materialize a Halcyon Figment.
+At the start of the game, draw your highest-cost character. It gains +2 spark.
+2●, Return an allied Warrior to hand: Materialize two Warrior figments.
+The first card you put into your void from your deck each turn gains reclaim equal to its cost.
+2●, Discard a character: Materialize a character with cost 5● or more from your void.
+While you have 8+ cards in your void, your events cost 1● less.
+When you play a card from your void, draw a card.
+Once per turn, when an ally returns to hand, materialize a 1✦ figment in its column.
+Once per turn, when one effect draws you 2 or more cards, gain 1 maximum ●.
+2●, Banish 2 cards from your void: Materialize a Shadow Figment.
+Allies in the focus rank have '▸ Dawn: Foresee 1.'
+1●: Choose an ally. When it is dissolved this turn, discover a character with cost 1● higher.
+Once per turn, when you draw your second card, gain 2●.
+2●: This turn, your next 5●+ character makes the opponent's events cost 2● more until next turn.
+When you discard a character, materialize a copy of it with 1 spark.
+Supported allies have +1 spark and Dread 1.
+2●: Test an ally against an enemy. If your ally survives, it gains +1 spark.
+The first Warrior with cost 3● or less you materialize each turn materializes a 1-spark copy of itself.
+Once per turn, when you discard a card, draw a card.
+At end of your turn, if you spent 6●+ this turn, each enemy loses 1 spark until next turn.
+Once per turn, when an allied ▸ Judgment: ability triggers, gain 1●.
+Allied characters have Steadfast.
+Your first card from your void each turn costs 1● less.
+When a ▸ Materialized: ability of an ally triggers, that ally gains +1✦.
+Once per turn, the first character you play from hand into an occupied column costs 2● less.
+Once per turn, the first ▸ Materialized: ability you trigger triggers an additional time.
+Once per turn, after an ally beats an enemy, return a character up to its spark from your void.
+When you play an event, each ally in the focus rank gains +1 spark.
+When an ally is dissolved in judgment, the focus-rank ally in its column gains +2 spark.
+Abandon an ally: Gain ● equal to that ally's cost.
+Your Warriors cost 1● less.
+When you materialize a character in a column with another ally, kindle 1.
+First ally returned to your hand each turn triggers ▸ Materialized: again when replayed.
+Once per turn, when an effect adds spark to only one ally, add that much again.
+Cards with cost 5● or more in your hand and deck have +2 spark.
+A character replayed from hand triggers its ▸ Materialized: ability an additional time.
+Once per turn, when you abandon a non-Figment ally, materialize a 1-spark copy of it.
+When an ally dissolves an enemy in judgment, it gains +2✦.
+2●: A 3●-or-less ally gains Unstoppable this turn. Activate only if an enemy left play.
+With 7+ cards in your void, the first Survivor you play each turn triggers its ▸ Judgment: ability.
+↯fast -- 2●: Return a ↯fast event from your void to your hand.
+When you play your third card in a turn, materialize two Figments.
+Once per turn, when an allied Survivor is dissolved, materialize a random Survivor from your deck.
+Once per turn, when you dissolve or banish an enemy, materialize a Shadow Figment.
+When you prevent a card, allies in the judgment rank each gain +1 spark.
+When you abandon an ally, trigger its ▸ Dissolved: ability an additional time.
+1●, Abandon an ally: When your next void character materializes this turn, it Tests an enemy.
+The first non-Figment you materialize each turn gains +1 spark for each allied Figment.
+Characters you materialize from your void have unbound.
+Your leftmost judgment-rank ally has +1 spark for each card you drew this turn beyond the first.
+Once per turn, when you copy an event, gain 1●.
+Allied Figments have +1 spark.
+Your foresee effects see 2 additional cards.
+Once per turn, when an enemy leaves play on your turn, your next 5●+ character costs 2● less.
+When you return an ally to hand, materialize a Celestial Figment.
+1●: An enemy cannot move to the judgment rank until your next turn.
+The opponent's ↯fast cards cost 1● more.
+Once per turn, when a Warrior or Survivor is dissolved, your next character gains its ▸ Dissolved ability.
+Your cards with cost 5● or more have ↯fast.
+Your Figments are Warriors in addition to their other types.
+Once per turn, when you abandon an ally, trigger its ▸ Materialized: ability.
+The first card you discard each turn may be played from your void this turn.
+When you play a character, the next character you play this turn costs 2● less.
+2●: Return an ally to hand. Your next character this turn costs 2● less and gains +2 spark.
+3●: Return another ally to hand. Your highest-spark ally gains +2 spark and Preeminence.
+Enemy judgment-rank characters opposite your judgment-rank characters lose 2 spark.
+Your first ↯fast event on each opponent turn costs 1● less.
+Warriors in your void have Reclaim equal to their cost.
+Your characters cost 1● less for each 3 events in your void.
+Characters you materialize have unbound if you returned an ally to hand this turn.
+Characters with ▸ Materialized cost you 1● less.
+When the opponent plays an event, they discard a card.
+When an enemy is dissolved, kindle 1.
+Once per turn, abandon a non-Figment ally: materialize a character from your deck costing 1● more.
+When you play an event, the next event you play this turn costs 1● less.
+Characters you play with cost 5● or more enter the judgment rank.
+The second ally you materialize each turn triggers its ▸ Materialized ability again.
+Once on your turn, when you play your third event, it gains Reclaim 0●.
+When you abandon a judgment-rank ally, your next materialized character this turn is unbound.
+Your events have ↯fast.
+Once on your turn, after your second event, choose a column. Your attacker there is Unstoppable.
+Allied Warriors cost you 1● less.
+The first character you draw each turn costs 2● less this turn.
+1●: Choose Event or Character. The first enemy card of that type next turn costs 2● more.
+At end of turn, if you materialized 2 allies, trigger the last one's ▸ Materialized ability.
+Your events that prevent cards have reclaim equal to their cost.
+Your first character with cost 2● or less each turn costs 1● less.
+Allied ↯fast characters have unbound.
+2●: Trigger the ▸ Judgment: ability of an ally.
+Once per turn, when a card enters your void from your deck, gain 1●. With 7+, gain 2● instead.
+When your void first reaches 5 cards, kindle 2. At 10, kindle 2 and gain 1✪.
+Once per turn, when you abandon a non-Figment ally, materialize a Shadow Figment.
+Once per turn, abandon an ally: Materialize a random character with cost 1● higher from your deck.
+While you control 3+ Survivors, cards in your void have reclaim equal to their cost.
+When you materialize a character with cost 4● or more, dissolve an enemy with the lowest spark.
+Allies have +1✦ for each character you materialized this turn.
+The first character you play from your void each turn is Unbound.
+Once per turn, when you play a character returned to hand this turn, return a lower-cost ally.
+When you draw a character, materialize a Celestial Figment.
+▸ Judgment: If you have 4+ allied Figments, gain 2●.
+Your focus-rank characters have '▸ Judgment: Put the top card of your deck into your void.'
+Characters you abandon have reclaim equal to their cost.
+Once per turn, when you abandon a focus-rank ally, its column's judgment-rank ally gains +3 spark.
+For each ally in the focus rank, your events cost 1● less.
+▸ Judgment: If exactly one ally is in judgment, it gains +2 spark and Unstoppable.
+When you abandon an ally, kindle X where X is that ally's ✦.
+Your judgment-rank characters have +1✦ for each other allied judgment-rank character.
+At the end of your turn, if you played no cards during your main phase, gain 1✪.
+Your events cost 1● less.
+When you abandon an ally, each ally in that ally's column gains +2✦.
+Allied characters have '▸ Dissolved: Draw a card.'
+At end of turn, if you discarded, choose a cost. Enemy cards of that cost cost 1● more next turn.
+Your events cost 1● less while you control 2+ Survivors.
+Once per turn, when an ally is dissolved, return a character with lower cost from your void to hand.
+Reveal the top card of your deck. It costs 1● less.
+Cards you discard are put on top of your deck instead of into your void.
+When you materialize a character from your void, it gains +3 spark.
+1●, Abandon a Figment: Another allied Figment gains +3 spark.
+Focus-rank allies have ↯fast -- Abandon this: Prevent a played card unless its controller pays 2●.
+Once per turn, when you play a card with cost 5● or more, gain 1✪.
+Your characters with cost 4● or more have dread 2.
+When you materialize a Warrior, you may move an allied Warrior to the judgment rank.
+3●: Copy the last event that resolved this turn.
+Your characters cost 2● less. Your character limit is 3.
+When you return an ally to hand, kindle 1.
+▸ Dawn: Each allied Figment gains +1 spark.
+The first event you play from your void each turn costs 0●.
+Once per turn, the first extra card you draw costs 2● less. After you play it, gain 1●.
+▸ Dawn: Reveal the top card of your deck. If it's a Warrior, materialize it.
+The first targeted event you copy each turn also targets an adjacent character.
+Once per turn, when you materialize a Figment, allied Figments of its type gain +1 spark.
+Supported Survivors have +1 spark and Steadfast.
+Your characters have '↯fast -- Abandon this character: Prevent a played card.'
+Once per turn, abandon an ally: gain 2●.
+Your characters with cost 5● or more have +2 spark.
+↯fast -- 2●: Move an allied focused character to judgment. It gains +2 spark this turn.
+2●, Return a Warrior to hand: Materialize two Warrior figments.
+Once per turn, when you discard a card, return a different card from your void to hand.
+Once per turn, when you discard a card, your next character this turn enters unbound.
+The first time each turn a non-Figment ally is dissolved, materialize a 1-spark copy of it.
+The first ↯fast card you play during the opponent's turn costs 1● less.
+Once per turn, when you play an event, discover an event with lower cost.
+Once per turn, when you play a character from hand for less than its cost, trigger ▸ Materialized again.
+Cards you draw from card effects have ↯fast this turn.
+Allied Warriors cost you 1● less.
+Your events that dissolve enemies cost 1● less for each enemy you dissolved this turn.
+Allied non-Figments enter with +1✦ for each ally that left play this turn.
+Once per turn, when an ally becomes supported, return an event from your void to your hand.
+Once per turn, discard a card: Gain 1●.
+Allied characters in the judgment rank have ▸ Dissolved: Return this character to your hand.
+1●: Your next event this turn has ↯fast. If it's the opponent's turn, it costs 1● less.
+Once per turn, when you play the top card of your deck, move an ally to an empty judgment column.
+When you move a character to the judgment rank, it gains +1 spark.
+Once per turn, when you dissolve an enemy, your next character this turn costs 2● less.
+1●: The next allied character with cost 2● or less you materialize this turn is Unbound.
+2●: Discover a card with cost 5● or more from your deck.
+Once per turn, 2●: Trigger the ▸ Materialized: ability of an ally.
+Once per turn, play a character from your hand for 0●. Its spark becomes 1.
+Allied Survivors in the focus rank have '▸ Judgment: Kindle 1.'
+Once per turn, when you play a Warrior with cost 2● or less, materialize a copy of it.
+When you materialize a character, you may abandon an ally to give it +3 spark.
+Figments in your judgment rank have +1 spark for each other Figment in your judgment rank.
+2●: Banish an allied focused character. Materialize it at end of turn.
+First ally you banish and materialize each turn triggers ▸ Materialized: again.
+The opponent's cards cost 1● more.
+Your leftmost ally's ▸ Judgment: ability triggers an additional time.
+Once per turn, when a Warrior enters your judgment rank, materialize a Warrior figment.
+When you play a card with cost 5● or more, each enemy loses 1 spark.
+Once each turn, an ally entering an empty column puts your top card into the void. At 7+, it gets +2✦.
+Once per turn, after your third allied ▸ Judgment: ability, trigger another Judgment phase.
+Cards you discard gain reclaim 2●.
+Your ally with the most spark has steadfast and dread 2.
+Characters you return to hand gain +2✦.
+Your characters with cost 2● or less have +1✦.
+When you materialize a character, kindle 1.
+When you discard a card, materialize a Shadow Figment.
+Once per turn, when you materialize a Warrior with cost 2● or less, materialize a 1✦ copy of it.
+The first card you draw each turn becomes Foresee 3, then draw one of those cards.
+When you materialize a character with cost 2● or less, gain 1●.
+The second card you discard each turn gains Reclaim 0● this turn.
+At the start of the opponent's turn, choose a cost in their void. Cards of that cost cost 1● more.
+Your single-enemy dissolve and banish effects give other enemies -1 spark.
+Once per turn, if an enemy left play this turn, your next 3●-or-less ally repeats its ▸ Materialized ability.
+Once per turn, when you materialize a second Survivor, trigger its ▸ Materialized: ability.
+Once per turn, after an allied ▸ Judgment:, you may banish it, then materialize it.
+2●: A character in your hand gains "▸ Judgment: Trigger its ▸ Materialized ability."
+The second time you discard a card each turn, your next card this turn costs 2● less.
+Characters with cost 5● or more cost you 2● less.
+Once per turn, when you dissolve or banish a second enemy in a turn, gain 1✪.
+When you discard a card, the opponent's next card costs 1● more.
+Once per turn, when you materialize your second character, draw a card.
+Once per turn, when you abandon an ally, play a character from hand with cost 1● higher for 0●.
+Abandon an ally: An enemy loses spark equal to that ally's spark.
+The first character you draw each turn gains '▸ Materialized: Materialize a Warrior figment.'
+Your cards and abilities that target exactly one ally cost 1● less.
+Once per turn, when you play an event with cost 2● or less, it gains reclaim 0●.
+↯fast characters you play have Unbound.
+Once per turn, when an ally moves to the judgment rank, trigger its ▸ Materialized: ability.
+During Dawn, trigger the ▸ Judgment: ability of each ally.
+Allied characters with a ▸ Judgment: ability have +1✦.
+Cards you prevent are added to your hand.
+Characters you play from your void gain '▸ Materialized: Materialize a Shadow figment.'
+Your figments have 'Abandon this: A 3● or less character in your void gains reclaim 0●.'
+Once per turn, 2●: Each ally gains +1 spark.
+Once per turn, when a card with cost 5● or more resolves, draw a card.
+Once per turn, if your first card returned or banished an enemy, your next 2●-or-less card costs 2● less.
+Supported allies have '▸ Judgment: Draw a card.'
+2●: Materialize a Survivor from your void. Abandon it at end of turn.
+Once per turn, when you materialize a Survivor with 2 allied Survivors, trigger its ▸ Judgment: ability.
+1●, once per turn: Put your top 3 cards into your void. With 10+, your next character costs 2● less.
+Once per turn, when you discard a character, you may pay 1●. Materialize its 1-spark copy.
+The first event you prevent each turn returns to its owner's hand. It costs 1● more.
+↯fast events in your void have reclaim equal to their cost.
+Once per turn, when an ally scores ✪, kindle 2.
+Once per turn, after you copy an event, the next different event you play is copied.
+Once per turn, when you play your second character, materialize a Warrior figment.
+At end of turn, you may pay 1● to materialize a character you abandoned this turn with +2 spark.
+Your first character with cost 5● or more each turn costs 2● less.
+Once per turn, when you play an event, you may discard a card to copy it.
+1●: Your next non-Figment ally to leave play this turn materializes a Shadow figment.
+Once per turn, when you play a ↯fast card during the opponent's turn, gain 2●.
+Characters with a ▸ Materialized: ability have reclaim equal to their cost.
+Characters with cost 3● or less have ↯fast.
+Allied characters' ▸ Dissolved: abilities trigger an additional time.
+When you materialize an ally, you may set its spark to 0. If you do, kindle that amount.
+▸ Dawn: Play a copy of the last event you played last turn for 0●.
+Once on your turn, when you play your second event, kindle 2.
+While you have more allies in the focus rank than the judgment rank, your events are copied.
+Your allies in the judgment rank have Unstoppable.
+Once per turn, when a character enters your void from deck, with 8+ there, materialize a 1✦ copy.
+Your first 3●-or-less ally each turn may materialize Unbound in an empty enemy column.
+Your first 5●+ character each turn costs 2● less.
+The first event you play from your void each turn is copied.
+▸ Dawn: Return each event you played from your void last turn to your hand.
+Once per turn, when you prevent a card, an event in your void gains reclaim 0● this turn.
+At end of turn, materialize a Warrior figment in each empty column with allies on both sides.
+When an ally is dissolved, the next character you play this turn costs 2● less.
+The first prevent card you play each turn costs 1● less.
+When an ally dissolves an enemy in judgment, kindle 1.
+▸ Dawn: The most expensive character in your hand costs 3● less this turn.
+Once per turn, when one of your characters survives a paired judgment, draw a card.
+Characters in hand have ↯fast. The first you play each opponent turn has Unbound.
+Supported allies have Dread 1.
+Once per turn, when you materialize a character with cost 3● or less, you may return an ally to hand.
+Once per turn, when you abandon an ally, your highest-cost character in your void gains Reclaim 0●.
+Once per turn, when you foresee, you may put a card from your void on top of your deck.
+Cards cost at least 2●.
+2●: A character with cost 3● or less in your void gains reclaim 0● this turn.
+Once per turn, when you banish and materialize an ally, materialize a Radiant Figment.
+1●: Discard a card, then draw a card.
