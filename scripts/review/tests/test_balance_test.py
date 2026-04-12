@@ -30,6 +30,11 @@ class BalanceTestCliTests(unittest.TestCase):
             balance_test.selected_modes("bonus-energy", []), ["bonus-energy"]
         )
 
+    def test_parse_args_accepts_new_mode_names(self) -> None:
+        args = balance_test.parse_args(["--mode", "three-four-energy"])
+
+        self.assertEqual(args.mode, "three-four-energy")
+
 
 if __name__ == "__main__":
     unittest.main()

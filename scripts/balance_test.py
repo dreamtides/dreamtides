@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Parallel balance mode testing for Dreamtides first-player advantage mitigation.
 
-Runs AI matchups across 6 balance modes in parallel and compares P1/P2 winrates.
+Runs AI matchups across the configured balance modes in parallel and compares
+P1/P2 winrates.
 
 Usage:
     python3 scripts/balance_test.py          # Full run: 50 matches per mode, MonteCarloV8(50)
@@ -25,6 +26,8 @@ BALANCE_MODES = [
     "bonus-energy",
     "bonus-energy-no-draw",
     "four-six-cards",
+    "four-five-cards",
+    "three-four-energy",
     "bonus-points",
     "no-sickness",
     "coin",
@@ -36,9 +39,11 @@ SEED_OFFSETS = {
     "bonus-energy": 2000000,
     "bonus-energy-no-draw": 3000000,
     "four-six-cards": 4000000,
-    "bonus-points": 5000000,
-    "no-sickness": 6000000,
-    "coin": 7000000,
+    "four-five-cards": 5000000,
+    "three-four-energy": 6000000,
+    "bonus-points": 7000000,
+    "no-sickness": 8000000,
+    "coin": 9000000,
 }
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent

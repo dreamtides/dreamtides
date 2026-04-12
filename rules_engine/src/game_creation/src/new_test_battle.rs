@@ -148,7 +148,8 @@ pub fn create_and_start(
     legal_actions_cache::populate(&mut battle);
 
     battle.status = BattleStatus::Playing;
-    let (player_one_opening_hand, player_two_opening_hand) = opening_hand_sizes(balance_mode);
+    let (player_one_opening_hand, player_two_opening_hand) =
+        opening_hand_sizes(first_player, balance_mode);
     battle_deck::draw_cards(
         &mut battle,
         EffectSource::Game { controller: PlayerName::One },
@@ -165,7 +166,10 @@ pub fn create_and_start(
     let second_player = first_player.opponent();
     let source = EffectSource::Game { controller: second_player };
     match balance_mode {
-        BalanceMode::None | BalanceMode::NoSickness | BalanceMode::FourSixCards => {}
+        BalanceMode::None
+        | BalanceMode::NoSickness
+        | BalanceMode::FourSixCards
+        | BalanceMode::FourFiveCards => {}
         BalanceMode::ExtraCard => {
             battle_deck::draw_card(&mut battle, source, second_player);
         }
@@ -173,6 +177,15 @@ pub fn create_and_start(
             let player_state = battle.players.player_mut(second_player);
             player_state.produced_energy = Energy(1);
             player_state.current_energy = Energy(1);
+        }
+        BalanceMode::ThreeFourEnergy => {
+            let first_player_state = battle.players.player_mut(first_player);
+            first_player_state.produced_energy = Energy(1);
+            first_player_state.current_energy = Energy(1);
+
+            let second_player_state = battle.players.player_mut(second_player);
+            second_player_state.produced_energy = Energy(2);
+            second_player_state.current_energy = Energy(2);
         }
         BalanceMode::BonusPoints => {
             battle.players.player_mut(second_player).points = Points(3);
@@ -207,9 +220,12 @@ pub fn create_quest_state(tabula: &Tabula, deck_name: TestDeckName) -> QuestStat
     }
 }
 
-fn opening_hand_sizes(balance_mode: BalanceMode) -> (u32, u32) {
-    match balance_mode {
-        BalanceMode::FourSixCards => (4, 6),
+fn opening_hand_sizes(first_player: PlayerName, balance_mode: BalanceMode) -> (u32, u32) {
+    match (first_player, balance_mode) {
+        (PlayerName::One, BalanceMode::FourSixCards) => (4, 6),
+        (PlayerName::Two, BalanceMode::FourSixCards) => (6, 4),
+        (PlayerName::One, BalanceMode::FourFiveCards) => (4, 5),
+        (PlayerName::Two, BalanceMode::FourFiveCards) => (5, 4),
         _ => (5, 5),
     }
 }

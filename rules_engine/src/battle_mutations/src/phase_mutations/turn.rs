@@ -133,6 +133,10 @@ pub fn start_next_turn(battle: &mut BattleState) {
 
 fn should_draw_for_turn(battle: &BattleState) -> bool {
     battle.turn.turn_id != TurnId(0)
-        && !(battle.rules_config.balance_mode == BalanceMode::BonusEnergyNoDraw
+        && !(skips_second_player_first_turn_draw(battle.rules_config.balance_mode)
             && battle.turn.turn_id == TurnId(1))
+}
+
+fn skips_second_player_first_turn_draw(balance_mode: BalanceMode) -> bool {
+    matches!(balance_mode, BalanceMode::BonusEnergyNoDraw | BalanceMode::ThreeFourEnergy)
 }

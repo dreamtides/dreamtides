@@ -7,6 +7,7 @@ use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };
 use core_data::identifiers::{BattleId, UserId};
+use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use game_creation::new_test_battle;
 use state_provider::display_state_provider::DisplayStateProvider;
@@ -53,6 +54,37 @@ fn four_six_cards_sets_opening_hands_to_four_and_six() {
 
     assert_eq!(four_six_cards.turn.active_player, PlayerName::Two);
     assert_eq!(four_six_cards.cards.hand(PlayerName::Two).len(), 7);
+}
+
+#[test]
+fn four_five_cards_sets_opening_hands_to_four_and_five() {
+    let mut four_five_cards = create_battle(BalanceMode::FourFiveCards);
+
+    assert_eq!(four_five_cards.cards.hand(PlayerName::One).len(), 4);
+    assert_eq!(four_five_cards.cards.hand(PlayerName::Two).len(), 5);
+
+    advance_to_second_players_turn(&mut four_five_cards);
+
+    assert_eq!(four_five_cards.turn.active_player, PlayerName::Two);
+    assert_eq!(four_five_cards.cards.hand(PlayerName::Two).len(), 6);
+}
+
+#[test]
+fn three_four_energy_sets_first_turn_energy_and_skips_second_draw() {
+    let mut three_four_energy = create_battle(BalanceMode::ThreeFourEnergy);
+
+    assert_eq!(three_four_energy.turn.active_player, PlayerName::One);
+    assert_eq!(three_four_energy.players.player(PlayerName::One).current_energy, Energy(3));
+    assert_eq!(three_four_energy.players.player(PlayerName::One).produced_energy, Energy(3));
+    assert_eq!(three_four_energy.cards.hand(PlayerName::One).len(), 5);
+    assert_eq!(three_four_energy.cards.hand(PlayerName::Two).len(), 5);
+
+    advance_to_second_players_turn(&mut three_four_energy);
+
+    assert_eq!(three_four_energy.turn.active_player, PlayerName::Two);
+    assert_eq!(three_four_energy.players.player(PlayerName::Two).current_energy, Energy(4));
+    assert_eq!(three_four_energy.players.player(PlayerName::Two).produced_energy, Energy(4));
+    assert_eq!(three_four_energy.cards.hand(PlayerName::Two).len(), 5);
 }
 
 fn advance_to_second_players_turn(battle: &mut BattleState) {
