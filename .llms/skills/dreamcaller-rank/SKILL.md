@@ -54,9 +54,11 @@ This is **not**:
 - "Which cards are the most obviously on-theme?"
 - "Which cards are best in a finished 40-card list after I already have all the pieces?"
 - "Which cards have the prettiest direct text match?"
+- "Which cards are strongest in a generic vacuum if I ignore the committed dreamcaller?"
 
-Raw power matters a lot. A premium generic removal spell usually outranks a merely decent
-on-plan card. Close calls should break toward dreamcaller fit.
+This is a committed-dreamcaller ranking, not a generic P1P1 ranking. Dreamcaller fit and
+infrastructure should matter more than standalone card quality. Premium generic removal should not
+default into the top 20 unless it is truly exceptional or also fits the dreamcaller cleanly.
 
 ## Inputs
 
@@ -115,7 +117,7 @@ Default delivery behavior:
 Score range: `0-100`.
 
 Interpret scores as draft-value bands, not win-rate estimates:
-- `95-100`: absurd bomb, nearly always first-pickable
+- `95-100`: true format-warping bomb; expect very few of these in a full pool
 - `85-94`: premium early pick
 - `70-84`: strong pick
 - `55-69`: solid role-player or narrower synergy piece
@@ -152,9 +154,8 @@ Use one of these labels in the dreamcaller model and let it materially change th
   composition. Early picks should move substantially toward payoffs, enablers, and glue that
   make that engine real. A merely strong generic card can lose to a clearly on-plan card.
 - **Medium**
-  The dreamcaller creates a real direction, but many generically strong cards still fit well.
-  Synergy should move cards by a meaningful tier, but not flatten obviously stronger generic
-  cards without a concrete reason.
+  The dreamcaller creates a real direction. Synergy should move cards by a meaningful tier and
+  should often beat generically strong but more situational or less structurally reliable cards.
 - **Open**
   The dreamcaller is mostly a nudge or tie-breaker. Generic power should dominate unless a
   card has an unusually clean synergy payoff. Do not force the ranking to look themed if the
@@ -165,11 +166,16 @@ dreamcaller distort a rational early-pick order?"
 
 ### Important Judgment Rules
 
-- **Bomb override:** truly generic bombs stay near the top even if their synergy is modest.
+- **Bomb override:** use this rarely. A card is not a bomb just because its ceiling is huge; it
+  should be strong in most plausible decks and not depend heavily on already having the right setup.
 - **No fake recursion loops:** do not keep boosting a card because it supports a card that
   supports another good card. Multi-hop synergy is real, but its weight decays quickly.
 - **Stop at generic adjacency:** once the argument becomes "this is good with good cards,"
   the second-order chain has run out.
+- **Situational ceiling is not raw power:** downgrade cards whose average case depends on specific
+  setup, hand composition, or support density.
+- **Generic removal is replaceable:** strong generic removal should usually trail premium payoffs,
+  enablers, and infrastructure once committed to the dreamcaller, unless it patches a clear shell weakness.
 - **On-plan is good:** do not talk yourself out of a strong enabler or glue card just because
   similar-looking support effects may exist somewhere else.
 - **Replaceability is real:** you may lower a card if its job is easy to fill later, but do so
@@ -328,7 +334,6 @@ Prompt requirements for stage-1 subagents:
 
 ### Phase 4: Merge Stage 1 and Write the Pool-Aware Dreamcaller Model
 
-Stage transition rule:
 - this phase begins only after every stage-1 chunk has validated successfully
 - do not inspect or reason from `stage1-merged.csv` until the merge command has completed successfully
 
@@ -432,7 +437,6 @@ Each row in `$RUN_DIR/stage2/chunk-XXX.jsonl` should therefore include:
 
 ### Phase 7: Merge Stage 2
 
-Stage transition rule:
 - this phase begins only after every stage-2 chunk has validated successfully
 - do not inspect or reason from `stage2-merged.csv` until the merge command has completed successfully
 
@@ -520,7 +524,6 @@ Reconciliation prompt requirements:
 
 ### Phase 9: Deterministic Final Merge
 
-Stage transition rule:
 - do not run the final merge until every reconciliation window has validated successfully and
   `validate_unique_uuids.py` has passed
 
@@ -552,21 +555,18 @@ After the final merge, write `$RUN_DIR/final_explanations.jsonl`. One row per UU
   "summary": "one-sentence final why"
 }
 ```
-`summary` should explain why the card landed where it did in the final ranking, usually in terms of
-raw power, dreamcaller fit, infrastructure value, replaceability, or anti-synergy. For cards not
+`summary` should explain why the card landed where it did, usually in terms of raw power,
+dreamcaller fit, infrastructure value, replaceability, or anti-synergy. For cards not
 touched by a reconciliation window, `window_note` may be `null`.
 
 ## Practical Notes
 
 - Use a unique run directory under `/tmp` unless the user requests a repo path.
 - If subagents are unavailable, run the same phases locally in sequence.
-- Prefer file-first delivery for large rankings. The default product is `$RUN_DIR/final.csv`, not
-  an inline dump of hundreds of lines into the chat.
-- If the user asks why a card ranked where it did, answer from `final_explanations.jsonl` first,
-  then use nearby cards in `final.csv` for pairwise comparison.
-- When a phase produces a merge artifact, wait for that merge command to succeed before running
-  dependent inspection commands or downstream logic.
-- The product is the ranking, not a long essay.
+- Prefer file-first delivery for large rankings. The default product is `$RUN_DIR/final.csv`.
+- If the user asks why a card ranked where it did, answer from `final_explanations.jsonl` first.
+- Use nearby cards in `final.csv` for pairwise comparison.
+- Wait for merge commands to succeed before running dependent inspection commands or downstream logic.
 - Treat any use of prior tide, rarity, resonance, or archetype knowledge as contamination.
 - If a validator fails, fix that stage before continuing; do not “eyeball past” it.
 
