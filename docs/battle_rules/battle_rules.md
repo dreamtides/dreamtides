@@ -2,14 +2,14 @@
 
 Dreamtides is a two-player card game in the tradition of collectible card games
 like Magic: The Gathering. Players build decks of character and event cards,
-then compete to score victory points through positional combat on a two-rank
+then compete to score victory points through positional combat on a staggered
 battlefield. Two key differences from traditional card games: the shared
 Dreamwell system replaces lands for energy production, and combat is resolved
 positionally on a staggered battlefield — during the Judgment phase at the start
-of each turn, the active player's judgment-rank characters attack across the
-four judgment lanes while the non-active player's judgment-rank characters
-block. Unblocked attackers score points, while paired attackers and blockers
-compare spark and the weaker is dissolved.
+of each turn, the active player's deployed characters attack across the four
+deployed lanes while the non-active player's deployed characters block.
+Unblocked attackers score points, while paired attackers and blockers compare
+spark and the weaker is dissolved.
 
 ## Table of Contents
 
@@ -37,11 +37,11 @@ winner, the game ends in a draw.
 
 **Character** — Permanent cards that enter the battlefield when they resolve.
 Each character has a spark value used in combat during the Judgment phase.
-Characters enter the focus rank and can be repositioned to the judgment rank on
+Characters enter your reserves as reserved characters and can be deployed on
 subsequent turns. Characters remain on the battlefield until removed by an
-effect (Dissolve or Banish) or defeated in combat. Surviving characters remain
-in their current slot after Judgment; they do not automatically return to the
-focus rank. They can have triggered, activated, and static abilities. Characters
+effect (Dissolve or Banish) or defeated in combat. Surviving deployed characters
+remain where they are after Judgment; they do not automatically return to your
+reserves. They can have triggered, activated, and static abilities. Characters
 have subtypes (Mage, Warrior, Robot, etc.) that other cards can reference.
 
 **Event** — One-shot cards that produce an effect when they resolve, then move
@@ -80,19 +80,22 @@ cards. Characters move to the battlefield when they resolve; events move to the
 void.
 
 **Battlefield** — Where characters reside. Each player has a staggered
-battlefield with 4 judgment-rank lanes (`J0-J3`) and 5 focus-rank slots
-(`F0-F4`), for 9 total slots. The focus rank is offset so each focus-rank slot
-sits behind one or two judgment-rank lanes:
+battlefield with 4 deployed lanes (`D0-D3`) in front and 5 reserve slots
+(`R0-R4`) behind, for 9 total positions. Dreamtides does **not** use columns.
+Because the grid is staggered, a deployed lane sits in front of one or two
+reserve slots: `D0` is in front of `R0` and `R1`, `D1` is in front of `R1` and
+`R2`, `D2` is in front of `R2` and `R3`, and `D3` is in front of `R3` and `R4`.
+`D0` and `R0` are not a column, and `D0` and `R1` are not a column either.
 
-- `F0` supports `J0`
-- `F1` supports `J0` and `J1`
-- `F2` supports `J1` and `J2`
-- `F3` supports `J2` and `J3`
-- `F4` supports `J3`
+- `R0` supports `D0`
+- `R1` supports `D0` and `D1`
+- `R2` supports `D1` and `D2`
+- `R3` supports `D2` and `D3`
+- `R4` supports `D3`
 
-Only judgment-rank characters participate directly in Judgment phase combat. A
-player can have at most 9 total characters on the battlefield, and new
-characters always enter the focus rank.
+Only deployed characters participate directly in Judgment phase combat. A player
+can have at most 9 total characters on the battlefield, and new characters
+always enter the reserves as reserved characters.
 
 **Void** — The discard pile. Events go here after resolving. Characters go here
 when dissolved. Some cards can interact with cards in the void (notably via
@@ -136,18 +139,17 @@ effect, while a phase 1 card might produce 1 energy and also let you Foresee 1.
 Each turn progresses through these phases in order:
 
 1. **Judgment** — Start-of-turn trigger window and combat resolution. Judgment
-   abilities trigger first. Then the active player's judgment-rank characters
-   attack and the non-active player's judgment-rank characters block. Each
-   judgment-rank lane (`J0-J3`) is resolved independently (see Spark and
-   Scoring).
+   abilities trigger first. Then the active player's deployed characters attack
+   and the non-active player's deployed characters block. Each deployed lane
+   (`D0-D3`) is resolved independently (see Spark and Scoring).
 2. **Dreamwell** — The active player draws the next Dreamwell card, permanently
    increasing their energy production and resetting their current energy. Any
    bonus effect on the card is applied.
 3. **Draw** — The active player draws one card from their deck. (Skipped on the
    very first turn of the game.)
 4. **Main** — The active player can play cards from hand, activate abilities,
-   reposition characters between the battlefield's 9 slots, and take other
-   actions. This is the primary action phase.
+   deploy or reserve characters by moving them between the battlefield's 9
+   positions, and take other actions. This is the primary action phase.
 5. **Ending** — The active player passes. The opponent may play fast cards
    during this window. Once the opponent also passes, end-of-turn triggers fire
    and the turn passes to the opponent.
@@ -178,21 +180,21 @@ Spark is the primary stat on characters. Characters have no health or toughness
 including support-based effects from other characters, that effective spark is
 what Judgment, scoring, and other game rules use.
 
-**Attackers and blockers:** The active player's judgment-rank characters are the
-attacking side during Judgment. The non-active player's judgment-rank characters
-are the blocking side. Combat happens only in the four judgment-rank lanes.
+**Attackers and blockers:** The active player's deployed characters are the
+attacking side during Judgment. The non-active player's deployed characters are
+the blocking side. Combat happens only in the four deployed lanes.
 
-- If both players have a judgment-rank character in the same lane, they are
-  paired for combat in that lane.
-- If only the active player has a judgment-rank character in a lane, that
-  attacker is unblocked and can score points.
-- If only the non-active player has a judgment-rank character in a lane, nothing
+- If both players have a deployed character in the same lane, they are paired
+  for combat in that lane.
+- If only the active player has a deployed character in a lane, that attacker is
+  unblocked and can score points.
+- If only the non-active player has a deployed character in a lane, nothing
   happens in that lane.
 
 **Judgment phase resolution:** During the Judgment phase at the start of each
-turn, the active player's judgment-rank characters are the attackers and the
-non-active player's judgment-rank characters are the blockers. Each
-judgment-rank lane (`J0-J3`) is resolved independently:
+turn, the active player's deployed characters are the attackers and the
+non-active player's deployed characters are the blockers. Each deployed lane
+(`D0-D3`) is resolved independently:
 
 - **Attacker with a blocker (paired judgment):** Compare their spark values. The
   character with lower spark is dissolved. If both have the same spark, both are
@@ -201,32 +203,32 @@ judgment-rank lane (`J0-J3`) is resolved independently:
 - **Attacker with no blocker (unblocked):** The attacker scores victory points
   equal to its spark value for the attacking player.
 - **Only the non-active player has a character in the lane:** Nothing happens —
-  the non-active player's judgment-rank characters are blockers, not attackers.
+  the non-active player's deployed characters are blockers, not attackers.
 - **Neither player has a character in the lane:** Nothing happens.
 
 **After Judgment:** Surviving characters stay where they are. There is no
-automatic return to the focus rank after combat, so a surviving judgment-rank
-character remains in that lane until it is repositioned or removed.
+automatic return to the reserves after combat, so a surviving deployed character
+remains in that lane until it is moved or removed.
 
-Focus-rank characters are safe during Judgment — they do not directly fight and
-do not score points, though their abilities can still affect judgment-rank
+Your reserves are safe during Judgment — reserved characters do not directly
+fight and do not score points, though their abilities can still affect deployed
 characters they support.
 
-**Entering focused:** When a character enters the battlefield, it is placed in
-the focus rank and enters focused. A focused character cannot be moved to the
-judgment rank. This temporary focused status wears off at the start of the
-controlling player's next turn.
+**Entering reserved:** When a character enters the battlefield, it is placed in
+your reserves and enters reserved. A reserved character cannot be deployed. This
+temporary reserved status wears off at the start of the controlling player's
+next turn.
 
 **Repositioning:** During the Main phase, a player can freely reposition their
-characters between judgment-rank and focus-rank slots, and between lanes within
-a rank, subject to the focused condition. Moving a character onto an occupied
-slot swaps the two characters. Characters cannot be repositioned outside the
-Main phase, and no cards can be played during Judgment.
+characters between deployed lanes and reserve slots, and between positions on
+the same row of the battlefield, subject to the reserved condition. Moving a
+character onto an occupied position swaps the two characters. Characters cannot
+be moved outside the Main phase, and no cards can be played during Judgment.
 
 **Materializing new characters:** Characters always enter the battlefield in the
-focus rank. If all 5 focus-rank slots are occupied, no additional characters can
-be played or materialized until a focus-rank slot is freed, even if the player
-has open judgment-rank lanes.
+reserves. If all 5 reserve slots are occupied, no additional characters can be
+played or materialized until a reserve slot is freed, even if the player has
+open deployed lanes.
 
 **Spark modification:** Spark may be modified by card effects before Judgment,
 but once Judgment begins, no new cards can be played in response.
@@ -246,21 +248,21 @@ Banished zone. Several variants exist: banish from the battlefield, banish from
 the void, banish until the banishing card leaves play, and banish until the next
 main phase.
 
-**Materialize** — Put a character onto the battlefield's focus rank. This is the
-term for a character entering play, whether from hand (played normally), from
-the void (via Reclaim or effects), from the deck (via effects), or as a token
-(Figments). Characters enter focused and cannot move to the judgment rank on the
-turn they are materialized. Materialize requires an empty focus-rank slot.
+**Materialize** — Put a character into your reserves. This is the term for a
+character entering play, whether from hand (played normally), from the void (via
+Reclaim or effects), from the deck (via effects), or as a token (Figments).
+Characters enter reserved and cannot be deployed on the turn they are
+materialized. Materialize requires an empty reserve slot.
 
 **Supported / Supporting** — These terms describe the staggered adjacency
-between the 5 focus-rank slots and 4 judgment-rank lanes. A focus-rank
-character's **supported** characters are the judgment-rank characters in the
-lanes its slot supports. A judgment-rank character's **supporting** characters
-are the focus-rank characters behind it. On the standard battlefield, `F0`
-supports `J0`, `F1` supports `J0/J1`, `F2` supports `J1/J2`, `F3` supports
-`J2/J3`, and `F4` supports `J3`; equivalently, `J0` is supported by `F0/F1`,
-`J1` by `F1/F2`, `J2` by `F2/F3`, and `J3` by `F3/F4`. Support has no built-in
-effect by itself, but abilities can reference these relationships.
+between the 5 reserve slots and 4 deployed lanes. A reserved character's
+**supported** characters are the deployed characters in the lanes its slot
+supports. A deployed character's **supporting** characters are the reserved
+characters behind it. On the standard battlefield, `R0` supports `D0`, `R1`
+supports `D0/D1`, `R2` supports `D1/D2`, `R3` supports `D2/D3`, and `R4`
+supports `D3`; equivalently, `D0` is supported by `R0/R1`, `D1` by `R1/R2`, `D2`
+by `R2/R3`, and `D3` by `R3/R4`. Support has no built-in effect by itself, but
+abilities can reference these relationships.
 
 **Prevent** — Counter a card on the stack, sending it to the void without
 resolving. Prevent effects are always fast (they must be played in response to a
@@ -307,8 +309,8 @@ comparison, not to points scored if unblocked.
 **Preeminence** — This character wins spark ties in judgment. If both characters
 in a paired judgment have preeminence, both are dissolved as normal.
 
-**Unbound** — This character enters the judgment rank instead of the focus rank
-and does not enter focused — it can attack or block on the turn it is
+**Unbound** — This character enters deployed instead of entering your reserves,
+and it does not enter reserved — it can attack or block on the turn it is
 materialized.
 
 **Unstoppable** — This character scores victory points equal to its spark even
@@ -317,13 +319,11 @@ when blocked. The paired spark comparison still occurs as normal.
 **Veil X** — This character costs X additional energy for the opponent to target
 with cards or abilities.
 
-**Focused** — This character cannot be moved to the judgment rank. It remains in
-the focus rank permanently, cannot participate in judgment, and cannot pay focus
-costs.
-
-**Focus** — An activated ability that requires this character to skip its next
-judgment (it does not attack or block). The character remains in the focus rank
-and is treated as absent during the judgment phase.
+**Reserve** — Keep a character in your reserves. A reserved character cannot be
+deployed, does not attack or block during the next Judgment phase, and is
+treated as absent during that phase. New characters enter reserved, and if an
+effect or game rule says a character becomes reserved, that restriction lasts
+until the start of its controller's next turn.
 
 **Other effect categories:** Effects also exist for drawing cards, gaining or
 losing energy, gaining or losing points, modifying spark values on characters,
@@ -369,7 +369,6 @@ valid targets from the available options.
 ## Figments
 
 Figments are token characters created by card effects rather than played from a
-deck. There are four types: Celestial, Radiant, Halcyon, and Shadow. Figments
-enter the battlefield through "Materialize Figments" effects and behave like
-regular characters — they have spark values, count toward the character limit,
-and can be targeted by effects.
+deck. Figments enter the battlefield through "Materialize Figments" effects and
+behave like regular characters — they have spark values, count toward the
+character limit, and can be targeted by effects.
