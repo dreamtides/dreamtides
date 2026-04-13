@@ -36,12 +36,16 @@ def main() -> None:
         for record in read_jsonl(path):
             uuid = record.get("uuid")
             score = record.get("score")
-            if not uuid or score is None:
-                raise SystemExit(f"{path}: every record must include uuid and score")
+            rendered_text = record.get("rendered_text")
+            if not uuid or score is None or rendered_text is None:
+                raise SystemExit(
+                    f"{path}: every record must include uuid, score, and rendered_text"
+                )
             merged[uuid] = {
                 "uuid": uuid,
                 "score": float(score),
                 "tie_break": float(record.get("tie_break", 0)),
+                "rendered_text": str(rendered_text),
             }
 
     if args.expected_count is not None and len(merged) != args.expected_count:
@@ -58,7 +62,13 @@ def main() -> None:
     with args.output.open("w", newline="") as handle:
         writer = csv.writer(handle)
         for record in ordered:
-            writer.writerow([record["uuid"], f"{record['score']:.2f}"])
+            writer.writerow(
+                [
+                    record["uuid"],
+                    f"{record['score']:.2f}",
+                    record["rendered_text"],
+                ]
+            )
 
 
 if __name__ == "__main__":

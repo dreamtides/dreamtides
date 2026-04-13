@@ -32,6 +32,8 @@ def main() -> None:
             ) from error
         if "uuid" not in record:
             raise SystemExit(f"{args.input_path}:{line_number}: missing uuid")
+        if "rendered_text" not in record:
+            raise SystemExit(f"{args.input_path}:{line_number}: missing rendered_text")
         lines.append(raw_line)
     args.output_dir.mkdir(parents=True, exist_ok=True)
 

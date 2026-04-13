@@ -11,6 +11,23 @@ The goal is a strict `best -> worst` ordering of the whole pool, not just a shor
 Use subagents when available. The task is intentionally staged: broad first-pass scoring,
 anchor extraction, second-pass refinement, then deterministic merge into one final ranking.
 
+Read `docs/battle_rules/battle_rules.md` before ranking. The agent and every ranking subagent
+must ground its judgments in Dreamtides rules vocabulary and timing.
+
+This skill is intentionally a fresh-perspective evaluation based only on the user-provided
+dreamcaller text and anonymized card pool.
+
+Do **not** read:
+- `docs/tides/tides.md`
+- `rules_engine/tabula/rendered-cards.toml`
+- `rules_engine/tabula/cards.toml`
+- `docs/resonance/resonance.md`
+- any file whose purpose is to assign cards to archetypes, resonances, tides, or existing deck
+  identities
+
+Do **not** use any prior archetype labels, tide associations, or card-pool curation metadata as
+evidence. Judge only from the given inputs plus `docs/battle_rules/battle_rules.md`.
+
 ## Objective
 
 Interpret the question as:
@@ -34,7 +51,7 @@ The user provides:
 - Path to an anonymized card pool export
 
 Assume the export already exists. Do not regenerate it from `rendered-cards.toml` unless the
-user explicitly asks.
+user explicitly asks. Even if the repo contains richer source data, ignore it for this skill.
 
 ## Expected Card Pool Format
 
@@ -49,14 +66,12 @@ Use JSONL unless the user specifies another format. Each line should be one card
   "subtype": "string or null",
   "rarity": "L | R | U | C | null",
   "is_fast": false,
-  "rendered_text": "string",
-  "normalized_text": "string"
+  "rendered_text": "string"
 }
 ```
 
 Notes:
 - `uuid` is required and is the only identity field used in the final output.
-- `normalized_text` should be a machine-friendlier version of `rendered_text`.
 - Ignore anonymized placeholder names if present. They are not reliable identifiers.
 
 ## Output
@@ -66,8 +81,8 @@ Produce a strict ranking of the full pool sorted `best -> worst`.
 Default output format:
 
 ```text
-uuid,score
-uuid,score
+uuid,score,rendered_text
+uuid,score,rendered_text
 ...
 ```
 
@@ -81,7 +96,7 @@ Interpret scores as draft-value bands, not win-rate estimates:
 - `40-54`: replaceable support
 - `0-39`: low-priority, weak, or meaningfully off-plan
 
-The final output must contain only `uuid,score`.
+The final output must contain only `uuid,score,rendered_text`.
 
 ## Core Ranking Lens
 
@@ -141,6 +156,9 @@ Before ranking any cards, write a short internal analysis containing:
 - whether the dreamcaller is **narrow**, **medium**, or **open**
 
 Do not overfit to exact words. Infer the deck's desired play pattern.
+Re-read `docs/battle_rules/battle_rules.md` if the dreamcaller depends on timing, board state,
+Judgment, void, reclaim, fast cards, or subtype interactions.
+Do not consult tides, resonance, archetype, or source-pool files to answer these questions.
 
 Example:
 
@@ -174,6 +192,7 @@ card in its chunk and write JSONL output with at least:
   "uuid": "string",
   "score": 78,
   "tie_break": 2,
+  "rendered_text": "string",
   "role": "direct_payoff",
   "note": "short internal note"
 }
@@ -193,6 +212,10 @@ committing to this dreamcaller:
 
 [dreamcaller text]
 
+Before ranking, read docs/battle_rules/battle_rules.md.
+Do not read docs/tides/tides.md, rendered-cards.toml, cards.toml, resonance docs, or any
+existing archetype-assignment material.
+
 Rank every card in [chunk path]. Use 0-100 draft-value scores.
 
 Focus on:
@@ -204,7 +227,7 @@ Focus on:
 Rules:
 - process every card exactly once
 - output JSONL to [output path]
-- include uuid, score, tie_break, role, and a short internal note
+- include uuid, score, tie_break, rendered_text, role, and a short internal note
 - generic bombs stay high
 - close calls break toward dreamcaller fit
 - do not use placeholder card names as identifiers
@@ -242,6 +265,10 @@ You are refining a chunk-level Dreamcaller draft ranking.
 Dreamcaller:
 [dreamcaller text]
 
+Before refining, read docs/battle_rules/battle_rules.md.
+Do not read docs/tides/tides.md, rendered-cards.toml, cards.toml, resonance docs, or any
+existing archetype-assignment material.
+
 Global anchors:
 - bombs/premiums: [list]
 - direct payoffs: [list]
@@ -251,6 +278,7 @@ For each card in [chunk path], write a refined JSONL row to [output path] with:
 - uuid
 - score
 - tie_break
+- rendered_text
 
 Guidelines:
 - raise cards that materially improve the anchor plans
@@ -298,7 +326,7 @@ The script:
 - dedupes by UUID
 - lets later files override earlier entries
 - sorts by `score desc`, then `tie_break desc`, then `uuid`
-- emits final `uuid,score`
+- emits final `uuid,score,rendered_text`
 
 ## Practical Notes
 
@@ -310,6 +338,10 @@ The script:
   fix it before returning.
 - If the input format differs from JSONL, adapt once up front. Do not let every subagent
   invent its own parser.
+- Preserve the exact `rendered_text` field from the card record in every intermediate ranking
+  file so the final merge can emit it without re-reading the source pool.
+- Treat any attempt to import prior archetype or tide knowledge as contamination of the
+  evaluation and avoid it.
 
 ## Failure Modes
 
@@ -318,6 +350,9 @@ The script:
 - **Recursive hand-waving:** "good with good cards" becomes an infinite reason generator.
 - **No bomb override:** powerful generically great cards sink for no good reason.
 - **No deterministic merge:** duplicate UUIDs or missing cards in the final output.
+- **Dropped rules text:** final rows lose the original `rendered_text`.
+- **Contaminated perspective:** reading tides, resonance, source TOML, or prior archetype
+  assignments and then pretending the evaluation was fresh.
 - **Too much global re-ranking:** spending most of the budget adjudicating low-impact tail
   cards.
 
@@ -327,6 +362,7 @@ The run is successful only if all of these are true:
 
 - every input UUID appears exactly once in the final output
 - the final output is strictly ordered `best -> worst`
+- every final row includes the card's `rendered_text`
 - obvious direct-fit cards rise appropriately
 - at least some non-obvious infrastructure cards rise for defensible second-order reasons
 - generic bombs still appear near the top when warranted
