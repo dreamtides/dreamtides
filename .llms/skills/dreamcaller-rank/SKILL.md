@@ -106,6 +106,12 @@ uuid,score,rendered_text
 ...
 ```
 
+Default delivery behavior:
+- write the completed ranking to `$RUN_DIR/final.csv`
+- if the user requested a specific destination path, copy or move the final file there
+- return a short pointer or note by default
+- print the full inline CSV only if the user explicitly asks for inline output
+
 Score range: `0-100`.
 
 Interpret scores as draft-value bands, not win-rate estimates:
@@ -274,6 +280,12 @@ Spawn subagents over disjoint chunk files. Every stage-1 subagent must read:
 - `$RUN_DIR/reference_set.jsonl`
 - its assigned chunk file
 
+Dispatch policy:
+- if the number of chunks exceeds available live subagent slots, run in waves
+- keep a queue of remaining chunks and backfill newly free slots as workers finish
+- close completed workers promptly once their outputs are validated so later chunks can start
+- do not wait for every worker in a wave to finish before launching the next chunk if a slot is free
+
 The reference set is calibration-only. Read it first, mentally place those cards on the
 `0-100` scale, then score the chunk on that same scale. Do **not** copy reference-set rows into
 chunk output.
@@ -313,6 +325,10 @@ Prompt requirements for stage-1 subagents:
 - do not read tides, resonance, rarity, or archetype files
 
 ### Phase 4: Merge Stage 1 and Write the Pool-Aware Dreamcaller Model
+
+Stage transition rule:
+- this phase begins only after every stage-1 chunk has validated successfully
+- do not inspect or reason from `stage1-merged.csv` until the merge command has completed successfully
 
 Merge stage 1:
 
@@ -375,6 +391,10 @@ Run a second pass by chunk. Every stage-2 subagent must read:
 - `$RUN_DIR/reference_set.jsonl`
 - its assigned chunk file
 
+Dispatch policy:
+- use the same wave-based queueing approach as stage 1 when chunk count exceeds available live subagent slots
+- close completed workers promptly after validation so remaining chunks can start
+
 Use this pass to fix under-ranked glue and infrastructure without talking yourself into
 recursive fake synergy.
 
@@ -396,6 +416,10 @@ Stage-2 prompt requirements:
 
 ### Phase 7: Merge Stage 2
 
+Stage transition rule:
+- this phase begins only after every stage-2 chunk has validated successfully
+- do not inspect or reason from `stage2-merged.csv` until the merge command has completed successfully
+
 ```bash
 python3 .llms/skills/dreamcaller-rank/scripts/merge_rankings.py \
   "$RUN_DIR"/stage2/*.jsonl \
@@ -413,6 +437,20 @@ ordering matters most:
 - top of pool
 - large tie bands
 - boundary clusters
+
+Build windows deterministically in this order:
+
+1. Always create one `top_of_pool` window covering ranks `1-25`.
+2. Starting at rank `26`, scan downward through `stage2-merged.csv` by contiguous equal-score
+   bands. For each untouched score band with at least `8` cards and whose starting rank is at or
+   before `150`, create one `large_tie_band` window covering that entire band.
+3. After steps 1-2, if fewer than `4` total windows exist, add `boundary_cluster` windows to fill
+   the gap. Each boundary window should cover `18` cards: `9` cards above and `9` cards below the
+   first not-yet-covered score drop of at least `1.0`, scanning downward from the top.
+4. Windows must remain disjoint. If a candidate band or boundary overlaps an existing window,
+   skip it and continue scanning.
+5. Stop once you have created `4` total windows. Fewer is acceptable if no valid disjoint windows
+   remain.
 
 Window rules:
 - windows must be **disjoint**
@@ -463,6 +501,10 @@ Reconciliation prompt requirements:
 
 ### Phase 9: Deterministic Final Merge
 
+Stage transition rule:
+- do not run the final merge until every reconciliation window has validated successfully and
+  `validate_unique_uuids.py` has passed
+
 Pass files in coarse-to-fine order so later stages override earlier stages:
 
 ```bash
@@ -482,6 +524,10 @@ Do not return a final file unless this merge succeeds.
 
 - Use a unique run directory under `/tmp` unless the user requests a repo path.
 - If subagents are unavailable, run the same phases locally in sequence.
+- Prefer file-first delivery for large rankings. The default product is `$RUN_DIR/final.csv`, not
+  an inline dump of hundreds of lines into the chat.
+- When a phase produces a merge artifact, wait for that merge command to succeed before running
+  dependent inspection commands or downstream logic.
 - The product is the ranking, not a long essay.
 - Treat any use of prior tide, rarity, resonance, or archetype knowledge as contamination.
 - If a validator fails, fix that stage before continuing; do not “eyeball past” it.
