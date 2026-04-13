@@ -226,6 +226,7 @@ Keep these run-local artifacts:
 - `windows/input/*.meta.json`
 - `windows/output/*.jsonl`
 - `final.csv`
+- `final_explanations.jsonl`
 
 Normalize the user export once up front to `$RUN_DIR/cards.jsonl`, and write the exact
 dreamcaller text to `$RUN_DIR/dreamcaller.txt`.
@@ -264,6 +265,7 @@ All intermediate ranking files must use:
 - `score`: finite `0-100`
 - `tie_break`: integer `-2` to `2`
 - `rendered_text`: exact copy from the source row
+- `note`: short rationale when the phase requires it
 
 Use `tie_break` only for close calls:
 - `2`: unusually clean dreamcaller fit
@@ -405,7 +407,8 @@ python3 .llms/skills/dreamcaller-rank/scripts/validate_rankings.py \
   "$RUN_DIR/chunks/chunk-001.jsonl" \
   "$RUN_DIR/stage2/chunk-001.jsonl" \
   --exact \
-  --require-tie-break
+  --require-tie-break \
+  --require-fields note
 ```
 
 Stage-2 prompt requirements:
@@ -413,6 +416,19 @@ Stage-2 prompt requirements:
 - let the pool-aware openness label matter
 - preserve `rendered_text` exactly
 - emit only the cards in the assigned chunk
+- include `note`, a short explanation of the card's final-local case in this chunk
+
+Each row in `$RUN_DIR/stage2/chunk-XXX.jsonl` should therefore include:
+
+```json
+{
+  "uuid": "string",
+  "score": 81,
+  "tie_break": 1,
+  "rendered_text": "string",
+  "note": "anchor-backed figment infrastructure"
+}
+```
 
 ### Phase 7: Merge Stage 2
 
@@ -479,6 +495,7 @@ python3 .llms/skills/dreamcaller-rank/scripts/validate_rankings.py \
   "$RUN_DIR/windows/output/window-001.jsonl" \
   --exact \
   --require-tie-break \
+  --require-fields note \
   --max-score-adjustment 4
 ```
 
@@ -497,6 +514,8 @@ Reconciliation prompt requirements:
 - do not reinvent the whole ranking
 - preserve `rendered_text` exactly
 - respect the score-adjustment cap
+- include `note`, a short local-order reason such as `raw power correction`, `cleaner abandon payoff`,
+  or `more replaceable than neighbors`
 - do not use legacy tide, rarity, resonance, or archetype reasoning
 
 ### Phase 9: Deterministic Final Merge
@@ -520,12 +539,31 @@ The merge helper validates score shape, preserves exact `rendered_text`, sorts b
 `score desc`, then `tie_break desc`, then `uuid`, and emits final `uuid,score,rendered_text`.
 Do not return a final file unless this merge succeeds.
 
+After the final merge, write `$RUN_DIR/final_explanations.jsonl`. One row per UUID:
+
+```json
+{
+  "uuid": "string",
+  "final_score": 82.4,
+  "final_tie_break": 1,
+  "stage1_note": "short note",
+  "stage2_note": "short note",
+  "window_note": "short note or null",
+  "summary": "one-sentence final why"
+}
+```
+`summary` should explain why the card landed where it did in the final ranking, usually in terms of
+raw power, dreamcaller fit, infrastructure value, replaceability, or anti-synergy. For cards not
+touched by a reconciliation window, `window_note` may be `null`.
+
 ## Practical Notes
 
 - Use a unique run directory under `/tmp` unless the user requests a repo path.
 - If subagents are unavailable, run the same phases locally in sequence.
 - Prefer file-first delivery for large rankings. The default product is `$RUN_DIR/final.csv`, not
   an inline dump of hundreds of lines into the chat.
+- If the user asks why a card ranked where it did, answer from `final_explanations.jsonl` first,
+  then use nearby cards in `final.csv` for pairwise comparison.
 - When a phase produces a merge artifact, wait for that merge command to succeed before running
   dependent inspection commands or downstream logic.
 - The product is the ranking, not a long essay.
@@ -554,6 +592,7 @@ The run succeeds only if:
 - the final output is strictly ordered `best -> worst`
 - every final row includes exact source `rendered_text`
 - stage outputs obey the score and tie-break contract
+- the run preserves enough explanation data to answer per-card and pairwise `why` questions later
 - obvious direct-fit cards rise appropriately
 - some non-obvious infrastructure cards rise for defensible reasons
 - generic bombs still stay near the top when warranted
