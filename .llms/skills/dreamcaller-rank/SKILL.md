@@ -188,10 +188,7 @@ Cards may have more than one internal role, but pick one dominant role when scor
 
 ### Phase 0: Create a Run-Isolated Workspace
 
-Every run must use its own directory. Never reuse a previous run directory. Never write stage
-artifacts into shared `/tmp/dreamcaller-rank` paths.
-
-Example:
+Every run must use a fresh directory. Never reuse shared `/tmp/dreamcaller-rank` paths.
 
 ```bash
 RUN_DIR="/tmp/dreamcaller-rank-$(date +%Y%m%d-%H%M%S)-$$"
@@ -203,11 +200,12 @@ mkdir -p \
   "$RUN_DIR/windows/output"
 ```
 
-Inside the run directory, keep:
-
-- `cards.jsonl` or another one-time normalized export
+Keep these run-local artifacts:
+- `cards.jsonl`
 - `dreamcaller.txt`
-- `dreamcaller_model.md`
+- `dreamcaller_prior.md`
+- `dreamcaller_pool.md`
+- `reference_set.jsonl`
 - `chunks/manifest.json`
 - `stage1/*.jsonl`
 - `stage1-merged.csv`
@@ -220,138 +218,100 @@ Inside the run directory, keep:
 - `windows/output/*.jsonl`
 - `final.csv`
 
-If the input format differs from JSONL, adapt it once up front and write the normalized result
-to `$RUN_DIR/cards.jsonl`. Do not let every subagent invent its own parser.
+Normalize the user export once up front to `$RUN_DIR/cards.jsonl`, and write the exact
+dreamcaller text to `$RUN_DIR/dreamcaller.txt`.
 
-Write the dreamcaller text to `$RUN_DIR/dreamcaller.txt` so every later stage can reference the
-same exact text.
+### Phase 1: Model the Dreamcaller Prior
 
-### Phase 1: Model the Dreamcaller
-
-Before ranking any cards, write a short internal analysis to `$RUN_DIR/dreamcaller_model.md`
-containing:
-
+Before looking at the whole pool, write `$RUN_DIR/dreamcaller_prior.md` with:
 - the dreamcaller's direct hooks
-- what the dreamcaller is trying to assemble
+- what the deck is trying to assemble
 - what classes of cards it actively wants
-- what classes of cards it merely tolerates
-- what kinds of cards are generic premiums even if not especially synergistic
-- whether the dreamcaller is **narrow**, **medium**, or **open**
-- one short paragraph explaining *why* that openness label is correct
+- what classes it merely tolerates
+- what kinds of generic premiums should stay high anyway
+- a **provisional** openness guess and why
 
-Do not overfit to exact words. Infer the deck's desired play pattern.
-Re-read `docs/battle_rules/battle_rules.md` if the dreamcaller depends on timing, board state,
-Judgment, void, reclaim, fast cards, or subtype interactions.
-Do not consult tides, rarity, resonance, archetype, or source-pool files to answer these
-questions.
+Do **not** lock the final openness label yet. The final `narrow / medium / open` call must be
+revisited after a first pass over the actual pool.
 
-Example:
+### Phase 2: Split the Pool and Build a Calibration Reference Set
 
-`With 3 allied Survivors, cards in your void have reclaim equal to their cost.`
-
-This is not only "Survivor tribal." It also wants:
-- cards that help keep Survivors on the battlefield
-- cards that stock the void
-- cards that become much better when reclaim is live
-- glue cards that connect the survivor-count requirement to the void engine
-
-### Phase 2: Split the Pool
-
-Use the helper script:
+Use the helper scripts:
 
 ```bash
 python3 .llms/skills/dreamcaller-rank/scripts/split_jsonl.py \
   "$RUN_DIR/cards.jsonl" "$RUN_DIR/chunks" --chunk-size 60
+
+python3 .llms/skills/dreamcaller-rank/scripts/build_reference_set.py \
+  "$RUN_DIR/cards.jsonl" "$RUN_DIR/reference_set.jsonl" --count 24
 ```
 
-This creates chunk files containing disjoint card sets and writes `manifest.json`.
-Treat `"$RUN_DIR/chunks/manifest.json"` as the source of truth for:
+`manifest.json` is the source of truth for chunk coverage. `reference_set.jsonl` is a small,
+deterministic calibration sample shared by every scoring subagent.
 
-- total expected record count
-- chunk filenames
-- chunk boundaries
+### Scoring Contract
 
-Never give two subagents the same output file.
+All intermediate ranking files must use:
+- `score`: finite `0-100`
+- `tie_break`: integer `-2` to `2`
+- `rendered_text`: exact copy from the source row
+
+Use `tie_break` only for close calls:
+- `2`: unusually clean dreamcaller fit
+- `1`: meaningful fit edge
+- `0`: neutral
+- `-1`: mild anti-synergy
+- `-2`: strong anti-synergy
 
 ### Phase 3: First-Pass Chunk Scoring
 
-Spawn parallel subagents over chunk files when available. Each subagent should score every
-card in its chunk and write JSONL output with at least:
+Spawn subagents over disjoint chunk files. Every stage-1 subagent must read:
+- `docs/battle_rules/battle_rules.md`
+- `$RUN_DIR/dreamcaller_prior.md`
+- `$RUN_DIR/reference_set.jsonl`
+- its assigned chunk file
+
+The reference set is calibration-only. Read it first, mentally place those cards on the
+`0-100` scale, then score the chunk on that same scale. Do **not** copy reference-set rows into
+chunk output.
+
+Each row in `$RUN_DIR/stage1/chunk-XXX.jsonl` must include:
 
 ```json
 {
   "uuid": "string",
   "score": 78,
-  "tie_break": 2,
+  "tie_break": 1,
   "rendered_text": "string",
   "role": "direct_payoff",
   "note": "short internal note"
 }
 ```
 
-First-pass scoring should be broad and fast. The purpose is to cover the whole pool once and
-to surface anchor candidates.
-
-The `tie_break` field is internal. Use higher values for stronger dreamcaller fit when cards
-are otherwise close.
-
-Write each result to a run-local path such as:
-
-- input: `$RUN_DIR/chunks/chunk-001.jsonl`
-- output: `$RUN_DIR/stage1/chunk-001.jsonl`
-
-After every chunk finishes, validate it before using it:
+Validate every chunk before using it:
 
 ```bash
 python3 .llms/skills/dreamcaller-rank/scripts/validate_rankings.py \
   "$RUN_DIR/chunks/chunk-001.jsonl" \
   "$RUN_DIR/stage1/chunk-001.jsonl" \
-  --exact
+  --exact \
+  --require-tie-break \
+  --require-fields role note
 ```
 
-Do not proceed past Phase 3 until every chunk output exists and validates against its source
-chunk.
+Do not proceed until all stage-1 chunks validate.
 
-#### First-Pass Prompt Template
-
-```text
-You are ranking one chunk of an anonymized Dreamtides card pool for pack 1 pick 1 after
-committing to this dreamcaller:
-
-[dreamcaller text]
-
-Before ranking, read docs/battle_rules/battle_rules.md.
-This project is currently removing tides and rarity from the game. If any legacy export fields
-mention tide or rarity, ignore them completely.
-Do not read docs/tides/tides.md, rendered-cards.toml, cards.toml, resonance docs, or any
-existing archetype-assignment material.
-
-Also read:
-- [dreamcaller model path]
-
-Rank every card in [chunk path]. Use 0-100 draft-value scores.
-
-Focus on:
-- raw power
-- direct dreamcaller fit
-- infrastructure / second-order fit
-- dependency
-- replaceability
-- openness
-
-Rules:
-- process every card in the chunk exactly once
-- write output JSONL to [output path]
-- include uuid, score, tie_break, rendered_text, role, and a short internal note
-- preserve rendered_text exactly from the input chunk
+Prompt requirements for stage-1 subagents:
+- score only the assigned chunk
+- preserve `rendered_text` exactly
 - generic bombs stay high
-- close calls break toward dreamcaller fit
-- do not use placeholder card names as identifiers
-```
+- close calls break toward fit
+- ignore legacy `tide` and `rarity`
+- do not read tides, resonance, rarity, or archetype files
 
-### Phase 4: Merge Stage 1 and Extract Global Anchors
+### Phase 4: Merge Stage 1 and Write the Pool-Aware Dreamcaller Model
 
-First produce a validated stage-1 merge:
+Merge stage 1:
 
 ```bash
 python3 .llms/skills/dreamcaller-rank/scripts/merge_rankings.py \
@@ -360,22 +320,28 @@ python3 .llms/skills/dreamcaller-rank/scripts/merge_rankings.py \
   --expected-jsonl "$RUN_DIR/cards.jsonl"
 ```
 
-Then extract global anchors and write them to both:
+Then write `$RUN_DIR/dreamcaller_pool.md`. This is the **final** dreamcaller model and must
+include:
+- the direct hooks and plan
+- what the pool actually supports well
+- what the pool supports weakly or sparsely
+- whether generic premiums are dense enough to resist synergy pulls
+- the final `narrow / medium / open` label
+- one short paragraph explaining why that label is correct **for this pool**
 
-- `$RUN_DIR/anchors.json`
-- `$RUN_DIR/anchors.md`
+The openness label must be based on both dreamcaller text and pool context, not dreamcaller
+text alone.
 
-Anchor extraction is the most important thinking step in the workflow. Do **not** treat it as
-"copy the top-scoring cards into three buckets." Anchors are the cards that explain why other
-cards should move.
+### Phase 5: Extract Anchors
 
-Create exactly three anchor groups:
+Write anchors to `$RUN_DIR/anchors.json` and `$RUN_DIR/anchors.md`.
 
+Use up to three anchor groups:
 - `bombs_or_premiums`
 - `direct_payoffs`
 - `infrastructure`
 
-Target roughly `8-20` cards in each group. Smaller is better than bloated.
+Each group may be small or empty. Do **not** pad a bucket just to hit a quota.
 
 Each anchor entry should include:
 
@@ -385,102 +351,47 @@ Each anchor entry should include:
   "score": 88,
   "rendered_text": "string",
   "anchor_type": "direct_payoffs",
-  "reason": "why this card is an anchor rather than just a good card",
-  "wants": "what kinds of neighboring cards it pulls upward",
+  "reason": "why this card moves neighboring cards",
+  "wants": "what kinds of cards it lifts",
   "confidence": "high | medium"
 }
 ```
 
-Use these rules when selecting anchors:
+Anchor rules:
+- a strong card is not automatically an anchor
+- every anchor needs a concrete `reason` and concrete `wants`
+- infrastructure must do real enabling work, not just generic adjacency
+- if a card would not plausibly move any neighbor, it is not an anchor
 
-- **Bombs / premiums:** cards that stay near the top with only modest dreamcaller help.
-  Their job is to stop the ranking from becoming fake-themes-only.
-- **Direct payoffs:** cards the dreamcaller makes substantially better, more reliable, or more
-  punishing. These are the cards the deck is happiest to end up with.
-- **Infrastructure:** cards that make the payoff plan happen more often. They remove bottlenecks,
-  increase trigger density, stabilize board conditions, feed the right zone, or connect two
-  otherwise separate requirements.
+### Phase 6: Second-Pass Refinement
 
-Use these anti-rules:
+Run a second pass by chunk. Every stage-2 subagent must read:
+- `docs/battle_rules/battle_rules.md`
+- `$RUN_DIR/dreamcaller_pool.md`
+- `$RUN_DIR/anchors.md`
+- `$RUN_DIR/reference_set.jsonl`
+- its assigned chunk file
 
-- Do **not** include a card as an anchor merely because it scored well.
-- Do **not** let direct payoffs crowd out infrastructure.
-- Do **not** call a card infrastructure if the only reason is "good cards like good cards."
-- Do **not** use legacy tide or rarity information to break ties.
-- If an anchor would not plausibly cause any other card to move, it is probably not an anchor.
+Use this pass to fix under-ranked glue and infrastructure without talking yourself into
+recursive fake synergy.
 
-For a non-obvious card, ask:
-
-`Does this card make one or more anchor plans materially better, more reliable, more numerous,
-or easier to draft into?`
-
-If yes, lift it. If the support claim is too indirect or too generic, do not.
-
-Before moving on, sanity-check the anchor file:
-
-- there is at least one real infrastructure anchor
-- the anchor sets are not just the same cards copied three times
-- each anchor has a concrete reason and a concrete "wants" clause
-- the anchor file still makes sense if tides and rarity are ignored
-
-### Phase 5: Second-Pass Refinement
-
-Run a second pass over the pool, again by chunk, but now include the dreamcaller model and the
-anchor artifact.
-
-Use this pass to fix the common failure mode where only direct matches rise while enabling
-cards stay too low.
-
-Write each refined chunk to:
-
-- input: `$RUN_DIR/chunks/chunk-001.jsonl`
-- output: `$RUN_DIR/stage2/chunk-001.jsonl`
-
-Validate every refined output before it is accepted:
+Validate every refined chunk:
 
 ```bash
 python3 .llms/skills/dreamcaller-rank/scripts/validate_rankings.py \
   "$RUN_DIR/chunks/chunk-001.jsonl" \
   "$RUN_DIR/stage2/chunk-001.jsonl" \
-  --exact
+  --exact \
+  --require-tie-break
 ```
 
-#### Second-Pass Prompt Template
+Stage-2 prompt requirements:
+- keep scores on the same calibrated scale as the reference set
+- let the pool-aware openness label matter
+- preserve `rendered_text` exactly
+- emit only the cards in the assigned chunk
 
-```text
-You are refining a chunk-level Dreamcaller draft ranking.
-
-Dreamcaller:
-[dreamcaller text]
-
-Before refining, read docs/battle_rules/battle_rules.md.
-This project is currently removing tides and rarity from the game. If any legacy export fields
-mention tide or rarity, ignore them completely.
-Do not read docs/tides/tides.md, rendered-cards.toml, cards.toml, resonance docs, or any
-existing archetype-assignment material.
-
-Also read:
-- [dreamcaller model path]
-- [anchors.md path]
-
-For each card in [chunk path], write a refined JSONL row to [output path] with:
-- uuid
-- score
-- tie_break
-- rendered_text
-
-Guidelines:
-- raise cards that materially improve the anchor plans
-- allow multi-hop support, but with fast decay
-- do not create self-justifying loops
-- keep truly generic bombs high
-- let the openness label matter
-- preserve rendered_text exactly from the input chunk
-```
-
-### Phase 6: Merge Stage 2 and Resolve Missing-Card Failures
-
-Before any reconciliation work, produce a validated stage-2 merge:
+### Phase 7: Merge Stage 2
 
 ```bash
 python3 .llms/skills/dreamcaller-rank/scripts/merge_rankings.py \
@@ -489,30 +400,25 @@ python3 .llms/skills/dreamcaller-rank/scripts/merge_rankings.py \
   --expected-jsonl "$RUN_DIR/cards.jsonl"
 ```
 
-If this merge fails because cards are missing, duplicated, or unexpected:
+If this merge fails because cards are missing, duplicated, or unexpected, stop, fix the bad
+chunks, revalidate them, and rerun the merge. A partial merge is invalid.
 
-1. Stop and identify which chunk outputs are invalid or absent.
-2. Re-run only the missing or invalid chunks.
-3. Re-validate those chunk outputs with `validate_rankings.py`.
-4. Re-run the stage-2 merge.
-5. Do not proceed until the merge succeeds.
+### Phase 8: Reconcile High-Value Windows
 
-A partial merge is not a valid intermediate result.
+Use `stage2-merged.csv` as the provisional global order. Reconcile only the windows where local
+ordering matters most:
+- top of pool
+- large tie bands
+- boundary clusters
 
-### Phase 7: Reconcile Only the Close Clusters
+Window rules:
+- windows must be **disjoint**
+- no UUID may appear in more than one reconciliation window
+- window input rows must carry the current `score` and `tie_break` from `stage2-merged.csv`
+- the subagent may adjust score by at most the metadata cap
+- the subagent may emit only the UUIDs in its own input file
 
-Do not spend agent budget globally re-ranking the whole pool again.
-
-Instead:
-
-1. Use `stage2-merged.csv` as the provisional global order.
-2. Materialize reconciliation windows as explicit files in `"$RUN_DIR/windows/input"`.
-3. For each window, also write a matching metadata file in
-   `"$RUN_DIR/windows/input/window-XXX.meta.json"`.
-4. Run reconciliation subagents only against those explicit window files.
-5. Validate each window output against its own window input before accepting it.
-
-Each window metadata file should include:
+Each metadata file should include:
 
 ```json
 {
@@ -524,76 +430,37 @@ Each window metadata file should include:
 }
 ```
 
-Window construction guidance:
-
-- **Top of pool:** always make at least one window covering roughly the top `20-30` cards.
-- **Large tie bands:** make windows where many cards sit within a very small score spread.
-- **Boundary clusters:** make windows where adjacent cards are close enough that local order
-  matters for draft decisions.
-- **Overlap:** adjacent windows may overlap by `5-10` cards so local ordering can stabilize
-  across boundaries.
-
-Do **not** create windows for the whole tail of the pool. Reconciliation is for the high-value
-parts of the ranking.
-
-For each window:
-
-- the input file must contain only the cards in that window
-- the subagent may reorder only those cards
-- the subagent may emit rows only for those UUIDs
-- the subagent may adjust scores, but by no more than the metadata cap unless there is a very
-  explicit reason
-- the subagent must preserve `rendered_text` exactly
-- the subagent must not introduce new archetype, tide, or rarity reasoning
-
-Validate every window result before it is used:
+Validate every window output:
 
 ```bash
 python3 .llms/skills/dreamcaller-rank/scripts/validate_rankings.py \
   "$RUN_DIR/windows/input/window-001.jsonl" \
   "$RUN_DIR/windows/output/window-001.jsonl" \
-  --exact
+  --exact \
+  --require-tie-break \
+  --max-score-adjustment 4
 ```
 
-If a window output fails validation, discard it and rerun that window instead of letting a bad
-file contaminate the final merge.
+Use the actual cap from that window's metadata, not a hard-coded number, when you run the
+validator.
 
-#### Reconciliation Prompt Template
+Before final merge, prove the windows are disjoint:
 
-```text
-You are reconciling a small local ranking window inside a Dreamcaller draft order.
+```bash
+python3 .llms/skills/dreamcaller-rank/scripts/validate_unique_uuids.py \
+  "$RUN_DIR"/windows/output/*.jsonl
+```
 
-Dreamcaller:
-[dreamcaller text]
-
-Read:
-- docs/battle_rules/battle_rules.md
-- [dreamcaller model path]
-- [anchors.md path]
-- [window metadata path]
-
-This project is currently removing tides and rarity from the game. Ignore any legacy export
-fields about tide or rarity.
-
-Your job:
-- read only the cards in [window input path]
-- reorder only those cards
+Reconciliation prompt requirements:
 - keep the comparison local
-- preserve rendered_text exactly
-- output one JSONL row per input card to [window output path]
-
-Guidelines:
-- stabilize close calls near the top and around score ties
 - do not reinvent the whole ranking
-- do not emit cards outside the window
-- do not use generic "good with good cards" logic as a reason
-- respect the window score-adjustment cap unless the current local order is clearly wrong
-```
+- preserve `rendered_text` exactly
+- respect the score-adjustment cap
+- do not use legacy tide, rarity, resonance, or archetype reasoning
 
-### Phase 8: Deterministic Final Merge
+### Phase 9: Deterministic Final Merge
 
-Use the merge helper script. Pass files in coarse-to-fine order so later stages override
-earlier ones:
+Pass files in coarse-to-fine order so later stages override earlier stages:
 
 ```bash
 python3 .llms/skills/dreamcaller-rank/scripts/merge_rankings.py \
@@ -604,55 +471,41 @@ python3 .llms/skills/dreamcaller-rank/scripts/merge_rankings.py \
   --expected-jsonl "$RUN_DIR/cards.jsonl"
 ```
 
-The script:
-
-- dedupes by UUID
-- lets later files override earlier entries
-- validates the final UUID set against the original normalized input
-- sorts by `score desc`, then `tie_break desc`, then `uuid`
-- emits final `uuid,score,rendered_text`
-
-Do not return a final output file unless this final merge succeeds.
+The merge helper validates score shape, preserves exact `rendered_text`, sorts by
+`score desc`, then `tie_break desc`, then `uuid`, and emits final `uuid,score,rendered_text`.
+Do not return a final file unless this merge succeeds.
 
 ## Practical Notes
 
 - Use a unique run directory under `/tmp` unless the user requests a repo path.
-- If subagents are unavailable, run the same workflow locally in multiple passes.
-- Do not waste effort on long written explanations. The product is the ranking.
-- If the final merge reports missing cards, treat that as a blocking failure and fix coverage.
-- If the final merge reports unexpected cards, treat that as a contamination failure and find
-  the bad stage output before continuing.
-- Preserve the exact `rendered_text` field from the card record in every intermediate ranking
-  file so the final merge can emit it without re-reading the source pool.
-- Treat any attempt to import prior archetype, tide, or rarity knowledge as contamination of
-  the evaluation and avoid it.
+- If subagents are unavailable, run the same phases locally in sequence.
+- The product is the ranking, not a long essay.
+- Treat any use of prior tide, rarity, resonance, or archetype knowledge as contamination.
+- If a validator fails, fix that stage before continuing; do not “eyeball past” it.
 
 ## Failure Modes
 
-- **Too literal:** only subtype matches rise; glue and infrastructure stay too low.
-- **Too generic:** the dreamcaller barely affects the ranking.
-- **Openness collapse:** every dreamcaller produces almost the same top-20 because the openness
-  label never materially changes the weighting.
+- **Too literal:** only direct subtype matches rise.
+- **Too generic:** the dreamcaller barely changes the ranking.
+- **Bad calibration:** different chunk subagents use different score temperatures.
+- **Premature openness:** the openness label is chosen before the pool is understood.
 - **Recursive hand-waving:** "good with good cards" becomes an infinite reason generator.
-- **No bomb override:** powerful generically great cards sink for no good reason.
-- **Anchor drift:** the anchor file is just a top-cards list with no real causal value.
-- **Shared temp contamination:** two runs reuse the same temp paths or stale files survive into
-  a new run.
+- **Anchor inflation:** the workflow invents anchors to satisfy a quota.
+- **Shared temp contamination:** runs reuse stale files.
 - **Missing-card merge:** a stage drops UUIDs and the workflow keeps going anyway.
-- **Window contamination:** a reconciliation file emits cards outside its intended window.
+- **Window overlap:** the same UUID appears in two reconciliation windows.
+- **Score-cap drift:** a window rewrites scores beyond its allowed adjustment.
 - **Dropped rules text:** final rows lose the original `rendered_text`.
 - **Legacy leakage:** tide or rarity fields sneak back into the reasoning.
-- **Too much global re-ranking:** spending most of the budget adjudicating low-impact tail
-  cards.
 
 ## Minimal Success Criteria
 
-The run is successful only if all of these are true:
-
+The run succeeds only if:
 - every input UUID appears exactly once in the final output
 - the final output is strictly ordered `best -> worst`
-- every final row includes the card's `rendered_text`
+- every final row includes exact source `rendered_text`
+- stage outputs obey the score and tie-break contract
 - obvious direct-fit cards rise appropriately
-- at least some non-obvious infrastructure cards rise for defensible second-order reasons
-- generic bombs still appear near the top when warranted
+- some non-obvious infrastructure cards rise for defensible reasons
+- generic bombs still stay near the top when warranted
 - the final reasoning is not contaminated by tide or rarity heuristics

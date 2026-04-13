@@ -2,6 +2,7 @@
 
 import argparse
 import csv
+import math
 import json
 from pathlib import Path
 
@@ -35,6 +36,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--expected-count", type=int)
     parser.add_argument("--expected-jsonl", type=Path)
+    parser.add_argument("--score-min", type=float, default=0.0)
+    parser.add_argument("--score-max", type=float, default=100.0)
+    parser.add_argument("--tie-break-min", type=int, default=-2)
+    parser.add_argument("--tie-break-max", type=int, default=2)
     return parser.parse_args()
 
 
@@ -48,6 +53,23 @@ def read_jsonl(path: Path) -> list[dict]:
         except json.JSONDecodeError as error:
             raise SystemExit(f"{path}:{line_number}: invalid JSON: {error}") from error
     return records
+
+
+def parse_finite_number(value: object, path: Path, field: str) -> float:
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError) as error:
+        raise SystemExit(f"{path}: invalid {field} {value!r}") from error
+    if not math.isfinite(parsed):
+        raise SystemExit(f"{path}: non-finite {field} {value!r}")
+    return parsed
+
+
+def parse_tie_break(value: object, path: Path) -> int:
+    parsed = parse_finite_number(value, path, "tie_break")
+    if not parsed.is_integer():
+        raise SystemExit(f"{path}: tie_break must be an integer, got {value!r}")
+    return int(parsed)
 
 
 def main() -> None:
@@ -64,10 +86,21 @@ def main() -> None:
                 raise SystemExit(
                     f"{path}: every record must include uuid, score, and rendered_text"
                 )
+            parsed_score = parse_finite_number(score, path, "score")
+            if parsed_score < args.score_min or parsed_score > args.score_max:
+                raise SystemExit(
+                    f"{path}: score {parsed_score} outside [{args.score_min}, {args.score_max}]"
+                )
+            parsed_tie_break = parse_tie_break(record.get("tie_break", 0), path)
+            if parsed_tie_break < args.tie_break_min or parsed_tie_break > args.tie_break_max:
+                raise SystemExit(
+                    f"{path}: tie_break {parsed_tie_break} outside "
+                    f"[{args.tie_break_min}, {args.tie_break_max}]"
+                )
             merged[uuid] = {
                 "uuid": uuid,
-                "score": float(score),
-                "tie_break": float(record.get("tie_break", 0)),
+                "score": parsed_score,
+                "tie_break": parsed_tie_break,
                 "rendered_text": str(rendered_text),
             }
             source_paths_by_uuid[uuid] = str(path)
