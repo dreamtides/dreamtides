@@ -49,8 +49,11 @@ the opponent's turn or in response to other cards on the stack.
 
 **Dreamcaller** — A player's identity card, an animated 3D character that starts
 each battle already in play. Dreamcallers provide powerful ongoing abilities
-(static, triggered, or activated) that define a player's playstyle. Primarily
-chosen during quest mode.
+(static, triggered, or activated) that define a player's playstyle. Each
+Dreamcaller also has an Awakening number, which is the turn on which that
+Dreamcaller's effects become active. For example, a Dreamcaller with Awakening 4
+and "Judgment: Draw a card" would begin applying that ability starting on turn
+4\. Primarily chosen during quest mode.
 
 **Dreamsign** — A quest-layer card representing a 2D illustrated object that
 provides ongoing effects. Selected during quest mode and active throughout
