@@ -63,10 +63,13 @@ on-plan card. Close calls should break toward dreamcaller fit.
 The user provides:
 
 - Dreamcaller rules text as plain text
-- Path to an anonymized card pool export
+- Path to an anonymized card pool export. Default to
+  `rules_engine/tabula/dreamcaller_rank_card_pool.jsonl`.
 
 Assume the export already exists. Do not regenerate it from `rendered-cards.toml` unless the
-user explicitly asks. Even if the repo contains richer source data, ignore it for this skill.
+user explicitly asks. If the user does not specify a path, use
+`rules_engine/tabula/dreamcaller_rank_card_pool.jsonl`.
+Even if the repo contains richer source data, ignore it for this skill.
 
 ## Expected Card Pool Format
 

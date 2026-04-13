@@ -25,7 +25,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("notes/dreamcaller_rank_card_pool.jsonl"),
+        default=Path("rules_engine/tabula/dreamcaller_rank_card_pool.jsonl"),
         help="Destination JSONL path",
     )
     return parser.parse_args()
