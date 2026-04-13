@@ -93,9 +93,9 @@ new arrival making the next one easier.
 
 ## Mechanical Identity
 
-Bloom is the ramp tide, but its ramp now serves character density rather than a
-single giant threat. Bloom wants full reserves, a crowded board, and Judgment
-engines that let one character play snowball into another.
+Bloom is the ramp tide. It uses that ramp to build character density, fill
+reserves, and create Judgment engines that let one character play snowball into
+another.
 
 **Primary strategy — Character Storm / Ramp / Spirit Animal Tribal:**
 
@@ -112,11 +112,11 @@ engines that let one character play snowball into another.
   characters.
 - **Wide pressure** — Bloom wins by sustained board growth, ally-count scaling,
   and a few herd-wide finishers, not by generic overrun effects.
-- **Big growth** — Bloom still ramps into notable top-end, but its finishers are
+- **Big growth** — Bloom ramps into notable top-end, and its finishers are
   strongest when they amplify an existing board. Unstoppable belongs here more
   naturally than pure spark-doubling.
 
-**Weakness:** Bloom is still slower than the dedicated aggressive tides. Its
+**Weakness:** Bloom is slower than the dedicated aggressive tides. Its
 characters usually enter reserved, so it can fall behind on immediate tempo, and
 board clears punish Bloom more than spot removal does.
 
@@ -219,10 +219,9 @@ charge is blunted.
 
 ## Mechanical Identity
 
-Ignite is not the generic go-wide tide anymore. Bloom owns the broad "play lots
-of characters" plan; Ignite goes wide specifically through Warriors and
-Figments, pushing bodies into deployed lanes and turning battalions into lethal
-Judgment phases.
+Ignite is the Warrior and Figment go-wide tide. It pushes bodies into deployed
+lanes and turns battalions into lethal Judgment phases, while Bloom occupies the
+broader "play lots of characters" space.
 
 **Primary strategy — Warrior Tribal / Figment Assault:**
 
@@ -326,10 +325,10 @@ ______________________________________________________________________
 
 ## Philosophy
 
-Umbra believes that what is hidden holds more power than what is seen. The void
-matters, but it is not Umbra's whole identity. Umbra is the tide of shadow,
-obscurity, and inevitability: veiled threats, returning nightmares, stolen
-strength, and victories that feel decided before the final blow lands.
+Umbra believes that what is hidden holds more power than what is seen. Umbra is
+the tide of shadow, obscurity, and inevitability: veiled threats, returning
+nightmares, stolen strength, and victories that feel decided before the final
+blow lands.
 
 Umbra is patient and unsettling. It commits narrowly, protects selectively, and
 makes removal fail to solve the real problem. It wins by concealment,
@@ -360,8 +359,8 @@ threats, reusing the void, and turning attrition into inevitability.
 - **Protected finishers** — Umbra is a natural secondary home for Unstoppable on
   veiled or recursive threats that are meant to end the game through resistance.
 
-**Weakness:** Umbra is slow and setup-dependent. Void hate still hurts badly,
-and Umbra can lose to fast starts before its shielded threats or recursion loops
+**Weakness:** Umbra is slow and setup-dependent. Void hate hurts badly, and
+Umbra can lose to fast starts before its shielded threats or recursion loops
 matter.
 
 ## Relationships
