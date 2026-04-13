@@ -133,10 +133,10 @@ ______________________________________________________________________
 ## Philosophy
 
 Arc believes that nothing is fixed. Reality is fluid, mutable, endlessly
-recombinable. Where Bloom sees a garden to nurture and Ignite sees a fire to
-spread, Arc sees a prism — turn it slightly and everything changes. The same
-card, materialized twice, is not the same card. The same moment, seen from a
-different angle, reveals a different truth.
+recombinable. Where Bloom grows through abundance and Ignite commits to force,
+Arc sees a prism — turn it slightly and everything changes. The same card,
+materialized twice, returned to hand and replayed, or seen from a different
+angle reveals a different truth.
 
 Arc's philosophy is one of motion and perspective. It values cleverness,
 adaptability, and the ability to see opportunities that others miss. It does not
@@ -153,19 +153,21 @@ either state on its own.
 
 ## Mechanical Identity
 
-Arc is the blink tide. Its primary strategy revolves around materializing
-characters, banishing them, and materializing them again to re-trigger their
-abilities for compounding value.
+Arc is the blink and bounce tide. Its primary strategy revolves around
+materializing characters, returning them to hand, banishing them, and replaying
+them to re-trigger their abilities for compounding value.
 
-**Primary strategy — Blink / Materialize triggers:**
+**Primary strategy — Blink / Bounce / Materialize triggers:**
 
 - Effects that banish a character and immediately materialize it again,
   re-triggering "Materialized" abilities
-- Characters with powerful materialized effects designed to be blinked
-  repeatedly
+- Effects that return allies to hand so they can be replayed for value or tempo
+- Characters with powerful materialized effects designed to be blinked or
+  replayed repeatedly
 - Temporary banish effects that remove enemy characters for a turn, creating
   windows of tempo advantage
-- Value engines built on repeating enter-the-battlefield triggers
+- Value engines built on repeating enter-the-battlefield triggers and
+  hand-to-battlefield loops
 
 **Supplemental strategies:**
 
@@ -199,9 +201,9 @@ ______________________________________________________________________
 ## Philosophy
 
 Ignite believes in the power of the collective — that a single spark means
-nothing, but a thousand sparks together become an inferno. Where Bloom invests
-in one great champion and Arc outmaneuvers with cleverness, Ignite overwhelms
-through sheer presence, passion, and numbers. It is the tide of inspiration,
+nothing, but a thousand sparks together become an inferno. Where Bloom grows a
+living ecosystem and Arc outmaneuvers with cleverness, Ignite overwhelms through
+sheer presence, passion, and numbers. It is the tide of inspiration,
 camaraderie, and the unstoppable momentum of a shared cause.
 
 Ignite's worldview is built on the conviction that greatness is not found in
@@ -220,8 +222,8 @@ charge is blunted.
 ## Mechanical Identity
 
 Ignite is the Warrior and Figment go-wide tide. It pushes bodies into deployed
-lanes and turns battalions into lethal Judgment phases, while Bloom occupies the
-broader "play lots of characters" space.
+lanes, rewards coordinated battalions, and turns front-line pressure into lethal
+Judgment phases.
 
 **Primary strategy — Warrior Tribal / Figment Assault:**
 
