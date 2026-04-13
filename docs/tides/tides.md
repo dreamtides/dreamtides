@@ -11,10 +11,15 @@ that share a tide, since those cards are designed to mechanically reinforce each
 other.
 
 There are seven core tides plus a special neutral tide called Neutral. Each core
-tide has a primary deck archetype and strategy it supports. Tides are not
-islands — they share borders. Adjacent tides have natural mechanical overlaps
-that reward players who draft across tide lines, creating hybrid strategies that
-combine the strengths of two philosophies.
+tide has a primary deck archetype and a distinct way of using the battlefield.
+In the modern game, tides are shaped not only by resources, but by how they use
+the staggered grid: how they build reserves, pressure deployed lanes, exploit
+support relationships, and turn Judgment into advantage.
+
+Reserve, Materialize, Dissolve, Banish, Support, Fast, Discover, and Copy are
+available to every tide. The clearest tide-linked battlefield keywords are Veil
+in Umbra, Unbound in Ignite, Test and Preeminence in Rime, and Unstoppable most
+often on Bloom and Umbra finishers.
 
 The tide circle, in order, is: Bloom — Arc — Ignite — Pact — Umbra — Rime —
 Surge, which loops back to Bloom. Each tide is most naturally allied with its
@@ -49,25 +54,21 @@ standalone power that any drafter can use.
 
 **Primary tools:**
 
-- **Generic removal** — Neutral provides flexible answers that don't require
-  tide-specific synergy. Dissolve effects, banish effects, and targeted spark
-  reduction all live here.
-- **Discover cards** — Neutral is the primary home of Discover, offering
-  flexible card selection that helps any strategy find what it needs.
-- **Sweepers** — Board-clearing effects that dissolve or banish multiple
-  characters. These are Neutral's most dramatic tools, resetting the battlefield
-  when things go wrong.
+- **Generic removal** — Dissolve, banish, and targeted spark reduction that do
+  not ask for tide-specific setup.
+- **Discover cards** — Neutral is the primary home of Discover, helping any deck
+  find what it needs.
+- **Sweepers** — Board resets that punish overcommitment and rescue stalled
+  drafts.
 - **Legendary powers** — Neutral is the exclusive home of the most mythic,
   format-warping effects: extra turns, massive card draw (draw 3), free energy
   generation (gain 3 energy for 0 cost), and permanent energy acceleration (gain
   2 extra energy per turn). These effects are rare, expensive, and
   game-defining.
 
-**Strategy:** Neutral does not have a dedicated deck archetype. Instead, Neutral
-cards appear in every deck as utility, removal, and raw power. A draft that goes
-poorly in a specific tide can often be rescued by pivoting into a Neutral-heavy
-"good stuff" pile that wins through card quality over synergy. Neutral cards are
-the safety net of the draft.
+**Strategy:** Neutral does not have a dedicated archetype. It appears in every
+deck as utility, removal, and raw power, and it can rescue a weak draft by
+supporting a generic "good stuff" plan.
 
 ## Relationships
 
@@ -80,63 +81,50 @@ ______________________________________________________________________
 
 ## Philosophy
 
-Bloom believes that the world is a garden waiting to flourish. Given time,
-patience, and nurturing, any seed can become something magnificent. Where other
-tides seek to force the world into shape through aggression, sacrifice, or
-cunning, Bloom trusts in the process of growth itself. It does not rush. It does
-not cut corners. It invests, cultivates, and waits — and when it finally acts,
-it acts with overwhelming, organic force.
+Bloom believes that the world is a garden waiting to flourish. It values
+patience, cultivation, and deep living energy, but not passivity. Bloom's ideal
+state is abundance: roots spreading below the surface, reserves filling, and
+then a sudden season of explosive growth.
 
-Bloom's worldview is one of abundance and potential. It sees the dream as a
-place of deep, living energy that rewards those who learn to work with it rather
-than against it. The spirit animals that populate Bloom's cards are not tamed or
-controlled — they are honored partners, ancient beings whose power awakens when
-a dreamer demonstrates patience and respect. To Bloom, the greatest sin is
-impatience: the premature harvest, the forced growth, the refusal to let things
-develop at their natural pace.
-
-Bloom is fundamentally optimistic. It believes that if you build something
-strong enough, it will endure on its own merits. It does not need tricks or
-deception — only time and care.
+The spirit animals of Bloom are honored partners, not tools. Their power awakens
+when a dreamer builds a thriving ecosystem rather than a single monument. Bloom
+is optimistic and expansive. It wants the battlefield crowded with life, every
+new arrival making the next one easier.
 
 ## Mechanical Identity
 
-Bloom is the ramp tide. Its primary strategy is accelerating energy production
-to deploy threats that are larger and more powerful than anything the opponent
-can match at that stage of the game.
+Bloom is the ramp tide, but its ramp now serves character density rather than a
+single giant threat. Bloom wants full reserves, a crowded board, and Judgment
+engines that let one character play snowball into another.
 
-**Primary strategy — Ramp / Spirit Animal Tribal:**
+**Primary strategy — Character Storm / Ramp / Spirit Animal Tribal:**
 
-- Spirit Animal characters that generate bonus energy during the Judgment phase
-  and when materialized
-- Effects that permanently increase energy production
-- Expensive, high-spark characters that dominate the board once deployed
-- The "go tall" philosophy: investing resources into a single massive threat
-  rather than spreading across many small ones
+- Spirit Animals are the main home of Bloom's recurring Judgment energy engine
+- Cost reduction, on-play draw, and top-of-deck play that chain real characters
+- Payoffs for a crowded battlefield, especially 4+ allies and full support webs
+- Expensive Spirit Animals that reward an established herd rather than replacing
+  it
 
 **Supplemental strategies:**
 
-- **Voltron** — Single-target pump effects that stack onto one character,
-  creating an enormous threat. Kindle effects, spark-doubling, and permanent
-  stat boosts all concentrate power onto Bloom's best character.
-- **Stompy** — Even without ramp, Bloom's characters tend to have above-curve
-  spark values at every cost point. A Bloom deck that falls behind on ramp can
-  still compete by curving out with efficiently-statted spirit animals.
-- **Protection** — Bloom has limited access to effects that shield its
-  investment. It cannot counter spells like Surge, but it can grant its
-  characters resilience against dissolve effects or temporarily make them immune
-  to targeting.
+- **Judgment engine** — Bloom is the main home of "Judgment: gain energy" and
+  allied Judgment retriggers, turning board presence into more mana and more
+  characters.
+- **Wide pressure** — Bloom wins by sustained board growth, ally-count scaling,
+  and a few herd-wide finishers, not by generic overrun effects.
+- **Big growth** — Bloom still ramps into notable top-end, but its finishers are
+  strongest when they amplify an existing board. Unstoppable belongs here more
+  naturally than pure spark-doubling.
 
-**Weakness:** Bloom is slow. Its early turns are spent ramping rather than
-affecting the board, making it vulnerable to aggressive strategies that score
-points before Bloom's engine comes online. Bloom also puts too many eggs in one
-basket — a single well-timed dissolve on its voltron threat can undo turns of
-investment.
+**Weakness:** Bloom is still slower than the dedicated aggressive tides. Its
+characters usually enter reserved, so it can fall behind on immediate tempo, and
+board clears punish Bloom more than spot removal does.
 
 ## Relationships
 
-Bloom's neighbors are Arc (blink effects re-trigger spirit animal materialized
-abilities for compounding ramp) and Surge (ramp fuels expensive event chains).
+Bloom's neighbors are Arc, which multiplies its materialize and Judgment
+engines, and Surge, which turns Bloom's energy surplus into larger sequencing
+turns.
 
 ______________________________________________________________________
 
@@ -185,10 +173,8 @@ abilities for compounding value.
   characters. It rewards playing at fast speed with bonus effects — draw a card
   when you play a fast card, kindle when a character materializes at fast speed,
   reduce costs of fast plays. This creates a reactive, instant-speed playstyle.
-- **Tempo** — Arc excels at creating small, compounding advantages. Temporary
-  banish on an enemy character, blink your own for value, play a fast threat
-  while the opponent is tapped out. Arc wins by staying one step ahead, not by
-  being bigger.
+- **Tempo** — Arc wins by manipulating state changes, support geometry, and
+  timing windows rather than by raw size.
 - **Protect the Queen** — Arc often commits to a single efficient, evasive
   threat and then protects it with blink effects (dodging removal by blinking in
   response) and fast-speed interaction. This "Delver-style" plan deploys a cheap
@@ -203,8 +189,8 @@ recursion or event chains.
 
 ## Relationships
 
-Arc's neighbors are Bloom (spirit animals with materialized abilities are ideal
-blink targets) and Ignite (blinking token-producers floods the board).
+Arc's neighbors are Bloom, whose Spirit Animals reward repeated materialization,
+and Ignite, whose token-makers turn blink into sudden board floods.
 
 ______________________________________________________________________
 
@@ -233,19 +219,18 @@ charge is blunted.
 
 ## Mechanical Identity
 
-Ignite is the go-wide tide. Its primary strategy is flooding the battlefield
-with warriors and figment tokens, then pumping them all simultaneously to
-overwhelm the opponent's spark total.
+Ignite is not the generic go-wide tide anymore. Bloom owns the broad "play lots
+of characters" plan; Ignite goes wide specifically through Warriors and
+Figments, pushing bodies into deployed lanes and turning battalions into lethal
+Judgment phases.
 
-**Primary strategy — Warrior Tribal / Token aggression:**
+**Primary strategy — Warrior Tribal / Figment Assault:**
 
-- Warrior characters with abilities that reward having other warriors on the
-  battlefield
-- Figment generation — "Materialize Figment" effects that create token
-  characters to fill the board
-- Mass pump effects that add spark to all your characters simultaneously
-- "Lord" characters — warriors whose static abilities boost all other warriors
-  (e.g., "Your other Warriors have +1 spark")
+- Warrior characters that reward other Warriors and care about battalion size
+- Figment generation and troop-multiplication that quickly fill open space
+- Unbound and similar immediate-pressure tools that bypass reserve tempo
+- Lords, combat pumps, and Dread-style pressure that make a crowded front line
+  lethal
 
 **Supplemental strategies:**
 
@@ -253,23 +238,20 @@ overwhelm the opponent's spark total.
   than the opponent by turn 3-4 and start scoring points immediately. Every card
   in an Ignite deck should contribute to the board, and every turn should
   increase the pressure.
-- **Go wide** — Even without tribal synergies, Ignite's raw volume of characters
-  makes it difficult to interact with. Dissolving one warrior barely dents a
-  board of six. Ignite forces the opponent to have sweepers or lose.
-- **Explosive finishers** — Mass pump events that give all your characters +2 or
-  +3 spark for a single, devastating judgment phase. These "overrun" effects can
-  end games from seemingly stable positions.
+- **Recruitment** — Ignite is excellent at finding Warriors, turning one troop
+  into several, and rebuilding a board through tribe-specific engines.
+- **Reinforcements** — Death and attrition often become more bodies. Ignite is
+  comfortable trading if those trades produce more Warriors or Figments.
 
 **Weakness:** Ignite runs out of gas. Its cards are cheap but individually weak,
 and once the initial wave is answered — especially by a Neutral sweeper — Ignite
-has little ability to rebuild. Ignite also struggles against go-tall strategies,
-where a single enormous character can outspark Ignite's entire army.
+has less generic staying power than Bloom. It also struggles when it does not
+draw enough tribal payoffs to make its battalion matter.
 
 ## Relationships
 
-Ignite's neighbors are Arc (blink effects multiply materialized triggers for
-token cascades) and Pact (expendable warriors and figments fuel sacrifice
-engines).
+Ignite's neighbors are Arc, which multiplies its entry triggers, and Pact, which
+turns expendable Warriors and Figments into fuel.
 
 ______________________________________________________________________
 
@@ -302,7 +284,7 @@ to give up to get what you want? And its answer is always: everything.
 
 Pact is the sacrifice tide. Its primary strategy revolves around abandoning its
 own characters for powerful effects, then cheating expensive threats into play
-from the void to replace what was lost.
+to replace what was lost.
 
 **Primary strategy — Sacrifice / Reanimator:**
 
@@ -335,8 +317,8 @@ cut off its reanimation plan entirely.
 
 ## Relationships
 
-Pact's neighbors are Ignite (expendable warriors and figments serve as sacrifice
-fodder) and Umbra (both fill and exploit the void from different angles).
+Pact's neighbors are Ignite, which supplies expendable bodies, and Umbra, which
+shares its taste for recursion and attrition.
 
 ______________________________________________________________________
 
@@ -345,62 +327,47 @@ ______________________________________________________________________
 ## Philosophy
 
 Umbra believes that what is hidden holds more power than what is seen. The void
-is not an ending — it is a second battlefield, deeper and more dangerous than
-the first. While other tides focus on what is present, Umbra focuses on what has
-been lost, discarded, forgotten, and buried. It finds strength in shadows, value
-in refuse, and inevitability in entropy.
+matters, but it is not Umbra's whole identity. Umbra is the tide of shadow,
+obscurity, and inevitability: veiled threats, returning nightmares, stolen
+strength, and victories that feel decided before the final blow lands.
 
-Umbra's worldview is patient and unsettling. It does not need to win the visible
-battle. It wins the invisible one — the slow accumulation of resources in the
-void, the quiet assembly of recursive engines, the gradual erosion of the
-opponent's options. Umbra believes that everything eventually falls into shadow,
-and the dreamer who understands shadow best will be the last one standing.
-
-This tide is also the home of control through denial. Umbra does not just build
-its own advantages — it tears down the opponent's. Forced sacrifices, forced
-discards, and resource denial are all part of Umbra's philosophy. If you cannot
-outrun the dark, the dark wins. Umbra is comfortable being feared.
+Umbra is patient and unsettling. It commits narrowly, protects selectively, and
+makes removal fail to solve the real problem. It wins by concealment,
+recurrence, and the gradual collapse of the opponent's ability to answer what
+matters.
 
 ## Mechanical Identity
 
-Umbra is the self-mill tide. Its primary strategy is filling its own void with
-cards and then extracting value from having a large, well-stocked void.
+Umbra is the veil and recursion tide. Its primary strategy is protecting key
+threats, reusing the void, and turning attrition into inevitability.
 
-**Primary strategy — Self-Mill / Survivor Tribal:**
+**Primary strategy — Veil / Recursion / Self-Mill:**
 
-- Effects that move cards from your deck directly to your void (mill effects)
-- Survivor characters that grow stronger based on the number of cards in your
-  void or that have abilities triggered by cards entering the void
-- Void-count payoffs — effects that scale with the size of your void (e.g.,
-  "Kindle X, where X is the number of characters in your void")
-- Reclaim as a primary mechanic, playing powerful cards from the void at
-  alternate costs
+- Veil and reactive shielding that make key Umbra threats hard to answer
+- Self-mill and reclaim engines that stock the void and turn it into a second
+  hand
+- Survivor cards and other recursive threats that keep returning after removal
+- Tall payoffs built through recursion, drain, copying, or shadow inheritance
+  rather than Bloom-style nurturing
 
 **Supplemental strategies:**
 
-- **Void recursion** — Beyond reclaim, Umbra has effects that return cards from
-  the void to hand, shuffle the void into the deck, or materialize characters
-  directly from the void. The void is Umbra's second hand.
-- **Combo-control** — Umbra's recursive engines can create loops that generate
-  value indefinitely. A character that reclaims itself when dissolved, combined
-  with an abandon outlet, creates a repeatable engine. These combos are Umbra's
-  path to inevitability.
-- **Stax / Denial** — Umbra is the primary home of forced sacrifice effects
-  (opponent must abandon a character), forced discard, and permanent-based
-  resource denial. These "stax" effects slow the game down to Umbra's preferred
-  pace and strip the opponent of options.
+- **Shadow control** — Umbra tears down the opponent's board with denial,
+  sacrifice pressure, spark theft, and selective recursion.
+- **Recursive inevitability** — Umbra is the best tide at making one threat stay
+  relevant through removal, whether by reclaiming it, returning it, or replacing
+  it with something worse.
+- **Protected finishers** — Umbra is a natural secondary home for Unstoppable on
+  veiled or recursive threats that are meant to end the game through resistance.
 
-**Weakness:** Umbra is slow and setup-dependent. Its self-mill can accidentally
-send critical cards to the void before it has the tools to reclaim them. Umbra
-also loses hard to void hate — banishing its void is devastating. And its stax
-effects can backfire in aggressive matchups where the opponent doesn't care
-about the resources being denied.
+**Weakness:** Umbra is slow and setup-dependent. Void hate still hurts badly,
+and Umbra can lose to fast starts before its shielded threats or recursion loops
+matter.
 
 ## Relationships
 
-Umbra's neighbors are Pact (both fill and exploit a stocked void) and Rime
-(discard-to-void feeds Umbra's recursive engines while Umbra provides late-game
-inevitability).
+Umbra's neighbors are Pact, which shares its attrition and recursion instincts,
+and Rime, whose exacting combat and denial feed Umbra's inevitability.
 
 ______________________________________________________________________
 
@@ -441,7 +408,8 @@ efficient, resilient threats.
   removal
 - "Discard matters" triggers on characters that reward you for discarding cards
 - Efficiently-costed characters with above-average spark for their energy cost
-- Balanced decks that combine proactive threats with reactive interaction
+- Efficient combat tools such as Test and Preeminence that let Rime win precise
+  Judgments
 
 **Supplemental strategies:**
 
@@ -453,14 +421,8 @@ efficient, resilient threats.
   disruption effects proactively, rather than holding up energy for reactive
   play. Rime's removal is efficient and sorcery-speed, designed to be cast
   before deploying a threat.
-- **Prison** — Rime's taxation effects can stack to create soft locks where the
-  opponent can technically still play cards but at such inflated costs that they
-  effectively can't. Characters that increase the opponent's costs, reduce their
-  energy, or limit their plays per turn create a "prison" that slowly
-  suffocates.
-- **Death and Taxes** — The hybrid strategy of efficient, disruptive small
-  characters paired with taxation effects. Every Rime character threatens to
-  trade up, and every Rime effect makes the opponent's response more costly.
+- **Death and Taxes** — Efficient, disruptive characters paired with taxation
+  effects make Rime the tide most concerned with winning Judgment cleanly.
 
 **Weakness:** Rime's discard-for-value plan requires cards in hand to fuel it.
 If Rime runs out of cards, its engine stalls. Rime also lacks explosive
@@ -470,9 +432,8 @@ but its ceiling is low.
 
 ## Relationships
 
-Rime's neighbors are Umbra (discarded cards fuel Umbra's void recursion) and
-Surge (proactive disruption pairs with reactive counterspells for full-spectrum
-control).
+Rime's neighbors are Umbra, which turns attrition into inevitability, and Surge,
+which adds stack interaction to Rime's battlefield denial.
 
 ______________________________________________________________________
 
@@ -542,15 +503,5 @@ comes together.
 
 ## Relationships
 
-Surge's neighbors are Rime (proactive disruption complements reactive
-counterspells) and Bloom (energy ramp powers explosive event chains).
-
-______________________________________________________________________
-
-# Tide Circle Summary
-
-The tide circle is: Bloom — Arc — Ignite — Pact — Umbra — Rime — Surge (looping
-back to Bloom). Adjacent tides have natural mechanical overlaps that can reward
-hybrid drafting, but most decks focus on a single tide's strategy. Neutral
-enhances any tide by providing removal, card selection, and format-warping
-legendary effects.
+Surge's neighbors are Rime, which constrains the opponent before Surge answers
+them, and Bloom, which supplies mana and breathing room for larger event turns.
