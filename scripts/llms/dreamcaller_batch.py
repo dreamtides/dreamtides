@@ -842,10 +842,14 @@ async def _run_command(
                 124,
             )
 
+        return_code = process.returncode
+        if return_code is None:
+            raise RuntimeError("subprocess finished without a return code")
+
         return (
             _read_temp_output(stdout_handle),
             _read_temp_output(stderr_handle),
-            process.returncode,
+            return_code,
         )
 
 

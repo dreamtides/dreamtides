@@ -15,11 +15,11 @@ from unittest import mock
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-LLMS_DIR = SCRIPT_DIR.parent
-if str(LLMS_DIR) not in sys.path:
-    sys.path.insert(0, str(LLMS_DIR))
+SCRIPTS_DIR = SCRIPT_DIR.parent.parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 
-import dreamcaller_batch
+import llms.dreamcaller_batch as dreamcaller_batch
 
 VALID_RESULT = {
     "theme": "tempo",
