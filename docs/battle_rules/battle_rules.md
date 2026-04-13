@@ -24,16 +24,14 @@ spark and the weaker is dissolved.
 - [Ability Types](#ability-types)
 - [Targeting](#targeting)
 - [Figments](#figments)
-- [Supplement: Reading Dreamtides Through an MTG Lens](#supplement-reading-dreamtides-through-an-mtg-lens)
-- [Appendix: Translating MTG Mechanics into Dreamtides](#appendix-translating-mtg-mechanics-into-dreamtides)
 
 ## Objective
 
 The first player to reach the victory point threshold wins the game. The default
-threshold is 12 points, but this is configurable per battle. Points are scored
-during the Judgment phase at the start of each turn when unblocked attacking
-characters score victory points equal to their spark. If 50 turns pass without a
-winner, the game ends in a draw.
+threshold is 12 points, but this is configurable per battle. Most points are
+scored during the Judgment phase at the start of each turn, when unblocked
+attacking characters score victory points equal to their spark. If 50 turns pass
+without a winner, the game ends in a draw.
 
 ## Card Types
 
@@ -120,7 +118,9 @@ that both players draw from, one per turn.
 - Each Dreamwell card has an energy production value that permanently increases
   the player's total energy production.
 - At the start of each turn, your current energy is reset to equal your total
-  production. Unspent energy does not carry over between turns.
+  production. After you draw your Dreamwell card, your current energy updates to
+  match your new total production. Unspent energy does not carry over between
+  turns.
 - Many Dreamwell cards also have bonus effects such as drawing a card, using
   Foresee, gaining a point, gaining extra energy, or milling cards to the void.
 
@@ -130,8 +130,9 @@ that both players draw from, one per turn.
   first cycle through the deck, typically providing a larger early energy boost.
   Higher-phase cards appear in every subsequent cycle, producing less energy per
   card but with bonus effects attached.
-- When the deck cycles, it is reshuffled, with cards sorted by phase so that
-  lower-phase cards always come first within a cycle.
+- When the deck cycles, it is reshuffled within phase groups so that lower-phase
+  cards always come first within a cycle, while cards of the same phase remain
+  randomized.
 
 For example, a phase 0 Dreamwell card might produce 2 energy with no bonus
 effect, while a phase 1 card might produce 1 energy and also let you Foresee 1.
@@ -145,8 +146,8 @@ Each turn progresses through these phases in order:
    and the non-active player's deployed characters block. Each deployed lane
    (`D0-D3`) is resolved independently (see Spark and Scoring).
 2. **Dreamwell** — The active player draws the next Dreamwell card, permanently
-   increasing their energy production and resetting their current energy. Any
-   bonus effect on the card is applied.
+   increasing their energy production. Their current energy then updates to
+   match that new total. Any bonus effect on the card is applied.
 3. **Draw** — The active player draws one card from their deck. (Skipped on the
    very first turn of the game.)
 4. **Main** — The active player can play cards from hand, activate abilities,
@@ -216,10 +217,10 @@ Your reserves are safe during Judgment — reserved characters do not directly
 fight and do not score points, though their abilities can still affect deployed
 characters they support.
 
-**Entering reserved:** When a character enters the battlefield, it is placed in
-your reserves and enters reserved. A reserved character cannot be deployed. This
-temporary reserved status wears off at the start of the controlling player's
-next turn.
+**Entering reserved:** When a character enters the battlefield, it is normally
+placed in your reserves and enters reserved. A reserved character cannot be
+deployed. This temporary reserved status wears off after the controlling
+player's next Judgment phase, before that turn's Main phase.
 
 **Repositioning:** During the Main phase, a player can freely reposition their
 characters between deployed lanes and reserve slots, and between positions on
@@ -227,10 +228,10 @@ the same row of the battlefield, subject to the reserved condition. Moving a
 character onto an occupied position swaps the two characters. Characters cannot
 be moved outside the Main phase, and no cards can be played during Judgment.
 
-**Materializing new characters:** Characters always enter the battlefield in the
-reserves. If all 5 reserve slots are occupied, no additional characters can be
-played or materialized until a reserve slot is freed, even if the player has
-open deployed lanes.
+**Materializing new characters:** Characters normally enter the battlefield in
+the reserves. If all 5 reserve slots are occupied, no additional characters that
+would enter reserves can be played or materialized until a reserve slot is
+freed, even if the player has open deployed lanes.
 
 **Spark modification:** Spark may be modified by card effects before Judgment,
 but once Judgment begins, no new cards can be played in response.
@@ -250,11 +251,12 @@ Banished zone. Several variants exist: banish from the battlefield, banish from
 the void, banish until the banishing card leaves play, and banish until the next
 main phase.
 
-**Materialize** — Put a character into your reserves. This is the term for a
-character entering play, whether from hand (played normally), from the void (via
-Reclaim or effects), from the deck (via effects), or as a token (Figments).
-Characters enter reserved and cannot be deployed on the turn they are
-materialized. Materialize requires an empty reserve slot.
+**Materialize** — Put a character onto the battlefield, normally into your
+reserves. This is the term for a character entering play, whether from hand
+(played normally), from the void (via Reclaim or effects), from the deck (via
+effects), or as a token (Figments). Characters normally enter reserved and
+cannot be deployed on the turn they are materialized. Materialize normally
+requires an empty reserve slot.
 
 **Supported / Supporting** — These terms describe the staggered adjacency
 between the 5 reserve slots and 4 deployed lanes. A reserved character's
@@ -283,8 +285,8 @@ any order and optionally send any of them to the void.
 **Reclaim** — A named ability that allows you to play a card from your void
 instead of from your hand. The card is played at its normal cost (or at a
 specified alternate cost: Reclaim N means it costs N energy when played from the
-void). When a reclaimed card later leaves play, it is banished instead of
-returning to the void.
+void). When a reclaimed card would later leave the stack or battlefield, it is
+banished instead of returning to the void.
 
 **Fast** — A property on cards and abilities indicating they can be used outside
 normal main phase timing: during the opponent's Main phase, during the Ending
@@ -325,7 +327,7 @@ with cards or abilities.
 deployed, does not attack or block during the next Judgment phase, and is
 treated as absent during that phase. New characters enter reserved, and if an
 effect or game rule says a character becomes reserved, that restriction lasts
-until the start of its controller's next turn.
+until after its controller's next Judgment phase, before that turn's Main phase.
 
 **Other effect categories:** Effects also exist for drawing cards, gaining or
 losing energy, gaining or losing points, modifying spark values on characters,
@@ -374,132 +376,3 @@ Figments are token characters created by card effects rather than played from a
 deck. Figments enter the battlefield through "Materialize Figments" effects and
 behave like regular characters — they have spark values, count toward the
 character limit, and can be targeted by effects.
-
-## Supplement: Reading Dreamtides Through an MTG Lens
-
-Dreamtides is often easiest for Magic: The Gathering players to learn by
-thinking of it as an MTG-like rules engine whose biggest changes are a shared
-mana system and a positional combat board.
-
-- The Dreamwell plays the same strategic role that lands and mana development
-  play in MTG, but it does so automatically and symmetrically. You still care
-  about curve, tempo, and resource scaling, but not about mana screw or land
-  count.
-- Materialize, void, banish, prevent, fast, and reclaim are close cousins of
-  "enters the battlefield," graveyard, exile, counterspell, flash, and casting
-  from the graveyard.
-- The largest shift is combat. Dreamtides moves much of what MTG handles during
-  combat declaration into battlefield positioning during the previous Main
-  phase.
-
-Judgment is the closest Dreamtides analog to MTG combat, but it compresses
-several MTG steps into one automatic resolution:
-
-- The active player's deployed characters are the attackers.
-- The non-active player's deployed characters are the blockers.
-- Each deployed lane is effectively a predeclared combat pairing. Repositioning
-  during Main is where you decide which creatures will attack, which ones will
-  block, and which lanes will be contested.
-- An unblocked attacker scoring points equal to its spark plays the role that
-  combat damage to the defending player plays in MTG.
-- A blocked lane behaves like a simplified one-attacker/one-blocker combat:
-  compare spark, dissolve the weaker character, and dissolve both on a tie.
-- Because no cards can be played during Judgment, Dreamtides has no direct
-  analog to MTG's combat-trick window inside combat damage. The relevant choices
-  happen before Judgment starts.
-
-The reserve row is also important to the analogy. A reserved character is still
-on the battlefield, but it is not currently participating in combat. In MTG
-terms, it is closer to a creature you have committed to board presence and
-synergy but not to the present combat exchange. Many Dreamtides cards are best
-understood as asking, "Should this body be deployed for immediate Judgment
-pressure, or left in reserve as support for later turns?"
-
-## Appendix: Translating MTG Mechanics into Dreamtides
-
-This appendix is about design translation, not strict rules identity. Some MTG
-mechanics map directly onto existing Dreamtides rules text; others map only at
-the level of play pattern. Unless noted otherwise, "evergreen" here refers to
-the evergreen MTG keyword abilities that players most commonly use as shorthand
-when comparing games.
-
-### Evergreen MTG keyword abilities
-
-- **Deathtouch** — In Dreamtides, the clean translation is "wins any paired
-  judgment or Test it touches" or "when this pairs in Judgment, dissolve the
-  opposing character." Because Dreamtides has no damage persistence,
-  deathtouch-style design is about guaranteed kills, not 1-damage lethality.
-- **Defender** — Best translated as a reserve-focused character that cannot be
-  deployed or cannot score. Dreamtides makes "wall" gameplay by asking a
-  character to support lanes without entering Judgment.
-- **Double strike** — Usually becomes "wins its lane twice" rather than "deals
-  damage twice": for example, an extra Judgment trigger, an extra Test, or "if
-  this survives paired judgment, it also scores its spark."
-- **First strike** — Dreamtides has no first-damage step, so the closest
-  translation is "dissolve the opposing character before it can trade" or, in a
-  lighter form, a built-in combat edge such as `Preeminence`.
-- **Flash** — Very close to `Fast`. A flash creature in MTG is usually a `Fast`
-  character or a materialize effect that can be used off-turn.
-- **Flying** — Dreamtides has no separate air layer, so the right translation is
-  evasive blocking restrictions, not literal altitude: "this can be blocked only
-  by special defenders" or "this is usually unblocked unless answered by a
-  specific kind of character."
-- **Haste** — Usually `Unbound`, or any text that lets a new character enter
-  deployed and skip `Reserve`.
-- **Hexproof** — Usually softens into `Veil X` rather than total
-  untargetability, because Dreamtides generally wants answers to remain
-  possible.
-- **Indestructible** — Usually "cannot be dissolved" or a recurring
-  dissolve-prevention shield.
-- **Lifelink** — Life gain becomes race swing. In Dreamtides, lifelink usually
-  maps to gaining points or energy when this scores, wins Judgment, or dissolves
-  an opposing character.
-- **Menace** — Because one blocker per lane is already the norm, menace becomes
-  "blocking this is unusually costly or restricted," not "needs two blockers." A
-  Dreamtides version usually taxes blockers or makes the lane hard to contest.
-- **Reach** — Only matters if a card set introduces flying-like evasion. Use it
-  as the permission to block those special evasive attackers.
-- **Trample** — `Unstoppable` is the clean analog: the character still gets its
-  spark through even when paired.
-- **Vigilance** — This is close to baseline Dreamtides behavior. A deployed
-  character already attacks on your turns and blocks on the opponent's turns
-  without tapping, so many vigilance play patterns require no extra rules text.
-- **Ward** — `Veil X` is the direct analog.
-
-### Non-evergreen MTG mechanics that translate well
-
-- **Prowess** — "Whenever you play an event, this gets +1 spark this turn" or a
-  Judgment-only spark boost. Prowess was once evergreen in MTG, but it is now
-  better treated as a recurring non-evergreen translation tool.
-- **Flashback** — `Reclaim` is the closest existing translation.
-- **Kicker** — Extra-energy rider text or modal abilities on play translate
-  cleanly.
-- **Cycling** — "Pay N, void this from hand: draw a card" is a natural fit for
-  Dreamtides hand smoothing.
-- **Convoke** — Using supporting or reserved characters to reduce a card's
-  energy cost is the most natural Dreamtides version.
-- **Delve** — Banish cards from your void to reduce energy cost.
-- **Unearth** — Materialize from the void with `Unbound` or temporary
-  deployment, then banish the character when it leaves play. This is especially
-  close to `Reclaim` on characters.
-- **Escape** — Repeatable `Reclaim` with an additional void-banish payment.
-- **Surveil** — A more void-oriented `Foresee`: look at cards, keep some on top,
-  send some to the void.
-- **Exert** — Attack now, then become `Reserved` or skip your next Judgment.
-- **Cascade** — `Discover`, then immediately play or materialize the found card.
-- **Exploit** — "Materialized: you may `Abandon` an ally. If you do, ..." is
-  almost a literal Dreamtides translation.
-- **Riot** — Choice between extra spark and `Unbound` / immediate deployment.
-- **Ninjutsu** — Replace an unblocked attacker with a character from hand or
-  void after lane commitments are known. Dreamtides positioning makes this
-  especially intuitive.
-- **Afterlife** — `Dissolved: Materialize` figment(s).
-- **Dash** — Materialize deployed and `Unbound` for immediate pressure, then
-  return the character to hand or reserve instead of leaving it fully committed.
-- **Suspend** — Exile a card into a delayed state, then materialize or play it
-  after a fixed number of turns or at a future Judgment.
-
-Mechanics tied tightly to MTG lands, tapping, or multi-blocker combat usually
-need the most reinterpretation. In general, Dreamtides translations work best
-when they preserve the play pattern the MTG mechanic creates: burst tempo,
-evasion, recursion, lane pressure, support synergy, or race compression.
