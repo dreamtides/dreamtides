@@ -1,4 +1,4 @@
-# Tides CO V2
+# Tides V2
 
 ## Scope
 
@@ -6,150 +6,249 @@ This spec replaces the old faction-like tide system for quest drafting.
 In the new system, a Dreamcaller points at a curated set of tide mini-decks.
 The run's draft pool is built once, up front, by combining those tides into a
 multiset of about 200 cards.
+
 Runtime data is intentionally minimal:
+
 - Per card: `tides = [tide_id, ...]`
 - Per Dreamcaller: `mandatory_tides = [...]`, `optional_tides = [...]`
+
 No other per-card labels, scores, or weights are used at runtime.
 `notes/all_input_batches.json` remains a design-time aid only.
 
 ## Core Position
 
 A tide is a draft package, not a faction and not a micro-tag.
-A good tide contains enough of a real deck to matter: game plan, curve,
-interaction, enablers, and payoffs.
-A bad tide is a half-engine like "discard outlets" or "discard payoffs."
-Those are assignment heuristics, not shipping tides.
-This system uses hybrid granularity:
-- 12 structural tides: large, self-contained deck shells
-- 8 support tides: secondary packages that change how a shell plays
-- 10 utility tides: curve, interaction, selection, and finishers
-This starts at 30 tides total.
-The rough idea of "25-50 cards per tide" and "about 10 tides per card" does
-not fit a 580-card pool; it implies well over 100 tides and too much duplicate
-pressure. The target is instead:
-- 30 tides total
-- mean tide size about 55 cards
-- mean card membership about 2.8-3.0 tides
-That gives real overlap without making every good card appear in every run.
+A good tide changes what a run feels like to draft.
+
+This system uses three layers:
+
+- Structural tides: full deck shells with a real plan and real finishers
+- Support tides: smaller, overlap-friendly splash packages that skew a shell
+- Utility tides: broad floor packages for curve, interaction, and texture
+
+Support tides are intentionally allowed to overlap heavily with structural
+tides.
+That is not a bug.
+One of their jobs is to let a Dreamcaller borrow some setup, early plays,
+interaction, or glue from a neighboring archetype without importing that
+archetype's full closer suite.
+
+This means a support tide may be more enabler-heavy than a structural tide.
+That is also fine.
+What is not fine is a shipping tide that is so tiny or abstract that it does
+not draft like a useful package.
+"Discard outlets" by itself is too atomized.
+"Event setup" or "void setup" is acceptable if it gives another deck a real
+play pattern, not just a keyword pile.
+
+This revision expands the library because the current card pool supports more
+meaningful packages than the original 30-tide proposal.
+The target is:
+
+- 42 tides total
+- 16 structural tides
+- 13 support tides
+- 13 utility tides
+- mean tide size about 40-44 cards
+- mean card membership about 3.0-3.2 tides
+
+That gives more precise Dreamcaller mapping while still keeping overlap under
+control.
 
 ## Tide Library
 
-Structural tides are the only tides that may anchor a Dreamcaller package.
-Each should be independently draftable if paired with basic utility tides.
-Structural tides:
+Structural tides are the main identity packages.
+These are the only tides that may anchor a Dreamcaller.
+Each should be independently draftable if paired with a few utility tides.
 
-- `warrior_pressure`: low-curve Warriors, spark buffs, direct scoring pressure
-- `warrior_bastion`: sticky Warriors, favorable trades, slower board control
+### Structural Tides
+
+- `warrior_pressure`: low-curve Warriors, direct spark buffs, point racing,
+  aggressive battlefield snowball
+- `warrior_bastion`: sticky Warriors, favorable trades, attrition tools,
+  defensive board control
 - `spirit_growth`: Spirit Animals, ramp, top-of-deck play, board snowball
-- `spirit_judgment`: Spirit boards that turn Judgment triggers into engines
-- `materialize_value`: ETB/materialized value, copies, repeat triggers
-- `materialize_tempo`: bounce, blink, temporary banish, fast tempo play
-- `event_chain`: event density, cost reduction, copying, burst turns
-- `event_control`: reactive events, prevents, taxes, pace control
-- `discard_velocity`: self-discard, hand churn, discard rewards, burst turns
-- `void_recursion`: self-mill, reclaim, void-as-hand, recursive threats
-- `abandon_furnace`: abandon outlets, sacrifice value, leave-play conversion
-- `figment_swarm`: token generation, token multiplication, go-wide payoffs
+- `spirit_judgment`: Spirit boards that turn Judgment triggers into energy,
+  spark growth, and repeated phase value
+- `materialize_value`: ETB/materialized value, copies, repeat triggers, steady
+  advantage
+- `materialize_tempo`: bounce, blink, temporary banish, fast pressure, and
+  replay timing
+- `event_chain`: event density, cost reduction, copying, burst sequencing,
+  spell-heavy turns
+- `event_control`: reactive events, prevents, taxes, denial, and pace control
+- `discard_velocity`: self-discard, hand churn, burst draws, and discard-fueled
+  tempo
+- `void_recursion`: self-mill, reclaim, void-as-hand, recursive threats, and
+  void threshold payoffs
+- `abandon_furnace`: abandon outlets, sacrifice value, leave-play conversion,
+  and death-for-resource turns
+- `figment_swarm`: token generation, token multiplication, and go-wide
+  battlefield finishes
+- `survivor_dissolve`: Survivors, Dissolved triggers, death loops, void rebuys,
+  and sticky attrition
+- `judgment_engines`: extra Judgment phases, repeated Judgment triggers,
+  phase-scaling bodies, and phase-centric payoff turns
+- `character_velocity`: low-curve characters, deploy chaining, cost rebates,
+  and character-dense turns
+- `spark_tall`: kindle, concentrated spark growth, board compression, and
+  single-threat or two-threat pressure
 
-Structural tide target size: 65-85 cards.
+Structural tide target size: 55-70 cards.
 
-Each structural tide should roughly contain 10-16 low-cost starters, 12-20
-engine cards, 8-14 interaction cards, 8-14 payoffs/closers, and 10-20 bridge
-cards that connect to support or utility tides.
+Each structural tide should roughly contain:
 
-Support tides are smaller draft packages that can tilt the same Dreamcaller
-into different versions of its plan. A support tide may not ship as only
-enablers or only payoffs.
+- 8-14 low-cost starters
+- 10-16 engine cards
+- 6-10 interaction cards
+- 6-10 payoffs or closers
+- 8-14 bridge cards that connect to support or utility tides
+
+### Support Tides
+
+Support tides are smaller packages that tilt the same Dreamcaller into
+different versions of its plan.
+They are allowed to overlap with structural tides on purpose.
+In practice, many support tides will function as the splashable slice of a
+larger shell.
+
+Typical support tide contents:
+
+- starters and setup cards
+- low-commitment glue cards
+- mild or medium-strength payoffs
+- interaction that reinforces the package's texture
+
+Typical support tide contents should not include most of a shell's most
+exclusive closers.
+If a support tide carries too many must-have payoffs, it is probably a hidden
+structural tide.
 
 Support tides:
-- `big_energy`: temporary and permanent energy bursts plus energy sinks
-- `fast_matters`: rewards playing on the opponent's turn or with fast cards
+
+- `big_energy`: temporary and permanent energy bursts plus flexible sinks
+- `fast_matters`: rewards for playing on the opponent's turn or with fast cards
 - `hand_cycling`: extra draw-discard loops and hand sculpting
 - `reclaim_characters`: repeated recovery and replay of characters
 - `reclaim_events`: repeated recovery and replay of events
-- `spark_control`: shrink, swap, steal, or flatten spark values
-- `wide_board_payoffs`: ally-count rewards for wide battlefield plans
-- `leave_play_payoffs`: value when allies are abandoned, banished, dissolved
+- `spark_growth`: splashable spark buffs, kindle chains, and concentrated
+  scaling for one or a few allies
+- `spark_disruption`: shrink, flatten, steal, or otherwise manipulate enemy
+  spark totals
+- `go_wide_enablers`: cheap extra bodies, ally-count glue, modest team buffs,
+  and board-flood setup
+- `leave_play_enablers`: sacrifice, bounce, banish, and dissolve bridges that
+  let other shells exploit leave-play cards
+- `bounce_blink_tools`: ally return, temporary banish, replay setup, and
+  materialized-value reuse
+- `void_setup`: self-mill, discard-to-void, threshold setup, and void stocking
+  without full recursion payoff concentration
+- `judgment_repeaters`: extra phases, trigger-copying, and generic Judgment
+  setup that can splash into non-Judgment decks
+- `event_setup`: cheap events, cost smoothing, event draw, and light event
+  texture without most `event_chain` closers
 
-Support tide target size: 40-65 cards.
+Support tide target size: 28-45 cards.
 
-Utility tides are the floor that keeps a pool draftable. They should be broadly
-good, but each still needs one clean role.
+### Utility Tides
 
-Utility tides:
-- `cheap_curve`: generically good 0-2 cost starters
-- `defensive_curve`: blockers, reserve-friendly bodies, stabilizers
-- `card_flow`: generic draw and hand refuel
-- `foresee_selection`: smoothing, selection, setup
-- `cheap_removal`: efficient but conditional answers
-- `premium_removal`: slower or rarer unconditional answers
-- `fast_interaction`: prevents, bounce, combat-speed disruption
-- `sweepers`: reset buttons and anti-wide punishment
-- `finishers`: top-end threats and closing tools
-- `void_denial`: banish, void hate, anti-recursion tools
-
-Utility tide target size: 25-50 cards.
-
+Utility tides are the draft floor.
+They should be broadly good, but each still needs one clean role.
 If a card is only good in one shell, it belongs in a structural or support
 tide instead.
+
+Utility tides:
+
+- `cheap_curve`: generically good 0-2 cost starters
+- `defensive_curve`: blockers, reserve-friendly bodies, and stabilizers
+- `midcurve_glue`: generic 3-5 cost role-players that fill turns without heavy
+  synergy demands
+- `card_flow`: generic draw and hand refuel
+- `foresee_selection`: smoothing, selection, and setup
+- `resource_burst`: broadly useful energy gain, rebates, and flexible sinks
+- `cheap_removal`: efficient but conditional answers
+- `premium_removal`: slower or rarer unconditional answers
+- `fast_interaction`: prevents, bounce, and combat-speed disruption
+- `hand_disruption`: discard, taxes, and card-denial pressure
+- `sweepers`: reset buttons and anti-wide punishment
+- `finishers`: top-end threats and closing tools
+- `void_denial`: banish, void hate, and anti-recursion tools
+
+Utility tide target size: 18-32 cards.
 
 ## Card Metadata
 
 Every main-pool card gets a tide membership list and nothing else:
-`tides = ["discard_velocity", "hand_cycling", "cheap_removal"]`
+`tides = ["discard_velocity", "void_setup", "cheap_removal"]`
 
 Assignment targets:
-- narrow build-arounds or tribal signposts: 1-2 tides
-- ordinary synergy pieces: 2-3 tides
-- true bridge cards: 3-4 tides
-- generic utility cards: 4-6 tides
-- exceptional all-purpose staples: 7-8 tides, very rare
 
-Global target: average 2.8-3.0 tides per card.
+- narrow build-arounds or tribal signposts: 1-2 tides
+- ordinary synergy pieces: 2-4 tides
+- splashable setup cards or true bridge cards: 3-5 tides
+- generic utility cards: 4-6 tides
+- exceptional all-purpose staples: 6-8 tides, very rare
+
+Global target: average 3.0-3.2 tides per card.
 
 Hard rules:
+
 - every card must belong to at least 1 tide
-- most cards should stop at 4 tides
-- if a card wants 5+ tides, ask whether it should instead live in a utility
-  tide that many Dreamcallers can include
+- most cards should stop at 5 tides
+- if a card wants 6+ tides, ask whether its role should instead be captured by
+  a support or utility tide
 - do not add a tide just because the card mentions a mechanic
-- add a tide only if a drafter in that package would be happy to take the card
-  in the first half of a run
+- add a structural or support tide only if a drafter in that package would be
+  happy to take the card in the first half of a run
+- add a support tide only if another shell can actively use that card without
+  needing the source shell's full payoff package
 
 ## Dreamcaller Data
 
 Every Dreamcaller gets:
-- 4 mandatory tides
-- 8 optional tides
+
+- 4 mandatory tides on average
+- 8-10 optional tides on average
 
 Mandatory tide rules:
+
 - at least 2 must be structural tides
-- at least 1 must provide curve or interaction floor
+- at least 1 must provide curve, interaction, or setup floor through support or
+  utility
 - mandatory-only pool must already represent a coherent deck shell
 - mandatory-only pool size target: 110-150 cards after duplicate capping
 
 Optional tide rules:
+
 - they create run variance, not basic functionality
 - at least 2 should reinforce the main plan
-- at least 2 should open real side branches
+- at least 2 should pull in overlapping support slices from neighboring shells
 - at least 2 should improve generic texture, not identity
+- if the same optional tide appears in nearly every legal subset through pure
+  size pressure, it should probably be mandatory instead
 
-Desired feel: same Dreamcaller, same mechanical spine every run; different
-Dreamcaller, clearly different spine; repeat runs with one Dreamcaller,
-noticeably different side packages.
+Desired feel:
+
+- same Dreamcaller, same mechanical spine every run
+- different Dreamcaller, clearly different spine
+- repeat runs with one Dreamcaller, noticeably different side packages
+- support tides should often change how a shell drafts without changing what
+  the shell fundamentally is
 
 ## Pool Construction
 
-The run's pool is fixed at Dreamcaller selection time. There is no later tide
-weighting based on draft picks.
+The run's pool is fixed at Dreamcaller selection time.
+There is no later tide weighting based on draft picks.
 
 Definitions:
+
 - `S`: selected tides for the run
 - `count(card, S)`: number of tides in `S` that contain the card
 - `copies(card, S) = min(2, count(card, S))`
 - `pool_size(S) = sum over all cards of copies(card, S)`
 
 Algorithm:
+
 1. The player chooses a Dreamcaller.
 2. Set `mandatory = dreamcaller.mandatory_tides`.
 3. Enumerate every subset of `dreamcaller.optional_tides` of size 3 and 4.
@@ -162,14 +261,16 @@ Algorithm:
 9. If no legal subset exists, the Dreamcaller data is invalid and must be
    redesigned; do not ship runtime fallback logic.
 10. Build the draft multiset with `copies(card, S)`.
-With 8 optional tides, the largest search is only
-`C(8, 3) + C(8, 4) = 126` subsets, so exact subset search is cheap and easy to
-audit.
+
+With 10 optional tides, the largest search is only
+`C(10, 3) + C(10, 4) = 330` subsets, so exact subset search is still cheap and
+easy to audit.
 
 ## Offer Generation
 
 After the pool is built, drafting is uniform from the remaining multiset.
 For each 4-card offer:
+
 1. Sample card names from the remaining pool with probability proportional to
    remaining copies.
 2. A single offer may not contain the same card name twice.
@@ -179,68 +280,121 @@ For each 4-card offer:
 Duplicate cards therefore matter across the run, not inside one offer.
 
 ## Assignment Process
+
 Card assignment should be done top-down.
+
 1. Write tide briefs.
-For each of the 30 tides, write one short brief covering what the deck is
-trying to do, what battlefield pattern it wants, what cards it needs early,
-mid, and late, and what support tides naturally pair with it.
-2. Anchor structural membership.
-Give every card one best home first. Ask what deck most wants this card and
-what deck misses something important if this card is absent. That answer
-becomes the card's first tide.
-3. Add genuine secondary homes.
-Add a second or third tide only when the card changes how another package can
-draft. Good reasons:
-- it is a true bridge card between two structural plans
-- it is a payoff inside one plan and a stabilizer inside another
-- it is the kind of glue a specific utility tide is meant to provide
+For each tide, write one short brief covering what the package is trying to do,
+what battlefield pattern it wants, what cards it needs early, mid, and late,
+and what it deliberately does not try to include.
+
+2. Build structural shells first.
+Each structural tide needs enough curve, interaction, and closers to feel like
+an actual deck when paired with a few utility tides.
+
+3. Cut support slices out of the structural spaces.
+For each major archetype, identify what another deck would want to borrow:
+setup, early plays, role compression, light recursion, safe interaction,
+moderate payoffs, or threshold enablers.
+Move those cards into support tides without moving most of the parent shell's
+most exclusive win conditions.
+
+4. Anchor every card in one best home.
+Ask what package most wants this card and what package misses something
+important if this card is absent.
+That answer becomes the card's first tide.
+
+5. Add genuine secondary homes.
+Add a second, third, or fourth tide only when the card materially changes how
+another package can draft.
+
+Good reasons:
+
+  - it is a true bridge card between two structural plans
+  - it is the splashable setup piece of one shell and real glue in another
+  - it is a payoff in one plan and a stabilizer in another
+  - it is the kind of broad role-player a specific utility tide is meant to
+    provide
+
 Bad reasons:
-- it contains a keyword that appears in the tide's theme
-- it can technically be played there
-- it needs to be somewhere and "this is close enough"
-4. Add utility membership last.
-This prevents good generic cards from being dumped into too many shells before
-real archetype identity is clear.
-5. Audit overlap.
-Overlap is a tool, not a goal. Remove memberships that do not create meaningful
-run-to-run differences. Optional tide selection should change the pool's
-texture, not just re-add the same staples twice.
+
+  - it contains a keyword that appears in the tide's theme
+  - it can technically be played there
+  - it needs to be somewhere and "this is close enough"
+
+6. Audit subset pressure.
+Optional tide selection should change the pool's texture, not just re-add the
+same staples twice.
+If a support tide is always selected because it is the only way to make the
+math work, the Dreamcaller package is not actually well-shaped.
+
 ## Validation
+
 Global validation:
+
 - every card has 1-8 tides
-- fewer than 15 cards in the full game should have 7-8 tides
+- fewer than 20 cards in the full game should have 7-8 tides
 - every structural tide is independently recognizable in packs
-- no support tide is a half-engine
+- every support tide has a clear job as a splash package, not just a mechanic
+  bucket
+- no support tide should be mostly dead without one specific structural tide
+- no support tide should contain most of one shell's exclusive closers
 - no utility tide contains cards that are dead outside one shell
+
 Dreamcaller validation:
+
 - mandatory-only size is `110-150`
 - at least 12 preferred optional subsets exist in the `190-210` size band
 - average final pool size across preferred subsets is `195-205`
-- average number of doubled cards in a final pool is `8-20`
-- no optional tide appears in every preferred subset through pure size pressure;
-  if that happens, it should probably be mandatory
+- average number of doubled cards in a final pool is `8-24`
+- no optional tide appears in every preferred subset through pure size pressure
+- at least some preferred subsets should differ because of support-overlap
+  choices, not only because of swapping one structural tide for another
+
 ## Example Dreamcaller Packages
+
 Self-discard Dreamcaller:
-- mandatory: `discard_velocity`, `hand_cycling`, `card_flow`,
-  `cheap_removal`
-- optional: `void_recursion`, `reclaim_events`, `event_chain`,
-  `fast_matters`, `premium_removal`, `finishers`, `leave_play_payoffs`,
-  `spark_control`
-Result: some runs lean hard into void recursion, others become event-heavy
-velocity decks, but the discard core always exists.
+
+- mandatory: `discard_velocity`, `void_recursion`, `cheap_removal`,
+  `card_flow`
+- optional: `hand_cycling`, `void_setup`, `event_setup`, `reclaim_events`,
+  `fast_interaction`, `finishers`, `judgment_repeaters`, `resource_burst`,
+  `void_denial`
+
+Result: some runs stay pure discard-void attrition, while others borrow cheap
+event texture and replay setup without importing most `event_chain` closers.
+
 Warrior control Dreamcaller:
+
 - mandatory: `warrior_bastion`, `defensive_curve`, `cheap_removal`,
   `card_flow`
-- optional: `warrior_pressure`, `figment_swarm`, `wide_board_payoffs`,
-  `event_control`, `premium_removal`, `sweepers`, `finishers`,
-  `spark_control`
+- optional: `warrior_pressure`, `spark_tall`, `go_wide_enablers`,
+  `figment_swarm`, `event_control`, `premium_removal`, `sweepers`,
+  `finishers`, `resource_burst`
+
 Result: some runs stay pure attrition-control, while others branch into wider
-token boards or a more proactive Warrior finish.
+Warrior floods or a taller spark endgame.
+
+Materialize tempo Dreamcaller:
+
+- mandatory: `materialize_tempo`, `materialize_value`, `fast_interaction`,
+  `card_flow`
+- optional: `bounce_blink_tools`, `fast_matters`, `judgment_repeaters`,
+  `go_wide_enablers`, `premium_removal`, `finishers`, `big_energy`,
+  `event_setup`, `spark_growth`
+
+Result: some runs stay blink-tempo, while others borrow extra ETB reuse, fast
+play texture, or board-flood side plans without changing the core identity.
+
 ## Rejected Models
+
 - Do not recreate the old seven-tide color wheel. This system is about curated
   packages, not faction identity.
-- Do not use ultra-small "mechanic atom" tides as shipping content. They create
-  bookkeeping, not draft meaning.
+- Do not ban overlap between support and structural tides. That overlap is one
+  of the main reasons support tides exist.
+- Do not use ultra-small "mechanic atom" tides as shipping content. Support
+  tides may be enabler-leaning, but they still need to draft as coherent splash
+  packages.
 - Do not aim for 10 tides per card. That destroys variance and turns optional
   selection into duplicate inflation.
 - Do not use runtime card weights based on prior picks. The signal source
