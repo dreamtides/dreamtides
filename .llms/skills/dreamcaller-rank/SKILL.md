@@ -110,9 +110,10 @@ uuid,score,rendered_text
 
 Default delivery behavior:
 - write the completed ranking to `$RUN_DIR/final.csv`
-- if the user requested a specific destination path, copy or move the final file there
-- return a short pointer or note by default
-- print the full inline CSV only if the user explicitly asks for inline output
+- copy `$RUN_DIR/final.csv` to `notes/dreamcaller_rank_<timestamp>.txt` by default
+- if the user requested a specific destination path, write the final file there instead
+- return only a short pointer or note by default
+- do **not** print the full ranking inline in assistant output unless the user explicitly asks for inline output
 
 Score range: `0-100`.
 
@@ -124,7 +125,8 @@ Interpret scores as draft-value bands, not win-rate estimates:
 - `40-54`: replaceable support
 - `0-39`: low-priority, weak, or meaningfully off-plan
 
-The final output must contain only `uuid,score,rendered_text`.
+The final ranking file must contain only `uuid,score,rendered_text`.
+The assistant's chat output should be a short pointer to the written file, not the ranking rows.
 
 ## Core Ranking Lens
 
@@ -559,11 +561,21 @@ After the final merge, write `$RUN_DIR/final_explanations.jsonl`. One row per UU
 dreamcaller fit, infrastructure value, replaceability, or anti-synergy. For cards not
 touched by a reconciliation window, `window_note` may be `null`.
 
+Then write the user-facing ranking file under `notes/` unless the user asked for another
+destination path:
+
+```bash
+NOTES_OUTPUT="notes/dreamcaller_rank_$(date +%Y%m%d-%H%M%S).txt"
+cp "$RUN_DIR/final.csv" "$NOTES_OUTPUT"
+```
+
+Return only a short pointer to the written file unless the user explicitly asks for inline output.
+
 ## Practical Notes
 
 - Use a unique run directory under `/tmp` unless the user requests a repo path.
 - If subagents are unavailable, run the same phases locally in sequence.
-- Prefer file-first delivery for large rankings. The default product is `$RUN_DIR/final.csv`.
+- Prefer file-first delivery for large rankings. The default user-facing product is a `notes/dreamcaller_rank_<timestamp>.txt` file copied from `$RUN_DIR/final.csv`.
 - If the user asks why a card ranked where it did, answer from `final_explanations.jsonl` first.
 - Use nearby cards in `final.csv` for pairwise comparison.
 - Wait for merge commands to succeed before running dependent inspection commands or downstream logic.
