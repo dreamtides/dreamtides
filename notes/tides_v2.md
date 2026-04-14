@@ -40,18 +40,6 @@ that is so tiny or abstract that it does not draft like a useful package.
 acceptable if it gives another deck a real play pattern, not just a keyword
 pile.
 
-The target library is:
-
-- 43 tides total
-- 17 structural tides
-- 13 support tides
-- 13 utility tides
-- mean tide size about 40-44 cards
-- mean card membership about 3.0-3.2 tides
-
-That gives more precise Dreamcaller mapping while still keeping overlap under
-control.
-
 ## Tide Library
 
 Structural tides are the main identity packages. These are the only tides that
@@ -71,28 +59,48 @@ a few utility tides.
   advantage
 - `materialize_tempo`: bounce, blink, temporary banish, fast pressure, and
   replay timing
+- `ally_formation`: generic multi-ally battlefield decks, non-figment go-wide
+  payoffs, pair scoring, and formation-style spark scaling
 - `fast_tempo`: dense fast cards, hand-fast enablers, opponent-turn plays, and
   explicit fast-payoff bodies
 - `event_chain`: event density, cost reduction, copying, burst sequencing,
   spell-heavy turns
+- `play_many`: cards-played-this-turn payoff turns, cross-card burst chains,
+  sequencing rewards, and storm-style finishers that are not event-only
 - `prevent_control`: prevent chains, counterspell pressure, taxes, reactive
   events, and pace control
 - `discard_velocity`: self-discard, hand churn, burst draws, and discard-fueled
   tempo
 - `void_recursion`: self-mill, reclaim, void-as-hand, recursive threats, and
   void threshold payoffs
+- `deck_ladder`: top-of-deck access, cost-step upgrades, deck-to-battlefield
+  cheats, and deck-as-a-resource combo turns
 - `abandon_furnace`: abandon outlets, sacrifice value, leave-play conversion,
-  and death-for-resource turns
-- `figment_swarm`: token generation, token multiplication, and go-wide
-  battlefield finishes
+  death-for-resource turns, and sacrifice loops that are not mainly deck-ladder
+  chains
+- `figment_swarm`: figment generation, figment multiplication, figment-tribal
+  payoffs, and dedicated token-board finishes
 - `survivor_dissolve`: Survivors, Dissolved triggers, death loops, void rebuys,
-  and sticky attrition
+  sticky attrition, and allied-dissolve payoff shells
 - `judgment_engines`: extra Judgment phases, repeated Judgment triggers,
   phase-scaling bodies, and phase-centric payoff turns
 - `character_velocity`: low-curve characters, deploy chaining, cost rebates, and
-  character-dense turns
+  character-dense turns that stay centered on character count rather than
+  generic card-count burst
 - `spark_tall`: kindle, concentrated spark growth, board compression, and
   single-threat or two-threat pressure
+
+Structural lane notes:
+
+- `ally_formation` is the generic wide-board shell. `figment_swarm` is for
+  figment-specific token decks.
+- `event_chain` is event-density. `play_many` is for cards whose main reward is
+  how many total cards you played this turn.
+- `spirit_growth` may borrow some top-of-deck texture, but `deck_ladder` owns
+  the cards whose primary job is chaining off the top of the deck or upgrading
+  bodies from deck hits.
+- `abandon_furnace` owns sacrifice and resource-conversion loops. `deck_ladder`
+  owns abandon-to-upgrade or abandon-to-deck-cheat chains.
 
 Structural tide target size: 55-70 cards.
 
@@ -154,12 +162,14 @@ Support tides:
   let other shells exploit leave-play patterns without leave-play reward cards
 - `bounce_blink_tools`: ally return, temporary banish, replay setup, and cheap
   blink infrastructure without most materialized payoff cards
+- `topdeck_setup`: top-of-deck access, deck smoothing, deck stocking, and light
+  deck-cheat setup without ladder payoffs or repeat-chain closers
 - `void_setup`: self-mill, discard-to-void, threshold setup, and void stocking
   without void-threshold or reclaim payoff concentration
 - `judgment_repeaters`: extra phases, trigger-copying, and generic Judgment
   setup that can splash into non-Judgment decks without Judgment payoff cards
 - `event_setup`: cheap events, cost smoothing, cantrips, and sequencing tools
-  without event-count or second-event payoff cards
+  without event-count, second-event, or cards-played-this-turn payoff cards
 
 Support tide target size: 28-45 cards.
 
@@ -201,8 +211,6 @@ Assignment targets:
 - generic utility cards: 4-6 tides
 - exceptional all-purpose staples: 6-8 tides, very rare
 
-Global target: average 3.0-3.2 tides per card.
-
 Hard rules:
 
 - every card must belong to at least 1 tide
@@ -222,7 +230,7 @@ Hard rules:
 Every Dreamcaller gets:
 
 - 4 mandatory tides on average
-- 8-10 optional tides on average
+- 10 optional tides on average
 
 Mandatory tide rules:
 
