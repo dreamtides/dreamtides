@@ -3,36 +3,15 @@ import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { generateInitialAtlas } from "../atlas/atlas-generator";
 import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import {
+  selectDreamcallerOffer,
+  toSelectedDreamcaller,
+} from "../data/dreamcaller-selection";
 import { dreamcallerAccentTide } from "../data/quest-content";
 import { createDreamsign } from "../data/dreamsigns";
 import { initializeDraftState } from "../draft/draft-engine";
 import { logEvent } from "../logging";
 import type { DreamcallerContent } from "../types/content";
-import type { Dreamcaller } from "../types/quest";
-
-/** Pick 3 random Dreamcallers without replacement. */
-function selectStartingDreamcallers(
-  dreamcallers: readonly DreamcallerContent[],
-): DreamcallerContent[] {
-  const pool = [...dreamcallers];
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  return pool.slice(0, 3);
-}
-
-function toSelectedDreamcaller(dreamcaller: DreamcallerContent): Dreamcaller {
-  const tide = dreamcallerAccentTide(dreamcaller);
-
-  return {
-    name: dreamcaller.name,
-    tide,
-    abilityDescription: dreamcaller.renderedText,
-    essenceBonus: 0,
-    tideCrystalGrant: tide,
-  };
-}
 
 /** Intro screen where the player picks a dreamcaller to start the quest. */
 export function QuestStartScreen() {
@@ -40,17 +19,24 @@ export function QuestStartScreen() {
 
   const offeredRef = useRef<DreamcallerContent[] | null>(null);
   if (offeredRef.current === null) {
-    offeredRef.current = selectStartingDreamcallers(questContent.dreamcallers);
+    offeredRef.current = selectDreamcallerOffer(questContent.dreamcallers);
   }
   const offered = offeredRef.current;
 
   const handlePickDreamcaller = useCallback(
     (dreamcaller: DreamcallerContent) => {
       const selectedDreamcaller = toSelectedDreamcaller(dreamcaller);
+      const resolvedPackage = questContent.resolvedPackagesByDreamcallerId.get(
+        dreamcaller.id,
+      );
+
+      if (resolvedPackage === undefined) {
+        throw new Error(`Missing resolved package for ${dreamcaller.id}`);
+      }
+
       const tide = selectedDreamcaller.tide;
       const excludedTides = NAMED_TIDES.filter((namedTide) => namedTide !== tide);
-      mutations.setChosenTide(tide);
-      mutations.setDreamcaller(selectedDreamcaller);
+      mutations.setDreamcallerSelection(selectedDreamcaller, resolvedPackage);
 
       const playerHasBanes =
         state.deck.some((e) => e.isBane) ||
@@ -64,7 +50,7 @@ export function QuestStartScreen() {
         excludedTides,
       });
 
-      const draftState = initializeDraftState(cardDatabase, tide);
+      const draftState = initializeDraftState(cardDatabase, resolvedPackage);
       mutations.setDraftState(draftState);
       mutations.updateAtlas(atlas);
 
@@ -79,6 +65,8 @@ export function QuestStartScreen() {
         dreamcallerAwakening: dreamcaller.awakening,
         packageTideCount:
           dreamcaller.mandatoryTides.length + dreamcaller.optionalTides.length,
+        selectedPackageTides: resolvedPackage.selectedTides,
+        draftPoolSize: resolvedPackage.draftPoolSize,
         dreamscapesGenerated: Object.keys(atlas.nodes).length - 1,
       });
 
@@ -89,7 +77,16 @@ export function QuestStartScreen() {
         mutations.setScreen({ type: "atlas" });
       }
     },
-    [state.completionLevel, state.deck, state.dreamsigns, state.essence, mutations, cardDatabase, questContent.dreamsignTemplates],
+    [
+      state.completionLevel,
+      state.deck,
+      state.dreamsigns,
+      state.essence,
+      mutations,
+      cardDatabase,
+      questContent.dreamsignTemplates,
+      questContent.resolvedPackagesByDreamcallerId,
+    ],
   );
 
   return (

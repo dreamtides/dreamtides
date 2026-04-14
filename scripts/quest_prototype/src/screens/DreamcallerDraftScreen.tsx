@@ -2,34 +2,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import {
+  selectDreamcallerOffer,
+  toSelectedDreamcaller,
+} from "../data/dreamcaller-selection";
 import { dreamcallerAccentTide } from "../data/quest-content";
 import { logEvent } from "../logging";
 import type { DreamcallerContent } from "../types/content";
-import type { Dreamcaller, SiteState } from "../types/quest";
-
-/** Returns 3 Dreamcallers in a stable random order for the current site visit. */
-function selectOfferedDreamcallers(
-  dreamcallers: readonly DreamcallerContent[],
-): DreamcallerContent[] {
-  const pool = [...dreamcallers];
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  return pool.slice(0, 3);
-}
-
-function toSelectedDreamcaller(dreamcaller: DreamcallerContent): Dreamcaller {
-  const tide = dreamcallerAccentTide(dreamcaller);
-
-  return {
-    name: dreamcaller.name,
-    tide,
-    abilityDescription: dreamcaller.renderedText,
-    essenceBonus: 0,
-    tideCrystalGrant: tide,
-  };
-}
+import type { SiteState } from "../types/quest";
 
 interface DreamcallerCardProps {
   dreamcaller: DreamcallerContent;
@@ -158,7 +138,7 @@ export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
   // Compute offered dreamcallers once on first render and keep stable.
   const offeredRef = useRef<DreamcallerContent[] | null>(null);
   if (offeredRef.current === null) {
-    offeredRef.current = selectOfferedDreamcallers(questContent.dreamcallers);
+    offeredRef.current = selectDreamcallerOffer(questContent.dreamcallers);
   }
   const offered = offeredRef.current;
 

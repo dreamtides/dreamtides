@@ -1,7 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   countPackageOverlap,
   isPackageAdjacent,
+  loadQuestContent,
   resolveDreamcallerPackage,
 } from "./quest-content";
 import type { DreamcallerContent, DreamsignTemplate } from "../types/content";
@@ -78,6 +79,10 @@ const DREAMSIGN_TEMPLATES: DreamsignTemplate[] = [
     packageTides: ["unused"],
   },
 ];
+
+beforeEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("countPackageOverlap", () => {
   it("counts shared package tides exactly once per shared entry", () => {
@@ -178,5 +183,51 @@ describe("resolveDreamcallerPackage", () => {
       "adjacent-sign",
       "mandatory-sign",
     ]);
+  });
+});
+
+describe("loadQuestContent", () => {
+  it("loads normalized assets and resolves packages once at runtime", async () => {
+    const cards = buildCards({
+      m1: 40,
+      m2: 40,
+      m3: 40,
+      o1: 20,
+      o2: 25,
+      o3: 30,
+      o4: 33,
+    });
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: string | URL) => {
+        const path = String(input);
+        if (path === "/card-data.json") {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve(cards),
+          });
+        }
+        if (path === "/dreamcaller-data.json") {
+          return Promise.resolve({
+            ok: true,
+            json: () =>
+              Promise.resolve([makeDreamcaller(["o1", "o2", "o3", "o4"])]),
+          });
+        }
+        return Promise.reject(new Error(`Unexpected fetch path: ${path}`));
+      }),
+    );
+
+    const content = await loadQuestContent();
+
+    expect(content.cardDatabase.size).toBe(cards.length);
+    expect(content.cardsByPackageTide.get("m1")).toHaveLength(40);
+    expect(content.dreamcallers).toHaveLength(1);
+    expect(content.resolvedPackagesByDreamcallerId.get("dreamcaller-1"))
+      .toMatchObject({
+        selectedTides: ["m1", "m2", "m3", "o2", "o3", "o4"],
+        draftPoolSize: 208,
+      });
   });
 });

@@ -247,7 +247,10 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
 
     let ds = state.draftState;
     if (ds === null) {
-      ds = initializeDraftState(cardDatabase, state.chosenTide ?? "Neutral");
+      if (state.resolvedPackage === null) {
+        return;
+      }
+      ds = initializeDraftState(cardDatabase, state.resolvedPackage);
     }
 
     // Deep clone to avoid mutating React state directly
@@ -262,7 +265,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
       .map((num) => cardDatabase.get(num))
       .filter((c): c is CardData => c !== undefined);
     setCurrentPackCards(sortCardsByTide(cards));
-  }, [state.draftState, state.chosenTide, cardDatabase, mutations]);
+  }, [state.draftState, state.resolvedPackage, cardDatabase, mutations]);
 
   // Resolve the current pack from draft state, sorted by tide
   const refreshPack = useCallback(() => {

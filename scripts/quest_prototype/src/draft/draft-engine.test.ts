@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { resetLog, getLogEntries } from "../logging";
 import type { CardData, Tide } from "../types/cards";
+import type { ResolvedDreamcallerPackage } from "../types/content";
 import {
   initializeDraftState,
   enterDraftSite,
@@ -59,14 +60,62 @@ function buildTideDB(
   return buildDB(cards);
 }
 
+function buildResolvedPackage(
+  copiesByCard: Record<number, number>,
+): ResolvedDreamcallerPackage {
+  return {
+    dreamcaller: {
+      id: "test-dreamcaller",
+      name: "Test Dreamcaller",
+      awakening: 4,
+      renderedText: "Test rules text.",
+      mandatoryTides: ["core"],
+      optionalTides: ["support-a", "support-b", "support-c"],
+    },
+    mandatoryTides: ["core"],
+    optionalSubset: ["support-a", "support-b", "support-c"],
+    selectedTides: ["accent:Bloom", "support-a", "support-b", "support-c"],
+    draftPoolCopiesByCard: Object.fromEntries(
+      Object.entries(copiesByCard).map(([cardNumber, copies]) => [
+        cardNumber,
+        copies,
+      ]),
+    ),
+    dreamsignPoolIds: [],
+    mandatoryOnlyPoolSize: 120,
+    draftPoolSize: Object.values(copiesByCard).reduce(
+      (total, copies) => total + copies,
+      0,
+    ),
+    doubledCardCount: Object.values(copiesByCard).filter((copies) => copies === 2)
+      .length,
+    legalSubsetCount: 1,
+    preferredSubsetCount: 1,
+  };
+}
+
+function buildIncludedCardCopies(
+  includedCardNumbers: number[],
+  copies = 1,
+): Record<number, number> {
+  return Object.fromEntries(
+    includedCardNumbers.map((cardNumber) => [cardNumber, copies]),
+  );
+}
+
 beforeEach(() => {
   resetLog();
 });
 
 describe("initializeDraftState", () => {
-  it("creates state with only chosen tide + Neutral cards", () => {
+  it("creates state from the resolved package pool", () => {
     const db = buildTideDB("Bloom", 10);
-    const state = initializeDraftState(db, "Bloom");
+    const state = initializeDraftState(
+      db,
+      buildResolvedPackage(buildIncludedCardCopies([
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+      ])),
+    );
     expect(state.pool.length).toBe(20); // 10 Bloom + 10 Neutral
     expect(state.draftedCards).toEqual([]);
     expect(state.pickNumber).toBe(1);
@@ -75,9 +124,14 @@ describe("initializeDraftState", () => {
     expect(state.seenCards).toEqual([]);
   });
 
-  it("excludes cards from other tides", () => {
+  it("excludes cards outside the resolved package pool", () => {
     const db = buildTideDB("Bloom", 10);
-    const state = initializeDraftState(db, "Bloom");
+    const state = initializeDraftState(
+      db,
+      buildResolvedPackage(buildIncludedCardCopies([
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+      ])),
+    );
 
     for (const cardNum of state.pool) {
       const card = db.get(cardNum)!;
@@ -85,9 +139,28 @@ describe("initializeDraftState", () => {
     }
   });
 
+  it("preserves duplicate copies from draftPoolCopiesByCard", () => {
+    const db = buildTideDB("Bloom", 10);
+    const state = initializeDraftState(
+      db,
+      buildResolvedPackage({
+        1: 2,
+        2: 1,
+        11: 2,
+      }),
+    );
+
+    expect(state.pool.filter((cardNumber) => cardNumber === 1)).toHaveLength(2);
+    expect(state.pool.filter((cardNumber) => cardNumber === 11)).toHaveLength(2);
+    expect(state.pool).not.toContain(21);
+  });
+
   it("logs pool initialization", () => {
     const db = buildTideDB("Bloom", 5);
-    initializeDraftState(db, "Bloom");
+    initializeDraftState(
+      db,
+      buildResolvedPackage(buildIncludedCardCopies([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])),
+    );
     const entries = getLogEntries();
     const initEvent = entries.find(
       (e) => e.event === "draft_pool_initialized",
@@ -100,7 +173,14 @@ describe("initializeDraftState", () => {
 describe("enterDraftSite and processPlayerPick", () => {
   it("draws a pack on entering draft site", () => {
     const db = buildTideDB("Bloom", 20);
-    const state = initializeDraftState(db, "Bloom");
+    const state = initializeDraftState(
+      db,
+      buildResolvedPackage(
+        buildIncludedCardCopies(
+          Array.from({ length: 40 }, (_, index) => index + 1),
+        ),
+      ),
+    );
     enterDraftSite(state, db);
     expect(state.currentPack.length).toBe(4);
     expect(state.sitePicksCompleted).toBe(0);
@@ -108,7 +188,14 @@ describe("enterDraftSite and processPlayerPick", () => {
 
   it("processes a player pick correctly", () => {
     const db = buildTideDB("Bloom", 20);
-    const state = initializeDraftState(db, "Bloom");
+    const state = initializeDraftState(
+      db,
+      buildResolvedPackage(
+        buildIncludedCardCopies(
+          Array.from({ length: 40 }, (_, index) => index + 1),
+        ),
+      ),
+    );
     enterDraftSite(state, db);
 
     const pack = [...state.currentPack];
@@ -129,7 +216,14 @@ describe("enterDraftSite and processPlayerPick", () => {
 
   it("tracks unpicked cards as seen", () => {
     const db = buildTideDB("Bloom", 20);
-    const state = initializeDraftState(db, "Bloom");
+    const state = initializeDraftState(
+      db,
+      buildResolvedPackage(
+        buildIncludedCardCopies(
+          Array.from({ length: 40 }, (_, index) => index + 1),
+        ),
+      ),
+    );
     enterDraftSite(state, db);
 
     const pack = [...state.currentPack];
@@ -147,14 +241,28 @@ describe("enterDraftSite and processPlayerPick", () => {
 
   it("throws when picking a card not in the pack", () => {
     const db = buildTideDB("Bloom", 20);
-    const state = initializeDraftState(db, "Bloom");
+    const state = initializeDraftState(
+      db,
+      buildResolvedPackage(
+        buildIncludedCardCopies(
+          Array.from({ length: 40 }, (_, index) => index + 1),
+        ),
+      ),
+    );
     enterDraftSite(state, db);
     expect(() => processPlayerPick(99999, state, db)).toThrow();
   });
 
   it("completes after SITE_PICKS picks", () => {
     const db = buildTideDB("Bloom", 40);
-    const state = initializeDraftState(db, "Bloom");
+    const state = initializeDraftState(
+      db,
+      buildResolvedPackage(
+        buildIncludedCardCopies(
+          Array.from({ length: 80 }, (_, index) => index + 1),
+        ),
+      ),
+    );
     enterDraftSite(state, db);
 
     for (let i = 0; i < SITE_PICKS; i++) {
@@ -175,7 +283,14 @@ describe("enterDraftSite and processPlayerPick", () => {
 describe("completeDraftSite", () => {
   it("logs the drafted cards", () => {
     const db = buildTideDB("Bloom", 40);
-    const state = initializeDraftState(db, "Bloom");
+    const state = initializeDraftState(
+      db,
+      buildResolvedPackage(
+        buildIncludedCardCopies(
+          Array.from({ length: 80 }, (_, index) => index + 1),
+        ),
+      ),
+    );
     enterDraftSite(state, db);
 
     for (let i = 0; i < SITE_PICKS; i++) {
@@ -220,7 +335,14 @@ describe("sortCardsByTide", () => {
 describe("draft state persistence across sites", () => {
   it("maintains pool and pick number across site visits", () => {
     const db = buildTideDB("Bloom", 40);
-    const state = initializeDraftState(db, "Bloom");
+    const state = initializeDraftState(
+      db,
+      buildResolvedPackage(
+        buildIncludedCardCopies(
+          Array.from({ length: 80 }, (_, index) => index + 1),
+        ),
+      ),
+    );
 
     // First site visit
     enterDraftSite(state, db);

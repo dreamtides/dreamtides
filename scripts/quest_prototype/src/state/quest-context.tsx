@@ -10,6 +10,7 @@ import {
 import type { QuestContent } from "../data/quest-content";
 import type { CardData, Tide } from "../types/cards";
 import { NAMED_TIDES } from "../data/card-database";
+import type { ResolvedDreamcallerPackage } from "../types/content";
 import type {
   DeckEntry,
   DreamAtlas,
@@ -37,6 +38,10 @@ export interface QuestMutations {
     effectDetails: Record<string, unknown>,
   ) => void;
   setDreamcaller: (dreamcaller: Dreamcaller) => void;
+  setDreamcallerSelection: (
+    dreamcaller: Dreamcaller,
+    resolvedPackage: ResolvedDreamcallerPackage,
+  ) => void;
   addDreamsign: (dreamsign: Dreamsign, sourceSiteType: string) => void;
   removeDreamsign: (index: number, reason: string) => void;
   addTideCrystal: (tide: Tide, count: number) => void;
@@ -75,6 +80,7 @@ function createDefaultState(): QuestState {
     essence: 250,
     deck: [],
     dreamcaller: null,
+    resolvedPackage: null,
     dreamsigns: [],
     tideCrystals: {
       Bloom: 0,
@@ -239,6 +245,34 @@ export function QuestProvider({
     setState((prev) => ({ ...prev, dreamcaller }));
   }, []);
 
+  const setDreamcallerSelection = useCallback(
+    (
+      dreamcaller: Dreamcaller,
+      resolvedPackage: ResolvedDreamcallerPackage,
+    ) => {
+      const excludedTides = NAMED_TIDES.filter((t) => t !== dreamcaller.tide);
+
+      logEvent("dreamcaller_selected", {
+        name: dreamcaller.name,
+        tide: dreamcaller.tide,
+        essenceBonus: dreamcaller.essenceBonus,
+        dreamcallerId: resolvedPackage.dreamcaller.id,
+        selectedPackageTides: resolvedPackage.selectedTides,
+        draftPoolSize: resolvedPackage.draftPoolSize,
+        dreamsignPoolSize: resolvedPackage.dreamsignPoolIds.length,
+      });
+      logEvent("tide_chosen", { chosenTide: dreamcaller.tide, excludedTides });
+      setState((prev) => ({
+        ...prev,
+        dreamcaller,
+        resolvedPackage,
+        chosenTide: dreamcaller.tide,
+        excludedTides,
+      }));
+    },
+    [],
+  );
+
   const addDreamsign = useCallback(
     (dreamsign: Dreamsign, sourceSiteType: string) => {
       setState((prev) => {
@@ -395,6 +429,7 @@ export function QuestProvider({
       removeCard,
       transfigureCard,
       setDreamcaller,
+      setDreamcallerSelection,
       addDreamsign,
       removeDreamsign,
       addTideCrystal,
@@ -415,6 +450,7 @@ export function QuestProvider({
       removeCard,
       transfigureCard,
       setDreamcaller,
+      setDreamcallerSelection,
       addDreamsign,
       removeDreamsign,
       addTideCrystal,

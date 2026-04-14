@@ -1,4 +1,5 @@
 import type { CardData, Tide } from "../types/cards";
+import type { ResolvedDreamcallerPackage } from "../types/content";
 import type { DraftConfig, DraftState, PackContext } from "../types/draft";
 import { cardAccentTide, NAMED_TIDES } from "../data/card-database";
 import { logEvent } from "../logging";
@@ -105,20 +106,41 @@ function countByTide(
   return counts;
 }
 
-/** Create initial DraftState, filtering to the chosen tide + Neutral. */
+function expandDraftPool(
+  cardDatabase: Map<number, CardData>,
+  draftPoolCopiesByCard: Record<string, number>,
+): number[] {
+  const pool: number[] = [];
+
+  for (const [cardNumberText, copies] of Object.entries(draftPoolCopiesByCard)) {
+    const cardNumber = Number(cardNumberText);
+    if (!Number.isInteger(cardNumber) || !cardDatabase.has(cardNumber)) {
+      continue;
+    }
+
+    for (let copyIndex = 0; copyIndex < copies; copyIndex += 1) {
+      pool.push(cardNumber);
+    }
+  }
+
+  return pool;
+}
+
+/** Create initial DraftState from the resolved Dreamcaller package. */
 export function initializeDraftState(
   cardDatabase: Map<number, CardData>,
-  chosenTide: Tide,
+  resolvedPackage: ResolvedDreamcallerPackage,
 ): DraftState {
-  const pool = Array.from(cardDatabase.keys()).filter((cardNum) => {
-    const card = cardDatabase.get(cardNum);
-    return card !== undefined &&
-      (cardAccentTide(card) === chosenTide || cardAccentTide(card) === "Neutral");
-  });
+  const pool = expandDraftPool(
+    cardDatabase,
+    resolvedPackage.draftPoolCopiesByCard,
+  );
 
   logEvent("draft_pool_initialized", {
     poolSize: pool.length,
-    chosenTide,
+    chosenTide: cardAccentTide({ tides: resolvedPackage.selectedTides }),
+    dreamcallerId: resolvedPackage.dreamcaller.id,
+    selectedPackageTides: resolvedPackage.selectedTides,
     cardCountByTide: countByTide(pool, cardDatabase),
     packStrategy: { type: "depletion" },
   });

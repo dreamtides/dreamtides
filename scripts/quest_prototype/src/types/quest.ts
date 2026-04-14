@@ -1,4 +1,5 @@
 import type { Tide } from "./cards";
+import type { ResolvedDreamcallerPackage } from "./content";
 import type { DraftState } from "./draft";
 
 /** Badge applied to a card via a Transfiguration site. */
@@ -92,6 +93,7 @@ export interface QuestState {
   essence: number;
   deck: DeckEntry[];
   dreamcaller: Dreamcaller | null;
+  resolvedPackage: ResolvedDreamcallerPackage | null;
   dreamsigns: Dreamsign[];
   tideCrystals: Record<Tide, number>;
   completionLevel: number;

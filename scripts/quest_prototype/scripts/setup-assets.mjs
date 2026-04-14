@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { resolve, join } from "node:path";
 import { homedir } from "node:os";
 import { execSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
 import { parse } from "smol-toml";
 
 const ROOT = resolve(import.meta.dirname, "..");
@@ -11,10 +12,6 @@ const PROJECT_ROOT = resolve(ROOT, "..", "..");
 const IMAGE_CACHE_DIR = join(homedir(), "Library", "Caches", "io.github.dreamtides.tv", "image_cache");
 
 const PUBLIC_DIR = join(ROOT, "public");
-const CARDS_DIR = join(PUBLIC_DIR, "cards");
-const TIDES_DIR = join(PUBLIC_DIR, "tides");
-const CARD_JSON_PATH = join(PUBLIC_DIR, "card-data.json");
-const DREAMCALLER_JSON_PATH = join(PUBLIC_DIR, "dreamcaller-data.json");
 
 /**
  * Find the main git worktree root for resolving untracked assets. Falls back
@@ -63,7 +60,7 @@ function kebabToCamel(str) {
  * Spark normalization: "" or missing becomes null; "*" (variable spark)
  * becomes null; integer values are preserved.
  */
-function transformCard(card) {
+export function transformCard(card) {
   const result = {};
   for (const [key, value] of Object.entries(card)) {
     const camelKey = kebabToCamel(key);
@@ -85,7 +82,7 @@ function transformCard(card) {
 /**
  * Convert a TOML Dreamcaller record to its JSON representation with camelCase keys.
  */
-function transformDreamcaller(dreamcaller) {
+export function transformDreamcaller(dreamcaller) {
   const result = {};
   for (const [key, value] of Object.entries(dreamcaller)) {
     result[kebabToCamel(key)] = value;
@@ -96,7 +93,7 @@ function transformDreamcaller(dreamcaller) {
 /**
  * Compute the SHA-256 hash of the Shutterstock URL for a given image number.
  */
-function imageHash(imageNumber) {
+export function imageHash(imageNumber) {
   const url = `https://www.shutterstock.com/image-illustration/-260nw-${imageNumber}.jpg`;
   return createHash("sha256").update(url).digest("hex");
 }
@@ -109,10 +106,35 @@ function recreateDir(dir) {
   mkdirSync(dir, { recursive: true });
 }
 
-function main() {
-  const cardTomlPath = resolveAssetPath("client", "Assets", "StreamingAssets", "Tabula", "rendered-cards.toml");
-  const dreamcallerTomlPath = resolveAssetPath("client", "Assets", "StreamingAssets", "Tabula", "dreamcallers.toml");
-  const tideIconsDir = resolveAssetPath("client", "Assets", "ThirdParty", "GameAssets", "Tides");
+export function setupAssets({
+  cardTomlPath = resolveAssetPath(
+    "client",
+    "Assets",
+    "StreamingAssets",
+    "Tabula",
+    "rendered-cards.toml",
+  ),
+  dreamcallerTomlPath = resolveAssetPath(
+    "client",
+    "Assets",
+    "StreamingAssets",
+    "Tabula",
+    "dreamcallers.toml",
+  ),
+  tideIconsDir = resolveAssetPath(
+    "client",
+    "Assets",
+    "ThirdParty",
+    "GameAssets",
+    "Tides",
+  ),
+  publicDir = PUBLIC_DIR,
+  imageCacheDir = IMAGE_CACHE_DIR,
+} = {}) {
+  const cardsDir = join(publicDir, "cards");
+  const tidesDir = join(publicDir, "tides");
+  const cardJsonPath = join(publicDir, "card-data.json");
+  const dreamcallerJsonPath = join(publicDir, "dreamcaller-data.json");
 
   console.log("Parsing rendered-cards.toml...");
   const cardTomlContent = readFileSync(cardTomlPath, "utf8");
@@ -133,8 +155,8 @@ function main() {
   const jsonCards = cards.map(transformCard);
 
   // Write card-data.json
-  mkdirSync(PUBLIC_DIR, { recursive: true });
-  writeFileSync(CARD_JSON_PATH, JSON.stringify(jsonCards, null, 2) + "\n");
+  mkdirSync(publicDir, { recursive: true });
+  writeFileSync(cardJsonPath, JSON.stringify(jsonCards, null, 2) + "\n");
   console.log(`Wrote ${jsonCards.length} cards to card-data.json`);
 
   console.log("Parsing dreamcallers.toml...");
@@ -148,7 +170,7 @@ function main() {
 
   const jsonDreamcallers = allDreamcallers.map(transformDreamcaller);
   writeFileSync(
-    DREAMCALLER_JSON_PATH,
+    dreamcallerJsonPath,
     JSON.stringify(jsonDreamcallers, null, 2) + "\n",
   );
   console.log(
@@ -156,14 +178,14 @@ function main() {
   );
 
   // Create card image symlinks
-  recreateDir(CARDS_DIR);
+  recreateDir(cardsDir);
   let linked = 0;
   let missing = 0;
 
   for (const card of jsonCards) {
     const hash = imageHash(card.imageNumber);
-    const cachePath = join(IMAGE_CACHE_DIR, hash);
-    const symlinkPath = join(CARDS_DIR, `${card.cardNumber}.webp`);
+    const cachePath = join(imageCacheDir, hash);
+    const symlinkPath = join(cardsDir, `${card.cardNumber}.webp`);
 
     if (existsSync(cachePath)) {
       symlinkSync(cachePath, symlinkPath);
@@ -177,7 +199,7 @@ function main() {
   console.log(`Linked ${linked} of ${jsonCards.length} card images (${missing} missing)`);
 
   // Copy tide icon PNGs
-  recreateDir(TIDES_DIR);
+  recreateDir(tidesDir);
 
   if (!existsSync(tideIconsDir)) {
     console.warn("Warning: tide icons directory not found, skipping tide icon copy");
@@ -187,7 +209,7 @@ function main() {
     );
 
     for (const file of tideFiles) {
-      copyFileSync(join(tideIconsDir, file), join(TIDES_DIR, file));
+      copyFileSync(join(tideIconsDir, file), join(tidesDir, file));
     }
 
     console.log(`Copied ${tideFiles.length} tide icons to public/tides/`);
@@ -196,4 +218,7 @@ function main() {
   console.log("Asset setup complete.");
 }
 
-main();
+if (process.argv[1] !== undefined &&
+  import.meta.url === pathToFileURL(process.argv[1]).href) {
+  setupAssets();
+}
